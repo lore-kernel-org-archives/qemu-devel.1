@@ -1,39 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50143)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53159)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1e4kPy-0008Ap-JU
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 05:13:42 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1e4kXB-00018o-2I
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 05:21:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1e4kPt-0003WU-Kw
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 05:13:38 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34198)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
-	id 1e4kPt-0003U5-CC
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 05:13:33 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v9I99VXV082117
-	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 05:13:26 -0400
-Received: from e18.ny.us.ibm.com (e18.ny.us.ibm.com [129.33.205.208])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2dp1867mer-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 05:13:25 -0400
-Received: from localhost
-	by e18.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
-	Wed, 18 Oct 2017 05:13:24 -0400
-Date: Wed, 18 Oct 2017 17:13:20 +0800
-From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-References: <20171017140453.51099-1-pasic@linux.vnet.ibm.com>
-	<20171017140453.51099-3-pasic@linux.vnet.ibm.com>
+	(envelope-from <pbonzini@redhat.com>) id 1e4kX9-0003fw-Iy
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 05:21:05 -0400
+References: <20171012185916.22776-1-eblake@redhat.com>
+	<20171012185916.22776-7-eblake@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <cd32b401-4571-2312-9e52-b3091c9561f5@redhat.com>
+Date: Wed, 18 Oct 2017 11:20:42 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171017140453.51099-3-pasic@linux.vnet.ibm.com>
-Message-Id: <20171018091320.GB5150@bjsdjshi@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v3 2/7] s390x/css: IO instr handler ending
- control
+In-Reply-To: <20171012185916.22776-7-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 06/20] iscsi: Switch
+ iscsi_allocmap_update() to byte-based
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,46 +25,226 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: Cornelia Huck <cohuck@redhat.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, famz@redhat.com, jsnow@redhat.com, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Peter Lieven <pl@kamp.de>, Max Reitz <mreitz@redhat.com>
 
-* Halil Pasic <pasic@linux.vnet.ibm.com> [2017-10-17 16:04:48 +0200]:
-
-[...]
-
-> diff --git a/include/hw/s390x/css.h b/include/hw/s390x/css.h
-> index 69b374730e..7e0dbd162f 100644
-> --- a/include/hw/s390x/css.h
-> +++ b/include/hw/s390x/css.h
-> @@ -99,6 +99,22 @@ typedef struct CcwDataStream {
->      hwaddr cda;
->  } CcwDataStream;
+On 12/10/2017 20:59, Eric Blake wrote:
+> We are gradually converting to byte-based interfaces, as they are
+> easier to reason about than sector-based.  Convert all uses of
+> the allocmap (no semantic change).  Callers that already had bytes
+> available are simpler, and callers that now scale to bytes will be
+> easier to switch to byte-based in the future.
 > 
-> +/*
-> + * IO instructions conclude according this. Currently we have only
-> + * cc codes. Valid values are 0,1,2,3 and the generic semantic for
-> + * IO instructions is described briefly. For more details consult the PoP.
-> + */
-> +typedef enum IOInstEnding {
-> +    /* produced expected result */
-> +    IOINST_CC_EXPECTED = 0,
-> +    /* status conditions were present or produced alternate result */
-> +    IOINST_CC_STATUS_PRESENT = 1,
-> +    /* inst. ineffective because busy with previously initiated function */
-> +    IOINST_CC_BUSY = 2,
-> +    /* inst. ineffective because not operational */
-> +    IOINST_CC_NOT_OPERATIONAL = 3
-> +} IOInstEnding;
-> +
->  typedef struct SubchDev SubchDev;
->  struct SubchDev {
->      /* channel-subsystem related things: */
-> -- 
-> 2.13.5
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> 
+> ---
+> v2: rebase to count/bytes rename
+> ---
+>  block/iscsi.c | 90 +++++++++++++++++++++++++++++------------------------------
+>  1 file changed, 44 insertions(+), 46 deletions(-)
+> 
+> diff --git a/block/iscsi.c b/block/iscsi.c
+> index 8f903d8370..4896d50d6e 100644
+> --- a/block/iscsi.c
+> +++ b/block/iscsi.c
+> @@ -455,24 +455,22 @@ static int iscsi_allocmap_init(IscsiLun *iscsilun, int open_flags)
+>  }
+> 
+>  static void
+> -iscsi_allocmap_update(IscsiLun *iscsilun, int64_t sector_num,
+> -                      int nb_sectors, bool allocated, bool valid)
+> +iscsi_allocmap_update(IscsiLun *iscsilun, int64_t offset,
+> +                      int64_t bytes, bool allocated, bool valid)
+>  {
+>      int64_t cl_num_expanded, nb_cls_expanded, cl_num_shrunk, nb_cls_shrunk;
+> -    int cluster_sectors = iscsilun->cluster_size >> BDRV_SECTOR_BITS;
+> 
+>      if (iscsilun->allocmap == NULL) {
+>          return;
+>      }
+>      /* expand to entirely contain all affected clusters */
+> -    assert(cluster_sectors);
+> -    cl_num_expanded = sector_num / cluster_sectors;
+> -    nb_cls_expanded = DIV_ROUND_UP(sector_num + nb_sectors,
+> -                                   cluster_sectors) - cl_num_expanded;
+> +    assert(iscsilun->cluster_size);
+> +    cl_num_expanded = offset / iscsilun->cluster_size;
+> +    nb_cls_expanded = DIV_ROUND_UP(offset + bytes, iscsilun->cluster_size)
+> +        - cl_num_expanded;
+>      /* shrink to touch only completely contained clusters */
+> -    cl_num_shrunk = DIV_ROUND_UP(sector_num, cluster_sectors);
+> -    nb_cls_shrunk = (sector_num + nb_sectors) / cluster_sectors
+> -                      - cl_num_shrunk;
+> +    cl_num_shrunk = DIV_ROUND_UP(offset, iscsilun->cluster_size);
+> +    nb_cls_shrunk = (offset + bytes) / iscsilun->cluster_size - cl_num_shrunk;
+>      if (allocated) {
+>          bitmap_set(iscsilun->allocmap, cl_num_expanded, nb_cls_expanded);
+>      } else {
+> @@ -495,26 +493,26 @@ iscsi_allocmap_update(IscsiLun *iscsilun, int64_t sector_num,
+>  }
+> 
+>  static void
+> -iscsi_allocmap_set_allocated(IscsiLun *iscsilun, int64_t sector_num,
+> -                             int nb_sectors)
+> +iscsi_allocmap_set_allocated(IscsiLun *iscsilun, int64_t offset,
+> +                             int64_t bytes)
+>  {
+> -    iscsi_allocmap_update(iscsilun, sector_num, nb_sectors, true, true);
+> +    iscsi_allocmap_update(iscsilun, offset, bytes, true, true);
+>  }
+> 
+>  static void
+> -iscsi_allocmap_set_unallocated(IscsiLun *iscsilun, int64_t sector_num,
+> -                               int nb_sectors)
+> +iscsi_allocmap_set_unallocated(IscsiLun *iscsilun, int64_t offset,
+> +                               int64_t bytes)
+>  {
+>      /* Note: if cache.direct=on the fifth argument to iscsi_allocmap_update
+>       * is ignored, so this will in effect be an iscsi_allocmap_set_invalid.
+>       */
+> -    iscsi_allocmap_update(iscsilun, sector_num, nb_sectors, false, true);
+> +    iscsi_allocmap_update(iscsilun, offset, bytes, false, true);
+>  }
+> 
+> -static void iscsi_allocmap_set_invalid(IscsiLun *iscsilun, int64_t sector_num,
+> -                                       int nb_sectors)
+> +static void iscsi_allocmap_set_invalid(IscsiLun *iscsilun, int64_t offset,
+> +                                       int64_t bytes)
+>  {
+> -    iscsi_allocmap_update(iscsilun, sector_num, nb_sectors, false, false);
+> +    iscsi_allocmap_update(iscsilun, offset, bytes, false, false);
+>  }
+> 
+>  static void iscsi_allocmap_invalidate(IscsiLun *iscsilun)
+> @@ -528,34 +526,30 @@ static void iscsi_allocmap_invalidate(IscsiLun *iscsilun)
+>  }
+> 
+>  static inline bool
+> -iscsi_allocmap_is_allocated(IscsiLun *iscsilun, int64_t sector_num,
+> -                            int nb_sectors)
+> +iscsi_allocmap_is_allocated(IscsiLun *iscsilun, int64_t offset,
+> +                            int64_t bytes)
+>  {
+>      unsigned long size;
+>      if (iscsilun->allocmap == NULL) {
+>          return true;
+>      }
+>      assert(iscsilun->cluster_size);
+> -    size = DIV_ROUND_UP(sector_num + nb_sectors,
+> -                        iscsilun->cluster_size >> BDRV_SECTOR_BITS);
+> +    size = DIV_ROUND_UP(offset + bytes, iscsilun->cluster_size);
+>      return !(find_next_bit(iscsilun->allocmap, size,
+> -                           sector_num * BDRV_SECTOR_SIZE /
+> -                           iscsilun->cluster_size) == size);
+> +                           offset / iscsilun->cluster_size) == size);
+>  }
+> 
+>  static inline bool iscsi_allocmap_is_valid(IscsiLun *iscsilun,
+> -                                           int64_t sector_num, int nb_sectors)
+> +                                           int64_t offset, int64_t bytes)
+>  {
+>      unsigned long size;
+>      if (iscsilun->allocmap_valid == NULL) {
+>          return false;
+>      }
+>      assert(iscsilun->cluster_size);
+> -    size = DIV_ROUND_UP(sector_num + nb_sectors,
+> -                        iscsilun->cluster_size >> BDRV_SECTOR_BITS);
+> +    size = DIV_ROUND_UP(offset + bytes, iscsilun->cluster_size);
+>      return (find_next_zero_bit(iscsilun->allocmap_valid, size,
+> -                               sector_num * BDRV_SECTOR_SIZE /
+> -                               iscsilun->cluster_size) == size);
+> +                               offset / iscsilun->cluster_size) == size);
+>  }
+> 
+>  static int coroutine_fn
+> @@ -637,12 +631,14 @@ retry:
+>      }
+> 
+>      if (iTask.status != SCSI_STATUS_GOOD) {
+> -        iscsi_allocmap_set_invalid(iscsilun, sector_num, nb_sectors);
+> +        iscsi_allocmap_set_invalid(iscsilun, sector_num * BDRV_SECTOR_SIZE,
+> +                                   nb_sectors * BDRV_SECTOR_SIZE);
+>          r = iTask.err_code;
+>          goto out_unlock;
+>      }
+> 
+> -    iscsi_allocmap_set_allocated(iscsilun, sector_num, nb_sectors);
+> +    iscsi_allocmap_set_allocated(iscsilun, sector_num * BDRV_SECTOR_SIZE,
+> +                                 nb_sectors * BDRV_SECTOR_SIZE);
+> 
+>  out_unlock:
+>      qemu_mutex_unlock(&iscsilun->mutex);
+> @@ -737,9 +733,11 @@ retry:
+>      }
+> 
+>      if (ret & BDRV_BLOCK_ZERO) {
+> -        iscsi_allocmap_set_unallocated(iscsilun, sector_num, *pnum);
+> +        iscsi_allocmap_set_unallocated(iscsilun, sector_num * BDRV_SECTOR_SIZE,
+> +                                       *pnum * BDRV_SECTOR_SIZE);
+>      } else {
+> -        iscsi_allocmap_set_allocated(iscsilun, sector_num, *pnum);
+> +        iscsi_allocmap_set_allocated(iscsilun, sector_num * BDRV_SECTOR_SIZE,
+> +                                     *pnum * BDRV_SECTOR_SIZE);
+>      }
+> 
+>      if (*pnum > nb_sectors) {
+> @@ -777,15 +775,19 @@ static int coroutine_fn iscsi_co_readv(BlockDriverState *bs,
+>      /* if cache.direct is off and we have a valid entry in our allocation map
+>       * we can skip checking the block status and directly return zeroes if
+>       * the request falls within an unallocated area */
+> -    if (iscsi_allocmap_is_valid(iscsilun, sector_num, nb_sectors) &&
+> -        !iscsi_allocmap_is_allocated(iscsilun, sector_num, nb_sectors)) {
+> +    if (iscsi_allocmap_is_valid(iscsilun, sector_num * BDRV_SECTOR_SIZE,
+> +                                nb_sectors * BDRV_SECTOR_SIZE) &&
+> +        !iscsi_allocmap_is_allocated(iscsilun, sector_num * BDRV_SECTOR_SIZE,
+> +                                     nb_sectors * BDRV_SECTOR_SIZE)) {
+>              qemu_iovec_memset(iov, 0, 0x00, iov->size);
+>              return 0;
+>      }
+> 
+>      if (nb_sectors >= ISCSI_CHECKALLOC_THRES &&
+> -        !iscsi_allocmap_is_valid(iscsilun, sector_num, nb_sectors) &&
+> -        !iscsi_allocmap_is_allocated(iscsilun, sector_num, nb_sectors)) {
+> +        !iscsi_allocmap_is_valid(iscsilun, sector_num * BDRV_SECTOR_SIZE,
+> +                                 nb_sectors * BDRV_SECTOR_SIZE) &&
+> +        !iscsi_allocmap_is_allocated(iscsilun, sector_num * BDRV_SECTOR_SIZE,
+> +                                     nb_sectors * BDRV_SECTOR_SIZE)) {
+>          int pnum;
+>          BlockDriverState *file;
+>          /* check the block status from the beginning of the cluster
+> @@ -1154,8 +1156,7 @@ retry:
+>          goto out_unlock;
+>      }
+> 
+> -    iscsi_allocmap_set_invalid(iscsilun, offset >> BDRV_SECTOR_BITS,
+> -                               bytes >> BDRV_SECTOR_BITS);
+> +    iscsi_allocmap_set_invalid(iscsilun, offset, bytes);
+> 
+>  out_unlock:
+>      qemu_mutex_unlock(&iscsilun->mutex);
+> @@ -1253,18 +1254,15 @@ retry:
+>      }
+> 
+>      if (iTask.status != SCSI_STATUS_GOOD) {
+> -        iscsi_allocmap_set_invalid(iscsilun, offset >> BDRV_SECTOR_BITS,
+> -                                   bytes >> BDRV_SECTOR_BITS);
+> +        iscsi_allocmap_set_invalid(iscsilun, offset, bytes);
+>          r = iTask.err_code;
+>          goto out_unlock;
+>      }
+> 
+>      if (flags & BDRV_REQ_MAY_UNMAP) {
+> -        iscsi_allocmap_set_invalid(iscsilun, offset >> BDRV_SECTOR_BITS,
+> -                                   bytes >> BDRV_SECTOR_BITS);
+> +        iscsi_allocmap_set_invalid(iscsilun, offset, bytes);
+>      } else {
+> -        iscsi_allocmap_set_allocated(iscsilun, offset >> BDRV_SECTOR_BITS,
+> -                                     bytes >> BDRV_SECTOR_BITS);
+> +        iscsi_allocmap_set_allocated(iscsilun, offset, bytes);
+>      }
+> 
+>  out_unlock:
 > 
 
-With what has been pointed out by Conny and Thomas addressed:
-Reviewed-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-
--- 
-Dong Jia Shi
+Acked-by: Paolo Bonzini <pbonzini@redhat.com>
