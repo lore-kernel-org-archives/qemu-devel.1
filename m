@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43375)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44196)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1e4kCT-0002u2-Gl
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 04:59:42 -0400
+	(envelope-from <bounces@canonical.com>) id 1e4kDv-0003or-L5
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 05:01:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1e4kCN-0007Vz-OW
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 04:59:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44540)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1e4kCN-0007Uk-FS
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 04:59:35 -0400
-Date: Wed, 18 Oct 2017 09:59:27 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20171018085927.GA2339@work-vm>
-References: <20171011191317.24157-1-dgilbert@redhat.com>
-	<20171011191317.24157-4-dgilbert@redhat.com>
-	<20171018033519.GM4166@pxdev.xzpeter.org>
+	(envelope-from <bounces@canonical.com>) id 1e4kDo-0000cA-Om
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 05:01:11 -0400
+Received: from indium.canonical.com ([91.189.90.7]:51072)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1e4kDo-0000bC-J4
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 05:01:04 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1e4kDl-0005qO-Ma
+	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 09:01:01 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 1438E2E80E2
+	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 09:01:00 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171018033519.GM4166@pxdev.xzpeter.org>
-Subject: Re: [Qemu-devel] [PATCH 3/7] migration: Wait for semaphore before
- completing migration
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 18 Oct 2017 08:46:49 -0000
+From: Christophe Lyon <christophe.lyon+launchpad@gmail.com>
+Reply-To: Bug 1724485 <1724485@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150831492991.17205.1365818841692773714.malonedeb@gac.canonical.com>
+Message-Id: <150831640922.22405.7110680437624228271.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1724485] Re: Invalid assertion in
+ arm_read_memory_func
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,135 +37,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, jdenemar@redhat.com, wangjie88@huawei.com, quintela@redhat.com, mreitz@redhat.com, berrange@redhat.com, eblake@redhat.com, fuweiwei2@huawei.com
+To: qemu-devel@nongnu.org
 
-* Peter Xu (peterx@redhat.com) wrote:
-> On Wed, Oct 11, 2017 at 08:13:13PM +0100, Dr. David Alan Gilbert (git) wrote:
-> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> > 
-> > Wait for a semaphore before completing the migration,
-> > if the previously added capability was enabled.
-> > 
-> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > ---
-> >  migration/migration.c | 47 +++++++++++++++++++++++++++++++++++++++++++++++
-> >  migration/migration.h |  3 +++
-> >  2 files changed, 50 insertions(+)
-> > 
-> > diff --git a/migration/migration.c b/migration/migration.c
-> > index e1a87c3d23..b411a7bb63 100644
-> > --- a/migration/migration.c
-> > +++ b/migration/migration.c
-> > @@ -1967,6 +1967,46 @@ fail:
-> >  }
-> >  
-> >  /**
-> > + * migration_maybe_pause: Pause if required to by migrate_pause_before_device
-> > + * called with the iothread locked
-> > + * Returns: 0 on success
-> > + */
-> > +static int migration_maybe_pause(MigrationState *s, int *current_active_state)
-> > +{
-> > +    int ret;
-> > +    if (!migrate_pause_before_device()) {
-> > +        return 0;
-> > +    }
-> > +    ret = bdrv_inactivate_all();
-> 
-> My understanding is that the crash was caused by mirrored block device
-> IO triggered after the inactivation, then... should we do this after
-> waiting for the semaphore (possibly at [1] below) to make sure the
-> block jobs are completed?  Or did I miss anything?
+The tarball contains:
+scoped1.exe
+etc/ld.so.cache
+lib/libm.so.6
+lib/libstdc++.so.6
+lib/lib.c.so.6
+lib/ld-linux-armhf.so.3
+lib/libgcc_s.so.1
 
-Ah you're right, just confirmed this with kwolf that I got it the
-wrong way around.
-I'll fix it.
+I can reproduce the problem with qemu-2.10.1:
+qemu-armeb -E LD_LIBRARY_PATH=3D$PWD/lib -cpu any -R 0 -d in_asm -L $PWD $P=
+WD/scoped1.exe
 
-Dave
+Removing '-d in_asm' works OK, because the offending assert is triggered
+while disassembling.
 
-> > +    if (ret) {
-> > +        error_report("%s: bdrv_inactivate_all() failed (%d)",
-> > +                     __func__, ret);
-> > +        return ret;
-> > +    }
-> > +
-> > +    s->block_inactive = true;
-> > +
-> > +    /* Since leaving this state is not atomic with posting the semaphore
-> > +     * it's possible that someone could have issued multiple migrate_continue
-> > +     * and the semaphore is incorrectly positive at this point;
-> > +     * the docs say it's undefined to reinit a semaphore that's already
-> > +     * init'd, so use timedwait to eat up any existing posts.
-> > +     */
-> > +    while (qemu_sem_timedwait(&s->pause_sem, 1) == 0);
-> > +
-> > +    qemu_mutex_unlock_iothread();
-> > +    migrate_set_state(&s->state, *current_active_state,
-> > +                      MIGRATION_STATUS_PAUSE_BEFORE_DEVICE);
-> > +    qemu_sem_wait(&s->pause_sem);
-> 
-> [1]
-> 
-> > +    migrate_set_state(&s->state, MIGRATION_STATUS_PAUSE_BEFORE_DEVICE,
-> > +                      MIGRATION_STATUS_DEVICE);
-> > +    *current_active_state = MIGRATION_STATUS_DEVICE;
-> > +    qemu_mutex_lock_iothread();
-> > +
-> > +    return s->state == MIGRATION_STATUS_DEVICE ? 0 : -EINVAL;
-> > +}
-> > +
-> > +/**
-> >   * migration_completion: Used by migration_thread when there's not much left.
-> >   *   The caller 'breaks' the loop when this returns.
-> >   *
-> > @@ -1992,6 +2032,11 @@ static void migration_completion(MigrationState *s, int current_active_state,
-> >              bool inactivate = !migrate_colo_enabled();
-> >              ret = vm_stop_force_state(RUN_STATE_FINISH_MIGRATE);
-> >              if (ret >= 0) {
-> > +                ret = migration_maybe_pause(s, &current_active_state);
-> > +                /* If this worked it will already have inactivated */
-> > +                inactivate &= !migrate_pause_before_device();
-> > +            }
-> > +            if (ret >= 0) {
-> >                  qemu_file_set_rate_limit(s->to_dst_file, INT64_MAX);
-> >                  ret = qemu_savevm_state_complete_precopy(s->to_dst_file, false,
-> >                                                           inactivate);
-> > @@ -2372,6 +2417,7 @@ static void migration_instance_finalize(Object *obj)
-> >  
-> >      g_free(params->tls_hostname);
-> >      g_free(params->tls_creds);
-> > +    qemu_sem_destroy(&ms->pause_sem);
-> >  }
-> >  
-> >  static void migration_instance_init(Object *obj)
-> > @@ -2382,6 +2428,7 @@ static void migration_instance_init(Object *obj)
-> >      ms->state = MIGRATION_STATUS_NONE;
-> >      ms->xbzrle_cache_size = DEFAULT_MIGRATE_CACHE_SIZE;
-> >      ms->mbps = -1;
-> > +    qemu_sem_init(&ms->pause_sem, 0);
-> >  
-> >      params->tls_hostname = g_strdup("");
-> >      params->tls_creds = g_strdup("");
-> > diff --git a/migration/migration.h b/migration/migration.h
-> > index 37feea5453..447e8b3f79 100644
-> > --- a/migration/migration.h
-> > +++ b/migration/migration.h
-> > @@ -121,6 +121,9 @@ struct MigrationState
-> >      /* Flag set once the migration thread called bdrv_inactivate_all */
-> >      bool block_inactive;
-> >  
-> > +    /* Migration is paused due to pause-before-device */
-> > +    QemuSemaphore pause_sem;
-> > +
-> >      /* The semaphore is used to notify COLO thread that failover is finished */
-> >      QemuSemaphore colo_exit_sem;
-> >  
-> > -- 
-> > 2.13.6
-> > 
-> 
-> -- 
-> Peter Xu
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+BTW, the program (scoped1.exe) does abort, it is a GCC testcase I was
+trying to debug ;-)
+
+Removing the assert lets execution continue, but the disassembly is incorre=
+ct. Without the assert, I see:
+IN: strlen
+0x40a1a880: f000 f890  bl 0x40a1a9a4
+0x40a1a884: 4502       cmp r2, r0
+but strlen normally starts with a pld instruction.
+
+So probably print_insn_arm needs also a change like
+given =3D (b[1]) | (b[0] <<8)<<16 | given;
+instead of
+given =3D (b[1]) | (b[0] <<8)|(given << 16);
+
+
+** Attachment added: "qemu-bug-1724485.tar.xz"
+   https://bugs.launchpad.net/qemu/+bug/1724485/+attachment/4974653/+files/=
+qemu-bug-1724485.tar.xz
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1724485
+
+Title:
+  Invalid assertion in arm_read_memory_func
+
+Status in QEMU:
+  New
+
+Bug description:
+  Hi,
+
+  I think there is an invalid assertion in arm_read_memory_func:
+  assert(info->endian =3D=3D BFD_ENDIAN_LITTLE)
+
+  I face it in the following use case: target armeb-linux (I use qemu
+  user mode), -d in_asm -cpu any.
+
+  At some point during program startup, glibc's _dl_new_object calls
+  strlen, which is written in thumb2 mode (armv6t2). So print_insn_arm()
+  calls arm_read_memory_func() with length=3D=3D2, and info->flags =3D=3D
+  INSN_ARM_BE32, and the assert is false.
+
+  If I remove the assert, execution continues OK.
+
+  With the assert, I get the error message from the assert, and qemu
+  then stalls.
+
+  Can you confirm the assert can be removed? Or if not, explain me how
+  to avoid/fix the subsequent qemu stall?
+
+  Thanks
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1724485/+subscriptions
