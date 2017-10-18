@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56873)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57786)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1e4fNP-0002As-O8
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 23:50:41 -0400
+	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1e4fPw-0002v5-Ba
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 23:53:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1e4fNM-0002aa-FJ
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 23:50:39 -0400
-Received: from mail.cn.fujitsu.com ([183.91.158.132]:31993
+	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1e4fPt-0004eX-6M
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 23:53:16 -0400
+Received: from mail.cn.fujitsu.com ([183.91.158.132]:4005
 	helo=heian.cn.fujitsu.com) by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1e4fNL-0002YF-Ao
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 23:50:36 -0400
-References: <1508298538-28753-1-git-send-email-douly.fnst@cn.fujitsu.com>
+	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1e4fPs-0004dX-AT
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 23:53:13 -0400
+References: <1505985788-10436-1-git-send-email-douly.fnst@cn.fujitsu.com>
 From: Dou Liyang <douly.fnst@cn.fujitsu.com>
-Message-ID: <66ec5354-d66c-a4e0-aea3-bc1ca428d2a8@cn.fujitsu.com>
-Date: Wed, 18 Oct 2017 11:50:32 +0800
+Message-ID: <0edc76f0-9de2-1169-194c-00833001957e@cn.fujitsu.com>
+Date: Wed, 18 Oct 2017 11:53:02 +0800
 MIME-Version: 1.0
-In-Reply-To: <1508298538-28753-1-git-send-email-douly.fnst@cn.fujitsu.com>
+In-Reply-To: <1505985788-10436-1-git-send-email-douly.fnst@cn.fujitsu.com>
 Content-Type: text/plain; charset="gbk"; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] ACPI/unit-test: Add a testcase for RAM
- allocation in numa node
+Subject: Re: [Qemu-devel] [PATCH v3] NUMA: Enable adding NUMA node implicitly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,233 +26,195 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org, ehabkost@redhat.com
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, David Hildenbrand <david@redhat.com>, Thomas Huth <thuth@redhat.com>, Alistair Francis <alistair23@gmail.com>, f4bug@amsat.org, Takao Indoh <indou.takao@jp.fujitsu.com>, Izumi Taku <izumi.taku@jp.fujitsu.com>
 
+Hi all,
 
-At 10/18/2017 11:48 AM, Dou Liyang wrote:
-> As QEMU supports the memory-less node, it is possible that there is
-> no RAM in the first numa node(also be called as node0). eg:
->   ... \
->   -m 128,slots=3,maxmem=1G \
->   -numa node -numa node,mem=128M \
->
-> But, this makes it hard for QEMU to build a known-to-work ACPI SRAT
-> table. Only fixing it is not enough.
->
-> Add a testcase for this situation to make sure the ACPI table is
-> correct for guest.
->
-> Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
-> Signed-off-by: Dou Liyang <douly.fnst@cn.fujitsu.com>
-> ---
-> Changelog:
->
-> This patch can pass the 'make check' in Peter's machine,
+It seems that a month has passed
 
-Oops,  s/can/can not  :-).
+So, Ping...
 
 Thanks,
 	dou.
 
-> But, in my own and Eduardo's machine, we can pass it.
+At 09/21/2017 05:23 PM, Dou Liyang wrote:
+> Linux and Windows need ACPI SRAT table to make memory hotplug work properly,
+> however currently QEMU doesn't create SRAT table if numa options aren't present
+> on CLI.
 >
-> So I rebase and spilt it independently.
+> Which breaks both linux and windows guests in certain conditions:
+>  * Windows: won't enable memory hotplug without SRAT table at all
+>  * Linux: if QEMU is started with initial memory all below 4Gb and no SRAT table
+>    present, guest kernel will use nommu DMA ops, which breaks 32bit hw drivers
+>    when memory is hotplugged and guest tries to use it with that drivers.
 >
-> Peter:
+> Fix above issues by automatically creating a numa node when QEMU is started with
+> memory hotplug enabled but without '-numa' options on CLI.
+> (PS: auto-create numa node only for new machine types so not to break migration).
 >
-> could you help me test it in your machine.
-> then, give me the output files, such as /tmp/asl-6QYK7Y.dsl and /tmp/asl-1H1I7Y.dsl file.
+> Which would provide SRAT table to guests without explicit -numa options on CLI
+> and would allow:
+>  * Windows: to enable memory hotplug
+>  * Linux: switch to SWIOTLB DMA ops, to bounce DMA transfers to 32bit allocated
+>    buffers that legacy drivers/hw can handle.
 >
->  tests/acpi-test-data/pc/DSDT.numamem  | Bin 0 -> 5104 bytes
->  tests/acpi-test-data/pc/SRAT.numamem  | Bin 0 -> 224 bytes
->  tests/acpi-test-data/q35/DSDT.numamem | Bin 0 -> 7788 bytes
->  tests/acpi-test-data/q35/SRAT.numamem | Bin 0 -> 224 bytes
->  tests/bios-tables-test.c              |  24 ++++++++++++++++++++++++
->  5 files changed, 24 insertions(+)
->  create mode 100644 tests/acpi-test-data/pc/DSDT.numamem
->  create mode 100644 tests/acpi-test-data/pc/SRAT.numamem
->  create mode 100644 tests/acpi-test-data/q35/DSDT.numamem
->  create mode 100644 tests/acpi-test-data/q35/SRAT.numamem
+> [Rewritten by Igor]
 >
-> diff --git a/tests/acpi-test-data/pc/DSDT.numamem b/tests/acpi-test-data/pc/DSDT.numamem
-> new file mode 100644
-> index 0000000000000000000000000000000000000000..bc703d77ee48720af1b801c518b43511c95c852d
-> GIT binary patch
-> literal 5104
-> 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
-> DEH%hI
+> Reported-by: Thadeu Lima de Souza Cascardo <cascardo@canonical.com>
+> Suggested-by: Igor Mammedov <imammedo@redhat.com>
+> Signed-off-by: Dou Liyang <douly.fnst@cn.fujitsu.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Richard Henderson <rth@twiddle.net>
+> Cc: Eduardo Habkost <ehabkost@redhat.com>
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Marcel Apfelbaum <marcel@redhat.com>
+> Cc: Igor Mammedov <imammedo@redhat.com>
+> Cc: David Hildenbrand <david@redhat.com>
+> Cc: Thomas Huth <thuth@redhat.com>
+> Cc: Alistair Francis <alistair23@gmail.com>
+> Cc: f4bug@amsat.org
+> Cc: Takao Indoh <indou.takao@jp.fujitsu.com>
+> Cc: Izumi Taku <izumi.taku@jp.fujitsu.com>
+> ---
+> changelog V2 --> V3:
+>   -Replace the callback function with a boolean parameter suggested by Igor
+>   -Use QTAILQ_EMPTY() macro to check the QemuOptsList
 >
-> literal 0
-> HcmV?d00001
+>  hw/i386/pc.c          |  1 +
+>  hw/i386/pc_piix.c     |  1 +
+>  hw/i386/pc_q35.c      |  1 +
+>  include/hw/boards.h   |  1 +
+>  include/sysemu/numa.h |  2 +-
+>  numa.c                | 24 ++++++++++++++++++++++--
+>  vl.c                  |  9 +++++----
+>  7 files changed, 32 insertions(+), 7 deletions(-)
 >
-> diff --git a/tests/acpi-test-data/pc/SRAT.numamem b/tests/acpi-test-data/pc/SRAT.numamem
-> new file mode 100644
-> index 0000000000000000000000000000000000000000..dbc595d9cb85d3fcb5a4243153f42bb431c9de8f
-> GIT binary patch
-> literal 224
-> zcmWFzatwLEz`(%x#mV2<BUr&HBEUHqD8>jB1F=Cg2*ZH@DxXmUE`z~9*2k!U%mXRq
-> Yf~!ZCL8t>-1O^}2VG2>z!9?-X08OU~0RR91
->
-> literal 0
-> HcmV?d00001
->
-> diff --git a/tests/acpi-test-data/q35/DSDT.numamem b/tests/acpi-test-data/q35/DSDT.numamem
-> new file mode 100644
-> index 0000000000000000000000000000000000000000..fcb18d947b28c09c8b5a4fa65692efb41ef3a5d9
-> GIT binary patch
-> literal 7788
-> zcmb7JTW=f38J#7U)M~kumeR`dU4ruvv}j_=PLrZV1CzVFRiZ?Zbew<!xOS6Pj)R8q
-> z1xRWHkQ5*nKNLvR27ROh{g3!3<gEt!)Ym>0D2nJQ>iNFm$TLd{i1<M6nLTH|IkT6u
-> z+=)6-_k+tqSpO++g!RsH`R!I1q0JIP&^G=04SP%UcA|2vZ{<?9)!WVSHonSE@QbK?
-> zvu6E$JN_n)AATNNw+G_RxBlPm+#Y=TMSMpP>Cv5m>(Yk5>h?S3es3>yTVbQ<^y`ht
-> zD}C=ePCt}eX{TR`+QRAIY(!SDHr3zgg!YqrB8+aW4A(RJ+l6`8?=}B<{fDKCH@>;`
-> zu=MP=|M<g`d#(+_HT*jGy*{9?_;Ktm#Y6w={kzsDB<FoA!}+iGdADryY0n_0mZzR<
-> zqOMjB?)gnej<w>{Ta~UFtA!C_Y?zOFtJ@Tw5a0ip6LxRcCp`aFWj$JMwWI!W@Or<~
-> zEr|iO!~<%&{pZ;A<DvJ}ek}Im+|kj27|wjPe_Q<ZwkQ7ezs!L+aAz?S?M|WK&U`kF
-> zsYmC+7UE;!-<W!phC|ba>B}}cr9Mv;2C#&|v>NTrlpDKVZ)XihFy-#Jsow56+7{tP
-> zvy>JVe#-b+YjvX(vnnZfk5~&}RYX{-tXp9jUu!LV`8O7?rd36%*4ulf-3?Jx9<v;d
-> z5smb$yHK+RVj%p~6=Bt^`{KSxWj_|Zy*F0N(J?)p4yJiNjxDk<7O}9PdRM%Q-zzCN
-> z?d`qX+_-rxoSjb!9XE4D_(XgYUXF>j2+qnGr}4+bEN1yYJhhJt`fk2veU$zv?KoF<
-> zxKPE$oUABE8EbUbjk=);IjNh&^kG^!SA6cKO5I#bbmOMfaA;0X>?d`YLO%}raaxVA
-> zDgv*MUu&>U$p6bb799dV{5M}Nt#-FHxB6gbE@$KH5o_zK6(P4RY*)pcN9}G3pr$|?
-> zpf2X}ws&-di&^qUh*TiX$bGB>RY6jsf99rG3GN7yQc+Wam7uZ`kdzn=bJMI;BcSt-
-> zdu3``DnV6{l&T8Od&%W~Y*s3&EtP8UfV$6&;WNWZMa@X18a$xxGi&(FvQkmArcXfK
-> z=ak`d%J4a5`UKQ{I)+cj@adR70d=3aLufNSZTOrveFEw}UBjnq_;gL5fV$6|;WKCW
-> z%$Ys`b)UFXX~)wue0ru&K;38F@R>J!=1re~y3ZNI=ZxWV#`FoO`<yj=&Kf>vO`m|e
-> zPv7wA8$Ny0C!p@LVE8N;J`1K#K;7q@;d9RLIcNF=)P2qyKIaXe^QKQg-DhC<3=E%v
-> z=@U@*xnTHQFnlhUJ^^)~XAGZb44-FApMbj0MZ@Q!;d9aS38?!#Yxq2C_&jU+1k`<=
-> zV`XV{Cp^c>^5|xFPAbC}kd)Dgd)`o<H<ag1C7`anU??vb$_u6vP*+|wlot)<MN<i=
-> zD=!(!ONR22sRY!Oc=FWl371)^?(vtUQr)-#NvV=#$*8$x)Lb%a0?L{W0<@$BXsy#Y
-> z4p3~P@F+k5P*#F8fGUarl{}6l3(q@DREe3AR0T<?1*qhz0M)1zppwc;3Q$0dMg^$k
-> zju6#USxW&bsmB2dh@mqV0V=s8L`pTe6rhsIN(xXw<r4uaxvWHhYE%kPNo6GkD4_C*
-> z0F_);B0x1N1*oL5k^&S^`9y$9E-MkB8kGW6Qdvm>3aES{KqZ%z2vChm0V=7iqyPm}
-> zJ`tdj%Sr^OMx_9iR8~@e0xF*fP|0N_0#u_?fJ!PWDL?_0PXwssvJwHRQ7J$rm6a5r
-> zfXXKVRB~B~0M)1zppwc;3Q$1h69Fo@tVDonR0>c@WhDhDpz?_Tm0VULKs71_sHC!z
-> z0u)gBM1V>zD-oa?l>$^!SxEs3sC*(oC6|>5P>o6fDygib00mS&5ulRGN(87zr2v&w
-> zR#JchDxU~Y$z>%1RHIUWN-8TUKmnCc1gPY)5&^1FDL^Hal@y?W$|nL;a#@K0)u<Gp
-> zlFCX7P(bAq0V=tyM1X2k3Q$R9B?Ty;@`(VITvj4LH7W(Dq_UC%6j1p@fJ!ba5uh5C
-> z0#s62NdXF|d?G+4mz4-mjY<J3sjQ>`1ynu}pg>xH0_gz?s0S#Z7ND9E0jen}Ks6-=
-> zsHQ}KYDxsCrlbJXloX(v5&^0y5uloq0#s8{fNDwvsHQ}KYDx-FO-TW&DG{JR>gXas
-> zfpEllGATd-aTpXNrJ7p=D3F?41SpW2TMAG>HMbO?fRPB!_Yt9D=<V~L)dTuN`ZP;F
-> zrQYtZucql=D!nV9w-HvWy;(xyZkFjQq_4;kcsH_Hq3tSt)#$741oMr}PS+YvKX!Mv
-> z@e*YEz|94(H8#WcGzjftVaCmUnHAIYG7A5cpHQ2d!FOZuc-x&7w1q*m@n&Rg3eN~7
-> z^<Uh>>lAuf<6zjG!Wnn|%Na49M!E^yzXk5Z=q;F)?<Hsm7)>cC^rJ>cd_vpq4!6wG
-> zn+|b617f_`@3cGClkL$Ms64fgs+SYh@mk?0S1)VT%Ur#T@#)pe!Q|@Y-d>Zuhl%QL
-> z>J;Tet$fJk!$kS;g!192e3UGY*JVH1eWaC-xO|i-ADvJ>8kMgk%iE_YU(w1}xO^p1
-> zzH&nO%BXxbSw3@$@>Q*TmCIKX<*O%@ua3&slI63fC|}dc*SLHwQNDIU`P!&_Jz0M0
-> z6y@t$`8t=cC(74PC|^f;n{H*v^1dvuZXS57px12t*3xVXvV6(ohpy{Ucgf4xEtuWm
-> zS!1j_**3AevFmcq><$kgW8KNNiQSD|XY*!vcq$p|PPR?#ZtS`V%<k~0GS;1Jo7mmh
-> zb+BM|hv%2E?qu7<?#9mRGiG;qs2S@{woUAA>^xmGyTg;tSa-6`?9ShKL#_~n?$(QU
-> z<*jz5qs~MZ7a;N{AGU5T*FStX_~6kWm+!y#;KN7vfB)VC(X+zV+Un?x%)4&QdhR{<
-> zEDx`?kvj;)+;a~v^mkt(P!h`_y_XLg>m4g>H{Y_t%I}Jnu*0w!IlbLEBBjGlWo;SE
-> zsMKA?tK`Od!x;!_?Cq6b+2R!hj75$wUkY1|VsWKNBao{vnV=AMtM8<S?*6v;EG!m_
-> zcY}I1MD^+3OIufMwH`noY3xTwgY9H9iVZ|OJinjZL8BkIvvKd`u{~?62XWBMkfYNT
-> zvXWh)hl%|M^_j2}t~)2$u;On^x&0U`8Sy|QJH-qSYxbBSJ`$L&Bps7)4aP<W_P~mt
-> zuG+);cvpNpCwJwh$NK^ueN8snoDMfSUGF5L6OY%}VBvUhcY?2hn@YA4_5EZcreNae
-> zdY`V^bXwsG!v|+5PA%tvPB5H=%~H3Ja~*;I^Yo+_<oa}m(@7zM87u^LbL32H-+dp~
-> z>)TBcT)-J!YgPJ{;x!yIUag|Dn+~)e&>p@HN9TF*bu46h@*0qfkF<PMo^t>6MP8)v
-> z-x{AI`oeP5p?Bz64%#gb>lZ@&fZd1QG0tQ0MTq}?j+=tqPtTJ_NAx^NpOoM|{Im-A
-> z?C9vbA9;s(_9iV`g*JvJ7eDi@^;WTjp~?FMwQDyBEI@WkZcauP-yoK=%UKI+U;fXw
-> zAn9E1&t+{3g|Pivf6lSpl#8VrpkLA+D(e5{h2`GftJPbfygBDLE6tlY64!{GsN!e*
-> z4BdwOb$g4~pQ^T8cg%H)MJ%|{3T<!i=bhrOB*5%g0*TRCiLm5G8`spvb>7If!u78B
-> EKkzjyY5)KL
->
-> literal 0
-> HcmV?d00001
->
-> diff --git a/tests/acpi-test-data/q35/SRAT.numamem b/tests/acpi-test-data/q35/SRAT.numamem
-> new file mode 100644
-> index 0000000000000000000000000000000000000000..dbc595d9cb85d3fcb5a4243153f42bb431c9de8f
-> GIT binary patch
-> literal 224
-> zcmWFzatwLEz`(%x#mV2<BUr&HBEUHqD8>jB1F=Cg2*ZH@DxXmUE`z~9*2k!U%mXRq
-> Yf~!ZCL8t>-1O^}2VG2>z!9?-X08OU~0RR91
->
-> literal 0
-> HcmV?d00001
->
-> diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
-> index 564da45..f092315 100644
-> --- a/tests/bios-tables-test.c
-> +++ b/tests/bios-tables-test.c
-> @@ -808,6 +808,28 @@ static void test_acpi_piix4_tcg_memhp(void)
->      free_test_data(&data);
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index 05985d4..f1a44cc 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -2318,6 +2318,7 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
+>      mc->cpu_index_to_instance_props = pc_cpu_index_to_props;
+>      mc->get_default_cpu_node_id = pc_get_default_cpu_node_id;
+>      mc->possible_cpu_arch_ids = pc_possible_cpu_arch_ids;
+> +    mc->auto_enable_numa_with_memhp = true;
+>      mc->has_hotpluggable_cpus = true;
+>      mc->default_boot_order = "cad";
+>      mc->hot_add_cpu = pc_hot_add_cpu;
+> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+> index 9ff79b1..d87a433 100644
+> --- a/hw/i386/pc_piix.c
+> +++ b/hw/i386/pc_piix.c
+> @@ -449,6 +449,7 @@ static void pc_i440fx_2_10_machine_options(MachineClass *m)
+>      m->is_default = 0;
+>      m->alias = NULL;
+>      SET_MACHINE_COMPAT(m, PC_COMPAT_2_10);
+> +    m->auto_enable_numa_with_memhp = false;
 >  }
 >
-> +static void test_acpi_q35_tcg_numamem(void)
-> +{
-> +    test_data data;
-> +
-> +    memset(&data, 0, sizeof(data));
-> +    data.machine = MACHINE_Q35;
-> +    data.variant = ".numamem";
-> +    test_acpi_one(" -numa node -numa node,mem=128", &data);
-> +    free_test_data(&data);
-> +}
-> +
-> +static void test_acpi_piix4_tcg_numamem(void)
-> +{
-> +    test_data data;
-> +
-> +    memset(&data, 0, sizeof(data));
-> +    data.machine = MACHINE_PC;
-> +    data.variant = ".numamem";
-> +    test_acpi_one(" -numa node -numa node,mem=128", &data);
-> +    free_test_data(&data);
-> +}
-> +
->  int main(int argc, char *argv[])
+>  DEFINE_I440FX_MACHINE(v2_10, "pc-i440fx-2.10", NULL,
+> diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+> index 6c4ec4b..68cbfc5 100644
+> --- a/hw/i386/pc_q35.c
+> +++ b/hw/i386/pc_q35.c
+> @@ -319,6 +319,7 @@ static void pc_q35_2_10_machine_options(MachineClass *m)
+>      m->alias = NULL;
+>      SET_MACHINE_COMPAT(m, PC_COMPAT_2_10);
+>      m->numa_auto_assign_ram = numa_legacy_auto_assign_ram;
+> +    m->auto_enable_numa_with_memhp = false;
+>  }
+>
+>  DEFINE_Q35_MACHINE(v2_10, "pc-q35-2.10", NULL,
+> diff --git a/include/hw/boards.h b/include/hw/boards.h
+> index 156e0a5..0fe2c8f 100644
+> --- a/include/hw/boards.h
+> +++ b/include/hw/boards.h
+> @@ -191,6 +191,7 @@ struct MachineClass {
+>      bool has_hotpluggable_cpus;
+>      bool ignore_memory_transaction_failures;
+>      int numa_mem_align_shift;
+> +    bool auto_enable_numa_with_memhp;
+>      void (*numa_auto_assign_ram)(MachineClass *mc, NodeInfo *nodes,
+>                                   int nb_nodes, ram_addr_t size);
+>
+> diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
+> index 5c6df28..31d3ac0 100644
+> --- a/include/sysemu/numa.h
+> +++ b/include/sysemu/numa.h
+> @@ -30,7 +30,7 @@ struct NumaNodeMem {
+>  };
+>
+>  extern NodeInfo numa_info[MAX_NODES];
+> -void parse_numa_opts(MachineState *ms);
+> +void parse_numa_opts(MachineState *ms, uint64_t ram_slots);
+>  void query_numa_node_mem(NumaNodeMem node_mem[]);
+>  extern QemuOptsList qemu_numa_opts;
+>  void numa_set_mem_node_id(ram_addr_t addr, uint64_t size, uint32_t node);
+> diff --git a/numa.c b/numa.c
+> index 100a67f..ba8d813 100644
+> --- a/numa.c
+> +++ b/numa.c
+> @@ -423,12 +423,32 @@ void numa_default_auto_assign_ram(MachineClass *mc, NodeInfo *nodes,
+>      nodes[i].node_mem = size - usedmem;
+>  }
+>
+> -void parse_numa_opts(MachineState *ms)
+> +void parse_numa_opts(MachineState *ms, uint64_t ram_slots)
 >  {
->      const char *arch = qtest_get_arch();
-> @@ -830,6 +852,8 @@ int main(int argc, char *argv[])
->          qtest_add_func("acpi/q35/cpuhp", test_acpi_q35_tcg_cphp);
->          qtest_add_func("acpi/piix4/memhp", test_acpi_piix4_tcg_memhp);
->          qtest_add_func("acpi/q35/memhp", test_acpi_q35_tcg_memhp);
-> +        qtest_add_func("acpi/piix4/numamem", test_acpi_piix4_tcg_numamem);
-> +        qtest_add_func("acpi/q35/numamem", test_acpi_q35_tcg_numamem);
+>      int i;
+>      MachineClass *mc = MACHINE_GET_CLASS(ms);
+> +    QemuOptsList *numa_opts = qemu_find_opts("numa");
+>
+> -    if (qemu_opts_foreach(qemu_find_opts("numa"), parse_numa, ms, NULL)) {
+> +    /*
+> +     * If memory hotplug is enabled (slots > 0) but without '-numa'
+> +     * options explicitly on CLI, guestes will break.
+> +     *
+> +     *   Windows: won't enable memory hotplug without SRAT table at all
+> +     *
+> +     *   Linux: if QEMU is started with initial memory all below 4Gb
+> +     *   and no SRAT table present, guest kernel will use nommu DMA ops,
+> +     *   which breaks 32bit hw drivers when memory is hotplugged and
+> +     *   guest tries to use it with that drivers.
+> +     *
+> +     * Enable NUMA implicitly by adding a new NUMA node automatically.
+> +     */
+> +    if (ram_slots > 0 && QTAILQ_EMPTY(&numa_opts->head)) {
+> +        if (mc->auto_enable_numa_with_memhp) {
+> +            qemu_opts_parse_noisily(numa_opts, "node", true);
+> +        }
+> +    }
+> +
+> +    if (qemu_opts_foreach(numa_opts, parse_numa, ms, NULL)) {
+>          exit(1);
 >      }
->      ret = g_test_run();
->      boot_sector_cleanup(disk);
+>
+> diff --git a/vl.c b/vl.c
+> index 9bb5058..d083b4d 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -4665,7 +4665,11 @@ int main(int argc, char **argv, char **envp)
+>      default_drive(default_floppy, snapshot, IF_FLOPPY, 0, FD_OPTS);
+>      default_drive(default_sdcard, snapshot, IF_SD, 0, SD_OPTS);
+>
+> -    parse_numa_opts(current_machine);
+> +    current_machine->ram_size = ram_size;
+> +    current_machine->maxram_size = maxram_size;
+> +    current_machine->ram_slots = ram_slots;
+> +
+> +    parse_numa_opts(current_machine, ram_slots);
+>
+>      if (qemu_opts_foreach(qemu_find_opts("mon"),
+>                            mon_init_func, NULL, NULL)) {
+> @@ -4710,9 +4714,6 @@ int main(int argc, char **argv, char **envp)
+>      replay_checkpoint(CHECKPOINT_INIT);
+>      qdev_machine_init();
+>
+> -    current_machine->ram_size = ram_size;
+> -    current_machine->maxram_size = maxram_size;
+> -    current_machine->ram_slots = ram_slots;
+>      current_machine->boot_order = boot_order;
+>      current_machine->cpu_model = cpu_model;
+>
 >
