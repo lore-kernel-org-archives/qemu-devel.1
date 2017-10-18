@@ -1,19 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50619)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52600)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1e4jaJ-0003Vb-Ja
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 04:20:16 -0400
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1e4jeA-0004Ke-Lc
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 04:24:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1e4jaF-0008KV-K8
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 04:20:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49806)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1e4jaF-0008Id-BD
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 04:20:11 -0400
-From: Fam Zheng <famz@redhat.com>
-Date: Wed, 18 Oct 2017 16:20:02 +0800
-Message-Id: <20171018082002.9406-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH] Revert "docker: Enable features explicitly in
- test-full"
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1e4jdx-0003VC-Uu
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 04:24:14 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:40788)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
+	id 1e4jdx-0003SY-Lg
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 04:24:01 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v9I8NtCk133162
+	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 04:23:57 -0400
+Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2dp24hbgef-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 04:23:56 -0400
+Received: from localhost
+	by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
+	Wed, 18 Oct 2017 04:23:53 -0400
+Date: Wed, 18 Oct 2017 16:23:47 +0800
+From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+References: <20171017140453.51099-1-pasic@linux.vnet.ibm.com>
+	<20171017171315.7afc5a59.cohuck@redhat.com>
+	<4ac6acdd-ccbf-3ff7-b6ec-5bdbc5456665@linux.vnet.ibm.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4ac6acdd-ccbf-3ff7-b6ec-5bdbc5456665@linux.vnet.ibm.com>
+Message-Id: <20171018082347.GA5150@bjsdjshi@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v3 0/7] improve error handling for IO instr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,120 +42,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, Fam Zheng <famz@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Halil Pasic <pasic@linux.vnet.ibm.com>
+Cc: Cornelia Huck <cohuck@redhat.com>, qemu-s390x@nongnu.org, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
 
-This reverts commit 5e8a7fe673ca5949bd51939ee36faaf3b1320de8.
+* Halil Pasic <pasic@linux.vnet.ibm.com> [2017-10-17 18:19:20 +0200]:
 
-It's hard to get all images to have all these packages, the usual
-"FEATURES" and "require" mechanism doesn't scale with so many features.
-With that change, the test basically only works in ubuntu.
+[...]
 
-Until a better way comes up, leave the feature enabling to ./configure
-detection.
+> >> Testing
+> >> =======
+> >>
+> >> Nothing happened since v2 except for a quick smoke test. Dong Jia gave v2
+> >> a spin with a focus on vfio-ccw. @Dong Jia I would appreciate some proper
+> >> testing, especially regarding the changes in vfio-ccw (patch #3).
+> > 
+> > Looks sane to me (if needed, I can fix up the minor things I found).
+> > 
+> > In addition to some testing, I'd appreciate some review from others as
+> > well.
+> > 
+> 
+> Of course, I'm fine with the fixes (won't answer individually). I think
+> both Dong Jia and Pierre have already put enough work in this to be credited
+> with a tag, so I really hope they will get around to review this. I would
+> be especially happy with an Tested-by: Dong Jia since this series is quite
+> under-tested, and the changes in vfio-ccw aren't just minor.
+> 
+> Of course I could come up with a test setup myself, but I hope Dong Jia
+> already has one, and he is certainly more involved with vfio-ccw.
+> 
+Using Conny's s390-next branch + this series (#2-#7), I didn't notice
+any obvious problem during my fio test.  So for the vfio-ccw related
+part:
+Tested-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
 
-But don't remove the "-e" removal.
+[...]
 
-Reported-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Fam Zheng <famz@redhat.com>
----
- tests/docker/test-full | 79 +++-----------------------------------------------
- 1 file changed, 4 insertions(+), 75 deletions(-)
-
-diff --git a/tests/docker/test-full b/tests/docker/test-full
-index 816d5a3eec..b4e42d25d7 100755
---- a/tests/docker/test-full
-+++ b/tests/docker/test-full
-@@ -1,8 +1,8 @@
- #!/bin/bash
- #
--# Compile all the targets with as many features enabled as possible
-+# Compile all the targets.
- #
--# Copyright 2016, 2017 Red Hat Inc.
-+# Copyright (c) 2016 Red Hat Inc.
- #
- # Authors:
- #  Fam Zheng <famz@redhat.com>
-@@ -13,77 +13,6 @@
- 
- . common.rc
- 
--cd "$BUILD_DIR" || exit 1
-+cd "$BUILD_DIR"
- 
--build_qemu \
--    --enable-attr \
--    --enable-bluez \
--    --enable-brlapi \
--    --enable-bsd-user \
--    --enable-bzip2 \
--    --enable-cap-ng \
--    --enable-coroutine-pool \
--    --enable-crypto-afalg \
--    --enable-curl \
--    --enable-curses \
--    --enable-debug \
--    --enable-debug-info \
--    --enable-debug-tcg \
--    --enable-docs \
--    --enable-fdt \
--    --enable-gcrypt \
--    --enable-glusterfs \
--    --enable-gnutls \
--    --enable-gprof \
--    --enable-gtk \
--    --enable-guest-agent \
--    --enable-jemalloc \
--    --enable-kvm \
--    --enable-libiscsi \
--    --enable-libnfs \
--    --enable-libssh2 \
--    --enable-libusb \
--    --enable-linux-aio \
--    --enable-linux-user \
--    --enable-live-block-migration \
--    --enable-lzo \
--    --enable-modules \
--    --enable-numa \
--    --enable-opengl \
--    --enable-pie \
--    --enable-profiler \
--    --enable-qom-cast-debug \
--    --enable-rbd \
--    --enable-rdma \
--    --enable-replication \
--    --enable-sdl \
--    --enable-seccomp \
--    --enable-smartcard \
--    --enable-snappy \
--    --enable-spice \
--    --enable-stack-protector \
--    --enable-system \
--    --enable-tcg \
--    --enable-tcg-interpreter \
--    --enable-tools \
--    --enable-tpm \
--    --enable-trace-backend=ftrace \
--    --enable-usb-redir \
--    --enable-user \
--    --enable-vde \
--    --enable-vhost-net \
--    --enable-vhost-scsi \
--    --enable-vhost-user \
--    --enable-vhost-vsock \
--    --enable-virtfs \
--    --enable-vnc \
--    --enable-vnc-jpeg \
--    --enable-vnc-png \
--    --enable-vnc-sasl \
--    --enable-vte \
--    --enable-werror \
--    --enable-xen \
--    --enable-xen-pci-passthrough \
--    --enable-xen-pv-domain-build \
--    --enable-xfsctl \
--&& make check $MAKEFLAGS && install_qemu
-+build_qemu && make check $MAKEFLAGS && install_qemu
 -- 
-2.13.5
+Dong Jia Shi
