@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53196)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54250)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1e4nFU-0006PE-LE
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 08:15:01 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1e4nJ5-0007rs-Vp
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 08:18:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1e4nFR-00032O-HV
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 08:15:00 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1e4nJ5-0004le-5X
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 08:18:43 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
 References: <20171017164426.25277-1-f4bug@amsat.org>
-	<20171017164426.25277-37-f4bug@amsat.org>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <30402756-92d4-ee2a-056e-fa976991035f@redhat.com>
-Date: Wed, 18 Oct 2017 14:14:47 +0200
+	<20171017164426.25277-17-f4bug@amsat.org>
+	<2466fbb7-ab33-26bf-9605-e5fa339abdf5@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <cd81b523-1241-83fd-e060-1b5694a64ff0@amsat.org>
+Date: Wed, 18 Oct 2017 09:18:33 -0300
 MIME-Version: 1.0
-In-Reply-To: <20171017164426.25277-37-f4bug@amsat.org>
+In-Reply-To: <2466fbb7-ab33-26bf-9605-e5fa339abdf5@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 36/42] hw/display/vga: "vga_int.h"
- requires "ui/console.h"
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v3 16/42] i386/hax: remove duplicated
+ include
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,24 +30,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>, Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@imgtec.com>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+To: Thomas Huth <thuth@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>, Peter Maydell <peter.maydell@linaro.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Yu Ning <yu.ning@linux.intel.com>, Vincent Palatin <vpalatin@chromium.org>, Corey Minyard <cminyard@mvista.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
 
-On 17.10.2017 18:44, Philippe Mathieu-Daud=C3=A9 wrote:
-> since The VGACommonState struct has a GraphicHwOps *hw_ops member,
-> then remove the now unnecessary includes.
->=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
->  hw/display/qxl.h        | 1 -
->  hw/display/vga_int.h    | 3 ++-
->  hw/display/cirrus_vga.c | 1 -
->  hw/display/vga-isa-mm.c | 1 -
->  hw/display/vga-isa.c    | 1 -
->  hw/display/vga-pci.c    | 1 -
->  hw/display/vga.c        | 1 -
->  hw/display/virtio-vga.c | 1 -
->  hw/display/vmware_vga.c | 1 -
->  9 files changed, 2 insertions(+), 9 deletions(-)
+On 10/18/2017 09:12 AM, Thomas Huth wrote:
+> On 17.10.2017 18:44, Philippe Mathieu-Daudé wrote:
+>> this file in include in "target/i386/hax-i386.h":
+>>
+>>     #ifdef CONFIG_WIN32
+>>     #include "target/i386/hax-windows.h"
+>>     #endif
+>>
+>> which guaranty than sysemu/os-win32.h is previously included (CONFIG_WIN32)
+> 
+> which guaranties that ... ?
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Oh :(
+Michael if you take the whole series, do you mind changing this
+description or do you want me to respin it? (if there is no further
+functional change asked).
+
+Regards,
+
+Phil.
