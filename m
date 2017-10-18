@@ -1,23 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59723)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38690)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1e4u6Z-0001np-6S
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 15:34:16 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1e4ugG-0007lH-GF
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 16:11:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1e4u6W-0004Ko-2O
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 15:34:15 -0400
-References: <20171016202358.3633-1-david@redhat.com>
-	<20171016202358.3633-3-david@redhat.com>
-	<8dd3c355-7d91-e1bb-b7d6-4d3e3e213da3@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <45f91319-3fe3-403d-1c79-af1ce33b49ed@redhat.com>
-Date: Wed, 18 Oct 2017 21:34:07 +0200
+	(envelope-from <ehabkost@redhat.com>) id 1e4ugD-0003HP-AH
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 16:11:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:29336)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1e4ugD-0003H0-1T
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 16:11:05 -0400
+Date: Wed, 18 Oct 2017 18:11:00 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20171018201100.GC2942@localhost.localdomain>
+References: <20171017092702.5b82103b@nial.brq.redhat.com>
+	<20171017150759.GB31897@redhat.com>
+	<20171017180635.6a900616@nial.brq.redhat.com>
+	<20171017160926.GJ31897@redhat.com>
+	<20171017181859.666cd9d0@nial.brq.redhat.com>
+	<20171018125911.GB2942@localhost.localdomain>
+	<20171018164435.5290db6a@nial.brq.redhat.com>
+	<20171018144936.GJ9719@redhat.com>
+	<20171018172412.58638543@nial.brq.redhat.com>
+	<20171018152747.GK9719@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <8dd3c355-7d91-e1bb-b7d6-4d3e3e213da3@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 2/2] s390x/tcg: low-address protection
- support
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171018152747.GK9719@redhat.com>
+Subject: Re: [Qemu-devel] [RFC 0/6] enable numa configuration before
+ machine_init() from HMP/QMP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,79 +36,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, cohuck@redhat.com, Peter Maydell <peter.maydell@linaro.org>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, peter.maydell@linaro.org, pkrempa@redhat.com, cohuck@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com, pbonzini@redhat.com, david@gibson.dropbear.id.au
 
-On 18.10.2017 20:21, Thomas Huth wrote:
-> On 16.10.2017 22:23, David Hildenbrand wrote:
->> This is a neat way to implement low address protection, whereby
->> only the first 512 bytes of the first two pages (each 4096 bytes) of
->> every address space are protected.
->>
->> Store a tec of 0 for the access exception, this is what is defined by
->> Enhanced Suppression on Protection in case of a low address protection
->> (Bit 61 set to 0, rest undefined).
->>
->> We have to make sure to to pass the access address, not the masked page
->> address into mmu_translate*().
->>
->> Drop the check from testblock. So we can properly test this via
->> kvm-unit-tests.
->>
->> This will check every access going through one of the MMUs.
->>
->> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
->> ---
->>  target/s390x/excp_helper.c |  3 +-
->>  target/s390x/mem_helper.c  |  8 ----
->>  target/s390x/mmu_helper.c  | 94 +++++++++++++++++++++++++++++-----------------
->>  3 files changed, 60 insertions(+), 45 deletions(-)
-> [...]
->> diff --git a/target/s390x/mmu_helper.c b/target/s390x/mmu_helper.c
->> index 9daa0fd8e2..9806685bee 100644
->> --- a/target/s390x/mmu_helper.c
->> +++ b/target/s390x/mmu_helper.c
->> @@ -106,6 +106,35 @@ static void trigger_page_fault(CPUS390XState *env, target_ulong vaddr,
->>      trigger_access_exception(env, type, ilen, tec);
->>  }
->>  
->> +/* check whether the address would be proteted by Low-Address Protection */
->> +static bool is_low_address(uint64_t addr)
->> +{
->> +    return addr < 512 || (addr >= 4096 && addr <= 4607);
->> +}
+On Wed, Oct 18, 2017 at 04:27:47PM +0100, Daniel P. Berrange wrote:
+> On Wed, Oct 18, 2017 at 05:24:12PM +0200, Igor Mammedov wrote:
+> > On Wed, 18 Oct 2017 15:49:36 +0100
+> > "Daniel P. Berrange" <berrange@redhat.com> wrote:
+> > 
+> > > On Wed, Oct 18, 2017 at 04:44:35PM +0200, Igor Mammedov wrote:
+> > > > not sure I parse question but looking at libvirt's domain docs
+> > > > it mentions
+> > > >   <numa>
+> > > >     <cell id='0' cpus='0-3' memory='512000' unit='KiB'/>
+> > > >     <cell id='1' cpus='4-7' memory='512000' unit='KiB' memAccess='shared'/>
+> > > >   </numa>
+> > > > 
+> > > > here libvirt assumes that there are cpus with cpu-index in range 0-7
+> > > > /and probably duplicates logic that calculates cpu-index/
+> > > > If libvirt would continue to duplicate logic we could skip on
+> > > > implementing early runtime QMP in QEMU and also drop support for
+> > > > query-hotpluggable-cpus as libvirt would be able to compute
+> > > > properties/values on it's own.  
+> > > 
+> > > From the POV of the XML, these CPU numbers are *not* required to be
+> > > the same as any QEMU CPU index. This is just saying that we've got
+> > > a <vcpus>8</vcpu> element, and we want the first 4 CPUs in one node
+> > > and the second 4 in the second node. 
+> > > 
+> > > If QEMU assigns CPU indexes 70-77 internally, that's not relevant to
+> > > the XML POV, which uses 0-7 regardless. If there ever was such a
+> > > disjoint representation of CPU indexes libvirt would have to remap
+> > > whats in the XML to match whats in QEMU
+> > that's what I'm saying, libvirt has to knows which cpu-indexes are valid
+> > to use so it is able to build CLI which works:
+> >   "-numa node,nodeid=0,cpus=0-3 -numa node,nodeid=1cpus=4-7"
+> > and if algoritm that assigns cpu-indexes would change on QEMU side
+> > it would break libvirt.
 > 
-> Just cosmetic, but I'd rather either use "<=" or "<" both times, so:
+> That's why I think QEMU should libvirt assign 'id' values to each
+> CPU, just like we do for other devices/object. That way QEMU can
+> have whatever CPU index numbering scheme it likes and it has no
+> effect on the mgmt app.
+
+Adding an intermediate ID doesn't seem to be address the problem
+at all: you would still need to tell QEMU which
+socket/core/thread combination correspond to which ID, and the
+set of valid socket/core/thread IDs is defined by the
+machine-type.
+
 > 
->    return addr <= 511 || (addr >= 4096 && addr <= 4607);
+> > now to newer interface
+> >   "-numa cpu,node-id=0,socket-id=0 -numa cpu,node-id=1,socket-id=1"
+> > libvirt would had to know that socket-id and values 0-1 are valid,
+> > now moving to spapr
+> >   "-numa cpu,node-id=0,core-id=0 -numa cpu,node-id=1,core-id=8"
+> > here valid values are not so obvious, core-id values are function
+> > of "-smp"
+> > 
+> > this series was written so that mgmt won't have to duplicate logic
+> > to match the same logic in qemu as libvirt didn't want to maintain
+> > it, I'd assume because it's fragile. If libvirt would make up valid
+> > properties/values on it's own we can forget about this series.
 > 
+> From libvirt POV we all we want to say is have N sockets, each with M
+> cores, each with O threads. That is architecture agnostic and what I
+> was trying to illustrate with my earlier proposed CLI syntax.
 
-That one then, as it matches the wording in the PoP.
+The set of valid socket/core/thread IDs accepted by QEMU is
+currently machine-dependent.  libvirt shouldn't expect them to be
+architecture agnostic.
 
->> +    /* Check the private-space control bit */
->> +    switch (asc) {
->> +    case PSW_ASC_PRIMARY:
->> +        return !(env->cregs[1] & _ASCE_PRIVATE_SPACE);
->> +    case PSW_ASC_SECONDARY:
->> +        return !(env->cregs[7] & _ASCE_PRIVATE_SPACE);
->> +    case PSW_ASC_HOME:
->> +        return !(env->cregs[13] & _ASCE_PRIVATE_SPACE);
->> +    default:
->> +        g_assert_not_reached();
-> 
-> Well, this is certainly reachable - if the guest was running in access
-> register mode. So it might be nicer to the user if you keep the
-> error_report() here?
-
-Right, this would be reachable via translate_pages(), but not via the
-tlb. Although unlikely to hit it at that point, we can keep the error.
-
-Conny, can you fix these two up or do you want me to resend?
-
+Defining architecture agnostic rules for them to avoid the need
+for query-hotpluggable-cpus would still be a valid proposal, but
+it needs to be written down instead of being just an implicit
+assumption from the libvirt side.
 
 -- 
-
-Thanks,
-
-David
+Eduardo
