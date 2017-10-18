@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36176)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36131)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1e4qyM-0003o2-KE
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 12:13:37 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1e4qyK-0003le-BX
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 12:13:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1e4qyL-0002P1-OX
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 12:13:34 -0400
-Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:56826)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1e4qyI-0002Ms-Rh
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 12:13:32 -0400
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:47837)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1e4qyL-0002OY-IF
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 12:13:33 -0400
-Received: by mail-wm0-x234.google.com with SMTP id l68so11141825wmd.5
-	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 09:13:33 -0700 (PDT)
+	id 1e4qyI-0002MR-Jl
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 12:13:30 -0400
+Received: by mail-wm0-x243.google.com with SMTP id t69so10986970wmt.2
+	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 09:13:30 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 18 Oct 2017 18:12:21 +0200
-Message-Id: <1508343141-31835-30-git-send-email-pbonzini@redhat.com>
+Date: Wed, 18 Oct 2017 18:12:18 +0200
+Message-Id: <1508343141-31835-27-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1508343141-31835-1-git-send-email-pbonzini@redhat.com>
 References: <1508343141-31835-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 29/29] scsi: reject configurations with logical
- block size > physical block size
+Subject: [Qemu-devel] [PULL 26/29] qdev: store DeviceState's canonical path
+ to use when unparenting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,51 +29,110 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Mark Kanda <mark.kanda@oracle.com>
+Cc: Michael Roth <mdroth@linux.vnet.ibm.com>, "Michael S. Tsirkin" <mst@redhat.com>, Greg Kurz <groug@kaod.org>
 
-From: Mark Kanda <mark.kanda@oracle.com>
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
 
-Logical block size of a SCSI disk should never be larger than
-physical block size. From an ATA/SCSI perspective, it makes no sense
-to have the logical block size greater than the physical block size,
-and it cannot even be effectively expressed in the command set. The
-whole point of adding the physical block size to the ATA/SCSI command
-set was to communicate a desire for a larger block size (than logical),
-while maintaining backwards compatibility with legacy 512 byte block
-size.
+device_unparent(dev, ...) is called when a device is unparented,
+either directly, or as a result of a parent device being
+finalized, and handles some final cleanup for the device. Part
+of this includes emiting a DEVICE_DELETED QMP event to notify
+management, which includes the device's path in the composition
+tree as provided by object_get_canonical_path().
 
-When setting logical_block_size > physical_block_size, QEMU cannot express
-it in READ CAPACITY(16) output, and all it can do is set the physical
-block exponent to 0 (i.e. logical_block_size == physical_block_size).
-Reporting the error properly, however, is better.
+object_get_canonical_path() assumes the device is still connected
+to the machine/root container, and will assert otherwise, but
+in some situations this isn't the case:
 
-Signed-off-by: Mark Kanda <mark.kanda@oracle.com>
-Reviewed-by: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
-Message-Id: <1508185024-5840-1-git-send-email-mark.kanda@oracle.com>
+If the parent is finalized as a result of object_unparent(), it
+will still be attached to the composition tree at the time any
+children are unparented as a result of that same call to
+object_unparent(). However, in some cases, object_unparent()
+will complete without finalizing the parent device, due to
+lingering references that won't be released till some time later.
+One such example is if the parent has MemoryRegion children (which
+take a ref on their parent), who in turn have AddressSpace's (which
+take a ref on their regions), since those AddressSpaces get cleaned
+up asynchronously by the RCU thread.
+
+In this case qdev:device_unparent() may be called for a child Device
+that no longer has a path to the root/machine container, causing
+object_get_canonical_path() to assert.
+
+Fix this by storing the canonical path during realize() so the
+information will still be available for device_unparent() in such
+cases.
+
+Cc: Michael S. Tsirkin <mst@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+Signed-off-by: Greg Kurz <groug@kaod.org>
+Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+Tested-by: Eric Auger <eric.auger@redhat.com>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+Message-Id: <20171016222315.407-2-mdroth@linux.vnet.ibm.com>
+[Clear dev->canonical_path at the post_realize_fail label, which is
+ cleaner.  Suggested by David Gibson. - Paolo]
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/scsi/scsi-disk.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ hw/core/qdev.c         | 17 ++++++++++++++---
+ include/hw/qdev-core.h |  1 +
+ 2 files changed, 15 insertions(+), 3 deletions(-)
 
-diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
-index a518080..1243117 100644
---- a/hw/scsi/scsi-disk.c
-+++ b/hw/scsi/scsi-disk.c
-@@ -2347,6 +2347,14 @@ static void scsi_realize(SCSIDevice *dev, Error **errp)
+diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+index 606ab53..0019a49 100644
+--- a/hw/core/qdev.c
++++ b/hw/core/qdev.c
+@@ -928,6 +928,13 @@ static void device_set_realized(Object *obj, bool value, Error **errp)
+             goto post_realize_fail;
+         }
  
-     blkconf_serial(&s->qdev.conf, &s->serial);
-     blkconf_blocksizes(&s->qdev.conf);
++        /*
++         * always free/re-initialize here since the value cannot be cleaned up
++         * in device_unrealize due to its usage later on in the unplug path
++         */
++        g_free(dev->canonical_path);
++        dev->canonical_path = object_get_canonical_path(OBJECT(dev));
 +
-+    if (s->qdev.conf.logical_block_size >
-+        s->qdev.conf.physical_block_size) {
-+        error_setg(errp,
-+                   "logical_block_size > physical_block_size not supported");
-+        return;
-+    }
-+
-     if (dev->type == TYPE_DISK) {
-         blkconf_geometry(&dev->conf, NULL, 65535, 255, 255, &err);
-         if (err) {
+         if (qdev_get_vmsd(dev)) {
+             if (vmstate_register_with_alias_id(dev, -1, qdev_get_vmsd(dev), dev,
+                                                dev->instance_id_alias,
+@@ -984,6 +991,8 @@ child_realize_fail:
+     }
+ 
+ post_realize_fail:
++    g_free(dev->canonical_path);
++    dev->canonical_path = NULL;
+     if (dc->unrealize) {
+         dc->unrealize(dev, NULL);
+     }
+@@ -1102,10 +1111,12 @@ static void device_unparent(Object *obj)
+ 
+     /* Only send event if the device had been completely realized */
+     if (dev->pending_deleted_event) {
+-        gchar *path = object_get_canonical_path(OBJECT(dev));
++        g_assert(dev->canonical_path);
+ 
+-        qapi_event_send_device_deleted(!!dev->id, dev->id, path, &error_abort);
+-        g_free(path);
++        qapi_event_send_device_deleted(!!dev->id, dev->id, dev->canonical_path,
++                                       &error_abort);
++        g_free(dev->canonical_path);
++        dev->canonical_path = NULL;
+     }
+ 
+     qemu_opts_del(dev->opts);
+diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
+index 0891461..0a71bf8 100644
+--- a/include/hw/qdev-core.h
++++ b/include/hw/qdev-core.h
+@@ -153,6 +153,7 @@ struct DeviceState {
+     /*< public >*/
+ 
+     const char *id;
++    char *canonical_path;
+     bool realized;
+     bool pending_deleted_event;
+     QemuOpts *opts;
 -- 
 1.8.3.1
