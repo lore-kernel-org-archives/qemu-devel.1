@@ -1,24 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49927)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50143)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <atar4qemu@gmail.com>) id 1e4kPX-00080F-HR
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 05:13:15 -0400
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1e4kPy-0008Ap-JU
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 05:13:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <atar4qemu@gmail.com>) id 1e4kPW-00036B-BG
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 05:13:11 -0400
-Received: from mail-io0-x244.google.com ([2607:f8b0:4001:c06::244]:56345)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <atar4qemu@gmail.com>) id 1e4kPW-00035Z-0o
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 05:13:10 -0400
-Received: by mail-io0-x244.google.com with SMTP id m81so5187641ioi.13
-	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 02:13:09 -0700 (PDT)
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1e4kPt-0003WU-Kw
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 05:13:38 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34198)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
+	id 1e4kPt-0003U5-CC
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 05:13:33 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v9I99VXV082117
+	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 05:13:26 -0400
+Received: from e18.ny.us.ibm.com (e18.ny.us.ibm.com [129.33.205.208])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2dp1867mer-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 05:13:25 -0400
+Received: from localhost
+	by e18.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
+	Wed, 18 Oct 2017 05:13:24 -0400
+Date: Wed, 18 Oct 2017 17:13:20 +0800
+From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+References: <20171017140453.51099-1-pasic@linux.vnet.ibm.com>
+	<20171017140453.51099-3-pasic@linux.vnet.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <1508006342-5304-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-References: <1508006342-5304-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-From: Artyom Tarasenko <atar4qemu@gmail.com>
-Date: Wed, 18 Oct 2017 11:12:49 +0200
-Message-ID: <CACXAS8AEgtVv=uwchkNzFziJ9F0XOdyi7c_Y9snD6j7_CguLBQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCHv3 00/13] sun4m: sparc32_dma tidy-ups
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171017140453.51099-3-pasic@linux.vnet.ibm.com>
+Message-Id: <20171018091320.GB5150@bjsdjshi@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v3 2/7] s390x/css: IO instr handler ending
+ control
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,69 +42,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: qemu-devel <qemu-devel@nongnu.org>
+To: Halil Pasic <pasic@linux.vnet.ibm.com>
+Cc: Cornelia Huck <cohuck@redhat.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
-On Sat, Oct 14, 2017 at 8:38 PM, Mark Cave-Ayland
-<mark.cave-ayland@ilande.co.uk> wrote:
-> This patchset aims to tidy-up the sparc32_dma code by improving the
-> modelling of the espdma/ledma devices using both QOM and the memory
-> API which didn't exist when the code was first written.
->
-> The result is that it is now possible to remove both the iommu_opaque
-> and is_ledma workarounds from the code, and the code for wiring up
-> the espdma/ledma and respective devices is also a lot more readable.
->
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+* Halil Pasic <pasic@linux.vnet.ibm.com> [2017-10-17 16:04:48 +0200]:
 
-Reviewed-by: Artyom Tarasenko <atar4qemu@gmail.com>
+[...]
 
->
-> v3:
-> - Add missing sysbus.h include to esp.h in patch 7
->
-> v2:
-> - Make esp/lance devices children of espdma/ledma devices respectively
-> - Add len parameter to ledma/espdma tracepoints
->
-> Mark Cave-Ayland (13):
->   sparc32_dma: rename SPARC32_DMA type to SPARC32_DMA_DEVICE
->   sparc32_dma: split esp and le into separate DMA devices
->   sparc32_dma: move type declarations from sparc32_dma.c to
->     sparc32_dma.h
->   sun4m: move DMA device wiring from sparc32_dma_init() to
->     sun4m_hw_init()
->   sun4m_iommu: move TYPE_SUN4M_IOMMU declaration to sun4m.h
->   sparc32_dma: use object link instead of qdev property to pass IOMMU
->     reference
->   esp: move TYPE_ESP and SysBusESPState from esp.c to esp.h
->   sparc32_dma: make esp device child of espdma device
->   lance: move TYPE_LANCE and SysBusPCNetState from lance.c to sun4m.h
->   sparc32_dma: make lance device child of ledma device
->   sparc32_dma: introduce new SPARC32_DMA type container object
->   sparc32_dma: remove is_ledma hack and replace with memory region
->     alias
->   sparc32_dma: add len to esp/le DMA memory tracing
->
->  hw/dma/sparc32_dma.c           |  236 +++++++++++++++++++++++++++++-----------
->  hw/dma/sun4m_iommu.c           |   14 ---
->  hw/dma/trace-events            |    8 +-
->  hw/net/lance.c                 |    9 --
->  hw/scsi/esp.c                  |   13 ---
->  hw/sparc/sun4m.c               |   82 ++++++--------
->  include/hw/scsi/esp.h          |   14 +++
->  include/hw/sparc/sparc32_dma.h |   55 ++++++++++
->  include/hw/sparc/sun4m.h       |   29 +++++
->  9 files changed, 307 insertions(+), 153 deletions(-)
->
-> --
-> 1.7.10.4
->
+> diff --git a/include/hw/s390x/css.h b/include/hw/s390x/css.h
+> index 69b374730e..7e0dbd162f 100644
+> --- a/include/hw/s390x/css.h
+> +++ b/include/hw/s390x/css.h
+> @@ -99,6 +99,22 @@ typedef struct CcwDataStream {
+>      hwaddr cda;
+>  } CcwDataStream;
+> 
+> +/*
+> + * IO instructions conclude according this. Currently we have only
+> + * cc codes. Valid values are 0,1,2,3 and the generic semantic for
+> + * IO instructions is described briefly. For more details consult the PoP.
+> + */
+> +typedef enum IOInstEnding {
+> +    /* produced expected result */
+> +    IOINST_CC_EXPECTED = 0,
+> +    /* status conditions were present or produced alternate result */
+> +    IOINST_CC_STATUS_PRESENT = 1,
+> +    /* inst. ineffective because busy with previously initiated function */
+> +    IOINST_CC_BUSY = 2,
+> +    /* inst. ineffective because not operational */
+> +    IOINST_CC_NOT_OPERATIONAL = 3
+> +} IOInstEnding;
+> +
+>  typedef struct SubchDev SubchDev;
+>  struct SubchDev {
+>      /* channel-subsystem related things: */
+> -- 
+> 2.13.5
+> 
 
-
+With what has been pointed out by Conny and Thomas addressed:
+Reviewed-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
 
 -- 
-Regards,
-Artyom Tarasenko
-
-SPARC and PPC PReP under qemu blog: http://tyom.blogspot.com/search/label/qemu
+Dong Jia Shi
