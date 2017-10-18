@@ -1,39 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52600)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54401)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1e4jeA-0004Ke-Lc
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 04:24:18 -0400
+	(envelope-from <famz@redhat.com>) id 1e4jiU-0005Uz-BX
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 04:28:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1e4jdx-0003VC-Uu
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 04:24:14 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:40788)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
-	id 1e4jdx-0003SY-Lg
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 04:24:01 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v9I8NtCk133162
-	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 04:23:57 -0400
-Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2dp24hbgef-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 04:23:56 -0400
-Received: from localhost
-	by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
-	Wed, 18 Oct 2017 04:23:53 -0400
-Date: Wed, 18 Oct 2017 16:23:47 +0800
-From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-References: <20171017140453.51099-1-pasic@linux.vnet.ibm.com>
-	<20171017171315.7afc5a59.cohuck@redhat.com>
-	<4ac6acdd-ccbf-3ff7-b6ec-5bdbc5456665@linux.vnet.ibm.com>
+	(envelope-from <famz@redhat.com>) id 1e4jiR-0008Fs-6P
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 04:28:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39300)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1e4jiR-0008F8-0R
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 04:28:39 -0400
+Date: Wed, 18 Oct 2017 16:28:36 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20171018082836.GD9443@lemon>
+References: <20171018073841.30062-1-famz@redhat.com>
+	<150831409774.377.7665751901178175493@b58463cdfd5f>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <4ac6acdd-ccbf-3ff7-b6ec-5bdbc5456665@linux.vnet.ibm.com>
-Message-Id: <20171018082347.GA5150@bjsdjshi@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v3 0/7] improve error handling for IO instr
+In-Reply-To: <150831409774.377.7665751901178175493@b58463cdfd5f>
+Subject: Re: [Qemu-devel] [PATCH] docker: Fix PATH for ccache
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,41 +27,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: Cornelia Huck <cohuck@redhat.com>, qemu-s390x@nongnu.org, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, berrange@redhat.com
+Cc: alex.bennee@linaro.org, f4bug@amsat.org
 
-* Halil Pasic <pasic@linux.vnet.ibm.com> [2017-10-17 18:19:20 +0200]:
-
-[...]
-
-> >> Testing
-> >> =======
-> >>
-> >> Nothing happened since v2 except for a quick smoke test. Dong Jia gave v2
-> >> a spin with a focus on vfio-ccw. @Dong Jia I would appreciate some proper
-> >> testing, especially regarding the changes in vfio-ccw (patch #3).
-> > 
-> > Looks sane to me (if needed, I can fix up the minor things I found).
-> > 
-> > In addition to some testing, I'd appreciate some review from others as
-> > well.
-> > 
+On Wed, 10/18 01:08, no-reply@patchew.org wrote:
+> Your branch is up-to-date with 'origin/test'.
+> Submodule 'dtc' (git://git.qemu-project.org/dtc.git) registered for path 'dtc'
+> Cloning into '/var/tmp/patchew-tester-tmp-jhpnlaz0/src/docker-src.2017-10-18-04.03.32.32287/qemu.tar.vroot/dtc'...
+> fatal: unable to connect to git.qemu-project.org:
+> git.qemu-project.org[0: 172.99.69.163]: errno=Connection timed out
 > 
-> Of course, I'm fine with the fixes (won't answer individually). I think
-> both Dong Jia and Pierre have already put enough work in this to be credited
-> with a tag, so I really hope they will get around to review this. I would
-> be especially happy with an Tested-by: Dong Jia since this series is quite
-> under-tested, and the changes in vfio-ccw aren't just minor.
+> fatal: clone of 'git://git.qemu-project.org/dtc.git' into submodule path '/var/tmp/patchew-tester-tmp-jhpnlaz0/src/docker-src.2017-10-18-04.03.32.32287/qemu.tar.vroot/dtc' failed
+> Failed to clone 'dtc'. Retry scheduled
+> Cloning into '/var/tmp/patchew-tester-tmp-jhpnlaz0/src/docker-src.2017-10-18-04.03.32.32287/qemu.tar.vroot/dtc'...
+> fatal: unable to connect to git.qemu-project.org:
+> git.qemu-project.org[0: 172.99.69.163]: errno=Connection timed out
 > 
-> Of course I could come up with a test setup myself, but I hope Dong Jia
-> already has one, and he is certainly more involved with vfio-ccw.
-> 
-Using Conny's s390-next branch + this series (#2-#7), I didn't notice
-any obvious problem during my fio test.  So for the vfio-ccw related
-part:
-Tested-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+> fatal: clone of 'git://git.qemu-project.org/dtc.git' into submodule path '/var/tmp/patchew-tester-tmp-jhpnlaz0/src/docker-src.2017-10-18-04.03.32.32287/qemu.tar.vroot/dtc' failed
+> Failed to clone 'dtc' a second time, aborting
+> failed to init submodule dtc
 
-[...]
+So now patchew is less robust on network hiccups: a number of the same "git
+submodule update --init" calls have succeeded above, so this is incidental. Any
+idea how to improve that? Maybe if there is a checkout from $QEMU_SRC, clone/cp
+from there instead of fetch from submodule remote?
 
--- 
-Dong Jia Shi
+Fam
