@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47591)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51014)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sundeep.lkml@gmail.com>) id 1e4exR-00052l-0l
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 23:23:49 -0400
+	(envelope-from <peterx@redhat.com>) id 1e4f8k-0006tm-Gs
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 23:35:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sundeep.lkml@gmail.com>) id 1e4exP-0000E6-Ui
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 23:23:48 -0400
+	(envelope-from <peterx@redhat.com>) id 1e4f8g-0008JT-Hg
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 23:35:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47692)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1e4f8g-0008Id-87
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 23:35:26 -0400
+Date: Wed, 18 Oct 2017 11:35:19 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20171018033519.GM4166@pxdev.xzpeter.org>
+References: <20171011191317.24157-1-dgilbert@redhat.com>
+	<20171011191317.24157-4-dgilbert@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CALHRZupURgAaiktM-mgWHud_2C07hNLY48BUbkbXE7ZV7EXqaQ@mail.gmail.com>
-References: <1508176489-9002-1-git-send-email-sundeep.lkml@gmail.com>
-	<CAFEAcA-vg31x5q7f1poJfHfrwKTrHEZo2Btua6o9xREHUzd8hQ@mail.gmail.com>
-	<CALHRZupURgAaiktM-mgWHud_2C07hNLY48BUbkbXE7ZV7EXqaQ@mail.gmail.com>
-From: sundeep subbaraya <sundeep.lkml@gmail.com>
-Date: Wed, 18 Oct 2017 08:53:46 +0530
-Message-ID: <CALHRZupdK7C4vGvN+e8B_8qqhoAFx2ts6Zi=TfSejvNyGHA7rw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Qemu devel PATCH] msf2: Remove dead code reported
- by Coverity
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20171011191317.24157-4-dgilbert@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 3/7] migration: Wait for semaphore before
+ completing migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,72 +28,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alistair Francis <alistair23@gmail.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, jdenemar@redhat.com, wangjie88@huawei.com, quintela@redhat.com, mreitz@redhat.com, berrange@redhat.com, eblake@redhat.com, fuweiwei2@huawei.com
 
-Hi Peter,
+On Wed, Oct 11, 2017 at 08:13:13PM +0100, Dr. David Alan Gilbert (git) wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> 
+> Wait for a semaphore before completing the migration,
+> if the previously added capability was enabled.
+> 
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> ---
+>  migration/migration.c | 47 +++++++++++++++++++++++++++++++++++++++++++++++
+>  migration/migration.h |  3 +++
+>  2 files changed, 50 insertions(+)
+> 
+> diff --git a/migration/migration.c b/migration/migration.c
+> index e1a87c3d23..b411a7bb63 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -1967,6 +1967,46 @@ fail:
+>  }
+>  
+>  /**
+> + * migration_maybe_pause: Pause if required to by migrate_pause_before_device
+> + * called with the iothread locked
+> + * Returns: 0 on success
+> + */
+> +static int migration_maybe_pause(MigrationState *s, int *current_active_state)
+> +{
+> +    int ret;
+> +    if (!migrate_pause_before_device()) {
+> +        return 0;
+> +    }
+> +    ret = bdrv_inactivate_all();
 
-On Wed, Oct 18, 2017 at 8:45 AM, sundeep subbaraya <sundeep.lkml@gmail.com>
-wrote:
+My understanding is that the crash was caused by mirrored block device
+IO triggered after the inactivation, then... should we do this after
+waiting for the semaphore (possibly at [1] below) to make sure the
+block jobs are completed?  Or did I miss anything?
 
-> Hi Peter,
->
-> On Tue, Oct 17, 2017 at 8:58 PM, Peter Maydell <peter.maydell@linaro.org>
-> wrote:
->
->> On 16 October 2017 at 18:54, Subbaraya Sundeep <sundeep.lkml@gmail.com>
->> wrote:
->> > Fixed incorrect frame size mask, validated maximum frame
->> > size in spi_write and removed dead code.
->> >
->> > Signed-off-by: Subbaraya Sundeep <sundeep.lkml@gmail.com>
->> > ---
->> >  hw/ssi/mss-spi.c | 8 +++++---
->> >  1 file changed, 5 insertions(+), 3 deletions(-)
->> >
->> > diff --git a/hw/ssi/mss-spi.c b/hw/ssi/mss-spi.c
->> > index 5a8e308..1e49cbc 100644
->> > --- a/hw/ssi/mss-spi.c
->> > +++ b/hw/ssi/mss-spi.c
->> > @@ -76,9 +76,10 @@
->> >  #define C_BIGFIFO            (1 << 29)
->> >  #define C_RESET              (1 << 31)
->> >
->> > -#define FRAMESZ_MASK         0x1F
->> > +#define FRAMESZ_MASK         0x3F
->> >  #define FMCOUNT_MASK         0x00FFFF00
->> >  #define FMCOUNT_SHIFT        8
->> > +#define FRAMESZ_MAX          32
->> >
->> >  static void txfifo_reset(MSSSpiState *s)
->> >  {
->> > @@ -106,8 +107,6 @@ static void set_fifodepth(MSSSpiState *s)
->> >          s->fifo_depth = 16;
->> >      } else if (size <= 32) {
->>
->> Shouldn't this just be "} else {" now ?
->>
->> Yes. I will send v2.
->
+> +    if (ret) {
+> +        error_report("%s: bdrv_inactivate_all() failed (%d)",
+> +                     __func__, ret);
+> +        return ret;
+> +    }
+> +
+> +    s->block_inactive = true;
+> +
+> +    /* Since leaving this state is not atomic with posting the semaphore
+> +     * it's possible that someone could have issued multiple migrate_continue
+> +     * and the semaphore is incorrectly positive at this point;
+> +     * the docs say it's undefined to reinit a semaphore that's already
+> +     * init'd, so use timedwait to eat up any existing posts.
+> +     */
+> +    while (qemu_sem_timedwait(&s->pause_sem, 1) == 0);
+> +
+> +    qemu_mutex_unlock_iothread();
+> +    migrate_set_state(&s->state, *current_active_state,
+> +                      MIGRATION_STATUS_PAUSE_BEFORE_DEVICE);
+> +    qemu_sem_wait(&s->pause_sem);
 
-Also I will log guest error if frame size is greater than 32.
+[1]
 
-Thanks,
-Sundeep
+> +    migrate_set_state(&s->state, MIGRATION_STATUS_PAUSE_BEFORE_DEVICE,
+> +                      MIGRATION_STATUS_DEVICE);
+> +    *current_active_state = MIGRATION_STATUS_DEVICE;
+> +    qemu_mutex_lock_iothread();
+> +
+> +    return s->state == MIGRATION_STATUS_DEVICE ? 0 : -EINVAL;
+> +}
+> +
+> +/**
+>   * migration_completion: Used by migration_thread when there's not much left.
+>   *   The caller 'breaks' the loop when this returns.
+>   *
+> @@ -1992,6 +2032,11 @@ static void migration_completion(MigrationState *s, int current_active_state,
+>              bool inactivate = !migrate_colo_enabled();
+>              ret = vm_stop_force_state(RUN_STATE_FINISH_MIGRATE);
+>              if (ret >= 0) {
+> +                ret = migration_maybe_pause(s, &current_active_state);
+> +                /* If this worked it will already have inactivated */
+> +                inactivate &= !migrate_pause_before_device();
+> +            }
+> +            if (ret >= 0) {
+>                  qemu_file_set_rate_limit(s->to_dst_file, INT64_MAX);
+>                  ret = qemu_savevm_state_complete_precopy(s->to_dst_file, false,
+>                                                           inactivate);
+> @@ -2372,6 +2417,7 @@ static void migration_instance_finalize(Object *obj)
+>  
+>      g_free(params->tls_hostname);
+>      g_free(params->tls_creds);
+> +    qemu_sem_destroy(&ms->pause_sem);
+>  }
+>  
+>  static void migration_instance_init(Object *obj)
+> @@ -2382,6 +2428,7 @@ static void migration_instance_init(Object *obj)
+>      ms->state = MIGRATION_STATUS_NONE;
+>      ms->xbzrle_cache_size = DEFAULT_MIGRATE_CACHE_SIZE;
+>      ms->mbps = -1;
+> +    qemu_sem_init(&ms->pause_sem, 0);
+>  
+>      params->tls_hostname = g_strdup("");
+>      params->tls_creds = g_strdup("");
+> diff --git a/migration/migration.h b/migration/migration.h
+> index 37feea5453..447e8b3f79 100644
+> --- a/migration/migration.h
+> +++ b/migration/migration.h
+> @@ -121,6 +121,9 @@ struct MigrationState
+>      /* Flag set once the migration thread called bdrv_inactivate_all */
+>      bool block_inactive;
+>  
+> +    /* Migration is paused due to pause-before-device */
+> +    QemuSemaphore pause_sem;
+> +
+>      /* The semaphore is used to notify COLO thread that failover is finished */
+>      QemuSemaphore colo_exit_sem;
+>  
+> -- 
+> 2.13.6
+> 
 
-
->
-> Thanks,
-> Sundeep
->
-> >          s->fifo_depth = 8;
->> > -    } else {
->> > -        s->fifo_depth = 4;
->> >      }
->> >  }
->>
->> thanks
->> -- PMM
->>
->
->
+-- 
+Peter Xu
