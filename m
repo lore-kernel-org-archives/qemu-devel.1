@@ -1,34 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60312)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34186)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e4juh-00048G-MZ
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 04:41:20 -0400
+	(envelope-from <quintela@redhat.com>) id 1e4jyl-0005CJ-JT
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 04:45:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e4jue-0002oc-I4
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 04:41:19 -0400
-Received: from indium.canonical.com ([91.189.90.7]:47654)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1e4jue-0002mW-C6
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 04:41:16 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1e4jub-0004By-Es
-	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 08:41:13 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 676FB2E80C8
-	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 08:41:13 +0000 (UTC)
+	(envelope-from <quintela@redhat.com>) id 1e4jyi-0007Z8-IQ
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 04:45:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37706)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1e4jyi-0007YV-Bt
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 04:45:28 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4BD667EA8D
+	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 08:45:27 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20171012055709.GF30901@pxdev.xzpeter.org> (Peter Xu's message of
+	"Thu, 12 Oct 2017 13:57:09 +0800")
+References: <20171010181542.24168-1-quintela@redhat.com>
+	<20171010181542.24168-7-quintela@redhat.com>
+	<20171012055709.GF30901@pxdev.xzpeter.org>
+Reply-To: quintela@redhat.com
+Date: Wed, 18 Oct 2017 10:45:22 +0200
+Message-ID: <87d15kondp.fsf@secure.laptop>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 18 Oct 2017 08:29:40 -0000
-From: Daniel Berrange <1724477@bugs.launchpad.net>
-Reply-To: Bug 1724477 <1724477@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150831284620.1599.14269987525342877867.malonedeb@soybean.canonical.com>
-Message-Id: <150831538082.17029.16413334604227714653.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1724477] Re: Build-in websocket broken since
- v2.9.0-rc0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 06/10] migration: Make sure that we pass
+ the right cache size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,47 +36,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, lvivier@redhat.com
 
-Note that we tightened up the websocket server impl to validate HTTP
-requests more strictly. One key change is that the websockets path is
-required to be empty, while noVNC will default to appending a path - so
-make sure you change noVNC to have an empty path. Also until GIT master
-yesterday, there was a bug that prevented it working if the client
-requested keep-alive, which I see noVNC now does. So if you try git
-master today, it ought to work.
+Peter Xu <peterx@redhat.com> wrote:
+> On Tue, Oct 10, 2017 at 08:15:38PM +0200, Juan Quintela wrote:
+>> Instead of passing silently round down the number of pages, make it an
+>> error that the cache size is not a multiple of 2.
+>
+> s/multiple/power/?
 
--- =
+Thanks.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1724477
+> Would this patch break existing users?
 
-Title:
-  Build-in websocket broken since v2.9.0-rc0
+I have a problem here. Current code:
+- "silently" truncate the value that we pass
+- "silently" uses a different value that the one that it shows as used
+- "shows" a value that is different of what has been set to
 
-Status in QEMU:
-  New
+So, I have to break one of them:
+- only allow valid values (and then we output the same value that user
+  input)
+- store "setup" value, and use something different "internaly"
 
-Bug description:
-  Since upgrading to 2.9.0, the qemu's build-in websocket was no longer
-  available.
+No clear winner.  This way we are at least consistent with everything
+else.  Documentation already required a power of 2 value.  And we give a
+good error message.
 
-  Host: Ubuntu 16.04 LTS
-  Command-line: /bin/qemu-system-x86_64 -enable-kvm -vnc 0.0.0.0:8,websocket
+Later, Juan.
 
-  I have tested the following qemu versions:
 
-  master      Fail
-  2.10.1      Fail
-  2.9.1       Fail
-  2.9.0       Fail
-  2.9.0-rc3   Fail
-  2.9.0-rc0   Fail
-
-  2.8.1.1     Pass
-  2.7.1       Pass
-  2.6.2       Pass
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1724477/+subscriptions
+>
+>> 
+>> Signed-off-by: Juan Quintela <quintela@redhat.com>
+>> ---
+>>  migration/page_cache.c | 12 +++++++-----
+>>  1 file changed, 7 insertions(+), 5 deletions(-)
+>> 
+>> diff --git a/migration/page_cache.c b/migration/page_cache.c
+>> index 9a9d13d6a2..96268c3aea 100644
+>> --- a/migration/page_cache.c
+>> +++ b/migration/page_cache.c
+>> @@ -58,6 +58,13 @@ PageCache *cache_init(int64_t new_size, size_t page_size, Error **errp)
+>>          return NULL;
+>>      }
+>>  
+>> +    /* round down to the nearest power of 2 */
+>> +    if (!is_power_of_2(num_pages)) {
+>> +        error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "cache size",
+>> +                   "is not a power of two number of pages");
+>> +        return NULL;
+>> +    }
+>> +
+>>      /* We prefer not to abort if there is no memory */
+>>      cache = g_try_malloc(sizeof(*cache));
+>>      if (!cache) {
+>> @@ -65,11 +72,6 @@ PageCache *cache_init(int64_t new_size, size_t page_size, Error **errp)
+>>                     "Failed to allocate cache");
+>>          return NULL;
+>>      }
+>> -    /* round down to the nearest power of 2 */
+>> -    if (!is_power_of_2(num_pages)) {
+>> -        num_pages = pow2floor(num_pages);
+>> -        DPRINTF("rounding down to %" PRId64 "\n", num_pages);
+>> -    }
+>>      cache->page_size = page_size;
+>>      cache->num_items = 0;
+>>      cache->max_num_items = num_pages;
+>> -- 
+>> 2.13.6
+>> 
