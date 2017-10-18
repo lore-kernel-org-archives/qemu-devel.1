@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57735)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58425)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e4jpX-0001sk-Px
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 04:36:00 -0400
+	(envelope-from <quintela@redhat.com>) id 1e4jr2-0002v8-5b
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 04:37:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e4jpU-0005LY-Kt
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 04:35:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52918)
+	(envelope-from <quintela@redhat.com>) id 1e4jqz-00086W-1r
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 04:37:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57346)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1e4jpU-0005Kk-Et
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 04:35:56 -0400
-Date: Wed, 18 Oct 2017 09:35:49 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20171018083549.GB9719@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20171018073841.30062-1-famz@redhat.com>
-	<150831409774.377.7665751901178175493@b58463cdfd5f>
-	<20171018082836.GD9443@lemon>
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1e4jqy-00085t-SL
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 04:37:28 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id F3447C04AC44
+	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 08:37:27 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20171012054621.GB30901@pxdev.xzpeter.org> (Peter Xu's message of
+	"Thu, 12 Oct 2017 13:46:21 +0800")
+References: <20171010181542.24168-1-quintela@redhat.com>
+	<20171010181542.24168-2-quintela@redhat.com>
+	<20171012054621.GB30901@pxdev.xzpeter.org>
+Reply-To: quintela@redhat.com
+Date: Wed, 18 Oct 2017 10:37:22 +0200
+Message-ID: <87h8uwonr1.fsf@secure.laptop>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20171018082836.GD9443@lemon>
-Subject: Re: [Qemu-devel] [PATCH] docker: Fix PATH for ccache
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 01/10] migration: Fix migrate_test_apply
+ for multifd parameters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,41 +36,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, alex.bennee@linaro.org, f4bug@amsat.org
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, lvivier@redhat.com
 
-On Wed, Oct 18, 2017 at 04:28:36PM +0800, Fam Zheng wrote:
-> On Wed, 10/18 01:08, no-reply@patchew.org wrote:
-> > Your branch is up-to-date with 'origin/test'.
-> > Submodule 'dtc' (git://git.qemu-project.org/dtc.git) registered for path 'dtc'
-> > Cloning into '/var/tmp/patchew-tester-tmp-jhpnlaz0/src/docker-src.2017-10-18-04.03.32.32287/qemu.tar.vroot/dtc'...
-> > fatal: unable to connect to git.qemu-project.org:
-> > git.qemu-project.org[0: 172.99.69.163]: errno=Connection timed out
-> > 
-> > fatal: clone of 'git://git.qemu-project.org/dtc.git' into submodule path '/var/tmp/patchew-tester-tmp-jhpnlaz0/src/docker-src.2017-10-18-04.03.32.32287/qemu.tar.vroot/dtc' failed
-> > Failed to clone 'dtc'. Retry scheduled
-> > Cloning into '/var/tmp/patchew-tester-tmp-jhpnlaz0/src/docker-src.2017-10-18-04.03.32.32287/qemu.tar.vroot/dtc'...
-> > fatal: unable to connect to git.qemu-project.org:
-> > git.qemu-project.org[0: 172.99.69.163]: errno=Connection timed out
-> > 
-> > fatal: clone of 'git://git.qemu-project.org/dtc.git' into submodule path '/var/tmp/patchew-tester-tmp-jhpnlaz0/src/docker-src.2017-10-18-04.03.32.32287/qemu.tar.vroot/dtc' failed
-> > Failed to clone 'dtc' a second time, aborting
-> > failed to init submodule dtc
-> 
-> So now patchew is less robust on network hiccups: a number of the same "git
-> submodule update --init" calls have succeeded above, so this is incidental. Any
-> idea how to improve that? Maybe if there is a checkout from $QEMU_SRC, clone/cp
-> from there instead of fetch from submodule remote?
+Peter Xu <peterx@redhat.com> wrote:
+> On Tue, Oct 10, 2017 at 08:15:33PM +0200, Juan Quintela wrote:
+>> They were missing when introduced on the tree
+>> 
+>> Signed-off-by: Juan Quintela <quintela@redhat.com>
+>> ---
+>>  migration/migration.c | 6 ++++++
+>>  1 file changed, 6 insertions(+)
+>> 
+>> diff --git a/migration/migration.c b/migration/migration.c
+>> index 98429dc843..fb62a639d8 100644
+>> --- a/migration/migration.c
+>> +++ b/migration/migration.c
+>> @@ -865,6 +865,12 @@ static void migrate_params_test_apply(MigrateSetParameters *params,
+>>      if (params->has_block_incremental) {
+>>          dest->block_incremental = params->block_incremental;
+>>      }
+>
+> (newline?)
 
-If patchew has unreliable connectivity to git.qemu.org then the best thing
-is probably have a background job that mirrors the git.qemu.org repos on
-the patchew server. Then have the test job modify .gitmodules to point to
-your local mirror. That way, network access is used during the background
-job only, and actual builds just get a local clone from the cache.
+I preffer without it.
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+At least in migration we have code with both approachs.
+
+>
+>> +    if (params->has_x_multifd_channels) {
+>> +        dest->x_multifd_channels = params->x_multifd_channels;
+>> +    }
+>
+> (newline?)
+>
+>> +    if (params->has_x_multifd_page_count) {
+>> +        dest->x_multifd_page_count = params->x_multifd_page_count;
+>> +    }
+>>  }
+>>  
+>>  static void migrate_params_apply(MigrateSetParameters *params)
+>> -- 
+>> 2.13.6
+>> 
+>
+> Reviewed-by: Peter Xu <peterx@redhat.com>
+
+Thanks.
