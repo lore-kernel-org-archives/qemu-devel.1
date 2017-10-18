@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53401)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54946)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1e4rul-00062M-8P
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 13:13:56 -0400
+	(envelope-from <prasad.singamsetty@oracle.com>) id 1e4s0L-0007wf-TC
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 13:19:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1e4rug-0006Hs-Py
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 13:13:55 -0400
-Resent-Message-Id: <E1e4rug-0006Hs-Py@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21367)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1e4rug-0006G3-Ix
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 13:13:50 -0400
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <150834681520.377.5310308039768949865@b58463cdfd5f>
-In-Reply-To: <1508343141-31835-1-git-send-email-pbonzini@redhat.com>
+	(envelope-from <prasad.singamsetty@oracle.com>) id 1e4s0G-0001Xt-Ud
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 13:19:41 -0400
+Received: from aserp1040.oracle.com ([141.146.126.69]:48065)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <prasad.singamsetty@oracle.com>)
+	id 1e4s0G-0001X8-Nw
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 13:19:36 -0400
+References: <a41b88a6-4882-1abc-b6e2-e42acf03c198@oracle.com>
+	<20171013170143.GB3370@work-vm> <20171013111403.293919fe@t450s.home>
+	<20171015035318.GA22780@pxdev.xzpeter.org>
+	<c4d07be9-7d9b-71fa-e84c-e393138f7a84@oracle.com>
+	<20171017035604.GJ4166@pxdev.xzpeter.org>
+From: Prasad Singamsetty <prasad.singamsetty@oracle.com>
+Message-ID: <2c478fc6-bb9a-3ac3-1f5d-c853b13dc8a1@oracle.com>
+Date: Wed, 18 Oct 2017 10:19:31 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 18 Oct 2017 10:13:35 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PULL 00/29] Misc patches for 2017-10-18
+In-Reply-To: <20171017035604.GJ4166@pxdev.xzpeter.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] host physical address width issues/questions for
+ x86_64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,115 +33,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org
+To: Peter Xu <peterx@redhat.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org, pbonzini@redhat.com, Sunit Jain <sunit.jain@oracle.com>, ehabkost@redhat.com, rth@twiddle.net
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDE1MDgzNDMxNDEtMzE4MzUtMS1naXQtc2VuZC1lbWFpbC1wYm9uemluaUByZWRo
-YXQuY29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUFVMTCAwMC8yOV0gTWlzYyBwYXRjaGVzIGZv
-ciAyMDE3LTEwLTE4Cgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNF
-PWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWls
-ZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0t
-bG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAt
-LXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tp
-bmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAg
-ICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gu
-cGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBm
-aQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9
-PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJv
-bSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAg
-ICAgICAgICAgICAgcGF0Y2hldy8yMDE3MTAxODE3MDEzOC4xOTA3OC0xLWRnaWxiZXJ0QHJlZGhh
-dC5jb20gLT4gcGF0Y2hldy8yMDE3MTAxODE3MDEzOC4xOTA3OC0xLWRnaWxiZXJ0QHJlZGhhdC5j
-b20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwpkZGY1ZjBmZDUzIHNjc2k6IHJlamVj
-dCBjb25maWd1cmF0aW9ucyB3aXRoIGxvZ2ljYWwgYmxvY2sgc2l6ZSA+IHBoeXNpY2FsIGJsb2Nr
-IHNpemUKZDZjNzgwZWY0YSBxZGV2OiBkZWZlciBERVZJQ0VfREVMIGV2ZW50IHVudGlsIGluc3Rh
-bmNlX2ZpbmFsaXplKCkKNTk4Nzc1MjJkOSBSZXZlcnQgInFkZXY6IEZyZWUgUWVtdU9wdHMgd2hl
-biB0aGUgUU9NIHBhdGggZ29lcyBhd2F5IgoyNjJkYWYzY2ZiIHFkZXY6IHN0b3JlIERldmljZVN0
-YXRlJ3MgY2Fub25pY2FsIHBhdGggdG8gdXNlIHdoZW4gdW5wYXJlbnRpbmcKN2U3MWUxMDY5YSBx
-ZW11LXByLWhlbHBlcjogdXNlIG5ldyBsaWJtdWx0aXBhdGggQVBJCmViNGMyZjI1OGIgd2F0Y2hf
-bWVtX3dyaXRlOiBpbXBsZW1lbnQgOC1ieXRlIGFjY2Vzc2VzCjFlNTQzYWVjOTIgbm90ZGlydHlf
-bWVtX3dyaXRlOiBpbXBsZW1lbnQgOC1ieXRlIGFjY2Vzc2VzCmNmZGRhNDYyMWIgbWVtb3J5OiBy
-ZXVzZSBzZWN0aW9uX2Zyb21fZmxhdF9yYW5nZSgpCjQ5Y2ZkY2FmMmYga3ZtOiBzaW1wbGlmeSBr
-dm1fYWxpZ25fc2VjdGlvbigpCjI0MzZiMTE4ZmQga3ZtOiByZWdpb25fYWRkIGFuZCByZWdpb25f
-ZGVsIGlzIG5vdCBjYWxsZWQgb24gdXBkYXRlcwoxMDVhNGIxN2Y3IGt2bTogZml4IGVycm9yIG1l
-c3NhZ2Ugd2hlbiBmYWlsaW5nIHRvIHVucmVnaXN0ZXIgc2xvdApmZmJmYWZkYTdmIGt2bTogdG9s
-ZXJhdGUgbm9uLWV4aXN0aW5nIHNsb3QgZm9yIGxvZ19zdGFydC9sb2dfc3RvcC9sb2dfc3luYwpm
-MmUxYWRiYzc1IGt2bTogZml4IGFsaWdubWVudCBvZiByYW0gYWRkcmVzcwpjOTUwYjg3Yjc1IG1l
-bW9yeTogY2FsbCBsb2dfc3RhcnQgYWZ0ZXIgcmVnaW9uX2FkZApiMzk2NzQ0ZTQwIHRhcmdldC9p
-Mzg2OiB0cmFwIG9uIGluc3RydWN0aW9ucyBsb25nZXIgdGhhbiA+MTUgYnl0ZXMKOGZmNTkxZmMz
-MiB0YXJnZXQvaTM4NjogaW50cm9kdWNlIHg4Nl9sZCpfY29kZQowMDVjM2NkNDk1IHRjbzogYWRk
-IHRyYWNlIGV2ZW50cwozMzdkNDllOTQwIGRvY3MvZGV2ZWwvbG9hZHMtc3RvcmVzLnJzdDogRG9j
-dW1lbnQgb3VyIHZhcmlvdXMgbG9hZCBhbmQgc3RvcmUgQVBJcwoyYWZiN2U4MjQ0IG5pb3MyOiBk
-ZWZpbmUgdGNnX2VudgoxNDU4OWFlYmU1IGJ1aWxkOiByZW1vdmUgQ09ORklHX0xJQkRFQ05VTUJF
-Ugo1MmQ2YmRlZWMxIGRpc2FzOiBBbHdheXMgaW5pdGlhbGl6ZSByZWFkX21lbW9yeV9pbm5lcl9m
-dW5jIHByb3Blcmx5CjM5ZDg4YzRhOWUgcGM6IG1ha2Ugc3VyZSB0aGF0IHBsdWdnZWQgQ1BVcyBh
-cmUgb2YgdGhlIHNhbWUgdHlwZQphYWNjMWQ2NmMwIG1lbW9yeTogZml4IG9mZi1ieS1vbmUgZXJy
-b3IgaW4gbWVtb3J5X3JlZ2lvbl9ub3RpZnlfb25lKCkKYWEyM2IwZGRkNCBleGVjOiBzaW1wbGlm
-eSBhZGRyZXNzX3NwYWNlX2dldF9pb3RsYl9lbnRyeQpkZTM5YmY3ZWVlIGV4ZWM6IGFkZCBwYWdl
-X21hc2sgZm9yIGZsYXR2aWV3X2RvX3RyYW5zbGF0ZQo5NGE5YmI0MDBjIGNoYXI6IGRvbid0IHNr
-aXAgY2xpZW50IGNsZWFudXAgaWYgJ2Nvbm5lY3RlZCcgZmxhZyBpcyB1bnNldAplYWJlYzFlMzgz
-IGlkZTogc3VwcG9ydCByZXBvcnRpbmcgb2Ygcm90YXRpb24gcmF0ZQpkZmJiMDI2Y2E1IHNjc2kt
-ZGlzazogc3VwcG9ydCByZXBvcnRpbmcgb2Ygcm90YXRpb24gcmF0ZQpmMTlmMWU2Mjc2IGNoZWNr
-cGF0Y2g6IHJlZmluZSBtb2RlIHNlbGVjdGlvbgoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tp
-bmcgUEFUQ0ggMS8yOTogY2hlY2twYXRjaDogcmVmaW5lIG1vZGUgc2VsZWN0aW9uLi4uCkNoZWNr
-aW5nIFBBVENIIDIvMjk6IHNjc2ktZGlzazogc3VwcG9ydCByZXBvcnRpbmcgb2Ygcm90YXRpb24g
-cmF0ZS4uLgpDaGVja2luZyBQQVRDSCAzLzI5OiBpZGU6IHN1cHBvcnQgcmVwb3J0aW5nIG9mIHJv
-dGF0aW9uIHJhdGUuLi4KQ2hlY2tpbmcgUEFUQ0ggNC8yOTogY2hhcjogZG9uJ3Qgc2tpcCBjbGll
-bnQgY2xlYW51cCBpZiAnY29ubmVjdGVkJyBmbGFnIGlzIHVuc2V0Li4uCkNoZWNraW5nIFBBVENI
-IDUvMjk6IGV4ZWM6IGFkZCBwYWdlX21hc2sgZm9yIGZsYXR2aWV3X2RvX3RyYW5zbGF0ZS4uLgpD
-aGVja2luZyBQQVRDSCA2LzI5OiBleGVjOiBzaW1wbGlmeSBhZGRyZXNzX3NwYWNlX2dldF9pb3Rs
-Yl9lbnRyeS4uLgpDaGVja2luZyBQQVRDSCA3LzI5OiBtZW1vcnk6IGZpeCBvZmYtYnktb25lIGVy
-cm9yIGluIG1lbW9yeV9yZWdpb25fbm90aWZ5X29uZSgpLi4uCkNoZWNraW5nIFBBVENIIDgvMjk6
-IHBjOiBtYWtlIHN1cmUgdGhhdCBwbHVnZ2VkIENQVXMgYXJlIG9mIHRoZSBzYW1lIHR5cGUuLi4K
-RVJST1I6IHNwYWNlIHJlcXVpcmVkIGJlZm9yZSB0aGUgb3BlbiBwYXJlbnRoZXNpcyAnKCcKIzM1
-OiBGSUxFOiBody9pMzg2L3BjLmM6MTg4MjoKKyAgICBpZighb2JqZWN0X2R5bmFtaWNfY2FzdChP
-QkpFQ1QoY3B1KSwgbXMtPmNwdV90eXBlKSkgewoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdz
-LCAxNSBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNl
-IHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBv
-cnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMu
-CgpDaGVja2luZyBQQVRDSCA5LzI5OiBkaXNhczogQWx3YXlzIGluaXRpYWxpemUgcmVhZF9tZW1v
-cnlfaW5uZXJfZnVuYyBwcm9wZXJseS4uLgpDaGVja2luZyBQQVRDSCAxMC8yOTogYnVpbGQ6IHJl
-bW92ZSBDT05GSUdfTElCREVDTlVNQkVSLi4uCkNoZWNraW5nIFBBVENIIDExLzI5OiBuaW9zMjog
-ZGVmaW5lIHRjZ19lbnYuLi4KQ2hlY2tpbmcgUEFUQ0ggMTIvMjk6IGRvY3MvZGV2ZWwvbG9hZHMt
-c3RvcmVzLnJzdDogRG9jdW1lbnQgb3VyIHZhcmlvdXMgbG9hZCBhbmQgc3RvcmUgQVBJcy4uLgpD
-aGVja2luZyBQQVRDSCAxMy8yOTogdGNvOiBhZGQgdHJhY2UgZXZlbnRzLi4uCkNoZWNraW5nIFBB
-VENIIDE0LzI5OiB0YXJnZXQvaTM4NjogaW50cm9kdWNlIHg4Nl9sZCpfY29kZS4uLgpDaGVja2lu
-ZyBQQVRDSCAxNS8yOTogdGFyZ2V0L2kzODY6IHRyYXAgb24gaW5zdHJ1Y3Rpb25zIGxvbmdlciB0
-aGFuID4xNSBieXRlcy4uLgpFUlJPUjogVXNlIG9mIHZvbGF0aWxlIGlzIHVzdWFsbHkgd3Jvbmc6
-IHNlZSBEb2N1bWVudGF0aW9uL3ZvbGF0aWxlLWNvbnNpZGVyZWQtaGFybWZ1bC50eHQKIzY5OiBG
-SUxFOiB0YXJnZXQvaTM4Ni90cmFuc2xhdGUuYzoxODgxOgorICAgICAgICAgICAgdm9sYXRpbGUg
-dWludDhfdCB1bnVzZWQgPQoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCA1MyBsaW5lcyBj
-aGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElm
-IGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0
-aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQ
-QVRDSCAxNi8yOTogbWVtb3J5OiBjYWxsIGxvZ19zdGFydCBhZnRlciByZWdpb25fYWRkLi4uCkNo
-ZWNraW5nIFBBVENIIDE3LzI5OiBrdm06IGZpeCBhbGlnbm1lbnQgb2YgcmFtIGFkZHJlc3MuLi4K
-Q2hlY2tpbmcgUEFUQ0ggMTgvMjk6IGt2bTogdG9sZXJhdGUgbm9uLWV4aXN0aW5nIHNsb3QgZm9y
-IGxvZ19zdGFydC9sb2dfc3RvcC9sb2dfc3luYy4uLgpDaGVja2luZyBQQVRDSCAxOS8yOToga3Zt
-OiBmaXggZXJyb3IgbWVzc2FnZSB3aGVuIGZhaWxpbmcgdG8gdW5yZWdpc3RlciBzbG90Li4uCkNo
-ZWNraW5nIFBBVENIIDIwLzI5OiBrdm06IHJlZ2lvbl9hZGQgYW5kIHJlZ2lvbl9kZWwgaXMgbm90
-IGNhbGxlZCBvbiB1cGRhdGVzLi4uCkNoZWNraW5nIFBBVENIIDIxLzI5OiBrdm06IHNpbXBsaWZ5
-IGt2bV9hbGlnbl9zZWN0aW9uKCkuLi4KQ2hlY2tpbmcgUEFUQ0ggMjIvMjk6IG1lbW9yeTogcmV1
-c2Ugc2VjdGlvbl9mcm9tX2ZsYXRfcmFuZ2UoKS4uLgpDaGVja2luZyBQQVRDSCAyMy8yOTogbm90
-ZGlydHlfbWVtX3dyaXRlOiBpbXBsZW1lbnQgOC1ieXRlIGFjY2Vzc2VzLi4uCkNoZWNraW5nIFBB
-VENIIDI0LzI5OiB3YXRjaF9tZW1fd3JpdGU6IGltcGxlbWVudCA4LWJ5dGUgYWNjZXNzZXMuLi4K
-Q2hlY2tpbmcgUEFUQ0ggMjUvMjk6IHFlbXUtcHItaGVscGVyOiB1c2UgbmV3IGxpYm11bHRpcGF0
-aCBBUEkuLi4KRVJST1I6IGV4dGVybnMgc2hvdWxkIGJlIGF2b2lkZWQgaW4gLmMgZmlsZXMKIzU0
-OiBGSUxFOiBzY3NpL3FlbXUtcHItaGVscGVyLmM6Mjg0OgorZXh0ZXJuIHN0cnVjdCBjb25maWcg
-KmdldF9tdWx0aXBhdGhfY29uZmlnKHZvaWQpOwoKRVJST1I6IGV4dGVybnMgc2hvdWxkIGJlIGF2
-b2lkZWQgaW4gLmMgZmlsZXMKIzYxOiBGSUxFOiBzY3NpL3FlbXUtcHItaGVscGVyLmM6MjkwOgor
-ZXh0ZXJuIHZvaWQgcHV0X211bHRpcGF0aF9jb25maWcoc3RydWN0IGNvbmZpZyAqY29uZik7Cgp0
-b3RhbDogMiBlcnJvcnMsIDAgd2FybmluZ3MsIDQ4IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2gg
-aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
-cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
-Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDI2LzI5OiBxZGV2OiBz
-dG9yZSBEZXZpY2VTdGF0ZSdzIGNhbm9uaWNhbCBwYXRoIHRvIHVzZSB3aGVuIHVucGFyZW50aW5n
-Li4uCkNoZWNraW5nIFBBVENIIDI3LzI5OiBSZXZlcnQgInFkZXY6IEZyZWUgUWVtdU9wdHMgd2hl
-biB0aGUgUU9NIHBhdGggZ29lcyBhd2F5Ii4uLgpDaGVja2luZyBQQVRDSCAyOC8yOTogcWRldjog
-ZGVmZXIgREVWSUNFX0RFTCBldmVudCB1bnRpbCBpbnN0YW5jZV9maW5hbGl6ZSgpLi4uCkNoZWNr
-aW5nIFBBVENIIDI5LzI5OiBzY3NpOiByZWplY3QgY29uZmlndXJhdGlvbnMgd2l0aCBsb2dpY2Fs
-IGJsb2NrIHNpemUgPiBwaHlzaWNhbCBibG9jayBzaXplLi4uCj09PSBPVVRQVVQgRU5EID09PQoK
-VGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1
-dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5k
-IHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
+
+
+On 10/16/2017 8:56 PM, Peter Xu wrote:
+> On Mon, Oct 16, 2017 at 10:02:25AM -0700, Prasad Singamsetty wrote:
+>>
+>>
+>> On 10/14/2017 8:53 PM, Peter Xu wrote:
+>>> On Fri, Oct 13, 2017 at 11:14:03AM -0600, Alex Williamson wrote:
+>>>> On Fri, 13 Oct 2017 18:01:44 +0100
+>>>> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+>>>>
+>>>>> * Prasad Singamsetty (prasad.singamsetty@oracle.com) wrote:
+>>>>>> Hi,
+>>>>>>
+>>>>>> I am new to the alias. I have some questions on this subject
+>>>>>> and seek some clarifications from the experts in the team.
+>>>>>> I ran into a couple of issues when I tried with large configuration
+>>>>>> ( >= 1TB memory, > 255 CPUs) for x86_64 guest machine.
+>>>>>>
+>>>>>> 1. QEMU uses the default value of 40 (TCG_PHYS_ADDR_BITS) for address
+>>>>>>     width if user has not specified phys-bits or host-phys-bits=true
+>>>>>>     property. The default value is obviously not sufficient and
+>>>>>>     causing guest kernel to crash if configured with >= 1TB
+>>>>>>     memory. Depending on the linux kernel version in the guest the
+>>>>>>     panic was in different code paths. The workaround is for the
+>>>>>>     user to specify the phys-bits property or set the property
+>>>>>>     host-phys-bits=true.
+>>>>>>
+>>>>>>     QUESTIONS:
+>>>> ...
+>>>>>> 2. host_address_width in DMAR table structure
+>>>>>>
+>>>>>>     In this case, the default value is set to 39
+>>>>>>     (VTD_HOST_ADDRESS_WIDTH - 1). With interrupt remapping
+>>>>>>     enabled for the intel iommu and the guest is configured
+>>>>>>     with > 255 cpus and >= 1TB memory, the guest kernel hangs
+>>>>>>     during boot up. This need to be fixed.
+>>>>>>
+>>>>>>     QUESTION:
+>>>>>>     The question here again is can we fix this to use the
+>>>>>>     real address width from the host as the default?
+>>>>>
+>>>>> I don't know DMAR stuff; chatting to Alex (cc'd) it does sound
+>>>>> like that's an ommission that should be fixed.
+>>>>
+>>>> [CC +Peter]
+>>>>
+>>>> On physical hardware VT-d supports either 39 or 48 bit address widths
+>>>> and generally you'd expect a sufficiently capable IOMMU to be matched
+>>>> with the CPU.  Seems QEMU has only implemented a lower bit width and
+>>>> it should probably be forcing phys bits of the VM to 39 to match until
+>>>> the extended width can be implemented.  Thanks,
+>>>>
+>>>> Alex
+>>>
+>>> There were patches that tried to enable 48 bits GAW but it was
+>>> not accepted somehow:
+>>>
+>>>    https://lists.gnu.org/archive/html/qemu-devel/2016-12/msg01886.html
+>>>
+>>> Would this help in any way?
+>>>
+>>
+>> Thanks Alex for the patch info. Just curious why the patch was not
+>> accepted. Any way, I will try it.
+> 
+> I don't sure I know the reason.  Anyway, it originated from one of
+> Fam's request for some NVMe tests.  If it can really help for your use
+> case as well, please feel free to revive those patches, or let me know
+> so that I can respin.  Thanks,
+> 
+
+Thanks Peter. I will start with your patch and see if I can get
+it to work first.
+
+A quick question. Looking at the code, it doesn't look like there
+is a way to disable dma remapping. User may have a case where he
+is interested only in interrupt remapping (for > 255 cpus) and
+not DMA remapping. Is that scenario considered before?
+
+Thanks.
+--Prasad
