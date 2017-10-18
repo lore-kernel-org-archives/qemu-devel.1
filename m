@@ -1,32 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40527)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41271)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e4o5S-00081V-WC
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 09:08:44 -0400
+	(envelope-from <bounces@canonical.com>) id 1e4o7l-0000kM-9Q
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 09:11:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e4o5O-0002tq-Do
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 09:08:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33244)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1e4o5O-0002ta-4S
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 09:08:38 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 36006C05972E
-	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 13:08:37 +0000 (UTC)
-Date: Wed, 18 Oct 2017 14:08:11 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20171018130811.GG9719@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20171004103933.7898-1-quintela@redhat.com>
-	<20171004103933.7898-2-quintela@redhat.com>
-	<20171018120331.GD9719@redhat.com> <20171018124940.GC2339@work-vm>
+	(envelope-from <bounces@canonical.com>) id 1e4o7j-0003lm-08
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 09:11:05 -0400
+Received: from indium.canonical.com ([91.189.90.7]:48594)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1e4o7i-0003l3-Ol
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 09:11:02 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1e4o7g-000657-LU
+	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 13:11:00 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id A08A82E80C9
+	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 13:11:00 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20171018124940.GC2339@work-vm>
-Subject: Re: [Qemu-devel] [PATCH 1/6] tests: Add basic migration precopy test
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 18 Oct 2017 13:02:43 -0000
+From: Daniel Berrange <1724570@bugs.launchpad.net>
+Reply-To: Bug 1724570 <1724570@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150833168269.1534.1058667524294729864.malonedeb@soybean.canonical.com>
+Message-Id: <150833176363.14188.4842271171767779581.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1724570] Re: qemu-system-x86_64 generates ACPI
+ tables with broken endianess when run on big-endian hosts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,103 +37,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
+To: qemu-devel@nongnu.org
 
-On Wed, Oct 18, 2017 at 01:49:42PM +0100, Dr. David Alan Gilbert wrote:
-> * Daniel P. Berrange (berrange@redhat.com) wrote:
-> > On Wed, Oct 04, 2017 at 12:39:28PM +0200, Juan Quintela wrote:
-> > > Signed-off-by: Juan Quintela <quintela@redhat.com>
-> > > ---
-> > >  tests/Makefile.include |   3 +
-> > >  tests/migration-test.c | 497 +++++++++++++++++++++++++++++++++++++++++++++++++
-> > >  2 files changed, 500 insertions(+)
-> > >  create mode 100644 tests/migration-test.c
-> > > 
-> > 
-> > 
-> > > +
-> > > +/* A simple PC boot sector that modifies memory (1-100MB) quickly
-> > > + * outputing a 'B' every so often if it's still running.
-> > > + */
-> > 
-> > 
-> > Can you add a comment about what it is actually doing to dirty the memory.
-> 
-> Yes, so this is the code from the postcopy tests, the commit message
-> ea0c6d62 has the actual source for it.
+** Attachment added: "AML for DSDT generated on ppc64 host"
+   https://bugs.launchpad.net/qemu/+bug/1724570/+attachment/4974808/+files/=
+aml-DSDT.ppc64
 
-Ah ha, thanks.
+-- =
 
-> > eg is it writing a different random value at each byte of RAM, or picking
-> > a random value at the stasrt of each iteration and writing it to all RAM,
-> > or it is just xoring current memory contents, or something else ?
-> > 
-> > Understanding this would be helpful in understanding how well the tests
-> > for xbzrle / compression are working, because the pattern of dirtying
-> > memory will affect whether the compression does anything useful or not.
-> 
-> It rolls through 100MB of RAM, incrementing the 1st byte of each page in
-> sequence and then goes back and does it again.  So it should be
-> excellent for xbzrle.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1724570
 
-Yes
+Title:
+  qemu-system-x86_64 generates ACPI tables with broken endianess when
+  run on big-endian hosts
 
-> 
-> Dave
-> 
-> > > +unsigned char bootsect[] = {
-> > > +  0xfa, 0x0f, 0x01, 0x16, 0x74, 0x7c, 0x66, 0xb8, 0x01, 0x00, 0x00, 0x00,
-> > > +  0x0f, 0x22, 0xc0, 0x66, 0xea, 0x20, 0x7c, 0x00, 0x00, 0x08, 0x00, 0x00,
-> > > +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xe4, 0x92, 0x0c, 0x02,
-> > > +  0xe6, 0x92, 0xb8, 0x10, 0x00, 0x00, 0x00, 0x8e, 0xd8, 0x66, 0xb8, 0x41,
-> > > +  0x00, 0x66, 0xba, 0xf8, 0x03, 0xee, 0xb3, 0x00, 0xb8, 0x00, 0x00, 0x10,
-> > > +  0x00, 0xfe, 0x00, 0x05, 0x00, 0x10, 0x00, 0x00, 0x3d, 0x00, 0x00, 0x40,
-> > > +  0x06, 0x7c, 0xf2, 0xfe, 0xc3, 0x75, 0xe9, 0x66, 0xb8, 0x42, 0x00, 0x66,
-> > > +  0xba, 0xf8, 0x03, 0xee, 0xeb, 0xde, 0x66, 0x90, 0x00, 0x00, 0x00, 0x00,
-> > > +  0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0x00, 0x00, 0x00, 0x9a, 0xcf, 0x00,
-> > > +  0xff, 0xff, 0x00, 0x00, 0x00, 0x92, 0xcf, 0x00, 0x27, 0x00, 0x5c, 0x7c,
-> > > +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > > +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > > +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > > +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > > +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > > +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > > +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > > +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > > +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > > +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > > +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > > +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > > +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > > +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > > +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > > +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > > +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > > +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > > +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > > +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > > +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > > +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > > +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > > +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > > +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > > +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > > +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > > +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > > +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > > +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > > +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > > +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > > +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x55, 0xaa
-> > > +};
+Status in QEMU:
+  New
 
-So lets delete this here. Take the bootsect variable in postcopy-test.c
-and put it into a migration-bootsector.c file and link it to both tests.
+Bug description:
+  The bios-tables-test always fails when run on a big-endian host, which
+  has iasl installed. When it calls iasl to dumps the AML files into ASL
+  files, iasl complains
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+  Intel ACPI Component Architecture
+  ASL+ Optimizing Compiler/Disassembler version 20170831
+  Copyright (c) 2000 - 2017 Intel Corporation
+
+  Input file aml-4L677Y, Length 0x38 (56) bytes
+  Table [TEPH] is too long for file - needs: 0x38000000, remaining in file:=
+ 0x38
+  Could not get ACPI tables from aml-4L677Y, AE_BAD_HEADER
+
+  =
+
+  At first I thought this was an iasl bug, but the latest version of iasl i=
+n rawhide is ported to big endian.
+
+  So I looked at the actual AML files that bios-tables-test extracts
+  from the qemu-system-x86_64 memory space, when running on ppc64 host.
+  These do indeed have different content from the AML files generated by
+  qemu-system-x86_64 when running on an x86_64 host.
+
+  =
+
+  eg the AML file for the HPET shows
+
+  < 0000000   T   E   P   H nul nul nul   8 soh etx   B   O   C   H   S  sp
+  <            4554    4850    0000    3800    0301    4f42    4843    2053
+  < 0000020   B   X   P   C   H   P   E   T nul nul nul soh   B   X   P   C
+  <            5842    4350    5048    5445    0000    0100    5842    4350
+  < 0000040 nul nul nul soh soh   " ack nul nul nul nul nul nul nul   P   ~
+  <            0000    0100    a201    8086    0000    0000    0000    fed0
+  ---
+  > 0000000   H   P   E   T   8 nul nul nul soh etx   B   O   C   H   S  sp
+  >            5048    5445    0038    0000    0301    4f42    4843    2053
+  > 0000020   B   X   P   C   H   P   E   T soh nul nul nul   B   X   P   C
+  >            5842    4350    5048    5445    0001    0000    5842    4350
+  > 0000040 soh nul nul nul soh   " ack nul nul nul nul nul nul nul   P   ~
+  >            0001    0000    a201    8086    0000    0000    0000    fed0
+
+  so not only is the table name inverted, but the lenght is inverted,
+  and several fields later on are inverted too.
+
+  Other AML files for APIC and DSDT show similar brokenness
+
+  This is seen with QEMU 2.10.0
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1724570/+subscriptions
