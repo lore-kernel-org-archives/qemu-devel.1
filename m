@@ -1,33 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44566)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45200)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1e4msm-0007HH-DI
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 07:51:33 -0400
+	(envelope-from <quintela@redhat.com>) id 1e4muJ-000828-Op
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 07:53:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1e4msj-0000Hd-CK
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 07:51:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:15399)
+	(envelope-from <quintela@redhat.com>) id 1e4muD-0000qo-SK
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 07:53:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39288)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1e4msj-0000HK-6k
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 07:51:29 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1e4muD-0000pX-Jm
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 07:53:01 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3F85AC05972E
-	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 11:51:28 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 96F93C04AC53
+	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 11:53:00 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20171016120901.GD2252@work-vm> (David Alan Gilbert's message of
-	"Mon, 16 Oct 2017 13:09:02 +0100")
+In-Reply-To: <20171016154000.GE2252@work-vm> (David Alan Gilbert's message of
+	"Mon, 16 Oct 2017 16:40:01 +0100")
 References: <20171004103933.7898-1-quintela@redhat.com>
-	<20171004103933.7898-3-quintela@redhat.com>
-	<20171016120901.GD2252@work-vm>
+	<20171004103933.7898-4-quintela@redhat.com>
+	<20171016154000.GE2252@work-vm>
 Reply-To: quintela@redhat.com
-Date: Wed, 18 Oct 2017 13:51:24 +0200
-Message-ID: <87fuagn077.fsf@secure.laptop>
+Date: Wed, 18 Oct 2017 13:52:56 +0200
+Message-ID: <87a80on04n.fsf@secure.laptop>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 2/6] tests: Add basic migration precopy tcp
- test
+Subject: Re: [Qemu-devel] [PATCH 3/6] tests: Add precopy test using
+ deprecated commands
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,56 +43,82 @@ Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
 > * Juan Quintela (quintela@redhat.com) wrote:
 >> Signed-off-by: Juan Quintela <quintela@redhat.com>
 >> ---
->>  tests/migration-test.c | 8 ++++++++
->>  1 file changed, 8 insertions(+)
+>>  tests/migration-test.c | 71 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>>  1 file changed, 71 insertions(+)
 >> 
 >> diff --git a/tests/migration-test.c b/tests/migration-test.c
->> index cd954caee4..8ef2b72459 100644
+>> index 8ef2b72459..8549e4c2c6 100644
 >> --- a/tests/migration-test.c
 >> +++ b/tests/migration-test.c
->> @@ -466,6 +466,13 @@ static void test_precopy_unix(void)
->>      g_free(uri);
+>> @@ -422,6 +422,76 @@ static void migrate_set_parameter(QTestState *who, const char *parameter,
+>>      QDECREF(rsp);
 >>  }
 >>  
->> +static void test_precopy_tcp(void)
+>> +static void migrate_set_downtime(QTestState *who, const char *value)
 >> +{
->> +    const char *uri = "tcp:0:44444";
+>> +    QDict *rsp;
+>> +    gchar *cmd;
 >> +
->> +    test_precopy(uri);
+>> +    cmd = g_strdup_printf("{ 'execute': 'migrate_set_downtime',"
+>> +                          "'arguments': { 'value': %s } }", value);
+>> +    rsp = qtest_qmp(who, cmd);
+>> +    g_free(cmd);
+>> +    g_assert(qdict_haskey(rsp, "return"));
+>> +    QDECREF(rsp);
 >> +}
+>> +
+>> +static void migrate_set_speed(QTestState *who, const char *value)
+>> +{
+>> +    QDict *rsp;
+>> +    gchar *cmd;
+>> +
+>> +    cmd = g_strdup_printf("{ 'execute': 'migrate_set_speed',"
+>> +                          "'arguments': { 'value': %s } }", value);
+>> +    rsp = qtest_qmp(who, cmd);
+>> +    g_free(cmd);
+>> +    g_assert(qdict_haskey(rsp, "return"));
+>> +    QDECREF(rsp);
+>> +}
+>> +
+>> +static void test_precopy_deprecated(const char *uri)
+>> +{
+>> +    QTestState *from, *to;
+>> +
+>> +    test_migrate_start(&from, &to, uri);
+>> +
+>> +    /* We want to pick a speed slow enough that the test completes
+>> +     * quickly, but that it doesn't complete precopy even on a slow
+>> +     * machine, so also set the downtime.
+>> +     */
+>> +    /* 100 ms */
+>> +    migrate_set_downtime(from, "100");
+>> +    /* 1MB/s slow*/
+>> +    migrate_set_speed(from, "100000000");
 >
-> The problem is that this will fail if you make check -j  and two
-> tests use 4444 at the same time.
-> That's pretty common especially when you've built multiple architectures
-> as targets and all the same tests run at the same time.
+> Can't we share more/most of this function?
+> For example, how about we have a migrate_set_speed(who,value, old)
+> tht is :
+>   if (old) {
+>       migrate_set_speed...
+>   } else {
+>       migrate_set_parameter
+>   }
+>
+> then test_precopy(const char *uri, bool old)
+>
+> and we've duped most of it?
 
-Options:
+Moved to different setup, we end having:
 
-- Use different start value by architecture.
-- as we have a directory use O_CREAT|O_EXCL  and do create the file with
-- the port number that we want to use
+- migrate_set_parameter
 
-Anything else that you want to propose?
+and
+
+- migrate_set_speed
+- migrate_set_downtime
+- migrate_set_cache_size
+
+My plan would be to test that if you don't use deprecated interfaces,
+you don't need to deal with them.
 
 Later, Juan.
-
-
->
-> Dave
->
->>  int main(int argc, char **argv)
->>  {
->>      char template[] = "/tmp/migration-test-XXXXXX";
->> @@ -482,6 +489,7 @@ int main(int argc, char **argv)
->>      module_call_init(MODULE_INIT_QOM);
->>  
->>      qtest_add_func("/migration/precopy/unix", test_precopy_unix);
->> +    qtest_add_func("/migration/precopy/tcp", test_precopy_tcp);
->>  
->>      ret = g_test_run();
->>  
->> -- 
->> 2.13.5
->> 
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
