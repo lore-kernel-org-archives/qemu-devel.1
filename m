@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40690)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41391)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarnath.valluri@intel.com>) id 1e4lDh-0006ZC-CL
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 06:05:02 -0400
+	(envelope-from <thuth@redhat.com>) id 1e4lGd-0007Vq-3F
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 06:08:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarnath.valluri@intel.com>) id 1e4lDc-0006Fa-Dk
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 06:05:01 -0400
-Received: from mga09.intel.com ([134.134.136.24]:40542)
+	(envelope-from <thuth@redhat.com>) id 1e4lGY-00009A-40
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 06:08:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37778)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarnath.valluri@intel.com>)
-	id 1e4lDc-0006DN-4y
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 06:04:56 -0400
-From: "Valluri, Amarnath" <amarnath.valluri@intel.com>
-Date: Wed, 18 Oct 2017 10:04:26 +0000
-Message-ID: <1508321124.4061.38.camel@intel.com>
-References: <20171018083305.5246-1-quintela@redhat.com>
-	<cfb8e3d0-7c4e-f83f-3887-18e6af8b0418@redhat.com>
-	<874lqwolg2.fsf@secure.laptop>
-In-Reply-To: <874lqwolg2.fsf@secure.laptop>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <36D9612C0B9AF34BAF6B89A54984676A@intel.com>
-Content-Transfer-Encoding: base64
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1e4lGX-000088-RF
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 06:07:58 -0400
+References: <20171017140453.51099-1-pasic@linux.vnet.ibm.com>
+	<20171017140453.51099-4-pasic@linux.vnet.ibm.com>
+	<0a29771b-da12-76eb-ead8-34d1a8d24ce7@redhat.com>
+	<20171018115219.2dafd05c.cohuck@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <efc6c522-e359-0f10-2ddc-6a434da4557a@redhat.com>
+Date: Wed, 18 Oct 2017 12:07:54 +0200
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] tpm: Fix compilation with --disable-tpm
+In-Reply-To: <20171018115219.2dafd05c.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 3/7] s390x: improve error handling for
+ SSCH and RSCH
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,44 +31,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "quintela@redhat.com" <quintela@redhat.com>, "lvivier@redhat.com" <lvivier@redhat.com>
-Cc: "dgilbert@redhat.com" <dgilbert@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "peterx@redhat.com" <peterx@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Halil Pasic <pasic@linux.vnet.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
-U29ycnkgZm9yIGNhdXNpbmcgYnVpbGQgYnJlYWsgOigNCg0KSSB3b3VsZCBwcmVmZXIgdGhlIHdh
-eSB0cG1faW5pdCgpIHdhcyBoYW5kbGVkIGluIHZsLmMsIGV2ZW4NCnRwbV9jbGVhbnVwKCkgc2h1
-b3VsZCBiZSBndWFyZGVkIGJlaGluZCAjaWZkZWYgQ09ORklHX1RQTS4NCg0KLSBBbWFybmF0aA0K
-T24gV2VkLCAyMDE3LTEwLTE4IGF0IDExOjI3ICswMjAwLCBKdWFuIFF1aW50ZWxhIHdyb3RlOg0K
-PiBMYXVyZW50IFZpdmllciA8bHZpdmllckByZWRoYXQuY29tPiB3cm90ZToNCj4gPiANCj4gPiBP
-biAxOC8xMC8yMDE3IDEwOjMzLCBKdWFuIFF1aW50ZWxhIHdyb3RlOg0KPiA+ID4gDQo+ID4gPiBD
-b21taXQNCj4gPiA+IMKgwqDCoGMzN2NhY2FiZjIyODViMDczMWI0NGMxZjY2Nzc4MWZkZDRmMmI2
-NTgNCj4gPiA+IA0KPiA+ID4gYnJva2UgY29tcGlsYXRpb24gd2l0aG91dCB0cG0uwqDCoEp1c3Qg
-YWRkIGFuIGVtcHR5IHRwbV9jbGVhbnVwKCkNCj4gPiA+IHN0dWIuDQo+ID4gdHBtX2luaXQoKSBh
-bmQgdHBtX2NvbmZpZ19wYXJzZSgpIGFyZSBtYW5hZ2VkIGluIGEgZGlmZmVyZW50IHdheToNCj4g
-PiB0aGV5DQo+ID4gYXJlIGluY2x1ZGVkIGluIGEgIiNpZmRlZiBDT05GSUdfVFBNIC4uICNlbmRp
-ZiIgaW4gdmwuYw0KPiA+IA0KPiA+IEkgdGhpbmsgeW91IHNob3VsZCBmb2xsb3cgdGhlIHNhbWUg
-d2F5Lg0KPiB0cG0gaXMgd2VpcmQgKFRNKToNCj4gDQo+IGluIGluY2x1ZGUvc3lzZW11L3RwbS5o
-IHdlIGRvIHRoYXQgaW4gYW4gaW5jbGluZSBmdW5jdGlvbg0KPiANCj4gc3RhdGljIGlubGluZSBU
-UE1WZXJzaW9uIHRwbV9nZXRfdmVyc2lvbih2b2lkKQ0KPiB7DQo+ICNpZmRlZiBDT05GSUdfVFBN
-DQo+IMKgwqDCoMKgT2JqZWN0ICpvYmogPSBvYmplY3RfcmVzb2x2ZV9wYXRoX3R5cGUoIiIsIFRZ
-UEVfVFBNX1RJUywgTlVMTCk7DQo+IA0KPiDCoMKgwqDCoGlmIChvYmopIHsNCj4gwqDCoMKgwqDC
-oMKgwqDCoHJldHVybiB0cG1fdGlzX2dldF90cG1fdmVyc2lvbihvYmopOw0KPiDCoMKgwqDCoH0N
-Cj4gI2VuZGlmDQo+IMKgwqDCoMKgcmV0dXJuIFRQTV9WRVJTSU9OX1VOU1BFQzsNCj4gfQ0KPiAN
-Cj4gDQo+IHRwbS5jLCB3ZSBoYXZlIGFuIGlmZGVmIGluIHRoZSBtaWRkbGUgb2YgdGhlIGZpbGUN
-Cj4gDQo+ICNpZmRlZiBDT05GSUdfVFBNDQo+IA0KPiAjZW5kaWYNCj4gDQo+IA0KPiB2bC5jLCB3
-ZSBwcm90ZWN0IHRwbV8qIGNhbGxzIHdpdGggQ09ORklHX1RQTQ0KPiANCj4gI2lmZGVmIENPTkZJ
-R19UUE0NCj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgY2FzZSBRRU1VX09QVElPTl90cG1kZXY6
-DQo+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgaWYgKHRwbV9jb25maWdfcGFyc2Uo
-cWVtdV9maW5kX29wdHMoInRwbWRldiIpLA0KPiBvcHRhcmcpIDwgMCkgew0KPiDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgZXhpdCgxKTsNCj4gwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqB9DQo+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgYnJl
-YWs7DQo+ICNlbmRpZg0KPiANCj4gDQo+IGJ1dCB3ZSBhbG1vc3QgbmV2ZXIgZG86DQo+IA0KPiAj
-aWZkZWYgQ09ORklHX1RQTQ0KPiDCoMKgwqB0cG1fY2xlYW51cCgpDQo+ICNlbmRpZg0KPiANCj4g
-V2Ugbm9ybWFsbHkgY3JlYXRlIGFuIHN0dWIgZnVuY3Rpb24uDQo+IA0KPiBTbyAuLi4uLi4NCj4g
-DQo+IFdlIGFyZSBnb2luZyB0byBiZSBpbmNvbnNpc3RlbnQgd2hhdGV2ZXIgd2UgZGlkLg0KPiAN
-Cj4gSSB3b3VsZCBoYXZlIHZvdGUgZm9yDQo+IA0KPiAjaWZkZWYgQ09ORklHX1RQTQ0KPiB2b2lk
-IHRwbV9jbGVhbnVwKHZvaWQpOw0KPiAjZWxzZQ0KPiBzdGF0aWMgaW5saW5lIHZvaWQgdHBtX2Ns
-ZWFudXAodm9pZCkge30NCj4gI2VuZGlmDQo+IA0KPiBPbiB0aGUgaGVhZGVyIGZpbGUgKGl0IHdh
-cyBteSBmaXJzdCBzb2x1dGlvbiksIGJ1dCBoYXZpbmcgQ09ORklHX1RQTQ0KPiBvbg0KPiB0cG0u
-YyBzb3VuZGVkIGdyb3NzLg0KPiANCj4gU28gLi4uLg0KPiANCj4gSSB0aGluayB0aGF0IG5vdyB0
-aGF0IHRoZSBwcm9ibGVtIGlzIHNwb3R0ZWQsIEkgd2lsbCBsZWZ0IHRoZSBjaG9vc2UNCj4gb2YN
-Cj4gdGhlIHNvbHV0aW9uIHRvIHRoZSBtYWludGFuZXIgTzotKQ0KPiANCj4gTGF0ZXIsIEp1YW4u
+On 18.10.2017 11:52, Cornelia Huck wrote:
+> On Wed, 18 Oct 2017 11:30:47 +0200
+> Thomas Huth <thuth@redhat.com> wrote:
+>=20
+>> On 17.10.2017 16:04, Halil Pasic wrote:
+>>> Simplify the error handling of the SSCH and RSCH handler avoiding
+>>> arbitrary and cryptic error codes being used to tell how the instruct=
+ion
+>>> is supposed to end.  Let the code detecting the condition tell how it=
+'s
+>>> to be handled in a less ambiguous way.  It's best to handle SSCH and =
+RSCH
+>>> in one go as the emulation of the two shares a lot of code.
+>>>
+>>> For passthrough this change isn't pure refactoring, but changes the w=
+ay
+>>> kernel reported EFAULT is handled. After clarifying the kernel interf=
+ace
+>>> we decided that EFAULT shall be mapped to unit exception.  Same goes =
+for
+>>> unexpected error codes and absence of required ORB flags.
+>>>
+>>> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+>>> ---
+>>>  hw/s390x/css.c              | 84 +++++++++++++----------------------=
+----------
+>>>  hw/s390x/s390-ccw.c         | 11 +++---
+>>>  hw/vfio/ccw.c               | 28 +++++++++++----
+>>>  include/hw/s390x/css.h      | 23 +++++++++----
+>>>  include/hw/s390x/s390-ccw.h |  2 +-
+>>>  target/s390x/ioinst.c       | 53 ++++------------------------
+>>>  6 files changed, 75 insertions(+), 126 deletions(-)
+>>>
+>>> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
+>>> index aa233d5f8a..ff5a05c34b 100644
+>>> --- a/hw/s390x/css.c
+>>> +++ b/hw/s390x/css.c
+>>> @@ -1181,12 +1181,11 @@ static void sch_handle_start_func_virtual(Sub=
+chDev *sch)
+>>> =20
+>>>  }
+>>> =20
+>>> -static int sch_handle_start_func_passthrough(SubchDev *sch)
+>>> +static IOInstEnding sch_handle_start_func_passthrough(SubchDev *sch)
+>>>  {
+>>> =20
+>>>      PMCW *p =3D &sch->curr_status.pmcw;
+>>>      SCSW *s =3D &sch->curr_status.scsw;
+>>> -    int ret;
+>>> =20
+>>>      ORB *orb =3D &sch->orb;
+>>>      if (!(s->ctrl & SCSW_ACTL_SUSP)) {
+>>> @@ -1200,31 +1199,12 @@ static int sch_handle_start_func_passthrough(=
+SubchDev *sch)
+>>>       */
+>>>      if (!(orb->ctrl0 & ORB_CTRL0_MASK_PFCH) ||
+>>>          !(orb->ctrl0 & ORB_CTRL0_MASK_C64)) {
+>>> -        return -EINVAL;
+>>> +        warn_report("vfio-ccw requires PFCH and C64 flags set..."); =
+=20
+>>
+>> Not sure, but should this maybe rather be a
+>> "qemu_log_mask(LOG_GUEST_ERROR, ...)" instead?
+>=20
+> Is that visible by default, though? I'd rather want the admin to be
+> able to find a hint in a log somewhere why the guest I/O is rejected.
+
+Well, the guest could also trigger this condition on purpose (e.g.
+kvm-unit-tests), so I wonder whether we want to see the warning in that
+case, too...
+IMHO this is exactly what qemu_log_mask(LOG_GUEST_ERROR, ...) has been
+implemented for: Log errors from the guest in case you suspect that the
+guest is doing something wrong. But that's just my 0.02 =E2=82=AC, feel f=
+ree to
+ignore me.
+
+>>> @@ -1844,27 +1816,23 @@ void css_do_schm(uint8_t mbk, int update, int=
+ dct, uint64_t mbo)
+>>>      }
+>>>  }
+>>> =20
+>>> -int css_do_rsch(SubchDev *sch)
+>>> +IOInstEnding css_do_rsch(SubchDev *sch)
+>>>  {
+>>>      SCSW *s =3D &sch->curr_status.scsw;
+>>>      PMCW *p =3D &sch->curr_status.pmcw;
+>>> -    int ret;
+>>> =20
+>>>      if (~(p->flags) & (PMCW_FLAGS_MASK_DNV | PMCW_FLAGS_MASK_ENA)) {
+>>> -        ret =3D -ENODEV;
+>>> -        goto out;
+>>> +        return IOINST_CC_NOT_OPERATIONAL;
+>>>      }
+>>> =20
+>>>      if (s->ctrl & SCSW_STCTL_STATUS_PEND) {
+>>> -        ret =3D -EINPROGRESS;
+>>> -        goto out;
+>>> +        return IOINST_CC_STATUS_PRESENT;
+>>>      }
+>>> =20
+>>>      if (((s->ctrl & SCSW_CTRL_MASK_FCTL) !=3D SCSW_FCTL_START_FUNC) =
+||
+>>>          (s->ctrl & SCSW_ACTL_RESUME_PEND) ||
+>>>          (!(s->ctrl & SCSW_ACTL_SUSP))) {
+>>> -        ret =3D -EINVAL;
+>>> -        goto out;
+>>> +        return IOINST_CC_BUSY; =20
+>>
+>> Why is EINVAL now mapped to IOINST_CC_BUSY? Shouldn't that be
+>> IOINST_CC_STATUS_PRESENT instead?
+>=20
+> No, that is correct (see the PoP for when cc 2 is supposed to be set by
+> rsch).
+
+So if this is on purpose, this change in behavior should also be
+mentioned in the patch description, I think.
+
+ Thomas
