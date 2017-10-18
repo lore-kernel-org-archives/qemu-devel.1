@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41270)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41267)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e4o7l-0000kL-91
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 09:11:09 -0400
+	(envelope-from <bounces@canonical.com>) id 1e4o7l-0000kJ-8u
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 09:11:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e4o7j-0003mE-IY
+	(envelope-from <bounces@canonical.com>) id 1e4o7j-0003lw-7l
 	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 09:11:05 -0400
-Received: from indium.canonical.com ([91.189.90.7]:48670)
+Received: from indium.canonical.com ([91.189.90.7]:48634)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1e4o7j-0003le-CJ
+	id 1e4o7j-0003lO-1H
 	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 09:11:03 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1e4o7i-000667-6C
-	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 13:11:02 +0000
+	id 1e4o7h-00065d-1m
+	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 13:11:01 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 2CF032E80CC
-	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 13:11:02 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 0C94A2E80D4
+	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 13:11:01 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 18 Oct 2017 13:03:39 -0000
+Date: Wed, 18 Oct 2017 13:03:02 -0000
 From: Daniel Berrange <1724570@bugs.launchpad.net>
 Reply-To: Bug 1724570 <1724570@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <150833168269.1534.1058667524294729864.malonedeb@soybean.canonical.com>
-Message-Id: <150833181997.16847.6253096249833131193.malone@gac.canonical.com>
+Message-Id: <150833178249.1005.652195180737432337.malone@soybean.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1724570] Re: qemu-system-x86_64 generates ACPI
  tables with broken endianess when run on big-endian hosts
@@ -39,9 +39,9 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-** Attachment added: "AML for HPET generated on x86_64 host"
-   https://bugs.launchpad.net/qemu/+bug/1724570/+attachment/4974811/+files/=
-aml-HPET.x86_64
+** Attachment added: "AML for DSDT generated on x86_64 host"
+   https://bugs.launchpad.net/qemu/+bug/1724570/+attachment/4974809/+files/=
+aml-DSDT.x86_64
 
 -- =
 
