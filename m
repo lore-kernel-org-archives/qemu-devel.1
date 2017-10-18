@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49600)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49648)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1e4rjY-0000mg-Jy
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 13:02:21 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1e4rjf-0000qh-NF
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 13:02:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1e4rjS-0004bN-UA
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 13:02:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45046)
+	(envelope-from <dgilbert@redhat.com>) id 1e4rjb-0004k2-SL
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 13:02:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47220)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1e4rjS-0004am-MK
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 13:02:14 -0400
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1e4rjb-0004jT-LQ
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 13:02:23 -0400
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Wed, 18 Oct 2017 18:01:33 +0100
-Message-Id: <20171018170138.19078-3-dgilbert@redhat.com>
+Date: Wed, 18 Oct 2017 18:01:35 +0100
+Message-Id: <20171018170138.19078-5-dgilbert@redhat.com>
 In-Reply-To: <20171018170138.19078-1-dgilbert@redhat.com>
 References: <20171018170138.19078-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 2/7] migration: Add 'pre-switchover' and
- 'device' statuses
+Subject: [Qemu-devel] [PATCH v2 4/7] migration: migrate-continue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,74 +28,64 @@ Cc: berrange@redhat.com, eblake@redhat.com, fuweiwei2@huawei.com
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Add two statuses for use when the 'pause-before-switchover'
-capability is enabled.
-
-'pre-switchover' is the state that we wait in for management
-to allow us to continue.
-'device' is the state we enter while serialising the devices
-after management gives us the OK.
+A new qmp command allows the caller to continue from a given
+paused state.
 
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- migration/migration.c | 6 ++++++
- qapi/migration.json   | 8 +++++++-
- 2 files changed, 13 insertions(+), 1 deletion(-)
+ migration/migration.c | 11 +++++++++++
+ qapi/migration.json   | 17 +++++++++++++++++
+ 2 files changed, 28 insertions(+)
 
 diff --git a/migration/migration.c b/migration/migration.c
-index fba3342368..86ae0292f0 100644
+index 6c6d5e2c75..c9a3ee9efd 100644
 --- a/migration/migration.c
 +++ b/migration/migration.c
-@@ -526,6 +526,8 @@ static bool migration_is_setup_or_active(int state)
-     case MIGRATION_STATUS_ACTIVE:
-     case MIGRATION_STATUS_POSTCOPY_ACTIVE:
-     case MIGRATION_STATUS_SETUP:
-+    case MIGRATION_STATUS_PRE_SWITCHOVER:
-+    case MIGRATION_STATUS_DEVICE:
-         return true;
+@@ -1368,6 +1368,17 @@ void qmp_migrate_cancel(Error **errp)
+     migrate_fd_cancel(migrate_get_current());
+ }
  
-     default:
-@@ -600,6 +602,8 @@ MigrationInfo *qmp_query_migrate(Error **errp)
-     case MIGRATION_STATUS_ACTIVE:
-     case MIGRATION_STATUS_CANCELLING:
-     case MIGRATION_STATUS_POSTCOPY_ACTIVE:
-+    case MIGRATION_STATUS_PRE_SWITCHOVER:
-+    case MIGRATION_STATUS_DEVICE:
-          /* TODO add some postcopy stats */
-         info->has_status = true;
-         info->has_total_time = true;
-@@ -1183,6 +1187,8 @@ bool migration_is_idle(void)
-     case MIGRATION_STATUS_ACTIVE:
-     case MIGRATION_STATUS_POSTCOPY_ACTIVE:
-     case MIGRATION_STATUS_COLO:
-+    case MIGRATION_STATUS_PRE_SWITCHOVER:
-+    case MIGRATION_STATUS_DEVICE:
-         return false;
-     case MIGRATION_STATUS__MAX:
-         g_assert_not_reached();
++void qmp_migrate_continue(MigrationStatus state, Error **errp)
++{
++    MigrationState *s = migrate_get_current();
++    if (s->state != state) {
++        error_setg(errp,  "Migration not in expected state: %s",
++                   MigrationStatus_str(s->state));
++        return;
++    }
++    qemu_sem_post(&s->pause_sem);
++}
++
+ void qmp_migrate_set_cache_size(int64_t value, Error **errp)
+ {
+     MigrationState *s = migrate_get_current();
 diff --git a/qapi/migration.json b/qapi/migration.json
-index 4960231ba2..b56f95db64 100644
+index b56f95db64..3b50afa6e8 100644
 --- a/qapi/migration.json
 +++ b/qapi/migration.json
-@@ -96,12 +96,18 @@
- # @colo: VM is in the process of fault tolerance, VM can not get into this
- #        state unless colo capability is enabled for migration. (since 2.8)
- #
-+# @pre-switchover: Paused before device serialisation. (since 2.11)
-+#
-+# @device: During device serialisation when pause-before-switchover is enabled
-+#        (since 2.11)
-+#
- # Since: 2.3
- #
- ##
- { 'enum': 'MigrationStatus',
-   'data': [ 'none', 'setup', 'cancelling', 'cancelled',
--            'active', 'postcopy-active', 'completed', 'failed', 'colo' ] }
-+            'active', 'postcopy-active', 'completed', 'failed', 'colo',
-+            'pre-switchover', 'device' ] }
+@@ -877,6 +877,23 @@
+ { 'command': 'migrate_cancel' }
  
  ##
- # @MigrationInfo:
++# @migrate-continue:
++#
++# Continue migration when it's in a paused state.
++#
++# @state: The state the migration is currently expected to be in
++#
++# Returns: nothing on success
++# Since: 2.11
++# Example:
++#
++# -> { "execute": "migrate-continue" , "arguments":
++#      { "state": "pause-before-device" } }
++# <- { "return": {} }
++##
++{ 'command': 'migrate-continue', 'data': {'state': 'MigrationStatus'} }
++
++##
+ # @migrate_set_downtime:
+ #
+ # Set maximum tolerated downtime for migration.
 -- 
 2.13.6
