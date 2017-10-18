@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47910)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48540)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1e4lec-0006UP-5j
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 06:32:51 -0400
+	(envelope-from <darren.kenny@oracle.com>) id 1e4lgo-0007U0-IV
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 06:35:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1e4leZ-0002M6-0I
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 06:32:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33036)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1e4leY-0002Ky-Nk
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 06:32:46 -0400
-References: <1508232883-8790-1-git-send-email-yang.zhong@intel.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <33bd9d2f-1b06-d73c-c4a9-5f0e69b8e1d5@redhat.com>
-Date: Wed, 18 Oct 2017 12:32:42 +0200
+	(envelope-from <darren.kenny@oracle.com>) id 1e4lgi-0003wa-Q1
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 06:35:06 -0400
+Date: Wed, 18 Oct 2017 11:34:45 +0100
+From: Darren Kenny <darren.kenny@oracle.com>
+Message-ID: <20171018103445.tyw6k2dsdaewrbxq@starbug-vm.ie.oracle.com>
+References: <1508298038-4156-1-git-send-email-sundeep.lkml@gmail.com>
+	<20171018085459.3mt4gynx3s3gndnt@starbug-vm.ie.oracle.com>
+	<CALHRZuqhHJftwxP3h5Ne_VERxofwzwRgngeCZMP6G9oXi4UuXA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <1508232883-8790-1-git-send-email-yang.zhong@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] x86/cpufeatures: Enable new AVX512 cpu
- features
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+In-Reply-To: <CALHRZuqhHJftwxP3h5Ne_VERxofwzwRgngeCZMP6G9oXi4UuXA@mail.gmail.com>
+Subject: Re: [Qemu-devel] [Qemu devel v2 PATCH] msf2: Remove dead code
+ reported by Coverity
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,68 +25,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yang Zhong <yang.zhong@intel.com>, qemu-devel@nongnu.org
+To: sundeep subbaraya <sundeep.lkml@gmail.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Alistair Francis <alistair23@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
-On 17/10/2017 11:34, Yang Zhong wrote:
-> Intel IceLake cpu has added new cpu features,AVX512VBMI2/GFNI/
-> VAES/AVX512VNNI/AVX512BITALG/VPCLMULQDQ. Those new cpu features
-> need expose to guest VM.
-> 
-> The bit definition:
-> CPUID.(EAX=7,ECX=0):ECX[bit 06] AVX512VBMI2
-> CPUID.(EAX=7,ECX=0):ECX[bit 08] GFNI
-> CPUID.(EAX=7,ECX=0):ECX[bit 09] VAES
-> CPUID.(EAX=7,ECX=0):ECX[bit 10] VPCLMULQDQ
-> CPUID.(EAX=7,ECX=0):ECX[bit 11] AVX512VNNI
-> CPUID.(EAX=7,ECX=0):ECX[bit 12] AVX512_BITALG
-> 
-> The release document ref below link:
-> https://software.intel.com/sites/default/files/managed/c5/15/
-> architecture-instruction-set-extensions-programming-reference.pdf
-> 
-> Signed-off-by: Yang Zhong <yang.zhong@intel.com>
+Hi Sundeep,
 
-Have you sent the KVM part of this too?  I cannot find it.
+On Wed, Oct 18, 2017 at 10:10:07AM +0000, sundeep subbaraya wrote:
+>Hi Darren,
+>
+>On Wed, Oct 18, 2017 at 2:24 PM, Darren Kenny <darren.kenny@oracle.com>
+>wrote:
+>
+>> On Wed, Oct 18, 2017 at 03:40:38AM +0000, Subbaraya Sundeep wrote:
+>>
+>>> Fixed incorrect frame size mask, validated maximum frame
+>>> size in spi_write and removed dead code.
+>>>
+>>> Signed-off-by: Subbaraya Sundeep <sundeep.lkml@gmail.com>
+>>> ---
+>>> v2:
+>>>         else if -> else in set_fifodepth
+>>>         log guest error when frame size is more than 32
+>>>
+>>> hw/ssi/mss-spi.c | 12 ++++++++----
+>>> 1 file changed, 8 insertions(+), 4 deletions(-)
+>>>
+>>> diff --git a/hw/ssi/mss-spi.c b/hw/ssi/mss-spi.c
+>>> index 5a8e308..7fef2c3 100644
+>>> --- a/hw/ssi/mss-spi.c
+>>> +++ b/hw/ssi/mss-spi.c
+>>> @@ -76,9 +76,10 @@
+>>> #define C_BIGFIFO            (1 << 29)
+>>> #define C_RESET              (1 << 31)
+>>>
+>>> -#define FRAMESZ_MASK         0x1F
+>>> +#define FRAMESZ_MASK         0x3F
+>>> #define FMCOUNT_MASK         0x00FFFF00
+>>> #define FMCOUNT_SHIFT        8
+>>> +#define FRAMESZ_MAX          32
+>>>
+>>> static void txfifo_reset(MSSSpiState *s)
+>>> {
+>>> @@ -104,10 +105,8 @@ static void set_fifodepth(MSSSpiState *s)
+>>>         s->fifo_depth = 32;
+>>>     } else if (size <= 16) {
+>>>         s->fifo_depth = 16;
+>>> -    } else if (size <= 32) {
+>>> -        s->fifo_depth = 8;
+>>>     } else {
+>>> -        s->fifo_depth = 4;
+>>> +        s->fifo_depth = 8;
+>>>     }
+>>> }
+>>>
+>>> @@ -301,6 +300,11 @@ static void spi_write(void *opaque, hwaddr addr,
+>>>         if (s->enabled) {
+>>>             break;
+>>>         }
+>>> +        if ((value & FRAMESZ_MASK) > FRAMESZ_MAX) {
+>>> +            qemu_log_mask(LOG_GUEST_ERROR, "%s: Maximum frame size is
+>>> %d\n",
+>>> +                         __func__, FRAMESZ_MAX);
+>>> +            break;
+>>> +        }
+>>>         s->regs[R_SPI_DFSIZE] = value;
+>>>         break;
+>>>
+>>
+>> This test, and subsequent use of value appear to be out of sorts -
+>> in that while it is testing for the value by ANDing it with
+>> FRAMESZ_MASK, it is subsequently using the value without that mask
+>> applied to it, which still has the potential to be larger than
+>> FRAMESZ_MASK if it contains a value larger than 0x3F.
+>>
+>> Is that the expected behaviour? If so, maybe include a comment on
+>> it?
+>>
+>
+>As per docs regarding [31:6]:
+>Software should not rely on the value of a reserved bit. To provide
+>compatibility with future products, the value of a reserved bit should be
+>preserved across a read-modify-write operation.
+>
+>Hence we do not care about [31:6] and validate only [5:0] for size
+>during write.  When reading size we AND with FRAMESZ_MASK. In other
+>words we let [31:6] bits like scratch bits where guest can read and
+>write. I am really not sure how hardware behaves if [5:0] is
+>greater than 32 hence guest error and write wont happen. If this is
+>not right we can discuss :)
 
-Paolo
+That sounds fine then - definitely would suggest some sort of
+comment w.r.t. the fact that we are intentionally preserving these
+extra bits - in case anyone looks at this again in the future.
+>
+>
+>>
+>> Also, it might be useful to include the incorrect value in the
+>> logged output too, not just what the maximum is.
+>>
+>> Ok I will change.
 
-> ---
->  target/i386/cpu.c | 6 +++---
->  target/i386/cpu.h | 6 ++++++
->  2 files changed, 9 insertions(+), 3 deletions(-)
-> 
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index 98732cd..03fb8ad 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -435,9 +435,9 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
->      [FEAT_7_0_ECX] = {
->          .feat_names = {
->              NULL, "avx512vbmi", "umip", "pku",
-> -            "ospke", NULL, NULL, NULL,
-> -            NULL, NULL, NULL, NULL,
-> -            NULL, NULL, "avx512-vpopcntdq", NULL,
-> +            "ospke", NULL, "avx512vbmi2", NULL,
-> +            "gfni", "vaes", "vpclmulqdq", "avx512vnni",
-> +            "avx512bitalg", NULL, "avx512-vpopcntdq", NULL,
->              "la57", NULL, NULL, NULL,
->              NULL, NULL, "rdpid", NULL,
->              NULL, NULL, NULL, NULL,
-> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> index b086b15..cdbf8b0 100644
-> --- a/target/i386/cpu.h
-> +++ b/target/i386/cpu.h
-> @@ -635,6 +635,12 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
->  #define CPUID_7_0_ECX_UMIP     (1U << 2)
->  #define CPUID_7_0_ECX_PKU      (1U << 3)
->  #define CPUID_7_0_ECX_OSPKE    (1U << 4)
-> +#define CPUID_7_0_ECX_VBMI2    (1U << 6) /* Additional VBMI Instrs */
-> +#define CPUID_7_0_ECX_GFNI     (1U << 8)
-> +#define CPUID_7_0_ECX_VAES     (1U << 9)
-> +#define CPUID_7_0_ECX_VPCLMULQDQ (1U << 10)
-> +#define CPUID_7_0_ECX_AVX512VNNI (1U << 11)
-> +#define CPUID_7_0_ECX_AVX512BITALG (1U << 12)
->  #define CPUID_7_0_ECX_AVX512_VPOPCNTDQ (1U << 14) /* POPCNT for vectors of DW/QW */
->  #define CPUID_7_0_ECX_LA57     (1U << 16)
->  #define CPUID_7_0_ECX_RDPID    (1U << 22)
-> 
+OK
+
+Thanks,
+
+Darren.
