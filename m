@@ -1,37 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41474)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41562)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=457281bb7=roger.pau@citrix.com>)
-	id 1e4k8t-0000m9-0q
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 04:56:00 -0400
+	(envelope-from <david@redhat.com>) id 1e4k93-0000sp-Ck
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 04:56:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=457281bb7=roger.pau@citrix.com>)
-	id 1e4k8p-0003t8-Uo
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 04:55:59 -0400
-Received: from smtp.citrix.com.au ([103.14.252.240]:5523)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=457281bb7=roger.pau@citrix.com>)
-	id 1e4k8p-0003pV-BS
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 04:55:55 -0400
-Date: Wed, 18 Oct 2017 09:55:44 +0100
-From: Roger Pau =?iso-8859-1?Q?Monn=E9?= <roger.pau@citrix.com>
-Message-ID: <20171018085544.xvtiejabymftfcz5@dhcp-3-128.uk.xensource.com>
-References: <f6478644-0d4a-6531-9016-aee2a0e76417@redhat.com>
-	<20171013075326.77azyi4j2wo3b2fx@hz-desktop>
-	<20171013104453.50284426@nial.brq.redhat.com>
-	<20171013111341.feb2462nh2rcrjpp@hz-desktop>
-	<59E0C9F602000078001862C4@prv-mh.provo.novell.com>
-	<alpine.DEB.2.10.1710131544350.2967@sstabellini-ThinkPad-X260>
-	<50dba025-45db-f723-1441-c048f2a30e6a@redhat.com>
-	<20171017121647.et5w5w3ss457twov@hz-desktop>
-	<20171018083225.4x42tkamuuauj4ki@dhcp-3-128.uk.xensource.com>
-	<f43ea65c-29c5-42bd-9b1e-9200662d4e41@redhat.com>
+	(envelope-from <david@redhat.com>) id 1e4k90-00043N-Bc
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 04:56:09 -0400
+References: <1508247148-25240-1-git-send-email-thuth@redhat.com>
+	<1508247148-25240-3-git-send-email-thuth@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <3caa6d80-0ef2-7019-8048-911e9bd2c40b@redhat.com>
+Date: Wed, 18 Oct 2017 10:55:59 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <f43ea65c-29c5-42bd-9b1e-9200662d4e41@redhat.com>
-Subject: Re: [Qemu-devel] [Xen-devel] [RFC QEMU PATCH v3 00/10] Implement
- vNVDIMM for Xen HVM guest
+In-Reply-To: <1508247148-25240-3-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/4] tests/cpu-plug-test: Check the CPU
+ hot-plugging with device_add, too
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,40 +25,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Haozhong Zhang <haozhong.zhang@intel.com>, Stefano Stabellini <sstabellini@kernel.org>, Jan Beulich <JBeulich@suse.com>, andrew.cooper3@citrix.com, Anthony Perard <anthony.perard@citrix.com>, george.dunlap@citrix.com, wei.liu2@citrix.com, ian.jackson@eu.citrix.com, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Dan Williams <dan.j.williams@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, xen-devel@lists.xen.org, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, Bharata B Rao <bharata@linux.vnet.ibm.com>
 
-On Wed, Oct 18, 2017 at 10:46:57AM +0200, Paolo Bonzini wrote:
-> On 18/10/2017 10:32, Roger Pau Monné wrote:
-> >> I'll have a try to check how much the differences would affect. If it
-> >> would not take too much work, I'd like to adapt Xen NVDIMM enabling
-> >> patches to the all QEMU built ACPI. Otherwise, I'll fall back to Paolo
-> >> and MST's suggestions.
-> > I don't agree with the end goal of fully switching to the QEMU build
-> > ACPI tables. First of all, the only entity that has all the
-> > information about the guest it's the toolstack, and so it should be
-> > the one in control of the ACPI tables.
-> > 
-> > Also, Xen guests can use several device models concurrently (via the
-> > ioreq server interface), and each should be able to contribute to the
-> > information presented in the ACPI tables. Intel is also working on
-> > adding IOMMU emulation to the Xen hypervisor, in which case the vIOMMU
-> > ACPI tables should be created by the toolstack and not QEMU. And
-> > finally keep in mind that there are Xen guests (PVH) that use ACPI
-> > tables but not QEMU.
+On 17.10.2017 15:32, Thomas Huth wrote:
+> Using 'device_add' instead of 'cpu-add' is the new way for
+> hot-plugging CPUs, so we should test this regularly, too.
 > 
-> I agree with this in fact; QEMU has a view of _most_ of the emulated
-> hardware, but not all.
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  tests/cpu-plug-test.c | 42 ++++++++++++++++++++++++++++++++++++++++--
+>  1 file changed, 40 insertions(+), 2 deletions(-)
 > 
-> However, I disagree that the toolstack should be alone in controlling
-> the ACPI tables; rather, each involved part of the stack should be
-> providing its own part of the tables.  For example, QEMU (in addition to
-> NVDIMM information) should be the one providing an SSDT for southbridge
-> devices (floppy, COMx, LPTx, etc.).
+> diff --git a/tests/cpu-plug-test.c b/tests/cpu-plug-test.c
+> index 4579119..5fef297 100644
+> --- a/tests/cpu-plug-test.c
+> +++ b/tests/cpu-plug-test.c
+> @@ -16,6 +16,7 @@
+>  struct PlugTestData {
+>      char *machine;
+>      const char *cpu_model;
+> +    const char *device_model;
+>      unsigned sockets;
+>      unsigned cores;
+>      unsigned threads;
+> @@ -71,6 +72,34 @@ static void test_plug_without_cpu_add(gconstpointer data)
+>      g_free(args);
+>  }
+>  
+> +static void test_plug_with_device_add_x86(gconstpointer data)
+> +{
+> +    const PlugTestData *td = data;
+> +    char *args;
+> +    unsigned int s, c, t;
+> +
+> +    args = g_strdup_printf("-machine %s -cpu %s "
+> +                           "-smp sockets=%u,cores=%u,threads=%u,maxcpus=%u",
+> +                           td->machine, td->cpu_model,
+> +                           td->sockets, td->cores, td->threads, td->maxcpus);
+> +    qtest_start(args);
+> +
 
-Yes, that's what I wanted to say, rather than the toolstack providing
-all the ACPI tables by itself. Every component should provide the
-tables of the devices under it's control, and that should be glued
-together by the toolstack (ie: hvmloader).
+I wonder if we should also query the hotpluggable CPUs via
+query-hotpluggable-cpus and try to add all (maybe even in random order).
+Could also be a second test case.
 
-Roger.
+> +    for (s = td->sockets; s < td->maxcpus / td->cores / td->threads; s++) {
+> +        for (c = 0; c < td->cores; c++) {
+> +            for (t = 0; t < td->threads; t++) {
+> +                char *id = g_strdup_printf("id-%i-%i-%i", s, c, t);
+> +                qtest_qmp_device_add(td->device_model, id, "'socket-id':'%i', "
+> +                                     "'core-id':'%i', 'thread-id':'%i'",
+> +                                     s, c, t);
+> +                g_free(id);
+> +            }
+> +        }
+> +    }
+> +
+> +    qtest_end();
+> +    g_free(args);
+> +}
+> +
+>  static void test_data_free(gpointer data)
+>  {
+>      PlugTestData *pc = data;
+> @@ -90,6 +119,7 @@ static void add_pc_test_case(const char *mname)
+>      data = g_new(PlugTestData, 1);
+>      data->machine = g_strdup(mname);
+>      data->cpu_model = "Haswell"; /* 1.3+ theoretically */
+> +    data->device_model = "Haswell-x86_64-cpu";
+>      data->sockets = 1;
+>      data->cores = 3;
+>      data->threads = 2;
+> @@ -105,19 +135,27 @@ static void add_pc_test_case(const char *mname)
+>          (strcmp(mname, "pc-0.12") == 0) ||
+>          (strcmp(mname, "pc-0.11") == 0) ||
+>          (strcmp(mname, "pc-0.10") == 0)) {
+> -        path = g_strdup_printf("cpu/%s/init/%ux%ux%u&maxcpus=%u",
+> +        path = g_strdup_printf("cpu-plug/%s/init/%ux%ux%u&maxcpus=%u",
+>                                 mname, data->sockets, data->cores,
+>                                 data->threads, data->maxcpus);
+>          qtest_add_data_func_full(path, data, test_plug_without_cpu_add,
+>                                   test_data_free);
+>          g_free(path);
+>      } else {
+> -        path = g_strdup_printf("cpu/%s/add/%ux%ux%u&maxcpus=%u",
+> +        PlugTestData *data2 = g_memdup(data, sizeof(PlugTestData));
+
+add an empty line?
+
+> +        data2->machine = g_strdup(mname);
+> +        path = g_strdup_printf("cpu-plug/%s/cpu-add/%ux%ux%u&maxcpus=%u",
+>                                 mname, data->sockets, data->cores,
+>                                 data->threads, data->maxcpus);
+>          qtest_add_data_func_full(path, data, test_plug_with_cpu_add,
+>                                   test_data_free);
+>          g_free(path);
+> +        path = g_strdup_printf("cpu-plug/%s/device-add/%ux%ux%u&maxcpus=%u",
+> +                               mname, data2->sockets, data2->cores,
+> +                               data2->threads, data2->maxcpus);
+> +        qtest_add_data_func_full(path, data2, test_plug_with_device_add_x86,
+> +                                 test_data_free);
+> +        g_free(path);
+>      }
+>  }
+>  
+> 
+
+device_model can usually be created from cpu_model (although not 100%
+clean, e.g. s390 vs. s390x). But the distinction here actually allows us
+to test that we can't plug mixed CPU models.
+
+So we might add a test case later that tries to hotplug a different CPU.
+
+Reviewed-by: David Hildenbrand <david@redhat.com>
+
+-- 
+
+Thanks,
+
+David
