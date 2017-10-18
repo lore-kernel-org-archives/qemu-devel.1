@@ -1,17 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42564)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43595)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1e4x1o-0003ld-Ul
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 18:41:33 -0400
+	(envelope-from <cota@braap.org>) id 1e4x5X-00059G-Tf
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 18:45:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1e4x1n-0001Zd-8I
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 18:41:32 -0400
-Date: Wed, 18 Oct 2017 15:41:23 -0700 (PDT)
-From: Stefano Stabellini <sstabellini@kernel.org>
-Message-ID: <alpine.DEB.2.10.1710181539580.27209@sstabellini-ThinkPad-X260>
+	(envelope-from <cota@braap.org>) id 1e4x5T-0003Et-Uq
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 18:45:23 -0400
+Received: from out4-smtp.messagingengine.com ([66.111.4.28]:56681)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1e4x5T-0003Eg-O5
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 18:45:19 -0400
+Date: Wed, 18 Oct 2017 18:45:18 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20171018224518.GA28532@flamenco>
+References: <20171016172609.23422-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: [Qemu-devel] [PATCH] don't hardcode EL1 in
- extended_addresses_enabled
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171016172609.23422-1-richard.henderson@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH v6 00/50] tcg tb_lock removal
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,24 +26,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, sstabellini@kernel.org, julien.grall@linaro.org
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org
 
-extended_addresses_enabled calls arm_el_is_aa64, hardcoding exception
-level 1. Instead, retrieve the current el calling arm_current_el.
+On Mon, Oct 16, 2017 at 10:25:19 -0700, Richard Henderson wrote:
+> I've fixed two bugs within v5 of Emilio's patch set:
+> 
+>  - The step_next_tb patch fixes the "rep movsb" bug that appeared
+>    when we included CF_COUNT_MASK into CF_HASH_MASK.  We had been
+>    relying on magic to single-step the next guest insn.
+> 
+>  - The original "allocate optimizer temps with tcg_malloc" patch
+>    failed testing on arm32 host.  I didn't really look into exactly
+>    what was wrong because I had an older patch set that touched the
+>    same portion of the optimizer.
 
-Signed-off-by: Stefano Stabellini <sstabellini@kernel.org>
+Thanks a lot for fixing these issues and respinning the series.
 
-diff --git a/target/arm/internals.h b/target/arm/internals.h
-index 1f6efef..63507d9 100644
---- a/target/arm/internals.h
-+++ b/target/arm/internals.h
-@@ -187,7 +187,7 @@ static inline unsigned int arm_pamax(ARMCPU *cpu)
- static inline bool extended_addresses_enabled(CPUARMState *env)
- {
-     TCR *tcr = &env->cp15.tcr_el[arm_is_secure(env) ? 3 : 1];
--    return arm_el_is_aa64(env, 1) ||
-+    return arm_el_is_aa64(env, arm_current_el(env)) ||
-            (arm_feature(env, ARM_FEATURE_LPAE) && (tcr->raw_tcr & TTBCR_EAE));
- }
- 
+I have just pushed a branch on top of this series that includes
+10 patches that further pave the way for the removal of tb_lock:
+
+  https://github.com/cota/qemu/tree/multi-tcg-v6-plus
+
+These patches are a subset of the ones that I posted on the
+tb_lock removal patchset [1]. In particular, these patches are
+groundwork that doesn't change anything fundamental wrt locking,
+which does get tricky.
+
+Given how close we are to the soft freeze for 2.11 [2], do you want
+me to post these patches on the list for review? Otherwise I can wait
+for the 2.12 dev cycle to post them with the complete tb_lock removal
+work.
+
+That said, I think we should at least cherry-pick "translate-all: exit
+from tb_phys_invalidate if qht_remove fails" for 2.11, since it
+fixes a real bug. Stable should also get it.
+
+Thanks,
+
+		Emilio
+
+[1] https://lists.gnu.org/archive/html/qemu-devel/2017-10/msg01199.html
+[2] https://lists.gnu.org/archive/html/qemu-devel/2017-10/msg02217.html
