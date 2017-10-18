@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39224)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39232)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e4pNi-0001Nz-Dg
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 10:31:40 -0400
+	(envelope-from <bounces@canonical.com>) id 1e4pNl-0001O7-DQ
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 10:31:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e4pNb-0006Om-Kw
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 10:31:38 -0400
-Received: from indium.canonical.com ([91.189.90.7]:48408)
+	(envelope-from <bounces@canonical.com>) id 1e4pNe-0006RV-UV
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 10:31:41 -0400
+Received: from indium.canonical.com ([91.189.90.7]:48566)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1e4pNb-0006Nf-Az
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 10:31:31 -0400
+	id 1e4pNe-0006QB-KO
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 10:31:34 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1e4pNY-0007jI-FU
-	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 14:31:28 +0000
+	id 1e4pNb-0007yU-LM
+	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 14:31:31 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 599DD2E80D6
-	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 14:31:28 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 0E0032E80EC
+	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 14:31:31 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 18 Oct 2017 14:23:55 -0000
-From: ChristianEhrhardt <1719196@bugs.launchpad.net>
+Date: Wed, 18 Oct 2017 14:24:32 -0000
+From: Sean Feole <sean.feole@canonical.com>
 Reply-To: Bug 1719196 <1719196@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <150626680089.6094.17724106932405637799.malonedeb@soybean.canonical.com>
-Message-Id: <150833663558.16886.16996617973077592724.malone@gac.canonical.com>
+Message-Id: <150833667224.17029.8698579950485097191.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1719196] Re: [arm64 ocata] newly created
  instances are unable to raise network interfaces
@@ -39,33 +39,22 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Hi,
-@admcleod as discussed on IRC I realized Ocata maps to Zesty so that is qem=
-u 2.8.
-Therefore the referred patch is released in Artful, but not in Zesty.
+To further reinforce what Christian said, the Newton cloud-archive also
+uses virtio-mmio for its address type.  (See my comment#15)
 
-I tagged up the bug tasks and provide a fix in [1] to test.
+Newton XML:
 
-[1]: https://launchpad.net/~ci-train-ppa-service/+archive/ubuntu/2995
+    <interface type=3D'bridge'>
+      <mac address=3D'fa:16:3e:8e:fc:48'/>
+      <source bridge=3D'qbrb5d335fc-46'/>
+      <target dev=3D'tapb5d335fc-46'/>
+      <model type=3D'virtio'/>
+      <alias name=3D'net0'/>
+      <address type=3D'virtio-mmio'/>
+    </interface>
 
-** Changed in: qemu (Ubuntu)
-       Status: Incomplete =3D> Fix Released
-
-** Also affects: qemu (Ubuntu Zesty)
-   Importance: Undecided
-       Status: New
-
-** Also affects: libvirt (Ubuntu Zesty)
-   Importance: Undecided
-       Status: New
-
-** No longer affects: libvirt (Ubuntu Zesty)
-
-** Changed in: qemu (Ubuntu Zesty)
-       Status: New =3D> Incomplete
-
-** Changed in: qemu (Ubuntu Zesty)
-       Status: Incomplete =3D> In Progress
+but we have proven this works with Newton.  Is it fair to say this could
+be attributed to a change in OVS, between Newton and Ocata?
 
 -- =
 
