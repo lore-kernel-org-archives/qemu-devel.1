@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54250)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54478)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e4nJ5-0007rs-Vp
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 08:18:47 -0400
+	(envelope-from <thuth@redhat.com>) id 1e4nJj-0008JQ-PR
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 08:19:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e4nJ5-0004le-5X
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 08:18:43 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
+	(envelope-from <thuth@redhat.com>) id 1e4nJg-00054C-K5
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 08:19:23 -0400
 References: <20171017164426.25277-1-f4bug@amsat.org>
-	<20171017164426.25277-17-f4bug@amsat.org>
-	<2466fbb7-ab33-26bf-9605-e5fa339abdf5@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <cd81b523-1241-83fd-e060-1b5694a64ff0@amsat.org>
-Date: Wed, 18 Oct 2017 09:18:33 -0300
+	<20171017164426.25277-38-f4bug@amsat.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <28efa044-0b5d-6a98-1356-631352d8b9ba@redhat.com>
+Date: Wed, 18 Oct 2017 14:19:11 +0200
 MIME-Version: 1.0
-In-Reply-To: <2466fbb7-ab33-26bf-9605-e5fa339abdf5@redhat.com>
+In-Reply-To: <20171017164426.25277-38-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 16/42] i386/hax: remove duplicated
- include
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 37/42] hw/display/vga: extract public
+ API from i386/pc to "hw/display/vga.h"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,26 +25,168 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>, Peter Maydell <peter.maydell@linaro.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Yu Ning <yu.ning@linux.intel.com>, Vincent Palatin <vpalatin@chromium.org>, Corey Minyard <cminyard@mvista.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>, Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@imgtec.com>
+Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
 
-On 10/18/2017 09:12 AM, Thomas Huth wrote:
-> On 17.10.2017 18:44, Philippe Mathieu-Daudé wrote:
->> this file in include in "target/i386/hax-i386.h":
->>
->>     #ifdef CONFIG_WIN32
->>     #include "target/i386/hax-windows.h"
->>     #endif
->>
->> which guaranty than sysemu/os-win32.h is previously included (CONFIG_WIN32)
-> 
-> which guaranties that ... ?
+On 17.10.2017 18:44, Philippe Mathieu-Daud=C3=A9 wrote:
+> and remove the old i386/pc dependency.
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+>  include/hw/display/vga.h | 25 +++++++++++++++++++++++++
+>  include/hw/i386/pc.h     | 12 ------------
+>  hw/display/vga-isa-mm.c  |  3 +--
+>  hw/display/vga-isa.c     |  2 +-
+>  hw/display/vga.c         |  2 +-
+>  hw/mips/mips_jazz.c      |  1 +
+>  vl.c                     |  2 +-
+>  MAINTAINERS              |  1 +
+>  8 files changed, 31 insertions(+), 17 deletions(-)
+>  create mode 100644 include/hw/display/vga.h
+>=20
+> diff --git a/include/hw/display/vga.h b/include/hw/display/vga.h
+> new file mode 100644
+> index 0000000000..0401a3a292
+> --- /dev/null
+> +++ b/include/hw/display/vga.h
+> @@ -0,0 +1,25 @@
+> +/*
+> + * QEMU VGA Emulator.
+> + *
+> + * Copyright (c) 2003 Fabrice Bellard
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or =
+later.
+> + * See the COPYING file in the top-level directory.
+> + */
+> +#ifndef QEMU_HW_DISPLAY_VGA_H
+> +#define QEMU_HW_DISPLAY_VGA_H
+> +
+> +#include "exec/memory.h"
+> +
+> +enum vga_retrace_method {
+> +    VGA_RETRACE_DUMB,
+> +    VGA_RETRACE_PRECISE
+> +};
+> +
+> +extern enum vga_retrace_method vga_retrace_method;
+> +
+> +int isa_vga_mm_init(hwaddr vram_base,
+> +                    hwaddr ctrl_base, int it_shift,
+> +                    MemoryRegion *address_space);
+> +
+> +#endif
+> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+> index b1b4c918af..25ba378bd8 100644
+> --- a/include/hw/i386/pc.h
+> +++ b/include/hw/i386/pc.h
+> @@ -302,18 +302,6 @@ PCIBus *find_i440fx(void);
+>  extern PCIDevice *piix4_dev;
+>  int piix4_init(PCIBus *bus, ISABus **isa_bus, int devfn);
+> =20
+> -/* vga.c */
+> -enum vga_retrace_method {
+> -    VGA_RETRACE_DUMB,
+> -    VGA_RETRACE_PRECISE
+> -};
+> -
+> -extern enum vga_retrace_method vga_retrace_method;
+> -
+> -int isa_vga_mm_init(hwaddr vram_base,
+> -                    hwaddr ctrl_base, int it_shift,
+> -                    MemoryRegion *address_space);
+> -
+>  /* ne2000.c */
+>  static inline bool isa_ne2000_init(ISABus *bus, int base, int irq, NIC=
+Info *nd)
+>  {
+> diff --git a/hw/display/vga-isa-mm.c b/hw/display/vga-isa-mm.c
+> index 68c4d6e23e..e887b45651 100644
+> --- a/hw/display/vga-isa-mm.c
+> +++ b/hw/display/vga-isa-mm.c
+> @@ -23,10 +23,9 @@
+>   */
+>  #include "qemu/osdep.h"
+>  #include "hw/hw.h"
+> -#include "hw/i386/pc.h"
+> +#include "hw/display/vga.h"
+>  #include "vga_int.h"
+>  #include "ui/pixel_ops.h"
+> -#include "qemu/timer.h"
+> =20
+>  #define VGA_RAM_SIZE (8192 * 1024)
+> =20
+> diff --git a/hw/display/vga-isa.c b/hw/display/vga-isa.c
+> index 26f69fd40a..469834add5 100644
+> --- a/hw/display/vga-isa.c
+> +++ b/hw/display/vga-isa.c
+> @@ -25,7 +25,7 @@
+>   */
+>  #include "qemu/osdep.h"
+>  #include "hw/hw.h"
+> -#include "hw/i386/pc.h"
+> +#include "hw/isa/isa.h"
+>  #include "vga_int.h"
+>  #include "ui/pixel_ops.h"
+>  #include "qemu/timer.h"
+> diff --git a/hw/display/vga.c b/hw/display/vga.c
+> index 22fd069ad2..59729f7031 100644
+> --- a/hw/display/vga.c
+> +++ b/hw/display/vga.c
+> @@ -24,7 +24,7 @@
+>  #include "qemu/osdep.h"
+>  #include "qapi/error.h"
+>  #include "hw/hw.h"
+> -#include "hw/i386/pc.h"
+> +#include "hw/display/vga.h"
+>  #include "hw/pci/pci.h"
+>  #include "vga_int.h"
+>  #include "vga_regs.h"
+> diff --git a/hw/mips/mips_jazz.c b/hw/mips/mips_jazz.c
+> index b9ffb33b45..ece4a153b2 100644
+> --- a/hw/mips/mips_jazz.c
+> +++ b/hw/mips/mips_jazz.c
+> @@ -39,6 +39,7 @@
+>  #include "hw/loader.h"
+>  #include "hw/timer/mc146818rtc.h"
+>  #include "hw/timer/i8254.h"
+> +#include "hw/display/vga.h"
+>  #include "hw/audio/pcspk.h"
+>  #include "sysemu/block-backend.h"
+>  #include "hw/sysbus.h"
+> diff --git a/vl.c b/vl.c
+> index 0d1f612629..f0b7106feb 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -57,9 +57,9 @@ int main(int argc, char **argv)
+>  #include "hw/boards.h"
+>  #include "sysemu/accel.h"
+>  #include "hw/usb.h"
+> -#include "hw/i386/pc.h"
+>  #include "hw/isa/isa.h"
+>  #include "hw/scsi/scsi.h"
+> +#include "hw/display/vga.h"
+>  #include "hw/bt.h"
+>  #include "sysemu/watchdog.h"
+>  #include "hw/smbios/smbios.h"
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 0e926a942b..81b67e4685 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -860,6 +860,7 @@ F: hw/timer/hpet*
+>  F: hw/timer/i8254*
+>  F: hw/timer/mc146818rtc*
+>  F: hw/watchdog/wdt_ib700.c
+> +F: include/hw/display/vga.h
+>  F: include/hw/i2c/pm_smbus.h
+>  F: include/hw/isa/i8257.h
+>  F: include/hw/timer/hpet.h
 
-Oh :(
-Michael if you take the whole series, do you mind changing this
-description or do you want me to respin it? (if there is no further
-functional change asked).
+Not sure whether this is the right section for vga.h ... especially
+since the other hw/display/vga* files are also not listed in MAINTAINERS
+yet?
 
-Regards,
+Anyway, the other parts of this patch look fine to me, so with or
+without the change to MAINTAINERS:
 
-Phil.
+Reviewed-by: Thomas Huth <thuth@redhat.com>
