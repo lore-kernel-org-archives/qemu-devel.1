@@ -1,32 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46193)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46462)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1e4mxk-0000Rv-TF
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 07:56:42 -0400
+	(envelope-from <quintela@redhat.com>) id 1e4myl-0000zl-O1
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 07:57:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1e4mxh-0002Dr-RA
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 07:56:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38512)
+	(envelope-from <quintela@redhat.com>) id 1e4myl-0002d2-02
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 07:57:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54960)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1e4mxh-0002Di-L0
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 07:56:37 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1e4myk-0002cq-Qf
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 07:57:42 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 76B8612B25
-	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 11:56:36 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id C7CE6C058EDC
+	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 11:57:41 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20171016160735.GF2252@work-vm> (David Alan Gilbert's message of
-	"Mon, 16 Oct 2017 17:07:35 +0100")
+In-Reply-To: <20171016162910.GG2252@work-vm> (David Alan Gilbert's message of
+	"Mon, 16 Oct 2017 17:29:10 +0100")
 References: <20171004103933.7898-1-quintela@redhat.com>
-	<20171004103933.7898-5-quintela@redhat.com>
-	<20171016160735.GF2252@work-vm>
+	<20171004103933.7898-6-quintela@redhat.com>
+	<20171016162910.GG2252@work-vm>
 Reply-To: quintela@redhat.com
-Date: Wed, 18 Oct 2017 13:56:31 +0200
-Message-ID: <8760bcmzyo.fsf@secure.laptop>
+Date: Wed, 18 Oct 2017 13:57:36 +0200
+Message-ID: <871sm0mzwv.fsf@secure.laptop>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 4/6] tests: Add migration xbzrle test
+Subject: Re: [Qemu-devel] [PATCH 5/6] tests: Add migration compress threads
+ tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,9 +41,23 @@ Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
 
 "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
 > * Juan Quintela (quintela@redhat.com) wrote:
+>> For some reason, compression is not working at the moment, test is
+>> disabled until I found why.
+>> 
 >> Signed-off-by: Juan Quintela <quintela@redhat.com>
-
-> +static void test_xbzrle(const char *uri)
+>> ---
+>>  tests/migration-test.c | 51 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>>  1 file changed, 51 insertions(+)
+>> 
+>> diff --git a/tests/migration-test.c b/tests/migration-test.c
+>> index f0734e4ba0..a8abc3d007 100644
+>> --- a/tests/migration-test.c
+>> +++ b/tests/migration-test.c
+>> @@ -621,6 +621,54 @@ static void test_xbzrle_unix(void)
+>>      g_free(uri);
+>>  }
+>>  
+>> +static void test_compress(const char *uri)
 >> +{
 >> +    QTestState *from, *to;
 >> +
@@ -57,56 +72,17 @@ Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
 >> +    /* 1MB/s slow*/
 >> +    migrate_set_parameter(from, "max-bandwidth", "100000000");
 >> +
->> +    migrate_set_cache_size(from, "50000000");
+>> +    migrate_set_parameter(from, "compress-threads", "4");
+>> +    migrate_set_parameter(from, "decompress-threads", "3"); 
 >
-> Why 50MB?  I guess this is an interesting test; the program
-> dirties 100MB of RAM repeatedly, one byte/page.  So 50MB is probably
-> not much use becuase it'll thrash.
+> Should that be 'to' ?
 
-No good reason.
-What I want (tm):
-- if you have fast hardware, test is as fast as it can
-- if you don't have fast hardware (or very overloaded), it don't fail
+Yes.
 
-My current idea is:
-- using 1GB/s for speed
-- using downtime = 1ms when I want to wait for migration not converge
-- using downtime = 300ms when I want it to finish
+> I worry about having this many threads in a loaded test environment.
 
-I am open to other numbers.
+Suggestion is?
 
->> +    migrate_set_capability(from, "xbzrle", "true");
->> +    migrate_set_capability(to, "xbzrle", "true");
->> +    /* Wait for the first serial output from the source */
->> +    wait_for_serial("src_serial");
->> +
->> +    migrate(from, uri);
->> +
->> +    wait_for_migration_pass(from);
->> +
->> +    /* 1GB/s now it should converge */
->> +    migrate_set_parameter(from, "max-bandwidth", "1000000000");
->
-> I wonder about doing a set_cache_size 150MB here, with a delay before
-> the max-bandwidht?  If we're lucky at 150MB it'll start actually using
-> the XBZRLE compression.
->
->> +    if (!got_stop) {
->> +        qtest_qmp_eventwait(from, "STOP");
->> +    }
->> +    qtest_qmp_eventwait(to, "RESUME");
->> +
->> +    wait_for_serial("dest_serial");
->> +    wait_for_migration_complete(from);
->> +
->> +    test_migrate_end(from, to);
->
-> Extract xbzrle stats?
-
-Thinking about that.
-
-I actually would want to test that when I set something, read it back
-that it is what I setted.  I gues I would use a similar trick to what
-you do to get the pass number.
+I am not getting they working reliabely without having it loaded.
 
 Later, Juan.
