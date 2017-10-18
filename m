@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47056)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47111)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e4pt1-0005os-5A
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 11:04:06 -0400
+	(envelope-from <jcody@redhat.com>) id 1e4ptD-0005rN-70
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 11:04:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e4psx-0003ur-BC
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 11:03:59 -0400
-References: <1508336428-20511-1-git-send-email-thuth@redhat.com>
-	<1508336428-20511-3-git-send-email-thuth@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <efcd4a44-2630-db7d-4b27-bb71fc6f4896@redhat.com>
-Date: Wed, 18 Oct 2017 10:03:45 -0500
+	(envelope-from <jcody@redhat.com>) id 1e4ptC-00046X-4i
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 11:04:11 -0400
+Date: Wed, 18 Oct 2017 11:03:52 -0400
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20171018150352.GE17962@localhost.localdomain>
+References: <cover.1508257445.git.jcody@redhat.com>
+	<503559b438cd67b865d32d7d0577afc7ee15f32c.1508257445.git.jcody@redhat.com>
+	<2de32e52-2c2a-5738-4624-d84bf7379c5f@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1508336428-20511-3-git-send-email-thuth@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="nxhSDtkI9SBAhhqpH8BDp2G3VGEEeGxWK"
-Subject: Re: [Qemu-devel] [PATCH 2/2] tests: Enable the very simple virtio
- tests on s390x, too
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2de32e52-2c2a-5738-4624-d84bf7379c5f@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v5 03/10] qemu-iotests: automatically clean
+ up bash protocol servers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,56 +25,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, cohuck@redhat.com, Michael S Tsirkin <mst@redhat.com>, Amit Shah <amit@kernel.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, jsnow@redhat.com, stefanha@redhat.com, qemu-block@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---nxhSDtkI9SBAhhqpH8BDp2G3VGEEeGxWK
-From: Eric Blake <eblake@redhat.com>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, cohuck@redhat.com,
- Michael S Tsirkin <mst@redhat.com>, Amit Shah <amit@kernel.org>
-Message-ID: <efcd4a44-2630-db7d-4b27-bb71fc6f4896@redhat.com>
-Subject: Re: [PATCH 2/2] tests: Enable the very simple virtio tests on s390x,
- too
-References: <1508336428-20511-1-git-send-email-thuth@redhat.com>
- <1508336428-20511-3-git-send-email-thuth@redhat.com>
-In-Reply-To: <1508336428-20511-3-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Wed, Oct 18, 2017 at 04:46:20PM +0200, Paolo Bonzini wrote:
+> On 17/10/2017 18:31, Jeff Cody wrote:
+> >              )
+> >          else
+> > +            # Do this in a sub-shell, so we are operating on the right
+> > +            # TEST_DIR / QEMU_TEST_DIR
+> >              (
+> >              export TEST_DIR=$TEST_DIR_SEQ
+> >              cd "$source_iotests";
+> 
+> Where is the missing ")"?
 
-On 10/18/2017 09:20 AM, Thomas Huth wrote:
-> These tests can easily be used on s390x, too. We just have to make
-> sure to use the virtio-xxx-ccw devices instead of virtio-xxx-pci.
->=20
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
+It's part of the diff context, not a change itself... it's still there, just
+not shown in the patch.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+> 
+> > @@ -837,6 +841,15 @@ do
+> >              fi
+> >          fi
+> >  
+> > +        # Do this in a sub-shell, so we are operating on the right
+> > +        # TEST_DIR / QEMU_TEST_DIR
+> > +        (
+> > +        export TEST_DIR=$TEST_DIR_SEQ
+> > +        . "$source_iotests/common.config"
+> > +        . "$source_iotests/common.rc"
+> > +
+> > +        _cleanup_protocols
+> 
+> "check" wasn't including common.rc before this patch, and most of the
+> content of that file doesn't apply to "check".  So if we want to move
+> cleanup code to "check" we should remove it from common.rc too.
+> 
+> In general, I think we should strive to have a better separation between
+> tests and harness.  This for example could let us write a different
+> harness for the same tests and integrate the tests better into Avocado.
+> Hence I see one advantage and one disadvantage in your series:
+> 
+> * by adding more functionality to "check", it shows that the current
+> separation may fail with a more sophisticated harness (such as the one
+> you are creating here)
+> 
+> * it adds a lot more knowledge of QEMU (especially protocols) in
+> "check", but there is still some unbalance: tests create the images and
+> the protocol servers, but the harness cleans it up.  The visible result
+> of this unbalance is for example how multi-process protocol tests can
+> fail when multiple tests try to bind the same address.
+> 
+> I think it's the right direction, but it feels like it's not there
+> yet...  Sorry---I know this is not very constructive, but I hope it
+> helps anyway.
+> 
+> Maybe we should actually rewrite "check" in Python.  That would force us
+> to think more about the design.
+> 
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---nxhSDtkI9SBAhhqpH8BDp2G3VGEEeGxWK
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnnbVEACgkQp6FrSiUn
-Q2q3RQf/e1OM88M3KBox6mGOK3+HbsZTwi82L5GlORl4naN0GWzHJBYVstTd0SBT
-cFo+/5niE7TzD969UByapotqvkvJzl3ONk8Dw4o6UEarHp38rDyO+CFIeTjZAny8
-UNX7curDOmHkWrRkZCtMz58Pr2atBmQeOQPoOeEu5L4aSrYvSTD/8igBfYWjkCIY
-WfLTfCzs4QR2NdY8tA2+jPf1gN1d8s/42mVkLYvkGCmTXxdJo0fDjQWd6BYLc7gT
-+PUjzAynm3PuaqyR7I0qSsY0kce53coZObq41XLMig+rq8TkPqCr2Arm8WyTlJLD
-tlGj5+aDEwf3Q3di6ZQEw4+MgmUi2A==
-=4ZBZ
------END PGP SIGNATURE-----
-
---nxhSDtkI9SBAhhqpH8BDp2G3VGEEeGxWK--
+I think writing a more sophisticated harness in another language, such as
+Python, has merit.  But to clarify, do you mean that as a 'nack' to this
+series, or as something to be done later, after this series?  If this series
+improves the existing harness, I don't see why to exclude it because a new
+re-write could be superior (which I don't dispute).
