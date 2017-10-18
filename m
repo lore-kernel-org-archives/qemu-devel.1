@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42806)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43375)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1e4kBQ-0002EX-4F
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 04:58:37 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1e4kCT-0002u2-Gl
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 04:59:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1e4kBP-0006aI-3V
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 04:58:36 -0400
-References: <1508247148-25240-1-git-send-email-thuth@redhat.com>
-	<1508247148-25240-5-git-send-email-thuth@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <fc201879-57fe-c798-fdfd-0a5631a41919@redhat.com>
-Date: Wed, 18 Oct 2017 10:58:29 +0200
+	(envelope-from <dgilbert@redhat.com>) id 1e4kCN-0007Vz-OW
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 04:59:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44540)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1e4kCN-0007Uk-FS
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 04:59:35 -0400
+Date: Wed, 18 Oct 2017 09:59:27 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20171018085927.GA2339@work-vm>
+References: <20171011191317.24157-1-dgilbert@redhat.com>
+	<20171011191317.24157-4-dgilbert@redhat.com>
+	<20171018033519.GM4166@pxdev.xzpeter.org>
 MIME-Version: 1.0
-In-Reply-To: <1508247148-25240-5-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 4/4] tests/cpu-plug-test: Test CPU
- hot-plugging on s390x
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171018033519.GM4166@pxdev.xzpeter.org>
+Subject: Re: [Qemu-devel] [PATCH 3/7] migration: Wait for semaphore before
+ completing migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,95 +29,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, Bharata B Rao <bharata@linux.vnet.ibm.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, jdenemar@redhat.com, wangjie88@huawei.com, quintela@redhat.com, mreitz@redhat.com, berrange@redhat.com, eblake@redhat.com, fuweiwei2@huawei.com
 
-On 17.10.2017 15:32, Thomas Huth wrote:
-> CPU hot-plugging on s390x is possible with both, "cpu-add"
-> and "device_add", so test both.
+* Peter Xu (peterx@redhat.com) wrote:
+> On Wed, Oct 11, 2017 at 08:13:13PM +0100, Dr. David Alan Gilbert (git) wrote:
+> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> > 
+> > Wait for a semaphore before completing the migration,
+> > if the previously added capability was enabled.
+> > 
+> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > ---
+> >  migration/migration.c | 47 +++++++++++++++++++++++++++++++++++++++++++++++
+> >  migration/migration.h |  3 +++
+> >  2 files changed, 50 insertions(+)
+> > 
+> > diff --git a/migration/migration.c b/migration/migration.c
+> > index e1a87c3d23..b411a7bb63 100644
+> > --- a/migration/migration.c
+> > +++ b/migration/migration.c
+> > @@ -1967,6 +1967,46 @@ fail:
+> >  }
+> >  
+> >  /**
+> > + * migration_maybe_pause: Pause if required to by migrate_pause_before_device
+> > + * called with the iothread locked
+> > + * Returns: 0 on success
+> > + */
+> > +static int migration_maybe_pause(MigrationState *s, int *current_active_state)
+> > +{
+> > +    int ret;
+> > +    if (!migrate_pause_before_device()) {
+> > +        return 0;
+> > +    }
+> > +    ret = bdrv_inactivate_all();
 > 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  tests/Makefile.include |  1 +
->  tests/cpu-plug-test.c  | 38 ++++++++++++++++++++++++++++++++++++++
->  2 files changed, 39 insertions(+)
+> My understanding is that the crash was caused by mirrored block device
+> IO triggered after the inactivation, then... should we do this after
+> waiting for the semaphore (possibly at [1] below) to make sure the
+> block jobs are completed?  Or did I miss anything?
+
+Ah you're right, just confirmed this with kwolf that I got it the
+wrong way around.
+I'll fix it.
+
+Dave
+
+> > +    if (ret) {
+> > +        error_report("%s: bdrv_inactivate_all() failed (%d)",
+> > +                     __func__, ret);
+> > +        return ret;
+> > +    }
+> > +
+> > +    s->block_inactive = true;
+> > +
+> > +    /* Since leaving this state is not atomic with posting the semaphore
+> > +     * it's possible that someone could have issued multiple migrate_continue
+> > +     * and the semaphore is incorrectly positive at this point;
+> > +     * the docs say it's undefined to reinit a semaphore that's already
+> > +     * init'd, so use timedwait to eat up any existing posts.
+> > +     */
+> > +    while (qemu_sem_timedwait(&s->pause_sem, 1) == 0);
+> > +
+> > +    qemu_mutex_unlock_iothread();
+> > +    migrate_set_state(&s->state, *current_active_state,
+> > +                      MIGRATION_STATUS_PAUSE_BEFORE_DEVICE);
+> > +    qemu_sem_wait(&s->pause_sem);
 > 
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index cbec19f..85cf9ea 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -368,6 +368,7 @@ check-qtest-s390x-$(CONFIG_SLIRP) += tests/test-netfilter$(EXESUF)
->  check-qtest-s390x-$(CONFIG_POSIX) += tests/test-filter-mirror$(EXESUF)
->  check-qtest-s390x-$(CONFIG_POSIX) += tests/test-filter-redirector$(EXESUF)
->  check-qtest-s390x-y += tests/drive_del-test$(EXESUF)
-> +check-qtest-s390x-y += tests/cpu-plug-test$(EXESUF)
->  
->  check-qtest-generic-y += tests/qom-test$(EXESUF)
->  check-qtest-generic-y += tests/test-hmp$(EXESUF)
-> diff --git a/tests/cpu-plug-test.c b/tests/cpu-plug-test.c
-> index 714a69c..58edaf6 100644
-> --- a/tests/cpu-plug-test.c
-> +++ b/tests/cpu-plug-test.c
-> @@ -207,6 +207,42 @@ static void add_pseries_test_case(const char *mname)
->      g_free(path);
->  }
->  
-> +static void add_s390x_test_case(const char *mname)
-> +{
-> +    char *path;
-> +    PlugTestData *data, *data2;
-> +
-> +    if (!g_str_has_prefix(mname, "s390-ccw-virtio-")) {
-> +        return;
-> +    }
-> +
-> +    data = g_new(PlugTestData, 1);
-> +    data->machine = g_strdup(mname);
-> +    data->cpu_model = "qemu";
-> +    data->device_model = "qemu-s390-cpu";
-> +    data->sockets = 1;
-> +    data->cores = 3;
-> +    data->threads = 1;
-> +    data->maxcpus = data->sockets * data->cores * data->threads * 2;
-> +
-> +    data2 = g_memdup(data, sizeof(PlugTestData));
-> +    data2->machine = g_strdup(mname);
-> +
-> +    path = g_strdup_printf("cpu-plug/%s/cpu-add/%ux%ux%u&maxcpus=%u",
-> +                           mname, data->sockets, data->cores,
-> +                           data->threads, data->maxcpus);
-> +    qtest_add_data_func_full(path, data, test_plug_with_cpu_add,
-> +                             test_data_free);
-> +    g_free(path);
-> +
-> +    path = g_strdup_printf("cpu-plug/%s/device-add/%ux%ux%u&maxcpus=%u",
-> +                           mname, data2->sockets, data2->cores,
-> +                           data2->threads, data2->maxcpus);
-> +    qtest_add_data_func_full(path, data2, test_plug_with_device_add_coreid,
-> +                             test_data_free);
-> +    g_free(path);
-> +}
-> +
->  int main(int argc, char **argv)
->  {
->      const char *arch = qtest_get_arch();
-> @@ -217,6 +253,8 @@ int main(int argc, char **argv)
->          qtest_cb_for_every_machine(add_pc_test_case);
->      } else if (g_str_equal(arch, "ppc64")) {
->          qtest_cb_for_every_machine(add_pseries_test_case);
-> +    } else if (g_str_equal(arch, "s390x")) {
-> +        qtest_cb_for_every_machine(add_s390x_test_case);
->      }
->  
->      return g_test_run();
+> [1]
 > 
-
-Looks sane to me, haven't tested it, though.
-
-Reviewed-by: David Hildenbrand <david@redhat.com>
-
--- 
-
-Thanks,
-
-David
+> > +    migrate_set_state(&s->state, MIGRATION_STATUS_PAUSE_BEFORE_DEVICE,
+> > +                      MIGRATION_STATUS_DEVICE);
+> > +    *current_active_state = MIGRATION_STATUS_DEVICE;
+> > +    qemu_mutex_lock_iothread();
+> > +
+> > +    return s->state == MIGRATION_STATUS_DEVICE ? 0 : -EINVAL;
+> > +}
+> > +
+> > +/**
+> >   * migration_completion: Used by migration_thread when there's not much left.
+> >   *   The caller 'breaks' the loop when this returns.
+> >   *
+> > @@ -1992,6 +2032,11 @@ static void migration_completion(MigrationState *s, int current_active_state,
+> >              bool inactivate = !migrate_colo_enabled();
+> >              ret = vm_stop_force_state(RUN_STATE_FINISH_MIGRATE);
+> >              if (ret >= 0) {
+> > +                ret = migration_maybe_pause(s, &current_active_state);
+> > +                /* If this worked it will already have inactivated */
+> > +                inactivate &= !migrate_pause_before_device();
+> > +            }
+> > +            if (ret >= 0) {
+> >                  qemu_file_set_rate_limit(s->to_dst_file, INT64_MAX);
+> >                  ret = qemu_savevm_state_complete_precopy(s->to_dst_file, false,
+> >                                                           inactivate);
+> > @@ -2372,6 +2417,7 @@ static void migration_instance_finalize(Object *obj)
+> >  
+> >      g_free(params->tls_hostname);
+> >      g_free(params->tls_creds);
+> > +    qemu_sem_destroy(&ms->pause_sem);
+> >  }
+> >  
+> >  static void migration_instance_init(Object *obj)
+> > @@ -2382,6 +2428,7 @@ static void migration_instance_init(Object *obj)
+> >      ms->state = MIGRATION_STATUS_NONE;
+> >      ms->xbzrle_cache_size = DEFAULT_MIGRATE_CACHE_SIZE;
+> >      ms->mbps = -1;
+> > +    qemu_sem_init(&ms->pause_sem, 0);
+> >  
+> >      params->tls_hostname = g_strdup("");
+> >      params->tls_creds = g_strdup("");
+> > diff --git a/migration/migration.h b/migration/migration.h
+> > index 37feea5453..447e8b3f79 100644
+> > --- a/migration/migration.h
+> > +++ b/migration/migration.h
+> > @@ -121,6 +121,9 @@ struct MigrationState
+> >      /* Flag set once the migration thread called bdrv_inactivate_all */
+> >      bool block_inactive;
+> >  
+> > +    /* Migration is paused due to pause-before-device */
+> > +    QemuSemaphore pause_sem;
+> > +
+> >      /* The semaphore is used to notify COLO thread that failover is finished */
+> >      QemuSemaphore colo_exit_sem;
+> >  
+> > -- 
+> > 2.13.6
+> > 
+> 
+> -- 
+> Peter Xu
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
