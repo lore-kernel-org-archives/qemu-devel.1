@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47825)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49995)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e4pvl-0007fG-35
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 11:06:54 -0400
+	(envelope-from <stefanha@redhat.com>) id 1e4q4j-0001Vt-JL
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 11:16:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e4pvh-0005vW-V9
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 11:06:49 -0400
-References: <cover.1508257445.git.jcody@redhat.com>
-	<503559b438cd67b865d32d7d0577afc7ee15f32c.1508257445.git.jcody@redhat.com>
-	<2de32e52-2c2a-5738-4624-d84bf7379c5f@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <444b4d0c-d97a-2b66-a10a-595d22bca9b2@redhat.com>
-Date: Wed, 18 Oct 2017 10:06:24 -0500
+	(envelope-from <stefanha@redhat.com>) id 1e4q4g-00043X-Dj
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 11:16:05 -0400
+Date: Wed, 18 Oct 2017 17:15:56 +0200
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20171018151556.GA31848@stefanha-x1.localdomain>
+References: <20171016202912.1117-1-sw@weilnetz.de>
 MIME-Version: 1.0
-In-Reply-To: <2de32e52-2c2a-5738-4624-d84bf7379c5f@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="DRodGGxkEN3Okgt9IBTXWT63TdAHWtmnF"
-Subject: Re: [Qemu-devel] [PATCH v5 03/10] qemu-iotests: automatically clean
- up bash protocol servers
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20171016202912.1117-1-sw@weilnetz.de>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] oslib-posix: Fix compiler warning and some
+ data types
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,65 +24,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, jsnow@redhat.com, qemu-block@nongnu.org, stefanha@redhat.com
+To: Stefan Weil <sw@weilnetz.de>
+Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---DRodGGxkEN3Okgt9IBTXWT63TdAHWtmnF
-From: Eric Blake <eblake@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, Jeff Cody <jcody@redhat.com>,
- qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, jsnow@redhat.com, qemu-block@nongnu.org,
- stefanha@redhat.com
-Message-ID: <444b4d0c-d97a-2b66-a10a-595d22bca9b2@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v5 03/10] qemu-iotests: automatically clean
- up bash protocol servers
-References: <cover.1508257445.git.jcody@redhat.com>
- <503559b438cd67b865d32d7d0577afc7ee15f32c.1508257445.git.jcody@redhat.com>
- <2de32e52-2c2a-5738-4624-d84bf7379c5f@redhat.com>
-In-Reply-To: <2de32e52-2c2a-5738-4624-d84bf7379c5f@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 10/18/2017 09:46 AM, Paolo Bonzini wrote:
-> On 17/10/2017 18:31, Jeff Cody wrote:
->>              )
->>          else
->> +            # Do this in a sub-shell, so we are operating on the righ=
-t
->> +            # TEST_DIR / QEMU_TEST_DIR
->>              (
->>              export TEST_DIR=3D$TEST_DIR_SEQ
->>              cd "$source_iotests";
+On Mon, Oct 16, 2017 at 10:29:12PM +0200, Stefan Weil wrote:
+> gcc warning:
 >=20
-> Where is the missing ")"?
+> /qemu/util/oslib-posix.c:304:11: error:
+>  variable =E2=80=98addr=E2=80=99 might be clobbered by =E2=80=98longjmp=
+=E2=80=99 or =E2=80=98vfork=E2=80=99
+>  [-Werror=3Dclobbered]
+>=20
+> Fix also some related data types:
+>=20
+> numpages, hpagesize are used as pointer offset.
+> Always use size_t for them and also for the derived
+> numpages_per_thread and size_per_thread.
+>=20
+> Avoid a type cast by declaring addr volatile.
 
-This hunk is just adding comments, not '(', so it is already well-paired.=
+I dropped this outdated line when merging the patch.
 
+>=20
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> Signed-off-by: Stefan Weil <sw@weilnetz.de>
+> ---
+>=20
+> v2: Fix more data types (partially as discussed with Richard)
+>=20
+> v3: Keep volatile type cast (suggested by Philippe and Paolo)
+>=20
+> Regards
+> Stefan
+>=20
+>  util/oslib-posix.c | 15 ++++++++-------
+>  1 file changed, 8 insertions(+), 7 deletions(-)
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Thanks, applied to my block tree:
+https://github.com/stefanha/qemu/commits/block
 
-
---DRodGGxkEN3Okgt9IBTXWT63TdAHWtmnF
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnnbfAACgkQp6FrSiUn
-Q2oFkAf9EkOmi3WukGn++k9M+POFeHmkl18je/v/iaUt4QzLSAnUCotKFgZyEUMQ
-AlXOFdbSx3YEFJvNrc3ygWVnuti9RIELPJsTghQliT14dcFXi5qH5jxZSsyRNkEA
-qKSI+etsYtsVOZgYf6Ydly4SDOpot17/HAeEt6/OoRXiw0tu1EQ55MWTKP/AO533
-7hXDoOfBeGLZRztkNZMlbveRdkthEpBRajPtSBMNOMd8KOGSasu88KnEOO3UR3BY
-WdyXhp3H/WVRutERA8MtsS0ICrFAGsLAXDz7P6RjepVaG6CzDJIceGiqd4+AUMan
-QT1F6U4SVbxmZnh/oWV1lR/KzsvbKw==
-=E0eC
------END PGP SIGNATURE-----
-
---DRodGGxkEN3Okgt9IBTXWT63TdAHWtmnF--
+Stefan
