@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35705)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35708)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1e4qxv-0003KH-R2
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 12:13:08 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1e4qxw-0003KR-1T
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 12:13:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1e4qxr-000207-Rw
+	(envelope-from <paolo.bonzini@gmail.com>) id 1e4qxv-000223-1v
 	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 12:13:07 -0400
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:54681)
+Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:50703)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1e4qxr-0001yw-Kr
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 12:13:03 -0400
-Received: by mail-wm0-x243.google.com with SMTP id i124so11136520wmf.3
-	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 09:13:03 -0700 (PDT)
+	id 1e4qxu-00021Q-S9
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 12:13:06 -0400
+Received: by mail-wr0-x244.google.com with SMTP id q42so5603205wrb.7
+	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 09:13:06 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 18 Oct 2017 18:11:55 +0200
-Message-Id: <1508343141-31835-4-git-send-email-pbonzini@redhat.com>
+Date: Wed, 18 Oct 2017 18:11:58 +0200
+Message-Id: <1508343141-31835-7-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1508343141-31835-1-git-send-email-pbonzini@redhat.com>
 References: <1508343141-31835-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 03/29] ide: support reporting of rotation rate
+Subject: [Qemu-devel] [PULL 06/29] exec: simplify
+ address_space_get_iotlb_entry
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,75 +29,76 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Peter Xu <peterx@redhat.com>, Maxime Coquelin <maxime.coquelin@redhat.com>
 
-From: "Daniel P. Berrange" <berrange@redhat.com>
+From: Peter Xu <peterx@redhat.com>
 
-The Linux kernel will query the ATA IDENTITY DEVICE data, word 217
-to determine the rotations per minute of the disk. If this has
-the value 1, it is taken to be an SSD and so Linux sets the
-'rotational' flag to 0 for the I/O queue and will stop using that
-disk as a source of random entropy. Other operating systems may
-also take into account rotation rate when setting up default
-behaviour.
+This patch let address_space_get_iotlb_entry() to use the newly
+introduced page_mask parameter in flatview_do_translate(). Then we
+will be sure the IOTLB can be aligned to page mask, also we should
+nicely support huge pages now when introducing a764040.
 
-Mgmt apps should be able to set the rotation rate for virtualized
-block devices, based on characteristics of the host storage in use,
-so that the guest OS gets sensible behaviour out of the box. This
-patch thus adds a 'rotation-rate' parameter for 'ide-hd' device
-types.
-
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-Message-Id: <20171004114008.14849-3-berrange@redhat.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
+Fixes: a764040 ("exec: abstract address_space_do_translate()")
+Signed-off-by: Peter Xu <peterx@redhat.com>
+Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
+Message-Id: <20171010094247.10173-3-maxime.coquelin@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/ide/core.c             | 1 +
- hw/ide/qdev.c             | 1 +
- include/hw/ide/internal.h | 8 ++++++++
- 3 files changed, 10 insertions(+)
+ exec.c | 31 ++++++++++---------------------
+ 1 file changed, 10 insertions(+), 21 deletions(-)
 
-diff --git a/hw/ide/core.c b/hw/ide/core.c
-index 5f1cd3b..a04766a 100644
---- a/hw/ide/core.c
-+++ b/hw/ide/core.c
-@@ -208,6 +208,7 @@ static void ide_identify(IDEState *s)
-     if (dev && dev->conf.discard_granularity) {
-         put_le16(p + 169, 1); /* TRIM support */
-     }
-+    put_le16(p + 217, dev->rotation_rate); /* Nominal media rotation rate */
+diff --git a/exec.c b/exec.c
+index ca520ac..6579e7a 100644
+--- a/exec.c
++++ b/exec.c
+@@ -554,14 +554,14 @@ IOMMUTLBEntry address_space_get_iotlb_entry(AddressSpace *as, hwaddr addr,
+                                             bool is_write)
+ {
+     MemoryRegionSection section;
+-    hwaddr xlat, plen;
++    hwaddr xlat, page_mask;
  
-     ide_identify_size(s);
-     s->identify_set = 1;
-diff --git a/hw/ide/qdev.c b/hw/ide/qdev.c
-index d60ac25..a5181b4 100644
---- a/hw/ide/qdev.c
-+++ b/hw/ide/qdev.c
-@@ -299,6 +299,7 @@ static Property ide_hd_properties[] = {
-     DEFINE_BLOCK_CHS_PROPERTIES(IDEDrive, dev.conf),
-     DEFINE_PROP_BIOS_CHS_TRANS("bios-chs-trans",
-                 IDEDrive, dev.chs_trans, BIOS_ATA_TRANSLATION_AUTO),
-+    DEFINE_PROP_UINT16("rotation_rate", IDEDrive, dev.rotation_rate, 0),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
-diff --git a/include/hw/ide/internal.h b/include/hw/ide/internal.h
-index e641012..31851b4 100644
---- a/include/hw/ide/internal.h
-+++ b/include/hw/ide/internal.h
-@@ -508,6 +508,14 @@ struct IDEDevice {
-     char *serial;
-     char *model;
-     uint64_t wwn;
+-    /* Try to get maximum page mask during translation. */
+-    plen = (hwaddr)-1;
+-
+-    /* This can never be MMIO. */
+-    section = flatview_do_translate(address_space_to_flatview(as), addr,
+-                                    &xlat, &plen, NULL, is_write, false, &as);
 +    /*
-+     * 0x0000        - rotation rate not reported
-+     * 0x0001        - non-rotating medium (SSD)
-+     * 0x0002-0x0400 - reserved
-+     * 0x0401-0xffe  - rotations per minute
-+     * 0xffff        - reserved
++     * This can never be MMIO, and we don't really care about plen,
++     * but page mask.
 +     */
-+    uint16_t rotation_rate;
- };
++    section = flatview_do_translate(address_space_to_flatview(as), addr, &xlat,
++                                    NULL, &page_mask, is_write, false, &as);
  
- /* These are used for the error_status field of IDEBus */
+     /* Illegal translation */
+     if (section.mr == &io_mem_unassigned) {
+@@ -572,22 +572,11 @@ IOMMUTLBEntry address_space_get_iotlb_entry(AddressSpace *as, hwaddr addr,
+     xlat += section.offset_within_address_space -
+         section.offset_within_region;
+ 
+-    if (plen == (hwaddr)-1) {
+-        /*
+-         * We use default page size here. Logically it only happens
+-         * for identity mappings.
+-         */
+-        plen = TARGET_PAGE_SIZE;
+-    }
+-
+-    /* Convert to address mask */
+-    plen -= 1;
+-
+     return (IOMMUTLBEntry) {
+         .target_as = as,
+-        .iova = addr & ~plen,
+-        .translated_addr = xlat & ~plen,
+-        .addr_mask = plen,
++        .iova = addr & ~page_mask,
++        .translated_addr = xlat & ~page_mask,
++        .addr_mask = page_mask,
+         /* IOTLBs are for DMAs, and DMA only allows on RAMs. */
+         .perm = IOMMU_RW,
+     };
 -- 
 1.8.3.1
