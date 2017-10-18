@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40367)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42025)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lprosek@redhat.com>) id 1e4gxM-0007mv-4z
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 01:31:53 -0400
+	(envelope-from <yang.zhong@intel.com>) id 1e4h0t-0000Jm-57
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 01:35:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lprosek@redhat.com>) id 1e4gxJ-0003Md-1N
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 01:31:52 -0400
-Received: from mail-ua0-f176.google.com ([209.85.217.176]:46144)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1e4gxI-0003ML-Sn
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 01:31:48 -0400
-Received: by mail-ua0-f176.google.com with SMTP id w45so2751362uac.3
-	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 22:31:48 -0700 (PDT)
+	(envelope-from <yang.zhong@intel.com>) id 1e4h0q-0006JW-2f
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 01:35:31 -0400
+Received: from mga11.intel.com ([192.55.52.93]:31516)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
+	id 1e4h0p-0006Im-Q3
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 01:35:27 -0400
+Date: Wed, 18 Oct 2017 13:34:59 +0800
+From: Zhong Yang <yang.zhong@intel.com>
+Message-ID: <20171018053459.GA4352@yangzhon-Virtual>
+References: <1508144183-30844-1-git-send-email-yang.zhong@intel.com>
+	<ebb88add-3173-78b9-397e-53a364ca0d53@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <34b4df5da848d69b213f538e5751c0d3@hostfission.com>
-References: <5548e41a5668ec0cba9543139327e035@hostfission.com>
-	<3A7697A0-1AF3-46E8-8BCC-45A8127A2638@redhat.com>
-	<286ea2bbfb5ec77d962300c9996c8688@hostfission.com>
-	<92FEAF6E-3002-4F0F-B845-4EC3D29381A4@redhat.com>
-	<c0c5158aeb4e553ac55639e66d81c007@hostfission.com>
-	<34b4df5da848d69b213f538e5751c0d3@hostfission.com>
-From: Ladi Prosek <lprosek@redhat.com>
-Date: Wed, 18 Oct 2017 07:31:46 +0200
-Message-ID: <CABdb734e-Fmfjk8auh-FzKnhmxjs0Bh9WpXWDmRBjYUWsZfe3A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] ivshmem Windows Driver
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ebb88add-3173-78b9-397e-53a364ca0d53@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH 0/2] add "nopin" option in the
+ memory-backend-file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,50 +29,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: geoff@hostfission.com
-Cc: Yan Vugenfirer <yvugenfi@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
+To: Xiao Guangrong <xiaoguangrong.eric@gmail.com>
+Cc: qemu-devel@nongnu.org, ehabkost@redhat.com, alex.williamson@redhat.com, pbonzini@redhat.com, anthony.xu@intel.com, yang.zhong@intel.com
 
-Hi Geoff,
+On Mon, Oct 16, 2017 at 06:20:32PM +0800, Xiao Guangrong wrote:
+> 
+> 
+> On 10/16/2017 04:56 PM, Yang Zhong wrote:
+> >Qemu does not need pin NVDIMM memory for VFIO device during VFIO
+> >hotplug, what's more, if there is no NVDIMM hw in the test machine,
+> >the VFIO hotplug operation will need at least 10 minutes to pin RAM
+> >as the NVDIMM, this time is not accepted. So we add "nopin=on" option
+> >in the memory-backed-file, which can avoid to pin RAM memory for NVDIMM.
+> 
+> No.
+> 
+> memory-backed-file does not dedicate for nvdimm only, it can be mapped
+> as normal memory as well. Rather more, this is no way to stop guest to
+> use it as DMA.
 
-On Mon, Oct 16, 2017 at 8:31 PM,  <geoff@hostfission.com> wrote:
-> Hi Yan & Ladi.
->
-> I have written an initial implementation that supports just the shared
-> memory
-> mapping at this time. I plan to add events also but before I go further I
-> would
-> like some feedback if possible on what I have implemented thus far.
->
-> Please see:
->
-> https://github.com/gnif/kvm-guest-drivers-windows/commit/8655cf12fbdd77b991f96d97bc20f967b5907c12
+Guangrong, thanks for your comments.
 
-Thank you, looks good overall.
+This issue was found in ClearContainer test and the general Qemu should also face
+same issue. If test machine does not have nvdimm hw and RAM is limitted, the
+VFIO hotplug or SRIOV will cost some minutes to preallocate memory for nvdimm, 
+even the hotplug faild because of RAM is not enough.
 
-* Please don't use the 'vio' prefix for this driver. ivshmem is not a
-VirtIO device (i.e. not using the VirtIO protocol). Also the test
-program should live in a subdirectory, so maybe something like
-/ivshmem and /ivshmem/test.
+We want to find a way to avoid this kind of issue, so the configurable "nopin" is added,
+but the default operation is not changed, the nvdimm still can be DMA target. thanks!
 
-* In VIOIVSHMEMEvtDevicePrepareHardware: I don't think that Windows
-guarantees that resources are enumerated in BAR order. In VirtIO
-drivers we read the PCI config space to identify the BAR index:
-https://github.com/virtio-win/kvm-guest-drivers-windows/blob/master/VirtIO/VirtIOPCICommon.c#L353
+Regards,
 
-* IOCTL codes on Windows have a structure to them:
-https://docs.microsoft.com/en-us/windows-hardware/drivers/kernel/defining-i-o-control-codes
-
-* In VIOIVSHMEMEvtIoDeviceControl: The "only one mapping at a time is
-allowed" test has a race. I think that simply making the IO queue
-WdfIoQueueDispatchSequential instead of WdfIoQueueDispatchParallel
-will fix it.
-
-* According to MSDN, MmMapLockedPagesSpecifyCache(UserMode) should be
-wrapped in try/except. Also, what happens if the file handle is
-inherited by a child process? Can it unmap the mapping in parent's
-address space? What if the parent exits? A possible solution is
-discussed in this article:
-http://www.osronline.com/article.cfm?article=39
-
-Thanks!
-Ladi
+Yang
+  
