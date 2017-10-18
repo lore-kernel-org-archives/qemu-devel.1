@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38078)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41219)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1e4r4M-0000Vd-VV
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 12:19:47 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1e4rER-0005wa-69
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 12:30:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1e4r4M-0006du-3y
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 12:19:46 -0400
-Date: Wed, 18 Oct 2017 12:19:35 -0400
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20171018161935.GH17962@localhost.localdomain>
-References: <cover.1508257445.git.jcody@redhat.com>
-	<503559b438cd67b865d32d7d0577afc7ee15f32c.1508257445.git.jcody@redhat.com>
-	<2de32e52-2c2a-5738-4624-d84bf7379c5f@redhat.com>
-	<20171018150352.GE17962@localhost.localdomain>
-	<d3682b70-64c6-1284-77c4-8df561a61098@redhat.com>
-	<20171018153416.GF17962@localhost.localdomain>
-	<07a69c86-aae3-9174-b646-dee04bf191de@redhat.com>
-	<20171018155038.GG17962@localhost.localdomain>
-	<f5da8290-096d-36b5-28c5-ecfeb66199af@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1e4rEM-0005VC-Oi
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 12:30:11 -0400
+Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:55911)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1e4rEM-0005UD-Hx
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 12:30:06 -0400
+Received: by mail-wm0-x22b.google.com with SMTP id u138so11326403wmu.4
+	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 09:30:05 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f5da8290-096d-36b5-28c5-ecfeb66199af@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v5 03/10] qemu-iotests: automatically clean
- up bash protocol servers
+In-Reply-To: <8ded3a0e-f7da-00cd-3abd-7d4bb22a5016@kaod.org>
+References: <20171013142852.916-1-clg@kaod.org>
+	<20171013142852.916-2-clg@kaod.org>
+	<CAFEAcA-gYYbQu-Nuds3E0Aw7j0OdD5_ySm=EdMb1_FzxEoMTBQ@mail.gmail.com>
+	<8ded3a0e-f7da-00cd-3abd-7d4bb22a5016@kaod.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 18 Oct 2017 17:29:43 +0100
+Message-ID: <CAFEAcA-7+XAXTVeemQvzEfRmCoMLTBDbM7VnCS6L6k0avXRcgA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 1/6] aspeed: add support for the
+ witherspoon-bmc board
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,39 +33,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, jsnow@redhat.com, stefanha@redhat.com, qemu-block@nongnu.org
+To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Andrew Jeffery <andrew@aj.id.au>, Joel Stanley <joel@jms.id.au>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 
-On Wed, Oct 18, 2017 at 05:51:53PM +0200, Paolo Bonzini wrote:
-> On 18/10/2017 17:50, Jeff Cody wrote:
-> > Here is what we need from common.rc for this series:
-> > 
-> > _rm_test_img
-> > _cleanup_nbd
-> > _cleanup_vxhs
-> > _cleanup_rbd
-> > _cleanup_sheepdog
-> > _cleanup_protocols
-> > _cleanup_test_img
-> > 
-> > 
-> > They all have a common theme (cleanup), so I could move them all to a
-> > common.cleanup (naming suggestion?) file (which would need to be included by
-> > common.rc, as well).
-> > 
-> > Would this be a strong enough delineation to overcome your concerns?
-> 
-> A great start.  Which of these are actually needed by the tests (and
-> hence by common.rc) and why?
-> 
+On 18 October 2017 at 17:10, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+> On 10/17/2017 05:39 PM, Peter Maydell wrote:
+>> A "reads like RAM but writes are ignored" lump of memory is easy...
+>
+> yes. It seems but I haven't found my way through :/
 
- Some tests are written such that they do intermediate cleanups between
- multiple internal sub-tests for varying reasons, and so use those cleanup
- functions as part of their testing.  The function _cleanup_test_img
- effectively calls all the other functions I listed, so they are really all
- required for the tests, if they choose to call _cleanup_test_img.
+memory_region_init_rom_device() creates a memory region
+which is backed by RAM for reads (and for debug writes,
+like ELF file loading), but backed by the usual
+device callback functions for writes. So I think you should
+just be able to use one of those but with the write
+functions doing nothing (or warning about unimp. behaviour,
+assuming that your flash devices actually have some
+kind of command behaviour for writes).
 
-And for 'check' to tear everything down to a clean state, it also needs to
-use the cleanup functions for everything that is not just a file/directory.
+This is how we implement the flash device with actual
+behaviour behind them.
 
--Jeff
+hw/mips/boston.c actually has an example of doing a dummy
+flash device like this (though it uses
+memory_region_init_rom_device_nomigrate(), which is a bug
+because your memory contents won't get migrated if you
+do that. Use the plain function instead.)
+
+thanks
+-- PMM
