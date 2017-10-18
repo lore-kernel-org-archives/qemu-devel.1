@@ -1,30 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58697)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58745)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1e4nXr-0005TJ-Lt
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 08:34:00 -0400
+	(envelope-from <lprosek@redhat.com>) id 1e4nYB-0005hB-TB
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 08:34:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1e4nXm-00044v-Od
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 08:33:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34902)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1e4nXm-00044i-Iq
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 08:33:54 -0400
-References: <1508170976-96869-1-git-send-email-imammedo@redhat.com>
-	<20171016163636.GI11975@redhat.com>
-	<20171017092702.5b82103b@nial.brq.redhat.com>
-	<20171017150759.GB31897@redhat.com>
-	<32e47d96-0292-4511-adb2-24a4766b3027@redhat.com>
-	<20171018122715.GF9719@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f281298d-f9b3-7ffe-e223-ccd596bb0545@redhat.com>
-Date: Wed, 18 Oct 2017 14:33:49 +0200
+	(envelope-from <lprosek@redhat.com>) id 1e4nY6-0004Bx-Ml
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 08:34:19 -0400
+Received: from mail-ua0-f196.google.com ([209.85.217.196]:54737)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1e4nY6-0004Bi-Hg
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 08:34:14 -0400
+Received: by mail-ua0-f196.google.com with SMTP id n38so3399061uai.11
+	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 05:34:14 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20171018122715.GF9719@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC 0/6] enable numa configuration before
- machine_init() from HMP/QMP
+In-Reply-To: <d5b66cd9f96b0dafedf4369ff02a7121@hostfission.com>
+References: <5548e41a5668ec0cba9543139327e035@hostfission.com>
+	<3A7697A0-1AF3-46E8-8BCC-45A8127A2638@redhat.com>
+	<286ea2bbfb5ec77d962300c9996c8688@hostfission.com>
+	<92FEAF6E-3002-4F0F-B845-4EC3D29381A4@redhat.com>
+	<c0c5158aeb4e553ac55639e66d81c007@hostfission.com>
+	<34b4df5da848d69b213f538e5751c0d3@hostfission.com>
+	<CABdb734e-Fmfjk8auh-FzKnhmxjs0Bh9WpXWDmRBjYUWsZfe3A@mail.gmail.com>
+	<0f911b72c94a0d0f1bedf1c6385b045e@hostfission.com>
+	<CABdb735gdt_N=GDTb2G_sPENjpxS98dFxoPQBLqtMmp8EKCRFw@mail.gmail.com>
+	<d5b66cd9f96b0dafedf4369ff02a7121@hostfission.com>
+From: Ladi Prosek <lprosek@redhat.com>
+Date: Wed, 18 Oct 2017 14:34:13 +0200
+Message-ID: <CABdb734KxNJ2uMo2e61sFOXNFRgax067ErkQNQ1U1iO7ROAvCw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] ivshmem Windows Driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,34 +37,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, peter.maydell@linaro.org, pkrempa@redhat.com, ehabkost@redhat.com, cohuck@redhat.com, armbru@redhat.com, david@gibson.dropbear.id.au
+To: geoff@hostfission.com
+Cc: Yan Vugenfirer <yvugenfi@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
 
-On 18/10/2017 14:27, Daniel P. Berrange wrote:
->>>   -object numa-node,id=numa0
->>>   -object numa-node,id=numa1
->>>   -object cpu,id=cpu0,node=numa0,socket=0,core=0,thread=0
->>>   -object cpu,id=cpu1,node=numa0,socket=0,core=1,thread=0
->>>   -object cpu,id=cpu2,node=numa0,socket=1,core=0,thread=0
->>>   -object cpu,id=cpu3,node=numa0,socket=1,core=1,thread=0
->>>   -object cpu,id=cpu4,node=numa1,socket=2,core=0,thread=0
->>>   -object cpu,id=cpu5,node=numa1,socket=2,core=1,thread=0
->>>   -object cpu,id=cpu6,node=numa1,socket=3,core=0,thread=0
->>>   -object cpu,id=cpu7,node=numa1,socket=3,core=1,thread=0
->>>
->>> (perhaps -device instead of -object above, but that's a minor detail)
->> I understand that this is just an example, but wasn't this what is solved by
+On Wed, Oct 18, 2017 at 8:56 AM,  <geoff@hostfission.com> wrote:
+> On 2017-10-18 17:50, Ladi Prosek wrote:
 >>
->>   -smp 8,sockets=4,cores=2,thread=1
->>   -numa node,nodeid=0 -numa cpu,node-id=0,socket-id=0-1
->>   -numa node,nodeid=1 -numa cpu,node-id=0,socket-id=2-3
-> IIUC, that lets you associate CPUs with NUMA nodes without having to know
-> the internal QEMU indexes. It won't help you with any monitor commands you
-> need to run later that expect the CPU index as input value.  My example
-> where lets you assign IDs to each CPU, which can then be used for montor
-> commands too - i should have illustrated that bit of it too.
+>> On Wed, Oct 18, 2017 at 7:50 AM,  <geoff@hostfission.com> wrote:
+>>>
+>>> On 2017-10-18 16:31, Ladi Prosek wrote:
+>>>>
+>>>>
+>>>> Hi Geoff,
+>>>>
+>>>> On Mon, Oct 16, 2017 at 8:31 PM,  <geoff@hostfission.com> wrote:
+>>>>>
+>>>>>
+>>>>> Hi Yan & Ladi.
+>>>>>
+>>>>> I have written an initial implementation that supports just the share=
+d
+>>>>> memory
+>>>>> mapping at this time. I plan to add events also but before I go furth=
+er
+>>>>> I
+>>>>> would
+>>>>> like some feedback if possible on what I have implemented thus far.
+>>>>>
+>>>>> Please see:
+>>>>>
+>>>>>
+>>>>>
+>>>>> https://github.com/gnif/kvm-guest-drivers-windows/commit/8655cf12fbdd=
+77b991f96d97bc20f967b5907c12
+>>>>
+>>>>
+>>>>
+>>>> Thank you, looks good overall.
+>>>>
+>>>> * Please don't use the 'vio' prefix for this driver. ivshmem is not a
+>>>> VirtIO device (i.e. not using the VirtIO protocol). Also the test
+>>>> program should live in a subdirectory, so maybe something like
+>>>> /ivshmem and /ivshmem/test.
+>>>
+>>>
+>>>
+>>> Noted, I will remove the prefix throughout and move the test applicatio=
+n.
+>>>
+>>>>
+>>>> * In VIOIVSHMEMEvtDevicePrepareHardware: I don't think that Windows
+>>>> guarantees that resources are enumerated in BAR order. In VirtIO
+>>>> drivers we read the PCI config space to identify the BAR index:
+>>>>
+>>>>
+>>>> https://github.com/virtio-win/kvm-guest-drivers-windows/blob/master/Vi=
+rtIO/VirtIOPCICommon.c#L353
+>>>
+>>>
+>>>
+>>> The windows 'toaster' sample relies on the resource order, but as a
+>>> belt and braces approach I will update the code to use the same
+>>> approach.
+>>
+>>
+>> Interesting, thanks! If that's really the case then we can remove the
+>> code from VirtioLib. I have cloned the latest Windows-driver-samples
+>> but can't find this under general/toaster. Namely
+>> ToasterEvtDevicePrepareHardware just prints some info about all
+>> resources but does not do anything order-related. Can you point me to
+>> the right code?
+>>
+>
+> Sorry, my mistake, it wasn't the toaster code but the kmdf driver, it
+> assumes the BAR ordering to determine which is which.
+>
+> https://github.com/Microsoft/Windows-driver-samples/blob/aa6e0b36eb932099=
+fa4eb950a6f5e289a23b6d6e/general/pcidrv/kmdf/HW/nic_init.c#L649
 
-I guess query-hotpluggable-cpus could also grow a first-cpu-index in the
-returned data.
+Got it. And MSDN says:
 
-Paolo
+"A driver for a PCI bus device receives resources that are listed in
+the order in which they appear in the device=E2=80=99s Base Address Registe=
+rs
+(BARs)."
+https://docs.microsoft.com/en-us/windows-hardware/drivers/wdf/raw-and-trans=
+lated-resources
+
+So please disregard my comment.
+
+We'll probably leave VirtioLib alone for now to stay robust, though.
+Counting resources works only if the BAR layout is known. VirtIO 1.0
+depends on knowing the exact BAR index and can't assume that the
+second mem/IO resource is BAR #1, for example. Thanks!
+
+>
+>>>>
+>>>> * IOCTL codes on Windows have a structure to them:
+>>>>
+>>>>
+>>>> https://docs.microsoft.com/en-us/windows-hardware/drivers/kernel/defin=
+ing-i-o-control-codes
+>>>
+>>>
+>>>
+>>> Thanks, I will fix this.
+>>>
+>>>>
+>>>> * In VIOIVSHMEMEvtIoDeviceControl: The "only one mapping at a time is
+>>>> allowed" test has a race. I think that simply making the IO queue
+>>>> WdfIoQueueDispatchSequential instead of WdfIoQueueDispatchParallel
+>>>> will fix it.
+>>>
+>>>
+>>>
+>>> Good point, I will change this.
+>>>
+>>>>
+>>>> * According to MSDN, MmMapLockedPagesSpecifyCache(UserMode) should be
+>>>> wrapped in try/except. Also, what happens if the file handle is
+>>>> inherited by a child process? Can it unmap the mapping in parent's
+>>>> address space? What if the parent exits? A possible solution is
+>>>> discussed in this article:
+>>>> http://www.osronline.com/article.cfm?article=3D39
+>>>
+>>>
+>>>
+>>> Noted re try/except. As for a child inheriting it, the owner is tracked
+>>> by the WDFFILEOBJECT, which the child I believe will inherit also, whic=
+h
+>>> would mean that the child would gain the ability to issue IOCTLs to the
+>>> mapping.
+>>>
+>>>>
+>>>> Thanks!
+>>>> Ladi
+>>>
+>>>
+>>>
+>>>
+>>> No, thank you! I am grateful someone is willing to provide some feedbac=
+k
+>>> on this.
+>>>
+>>> I have been working on adding MSI interrupt support to the driver
+>>> also which is close to ready, just trying to figure out why the driver
+>>> fails to start with STATUS_DEVICE_POWER_FAILURE when I try to setup the
+>>> IRQs with WdfInterruptCreate.
+>>>
+>>> Thanks again,
+>>> Geoff
+>
+>
