@@ -1,22 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41093)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41873)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1e4jG9-0006Dd-Oo
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 03:59:27 -0400
+	(envelope-from <bounces@canonical.com>) id 1e4jHx-00070X-1m
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 04:01:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1e4jG8-0002M5-Mn
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 03:59:25 -0400
-Date: Wed, 18 Oct 2017 15:59:15 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20171018075915.GB9443@lemon>
-References: <20171010134205.6120-1-vsementsov@virtuozzo.com>
-	<20171011092230.GC4593@dhcp-200-186.str.redhat.com>
-	<479101f8-d6db-c90b-f1aa-05c26d7470cb@virtuozzo.com>
-	<20171011094801.GE4593@dhcp-200-186.str.redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1e4jHs-0003pP-79
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 04:01:17 -0400
+Received: from indium.canonical.com ([91.189.90.7]:35410)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1e4jHs-0003p6-14
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 04:01:12 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1e4jHp-0000ry-SW
+	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 08:01:10 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 9624C2E80D6
+	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 08:01:09 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171011094801.GE4593@dhcp-200-186.str.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH RFC] file-posix: make lock_fd read-only
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 18 Oct 2017 07:47:26 -0000
+From: Raghav Sinha <1724477@bugs.launchpad.net>
+Reply-To: Bug 1724477 <1724477@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <150831284620.1599.14269987525342877867.malonedeb@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1724477] [NEW] Build-in websocket broken since
+ v2.9.0-rc0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,61 +36,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com, den@openvz.org, berrange@redhat.com, eblake@redhat.com
+To: qemu-devel@nongnu.org
 
-On Wed, 10/11 11:48, Kevin Wolf wrote:
-> Am 11.10.2017 um 11:38 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> > 11.10.2017 12:22, Kevin Wolf wrote:
-> > > [ Cc: Fam ]
+Public bug reported:
 
-Sorry for being slow, now finally getting my hands on email backlog after
-holiday and preparing for KVM Forum presentation.
+Since upgrading to 2.9.0, the qemu's build-in websocket was no longer
+available.
 
-> > > 
-> > > Am 10.10.2017 um 15:42 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> > > > We do not reopen lock_fd on bdrv_reopen which leads to problems on
-> > > > reopen image RO. So, lets make lock_fd be always RO.
-> > > > This is correct, because qemu_lock_fd always called with exclusive=false
-> > > > on lock_fd.
-> > > > 
-> > > > Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> > > > ---
-> > > > 
-> > > > Hi all!
-> > > > 
-> > > > We've faced the following problem with our shared-storage migration
-> > > > scheme. We make an external snapshot and need base image to be reopened
-> > > > RO. However, bdrv_reopen reopens only .fd of BDRVRawState but not
-> > > > .lock_fd. So, .lock_fd is left opened RW and this breaks the whole
-> > > > thing.
-> > > > 
-> > > > The simple fix is here: let's just open lock_fd as RO always. This
-> > > > looks fine for current code, as we never try to set write locks
-> > > > (qemu_lock_fd always called with exclusive=false).
-> > > > 
-> > > > However it will not work if we are going to use write locks.
-> > > I was sure that we had discussed this during review, so I just went back
-> > > and checked. Indeed, Fam originally had an unconditional O_RDONLY in
-> > > some version of the image locking patches, but I actually found a
-> > > potential problem with that back then:
-> > > 
-> > > > Note that with /dev/fdset there can be cases where we can open a file
-> > > > O_RDWR, but not O_RDONLY. Should we better just use the same flags as
-> > > > for the s->fd?
-> > > https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg05107.html
-> > > 
-> > > However, I'm now wondering whether we really still need a separate
-> > > s->lock_fd or whether we can just use the normal image fd for this. If I
-> > > understood the old threads correctly, the original reason for it was
-> > > that during bdrv_reopen(), we couldn't safely migrate exclusive locks
-> > > from the old fd to the new one. But as we aren't using exclusive locks
-> > > any more, this shouldn't be a problem today.
-> > > 
-> > > Fam, are there more reasons why we need a separate lock_fd?
+Host: Ubuntu 16.04 LTS
+Command-line: /bin/qemu-system-x86_64 -enable-kvm -vnc 0.0.0.0:8,websocket
 
-I think your reasoning is right. We needed lock_fd in earlier revisions of the
-image locking patch because we cannot move exclusive lock from one fd to another
-transactionally. We don't need that now.
+I have tested the following qemu versions:
 
-Fam
+master      Fail
+2.10.1      Fail
+2.9.1       Fail
+2.9.0       Fail
+2.9.0-rc3   Fail
+2.9.0-rc0   Fail
+
+2.8.1.1     Pass
+2.7.1       Pass
+2.6.2       Pass
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+** Attachment added: "PrintScreen.png"
+   https://bugs.launchpad.net/bugs/1724477/+attachment/4974561/+files/Print=
+Screen.png
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1724477
+
+Title:
+  Build-in websocket broken since v2.9.0-rc0
+
+Status in QEMU:
+  New
+
+Bug description:
+  Since upgrading to 2.9.0, the qemu's build-in websocket was no longer
+  available.
+
+  Host: Ubuntu 16.04 LTS
+  Command-line: /bin/qemu-system-x86_64 -enable-kvm -vnc 0.0.0.0:8,websocket
+
+  I have tested the following qemu versions:
+
+  master      Fail
+  2.10.1      Fail
+  2.9.1       Fail
+  2.9.0       Fail
+  2.9.0-rc3   Fail
+  2.9.0-rc0   Fail
+
+  2.8.1.1     Pass
+  2.7.1       Pass
+  2.6.2       Pass
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1724477/+subscriptions
