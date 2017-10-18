@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58425)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60312)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1e4jr2-0002v8-5b
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 04:37:33 -0400
+	(envelope-from <bounces@canonical.com>) id 1e4juh-00048G-MZ
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 04:41:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1e4jqz-00086W-1r
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 04:37:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57346)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1e4jqy-00085t-SL
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 04:37:28 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id F3447C04AC44
-	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 08:37:27 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20171012054621.GB30901@pxdev.xzpeter.org> (Peter Xu's message of
-	"Thu, 12 Oct 2017 13:46:21 +0800")
-References: <20171010181542.24168-1-quintela@redhat.com>
-	<20171010181542.24168-2-quintela@redhat.com>
-	<20171012054621.GB30901@pxdev.xzpeter.org>
-Reply-To: quintela@redhat.com
-Date: Wed, 18 Oct 2017 10:37:22 +0200
-Message-ID: <87h8uwonr1.fsf@secure.laptop>
+	(envelope-from <bounces@canonical.com>) id 1e4jue-0002oc-I4
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 04:41:19 -0400
+Received: from indium.canonical.com ([91.189.90.7]:47654)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1e4jue-0002mW-C6
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 04:41:16 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1e4jub-0004By-Es
+	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 08:41:13 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 676FB2E80C8
+	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 08:41:13 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 01/10] migration: Fix migrate_test_apply
- for multifd parameters
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 18 Oct 2017 08:29:40 -0000
+From: Daniel Berrange <1724477@bugs.launchpad.net>
+Reply-To: Bug 1724477 <1724477@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150831284620.1599.14269987525342877867.malonedeb@soybean.canonical.com>
+Message-Id: <150831538082.17029.16413334604227714653.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1724477] Re: Build-in websocket broken since
+ v2.9.0-rc0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,50 +37,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, lvivier@redhat.com
+To: qemu-devel@nongnu.org
 
-Peter Xu <peterx@redhat.com> wrote:
-> On Tue, Oct 10, 2017 at 08:15:33PM +0200, Juan Quintela wrote:
->> They were missing when introduced on the tree
->> 
->> Signed-off-by: Juan Quintela <quintela@redhat.com>
->> ---
->>  migration/migration.c | 6 ++++++
->>  1 file changed, 6 insertions(+)
->> 
->> diff --git a/migration/migration.c b/migration/migration.c
->> index 98429dc843..fb62a639d8 100644
->> --- a/migration/migration.c
->> +++ b/migration/migration.c
->> @@ -865,6 +865,12 @@ static void migrate_params_test_apply(MigrateSetParameters *params,
->>      if (params->has_block_incremental) {
->>          dest->block_incremental = params->block_incremental;
->>      }
->
-> (newline?)
+Note that we tightened up the websocket server impl to validate HTTP
+requests more strictly. One key change is that the websockets path is
+required to be empty, while noVNC will default to appending a path - so
+make sure you change noVNC to have an empty path. Also until GIT master
+yesterday, there was a bug that prevented it working if the client
+requested keep-alive, which I see noVNC now does. So if you try git
+master today, it ought to work.
 
-I preffer without it.
+-- =
 
-At least in migration we have code with both approachs.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1724477
 
->
->> +    if (params->has_x_multifd_channels) {
->> +        dest->x_multifd_channels = params->x_multifd_channels;
->> +    }
->
-> (newline?)
->
->> +    if (params->has_x_multifd_page_count) {
->> +        dest->x_multifd_page_count = params->x_multifd_page_count;
->> +    }
->>  }
->>  
->>  static void migrate_params_apply(MigrateSetParameters *params)
->> -- 
->> 2.13.6
->> 
->
-> Reviewed-by: Peter Xu <peterx@redhat.com>
+Title:
+  Build-in websocket broken since v2.9.0-rc0
 
-Thanks.
+Status in QEMU:
+  New
+
+Bug description:
+  Since upgrading to 2.9.0, the qemu's build-in websocket was no longer
+  available.
+
+  Host: Ubuntu 16.04 LTS
+  Command-line: /bin/qemu-system-x86_64 -enable-kvm -vnc 0.0.0.0:8,websocket
+
+  I have tested the following qemu versions:
+
+  master      Fail
+  2.10.1      Fail
+  2.9.1       Fail
+  2.9.0       Fail
+  2.9.0-rc3   Fail
+  2.9.0-rc0   Fail
+
+  2.8.1.1     Pass
+  2.7.1       Pass
+  2.6.2       Pass
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1724477/+subscriptions
