@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60409)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60426)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1e4sKQ-0005Os-UP
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 13:40:27 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1e4sKS-0005P5-Go
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 13:40:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1e4sKP-0001Xu-2f
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 13:40:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47624)
+	(envelope-from <dgilbert@redhat.com>) id 1e4sKR-0001Z1-G6
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 13:40:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56156)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1e4sKO-0001Xb-Qd
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 13:40:24 -0400
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1e4sKR-0001YY-8A
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 13:40:27 -0400
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Wed, 18 Oct 2017 18:40:07 +0100
-Message-Id: <20171018174013.22709-2-dgilbert@redhat.com>
+Date: Wed, 18 Oct 2017 18:40:08 +0100
+Message-Id: <20171018174013.22709-3-dgilbert@redhat.com>
 In-Reply-To: <20171018174013.22709-1-dgilbert@redhat.com>
 References: <20171018174013.22709-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 1/7] migration: Add
- 'pause-before-switchover' capability
+Subject: [Qemu-devel] [PATCH v3 2/7] migration: Add 'pre-switchover' and
+ 'device' statuses
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,74 +29,74 @@ Cc: berrange@redhat.com, eblake@redhat.com, fuweiwei2@huawei.com
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-When 'pause-before-switchover' is enabled, the outgoing migration
-will pause before invalidating the block devices and serializing
-the device state.
-At this point the management layer gets the chance to clean up any
-device jobs or other device users before the migration completes.
+Add two statuses for use when the 'pause-before-switchover'
+capability is enabled.
+
+'pre-switchover' is the state that we wait in for management
+to allow us to continue.
+'device' is the state we enter while serialising the devices
+after management gives us the OK.
 
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- migration/migration.c | 10 ++++++++++
- migration/migration.h |  1 +
- qapi/migration.json   |  5 ++++-
- 3 files changed, 15 insertions(+), 1 deletion(-)
+ migration/migration.c | 6 ++++++
+ qapi/migration.json   | 8 +++++++-
+ 2 files changed, 13 insertions(+), 1 deletion(-)
 
 diff --git a/migration/migration.c b/migration/migration.c
-index 98429dc843..fba3342368 100644
+index fba3342368..86ae0292f0 100644
 --- a/migration/migration.c
 +++ b/migration/migration.c
-@@ -1521,6 +1521,16 @@ bool migrate_use_multifd(void)
-     return s->enabled_capabilities[MIGRATION_CAPABILITY_X_MULTIFD];
- }
+@@ -526,6 +526,8 @@ static bool migration_is_setup_or_active(int state)
+     case MIGRATION_STATUS_ACTIVE:
+     case MIGRATION_STATUS_POSTCOPY_ACTIVE:
+     case MIGRATION_STATUS_SETUP:
++    case MIGRATION_STATUS_PRE_SWITCHOVER:
++    case MIGRATION_STATUS_DEVICE:
+         return true;
  
-+bool migrate_pause_before_switchover(void)
-+{
-+    MigrationState *s;
-+
-+    s = migrate_get_current();
-+
-+    return s->enabled_capabilities[
-+        MIGRATION_CAPABILITY_PAUSE_BEFORE_SWITCHOVER];
-+}
-+
- int migrate_multifd_channels(void)
- {
-     MigrationState *s;
-diff --git a/migration/migration.h b/migration/migration.h
-index b83cceadc4..969866303e 100644
---- a/migration/migration.h
-+++ b/migration/migration.h
-@@ -177,6 +177,7 @@ bool migrate_zero_blocks(void);
- 
- bool migrate_auto_converge(void);
- bool migrate_use_multifd(void);
-+bool migrate_pause_before_switchover(void);
- int migrate_multifd_channels(void);
- int migrate_multifd_page_count(void);
- 
+     default:
+@@ -600,6 +602,8 @@ MigrationInfo *qmp_query_migrate(Error **errp)
+     case MIGRATION_STATUS_ACTIVE:
+     case MIGRATION_STATUS_CANCELLING:
+     case MIGRATION_STATUS_POSTCOPY_ACTIVE:
++    case MIGRATION_STATUS_PRE_SWITCHOVER:
++    case MIGRATION_STATUS_DEVICE:
+          /* TODO add some postcopy stats */
+         info->has_status = true;
+         info->has_total_time = true;
+@@ -1183,6 +1187,8 @@ bool migration_is_idle(void)
+     case MIGRATION_STATUS_ACTIVE:
+     case MIGRATION_STATUS_POSTCOPY_ACTIVE:
+     case MIGRATION_STATUS_COLO:
++    case MIGRATION_STATUS_PRE_SWITCHOVER:
++    case MIGRATION_STATUS_DEVICE:
+         return false;
+     case MIGRATION_STATUS__MAX:
+         g_assert_not_reached();
 diff --git a/qapi/migration.json b/qapi/migration.json
-index f8b365e3f5..4960231ba2 100644
+index 4960231ba2..b56f95db64 100644
 --- a/qapi/migration.json
 +++ b/qapi/migration.json
-@@ -341,6 +341,9 @@
- # @return-path: If enabled, migration will use the return path even
- #               for precopy. (since 2.10)
+@@ -96,12 +96,18 @@
+ # @colo: VM is in the process of fault tolerance, VM can not get into this
+ #        state unless colo capability is enabled for migration. (since 2.8)
  #
-+# @pause-before-switchover: Pause outgoing migration before serialising device
-+#          state and before disabling block IO (since 2.11)
++# @pre-switchover: Paused before device serialisation. (since 2.11)
 +#
- # @x-multifd: Use more than one fd for migration (since 2.11)
++# @device: During device serialisation when pause-before-switchover is enabled
++#        (since 2.11)
++#
+ # Since: 2.3
  #
- # Since: 1.2
-@@ -348,7 +351,7 @@
- { 'enum': 'MigrationCapability',
-   'data': ['xbzrle', 'rdma-pin-all', 'auto-converge', 'zero-blocks',
-            'compress', 'events', 'postcopy-ram', 'x-colo', 'release-ram',
--           'block', 'return-path', 'x-multifd' ] }
-+           'block', 'return-path', 'pause-before-switchover', 'x-multifd' ] }
+ ##
+ { 'enum': 'MigrationStatus',
+   'data': [ 'none', 'setup', 'cancelling', 'cancelled',
+-            'active', 'postcopy-active', 'completed', 'failed', 'colo' ] }
++            'active', 'postcopy-active', 'completed', 'failed', 'colo',
++            'pre-switchover', 'device' ] }
  
  ##
- # @MigrationCapabilityStatus:
+ # @MigrationInfo:
 -- 
 2.13.6
