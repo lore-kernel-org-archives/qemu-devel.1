@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35698)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35705)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1e4qxv-0003Jt-AH
+	(envelope-from <paolo.bonzini@gmail.com>) id 1e4qxv-0003KH-R2
 	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 12:13:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1e4qxu-00021J-5S
+	(envelope-from <paolo.bonzini@gmail.com>) id 1e4qxr-000207-Rw
 	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 12:13:07 -0400
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:52862)
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:54681)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1e4qxt-00020v-Rr
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 12:13:06 -0400
-Received: by mail-wm0-x241.google.com with SMTP id k4so11169200wmc.1
-	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 09:13:05 -0700 (PDT)
+	id 1e4qxr-0001yw-Kr
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 12:13:03 -0400
+Received: by mail-wm0-x243.google.com with SMTP id i124so11136520wmf.3
+	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 09:13:03 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 18 Oct 2017 18:11:57 +0200
-Message-Id: <1508343141-31835-6-git-send-email-pbonzini@redhat.com>
+Date: Wed, 18 Oct 2017 18:11:55 +0200
+Message-Id: <1508343141-31835-4-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1508343141-31835-1-git-send-email-pbonzini@redhat.com>
 References: <1508343141-31835-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 05/29] exec: add page_mask for
- flatview_do_translate
+Subject: [Qemu-devel] [PULL 03/29] ide: support reporting of rotation rate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,151 +28,75 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Xu <peterx@redhat.com>, Maxime Coquelin <maxime.coquelin@redhat.com>
 
-From: Peter Xu <peterx@redhat.com>
+From: "Daniel P. Berrange" <berrange@redhat.com>
 
-The function is originally used for flatview_space_translate() and what
-we care about most is (xlat, plen) range. However for iotlb requests, we
-don't really care about "plen", but the size of the page that "xlat" is
-located on. While, plen cannot really contain this information.
+The Linux kernel will query the ATA IDENTITY DEVICE data, word 217
+to determine the rotations per minute of the disk. If this has
+the value 1, it is taken to be an SSD and so Linux sets the
+'rotational' flag to 0 for the I/O queue and will stop using that
+disk as a source of random entropy. Other operating systems may
+also take into account rotation rate when setting up default
+behaviour.
 
-A simple example to show why "plen" is not good for IOTLB translations:
+Mgmt apps should be able to set the rotation rate for virtualized
+block devices, based on characteristics of the host storage in use,
+so that the guest OS gets sensible behaviour out of the box. This
+patch thus adds a 'rotation-rate' parameter for 'ide-hd' device
+types.
 
-E.g., for huge pages, it is possible that guest mapped 1G huge page on
-device side that used this GPA range:
-
-  0x100000000 - 0x13fffffff
-
-Then let's say we want to translate one IOVA that finally mapped to GPA
-0x13ffffe00 (which is located on this 1G huge page). Then here we'll
-get:
-
-  (xlat, plen) = (0x13fffe00, 0x200)
-
-So the IOTLB would be only covering a very small range since from
-"plen" (which is 0x200 bytes) we cannot tell the size of the page.
-
-Actually we can really know that this is a huge page - we just throw the
-information away in flatview_do_translate().
-
-This patch introduced "page_mask" optional parameter to capture that
-page mask info. Also, I made "plen" an optional parameter as well, with
-some comments for the whole function.
-
-No functional change yet.
-
-Signed-off-by: Peter Xu <peterx@redhat.com>
-Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
-Message-Id: <20171010094247.10173-2-maxime.coquelin@redhat.com>
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+Message-Id: <20171004114008.14849-3-berrange@redhat.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- exec.c | 51 +++++++++++++++++++++++++++++++++++++++++++++------
- 1 file changed, 45 insertions(+), 6 deletions(-)
+ hw/ide/core.c             | 1 +
+ hw/ide/qdev.c             | 1 +
+ include/hw/ide/internal.h | 8 ++++++++
+ 3 files changed, 10 insertions(+)
 
-diff --git a/exec.c b/exec.c
-index 6378714..ca520ac 100644
---- a/exec.c
-+++ b/exec.c
-@@ -465,11 +465,29 @@ address_space_translate_internal(AddressSpaceDispatch *d, hwaddr addr, hwaddr *x
-     return section;
- }
+diff --git a/hw/ide/core.c b/hw/ide/core.c
+index 5f1cd3b..a04766a 100644
+--- a/hw/ide/core.c
++++ b/hw/ide/core.c
+@@ -208,6 +208,7 @@ static void ide_identify(IDEState *s)
+     if (dev && dev->conf.discard_granularity) {
+         put_le16(p + 169, 1); /* TRIM support */
+     }
++    put_le16(p + 217, dev->rotation_rate); /* Nominal media rotation rate */
  
--/* Called from RCU critical section */
-+/**
-+ * flatview_do_translate - translate an address in FlatView
-+ *
-+ * @fv: the flat view that we want to translate on
-+ * @addr: the address to be translated in above address space
-+ * @xlat: the translated address offset within memory region. It
-+ *        cannot be @NULL.
-+ * @plen_out: valid read/write length of the translated address. It
-+ *            can be @NULL when we don't care about it.
-+ * @page_mask_out: page mask for the translated address. This
-+ *            should only be meaningful for IOMMU translated
-+ *            addresses, since there may be huge pages that this bit
-+ *            would tell. It can be @NULL if we don't care about it.
-+ * @is_write: whether the translation operation is for write
-+ * @is_mmio: whether this can be MMIO, set true if it can
-+ *
-+ * This function is called from RCU critical section
-+ */
- static MemoryRegionSection flatview_do_translate(FlatView *fv,
-                                                  hwaddr addr,
-                                                  hwaddr *xlat,
--                                                 hwaddr *plen,
-+                                                 hwaddr *plen_out,
-+                                                 hwaddr *page_mask_out,
-                                                  bool is_write,
-                                                  bool is_mmio,
-                                                  AddressSpace **target_as)
-@@ -478,11 +496,17 @@ static MemoryRegionSection flatview_do_translate(FlatView *fv,
-     MemoryRegionSection *section;
-     IOMMUMemoryRegion *iommu_mr;
-     IOMMUMemoryRegionClass *imrc;
-+    hwaddr page_mask = (hwaddr)(-1);
-+    hwaddr plen = (hwaddr)(-1);
-+
-+    if (plen_out) {
-+        plen = *plen_out;
-+    }
+     ide_identify_size(s);
+     s->identify_set = 1;
+diff --git a/hw/ide/qdev.c b/hw/ide/qdev.c
+index d60ac25..a5181b4 100644
+--- a/hw/ide/qdev.c
++++ b/hw/ide/qdev.c
+@@ -299,6 +299,7 @@ static Property ide_hd_properties[] = {
+     DEFINE_BLOCK_CHS_PROPERTIES(IDEDrive, dev.conf),
+     DEFINE_PROP_BIOS_CHS_TRANS("bios-chs-trans",
+                 IDEDrive, dev.chs_trans, BIOS_ATA_TRANSLATION_AUTO),
++    DEFINE_PROP_UINT16("rotation_rate", IDEDrive, dev.rotation_rate, 0),
+     DEFINE_PROP_END_OF_LIST(),
+ };
  
-     for (;;) {
-         section = address_space_translate_internal(
-                 flatview_to_dispatch(fv), addr, &addr,
--                plen, is_mmio);
-+                &plen, is_mmio);
+diff --git a/include/hw/ide/internal.h b/include/hw/ide/internal.h
+index e641012..31851b4 100644
+--- a/include/hw/ide/internal.h
++++ b/include/hw/ide/internal.h
+@@ -508,6 +508,14 @@ struct IDEDevice {
+     char *serial;
+     char *model;
+     uint64_t wwn;
++    /*
++     * 0x0000        - rotation rate not reported
++     * 0x0001        - non-rotating medium (SSD)
++     * 0x0002-0x0400 - reserved
++     * 0x0401-0xffe  - rotations per minute
++     * 0xffff        - reserved
++     */
++    uint16_t rotation_rate;
+ };
  
-         iommu_mr = memory_region_get_iommu(section->mr);
-         if (!iommu_mr) {
-@@ -494,7 +518,8 @@ static MemoryRegionSection flatview_do_translate(FlatView *fv,
-                                 IOMMU_WO : IOMMU_RO);
-         addr = ((iotlb.translated_addr & ~iotlb.addr_mask)
-                 | (addr & iotlb.addr_mask));
--        *plen = MIN(*plen, (addr | iotlb.addr_mask) - addr + 1);
-+        page_mask &= iotlb.addr_mask;
-+        plen = MIN(plen, (addr | iotlb.addr_mask) - addr + 1);
-         if (!(iotlb.perm & (1 << is_write))) {
-             goto translate_fail;
-         }
-@@ -505,6 +530,19 @@ static MemoryRegionSection flatview_do_translate(FlatView *fv,
- 
-     *xlat = addr;
- 
-+    if (page_mask == (hwaddr)(-1)) {
-+        /* Not behind an IOMMU, use default page size. */
-+        page_mask = ~TARGET_PAGE_MASK;
-+    }
-+
-+    if (page_mask_out) {
-+        *page_mask_out = page_mask;
-+    }
-+
-+    if (plen_out) {
-+        *plen_out = plen;
-+    }
-+
-     return *section;
- 
- translate_fail:
-@@ -523,7 +561,7 @@ IOMMUTLBEntry address_space_get_iotlb_entry(AddressSpace *as, hwaddr addr,
- 
-     /* This can never be MMIO. */
-     section = flatview_do_translate(address_space_to_flatview(as), addr,
--                                    &xlat, &plen, is_write, false, &as);
-+                                    &xlat, &plen, NULL, is_write, false, &as);
- 
-     /* Illegal translation */
-     if (section.mr == &io_mem_unassigned) {
-@@ -567,7 +605,8 @@ MemoryRegion *flatview_translate(FlatView *fv, hwaddr addr, hwaddr *xlat,
-     AddressSpace *as = NULL;
- 
-     /* This can be MMIO, so setup MMIO bit. */
--    section = flatview_do_translate(fv, addr, xlat, plen, is_write, true, &as);
-+    section = flatview_do_translate(fv, addr, xlat, plen, NULL,
-+                                    is_write, true, &as);
-     mr = section.mr;
- 
-     if (xen_enabled() && memory_access_is_direct(mr, is_write)) {
+ /* These are used for the error_status field of IDEBus */
 -- 
 1.8.3.1
