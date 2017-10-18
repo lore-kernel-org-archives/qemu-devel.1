@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38073)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44481)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1e4efk-0000Jg-9u
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 23:05:33 -0400
+	(envelope-from <sundeep.lkml@gmail.com>) id 1e4epj-0003Ub-Rv
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 23:15:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1e4efj-0002ER-7h
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 23:05:32 -0400
-Date: Tue, 17 Oct 2017 23:05:20 -0400
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20171018030520.GA17962@localhost.localdomain>
-References: <cover.1508257445.git.jcody@redhat.com>
-	<399631b6632f0a605339391ff76c90468ebd54ee.1508257445.git.jcody@redhat.com>
-	<9eec2de6-5b7d-0450-8882-d2606d24fc0e@redhat.com>
+	(envelope-from <sundeep.lkml@gmail.com>) id 1e4epi-0002Ay-OB
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 23:15:51 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9eec2de6-5b7d-0450-8882-d2606d24fc0e@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v5 01/10] qemu-iotests: refuse to run if
- TEST_DIR contains spaces
+In-Reply-To: <CAFEAcA-vg31x5q7f1poJfHfrwKTrHEZo2Btua6o9xREHUzd8hQ@mail.gmail.com>
+References: <1508176489-9002-1-git-send-email-sundeep.lkml@gmail.com>
+	<CAFEAcA-vg31x5q7f1poJfHfrwKTrHEZo2Btua6o9xREHUzd8hQ@mail.gmail.com>
+From: sundeep subbaraya <sundeep.lkml@gmail.com>
+Date: Wed, 18 Oct 2017 08:45:48 +0530
+Message-ID: <CALHRZupURgAaiktM-mgWHud_2C07hNLY48BUbkbXE7ZV7EXqaQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Qemu devel PATCH] msf2: Remove dead code reported
+ by Coverity
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,65 +23,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, jsnow@redhat.com, stefanha@redhat.com, kwolf@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alistair Francis <alistair23@gmail.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Tue, Oct 17, 2017 at 08:03:56PM -0500, Eric Blake wrote:
-> On 10/17/2017 11:31 AM, Jeff Cody wrote:
-> > Currently, not all qemu-iotests work if TEST_DIR has spaces, and they
-> > also might not be safe.  Refuse to run if TEST_DIR in this case, at
-> > least until all tests are fixed sometime in the future.
-> > 
-> > Signed-off-by: Jeff Cody <jcody@redhat.com>
+Hi Peter,
+
+On Tue, Oct 17, 2017 at 8:58 PM, Peter Maydell <peter.maydell@linaro.org>
+wrote:
+
+> On 16 October 2017 at 18:54, Subbaraya Sundeep <sundeep.lkml@gmail.com>
+> wrote:
+> > Fixed incorrect frame size mask, validated maximum frame
+> > size in spi_write and removed dead code.
+> >
+> > Signed-off-by: Subbaraya Sundeep <sundeep.lkml@gmail.com>
 > > ---
-> >  tests/qemu-iotests/check | 8 ++++++++
-> >  1 file changed, 8 insertions(+)
-> > 
-> > diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
-> > index e6b6ff7..e2163cc 100755
-> > --- a/tests/qemu-iotests/check
-> > +++ b/tests/qemu-iotests/check
-> > @@ -102,6 +102,14 @@ if [ -z "$TEST_DIR" ]; then
-> >          TEST_DIR=`pwd`/scratch
-> >  fi
-> >  
-> > +case $TEST_DIR in
-> > +    *[[:blank:]]*)
-> > +        echo "The TEST_DIR pathname '$TEST_DIR' contains whitespace. "
-> 
-> Echoes a trailing space. Do we care?
-> 
+> >  hw/ssi/mss-spi.c | 8 +++++---
+> >  1 file changed, 5 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/hw/ssi/mss-spi.c b/hw/ssi/mss-spi.c
+> > index 5a8e308..1e49cbc 100644
+> > --- a/hw/ssi/mss-spi.c
+> > +++ b/hw/ssi/mss-spi.c
+> > @@ -76,9 +76,10 @@
+> >  #define C_BIGFIFO            (1 << 29)
+> >  #define C_RESET              (1 << 31)
+> >
+> > -#define FRAMESZ_MASK         0x1F
+> > +#define FRAMESZ_MASK         0x3F
+> >  #define FMCOUNT_MASK         0x00FFFF00
+> >  #define FMCOUNT_SHIFT        8
+> > +#define FRAMESZ_MAX          32
+> >
+> >  static void txfifo_reset(MSSSpiState *s)
+> >  {
+> > @@ -106,8 +107,6 @@ static void set_fifodepth(MSSSpiState *s)
+> >          s->fifo_depth = 16;
+> >      } else if (size <= 32) {
+>
+> Shouldn't this just be "} else {" now ?
+>
+> Yes. I will send v2.
 
-Heh, spurious whitespcae, a bit ironic, I suppose...
+Thanks,
+Sundeep
 
-Might as well take care of it with a v6, along with expanding the tests as
-you hint at below.
-
-> > +        echo "This is currently unsupported by qemu-iotests"
-> 
-> Is it just whitespace, or should we also be wary of other shell
-> metacharacters (such as quotes or glob characters)?  In test 197, I did
-> an alternative check for anything that is not alphanumeric, -, or _ (and
-> allowing / between names).
-
-I know that '-' works, because for years my work directory has been called
-"qemu-kvm".  I'm not sure about globbing characters like *, or quotes, but
-probably not a bad idea to exclude them as well (although, someone that
-uses '*' in their directory names is probably no stranger to data
-catastrophe!).
-
-> 
-> > +        exit 1
-> > +        ;;
-> > +esac
-> > +
-> >  if [ ! -e "$TEST_DIR" ]; then
-> >          mkdir "$TEST_DIR"
-> >  fi
-> > 
-> 
-> -- 
-> Eric Blake, Principal Software Engineer
-> Red Hat, Inc.           +1-919-301-3266
-> Virtualization:  qemu.org | libvirt.org
-> 
+>          s->fifo_depth = 8;
+> > -    } else {
+> > -        s->fifo_depth = 4;
+> >      }
+> >  }
+>
+> thanks
+> -- PMM
+>
