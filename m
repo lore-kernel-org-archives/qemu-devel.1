@@ -1,18 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60410)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60409)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1e4sKQ-0005Ot-UR
+	(envelope-from <dgilbert@redhat.com>) id 1e4sKQ-0005Os-UP
 	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 13:40:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1e4sKM-0001X9-Sq
+	(envelope-from <dgilbert@redhat.com>) id 1e4sKP-0001Xu-2f
 	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 13:40:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55922)
+Received: from mx1.redhat.com ([209.132.183.28]:47624)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1e4sKM-0001Wu-Gi
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 13:40:22 -0400
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1e4sKO-0001Xb-Qd
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 13:40:24 -0400
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Wed, 18 Oct 2017 18:40:06 +0100
-Message-Id: <20171018174013.22709-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 0/7] migration: pause-before-switchover
+Date: Wed, 18 Oct 2017 18:40:07 +0100
+Message-Id: <20171018174013.22709-2-dgilbert@redhat.com>
+In-Reply-To: <20171018174013.22709-1-dgilbert@redhat.com>
+References: <20171018174013.22709-1-dgilbert@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 1/7] migration: Add
+ 'pause-before-switchover' capability
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,82 +29,74 @@ Cc: berrange@redhat.com, eblake@redhat.com, fuweiwei2@huawei.com
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Hi,
-  This set attempts to make a race condition between migration and
-drive-mirror (and other block users) soluble by allowing the migration
-to be paused after the source qemu releases the block devices but
-before the serialisation of the device state.
+When 'pause-before-switchover' is enabled, the outgoing migration
+will pause before invalidating the block devices and serializing
+the device state.
+At this point the management layer gets the chance to clean up any
+device jobs or other device users before the migration completes.
 
-The symptom of this failure, as reported by Wangjie, is a:
-   _co_do_pwritev: Assertion `!(bs->open_flags & 0x0800)' failed
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ migration/migration.c | 10 ++++++++++
+ migration/migration.h |  1 +
+ qapi/migration.json   |  5 ++++-
+ 3 files changed, 15 insertions(+), 1 deletion(-)
 
-and the source qemu dieing; so the problem is pretty nasty.
-This has only been seen on 2.9 onwards, but the theory is that
-prior to 2.9 it might have been happening anyway and we were
-perhaps getting unreported corruptions (lost writes); so this
-really needs fixing.
-
-This flow came from discussions between Kevin and me, and we can't
-see a way of fixing it without exposing a new state to the management
-layer.
-
-The flow is now:
-
-(qemu) migrate_set_capability pause-before-switchover on
-(qemu) migrate -d ...
-(qemu) info migrate
-...
-Migration status: pre-switchover
-...
-<< issue commands to clean up any block jobs>>
-
-(qemu) migrate_continue pre-switchover
-(qemu) info migrate
-...
-Migration status: completed
-
-This set has been _very_ lightly tested just at the normal migration
-code, without the addition of the drive mirror; so this is a first
-cut.  I'd appreciate some feedback from libvirt whether the inteface
-is OK and ideally a hack to test it in a full libvirt setup to see
-if we hit any other issues.
-
-The precopy flow is:
-active->pre-switchover->device->completed
-
-The postcopy flow is:
-active->pre-switchover->postcopy-active->completed
-
-Although the behaviour with postcopy only gets interesting when
-we add something like Max's active-sync.
-
-Dave
-
---
-v3
-  A couple of FIXUPs that had escaped v2's merge
-
-v2
-  Pause *before* block inactivation (thanks Peter)
-  Rename state and capability to Dan+KWolf's combined suggestion
-
-
-Dr. David Alan Gilbert (7):
-  migration: Add 'pause-before-switchover' capability
-  migration: Add 'pre-switchover' and 'device' statuses
-  migration: Wait for semaphore before completing migration
-  migration: migrate-continue
-  migrate: HMP migate_continue
-  migration: allow cancel to unpause
-  migration: pause-before-switchover for postcopy
-
- hmp-commands.hx       | 12 +++++++
- hmp.c                 | 13 ++++++++
- hmp.h                 |  1 +
- migration/migration.c | 88 +++++++++++++++++++++++++++++++++++++++++++++++++--
- migration/migration.h |  4 +++
- qapi/migration.json   | 30 ++++++++++++++++--
- 6 files changed, 144 insertions(+), 4 deletions(-)
-
+diff --git a/migration/migration.c b/migration/migration.c
+index 98429dc843..fba3342368 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -1521,6 +1521,16 @@ bool migrate_use_multifd(void)
+     return s->enabled_capabilities[MIGRATION_CAPABILITY_X_MULTIFD];
+ }
+ 
++bool migrate_pause_before_switchover(void)
++{
++    MigrationState *s;
++
++    s = migrate_get_current();
++
++    return s->enabled_capabilities[
++        MIGRATION_CAPABILITY_PAUSE_BEFORE_SWITCHOVER];
++}
++
+ int migrate_multifd_channels(void)
+ {
+     MigrationState *s;
+diff --git a/migration/migration.h b/migration/migration.h
+index b83cceadc4..969866303e 100644
+--- a/migration/migration.h
++++ b/migration/migration.h
+@@ -177,6 +177,7 @@ bool migrate_zero_blocks(void);
+ 
+ bool migrate_auto_converge(void);
+ bool migrate_use_multifd(void);
++bool migrate_pause_before_switchover(void);
+ int migrate_multifd_channels(void);
+ int migrate_multifd_page_count(void);
+ 
+diff --git a/qapi/migration.json b/qapi/migration.json
+index f8b365e3f5..4960231ba2 100644
+--- a/qapi/migration.json
++++ b/qapi/migration.json
+@@ -341,6 +341,9 @@
+ # @return-path: If enabled, migration will use the return path even
+ #               for precopy. (since 2.10)
+ #
++# @pause-before-switchover: Pause outgoing migration before serialising device
++#          state and before disabling block IO (since 2.11)
++#
+ # @x-multifd: Use more than one fd for migration (since 2.11)
+ #
+ # Since: 1.2
+@@ -348,7 +351,7 @@
+ { 'enum': 'MigrationCapability',
+   'data': ['xbzrle', 'rdma-pin-all', 'auto-converge', 'zero-blocks',
+            'compress', 'events', 'postcopy-ram', 'x-colo', 'release-ram',
+-           'block', 'return-path', 'x-multifd' ] }
++           'block', 'return-path', 'pause-before-switchover', 'x-multifd' ] }
+ 
+ ##
+ # @MigrationCapabilityStatus:
 -- 
 2.13.6
