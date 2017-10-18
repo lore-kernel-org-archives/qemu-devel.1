@@ -1,34 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41327)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42330)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e4o7p-0000mK-JW
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 09:11:11 -0400
+	(envelope-from <berrange@redhat.com>) id 1e4oAU-0003AE-S6
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 09:13:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e4o7j-0003m7-BA
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 09:11:09 -0400
-Received: from indium.canonical.com ([91.189.90.7]:48658)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1e4o7j-0003la-51
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 09:11:03 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1e4o7h-00064m-L1
-	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 13:11:01 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 9DF582E80CC
-	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 13:11:01 +0000 (UTC)
+	(envelope-from <berrange@redhat.com>) id 1e4oAQ-0004st-Sa
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 09:13:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:7309)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1e4oAQ-0004sI-Lz
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 09:13:50 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B67CB96CA
+	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 13:13:49 +0000 (UTC)
+Date: Wed, 18 Oct 2017 14:13:42 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20171018131342.GH9719@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <1508331989-142364-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 18 Oct 2017 13:03:17 -0000
-From: Daniel Berrange <1724570@bugs.launchpad.net>
-Reply-To: Bug 1724570 <1724570@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150833168269.1534.1058667524294729864.malonedeb@soybean.canonical.com>
-Message-Id: <150833179711.22673.13899055511250578570.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1724570] Re: qemu-system-x86_64 generates ACPI
- tables with broken endianess when run on big-endian hosts
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1508331989-142364-1-git-send-email-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] docker: allow running from srcdir !=
+ builddir build
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,73 +34,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>
 
-** Attachment added: "AML for HPET generated on ppc64 host"
-   https://bugs.launchpad.net/qemu/+bug/1724570/+attachment/4974810/+files/=
-aml-HPET.ppc64
+On Wed, Oct 18, 2017 at 03:06:29PM +0200, Paolo Bonzini wrote:
+> The new script uses "git submodule", which is picky about being invoked
+> from the top of the git checkout.  Invoke the script from $(SRC_PATH)
+> to avoid git's wrath.
 
--- =
+I wonder if there's interest in being "evil" and flat out refusing to
+ever build with srcdir==builddir. We have a never ending stream of
+bugs where we forget to consider one of the two possible scenarios.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1724570
+> 
+> Fixes: b7f404201e45e99da23b9764dec27ce5f965cdcd
+> Cc: Fam Zheng <famz@redhat.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> 
+> ---
+>  tests/docker/Makefile.include | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
+> index 6f9ea19..b6d9fa3 100644
+> --- a/tests/docker/Makefile.include
+> +++ b/tests/docker/Makefile.include
+> @@ -18,11 +18,11 @@ TESTS ?= %
+>  IMAGES ?= %
+>  
+>  CUR_TIME := $(shell date +%Y-%m-%d-%H.%M.%S.$$$$)
+> -DOCKER_SRC_COPY := docker-src.$(CUR_TIME)
+> +DOCKER_SRC_COPY := $(BUILD_DIR)/docker-src.$(CUR_TIME)
+>  
+>  $(DOCKER_SRC_COPY):
+>  	@mkdir $@
+> -	$(call quiet-command, $(SRC_PATH)/scripts/archive-source.sh $@/qemu.tar, \
+> +	$(call quiet-command, cd $(SRC_PATH) && scripts/archive-source.sh $@/qemu.tar, \
+>  		"GEN", "$@/qemu.tar")
+>  	$(call quiet-command, cp $(SRC_PATH)/tests/docker/run $@/run, \
+>  		"COPY","RUNNER")
 
-Title:
-  qemu-system-x86_64 generates ACPI tables with broken endianess when
-  run on big-endian hosts
+Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
 
-Status in QEMU:
-  New
-
-Bug description:
-  The bios-tables-test always fails when run on a big-endian host, which
-  has iasl installed. When it calls iasl to dumps the AML files into ASL
-  files, iasl complains
-
-  Intel ACPI Component Architecture
-  ASL+ Optimizing Compiler/Disassembler version 20170831
-  Copyright (c) 2000 - 2017 Intel Corporation
-
-  Input file aml-4L677Y, Length 0x38 (56) bytes
-  Table [TEPH] is too long for file - needs: 0x38000000, remaining in file:=
- 0x38
-  Could not get ACPI tables from aml-4L677Y, AE_BAD_HEADER
-
-  =
-
-  At first I thought this was an iasl bug, but the latest version of iasl i=
-n rawhide is ported to big endian.
-
-  So I looked at the actual AML files that bios-tables-test extracts
-  from the qemu-system-x86_64 memory space, when running on ppc64 host.
-  These do indeed have different content from the AML files generated by
-  qemu-system-x86_64 when running on an x86_64 host.
-
-  =
-
-  eg the AML file for the HPET shows
-
-  < 0000000   T   E   P   H nul nul nul   8 soh etx   B   O   C   H   S  sp
-  <            4554    4850    0000    3800    0301    4f42    4843    2053
-  < 0000020   B   X   P   C   H   P   E   T nul nul nul soh   B   X   P   C
-  <            5842    4350    5048    5445    0000    0100    5842    4350
-  < 0000040 nul nul nul soh soh   " ack nul nul nul nul nul nul nul   P   ~
-  <            0000    0100    a201    8086    0000    0000    0000    fed0
-  ---
-  > 0000000   H   P   E   T   8 nul nul nul soh etx   B   O   C   H   S  sp
-  >            5048    5445    0038    0000    0301    4f42    4843    2053
-  > 0000020   B   X   P   C   H   P   E   T soh nul nul nul   B   X   P   C
-  >            5842    4350    5048    5445    0001    0000    5842    4350
-  > 0000040 soh nul nul nul soh   " ack nul nul nul nul nul nul nul   P   ~
-  >            0001    0000    a201    8086    0000    0000    0000    fed0
-
-  so not only is the table name inverted, but the lenght is inverted,
-  and several fields later on are inverted too.
-
-  Other AML files for APIC and DSDT show similar brokenness
-
-  This is seen with QEMU 2.10.0
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1724570/+subscriptions
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
