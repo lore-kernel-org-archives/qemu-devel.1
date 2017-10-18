@@ -1,34 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55700)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56202)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e4jlS-0007S7-1i
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 04:31:48 -0400
+	(envelope-from <prvs=457281bb7=roger.pau@citrix.com>)
+	id 1e4jmO-0008B0-TE
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 04:32:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e4jlO-0001wN-PT
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 04:31:46 -0400
-Received: from indium.canonical.com ([91.189.90.7]:45394)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1e4jlO-0001vn-GP
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 04:31:42 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1e4jlM-0007w8-4i
-	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 08:31:40 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 581442E8196
-	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 08:31:36 +0000 (UTC)
+	(envelope-from <prvs=457281bb7=roger.pau@citrix.com>)
+	id 1e4jmL-0002lY-NI
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 04:32:44 -0400
+Received: from smtp.citrix.com.au ([103.14.252.240]:21298)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=457281bb7=roger.pau@citrix.com>)
+	id 1e4jmL-0002hz-3i
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 04:32:41 -0400
+Date: Wed, 18 Oct 2017 09:32:25 +0100
+From: Roger Pau =?iso-8859-1?Q?Monn=E9?= <roger.pau@citrix.com>
+Message-ID: <20171018083225.4x42tkamuuauj4ki@dhcp-3-128.uk.xensource.com>
+References: <20171010160544.GA1772@char.us.oracle.com>
+	<20171012124544.dq3wyr65tefi3glk@hz-desktop>
+	<f6478644-0d4a-6531-9016-aee2a0e76417@redhat.com>
+	<20171013075326.77azyi4j2wo3b2fx@hz-desktop>
+	<20171013104453.50284426@nial.brq.redhat.com>
+	<20171013111341.feb2462nh2rcrjpp@hz-desktop>
+	<59E0C9F602000078001862C4@prv-mh.provo.novell.com>
+	<alpine.DEB.2.10.1710131544350.2967@sstabellini-ThinkPad-X260>
+	<50dba025-45db-f723-1441-c048f2a30e6a@redhat.com>
+	<20171017121647.et5w5w3ss457twov@hz-desktop>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 18 Oct 2017 08:18:01 -0000
-From: ChristianEhrhardt <1719196@bugs.launchpad.net>
-Reply-To: Bug 1719196 <1719196@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150626680089.6094.17724106932405637799.malonedeb@soybean.canonical.com>
-Message-Id: <150831468154.13289.8089004924408915985.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1719196] Re: [arm64 ocata] newly created
- instances are unable to raise network interfaces
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20171017121647.et5w5w3ss457twov@hz-desktop>
+Subject: Re: [Qemu-devel] [Xen-devel] [RFC QEMU PATCH v3 00/10] Implement
+ vNVDIMM for Xen HVM guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,303 +39,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Haozhong Zhang <haozhong.zhang@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Jan Beulich <JBeulich@suse.com>, andrew.cooper3@citrix.com, Anthony Perard <anthony.perard@citrix.com>, george.dunlap@citrix.com, wei.liu2@citrix.com, ian.jackson@eu.citrix.com, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Dan Williams <dan.j.williams@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, xen-devel@lists.xen.org, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-So,
-libvirt knew about some change and picks the right default if you do not sp=
-ecify it.
-But if you (Openstack in this case) specify virtio-mmio as type, then it fa=
-ils - is that correct?
+On Tue, Oct 17, 2017 at 08:16:47PM +0800, Haozhong Zhang wrote:
+> On 10/17/17 13:45 +0200, Paolo Bonzini wrote:
+> > On 14/10/2017 00:46, Stefano Stabellini wrote:
+> > > On Fri, 13 Oct 2017, Jan Beulich wrote:
+> > >>>>> On 13.10.17 at 13:13, <haozhong.zhang@intel.com> wrote:
+> > >>> To Jan, Andrew, Stefano and Anthony,
+> > >>>
+> > >>> what do you think about allowing QEMU to build the entire guest ACPI
+> > >>> and letting SeaBIOS to load it? ACPI builder code in hvmloader is
+> > >>> still there and just bypassed in this case.
+> > >> Well, if that can be made work in a non-quirky way and without
+> > >> loss of functionality, I'd probably be fine. I do think, however,
+> > >> that there's a reason this is being handled in hvmloader right now.
+> > > And not to discourage you, just as a clarification, you'll also need to
+> > > consider backward compatibility: unless the tables are identical, I
+> > > imagine we'll have to keep using the old tables for already installed
+> > > virtual machines.
+> > 
+> > I agree.  Some of them are already identical, some are not but the QEMU
+> > version should be okay, and for yet more it's probably better to keep
+> > the Xen-specific parts in hvmloader.
+> > 
+> > The good thing is that it's possible to proceed incrementally once you
+> > have the hvmloader support for merging the QEMU and hvmloader RSDT or
+> > XSDT (whatever you are using), starting with just NVDIMM and proceeding
+> > later with whatever you see fit.
+> > 
+> 
+> I'll have a try to check how much the differences would affect. If it
+> would not take too much work, I'd like to adapt Xen NVDIMM enabling
+> patches to the all QEMU built ACPI. Otherwise, I'll fall back to Paolo
+> and MST's suggestions.
 
-The patch in the referred RH-BZ is already in the qemu we have in Artful (a=
-nd thereby Ocata).
-So if that is supposed to be the issue there has to be a new one after that=
- fix.
+I don't agree with the end goal of fully switching to the QEMU build
+ACPI tables. First of all, the only entity that has all the
+information about the guest it's the toolstack, and so it should be
+the one in control of the ACPI tables.
 
-Also as I've shown in c#17 (yes it is long sorry) - virtio-mmio works
-with the bridge that libvirt is usually creating - again my assumption
-is that it is somehow related to how this bridge is created (openvswitch
-in your case I assume).
+Also, Xen guests can use several device models concurrently (via the
+ioreq server interface), and each should be able to contribute to the
+information presented in the ACPI tables. Intel is also working on
+adding IOMMU emulation to the Xen hypervisor, in which case the vIOMMU
+ACPI tables should be created by the toolstack and not QEMU. And
+finally keep in mind that there are Xen guests (PVH) that use ACPI
+tables but not QEMU.
 
-So is the real error "network fails when using virtio-mmio on openvswitch s=
-et up by openstack"?
-I have no OVS around to quickly try something around that atm.
-
-Would it be reasonable to teach Openstack to not define virtio-mmio in this=
- case?
-Libvirt will make the right default (hopefully also when driven by Openstac=
-k which sets some force options), and just work then.
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1719196
-
-Title:
-  [arm64 ocata] newly created instances are unable to raise network
-  interfaces
-
-Status in libvirt:
-  New
-Status in QEMU:
-  New
-Status in libvirt package in Ubuntu:
-  Incomplete
-Status in qemu package in Ubuntu:
-  Incomplete
-
-Bug description:
-  arm64 Ocata ,
-
-  I'm testing to see I can get Ocata running on arm64 and using the
-  openstack-base bundle to deploy it.  I have added the bundle to the
-  log file attached to this bug.
-
-  When I create a new instance via nova, the VM comes up and runs,
-  however fails to raise its eth0 interface. This occurs on both
-  internal and external networks.
-
-  ubuntu@openstackaw:~$ nova list
-  +--------------------------------------+---------+--------+------------+-=
-------------+--------------------+
-  | ID                                   | Name    | Status | Task State | =
-Power State | Networks           |
-  +--------------------------------------+---------+--------+------------+-=
-------------+--------------------+
-  | dcaf6d51-f81e-4cbd-ac77-0c5d21bde57c | sfeole1 | ACTIVE | -          | =
-Running     | internal=3D10.5.5.3  |
-  | aa0b8aee-5650-41f4-8fa0-aeccdc763425 | sfeole2 | ACTIVE | -          | =
-Running     | internal=3D10.5.5.13 |
-  +--------------------------------------+---------+--------+------------+-=
-------------+--------------------+
-  ubuntu@openstackaw:~$ nova show aa0b8aee-5650-41f4-8fa0-aeccdc763425
-  +--------------------------------------+---------------------------------=
--------------------------+
-  | Property                             | Value                           =
-                         |
-  +--------------------------------------+---------------------------------=
--------------------------+
-  | OS-DCF:diskConfig                    | MANUAL                          =
-                         |
-  | OS-EXT-AZ:availability_zone          | nova                            =
-                         |
-  | OS-EXT-SRV-ATTR:host                 | awrep3                          =
-                         |
-  | OS-EXT-SRV-ATTR:hypervisor_hostname  | awrep3.maas                     =
-                         |
-  | OS-EXT-SRV-ATTR:instance_name        | instance-00000003               =
-                         |
-  | OS-EXT-STS:power_state               | 1                               =
-                         |
-  | OS-EXT-STS:task_state                | -                               =
-                         |
-  | OS-EXT-STS:vm_state                  | active                          =
-                         |
-  | OS-SRV-USG:launched_at               | 2017-09-24T14:23:08.000000      =
-                         |
-  | OS-SRV-USG:terminated_at             | -                               =
-                         |
-  | accessIPv4                           |                                 =
-                         |
-  | accessIPv6                           |                                 =
-                         |
-  | config_drive                         |                                 =
-                         |
-  | created                              | 2017-09-24T14:22:41Z            =
-                         |
-  | flavor                               | m1.small (717660ae-0440-4b19-a76=
-2-ffeb32a0575c)          |
-  | hostId                               | 5612a00671c47255d2ebd6737a64ec9b=
-d3a5866d1233ecf3e988b025 |
-  | id                                   | aa0b8aee-5650-41f4-8fa0-aeccdc76=
-3425                     |
-  | image                                | zestynosplash (e88fd1bd-f040-44d=
-8-9e7c-c462ccf4b945)     |
-  | internal network                     | 10.5.5.13                       =
-                         |
-  | key_name                             | mykey                           =
-                         |
-  | metadata                             | {}                              =
-                         |
-  | name                                 | sfeole2                         =
-                         |
-  | os-extended-volumes:volumes_attached | []                              =
-                         |
-  | progress                             | 0                               =
-                         |
-  | security_groups                      | default                         =
-                         |
-  | status                               | ACTIVE                          =
-                         |
-  | tenant_id                            | 9f7a21c1ad264fec81abc09f3960ad1d=
-                         |
-  | updated                              | 2017-09-24T14:23:09Z            =
-                         |
-  | user_id                              | e6bb6f5178a248c1b5ae66ed388f9040=
-                         |
-  +--------------------------------------+---------------------------------=
--------------------------+
-
-
-  As seen above the instances boot an run.  Full Console output is
-  attached to this bug.
-
-  =
-
-  [  OK  ] Started Initial cloud-init job (pre-networking).
-  [  OK  ] Reached target Network (Pre).
-  [  OK  ] Started AppArmor initialization.
-           Starting Raise network interfaces...
-  [FAILED] Failed to start Raise network interfaces.
-  See 'systemctl status networking.service' for details.
-           Starting Initial cloud-init job (metadata service crawler)...
-  [  OK  ] Reached target Network.
-  [  315.051902] cloud-init[881]: Cloud-init v. 0.7.9 running 'init' at Fri=
-, 22 Sep 2017 18:29:15 +0000. Up 314.70 seconds.
-  [  315.057291] cloud-init[881]: ci-info: +++++++++++++++++++++++++++Net d=
-evice info+++++++++++++++++++++++++++
-  [  315.060338] cloud-init[881]: ci-info: +--------+------+-----------+---=
---------+-------+-------------------+
-  [  315.063308] cloud-init[881]: ci-info: | Device |  Up  |  Address  |   =
- Mask   | Scope |     Hw-Address    |
-  [  315.066304] cloud-init[881]: ci-info: +--------+------+-----------+---=
---------+-------+-------------------+
-  [  315.069303] cloud-init[881]: ci-info: | eth0:  | True |     .     |   =
-  .     |   .   | fa:16:3e:39:4c:48 |
-  [  315.072308] cloud-init[881]: ci-info: | eth0:  | True |     .     |   =
-  .     |   d   | fa:16:3e:39:4c:48 |
-  [  315.075260] cloud-init[881]: ci-info: |  lo:   | True | 127.0.0.1 | 25=
-5.0.0.0 |   .   |         .         |
-  [  315.078258] cloud-init[881]: ci-info: |  lo:   | True |     .     |   =
-  .     |   d   |         .         |
-  [  315.081249] cloud-init[881]: ci-info: +--------+------+-----------+---=
---------+-------+-------------------+
-  [  315.084240] cloud-init[881]: 2017-09-22 18:29:15,393 - url_helper.py[W=
-ARNING]: Calling 'http://169.254.169.254/2009-04-04/meta-data/instance-id' =
-failed [0/120s]: request error [HTTPConnectionPool(host=3D'169.254.169.254'=
-, port=3D80): Max retries exceeded with url: /2009-04-04/meta-data/instance=
--id (Caused by NewConnectionError('<requests.packages.urllib3.connection.HT=
-TPConnection object at 0xffffb10794e0>: Failed to establish a new connectio=
-n: [Errno 101] Network is unreachable',))]
-
-
-  =
-
-  ----------------
-
-
-  I have checked all services in neutron and made sure that they are
-  running and restarted in neutron-gateway
-
-  =
-
-   [ + ]  neutron-dhcp-agent
-   [ + ]  neutron-l3-agent
-   [ + ]  neutron-lbaasv2-agent
-   [ + ]  neutron-metadata-agent
-   [ + ]  neutron-metering-agent
-   [ + ]  neutron-openvswitch-agent
-   [ + ]  neutron-ovs-cleanup
-
-  and have also restarted and checked the nova-compute logs for their
-  neutron counterparts.
-
-  =
-
-   [ + ]  neutron-openvswitch-agent
-   [ + ]  neutron-ovs-cleanup
-
-
-   There are some warnings/errors in the neutron-gateway logs which I
-  have attached the full tarball in a separate attachment to this bug:
-
-  2017-09-24 14:39:33.152 10322 INFO ryu.base.app_manager [-] instantiating=
- app ryu.controller.ofp_handler of OFPHandler
-  2017-09-24 14:39:33.153 10322 INFO ryu.base.app_manager [-] instantiating=
- app ryu.app.ofctl.service of OfctlService
-  2017-09-24 14:39:39.577 10322 ERROR neutron.agent.ovsdb.impl_vsctl [req-2=
-f084ae8-13dc-47dc-b351-24c8f3c57067 - - - - -] Unable to execute ['ovs-vsct=
-l', '--timeout=3D10', '--oneline', '--format=3Djson', '--', '--id=3D@manage=
-r', 'create', 'Manager', 'target=3D"ptcp:6640:127.0.0.1"', '--', 'add', 'Op=
-en_vSwitch', '.', 'manager_options', '@manager']. Exception: Exit code: 1; =
-Stdin: ; Stdout: ; Stderr: ovs-vsctl: transaction error: {"details":"Transa=
-ction causes multiple rows in \"Manager\" table to have identical values (\=
-"ptcp:6640:127.0.0.1\") for index on column \"target\".  First row, with UU=
-ID e02a5f7f-bfd2-4a1d-ae3c-0321db4bd3fb, existed in the database before thi=
-s transaction and was not modified by the transaction.  Second row, with UU=
-ID 6e9aba3a-471a-4976-bffd-b7131bbe5377, was inserted by this transaction."=
-,"error":"constraint violation"}
-
-
-  These warnings/errors also occur on the nova-compute hosts in
-  /var/log/neutron/
-
-
-  =
-
-  2017-09-22 18:54:52.130 387556 INFO ryu.base.app_manager [-] instantiatin=
-g app ryu.app.ofctl.service of OfctlService
-  2017-09-22 18:54:56.124 387556 ERROR neutron.agent.ovsdb.impl_vsctl [req-=
-e291c2f9-a123-422c-be7c-fadaeb5decfa - - - - -] Unable to execute ['ovs-vsc=
-tl', '--timeout=3D10', '--oneline', '--format=3Djson', '--', '--id=3D@manag=
-er', 'create', 'Manager', 'target=3D"ptcp:6640:127.0.0.1"', '--', 'add', 'O=
-pen_vSwitch', '.', 'manager_options', '@manager']. Exception: Exit code: 1;=
- Stdin: ; Stdout: ; Stderr: ovs-vsctl: transaction error: {"details":"Trans=
-action causes multiple rows in \"Manager\" table to have identical values (=
-\"ptcp:6640:127.0.0.1\") for index on column \"target\".  First row, with U=
-UID 9f27ddee-9881-4cbc-9777-2f42fee735e9, was inserted by this transaction.=
-  Second row, with UUID ccf0e097-09d5-449c-b353-6b69781dc3f7, existed in th=
-e database before this transaction and was not modified by the transaction.=
-","error":"constraint violation"}
-
-
-  I'm not sure if the above error could be pertaining to the failure, I
-  have also attached those logs to this bug as well...
-
-  =
-
-  .
-  (neutron) agent-list
-  +--------------------------------------+----------------------+--------+-=
-------------------+-------+----------------+---------------------------+
-  | id                                   | agent_type           | host   | =
-availability_zone | alive | admin_state_up | binary                    |
-  +--------------------------------------+----------------------+--------+-=
-------------------+-------+----------------+---------------------------+
-  | 0cca03fb-abb2-4704-8b0b-e7d3e117d882 | DHCP agent           | awrep1 | =
-nova              | :-)   | True           | neutron-dhcp-agent        |
-  | 14a5fd52-fbc3-450c-96d5-4e9a65776dad | L3 agent             | awrep1 | =
-nova              | :-)   | True           | neutron-l3-agent          |
-  | 2ebc7238-5e61-41f8-bc60-df14ec6b226b | Loadbalancerv2 agent | awrep1 | =
-                  | :-)   | True           | neutron-lbaasv2-agent     |
-  | 4f6275be-fc8b-4994-bdac-13a4b76f6a83 | Metering agent       | awrep1 | =
-                  | :-)   | True           | neutron-metering-agent    |
-  | 86ecc6b0-c100-4298-b861-40c17516cc08 | Open vSwitch agent   | awrep1 | =
-                  | :-)   | True           | neutron-openvswitch-agent |
-  | 947ad3ab-650b-4b96-a520-00441ecb33e7 | Open vSwitch agent   | awrep4 | =
-                  | :-)   | True           | neutron-openvswitch-agent |
-  | 996b0692-7d19-4641-bec3-e057f4a856f6 | Open vSwitch agent   | awrep3 | =
-                  | :-)   | True           | neutron-openvswitch-agent |
-  | ab6b1065-0b98-4cf3-9f46-6bddba0c5e75 | Metadata agent       | awrep1 | =
-                  | :-)   | True           | neutron-metadata-agent    |
-  | fe24f622-b77c-4eed-ae22-18e4195cf763 | Open vSwitch agent   | awrep2 | =
-                  | :-)   | True           | neutron-openvswitch-agent |
-  +--------------------------------------+----------------------+--------+-=
-------------------+-------+----------------+---------------------------+
-
-  =
-
-  Should neutron-openvswitch be assigned to the 'nova' availability zone? =
-
-
-  I have also attached the ovs-vsctl show from a nova-compute host and
-  the neutron-gateway host to ensure that the open v switch routes are
-  correct.
-
-  =
-
-  I can supply more logs if required.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/libvirt/+bug/1719196/+subscriptions
+Thanks, Roger.
