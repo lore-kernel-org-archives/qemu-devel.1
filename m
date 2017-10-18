@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58600)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58573)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <riku.voipio@linaro.org>) id 1e4nXV-0005Cq-F7
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 08:33:38 -0400
+	(envelope-from <riku.voipio@linaro.org>) id 1e4nXU-0005C6-HZ
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 08:33:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <riku.voipio@linaro.org>) id 1e4nXU-0003wR-JL
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 08:33:37 -0400
-Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:48470)
+	(envelope-from <riku.voipio@linaro.org>) id 1e4nXO-0003ss-Mj
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 08:33:35 -0400
+Received: from mail-lf0-x22c.google.com ([2a00:1450:4010:c07::22c]:44717)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <riku.voipio@linaro.org>)
-	id 1e4nXU-0003w8-BB
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 08:33:36 -0400
-Received: by mail-lf0-x243.google.com with SMTP id a69so5627118lfe.5
-	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 05:33:36 -0700 (PDT)
+	id 1e4nXO-0003sM-FB
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 08:33:30 -0400
+Received: by mail-lf0-x22c.google.com with SMTP id 75so5619267lfx.1
+	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 05:33:30 -0700 (PDT)
 From: riku.voipio@linaro.org
-Date: Wed, 18 Oct 2017 15:33:19 +0300
-Message-Id: <de258eb07db6cf893ef1bfad8c0cedc0b983db55.1508329282.git.riku.voipio@linaro.org>
+Date: Wed, 18 Oct 2017 15:33:15 +0300
+Message-Id: <5f9cee46cd4ec4600e1a2fdcca20adcf30348f9e.1508329282.git.riku.voipio@linaro.org>
 In-Reply-To: <cover.1508329282.git.riku.voipio@linaro.org>
 References: <cover.1508329282.git.riku.voipio@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 05/10] tcg: Fix off-by-one in assert in
- page_set_flags
+Subject: [Qemu-devel] [PULL 01/10] linux-user: fix O_TMPFILE handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,39 +27,77 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Richard Henderson <rth@twiddle.net>
+Cc: Riku Voipio <riku.voipio@linaro.org>
 
-From: Richard Henderson <rth@twiddle.net>
+From: Riku Voipio <riku.voipio@linaro.org>
 
-Most of the users of page_set_flags offset (page, page + len) as
-the end points.  One might consider this an error, since the other
-users do supply an endpoint as the last byte of the region.
+Since O_TMPFILE might differ between guest and host,
+add it to the bitmask_transtbl. While at it, fix the definitions
+of O_DIRECTORY etc which should arm32 according to kernel sources.
 
-However, the first thing that page_set_flags does is round end UP
-to the start of the next page.  Which means computing page + len - 1
-is in the end pointless.  Therefore, accept this usage and do not
-assert when given the exact size of the vm as the endpoint.
+This fixes open14 and openat03 ltp testcases. Fixes:
 
-Signed-off-by: Richard Henderson <rth@twiddle.net>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-Id: <20170708025030.15845-2-rth@twiddle.net>
-Signed-off-by: Riku Voipio <riku.voipio@linaro.org>
+https://bugs.launchpad.net/qemu/+bug/1709170
 ---
- accel/tcg/translate-all.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ linux-user/strace.c       | 4 ++++
+ linux-user/syscall.c      | 3 +++
+ linux-user/syscall_defs.h | 8 +++++++-
+ 3 files changed, 14 insertions(+), 1 deletion(-)
 
-diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index c5ce99d549..1b43deb0cd 100644
---- a/accel/tcg/translate-all.c
-+++ b/accel/tcg/translate-all.c
-@@ -2114,7 +2114,7 @@ void page_set_flags(target_ulong start, target_ulong end, int flags)
-        guest address space.  If this assert fires, it probably indicates
-        a missing call to h2g_valid.  */
- #if TARGET_ABI_BITS > L1_MAP_ADDR_SPACE_BITS
--    assert(end < ((target_ulong)1 << L1_MAP_ADDR_SPACE_BITS));
-+    assert(end <= ((target_ulong)1 << L1_MAP_ADDR_SPACE_BITS));
+diff --git a/linux-user/strace.c b/linux-user/strace.c
+index d821d165ff..bd897a3f20 100644
+--- a/linux-user/strace.c
++++ b/linux-user/strace.c
+@@ -837,6 +837,10 @@ UNUSED static struct flags open_flags[] = {
  #endif
-     assert(start < end);
-     assert_memory_lock();
+ #ifdef O_PATH
+     FLAG_TARGET(O_PATH),
++#endif
++#ifdef O_TMPFILE
++    FLAG_TARGET(O_TMPFILE),
++    FLAG_TARGET(__O_TMPFILE),
+ #endif
+     FLAG_END,
+ };
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 9b6364a266..08fbc4d5f7 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -341,6 +341,9 @@ static bitmask_transtbl fcntl_flags_tbl[] = {
+ #endif
+ #if defined(O_PATH)
+   { TARGET_O_PATH,      TARGET_O_PATH,      O_PATH,      O_PATH       },
++#endif
++#if defined(O_TMPFILE)
++  { TARGET_O_TMPFILE,   TARGET_O_TMPFILE,   O_TMPFILE,   O_TMPFILE    },
+ #endif
+   /* Don't terminate the list prematurely on 64-bit host+guest.  */
+ #if TARGET_O_LARGEFILE != 0 || O_LARGEFILE != 0
+diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
+index 40c5027e93..6e2287e918 100644
+--- a/linux-user/syscall_defs.h
++++ b/linux-user/syscall_defs.h
+@@ -2416,7 +2416,7 @@ struct target_statfs64 {
+ #define TARGET_O_CLOEXEC     010000000
+ #define TARGET___O_SYNC      000100000
+ #define TARGET_O_PATH        020000000
+-#elif defined(TARGET_ARM) || defined(TARGET_M68K)
++#elif defined(TARGET_ARM) || defined(TARGET_M68K) || defined(TARGET_AARCH64)
+ #define TARGET_O_DIRECTORY      040000 /* must be a directory */
+ #define TARGET_O_NOFOLLOW      0100000 /* don't follow links */
+ #define TARGET_O_DIRECT        0200000 /* direct disk access hint */
+@@ -2513,6 +2513,12 @@ struct target_statfs64 {
+ #ifndef TARGET_O_PATH
+ #define TARGET_O_PATH        010000000
+ #endif
++#ifndef TARGET___O_TMPFILE
++#define TARGET___O_TMPFILE   020000000
++#endif
++#ifndef TARGET_O_TMPFILE
++#define TARGET_O_TMPFILE     (TARGET___O_TMPFILE | TARGET_O_DIRECTORY)
++#endif
+ #ifndef TARGET_O_NDELAY
+ #define TARGET_O_NDELAY  TARGET_O_NONBLOCK
+ #endif
 -- 
 2.14.2
