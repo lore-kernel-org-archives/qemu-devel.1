@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36106)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36146)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1e4qyJ-0003kS-BU
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 12:13:32 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1e4qyL-0003mV-4O
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 12:13:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1e4qyH-0002Lk-EH
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 12:13:31 -0400
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:47837)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1e4qyJ-0002Nb-Rg
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 12:13:33 -0400
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:52865)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1e4qyH-0002LH-7k
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 12:13:29 -0400
-Received: by mail-wm0-x241.google.com with SMTP id t69so10986885wmt.2
-	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 09:13:29 -0700 (PDT)
-Received: from 640k.lan (94-39-155-245.adsl-ull.clienti.tiscali.it.
-	[94.39.155.245])
-	by smtp.gmail.com with ESMTPSA id 69sm13436794wmm.2.2017.10.18.09.13.27
-	for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Wed, 18 Oct 2017 09:13:27 -0700 (PDT)
+	id 1e4qyJ-0002N0-LT
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 12:13:31 -0400
+Received: by mail-wm0-x242.google.com with SMTP id k4so11170990wmc.1
+	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 09:13:31 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 18 Oct 2017 18:12:17 +0200
-Message-Id: <1508343141-31835-26-git-send-email-pbonzini@redhat.com>
+Date: Wed, 18 Oct 2017 18:12:19 +0200
+Message-Id: <1508343141-31835-28-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1508343141-31835-1-git-send-email-pbonzini@redhat.com>
 References: <1508343141-31835-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 25/29] qemu-pr-helper: use new libmultipath API
+Subject: [Qemu-devel] [PULL 27/29] Revert "qdev: Free QemuOpts when the QOM
+ path goes away"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,77 +29,53 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Michael Roth <mdroth@linux.vnet.ibm.com>
 
-libmultipath has recently changed its API.  The new API supports multi-threaded
-clients better.  Unfortunately there is no backwards-compatibility, so we just
-switch to the new one.  Running QEMU compiled with the new library on the old
-library will likely crash, while doing the opposite will cause QEMU not to
-start at all (because udev, get_multipath_config and put_multipath_config
-are undefined).
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
 
+This reverts commit abed886ec60cf239a03515cf0b30fb11fa964c44.
+
+This patch originally addressed an issue where a DEVICE_DELETED
+event could be emitted (in device_unparent()) before a Device's
+QemuOpts were cleaned up (in device_finalize()), leading to a
+"duplicate ID" error if management attempted to immediately add
+a device with the same ID in response to the DEVICE_DELETED event.
+
+An alternative will be implemented in a subsequent patch where we
+defer the DEVICE_DELETED event until device_finalize(), which would
+also prevent the race, so we revert the original fix in preparation.
+
+Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+Reviewed-by: Greg Kurz <groug@kaod.org>
+Tested-by: Eric Auger <eric.auger@redhat.com>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+Message-Id: <20171016222315.407-3-mdroth@linux.vnet.ibm.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- configure             | 12 ++++++++++--
- scsi/qemu-pr-helper.c | 17 ++++++++++++++---
- 2 files changed, 24 insertions(+), 5 deletions(-)
+ hw/core/qdev.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/configure b/configure
-index 6587e80..7766e74 100755
---- a/configure
-+++ b/configure
-@@ -3312,9 +3312,17 @@ if test "$mpath" != "no" ; then
- #include <mpath_persist.h>
- unsigned mpath_mx_alloc_len = 1024;
- int logsink;
-+static struct config *multipath_conf;
-+extern struct udev *udev;
-+extern struct config *get_multipath_config(void);
-+extern void put_multipath_config(struct config *conf);
-+struct udev *udev;
-+struct config *get_multipath_config(void) { return multipath_conf; }
-+void put_multipath_config(struct config *conf) { }
-+
- int main(void) {
--    struct udev *udev = udev_new();
--    mpath_lib_init(udev);
-+    udev = udev_new();
-+    multipath_conf = mpath_lib_init();
-     return 0;
- }
- EOF
-diff --git a/scsi/qemu-pr-helper.c b/scsi/qemu-pr-helper.c
-index d581848..dd97851 100644
---- a/scsi/qemu-pr-helper.c
-+++ b/scsi/qemu-pr-helper.c
-@@ -276,15 +276,26 @@ static void dm_init(void)
+diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+index 0019a49..418cdac 100644
+--- a/hw/core/qdev.c
++++ b/hw/core/qdev.c
+@@ -1069,6 +1069,7 @@ static void device_finalize(Object *obj)
+     NamedGPIOList *ngl, *next;
  
- /* Variables required by libmultipath and libmpathpersist.  */
- QEMU_BUILD_BUG_ON(PR_HELPER_DATA_SIZE > MPATH_MAX_PARAM_LEN);
-+static struct config *multipath_conf;
- unsigned mpath_mx_alloc_len = PR_HELPER_DATA_SIZE;
- int logsink;
-+struct udev *udev;
+     DeviceState *dev = DEVICE(obj);
++    qemu_opts_del(dev->opts);
  
--static void multipath_pr_init(void)
-+extern struct config *get_multipath_config(void);
-+struct config *get_multipath_config(void)
- {
--    static struct udev *udev;
-+    return multipath_conf;
-+}
- 
-+extern void put_multipath_config(struct config *conf);
-+void put_multipath_config(struct config *conf)
-+{
-+}
-+
-+static void multipath_pr_init(void)
-+{
-     udev = udev_new();
--    mpath_lib_init(udev);
-+    multipath_conf = mpath_lib_init();
+     QLIST_FOREACH_SAFE(ngl, &dev->gpios, node, next) {
+         QLIST_REMOVE(ngl, node);
+@@ -1118,9 +1119,6 @@ static void device_unparent(Object *obj)
+         g_free(dev->canonical_path);
+         dev->canonical_path = NULL;
+     }
+-
+-    qemu_opts_del(dev->opts);
+-    dev->opts = NULL;
  }
  
- static int is_mpath(int fd)
+ static void device_class_init(ObjectClass *class, void *data)
 -- 
 1.8.3.1
