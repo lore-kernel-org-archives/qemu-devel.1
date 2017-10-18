@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58573)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58575)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <riku.voipio@linaro.org>) id 1e4nXU-0005C6-HZ
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 08:33:40 -0400
+	(envelope-from <riku.voipio@linaro.org>) id 1e4nXU-0005C7-Hb
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 08:33:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <riku.voipio@linaro.org>) id 1e4nXO-0003ss-Mj
+	(envelope-from <riku.voipio@linaro.org>) id 1e4nXQ-0003tU-6S
 	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 08:33:35 -0400
-Received: from mail-lf0-x22c.google.com ([2a00:1450:4010:c07::22c]:44717)
+Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:49430)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <riku.voipio@linaro.org>)
-	id 1e4nXO-0003sM-FB
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 08:33:30 -0400
-Received: by mail-lf0-x22c.google.com with SMTP id 75so5619267lfx.1
-	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 05:33:30 -0700 (PDT)
+	id 1e4nXP-0003t2-Uv
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 08:33:32 -0400
+Received: by mail-lf0-x243.google.com with SMTP id w21so5625554lfc.6
+	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 05:33:31 -0700 (PDT)
 From: riku.voipio@linaro.org
-Date: Wed, 18 Oct 2017 15:33:15 +0300
-Message-Id: <5f9cee46cd4ec4600e1a2fdcca20adcf30348f9e.1508329282.git.riku.voipio@linaro.org>
+Date: Wed, 18 Oct 2017 15:33:16 +0300
+Message-Id: <ee46a46b02e58d82ba27943746f6e7e1ffc1a173.1508329282.git.riku.voipio@linaro.org>
 In-Reply-To: <cover.1508329282.git.riku.voipio@linaro.org>
 References: <cover.1508329282.git.riku.voipio@linaro.org>
-Subject: [Qemu-devel] [PULL 01/10] linux-user: fix O_TMPFILE handling
+Subject: [Qemu-devel] [PULL 02/10] target/m68k,
+ linux-user: manage FP registers in ucontext
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,77 +28,87 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Riku Voipio <riku.voipio@linaro.org>
+Cc: Laurent Vivier <laurent@vivier.eu>
 
-From: Riku Voipio <riku.voipio@linaro.org>
+From: Laurent Vivier <laurent@vivier.eu>
 
-Since O_TMPFILE might differ between guest and host,
-add it to the bitmask_transtbl. While at it, fix the definitions
-of O_DIRECTORY etc which should arm32 according to kernel sources.
-
-This fixes open14 and openat03 ltp testcases. Fixes:
-
-https://bugs.launchpad.net/qemu/+bug/1709170
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+Reviewed-by: Richard Henderson <rth@twiddle.net>
+Signed-off-by: Riku Voipio <riku.voipio@linaro.org>
 ---
- linux-user/strace.c       | 4 ++++
- linux-user/syscall.c      | 3 +++
- linux-user/syscall_defs.h | 8 +++++++-
- 3 files changed, 14 insertions(+), 1 deletion(-)
+ linux-user/signal.c | 43 +++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 43 insertions(+)
 
-diff --git a/linux-user/strace.c b/linux-user/strace.c
-index d821d165ff..bd897a3f20 100644
---- a/linux-user/strace.c
-+++ b/linux-user/strace.c
-@@ -837,6 +837,10 @@ UNUSED static struct flags open_flags[] = {
- #endif
- #ifdef O_PATH
-     FLAG_TARGET(O_PATH),
-+#endif
-+#ifdef O_TMPFILE
-+    FLAG_TARGET(O_TMPFILE),
-+    FLAG_TARGET(__O_TMPFILE),
- #endif
-     FLAG_END,
- };
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 9b6364a266..08fbc4d5f7 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -341,6 +341,9 @@ static bitmask_transtbl fcntl_flags_tbl[] = {
- #endif
- #if defined(O_PATH)
-   { TARGET_O_PATH,      TARGET_O_PATH,      O_PATH,      O_PATH       },
-+#endif
-+#if defined(O_TMPFILE)
-+  { TARGET_O_TMPFILE,   TARGET_O_TMPFILE,   O_TMPFILE,   O_TMPFILE    },
- #endif
-   /* Don't terminate the list prematurely on 64-bit host+guest.  */
- #if TARGET_O_LARGEFILE != 0 || O_LARGEFILE != 0
-diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index 40c5027e93..6e2287e918 100644
---- a/linux-user/syscall_defs.h
-+++ b/linux-user/syscall_defs.h
-@@ -2416,7 +2416,7 @@ struct target_statfs64 {
- #define TARGET_O_CLOEXEC     010000000
- #define TARGET___O_SYNC      000100000
- #define TARGET_O_PATH        020000000
--#elif defined(TARGET_ARM) || defined(TARGET_M68K)
-+#elif defined(TARGET_ARM) || defined(TARGET_M68K) || defined(TARGET_AARCH64)
- #define TARGET_O_DIRECTORY      040000 /* must be a directory */
- #define TARGET_O_NOFOLLOW      0100000 /* don't follow links */
- #define TARGET_O_DIRECT        0200000 /* direct disk access hint */
-@@ -2513,6 +2513,12 @@ struct target_statfs64 {
- #ifndef TARGET_O_PATH
- #define TARGET_O_PATH        010000000
- #endif
-+#ifndef TARGET___O_TMPFILE
-+#define TARGET___O_TMPFILE   020000000
-+#endif
-+#ifndef TARGET_O_TMPFILE
-+#define TARGET_O_TMPFILE     (TARGET___O_TMPFILE | TARGET_O_DIRECTORY)
-+#endif
- #ifndef TARGET_O_NDELAY
- #define TARGET_O_NDELAY  TARGET_O_NONBLOCK
- #endif
+diff --git a/linux-user/signal.c b/linux-user/signal.c
+index cc0c3fcee9..7a238aaea1 100644
+--- a/linux-user/signal.c
++++ b/linux-user/signal.c
+@@ -5704,6 +5704,24 @@ give_sigsegv:
+     force_sigsegv(sig);
+ }
+ 
++static inline void target_rt_save_fpu_state(struct target_ucontext *uc,
++                                           CPUM68KState *env)
++{
++    int i;
++    target_fpregset_t *fpregs = &uc->tuc_mcontext.fpregs;
++
++    __put_user(env->fpcr, &fpregs->f_fpcntl[0]);
++    __put_user(env->fpsr, &fpregs->f_fpcntl[1]);
++    /* fpiar is not emulated */
++
++    for (i = 0; i < 8; i++) {
++        uint32_t high = env->fregs[i].d.high << 16;
++        __put_user(high, &fpregs->f_fpregs[i * 3]);
++        __put_user(env->fregs[i].d.low,
++                   (uint64_t *)&fpregs->f_fpregs[i * 3 + 1]);
++    }
++}
++
+ static inline int target_rt_setup_ucontext(struct target_ucontext *uc,
+                                            CPUM68KState *env)
+ {
+@@ -5730,9 +5748,32 @@ static inline int target_rt_setup_ucontext(struct target_ucontext *uc,
+     __put_user(env->pc, &gregs[16]);
+     __put_user(sr, &gregs[17]);
+ 
++    target_rt_save_fpu_state(uc, env);
++
+     return 0;
+ }
+ 
++static inline void target_rt_restore_fpu_state(CPUM68KState *env,
++                                               struct target_ucontext *uc)
++{
++    int i;
++    target_fpregset_t *fpregs = &uc->tuc_mcontext.fpregs;
++    uint32_t fpcr;
++
++    __get_user(fpcr, &fpregs->f_fpcntl[0]);
++    cpu_m68k_set_fpcr(env, fpcr);
++    __get_user(env->fpsr, &fpregs->f_fpcntl[1]);
++    /* fpiar is not emulated */
++
++    for (i = 0; i < 8; i++) {
++        uint32_t high;
++        __get_user(high, &fpregs->f_fpregs[i * 3]);
++        env->fregs[i].d.high = high >> 16;
++        __get_user(env->fregs[i].d.low,
++                   (uint64_t *)&fpregs->f_fpregs[i * 3 + 1]);
++    }
++}
++
+ static inline int target_rt_restore_ucontext(CPUM68KState *env,
+                                              struct target_ucontext *uc)
+ {
+@@ -5764,6 +5805,8 @@ static inline int target_rt_restore_ucontext(CPUM68KState *env,
+     __get_user(temp, &gregs[17]);
+     cpu_m68k_set_ccr(env, temp);
+ 
++    target_rt_restore_fpu_state(env, uc);
++
+     return 0;
+ 
+ badframe:
 -- 
 2.14.2
