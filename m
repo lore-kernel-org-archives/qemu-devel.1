@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43360)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43812)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1e4swd-0006Wn-A0
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 14:19:56 -0400
+	(envelope-from <thuth@redhat.com>) id 1e4syH-0007Cu-4l
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 14:21:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1e4swZ-0007fF-8n
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 14:19:55 -0400
-Received: from out4-smtp.messagingengine.com ([66.111.4.28]:53649)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1e4swZ-0007ek-3c
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 14:19:51 -0400
-Date: Wed, 18 Oct 2017 14:19:49 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20171018181949.GA32663@flamenco>
-References: <20171016172609.23422-1-richard.henderson@linaro.org>
-	<20171016172609.23422-39-richard.henderson@linaro.org>
-	<b420cf7c-a15f-6edc-74a8-4e41738bad28@redhat.com>
+	(envelope-from <thuth@redhat.com>) id 1e4syD-0000eI-36
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 14:21:37 -0400
+References: <20171016202358.3633-1-david@redhat.com>
+	<20171016202358.3633-3-david@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <8dd3c355-7d91-e1bb-b7d6-4d3e3e213da3@redhat.com>
+Date: Wed, 18 Oct 2017 20:21:22 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b420cf7c-a15f-6edc-74a8-4e41738bad28@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v6 38/50] translate-all: use a binary
- search tree to track TBs in TBContext
+In-Reply-To: <20171016202358.3633-3-david@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v1 2/2] s390x/tcg: low-address protection
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,84 +25,153 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, cohuck@redhat.com, Peter Maydell <peter.maydell@linaro.org>
 
-On Wed, Oct 18, 2017 at 09:41:43 +0200, Paolo Bonzini wrote:
-> On 16/10/2017 19:25, Richard Henderson wrote:
-> >   * Translation Cache-related fields of a TB.
-> > + * This struct exists just for convenience; we keep track of TB's in a binary
-> > + * search tree, and the only fields needed to compare TB's in the tree are
-> > + * @ptr and @size. @search is brought here for consistency, since it is also
-> > + * a TC-related field.
-> >   */
-> >  struct tb_tc {
-> >      void *ptr;    /* pointer to the translated code */
-> >      uint8_t *search;  /* pointer to search data */
-> > +    size_t size;
-> >  };
-> 
-> Isn't search equal to ptr + size, or something like that?
+On 16.10.2017 22:23, David Hildenbrand wrote:
+> This is a neat way to implement low address protection, whereby
+> only the first 512 bytes of the first two pages (each 4096 bytes) of
+> every address space are protected.
+>=20
+> Store a tec of 0 for the access exception, this is what is defined by
+> Enhanced Suppression on Protection in case of a low address protection
+> (Bit 61 set to 0, rest undefined).
+>=20
+> We have to make sure to to pass the access address, not the masked page
+> address into mmu_translate*().
+>=20
+> Drop the check from testblock. So we can properly test this via
+> kvm-unit-tests.
+>=20
+> This will check every access going through one of the MMUs.
+>=20
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  target/s390x/excp_helper.c |  3 +-
+>  target/s390x/mem_helper.c  |  8 ----
+>  target/s390x/mmu_helper.c  | 94 +++++++++++++++++++++++++++++---------=
+--------
+>  3 files changed, 60 insertions(+), 45 deletions(-)
+[...]
+> diff --git a/target/s390x/mmu_helper.c b/target/s390x/mmu_helper.c
+> index 9daa0fd8e2..9806685bee 100644
+> --- a/target/s390x/mmu_helper.c
+> +++ b/target/s390x/mmu_helper.c
+> @@ -106,6 +106,35 @@ static void trigger_page_fault(CPUS390XState *env,=
+ target_ulong vaddr,
+>      trigger_access_exception(env, type, ilen, tec);
+>  }
+> =20
+> +/* check whether the address would be proteted by Low-Address Protecti=
+on */
+> +static bool is_low_address(uint64_t addr)
+> +{
+> +    return addr < 512 || (addr >=3D 4096 && addr <=3D 4607);
+> +}
 
-It is indeed! Fixup below.
+Just cosmetic, but I'd rather either use "<=3D" or "<" both times, so:
 
-The change shrinks TranslationBlock, but it leaves performance unchanged
-(recall that we add padding after TranslationBlock to avoid cache line
-overlap between the struct and translated code).
+   return addr <=3D 511 || (addr >=3D 4096 && addr <=3D 4607);
 
-Thanks,
+or:
 
-		Emilio
+   return addr < 512 || (addr >=3D 4096 && addr < 4608);
 
--- >8 --
-Subject: [PATCH] fixup
+> +/* check whether Low-Address Protection is enabled for mmu_translate()=
+ */
+> +static bool lowprot_enabled(const CPUS390XState *env, uint64_t asc)
+> +{
+> +    if (!(env->cregs[0] & CR0_LOWPROT)) {
+> +        return false;
+> +    }
+> +    if (!(env->psw.mask & PSW_MASK_DAT)) {
+> +        return true;
+> +    }
+> +
+> +    /* Check the private-space control bit */
+> +    switch (asc) {
+> +    case PSW_ASC_PRIMARY:
+> +        return !(env->cregs[1] & _ASCE_PRIVATE_SPACE);
+> +    case PSW_ASC_SECONDARY:
+> +        return !(env->cregs[7] & _ASCE_PRIVATE_SPACE);
+> +    case PSW_ASC_HOME:
+> +        return !(env->cregs[13] & _ASCE_PRIVATE_SPACE);
+> +    default:
+> +        g_assert_not_reached();
 
-Signed-off-by: Emilio G. Cota <cota@braap.org>
----
- accel/tcg/translate-all.c | 4 +---
- include/exec/exec-all.h   | 5 ++---
- 2 files changed, 3 insertions(+), 6 deletions(-)
+Well, this is certainly reachable - if the guest was running in access
+register mode. So it might be nicer to the user if you keep the
+error_report() here?
 
-diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index ac8dfe6..f9881d8 100644
---- a/accel/tcg/translate-all.c
-+++ b/accel/tcg/translate-all.c
-@@ -272,8 +272,6 @@ static int encode_search(TranslationBlock *tb, uint8_t *block)
-     uint8_t *p = block;
-     int i, j, n;
- 
--    tb->tc.search = block;
--
-     for (i = 0, n = tb->icount; i < n; ++i) {
-         target_ulong prev;
- 
-@@ -309,7 +307,7 @@ static int cpu_restore_state_from_tb(CPUState *cpu, TranslationBlock *tb,
-     target_ulong data[TARGET_INSN_START_WORDS] = { tb->pc };
-     uintptr_t host_pc = (uintptr_t)tb->tc.ptr;
-     CPUArchState *env = cpu->env_ptr;
--    uint8_t *p = tb->tc.search;
-+    uint8_t *p = tb->tc.ptr + tb->tc.size;
-     int i, j, num_insns = tb->icount;
- #ifdef CONFIG_PROFILER
-     TCGProfile *prof = &tcg_ctx->prof;
-diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
-index 746f4be..923ece3 100644
---- a/include/exec/exec-all.h
-+++ b/include/exec/exec-all.h
-@@ -308,12 +308,11 @@ static inline void tb_invalidate_phys_addr(AddressSpace *as, hwaddr addr)
-  * Translation Cache-related fields of a TB.
-  * This struct exists just for convenience; we keep track of TB's in a binary
-  * search tree, and the only fields needed to compare TB's in the tree are
-- * @ptr and @size. @search is brought here for consistency, since it is also
-- * a TC-related field.
-+ * @ptr and @size.
-+ * Note: the address of search data can be obtained by adding @size to @ptr.
-  */
- struct tb_tc {
-     void *ptr;    /* pointer to the translated code */
--    uint8_t *search;  /* pointer to search data */
-     size_t size;
- };
- 
--- 
-2.7.4
+> +    }
+> +}
+> +
+>  /**
+>   * Translate real address to absolute (=3D physical)
+>   * address by taking care of the prefix mapping.
+> @@ -323,6 +352,24 @@ int mmu_translate(CPUS390XState *env, target_ulong=
+ vaddr, int rw, uint64_t asc,
+>      }
+> =20
+>      *flags =3D PAGE_READ | PAGE_WRITE | PAGE_EXEC;
+> +    if (is_low_address(vaddr & TARGET_PAGE_MASK) && lowprot_enabled(en=
+v, asc)) {
+> +        /*
+> +         * If any part of this page is currently protected, make sure =
+the
+> +         * TLB entry will not be reused.
+> +         *
+> +         * As the protected range is always the first 512 bytes of the
+> +         * two first pages, we are able to catch all writes to these a=
+reas
+> +         * just by looking at the start address (triggering the tlb mi=
+ss).
+> +         */
+> +        *flags |=3D PAGE_WRITE_INV;
+> +        if (is_low_address(vaddr) && rw =3D=3D MMU_DATA_STORE) {
+> +            if (exc) {
+> +                trigger_access_exception(env, PGM_PROTECTION, ILEN_AUT=
+O, 0);
+> +            }
+> +            return -EACCES;
+> +        }
+> +    }
+> +
+>      vaddr &=3D TARGET_PAGE_MASK;
+> =20
+>      if (!(env->psw.mask & PSW_MASK_DAT)) {
+> @@ -392,50 +439,17 @@ int mmu_translate(CPUS390XState *env, target_ulon=
+g vaddr, int rw, uint64_t asc,
+>  }
+> =20
+>  /**
+> - * lowprot_enabled: Check whether low-address protection is enabled
+> - */
+> -static bool lowprot_enabled(const CPUS390XState *env)
+> -{
+> -    if (!(env->cregs[0] & CR0_LOWPROT)) {
+> -        return false;
+> -    }
+> -    if (!(env->psw.mask & PSW_MASK_DAT)) {
+> -        return true;
+> -    }
+> -
+> -    /* Check the private-space control bit */
+> -    switch (env->psw.mask & PSW_MASK_ASC) {
+> -    case PSW_ASC_PRIMARY:
+> -        return !(env->cregs[1] & _ASCE_PRIVATE_SPACE);
+> -    case PSW_ASC_SECONDARY:
+> -        return !(env->cregs[7] & _ASCE_PRIVATE_SPACE);
+> -    case PSW_ASC_HOME:
+> -        return !(env->cregs[13] & _ASCE_PRIVATE_SPACE);
+> -    default:
+> -        /* We don't support access register mode */
+> -        error_report("unsupported addressing mode");
+> -        exit(1);
+> -    }
+> -}
+
+Apart from the nits, the patch looks fine to me.
+
+ Thomas
