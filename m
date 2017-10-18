@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49823)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49836)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1e4rjv-00013Z-JP
+	(envelope-from <dgilbert@redhat.com>) id 1e4rjw-00013a-Kw
 	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 13:02:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1e4rjp-0004tV-VX
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 13:02:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41096)
+	(envelope-from <dgilbert@redhat.com>) id 1e4rjv-00051u-Kj
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 13:02:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42664)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1e4rjp-0004tG-QU
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 13:02:37 -0400
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1e4rjv-0004zk-Bu
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 13:02:43 -0400
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Wed, 18 Oct 2017 18:01:37 +0100
-Message-Id: <20171018170138.19078-7-dgilbert@redhat.com>
+Date: Wed, 18 Oct 2017 18:01:38 +0100
+Message-Id: <20171018170138.19078-8-dgilbert@redhat.com>
 In-Reply-To: <20171018170138.19078-1-dgilbert@redhat.com>
 References: <20171018170138.19078-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 6/7] migration: allow cancel to unpause
+Subject: [Qemu-devel] [PATCH v2 7/7] migration: pause-before-switchover for
+ postcopy
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,28 +29,91 @@ Cc: berrange@redhat.com, eblake@redhat.com, fuweiwei2@huawei.com
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-If a migration_cancel is issued during the new paused state,
-kick the pause_sem to get to unpause so it can cancel.
+Add pause-before-switchover support for postcopy.
+After starting postcopy it will transition
+    active->pre-switchover->postcopy_active
 
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- migration/migration.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ migration/migration.c | 29 ++++++++++++++++++++++-------
+ 1 file changed, 22 insertions(+), 7 deletions(-)
 
 diff --git a/migration/migration.c b/migration/migration.c
-index c9a3ee9efd..3d36d5e2b9 100644
+index 3d36d5e2b9..14873e7b4a 100644
 --- a/migration/migration.c
 +++ b/migration/migration.c
-@@ -1108,6 +1108,10 @@ static void migrate_fd_cancel(MigrationState *s)
-         if (!migration_is_setup_or_active(old_state)) {
-             break;
-         }
-+        /* If the migration is paused, kick it out of the pause */
-+        if (old_state == MIGRATION_STATUS_PAUSE_BEFORE_DEVICE) {
-+            qemu_sem_post(&s->pause_sem);
-+        }
-         migrate_set_state(&s->state, old_state, MIGRATION_STATUS_CANCELLING);
-     } while (s->state != MIGRATION_STATUS_CANCELLING);
+@@ -104,6 +104,9 @@ enum mig_rp_message_type {
+ static MigrationState *current_migration;
  
+ static bool migration_object_check(MigrationState *ms, Error **errp);
++static int migration_maybe_pause(MigrationState *s,
++                                 int *current_active_state,
++                                 int new_state);
+ 
+ void migration_object_init(void)
+ {
+@@ -1830,8 +1833,11 @@ static int postcopy_start(MigrationState *ms, bool *old_vm_running)
+     QEMUFile *fb;
+     int64_t time_at_stop = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+     bool restart_block = false;
+-    migrate_set_state(&ms->state, MIGRATION_STATUS_ACTIVE,
+-                      MIGRATION_STATUS_POSTCOPY_ACTIVE);
++    int cur_state = MIGRATION_STATUS_ACTIVE;
++    if (!migrate_pause_before_device()) {
++        migrate_set_state(&ms->state, MIGRATION_STATUS_ACTIVE,
++                          MIGRATION_STATUS_POSTCOPY_ACTIVE);
++    }
+ 
+     trace_postcopy_start();
+     qemu_mutex_lock_iothread();
+@@ -1845,6 +1851,12 @@ static int postcopy_start(MigrationState *ms, bool *old_vm_running)
+         goto fail;
+     }
+ 
++    ret = migration_maybe_pause(ms, &cur_state,
++                                MIGRATION_STATUS_POSTCOPY_ACTIVE);
++    if (ret < 0) {
++        goto fail;
++    }
++
+     ret = bdrv_inactivate_all();
+     if (ret < 0) {
+         goto fail;
+@@ -1987,7 +1999,9 @@ fail:
+  * migrate_pause_before_switchover called with the iothread locked
+  * Returns: 0 on success
+  */
+-static int migration_maybe_pause(MigrationState *s, int *current_active_state)
++static int migration_maybe_pause(MigrationState *s,
++                                 int *current_active_state,
++                                 int new_state)
+ {
+     if (!migrate_pause_before_switchover()) {
+         return 0;
+@@ -2008,11 +2022,11 @@ static int migration_maybe_pause(MigrationState *s, int *current_active_state)
+                       MIGRATION_STATUS_PRE_SWITCHOVER);
+     qemu_sem_wait(&s->pause_sem);
+     migrate_set_state(&s->state, MIGRATION_STATUS_PRE_SWITCHOVER,
+-                      MIGRATION_STATUS_DEVICE);
+-    *current_active_state = MIGRATION_STATUS_DEVICE;
++                      new_state);
++    *current_active_state = new_state;
+     qemu_mutex_lock_iothread();
+ 
+-    return s->state == MIGRATION_STATUS_DEVICE ? 0 : -EINVAL;
++    return s->state == new_state ? 0 : -EINVAL;
+ }
+ 
+ /**
+@@ -2041,7 +2055,8 @@ static void migration_completion(MigrationState *s, int current_active_state,
+             bool inactivate = !migrate_colo_enabled();
+             ret = vm_stop_force_state(RUN_STATE_FINISH_MIGRATE);
+             if (ret >= 0) {
+-                ret = migration_maybe_pause(s, &current_active_state);
++                ret = migration_maybe_pause(s, &current_active_state,
++                                            MIGRATION_STATUS_DEVICE);
+             }
+             if (ret >= 0) {
+                 qemu_file_set_rate_limit(s->to_dst_file, INT64_MAX);
 -- 
 2.13.6
