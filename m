@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35677)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35650)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1e4qxu-0003J0-72
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 12:13:07 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1e4qxs-0003If-3R
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 12:13:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1e4qxt-00020o-2A
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 12:13:06 -0400
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:55350)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1e4qxp-0001wG-Gf
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 12:13:04 -0400
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:46844)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1e4qxs-00020J-Q3
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 12:13:04 -0400
-Received: by mail-wr0-x242.google.com with SMTP id z99so3131120wrc.12
-	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 09:13:04 -0700 (PDT)
+	id 1e4qxp-0001va-Ag
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 12:13:01 -0400
+Received: by mail-wm0-x244.google.com with SMTP id m72so10990723wmc.1
+	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 09:13:01 -0700 (PDT)
+Received: from 640k.lan (94-39-155-245.adsl-ull.clienti.tiscali.it.
+	[94.39.155.245])
+	by smtp.gmail.com with ESMTPSA id 69sm13436794wmm.2.2017.10.18.09.12.57
+	for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Wed, 18 Oct 2017 09:12:57 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 18 Oct 2017 18:11:56 +0200
-Message-Id: <1508343141-31835-5-git-send-email-pbonzini@redhat.com>
+Date: Wed, 18 Oct 2017 18:11:53 +0200
+Message-Id: <1508343141-31835-2-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1508343141-31835-1-git-send-email-pbonzini@redhat.com>
 References: <1508343141-31835-1-git-send-email-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 04/29] char: don't skip client cleanup if
- 'connected' flag is unset
+Subject: [Qemu-devel] [PULL 01/29] checkpatch: refine mode selection
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,77 +35,78 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: "Daniel P. Berrange" <berrange@redhat.com>
+stgit produces patch files that lack the ".patch" extensions.  Others
+might be using ".diff" too.  But since we are already limiting source files
+to only a handful of extensions, we can reuse that in the mode selection
+code.
 
-The tcp_chr_free_connection & tcp_chr_disconnect methods both
-skip all of their cleanup work unless the 's->connected' flag
-is set.  This flag is set when the incoming client connection
-is ready to use. Crucially this is *after* the TLS handshake
-has been completed. So if the TLS handshake fails and we try
-to cleanup the failed client, all the cleanup is skipped as
-'s->connected' is still false.
+While at it, do not match "../foo" as a branch name.
 
-The only important thing that should be skipped in this case
-is sending of the CHR_EVENT_CLOSED, because we never got as
-far as sending the corresponding CHR_EVENT_OPENED. Every other
-bit of cleanup can be robust against being called even when
-s->connected is false.
-
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-Message-Id: <20171005155057.7664-1-berrange@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- chardev/char-socket.c | 19 +++++++++----------
- 1 file changed, 9 insertions(+), 10 deletions(-)
+ scripts/checkpatch.pl | 19 ++++++++++---------
+ 1 file changed, 10 insertions(+), 9 deletions(-)
 
-diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-index e65148f..53eda8e 100644
---- a/chardev/char-socket.c
-+++ b/chardev/char-socket.c
-@@ -332,10 +332,6 @@ static void tcp_chr_free_connection(Chardev *chr)
-     SocketChardev *s = SOCKET_CHARDEV(chr);
-     int i;
+diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+index 0c41f12..ce9f08e 100755
+--- a/scripts/checkpatch.pl
++++ b/scripts/checkpatch.pl
+@@ -11,6 +11,8 @@ use warnings;
+ my $P = $0;
+ $P =~ s@.*/@@g;
  
--    if (!s->connected) {
--        return;
--    }
--
-     if (s->read_msgfds_num) {
-         for (i = 0; i < s->read_msgfds_num; i++) {
-             close(s->read_msgfds[i]);
-@@ -394,22 +390,25 @@ static void update_disconnected_filename(SocketChardev *s)
-                                          s->is_listen, s->is_telnet);
++our $SrcFile    = qr{\.(?:h|c|cpp|s|S|pl|py|sh)$};
++
+ my $V = '0.31';
+ 
+ use Getopt::Long qw(:config no_auto_abbrev);
+@@ -101,30 +103,29 @@ if ($#ARGV < 0) {
  }
  
-+/* NB may be called even if tcp_chr_connect has not been
-+ * reached, due to TLS or telnet initialization failure,
-+ * so can *not* assume s->connected == true
-+ */
- static void tcp_chr_disconnect(Chardev *chr)
- {
-     SocketChardev *s = SOCKET_CHARDEV(chr);
--
--    if (!s->connected) {
--        return;
--    }
-+    bool emit_close = s->connected;
+ if (!defined $chk_branch && !defined $chk_patch && !defined $file) {
+-	$chk_branch = $ARGV[0] =~ /\.\./ ? 1 : 0;
+-	$chk_patch = $chk_branch ? 0 :
+-		$ARGV[0] =~ /\.patch$/ || $ARGV[0] eq "-" ? 1 : 0;
+-	$file = $chk_branch || $chk_patch ? 0 : 1;
++	$chk_branch = $ARGV[0] =~ /.\.\./ ? 1 : 0;
++	$file = $ARGV[0] =~ /$SrcFile/ ? 1 : 0;
++	$chk_patch = $chk_branch || $file ? 0 : 1;
+ } elsif (!defined $chk_branch && !defined $chk_patch) {
+ 	if ($file) {
+ 		$chk_branch = $chk_patch = 0;
+ 	} else {
+-		$chk_branch = $ARGV[0] =~ /\.\./ ? 1 : 0;
++		$chk_branch = $ARGV[0] =~ /.\.\./ ? 1 : 0;
+ 		$chk_patch = $chk_branch ? 0 : 1;
+ 	}
+ } elsif (!defined $chk_branch && !defined $file) {
+ 	if ($chk_patch) {
+ 		$chk_branch = $file = 0;
+ 	} else {
+-		$chk_branch = $ARGV[0] =~ /\.\./ ? 1 : 0;
++		$chk_branch = $ARGV[0] =~ /.\.\./ ? 1 : 0;
+ 		$file = $chk_branch ? 0 : 1;
+ 	}
+ } elsif (!defined $chk_patch && !defined $file) {
+ 	if ($chk_branch) {
+ 		$chk_patch = $file = 0;
+ 	} else {
+-		$chk_patch = $ARGV[0] =~ /\.patch$/ || $ARGV[0] eq "-" ? 1 : 0;
+-		$file = $chk_patch ? 0 : 1;
++		$file = $ARGV[0] =~ /$SrcFile/ ? 1 : 0;
++		$chk_patch = $file ? 0 : 1;
+ 	}
+ } elsif (!defined $chk_branch) {
+ 	$chk_branch = $chk_patch || $file ? 0 : 1;
+@@ -1443,7 +1444,7 @@ sub process {
+ 		}
  
-     tcp_chr_free_connection(chr);
+ # check we are in a valid source file if not then ignore this hunk
+-		next if ($realfile !~ /\.(h|c|cpp|s|S|pl|py|sh)$/);
++		next if ($realfile !~ /$SrcFile/);
  
--    if (s->listen_ioc) {
-+    if (s->listen_ioc && s->listen_tag == 0) {
-         s->listen_tag = qio_channel_add_watch(
-             QIO_CHANNEL(s->listen_ioc), G_IO_IN, tcp_chr_accept, chr, NULL);
-     }
-     update_disconnected_filename(s);
--    qemu_chr_be_event(chr, CHR_EVENT_CLOSED);
-+    if (emit_close) {
-+        qemu_chr_be_event(chr, CHR_EVENT_CLOSED);
-+    }
-     if (s->reconnect_time) {
-         qemu_chr_socket_restart_timer(chr);
-     }
+ #90 column limit
+ 		if ($line =~ /^\+/ &&
 -- 
 1.8.3.1
