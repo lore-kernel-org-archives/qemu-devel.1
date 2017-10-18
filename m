@@ -1,30 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35851)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35857)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1e4qy4-0003Ua-RZ
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 12:13:17 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1e4qy5-0003Up-1a
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 12:13:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1e4qy3-00028h-Rq
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 12:13:16 -0400
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:51625)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1e4qy3-00027f-L8
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 12:13:15 -0400
-Received: by mail-wm0-x243.google.com with SMTP id f4so11175278wme.0
-	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 09:13:15 -0700 (PDT)
-Received: from 640k.lan (94-39-155-245.adsl-ull.clienti.tiscali.it.
-	[94.39.155.245])
-	by smtp.gmail.com with ESMTPSA id 69sm13436794wmm.2.2017.10.18.09.13.12
-	for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Wed, 18 Oct 2017 09:13:13 -0700 (PDT)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1e4qy0-00025n-V4
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 12:13:17 -0400
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 18 Oct 2017 18:12:05 +0200
-Message-Id: <1508343141-31835-14-git-send-email-pbonzini@redhat.com>
+Date: Wed, 18 Oct 2017 18:12:03 +0200
+Message-Id: <1508343141-31835-12-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1508343141-31835-1-git-send-email-pbonzini@redhat.com>
 References: <1508343141-31835-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 13/29] tco: add trace events
+Subject: [Qemu-devel] [PULL 11/29] nios2: define tcg_env
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,65 +21,36 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: qemu-stable@nongnu.org, Marek Vasut <marex@denx.de>
 
-Add trace events to the PCH watchdog timer, it can be useful to see how
-the guest is using it.
+This should be done by all target and, since commit 53f6672bcf
+("gen-icount: use tcg_ctx.tcg_env instead of cpu_env", 2017-06-30),
+is causing the NIOS2 target to hang.
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-Id: <1507816448-86665-1-git-send-email-pbonzini@redhat.com>
+This is because the test for "should I exit to the main loop"
+was being done with the correct offset to the icount decrementer,
+but using TCG temporary 0 (the frame pointer) rather than the
+env pointer.
+
+Cc: qemu-stable@nongnu.org
+Cc: Marek Vasut <marex@denx.de>
+Reported-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/acpi/tco.c        | 11 +++++++++--
- hw/acpi/trace-events |  4 ++++
- 2 files changed, 13 insertions(+), 2 deletions(-)
+ target/nios2/translate.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/hw/acpi/tco.c b/hw/acpi/tco.c
-index 05b9d7b..a914396 100644
---- a/hw/acpi/tco.c
-+++ b/hw/acpi/tco.c
-@@ -12,6 +12,7 @@
- #include "hw/i386/ich9.h"
+diff --git a/target/nios2/translate.c b/target/nios2/translate.c
+index 6b09618..54fbe89 100644
+--- a/target/nios2/translate.c
++++ b/target/nios2/translate.c
+@@ -948,6 +948,7 @@ void nios2_tcg_init(void)
+     int i;
  
- #include "hw/acpi/tco.h"
-+#include "trace.h"
+     cpu_env = tcg_global_reg_new_ptr(TCG_AREG0, "env");
++    tcg_ctx.tcg_env = cpu_env;
  
- //#define DEBUG
- 
-@@ -41,8 +42,11 @@ enum {
- 
- static inline void tco_timer_reload(TCOIORegs *tr)
- {
--    tr->expire_time = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
--        ((int64_t)(tr->tco.tmr & TCO_TMR_MASK) * TCO_TICK_NSEC);
-+    int ticks = tr->tco.tmr & TCO_TMR_MASK;
-+    int64_t nsec = (int64_t)ticks * TCO_TICK_NSEC;
-+
-+    trace_tco_timer_reload(ticks, nsec / 1000000);
-+    tr->expire_time = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + nsec;
-     timer_mod(tr->tco_timer, tr->expire_time);
- }
- 
-@@ -59,6 +63,9 @@ static void tco_timer_expired(void *opaque)
-     ICH9LPCState *lpc = container_of(pm, ICH9LPCState, pm);
-     uint32_t gcs = pci_get_long(lpc->chip_config + ICH9_CC_GCS);
- 
-+    trace_tco_timer_expired(tr->timeouts_no,
-+                            lpc->pin_strap.spkr_hi,
-+                            !!(gcs & ICH9_CC_GCS_NO_REBOOT));
-     tr->tco.rld = 0;
-     tr->tco.sts1 |= TCO_TIMEOUT;
-     if (++tr->timeouts_no == 2) {
-diff --git a/hw/acpi/trace-events b/hw/acpi/trace-events
-index e3b41e9..df0024f 100644
---- a/hw/acpi/trace-events
-+++ b/hw/acpi/trace-events
-@@ -30,3 +30,7 @@ cpuhp_acpi_ejecting_invalid_cpu(uint32_t idx) "0x%"PRIx32
- cpuhp_acpi_ejecting_cpu(uint32_t idx) "0x%"PRIx32
- cpuhp_acpi_write_ost_ev(uint32_t slot, uint32_t ev) "idx[0x%"PRIx32"] OST EVENT: 0x%"PRIx32
- cpuhp_acpi_write_ost_status(uint32_t slot, uint32_t st) "idx[0x%"PRIx32"] OST STATUS: 0x%"PRIx32
-+
-+# hw/acpi/tco.c
-+tco_timer_reload(int ticks, int msec) "ticks=%d (%d ms)"
-+tco_timer_expired(int timeouts_no, bool strap, bool no_reboot) "timeouts_no=%d no_reboot=%d/%d"
+     for (i = 0; i < NUM_CORE_REGS; i++) {
+         cpu_R[i] = tcg_global_mem_new(cpu_env,
 -- 
 1.8.3.1
