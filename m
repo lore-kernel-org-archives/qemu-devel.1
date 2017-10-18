@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58639)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58655)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <riku.voipio@linaro.org>) id 1e4nXa-0005Gr-KB
+	(envelope-from <riku.voipio@linaro.org>) id 1e4nXe-0005HY-0S
 	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 08:33:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <riku.voipio@linaro.org>) id 1e4nXW-0003xF-Cf
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 08:33:42 -0400
-Received: from mail-lf0-x242.google.com ([2a00:1450:4010:c07::242]:50978)
+	(envelope-from <riku.voipio@linaro.org>) id 1e4nXc-00040W-9B
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 08:33:46 -0400
+Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:46831)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <riku.voipio@linaro.org>)
-	id 1e4nXW-0003wh-1O
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 08:33:38 -0400
-Received: by mail-lf0-x242.google.com with SMTP id a132so5618370lfa.7
-	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 05:33:37 -0700 (PDT)
+	id 1e4nXc-00040D-0M
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 08:33:44 -0400
+Received: by mail-lf0-x243.google.com with SMTP id g70so5628429lfl.3
+	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 05:33:43 -0700 (PDT)
 From: riku.voipio@linaro.org
-Date: Wed, 18 Oct 2017 15:33:20 +0300
-Message-Id: <18e80c55bb6ec17c05ec0ba717ec83933c2bfc07.1508329282.git.riku.voipio@linaro.org>
+Date: Wed, 18 Oct 2017 15:33:24 +0300
+Message-Id: <f443e3960d9d3340dd286e5fc0b661bb165a8b22.1508329282.git.riku.voipio@linaro.org>
 In-Reply-To: <cover.1508329282.git.riku.voipio@linaro.org>
 References: <cover.1508329282.git.riku.voipio@linaro.org>
-Subject: [Qemu-devel] [PULL 06/10] linux-user: Tidy and enforce reserved_va
- initialization
+Subject: [Qemu-devel] [PULL 10/10] linux-user: Fix
+ TARGET_MTIOCTOP/MTIOCGET/MTIOCPOS values
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,149 +28,63 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Richard Henderson <rth@twiddle.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>
 
-From: Richard Henderson <rth@twiddle.net>
+From: Peter Maydell <peter.maydell@linaro.org>
 
-We had a check using TARGET_VIRT_ADDR_SPACE_BITS to make sure
-that the allocation coming in from the command-line option was
-not too large, but that didn't include target-specific knowledge
-about other restrictions on user-space.
+The TARGET_MTIOCTOP/TARGET_MTIOCGET/TARGET_MTIOCPOS values
+were being defined in terms of host struct types, but
+these structures are such that their size might differ
+on different hosts. Switch to using a target struct
+definition instead.
 
-Remove several target-specific hacks in linux-user/main.c.
-
-For MIPS and Nios, we can replace them with proper adjustments
-to the respective target's TARGET_VIRT_ADDR_SPACE_BITS definition.
-
-For ARM, we had no existing ifdef but I suspect that the current
-default value of 0xf7000000 was chosen with this in mind.  Define
-a workable value in linux-user/arm/, and also document why the
-special case is required.
-
-Signed-off-by: Richard Henderson <rth@twiddle.net>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Message-Id: <20170708025030.15845-3-rth@twiddle.net>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Riku Voipio <riku.voipio@linaro.org>
 ---
- linux-user/arm/target_cpu.h |  4 ++++
- linux-user/main.c           | 38 +++++++++++++++++++++++++-------------
- target/mips/mips-defs.h     |  6 +++++-
- target/nios2/cpu.h          |  6 +++++-
- 4 files changed, 39 insertions(+), 15 deletions(-)
+ linux-user/syscall_defs.h | 31 ++++++++++++++++++++++++++++---
+ 1 file changed, 28 insertions(+), 3 deletions(-)
 
-diff --git a/linux-user/arm/target_cpu.h b/linux-user/arm/target_cpu.h
-index d888219150..c3eb4b243d 100644
---- a/linux-user/arm/target_cpu.h
-+++ b/linux-user/arm/target_cpu.h
-@@ -19,6 +19,10 @@
- #ifndef ARM_TARGET_CPU_H
- #define ARM_TARGET_CPU_H
+diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
+index 447915cf80..e405d1d31d 100644
+--- a/linux-user/syscall_defs.h
++++ b/linux-user/syscall_defs.h
+@@ -2712,9 +2712,34 @@ struct target_f_owner_ex {
+ #define TARGET_VFAT_IOCTL_READDIR_BOTH    TARGET_IORU('r', 1)
+ #define TARGET_VFAT_IOCTL_READDIR_SHORT   TARGET_IORU('r', 2)
  
-+/* We need to be able to map the commpage.
-+   See validate_guest_space in linux-user/elfload.c.  */
-+#define MAX_RESERVED_VA  0xffff0000ul
+-#define TARGET_MTIOCTOP        TARGET_IOW('m', 1, struct mtop)
+-#define TARGET_MTIOCGET        TARGET_IOR('m', 2, struct mtget)
+-#define TARGET_MTIOCPOS        TARGET_IOR('m', 3, struct mtpos)
++struct target_mtop {
++    abi_short mt_op;
++    abi_int mt_count;
++};
 +
- static inline void cpu_clone_regs(CPUARMState *env, target_ulong newsp)
- {
-     if (newsp) {
-diff --git a/linux-user/main.c b/linux-user/main.c
-index 829f974662..fd54d344bb 100644
---- a/linux-user/main.c
-+++ b/linux-user/main.c
-@@ -60,23 +60,38 @@ do {                                                                    \
-     }                                                                   \
- } while (0)
- 
--#if (TARGET_LONG_BITS == 32) && (HOST_LONG_BITS == 64)
- /*
-  * When running 32-on-64 we should make sure we can fit all of the possible
-  * guest address space into a contiguous chunk of virtual host memory.
-  *
-  * This way we will never overlap with our own libraries or binaries or stack
-  * or anything else that QEMU maps.
-+ *
-+ * Many cpus reserve the high bit (or more than one for some 64-bit cpus)
-+ * of the address for the kernel.  Some cpus rely on this and user space
-+ * uses the high bit(s) for pointer tagging and the like.  For them, we
-+ * must preserve the expected address space.
-  */
--# if defined(TARGET_MIPS) || defined(TARGET_NIOS2)
--/*
-- * MIPS only supports 31 bits of virtual address space for user space.
-- * Nios2 also only supports 31 bits.
-- */
--unsigned long reserved_va = 0x77000000;
-+#ifndef MAX_RESERVED_VA
-+# if HOST_LONG_BITS > TARGET_VIRT_ADDR_SPACE_BITS
-+#  if TARGET_VIRT_ADDR_SPACE_BITS == 32 && \
-+      (TARGET_LONG_BITS == 32 || defined(TARGET_ABI32))
-+/* There are a number of places where we assign reserved_va to a variable
-+   of type abi_ulong and expect it to fit.  Avoid the last page.  */
-+#   define MAX_RESERVED_VA  (0xfffffffful & TARGET_PAGE_MASK)
-+#  else
-+#   define MAX_RESERVED_VA  (1ul << TARGET_VIRT_ADDR_SPACE_BITS)
-+#  endif
- # else
--unsigned long reserved_va = 0xf7000000;
-+#  define MAX_RESERVED_VA  0
- # endif
-+#endif
-+
-+/* That said, reserving *too* much vm space via mmap can run into problems
-+   with rlimits, oom due to page table creation, etc.  We will still try it,
-+   if directed by the command-line option, but not by default.  */
-+#if HOST_LONG_BITS == 64 && TARGET_VIRT_ADDR_SPACE_BITS <= 32
-+unsigned long reserved_va = MAX_RESERVED_VA;
- #else
- unsigned long reserved_va;
- #endif
-@@ -3978,11 +3993,8 @@ static void handle_arg_reserved_va(const char *arg)
-         unsigned long unshifted = reserved_va;
-         p++;
-         reserved_va <<= shift;
--        if (((reserved_va >> shift) != unshifted)
--#if HOST_LONG_BITS > TARGET_VIRT_ADDR_SPACE_BITS
--            || (reserved_va > (1ul << TARGET_VIRT_ADDR_SPACE_BITS))
--#endif
--            ) {
-+        if (reserved_va >> shift != unshifted
-+            || (MAX_RESERVED_VA && reserved_va > MAX_RESERVED_VA)) {
-             fprintf(stderr, "Reserved virtual address too big\n");
-             exit(EXIT_FAILURE);
-         }
-diff --git a/target/mips/mips-defs.h b/target/mips/mips-defs.h
-index 047554ee45..d239069975 100644
---- a/target/mips/mips-defs.h
-+++ b/target/mips/mips-defs.h
-@@ -15,7 +15,11 @@
- #else
- #define TARGET_LONG_BITS 32
- #define TARGET_PHYS_ADDR_SPACE_BITS 40
--#define TARGET_VIRT_ADDR_SPACE_BITS 32
-+# ifdef CONFIG_USER_ONLY
-+#  define TARGET_VIRT_ADDR_SPACE_BITS 31
-+# else
-+#  define TARGET_VIRT_ADDR_SPACE_BITS 32
-+#endif
- #endif
- 
- /* Masks used to mark instructions to indicate which ISA level they
-diff --git a/target/nios2/cpu.h b/target/nios2/cpu.h
-index 50d803a217..9119eee587 100644
---- a/target/nios2/cpu.h
-+++ b/target/nios2/cpu.h
-@@ -226,7 +226,11 @@ qemu_irq *nios2_cpu_pic_init(Nios2CPU *cpu);
- void nios2_check_interrupts(CPUNios2State *env);
- 
- #define TARGET_PHYS_ADDR_SPACE_BITS 32
--#define TARGET_VIRT_ADDR_SPACE_BITS 32
-+#ifdef CONFIG_USER_ONLY
-+# define TARGET_VIRT_ADDR_SPACE_BITS 31
++#if defined(TARGET_SPARC) || defined(TARGET_MIPS)
++typedef abi_long target_kernel_daddr_t;
 +#else
-+# define TARGET_VIRT_ADDR_SPACE_BITS 32
++typedef abi_int target_kernel_daddr_t;
 +#endif
++
++struct target_mtget {
++    abi_long mt_type;
++    abi_long mt_resid;
++    abi_long mt_dsreg;
++    abi_long mt_gstat;
++    abi_long mt_erreg;
++    target_kernel_daddr_t mt_fileno;
++    target_kernel_daddr_t mt_blkno;
++};
++
++struct target_mtpos {
++    abi_long mt_blkno;
++};
++
++#define TARGET_MTIOCTOP        TARGET_IOW('m', 1, struct target_mtop)
++#define TARGET_MTIOCGET        TARGET_IOR('m', 2, struct target_mtget)
++#define TARGET_MTIOCPOS        TARGET_IOR('m', 3, struct target_mtpos)
  
- #define cpu_init(cpu_model) cpu_generic_init(TYPE_NIOS2_CPU, cpu_model)
- 
+ struct target_sysinfo {
+     abi_long uptime;                /* Seconds since boot */
 -- 
 2.14.2
