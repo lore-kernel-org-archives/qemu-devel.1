@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53293)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55863)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1e4kXM-0001Fk-E0
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 05:21:17 -0400
+	(envelope-from <quintela@redhat.com>) id 1e4kdD-00036Q-K6
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 05:27:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1e4kXL-0003yi-6K
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 05:21:16 -0400
-References: <20171012185916.22776-1-eblake@redhat.com>
-	<20171012185916.22776-6-eblake@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <acf0e16c-d9ac-398f-d500-74599a43490d@redhat.com>
-Date: Wed, 18 Oct 2017 11:20:35 +0200
+	(envelope-from <quintela@redhat.com>) id 1e4kd9-0001RO-NU
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 05:27:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33564)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1e4kd9-0001Px-HC
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 05:27:15 -0400
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <cfb8e3d0-7c4e-f83f-3887-18e6af8b0418@redhat.com> (Laurent
+	Vivier's message of "Wed, 18 Oct 2017 11:09:19 +0200")
+References: <20171018083305.5246-1-quintela@redhat.com>
+	<cfb8e3d0-7c4e-f83f-3887-18e6af8b0418@redhat.com>
+Reply-To: quintela@redhat.com
+Date: Wed, 18 Oct 2017 11:27:09 +0200
+Message-ID: <874lqwolg2.fsf@secure.laptop>
 MIME-Version: 1.0
-In-Reply-To: <20171012185916.22776-6-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 05/20] iscsi: Switch cluster_sectors to
- byte-based
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] tpm: Fix compilation with --disable-tpm
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,159 +28,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, famz@redhat.com, jsnow@redhat.com, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Peter Lieven <pl@kamp.de>, Max Reitz <mreitz@redhat.com>
+To: Laurent Vivier <lvivier@redhat.com>
+Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, peterx@redhat.com, Amarnath Valluri <amarnath.valluri@intel.com>
 
-On 12/10/2017 20:59, Eric Blake wrote:
-> We are gradually converting to byte-based interfaces, as they are
-> easier to reason about than sector-based.  Convert all uses of
-> the cluster size in sectors, along with adding assertions that we
-> are not dividing by zero.
-> 
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> 
-> ---
-> v2: no change
-> ---
->  block/iscsi.c | 56 +++++++++++++++++++++++++++++++++++---------------------
->  1 file changed, 35 insertions(+), 21 deletions(-)
-> 
-> diff --git a/block/iscsi.c b/block/iscsi.c
-> index 4683f3b244..8f903d8370 100644
-> --- a/block/iscsi.c
-> +++ b/block/iscsi.c
-> @@ -84,7 +84,7 @@ typedef struct IscsiLun {
->      unsigned long *allocmap;
->      unsigned long *allocmap_valid;
->      long allocmap_size;
-> -    int cluster_sectors;
-> +    int cluster_size;
->      bool use_16_for_rw;
->      bool write_protected;
->      bool lbpme;
-> @@ -427,9 +427,10 @@ static int iscsi_allocmap_init(IscsiLun *iscsilun, int open_flags)
->  {
->      iscsi_allocmap_free(iscsilun);
-> 
-> +    assert(iscsilun->cluster_size);
->      iscsilun->allocmap_size =
-> -        DIV_ROUND_UP(sector_lun2qemu(iscsilun->num_blocks, iscsilun),
-> -                     iscsilun->cluster_sectors);
-> +        DIV_ROUND_UP(iscsilun->num_blocks * iscsilun->block_size,
-> +                     iscsilun->cluster_size);
-> 
->      iscsilun->allocmap = bitmap_try_new(iscsilun->allocmap_size);
->      if (!iscsilun->allocmap) {
-> @@ -437,7 +438,7 @@ static int iscsi_allocmap_init(IscsiLun *iscsilun, int open_flags)
->      }
-> 
->      if (open_flags & BDRV_O_NOCACHE) {
-> -        /* in case that cache.direct = on all allocmap entries are
-> +        /* when cache.direct = on all allocmap entries are
->           * treated as invalid to force a relookup of the block
->           * status on every read request */
->          return 0;
-> @@ -458,17 +459,19 @@ iscsi_allocmap_update(IscsiLun *iscsilun, int64_t sector_num,
->                        int nb_sectors, bool allocated, bool valid)
->  {
->      int64_t cl_num_expanded, nb_cls_expanded, cl_num_shrunk, nb_cls_shrunk;
-> +    int cluster_sectors = iscsilun->cluster_size >> BDRV_SECTOR_BITS;
-> 
->      if (iscsilun->allocmap == NULL) {
->          return;
->      }
->      /* expand to entirely contain all affected clusters */
-> -    cl_num_expanded = sector_num / iscsilun->cluster_sectors;
-> +    assert(cluster_sectors);
-> +    cl_num_expanded = sector_num / cluster_sectors;
->      nb_cls_expanded = DIV_ROUND_UP(sector_num + nb_sectors,
-> -                                   iscsilun->cluster_sectors) - cl_num_expanded;
-> +                                   cluster_sectors) - cl_num_expanded;
->      /* shrink to touch only completely contained clusters */
-> -    cl_num_shrunk = DIV_ROUND_UP(sector_num, iscsilun->cluster_sectors);
-> -    nb_cls_shrunk = (sector_num + nb_sectors) / iscsilun->cluster_sectors
-> +    cl_num_shrunk = DIV_ROUND_UP(sector_num, cluster_sectors);
-> +    nb_cls_shrunk = (sector_num + nb_sectors) / cluster_sectors
->                        - cl_num_shrunk;
->      if (allocated) {
->          bitmap_set(iscsilun->allocmap, cl_num_expanded, nb_cls_expanded);
-> @@ -532,9 +535,12 @@ iscsi_allocmap_is_allocated(IscsiLun *iscsilun, int64_t sector_num,
->      if (iscsilun->allocmap == NULL) {
->          return true;
->      }
-> -    size = DIV_ROUND_UP(sector_num + nb_sectors, iscsilun->cluster_sectors);
-> +    assert(iscsilun->cluster_size);
-> +    size = DIV_ROUND_UP(sector_num + nb_sectors,
-> +                        iscsilun->cluster_size >> BDRV_SECTOR_BITS);
->      return !(find_next_bit(iscsilun->allocmap, size,
-> -                           sector_num / iscsilun->cluster_sectors) == size);
-> +                           sector_num * BDRV_SECTOR_SIZE /
-> +                           iscsilun->cluster_size) == size);
->  }
-> 
->  static inline bool iscsi_allocmap_is_valid(IscsiLun *iscsilun,
-> @@ -544,9 +550,12 @@ static inline bool iscsi_allocmap_is_valid(IscsiLun *iscsilun,
->      if (iscsilun->allocmap_valid == NULL) {
->          return false;
->      }
-> -    size = DIV_ROUND_UP(sector_num + nb_sectors, iscsilun->cluster_sectors);
-> +    assert(iscsilun->cluster_size);
-> +    size = DIV_ROUND_UP(sector_num + nb_sectors,
-> +                        iscsilun->cluster_size >> BDRV_SECTOR_BITS);
->      return (find_next_zero_bit(iscsilun->allocmap_valid, size,
-> -                               sector_num / iscsilun->cluster_sectors) == size);
-> +                               sector_num * BDRV_SECTOR_SIZE /
-> +                               iscsilun->cluster_size) == size);
->  }
-> 
->  static int coroutine_fn
-> @@ -781,16 +790,21 @@ static int coroutine_fn iscsi_co_readv(BlockDriverState *bs,
->          BlockDriverState *file;
->          /* check the block status from the beginning of the cluster
->           * containing the start sector */
-> -        int64_t ret = iscsi_co_get_block_status(bs,
-> -                          sector_num - sector_num % iscsilun->cluster_sectors,
-> -                          BDRV_REQUEST_MAX_SECTORS, &pnum, &file);
-> +        int cluster_sectors = iscsilun->cluster_size >> BDRV_SECTOR_BITS;
-> +        int head;
-> +        int64_t ret;
-> +
-> +        assert(cluster_sectors);
-> +        head = sector_num % cluster_sectors;
-> +        ret = iscsi_co_get_block_status(bs, sector_num - head,
-> +                                        BDRV_REQUEST_MAX_SECTORS, &pnum,
-> +                                        &file);
->          if (ret < 0) {
->              return ret;
->          }
->          /* if the whole request falls into an unallocated area we can avoid
-> -         * to read and directly return zeroes instead */
-> -        if (ret & BDRV_BLOCK_ZERO &&
-> -            pnum >= nb_sectors + sector_num % iscsilun->cluster_sectors) {
-> +         * reading and directly return zeroes instead */
-> +        if (ret & BDRV_BLOCK_ZERO && pnum >= nb_sectors + head) {
->              qemu_iovec_memset(iov, 0, 0x00, iov->size);
->              return 0;
->          }
-> @@ -1930,8 +1944,8 @@ static int iscsi_open(BlockDriverState *bs, QDict *options, int flags,
->       * reasonable size */
->      if (iscsilun->bl.opt_unmap_gran * iscsilun->block_size >= 4 * 1024 &&
->          iscsilun->bl.opt_unmap_gran * iscsilun->block_size <= 16 * 1024 * 1024) {
-> -        iscsilun->cluster_sectors = (iscsilun->bl.opt_unmap_gran *
-> -                                     iscsilun->block_size) >> BDRV_SECTOR_BITS;
-> +        iscsilun->cluster_size = iscsilun->bl.opt_unmap_gran *
-> +            iscsilun->block_size;
->          if (iscsilun->lbprz) {
->              ret = iscsi_allocmap_init(iscsilun, bs->open_flags);
->          }
-> @@ -2137,7 +2151,7 @@ static int iscsi_get_info(BlockDriverState *bs, BlockDriverInfo *bdi)
->      IscsiLun *iscsilun = bs->opaque;
->      bdi->unallocated_blocks_are_zero = iscsilun->lbprz;
->      bdi->can_write_zeroes_with_unmap = iscsilun->lbprz && iscsilun->lbp.lbpws;
-> -    bdi->cluster_size = iscsilun->cluster_sectors * BDRV_SECTOR_SIZE;
-> +    bdi->cluster_size = iscsilun->cluster_size;
->      return 0;
->  }
-> 
+Laurent Vivier <lvivier@redhat.com> wrote:
+> On 18/10/2017 10:33, Juan Quintela wrote:
+>> Commit
+>>    c37cacabf2285b0731b44c1f667781fdd4f2b658
+>> 
+>> broke compilation without tpm.  Just add an empty tpm_cleanup() stub.
+>
+> tpm_init() and tpm_config_parse() are managed in a different way: they
+> are included in a "#ifdef CONFIG_TPM .. #endif" in vl.c
+>
+> I think you should follow the same way.
 
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+tpm is weird (TM):
+
+in include/sysemu/tpm.h we do that in an incline function
+
+static inline TPMVersion tpm_get_version(void)
+{
+#ifdef CONFIG_TPM
+    Object *obj = object_resolve_path_type("", TYPE_TPM_TIS, NULL);
+
+    if (obj) {
+        return tpm_tis_get_tpm_version(obj);
+    }
+#endif
+    return TPM_VERSION_UNSPEC;
+}
+
+
+tpm.c, we have an ifdef in the middle of the file
+
+#ifdef CONFIG_TPM
+
+#endif
+
+
+vl.c, we protect tpm_* calls with CONFIG_TPM
+
+#ifdef CONFIG_TPM
+            case QEMU_OPTION_tpmdev:
+                if (tpm_config_parse(qemu_find_opts("tpmdev"), optarg) < 0) {
+                    exit(1);
+                }
+                break;
+#endif
+
+
+but we almost never do:
+
+#ifdef CONFIG_TPM
+   tpm_cleanup()
+#endif
+
+We normally create an stub function.
+
+So ......
+
+We are going to be inconsistent whatever we did.
+
+I would have vote for
+
+#ifdef CONFIG_TPM
+void tpm_cleanup(void);
+#else
+static inline void tpm_cleanup(void) {}
+#endif
+
+On the header file (it was my first solution), but having CONFIG_TPM on
+tpm.c sounded gross.
+
+So ....
+
+I think that now that the problem is spotted, I will left the choose of
+the solution to the maintaner O:-)
+
+Later, Juan.
