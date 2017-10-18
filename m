@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48540)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49112)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <darren.kenny@oracle.com>) id 1e4lgo-0007U0-IV
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 06:35:09 -0400
+	(envelope-from <quintela@redhat.com>) id 1e4liP-00089l-O2
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 06:36:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <darren.kenny@oracle.com>) id 1e4lgi-0003wa-Q1
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 06:35:06 -0400
-Date: Wed, 18 Oct 2017 11:34:45 +0100
-From: Darren Kenny <darren.kenny@oracle.com>
-Message-ID: <20171018103445.tyw6k2dsdaewrbxq@starbug-vm.ie.oracle.com>
-References: <1508298038-4156-1-git-send-email-sundeep.lkml@gmail.com>
-	<20171018085459.3mt4gynx3s3gndnt@starbug-vm.ie.oracle.com>
-	<CALHRZuqhHJftwxP3h5Ne_VERxofwzwRgngeCZMP6G9oXi4UuXA@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-In-Reply-To: <CALHRZuqhHJftwxP3h5Ne_VERxofwzwRgngeCZMP6G9oXi4UuXA@mail.gmail.com>
-Subject: Re: [Qemu-devel] [Qemu devel v2 PATCH] msf2: Remove dead code
- reported by Coverity
+	(envelope-from <quintela@redhat.com>) id 1e4liO-0005Hr-0K
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 06:36:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:1191)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1e4liN-0005HA-QG
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 06:36:43 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D3182883BA
+	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 10:36:42 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+Date: Wed, 18 Oct 2017 12:36:24 +0200
+Message-Id: <20171018103633.5549-2-quintela@redhat.com>
+In-Reply-To: <20171018103633.5549-1-quintela@redhat.com>
+References: <20171018103633.5549-1-quintela@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 01/10] migration: Fix migrate_test_apply for
+ multifd parameters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,108 +30,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: sundeep subbaraya <sundeep.lkml@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Alistair Francis <alistair23@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-Hi Sundeep,
+They were missing when introduced on the tree
 
-On Wed, Oct 18, 2017 at 10:10:07AM +0000, sundeep subbaraya wrote:
->Hi Darren,
->
->On Wed, Oct 18, 2017 at 2:24 PM, Darren Kenny <darren.kenny@oracle.com>
->wrote:
->
->> On Wed, Oct 18, 2017 at 03:40:38AM +0000, Subbaraya Sundeep wrote:
->>
->>> Fixed incorrect frame size mask, validated maximum frame
->>> size in spi_write and removed dead code.
->>>
->>> Signed-off-by: Subbaraya Sundeep <sundeep.lkml@gmail.com>
->>> ---
->>> v2:
->>>         else if -> else in set_fifodepth
->>>         log guest error when frame size is more than 32
->>>
->>> hw/ssi/mss-spi.c | 12 ++++++++----
->>> 1 file changed, 8 insertions(+), 4 deletions(-)
->>>
->>> diff --git a/hw/ssi/mss-spi.c b/hw/ssi/mss-spi.c
->>> index 5a8e308..7fef2c3 100644
->>> --- a/hw/ssi/mss-spi.c
->>> +++ b/hw/ssi/mss-spi.c
->>> @@ -76,9 +76,10 @@
->>> #define C_BIGFIFO            (1 << 29)
->>> #define C_RESET              (1 << 31)
->>>
->>> -#define FRAMESZ_MASK         0x1F
->>> +#define FRAMESZ_MASK         0x3F
->>> #define FMCOUNT_MASK         0x00FFFF00
->>> #define FMCOUNT_SHIFT        8
->>> +#define FRAMESZ_MAX          32
->>>
->>> static void txfifo_reset(MSSSpiState *s)
->>> {
->>> @@ -104,10 +105,8 @@ static void set_fifodepth(MSSSpiState *s)
->>>         s->fifo_depth = 32;
->>>     } else if (size <= 16) {
->>>         s->fifo_depth = 16;
->>> -    } else if (size <= 32) {
->>> -        s->fifo_depth = 8;
->>>     } else {
->>> -        s->fifo_depth = 4;
->>> +        s->fifo_depth = 8;
->>>     }
->>> }
->>>
->>> @@ -301,6 +300,11 @@ static void spi_write(void *opaque, hwaddr addr,
->>>         if (s->enabled) {
->>>             break;
->>>         }
->>> +        if ((value & FRAMESZ_MASK) > FRAMESZ_MAX) {
->>> +            qemu_log_mask(LOG_GUEST_ERROR, "%s: Maximum frame size is
->>> %d\n",
->>> +                         __func__, FRAMESZ_MAX);
->>> +            break;
->>> +        }
->>>         s->regs[R_SPI_DFSIZE] = value;
->>>         break;
->>>
->>
->> This test, and subsequent use of value appear to be out of sorts -
->> in that while it is testing for the value by ANDing it with
->> FRAMESZ_MASK, it is subsequently using the value without that mask
->> applied to it, which still has the potential to be larger than
->> FRAMESZ_MASK if it contains a value larger than 0x3F.
->>
->> Is that the expected behaviour? If so, maybe include a comment on
->> it?
->>
->
->As per docs regarding [31:6]:
->Software should not rely on the value of a reserved bit. To provide
->compatibility with future products, the value of a reserved bit should be
->preserved across a read-modify-write operation.
->
->Hence we do not care about [31:6] and validate only [5:0] for size
->during write.  When reading size we AND with FRAMESZ_MASK. In other
->words we let [31:6] bits like scratch bits where guest can read and
->write. I am really not sure how hardware behaves if [5:0] is
->greater than 32 hence guest error and write wont happen. If this is
->not right we can discuss :)
+Signed-off-by: Juan Quintela <quintela@redhat.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
+---
+ migration/migration.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-That sounds fine then - definitely would suggest some sort of
-comment w.r.t. the fact that we are intentionally preserving these
-extra bits - in case anyone looks at this again in the future.
->
->
->>
->> Also, it might be useful to include the incorrect value in the
->> logged output too, not just what the maximum is.
->>
->> Ok I will change.
-
-OK
-
-Thanks,
-
-Darren.
+diff --git a/migration/migration.c b/migration/migration.c
+index 98429dc843..fb62a639d8 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -865,6 +865,12 @@ static void migrate_params_test_apply(MigrateSetParameters *params,
+     if (params->has_block_incremental) {
+         dest->block_incremental = params->block_incremental;
+     }
++    if (params->has_x_multifd_channels) {
++        dest->x_multifd_channels = params->x_multifd_channels;
++    }
++    if (params->has_x_multifd_page_count) {
++        dest->x_multifd_page_count = params->x_multifd_page_count;
++    }
+ }
+ 
+ static void migrate_params_apply(MigrateSetParameters *params)
+-- 
+2.13.6
