@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48072)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48669)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1e4kLx-0006Qq-TY
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 05:09:34 -0400
+	(envelope-from <atar4qemu@gmail.com>) id 1e4kNM-00075s-1m
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 05:10:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1e4kLu-00007Y-6U
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 05:09:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44892)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1e4kLu-00006P-0H
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 05:09:26 -0400
-References: <20171018083305.5246-1-quintela@redhat.com>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <cfb8e3d0-7c4e-f83f-3887-18e6af8b0418@redhat.com>
-Date: Wed, 18 Oct 2017 11:09:19 +0200
+	(envelope-from <atar4qemu@gmail.com>) id 1e4kNK-0001FQ-Vt
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 05:10:55 -0400
+Received: from mail-io0-x241.google.com ([2607:f8b0:4001:c06::241]:50492)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <atar4qemu@gmail.com>) id 1e4kNK-0001CK-Qv
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 05:10:54 -0400
+Received: by mail-io0-x241.google.com with SMTP id 97so5189715iok.7
+	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 02:10:53 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20171018083305.5246-1-quintela@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] tpm: Fix compilation with --disable-tpm
+In-Reply-To: <1508059309-28458-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+References: <1508059309-28458-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+From: Artyom Tarasenko <atar4qemu@gmail.com>
+Date: Wed, 18 Oct 2017 11:10:32 +0200
+Message-ID: <CACXAS8Afsmewn0J_kW+9bqoVZOHZwEJEwKJ_MnzFNM77XDaqBg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] sun4u: fix assert when adding NICs which
+ aren't the in-built model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,19 +28,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, peterx@redhat.com, Amarnath Valluri <amarnath.valluri@intel.com>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: qemu-devel <qemu-devel@nongnu.org>
 
-On 18/10/2017 10:33, Juan Quintela wrote:
-> Commit
->    c37cacabf2285b0731b44c1f667781fdd4f2b658
-> 
-> broke compilation without tpm.  Just add an empty tpm_cleanup() stub.
+On Sun, Oct 15, 2017 at 11:21 AM, Mark Cave-Ayland
+<mark.cave-ayland@ilande.co.uk> wrote:
+> Commit 8d93297 introduced a bug whereby non-inbuilt NICs are realized before
+> setting the default MAC address causing an assert. Switch NIC creation
+> over from pci_create_simple() to pci_create() which works exactly the
+> same except omitting the realize as originally intended.
+>
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-tpm_init() and tpm_config_parse() are managed in a different way: they
-are included in a "#ifdef CONFIG_TPM .. #endif" in vl.c
+Reviewed-by: Artyom Tarasenko <atar4qemu@gmail.com>
 
-I think you should follow the same way.
+> ---
+>  hw/sparc64/sun4u.c |    4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
+> index 2edd1cc..bf89252 100644
+> --- a/hw/sparc64/sun4u.c
+> +++ b/hw/sparc64/sun4u.c
+> @@ -490,10 +490,10 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
+>                  memcpy(&macaddr, &nd->macaddr.a, sizeof(MACAddr));
+>                  onboard_nic = true;
+>              } else {
+> -                pci_dev = pci_create_simple(pci_busB, -1, "sunhme");
+> +                pci_dev = pci_create(pci_busB, -1, "sunhme");
+>              }
+>          } else {
+> -            pci_dev = pci_create_simple(pci_busB, -1, nd->model);
+> +            pci_dev = pci_create(pci_busB, -1, nd->model);
+>          }
+>
+>          dev = &pci_dev->qdev;
+> --
+> 1.7.10.4
+>
 
-Thanks,
-Laurent
+
+
+-- 
+Regards,
+Artyom Tarasenko
+
+SPARC and PPC PReP under qemu blog: http://tyom.blogspot.com/search/label/qemu
