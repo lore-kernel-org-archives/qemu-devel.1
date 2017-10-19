@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39942)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41306)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1e5999-0002se-UQ
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 07:37:57 -0400
+	(envelope-from <groug@kaod.org>) id 1e59CH-0003f5-RZ
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 07:41:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1e5995-0007aP-PJ
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 07:37:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43162)
+	(envelope-from <groug@kaod.org>) id 1e59CD-0001PK-Hm
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 07:41:09 -0400
+Received: from 15.mo5.mail-out.ovh.net ([178.33.107.29]:36699)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1e5995-0007Zv-EN
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 07:37:51 -0400
-References: <1508390650-19115-1-git-send-email-changpeng.liu@intel.com>
-	<1508390650-19115-2-git-send-email-changpeng.liu@intel.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <786e5637-a04b-3e8f-9798-e57a38408a38@redhat.com>
-Date: Thu, 19 Oct 2017 13:37:38 +0200
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1e59CD-0001Is-Bu
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 07:41:05 -0400
+Received: from player773.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 79445145110
+	for <qemu-devel@nongnu.org>; Thu, 19 Oct 2017 13:40:53 +0200 (CEST)
+From: Greg Kurz <groug@kaod.org>
+Date: Thu, 19 Oct 2017 13:40:42 +0200
+Message-ID: <150841324224.31292.4012464539983692364.stgit@bahia.lan>
 MIME-Version: 1.0
-In-Reply-To: <1508390650-19115-2-git-send-email-changpeng.liu@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 1/4] vhost-user: add new vhost user
- messages to support virtio config space
+Subject: [Qemu-devel] [PATCH] docker: fix out-of-tree 'make
+ docker-test-build@debian-powerpc-cross'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,339 +28,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Changpeng Liu <changpeng.liu@intel.com>, qemu-devel@nongnu.org
-Cc: stefanha@gmail.com, mst@redhat.com, marcandre.lureau@redhat.com, felipe@nutanix.com, james.r.harris@intel.com
+To: qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, Alex =?utf-8?q?Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, Philippe =?utf-8?q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-On 19/10/2017 07:24, Changpeng Liu wrote:
-> Add VHOST_USER_GET_CONFIG/VHOST_USER_SET_CONFIG messages which can be
-> used for live migration of vhost user devices, also vhost user devices
-> can benefit from the messages to get/set virtio config space from/to the
-> I/O target. For the purpose to support virtio config space change,
-> VHOST_USER_SET_CONFIG_FD message is added as the event notifier
-> in case virtio config space change in the I/O target.
-> 
-> Signed-off-by: Changpeng Liu <changpeng.liu@intel.com>
-> ---
->  docs/interop/vhost-user.txt       | 33 +++++++++++++
->  hw/virtio/vhost-user.c            | 97 +++++++++++++++++++++++++++++++++++++++
->  hw/virtio/vhost.c                 | 63 +++++++++++++++++++++++++
->  include/hw/virtio/vhost-backend.h |  8 ++++
->  include/hw/virtio/vhost.h         | 16 +++++++
->  5 files changed, 217 insertions(+)
-> 
-> diff --git a/docs/interop/vhost-user.txt b/docs/interop/vhost-user.txt
-> index 954771d..ea4c5ca 100644
-> --- a/docs/interop/vhost-user.txt
-> +++ b/docs/interop/vhost-user.txt
-> @@ -116,6 +116,10 @@ Depending on the request type, payload can be:
->      - 3: IOTLB invalidate
->      - 4: IOTLB access fail
->  
-> + * Virtio device config space
-> +
-> +   256 Bytes static virito device config space
+Without this patch, it fails with:
 
-"A 256-bytes array holding the contents of the virtio device's
-configuration space"
+IOError: [Errno 2] No such file or directory:
+ 'tests/docker/dockerfiles/debian-apt-fake.sh'
 
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
+ tests/docker/Makefile.include |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> +* VHOST_USER_SET_CONFIG_FD
-> +      Id: 26
-> +      Equivalent ioctl: N/A
-> +      Master payload: N/A
-> +
-> +      Sets the notifier file descriptor, which is passed as ancillary data.
-> +      Vhost-user slave uses the file descriptor to notify vhost-user master
-
-"The vhost-user slave uses the file descriptor to notify the vhost-user
-master of changes to the virtio configuration space."
-
-Paolo
-
-> +      when the virtio config space changed. The vhost-user master can read
-> +      the virtio config space to get the latest update.
-> +
->  Slave message types
->  -------------------
->  
-> diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-> index 093675e..4e7bafc 100644
-> --- a/hw/virtio/vhost-user.c
-> +++ b/hw/virtio/vhost-user.c
-> @@ -26,6 +26,11 @@
->  #define VHOST_MEMORY_MAX_NREGIONS    8
->  #define VHOST_USER_F_PROTOCOL_FEATURES 30
->  
-> +/*
-> + * Maximum size of virtio device config space
-> + */
-> +#define VHOST_USER_MAX_CONFIG_SIZE 256
-> +
->  enum VhostUserProtocolFeature {
->      VHOST_USER_PROTOCOL_F_MQ = 0,
->      VHOST_USER_PROTOCOL_F_LOG_SHMFD = 1,
-> @@ -65,6 +70,9 @@ typedef enum VhostUserRequest {
->      VHOST_USER_SET_SLAVE_REQ_FD = 21,
->      VHOST_USER_IOTLB_MSG = 22,
->      VHOST_USER_SET_VRING_ENDIAN = 23,
-> +    VHOST_USER_GET_CONFIG = 24,
-> +    VHOST_USER_SET_CONFIG = 25,
-> +    VHOST_USER_SET_CONFIG_FD = 26,
->      VHOST_USER_MAX
->  } VhostUserRequest;
->  
-> @@ -109,6 +117,7 @@ typedef struct VhostUserMsg {
->          VhostUserMemory memory;
->          VhostUserLog log;
->          struct vhost_iotlb_msg iotlb;
-> +        uint8_t config[VHOST_USER_MAX_CONFIG_SIZE];
->      } payload;
->  } QEMU_PACKED VhostUserMsg;
->  
-> @@ -922,6 +931,91 @@ static void vhost_user_set_iotlb_callback(struct vhost_dev *dev, int enabled)
->      /* No-op as the receive channel is not dedicated to IOTLB messages. */
->  }
->  
-> +static int vhost_user_get_config(struct vhost_dev *dev, uint8_t *config,
-> +                                 size_t config_len)
-> +{
-> +    VhostUserMsg msg = {
-> +        .request = VHOST_USER_GET_CONFIG,
-> +        .flags = VHOST_USER_VERSION,
-> +        .size = config_len,
-> +    };
-> +
-> +    if (config_len == 0 || config_len > VHOST_USER_PAYLOAD_SIZE) {
-> +        error_report("bad config length");
-> +        return -1;
-> +    }
-> +
-> +    if (vhost_user_write(dev, &msg, NULL, 0) < 0) {
-> +        return -1;
-> +    }
-> +
-> +    if (vhost_user_read(dev, &msg) < 0) {
-> +        return -1;
-> +    }
-> +
-> +    if (msg.request != VHOST_USER_GET_CONFIG) {
-> +        error_report("Received unexpected msg type. Expected %d received %d",
-> +                     VHOST_USER_GET_CONFIG, msg.request);
-> +        return -1;
-> +    }
-> +
-> +    if (msg.size != config_len) {
-> +        error_report("Received bad msg size.");
-> +        return -1;
-> +    }
-> +
-> +    memcpy(config, &msg.payload.config, config_len);
-> +
-> +    return 0;
-> +}
-> +
-> +static int vhost_user_set_config(struct vhost_dev *dev, const uint8_t *config,
-> +                                 size_t config_len)
-> +{
-> +    bool reply_supported = virtio_has_feature(dev->protocol_features,
-> +                                              VHOST_USER_PROTOCOL_F_REPLY_ACK);
-> +
-> +    VhostUserMsg msg = {
-> +        .request = VHOST_USER_SET_CONFIG,
-> +        .flags = VHOST_USER_VERSION,
-> +        .size = config_len,
-> +    };
-> +
-> +    if (reply_supported) {
-> +        msg.flags |= VHOST_USER_NEED_REPLY_MASK;
-> +    }
-> +
-> +    if (config_len == 0 || config_len > VHOST_USER_PAYLOAD_SIZE) {
-> +        error_report("bad config length");
-> +        return -1;
-> +    }
-> +
-> +    memcpy(&msg.payload.config, config, config_len);
-> +    if (vhost_user_write(dev, &msg, NULL, 0) < 0) {
-> +        return -1;
-> +    }
-> +
-> +    if (reply_supported) {
-> +        return process_message_reply(dev, &msg);
-> +    }
-> +
-> +    return 0;
-> +}
-> +
-> +static int vhost_user_set_config_fd(struct vhost_dev *dev, int fd)
-> +{
-> +    VhostUserMsg msg = {
-> +       .request = VHOST_USER_SET_CONFIG_FD,
-> +       .flags = VHOST_USER_VERSION,
-> +    };
-> +
-> +    if (vhost_user_write(dev, &msg, &fd, 1) < 0) {
-> +        return -1;
-> +    }
-> +
-> +    return 0;
-> +}
-> +
->  const VhostOps user_ops = {
->          .backend_type = VHOST_BACKEND_TYPE_USER,
->          .vhost_backend_init = vhost_user_init,
-> @@ -948,4 +1042,7 @@ const VhostOps user_ops = {
->          .vhost_net_set_mtu = vhost_user_net_set_mtu,
->          .vhost_set_iotlb_callback = vhost_user_set_iotlb_callback,
->          .vhost_send_device_iotlb_msg = vhost_user_send_device_iotlb_msg,
-> +        .vhost_get_config = vhost_user_get_config,
-> +        .vhost_set_config = vhost_user_set_config,
-> +        .vhost_set_config_fd = vhost_user_set_config_fd,
->  };
-> diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-> index ddc42f0..8079f46 100644
-> --- a/hw/virtio/vhost.c
-> +++ b/hw/virtio/vhost.c
-> @@ -1354,6 +1354,9 @@ void vhost_dev_cleanup(struct vhost_dev *hdev)
->      for (i = 0; i < hdev->nvqs; ++i) {
->          vhost_virtqueue_cleanup(hdev->vqs + i);
->      }
-> +    if (hdev->config_ops) {
-> +        event_notifier_cleanup(&hdev->config_notifier);
-> +    }
->      if (hdev->mem) {
->          /* those are only safe after successful init */
->          memory_listener_unregister(&hdev->memory_listener);
-> @@ -1501,6 +1504,66 @@ void vhost_ack_features(struct vhost_dev *hdev, const int *feature_bits,
->      }
->  }
->  
-> +int vhost_dev_get_config(struct vhost_dev *hdev, uint8_t *config,
-> +                         size_t config_len)
-> +{
-> +    assert(hdev->vhost_ops);
-> +
-> +    if (hdev->vhost_ops->vhost_get_config) {
-> +        return hdev->vhost_ops->vhost_get_config(hdev, config, config_len);
-> +    }
-> +
-> +    return 0;
-> +}
-> +
-> +int vhost_dev_set_config(struct vhost_dev *hdev, const uint8_t *config,
-> +                         size_t config_len)
-> +{
-> +    assert(hdev->vhost_ops);
-> +
-> +    if (hdev->vhost_ops->vhost_set_config) {
-> +        return hdev->vhost_ops->vhost_set_config(hdev, config, config_len);
-> +    }
-> +
-> +    return 0;
-> +}
-> +
-> +static void vhost_dev_config_notifier_read(EventNotifier *n)
-> +{
-> +    struct vhost_dev *hdev = container_of(n, struct vhost_dev,
-> +                                         config_notifier);
-> +
-> +    if (event_notifier_test_and_clear(n)) {
-> +        if (hdev->config_ops) {
-> +            hdev->config_ops->vhost_dev_config_notifier(hdev);
-> +        }
-> +    }
-> +}
-> +
-> +int vhost_dev_set_config_notifier(struct vhost_dev *hdev,
-> +                                  const VhostDevConfigOps *ops)
-> +{
-> +    int r, fd;
-> +
-> +    assert(hdev->vhost_ops);
-> +
-> +    r = event_notifier_init(&hdev->config_notifier, 0);
-> +    if (r < 0) {
-> +        return r;
-> +    }
-> +
-> +    hdev->config_ops = ops;
-> +    event_notifier_set_handler(&hdev->config_notifier,
-> +                               vhost_dev_config_notifier_read);
-> +
-> +    if (hdev->vhost_ops->vhost_set_config_fd) {
-> +        fd  = event_notifier_get_fd(&hdev->config_notifier);
-> +        return hdev->vhost_ops->vhost_set_config_fd(hdev, fd);
-> +    }
-> +
-> +    return 0;
-> +}
-> +
->  /* Host notifiers must be enabled at this point. */
->  int vhost_dev_start(struct vhost_dev *hdev, VirtIODevice *vdev)
->  {
-> diff --git a/include/hw/virtio/vhost-backend.h b/include/hw/virtio/vhost-backend.h
-> index a7a5f22..df6769e 100644
-> --- a/include/hw/virtio/vhost-backend.h
-> +++ b/include/hw/virtio/vhost-backend.h
-> @@ -84,6 +84,11 @@ typedef void (*vhost_set_iotlb_callback_op)(struct vhost_dev *dev,
->                                             int enabled);
->  typedef int (*vhost_send_device_iotlb_msg_op)(struct vhost_dev *dev,
->                                                struct vhost_iotlb_msg *imsg);
-> +typedef int (*vhost_set_config_op)(struct vhost_dev *dev, const uint8_t *config,
-> +                                   size_t config_len);
-> +typedef int (*vhost_get_config_op)(struct vhost_dev *dev, uint8_t *config,
-> +                                   size_t config_len);
-> +typedef int (*vhost_set_config_fd_op)(struct vhost_dev *dev, int fd);
->  
->  typedef struct VhostOps {
->      VhostBackendType backend_type;
-> @@ -118,6 +123,9 @@ typedef struct VhostOps {
->      vhost_vsock_set_running_op vhost_vsock_set_running;
->      vhost_set_iotlb_callback_op vhost_set_iotlb_callback;
->      vhost_send_device_iotlb_msg_op vhost_send_device_iotlb_msg;
-> +    vhost_get_config_op vhost_get_config;
-> +    vhost_set_config_op vhost_set_config;
-> +    vhost_set_config_fd_op vhost_set_config_fd;
->  } VhostOps;
->  
->  extern const VhostOps user_ops;
-> diff --git a/include/hw/virtio/vhost.h b/include/hw/virtio/vhost.h
-> index 467dc77..ff172f2 100644
-> --- a/include/hw/virtio/vhost.h
-> +++ b/include/hw/virtio/vhost.h
-> @@ -46,6 +46,12 @@ struct vhost_iommu {
->      QLIST_ENTRY(vhost_iommu) iommu_next;
->  };
->  
-> +typedef struct VhostDevConfigOps {
-> +    /* Vhost device config space changed callback
-> +     */
-> +    void (*vhost_dev_config_notifier)(struct vhost_dev *dev);
-> +} VhostDevConfigOps;
-> +
->  struct vhost_memory;
->  struct vhost_dev {
->      VirtIODevice *vdev;
-> @@ -76,6 +82,8 @@ struct vhost_dev {
->      QLIST_ENTRY(vhost_dev) entry;
->      QLIST_HEAD(, vhost_iommu) iommu_list;
->      IOMMUNotifier n;
-> +    EventNotifier config_notifier;
-> +    const VhostDevConfigOps *config_ops;
->  };
->  
->  int vhost_dev_init(struct vhost_dev *hdev, void *opaque,
-> @@ -106,4 +114,12 @@ int vhost_net_set_backend(struct vhost_dev *hdev,
->                            struct vhost_vring_file *file);
->  
->  int vhost_device_iotlb_miss(struct vhost_dev *dev, uint64_t iova, int write);
-> +int vhost_dev_get_config(struct vhost_dev *dev, uint8_t *config,
-> +                         size_t config_len);
-> +int vhost_dev_set_config(struct vhost_dev *dev, const uint8_t *config,
-> +                         size_t config_len);
-> +/* notifier callback in case vhost device config space changed
-> + */
-> +int vhost_dev_set_config_notifier(struct vhost_dev *dev,
-> +                                  const VhostDevConfigOps *ops);
->  #endif
-> 
+diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
+index 6f9ea196a7b8..5d54eca5d0b3 100644
+--- a/tests/docker/Makefile.include
++++ b/tests/docker/Makefile.include
+@@ -44,7 +44,7 @@ docker-image-%: $(DOCKER_FILES_DIR)/%.docker
+ 		$(if $(EXECUTABLE),--include-executable=$(EXECUTABLE)),\
+ 		"BUILD","$*")
+ 
+-docker-image-debian-powerpc-cross: EXTRA_FILES:=tests/docker/dockerfiles/debian-apt-fake.sh
++docker-image-debian-powerpc-cross: EXTRA_FILES:=$(SRC_PATH)/tests/docker/dockerfiles/debian-apt-fake.sh
+ 
+ # Enforce dependancies for composite images
+ docker-image-debian: docker-image-debian9
