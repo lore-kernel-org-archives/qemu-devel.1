@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58647)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58923)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e56v7-0003GT-BG
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 05:15:21 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1e56wK-0003pu-2P
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 05:16:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e56v6-0003JP-1e
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 05:15:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:61816)
+	(envelope-from <dgilbert@redhat.com>) id 1e56wI-00049G-MJ
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 05:16:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60124)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1e56v5-0003Hh-Ql
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 05:15:15 -0400
-Date: Thu, 19 Oct 2017 10:15:07 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20171019091507.GF8408@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <1508352023-28591-1-git-send-email-alindsay@codeaurora.org>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1e56wI-00048q-Cg
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 05:16:30 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4D7287EA99
+	for <qemu-devel@nongnu.org>; Thu, 19 Oct 2017 09:16:29 +0000 (UTC)
+Date: Thu, 19 Oct 2017 10:16:23 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20171019091623.GD2281@work-vm>
+References: <20171004103933.7898-1-quintela@redhat.com>
+	<20171004103933.7898-2-quintela@redhat.com>
+	<20171018042601.GN4166@pxdev.xzpeter.org>
+	<87o9p4n0vb.fsf@secure.laptop> <20171018121038.GE9719@redhat.com>
+	<20171019031833.GP4166@pxdev.xzpeter.org>
+	<20171019090926.GC8408@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1508352023-28591-1-git-send-email-alindsay@codeaurora.org>
-Subject: Re: [Qemu-devel] [PATCH] build: Fix dtc-checkout race condition in
- Makefile
+In-Reply-To: <20171019090926.GC8408@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/6] tests: Add basic migration precopy test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,69 +37,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aaron Lindsay <alindsay@codeaurora.org>
-Cc: qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Fam Zheng <famz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Peter Xu <peterx@redhat.com>, Juan Quintela <quintela@redhat.com>, lvivier@redhat.com, qemu-devel@nongnu.org
 
-On Wed, Oct 18, 2017 at 02:40:23PM -0400, Aaron Lindsay wrote:
-> This was introduced by:
->     commit aef45d51d1204f3335fb99de6658e0c5612c2b67
->     Author: Daniel P. Berrange <berrange@redhat.com>
->     Date:   Fri Sep 29 11:11:56 2017 +0100
+* Daniel P. Berrange (berrange@redhat.com) wrote:
+> On Thu, Oct 19, 2017 at 11:18:33AM +0800, Peter Xu wrote:
+> > On Wed, Oct 18, 2017 at 01:10:38PM +0100, Daniel P. Berrange wrote:
+> > > On Wed, Oct 18, 2017 at 01:36:56PM +0200, Juan Quintela wrote:
+> > > > Peter Xu <peterx@redhat.com> wrote:
+> > > > > On Wed, Oct 04, 2017 at 12:39:28PM +0200, Juan Quintela wrote:
+> > > > >
+> > > > > [...]
+> > > > >
+> > > > >> +/* A simple PC boot sector that modifies memory (1-100MB) quickly
+> > > > >> + * outputing a 'B' every so often if it's still running.
+> > > > >> + */
+> > > > >> +unsigned char bootsect[] = {
+> > > > >> +  0xfa, 0x0f, 0x01, 0x16, 0x74, 0x7c, 0x66, 0xb8, 0x01, 0x00, 0x00, 0x00,
+> > > > >> +  0x0f, 0x22, 0xc0, 0x66, 0xea, 0x20, 0x7c, 0x00, 0x00, 0x08, 0x00, 0x00,
+> > > > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xe4, 0x92, 0x0c, 0x02,
+> > > > >> +  0xe6, 0x92, 0xb8, 0x10, 0x00, 0x00, 0x00, 0x8e, 0xd8, 0x66, 0xb8, 0x41,
+> > > > >> +  0x00, 0x66, 0xba, 0xf8, 0x03, 0xee, 0xb3, 0x00, 0xb8, 0x00, 0x00, 0x10,
+> > > > >> +  0x00, 0xfe, 0x00, 0x05, 0x00, 0x10, 0x00, 0x00, 0x3d, 0x00, 0x00, 0x40,
+> > > > >> +  0x06, 0x7c, 0xf2, 0xfe, 0xc3, 0x75, 0xe9, 0x66, 0xb8, 0x42, 0x00, 0x66,
+> > > > >> +  0xba, 0xf8, 0x03, 0xee, 0xeb, 0xde, 0x66, 0x90, 0x00, 0x00, 0x00, 0x00,
+> > > > >> +  0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0x00, 0x00, 0x00, 0x9a, 0xcf, 0x00,
+> > > > >> +  0xff, 0xff, 0x00, 0x00, 0x00, 0x92, 0xcf, 0x00, 0x27, 0x00, 0x5c, 0x7c,
+> > > > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> > > > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> > > > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> > > > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> > > > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> > > > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> > > > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> > > > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> > > > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> > > > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> > > > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> > > > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> > > > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> > > > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> > > > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> > > > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> > > > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> > > > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> > > > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> > > > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> > > > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> > > > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> > > > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> > > > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> > > > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> > > > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> > > > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> > > > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> > > > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> > > > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> > > > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> > > > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> > > > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x55, 0xaa
+> > > > >> +};
+> > > > >
+> > > > > Not sure whether it would be nicer to put this section as binary into
+> > > > > QEMU's tree as shared, then other test code can use it too directly,
+> > > > > and it would be easier if someone wants to boot a VM running this
+> > > > > bootstrap code.  Thanks,
+> > > > 
+> > > > I am sharing this code now on a single place.  About getting this
+> > > > outside ... I will wait for someone that understand how this works, I
+> > > > have no clue neither how it works nor how to share/use/setup/....
+> > > 
+> > > FWIW, we already have a reusuable program that can be used to generate
+> > > load stress for testing live migration see tests/migration/stress.c
+> > > This gets compiled into a static binary, put into an initrd, and then
+> > > run by booting the host OS kernel. So the caveat is that this approach
+> > > only lets you test a QEMU emulator whose target arch matches the host.
+> > > That isn't much different from this boot sector though which only lets
+> > > you test the x86 system emulator.
+> > 
+> > Yes, if we can have some C program for all architecture then it sounds
+> > nicer, though IIUC this program is somehow special since it should be
+> > writting some "A"/"B" chars to console, and the test program is using
+> > those chars during the process.
 > 
-> 	build: automatically handle GIT submodule checkout for dtc
+> That would be easy enough to add to the current program I expect.
 > 
-> On my system, I see the following with a fresh clone:
+> Oh the other difference with the program I wrote is that it is
+> multi-threaded, so it spawns a writer thread for each vCPU that
+> is given to the guest. This lets you generate even more extreme
+> memory dirtying rates if desired :-)
 > 
-> % ./configure --disable-gtk --target-list=aarch64-softmmu
-> % make -j8
->   GEN     aarch64-softmmu/config-devices.mak.tmp
->   GEN     config-host.h
-> mkdir -p dtc/libfdt
->   GIT     ui/keycodemapdb dtc
-> mkdir -p dtc/tests
->   GEN     qemu-options.def
-> [snip]
->   GEN     migration/trace.h
-> make: *** [git-submodule-update] Error 1
-> make: *** Waiting for unfinished jobs....
+> > Maybe it would be nice to rewrite a C program to replace current
+> > binary sector when someone wants to support postcopy migration test on
+> > a 3rd platform besides x86 and ppc.
 > 
-> Upon closer inspection, the root cause of the error is:
-> 
-> % git submodule update --init ui/keycodemapdb dtc
-> fatal: destination path 'dtc' already exists and is not an empty directory.
-> Clone of 'git://git.qemu-project.org/dtc.git' into submodule path 'dtc' failed
-> 
-> This patch fixes this race condition by forcing the 'dtc/%' rule which caused
-> 'dtc' to be non-empty to wait on '.git-submodule-status'.
+> Booting a real Linux kernel and then running the C program as 'init'
+> is easier to make portable since we don't need to know about special
+> ways each arch deals with initial boot up.
 
-Yes this makes sense
+No, it doesn't work.
+This test reads a well defined area of physical memory; you can't
+replace that test booting a full kernel and userland program.
+
+Dave
 
 > 
-> Signed-off-by: Aaron Lindsay <alindsay@codeaurora.org>
-> ---
->  Makefile | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/Makefile b/Makefile
-> index 90f91e5..ffa82e8 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -380,7 +380,7 @@ DTC_CPPFLAGS=-I$(BUILD_DIR)/dtc -I$(SRC_PATH)/dtc -I$(SRC_PATH)/dtc/libfdt
->  subdir-dtc: .git-submodule-status dtc/libfdt dtc/tests
->  	$(call quiet-command,$(MAKE) $(DTC_MAKE_ARGS) CPPFLAGS="$(DTC_CPPFLAGS)" CFLAGS="$(DTC_CFLAGS)" LDFLAGS="$(LDFLAGS)" ARFLAGS="$(ARFLAGS)" CC="$(CC)" AR="$(AR)" LD="$(LD)" $(SUBDIR_MAKEFLAGS) libfdt/libfdt.a,)
->  
-> -dtc/%:
-> +dtc/%: .git-submodule-status
->  	mkdir -p $@
->  
->  $(SUBDIR_RULES): libqemuutil.a $(common-obj-y) $(chardev-obj-y) \
-
-Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
-
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+> Regards,
+> Daniel
+> -- 
+> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+> |: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
