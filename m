@@ -1,38 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36246)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36249)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e5FAP-0007Q9-07
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e5FAP-0007QB-1B
 	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 14:03:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e5FAK-0007Om-SD
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e5FAK-0007P0-Uq
 	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 14:03:36 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:50552
-	helo=mx0a-001b2d01.pphosted.com)
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37953)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1e5FAK-0007OL-Km
+	id 1e5FAK-0007NU-IT
 	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 14:03:32 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v9JHxTLu024592
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v9JI3Huw114327
 	for <qemu-devel@nongnu.org>; Thu, 19 Oct 2017 14:03:29 -0400
-Received: from e19.ny.us.ibm.com (e19.ny.us.ibm.com [129.33.205.209])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2dpxypesqh-1
+Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2dq0xbg6ve-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
 	for <qemu-devel@nongnu.org>; Thu, 19 Oct 2017 14:03:29 -0400
 Received: from localhost
-	by e19.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Thu, 19 Oct 2017 14:03:29 -0400
+	Thu, 19 Oct 2017 14:03:28 -0400
 From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Thu, 19 Oct 2017 14:02:50 -0400
+Date: Thu, 19 Oct 2017 14:02:35 -0400
 In-Reply-To: <1508436175-1596-1-git-send-email-stefanb@linux.vnet.ibm.com>
 References: <1508436175-1596-1-git-send-email-stefanb@linux.vnet.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Message-Id: <1508436175-1596-17-git-send-email-stefanb@linux.vnet.ibm.com>
+Message-Id: <1508436175-1596-2-git-send-email-stefanb@linux.vnet.ibm.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v1 16/21] tpm: remove locty_data from TPMState
+Subject: [Qemu-devel] [PULL v1 01/21] tpm-tis: remove unused hw_access
+ argument
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,80 +46,57 @@ Cc: Peter Maydell <peter.maydell@linaro.org>, marcandre.lureau@gmail.com, =?UTF-
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Keep it internal to tpm-tis instead.
+This argument is always false, simplify the code.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Reviewed-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
 Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
 ---
- hw/tpm/tpm_emulator.c |  3 +--
- hw/tpm/tpm_int.h      |  2 --
- hw/tpm/tpm_tis.c      | 12 +++++-------
- 3 files changed, 6 insertions(+), 11 deletions(-)
+ hw/tpm/tpm_tis.c | 13 +++----------
+ 1 file changed, 3 insertions(+), 10 deletions(-)
 
-diff --git a/hw/tpm/tpm_emulator.c b/hw/tpm/tpm_emulator.c
-index a613cec..6500b86 100644
---- a/hw/tpm/tpm_emulator.c
-+++ b/hw/tpm/tpm_emulator.c
-@@ -180,8 +180,7 @@ static void tpm_emulator_handle_request(TPMBackend *t=
-b, TPMBackendCmd *cmd)
-=20
-     DPRINTF("processing TPM command");
-=20
--    if (tpm_emulator_set_locality(tpm_emu,
--                                  tb->tpm_state->locty_number, &err) < 0=
-) {
-+    if (tpm_emulator_set_locality(tpm_emu, cmd->locty, &err) < 0) {
-         goto error;
-     }
-=20
-diff --git a/hw/tpm/tpm_int.h b/hw/tpm/tpm_int.h
-index 6d7b3dc..252c408 100644
---- a/hw/tpm/tpm_int.h
-+++ b/hw/tpm/tpm_int.h
-@@ -24,8 +24,6 @@ struct TPMState {
-         TPMTISEmuState tis;
-     } s;
-=20
--    uint8_t     locty_number;
--    TPMLocality *locty_data;
-     TPMBackendCmd cmd;
-=20
-     char *backend;
 diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
-index ffed7bf..ad28456 100644
+index d5118e7..a9e9cbd 100644
 --- a/hw/tpm/tpm_tis.c
 +++ b/hw/tpm/tpm_tis.c
-@@ -203,12 +203,10 @@ static void tpm_tis_sts_set(TPMLocality *l, uint32_=
-t flags)
- static void tpm_tis_tpm_send(TPMState *s, uint8_t locty)
+@@ -615,9 +615,8 @@ static uint64_t tpm_tis_mmio_read(void *opaque, hwadd=
+r addr,
+  * Write a value to a register of the TIS interface
+  * See specs pages 33-63 for description of the registers
+  */
+-static void tpm_tis_mmio_write_intern(void *opaque, hwaddr addr,
+-                                      uint64_t val, unsigned size,
+-                                      bool hw_access)
++static void tpm_tis_mmio_write(void *opaque, hwaddr addr,
++                               uint64_t val, unsigned size)
  {
+     TPMState *s =3D opaque;
      TPMTISEmuState *tis =3D &s->s.tis;
-+    TPMLocality *locty_data =3D &tis->loc[locty];
+@@ -631,7 +630,7 @@ static void tpm_tis_mmio_write_intern(void *opaque, h=
+waddr addr,
 =20
-     tpm_tis_show_buffer(&tis->loc[locty].w_buffer, "tpm_tis: To TPM");
+     DPRINTF("tpm_tis: write.%u(%08x) =3D %08x\n", size, (int)addr, (int)=
+val);
 =20
--    s->locty_number =3D locty;
--    s->locty_data =3D &tis->loc[locty];
+-    if (locty =3D=3D 4 && !hw_access) {
++    if (locty =3D=3D 4) {
+         DPRINTF("tpm_tis: Access to locality 4 only allowed from hardwar=
+e\n");
+         return;
+     }
+@@ -942,12 +941,6 @@ static void tpm_tis_mmio_write_intern(void *opaque, =
+hwaddr addr,
+     }
+ }
+=20
+-static void tpm_tis_mmio_write(void *opaque, hwaddr addr,
+-                               uint64_t val, unsigned size)
+-{
+-    tpm_tis_mmio_write_intern(opaque, addr, val, size, false);
+-}
 -
-     /*
-      * w_offset serves as length indicator for length of data;
-      * it's reset when the response comes back
-@@ -217,10 +215,10 @@ static void tpm_tis_tpm_send(TPMState *s, uint8_t l=
-octy)
-=20
-     s->cmd =3D (TPMBackendCmd) {
-         .locty =3D locty,
--        .in =3D s->locty_data->w_buffer.buffer,
--        .in_len =3D s->locty_data->w_offset,
--        .out =3D s->locty_data->r_buffer.buffer,
--        .out_len =3D s->locty_data->r_buffer.size
-+        .in =3D locty_data->w_buffer.buffer,
-+        .in_len =3D locty_data->w_offset,
-+        .out =3D locty_data->r_buffer.buffer,
-+        .out_len =3D locty_data->r_buffer.size
-     };
-=20
-     tpm_backend_deliver_request(s->be_driver, &s->cmd);
+ static const MemoryRegionOps tpm_tis_memory_ops =3D {
+     .read =3D tpm_tis_mmio_read,
+     .write =3D tpm_tis_mmio_write,
 --=20
 2.5.5
