@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40602)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43513)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e57VS-00006Z-Mf
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 05:52:51 -0400
+	(envelope-from <clg@kaod.org>) id 1e57gl-0002la-6J
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 06:04:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e57VR-00078v-SJ
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 05:52:50 -0400
-Received: from mail-wr0-x229.google.com ([2a00:1450:400c:c0c::229]:51363)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1e57VR-00076w-LZ
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 05:52:49 -0400
-Received: by mail-wr0-x229.google.com with SMTP id j14so7676863wre.8
-	for <qemu-devel@nongnu.org>; Thu, 19 Oct 2017 02:52:49 -0700 (PDT)
+	(envelope-from <clg@kaod.org>) id 1e57gf-0007pc-BQ
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 06:04:31 -0400
+Received: from 5.mo5.mail-out.ovh.net ([87.98.173.103]:44150)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1e57gf-0007nj-5g
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 06:04:25 -0400
+Received: from player786.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 59D11145A05
+	for <qemu-devel@nongnu.org>; Thu, 19 Oct 2017 12:04:22 +0200 (CEST)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+Date: Thu, 19 Oct 2017 12:04:02 +0200
+Message-Id: <20171019100410.26239-1-clg@kaod.org>
 MIME-Version: 1.0
-In-Reply-To: <20171017042152.29443-1-david@gibson.dropbear.id.au>
-References: <20171017042152.29443-1-david@gibson.dropbear.id.au>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 19 Oct 2017 10:52:27 +0100
-Message-ID: <CAFEAcA_1GiuW3NHquG0OUYfpxOoy6S0M_jPj_CQ36wJLwr=Y0Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/34] ppc-for-2.11 queue 20171017
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v4 0/8] aspeed: add a witherspoon-bmc machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,35 +27,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Alexander Graf <agraf@suse.de>, Igor Mammedov <imammedo@redhat.com>, Greg Kurz <groug@kaod.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, Andrew Jeffery <andrew@aj.id.au>, Joel Stanley <joel@jms.id.au>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-On 17 October 2017 at 05:21, David Gibson <david@gibson.dropbear.id.au> wrote:
-> The following changes since commit c5bbcaa4b7c0f8a322bebe9ec563560178a68b55:
->
->   Merge remote-tracking branch 'remotes/mst/tags/for_upstream' into staging (2017-10-16 17:29:16 +0100)
->
-> are available in the git repository at:
->
->   git://github.com/dgibson/qemu.git tags/ppc-for-2.11-20171017
->
-> for you to fetch changes up to e7cca3e94f7595b7b5a493a87146e782831611d7:
->
->   spapr_cpu_core: rewrite machine type sanity check (2017-10-17 10:34:01 +1100)
->
-> ----------------------------------------------------------------
-> ppc patch queue 2017-10-17
->
-> Here's the currently accumulated set of ppc patches for qemu.
->
->   * The biggest set here is the ppc parts of Igor Mammedov's cleanups
->     to cpu model handling
->   * The above also includes a generic patches which are required as
->     prerequisites for the ppc parts.  They don't seem to have been
->     merged by Eduardo yet, so I hope they're ok to include here.
->   * Apart from that it's basically just assorted bug fixes and cleanups
->
+Hello,
 
-Applied, thanks.
+This series adds a new Aspeed machine to emulate the BMC of a
+Witherspoon system. It also extends the other Aspeed machines with I2C
+devices and adds a simple model for the pca9552 LED blinker present on
+the witherspoon board.
 
--- PMM
+Thanks,
+
+C.
+
+Changes since v3:
+
+ - introduce a dummy ROM device to catch invalid writes
+ - removed 'ignore_memory_transaction_failures' on all Aspeed machines
+ - reworked PCA9552 device :
+   . simpler I2C handles
+   . auto-increment support
+   . unit test
+
+Changes since v2:
+
+ - removed comments on the I2C buffer size pf the PCA9552 device.
+ - removed 'ignore_memory_transaction_failures' flag on the
+   witherspoon machine.
+  =20
+Changes since v1:
+
+ - introduced smbus_eeprom_init_one()
+
+
+C=C3=A9dric Le Goater (8):
+  aspeed: introduce a dummy ROM device to catch invalid writes
+  aspeed: remove ignore_memory_transaction_failures on all boards
+  aspeed: add support for the witherspoon-bmc board
+  aspeed: add an I2C RTC device to all machines
+  smbus: add a smbus_eeprom_init_one() routine
+  aspeed: Add EEPROM I2C devices
+  misc: add pca9552 LED blinker model
+  aspeed: add the pc9552 chips to the witherspoon machine
+
+ default-configs/arm-softmmu.mak |   1 +
+ hw/arm/aspeed.c                 | 112 ++++++++++++++++-
+ hw/i2c/smbus_eeprom.c           |  16 ++-
+ hw/misc/Makefile.objs           |   1 +
+ hw/misc/pca9552.c               | 259 ++++++++++++++++++++++++++++++++++=
+++++++
+ include/hw/i2c/smbus.h          |   1 +
+ include/hw/misc/pca9552.h       |  33 +++++
+ tests/Makefile.include          |   2 +
+ tests/pca9552-test.c            | 131 ++++++++++++++++++++
+ 9 files changed, 548 insertions(+), 8 deletions(-)
+ create mode 100644 hw/misc/pca9552.c
+ create mode 100644 include/hw/misc/pca9552.h
+ create mode 100644 tests/pca9552-test.c
+
+--=20
+2.13.6
