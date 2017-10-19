@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43910)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45140)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e5HiY-0006Uh-9g
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 16:47:03 -0400
+	(envelope-from <cota@braap.org>) id 1e5HpW-0007Ul-ON
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 16:54:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e5HiX-00021u-6h
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 16:47:02 -0400
-References: <20171015010131.12172-1-eblake@redhat.com>
-	<20171017125710.11626-1-vsementsov@virtuozzo.com>
-	<7480d774-569e-9b43-8f0c-7b3b4d9bfbf0@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <41d371a1-5665-c88e-03e2-b581301cd570@redhat.com>
-Date: Thu, 19 Oct 2017 15:46:51 -0500
+	(envelope-from <cota@braap.org>) id 1e5HpT-00060K-M8
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 16:54:14 -0400
+Received: from out4-smtp.messagingengine.com ([66.111.4.28]:52755)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1e5HpT-0005z7-FT
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 16:54:11 -0400
+Date: Thu, 19 Oct 2017 16:54:09 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20171019205409.GA4170@flamenco>
+References: <CADHp1NwU=HowMfgBGtcwnY25v_fL6qZ2gd469a2oZY+QQi2uFw@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <7480d774-569e-9b43-8f0c-7b3b4d9bfbf0@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="2fs0spAXv6LNru11hsXfWLjVwGRqewvwi"
-Subject: Re: [Qemu-devel] [PATCH v4 RFC 9/8] nbd: Minimal structured read
- for client
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CADHp1NwU=HowMfgBGtcwnY25v_fL6qZ2gd469a2oZY+QQi2uFw@mail.gmail.com>
+Subject: Re: [Qemu-devel] Running Qemu in discrete time/step by step
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,92 +26,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org, mreitz@redhat.com
+To: Matt <mattator@gmail.com>
+Cc: qemu-devel@nongnu.org, Hajime Tazaki <tazaki@wide.ad.jp>, "James J. Nutaro" <nutarojj@ornl.gov>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---2fs0spAXv6LNru11hsXfWLjVwGRqewvwi
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org, mreitz@redhat.com
-Message-ID: <41d371a1-5665-c88e-03e2-b581301cd570@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4 RFC 9/8] nbd: Minimal structured read for
- client
-References: <20171015010131.12172-1-eblake@redhat.com>
- <20171017125710.11626-1-vsementsov@virtuozzo.com>
- <7480d774-569e-9b43-8f0c-7b3b4d9bfbf0@redhat.com>
-In-Reply-To: <7480d774-569e-9b43-8f0c-7b3b4d9bfbf0@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Thu, Oct 19, 2017 at 14:14:12 +0900, Matt wrote:
+(snip)
+> - VMSimint does nearly that, it runs Qemu in discrete time but
+> interface it with a JAVA simulator
+> http://www.ikr.uni-stuttgart.de/Content/Publications/Archive/We_SIMUTools_2014_40209.pdf
+> (with the code http://www.ikr.uni-stuttgart.de/Content/IKRSimLib/Download/)
+> - http://web.ornl.gov/~nutarojj/adevs/ does sthg similar too
 
-On 10/17/2017 04:17 PM, Eric Blake wrote:
-> On 10/17/2017 07:57 AM, Vladimir Sementsov-Ogievskiy wrote:
->> Minimal implementation: for structured error only error_report error
->> message.
->>
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>=
-
->> ---
-
-> But in the client, I then perform 'w 0 0' (a zero-byte write, which
-> should fail because the server is read-only).  I see:
->=20
-> C: 19481@1508268433.381446:nbd_send_request Sending request to server: =
-{
-> .from =3D 0, .len =3D 0, .handle =3D 93997172956880, .flags =3D 0x1, .t=
-ype =3D 1
-> (write) }
-> S: 19479@1508268433.381516:nbd_receive_request Got request: { magic =3D=
-
-> 0x25609513, .flags =3D 0x1, .type =3D 0x1, from =3D 0, len =3D 0 }
-> S: 19479@1508268433.381527:nbd_co_receive_request_decode_type Decoding
-> type: handle =3D 93997172956880, type =3D 1 (write)
-> S: 19479@1508268433.381540:nbd_co_receive_request_payload_received
-> Payload received: handle =3D 93997172956880, len =3D 0
-> S: 19479@1508268433.381564:nbd_co_send_structured_error Send structured=
-
-> error reply: handle =3D 93997172956880, error =3D 1 (EPERM), msg =3D ''=
-
-> C: 19481@1508268433.381622:nbd_receive_structured_reply_chunk Got
-> structured reply chunk: { flags =3D 0x1, type =3D 32769, handle =3D
-> 93997172956880, length =3D 6 }
-> C: wrote 0/0 bytes at offset 0
-> C: 0 bytes, 1 ops; 0.0002 sec (0 bytes/sec and 4291.8455 ops/sec)
->=20
-> Oops - the client claimed success, even though the server replied with
-> EPERM.  And the server didn't do a good job of including details on the=
-
-> error message.  So there's still some tweaks needed.
-
-The server not sending details is a separate pre-existing issue; in
-server.c, we set errp for NBD_CMD_WRITE_ZEROES but not for
-NBD_CMD_WRITE.  You can get the server to cough up a message by using 'w
--z 0 1' instead.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Nutaro's work to interface with QEMU has been posted on the list:
+  https://patchwork.kernel.org/patch/9572497/
+I'm Cc'ing him in case he's not subscribed to the list.
 
 
---2fs0spAXv6LNru11hsXfWLjVwGRqewvwi
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+> My questions would be:
+> 1/ do you know of any other related work ?
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+Is QEMU's record/replay mode of any use to you? Note that as is the
+case with Nutaro's patch, you'll need icount mode (i.e. single-core)
+enabled.
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnpDzsACgkQp6FrSiUn
-Q2qLSQf/YCyBHxynFFAblGjZmO1YxuxX7+eW1axF7YYrApZHz8SWURphMWr3io4d
-HHYO0JJtVSnefcgQWtvcYE99Znmo9yAlWav41kuLuABlSa0R1srphRQM8b1vqyAN
-FArF1KGSI/BuYb9R1WRAOXCiBnDMLul+Z4rGVUVmqUrgfinFWNiaKC8LK5fsVD8p
-I0lIADbnsKM92X20H9cElMQHkjEaMebYAvCYa+EUrVx5AlGTXR7PEnVwoNGEjIoN
-stXP4x5mwPJWi2UGBb8NcDdFN+/eLmOUTulrOCNKil7sH3HgRQ9+FYUHUjqBBAF5
-keKMK4ZAVByE20MneQV6XIR5cpmoWA==
-=qP4S
------END PGP SIGNATURE-----
+> 2/ I believe there is interest from the research side but would it be
+> possible to merge either approach or a similar one (adevs patch
+> doesn't seem too big ~500 lines), would that be of interest for the
+> Qemu comminity too ?
+> 3/ if yes to 2. How to proceed, which one would be favorite ? if no,
+> what should be improved ? or would that be a definitive no ?
 
---2fs0spAXv6LNru11hsXfWLjVwGRqewvwi--
+I think the adevs approach is reasonable. The patch hasn't gotten much
+attention I guess because not many people care about this feature.
+But if you could review the patch and certify that it works for you
+(i.e. it works with simulators other than adevs), that could only help
+the patch getting in.
+
+That said, I make no merging decisions so take this as just my opinion.
+
+Cheers,
+
+		Emilio
