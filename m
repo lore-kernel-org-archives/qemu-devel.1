@@ -1,35 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42002)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43053)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e5Crj-0006Mc-Ne
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 11:36:13 -0400
+	(envelope-from <mst@redhat.com>) id 1e5Cun-0008Ia-Vi
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 11:39:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e5Crf-0006im-9u
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 11:36:11 -0400
-Received: from indium.canonical.com ([91.189.90.7]:58746)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1e5Crf-0006i6-2q
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 11:36:07 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1e5Crc-0004iL-Pg
-	for <qemu-devel@nongnu.org>; Thu, 19 Oct 2017 15:36:04 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 7D9242E80CC
-	for <qemu-devel@nongnu.org>; Thu, 19 Oct 2017 15:36:04 +0000 (UTC)
+	(envelope-from <mst@redhat.com>) id 1e5Cuk-0000kA-QA
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 11:39:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42416)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1e5Cuk-0000jl-G8
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 11:39:18 -0400
+Date: Thu, 19 Oct 2017 18:39:10 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20171019183638-mutt-send-email-mst@kernel.org>
+References: <1508390650-19115-1-git-send-email-changpeng.liu@intel.com>
+	<1508390650-19115-2-git-send-email-changpeng.liu@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 19 Oct 2017 15:28:30 -0000
-From: David Hildenbrand <1721221@bugs.launchpad.net>
-Reply-To: Bug 1721221 <1721221@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150711207545.12908.17996297593812507930.malonedeb@wampee.canonical.com>
-Message-Id: <150842691074.858.3128356817544295875.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1721221] Re: PCI-E passthrough of Nvidia GTX GFX
- card to Win 10 guest fails with "kvm_set_phys_mem: error registering slot:
- Invalid argument"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1508390650-19115-2-git-send-email-changpeng.liu@intel.com>
+Subject: Re: [Qemu-devel] [PATCH v4 1/4] vhost-user: add new vhost user
+ messages to support virtio config space
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,115 +28,372 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Changpeng Liu <changpeng.liu@intel.com>
+Cc: qemu-devel@nongnu.org, stefanha@gmail.com, pbonzini@redhat.com, marcandre.lureau@redhat.com, felipe@nutanix.com, james.r.harris@intel.com
 
-Fix will end up in QEMU master soon.
+On Thu, Oct 19, 2017 at 01:24:07PM +0800, Changpeng Liu wrote:
+> Add VHOST_USER_GET_CONFIG/VHOST_USER_SET_CONFIG messages which can be
+> used for live migration of vhost user devices, also vhost user devices
+> can benefit from the messages to get/set virtio config space from/to the
+> I/O target. For the purpose to support virtio config space change,
+> VHOST_USER_SET_CONFIG_FD message is added as the event notifier
+> in case virtio config space change in the I/O target.
+> 
+> Signed-off-by: Changpeng Liu <changpeng.liu@intel.com>
 
-** Changed in: qemu
-       Status: New =3D> Confirmed
+I don't much like it that config is getting passed through.
 
--- =
+IMO this makes managing things harder not easier.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1721221
+How about specific messages about specific parts of
+config space that you want to get from the backend?
 
-Title:
-  PCI-E passthrough of Nvidia GTX GFX card to Win 10 guest fails with
-  "kvm_set_phys_mem: error registering slot: Invalid argument"
 
-Status in QEMU:
-  Confirmed
-
-Bug description:
-  Problem: =
-
-  Passthrough of a PCI-E Nvidia GTX 970 GFX card to a Windows 10 guest from=
- a Debian Stretch host fails after recent changes to kvm in QEMU master/tru=
-nk. Before this recent commit, everything worked as expected.
-
-  QEMU Version:
-  Master/trunk pulled from github 4/10/17 ( git reflog: d147f7e815 HEAD@{0}=
- )
-
-  Host:
-  Debian Stretch kernel SMP Debian 4.9.30-2+deb9u5 (2017-09-19) x86_64 GNU/=
-Linux
-
-  Guest:
-  Windows 10 Professional
-
-  Issue is with this commit:
-  https://github.com/qemu/qemu/commit/f357f564be0bd45245b3ccfbbe20ace08fe83=
-ca8
-
-  Subsequent commit does not help:
-  https://github.com/qemu/qemu/commit/3110cdbd8a4845c5b5fb861b0a664c56d993d=
-d3c#diff-7b7a17f6e8ba4195198dd685073f43cb
-
-  Error output from qemu: =
-
-  (qemu) kvm_set_phys_mem: error registering slot: Invalid argument
-
-  QEMU commandline used:
-
-  ./sources/qemu/x86_64-softmmu/qemu-system-x86_64 -machine q35,accel=3Dkvm=
- -serial none -parallel none -name Windows \
-  -enable-kvm -cpu host,kvm=3Doff,hv_vendor_id=3Dsugoidesu,-hypervisor -smp=
- 6,sockets=3D1,cores=3D3,threads=3D2 \
-  -m 8G -mem-path /dev/hugepages -mem-prealloc -balloon none \
-  -drive if=3Dpflash,format=3Draw,readonly,file=3Dvms/ovmf-x64/ovmf-x64/OVM=
-F_CODE-pure-efi.fd \
-  -drive if=3Dpflash,format=3Draw,file=3Dvms/ovmf-x64/ovmf-x64/OVMF_VARS-pu=
-re-efi.fd \
-  -rtc clock=3Dhost,base=3Dlocaltime \
-  -readconfig ./vms/q35-virtio-graphical.cfg \
-  -object iothread,id=3Diothread0 -object iothread,id=3Diothread1 -object i=
-othread,id=3Diothread2 -object iothread,id=3Diothread3 \
-  -device virtio-scsi-pci,iothread=3Diothread0,id=3Dscsi0 -device virtio-sc=
-si-pci,iothread=3Diothread1,id=3Dscsi1 -device virtio-scsi-pci,iothread=3Di=
-othread2,id=3Dscsi2 -device virtio-scsi-pci,iothread=3Diothread3,id=3Dscsi3=
- \
-  -device scsi-hd,bus=3Dscsi0.0,drive=3Ddrive0,bootindex=3D1 -device scsi-h=
-d,bus=3Dscsi1.0,drive=3Ddrive1 -device scsi-hd,bus=3Dscsi2.0,drive=3Ddrive2=
- -device scsi-hd,bus=3Dscsi3.0,drive=3Ddrive3 -device scsi-hd,bus=3Dscsi1.0=
-,drive=3Ddrive4 -device scsi-hd,bus=3Dscsi2.0,drive=3Ddrive5 -device scsi-h=
-d,bus=3Dscsi3.0,drive=3Ddrive6 -device scsi-hd,bus=3Dscsi1.0,drive=3Ddrive7=
- -device scsi-hd,bus=3Dscsi2.0,drive=3Ddrive8 -device scsi-hd,bus=3Dscsi3.0=
-,drive=3Ddrive9 \
-  -drive if=3Dnone,id=3Ddrive0,file=3Dvms/w10p64.qcow2,format=3Dqcow2,cache=
-=3Dnone,discard=3Dunmap \
-  -drive if=3Dnone,id=3Ddrive1,file=3Dvms/w10p64-2.qcow2,format=3Dqcow2,cac=
-he=3Dnone,discard=3Dunmap \
-  -drive if=3Dnone,id=3Ddrive2,file=3D/dev/mapper/w10p64-3,format=3Draw,cac=
-he=3Dnone \
-  -drive if=3Dnone,id=3Ddrive3,file=3Dvms/w10p64-4.qcow2,format=3Dqcow2,cac=
-he=3Dnone \
-  -drive if=3Dnone,id=3Ddrive4,file=3Dvms/w10p64-5.qcow2,format=3Dqcow2,cac=
-he=3Dnone \
-  -drive if=3Dnone,id=3Ddrive5,file=3Dvms/w10p64-6.qcow2,format=3Dqcow2,cac=
-he=3Dnone,discard=3Dunmap \
-  -drive if=3Dnone,id=3Ddrive6,file=3D/dev/mapper/w10p64-7,format=3Draw,cac=
-he=3Dnone \
-  -drive if=3Dnone,id=3Ddrive7,file=3Dvms/w10p64-8.qcow2,format=3Dqcow2,cac=
-he=3Dnone,discard=3Dunmap \
-  -device vfio-pci,host=3D01:00.0,multifunction=3Don,x-vga=3Don \
-  -device vfio-pci,host=3D01:00.1,multifunction=3Don \
-  -netdev type=3Dtap,id=3Dnet1,ifname=3Dtap1,script=3Dno,downscript=3Dno,vh=
-ost=3Don \
-  -device virtio-net-pci,netdev=3Dnet1,mac=3D52:54:00:18:32:c9,bus=3Dpcie.2=
-,addr=3D00.0,ioeventfd=3Don \
-  -device usb-host,bus=3Dusb.0,hostbus=3D3,hostport=3D2.1 \
-  -device usb-host,hostbus=3D3,hostport=3D2.2 \
-  -device usb-host,bus=3Dich9-ehci-1.0,hostbus=3D3,hostport=3D2.4 \
-  -object input-linux,id=3Dkbd1,evdev=3D/dev/input/event0,grab_all=3Dyes,re=
-peat=3Don \
-  -drive if=3Dnone,id=3Ddrive8,file=3Dvms/w10p64.qcow2-9,format=3Dqcow2,dis=
-card=3Dunmap \
-  -drive if=3Dnone,id=3Ddrive9,file=3Dvms/w10p64-10.qcow2,format=3Dqcow2,ca=
-che=3Dnone,discard=3Dunmap \
-  -device usb-host,bus=3Dusb.0,hostbus=3D3,hostport=3D9 \
-  -monitor stdio
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1721221/+subscriptions
+> ---
+>  docs/interop/vhost-user.txt       | 33 +++++++++++++
+>  hw/virtio/vhost-user.c            | 97 +++++++++++++++++++++++++++++++++++++++
+>  hw/virtio/vhost.c                 | 63 +++++++++++++++++++++++++
+>  include/hw/virtio/vhost-backend.h |  8 ++++
+>  include/hw/virtio/vhost.h         | 16 +++++++
+>  5 files changed, 217 insertions(+)
+> 
+> diff --git a/docs/interop/vhost-user.txt b/docs/interop/vhost-user.txt
+> index 954771d..ea4c5ca 100644
+> --- a/docs/interop/vhost-user.txt
+> +++ b/docs/interop/vhost-user.txt
+> @@ -116,6 +116,10 @@ Depending on the request type, payload can be:
+>      - 3: IOTLB invalidate
+>      - 4: IOTLB access fail
+>  
+> + * Virtio device config space
+> +
+> +   256 Bytes static virito device config space
+> +
+>  In QEMU the vhost-user message is implemented with the following struct:
+>  
+>  typedef struct VhostUserMsg {
+> @@ -129,6 +133,7 @@ typedef struct VhostUserMsg {
+>          VhostUserMemory memory;
+>          VhostUserLog log;
+>          struct vhost_iotlb_msg iotlb;
+> +        uint8_t config[256];
+>      };
+>  } QEMU_PACKED VhostUserMsg;
+>  
+> @@ -596,6 +601,34 @@ Master message types
+>        and expect this message once (per VQ) during device configuration
+>        (ie. before the master starts the VQ).
+>  
+> + * VHOST_USER_GET_CONFIG
+> +      Id: 24
+> +      Equivalent ioctl: N/A
+> +      Master payload: virtio device config space
+> +
+> +      Submitted by the vhost-user master to fetch the contents of the virtio
+> +      device config space. The vhost-user master may cache the contents to
+> +      avoid repeated VHOST_USER_GET_CONFIG calls.
+> +
+> +* VHOST_USER_SET_CONFIG
+> +      Id: 25
+> +      Equivalent ioctl: N/A
+> +      Master payload: virtio device config space
+> +
+> +      Submitted by the vhost-user master when the Guest changes the virtio
+> +      device config space and also can be used for live migration on the
+> +      destination host.
+> +
+> +* VHOST_USER_SET_CONFIG_FD
+> +      Id: 26
+> +      Equivalent ioctl: N/A
+> +      Master payload: N/A
+> +
+> +      Sets the notifier file descriptor, which is passed as ancillary data.
+> +      Vhost-user slave uses the file descriptor to notify vhost-user master
+> +      when the virtio config space changed. The vhost-user master can read
+> +      the virtio config space to get the latest update.
+> +
+>  Slave message types
+>  -------------------
+>  
+> diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
+> index 093675e..4e7bafc 100644
+> --- a/hw/virtio/vhost-user.c
+> +++ b/hw/virtio/vhost-user.c
+> @@ -26,6 +26,11 @@
+>  #define VHOST_MEMORY_MAX_NREGIONS    8
+>  #define VHOST_USER_F_PROTOCOL_FEATURES 30
+>  
+> +/*
+> + * Maximum size of virtio device config space
+> + */
+> +#define VHOST_USER_MAX_CONFIG_SIZE 256
+> +
+>  enum VhostUserProtocolFeature {
+>      VHOST_USER_PROTOCOL_F_MQ = 0,
+>      VHOST_USER_PROTOCOL_F_LOG_SHMFD = 1,
+> @@ -65,6 +70,9 @@ typedef enum VhostUserRequest {
+>      VHOST_USER_SET_SLAVE_REQ_FD = 21,
+>      VHOST_USER_IOTLB_MSG = 22,
+>      VHOST_USER_SET_VRING_ENDIAN = 23,
+> +    VHOST_USER_GET_CONFIG = 24,
+> +    VHOST_USER_SET_CONFIG = 25,
+> +    VHOST_USER_SET_CONFIG_FD = 26,
+>      VHOST_USER_MAX
+>  } VhostUserRequest;
+>  
+> @@ -109,6 +117,7 @@ typedef struct VhostUserMsg {
+>          VhostUserMemory memory;
+>          VhostUserLog log;
+>          struct vhost_iotlb_msg iotlb;
+> +        uint8_t config[VHOST_USER_MAX_CONFIG_SIZE];
+>      } payload;
+>  } QEMU_PACKED VhostUserMsg;
+>  
+> @@ -922,6 +931,91 @@ static void vhost_user_set_iotlb_callback(struct vhost_dev *dev, int enabled)
+>      /* No-op as the receive channel is not dedicated to IOTLB messages. */
+>  }
+>  
+> +static int vhost_user_get_config(struct vhost_dev *dev, uint8_t *config,
+> +                                 size_t config_len)
+> +{
+> +    VhostUserMsg msg = {
+> +        .request = VHOST_USER_GET_CONFIG,
+> +        .flags = VHOST_USER_VERSION,
+> +        .size = config_len,
+> +    };
+> +
+> +    if (config_len == 0 || config_len > VHOST_USER_PAYLOAD_SIZE) {
+> +        error_report("bad config length");
+> +        return -1;
+> +    }
+> +
+> +    if (vhost_user_write(dev, &msg, NULL, 0) < 0) {
+> +        return -1;
+> +    }
+> +
+> +    if (vhost_user_read(dev, &msg) < 0) {
+> +        return -1;
+> +    }
+> +
+> +    if (msg.request != VHOST_USER_GET_CONFIG) {
+> +        error_report("Received unexpected msg type. Expected %d received %d",
+> +                     VHOST_USER_GET_CONFIG, msg.request);
+> +        return -1;
+> +    }
+> +
+> +    if (msg.size != config_len) {
+> +        error_report("Received bad msg size.");
+> +        return -1;
+> +    }
+> +
+> +    memcpy(config, &msg.payload.config, config_len);
+> +
+> +    return 0;
+> +}
+> +
+> +static int vhost_user_set_config(struct vhost_dev *dev, const uint8_t *config,
+> +                                 size_t config_len)
+> +{
+> +    bool reply_supported = virtio_has_feature(dev->protocol_features,
+> +                                              VHOST_USER_PROTOCOL_F_REPLY_ACK);
+> +
+> +    VhostUserMsg msg = {
+> +        .request = VHOST_USER_SET_CONFIG,
+> +        .flags = VHOST_USER_VERSION,
+> +        .size = config_len,
+> +    };
+> +
+> +    if (reply_supported) {
+> +        msg.flags |= VHOST_USER_NEED_REPLY_MASK;
+> +    }
+> +
+> +    if (config_len == 0 || config_len > VHOST_USER_PAYLOAD_SIZE) {
+> +        error_report("bad config length");
+> +        return -1;
+> +    }
+> +
+> +    memcpy(&msg.payload.config, config, config_len);
+> +    if (vhost_user_write(dev, &msg, NULL, 0) < 0) {
+> +        return -1;
+> +    }
+> +
+> +    if (reply_supported) {
+> +        return process_message_reply(dev, &msg);
+> +    }
+> +
+> +    return 0;
+> +}
+> +
+> +static int vhost_user_set_config_fd(struct vhost_dev *dev, int fd)
+> +{
+> +    VhostUserMsg msg = {
+> +       .request = VHOST_USER_SET_CONFIG_FD,
+> +       .flags = VHOST_USER_VERSION,
+> +    };
+> +
+> +    if (vhost_user_write(dev, &msg, &fd, 1) < 0) {
+> +        return -1;
+> +    }
+> +
+> +    return 0;
+> +}
+> +
+>  const VhostOps user_ops = {
+>          .backend_type = VHOST_BACKEND_TYPE_USER,
+>          .vhost_backend_init = vhost_user_init,
+> @@ -948,4 +1042,7 @@ const VhostOps user_ops = {
+>          .vhost_net_set_mtu = vhost_user_net_set_mtu,
+>          .vhost_set_iotlb_callback = vhost_user_set_iotlb_callback,
+>          .vhost_send_device_iotlb_msg = vhost_user_send_device_iotlb_msg,
+> +        .vhost_get_config = vhost_user_get_config,
+> +        .vhost_set_config = vhost_user_set_config,
+> +        .vhost_set_config_fd = vhost_user_set_config_fd,
+>  };
+> diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+> index ddc42f0..8079f46 100644
+> --- a/hw/virtio/vhost.c
+> +++ b/hw/virtio/vhost.c
+> @@ -1354,6 +1354,9 @@ void vhost_dev_cleanup(struct vhost_dev *hdev)
+>      for (i = 0; i < hdev->nvqs; ++i) {
+>          vhost_virtqueue_cleanup(hdev->vqs + i);
+>      }
+> +    if (hdev->config_ops) {
+> +        event_notifier_cleanup(&hdev->config_notifier);
+> +    }
+>      if (hdev->mem) {
+>          /* those are only safe after successful init */
+>          memory_listener_unregister(&hdev->memory_listener);
+> @@ -1501,6 +1504,66 @@ void vhost_ack_features(struct vhost_dev *hdev, const int *feature_bits,
+>      }
+>  }
+>  
+> +int vhost_dev_get_config(struct vhost_dev *hdev, uint8_t *config,
+> +                         size_t config_len)
+> +{
+> +    assert(hdev->vhost_ops);
+> +
+> +    if (hdev->vhost_ops->vhost_get_config) {
+> +        return hdev->vhost_ops->vhost_get_config(hdev, config, config_len);
+> +    }
+> +
+> +    return 0;
+> +}
+> +
+> +int vhost_dev_set_config(struct vhost_dev *hdev, const uint8_t *config,
+> +                         size_t config_len)
+> +{
+> +    assert(hdev->vhost_ops);
+> +
+> +    if (hdev->vhost_ops->vhost_set_config) {
+> +        return hdev->vhost_ops->vhost_set_config(hdev, config, config_len);
+> +    }
+> +
+> +    return 0;
+> +}
+> +
+> +static void vhost_dev_config_notifier_read(EventNotifier *n)
+> +{
+> +    struct vhost_dev *hdev = container_of(n, struct vhost_dev,
+> +                                         config_notifier);
+> +
+> +    if (event_notifier_test_and_clear(n)) {
+> +        if (hdev->config_ops) {
+> +            hdev->config_ops->vhost_dev_config_notifier(hdev);
+> +        }
+> +    }
+> +}
+> +
+> +int vhost_dev_set_config_notifier(struct vhost_dev *hdev,
+> +                                  const VhostDevConfigOps *ops)
+> +{
+> +    int r, fd;
+> +
+> +    assert(hdev->vhost_ops);
+> +
+> +    r = event_notifier_init(&hdev->config_notifier, 0);
+> +    if (r < 0) {
+> +        return r;
+> +    }
+> +
+> +    hdev->config_ops = ops;
+> +    event_notifier_set_handler(&hdev->config_notifier,
+> +                               vhost_dev_config_notifier_read);
+> +
+> +    if (hdev->vhost_ops->vhost_set_config_fd) {
+> +        fd  = event_notifier_get_fd(&hdev->config_notifier);
+> +        return hdev->vhost_ops->vhost_set_config_fd(hdev, fd);
+> +    }
+> +
+> +    return 0;
+> +}
+> +
+>  /* Host notifiers must be enabled at this point. */
+>  int vhost_dev_start(struct vhost_dev *hdev, VirtIODevice *vdev)
+>  {
+> diff --git a/include/hw/virtio/vhost-backend.h b/include/hw/virtio/vhost-backend.h
+> index a7a5f22..df6769e 100644
+> --- a/include/hw/virtio/vhost-backend.h
+> +++ b/include/hw/virtio/vhost-backend.h
+> @@ -84,6 +84,11 @@ typedef void (*vhost_set_iotlb_callback_op)(struct vhost_dev *dev,
+>                                             int enabled);
+>  typedef int (*vhost_send_device_iotlb_msg_op)(struct vhost_dev *dev,
+>                                                struct vhost_iotlb_msg *imsg);
+> +typedef int (*vhost_set_config_op)(struct vhost_dev *dev, const uint8_t *config,
+> +                                   size_t config_len);
+> +typedef int (*vhost_get_config_op)(struct vhost_dev *dev, uint8_t *config,
+> +                                   size_t config_len);
+> +typedef int (*vhost_set_config_fd_op)(struct vhost_dev *dev, int fd);
+>  
+>  typedef struct VhostOps {
+>      VhostBackendType backend_type;
+> @@ -118,6 +123,9 @@ typedef struct VhostOps {
+>      vhost_vsock_set_running_op vhost_vsock_set_running;
+>      vhost_set_iotlb_callback_op vhost_set_iotlb_callback;
+>      vhost_send_device_iotlb_msg_op vhost_send_device_iotlb_msg;
+> +    vhost_get_config_op vhost_get_config;
+> +    vhost_set_config_op vhost_set_config;
+> +    vhost_set_config_fd_op vhost_set_config_fd;
+>  } VhostOps;
+>  
+>  extern const VhostOps user_ops;
+> diff --git a/include/hw/virtio/vhost.h b/include/hw/virtio/vhost.h
+> index 467dc77..ff172f2 100644
+> --- a/include/hw/virtio/vhost.h
+> +++ b/include/hw/virtio/vhost.h
+> @@ -46,6 +46,12 @@ struct vhost_iommu {
+>      QLIST_ENTRY(vhost_iommu) iommu_next;
+>  };
+>  
+> +typedef struct VhostDevConfigOps {
+> +    /* Vhost device config space changed callback
+> +     */
+> +    void (*vhost_dev_config_notifier)(struct vhost_dev *dev);
+> +} VhostDevConfigOps;
+> +
+>  struct vhost_memory;
+>  struct vhost_dev {
+>      VirtIODevice *vdev;
+> @@ -76,6 +82,8 @@ struct vhost_dev {
+>      QLIST_ENTRY(vhost_dev) entry;
+>      QLIST_HEAD(, vhost_iommu) iommu_list;
+>      IOMMUNotifier n;
+> +    EventNotifier config_notifier;
+> +    const VhostDevConfigOps *config_ops;
+>  };
+>  
+>  int vhost_dev_init(struct vhost_dev *hdev, void *opaque,
+> @@ -106,4 +114,12 @@ int vhost_net_set_backend(struct vhost_dev *hdev,
+>                            struct vhost_vring_file *file);
+>  
+>  int vhost_device_iotlb_miss(struct vhost_dev *dev, uint64_t iova, int write);
+> +int vhost_dev_get_config(struct vhost_dev *dev, uint8_t *config,
+> +                         size_t config_len);
+> +int vhost_dev_set_config(struct vhost_dev *dev, const uint8_t *config,
+> +                         size_t config_len);
+> +/* notifier callback in case vhost device config space changed
+> + */
+> +int vhost_dev_set_config_notifier(struct vhost_dev *dev,
+> +                                  const VhostDevConfigOps *ops);
+>  #endif
+> -- 
+> 1.9.3
