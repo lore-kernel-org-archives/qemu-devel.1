@@ -1,22 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50069)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50700)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e5G9L-0004h5-CI
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 15:06:36 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1e5GDH-0005bF-TG
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 15:10:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e5G9K-0000Cf-3J
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 15:06:35 -0400
-References: <20171015010131.12172-1-eblake@redhat.com>
-	<20171017125710.11626-1-vsementsov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <9e1de427-f3bd-074b-ada5-b14b97579272@redhat.com>
-Date: Thu, 19 Oct 2017 14:06:23 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1e5GDE-0003ZW-MT
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 15:10:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54609)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1e5GDE-0003YL-Cx
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 15:10:36 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 48D8C127AD
+	for <qemu-devel@nongnu.org>; Thu, 19 Oct 2017 19:10:33 +0000 (UTC)
+Date: Thu, 19 Oct 2017 20:10:30 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20171019191029.GK2281@work-vm>
+References: <20171018174013.22709-1-dgilbert@redhat.com>
+	<20171019152442.GG130425@orkuz.home>
 MIME-Version: 1.0
-In-Reply-To: <20171017125710.11626-1-vsementsov@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="WRBGr3b3qB1TdHjR4IBB98fv2hRh0nNo8"
-Subject: Re: [Qemu-devel] [PATCH v4 RFC 9/8] nbd: Minimal structured read
- for client
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171019152442.GG130425@orkuz.home>
+Subject: Re: [Qemu-devel] [PATCH v3 0/7] migration: pause-before-switchover
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,199 +33,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
+To: Jiri Denemark <jdenemar@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---WRBGr3b3qB1TdHjR4IBB98fv2hRh0nNo8
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
-Message-ID: <9e1de427-f3bd-074b-ada5-b14b97579272@redhat.com>
-Subject: Re: [PATCH v4 RFC 9/8] nbd: Minimal structured read for client
-References: <20171015010131.12172-1-eblake@redhat.com>
- <20171017125710.11626-1-vsementsov@virtuozzo.com>
-In-Reply-To: <20171017125710.11626-1-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+* Jiri Denemark (jdenemar@redhat.com) wrote:
+> The libvirt changes which will make use of this new migration capability
+> can be found in migration-pause branch of my gitlab repository:
+> 
+>     git fetch https://gitlab.com/jirkade/libvirt.git migration-pause
+> 
+> It's not properly split into patches, it has no commit message etc.,
+> but the functionality should be complete.
+> 
+> Feel free to test it and report any issues.
 
-On 10/17/2017 07:57 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Minimal implementation: for structured error only error_report error
-> message.
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
+Looks promising:
 
-and I replied:
->=20
-> But in the client, I then perform 'w 0 0' (a zero-byte write, which
-> should fail because the server is read-only).  I see:
->=20
-> C: 19481@1508268433.381446:nbd_send_request Sending request to server: =
-{
-> .from =3D 0, .len =3D 0, .handle =3D 93997172956880, .flags =3D 0x1, .t=
-ype =3D 1
-> (write) }
-> S: 19479@1508268433.381516:nbd_receive_request Got request: { magic =3D=
+virsh migrate --live --copy-storage-all --verbose
 
-> 0x25609513, .flags =3D 0x1, .type =3D 0x1, from =3D 0, len =3D 0 }
-> S: 19479@1508268433.381527:nbd_co_receive_request_decode_type Decoding
-> type: handle =3D 93997172956880, type =3D 1 (write)
-> S: 19479@1508268433.381540:nbd_co_receive_request_payload_received
-> Payload received: handle =3D 93997172956880, len =3D 0
-> S: 19479@1508268433.381564:nbd_co_send_structured_error Send structured=
+2017-10-19 17:52:38.665+0000: 31999: debug : qemuMonitorSetMigrationCapability:3948 : capability=pause-before-switchover, state=1
+2017-10-19 17:52:38.666+0000: 31999: debug : virJSONValueToString:1914 : result={"execute":"migrate-set-capabilities","arguments":{"capabilities":[{"capability":"pause-before-switchover","state":true}]},"id":"libvirt-1861"}
+2017-10-19 17:52:38.693+0000: 31999: debug : qemuMonitorJSONCommandWithFd:298 : Send command '{"execute":"migrate","arguments":{"detach":true,"blk":false,"inc":false,"uri":"fd:migrate"},"id":"libvirt-1865"}' for write with FD -1
+2017-10-19 17:52:38.695+0000: 31998: debug : qemuMonitorJSONIOProcessLine:193 : Line [{"timestamp": {"seconds": 1508435558, "microseconds": 695732}, "event": "MIGRATION", "data": {"status": "setup"}}]
+2017-10-19 17:52:38.743+0000: 31998: debug : qemuMonitorJSONIOProcessLine:193 : Line [{"timestamp": {"seconds": 1508435558, "microseconds": 743564}, "event": "MIGRATION_PASS", "data": {"pass": 1}}]
+2017-10-19 17:52:38.744+0000: 31998: debug : qemuMonitorJSONIOProcessLine:193 : Line [{"timestamp": {"seconds": 1508435558, "microseconds": 743724}, "event": "MIGRATION", "data": {"status": "active"}}]
+2017-10-19 17:52:43.193+0000: 31998: debug : qemuMonitorJSONIOProcessLine:193 : Line [{"timestamp": {"seconds": 1508435563, "microseconds": 192728}, "event": "MIGRATION_PASS", "data": {"pass": 2}}]
+2017-10-19 17:52:43.389+0000: 31998: debug : qemuMonitorJSONIOProcessLine:193 : Line [{"timestamp": {"seconds": 1508435563, "microseconds": 388947}, "event": "STOP"}]
+2017-10-19 17:52:43.862+0000: 31998: debug : qemuMonitorJSONIOProcessLine:193 : Line [{"timestamp": {"seconds": 1508435563, "microseconds": 862428}, "event": "MIGRATION", "data": {"status": "pre-switchover"}}]
+2017-10-19 17:52:43.863+0000: 31999: debug : qemuMigrationDriveMirrorReady:634 : All disk mirrors are ready
+2017-10-19 17:52:43.863+0000: 31999: debug : qemuMigrationCompleted:1534 : Migration paused before switchover
+2017-10-19 17:52:43.865+0000: 31998: debug : qemuMonitorJSONIOProcessLine:193 : Line [{"return": {"expected-downtime": 300, "status": "pre-switchover", "setup-time": 47, "total-time": 5169, "ram": {"total": 4430053376, "postcopy-requests": 0, "dirty-sync-count": 2, "page-size": 4096, "remaining": 7204864, "mbps": 941.43529, "transferred": 450864646, "duplicate": 973832, "dirty-pages-rate": 243277, "skipped": 0, "normal-bytes": 441237504, "normal": 107724}}, "id": "libvirt-1876"}]
+2017-10-19 17:52:43.866+0000: 31999: debug : qemuMigrationCancelDriveMirror:803 : Cancelling drive mirrors for domain debianlocalqemu
+2017-10-19 17:52:43.866+0000: 31999: debug : qemuMonitorJSONCommandWithFd:298 : Send command '{"execute":"block-job-cancel","arguments":{"device":"drive-virtio-disk0"},"id":"libvirt-1877"}' for write with FD -1
+2017-10-19 17:52:43.868+0000: 31999: debug : qemuMigrationDriveMirrorCancelled:715 : Waiting for 1 disk mirrors to finish
+2017-10-19 17:52:43.872+0000: 31998: info : qemuMonitorIOProcess:439 : QEMU_MONITOR_IO_PROCESS: mon=0x7f4544008840 buf={"timestamp": {"seconds": 1508435563, "microseconds": 871816}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "drive-virtio-disk0", "len": 58430259200, "offset": 58430259200, "speed": 9223372036853727232, "type": "mirror"}}^M
+2017-10-19 17:52:43.873+0000: 31998: debug : qemuProcessHandleBlockJob:1014 : Block job for device drive-virtio-disk0 (domain: 0x7f45440254c0,debianlocalqemu) type 2 status 0
+2017-10-19 17:52:43.873+0000: 31999: debug : qemuBlockJobEventProcess:106 : disk=vda, mirrorState=yes, type=2, status=0
+2017-10-19 17:52:43.916+0000: 31999: debug : qemuMonitorJSONCommandWithFd:298 : Send command '{"execute":"migrate-continue","arguments":{"state":"pre-switchover"},"id":"libvirt-1880"}' for write with FD -1
+2017-10-19 17:52:43.918+0000: 31998: debug : qemuMonitorJSONIOProcessLine:193 : Line [{"timestamp": {"seconds": 1508435563, "microseconds": 917872}, "event": "MIGRATION", "data": {"status": "device"}}]
+2017-10-19 17:52:43.921+0000: 31998: debug : qemuMonitorJSONIOProcessLine:193 : Line [{"timestamp": {"seconds": 1508435563, "microseconds": 921194}, "event": "MIGRATION_PASS", "data": {"pass": 3}}]
+2017-10-19 17:52:43.991+0000: 31998: info : qemuMonitorIOProcess:439 : QEMU_MONITOR_IO_PROCESS: mon=0x7f4544008840 buf={"timestamp": {"seconds": 1508435563, "microseconds": 991528}, "event": "MIGRATION", "data": {"status": "completed"}}^M
 
-> error reply: handle =3D 93997172956880, error =3D 1 (EPERM), msg =3D ''=
+So I think libvirt is doing the right thing - thanks!
 
-> C: 19481@1508268433.381622:nbd_receive_structured_reply_chunk Got
-> structured reply chunk: { flags =3D 0x1, type =3D 32769, handle =3D
-> 93997172956880, length =3D 6 }
-> C: wrote 0/0 bytes at offset 0
-> C: 0 bytes, 1 ops; 0.0002 sec (0 bytes/sec and 4291.8455 ops/sec)
->=20
-> Oops - the client claimed success, even though the server replied with
-> EPERM.  And the server didn't do a good job of including details on the=
+I'll post the version with your minor comment change 1st thing tomorrow.
 
-> error message.  So there's still some tweaks needed.
+(I'm not too convinced qemu is that happy during the drive-mirror; the
+guest complained about tasks blocked for 120seconds+ - I was running a
+heavy cp;  and looking at an iostat in the guest I could see there 
+were a few minute chunks where nothing was happening; and the write
+performance after migrate seems way low;  however - neither of those
+are related directly to this change - since the first problem
+is happening before the actual migration code has started).
 
-Okay, I found that issue:
+Dave
 
-> +static int nbd_parse_error_payload(NBDStructuredReplyChunk *chunk,
-> +                                   uint8_t *payload, int *request_ret,=
-
-> +                                   Error **errp)
-> +{
-> +    uint32_t error;
-> +    uint16_t message_size;
-> +
-> +    assert(chunk->type & (1 << 15));
-> +
-> +    if (chunk->length < sizeof(error) + sizeof(message_size)) {
-> +        error_setg(errp,
-> +                   "Protocol error: invalid payload for structured err=
-or");
-> +        return -EINVAL;
-> +    }
-> +
-> +    error =3D nbd_errno_to_system_errno(payload_advance32(&payload));
-> +    if (error =3D=3D 0) {
-> +        error_setg(errp, "Protocol error: server sent structured error=
- chunk"
-> +                         "with error =3D 0");
-> +        return -EINVAL;
-> +    }
-> +
-> +    *request_ret =3D error;
-
-Here, you set *request_ret to a positive value when the server gives an
-error,
-
-> +static coroutine_fn int nbd_co_do_receive_one_chunk(
-> +        NBDClientSession *s, uint64_t handle, bool only_structured,
-> +        int *request_ret, QEMUIOVector *qiov, void **payload, Error **=
-errp)
->  {
-
-> -    } else {
-> -        assert(s->reply.handle =3D=3D handle);
-> -        ret =3D -nbd_errno_to_system_errno(s->reply.simple.error);
-> -        if (qiov && ret =3D=3D 0) {
-> -            if (qio_channel_readv_all(s->ioc, qiov->iov, qiov->niov,
-> -                                      NULL) < 0) {
-> -                ret =3D -EIO;
-> -                s->quit =3D true;
-> +        error_setg(errp, "Connection closed");
-> +        return -EIO;
-> +    }
-> +
-> +    assert(s->reply.handle =3D=3D handle);
-> +
-> +    if (nbd_reply_is_simple(&s->reply)) {
-> +        if (only_structured) {
-> +            error_setg(errp, "Protocol error: simple reply when struct=
-ured"
-> +                             "reply chunk was expected");
-> +            return -EINVAL;
-> +        }
-> +
-> +        *request_ret =3D -nbd_errno_to_system_errno(s->reply.simple.er=
-ror);
-
-But here, you set it to a negative value,
-
-> +/* nbd_reply_chunk_iter_receive
-> + * The pointer stored in @payload requires qemu_vfree() to free it.
-> + */
-> +static bool nbd_reply_chunk_iter_receive(NBDClientSession *s,
-> +                                         NBDReplyChunkIter *iter,
-> +                                         uint64_t handle,
-> +                                         QEMUIOVector *qiov, NBDReply =
-*reply,
-> +                                         void **payload)
-> +{
-> +    int ret;
-> +    NBDReply local_reply;
-> +    NBDStructuredReplyChunk *chunk;
-> +    Error *local_err =3D NULL;
-> +    if (s->quit) {
-> +        error_setg(&local_err, "Connection closed");
-> +        nbd_iter_error(iter, true, -EIO, &local_err);
-> +        goto break_loop;
-> +    }
-> +
-> +    if (iter->done) {
-> +        /* Previous iteration was last. */
-> +        goto break_loop;
-> +    }
-> +
-> +    if (reply =3D=3D NULL) {
-> +        reply =3D &local_reply;
-> +    }
-> +
-> +    ret =3D nbd_co_receive_one_chunk(s, handle, iter->only_structured,=
-
-> +                                   qiov, reply, payload, &local_err);
-> +    if (ret < 0) {
-> +        /* If it is a fatal error s->quit is set by nbd_co_receive_one=
-_chunk */
-> +        nbd_iter_error(iter, s->quit, ret, &local_err);
-> +    }
-
-and you only ever set iter.ret to non-zero if the value was negative (so
-you were missing all errors sent through a structured reply).
-
-There was a lot of back-and-forth hunting through the code to see where
-errors flow.  I wonder if our intermediate processing should try harder
-to distinguish between NBD errors sent by the server (but the connection
-is still good - aka not a fatal error for the receive loop but does
-affect the end client) vs. those detected locally (server sent garbage
-or our connection failed, either way, the error is fatal and we won't
-ever talk to the server again).
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---WRBGr3b3qB1TdHjR4IBB98fv2hRh0nNo8
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlno968ACgkQp6FrSiUn
-Q2rF7wf/Qsu249EV84eO8LrLm+vB4cS3FX8bhwquWz55fqXxwY+kvN+lCxr2PSXW
-aQgLViqjtTxZrnOgYhg5Ukgm+d/PL/FmYrdXCS+Pse7rFmAikCMe8cEtOCR8fRJ3
-JasGL4UyW3dQTeaUBGDgobZ/Y/BY3NHJ4SW1y5ULNOTQzFs7JoaeNBGU0upKWkbY
-3ybh7bqan2ixYqLaE/tnJ63jkqhsdUAi19uguH1ktv8Xb4yTarY0FNPXrHpqashA
-32Ra3X0E3cs02xwjABetJwtoUL/kjHCMLkCBGDrOM3dU8J6Q398ZQgKx8qRVA/MX
-e9oAzt2xnKGJX/Flsid1wHW2E9PoaA==
-=heVM
------END PGP SIGNATURE-----
-
---WRBGr3b3qB1TdHjR4IBB98fv2hRh0nNo8--
+> Thanks,
+> 
+> Jirka
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
