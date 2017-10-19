@@ -1,24 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56911)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57264)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e5DcS-0007w9-R8
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 12:24:30 -0400
+	(envelope-from <bounces@canonical.com>) id 1e5De1-0000uZ-AC
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 12:26:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e5DcP-00039i-JZ
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 12:24:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44686)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1e5DcP-00039Q-AD
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 12:24:25 -0400
-Date: Thu, 19 Oct 2017 17:24:20 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20171019162420.GA8408@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20171019160419.11611-1-ross.lagerwall@citrix.com>
+	(envelope-from <bounces@canonical.com>) id 1e5Ddy-0003mg-42
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 12:26:05 -0400
+Received: from indium.canonical.com ([91.189.90.7]:49208)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1e5Ddx-0003lv-US
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 12:26:02 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1e5Ddw-0007rz-6g
+	for <qemu-devel@nongnu.org>; Thu, 19 Oct 2017 16:26:00 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 2D03F2E80CC
+	for <qemu-devel@nongnu.org>; Thu, 19 Oct 2017 16:26:00 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20171019160419.11611-1-ross.lagerwall@citrix.com>
-Subject: Re: [Qemu-devel] [PATCH v1] os-posix: Add -unshare option
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 19 Oct 2017 16:17:44 -0000
+From: Richard Henderson <rth@twiddle.net>
+Reply-To: Bug 1724485 <1724485@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150831492991.17205.1365818841692773714.malonedeb@gac.canonical.com>
+Message-Id: <150842986500.13434.2383418212797301459.launchpad@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1724485] Re: Invalid assertion in
+ arm_read_memory_func
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,147 +37,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ross Lagerwall <ross.lagerwall@citrix.com>
-Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
 
-On Thu, Oct 19, 2017 at 05:04:19PM +0100, Ross Lagerwall wrote:
-> Add an option to allow calling unshare() just before starting guest
-> execution. The option allows unsharing one or more of the mount
-> namespace, the network namespace, and the IPC namespace. This is useful
-> to restrict the ability of QEMU to cause damage to the system should it
-> be compromised.
-> 
-> An example of using this would be to have QEMU open a QMP socket at
-> startup and unshare the network namespace. The instance of QEMU could
-> still be controlled by the QMP socket since that belongs in the original
-> namespace, but if QEMU were compromised it wouldn't be able to open any
-> new connections, even to other processes on the same machine.
+** Changed in: qemu
+     Assignee: (unassigned) =3D> Richard Henderson (rth)
 
-Unless I'm misunderstanding you, what's described here is already possible
-by just using the 'unshare' command to spawn QEMU:
+-- =
 
-  # unshare --ipc --mount --net qemu-system-x86_64 -qmp unix:/tmp/foo,server -vnc :1
-  qemu-system-x86_64: -qmp unix:/tmp/foo,server: QEMU waiting for connection on: disconnected:unix:/tmp/foo,server
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1724485
 
-And in another shell I can still access the QMP socket from the original host
-namespace
+Title:
+  Invalid assertion in arm_read_memory_func
 
-  # ./scripts/qmp/qmp-shell /tmp/foo
-  Welcome to the QMP low-level shell!
-  Connected to QEMU 2.9.1
+Status in QEMU:
+  New
 
-  (QEMU) query-kvm
-  {"return": {"enabled": false, "present": true}}
+Bug description:
+  Hi,
 
+  I think there is an invalid assertion in arm_read_memory_func:
+  assert(info->endian =3D=3D BFD_ENDIAN_LITTLE)
 
-FWIW, even if that were not possible, you could still do it by wrapping the
-qmp-shell in an 'nsenter' call. eg
+  I face it in the following use case: target armeb-linux (I use qemu
+  user mode), -d in_asm -cpu any.
 
-  nsenter --target $QEMUPID --net ./scripts/qmp/qmp-shell /tmp/foo
+  At some point during program startup, glibc's _dl_new_object calls
+  strlen, which is written in thumb2 mode (armv6t2). So print_insn_arm()
+  calls arm_read_memory_func() with length=3D=3D2, and info->flags =3D=3D
+  INSN_ARM_BE32, and the assert is false.
 
-> Signed-off-by: Ross Lagerwall <ross.lagerwall@citrix.com>
-> ---
->  os-posix.c      | 34 ++++++++++++++++++++++++++++++++++
->  qemu-options.hx | 14 ++++++++++++++
->  2 files changed, 48 insertions(+)
-> 
-> diff --git a/os-posix.c b/os-posix.c
-> index b9c2343..cfc5c38 100644
-> --- a/os-posix.c
-> +++ b/os-posix.c
-> @@ -45,6 +45,7 @@ static struct passwd *user_pwd;
->  static const char *chroot_dir;
->  static int daemonize;
->  static int daemon_pipe;
-> +static int unshare_flags;
->  
->  void os_setup_early_signal_handling(void)
->  {
-> @@ -160,6 +161,28 @@ void os_parse_cmd_args(int index, const char *optarg)
->          fips_set_state(true);
->          break;
->  #endif
-> +#ifdef CONFIG_SETNS
-> +    case QEMU_OPTION_unshare:
-> +        {
-> +            char *flag;
-> +            char *opts = g_strdup(optarg);
-> +
-> +            while ((flag = qemu_strsep(&opts, ",")) != NULL) {
-> +                if (!strcmp(flag, "mount")) {
-> +                    unshare_flags |= CLONE_NEWNS;
-> +                } else if (!strcmp(flag, "net")) {
-> +                    unshare_flags |= CLONE_NEWNET;
-> +                } else if (!strcmp(flag, "ipc")) {
-> +                    unshare_flags |= CLONE_NEWIPC;
-> +                } else {
-> +                    fprintf(stderr, "Unknown unshare option: %s\n", flag);
-> +                    exit(1);
-> +                }
-> +            }
-> +            g_free(opts);
-> +        }
-> +        break;
-> +#endif
->      }
->  }
->  
-> @@ -201,6 +224,16 @@ static void change_root(void)
->  
->  }
->  
-> +static void unshare_namespaces(void)
-> +{
-> +    if (unshare_flags) {
-> +        if (unshare(unshare_flags) < 0) {
-> +            perror("could not unshare");
-> +            exit(1);
-> +        }
-> +    }
-> +}
-> +
->  void os_daemonize(void)
->  {
->      if (daemonize) {
-> @@ -266,6 +299,7 @@ void os_setup_post(void)
->      }
->  
->      change_root();
-> +    unshare_namespaces();
->      change_process_uid();
+  If I remove the assert, execution continues OK.
 
-This has some really bad implications.  All the command line options that are
-given are processed *beforfe* os_setup_post() is called. IOW, -chardev, -vnc,
--migrate, -net, etc will all be configured in the context of the host namespace.
+  With the assert, I get the error message from the assert, and qemu
+  then stalls.
 
-If you then use the QMP monitor to run  chardev_add,  device_add, migrate,
-hostnet_add, etc this will all take place in the new namespace.
+  Can you confirm the assert can be removed? Or if not, explain me how
+  to avoid/fix the subsequent qemu stall?
 
-So the exact same args give as ARGV now have completely different semantics
-when given via QMP.
+  Thanks
 
-I think this is really very undesirable.
-
-If you wrap QEMU execution in 'unshare' as I illustrate above, then the
-semantics of ARGV & QMP remain consistent.
-
-FWIW, as a further point that might be of interest, libvirt will now spawn
-a new private mount namespace for QEMU by default. We do this so that we can
-give QEMU a private /dev filesystem with only the devices its permitted to
-use present as device nodes.  The ability to do such setup tasks inbetween
-namespace creation and QEMU launching is broadly useful. For example, if
-using a private network namespace, you might want to create a veth pair and
-put one end in the namespace, so that QEMU's network services have some
-level of outside network connectivity - eg to enable QEMU to connect to a remote
-QEMU for live migration.
-
-So overall, I absolutely encourage the use of namespaces to confine QEMU,
-but I tend to think namespace creation/setup is better done outside QEMU
-before launching it.
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1724485/+subscriptions
