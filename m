@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50700)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51407)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1e5GDH-0005bF-TG
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 15:10:41 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1e5GGS-0006P7-PS
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 15:13:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1e5GDE-0003ZW-MT
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 15:10:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54609)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1e5GDE-0003YL-Cx
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 15:10:36 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 48D8C127AD
-	for <qemu-devel@nongnu.org>; Thu, 19 Oct 2017 19:10:33 +0000 (UTC)
-Date: Thu, 19 Oct 2017 20:10:30 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20171019191029.GK2281@work-vm>
-References: <20171018174013.22709-1-dgilbert@redhat.com>
-	<20171019152442.GG130425@orkuz.home>
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1e5GGP-00059K-JZ
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 15:13:56 -0400
+Received: from chuckie.co.uk ([82.165.15.123]:47294
+	helo=s16892447.onlinehome-server.info)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1e5GGP-00058m-DN
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 15:13:53 -0400
+References: <20171019071036.GB20805@kentang.lan>
+	<CAFEAcA_KWLxNKSr3cDDoQE2JPaKm8L4MCKRDJYri4THpqjbBdw@mail.gmail.com>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <29d59a68-437c-8157-0dcf-d9f16c8fda8f@ilande.co.uk>
+Date: Thu, 19 Oct 2017 20:13:41 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171019152442.GG130425@orkuz.home>
-Subject: Re: [Qemu-devel] [PATCH v3 0/7] migration: pause-before-switchover
+In-Reply-To: <CAFEAcA_KWLxNKSr3cDDoQE2JPaKm8L4MCKRDJYri4THpqjbBdw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL] Update OpenBIOS images
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,63 +30,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jiri Denemark <jdenemar@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-* Jiri Denemark (jdenemar@redhat.com) wrote:
-> The libvirt changes which will make use of this new migration capability
-> can be found in migration-pause branch of my gitlab repository:
+On 19/10/17 19:18, Peter Maydell wrote:
+
+> On 19 October 2017 at 08:10, Mark Cave-Ayland
+> <mark.cave-ayland@ilande.co.uk> wrote:
+>> Hi Peter,
+>>
+>> Here are the latest set of updates for OpenBIOS which should be pulled after the sun4u
+>> patches have been applied due to breaking changes in the sun4u machine.
+>>
+>>
+>> ATB,
+>>
+>> Mark.
+>>
+>>
+>> The following changes since commit 861cd431c99e56ddb5953ca1da164a9c32b477ca:
+>>
+>>   Merge remote-tracking branch 'remotes/dgibson/tags/ppc-for-2.11-20171017' into staging (2017-10-17 15:26:51 +0100)
+>>
+>> are available in the git repository at:
+>>
+>>
+>>   https://github.com/mcayland/qemu.git tags/qemu-openbios-signed
+>>
+>> for you to fetch changes up to 08e2c1854d8bc32b3b6fcefbead0ea808c44cbc8:
+>>
+>>   Update OpenBIOS images to 83818bd built from submodule. (2017-10-19 08:04:15 +0100)
+>>
+>> ----------------------------------------------------------------
+>> Update OpenBIOS images
+>>
+>> ----------------------------------------------------------------
+>> Mark Cave-Ayland (1):
+>>       Update OpenBIOS images to 83818bd built from submodule.
+>>
+>>  pc-bios/openbios-ppc     |  Bin 754936 -> 754936 bytes
+>>  pc-bios/openbios-sparc32 |  Bin 382048 -> 382048 bytes
+>>  pc-bios/openbios-sparc64 |  Bin 1593408 -> 1593408 bytes
+>>  roms/openbios            |    2 +-
 > 
->     git fetch https://gitlab.com/jirkade/libvirt.git migration-pause
+> This fails to merge, because your other pullreq also
+> updated pc-bios/openbios-sparc64 and git can't automatically
+> resolve merge conflicts between binary files.
 > 
-> It's not properly split into patches, it has no commit message etc.,
-> but the functionality should be complete.
-> 
-> Feel free to test it and report any issues.
+> If you tell me which version of the binary to prefer I can
+> fix it up by hand in the merge commit I guess.
 
-Looks promising:
+Ah yes indeed, I didn't realise until I tried just now that it wouldn't
+work.
 
-virsh migrate --live --copy-storage-all --verbose
+I've gone for the assumption that the patches would be applied on a
+first come, first served basis so the binaries for the OpenBIOS commit
+should completely replace the openbios-sparc64 from the sun4u commit.
 
-2017-10-19 17:52:38.665+0000: 31999: debug : qemuMonitorSetMigrationCapability:3948 : capability=pause-before-switchover, state=1
-2017-10-19 17:52:38.666+0000: 31999: debug : virJSONValueToString:1914 : result={"execute":"migrate-set-capabilities","arguments":{"capabilities":[{"capability":"pause-before-switchover","state":true}]},"id":"libvirt-1861"}
-2017-10-19 17:52:38.693+0000: 31999: debug : qemuMonitorJSONCommandWithFd:298 : Send command '{"execute":"migrate","arguments":{"detach":true,"blk":false,"inc":false,"uri":"fd:migrate"},"id":"libvirt-1865"}' for write with FD -1
-2017-10-19 17:52:38.695+0000: 31998: debug : qemuMonitorJSONIOProcessLine:193 : Line [{"timestamp": {"seconds": 1508435558, "microseconds": 695732}, "event": "MIGRATION", "data": {"status": "setup"}}]
-2017-10-19 17:52:38.743+0000: 31998: debug : qemuMonitorJSONIOProcessLine:193 : Line [{"timestamp": {"seconds": 1508435558, "microseconds": 743564}, "event": "MIGRATION_PASS", "data": {"pass": 1}}]
-2017-10-19 17:52:38.744+0000: 31998: debug : qemuMonitorJSONIOProcessLine:193 : Line [{"timestamp": {"seconds": 1508435558, "microseconds": 743724}, "event": "MIGRATION", "data": {"status": "active"}}]
-2017-10-19 17:52:43.193+0000: 31998: debug : qemuMonitorJSONIOProcessLine:193 : Line [{"timestamp": {"seconds": 1508435563, "microseconds": 192728}, "event": "MIGRATION_PASS", "data": {"pass": 2}}]
-2017-10-19 17:52:43.389+0000: 31998: debug : qemuMonitorJSONIOProcessLine:193 : Line [{"timestamp": {"seconds": 1508435563, "microseconds": 388947}, "event": "STOP"}]
-2017-10-19 17:52:43.862+0000: 31998: debug : qemuMonitorJSONIOProcessLine:193 : Line [{"timestamp": {"seconds": 1508435563, "microseconds": 862428}, "event": "MIGRATION", "data": {"status": "pre-switchover"}}]
-2017-10-19 17:52:43.863+0000: 31999: debug : qemuMigrationDriveMirrorReady:634 : All disk mirrors are ready
-2017-10-19 17:52:43.863+0000: 31999: debug : qemuMigrationCompleted:1534 : Migration paused before switchover
-2017-10-19 17:52:43.865+0000: 31998: debug : qemuMonitorJSONIOProcessLine:193 : Line [{"return": {"expected-downtime": 300, "status": "pre-switchover", "setup-time": 47, "total-time": 5169, "ram": {"total": 4430053376, "postcopy-requests": 0, "dirty-sync-count": 2, "page-size": 4096, "remaining": 7204864, "mbps": 941.43529, "transferred": 450864646, "duplicate": 973832, "dirty-pages-rate": 243277, "skipped": 0, "normal-bytes": 441237504, "normal": 107724}}, "id": "libvirt-1876"}]
-2017-10-19 17:52:43.866+0000: 31999: debug : qemuMigrationCancelDriveMirror:803 : Cancelling drive mirrors for domain debianlocalqemu
-2017-10-19 17:52:43.866+0000: 31999: debug : qemuMonitorJSONCommandWithFd:298 : Send command '{"execute":"block-job-cancel","arguments":{"device":"drive-virtio-disk0"},"id":"libvirt-1877"}' for write with FD -1
-2017-10-19 17:52:43.868+0000: 31999: debug : qemuMigrationDriveMirrorCancelled:715 : Waiting for 1 disk mirrors to finish
-2017-10-19 17:52:43.872+0000: 31998: info : qemuMonitorIOProcess:439 : QEMU_MONITOR_IO_PROCESS: mon=0x7f4544008840 buf={"timestamp": {"seconds": 1508435563, "microseconds": 871816}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "drive-virtio-disk0", "len": 58430259200, "offset": 58430259200, "speed": 9223372036853727232, "type": "mirror"}}^M
-2017-10-19 17:52:43.873+0000: 31998: debug : qemuProcessHandleBlockJob:1014 : Block job for device drive-virtio-disk0 (domain: 0x7f45440254c0,debianlocalqemu) type 2 status 0
-2017-10-19 17:52:43.873+0000: 31999: debug : qemuBlockJobEventProcess:106 : disk=vda, mirrorState=yes, type=2, status=0
-2017-10-19 17:52:43.916+0000: 31999: debug : qemuMonitorJSONCommandWithFd:298 : Send command '{"execute":"migrate-continue","arguments":{"state":"pre-switchover"},"id":"libvirt-1880"}' for write with FD -1
-2017-10-19 17:52:43.918+0000: 31998: debug : qemuMonitorJSONIOProcessLine:193 : Line [{"timestamp": {"seconds": 1508435563, "microseconds": 917872}, "event": "MIGRATION", "data": {"status": "device"}}]
-2017-10-19 17:52:43.921+0000: 31998: debug : qemuMonitorJSONIOProcessLine:193 : Line [{"timestamp": {"seconds": 1508435563, "microseconds": 921194}, "event": "MIGRATION_PASS", "data": {"pass": 3}}]
-2017-10-19 17:52:43.991+0000: 31998: info : qemuMonitorIOProcess:439 : QEMU_MONITOR_IO_PROCESS: mon=0x7f4544008840 buf={"timestamp": {"seconds": 1508435563, "microseconds": 991528}, "event": "MIGRATION", "data": {"status": "completed"}}^M
+If you check the signed tag again, I've rebased the commit and re-pushed
+to github again so you should now hopefully be able to apply without any
+issues.
 
-So I think libvirt is doing the right thing - thanks!
 
-I'll post the version with your minor comment change 1st thing tomorrow.
+ATB,
 
-(I'm not too convinced qemu is that happy during the drive-mirror; the
-guest complained about tasks blocked for 120seconds+ - I was running a
-heavy cp;  and looking at an iostat in the guest I could see there 
-were a few minute chunks where nothing was happening; and the write
-performance after migrate seems way low;  however - neither of those
-are related directly to this change - since the first problem
-is happening before the actual migration code has started).
-
-Dave
-
-> Thanks,
-> 
-> Jirka
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Mark.
