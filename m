@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38220)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38285)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e5Asc-00031m-NN
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 09:28:59 -0400
+	(envelope-from <stefanha@gmail.com>) id 1e5Asu-0003AR-Pt
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 09:29:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e5AsZ-0004xc-Gp
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 09:28:58 -0400
-References: <1508336428-20511-1-git-send-email-thuth@redhat.com>
-	<9d7d4163-1752-64a1-e5e1-d0b45bd3eb46@redhat.com>
-	<20171019114331.44a29bec.cohuck@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <09614aaf-cf6d-1fa4-50d4-f481f1fde401@redhat.com>
-Date: Thu, 19 Oct 2017 08:28:44 -0500
+	(envelope-from <stefanha@gmail.com>) id 1e5Asr-00054n-JN
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 09:29:16 -0400
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:47049)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1e5Asr-00053y-Bi
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 09:29:13 -0400
+Received: by mail-wr0-x242.google.com with SMTP id l1so8344072wrc.3
+	for <qemu-devel@nongnu.org>; Thu, 19 Oct 2017 06:29:11 -0700 (PDT)
+Date: Thu, 19 Oct 2017 15:29:07 +0200
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20171019132907.GF6205@stefanha-x1.localdomain>
+References: <CALMRoie6DWc0B5Q3ZAbSS7ezFC=tXtNW+eU1T_deJsadO06erQ@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20171019114331.44a29bec.cohuck@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="TqkUvtiSta65upec34dRIudg7xH5716t7"
-Subject: Re: [Qemu-devel] [PATCH 0/2] Enable the simple virtio tests on
- s390x, too
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CALMRoie6DWc0B5Q3ZAbSS7ezFC=tXtNW+eU1T_deJsadO06erQ@mail.gmail.com>
+Subject: Re: [Qemu-devel] [Block-io] qemu virtual machine get stuck during
+ startup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,82 +29,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Michael S Tsirkin <mst@redhat.com>, Amit Shah <amit@kernel.org>
+To: Wahaha Huang <kingtan9527@gmail.com>
+Cc: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---TqkUvtiSta65upec34dRIudg7xH5716t7
-From: Eric Blake <eblake@redhat.com>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org,
- qemu-s390x@nongnu.org, Michael S Tsirkin <mst@redhat.com>,
- Amit Shah <amit@kernel.org>
-Message-ID: <09614aaf-cf6d-1fa4-50d4-f481f1fde401@redhat.com>
-Subject: Re: [PATCH 0/2] Enable the simple virtio tests on s390x, too
-References: <1508336428-20511-1-git-send-email-thuth@redhat.com>
- <9d7d4163-1752-64a1-e5e1-d0b45bd3eb46@redhat.com>
- <20171019114331.44a29bec.cohuck@redhat.com>
-In-Reply-To: <20171019114331.44a29bec.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Thu, Oct 19, 2017 at 05:32:10PM +0800, Wahaha Huang wrote:
+> Hi there,
+> I'm a newbie of qemu(2.10.0), when i start a vm from qemu, it sometimes get
+> stuck,
 
-On 10/19/2017 04:43 AM, Cornelia Huck wrote:
-> On Wed, 18 Oct 2017 10:01:57 -0500
-> Eric Blake <eblake@redhat.com> wrote:
->=20
->> On 10/18/2017 09:20 AM, Thomas Huth wrote:
->>> First patch introduces the qtest_startf() function that can be used
->>> to start tests with a printf-like string. This patch was originally
->>> part of Eric's bigger qtest refactoring series, and I originally want=
-ed
->>> to wait 'til it's included in the master branch. But since this did
->>> not happen yet and QEMU soft-freeze is approaching soon, I decided
->>> to rather included a slightly simplified version of that patch here
->>> instead. =20
->>
->> Fair enough.  I'm also trying to focus on getting features in before
->> soft freeze, hence my lack of rebasing the qtest refactoring series in=
+Please post your QEMU command-line and describe the behavior when it
+gets stuck.
 
->> the meantime.  Arguably (although it is a bit weak) we can claim
->> testsuite fixes as material that is still relevant after soft freeze a=
-s
->> it does not affect the final installed binaries, as long as they still=
+Are there any error messages?  Does the QEMU monitor still work?  Is the
+QEMU process running at 100% CPU?  etc
 
->> go in before hard freeze, but it's hard to say at this point if any of=
+> through gdb debugging, i found aio_worker thread(list below) missing when
+> vm get stuck,
+> but i don't know why, does anybody has further idea about this?
 
->> my qtest refactoring will make 2.11.
->>
->=20
-> Hi Eric,
->=20
-> does Thomas' port of your patch look sane? If yes, I'll queue both
-> patches on s390-next for 2.11.
+Worker threads are temporary threads.  If there is no work to do then
+they terminate.  New worker threads are started as needed.  Therefore
+you can't assume that a specific number of worker threads exists.
 
-Yes, it's fine with me.
+> (gdb) info threads
+> >
+> >   Id   Target Id         Frame
+> >
+> >   1    LWP 25451 "qemu-system-x86" 0x00007fc62081dc8b in ppoll () from
+> >> /lib/libc.so.6
+> >
+> >   2    LWP 25452 "qemu-system-x86" 0x00007fc620823ee9 in syscall () from
+> >> /lib/libc.so.6
+> >
+> > * 3    LWP 25495 "qemu-system-x86" 0x00007fc620af8e80 in ?? () from
+> >> /lib/libpthread.so.0
+> >
+> >   4    LWP 25496 "qemu-system-x86" 0x00007fc62081f697 in ioctl () from
+> >> /lib/libc.so.6
+> >
+> >   5    LWP 25497 "qemu-system-x86" 0x00007fc62081f697 in ioctl () from
+> >> /lib/libc.so.6
+> >
+> >   6    LWP 25498 "qemu-system-x86" 0x00007fc62081db9d in poll () from
+> >> /lib/libc.so.6
+> >
+> >   7    LWP 25500 "threaded-ml" 0x00007fc62081db9d in poll () from
+> >> /lib/libc.so.6
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+This looks like PulseAudio.  I suggest disabling audio and checking if
+the hang still occurs.
 
+> >
+> >   8    LWP 25501 "qemu-system-x86" 0x00007fc620af5e1d in pthread_cond_wait
+> >> () from /lib/libpthread.so.0
+> >
+> >   9    LWP 25502 "qemu-system-x86" 0x00007fc620af5e1d in pthread_cond_wait
+> >> () from /lib/libpthread.so.0
+> >
+> > (gdb) bt
+> >
+> > #0  0x00007fc620af8e80 in  () at /lib/libpthread.so.0
+> >
+> > #1  0x00007fc620af8f5f in  () at /lib/libpthread.so.0
+> >
+> > #2  0x00007fc620af906f in sem_timedwait () at /lib/libpthread.so.0
+> >
+> > #3  0x000055b66332e585 in qemu_sem_timedwait (sem=0x55b664e6c868,
+> >> ms=10000) at util/qemu-thread-posix.c:289
+> >
+> > #4  0x000055b6633279b6 in worker_thread (opaque=0x55b664e6c7f0) at
+> >> util/thread-pool.c:102
+> >
+> > #5  0x00007fc620aef767 in  () at /lib/libpthread.so.0
+> >
+> > #6  0x00007fc62082985f in clone () at /lib/libc.so.6
 
---TqkUvtiSta65upec34dRIudg7xH5716t7
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnoqIwACgkQp6FrSiUn
-Q2oMKAf/TEjq5vhC0dZJp6FrhKfUYQKMtaihtpViyMDO93YfN1C+7UluLmR/mfHE
-0Wr824JYX6JSpZ/XCiQ9fnph0VspzRsE4TS0B+q6JYic44EzrXPipgWgM0I4PFO5
-8x9AeuJC43/iXn9vIb2L+Y69DQJU+N/pfo2rPYK526cCPa1qAraQaVlwSBDQbIAc
-kco5ULpfhbdRm3NrN2RxkbpIU+AoDoqVOuccwOlnKpcfraXY+boWORzL0kl+IGw7
-ELw2KBqts9MVWKIQM40xLsm54pT0Zpo4qjnHSv690L0DBQbt++3Hk57LZDXhP2Zb
-BB82T0AlpcYokPNosE1ND5Jr8q0MXw==
-=HEmS
------END PGP SIGNATURE-----
-
---TqkUvtiSta65upec34dRIudg7xH5716t7--
+This is a worker thread waiting for more work to do.  It's normal.
