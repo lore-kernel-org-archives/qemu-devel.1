@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39878)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40876)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gabriel291075@gmail.com>) id 1e5E6j-0001Z5-5i
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 12:55:46 -0400
+	(envelope-from <thuth@redhat.com>) id 1e5EA2-0004QD-Ny
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 12:59:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gabriel291075@gmail.com>) id 1e5E6f-00011n-8T
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 12:55:45 -0400
-Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:44585)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <gabriel291075@gmail.com>)
-	id 1e5E6f-00011W-3f
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 12:55:41 -0400
-Received: by mail-qk0-x241.google.com with SMTP id r64so11176170qkc.1
-	for <qemu-devel@nongnu.org>; Thu, 19 Oct 2017 09:55:40 -0700 (PDT)
-From: gabriel291075@gmail.com
-Date: Thu, 19 Oct 2017 08:51:25 -0400
-Message-Id: <1508417485-31911-1-git-send-email-gabriel291075@gmail.com>
-Subject: [Qemu-devel] [PATCH v2] arm: Adding makefile for Kinetis K64
- MK64FN1M0
+	(envelope-from <thuth@redhat.com>) id 1e5E9y-000314-Op
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 12:59:10 -0400
+References: <cover.1508390588.git.alistair.francis@xilinx.com>
+	<3a47068b0561596283383c38e6e1188b1d6e7d2f.1508390588.git.alistair.francis@xilinx.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <9b967d33-397f-3602-35d8-67fdd9a81949@redhat.com>
+Date: Thu, 19 Oct 2017 18:58:59 +0200
+MIME-Version: 1.0
+In-Reply-To: <3a47068b0561596283383c38e6e1188b1d6e7d2f.1508390588.git.alistair.francis@xilinx.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 32/46] hw/s390x: Replace fprintf(stderr,
+ "*\n" with error_report()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,44 +25,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, Gabriel Augusto Costa <gabriel291075@gmail.com>
+To: Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org
+Cc: alistair23@gmail.com, armbru@redhat.com, qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>
 
-From: Gabriel Augusto Costa <gabriel291075@gmail.com>
+On 19.10.2017 18:17, Alistair Francis wrote:
+> Replace a large number of the fprintf(stderr, "*\n" calls with
+> error_report(). The functions were renamed with these commands and then
+> compiler issues where manually fixed.
+[...]
+> Some lines where then manually tweaked to pass checkpatch.
+> 
+> One fprintf(stderr, was manually converted to a
+> qemu_log_mask(LOG_GUEST_ERROR,
+> 
+> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+> ---
+> V3:
+>  - Use a qemu_log_mask(LOG_GUEST_ERROR,
+> V2:
+>  - Split hw patch into individual directories
+> 
+>  hw/s390x/virtio-ccw.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
+> index 085f17f871..1c6ea916b8 100644
+> --- a/hw/s390x/virtio-ccw.c
+> +++ b/hw/s390x/virtio-ccw.c
+> @@ -426,8 +426,9 @@ static int virtio_ccw_cb(SubchDev *sch, CCW1 ccw)
+>                   * passes us zeroes for those we don't support.
+>                   */
+>                  if (features.features) {
+> -                    fprintf(stderr, "Guest bug: features[%i]=%x (expected 0)\n",
+> -                            features.index, features.features);
+> +                    qemu_log_mask(LOG_GUEST_ERROR,
+> +                                  "Guest bug: features[%i]=%x (expected 0)",
+> +                                  features.index, features.features);
+>                      /* XXX: do a unit check here? */
+>                  }
+>              }
+> 
 
-I add a new arm machine with some peripherals. The machine is mk64fn1m0, a 
-cortex-m4 microcontroller from NXP Kinetis family. The machine can run a 
-simple arm binary file using UART0 in polling mode.
-I prepared two patchs to include this machine:
-PATCH v1: Include the machine and peripherals devices;
-PATCH v2: Change the make file to compile this machine.
-Also, I made a folder tree to accomodate this machine more or less like u-boot.
-In my opinion put all files in the same folder "/hw/arm" is not a good idea, 
-or put all code in an unique file, because machines from the same family 
-sharing the same peripherals.
-The folder tree struct is machine/family/peripheral, as an example:
-kinetis/k64/peripheral.
-So, in this way the code will be more maintainable.  
-
-Signed-off-by: Gabriel Augusto Costa <gabriel291075@gmail.com>
----
- hw/arm/Makefile.objs | 4 ++++
- 1 file changed, 4 insertions(+)
- mode change 100644 => 100755 hw/arm/Makefile.objs
-
-diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
-old mode 100644
-new mode 100755
-index 2794e08..650a0af
---- a/hw/arm/Makefile.objs
-+++ b/hw/arm/Makefile.objs
-@@ -20,3 +20,7 @@ obj-$(CONFIG_FSL_IMX6) += fsl-imx6.o sabrelite.o
- obj-$(CONFIG_ASPEED_SOC) += aspeed_soc.o aspeed.o
- obj-$(CONFIG_MPS2) += mps2.o
- obj-$(CONFIG_MSF2) += msf2-soc.o msf2-som.o
-+obj-y += kinetis/k64/mk64fn1m0.o kinetis/k64/peripheral/mcg.o \
-+	kinetis/k64/peripheral/sim.o kinetis/k64/peripheral/pmux.o \
-+	kinetis/k64/peripheral/uart.o kinetis/k64/peripheral/flextimer.o
-+	
--- 
-2.1.4
+Reviewed-by: Thomas Huth <thuth@redhat.com>
