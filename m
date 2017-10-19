@@ -1,33 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34696)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35749)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1e57Hz-00038e-Bz
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 05:38:59 -0400
+	(envelope-from <geoff@hostfission.com>) id 1e57Kv-0004d8-Mk
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 05:41:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1e57Ht-0002kY-AV
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 05:38:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35986)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1e57Ht-0002jN-1X
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 05:38:49 -0400
-References: <1506082711-16004-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<905d94b3-291b-0e55-e234-97fc2c85b6a6@redhat.com>
-	<4a9754d9-e73b-8e67-427e-9624d0486c91@ilande.co.uk>
-	<26f60ea0-199e-f9ec-5b1d-d7023d60bb03@redhat.com>
-	<20170925081140.GA2656@work-vm>
-	<c0055753-30ba-7cd0-cf64-94e1679678ef@ilande.co.uk>
-	<ca4d8002-b0b4-873d-2a99-aabbdaaf7060@redhat.com>
-	<f6e34569-af2c-900c-75fc-683467b99a72@ilande.co.uk>
-	<c9c2732e-ceb6-177f-db93-444a59a5a82a@ilande.co.uk>
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <9b513080-2ae0-0763-3bd4-ab0c947c4263@redhat.com>
-Date: Thu, 19 Oct 2017 12:38:41 +0300
+	(envelope-from <geoff@hostfission.com>) id 1e57Kr-0005O6-M8
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 05:41:57 -0400
+Received: from mail1.hostfission.com ([139.99.139.48]:34634)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <geoff@hostfission.com>) id 1e57Kr-0005N9-1x
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 05:41:53 -0400
 MIME-Version: 1.0
-In-Reply-To: <c9c2732e-ceb6-177f-db93-444a59a5a82a@ilande.co.uk>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] pci: allow 32-bit PCI IO accesses to pass
- through the PCI bridge
+Date: Thu, 19 Oct 2017 20:41:47 +1100
+From: geoff@hostfission.com
+In-Reply-To: <59a147491e11c4c692e9f762bcd9fb21@hostfission.com>
+References: <5548e41a5668ec0cba9543139327e035@hostfission.com>
+	<3A7697A0-1AF3-46E8-8BCC-45A8127A2638@redhat.com>
+	<286ea2bbfb5ec77d962300c9996c8688@hostfission.com>
+	<92FEAF6E-3002-4F0F-B845-4EC3D29381A4@redhat.com>
+	<c0c5158aeb4e553ac55639e66d81c007@hostfission.com>
+	<34b4df5da848d69b213f538e5751c0d3@hostfission.com>
+	<CABdb734e-Fmfjk8auh-FzKnhmxjs0Bh9WpXWDmRBjYUWsZfe3A@mail.gmail.com>
+	<0f911b72c94a0d0f1bedf1c6385b045e@hostfission.com>
+	<CABdb735gdt_N=GDTb2G_sPENjpxS98dFxoPQBLqtMmp8EKCRFw@mail.gmail.com>
+	<d5b66cd9f96b0dafedf4369ff02a7121@hostfission.com>
+	<CABdb734KxNJ2uMo2e61sFOXNFRgax067ErkQNQ1U1iO7ROAvCw@mail.gmail.com>
+	<4d790f860a3cf21bd7e33e7c3f53b58b@hostfission.com>
+	<CABdb737FAM-k18=8wKohxrn21otnqiBUFoBNKqdEyu==B-s_kA@mail.gmail.com>
+	<a92ac1c09d6d24656449bc2d65c623ea@hostfission.com>
+	<CABdb736Ja=PTUn_iPaNSG9HAFO-STJ5m8A3cKVt4Ff8T4jcXhQ@mail.gmail.com>
+	<59a147491e11c4c692e9f762bcd9fb21@hostfission.com>
+Message-ID: <cb980fa56e032de56dc48193f6989ed7@hostfission.com>
+Subject: Re: [Qemu-devel] ivshmem Windows Driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,101 +42,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Laszlo Ersek <lersek@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, mst@redhat.com
+To: Ladi Prosek <lprosek@redhat.com>
+Cc: Yan Vugenfirer <yvugenfi@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
 
-On 11/10/2017 9:35, Mark Cave-Ayland wrote:
-> On 01/10/17 22:44, Mark Cave-Ayland wrote:
-> 
->> On 28/09/17 08:56, Laszlo Ersek wrote:
->>
->>> On 09/28/17 09:31, Mark Cave-Ayland wrote:
->>>> On 25/09/17 09:11, Dr. David Alan Gilbert wrote:
->>>>
->>>>> * Marcel Apfelbaum (marcel@redhat.com) wrote:
->>>>>> On 23/09/2017 11:23, Mark Cave-Ayland wrote:
->>>>>>> On 22/09/17 23:18, Laszlo Ersek wrote:
->>>>>>>
->>>>>>>> On 09/22/17 14:18, Mark Cave-Ayland wrote:
->>>>>>>>> Whilst the underlying PCI bridge implementation supports 32-bit PCI IO
->>>>>>>>> accesses, unfortunately they are truncated at the legacy 64K limit.
->>>>>>>>>
->>>>>>>>> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
->>>>>>>>> ---
->>>>>>>>>    hw/pci/pci_bridge.c |    3 ++-
->>>>>>>>>    1 file changed, 2 insertions(+), 1 deletion(-)
->>>>>>>>>
->>>>>>>>> diff --git a/hw/pci/pci_bridge.c b/hw/pci/pci_bridge.c
->>>>>>>>> index 17feae5..a47d257 100644
->>>>>>>>> --- a/hw/pci/pci_bridge.c
->>>>>>>>> +++ b/hw/pci/pci_bridge.c
->>>>>>>>> @@ -379,7 +379,8 @@ void pci_bridge_initfn(PCIDevice *dev, const char *typename)
->>>>>>>>>        sec_bus->address_space_mem = &br->address_space_mem;
->>>>>>>>>        memory_region_init(&br->address_space_mem, OBJECT(br), "pci_bridge_pci", UINT64_MAX);
->>>>>>>>>        sec_bus->address_space_io = &br->address_space_io;
->>>>>>>>> -    memory_region_init(&br->address_space_io, OBJECT(br), "pci_bridge_io", 65536);
->>>>>>>>> +    memory_region_init(&br->address_space_io, OBJECT(br), "pci_bridge_io",
->>>>>>>>> +                       UINT32_MAX);
->>>>>>>>>        br->windows = pci_bridge_region_init(br);
->>>>>>>>>        QLIST_INIT(&sec_bus->child);
->>>>>>>>>        QLIST_INSERT_HEAD(&parent->child, sec_bus, sibling);
->>>>>>>>>
->>>>>>>>
->>>>>>
->>>>>> Hi Mark,
->>>>>>
->>>>>>>> Based on the commit message, I assume this change is guest-visible. If
->>>>>>>> so, should it be made dependent on a compat property, so that it doesn't
->>>>>>>> cause problems with migration?
->>>>>>>
->>>>>>> In order to enable 32-bit IO accesses the PCI bridge needs to set bit 0
->>>>>>> in the IO_LIMIT and IO_BASE registers - this bit is read-only to guests,
->>>>>>> so unless a PCI bridge has this bit set then it's impossible for this
->>>>>>> change to be guest visible.
->>>>>>>
->>>>>>> I did a grep for PCI_IO_RANGE_TYPE_32 and didn't see any existing users
->>>>>>> (other than an upcoming patchset from me!), so this combined with the
->>>>>>> fact that without this patch the feature is broken makes me think that I
->>>>>>> am the first user and so existing guests won't have a problem.
->>>>>>>
->>>>>>
->>>>>> (adding Dave for his expertise)
->>>>>>
->>>>>> Do you know how the migration code will behave if it will have
->>>>>> a 65k address space on source and MAX UINT on destination?
->>>>>> (and the other way around for rolling back)
->>>>>
->>>>> Hmm not sure; we don't migrate regions explicitly; just RAMBlocks
->>>>> and devices that back them.  If the change is visible in the IO
->>>>> addresses allocated to the PCI devices or in the config space then
->>>>> it might fail.
->>>>
->>>> For reference here is the link to the sun4u patch I posted yesterday
->>>> that requires this fix if anyone else would like to test:
->>>> https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg07355.html.
->>>>
->>>> Other than that are there any further objections to this patch?
->>>
->>> None from my side. (I didn't "object" to begin with :) , I was just
->>> curious about any possible migration impact.)
->>
->> Okay great! I guess I mis-read your query as being a NACK for the patch.
-> 
-> Hi Marcel,
-> 
-> Did you manage to get any further with your testing? It appears that
-> freeze is coming soon and my remaining changes for the sun4u machine are
-> currently blocked on this patch :/
-> 
+On 2017-10-19 20:07, geoff@hostfission.com wrote:
+> On 2017-10-19 20:01, Ladi Prosek wrote:
+>> On Thu, Oct 19, 2017 at 10:44 AM,  <geoff@hostfission.com> wrote:
+>>> On 2017-10-19 19:35, Ladi Prosek wrote:
+>>>> 
+>>>> On Wed, Oct 18, 2017 at 5:04 PM,  <geoff@hostfission.com> wrote:
+>>>>> 
+>>>>> Hi Ladi & Yan,
+>>>>> 
+>>>>> I am pleased to present the completed driver for review, please 
+>>>>> see:
+>>>>> 
+>>>>> https://github.com/gnif/kvm-guest-drivers-windows
+>>>> 
+>>>> 
+>>>> Awesome!
+>>>> 
+>>>> Feel free to open pull request, it should be easier to comment on.
+>>> 
+>>> 
+>>> Great, I will do so after I have addressed the below. Thanks again.
+>>> 
 
-Not yet, but I see your patch is already merged.
-I'll let you know if there will be any problems.
+I have created a PR, see:
 
-Thanks,
-Marcel
+https://github.com/virtio-win/kvm-guest-drivers-windows/pull/174
+
+>>>> 
+>>>> * WoW considerations: It would be nice if the driver could detect 
+>>>> that
+>>>> the map request is coming from a 32-bit process and expect a 
+>>>> different
+>>>> layout of struct IVSHMEM_MMAP.
+>>> 
+>>> 
+>>> I did think of this but I am unsure as to how to detect this.
+>> 
+>> I don't think I ever used it but IoIs32bitProcess() looks promising.
+>> 
+
+
+Obviously PVOID will be 32bit which will mess with the struct size and
+offset of vectors but I am not aware of a solution to this. If you have
+any suggestions on how to rectify this it would be very much 
+appreciated.
+
+>>>> 
+>>>> * It would be cleaner to use READ_REGISTER_* and WRITE_REGISTER_*
+>>>> from/to IVSHMEMDeviceRegisters instead of plain memory accesses. Or 
+>>>> at
+>>>> the very least the accesses should be marked volatile.
+>>> 
+>>> 
+>>> I thought that mapping the IO space was enough for this since it is
+>>> mapped as non-cacheable. I can see the point of marking it volatile 
+>>> but
+>>> see no need to use the read/write register semantics. If this is what 
+>>> it
+>>> takes however I am happy to do so.
+>> 
+>> Code like this raises eyebrows:
+>> 
+>>   deviceContext->devRegisters->doorbell |= (UINT32)in->vector |
+>> (in->peerID << 16);
+>> 
+>> Many readers will probably be wondering what exactly the compiler is
+>> allowed to do with this statement. May it end up ORing the lower and
+>> upper word separately, for example?
+>> 
+>>   OR [word ptr addr], in->vector
+>>   OR [word ptr addr + 2], in->peerID
+>> 
+>> And, by the way, is OR really what we want here?
+>> 
+> 
+> After double checking this you are dead right, the register is 
+> documented
+> as write only. I will fix this.
+
+Done.
 
 > 
-> ATB,
-> 
-> Mark.
-> 
+>>>> 
+>>>> * In ivshmem.inf: ManufacturerName="Red Hat, Inc." instead of 
+>>>> "RedHat"
+>>>> 
+>>> 
+>>> No worries.
+>>> 
+>>>> * Is any of the API used by the driver Win10-only? Just curious, 
+>>>> it's
+>>>> fine to build the driver only for Win10 for now even if it isn't.
+>>> 
+>>> 
+>>> I have not tried to build it on anything older then win 10 build 
+>>> 10586
+>>> as I have nothing older, but AFAIK it should build on windows 8.1 or
+>>> later just fine. This is more due to my lack of familiarity with 
+>>> Visual
+>>> Studio, give me gcc and vim any day :).
+>> 
+>> Gotcha, no worries, other versions can be tested later.
