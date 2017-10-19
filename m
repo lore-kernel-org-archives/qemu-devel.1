@@ -1,22 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58953)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33152)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e5Gna-0000ER-Sh
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 15:48:12 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1e5GwB-0003Mj-Vm
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 15:57:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e5GnZ-00034L-Sr
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 15:48:10 -0400
-References: <20171015010131.12172-1-eblake@redhat.com>
-	<20171017125710.11626-1-vsementsov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <556c5686-560d-2caa-7db7-deb2e1d90a90@redhat.com>
-Date: Thu, 19 Oct 2017 14:47:57 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1e5Gw7-0001Cw-Vd
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 15:57:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42044)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1e5Gw7-0001CO-MA
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 15:56:59 -0400
+Date: Thu, 19 Oct 2017 17:56:49 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20171019195649.GJ2942@localhost.localdomain>
+References: <1508170976-96869-1-git-send-email-imammedo@redhat.com>
+	<20171016163636.GI11975@redhat.com>
+	<20171017092702.5b82103b@nial.brq.redhat.com>
+	<20171017150759.GB31897@redhat.com>
+	<20171017180635.6a900616@nial.brq.redhat.com>
+	<20171018153010.GL9719@redhat.com>
+	<592659564.17712286.1508426482283.JavaMail.zimbra@redhat.com>
+	<20171019152859.GV8408@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20171017125710.11626-1-vsementsov@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="fruBrmTfDqqFFjoo4N1F3WEROdaj16asR"
-Subject: Re: [Qemu-devel] [PATCH v4 RFC 9/8] nbd: Minimal structured read
- for client
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171019152859.GV8408@redhat.com>
+Subject: Re: [Qemu-devel] [RFC 0/6] enable numa configuration before
+ machine_init() from HMP/QMP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,113 +34,183 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, peter maydell <peter.maydell@linaro.org>, pkrempa@redhat.com, cohuck@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com, pbonzini@redhat.com, david@gibson.dropbear.id.au, Laine Stump <laine@redhat.com>, libvir-list@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---fruBrmTfDqqFFjoo4N1F3WEROdaj16asR
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
-Message-ID: <556c5686-560d-2caa-7db7-deb2e1d90a90@redhat.com>
-Subject: Re: [PATCH v4 RFC 9/8] nbd: Minimal structured read for client
-References: <20171015010131.12172-1-eblake@redhat.com>
- <20171017125710.11626-1-vsementsov@virtuozzo.com>
-In-Reply-To: <20171017125710.11626-1-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Thu, Oct 19, 2017 at 04:28:59PM +0100, Daniel P. Berrange wrote:
+> On Thu, Oct 19, 2017 at 11:21:22AM -0400, Igor Mammedov wrote:
+> > ----- Original Message -----
+> > > From: "Daniel P. Berrange" <berrange@redhat.com>
+> > > To: "Igor Mammedov" <imammedo@redhat.com>
+> > > Cc: "peter maydell" <peter.maydell@linaro.org>, pkrempa@redhat.com, ehabkost@redhat.com, cohuck@redhat.com,
+> > > qemu-devel@nongnu.org, armbru@redhat.com, pbonzini@redhat.com, david@gibson.dropbear.id.au
+> > > Sent: Wednesday, October 18, 2017 5:30:10 PM
+> > > Subject: Re: [Qemu-devel] [RFC 0/6] enable numa configuration before machine_init() from HMP/QMP
+> > > 
+> > > On Tue, Oct 17, 2017 at 06:06:35PM +0200, Igor Mammedov wrote:
+> > > > On Tue, 17 Oct 2017 16:07:59 +0100
+> > > > "Daniel P. Berrange" <berrange@redhat.com> wrote:
+> > > > 
+> > > > > On Tue, Oct 17, 2017 at 09:27:02AM +0200, Igor Mammedov wrote:
+> > > > > > On Mon, 16 Oct 2017 17:36:36 +0100
+> > > > > > "Daniel P. Berrange" <berrange@redhat.com> wrote:
+> > > > > >   
+> > > > > > > On Mon, Oct 16, 2017 at 06:22:50PM +0200, Igor Mammedov wrote:
+> > > > > > > > Series allows to configure NUMA mapping at runtime using QMP/HMP
+> > > > > > > > interface. For that to happen it introduces a new '-paused' CLI
+> > > > > > > > option
+> > > > > > > > which allows to pause QEMU before machine_init() is run and
+> > > > > > > > adds new set-numa-node HMP/QMP commands which in conjuction with
+> > > > > > > > info hotpluggable-cpus/query-hotpluggable-cpus allow to configure
+> > > > > > > > NUMA mapping for cpus.
+> > > > > > > 
+> > > > > > > What's the problem we're seeking solve here compared to what we
+> > > > > > > currently
+> > > > > > > do for NUMA configuration ?
+> > > > > > From RHBZ1382425
+> > > > > > "
+> > > > > > Current -numa CLI interface is quite limited in terms that allow map
+> > > > > > CPUs to NUMA nodes as it requires to provide cpu_index values which
+> > > > > > are non obvious and depend on machine/arch. As result libvirt has to
+> > > > > > assume/re-implement cpu_index allocation logic to provide valid
+> > > > > > values for -numa cpus=... QEMU CLI option.
+> > > > > 
+> > > > > In broad terms, this problem applies to every device / object libvirt
+> > > > > asks QEMU to create. For everything else libvirt is able to assign a
+> > > > > "id" string, which is can then use to identify the thing later. The
+> > > > > CPU stuff is different because libvirt isn't able to provide 'id'
+> > > > > strings for each CPU - QEMU generates a psuedo-id internally which
+> > > > > libvirt has to infer. The latter is the same problem we had with
+> > > > > devices before '-device' was introduced allowing 'id' naming.
+> > > > > 
+> > > > > IMHO we should take the same approach with CPUs and start modelling
+> > > > > the individual CPUs as something we can explicitly create with -object
+> > > > > or -device. That way libvirt can assign names and does not have to
+> > > > > care about CPU index values, and it all works just the same way as
+> > > > > any other devices / object we create
+> > > > > 
+> > > > > ie instead of:
+> > > > > 
+> > > > >   -smp 8,sockets=4,cores=2,threads=1
+> > > > >   -numa node,nodeid=0,cpus=0-3
+> > > > >   -numa node,nodeid=1,cpus=4-7
+> > > > > 
+> > > > > we could do:
+> > > > > 
+> > > > >   -object numa-node,id=numa0
+> > > > >   -object numa-node,id=numa1
+> > > > >   -object cpu,id=cpu0,node=numa0,socket=0,core=0,thread=0
+> > > > >   -object cpu,id=cpu1,node=numa0,socket=0,core=1,thread=0
+> > > > >   -object cpu,id=cpu2,node=numa0,socket=1,core=0,thread=0
+> > > > >   -object cpu,id=cpu3,node=numa0,socket=1,core=1,thread=0
+> > > > >   -object cpu,id=cpu4,node=numa1,socket=2,core=0,thread=0
+> > > > >   -object cpu,id=cpu5,node=numa1,socket=2,core=1,thread=0
+> > > > >   -object cpu,id=cpu6,node=numa1,socket=3,core=0,thread=0
+> > > > >   -object cpu,id=cpu7,node=numa1,socket=3,core=1,thread=0
+> > > > the follow up question would be where do "socket=3,core=1,thread=0"
+> > > > come from, currently these options are the function of
+> > > > (-M foo -smp ...) and can be queried vi query-hotpluggble-cpus at
+> > > > runtime after qemu parses -M and -smp options.
+> > > 
+> > > NB, I realize my example was open to mis-interpretation. The values I'm
+> > > illustrating here for socket=3,core=1,thread=0 and *not* ID values, they
+> > > are a plain enumeration of values. ie this is saying the 4th socket, the
+> > > 2nd core and the 1st thread.  Internally QEMU might have the 2nd core
+> > > with a core-id of 8, or 7038 or whatever architecture specific numbering
+> > > scheme makes sense, but that's not what the mgmt app gives at the CLI
+> > > level
+> > Even though fixed properties/values simplicity is tempting and it might even
+> > work for what we have implemented in qemu currently (well, SPAPR will need
+> > refactoring (if possible) to meet requirements + compat stuff for current
+> > machines with sparse IDs).
+> > But I have to disagree here and try to oppose it.
+> > 
+> > QEMU models concrete platforms/hw with certain non abstract properties
+> > and it's libvirt's domain to translate platform specific devices into
+> > 'spherical' devices with abstract properties.
+> > 
+> > Now back to cpus and suggestion to fix the set of 'address' properties
+> > and their values into continuous enumeration range [0..N). That would
+> >   1. put a burden of hiding platform/device details on QEMU
+> >       (which is already bad as QEMU's job is to emulate it)
+> >   2. with abstract 'address' properties and values, user won't have
+> >      a clue as to where device is being attached (as qemu would magically
+> >      remap that to fit specific machine needs)
+> >   2.1. if abstract 'address' properties and values we can do away with
+> >      socket/core/thread/whatnot since they won't mean the same when considered
+> >      from platform point of view, so we can just drop all these nonsense
+> >      and go back to cpu-index that has all the properties you've suggested
+> >      /abstract, [0..N]/.
+> >   3. we currently stopped with socket|core|thread-id properties as they are
+> >      applicable to machines that support -device cpu, but it's up to machine
+> >      to pick witch of these to use (x86: uses all, spar: uses core-id only),
+> >      but current property set is open for extension if need arises without
+> >      need to redefine interface. So fixed list of properties [even ignoring
+> >      values impact] doesn't scale.
+> 
+> Note from the libvirt POV, we don't expose socket-id/core-id/thread-id in our
+> guest XML, we just provide an overall count of sockets/cores/threads which is
+> portable. The only arch specific thing we would have todo is express constraints
+> about ratios of these - eg indicate in some way that ppc doesn't allow mutliple
+> threads per core for example.
+> 
+> > We even have cpu-add command which takes cpu-index as argument and
+> > -numa node,cpus=0..X CLI option, good luck with figuring out which cpu goes
+> > where and if it makes any sense from platform point of view.
+> > 
+> > That's why when designing hot plug for 'device_add cpu' interface, we ended up
+> > with new query-hotpluggble-cpus QMP command, which is currently used by libvirt
+> > for hot-plug:
+> > 
+> > Approach allows 
+> >    1: machine to publish properties/values that make sense from emulated
+> >       platform point of view but still understandable by user of given hw.
+> >    2: user may use them as opaque mandatory properties to create cpu device if
+> >       he/she doesn't care about where it's plugged.
+> >    3: if user cares about which cpu goes where, properties defined by machine
+> >       provide that info from emulated hw point of view including platform specific
+> >       details.
+> >    4: it's easy to extend set of properties/values if need arises without
+> >       breaking users (provided user will put them all in -device/device_add
+> >       options as it's supposed to)
+> > 
+> > But current approach has drawback, to call query-hotpluggble-cpus, machine has to
+> > be started first, which is fine for hot plug but not for specifying CLI options.
+> > 
+> > Currently that could be solved by starting qemu twice when 'defining domain',
+> > where on the first run mgmt queries board layout and caches it for all the next
+> > times the defined machine is started (change in machine/version/-smp/-cpu will
+> > invalidate, cache).
+> > 
+> > This series allows to avoid this 1st time restart, when creating domain for
+> > the first time, mgmt can query layout and then specify numa mapping without
+> > restarting, it can cache defined mapping as commands exactly match corresponding
+> > CLI options and reuse cached options on the next domain starts.
+> > 
+> > This approach could be extended further with "device_add cpu" command
+> > so it would be possible to start qemu with -smp 0,... and allow mgmt to
+> > create cpus with explicit IDs controlled by mgmt, and again mgmt may cache
+> > these commands and reuse them on CLI next time machine is started
+> > 
+> > I think Eduardo's work on query-slots is superset of query-hotpluggble-cpus,
+> > but working to the same goal to allow mgmt discover which hw is provided by
+> > specific machine and where/which hw could be plugged (like which slot supports
+> > which kind of device and which 'address' should be used to attach device
+> > (socket|core... - for cpus, bus/function - for pic, ...)
+> 
+> As mentioned elsewhere in the thread, the approach of defining the VM config
+> incrementally via the monitor has significant downsides, by making the config
+> invisible in any logs of the ARGV, and has likely performance impact when
+> starting up QEMU, particularly if it is used for more things going forward. To
+> me these downsides are enough to make the suggested approach for CPUs impractical
+> for libvirt to use.
 
-On 10/17/2017 07:57 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Minimal implementation: for structured error only error_report error
-> message.
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->=20
+Those downsides do exist, but we should weight them against the
+downsides of not allowing any information at all to flow from
+QEMU to libvirt when starting a VM.
 
-> +static int nbd_co_request(BlockDriverState *bs, NBDRequest *request,
-> +                          QEMUIOVector *write_qiov)
->  {
+I believe the code in libvirt/src/qemu/qemu_domain_address.c is
+a good illustration of those downsides.
 
-> -    return nbd_co_receive_reply(client, request->handle,
-> -                                request->type =3D=3D NBD_CMD_READ ? qi=
-ov : NULL);
-> +    ret =3D nbd_co_receive_return_code(client, request->handle, &local=
-_err);
-> +    if (ret < 0) {
-> +        error_report_err(local_err);
-> +    }
-
-I think this new error_report_err() is a regression in behavior.
-Running the old server:
-
-$ qemu-nbd -x foo -f qcow2 --trace=3D'nbd_*' file -r
-
-and an old client:
-
-$ qemu-io -f raw nbd://localhost:10809/foo
-qemu-io> w 0 0
-write failed: Operation not permitted
-qemu-io> q
-
-but with the new client (once I fix the bug about being able to ignore
-the NBD_REP_ERR_UNSUP with non-zero length in the earlier patch):
-
-$ ./qemu-io -f raw nbd://localhost:10809/foo
-qemu-io> w 0 0
-Request failed: Operation not permitted
-write failed: Operation not permitted
-qemu-io>
-
-and worse, new server with new client:
-
-$ ./qemu-io -f raw nbd://localhost:10809/foo
-qemu-io> w 0 0
-: Operation not permitted
-write failed: Operation not permitted
-qemu-io>
-
-we don't even manage to post a sane message.
-
-Reporting fatal errors where we lose connection with the server (or
-forcefully give up on the server because it violated protocol) may be
-okay, but reporting common errors where the server reported a problem
-but we are still connected is too verbose.
-
-I know I asked about errp plumbing on v3, but now I'm thinking that it
-was a premature request; we either plumb in errp handling without any
-new features, or we do the new features in isolation and only later see
-if adding errp plumbing makes sense.  Yes, that means undoing some of
-the changes you made between v3 and v4, so sorry for the churn it has
-caused.
-
-I hope to post a v5 soon with the tweaks I've made after playing with
-this version.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---fruBrmTfDqqFFjoo4N1F3WEROdaj16asR
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnpAW0ACgkQp6FrSiUn
-Q2qBJggAkwffWRrnLzOFIyMZNTlvHHpsXteZUTlCJ4SaZ/l/Qoyr4pcKuB6B+31d
-b5CSZ+WCxPeYDPxvXq3DgFe7AiBQkkuVsWNkhTU/ruMke4IwvEIztkP4m9CLIla0
-99DKhMmV85k99Fl8/ZwqXnG/uwBETGrgApqH+Wmx+CWwr8StSC0S+N2C/Z1Jk/GF
-IASMLFP2vklJEGctDvjcHQpsBzTGxruvxb4YOwBIMZdNVm2CA2sPpaOIhTciPN5K
-/UJZASOopbyrvj1WNgiI+via6SryKcVI+NrLc/HcxtoOrEJeFhYMT/tFMDyV0FPw
-cnNbwBa3JeVi3ITm/5F6GUielTcH2A==
-=1ZNe
------END PGP SIGNATURE-----
-
---fruBrmTfDqqFFjoo4N1F3WEROdaj16asR--
+-- 
+Eduardo
