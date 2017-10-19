@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58110)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58647)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e56tA-0001s1-MS
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 05:13:21 -0400
+	(envelope-from <berrange@redhat.com>) id 1e56v7-0003GT-BG
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 05:15:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e56t7-0001gr-E6
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 05:13:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37702)
+	(envelope-from <berrange@redhat.com>) id 1e56v6-0003JP-1e
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 05:15:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:61816)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1e56t7-0001fM-7Y
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 05:13:13 -0400
-Date: Thu, 19 Oct 2017 10:13:08 +0100
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1e56v5-0003Hh-Ql
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 05:15:15 -0400
+Date: Thu, 19 Oct 2017 10:15:07 +0100
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20171019091308.GE8408@redhat.com>
+Message-ID: <20171019091507.GF8408@redhat.com>
 Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20171016131644.9565-1-kraxel@redhat.com>
-	<19f64376-dcae-7185-110f-9970299666b2@redhat.com>
-	<1508397252.10073.10.camel@redhat.com>
+References: <1508352023-28591-1-git-send-email-alindsay@codeaurora.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1508397252.10073.10.camel@redhat.com>
-Subject: Re: [Qemu-devel] [PULL 00/11] Ui 20171016 patches
+In-Reply-To: <1508352023-28591-1-git-send-email-alindsay@codeaurora.org>
+Subject: Re: [Qemu-devel] [PATCH] build: Fix dtc-checkout race condition in
+ Makefile
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,29 +28,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
+To: Aaron Lindsay <alindsay@codeaurora.org>
+Cc: qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Fam Zheng <famz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Thu, Oct 19, 2017 at 09:14:12AM +0200, Gerd Hoffmann wrote:
->   Hi,
+On Wed, Oct 18, 2017 at 02:40:23PM -0400, Aaron Lindsay wrote:
+> This was introduced by:
+>     commit aef45d51d1204f3335fb99de6658e0c5612c2b67
+>     Author: Daniel P. Berrange <berrange@redhat.com>
+>     Date:   Fri Sep 29 11:11:56 2017 +0100
 > 
-> > I just noticed that I now get the following warning message when I
-> > change to an older git branch:
-> > 
-> > warning: unable to rmdir ui/keycodemapdb: Directory not empty
-> > 
-> > ... this is kind of ugly, is there a way to fix this?
+> 	build: automatically handle GIT submodule checkout for dtc
 > 
-> Hmm, no good idea, other than just rebasing the branch to latest
-> master.  It's one of the issues with submodules.
+> On my system, I see the following with a fresh clone:
 > 
-> Related issue shows up if you go back to an older branch after a
-> firmware update.  git shows the firmware submodule as modified then and
-> you have to take care that you don't revert the change by accident. 
-> Which can easily happen with "git commit -a" ...
+> % ./configure --disable-gtk --target-list=aarch64-softmmu
+> % make -j8
+>   GEN     aarch64-softmmu/config-devices.mak.tmp
+>   GEN     config-host.h
+> mkdir -p dtc/libfdt
+>   GIT     ui/keycodemapdb dtc
+> mkdir -p dtc/tests
+>   GEN     qemu-options.def
+> [snip]
+>   GEN     migration/trace.h
+> make: *** [git-submodule-update] Error 1
+> make: *** Waiting for unfinished jobs....
+> 
+> Upon closer inspection, the root cause of the error is:
+> 
+> % git submodule update --init ui/keycodemapdb dtc
+> fatal: destination path 'dtc' already exists and is not an empty directory.
+> Clone of 'git://git.qemu-project.org/dtc.git' into submodule path 'dtc' failed
+> 
+> This patch fixes this race condition by forcing the 'dtc/%' rule which caused
+> 'dtc' to be non-empty to wait on '.git-submodule-status'.
 
-If you do a 'make' before committing though the configure code will take
-care to re-sync submodules, helping to avoid this problem going forward.
+Yes this makes sense
+
+> 
+> Signed-off-by: Aaron Lindsay <alindsay@codeaurora.org>
+> ---
+>  Makefile | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/Makefile b/Makefile
+> index 90f91e5..ffa82e8 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -380,7 +380,7 @@ DTC_CPPFLAGS=-I$(BUILD_DIR)/dtc -I$(SRC_PATH)/dtc -I$(SRC_PATH)/dtc/libfdt
+>  subdir-dtc: .git-submodule-status dtc/libfdt dtc/tests
+>  	$(call quiet-command,$(MAKE) $(DTC_MAKE_ARGS) CPPFLAGS="$(DTC_CPPFLAGS)" CFLAGS="$(DTC_CFLAGS)" LDFLAGS="$(LDFLAGS)" ARFLAGS="$(ARFLAGS)" CC="$(CC)" AR="$(AR)" LD="$(LD)" $(SUBDIR_MAKEFLAGS) libfdt/libfdt.a,)
+>  
+> -dtc/%:
+> +dtc/%: .git-submodule-status
+>  	mkdir -p $@
+>  
+>  $(SUBDIR_RULES): libqemuutil.a $(common-obj-y) $(chardev-obj-y) \
+
+Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
+
 
 Regards,
 Daniel
