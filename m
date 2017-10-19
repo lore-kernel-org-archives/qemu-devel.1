@@ -1,32 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51697)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51857)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1e59r2-0004dg-Sy
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 08:23:17 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1e59s8-0005Cm-Cx
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 08:24:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1e59qz-00080a-Ou
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 08:23:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58416)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1e59qz-00080B-GT
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 08:23:13 -0400
-References: <1508170976-96869-1-git-send-email-imammedo@redhat.com>
-	<20171016163636.GI11975@redhat.com>
-	<20171017092702.5b82103b@nial.brq.redhat.com>
-	<20171017150759.GB31897@redhat.com>
-	<20171017180635.6a900616@nial.brq.redhat.com>
-	<20171018153010.GL9719@redhat.com>
-	<20171018202240.GD2942@localhost.localdomain>
-	<20171019114954.GC13245@umbus>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <58846850-bbe2-e1c4-2235-58b3f6709ba6@redhat.com>
-Date: Thu, 19 Oct 2017 14:23:04 +0200
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1e59s7-0000Hc-Hm
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 08:24:24 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <150841324224.31292.4012464539983692364.stgit@bahia.lan>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <75a0ecaa-f45b-b4a8-131d-97b52fca2ccd@amsat.org>
+Date: Thu, 19 Oct 2017 09:24:15 -0300
 MIME-Version: 1.0
-In-Reply-To: <20171019114954.GC13245@umbus>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="JnvLvQI6kSR4pmgvBoCUX44Niv2JJ33mj"
-Subject: Re: [Qemu-devel] [RFC 0/6] enable numa configuration before
- machine_init() from HMP/QMP
+In-Reply-To: <150841324224.31292.4012464539983692364.stgit@bahia.lan>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] docker: fix out-of-tree
+ 'make docker-test-build@debian-powerpc-cross'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,70 +28,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>, Eduardo Habkost <ehabkost@redhat.com>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, Igor Mammedov <imammedo@redhat.com>, peter.maydell@linaro.org, pkrempa@redhat.com, cohuck@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com
+To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, Fam Zheng <famz@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---JnvLvQI6kSR4pmgvBoCUX44Niv2JJ33mj
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: David Gibson <david@gibson.dropbear.id.au>,
- Eduardo Habkost <ehabkost@redhat.com>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>,
- Igor Mammedov <imammedo@redhat.com>, peter.maydell@linaro.org,
- pkrempa@redhat.com, cohuck@redhat.com, qemu-devel@nongnu.org,
- armbru@redhat.com
-Message-ID: <58846850-bbe2-e1c4-2235-58b3f6709ba6@redhat.com>
-Subject: Re: [Qemu-devel] [RFC 0/6] enable numa configuration before
- machine_init() from HMP/QMP
-References: <1508170976-96869-1-git-send-email-imammedo@redhat.com>
- <20171016163636.GI11975@redhat.com>
- <20171017092702.5b82103b@nial.brq.redhat.com>
- <20171017150759.GB31897@redhat.com>
- <20171017180635.6a900616@nial.brq.redhat.com>
- <20171018153010.GL9719@redhat.com>
- <20171018202240.GD2942@localhost.localdomain> <20171019114954.GC13245@umbus>
-In-Reply-To: <20171019114954.GC13245@umbus>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
+On 10/19/2017 08:40 AM, Greg Kurz wrote:
+> Without this patch, it fails with:
+> 
+> IOError: [Errno 2] No such file or directory:
+>  'tests/docker/dockerfiles/debian-apt-fake.sh'
 
-On 19/10/2017 13:49, David Gibson wrote:
-> Note that describing socket/core/thread tuples as arch independent (or
-> even machine independent) is.. debatable.  I mean it's flexible enough
-> that most platforms can be fit to that scheme without too much
-> straining.  But, there's no arch independent way of defining what each
-> level means in terms of its properties.
->=20
-> So, for example, on spapr - being paravirt - there's no real
-> distinction between cores and sockets, how you divide them up is
-> completely arbitrary.
+Yes, my bad :)
 
-Same on x86, actually.
+I have the same fix in my CI-WIP branch which sadly lacks of love.
 
-It's _common_ that cores on the same socket share L3 cache and that a
-socket spans an integer number of NUMA nodes, but it doesn't have to be
-that way.
+> 
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 
-QEMU currently enforces the former (if it tells the guest at all that
-there is an L3 cache), but not the latter.
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Paolo
-
-
---JnvLvQI6kSR4pmgvBoCUX44Niv2JJ33mj
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEE8TM4V0tmI4mGbHaCv/vSX3jHroMFAlnomSgACgkQv/vSX3jH
-roMJDQgAhssWd+Qc28l+1oQDnRleJrOOIVAipnq1V0aJukeljuJpmpvktVgAT7GS
-1R+lwsDgWK5qf7RS/9x3HY72DV9bJs+vG7dbucUwSAf64lMAr70bqRgArFTEthFN
-v1Jh20ThoHqVCuxtV9usELFno4pnzKzInycCGTYLKAtx+A36wOroyzaMdNx9+tsR
-WEjj4hQt30rMmIcZJFTDhhnZV2RVi83KH9RPdY9dlD2dSEER1Dl5Qmmx4O3LN5e8
-5SJntIbxFeJSjn7WMwwYnDZAsiCgZzo9y+4143pNk4anrl/0H9PDLohgJu4ppaAN
-hfakHq8tGi49We9yAj5gwvbmPDqw8Q==
-=Wtee
------END PGP SIGNATURE-----
-
---JnvLvQI6kSR4pmgvBoCUX44Niv2JJ33mj--
+> ---
+>  tests/docker/Makefile.include |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
+> index 6f9ea196a7b8..5d54eca5d0b3 100644
+> --- a/tests/docker/Makefile.include
+> +++ b/tests/docker/Makefile.include
+> @@ -44,7 +44,7 @@ docker-image-%: $(DOCKER_FILES_DIR)/%.docker
+>  		$(if $(EXECUTABLE),--include-executable=$(EXECUTABLE)),\
+>  		"BUILD","$*")
+>  
+> -docker-image-debian-powerpc-cross: EXTRA_FILES:=tests/docker/dockerfiles/debian-apt-fake.sh
+> +docker-image-debian-powerpc-cross: EXTRA_FILES:=$(SRC_PATH)/tests/docker/dockerfiles/debian-apt-fake.sh
+>  
+>  # Enforce dependancies for composite images
+>  docker-image-debian: docker-image-debian9
