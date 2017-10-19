@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42497)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45377)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1e50Mo-0006YP-TN
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 22:15:27 -0400
+	(envelope-from <programmingkidx@gmail.com>) id 1e50kd-0000rx-Bx
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 22:40:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1e50Ml-0002hd-LS
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 22:15:26 -0400
-Received: from ozlabs.ru ([107.173.13.209]:35006)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1e50Ml-0002bS-8P
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 22:15:23 -0400
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Date: Thu, 19 Oct 2017 13:15:05 +1100
-Message-Id: <20171019021505.30576-1-aik@ozlabs.ru>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+	(envelope-from <programmingkidx@gmail.com>) id 1e50ka-0007yU-6q
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 22:40:03 -0400
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+From: Programmingkid <programmingkidx@gmail.com>
+In-Reply-To: <20171019013126.GR2776@umbus.fritz.box>
+Date: Wed, 18 Oct 2017 22:39:57 -0400
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH qemu v3] pci: Initialize pci_dev->name before
- use
+Message-Id: <73CB718C-E1F1-4028-9E64-55759471792A@gmail.com>
+References: <20171018223116.6035-1-programmingkidx@gmail.com>
+	<20171019013126.GR2776@umbus.fritz.box>
+Subject: Re: [Qemu-devel] [PATCH] fdt_ro.c: implement strnlen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,51 +23,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, "Michael S. Tsirkin" <mst@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
-This moves pci_dev->name initialization earlier so
-pci_dev->bus_master_as could get a name instead of an empty string.
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Reviewed-by: Peter Xu <peterx@redhat.com>
-Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
----
+> On Oct 18, 2017, at 9:31 PM, David Gibson =
+<david@gibson.dropbear.id.au> wrote:
+>=20
+> On Wed, Oct 18, 2017 at 06:31:16PM -0400, John Arbuckle wrote:
+>> Implement the strnlen() function if it isn't implemented.
+>>=20
+>> Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
+>=20
+> Nice idea, but this won't work.
+>=20
+>> ---
+>> libfdt/fdt_ro.c | 24 ++++++++++++++++++++++++
+>> 1 file changed, 24 insertions(+)
+>>=20
+>> diff --git a/libfdt/fdt_ro.c b/libfdt/fdt_ro.c
+>> index 3d00d2e..a7986fb 100644
+>> --- a/libfdt/fdt_ro.c
+>> +++ b/libfdt/fdt_ro.c
+>> @@ -55,6 +55,30 @@
+>>=20
+>> #include "libfdt_internal.h"
+>>=20
+>> +/* if the current environment does not define strnlen */
+>> +#ifndef strnlen
+>=20
+> This will only trigger if strnlen is defined as a macro.  The C
+> library (or other environment) *might* do that, but there's no
+> guarantee, whether or not it defines strnlen as a function.  With
+> extra complications if the compiler has a strnlen builtin like gcc.
 
-Changes:
-v3:
-* more "reviewed-by"
-* fixed spelling in commit log
+:(
 
-v2:
-* fixed mistype in the commit log
-* added "rb"
----
- hw/pci/pci.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+>> +
+>> +/* This eliminates the missing prototype warning */
+>> +int strnlen(const char *string, int max_count);
+>> +
+>> +/*
+>> + * strnlen: return the length of a string or max_count
+>> + * which ever is shortest
+>> + */
+>> +
+>> +int strnlen(const char *string, int max_count)
+>=20
+> Also strnlen is supposed to take and return size_t, not int.
 
-diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-index 5ed3c8dca4..b2d139bd9a 100644
---- a/hw/pci/pci.c
-+++ b/hw/pci/pci.c
-@@ -1030,6 +1030,7 @@ static PCIDevice *do_pci_register_device(PCIDevice =
-*pci_dev, PCIBus *bus,
-=20
-     pci_dev->devfn =3D devfn;
-     pci_dev->requester_id_cache =3D pci_req_id_cache_get(pci_dev);
-+    pstrcpy(pci_dev->name, sizeof(pci_dev->name), name);
-=20
-     memory_region_init(&pci_dev->bus_master_container_region, OBJECT(pci=
-_dev),
-                        "bus master container", UINT64_MAX);
-@@ -1039,7 +1040,6 @@ static PCIDevice *do_pci_register_device(PCIDevice =
-*pci_dev, PCIBus *bus,
-     if (qdev_hotplug) {
-         pci_init_bus_master(pci_dev);
-     }
--    pstrcpy(pci_dev->name, sizeof(pci_dev->name), name);
-     pci_dev->irq_state =3D 0;
-     pci_config_alloc(pci_dev);
-=20
---=20
-2.11.0
+Will change this.
+
+>=20
+>> +{
+>> +    int count;
+>> +    for(count =3D 0; count < max_count; count++) {
+>> +        if (string[count] =3D=3D '\0') {
+>> +            break;
+>> +        }
+>> +    }
+>> +    return count;
+>> +}
+>> +
+>> +#endif /* strnlen */
+>> +
+>> static int _fdt_nodename_eq(const void *fdt, int offset,
+>> 			    const char *s, int len)
+>> {
+>=20
+> In any case, this sort of compatibility munging is the job of
+> libfdt_env.h.  It's purpose is to provide all the external things that
+> libfdt needs - there's not that many of them and strnlen() is one.
+> The included libfdt_env.h is intended for POSIXy userspace
+> environments, which should already include strnlen() in string.h.
+
+QEMU supports Mac OS 10.5 and higher. The strnlen() function might have =
+been added to Mac OS X in version 10.7. libfdt prevents QEMU from =
+compiling on Mac OS X because of the missing strnlen() function. This =
+issue needs to be resolved. If libfdt_env.h is where you want a fix =
+located, would something like this be good:
+
+#ifdef __APPLE__
+
+#if (MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_7)
+	size_t strnlen(const char *string, int max_count)
+	{
+		... // pretend this is implemented
+	}
+#endif=20
+
+#endif
