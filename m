@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35988)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36135)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e5JHA-00059y-3h
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 18:26:53 -0400
+	(envelope-from <eblake@redhat.com>) id 1e5JHH-0005FY-Jw
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 18:27:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e5JH8-00044k-9T
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 18:26:52 -0400
+	(envelope-from <eblake@redhat.com>) id 1e5JHG-0004Kd-6Q
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 18:26:59 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Thu, 19 Oct 2017 17:26:28 -0500
-Message-Id: <20171019222637.17890-3-eblake@redhat.com>
+Date: Thu, 19 Oct 2017 17:26:34 -0500
+Message-Id: <20171019222637.17890-9-eblake@redhat.com>
 In-Reply-To: <20171019222637.17890-1-eblake@redhat.com>
 References: <20171019222637.17890-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 02/11] nbd: Move nbd_errno_to_system_errno()
- to public header
+Subject: [Qemu-devel] [PATCH v5 08/11] nbd/client: refactor
+ nbd_receive_starttls
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,187 +21,126 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: vsementsov@virtuozzo.com, pbonzini@redhat.com, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: vsementsov@virtuozzo.com, pbonzini@redhat.com, qemu-block@nongnu.org
 
-This is needed in preparation for structured reply handling,
-as we will be performing the translation from NBD error to
-system errno value higher in the stack at block/nbd-client.c.
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
+Split out nbd_request_simple_option to be reused for structured reply
+option.
+
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Signed-off-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+
 ---
- include/block/nbd.h | 13 +++++++++++++
- nbd/nbd-internal.h  | 12 ------------
- nbd/client.c        | 32 --------------------------------
- nbd/common.c        | 34 ++++++++++++++++++++++++++++++++++
- nbd/trace-events    |  4 +++-
- 5 files changed, 50 insertions(+), 45 deletions(-)
+v5: only check length for ACK responses
+v4: reduce redundant traces, typo fix in commit message
+---
+ nbd/client.c     | 70 ++++++++++++++++++++++++++++++++++++++------------------
+ nbd/trace-events |  4 +---
+ 2 files changed, 49 insertions(+), 25 deletions(-)
 
-diff --git a/include/block/nbd.h b/include/block/nbd.h
-index a6df5ce8b5..dc62b5cd19 100644
---- a/include/block/nbd.h
-+++ b/include/block/nbd.h
-@@ -149,6 +149,18 @@ enum {
-  * aren't overflowing some other buffer. */
- #define NBD_MAX_NAME_SIZE 256
-
-+/* NBD errors are based on errno numbers, so there is a 1:1 mapping,
-+ * but only a limited set of errno values is specified in the protocol.
-+ * Everything else is squashed to EINVAL.
-+ */
-+#define NBD_SUCCESS    0
-+#define NBD_EPERM      1
-+#define NBD_EIO        5
-+#define NBD_ENOMEM     12
-+#define NBD_EINVAL     22
-+#define NBD_ENOSPC     28
-+#define NBD_ESHUTDOWN  108
-+
- /* Details collected by NBD_OPT_EXPORT_NAME and NBD_OPT_GO */
- struct NBDExportInfo {
-     /* Set by client before nbd_receive_negotiate() */
-@@ -172,6 +184,7 @@ int nbd_send_request(QIOChannel *ioc, NBDRequest *request);
- int nbd_receive_reply(QIOChannel *ioc, NBDReply *reply, Error **errp);
- int nbd_client(int fd);
- int nbd_disconnect(int fd);
-+int nbd_errno_to_system_errno(int err);
-
- typedef struct NBDExport NBDExport;
- typedef struct NBDClient NBDClient;
-diff --git a/nbd/nbd-internal.h b/nbd/nbd-internal.h
-index 4bfe5be884..df6c8b2f24 100644
---- a/nbd/nbd-internal.h
-+++ b/nbd/nbd-internal.h
-@@ -64,18 +64,6 @@
- #define NBD_SET_TIMEOUT             _IO(0xab, 9)
- #define NBD_SET_FLAGS               _IO(0xab, 10)
-
--/* NBD errors are based on errno numbers, so there is a 1:1 mapping,
-- * but only a limited set of errno values is specified in the protocol.
-- * Everything else is squashed to EINVAL.
-- */
--#define NBD_SUCCESS    0
--#define NBD_EPERM      1
--#define NBD_EIO        5
--#define NBD_ENOMEM     12
--#define NBD_EINVAL     22
--#define NBD_ENOSPC     28
--#define NBD_ESHUTDOWN  108
--
- /* nbd_read_eof
-  * Tries to read @size bytes from @ioc.
-  * Returns 1 on success
 diff --git a/nbd/client.c b/nbd/client.c
-index 59d7c9d49f..50f36b511e 100644
+index 50f36b511e..78a0e9cdc3 100644
 --- a/nbd/client.c
 +++ b/nbd/client.c
-@@ -22,38 +22,6 @@
- #include "trace.h"
- #include "nbd-internal.h"
-
--static int nbd_errno_to_system_errno(int err)
--{
--    int ret;
--    switch (err) {
--    case NBD_SUCCESS:
--        ret = 0;
--        break;
--    case NBD_EPERM:
--        ret = EPERM;
--        break;
--    case NBD_EIO:
--        ret = EIO;
--        break;
--    case NBD_ENOMEM:
--        ret = ENOMEM;
--        break;
--    case NBD_ENOSPC:
--        ret = ENOSPC;
--        break;
--    case NBD_ESHUTDOWN:
--        ret = ESHUTDOWN;
--        break;
--    default:
--        trace_nbd_unknown_error(err);
--        /* fallthrough */
--    case NBD_EINVAL:
--        ret = EINVAL;
--        break;
--    }
--    return ret;
--}
--
- /* Definitions for opaque data types */
-
- static QTAILQ_HEAD(, NBDExport) exports = QTAILQ_HEAD_INITIALIZER(exports);
-diff --git a/nbd/common.c b/nbd/common.c
-index 7456021f7e..593904f148 100644
---- a/nbd/common.c
-+++ b/nbd/common.c
-@@ -18,6 +18,7 @@
-
- #include "qemu/osdep.h"
- #include "qapi/error.h"
-+#include "trace.h"
- #include "nbd-internal.h"
-
- /* Discard length bytes from channel.  Return -errno on failure and 0 on
-@@ -171,3 +172,36 @@ const char *nbd_err_lookup(int err)
-         return "<unknown>";
+@@ -508,35 +508,61 @@ static int nbd_receive_query_exports(QIOChannel *ioc,
      }
  }
-+
-+
-+int nbd_errno_to_system_errno(int err)
+
++/* nbd_request_simple_option: Send an option request, and parse the reply
++ * return 1 for successful negotiation,
++ *        0 if operation is unsupported,
++ *        -1 with errp set for any other error
++ */
++static int nbd_request_simple_option(QIOChannel *ioc, int opt, Error **errp)
 +{
-+    int ret;
-+    switch (err) {
-+    case NBD_SUCCESS:
-+        ret = 0;
-+        break;
-+    case NBD_EPERM:
-+        ret = EPERM;
-+        break;
-+    case NBD_EIO:
-+        ret = EIO;
-+        break;
-+    case NBD_ENOMEM:
-+        ret = ENOMEM;
-+        break;
-+    case NBD_ENOSPC:
-+        ret = ENOSPC;
-+        break;
-+    case NBD_ESHUTDOWN:
-+        ret = ESHUTDOWN;
-+        break;
-+    default:
-+        trace_nbd_unknown_error(err);
-+        /* fallthrough */
-+    case NBD_EINVAL:
-+        ret = EINVAL;
-+        break;
++    nbd_opt_reply reply;
++    int error;
++
++    if (nbd_send_option_request(ioc, opt, 0, NULL, errp) < 0) {
++        return -1;
 +    }
-+    return ret;
++
++    if (nbd_receive_option_reply(ioc, opt, &reply, errp) < 0) {
++        return -1;
++    }
++    error = nbd_handle_reply_err(ioc, &reply, errp);
++    if (error <= 0) {
++        return error;
++    }
++
++    if (reply.type != NBD_REP_ACK) {
++        error_setg(errp, "Server rejected request for option %d (%s) "
++                   "with reply %" PRIx32 " (%s)", opt, nbd_opt_lookup(opt),
++                   reply.type, nbd_rep_lookup(reply.type));
++        nbd_send_opt_abort(ioc);
++        return -1;
++    }
++
++    if (reply.length != 0) {
++        error_setg(errp, "Option %d ('%s') response length is %" PRIu32
++                   " (it should be zero)", opt, nbd_opt_lookup(opt),
++                   reply.length);
++        nbd_send_opt_abort(ioc);
++        return -1;
++    }
++
++    return 1;
 +}
++
+ static QIOChannel *nbd_receive_starttls(QIOChannel *ioc,
+                                         QCryptoTLSCreds *tlscreds,
+                                         const char *hostname, Error **errp)
+ {
+-    nbd_opt_reply reply;
++    int ret;
+     QIOChannelTLS *tioc;
+     struct NBDTLSHandshakeData data = { 0 };
+
+-    trace_nbd_receive_starttls_request();
+-    if (nbd_send_option_request(ioc, NBD_OPT_STARTTLS, 0, NULL, errp) < 0) {
+-        return NULL;
+-    }
+-
+-    trace_nbd_receive_starttls_reply();
+-    if (nbd_receive_option_reply(ioc, NBD_OPT_STARTTLS, &reply, errp) < 0) {
+-        return NULL;
+-    }
+-
+-    if (reply.type != NBD_REP_ACK) {
+-        error_setg(errp, "Server rejected request to start TLS %" PRIx32,
+-                   reply.type);
+-        nbd_send_opt_abort(ioc);
+-        return NULL;
+-    }
+-
+-    if (reply.length != 0) {
+-        error_setg(errp, "Start TLS response was not zero %" PRIu32,
+-                   reply.length);
+-        nbd_send_opt_abort(ioc);
++    ret = nbd_request_simple_option(ioc, NBD_OPT_STARTTLS, errp);
++    if (ret <= 0) {
++        if (ret == 0) {
++            error_setg(errp, "Server don't support STARTTLS option");
++            nbd_send_opt_abort(ioc);
++        }
+         return NULL;
+     }
+
 diff --git a/nbd/trace-events b/nbd/trace-events
-index 920c8a0e5e..ab3d7dad4f 100644
+index 52150bd738..596df96575 100644
 --- a/nbd/trace-events
 +++ b/nbd/trace-events
-@@ -1,5 +1,4 @@
- # nbd/client.c
--nbd_unknown_error(int err) "Squashing unexpected error %d to EINVAL"
- nbd_send_option_request(uint32_t opt, const char *name, uint32_t len) "Sending option request %" PRIu32" (%s), len %" PRIu32
- nbd_receive_option_reply(uint32_t option, const char *optname, uint32_t type, const char *typename, uint32_t length) "Received option reply 0x%" PRIx32" (%s), type 0x%" PRIx32" (%s), len %" PRIu32
- nbd_reply_err_unsup(uint32_t option, const char *name) "server doesn't understand request 0x%" PRIx32 " (%s), attempting fallback"
-@@ -31,6 +30,9 @@ nbd_client_clear_socket(void) "Clearing NBD socket"
- nbd_send_request(uint64_t from, uint32_t len, uint64_t handle, uint16_t flags, uint16_t type, const char *name) "Sending request to server: { .from = %" PRIu64", .len = %" PRIu32 ", .handle = %" PRIu64 ", .flags = 0x%" PRIx16 ", .type = %" PRIu16 " (%s) }"
- nbd_receive_reply(uint32_t magic, int32_t error, const char *errname, uint64_t handle) "Got reply: { magic = 0x%" PRIx32 ", .error = %" PRId32 " (%s), handle = %" PRIu64" }"
-
-+# nbd/common.c
-+nbd_unknown_error(int err) "Squashing unexpected error %d to EINVAL"
-+
- # nbd/server.c
- nbd_negotiate_send_rep_len(uint32_t opt, const char *optname, uint32_t type, const char *typename, uint32_t len) "Reply opt=0x%" PRIx32 " (%s), type=0x%" PRIx32 " (%s), len=%" PRIu32
- nbd_negotiate_send_rep_err(const char *msg) "sending error message \"%s\""
+@@ -8,9 +8,7 @@ nbd_opt_go_info_unknown(int info, const char *name) "Ignoring unknown info %d (%
+ nbd_opt_go_info_block_size(uint32_t minimum, uint32_t preferred, uint32_t maximum) "Block sizes are 0x%" PRIx32 ", 0x%" PRIx32 ", 0x%" PRIx32
+ nbd_receive_query_exports_start(const char *wantname) "Querying export list for '%s'"
+ nbd_receive_query_exports_success(const char *wantname) "Found desired export name '%s'"
+-nbd_receive_starttls_request(void) "Requesting TLS from server"
+-nbd_receive_starttls_reply(void) "Getting TLS reply from server"
+-nbd_receive_starttls_new_client(void) "TLS request approved, setting up TLS"
++nbd_receive_starttls_new_client(void) "Setting up TLS"
+ nbd_receive_starttls_tls_handshake(void) "Starting TLS handshake"
+ nbd_receive_negotiate(void *tlscreds, const char *hostname) "Receiving negotiation tlscreds=%p hostname=%s"
+ nbd_receive_negotiate_magic(uint64_t magic) "Magic is 0x%" PRIx64
 -- 
 2.13.6
