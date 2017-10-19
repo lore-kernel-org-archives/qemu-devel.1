@@ -1,20 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45377)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51838)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1e50kd-0000rx-Bx
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 22:40:04 -0400
+	(envelope-from <peterx@redhat.com>) id 1e51M4-0005jv-Rv
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 23:18:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1e50ka-0007yU-6q
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 22:40:03 -0400
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-From: Programmingkid <programmingkidx@gmail.com>
-In-Reply-To: <20171019013126.GR2776@umbus.fritz.box>
-Date: Wed, 18 Oct 2017 22:39:57 -0400
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <73CB718C-E1F1-4028-9E64-55759471792A@gmail.com>
-References: <20171018223116.6035-1-programmingkidx@gmail.com>
-	<20171019013126.GR2776@umbus.fritz.box>
-Subject: Re: [Qemu-devel] [PATCH] fdt_ro.c: implement strnlen
+	(envelope-from <peterx@redhat.com>) id 1e51Lz-00075c-Pk
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 23:18:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43092)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1e51Lz-000757-Gu
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 23:18:39 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 92C0B83F40
+	for <qemu-devel@nongnu.org>; Thu, 19 Oct 2017 03:18:37 +0000 (UTC)
+Date: Thu, 19 Oct 2017 11:18:33 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20171019031833.GP4166@pxdev.xzpeter.org>
+References: <20171004103933.7898-1-quintela@redhat.com>
+	<20171004103933.7898-2-quintela@redhat.com>
+	<20171018042601.GN4166@pxdev.xzpeter.org>
+	<87o9p4n0vb.fsf@secure.laptop> <20171018121038.GE9719@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20171018121038.GE9719@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/6] tests: Add basic migration precopy test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,93 +35,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Juan Quintela <quintela@redhat.com>, lvivier@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com
 
+On Wed, Oct 18, 2017 at 01:10:38PM +0100, Daniel P. Berrange wrote:
+> On Wed, Oct 18, 2017 at 01:36:56PM +0200, Juan Quintela wrote:
+> > Peter Xu <peterx@redhat.com> wrote:
+> > > On Wed, Oct 04, 2017 at 12:39:28PM +0200, Juan Quintela wrote:
+> > >
+> > > [...]
+> > >
+> > >> +/* A simple PC boot sector that modifies memory (1-100MB) quickly
+> > >> + * outputing a 'B' every so often if it's still running.
+> > >> + */
+> > >> +unsigned char bootsect[] = {
+> > >> +  0xfa, 0x0f, 0x01, 0x16, 0x74, 0x7c, 0x66, 0xb8, 0x01, 0x00, 0x00, 0x00,
+> > >> +  0x0f, 0x22, 0xc0, 0x66, 0xea, 0x20, 0x7c, 0x00, 0x00, 0x08, 0x00, 0x00,
+> > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xe4, 0x92, 0x0c, 0x02,
+> > >> +  0xe6, 0x92, 0xb8, 0x10, 0x00, 0x00, 0x00, 0x8e, 0xd8, 0x66, 0xb8, 0x41,
+> > >> +  0x00, 0x66, 0xba, 0xf8, 0x03, 0xee, 0xb3, 0x00, 0xb8, 0x00, 0x00, 0x10,
+> > >> +  0x00, 0xfe, 0x00, 0x05, 0x00, 0x10, 0x00, 0x00, 0x3d, 0x00, 0x00, 0x40,
+> > >> +  0x06, 0x7c, 0xf2, 0xfe, 0xc3, 0x75, 0xe9, 0x66, 0xb8, 0x42, 0x00, 0x66,
+> > >> +  0xba, 0xf8, 0x03, 0xee, 0xeb, 0xde, 0x66, 0x90, 0x00, 0x00, 0x00, 0x00,
+> > >> +  0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0x00, 0x00, 0x00, 0x9a, 0xcf, 0x00,
+> > >> +  0xff, 0xff, 0x00, 0x00, 0x00, 0x92, 0xcf, 0x00, 0x27, 0x00, 0x5c, 0x7c,
+> > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x55, 0xaa
+> > >> +};
+> > >
+> > > Not sure whether it would be nicer to put this section as binary into
+> > > QEMU's tree as shared, then other test code can use it too directly,
+> > > and it would be easier if someone wants to boot a VM running this
+> > > bootstrap code.  Thanks,
+> > 
+> > I am sharing this code now on a single place.  About getting this
+> > outside ... I will wait for someone that understand how this works, I
+> > have no clue neither how it works nor how to share/use/setup/....
+> 
+> FWIW, we already have a reusuable program that can be used to generate
+> load stress for testing live migration see tests/migration/stress.c
+> This gets compiled into a static binary, put into an initrd, and then
+> run by booting the host OS kernel. So the caveat is that this approach
+> only lets you test a QEMU emulator whose target arch matches the host.
+> That isn't much different from this boot sector though which only lets
+> you test the x86 system emulator.
 
-> On Oct 18, 2017, at 9:31 PM, David Gibson =
-<david@gibson.dropbear.id.au> wrote:
->=20
-> On Wed, Oct 18, 2017 at 06:31:16PM -0400, John Arbuckle wrote:
->> Implement the strnlen() function if it isn't implemented.
->>=20
->> Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
->=20
-> Nice idea, but this won't work.
->=20
->> ---
->> libfdt/fdt_ro.c | 24 ++++++++++++++++++++++++
->> 1 file changed, 24 insertions(+)
->>=20
->> diff --git a/libfdt/fdt_ro.c b/libfdt/fdt_ro.c
->> index 3d00d2e..a7986fb 100644
->> --- a/libfdt/fdt_ro.c
->> +++ b/libfdt/fdt_ro.c
->> @@ -55,6 +55,30 @@
->>=20
->> #include "libfdt_internal.h"
->>=20
->> +/* if the current environment does not define strnlen */
->> +#ifndef strnlen
->=20
-> This will only trigger if strnlen is defined as a macro.  The C
-> library (or other environment) *might* do that, but there's no
-> guarantee, whether or not it defines strnlen as a function.  With
-> extra complications if the compiler has a strnlen builtin like gcc.
+Yes, if we can have some C program for all architecture then it sounds
+nicer, though IIUC this program is somehow special since it should be
+writting some "A"/"B" chars to console, and the test program is using
+those chars during the process.
 
-:(
+Maybe it would be nice to rewrite a C program to replace current
+binary sector when someone wants to support postcopy migration test on
+a 3rd platform besides x86 and ppc.
 
->> +
->> +/* This eliminates the missing prototype warning */
->> +int strnlen(const char *string, int max_count);
->> +
->> +/*
->> + * strnlen: return the length of a string or max_count
->> + * which ever is shortest
->> + */
->> +
->> +int strnlen(const char *string, int max_count)
->=20
-> Also strnlen is supposed to take and return size_t, not int.
+Thanks,
 
-Will change this.
-
->=20
->> +{
->> +    int count;
->> +    for(count =3D 0; count < max_count; count++) {
->> +        if (string[count] =3D=3D '\0') {
->> +            break;
->> +        }
->> +    }
->> +    return count;
->> +}
->> +
->> +#endif /* strnlen */
->> +
->> static int _fdt_nodename_eq(const void *fdt, int offset,
->> 			    const char *s, int len)
->> {
->=20
-> In any case, this sort of compatibility munging is the job of
-> libfdt_env.h.  It's purpose is to provide all the external things that
-> libfdt needs - there's not that many of them and strnlen() is one.
-> The included libfdt_env.h is intended for POSIXy userspace
-> environments, which should already include strnlen() in string.h.
-
-QEMU supports Mac OS 10.5 and higher. The strnlen() function might have =
-been added to Mac OS X in version 10.7. libfdt prevents QEMU from =
-compiling on Mac OS X because of the missing strnlen() function. This =
-issue needs to be resolved. If libfdt_env.h is where you want a fix =
-located, would something like this be good:
-
-#ifdef __APPLE__
-
-#if (MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_7)
-	size_t strnlen(const char *string, int max_count)
-	{
-		... // pretend this is implemented
-	}
-#endif=20
-
-#endif
+-- 
+Peter Xu
