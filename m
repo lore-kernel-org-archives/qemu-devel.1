@@ -1,24 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56224)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56275)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1e5DaT-00068F-KL
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 12:22:28 -0400
+	(envelope-from <alistai@xilinx.com>) id 1e5Daa-0006Eq-0T
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 12:22:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1e5DaP-0002EK-NT
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 12:22:25 -0400
-Received: from mail-cys01nam02on0056.outbound.protection.outlook.com
-	([104.47.37.56]:25883
-	helo=NAM02-CY1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1e5DaP-0002Db-BG
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 12:22:21 -0400
+	(envelope-from <alistai@xilinx.com>) id 1e5DaW-0002NZ-MC
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 12:22:32 -0400
 From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Thu, 19 Oct 2017 09:18:08 -0700
-Message-ID: <9721c76be2faed85b0516b2e4184ab17e4690570.1508390588.git.alistair.francis@xilinx.com>
+Date: Thu, 19 Oct 2017 09:18:17 -0700
+Message-ID: <7f741376b50552aa58c943b710fffa3c24f28b2f.1508390588.git.alistair.francis@xilinx.com>
 In-Reply-To: <cover.1508390588.git.alistair.francis@xilinx.com>
 References: <cover.1508390588.git.alistair.francis@xilinx.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v3 39/46] hw/usb: Replace fprintf(stderr,
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v3 42/46] util: Replace fprintf(stderr,
  "*\n" with error_report()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -29,582 +24,416 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: alistair.francis@xilinx.com, alistair23@gmail.com, armbru@redhat.com, Gerd Hoffmann <kraxel@redhat.com>
+Cc: alistair.francis@xilinx.com, alistair23@gmail.com, armbru@redhat.com, Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Weil <sw@weilnetz.de>, qemu-block@nongnu.org
 
 Replace a large number of the fprintf(stderr, "*\n" calls with
 error_report(). The functions were renamed with these commands and then
 compiler issues where manually fixed.
 
 find ./* -type f -exec sed -i \
-    'N;N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+    'N;N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_=
+report("\1"\2);|Ig}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+    'N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_re=
+port("\1"\2);|Ig}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+    'N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report=
+("\1"\2);|Ig}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+    'N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("=
+\1"\2);|Ig}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+    'N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1=
+"\2);|Ig}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+    'N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\=
+2);|Ig}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+    'N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2)=
+;|Ig}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+    'N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|=
+Ig}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+    'N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig=
+}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+    'N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}'=
+ \
     {} +
 find ./* -type f -exec sed -i \
     'N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
     {} +
 
-Some lines where then manually tweaked to pass checkpatch.
-
-The debug prints in usb_net_handle_control() where reverted to use
-fprintf(stderr, and usb_mtp_cancel_packet() now uses
-g_assert_not_reached().
-
 Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Stefan Weil <sw@weilnetz.de>
+Cc: qemu-block@nongnu.org
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 ---
-V3:
- - Use g_assert_not_reached() in usb_mtp_cancel_packet()
- - Leave the fprintf(stderr in usb_net_handle_control()
-V2:
- - Split hw patch into individual directories
 
- hw/usb/core.c          | 15 ++++++++-------
- hw/usb/desc.c          |  6 +++---
- hw/usb/dev-audio.c     | 39 ++++++++++++++++++++-------------------
- hw/usb/dev-bluetooth.c |  4 ++--
- hw/usb/dev-mtp.c       |  9 +++++----
- hw/usb/dev-network.c   | 14 +++++++-------
- hw/usb/hcd-ehci.c      | 32 ++++++++++++++++----------------
- hw/usb/hcd-musb.c      |  4 ++--
- hw/usb/hcd-xhci.c      |  3 ++-
- hw/usb/host-legacy.c   |  3 ++-
- 10 files changed, 67 insertions(+), 62 deletions(-)
+ util/aio-posix.c             | 5 +++--
+ util/coroutine-sigaltstack.c | 2 +-
+ util/error.c                 | 2 +-
+ util/main-loop.c             | 2 +-
+ util/mmap-alloc.c            | 3 ++-
+ util/module.c                | 6 +++---
+ util/osdep.c                 | 4 ++--
+ util/oslib-posix.c           | 3 ++-
+ util/oslib-win32.c           | 3 ++-
+ util/qemu-coroutine.c        | 5 +++--
+ util/qemu-progress.c         | 3 ++-
+ util/qemu-thread-posix.c     | 5 +++--
+ util/qemu-thread-win32.c     | 5 +++--
+ util/qemu-timer-common.c     | 3 ++-
+ util/qht.c                   | 2 +-
+ 15 files changed, 31 insertions(+), 22 deletions(-)
 
-diff --git a/hw/usb/core.c b/hw/usb/core.c
-index 241ae66b15..9ffdef055c 100644
---- a/hw/usb/core.c
-+++ b/hw/usb/core.c
-@@ -24,6 +24,7 @@
+diff --git a/util/aio-posix.c b/util/aio-posix.c
+index 5946ac09f0..29fff51fcf 100644
+--- a/util/aio-posix.c
++++ b/util/aio-posix.c
+@@ -15,6 +15,7 @@
+=20
+ #include "qemu/osdep.h"
+ #include "qemu-common.h"
++#include "qemu/error-report.h"
+ #include "block/block.h"
+ #include "qemu/rcu_queue.h"
+ #include "qemu/sockets.h"
+@@ -703,8 +704,8 @@ void aio_context_setup(AioContext *ctx)
+ {
+     /* TODO remove this in final patch submission */
+     if (getenv("QEMU_AIO_POLL_MAX_NS")) {
+-        fprintf(stderr, "The QEMU_AIO_POLL_MAX_NS environment variable has=
+ "
+-                "been replaced with -object iothread,poll-max-ns=3DNUM\n")=
+;
++        error_report("The QEMU_AIO_POLL_MAX_NS environment variable has "
++                "been replaced with -object iothread,poll-max-ns=3DNUM");
+         exit(1);
+     }
+=20
+diff --git a/util/coroutine-sigaltstack.c b/util/coroutine-sigaltstack.c
+index f6fc49a0e5..96a01c2c88 100644
+--- a/util/coroutine-sigaltstack.c
++++ b/util/coroutine-sigaltstack.c
+@@ -80,7 +80,7 @@ static void __attribute__((constructor)) coroutine_init(v=
+oid)
+=20
+     ret =3D pthread_key_create(&thread_state_key, qemu_coroutine_thread_cl=
+eanup);
+     if (ret !=3D 0) {
+-        fprintf(stderr, "unable to create leader key: %s\n", strerror(errn=
+o));
++        error_report("unable to create leader key: %s", strerror(errno));
+         abort();
+     }
+ }
+diff --git a/util/error.c b/util/error.c
+index 3efdd69162..e423368ca0 100644
+--- a/util/error.c
++++ b/util/error.c
+@@ -32,7 +32,7 @@ Error *error_fatal;
+ static void error_handle_fatal(Error **errp, Error *err)
+ {
+     if (errp =3D=3D &error_abort) {
+-        fprintf(stderr, "Unexpected error in %s() at %s:%d:\n",
++        error_report("Unexpected error in %s() at %s:%d:",
+                 err->func, err->src, err->line);
+         error_report_err(err);
+         abort();
+diff --git a/util/main-loop.c b/util/main-loop.c
+index 7558eb5f53..d8369716b2 100644
+--- a/util/main-loop.c
++++ b/util/main-loop.c
+@@ -95,7 +95,7 @@ static int qemu_signal_init(void)
+     sigdelset(&set, SIG_IPI);
+     sigfd =3D qemu_signalfd(&set);
+     if (sigfd =3D=3D -1) {
+-        fprintf(stderr, "failed to create signalfd\n");
++        error_report("failed to create signalfd");
+         return -errno;
+     }
+=20
+diff --git a/util/mmap-alloc.c b/util/mmap-alloc.c
+index 3ec029a9ea..11887aac69 100644
+--- a/util/mmap-alloc.c
++++ b/util/mmap-alloc.c
+@@ -11,6 +11,7 @@
+  */
+=20
+ #include "qemu/osdep.h"
++#include "qemu/error-report.h"
+ #include "qemu/mmap-alloc.h"
+ #include "qemu/host-utils.h"
+=20
+@@ -51,7 +52,7 @@ size_t qemu_mempath_getpagesize(const char *mem_path)
+     } while (ret !=3D 0 && errno =3D=3D EINTR);
+=20
+     if (ret !=3D 0) {
+-        fprintf(stderr, "Couldn't statfs() memory path: %s\n",
++        error_report("Couldn't statfs() memory path: %s",
+                 strerror(errno));
+         exit(1);
+     }
+diff --git a/util/module.c b/util/module.c
+index c90973721f..1153e3ebb0 100644
+--- a/util/module.c
++++ b/util/module.c
+@@ -124,13 +124,13 @@ static int module_load_file(const char *fname)
+=20
+     g_module =3D g_module_open(fname, G_MODULE_BIND_LAZY | G_MODULE_BIND_L=
+OCAL);
+     if (!g_module) {
+-        fprintf(stderr, "Failed to open module: %s\n",
++        error_report("Failed to open module: %s",
+                 g_module_error());
+         ret =3D -EINVAL;
+         goto out;
+     }
+     if (!g_module_symbol(g_module, DSO_STAMP_FUN_STR, (gpointer *)&sym)) {
+-        fprintf(stderr, "Failed to initialize module: %s\n",
++        error_report("Failed to initialize module: %s",
+                 fname);
+         /* Print some info if this is a QEMU module (but from different bu=
+ild),
+          * this will make debugging user problems easier. */
+@@ -169,7 +169,7 @@ void module_load_one(const char *prefix, const char *li=
+b_name)
+     static GHashTable *loaded_modules;
+=20
+     if (!g_module_supported()) {
+-        fprintf(stderr, "Module is not supported by system.\n");
++        error_report("Module is not supported by system.");
+         return;
+     }
+=20
+diff --git a/util/osdep.c b/util/osdep.c
+index a479fedc4a..62d92c9560 100644
+--- a/util/osdep.c
++++ b/util/osdep.c
+@@ -425,7 +425,7 @@ void fips_set_state(bool requested)
+ #endif /* __linux__ */
+=20
+ #ifdef _FIPS_DEBUG
+-    fprintf(stderr, "FIPS mode %s (requested %s)\n",
++    error_report("FIPS mode %s (requested %s)",
+ 	    (fips_enabled ? "enabled" : "disabled"),
+ 	    (requested ? "enabled" : "disabled"));
+ #endif
+@@ -452,7 +452,7 @@ int socket_init(void)
+     ret =3D WSAStartup(MAKEWORD(2, 2), &Data);
+     if (ret !=3D 0) {
+         err =3D WSAGetLastError();
+-        fprintf(stderr, "WSAStartup: %d\n", err);
++        error_report("WSAStartup: %d", err);
+         return -1;
+     }
+     atexit(socket_cleanup);
+diff --git a/util/oslib-posix.c b/util/oslib-posix.c
+index 80086c549f..d840692dd7 100644
+--- a/util/oslib-posix.c
++++ b/util/oslib-posix.c
+@@ -34,6 +34,7 @@
+ #include "sysemu/sysemu.h"
+ #include "trace.h"
+ #include "qapi/error.h"
++#include "qemu/error-report.h"
+ #include "qemu/sockets.h"
+ #include <libgen.h>
+ #include <sys/signal.h>
+@@ -87,7 +88,7 @@ int qemu_daemon(int nochdir, int noclose)
+ void *qemu_oom_check(void *ptr)
+ {
+     if (ptr =3D=3D NULL) {
+-        fprintf(stderr, "Failed to allocate memory: %s\n", strerror(errno)=
+);
++        error_report("Failed to allocate memory: %s", strerror(errno));
+         abort();
+     }
+     return ptr;
+diff --git a/util/oslib-win32.c b/util/oslib-win32.c
+index 69a6286d50..2197a6a4fc 100644
+--- a/util/oslib-win32.c
++++ b/util/oslib-win32.c
+@@ -30,6 +30,7 @@
+  * see the license comment there.
+  */
+ #include "qemu/osdep.h"
++#include "qemu/error-report.h"
+ #include <windows.h>
+ #include "qapi/error.h"
+ #include "sysemu/sysemu.h"
+@@ -44,7 +45,7 @@
+ void *qemu_oom_check(void *ptr)
+ {
+     if (ptr =3D=3D NULL) {
+-        fprintf(stderr, "Failed to allocate memory: %lu\n", GetLastError()=
+);
++        error_report("Failed to allocate memory: %lu", GetLastError());
+         abort();
+     }
+     return ptr;
+diff --git a/util/qemu-coroutine.c b/util/qemu-coroutine.c
+index d6095c1d5a..1f7cce6706 100644
+--- a/util/qemu-coroutine.c
++++ b/util/qemu-coroutine.c
+@@ -13,6 +13,7 @@
+  */
+=20
+ #include "qemu/osdep.h"
++#include "qemu/error-report.h"
+ #include "trace.h"
+ #include "qemu-common.h"
+ #include "qemu/thread.h"
+@@ -110,7 +111,7 @@ void qemu_aio_coroutine_enter(AioContext *ctx, Coroutin=
+e *co)
+     trace_qemu_aio_coroutine_enter(ctx, self, co, co->entry_arg);
+=20
+     if (co->caller) {
+-        fprintf(stderr, "Co-routine re-entered recursively\n");
++        error_report("Co-routine re-entered recursively");
+         abort();
+     }
+=20
+@@ -164,7 +165,7 @@ void coroutine_fn qemu_coroutine_yield(void)
+     trace_qemu_coroutine_yield(self, to);
+=20
+     if (!to) {
+-        fprintf(stderr, "Co-routine is yielding to no one\n");
++        error_report("Co-routine is yielding to no one");
+         abort();
+     }
+=20
+diff --git a/util/qemu-progress.c b/util/qemu-progress.c
+index 3c2223c1a2..84598f0fbb 100644
+--- a/util/qemu-progress.c
++++ b/util/qemu-progress.c
+@@ -23,6 +23,7 @@
+  */
+=20
+ #include "qemu/osdep.h"
++#include "qemu/error-report.h"
+ #include "qemu-common.h"
+=20
+ struct progress_state {
+@@ -68,7 +69,7 @@ static void sigusr_print(int signal)
+ static void progress_dummy_print(void)
+ {
+     if (print_pending) {
+-        fprintf(stderr, "    (%3.2f/100%%)\n", state.current);
++        error_report("    (%3.2f/100%%)", state.current);
+         print_pending =3D 0;
+     }
+ }
+diff --git a/util/qemu-thread-posix.c b/util/qemu-thread-posix.c
+index 7306475899..1207ef71d6 100644
+--- a/util/qemu-thread-posix.c
++++ b/util/qemu-thread-posix.c
+@@ -11,6 +11,7 @@
+  *
+  */
+ #include "qemu/osdep.h"
++#include "qemu/error-report.h"
+ #include "qemu/thread.h"
+ #include "qemu/atomic.h"
+ #include "qemu/notify.h"
+@@ -25,14 +26,14 @@ void qemu_thread_naming(bool enable)
+ #ifndef CONFIG_THREAD_SETNAME_BYTHREAD
+     /* This is a debugging option, not fatal */
+     if (enable) {
+-        fprintf(stderr, "qemu: thread naming not supported on this host\n"=
+);
++        error_report("thread naming not supported on this host");
+     }
+ #endif
+ }
+=20
+ static void error_exit(int err, const char *msg)
+ {
+-    fprintf(stderr, "qemu: %s: %s\n", msg, strerror(err));
++    error_report("%s: %s", msg, strerror(err));
+     abort();
+ }
+=20
+diff --git a/util/qemu-thread-win32.c b/util/qemu-thread-win32.c
+index 94f3491a87..02b94e22da 100644
+--- a/util/qemu-thread-win32.c
++++ b/util/qemu-thread-win32.c
+@@ -16,6 +16,7 @@
+ #endif
+=20
+ #include "qemu/osdep.h"
++#include "qemu/error-report.h"
+ #include "qemu-common.h"
+ #include "qemu/thread.h"
+ #include "qemu/notify.h"
+@@ -29,7 +30,7 @@ void qemu_thread_naming(bool enable)
+     /* But note we don't actually name them on Windows yet */
+     name_threads =3D enable;
+=20
+-    fprintf(stderr, "qemu: thread naming not supported on this host\n");
++    error_report("thread naming not supported on this host");
+ }
+=20
+ static void error_exit(int err, const char *msg)
+@@ -38,7 +39,7 @@ static void error_exit(int err, const char *msg)
+=20
+     FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUF=
+FER,
+                   NULL, err, 0, (LPTSTR)&pstr, 2, NULL);
+-    fprintf(stderr, "qemu: %s: %s\n", msg, pstr);
++    error_report("%s: %s", msg, pstr);
+     LocalFree(pstr);
+     abort();
+ }
+diff --git a/util/qemu-timer-common.c b/util/qemu-timer-common.c
+index 06d084d364..ab7b702c4f 100644
+--- a/util/qemu-timer-common.c
++++ b/util/qemu-timer-common.c
+@@ -22,6 +22,7 @@
   * THE SOFTWARE.
   */
  #include "qemu/osdep.h"
 +#include "qemu/error-report.h"
- #include "qemu-common.h"
- #include "hw/usb.h"
- #include "qemu/iov.h"
-@@ -599,7 +600,7 @@ void usb_packet_copy(USBPacket *p, void *ptr, size_t bytes)
-         iov_from_buf(iov->iov, iov->niov, p->actual_length, ptr, bytes);
-         break;
-     default:
--        fprintf(stderr, "%s: invalid pid: %x\n", __func__, p->pid);
-+        error_report("%s: invalid pid: %x", __func__, p->pid);
-         abort();
+ #include "qemu/timer.h"
+=20
+ /***********************************************************/
+@@ -37,7 +38,7 @@ static void __attribute__((constructor)) init_get_clock(v=
+oid)
+     int ret;
+     ret =3D QueryPerformanceFrequency(&freq);
+     if (ret =3D=3D 0) {
+-        fprintf(stderr, "Could not calibrate ticks\n");
++        error_report("Could not calibrate ticks");
+         exit(1);
      }
-     p->actual_length += bytes;
-@@ -681,7 +682,7 @@ void usb_ep_dump(USBDevice *dev)
-     };
-     int ifnum, ep, first;
- 
--    fprintf(stderr, "Device \"%s\", config %d\n",
-+    error_report("Device \"%s\", config %d",
-             dev->product_desc, dev->configuration);
-     for (ifnum = 0; ifnum < 16; ifnum++) {
-         first = 1;
-@@ -690,10 +691,10 @@ void usb_ep_dump(USBDevice *dev)
-                 dev->ep_in[ep].ifnum == ifnum) {
-                 if (first) {
-                     first = 0;
--                    fprintf(stderr, "  Interface %d, alternative %d\n",
-+                    error_report("  Interface %d, alternative %d",
-                             ifnum, dev->altsetting[ifnum]);
-                 }
--                fprintf(stderr, "    Endpoint %d, IN, %s, %d max\n", ep,
-+                error_report("    Endpoint %d, IN, %s, %d max", ep,
-                         tname[dev->ep_in[ep].type],
-                         dev->ep_in[ep].max_packet_size);
-             }
-@@ -701,16 +702,16 @@ void usb_ep_dump(USBDevice *dev)
-                 dev->ep_out[ep].ifnum == ifnum) {
-                 if (first) {
-                     first = 0;
--                    fprintf(stderr, "  Interface %d, alternative %d\n",
-+                    error_report("  Interface %d, alternative %d",
-                             ifnum, dev->altsetting[ifnum]);
-                 }
--                fprintf(stderr, "    Endpoint %d, OUT, %s, %d max\n", ep,
-+                error_report("    Endpoint %d, OUT, %s, %d max", ep,
-                         tname[dev->ep_out[ep].type],
-                         dev->ep_out[ep].max_packet_size);
-             }
-         }
-     }
--    fprintf(stderr, "--\n");
-+    error_report("--");
- }
- 
- struct USBEndpoint *usb_ep_get(USBDevice *dev, int pid, int ep)
-diff --git a/hw/usb/desc.c b/hw/usb/desc.c
-index 85c15addc5..bde39e3903 100644
---- a/hw/usb/desc.c
-+++ b/hw/usb/desc.c
-@@ -1,5 +1,5 @@
- #include "qemu/osdep.h"
--
-+#include "qemu/error-report.h"
- #include "hw/usb.h"
- #include "hw/usb/desc.h"
- #include "trace.h"
-@@ -688,8 +688,8 @@ int usb_desc_get_descriptor(USBDevice *dev, USBPacket *p,
-         break;
- 
-     default:
--        fprintf(stderr, "%s: %d unknown type %d (len %zd)\n", __func__,
--                dev->addr, type, len);
-+        error_report("%s: %d unknown type %d (len %zd)", __func__,
-+                     dev->addr, type, len);
-         break;
-     }
- 
-diff --git a/hw/usb/dev-audio.c b/hw/usb/dev-audio.c
-index 343345235c..a95e4cdbd9 100644
---- a/hw/usb/dev-audio.c
-+++ b/hw/usb/dev-audio.c
-@@ -30,6 +30,7 @@
-  */
- 
- #include "qemu/osdep.h"
-+#include "qemu/error-report.h"
- #include "qemu-common.h"
- #include "hw/usb.h"
- #include "hw/usb/desc.h"
-@@ -398,7 +399,7 @@ static int usb_audio_set_output_altset(USBAudioState *s, int altset)
-     }
- 
-     if (s->debug) {
--        fprintf(stderr, "usb-audio: set interface %d\n", altset);
-+        error_report("usb-audio: set interface %d", altset);
-     }
-     s->out.altset = altset;
-     return 0;
-@@ -478,7 +479,7 @@ static int usb_audio_set_control(USBAudioState *s, uint8_t attrib,
-             uint16_t vol = data[0] + (data[1] << 8);
- 
-             if (s->debug) {
--                fprintf(stderr, "usb-audio: vol %04x\n", (uint16_t)vol);
-+                error_report("usb-audio: vol %04x", (uint16_t)vol);
-             }
- 
-             vol -= 0x8000;
-@@ -496,8 +497,8 @@ static int usb_audio_set_control(USBAudioState *s, uint8_t attrib,
- 
-     if (set_vol) {
-         if (s->debug) {
--            fprintf(stderr, "usb-audio: mute %d, lvol %3d, rvol %3d\n",
--                    s->out.mute, s->out.vol[0], s->out.vol[1]);
-+            error_report("usb-audio: mute %d, lvol %3d, rvol %3d",
-+                         s->out.mute, s->out.vol[0], s->out.vol[1]);
-         }
-         AUD_set_volume_out(s->out.voice, s->out.mute,
-                            s->out.vol[0], s->out.vol[1]);
-@@ -514,9 +515,9 @@ static void usb_audio_handle_control(USBDevice *dev, USBPacket *p,
-     int ret = 0;
- 
-     if (s->debug) {
--        fprintf(stderr, "usb-audio: control transaction: "
--                "request 0x%04x value 0x%04x index 0x%04x length 0x%04x\n",
--                request, value, index, length);
-+        error_report("usb-audio: control transaction: "
-+                     "request 0x%04x value 0x%04x index 0x%04x length 0x%04x",
-+                     request, value, index, length);
-     }
- 
-     ret = usb_desc_handle_control(dev, p, request, value, index, length, data);
-@@ -533,7 +534,7 @@ static void usb_audio_handle_control(USBDevice *dev, USBPacket *p,
-                                     length, data);
-         if (ret < 0) {
-             if (s->debug) {
--                fprintf(stderr, "usb-audio: fail: get control\n");
-+                error_report("usb-audio: fail: get control");
-             }
-             goto fail;
-         }
-@@ -548,7 +549,7 @@ static void usb_audio_handle_control(USBDevice *dev, USBPacket *p,
-                                     length, data);
-         if (ret < 0) {
-             if (s->debug) {
--                fprintf(stderr, "usb-audio: fail: set control\n");
-+                error_report("usb-audio: fail: set control");
-             }
-             goto fail;
-         }
-@@ -557,9 +558,9 @@ static void usb_audio_handle_control(USBDevice *dev, USBPacket *p,
-     default:
- fail:
-         if (s->debug) {
--            fprintf(stderr, "usb-audio: failed control transaction: "
--                    "request 0x%04x value 0x%04x index 0x%04x length 0x%04x\n",
--                    request, value, index, length);
-+            error_report("usb-audio: failed control transaction: "
-+                         "request 0x%04x value 0x%04x index 0x%04x length 0x%04x",
-+                         request, value, index, length);
-         }
-         p->status = USB_RET_STALL;
-         break;
-@@ -581,7 +582,7 @@ static void usb_audio_handle_reset(USBDevice *dev)
-     USBAudioState *s = USB_AUDIO(dev);
- 
-     if (s->debug) {
--        fprintf(stderr, "usb-audio: reset\n");
-+        error_report("usb-audio: reset");
-     }
-     usb_audio_set_output_altset(s, ALTSET_OFF);
- }
-@@ -595,8 +596,8 @@ static void usb_audio_handle_dataout(USBAudioState *s, USBPacket *p)
- 
-     streambuf_put(&s->out.buf, p);
-     if (p->actual_length < p->iov.size && s->debug > 1) {
--        fprintf(stderr, "usb-audio: output overrun (%zd bytes)\n",
--                p->iov.size - p->actual_length);
-+        error_report("usb-audio: output overrun (%zd bytes)",
-+                     p->iov.size - p->actual_length);
-     }
- }
- 
-@@ -611,9 +612,9 @@ static void usb_audio_handle_data(USBDevice *dev, USBPacket *p)
- 
-     p->status = USB_RET_STALL;
-     if (s->debug) {
--        fprintf(stderr, "usb-audio: failed data transaction: "
--                        "pid 0x%x ep 0x%x len 0x%zx\n",
--                        p->pid, p->ep->nr, p->iov.size);
-+        error_report("usb-audio: failed data transaction: "
-+                     "pid 0x%x ep 0x%x len 0x%zx",
-+                     p->pid, p->ep->nr, p->iov.size);
-     }
- }
- 
-@@ -622,7 +623,7 @@ static void usb_audio_unrealize(USBDevice *dev, Error **errp)
-     USBAudioState *s = USB_AUDIO(dev);
- 
-     if (s->debug) {
--        fprintf(stderr, "usb-audio: destroy\n");
-+        error_report("usb-audio: destroy");
-     }
- 
-     usb_audio_set_output_altset(s, ALTSET_OFF);
-diff --git a/hw/usb/dev-bluetooth.c b/hw/usb/dev-bluetooth.c
-index 0bbceaea0b..dfef258dca 100644
---- a/hw/usb/dev-bluetooth.c
-+++ b/hw/usb/dev-bluetooth.c
-@@ -274,13 +274,13 @@ static void usb_bt_fifo_enqueue(struct usb_hci_in_fifo_s *fifo,
-     if (off <= DFIFO_LEN_MASK) {
-         if (off + len > DFIFO_LEN_MASK + 1 &&
-                         (fifo->dsize = off + len) > (DFIFO_LEN_MASK + 1) * 2) {
--            fprintf(stderr, "%s: can't alloc %i bytes\n", __func__, len);
-+            error_report("%s: can't alloc %i bytes", __func__, len);
-             exit(-1);
-         }
-         buf = fifo->data + off;
-     } else {
-         if (fifo->dlen > fifo->dsize) {
--            fprintf(stderr, "%s: can't alloc %i bytes\n", __func__, len);
-+            error_report("%s: can't alloc %i bytes", __func__, len);
-             exit(-1);
-         }
-         buf = fifo->data + off - fifo->dsize;
-diff --git a/hw/usb/dev-mtp.c b/hw/usb/dev-mtp.c
-index 94c2e94f10..69e2eac259 100644
---- a/hw/usb/dev-mtp.c
-+++ b/hw/usb/dev-mtp.c
-@@ -10,6 +10,7 @@
-  */
- 
- #include "qemu/osdep.h"
-+#include "qemu/error-report.h"
- #include "qapi/error.h"
- #include <wchar.h>
- #include <dirent.h>
-@@ -546,7 +547,7 @@ static void inotify_watchfn(void *arg)
-                 break;
- 
-             default:
--                fprintf(stderr, "usb-mtp: failed to parse inotify event\n");
-+                error_report("usb-mtp: failed to parse inotify event");
+     clock_freq =3D freq.QuadPart;
+diff --git a/util/qht.c b/util/qht.c
+index ff4d2e6974..bfab5c7e5e 100644
+--- a/util/qht.c
++++ b/util/qht.c
+@@ -154,7 +154,7 @@ static void qht_bucket_debug__locked(struct qht_bucket =
+*b)
                  continue;
              }
- 
-@@ -617,7 +618,7 @@ static void usb_mtp_object_readdir(MTPState *s, MTPObject *o)
- #ifdef CONFIG_INOTIFY1
-     int watchfd = usb_mtp_add_watch(s->inotifyfd, o->path);
-     if (watchfd == -1) {
--        fprintf(stderr, "usb-mtp: failed to add watch for %s\n", o->path);
-+        error_report("usb-mtp: failed to add watch for %s", o->path);
-     } else {
-         trace_usb_mtp_inotify_event(s->dev.addr, o->path,
-                                     0, "Watch Added");
-@@ -1144,7 +1145,7 @@ static void usb_mtp_command(MTPState *s, MTPControl *c)
-         usb_mtp_object_alloc(s, s->next_handle++, NULL, s->root);
- #ifdef CONFIG_INOTIFY1
-         if (usb_mtp_inotify_init(s)) {
--            fprintf(stderr, "usb-mtp: file monitoring init failed\n");
-+            error_report("usb-mtp: file monitoring init failed");
-         }
- #endif
-         break;
-@@ -1348,7 +1349,7 @@ static void usb_mtp_handle_control(USBDevice *dev, USBPacket *p,
- static void usb_mtp_cancel_packet(USBDevice *dev, USBPacket *p)
- {
-     /* we don't use async packets, so this should never be called */
--    fprintf(stderr, "%s\n", __func__);
-+    g_assert_not_reached();
- }
- 
- static void usb_mtp_handle_data(USBDevice *dev, USBPacket *p)
-diff --git a/hw/usb/dev-network.c b/hw/usb/dev-network.c
-index 85fc81bf43..7245182467 100644
---- a/hw/usb/dev-network.c
-+++ b/hw/usb/dev-network.c
-@@ -815,7 +815,7 @@ static int ndis_query(USBNetState *s, uint32_t oid,
-         return sizeof(le32);
- 
-     default:
--        fprintf(stderr, "usbnet: unknown OID 0x%08x\n", oid);
-+        error_report("usbnet: unknown OID 0x%08x", oid);
-         return 0;
-     }
-     return -1;
-@@ -1120,9 +1120,9 @@ static void usb_net_handle_control(USBDevice *dev, USBPacket *p,
- 
-     default:
-     fail:
--        fprintf(stderr, "usbnet: failed control transaction: "
--                        "request 0x%x value 0x%x index 0x%x length 0x%x\n",
--                        request, value, index, length);
-+        error_report("usbnet: failed control transaction: "
-+                     "request 0x%x value 0x%x index 0x%x length 0x%x",
-+                     request, value, index, length);
-         p->status = USB_RET_STALL;
-         break;
-     }
-@@ -1190,7 +1190,7 @@ static void usb_net_handle_dataout(USBNetState *s, USBPacket *p)
-     uint32_t len;
- 
- #ifdef TRAFFIC_DEBUG
--    fprintf(stderr, "usbnet: data out len %zu\n", p->iov.size);
-+    error_report("usbnet: data out len %zu", p->iov.size);
-     iov_hexdump(p->iov.iov, p->iov.niov, stderr, "usbnet", p->iov.size);
- #endif
- 
-@@ -1260,8 +1260,8 @@ static void usb_net_handle_data(USBDevice *dev, USBPacket *p)
-     }
- 
-     if (p->status == USB_RET_STALL) {
--        fprintf(stderr, "usbnet: failed data transaction: "
--                        "pid 0x%x ep 0x%x len 0x%zx\n",
-+        error_report("usbnet: failed data transaction: "
-+                        "pid 0x%x ep 0x%x len 0x%zx",
-                         p->pid, p->ep->nr, p->iov.size);
-     }
- }
-diff --git a/hw/usb/hcd-ehci.c b/hw/usb/hcd-ehci.c
-index 0134232627..e405b882fb 100644
---- a/hw/usb/hcd-ehci.c
-+++ b/hw/usb/hcd-ehci.c
-@@ -419,7 +419,7 @@ static int ehci_get_pid(EHCIqtd *qtd)
-     case 2:
-         return USB_TOKEN_SETUP;
-     default:
--        fprintf(stderr, "bad token\n");
-+        error_report("bad token");
-         return 0;
-     }
- }
-@@ -1033,7 +1033,7 @@ static void ehci_opreg_write(void *ptr, hwaddr addr,
- 
-         /* not supporting dynamic frame list size at the moment */
-         if ((val & USBCMD_FLS) && !(s->usbcmd & USBCMD_FLS)) {
--            fprintf(stderr, "attempt to set frame list size -- value %d\n",
-+            error_report("attempt to set frame list size -- value %d",
-                     (int)val & USBCMD_FLS);
-             val &= ~USBCMD_FLS;
-         }
-@@ -1190,7 +1190,7 @@ static int ehci_init_transfer(EHCIPacket *p)
- 
-     while (bytes > 0) {
-         if (cpage > 4) {
--            fprintf(stderr, "cpage out of range (%d)\n", cpage);
-+            error_report("cpage out of range (%d)", cpage);
-             qemu_sglist_destroy(&p->sgl);
-             return -1;
-         }
-@@ -1296,7 +1296,7 @@ static void ehci_execute_complete(EHCIQueue *q)
-         break;
-     default:
-         /* should not be triggerable */
--        fprintf(stderr, "USB invalid response %d\n", p->packet.status);
-+        error_report("USB invalid response %d", p->packet.status);
-         g_assert_not_reached();
-         break;
-     }
-@@ -1345,7 +1345,7 @@ static int ehci_execute(EHCIPacket *p, const char *action)
-            p->async == EHCI_ASYNC_INITIALIZED);
- 
-     if (!(p->qtd.token & QTD_TOKEN_ACTIVE)) {
--        fprintf(stderr, "Attempting to execute inactive qtd\n");
-+        error_report("Attempting to execute inactive qtd");
-         return -1;
-     }
- 
-@@ -1383,7 +1383,7 @@ static int ehci_execute(EHCIPacket *p, const char *action)
-             p->packet.actual_length);
- 
-     if (p->packet.actual_length > BUFF_SIZE) {
--        fprintf(stderr, "ret from usb_handle_packet > BUFF_SIZE\n");
-+        error_report("ret from usb_handle_packet > BUFF_SIZE");
-         return -1;
-     }
- 
-@@ -1461,7 +1461,7 @@ static int ehci_process_itd(EHCIState *ehci,
-             case USB_RET_SUCCESS:
-                 break;
-             default:
--                fprintf(stderr, "Unexpected iso usb result: %d\n",
-+                error_report("Unexpected iso usb result: %d",
-                         ehci->ipacket.status);
-                 /* Fall through */
-             case USB_RET_IOERROR:
-@@ -1564,7 +1564,7 @@ static int ehci_state_fetchentry(EHCIState *ehci, int async)
- 
-     /* section 4.8, only QH in async schedule */
-     if (async && (NLPTR_TYPE_GET(entry) != NLPTR_TYPE_QH)) {
--        fprintf(stderr, "non queue head request in async schedule\n");
-+        error_report("non queue head request in async schedule");
-         return -1;
-     }
- 
-@@ -1586,8 +1586,8 @@ static int ehci_state_fetchentry(EHCIState *ehci, int async)
- 
-     default:
-         /* TODO: handle FSTN type */
--        fprintf(stderr, "FETCHENTRY: entry at %X is of type %d "
--                "which is not supported yet\n", entry, NLPTR_TYPE_GET(entry));
-+        error_report("FETCHENTRY: entry at %X is of type %d "
-+                "which is not supported yet", entry, NLPTR_TYPE_GET(entry));
-         return -1;
-     }
- 
-@@ -2086,7 +2086,7 @@ static void ehci_advance_state(EHCIState *ehci, int async)
-             break;
- 
-         default:
--            fprintf(stderr, "Bad state!\n");
-+            error_report("Bad state!");
-             again = -1;
-             g_assert_not_reached();
-             break;
-@@ -2094,7 +2094,7 @@ static void ehci_advance_state(EHCIState *ehci, int async)
- 
-         if (again < 0 || itd_count > 16) {
-             /* TODO: notify guest (raise HSE irq?) */
--            fprintf(stderr, "processing error - resetting ehci HC\n");
-+            error_report("processing error - resetting ehci HC");
-             ehci_reset(ehci);
-             again = 0;
-         }
-@@ -2151,8 +2151,8 @@ static void ehci_advance_async_state(EHCIState *ehci)
- 
-     default:
-         /* this should only be due to a developer mistake */
--        fprintf(stderr, "ehci: Bad asynchronous state %d. "
--                "Resetting to active\n", ehci->astate);
-+        error_report("ehci: Bad asynchronous state %d. "
-+                "Resetting to active", ehci->astate);
-         g_assert_not_reached();
-     }
- }
-@@ -2201,8 +2201,8 @@ static void ehci_advance_periodic_state(EHCIState *ehci)
- 
-     default:
-         /* this should only be due to a developer mistake */
--        fprintf(stderr, "ehci: Bad periodic state %d. "
--                "Resetting to active\n", ehci->pstate);
-+        error_report("ehci: Bad periodic state %d. "
-+                "Resetting to active", ehci->pstate);
-         g_assert_not_reached();
-     }
- }
-diff --git a/hw/usb/hcd-musb.c b/hw/usb/hcd-musb.c
-index d70a91a58c..4729926124 100644
---- a/hw/usb/hcd-musb.c
-+++ b/hw/usb/hcd-musb.c
-@@ -253,8 +253,8 @@
- /* #define MUSB_DEBUG */
- 
- #ifdef MUSB_DEBUG
--#define TRACE(fmt, ...) fprintf(stderr, "%s@%d: " fmt "\n", __func__, \
--                                __LINE__, ##__VA_ARGS__)
-+#define TRACE(fmt, ...) error_report("%s@%d: " fmt "", __func__, \
-+                                     __LINE__, ##__VA_ARGS__)
- #else
- #define TRACE(...)
- #endif
-diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
-index af3a9d88de..14f4f455a0 100644
---- a/hw/usb/hcd-xhci.c
-+++ b/hw/usb/hcd-xhci.c
-@@ -19,6 +19,7 @@
-  * License along with this library; if not, see <http://www.gnu.org/licenses/>.
-  */
- #include "qemu/osdep.h"
-+#include "qemu/error-report.h"
- #include "hw/hw.h"
- #include "qemu/timer.h"
- #include "qemu/queue.h"
-@@ -39,7 +40,7 @@
- #else
- #define DPRINTF(...) do {} while (0)
- #endif
--#define FIXME(_msg) do { fprintf(stderr, "FIXME %s:%d %s\n", \
-+#define FIXME(_msg) do { error_report("FIXME %s:%d %s", \
-                                  __func__, __LINE__, _msg); abort(); } while (0)
- 
- #define TRB_LINK_LIMIT  32
-diff --git a/hw/usb/host-legacy.c b/hw/usb/host-legacy.c
-index 3b57e21b52..56865c40ed 100644
---- a/hw/usb/host-legacy.c
-+++ b/hw/usb/host-legacy.c
-@@ -34,6 +34,7 @@
- #include "qemu-common.h"
- #include "hw/usb.h"
- #include "hw/usb/host.h"
-+#include "qemu/error-report.h"
- 
- /*
-  * Autoconnect filter
-@@ -86,7 +87,7 @@ static int parse_filter(const char *spec, struct USBAutoFilter *f)
-     }
- 
-     if (i < DEV) {
--        fprintf(stderr, "husb: invalid auto filter spec %s\n", spec);
-+        error_report("husb: invalid auto filter spec %s", spec);
-         return -1;
-     }
- 
--- 
+             if (seen_empty) {
+-                fprintf(stderr, "%s: b: %p, pos: %i, hash: 0x%x, p: %p\n",
++                error_report("%s: b: %p, pos: %i, hash: 0x%x, p: %p",
+                         __func__, b, i, b->hashes[i], b->pointers[i]);
+                 corrupt =3D true;
+             }
+--=20
 2.11.0
