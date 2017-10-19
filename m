@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56982)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57016)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e56pe-0007VU-A7
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 05:09:40 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1e56po-0007Zp-5b
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 05:09:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e56pb-0005vY-2U
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 05:09:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48276)
+	(envelope-from <dgilbert@redhat.com>) id 1e56pk-00063P-Sz
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 05:09:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36588)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1e56pa-0005vC-P1
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 05:09:34 -0400
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1e56pk-00062X-J0
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 05:09:44 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
 	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E62387EAA1
-	for <qemu-devel@nongnu.org>; Thu, 19 Oct 2017 09:09:33 +0000 (UTC)
-Date: Thu, 19 Oct 2017 10:09:26 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20171019090926.GC8408@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id 96B8A4900D
+	for <qemu-devel@nongnu.org>; Thu, 19 Oct 2017 09:09:43 +0000 (UTC)
+Date: Thu, 19 Oct 2017 10:09:39 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20171019090939.GC2281@work-vm>
 References: <20171004103933.7898-1-quintela@redhat.com>
 	<20171004103933.7898-2-quintela@redhat.com>
 	<20171018042601.GN4166@pxdev.xzpeter.org>
 	<87o9p4n0vb.fsf@secure.laptop> <20171018121038.GE9719@redhat.com>
 	<20171019031833.GP4166@pxdev.xzpeter.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20171019031833.GP4166@pxdev.xzpeter.org>
 Subject: Re: [Qemu-devel] [PATCH 1/6] tests: Add basic migration precopy test
@@ -38,9 +37,9 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Xu <peterx@redhat.com>
-Cc: Juan Quintela <quintela@redhat.com>, lvivier@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, lvivier@redhat.com, qemu-devel@nongnu.org
 
-On Thu, Oct 19, 2017 at 11:18:33AM +0800, Peter Xu wrote:
+* Peter Xu (peterx@redhat.com) wrote:
 > On Wed, Oct 18, 2017 at 01:10:38PM +0100, Daniel P. Berrange wrote:
 > > On Wed, Oct 18, 2017 at 01:36:56PM +0200, Juan Quintela wrote:
 > > > Peter Xu <peterx@redhat.com> wrote:
@@ -118,26 +117,26 @@ On Thu, Oct 19, 2017 at 11:18:33AM +0800, Peter Xu wrote:
 > nicer, though IIUC this program is somehow special since it should be
 > writting some "A"/"B" chars to console, and the test program is using
 > those chars during the process.
-
-That would be easy enough to add to the current program I expect.
-
-Oh the other difference with the program I wrote is that it is
-multi-threaded, so it spawns a writer thread for each vCPU that
-is given to the guest. This lets you generate even more extreme
-memory dirtying rates if desired :-)
-
+> 
 > Maybe it would be nice to rewrite a C program to replace current
 > binary sector when someone wants to support postcopy migration test on
 > a 3rd platform besides x86 and ppc.
 
-Booting a real Linux kernel and then running the C program as 'init'
-is easier to make portable since we don't need to know about special
-ways each arch deals with initial boot up.
+The problem is you then rely on having Linux or booting a full guest;
+and then you can't get the memory mapping reliably to allow the test to
+examine the physical memory contents.
+
+This little boot sector works quite nicely for x86, and Laurent's line
+of Forth works nicely on Power.
+
+Similar trivial tests for other architectures are probably easy.
+
+Dave
 
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+> Thanks,
+> 
+> -- 
+> Peter Xu
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
