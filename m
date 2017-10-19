@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38229)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38809)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1e591D-0008C6-HR
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 07:29:45 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1e594j-0000nc-I9
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 07:33:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1e5918-0002xd-IO
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 07:29:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47232)
+	(envelope-from <pbonzini@redhat.com>) id 1e594f-0004aI-Fa
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 07:33:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59642)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1e5918-0002wz-8z
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 07:29:38 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9B7C7562DE
-	for <qemu-devel@nongnu.org>; Thu, 19 Oct 2017 11:29:36 +0000 (UTC)
-References: <20171018095807.101406-1-marcel@redhat.com>
-	<69cefa98-5681-5b12-719c-e13fcba969c4@redhat.com>
-	<9d4b1fa8-e670-556b-278d-4993ad41b512@redhat.com>
-	<36a5b8e7-84d1-5ffd-d85b-7f0378801f3c@redhat.com>
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <7b08ea3e-d380-ac0c-a716-d0ac703feaea@redhat.com>
-Date: Thu, 19 Oct 2017 14:29:28 +0300
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1e594f-0004ZA-AS
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 07:33:17 -0400
+References: <1508390650-19115-1-git-send-email-changpeng.liu@intel.com>
+	<1508390650-19115-3-git-send-email-changpeng.liu@intel.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <f5ffd96f-8060-2c22-e6f9-49eab8cfe7c7@redhat.com>
+Date: Thu, 19 Oct 2017 13:33:07 +0200
 MIME-Version: 1.0
-In-Reply-To: <36a5b8e7-84d1-5ffd-d85b-7f0378801f3c@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <1508390650-19115-3-git-send-email-changpeng.liu@intel.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] hw/pci-host: Fix x86 Host Bridges 64bit
- PCI hole
+Subject: Re: [Qemu-devel] [PATCH v4 2/4] vhost-user-blk: introduce a new
+ vhost-user-blk host device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,283 +29,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org
-Cc: mst@redhat.com, pbonzini@redhat.com, ehabkost@redhat.com, Igor Mammedov <imammedo@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: Changpeng Liu <changpeng.liu@intel.com>, qemu-devel@nongnu.org
+Cc: stefanha@gmail.com, mst@redhat.com, marcandre.lureau@redhat.com, felipe@nutanix.com, james.r.harris@intel.com
 
-Hi Laszlo,
+On 19/10/2017 07:24, Changpeng Liu wrote:
+>    ;;
+>    --enable-vhost-scsi) vhost_scsi=3D"yes"
+>    ;;
+> +  --disable-vhost-user-blk) vhost_user_blk=3D"no"
+> +  ;;
+> +  --enable-vhost-user-blk) vhost_user_blk=3D"yes"
+> +  ;;
+>    --disable-vhost-vsock) vhost_vsock=3D"no"
+>    ;;
+>    --enable-vhost-vsock) vhost_vsock=3D"yes"
+> @@ -1511,6 +1517,7 @@ disabled with --disable-FEATURE, default is enabl=
+ed if available:
+>    cap-ng          libcap-ng support
+>    attr            attr and xattr support
+>    vhost-net       vhost-net acceleration support
+> +  vhost-user-blk  VM virtio-blk acceleration in user space
 
-On 19/10/2017 13:41, Laszlo Ersek wrote:
-> On 10/19/17 11:30, Marcel Apfelbaum wrote:
->>
->> Hi Laszlo,
->>
->> On 18/10/2017 14:40, Laszlo Ersek wrote:
->>> Hi Marcel,
->>>
->>> On 10/18/17 11:58, Marcel Apfelbaum wrote:
->>>> Currently there is no MMIO range over 4G
->>>> reserved for PCI hotplug. Since the 32bit PCI hole
->>>> depends on the number of cold-plugged PCI devices
->>>> and other factors, it is very possible is too small
->>>> to hotplug PCI devices with large BARs.
->>>>
->>>> Fix it by reserving all the address space after
->>>> RAM (and the reserved space for RAM hotplug),
->>>> but no more than 40bits. The later seems to be
->>>> QEMU's magic number for the Guest physical CPU addressable
->>>> bits and is safe with respect to migration.
->>>>
->>>> Note this is a regression since prev QEMU versions had
->>>> some range reserved for 64bit PCI hotplug.
->>>>
->>>> Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
->>>> ---
->>>>  =C2=A0 hw/i386/pc.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 22 ++++++++++++++++++++++
->>>>  =C2=A0 hw/pci-host/piix.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- | 10 ++++++++++
->>>>  =C2=A0 hw/pci-host/q35.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 |=C2=A0 9 +++++++++
->>>>  =C2=A0 include/hw/i386/pc.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 10 ++++=
-++++++
->>>>  =C2=A0 include/hw/pci-host/q35.h |=C2=A0 1 +
->>>>  =C2=A0 5 files changed, 52 insertions(+)
->>>
->>> - What are the symptoms of the problem?
->>>
->>
->> PCI devices with *relatively* large BARs can't be hot-plugged.
->> The reason is QEMU does not reserve MMIO range over 4G and
->> uses whatever remains on the 32bit PCI window.
->>
->> If you coldplug enough PCI devices you will end up with
->> with a 64bit PCI window that covers only the cold-plugged PCI
->> devices, still no room for hotplug.
->>
->>> - What QEMU commit regressed the previous functionality?
->>>
->>
->>  =C2=A0- commit 39848901818 pc: limit 64 bit hole to 2G by default
->>  =C2=A0shows us QEMU had the 64bit PCI hole, so it is a regression.
->=20
-> (Side remark: this commit was part of release v1.6.0, and at that time
-> we also had the "etc/pci-info" fw_cfg file.)
->=20
->>
->>  =C2=A0- commit 2028fdf3791 piix: use 64 bit window programmed by gues=
-t
->>  =C2=A0leaves no room for PCI hotplug
->=20
-> (Side remark: part of v1.7.0, from 2013. So, we can call this a
-> regression, but then it's a very old one.
->=20
-> Of course this is *not* a counter-argument to your patch, or commit
-> message wording; it's just that I'm surprised that the issue could
-> remain dormant this long -- usually users report regressions very quick=
-ly.)
->=20
+Please use default-configs instead of a new configure switch.  See how
+CONFIG_VHOST_USER_SCSI is used in default-configs/pci.mak and
+default-configs/s390x-softmmu.mak.
 
-I also thought I am proposing a new feature and I was pretty amazed
-I actually fix something that worked before.
+>=20
+> +static const int user_feature_bits[] =3D {
+> +    VIRTIO_BLK_F_SIZE_MAX,
+> +    VIRTIO_BLK_F_SEG_MAX,
+> +    VIRTIO_BLK_F_GEOMETRY,
+> +    VIRTIO_BLK_F_BLK_SIZE,
+> +    VIRTIO_BLK_F_TOPOLOGY,
+> +    VIRTIO_BLK_F_SCSI,
 
->>
->>> - How exactly is the regression (and this fix) exposed to the guest?
->>>
->>
->> The nuance is both above commits computed the actual MMIO
->> range used by cold-plugged devices, but as side effect
->> they influenced the remaining PCI window for hot-plugged devices.
->>
->> What the guest sees is the CRS MMIO range over 4G.
->=20
-> OK, understood.
->=20
->>
->>> I'm confused because semi-recently I've done multiple successful
->>> hotplugs, with OVMF, Q35, PCIe root ports, and PCI Express devices
->>> having large (64-bit) MMIO BARs. The examples include ivshmem / Linux
->>> guest (based on your hints) and vfio-pci (XL710 NIC) / Windows Server
->>> 2016 guest.
->>
->> Cool! These are actually great news!
->> Back to the issue in hand, a few things:
->> 1. It works with Q35 only, but not with the I440FX machines.
->=20
-> OK.
->=20
->> 2. The hints are used for the PCIe root ports, meaning for PCI bridges
->>  =C2=A0=C2=A0 and addresses a slightly different issues: leave hotplug=
- space
->>  =C2=A0=C2=A0 for secondary buses, while this patch tackles hotplug
->>  =C2=A0=C2=A0 space for root buses.
->=20
-> OK.
->=20
->>
->>>
->>> By default, OVMF marks a 32GB area as 64-bit MMIO aperture, for BAR
->>> allocation. This area is above the normal memory (plus reservation fo=
-r
->>> hotplug memory, if any). It is also GB-aligned. The aperture size can=
- be
->>> changed (currently) with an experimental -fw_cfg switch (the fw_cfg f=
-ile
->>> is called "opt/ovmf/X-PciMmio64Mb", it states the size of the 64-bit
->>> MMIO aperture as a decimal number of megabytes).
->>
->> I'll try to explain how I see the "picture":
->> CRS is created by QEMU and computed *after* the firmware finishes
->> the PCI BARs allocations.
->=20
-> Yes.
->=20
->> Then *QEMU* decides how big it will be the
->> 64bit PCI hole, not the firmware - see the past commits.
->=20
-> Yes, first the guest-side programming happens, then QEMU (re-)calculate=
-s
-> the ACPI payload once the right ACPI fw_cfg file is selected / read.
-> This re-calculation (including the CRS) observes the previously
-> programmed values.
->=20
->>
->> So IMHO you don't need the opt/ovmf/X-PciMmio64Mb since the OVMF
->> is not deciding this value. It actually should not care at all.
->=20
-> OVMF cannot *not* care. It must internally provide (to other,
-> platform-independent components in edk2) the 64-bit MMIO aperture that
-> the BARs can be allocated from.
->=20
->=20
-> But maybe I'm totally misunderstanding this patch! Are you saying that
-> the patch makes the following difference only: when the CRS is
-> recalculated (i.e., after the PCI enumeration has completed in the
-> guest, and the ACPI linker/loader fw_cfg files are opened), then you
-> only grow / round up the 64-bit range?
->=20
+Please omit VIRTIO_BLK_F_SCSI, it's a legacy option that is not anymore
+part of virtio 1.0.
 
-Exactly.
+> +    VIRTIO_BLK_F_MQ,
+> +    VIRTIO_BLK_F_RO,
+> +    VIRTIO_BLK_F_FLUSH,
+> +    VIRTIO_BLK_F_BARRIER,
 
-> That would make sense, because a *superset* aperture exposed to the OS
-> via the _CRS does not invalidate any allocations done by the firmware
-> earlier. Furthermore, the firmware itself need not learn about the
-> details of said superset. In this sense I agree that OVMF should not
-> care at all.
+Same for VIRTIO_BLK_F_BARRIER.
+
+> +    VIRTIO_BLK_F_WCE,
+
+And VIRTIO_BLK_F_WCE is the same as VIRTIO_BLK_F_FLUSH, so it can be
+removed too.  Please include VIRTIO_BLK_F_CONFIG_WCE instead, since you
+are supporting it in vhost_user_blk_set_config.
+
+> +    VIRTIO_F_VERSION_1,
+> +    VIRTIO_RING_F_INDIRECT_DESC,
+> +    VIRTIO_RING_F_EVENT_IDX,
+> +    VIRTIO_F_NOTIFY_ON_EMPTY,
+> +    VHOST_INVALID_FEATURE_BIT
+> +};
+
 >=20
+> +static const TypeInfo vhost_user_blk_info =3D {
+> +    .name =3D TYPE_VHOST_USER_BLK,
+> +    .parent =3D TYPE_VIRTIO_DEVICE,
+> +    .instance_size =3D sizeof(VHostUserBlk),
+> +    .instance_init =3D vhost_user_blk_instance_init,
+> +    .class_init =3D vhost_user_blk_class_init,
+> +};
+> +
 
-Exactly, the range is a superset.
+There is some code duplication, so maybe it's worth introducing a common
+superclass like TYPE_VIRTIO_SCSI_COMMON.  I'll let others comment on
+whether this is a requirement.
 
-> [snip]
->=20
->>> Also, how do you plan to integrate this feature with SeaBIOS?
->=20
-> (Ever since I sent my previous response, I've been glad that I finished
-> my email with this question -- I really think OVMF and SeaBIOS should
-> behave uniformly in this regard. So I'm happy about your answer:)
->=20
->> Simple, no need :) . It just works as it should.
->> SeaBIOS computes everything, *then* QEMU creates the CRs ranges
->> based on firmware input and other properties.
->> I think it works also with OVMF out of the box.
->=20
-> OK, so this explains it all, thank you very much -- my question is if
-> you could spell out those "other properties" in a bit more detail (I
-> apologize if these should be obvious to me already, from the commit
-> message and the patch):
->=20
-
-"Other properties" was a vague link to max RAM, and things like that.
-Nothing specific.
-
-> (1) How exactly does the enlarged 64-bit hole remain a *superset* of th=
-e
-> firmware-programmed BARs? Can you point me to a location in the code?
->=20
-
-Sure in the patch itself:
-  We first take the firmware computed ranges:
-      pci_bus_get_w64_range(h->bus, &w64);
-  Look at the *get_pci_hole64_start -> If the firmware set it we don't to=
-uch.
-  And to the *get_pci_hole64_end -> We only update the value if is smalle=
-r
-                                     than what firmware set.
-
-
-
-> (2) What happens if we do have more than 1TB RAM?
->=20
-
-You get no 64bit "hot-pluggable" reserved range.
-The code dealing with that is:
-
-+    if (hole64_start > PCI_HOST_PCI_HOLE64_END) {
-+        hole64_start =3D PCI_HOST_PCI_HOLE64_END;
-+    }
-
-And since the end is hard-coded to PCI_HOST_PCI_HOLE64_END
-we have a 0 size region which gets discarded.
-
-An interesting case is if we have more than 1T RAM and the
-firmware assigns BARs over that, we are increasing the
-64bit window to include some of the RAM...
-
-A better approach is to check against the actual hole64
-end and not the magic value.
-I'll send a v3, thanks!
-
->> A last note, when pxb/pxb-pcies will became hot-pluggable
->> we need to leave some bits for them too. I wouldn't
->> really want to add fw_config files for them too, or
->> use a complicate fw_config, or rewrite
->> the logic for all firmware if we don't have to.
->=20
-> OK.
->=20
->>
->> 64bit PCI window starts from memory(+reserved) end
->> and finishes at 40bit.
->=20
-> OK, this seems to (partly) answer my question (1) -- can you please
-> confirm that the
->=20
->    finishes at 40bit
->=20
-> part does not imply forcefully truncating the CRS at 1TB, in case the
-> firmware already allocated BARs higher than that?
->=20
-
-I confirm:
-
-+    if (s->pci_hole64_fix && value < PCI_HOST_PCI_HOLE64_END) {
-+        value =3D PCI_HOST_PCI_HOLE64_END;
-+    }
-
-I touch the value only if is smaller than what the firmware set.
-
->> If you have 1T of RAM you
->> get nothing for PCI hotplug, seems fair.
->=20
-> This is fine (as the answer to my question (2)) as long as you mean it
-> in the following sense: "QEMU will simply *not grow* the MMIO in the
-> _CRS past 1TB".
->=20
->> When guests with more then 1T of RAM will become
->> frequent, I suppose the QEMU's default CPU addressable
->> bits will change and we will change it too.
->=20
-> Thanks Marcel, I feel a lot safer now.
->=20
-> Please confirm that the changes can only grow the area exposed in the
-> _CRS -- i.e., only lower or preserve the base, and only raise or
-> preserve the absolute limit. I'll shut up then :)
->=20
-
-Confirmed and thanks for the review!
-
-Thanks,
-Marcel
-
-> Thanks!
-> Laszlo
->=20
+Paolo
