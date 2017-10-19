@@ -1,39 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58235)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58260)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e5C4y-0002qy-8k
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 10:45:49 -0400
+	(envelope-from <berrange@redhat.com>) id 1e5C50-0002r4-Ol
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 10:45:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e5C4t-0000x8-DF
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 10:45:48 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:51604)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1e5C4t-0000wd-4R
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 10:45:43 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v9JEjXs7100456
-	for <qemu-devel@nongnu.org>; Thu, 19 Oct 2017 10:45:39 -0400
-Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2dpx2m82jq-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 19 Oct 2017 10:45:36 -0400
-Received: from localhost
-	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Thu, 19 Oct 2017 08:45:01 -0600
-References: <20171009225623.29232-1-marcandre.lureau@redhat.com>
-	<523bf8e7-0be0-0db9-83da-4e7d7449562f@linux.vnet.ibm.com>
-	<969297048.30042590.1508423615378.JavaMail.zimbra@redhat.com>
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Thu, 19 Oct 2017 10:44:58 -0400
+	(envelope-from <berrange@redhat.com>) id 1e5C4w-0000zB-OK
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 10:45:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33444)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1e5C4w-0000yn-El
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 10:45:46 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 41A51806B3
+	for <qemu-devel@nongnu.org>; Thu, 19 Oct 2017 14:45:45 +0000 (UTC)
+Date: Thu, 19 Oct 2017 15:45:37 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20171019144537.GT8408@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20171019142848.572-1-berrange@redhat.com>
+	<20171019142848.572-5-berrange@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <969297048.30042590.1508423615378.JavaMail.zimbra@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Message-Id: <6b6eb9ff-b9de-7480-3f0d-ee2e7b5ab3b1@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 00/42] TPM: code cleanup & CRB device
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20171019142848.572-5-berrange@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v1 4/9] ps2: fix scancodes sent for
+ Alt-Print key combination (aka SysRq)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,35 +35,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
-Cc: amarnath valluri <amarnath.valluri@intel.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-On 10/19/2017 10:33 AM, Marc-Andr=C3=A9 Lureau wrote:
-> Hi Stefan
->
-> ----- Original Message -----
->> On 10/09/2017 06:55 PM, Marc-Andr=C3=A9 Lureau wrote:
->>> Hi,
->>>
->>> I accumulated a series of patch doing some TPM code cleanup while
->>> doing review. I removed some dead code, simplified other parts, and
->>> tried to isolate implementation of the backend and frontend by using =
-a
->>> new TPMIf interface. I solved a few issues, and added some FIXME for
->>> what should be tackled.  Finally, I implemented a simple CRB device
->>> (tpm 2.0) that is work in progress for now - it works fine with
->>> passthrough, but swtpm/libtpms with win10 has some issues that need
->>> more investigations.
->>>
->>> seabios CRB support is required for TPM 2.0 & emulation
->>> (https://mail.coreboot.org/pipermail/seabios/2017-October/011839.html=
-)
->>>
->>> Comments/review welcome!
->> Are you going to post a v2 soon?
-> I was wondering if you would take the patches that you already reviewed=
- for the next pull request. That way v2 would be smaller.
+On Thu, Oct 19, 2017 at 03:28:43PM +0100, Daniel P. Berrange wrote:
+> The 'Print' key is special in the AT set 1 / set 2 scancode definitions.
+> 
+> An unmodified 'Print' key is supposed to send
+> 
+>  AT Set 1:  e0 2a e0 37 (Down)  e0 b7 e0 aa (Up)
+>  AT Set 2:  e0 12 e0 7c (Down)  e0 f0 7c e0 f0 12 (Up)
+> 
+> which QEMU gets right. When pressed in combination with the 'Alt_L' or 'Alt_R'
+> keys (which signify SysRq), the scancodes are required to follow a different
+> scheme. With Alt_L, the expected sequences are
+> 
+>  AT set 1:  38, 54 (Down) d4, b8 (Up)
+>  AT set 2:  11, 84 (Down) f0 84, f0 11 (Up)
+> 
+> And with Alt_R
+> 
+>  AT set 1:  e0 38, 54 (Down) d4, e0 b8 (Up)
+>  AT set 2:  e0 11, 84 (Down) f0 84, f0 e0 11 (Up)
+> 
+> It is actually slightly more complicated than that, because (according results
+> of 'showkey -s', keyboards will in fact first release the currently pressed
+> modifier before sending the sequence above (which effectively re-presses &
+> then releases the modifier) and finally re-press the original modifier
+> afterwards. IOW, with Alt_L we need to send
+> 
+>  AT set 1:  b8, 38, 54 (Down) d4, b8, 38 (Up)
+>  AT set 2:  f0 11, 11, 84 (Down) f0 84, f0 11, 11 (Up)
+> 
+> And with Alt_R
+> 
+>  AT set 1:  e0 b8, e0 38, 54 (Down) d4, e0 b8, e0 38 (Up)
+>  AT set 2:  e0 f0 11, e0 11, 84 (Down) f0 84, e0 f0 11, e0 11 (Up)
+> 
+> The AT set 3 scancodes have no special handling for Alt-Print.
+> 
+> Rather than fixing the handling of the 'print' key in the ps2 driver to consider
+> the Alt modifiers, way back, a patch was commited that defined an extra 'sysrq'
+> key name:
+> 
+>   commit f2289cb6924afc97b2a75d21bfc9217024d11741
+>   Author: balrog <balrog@c046a42c-6fe2-441c-8c8c-71466251a162>
+>   Date:   Wed Jun 4 10:14:16 2008 +0000
+> 
+>     Add sysrq to key names known by "sendkey".
+> 
+>     Adding sysrq keycode to the table enabling running sysrq debugging in
+>     the guest via the monitor sendkey command, like:
+> 
+>     (qemu) sendkey alt-sysrq-t
+> 
+>     Tested on x86-64 target and Linux guest.
+> 
+>     Signed-off-by: Ryan Harper <ryanh@us.ibm.com>
+> 
+> With this patch QEMU would send
+> 
+>  AT set 1:  38, 54 (Down) d4, b8 (Up)
+>  AT set 2:  11, 84 (Down) f0 84, f0 11 (Up)
+> 
+> but this doesn't match what actual real keyboards send, as it is not releasing
+> the original modifier & pressing it again afterwards. In addition the original
+> problem remains, and a new problem was added:
+> 
+>   - The sequence 'alt-print-t' is still broken, acting as if 'print-t' was
+>     requested
+>   - The sequence 'sysrq-t' is broken, injecting an undefine scancode sequence
+>     tot he guest os (bare 0x54)
+> 
+> To deal with this mess we make these changes to the ps2 code, so that we track
+> the state of modifier keys (Alt, Shift, Ctrl - both left & right). Then we can
+> vary what scancodes are sent for Q_KEY_CODE_PRINT according to the Alt key
+> modifier state
+> 
+> Interestingly, it appears that of operating systems I've checked (Linux, FreeBSD
+> and OpenSolaris), none of them actually bother to validate the full sequences
+> for a unmodified 'Print' key. They all just ignore the leading "e0 2a" and
+> trigger based off "e0 37" alone. The latter two byte sequence is what keyboards
+> send with 'Print' is combined with 'Shift' or 'Ctrl' modifiers.
+> 
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> ---
+>  hw/input/ps2.c        | 137 ++++++++++++++++++++++++++++++++++++++++++--------
+>  hw/input/trace-events |   1 +
+>  2 files changed, 118 insertions(+), 20 deletions(-)
+> 
+> diff --git a/hw/input/ps2.c b/hw/input/ps2.c
+> index dff3f1e024..1e6f6ae9b6 100644
+> --- a/hw/input/ps2.c
+> +++ b/hw/input/ps2.c
+> @@ -78,6 +78,14 @@
+>  
+>  #define PS2_QUEUE_SIZE 16  /* Buffer size required by PS/2 protocol */
+>  
+> +/* Bits for 'modifiers' field in PS2KbdState */
+> +#define MOD_CTRL_L  (1 << 0)
+> +#define MOD_SHIFT_L (1 << 1)
+> +#define MOD_ALT_L   (1 << 2)
+> +#define MOD_CTRL_R  (1 << 3)
+> +#define MOD_SHIFT_R (1 << 4)
+> +#define MOD_ALT_R   (1 << 5)
+> +
+>  typedef struct {
+>      /* Keep the data array 256 bytes long, which compatibility
+>       with older qemu versions. */
+> @@ -99,6 +107,7 @@ typedef struct {
+>      int scancode_set; /* 1=XT, 2=AT, 3=PS/2 */
+>      int ledstate;
+>      bool need_high_bit;
+> +    unsigned int modifiers; /* bitmask of MOD_* constants above */
+>  } PS2KbdState;
 
-I'll take them up to 21/42.
+Presumably the addition of this field means I should do something with the
+vmstate for migration. I'm unclear exactly how to modify that data in the right
+way that correctly preserves back compatibility ?
 
-    Stefan
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
