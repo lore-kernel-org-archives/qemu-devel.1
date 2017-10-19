@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51733)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51713)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1e54NL-0000lS-20
+	(envelope-from <peterx@redhat.com>) id 1e54NJ-0000kz-Ul
 	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 02:32:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1e54NK-0003DK-7m
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 02:32:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48558)
+	(envelope-from <peterx@redhat.com>) id 1e54NF-0003Bh-TC
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 02:32:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41064)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1e54NK-0003Ct-1a
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 02:32:14 -0400
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1e54NF-0003BI-NR
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 02:32:09 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
 	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 194424E919
-	for <qemu-devel@nongnu.org>; Thu, 19 Oct 2017 06:32:13 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 93A5761470
+	for <qemu-devel@nongnu.org>; Thu, 19 Oct 2017 06:32:08 +0000 (UTC)
 From: Peter Xu <peterx@redhat.com>
-Date: Thu, 19 Oct 2017 14:31:58 +0800
-Message-Id: <20171019063200.19048-3-peterx@redhat.com>
-In-Reply-To: <20171019063200.19048-1-peterx@redhat.com>
-References: <20171019063200.19048-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH 2/4] migration: provide ram_state_cleanup
+Date: Thu, 19 Oct 2017 14:31:56 +0800
+Message-Id: <20171019063200.19048-1-peterx@redhat.com>
+Subject: [Qemu-devel] [PATCH 0/4] migration: fixes and cleanups for ram
+ state init
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,47 +31,19 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Laurent Vivier <lvivier@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
 
-There are two Mutexes that are created but not yet destroyed for
-RAMState.  Fix that.
+I saw some leaks during ram setup, so trying to fix them.  Since at
+it, I cleaned up the ram init phase a bit along with ram cleanup.
 
-Since we are at it, provide helper function to clean up RAMState.
+Please review.  Thanks,
 
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- migration/ram.c | 13 ++++++++++---
- 1 file changed, 10 insertions(+), 3 deletions(-)
+Peter Xu (4):
+  migration: provide ram_state_init()
+  migration: provide ram_state_cleanup
+  migration: clean up xbzrle cache init/destroy
+  migration: new ram_init_bitmaps()
 
-diff --git a/migration/ram.c b/migration/ram.c
-index fd8e14c59b..72c48e76e9 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -1566,6 +1566,15 @@ static void xbzrle_load_cleanup(void)
-     XBZRLE.decoded_buf = NULL;
- }
- 
-+static void ram_state_cleanup(RAMState **rsp)
-+{
-+    migration_page_queue_free(*rsp);
-+    qemu_mutex_destroy(&(*rsp)->bitmap_mutex);
-+    qemu_mutex_destroy(&(*rsp)->src_page_req_mutex);
-+    g_free(*rsp);
-+    *rsp = NULL;
-+}
-+
- static void ram_save_cleanup(void *opaque)
- {
-     RAMState **rsp = opaque;
-@@ -1595,10 +1604,8 @@ static void ram_save_cleanup(void *opaque)
-         XBZRLE.zero_target_page = NULL;
-     }
-     XBZRLE_cache_unlock();
--    migration_page_queue_free(*rsp);
-     compress_threads_save_cleanup();
--    g_free(*rsp);
--    *rsp = NULL;
-+    ram_state_cleanup(rsp);
- }
- 
- static void ram_state_reset(RAMState *rs)
+ migration/ram.c | 194 +++++++++++++++++++++++++++++++++++++-------------------
+ 1 file changed, 128 insertions(+), 66 deletions(-)
+
 -- 
 2.13.5
