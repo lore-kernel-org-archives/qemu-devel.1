@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50971)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50966)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1e59o9-000338-4l
+	(envelope-from <dgibson@ozlabs.org>) id 1e59o7-000334-D8
 	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 08:20:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1e59o5-0006Re-Ow
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 08:20:17 -0400
-Received: from ozlabs.org ([103.22.144.67]:37401)
+	(envelope-from <dgibson@ozlabs.org>) id 1e59o5-0006RZ-P6
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 08:20:15 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:47971)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1e59o4-0006Pg-AV
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1e59o4-0006Pf-Ac
 	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 08:20:13 -0400
-Date: Thu, 19 Oct 2017 22:49:54 +1100
+Date: Thu, 19 Oct 2017 21:42:18 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20171019114954.GC13245@umbus>
+Message-ID: <20171019104218.GB13245@umbus>
 References: <1508170976-96869-1-git-send-email-imammedo@redhat.com>
-	<20171016163636.GI11975@redhat.com>
-	<20171017092702.5b82103b@nial.brq.redhat.com>
-	<20171017150759.GB31897@redhat.com>
-	<20171017180635.6a900616@nial.brq.redhat.com>
-	<20171018153010.GL9719@redhat.com>
-	<20171018202240.GD2942@localhost.localdomain>
+	<1508170976-96869-5-git-send-email-imammedo@redhat.com>
+	<20171016165916.GI3246@localhost.localdomain>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="Clx92ZfkiYIKRjnr"
+	protocol="application/pgp-signature"; boundary="qlTNgmc+xy1dBmNv"
 Content-Disposition: inline
-In-Reply-To: <20171018202240.GD2942@localhost.localdomain>
-Subject: Re: [Qemu-devel] [RFC 0/6] enable numa configuration before
- machine_init() from HMP/QMP
+In-Reply-To: <20171016165916.GI3246@localhost.localdomain>
+Subject: Re: [Qemu-devel] [RFC 4/6] CLI: add -paused option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,131 +30,252 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, Igor Mammedov <imammedo@redhat.com>, peter.maydell@linaro.org, pkrempa@redhat.com, cohuck@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com, pbonzini@redhat.com
+Cc: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, eblake@redhat.com, armbru@redhat.com, pkrempa@redhat.com, peter.maydell@linaro.org, pbonzini@redhat.com, cohuck@redhat.com
 
 
---Clx92ZfkiYIKRjnr
+--qlTNgmc+xy1dBmNv
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Oct 18, 2017 at 06:22:40PM -0200, Eduardo Habkost wrote:
-> On Wed, Oct 18, 2017 at 04:30:10PM +0100, Daniel P. Berrange wrote:
-> > On Tue, Oct 17, 2017 at 06:06:35PM +0200, Igor Mammedov wrote:
-> > > On Tue, 17 Oct 2017 16:07:59 +0100
-> > > "Daniel P. Berrange" <berrange@redhat.com> wrote:
-> > >=20
-> > > > On Tue, Oct 17, 2017 at 09:27:02AM +0200, Igor Mammedov wrote:
-> > > > > On Mon, 16 Oct 2017 17:36:36 +0100
-> > > > > "Daniel P. Berrange" <berrange@redhat.com> wrote:
-> > > > >  =20
-> > > > > > On Mon, Oct 16, 2017 at 06:22:50PM +0200, Igor Mammedov wrote: =
-=20
-> > > > > > > Series allows to configure NUMA mapping at runtime using QMP/=
-HMP
-> > > > > > > interface. For that to happen it introduces a new '-paused' C=
-LI option
-> > > > > > > which allows to pause QEMU before machine_init() is run and
-> > > > > > > adds new set-numa-node HMP/QMP commands which in conjuction w=
-ith
-> > > > > > > info hotpluggable-cpus/query-hotpluggable-cpus allow to confi=
-gure
-> > > > > > > NUMA mapping for cpus.   =20
-> > > > > >=20
-> > > > > > What's the problem we're seeking solve here compared to what we=
- currently
-> > > > > > do for NUMA configuration ? =20
-> > > > > From RHBZ1382425
-> > > > > "
-> > > > > Current -numa CLI interface is quite limited in terms that allow =
-map
-> > > > > CPUs to NUMA nodes as it requires to provide cpu_index values whi=
-ch=20
-> > > > > are non obvious and depend on machine/arch. As result libvirt has=
- to
-> > > > > assume/re-implement cpu_index allocation logic to provide valid=
-=20
-> > > > > values for -numa cpus=3D... QEMU CLI option. =20
-> > > >=20
-> > > > In broad terms, this problem applies to every device / object libvi=
-rt
-> > > > asks QEMU to create. For everything else libvirt is able to assign a
-> > > > "id" string, which is can then use to identify the thing later. The
-> > > > CPU stuff is different because libvirt isn't able to provide 'id'
-> > > > strings for each CPU - QEMU generates a psuedo-id internally which
-> > > > libvirt has to infer. The latter is the same problem we had with
-> > > > devices before '-device' was introduced allowing 'id' naming.
-> > > >=20
-> > > > IMHO we should take the same approach with CPUs and start modelling=
-=20
-> > > > the individual CPUs as something we can explicitly create with -obj=
-ect
-> > > > or -device. That way libvirt can assign names and does not have to=
-=20
-> > > > care about CPU index values, and it all works just the same way as
-> > > > any other devices / object we create
-> > > >=20
-> > > > ie instead of:
-> > > >=20
-> > > >   -smp 8,sockets=3D4,cores=3D2,threads=3D1
-> > > >   -numa node,nodeid=3D0,cpus=3D0-3
-> > > >   -numa node,nodeid=3D1,cpus=3D4-7
-> > > >=20
-> > > > we could do:
-> > > >=20
-> > > >   -object numa-node,id=3Dnuma0
-> > > >   -object numa-node,id=3Dnuma1
-> > > >   -object cpu,id=3Dcpu0,node=3Dnuma0,socket=3D0,core=3D0,thread=3D0
-> > > >   -object cpu,id=3Dcpu1,node=3Dnuma0,socket=3D0,core=3D1,thread=3D0
-> > > >   -object cpu,id=3Dcpu2,node=3Dnuma0,socket=3D1,core=3D0,thread=3D0
-> > > >   -object cpu,id=3Dcpu3,node=3Dnuma0,socket=3D1,core=3D1,thread=3D0
-> > > >   -object cpu,id=3Dcpu4,node=3Dnuma1,socket=3D2,core=3D0,thread=3D0
-> > > >   -object cpu,id=3Dcpu5,node=3Dnuma1,socket=3D2,core=3D1,thread=3D0
-> > > >   -object cpu,id=3Dcpu6,node=3Dnuma1,socket=3D3,core=3D0,thread=3D0
-> > > >   -object cpu,id=3Dcpu7,node=3Dnuma1,socket=3D3,core=3D1,thread=3D0
-> > > the follow up question would be where do "socket=3D3,core=3D1,thread=
-=3D0"
-> > > come from, currently these options are the function of
-> > > (-M foo -smp ...) and can be queried vi query-hotpluggble-cpus at
-> > > runtime after qemu parses -M and -smp options.
+On Mon, Oct 16, 2017 at 02:59:16PM -0200, Eduardo Habkost wrote:
+> On Mon, Oct 16, 2017 at 06:22:54PM +0200, Igor Mammedov wrote:
+> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> > ---
+> >  include/sysemu/sysemu.h |  1 +
+> >  qemu-options.hx         | 15 ++++++++++++++
+> >  qmp.c                   |  5 +++++
+> >  vl.c                    | 54 +++++++++++++++++++++++++++++++++++++++++=
++++++++-
+> >  4 files changed, 74 insertions(+), 1 deletion(-)
 > >=20
-> > NB, I realize my example was open to mis-interpretation. The values I'm
-> > illustrating here for socket=3D3,core=3D1,thread=3D0 and *not* ID value=
-s, they
-> > are a plain enumeration of values. ie this is saying the 4th socket, the
-> > 2nd core and the 1st thread.  Internally QEMU might have the 2nd core
-> > with a core-id of 8, or 7038 or whatever architecture specific numbering
-> > scheme makes sense, but that's not what the mgmt app gives at the CLI
-> > level
+> > diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+> > index b213696..3feb94f 100644
+> > --- a/include/sysemu/sysemu.h
+> > +++ b/include/sysemu/sysemu.h
+> > @@ -66,6 +66,7 @@ typedef enum WakeupReason {
+> >      QEMU_WAKEUP_REASON_OTHER,
+> >  } WakeupReason;
+> > =20
+> > +void qemu_exit_preconfig_request(void);
+> >  void qemu_system_reset_request(ShutdownCause reason);
+> >  void qemu_system_suspend_request(void);
+> >  void qemu_register_suspend_notifier(Notifier *notifier);
+> > diff --git a/qemu-options.hx b/qemu-options.hx
+> > index 39225ae..bd44db8 100644
+> > --- a/qemu-options.hx
+> > +++ b/qemu-options.hx
+> > @@ -3498,6 +3498,21 @@ STEXI
+> >  Run the emulation in single step mode.
+> >  ETEXI
+> > =20
+> > +DEF("paused", HAS_ARG, QEMU_OPTION_paused, \
+> > +    "-paused [state=3D]postconf|preconf\n"
+> > +    "                postconf: pause QEMU after machine is initialized=
+\n"
+> > +    "                preconf: pause QEMU before machine is initialized=
+\n",
+> > +    QEMU_ARCH_ALL)
 >=20
-> I believe we have been trying to avoid index numbers to identify
-> entities as a reaction to the bad experience we had with the
-> cpu_index/apic_id mess in the past.
+> I would like to allow pausing before machine-type is selected, so
+> management could run query-machines before choosing a
+> machine-type.  Would that need a third "-pause" mode, or will we
+> be able to change "preconf" to pause before select_machine() is
+> called?
 >=20
-> An interface using arch-independent socket/core/thread indexes
-> (not arch-dependent IDs) like you propose in the paragraph above
-> could be a solution, as long as it is documented very clearly
-> (and we include automated testing for those constraints).  But
-> note that this is _not_ how the socket/core/thread IDs on the
-> "-device *-cpu" and -numa command-line options work today.
->=20
-> Also, this might solve the problem for CPU socket/core/thread
-> identification, but might not be enough for the messy device
-> address assignment rules that libvirt needs to duplicate in
-> src/qemu/qemu_domain_address.c today.
+> The same probably applies to other things initialized before
+> machine_run_board_init() that could be configurable using QMP,
+> including but not limited to:
+> * Accelerator configuration
+> * Registering global properties
+> * RAM size
+> * SMP/CPU configuration
 
-Note that describing socket/core/thread tuples as arch independent (or
-even machine independent) is.. debatable.  I mean it's flexible enough
-that most platforms can be fit to that scheme without too much
-straining.  But, there's no arch independent way of defining what each
-level means in terms of its properties.
+Yeah.. having a bunch of different possible pause stages to select
+doesn't sound great.  Could we avoid this by instead changing -S to
+pause at the earliest possible spot, but having any monitor commands
+that require a later stage automatically "fast forwarding" to the
+right phase?
 
-So, for example, on spapr - being paravirt - there's no real
-distinction between cores and sockets, how you divide them up is
-completely arbitrary.  I don't think we have any implemented, but it's
-easy to imagine modelling a big server type machine with more than 3
-natural layers of heirarchy (say, thread, core, chip,
-multi-chip-module, big-honkin-drawer-of-processors, ...).
+>=20
+>=20
+> > +STEXI
+> > +@item -paused
+> > +@findex -paused
+> > +if set enabled interactive configuration stages before machine emulati=
+on starts.
+> > +'postconf' option value mimics -S option behaviour where machine is cr=
+eated
+> > +but emulation isn't started. 'preconf' option value pauses QEMU before=
+ machine
+> > +is created, which allows to query and configure properties affecting m=
+achine
+> > +initialization. Use monitor/QMP command 'cont' to go to exit paused st=
+ate.
+>=20
+> What if "-S" is used at the same time"?  Will "cont" only
+> initialize the machine and wait for another "cont" command to
+> start the VCPUs, or will it unpause everything?
+>=20
+>=20
+> > +ETEXI
+> > +
+> >  DEF("S", 0, QEMU_OPTION_S, \
+> >      "-S              freeze CPU at startup (use 'c' to start execution=
+)\n",
+> >      QEMU_ARCH_ALL)
+> > diff --git a/qmp.c b/qmp.c
+> > index e8c3031..49e9a5c 100644
+> > --- a/qmp.c
+> > +++ b/qmp.c
+> > @@ -167,6 +167,11 @@ void qmp_cont(Error **errp)
+> >      BlockBackend *blk;
+> >      Error *local_err =3D NULL;
+> > =20
+> > +    if (runstate_check(RUN_STATE_PRELAUNCH)) {
+> > +        qemu_exit_preconfig_request();
+> > +        return;
+> > +    }
+> > +
+> >      /* if there is a dump in background, we should wait until the dump
+> >       * finished */
+> >      if (dump_in_progress()) {
+> > diff --git a/vl.c b/vl.c
+> > index 3fed457..30631fd 100644
+> > --- a/vl.c
+> > +++ b/vl.c
+> > @@ -555,6 +555,20 @@ static QemuOptsList qemu_fw_cfg_opts =3D {
+> >      },
+> >  };
+> > =20
+> > +static QemuOptsList qemu_paused_opts =3D {
+> > +    .name =3D "paused",
+> > +    .implied_opt_name =3D "state",
+> > +    .head =3D QTAILQ_HEAD_INITIALIZER(qemu_paused_opts.head),
+> > +    .desc =3D {
+> > +        {
+> > +            .name =3D "state",
+> > +            .type =3D QEMU_OPT_STRING,
+> > +            .help =3D "Pause state of QEMU on startup",
+> > +        },
+> > +        { /* end of list */ }
+> > +    },
+> > +};
+> > +
+> >  /**
+> >   * Get machine options
+> >   *
+> > @@ -1689,6 +1703,11 @@ static pid_t shutdown_pid;
+> >  static int powerdown_requested;
+> >  static int debug_requested;
+> >  static int suspend_requested;
+> > +static enum {
+> > +    PRECONFIG_CONT =3D 0,
+> > +    PRECONFIG_PAUSE,
+> > +    PRECONFIG_SKIP,
+> > +} preconfig_requested;
+> >  static WakeupReason wakeup_reason;
+> >  static NotifierList powerdown_notifiers =3D
+> >      NOTIFIER_LIST_INITIALIZER(powerdown_notifiers);
+> > @@ -1773,6 +1792,11 @@ static int qemu_debug_requested(void)
+> >      return r;
+> >  }
+> > =20
+> > +void qemu_exit_preconfig_request(void)
+> > +{
+> > +    preconfig_requested =3D PRECONFIG_CONT;
+> > +}
+> > +
+> >  /*
+> >   * Reset the VM. Issue an event unless @reason is SHUTDOWN_CAUSE_NONE.
+> >   */
+> > @@ -1939,6 +1963,12 @@ static bool main_loop_should_exit(void)
+> >      RunState r;
+> >      ShutdownCause request;
+> > =20
+> > +    if (runstate_check(RUN_STATE_PRELAUNCH)) {
+> > +        if (preconfig_requested =3D=3D PRECONFIG_CONT) {
+> > +            preconfig_requested =3D PRECONFIG_SKIP;
+> > +            return true;
+> > +        }
+> > +    }
+> >      if (qemu_debug_requested()) {
+> >          vm_stop(RUN_STATE_DEBUG);
+> >      }
+> > @@ -3177,6 +3207,7 @@ int main(int argc, char **argv, char **envp)
+> >      qemu_add_opts(&qemu_icount_opts);
+> >      qemu_add_opts(&qemu_semihosting_config_opts);
+> >      qemu_add_opts(&qemu_fw_cfg_opts);
+> > +    qemu_add_opts(&qemu_paused_opts);
+> >      module_call_init(MODULE_INIT_OPTS);
+> > =20
+> >      runstate_init();
+> > @@ -3845,6 +3876,26 @@ int main(int argc, char **argv, char **envp)
+> >                      exit(1);
+> >                  }
+> >                  break;
+> > +            case QEMU_OPTION_paused:
+> > +                {
+> > +                    const char *value;
+> > +
+> > +                    opts =3D qemu_opts_parse_noisily(qemu_find_opts("p=
+aused"),
+> > +                                                   optarg, true);
+> > +                    if (opts =3D=3D NULL) {
+> > +                        exit(1);
+> > +                    }
+> > +                    value =3D qemu_opt_get(opts, "state");
+> > +                    if (!strcmp(value, "postconf")) {
+> > +                        autostart =3D 0;
+> > +                    } else if (!strcmp(value, "preconf")) {
+> > +                        preconfig_requested =3D PRECONFIG_PAUSE;
+> > +                    } else {
+> > +                        error_report("incomplete '-paused' option\n");
+> > +                        exit(1);
+> > +                    }
+> > +                    break;
+> > +                }
+> >              case QEMU_OPTION_enable_kvm:
+> >                  olist =3D qemu_find_opts("machine");
+> >                  qemu_opts_parse_noisily(olist, "accel=3Dkvm", false);
+> > @@ -4731,7 +4782,6 @@ int main(int argc, char **argv, char **envp)
+> >      current_machine->boot_order =3D boot_order;
+> >      current_machine->cpu_model =3D cpu_model;
+> > =20
+> > -
+> >      /* parse features once if machine provides default cpu_type */
+> >      if (machine_class->default_cpu_type) {
+> >          current_machine->cpu_type =3D machine_class->default_cpu_type;
+> > @@ -4741,6 +4791,8 @@ int main(int argc, char **argv, char **envp)
+> >          }
+> >      }
+> > =20
+> > +    main_loop(); /* do monitor/qmp handling at preconfig state if requ=
+ested */
+> > +
+>=20
+> I'm impressed by the simplicity of the implementation.  I though
+> this would involve moving everything between this line and the
+> next main_loop() call outside main(), so they would be called by
+> qmp_cont().
+>=20
+> Any expert on GLib's Event Loop sees any gotcha in this method?
+>=20
+> I would like to do a careful review of main_loop_wait() and
+> main_loop_should_exit(), to ensure those functions don't depend
+> on anything that's initialized after this line.  Probably a few
+> existing QMP commands can crash if machine is not initialized
+> yet?
+>=20
+> The rules and expectations on initialization ordering are very
+> subtle, I suggest including test code for the new feature to
+> ensure nothing crashes or breaks in the future.
+>=20
+>=20
+> >      machine_run_board_init(current_machine);
+> > =20
+> >      realtime_init();
+>=20
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -167,24 +283,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---Clx92ZfkiYIKRjnr
+--qlTNgmc+xy1dBmNv
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnokV8ACgkQbDjKyiDZ
-s5J6xQ//Yaipv/wB+sWqShbefMQAQUBpiVUm6iMT5DGJpvIsQWzuyowDSikazJQH
-gqSLOiff3MushX9t72qVW/k9/GByLx0KdylVh5CV03og8ZK6GEkvYi37+vhfU9Ei
-KTXIHVnHNS/i01SnL9rUu2yywMjaN7dfo8kEYZSm5fpofZ7WPIrNF9JEeQl8mCEU
-OiFu0XsPD6K0zwQAaaONAX3vX44Re0GxdoKhs6E4AIv8P8kQWXdCiTfn63D3q5E1
-bEKikgMYCWC2/pZo6mrwnAqHkpoHOwWcXBn10g+FkoeI7HFZcmOFv4h/kUmoE93f
-tgS5cgamosl1HZBvkVa63F/E7M88B7eG1iyaTBJM9ATW7imvZb+RkKiJn9bpa5XW
-1OMNbVnXNDdLQ2VJx8YY6sLqOhlhF6c3WkvLQyp232ziMLFAGqgYEgn3qW45VDcl
-tqJ/8GlYY9crflaMqivkpnp0Lgk9I2aE/VaDcL88WuZZTOpD1LqwdITfRiHomrFD
-mEgqj7SrIg/jzmv56vVKZ8YTMRgpNtQYDxvPY4nixYv2E5fmcOQ2+zh7VA7AyXQY
-zsKOc98dCXEzOmrz/AK/bexRH2TP3X1sDln8vHt12GbxjI0964MiSe0LImp9+rgh
-1lYgtpbV85zPqh0KxHWYsUhFuIIzy24KoYpgGt9coU7WEfQirJo=
-=HzTh
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnogXgACgkQbDjKyiDZ
+s5JDhRAAiOAaUx4Xn+08LSNvMMPugUDn3Tq3oJaF6CLq84catw/OLOK+AoIl1jCV
+uM36PWA/9h+xJ/LOa4IPN2u7zxnz7HSWOqt/rQ9sm4WdODssePjMqItGl1tPNa29
+px1mKvaXiSQuh9e8tJ5rCooI9qaGInxJ+JP3ZMZpwK4KQQI0CTTcpE2OaqE2d5bA
+OTB+EN7D+qXWuHuFP6//qrcfeFAsnGJTjWeO1oQu17F1z999a2Vd2iRsb+Dymy0R
+5cemK01cmSiAZXyP0upLN8frolCFvd+T/PXgHATBSTw0j19AVv60hDwkWJuomhW9
+KbV9HyyNcxvqBb359mlwOXxangZwZizfl1UCt1lGTiLqlVFSG/fMezuy3bVNS6mH
+jZL/2Q+PEM4XCkjL9UgANjWn0CjKm+o1hqkXHSFRYoUNwJJeOXuBB33twroL5e37
+sVHDYitOxXeSSdIJZVScX8xOGRtE5HhV3qBXPQ6Bqu2PfEzqv0Z5jCcobu3HvWYp
+QoLH3C9b40yVZlM+gH5YhOhgPJyh6fV8o2Rjjg0E/5pvhU9xoaGfjIOqTp681vZY
+Rei4II2Sd7ZnzrSEFXPCouG0fl+f9T5AnK6NzGFDtCcM293jSbnhEoYvwFMSzxJa
+HS8kVFVdUhVLaJIlwOQwtH3GRO9cfsusUM3DPauSZvEf/88jauQ=
+=HvZO
 -----END PGP SIGNATURE-----
 
---Clx92ZfkiYIKRjnr--
+--qlTNgmc+xy1dBmNv--
