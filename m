@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56191)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56195)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1e5DaQ-000655-7z
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 12:22:23 -0400
+	(envelope-from <alistai@xilinx.com>) id 1e5DaQ-00065W-PZ
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 12:22:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1e5DaN-0002D2-1W
+	(envelope-from <alistai@xilinx.com>) id 1e5DaN-0002DP-Hg
 	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 12:22:22 -0400
-Received: from mail-sn1nam01on0043.outbound.protection.outlook.com
-	([104.47.32.43]:65360
-	helo=NAM01-SN1-obe.outbound.protection.outlook.com)
+Received: from mail-bn3nam01on0087.outbound.protection.outlook.com
+	([104.47.33.87]:47712
+	helo=NAM01-BN3-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1e5DaM-0002Ce-NC
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 12:22:18 -0400
+	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1e5DaN-0002Cy-AC
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 12:22:19 -0400
 From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Thu, 19 Oct 2017 09:18:11 -0700
-Message-ID: <d34071814ded4ba1ffd2482b3bdfbb71175fc06f.1508390588.git.alistair.francis@xilinx.com>
+Date: Thu, 19 Oct 2017 09:18:14 -0700
+Message-ID: <55afe994ca32715382326d5d250231bdaa836f08.1508390588.git.alistair.francis@xilinx.com>
 In-Reply-To: <cover.1508390588.git.alistair.francis@xilinx.com>
 References: <cover.1508390588.git.alistair.francis@xilinx.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v3 40/46] hw/watchdog: Replace fprintf(stderr,
+Subject: [Qemu-devel] [PATCH v3 41/46] hw/xen*: Replace fprintf(stderr,
  "*\n" with error_report()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -29,7 +29,7 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: alistair.francis@xilinx.com, alistair23@gmail.com, armbru@redhat.com
+Cc: alistair.francis@xilinx.com, alistair23@gmail.com, armbru@redhat.com, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>
 
 Replace a large number of the fprintf(stderr, "*\n" calls with
 error_report(). The functions were renamed with these commands and then
@@ -71,84 +71,200 @@ find ./* -type f -exec sed -i \
 
 Some lines where then manually tweaked to pass checkpatch.
 
+xen_pt_log() was left with an fprintf(stderr,
+
 Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+Cc: Stefano Stabellini <sstabellini@kernel.org>
+Cc: Anthony Perard <anthony.perard@citrix.com>
 ---
+V3:
+ - Don't change xen_pt_log()
 V2:
  - Split hw patch into individual directories
 
- hw/watchdog/watchdog.c     | 9 +++++----
- hw/watchdog/wdt_i6300esb.c | 8 +++++---
- 2 files changed, 10 insertions(+), 7 deletions(-)
+ hw/xen/xen-common.c        | 11 ++++++-----
+ hw/xenpv/xen_domainbuild.c | 24 ++++++++++++------------
+ hw/xenpv/xen_machine_pv.c  |  9 +++++----
+ 3 files changed, 23 insertions(+), 21 deletions(-)
 
-diff --git a/hw/watchdog/watchdog.c b/hw/watchdog/watchdog.c
-index 670114ecfe..d6d11ef1e5 100644
---- a/hw/watchdog/watchdog.c
-+++ b/hw/watchdog/watchdog.c
-@@ -20,6 +20,7 @@
+diff --git a/hw/xen/xen-common.c b/hw/xen/xen-common.c
+index 632a938dcc..42ada2ac05 100644
+--- a/hw/xen/xen-common.c
++++ b/hw/xen/xen-common.c
+@@ -9,6 +9,7 @@
   */
  
  #include "qemu/osdep.h"
 +#include "qemu/error-report.h"
- #include "qemu/option.h"
- #include "qemu/config-file.h"
- #include "qemu/queue.h"
-@@ -52,7 +53,7 @@ int select_watchdog(const char *p)
-     /* -watchdog ? lists available devices and exits cleanly. */
-     if (is_help_option(p)) {
-         QLIST_FOREACH(model, &watchdog_list, entry) {
--            fprintf(stderr, "\t%s\t%s\n",
-+            error_report("\t%s\t%s",
-                      model->wdt_name, model->wdt_description);
-         }
-         return 2;
-@@ -68,9 +69,9 @@ int select_watchdog(const char *p)
-         }
+ #include "hw/xen/xen_backend.h"
+ #include "qmp-commands.h"
+ #include "chardev/char.h"
+@@ -47,19 +48,19 @@ static int store_dev_info(int domid, Chardev *cs, const char *string)
+     /* We now have everything we need to set the xenstore entry. */
+     xs = xs_open(0);
+     if (xs == NULL) {
+-        fprintf(stderr, "Could not contact XenStore\n");
++        error_report("Could not contact XenStore");
+         goto out;
      }
  
--    fprintf(stderr, "Unknown -watchdog device. Supported devices are:\n");
-+    error_report("Unknown -watchdog device. Supported devices are:");
-     QLIST_FOREACH(model, &watchdog_list, entry) {
--        fprintf(stderr, "\t%s\t%s\n",
-+        error_report("\t%s\t%s",
-                  model->wdt_name, model->wdt_description);
+     path = xs_get_domain_path(xs, domid);
+     if (path == NULL) {
+-        fprintf(stderr, "xs_get_domain_path() error\n");
++        error_report("xs_get_domain_path() error");
+         goto out;
      }
-     return 1;
-@@ -126,7 +127,7 @@ void watchdog_perform_action(void)
+     newpath = realloc(path, (strlen(path) + strlen(string) +
+                 strlen("/tty") + 1));
+     if (newpath == NULL) {
+-        fprintf(stderr, "realloc error\n");
++        error_report("realloc error");
+         goto out;
+     }
+     path = newpath;
+@@ -96,13 +97,13 @@ static void xenstore_record_dm_state(struct xs_handle *xs, const char *state)
+     char path[50];
  
-     case WATCHDOG_ACTION_DEBUG:
-         qapi_event_send_watchdog(WATCHDOG_ACTION_DEBUG, &error_abort);
--        fprintf(stderr, "watchdog: timer fired\n");
-+        error_report("watchdog: timer fired");
+     if (xs == NULL) {
+-        fprintf(stderr, "xenstore connection not initialized\n");
++        error_report("xenstore connection not initialized");
+         exit(1);
+     }
+ 
+     snprintf(path, sizeof (path), "device-model/%u/state", xen_domid);
+     if (!xs_write(xs, XBT_NULL, path, state, strlen(state))) {
+-        fprintf(stderr, "error recording dm state\n");
++        error_report("error recording dm state");
+         exit(1);
+     }
+ }
+diff --git a/hw/xenpv/xen_domainbuild.c b/hw/xenpv/xen_domainbuild.c
+index 027f76fad1..f5514ffec2 100644
+--- a/hw/xenpv/xen_domainbuild.c
++++ b/hw/xenpv/xen_domainbuild.c
+@@ -25,22 +25,22 @@ static int xenstore_domain_mkdir(char *path)
+     int i;
+ 
+     if (!xs_mkdir(xenstore, 0, path)) {
+-        fprintf(stderr, "%s: xs_mkdir %s: failed\n", __func__, path);
+-	return -1;
++        error_report("%s: xs_mkdir %s: failed", __func__, path);
++        return -1;
+     }
+     if (!xs_set_permissions(xenstore, 0, path, perms_ro, 2)) {
+-        fprintf(stderr, "%s: xs_set_permissions failed\n", __func__);
+-	return -1;
++        error_report("%s: xs_set_permissions failed", __func__);
++        return -1;
+     }
+ 
+     for (i = 0; writable[i]; i++) {
+         snprintf(subpath, sizeof(subpath), "%s/%s", path, writable[i]);
+         if (!xs_mkdir(xenstore, 0, subpath)) {
+-            fprintf(stderr, "%s: xs_mkdir %s: failed\n", __func__, subpath);
++            error_report("%s: xs_mkdir %s: failed", __func__, subpath);
+             return -1;
+         }
+         if (!xs_set_permissions(xenstore, 0, subpath, perms_rw, 2)) {
+-            fprintf(stderr, "%s: xs_set_permissions failed\n", __func__);
++            error_report("%s: xs_set_permissions failed", __func__);
+             return -1;
+         }
+     }
+@@ -235,7 +235,7 @@ int xen_domain_build_pv(const char *kernel, const char *ramdisk,
+     memcpy(uuid, &qemu_uuid, sizeof(uuid));
+     rc = xen_domain_create(xen_xc, ssidref, uuid, flags, &xen_domid);
+     if (rc < 0) {
+-        fprintf(stderr, "xen: xc_domain_create() failed\n");
++        error_report("xen: xc_domain_create() failed");
+         goto err;
+     }
+     qemu_log("xen: created domain %d\n", xen_domid);
+@@ -248,21 +248,21 @@ int xen_domain_build_pv(const char *kernel, const char *ramdisk,
+ 
+     rc = xc_domain_max_vcpus(xen_xc, xen_domid, smp_cpus);
+     if (rc < 0) {
+-        fprintf(stderr, "xen: xc_domain_max_vcpus() failed\n");
++        error_report("xen: xc_domain_max_vcpus() failed");
+         goto err;
+     }
+ 
+ #if 0
+     rc = xc_domain_setcpuweight(xen_xc, xen_domid, 256);
+     if (rc < 0) {
+-        fprintf(stderr, "xen: xc_domain_setcpuweight() failed\n");
++        error_report("xen: xc_domain_setcpuweight() failed");
+         goto err;
+     }
+ #endif
+ 
+     rc = xc_domain_setmaxmem(xen_xc, xen_domid, ram_size >> 10);
+     if (rc < 0) {
+-        fprintf(stderr, "xen: xc_domain_setmaxmem() failed\n");
++        error_report("xen: xc_domain_setmaxmem() failed");
+         goto err;
+     }
+ 
+@@ -275,7 +275,7 @@ int xen_domain_build_pv(const char *kernel, const char *ramdisk,
+                         xenstore_port, &xenstore_mfn,
+                         console_port, &console_mfn);
+     if (rc < 0) {
+-        fprintf(stderr, "xen: xc_linux_build() failed\n");
++        error_report("xen: xc_linux_build() failed");
+         goto err;
+     }
+ 
+@@ -285,7 +285,7 @@ int xen_domain_build_pv(const char *kernel, const char *ramdisk,
+     qemu_log("xen: unpausing domain %d\n", xen_domid);
+     rc = xc_domain_unpause(xen_xc, xen_domid);
+     if (rc < 0) {
+-        fprintf(stderr, "xen: xc_domain_unpause() failed\n");
++        error_report("xen: xc_domain_unpause() failed");
+         goto err;
+     }
+ 
+diff --git a/hw/xenpv/xen_machine_pv.c b/hw/xenpv/xen_machine_pv.c
+index 69a52a9f93..44d67b87c4 100644
+--- a/hw/xenpv/xen_machine_pv.c
++++ b/hw/xenpv/xen_machine_pv.c
+@@ -23,6 +23,7 @@
+  */
+ 
+ #include "qemu/osdep.h"
++#include "qemu/error-report.h"
+ #include "hw/hw.h"
+ #include "hw/boards.h"
+ #include "hw/xen/xen_backend.h"
+@@ -36,7 +37,7 @@ static void xen_init_pv(MachineState *machine)
+ 
+     /* Initialize backend core & drivers */
+     if (xen_be_init() != 0) {
+-        fprintf(stderr, "%s: xen backend core setup failed\n", __func__);
++        error_report("%s: xen backend core setup failed", __func__);
+         exit(1);
+     }
+ 
+@@ -51,18 +52,18 @@ static void xen_init_pv(MachineState *machine)
+         const char *initrd_filename = machine->initrd_filename;
+         if (xen_domain_build_pv(kernel_filename, initrd_filename,
+                                 kernel_cmdline) < 0) {
+-            fprintf(stderr, "xen pv domain creation failed\n");
++            error_report("xen pv domain creation failed");
+             exit(1);
+         }
          break;
- 
-     case WATCHDOG_ACTION_NONE:
-diff --git a/hw/watchdog/wdt_i6300esb.c b/hw/watchdog/wdt_i6300esb.c
-index e596b0804d..c5f5190e55 100644
---- a/hw/watchdog/wdt_i6300esb.c
-+++ b/hw/watchdog/wdt_i6300esb.c
-@@ -20,7 +20,7 @@
-  */
- 
- #include "qemu/osdep.h"
--
-+#include "qemu/error-report.h"
- #include "qemu-common.h"
- #include "qemu/timer.h"
- #include "sysemu/watchdog.h"
-@@ -186,10 +186,12 @@ static void i6300esb_timer_expired(void *vp)
-         /* What to do at the end of stage 1? */
-         switch (d->int_type) {
-         case INT_TYPE_IRQ:
--            fprintf(stderr, "i6300esb_timer_expired: I would send APIC 1 INT 10 here if I knew how (XXX)\n");
-+            error_report("i6300esb_timer_expired: I would send APIC 1 INT 10"
-+                          "here if I knew how (XXX)");
-             break;
-         case INT_TYPE_SMI:
--            fprintf(stderr, "i6300esb_timer_expired: I would send SMI here if I knew how (XXX)\n");
-+            error_report("i6300esb_timer_expired: I would send SMI here if I"
-+                         "knew how (XXX)");
-             break;
-         }
- 
+     }
+ #endif
+     case XEN_EMULATE:
+-        fprintf(stderr, "xen emulation not implemented (yet)\n");
++        error_report("xen emulation not implemented (yet)");
+         exit(1);
+         break;
+     default:
+-        fprintf(stderr, "unhandled xen_mode %d\n", xen_mode);
++        error_report("unhandled xen_mode %d", xen_mode);
+         exit(1);
+         break;
+     }
 -- 
 2.11.0
