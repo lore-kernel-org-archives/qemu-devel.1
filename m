@@ -1,26 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37183)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40147)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1e57Ph-0006HN-3n
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 05:46:54 -0400
+	(envelope-from <lprosek@redhat.com>) id 1e57UA-0007zT-DH
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 05:51:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1e57Pe-0001ln-K2
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 05:46:53 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:56921)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1e57Pd-0001ib-PO
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 05:46:50 -0400
-Date: Thu, 19 Oct 2017 17:31:51 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20171019063151.GA13245@umbus>
-References: <1508170976-96869-4-git-send-email-imammedo@redhat.com>
-	<1508325132-70513-1-git-send-email-imammedo@redhat.com>
+	(envelope-from <lprosek@redhat.com>) id 1e57U6-0005lH-5M
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 05:51:30 -0400
+Received: from mail-vk0-f51.google.com ([209.85.213.51]:43122)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1e57U6-0005kn-1L
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 05:51:26 -0400
+Received: by mail-vk0-f51.google.com with SMTP id t203so5014602vke.0
+	for <qemu-devel@nongnu.org>; Thu, 19 Oct 2017 02:51:25 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="0F1p//8PRICkK4MW"
-Content-Disposition: inline
-In-Reply-To: <1508325132-70513-1-git-send-email-imammedo@redhat.com>
-Subject: Re: [Qemu-devel] [RFC v2 3/6] possible_cpus: add CPUArchId::type
- field
+In-Reply-To: <cb980fa56e032de56dc48193f6989ed7@hostfission.com>
+References: <5548e41a5668ec0cba9543139327e035@hostfission.com>
+	<3A7697A0-1AF3-46E8-8BCC-45A8127A2638@redhat.com>
+	<286ea2bbfb5ec77d962300c9996c8688@hostfission.com>
+	<92FEAF6E-3002-4F0F-B845-4EC3D29381A4@redhat.com>
+	<c0c5158aeb4e553ac55639e66d81c007@hostfission.com>
+	<34b4df5da848d69b213f538e5751c0d3@hostfission.com>
+	<CABdb734e-Fmfjk8auh-FzKnhmxjs0Bh9WpXWDmRBjYUWsZfe3A@mail.gmail.com>
+	<0f911b72c94a0d0f1bedf1c6385b045e@hostfission.com>
+	<CABdb735gdt_N=GDTb2G_sPENjpxS98dFxoPQBLqtMmp8EKCRFw@mail.gmail.com>
+	<d5b66cd9f96b0dafedf4369ff02a7121@hostfission.com>
+	<CABdb734KxNJ2uMo2e61sFOXNFRgax067ErkQNQ1U1iO7ROAvCw@mail.gmail.com>
+	<4d790f860a3cf21bd7e33e7c3f53b58b@hostfission.com>
+	<CABdb737FAM-k18=8wKohxrn21otnqiBUFoBNKqdEyu==B-s_kA@mail.gmail.com>
+	<a92ac1c09d6d24656449bc2d65c623ea@hostfission.com>
+	<CABdb736Ja=PTUn_iPaNSG9HAFO-STJ5m8A3cKVt4Ff8T4jcXhQ@mail.gmail.com>
+	<59a147491e11c4c692e9f762bcd9fb21@hostfission.com>
+	<cb980fa56e032de56dc48193f6989ed7@hostfission.com>
+From: Ladi Prosek <lprosek@redhat.com>
+Date: Thu, 19 Oct 2017 11:51:24 +0200
+Message-ID: <CABdb737CKEBTBB4FQHsr=UW3seZQpPF_Rktw2qEKhHL+kD0CbQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] ivshmem Windows Driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,105 +43,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, pkrempa@redhat.com, ehabkost@redhat.com, pbonzini@redhat.com, drjones@redhat.com, cohuck@redhat.com
+To: Geoffrey McRae <geoff@hostfission.com>
+Cc: Yan Vugenfirer <yvugenfi@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
 
+On Thu, Oct 19, 2017 at 11:41 AM,  <geoff@hostfission.com> wrote:
+> On 2017-10-19 20:07, geoff@hostfission.com wrote:
+>>
+>> On 2017-10-19 20:01, Ladi Prosek wrote:
+>>>
+>>> On Thu, Oct 19, 2017 at 10:44 AM,  <geoff@hostfission.com> wrote:
+>>>>
+>>>> On 2017-10-19 19:35, Ladi Prosek wrote:
+>>>>>
+>>>>>
+>>>>> On Wed, Oct 18, 2017 at 5:04 PM,  <geoff@hostfission.com> wrote:
+>>>>>>
+>>>>>>
+>>>>>> Hi Ladi & Yan,
+>>>>>>
+>>>>>> I am pleased to present the completed driver for review, please see:
+>>>>>>
+>>>>>> https://github.com/gnif/kvm-guest-drivers-windows
+>>>>>
+>>>>>
+>>>>>
+>>>>> Awesome!
+>>>>>
+>>>>> Feel free to open pull request, it should be easier to comment on.
+>>>>
+>>>>
+>>>>
+>>>> Great, I will do so after I have addressed the below. Thanks again.
+>>>>
+>
+> I have created a PR, see:
+>
+> https://github.com/virtio-win/kvm-guest-drivers-windows/pull/174
+>
+>>>>>
+>>>>> * WoW considerations: It would be nice if the driver could detect that
+>>>>> the map request is coming from a 32-bit process and expect a different
+>>>>> layout of struct IVSHMEM_MMAP.
+>>>>
+>>>>
+>>>>
+>>>> I did think of this but I am unsure as to how to detect this.
+>>>
+>>>
+>>> I don't think I ever used it but IoIs32bitProcess() looks promising.
+>>>
+>
+>
+> Obviously PVOID will be 32bit which will mess with the struct size and
+> offset of vectors but I am not aware of a solution to this. If you have
+> any suggestions on how to rectify this it would be very much appreciated.
 
---0F1p//8PRICkK4MW
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I was thinking something simple like:
 
-On Wed, Oct 18, 2017 at 01:12:12PM +0200, Igor Mammedov wrote:
-> For enabling early cpu to numa node configuration at runtime
-> qmp_query_hotpluggable_cpus() should provide a list of available
-> cpu slots at early stage, before machine_init() is called and
-> the 1st cpu is created, so that mgmt might be able to call it
-> and use output to set numa mapping.
-> Use MachineClass::possible_cpu_arch_ids() callback to set
-> cpu type info, along with the rest of possible cpu properties,
-> to let machine define which cpu type* will be used.
->=20
-> * for SPAPR it will be a spapr core type and for ARM/s390x/x86
->   a respective descendant of CPUClass.
->=20
-> Move parse_numa_opts() in vl.c after cpu_model is parsed into
-> cpu_type so that possible_cpu_arch_ids() would know which
-> cpu_type to use during layout initialization.
->=20
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+#ifdef _WIN64
+typedef struct IVSHMEM_MMAP_32
+{
+    ...
+    UINT32 ptr;
+    ...
+}
+IVSHMEM_MMAP_32, *PIVSHMEM_MMAP_32;
+#endif
 
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+in a private header. Then in the IOCTL handler call IoIs32bitProcess()
+and if it returns true, expect IVSHMEM_MMAP_32 instead of
+IVSHMEM_MMAP.
 
-> ---
->   v2:
->      - fix NULL dereference caused by not initialized
->        MachineState::cpu_type at the time parse_numa_opts()
->        were called
-> ---
->  include/hw/boards.h        |  2 ++
->  hw/arm/virt.c              |  3 ++-
->  hw/core/machine.c          | 12 ++++++------
->  hw/i386/pc.c               |  4 +++-
->  hw/ppc/spapr.c             | 13 ++++++++-----
->  hw/s390x/s390-virtio-ccw.c |  1 +
->  vl.c                       |  3 +--
->  7 files changed, 23 insertions(+), 15 deletions(-)
->=20
-> diff --git a/include/hw/boards.h b/include/hw/boards.h
-> index 191a5b3..fa21758 100644
-> --- a/include/hw/boards.h
-> +++ b/include/hw/boards.h
-> @@ -80,6 +80,7 @@ void machine_set_cpu_numa_node(MachineState *machine,
->   * CPUArchId:
->   * @arch_id - architecture-dependent CPU ID of present or possible CPU
-
-I know this isn't really in scope for this patch, but is @arch_id here
-supposed to have meaning defined by the target, or by the machine?
-
-If it's the machime, it could do with a rename - "arch" means target
-to most people (thanks to Linux).
-
-If it's the target, it's kind of bogus, because it doesn't necessarily
-have a clear meaning per target - get_arch_id in CPUClass has the same
-problem, which is probably one reason it's basically only used by the
-x86 code at present.
-
-e.g. for target/ppc, what do we use?  There's the PIR, which is in the
-CPU.. but only on some cpu models, not all.  There will generally be
-some kind of master PIC id, but there are different PIC models on
-different boards.  What goes in the devicetree?  Well only some
-machines use devicetree, and they might define the cpu reg=20
-differently.
-
-Board designs will generally try to make some if not all of those
-possible values equal for simplicity, but there's still no real way of
-defining a sensible arch_id independent of machine / board.
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---0F1p//8PRICkK4MW
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnoRtcACgkQbDjKyiDZ
-s5J3KBAAowqyp9rouZZuJpm6i5PXYzRw+68YdjYlTdO2184TiImPemcryuC9hPJ+
-uTb1wAgZxFSg4ZQtF7oPbps1SMeP0c1GBwQf671Tf6loGFU0V6xmdH2q1V1o1sCC
-xjlCoFa/dQVVOILYkH/AFHTW52q45G+3SqN2olkshVHT/Yhl7xsuQmLbi2mx2Prq
-G7iD0Z8IMhbMAPL6WZcFH3QQ4jeOxti4OR/iHrfKSiPfy0gAO6Xe+InDVeLIGewc
-9GSlUj+RpfvZZiU88X1eupfZy5RiEQWfLDxG9uiMeKAWsBMAqKHDugekYaxUV55T
-Yz3WaBycYhEvUVXXEgnEL3IpFeFGVvHi/0tj4ieLxmMczuskW2gjbVqzDY+O8gCY
-o64Ge18bRRsF12034EQ9NtaT84FH3uWYUaHgnZpddXPPRyx/+QsJQ/poFVnplqFV
-ONikMwE85zHlpjEsZK82ipfUg2t6f+JMjHtftcPm3vrp67r82k2eIEK8QRQds6do
-FSVXJNKpyv47BIZFHZE2QarPoxiOmeV7d0UrX8nomJH/nsKH06tcMz4L7c9uhOvM
-lrrxHAisbU2cMUPvLBnXPMiN8jkVVVcOp4XH+fGof5XMZMFAZ2YK6XlxH+1jEjtr
-iPp4rhzZLk2GbiM2BBVjJCL7ma7kW33s9QFeqjJH7JsrUiR1Qns=
-=Jcdr
------END PGP SIGNATURE-----
-
---0F1p//8PRICkK4MW--
+>>>>>
+>>>>> * It would be cleaner to use READ_REGISTER_* and WRITE_REGISTER_*
+>>>>> from/to IVSHMEMDeviceRegisters instead of plain memory accesses. Or at
+>>>>> the very least the accesses should be marked volatile.
+>>>>
+>>>>
+>>>>
+>>>> I thought that mapping the IO space was enough for this since it is
+>>>> mapped as non-cacheable. I can see the point of marking it volatile but
+>>>> see no need to use the read/write register semantics. If this is what it
+>>>> takes however I am happy to do so.
+>>>
+>>>
+>>> Code like this raises eyebrows:
+>>>
+>>>   deviceContext->devRegisters->doorbell |= (UINT32)in->vector |
+>>> (in->peerID << 16);
+>>>
+>>> Many readers will probably be wondering what exactly the compiler is
+>>> allowed to do with this statement. May it end up ORing the lower and
+>>> upper word separately, for example?
+>>>
+>>>   OR [word ptr addr], in->vector
+>>>   OR [word ptr addr + 2], in->peerID
+>>>
+>>> And, by the way, is OR really what we want here?
+>>>
+>>
+>> After double checking this you are dead right, the register is documented
+>> as write only. I will fix this.
+>
+>
+> Done.
+>
+>
+>>
+>>>>>
+>>>>> * In ivshmem.inf: ManufacturerName="Red Hat, Inc." instead of "RedHat"
+>>>>>
+>>>>
+>>>> No worries.
+>>>>
+>>>>> * Is any of the API used by the driver Win10-only? Just curious, it's
+>>>>> fine to build the driver only for Win10 for now even if it isn't.
+>>>>
+>>>>
+>>>>
+>>>> I have not tried to build it on anything older then win 10 build 10586
+>>>> as I have nothing older, but AFAIK it should build on windows 8.1 or
+>>>> later just fine. This is more due to my lack of familiarity with Visual
+>>>> Studio, give me gcc and vim any day :).
+>>>
+>>>
+>>> Gotcha, no worries, other versions can be tested later.
+>
+>
