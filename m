@@ -1,22 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41773)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46886)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <changpeng.liu@intel.com>) id 1e53I7-0003KQ-Am
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 01:22:50 -0400
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1e53ti-0001fI-OH
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 02:01:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <changpeng.liu@intel.com>) id 1e53I5-0004XR-Cl
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 01:22:47 -0400
-Received: from mga11.intel.com ([192.55.52.93]:52983)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <changpeng.liu@intel.com>)
-	id 1e53I4-0004N3-V8
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 01:22:45 -0400
-From: Changpeng Liu <changpeng.liu@intel.com>
-Date: Thu, 19 Oct 2017 13:24:10 +0800
-Message-Id: <1508390650-19115-5-git-send-email-changpeng.liu@intel.com>
-In-Reply-To: <1508390650-19115-1-git-send-email-changpeng.liu@intel.com>
-References: <1508390650-19115-1-git-send-email-changpeng.liu@intel.com>
-Subject: [Qemu-devel] [PATCH v4 4/4] contrib/vhost-user-blk: introduce a
- vhost-user-blk sample application
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1e53td-0005uj-4n
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 02:01:38 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:36678)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
+	id 1e53tc-0005tp-Sd
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 02:01:33 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v9J5xZBg070887
+	for <qemu-devel@nongnu.org>; Thu, 19 Oct 2017 02:01:26 -0400
+Received: from e19.ny.us.ibm.com (e19.ny.us.ibm.com [129.33.205.209])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2dpnjy29vx-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 19 Oct 2017 02:01:26 -0400
+Received: from localhost
+	by e19.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
+	Thu, 19 Oct 2017 02:01:19 -0400
+Date: Thu, 19 Oct 2017 14:01:13 +0800
+From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+References: <20171017140453.51099-1-pasic@linux.vnet.ibm.com>
+	<20171017171315.7afc5a59.cohuck@redhat.com>
+	<4ac6acdd-ccbf-3ff7-b6ec-5bdbc5456665@linux.vnet.ibm.com>
+	<20171018082347.GA5150@bjsdjshi@linux.vnet.ibm.com>
+	<20171018115310.44eec1ed.cohuck@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171018115310.44eec1ed.cohuck@redhat.com>
+Message-Id: <20171019060113.GA4612@bjsdjshi@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v3 0/7] improve error handling for IO instr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,579 +44,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: changpeng.liu@intel.com, qemu-devel@nongnu.org
-Cc: stefanha@gmail.com, pbonzini@redhat.com, mst@redhat.com, marcandre.lureau@redhat.com, felipe@nutanix.com, james.r.harris@intel.com
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, qemu-s390x@nongnu.org, Pierre Morel <pmorel@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
 
-This commit introcudes a vhost-user-blk backend device, it uses UNIX
-domain socket to communicate with Qemu. The vhost-user-blk sample
-application should be used with Qemu vhost-user-blk-pci device.
+* Cornelia Huck <cohuck@redhat.com> [2017-10-18 11:53:10 +0200]:
 
-To use it, complie with:
-make vhost-user-blk
+> On Wed, 18 Oct 2017 16:23:47 +0800
+> Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
+> 
+> > * Halil Pasic <pasic@linux.vnet.ibm.com> [2017-10-17 18:19:20 +0200]:
+> > 
+> > [...]
+> > 
+> > > >> Testing
+> > > >> =======
+> > > >>
+> > > >> Nothing happened since v2 except for a quick smoke test. Dong Jia gave v2
+> > > >> a spin with a focus on vfio-ccw. @Dong Jia I would appreciate some proper
+> > > >> testing, especially regarding the changes in vfio-ccw (patch #3).  
+> > > > 
+> > > > Looks sane to me (if needed, I can fix up the minor things I found).
+> > > > 
+> > > > In addition to some testing, I'd appreciate some review from others as
+> > > > well.
+> > > >   
+> > > 
+> > > Of course, I'm fine with the fixes (won't answer individually). I think
+> > > both Dong Jia and Pierre have already put enough work in this to be credited
+> > > with a tag, so I really hope they will get around to review this. I would
+> > > be especially happy with an Tested-by: Dong Jia since this series is quite
+> > > under-tested, and the changes in vfio-ccw aren't just minor.
+> > > 
+> > > Of course I could come up with a test setup myself, but I hope Dong Jia
+> > > already has one, and he is certainly more involved with vfio-ccw.
+> > >   
+> > Using Conny's s390-next branch + this series (#2-#7), I didn't notice
+> > any obvious problem during my fio test.  So for the vfio-ccw related
+> > part:
+> > Tested-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+> 
+> Thanks!
+> 
+> To which patches may I add the tag? :)
+> 
+The test should cover the vfio-ccw related part in patch #3, I assume.
+So add it there?
 
-and start like this:
-vhost-user-blk -b /dev/sdb -s /path/vhost.socket
-
-Signed-off-by: Changpeng Liu <changpeng.liu@intel.com>
----
- .gitignore                              |   1 +
- Makefile                                |   3 +
- Makefile.objs                           |   1 +
- contrib/vhost-user-blk/Makefile.objs    |   1 +
- contrib/vhost-user-blk/vhost-user-blk.c | 492 ++++++++++++++++++++++++++++++++
- 5 files changed, 498 insertions(+)
- create mode 100644 contrib/vhost-user-blk/Makefile.objs
- create mode 100644 contrib/vhost-user-blk/vhost-user-blk.c
-
-diff --git a/.gitignore b/.gitignore
-index 620eec6..544276e 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -53,6 +53,7 @@
- /scsi/qemu-pr-helper
- /vscclient
- /vhost-user-scsi
-+/vhost-user-blk
- /fsdev/virtfs-proxy-helper
- *.tmp
- *.[1-9]
-diff --git a/Makefile b/Makefile
-index 90f91e5..be67a09 100644
---- a/Makefile
-+++ b/Makefile
-@@ -318,6 +318,7 @@ dummy := $(call unnest-vars,, \
-                 ivshmem-server-obj-y \
-                 libvhost-user-obj-y \
-                 vhost-user-scsi-obj-y \
-+                vhost-user-blk-obj-y \
-                 qga-vss-dll-obj-y \
-                 block-obj-y \
-                 block-obj-m \
-@@ -534,6 +535,8 @@ ivshmem-server$(EXESUF): $(ivshmem-server-obj-y) $(COMMON_LDADDS)
- endif
- vhost-user-scsi$(EXESUF): $(vhost-user-scsi-obj-y) libvhost-user.a
- 	$(call LINK, $^)
-+vhost-user-blk$(EXESUF): $(vhost-user-blk-obj-y) libvhost-user.a
-+	$(call LINK, $^)
- 
- module_block.h: $(SRC_PATH)/scripts/modules/module_block.py config-host.mak
- 	$(call quiet-command,$(PYTHON) $< $@ \
-diff --git a/Makefile.objs b/Makefile.objs
-index d4f973a..3af989d 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -115,6 +115,7 @@ libvhost-user-obj-y = contrib/libvhost-user/
- vhost-user-scsi.o-cflags := $(LIBISCSI_CFLAGS)
- vhost-user-scsi.o-libs := $(LIBISCSI_LIBS)
- vhost-user-scsi-obj-y = contrib/vhost-user-scsi/
-+vhost-user-blk-obj-y = contrib/vhost-user-blk/
- 
- ######################################################################
- trace-events-subdirs =
-diff --git a/contrib/vhost-user-blk/Makefile.objs b/contrib/vhost-user-blk/Makefile.objs
-new file mode 100644
-index 0000000..72e2cdc
---- /dev/null
-+++ b/contrib/vhost-user-blk/Makefile.objs
-@@ -0,0 +1 @@
-+vhost-user-blk-obj-y = vhost-user-blk.o
-diff --git a/contrib/vhost-user-blk/vhost-user-blk.c b/contrib/vhost-user-blk/vhost-user-blk.c
-new file mode 100644
-index 0000000..45050bc
---- /dev/null
-+++ b/contrib/vhost-user-blk/vhost-user-blk.c
-@@ -0,0 +1,492 @@
-+/*
-+ * vhost-user-blk sample application
-+ *
-+ * Copyright IBM, Corp. 2007
-+ * Copyright (c) 2016 Nutanix Inc. All rights reserved.
-+ * Copyright (c) 2017 Intel Corporation. All rights reserved.
-+ *
-+ * Author:
-+ *  Anthony Liguori <aliguori@us.ibm.com>
-+ *  Felipe Franciosi <felipe@nutanix.com>
-+ *  Changpeng Liu <changpeng.liu@intel.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 only.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "standard-headers/linux/virtio_blk.h"
-+#include "contrib/libvhost-user/libvhost-user-glib.h"
-+#include "contrib/libvhost-user/libvhost-user.h"
-+
-+#include <glib.h>
-+
-+struct virtio_blk_inhdr {
-+    unsigned char status;
-+};
-+
-+/* vhost user block device */
-+typedef struct VubDev {
-+    VugDev parent;
-+    int blk_fd;
-+    struct virtio_blk_config blkcfg;
-+    char *blk_name;
-+    GMainLoop *loop;
-+} VubDev;
-+
-+typedef struct VubReq {
-+    VuVirtqElement *elem;
-+    int64_t sector_num;
-+    size_t size;
-+    struct virtio_blk_inhdr *in;
-+    struct virtio_blk_outhdr *out;
-+    VubDev *vdev_blk;
-+    struct VuVirtq *vq;
-+} VubReq;
-+
-+/**  refer util/iov.c  **/
-+static size_t vub_iov_size(const struct iovec *iov,
-+                              const unsigned int iov_cnt)
-+{
-+    size_t len;
-+    unsigned int i;
-+
-+    len = 0;
-+    for (i = 0; i < iov_cnt; i++) {
-+        len += iov[i].iov_len;
-+    }
-+    return len;
-+}
-+
-+static void vub_panic_cb(VuDev *vu_dev, const char *buf)
-+{
-+    VugDev *gdev;
-+    VubDev *vdev_blk;
-+
-+    assert(vu_dev);
-+
-+    gdev = container_of(vu_dev, VugDev, parent);
-+    vdev_blk = container_of(gdev, VubDev, parent);
-+    if (buf) {
-+        g_warning("vu_panic: %s", buf);
-+    }
-+
-+    g_main_loop_quit(vdev_blk->loop);
-+}
-+
-+static void vub_req_complete(VubReq *req)
-+{
-+    VugDev *gdev = &req->vdev_blk->parent;
-+    VuDev *vu_dev = &gdev->parent;
-+
-+    /* IO size with 1 extra status byte */
-+    vu_queue_push(vu_dev, req->vq, req->elem,
-+                  req->size + 1);
-+    vu_queue_notify(vu_dev, req->vq);
-+
-+    if (req->elem) {
-+        free(req->elem);
-+    }
-+    g_free(req);
-+}
-+
-+static int vub_open(const char *file_name)
-+{
-+    int fd;
-+
-+    fd = open(file_name, O_RDWR | O_DIRECT);
-+    if (fd < 0) {
-+        fprintf(stderr, "Cannot open file %s, %s\n", file_name,
-+                strerror(errno));
-+        return -1;
-+    }
-+
-+    return fd;
-+}
-+
-+static void vub_close(int fd)
-+{
-+    if (fd >= 0) {
-+        close(fd);
-+    }
-+}
-+
-+static ssize_t
-+vub_readv(VubReq *req, struct iovec *iov, uint32_t iovcnt)
-+{
-+    VubDev *vdev_blk = req->vdev_blk;
-+    ssize_t rc;
-+
-+    if (!iovcnt) {
-+        fprintf(stderr, "Invalid Read IOV count\n");
-+        return -1;
-+    }
-+
-+    req->size = vub_iov_size(iov, iovcnt);
-+    rc = preadv(vdev_blk->blk_fd, iov, iovcnt, req->sector_num * 512);
-+    if (rc < 0) {
-+        fprintf(stderr, "Block %s, Sector %"PRIu64", Size %lu Read Failed\n",
-+                vdev_blk->blk_name, req->sector_num, req->size);
-+        return -1;
-+    }
-+
-+    return rc;
-+}
-+
-+static ssize_t
-+vub_writev(VubReq *req, struct iovec *iov, uint32_t iovcnt)
-+{
-+    VubDev *vdev_blk = req->vdev_blk;
-+    ssize_t rc;
-+
-+    if (!iovcnt) {
-+        fprintf(stderr, "Invalid Write IOV count\n");
-+        return -1;
-+    }
-+
-+    req->size = vub_iov_size(iov, iovcnt);
-+    rc = pwritev(vdev_blk->blk_fd, iov, iovcnt, req->sector_num * 512);
-+    if (rc < 0) {
-+        fprintf(stderr, "Block %s, Sector %"PRIu64", Size %lu Write Failed\n",
-+                vdev_blk->blk_name, req->sector_num, req->size);
-+        return -1;
-+    }
-+
-+    return rc;
-+}
-+
-+static void
-+vub_flush(VubReq *req)
-+{
-+    VubDev *vdev_blk = req->vdev_blk;
-+
-+    if (vdev_blk->blk_fd) {
-+        fsync(vdev_blk->blk_fd);
-+    }
-+}
-+
-+
-+static int vub_virtio_process_req(VubDev *vdev_blk,
-+                                     VuVirtq *vq)
-+{
-+    VugDev *gdev = &vdev_blk->parent;
-+    VuDev *vu_dev = &gdev->parent;
-+    VuVirtqElement *elem;
-+    uint32_t type;
-+    unsigned in_num;
-+    unsigned out_num;
-+    VubReq *req;
-+
-+    elem = vu_queue_pop(vu_dev, vq, sizeof(VuVirtqElement));
-+    if (!elem) {
-+        return -1;
-+    }
-+
-+    /* refer to hw/block/virtio_blk.c */
-+    if (elem->out_num < 1 || elem->in_num < 1) {
-+        fprintf(stderr, "virtio-blk request missing headers\n");
-+        free(elem);
-+        return -1;
-+    }
-+
-+    req = g_new0(VubReq, 1);
-+    req->vdev_blk = vdev_blk;
-+    req->vq = vq;
-+    req->elem = elem;
-+
-+    in_num = elem->in_num;
-+    out_num = elem->out_num;
-+
-+    /* don't support VIRTIO_F_ANY_LAYOUT and virtio 1.0 only */
-+    if (elem->out_sg[0].iov_len < sizeof(struct virtio_blk_outhdr)) {
-+        fprintf(stderr, "Invalid outhdr size\n");
-+        goto err;
-+    }
-+    req->out = (struct virtio_blk_outhdr *)elem->out_sg[0].iov_base;
-+    out_num--;
-+
-+    if (elem->in_sg[in_num - 1].iov_len < sizeof(struct virtio_blk_inhdr)) {
-+        fprintf(stderr, "Invalid inhdr size\n");
-+        goto err;
-+    }
-+    req->in = (struct virtio_blk_inhdr *)elem->in_sg[in_num - 1].iov_base;
-+    in_num--;
-+
-+    type = le32toh(req->out->type);
-+    switch (type & ~(VIRTIO_BLK_T_OUT | VIRTIO_BLK_T_BARRIER)) {
-+        case VIRTIO_BLK_T_IN: {
-+            ssize_t ret = 0;
-+            bool is_write = type & VIRTIO_BLK_T_OUT;
-+            req->sector_num = le64toh(req->out->sector);
-+            if (is_write) {
-+                ret  = vub_writev(req, &elem->out_sg[1], out_num);
-+            } else {
-+                ret = vub_readv(req, &elem->in_sg[0], in_num);
-+            }
-+            if (ret >= 0) {
-+                req->in->status = VIRTIO_BLK_S_OK;
-+            } else {
-+                req->in->status = VIRTIO_BLK_S_IOERR;
-+            }
-+            vub_req_complete(req);
-+            break;
-+        }
-+        case VIRTIO_BLK_T_FLUSH: {
-+            vub_flush(req);
-+            req->in->status = VIRTIO_BLK_S_OK;
-+            vub_req_complete(req);
-+            break;
-+        }
-+        case VIRTIO_BLK_T_GET_ID: {
-+            size_t size = MIN(vub_iov_size(&elem->in_sg[0], in_num),
-+                              VIRTIO_BLK_ID_BYTES);
-+            snprintf(elem->in_sg[0].iov_base, size, "%s", "vhost_user_blk");
-+            req->in->status = VIRTIO_BLK_S_OK;
-+            req->size = elem->in_sg[0].iov_len;
-+            vub_req_complete(req);
-+            break;
-+        }
-+        default: {
-+            req->in->status = VIRTIO_BLK_S_UNSUPP;
-+            vub_req_complete(req);
-+            break;
-+        }
-+    }
-+
-+    return 0;
-+
-+err:
-+    free(elem);
-+    g_free(req);
-+    return -1;
-+}
-+
-+static void vub_process_vq(VuDev *vu_dev, int idx)
-+{
-+    VugDev *gdev;
-+    VubDev *vdev_blk;
-+    VuVirtq *vq;
-+    int ret;
-+
-+    if ((idx < 0) || (idx >= VHOST_MAX_NR_VIRTQUEUE)) {
-+        fprintf(stderr, "VQ Index out of range: %d\n", idx);
-+        vub_panic_cb(vu_dev, NULL);
-+        return;
-+    }
-+
-+    gdev = container_of(vu_dev, VugDev, parent);
-+    vdev_blk = container_of(gdev, VubDev, parent);
-+    assert(vdev_blk);
-+
-+    vq = vu_get_queue(vu_dev, idx);
-+    assert(vq);
-+
-+    while (1) {
-+        ret = vub_virtio_process_req(vdev_blk, vq);
-+        if (ret) {
-+            break;
-+        }
-+    }
-+}
-+
-+static void vub_queue_set_started(VuDev *vu_dev, int idx, bool started)
-+{
-+    VuVirtq *vq;
-+
-+    assert(vu_dev);
-+
-+    if ((idx < 0) || (idx >= VHOST_MAX_NR_VIRTQUEUE)) {
-+        fprintf(stderr, "VQ Index out of range: %d\n", idx);
-+        vub_panic_cb(vu_dev, NULL);
-+        return;
-+    }
-+
-+    vq = vu_get_queue(vu_dev, idx);
-+    vu_set_queue_handler(vu_dev, vq, started ? vub_process_vq : NULL);
-+}
-+
-+static uint64_t
-+vub_get_features(VuDev *dev)
-+{
-+    return 1ull << VIRTIO_BLK_F_SIZE_MAX |
-+           1ull << VIRTIO_BLK_F_SEG_MAX |
-+           1ull << VIRTIO_BLK_F_TOPOLOGY |
-+           1ull << VIRTIO_BLK_F_BLK_SIZE |
-+           1ull << VIRTIO_F_VERSION_1 |
-+           1ull << VHOST_USER_F_PROTOCOL_FEATURES;
-+}
-+
-+static int
-+vub_get_config(VuDev *vu_dev, uint8_t *config, size_t len)
-+{
-+    VugDev *gdev;
-+    VubDev *vdev_blk;
-+
-+    if (len != sizeof(struct virtio_blk_config)) {
-+        return -1;
-+    }
-+    gdev = container_of(vu_dev, VugDev, parent);
-+    vdev_blk = container_of(gdev, VubDev, parent);
-+    memcpy(config, &vdev_blk->blkcfg, len);
-+
-+    return 0;
-+}
-+
-+static const VuDevIface vub_iface = {
-+    .get_features = vub_get_features,
-+    .queue_set_started = vub_queue_set_started,
-+    .get_config = vub_get_config,
-+};
-+
-+static int unix_sock_new(char *unix_fn)
-+{
-+    int sock;
-+    struct sockaddr_un un;
-+    size_t len;
-+
-+    assert(unix_fn);
-+
-+    sock = socket(AF_UNIX, SOCK_STREAM, 0);
-+    if (sock <= 0) {
-+        perror("socket");
-+        return -1;
-+    }
-+
-+    un.sun_family = AF_UNIX;
-+    (void)snprintf(un.sun_path, sizeof(un.sun_path), "%s", unix_fn);
-+    len = sizeof(un.sun_family) + strlen(un.sun_path);
-+
-+    (void)unlink(unix_fn);
-+    if (bind(sock, (struct sockaddr *)&un, len) < 0) {
-+        perror("bind");
-+        goto fail;
-+    }
-+
-+    if (listen(sock, 1) < 0) {
-+        perror("listen");
-+        goto fail;
-+    }
-+
-+    return sock;
-+
-+fail:
-+    (void)close(sock);
-+
-+    return -1;
-+}
-+
-+static void vub_deinit(struct VubDev *vdev_blk)
-+{
-+    if (!vdev_blk) {
-+        return;
-+    }
-+
-+    if (vdev_blk->blk_fd) {
-+        vub_close(vdev_blk->blk_fd);
-+    }
-+}
-+
-+static void
-+vub_initialize_config(int fd, struct virtio_blk_config *config)
-+{
-+    off64_t capacity;
-+
-+    capacity = lseek64(fd, 0, SEEK_END);
-+    config->capacity = capacity >> 9;
-+    config->blk_size = 512;
-+    config->size_max = 65536;
-+    config->seg_max = 128 - 2;
-+    config->min_io_size = 1;
-+    config->opt_io_size = 1;
-+    config->num_queues = 1;
-+}
-+
-+static int
-+vub_new_block(VubDev *vdev_blk, char *blk_file)
-+{
-+    vdev_blk->blk_fd = vub_open(blk_file);
-+    if (vdev_blk->blk_fd  < 0) {
-+        fprintf(stderr, "Error to open block device %s\n", blk_file);
-+        return -1;
-+    }
-+    vdev_blk->blk_name = blk_file;
-+
-+    /* fill virtio_blk_config with block parameters */
-+    vub_initialize_config(vdev_blk->blk_fd, &vdev_blk->blkcfg);
-+
-+    return 0;
-+}
-+
-+int main(int argc, char **argv)
-+{
-+    int opt;
-+    char *unix_socket = NULL;
-+    char *blk_file = NULL;
-+    int lsock = -1, csock = -1, rc;
-+    VubDev *vdev_blk = NULL;
-+
-+    while ((opt = getopt(argc, argv, "b:h:s:")) != -1) {
-+        switch (opt) {
-+        case 'b':
-+            blk_file = g_strdup(optarg);
-+            break;
-+        case 's':
-+            unix_socket = g_strdup(optarg);
-+            break;
-+        case 'h':
-+        default:
-+            printf("Usage: %s [-b block device or file, -s UNIX domain socket]"
-+                   " | [ -h ]\n", argv[0]);
-+            return -1;
-+        }
-+    }
-+
-+    if (!unix_socket || !blk_file) {
-+        printf("Usage: %s [-b block device or file, -s UNIX domain socket] |"
-+               " [ -h ]\n", argv[0]);
-+        return -1;
-+    }
-+
-+    lsock = unix_sock_new(unix_socket);
-+    if (lsock < 0) {
-+        goto err;
-+    }
-+
-+    csock = accept(lsock, (void *)0, (void *)0);
-+    if (csock < 0) {
-+        fprintf(stderr, "Accept error %s\n", strerror(errno));
-+        goto err;
-+    }
-+
-+    vdev_blk = g_new0(VubDev, 1);
-+    vdev_blk->loop = g_main_loop_new(NULL, FALSE);
-+
-+    rc = vub_new_block(vdev_blk, blk_file);
-+    if (rc) {
-+        goto err;
-+    }
-+
-+    vug_init(&vdev_blk->parent, csock, vub_panic_cb, &vub_iface);
-+
-+    g_main_loop_run(vdev_blk->loop);
-+
-+    vug_deinit(&vdev_blk->parent);
-+
-+err:
-+    if (vdev_blk) {
-+        g_main_loop_unref(vdev_blk->loop);
-+        vub_deinit(vdev_blk);
-+        g_free(vdev_blk);
-+    }
-+    if (csock >= 0) {
-+        close(csock);
-+    }
-+    if (lsock >= 0) {
-+        close(lsock);
-+    }
-+    g_free(unix_socket);
-+    g_free(blk_file);
-+
-+    return 0;
-+}
-+
 -- 
-1.9.3
+Dong Jia Shi
