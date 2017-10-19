@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47629)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49561)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=458e47f2f=anthony.perard@citrix.com>)
-	id 1e5BTD-0002vV-8X
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 10:06:48 -0400
+	(envelope-from <stefanha@gmail.com>) id 1e5BW2-0004Ai-To
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 10:09:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=458e47f2f=anthony.perard@citrix.com>)
-	id 1e5BT9-0001Dw-Ut
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 10:06:47 -0400
-Received: from smtp.citrix.com ([66.165.176.89]:29562)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=458e47f2f=anthony.perard@citrix.com>)
-	id 1e5BT9-0001DK-NX
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 10:06:43 -0400
-Date: Thu, 19 Oct 2017 15:05:45 +0100
-From: Anthony PERARD <anthony.perard@citrix.com>
-Message-ID: <20171019140545.GA30324@perard.uk.xensource.com>
-References: <20171016131644.9565-1-kraxel@redhat.com>
-	<20171016131644.9565-2-kraxel@redhat.com>
+	(envelope-from <stefanha@gmail.com>) id 1e5BVz-0003Ig-19
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 10:09:42 -0400
+Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:49296)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1e5BVy-0003IH-Qs
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 10:09:38 -0400
+Received: by mail-wr0-x243.google.com with SMTP id g90so8473319wrd.6
+	for <qemu-devel@nongnu.org>; Thu, 19 Oct 2017 07:09:38 -0700 (PDT)
+Date: Thu, 19 Oct 2017 16:09:35 +0200
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20171019140935.GG6205@stefanha-x1.localdomain>
+References: <1508390650-19115-1-git-send-email-changpeng.liu@intel.com>
+	<1508390650-19115-2-git-send-email-changpeng.liu@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20171016131644.9565-2-kraxel@redhat.com>
-Subject: Re: [Qemu-devel] [PULL 01/11] build: automatically handle GIT
- submodule checkout for dtc
+In-Reply-To: <1508390650-19115-2-git-send-email-changpeng.liu@intel.com>
+Subject: Re: [Qemu-devel] [PATCH v4 1/4] vhost-user: add new vhost user
+ messages to support virtio config space
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,102 +30,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Changpeng Liu <changpeng.liu@intel.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, mst@redhat.com, marcandre.lureau@redhat.com, felipe@nutanix.com, james.r.harris@intel.com
 
-On Mon, Oct 16, 2017 at 03:16:34PM +0200, Gerd Hoffmann wrote:
-> From: "Daniel P. Berrange" <berrange@redhat.com>
-> 
-> Currently if DTC is required by configure and not available in the host
-> OS install, we exit with an error message telling the user to checkout a
-> git submodule or install the library.
-> 
-> This introduces automatic handling of the git submodule checkout process
-> and enables it for dtc. This only runs if building from GIT, so users of
-> release tarballs still need the system library install. The current state
-> of the git checkout is stashed in .git-submodule-status, and a helper
-> program is used to determine if this state matches the desired submodule
-> state. A dependency against 'Makefile' ensures that the submodule state
-> is refreshed at the start of the build process
-> 
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> Message-id: 20170929101201.21039-2-berrange@redhat.com
-> 
-> [ kraxel: use /bin/sh not bash for scripts/git-submodule.sh ]
-> [ kraxel: fix Makefile dependencies ]
-> 
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> 
-> [fixup] Makefile dep
-> ---
-
-> diff --git a/Makefile b/Makefile
-> index 97b4508d7d..9866909e08 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -14,6 +14,27 @@ ifneq ($(wildcard config-host.mak),)
->  all:
->  include config-host.mak
+On Thu, Oct 19, 2017 at 01:24:07PM +0800, Changpeng Liu wrote:
+> @@ -922,6 +931,91 @@ static void vhost_user_set_iotlb_callback(struct vhost_dev *dev, int enabled)
+>      /* No-op as the receive channel is not dedicated to IOTLB messages. */
+>  }
 >  
-> +git-submodule-update:
+> +static int vhost_user_get_config(struct vhost_dev *dev, uint8_t *config,
+> +                                 size_t config_len)
+> +{
+> +    VhostUserMsg msg = {
+> +        .request = VHOST_USER_GET_CONFIG,
+> +        .flags = VHOST_USER_VERSION,
+> +        .size = config_len,
+> +    };
 > +
-> +.PHONY: git-submodule-update
+> +    if (config_len == 0 || config_len > VHOST_USER_PAYLOAD_SIZE) {
+
+config_len should be limited to 256 bytes:
+
+  if (config_len == 0 || config_len > sizeof(msg.payload.config) {
+
+> +        error_report("bad config length");
+> +        return -1;
+> +    }
 > +
-> +ifeq (0,$(MAKELEVEL))
-
-Hi,
-
-this new patch, and especialy the use MAKELEVEL here does not work when
-we build Xen, since we build QEMU when building Xen.
-
-When Xen is built, a clone of qemu.git is made, and then configure/make
-is called. At this point, MAKELEVEL would already be set so
-the makefile rule git-submodule-update would be empty.
-
-Is it possible to do things differently in the QEMU makefiles? (Or do we
-have to simply unset MAKELEVEL in xen makefiles before building qemu.)
-
-A build log of Xen (with the build failure of QEMU near the end):
-http://logs.test-lab.xenproject.org/osstest/logs/114667/build-amd64/6.ts-xen-build.log
-
-Thanks,
-
-> +  git_module_status := $(shell \
-> +    cd '$(SRC_PATH)' && \
-> +    ./scripts/git-submodule.sh status $(GIT_SUBMODULES); \
-> +    echo $$?; \
-> +  )
+> +    if (vhost_user_write(dev, &msg, NULL, 0) < 0) {
+> +        return -1;
+> +    }
 > +
-> +ifeq (1,$(git_module_status))
-> +git-submodule-update:
-> +	$(call quiet-command, \
-> +          (cd $(SRC_PATH) && ./scripts/git-submodule.sh update $(GIT_SUBMODULES)), \
-> +          "GIT","$(GIT_SUBMODULES)")
-> +endif
-> +endif
+> +    if (vhost_user_read(dev, &msg) < 0) {
+> +        return -1;
+> +    }
 > +
-> +.git-submodule-status: git-submodule-update
+> +    if (msg.request != VHOST_USER_GET_CONFIG) {
+> +        error_report("Received unexpected msg type. Expected %d received %d",
+> +                     VHOST_USER_GET_CONFIG, msg.request);
+> +        return -1;
+> +    }
 > +
->  # Check that we're not trying to do an out-of-tree build from
->  # a tree that's been used for an in-tree build.
->  ifneq ($(realpath $(SRC_PATH)),$(realpath .))
-> @@ -84,6 +105,7 @@ endif
->  GENERATED_FILES += $(TRACE_HEADERS)
->  GENERATED_FILES += $(TRACE_SOURCES)
->  GENERATED_FILES += $(BUILD_DIR)/trace-events-all
-> +GENERATED_FILES += .git-submodule-status
->  
->  trace-group-name = $(shell dirname $1 | sed -e 's/[^a-zA-Z0-9]/_/g')
->  
-> @@ -330,7 +352,7 @@ DTC_MAKE_ARGS=-I$(SRC_PATH)/dtc VPATH=$(SRC_PATH)/dtc -C dtc V="$(V)" LIBFDT_src
->  DTC_CFLAGS=$(CFLAGS) $(QEMU_CFLAGS)
->  DTC_CPPFLAGS=-I$(BUILD_DIR)/dtc -I$(SRC_PATH)/dtc -I$(SRC_PATH)/dtc/libfdt
->  
-> -subdir-dtc:dtc/libfdt dtc/tests
-> +subdir-dtc: .git-submodule-status dtc/libfdt dtc/tests
->  	$(call quiet-command,$(MAKE) $(DTC_MAKE_ARGS) CPPFLAGS="$(DTC_CPPFLAGS)" CFLAGS="$(DTC_CFLAGS)" LDFLAGS="$(LDFLAGS)" ARFLAGS="$(ARFLAGS)" CC="$(CC)" AR="$(AR)" LD="$(LD)" $(SUBDIR_MAKEFLAGS) libfdt/libfdt.a,)
->  
->  dtc/%:
+> +    if (msg.size != config_len) {
+> +        error_report("Received bad msg size.");
+> +        return -1;
+> +    }
+> +
+> +    memcpy(config, &msg.payload.config, config_len);
 
--- 
-Anthony PERARD
+There is some complexity here: different virtio devices use different
+amounts of config space.  Devices may append new fields to the config
+space to support new features.
+
+Therefore I think the simplest protocol is to always fetch the full
+256-byte configuration space.  This way the vhost-user slave process can
+implement feature bits that the master process does not know about.
+
+In other words, I don't think the master process knows how much of the
+config space is used so it should always request 256 bytes.
+
+> +    return 0;
+> +}
+> +
+> +static int vhost_user_set_config(struct vhost_dev *dev, const uint8_t *config,
+> +                                 size_t config_len)
+> +{
+> +    bool reply_supported = virtio_has_feature(dev->protocol_features,
+> +                                              VHOST_USER_PROTOCOL_F_REPLY_ACK);
+> +
+> +    VhostUserMsg msg = {
+> +        .request = VHOST_USER_SET_CONFIG,
+> +        .flags = VHOST_USER_VERSION,
+> +        .size = config_len,
+> +    };
+> +
+> +    if (reply_supported) {
+> +        msg.flags |= VHOST_USER_NEED_REPLY_MASK;
+> +    }
+> +
+> +    if (config_len == 0 || config_len > VHOST_USER_PAYLOAD_SIZE) {
+
+Same thing here: config_len > sizeof(msg.payload.config)
