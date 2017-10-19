@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60079)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60282)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e5EqB-0003J0-KD
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 13:42:44 -0400
+	(envelope-from <mst@redhat.com>) id 1e5Eqt-0003d3-FB
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 13:43:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e5EqA-00029g-FO
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 13:42:43 -0400
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:54230)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1e5EqA-00029H-7k
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 13:42:42 -0400
-Received: by mail-wm0-x243.google.com with SMTP id q132so17892725wmd.2
-	for <qemu-devel@nongnu.org>; Thu, 19 Oct 2017 10:42:41 -0700 (PDT)
+	(envelope-from <mst@redhat.com>) id 1e5Eqq-0002RC-9y
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 13:43:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54182)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1e5Eqq-0002QR-4J
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 13:43:24 -0400
+Date: Thu, 19 Oct 2017 20:43:19 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20171019204305-mutt-send-email-mst@kernel.org>
+References: <1508390650-19115-1-git-send-email-changpeng.liu@intel.com>
+	<1508390650-19115-2-git-send-email-changpeng.liu@intel.com>
+	<20171019183638-mutt-send-email-mst@kernel.org>
+	<42aa8736-bc23-d66d-27de-dbaf83ea2f99@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20171019082015.16432-1-kraxel@redhat.com>
-References: <20171019082015.16432-1-kraxel@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 19 Oct 2017 18:42:20 +0100
-Message-ID: <CAFEAcA_KEwS6JWNqgLpdTN5S36FYPODYUTrM65=zYFgsZUoCsw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/1] Seabios 1.11 prerelease 20171019 patches
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <42aa8736-bc23-d66d-27de-dbaf83ea2f99@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 1/4] vhost-user: add new vhost user
+ messages to support virtio config space
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,43 +30,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Changpeng Liu <changpeng.liu@intel.com>, qemu-devel@nongnu.org, stefanha@gmail.com, marcandre.lureau@redhat.com, felipe@nutanix.com, james.r.harris@intel.com
 
-On 19 October 2017 at 09:20, Gerd Hoffmann <kraxel@redhat.com> wrote:
-> The following changes since commit 861cd431c99e56ddb5953ca1da164a9c32b477ca:
->
->   Merge remote-tracking branch 'remotes/dgibson/tags/ppc-for-2.11-20171017' into staging (2017-10-17 15:26:51 +0100)
->
-> are available in the git repository at:
->
->   git://git.kraxel.org/qemu tags/seabios-1.11-prerelease-20171019-pull-request
->
-> for you to fetch changes up to 083fab0290f2c40d3d04f7f22eed9c8f2d5b6787:
->
->   seabios: update to 1.11 prerelease (2017-10-19 10:14:26 +0200)
->
-> ----------------------------------------------------------------
-> seabios: update to 1.11 prerelease
->
-> ----------------------------------------------------------------
->
-> Gerd Hoffmann (1):
->   seabios: update to 1.11 prerelease
->
->  pc-bios/bios-256k.bin      | Bin 262144 -> 262144 bytes
->  pc-bios/bios.bin           | Bin 131072 -> 131072 bytes
->  pc-bios/vgabios-cirrus.bin | Bin 38400 -> 38400 bytes
->  pc-bios/vgabios-qxl.bin    | Bin 38912 -> 38912 bytes
->  pc-bios/vgabios-stdvga.bin | Bin 38912 -> 38912 bytes
->  pc-bios/vgabios-virtio.bin | Bin 38912 -> 38912 bytes
->  pc-bios/vgabios-vmware.bin | Bin 38912 -> 38912 bytes
->  pc-bios/vgabios.bin        | Bin 38400 -> 38400 bytes
->  roms/config.seabios-128k   |   4 ++++
->  roms/seabios               |   2 +-
->  10 files changed, 5 insertions(+), 1 deletion(-)
->
+On Thu, Oct 19, 2017 at 05:43:18PM +0200, Paolo Bonzini wrote:
+> On 19/10/2017 17:39, Michael S. Tsirkin wrote:
+> >> Add VHOST_USER_GET_CONFIG/VHOST_USER_SET_CONFIG messages which can be
+> >> used for live migration of vhost user devices, also vhost user devices
+> >> can benefit from the messages to get/set virtio config space from/to the
+> >> I/O target. For the purpose to support virtio config space change,
+> >> VHOST_USER_SET_CONFIG_FD message is added as the event notifier
+> >> in case virtio config space change in the I/O target.
+> >>
+> >> Signed-off-by: Changpeng Liu <changpeng.liu@intel.com>
+> > I don't much like it that config is getting passed through.
+> > 
+> > IMO this makes managing things harder not easier.
+> > 
+> > How about specific messages about specific parts of
+> > config space that you want to get from the backend?
+> 
+> In the case of virtio-blk that would be all of it.  Do you have a case
+> in mind where some part of the configuration space is owned by QEMU?
+> 
+> Paolo
 
-Applied, thanks.
-
--- PMM
+Yes. seg_max
