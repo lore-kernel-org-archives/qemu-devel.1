@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40376)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41735)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1e534C-00015o-FF
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 01:08:25 -0400
+	(envelope-from <changpeng.liu@intel.com>) id 1e53I0-0003Gf-Ao
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 01:22:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1e5344-0001ww-Pi
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 01:08:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56728)
+	(envelope-from <changpeng.liu@intel.com>) id 1e53Hx-0004Ja-6F
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 01:22:40 -0400
+Received: from mga11.intel.com ([192.55.52.93]:30895)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1e5344-0001vV-HC
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 01:08:16 -0400
-Date: Thu, 19 Oct 2017 13:08:09 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20171019050809.GW4166@pxdev.xzpeter.org>
-References: <20171018174013.22709-1-dgilbert@redhat.com>
-	<20171018174013.22709-8-dgilbert@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20171018174013.22709-8-dgilbert@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 7/7] migration: pause-before-switchover
- for postcopy
+	(Exim 4.71) (envelope-from <changpeng.liu@intel.com>)
+	id 1e53Hw-0004G3-T8
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 01:22:37 -0400
+From: Changpeng Liu <changpeng.liu@intel.com>
+Date: Thu, 19 Oct 2017 13:24:06 +0800
+Message-Id: <1508390650-19115-1-git-send-email-changpeng.liu@intel.com>
+Subject: [Qemu-devel] [PATCH v4 0/4] *** Introduce a new vhost-user-blk host
+ device to Qemu ***
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,106 +23,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, jdenemar@redhat.com, wangjie88@huawei.com, quintela@redhat.com, mreitz@redhat.com, berrange@redhat.com, eblake@redhat.com, fuweiwei2@huawei.com
+To: changpeng.liu@intel.com, qemu-devel@nongnu.org
+Cc: stefanha@gmail.com, pbonzini@redhat.com, mst@redhat.com, marcandre.lureau@redhat.com, felipe@nutanix.com, james.r.harris@intel.com
 
-On Wed, Oct 18, 2017 at 06:40:13PM +0100, Dr. David Alan Gilbert (git) wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> 
-> Add pause-before-switchover support for postcopy.
-> After starting postcopy it will transition
->     active->pre-switchover->postcopy_active
-> 
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> ---
->  migration/migration.c | 29 ++++++++++++++++++++++-------
->  1 file changed, 22 insertions(+), 7 deletions(-)
-> 
-> diff --git a/migration/migration.c b/migration/migration.c
-> index 756deb3e2c..af587377e9 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -104,6 +104,9 @@ enum mig_rp_message_type {
->  static MigrationState *current_migration;
->  
->  static bool migration_object_check(MigrationState *ms, Error **errp);
-> +static int migration_maybe_pause(MigrationState *s,
-> +                                 int *current_active_state,
-> +                                 int new_state);
->  
->  void migration_object_init(void)
->  {
-> @@ -1830,8 +1833,11 @@ static int postcopy_start(MigrationState *ms, bool *old_vm_running)
->      QEMUFile *fb;
->      int64_t time_at_stop = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
->      bool restart_block = false;
-> -    migrate_set_state(&ms->state, MIGRATION_STATUS_ACTIVE,
-> -                      MIGRATION_STATUS_POSTCOPY_ACTIVE);
-> +    int cur_state = MIGRATION_STATUS_ACTIVE;
-> +    if (!migrate_pause_before_switchover()) {
-> +        migrate_set_state(&ms->state, MIGRATION_STATUS_ACTIVE,
-> +                          MIGRATION_STATUS_POSTCOPY_ACTIVE);
+Although virtio scsi specification was designed as a replacement for virtio_blk,
+there are still many users using virtio_blk. Qemu 2.9 introduced a new device
+vhost user scsi which can process I/O in user space for virtio_scsi, this commit
+introduces a new vhost user block host device, which can support virtio_blk in
+Guest OS, and I/O processing in another I/O target.
 
-(Note: so we are sending device data during
- MIGRATION_STATUS_POSTCOPY_ACTIVE state if "pause-before-switchover"
- is not set, and MIGRATION_STATUS_DEVICE state if that is set)
+Due to the limitation for virtio_blk specification, virtio_blk device cannot get
+block information such as capacity, block size etc via the specification, several
+new vhost user messages were added to deliver virtio config space
+information between Qemu and I/O target, VHOST_USER_GET_CONFIG/VHOST_USER_SET_CONFIG
+messages used for get/set config space from/to I/O target, VHOST_USER_SET_CONFIG_FD
+was added for event notifier in case the change of virtio config space. Also, those
+messages can be used for vhost device live migration as well.
 
-> +    }
->  
->      trace_postcopy_start();
->      qemu_mutex_lock_iothread();
-> @@ -1845,6 +1851,12 @@ static int postcopy_start(MigrationState *ms, bool *old_vm_running)
->          goto fail;
->      }
->  
-> +    ret = migration_maybe_pause(ms, &cur_state,
-> +                                MIGRATION_STATUS_POSTCOPY_ACTIVE);
-> +    if (ret < 0) {
-> +        goto fail;
-> +    }
-> +
+v3-v4: refactoring the vhost user block example patch based on new libvhost-user library.
+v2-v3: add new vhost user message to get/set virtio config space
 
-I think it works, so:
+Changpeng Liu (4):
+  vhost-user: add new vhost user messages to support virtio config space
+  vhost-user-blk: introduce a new vhost-user-blk host device
+  contrib/libvhost-user: enable virtio config space messages
+  contrib/vhost-user-blk: introduce a vhost-user-blk sample application
 
-Reviewed-by: Peter Xu <peterx@redhat.com>
-
-About the unification of state change I mentioned in cover letter,
-what I proposed would look like this for postcopy (I would avoid
-fiddling with cur_state and related, and for precopy it should be
-similar):
-
-migration_pre_switchover (ms)
-{
-  migrate_set_state(ms, MIGRATION_STATUS_PRE_SWITCHOVER);
-  qemu_mutex_unlock_iothread();
-  qemu_sem_wait();
-  qemu_mutex_lock_iothread();
-}
-
-postcopy_start ()
-{
-  ...
-
-  /* Whether we need extra pre-switchover state transition */
-  if (migrate_pause_before_switchover ()) {
-    migration_pre_switchover (ms);
-  }
-
-  /*
-   * To "switchover" state to send device states, etc., no matter
-   * whether "pause-before-switchover" is enabled
-   */
-  migration_set_state (ms, MIGRATION_STATUS_SWITCHOVER);
-
-  /* send device states and the rest postcopy work... */
-
-  migration_set_state (ms, MIGRATION_STATUS_POSTCOPY_ACTIVE)
-}
-
-I proposed this only for readability and cleaness of state transition.
-At least then we'll know that we are always sending the device data
-during SWITCHOVER state (or say, DEVICE state). Again, either way is
-fine to me.  Thanks,
+ .gitignore                              |   1 +
+ Makefile                                |   3 +
+ Makefile.objs                           |   1 +
+ configure                               |  11 +
+ contrib/libvhost-user/libvhost-user.c   |  75 +++++
+ contrib/libvhost-user/libvhost-user.h   |  15 +-
+ contrib/vhost-user-blk/Makefile.objs    |   1 +
+ contrib/vhost-user-blk/vhost-user-blk.c | 492 ++++++++++++++++++++++++++++++++
+ docs/interop/vhost-user.txt             |  33 +++
+ hw/block/Makefile.objs                  |   3 +
+ hw/block/vhost-user-blk.c               | 360 +++++++++++++++++++++++
+ hw/virtio/vhost-user.c                  |  97 +++++++
+ hw/virtio/vhost.c                       |  63 ++++
+ hw/virtio/virtio-pci.c                  |  55 ++++
+ hw/virtio/virtio-pci.h                  |  18 ++
+ include/hw/virtio/vhost-backend.h       |   8 +
+ include/hw/virtio/vhost-user-blk.h      |  40 +++
+ include/hw/virtio/vhost.h               |  16 ++
+ 18 files changed, 1291 insertions(+), 1 deletion(-)
+ create mode 100644 contrib/vhost-user-blk/Makefile.objs
+ create mode 100644 contrib/vhost-user-blk/vhost-user-blk.c
+ create mode 100644 hw/block/vhost-user-blk.c
+ create mode 100644 include/hw/virtio/vhost-user-blk.h
 
 -- 
-Peter Xu
+1.9.3
