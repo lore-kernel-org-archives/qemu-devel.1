@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53711)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53770)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e5Boi-0000Mk-JB
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 10:29:04 -0400
+	(envelope-from <berrange@redhat.com>) id 1e5Boq-0000UU-SA
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 10:29:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e5Bog-0005hp-Jk
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 10:29:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38115)
+	(envelope-from <berrange@redhat.com>) id 1e5Bom-0005kq-5D
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 10:29:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36048)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1e5Bog-0005hW-Dy
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 10:28:58 -0400
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1e5Bol-0005kb-SM
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 10:29:04 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
 	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 846443E2CE
-	for <qemu-devel@nongnu.org>; Thu, 19 Oct 2017 14:28:57 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id EFD43343360
+	for <qemu-devel@nongnu.org>; Thu, 19 Oct 2017 14:29:02 +0000 (UTC)
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Thu, 19 Oct 2017 15:28:40 +0100
-Message-Id: <20171019142848.572-2-berrange@redhat.com>
+Date: Thu, 19 Oct 2017 15:28:43 +0100
+Message-Id: <20171019142848.572-5-berrange@redhat.com>
 In-Reply-To: <20171019142848.572-1-berrange@redhat.com>
 References: <20171019142848.572-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH v1 1/9] input: use hex in ps2 keycode trace
- events
+Subject: [Qemu-devel] [PATCH v1 4/9] ps2: fix scancodes sent for Alt-Print
+ key combination (aka SysRq)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,24 +33,297 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Gerd Hoffmann <kraxel@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-Hardware scancodes are all documented in hex, so use that in trace
-events to make it easier to understand.
+The 'Print' key is special in the AT set 1 / set 2 scancode definitions.
+
+An unmodified 'Print' key is supposed to send
+
+ AT Set 1:  e0 2a e0 37 (Down)  e0 b7 e0 aa (Up)
+ AT Set 2:  e0 12 e0 7c (Down)  e0 f0 7c e0 f0 12 (Up)
+
+which QEMU gets right. When pressed in combination with the 'Alt_L' or 'Alt_R'
+keys (which signify SysRq), the scancodes are required to follow a different
+scheme. With Alt_L, the expected sequences are
+
+ AT set 1:  38, 54 (Down) d4, b8 (Up)
+ AT set 2:  11, 84 (Down) f0 84, f0 11 (Up)
+
+And with Alt_R
+
+ AT set 1:  e0 38, 54 (Down) d4, e0 b8 (Up)
+ AT set 2:  e0 11, 84 (Down) f0 84, f0 e0 11 (Up)
+
+It is actually slightly more complicated than that, because (according results
+of 'showkey -s', keyboards will in fact first release the currently pressed
+modifier before sending the sequence above (which effectively re-presses &
+then releases the modifier) and finally re-press the original modifier
+afterwards. IOW, with Alt_L we need to send
+
+ AT set 1:  b8, 38, 54 (Down) d4, b8, 38 (Up)
+ AT set 2:  f0 11, 11, 84 (Down) f0 84, f0 11, 11 (Up)
+
+And with Alt_R
+
+ AT set 1:  e0 b8, e0 38, 54 (Down) d4, e0 b8, e0 38 (Up)
+ AT set 2:  e0 f0 11, e0 11, 84 (Down) f0 84, e0 f0 11, e0 11 (Up)
+
+The AT set 3 scancodes have no special handling for Alt-Print.
+
+Rather than fixing the handling of the 'print' key in the ps2 driver to consider
+the Alt modifiers, way back, a patch was commited that defined an extra 'sysrq'
+key name:
+
+  commit f2289cb6924afc97b2a75d21bfc9217024d11741
+  Author: balrog <balrog@c046a42c-6fe2-441c-8c8c-71466251a162>
+  Date:   Wed Jun 4 10:14:16 2008 +0000
+
+    Add sysrq to key names known by "sendkey".
+
+    Adding sysrq keycode to the table enabling running sysrq debugging in
+    the guest via the monitor sendkey command, like:
+
+    (qemu) sendkey alt-sysrq-t
+
+    Tested on x86-64 target and Linux guest.
+
+    Signed-off-by: Ryan Harper <ryanh@us.ibm.com>
+
+With this patch QEMU would send
+
+ AT set 1:  38, 54 (Down) d4, b8 (Up)
+ AT set 2:  11, 84 (Down) f0 84, f0 11 (Up)
+
+but this doesn't match what actual real keyboards send, as it is not releasing
+the original modifier & pressing it again afterwards. In addition the original
+problem remains, and a new problem was added:
+
+  - The sequence 'alt-print-t' is still broken, acting as if 'print-t' was
+    requested
+  - The sequence 'sysrq-t' is broken, injecting an undefine scancode sequence
+    tot he guest os (bare 0x54)
+
+To deal with this mess we make these changes to the ps2 code, so that we track
+the state of modifier keys (Alt, Shift, Ctrl - both left & right). Then we can
+vary what scancodes are sent for Q_KEY_CODE_PRINT according to the Alt key
+modifier state
+
+Interestingly, it appears that of operating systems I've checked (Linux, FreeBSD
+and OpenSolaris), none of them actually bother to validate the full sequences
+for a unmodified 'Print' key. They all just ignore the leading "e0 2a" and
+trigger based off "e0 37" alone. The latter two byte sequence is what keyboards
+send with 'Print' is combined with 'Shift' or 'Ctrl' modifiers.
 
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- hw/input/trace-events | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/input/ps2.c        | 137 ++++++++++++++++++++++++++++++++++++++++++--------
+ hw/input/trace-events |   1 +
+ 2 files changed, 118 insertions(+), 20 deletions(-)
 
+diff --git a/hw/input/ps2.c b/hw/input/ps2.c
+index dff3f1e024..1e6f6ae9b6 100644
+--- a/hw/input/ps2.c
++++ b/hw/input/ps2.c
+@@ -78,6 +78,14 @@
+ 
+ #define PS2_QUEUE_SIZE 16  /* Buffer size required by PS/2 protocol */
+ 
++/* Bits for 'modifiers' field in PS2KbdState */
++#define MOD_CTRL_L  (1 << 0)
++#define MOD_SHIFT_L (1 << 1)
++#define MOD_ALT_L   (1 << 2)
++#define MOD_CTRL_R  (1 << 3)
++#define MOD_SHIFT_R (1 << 4)
++#define MOD_ALT_R   (1 << 5)
++
+ typedef struct {
+     /* Keep the data array 256 bytes long, which compatibility
+      with older qemu versions. */
+@@ -99,6 +107,7 @@ typedef struct {
+     int scancode_set; /* 1=XT, 2=AT, 3=PS/2 */
+     int ledstate;
+     bool need_high_bit;
++    unsigned int modifiers; /* bitmask of MOD_* constants above */
+ } PS2KbdState;
+ 
+ typedef struct {
+@@ -545,6 +554,26 @@ static uint8_t translate_table[256] = {
+     0xf8, 0xf9, 0xfa, 0xfb, 0xfc, 0xfd, 0xfe, 0xff,
+ };
+ 
++static unsigned int ps2_modifier_bit(QKeyCode key)
++{
++    switch (key) {
++    case Q_KEY_CODE_CTRL:
++        return MOD_CTRL_L;
++    case Q_KEY_CODE_CTRL_R:
++        return MOD_CTRL_R;
++    case Q_KEY_CODE_SHIFT:
++        return MOD_SHIFT_L;
++    case Q_KEY_CODE_SHIFT_R:
++        return MOD_SHIFT_R;
++    case Q_KEY_CODE_ALT:
++        return MOD_ALT_L;
++    case Q_KEY_CODE_ALT_R:
++        return MOD_ALT_R;
++    default:
++        return 0;
++    }
++}
++
+ static void ps2_reset_queue(PS2State *s)
+ {
+     PS2Queue *q = &s->queue;
+@@ -596,11 +625,20 @@ static void ps2_keyboard_event(DeviceState *dev, QemuConsole *src,
+     InputKeyEvent *key = evt->u.key.data;
+     int qcode;
+     uint16_t keycode;
++    int mod;
+ 
+     qemu_system_wakeup_request(QEMU_WAKEUP_REASON_OTHER);
+     assert(evt->type == INPUT_EVENT_KIND_KEY);
+     qcode = qemu_input_key_value_to_qcode(key->key);
+ 
++    mod = ps2_modifier_bit(qcode);
++    trace_ps2_keyboard_event(s, qcode, key->down, mod, s->modifiers);
++    if (key->down) {
++        s->modifiers |= mod;
++    } else {
++        s->modifiers &= ~mod;
++    }
++
+     if (s->scancode_set == 1) {
+         if (qcode == Q_KEY_CODE_PAUSE) {
+             if (key->down) {
+@@ -612,16 +650,42 @@ static void ps2_keyboard_event(DeviceState *dev, QemuConsole *src,
+                 ps2_put_keycode(s, 0xc5);
+             }
+         } else if (qcode == Q_KEY_CODE_PRINT) {
+-            if (key->down) {
+-                ps2_put_keycode(s, 0xe0);
+-                ps2_put_keycode(s, 0x2a);
+-                ps2_put_keycode(s, 0xe0);
+-                ps2_put_keycode(s, 0x37);
++            if (s->modifiers & MOD_ALT_L) {
++                if (key->down) {
++                    ps2_put_keycode(s, 0xb8);
++                    ps2_put_keycode(s, 0x38);
++                    ps2_put_keycode(s, 0x54);
++                } else {
++                    ps2_put_keycode(s, 0xd4);
++                    ps2_put_keycode(s, 0xb8);
++                    ps2_put_keycode(s, 0x38);
++                }
++            } else if (s->modifiers & MOD_ALT_R) {
++                if (key->down) {
++                    ps2_put_keycode(s, 0xe0);
++                    ps2_put_keycode(s, 0xb8);
++                    ps2_put_keycode(s, 0xe0);
++                    ps2_put_keycode(s, 0x38);
++                    ps2_put_keycode(s, 0x54);
++                } else {
++                    ps2_put_keycode(s, 0xd4);
++                    ps2_put_keycode(s, 0xe0);
++                    ps2_put_keycode(s, 0xb8);
++                    ps2_put_keycode(s, 0xe0);
++                    ps2_put_keycode(s, 0x38);
++                }
+             } else {
+-                ps2_put_keycode(s, 0xe0);
+-                ps2_put_keycode(s, 0xb7);
+-                ps2_put_keycode(s, 0xe0);
+-                ps2_put_keycode(s, 0xaa);
++                if (key->down) {
++                    ps2_put_keycode(s, 0xe0);
++                    ps2_put_keycode(s, 0x2a);
++                    ps2_put_keycode(s, 0xe0);
++                    ps2_put_keycode(s, 0x37);
++                } else {
++                    ps2_put_keycode(s, 0xe0);
++                    ps2_put_keycode(s, 0xb7);
++                    ps2_put_keycode(s, 0xe0);
++                    ps2_put_keycode(s, 0xaa);
++                }
+             }
+         } else {
+             keycode = qcode_to_keycode_set1[qcode];
+@@ -651,18 +715,50 @@ static void ps2_keyboard_event(DeviceState *dev, QemuConsole *src,
+                 ps2_put_keycode(s, 0x77);
+             }
+         } else if (qcode == Q_KEY_CODE_PRINT) {
+-            if (key->down) {
+-                ps2_put_keycode(s, 0xe0);
+-                ps2_put_keycode(s, 0x12);
+-                ps2_put_keycode(s, 0xe0);
+-                ps2_put_keycode(s, 0x7c);
++            if (s->modifiers & MOD_ALT_L) {
++                if (key->down) {
++                    ps2_put_keycode(s, 0xf0);
++                    ps2_put_keycode(s, 0x11);
++                    ps2_put_keycode(s, 0x11);
++                    ps2_put_keycode(s, 0x84);
++                } else {
++                    ps2_put_keycode(s, 0xf0);
++                    ps2_put_keycode(s, 0x84);
++                    ps2_put_keycode(s, 0xf0);
++                    ps2_put_keycode(s, 0x11);
++                    ps2_put_keycode(s, 0x11);
++                }
++            } else if (s->modifiers & MOD_ALT_R) {
++                if (key->down) {
++                    ps2_put_keycode(s, 0xe0);
++                    ps2_put_keycode(s, 0xf0);
++                    ps2_put_keycode(s, 0x11);
++                    ps2_put_keycode(s, 0xe0);
++                    ps2_put_keycode(s, 0x11);
++                    ps2_put_keycode(s, 0x84);
++                } else {
++                    ps2_put_keycode(s, 0xf0);
++                    ps2_put_keycode(s, 0x84);
++                    ps2_put_keycode(s, 0xe0);
++                    ps2_put_keycode(s, 0xf0);
++                    ps2_put_keycode(s, 0x11);
++                    ps2_put_keycode(s, 0xe0);
++                    ps2_put_keycode(s, 0x11);
++                }
+             } else {
+-                ps2_put_keycode(s, 0xe0);
+-                ps2_put_keycode(s, 0xf0);
+-                ps2_put_keycode(s, 0x7c);
+-                ps2_put_keycode(s, 0xe0);
+-                ps2_put_keycode(s, 0xf0);
+-                ps2_put_keycode(s, 0x12);
++                if (key->down) {
++                    ps2_put_keycode(s, 0xe0);
++                    ps2_put_keycode(s, 0x12);
++                    ps2_put_keycode(s, 0xe0);
++                    ps2_put_keycode(s, 0x7c);
++                } else {
++                    ps2_put_keycode(s, 0xe0);
++                    ps2_put_keycode(s, 0xf0);
++                    ps2_put_keycode(s, 0x7c);
++                    ps2_put_keycode(s, 0xe0);
++                    ps2_put_keycode(s, 0xf0);
++                    ps2_put_keycode(s, 0x12);
++                }
+             }
+         } else {
+             keycode = qcode_to_keycode_set2[qcode];
+@@ -1125,6 +1221,7 @@ static void ps2_kbd_reset(void *opaque)
+     s->scan_enabled = 0;
+     s->translate = 0;
+     s->scancode_set = 2;
++    s->modifiers = 0;
+ }
+ 
+ static void ps2_mouse_reset(void *opaque)
 diff --git a/hw/input/trace-events b/hw/input/trace-events
-index 6fcb3c063f..d04132d342 100644
+index d04132d342..88150ef7a6 100644
 --- a/hw/input/trace-events
 +++ b/hw/input/trace-events
-@@ -1,7 +1,7 @@
- # See docs/devel/tracing.txt for syntax documentation.
+@@ -2,6 +2,7 @@
  
  # hw/input/ps2.c
--ps2_put_keycode(void *opaque, int keycode) "%p keycode %d"
-+ps2_put_keycode(void *opaque, int keycode) "%p keycode 0x%02x"
+ ps2_put_keycode(void *opaque, int keycode) "%p keycode 0x%02x"
++ps2_keyboard_event(void *opaque, int qcode, int down, unsigned int modifier, unsigned int modifiers) "%p qcode %d down %d modifier 0x%x modifiers 0x%x"
  ps2_read_data(void *opaque) "%p"
  ps2_set_ledstate(void *s, int ledstate) "%p ledstate %d"
  ps2_reset_keyboard(void *s) "%p"
