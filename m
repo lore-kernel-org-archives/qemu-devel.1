@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58260)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58511)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e5C50-0002r4-Ol
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 10:45:52 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1e5C5u-0003Sf-G7
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 10:46:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e5C4w-0000zB-OK
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 10:45:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33444)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1e5C4w-0000yn-El
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 10:45:46 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 41A51806B3
-	for <qemu-devel@nongnu.org>; Thu, 19 Oct 2017 14:45:45 +0000 (UTC)
-Date: Thu, 19 Oct 2017 15:45:37 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20171019144537.GT8408@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20171019142848.572-1-berrange@redhat.com>
-	<20171019142848.572-5-berrange@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1e5C5t-0001UP-JP
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 10:46:46 -0400
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:53959)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1e5C5t-0001Tw-C5
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 10:46:45 -0400
+Received: by mail-wm0-x243.google.com with SMTP id q132so16902782wmd.2
+	for <qemu-devel@nongnu.org>; Thu, 19 Oct 2017 07:46:45 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20171019142848.572-5-berrange@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v1 4/9] ps2: fix scancodes sent for
- Alt-Print key combination (aka SysRq)
+In-Reply-To: <alpine.DEB.2.10.1710171708130.27209@sstabellini-ThinkPad-X260>
+References: <alpine.DEB.2.10.1710171708130.27209@sstabellini-ThinkPad-X260>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 19 Oct 2017 15:46:23 +0100
+Message-ID: <CAFEAcA9zXAmNPL8TsLKSPbm8Er_KLK8Ubwth6=nL6WD87OmBQw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] aarch64: advertise the GIC system register
+ interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,129 +29,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+To: Stefano Stabellini <sstabellini@kernel.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "xen-devel@lists.xen.org" <xen-devel@lists.xen.org>, julien.grall@arm.com, qemu-arm <qemu-arm@nongnu.org>
 
-On Thu, Oct 19, 2017 at 03:28:43PM +0100, Daniel P. Berrange wrote:
-> The 'Print' key is special in the AT set 1 / set 2 scancode definitions.
-> 
-> An unmodified 'Print' key is supposed to send
-> 
->  AT Set 1:  e0 2a e0 37 (Down)  e0 b7 e0 aa (Up)
->  AT Set 2:  e0 12 e0 7c (Down)  e0 f0 7c e0 f0 12 (Up)
-> 
-> which QEMU gets right. When pressed in combination with the 'Alt_L' or 'Alt_R'
-> keys (which signify SysRq), the scancodes are required to follow a different
-> scheme. With Alt_L, the expected sequences are
-> 
->  AT set 1:  38, 54 (Down) d4, b8 (Up)
->  AT set 2:  11, 84 (Down) f0 84, f0 11 (Up)
-> 
-> And with Alt_R
-> 
->  AT set 1:  e0 38, 54 (Down) d4, e0 b8 (Up)
->  AT set 2:  e0 11, 84 (Down) f0 84, f0 e0 11 (Up)
-> 
-> It is actually slightly more complicated than that, because (according results
-> of 'showkey -s', keyboards will in fact first release the currently pressed
-> modifier before sending the sequence above (which effectively re-presses &
-> then releases the modifier) and finally re-press the original modifier
-> afterwards. IOW, with Alt_L we need to send
-> 
->  AT set 1:  b8, 38, 54 (Down) d4, b8, 38 (Up)
->  AT set 2:  f0 11, 11, 84 (Down) f0 84, f0 11, 11 (Up)
-> 
-> And with Alt_R
-> 
->  AT set 1:  e0 b8, e0 38, 54 (Down) d4, e0 b8, e0 38 (Up)
->  AT set 2:  e0 f0 11, e0 11, 84 (Down) f0 84, e0 f0 11, e0 11 (Up)
-> 
-> The AT set 3 scancodes have no special handling for Alt-Print.
-> 
-> Rather than fixing the handling of the 'print' key in the ps2 driver to consider
-> the Alt modifiers, way back, a patch was commited that defined an extra 'sysrq'
-> key name:
-> 
->   commit f2289cb6924afc97b2a75d21bfc9217024d11741
->   Author: balrog <balrog@c046a42c-6fe2-441c-8c8c-71466251a162>
->   Date:   Wed Jun 4 10:14:16 2008 +0000
-> 
->     Add sysrq to key names known by "sendkey".
-> 
->     Adding sysrq keycode to the table enabling running sysrq debugging in
->     the guest via the monitor sendkey command, like:
-> 
->     (qemu) sendkey alt-sysrq-t
-> 
->     Tested on x86-64 target and Linux guest.
-> 
->     Signed-off-by: Ryan Harper <ryanh@us.ibm.com>
-> 
-> With this patch QEMU would send
-> 
->  AT set 1:  38, 54 (Down) d4, b8 (Up)
->  AT set 2:  11, 84 (Down) f0 84, f0 11 (Up)
-> 
-> but this doesn't match what actual real keyboards send, as it is not releasing
-> the original modifier & pressing it again afterwards. In addition the original
-> problem remains, and a new problem was added:
-> 
->   - The sequence 'alt-print-t' is still broken, acting as if 'print-t' was
->     requested
->   - The sequence 'sysrq-t' is broken, injecting an undefine scancode sequence
->     tot he guest os (bare 0x54)
-> 
-> To deal with this mess we make these changes to the ps2 code, so that we track
-> the state of modifier keys (Alt, Shift, Ctrl - both left & right). Then we can
-> vary what scancodes are sent for Q_KEY_CODE_PRINT according to the Alt key
-> modifier state
-> 
-> Interestingly, it appears that of operating systems I've checked (Linux, FreeBSD
-> and OpenSolaris), none of them actually bother to validate the full sequences
-> for a unmodified 'Print' key. They all just ignore the leading "e0 2a" and
-> trigger based off "e0 37" alone. The latter two byte sequence is what keyboards
-> send with 'Print' is combined with 'Shift' or 'Ctrl' modifiers.
-> 
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> ---
->  hw/input/ps2.c        | 137 ++++++++++++++++++++++++++++++++++++++++++--------
->  hw/input/trace-events |   1 +
->  2 files changed, 118 insertions(+), 20 deletions(-)
-> 
-> diff --git a/hw/input/ps2.c b/hw/input/ps2.c
-> index dff3f1e024..1e6f6ae9b6 100644
-> --- a/hw/input/ps2.c
-> +++ b/hw/input/ps2.c
-> @@ -78,6 +78,14 @@
->  
->  #define PS2_QUEUE_SIZE 16  /* Buffer size required by PS/2 protocol */
->  
-> +/* Bits for 'modifiers' field in PS2KbdState */
-> +#define MOD_CTRL_L  (1 << 0)
-> +#define MOD_SHIFT_L (1 << 1)
-> +#define MOD_ALT_L   (1 << 2)
-> +#define MOD_CTRL_R  (1 << 3)
-> +#define MOD_SHIFT_R (1 << 4)
-> +#define MOD_ALT_R   (1 << 5)
-> +
->  typedef struct {
->      /* Keep the data array 256 bytes long, which compatibility
->       with older qemu versions. */
-> @@ -99,6 +107,7 @@ typedef struct {
->      int scancode_set; /* 1=XT, 2=AT, 3=PS/2 */
->      int ledstate;
->      bool need_high_bit;
-> +    unsigned int modifiers; /* bitmask of MOD_* constants above */
->  } PS2KbdState;
+On 18 October 2017 at 01:10, Stefano Stabellini <sstabellini@kernel.org> wrote:
+> Advertise the presence of the GIC system register interface (1<<24)
+> according to H9.248 of the ARM ARM.
+>
+> This patch allows Xen to boot on QEMU aarch64.
+>
+> Signed-off-by: Stefano Stabellini <sstabellini@kernel.org>
+>
+> diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
+> index 670c07a..a451763 100644
+> --- a/target/arm/cpu64.c
+> +++ b/target/arm/cpu64.c
+> @@ -136,7 +136,7 @@ static void aarch64_a57_initfn(Object *obj)
+>      cpu->id_isar3 = 0x01112131;
+>      cpu->id_isar4 = 0x00011142;
+>      cpu->id_isar5 = 0x00011121;
+> -    cpu->id_aa64pfr0 = 0x00002222;
+> +    cpu->id_aa64pfr0 = 0x01002222;
+>      cpu->id_aa64dfr0 = 0x10305106;
+>      cpu->pmceid0 = 0x00000000;
+>      cpu->pmceid1 = 0x00000000;
+> @@ -196,7 +196,7 @@ static void aarch64_a53_initfn(Object *obj)
+>      cpu->id_isar3 = 0x01112131;
+>      cpu->id_isar4 = 0x00011142;
+>      cpu->id_isar5 = 0x00011121;
+> -    cpu->id_aa64pfr0 = 0x00002222;
+> +    cpu->id_aa64pfr0 = 0x01002222;
+>      cpu->id_aa64dfr0 = 0x10305106;
+>      cpu->id_aa64isar0 = 0x00011120;
+>      cpu->id_aa64mmfr0 = 0x00001122; /* 40 bit physical addr */
 
-Presumably the addition of this field means I should do something with the
-vmstate for migration. I'm unclear exactly how to modify that data in the right
-way that correctly preserves back compatibility ?
+Whoops -- we missed this when we added the GICv3 support, because
+Linux doesn't check it.
 
+Applied to target-arm.next, thanks.
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+-- PMM
