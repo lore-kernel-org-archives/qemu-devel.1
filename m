@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56012)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56069)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1e5DZu-0005fh-93
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 12:21:57 -0400
+	(envelope-from <alistai@xilinx.com>) id 1e5Da3-0005pp-Ow
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 12:22:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1e5DZq-00021g-Ua
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 12:21:50 -0400
-Received: from mail-cys01nam02on0042.outbound.protection.outlook.com
-	([104.47.37.42]:57479
-	helo=NAM02-CY1-obe.outbound.protection.outlook.com)
+	(envelope-from <alistai@xilinx.com>) id 1e5Da0-00024g-I0
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 12:21:59 -0400
+Received: from mail-dm3nam03on0069.outbound.protection.outlook.com
+	([104.47.41.69]:51760
+	helo=NAM03-DM3-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1e5DZq-000217-IV
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 12:21:46 -0400
+	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1e5Da0-00024O-AY
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 12:21:56 -0400
 From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Thu, 19 Oct 2017 09:17:40 -0700
-Message-ID: <5d68af196a5b6386f66e6461d1c65b6a935b6ea0.1508390588.git.alistair.francis@xilinx.com>
+Date: Thu, 19 Oct 2017 09:17:43 -0700
+Message-ID: <e875fc6ca98b01cb94f175b60048fa863ec423ce.1508390588.git.alistair.francis@xilinx.com>
 In-Reply-To: <cover.1508390588.git.alistair.francis@xilinx.com>
 References: <cover.1508390588.git.alistair.francis@xilinx.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v3 33/46] hw/scsi: Replace fprintf(stderr,
+Subject: [Qemu-devel] [PATCH v3 34/46] hw/sd: Replace fprintf(stderr,
  "*\n" with error_report()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -29,7 +29,7 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: alistair.francis@xilinx.com, alistair23@gmail.com, armbru@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>
+Cc: alistair.francis@xilinx.com, alistair23@gmail.com, armbru@redhat.com
 
 Replace a large number of the fprintf(stderr, "*\n" calls with
 error_report(). The functions were renamed with these commands and then
@@ -71,276 +71,102 @@ find ./* -type f -exec sed -i \
 
 Some lines where then manually tweaked to pass checkpatch.
 
+Some of the prints in hw/sd/sd.c were manually converted to using
+DPRINTF() instead.
+
 Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>
-Cc: Alexander Graf <agraf@suse.de>
 ---
+V3:
+ - Fixup some DPRINTF() prints being wrong
 V2:
  - Split hw patch into individual directories
 
- hw/scsi/lsi53c895a.c            |  4 ++--
- hw/scsi/spapr_vscsi.c           | 49 +++++++++++++++++++++--------------------
- hw/scsi/virtio-scsi-dataplane.c |  6 ++---
- 3 files changed, 30 insertions(+), 29 deletions(-)
+ hw/sd/pl181.c |  5 +++--
+ hw/sd/sd.c    | 15 ++++++++-------
+ 2 files changed, 11 insertions(+), 9 deletions(-)
 
-diff --git a/hw/scsi/lsi53c895a.c b/hw/scsi/lsi53c895a.c
-index 191505df5b..7c9a930e2f 100644
---- a/hw/scsi/lsi53c895a.c
-+++ b/hw/scsi/lsi53c895a.c
-@@ -14,7 +14,7 @@
+diff --git a/hw/sd/pl181.c b/hw/sd/pl181.c
+index 55c8098ecd..2b878a0c5e 100644
+--- a/hw/sd/pl181.c
++++ b/hw/sd/pl181.c
+@@ -8,6 +8,7 @@
   */
  
  #include "qemu/osdep.h"
--
 +#include "qemu/error-report.h"
- #include "hw/hw.h"
- #include "hw/pci/pci.h"
- #include "hw/scsi/scsi.h"
-@@ -1501,7 +1501,7 @@ again:
-            This is apparently sufficient to beat the drivers into submission.
-          */
-         if (!(s->sien0 & LSI_SIST0_UDC))
--            fprintf(stderr, "inf. loop with UDC masked\n");
-+            error_report("inf. loop with UDC masked");
-         lsi_script_scsi_interrupt(s, LSI_SIST0_UDC, 0);
-         lsi_disconnect(s);
-     } else if (s->istat1 & LSI_ISTAT1_SRUN && !s->waiting) {
-diff --git a/hw/scsi/spapr_vscsi.c b/hw/scsi/spapr_vscsi.c
-index 360db53ac8..8c4eabcf3d 100644
---- a/hw/scsi/spapr_vscsi.c
-+++ b/hw/scsi/spapr_vscsi.c
-@@ -32,6 +32,7 @@
-  *  - Maybe do autosense (PAPR seems to mandate it, linux doesn't care)
-  */
- #include "qemu/osdep.h"
-+#include "qemu/error-report.h"
- #include "qemu-common.h"
- #include "cpu.h"
- #include "hw/hw.h"
-@@ -179,7 +180,7 @@ static int vscsi_send_iu(VSCSIState *s, vscsi_req *req,
-     rc = spapr_vio_dma_write(&s->vdev, req->crq.s.IU_data_ptr,
-                              &req->iu, length);
-     if (rc) {
--        fprintf(stderr, "vscsi_send_iu: DMA write failure !\n");
-+        error_report("vscsi_send_iu: DMA write failure !");
+ #include "sysemu/block-backend.h"
+ #include "sysemu/blockdev.h"
+ #include "hw/sysbus.h"
+@@ -146,7 +147,7 @@ static void pl181_fifo_push(PL181State *s, uint32_t value)
+     int n;
+ 
+     if (s->fifo_len == PL181_FIFO_LEN) {
+-        fprintf(stderr, "pl181: FIFO overflow\n");
++        error_report("pl181: FIFO overflow");
+         return;
      }
+     n = (s->fifo_pos + s->fifo_len) & (PL181_FIFO_LEN - 1);
+@@ -160,7 +161,7 @@ static uint32_t pl181_fifo_pop(PL181State *s)
+     uint32_t value;
  
-     req->crq.s.valid = 0x80;
-@@ -197,7 +198,7 @@ static int vscsi_send_iu(VSCSIState *s, vscsi_req *req,
- 
-     rc1 = spapr_vio_send_crq(&s->vdev, req->crq.raw);
-     if (rc1) {
--        fprintf(stderr, "vscsi_send_iu: Error sending response\n");
-+        error_report("vscsi_send_iu: Error sending response");
-         return rc1;
+     if (s->fifo_len == 0) {
+-        fprintf(stderr, "pl181: FIFO underflow\n");
++        error_report("pl181: FIFO underflow");
+         return 0;
      }
- 
-@@ -330,7 +331,7 @@ static int vscsi_fetch_desc(VSCSIState *s, struct vscsi_req *req,
-         break;
-     }
-     default:
--        fprintf(stderr, "VSCSI:   Unknown format %x\n", req->dma_fmt);
-+        error_report("VSCSI:   Unknown format %x", req->dma_fmt);
-         return -1;
-     }
- 
-@@ -518,7 +519,7 @@ static void vscsi_transfer_data(SCSIRequest *sreq, uint32_t len)
- 
-     trace_spapr_vscsi_transfer_data(sreq->tag, len, req);
-     if (req == NULL) {
--        fprintf(stderr, "VSCSI: Can't find request for tag 0x%x\n", sreq->tag);
-+        error_report("VSCSI: Can't find request for tag 0x%x", sreq->tag);
+     value = s->fifo[s->fifo_pos];
+diff --git a/hw/sd/sd.c b/hw/sd/sd.c
+index 35347a5bbc..5d7fa3e418 100644
+--- a/hw/sd/sd.c
++++ b/hw/sd/sd.c
+@@ -700,7 +700,7 @@ static void sd_lock_command(SDState *sd)
+         sd->card_status &= ~CARD_IS_LOCKED;
+         sd->pwd_len = 0;
+         /* Erasing the entire card here! */
+-        fprintf(stderr, "SD: Card force-erased by CMD42\n");
++        error_report("SD: Card force-erased by CMD42");
          return;
      }
  
-@@ -527,7 +528,7 @@ static void vscsi_transfer_data(SCSIRequest *sreq, uint32_t len)
-         rc = vscsi_srp_transfer_data(s, req, req->writing, buf, len);
+@@ -1282,7 +1282,7 @@ static sd_rsp_type_t sd_normal_command(SDState *sd,
+         return sd_r1;
+ 
+     case 56:	/* CMD56:  GEN_CMD */
+-        fprintf(stderr, "SD: GEN_CMD 0x%08x\n", req.arg);
++        error_report("SD: GEN_CMD 0x%08x", req.arg);
+ 
+         switch (sd->state) {
+         case sd_transfer_state:
+@@ -1564,9 +1564,10 @@ send_response:
+     if (rsplen) {
+         int i;
+         DPRINTF("Response:");
+-        for (i = 0; i < rsplen; i++)
+-            fprintf(stderr, " %02x", response[i]);
+-        fprintf(stderr, " state %d\n", sd->state);
++        for (i = 0; i < rsplen; i++) {
++            DPRINTF(" %02x", response[i]);
++        }
++        DPRINTF(" state %d\n", sd->state);
+     } else {
+         DPRINTF("No response %d\n", sd->state);
      }
-     if (rc < 0) {
--        fprintf(stderr, "VSCSI: RDMA error rc=%d!\n", rc);
-+        error_report("VSCSI: RDMA error rc=%d!", rc);
-         req->dma_error = true;
-         scsi_req_cancel(req->sreq);
-         return;
-@@ -547,7 +548,7 @@ static void vscsi_command_complete(SCSIRequest *sreq, uint32_t status, size_t re
- 
-     trace_spapr_vscsi_command_complete(sreq->tag, status, req);
-     if (req == NULL) {
--        fprintf(stderr, "VSCSI: Can't find request for tag 0x%x\n", sreq->tag);
-+        error_report("VSCSI: Can't find request for tag 0x%x", sreq->tag);
-         return;
+@@ -1580,14 +1581,14 @@ static void sd_blk_read(SDState *sd, uint64_t addr, uint32_t len)
+     DPRINTF("sd_blk_read: addr = 0x%08llx, len = %d\n",
+             (unsigned long long) addr, len);
+     if (!sd->blk || blk_pread(sd->blk, addr, sd->data, len) < 0) {
+-        fprintf(stderr, "sd_blk_read: read error on host side\n");
++        error_report("sd_blk_read: read error on host side");
      }
+ }
  
-@@ -639,7 +640,7 @@ static void *vscsi_load_request(QEMUFile *f, SCSIRequest *sreq)
-     memset(req, 0, sizeof(*req));
-     rc = vmstate_load_state(f, &vmstate_spapr_vscsi_req, req, 1);
-     if (rc) {
--        fprintf(stderr, "VSCSI: failed loading request tag#%u\n", sreq->tag);
-+        error_report("VSCSI: failed loading request tag#%u", sreq->tag);
-         return NULL;
+ static void sd_blk_write(SDState *sd, uint64_t addr, uint32_t len)
+ {
+     if (!sd->blk || blk_pwrite(sd->blk, addr, sd->data, len, 0) < 0) {
+-        fprintf(stderr, "sd_blk_write: write error on host side\n");
++        error_report("sd_blk_write: write error on host side");
      }
-     assert(req->active);
-@@ -827,7 +828,7 @@ static int vscsi_process_tsk_mgmt(VSCSIState *s, vscsi_req *req)
-     uint64_t tag = iu->srp.rsp.tag;
-     uint8_t sol_not = iu->srp.cmd.sol_not;
- 
--    fprintf(stderr, "vscsi_process_tsk_mgmt %02x\n",
-+    error_report("vscsi_process_tsk_mgmt %02x",
-             iu->srp.tsk_mgmt.tsk_mgmt_func);
- 
-     d = vscsi_device_find(&s->bus, be64_to_cpu(req->iu.srp.tsk_mgmt.lun), &lun);
-@@ -932,10 +933,10 @@ static int vscsi_handle_srp_req(VSCSIState *s, vscsi_req *req)
-     case SRP_CRED_RSP:
-     case SRP_AER_REQ:
-     case SRP_AER_RSP:
--        fprintf(stderr, "VSCSI: Unsupported opcode %02x\n", opcode);
-+        error_report("VSCSI: Unsupported opcode %02x", opcode);
-         break;
-     default:
--        fprintf(stderr, "VSCSI: Unknown type %02x\n", opcode);
-+        error_report("VSCSI: Unknown type %02x", opcode);
-     }
- 
-     return done;
-@@ -953,7 +954,7 @@ static int vscsi_send_adapter_info(VSCSIState *s, vscsi_req *req)
-     rc = spapr_vio_dma_read(&s->vdev, be64_to_cpu(sinfo->buffer),
-                             &info, be16_to_cpu(sinfo->common.length));
-     if (rc) {
--        fprintf(stderr, "vscsi_send_adapter_info: DMA read failure !\n");
-+        error_report("vscsi_send_adapter_info: DMA read failure !");
-     }
- #endif
-     memset(&info, 0, sizeof(info));
-@@ -967,7 +968,7 @@ static int vscsi_send_adapter_info(VSCSIState *s, vscsi_req *req)
-     rc = spapr_vio_dma_write(&s->vdev, be64_to_cpu(sinfo->buffer),
-                              &info, be16_to_cpu(sinfo->common.length));
-     if (rc)  {
--        fprintf(stderr, "vscsi_send_adapter_info: DMA write failure !\n");
-+        error_report("vscsi_send_adapter_info: DMA write failure !");
-     }
- 
-     sinfo->common.status = rc ? cpu_to_be32(1) : 0;
-@@ -987,7 +988,7 @@ static int vscsi_send_capabilities(VSCSIState *s, vscsi_req *req)
-     req_len = len = be16_to_cpu(vcap->common.length);
-     buffer = be64_to_cpu(vcap->buffer);
-     if (len > sizeof(cap)) {
--        fprintf(stderr, "vscsi_send_capabilities: capabilities size mismatch !\n");
-+        error_report("vscsi_send_capabilities: capabilities size mismatch !");
- 
-         /*
-          * Just read and populate the structure that is known.
-@@ -997,7 +998,7 @@ static int vscsi_send_capabilities(VSCSIState *s, vscsi_req *req)
-     }
-     rc = spapr_vio_dma_read(&s->vdev, buffer, &cap, len);
-     if (rc)  {
--        fprintf(stderr, "vscsi_send_capabilities: DMA read failure !\n");
-+        error_report("vscsi_send_capabilities: DMA read failure !");
-     }
- 
-     /*
-@@ -1013,7 +1014,7 @@ static int vscsi_send_capabilities(VSCSIState *s, vscsi_req *req)
- 
-     rc = spapr_vio_dma_write(&s->vdev, buffer, &cap, len);
-     if (rc)  {
--        fprintf(stderr, "vscsi_send_capabilities: DMA write failure !\n");
-+        error_report("vscsi_send_capabilities: DMA write failure !");
-     }
-     if (req_len > len) {
-         /*
-@@ -1034,11 +1035,11 @@ static int vscsi_handle_mad_req(VSCSIState *s, vscsi_req *req)
- 
-     switch (be32_to_cpu(mad->empty_iu.common.type)) {
-     case VIOSRP_EMPTY_IU_TYPE:
--        fprintf(stderr, "Unsupported EMPTY MAD IU\n");
-+        error_report("Unsupported EMPTY MAD IU");
-         retlen = sizeof(mad->empty_iu);
-         break;
-     case VIOSRP_ERROR_LOG_TYPE:
--        fprintf(stderr, "Unsupported ERROR LOG MAD IU\n");
-+        error_report("Unsupported ERROR LOG MAD IU");
-         retlen = sizeof(mad->error_log);
-         break;
-     case VIOSRP_ADAPTER_INFO_TYPE:
-@@ -1053,7 +1054,7 @@ static int vscsi_handle_mad_req(VSCSIState *s, vscsi_req *req)
-         request_handled = true;
-         break;
-     default:
--        fprintf(stderr, "VSCSI: Unknown MAD type %02x\n",
-+        error_report("VSCSI: Unknown MAD type %02x",
-                 be32_to_cpu(mad->empty_iu.common.type));
-         /*
-          * PAPR+ says that "The length field is set to the length
-@@ -1078,7 +1079,7 @@ static void vscsi_got_payload(VSCSIState *s, vscsi_crq *crq)
- 
-     req = vscsi_get_req(s);
-     if (req == NULL) {
--        fprintf(stderr, "VSCSI: Failed to get a request !\n");
-+        error_report("VSCSI: Failed to get a request !");
-         return;
-     }
- 
-@@ -1088,7 +1089,7 @@ static void vscsi_got_payload(VSCSIState *s, vscsi_crq *crq)
-      * of the structure.
-      */
-     if (crq->s.IU_length > sizeof(union viosrp_iu)) {
--        fprintf(stderr, "VSCSI: SRP IU too long (%d bytes) !\n",
-+        error_report("VSCSI: SRP IU too long (%d bytes) !",
-                 crq->s.IU_length);
-         vscsi_put_req(req);
-         return;
-@@ -1097,7 +1098,7 @@ static void vscsi_got_payload(VSCSIState *s, vscsi_crq *crq)
-     /* XXX Handle failure differently ? */
-     if (spapr_vio_dma_read(&s->vdev, crq->s.IU_data_ptr, &req->iu,
-                            crq->s.IU_length)) {
--        fprintf(stderr, "vscsi_got_payload: DMA read failure !\n");
-+        error_report("vscsi_got_payload: DMA read failure !");
-         vscsi_put_req(req);
-         return;
-     }
-@@ -1158,16 +1159,16 @@ static int vscsi_do_crq(struct VIOsPAPRDevice *dev, uint8_t *crq_data)
-         case VIOSRP_AIX_FORMAT:
-         case VIOSRP_LINUX_FORMAT:
-         case VIOSRP_INLINE_FORMAT:
--            fprintf(stderr, "vscsi_do_srq: Unsupported payload format %02x\n",
-+            error_report("vscsi_do_srq: Unsupported payload format %02x",
-                     crq.s.format);
-             break;
-         default:
--            fprintf(stderr, "vscsi_do_srq: Unknown payload format %02x\n",
-+            error_report("vscsi_do_srq: Unknown payload format %02x",
-                     crq.s.format);
-         }
-         break;
-     default:
--        fprintf(stderr, "vscsi_do_crq: unknown CRQ %02x %02x ...\n",
-+        error_report("vscsi_do_crq: unknown CRQ %02x %02x ...",
-                 crq.raw[0], crq.raw[1]);
-     };
- 
-diff --git a/hw/scsi/virtio-scsi-dataplane.c b/hw/scsi/virtio-scsi-dataplane.c
-index add4b3f4a4..e047361310 100644
---- a/hw/scsi/virtio-scsi-dataplane.c
-+++ b/hw/scsi/virtio-scsi-dataplane.c
-@@ -97,7 +97,7 @@ static int virtio_scsi_vring_init(VirtIOSCSI *s, VirtQueue *vq, int n,
-     /* Set up virtqueue notify */
-     rc = virtio_bus_set_host_notifier(VIRTIO_BUS(qbus), n, true);
-     if (rc != 0) {
--        fprintf(stderr, "virtio-scsi: Failed to set host notifier (%d)\n",
-+        error_report("virtio-scsi: Failed to set host notifier (%d)",
-                 rc);
-         s->dataplane_fenced = true;
-         return rc;
-@@ -141,8 +141,8 @@ int virtio_scsi_dataplane_start(VirtIODevice *vdev)
-     /* Set up guest notifier (irq) */
-     rc = k->set_guest_notifiers(qbus->parent, vs->conf.num_queues + 2, true);
-     if (rc != 0) {
--        fprintf(stderr, "virtio-scsi: Failed to set guest notifiers (%d), "
--                "ensure -enable-kvm is set\n", rc);
-+        error_report("virtio-scsi: Failed to set guest notifiers (%d), "
-+                "ensure -enable-kvm is set", rc);
-         goto fail_guest_notifiers;
-     }
+ }
  
 -- 
 2.11.0
