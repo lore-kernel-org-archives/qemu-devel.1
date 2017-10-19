@@ -1,34 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57264)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32813)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e5De1-0000uZ-AC
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 12:26:06 -0400
+	(envelope-from <clg@kaod.org>) id 1e5Dne-00011L-VV
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 12:36:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e5Ddy-0003mg-42
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 12:26:05 -0400
-Received: from indium.canonical.com ([91.189.90.7]:49208)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1e5Ddx-0003lv-US
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 12:26:02 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1e5Ddw-0007rz-6g
-	for <qemu-devel@nongnu.org>; Thu, 19 Oct 2017 16:26:00 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 2D03F2E80CC
-	for <qemu-devel@nongnu.org>; Thu, 19 Oct 2017 16:26:00 +0000 (UTC)
+	(envelope-from <clg@kaod.org>) id 1e5DnZ-0003JO-Us
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 12:36:02 -0400
+Received: from 6.mo5.mail-out.ovh.net ([178.32.119.138]:49707)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1e5DnZ-0003In-Ok
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 12:35:57 -0400
+Received: from player786.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 2E08B1461D8
+	for <qemu-devel@nongnu.org>; Thu, 19 Oct 2017 18:35:56 +0200 (CEST)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+Date: Thu, 19 Oct 2017 18:35:38 +0200
+Message-Id: <20171019163546.2039-1-clg@kaod.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 19 Oct 2017 16:17:44 -0000
-From: Richard Henderson <rth@twiddle.net>
-Reply-To: Bug 1724485 <1724485@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150831492991.17205.1365818841692773714.malonedeb@gac.canonical.com>
-Message-Id: <150842986500.13434.2383418212797301459.launchpad@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1724485] Re: Invalid assertion in
- arm_read_memory_func
+Subject: [Qemu-devel] [PATCH v6 0/8] aspeed: add a witherspoon-bmc machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,46 +27,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, Andrew Jeffery <andrew@aj.id.au>, Joel Stanley <joel@jms.id.au>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-** Changed in: qemu
-     Assignee: (unassigned) =3D> Richard Henderson (rth)
+Hello,
 
--- =
+This series adds a new Aspeed machine to emulate the BMC of a
+Witherspoon system. It also extends the other Aspeed machines with I2C
+devices and adds a simple model for the pca9552 LED blinker present on
+the witherspoon board.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1724485
+Thanks,
 
-Title:
-  Invalid assertion in arm_read_memory_func
+C.
 
-Status in QEMU:
-  New
+Changes since v5:
 
-Bug description:
-  Hi,
+ - created the ROM memory region even if there is no file backend
+   specified by the user
 
-  I think there is an invalid assertion in arm_read_memory_func:
-  assert(info->endian =3D=3D BFD_ENDIAN_LITTLE)
+Changes since v4:
 
-  I face it in the following use case: target armeb-linux (I use qemu
-  user mode), -d in_asm -cpu any.
+ - use a ROM memory region
 
-  At some point during program startup, glibc's _dl_new_object calls
-  strlen, which is written in thumb2 mode (armv6t2). So print_insn_arm()
-  calls arm_read_memory_func() with length=3D=3D2, and info->flags =3D=3D
-  INSN_ARM_BE32, and the assert is false.
+Changes since v3:
 
-  If I remove the assert, execution continues OK.
+ - introduce a dummy ROM device to catch invalid writes
+ - removed 'ignore_memory_transaction_failures' on all Aspeed machines
+ - reworked PCA9552 device :
+   . simpler I2C handles
+   . auto-increment support
+   . unit test
 
-  With the assert, I get the error message from the assert, and qemu
-  then stalls.
+Changes since v2:
 
-  Can you confirm the assert can be removed? Or if not, explain me how
-  to avoid/fix the subsequent qemu stall?
+ - removed comments on the I2C buffer size pf the PCA9552 device.
+ - removed 'ignore_memory_transaction_failures' flag on the
+   witherspoon machine.
+  =20
+Changes since v1:
 
-  Thanks
+ - introduced smbus_eeprom_init_one()
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1724485/+subscriptions
+
+C=C3=A9dric Le Goater (8):
+  aspeed: use a ROM memory region to catch invalid writes
+  aspeed: remove ignore_memory_transaction_failures on all boards
+  aspeed: add support for the witherspoon-bmc board
+  aspeed: add an I2C RTC device to all machines
+  smbus: add a smbus_eeprom_init_one() routine
+  aspeed: Add EEPROM I2C devices
+  misc: add pca9552 LED blinker model
+  aspeed: add the pc9552 chips to the witherspoon machine
+
+ default-configs/arm-softmmu.mak |   1 +
+ hw/arm/aspeed.c                 | 139 ++++++++++++++++++---
+ hw/i2c/smbus_eeprom.c           |  16 ++-
+ hw/misc/Makefile.objs           |   1 +
+ hw/misc/pca9552.c               | 259 ++++++++++++++++++++++++++++++++++=
+++++++
+ include/hw/i2c/smbus.h          |   1 +
+ include/hw/misc/pca9552.h       |  33 +++++
+ tests/Makefile.include          |   2 +
+ tests/pca9552-test.c            | 131 ++++++++++++++++++++
+ 9 files changed, 560 insertions(+), 23 deletions(-)
+ create mode 100644 hw/misc/pca9552.c
+ create mode 100644 include/hw/misc/pca9552.h
+ create mode 100644 tests/pca9552-test.c
+
+--=20
+2.13.6
