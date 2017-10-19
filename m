@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43147)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44813)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e5CvC-0008TV-ES
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 11:39:47 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1e5Cyx-0002F2-58
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 11:43:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e5CvB-0000yg-Gn
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 11:39:46 -0400
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:45571)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1e5CvB-0000yN-8b
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 11:39:45 -0400
-Received: by mail-wm0-x241.google.com with SMTP id q124so16859490wmb.0
-	for <qemu-devel@nongnu.org>; Thu, 19 Oct 2017 08:39:45 -0700 (PDT)
+	(envelope-from <pbonzini@redhat.com>) id 1e5Cyt-0003Gr-Hf
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 11:43:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47204)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1e5Cyt-0003FO-9H
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 11:43:35 -0400
+References: <1508390650-19115-1-git-send-email-changpeng.liu@intel.com>
+	<1508390650-19115-2-git-send-email-changpeng.liu@intel.com>
+	<20171019183638-mutt-send-email-mst@kernel.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <42aa8736-bc23-d66d-27de-dbaf83ea2f99@redhat.com>
+Date: Thu, 19 Oct 2017 17:43:18 +0200
 MIME-Version: 1.0
-In-Reply-To: <alpine.DEB.2.10.1710181539580.27209@sstabellini-ThinkPad-X260>
-References: <alpine.DEB.2.10.1710181539580.27209@sstabellini-ThinkPad-X260>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 19 Oct 2017 16:39:23 +0100
-Message-ID: <CAFEAcA9t7i4JLbn2X5r2KqdA00fSEZPLEW4PpCsp_uyg8Gsm0A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] don't hardcode EL1 in
- extended_addresses_enabled
+In-Reply-To: <20171019183638-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 1/4] vhost-user: add new vhost user
+ messages to support virtio config space
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,56 +30,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Stabellini <sstabellini@kernel.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Julien Grall <julien.grall@linaro.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>, Changpeng Liu <changpeng.liu@intel.com>
+Cc: qemu-devel@nongnu.org, stefanha@gmail.com, marcandre.lureau@redhat.com, felipe@nutanix.com, james.r.harris@intel.com
 
-On 18 October 2017 at 23:41, Stefano Stabellini <sstabellini@kernel.org> wrote:
-> extended_addresses_enabled calls arm_el_is_aa64, hardcoding exception
-> level 1. Instead, retrieve the current el calling arm_current_el.
->
-> Signed-off-by: Stefano Stabellini <sstabellini@kernel.org>
->
-> diff --git a/target/arm/internals.h b/target/arm/internals.h
-> index 1f6efef..63507d9 100644
-> --- a/target/arm/internals.h
-> +++ b/target/arm/internals.h
-> @@ -187,7 +187,7 @@ static inline unsigned int arm_pamax(ARMCPU *cpu)
->  static inline bool extended_addresses_enabled(CPUARMState *env)
->  {
->      TCR *tcr = &env->cp15.tcr_el[arm_is_secure(env) ? 3 : 1];
-> -    return arm_el_is_aa64(env, 1) ||
-> +    return arm_el_is_aa64(env, arm_current_el(env)) ||
->             (arm_feature(env, ARM_FEATURE_LPAE) && (tcr->raw_tcr & TTBCR_EAE));
->  }
+On 19/10/2017 17:39, Michael S. Tsirkin wrote:
+>> Add VHOST_USER_GET_CONFIG/VHOST_USER_SET_CONFIG messages which can be
+>> used for live migration of vhost user devices, also vhost user devices
+>> can benefit from the messages to get/set virtio config space from/to the
+>> I/O target. For the purpose to support virtio config space change,
+>> VHOST_USER_SET_CONFIG_FD message is added as the event notifier
+>> in case virtio config space change in the I/O target.
+>>
+>> Signed-off-by: Changpeng Liu <changpeng.liu@intel.com>
+> I don't much like it that config is getting passed through.
+> 
+> IMO this makes managing things harder not easier.
+> 
+> How about specific messages about specific parts of
+> config space that you want to get from the backend?
 
-Hmm. The current code was definitely written under a "aarch64
-only supports EL0 and EL1" assumption, but I'm not sure
-this change is entirely correct.
+In the case of virtio-blk that would be all of it.  Do you have a case
+in mind where some part of the configuration space is owned by QEMU?
 
-We use this function in 3 places:
-
- * identifying whether to flush TLBs on CONTEXTIDR writes
-    -- using current EL seems like the right thing (but I'm not
-       sure -- perhaps we should pass in the S/NS from which
-       version of the 32-bit banked register is being updated
-       rather than using arm_is_secure(env) ???)
- * choosing a PAR format for ATS operations
-    -- using the current EL is closer to correct that what we
-       have now. There are cases for a 32-bit CPU in Hyp mode that
-       this code mishandles, but we don't support that yet.
- * choosing an FSR value when taking a breakpoint or watchpoint trap
-    -- here what we want the function to mean is "what is the
-       FSR format for the EL we're about to take this debug
-       exception to", which isn't necessarily the answer for the
-       current EL (consider 32 bit EL0 under a 64-bit EL1)
-
-So this change will fix the PAR format for ATS operations
-made at AArch64 EL2 when EL1 is AArch32, but it will break
-the FSR format for breakpoints/watchpoints hit at AArch32 EL0
-and taken to AArch64 EL1, I think.
-
-We probably need to separate out these uses to not all try
-to use the same function, and clarify what they're checking.
-
-thanks
--- PMM
+Paolo
