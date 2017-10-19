@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55592)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55590)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1e5DZ3-0004wN-Sv
+	(envelope-from <alistai@xilinx.com>) id 1e5DZ3-0004wI-Pt
 	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 12:20:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1e5DZ0-0001XL-LU
+	(envelope-from <alistai@xilinx.com>) id 1e5DZ0-0001XE-J0
 	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 12:20:57 -0400
-Received: from mail-by2nam03on0066.outbound.protection.outlook.com
-	([104.47.42.66]:36592
-	helo=NAM03-BY2-obe.outbound.protection.outlook.com)
+Received: from mail-bl2nam02on0082.outbound.protection.outlook.com
+	([104.47.38.82]:25234
+	helo=NAM02-BL2-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1e5DZ0-0001WY-CP
+	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1e5DZ0-0001Wk-DL
 	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 12:20:54 -0400
 From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Thu, 19 Oct 2017 09:16:46 -0700
-Message-ID: <10e63c6a862eee19dae31128b8301f3d566fe30d.1508390588.git.alistair.francis@xilinx.com>
+Date: Thu, 19 Oct 2017 09:16:50 -0700
+Message-ID: <920243e2e3323424d76116ae7bee8423207b68f5.1508390588.git.alistair.francis@xilinx.com>
 In-Reply-To: <cover.1508390588.git.alistair.francis@xilinx.com>
 References: <cover.1508390588.git.alistair.francis@xilinx.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 20/46] hw/isa: Replace fprintf(stderr,
+Subject: [Qemu-devel] [PATCH v3 21/46] hw/lm32: Replace fprintf(stderr,
  "*\n" with error_report()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -30,99 +30,133 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: alistair.francis@xilinx.com, alistair23@gmail.com, armbru@redhat.com
+Cc: alistair.francis@xilinx.com, alistair23@gmail.com, armbru@redhat.com, Michael Walle <michael@walle.cc>
 
 Replace a large number of the fprintf(stderr, "*\n" calls with
 error_report(). The functions were renamed with these commands and then
 compiler issues where manually fixed.
 
 find ./* -type f -exec sed -i \
-    'N;N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr,
-"\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+    'N;N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_=
+report("\1"\2);|Ig}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr,
-"\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+    'N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_re=
+port("\1"\2);|Ig}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N;N;N;N;N;N;N;N;N; {s|fprintf(stderr,
-"\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+    'N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report=
+("\1"\2);|Ig}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N;N;N;N;N;N;N;N; {s|fprintf(stderr,
-"\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+    'N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("=
+\1"\2);|Ig}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N;N;N;N;N;N;N; {s|fprintf(stderr,
-"\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+    'N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1=
+"\2);|Ig}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N;N;N;N;N;N; {s|fprintf(stderr,
-"\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+    'N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\=
+2);|Ig}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N;N;N;N;N; {s|fprintf(stderr,
-"\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+    'N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2)=
+;|Ig}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N;N;N;N; {s|fprintf(stderr,
-"\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+    'N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|=
+Ig}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N;N;N; {s|fprintf(stderr,
-"\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+    'N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig=
+}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N;N; {s|fprintf(stderr,
-"\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+    'N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}'=
+ \
     {} +
 find ./* -type f -exec sed -i \
-    'N; {s|fprintf(stderr,
-"\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+    'N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
     {} +
 
 Some lines where then manually tweaked to pass checkpatch.
 
 Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+Cc: Michael Walle <michael@walle.cc>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 ---
 V2:
  - Split hw patch into individual directories
 
- hw/isa/isa-bus.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+ hw/lm32/lm32_boards.c | 7 +++----
+ hw/lm32/milkymist.c   | 7 +++----
+ 2 files changed, 6 insertions(+), 8 deletions(-)
 
-diff --git a/hw/isa/isa-bus.c b/hw/isa/isa-bus.c
-index 348e0eab9d..0f2e426d02 100644
---- a/hw/isa/isa-bus.c
-+++ b/hw/isa/isa-bus.c
-@@ -17,6 +17,7 @@
-  * License along with this library; if not, see <http://www.gnu.org/licens=
-es/>.
+diff --git a/hw/lm32/lm32_boards.c b/hw/lm32/lm32_boards.c
+index b0bb3ef58a..c00bf683ad 100644
+--- a/hw/lm32/lm32_boards.c
++++ b/hw/lm32/lm32_boards.c
+@@ -18,6 +18,7 @@
   */
+=20
  #include "qemu/osdep.h"
 +#include "qemu/error-report.h"
- #include "qapi/error.h"
- #include "hw/hw.h"
- #include "monitor/monitor.h"
-@@ -186,15 +187,15 @@ ISADevice *isa_vga_init(ISABus *bus)
-     case VGA_CIRRUS:
-         return isa_create_simple(bus, "isa-cirrus-vga");
-     case VGA_QXL:
--        fprintf(stderr, "%s: qxl: no PCI bus\n", __func__);
-+        error_report("%s: qxl: no PCI bus", __func__);
-         return NULL;
-     case VGA_STD:
-         return isa_create_simple(bus, "isa-vga");
-     case VGA_VMWARE:
--        fprintf(stderr, "%s: vmware_vga: no PCI bus\n", __func__);
-+        error_report("%s: vmware_vga: no PCI bus", __func__);
-         return NULL;
-     case VGA_VIRTIO:
--        fprintf(stderr, "%s: virtio-vga: no PCI bus\n", __func__);
-+        error_report("%s: virtio-vga: no PCI bus", __func__);
-         return NULL;
-     case VGA_NONE:
-     default:
+ #include "qemu-common.h"
+ #include "cpu.h"
+ #include "hw/sysbus.h"
+@@ -152,8 +153,7 @@ static void lm32_evr_init(MachineState *machine)
+         }
+=20
+         if (kernel_size < 0) {
+-            fprintf(stderr, "qemu: could not load kernel '%s'\n",
+-                    kernel_filename);
++            error_report("could not load kernel '%s'", kernel_filename);
+             exit(1);
+         }
+     }
+@@ -250,8 +250,7 @@ static void lm32_uclinux_init(MachineState *machine)
+         }
+=20
+         if (kernel_size < 0) {
+-            fprintf(stderr, "qemu: could not load kernel '%s'\n",
+-                    kernel_filename);
++            error_report("could not load kernel '%s'", kernel_filename);
+             exit(1);
+         }
+     }
+diff --git a/hw/lm32/milkymist.c b/hw/lm32/milkymist.c
+index 4db4d2d533..1000178af6 100644
+--- a/hw/lm32/milkymist.c
++++ b/hw/lm32/milkymist.c
+@@ -18,6 +18,7 @@
+  */
+=20
+ #include "qemu/osdep.h"
++#include "qemu/error-report.h"
+ #include "qemu-common.h"
+ #include "cpu.h"
+ #include "hw/sysbus.h"
+@@ -149,8 +150,7 @@ milkymist_init(MachineState *machine)
+=20
+     /* if no kernel is given no valid bios rom is a fatal error */
+     if (!kernel_filename && !dinfo && !bios_filename && !qtest_enabled()) =
+{
+-        fprintf(stderr, "qemu: could not load Milkymist One bios '%s'\n",
+-                bios_name);
++        error_report("could not load Milkymist One bios '%s'", bios_name);
+         exit(1);
+     }
+     g_free(bios_filename);
+@@ -188,8 +188,7 @@ milkymist_init(MachineState *machine)
+         }
+=20
+         if (kernel_size < 0) {
+-            fprintf(stderr, "qemu: could not load kernel '%s'\n",
+-                    kernel_filename);
++            error_report("could not load kernel '%s'", kernel_filename);
+             exit(1);
+         }
+     }
 --=20
 2.11.0
