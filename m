@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35149)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35174)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1e5CVX-00019d-3y
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 11:13:26 -0400
+	(envelope-from <clg@kaod.org>) id 1e5CVe-0001D2-57
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 11:13:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1e5CVR-00018Q-EC
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 11:13:15 -0400
-Received: from 1.mo5.mail-out.ovh.net ([188.165.57.91]:40167)
+	(envelope-from <clg@kaod.org>) id 1e5CVY-0001Be-9N
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 11:13:22 -0400
+Received: from 1.mo5.mail-out.ovh.net ([188.165.57.91]:54073)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1e5CVR-00017z-7T
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 11:13:09 -0400
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1e5CVY-0001BH-3b
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 11:13:16 -0400
 Received: from player786.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 015D314614D
-	for <qemu-devel@nongnu.org>; Thu, 19 Oct 2017 17:13:07 +0200 (CEST)
+	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 2EACE146148
+	for <qemu-devel@nongnu.org>; Thu, 19 Oct 2017 17:13:15 +0200 (CEST)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Thu, 19 Oct 2017 17:12:42 +0200
-Message-Id: <20171019151249.13663-2-clg@kaod.org>
+Date: Thu, 19 Oct 2017 17:12:43 +0200
+Message-Id: <20171019151249.13663-3-clg@kaod.org>
 In-Reply-To: <20171019151249.13663-1-clg@kaod.org>
 References: <20171019151249.13663-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v5 1/8] aspeed: use a ROM memory region to
- catch invalid writes
+Subject: [Qemu-devel] [PATCH v5 2/8] aspeed: remove
+ ignore_memory_transaction_failures all boards
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,65 +33,45 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>
 Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, Andrew Jeffery <andrew@aj.id.au>, Joel Stanley <joel@jms.id.au>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-Some legacy firmwares access unimplemented addresses on the Aspeed SoC
-(old U-Boot code using variables in the bss when it shouldn't do).
-Let's use a ROM memory region to catch the invalid writes and support
-new boards without using the 'ignore_memory_transaction_failures'
-flag.
+Now that we have a dummy ROM device catching the invalid writes, we
+can remove this flag and work on fixing the current firwmares still
+accessing unimplemented addresses.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
-
- Changes since v4 :
-
- - use a ROM memory region
-
-=20
- hw/arm/aspeed.c | 22 ++++++++++++++++++++--
- 1 file changed, 20 insertions(+), 2 deletions(-)
+ hw/arm/aspeed.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
 diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
-index ab895ad490af..d88a8b5120b6 100644
+index d88a8b5120b6..91c23968f685 100644
 --- a/hw/arm/aspeed.c
 +++ b/hw/arm/aspeed.c
-@@ -166,6 +166,23 @@ static void aspeed_board_init_flashes(AspeedSMCState=
- *s, const char *flashtype,
-     }
+@@ -288,7 +288,6 @@ static void palmetto_bmc_class_init(ObjectClass *oc, =
+void *data)
+     mc->no_floppy =3D 1;
+     mc->no_cdrom =3D 1;
+     mc->no_parallel =3D 1;
+-    mc->ignore_memory_transaction_failures =3D true;
  }
 =20
-+/*
-+ * This is to track invalid writes done in the ROM by some legacy
-+ * firmwares
-+ */
-+static void boot_rom_write(void *opaque, hwaddr offset, uint64_t value,
-+                           unsigned size)
-+{
-+    qemu_log_mask(LOG_GUEST_ERROR,
-+                  "%s: 0x%" HWADDR_PRIx " <- 0x%" PRIx64 " [%u]\n",
-+                  __func__, offset, value, size);
-+}
-+
-+static const MemoryRegionOps boot_rom_ops =3D {
-+    .write =3D boot_rom_write,
-+    .endianness =3D DEVICE_NATIVE_ENDIAN,
-+};
-+
- static void aspeed_board_init(MachineState *machine,
-                               const AspeedBoardConfig *cfg)
- {
-@@ -216,8 +233,9 @@ static void aspeed_board_init(MachineState *machine,
-          * SoC and 128MB for the AST2500 SoC, which is twice as big as
-          * needed by the flash modules of the Aspeed machines.
-          */
--        memory_region_init_rom_nomigrate(boot_rom, OBJECT(bmc), "aspeed.=
-boot_rom",
--                               fl->size, &error_abort);
-+        memory_region_init_rom_device(boot_rom, OBJECT(bmc), &boot_rom_o=
-ps,
-+                                      NULL, "aspeed.boot_rom", fl->size,
-+                                      &error_abort);
-         memory_region_add_subregion(get_system_memory(), FIRMWARE_ADDR,
-                                     boot_rom);
-         write_boot_rom(drive0, FIRMWARE_ADDR, fl->size, &error_abort);
+ static const TypeInfo palmetto_bmc_type =3D {
+@@ -321,7 +320,6 @@ static void ast2500_evb_class_init(ObjectClass *oc, v=
+oid *data)
+     mc->no_floppy =3D 1;
+     mc->no_cdrom =3D 1;
+     mc->no_parallel =3D 1;
+-    mc->ignore_memory_transaction_failures =3D true;
+ }
+=20
+ static const TypeInfo ast2500_evb_type =3D {
+@@ -346,7 +344,6 @@ static void romulus_bmc_class_init(ObjectClass *oc, v=
+oid *data)
+     mc->no_floppy =3D 1;
+     mc->no_cdrom =3D 1;
+     mc->no_parallel =3D 1;
+-    mc->ignore_memory_transaction_failures =3D true;
+ }
+=20
+ static const TypeInfo romulus_bmc_type =3D {
 --=20
 2.13.6
