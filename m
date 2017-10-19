@@ -1,33 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57016)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57204)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1e56po-0007Zp-5b
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 05:09:49 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1e56qc-00087I-2s
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 05:10:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1e56pk-00063P-Sz
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 05:09:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36588)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1e56pk-00062X-J0
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 05:09:44 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 96B8A4900D
-	for <qemu-devel@nongnu.org>; Thu, 19 Oct 2017 09:09:43 +0000 (UTC)
-Date: Thu, 19 Oct 2017 10:09:39 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20171019090939.GC2281@work-vm>
-References: <20171004103933.7898-1-quintela@redhat.com>
-	<20171004103933.7898-2-quintela@redhat.com>
-	<20171018042601.GN4166@pxdev.xzpeter.org>
-	<87o9p4n0vb.fsf@secure.laptop> <20171018121038.GE9719@redhat.com>
-	<20171019031833.GP4166@pxdev.xzpeter.org>
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1e56qW-0007S0-1A
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 05:10:38 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60592)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1e56qV-0007RJ-Nt
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 05:10:31 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v9J99D0d033961
+	for <qemu-devel@nongnu.org>; Thu, 19 Oct 2017 05:10:27 -0400
+Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2dpgdh8413-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 19 Oct 2017 05:10:26 -0400
+Received: from localhost
+	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Thu, 19 Oct 2017 10:10:24 +0100
+References: <20171017140453.51099-1-pasic@linux.vnet.ibm.com>
+	<20171017140453.51099-5-pasic@linux.vnet.ibm.com>
+	<20171019061125.GC4612@bjsdjshi@linux.vnet.ibm.com>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Thu, 19 Oct 2017 11:10:22 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171019031833.GP4166@pxdev.xzpeter.org>
-Subject: Re: [Qemu-devel] [PATCH 1/6] tests: Add basic migration precopy test
+In-Reply-To: <20171019061125.GC4612@bjsdjshi@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Message-Id: <4ad90651-e572-345d-d0bc-615e5fef3deb@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v3 4/7] s390x: refactor error handling for
+ XSCH handler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,107 +44,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, lvivier@redhat.com, qemu-devel@nongnu.org
+To: Cornelia Huck <cohuck@redhat.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
-* Peter Xu (peterx@redhat.com) wrote:
-> On Wed, Oct 18, 2017 at 01:10:38PM +0100, Daniel P. Berrange wrote:
-> > On Wed, Oct 18, 2017 at 01:36:56PM +0200, Juan Quintela wrote:
-> > > Peter Xu <peterx@redhat.com> wrote:
-> > > > On Wed, Oct 04, 2017 at 12:39:28PM +0200, Juan Quintela wrote:
-> > > >
-> > > > [...]
-> > > >
-> > > >> +/* A simple PC boot sector that modifies memory (1-100MB) quickly
-> > > >> + * outputing a 'B' every so often if it's still running.
-> > > >> + */
-> > > >> +unsigned char bootsect[] = {
-> > > >> +  0xfa, 0x0f, 0x01, 0x16, 0x74, 0x7c, 0x66, 0xb8, 0x01, 0x00, 0x00, 0x00,
-> > > >> +  0x0f, 0x22, 0xc0, 0x66, 0xea, 0x20, 0x7c, 0x00, 0x00, 0x08, 0x00, 0x00,
-> > > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xe4, 0x92, 0x0c, 0x02,
-> > > >> +  0xe6, 0x92, 0xb8, 0x10, 0x00, 0x00, 0x00, 0x8e, 0xd8, 0x66, 0xb8, 0x41,
-> > > >> +  0x00, 0x66, 0xba, 0xf8, 0x03, 0xee, 0xb3, 0x00, 0xb8, 0x00, 0x00, 0x10,
-> > > >> +  0x00, 0xfe, 0x00, 0x05, 0x00, 0x10, 0x00, 0x00, 0x3d, 0x00, 0x00, 0x40,
-> > > >> +  0x06, 0x7c, 0xf2, 0xfe, 0xc3, 0x75, 0xe9, 0x66, 0xb8, 0x42, 0x00, 0x66,
-> > > >> +  0xba, 0xf8, 0x03, 0xee, 0xeb, 0xde, 0x66, 0x90, 0x00, 0x00, 0x00, 0x00,
-> > > >> +  0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0x00, 0x00, 0x00, 0x9a, 0xcf, 0x00,
-> > > >> +  0xff, 0xff, 0x00, 0x00, 0x00, 0x92, 0xcf, 0x00, 0x27, 0x00, 0x5c, 0x7c,
-> > > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> > > >> +  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x55, 0xaa
-> > > >> +};
-> > > >
-> > > > Not sure whether it would be nicer to put this section as binary into
-> > > > QEMU's tree as shared, then other test code can use it too directly,
-> > > > and it would be easier if someone wants to boot a VM running this
-> > > > bootstrap code.  Thanks,
-> > > 
-> > > I am sharing this code now on a single place.  About getting this
-> > > outside ... I will wait for someone that understand how this works, I
-> > > have no clue neither how it works nor how to share/use/setup/....
-> > 
-> > FWIW, we already have a reusuable program that can be used to generate
-> > load stress for testing live migration see tests/migration/stress.c
-> > This gets compiled into a static binary, put into an initrd, and then
-> > run by booting the host OS kernel. So the caveat is that this approach
-> > only lets you test a QEMU emulator whose target arch matches the host.
-> > That isn't much different from this boot sector though which only lets
-> > you test the x86 system emulator.
+
+
+On 10/19/2017 08:11 AM, Dong Jia Shi wrote:
+>> +    if (!sch || !css_subch_visible(sch)) {
+>> +        setcc(cpu, 3);
+> ?:
+> s/3/IOINST_CC_NOT_OPERATIONAL/
 > 
-> Yes, if we can have some C program for all architecture then it sounds
-> nicer, though IIUC this program is somehow special since it should be
-> writting some "A"/"B" chars to console, and the test program is using
-> those chars during the process.
+> This also applies to other alike cases.
 > 
-> Maybe it would be nice to rewrite a C program to replace current
-> binary sector when someone wants to support postcopy migration test on
-> a 3rd platform besides x86 and ppc.
 
-The problem is you then rely on having Linux or booting a full guest;
-and then you can't get the memory mapping reliably to allow the test to
-examine the physical memory contents.
+I do not know. My first reaction was that I'm against because
+were IOInstEnding strongly typed, it would not work as set
+cc takes an int and works not just for IO instructions.
 
-This little boot sector works quite nicely for x86, and Laurent's line
-of Forth works nicely on Power.
+OTOH the same goes for setcc(cpu, css_do_xsch(sch)) so that
+ain't really an argument, and it would improve grepability.
 
-Similar trivial tests for other architectures are probably easy.
+So I think I'm in favor now.
 
-Dave
-
-
-> Thanks,
-> 
-> -- 
-> Peter Xu
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Halil
