@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41306)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43483)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1e59CH-0003f5-RZ
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 07:41:14 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1e59Es-0004eo-Kv
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 07:43:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1e59CD-0001PK-Hm
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 07:41:09 -0400
-Received: from 15.mo5.mail-out.ovh.net ([178.33.107.29]:36699)
+	(envelope-from <pbonzini@redhat.com>) id 1e59Eo-0003gZ-PD
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 07:43:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36490)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1e59CD-0001Is-Bu
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 07:41:05 -0400
-Received: from player773.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 79445145110
-	for <qemu-devel@nongnu.org>; Thu, 19 Oct 2017 13:40:53 +0200 (CEST)
-From: Greg Kurz <groug@kaod.org>
-Date: Thu, 19 Oct 2017 13:40:42 +0200
-Message-ID: <150841324224.31292.4012464539983692364.stgit@bahia.lan>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1e59Eo-0003fo-JH
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 07:43:46 -0400
+References: <1508390650-19115-1-git-send-email-changpeng.liu@intel.com>
+	<1508390650-19115-5-git-send-email-changpeng.liu@intel.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <46402c4f-d702-5119-7b99-fa8abb778f66@redhat.com>
+Date: Thu, 19 Oct 2017 13:43:35 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <1508390650-19115-5-git-send-email-changpeng.liu@intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH] docker: fix out-of-tree 'make
- docker-test-build@debian-powerpc-cross'
+Subject: Re: [Qemu-devel] [PATCH v4 4/4] contrib/vhost-user-blk: introduce a
+ vhost-user-blk sample application
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,29 +29,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, Alex =?utf-8?q?Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, Philippe =?utf-8?q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: Changpeng Liu <changpeng.liu@intel.com>, qemu-devel@nongnu.org
+Cc: stefanha@gmail.com, mst@redhat.com, marcandre.lureau@redhat.com, felipe@nutanix.com, james.r.harris@intel.com
 
-Without this patch, it fails with:
+On 19/10/2017 07:24, Changpeng Liu wrote:
+> 
+> +}
+> +
+> +static void
+> +vub_flush(VubReq *req)
+> +{
+> +    VubDev *vdev_blk = req->vdev_blk;
+> +
+> +    if (vdev_blk->blk_fd) {
+> +        fsync(vdev_blk->blk_fd);
+> +    }
+> +}
+> +
 
-IOError: [Errno 2] No such file or directory:
- 'tests/docker/dockerfiles/debian-apt-fake.sh'
+No need to check the file descriptor---vub_readv and vub_writev aren't
+checking it either.  Also please use fdatasync instead of fsync.
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
- tests/docker/Makefile.include |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> +static uint64_t
+> +vub_get_features(VuDev *dev)
+> +{
+> +    return 1ull << VIRTIO_BLK_F_SIZE_MAX |
+> +           1ull << VIRTIO_BLK_F_SEG_MAX |
+> +           1ull << VIRTIO_BLK_F_TOPOLOGY |
+> +           1ull << VIRTIO_BLK_F_BLK_SIZE |
+> +           1ull << VIRTIO_F_VERSION_1 |
+> +           1ull << VHOST_USER_F_PROTOCOL_FEATURES;
+> +}
 
-diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
-index 6f9ea196a7b8..5d54eca5d0b3 100644
---- a/tests/docker/Makefile.include
-+++ b/tests/docker/Makefile.include
-@@ -44,7 +44,7 @@ docker-image-%: $(DOCKER_FILES_DIR)/%.docker
- 		$(if $(EXECUTABLE),--include-executable=$(EXECUTABLE)),\
- 		"BUILD","$*")
- 
--docker-image-debian-powerpc-cross: EXTRA_FILES:=tests/docker/dockerfiles/debian-apt-fake.sh
-+docker-image-debian-powerpc-cross: EXTRA_FILES:=$(SRC_PATH)/tests/docker/dockerfiles/debian-apt-fake.sh
- 
- # Enforce dependancies for composite images
- docker-image-debian: docker-image-debian9
+VIRTIO_BLK_F_FLUSH is missing.
+
+Thanks,
+
+Paolo
