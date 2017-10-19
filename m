@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38836)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38845)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=4589aa1ec=Ian.Jackson@citrix.com>)
-	id 1e5E3I-0006U2-Au
+	id 1e5E3I-0006Ua-Q9
 	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 12:52:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=4589aa1ec=Ian.Jackson@citrix.com>)
-	id 1e5E3H-0006Jq-5S
+	id 1e5E3H-0006K9-Fe
 	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 12:52:12 -0400
 Received: from smtp.citrix.com ([66.165.176.89]:55845)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
 	(envelope-from <prvs=4589aa1ec=Ian.Jackson@citrix.com>)
-	id 1e5E3G-0006GC-Tr
+	id 1e5E3H-0006GC-AJ
 	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 12:52:11 -0400
 From: Ian Jackson <ian.jackson@eu.citrix.com>
-Date: Thu, 19 Oct 2017 17:51:54 +0100
-Message-ID: <1508431916-9412-7-git-send-email-ian.jackson@eu.citrix.com>
+Date: Thu, 19 Oct 2017 17:51:56 +0100
+Message-ID: <1508431916-9412-9-git-send-email-ian.jackson@eu.citrix.com>
 In-Reply-To: <1508431916-9412-1-git-send-email-ian.jackson@eu.citrix.com>
 References: <1508431916-9412-1-git-send-email-ian.jackson@eu.citrix.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 6/8] xen: destroy_hvm_domain: Try
- xendevicemodel_shutdown
+Subject: [Qemu-devel] [PATCH 8/8] configure: do_compiler: Dump some extra
+ info under bash
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,65 +32,37 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Ross Lagerwall <ross.lagerwall@citrix.com>, Anthony PERARD <anthony.perard@citrix.com>, Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org, Ian Jackson <ian.jackson@eu.citrix.com>, Ian Jackson <Ian.Jackson@eu.citrix.com>
 
-xc_interface_open etc. is not going to work if we have dropped
-privilege, but xendevicemodel_shutdown will if everything is new
-enough.
+This makes it much easier to find a particular thing in config.log.
 
-xendevicemodel_shutdown is only availabe in Xen 4.10 and later, so
-provide a stub for earlier versions.
+The information may be lacking in other shells, resulting in harmless
+empty output.  (This is why we don't use the proper ${FUNCNAME[*]}
+array syntax - other shells will choke on that.)
 
-Signed-off-by: Ian Jackson <Ian.Jackson@eu.citrix.com>
----
-v2: Add compatibility stub for Xen < 4.10.
-    Fix coding style.
+The extra output is only printed if configure is run with bash.  The
+something), it is necessary to say   bash ./configure  to get the extra
+debug info in the log.
 
 Signed-off-by: Ian Jackson <Ian.Jackson@eu.citrix.com>
 ---
- hw/i386/xen/xen-hvm.c       | 10 ++++++++++
- include/hw/xen/xen_common.h |  7 +++++++
- 2 files changed, 17 insertions(+)
+v4: No longer tag this patch RFC.
+---
+ configure | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/hw/i386/xen/xen-hvm.c b/hw/i386/xen/xen-hvm.c
-index 83420cd..25b8b14 100644
---- a/hw/i386/xen/xen-hvm.c
-+++ b/hw/i386/xen/xen-hvm.c
-@@ -1386,9 +1386,19 @@ void destroy_hvm_domain(bool reboot)
- {
-     xc_interface *xc_handle;
-     int sts;
-+    int rc;
- 
-     unsigned int reason = reboot ? SHUTDOWN_reboot : SHUTDOWN_poweroff;
- 
-+    if (xen_dmod) {
-+        rc = xendevicemodel_shutdown(xen_dmod, xen_domid, reason);
-+        if (!rc) {
-+            return;
-+        }
-+        perror("xendevicemodel_shutdown failed");
-+        /* well, try the old thing then */
-+    }
-+
-     xc_handle = xc_interface_open(0, 0, 0);
-     if (xc_handle == NULL) {
-         fprintf(stderr, "Cannot acquire xenctrl handle\n");
-diff --git a/include/hw/xen/xen_common.h b/include/hw/xen/xen_common.h
-index 8efdb8a..1d6fb57 100644
---- a/include/hw/xen/xen_common.h
-+++ b/include/hw/xen/xen_common.h
-@@ -108,6 +108,13 @@ static inline int xentoolcore_restrict_all(domid_t domid)
-     return -1;
- }
- 
-+static inline int xendevicemodel_shutdown(xendevicemodel_handle *dmod,
-+                                          domid_t domid, unsigned int reason)
-+{
-+    errno = ENOTTY;
-+    return -1;
-+}
-+
- #else /* CONFIG_XEN_CTRL_INTERFACE_VERSION >= 41000 */
- 
- #include <xentoolcore.h>
+diff --git a/configure b/configure
+index 6f691df..21a2b15 100755
+--- a/configure
++++ b/configure
+@@ -60,6 +60,10 @@ do_compiler() {
+     # is compiler binary to execute.
+     local compiler="$1"
+     shift
++    echo >>config.log "
++funcs: ${FUNCNAME}
++lines: ${BASH_LINENO}
++files: ${BASH_SOURCE}"
+     echo $compiler "$@" >> config.log
+     $compiler "$@" >> config.log 2>&1 || return $?
+     # Test passed. If this is an --enable-werror build, rerun
 -- 
 2.1.4
