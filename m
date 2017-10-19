@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46883)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46907)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e53ti-0001fH-DI
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 02:01:40 -0400
+	(envelope-from <bounces@canonical.com>) id 1e53tn-0001fn-AM
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 02:01:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e53tf-0005wL-6N
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 02:01:38 -0400
-Received: from indium.canonical.com ([91.189.90.7]:41726)
+	(envelope-from <bounces@canonical.com>) id 1e53tl-00060n-D3
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 02:01:43 -0400
+Received: from indium.canonical.com ([91.189.90.7]:41914)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1e53te-0005vZ-SG
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 02:01:35 -0400
+	id 1e53tk-0005zQ-N0
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 02:01:41 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1e53tc-00022B-BU
-	for <qemu-devel@nongnu.org>; Thu, 19 Oct 2017 06:01:32 +0000
+	id 1e53th-00027u-VD
+	for <qemu-devel@nongnu.org>; Thu, 19 Oct 2017 06:01:38 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 52F3A2E80CF
-	for <qemu-devel@nongnu.org>; Thu, 19 Oct 2017 06:01:32 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id CCAF82E80DD
+	for <qemu-devel@nongnu.org>; Thu, 19 Oct 2017 06:01:37 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 19 Oct 2017 05:48:20 -0000
+Date: Thu, 19 Oct 2017 05:48:40 -0000
 From: ChristianEhrhardt <1719196@bugs.launchpad.net>
 Reply-To: Bug 1719196 <1719196@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <150626680089.6094.17724106932405637799.malonedeb@soybean.canonical.com>
-Message-Id: <150839210015.16732.8082296901316040290.malone@gac.canonical.com>
+Message-Id: <150839212020.17064.17120495161429777055.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1719196] Re: [arm64 ocata] newly created
  instances are unable to raise network interfaces
@@ -39,15 +39,14 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Yeah, the offending patch in RH-BZ 1422413 appeared in qemu 2.8.
-So it would make sense to work with newtwon (2.6.1), and pike (2.10), but f=
-ail on Ocata (2.8).
+Since we wait for the zesty verification I'm setting the status to
+incomplete for now.
 
-I checked the ppa, in general it seems to work for me, so I'm now waiting f=
-or your verification if that really addresses the issue you are facing.
-If that would be the case I can pass it through regression tests and afterw=
-ards to SRU (which currently holds another update that has to clear before =
-doing so)
+** Changed in: qemu (Ubuntu Zesty)
+       Status: In Progress =3D> Incomplete
+
+** Changed in: libvirt (Ubuntu)
+       Status: Incomplete =3D> Invalid
 
 -- =
 
