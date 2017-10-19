@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53884)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53901)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e5Bp4-0000eT-E9
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 10:29:23 -0400
+	(envelope-from <berrange@redhat.com>) id 1e5Bp5-0000ej-VK
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 10:29:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e5Bp1-0005xB-AO
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 10:29:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48092)
+	(envelope-from <berrange@redhat.com>) id 1e5Bp5-00063M-4s
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 10:29:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35198)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1e5Bp1-0005vT-2Q
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 10:29:19 -0400
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1e5Bp4-000624-U8
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 10:29:23 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
 	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2D2FED6F14
-	for <qemu-devel@nongnu.org>; Thu, 19 Oct 2017 14:29:18 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 06149C0467FC
+	for <qemu-devel@nongnu.org>; Thu, 19 Oct 2017 14:29:22 +0000 (UTC)
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Thu, 19 Oct 2017 15:28:46 +0100
-Message-Id: <20171019142848.572-8-berrange@redhat.com>
+Date: Thu, 19 Oct 2017 15:28:47 +0100
+Message-Id: <20171019142848.572-9-berrange@redhat.com>
 In-Reply-To: <20171019142848.572-1-berrange@redhat.com>
 References: <20171019142848.572-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH v1 7/9] ps2: fix scancodes sent for Ctrl+Pause
- key combination
+Subject: [Qemu-devel] [PATCH v1 8/9] ui: normalize the 'sysrq' key into the
+ 'print' key
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,92 +33,77 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Gerd Hoffmann <kraxel@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-The 'Pause' key is special in the AT set 1 / set 2 scancode definitions.
+The 'sysrq' key was mistakenly added to QEMU to deal with incorrect handling
+of the 'print' key in the ps2 device:
 
-An unmodified 'Pause' key is supposed to send
+  commit f2289cb6924afc97b2a75d21bfc9217024d11741
+  Author: balrog <balrog@c046a42c-6fe2-441c-8c8c-71466251a162>
+  Date:   Wed Jun 4 10:14:16 2008 +0000
 
- AT Set 1:  e1 1d 45 91 9d c5 (Down)  <nothing> (Up)
- AT Set 2:  e1 14 77 e1 f0 14 f0 77 (Down)  <nothing> (Up)
+    Add sysrq to key names known by "sendkey".
 
-which QEMU gets right. When combined with Ctrl (both left and right variants),
-a different sequence is expected
+    Adding sysrq keycode to the table enabling running sysrq debugging in
+    the guest via the monitor sendkey command, like:
 
- AT Set 1:  e0 46 e0 c6 (Down)  <nothing> (Up)
- AT Set 2:  e0 7e e0 f0 73 (Down)  <nothing> (Up)
+    (qemu) sendkey alt-sysrq-t
+
+    Tested on x86-64 target and Linux guest.
+
+    Signed-off-by: Ryan Harper <ryanh@us.ibm.com>
+
+The ps2 device is now fixed wrt modifiers and the 'print' key. Further the
+handling of the 'sysrq' key has some problems of its own, documented in the
+previous commit. To cleanup this mess, we convert any use of 'sysrq' into
+'print' prior to dispatching the event to device models.
 
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- hw/input/ps2.c | 51 +++++++++++++++++++++++++++++++++++----------------
- 1 file changed, 35 insertions(+), 16 deletions(-)
+ qapi/ui.json |  7 +++++++
+ ui/input.c   | 14 ++++++++++++++
+ 2 files changed, 21 insertions(+)
 
-diff --git a/hw/input/ps2.c b/hw/input/ps2.c
-index 133cc2aa64..f388a23c8e 100644
---- a/hw/input/ps2.c
-+++ b/hw/input/ps2.c
-@@ -641,13 +641,22 @@ static void ps2_keyboard_event(DeviceState *dev, QemuConsole *src,
+diff --git a/qapi/ui.json b/qapi/ui.json
+index e5d6610b4a..07b468f625 100644
+--- a/qapi/ui.json
++++ b/qapi/ui.json
+@@ -748,6 +748,13 @@
+ # @ac_bookmarks: since 2.10
+ # altgr, altgr_r: dropped in 2.10
+ #
++# 'sysrq' was mistakenly added to hack around the fact that
++# the ps2 driver was not generating correct scancodes sequences
++# when 'alt+print' was pressed. This flaw is now fixed and the
++# 'sysrq' key serves no further purpose. Any further use of
++# 'sysrq' will be transparently changed to 'print', so they
++# are effectively synonyms.
++#
+ # Since: 1.3.0
+ #
+ ##
+diff --git a/ui/input.c b/ui/input.c
+index 4e821f8f2b..3e2d324278 100644
+--- a/ui/input.c
++++ b/ui/input.c
+@@ -353,6 +353,20 @@ void qemu_input_event_send(QemuConsole *src, InputEvent *evt)
+     assert(!(evt->type == INPUT_EVENT_KIND_KEY &&
+              evt->u.key.data->key->type == KEY_VALUE_KIND_NUMBER));
  
-     if (s->scancode_set == 1) {
-         if (qcode == Q_KEY_CODE_PAUSE) {
--            if (key->down) {
--                ps2_put_keycode(s, 0xe1);
--                ps2_put_keycode(s, 0x1d);
--                ps2_put_keycode(s, 0x45);
--                ps2_put_keycode(s, 0xe1);
--                ps2_put_keycode(s, 0x9d);
--                ps2_put_keycode(s, 0xc5);
-+            if (s->modifiers & (MOD_CTRL_L | MOD_CTRL_R)) {
-+                if (key->down) {
-+                    ps2_put_keycode(s, 0xe0);
-+                    ps2_put_keycode(s, 0x46);
-+                    ps2_put_keycode(s, 0xe0);
-+                    ps2_put_keycode(s, 0xc6);
-+                }
-+            } else {
-+                if (key->down) {
-+                    ps2_put_keycode(s, 0xe1);
-+                    ps2_put_keycode(s, 0x1d);
-+                    ps2_put_keycode(s, 0x45);
-+                    ps2_put_keycode(s, 0xe1);
-+                    ps2_put_keycode(s, 0x9d);
-+                    ps2_put_keycode(s, 0xc5);
-+                }
-             }
-         } else if (qcode == Q_KEY_CODE_PRINT) {
-             if (s->modifiers & MOD_ALT_L) {
-@@ -713,15 +722,25 @@ static void ps2_keyboard_event(DeviceState *dev, QemuConsole *src,
-         }
-     } else if (s->scancode_set == 2) {
-         if (qcode == Q_KEY_CODE_PAUSE) {
--            if (key->down) {
--                ps2_put_keycode(s, 0xe1);
--                ps2_put_keycode(s, 0x14);
--                ps2_put_keycode(s, 0x77);
--                ps2_put_keycode(s, 0xe1);
--                ps2_put_keycode(s, 0xf0);
--                ps2_put_keycode(s, 0x14);
--                ps2_put_keycode(s, 0xf0);
--                ps2_put_keycode(s, 0x77);
-+            if (s->modifiers & (MOD_CTRL_L | MOD_CTRL_R)) {
-+                if (key->down) {
-+                    ps2_put_keycode(s, 0xe0);
-+                    ps2_put_keycode(s, 0x7e);
-+                    ps2_put_keycode(s, 0xe0);
-+                    ps2_put_keycode(s, 0xf0);
-+                    ps2_put_keycode(s, 0x7e);
-+                }
-+            } else {
-+                if (key->down) {
-+                    ps2_put_keycode(s, 0xe1);
-+                    ps2_put_keycode(s, 0x14);
-+                    ps2_put_keycode(s, 0x77);
-+                    ps2_put_keycode(s, 0xe1);
-+                    ps2_put_keycode(s, 0xf0);
-+                    ps2_put_keycode(s, 0x14);
-+                    ps2_put_keycode(s, 0xf0);
-+                    ps2_put_keycode(s, 0x77);
-+                }
-             }
-         } else if (qcode == Q_KEY_CODE_PRINT) {
-             if (s->modifiers & MOD_ALT_L) {
++
++    /*
++     * 'sysrq' was mistakenly added to hack around the fact that
++     * the ps2 driver was not generating correct scancodes sequences
++     * when 'alt+print' was pressed. This flaw is now fixed and the
++     * 'sysrq' key serves no further purpose. We normalize it to
++     * 'print', so that downstream receivers of the event don't
++     * neeed to deal with this mistake
++     */
++    if (evt->type == INPUT_EVENT_KIND_KEY &&
++        evt->u.key.data->key->u.qcode.data == Q_KEY_CODE_SYSRQ) {
++        evt->u.key.data->key->u.qcode.data = Q_KEY_CODE_PRINT;
++    }
++
+     if (!runstate_is_running() && !runstate_check(RUN_STATE_SUSPENDED)) {
+         return;
+     }
 -- 
 2.13.6
