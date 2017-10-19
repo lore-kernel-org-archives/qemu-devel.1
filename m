@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42859)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43910)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1e5HgD-0005WE-5l
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 16:44:38 -0400
+	(envelope-from <eblake@redhat.com>) id 1e5HiY-0006Uh-9g
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 16:47:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1e5Hg8-0000WD-Vs
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 16:44:37 -0400
-Resent-Message-Id: <E1e5Hg8-0000WD-Vs@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21497)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1e5Hg8-0000VZ-OB
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 16:44:32 -0400
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <150843227990.407.17016383426695388431@b58463cdfd5f>
-In-Reply-To: <20171019155146.30434-1-richard.henderson@linaro.org>
+	(envelope-from <eblake@redhat.com>) id 1e5HiX-00021u-6h
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 16:47:02 -0400
+References: <20171015010131.12172-1-eblake@redhat.com>
+	<20171017125710.11626-1-vsementsov@virtuozzo.com>
+	<7480d774-569e-9b43-8f0c-7b3b4d9bfbf0@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <41d371a1-5665-c88e-03e2-b581301cd570@redhat.com>
+Date: Thu, 19 Oct 2017 15:46:51 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 19 Oct 2017 09:58:00 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v6 0/9] Support the Capstone disassembler
+In-Reply-To: <7480d774-569e-9b43-8f0c-7b3b4d9bfbf0@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="2fs0spAXv6LNru11hsXfWLjVwGRqewvwi"
+Subject: Re: [Qemu-devel] [PATCH v4 RFC 9/8] nbd: Minimal structured read
+ for client
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,148 +26,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: richard.henderson@linaro.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org, kraxel@redhat.com
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org, mreitz@redhat.com
 
-SGksCgpUaGlzIHNlcmllcyBmYWlsZWQgYXV0b21hdGljIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5k
-IHRoZSB0ZXN0aW5nIGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZl
-IGRvY2tlciBpbnN0YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHku
-CgpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMjAxNzEwMTkxNTUxNDYuMzA0MzQtMS1yaWNoYXJk
-LmhlbmRlcnNvbkBsaW5hcm8ub3JnClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjYgMC85
-XSBTdXBwb3J0IHRoZSBDYXBzdG9uZSBkaXNhc3NlbWJsZXIKCj09PSBURVNUIFNDUklQVCBCRUdJ
-TiA9PT0KIyEvYmluL2Jhc2gKc2V0IC1lCmdpdCBzdWJtb2R1bGUgdXBkYXRlIC0taW5pdCBkdGMK
-IyBMZXQgZG9ja2VyIHRlc3RzIGR1bXAgZW52aXJvbm1lbnQgaW5mbwpleHBvcnQgU0hPV19FTlY9
-MQpleHBvcnQgSj04CnRpbWUgbWFrZSBkb2NrZXItdGVzdC1xdWlja0BjZW50b3M2CnRpbWUgbWFr
-ZSBkb2NrZXItdGVzdC1idWlsZEBtaW4tZ2xpYgp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtbWluZ3dA
-ZmVkb3JhCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1ibG9ja0BmZWRvcmEKPT09IFRFU1QgU0NSSVBU
-IEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMz
-ODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwpiYzcyZThiZTZlIGRpc2FzOiBBZGQg
-Y2Fwc3RvbmUgYXMgc3VibW9kdWxlCjViYWU4NWY3YjUgZGlzYXM6IFJlbW92ZSBtb25pdG9yX2Rp
-c2FzX2lzX3BoeXNpY2FsCmM4OWQ0YmI1NDkgcHBjOiBTdXBwb3J0IENhcHN0b25lIGluIGRpc2Fz
-X3NldF9pbmZvCjYzYzMyYWQ2YjkgYXJtOiBTdXBwb3J0IENhcHN0b25lIGluIGRpc2FzX3NldF9p
-bmZvCjU2ZGJjMDNjMGMgaTM4NjogU3VwcG9ydCBDYXBzdG9uZSBpbiBkaXNhc19zZXRfaW5mbwo4
-ZmIzYzk1M2FlIGRpc2FzOiBTdXBwb3J0IHRoZSBDYXBzdG9uZSBkaXNhc3NlbWJsZXIgbGlicmFy
-eQoyZDNkNDE5MzZlIGRpc2FzOiBSZW1vdmUgdW51c2VkIGZsYWdzIGFyZ3VtZW50cwplZjA4MDk5
-OGJmIHRhcmdldC9wcGM6IENvbnZlcnQgdG8gZGlzYXNfc2V0X2luZm8gaG9vawphYWMwMmJhZGNl
-IHRhcmdldC9pMzg2OiBDb252ZXJ0IHRvIGRpc2FzX3NldF9pbmZvIGhvb2sKCj09PSBPVVRQVVQg
-QkVHSU4gPT09ClN1Ym1vZHVsZSAnZHRjJyAoZ2l0Oi8vZ2l0LnFlbXUtcHJvamVjdC5vcmcvZHRj
-LmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAnZHRjJwpDbG9uaW5nIGludG8gJy92YXIvdG1wL3Bh
-dGNoZXctdGVzdGVyLXRtcC1obl8xZ21yXy9zcmMvZHRjJy4uLgpTdWJtb2R1bGUgcGF0aCAnZHRj
-JzogY2hlY2tlZCBvdXQgJzU1OGNkODFiZGQ0MzI3NjliNTliZmYwMTI0MGM0NGY4MmNmYjFhOWQn
-CiAgQlVJTEQgICBjZW50b3M2Cm1ha2VbMV06IEVudGVyaW5nIGRpcmVjdG9yeSAnL3Zhci90bXAv
-cGF0Y2hldy10ZXN0ZXItdG1wLWhuXzFnbXJfL3NyYycKICBHRU4gICAgIGRvY2tlci1zcmMuMjAx
-Ny0xMC0xOS0xMi41Ni4xOS41Nzk3L3FlbXUudGFyCkNsb25pbmcgaW50byAnL3Zhci90bXAvcGF0
-Y2hldy10ZXN0ZXItdG1wLWhuXzFnbXJfL3NyYy9kb2NrZXItc3JjLjIwMTctMTAtMTktMTIuNTYu
-MTkuNTc5Ny9xZW11LnRhci52cm9vdCcuLi4KZG9uZS4KQ2hlY2tpbmcgb3V0IGZpbGVzOiAgNDMl
-ICgyNDYwLzU2NTApICAgCkNoZWNraW5nIG91dCBmaWxlczogIDQ0JSAoMjQ4Ni81NjUwKSAgIApD
-aGVja2luZyBvdXQgZmlsZXM6ICA0NSUgKDI1NDMvNTY1MCkgICAKQ2hlY2tpbmcgb3V0IGZpbGVz
-OiAgNDYlICgyNTk5LzU2NTApICAgCkNoZWNraW5nIG91dCBmaWxlczogIDQ3JSAoMjY1Ni81NjUw
-KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA0OCUgKDI3MTIvNTY1MCkgICAKQ2hlY2tpbmcgb3V0
-IGZpbGVzOiAgNDklICgyNzY5LzU2NTApICAgCkNoZWNraW5nIG91dCBmaWxlczogIDUwJSAoMjgy
-NS81NjUwKSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA1MSUgKDI4ODIvNTY1MCkgICAKQ2hlY2tp
-bmcgb3V0IGZpbGVzOiAgNTIlICgyOTM4LzU2NTApICAgCkNoZWNraW5nIG91dCBmaWxlczogIDUz
-JSAoMjk5NS81NjUwKSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA1NCUgKDMwNTEvNTY1MCkgICAK
-Q2hlY2tpbmcgb3V0IGZpbGVzOiAgNTUlICgzMTA4LzU2NTApICAgCkNoZWNraW5nIG91dCBmaWxl
-czogIDU2JSAoMzE2NC81NjUwKSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA1NyUgKDMyMjEvNTY1
-MCkgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgNTglICgzMjc3LzU2NTApICAgCkNoZWNraW5nIG91
-dCBmaWxlczogIDU5JSAoMzMzNC81NjUwKSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA2MCUgKDMz
-OTAvNTY1MCkgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgNjElICgzNDQ3LzU2NTApICAgCkNoZWNr
-aW5nIG91dCBmaWxlczogIDYyJSAoMzUwMy81NjUwKSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA2
-MyUgKDM1NjAvNTY1MCkgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgNjQlICgzNjE2LzU2NTApICAg
-CkNoZWNraW5nIG91dCBmaWxlczogIDY1JSAoMzY3My81NjUwKSAgIApDaGVja2luZyBvdXQgZmls
-ZXM6ICA2NiUgKDM3MjkvNTY1MCkgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgNjclICgzNzg2LzU2
-NTApICAgCkNoZWNraW5nIG91dCBmaWxlczogIDY4JSAoMzg0Mi81NjUwKSAgIApDaGVja2luZyBv
-dXQgZmlsZXM6ICA2OSUgKDM4OTkvNTY1MCkgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgNzAlICgz
-OTU1LzU2NTApICAgCkNoZWNraW5nIG91dCBmaWxlczogIDcxJSAoNDAxMi81NjUwKSAgIApDaGVj
-a2luZyBvdXQgZmlsZXM6ICA3MiUgKDQwNjgvNTY1MCkgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAg
-NzMlICg0MTI1LzU2NTApICAgCkNoZWNraW5nIG91dCBmaWxlczogIDc0JSAoNDE4MS81NjUwKSAg
-IApDaGVja2luZyBvdXQgZmlsZXM6ICA3NSUgKDQyMzgvNTY1MCkgICAKQ2hlY2tpbmcgb3V0IGZp
-bGVzOiAgNzYlICg0Mjk0LzU2NTApICAgCkNoZWNraW5nIG91dCBmaWxlczogIDc3JSAoNDM1MS81
-NjUwKSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA3OCUgKDQ0MDcvNTY1MCkgICAKQ2hlY2tpbmcg
-b3V0IGZpbGVzOiAgNzklICg0NDY0LzU2NTApICAgCkNoZWNraW5nIG91dCBmaWxlczogIDgwJSAo
-NDUyMC81NjUwKSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA4MSUgKDQ1NzcvNTY1MCkgICAKQ2hl
-Y2tpbmcgb3V0IGZpbGVzOiAgODIlICg0NjMzLzU2NTApICAgCkNoZWNraW5nIG91dCBmaWxlczog
-IDgzJSAoNDY5MC81NjUwKSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA4NCUgKDQ3NDYvNTY1MCkg
-ICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgODUlICg0ODAzLzU2NTApICAgCkNoZWNraW5nIG91dCBm
-aWxlczogIDg2JSAoNDg1OS81NjUwKSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA4NyUgKDQ5MTYv
-NTY1MCkgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgODglICg0OTcyLzU2NTApICAgCkNoZWNraW5n
-IG91dCBmaWxlczogIDg5JSAoNTAyOS81NjUwKSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA5MCUg
-KDUwODUvNTY1MCkgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgOTElICg1MTQyLzU2NTApICAgCkNo
-ZWNraW5nIG91dCBmaWxlczogIDkyJSAoNTE5OC81NjUwKSAgIApDaGVja2luZyBvdXQgZmlsZXM6
-ICA5MyUgKDUyNTUvNTY1MCkgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgOTQlICg1MzExLzU2NTAp
-ICAgCkNoZWNraW5nIG91dCBmaWxlczogIDk1JSAoNTM2OC81NjUwKSAgIApDaGVja2luZyBvdXQg
-ZmlsZXM6ICA5NiUgKDU0MjQvNTY1MCkgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgOTclICg1NDgx
-LzU2NTApICAgCkNoZWNraW5nIG91dCBmaWxlczogIDk4JSAoNTUzNy81NjUwKSAgIApDaGVja2lu
-ZyBvdXQgZmlsZXM6ICA5OSUgKDU1OTQvNTY1MCkgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAxMDAl
-ICg1NjUwLzU2NTApICAgCkNoZWNraW5nIG91dCBmaWxlczogMTAwJSAoNTY1MC81NjUwKSwgZG9u
-ZS4KWW91ciBicmFuY2ggaXMgdXAtdG8tZGF0ZSB3aXRoICdvcmlnaW4vdGVzdCcuClN1Ym1vZHVs
-ZSAnZHRjJyAoZ2l0Oi8vZ2l0LnFlbXUtcHJvamVjdC5vcmcvZHRjLmdpdCkgcmVnaXN0ZXJlZCBm
-b3IgcGF0aCAnZHRjJwpDbG9uaW5nIGludG8gJy92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC1o
-bl8xZ21yXy9zcmMvZG9ja2VyLXNyYy4yMDE3LTEwLTE5LTEyLjU2LjE5LjU3OTcvcWVtdS50YXIu
-dnJvb3QvZHRjJy4uLgpTdWJtb2R1bGUgcGF0aCAnZHRjJzogY2hlY2tlZCBvdXQgJzU1OGNkODFi
-ZGQ0MzI3NjliNTliZmYwMTI0MGM0NGY4MmNmYjFhOWQnClN1Ym1vZHVsZSAndWkva2V5Y29kZW1h
-cGRiJyAoZ2l0Oi8vZ2l0LnFlbXUub3JnL2tleWNvZGVtYXBkYi5naXQpIHJlZ2lzdGVyZWQgZm9y
-IHBhdGggJ3VpL2tleWNvZGVtYXBkYicKQ2xvbmluZyBpbnRvICcvdmFyL3RtcC9wYXRjaGV3LXRl
-c3Rlci10bXAtaG5fMWdtcl8vc3JjL2RvY2tlci1zcmMuMjAxNy0xMC0xOS0xMi41Ni4xOS41Nzk3
-L3FlbXUudGFyLnZyb290L3VpL2tleWNvZGVtYXBkYicuLi4KU3VibW9kdWxlIHBhdGggJ3VpL2tl
-eWNvZGVtYXBkYic6IGNoZWNrZWQgb3V0ICc1NmNlNTY1MGQyYzZlYTIxNmI0NTgwZGY0NGI5YTZk
-ZDNiYzkyYzNiJwogIENPUFkgICAgUlVOTkVSCiAgICBSVU4gdGVzdC1xdWljayBpbiBxZW11OmNl
-bnRvczYgClBhY2thZ2VzIGluc3RhbGxlZDoKU0RMLWRldmVsLTEuMi4xNC03LmVsNl83LjEueDg2
-XzY0CmJpc29uLTIuNC4xLTUuZWw2Lng4Nl82NApiemlwMi1kZXZlbC0xLjAuNS03LmVsNl8wLng4
-Nl82NApjY2FjaGUtMy4xLjYtMi5lbDYueDg2XzY0CmNzbmFwcHktZGV2ZWwtMC02LjIwMTUwNzI5
-Z2l0ZDdiYzY4My5lbDYueDg2XzY0CmZsZXgtMi41LjM1LTkuZWw2Lng4Nl82NApnY2MtNC40Ljct
-MTguZWw2Lng4Nl82NApnZXR0ZXh0LTAuMTctMTguZWw2Lng4Nl82NApnaXQtMS43LjEtOS5lbDZf
-OS54ODZfNjQKZ2xpYjItZGV2ZWwtMi4yOC44LTkuZWw2Lng4Nl82NApsaWJlcG94eS1kZXZlbC0x
-LjItMy5lbDYueDg2XzY0CmxpYmZkdC1kZXZlbC0xLjQuMC0xLmVsNi54ODZfNjQKbGlicmRtYWNt
-LWRldmVsLTEuMC4yMS0wLmVsNi54ODZfNjQKbHpvLWRldmVsLTIuMDMtMy4xLmVsNl81LjEueDg2
-XzY0Cm1ha2UtMy44MS0yMy5lbDYueDg2XzY0Cm1lc2EtbGliRUdMLWRldmVsLTExLjAuNy00LmVs
-Ni54ODZfNjQKbWVzYS1saWJnYm0tZGV2ZWwtMTEuMC43LTQuZWw2Lng4Nl82NApwYWNrYWdlIGcr
-KyBpcyBub3QgaW5zdGFsbGVkCnBpeG1hbi1kZXZlbC0wLjMyLjgtMS5lbDYueDg2XzY0CnNwaWNl
-LWdsaWItZGV2ZWwtMC4yNi04LmVsNi54ODZfNjQKc3BpY2Utc2VydmVyLWRldmVsLTAuMTIuNC0x
-Ni5lbDYueDg2XzY0CnRhci0xLjIzLTE1LmVsNl84Lng4Nl82NAp2dGUtZGV2ZWwtMC4yNS4xLTku
-ZWw2Lng4Nl82NAp4ZW4tZGV2ZWwtNC42LjYtMi5lbDYueDg2XzY0CnpsaWItZGV2ZWwtMS4yLjMt
-MjkuZWw2Lng4Nl82NAoKRW52aXJvbm1lbnQgdmFyaWFibGVzOgpQQUNLQUdFUz1iaXNvbiAgICAg
-YnppcDItZGV2ZWwgICAgIGNjYWNoZSAgICAgY3NuYXBweS1kZXZlbCAgICAgZmxleCAgICAgZysr
-ICAgICBnY2MgICAgIGdldHRleHQgICAgIGdpdCAgICAgZ2xpYjItZGV2ZWwgICAgIGxpYmVwb3h5
-LWRldmVsICAgICBsaWJmZHQtZGV2ZWwgICAgIGxpYnJkbWFjbS1kZXZlbCAgICAgbHpvLWRldmVs
-ICAgICBtYWtlICAgICBtZXNhLWxpYkVHTC1kZXZlbCAgICAgbWVzYS1saWJnYm0tZGV2ZWwgICAg
-IHBpeG1hbi1kZXZlbCAgICAgU0RMLWRldmVsICAgICBzcGljZS1nbGliLWRldmVsICAgICBzcGlj
-ZS1zZXJ2ZXItZGV2ZWwgICAgIHRhciAgICAgdnRlLWRldmVsICAgICB4ZW4tZGV2ZWwgICAgIHps
-aWItZGV2ZWwKSE9TVE5BTUU9MTk0NDEyYzIzY2E5ClRFUk09eHRlcm0KTUFLRUZMQUdTPSAtajgK
-Sj04CkNDQUNIRV9ESVI9L3Zhci90bXAvY2NhY2hlCkVYVFJBX0NPTkZJR1VSRV9PUFRTPQpWPQpT
-SE9XX0VOVj0xClBBVEg9L3Vzci9saWIvY2NhY2hlOi91c3IvbG9jYWwvc2JpbjovdXNyL2xvY2Fs
-L2JpbjovdXNyL3NiaW46L3Vzci9iaW46L3NiaW46L2JpbgpQV0Q9LwpUQVJHRVRfTElTVD0KU0hM
-Vkw9MQpIT01FPS9yb290ClRFU1RfRElSPS90bXAvcWVtdS10ZXN0CkZFQVRVUkVTPSBkdGMKREVC
-VUc9Cl89L3Vzci9iaW4vZW52CgpDb25maWd1cmUgb3B0aW9uczoKLS1lbmFibGUtd2Vycm9yIC0t
-dGFyZ2V0LWxpc3Q9eDg2XzY0LXNvZnRtbXUsYWFyY2g2NC1zb2Z0bW11IC0tcHJlZml4PS90bXAv
-cWVtdS10ZXN0L2luc3RhbGwKCkVSUk9SOiBVbmtub3duIHN0YXRlIGZvciBjYXBzdG9uZTogeWVz
-CgpUcmFjZWJhY2sgKG1vc3QgcmVjZW50IGNhbGwgbGFzdCk6CiAgRmlsZSAiLi90ZXN0cy9kb2Nr
-ZXIvZG9ja2VyLnB5IiwgbGluZSAzODUsIGluIDxtb2R1bGU+CiAgICBzeXMuZXhpdChtYWluKCkp
-CiAgRmlsZSAiLi90ZXN0cy9kb2NrZXIvZG9ja2VyLnB5IiwgbGluZSAzODIsIGluIG1haW4KICAg
-IHJldHVybiBhcmdzLmNtZG9iai5ydW4oYXJncywgYXJndikKICBGaWxlICIuL3Rlc3RzL2RvY2tl
-ci9kb2NrZXIucHkiLCBsaW5lIDIzOSwgaW4gcnVuCiAgICByZXR1cm4gRG9ja2VyKCkucnVuKGFy
-Z3YsIGFyZ3Mua2VlcCwgcXVpZXQ9YXJncy5xdWlldCkKICBGaWxlICIuL3Rlc3RzL2RvY2tlci9k
-b2NrZXIucHkiLCBsaW5lIDIwNywgaW4gcnVuCiAgICBxdWlldD1xdWlldCkKICBGaWxlICIuL3Rl
-c3RzL2RvY2tlci9kb2NrZXIucHkiLCBsaW5lIDEyNSwgaW4gX2RvX2NoZWNrCiAgICByZXR1cm4g
-c3VicHJvY2Vzcy5jaGVja19jYWxsKHNlbGYuX2NvbW1hbmQgKyBjbWQsICoqa3dhcmdzKQogIEZp
-bGUgIi91c3IvbGliNjQvcHl0aG9uMi43L3N1YnByb2Nlc3MucHkiLCBsaW5lIDE4NiwgaW4gY2hl
-Y2tfY2FsbAogICAgcmFpc2UgQ2FsbGVkUHJvY2Vzc0Vycm9yKHJldGNvZGUsIGNtZCkKc3VicHJv
-Y2Vzcy5DYWxsZWRQcm9jZXNzRXJyb3I6IENvbW1hbmQgJ1snZG9ja2VyJywgJ3J1bicsICctLWxh
-YmVsJywgJ2NvbS5xZW11Lmluc3RhbmNlLnV1aWQ9NzdhZjgzZDJiNGVlMTFlN2EyODg1MjU0MDA2
-OWM4MzAnLCAnLXUnLCAnMCcsICctdCcsICctLXNlY3VyaXR5LW9wdCcsICdzZWNjb21wPXVuY29u
-ZmluZWQnLCAnLS1ybScsICctLW5ldD1ub25lJywgJy1lJywgJ1RBUkdFVF9MSVNUPScsICctZScs
-ICdFWFRSQV9DT05GSUdVUkVfT1BUUz0nLCAnLWUnLCAnVj0nLCAnLWUnLCAnSj04JywgJy1lJywg
-J0RFQlVHPScsICctZScsICdTSE9XX0VOVj0xJywgJy1lJywgJ0NDQUNIRV9ESVI9L3Zhci90bXAv
-Y2NhY2hlJywgJy12JywgJy9yb290Ly5jYWNoZS9xZW11LWRvY2tlci1jY2FjaGU6L3Zhci90bXAv
-Y2NhY2hlOnonLCAnLXYnLCAnL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLWhuXzFnbXJfL3Ny
-Yy9kb2NrZXItc3JjLjIwMTctMTAtMTktMTIuNTYuMTkuNTc5NzovdmFyL3RtcC9xZW11Onoscm8n
-LCAncWVtdTpjZW50b3M2JywgJy92YXIvdG1wL3FlbXUvcnVuJywgJ3Rlc3QtcXVpY2snXScgcmV0
-dXJuZWQgbm9uLXplcm8gZXhpdCBzdGF0dXMgMQptYWtlWzFdOiAqKiogW3Rlc3RzL2RvY2tlci9N
-YWtlZmlsZS5pbmNsdWRlOjEyOTogZG9ja2VyLXJ1bl0gRXJyb3IgMQptYWtlWzFdOiBMZWF2aW5n
-IGRpcmVjdG9yeSAnL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLWhuXzFnbXJfL3NyYycKbWFr
-ZTogKioqIFt0ZXN0cy9kb2NrZXIvTWFrZWZpbGUuaW5jbHVkZToxNjE6IGRvY2tlci1ydW4tdGVz
-dC1xdWlja0BjZW50b3M2XSBFcnJvciAyCgpyZWFsCTFtNDIuMDY3cwp1c2VyCTBtMy45OTlzCnN5
-cwkwbTQuMTgxcwo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBj
-b2RlOiAyCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0
-dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXct
-ZGV2ZWxAZnJlZWxpc3RzLm9yZw==
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--2fs0spAXv6LNru11hsXfWLjVwGRqewvwi
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org, mreitz@redhat.com
+Message-ID: <41d371a1-5665-c88e-03e2-b581301cd570@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 RFC 9/8] nbd: Minimal structured read for
+ client
+References: <20171015010131.12172-1-eblake@redhat.com>
+ <20171017125710.11626-1-vsementsov@virtuozzo.com>
+ <7480d774-569e-9b43-8f0c-7b3b4d9bfbf0@redhat.com>
+In-Reply-To: <7480d774-569e-9b43-8f0c-7b3b4d9bfbf0@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 10/17/2017 04:17 PM, Eric Blake wrote:
+> On 10/17/2017 07:57 AM, Vladimir Sementsov-Ogievskiy wrote:
+>> Minimal implementation: for structured error only error_report error
+>> message.
+>>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>=
+
+>> ---
+
+> But in the client, I then perform 'w 0 0' (a zero-byte write, which
+> should fail because the server is read-only).  I see:
+>=20
+> C: 19481@1508268433.381446:nbd_send_request Sending request to server: =
+{
+> .from =3D 0, .len =3D 0, .handle =3D 93997172956880, .flags =3D 0x1, .t=
+ype =3D 1
+> (write) }
+> S: 19479@1508268433.381516:nbd_receive_request Got request: { magic =3D=
+
+> 0x25609513, .flags =3D 0x1, .type =3D 0x1, from =3D 0, len =3D 0 }
+> S: 19479@1508268433.381527:nbd_co_receive_request_decode_type Decoding
+> type: handle =3D 93997172956880, type =3D 1 (write)
+> S: 19479@1508268433.381540:nbd_co_receive_request_payload_received
+> Payload received: handle =3D 93997172956880, len =3D 0
+> S: 19479@1508268433.381564:nbd_co_send_structured_error Send structured=
+
+> error reply: handle =3D 93997172956880, error =3D 1 (EPERM), msg =3D ''=
+
+> C: 19481@1508268433.381622:nbd_receive_structured_reply_chunk Got
+> structured reply chunk: { flags =3D 0x1, type =3D 32769, handle =3D
+> 93997172956880, length =3D 6 }
+> C: wrote 0/0 bytes at offset 0
+> C: 0 bytes, 1 ops; 0.0002 sec (0 bytes/sec and 4291.8455 ops/sec)
+>=20
+> Oops - the client claimed success, even though the server replied with
+> EPERM.  And the server didn't do a good job of including details on the=
+
+> error message.  So there's still some tweaks needed.
+
+The server not sending details is a separate pre-existing issue; in
+server.c, we set errp for NBD_CMD_WRITE_ZEROES but not for
+NBD_CMD_WRITE.  You can get the server to cough up a message by using 'w
+-z 0 1' instead.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--2fs0spAXv6LNru11hsXfWLjVwGRqewvwi
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnpDzsACgkQp6FrSiUn
+Q2qLSQf/YCyBHxynFFAblGjZmO1YxuxX7+eW1axF7YYrApZHz8SWURphMWr3io4d
+HHYO0JJtVSnefcgQWtvcYE99Znmo9yAlWav41kuLuABlSa0R1srphRQM8b1vqyAN
+FArF1KGSI/BuYb9R1WRAOXCiBnDMLul+Z4rGVUVmqUrgfinFWNiaKC8LK5fsVD8p
+I0lIADbnsKM92X20H9cElMQHkjEaMebYAvCYa+EUrVx5AlGTXR7PEnVwoNGEjIoN
+stXP4x5mwPJWi2UGBb8NcDdFN+/eLmOUTulrOCNKil7sH3HgRQ9+FYUHUjqBBAF5
+keKMK4ZAVByE20MneQV6XIR5cpmoWA==
+=qP4S
+-----END PGP SIGNATURE-----
+
+--2fs0spAXv6LNru11hsXfWLjVwGRqewvwi--
