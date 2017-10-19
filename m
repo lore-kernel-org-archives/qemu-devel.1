@@ -1,19 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55024)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55047)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1e5DYH-0004AM-7g
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 12:20:14 -0400
+	(envelope-from <alistai@xilinx.com>) id 1e5DYK-0004Cy-Rp
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 12:20:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1e5DY8-0000sx-PS
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 12:20:09 -0400
+	(envelope-from <alistai@xilinx.com>) id 1e5DYF-0000w8-AU
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 12:20:10 -0400
 From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Thu, 19 Oct 2017 09:15:54 -0700
-Message-ID: <40f44a01e122c59d5cb32c53dd2653e15145296f.1508390588.git.alistair.francis@xilinx.com>
+Date: Thu, 19 Oct 2017 09:15:50 -0700
+Message-ID: <eba67bfc39032bf896b5e1b52371e97f5f4f54bd.1508390588.git.alistair.francis@xilinx.com>
 In-Reply-To: <cover.1508390588.git.alistair.francis@xilinx.com>
 References: <cover.1508390588.git.alistair.francis@xilinx.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 05/46] hw/arm: Replace fprintf(stderr,
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v3 04/46] tests: Replace fprintf(stderr,
  "*\n" with error_report()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -24,763 +23,883 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: alistair.francis@xilinx.com, alistair23@gmail.com, armbru@redhat.com, qemu-arm@nongnu.org
+Cc: alistair.francis@xilinx.com, alistair23@gmail.com, armbru@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, qemu-block@nongnu.org
 
 Replace a large number of the fprintf(stderr, "*\n" calls with
 error_report(). The functions were renamed with these commands and then
 compiler issues where manually fixed.
 
 find ./* -type f -exec sed -i \
-    'N;N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_=
-report("\1"\2);|Ig}' \
+    'N;N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_re=
-port("\1"\2);|Ig}' \
+    'N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report=
-("\1"\2);|Ig}' \
+    'N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("=
-\1"\2);|Ig}' \
+    'N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1=
-"\2);|Ig}' \
+    'N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\=
-2);|Ig}' \
+    'N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2)=
-;|Ig}' \
+    'N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|=
-Ig}' \
+    'N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig=
-}' \
+    'N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}'=
- \
+    'N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
     {} +
 find ./* -type f -exec sed -i \
     'N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
     {} +
 
-Some lines where then manually tweaked to pass checkpatch.
-
-The 'qemu: ' prefix was manually removed from the hw/arm/boot.c file.
+Some of the error_report()'s were manually kept as fprintf(stderr, ) to
+maintain standalone test cases.
 
 Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-Cc: qemu-arm@nongnu.org
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-block@nongnu.org
 ---
-V3:
- - Remoave 'qemu: ' prefix
 V2:
- - Split hw patch into individual directories
+ - Keep some of the fprintf() calls
+ - Remove a file I accidently checked in
 
- hw/arm/armv7m.c      |  2 +-
- hw/arm/boot.c        | 37 ++++++++++++++++++-------------------
- hw/arm/gumstix.c     | 13 +++++++------
- hw/arm/mainstone.c   |  7 ++++---
- hw/arm/musicpal.c    |  2 +-
- hw/arm/omap1.c       |  5 +++--
- hw/arm/omap2.c       | 23 ++++++++++++-----------
- hw/arm/omap_sx1.c    |  6 +++---
- hw/arm/palm.c        | 10 +++++-----
- hw/arm/pxa2xx.c      |  7 ++++---
- hw/arm/stellaris.c   |  3 ++-
- hw/arm/tosa.c        | 17 +++++++++--------
- hw/arm/versatilepb.c |  2 +-
- hw/arm/vexpress.c    |  8 ++++----
- hw/arm/z2.c          |  6 +++---
- 15 files changed, 77 insertions(+), 71 deletions(-)
+ tests/Makefile.include                 |  4 ++--
+ tests/ahci-test.c                      |  3 ++-
+ tests/bios-tables-test.c               |  5 +++--
+ tests/i440fx-test.c                    |  8 ++++----
+ tests/libqos/ahci.c                    | 10 +++++-----
+ tests/libqos/libqos.c                  |  7 ++++---
+ tests/libqos/malloc.c                  | 13 ++++++------
+ tests/libqtest.c                       | 13 ++++++------
+ tests/migration/stress.c               | 36 +++++++++++++++++-----------------
+ tests/postcopy-test.c                  |  8 ++++----
+ tests/qemu-iotests/socket_scm_helper.c | 11 ++++++-----
+ tests/rcutorture.c                     |  5 +++--
+ tests/tcg/linux-test.c                 |  2 +-
+ tests/tcg/runcom.c                     |  6 +++---
+ tests/tcg/test-i386-fprem.c            |  2 +-
+ tests/tcg/test_path.c                  |  4 ++--
+ tests/test-hmp.c                       |  5 +++--
+ tests/test-rcu-list.c                  |  5 +++--
+ tests/usb-hcd-ehci-test.c              |  2 +-
+ tests/vhost-user-bridge.c              | 28 +++++++++++++-------------
+ 20 files changed, 93 insertions(+), 84 deletions(-)
 
-diff --git a/hw/arm/armv7m.c b/hw/arm/armv7m.c
-index bb2dfc942b..56770a7048 100644
---- a/hw/arm/armv7m.c
-+++ b/hw/arm/armv7m.c
-@@ -278,7 +278,7 @@ void armv7m_load_kernel(ARMCPU *cpu, const char *kernel=
-_filename, int mem_size)
- #endif
-=20
-     if (!kernel_filename && !qtest_enabled()) {
--        fprintf(stderr, "Guest image must be specified (using -kernel)\n")=
-;
-+        error_report("Guest image must be specified (using -kernel)");
-         exit(1);
-     }
-=20
-diff --git a/hw/arm/boot.c b/hw/arm/boot.c
-index c2720c8046..6e6b8c0c6a 100644
---- a/hw/arm/boot.c
-+++ b/hw/arm/boot.c
-@@ -8,6 +8,7 @@
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 4ca15e6817..f24ea63ac3 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -618,7 +618,7 @@ tests/test-vmstate$(EXESUF): tests/test-vmstate.o \
+ 	$(test-io-obj-y)
+ tests/test-timed-average$(EXESUF): tests/test-timed-average.o $(test-util-obj-y)
+ tests/test-base64$(EXESUF): tests/test-base64.o $(test-util-obj-y)
+-tests/ptimer-test$(EXESUF): tests/ptimer-test.o tests/ptimer-test-stubs.o hw/core/ptimer.o
++tests/ptimer-test$(EXESUF): tests/ptimer-test.o tests/ptimer-test-stubs.o hw/core/ptimer.o $(test-util-obj-y)
+ 
+ tests/test-logging$(EXESUF): tests/test-logging.o $(test-util-obj-y)
+ 
+@@ -785,7 +785,7 @@ tests/postcopy-test$(EXESUF): tests/postcopy-test.o
+ tests/vhost-user-test$(EXESUF): tests/vhost-user-test.o $(test-util-obj-y) \
+ 	$(qtest-obj-y) $(test-io-obj-y) $(libqos-virtio-obj-y) $(libqos-pc-obj-y) \
+ 	$(chardev-obj-y)
+-tests/qemu-iotests/socket_scm_helper$(EXESUF): tests/qemu-iotests/socket_scm_helper.o
++tests/qemu-iotests/socket_scm_helper$(EXESUF): tests/qemu-iotests/socket_scm_helper.o $(test-util-obj-y)
+ tests/test-qemu-opts$(EXESUF): tests/test-qemu-opts.o $(test-util-obj-y)
+ tests/test-keyval$(EXESUF): tests/test-keyval.o $(test-util-obj-y) $(test-qapi-obj-y)
+ tests/test-write-threshold$(EXESUF): tests/test-write-threshold.o $(test-block-obj-y)
+diff --git a/tests/ahci-test.c b/tests/ahci-test.c
+index cb84edc8fb..ac8a30ab8b 100644
+--- a/tests/ahci-test.c
++++ b/tests/ahci-test.c
+@@ -23,6 +23,7 @@
   */
-=20
+ 
  #include "qemu/osdep.h"
 +#include "qemu/error-report.h"
- #include "qapi/error.h"
- #include <libfdt.h>
- #include "hw/hw.h"
-@@ -418,13 +419,13 @@ static int load_dtb(hwaddr addr, const struct arm_boo=
-t_info *binfo,
-         char *filename;
-         filename =3D qemu_find_file(QEMU_FILE_TYPE_BIOS, binfo->dtb_filena=
-me);
-         if (!filename) {
--            fprintf(stderr, "Couldn't open dtb file %s\n", binfo->dtb_file=
-name);
-+            error_report("Couldn't open dtb file %s", binfo->dtb_filename)=
-;
-             goto fail;
-         }
-=20
-         fdt =3D load_device_tree(filename, &size);
-         if (!fdt) {
--            fprintf(stderr, "Couldn't open dtb file %s\n", filename);
-+            error_report("Couldn't open dtb file %s", filename);
-             g_free(filename);
-             goto fail;
-         }
-@@ -432,7 +433,7 @@ static int load_dtb(hwaddr addr, const struct arm_boot_=
-info *binfo,
-     } else {
-         fdt =3D binfo->get_dtb(binfo, &size);
-         if (!fdt) {
--            fprintf(stderr, "Board was unable to create a dtb blob\n");
-+            error_report("Board was unable to create a dtb blob");
-             goto fail;
-         }
-     }
-@@ -451,7 +452,7 @@ static int load_dtb(hwaddr addr, const struct arm_boot_=
-info *binfo,
-     scells =3D qemu_fdt_getprop_cell(fdt, "/", "#size-cells",
-                                    NULL, &error_fatal);
-     if (acells =3D=3D 0 || scells =3D=3D 0) {
--        fprintf(stderr, "dtb file invalid (#address-cells or #size-cells 0=
-)\n");
-+        error_report("dtb file invalid (#address-cells or #size-cells 0)")=
-;
-         goto fail;
-     }
-=20
-@@ -459,8 +460,7 @@ static int load_dtb(hwaddr addr, const struct arm_boot_=
-info *binfo,
-         /* This is user error so deserves a friendlier error message
-          * than the failure of setprop_sized_cells would provide
-          */
--        fprintf(stderr, "qemu: dtb file not compatible with "
--                "RAM size > 4GB\n");
-+        error_report("dtb file not compatible with RAM size > 4GB");
-         goto fail;
-     }
-=20
-@@ -480,7 +480,7 @@ static int load_dtb(hwaddr addr, const struct arm_boot_=
-info *binfo,
-                                               acells, mem_base,
-                                               scells, mem_len);
-             if (rc < 0) {
--                fprintf(stderr, "couldn't set %s/reg for node %d\n", noden=
-ame,
-+                error_report("couldn't set %s/reg for node %d", nodename,
-                         i);
-                 goto fail;
-             }
-@@ -505,7 +505,7 @@ static int load_dtb(hwaddr addr, const struct arm_boot_=
-info *binfo,
-                                           acells, binfo->loader_start,
-                                           scells, binfo->ram_size);
-         if (rc < 0) {
--            fprintf(stderr, "couldn't set /memory/reg\n");
-+            error_report("couldn't set /memory/reg");
-             goto fail;
-         }
-     }
-@@ -519,7 +519,7 @@ static int load_dtb(hwaddr addr, const struct arm_boot_=
-info *binfo,
-         rc =3D qemu_fdt_setprop_string(fdt, "/chosen", "bootargs",
-                                      binfo->kernel_cmdline);
-         if (rc < 0) {
--            fprintf(stderr, "couldn't set /chosen/bootargs\n");
-+            error_report("couldn't set /chosen/bootargs");
-             goto fail;
-         }
-     }
-@@ -528,14 +528,14 @@ static int load_dtb(hwaddr addr, const struct arm_boo=
-t_info *binfo,
-         rc =3D qemu_fdt_setprop_cell(fdt, "/chosen", "linux,initrd-start",
-                                    binfo->initrd_start);
-         if (rc < 0) {
--            fprintf(stderr, "couldn't set /chosen/linux,initrd-start\n");
-+            error_report("couldn't set /chosen/linux,initrd-start");
-             goto fail;
-         }
-=20
-         rc =3D qemu_fdt_setprop_cell(fdt, "/chosen", "linux,initrd-end",
-                                    binfo->initrd_start + binfo->initrd_siz=
-e);
-         if (rc < 0) {
--            fprintf(stderr, "couldn't set /chosen/linux,initrd-end\n");
-+            error_report("couldn't set /chosen/linux,initrd-end");
-             goto fail;
-         }
-     }
-@@ -690,7 +690,7 @@ static void load_image_to_fw_cfg(FWCfgState *fw_cfg, ui=
-nt16_t size_key,
-         gsize length;
-=20
-         if (!g_file_get_contents(image_name, &contents, &length, NULL)) {
--            fprintf(stderr, "failed to load \"%s\"\n", image_name);
-+            error_report("failed to load \"%s\"", image_name);
-             exit(1);
-         }
-         size =3D length;
-@@ -956,8 +956,7 @@ static void arm_load_kernel_notify(Notifier *notifier, =
-void *data)
-         is_linux =3D 1;
-     }
-     if (kernel_size < 0) {
--        fprintf(stderr, "qemu: could not load kernel '%s'\n",
--                info->kernel_filename);
-+        error_report("could not load kernel '%s'", info->kernel_filename);
-         exit(1);
-     }
-     info->entry =3D entry;
-@@ -976,8 +975,8 @@ static void arm_load_kernel_notify(Notifier *notifier, =
-void *data)
-                                                   info->initrd_start);
-             }
-             if (initrd_size < 0) {
--                fprintf(stderr, "qemu: could not load initrd '%s'\n",
--                        info->initrd_filename);
-+                error_report("could not load initrd '%s'",
-+                             info->initrd_filename);
-                 exit(1);
-             }
-         } else {
-@@ -1021,9 +1020,9 @@ static void arm_load_kernel_notify(Notifier *notifier=
-, void *data)
-         } else {
-             fixupcontext[FIXUP_ARGPTR] =3D info->loader_start + KERNEL_ARG=
-S_ADDR;
-             if (info->ram_size >=3D (1ULL << 32)) {
--                fprintf(stderr, "qemu: RAM size must be less than 4GB to b=
-oot"
--                        " Linux kernel using ATAGS (try passing a device t=
-ree"
--                        " using -dtb)\n");
-+                error_report("RAM size must be less than 4GB to boot"
-+                             " Linux kernel using ATAGS (try passing a dev=
-ice tree"
-+                             " using -dtb)");
-                 exit(1);
-             }
-         }
-diff --git a/hw/arm/gumstix.c b/hw/arm/gumstix.c
-index bba9e9f57a..8f11b03066 100644
---- a/hw/arm/gumstix.c
-+++ b/hw/arm/gumstix.c
-@@ -35,6 +35,7 @@
-  */
-=20
- #include "qemu/osdep.h"
-+#include "qemu/error-report.h"
- #include "hw/hw.h"
- #include "hw/arm/pxa.h"
- #include "net/net.h"
-@@ -62,8 +63,8 @@ static void connex_init(MachineState *machine)
-=20
-     dinfo =3D drive_get(IF_PFLASH, 0, 0);
-     if (!dinfo && !qtest_enabled()) {
--        fprintf(stderr, "A flash image must be given with the "
--                "'pflash' parameter\n");
-+        error_report("A flash image must be given with the "
-+                     "'pflash' parameter");
-         exit(1);
-     }
-=20
-@@ -76,7 +77,7 @@ static void connex_init(MachineState *machine)
-                                dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
-                                sector_len, connex_rom / sector_len,
-                                2, 0, 0, 0, 0, be)) {
--        fprintf(stderr, "qemu: Error registering flash memory.\n");
-+        error_report("Error registering flash memory.");
-         exit(1);
-     }
-=20
-@@ -99,8 +100,8 @@ static void verdex_init(MachineState *machine)
-=20
-     dinfo =3D drive_get(IF_PFLASH, 0, 0);
-     if (!dinfo && !qtest_enabled()) {
--        fprintf(stderr, "A flash image must be given with the "
--                "'pflash' parameter\n");
-+        error_report("A flash image must be given with the "
-+                     "'pflash' parameter");
-         exit(1);
-     }
-=20
-@@ -113,7 +114,7 @@ static void verdex_init(MachineState *machine)
-                                dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
-                                sector_len, verdex_rom / sector_len,
-                                2, 0, 0, 0, 0, be)) {
--        fprintf(stderr, "qemu: Error registering flash memory.\n");
-+        error_report("Error registering flash memory.");
-         exit(1);
-     }
-=20
-diff --git a/hw/arm/mainstone.c b/hw/arm/mainstone.c
-index d07972a966..189febf8b7 100644
---- a/hw/arm/mainstone.c
-+++ b/hw/arm/mainstone.c
-@@ -12,6 +12,7 @@
-  * GNU GPL, version 2 or (at your option) any later version.
-  */
- #include "qemu/osdep.h"
-+#include "qemu/error-report.h"
- #include "qapi/error.h"
- #include "hw/hw.h"
- #include "hw/arm/pxa.h"
-@@ -143,8 +144,8 @@ static void mainstone_common_init(MemoryRegion *address=
-_space_mem,
-             if (qtest_enabled()) {
-                 break;
-             }
--            fprintf(stderr, "Two flash images must be given with the "
--                    "'pflash' parameter\n");
-+            error_report("Two flash images must be given with the "
-+                         "'pflash' parameter");
-             exit(1);
-         }
-=20
-@@ -154,7 +155,7 @@ static void mainstone_common_init(MemoryRegion *address=
-_space_mem,
-                                    blk_by_legacy_dinfo(dinfo),
-                                    sector_len, MAINSTONE_FLASH / sector_le=
-n,
-                                    4, 0, 0, 0, 0, be)) {
--            fprintf(stderr, "qemu: Error registering flash memory.\n");
-+            error_report("Error registering flash memory.");
-             exit(1);
-         }
-     }
-diff --git a/hw/arm/musicpal.c b/hw/arm/musicpal.c
-index b648770882..06127a873d 100644
---- a/hw/arm/musicpal.c
-+++ b/hw/arm/musicpal.c
-@@ -1626,7 +1626,7 @@ static void musicpal_init(MachineState *machine)
-         flash_size =3D blk_getlength(blk);
-         if (flash_size !=3D 8*1024*1024 && flash_size !=3D 16*1024*1024 &&
-             flash_size !=3D 32*1024*1024) {
--            fprintf(stderr, "Invalid flash image size\n");
-+            error_report("Invalid flash image size");
-             exit(1);
-         }
-=20
-diff --git a/hw/arm/omap1.c b/hw/arm/omap1.c
-index 92e58f09c8..b3a23a83d1 100644
---- a/hw/arm/omap1.c
-+++ b/hw/arm/omap1.c
-@@ -18,6 +18,7 @@
-  */
-=20
- #include "qemu/osdep.h"
-+#include "qemu/error-report.h"
- #include "qapi/error.h"
- #include "qemu-common.h"
- #include "cpu.h"
-@@ -2313,7 +2314,7 @@ void omap_uwire_attach(struct omap_uwire_s *s,
-                 uWireSlave *slave, int chipselect)
- {
-     if (chipselect < 0 || chipselect > 3) {
--        fprintf(stderr, "%s: Bad chipselect %i\n", __func__, chipselect);
-+        error_report("%s: Bad chipselect %i", __func__, chipselect);
-         exit(-1);
-     }
-=20
-@@ -3987,7 +3988,7 @@ struct omap_mpu_state_s *omap310_mpu_init(MemoryRegio=
-n *system_memory,
-=20
-     dinfo =3D drive_get(IF_SD, 0, 0);
-     if (!dinfo) {
--        fprintf(stderr, "qemu: missing SecureDigital device\n");
-+        error_report("missing SecureDigital device");
-         exit(1);
-     }
-     s->mmc =3D omap_mmc_init(0xfffb7800, system_memory,
-diff --git a/hw/arm/omap2.c b/hw/arm/omap2.c
-index b53878b8b9..3a1d995d6a 100644
---- a/hw/arm/omap2.c
-+++ b/hw/arm/omap2.c
-@@ -19,6 +19,7 @@
-  */
-=20
- #include "qemu/osdep.h"
-+#include "qemu/error-report.h"
- #include "qapi/error.h"
- #include "qemu-common.h"
- #include "cpu.h"
-@@ -1311,8 +1312,8 @@ static void omap_prcm_apll_update(struct omap_prcm_s =
-*s)
-     /* TODO: update clocks */
-=20
-     if (mode[0] =3D=3D 1 || mode[0] =3D=3D 2 || mode[1] =3D=3D 1 || mode[1=
-] =3D=3D 2)
--        fprintf(stderr, "%s: bad EN_54M_PLL or bad EN_96M_PLL\n",
--                        __func__);
-+        error_report("%s: bad EN_54M_PLL or bad EN_96M_PLL",
-+                     __func__);
- }
-=20
- static void omap_prcm_dpll_update(struct omap_prcm_s *s)
-@@ -1331,7 +1332,7 @@ static void omap_prcm_dpll_update(struct omap_prcm_s =
-*s)
-     s->dpll_lock =3D 0;
-     switch (mode) {
-     case 0:
--        fprintf(stderr, "%s: bad EN_DPLL\n", __func__);
-+        error_report("%s: bad EN_DPLL", __func__);
-         break;
-     case 1:	/* Low-power bypass mode (Default) */
-     case 2:	/* Fast-relock bypass mode */
-@@ -1358,7 +1359,7 @@ static void omap_prcm_dpll_update(struct omap_prcm_s =
-*s)
-         omap_clk_reparent(core, dpll_x2);
-         break;
-     case 3:
--        fprintf(stderr, "%s: bad CORE_CLK_SRC\n", __func__);
-+        error_report("%s: bad CORE_CLK_SRC", __func__);
-         break;
-     }
- }
-@@ -1627,8 +1628,8 @@ static void omap_prcm_write(void *opaque, hwaddr addr=
-,
-=20
-     case 0x500:	/* CM_CLKEN_PLL */
-         if (value & 0xffffff30)
--            fprintf(stderr, "%s: write 0s in CM_CLKEN_PLL for "
--                            "future compatibility\n", __func__);
-+            error_report("%s: write 0s in CM_CLKEN_PLL for "
-+                         "future compatibility", __func__);
-         if ((s->clken[9] ^ value) & 0xcc) {
-             s->clken[9] &=3D ~0xcc;
-             s->clken[9] |=3D value & 0xcc;
-@@ -1646,8 +1647,8 @@ static void omap_prcm_write(void *opaque, hwaddr addr=
-,
-         break;
-     case 0x540:	/* CM_CLKSEL1_PLL */
-         if (value & 0xfc4000d7)
--            fprintf(stderr, "%s: write 0s in CM_CLKSEL1_PLL for "
--                            "future compatibility\n", __func__);
-+            error_report("%s: write 0s in CM_CLKSEL1_PLL for "
-+                         "future compatibility", __func__);
-         if ((s->clksel[5] ^ value) & 0x003fff00) {
-             s->clksel[5] =3D value & 0x03bfff28;
-             omap_prcm_dpll_update(s);
-@@ -1658,8 +1659,8 @@ static void omap_prcm_write(void *opaque, hwaddr addr=
-,
-         break;
-     case 0x544:	/* CM_CLKSEL2_PLL */
-         if (value & ~3)
--            fprintf(stderr, "%s: write 0s in CM_CLKSEL2_PLL[31:2] for "
--                            "future compatibility\n", __func__);
-+            error_report("%s: write 0s in CM_CLKSEL2_PLL[31:2] for "
-+                         "future compatibility", __func__);
-         if (s->clksel[6] !=3D (value & 3)) {
-             s->clksel[6] =3D value & 3;
-             omap_prcm_dpll_update(s);
-@@ -2486,7 +2487,7 @@ struct omap_mpu_state_s *omap2420_mpu_init(MemoryRegi=
-on *sysmem,
-=20
-     dinfo =3D drive_get(IF_SD, 0, 0);
-     if (!dinfo) {
--        fprintf(stderr, "qemu: missing SecureDigital device\n");
-+        error_report("missing SecureDigital device");
-         exit(1);
-     }
-     s->mmc =3D omap2_mmc_init(omap_l4tao(s->l4, 9),
-diff --git a/hw/arm/omap_sx1.c b/hw/arm/omap_sx1.c
-index 9a14270795..e510465137 100644
---- a/hw/arm/omap_sx1.c
-+++ b/hw/arm/omap_sx1.c
-@@ -158,7 +158,7 @@ static void sx1_init(MachineState *machine, const int v=
-ersion)
-                                    blk_by_legacy_dinfo(dinfo),
-                                    sector_size, flash_size / sector_size,
-                                    4, 0, 0, 0, 0, be)) {
--            fprintf(stderr, "qemu: Error registering flash memory %d.\n",
-+            error_report("Error registering flash memory %d.",
-                            fl_idx);
-         }
-         fl_idx++;
-@@ -182,7 +182,7 @@ static void sx1_init(MachineState *machine, const int v=
-ersion)
-                                    blk_by_legacy_dinfo(dinfo),
-                                    sector_size, flash1_size / sector_size,
-                                    4, 0, 0, 0, 0, be)) {
--            fprintf(stderr, "qemu: Error registering flash memory %d.\n",
-+            error_report("Error registering flash memory %d.",
-                            fl_idx);
-         }
-         fl_idx++;
-@@ -194,7 +194,7 @@ static void sx1_init(MachineState *machine, const int v=
-ersion)
-     }
-=20
-     if (!machine->kernel_filename && !fl_idx && !qtest_enabled()) {
--        fprintf(stderr, "Kernel or Flash image must be specified\n");
-+        error_report("Kernel or Flash image must be specified");
-         exit(1);
-     }
-=20
-diff --git a/hw/arm/palm.c b/hw/arm/palm.c
-index 285f43709d..7f3637041a 100644
---- a/hw/arm/palm.c
-+++ b/hw/arm/palm.c
-@@ -233,8 +233,8 @@ static void palmte_init(MachineState *machine)
-     if (nb_option_roms) {
-         rom_size =3D get_image_size(option_rom[0].name);
-         if (rom_size > flash_size) {
--            fprintf(stderr, "%s: ROM image too big (%x > %x)\n",
--                            __func__, rom_size, flash_size);
-+            error_report("%s: ROM image too big (%x > %x)",
-+                         __func__, rom_size, flash_size);
-             rom_size =3D 0;
-         }
-         if (rom_size > 0) {
-@@ -243,13 +243,13 @@ static void palmte_init(MachineState *machine)
-             rom_loaded =3D 1;
-         }
-         if (rom_size < 0) {
--            fprintf(stderr, "%s: error loading '%s'\n",
--                            __func__, option_rom[0].name);
-+            error_report("%s: error loading '%s'",
-+                         __func__, option_rom[0].name);
-         }
-     }
-=20
-     if (!rom_loaded && !kernel_filename && !qtest_enabled()) {
--        fprintf(stderr, "Kernel or ROM image must be specified\n");
-+        fprintf(stderr, "Kernel or ROM image must be specified");
-         exit(1);
-     }
-=20
-diff --git a/hw/arm/pxa2xx.c b/hw/arm/pxa2xx.c
-index db860c238e..0386a0d8bf 100644
---- a/hw/arm/pxa2xx.c
-+++ b/hw/arm/pxa2xx.c
-@@ -8,6 +8,7 @@
-  */
-=20
- #include "qemu/osdep.h"
-+#include "qemu/error-report.h"
- #include "qapi/error.h"
- #include "qemu-common.h"
- #include "cpu.h"
-@@ -2062,7 +2063,7 @@ PXA2xxState *pxa270_init(MemoryRegion *address_space,
-     s =3D g_new0(PXA2xxState, 1);
-=20
-     if (strncmp(cpu_type, "pxa27", 5)) {
--        fprintf(stderr, "Machine requires a PXA27x processor.\n");
-+        error_report("Machine requires a PXA27x processor.");
-         exit(1);
-     }
-=20
-@@ -2095,7 +2096,7 @@ PXA2xxState *pxa270_init(MemoryRegion *address_space,
-=20
-     dinfo =3D drive_get(IF_SD, 0, 0);
-     if (!dinfo) {
--        fprintf(stderr, "qemu: missing SecureDigital device\n");
-+        error_report("missing SecureDigital device");
-         exit(1);
-     }
-     s->mmc =3D pxa2xx_mmci_init(address_space, 0x41100000,
-@@ -2220,7 +2221,7 @@ PXA2xxState *pxa255_init(MemoryRegion *address_space,=
- unsigned int sdram_size)
-=20
-     dinfo =3D drive_get(IF_SD, 0, 0);
-     if (!dinfo) {
--        fprintf(stderr, "qemu: missing SecureDigital device\n");
-+        error_report("missing SecureDigital device");
-         exit(1);
-     }
-     s->mmc =3D pxa2xx_mmci_init(address_space, 0x41100000,
-diff --git a/hw/arm/stellaris.c b/hw/arm/stellaris.c
-index de7c0fc4a6..f6f295b363 100644
---- a/hw/arm/stellaris.c
-+++ b/hw/arm/stellaris.c
-@@ -8,6 +8,7 @@
-  */
-=20
- #include "qemu/osdep.h"
-+#include "qemu/error-report.h"
- #include "qapi/error.h"
- #include "hw/sysbus.h"
- #include "hw/ssi/ssi.h"
-@@ -559,7 +560,7 @@ static void ssys_write(void *opaque, hwaddr offset,
-     case 0x040: /* SRCR0 */
-     case 0x044: /* SRCR1 */
-     case 0x048: /* SRCR2 */
--        fprintf(stderr, "Peripheral reset not implemented\n");
-+        error_report("Peripheral reset not implemented");
-         break;
-     case 0x054: /* IMC */
-         s->int_mask =3D value & 0x7f;
-diff --git a/hw/arm/tosa.c b/hw/arm/tosa.c
-index a55b1a369c..a069c95f1c 100644
---- a/hw/arm/tosa.c
-+++ b/hw/arm/tosa.c
-@@ -12,6 +12,7 @@
-  */
-=20
- #include "qemu/osdep.h"
-+#include "qemu/error-report.h"
- #include "qapi/error.h"
- #include "hw/hw.h"
- #include "hw/arm/pxa.h"
-@@ -70,19 +71,19 @@ static void tosa_out_switch(void *opaque, int line, int=
- level)
- {
-     switch (line) {
-         case 0:
--            fprintf(stderr, "blue LED %s.\n", level ? "on" : "off");
-+            error_report("blue LED %s.", level ? "on" : "off");
-             break;
-         case 1:
--            fprintf(stderr, "green LED %s.\n", level ? "on" : "off");
-+            error_report("green LED %s.", level ? "on" : "off");
-             break;
-         case 2:
--            fprintf(stderr, "amber LED %s.\n", level ? "on" : "off");
-+            error_report("amber LED %s.", level ? "on" : "off");
-             break;
-         case 3:
--            fprintf(stderr, "wlan LED %s.\n", level ? "on" : "off");
-+            fprintf(stderr, "wlan LED %s.", level ? "on" : "off");
+ #include <getopt.h>
+ 
+ #include "libqtest.h"
+@@ -1859,7 +1860,7 @@ int main(int argc, char **argv)
+             ahci_pedantic = 1;
              break;
          default:
--            fprintf(stderr, "Uhandled out event: %d =3D %d\n", line, level=
-);
-+            fprintf(stderr, "Uhandled out event: %d =3D %d", line, level);
-             break;
-     }
- }
-@@ -133,7 +134,7 @@ static void tosa_gpio_setup(PXA2xxState *cpu,
-=20
- static uint32_t tosa_ssp_tansfer(SSISlave *dev, uint32_t value)
- {
--    fprintf(stderr, "TG: %d %02x\n", value >> 5, value & 0x1f);
-+    error_report("TG: %d %02x", value >> 5, value & 0x1f);
-     return 0;
- }
-=20
-@@ -159,13 +160,13 @@ static int tosa_dac_send(I2CSlave *i2c, uint8_t data)
-     s->buf[s->len] =3D data;
-     if (s->len ++ > 2) {
- #ifdef VERBOSE
--        fprintf(stderr, "%s: message too long (%i bytes)\n", __func__, s->=
-len);
-+        error_report("%s: message too long (%i bytes)", __func__, s->len);
- #endif
-         return 1;
-     }
-=20
-     if (s->len =3D=3D 2) {
--        fprintf(stderr, "dac: channel %d value 0x%02x\n",
-+        error_report("dac: channel %d value 0x%02x",
-                 s->buf[0], s->buf[1]);
-     }
-=20
-diff --git a/hw/arm/versatilepb.c b/hw/arm/versatilepb.c
-index 418792cd02..56f9d60bed 100644
---- a/hw/arm/versatilepb.c
-+++ b/hw/arm/versatilepb.c
-@@ -364,7 +364,7 @@ static void versatile_init(MachineState *machine, int b=
-oard_id)
-                           VERSATILE_FLASH_SECT_SIZE,
-                           VERSATILE_FLASH_SIZE / VERSATILE_FLASH_SECT_SIZE=
-,
-                           4, 0x0089, 0x0018, 0x0000, 0x0, 0)) {
--        fprintf(stderr, "qemu: Error registering flash memory.\n");
-+        error_report("Error registering flash memory.");
-     }
-=20
-     versatile_binfo.ram_size =3D machine->ram_size;
-diff --git a/hw/arm/vexpress.c b/hw/arm/vexpress.c
-index efb5a29475..508629dfe9 100644
---- a/hw/arm/vexpress.c
-+++ b/hw/arm/vexpress.c
-@@ -266,7 +266,7 @@ static void a9_daughterboard_init(const VexpressMachine=
-State *vms,
-=20
-     if (ram_size > 0x40000000) {
-         /* 1GB is the maximum the address space permits */
--        fprintf(stderr, "vexpress-a9: cannot model more than 1GB RAM\n");
-+        error_report("vexpress-a9: cannot model more than 1GB RAM");
-         exit(1);
-     }
-=20
-@@ -355,7 +355,7 @@ static void a15_daughterboard_init(const VexpressMachin=
-eState *vms,
-          */
-         uint64_t rsz =3D ram_size;
-         if (rsz > (30ULL * 1024 * 1024 * 1024)) {
--            fprintf(stderr, "vexpress-a15: cannot model more than 30GB RAM=
-\n");
-+            error_report("vexpress-a15: cannot model more than 30GB RAM");
-             exit(1);
+-            fprintf(stderr, "Unrecognized ahci_test option.\n");
++            error_report("Unrecognized ahci_test option.");
+             g_assert_not_reached();
          }
      }
-@@ -640,7 +640,7 @@ static void vexpress_common_init(MachineState *machine)
-     pflash0 =3D ve_pflash_cfi01_register(map[VE_NORFLASH0], "vexpress.flas=
-h0",
-                                        dinfo);
-     if (!pflash0) {
--        fprintf(stderr, "vexpress: error registering flash 0.\n");
-+        error_report("vexpress: error registering flash 0.");
+diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
+index 564da45f65..0955c72a74 100644
+--- a/tests/bios-tables-test.c
++++ b/tests/bios-tables-test.c
+@@ -11,6 +11,7 @@
+  */
+ 
+ #include "qemu/osdep.h"
++#include "qemu/error-report.h"
+ #include <glib/gstdio.h>
+ #include "qemu-common.h"
+ #include "hw/smbios/smbios.h"
+@@ -396,7 +397,7 @@ try_again:
+         aml_file = g_strdup_printf("%s/%s/%.4s%s", data_dir, data->machine,
+                                    (gchar *)&signature, ext);
+         if (getenv("V")) {
+-            fprintf(stderr, "\nLooking for expected file '%s'\n", aml_file);
++            error_report("Looking for expected file '%s'", aml_file);
+         }
+         if (g_file_test(aml_file, G_FILE_TEST_EXISTS)) {
+             exp_sdt.aml_file = aml_file;
+@@ -408,7 +409,7 @@ try_again:
+         }
+         g_assert(exp_sdt.aml_file);
+         if (getenv("V")) {
+-            fprintf(stderr, "\nUsing expected file '%s'\n", aml_file);
++            error_report("Using expected file '%s'", aml_file);
+         }
+         ret = g_file_get_contents(aml_file, &exp_sdt.aml,
+                                   &exp_sdt.aml_len, &error);
+diff --git a/tests/i440fx-test.c b/tests/i440fx-test.c
+index e9d05c87d1..75fb9742ce 100644
+--- a/tests/i440fx-test.c
++++ b/tests/i440fx-test.c
+@@ -13,7 +13,7 @@
+  */
+ 
+ #include "qemu/osdep.h"
+-
++#include "qemu/error-report.h"
+ #include "libqtest.h"
+ #include "libqos/pci.h"
+ #include "libqos/pci-pc.h"
+@@ -295,18 +295,18 @@ static char *create_blob_file(void)
+     ret = -1;
+     fd = g_file_open_tmp("blob_XXXXXX", &pathname, &error);
+     if (fd == -1) {
+-        fprintf(stderr, "unable to create blob file: %s\n", error->message);
++        error_report("unable to create blob file: %s", error->message);
+         g_error_free(error);
+     } else {
+         if (ftruncate(fd, BLOB_SIZE) == -1) {
+-            fprintf(stderr, "ftruncate(\"%s\", %zu): %s\n", pathname,
++            error_report("ftruncate(\"%s\", %zu): %s", pathname,
+                     BLOB_SIZE, strerror(errno));
+         } else {
+             void *buf;
+ 
+             buf = mmap(NULL, BLOB_SIZE, PROT_WRITE, MAP_SHARED, fd, 0);
+             if (buf == MAP_FAILED) {
+-                fprintf(stderr, "mmap(\"%s\", %zu): %s\n", pathname, BLOB_SIZE,
++                error_report("mmap(\"%s\", %zu): %s", pathname, BLOB_SIZE,
+                         strerror(errno));
+             } else {
+                 size_t i;
+diff --git a/tests/libqos/ahci.c b/tests/libqos/ahci.c
+index 13c0749582..286f5c3e64 100644
+--- a/tests/libqos/ahci.c
++++ b/tests/libqos/ahci.c
+@@ -23,7 +23,7 @@
+  */
+ 
+ #include "qemu/osdep.h"
+-
++#include "qemu/error-report.h"
+ #include "libqtest.h"
+ #include "libqos/ahci.h"
+ #include "libqos/pci-pc.h"
+@@ -985,9 +985,9 @@ static void ahci_atapi_command_set_offset(AHCICommand *cmd, uint64_t lba)
+     default:
+         /* SCSI doesn't have uniform packet formats,
+          * so you have to add support for it manually. Sorry! */
+-        fprintf(stderr, "The Libqos AHCI driver does not support the "
++        error_report("The Libqos AHCI driver does not support the "
+                 "set_offset operation for ATAPI command 0x%02x, "
+-                "please add support.\n",
++                "please add support.",
+                 cbd[0]);
+         g_assert_not_reached();
+     }
+@@ -1060,8 +1060,8 @@ static void ahci_atapi_set_size(AHCICommand *cmd, uint64_t xbytes)
+     default:
+         /* SCSI doesn't have uniform packet formats,
+          * so you have to add support for it manually. Sorry! */
+-        fprintf(stderr, "The Libqos AHCI driver does not support the set_size "
+-                "operation for ATAPI command 0x%02x, please add support.\n",
++        error_report("The Libqos AHCI driver does not support the set_size "
++                "operation for ATAPI command 0x%02x, please add support.",
+                 cbd[0]);
+         g_assert_not_reached();
+     }
+diff --git a/tests/libqos/libqos.c b/tests/libqos/libqos.c
+index 991bc1aec2..c84ffb6925 100644
+--- a/tests/libqos/libqos.c
++++ b/tests/libqos/libqos.c
+@@ -1,4 +1,5 @@
+ #include "qemu/osdep.h"
++#include "qemu/error-report.h"
+ #include <sys/wait.h>
+ 
+ #include "libqtest.h"
+@@ -155,7 +156,7 @@ void migrate(QOSState *from, QOSState *to, const char *uri)
+             continue;
+         }
+ 
+-        fprintf(stderr, "Migration did not complete, status: %s\n", st);
++        error_report("Migration did not complete, status: %s", st);
+         g_assert_not_reached();
+     }
+ 
+@@ -199,7 +200,7 @@ void mkimg(const char *file, const char *fmt, unsigned size_mb)
+                           fmt, file, size_mb);
+     ret = g_spawn_command_line_sync(cli, &out, &out2, &rc, &err);
+     if (err) {
+-        fprintf(stderr, "%s\n", err->message);
++        error_report("%s", err->message);
+         g_error_free(err);
+     }
+     g_assert(ret && !err);
+@@ -210,7 +211,7 @@ void mkimg(const char *file, const char *fmt, unsigned size_mb)
+      * 0 is only possible if the program exited normally, so that should be
+      * sufficient for our purposes on all platforms, here. */
+     if (rc) {
+-        fprintf(stderr, "qemu-img returned status code %d\n", rc);
++        error_report("qemu-img returned status code %d", rc);
+     }
+     g_assert(!rc);
+ 
+diff --git a/tests/libqos/malloc.c b/tests/libqos/malloc.c
+index ac05874b0a..a655a25f1f 100644
+--- a/tests/libqos/malloc.c
++++ b/tests/libqos/malloc.c
+@@ -11,6 +11,7 @@
+  */
+ 
+ #include "qemu/osdep.h"
++#include "qemu/error-report.h"
+ #include "libqos/malloc.h"
+ #include "qemu-common.h"
+ #include "qemu/host-utils.h"
+@@ -193,7 +194,7 @@ static uint64_t mlist_alloc(QGuestAllocator *s, uint64_t size)
+ 
+     node = mlist_find_space(s->free, size);
+     if (!node) {
+-        fprintf(stderr, "Out of guest memory.\n");
++        error_report("Out of guest memory.");
+         g_assert_not_reached();
+     }
+     return mlist_fulfill(s, node, size);
+@@ -209,8 +210,8 @@ static void mlist_free(QGuestAllocator *s, uint64_t addr)
+ 
+     node = mlist_find_key(s->used, addr);
+     if (!node) {
+-        fprintf(stderr, "Error: no record found for an allocation at "
+-                "0x%016" PRIx64 ".\n",
++        error_report("Error: no record found for an allocation at "
++                "0x%016" PRIx64 ".",
+                 addr);
+         g_assert_not_reached();
+     }
+@@ -234,8 +235,8 @@ void alloc_uninit(QGuestAllocator *allocator)
+     /* Check for guest leaks, and destroy the list. */
+     QTAILQ_FOREACH_SAFE(node, allocator->used, MLIST_ENTNAME, tmp) {
+         if (allocator->opts & (ALLOC_LEAK_WARN | ALLOC_LEAK_ASSERT)) {
+-            fprintf(stderr, "guest malloc leak @ 0x%016" PRIx64 "; "
+-                    "size 0x%016" PRIx64 ".\n",
++            error_report("guest malloc leak @ 0x%016" PRIx64 "; "
++                    "size 0x%016" PRIx64 ".",
+                     node->addr, node->size);
+         }
+         if (allocator->opts & (ALLOC_LEAK_ASSERT)) {
+@@ -251,7 +252,7 @@ void alloc_uninit(QGuestAllocator *allocator)
+         if ((allocator->opts & mask) == mask) {
+             if ((node->addr != allocator->start) ||
+                 (node->size != allocator->end - allocator->start)) {
+-                fprintf(stderr, "Free list is corrupted.\n");
++                error_report("Free list is corrupted.");
+                 g_assert_not_reached();
+             }
+         }
+diff --git a/tests/libqtest.c b/tests/libqtest.c
+index adf71188b6..936ace03c9 100644
+--- a/tests/libqtest.c
++++ b/tests/libqtest.c
+@@ -15,6 +15,7 @@
+  *
+  */
+ #include "qemu/osdep.h"
++#include "qemu/error-report.h"
+ #include "libqtest.h"
+ 
+ #include <sys/socket.h>
+@@ -89,7 +90,7 @@ static int socket_accept(int sock)
+         ret = accept(sock, (struct sockaddr *)&addr, &addrlen);
+     } while (ret == -1 && errno == EINTR);
+     if (ret == -1) {
+-        fprintf(stderr, "%s failed: %s\n", __func__, strerror(errno));
++        error_report("%s failed: %s", __func__, strerror(errno));
+     }
+     close(sock);
+ 
+@@ -155,7 +156,7 @@ static const char *qtest_qemu_binary(void)
+ 
+     qemu_bin = getenv("QTEST_QEMU_BINARY");
+     if (!qemu_bin) {
+-        fprintf(stderr, "Environment variable QTEST_QEMU_BINARY required\n");
++        error_report("Environment variable QTEST_QEMU_BINARY required");
          exit(1);
      }
-=20
-@@ -655,7 +655,7 @@ static void vexpress_common_init(MachineState *machine)
-     dinfo =3D drive_get_next(IF_PFLASH);
-     if (!ve_pflash_cfi01_register(map[VE_NORFLASH1], "vexpress.flash1",
-                                   dinfo)) {
--        fprintf(stderr, "vexpress: error registering flash 1.\n");
-+        error_report("vexpress: error registering flash 1.");
+ 
+@@ -312,7 +313,7 @@ static GString *qtest_recv_line(QTestState *s)
+         }
+ 
+         if (len == -1 || len == 0) {
+-            fprintf(stderr, "Broken pipe\n");
++            error_report("Broken pipe");
+             exit(1);
+         }
+ 
+@@ -397,7 +398,7 @@ static void qmp_response(JSONMessageParser *parser, GQueue *tokens)
+ 
+     obj = json_parser_parse(tokens, NULL);
+     if (!obj) {
+-        fprintf(stderr, "QMP JSON response parsing failed\n");
++        error_report("QMP JSON response parsing failed");
          exit(1);
      }
-=20
-diff --git a/hw/arm/z2.c b/hw/arm/z2.c
-index 60561c7b7c..ee59142667 100644
---- a/hw/arm/z2.c
-+++ b/hw/arm/z2.c
-@@ -319,8 +319,8 @@ static void z2_init(MachineState *machine)
+ 
+@@ -423,7 +424,7 @@ QDict *qmp_fd_receive(int fd)
+         }
+ 
+         if (len == -1 || len == 0) {
+-            fprintf(stderr, "Broken pipe\n");
++            error_report("Broken pipe");
+             exit(1);
+         }
+ 
+@@ -880,7 +881,7 @@ void qtest_bufread(QTestState *s, uint64_t addr, void *data, size_t size)
+ 
+     g_base64_decode_inplace(args[1], &len);
+     if (size != len) {
+-        fprintf(stderr, "bufread: asked for %zu bytes but decoded %zu\n",
++        error_report("bufread: asked for %zu bytes but decoded %zu",
+                 size, len);
+         len = MIN(len, size);
+     }
+diff --git a/tests/migration/stress.c b/tests/migration/stress.c
+index cf8ce8b16d..49e1ff4555 100644
+--- a/tests/migration/stress.c
++++ b/tests/migration/stress.c
+@@ -47,7 +47,7 @@ static __attribute__((noreturn)) void exit_failure(void)
+     if (getpid() == 1) {
+         sync();
+         reboot(RB_POWER_OFF);
+-        fprintf(stderr, "%s (%05d): ERROR: cannot reboot: %s\n",
++        error_report("%s (%05d): cannot reboot: %s",
+                 argv0, gettid(), strerror(errno));
+         abort();
+     } else {
+@@ -60,7 +60,7 @@ static __attribute__((noreturn)) void exit_success(void)
+     if (getpid() == 1) {
+         sync();
+         reboot(RB_POWER_OFF);
+-        fprintf(stderr, "%s (%05d): ERROR: cannot reboot: %s\n",
++        error_report("%s (%05d): cannot reboot: %s",
+                 argv0, gettid(), strerror(errno));
+         abort();
+     } else {
+@@ -76,13 +76,13 @@ static int get_command_arg_str(const char *name,
+     char *start, *end;
+ 
+     if (fp == NULL) {
+-        fprintf(stderr, "%s (%05d): ERROR: cannot open /proc/cmdline: %s\n",
++        error_report("%s (%05d): cannot open /proc/cmdline: %s",
+                 argv0, gettid(), strerror(errno));
+         return -1;
+     }
+ 
+     if (!fgets(line, sizeof line, fp)) {
+-        fprintf(stderr, "%s (%05d): ERROR: cannot read /proc/cmdline: %s\n",
++        error_report("%s (%05d): cannot read /proc/cmdline: %s",
+                 argv0, gettid(), strerror(errno));
+         fclose(fp);
+         return -1;
+@@ -96,8 +96,8 @@ static int get_command_arg_str(const char *name,
+     start += strlen(name);
+ 
+     if (*start != '=') {
+-        fprintf(stderr, "%s (%05d): ERROR: no value provided for '%s' in /proc/cmdline\n",
+-                argv0, gettid(), name);
++        error_report("%s (%05d): no value provided for '%s' in /proc/cmdline",
++                     argv0, gettid(), name);
+     }
+     start++;
+ 
+@@ -106,8 +106,8 @@ static int get_command_arg_str(const char *name,
+         end = strstr(start, "\n");
+ 
+     if (end == start) {
+-        fprintf(stderr, "%s (%05d): ERROR: no value provided for '%s' in /proc/cmdline\n",
+-                argv0, gettid(), name);
++        error_report("%s (%05d): no value provided for '%s' in /proc/cmdline",
++                     argv0, gettid(), name);
+         return -1;
+     }
+ 
+@@ -132,7 +132,7 @@ static int get_command_arg_ull(const char *name,
+     errno = 0;
+     *val = strtoll(valstr, &end, 10);
+     if (errno || *end) {
+-        fprintf(stderr, "%s (%05d): ERROR: cannot parse %s value %s\n",
++        error_report("%s (%05d): cannot parse %s value %s",
+                 argv0, gettid(), name, valstr);
+         free(valstr);
+         return -1;
+@@ -148,13 +148,13 @@ static int random_bytes(char *buf, size_t len)
+ 
+     fd = open("/dev/urandom", O_RDONLY);
+     if (fd < 0) {
+-        fprintf(stderr, "%s (%05d): ERROR: cannot open /dev/urandom: %s\n",
++        error_report("%s (%05d): cannot open /dev/urandom: %s",
+                 argv0, gettid(), strerror(errno));
+         return -1;
+     }
+ 
+     if (read(fd, buf, len) != len) {
+-        fprintf(stderr, "%s (%05d): ERROR: cannot read /dev/urandom: %s\n",
++        error_report("%s (%05d): cannot read /dev/urandom: %s",
+                 argv0, gettid(), strerror(errno));
+         close(fd);
+         return -1;
+@@ -187,12 +187,12 @@ static int stressone(unsigned long long ramsizeMB)
+     unsigned long long before, after;
+ 
+     if (!ram) {
+-        fprintf(stderr, "%s (%05d): ERROR: cannot allocate %llu MB of RAM: %s\n",
++        error_report("%s (%05d): cannot allocate %llu MB of RAM: %s",
+                 argv0, gettid(), ramsizeMB, strerror(errno));
+         return -1;
+     }
+     if (!data) {
+-        fprintf(stderr, "%s (%d): ERROR: cannot allocate %d bytes of RAM: %s\n",
++        error_report("%s (%d): cannot allocate %d bytes of RAM: %s",
+                 argv0, gettid(), PAGE_SIZE, strerror(errno));
+         free(ram);
+         return -1;
+@@ -271,13 +271,13 @@ static int stress(unsigned long long ramsizeGB, int ncpus)
+ static int mount_misc(const char *fstype, const char *dir)
+ {
+     if (mkdir(dir, 0755) < 0 && errno != EEXIST) {
+-        fprintf(stderr, "%s (%05d): ERROR: cannot create %s: %s\n",
++        error_report("%s (%05d): cannot create %s: %s",
+                 argv0, gettid(), dir, strerror(errno));
+         return -1;
+     }
+ 
+     if (mount("none", dir, fstype, 0, NULL) < 0) {
+-        fprintf(stderr, "%s (%05d): ERROR: cannot mount %s: %s\n",
++        error_report("%s (%05d): cannot mount %s: %s",
+                 argv0, gettid(), dir, strerror(errno));
+         return -1;
+     }
+@@ -322,7 +322,7 @@ int main(int argc, char **argv)
+             errno = 0;
+             ramsizeGB = strtoll(optarg, &end, 10);
+             if (errno != 0 || *end) {
+-                fprintf(stderr, "%s (%05d): ERROR: Cannot parse RAM size %s\n",
++                error_report("%s (%05d): Cannot parse RAM size %s",
+                         argv0, gettid(), optarg);
+                 exit_failure();
+             }
+@@ -332,7 +332,7 @@ int main(int argc, char **argv)
+             errno = 0;
+             ncpus = strtoll(optarg, &end, 10);
+             if (errno != 0 || *end) {
+-                fprintf(stderr, "%s (%05d): ERROR: Cannot parse CPU count %s\n",
++                error_report("%s (%05d): Cannot parse CPU count %s",
+                         argv0, gettid(), optarg);
+                 exit_failure();
+             }
+@@ -340,7 +340,7 @@ int main(int argc, char **argv)
+ 
+         case '?':
+         case 'h':
+-            fprintf(stderr, "%s: [--help][--ramsize GB][--cpus N]\n", argv0);
++            error_report("%s: [--help][--ramsize GB][--cpus N]", argv0);
+             exit_failure();
+         }
+     }
+diff --git a/tests/postcopy-test.c b/tests/postcopy-test.c
+index 8142f2ab90..32bb11ba82 100644
+--- a/tests/postcopy-test.c
++++ b/tests/postcopy-test.c
+@@ -11,7 +11,7 @@
+  */
+ 
+ #include "qemu/osdep.h"
+-
++#include "qemu/error-report.h"
+ #include "libqtest.h"
+ #include "qemu/option.h"
+ #include "qemu/range.h"
+@@ -214,7 +214,7 @@ static void wait_for_serial(const char *side)
+             break;
+ 
+         default:
+-            fprintf(stderr, "Unexpected %d on %s serial\n", readvalue, side);
++            error_report("Unexpected %d on %s serial", readvalue, side);
+             g_assert_not_reached();
+         }
+     } while (true);
+@@ -333,9 +333,9 @@ static void check_guests_ram(void)
+                  */
+                 hit_edge = true;
+             } else {
+-                fprintf(stderr, "Memory content inconsistency at %x"
++                error_report("Memory content inconsistency at %x"
+                                 " first_byte = %x last_byte = %x current = %x"
+-                                " hit_edge = %x\n",
++                                " hit_edge = %x",
+                                 address, first_byte, last_byte, b, hit_edge);
+                 bad = true;
+             }
+diff --git a/tests/qemu-iotests/socket_scm_helper.c b/tests/qemu-iotests/socket_scm_helper.c
+index eb76d31aa9..7785da953a 100644
+--- a/tests/qemu-iotests/socket_scm_helper.c
++++ b/tests/qemu-iotests/socket_scm_helper.c
+@@ -11,6 +11,7 @@
+  */
+ 
+ #include "qemu/osdep.h"
++#include "qemu/error-report.h"
+ #include <sys/socket.h>
+ #include <sys/un.h>
+ 
+@@ -53,7 +54,7 @@ static int send_fd(int fd, int fd_to_send)
+     } while (ret < 0 && errno == EINTR);
+ 
+     if (ret < 0) {
+-        fprintf(stderr, "Failed to send msg, reason: %s\n", strerror(errno));
++        error_report("Failed to send msg, reason: %s", strerror(errno));
+     }
+ 
+     return ret;
+@@ -69,14 +70,14 @@ static int get_fd_num(const char *fd_str, bool silent)
+     sock = strtol(fd_str, &err, 10);
+     if (errno) {
+         if (!silent) {
+-            fprintf(stderr, "Failed in strtol for socket fd, reason: %s\n",
++            error_report("Failed in strtol for socket fd, reason: %s",
+                     strerror(errno));
+         }
+         return -1;
+     }
+     if (!*fd_str || *err || sock < 0) {
+         if (!silent) {
+-            fprintf(stderr, "bad numerical value for socket fd '%s'\n", fd_str);
++            error_report("bad numerical value for socket fd '%s'", fd_str);
+         }
+         return -1;
+     }
+@@ -96,7 +97,7 @@ int main(int argc, char **argv, char **envp)
+ #ifdef SOCKET_SCM_DEBUG
+     int i;
+     for (i = 0; i < argc; i++) {
+-        fprintf(stderr, "Parameter %d: %s\n", i, argv[i]);
++        error_report("Parameter %d: %s", i, argv[i]);
+     }
  #endif
-     dinfo =3D drive_get(IF_PFLASH, 0, 0);
-     if (!dinfo && !qtest_enabled()) {
--        fprintf(stderr, "Flash image must be given with the "
--                "'pflash' parameter\n");
-+        error_report("Flash image must be given with the "
-+                     "'pflash' parameter");
+ 
+@@ -120,7 +121,7 @@ int main(int argc, char **argv, char **envp)
+            is supposed to fork and exec this program. */
+         fd = open(argv[2], O_RDONLY);
+         if (fd < 0) {
+-            fprintf(stderr, "Failed to open file '%s'\n", argv[2]);
++            error_report("Failed to open file '%s'", argv[2]);
+             return EXIT_FAILURE;
+         }
+     }
+diff --git a/tests/rcutorture.c b/tests/rcutorture.c
+index 4002ecf123..21d2c76d0b 100644
+--- a/tests/rcutorture.c
++++ b/tests/rcutorture.c
+@@ -61,6 +61,7 @@
+  */
+ 
+ #include "qemu/osdep.h"
++#include "qemu/error-report.h"
+ #include "qemu/atomic.h"
+ #include "qemu/rcu.h"
+ #include "qemu/thread.h"
+@@ -86,7 +87,7 @@ static int n_threads;
+ static void create_thread(void *(*func)(void *))
+ {
+     if (n_threads >= NR_THREADS) {
+-        fprintf(stderr, "Thread limit of %d exceeded!\n", NR_THREADS);
++        error_report("Thread limit of %d exceeded!", NR_THREADS);
+         exit(-1);
+     }
+     qemu_thread_create(&threads[n_threads], "test", func, &data[n_threads],
+@@ -417,7 +418,7 @@ static void gtest_stress_10_5(void)
+ 
+ static void usage(int argc, char *argv[])
+ {
+-    fprintf(stderr, "Usage: %s [nreaders [ perf | stress ] ]\n", argv[0]);
++    error_report("Usage: %s [nreaders [ perf | stress ] ]", argv[0]);
+     exit(-1);
+ }
+ 
+diff --git a/tests/tcg/linux-test.c b/tests/tcg/linux-test.c
+index 5070d31446..76c9059073 100644
+--- a/tests/tcg/linux-test.c
++++ b/tests/tcg/linux-test.c
+@@ -51,7 +51,7 @@ void error1(const char *filename, int line, const char *fmt, ...)
+     va_start(ap, fmt);
+     fprintf(stderr, "%s:%d: ", filename, line);
+     vfprintf(stderr, fmt, ap);
+-    fprintf(stderr, "\n");
++    error_report("");
+     va_end(ap);
+     exit(1);
+ }
+diff --git a/tests/tcg/runcom.c b/tests/tcg/runcom.c
+index d60342bfc6..7acf0239c8 100644
+--- a/tests/tcg/runcom.c
++++ b/tests/tcg/runcom.c
+@@ -61,7 +61,7 @@ void dump_regs(struct vm86_regs *r)
+ #ifdef SIGTEST
+ void alarm_handler(int sig)
+ {
+-    fprintf(stderr, "alarm signal=%d\n", sig);
++    error_report("alarm signal=%d", sig);
+     alarm(1);
+ }
+ #endif
+@@ -172,7 +172,7 @@ int main(int argc, char **argv)
+                     break;
+                 default:
+                 unknown_int:
+-                    fprintf(stderr, "unsupported int 0x%02x\n", int_num);
++                    error_report("unsupported int 0x%02x", int_num);
+                     dump_regs(&ctx.regs);
+                     //                    exit(1);
+                 }
+@@ -184,7 +184,7 @@ int main(int argc, char **argv)
+         case VM86_STI:
+             break;
+         default:
+-            fprintf(stderr, "unhandled vm86 return code (0x%x)\n", ret);
++            error_report("unhandled vm86 return code (0x%x)", ret);
+             dump_regs(&ctx.regs);
+             exit(1);
+         }
+diff --git a/tests/tcg/test-i386-fprem.c b/tests/tcg/test-i386-fprem.c
+index 1a71623204..7c3d37d07a 100644
+--- a/tests/tcg/test-i386-fprem.c
++++ b/tests/tcg/test-i386-fprem.c
+@@ -340,7 +340,7 @@ static void test_fprem_pairs(void)
+         }
+     }
+ 
+-    fprintf(stderr, "test-i386-fprem: tested %llu cases\n", count);
++    error_report("test-i386-fprem: tested %llu cases", count);
+ }
+ 
+ int main(int argc, char **argv)
+diff --git a/tests/tcg/test_path.c b/tests/tcg/test_path.c
+index 1c29bce263..d543bb76ef 100644
+--- a/tests/tcg/test_path.c
++++ b/tests/tcg/test_path.c
+@@ -150,8 +150,8 @@ int main(int argc, char *argv[])
+     ret = do_test();
+     cleanup();
+     if (ret) {
+-	fprintf(stderr, "test_path: failed on line %i\n", ret);
+-	return 1;
++        error_report("test_path: failed on line %i", ret);
++        return 1;
+     }
+     return 0;
+ }
+diff --git a/tests/test-hmp.c b/tests/test-hmp.c
+index 5677fbf775..ff86220814 100644
+--- a/tests/test-hmp.c
++++ b/tests/test-hmp.c
+@@ -15,6 +15,7 @@
+  */
+ 
+ #include "qemu/osdep.h"
++#include "qemu/error-report.h"
+ #include "libqtest.h"
+ 
+ static int verbose;
+@@ -79,7 +80,7 @@ static void test_commands(void)
+ 
+     for (i = 0; hmp_cmds[i] != NULL; i++) {
+         if (verbose) {
+-            fprintf(stderr, "\t%s\n", hmp_cmds[i]);
++            error_report("\t%s", hmp_cmds[i]);
+         }
+         response = hmp("%s", hmp_cmds[i]);
+         g_free(response);
+@@ -102,7 +103,7 @@ static void test_info_commands(void)
+         *endp = '\0';
+         /* Now run the info command */
+         if (verbose) {
+-            fprintf(stderr, "\t%s\n", info);
++            error_report("\t%s", info);
+         }
+         resp = hmp("%s", info);
+         g_free(resp);
+diff --git a/tests/test-rcu-list.c b/tests/test-rcu-list.c
+index 1514d7ec97..00a03de370 100644
+--- a/tests/test-rcu-list.c
++++ b/tests/test-rcu-list.c
+@@ -21,6 +21,7 @@
+  */
+ 
+ #include "qemu/osdep.h"
++#include "qemu/error-report.h"
+ #include "qemu/atomic.h"
+ #include "qemu/rcu.h"
+ #include "qemu/thread.h"
+@@ -64,7 +65,7 @@ static int select_random_el(int max)
+ static void create_thread(void *(*func)(void *))
+ {
+     if (n_threads >= NR_THREADS) {
+-        fprintf(stderr, "Thread limit of %d exceeded!\n", NR_THREADS);
++        error_report("Thread limit of %d exceeded!", NR_THREADS);
+         exit(-1);
+     }
+     qemu_thread_create(&threads[n_threads], "test", func, &data[n_threads],
+@@ -255,7 +256,7 @@ static void rcu_qtest(const char *test, int duration, int nreaders)
+ 
+ static void usage(int argc, char *argv[])
+ {
+-    fprintf(stderr, "Usage: %s duration nreaders\n", argv[0]);
++    error_report("Usage: %s duration nreaders", argv[0]);
+     exit(-1);
+ }
+ 
+diff --git a/tests/usb-hcd-ehci-test.c b/tests/usb-hcd-ehci-test.c
+index 944eb1c088..1e7ef842e5 100644
+--- a/tests/usb-hcd-ehci-test.c
++++ b/tests/usb-hcd-ehci-test.c
+@@ -42,7 +42,7 @@ static void ehci_port_test(struct qhc *hc, int port, uint32_t expect)
+     uint16_t mask = ~(PORTSC_CSC | PORTSC_PEDC | PORTSC_OCC);
+ 
+ #if 0
+-    fprintf(stderr, "%s: %d, have 0x%08x, want 0x%08x\n",
++    error_report("%s: %d, have 0x%08x, want 0x%08x",
+             __func__, port, value & mask, expect & mask);
+ #endif
+     g_assert((value & mask) == (expect & mask));
+diff --git a/tests/vhost-user-bridge.c b/tests/vhost-user-bridge.c
+index d820033a72..31a884e0da 100644
+--- a/tests/vhost-user-bridge.c
++++ b/tests/vhost-user-bridge.c
+@@ -181,7 +181,7 @@ vubr_handle_tx(VuDev *dev, int qidx)
+         out_num = elem->out_num;
+         out_sg = elem->out_sg;
+         if (out_num < 1) {
+-            fprintf(stderr, "virtio-net header not in first element\n");
++            error_report("virtio-net header not in first element");
+             break;
+         }
+         if (VHOST_USER_BRIDGE_DEBUG) {
+@@ -294,7 +294,7 @@ vubr_backend_recv_cb(int sock, void *ctx)
+         }
+ 
+         if (elem->in_num < 1) {
+-            fprintf(stderr, "virtio-net contains no in buffers\n");
++            error_report("virtio-net contains no in buffers");
+             break;
+         }
+ 
+@@ -364,7 +364,7 @@ vubr_receive_cb(int sock, void *ctx)
+     VubrDev *vubr = (VubrDev *)ctx;
+ 
+     if (!vu_dispatch(&vubr->vudev)) {
+-        fprintf(stderr, "Error while dispatching\n");
++        error_report("Error while dispatching");
+     }
+ }
+ 
+@@ -461,7 +461,7 @@ vubr_panic(VuDev *dev, const char *msg)
+ {
+     VubrDev *vubr = container_of(dev, VubrDev, vudev);
+ 
+-    fprintf(stderr, "PANIC: %s\n", msg);
++    error_report("PANIC: %s", msg);
+ 
+     dispatcher_remove(&vubr->dispatcher, dev->sock);
+     vubr->quit = 1;
+@@ -562,14 +562,14 @@ vubr_set_host(struct sockaddr_in *saddr, const char *host)
+ {
+     if (isdigit(host[0])) {
+         if (!inet_aton(host, &saddr->sin_addr)) {
+-            fprintf(stderr, "inet_aton() failed.\n");
++            error_report("inet_aton() failed.");
+             exit(1);
+         }
+     } else {
+         struct hostent *he = gethostbyname(host);
+ 
+         if (!he) {
+-            fprintf(stderr, "gethostbyname() failed.\n");
++            error_report("gethostbyname() failed.");
+             exit(1);
+         }
+         saddr->sin_addr = *(struct in_addr *)he->h_addr;
+@@ -590,13 +590,13 @@ vubr_backend_udp_setup(VubrDev *dev,
+ 
+     lport = strtol(local_port, (char **)&r, 0);
+     if (r == local_port) {
+-        fprintf(stderr, "lport parsing failed.\n");
++        error_report("lport parsing failed.");
          exit(1);
      }
-=20
-@@ -329,7 +329,7 @@ static void z2_init(MachineState *machine)
-                                dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
-                                sector_len, Z2_FLASH_SIZE / sector_len,
-                                4, 0, 0, 0, 0, be)) {
--        fprintf(stderr, "qemu: Error registering flash memory.\n");
-+        error_report("Error registering flash memory.");
+ 
+     rport = strtol(remote_port, (char **)&r, 0);
+     if (r == remote_port) {
+-        fprintf(stderr, "rport parsing failed.\n");
++        error_report("rport parsing failed.");
          exit(1);
      }
-=20
---=20
+ 
+@@ -714,15 +714,15 @@ main(int argc, char *argv[])
+     return 0;
+ 
+ out:
+-    fprintf(stderr, "Usage: %s ", argv[0]);
+-    fprintf(stderr, "[-c] [-u ud_socket_path] [-l lhost:lport] [-r rhost:rport]\n");
+-    fprintf(stderr, "\t-u path to unix doman socket. default: %s\n",
++    error_report("Usage: %s ", argv[0]);
++    error_report("[-c] [-u ud_socket_path] [-l lhost:lport] [-r rhost:rport]");
++    error_report("\t-u path to unix doman socket. default: %s",
+             DEFAULT_UD_SOCKET);
+-    fprintf(stderr, "\t-l local host and port. default: %s:%s\n",
++    fprintf(stderr, "\t-l local host and port. default: %s:%s",
+             DEFAULT_LHOST, DEFAULT_LPORT);
+-    fprintf(stderr, "\t-r remote host and port. default: %s:%s\n",
++    error_report("\t-r remote host and port. default: %s:%s",
+             DEFAULT_RHOST, DEFAULT_RPORT);
+-    fprintf(stderr, "\t-c client mode\n");
++    error_report("\t-c client mode");
+ 
+     return 1;
+ }
+-- 
 2.11.0
