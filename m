@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51536)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51712)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e54MX-0000Hv-I4
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 02:31:27 -0400
+	(envelope-from <peterx@redhat.com>) id 1e54NJ-0000kx-Uk
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 02:32:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e54MT-0002qz-1S
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 02:31:25 -0400
-Received: from indium.canonical.com ([91.189.90.7]:46006)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1e54MS-0002qa-Nm
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 02:31:20 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1e54MQ-0007Gv-5A
-	for <qemu-devel@nongnu.org>; Thu, 19 Oct 2017 06:31:18 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 175122E80D7
-	for <qemu-devel@nongnu.org>; Thu, 19 Oct 2017 06:31:18 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 19 Oct 2017 06:24:14 -0000
-From: Thomas Huth <1719196@bugs.launchpad.net>
-Reply-To: Bug 1719196 <1719196@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150626680089.6094.17724106932405637799.malonedeb@soybean.canonical.com>
-Message-Id: <150839425502.1634.13397978359066544951.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1719196] Re: [arm64 ocata] newly created
- instances are unable to raise network interfaces
+	(envelope-from <peterx@redhat.com>) id 1e54NI-0003CT-5J
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 02:32:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46692)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1e54NH-0003C9-UV
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 02:32:12 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D9F0E13A49
+	for <qemu-devel@nongnu.org>; Thu, 19 Oct 2017 06:32:10 +0000 (UTC)
+From: Peter Xu <peterx@redhat.com>
+Date: Thu, 19 Oct 2017 14:31:57 +0800
+Message-Id: <20171019063200.19048-2-peterx@redhat.com>
+In-Reply-To: <20171019063200.19048-1-peterx@redhat.com>
+References: <20171019063200.19048-1-peterx@redhat.com>
+Subject: [Qemu-devel] [PATCH 1/4] migration: provide ram_state_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,289 +30,86 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Laurent Vivier <lvivier@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
 
-Since the fix mentioned in the previous comments is already in upstream
-QEMU, I'm setting the upstream status to "Fix released".
+The old ram_state_init() is not really initializing the RAMState only,
+but including lots of other stuff that is RAM-related.  Renaming it to
+ram_init_all().  Instead, provide a real ram_state_init().
 
-** Changed in: qemu
-       Status: New =3D> Fix Released
+Signed-off-by: Peter Xu <peterx@redhat.com>
+---
+ migration/ram.c | 33 ++++++++++++++++++++++++---------
+ 1 file changed, 24 insertions(+), 9 deletions(-)
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1719196
-
-Title:
-  [arm64 ocata] newly created instances are unable to raise network
-  interfaces
-
-Status in Ubuntu Cloud Archive:
-  Fix Released
-Status in Ubuntu Cloud Archive ocata series:
-  Triaged
-Status in libvirt:
-  New
-Status in QEMU:
-  Fix Released
-Status in libvirt package in Ubuntu:
-  Invalid
-Status in qemu package in Ubuntu:
-  Fix Released
-Status in qemu source package in Zesty:
-  Incomplete
-
-Bug description:
-  arm64 Ocata ,
-
-  I'm testing to see I can get Ocata running on arm64 and using the
-  openstack-base bundle to deploy it.  I have added the bundle to the
-  log file attached to this bug.
-
-  When I create a new instance via nova, the VM comes up and runs,
-  however fails to raise its eth0 interface. This occurs on both
-  internal and external networks.
-
-  ubuntu@openstackaw:~$ nova list
-  +--------------------------------------+---------+--------+------------+-=
-------------+--------------------+
-  | ID                                   | Name    | Status | Task State | =
-Power State | Networks           |
-  +--------------------------------------+---------+--------+------------+-=
-------------+--------------------+
-  | dcaf6d51-f81e-4cbd-ac77-0c5d21bde57c | sfeole1 | ACTIVE | -          | =
-Running     | internal=3D10.5.5.3  |
-  | aa0b8aee-5650-41f4-8fa0-aeccdc763425 | sfeole2 | ACTIVE | -          | =
-Running     | internal=3D10.5.5.13 |
-  +--------------------------------------+---------+--------+------------+-=
-------------+--------------------+
-  ubuntu@openstackaw:~$ nova show aa0b8aee-5650-41f4-8fa0-aeccdc763425
-  +--------------------------------------+---------------------------------=
--------------------------+
-  | Property                             | Value                           =
-                         |
-  +--------------------------------------+---------------------------------=
--------------------------+
-  | OS-DCF:diskConfig                    | MANUAL                          =
-                         |
-  | OS-EXT-AZ:availability_zone          | nova                            =
-                         |
-  | OS-EXT-SRV-ATTR:host                 | awrep3                          =
-                         |
-  | OS-EXT-SRV-ATTR:hypervisor_hostname  | awrep3.maas                     =
-                         |
-  | OS-EXT-SRV-ATTR:instance_name        | instance-00000003               =
-                         |
-  | OS-EXT-STS:power_state               | 1                               =
-                         |
-  | OS-EXT-STS:task_state                | -                               =
-                         |
-  | OS-EXT-STS:vm_state                  | active                          =
-                         |
-  | OS-SRV-USG:launched_at               | 2017-09-24T14:23:08.000000      =
-                         |
-  | OS-SRV-USG:terminated_at             | -                               =
-                         |
-  | accessIPv4                           |                                 =
-                         |
-  | accessIPv6                           |                                 =
-                         |
-  | config_drive                         |                                 =
-                         |
-  | created                              | 2017-09-24T14:22:41Z            =
-                         |
-  | flavor                               | m1.small (717660ae-0440-4b19-a76=
-2-ffeb32a0575c)          |
-  | hostId                               | 5612a00671c47255d2ebd6737a64ec9b=
-d3a5866d1233ecf3e988b025 |
-  | id                                   | aa0b8aee-5650-41f4-8fa0-aeccdc76=
-3425                     |
-  | image                                | zestynosplash (e88fd1bd-f040-44d=
-8-9e7c-c462ccf4b945)     |
-  | internal network                     | 10.5.5.13                       =
-                         |
-  | key_name                             | mykey                           =
-                         |
-  | metadata                             | {}                              =
-                         |
-  | name                                 | sfeole2                         =
-                         |
-  | os-extended-volumes:volumes_attached | []                              =
-                         |
-  | progress                             | 0                               =
-                         |
-  | security_groups                      | default                         =
-                         |
-  | status                               | ACTIVE                          =
-                         |
-  | tenant_id                            | 9f7a21c1ad264fec81abc09f3960ad1d=
-                         |
-  | updated                              | 2017-09-24T14:23:09Z            =
-                         |
-  | user_id                              | e6bb6f5178a248c1b5ae66ed388f9040=
-                         |
-  +--------------------------------------+---------------------------------=
--------------------------+
-
-
-  As seen above the instances boot an run.  Full Console output is
-  attached to this bug.
-
-  =
-
-  [  OK  ] Started Initial cloud-init job (pre-networking).
-  [  OK  ] Reached target Network (Pre).
-  [  OK  ] Started AppArmor initialization.
-           Starting Raise network interfaces...
-  [FAILED] Failed to start Raise network interfaces.
-  See 'systemctl status networking.service' for details.
-           Starting Initial cloud-init job (metadata service crawler)...
-  [  OK  ] Reached target Network.
-  [  315.051902] cloud-init[881]: Cloud-init v. 0.7.9 running 'init' at Fri=
-, 22 Sep 2017 18:29:15 +0000. Up 314.70 seconds.
-  [  315.057291] cloud-init[881]: ci-info: +++++++++++++++++++++++++++Net d=
-evice info+++++++++++++++++++++++++++
-  [  315.060338] cloud-init[881]: ci-info: +--------+------+-----------+---=
---------+-------+-------------------+
-  [  315.063308] cloud-init[881]: ci-info: | Device |  Up  |  Address  |   =
- Mask   | Scope |     Hw-Address    |
-  [  315.066304] cloud-init[881]: ci-info: +--------+------+-----------+---=
---------+-------+-------------------+
-  [  315.069303] cloud-init[881]: ci-info: | eth0:  | True |     .     |   =
-  .     |   .   | fa:16:3e:39:4c:48 |
-  [  315.072308] cloud-init[881]: ci-info: | eth0:  | True |     .     |   =
-  .     |   d   | fa:16:3e:39:4c:48 |
-  [  315.075260] cloud-init[881]: ci-info: |  lo:   | True | 127.0.0.1 | 25=
-5.0.0.0 |   .   |         .         |
-  [  315.078258] cloud-init[881]: ci-info: |  lo:   | True |     .     |   =
-  .     |   d   |         .         |
-  [  315.081249] cloud-init[881]: ci-info: +--------+------+-----------+---=
---------+-------+-------------------+
-  [  315.084240] cloud-init[881]: 2017-09-22 18:29:15,393 - url_helper.py[W=
-ARNING]: Calling 'http://169.254.169.254/2009-04-04/meta-data/instance-id' =
-failed [0/120s]: request error [HTTPConnectionPool(host=3D'169.254.169.254'=
-, port=3D80): Max retries exceeded with url: /2009-04-04/meta-data/instance=
--id (Caused by NewConnectionError('<requests.packages.urllib3.connection.HT=
-TPConnection object at 0xffffb10794e0>: Failed to establish a new connectio=
-n: [Errno 101] Network is unreachable',))]
-
-
-  =
-
-  ----------------
-
-
-  I have checked all services in neutron and made sure that they are
-  running and restarted in neutron-gateway
-
-  =
-
-   [ + ]  neutron-dhcp-agent
-   [ + ]  neutron-l3-agent
-   [ + ]  neutron-lbaasv2-agent
-   [ + ]  neutron-metadata-agent
-   [ + ]  neutron-metering-agent
-   [ + ]  neutron-openvswitch-agent
-   [ + ]  neutron-ovs-cleanup
-
-  and have also restarted and checked the nova-compute logs for their
-  neutron counterparts.
-
-  =
-
-   [ + ]  neutron-openvswitch-agent
-   [ + ]  neutron-ovs-cleanup
-
-
-   There are some warnings/errors in the neutron-gateway logs which I
-  have attached the full tarball in a separate attachment to this bug:
-
-  2017-09-24 14:39:33.152 10322 INFO ryu.base.app_manager [-] instantiating=
- app ryu.controller.ofp_handler of OFPHandler
-  2017-09-24 14:39:33.153 10322 INFO ryu.base.app_manager [-] instantiating=
- app ryu.app.ofctl.service of OfctlService
-  2017-09-24 14:39:39.577 10322 ERROR neutron.agent.ovsdb.impl_vsctl [req-2=
-f084ae8-13dc-47dc-b351-24c8f3c57067 - - - - -] Unable to execute ['ovs-vsct=
-l', '--timeout=3D10', '--oneline', '--format=3Djson', '--', '--id=3D@manage=
-r', 'create', 'Manager', 'target=3D"ptcp:6640:127.0.0.1"', '--', 'add', 'Op=
-en_vSwitch', '.', 'manager_options', '@manager']. Exception: Exit code: 1; =
-Stdin: ; Stdout: ; Stderr: ovs-vsctl: transaction error: {"details":"Transa=
-ction causes multiple rows in \"Manager\" table to have identical values (\=
-"ptcp:6640:127.0.0.1\") for index on column \"target\".  First row, with UU=
-ID e02a5f7f-bfd2-4a1d-ae3c-0321db4bd3fb, existed in the database before thi=
-s transaction and was not modified by the transaction.  Second row, with UU=
-ID 6e9aba3a-471a-4976-bffd-b7131bbe5377, was inserted by this transaction."=
-,"error":"constraint violation"}
-
-
-  These warnings/errors also occur on the nova-compute hosts in
-  /var/log/neutron/
-
-
-  =
-
-  2017-09-22 18:54:52.130 387556 INFO ryu.base.app_manager [-] instantiatin=
-g app ryu.app.ofctl.service of OfctlService
-  2017-09-22 18:54:56.124 387556 ERROR neutron.agent.ovsdb.impl_vsctl [req-=
-e291c2f9-a123-422c-be7c-fadaeb5decfa - - - - -] Unable to execute ['ovs-vsc=
-tl', '--timeout=3D10', '--oneline', '--format=3Djson', '--', '--id=3D@manag=
-er', 'create', 'Manager', 'target=3D"ptcp:6640:127.0.0.1"', '--', 'add', 'O=
-pen_vSwitch', '.', 'manager_options', '@manager']. Exception: Exit code: 1;=
- Stdin: ; Stdout: ; Stderr: ovs-vsctl: transaction error: {"details":"Trans=
-action causes multiple rows in \"Manager\" table to have identical values (=
-\"ptcp:6640:127.0.0.1\") for index on column \"target\".  First row, with U=
-UID 9f27ddee-9881-4cbc-9777-2f42fee735e9, was inserted by this transaction.=
-  Second row, with UUID ccf0e097-09d5-449c-b353-6b69781dc3f7, existed in th=
-e database before this transaction and was not modified by the transaction.=
-","error":"constraint violation"}
-
-
-  I'm not sure if the above error could be pertaining to the failure, I
-  have also attached those logs to this bug as well...
-
-  =
-
-  .
-  (neutron) agent-list
-  +--------------------------------------+----------------------+--------+-=
-------------------+-------+----------------+---------------------------+
-  | id                                   | agent_type           | host   | =
-availability_zone | alive | admin_state_up | binary                    |
-  +--------------------------------------+----------------------+--------+-=
-------------------+-------+----------------+---------------------------+
-  | 0cca03fb-abb2-4704-8b0b-e7d3e117d882 | DHCP agent           | awrep1 | =
-nova              | :-)   | True           | neutron-dhcp-agent        |
-  | 14a5fd52-fbc3-450c-96d5-4e9a65776dad | L3 agent             | awrep1 | =
-nova              | :-)   | True           | neutron-l3-agent          |
-  | 2ebc7238-5e61-41f8-bc60-df14ec6b226b | Loadbalancerv2 agent | awrep1 | =
-                  | :-)   | True           | neutron-lbaasv2-agent     |
-  | 4f6275be-fc8b-4994-bdac-13a4b76f6a83 | Metering agent       | awrep1 | =
-                  | :-)   | True           | neutron-metering-agent    |
-  | 86ecc6b0-c100-4298-b861-40c17516cc08 | Open vSwitch agent   | awrep1 | =
-                  | :-)   | True           | neutron-openvswitch-agent |
-  | 947ad3ab-650b-4b96-a520-00441ecb33e7 | Open vSwitch agent   | awrep4 | =
-                  | :-)   | True           | neutron-openvswitch-agent |
-  | 996b0692-7d19-4641-bec3-e057f4a856f6 | Open vSwitch agent   | awrep3 | =
-                  | :-)   | True           | neutron-openvswitch-agent |
-  | ab6b1065-0b98-4cf3-9f46-6bddba0c5e75 | Metadata agent       | awrep1 | =
-                  | :-)   | True           | neutron-metadata-agent    |
-  | fe24f622-b77c-4eed-ae22-18e4195cf763 | Open vSwitch agent   | awrep2 | =
-                  | :-)   | True           | neutron-openvswitch-agent |
-  +--------------------------------------+----------------------+--------+-=
-------------------+-------+----------------+---------------------------+
-
-  =
-
-  Should neutron-openvswitch be assigned to the 'nova' availability zone? =
-
-
-  I have also attached the ovs-vsctl show from a nova-compute host and
-  the neutron-gateway host to ensure that the open v switch routes are
-  correct.
-
-  =
-
-  I can supply more logs if required.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/cloud-archive/+bug/1719196/+subscriptions
+diff --git a/migration/ram.c b/migration/ram.c
+index b83f8977c5..fd8e14c59b 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -2009,12 +2009,34 @@ err:
+ 
+ static int ram_state_init(RAMState **rsp)
+ {
+-    *rsp = g_new0(RAMState, 1);
++    *rsp = g_try_new0(RAMState, 1);
++
++    if (!*rsp) {
++        error_report("%s: Init ramstate fail", __func__);
++        return -1;
++    }
+ 
+     qemu_mutex_init(&(*rsp)->bitmap_mutex);
+     qemu_mutex_init(&(*rsp)->src_page_req_mutex);
+     QSIMPLEQ_INIT(&(*rsp)->src_page_requests);
+ 
++    /*
++     * Count the total number of pages used by ram blocks not including any
++     * gaps due to alignment or unplugs.
++     */
++    (*rsp)->migration_dirty_pages = ram_bytes_total() >> TARGET_PAGE_BITS;
++
++    ram_state_reset(*rsp);
++
++    return 0;
++}
++
++static int ram_init_all(RAMState **rsp)
++{
++    if (ram_state_init(rsp)) {
++        return -1;
++    }
++
+     if (migrate_use_xbzrle()) {
+         XBZRLE_cache_lock();
+         XBZRLE.zero_target_page = g_malloc0(TARGET_PAGE_SIZE);
+@@ -2055,7 +2077,6 @@ static int ram_state_init(RAMState **rsp)
+ 
+     qemu_mutex_lock_ramlist();
+     rcu_read_lock();
+-    ram_state_reset(*rsp);
+ 
+     /* Skip setting bitmap if there is no RAM */
+     if (ram_bytes_total()) {
+@@ -2073,12 +2094,6 @@ static int ram_state_init(RAMState **rsp)
+         }
+     }
+ 
+-    /*
+-     * Count the total number of pages used by ram blocks not including any
+-     * gaps due to alignment or unplugs.
+-     */
+-    (*rsp)->migration_dirty_pages = ram_bytes_total() >> TARGET_PAGE_BITS;
+-
+     memory_global_dirty_log_start();
+     migration_bitmap_sync(*rsp);
+     qemu_mutex_unlock_ramlist();
+@@ -2110,7 +2125,7 @@ static int ram_save_setup(QEMUFile *f, void *opaque)
+ 
+     /* migration has already setup the bitmap, reuse it. */
+     if (!migration_in_colo_state()) {
+-        if (ram_state_init(rsp) != 0) {
++        if (ram_init_all(rsp) != 0) {
+             return -1;
+         }
+     }
+-- 
+2.13.5
