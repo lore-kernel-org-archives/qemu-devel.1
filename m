@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33636)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34397)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1e52HH-0004za-98
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 00:17:52 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1e52Pe-0006If-UC
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 00:26:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1e52HC-000437-9P
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 00:17:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52970)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1e52HC-00041Z-0V
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 00:17:46 -0400
-Date: Thu, 19 Oct 2017 12:17:37 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20171019041737.GS4166@pxdev.xzpeter.org>
-References: <20171018174013.22709-1-dgilbert@redhat.com>
-	<20171018174013.22709-2-dgilbert@redhat.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1e52PZ-00089F-Vp
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 00:26:30 -0400
+Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:54258)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1e52PZ-00088o-QX
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 00:26:25 -0400
+Received: by mail-qt0-x241.google.com with SMTP id n61so12964330qte.10
+	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 21:26:24 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1508006342-5304-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<1508006342-5304-2-git-send-email-mark.cave-ayland@ilande.co.uk>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <318e5572-0ad0-0ae3-f26e-61c6a9c3aa93@amsat.org>
+Date: Thu, 19 Oct 2017 01:26:20 -0300
 MIME-Version: 1.0
+In-Reply-To: <1508006342-5304-2-git-send-email-mark.cave-ayland@ilande.co.uk>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20171018174013.22709-2-dgilbert@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 1/7] migration: Add
- 'pause-before-switchover' capability
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCHv3 01/13] sparc32_dma: rename SPARC32_DMA
+ type to SPARC32_DMA_DEVICE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,91 +36,227 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, jdenemar@redhat.com, wangjie88@huawei.com, quintela@redhat.com, mreitz@redhat.com, berrange@redhat.com, eblake@redhat.com, fuweiwei2@huawei.com
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, atar4qemu@gmail.com
 
-On Wed, Oct 18, 2017 at 06:40:07PM +0100, Dr. David Alan Gilbert (git) wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Hi Mark,
+
+On 10/14/2017 03:38 PM, Mark Cave-Ayland wrote:
+> Also update the function names to match as appropriate. While we're
+> here rename the type from sparc32_dma to sparc32-dma in order to
+> match the current QOM convention.
+
+Where can I read on the QOM convention?
+
 > 
-> When 'pause-before-switchover' is enabled, the outgoing migration
-> will pause before invalidating the block devices and serializing
-> the device state.
-> At this point the management layer gets the chance to clean up any
-> device jobs or other device users before the migration completes.
-> 
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 > ---
->  migration/migration.c | 10 ++++++++++
->  migration/migration.h |  1 +
->  qapi/migration.json   |  5 ++++-
->  3 files changed, 15 insertions(+), 1 deletion(-)
+>  hw/dma/sparc32_dma.c |   67 +++++++++++++++++++++++++-------------------------
+>  hw/sparc/sun4m.c     |    2 +-
+>  2 files changed, 35 insertions(+), 34 deletions(-)
 > 
-> diff --git a/migration/migration.c b/migration/migration.c
-> index 98429dc843..fba3342368 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -1521,6 +1521,16 @@ bool migrate_use_multifd(void)
->      return s->enabled_capabilities[MIGRATION_CAPABILITY_X_MULTIFD];
+> diff --git a/hw/dma/sparc32_dma.c b/hw/dma/sparc32_dma.c
+> index eb491b5..a8d31c1 100644
+> --- a/hw/dma/sparc32_dma.c
+> +++ b/hw/dma/sparc32_dma.c
+> @@ -61,12 +61,13 @@
+>  /* XXX SCSI and ethernet should have different read-only bit masks */
+>  #define DMA_CSR_RO_MASK 0xfe000007
+>  
+> -#define TYPE_SPARC32_DMA "sparc32_dma"
+> -#define SPARC32_DMA(obj) OBJECT_CHECK(DMAState, (obj), TYPE_SPARC32_DMA)
+> +#define TYPE_SPARC32_DMA_DEVICE "sparc32-dma-device"
+> +#define SPARC32_DMA_DEVICE(obj) OBJECT_CHECK(DMADeviceState, (obj), \
+
+not sure this is an improvement.
+
+> +                                             TYPE_SPARC32_DMA_DEVICE)
+>  
+> -typedef struct DMAState DMAState;
+> +typedef struct DMADeviceState DMADeviceState;
+>  
+> -struct DMAState {
+> +struct DMADeviceState {
+>      SysBusDevice parent_obj;
+>  
+>      MemoryRegion iomem;
+> @@ -86,7 +87,7 @@ enum {
+>  void ledma_memory_read(void *opaque, hwaddr addr,
+>                         uint8_t *buf, int len, int do_bswap)
+>  {
+> -    DMAState *s = opaque;
+> +    DMADeviceState *s = opaque;
+>      int i;
+>  
+>      addr |= s->dmaregs[3];
+> @@ -106,7 +107,7 @@ void ledma_memory_read(void *opaque, hwaddr addr,
+>  void ledma_memory_write(void *opaque, hwaddr addr,
+>                          uint8_t *buf, int len, int do_bswap)
+>  {
+> -    DMAState *s = opaque;
+> +    DMADeviceState *s = opaque;
+>      int l, i;
+>      uint16_t tmp_buf[32];
+>  
+> @@ -134,7 +135,7 @@ void ledma_memory_write(void *opaque, hwaddr addr,
+>  
+>  static void dma_set_irq(void *opaque, int irq, int level)
+>  {
+> -    DMAState *s = opaque;
+> +    DMADeviceState *s = opaque;
+>      if (level) {
+>          s->dmaregs[0] |= DMA_INTR;
+>          if (s->dmaregs[0] & DMA_INTREN) {
+> @@ -154,7 +155,7 @@ static void dma_set_irq(void *opaque, int irq, int level)
+>  
+>  void espdma_memory_read(void *opaque, uint8_t *buf, int len)
+>  {
+> -    DMAState *s = opaque;
+> +    DMADeviceState *s = opaque;
+>  
+>      trace_espdma_memory_read(s->dmaregs[1]);
+>      sparc_iommu_memory_read(s->iommu, s->dmaregs[1], buf, len);
+> @@ -163,7 +164,7 @@ void espdma_memory_read(void *opaque, uint8_t *buf, int len)
+>  
+>  void espdma_memory_write(void *opaque, uint8_t *buf, int len)
+>  {
+> -    DMAState *s = opaque;
+> +    DMADeviceState *s = opaque;
+>  
+>      trace_espdma_memory_write(s->dmaregs[1]);
+>      sparc_iommu_memory_write(s->iommu, s->dmaregs[1], buf, len);
+> @@ -173,7 +174,7 @@ void espdma_memory_write(void *opaque, uint8_t *buf, int len)
+>  static uint64_t dma_mem_read(void *opaque, hwaddr addr,
+>                               unsigned size)
+>  {
+> -    DMAState *s = opaque;
+> +    DMADeviceState *s = opaque;
+>      uint32_t saddr;
+>  
+>      if (s->is_ledma && (addr > DMA_MAX_REG_OFFSET)) {
+> @@ -190,7 +191,7 @@ static uint64_t dma_mem_read(void *opaque, hwaddr addr,
+>  static void dma_mem_write(void *opaque, hwaddr addr,
+>                            uint64_t val, unsigned size)
+>  {
+> -    DMAState *s = opaque;
+> +    DMADeviceState *s = opaque;
+>      uint32_t saddr;
+>  
+>      if (s->is_ledma && (addr > DMA_MAX_REG_OFFSET)) {
+> @@ -252,28 +253,28 @@ static const MemoryRegionOps dma_mem_ops = {
+>      },
+>  };
+>  
+> -static void dma_reset(DeviceState *d)
+> +static void sparc32_dma_device_reset(DeviceState *d)
+>  {
+> -    DMAState *s = SPARC32_DMA(d);
+> +    DMADeviceState *s = SPARC32_DMA_DEVICE(d);
+>  
+>      memset(s->dmaregs, 0, DMA_SIZE);
+>      s->dmaregs[0] = DMA_VER;
 >  }
 >  
-> +bool migrate_pause_before_switchover(void)
-> +{
-> +    MigrationState *s;
-> +
-> +    s = migrate_get_current();
-> +
-> +    return s->enabled_capabilities[
-> +        MIGRATION_CAPABILITY_PAUSE_BEFORE_SWITCHOVER];
-> +}
-> +
->  int migrate_multifd_channels(void)
+> -static const VMStateDescription vmstate_dma = {
+> +static const VMStateDescription vmstate_sparc32_dma_device = {
+>      .name ="sparc32_dma",
+>      .version_id = 2,
+>      .minimum_version_id = 2,
+>      .fields = (VMStateField[]) {
+> -        VMSTATE_UINT32_ARRAY(dmaregs, DMAState, DMA_REGS),
+> +        VMSTATE_UINT32_ARRAY(dmaregs, DMADeviceState, DMA_REGS),
+>          VMSTATE_END_OF_LIST()
+>      }
+>  };
+>  
+> -static void sparc32_dma_init(Object *obj)
+> +static void sparc32_dma_device_init(Object *obj)
 >  {
->      MigrationState *s;
-> diff --git a/migration/migration.h b/migration/migration.h
-> index b83cceadc4..969866303e 100644
-> --- a/migration/migration.h
-> +++ b/migration/migration.h
-> @@ -177,6 +177,7 @@ bool migrate_zero_blocks(void);
+>      DeviceState *dev = DEVICE(obj);
+> -    DMAState *s = SPARC32_DMA(obj);
+> +    DMADeviceState *s = SPARC32_DMA_DEVICE(obj);
+>      SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
 >  
->  bool migrate_auto_converge(void);
->  bool migrate_use_multifd(void);
-> +bool migrate_pause_before_switchover(void);
->  int migrate_multifd_channels(void);
->  int migrate_multifd_page_count(void);
+>      sysbus_init_irq(sbd, &s->irq);
+> @@ -284,9 +285,9 @@ static void sparc32_dma_init(Object *obj)
+>      qdev_init_gpio_out(dev, s->gpio, 2);
+>  }
 >  
-> diff --git a/qapi/migration.json b/qapi/migration.json
-> index f8b365e3f5..4960231ba2 100644
-> --- a/qapi/migration.json
-> +++ b/qapi/migration.json
-> @@ -341,6 +341,9 @@
->  # @return-path: If enabled, migration will use the return path even
->  #               for precopy. (since 2.10)
->  #
-> +# @pause-before-switchover: Pause outgoing migration before serialising device
-> +#          state and before disabling block IO (since 2.11)
-
-Nit: Not sure whether it's good to avoid naming "disabling block IO",
-since after all this pre-switch state can be used to do other things
-as well in the future.
-
-Reviewed-by: Peter Xu <peterx@redhat.com>
-
-> +#
->  # @x-multifd: Use more than one fd for migration (since 2.11)
->  #
->  # Since: 1.2
-> @@ -348,7 +351,7 @@
->  { 'enum': 'MigrationCapability',
->    'data': ['xbzrle', 'rdma-pin-all', 'auto-converge', 'zero-blocks',
->             'compress', 'events', 'postcopy-ram', 'x-colo', 'release-ram',
-> -           'block', 'return-path', 'x-multifd' ] }
-> +           'block', 'return-path', 'pause-before-switchover', 'x-multifd' ] }
+> -static void sparc32_dma_realize(DeviceState *dev, Error **errp)
+> +static void sparc32_dma_device_realize(DeviceState *dev, Error **errp)
+>  {
+> -    DMAState *s = SPARC32_DMA(dev);
+> +    DMADeviceState *s = SPARC32_DMA_DEVICE(dev);
+>      int reg_size;
 >  
->  ##
->  # @MigrationCapabilityStatus:
-> -- 
-> 2.13.6
+>      reg_size = s->is_ledma ? DMA_ETH_SIZE : DMA_SIZE;
+> @@ -294,35 +295,35 @@ static void sparc32_dma_realize(DeviceState *dev, Error **errp)
+>                            "dma", reg_size);
+>  }
+>  
+> -static Property sparc32_dma_properties[] = {
+> -    DEFINE_PROP_PTR("iommu_opaque", DMAState, iommu),
+> -    DEFINE_PROP_UINT32("is_ledma", DMAState, is_ledma, 0),
+> +static Property sparc32_dma_device_properties[] = {
+> +    DEFINE_PROP_PTR("iommu_opaque", DMADeviceState, iommu),
+> +    DEFINE_PROP_UINT32("is_ledma", DMADeviceState, is_ledma, 0),
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+>  
+> -static void sparc32_dma_class_init(ObjectClass *klass, void *data)
+> +static void sparc32_dma_device_class_init(ObjectClass *klass, void *data)
+>  {
+>      DeviceClass *dc = DEVICE_CLASS(klass);
+>  
+> -    dc->reset = dma_reset;
+> -    dc->vmsd = &vmstate_dma;
+> -    dc->props = sparc32_dma_properties;
+> -    dc->realize = sparc32_dma_realize;
+> +    dc->reset = sparc32_dma_device_reset;
+> +    dc->vmsd = &vmstate_sparc32_dma_device;
+> +    dc->props = sparc32_dma_device_properties;
+> +    dc->realize = sparc32_dma_device_realize;
+>      /* Reason: pointer property "iommu_opaque" */
+>      dc->user_creatable = false;
+>  }
+>  
+> -static const TypeInfo sparc32_dma_info = {
+> -    .name          = TYPE_SPARC32_DMA,
+> +static const TypeInfo sparc32_dma_device_info = {
+> +    .name          = TYPE_SPARC32_DMA_DEVICE,
+>      .parent        = TYPE_SYS_BUS_DEVICE,
+> -    .instance_size = sizeof(DMAState),
+> -    .instance_init = sparc32_dma_init,
+> -    .class_init    = sparc32_dma_class_init,
+> +    .instance_size = sizeof(DMADeviceState),
+> +    .instance_init = sparc32_dma_device_init,
+> +    .class_init    = sparc32_dma_device_class_init,
+>  };
+>  
+>  static void sparc32_dma_register_types(void)
+>  {
+> -    type_register_static(&sparc32_dma_info);
+> +    type_register_static(&sparc32_dma_device_info);
+>  }
+>  
+>  type_init(sparc32_dma_register_types)
+> diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
+> index e1bdd48..82c553c 100644
+> --- a/hw/sparc/sun4m.c
+> +++ b/hw/sparc/sun4m.c
+> @@ -313,7 +313,7 @@ static void *sparc32_dma_init(hwaddr daddr, qemu_irq parent_irq,
+>      DeviceState *dev;
+>      SysBusDevice *s;
+>  
+> -    dev = qdev_create(NULL, "sparc32_dma");
+> +    dev = qdev_create(NULL, "sparc32-dma-device");
+
+Can you use TYPE_SPARC32_DMA_DEVICE instead here?
+
+>      qdev_prop_set_ptr(dev, "iommu_opaque", iommu);
+>      qdev_prop_set_uint32(dev, "is_ledma", is_ledma);
+>      qdev_init_nofail(dev);
 > 
 
--- 
-Peter Xu
+Regards,
+
+Phil.
