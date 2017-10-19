@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35239)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35448)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e52WK-0000dP-8X
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 00:33:29 -0400
+	(envelope-from <peterx@redhat.com>) id 1e52XV-0001Fy-9G
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 00:34:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e52WG-00046Q-9X
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 00:33:24 -0400
-Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:54335)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e52WG-00044i-44
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 00:33:20 -0400
-Received: by mail-qk0-x243.google.com with SMTP id n5so8912769qke.11
-	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 21:33:20 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1508006342-5304-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<1508006342-5304-3-git-send-email-mark.cave-ayland@ilande.co.uk>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <fab45917-6f63-c2d2-8875-cb33b09f9bc8@amsat.org>
-Date: Thu, 19 Oct 2017 01:33:15 -0300
+	(envelope-from <peterx@redhat.com>) id 1e52XR-0005Xa-5P
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 00:34:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58720)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1e52XQ-0005W8-V2
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 00:34:33 -0400
+Date: Thu, 19 Oct 2017 12:34:26 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20171019043426.GB7850@pxdev.xzpeter.org>
+References: <20171018174013.22709-1-dgilbert@redhat.com>
+	<20171018174013.22709-3-dgilbert@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1508006342-5304-3-git-send-email-mark.cave-ayland@ilande.co.uk>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCHv3 02/13] sparc32_dma: split esp and le into
- separate DMA devices
+Content-Disposition: inline
+In-Reply-To: <20171018174013.22709-3-dgilbert@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 2/7] migration: Add 'pre-switchover' and
+ 'device' statuses
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,145 +28,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, atar4qemu@gmail.com
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, jdenemar@redhat.com, wangjie88@huawei.com, quintela@redhat.com, mreitz@redhat.com, berrange@redhat.com, eblake@redhat.com, fuweiwei2@huawei.com
 
-On 10/14/2017 03:38 PM, Mark Cave-Ayland wrote:
-> Due to slight differences in behaviour accessing the registers for the
-> esp and le devices, create two separate SPARC32_DMA_DEVICE types and
-> update the sun4m machine to use.
+On Wed, Oct 18, 2017 at 06:40:08PM +0100, Dr. David Alan Gilbert (git) wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 > 
-> Note that by using different device types we already know the size of
-> the register block and the value of is_ledma at init time, allowing us to
-> drop the SPARC32_DMA_DEVICE realize function and the is_ledma device
-> property.
+> Add two statuses for use when the 'pause-before-switchover'
+> capability is enabled.
 > 
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> ---
->  hw/dma/sparc32_dma.c |   63 ++++++++++++++++++++++++++++++++++++++++----------
->  hw/sparc/sun4m.c     |    3 +--
->  2 files changed, 52 insertions(+), 14 deletions(-)
+> 'pre-switchover' is the state that we wait in for management
+> to allow us to continue.
+> 'device' is the state we enter while serialising the devices
+> after management gives us the OK.
 > 
-> diff --git a/hw/dma/sparc32_dma.c b/hw/dma/sparc32_dma.c
-> index a8d31c1..e4ff4a8 100644
-> --- a/hw/dma/sparc32_dma.c
-> +++ b/hw/dma/sparc32_dma.c
-> @@ -78,6 +78,22 @@ struct DMADeviceState {
->      uint32_t is_ledma;
->  };
->  
-> +#define TYPE_SPARC32_ESPDMA_DEVICE "sparc32-espdma"
-> +#define SPARC32_ESPDMA_DEVICE(obj) OBJECT_CHECK(ESPDMADeviceState, (obj), \
-> +                                                TYPE_SPARC32_ESPDMA_DEVICE)
-> +
-> +typedef struct ESPDMADeviceState {
-> +    DMADeviceState parent_obj;
-> +} ESPDMADeviceState;
-> +
-> +#define TYPE_SPARC32_LEDMA_DEVICE "sparc32-ledma"
-> +#define SPARC32_LEDMA_DEVICE(obj) OBJECT_CHECK(LEDMADeviceState, (obj), \
-> +                                               TYPE_SPARC32_LEDMA_DEVICE)
-> +
-> +typedef struct LEDMADeviceState {
-> +    DMADeviceState parent_obj;
-> +} LEDMADeviceState;
-> +
->  enum {
->      GPIO_RESET = 0,
->      GPIO_DMA,
-> @@ -285,19 +301,8 @@ static void sparc32_dma_device_init(Object *obj)
->      qdev_init_gpio_out(dev, s->gpio, 2);
->  }
->  
-> -static void sparc32_dma_device_realize(DeviceState *dev, Error **errp)
-> -{
-> -    DMADeviceState *s = SPARC32_DMA_DEVICE(dev);
-> -    int reg_size;
-> -
-> -    reg_size = s->is_ledma ? DMA_ETH_SIZE : DMA_SIZE;
-> -    memory_region_init_io(&s->iomem, OBJECT(dev), &dma_mem_ops, s,
-> -                          "dma", reg_size);
-> -}
-> -
->  static Property sparc32_dma_device_properties[] = {
->      DEFINE_PROP_PTR("iommu_opaque", DMADeviceState, iommu),
-> -    DEFINE_PROP_UINT32("is_ledma", DMADeviceState, is_ledma, 0),
->      DEFINE_PROP_END_OF_LIST(),
->  };
->  
-> @@ -308,7 +313,6 @@ static void sparc32_dma_device_class_init(ObjectClass *klass, void *data)
->      dc->reset = sparc32_dma_device_reset;
->      dc->vmsd = &vmstate_sparc32_dma_device;
->      dc->props = sparc32_dma_device_properties;
-> -    dc->realize = sparc32_dma_device_realize;
->      /* Reason: pointer property "iommu_opaque" */
->      dc->user_creatable = false;
->  }
-> @@ -316,14 +320,49 @@ static void sparc32_dma_device_class_init(ObjectClass *klass, void *data)
->  static const TypeInfo sparc32_dma_device_info = {
->      .name          = TYPE_SPARC32_DMA_DEVICE,
->      .parent        = TYPE_SYS_BUS_DEVICE,
-> +    .abstract      = true,
->      .instance_size = sizeof(DMADeviceState),
->      .instance_init = sparc32_dma_device_init,
->      .class_init    = sparc32_dma_device_class_init,
->  };
->  
-> +static void sparc32_espdma_device_init(Object *obj)
-> +{
-> +    DMADeviceState *s = SPARC32_DMA_DEVICE(obj);
-> +
-> +    memory_region_init_io(&s->iomem, OBJECT(s), &dma_mem_ops, s,
-> +                          "espdma-mmio", DMA_SIZE);
-> +    s->is_ledma = 0;
-> +}
-> +
-> +static const TypeInfo sparc32_espdma_device_info = {
-> +    .name          = TYPE_SPARC32_ESPDMA_DEVICE,
-> +    .parent        = TYPE_SPARC32_DMA_DEVICE,
-> +    .instance_size = sizeof(ESPDMADeviceState),
-> +    .instance_init = sparc32_espdma_device_init,
-> +};
-> +
-> +static void sparc32_ledma_device_init(Object *obj)
-> +{
-> +    DMADeviceState *s = SPARC32_DMA_DEVICE(obj);
-> +
-> +    memory_region_init_io(&s->iomem, OBJECT(s), &dma_mem_ops, s,
-> +                          "ledma-mmio", DMA_ETH_SIZE);
-> +    s->is_ledma = 1;
-> +}
-> +
-> +static const TypeInfo sparc32_ledma_device_info = {
-> +    .name          = TYPE_SPARC32_LEDMA_DEVICE,
-> +    .parent        = TYPE_SPARC32_DMA_DEVICE,
-> +    .instance_size = sizeof(LEDMADeviceState),
-> +    .instance_init = sparc32_ledma_device_init,
-> +};
-> +
->  static void sparc32_dma_register_types(void)
->  {
->      type_register_static(&sparc32_dma_device_info);
-> +    type_register_static(&sparc32_espdma_device_info);
-> +    type_register_static(&sparc32_ledma_device_info);
->  }
->  
->  type_init(sparc32_dma_register_types)
-> diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
-> index 82c553c..88a9752 100644
-> --- a/hw/sparc/sun4m.c
-> +++ b/hw/sparc/sun4m.c
-> @@ -313,9 +313,8 @@ static void *sparc32_dma_init(hwaddr daddr, qemu_irq parent_irq,
->      DeviceState *dev;
->      SysBusDevice *s;
->  
-> -    dev = qdev_create(NULL, "sparc32-dma-device");
-> +    dev = qdev_create(NULL, is_ledma ? "sparc32-ledma" : "sparc32-espdma");
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-TYPE_SPARC32_LEDMA_DEVICE and TYPE_SPARC32_ESPDMA_DEVICE?
+I proposed another naming in cover letter, but this one is ok to me as
+well.  For either case:
 
->      qdev_prop_set_ptr(dev, "iommu_opaque", iommu);
-> -    qdev_prop_set_uint32(dev, "is_ledma", is_ledma);
->      qdev_init_nofail(dev);
->      s = SYS_BUS_DEVICE(dev);
->      sysbus_connect_irq(s, 0, parent_irq);
-> 
+Reviewed-by: Peter Xu <peterx@redhat.com>
+
+-- 
+Peter Xu
