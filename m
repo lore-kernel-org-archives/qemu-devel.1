@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43513)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43526)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1e57gl-0002la-6J
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 06:04:32 -0400
+	(envelope-from <clg@kaod.org>) id 1e57go-0002nN-Ly
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 06:04:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1e57gf-0007pc-BQ
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 06:04:31 -0400
-Received: from 5.mo5.mail-out.ovh.net ([87.98.173.103]:44150)
+	(envelope-from <clg@kaod.org>) id 1e57gk-0007wA-Mf
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 06:04:34 -0400
+Received: from 17.mo5.mail-out.ovh.net ([46.105.56.132]:43800)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1e57gf-0007nj-5g
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 06:04:25 -0400
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1e57gk-0007v6-GW
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 06:04:30 -0400
 Received: from player786.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 59D11145A05
-	for <qemu-devel@nongnu.org>; Thu, 19 Oct 2017 12:04:22 +0200 (CEST)
+	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 103A7145A18
+	for <qemu-devel@nongnu.org>; Thu, 19 Oct 2017 12:04:29 +0200 (CEST)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Thu, 19 Oct 2017 12:04:02 +0200
-Message-Id: <20171019100410.26239-1-clg@kaod.org>
+Date: Thu, 19 Oct 2017 12:04:03 +0200
+Message-Id: <20171019100410.26239-2-clg@kaod.org>
+In-Reply-To: <20171019100410.26239-1-clg@kaod.org>
+References: <20171019100410.26239-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 0/8] aspeed: add a witherspoon-bmc machine
+Subject: [Qemu-devel] [PATCH v4 1/8] aspeed: introduce a dummy ROM device to
+ catch invalid writes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,61 +33,69 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>
 Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, Andrew Jeffery <andrew@aj.id.au>, Joel Stanley <joel@jms.id.au>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-Hello,
+Some legacy firmwares access unimplemented addresses on the Aspeed SoC
+(old U-Boot code using variables in the bss when it shouldn't do).
+Let's add a dummy ROM device to catch the invalid writes and support
+new board without using the 'ignore_memory_transaction_failures' flags.
 
-This series adds a new Aspeed machine to emulate the BMC of a
-Witherspoon system. It also extends the other Aspeed machines with I2C
-devices and adds a simple model for the pca9552 LED blinker present on
-the witherspoon board.
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+---
+ hw/arm/aspeed.c | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
 
-Thanks,
-
-C.
-
-Changes since v3:
-
- - introduce a dummy ROM device to catch invalid writes
- - removed 'ignore_memory_transaction_failures' on all Aspeed machines
- - reworked PCA9552 device :
-   . simpler I2C handles
-   . auto-increment support
-   . unit test
-
-Changes since v2:
-
- - removed comments on the I2C buffer size pf the PCA9552 device.
- - removed 'ignore_memory_transaction_failures' flag on the
-   witherspoon machine.
-  =20
-Changes since v1:
-
- - introduced smbus_eeprom_init_one()
-
-
-C=C3=A9dric Le Goater (8):
-  aspeed: introduce a dummy ROM device to catch invalid writes
-  aspeed: remove ignore_memory_transaction_failures on all boards
-  aspeed: add support for the witherspoon-bmc board
-  aspeed: add an I2C RTC device to all machines
-  smbus: add a smbus_eeprom_init_one() routine
-  aspeed: Add EEPROM I2C devices
-  misc: add pca9552 LED blinker model
-  aspeed: add the pc9552 chips to the witherspoon machine
-
- default-configs/arm-softmmu.mak |   1 +
- hw/arm/aspeed.c                 | 112 ++++++++++++++++-
- hw/i2c/smbus_eeprom.c           |  16 ++-
- hw/misc/Makefile.objs           |   1 +
- hw/misc/pca9552.c               | 259 ++++++++++++++++++++++++++++++++++=
-++++++
- include/hw/i2c/smbus.h          |   1 +
- include/hw/misc/pca9552.h       |  33 +++++
- tests/Makefile.include          |   2 +
- tests/pca9552-test.c            | 131 ++++++++++++++++++++
- 9 files changed, 548 insertions(+), 8 deletions(-)
- create mode 100644 hw/misc/pca9552.c
- create mode 100644 include/hw/misc/pca9552.h
- create mode 100644 tests/pca9552-test.c
-
+diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
+index ab895ad490af..e44733153819 100644
+--- a/hw/arm/aspeed.c
++++ b/hw/arm/aspeed.c
+@@ -166,6 +166,19 @@ static void aspeed_board_init_flashes(AspeedSMCState=
+ *s, const char *flashtype,
+     }
+ }
+=20
++static void boot_rom_rw_flash_write(void *opaque, hwaddr offset, uint64_=
+t value,
++                              unsigned size)
++{
++    qemu_log_mask(LOG_GUEST_ERROR,
++                  "%s: 0x%" HWADDR_PRIx " <- 0x%" PRIx64 " [%u]\n",
++                  __func__, offset, value, size);
++}
++
++static const MemoryRegionOps boot_rom_rw_flash_ops =3D {
++    .write =3D boot_rom_rw_flash_write,
++    .endianness =3D DEVICE_NATIVE_ENDIAN,
++};
++
+ static void aspeed_board_init(MachineState *machine,
+                               const AspeedBoardConfig *cfg)
+ {
+@@ -209,6 +222,7 @@ static void aspeed_board_init(MachineState *machine,
+     if (drive0) {
+         AspeedSMCFlash *fl =3D &bmc->soc.fmc.flashes[0];
+         MemoryRegion *boot_rom =3D g_new(MemoryRegion, 1);
++        MemoryRegion *boot_rom_rw =3D  g_new(MemoryRegion, 1);
+=20
+         /*
+          * create a ROM region using the default mapping window size of
+@@ -221,6 +235,16 @@ static void aspeed_board_init(MachineState *machine,
+         memory_region_add_subregion(get_system_memory(), FIRMWARE_ADDR,
+                                     boot_rom);
+         write_boot_rom(drive0, FIRMWARE_ADDR, fl->size, &error_abort);
++
++        /*
++         * Create a fake ROM region to track invalid writes done by
++         * some legacy firmwares
++         */
++        memory_region_init_rom_device(boot_rom_rw, NULL, &boot_rom_rw_fl=
+ash_ops,
++                                      NULL, "aspeed.boot_rom_rw", fl->si=
+ze,
++                                      &error_abort);
++        memory_region_add_subregion_overlap(get_system_memory(), FIRMWAR=
+E_ADDR,
++                                            boot_rom_rw, 0);
+     }
+=20
+     aspeed_board_binfo.kernel_filename =3D machine->kernel_filename;
 --=20
 2.13.6
