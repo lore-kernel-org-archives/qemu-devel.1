@@ -1,25 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40421)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41308)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1e55Wl-0001tx-KU
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 03:46:08 -0400
+	(envelope-from <rjones@redhat.com>) id 1e55bD-0002sa-Ok
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 03:50:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1e55Wi-00078X-Go
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 03:46:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35368)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <rjones@redhat.com>) id 1e55Wi-00077p-A5
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 03:46:00 -0400
-Date: Thu, 19 Oct 2017 08:45:56 +0100
+	(envelope-from <rjones@redhat.com>) id 1e55bA-0000jz-Lz
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 03:50:39 -0400
 From: "Richard W.M. Jones" <rjones@redhat.com>
-Message-ID: <20171019074556.GC18719@redhat.com>
-References: <1506683421-27004-1-git-send-email-amarnath.valluri@intel.com>
-	<1506683421-27004-10-git-send-email-amarnath.valluri@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1506683421-27004-10-git-send-email-amarnath.valluri@intel.com>
-Subject: Re: [Qemu-devel] [PATCH v10 9/9] tpm: Move tpm_cleanup() to right
- place
+Date: Thu, 19 Oct 2017 08:50:31 +0100
+Message-Id: <20171019075031.25507-1-rjones@redhat.com>
+Subject: [Qemu-devel] [PATCH] tpm: Don't call tpm_cleanup unless CONFIG_TPM.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,53 +17,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Amarnath Valluri <amarnath.valluri@intel.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, marcandre.lureau@gmail.com, stefanb@linux.vnet.ibm.com
+To: qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, amarnath.valluri@intel.com, pbonzini@redhat.com, marcandre.lureau@gmail.com, stefanb@linux.vnet.ibm.com
 
+When compiling with --disable-tpm:
 
-On Fri, Sep 29, 2017 at 02:10:21PM +0300, Amarnath Valluri wrote:
-> As Emulator TPM backend uses chardev, tpm cleanup should happen before chardev
-> similar to other vhost-users.
-> 
-> Signed-off-by: Amarnath Valluri <amarnath.valluri@intel.com>
-> ---
->  tpm.c | 1 -
->  vl.c  | 1 +
->  2 files changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/tpm.c b/tpm.c
-> index 3b8c7ed..3122227 100644
-> --- a/tpm.c
-> +++ b/tpm.c
-> @@ -172,7 +172,6 @@ int tpm_init(void)
->          return -1;
->      }
->  
-> -    atexit(tpm_cleanup);
->      return 0;
->  }
->  
-> diff --git a/vl.c b/vl.c
-> index 9bb5058..ed86209 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -4893,6 +4893,7 @@ int main(int argc, char **argv, char **envp)
->      res_free();
->  
->      /* vhost-user must be cleaned up before chardevs.  */
-> +    tpm_cleanup();
->      net_cleanup();
->      audio_cleanup();
->      monitor_cleanup();
+  ../vl.o: In function `main':
+  /home/rjones/d/qemu/vl.c:4908: undefined reference to `tpm_cleanup'
 
-This breaks compilation with --disable-tpm.  I'll post a trivial
-patch shortly.
+This appears to have been introduced in commit c37cacabf228
+("tpm: Move tpm_cleanup() to right place").
 
-Rich.
+Signed-off-by: Richard W.M. Jones <rjones@redhat.com>
+---
+ vl.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
+diff --git a/vl.c b/vl.c
+index 0723835bbf..dbfd06d4bc 100644
+--- a/vl.c
++++ b/vl.c
+@@ -4905,7 +4905,9 @@ int main(int argc, char **argv, char **envp)
+     res_free();
+ 
+     /* vhost-user must be cleaned up before chardevs.  */
++#ifdef CONFIG_TPM
+     tpm_cleanup();
++#endif
+     net_cleanup();
+     audio_cleanup();
+     monitor_cleanup();
 -- 
-Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
-Read my programming and virtualization blog: http://rwmj.wordpress.com
-virt-df lists disk usage of guests without needing to install any
-software inside the virtual machine.  Supports Linux and Windows.
-http://people.redhat.com/~rjones/virt-df/
+2.13.1
