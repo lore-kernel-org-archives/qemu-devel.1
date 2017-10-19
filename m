@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56778)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33636)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1e51b3-0008Lt-GW
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 23:34:14 -0400
+	(envelope-from <peterx@redhat.com>) id 1e52HH-0004za-98
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 00:17:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1e51az-0002gC-CM
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 23:34:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47078)
+	(envelope-from <peterx@redhat.com>) id 1e52HC-000437-9P
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 00:17:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52970)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1e51az-0002fk-2I
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 23:34:09 -0400
-Date: Thu, 19 Oct 2017 11:33:59 +0800
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1e52HC-00041Z-0V
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 00:17:46 -0400
+Date: Thu, 19 Oct 2017 12:17:37 +0800
 From: Peter Xu <peterx@redhat.com>
-Message-ID: <20171019033359.GR4166@pxdev.xzpeter.org>
-References: <a41b88a6-4882-1abc-b6e2-e42acf03c198@oracle.com>
-	<20171013170143.GB3370@work-vm>
-	<20171013111403.293919fe@t450s.home>
-	<20171015035318.GA22780@pxdev.xzpeter.org>
-	<c4d07be9-7d9b-71fa-e84c-e393138f7a84@oracle.com>
-	<20171017035604.GJ4166@pxdev.xzpeter.org>
-	<2c478fc6-bb9a-3ac3-1f5d-c853b13dc8a1@oracle.com>
+Message-ID: <20171019041737.GS4166@pxdev.xzpeter.org>
+References: <20171018174013.22709-1-dgilbert@redhat.com>
+	<20171018174013.22709-2-dgilbert@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <2c478fc6-bb9a-3ac3-1f5d-c853b13dc8a1@oracle.com>
-Subject: Re: [Qemu-devel] host physical address width issues/questions for
- x86_64
+In-Reply-To: <20171018174013.22709-2-dgilbert@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 1/7] migration: Add
+ 'pause-before-switchover' capability
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,101 +28,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Prasad Singamsetty <prasad.singamsetty@oracle.com>
-Cc: Alex Williamson <alex.williamson@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org, pbonzini@redhat.com, Sunit Jain <sunit.jain@oracle.com>, ehabkost@redhat.com, rth@twiddle.net
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, jdenemar@redhat.com, wangjie88@huawei.com, quintela@redhat.com, mreitz@redhat.com, berrange@redhat.com, eblake@redhat.com, fuweiwei2@huawei.com
 
-On Wed, Oct 18, 2017 at 10:19:31AM -0700, Prasad Singamsetty wrote:
+On Wed, Oct 18, 2017 at 06:40:07PM +0100, Dr. David Alan Gilbert (git) wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 > 
+> When 'pause-before-switchover' is enabled, the outgoing migration
+> will pause before invalidating the block devices and serializing
+> the device state.
+> At this point the management layer gets the chance to clean up any
+> device jobs or other device users before the migration completes.
 > 
-> On 10/16/2017 8:56 PM, Peter Xu wrote:
-> >On Mon, Oct 16, 2017 at 10:02:25AM -0700, Prasad Singamsetty wrote:
-> >>
-> >>
-> >>On 10/14/2017 8:53 PM, Peter Xu wrote:
-> >>>On Fri, Oct 13, 2017 at 11:14:03AM -0600, Alex Williamson wrote:
-> >>>>On Fri, 13 Oct 2017 18:01:44 +0100
-> >>>>"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> >>>>
-> >>>>>* Prasad Singamsetty (prasad.singamsetty@oracle.com) wrote:
-> >>>>>>Hi,
-> >>>>>>
-> >>>>>>I am new to the alias. I have some questions on this subject
-> >>>>>>and seek some clarifications from the experts in the team.
-> >>>>>>I ran into a couple of issues when I tried with large configuration
-> >>>>>>( >= 1TB memory, > 255 CPUs) for x86_64 guest machine.
-> >>>>>>
-> >>>>>>1. QEMU uses the default value of 40 (TCG_PHYS_ADDR_BITS) for address
-> >>>>>>    width if user has not specified phys-bits or host-phys-bits=true
-> >>>>>>    property. The default value is obviously not sufficient and
-> >>>>>>    causing guest kernel to crash if configured with >= 1TB
-> >>>>>>    memory. Depending on the linux kernel version in the guest the
-> >>>>>>    panic was in different code paths. The workaround is for the
-> >>>>>>    user to specify the phys-bits property or set the property
-> >>>>>>    host-phys-bits=true.
-> >>>>>>
-> >>>>>>    QUESTIONS:
-> >>>>...
-> >>>>>>2. host_address_width in DMAR table structure
-> >>>>>>
-> >>>>>>    In this case, the default value is set to 39
-> >>>>>>    (VTD_HOST_ADDRESS_WIDTH - 1). With interrupt remapping
-> >>>>>>    enabled for the intel iommu and the guest is configured
-> >>>>>>    with > 255 cpus and >= 1TB memory, the guest kernel hangs
-> >>>>>>    during boot up. This need to be fixed.
-> >>>>>>
-> >>>>>>    QUESTION:
-> >>>>>>    The question here again is can we fix this to use the
-> >>>>>>    real address width from the host as the default?
-> >>>>>
-> >>>>>I don't know DMAR stuff; chatting to Alex (cc'd) it does sound
-> >>>>>like that's an ommission that should be fixed.
-> >>>>
-> >>>>[CC +Peter]
-> >>>>
-> >>>>On physical hardware VT-d supports either 39 or 48 bit address widths
-> >>>>and generally you'd expect a sufficiently capable IOMMU to be matched
-> >>>>with the CPU.  Seems QEMU has only implemented a lower bit width and
-> >>>>it should probably be forcing phys bits of the VM to 39 to match until
-> >>>>the extended width can be implemented.  Thanks,
-> >>>>
-> >>>>Alex
-> >>>
-> >>>There were patches that tried to enable 48 bits GAW but it was
-> >>>not accepted somehow:
-> >>>
-> >>>   https://lists.gnu.org/archive/html/qemu-devel/2016-12/msg01886.html
-> >>>
-> >>>Would this help in any way?
-> >>>
-> >>
-> >>Thanks Alex for the patch info. Just curious why the patch was not
-> >>accepted. Any way, I will try it.
-> >
-> >I don't sure I know the reason.  Anyway, it originated from one of
-> >Fam's request for some NVMe tests.  If it can really help for your use
-> >case as well, please feel free to revive those patches, or let me know
-> >so that I can respin.  Thanks,
-> >
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> ---
+>  migration/migration.c | 10 ++++++++++
+>  migration/migration.h |  1 +
+>  qapi/migration.json   |  5 ++++-
+>  3 files changed, 15 insertions(+), 1 deletion(-)
 > 
-> Thanks Peter. I will start with your patch and see if I can get
-> it to work first.
+> diff --git a/migration/migration.c b/migration/migration.c
+> index 98429dc843..fba3342368 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -1521,6 +1521,16 @@ bool migrate_use_multifd(void)
+>      return s->enabled_capabilities[MIGRATION_CAPABILITY_X_MULTIFD];
+>  }
+>  
+> +bool migrate_pause_before_switchover(void)
+> +{
+> +    MigrationState *s;
+> +
+> +    s = migrate_get_current();
+> +
+> +    return s->enabled_capabilities[
+> +        MIGRATION_CAPABILITY_PAUSE_BEFORE_SWITCHOVER];
+> +}
+> +
+>  int migrate_multifd_channels(void)
+>  {
+>      MigrationState *s;
+> diff --git a/migration/migration.h b/migration/migration.h
+> index b83cceadc4..969866303e 100644
+> --- a/migration/migration.h
+> +++ b/migration/migration.h
+> @@ -177,6 +177,7 @@ bool migrate_zero_blocks(void);
+>  
+>  bool migrate_auto_converge(void);
+>  bool migrate_use_multifd(void);
+> +bool migrate_pause_before_switchover(void);
+>  int migrate_multifd_channels(void);
+>  int migrate_multifd_page_count(void);
+>  
+> diff --git a/qapi/migration.json b/qapi/migration.json
+> index f8b365e3f5..4960231ba2 100644
+> --- a/qapi/migration.json
+> +++ b/qapi/migration.json
+> @@ -341,6 +341,9 @@
+>  # @return-path: If enabled, migration will use the return path even
+>  #               for precopy. (since 2.10)
+>  #
+> +# @pause-before-switchover: Pause outgoing migration before serialising device
+> +#          state and before disabling block IO (since 2.11)
+
+Nit: Not sure whether it's good to avoid naming "disabling block IO",
+since after all this pre-switch state can be used to do other things
+as well in the future.
+
+Reviewed-by: Peter Xu <peterx@redhat.com>
+
+> +#
+>  # @x-multifd: Use more than one fd for migration (since 2.11)
+>  #
+>  # Since: 1.2
+> @@ -348,7 +351,7 @@
+>  { 'enum': 'MigrationCapability',
+>    'data': ['xbzrle', 'rdma-pin-all', 'auto-converge', 'zero-blocks',
+>             'compress', 'events', 'postcopy-ram', 'x-colo', 'release-ram',
+> -           'block', 'return-path', 'x-multifd' ] }
+> +           'block', 'return-path', 'pause-before-switchover', 'x-multifd' ] }
+>  
+>  ##
+>  # @MigrationCapabilityStatus:
+> -- 
+> 2.13.6
 > 
-> A quick question. Looking at the code, it doesn't look like there
-> is a way to disable dma remapping. User may have a case where he
-> is interested only in interrupt remapping (for > 255 cpus) and
-> not DMA remapping. Is that scenario considered before?
-
-It can be done in the guest if the guest doesn't want DMAR.
-
-Note that there are two isolated kernel tunables for the VT-d device:
-
-- intel_iommu: "on" to turn on DMAR, "off" to turn off DMAR
-- intremap:    "on" to turn on IR, "off" to turn off IR
-
-So even if guest has "intel_iommu=off" in its boot parameter, IR will
-still be on by default (or specify it explicitly using "intremap=on").
-
-Thanks,
 
 -- 
 Peter Xu
