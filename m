@@ -1,27 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50927)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53258)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e5Bc2-0005lv-L1
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 10:15:55 -0400
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e5Bmv-0008By-Dv
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 10:27:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e5Bbw-0006Za-KK
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 10:15:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48864)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1e5Bbw-0006ZD-B3
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 10:15:48 -0400
-Date: Thu, 19 Oct 2017 15:15:41 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20171019141541.GS8408@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20171016131644.9565-1-kraxel@redhat.com>
-	<20171016131644.9565-2-kraxel@redhat.com>
-	<20171019140545.GA30324@perard.uk.xensource.com>
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e5Bms-0004FC-8p
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 10:27:09 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:58170)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
+	id 1e5Bmr-0004Eo-WC
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 10:27:06 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v9JEPx5O143533
+	for <qemu-devel@nongnu.org>; Thu, 19 Oct 2017 10:27:01 -0400
+Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2dpws1r74d-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 19 Oct 2017 10:27:00 -0400
+Received: from localhost
+	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
+	Thu, 19 Oct 2017 10:26:55 -0400
+References: <20171009225623.29232-1-marcandre.lureau@redhat.com>
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Date: Thu, 19 Oct 2017 10:26:52 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20171019140545.GA30324@perard.uk.xensource.com>
-Subject: Re: [Qemu-devel] [PULL 01/11] build: automatically handle GIT
- submodule checkout for dtc
+In-Reply-To: <20171009225623.29232-1-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Message-Id: <523bf8e7-0be0-0db9-83da-4e7d7449562f@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 00/42] TPM: code cleanup & CRB device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,69 +40,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anthony PERARD <anthony.perard@citrix.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+Cc: amarnath.valluri@intel.com
 
-On Thu, Oct 19, 2017 at 03:05:45PM +0100, Anthony PERARD wrote:
-> On Mon, Oct 16, 2017 at 03:16:34PM +0200, Gerd Hoffmann wrote:
-> > From: "Daniel P. Berrange" <berrange@redhat.com>
-> > 
-> > Currently if DTC is required by configure and not available in the host
-> > OS install, we exit with an error message telling the user to checkout a
-> > git submodule or install the library.
-> > 
-> > This introduces automatic handling of the git submodule checkout process
-> > and enables it for dtc. This only runs if building from GIT, so users of
-> > release tarballs still need the system library install. The current state
-> > of the git checkout is stashed in .git-submodule-status, and a helper
-> > program is used to determine if this state matches the desired submodule
-> > state. A dependency against 'Makefile' ensures that the submodule state
-> > is refreshed at the start of the build process
-> > 
-> > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> > Message-id: 20170929101201.21039-2-berrange@redhat.com
-> > 
-> > [ kraxel: use /bin/sh not bash for scripts/git-submodule.sh ]
-> > [ kraxel: fix Makefile dependencies ]
-> > 
-> > Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> > 
-> > [fixup] Makefile dep
-> > ---
-> 
-> > diff --git a/Makefile b/Makefile
-> > index 97b4508d7d..9866909e08 100644
-> > --- a/Makefile
-> > +++ b/Makefile
-> > @@ -14,6 +14,27 @@ ifneq ($(wildcard config-host.mak),)
-> >  all:
-> >  include config-host.mak
-> >  
-> > +git-submodule-update:
-> > +
-> > +.PHONY: git-submodule-update
-> > +
-> > +ifeq (0,$(MAKELEVEL))
-> 
+On 10/09/2017 06:55 PM, Marc-Andr=C3=A9 Lureau wrote:
 > Hi,
-> 
-> this new patch, and especialy the use MAKELEVEL here does not work when
-> we build Xen, since we build QEMU when building Xen.
-> 
-> When Xen is built, a clone of qemu.git is made, and then configure/make
-> is called. At this point, MAKELEVEL would already be set so
-> the makefile rule git-submodule-update would be empty.
-> 
-> Is it possible to do things differently in the QEMU makefiles? (Or do we
-> have to simply unset MAKELEVEL in xen makefiles before building qemu.)
+>
+> I accumulated a series of patch doing some TPM code cleanup while
+> doing review. I removed some dead code, simplified other parts, and
+> tried to isolate implementation of the backend and frontend by using a
+> new TPMIf interface. I solved a few issues, and added some FIXME for
+> what should be tackled.  Finally, I implemented a simple CRB device
+> (tpm 2.0) that is work in progress for now - it works fine with
+> passthrough, but swtpm/libtpms with win10 has some issues that need
+> more investigations.
+>
+> seabios CRB support is required for TPM 2.0 & emulation
+> (https://mail.coreboot.org/pipermail/seabios/2017-October/011839.html)
+>
+> Comments/review welcome!
 
-If it is practical from the Xen side, I think it would be preferrable
-to unset MAKELEVEL when jumping in to build QEMU, that way any part of
-QEMU makefiles can rely on MAKELEVEL being set normally.
+Are you going to post a v2 soon?
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+    Stefan
