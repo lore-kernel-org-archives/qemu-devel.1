@@ -1,38 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36360)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40708)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e5FAS-0007SE-DR
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 14:03:41 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1e5FNp-00039U-Mc
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 14:17:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e5FAL-0007QX-FD
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 14:03:40 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34030)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1e5FAL-0007OS-5I
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 14:03:33 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v9JI0KHF042817
-	for <qemu-devel@nongnu.org>; Thu, 19 Oct 2017 14:03:28 -0400
-Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2dpykvbh42-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 19 Oct 2017 14:03:28 -0400
-Received: from localhost
-	by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Thu, 19 Oct 2017 14:03:26 -0400
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Thu, 19 Oct 2017 14:02:39 -0400
-In-Reply-To: <1508436175-1596-1-git-send-email-stefanb@linux.vnet.ibm.com>
-References: <1508436175-1596-1-git-send-email-stefanb@linux.vnet.ibm.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1e5FNo-0000sI-T0
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 14:17:29 -0400
+Received: from mail-wm0-x230.google.com ([2a00:1450:400c:c09::230]:46381)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1e5FNo-0000rv-M2
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 14:17:28 -0400
+Received: by mail-wm0-x230.google.com with SMTP id m72so17694272wmc.1
+	for <qemu-devel@nongnu.org>; Thu, 19 Oct 2017 11:17:28 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Message-Id: <1508436175-1596-6-git-send-email-stefanb@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v1 05/21] tpm: replace tpm_get_backend_driver()
- to drop be_drivers
+In-Reply-To: <20171019065854.GB17401@kentang.lan>
+References: <20171019065854.GB17401@kentang.lan>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 19 Oct 2017 19:17:07 +0100
+Message-ID: <CAFEAcA-E7-C_DbUDDGbqpFfsPy16M+WjemkzN9noiSeGKQsVvg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL] qemu-sparc updates
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,55 +28,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, marcandre.lureau@gmail.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+On 19 October 2017 at 07:58, Mark Cave-Ayland
+<mark.cave-ayland@ilande.co.uk> wrote:
+> Hi Peter,
+>
+> Here are my sun4u patches for 2.11. Note that because of the machine changes
+> there is an openbios-sparc64 binary update included in the first patch to
+> maintain bisectability. There will be a follow-up patch for OpenBIOS which will
+> update binaries for all architectures to the latest and update the submodule
+> shortly.
+>
+>
+> ATB,
+>
+> Mark.
+>
+>
+> The following changes since commit 861cd431c99e56ddb5953ca1da164a9c32b477ca:
+>
+>   Merge remote-tracking branch 'remotes/dgibson/tags/ppc-for-2.11-20171017' into staging (2017-10-17 15:26:51 +0100)
+>
+> are available in the git repository at:
+>
+>
+>   https://github.com/mcayland/qemu.git tags/qemu-sparc-signed
+>
+> for you to fetch changes up to bcf9e2c2f2b7a610efaafc4bd6d0bee9181c2345:
+>
+>   sun4u: fix assert when adding NICs which aren't the in-built model (2017-10-19 07:45:35 +0100)
+>
+> ----------------------------------------------------------------
+> qemu-sparc update
+>
+> ----------------------------------------------------------------
+> Mark Cave-Ayland (2):
+>       sun4u: update PCI topology to include simba PCI bridges
+>       sun4u: fix assert when adding NICs which aren't the in-built model
 
-Use tpm_driver_find_by_type() instead.
+Applied, thanks.
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
----
- tpm.c | 11 +++--------
- 1 file changed, 3 insertions(+), 8 deletions(-)
-
-diff --git a/tpm.c b/tpm.c
-index 04de8da..ad2ed6a 100644
---- a/tpm.c
-+++ b/tpm.c
-@@ -31,13 +31,6 @@ void tpm_register_model(enum TpmModel model)
-     tpm_models[model] =3D true;
- }
-=20
--static const TPMDriverOps *tpm_get_backend_driver(const char *type)
--{
--    int i =3D qapi_enum_parse(&TpmType_lookup, type, -1, NULL);
--
--    return i >=3D 0 ? be_drivers[i] : NULL;
--}
--
- #ifdef CONFIG_TPM
-=20
- void tpm_register_driver(const TPMDriverOps *tdo)
-@@ -110,6 +103,7 @@ static int configure_tpm(QemuOpts *opts)
-     const TPMDriverOps *be;
-     TPMBackend *drv;
-     Error *local_err =3D NULL;
-+    int i;
-=20
-     if (!QLIST_EMPTY(&tpm_backends)) {
-         error_report("Only one TPM is allowed.");
-@@ -129,7 +123,8 @@ static int configure_tpm(QemuOpts *opts)
-         return 1;
-     }
-=20
--    be =3D tpm_get_backend_driver(value);
-+    i =3D qapi_enum_parse(&TpmType_lookup, value, -1, NULL);
-+    be =3D i >=3D 0 ? tpm_driver_find_by_type(i) : NULL;
-     if (be =3D=3D NULL) {
-         error_report(QERR_INVALID_PARAMETER_VALUE,
-                      "type", "a TPM backend type");
---=20
-2.5.5
+-- PMM
