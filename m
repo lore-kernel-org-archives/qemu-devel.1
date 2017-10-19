@@ -1,31 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48884)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54857)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1e57zY-0004dR-CU
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 06:23:58 -0400
+	(envelope-from <lersek@redhat.com>) id 1e58HB-00089L-Ul
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 06:42:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1e57zW-0006EB-MB
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 06:23:56 -0400
-References: <503559b438cd67b865d32d7d0577afc7ee15f32c.1508257445.git.jcody@redhat.com>
-	<2de32e52-2c2a-5738-4624-d84bf7379c5f@redhat.com>
-	<20171018150352.GE17962@localhost.localdomain>
-	<d3682b70-64c6-1284-77c4-8df561a61098@redhat.com>
-	<20171018153416.GF17962@localhost.localdomain>
-	<07a69c86-aae3-9174-b646-dee04bf191de@redhat.com>
-	<20171018155038.GG17962@localhost.localdomain>
-	<f5da8290-096d-36b5-28c5-ecfeb66199af@redhat.com>
-	<20171018161935.GH17962@localhost.localdomain>
-	<d6b6250f-4215-adfa-f09a-e35360f04597@redhat.com>
-	<20171018172744.GI17962@localhost.localdomain>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <eb4560ed-9b2f-bab0-9b0a-d2e0b1c9137c@redhat.com>
-Date: Thu, 19 Oct 2017 12:23:39 +0200
+	(envelope-from <lersek@redhat.com>) id 1e58H8-0001ch-OS
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 06:42:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47404)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1e58H8-0001cP-FG
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 06:42:06 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 85E6ED7912
+	for <qemu-devel@nongnu.org>; Thu, 19 Oct 2017 10:42:05 +0000 (UTC)
+References: <20171018095807.101406-1-marcel@redhat.com>
+	<69cefa98-5681-5b12-719c-e13fcba969c4@redhat.com>
+	<9d4b1fa8-e670-556b-278d-4993ad41b512@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <36a5b8e7-84d1-5ffd-d85b-7f0378801f3c@redhat.com>
+Date: Thu, 19 Oct 2017 12:41:41 +0200
 MIME-Version: 1.0
-In-Reply-To: <20171018172744.GI17962@localhost.localdomain>
+In-Reply-To: <9d4b1fa8-e670-556b-278d-4993ad41b512@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 03/10] qemu-iotests: automatically clean
- up bash protocol servers
+Subject: Re: [Qemu-devel] [PATCH] hw/pci-host: Fix x86 Host Bridges 64bit
+ PCI hole
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,217 +36,215 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jeff Cody <jcody@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, jsnow@redhat.com, stefanha@redhat.com, qemu-block@nongnu.org
+To: Marcel Apfelbaum <marcel@redhat.com>, qemu-devel@nongnu.org
+Cc: mst@redhat.com, pbonzini@redhat.com, ehabkost@redhat.com, Igor Mammedov <imammedo@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-On 18/10/2017 19:27, Jeff Cody wrote:
-> On Wed, Oct 18, 2017 at 06:39:26PM +0200, Paolo Bonzini wrote:
->> On 18/10/2017 18:19, Jeff Cody wrote:
->>>>> Here is what we need from common.rc for this series:
->>>>>
->>>>> _rm_test_img
->>>>> _cleanup_nbd
->>>>> _cleanup_vxhs
->>>>> _cleanup_rbd
->>>>> _cleanup_sheepdog
->>>>> _cleanup_protocols
->>>>> _cleanup_test_img
->>>>>
->>>>> They all have a common theme (cleanup), so I could move them all to=
- a
->>>>> common.cleanup (naming suggestion?) file (which would need to be in=
-cluded by
->>>>> common.rc, as well).
->>>>>
->>>>> Would this be a strong enough delineation to overcome your concerns=
-?
->>>>
->>>> A great start.  Which of these are actually needed by the tests (and
->>>> hence by common.rc) and why?
->>>
->>>  Some tests are written such that they do intermediate cleanups betwe=
-en
->>>  multiple internal sub-tests for varying reasons, and so use those cl=
-eanup
->>>  functions as part of their testing.  The function _cleanup_test_img
->>>  effectively calls all the other functions I listed, so they are real=
-ly all
->>>  required for the tests, if they choose to call _cleanup_test_img.
->>>
->>> And for 'check' to tear everything down to a clean state, it also nee=
-ds to
->>> use the cleanup functions for everything that is not just a file/dire=
-ctory.
+On 10/19/17 11:30, Marcel Apfelbaum wrote:
+>=20
+> Hi Laszlo,
+>=20
+> On 18/10/2017 14:40, Laszlo Ersek wrote:
+>> Hi Marcel,
 >>
->> Do these tests really need the "cleanup protocols" part, because the f=
-ew
->> that have more than one _cleanup_test_img (059, 066, 070, 084, 146, 17=
-1)
->> are either file-only or non-raw, so they should be able to just rebuil=
-d
->> the format on top of the same image.
+>> On 10/18/17 11:58, Marcel Apfelbaum wrote:
+>>> Currently there is no MMIO range over 4G
+>>> reserved for PCI hotplug. Since the 32bit PCI hole
+>>> depends on the number of cold-plugged PCI devices
+>>> and other factors, it is very possible is too small
+>>> to hotplug PCI devices with large BARs.
+>>>
+>>> Fix it by reserving all the address space after
+>>> RAM (and the reserved space for RAM hotplug),
+>>> but no more than 40bits. The later seems to be
+>>> QEMU's magic number for the Guest physical CPU addressable
+>>> bits and is safe with respect to migration.
+>>>
+>>> Note this is a regression since prev QEMU versions had
+>>> some range reserved for 64bit PCI hotplug.
+>>>
+>>> Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
+>>> ---
+>>> =C2=A0 hw/i386/pc.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 22 ++++++++++++++++++++++
+>>> =C2=A0 hw/pci-host/piix.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=
+ 10 ++++++++++
+>>> =C2=A0 hw/pci-host/q35.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 |=C2=A0 9 +++++++++
+>>> =C2=A0 include/hw/i386/pc.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 10 ++++++=
+++++
+>>> =C2=A0 include/hw/pci-host/q35.h |=C2=A0 1 +
+>>> =C2=A0 5 files changed, 52 insertions(+)
+>>
+>> - What are the symptoms of the problem?
 >>
 >=20
-> Maybe not, but that could just be the nature of what bugs we are testin=
-g for
-> at this time.  These specific tests may not need to, but it is not
-> inconceivable to have a test that involves bringing up and tearing down
-> a protocol based server some arbitrary number times, to test that speci=
-fic
-> behavior.
-
-Right, but such a test should probably be protocol-specific; it can just
-use "file" and invoke QEMU_NBD on its own for example, similar to what
-tests 058 and 162 already do.
-
-For example, it's very different if you delete and recreate a raw image
-_and_ rerun qemu-nbd, or only do the latter.
-
->> Maybe that's where the separation lies---protocol vs. format, where
->> cleaning up the "file" protocol need not do anything because it's done
->> when removing the test directory.  If that's the case, it'd be nice
->> because it might also make it much easier to tackle the issue with
->> parallel tests.
+> PCI devices with *relatively* large BARs can't be hot-plugged.
+> The reason is QEMU does not reserve MMIO range over 4G and
+> uses whatever remains on the 32bit PCI window.
 >=20
-> On final exit, yes, a test needs not remember to remove all of its mous=
-e
-> droppings.  But as far as not needing to remove images in intermediate
-> stages of a given test, I think that assumes too much. For instance,
-> qemu-img _should_ be able to rebuild a format on top of the same image.=
-  But
-> maybe a test wants to see if that specific functionality actually works=
- as
-> intended, and compares removing and creating an image to rebuilding on =
-top
-> of an image, etc.
+> If you coldplug enough PCI devices you will end up with
+> with a 64bit PCI window that covers only the cold-plugged PCI
+> devices, still no room for hotplug.
+>=20
+>> - What QEMU commit regressed the previous functionality?
+>>
+>=20
+> =C2=A0- commit 39848901818 pc: limit 64 bit hole to 2G by default
+> =C2=A0shows us QEMU had the 64bit PCI hole, so it is a regression.
 
-Right, but let's draw a line, does such a test need to support multiple
-protocols?  For example:
+(Side remark: this commit was part of release v1.6.0, and at that time
+we also had the "etc/pci-info" fw_cfg file.)
 
-- 083 and 143 for example are very much NBD-specific; 083 uses
-"_supported_proto nbd", while 143 probably should be using either "file"
-or "nbd".
+>=20
+> =C2=A0- commit 2028fdf3791 piix: use 64 bit window programmed by guest
+> =C2=A0leaves no room for PCI hotplug
 
-- only 058 and 162 are running qemu-nbd manually, and they actually
-start a _new_ NBD protocol server
+(Side remark: part of v1.7.0, from 2013. So, we can call this a
+regression, but then it's a very old one.
+
+Of course this is *not* a counter-argument to your patch, or commit
+message wording; it's just that I'm surprised that the issue could
+remain dormant this long -- usually users report regressions very quickly=
+.)
+
+>=20
+>> - How exactly is the regression (and this fix) exposed to the guest?
+>>
+>=20
+> The nuance is both above commits computed the actual MMIO
+> range used by cold-plugged devices, but as side effect
+> they influenced the remaining PCI window for hot-plugged devices.
+>=20
+> What the guest sees is the CRS MMIO range over 4G.
+
+OK, understood.
+
+>=20
+>> I'm confused because semi-recently I've done multiple successful
+>> hotplugs, with OVMF, Q35, PCIe root ports, and PCI Express devices
+>> having large (64-bit) MMIO BARs. The examples include ivshmem / Linux
+>> guest (based on your hints) and vfio-pci (XL710 NIC) / Windows Server
+>> 2016 guest.
+>=20
+> Cool! These are actually great news!
+> Back to the issue in hand, a few things:
+> 1. It works with Q35 only, but not with the I440FX machines.
+
+OK.
+
+> 2. The hints are used for the PCIe root ports, meaning for PCI bridges
+> =C2=A0=C2=A0 and addresses a slightly different issues: leave hotplug s=
+pace
+> =C2=A0=C2=A0 for secondary buses, while this patch tackles hotplug
+> =C2=A0=C2=A0 space for root buses.
+
+OK.
+
+>=20
+>>
+>> By default, OVMF marks a 32GB area as 64-bit MMIO aperture, for BAR
+>> allocation. This area is above the normal memory (plus reservation for
+>> hotplug memory, if any). It is also GB-aligned. The aperture size can =
+be
+>> changed (currently) with an experimental -fw_cfg switch (the fw_cfg fi=
+le
+>> is called "opt/ovmf/X-PciMmio64Mb", it states the size of the 64-bit
+>> MMIO aperture as a decimal number of megabytes).
+>=20
+> I'll try to explain how I see the "picture":
+> CRS is created by QEMU and computed *after* the firmware finishes
+> the PCI BARs allocations.
+
+Yes.
+
+> Then *QEMU* decides how big it will be the
+> 64bit PCI hole, not the firmware - see the past commits.
+
+Yes, first the guest-side programming happens, then QEMU (re-)calculates
+the ACPI payload once the right ACPI fw_cfg file is selected / read.
+This re-calculation (including the CRS) observes the previously
+programmed values.
+
+>=20
+> So IMHO you don't need the opt/ovmf/X-PciMmio64Mb since the OVMF
+> is not deciding this value. It actually should not care at all.
+
+OVMF cannot *not* care. It must internally provide (to other,
+platform-independent components in edk2) the 64-bit MMIO aperture that
+the BARs can be allocated from.
 
 
-In addition not many tests do not use _make_test_img, as seen with "git
-grep -LE '_make_test_img|bin/env python' [0-9][0-9][0-9]".  They are:
+But maybe I'm totally misunderstanding this patch! Are you saying that
+the patch makes the following difference only: when the CRS is
+recalculated (i.e., after the PCI enumeration has completed in the
+guest, and the ACPI linker/loader fw_cfg files are opened), then you
+only grow / round up the 64-bit range?
 
-- 064, 070 and 135 which use the sample image and thus _should_ be using
-file
+That would make sense, because a *superset* aperture exposed to the OS
+via the _CRS does not invalidate any allocations done by the firmware
+earlier. Furthermore, the firmware itself need not learn about the
+details of said superset. In this sense I agree that OVMF should not
+care at all.
 
-- 049, 082, 111 which is creating images with "qemu-img create"; 049 and
-111 might actually use nfs too.  150 is using "qemu-img convert", which
-is also creation more or less
+[snip]
 
-- 083 is NBD-specific because it uses the fault injector
+>> Also, how do you plan to integrate this feature with SeaBIOS?
 
-- 113 probably should be more generic than just NBD
+(Ever since I sent my previous response, I've been glad that I finished
+my email with this question -- I really think OVMF and SeaBIOS should
+behave uniformly in this regard. So I'm happy about your answer:)
 
-- 128 is pretty unique in that it creates a Linux device mapper device (!=
-)
+> Simple, no need :) . It just works as it should.
+> SeaBIOS computes everything, *then* QEMU creates the CRs ranges
+> based on firmware input and other properties.
+> I think it works also with OVMF out of the box.
 
-- 143 probably should be using either "file" or "nbd".
+OK, so this explains it all, thank you very much -- my question is if
+you could spell out those "other properties" in a bit more detail (I
+apologize if these should be obvious to me already, from the commit
+message and the patch):
 
-- 162 is also a bit unique in that it tests null-co:// and disregards
-IMGFMT/IMGPROTO
+(1) How exactly does the enlarged 64-bit hole remain a *superset* of the
+firmware-programmed BARs? Can you point me to a location in the code?
 
+(2) What happens if we do have more than 1TB RAM?
 
-So it does seem that handling the protocol in "check" is a good
-approximation.
+> A last note, when pxb/pxb-pcies will became hot-pluggable
+> we need to leave some bits for them too. I wouldn't
+> really want to add fw_config files for them too, or
+> use a complicate fw_config, or rewrite
+> the logic for all firmware if we don't have to.
 
-And by the way, the only existing uses of "_supported_proto" are
+OK.
 
-    _supported_proto file
-    _supported_proto file nfs
-    _supported_proto file sheepdog rbd nfs
-    _supported_proto generic
-    _supported_proto nbd
-    _supported_proto nfs
+>=20
+> 64bit PCI window starts from memory(+reserved) end
+> and finishes at 40bit.
 
-so another thing to do might be to change _supported_proto to a
-feature-based test:
+OK, this seems to (partly) answer my question (1) -- can you please
+confirm that the
 
-- file/sheepdog/rbd/nfs are those that support resizing (aka "truncate")
+  finishes at 40bit
 
-- file/nfs are generally those that support "qemu-img create" (plus
-others that should be "generic" actually, including 090, 103, 107); 150
-is "file" because it needs "map" in addition to "create".
+part does not imply forcefully truncating the CRS at 1TB, in case the
+firmware already allocated BARs higher than that?
 
-- nfs is used in test 173 to test protocol-based images with relative
-filename backing strings; it probably can run on file too, anyway that's
-a third important discriminating feature
+> If you have 1T of RAM you
+> get nothing for PCI hotplug, seems fair.
 
-- nbd is used in a bunch of random tests that can be made more generic
-(094, 113, 119, 123).  Only 083 is NBD-specific because it uses the NBD
-fault injector, and it actually doesn't use the protocol that is created
-by the caller.
+This is fine (as the answer to my question (2)) as long as you mean it
+in the following sense: "QEMU will simply *not grow* the MMIO in the
+_CRS past 1TB".
 
+> When guests with more then 1T of RAM will become
+> frequent, I suppose the QEMU's default CPU addressable
+> bits will change and we will change it too.
 
-Since you are doing a lot of whole-directory moves, "_supported" tags
-could become a separate configuration file, e.g.
+Thanks Marcel, I feel a lot safer now.
 
-----
-# all generic, no need to include it
-#[001]
+Please confirm that the changes can only grow the area exposed in the
+_CRS -- i.e., only lower or preserve the base, and only raise or
+preserve the absolute limit. I'll shut up then :)
 
-[025]
-fmt=3Draw qcow2 qed
-# specify feature
-proto=3D+resize
-
-[143]
-fmt=3Dgeneric
-proto=3Dnbd
-start_protocol=3Dno
-
-[150]
-fmt=3Draw qcow2
-proto=3D+create +map
-----
-
-The few tests using start_protocol=3Dno would have to ensure parallel-saf=
-e
-operation themselves.  This would also enable a more consistent handling
-across shell and Python tests.
-
-So, this is why I was wondering whether patches 3/4 kinda paint
-ourselves in the corner.
-
-So, looking at the patches:
-
-- 1, 2, 7, 8, 9 are definitely good ideas, and should be done _before_
-an eventual/hypothetical Python rewrite of "check".
-
-- for 5, 6 I think we should be using shell job control instead in
-"check" ('set -m')
-
-  #! /bin/sh
-  set -m
-  # Start a job which leaves two processes behind.  By starting it
-  # in the background, we can get the leader process's pid in $!
-  # That pid is also the process group id of the whole job.
-  sh -c 'echo subshell pid is $$; sleep 10 | sleep 15 &' &
-  pgrp=3D$!
-  wait
-  echo '$! is '$pgrp', killing all processes in that group:'
-  pgrep -g $pgrp -a
-  kill -TERM -$pgrp
-  sleep 1
-  echo Leftover processes have been killed:
-  ps axo pid,ppid,pgrp,stat,tty,comm|grep sleep
-
-(Python can do the same by setting preexec_fn=3Dos.setpgrp when calling
-Subprocess.popen; then you can kill the entire group with os.killpg)
-
-- 10 depends on everything before. SAD! ;)
-
-It's a pity to lose the cleanup in patch 4, but I think it's better in
-the long term if we have a clear idea of the tests' tasks vs. the harness=
-'s.
-
-Thanks,
-
-Paolo
+Thanks!
+Laszlo
