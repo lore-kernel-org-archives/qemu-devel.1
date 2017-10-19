@@ -1,29 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47792)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48491)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1e5Hzv-00040F-Fr
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 17:05:00 -0400
+	(envelope-from <sstabellini@kernel.org>) id 1e5I3R-00056l-Vq
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 17:08:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1e5Hzs-0005YL-Sm
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 17:04:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35130)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1e5Hzs-0005Y9-MV
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 17:04:56 -0400
-References: <1508390650-19115-1-git-send-email-changpeng.liu@intel.com>
-	<1508390650-19115-2-git-send-email-changpeng.liu@intel.com>
-	<20171019183638-mutt-send-email-mst@kernel.org>
-	<42aa8736-bc23-d66d-27de-dbaf83ea2f99@redhat.com>
-	<20171019204305-mutt-send-email-mst@kernel.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <e2c13ada-aa4b-1bbd-b2ba-3dcf247b6f57@redhat.com>
-Date: Thu, 19 Oct 2017 23:04:48 +0200
+	(envelope-from <sstabellini@kernel.org>) id 1e5I3Q-0007j3-P8
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 17:08:37 -0400
+Date: Thu, 19 Oct 2017 14:08:24 -0700 (PDT)
+From: Stefano Stabellini <sstabellini@kernel.org>
+In-Reply-To: <CAFEAcA9t7i4JLbn2X5r2KqdA00fSEZPLEW4PpCsp_uyg8Gsm0A@mail.gmail.com>
+Message-ID: <alpine.DEB.2.10.1710191404250.27209@sstabellini-ThinkPad-X260>
+References: <alpine.DEB.2.10.1710181539580.27209@sstabellini-ThinkPad-X260>
+	<CAFEAcA9t7i4JLbn2X5r2KqdA00fSEZPLEW4PpCsp_uyg8Gsm0A@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20171019204305-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 1/4] vhost-user: add new vhost user
- messages to support virtio config space
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: Re: [Qemu-devel] [PATCH] don't hardcode EL1 in
+ extended_addresses_enabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,36 +23,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Changpeng Liu <changpeng.liu@intel.com>, qemu-devel@nongnu.org, stefanha@gmail.com, marcandre.lureau@redhat.com, felipe@nutanix.com, james.r.harris@intel.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Stefano Stabellini <sstabellini@kernel.org>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Julien Grall <julien.grall@linaro.org>
 
-On 19/10/2017 19:43, Michael S. Tsirkin wrote:
-> On Thu, Oct 19, 2017 at 05:43:18PM +0200, Paolo Bonzini wrote:
->> On 19/10/2017 17:39, Michael S. Tsirkin wrote:
->>>> Add VHOST_USER_GET_CONFIG/VHOST_USER_SET_CONFIG messages which can be
->>>> used for live migration of vhost user devices, also vhost user devices
->>>> can benefit from the messages to get/set virtio config space from/to the
->>>> I/O target. For the purpose to support virtio config space change,
->>>> VHOST_USER_SET_CONFIG_FD message is added as the event notifier
->>>> in case virtio config space change in the I/O target.
->>>>
->>>> Signed-off-by: Changpeng Liu <changpeng.liu@intel.com>
->>> I don't much like it that config is getting passed through.
->>>
->>> IMO this makes managing things harder not easier.
->>>
->>> How about specific messages about specific parts of
->>> config space that you want to get from the backend?
->>
->> In the case of virtio-blk that would be all of it.  Do you have a case
->> in mind where some part of the configuration space is owned by QEMU?
->>
->> Paolo
+On Thu, 19 Oct 2017, Peter Maydell wrote:
+> On 18 October 2017 at 23:41, Stefano Stabellini <sstabellini@kernel.org> wrote:
+> > extended_addresses_enabled calls arm_el_is_aa64, hardcoding exception
+> > level 1. Instead, retrieve the current el calling arm_current_el.
+> >
+> > Signed-off-by: Stefano Stabellini <sstabellini@kernel.org>
+> >
+> > diff --git a/target/arm/internals.h b/target/arm/internals.h
+> > index 1f6efef..63507d9 100644
+> > --- a/target/arm/internals.h
+> > +++ b/target/arm/internals.h
+> > @@ -187,7 +187,7 @@ static inline unsigned int arm_pamax(ARMCPU *cpu)
+> >  static inline bool extended_addresses_enabled(CPUARMState *env)
+> >  {
+> >      TCR *tcr = &env->cp15.tcr_el[arm_is_secure(env) ? 3 : 1];
+> > -    return arm_el_is_aa64(env, 1) ||
+> > +    return arm_el_is_aa64(env, arm_current_el(env)) ||
+> >             (arm_feature(env, ARM_FEATURE_LPAE) && (tcr->raw_tcr & TTBCR_EAE));
+> >  }
 > 
-> Yes. seg_max
+> Hmm. The current code was definitely written under a "aarch64
+> only supports EL0 and EL1" assumption, but I'm not sure
+> this change is entirely correct.
+> 
+> We use this function in 3 places:
+> 
+>  * identifying whether to flush TLBs on CONTEXTIDR writes
+>     -- using current EL seems like the right thing (but I'm not
+>        sure -- perhaps we should pass in the S/NS from which
+>        version of the 32-bit banked register is being updated
+>        rather than using arm_is_secure(env) ???)
+>  * choosing a PAR format for ATS operations
+>     -- using the current EL is closer to correct that what we
+>        have now. There are cases for a 32-bit CPU in Hyp mode that
+>        this code mishandles, but we don't support that yet.
+>  * choosing an FSR value when taking a breakpoint or watchpoint trap
+>     -- here what we want the function to mean is "what is the
+>        FSR format for the EL we're about to take this debug
+>        exception to", which isn't necessarily the answer for the
+>        current EL (consider 32 bit EL0 under a 64-bit EL1)
+> 
+> So this change will fix the PAR format for ATS operations
+> made at AArch64 EL2 when EL1 is AArch32, but it will break
+> the FSR format for breakpoints/watchpoints hit at AArch32 EL0
+> and taken to AArch64 EL1, I think.
+> 
+> We probably need to separate out these uses to not all try
+> to use the same function, and clarify what they're checking.
 
-The seg_max limit is established by whoever reads buffers from the vring
-and passes them down to the lower layer.  For vhost-blk that's the
-device server, not QEMU.
 
-Paolo
+What if we do use a single extended_addresses_enabled function, but we
+pass the EL to check? I think it makes sense, but please check the
+changes below, especially the ones to arm_debug_excp_handler.
+What do you think?
+
+
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 96113fe..2298428 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -500,7 +500,7 @@ static void contextidr_write(CPUARMState *env, const ARMCPRegInfo *ri,
+     ARMCPU *cpu = arm_env_get_cpu(env);
+ 
+     if (raw_read(env, ri) != value && !arm_feature(env, ARM_FEATURE_PMSA)
+-        && !extended_addresses_enabled(env)) {
++        && !extended_addresses_enabled(env, arm_current_el(env))) {
+         /* For VMSA (when not using the LPAE long descriptor page table
+          * format) this register includes the ASID, so do a TLB flush.
+          * For PMSA it is purely a process ID and no action is needed.
+@@ -2162,7 +2162,7 @@ static uint64_t do_ats_write(CPUARMState *env, uint64_t value,
+ 
+     ret = get_phys_addr(env, value, access_type, mmu_idx,
+                         &phys_addr, &attrs, &prot, &page_size, &fsr, &fi);
+-    if (extended_addresses_enabled(env)) {
++    if (extended_addresses_enabled(env, arm_current_el(env))) {
+         /* fsr is a DFSR/IFSR value for the long descriptor
+          * translation table format, but with WnR always clear.
+          * Convert it to a 64-bit PAR.
+diff --git a/target/arm/internals.h b/target/arm/internals.h
+index 43106a2..6792df2 100644
+--- a/target/arm/internals.h
++++ b/target/arm/internals.h
+@@ -217,10 +217,10 @@ static inline unsigned int arm_pamax(ARMCPU *cpu)
+  * This is always the case if our translation regime is 64 bit,
+  * but depends on TTBCR.EAE for 32 bit.
+  */
+-static inline bool extended_addresses_enabled(CPUARMState *env)
++static inline bool extended_addresses_enabled(CPUARMState *env, unsigned int el)
+ {
+-    TCR *tcr = &env->cp15.tcr_el[arm_is_secure(env) ? 3 : 1];
+-    return arm_el_is_aa64(env, 1) ||
++    TCR *tcr = &env->cp15.tcr_el[el];
++    return arm_el_is_aa64(env, el) ||
+            (arm_feature(env, ARM_FEATURE_LPAE) && (tcr->raw_tcr & TTBCR_EAE));
+ }
+diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
+index 3914145..4f46eb8 100644
+--- a/target/arm/op_helper.c
++++ b/target/arm/op_helper.c
+@@ -1378,7 +1378,7 @@ void arm_debug_excp_handler(CPUState *cs)
+ 
+             cs->watchpoint_hit = NULL;
+ 
+-            if (extended_addresses_enabled(env)) {
++            if (extended_addresses_enabled(env, arm_debug_target_el(env))) {
+                 env->exception.fsr = (1 << 9) | 0x22;
+             } else {
+                 env->exception.fsr = 0x2;
+@@ -1402,7 +1402,7 @@ void arm_debug_excp_handler(CPUState *cs)
+             return;
+         }
+ 
+-        if (extended_addresses_enabled(env)) {
++        if (extended_addresses_enabled(env, arm_debug_target_el(env))) {
+             env->exception.fsr = (1 << 9) | 0x22;
+         } else {
+             env->exception.fsr = 0x2;
