@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33797)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34022)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1e5AcK-0007Wm-6Q
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 09:12:16 -0400
+	(envelope-from <mst@redhat.com>) id 1e5Acd-0007cL-PI
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 09:12:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1e5AcD-0001CF-UP
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 09:12:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59402)
+	(envelope-from <mst@redhat.com>) id 1e5AcZ-0001WD-ME
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 09:12:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60240)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1e5AcD-0001B1-LZ
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 09:12:01 -0400
-Date: Thu, 19 Oct 2017 15:11:50 +0200
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20171019131150.GD6205@stefanha-x1.localdomain>
-References: <20170929033844.26935-1-peterx@redhat.com>
-	<20170929033844.26935-16-peterx@redhat.com>
-	<20171012125620.GG5957@stefanha-x1.localdomain>
-	<20171016081158.GE4166@pxdev.xzpeter.org>
-	<20171018152804.GC31848@stefanha-x1.localdomain>
-	<20171019071611.GY4166@pxdev.xzpeter.org>
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1e5AcZ-0001U6-DV
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 09:12:23 -0400
+Date: Thu, 19 Oct 2017 16:12:20 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20171019160405-mutt-send-email-mst@kernel.org>
+References: <cover.1505998455.git.tgolembi@redhat.com>
+	<b13f11c03ed394bd8ad367dc90996ed134ea98da.1505998455.git.tgolembi@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20171019071611.GY4166@pxdev.xzpeter.org>
-Subject: Re: [Qemu-devel] [RFC v2 15/22] monitor: send event when request
- queue full
+In-Reply-To: <b13f11c03ed394bd8ad367dc90996ed134ea98da.1505998455.git.tgolembi@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 1/1] virtio_balloon: include buffers and
+ cached memory statistics
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,123 +29,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Stefan Hajnoczi <shajnocz@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: =?utf-8?B?VG9tw6HFoSBHb2xlbWJpb3Zza8O9?= <tgolembi@redhat.com>
+Cc: linux-mm@kvack.org, virtualization@lists.linux-foundation.org, qemu-devel@nongnu.org, kvm@vger.kernel.org, virtio-dev@lists.oasis-open.org, Wei Wang <wei.w.wang@intel.com>, Shaohua Li <shli@fb.com>, Huang Ying <ying.huang@intel.com>, Jason Wang <jasowang@redhat.com>
 
-On Thu, Oct 19, 2017 at 03:16:11PM +0800, Peter Xu wrote:
-> On Wed, Oct 18, 2017 at 05:28:04PM +0200, Stefan Hajnoczi wrote:
-> > On Mon, Oct 16, 2017 at 04:11:58PM +0800, Peter Xu wrote:
-> > > On Thu, Oct 12, 2017 at 01:56:20PM +0100, Stefan Hajnoczi wrote:
-> > > > On Fri, Sep 29, 2017 at 11:38:37AM +0800, Peter Xu wrote:
-> > > > > Set maximum QMP request queue length to 8.  If queue full, instead of
-> > > > > queue the command, we directly return a "request-dropped" event, telling
-> > > > > client that specific command is dropped.
-> > > > > 
-> > > > > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > > > > ---
-> > > > >  monitor.c | 15 +++++++++++++++
-> > > > >  1 file changed, 15 insertions(+)
-> > > > > 
-> > > > > diff --git a/monitor.c b/monitor.c
-> > > > > index 1e9a6cb6a5..d9bed31248 100644
-> > > > > --- a/monitor.c
-> > > > > +++ b/monitor.c
-> > > > > @@ -3971,6 +3971,8 @@ static void monitor_qmp_bh_dispatcher(void *data)
-> > > > >      }
-> > > > >  }
-> > > > >  
-> > > > > +#define  QMP_ASYNC_QUEUE_LEN_MAX  (8)
-> > > > 
-> > > > Why 8?
-> > > 
-> > > I proposed this in previous discussion and no one objected, so I just
-> > > used it. It's here:
-> > > 
-> > >   https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg03989.html
-> > >   (please don't go over the thread; I'll copy the related paragraphs)
-> > > 
-> > > """
-> > >   ...
-> > >   Regarding to queue size: I am afraid max_size=1 may not suffice?
-> > >   Otherwise a simple batch of:
-> > > 
-> > >   {"execute": "query-status"} {"execute": "query-status"}
-> > > 
-> > >   Will trigger the failure.  But I definitely agree it should not be
-> > >   something very large.  The total memory will be this:
-> > > 
-> > >     json limit * queue length limit * monitor count limit
-> > >         (X)            (Y)                    (Z)
-> > > 
-> > >   Now we have (X) already (in form of a few tunables for JSON token
-> > >   counts, etc.), we don't have (Z), and we definitely need (Y).
-> > > 
-> > >   How about we add limits on Y=16 and Z=8?
-> > > 
-> > >   We can do some math if we want some more exact number though.
-> > >   ...
-> > > """
-> > > 
-> > > Oops, I proposed "16", but I used "8"; I hope 8 is good enough, but I
-> > > am definitely not sure whether "1" is good.
-> > 
-> > I understand the concern about breaking existing clients but choosing an
-> > arbitrary magic number isn't a correct solution to that problem because
-> > existing clients may exceed the magic number!
-> 
-> I agree.
-> 
-> > 
-> > Instead I think QMP should only look ahead if the out-of-band feature
-> > has been negotatiated.  This way existing clients continue to work.  New
-> > clients will have to avoid sending a batch of requests or they must
-> > handle the queue size limit error.
-> 
-> Hmm yes I just noticed that although I broadcasted the "OOB"
-> capability but actually I skipped the negociation phase (so OOB is
-> always enabled). I think I should have that for sure.
-> 
-> IIUC below new handle_qmp_command() should be always compatible with
-> old clients then:
-> 
-> handle_qmp_command ()
-> {
->   ...
->   if (oob_enabled) {
->     if (cmd_is_oob (req)) {
->       // execute command
->       qmp_dispatch (req);
->       return;
->     }
->     if (queue_full (mon)) {
->       // drop req
->       send_full_event (mon);
->       return;
->     }
->   }
-> 
->   queue (req);
->   kick (task);
-> 
->   if (!oob_enabled) {
->     // if oob not enabled, we don't process next request before previous
->     // one finishes, and queue length will always be either 0 or 1.
->     // Note: this means the parsing thread can block now.
->     wait_until_req_handled (req);
->   }
-> }
-> 
-> This will be somehow more complicated than before though, since if
-> with this, we need to make sure all the QMP clients have enabled OOB
-> feature to make sure OOB command can work. Otherwise even if only one
-> QMP client didn't enable OOB, then it may block at waiting for the
-> request to finish, and it will block the whole monitor IOThread as
-> well (which is currently shared by OOB and non-OOB monitors).
-> 
-> Or, maybe, I should just create one IOThread for each QMP monitor.
+On Thu, Sep 21, 2017 at 02:55:41PM +0200, Tom=C3=A1=C5=A1 Golembiovsk=C3=BD=
+ wrote:
+> Add a new fields, VIRTIO_BALLOON_S_BUFFERS and VIRTIO_BALLOON_S_CACHED,
+> to virtio_balloon memory statistics protocol. The values correspond to
+> 'Buffers' and 'Cached' in /proc/meminfo.
+>=20
+> To be able to compute the value of 'Cached' memory it is necessary to
+> export total_swapcache_pages() to modules.
+>=20
+> Signed-off-by: Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com>
 
-Or temporarily stop monitoring a client's chardev while the request is
-being processed if OOB isn't negotiated.  That way a single IOThread can
-still service multiple QMP monitors with differing OOB settings.
+Does 'Buffers' actually make sense? It's a temporary storage -
+wouldn't it be significantly out of date by the time
+host receives it?
 
-Stefan
+> ---
+>  drivers/virtio/virtio_balloon.c     | 11 +++++++++++
+>  include/uapi/linux/virtio_balloon.h |  4 +++-
+>  mm/swap_state.c                     |  1 +
+>  3 files changed, 15 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/drivers/virtio/virtio_balloon.c b/drivers/virtio/virtio_ba=
+lloon.c
+> index f0b3a0b9d42f..c2558ec47a62 100644
+> --- a/drivers/virtio/virtio_balloon.c
+> +++ b/drivers/virtio/virtio_balloon.c
+> @@ -244,12 +244,19 @@ static unsigned int update_balloon_stats(struct v=
+irtio_balloon *vb)
+>  	struct sysinfo i;
+>  	unsigned int idx =3D 0;
+>  	long available;
+> +	long cached;
+> =20
+>  	all_vm_events(events);
+>  	si_meminfo(&i);
+> =20
+>  	available =3D si_mem_available();
+> =20
+> +	cached =3D global_node_page_state(NR_FILE_PAGES) -
+> +			total_swapcache_pages() - i.bufferram;
+> +	if (cached < 0)
+> +		cached =3D 0;
+> +
+> +
+>  #ifdef CONFIG_VM_EVENT_COUNTERS
+>  	update_stat(vb, idx++, VIRTIO_BALLOON_S_SWAP_IN,
+>  				pages_to_bytes(events[PSWPIN]));
+> @@ -264,6 +271,10 @@ static unsigned int update_balloon_stats(struct vi=
+rtio_balloon *vb)
+>  				pages_to_bytes(i.totalram));
+>  	update_stat(vb, idx++, VIRTIO_BALLOON_S_AVAIL,
+>  				pages_to_bytes(available));
+> +	update_stat(vb, idx++, VIRTIO_BALLOON_S_BUFFERS,
+> +				pages_to_bytes(i.bufferram));
+> +	update_stat(vb, idx++, VIRTIO_BALLOON_S_CACHED,
+> +				pages_to_bytes(cached));
+> =20
+>  	return idx;
+>  }
+> diff --git a/include/uapi/linux/virtio_balloon.h b/include/uapi/linux/v=
+irtio_balloon.h
+> index 343d7ddefe04..d5dc8a56a497 100644
+> --- a/include/uapi/linux/virtio_balloon.h
+> +++ b/include/uapi/linux/virtio_balloon.h
+> @@ -52,7 +52,9 @@ struct virtio_balloon_config {
+>  #define VIRTIO_BALLOON_S_MEMFREE  4   /* Total amount of free memory *=
+/
+>  #define VIRTIO_BALLOON_S_MEMTOT   5   /* Total amount of memory */
+>  #define VIRTIO_BALLOON_S_AVAIL    6   /* Available memory as in /proc =
+*/
+> -#define VIRTIO_BALLOON_S_NR       7
+> +#define VIRTIO_BALLOON_S_BUFFERS  7   /* Buffers memory as in /proc */
+> +#define VIRTIO_BALLOON_S_CACHED   8   /* Cached memory as in /proc */
+> +#define VIRTIO_BALLOON_S_NR       9
+> =20
+>  /*
+>   * Memory statistics structure.
+> diff --git a/mm/swap_state.c b/mm/swap_state.c
+> index 71ce2d1ccbf7..f3a4ff7d6c52 100644
+> --- a/mm/swap_state.c
+> +++ b/mm/swap_state.c
+> @@ -95,6 +95,7 @@ unsigned long total_swapcache_pages(void)
+>  	rcu_read_unlock();
+>  	return ret;
+>  }
+> +EXPORT_SYMBOL_GPL(total_swapcache_pages);
+> =20
+>  static atomic_t swapin_readahead_hits =3D ATOMIC_INIT(4);
+
+Need an ack from MM crowd on that.
+
+> --=20
+> 2.14.1
