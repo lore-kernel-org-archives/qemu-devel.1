@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33153)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36039)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e58iQ-0005EP-AT
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 07:10:23 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1e58tM-0006zt-UO
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 07:21:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e58iM-0005fr-CV
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 07:10:18 -0400
-Received: from mail-wr0-x236.google.com ([2a00:1450:400c:c0c::236]:54227)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1e58iM-0005f8-5K
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 07:10:14 -0400
-Received: by mail-wr0-x236.google.com with SMTP id u40so2032644wrf.10
-	for <qemu-devel@nongnu.org>; Thu, 19 Oct 2017 04:10:14 -0700 (PDT)
+	(envelope-from <dgilbert@redhat.com>) id 1e58tH-0006Aa-Vq
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 07:21:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51626)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1e58tH-0006AG-P1
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 07:21:31 -0400
+Date: Thu, 19 Oct 2017 12:21:23 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20171019112122.GF2281@work-vm>
+References: <20171018174013.22709-1-dgilbert@redhat.com>
+	<20171019043145.GA7850@pxdev.xzpeter.org>
 MIME-Version: 1.0
-In-Reply-To: <20171017082502.7885-1-kraxel@redhat.com>
-References: <20171017082502.7885-1-kraxel@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 19 Oct 2017 12:09:52 +0100
-Message-ID: <CAFEAcA_42+22DtNAT33VjYDVB3znjrRrLhtmDwxZ_7Fp=GFPgw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/4] Vga 20171017 patches
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171019043145.GA7850@pxdev.xzpeter.org>
+Subject: Re: [Qemu-devel] [PATCH v3 0/7] migration: pause-before-switchover
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,34 +27,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, jdenemar@redhat.com, wangjie88@huawei.com, quintela@redhat.com, mreitz@redhat.com, berrange@redhat.com, eblake@redhat.com, fuweiwei2@huawei.com
 
-On 17 October 2017 at 09:24, Gerd Hoffmann <kraxel@redhat.com> wrote:
-> The following changes since commit c5bbcaa4b7c0f8a322bebe9ec563560178a68b55:
->
->   Merge remote-tracking branch 'remotes/mst/tags/for_upstream' into staging (2017-10-16 17:29:16 +0100)
->
-> are available in the git repository at:
->
->   git://git.kraxel.org/qemu tags/vga-20171017-pull-request
->
-> for you to fetch changes up to eb38e1bc3740725ca29a535351de94107ec58d51:
->
->   cirrus: fix oob access in mode4and5 write functions (2017-10-17 09:59:00 +0200)
->
-> ----------------------------------------------------------------
-> cirrus: bugfixes, with some vga cleanups.
->
-> ----------------------------------------------------------------
->
-> Gerd Hoffmann (4):
->   vga: drop line_offset variable
->   vga: handle cirrus vbe mode wraparounds.
->   vga: add ram_addr_t cast
->   cirrus: fix oob access in mode4and5 write functions
->
+* Peter Xu (peterx@redhat.com) wrote:
+> On Wed, Oct 18, 2017 at 06:40:06PM +0100, Dr. David Alan Gilbert (git) wrote:
+> 
+> [...]
+> 
+> > The precopy flow is:
+> > active->pre-switchover->device->completed
+> > 
+> > The postcopy flow is:
+> > active->pre-switchover->postcopy-active->completed
+> 
+> The naming is still slightly confusing to me:
+> 
+> (1) we have a capability called "pause-before-switchover", so it feels
+>     like there is something called "switchover" and if we enable this
+>     we'll pause before that point;
+> 
+> (2) we have a new status "pre-switchover", it feels like that's the
+>     point before we are in "switchover" state;
+> 
+> (3) we don't really have a "switchover" state, but instead it's called
+>     "device" which is exactly the "switchover" action.
+> 
+> Considering (1) and (2), I would prefer "device" state to be just
+> "switchover"...
 
-Applied, thanks.
+Yes I stuck to pause-before-device and device originally; but
+what we're doing during the 'device' stage is mostly saving device
+state; the actual switchover occurs at the end.  So hmm.
 
--- PMM
+> Further, not sure we can unify the state transition as well (say, we
+> add this switchover state even without cap "pause-before-switchover"
+> set, although it does not make much sense itself). Then, we can also
+> unify the precopy/postcopy state machine into one:
+> 
+> active->
+>   [pre-switchover->]      (optional, decided by "pause-before-switchover")
+>     switchover->
+>       [postcopy-active->] (optional, decided by "postcopy-arm")
+>         completed
+
+I didn't want to change the state transition behaviour without the
+capability set, since that could upset an existing libvirt that would
+get confused by the new state.
+
+Dave
+
+> (Sorry I am discussing the naming again instead of reviewing real
+>  stuff!)
+> 
+> -- 
+> Peter Xu
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
