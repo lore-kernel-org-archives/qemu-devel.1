@@ -1,16 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35151)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38220)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sochin.jiang@huawei.com>) id 1e5AgX-0001Ed-KU
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 09:16:32 -0400
+	(envelope-from <eblake@redhat.com>) id 1e5Asc-00031m-NN
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 09:28:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sochin.jiang@huawei.com>) id 1e5AgW-0004fH-Od
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 09:16:29 -0400
-From: "sochin.jiang" <sochin.jiang@huawei.com>
-Message-ID: <1385265352-40801-1-git-send-email-sochin.jiang@huawei.com>
+	(envelope-from <eblake@redhat.com>) id 1e5AsZ-0004xc-Gp
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 09:28:58 -0400
+References: <1508336428-20511-1-git-send-email-thuth@redhat.com>
+	<9d7d4163-1752-64a1-e5e1-d0b45bd3eb46@redhat.com>
+	<20171019114331.44a29bec.cohuck@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <09614aaf-cf6d-1fa4-50d4-f481f1fde401@redhat.com>
+Date: Thu, 19 Oct 2017 08:28:44 -0500
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH] throttle: fix a qemu crash problem when
- calling blk_delete
+In-Reply-To: <20171019114331.44a29bec.cohuck@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="TqkUvtiSta65upec34dRIudg7xH5716t7"
+Subject: Re: [Qemu-devel] [PATCH 0/2] Enable the simple virtio tests on
+ s390x, too
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,75 +26,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Date: Thu, 19 Oct 2017 13:16:33 -0000
-To: kwolf@redhat.com, jcody@redhat.com, pbonzini@redhat.com, mreitz@redhat.com
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, sochin.jiang@huawei.com, eric.fangyi@huawei.com, subo7@huawei.com, xieyingtai@huawei.com, lina.lulina@huawei.com, zhangshuai13@huawei.com, lizhengui@huawei.com
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Michael S Tsirkin <mst@redhat.com>, Amit Shah <amit@kernel.org>
 
-From: "sochin.jiang" <sochin.jiang@huawei.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--TqkUvtiSta65upec34dRIudg7xH5716t7
+From: Eric Blake <eblake@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org,
+ qemu-s390x@nongnu.org, Michael S Tsirkin <mst@redhat.com>,
+ Amit Shah <amit@kernel.org>
+Message-ID: <09614aaf-cf6d-1fa4-50d4-f481f1fde401@redhat.com>
+Subject: Re: [PATCH 0/2] Enable the simple virtio tests on s390x, too
+References: <1508336428-20511-1-git-send-email-thuth@redhat.com>
+ <9d7d4163-1752-64a1-e5e1-d0b45bd3eb46@redhat.com>
+ <20171019114331.44a29bec.cohuck@redhat.com>
+In-Reply-To: <20171019114331.44a29bec.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-commit 7ca7f0 moves the throttling related part of the BDS life cycle management
-to BlockBackend, adds call to throttle_timers_detach_aio_context in blk_remove_bs.
-commit 1606e remove a block device from its throttle group in blk_delete by calling
-blk_io_limits_disable, this fix an easily reproducible qemu crash. But delete a
-BB without a BDS inserted could easily cause a qemu crash too by calling
-bdrv_drained_begin in blk_io_limits_disable. Say, a simply drive_add and then a
-drive_del command.
+On 10/19/2017 04:43 AM, Cornelia Huck wrote:
+> On Wed, 18 Oct 2017 10:01:57 -0500
+> Eric Blake <eblake@redhat.com> wrote:
+>=20
+>> On 10/18/2017 09:20 AM, Thomas Huth wrote:
+>>> First patch introduces the qtest_startf() function that can be used
+>>> to start tests with a printf-like string. This patch was originally
+>>> part of Eric's bigger qtest refactoring series, and I originally want=
+ed
+>>> to wait 'til it's included in the master branch. But since this did
+>>> not happen yet and QEMU soft-freeze is approaching soon, I decided
+>>> to rather included a slightly simplified version of that patch here
+>>> instead. =20
+>>
+>> Fair enough.  I'm also trying to focus on getting features in before
+>> soft freeze, hence my lack of rebasing the qtest refactoring series in=
 
-Signed-off-by: sochin.jiang <sochin.jiang@huawei.com>
----
- block/io.c      | 8 ++++++++
- util/throttle.c | 6 +++---
- 2 files changed, 11 insertions(+), 3 deletions(-)
+>> the meantime.  Arguably (although it is a bit weak) we can claim
+>> testsuite fixes as material that is still relevant after soft freeze a=
+s
+>> it does not affect the final installed binaries, as long as they still=
 
-diff --git a/block/io.c b/block/io.c
-index 0854e0f..c411a87 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -269,6 +269,10 @@ static void coroutine_fn bdrv_co_yield_to_drain(BlockDriverState *bs,
- 
- void bdrv_drained_begin(BlockDriverState *bs)
- {
-+    if (!bs) {
-+        return;
-+    }
-+
-     if (qemu_in_coroutine()) {
-         bdrv_co_yield_to_drain(bs, true);
-         return;
-@@ -284,6 +288,10 @@ void bdrv_drained_begin(BlockDriverState *bs)
- 
- void bdrv_drained_end(BlockDriverState *bs)
- {
-+    if (!bs) {
-+        return;
-+    }
-+
-     if (qemu_in_coroutine()) {
-         bdrv_co_yield_to_drain(bs, false);
-         return;
-diff --git a/util/throttle.c b/util/throttle.c
-index b38e742..35a21fc 100644
---- a/util/throttle.c
-+++ b/util/throttle.c
-@@ -245,8 +245,6 @@ void throttle_timers_init(ThrottleTimers *tt,
- /* destroy a timer */
- static void throttle_timer_destroy(QEMUTimer **timer)
- {
--    assert(*timer != NULL);
--
-     timer_del(*timer);
-     timer_free(*timer);
-     *timer = NULL;
-@@ -258,7 +256,9 @@ void throttle_timers_detach_aio_context(ThrottleTimers *tt)
-     int i;
- 
-     for (i = 0; i < 2; i++) {
--        throttle_timer_destroy(&tt->timers[i]);
-+        if (tt->timers[i]) {
-+            throttle_timer_destroy(&tt->timers[i]);
-+        }
-     }
- }
- 
--- 
-1.8.3.1
+>> go in before hard freeze, but it's hard to say at this point if any of=
+
+>> my qtest refactoring will make 2.11.
+>>
+>=20
+> Hi Eric,
+>=20
+> does Thomas' port of your patch look sane? If yes, I'll queue both
+> patches on s390-next for 2.11.
+
+Yes, it's fine with me.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--TqkUvtiSta65upec34dRIudg7xH5716t7
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnoqIwACgkQp6FrSiUn
+Q2oMKAf/TEjq5vhC0dZJp6FrhKfUYQKMtaihtpViyMDO93YfN1C+7UluLmR/mfHE
+0Wr824JYX6JSpZ/XCiQ9fnph0VspzRsE4TS0B+q6JYic44EzrXPipgWgM0I4PFO5
+8x9AeuJC43/iXn9vIb2L+Y69DQJU+N/pfo2rPYK526cCPa1qAraQaVlwSBDQbIAc
+kco5ULpfhbdRm3NrN2RxkbpIU+AoDoqVOuccwOlnKpcfraXY+boWORzL0kl+IGw7
+ELw2KBqts9MVWKIQM40xLsm54pT0Zpo4qjnHSv690L0DBQbt++3Hk57LZDXhP2Zb
+BB82T0AlpcYokPNosE1ND5Jr8q0MXw==
+=HEmS
+-----END PGP SIGNATURE-----
+
+--TqkUvtiSta65upec34dRIudg7xH5716t7--
