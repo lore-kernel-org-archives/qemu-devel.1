@@ -1,31 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56133)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56554)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1e56mY-00063v-54
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 05:06:27 -0400
+	(envelope-from <geoff@hostfission.com>) id 1e56o8-0006uw-Ru
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 05:08:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1e56mU-0002tn-Th
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 05:06:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45050)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1e56mU-0002tA-K1
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 05:06:22 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id AE1661B5E48
-	for <qemu-devel@nongnu.org>; Thu, 19 Oct 2017 09:06:21 +0000 (UTC)
-Date: Thu, 19 Oct 2017 10:06:15 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20171019090615.GB2281@work-vm>
-References: <20171004103933.7898-1-quintela@redhat.com>
-	<20171004103933.7898-5-quintela@redhat.com>
-	<20171016160735.GF2252@work-vm> <8760bcmzyo.fsf@secure.laptop>
+	(envelope-from <geoff@hostfission.com>) id 1e56o5-0004Xc-KS
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 05:08:04 -0400
+Received: from mail1.hostfission.com ([139.99.139.48]:34354)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <geoff@hostfission.com>) id 1e56o5-0004W2-8J
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 05:08:01 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8760bcmzyo.fsf@secure.laptop>
-Subject: Re: [Qemu-devel] [PATCH 4/6] tests: Add migration xbzrle test
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date: Thu, 19 Oct 2017 20:07:54 +1100
+From: geoff@hostfission.com
+In-Reply-To: <CABdb736Ja=PTUn_iPaNSG9HAFO-STJ5m8A3cKVt4Ff8T4jcXhQ@mail.gmail.com>
+References: <5548e41a5668ec0cba9543139327e035@hostfission.com>
+	<3A7697A0-1AF3-46E8-8BCC-45A8127A2638@redhat.com>
+	<286ea2bbfb5ec77d962300c9996c8688@hostfission.com>
+	<92FEAF6E-3002-4F0F-B845-4EC3D29381A4@redhat.com>
+	<c0c5158aeb4e553ac55639e66d81c007@hostfission.com>
+	<34b4df5da848d69b213f538e5751c0d3@hostfission.com>
+	<CABdb734e-Fmfjk8auh-FzKnhmxjs0Bh9WpXWDmRBjYUWsZfe3A@mail.gmail.com>
+	<0f911b72c94a0d0f1bedf1c6385b045e@hostfission.com>
+	<CABdb735gdt_N=GDTb2G_sPENjpxS98dFxoPQBLqtMmp8EKCRFw@mail.gmail.com>
+	<d5b66cd9f96b0dafedf4369ff02a7121@hostfission.com>
+	<CABdb734KxNJ2uMo2e61sFOXNFRgax067ErkQNQ1U1iO7ROAvCw@mail.gmail.com>
+	<4d790f860a3cf21bd7e33e7c3f53b58b@hostfission.com>
+	<CABdb737FAM-k18=8wKohxrn21otnqiBUFoBNKqdEyu==B-s_kA@mail.gmail.com>
+	<a92ac1c09d6d24656449bc2d65c623ea@hostfission.com>
+	<CABdb736Ja=PTUn_iPaNSG9HAFO-STJ5m8A3cKVt4Ff8T4jcXhQ@mail.gmail.com>
+Message-ID: <59a147491e11c4c692e9f762bcd9fb21@hostfission.com>
+Subject: Re: [Qemu-devel] ivshmem Windows Driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,87 +41,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
+To: Ladi Prosek <lprosek@redhat.com>
+Cc: Yan Vugenfirer <yvugenfi@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> > * Juan Quintela (quintela@redhat.com) wrote:
-> >> Signed-off-by: Juan Quintela <quintela@redhat.com>
+On 2017-10-19 20:01, Ladi Prosek wrote:
+> On Thu, Oct 19, 2017 at 10:44 AM,  <geoff@hostfission.com> wrote:
+>> On 2017-10-19 19:35, Ladi Prosek wrote:
+>>> 
+>>> On Wed, Oct 18, 2017 at 5:04 PM,  <geoff@hostfission.com> wrote:
+>>>> 
+>>>> Hi Ladi & Yan,
+>>>> 
+>>>> I am pleased to present the completed driver for review, please see:
+>>>> 
+>>>> https://github.com/gnif/kvm-guest-drivers-windows
+>>> 
+>>> 
+>>> Awesome!
+>>> 
+>>> Feel free to open pull request, it should be easier to comment on.
+>> 
+>> 
+>> Great, I will do so after I have addressed the below. Thanks again.
+>> 
+>>> 
+>>> * WoW considerations: It would be nice if the driver could detect 
+>>> that
+>>> the map request is coming from a 32-bit process and expect a 
+>>> different
+>>> layout of struct IVSHMEM_MMAP.
+>> 
+>> 
+>> I did think of this but I am unsure as to how to detect this.
 > 
-> > +static void test_xbzrle(const char *uri)
-> >> +{
-> >> +    QTestState *from, *to;
-> >> +
-> >> +    test_migrate_start(&from, &to, uri);
-> >> +
-> >> +    /* We want to pick a speed slow enough that the test completes
-> >> +     * quickly, but that it doesn't complete precopy even on a slow
-> >> +     * machine, so also set the downtime.
-> >> +     */
-> >> +    /* 100 ms */
-> >> +    migrate_set_parameter(from, "downtime-limit", "100");
-> >> +    /* 1MB/s slow*/
-> >> +    migrate_set_parameter(from, "max-bandwidth", "100000000");
-> >> +
-> >> +    migrate_set_cache_size(from, "50000000");
-> >
-> > Why 50MB?  I guess this is an interesting test; the program
-> > dirties 100MB of RAM repeatedly, one byte/page.  So 50MB is probably
-> > not much use becuase it'll thrash.
+> I don't think I ever used it but IoIs32bitProcess() looks promising.
 > 
-> No good reason.
-> What I want (tm):
-> - if you have fast hardware, test is as fast as it can
-> - if you don't have fast hardware (or very overloaded), it don't fail
+>>> 
+>>> * It would be cleaner to use READ_REGISTER_* and WRITE_REGISTER_*
+>>> from/to IVSHMEMDeviceRegisters instead of plain memory accesses. Or 
+>>> at
+>>> the very least the accesses should be marked volatile.
+>> 
+>> 
+>> I thought that mapping the IO space was enough for this since it is
+>> mapped as non-cacheable. I can see the point of marking it volatile 
+>> but
+>> see no need to use the read/write register semantics. If this is what 
+>> it
+>> takes however I am happy to do so.
 > 
-> My current idea is:
-> - using 1GB/s for speed
-> - using downtime = 1ms when I want to wait for migration not converge
-> - using downtime = 300ms when I want it to finish
+> Code like this raises eyebrows:
 > 
-> I am open to other numbers.
+>   deviceContext->devRegisters->doorbell |= (UINT32)in->vector |
+> (in->peerID << 16);
+> 
+> Many readers will probably be wondering what exactly the compiler is
+> allowed to do with this statement. May it end up ORing the lower and
+> upper word separately, for example?
+> 
+>   OR [word ptr addr], in->vector
+>   OR [word ptr addr + 2], in->peerID
+> 
+> And, by the way, is OR really what we want here?
+> 
 
-Well I was thinking if we could get it to not-converge unless
-the xbzrle cache was large enough it would actually make sure we test
-xbzrle;  with a 50MB cache you wont test much of xbzrle because I think
-it'll be rare to get a cache hit.
+After double checking this you are dead right, the register is 
+documented
+as write only. I will fix this.
 
-Dave
-> >> +    migrate_set_capability(from, "xbzrle", "true");
-> >> +    migrate_set_capability(to, "xbzrle", "true");
-> >> +    /* Wait for the first serial output from the source */
-> >> +    wait_for_serial("src_serial");
-> >> +
-> >> +    migrate(from, uri);
-> >> +
-> >> +    wait_for_migration_pass(from);
-> >> +
-> >> +    /* 1GB/s now it should converge */
-> >> +    migrate_set_parameter(from, "max-bandwidth", "1000000000");
-> >
-> > I wonder about doing a set_cache_size 150MB here, with a delay before
-> > the max-bandwidht?  If we're lucky at 150MB it'll start actually using
-> > the XBZRLE compression.
-> >
-> >> +    if (!got_stop) {
-> >> +        qtest_qmp_eventwait(from, "STOP");
-> >> +    }
-> >> +    qtest_qmp_eventwait(to, "RESUME");
-> >> +
-> >> +    wait_for_serial("dest_serial");
-> >> +    wait_for_migration_complete(from);
-> >> +
-> >> +    test_migrate_end(from, to);
-> >
-> > Extract xbzrle stats?
+>>> 
+>>> * In ivshmem.inf: ManufacturerName="Red Hat, Inc." instead of 
+>>> "RedHat"
+>>> 
+>> 
+>> No worries.
+>> 
+>>> * Is any of the API used by the driver Win10-only? Just curious, it's
+>>> fine to build the driver only for Win10 for now even if it isn't.
+>> 
+>> 
+>> I have not tried to build it on anything older then win 10 build 10586
+>> as I have nothing older, but AFAIK it should build on windows 8.1 or
+>> later just fine. This is more due to my lack of familiarity with 
+>> Visual
+>> Studio, give me gcc and vim any day :).
 > 
-> Thinking about that.
-> 
-> I actually would want to test that when I set something, read it back
-> that it is what I setted.  I gues I would use a similar trick to what
-> you do to get the pass number.
-> 
-> Later, Juan.
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> Gotcha, no worries, other versions can be tested later.
