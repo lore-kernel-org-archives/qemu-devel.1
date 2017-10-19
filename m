@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52458)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52632)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1e5ywM-0008QK-Cj
-	for qemu-devel@nongnu.org; Sat, 21 Oct 2017 14:56:11 -0400
+	(envelope-from <no-reply@patchew.org>) id 1e5yx7-0000QI-FR
+	for qemu-devel@nongnu.org; Sat, 21 Oct 2017 14:56:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1e5ywI-0001WM-G5
-	for qemu-devel@nongnu.org; Sat, 21 Oct 2017 14:56:10 -0400
-Received: from mail-pg0-x22a.google.com ([2607:f8b0:400e:c05::22a]:56251)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1e5ywI-0001Uz-9Y
-	for qemu-devel@nongnu.org; Sat, 21 Oct 2017 14:56:06 -0400
-Received: by mail-pg0-x22a.google.com with SMTP id 15so4247018pgc.12
-	for <qemu-devel@nongnu.org>; Sat, 21 Oct 2017 11:56:05 -0700 (PDT)
-References: <1508522170-22539-1-git-send-email-peter.maydell@linaro.org>
-	<19d12a08-9ecd-8c91-4652-28773ca35d8e@twiddle.net>
-	<CAFEAcA_HWF_TD190CSVNbgeu-NGrzWsJmFN_u97CRNA8y-yW0w@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <b96c8607-8c7e-a403-d4e7-9e864dd4c6b7@linaro.org>
-Date: Sat, 21 Oct 2017 11:56:01 -0700
+	(envelope-from <no-reply@patchew.org>) id 1e5yx3-0002TL-IW
+	for qemu-devel@nongnu.org; Sat, 21 Oct 2017 14:56:57 -0400
+Resent-Message-Id: <E1e5yx3-0002TL-IW@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21418)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1e5yx3-0002SC-C1
+	for qemu-devel@nongnu.org; Sat, 21 Oct 2017 14:56:53 -0400
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <150843936788.413.8319410302655093683@b58463cdfd5f>
+In-Reply-To: <1508431916-9412-1-git-send-email-ian.jackson@eu.citrix.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_HWF_TD190CSVNbgeu-NGrzWsJmFN_u97CRNA8y-yW0w@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] translate.c: Fix usermode big-endian
- AArch32 LDREXD and STREXD
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 19 Oct 2017 11:56:08 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v5 0/8] xen: xen-domid-restrict improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,30 +28,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <rth@twiddle.net>
-Cc: Christophe Lyon <christophe.lyon@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>
+To: ian.jackson@eu.citrix.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, anthony.perard@citrix.com, ross.lagerwall@citrix.com, sstabellini@kernel.org, jgross@suse.com, xen-devel@lists.xenproject.org
 
-On 10/21/2017 03:17 AM, Peter Maydell wrote:
->>> -        gen_aa32_frob64(s, o64);
->>> +        if (s->be_data) {
->>> +            tcg_gen_rotri_i64(o64, o64, 32);
->>> +        }
->>>          tcg_gen_setcond_i64(TCG_COND_NE, o64, o64, cpu_exclusive_val);
->>
->> We're not splitting o64 to parts.  Are you sure it shouldn't stay as frob?
-> 
-> This is confusing, but I don't think frob is right. We want to
-> be matching either (a) the transformation we just did to produce
-> the 64 bit data we're storing, or (b) the transformation we
-> do on the ldrexd, don't we? Neither of those is frob.
-> 
-> I think I need to think through a bit more carefully about
-> what's actually going on here, since we seem to have the
-> value in two places (actual memory, and the cpu_exclusive_val
-> TCGv.)
-
-We should match what we do in ldrexd, I think.  Which is just a straight BE
-load.  So I guess the frob64 should be dropped and nothing should replace it.
-
-
-r~
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDE1MDg0MzE5MTYtOTQxMi0xLWdpdC1zZW5kLWVtYWlsLWlhbi5qYWNrc29uQGV1
+LmNpdHJpeC5jb20KU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2NSAwLzhdIHhlbjogeGVu
+LWRvbWlkLXJlc3RyaWN0IGltcHJvdmVtZW50cwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQoj
+IS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNF
+Li4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0
+IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBs
+b2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8K
+ICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3Jt
+YXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2Ny
+aXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAg
+ICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBU
+RVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0
+NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKYjlmOTY3MmM0ZCBj
+b25maWd1cmU6IGRvX2NvbXBpbGVyOiBEdW1wIHNvbWUgZXh0cmEgaW5mbyB1bmRlciBiYXNoCjc0
+ZjJkYzRhODEgb3MtcG9zaXg6IFByb3ZpZGUgbmV3IC1ydW5hcyA8dWlkPi48Z2lkPiBmYWNpbGl0
+eQozNGJmNWJmMmZhIHhlbjogZGVzdHJveV9odm1fZG9tYWluOiBUcnkgeGVuZGV2aWNlbW9kZWxf
+c2h1dGRvd24KYmFhOTIwNzgxOSB4ZW46IG1vdmUgeGNfaW50ZXJmYWNlIGNvbXBhdGliaWxpdHkg
+ZmFsbGJhY2sgZnVydGhlciB1cCB0aGUgZmlsZQpmM2NiNWU2ODkwIHhlbjogZGVzdHJveV9odm1f
+ZG9tYWluOiBNb3ZlIHJlYXNvbiBpbnRvIGEgdmFyaWFibGUKNGQwZDkxZWQ5MSB4ZW46IGRlZmVy
+IGNhbGwgdG8geGVuX3Jlc3RyaWN0IHVudGlsIGp1c3QgYmVmb3JlIG9zX3NldHVwX3Bvc3QKNGRl
+YWRhNTE5NiB4ZW46IHJlc3RyaWN0OiB1c2UgeGVudG9vbGNvcmVfcmVzdHJpY3RfYWxsCjEzODM2
+Y2U3ZDkgeGVuOiBsaW5rIGFnYWluc3QgeGVudG9vbGNvcmUKCj09PSBPVVRQVVQgQkVHSU4gPT09
+CkNoZWNraW5nIFBBVENIIDEvODogeGVuOiBsaW5rIGFnYWluc3QgeGVudG9vbGNvcmUuLi4KQ2hl
+Y2tpbmcgUEFUQ0ggMi84OiB4ZW46IHJlc3RyaWN0OiB1c2UgeGVudG9vbGNvcmVfcmVzdHJpY3Rf
+YWxsLi4uCkNoZWNraW5nIFBBVENIIDMvODogeGVuOiBkZWZlciBjYWxsIHRvIHhlbl9yZXN0cmlj
+dCB1bnRpbCBqdXN0IGJlZm9yZSBvc19zZXR1cF9wb3N0Li4uCkNoZWNraW5nIFBBVENIIDQvODog
+eGVuOiBkZXN0cm95X2h2bV9kb21haW46IE1vdmUgcmVhc29uIGludG8gYSB2YXJpYWJsZS4uLgpD
+aGVja2luZyBQQVRDSCA1Lzg6IHhlbjogbW92ZSB4Y19pbnRlcmZhY2UgY29tcGF0aWJpbGl0eSBm
+YWxsYmFjayBmdXJ0aGVyIHVwIHRoZSBmaWxlLi4uCkNoZWNraW5nIFBBVENIIDYvODogeGVuOiBk
+ZXN0cm95X2h2bV9kb21haW46IFRyeSB4ZW5kZXZpY2Vtb2RlbF9zaHV0ZG93bi4uLgpDaGVja2lu
+ZyBQQVRDSCA3Lzg6IG9zLXBvc2l4OiBQcm92aWRlIG5ldyAtcnVuYXMgPHVpZD4uPGdpZD4gZmFj
+aWxpdHkuLi4KRVJST1I6IGNvbnNpZGVyIHVzaW5nIHFlbXVfc3RydG91bCBpbiBwcmVmZXJlbmNl
+IHRvIHN0cnRvdWwKIzQ1OiBGSUxFOiBvcy1wb3NpeC5jOjE0MjoKKyAgICBsdiA9IHN0cnRvdWwo
+b3B0YXJnLCAmZXAsIDApOyAvKiBjYW4ndCBxZW11X3N0cnRvdWwsIHdhbnQgKmVwPT0nLicgKi8K
+CnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMTAwIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0
+Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVy
+cm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBz
+ZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDgvODogY29uZmln
+dXJlOiBkb19jb21waWxlcjogRHVtcCBzb21lIGV4dHJhIGluZm8gdW5kZXIgYmFzaC4uLgo9PT0g
+T1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVt
+YWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9y
+Zy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3Rz
+Lm9yZw==
