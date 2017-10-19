@@ -1,29 +1,44 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33927)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34351)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=4589aa1ec=Ian.Jackson@citrix.com>)
-	id 1e5Dps-0002qg-Ny
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 12:38:21 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1e5DrM-00046L-BL
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 12:39:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=4589aa1ec=Ian.Jackson@citrix.com>)
-	id 1e5Dpn-0004jr-OJ
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 12:38:20 -0400
-Received: from smtp02.citrix.com ([66.165.176.63]:49003)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=4589aa1ec=Ian.Jackson@citrix.com>)
-	id 1e5Dpn-0004ip-Hq
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 12:38:15 -0400
-From: Ian Jackson <ian.jackson@eu.citrix.com>
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1e5DrH-0005rl-CJ
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 12:39:52 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:42446
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1e5DrH-0005rF-5x
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 12:39:47 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v9JGd55s027571
+	for <qemu-devel@nongnu.org>; Thu, 19 Oct 2017 12:39:43 -0400
+Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2dpyrmg0u7-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 19 Oct 2017 12:39:42 -0400
+Received: from localhost
+	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Thu, 19 Oct 2017 17:39:41 +0100
+References: <20170913132752.8484-1-pasic@linux.vnet.ibm.com>
+	<20170913132752.8484-2-pasic@linux.vnet.ibm.com>
+	<20170914162603.1cdabd09.cohuck@redhat.com>
+	<0b42ef59-4366-175f-8dc7-bc3ed02e2fb4@linux.vnet.ibm.com>
+	<20170915092758.16ea52fc.cohuck@redhat.com>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Thu, 19 Oct 2017 18:39:37 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Message-ID: <23016.54514.243025.328812@mariner.uk.xensource.com>
-Date: Thu, 19 Oct 2017 17:38:10 +0100
-In-Reply-To: <20171010103215.GD1771@perard.uk.xensource.com>
-References: <1507564902-9000-1-git-send-email-ian.jackson@eu.citrix.com>
-	<1507564902-9000-2-git-send-email-ian.jackson@eu.citrix.com>
-	<23003.41880.818255.728737@mariner.uk.xensource.com>
-	<20171010103215.GD1771@perard.uk.xensource.com>
-Subject: Re: [Qemu-devel] [PATCH 1/8] xen: link against xentoolcore
+In-Reply-To: <20170915092758.16ea52fc.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Message-Id: <711b1e41-693a-de7d-9c13-fbe0f964c53c@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 1/2] s390x/ccs: add ccw-tester emulated
+ device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,25 +47,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anthony PERARD <anthony.perard@citrix.com>
-Cc: qemu-devel@nongnu.org, Ross Lagerwall <ross.lagerwall@citrix.com>, Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>
 
-Anthony PERARD writes ("Re: [PATCH 1/8] xen: link against xentoolcore"):
-> I don't think it is necessary to do anything in qemu. The linker should
-> find on its own the new libxentoolcore as long as an option
-> -Wl,-rpath-link= provide the right path to xentoolcore when building
-> qemu from xen.git.  In other cases, the pkg-config files should be
-> enough (configure doesn't need to known about a new xentoolcore.pc
-> file).
 
-It seems that the build still works, without this patch but without
-the rest of my series too, because we end up passing
-  -L/u/iwj/work/xen.git/tools/../tools/libs/toolcore
-  -Wl,-rpath-link=/u/iwj/work/xen.git/tools/../tools/libs/toolcore
-(or similar) on the qemu link line.  So when ld links against
-libxenstore (say) it finds that xenstore needs toolcore and finds
-toolcore in the relevant paths.
 
-We still need this patch for the rest of the series, though.
+On 09/15/2017 09:27 AM, Cornelia Huck wrote:
+>>>   
+>>>> +    DEFINE_PROP_UINT8("chpid_type", CcwTesterDevice, chpid_type,
+>>>> +                       0x98),
+> This might also need re-evaluation - we should not really need a new
+> chpid type.
+> 
 
-Ian.
+I'm back at ccw-tester again (for v2). I've realized we did not agree
+on what to use here (chpid_type). Shall I use 0x25 (Fibre Channel) or
+EMULATED_CCW_3270_CHPID_TYPE, or even 0x32 (virtio-ccw) as a default
+value? And should EMULATED_CCW_3270_CHPID_TYPE be called like that
+(is it really supposed to be specific to 3270?
+
+Sorry I did not notice sooner.
+
+Regards,
+Halil
