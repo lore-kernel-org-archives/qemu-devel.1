@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34203)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34425)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1e57G4-0001kF-F8
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 05:36:57 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1e57H0-0002Lc-KX
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 05:37:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1e57G0-0000r0-F0
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 05:36:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42212)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1e57G0-0000pv-9C
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 05:36:52 -0400
-Date: Thu, 19 Oct 2017 11:36:47 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20171019093647.GA6195@localhost.localdomain>
-References: <20171012235439.19457-1-anatol.pomozov@gmail.com>
-	<20171012235439.19457-4-anatol.pomozov@gmail.com>
-	<CAOMFOmUaJT+OdfN9Yin91AiP_+HXMbVFXuPY0FORb1PNvzYCmw@mail.gmail.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1e57Gz-0001iA-R9
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 05:37:54 -0400
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:56691)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1e57Gz-0001hY-Ko
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 05:37:53 -0400
+Received: by mail-wr0-x242.google.com with SMTP id r79so7630227wrb.13
+	for <qemu-devel@nongnu.org>; Thu, 19 Oct 2017 02:37:53 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAOMFOmUaJT+OdfN9Yin91AiP_+HXMbVFXuPY0FORb1PNvzYCmw@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH 3/4] multiboot: load elf sections and
- section headers
+In-Reply-To: <20171019041134.GX2776@umbus.fritz.box>
+References: <20171018223116.6035-1-programmingkidx@gmail.com>
+	<20171019013126.GR2776@umbus.fritz.box>
+	<73CB718C-E1F1-4028-9E64-55759471792A@gmail.com>
+	<20171019041134.GX2776@umbus.fritz.box>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 19 Oct 2017 10:37:31 +0100
+Message-ID: <CAFEAcA_0X59g3uyLcmVQ=ffjaz_=tHi_KLqsJ4rLsrhV91FrtQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] fdt_ro.c: implement strnlen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,32 +31,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anatol Pomozov <anatol.pomozov@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <agraf@suse.de>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Programmingkid <programmingkidx@gmail.com>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-Am 18.10.2017 um 19:22 hat Anatol Pomozov geschrieben:
-> Hello qemu-devs,
-> 
-> This patchset has been posted a while ago. I would like to move
-> forward with it and look at the next task (e.g. multiboot2 support in
-> QEMU). Who is the multiboot code maintainer who can help to review
-> this patchset and give go/no-go answer?
+On 19 October 2017 at 05:11, David Gibson <david@gibson.dropbear.id.au> wrote:
+> On Wed, Oct 18, 2017 at 10:39:57PM -0400, Programmingkid wrote:
+>> QEMU supports Mac OS 10.5 and higher. The strnlen() function might
+>> have been added to Mac OS X in version 10.7.
+>
+> Wow.  No strnlen() in MacOS until that recently, that's pretty shit.
 
-I think that's exactly your problem, there is nobody who feels
-responsible for Multiboot support. Officially, it is part of the PC/x86
-subsystems:
+It's pretty poor, but the 10.7 release date was 2011, five years
+ago now, and it's been out of security-fix support for 2 or 3 years.
 
-$ scripts/get_maintainer.pl -f hw/i386/multiboot.c
-"Michael S. Tsirkin" <mst@redhat.com> (supporter:PC)
-Paolo Bonzini <pbonzini@redhat.com> (maintainer:X86)
-Richard Henderson <rth@twiddle.net> (maintainer:X86)
-Eduardo Habkost <ehabkost@redhat.com> (maintainer:X86)
-qemu-devel@nongnu.org (open list:All patches CC here)
-
-I'm not sure if any of them know much about Multiboot. Myself, I am
-personally interested in having Multiboot support, which is why I've
-even commented on your patches, but I'm not the maintainer.
-
-The last few Multiboot patches seem to have been merged by Paolo.
-
-Kevin
+thanks
+-- PMM
