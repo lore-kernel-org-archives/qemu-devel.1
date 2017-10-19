@@ -1,33 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44908)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47614)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1e55pI-0007ua-Jr
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 04:05:18 -0400
+	(envelope-from <kraxel@redhat.com>) id 1e5642-00018l-IY
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 04:20:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1e55pD-0004bo-0h
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 04:05:12 -0400
-Received: from mga11.intel.com ([192.55.52.93]:45861)
+	(envelope-from <kraxel@redhat.com>) id 1e563w-000784-LA
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 04:20:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50120)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1e55pC-0004bI-MU
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 04:05:06 -0400
-Message-ID: <59E85D2A.1060407@intel.com>
-Date: Thu, 19 Oct 2017 16:07:06 +0800
-From: Wei Wang <wei.w.wang@intel.com>
-MIME-Version: 1.0
-References: <1506744354-20979-1-git-send-email-wei.w.wang@intel.com>
-	<1506744354-20979-6-git-send-email-wei.w.wang@intel.com>
-	<20171001060305-mutt-send-email-mst@kernel.org>
-	<286AC319A985734F985F78AFA26841F73932025A@shsmsx102.ccr.corp.intel.com>
-	<20171010180636-mutt-send-email-mst@kernel.org>
-	<59DDB428.4020208@intel.com>
-	<20171011161912-mutt-send-email-mst@kernel.org>
-	<59DEE790.5040809@intel.com>
-	<20171013163503-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20171013163503-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v16 5/5] virtio-balloon:
- VIRTIO_BALLOON_F_CTRL_VQ
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1e563w-000771-E2
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 04:20:20 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 67A6933A17B
+	for <qemu-devel@nongnu.org>; Thu, 19 Oct 2017 08:20:19 +0000 (UTC)
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Thu, 19 Oct 2017 10:20:14 +0200
+Message-Id: <20171019082015.16432-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PULL 0/1] Seabios 1.11 prerelease 20171019 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,23 +27,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, "mhocko@kernel.org" <mhocko@kernel.org>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>, "mawilcox@microsoft.com" <mawilcox@microsoft.com>, "david@redhat.com" <david@redhat.com>, "cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>, "mgorman@techsingularity.net" <mgorman@techsingularity.net>, "aarcange@redhat.com" <aarcange@redhat.com>, "amit.shah@redhat.com" <amit.shah@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "willy@infradead.org" <willy@infradead.org>, "liliang.opensource@gmail.com" <liliang.opensource@gmail.com>, "yang.zhang.wz@gmail.com" <yang.zhang.wz@gmail.com>, "quan.xu@aliyun.com" <quan.xu@aliyun.com>
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-On 10/13/2017 09:38 PM, Michael S. Tsirkin wrote:
-> On Thu, Oct 12, 2017 at 11:54:56AM +0800, Wei Wang wrote:
->>> But I think flushing is very fragile. You will easily run into races
->>> if one of the actors gets out of sync and keeps adding data.
->>> I think adding an ID in the free vq stream is a more robust
->>> approach.
->>>
->> Adding ID to the free vq would need the device to distinguish whether it
->> receives an ID or a free page hint,
-> Not really.  It's pretty simple: a 64 bit buffer is an ID. A 4K and bigger one
-> is a page.
+The following changes since commit 861cd431c99e56ddb5953ca1da164a9c32b477ca:
 
-I think we can also use the previous method, free page via in_buf, and 
-id via out_buf.
+  Merge remote-tracking branch 'remotes/dgibson/tags/ppc-for-2.11-20171017' into staging (2017-10-17 15:26:51 +0100)
 
-Best,
-Wei
+are available in the git repository at:
+
+  git://git.kraxel.org/qemu tags/seabios-1.11-prerelease-20171019-pull-request
+
+for you to fetch changes up to 083fab0290f2c40d3d04f7f22eed9c8f2d5b6787:
+
+  seabios: update to 1.11 prerelease (2017-10-19 10:14:26 +0200)
+
+----------------------------------------------------------------
+seabios: update to 1.11 prerelease
+
+----------------------------------------------------------------
+
+Gerd Hoffmann (1):
+  seabios: update to 1.11 prerelease
+
+ pc-bios/bios-256k.bin      | Bin 262144 -> 262144 bytes
+ pc-bios/bios.bin           | Bin 131072 -> 131072 bytes
+ pc-bios/vgabios-cirrus.bin | Bin 38400 -> 38400 bytes
+ pc-bios/vgabios-qxl.bin    | Bin 38912 -> 38912 bytes
+ pc-bios/vgabios-stdvga.bin | Bin 38912 -> 38912 bytes
+ pc-bios/vgabios-virtio.bin | Bin 38912 -> 38912 bytes
+ pc-bios/vgabios-vmware.bin | Bin 38912 -> 38912 bytes
+ pc-bios/vgabios.bin        | Bin 38400 -> 38400 bytes
+ roms/config.seabios-128k   |   4 ++++
+ roms/seabios               |   2 +-
+ 10 files changed, 5 insertions(+), 1 deletion(-)
+
+-- 
+2.9.3
