@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56087)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58257)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1e54en-0005s8-Ta
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 02:50:18 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1e54nX-0007fM-QB
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 02:59:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1e54ek-0006Qh-Ng
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 02:50:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58718)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1e54ek-0006Oo-AQ
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 02:50:14 -0400
-References: <20171016131644.9565-1-kraxel@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <19f64376-dcae-7185-110f-9970299666b2@redhat.com>
-Date: Thu, 19 Oct 2017 08:50:02 +0200
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1e54nU-0001mt-LT
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 02:59:19 -0400
+Received: from chuckie.co.uk ([82.165.15.123]:45339
+	helo=s16892447.onlinehome-server.info)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1e54nU-0001cN-FF
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 02:59:16 -0400
+Date: Thu, 19 Oct 2017 07:58:54 +0100
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <20171019065854.GB17401@kentang.lan>
 MIME-Version: 1.0
-In-Reply-To: <20171016131644.9565-1-kraxel@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 00/11] Ui 20171016 patches
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Subject: [Qemu-devel] [PULL] qemu-sparc updates
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,33 +26,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, "Daniel P. Berrange" <berrange@redhat.com>
+To: qemu-devel@nongnu.org, peter.maydell@linaro.org
 
-On 16.10.2017 15:16, Gerd Hoffmann wrote:
-> The following changes since commit f90ea7ba7c5ae7010ee0ce062207ae42530f57d6:
-> 
->   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20171012' into staging (2017-10-12 17:06:50 +0100)
-> 
-> are available in the git repository at:
-> 
->   git://git.kraxel.org/qemu tags/ui-20171016-pull-request
-> 
-> for you to fetch changes up to 2ff408de9c080f2fb5a94ebf6a209c6180c64933:
-> 
->   gtk: fix wrong id between texture and framebuffer (2017-10-16 14:50:54 +0200)
-> 
-> ----------------------------------------------------------------
-> ui: use keycodemapdb for key code mappings, part one (v2)
-> ui: add qemu-keymap, update reverse keymaps (for qemu -k $map)
-> ui: fix for vte 0.50
-> ui: gtk texture fix
+Hi Peter,
 
-I just noticed that I now get the following warning message when I
-change to an older git branch:
+Here are my sun4u patches for 2.11. Note that because of the machine changes
+there is an openbios-sparc64 binary update included in the first patch to 
+maintain bisectability. There will be a follow-up patch for OpenBIOS which will
+update binaries for all architectures to the latest and update the submodule 
+shortly.
 
-warning: unable to rmdir ui/keycodemapdb: Directory not empty
 
-... this is kind of ugly, is there a way to fix this?
+ATB,
 
- Thomas
+Mark.  
+
+
+The following changes since commit 861cd431c99e56ddb5953ca1da164a9c32b477ca:
+
+  Merge remote-tracking branch 'remotes/dgibson/tags/ppc-for-2.11-20171017' into staging (2017-10-17 15:26:51 +0100)
+
+are available in the git repository at:
+
+
+  https://github.com/mcayland/qemu.git tags/qemu-sparc-signed
+
+for you to fetch changes up to bcf9e2c2f2b7a610efaafc4bd6d0bee9181c2345:
+
+  sun4u: fix assert when adding NICs which aren't the in-built model (2017-10-19 07:45:35 +0100)
+
+----------------------------------------------------------------
+qemu-sparc update
+
+----------------------------------------------------------------
+Mark Cave-Ayland (2):
+      sun4u: update PCI topology to include simba PCI bridges
+      sun4u: fix assert when adding NICs which aren't the in-built model
+
+ hw/pci-host/apb.c        |   47 +++++++++++++++++++++++++++---------
+ hw/sparc64/sun4u.c       |   60 +++++++++++++++++++++++++++++++++-------------
+ pc-bios/openbios-sparc64 |  Bin 1593408 -> 1593408 bytes
+ 3 files changed, 79 insertions(+), 28 deletions(-)
