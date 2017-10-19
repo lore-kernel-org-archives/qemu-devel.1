@@ -1,37 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36253)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36284)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e5FAP-0007QD-1j
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 14:03:38 -0400
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e5FAP-0007QK-NQ
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 14:03:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e5FAK-0007PE-Um
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e5FAL-0007Q0-4u
 	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 14:03:37 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:40998)
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:51660)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1e5FAK-0007Ny-JE
+	id 1e5FAK-0007OA-Os
 	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 14:03:32 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v9JI1Hw7134348
+	v9JI2Hoe047138
 	for <qemu-devel@nongnu.org>; Thu, 19 Oct 2017 14:03:29 -0400
-Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2dpws2453s-1
+Received: from e19.ny.us.ibm.com (e19.ny.us.ibm.com [129.33.205.209])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2dpvu3rt3n-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
 	for <qemu-devel@nongnu.org>; Thu, 19 Oct 2017 14:03:28 -0400
 Received: from localhost
-	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e19.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
 	Thu, 19 Oct 2017 14:03:27 -0400
 From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Thu, 19 Oct 2017 14:02:54 -0400
+Date: Thu, 19 Oct 2017 14:02:40 -0400
 In-Reply-To: <1508436175-1596-1-git-send-email-stefanb@linux.vnet.ibm.com>
 References: <1508436175-1596-1-git-send-email-stefanb@linux.vnet.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Message-Id: <1508436175-1596-21-git-send-email-stefanb@linux.vnet.ibm.com>
+Message-Id: <1508436175-1596-7-git-send-email-stefanb@linux.vnet.ibm.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v1 20/21] tpm: add a QOM TPM interface
+Subject: [Qemu-devel] [PULL v1 06/21] tpm: remove tpm_register_driver()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,89 +45,78 @@ Cc: Peter Maydell <peter.maydell@linaro.org>, marcandre.lureau@gmail.com, =?UTF-
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-This will simplify backend / interface objects relationship, so the
-frontend interface will simply have to implement the TPM QOM interface.
+No more users of be_drivers[], drop that too.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Reviewed-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
 Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
 ---
- backends/tpm.c   |  8 ++++++++
- hw/tpm/tpm_int.h | 17 +++++++++++++++++
- hw/tpm/tpm_tis.c |  4 ++++
- 3 files changed, 29 insertions(+)
+ hw/tpm/tpm_emulator.c        | 1 -
+ hw/tpm/tpm_passthrough.c     | 1 -
+ include/sysemu/tpm_backend.h | 1 -
+ tpm.c                        | 8 --------
+ 4 files changed, 11 deletions(-)
 
-diff --git a/backends/tpm.c b/backends/tpm.c
-index dc7c831..87c5c09 100644
---- a/backends/tpm.c
-+++ b/backends/tpm.c
-@@ -17,6 +17,7 @@
- #include "qapi/error.h"
- #include "qapi/qmp/qerror.h"
- #include "sysemu/tpm.h"
-+#include "hw/tpm/tpm_int.h"
- #include "qemu/thread.h"
-=20
- static void tpm_backend_worker_thread(gpointer data, gpointer user_data)
-@@ -209,9 +210,16 @@ static const TypeInfo tpm_backend_info =3D {
-     .abstract =3D true,
- };
-=20
-+static const TypeInfo tpm_if_info =3D {
-+    .name =3D TYPE_TPM_IF,
-+    .parent =3D TYPE_INTERFACE,
-+    .class_size =3D sizeof(TPMIfClass),
-+};
-+
- static void register_types(void)
+diff --git a/hw/tpm/tpm_emulator.c b/hw/tpm/tpm_emulator.c
+index 95e1e04..187a69e 100644
+--- a/hw/tpm/tpm_emulator.c
++++ b/hw/tpm/tpm_emulator.c
+@@ -581,7 +581,6 @@ static const TypeInfo tpm_emulator_info =3D {
+ static void tpm_emulator_register(void)
  {
-     type_register_static(&tpm_backend_info);
-+    type_register_static(&tpm_if_info);
+     type_register_static(&tpm_emulator_info);
+-    tpm_register_driver(&tpm_emulator_driver);
  }
 =20
- type_init(register_types);
-diff --git a/hw/tpm/tpm_int.h b/hw/tpm/tpm_int.h
-index e231d0e..eb02e77 100644
---- a/hw/tpm/tpm_int.h
-+++ b/hw/tpm/tpm_int.h
-@@ -13,6 +13,23 @@
- #define TPM_TPM_INT_H
+ type_init(tpm_emulator_register)
+diff --git a/hw/tpm/tpm_passthrough.c b/hw/tpm/tpm_passthrough.c
+index e6ace28..f04eab3 100644
+--- a/hw/tpm/tpm_passthrough.c
++++ b/hw/tpm/tpm_passthrough.c
+@@ -418,7 +418,6 @@ static const TypeInfo tpm_passthrough_info =3D {
+ static void tpm_passthrough_register(void)
+ {
+     type_register_static(&tpm_passthrough_info);
+-    tpm_register_driver(&tpm_passthrough_driver);
+ }
 =20
- #include "qemu/osdep.h"
-+#include "qom/object.h"
-+
-+#define TYPE_TPM_IF "tpm-if"
-+#define TPM_IF_CLASS(klass) \
-+    OBJECT_CLASS_CHECK(TPMIfClass, (klass), TYPE_TPM_IF)
-+#define TPM_IF_GET_CLASS(obj) \
-+    OBJECT_GET_CLASS(TPMIfClass, (obj), TYPE_TPM_IF)
-+#define TPM_IF(obj) \
-+    INTERFACE_CHECK(TPMIf, (obj), TYPE_TPM_IF)
-+
-+typedef struct TPMIf {
-+    Object parent_obj;
-+} TPMIf;
-+
-+typedef struct TPMIfClass {
-+    InterfaceClass parent_class;
-+} TPMIfClass;
+ type_init(tpm_passthrough_register)
+diff --git a/include/sysemu/tpm_backend.h b/include/sysemu/tpm_backend.h
+index c6e5637..adb6a68 100644
+--- a/include/sysemu/tpm_backend.h
++++ b/include/sysemu/tpm_backend.h
+@@ -216,6 +216,5 @@ TPMInfo *tpm_backend_query_tpm(TPMBackend *s);
+ TPMBackend *qemu_find_tpm(const char *id);
 =20
- #define TPM_STANDARD_CMDLINE_OPTS               \
-     { \
-diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
-index d84eec4..dbb5004 100644
---- a/hw/tpm/tpm_tis.c
-+++ b/hw/tpm/tpm_tis.c
-@@ -1123,6 +1123,10 @@ static const TypeInfo tpm_tis_info =3D {
-     .instance_size =3D sizeof(TPMState),
-     .instance_init =3D tpm_tis_initfn,
-     .class_init  =3D tpm_tis_class_init,
-+    .interfaces =3D (InterfaceInfo[]) {
-+        { TYPE_TPM_IF },
-+        { }
-+    }
- };
+ void tpm_register_model(enum TpmModel model);
+-void tpm_register_driver(const TPMDriverOps *tdo);
 =20
- static void tpm_tis_register(void)
+ #endif
+diff --git a/tpm.c b/tpm.c
+index ad2ed6a..75a589b 100644
+--- a/tpm.c
++++ b/tpm.c
+@@ -23,7 +23,6 @@
+ static QLIST_HEAD(, TPMBackend) tpm_backends =3D
+     QLIST_HEAD_INITIALIZER(tpm_backends);
+=20
+-static TPMDriverOps const *be_drivers[TPM_TYPE__MAX];
+ static bool tpm_models[TPM_MODEL__MAX];
+=20
+ void tpm_register_model(enum TpmModel model)
+@@ -33,13 +32,6 @@ void tpm_register_model(enum TpmModel model)
+=20
+ #ifdef CONFIG_TPM
+=20
+-void tpm_register_driver(const TPMDriverOps *tdo)
+-{
+-    assert(!be_drivers[tdo->type]);
+-
+-    be_drivers[tdo->type] =3D tdo;
+-}
+-
+ static const TPMDriverOps *
+ tpm_driver_find_by_type(enum TpmType type)
+ {
 --=20
 2.5.5
