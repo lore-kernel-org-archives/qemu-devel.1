@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33658)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40421)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1e554G-00042p-SM
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 03:16:42 -0400
+	(envelope-from <rjones@redhat.com>) id 1e55Wl-0001tx-KU
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 03:46:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1e554C-0005zc-36
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 03:16:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56524)
+	(envelope-from <rjones@redhat.com>) id 1e55Wi-00078X-Go
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 03:46:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35368)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1e554B-0005z7-Pj
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 03:16:32 -0400
-Date: Thu, 19 Oct 2017 15:16:11 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20171019071611.GY4166@pxdev.xzpeter.org>
-References: <20170929033844.26935-1-peterx@redhat.com>
-	<20170929033844.26935-16-peterx@redhat.com>
-	<20171012125620.GG5957@stefanha-x1.localdomain>
-	<20171016081158.GE4166@pxdev.xzpeter.org>
-	<20171018152804.GC31848@stefanha-x1.localdomain>
+	(Exim 4.71) (envelope-from <rjones@redhat.com>) id 1e55Wi-00077p-A5
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 03:46:00 -0400
+Date: Thu, 19 Oct 2017 08:45:56 +0100
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Message-ID: <20171019074556.GC18719@redhat.com>
+References: <1506683421-27004-1-git-send-email-amarnath.valluri@intel.com>
+	<1506683421-27004-10-git-send-email-amarnath.valluri@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20171018152804.GC31848@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] [RFC v2 15/22] monitor: send event when request
- queue full
+In-Reply-To: <1506683421-27004-10-git-send-email-amarnath.valluri@intel.com>
+Subject: Re: [Qemu-devel] [PATCH v10 9/9] tpm: Move tpm_cleanup() to right
+ place
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,126 +28,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Stefan Hajnoczi <shajnocz@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Amarnath Valluri <amarnath.valluri@intel.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, marcandre.lureau@gmail.com, stefanb@linux.vnet.ibm.com
 
-On Wed, Oct 18, 2017 at 05:28:04PM +0200, Stefan Hajnoczi wrote:
-> On Mon, Oct 16, 2017 at 04:11:58PM +0800, Peter Xu wrote:
-> > On Thu, Oct 12, 2017 at 01:56:20PM +0100, Stefan Hajnoczi wrote:
-> > > On Fri, Sep 29, 2017 at 11:38:37AM +0800, Peter Xu wrote:
-> > > > Set maximum QMP request queue length to 8.  If queue full, instead of
-> > > > queue the command, we directly return a "request-dropped" event, telling
-> > > > client that specific command is dropped.
-> > > > 
-> > > > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > > > ---
-> > > >  monitor.c | 15 +++++++++++++++
-> > > >  1 file changed, 15 insertions(+)
-> > > > 
-> > > > diff --git a/monitor.c b/monitor.c
-> > > > index 1e9a6cb6a5..d9bed31248 100644
-> > > > --- a/monitor.c
-> > > > +++ b/monitor.c
-> > > > @@ -3971,6 +3971,8 @@ static void monitor_qmp_bh_dispatcher(void *data)
-> > > >      }
-> > > >  }
-> > > >  
-> > > > +#define  QMP_ASYNC_QUEUE_LEN_MAX  (8)
-> > > 
-> > > Why 8?
-> > 
-> > I proposed this in previous discussion and no one objected, so I just
-> > used it. It's here:
-> > 
-> >   https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg03989.html
-> >   (please don't go over the thread; I'll copy the related paragraphs)
-> > 
-> > """
-> >   ...
-> >   Regarding to queue size: I am afraid max_size=1 may not suffice?
-> >   Otherwise a simple batch of:
-> > 
-> >   {"execute": "query-status"} {"execute": "query-status"}
-> > 
-> >   Will trigger the failure.  But I definitely agree it should not be
-> >   something very large.  The total memory will be this:
-> > 
-> >     json limit * queue length limit * monitor count limit
-> >         (X)            (Y)                    (Z)
-> > 
-> >   Now we have (X) already (in form of a few tunables for JSON token
-> >   counts, etc.), we don't have (Z), and we definitely need (Y).
-> > 
-> >   How about we add limits on Y=16 and Z=8?
-> > 
-> >   We can do some math if we want some more exact number though.
-> >   ...
-> > """
-> > 
-> > Oops, I proposed "16", but I used "8"; I hope 8 is good enough, but I
-> > am definitely not sure whether "1" is good.
+
+On Fri, Sep 29, 2017 at 02:10:21PM +0300, Amarnath Valluri wrote:
+> As Emulator TPM backend uses chardev, tpm cleanup should happen before chardev
+> similar to other vhost-users.
 > 
-> I understand the concern about breaking existing clients but choosing an
-> arbitrary magic number isn't a correct solution to that problem because
-> existing clients may exceed the magic number!
-
-I agree.
-
+> Signed-off-by: Amarnath Valluri <amarnath.valluri@intel.com>
+> ---
+>  tpm.c | 1 -
+>  vl.c  | 1 +
+>  2 files changed, 1 insertion(+), 1 deletion(-)
 > 
-> Instead I think QMP should only look ahead if the out-of-band feature
-> has been negotatiated.  This way existing clients continue to work.  New
-> clients will have to avoid sending a batch of requests or they must
-> handle the queue size limit error.
+> diff --git a/tpm.c b/tpm.c
+> index 3b8c7ed..3122227 100644
+> --- a/tpm.c
+> +++ b/tpm.c
+> @@ -172,7 +172,6 @@ int tpm_init(void)
+>          return -1;
+>      }
+>  
+> -    atexit(tpm_cleanup);
+>      return 0;
+>  }
+>  
+> diff --git a/vl.c b/vl.c
+> index 9bb5058..ed86209 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -4893,6 +4893,7 @@ int main(int argc, char **argv, char **envp)
+>      res_free();
+>  
+>      /* vhost-user must be cleaned up before chardevs.  */
+> +    tpm_cleanup();
+>      net_cleanup();
+>      audio_cleanup();
+>      monitor_cleanup();
 
-Hmm yes I just noticed that although I broadcasted the "OOB"
-capability but actually I skipped the negociation phase (so OOB is
-always enabled). I think I should have that for sure.
+This breaks compilation with --disable-tpm.  I'll post a trivial
+patch shortly.
 
-IIUC below new handle_qmp_command() should be always compatible with
-old clients then:
-
-handle_qmp_command ()
-{
-  ...
-  if (oob_enabled) {
-    if (cmd_is_oob (req)) {
-      // execute command
-      qmp_dispatch (req);
-      return;
-    }
-    if (queue_full (mon)) {
-      // drop req
-      send_full_event (mon);
-      return;
-    }
-  }
-
-  queue (req);
-  kick (task);
-
-  if (!oob_enabled) {
-    // if oob not enabled, we don't process next request before previous
-    // one finishes, and queue length will always be either 0 or 1.
-    // Note: this means the parsing thread can block now.
-    wait_until_req_handled (req);
-  }
-}
-
-This will be somehow more complicated than before though, since if
-with this, we need to make sure all the QMP clients have enabled OOB
-feature to make sure OOB command can work. Otherwise even if only one
-QMP client didn't enable OOB, then it may block at waiting for the
-request to finish, and it will block the whole monitor IOThread as
-well (which is currently shared by OOB and non-OOB monitors).
-
-Or, maybe, I should just create one IOThread for each QMP monitor.
-
-> 
-> > For the naming: how about QMP_REQ_QUEUE_LEN_MAX?
-> 
-> Yes.
-
-Thanks,
+Rich.
 
 -- 
-Peter Xu
+Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
+Read my programming and virtualization blog: http://rwmj.wordpress.com
+virt-df lists disk usage of guests without needing to install any
+software inside the virtual machine.  Supports Linux and Windows.
+http://people.redhat.com/~rjones/virt-df/
