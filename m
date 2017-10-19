@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57489)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57640)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1e56rS-0000He-US
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 05:11:31 -0400
+	(envelope-from <berrange@redhat.com>) id 1e56rz-0000s7-Ux
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 05:12:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1e56rO-0000Gb-U5
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 05:11:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52226)
+	(envelope-from <berrange@redhat.com>) id 1e56rw-0000Y2-OK
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 05:12:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51564)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1e56rO-0000G6-NT
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 05:11:26 -0400
-Date: Thu, 19 Oct 2017 11:11:21 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20171019111121.39b7a277.cohuck@redhat.com>
-In-Reply-To: <20171019061445.GD4612@bjsdjshi@linux.vnet.ibm.com>
-References: <20171017140453.51099-1-pasic@linux.vnet.ibm.com>
-	<20171017140453.51099-6-pasic@linux.vnet.ibm.com>
-	<20171019061445.GD4612@bjsdjshi@linux.vnet.ibm.com>
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1e56rw-0000XX-Go
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 05:12:00 -0400
+Date: Thu, 19 Oct 2017 10:11:52 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20171019091152.GD8408@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20171016131644.9565-1-kraxel@redhat.com>
+	<19f64376-dcae-7185-110f-9970299666b2@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 5/7] s390x: refactor error handling for
- CSCH handler
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <19f64376-dcae-7185-110f-9970299666b2@redhat.com>
+Subject: Re: [Qemu-devel] [PULL 00/11] Ui 20171016 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,70 +28,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-Cc: Halil Pasic <pasic@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
 
-On Thu, 19 Oct 2017 14:14:45 +0800
-Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
-
-> * Halil Pasic <pasic@linux.vnet.ibm.com> [2017-10-17 16:04:51 +0200]:
-> 
-> > Simplify the error handling of the cSCH.  Let the code detecting the
-> > condition tell (in a less ambiguous way) how it's to be handled. No
-> > changes in behavior.
+On Thu, Oct 19, 2017 at 08:50:02AM +0200, Thomas Huth wrote:
+> On 16.10.2017 15:16, Gerd Hoffmann wrote:
+> > The following changes since commit f90ea7ba7c5ae7010ee0ce062207ae42530f57d6:
 > > 
-> > Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
-> > ---  
-> [...]
-> 
-> > diff --git a/target/s390x/ioinst.c b/target/s390x/ioinst.c
-> > index 4ad07e9181..fd659e77a5 100644
-> > --- a/target/s390x/ioinst.c
-> > +++ b/target/s390x/ioinst.c
-> > @@ -60,8 +60,6 @@ void ioinst_handle_csch(S390CPU *cpu, uint64_t reg1)
-> >  {
-> >      int cssid, ssid, schid, m;
-> >      SubchDev *sch;
-> > -    int ret = -ENODEV;
-> > -    int cc;
+> >   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20171012' into staging (2017-10-12 17:06:50 +0100)
 > > 
-> >      if (ioinst_disassemble_sch_ident(reg1, &m, &cssid, &ssid, &schid)) {
-> >          program_interrupt(&cpu->env, PGM_OPERAND, 4);
-> > @@ -69,15 +67,11 @@ void ioinst_handle_csch(S390CPU *cpu, uint64_t reg1)
-> >      }
-> >      trace_ioinst_sch_id("csch", cssid, ssid, schid);
-> >      sch = css_find_subch(m, cssid, ssid, schid);
-> > -    if (sch && css_subch_visible(sch)) {
-> > -        ret = css_do_csch(sch);
-> > -    }
-> > -    if (ret == -ENODEV) {
-> > -        cc = 3;
-> > -    } else {
-> > -        cc = 0;
-> > +    if (!sch || !css_subch_visible(sch)) {
-> > +        setcc(cpu, 3);  
-> Same question here.
-> 
-> > +        return;
-> >      }
-> > -    setcc(cpu, cc);
-> > +    setcc(cpu, css_do_csch(sch));
-> >  }
+> > are available in the git repository at:
 > > 
-> >  void ioinst_handle_hsch(S390CPU *cpu, uint64_t reg1)
-> > -- 
-> > 2.13.5
-> >   
+> >   git://git.kraxel.org/qemu tags/ui-20171016-pull-request
+> > 
+> > for you to fetch changes up to 2ff408de9c080f2fb5a94ebf6a209c6180c64933:
+> > 
+> >   gtk: fix wrong id between texture and framebuffer (2017-10-16 14:50:54 +0200)
+> > 
+> > ----------------------------------------------------------------
+> > ui: use keycodemapdb for key code mappings, part one (v2)
+> > ui: add qemu-keymap, update reverse keymaps (for qemu -k $map)
+> > ui: fix for vte 0.50
+> > ui: gtk texture fix
 > 
-> If we agree to replace 3 with IOINST_CC_NOT_OPERATIONAL, maybe Conny
-> could fix it. Or we can do that in a following cleanup patch?
-
-Switching it to IOINST_CC_NOT_OPERATIONAL is certainly good, but I
-think I've already done enough editing for this series...
-
-A patch on top would be the best way.
-
+> I just noticed that I now get the following warning message when I
+> change to an older git branch:
 > 
-> W/ or w/o the fix, for now:
-> Reviewed-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+> warning: unable to rmdir ui/keycodemapdb: Directory not empty
 > 
+> ... this is kind of ugly, is there a way to fix this?
+
+There's no way to automatically clean that up when switching to older
+branches. You can do 'git submodule deinit -f ui/keycodemapdb' *before*
+switching to the old branch, or just 'git submodule deinit -f --all'.
+
+Having this stable submodule should be completely harmless though as
+nothing in the older branch will be using it.  So IMHO just ignore the
+warning message - its only ever going to be a very short term problem
+for people until they rebase their branches to git master (aside from
+those few people working on stable maint branches)
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
