@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60763)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35143)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e5CG1-00079X-0X
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 10:57:14 -0400
+	(envelope-from <clg@kaod.org>) id 1e5CVV-00019X-K8
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 11:13:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e5CG0-0007tF-4j
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 10:57:13 -0400
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:51267)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1e5CFz-0007sh-Sk
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 10:57:12 -0400
-Received: by mail-wr0-x244.google.com with SMTP id j14so8639855wre.8
-	for <qemu-devel@nongnu.org>; Thu, 19 Oct 2017 07:57:11 -0700 (PDT)
+	(envelope-from <clg@kaod.org>) id 1e5CVR-00018c-Kg
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 11:13:13 -0400
+Received: from 4.mo5.mail-out.ovh.net ([178.33.111.247]:56508)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1e5CVR-00015L-EK
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 11:13:09 -0400
+Received: from player786.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo5.mail-out.ovh.net (Postfix) with ESMTP id E05A5145FB8
+	for <qemu-devel@nongnu.org>; Thu, 19 Oct 2017 17:13:01 +0200 (CEST)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+Date: Thu, 19 Oct 2017 17:12:41 +0200
+Message-Id: <20171019151249.13663-1-clg@kaod.org>
 MIME-Version: 1.0
-In-Reply-To: <alpine.DEB.2.10.1710181439060.27209@sstabellini-ThinkPad-X260>
-References: <alpine.DEB.2.10.1710181439060.27209@sstabellini-ThinkPad-X260>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 19 Oct 2017 15:56:49 +0100
-Message-ID: <CAFEAcA_v=UsQ4hfn2oVLt3MPU3yJUnHLfzZHrdkstQ0VVgSDbw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] fix WFI/WFE length in syndrome register
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v5 0/8] aspeed: add a witherspoon-bmc machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,43 +27,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Stabellini <sstabellini@kernel.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Julien Grall <julien.grall@linaro.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, Andrew Jeffery <andrew@aj.id.au>, Joel Stanley <joel@jms.id.au>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-On 18 October 2017 at 23:03, Stefano Stabellini <sstabellini@kernel.org> wrote:
-> WFI/E are 4 bytes long: set ARM_EL_IL_SHIFT in the syndrome.
->
-> Signed-off-by: Stefano Stabellini <sstabellini@kernel.org>
->
-> diff --git a/target/arm/internals.h b/target/arm/internals.h
-> index 1f6efef..cf8c966 100644
-> --- a/target/arm/internals.h
-> +++ b/target/arm/internals.h
-> @@ -398,6 +398,7 @@ static inline uint32_t syn_breakpoint(int same_el)
->  static inline uint32_t syn_wfx(int cv, int cond, int ti)
->  {
->      return (EC_WFX_TRAP << ARM_EL_EC_SHIFT) |
-> +           (1 << ARM_EL_IL_SHIFT) |
->             (cv << 24) | (cond << 20) | ti;
->  }
+Hello,
 
-Hmm. What we do now is definitely wrong, but WFI and WFE can be 2 bytes:
-there is a T1 Thumb encoding that is 2 bytes.
+This series adds a new Aspeed machine to emulate the BMC of a
+Witherspoon system. It also extends the other Aspeed machines with I2C
+devices and adds a simple model for the pca9552 LED blinker present on
+the witherspoon board.
 
-HELPER(wfi) doesn't get that right, though:
-    if (target_el) {
-        env->pc -= 4;
-        raise_exception(env, EXCP_UDEF, syn_wfx(1, 0xe, 0), target_el);
-    }
+Thanks,
 
-So I think that HELPER(wfi) needs to be passed an extra
-parameter is_16bit, which it can then use both in its adjustment
-of env->pc and to pass as an extra parameter to syn_wfx(),
-which is then syn_wfx(int cv, int cond, int ti, bool is_16bit).
+C.
 
-(In theory HELPER(wfe) should also be passed is_16bit, but
-since it doesn't currently ever raise an exception it
-doesn't matter.)
+Changes since v4:
 
-thanks
--- PMM
+ - use a ROM memory region
+
+Changes since v3:
+
+ - introduce a dummy ROM device to catch invalid writes
+ - removed 'ignore_memory_transaction_failures' on all Aspeed machines
+ - reworked PCA9552 device :
+   . simpler I2C handles
+   . auto-increment support
+   . unit test
+
+Changes since v2:
+
+ - removed comments on the I2C buffer size pf the PCA9552 device.
+ - removed 'ignore_memory_transaction_failures' flag on the
+   witherspoon machine.
+  =20
+Changes since v1:
+
+ - introduced smbus_eeprom_init_one()
+
+C=C3=A9dric Le Goater (8):
+  aspeed: use a ROM memory region to catch invalid writes
+  aspeed: remove ignore_memory_transaction_failures all boards
+  aspeed: add support for the witherspoon-bmc board
+  aspeed: add an I2C RTC device to all machines
+  smbus: add a smbus_eeprom_init_one() routine
+  aspeed: Add EEPROM I2C devices
+  misc: add pca9552 LED blinker model
+  aspeed: add the pc9552 chips to the witherspoon machine
+
+ default-configs/arm-softmmu.mak |   1 +
+ hw/arm/aspeed.c                 | 110 ++++++++++++++++-
+ hw/i2c/smbus_eeprom.c           |  16 ++-
+ hw/misc/Makefile.objs           |   1 +
+ hw/misc/pca9552.c               | 259 ++++++++++++++++++++++++++++++++++=
+++++++
+ include/hw/i2c/smbus.h          |   1 +
+ include/hw/misc/pca9552.h       |  33 +++++
+ tests/Makefile.include          |   2 +
+ tests/pca9552-test.c            | 131 ++++++++++++++++++++
+ 9 files changed, 544 insertions(+), 10 deletions(-)
+ create mode 100644 hw/misc/pca9552.c
+ create mode 100644 include/hw/misc/pca9552.h
+ create mode 100644 tests/pca9552-test.c
+
+--=20
+2.13.6
