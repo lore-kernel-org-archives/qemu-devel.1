@@ -1,27 +1,48 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43725)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44042)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gabriel291075@gmail.com>) id 1e5XsI-00025o-Jp
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 10:02:17 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1e5XtE-0003e7-Kw
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 10:03:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gabriel291075@gmail.com>) id 1e5Xs4-0006ok-6a
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 10:02:06 -0400
-Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:55670)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <gabriel291075@gmail.com>)
-	id 1e5Xs3-0006oW-Td
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 10:01:56 -0400
-Received: by mail-pf0-x241.google.com with SMTP id 17so11209420pfn.12
-	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 07:01:55 -0700 (PDT)
+	(envelope-from <borntraeger@de.ibm.com>) id 1e5Xt6-0007fI-UB
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 10:03:08 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41034
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1e5Xt6-0007f1-Lv
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 10:03:00 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v9KDxfgO093016
+	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 10:02:55 -0400
+Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2dqj2s9jf4-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 10:02:55 -0400
+Received: from localhost
+	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Fri, 20 Oct 2017 15:02:53 +0100
+References: <87y3oqugm7.fsf@marc-ibm.boeblingen.de.ibm.com>
+	<20171005121115.GD3946746@orkuz.home>
+	<87y3ok7n2n.fsf@marc-ibm.boeblingen.de.ibm.com>
+	<20171012120714.GA314661@orkuz.home>
+	<87mv4m6pp5.fsf@marc-ibm.boeblingen.de.ibm.com>
+	<0aab6dae-a926-c106-9bc5-68561a9bef5c@redhat.com>
+	<0dae2b6c-9164-efc7-5c67-0e4aa5eb4a21@de.ibm.com>
+	<fcf03f16-389e-83b5-77bf-d7a50151005c@redhat.com>
+	<2bfd5f45-3db1-b6c7-3162-43be564cfa05@de.ibm.com>
+	<fb0b2486-706c-c7af-0e38-ddea1faa7b92@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Fri, 20 Oct 2017 16:02:49 +0200
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8dSSQgQAKN0GsOZPWDxhRL0zjDQ+QN=uSRh6hLB=1wCg@mail.gmail.com>
-References: <1508417443-31849-1-git-send-email-gabriel291075@gmail.com>
-	<CAFEAcA8dSSQgQAKN0GsOZPWDxhRL0zjDQ+QN=uSRh6hLB=1wCg@mail.gmail.com>
-From: Gabriel Costa <gabriel291075@gmail.com>
-Date: Fri, 20 Oct 2017 10:01:53 -0400
-Message-ID: <CAG+oHk_Zw0CdEphX0bVeyBbyWEBLqh8tBad6R-sP5gW11ni__w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v1] arm: Adding new arm machine,
- Kinetis K64 MK64FN1M0
+In-Reply-To: <fb0b2486-706c-c7af-0e38-ddea1faa7b92@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <90dcd7c4-0a89-df06-90e3-0d8253871395@de.ibm.com>
+Subject: Re: [Qemu-devel] [libvirt] Question about the host-model CPU mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,102 +51,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: David Hildenbrand <david@redhat.com>, Marc Hartmayer <mhartmay@linux.vnet.ibm.com>, libvir-list@redhat.com, qemu-devel@nongnu.org
+Cc: Jiri Denemark <jdenemar@redhat.com>, Boris Fiuczynski <fiuczy@linux.vnet.ibm.com>, "Jason J. Herne" <jjherne@linux.vnet.ibm.com>, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
 
-Thanks for your fast response and tips. This is my first time sending
-patchs!
 
-Yes, I will follow the QEmu struct. I saw what other developers done
-(stm32f2xx) and I put the files in following folders:
-hw/arm/mk64fn1m0.c                 This file define the SoC
-hw/char/kinetis_k64_uart.c         UART peripheral
-hw/misc/kinetis_k64_flextimer.c  Timers peripherals
-hw/misc/kinetis_k64_mcg.c        Clock Manager
-hw/misc/kinetis_k64_pmux.c      MUX selector
-hw/misc/kinetis_k64_sim.c         More Clock selection
-that is ok?
 
-I will solve the code style issues and prepare a new patch series.
-Also, I received an error about a build fail (among others, of course), I
-believe that this happened because the first patch was not applied.
+On 10/20/2017 03:51 PM, David Hildenbrand wrote:
+[...]
+>> The problem goes much further.
+>> A fresh guest with
+>>
+>>     <os>
+>>      <type arch='s390x' machine='s390-ccw-virtio-2.9'>hvm</type>
+>>    </os>
+>>    <cpu mode='host-model'/>
+>>
+>> does not start. No migration from an older system is necessary.
+>>
+> 
+> Yes, as stated in the documentation "copying host CPU definition from
+> capabilities XML" this can not work. And it works just as documented.
+> Not saying this is a nice thing :)
+> 
+> I think we should try to fix gs_allowed (if possible) and avoid
+> something like that in the future. This would avoid other complexity
+> involved when suddenly having X host models.
 
-Regards to all,
+Maybe this one is really a proper fix. It will allow the guest to start
+and on migration the cpu model will complain if the target cannot provide gs.
+Similar things can happen if - for example - the host kernel lacks some features.
 
-Gabriel Costa
 
-On Thu, Oct 19, 2017 at 1:02 PM, Peter Maydell <peter.maydell@linaro.org>
-wrote:
-
-> On 19 October 2017 at 13:50,  <gabriel291075@gmail.com> wrote:
-> > From: Gabriel Augusto Costa <gabriel291075@gmail.com>
-> >
-> > I add a new arm machine with some peripherals. The machine is mk64fn1m0,
-> a
-> > cortex-m4 microcontroller from NXP Kinetis family. The machine can run a
-> > simple arm binary file using UART0 in polling mode.
-> > I prepared two patchs to include this machine:
-> > PATCH v1: Include the machine and peripherals devices;
-> > PATCH v2: Change the make file to compile this machine.
->
-> Thanks for these patches.
->
-> > Also, I made a folder tree to accomodate this machine more or less like
-> u-boot.
-> > In my opinion put all files in the same folder "/hw/arm" is not a good
-> idea,
-> > or put all code in an unique file, because machines from the same family
-> > sharing the same peripherals.
-> > The folder tree struct is machine/family/peripheral, as an example:
-> > kinetis/k64/peripheral.
-> > So, in this way the code will be more maintainable.
->
-> There's an inevitable conflict between:
->  * these peripherals are all for this board so they should go
->    in a subdirectory for these boards
->  * these peripherals are all of the same type so they should
->    go in a subdirectory for devices of that type
-> Whichever way you slice things it will split things that in
-> some sense should go together.
->
-> However, QEMU has made a decision that we put devices of a
-> specific type in the same directory (roughly following what
-> the Linux kernel does). So can you please follow the structure
-> we have? Having a mix of the two schemes is much worse than
-> consistently following either.
->
-> > Signed-off-by: Gabriel Augusto Costa <gabriel291075@gmail.com>
-> > ---
-> >  hw/arm/kinetis/k64/mk64fn1m0.c                    | 170 +++++++++
-> >  hw/arm/kinetis/k64/peripheral/flextimer.c         | 139 +++++++
-> >  hw/arm/kinetis/k64/peripheral/mcg.c               | 225 ++++++++++++
-> >  hw/arm/kinetis/k64/peripheral/pmux.c              | 423
-> ++++++++++++++++++++++
-> >  hw/arm/kinetis/k64/peripheral/sim.c               | 292 +++++++++++++++
-> >  hw/arm/kinetis/k64/peripheral/uart.c              | 369
-> +++++++++++++++++++
-> >  include/hw/arm/kinetis/k64/peripheral/flextimer.h |  62 ++++
-> >  include/hw/arm/kinetis/k64/peripheral/mcg.h       |  47 +++
-> >  include/hw/arm/kinetis/k64/peripheral/pmux.h      |  73 ++++
-> >  include/hw/arm/kinetis/k64/peripheral/sim.h       |  56 +++
-> >  include/hw/arm/kinetis/k64/peripheral/uart.h      |  85 +++++
-> >  11 files changed, 1941 insertions(+)
->
-> This patch is much too large to review. Please can you split it up
-> into a number of smaller logical patchsets? (Usually for a new
-> board and SoC one patch per new device is what makes most sense.
-> If you get much over 250 lines in one patch you should consider
-> whether there's a logical split of it possible.)
->
-> https://wiki.qemu.org/Contribute/SubmitAPatch has some other
-> helpful suggestions for patch submissions and is generally
-> worth reading I think.
->
-> If you could structure your next revision of this series to
-> include a cover letter email that would also be helpful;
-> some of our automatic patch handling tools can't deal with
-> multi-patch series that don't have the cover letter.
->
-> thanks
-> -- PMM
->
+diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+index 77169bb..97a08fa 100644
+--- a/hw/s390x/s390-virtio-ccw.c
++++ b/hw/s390x/s390-virtio-ccw.c
+@@ -430,7 +430,6 @@ static void ccw_machine_class_init(ObjectClass *oc, void *data)
+     s390mc->ri_allowed = true;
+     s390mc->cpu_model_allowed = true;
+     s390mc->css_migration_enabled = true;
+-    s390mc->gs_allowed = true;
+     mc->init = ccw_init;
+     mc->reset = s390_machine_reset;
+     mc->hot_add_cpu = s390_hot_add_cpu;
+@@ -509,12 +508,6 @@ bool cpu_model_allowed(void)
+     return get_machine_class()->cpu_model_allowed;
+ }
+ 
+-bool gs_allowed(void)
+-{
+-    /* for "none" machine this results in true */
+-    return get_machine_class()->gs_allowed;
+-}
+-
+ static char *machine_get_loadparm(Object *obj, Error **errp)
+ {
+     S390CcwMachineState *ms = S390_CCW_MACHINE(obj);
+@@ -757,7 +750,6 @@ static void ccw_machine_2_9_class_options(MachineClass *mc)
+ {
+     S390CcwMachineClass *s390mc = S390_MACHINE_CLASS(mc);
+ 
+-    s390mc->gs_allowed = false;
+     ccw_machine_2_10_class_options(mc);
+     SET_MACHINE_COMPAT(mc, CCW_COMPAT_2_9);
+     s390mc->css_migration_enabled = false;
+diff --git a/include/hw/s390x/s390-virtio-ccw.h b/include/hw/s390x/s390-virtio-ccw.h
+index a9a90c2..1de53b0 100644
+--- a/include/hw/s390x/s390-virtio-ccw.h
++++ b/include/hw/s390x/s390-virtio-ccw.h
+@@ -40,7 +40,6 @@ typedef struct S390CcwMachineClass {
+     bool ri_allowed;
+     bool cpu_model_allowed;
+     bool css_migration_enabled;
+-    bool gs_allowed;
+ } S390CcwMachineClass;
+ 
+ /* runtime-instrumentation allowed by the machine */
+diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+index a0d5052..3f13fc2 100644
+--- a/target/s390x/kvm.c
++++ b/target/s390x/kvm.c
+@@ -362,7 +362,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+             cap_ri = 1;
+         }
+     }
+-    if (gs_allowed()) {
++    if (cpu_model_allowed()) {
+         if (kvm_vm_enable_cap(s, KVM_CAP_S390_GS, 0) == 0) {
+             cap_gs = 1;
+         }
