@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59255)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59296)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1e5Vu8-0003FI-S0
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 07:55:57 -0400
+	(envelope-from <cohuck@redhat.com>) id 1e5VuD-0003KO-Ua
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 07:56:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1e5Vu8-0003ly-1o
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 07:55:56 -0400
+	(envelope-from <cohuck@redhat.com>) id 1e5VuB-0003nm-LT
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 07:56:02 -0400
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Fri, 20 Oct 2017 13:54:01 +0200
-Message-Id: <20171020115418.2050-30-cohuck@redhat.com>
+Date: Fri, 20 Oct 2017 13:54:02 +0200
+Message-Id: <20171020115418.2050-31-cohuck@redhat.com>
 In-Reply-To: <20171020115418.2050-1-cohuck@redhat.com>
 References: <20171020115418.2050-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL 29/46] s390x/tcg: unlock NMI
+Subject: [Qemu-devel] [PULL 30/46] s390x/tcg: refactor stfl(e) to use
+ s390_get_feat_block()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,48 +25,136 @@ Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, rth@twiddle.net, agraf@suse.de
 
 From: David Hildenbrand <david@redhat.com>
 
-Nothing hindering us anymore from unlocking the restart code (used for
-NMI).
+Refactor it to use s390_get_feat_block(). Directly write into the mapped
+lowcore with stfl and make sure it is really only compiled if needed.
+
+While at it, add an alignment check for STFLE and avoid
+potential_page_fault() by properly restoring the CPU state.
+
+Due to s390_get_feat_block(), we will now also indicate the
+"Configuration-z-architectural-mode", which is with new SIGP code the
+right thing to do.
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20170928203708.9376-29-david@redhat.com>
+Message-Id: <20170928203708.9376-30-david@redhat.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- hw/s390x/s390-virtio-ccw.c | 4 +---
- target/s390x/sigp.c        | 5 -----
- 2 files changed, 1 insertion(+), 8 deletions(-)
+ target/s390x/misc_helper.c | 67 ++++++++++++++++++++--------------------------
+ target/s390x/translate.c   |  1 -
+ 2 files changed, 29 insertions(+), 39 deletions(-)
 
-diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-index a403645baa..e4474587aa 100644
---- a/hw/s390x/s390-virtio-ccw.c
-+++ b/hw/s390x/s390-virtio-ccw.c
-@@ -398,9 +398,7 @@ static void s390_nmi(NMIState *n, int cpu_index, Error **errp)
- {
-     CPUState *cs = qemu_get_cpu(cpu_index);
- 
--    if (s390_cpu_restart(S390_CPU(cs))) {
--        error_setg(errp, QERR_UNSUPPORTED);
--    }
-+    s390_cpu_restart(S390_CPU(cs));
+diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
+index 0b3613ea5f..4afd90b969 100644
+--- a/target/s390x/misc_helper.c
++++ b/target/s390x/misc_helper.c
+@@ -475,66 +475,57 @@ void HELPER(per_ifetch)(CPUS390XState *env, uint64_t addr)
  }
+ #endif
  
- static void ccw_machine_class_init(ObjectClass *oc, void *data)
-diff --git a/target/s390x/sigp.c b/target/s390x/sigp.c
-index c5a5dac911..964c75a736 100644
---- a/target/s390x/sigp.c
-+++ b/target/s390x/sigp.c
-@@ -480,11 +480,6 @@ int s390_cpu_restart(S390CPU *cpu)
+-/* The maximum bit defined at the moment is 129.  */
+-#define MAX_STFL_WORDS  3
++static uint8_t stfl_bytes[2048];
++static unsigned int used_stfl_bytes;
+ 
+-/* Canonicalize the current cpu's features into the 64-bit words required
+-   by STFLE.  Return the index-1 of the max word that is non-zero.  */
+-static unsigned do_stfle(CPUS390XState *env, uint64_t words[MAX_STFL_WORDS])
++static void prepare_stfl(void)
  {
-     SigpInfo si = {};
- 
--    if (tcg_enabled()) {
--        /* FIXME TCG */
--        return -ENOSYS;
--    }
+-    S390CPU *cpu = s390_env_get_cpu(env);
+-    const unsigned long *features = cpu->model->features;
+-    unsigned max_bit = 0;
+-    S390Feat feat;
 -
-     run_on_cpu(CPU(cpu), sigp_restart, RUN_ON_CPU_HOST_PTR(&si));
-     return 0;
+-    memset(words, 0, sizeof(uint64_t) * MAX_STFL_WORDS);
++    static bool initialized;
++    int i;
+ 
+-    if (test_bit(S390_FEAT_ZARCH, features)) {
+-        /* z/Architecture is always active if around */
+-        words[0] = 1ull << (63 - 2);
++    /* racy, but we don't care, the same values are always written */
++    if (initialized) {
++        return;
+     }
+ 
+-    for (feat = find_first_bit(features, S390_FEAT_MAX);
+-         feat < S390_FEAT_MAX;
+-         feat = find_next_bit(features, S390_FEAT_MAX, feat + 1)) {
+-        const S390FeatDef *def = s390_feat_def(feat);
+-        if (def->type == S390_FEAT_TYPE_STFL) {
+-            unsigned bit = def->bit;
+-            if (bit > max_bit) {
+-                max_bit = bit;
+-            }
+-            assert(bit / 64 < MAX_STFL_WORDS);
+-            words[bit / 64] |= 1ULL << (63 - bit % 64);
++    s390_get_feat_block(S390_FEAT_TYPE_STFL, stfl_bytes);
++    for (i = 0; i < sizeof(stfl_bytes); i++) {
++        if (stfl_bytes[i]) {
++            used_stfl_bytes = i + 1;
+         }
+     }
+-
+-    return max_bit / 64;
++    initialized = true;
  }
+ 
+ #ifndef CONFIG_USER_ONLY
+ void HELPER(stfl)(CPUS390XState *env)
+ {
+-    uint64_t words[MAX_STFL_WORDS];
+     LowCore *lowcore;
+ 
+     lowcore = cpu_map_lowcore(env);
+-    do_stfle(env, words);
+-    lowcore->stfl_fac_list = cpu_to_be32(words[0] >> 32);
++    prepare_stfl();
++    memcpy(&lowcore->stfl_fac_list, stfl_bytes, sizeof(lowcore->stfl_fac_list));
+     cpu_unmap_lowcore(lowcore);
+ }
+ #endif
+ 
+ uint32_t HELPER(stfle)(CPUS390XState *env, uint64_t addr)
+ {
+-    uint64_t words[MAX_STFL_WORDS];
+-    unsigned count_m1 = env->regs[0] & 0xff;
+-    unsigned max_m1 = do_stfle(env, words);
+-    unsigned i;
++    const uintptr_t ra = GETPC();
++    const int count_bytes = ((env->regs[0] & 0xff) + 1) * 8;
++    const int max_bytes = ROUND_UP(used_stfl_bytes, 8);
++    int i;
++
++    if (addr & 0x7) {
++        cpu_restore_state(ENV_GET_CPU(env), ra);
++        program_interrupt(env, PGM_SPECIFICATION, 4);
++    }
+ 
+-    for (i = 0; i <= count_m1; ++i) {
+-        cpu_stq_data(env, addr + 8 * i, words[i]);
++    prepare_stfl();
++    for (i = 0; i < count_bytes; ++i) {
++        cpu_stb_data_ra(env, addr + i, stfl_bytes[i], ra);
+     }
+ 
+-    env->regs[0] = deposit64(env->regs[0], 0, 8, max_m1);
+-    return (count_m1 >= max_m1 ? 0 : 3);
++    env->regs[0] = deposit64(env->regs[0], 0, 8, (max_bytes / 8) - 1);
++    return count_bytes >= max_bytes ? 0 : 3;
+ }
+diff --git a/target/s390x/translate.c b/target/s390x/translate.c
+index 22e0f42a2a..6ecf764a98 100644
+--- a/target/s390x/translate.c
++++ b/target/s390x/translate.c
+@@ -4143,7 +4143,6 @@ static ExitStatus op_sturg(DisasContext *s, DisasOps *o)
+ 
+ static ExitStatus op_stfle(DisasContext *s, DisasOps *o)
+ {
+-    potential_page_fault(s);
+     gen_helper_stfle(cc_op, cpu_env, o->in2);
+     set_cc_static(s);
+     return NO_EXIT;
 -- 
 2.13.6
