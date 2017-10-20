@@ -1,45 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51518)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52797)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1e5YN9-00019o-51
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 10:34:05 -0400
+	(envelope-from <mdavidsaver@gmail.com>) id 1e5YSa-0004Uq-QW
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 10:39:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1e5YN6-0007GM-1P
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 10:34:03 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:50970)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1e5YN5-0007Fn-P3
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 10:33:59 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v9KEUnkK104087
-	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 10:33:55 -0400
-Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2dqe5q76mg-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 10:33:54 -0400
-Received: from localhost
-	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Fri, 20 Oct 2017 15:33:52 +0100
-References: <20170913132752.8484-1-pasic@linux.vnet.ibm.com>
-	<20170913132752.8484-2-pasic@linux.vnet.ibm.com>
-	<20170914162603.1cdabd09.cohuck@redhat.com>
-	<0b42ef59-4366-175f-8dc7-bc3ed02e2fb4@linux.vnet.ibm.com>
-	<20170915092758.16ea52fc.cohuck@redhat.com>
-	<711b1e41-693a-de7d-9c13-fbe0f964c53c@linux.vnet.ibm.com>
-	<20171020150043.383b2117.cohuck@redhat.com>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Fri, 20 Oct 2017 16:33:47 +0200
-MIME-Version: 1.0
-In-Reply-To: <20171020150043.383b2117.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <c17eb441-f22b-2e92-dd39-01c3caddec19@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 1/2] s390x/ccs: add ccw-tester emulated
- device
+	(envelope-from <mdavidsaver@gmail.com>) id 1e5YSZ-0001i6-Nh
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 10:39:40 -0400
+From: Michael Davidsaver <mdavidsaver@gmail.com>
+Date: Fri, 20 Oct 2017 09:38:52 -0500
+Message-Id: <20171020143852.2443-1-mdavidsaver@gmail.com>
+Subject: [Qemu-devel] [PATCH] e500: ppce500_init_mpic() return device
+ instead of IRQ array
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -48,38 +18,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+To: Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Michael Davidsaver <mdavidsaver@gmail.com>
 
+Actual number of interrupt pins isn't known
+in ppce500_init_mpic() so a hardcoded number
+was used, which causes a crash with older openpic.
 
+Instead, return the DeviceState* and change ppce500_init()
+to call qdev_get_gpio_in() to get only the irq pins
+which are needed.
 
-On 10/20/2017 03:00 PM, Cornelia Huck wrote:
-> On Thu, 19 Oct 2017 18:39:37 +0200
-> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
-> 
->> On 09/15/2017 09:27 AM, Cornelia Huck wrote:
->>>>>     
->>>>>> +    DEFINE_PROP_UINT8("chpid_type", CcwTesterDevice, chpid_type,
->>>>>> +                       0x98),  
->>> This might also need re-evaluation - we should not really need a new
->>> chpid type.
->>>   
->>
->> I'm back at ccw-tester again (for v2). I've realized we did not agree
->> on what to use here (chpid_type). Shall I use 0x25 (Fibre Channel) or
->> EMULATED_CCW_3270_CHPID_TYPE, or even 0x32 (virtio-ccw) as a default
->> value? And should EMULATED_CCW_3270_CHPID_TYPE be called like that
->> (is it really supposed to be specific to 3270?
->>
->> Sorry I did not notice sooner.
-> 
-> It might make sense to pick whatever z/VM commonly uses for emulated
-> devices. (Or ask them if they reserved something explicitly for testing
-> -- that would be an even better match.)
-> 
+Signed-off-by: Michael Davidsaver <mdavidsaver@gmail.com>
+---
+ hw/ppc/e500.c | 32 +++++++++++++-------------------
+ 1 file changed, 13 insertions(+), 19 deletions(-)
 
-OK, I will approach the z/VM guys. About EMULATED_CCW_3270_CHPID_TYPE,
-does it really make sense to have a separate chpid type for 3270? (You
-have missed that question, so I'm asking it again).
-
-Halil
+diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
+index b8d786c479..33adc809ba 100644
+--- a/hw/ppc/e500.c
++++ b/hw/ppc/e500.c
+@@ -729,15 +729,13 @@ static DeviceState *ppce500_init_mpic_kvm(PPCE500Params *params,
+     return dev;
+ }
+ 
+-static qemu_irq *ppce500_init_mpic(MachineState *machine, PPCE500Params *params,
+-                                   MemoryRegion *ccsr, qemu_irq **irqs)
++static DeviceState *ppce500_init_mpic(MachineState *machine,
++                                      PPCE500Params *params,
++                                      MemoryRegion *ccsr,
++                                      qemu_irq **irqs)
+ {
+-    qemu_irq *mpic;
+     DeviceState *dev = NULL;
+     SysBusDevice *s;
+-    int i;
+-
+-    mpic = g_new0(qemu_irq, 256);
+ 
+     if (kvm_enabled()) {
+         Error *err = NULL;
+@@ -756,15 +754,11 @@ static qemu_irq *ppce500_init_mpic(MachineState *machine, PPCE500Params *params,
+         dev = ppce500_init_mpic_qemu(params, irqs);
+     }
+ 
+-    for (i = 0; i < 256; i++) {
+-        mpic[i] = qdev_get_gpio_in(dev, i);
+-    }
+-
+     s = SYS_BUS_DEVICE(dev);
+     memory_region_add_subregion(ccsr, MPC8544_MPIC_REGS_OFFSET,
+                                 s->mmio[0].memory);
+ 
+-    return mpic;
++    return dev;
+ }
+ 
+ static void ppce500_power_off(void *opaque, int line, int on)
+@@ -796,8 +790,8 @@ void ppce500_init(MachineState *machine, PPCE500Params *params)
+     /* irq num for pin INTA, INTB, INTC and INTD is 1, 2, 3 and
+      * 4 respectively */
+     unsigned int pci_irq_nrs[PCI_NUM_PINS] = {1, 2, 3, 4};
+-    qemu_irq **irqs, *mpic;
+-    DeviceState *dev;
++    qemu_irq **irqs;
++    DeviceState *dev, *mpicdev;
+     CPUPPCState *firstenv = NULL;
+     MemoryRegion *ccsr_addr_space;
+     SysBusDevice *s;
+@@ -866,18 +860,18 @@ void ppce500_init(MachineState *machine, PPCE500Params *params)
+     memory_region_add_subregion(address_space_mem, params->ccsrbar_base,
+                                 ccsr_addr_space);
+ 
+-    mpic = ppce500_init_mpic(machine, params, ccsr_addr_space, irqs);
++    mpicdev = ppce500_init_mpic(machine, params, ccsr_addr_space, irqs);
+ 
+     /* Serial */
+     if (serial_hds[0]) {
+         serial_mm_init(ccsr_addr_space, MPC8544_SERIAL0_REGS_OFFSET,
+-                       0, mpic[42], 399193,
++                       0, qdev_get_gpio_in(mpicdev, 42), 399193,
+                        serial_hds[0], DEVICE_BIG_ENDIAN);
+     }
+ 
+     if (serial_hds[1]) {
+         serial_mm_init(ccsr_addr_space, MPC8544_SERIAL1_REGS_OFFSET,
+-                       0, mpic[42], 399193,
++                       0, qdev_get_gpio_in(mpicdev, 42), 399193,
+                        serial_hds[1], DEVICE_BIG_ENDIAN);
+     }
+ 
+@@ -896,7 +890,7 @@ void ppce500_init(MachineState *machine, PPCE500Params *params)
+     qdev_init_nofail(dev);
+     s = SYS_BUS_DEVICE(dev);
+     for (i = 0; i < PCI_NUM_PINS; i++) {
+-        sysbus_connect_irq(s, i, mpic[pci_irq_nrs[i]]);
++        sysbus_connect_irq(s, i, qdev_get_gpio_in(mpicdev, pci_irq_nrs[i]));
+     }
+ 
+     memory_region_add_subregion(ccsr_addr_space, MPC8544_PCI_REGS_OFFSET,
+@@ -927,7 +921,7 @@ void ppce500_init(MachineState *machine, PPCE500Params *params)
+         dev = qdev_create(NULL, "mpc8xxx_gpio");
+         s = SYS_BUS_DEVICE(dev);
+         qdev_init_nofail(dev);
+-        sysbus_connect_irq(s, 0, mpic[MPC8XXX_GPIO_IRQ]);
++        sysbus_connect_irq(s, 0, qdev_get_gpio_in(mpicdev, MPC8XXX_GPIO_IRQ));
+         memory_region_add_subregion(ccsr_addr_space, MPC8XXX_GPIO_OFFSET,
+                                     sysbus_mmio_get_region(s, 0));
+ 
+@@ -947,7 +941,7 @@ void ppce500_init(MachineState *machine, PPCE500Params *params)
+ 
+         for (i = 0; i < params->platform_bus_num_irqs; i++) {
+             int irqn = params->platform_bus_first_irq + i;
+-            sysbus_connect_irq(s, i, mpic[irqn]);
++            sysbus_connect_irq(s, i, qdev_get_gpio_in(mpicdev, irqn));
+         }
+ 
+         memory_region_add_subregion(address_space_mem,
+-- 
+2.11.0
