@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56528)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56547)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e5Tdl-0000yP-5V
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 05:30:54 -0400
+	(envelope-from <li.shanlue@zte.com.cn>) id 1e5Tdr-00012G-UI
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 05:31:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e5Tdk-00015F-6I
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 05:30:53 -0400
-Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:44365)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1e5Tdj-00014n-Vk
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 05:30:52 -0400
-Received: by mail-wr0-x241.google.com with SMTP id z55so4745672wrz.1
-	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 02:30:51 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <alpine.DEB.2.10.1710191354020.27209@sstabellini-ThinkPad-X260>
-References: <alpine.DEB.2.10.1710181439060.27209@sstabellini-ThinkPad-X260>
-	<CAFEAcA_v=UsQ4hfn2oVLt3MPU3yJUnHLfzZHrdkstQ0VVgSDbw@mail.gmail.com>
-	<alpine.DEB.2.10.1710191354020.27209@sstabellini-ThinkPad-X260>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 20 Oct 2017 10:30:30 +0100
-Message-ID: <CAFEAcA8uH1+V4uYsA=XuuxHOLKvLyZ56ieAaS5K9QNoLYspOsQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] fix WFI/WFE length in syndrome register
+	(envelope-from <li.shanlue@zte.com.cn>) id 1e5Tdo-00017T-SE
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 05:30:59 -0400
+Received: from mxhk.zte.com.cn ([63.217.80.70]:63978)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <li.shanlue@zte.com.cn>)
+	id 1e5Tdo-00014X-H3
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 05:30:56 -0400
+Received: from mse02.zte.com.cn (unknown [10.30.3.21])
+	by Forcepoint Email with ESMTPS id BE796F26CE0D53EEF8EF
+	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 17:30:49 +0800 (CST)
+Received: from kjyxapp01.zte.com.cn ([10.30.12.200])
+	by mse02.zte.com.cn with SMTP id v9K9UfLD048447
+	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 17:30:41 +0800 (GMT-8)
+	(envelope-from li.shanlue@zte.com.cn)
+Date: Fri, 20 Oct 2017 17:30:44 +0800 (CST)
+Message-ID: <201710201730444722808@zte.com.cn>
+Mime-Version: 1.0
+From: <li.shanlue@zte.com.cn>
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: base64 
+Subject: [Qemu-devel] =?utf-8?q?wurb_test_zt?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,68 +33,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Stabellini <sstabellini@kernel.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Julien Grall <julien.grall@linaro.org>
+To: qemu-devel@nongnu.org
 
-On 19 October 2017 at 21:56, Stefano Stabellini <sstabellini@kernel.org> wrote:
-> On Thu, 19 Oct 2017, Peter Maydell wrote:
->> On 18 October 2017 at 23:03, Stefano Stabellini <sstabellini@kernel.org> wrote:
->> > WFI/E are 4 bytes long: set ARM_EL_IL_SHIFT in the syndrome.
->> >
->> > Signed-off-by: Stefano Stabellini <sstabellini@kernel.org>
->> >
->> > diff --git a/target/arm/internals.h b/target/arm/internals.h
->> > index 1f6efef..cf8c966 100644
->> > --- a/target/arm/internals.h
->> > +++ b/target/arm/internals.h
->> > @@ -398,6 +398,7 @@ static inline uint32_t syn_breakpoint(int same_el)
->> >  static inline uint32_t syn_wfx(int cv, int cond, int ti)
->> >  {
->> >      return (EC_WFX_TRAP << ARM_EL_EC_SHIFT) |
->> > +           (1 << ARM_EL_IL_SHIFT) |
->> >             (cv << 24) | (cond << 20) | ti;
->> >  }
->>
->> Hmm. What we do now is definitely wrong, but WFI and WFE can be 2 bytes:
->> there is a T1 Thumb encoding that is 2 bytes.
->>
->> HELPER(wfi) doesn't get that right, though:
->>     if (target_el) {
->>         env->pc -= 4;
->>         raise_exception(env, EXCP_UDEF, syn_wfx(1, 0xe, 0), target_el);
->>     }
->>
->> So I think that HELPER(wfi) needs to be passed an extra
->> parameter is_16bit, which it can then use both in its adjustment
->> of env->pc and to pass as an extra parameter to syn_wfx(),
->> which is then syn_wfx(int cv, int cond, int ti, bool is_16bit).
->>
->> (In theory HELPER(wfe) should also be passed is_16bit, but
->> since it doesn't currently ever raise an exception it
->> doesn't matter.)
->
-> Wouldn't it be better to just check on env->thumb like
-> HELPER(cpsr_write_eret) for example?
-
-> diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
-> index 3914145..ea16c9a 100644
-> --- a/target/arm/op_helper.c
-> +++ b/target/arm/op_helper.c
-> @@ -476,8 +476,8 @@ void HELPER(wfi)(CPUARMState *env)
->      }
->
->      if (target_el) {
-> -        env->pc -= 4;
-> -        raise_exception(env, EXCP_UDEF, syn_wfx(1, 0xe, 0), target_el);
-> +        env->pc -= env->thumb ? 2 : 4;
-> +        raise_exception(env, EXCP_UDEF, syn_wfx(1, 0xe, 0, env->thumb), target_el);
->      }
->
->      cs->exception_index = EXCP_HLT;
-
-This doesn't work, because there is also a 32 bit Thumb
-encoding of WFI. env->thumb says "we are in thumb mode",
-which isn't the same as "this insn is 16 bits".
-
-thanks
--- PMM
+SXQncyBhIHRlc3QgbWFpbCBmb3IgdGVzdGluZyByZWxhdGl2ZQogYmV0d2VlbiB0b3BpYyBhbmQg
+cmVwbHku
