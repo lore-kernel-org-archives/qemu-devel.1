@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44433)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44498)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1e5gb2-00064y-Jm
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 19:21:03 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1e5gbA-00067R-2E
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 19:21:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1e5gb1-0007gn-9i
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 19:20:56 -0400
-Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:47095)
+	(envelope-from <richard.henderson@linaro.org>) id 1e5gb8-0007kj-Lv
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 19:21:04 -0400
+Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:47286)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1e5gb1-0007gZ-1f
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 19:20:55 -0400
-Received: by mail-pf0-x242.google.com with SMTP id p87so13073631pfj.3
-	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 16:20:54 -0700 (PDT)
+	id 1e5gb8-0007kN-DQ
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 19:21:02 -0400
+Received: by mail-pf0-x243.google.com with SMTP id z11so13060096pfk.4
+	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 16:21:02 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Fri, 20 Oct 2017 16:19:50 -0700
-Message-Id: <20171020232023.15010-20-richard.henderson@linaro.org>
+Date: Fri, 20 Oct 2017 16:19:55 -0700
+Message-Id: <20171020232023.15010-25-richard.henderson@linaro.org>
 In-Reply-To: <20171020232023.15010-1-richard.henderson@linaro.org>
 References: <20171020232023.15010-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v7 19/52] tcg: Remove TCGV_EQUAL*
+Subject: [Qemu-devel] [PATCH v7 24/52] tcg: Add CPUState cflags_next_tb
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,168 +29,210 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: cota@braap.org, f4bug@amsat.org, pbonzini@redhat.com
 
-When we used structures for TCGv_*, we needed a macro in order to
-perform a comparison.  Now that we use pointers, this is just clutter.
+We were generating code during tb_invalidate_phys_page_range,
+check_watchpoint, cpu_io_recompile, and (seemingly) discarding
+the TB, assuming that it would magically be picked up during
+the next iteration through the cpu_exec loop.
+
+Instead, record the desired cflags in CPUState so that we request
+the proper TB so that there is no more magic.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- tcg/tcg-op.h            | 6 ++----
- tcg/tcg.h               | 4 ----
- target/cris/translate.c | 6 +++---
- target/i386/translate.c | 6 +++---
- target/m68k/translate.c | 2 +-
- target/ppc/translate.c  | 4 ++--
- 6 files changed, 11 insertions(+), 17 deletions(-)
+ include/qom/cpu.h         |  1 +
+ accel/tcg/cpu-exec.c      | 21 +++++++++++++++++----
+ accel/tcg/translate-all.c | 36 ++++++++++--------------------------
+ exec.c                    |  7 ++-----
+ qom/cpu.c                 |  1 +
+ 5 files changed, 31 insertions(+), 35 deletions(-)
 
-diff --git a/tcg/tcg-op.h b/tcg/tcg-op.h
-index ab2f3c6cee..3129159907 100644
---- a/tcg/tcg-op.h
-+++ b/tcg/tcg-op.h
-@@ -328,7 +328,7 @@ static inline void tcg_gen_discard_i32(TCGv_i32 arg)
+diff --git a/include/qom/cpu.h b/include/qom/cpu.h
+index df0ba86202..fa4b0c9dba 100644
+--- a/include/qom/cpu.h
++++ b/include/qom/cpu.h
+@@ -344,6 +344,7 @@ struct CPUState {
+     bool unplug;
+     bool crash_occurred;
+     bool exit_request;
++    uint32_t cflags_next_tb;
+     /* updates protected by BQL */
+     uint32_t interrupt_request;
+     int singlestep_enabled;
+diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
+index 39ec9508d1..1c64977849 100644
+--- a/accel/tcg/cpu-exec.c
++++ b/accel/tcg/cpu-exec.c
+@@ -367,13 +367,12 @@ static inline void tb_add_jump(TranslationBlock *tb, int n,
  
- static inline void tcg_gen_mov_i32(TCGv_i32 ret, TCGv_i32 arg)
+ static inline TranslationBlock *tb_find(CPUState *cpu,
+                                         TranslationBlock *last_tb,
+-                                        int tb_exit)
++                                        int tb_exit, uint32_t cf_mask)
  {
--    if (!TCGV_EQUAL_I32(ret, arg)) {
-+    if (ret != arg) {
-         tcg_gen_op2_i32(INDEX_op_mov_i32, ret, arg);
-     }
- }
-@@ -522,7 +522,7 @@ static inline void tcg_gen_discard_i64(TCGv_i64 arg)
+     TranslationBlock *tb;
+     target_ulong cs_base, pc;
+     uint32_t flags;
+     bool acquired_tb_lock = false;
+-    uint32_t cf_mask = curr_cflags();
  
- static inline void tcg_gen_mov_i64(TCGv_i64 ret, TCGv_i64 arg)
+     tb = tb_lookup__cpu_state(cpu, &pc, &cs_base, &flags, cf_mask);
+     if (tb == NULL) {
+@@ -501,7 +500,7 @@ static inline bool cpu_handle_exception(CPUState *cpu, int *ret)
+     } else if (replay_has_exception()
+                && cpu->icount_decr.u16.low + cpu->icount_extra == 0) {
+         /* try to cause an exception pending in the log */
+-        cpu_exec_nocache(cpu, 1, tb_find(cpu, NULL, 0), true);
++        cpu_exec_nocache(cpu, 1, tb_find(cpu, NULL, 0, curr_cflags()), true);
+         *ret = -1;
+         return true;
+ #endif
+@@ -697,7 +696,21 @@ int cpu_exec(CPUState *cpu)
+         int tb_exit = 0;
+ 
+         while (!cpu_handle_interrupt(cpu, &last_tb)) {
+-            TranslationBlock *tb = tb_find(cpu, last_tb, tb_exit);
++            uint32_t cflags = cpu->cflags_next_tb;
++            TranslationBlock *tb;
++
++            /* When requested, use an exact setting for cflags for the next
++               execution.  This is used for icount, precise smc, and stop-
++               after-access watchpoints.  Since this request should never
++               have CF_INVALID set, -1 is a convenient invalid value that
++               does not require tcg headers for cpu_common_reset.  */
++            if (cflags == -1) {
++                cflags = curr_cflags();
++            } else {
++                cpu->cflags_next_tb = -1;
++            }
++
++            tb = tb_find(cpu, last_tb, tb_exit, cflags);
+             cpu_loop_exec_tb(cpu, tb, &last_tb, &tb_exit);
+             /* Try to align the host and virtual clocks
+                if the guest is in advance */
+diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
+index 7ad65bc705..91fd6e444b 100644
+--- a/accel/tcg/translate-all.c
++++ b/accel/tcg/translate-all.c
+@@ -1463,14 +1463,12 @@ void tb_invalidate_phys_page_range(tb_page_addr_t start, tb_page_addr_t end,
+                                    int is_cpu_write_access)
  {
--    if (!TCGV_EQUAL_I64(ret, arg)) {
-+    if (ret != arg) {
-         tcg_gen_op2_i64(INDEX_op_mov_i64, ret, arg);
+     TranslationBlock *tb, *tb_next;
+-#if defined(TARGET_HAS_PRECISE_SMC)
+-    CPUState *cpu = current_cpu;
+-    CPUArchState *env = NULL;
+-#endif
+     tb_page_addr_t tb_start, tb_end;
+     PageDesc *p;
+     int n;
+ #ifdef TARGET_HAS_PRECISE_SMC
++    CPUState *cpu = current_cpu;
++    CPUArchState *env = NULL;
+     int current_tb_not_found = is_cpu_write_access;
+     TranslationBlock *current_tb = NULL;
+     int current_tb_modified = 0;
+@@ -1547,11 +1545,8 @@ void tb_invalidate_phys_page_range(tb_page_addr_t start, tb_page_addr_t end,
+ #endif
+ #ifdef TARGET_HAS_PRECISE_SMC
+     if (current_tb_modified) {
+-        /* we generate a block containing just the instruction
+-           modifying the memory. It will ensure that it cannot modify
+-           itself */
+-        tb_gen_code(cpu, current_pc, current_cs_base, current_flags,
+-                    1 | curr_cflags());
++        /* Force execution of one insn next time.  */
++        cpu->cflags_next_tb = 1 | curr_cflags();
+         cpu_loop_exit_noexc(cpu);
      }
- }
-@@ -809,7 +809,6 @@ void tcg_gen_lookup_and_goto_ptr(void);
- #define tcg_temp_free tcg_temp_free_i32
- #define TCGV_UNUSED(x) TCGV_UNUSED_I32(x)
- #define TCGV_IS_UNUSED(x) TCGV_IS_UNUSED_I32(x)
--#define TCGV_EQUAL(a, b) TCGV_EQUAL_I32(a, b)
- #define tcg_gen_qemu_ld_tl tcg_gen_qemu_ld_i32
- #define tcg_gen_qemu_st_tl tcg_gen_qemu_st_i32
- #else
-@@ -820,7 +819,6 @@ void tcg_gen_lookup_and_goto_ptr(void);
- #define tcg_temp_free tcg_temp_free_i64
- #define TCGV_UNUSED(x) TCGV_UNUSED_I64(x)
- #define TCGV_IS_UNUSED(x) TCGV_IS_UNUSED_I64(x)
--#define TCGV_EQUAL(a, b) TCGV_EQUAL_I64(a, b)
- #define tcg_gen_qemu_ld_tl tcg_gen_qemu_ld_i64
- #define tcg_gen_qemu_st_tl tcg_gen_qemu_st_i64
  #endif
-diff --git a/tcg/tcg.h b/tcg/tcg.h
-index b7fac0db8a..8f692bc6cf 100644
---- a/tcg/tcg.h
-+++ b/tcg/tcg.h
-@@ -428,10 +428,6 @@ typedef TCGv_ptr TCGv_env;
- #error Unhandled TARGET_LONG_BITS value
+@@ -1666,11 +1661,8 @@ static bool tb_invalidate_phys_page(tb_page_addr_t addr, uintptr_t pc)
+     p->first_tb = NULL;
+ #ifdef TARGET_HAS_PRECISE_SMC
+     if (current_tb_modified) {
+-        /* we generate a block containing just the instruction
+-           modifying the memory. It will ensure that it cannot modify
+-           itself */
+-        tb_gen_code(cpu, current_pc, current_cs_base, current_flags,
+-                    1 | curr_cflags());
++        /* Force execution of one insn next time.  */
++        cpu->cflags_next_tb = 1 | curr_cflags();
+         /* tb_lock will be reset after cpu_loop_exit_noexc longjmps
+          * back into the cpu_exec loop. */
+         return true;
+@@ -1773,9 +1765,7 @@ void cpu_io_recompile(CPUState *cpu, uintptr_t retaddr)
+     CPUArchState *env = cpu->env_ptr;
  #endif
+     TranslationBlock *tb;
+-    uint32_t n, cflags;
+-    target_ulong pc, cs_base;
+-    uint32_t flags;
++    uint32_t n;
  
--#define TCGV_EQUAL_I32(a, b) ((a) == (b))
--#define TCGV_EQUAL_I64(a, b) ((a) == (b))
--#define TCGV_EQUAL_PTR(a, b) ((a) == (b))
--
- /* Dummy definition to avoid compiler warnings.  */
- #define TCGV_UNUSED_I32(x) (x = (TCGv_i32)-1)
- #define TCGV_UNUSED_I64(x) (x = (TCGv_i64)-1)
-diff --git a/target/cris/translate.c b/target/cris/translate.c
-index 38a999e6f1..55a9202777 100644
---- a/target/cris/translate.c
-+++ b/target/cris/translate.c
-@@ -839,7 +839,7 @@ static void cris_alu(DisasContext *dc, int op,
+     tb_lock();
+     tb = tb_find_pc(retaddr);
+@@ -1813,12 +1803,9 @@ void cpu_io_recompile(CPUState *cpu, uintptr_t retaddr)
+         cpu_abort(cpu, "TB too big during recompile");
+     }
+ 
+-    cflags = n | CF_LAST_IO;
+-    cflags |= curr_cflags();
+-    pc = tb->pc;
+-    cs_base = tb->cs_base;
+-    flags = tb->flags;
+-    tb_phys_invalidate(tb, -1);
++    /* Adjust the execution state of the next TB.  */
++    cpu->cflags_next_tb = curr_cflags() | CF_LAST_IO | n;
++
+     if (tb->cflags & CF_NOCACHE) {
+         if (tb->orig_tb) {
+             /* Invalidate original TB if this TB was generated in
+@@ -1827,9 +1814,6 @@ void cpu_io_recompile(CPUState *cpu, uintptr_t retaddr)
          }
-         tcg_gen_or_tl(d, d, tmp);
+         tb_free(tb);
      }
--    if (!TCGV_EQUAL(tmp, d)) {
-+    if (tmp != d) {
-         tcg_temp_free(tmp);
-     }
- }
-@@ -1162,7 +1162,7 @@ static inline void t_gen_sext(TCGv d, TCGv s, int size)
-         tcg_gen_ext8s_i32(d, s);
-     } else if (size == 2) {
-         tcg_gen_ext16s_i32(d, s);
--    } else if (!TCGV_EQUAL(d, s)) {
-+    } else {
-         tcg_gen_mov_tl(d, s);
-     }
- }
-@@ -1173,7 +1173,7 @@ static inline void t_gen_zext(TCGv d, TCGv s, int size)
-         tcg_gen_ext8u_i32(d, s);
-     } else if (size == 2) {
-         tcg_gen_ext16u_i32(d, s);
--    } else if (!TCGV_EQUAL(d, s)) {
-+    } else {
-         tcg_gen_mov_tl(d, s);
-     }
- }
-diff --git a/target/i386/translate.c b/target/i386/translate.c
-index 5f24a2de3c..d6697f721c 100644
---- a/target/i386/translate.c
-+++ b/target/i386/translate.c
-@@ -742,7 +742,7 @@ static CCPrepare gen_prepare_eflags_c(DisasContext *s, TCGv reg)
-         size = s->cc_op - CC_OP_SUBB;
-         t1 = gen_ext_tl(cpu_tmp0, cpu_cc_src, size, false);
-         /* If no temporary was used, be careful not to alias t1 and t0.  */
--        t0 = TCGV_EQUAL(t1, cpu_cc_src) ? cpu_tmp0 : reg;
-+        t0 = t1 == cpu_cc_src ? cpu_tmp0 : reg;
-         tcg_gen_mov_tl(t0, cpu_cc_srcT);
-         gen_extu(size, t0);
-         goto add_sub;
-@@ -951,7 +951,7 @@ static CCPrepare gen_prepare_cc(DisasContext *s, int b, TCGv reg)
-             break;
-         case JCC_L:
-             gen_compute_eflags(s);
--            if (TCGV_EQUAL(reg, cpu_cc_src)) {
-+            if (reg == cpu_cc_src) {
-                 reg = cpu_tmp0;
+-    /* FIXME: In theory this could raise an exception.  In practice
+-       we have already translated the block once so it's probably ok.  */
+-    tb_gen_code(cpu, pc, cs_base, flags, cflags);
+ 
+     /* TODO: If env->pc != tb->pc (i.e. the faulting instruction was not
+      * the first in the TB) then we end up generating a whole new TB and
+diff --git a/exec.c b/exec.c
+index 3e0a3dae46..97a24a875e 100644
+--- a/exec.c
++++ b/exec.c
+@@ -2431,11 +2431,8 @@ static void check_watchpoint(int offset, int len, MemTxAttrs attrs, int flags)
+ {
+     CPUState *cpu = current_cpu;
+     CPUClass *cc = CPU_GET_CLASS(cpu);
+-    CPUArchState *env = cpu->env_ptr;
+-    target_ulong pc, cs_base;
+     target_ulong vaddr;
+     CPUWatchpoint *wp;
+-    uint32_t cpu_flags;
+ 
+     assert(tcg_enabled());
+     if (cpu->watchpoint_hit) {
+@@ -2475,8 +2472,8 @@ static void check_watchpoint(int offset, int len, MemTxAttrs attrs, int flags)
+                     cpu->exception_index = EXCP_DEBUG;
+                     cpu_loop_exit(cpu);
+                 } else {
+-                    cpu_get_tb_cpu_state(env, &pc, &cs_base, &cpu_flags);
+-                    tb_gen_code(cpu, pc, cs_base, cpu_flags, 1 | curr_cflags());
++                    /* Force execution of one insn next time.  */
++                    cpu->cflags_next_tb = 1 | curr_cflags();
+                     cpu_loop_exit_noexc(cpu);
+                 }
              }
-             tcg_gen_shri_tl(reg, cpu_cc_src, 4); /* CC_O -> CC_S */
-@@ -962,7 +962,7 @@ static CCPrepare gen_prepare_cc(DisasContext *s, int b, TCGv reg)
-         default:
-         case JCC_LE:
-             gen_compute_eflags(s);
--            if (TCGV_EQUAL(reg, cpu_cc_src)) {
-+            if (reg == cpu_cc_src) {
-                 reg = cpu_tmp0;
-             }
-             tcg_gen_shri_tl(reg, cpu_cc_src, 4); /* CC_O -> CC_S */
-diff --git a/target/m68k/translate.c b/target/m68k/translate.c
-index d738f32f9c..63b1552669 100644
---- a/target/m68k/translate.c
-+++ b/target/m68k/translate.c
-@@ -58,7 +58,7 @@ static TCGv_i64 cpu_macc[4];
- #define QREG_SP         get_areg(s, 7)
+diff --git a/qom/cpu.c b/qom/cpu.c
+index 54c9452b1c..e42d9a7f9e 100644
+--- a/qom/cpu.c
++++ b/qom/cpu.c
+@@ -301,6 +301,7 @@ static void cpu_common_reset(CPUState *cpu)
+     cpu->can_do_io = 1;
+     cpu->exception_index = -1;
+     cpu->crash_occurred = false;
++    cpu->cflags_next_tb = -1;
  
- static TCGv NULL_QREG;
--#define IS_NULL_QREG(t) (TCGV_EQUAL(t, NULL_QREG))
-+#define IS_NULL_QREG(t) (t == NULL_QREG)
- /* Used to distinguish stores from bad addressing modes.  */
- static TCGv store_dummy;
- 
-diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-index a81ff69d75..616cf8f50e 100644
---- a/target/ppc/translate.c
-+++ b/target/ppc/translate.c
-@@ -902,7 +902,7 @@ static inline void gen_op_arith_add(DisasContext *ctx, TCGv ret, TCGv arg1,
-         gen_set_Rc0(ctx, t0);
-     }
- 
--    if (!TCGV_EQUAL(t0, ret)) {
-+    if (t0 != ret) {
-         tcg_gen_mov_tl(ret, t0);
-         tcg_temp_free(t0);
-     }
-@@ -1438,7 +1438,7 @@ static inline void gen_op_arith_subf(DisasContext *ctx, TCGv ret, TCGv arg1,
-         gen_set_Rc0(ctx, t0);
-     }
- 
--    if (!TCGV_EQUAL(t0, ret)) {
-+    if (t0 != ret) {
-         tcg_gen_mov_tl(ret, t0);
-         tcg_temp_free(t0);
-     }
+     if (tcg_enabled()) {
+         cpu_tb_jmp_cache_clear(cpu);
 -- 
 2.13.6
