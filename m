@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55839)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56227)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e5Taq-0007Id-8D
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 05:27:53 -0400
+	(envelope-from <berrange@redhat.com>) id 1e5Tbo-00080n-Jx
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 05:28:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e5Tap-0008Cf-6P
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 05:27:52 -0400
-Received: from mail-wr0-x235.google.com ([2a00:1450:400c:c0c::235]:55368)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1e5Tao-0008CL-Ty
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 05:27:51 -0400
-Received: by mail-wr0-x235.google.com with SMTP id z99so8341607wrc.12
-	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 02:27:50 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <1508443483-5429-1-git-send-email-alindsay@codeaurora.org>
-References: <1508443483-5429-1-git-send-email-alindsay@codeaurora.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 20 Oct 2017 10:27:29 +0100
-Message-ID: <CAFEAcA-R-3F8US1RGJVNyVnC81z9+1dd3Liq0tmVSNz1eDszbA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] build: Don't force preserving permissions
- on config-devices.mak.old
+	(envelope-from <berrange@redhat.com>) id 1e5Tbl-0000Ft-BY
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 05:28:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56384)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1e5Tbl-0000F0-3I
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 05:28:49 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 22CCD4792
+	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 09:28:48 +0000 (UTC)
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Date: Fri, 20 Oct 2017 10:28:44 +0100
+Message-Id: <20171020092844.13880-1-berrange@redhat.com>
+Subject: [Qemu-devel] [PATCH] sockets: avoid leak of listen file descriptor
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,40 +27,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aaron Lindsay <alindsay@codeaurora.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Stefan Weil <sw@weilnetz.de>, Markus Armbruster <armbru@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, Paul Brook <paul@codesourcery.com>
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-On 19 October 2017 at 21:04, Aaron Lindsay <alindsay@codeaurora.org> wrote:
-> I get the following error when building on an NFSv3 filesystem:
->
-> % make -j8
->   GEN     aarch64-softmmu/config-devices.mak.tmp
->   GEN     config-host.h
-> [snip]
->   GEN     qmp-marshal.c
->   GEN     aarch64-softmmu/config-devices.mak
-> cp: preserving permissions for =E2=80=98aarch64-softmmu/config-devices.ma=
-k.old=E2=80=99: Operation not supported
-> make: *** Deleting file `aarch64-softmmu/config-devices.mak'
->   GEN     qapi-types.c
-> [snip]
->   CC      scsi/qemu-pr-helper.o
-> make: *** No rule to make target `config-all-devices.mak', needed by `sub=
-dir-aarch64-softmmu'.  Stop.
-> make: *** Waiting for unfinished jobs....
->
-> Ideally you would only build on a filesystem with proper support, but I h=
-aven't
-> been able to find a reason why preserving exact permissions is important =
-in
-> this case.
+If we iterate over the full port range without successfully binding+listening
+on the socket, we'll try the next address, whereupon we overwrite the slisten
+file descriptor variable without closing it.
 
-Do we even need this code at all? As far as I can tell from
-the git logs, the idea is to support users who hand-modify
-config-devices.mak. But do we want to support that? I would
-think of config-devices.mak as an internal part of the build
-machinery, and the bit you can edit as a user is the stuff
-in default-configs/.
+Rather than having two places where we open + close socket FDs on different
+iterations of nested for loops, re-arrange the code to always open+close
+within the same loop iteration.
 
-thanks
--- PMM
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+---
+ util/qemu-sockets.c | 31 +++++++++++++++++++------------
+ 1 file changed, 19 insertions(+), 12 deletions(-)
+
+diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
+index b47fb45885..a319338cca 100644
+--- a/util/qemu-sockets.c
++++ b/util/qemu-sockets.c
+@@ -207,7 +207,7 @@ static int inet_listen_saddr(InetSocketAddress *saddr,
+     char uaddr[INET6_ADDRSTRLEN+1];
+     char uport[33];
+     int rc, port_min, port_max, p;
+-    int slisten = 0;
++    int slisten = -1;
+     int saved_errno = 0;
+     bool socket_created = false;
+     Error *err = NULL;
+@@ -267,16 +267,28 @@ static int inet_listen_saddr(InetSocketAddress *saddr,
+ 		        uaddr,INET6_ADDRSTRLEN,uport,32,
+ 		        NI_NUMERICHOST | NI_NUMERICSERV);
+ 
+-        slisten = create_fast_reuse_socket(e);
+-        if (slisten < 0) {
+-            continue;
+-        }
+-
+         socket_created = true;
+         port_min = inet_getport(e);
+         port_max = saddr->has_to ? saddr->to + port_offset : port_min;
+         for (p = port_min; p <= port_max; p++) {
+             inet_setport(e, p);
++
++            slisten = create_fast_reuse_socket(e);
++            if (slisten < 0) {
++                /* First time we expect we might fail to create the socket
++                 * eg if 'e' has AF_INET6 but ipv6 kmod is not loaded.
++                 * Later iterations should always succeeed if first iteration
++                 * worked though, so treat that as fatal.
++                 */
++                if (p == port_min) {
++                    continue;
++                } else {
++                    error_setg_errno(errp, errno,
++                                     "Failed to recreate failed listening socket");
++                    goto listen_failed;
++                }
++            }
++
+             rc = try_bind(slisten, saddr, e);
+             if (rc) {
+                 if (errno == EADDRINUSE) {
+@@ -299,12 +311,7 @@ static int inet_listen_saddr(InetSocketAddress *saddr,
+              * socket to allow bind attempts for subsequent ports:
+              */
+             closesocket(slisten);
+-            slisten = create_fast_reuse_socket(e);
+-            if (slisten < 0) {
+-                error_setg_errno(errp, errno,
+-                                 "Failed to recreate failed listening socket");
+-                goto listen_failed;
+-            }
++            slisten = -1;
+         }
+     }
+     error_setg_errno(errp, errno,
+-- 
+2.13.6
