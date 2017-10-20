@@ -1,17 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32821)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34919)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Andrew.Baumann@microsoft.com>) id 1e5fBC-0004Ba-Hh
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 17:50:12 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1e5fOX-0000tG-Cl
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 18:03:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Andrew.Baumann@microsoft.com>) id 1e5fBA-0003HU-SV
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 17:50:10 -0400
-From: Andrew Baumann <Andrew.Baumann@microsoft.com>
-Date: Fri, 20 Oct 2017 14:49:18 -0700
-Message-Id: <20171020214918.18944-1-Andrew.Baumann@microsoft.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1e5fOS-0002nj-E2
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 18:03:57 -0400
+Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:46658)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1e5fOS-0002nV-9N
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 18:03:52 -0400
+Received: by mail-qt0-x244.google.com with SMTP id 1so20213409qtn.3
+	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 15:03:52 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1508514117-15880-1-git-send-email-gabriel291075@gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <057c334d-7559-24bc-492e-d792f353df7a@amsat.org>
+Date: Fri, 20 Oct 2017 19:03:48 -0300
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2] arm: implement cache/shareability attribute
- bits for PAR registers
+In-Reply-To: <1508514117-15880-1-git-send-email-gabriel291075@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v3 08/11] kinetis_k64_pmux.c has been added
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,320 +34,490 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, Andrew Baumann <Andrew.Baumann@microsoft.com>
+To: Gabriel Augusto Costa <gabriel291075@gmail.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org
 
-On a successful address translation instruction, PAR is supposed to
-contain cacheability and shareability attributes determined by the
-translation. We previously returned 0 for these bits (in line with the
-general strategy of ignoring caches and memory attributes), but some
-guest OSes may depend on them.
+On 10/20/2017 12:41 PM, Gabriel Augusto Costa wrote:
+> I made a new arm machine with some peripherals. The machine is mk64fn1m0, a
+> cortex-m4 microcontroller from NXP Kinetis family. The machine can run a
+> simple arm binary file using UART0 in polling mode.
+> I have prepared a series of patchs to include this machine:
+> PATCH v3 n/11: It adds the machine and peripherals devices;
+> PATCH v4 n/2: It changes the Make files to compile this machine.
+> 
+> Signed-off-by: Gabriel Augusto Costa <gabriel291075@gmail.com>
+> ---
+>  hw/misc/kinetis_k64_pmux.c | 417 +++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 417 insertions(+)
+>  create mode 100644 hw/misc/kinetis_k64_pmux.c
+> 
+> diff --git a/hw/misc/kinetis_k64_pmux.c b/hw/misc/kinetis_k64_pmux.c
+> new file mode 100644
+> index 0000000..02b31e1
+> --- /dev/null
+> +++ b/hw/misc/kinetis_k64_pmux.c
+> @@ -0,0 +1,417 @@
+> +/*
+> + * Kinetis K64 peripheral microcontroller emulation.
+> + *
+> + * Copyright (c) 2017 Advantech Wireless
+> + * Written by Gabriel Costa <gabriel291075@gmail.com>
+> + *
+> + *  This program is free software; you can redistribute it and/or modify
+> + *  it under the terms of the GNU General Public License version 2 or
+> + *  (at your option) any later version.
+> + */
+> +
+> +/* Kinetis K64 series PMUX controller.  */
+> +
+> +#include "qemu/osdep.h"
+> +#include "qapi/error.h"
+> +#include "hw/sysbus.h"
+> +#include "hw/ssi/ssi.h"
 
-This patch collects the attribute bits in the page-table walk, and
-updates PAR with the correct attributes for all LPAE
-translations. Short descriptor formats still return 0 for these bits,
-as in the prior implementation, but now log an unimplemented message.
+not used
 
-Signed-off-by: Andrew Baumann <Andrew.Baumann@microsoft.com>
----
-v2:
- * return attrs via out parameter from get_phys_addr, rather than MemTxAttrs
- * move MAIR lookup/index inline, since it turned out to be simple
- * implement attributes for stage 2 translations
- * combine attributes from stages 1 and 2 when required
+> +#include "hw/arm/arm.h"
 
-Attributes for short PTE formats remain unimplemented; there's a LOG_UNIMP for
-this case, but it's likely to be noisy for guests that trigger it -- do we need
-a one-shot mechanism for the log statement?
+not used
 
-Cheers,
-Andrew
+> +#include "hw/devices.h"
+> +#include "qemu/timer.h"
 
- target/arm/helper.c | 153 +++++++++++++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 139 insertions(+), 14 deletions(-)
+used?
 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 96113fe989..60cdc7ce1f 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -19,17 +19,23 @@
- #define ARM_CPU_FREQ 1000000000 /* FIXME: 1 GHz, should be configurable */
- 
- #ifndef CONFIG_USER_ONLY
-+/* Cacheability and shareability attributes for a memory access */
-+typedef struct ARMCacheAttrs {
-+    unsigned int attrs:8; /* as in the MAIR register encoding */
-+    unsigned int shareability:2; /* as in the SH field of the VMSAv8-64 PTEs */
-+} ARMCacheAttrs;
-+
- static bool get_phys_addr(CPUARMState *env, target_ulong address,
-                           MMUAccessType access_type, ARMMMUIdx mmu_idx,
-                           hwaddr *phys_ptr, MemTxAttrs *attrs, int *prot,
-                           target_ulong *page_size, uint32_t *fsr,
--                          ARMMMUFaultInfo *fi);
-+                          ARMMMUFaultInfo *fi, ARMCacheAttrs *cacheattrs);
- 
- static bool get_phys_addr_lpae(CPUARMState *env, target_ulong address,
-                                MMUAccessType access_type, ARMMMUIdx mmu_idx,
-                                hwaddr *phys_ptr, MemTxAttrs *txattrs, int *prot,
-                                target_ulong *page_size_ptr, uint32_t *fsr,
--                               ARMMMUFaultInfo *fi);
-+                               ARMMMUFaultInfo *fi, ARMCacheAttrs *cacheattrs);
- 
- /* Security attributes for an address, as returned by v8m_security_lookup. */
- typedef struct V8M_SAttributes {
-@@ -2159,9 +2165,10 @@ static uint64_t do_ats_write(CPUARMState *env, uint64_t value,
-     uint64_t par64;
-     MemTxAttrs attrs = {};
-     ARMMMUFaultInfo fi = {};
-+    ARMCacheAttrs cacheattrs = {};
- 
--    ret = get_phys_addr(env, value, access_type, mmu_idx,
--                        &phys_addr, &attrs, &prot, &page_size, &fsr, &fi);
-+    ret = get_phys_addr(env, value, access_type, mmu_idx, &phys_addr, &attrs,
-+                        &prot, &page_size, &fsr, &fi, &cacheattrs);
-     if (extended_addresses_enabled(env)) {
-         /* fsr is a DFSR/IFSR value for the long descriptor
-          * translation table format, but with WnR always clear.
-@@ -2173,7 +2180,8 @@ static uint64_t do_ats_write(CPUARMState *env, uint64_t value,
-             if (!attrs.secure) {
-                 par64 |= (1 << 9); /* NS */
-             }
--            /* We don't set the ATTR or SH fields in the PAR. */
-+            par64 |= (uint64_t)cacheattrs.attrs << 56; /* ATTR */
-+            par64 |= cacheattrs.shareability << 7; /* SH */
-         } else {
-             par64 |= 1; /* F */
-             par64 |= (fsr & 0x3f) << 1; /* FS */
-@@ -2189,6 +2197,8 @@ static uint64_t do_ats_write(CPUARMState *env, uint64_t value,
-          */
-         if (!ret) {
-             /* We do not set any attribute bits in the PAR */
-+            qemu_log_mask(LOG_UNIMP, "ats_write: cache/shareability attributes"
-+                          " for short PTEs not implemented in PAR\n");
-             if (page_size == (1 << 24)
-                 && arm_feature(env, ARM_FEATURE_V7)) {
-                 par64 = (phys_addr & 0xff000000) | (1 << 1);
-@@ -6925,7 +6935,7 @@ static bool v7m_read_half_insn(ARMCPU *cpu, ARMMMUIdx mmu_idx,
-         return false;
-     }
-     if (get_phys_addr(env, addr, MMU_INST_FETCH, mmu_idx,
--                      &physaddr, &attrs, &prot, &page_size, &fsr, &fi)) {
-+                      &physaddr, &attrs, &prot, &page_size, &fsr, &fi, NULL)) {
-         /* the MPU lookup failed */
-         env->v7m.cfsr[env->v7m.secure] |= R_V7M_CFSR_IACCVIOL_MASK;
-         armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_MEM, env->v7m.secure);
-@@ -8207,7 +8217,7 @@ static hwaddr S1_ptw_translate(CPUARMState *env, ARMMMUIdx mmu_idx,
-         int ret;
- 
-         ret = get_phys_addr_lpae(env, addr, 0, ARMMMUIdx_S2NS, &s2pa,
--                                 &txattrs, &s2prot, &s2size, fsr, fi);
-+                                 &txattrs, &s2prot, &s2size, fsr, fi, NULL);
-         if (ret) {
-             fi->s2addr = addr;
-             fi->stage2 = true;
-@@ -8612,7 +8622,7 @@ static bool get_phys_addr_lpae(CPUARMState *env, target_ulong address,
-                                MMUAccessType access_type, ARMMMUIdx mmu_idx,
-                                hwaddr *phys_ptr, MemTxAttrs *txattrs, int *prot,
-                                target_ulong *page_size_ptr, uint32_t *fsr,
--                               ARMMMUFaultInfo *fi)
-+                               ARMMMUFaultInfo *fi, ARMCacheAttrs *cacheattrs)
- {
-     ARMCPU *cpu = arm_env_get_cpu(env);
-     CPUState *cs = CPU(cpu);
-@@ -8929,6 +8939,28 @@ static bool get_phys_addr_lpae(CPUARMState *env, target_ulong address,
-          */
-         txattrs->secure = false;
-     }
-+
-+    if (cacheattrs != NULL) {
-+        if (mmu_idx == ARMMMUIdx_S2NS) {
-+            /* Translate from the 4-bit stage 2 representation of
-+             * memory attributes (without cache-allocation hints) to
-+             * the 8-bit representation of the stage 1 MAIR registers
-+             * (which includes allocation hints).
-+             */
-+            uint8_t memattr = extract32(attrs, 0, 4);
-+            cacheattrs->attrs = (extract32(memattr, 2, 2) << 4)
-+                              | (extract32(memattr, 0, 2) << 2);
-+            cacheattrs->shareability = extract32(attrs, 4, 2);
-+        } else {
-+            /* Index into MAIR registers for cache attributes */
-+            uint8_t attrindx = extract32(attrs, 0, 3);
-+            uint64_t mair = env->cp15.mair_el[regime_el(env, mmu_idx)];
-+            assert(attrindx <= 7);
-+            cacheattrs->attrs = extract64(mair, attrindx * 8, 8);
-+            cacheattrs->shareability = extract32(attrs, 6, 2);
-+        }
-+    }
-+
-     *phys_ptr = descaddr;
-     *page_size_ptr = page_size;
-     return false;
-@@ -9490,6 +9522,89 @@ static bool get_phys_addr_pmsav5(CPUARMState *env, uint32_t address,
-     return false;
- }
- 
-+/* Combine either inner or outer cacheability attributes for normal
-+ * memory, according to table D4-42 of ARM DDI 0487B.b (the ARMv8 ARM).
-+ *
-+ * NB: only stage 1 includes allocation hints (RW bits), leading to
-+ * some asymmetry.
-+ */
-+static uint8_t combine_cacheattr_nibble(uint8_t s1, uint8_t s2)
-+{
-+    if (s1 == 4 || s2 == 4) {
-+        /* non-cacheable has precedence */
-+        return 4;
-+    } else if (extract32(s1, 2, 2) == 0 || extract32(s1, 2, 2) == 2) {
-+        /* stage 1 write-through takes precedence */
-+        return s1;
-+    } else if (extract32(s2, 2, 2) == 2) {
-+        /* stage 2 write-through takes precedence */
-+        return s2;
-+    } else { /* write-back */
-+        return s1;
-+    }
-+}
-+
-+/* Combine S1 and S2 cacheability/shareability attributes, per D4.5.4
-+ *
-+ * @s1:      Attributes from stage 1 walk
-+ * @s2:      Attributes from stage 2 walk
-+ */
-+static ARMCacheAttrs combine_cacheattrs(ARMCacheAttrs s1, ARMCacheAttrs s2)
-+{
-+    uint8_t s1lo = extract32(s1.attrs, 0, 4), s2lo = extract32(s2.attrs, 0, 4);
-+    uint8_t s1hi = extract32(s1.attrs, 4, 4), s2hi = extract32(s2.attrs, 4, 4);
-+    ARMCacheAttrs ret;
-+
-+    /* Combine shareability attributes (table D4-43) */
-+    if (s1.shareability == 2 || s2.shareability == 2) {
-+        /* if either are outer-shareable, the result is outer-shareable */
-+        ret.shareability = 2;
-+    } else if (s1.shareability == 3 || s2.shareability == 3) {
-+        /* if either are inner-shareable, the result is inner-shareable */
-+        ret.shareability = 3;
-+    } else {
-+        /* both non-shareable */
-+        ret.shareability = 0;
-+    }
-+
-+    /* Combine memory type and cacheability attributes */
-+    if (s1hi == 0 || s2hi == 0) {
-+        /* Device has precedence over normal */
-+        if (s1lo == 0 || s2lo == 0) {
-+            /* nGnRnE has precedence over anything */
-+            ret.attrs = 0;
-+        } else if (s1lo == 4 || s2lo == 4) {
-+            /* non-Reordering has precedence over Reordering */
-+            ret.attrs = 4;  /* nGnRE */
-+        } else if (s1lo == 8 || s2lo == 8) {
-+            /* non-Gathering has precedence over Gathering */
-+            ret.attrs = 8;  /* nGRE */
-+        } else {
-+            ret.attrs = 0xc; /* GRE */
-+        }
-+
-+        /* Any location for which the resultant memory type is any
-+         * type of Device memory is always treated as Outer Shareable.
-+         */
-+        ret.shareability = 2;
-+    } else { /* Normal memory */
-+        /* Outer/inner cacheability combine independently */
-+        ret.attrs = combine_cacheattr_nibble(s1hi, s2hi) << 4
-+                  | combine_cacheattr_nibble(s1lo, s2lo);
-+
-+        if (ret.attrs == 0x44) {
-+            /* Any location for which the resultant memory type is Normal
-+             * Inner Non-cacheable, Outer Non-cacheable is always treated
-+             * as Outer Shareable.
-+             */
-+            ret.shareability = 2;
-+        }
-+    }
-+
-+    return ret;
-+}
-+
-+
- /* get_phys_addr - get the physical address for this virtual address
-  *
-  * Find the physical address corresponding to the given virtual address,
-@@ -9514,12 +9629,14 @@ static bool get_phys_addr_pmsav5(CPUARMState *env, uint32_t address,
-  * @prot: set to the permissions for the page containing phys_ptr
-  * @page_size: set to the size of the page containing phys_ptr
-  * @fsr: set to the DFSR/IFSR value on failure
-+ * @fi: set to fault info if the translation fails
-+ * @cacheattrs: (if non-NULL) set to the cacheability/shareability attributes
-  */
- static bool get_phys_addr(CPUARMState *env, target_ulong address,
-                           MMUAccessType access_type, ARMMMUIdx mmu_idx,
-                           hwaddr *phys_ptr, MemTxAttrs *attrs, int *prot,
-                           target_ulong *page_size, uint32_t *fsr,
--                          ARMMMUFaultInfo *fi)
-+                          ARMMMUFaultInfo *fi, ARMCacheAttrs *cacheattrs)
- {
-     if (mmu_idx == ARMMMUIdx_S12NSE0 || mmu_idx == ARMMMUIdx_S12NSE1) {
-         /* Call ourselves recursively to do the stage 1 and then stage 2
-@@ -9529,10 +9646,11 @@ static bool get_phys_addr(CPUARMState *env, target_ulong address,
-             hwaddr ipa;
-             int s2_prot;
-             int ret;
-+            ARMCacheAttrs cacheattrs2 = {};
- 
-             ret = get_phys_addr(env, address, access_type,
-                                 stage_1_mmu_idx(mmu_idx), &ipa, attrs,
--                                prot, page_size, fsr, fi);
-+                                prot, page_size, fsr, fi, cacheattrs);
- 
-             /* If S1 fails or S2 is disabled, return early.  */
-             if (ret || regime_translation_disabled(env, ARMMMUIdx_S2NS)) {
-@@ -9543,10 +9661,17 @@ static bool get_phys_addr(CPUARMState *env, target_ulong address,
-             /* S1 is done. Now do S2 translation.  */
-             ret = get_phys_addr_lpae(env, ipa, access_type, ARMMMUIdx_S2NS,
-                                      phys_ptr, attrs, &s2_prot,
--                                     page_size, fsr, fi);
-+                                     page_size, fsr, fi,
-+                                     cacheattrs != NULL ? &cacheattrs2 : NULL);
-             fi->s2addr = ipa;
-             /* Combine the S1 and S2 perms.  */
-             *prot &= s2_prot;
-+
-+            /* Combine the S1 and S2 cache attributes, if needed */
-+            if (!ret && cacheattrs != NULL) {
-+                *cacheattrs = combine_cacheattrs(*cacheattrs, cacheattrs2);
-+            }
-+
-             return ret;
-         } else {
-             /*
-@@ -9617,7 +9742,7 @@ static bool get_phys_addr(CPUARMState *env, target_ulong address,
- 
-     if (regime_using_lpae_format(env, mmu_idx)) {
-         return get_phys_addr_lpae(env, address, access_type, mmu_idx, phys_ptr,
--                                  attrs, prot, page_size, fsr, fi);
-+                                  attrs, prot, page_size, fsr, fi, cacheattrs);
-     } else if (regime_sctlr(env, mmu_idx) & SCTLR_XP) {
-         return get_phys_addr_v6(env, address, access_type, mmu_idx, phys_ptr,
-                                 attrs, prot, page_size, fsr, fi);
-@@ -9645,7 +9770,7 @@ bool arm_tlb_fill(CPUState *cs, vaddr address,
- 
-     ret = get_phys_addr(env, address, access_type,
-                         core_to_arm_mmu_idx(env, mmu_idx), &phys_addr,
--                        &attrs, &prot, &page_size, fsr, fi);
-+                        &attrs, &prot, &page_size, fsr, fi, NULL);
-     if (!ret) {
-         /* Map a single [sub]page.  */
-         phys_addr &= TARGET_PAGE_MASK;
-@@ -9674,7 +9799,7 @@ hwaddr arm_cpu_get_phys_page_attrs_debug(CPUState *cs, vaddr addr,
-     *attrs = (MemTxAttrs) {};
- 
-     ret = get_phys_addr(env, addr, 0, mmu_idx, &phys_addr,
--                        attrs, &prot, &page_size, &fsr, &fi);
-+                        attrs, &prot, &page_size, &fsr, &fi, NULL);
- 
-     if (ret) {
-         return -1;
--- 
-2.14.2
+> +#include "net/net.h"
+
+not used
+
+> +#include "hw/boards.h"
+
+used?
+
+> +#include "qemu/log.h"
+> +#include "exec/address-spaces.h"
+
+used?
+
+> +#include "sysemu/sysemu.h"
+
+used?
+
+> +#include "hw/char/pl011.h"
+
+not used
+
+> +#include "hw/misc/unimp.h"
+> +#include "hw/misc/kinetis_k64_pmux.h"
+> +
+> +static const VMStateDescription vmstate_kinetis_k64_pmux = {
+> +    .name = TYPE_KINETIS_K64_PMUX,
+> +    .version_id = 1,
+> +    .minimum_version_id = 1,
+> +    .fields = (VMStateField[]) {
+> +        VMSTATE_UINT32(PCR00, kinetis_k64_pmux_state),
+> +        VMSTATE_UINT32(PCR01, kinetis_k64_pmux_state),
+> +        VMSTATE_UINT32(PCR02, kinetis_k64_pmux_state),
+> +        VMSTATE_UINT32(PCR03, kinetis_k64_pmux_state),
+> +        VMSTATE_UINT32(PCR04, kinetis_k64_pmux_state),
+> +        VMSTATE_UINT32(PCR05, kinetis_k64_pmux_state),
+> +        VMSTATE_UINT32(PCR06, kinetis_k64_pmux_state),
+> +        VMSTATE_UINT32(PCR07, kinetis_k64_pmux_state),
+> +        VMSTATE_UINT32(PCR08, kinetis_k64_pmux_state),
+> +        VMSTATE_UINT32(PCR09, kinetis_k64_pmux_state),
+> +        VMSTATE_UINT32(PCR10, kinetis_k64_pmux_state),
+> +        VMSTATE_UINT32(PCR11, kinetis_k64_pmux_state),
+> +        VMSTATE_UINT32(PCR12, kinetis_k64_pmux_state),
+> +        VMSTATE_UINT32(PCR13, kinetis_k64_pmux_state),
+> +        VMSTATE_UINT32(PCR14, kinetis_k64_pmux_state),
+> +        VMSTATE_UINT32(PCR15, kinetis_k64_pmux_state),
+> +        VMSTATE_UINT32(PCR16, kinetis_k64_pmux_state),
+> +        VMSTATE_UINT32(PCR17, kinetis_k64_pmux_state),
+> +        VMSTATE_UINT32(PCR18, kinetis_k64_pmux_state),
+> +        VMSTATE_UINT32(PCR19, kinetis_k64_pmux_state),
+> +        VMSTATE_UINT32(PCR20, kinetis_k64_pmux_state),
+> +        VMSTATE_UINT32(PCR21, kinetis_k64_pmux_state),
+> +        VMSTATE_UINT32(PCR22, kinetis_k64_pmux_state),
+> +        VMSTATE_UINT32(PCR23, kinetis_k64_pmux_state),
+> +        VMSTATE_UINT32(PCR24, kinetis_k64_pmux_state),
+> +        VMSTATE_UINT32(PCR25, kinetis_k64_pmux_state),
+> +        VMSTATE_UINT32(PCR26, kinetis_k64_pmux_state),
+> +        VMSTATE_UINT32(PCR27, kinetis_k64_pmux_state),
+> +        VMSTATE_UINT32(PCR28, kinetis_k64_pmux_state),
+> +        VMSTATE_UINT32(PCR29, kinetis_k64_pmux_state),
+> +        VMSTATE_UINT32(PCR30, kinetis_k64_pmux_state),
+> +        VMSTATE_UINT32(PCR31, kinetis_k64_pmux_state),
+
+all those this could be:
+
+           VMSTATE_UINT32_ARRAY(PCR, kinetis_k64_pmux_state, 32),
+
+> +        VMSTATE_UINT32(GPCLR, kinetis_k64_pmux_state),
+> +        VMSTATE_UINT32(GPCHR, kinetis_k64_pmux_state),
+> +        VMSTATE_UINT32(ISFR, kinetis_k64_pmux_state),
+> +        VMSTATE_UINT32(DFER, kinetis_k64_pmux_state),
+> +        VMSTATE_UINT32(DFCR, kinetis_k64_pmux_state),
+> +        VMSTATE_UINT32(DFWR, kinetis_k64_pmux_state),
+> +        VMSTATE_END_OF_LIST()
+> +    }
+> +};
+> +
+> +static void kinetis_k64_pmux_reset(DeviceState *dev)
+> +{
+> +    kinetis_k64_pmux_state *s = KINETIS_K64_PMUX(dev);
+> +
+> +    s->PCR00 = 0x00000000;
+> +    s->PCR01 = 0x00000000;
+> +    s->PCR02 = 0x00000000;
+> +    s->PCR03 = 0x00000000;
+> +    s->PCR04 = 0x00000000;
+> +    s->PCR05 = 0x00000000;
+> +    s->PCR06 = 0x00000000;
+> +    s->PCR07 = 0x00000000;
+> +    s->PCR08 = 0x00000000;
+> +    s->PCR09 = 0x00000000;
+> +    s->PCR10 = 0x00000000;
+> +    s->PCR11 = 0x00000000;
+> +    s->PCR12 = 0x00000000;
+> +    s->PCR13 = 0x00000000;
+> +    s->PCR14 = 0x00000000;
+> +    s->PCR15 = 0x00000000;
+> +    s->PCR16 = 0x00000000;
+> +    s->PCR17 = 0x00000000;
+> +    s->PCR18 = 0x00000000;
+> +    s->PCR19 = 0x00000000;
+> +    s->PCR20 = 0x00000000;
+> +    s->PCR21 = 0x00000000;
+> +    s->PCR22 = 0x00000000;
+> +    s->PCR23 = 0x00000000;
+> +    s->PCR24 = 0x00000000;
+> +    s->PCR25 = 0x00000000;
+> +    s->PCR26 = 0x00000000;
+> +    s->PCR27 = 0x00000000;
+> +    s->PCR28 = 0x00000000;
+> +    s->PCR29 = 0x00000000;
+> +    s->PCR30 = 0x00000000;
+> +    s->PCR31 = 0x00000000;
+> +    s->GPCLR = 0x00000000;
+> +    s->GPCHR = 0x00000000;
+> +    s->ISFR = 0x00000000;
+> +    s->DFER = 0x00000000;
+> +    s->DFCR = 0x00000000;
+> +    s->DFWR = 0x00000000;
+> +}
+> +
+> +static void kinetis_k64_pmux_write(void *opaque, hwaddr offset, uint64_t value,
+> +        unsigned size)
+> +{
+> +    kinetis_k64_pmux_state *s = (kinetis_k64_pmux_state *)opaque;
+> +
+> +    value &= 0xFFFFFFFF;
+> +    switch (offset) {
+> +    case 0x00:
+> +        s->PCR00 = value;
+> +        break;
+> +    case 0x04:
+> +        s->PCR01 = value;
+> +        break;
+> +    case 0x08:
+> +        s->PCR02 = value;
+> +        break;
+> +    case 0x0C:
+> +        s->PCR03 = value;
+> +        break;
+> +    case 0x10:
+> +        s->PCR04 = value;
+> +        break;
+> +    case 0x14:
+> +        s->PCR05 = value;
+> +        break;
+> +    case 0x18:
+> +        s->PCR06 = value;
+> +        break;
+> +    case 0x1C:
+> +        s->PCR07 = value;
+> +        break;
+> +    case 0x20:
+> +        s->PCR08 = value;
+> +        break;
+> +    case 0x24:
+> +        s->PCR09 = value;
+> +        break;
+> +    case 0x28:
+> +        s->PCR10 = value;
+> +        break;
+> +    case 0x2C:
+> +        s->PCR11 = value;
+> +        break;
+> +    case 0x30:
+> +        s->PCR12 = value;
+> +        break;
+> +    case 0x34:
+> +        s->PCR13 = value;
+> +        break;
+> +    case 0x38:
+> +        s->PCR14 = value;
+> +        break;
+> +    case 0x3C:
+> +        s->PCR15 = value;
+> +        break;
+> +    case 0x40:
+> +        s->PCR16 = value;
+> +        break;
+> +    case 0x44:
+> +        s->PCR17 = value;
+> +        break;
+> +    case 0x48:
+> +        s->PCR18 = value;
+> +        break;
+> +    case 0x4C:
+> +        s->PCR19 = value;
+> +        break;
+> +    case 0x50:
+> +        s->PCR20 = value;
+> +        break;
+> +    case 0x54:
+> +        s->PCR21 = value;
+> +        break;
+> +    case 0x58:
+> +        s->PCR22 = value;
+> +        break;
+> +    case 0x5C:
+> +        s->PCR23 = value;
+> +        break;
+> +    case 0x60:
+> +        s->PCR24 = value;
+> +        break;
+> +    case 0x64:
+> +        s->PCR25 = value;
+> +        break;
+> +    case 0x68:
+> +        s->PCR26 = value;
+> +        break;
+> +    case 0x6C:
+> +        s->PCR27 = value;
+> +        break;
+> +    case 0x70:
+> +        s->PCR28 = value;
+> +        break;
+> +    case 0x74:
+> +        s->PCR29 = value;
+> +        break;
+> +    case 0x78:
+> +        s->PCR30 = value;
+> +        break;
+> +    case 0x7C:
+> +        s->PCR31 = value;
+> +        break;
+
+all those could be:
+
+    case 0x00 ... 0x7f:
+        s->PCR[offset >> 2] = value;
+        break;
+
+> +    case 0x80:
+> +        s->GPCLR = value;
+> +        break;
+> +    case 0x84:
+> +        s->GPCHR = value;
+> +        break;
+> +    case 0xA0:
+> +        s->ISFR = value;
+> +        break;
+> +    case 0xC0:
+> +        s->DFER = value;
+> +        break;
+> +    case 0xC4:
+> +        s->DFCR = value;
+> +        break;
+> +    case 0xC8:
+> +        s->DFWR = value;
+> +        break;
+> +    default:
+> +        qemu_log_mask(LOG_GUEST_ERROR,
+> +                "kinetis_k64_pmux: write at bad offset 0x%x\n",
+> +                (int)offset);
+> +    }
+> +}
+> +
+> +static uint64_t kinetis_k64_pmux_read(void *opaque, hwaddr offset,
+> +        unsigned size)
+> +{
+> +    kinetis_k64_pmux_state *s = (kinetis_k64_pmux_state *)opaque;
+> +    uint8_t value;
+> +
+> +    switch (offset) {
+> +    case 0x00:
+> +        value = s->PCR00;
+> +        break;
+> +    case 0x04:
+> +        value = s->PCR01;
+> +        break;
+> +    case 0x08:
+> +        value = s->PCR02;
+> +        break;
+> +    case 0x0C:
+> +        value = s->PCR03;
+> +        break;
+> +    case 0x10:
+> +        value = s->PCR04;
+> +        break;
+> +    case 0x14:
+> +        value = s->PCR05;
+> +        break;
+> +    case 0x18:
+> +        value = s->PCR06;
+> +        break;
+> +    case 0x1C:
+> +        value = s->PCR07;
+> +        break;
+> +    case 0x20:
+> +        value = s->PCR08;
+> +        break;
+> +    case 0x24:
+> +        value = s->PCR09;
+> +        break;
+> +    case 0x28:
+> +        value = s->PCR10;
+> +        break;
+> +    case 0x2C:
+> +        value = s->PCR11;
+> +        break;
+> +    case 0x30:
+> +        value = s->PCR12;
+> +        break;
+> +    case 0x34:
+> +        value = s->PCR13;
+> +        break;
+> +    case 0x38:
+> +        value = s->PCR14;
+> +        break;
+> +    case 0x3C:
+> +        value = s->PCR15;
+> +        break;
+> +    case 0x40:
+> +        value = s->PCR16;
+> +        break;
+> +    case 0x44:
+> +        value = s->PCR17;
+> +        break;
+> +    case 0x48:
+> +        value = s->PCR18;
+> +        break;
+> +    case 0x4C:
+> +        value = s->PCR19;
+> +        break;
+> +    case 0x50:
+> +        value = s->PCR20;
+> +        break;
+> +    case 0x54:
+> +        value = s->PCR21;
+> +        break;
+> +    case 0x58:
+> +        value = s->PCR22;
+> +        break;
+> +    case 0x5C:
+> +        value = s->PCR23;
+> +        break;
+> +    case 0x60:
+> +        value = s->PCR24;
+> +        break;
+> +    case 0x64:
+> +        value = s->PCR25;
+> +        break;
+> +    case 0x68:
+> +        value = s->PCR26;
+> +        break;
+> +    case 0x6C:
+> +        value = s->PCR27;
+> +        break;
+> +    case 0x70:
+> +        value = s->PCR28;
+> +        break;
+> +    case 0x74:
+> +        value = s->PCR29;
+> +        break;
+> +    case 0x78:
+> +        value = s->PCR30;
+> +        break;
+> +    case 0x7C:
+> +        value = s->PCR31;
+> +        break;
+
+same:
+
+    case 0x00 ... 0x7f:
+        value = s->PCR[offset >> 2];
+        break;
+
+> +    case 0x80:
+> +        value = s->GPCLR;
+> +        break;
+> +    case 0x84:
+> +        value = s->GPCHR;
+> +        break;
+> +    case 0xA0:
+> +        value = s->ISFR;
+> +        break;
+> +    case 0xC0:
+> +        value = s->DFER;
+> +        break;
+> +    case 0xC4:
+> +        value = s->DFCR;
+> +        break;
+> +    case 0xC8:
+> +        value = s->DFWR;
+> +        break;
+> +    default:
+> +        qemu_log_mask(LOG_GUEST_ERROR,
+> +                "kinetis_k64_pmux: read at bad offset 0x%x\n", (int)offset);
+
+you can use the HWADDR_PRIx format instead of casting.
+
+> +        return 0;
+> +    }
+> +    return value;
+> +}
+> +
+> +static const MemoryRegionOps kinetis_k64_pmux_ops = {
+> +    .read = kinetis_k64_pmux_read,
+> +    .write = kinetis_k64_pmux_write,
+> +    .endianness = DEVICE_NATIVE_ENDIAN,
+> +};
+> +
+> +static void kinetis_k64_pmux_init(Object *obj)
+> +{
+> +    kinetis_k64_pmux_state *s = KINETIS_K64_PMUX(obj);
+> +    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
+> +
+> +    memory_region_init_io(&s->iomem, obj, &kinetis_k64_pmux_ops, s,
+> +            TYPE_KINETIS_K64_PMUX, 0x1000);
+> +    sysbus_init_mmio(sbd, &s->iomem);
+> +    sysbus_init_irq(sbd, &s->irq);
+> +}
+> +
+> +static void kinetis_k64_pmux_class_init(ObjectClass *klass, void *data)
+> +{
+> +    DeviceClass *dc = DEVICE_CLASS(klass);
+> +
+> +    dc->vmsd = &vmstate_kinetis_k64_pmux;
+> +    dc->reset = kinetis_k64_pmux_reset;
+> +    dc->desc = "Kinetis K64 series PMUX";
+> +}
+> +
+> +static const TypeInfo kinetis_k64_pmux_info = {
+> +    .name          = TYPE_KINETIS_K64_PMUX,
+> +    .parent        = TYPE_SYS_BUS_DEVICE,
+> +    .instance_size = sizeof(kinetis_k64_pmux_state),
+> +    .instance_init = kinetis_k64_pmux_init,
+> +    .class_init    = kinetis_k64_pmux_class_init,
+> +};
+> +
+> +static void kinetis_k64_pmux_register_types(void)
+> +{
+> +    type_register_static(&kinetis_k64_pmux_info);
+> +}
+> +
+> +type_init(kinetis_k64_pmux_register_types)
+> 
