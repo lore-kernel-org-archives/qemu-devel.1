@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44300)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44305)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1e5gan-0005rN-3U
+	(envelope-from <richard.henderson@linaro.org>) id 1e5gan-0005rb-6A
 	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 19:20:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1e5gaj-0007YB-3X
+	(envelope-from <richard.henderson@linaro.org>) id 1e5gam-0007Zg-5l
 	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 19:20:41 -0400
-Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:54400)
+Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:52240)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1e5gai-0007Xv-U7
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 19:20:37 -0400
-Received: by mail-pf0-x243.google.com with SMTP id n89so13055357pfk.11
-	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 16:20:36 -0700 (PDT)
+	id 1e5gal-0007ZS-Vk
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 19:20:40 -0400
+Received: by mail-pf0-x242.google.com with SMTP id e64so13061911pfk.9
+	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 16:20:39 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Fri, 20 Oct 2017 16:19:37 -0700
-Message-Id: <20171020232023.15010-7-richard.henderson@linaro.org>
+Date: Fri, 20 Oct 2017 16:19:39 -0700
+Message-Id: <20171020232023.15010-9-richard.henderson@linaro.org>
 In-Reply-To: <20171020232023.15010-1-richard.henderson@linaro.org>
 References: <20171020232023.15010-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v7 06/52] tcg: Add temp_global bit to TCGTemp
+Subject: [Qemu-devel] [PATCH v7 08/52] tcg: Introduce temp_arg,
+ export temp_idx
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,122 +32,109 @@ Cc: cota@braap.org, f4bug@amsat.org, pbonzini@redhat.com, Richard Henderson <rth
 
 From: Richard Henderson <rth@twiddle.net>
 
-This avoids needing to test the index of a temp against nb_globals.
+At the same time, adrop the TCGContext argument and use tcg_ctx instead.
 
 Reviewed-by: Emilio G. Cota <cota@braap.org>
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- tcg/tcg.h      | 12 ++++++++----
- tcg/optimize.c | 15 ++++++++-------
- tcg/tcg.c      | 11 ++++++++---
- 3 files changed, 24 insertions(+), 14 deletions(-)
+ tcg/tcg.h | 12 ++++++++++++
+ tcg/tcg.c | 19 ++++++-------------
+ 2 files changed, 18 insertions(+), 13 deletions(-)
 
 diff --git a/tcg/tcg.h b/tcg/tcg.h
-index f06187fd8e..fc4d1ed58b 100644
+index 5fcdec1fc5..828c1e70e5 100644
 --- a/tcg/tcg.h
 +++ b/tcg/tcg.h
-@@ -579,10 +579,14 @@ typedef struct TCGTemp {
-     unsigned int indirect_base:1;
-     unsigned int mem_coherent:1;
-     unsigned int mem_allocated:1;
--    unsigned int temp_local:1; /* If true, the temp is saved across
--                                  basic blocks. Otherwise, it is not
--                                  preserved across basic blocks. */
--    unsigned int temp_allocated:1; /* never used for code gen */
-+    /* If true, the temp is saved across both basic blocks and
-+       translation blocks.  */
-+    unsigned int temp_global:1;
-+    /* If true, the temp is saved across basic blocks but dead
-+       at the end of translation blocks.  If false, the temp is
-+       dead at the end of basic blocks.  */
-+    unsigned int temp_local:1;
-+    unsigned int temp_allocated:1;
+@@ -729,6 +729,18 @@ struct TCGContext {
+ extern TCGContext tcg_ctx;
+ extern bool parallel_cpus;
  
-     tcg_target_long val;
-     struct TCGTemp *mem_base;
-diff --git a/tcg/optimize.c b/tcg/optimize.c
-index d8c3a7ed56..55f9e83ce8 100644
---- a/tcg/optimize.c
-+++ b/tcg/optimize.c
-@@ -116,25 +116,26 @@ static TCGOpcode op_to_movi(TCGOpcode op)
-     }
- }
- 
--static TCGArg find_better_copy(TCGContext *s, TCGArg temp)
-+static TCGArg find_better_copy(TCGContext *s, TCGArg arg)
++static inline size_t temp_idx(TCGTemp *ts)
++{
++    ptrdiff_t n = ts - tcg_ctx.temps;
++    tcg_debug_assert(n >= 0 && n < tcg_ctx.nb_temps);
++    return n;
++}
++
++static inline TCGArg temp_arg(TCGTemp *ts)
++{
++    return temp_idx(ts);
++}
++
+ static inline TCGTemp *arg_temp(TCGArg a)
  {
-+    TCGTemp *ts = arg_temp(arg);
-     TCGArg i;
- 
-     /* If this is already a global, we can't do better. */
--    if (temp < s->nb_globals) {
--        return temp;
-+    if (ts->temp_global) {
-+        return arg;
-     }
- 
-     /* Search for a global first. */
--    for (i = temps[temp].next_copy ; i != temp ; i = temps[i].next_copy) {
-+    for (i = temps[arg].next_copy ; i != arg; i = temps[i].next_copy) {
-         if (i < s->nb_globals) {
-             return i;
-         }
-     }
- 
-     /* If it is a temp, search for a temp local. */
--    if (!arg_temp(temp)->temp_local) {
--        for (i = temps[temp].next_copy ; i != temp ; i = temps[i].next_copy) {
-+    if (!ts->temp_local) {
-+        for (i = temps[arg].next_copy ; i != arg; i = temps[i].next_copy) {
-             if (s->temps[i].temp_local) {
-                 return i;
-             }
-@@ -142,7 +143,7 @@ static TCGArg find_better_copy(TCGContext *s, TCGArg temp)
-     }
- 
-     /* Failure to find a better representation, return the same temp. */
--    return temp;
-+    return arg;
- }
- 
- static bool temps_are_copies(TCGArg arg1, TCGArg arg2)
+     return a == TCG_CALL_DUMMY_ARG ? NULL : &tcg_ctx.temps[a];
 diff --git a/tcg/tcg.c b/tcg/tcg.c
-index 935f3da0a1..e2a5f3f4c2 100644
+index e2a5f3f4c2..f6e76df3ba 100644
 --- a/tcg/tcg.c
 +++ b/tcg/tcg.c
-@@ -489,9 +489,14 @@ static inline TCGTemp *tcg_temp_alloc(TCGContext *s)
- 
- static inline TCGTemp *tcg_global_alloc(TCGContext *s)
- {
-+    TCGTemp *ts;
-+
-     tcg_debug_assert(s->nb_globals == s->nb_temps);
-     s->nb_globals++;
--    return tcg_temp_alloc(s);
-+    ts = tcg_temp_alloc(s);
-+    ts->temp_global = 1;
-+
-+    return ts;
+@@ -473,13 +473,6 @@ void tcg_func_start(TCGContext *s)
+     s->gen_next_op_idx = 1;
  }
  
- static int tcg_global_reg_new_internal(TCGContext *s, TCGType type,
-@@ -1190,7 +1195,7 @@ static char *tcg_get_arg_str_ptr(TCGContext *s, char *buf, int buf_size,
+-static inline int temp_idx(TCGContext *s, TCGTemp *ts)
+-{
+-    ptrdiff_t n = ts - s->temps;
+-    tcg_debug_assert(n >= 0 && n < s->nb_temps);
+-    return n;
+-}
+-
+ static inline TCGTemp *tcg_temp_alloc(TCGContext *s)
  {
-     int idx = temp_idx(s, ts);
+     int n = s->nb_temps++;
+@@ -516,7 +509,7 @@ static int tcg_global_reg_new_internal(TCGContext *s, TCGType type,
+     ts->name = name;
+     tcg_regset_set_reg(s->reserved_regs, reg);
  
--    if (idx < s->nb_globals) {
-+    if (ts->temp_global) {
-         pstrcpy(buf, buf_size, ts->name);
-     } else if (ts->temp_local) {
-         snprintf(buf, buf_size, "loc%d", idx - s->nb_globals);
-@@ -2128,7 +2133,7 @@ static void temp_free_or_dead(TCGContext *s, TCGTemp *ts, int free_or_dead)
+-    return temp_idx(s, ts);
++    return temp_idx(ts);
+ }
+ 
+ void tcg_set_frame(TCGContext *s, TCGReg reg, intptr_t start, intptr_t size)
+@@ -605,7 +598,7 @@ int tcg_global_mem_new_internal(TCGType type, TCGv_ptr base,
+         ts->mem_offset = offset;
+         ts->name = name;
      }
-     ts->val_type = (free_or_dead < 0
-                     || ts->temp_local
--                    || temp_idx(s, ts) < s->nb_globals
-+                    || ts->temp_global
-                     ? TEMP_VAL_MEM : TEMP_VAL_DEAD);
+-    return temp_idx(s, ts);
++    return temp_idx(ts);
  }
  
+ static int tcg_temp_new_internal(TCGType type, int temp_local)
+@@ -645,7 +638,7 @@ static int tcg_temp_new_internal(TCGType type, int temp_local)
+             ts->temp_allocated = 1;
+             ts->temp_local = temp_local;
+         }
+-        idx = temp_idx(s, ts);
++        idx = temp_idx(ts);
+     }
+ 
+ #if defined(CONFIG_DEBUG_TCG)
+@@ -1193,7 +1186,7 @@ static void tcg_reg_alloc_start(TCGContext *s)
+ static char *tcg_get_arg_str_ptr(TCGContext *s, char *buf, int buf_size,
+                                  TCGTemp *ts)
+ {
+-    int idx = temp_idx(s, ts);
++    int idx = temp_idx(ts);
+ 
+     if (ts->temp_global) {
+         pstrcpy(buf, buf_size, ts->name);
+@@ -1941,7 +1934,7 @@ static bool liveness_pass_2(TCGContext *s, uint8_t *temp_state)
+                     TCGOp *lop = tcg_op_insert_before(s, op, lopc, 3);
+ 
+                     lop->args[0] = dir;
+-                    lop->args[1] = temp_idx(s, its->mem_base);
++                    lop->args[1] = temp_arg(its->mem_base);
+                     lop->args[2] = its->mem_offset;
+ 
+                     /* Loaded, but synced with memory.  */
+@@ -2012,7 +2005,7 @@ static bool liveness_pass_2(TCGContext *s, uint8_t *temp_state)
+                 TCGOp *sop = tcg_op_insert_after(s, op, sopc, 3);
+ 
+                 sop->args[0] = dir;
+-                sop->args[1] = temp_idx(s, its->mem_base);
++                sop->args[1] = temp_arg(its->mem_base);
+                 sop->args[2] = its->mem_offset;
+ 
+                 temp_state[arg] = TS_MEM;
 -- 
 2.13.6
