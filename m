@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52693)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54852)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e5Wli-0003ez-P5
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 08:51:20 -0400
+	(envelope-from <cohuck@redhat.com>) id 1e5Wuy-0007o5-CX
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 09:00:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e5Wlf-00027z-JK
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 08:51:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44358)
+	(envelope-from <cohuck@redhat.com>) id 1e5Wuv-00078n-6R
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 09:00:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60990)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1e5Wlf-00027I-As
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 08:51:15 -0400
-Date: Fri, 20 Oct 2017 13:51:07 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20171020125107.GM21172@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20171018073841.30062-1-famz@redhat.com>
-	<150831409774.377.7665751901178175493@b58463cdfd5f>
-	<20171018082836.GD9443@lemon> <20171018083549.GB9719@redhat.com>
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1e5Wuu-00078U-W5
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 09:00:49 -0400
+Date: Fri, 20 Oct 2017 15:00:43 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20171020150043.383b2117.cohuck@redhat.com>
+In-Reply-To: <711b1e41-693a-de7d-9c13-fbe0f964c53c@linux.vnet.ibm.com>
+References: <20170913132752.8484-1-pasic@linux.vnet.ibm.com>
+	<20170913132752.8484-2-pasic@linux.vnet.ibm.com>
+	<20170914162603.1cdabd09.cohuck@redhat.com>
+	<0b42ef59-4366-175f-8dc7-bc3ed02e2fb4@linux.vnet.ibm.com>
+	<20170915092758.16ea52fc.cohuck@redhat.com>
+	<711b1e41-693a-de7d-9c13-fbe0f964c53c@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20171018083549.GB9719@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] docker: Fix PATH for ccache
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/2] s390x/ccs: add ccw-tester emulated
+ device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,55 +32,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: alex.bennee@linaro.org, qemu-devel@nongnu.org, f4bug@amsat.org
+To: Halil Pasic <pasic@linux.vnet.ibm.com>
+Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>
 
-On Wed, Oct 18, 2017 at 09:35:49AM +0100, Daniel P. Berrange wrote:
-> On Wed, Oct 18, 2017 at 04:28:36PM +0800, Fam Zheng wrote:
-> > On Wed, 10/18 01:08, no-reply@patchew.org wrote:
-> > > Your branch is up-to-date with 'origin/test'.
-> > > Submodule 'dtc' (git://git.qemu-project.org/dtc.git) registered for path 'dtc'
-> > > Cloning into '/var/tmp/patchew-tester-tmp-jhpnlaz0/src/docker-src.2017-10-18-04.03.32.32287/qemu.tar.vroot/dtc'...
-> > > fatal: unable to connect to git.qemu-project.org:
-> > > git.qemu-project.org[0: 172.99.69.163]: errno=Connection timed out
-> > > 
-> > > fatal: clone of 'git://git.qemu-project.org/dtc.git' into submodule path '/var/tmp/patchew-tester-tmp-jhpnlaz0/src/docker-src.2017-10-18-04.03.32.32287/qemu.tar.vroot/dtc' failed
-> > > Failed to clone 'dtc'. Retry scheduled
-> > > Cloning into '/var/tmp/patchew-tester-tmp-jhpnlaz0/src/docker-src.2017-10-18-04.03.32.32287/qemu.tar.vroot/dtc'...
-> > > fatal: unable to connect to git.qemu-project.org:
-> > > git.qemu-project.org[0: 172.99.69.163]: errno=Connection timed out
-> > > 
-> > > fatal: clone of 'git://git.qemu-project.org/dtc.git' into submodule path '/var/tmp/patchew-tester-tmp-jhpnlaz0/src/docker-src.2017-10-18-04.03.32.32287/qemu.tar.vroot/dtc' failed
-> > > Failed to clone 'dtc' a second time, aborting
-> > > failed to init submodule dtc
-> > 
-> > So now patchew is less robust on network hiccups: a number of the same "git
-> > submodule update --init" calls have succeeded above, so this is incidental. Any
-> > idea how to improve that? Maybe if there is a checkout from $QEMU_SRC, clone/cp
-> > from there instead of fetch from submodule remote?
+On Thu, 19 Oct 2017 18:39:37 +0200
+Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+
+> On 09/15/2017 09:27 AM, Cornelia Huck wrote:
+> >>>     
+> >>>> +    DEFINE_PROP_UINT8("chpid_type", CcwTesterDevice, chpid_type,
+> >>>> +                       0x98),  
+> > This might also need re-evaluation - we should not really need a new
+> > chpid type.
+> >   
 > 
-> If patchew has unreliable connectivity to git.qemu.org then the best thing
-> is probably have a background job that mirrors the git.qemu.org repos on
-> the patchew server. Then have the test job modify .gitmodules to point to
-> your local mirror. That way, network access is used during the background
-> job only, and actual builds just get a local clone from the cache.
+> I'm back at ccw-tester again (for v2). I've realized we did not agree
+> on what to use here (chpid_type). Shall I use 0x25 (Fibre Channel) or
+> EMULATED_CCW_3270_CHPID_TYPE, or even 0x32 (virtio-ccw) as a default
+> value? And should EMULATED_CCW_3270_CHPID_TYPE be called like that
+> (is it really supposed to be specific to 3270?
+> 
+> Sorry I did not notice sooner.
 
-I thought of a simpler way to address this.
-
-Currently patchew runs 4 docker jobs, and each one triggers creation of
-the $(DOCKER_SRC_COPY) rule. This runs archive-source.sh 4 times, because
-$(DOCKER_SRC_COPY) contains the current timestamp and so is different
-each time we run it.
-
-If you override DOCKER_SRC_COPY with the current git change hash, then
-you would end up using the same archive for all 4 jobs, and so only do
-the checkouts once
- 
-  make docker-foo   DOCKER_SRC_COPY=docker-src.`git rev-parse HEAD`
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+It might make sense to pick whatever z/VM commonly uses for emulated
+devices. (Or ask them if they reserved something explicitly for testing
+-- that would be an even better match.)
