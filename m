@@ -1,33 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58637)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59732)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e5O1X-0005W6-Q5
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 23:31:04 -0400
+	id 1e5O95-0006nO-JR
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 23:38:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e5O1U-00014J-MI
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 23:31:03 -0400
-Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:45609)
+	id 1e5O91-00035e-Cr
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 23:38:51 -0400
+Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:45926)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e5O1U-00013Y-Gh
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 23:31:00 -0400
-Received: by mail-qt0-x242.google.com with SMTP id p1so17004733qtg.2
-	for <qemu-devel@nongnu.org>; Thu, 19 Oct 2017 20:31:00 -0700 (PDT)
+	id 1e5O91-00034z-8l
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 23:38:47 -0400
+Received: by mail-qk0-x244.google.com with SMTP id f199so12899959qke.2
+	for <qemu-devel@nongnu.org>; Thu, 19 Oct 2017 20:38:47 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-References: <cover.1508390588.git.alistair.francis@xilinx.com>
-	<136f534d6337e148924913a06c43b2e06fcebb4c.1508390588.git.alistair.francis@xilinx.com>
+References: <20171019212109.11341-1-richard.henderson@linaro.org>
+	<20171019212109.11341-3-richard.henderson@linaro.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <9689eea3-864a-90f0-05d2-d70c481f3f73@amsat.org>
-Date: Fri, 20 Oct 2017 00:30:39 -0300
+Message-ID: <cab48a52-f103-be5f-fae8-2199daf6cc5c@amsat.org>
+Date: Fri, 20 Oct 2017 00:38:38 -0300
 MIME-Version: 1.0
-In-Reply-To: <136f534d6337e148924913a06c43b2e06fcebb4c.1508390588.git.alistair.francis@xilinx.com>
+In-Reply-To: <20171019212109.11341-3-richard.henderson@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 08/46] hw/char: Replace fprintf(stderr,
- "*\n" with error_report()
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 2/2] target/arm: Don't set INSN_ARM_BE32
+ for CONFIG_USER_ONLY
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,96 +36,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org
-Cc: alistair23@gmail.com, Paolo Bonzini <pbonzini@redhat.com>, armbru@redhat.com
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org
 
-On 10/19/2017 01:16 PM, Alistair Francis wrote:
-> Replace a large number of the fprintf(stderr, "*\n" calls with
-> error_report(). The functions were renamed with these commands and then
-> compiler issues where manually fixed.
-[...]
+On 10/19/2017 06:21 PM, Richard Henderson wrote:
+> This matches translator behaviour in arm_lduw_code.
+> 
+> Fixes: https://bugs.launchpad.net/qemu/+bug/1724485
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
 > ---
-> V2:
->  - Split hw patch into individual directories
+>  target/arm/cpu.c | 9 +++++++--
+>  1 file changed, 7 insertions(+), 2 deletions(-)
 > 
->  hw/char/mcf_uart.c  | 5 +++--
->  hw/char/sh_serial.c | 9 +++++----
->  2 files changed, 8 insertions(+), 6 deletions(-)
-> 
-> diff --git a/hw/char/mcf_uart.c b/hw/char/mcf_uart.c
-> index 56fa402b58..14cb051be9 100644
-> --- a/hw/char/mcf_uart.c
-> +++ b/hw/char/mcf_uart.c
-> @@ -6,6 +6,7 @@
->   * This code is licensed under the GPL
->   */
->  #include "qemu/osdep.h"
-> +#include "qemu/error-report.h"
->  #include "hw/hw.h"
->  #include "hw/sysbus.h"
->  #include "hw/m68k/mcf.h"
-> @@ -174,7 +175,7 @@ static void mcf_do_command(mcf_uart_state *s, uint8_t cmd)
->          mcf_uart_do_tx(s);
->          break;
->      case 3: /* Reserved.  */
-> -        fprintf(stderr, "mcf_uart: Bad TX command\n");
-> +        error_report("mcf_uart: Bad TX command");
-
-I'd rather use qemu_log_mask(LOG_GUEST_ERROR,...) here.
-
->          break;
->      }
+> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+> index bc9d70df04..a0ed11c9a5 100644
+> --- a/target/arm/cpu.c
+> +++ b/target/arm/cpu.c
+> @@ -478,6 +478,7 @@ static void arm_disas_set_info(CPUState *cpu, disassemble_info *info)
+>  {
+>      ARMCPU *ac = ARM_CPU(cpu);
+>      CPUARMState *env = &ac->env;
+> +    bool sctlr_b;
 >  
-> @@ -189,7 +190,7 @@ static void mcf_do_command(mcf_uart_state *s, uint8_t cmd)
->          s->rx_enabled = 0;
->          break;
->      case 3: /* Reserved.  */
-> -        fprintf(stderr, "mcf_uart: Bad RX command\n");
-> +        error_report("mcf_uart: Bad RX command");
-
-ditto
-
->          break;
+>      if (is_a64(env)) {
+>          /* We might not be compiled with the A64 disassembler
+> @@ -506,7 +507,9 @@ static void arm_disas_set_info(CPUState *cpu, disassemble_info *info)
+>          info->cap_arch = CS_ARCH_ARM;
+>          info->cap_mode = cap_mode;
 >      }
->  }
-> diff --git a/hw/char/sh_serial.c b/hw/char/sh_serial.c
-> index 835b5378a0..7bb3f3c70b 100644
-> --- a/hw/char/sh_serial.c
-> +++ b/hw/char/sh_serial.c
-> @@ -25,6 +25,7 @@
->   * THE SOFTWARE.
->   */
->  #include "qemu/osdep.h"
-> +#include "qemu/error-report.h"
->  #include "hw/hw.h"
->  #include "hw/sh4/sh.h"
->  #include "chardev/char-fe.h"
-> @@ -190,8 +191,8 @@ static void sh_serial_write(void *opaque, hwaddr offs,
->          }
->      }
->  
-> -    fprintf(stderr, "sh_serial: unsupported write to 0x%02"
-> -            HWADDR_PRIx "\n", offs);
-> +    error_report("sh_serial: unsupported write to 0x%02"
-> +                 HWADDR_PRIx "", offs);
-
-and qemu_log_mask(LOG_UNIMP, ...) here
-
->      abort();
->  }
->  
-> @@ -290,8 +291,8 @@ static uint64_t sh_serial_read(void *opaque, hwaddr offs,
+> -    if (bswap_code(arm_sctlr_b(env))) {
+> +
+> +    sctlr_b = arm_sctlr_b(env);
+> +    if (bswap_code(sctlr_b)) {
+>  #ifdef TARGET_WORDS_BIGENDIAN
+>          info->endian = BFD_ENDIAN_LITTLE;
+>  #else
+> @@ -514,9 +517,11 @@ static void arm_disas_set_info(CPUState *cpu, disassemble_info *info)
 >  #endif
->  
->      if (ret & ~((1 << 16) - 1)) {
-> -        fprintf(stderr, "sh_serial: unsupported read from 0x%02"
-> -                HWADDR_PRIx "\n", offs);
-> +        error_report("sh_serial: unsupported read from 0x%02"
-> +                     HWADDR_PRIx "", offs);
-
-ditto
-
->          abort();
 >      }
+>      info->flags &= ~INSN_ARM_BE32;
+> -    if (arm_sctlr_b(env)) {
+> +#ifndef CONFIG_USER_ONLY
+> +    if (sctlr_b) {
+>          info->flags |= INSN_ARM_BE32;
+>      }
+> +#endif
+>  }
 >  
+>  uint64_t arm_cpu_mp_affinity(int idx, uint8_t clustersz)
 > 
