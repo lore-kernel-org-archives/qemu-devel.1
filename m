@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52602)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52693)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jdenemar@redhat.com>) id 1e5WlZ-0003X7-7w
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 08:51:10 -0400
+	(envelope-from <berrange@redhat.com>) id 1e5Wli-0003ez-P5
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 08:51:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jdenemar@redhat.com>) id 1e5WlW-00021U-1r
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 08:51:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34850)
+	(envelope-from <berrange@redhat.com>) id 1e5Wlf-00027z-JK
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 08:51:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44358)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jdenemar@redhat.com>) id 1e5WlV-00020Z-PB
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 08:51:05 -0400
-Date: Fri, 20 Oct 2017 14:50:56 +0200
-From: Jiri Denemark <jdenemar@redhat.com>
-Message-ID: <20171020125056.GN130425@orkuz.home>
-References: <87y3oqugm7.fsf@marc-ibm.boeblingen.de.ibm.com>
-	<20171005121115.GD3946746@orkuz.home>
-	<87y3ok7n2n.fsf@marc-ibm.boeblingen.de.ibm.com>
-	<20171012120714.GA314661@orkuz.home>
-	<87mv4m6pp5.fsf@marc-ibm.boeblingen.de.ibm.com>
-	<7aa560cd-d35f-7feb-a9db-378d3e763a62@redhat.com>
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1e5Wlf-00027I-As
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 08:51:15 -0400
+Date: Fri, 20 Oct 2017 13:51:07 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20171020125107.GM21172@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20171018073841.30062-1-famz@redhat.com>
+	<150831409774.377.7665751901178175493@b58463cdfd5f>
+	<20171018082836.GD9443@lemon> <20171018083549.GB9719@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <7aa560cd-d35f-7feb-a9db-378d3e763a62@redhat.com>
-Subject: Re: [Qemu-devel] [libvirt] Question about the host-model CPU mode
+In-Reply-To: <20171018083549.GB9719@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] docker: Fix PATH for ccache
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,51 +29,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: Marc Hartmayer <mhartmay@linux.vnet.ibm.com>, libvir-list@redhat.com, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Boris Fiuczynski <fiuczy@linux.vnet.ibm.com>, "Jason J. Herne" <jjherne@linux.vnet.ibm.com>, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
+To: Fam Zheng <famz@redhat.com>
+Cc: alex.bennee@linaro.org, qemu-devel@nongnu.org, f4bug@amsat.org
 
-On Fri, Oct 20, 2017 at 13:37:42 +0200, David Hildenbrand wrote:
-> On 20.10.2017 13:09, Marc Hartmayer wrote:
-> > we recently encountered the problem that the 'host-model' [1] has to be
-> > related to the machine type of a domain. We have following problem:
+On Wed, Oct 18, 2017 at 09:35:49AM +0100, Daniel P. Berrange wrote:
+> On Wed, Oct 18, 2017 at 04:28:36PM +0800, Fam Zheng wrote:
+> > On Wed, 10/18 01:08, no-reply@patchew.org wrote:
+> > > Your branch is up-to-date with 'origin/test'.
+> > > Submodule 'dtc' (git://git.qemu-project.org/dtc.git) registered for path 'dtc'
+> > > Cloning into '/var/tmp/patchew-tester-tmp-jhpnlaz0/src/docker-src.2017-10-18-04.03.32.32287/qemu.tar.vroot/dtc'...
+> > > fatal: unable to connect to git.qemu-project.org:
+> > > git.qemu-project.org[0: 172.99.69.163]: errno=Connection timed out
+> > > 
+> > > fatal: clone of 'git://git.qemu-project.org/dtc.git' into submodule path '/var/tmp/patchew-tester-tmp-jhpnlaz0/src/docker-src.2017-10-18-04.03.32.32287/qemu.tar.vroot/dtc' failed
+> > > Failed to clone 'dtc'. Retry scheduled
+> > > Cloning into '/var/tmp/patchew-tester-tmp-jhpnlaz0/src/docker-src.2017-10-18-04.03.32.32287/qemu.tar.vroot/dtc'...
+> > > fatal: unable to connect to git.qemu-project.org:
+> > > git.qemu-project.org[0: 172.99.69.163]: errno=Connection timed out
+> > > 
+> > > fatal: clone of 'git://git.qemu-project.org/dtc.git' into submodule path '/var/tmp/patchew-tester-tmp-jhpnlaz0/src/docker-src.2017-10-18-04.03.32.32287/qemu.tar.vroot/dtc' failed
+> > > Failed to clone 'dtc' a second time, aborting
+> > > failed to init submodule dtc
 > > 
-> >    Let's assume we've a z13 system with a QEMU 2.9 and we define a
-> >    domain using the default s390-virtio-ccw machine together with the
-> >    host-model CPU mode [1]. The definition will have the machine
-> >    expanded to s390-virtio-ccw-2.9 but retain the host-model CPU mode
-> >    in the domain definition. In a next step we upgrade to QEMU 2.10
-> >    (first version to recognize z14). Everything is still fine, even
-> >    though the machine runs in 2.9 compatibility mode. Finally we
-> >    upgrade to a z14. As a consequence it is not possible to start the
-> >    domain anymore as the machine type doesn't support our CPU host
-> >    model (which is expanded at start time of the domain).
+> > So now patchew is less robust on network hiccups: a number of the same "git
+> > submodule update --init" calls have succeeded above, so this is incidental. Any
+> > idea how to improve that? Maybe if there is a checkout from $QEMU_SRC, clone/cp
+> > from there instead of fetch from submodule remote?
 > 
-> Yes, the host model may vary depending on QEMU version and to some
-> degree also on compatibility machines (although I always try to push
-> people to not introduce any new such stuff).
-> 
-> Quoting for the libvirt documentation: https://libvirt.org/formatdomain.html
-> 
-> "host-model
->     The host-model mode is essentially a shortcut to copying host CPU
-> definition from capabilities XML into domain XML. Since the CPU
-> definition is copied just before starting a domain, exactly the same XML
-> can be used on different hosts while still providing the best guest CPU
-> each host supports."
-> 
-> You're telling me that that copying does not happen, which seems to be
-> the problematic part about this in my opinion.
-> 
-> So I am not sure if probing anything else (as you noted below) is the
-> correct thing to do. Copy it and you have a migration_safe and even
-> static version of the _current_ host CPU.
+> If patchew has unreliable connectivity to git.qemu.org then the best thing
+> is probably have a background job that mirrors the git.qemu.org repos on
+> the patchew server. Then have the test job modify .gitmodules to point to
+> your local mirror. That way, network access is used during the background
+> job only, and actual builds just get a local clone from the cache.
 
-The thing is libvirt calls query-cpu-model-expansion to check what the
-host CPU is. This 'host-model' CPU is replaced with the probed CPU model
-when a domain starts. The problem described by Marc is that the probed
-CPU model cannot be used universally with all machine types. So starting
-a domain on such host with machine type s390-virtio-ccw-2.10 works, but
-a domain with machine type s390-virtio-ccw-2.9 fails to start with the
-same probed CPU model.
+I thought of a simpler way to address this.
 
-Jirka
+Currently patchew runs 4 docker jobs, and each one triggers creation of
+the $(DOCKER_SRC_COPY) rule. This runs archive-source.sh 4 times, because
+$(DOCKER_SRC_COPY) contains the current timestamp and so is different
+each time we run it.
+
+If you override DOCKER_SRC_COPY with the current git change hash, then
+you would end up using the same archive for all 4 jobs, and so only do
+the checkouts once
+ 
+  make docker-foo   DOCKER_SRC_COPY=docker-src.`git rev-parse HEAD`
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
