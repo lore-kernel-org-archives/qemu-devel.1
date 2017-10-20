@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59434)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59401)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1e5VuQ-0003UT-Dd
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 07:56:15 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1e5VuP-0003vd-O0
+	(envelope-from <cohuck@redhat.com>) id 1e5VuN-0003Ts-RO
 	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 07:56:14 -0400
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <cohuck@redhat.com>) id 1e5VuK-0003si-4p
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 07:56:11 -0400
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Fri, 20 Oct 2017 13:54:07 +0200
-Message-Id: <20171020115418.2050-36-cohuck@redhat.com>
+Date: Fri, 20 Oct 2017 13:54:05 +0200
+Message-Id: <20171020115418.2050-34-cohuck@redhat.com>
 In-Reply-To: <20171020115418.2050-1-cohuck@redhat.com>
 References: <20171020115418.2050-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL 35/46] s390x: fix cpu object referrence leak in
- s390x_new_cpu()
+Subject: [Qemu-devel] [PULL 33/46] s390x/MAINTAINERS: add mailing list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,36 +20,69 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, rth@twiddle.net, agraf@suse.de, thuth@redhat.com, borntraeger@de.ibm.com, david@redhat.com, Igor Mammedov <imammedo@redhat.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, rth@twiddle.net, agraf@suse.de, thuth@redhat.com, borntraeger@de.ibm.com, david@redhat.com, Cornelia Huck <cohuck@redhat.com>
 
-From: Igor Mammedov <imammedo@redhat.com>
+There's a new qemu-s390x@nongnu.org mailing list: add it to the
+s390 sections.
 
-object_new() returns cpu with refcnt == 1 and after realize
-refcnt == 2*. s390x_new_cpu() as an owner of the first refcnt
-should have released it on exit in both cases (on error and
-success) to avoid it leaking. Do so for both cases.
-
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Message-Id: <1508247680-98800-2-git-send-email-imammedo@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- target/s390x/helper.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ MAINTAINERS | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/target/s390x/helper.c b/target/s390x/helper.c
-index c41aa4c4ff..9ff7ff4acc 100644
---- a/target/s390x/helper.c
-+++ b/target/s390x/helper.c
-@@ -73,9 +73,9 @@ S390CPU *s390x_new_cpu(const char *typename, uint32_t core_id, Error **errp)
-     object_property_set_bool(OBJECT(cpu), true, "realized", &err);
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 757b02031d..12175425a7 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -216,6 +216,7 @@ S: Maintained
+ F: target/s390x/
+ F: hw/s390x/
+ F: disas/s390.c
++L: qemu-s390x@nongnu.org
  
- out:
-+    object_unref(OBJECT(cpu));
-     if (err) {
-         error_propagate(errp, err);
--        object_unref(OBJECT(cpu));
-         cpu = NULL;
-     }
-     return cpu;
+ SH4
+ M: Aurelien Jarno <aurelien@aurel32.net>
+@@ -310,6 +311,7 @@ F: include/hw/s390x/s390_flic.h
+ F: gdb-xml/s390*.xml
+ T: git git://github.com/cohuck/qemu.git s390-next
+ T: git git://github.com/borntraeger/qemu.git s390-next
++L: qemu-s390x@nongnu.org
+ 
+ X86
+ M: Paolo Bonzini <pbonzini@redhat.com>
+@@ -808,6 +810,7 @@ F: pc-bios/s390-ccw.img
+ F: default-configs/s390x-softmmu.mak
+ T: git git://github.com/cohuck/qemu.git s390-next
+ T: git git://github.com/borntraeger/qemu.git s390-next
++L: qemu-s390x@nongnu.org
+ 
+ UniCore32 Machines
+ -------------
+@@ -1032,6 +1035,7 @@ F: hw/vfio/ccw.c
+ F: hw/s390x/s390-ccw.c
+ F: include/hw/s390x/s390-ccw.h
+ T: git git://github.com/cohuck/qemu.git s390-next
++L: qemu-s390x@nongnu.org
+ 
+ vhost
+ M: Michael S. Tsirkin <mst@redhat.com>
+@@ -1075,6 +1079,7 @@ S: Supported
+ F: hw/s390x/virtio-ccw.[hc]
+ T: git git://github.com/cohuck/qemu.git s390-next
+ T: git git://github.com/borntraeger/qemu.git s390-next
++L: qemu-s390x@nongnu.org
+ 
+ virtio-input
+ M: Gerd Hoffmann <kraxel@redhat.com>
+@@ -1718,6 +1723,7 @@ M: Richard Henderson <rth@twiddle.net>
+ S: Maintained
+ F: tcg/s390/
+ F: disas/s390.c
++L: qemu-s390x@nongnu.org
+ 
+ SPARC target
+ S: Odd Fixes
 -- 
 2.13.6
