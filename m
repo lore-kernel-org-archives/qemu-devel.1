@@ -1,24 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55415)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56429)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e5Yd9-0008Ue-Lg
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 10:50:36 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1e5Yi4-0001YM-9U
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 10:55:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e5Yd5-0007ON-TF
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 10:50:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47668)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1e5Yd5-0007Nd-8h
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 10:50:31 -0400
-References: <201710201734276973012@zte.com.cn>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <7bb7ca98-1c17-7815-7f58-228c04f93ba9@redhat.com>
-Date: Fri, 20 Oct 2017 09:50:24 -0500
-MIME-Version: 1.0
-In-Reply-To: <201710201734276973012@zte.com.cn>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="3oFWAju0LronmVURUPs9SBK4lXFiSO4OH"
-Subject: Re: [Qemu-devel] wurb test zt
+	(envelope-from <borntraeger@de.ibm.com>) id 1e5Yi0-0001nw-BL
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 10:55:40 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:38302)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1e5Yi0-0001ml-32
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 10:55:36 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v9KEtMLE098810
+	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 10:55:31 -0400
+Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2dqgpwg526-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 10:55:29 -0400
+Received: from localhost
+	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Fri, 20 Oct 2017 15:54:40 +0100
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Fri, 20 Oct 2017 16:54:37 +0200
+Message-Id: <20171020145437.18549-1-borntraeger@de.ibm.com>
+Subject: [Qemu-devel] [PATCH/QEMU] s390x/kvm: use cpu_model_available for
+ guarded storage on compat machines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,49 +36,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: li.shanlue@zte.com.cn, qemu-devel@nongnu.org
+To: Marc Hartmayer <mhartmay@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: libvir-list@redhat.com, qemu-devel@nongnu.org, Jiri Denemark <jdenemar@redhat.com>, Boris Fiuczynski <fiuczy@linux.vnet.ibm.com>, "Jason J . Herne" <jjherne@linux.vnet.ibm.com>, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---3oFWAju0LronmVURUPs9SBK4lXFiSO4OH
-From: Eric Blake <eblake@redhat.com>
-To: li.shanlue@zte.com.cn, qemu-devel@nongnu.org
-Message-ID: <7bb7ca98-1c17-7815-7f58-228c04f93ba9@redhat.com>
-Subject: Re: [Qemu-devel] wurb test zt
-References: <201710201734276973012@zte.com.cn>
-In-Reply-To: <201710201734276973012@zte.com.cn>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Starting a guest with
+   <os>
+    <type arch='s390x' machine='s390-ccw-virtio-2.9'>hvm</type>
+  </os>
+  <cpu mode='host-model'/>
 
-On 10/20/2017 04:34 AM, li.shanlue@zte.com.cn wrote:
-> reply for an original mail from mail group system
+on an IBM z14 results in
 
-Rather than spamming all list readers with test mails with no relevance,
-can you include topics relevant to qemu as part of your test?  Also,
-technical lists don't mesh well with your style of top-posting.
+"qemu-system-s390x: Some features requested in the CPU model are not
+available in the configuration: gs"
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+This is because guarded storage is fenced for compat machines that did not have
+guarded storage support, but libvirt expands the cpu model according to the
+latest available machine.
 
+While this prevents future migration abort (by not starting the guest at all),
+not being able to start a "host-model" guest is very much unexpected.  As it
+turns out, even if we would modify libvirt to not expand the cpu model to
+contain "gs" for compat machines, it cannot guarantee that a migration will
+succeed. For example if the kernel changes its features (or the user has
+nested=1 on one host but not on the other) the migration will fail
+nevertheless.  So instead of fencing "gs" for machines <= 2.9 lets allow it for
+all machine types that support the CPU model. This will make "host-model"
+runnable all the time, while relying on the CPU model to reject invalid
+migration attempts.
 
---3oFWAju0LronmVURUPs9SBK4lXFiSO4OH
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Suggested-by: David Hildenbrand <david@redhat.com>
+Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+---
+ hw/s390x/s390-virtio-ccw.c         | 8 --------
+ include/hw/s390x/s390-virtio-ccw.h | 3 ---
+ target/s390x/kvm.c                 | 2 +-
+ 3 files changed, 1 insertion(+), 12 deletions(-)
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnqDTAACgkQp6FrSiUn
-Q2oGeQf/UpBvbz8WAodUac0nNFAwQj5dqoEsx4GTG+gC3ewIJfwYDJpte50ae/N3
-n3bHHPSe60dtCAVjr27lnHrba6u4OPxb/ahPIuAVer7O6YrY666tGjzM6D3ZlL5a
-/AzrbhOtqIMi+kaS8hV4s5BO4eL0BzsUCxlGOOfNfBWvqYQ04DSi1PkTiCo9UK+7
-54OZGkus/+rGopozhBlT0gkRl5wJaGmfPtlUqvuMiP0fkPqlVdaYyq7kNnjowvQ3
-9tc4gbYbl27IDhp6dp8AVp/9rt8C1idDZ6qzmx30g10hHCli1EoWuTkZlTYJmFez
-2zw3NtcI18Q7tD8ZCTHqSfeiw8eFfg==
-=RgqW
------END PGP SIGNATURE-----
-
---3oFWAju0LronmVURUPs9SBK4lXFiSO4OH--
+diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+index fabe4a6..ae5b01a 100644
+--- a/hw/s390x/s390-virtio-ccw.c
++++ b/hw/s390x/s390-virtio-ccw.c
+@@ -414,7 +414,6 @@ static void ccw_machine_class_init(ObjectClass *oc, void *data)
+     s390mc->ri_allowed = true;
+     s390mc->cpu_model_allowed = true;
+     s390mc->css_migration_enabled = true;
+-    s390mc->gs_allowed = true;
+     mc->init = ccw_init;
+     mc->reset = s390_machine_reset;
+     mc->hot_add_cpu = s390_hot_add_cpu;
+@@ -495,12 +494,6 @@ bool cpu_model_allowed(void)
+     return get_machine_class()->cpu_model_allowed;
+ }
+ 
+-bool gs_allowed(void)
+-{
+-    /* for "none" machine this results in true */
+-    return get_machine_class()->gs_allowed;
+-}
+-
+ static char *machine_get_loadparm(Object *obj, Error **errp)
+ {
+     S390CcwMachineState *ms = S390_CCW_MACHINE(obj);
+@@ -740,7 +733,6 @@ static void ccw_machine_2_9_class_options(MachineClass *mc)
+ {
+     S390CcwMachineClass *s390mc = S390_MACHINE_CLASS(mc);
+ 
+-    s390mc->gs_allowed = false;
+     ccw_machine_2_10_class_options(mc);
+     SET_MACHINE_COMPAT(mc, CCW_COMPAT_2_9);
+     s390mc->css_migration_enabled = false;
+diff --git a/include/hw/s390x/s390-virtio-ccw.h b/include/hw/s390x/s390-virtio-ccw.h
+index a9a90c2..ac896e3 100644
+--- a/include/hw/s390x/s390-virtio-ccw.h
++++ b/include/hw/s390x/s390-virtio-ccw.h
+@@ -40,15 +40,12 @@ typedef struct S390CcwMachineClass {
+     bool ri_allowed;
+     bool cpu_model_allowed;
+     bool css_migration_enabled;
+-    bool gs_allowed;
+ } S390CcwMachineClass;
+ 
+ /* runtime-instrumentation allowed by the machine */
+ bool ri_allowed(void);
+ /* cpu model allowed by the machine */
+ bool cpu_model_allowed(void);
+-/* guarded-storage allowed by the machine */
+-bool gs_allowed(void);
+ 
+ /**
+  * Returns true if (vmstate based) migration of the channel subsystem
+diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+index 4c85ed8..020a7ea 100644
+--- a/target/s390x/kvm.c
++++ b/target/s390x/kvm.c
+@@ -363,7 +363,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+             cap_ri = 1;
+         }
+     }
+-    if (gs_allowed()) {
++    if (cpu_model_allowed()) {
+         if (kvm_vm_enable_cap(s, KVM_CAP_S390_GS, 0) == 0) {
+             cap_gs = 1;
+         }
+-- 
+2.9.4
