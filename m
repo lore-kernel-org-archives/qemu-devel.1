@@ -1,21 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50942)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51375)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1e5Qms-0007Oo-HY
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 02:28:07 -0400
+	(envelope-from <clg@kaod.org>) id 1e5QpB-0000a3-PU
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 02:30:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1e5Qmr-000563-CM
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 02:28:06 -0400
-Date: Fri, 20 Oct 2017 14:27:57 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20171020062757.GE29815@lemon>
-References: <20171009125940.24220-1-ashijeetacharya@gmail.com>
-	<20171009141236.GC28199@lemon>
+	(envelope-from <clg@kaod.org>) id 1e5Qp8-0006pj-HL
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 02:30:29 -0400
+Received: from 5.mo5.mail-out.ovh.net ([87.98.173.103]:35740)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1e5Qp8-0006nO-Aw
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 02:30:26 -0400
+Received: from player786.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo5.mail-out.ovh.net (Postfix) with ESMTP id C0E16145100
+	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 08:30:24 +0200 (CEST)
+References: <20171019151249.13663-1-clg@kaod.org>
+	<20171019151249.13663-2-clg@kaod.org>
+	<CAFEAcA-6gXF9skgYRTke5-0Ds_SLceAgX-Dz6WyyuiYJSz7afw@mail.gmail.com>
+	<114c397f-7540-15ca-a44d-0b3a4cdcc238@amsat.org>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <c8392d97-7823-7a00-648c-31a786957c26@kaod.org>
+Date: Fri, 20 Oct 2017 08:30:17 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171009141236.GC28199@lemon>
-Subject: Re: [Qemu-devel] [PATCH v9 0/8] Optimize VMDK I/O by allocating
- multiple clusters
+In-Reply-To: <114c397f-7540-15ca-a44d-0b3a4cdcc238@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v5 1/8] aspeed: use a ROM memory region to
+ catch invalid writes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,50 +34,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ashijeet Acharya <ashijeetacharya@gmail.com>
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, stefanha@gmail.com, qemu-devel@nongnu.org, mreitz@redhat.com, jsnow@redhat.com
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Andrew Jeffery <andrew@aj.id.au>, Joel Stanley <joel@jms.id.au>
 
-On Mon, 10/09 22:12, Fam Zheng wrote:
-> On Mon, 10/09 18:29, Ashijeet Acharya wrote:
-> > Optimization test results:
-> > 
-> > This patch series improves 128 KB sequential write performance to an
-> > empty VMDK file by 54%
-> > 
-> > Benchmark command: ./qemu-img bench -w -c 1024 -s 128K -d 1 -t none -f
-> > vmdk test.vmdk
-> > 
-> > Changes in v9:
-> > - rebase the series
-> 
-> Thanks, looks good to me, applied:
-> 
-> https://github.com/famz/qemu/tree/staging
+On 10/20/2017 05:10 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 10/19/2017 12:44 PM, Peter Maydell wrote:
+>> On 19 October 2017 at 16:12, C=C3=A9dric Le Goater <clg@kaod.org> wrot=
+e:
+>>> Some legacy firmwares access unimplemented addresses on the Aspeed So=
+C
+>>> (old U-Boot code using variables in the bss when it shouldn't do).
+>>> Let's use a ROM memory region to catch the invalid writes and support
+>>> new boards without using the 'ignore_memory_transaction_failures'
+>>> flag.
+>>>
+>>> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+>>> ---
+>>>
+>>>  Changes since v4 :
+>>>
+>>>  - use a ROM memory region
+>>
+>> Probably worth mentioning in the commit message that this
+>> is a migration compatibility break for these boards.
+>=20
+> What about the eeprom_buf from patch 6 "Add EEPROM I2C devices"?
+>=20
+> My understanding is a migrated board would resume with a zeroized
+> eeprom, is this the expected behaviour?
 
-Ashijeet: I've been testing my branch and it seems installing Fedora/CentOS to a
-VMDK image is broken with your patches applied. Both guest and QEMU are
-responsive, but the installing of packages stops to make any progress at some
-point:
+That would be probably the case. yes. As we don't populate the eeprom=20
+with VPD at machine init time and that migration is clearly not tested,=20
+I think we will address this issue later. =20
 
-Installing rootfiles.noarch (317/318)
-Installing langpacks-en.noarch (318/318)
-Performing post-installation setup tasks
-Configuring fedora-release.noarch
-Configuring filesystem.x86_64
-Configuring GeoIP-GeoLite-data.noarch
-Configuring python3.x86_64
-Configuring fedora-logos.x86_64
-Configuring kernel-core.x86_64
+Thanks,
 
-# hang here
-
-Can you reproduce this on your machine?
-
-My command line is something like this:
-
-qemu-system-x86_64 -enable-kvm -cpu host -m 1G -qmp unix:/home/fam/.q/qemu-8DOC9EF4/qmp,server,nowait -name 8DOC9EF4 -netdev user,id=vnet,hostfwd=:0.0.0.0:10022-:22 -device virtio-net-pci,netdev=vnet -drive file=/var/tmp/test2.vmdk,if=none,id=drive-1,cache=none,aio=native -device virtio-blk-pci,drive=drive-1 -cdrom /stor/iso/CentOS-6.9-x86_64-minimal.iso -pidfile /home/fam/.q/qemu-8DOC9EF4/pid
-
-qemu.git master doesn't have this problem. So I'll drop this series from the
-pull request until it is resolved.
-
-Fam
+C. =20
