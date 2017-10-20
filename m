@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50199)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50800)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e5TCP-0004e6-80
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 05:02:38 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1e5TFp-0005eM-5e
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 05:06:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e5TCO-0001rX-5l
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 05:02:37 -0400
-Date: Fri, 20 Oct 2017 10:02:19 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20171020090219.GC21172@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20171004114008.14849-1-berrange@redhat.com>
-	<20171004114008.14849-3-berrange@redhat.com>
-	<20171020084221.GA3667@localhost.localdomain>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20171020084221.GA3667@localhost.localdomain>
-Subject: Re: [Qemu-devel] [PATCH v1 2/2] ide: support reporting of rotation
- rate
+	(envelope-from <dgilbert@redhat.com>) id 1e5TFo-0004Ax-4n
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 05:06:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58410)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1e5TFn-0004AT-SK
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 05:06:08 -0400
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Date: Fri, 20 Oct 2017 10:05:52 +0100
+Message-Id: <20171020090556.18631-4-dgilbert@redhat.com>
+In-Reply-To: <20171020090556.18631-1-dgilbert@redhat.com>
+References: <20171020090556.18631-1-dgilbert@redhat.com>
+Subject: [Qemu-devel] [PATCH v4 3/7] migration: Wait for semaphore before
+ completing migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,62 +24,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
+To: qemu-devel@nongnu.org, kwolf@redhat.com, jdenemar@redhat.com, wangjie88@huawei.com, quintela@redhat.com, peterx@redhat.com, mreitz@redhat.com
+Cc: berrange@redhat.com, eblake@redhat.com, fuweiwei2@huawei.com
 
-On Fri, Oct 20, 2017 at 10:42:21AM +0200, Kevin Wolf wrote:
-> [ Cc: qemu-block ]
-> 
-> Am 04.10.2017 um 13:40 hat Daniel P. Berrange geschrieben:
-> > The Linux kernel will query the ATA IDENTITY DEVICE data, word 217
-> > to determine the rotations per minute of the disk. If this has
-> > the value 1, it is taken to be an SSD and so Linux sets the
-> > 'rotational' flag to 0 for the I/O queue and will stop using that
-> > disk as a source of random entropy. Other operating systems may
-> > also take into account rotation rate when setting up default
-> > behaviour.
-> > 
-> > Mgmt apps should be able to set the rotation rate for virtualized
-> > block devices, based on characteristics of the host storage in use,
-> > so that the guest OS gets sensible behaviour out of the box. This
-> > patch thus adds a 'rotation-rate' parameter for 'ide-hd' device
-> > types.
-> > 
-> > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> > ---
-> >  hw/ide/core.c             | 1 +
-> >  hw/ide/qdev.c             | 1 +
-> >  include/hw/ide/internal.h | 8 ++++++++
-> >  3 files changed, 10 insertions(+)
-> > 
-> > diff --git a/hw/ide/core.c b/hw/ide/core.c
-> > index 5f1cd3b91f..a04766aee7 100644
-> > --- a/hw/ide/core.c
-> > +++ b/hw/ide/core.c
-> > @@ -208,6 +208,7 @@ static void ide_identify(IDEState *s)
-> >      if (dev && dev->conf.discard_granularity) {
-> >          put_le16(p + 169, 1); /* TRIM support */
-> >      }
-> > +    put_le16(p + 217, dev->rotation_rate); /* Nominal media rotation rate */
-> 
-> Coverity points out that all other dereferences of dev have a NULL check
-> first. Are we sure that it is always non-NULL?
-> 
-> A follow-up patch is necessary either way. Either fix the missing NULL
-> check here or remove useless NULL checks in the other places.
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-'dev' comes from:
+Wait for a semaphore before completing the migration,
+if the previously added capability was enabled.
 
-    IDEDevice *dev = s->unit ? s->bus->slave : s->bus->master;
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
+---
+ migration/migration.c | 38 ++++++++++++++++++++++++++++++++++++++
+ migration/migration.h |  3 +++
+ 2 files changed, 41 insertions(+)
 
-IIUC, this is choosing either the first or the second unit on the IDE
-bus. Presumably this can be lead to dev==NULL, when the guest OS calls
-identify on a unit that doesn't have a drive attached. Soo the NULL
-checks looks like its required to me.
-
-Regards,
-Daniel
+diff --git a/migration/migration.c b/migration/migration.c
+index 86ae0292f0..6c6d5e2c75 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -1968,6 +1968,39 @@ fail:
+ }
+ 
+ /**
++ * migration_maybe_pause: Pause if required to by
++ * migrate_pause_before_switchover called with the iothread locked
++ * Returns: 0 on success
++ */
++static int migration_maybe_pause(MigrationState *s, int *current_active_state)
++{
++    if (!migrate_pause_before_switchover()) {
++        return 0;
++    }
++
++    /* Since leaving this state is not atomic with posting the semaphore
++     * it's possible that someone could have issued multiple migrate_continue
++     * and the semaphore is incorrectly positive at this point;
++     * the docs say it's undefined to reinit a semaphore that's already
++     * init'd, so use timedwait to eat up any existing posts.
++     */
++    while (qemu_sem_timedwait(&s->pause_sem, 1) == 0) {
++        /* This block intentionally left blank */
++    }
++
++    qemu_mutex_unlock_iothread();
++    migrate_set_state(&s->state, *current_active_state,
++                      MIGRATION_STATUS_PRE_SWITCHOVER);
++    qemu_sem_wait(&s->pause_sem);
++    migrate_set_state(&s->state, MIGRATION_STATUS_PRE_SWITCHOVER,
++                      MIGRATION_STATUS_DEVICE);
++    *current_active_state = MIGRATION_STATUS_DEVICE;
++    qemu_mutex_lock_iothread();
++
++    return s->state == MIGRATION_STATUS_DEVICE ? 0 : -EINVAL;
++}
++
++/**
+  * migration_completion: Used by migration_thread when there's not much left.
+  *   The caller 'breaks' the loop when this returns.
+  *
+@@ -1993,6 +2026,9 @@ static void migration_completion(MigrationState *s, int current_active_state,
+             bool inactivate = !migrate_colo_enabled();
+             ret = vm_stop_force_state(RUN_STATE_FINISH_MIGRATE);
+             if (ret >= 0) {
++                ret = migration_maybe_pause(s, &current_active_state);
++            }
++            if (ret >= 0) {
+                 qemu_file_set_rate_limit(s->to_dst_file, INT64_MAX);
+                 ret = qemu_savevm_state_complete_precopy(s->to_dst_file, false,
+                                                          inactivate);
+@@ -2373,6 +2409,7 @@ static void migration_instance_finalize(Object *obj)
+ 
+     g_free(params->tls_hostname);
+     g_free(params->tls_creds);
++    qemu_sem_destroy(&ms->pause_sem);
+ }
+ 
+ static void migration_instance_init(Object *obj)
+@@ -2383,6 +2420,7 @@ static void migration_instance_init(Object *obj)
+     ms->state = MIGRATION_STATUS_NONE;
+     ms->xbzrle_cache_size = DEFAULT_MIGRATE_CACHE_SIZE;
+     ms->mbps = -1;
++    qemu_sem_init(&ms->pause_sem, 0);
+ 
+     params->tls_hostname = g_strdup("");
+     params->tls_creds = g_strdup("");
+diff --git a/migration/migration.h b/migration/migration.h
+index 969866303e..cd988a99b9 100644
+--- a/migration/migration.h
++++ b/migration/migration.h
+@@ -121,6 +121,9 @@ struct MigrationState
+     /* Flag set once the migration thread called bdrv_inactivate_all */
+     bool block_inactive;
+ 
++    /* Migration is paused due to pause-before-switchover */
++    QemuSemaphore pause_sem;
++
+     /* The semaphore is used to notify COLO thread that failover is finished */
+     QemuSemaphore colo_exit_sem;
+ 
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+2.13.6
