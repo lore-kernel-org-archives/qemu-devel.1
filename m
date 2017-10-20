@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52156)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53007)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1e5bmW-0002AL-OS
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 14:12:30 -0400
+	(envelope-from <rth7680@gmail.com>) id 1e5bpr-000325-5X
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 14:15:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1e5bmU-0000gk-0x
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 14:12:28 -0400
-References: <20171019222637.17890-1-eblake@redhat.com>
-	<20171019222637.17890-6-eblake@redhat.com>
-	<ff85f750-2531-a687-199b-b3e0f6931e3a@virtuozzo.com>
-	<1a2498fc-47f8-e53c-b83e-47934cccc2ff@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <7c823fcf-a037-f198-e19b-c2571552b1a9@virtuozzo.com>
-Date: Fri, 20 Oct 2017 21:12:20 +0300
+	(envelope-from <rth7680@gmail.com>) id 1e5bpo-0002aC-FM
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 14:15:55 -0400
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <1508522170-22539-1-git-send-email-peter.maydell@linaro.org>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <19d12a08-9ecd-8c91-4652-28773ca35d8e@twiddle.net>
+Date: Fri, 20 Oct 2017 11:15:46 -0700
 MIME-Version: 1.0
-In-Reply-To: <1a2498fc-47f8-e53c-b83e-47934cccc2ff@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <1508522170-22539-1-git-send-email-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: base64
-Subject: Re: [Qemu-devel] [PATCH v5 05/11] nbd/server: Refactor zero-length
- option check
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] translate.c: Fix usermode big-endian
+ AArch32 LDREXD and STREXD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,101 +25,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, qemu-block@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org, christophe.lyon@linaro.org
 
-MjAuMTAuMjAxNyAxODowNywgRXJpYyBCbGFrZSB3cm90ZToNCj4gT24gMTAvMjAvMjAxNyAw
-MzozNCBBTSwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+IDIwLjEw
-LjIwMTcgMDE6MjYsIEVyaWMgQmxha2Ugd3JvdGU6DQo+Pj4gQ29uc29saWRhdGUgdGhlIGNo
-ZWNrIGZvciBhIHplcm8tbGVuZ3RoIHBheWxvYWQgdG8gYW4gb3B0aW9uDQo+Pj4gaW50byBh
-IG5ldyBmdW5jdGlvbiwgbmJkX2NoZWNrX3plcm9fbGVuZ3RoKCk7IHRoaXMgY2hlY2sgd2ls
-bA0KPj4+IGFsc28gYmUgdXNlZCB3aGVuIGludHJvZHVjaW5nIHN1cHBvcnQgZm9yIHN0cnVj
-dHVyZWQgcmVwbGllcy4NCj4+Pg0KPj4+IEJ5IHN0aWNraW5nIGEgY2F0Y2gtYWxsIGNoZWNr
-IGF0IHRoZSBlbmQgb2YgdGhlIGxvb3AgZm9yDQo+Pj4gcHJvY2Vzc2luZyBvcHRpb25zLCB3
-ZSBjYW4gc2ltcGxpZnkgc2V2ZXJhbCBvZiB0aGUgaW50ZXJtZWRpYXRlDQo+Pj4gY2FzZXMu
-DQo+Pj4NCj4+PiBTaWduZWQtb2ZmLWJ5OiBFcmljIEJsYWtlIDxlYmxha2VAcmVkaGF0LmNv
-bT4NCj4+IGxvb2tzIGxpa2UgdHdvIHBhdGNoZXMgaW4gb25lLCBob3dldmVyIEknbSBub3Qg
-YWdhaW5zdCAoY29uc2lkZXJpbmcgbXkNCj4+IGJpZyBwYXRjaGVzID0pKS4NCj4+IEkndmUg
-YWxyZWFkeSBwdXQgYW4gci1iIGhlcmUgYnV0IHN1ZGRlbmx5IHVuZGVyc3Rvb2QgYSBoaWRk
-ZW4gYmVoYXZpb3INCj4+IGNoYW5nZSB5b3UndmUgbWFkZSwNCj4+IHdoaWNoIG1heSBjb25z
-aWRlcmVkIGxpa2UgYSBidWcsIHNlZSBiZWxvdy4NCj4+DQo+Pj4gKy8qIG5iZF9jaGVja196
-ZXJvX2xlbmd0aDogSGFuZGxlIGFueSB1bmV4cGVjdGVkIHBheWxvYWQuDQo+Pj4gKyAqIFJl
-dHVybjoNCj4+PiArICogLWVycm5vwqAgb24gZXJyb3IsIGVycnAgaXMgc2V0DQo+Pj4gKyAq
-IDDCoMKgwqDCoMKgwqAgb24gc3VjY2Vzc2Z1bCBuZWdvdGlhdGlvbiwgZXJycCBpcyBub3Qg
-c2V0DQo+Pj4gKyAqLw0KPj4+ICtzdGF0aWMgaW50IG5iZF9jaGVja196ZXJvX2xlbmd0aChO
-QkRDbGllbnQgKmNsaWVudCwgdWludDMyX3QgbGVuZ3RoLA0KPj4+ICvCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHVp
-bnQzMl90IG9wdGlvbiwgRXJyb3IgKiplcnJwKQ0KPj4+ICt7DQo+Pj4gK8KgwqDCoCBpZiAo
-IWxlbmd0aCkgew0KPj4+ICvCoMKgwqDCoMKgwqDCoCByZXR1cm4gMDsNCj4+PiArwqDCoMKg
-IH0NCj4+PiArwqDCoMKgIGlmIChuYmRfZHJvcChjbGllbnQtPmlvYywgbGVuZ3RoLCBlcnJw
-KSA8IDApIHsNCj4+PiArwqDCoMKgwqDCoMKgwqAgcmV0dXJuIC1FSU87DQo+Pj4gK8KgwqDC
-oCB9DQo+Pj4gK8KgwqDCoCByZXR1cm4gbmJkX25lZ290aWF0ZV9zZW5kX3JlcF9lcnIoY2xp
-ZW50LT5pb2MsDQo+Pj4gTkJEX1JFUF9FUlJfSU5WQUxJRCwgb3B0aW9uLA0KPj4+ICvCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoCBlcnJwLCAib3B0aW9uICVzIHNob3VsZCBoYXZlDQo+Pj4gemVy
-byBsZW5ndGgiLA0KPj4gbWF5IGJlIHF1b3RlcyBhcm91bmQgJXMgb3IgeW91ciB0cmFjZS1u
-b3RhdGlvbiAlZCAoJXMpIHdvdWxkIGJlIG1vcmUNCj4+IHJlYWRhYmxlDQo+IHF1b3RlcyBk
-b24ndCBodXJ0LCBidXQgc2luY2Ugbm9uZSBvZiB0aGUgb3B0aW9uIG5hbWVzIGNvbnRhaW4g
-c3BhY2VzLA0KDQp0d28gb2YgdGhlbTogImV4cG9ydCBuYW1lIiBhbmQgInN0cnVjdHVyZWQg
-cmVwbHkiDQoNCj4gaXQncyBub3QgcXVpdGUgYXMgaW1wb3J0YW50IGFzIHdoZW4geW91IGFy
-ZSBxdW90aW5nIGEgbWVzc2FnZSBzZW50IG92ZXINCj4gdGhlIHdpcmUuDQo+DQo+Pj4gK8Kg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgIG5iZF9vcHRfbG9va3VwKG9wdGlvbikpOw0KPj4+ICt9DQo+
-Pj4gKw0KPj4+ICDCoCAvKiBuYmRfbmVnb3RpYXRlX29wdGlvbnMNCj4+PiAgwqDCoCAqIFBy
-b2Nlc3MgYWxsIE5CRF9PUFRfKiBjbGllbnQgb3B0aW9uIGNvbW1hbmRzLCBkdXJpbmcgZml4
-ZWQgbmV3c3R5bGUNCj4+PiAgwqDCoCAqIG5lZ290aWF0aW9uLg0KPj4+IEBAIC02NzQsNyAr
-NjcyLDExIEBAIHN0YXRpYyBpbnQgbmJkX25lZ290aWF0ZV9vcHRpb25zKE5CRENsaWVudA0K
-Pj4+ICpjbGllbnQsIHVpbnQxNl90IG15ZmxhZ3MsDQo+Pj4gIMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgIH0NCj4+PiAgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgc3dpdGNoIChv
-cHRpb24pIHsNCj4+PiAgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgY2FzZSBOQkRfT1BU
-X1NUQVJUVExTOg0KPj4+IC3CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgdGlvYyA9
-IG5iZF9uZWdvdGlhdGVfaGFuZGxlX3N0YXJ0dGxzKGNsaWVudCwgbGVuZ3RoLA0KPj4+IGVy
-cnApOw0KPj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgcmV0ID0gbmJkX2No
-ZWNrX3plcm9fbGVuZ3RoKGNsaWVudCwgbGVuZ3RoLCBvcHRpb24sDQo+Pj4gZXJycCk7DQo+
-Pj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBpZiAocmV0IDwgMCkgew0KPj4+
-ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCByZXR1cm4gcmV0Ow0K
-Pj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgfQ0KPj4gbm8sIHlvdSBzaG91
-bGQgbm90IGNvbnRpbnVlIGlmIGxlbmd0aD4wIChvbGQgYmVoYXZpb3IpLg0KPj4gbmJkX25l
-Z290aWF0ZV9zZW5kX3JlcF9lcnIgcmV0dXJucyAwIG9uIHN1Y2Nlc3MNCj4+IGluIG5iZF9j
-aGVja196ZXJvX2xlbmd0aCgpLg0KPiBPaCwgZ29vZCBjYXRjaC4gQnV0IGl0J3Mgc3VidGxl
-ciB0aGFuIHRoYXQuIEluIHRoZSBvbGQgY29kZSwNCj4gbmJkX25lZ290aWF0ZV9oYW5kbGVf
-c3RhcnR0bHMoKSByZXR1cm5zIE5VTEwgb24gbm9uLXplcm8gbGVuZ3RoIChldmVuIGlmDQo+
-IGl0IHNlbnQgYSBtZXNzYWdlIHRvIHRoZSBjbGllbnQpLCBiZWNhdXNlIHdlIHJlYWxseSB3
-YW50IHRvIGtpbGwgdGhlDQo+IGNvbm5lY3Rpb24gaWYgYSBjbGllbnQgY2FuJ3QgdHVybiBv
-biBUTFMgY29ycmVjdGx5Li4uDQo+DQo+Pj4gQEAgLTcxMiw5ICs3MTEsOSBAQCBzdGF0aWMg
-aW50IG5iZF9uZWdvdGlhdGVfb3B0aW9ucyhOQkRDbGllbnQNCj4+PiAqY2xpZW50LCB1aW50
-MTZfdCBteWZsYWdzLA0KPj4+ICDCoMKgwqDCoMKgwqDCoMKgwqAgfSBlbHNlIGlmIChmaXhl
-ZE5ld3N0eWxlKSB7DQo+Pj4gIMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHN3aXRjaCAo
-b3B0aW9uKSB7DQo+Pj4gIMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGNhc2UgTkJEX09Q
-VF9MSVNUOg0KPj4+IC3CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgcmV0ID0gbmJk
-X25lZ290aWF0ZV9oYW5kbGVfbGlzdChjbGllbnQsIGxlbmd0aCwgZXJycCk7DQo+Pj4gLcKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBpZiAocmV0IDwgMCkgew0KPj4+IC3CoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCByZXR1cm4gcmV0Ow0KPj4+ICvC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgcmV0ID0gbmJkX2NoZWNrX3plcm9fbGVu
-Z3RoKGNsaWVudCwgbGVuZ3RoLCBvcHRpb24sDQo+Pj4gZXJycCk7DQo+Pj4gK8KgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBpZiAoIXJldCkgew0KPj4gdGhlIHNhbWUgaGVyZQ0K
-Pj4NCj4gd2hpbGUgbmJkX25lZ290aWF0ZV9oYW5kbGVfbGlzdCgpIHVzZWQgdG8gcmV0dXJu
-IDAgaWYgdGhlIGNsaWVudCBzZW50DQo+IG5vbi16ZXJvIGxlbmd0aCAod2UgaGFuZGxlZCB0
-aGUgaW5jb3JyZWN0IG1lc3NhZ2UgZnJvbSB0aGUgY2xpZW50IGp1c3QNCj4gZmluZSwgYW5k
-IGNhbiBjb250aW51ZSBsaXN0ZW5pbmcgZm9yIG1vcmUgb3B0aW9ucykuDQo+DQo+IE1heWJl
-IEkgY2FuIGZpeCBpdCB3aXRoIGEgdHJpLXN0YXRlIHJldHVybjogMSBpZiBjb3JyZWN0IGxl
-bmd0aCwgMCBpZg0KPiBub256ZXJvIGxlbmd0aCBidXQgZXJyb3IgbWVzc2FnZSBzZW50IHN1
-Y2Nlc3NmdWxseSwgYW5kIG5lZ2F0aXZlIG9uDQo+IHRyYW5zbWlzc2lvbiBmYWlsdXJlOyBh
-bHRob3VnaCB0aGVuIGl0J3MgdHJpY2tpZXIgZm9yIGNhbGxlcnMuICBJJ2xsDQo+IGhhdmUg
-dG8gdGhpbmsgYWJvdXQgaXQuLi4NCj4NCj4+PiAgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqAgY2FzZSBOQkRfT1BUX1NUQVJUVExTOg0KPj4+IC3CoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqAgaWYgKG5iZF9kcm9wKGNsaWVudC0+aW9jLCBsZW5ndGgsIGVycnApIDwgMCkg
-ew0KPj4+IC3CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCByZXR1cm4g
-LUVJTzsNCj4+PiAtwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIH0NCj4+PiAtwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGlmIChjbGllbnQtPnRsc2NyZWRzKSB7DQo+
-Pj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBpZiAobGVuZ3RoKSB7DQo+Pj4g
-K8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHJldCA9IG5iZF9jaGVj
-a196ZXJvX2xlbmd0aChjbGllbnQsIGxlbmd0aCwNCj4+PiBvcHRpb24sIGVycnApOw0KPiBN
-YXliZSBleHBsaWNpdGx5IGNoZWNraW5nIGZvciBsZW5ndGggYXQgZWFjaCBjYWxsZXIgaXMg
-dGhlIHNpbXBsZXN0DQo+IGFwcHJvYWNoIGZvciBnZXR0aW5nIHRoZSBkZWNpc2lvbiBsb2dp
-YyBjb3JyZWN0LCBzaW5jZSBJIHJlYWxseSB3YXNuJ3QNCj4gYWJsZSB0byBhYnN0cmFjdCBh
-IGNsZWFuICJmYWlsdXJlIHRvIGNvbW11bmljYXRlIiB2cy4gImVycm9yIG1lc3NhZ2UNCj4g
-c2VudCwgZ28gb24gdG8gbmV4dCBtZXNzYWdlIG9yIGFib3J0IGNvbm5lY3Rpb24gYXMgYXBw
-cm9wcmlhdGUiIHZzLg0KPiAiZXZlcnl0aGluZyB2YWxpZGF0ZWQsIHByb2NlZWQgd2l0aCBy
-ZXN0IG9mIGhhbmRpbmcgY3VycmVudCBvcHRpb24iLg0KPg0KDQoNCi0tIA0KQmVzdCByZWdh
-cmRzLA0KVmxhZGltaXINCg0K
+On 10/20/2017 10:56 AM, Peter Maydell wrote:
+> +        if (s->be_data) {
+> +            tcg_gen_extr_i64_i32(tmp2, tmp, t64);
+> +        } else {
+> +            tcg_gen_extr_i64_i32(tmp, tmp2, t64);
+> +        }
+
+The test against be_data must be of the form s->be_data == MO_BE/LE.
+
+The actual bits have MO_BSWAP non-zero, and then set MO_BE/LE to either 0 or
+MO_BSWAP depending on the host endianness.
+
+
+> -        gen_aa32_frob64(s, o64);
+> +        if (s->be_data) {
+> +            tcg_gen_rotri_i64(o64, o64, 32);
+> +        }
+>          tcg_gen_setcond_i64(TCG_COND_NE, o64, o64, cpu_exclusive_val);
+
+We're not splitting o64 to parts.  Are you sure it shouldn't stay as frob?
+
+
+r~
