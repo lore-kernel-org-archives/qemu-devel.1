@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47258)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48019)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <frederic.konrad@adacore.com>) id 1e5Y7k-0001zW-Iz
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 10:18:09 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1e5YAd-0002rz-9b
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 10:21:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <frederic.konrad@adacore.com>) id 1e5Y7g-00066L-AA
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 10:18:08 -0400
-Received: from mel.act-europe.fr ([194.98.77.210]:52730
-	helo=smtp.eu.adacore.com)
+	(envelope-from <ehabkost@redhat.com>) id 1e5YAa-00080h-3l
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 10:21:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60516)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <frederic.konrad@adacore.com>)
-	id 1e5Y7f-00065h-RJ
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 10:18:04 -0400
-References: <1508417443-31849-1-git-send-email-gabriel291075@gmail.com>
-	<CAFEAcA8dSSQgQAKN0GsOZPWDxhRL0zjDQ+QN=uSRh6hLB=1wCg@mail.gmail.com>
-	<CAG+oHk_Zw0CdEphX0bVeyBbyWEBLqh8tBad6R-sP5gW11ni__w@mail.gmail.com>
-From: KONRAD Frederic <frederic.konrad@adacore.com>
-Message-ID: <8f0e9570-75d8-581c-3f3a-a584c6f6af2d@adacore.com>
-Date: Fri, 20 Oct 2017 16:17:59 +0200
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1e5YAZ-00080O-QC
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 10:21:04 -0400
+Date: Fri, 20 Oct 2017 12:21:00 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20171020142100.GM2942@localhost.localdomain>
+References: <1508170976-96869-1-git-send-email-imammedo@redhat.com>
+	<1508170976-96869-5-git-send-email-imammedo@redhat.com>
+	<20171016165916.GI3246@localhost.localdomain>
+	<20171019104218.GB13245@umbus>
+	<20171020001548.GK2942@localhost.localdomain>
+	<20171020011917.GF13245@umbus>
 MIME-Version: 1.0
-In-Reply-To: <CAG+oHk_Zw0CdEphX0bVeyBbyWEBLqh8tBad6R-sP5gW11ni__w@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1] arm: Adding new arm machine,
- Kinetis K64 MK64FN1M0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171020011917.GF13245@umbus>
+Subject: Re: [Qemu-devel] [RFC 4/6] CLI: add -paused option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,110 +31,179 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gabriel Costa <gabriel291075@gmail.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, eblake@redhat.com, armbru@redhat.com, pkrempa@redhat.com, peter.maydell@linaro.org, pbonzini@redhat.com, cohuck@redhat.com
+
+On Fri, Oct 20, 2017 at 12:19:17PM +1100, David Gibson wrote:
+> On Thu, Oct 19, 2017 at 10:15:48PM -0200, Eduardo Habkost wrote:
+> > On Thu, Oct 19, 2017 at 09:42:18PM +1100, David Gibson wrote:
+> > > On Mon, Oct 16, 2017 at 02:59:16PM -0200, Eduardo Habkost wrote:
+> > > > On Mon, Oct 16, 2017 at 06:22:54PM +0200, Igor Mammedov wrote:
+> > > > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> > > > > ---
+> > > > >  include/sysemu/sysemu.h |  1 +
+> > > > >  qemu-options.hx         | 15 ++++++++++++++
+> > > > >  qmp.c                   |  5 +++++
+> > > > >  vl.c                    | 54 ++++++++++++++++++++++++++++++++++++++++++++++++-
+> > > > >  4 files changed, 74 insertions(+), 1 deletion(-)
+> > > > > 
+> > > > > diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+> > > > > index b213696..3feb94f 100644
+> > > > > --- a/include/sysemu/sysemu.h
+> > > > > +++ b/include/sysemu/sysemu.h
+> > > > > @@ -66,6 +66,7 @@ typedef enum WakeupReason {
+> > > > >      QEMU_WAKEUP_REASON_OTHER,
+> > > > >  } WakeupReason;
+> > > > >  
+> > > > > +void qemu_exit_preconfig_request(void);
+> > > > >  void qemu_system_reset_request(ShutdownCause reason);
+> > > > >  void qemu_system_suspend_request(void);
+> > > > >  void qemu_register_suspend_notifier(Notifier *notifier);
+> > > > > diff --git a/qemu-options.hx b/qemu-options.hx
+> > > > > index 39225ae..bd44db8 100644
+> > > > > --- a/qemu-options.hx
+> > > > > +++ b/qemu-options.hx
+> > > > > @@ -3498,6 +3498,21 @@ STEXI
+> > > > >  Run the emulation in single step mode.
+> > > > >  ETEXI
+> > > > >  
+> > > > > +DEF("paused", HAS_ARG, QEMU_OPTION_paused, \
+> > > > > +    "-paused [state=]postconf|preconf\n"
+> > > > > +    "                postconf: pause QEMU after machine is initialized\n"
+> > > > > +    "                preconf: pause QEMU before machine is initialized\n",
+> > > > > +    QEMU_ARCH_ALL)
+> > > > 
+> > > > I would like to allow pausing before machine-type is selected, so
+> > > > management could run query-machines before choosing a
+> > > > machine-type.  Would that need a third "-pause" mode, or will we
+> > > > be able to change "preconf" to pause before select_machine() is
+> > > > called?
+> > > > 
+> > > > The same probably applies to other things initialized before
+> > > > machine_run_board_init() that could be configurable using QMP,
+> > > > including but not limited to:
+> > > > * Accelerator configuration
+> > > > * Registering global properties
+> > > > * RAM size
+> > > > * SMP/CPU configuration
+> > > 
+> > > Yeah.. having a bunch of different possible pause stages to select
+> > > doesn't sound great.
+> > 
+> > I agree.  The number of externally visible pause states should be
+> > as small as possible.
+> > 
+> > 
+> > >                       Could we avoid this by instead changing -S to
+> > > pause at the earliest possible spot, but having any monitor commands
+> > > that require a later stage automatically "fast forwarding" to the
+> > > right phase?
+> > 
+> > That would hide the internal details from the outside.  Sounds
+> > nice, but adding new machine/device configuration QMP commands
+> > while hiding the QEMU state from the outside sounds impossible.
+> > 
+> > For example, if we use -S today, this works:
+> > 
+> >   $ qemu-system-x86_64 -S -qmp stdio
+> >   <- {"QMP": {"version": {"qemu": {"micro": 0, "minor": 10, "major": 2}, "package": " (v2.10.0-83-g9375da7831)"}, "capabilities": []}}
+> >   -> {"execute":"qmp_capabilities"}
+> >   <- {"return": {}}
+> >   -> {"execute":"query-cpus"}
+> >   <- {"return": [{"arch": "x86", "current": true, "props": {"core-id": 0, "thread-id": 0, "socket-id": 0}, "CPU": 0, "qom_path": "/machine/unattached/device[0]", "pc": 4294967280, "halted": false, "thread_id": 4038}]}
+> > 
+> > This means "query-cpus" needs to fast-forward to the CPU creation
+> > stage if we want to keep compatibility.
+> > 
+> > Now, assume we add a set-numa-node command like the one in this
+> > series.  e.g.:
+> > 
+> >   $ qemu-system-x86_64 -S -qmp stdio
+> >   <- {"QMP": {"version": {"qemu": {"micro": 0, "minor": 10, "major": 2}, "package": " (v2.10.0-83-g9375da7831)"}, "capabilities": []}}
+> >   -> {"execute":"qmp_capabilities"}
+> >   <- {"return": {}}
+> >   -> {"execute":"set-numa-node" ... }
+> >   <- {"return": ...}
+> > 
+> > The command will work only if machine initialization didn't run
+> > yet.
+> > 
+> > But now an innocent-looking query command would change QEMU state
+> > in an unexpected way:
+> > 
+> >   $ qemu-system-x86_64 -S -qmp stdio
+> >   <- {"QMP": {"version": {"qemu": {"micro": 0, "minor": 10, "major": 2}, "package": " (v2.10.0-83-g9375da7831)"}, "capabilities": []}}
+> >   -> {"execute":"qmp_capabilities"}
+> >   <- {"return": {}}
+> >   -> {"execute":"query-cpus"}  [will silently fast-forward QEMU state]
+> >   <- {"return": [{"arch": "x86", "current": true, "props": {"core-id": 0, "thread-id": 0, "socket-id": 0}, "CPU": 0, "qom_path": "/machine/unattached/device[0]", "pc": 4294967280, "halted": false, "thread_id": 4038}]}
+> >   -> {"execute":"set-numa-node" ... }
+> >   <- {"error": ...}  [the command will fail because the machine was already created]
+> > 
+> > This means we do have a externally visible "too late to use
+> > set-numa-node" QEMU state, and query-cpus will have a externally
+> > visible side effect.  Every QMP command would need to document
+> > how it affects QEMU state in a externally visible way.
+> > 
+> > If QEMU pause state is still going to be externally visible this
+> > way, I would prefer to let the client to explicitly tell what's
+> > the state they want QEMU to be, instead of making QEMU change
+> > state silently as a side effect of QMP commands.
+> 
+> Yeah, good point.  My proposal would just have changed explicitly
+> exposed ugly internal state to subtly exposed ugly internal state,
+> which is probably worse :(.
+> 
+> 
+> Ok.. next possibly bad idea..
+> 
+> What about a "re-exec" monitor command; it would take what's
+> essentially a new command line, and basically restart qemu from the
+> beginning, reparsing this new command line, but without actually 
+> 
+> Pro:
+>   * Mitigates Daniel Berrange's concern about lots of qemu
+>     configuration being buried in the qmp session - if libvirt logged
+>     its last "re-exec" that would have what is generally needed.
+>   * Lets libvirt do assorted investigation of options, then rewind to
+>     choose what it actually wants
+
+Sounds like a superset of Paolo's "-machine none" proposal[1].
+It would be a very simple interface, not sure it can be easily
+implemented efficiently.
+
+[1] https://www.mail-archive.com/qemu-devel@nongnu.org/msg488618.html
+
+> 
+> Con:
+>   * Would require a bunch of auditing of structures/state to make sure
+>     they can be re-initialized cleanly
+
+This sounds like a big obstacle.  QEMU still have too much global
+state outside the machine/qdev tree.
 
 
+>   * Would it be fast enough for libvirt to use?  Do we know if the
+>     slowness which makes multiple qemu invocations by libvirt
+>     unattractive is from the kernel/libc/ldso overhead, or from qemu's
+>     internal start up processing?
 
-On 10/20/2017 04:01 PM, Gabriel Costa wrote:
-> Thanks for your fast response and tips. This is my first time sending
-> patchs!
-> 
-> Yes, I will follow the QEmu struct. I saw what other developers done
-> (stm32f2xx) and I put the files in following folders:
-> hw/arm/mk64fn1m0.c                 This file define the SoC
-> hw/char/kinetis_k64_uart.c         UART peripheral
-> hw/misc/kinetis_k64_flextimer.c  Timers peripherals
+My gut feeling is that this could be too slow, if the scope of
+"re-exec" is too big.
 
-I'd say hw/timer/kinetis_k64_flextimer.c here.
 
-Fred
+Now, let me try to go to the opposite extreme: I think you had a
+good point in your previous proposal.  Why should we need to
+restart/re-execute anything at all just because some bit of
+configuration is being changed by libvirt?  Why commands like
+set-numa-node should require QEMU to be in a state that is not
+covered by -S?  If the guest is not running yet, there should be
+no reason to require clients to explicitly pause/continue/restart
+anything.
 
-> hw/misc/kinetis_k64_mcg.c        Clock Manager
-> hw/misc/kinetis_k64_pmux.c      MUX selector
-> hw/misc/kinetis_k64_sim.c         More Clock selection
-> that is ok?
-> 
-> I will solve the code style issues and prepare a new patch series.
-> Also, I received an error about a build fail (among others, of course), I
-> believe that this happened because the first patch was not applied.
-> 
-> Regards to all,
-> 
-> Gabriel Costa
-> 
-> On Thu, Oct 19, 2017 at 1:02 PM, Peter Maydell <peter.maydell@linaro.org>
-> wrote:
-> 
->> On 19 October 2017 at 13:50,  <gabriel291075@gmail.com> wrote:
->>> From: Gabriel Augusto Costa <gabriel291075@gmail.com>
->>>
->>> I add a new arm machine with some peripherals. The machine is mk64fn1m0,
->> a
->>> cortex-m4 microcontroller from NXP Kinetis family. The machine can run a
->>> simple arm binary file using UART0 in polling mode.
->>> I prepared two patchs to include this machine:
->>> PATCH v1: Include the machine and peripherals devices;
->>> PATCH v2: Change the make file to compile this machine.
->>
->> Thanks for these patches.
->>
->>> Also, I made a folder tree to accomodate this machine more or less like
->> u-boot.
->>> In my opinion put all files in the same folder "/hw/arm" is not a good
->> idea,
->>> or put all code in an unique file, because machines from the same family
->>> sharing the same peripherals.
->>> The folder tree struct is machine/family/peripheral, as an example:
->>> kinetis/k64/peripheral.
->>> So, in this way the code will be more maintainable.
->>
->> There's an inevitable conflict between:
->>   * these peripherals are all for this board so they should go
->>     in a subdirectory for these boards
->>   * these peripherals are all of the same type so they should
->>     go in a subdirectory for devices of that type
->> Whichever way you slice things it will split things that in
->> some sense should go together.
->>
->> However, QEMU has made a decision that we put devices of a
->> specific type in the same directory (roughly following what
->> the Linux kernel does). So can you please follow the structure
->> we have? Having a mix of the two schemes is much worse than
->> consistently following either.
->>
->>> Signed-off-by: Gabriel Augusto Costa <gabriel291075@gmail.com>
->>> ---
->>>   hw/arm/kinetis/k64/mk64fn1m0.c                    | 170 +++++++++
->>>   hw/arm/kinetis/k64/peripheral/flextimer.c         | 139 +++++++
->>>   hw/arm/kinetis/k64/peripheral/mcg.c               | 225 ++++++++++++
->>>   hw/arm/kinetis/k64/peripheral/pmux.c              | 423
->> ++++++++++++++++++++++
->>>   hw/arm/kinetis/k64/peripheral/sim.c               | 292 +++++++++++++++
->>>   hw/arm/kinetis/k64/peripheral/uart.c              | 369
->> +++++++++++++++++++
->>>   include/hw/arm/kinetis/k64/peripheral/flextimer.h |  62 ++++
->>>   include/hw/arm/kinetis/k64/peripheral/mcg.h       |  47 +++
->>>   include/hw/arm/kinetis/k64/peripheral/pmux.h      |  73 ++++
->>>   include/hw/arm/kinetis/k64/peripheral/sim.h       |  56 +++
->>>   include/hw/arm/kinetis/k64/peripheral/uart.h      |  85 +++++
->>>   11 files changed, 1941 insertions(+)
->>
->> This patch is much too large to review. Please can you split it up
->> into a number of smaller logical patchsets? (Usually for a new
->> board and SoC one patch per new device is what makes most sense.
->> If you get much over 250 lines in one patch you should consider
->> whether there's a logical split of it possible.)
->>
->> https://wiki.qemu.org/Contribute/SubmitAPatch has some other
->> helpful suggestions for patch submissions and is generally
->> worth reading I think.
->>
->> If you could structure your next revision of this series to
->> include a cover letter email that would also be helpful;
->> some of our automatic patch handling tools can't deal with
->> multi-patch series that don't have the cover letter.
->>
->> thanks
->> -- PMM
->>
+(Translating this to my example above: why exactly have I assumed
+above that keeping "query-cpus" working would necessarily make
+set-numa-node stop working?)
+
+-- 
+Eduardo
