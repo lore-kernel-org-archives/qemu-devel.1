@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36317)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38091)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=4594c9e72=Ian.Jackson@citrix.com>)
-	id 1e5XVc-00059z-7O
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 09:38:45 -0400
+	(envelope-from <david@redhat.com>) id 1e5XaG-0000q6-J6
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 09:43:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=4594c9e72=Ian.Jackson@citrix.com>)
-	id 1e5XVY-0002tH-16
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 09:38:44 -0400
-Received: from smtp02.citrix.com ([66.165.176.63]:19492)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=4594c9e72=Ian.Jackson@citrix.com>)
-	id 1e5XVX-0002qS-Oi
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 09:38:39 -0400
-From: Ian Jackson <ian.jackson@eu.citrix.com>
-Date: Fri, 20 Oct 2017 14:38:19 +0100
-Message-ID: <1508506702-17704-5-git-send-email-ian.jackson@eu.citrix.com>
-In-Reply-To: <1508506702-17704-1-git-send-email-ian.jackson@eu.citrix.com>
-References: <23017.64539.31230.43449@mariner.uk.xensource.com>
-	<1508506702-17704-1-git-send-email-ian.jackson@eu.citrix.com>
+	(envelope-from <david@redhat.com>) id 1e5XaB-000503-Na
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 09:43:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59658)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1e5XaB-0004zq-EJ
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 09:43:27 -0400
+References: <87y3oqugm7.fsf@marc-ibm.boeblingen.de.ibm.com>
+	<20171005121115.GD3946746@orkuz.home>
+	<87y3ok7n2n.fsf@marc-ibm.boeblingen.de.ibm.com>
+	<20171012120714.GA314661@orkuz.home>
+	<87mv4m6pp5.fsf@marc-ibm.boeblingen.de.ibm.com>
+	<0aab6dae-a926-c106-9bc5-68561a9bef5c@redhat.com>
+	<0dae2b6c-9164-efc7-5c67-0e4aa5eb4a21@de.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <fcf03f16-389e-83b5-77bf-d7a50151005c@redhat.com>
+Date: Fri, 20 Oct 2017 15:43:21 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v5.1 5/8] xen: move xc_interface compatibility
- fallback further up the file
+In-Reply-To: <0dae2b6c-9164-efc7-5c67-0e4aa5eb4a21@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [libvirt] Question about the host-model CPU mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,70 +33,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Ross Lagerwall <ross.lagerwall@citrix.com>, Anthony PERARD <anthony.perard@citrix.com>, Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org, Ian Jackson <ian.jackson@eu.citrix.com>, Ian Jackson <Ian.Jackson@eu.citrix.com>
+To: Christian Borntraeger <borntraeger@de.ibm.com>, Marc Hartmayer <mhartmay@linux.vnet.ibm.com>, libvir-list@redhat.com, qemu-devel@nongnu.org
+Cc: Jiri Denemark <jdenemar@redhat.com>, Boris Fiuczynski <fiuczy@linux.vnet.ibm.com>, "Jason J. Herne" <jjherne@linux.vnet.ibm.com>, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
 
-We are going to want to use the dummy xendevicemodel_handle type in
-new stub functions in the CONFIG_XEN_CTRL_INTERFACE_VERSION < 41000
-section.  So we need to provide that definition, or (as applicable)
-include the appropriate header, earlier in the file.
+On 20.10.2017 15:36, Christian Borntraeger wrote:
+> 
+> 
+> On 10/20/2017 03:16 PM, David Hildenbrand wrote:
+>>
+>>> Hi all,
+>>>
+>>> we recently encountered the problem that the 'host-model' [1] has to be
+>>> related to the machine type of a domain. We have following problem:
+>>>
+>>>    Let's assume we've a z13 system with a QEMU 2.9 and we define a
+>>>    domain using the default s390-virtio-ccw machine together with the
+>>>    host-model CPU mode [1]. The definition will have the machine
+>>>    expanded to s390-virtio-ccw-2.9 but retain the host-model CPU mode
+>>>    in the domain definition. In a next step we upgrade to QEMU 2.10
+>>>    (first version to recognize z14). Everything is still fine, even
+>>>    though the machine runs in 2.9 compatibility mode. Finally we
+>>>    upgrade to a z14. As a consequence it is not possible to start the
+>>>    domain anymore as the machine type doesn't support our CPU host
+>>>    model (which is expanded at start time of the domain).
+>>
+>> Actually, what is the cause of that problem? I assume it is the gs
+>> feature (gs_allowed)?
+>>
+>> We should really avoid such things (..._allowed) for CPU model features
+>> in the future and clue all new such stuff to cpumodel_allowed.
+> 
+> Yes, starting a guest with
+>    <os>
+>     <type arch='s390x' machine='s390-ccw-virtio-2.9'>hvm</type>
+>   </os>
+>   <cpu mode='host-model'/>
+> 
+> results in
+> 
+> qemu-system-s390x: Some features requested in the CPU model are not available in the configuration: gs 
+> 
+> Tying it to cpumodel_allowed would not help, migration-wise though.
+> libvirt would still transform
+> 
+>    <os>
+>     <type arch='s390x' machine='s390-ccw-virtio-2.9'>hvm</type>
+>   </os>
+>   <cpu mode='host-model'/>
 
-(Ideally the newer compatibility layers would be at the bottom of the
-file, so that they can naturally benefit from the compatibility layers
-for earlier version.  But that's rather too much for this series.)
+My point was, that the host model would have to be copied and _remain_
+there when s390-ccw-virtio was expanded to s390-ccw-virtio-2.9.
 
-No functional change.
+So really replacing <cpu mode='host-model'/> by the model z13-base....
+This would at least fix this issue. Just like s390-ccw-virtio get's
+replaced and remains thats way.
 
-Signed-off-by: Ian Jackson <Ian.Jackson@eu.citrix.com>
-Acked-by: Anthony PERARD <anthony.perard@citrix.com>
----
-v2: New patch in v2 of the series
----
- include/hw/xen/xen_common.h | 18 +++++++++++-------
- 1 file changed, 11 insertions(+), 7 deletions(-)
+But this might for sure have other problems.
 
-diff --git a/include/hw/xen/xen_common.h b/include/hw/xen/xen_common.h
-index 3f44a63..8efdb8a 100644
---- a/include/hw/xen/xen_common.h
-+++ b/include/hw/xen/xen_common.h
-@@ -78,6 +78,17 @@ static inline void *xenforeignmemory_map(xc_interface *h, uint32_t dom,
- 
- extern xenforeignmemory_handle *xen_fmem;
- 
-+#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 40900
-+
-+typedef xc_interface xendevicemodel_handle;
-+
-+#else /* CONFIG_XEN_CTRL_INTERFACE_VERSION >= 40900 */
-+
-+#undef XC_WANT_COMPAT_DEVICEMODEL_API
-+#include <xendevicemodel.h>
-+
-+#endif
-+
- #if CONFIG_XEN_CTRL_INTERFACE_VERSION < 41000
- 
- #define XEN_COMPAT_PHYSMAP
-@@ -105,8 +116,6 @@ static inline int xentoolcore_restrict_all(domid_t domid)
- 
- #if CONFIG_XEN_CTRL_INTERFACE_VERSION < 40900
- 
--typedef xc_interface xendevicemodel_handle;
--
- static inline xendevicemodel_handle *xendevicemodel_open(
-     struct xentoollog_logger *logger, unsigned int open_flags)
- {
-@@ -228,11 +237,6 @@ static inline int xendevicemodel_set_mem_type(
-     return xc_hvm_set_mem_type(dmod, domid, mem_type, first_pfn, nr);
- }
- 
--#else /* CONFIG_XEN_CTRL_INTERFACE_VERSION >= 40900 */
--
--#undef XC_WANT_COMPAT_DEVICEMODEL_API
--#include <xendevicemodel.h>
--
- #endif
- 
- extern xendevicemodel_handle *xen_dmod;
+> 
+> 
+> into 
+> -cpu z14-base,aen=on,cmmnt=on,aefsi=on,mepoch=on,msa8=on,msa7=on,msa6=on,msa5=on,msa4=on, \
+> msa3=on,msa2=on,msa1=on,sthyi=on,edat=on,ri=on,edat2=on,vx=on,ipter=on,vxeh=on,vxpd=on, \
+> esop=on,iep=on,cte=on,ais=on,gs=on,zpci=on,sea_esop2=on,te=on,cmm=on
+>                              ^^^^^
+> because cpu model is certainly there. Now the guest would start but migration would
+> later fail because what we create now would never have been possible with 2.9.
+
+Migration is a totally different story, as tooling has to make sure to
+find a CPU model that is compatible over all host models. So
+cpumodel_allowed would indeed work. (at least in my theory ;) )
+
+> 
+> If libvirt could get information from QEMU depending on the machine version, this would
+> make it work. But of course this has other issues.
+
+I am not sure if that is the right thing to do.
+
+The documentation states clearly that the host model is copied. If that
+is not runnable, fix the setup.
+
+> 
+> Christian
+> 
+
+
 -- 
-2.1.4
+
+Thanks,
+
+David
