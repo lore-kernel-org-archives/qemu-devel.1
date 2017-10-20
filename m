@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40769)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41367)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gabriel291075@gmail.com>) id 1e5dDD-000617-CH
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 15:44:08 -0400
+	(envelope-from <gabriel291075@gmail.com>) id 1e5dEh-0007Zb-JN
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 15:45:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gabriel291075@gmail.com>) id 1e5dDC-0005Xg-Bb
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 15:44:07 -0400
-Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:47563)
+	(envelope-from <gabriel291075@gmail.com>) id 1e5dEe-00078j-Fc
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 15:45:39 -0400
+Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:53674)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <gabriel291075@gmail.com>)
-	id 1e5dDC-0005XV-6z
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 15:44:06 -0400
-Received: by mail-qk0-x241.google.com with SMTP id m189so15626970qke.4
-	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 12:44:06 -0700 (PDT)
+	id 1e5dEe-00077x-9o
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 15:45:36 -0400
+Received: by mail-qt0-x241.google.com with SMTP id n61so19802693qte.10
+	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 12:45:36 -0700 (PDT)
 From: Gabriel Augusto Costa <gabriel291075@gmail.com>
-Date: Fri, 20 Oct 2017 11:39:49 -0400
-Message-Id: <1508513990-15730-1-git-send-email-gabriel291075@gmail.com>
-Subject: [Qemu-devel] [PATCH v3 05/11] kinetis_k64_flextimer.h has been added
+Date: Fri, 20 Oct 2017 11:41:19 -0400
+Message-Id: <1508514079-15830-1-git-send-email-gabriel291075@gmail.com>
+Subject: [Qemu-devel] [PATCH v3 07/11] kinetis_k64_mcg.c has been added
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,16 +36,16 @@ PATCH v4 n/2: It changes the Make files to compile this machine.
 
 Signed-off-by: Gabriel Augusto Costa <gabriel291075@gmail.com>
 ---
- include/hw/timer/kinetis_k64_flextimer.h | 62 ++++++++++++++++++++++++++++++++
- 1 file changed, 62 insertions(+)
- create mode 100644 include/hw/timer/kinetis_k64_flextimer.h
+ hw/misc/kinetis_k64_mcg.c | 221 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 221 insertions(+)
+ create mode 100644 hw/misc/kinetis_k64_mcg.c
 
-diff --git a/include/hw/timer/kinetis_k64_flextimer.h b/include/hw/timer/kinetis_k64_flextimer.h
+diff --git a/hw/misc/kinetis_k64_mcg.c b/hw/misc/kinetis_k64_mcg.c
 new file mode 100644
-index 0000000..b0554f6
+index 0000000..d768f06
 --- /dev/null
-+++ b/include/hw/timer/kinetis_k64_flextimer.h
-@@ -0,0 +1,62 @@
++++ b/hw/misc/kinetis_k64_mcg.c
+@@ -0,0 +1,221 @@
 +/*
 + * Kinetis K64 peripheral microcontroller emulation.
 + *
@@ -57,56 +57,215 @@ index 0000000..b0554f6
 + *  (at your option) any later version.
 + */
 +
-+/* Kinetis K64 series FLEXTIMER controller.  */
++/* Kinetis K64 series MCG controller.  */
 +
-+#ifndef KINETIS_FLEXTIMER_H
-+#define KINETIS_FLEXTIMER_H
-+
++#include "qemu/osdep.h"
++#include "qapi/error.h"
 +#include "hw/sysbus.h"
-+#include "chardev/char-fe.h"
-+#include "chardev/char-mux.h"
-+#include "hw/hw.h"
++#include "hw/ssi/ssi.h"
++#include "hw/arm/arm.h"
++#include "hw/devices.h"
++#include "qemu/timer.h"
++#include "net/net.h"
++#include "hw/boards.h"
++#include "qemu/log.h"
++#include "exec/address-spaces.h"
++#include "sysemu/sysemu.h"
++#include "hw/char/pl011.h"
++#include "hw/misc/unimp.h"
++#include "hw/misc/kinetis_k64_mcg.h"
 +
-+#define TYPE_KINETIS_K64_FLEXTIMER "kinetis_K64_flextimer"
-+#define KINETIS_K64_FLEXTIMER(obj) \
-+    OBJECT_CHECK(kinetis_k64_flextimer_state, (obj), TYPE_KINETIS_K64_FLEXTIMER)
++static const VMStateDescription vmstate_kinetis_k64_mcg = {
++    .name = TYPE_KINETIS_K64_MCG,
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT8(C1, kinetis_k64_mcg_state),
++        VMSTATE_UINT8(C2, kinetis_k64_mcg_state),
++        VMSTATE_UINT8(C3, kinetis_k64_mcg_state),
++        VMSTATE_UINT8(C4, kinetis_k64_mcg_state),
++        VMSTATE_UINT8(C5, kinetis_k64_mcg_state),
++        VMSTATE_UINT8(C6, kinetis_k64_mcg_state),
++        VMSTATE_UINT8(S, kinetis_k64_mcg_state),
++        VMSTATE_UINT8(SC, kinetis_k64_mcg_state),
++        VMSTATE_UINT8(ATCVH, kinetis_k64_mcg_state),
++        VMSTATE_UINT8(ATCVL, kinetis_k64_mcg_state),
++        VMSTATE_UINT8(C7, kinetis_k64_mcg_state),
++        VMSTATE_UINT8(C8, kinetis_k64_mcg_state),
++        VMSTATE_END_OF_LIST()
++    }
++};
 +
-+typedef struct {
-+    SysBusDevice parent_obj;
++static void kinetis_k64_mcg_reset(DeviceState *dev)
++{
++    kinetis_k64_mcg_state *s = KINETIS_K64_MCG(dev);
 +
-+    MemoryRegion iomem;
++    s->C1 = 0x04;
++    s->C2 = 0x80;
++    s->C3 = 0x00;
++    s->C4 = 0x00;
++    s->C5 = 0x00;
++    s->C6 = 0x00;
++    s->S = 0x10;
++    s->SC = 0x02;
++    s->ATCVH = 0x00;
++    s->ATCVL = 0x00;
++    s->C7 = 0x00;
++    s->C8 = 0x80;
++}
 +
-+    uint32_t SC;        /**< Status And Control, offset: 0x0 */
-+    uint32_t CNT;       /**< Counter, offset: 0x4 */
-+    uint32_t MOD;       /**< Modulo, offset: 0x8 */
-+    struct {            /* offset: 0xC, array step: 0x8 */
-+     uint32_t CnSC;     /**< Ch(n) Status And Control, offset: 0xC, step: 0x8 */
-+     uint32_t CnV;      /**< Ch(n) Value, array offset: 0x10, array step: 0x8 */
-+    } CONTROLS[8];
-+    uint32_t CNTIN;     /**< Counter Initial Value, offset: 0x4C */
-+    uint32_t STATUS;    /**< Capture And Compare Status, offset: 0x50 */
-+    uint32_t MODE;      /**< Features Mode Selection, offset: 0x54 */
-+    uint32_t SYNC;      /**< Synchronization, offset: 0x58 */
-+    uint32_t OUTINIT;   /**< Initial State For Channels Output, offset: 0x5C */
-+    uint32_t OUTMASK;   /**< Output Mask, offset: 0x60 */
-+    uint32_t COMBINE;   /**< Function For Linked Channels, offset: 0x64 */
-+    uint32_t DEADTIME;  /**< Deadtime Insertion Control, offset: 0x68 */
-+    uint32_t EXTTRIG;   /**< FTM External Trigger, offset: 0x6C */
-+    uint32_t POL;       /**< Channels Polarity, offset: 0x70 */
-+    uint32_t FMS;       /**< Fault Mode Status, offset: 0x74 */
-+    uint32_t FILTER;    /**< Input Capture Filter Control, offset: 0x78 */
-+    uint32_t FLTCTRL;   /**< Fault Control, offset: 0x7C */
-+    uint32_t QDCTRL; /**< Quadrature Decoder Control And Status, offset: 0x80 */
-+    uint32_t CONF;      /**< Configuration, offset: 0x84 */
-+    uint32_t FLTPOL;    /**< FTM Fault Input Polarity, offset: 0x88 */
-+    uint32_t SYNCONF;   /**< Synchronization Configuration, offset: 0x8C */
-+    uint32_t INVCTRL;   /**< FTM Inverting Control, offset: 0x90 */
-+    uint32_t SWOCTRL;   /**< FTM Software Output Control, offset: 0x94 */
-+    uint32_t PWMLOAD;   /**< FTM PWM Load, offset: 0x98 */
++static void kinetis_k64_mcg_write(void *opaque, hwaddr offset, uint64_t value,
++        unsigned size)
++{
++    kinetis_k64_mcg_state *s = (kinetis_k64_mcg_state *)opaque;
 +
-+    qemu_irq irq;
-+} kinetis_k64_flextimer_state;
++    value &= 0xFF;
 +
-+#endif
++    switch (offset) {
++    case 0x00:
++        if (value & 1 << 2) { /*IREFS*/
++            s->S = 0;
++            s->S |= 1 << 3; /*10 Enconding 2 - External ref clk is selected*/
++        }
++        if ((s->C1 & 0x80) && (value >> 6 == 0)) {
++            s->S |= 1 << 2; /*11 Enconding 3 - Output of the PLL is selected*/
++        }
++        s->C1 = value;
++        break;
++    case 0x01:
++        s->C2 = value;
++        break;
++    case 0x02:
++        s->C3 = value;
++        break;
++    case 0x03:
++        s->C4 = value;
++        break;
++    case 0x04:
++        s->C5 = value;
++        if (s->C5 & 1 << 6) { /*PLLCLKEN0*/
++            s->S |= 1 << 6;  /*LOCK0*/
++        }
++        break;
++    case 0x05:
++        s->C6 = value;
++        if (s->C6 & 1 << 6) { /*PLLS*/
++            s->S |= 1 << 5;  /*PLLST*/
++        }
++        break;
++    case 0x06:
++        s->S = value;
++        break;
++    case 0x08:
++        s->SC = value;
++        break;
++    case 0x0A:
++        s->ATCVH = value;
++        break;
++    case 0x0B:
++        s->ATCVL = value;
++        break;
++    case 0x0C:
++        s->C7 = value;
++        break;
++    case 0x0D:
++        s->C8 = value;
++        break;
++    default:
++        qemu_log_mask(LOG_GUEST_ERROR,
++                "kinetis_k64_mcg: write at bad offset 0x%x\n", (int)offset);
++    }
++}
++
++static uint64_t kinetis_k64_mcg_read(void *opaque, hwaddr offset, unsigned size)
++{
++    kinetis_k64_mcg_state *s = (kinetis_k64_mcg_state *)opaque;
++    uint8_t value;
++
++    switch (offset) {
++    case 0x00: /**< MCG Control 1 Register, offset: 0x0 */
++        value = s->C1;
++        break;
++    case 0x01: /**< MCG Control 2 Register, offset: 0x1 */
++        value = s->C2;
++        break;
++    case 0x02: /**< MCG Control 3 Register, offset: 0x2 */
++        value = s->C3;
++        break;
++    case 0x03: /**< MCG Control 4 Register, offset: 0x3 */
++        value = s->C4;
++        break;
++    case 0x04: /**< MCG Control 5 Register, offset: 0x4 */
++        value = s->C5;
++        break;
++    case 0x05: /**< MCG Control 6 Register, offset: 0x5 */
++        value = s->C6;
++        break;
++    case 0x06: /**< MCG Status Register, offset: 0x6 */
++        value = s->S;
++        break;
++    case 0x08: /**< MCG Status and Control Register, offset: 0x8 */
++        value = s->SC;
++        break;
++    case 0x0A: /**< MCG Auto Trim Compare Value High Register, offset: 0xA*/
++        value = s->ATCVH;
++        break;
++    case 0x0B: /**< MCG Auto Trim Compare Value Low Register, offset: 0xB */
++        value = s->ATCVL;
++        break;
++    case 0x0C: /**< MCG Control 7 Register, offset: 0xC */
++        value = s->C7;
++        break;
++    case 0x0D: /**< MCG Control 8 Register, offset: 0xD */
++        value = s->C8;
++        break;
++    default:
++        qemu_log_mask(LOG_GUEST_ERROR,
++                "kinetis_k64_mcg: read at bad offset 0x%x\n", (int)offset);
++        return 0;
++    }
++    return value;
++}
++
++static const MemoryRegionOps kinetis_k64_mcg_ops = {
++    .read = kinetis_k64_mcg_read,
++    .write = kinetis_k64_mcg_write,
++    .endianness = DEVICE_NATIVE_ENDIAN,
++};
++
++static void kinetis_k64_mcg_init(Object *obj)
++{
++    kinetis_k64_mcg_state *s = KINETIS_K64_MCG(obj);
++    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
++
++    memory_region_init_io(&s->iomem, obj, &kinetis_k64_mcg_ops, s,
++            TYPE_KINETIS_K64_MCG, 0x1000);
++    sysbus_init_mmio(sbd, &s->iomem);
++    sysbus_init_irq(sbd, &s->irq);
++}
++
++static void kinetis_k64_mcg_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++
++    dc->vmsd = &vmstate_kinetis_k64_mcg;
++    dc->reset = kinetis_k64_mcg_reset;
++    dc->desc = "Kinetis K64 series MCG";
++}
++
++static const TypeInfo kinetis_k64_mcg_info = {
++    .name          = TYPE_KINETIS_K64_MCG,
++    .parent        = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(kinetis_k64_mcg_state),
++    .instance_init = kinetis_k64_mcg_init,
++    .class_init    = kinetis_k64_mcg_class_init,
++};
++
++static void kinetis_k64_mcg_register_types(void)
++{
++    type_register_static(&kinetis_k64_mcg_info);
++}
++
++type_init(kinetis_k64_mcg_register_types)
 -- 
 2.1.4
