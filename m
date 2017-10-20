@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44812)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44864)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1e5gbc-0006a2-N7
+	(envelope-from <richard.henderson@linaro.org>) id 1e5gbf-0006hE-J5
 	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 19:21:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1e5gbY-0007yb-Iy
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 19:21:32 -0400
-Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:47295)
+	(envelope-from <richard.henderson@linaro.org>) id 1e5gbe-00081T-2U
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 19:21:35 -0400
+Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:51601)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1e5gbY-0007xv-6k
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 19:21:28 -0400
-Received: by mail-pf0-x243.google.com with SMTP id z11so13061212pfk.4
-	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 16:21:28 -0700 (PDT)
+	id 1e5gbd-00081D-Q5
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 19:21:33 -0400
+Received: by mail-pf0-x244.google.com with SMTP id n14so13060176pfh.8
+	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 16:21:33 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Fri, 20 Oct 2017 16:20:13 -0700
-Message-Id: <20171020232023.15010-43-richard.henderson@linaro.org>
+Date: Fri, 20 Oct 2017 16:20:17 -0700
+Message-Id: <20171020232023.15010-47-richard.henderson@linaro.org>
 In-Reply-To: <20171020232023.15010-1-richard.henderson@linaro.org>
 References: <20171020232023.15010-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v7 42/52] tcg: define tcg_init_ctx and make
- tcg_ctx a pointer
+Subject: [Qemu-devel] [PATCH v7 46/52] tcg: allocate optimizer temps with
+ tcg_malloc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,1080 +34,177 @@ From: "Emilio G. Cota" <cota@braap.org>
 
 Groundwork for supporting multiple TCG contexts.
 
-The core of this patch is this change to tcg/tcg.h:
+While at it, also allocate temps_used directly as a bitmap of the
+required size, instead of using a bitmap of TCG_MAX_TEMPS via
+TCGTempSet.
 
-> -extern TCGContext tcg_ctx;
-> +extern TCGContext tcg_init_ctx;
-> +extern TCGContext *tcg_ctx;
+Performance-wise we lose about 1.12% in a translation-heavy workload
+such as booting+shutting down debian-arm:
 
-Note that for now we set *tcg_ctx to whatever TCGContext is passed
-to tcg_context_init -- in this case &tcg_init_ctx.
+Performance counter stats for 'taskset -c 0 arm-softmmu/qemu-system-arm \
+	-machine type=virt -nographic -smp 1 -m 4096 \
+	-netdev user,id=unet,hostfwd=tcp::2222-:22 \
+	-device virtio-net-device,netdev=unet \
+	-drive file=die-on-boot.qcow2,id=myblock,index=0,if=none \
+	-device virtio-blk-device,drive=myblock \
+	-kernel kernel.img -append console=ttyAMA0 root=/dev/vda1 \
+	-name arm,debug-threads=on -smp 1' (10 runs):
 
-Reviewed-by: Richard Henderson <rth@twiddle.net>
+             exec time (s)  Relative slowdown wrt original (%)
+---------------------------------------------------------------
+ original     20.213321616                                  0.
+ tcg_malloc   20.441130078                           1.1270214
+ TCGContext   20.477846517                           1.3086662
+ g_malloc     20.780527895                           2.8061013
+
+The other two alternatives shown in the table are:
+- TCGContext: embed temps[TCG_MAX_TEMPS] and TCGTempSet used_temps
+  in TCGContext. This is simple enough but it isn't faster than using
+  tcg_malloc; moreover, it wastes memory.
+- g_malloc: allocate/deallocate both temps and used_temps every time
+  tcg_optimize is executed.
+
+Suggested-by: Richard Henderson <rth@twiddle.net>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- include/exec/gen-icount.h     |  10 ++--
- tcg/tcg.h                     |  21 ++++----
- accel/tcg/tcg-runtime.c       |   2 +-
- accel/tcg/translate-all.c     | 109 +++++++++++++++++++++---------------------
- bsd-user/main.c               |   2 +-
- linux-user/main.c             |   2 +-
- target/alpha/translate.c      |   2 +-
- target/arm/translate.c        |   2 +-
- target/cris/translate.c       |   2 +-
- target/cris/translate_v10.c   |   2 +-
- target/hppa/translate.c       |   2 +-
- target/i386/translate.c       |   2 +-
- target/lm32/translate.c       |   2 +-
- target/m68k/translate.c       |   2 +-
- target/microblaze/translate.c |   2 +-
- target/mips/translate.c       |   2 +-
- target/moxie/translate.c      |   2 +-
- target/nios2/translate.c      |   2 +-
- target/openrisc/translate.c   |   2 +-
- target/ppc/translate.c        |   2 +-
- target/s390x/translate.c      |   2 +-
- target/sh4/translate.c        |   2 +-
- target/sparc/translate.c      |   2 +-
- target/tilegx/translate.c     |   2 +-
- target/tricore/translate.c    |   2 +-
- target/unicore32/translate.c  |   2 +-
- target/xtensa/translate.c     |   2 +-
- tcg/tcg-op.c                  |  46 +++++++++---------
- tcg/tcg.c                     |  22 +++++----
- 29 files changed, 130 insertions(+), 126 deletions(-)
+ tcg/optimize.c | 42 +++++++++++++++++++-----------------------
+ 1 file changed, 19 insertions(+), 23 deletions(-)
 
-diff --git a/include/exec/gen-icount.h b/include/exec/gen-icount.h
-index 48b566c1c9..c58b0b2585 100644
---- a/include/exec/gen-icount.h
-+++ b/include/exec/gen-icount.h
-@@ -19,7 +19,7 @@ static inline void gen_tb_start(TranslationBlock *tb)
-         count = tcg_temp_new_i32();
-     }
- 
--    tcg_gen_ld_i32(count, tcg_ctx.tcg_env,
-+    tcg_gen_ld_i32(count, tcg_ctx->tcg_env,
-                    -ENV_OFFSET + offsetof(CPUState, icount_decr.u32));
- 
-     if (tb_cflags(tb) & CF_USE_ICOUNT) {
-@@ -37,7 +37,7 @@ static inline void gen_tb_start(TranslationBlock *tb)
-     tcg_gen_brcondi_i32(TCG_COND_LT, count, 0, exitreq_label);
- 
-     if (tb_cflags(tb) & CF_USE_ICOUNT) {
--        tcg_gen_st16_i32(count, tcg_ctx.tcg_env,
-+        tcg_gen_st16_i32(count, tcg_ctx->tcg_env,
-                          -ENV_OFFSET + offsetof(CPUState, icount_decr.u16.low));
-     }
- 
-@@ -56,13 +56,13 @@ static inline void gen_tb_end(TranslationBlock *tb, int num_insns)
-     tcg_gen_exit_tb((uintptr_t)tb + TB_EXIT_REQUESTED);
- 
-     /* Terminate the linked list.  */
--    tcg_ctx.gen_op_buf[tcg_ctx.gen_op_buf[0].prev].next = 0;
-+    tcg_ctx->gen_op_buf[tcg_ctx->gen_op_buf[0].prev].next = 0;
- }
- 
- static inline void gen_io_start(void)
- {
-     TCGv_i32 tmp = tcg_const_i32(1);
--    tcg_gen_st_i32(tmp, tcg_ctx.tcg_env,
-+    tcg_gen_st_i32(tmp, tcg_ctx->tcg_env,
-                    -ENV_OFFSET + offsetof(CPUState, can_do_io));
-     tcg_temp_free_i32(tmp);
- }
-@@ -70,7 +70,7 @@ static inline void gen_io_start(void)
- static inline void gen_io_end(void)
- {
-     TCGv_i32 tmp = tcg_const_i32(0);
--    tcg_gen_st_i32(tmp, tcg_ctx.tcg_env,
-+    tcg_gen_st_i32(tmp, tcg_ctx->tcg_env,
-                    -ENV_OFFSET + offsetof(CPUState, can_do_io));
-     tcg_temp_free_i32(tmp);
- }
-diff --git a/tcg/tcg.h b/tcg/tcg.h
-index 3e1b5ec1f0..6741f06200 100644
---- a/tcg/tcg.h
-+++ b/tcg/tcg.h
-@@ -688,12 +688,13 @@ struct TCGContext {
-     target_ulong gen_insn_data[TCG_MAX_INSNS][TARGET_INSN_START_WORDS];
+diff --git a/tcg/optimize.c b/tcg/optimize.c
+index 66daced167..438321c6cc 100644
+--- a/tcg/optimize.c
++++ b/tcg/optimize.c
+@@ -40,9 +40,6 @@ struct tcg_temp_info {
+     tcg_target_ulong mask;
  };
  
--extern TCGContext tcg_ctx;
-+extern TCGContext tcg_init_ctx;
-+extern TCGContext *tcg_ctx;
- 
- static inline size_t temp_idx(TCGTemp *ts)
+-static struct tcg_temp_info temps[TCG_MAX_TEMPS];
+-static TCGTempSet temps_used;
+-
+ static inline struct tcg_temp_info *ts_info(TCGTemp *ts)
  {
--    ptrdiff_t n = ts - tcg_ctx.temps;
--    tcg_debug_assert(n >= 0 && n < tcg_ctx.nb_temps);
-+    ptrdiff_t n = ts - tcg_ctx->temps;
-+    tcg_debug_assert(n >= 0 && n < tcg_ctx->nb_temps);
-     return n;
+     return ts->state_ptr;
+@@ -88,31 +85,27 @@ static void reset_temp(TCGArg arg)
+     reset_ts(arg_temp(arg));
  }
  
-@@ -710,7 +711,7 @@ static inline TCGTemp *arg_temp(TCGArg a)
- static inline TCGTemp *tcgv_i32_temp(TCGv_i32 v)
+-/* Reset all temporaries, given that there are NB_TEMPS of them.  */
+-static void reset_all_temps(int nb_temps)
+-{
+-    bitmap_zero(temps_used.l, nb_temps);
+-}
+-
+ /* Initialize and activate a temporary.  */
+-static void init_ts_info(TCGTemp *ts)
++static void init_ts_info(struct tcg_temp_info *infos,
++                         TCGTempSet *temps_used, TCGTemp *ts)
  {
-     uintptr_t o = (uintptr_t)v;
--    TCGTemp *t = (void *)&tcg_ctx + o;
-+    TCGTemp *t = (void *)tcg_ctx + o;
-     tcg_debug_assert(offsetof(TCGContext, temps[temp_idx(t)]) == o);
-     return t;
- }
-@@ -743,7 +744,7 @@ static inline TCGArg tcgv_ptr_arg(TCGv_ptr v)
- static inline TCGv_i32 temp_tcgv_i32(TCGTemp *t)
- {
-     (void)temp_idx(t); /* trigger embedded assert */
--    return (TCGv_i32)((void *)t - (void *)&tcg_ctx);
-+    return (TCGv_i32)((void *)t - (void *)tcg_ctx);
- }
+     size_t idx = temp_idx(ts);
+-    if (!test_bit(idx, temps_used.l)) {
+-        struct tcg_temp_info *ti = &temps[idx];
++    if (!test_bit(idx, temps_used->l)) {
++        struct tcg_temp_info *ti = &infos[idx];
  
- static inline TCGv_i64 temp_tcgv_i64(TCGTemp *t)
-@@ -770,13 +771,13 @@ static inline TCGv_i32 TCGV_HIGH(TCGv_i64 t)
- 
- static inline void tcg_set_insn_param(int op_idx, int arg, TCGArg v)
- {
--    tcg_ctx.gen_op_buf[op_idx].args[arg] = v;
-+    tcg_ctx->gen_op_buf[op_idx].args[arg] = v;
- }
- 
- /* The number of opcodes emitted so far.  */
- static inline int tcg_op_buf_count(void)
- {
--    return tcg_ctx.gen_next_op_idx;
-+    return tcg_ctx->gen_next_op_idx;
+         ts->state_ptr = ti;
+         ti->next_copy = ts;
+         ti->prev_copy = ts;
+         ti->is_const = false;
+         ti->mask = -1;
+-        set_bit(idx, temps_used.l);
++        set_bit(idx, temps_used->l);
+     }
  }
  
- /* Test for whether to terminate the TB for using too many opcodes.  */
-@@ -795,7 +796,7 @@ TranslationBlock *tcg_tb_alloc(TCGContext *s);
- /* Called with tb_lock held.  */
- static inline void *tcg_malloc(int size)
+-static void init_arg_info(TCGArg arg)
++static void init_arg_info(struct tcg_temp_info *infos,
++                          TCGTempSet *temps_used, TCGArg arg)
  {
--    TCGContext *s = &tcg_ctx;
-+    TCGContext *s = tcg_ctx;
-     uint8_t *ptr, *ptr_end;
- 
-     /* ??? This is a weak placeholder for minimum malloc alignment.  */
-@@ -804,7 +805,7 @@ static inline void *tcg_malloc(int size)
-     ptr = s->pool_cur;
-     ptr_end = ptr + size;
-     if (unlikely(ptr_end > s->pool_end)) {
--        return tcg_malloc_internal(&tcg_ctx, size);
-+        return tcg_malloc_internal(tcg_ctx, size);
-     } else {
-         s->pool_cur = ptr_end;
-         return ptr;
-@@ -1144,7 +1145,7 @@ static inline unsigned get_mmuidx(TCGMemOpIdx oi)
- uintptr_t tcg_qemu_tb_exec(CPUArchState *env, uint8_t *tb_ptr);
- #else
- # define tcg_qemu_tb_exec(env, tb_ptr) \
--    ((uintptr_t (*)(void *, void *))tcg_ctx.code_gen_prologue)(env, tb_ptr)
-+    ((uintptr_t (*)(void *, void *))tcg_ctx->code_gen_prologue)(env, tb_ptr)
- #endif
- 
- void tcg_register_jit(void *buf, size_t buf_size);
-diff --git a/accel/tcg/tcg-runtime.c b/accel/tcg/tcg-runtime.c
-index 25f0cabfed..4172ffda82 100644
---- a/accel/tcg/tcg-runtime.c
-+++ b/accel/tcg/tcg-runtime.c
-@@ -153,7 +153,7 @@ void *HELPER(lookup_tb_ptr)(CPUArchState *env)
- 
-     tb = tb_lookup__cpu_state(cpu, &pc, &cs_base, &flags, curr_cflags());
-     if (tb == NULL) {
--        return tcg_ctx.code_gen_epilogue;
-+        return tcg_ctx->code_gen_epilogue;
-     }
-     qemu_log_mask_and_addr(CPU_LOG_EXEC, pc,
-                            "Chain %p [%d: " TARGET_FMT_lx "] %s\n",
-diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index b238b724a8..7cd9ad5f9c 100644
---- a/accel/tcg/translate-all.c
-+++ b/accel/tcg/translate-all.c
-@@ -153,7 +153,8 @@ static int v_l2_levels;
- static void *l1_map[V_L1_MAX_SIZE];
- 
- /* code generation context */
--TCGContext tcg_ctx;
-+TCGContext tcg_init_ctx;
-+TCGContext *tcg_ctx;
- TBContext tb_ctx;
- bool parallel_cpus;
- 
-@@ -209,7 +210,7 @@ static TranslationBlock *tb_find_pc(uintptr_t tc_ptr);
- 
- void cpu_gen_init(void)
- {
--    tcg_context_init(&tcg_ctx); 
-+    tcg_context_init(&tcg_init_ctx);
+-    init_ts_info(arg_temp(arg));
++    init_ts_info(infos, temps_used, arg_temp(arg));
  }
  
- /* Encode VAL as a signed leb128 sequence at P.
-@@ -267,7 +268,7 @@ static target_long decode_sleb128(uint8_t **pp)
- 
- static int encode_search(TranslationBlock *tb, uint8_t *block)
+ static int op_bits(TCGOpcode op)
+@@ -611,6 +604,8 @@ void tcg_optimize(TCGContext *s)
  {
--    uint8_t *highwater = tcg_ctx.code_gen_highwater;
-+    uint8_t *highwater = tcg_ctx->code_gen_highwater;
-     uint8_t *p = block;
-     int i, j, n;
+     int oi, oi_next, nb_temps, nb_globals;
+     TCGOp *prev_mb = NULL;
++    struct tcg_temp_info *infos;
++    TCGTempSet temps_used;
  
-@@ -278,12 +279,12 @@ static int encode_search(TranslationBlock *tb, uint8_t *block)
-             if (i == 0) {
-                 prev = (j == 0 ? tb->pc : 0);
-             } else {
--                prev = tcg_ctx.gen_insn_data[i - 1][j];
-+                prev = tcg_ctx->gen_insn_data[i - 1][j];
-             }
--            p = encode_sleb128(p, tcg_ctx.gen_insn_data[i][j] - prev);
-+            p = encode_sleb128(p, tcg_ctx->gen_insn_data[i][j] - prev);
-         }
--        prev = (i == 0 ? 0 : tcg_ctx.gen_insn_end_off[i - 1]);
--        p = encode_sleb128(p, tcg_ctx.gen_insn_end_off[i] - prev);
-+        prev = (i == 0 ? 0 : tcg_ctx->gen_insn_end_off[i - 1]);
-+        p = encode_sleb128(p, tcg_ctx->gen_insn_end_off[i] - prev);
+     /* Array VALS has an element for each temp.
+        If this temp holds a constant then its value is kept in VALS' element.
+@@ -619,7 +614,8 @@ void tcg_optimize(TCGContext *s)
  
-         /* Test for (pending) buffer overflow.  The assumption is that any
-            one row beginning below the high water mark cannot overrun
-@@ -343,8 +344,8 @@ static int cpu_restore_state_from_tb(CPUState *cpu, TranslationBlock *tb,
-     restore_state_to_opc(env, tb, data);
+     nb_temps = s->nb_temps;
+     nb_globals = s->nb_globals;
+-    reset_all_temps(nb_temps);
++    bitmap_zero(temps_used.l, nb_temps);
++    infos = tcg_malloc(sizeof(struct tcg_temp_info) * nb_temps);
  
- #ifdef CONFIG_PROFILER
--    tcg_ctx.restore_time += profile_getclock() - ti;
--    tcg_ctx.restore_count++;
-+    tcg_ctx->restore_time += profile_getclock() - ti;
-+    tcg_ctx->restore_count++;
- #endif
-     return 0;
- }
-@@ -590,7 +591,7 @@ static inline void *split_cross_256mb(void *buf1, size_t size1)
-         buf1 = buf2;
-     }
- 
--    tcg_ctx.code_gen_buffer_size = size1;
-+    tcg_ctx->code_gen_buffer_size = size1;
-     return buf1;
- }
- #endif
-@@ -653,16 +654,16 @@ static inline void *alloc_code_gen_buffer(void)
-     size = full_size - qemu_real_host_page_size;
- 
-     /* Honor a command-line option limiting the size of the buffer.  */
--    if (size > tcg_ctx.code_gen_buffer_size) {
--        size = (((uintptr_t)buf + tcg_ctx.code_gen_buffer_size)
-+    if (size > tcg_ctx->code_gen_buffer_size) {
-+        size = (((uintptr_t)buf + tcg_ctx->code_gen_buffer_size)
-                 & qemu_real_host_page_mask) - (uintptr_t)buf;
-     }
--    tcg_ctx.code_gen_buffer_size = size;
-+    tcg_ctx->code_gen_buffer_size = size;
- 
- #ifdef __mips__
-     if (cross_256mb(buf, size)) {
-         buf = split_cross_256mb(buf, size);
--        size = tcg_ctx.code_gen_buffer_size;
-+        size = tcg_ctx->code_gen_buffer_size;
-     }
- #endif
- 
-@@ -675,7 +676,7 @@ static inline void *alloc_code_gen_buffer(void)
- #elif defined(_WIN32)
- static inline void *alloc_code_gen_buffer(void)
- {
--    size_t size = tcg_ctx.code_gen_buffer_size;
-+    size_t size = tcg_ctx->code_gen_buffer_size;
-     void *buf1, *buf2;
- 
-     /* Perform the allocation in two steps, so that the guard page
-@@ -694,7 +695,7 @@ static inline void *alloc_code_gen_buffer(void)
- {
-     int flags = MAP_PRIVATE | MAP_ANONYMOUS;
-     uintptr_t start = 0;
--    size_t size = tcg_ctx.code_gen_buffer_size;
-+    size_t size = tcg_ctx->code_gen_buffer_size;
-     void *buf;
- 
-     /* Constrain the position of the buffer based on the host cpu.
-@@ -711,7 +712,7 @@ static inline void *alloc_code_gen_buffer(void)
-     flags |= MAP_32BIT;
-     /* Cannot expect to map more than 800MB in low memory.  */
-     if (size > 800u * 1024 * 1024) {
--        tcg_ctx.code_gen_buffer_size = size = 800u * 1024 * 1024;
-+        tcg_ctx->code_gen_buffer_size = size = 800u * 1024 * 1024;
-     }
- # elif defined(__sparc__)
-     start = 0x40000000ul;
-@@ -751,7 +752,7 @@ static inline void *alloc_code_gen_buffer(void)
-         default:
-             /* Split the original buffer.  Free the smaller half.  */
-             buf2 = split_cross_256mb(buf, size);
--            size2 = tcg_ctx.code_gen_buffer_size;
-+            size2 = tcg_ctx->code_gen_buffer_size;
-             if (buf == buf2) {
-                 munmap(buf + size2 + qemu_real_host_page_size, size - size2);
-             } else {
-@@ -819,9 +820,9 @@ static gint tb_tc_cmp(gconstpointer ap, gconstpointer bp)
- 
- static inline void code_gen_alloc(size_t tb_size)
- {
--    tcg_ctx.code_gen_buffer_size = size_code_gen_buffer(tb_size);
--    tcg_ctx.code_gen_buffer = alloc_code_gen_buffer();
--    if (tcg_ctx.code_gen_buffer == NULL) {
-+    tcg_ctx->code_gen_buffer_size = size_code_gen_buffer(tb_size);
-+    tcg_ctx->code_gen_buffer = alloc_code_gen_buffer();
-+    if (tcg_ctx->code_gen_buffer == NULL) {
-         fprintf(stderr, "Could not allocate dynamic translator buffer\n");
-         exit(1);
-     }
-@@ -849,7 +850,7 @@ void tcg_exec_init(unsigned long tb_size)
- #if defined(CONFIG_SOFTMMU)
-     /* There's no guest base to take into account, so go ahead and
-        initialize the prologue now.  */
--    tcg_prologue_init(&tcg_ctx);
-+    tcg_prologue_init(tcg_ctx);
- #endif
- }
- 
-@@ -865,7 +866,7 @@ static TranslationBlock *tb_alloc(target_ulong pc)
- 
-     assert_tb_locked();
- 
--    tb = tcg_tb_alloc(&tcg_ctx);
-+    tb = tcg_tb_alloc(tcg_ctx);
-     if (unlikely(tb == NULL)) {
-         return NULL;
-     }
-@@ -949,11 +950,11 @@ static void do_tb_flush(CPUState *cpu, run_on_cpu_data tb_flush_count)
- 
-         g_tree_foreach(tb_ctx.tb_tree, tb_host_size_iter, &host_size);
-         printf("qemu: flush code_size=%td nb_tbs=%zu avg_tb_size=%zu\n",
--               tcg_ctx.code_gen_ptr - tcg_ctx.code_gen_buffer, nb_tbs,
-+               tcg_ctx->code_gen_ptr - tcg_ctx->code_gen_buffer, nb_tbs,
-                nb_tbs > 0 ? host_size / nb_tbs : 0);
-     }
--    if ((unsigned long)(tcg_ctx.code_gen_ptr - tcg_ctx.code_gen_buffer)
--        > tcg_ctx.code_gen_buffer_size) {
-+    if ((unsigned long)(tcg_ctx->code_gen_ptr - tcg_ctx->code_gen_buffer)
-+        > tcg_ctx->code_gen_buffer_size) {
-         cpu_abort(cpu, "Internal error: code buffer overflow\n");
-     }
- 
-@@ -968,7 +969,7 @@ static void do_tb_flush(CPUState *cpu, run_on_cpu_data tb_flush_count)
-     qht_reset_size(&tb_ctx.htable, CODE_GEN_HTABLE_SIZE);
-     page_flush_tb();
- 
--    tcg_ctx.code_gen_ptr = tcg_ctx.code_gen_buffer;
-+    tcg_ctx->code_gen_ptr = tcg_ctx->code_gen_buffer;
-     /* XXX: flush processor icache at this point if cache flush is
-        expensive */
-     atomic_mb_set(&tb_ctx.tb_flush_count, tb_ctx.tb_flush_count + 1);
-@@ -1316,44 +1317,44 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
-         cpu_loop_exit(cpu);
-     }
- 
--    gen_code_buf = tcg_ctx.code_gen_ptr;
-+    gen_code_buf = tcg_ctx->code_gen_ptr;
-     tb->tc.ptr = gen_code_buf;
-     tb->pc = pc;
-     tb->cs_base = cs_base;
-     tb->flags = flags;
-     tb->cflags = cflags;
-     tb->trace_vcpu_dstate = *cpu->trace_dstate;
--    tcg_ctx.tb_cflags = cflags;
-+    tcg_ctx->tb_cflags = cflags;
- 
- #ifdef CONFIG_PROFILER
--    tcg_ctx.tb_count1++; /* includes aborted translations because of
-+    tcg_ctx->tb_count1++; /* includes aborted translations because of
-                        exceptions */
-     ti = profile_getclock();
- #endif
- 
--    tcg_func_start(&tcg_ctx);
-+    tcg_func_start(tcg_ctx);
- 
--    tcg_ctx.cpu = ENV_GET_CPU(env);
-+    tcg_ctx->cpu = ENV_GET_CPU(env);
-     gen_intermediate_code(cpu, tb);
--    tcg_ctx.cpu = NULL;
-+    tcg_ctx->cpu = NULL;
- 
-     trace_translate_block(tb, tb->pc, tb->tc.ptr);
- 
-     /* generate machine code */
-     tb->jmp_reset_offset[0] = TB_JMP_RESET_OFFSET_INVALID;
-     tb->jmp_reset_offset[1] = TB_JMP_RESET_OFFSET_INVALID;
--    tcg_ctx.tb_jmp_reset_offset = tb->jmp_reset_offset;
-+    tcg_ctx->tb_jmp_reset_offset = tb->jmp_reset_offset;
-     if (TCG_TARGET_HAS_direct_jump) {
--        tcg_ctx.tb_jmp_insn_offset = tb->jmp_target_arg;
--        tcg_ctx.tb_jmp_target_addr = NULL;
-+        tcg_ctx->tb_jmp_insn_offset = tb->jmp_target_arg;
-+        tcg_ctx->tb_jmp_target_addr = NULL;
-     } else {
--        tcg_ctx.tb_jmp_insn_offset = NULL;
--        tcg_ctx.tb_jmp_target_addr = tb->jmp_target_arg;
-+        tcg_ctx->tb_jmp_insn_offset = NULL;
-+        tcg_ctx->tb_jmp_target_addr = tb->jmp_target_arg;
-     }
- 
- #ifdef CONFIG_PROFILER
--    tcg_ctx.tb_count++;
--    tcg_ctx.interm_time += profile_getclock() - ti;
-+    tcg_ctx->tb_count++;
-+    tcg_ctx->interm_time += profile_getclock() - ti;
-     ti = profile_getclock();
- #endif
- 
-@@ -1362,7 +1363,7 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
-        the tcg optimization currently hidden inside tcg_gen_code.  All
-        that should be required is to flush the TBs, allocate a new TB,
-        re-initialize it per above, and re-do the actual code generation.  */
--    gen_code_size = tcg_gen_code(&tcg_ctx, tb);
-+    gen_code_size = tcg_gen_code(tcg_ctx, tb);
-     if (unlikely(gen_code_size < 0)) {
-         goto buffer_overflow;
-     }
-@@ -1373,10 +1374,10 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
-     tb->tc.size = gen_code_size;
- 
- #ifdef CONFIG_PROFILER
--    tcg_ctx.code_time += profile_getclock() - ti;
--    tcg_ctx.code_in_len += tb->size;
--    tcg_ctx.code_out_len += gen_code_size;
--    tcg_ctx.search_out_len += search_size;
-+    tcg_ctx->code_time += profile_getclock() - ti;
-+    tcg_ctx->code_in_len += tb->size;
-+    tcg_ctx->code_out_len += gen_code_size;
-+    tcg_ctx->search_out_len += search_size;
- #endif
- 
- #ifdef DEBUG_DISAS
-@@ -1384,8 +1385,8 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
-         qemu_log_in_addr_range(tb->pc)) {
-         qemu_log_lock();
-         qemu_log("OUT: [size=%d]\n", gen_code_size);
--        if (tcg_ctx.data_gen_ptr) {
--            size_t code_size = tcg_ctx.data_gen_ptr - tb->tc.ptr;
-+        if (tcg_ctx->data_gen_ptr) {
-+            size_t code_size = tcg_ctx->data_gen_ptr - tb->tc.ptr;
-             size_t data_size = gen_code_size - code_size;
-             size_t i;
- 
-@@ -1394,12 +1395,12 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
-             for (i = 0; i < data_size; i += sizeof(tcg_target_ulong)) {
-                 if (sizeof(tcg_target_ulong) == 8) {
-                     qemu_log("0x%08" PRIxPTR ":  .quad  0x%016" PRIx64 "\n",
--                             (uintptr_t)tcg_ctx.data_gen_ptr + i,
--                             *(uint64_t *)(tcg_ctx.data_gen_ptr + i));
-+                             (uintptr_t)tcg_ctx->data_gen_ptr + i,
-+                             *(uint64_t *)(tcg_ctx->data_gen_ptr + i));
-                 } else {
-                     qemu_log("0x%08" PRIxPTR ":  .long  0x%08x\n",
--                             (uintptr_t)tcg_ctx.data_gen_ptr + i,
--                             *(uint32_t *)(tcg_ctx.data_gen_ptr + i));
-+                             (uintptr_t)tcg_ctx->data_gen_ptr + i,
-+                             *(uint32_t *)(tcg_ctx->data_gen_ptr + i));
+     for (oi = s->gen_op_buf[0].next; oi != 0; oi = oi_next) {
+         tcg_target_ulong mask, partmask, affected;
+@@ -640,14 +636,14 @@ void tcg_optimize(TCGContext *s)
+             for (i = 0; i < nb_oargs + nb_iargs; i++) {
+                 TCGTemp *ts = arg_temp(op->args[i]);
+                 if (ts) {
+-                    init_ts_info(ts);
++                    init_ts_info(infos, &temps_used, ts);
                  }
              }
          } else {
-@@ -1411,7 +1412,7 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
-     }
- #endif
- 
--    tcg_ctx.code_gen_ptr = (void *)
-+    tcg_ctx->code_gen_ptr = (void *)
-         ROUND_UP((uintptr_t)gen_code_buf + gen_code_size + search_size,
-                  CODE_GEN_ALIGN);
- 
-@@ -1940,8 +1941,8 @@ void dump_exec_info(FILE *f, fprintf_function cpu_fprintf)
-      * For avg host size we use the precise numbers from tb_tree_stats though.
-      */
-     cpu_fprintf(f, "gen code size       %td/%zd\n",
--                tcg_ctx.code_gen_ptr - tcg_ctx.code_gen_buffer,
--                tcg_ctx.code_gen_highwater - tcg_ctx.code_gen_buffer);
-+                tcg_ctx->code_gen_ptr - tcg_ctx->code_gen_buffer,
-+                tcg_ctx->code_gen_highwater - tcg_ctx->code_gen_buffer);
-     cpu_fprintf(f, "TB count            %zu\n", nb_tbs);
-     cpu_fprintf(f, "TB avg target size  %zu max=%zu bytes\n",
-                 nb_tbs ? tst.target_size / nb_tbs : 0,
-diff --git a/bsd-user/main.c b/bsd-user/main.c
-index 836daac15c..392c0ed5fb 100644
---- a/bsd-user/main.c
-+++ b/bsd-user/main.c
-@@ -977,7 +977,7 @@ int main(int argc, char **argv)
-     /* Now that we've loaded the binary, GUEST_BASE is fixed.  Delay
-        generating the prologue until now so that the prologue can take
-        the real value of GUEST_BASE into account.  */
--    tcg_prologue_init(&tcg_ctx);
-+    tcg_prologue_init(tcg_ctx);
- 
-     /* build Task State */
-     memset(ts, 0, sizeof(TaskState));
-diff --git a/linux-user/main.c b/linux-user/main.c
-index 0a2a0d75b3..8814906409 100644
---- a/linux-user/main.c
-+++ b/linux-user/main.c
-@@ -4476,7 +4476,7 @@ int main(int argc, char **argv, char **envp)
-     /* Now that we've loaded the binary, GUEST_BASE is fixed.  Delay
-        generating the prologue until now so that the prologue can take
-        the real value of GUEST_BASE into account.  */
--    tcg_prologue_init(&tcg_ctx);
-+    tcg_prologue_init(tcg_ctx);
- 
- #if defined(TARGET_I386)
-     env->cr[0] = CR0_PG_MASK | CR0_WP_MASK | CR0_PE_MASK;
-diff --git a/target/alpha/translate.c b/target/alpha/translate.c
-index 53b8c036e2..f6247bf38d 100644
---- a/target/alpha/translate.c
-+++ b/target/alpha/translate.c
-@@ -127,7 +127,7 @@ void alpha_translate_init(void)
-     int i;
- 
-     cpu_env = tcg_global_reg_new_ptr(TCG_AREG0, "env");
--    tcg_ctx.tcg_env = cpu_env;
-+    tcg_ctx->tcg_env = cpu_env;
- 
-     for (i = 0; i < 31; i++) {
-         cpu_std_ir[i] = tcg_global_mem_new_i64(cpu_env,
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 397cc7afea..7873c03ae8 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -82,7 +82,7 @@ void arm_translate_init(void)
-     int i;
- 
-     cpu_env = tcg_global_reg_new_ptr(TCG_AREG0, "env");
--    tcg_ctx.tcg_env = cpu_env;
-+    tcg_ctx->tcg_env = cpu_env;
- 
-     for (i = 0; i < 16; i++) {
-         cpu_R[i] = tcg_global_mem_new_i32(cpu_env,
-diff --git a/target/cris/translate.c b/target/cris/translate.c
-index 6774acc7af..6687b838d5 100644
---- a/target/cris/translate.c
-+++ b/target/cris/translate.c
-@@ -3369,7 +3369,7 @@ void cris_initialize_tcg(void)
-     int i;
- 
-     cpu_env = tcg_global_reg_new_ptr(TCG_AREG0, "env");
--    tcg_ctx.tcg_env = cpu_env;
-+    tcg_ctx->tcg_env = cpu_env;
-     cc_x = tcg_global_mem_new(cpu_env,
-                               offsetof(CPUCRISState, cc_x), "cc_x");
-     cc_src = tcg_global_mem_new(cpu_env,
-diff --git a/target/cris/translate_v10.c b/target/cris/translate_v10.c
-index 4a0b485d8e..5d489203f4 100644
---- a/target/cris/translate_v10.c
-+++ b/target/cris/translate_v10.c
-@@ -1273,7 +1273,7 @@ void cris_initialize_crisv10_tcg(void)
-     int i;
- 
-     cpu_env = tcg_global_reg_new_ptr(TCG_AREG0, "env");
--    tcg_ctx.tcg_env = cpu_env;
-+    tcg_ctx->tcg_env = cpu_env;
-     cc_x = tcg_global_mem_new(cpu_env,
-                               offsetof(CPUCRISState, cc_x), "cc_x");
-     cc_src = tcg_global_mem_new(cpu_env,
-diff --git a/target/hppa/translate.c b/target/hppa/translate.c
-index 08b2c73291..9059812d4e 100644
---- a/target/hppa/translate.c
-+++ b/target/hppa/translate.c
-@@ -127,7 +127,7 @@ void hppa_translate_init(void)
-     int i;
- 
-     cpu_env = tcg_global_reg_new_ptr(TCG_AREG0, "env");
--    tcg_ctx.tcg_env = cpu_env;
-+    tcg_ctx->tcg_env = cpu_env;
- 
-     TCGV_UNUSED(cpu_gr[0]);
-     for (i = 1; i < 32; i++) {
-diff --git a/target/i386/translate.c b/target/i386/translate.c
-index 70ba0b2d5a..649004393d 100644
---- a/target/i386/translate.c
-+++ b/target/i386/translate.c
-@@ -8368,7 +8368,7 @@ void tcg_x86_init(void)
-     int i;
- 
-     cpu_env = tcg_global_reg_new_ptr(TCG_AREG0, "env");
--    tcg_ctx.tcg_env = cpu_env;
-+    tcg_ctx->tcg_env = cpu_env;
-     cpu_cc_op = tcg_global_mem_new_i32(cpu_env,
-                                        offsetof(CPUX86State, cc_op), "cc_op");
-     cpu_cc_dst = tcg_global_mem_new(cpu_env, offsetof(CPUX86State, cc_dst),
-diff --git a/target/lm32/translate.c b/target/lm32/translate.c
-index d4a2e00165..6707967a2c 100644
---- a/target/lm32/translate.c
-+++ b/target/lm32/translate.c
-@@ -1209,7 +1209,7 @@ void lm32_translate_init(void)
-     int i;
- 
-     cpu_env = tcg_global_reg_new_ptr(TCG_AREG0, "env");
--    tcg_ctx.tcg_env = cpu_env;
-+    tcg_ctx->tcg_env = cpu_env;
- 
-     for (i = 0; i < ARRAY_SIZE(cpu_R); i++) {
-         cpu_R[i] = tcg_global_mem_new(cpu_env,
-diff --git a/target/m68k/translate.c b/target/m68k/translate.c
-index d751faed7c..f6e902f2b6 100644
---- a/target/m68k/translate.c
-+++ b/target/m68k/translate.c
-@@ -70,7 +70,7 @@ void m68k_tcg_init(void)
-     int i;
- 
-     cpu_env = tcg_global_reg_new_ptr(TCG_AREG0, "env");
--    tcg_ctx.tcg_env = cpu_env;
-+    tcg_ctx->tcg_env = cpu_env;
- 
- #define DEFO32(name, offset) \
-     QREG_##name = tcg_global_mem_new_i32(cpu_env, \
-diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
-index c70a2d6644..22f8d6230b 100644
---- a/target/microblaze/translate.c
-+++ b/target/microblaze/translate.c
-@@ -1856,7 +1856,7 @@ void mb_tcg_init(void)
-     int i;
- 
-     cpu_env = tcg_global_reg_new_ptr(TCG_AREG0, "env");
--    tcg_ctx.tcg_env = cpu_env;
-+    tcg_ctx->tcg_env = cpu_env;
- 
-     env_debug = tcg_global_mem_new(cpu_env,
-                     offsetof(CPUMBState, debug),
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index aadffbec39..7dfa94ab26 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -20455,7 +20455,7 @@ void mips_tcg_init(void)
-     int i;
- 
-     cpu_env = tcg_global_reg_new_ptr(TCG_AREG0, "env");
--    tcg_ctx.tcg_env = cpu_env;
-+    tcg_ctx->tcg_env = cpu_env;
- 
-     TCGV_UNUSED(cpu_gpr[0]);
-     for (i = 1; i < 32; i++)
-diff --git a/target/moxie/translate.c b/target/moxie/translate.c
-index 3f1e609028..59c70b5cef 100644
---- a/target/moxie/translate.c
-+++ b/target/moxie/translate.c
-@@ -102,7 +102,7 @@ void moxie_translate_init(void)
-     };
- 
-     cpu_env = tcg_global_reg_new_ptr(TCG_AREG0, "env");
--    tcg_ctx.tcg_env = cpu_env;
-+    tcg_ctx->tcg_env = cpu_env;
-     cpu_pc = tcg_global_mem_new_i32(cpu_env,
-                                     offsetof(CPUMoxieState, pc), "$pc");
-     for (i = 0; i < 16; i++)
-diff --git a/target/nios2/translate.c b/target/nios2/translate.c
-index d33e365892..b91fd206fb 100644
---- a/target/nios2/translate.c
-+++ b/target/nios2/translate.c
-@@ -948,7 +948,7 @@ void nios2_tcg_init(void)
-     int i;
- 
-     cpu_env = tcg_global_reg_new_ptr(TCG_AREG0, "env");
--    tcg_ctx.tcg_env = cpu_env;
-+    tcg_ctx->tcg_env = cpu_env;
- 
-     for (i = 0; i < NUM_CORE_REGS; i++) {
-         cpu_R[i] = tcg_global_mem_new(cpu_env,
-diff --git a/target/openrisc/translate.c b/target/openrisc/translate.c
-index 666d050650..b031f2db97 100644
---- a/target/openrisc/translate.c
-+++ b/target/openrisc/translate.c
-@@ -81,7 +81,7 @@ void openrisc_translate_init(void)
-     int i;
- 
-     cpu_env = tcg_global_reg_new_ptr(TCG_AREG0, "env");
--    tcg_ctx.tcg_env = cpu_env;
-+    tcg_ctx->tcg_env = cpu_env;
-     cpu_sr = tcg_global_mem_new(cpu_env,
-                                 offsetof(CPUOpenRISCState, sr), "sr");
-     cpu_dflag = tcg_global_mem_new_i32(cpu_env,
-diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-index ac5b8ea9a5..0ad84a75e4 100644
---- a/target/ppc/translate.c
-+++ b/target/ppc/translate.c
-@@ -86,7 +86,7 @@ void ppc_translate_init(void)
-     size_t cpu_reg_names_size;
- 
-     cpu_env = tcg_global_reg_new_ptr(TCG_AREG0, "env");
--    tcg_ctx.tcg_env = cpu_env;
-+    tcg_ctx->tcg_env = cpu_env;
- 
-     p = cpu_reg_names;
-     cpu_reg_names_size = sizeof(cpu_reg_names);
-diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index 241b708502..2bf6f48089 100644
---- a/target/s390x/translate.c
-+++ b/target/s390x/translate.c
-@@ -113,7 +113,7 @@ void s390x_translate_init(void)
-     int i;
- 
-     cpu_env = tcg_global_reg_new_ptr(TCG_AREG0, "env");
--    tcg_ctx.tcg_env = cpu_env;
-+    tcg_ctx->tcg_env = cpu_env;
-     psw_addr = tcg_global_mem_new_i64(cpu_env,
-                                       offsetof(CPUS390XState, psw.addr),
-                                       "psw_addr");
-diff --git a/target/sh4/translate.c b/target/sh4/translate.c
-index f918bae978..c13be851ba 100644
---- a/target/sh4/translate.c
-+++ b/target/sh4/translate.c
-@@ -100,7 +100,7 @@ void sh4_translate_init(void)
-     };
- 
-     cpu_env = tcg_global_reg_new_ptr(TCG_AREG0, "env");
--    tcg_ctx.tcg_env = cpu_env;
-+    tcg_ctx->tcg_env = cpu_env;
- 
-     for (i = 0; i < 24; i++) {
-         cpu_gregs[i] = tcg_global_mem_new_i32(cpu_env,
-diff --git a/target/sparc/translate.c b/target/sparc/translate.c
-index 9dc41869a4..afef77976b 100644
---- a/target/sparc/translate.c
-+++ b/target/sparc/translate.c
-@@ -5912,7 +5912,7 @@ void sparc_tcg_init(void)
-     unsigned int i;
- 
-     cpu_env = tcg_global_reg_new_ptr(TCG_AREG0, "env");
--    tcg_ctx.tcg_env = cpu_env;
-+    tcg_ctx->tcg_env = cpu_env;
- 
-     cpu_regwptr = tcg_global_mem_new_ptr(cpu_env,
-                                          offsetof(CPUSPARCState, regwptr),
-diff --git a/target/tilegx/translate.c b/target/tilegx/translate.c
-index 5cd84f6b25..a744c38bb7 100644
---- a/target/tilegx/translate.c
-+++ b/target/tilegx/translate.c
-@@ -2446,7 +2446,7 @@ void tilegx_tcg_init(void)
-     int i;
- 
-     cpu_env = tcg_global_reg_new_ptr(TCG_AREG0, "env");
--    tcg_ctx.tcg_env = cpu_env;
-+    tcg_ctx->tcg_env = cpu_env;
-     cpu_pc = tcg_global_mem_new_i64(cpu_env, offsetof(CPUTLGState, pc), "pc");
-     for (i = 0; i < TILEGX_R_COUNT; i++) {
-         cpu_regs[i] = tcg_global_mem_new_i64(cpu_env,
-diff --git a/target/tricore/translate.c b/target/tricore/translate.c
-index 042c0e69bc..590cbbee8b 100644
---- a/target/tricore/translate.c
-+++ b/target/tricore/translate.c
-@@ -8882,7 +8882,7 @@ void tricore_tcg_init(void)
-     int i;
- 
-     cpu_env = tcg_global_reg_new_ptr(TCG_AREG0, "env");
--    tcg_ctx.tcg_env = cpu_env;
-+    tcg_ctx->tcg_env = cpu_env;
-     /* reg init */
-     for (i = 0 ; i < 16 ; i++) {
-         cpu_gpr_a[i] = tcg_global_mem_new(cpu_env,
-diff --git a/target/unicore32/translate.c b/target/unicore32/translate.c
-index d717de0335..070653e2d1 100644
---- a/target/unicore32/translate.c
-+++ b/target/unicore32/translate.c
-@@ -75,7 +75,7 @@ void uc32_translate_init(void)
-     int i;
- 
-     cpu_env = tcg_global_reg_new_ptr(TCG_AREG0, "env");
--    tcg_ctx.tcg_env = cpu_env;
-+    tcg_ctx->tcg_env = cpu_env;
- 
-     for (i = 0; i < 32; i++) {
-         cpu_R[i] = tcg_global_mem_new_i32(cpu_env,
-diff --git a/target/xtensa/translate.c b/target/xtensa/translate.c
-index f62319eddd..ab96b77d88 100644
---- a/target/xtensa/translate.c
-+++ b/target/xtensa/translate.c
-@@ -222,7 +222,7 @@ void xtensa_translate_init(void)
-     int i;
- 
-     cpu_env = tcg_global_reg_new_ptr(TCG_AREG0, "env");
--    tcg_ctx.tcg_env = cpu_env;
-+    tcg_ctx->tcg_env = cpu_env;
-     cpu_pc = tcg_global_mem_new_i32(cpu_env,
-             offsetof(CPUXtensaState, pc), "pc");
- 
-diff --git a/tcg/tcg-op.c b/tcg/tcg-op.c
-index 8c7668de60..ba603281d3 100644
---- a/tcg/tcg-op.c
-+++ b/tcg/tcg-op.c
-@@ -48,7 +48,7 @@ extern TCGv_i32 TCGV_HIGH_link_error(TCGv_i64);
- 
- static inline TCGOp *tcg_emit_op(TCGOpcode opc)
- {
--    TCGContext *ctx = &tcg_ctx;
-+    TCGContext *ctx = tcg_ctx;
-     int oi = ctx->gen_next_op_idx;
-     int ni = oi + 1;
-     int pi = oi - 1;
-@@ -121,7 +121,7 @@ void tcg_gen_op6(TCGOpcode opc, TCGArg a1, TCGArg a2, TCGArg a3,
- 
- void tcg_gen_mb(TCGBar mb_type)
- {
--    if (tcg_ctx.tb_cflags & CF_PARALLEL) {
-+    if (tcg_ctx->tb_cflags & CF_PARALLEL) {
-         tcg_gen_op1(INDEX_op_mb, mb_type);
-     }
- }
-@@ -2552,8 +2552,8 @@ void tcg_gen_goto_tb(unsigned idx)
-     tcg_debug_assert(idx <= 1);
- #ifdef CONFIG_DEBUG_TCG
-     /* Verify that we havn't seen this numbered exit before.  */
--    tcg_debug_assert((tcg_ctx.goto_tb_issue_mask & (1 << idx)) == 0);
--    tcg_ctx.goto_tb_issue_mask |= 1 << idx;
-+    tcg_debug_assert((tcg_ctx->goto_tb_issue_mask & (1 << idx)) == 0);
-+    tcg_ctx->goto_tb_issue_mask |= 1 << idx;
- #endif
-     tcg_gen_op1i(INDEX_op_goto_tb, idx);
- }
-@@ -2562,7 +2562,7 @@ void tcg_gen_lookup_and_goto_ptr(void)
- {
-     if (TCG_TARGET_HAS_goto_ptr && !qemu_loglevel_mask(CPU_LOG_TB_NOCHAIN)) {
-         TCGv_ptr ptr = tcg_temp_new_ptr();
--        gen_helper_lookup_tb_ptr(ptr, tcg_ctx.tcg_env);
-+        gen_helper_lookup_tb_ptr(ptr, tcg_ctx->tcg_env);
-         tcg_gen_op1i(INDEX_op_goto_ptr, tcgv_ptr_arg(ptr));
-         tcg_temp_free_ptr(ptr);
-     } else {
-@@ -2648,7 +2648,7 @@ void tcg_gen_qemu_ld_i32(TCGv_i32 val, TCGv addr, TCGArg idx, TCGMemOp memop)
- {
-     tcg_gen_req_mo(TCG_MO_LD_LD | TCG_MO_ST_LD);
-     memop = tcg_canonicalize_memop(memop, 0, 0);
--    trace_guest_mem_before_tcg(tcg_ctx.cpu, tcg_ctx.tcg_env,
-+    trace_guest_mem_before_tcg(tcg_ctx->cpu, tcg_ctx->tcg_env,
-                                addr, trace_mem_get_info(memop, 0));
-     gen_ldst_i32(INDEX_op_qemu_ld_i32, val, addr, memop, idx);
- }
-@@ -2657,7 +2657,7 @@ void tcg_gen_qemu_st_i32(TCGv_i32 val, TCGv addr, TCGArg idx, TCGMemOp memop)
- {
-     tcg_gen_req_mo(TCG_MO_LD_ST | TCG_MO_ST_ST);
-     memop = tcg_canonicalize_memop(memop, 0, 1);
--    trace_guest_mem_before_tcg(tcg_ctx.cpu, tcg_ctx.tcg_env,
-+    trace_guest_mem_before_tcg(tcg_ctx->cpu, tcg_ctx->tcg_env,
-                                addr, trace_mem_get_info(memop, 1));
-     gen_ldst_i32(INDEX_op_qemu_st_i32, val, addr, memop, idx);
- }
-@@ -2676,7 +2676,7 @@ void tcg_gen_qemu_ld_i64(TCGv_i64 val, TCGv addr, TCGArg idx, TCGMemOp memop)
-     }
- 
-     memop = tcg_canonicalize_memop(memop, 1, 0);
--    trace_guest_mem_before_tcg(tcg_ctx.cpu, tcg_ctx.tcg_env,
-+    trace_guest_mem_before_tcg(tcg_ctx->cpu, tcg_ctx->tcg_env,
-                                addr, trace_mem_get_info(memop, 0));
-     gen_ldst_i64(INDEX_op_qemu_ld_i64, val, addr, memop, idx);
- }
-@@ -2690,7 +2690,7 @@ void tcg_gen_qemu_st_i64(TCGv_i64 val, TCGv addr, TCGArg idx, TCGMemOp memop)
-     }
- 
-     memop = tcg_canonicalize_memop(memop, 1, 1);
--    trace_guest_mem_before_tcg(tcg_ctx.cpu, tcg_ctx.tcg_env,
-+    trace_guest_mem_before_tcg(tcg_ctx->cpu, tcg_ctx->tcg_env,
-                                addr, trace_mem_get_info(memop, 1));
-     gen_ldst_i64(INDEX_op_qemu_st_i64, val, addr, memop, idx);
- }
-@@ -2780,7 +2780,7 @@ void tcg_gen_atomic_cmpxchg_i32(TCGv_i32 retv, TCGv addr, TCGv_i32 cmpv,
- {
-     memop = tcg_canonicalize_memop(memop, 0, 0);
- 
--    if (!(tcg_ctx.tb_cflags & CF_PARALLEL)) {
-+    if (!(tcg_ctx->tb_cflags & CF_PARALLEL)) {
-         TCGv_i32 t1 = tcg_temp_new_i32();
-         TCGv_i32 t2 = tcg_temp_new_i32();
- 
-@@ -2806,11 +2806,11 @@ void tcg_gen_atomic_cmpxchg_i32(TCGv_i32 retv, TCGv addr, TCGv_i32 cmpv,
- #ifdef CONFIG_SOFTMMU
-         {
-             TCGv_i32 oi = tcg_const_i32(make_memop_idx(memop & ~MO_SIGN, idx));
--            gen(retv, tcg_ctx.tcg_env, addr, cmpv, newv, oi);
-+            gen(retv, tcg_ctx->tcg_env, addr, cmpv, newv, oi);
-             tcg_temp_free_i32(oi);
+             nb_oargs = def->nb_oargs;
+             nb_iargs = def->nb_iargs;
+             for (i = 0; i < nb_oargs + nb_iargs; i++) {
+-                init_arg_info(op->args[i]);
++                init_arg_info(infos, &temps_used, op->args[i]);
+             }
          }
- #else
--        gen(retv, tcg_ctx.tcg_env, addr, cmpv, newv);
-+        gen(retv, tcg_ctx->tcg_env, addr, cmpv, newv);
- #endif
  
-         if (memop & MO_SIGN) {
-@@ -2824,7 +2824,7 @@ void tcg_gen_atomic_cmpxchg_i64(TCGv_i64 retv, TCGv addr, TCGv_i64 cmpv,
- {
-     memop = tcg_canonicalize_memop(memop, 1, 0);
- 
--    if (!(tcg_ctx.tb_cflags & CF_PARALLEL)) {
-+    if (!(tcg_ctx->tb_cflags & CF_PARALLEL)) {
-         TCGv_i64 t1 = tcg_temp_new_i64();
-         TCGv_i64 t2 = tcg_temp_new_i64();
- 
-@@ -2851,14 +2851,14 @@ void tcg_gen_atomic_cmpxchg_i64(TCGv_i64 retv, TCGv addr, TCGv_i64 cmpv,
- #ifdef CONFIG_SOFTMMU
-         {
-             TCGv_i32 oi = tcg_const_i32(make_memop_idx(memop, idx));
--            gen(retv, tcg_ctx.tcg_env, addr, cmpv, newv, oi);
-+            gen(retv, tcg_ctx->tcg_env, addr, cmpv, newv, oi);
-             tcg_temp_free_i32(oi);
-         }
- #else
--        gen(retv, tcg_ctx.tcg_env, addr, cmpv, newv);
-+        gen(retv, tcg_ctx->tcg_env, addr, cmpv, newv);
- #endif
- #else
--        gen_helper_exit_atomic(tcg_ctx.tcg_env);
-+        gen_helper_exit_atomic(tcg_ctx->tcg_env);
-         /* Produce a result, so that we have a well-formed opcode stream
-            with respect to uses of the result in the (dead) code following.  */
-         tcg_gen_movi_i64(retv, 0);
-@@ -2914,11 +2914,11 @@ static void do_atomic_op_i32(TCGv_i32 ret, TCGv addr, TCGv_i32 val,
- #ifdef CONFIG_SOFTMMU
-     {
-         TCGv_i32 oi = tcg_const_i32(make_memop_idx(memop & ~MO_SIGN, idx));
--        gen(ret, tcg_ctx.tcg_env, addr, val, oi);
-+        gen(ret, tcg_ctx->tcg_env, addr, val, oi);
-         tcg_temp_free_i32(oi);
-     }
- #else
--    gen(ret, tcg_ctx.tcg_env, addr, val);
-+    gen(ret, tcg_ctx->tcg_env, addr, val);
- #endif
- 
-     if (memop & MO_SIGN) {
-@@ -2959,14 +2959,14 @@ static void do_atomic_op_i64(TCGv_i64 ret, TCGv addr, TCGv_i64 val,
- #ifdef CONFIG_SOFTMMU
-         {
-             TCGv_i32 oi = tcg_const_i32(make_memop_idx(memop & ~MO_SIGN, idx));
--            gen(ret, tcg_ctx.tcg_env, addr, val, oi);
-+            gen(ret, tcg_ctx->tcg_env, addr, val, oi);
-             tcg_temp_free_i32(oi);
-         }
- #else
--        gen(ret, tcg_ctx.tcg_env, addr, val);
-+        gen(ret, tcg_ctx->tcg_env, addr, val);
- #endif
- #else
--        gen_helper_exit_atomic(tcg_ctx.tcg_env);
-+        gen_helper_exit_atomic(tcg_ctx->tcg_env);
-         /* Produce a result, so that we have a well-formed opcode stream
-            with respect to uses of the result in the (dead) code following.  */
-         tcg_gen_movi_i64(ret, 0);
-@@ -3001,7 +3001,7 @@ static void * const table_##NAME[16] = {                                \
- void tcg_gen_atomic_##NAME##_i32                                        \
-     (TCGv_i32 ret, TCGv addr, TCGv_i32 val, TCGArg idx, TCGMemOp memop) \
- {                                                                       \
--    if (tcg_ctx.tb_cflags & CF_PARALLEL) {                              \
-+    if (tcg_ctx->tb_cflags & CF_PARALLEL) {                             \
-         do_atomic_op_i32(ret, addr, val, idx, memop, table_##NAME);     \
-     } else {                                                            \
-         do_nonatomic_op_i32(ret, addr, val, idx, memop, NEW,            \
-@@ -3011,7 +3011,7 @@ void tcg_gen_atomic_##NAME##_i32                                        \
- void tcg_gen_atomic_##NAME##_i64                                        \
-     (TCGv_i64 ret, TCGv addr, TCGv_i64 val, TCGArg idx, TCGMemOp memop) \
- {                                                                       \
--    if (tcg_ctx.tb_cflags & CF_PARALLEL) {                              \
-+    if (tcg_ctx->tb_cflags & CF_PARALLEL) {                             \
-         do_atomic_op_i64(ret, addr, val, idx, memop, table_##NAME);     \
-     } else {                                                            \
-         do_nonatomic_op_i64(ret, addr, val, idx, memop, NEW,            \
-diff --git a/tcg/tcg.c b/tcg/tcg.c
-index 3a73912827..62f418ac8a 100644
---- a/tcg/tcg.c
-+++ b/tcg/tcg.c
-@@ -243,7 +243,7 @@ static void tcg_out_label(TCGContext *s, TCGLabel *l, tcg_insn_unit *ptr)
- 
- TCGLabel *gen_new_label(void)
- {
--    TCGContext *s = &tcg_ctx;
-+    TCGContext *s = tcg_ctx;
-     TCGLabel *l = tcg_malloc(sizeof(TCGLabel));
- 
-     *l = (TCGLabel){
-@@ -382,6 +382,8 @@ void tcg_context_init(TCGContext *s)
-     for (; i < ARRAY_SIZE(tcg_target_reg_alloc_order); ++i) {
-         indirect_reg_alloc_order[i] = tcg_target_reg_alloc_order[i];
-     }
-+
-+    tcg_ctx = s;
- }
- 
- /*
-@@ -522,7 +524,7 @@ void tcg_set_frame(TCGContext *s, TCGReg reg, intptr_t start, intptr_t size)
- 
- TCGv_i32 tcg_global_reg_new_i32(TCGReg reg, const char *name)
- {
--    TCGContext *s = &tcg_ctx;
-+    TCGContext *s = tcg_ctx;
-     TCGTemp *t;
- 
-     if (tcg_regset_test_reg(s->reserved_regs, reg)) {
-@@ -534,7 +536,7 @@ TCGv_i32 tcg_global_reg_new_i32(TCGReg reg, const char *name)
- 
- TCGv_i64 tcg_global_reg_new_i64(TCGReg reg, const char *name)
- {
--    TCGContext *s = &tcg_ctx;
-+    TCGContext *s = tcg_ctx;
-     TCGTemp *t;
- 
-     if (tcg_regset_test_reg(s->reserved_regs, reg)) {
-@@ -547,7 +549,7 @@ TCGv_i64 tcg_global_reg_new_i64(TCGReg reg, const char *name)
- TCGTemp *tcg_global_mem_new_internal(TCGType type, TCGv_ptr base,
-                                      intptr_t offset, const char *name)
- {
--    TCGContext *s = &tcg_ctx;
-+    TCGContext *s = tcg_ctx;
-     TCGTemp *base_ts = tcgv_ptr_temp(base);
-     TCGTemp *ts = tcg_global_alloc(s);
-     int indirect_reg = 0, bigendian = 0;
-@@ -602,7 +604,7 @@ TCGTemp *tcg_global_mem_new_internal(TCGType type, TCGv_ptr base,
- 
- static TCGTemp *tcg_temp_new_internal(TCGType type, int temp_local)
- {
--    TCGContext *s = &tcg_ctx;
-+    TCGContext *s = tcg_ctx;
-     TCGTemp *ts;
-     int idx, k;
- 
-@@ -659,7 +661,7 @@ TCGv_i64 tcg_temp_new_internal_i64(int temp_local)
- 
- static void tcg_temp_free_internal(TCGTemp *ts)
- {
--    TCGContext *s = &tcg_ctx;
-+    TCGContext *s = tcg_ctx;
-     int k, idx;
- 
- #if defined(CONFIG_DEBUG_TCG)
-@@ -723,13 +725,13 @@ TCGv_i64 tcg_const_local_i64(int64_t val)
- #if defined(CONFIG_DEBUG_TCG)
- void tcg_clear_temp_count(void)
- {
--    TCGContext *s = &tcg_ctx;
-+    TCGContext *s = tcg_ctx;
-     s->temps_in_use = 0;
- }
- 
- int tcg_check_temp_count(void)
- {
--    TCGContext *s = &tcg_ctx;
-+    TCGContext *s = tcg_ctx;
-     if (s->temps_in_use) {
-         /* Clear the count so that we don't give another
-          * warning immediately next time around.
-@@ -969,7 +971,7 @@ bool tcg_op_supported(TCGOpcode op)
-    and endian swap in tcg_reg_alloc_call(). */
- void tcg_gen_callN(void *func, TCGTemp *ret, int nargs, TCGTemp **args)
- {
--    TCGContext *s = &tcg_ctx;
-+    TCGContext *s = tcg_ctx;
-     int i, real_args, nb_rets, pi;
-     unsigned sizemask, flags;
-     TCGHelperInfo *info;
-@@ -2908,7 +2910,7 @@ int tcg_gen_code(TCGContext *s, TranslationBlock *tb)
- #ifdef CONFIG_PROFILER
- void tcg_dump_info(FILE *f, fprintf_function cpu_fprintf)
- {
--    TCGContext *s = &tcg_ctx;
-+    TCGContext *s = tcg_ctx;
-     int64_t tb_count = s->tb_count;
-     int64_t tb_div_count = tb_count ? tb_count : 1;
-     int64_t tot = s->interm_time + s->code_time;
+@@ -1208,7 +1204,7 @@ void tcg_optimize(TCGContext *s)
+                                            op->args[1], op->args[2]);
+             if (tmp != 2) {
+                 if (tmp) {
+-                    reset_all_temps(nb_temps);
++                    bitmap_zero(temps_used.l, nb_temps);
+                     op->opc = INDEX_op_br;
+                     op->args[0] = op->args[3];
+                 } else {
+@@ -1297,7 +1293,7 @@ void tcg_optimize(TCGContext *s)
+             if (tmp != 2) {
+                 if (tmp) {
+             do_brcond_true:
+-                    reset_all_temps(nb_temps);
++                    bitmap_zero(temps_used.l, nb_temps);
+                     op->opc = INDEX_op_br;
+                     op->args[0] = op->args[5];
+                 } else {
+@@ -1313,7 +1309,7 @@ void tcg_optimize(TCGContext *s)
+                 /* Simplify LT/GE comparisons vs zero to a single compare
+                    vs the high word of the input.  */
+             do_brcond_high:
+-                reset_all_temps(nb_temps);
++                bitmap_zero(temps_used.l, nb_temps);
+                 op->opc = INDEX_op_brcond_i32;
+                 op->args[0] = op->args[1];
+                 op->args[1] = op->args[3];
+@@ -1339,7 +1335,7 @@ void tcg_optimize(TCGContext *s)
+                     goto do_default;
+                 }
+             do_brcond_low:
+-                reset_all_temps(nb_temps);
++                bitmap_zero(temps_used.l, nb_temps);
+                 op->opc = INDEX_op_brcond_i32;
+                 op->args[1] = op->args[2];
+                 op->args[2] = op->args[4];
+@@ -1459,7 +1455,7 @@ void tcg_optimize(TCGContext *s)
+                block, otherwise we only trash the output args.  "mask" is
+                the non-zero bits mask for the first output arg.  */
+             if (def->flags & TCG_OPF_BB_END) {
+-                reset_all_temps(nb_temps);
++                bitmap_zero(temps_used.l, nb_temps);
+             } else {
+         do_reset_output:
+                 for (i = 0; i < nb_oargs; i++) {
 -- 
 2.13.6
