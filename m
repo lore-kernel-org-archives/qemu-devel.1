@@ -1,31 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40326)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41016)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1e5UWb-0005t6-5i
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 06:27:34 -0400
+	(envelope-from <kraxel@redhat.com>) id 1e5UY9-0006pU-FM
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 06:29:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1e5UWW-0007xL-Qz
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 06:27:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37650)
+	(envelope-from <kraxel@redhat.com>) id 1e5UY4-0000eb-En
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 06:29:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39760)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1e5UWW-0007vz-Ia
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 06:27:28 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9B79F7F41B
-	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 10:27:27 +0000 (UTC)
-References: <20171020101219.2378-1-pbonzini@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <1b56a63f-ab38-219b-6b2c-2a43c343e5f0@redhat.com>
-Date: Fri, 20 Oct 2017 12:27:25 +0200
-MIME-Version: 1.0
-In-Reply-To: <20171020101219.2378-1-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1e5UY4-0000eQ-97
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 06:29:04 -0400
+Message-ID: <1508495342.18146.8.camel@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Fri, 20 Oct 2017 12:29:02 +0200
+In-Reply-To: <d34ce785-80bb-c4f5-4e35-2ec71b00344d@msgid.tls.msk.ru>
+References: <d34ce785-80bb-c4f5-4e35-2ec71b00344d@msgid.tls.msk.ru>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] build: disable -Wmissing-braces on older
- compilers
+Subject: Re: [Qemu-devel] SDL2 issues
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,76 +26,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+To: Michael Tokarev <mjt@tls.msk.ru>, qemu-devel qemu-devel <qemu-devel@nongnu.org>
 
-On 10/20/17 12:12, Paolo Bonzini wrote:
-> GCC 4.9 and newer stopped warning for missing braces around the
-> "universal" C zero initializer {0}.  One such initializer sneaked
-
-s/sneaked/snuck/
-
-Hmmm, no, wait, both forms are valid!
-
-https://en.wiktionary.org/wiki/sneaked
-https://en.wiktionary.org/wiki/snuck
-
-    The irregular form snuck originated by analogy with struck for the
-    past of strike. Snuck was originally limited to a few dialects, but
-    is now very widespread (especially in American English) and is
-    recognized by most dictionaries. The word is now one of the best
-    examples of irregularization of a regular verb, along with dove.
-
-> into scsi/qemu-pr-helper.c and is breaking the build with such
-> older GCC versions.
+On Fri, 2017-10-20 at 13:05 +0300, Michael Tokarev wrote:
+> Hello
 > 
-> Detect the lack of support for the idiom, and disable the warning
-> in that case.
+> After we tried to switch from SDL1 to SDL2 in Debian qemu,
+> we receives quite some reports about various issues.
 > 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->         Of course it's always possible to use "memset", but {0}
->         is neater in my opinion.
-
-Strongly agree.
-
+> We use 2.10.1 version of qemu.
 > 
->  configure | 13 +++++++++++++
->  1 file changed, 13 insertions(+)
-> 
-> diff --git a/configure b/configure
-> index 7766e74125..0b2d595c6e 100755
-> --- a/configure
-> +++ b/configure
-> @@ -1651,6 +1651,19 @@ EOF
->    fi
->  fi
->  
-> +# Disable -Wmissing-braces on older compilers that warn even for
-> +# the "universal" C zero initializer {0}.
-> +cat > $TMPC << EOF
-> +struct {
-> +  int a[2];
-> +} x = {0};
-> +EOF
-> +if compile_object "-Werror" "" ; then
-> +  :
-> +else
+> Example of the issues: http://bugs.debian.org/879193
 
-Is this an established idiom for the configure script, in place of:
+Doesn't reproduce.
 
-  if ! compile_object "-Werror" "" ; then
+> http://bugs.debian.org/870025 - a few patches at the bottom
 
-?
+Those patches should go to the mailing list.
 
-Looks good to me otherwise.
+> http://bugs.debian.org/878087
 
-Thanks!
-Laszlo
+Yes, -k is simply not supported with sdl2.
+Those remappings should be done in the guest instead.
 
-> +  QEMU_CFLAGS="$QEMU_CFLAGS -Wno-missing-braces"
-> +fi
-> +
->  # Workaround for http://gcc.gnu.org/PR55489.  Happens with -fPIE/-fPIC and
->  # large functions that use global variables.  The bug is in all releases of
->  # GCC, but it became particularly acute in 4.6.x and 4.7.x.  It is fixed in
-> 
+> What's the status of SDL2 support in qemu? I've seen it is
+> the default now if SDL2 is present on the system (it was
+> SDL1 before).
+
+Yep.  Long term I want drop SDL1, this is the first step.
+
+> Also, what's the status of SDL _audio_ support, is it needed
+> at all once we have alsa, pa and oss?
+
+Dunno how well mixing sdl display with non-sdl audio works.  Feel free
+to send a patch dropping sdl audio to the list to check what people
+think about that ;)
+
+cheers,
+  Gerd
