@@ -1,30 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38091)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39674)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1e5XaG-0000q6-J6
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 09:43:33 -0400
+	(envelope-from <marcel@redhat.com>) id 1e5Xe0-0003VP-41
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 09:47:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1e5XaB-000503-Na
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 09:43:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59658)
+	(envelope-from <marcel@redhat.com>) id 1e5Xdv-000797-8p
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 09:47:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58724)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1e5XaB-0004zq-EJ
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 09:43:27 -0400
-References: <87y3oqugm7.fsf@marc-ibm.boeblingen.de.ibm.com>
-	<20171005121115.GD3946746@orkuz.home>
-	<87y3ok7n2n.fsf@marc-ibm.boeblingen.de.ibm.com>
-	<20171012120714.GA314661@orkuz.home>
-	<87mv4m6pp5.fsf@marc-ibm.boeblingen.de.ibm.com>
-	<0aab6dae-a926-c106-9bc5-68561a9bef5c@redhat.com>
-	<0dae2b6c-9164-efc7-5c67-0e4aa5eb4a21@de.ibm.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <fcf03f16-389e-83b5-77bf-d7a50151005c@redhat.com>
-Date: Fri, 20 Oct 2017 15:43:21 +0200
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1e5Xdv-00077r-2K
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 09:47:19 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6831F883C5
+	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 13:47:17 +0000 (UTC)
+References: <20171018095807.101406-1-marcel@redhat.com>
+	<69cefa98-5681-5b12-719c-e13fcba969c4@redhat.com>
+	<9d4b1fa8-e670-556b-278d-4993ad41b512@redhat.com>
+	<1508418225.18146.1.camel@redhat.com>
+	<d231ac0a-bb7d-78aa-ddb4-8048cc7bdfd8@redhat.com>
+	<1508482525.18146.6.camel@redhat.com>
+From: Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <f58bd55b-5a32-bbe1-90e6-79c5b1036355@redhat.com>
+Date: Fri, 20 Oct 2017 16:47:01 +0300
 MIME-Version: 1.0
-In-Reply-To: <0dae2b6c-9164-efc7-5c67-0e4aa5eb4a21@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1508482525.18146.6.camel@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [libvirt] Question about the host-model CPU mode
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] hw/pci-host: Fix x86 Host Bridges 64bit
+ PCI hole
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,93 +39,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>, Marc Hartmayer <mhartmay@linux.vnet.ibm.com>, libvir-list@redhat.com, qemu-devel@nongnu.org
-Cc: Jiri Denemark <jdenemar@redhat.com>, Boris Fiuczynski <fiuczy@linux.vnet.ibm.com>, "Jason J. Herne" <jjherne@linux.vnet.ibm.com>, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
+To: Gerd Hoffmann <kraxel@redhat.com>, Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org
+Cc: mst@redhat.com, pbonzini@redhat.com, ehabkost@redhat.com, Igor Mammedov <imammedo@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-On 20.10.2017 15:36, Christian Borntraeger wrote:
-> 
-> 
-> On 10/20/2017 03:16 PM, David Hildenbrand wrote:
->>
->>> Hi all,
+Hi Gerd,
+
+On 20/10/2017 9:55, Gerd Hoffmann wrote:
+>    Hi,
+>=20
+>>> commit message says:
 >>>
->>> we recently encountered the problem that the 'host-model' [1] has to be
->>> related to the machine type of a domain. We have following problem:
+>>> <quote>
+>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0It turns out that some 32 bit windows =
+guests crash
+>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if 64 bit PCI hole size is >2G.
+>>> </quote>
 >>>
->>>    Let's assume we've a z13 system with a QEMU 2.9 and we define a
->>>    domain using the default s390-virtio-ccw machine together with the
->>>    host-model CPU mode [1]. The definition will have the machine
->>>    expanded to s390-virtio-ccw-2.9 but retain the host-model CPU mode
->>>    in the domain definition. In a next step we upgrade to QEMU 2.10
->>>    (first version to recognize z14). Everything is still fine, even
->>>    though the machine runs in 2.9 compatibility mode. Finally we
->>>    upgrade to a z14. As a consequence it is not possible to start the
->>>    domain anymore as the machine type doesn't support our CPU host
->>>    model (which is expanded at start time of the domain).
+>>> Why this suddenly isn't a problem any more?
+>>>
 >>
->> Actually, what is the cause of that problem? I assume it is the gs
->> feature (gs_allowed)?
->>
->> We should really avoid such things (..._allowed) for CPU model features
->> in the future and clue all new such stuff to cpumodel_allowed.
-> 
-> Yes, starting a guest with
->    <os>
->     <type arch='s390x' machine='s390-ccw-virtio-2.9'>hvm</type>
->   </os>
->   <cpu mode='host-model'/>
-> 
-> results in
-> 
-> qemu-system-s390x: Some features requested in the CPU model are not available in the configuration: gs 
-> 
-> Tying it to cpumodel_allowed would not help, migration-wise though.
-> libvirt would still transform
-> 
->    <os>
->     <type arch='s390x' machine='s390-ccw-virtio-2.9'>hvm</type>
->   </os>
->   <cpu mode='host-model'/>
+>> I suppose it is, so we need a way to turn it "off".
+>=20
+> Or have machine types behave differently, i.e. give q35 a large 64bit
+> hole and leave pc as-is.
+>=20
+> Devices with that large bars are most likely pci express anyway ...
+>=20
 
-My point was, that the host model would have to be copied and _remain_
-there when s390-ccw-virtio was expanded to s390-ccw-virtio-2.9.
+Agreed
 
-So really replacing <cpu mode='host-model'/> by the model z13-base....
-This would at least fix this issue. Just like s390-ccw-virtio get's
-replaced and remains thats way.
+>> This is how I started, however Eduardo and (and maybe Michael ?)
+>> where against letting the upper management software to deal with
+>> such a low low level detail. They simply can't take such a decision.
+>> This is why the property you mentioned is not ever linked
+>> in code anywhere! It is simply not implemented and not used.
+>=20
+> Makes sense.
+>=20
+> BTW:  Is it safe to just assume 40 bits physical is going to work?  My
+> workstation:
+>=20
+> model name=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0: Intel(R) Core(TM) i7-77=
+00K CPU @ 4.20GHz
+> address sizes=C2=A0=C2=A0=C2=A0: 39 bits physical, 48 bits virtual
+>=20
+> Does this imply ept is limited 39 bits physical too?
+>=20
 
-But this might for sure have other problems.
+The guest will still run with 40 bits physical!
+(judging the code anyway, I hope I am wrong)
 
-> 
-> 
-> into 
-> -cpu z14-base,aen=on,cmmnt=on,aefsi=on,mepoch=on,msa8=on,msa7=on,msa6=on,msa5=on,msa4=on, \
-> msa3=on,msa2=on,msa1=on,sthyi=on,edat=on,ri=on,edat2=on,vx=on,ipter=on,vxeh=on,vxpd=on, \
-> esop=on,iep=on,cte=on,ais=on,gs=on,zpci=on,sea_esop2=on,te=on,cmm=on
->                              ^^^^^
-> because cpu model is certainly there. Now the guest would start but migration would
-> later fail because what we create now would never have been possible with 2.9.
-
-Migration is a totally different story, as tooling has to make sure to
-find a CPU model that is compatible over all host models. So
-cpumodel_allowed would indeed work. (at least in my theory ;) )
-
-> 
-> If libvirt could get information from QEMU depending on the machine version, this would
-> make it work. But of course this has other issues.
-
-I am not sure if that is the right thing to do.
-
-The documentation states clearly that the host model is copied. If that
-is not runnable, fix the setup.
-
-> 
-> Christian
-> 
-
-
--- 
+Then, the stakes are not so big, the Guest kernel will disregard
+the 64bit hole since is not CPU addressable and go on.
+At least Linux does it, but I think Win10 also can leave with that.
 
 Thanks,
+Marcel
 
-David
+> cheers,
+>    Gerd
+>=20
