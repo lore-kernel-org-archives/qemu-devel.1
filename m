@@ -1,39 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38413)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38820)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e5ZGq-0004aE-LI
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 11:31:39 -0400
+	(envelope-from <lersek@redhat.com>) id 1e5ZIF-0005eB-Or
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 11:33:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e5ZGn-0002se-Bw
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 11:31:36 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35952
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1e5ZGn-0002ny-4g
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 11:31:33 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v9KFTpbn111441
-	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 11:31:28 -0400
-Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2dqg41bmg0-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 11:31:27 -0400
-Received: from localhost
-	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Fri, 20 Oct 2017 09:31:27 -0600
-References: <20171009225623.29232-1-marcandre.lureau@redhat.com>
-	<20171009225623.29232-43-marcandre.lureau@redhat.com>
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Fri, 20 Oct 2017 11:31:20 -0400
+	(envelope-from <lersek@redhat.com>) id 1e5ZIE-0005gs-Si
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 11:33:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54310)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1e5ZIE-0005fb-NQ
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 11:33:02 -0400
+References: <20171020101219.2378-1-pbonzini@redhat.com>
+	<CAFEAcA9uEmoxgF4Ra9+u==kyou3GHw9BzuXJn1RGuraikY1h3Q@mail.gmail.com>
+	<9695ca9b-6275-d7bf-1c3b-147aeab25473@redhat.com>
+	<ec107687-d109-9eaa-780c-851f73971178@redhat.com>
+	<d7f4739b-0318-ef87-67a9-73a9c5e836c0@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <f0573dbb-c81e-c3c3-b0a6-8bafc9d0b2ac@redhat.com>
+Date: Fri, 20 Oct 2017 17:32:59 +0200
 MIME-Version: 1.0
-In-Reply-To: <20171009225623.29232-43-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Message-Id: <b9c05a22-e650-75b8-1eb3-799f2b57e701@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 42/42] WIP: add TPM CRB device
+In-Reply-To: <d7f4739b-0318-ef87-67a9-73a9c5e836c0@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] build: disable -Wmissing-braces on older
+ compilers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,616 +32,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: amarnath.valluri@intel.com, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 10/09/2017 06:56 PM, Marc-Andr=C3=A9 Lureau wrote:
-> tpm_crb is a device for TPM 2.0 Command Response Buffer (CRB)
-> Interface as defined in TCG PC Client Platform TPM Profile (PTP)
-> Specification Family =E2=80=9C2.0=E2=80=9D Level 00 Revision 01.03 v22.
+On 10/20/17 17:09, Paolo Bonzini wrote:
+> On 20/10/2017 17:08, Laszlo Ersek wrote:
+>> On 10/20/17 13:02, Paolo Bonzini wrote:
+>>> On 20/10/2017 12:48, Peter Maydell wrote:
+>>>> On 20 October 2017 at 11:12, Paolo Bonzini <pbonzini@redhat.com>
+>>>> wrote:
+>>>>> GCC 4.9 and newer stopped warning for missing braces around the
+>>>>> "universal" C zero initializer {0}.  One such initializer sneaked
+>>>>> into scsi/qemu-pr-helper.c and is breaking the build with such
+>>>>> older GCC versions.
+>>>>>
+>>>>> Detect the lack of support for the idiom, and disable the warning
+>>>>> in that case.
+>>>>>
+>>>>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>>>>
+>>>> AFAIK "{}" will work and not be warned about anywhere (we
+>>>> use it extensively already) so you don't need to fall back to
+>>>> memset...
+>>>
+>>> Doh, of course that will work in scsi/qemu-pr-helper.c.  In general
+>>> you can use {0} but not {} to initialize a scalar, like
+>>>
+>>> 	IDontKnowIfItsAnArrayOrPointer x = {};	//might fail
+>>> 	IDontKnowIfItsAnArrayOrPointer x = {0};	//always works
+>>>
+>>> I'm not sure if that matters.
+>>
+>> My remark below might matter even less, but:
+>>
+>> I'd find it regrettable if we suppressed a wrong gcc warning about a
+>> valid C construct by replacing the construct with a GNU-ism that is
+>> *not* standard C. :/
 >
-> The PTP allows device implementation to switch between TIS and CRB
-> model at run time, but given that CRB is a simpler device to
-> implement, I chose to implement it as a different device.
->
-> The device doesn't implement other locality than 0 for now (my laptop
-> TPM doesn't either, so I assume this isn't so bad)
->
-> The command/reply memory region is statically allocated after the CRB
-> registers address TPM_CRB_ADDR_BASE + sizeof(struct crb_regs). I
-> wonder if the BIOS could or should allocate it instead, or what size
-> to use.
->
-> The PTP doesn't specify a particular bus to put the device. I chose to
-> add it on the system bus directly, so it could hopefully be used
-> easily on a different platform. However, I am not sure this is easily
-> done or a smart approach. It fails to init on piix, because
-> error_on_sysbus_device() check. Removing this check, the device is
-> still functional... We may want to put it on ISA bus instead for now.
->
-> Tested with some success with Linux upstream and Windows 10. The
-> device is recognized and correctly transmit command/response with
-> passthrough/emu, but the swtpm emulator has some issues I need to
-> investigate further.
+> Is {} to initialize structs a GNUism?
 
-Some keys need to be there and SeaBIOS currently locks the storage=20
-hierarchy, which it shouldn't. I am not sure whether SeaBIOS should=20
-create those keys.
+It is;
 
-Two more things:
-- the SeaBIOS menu does not show up when using a TPM 2 with it; I don't=20
-know why
-- the driver should error and terminate when it detects that the backend=20
-it a TPM 2
+> struct {
+>   int a, b;
+> } x = {};
 
-Otherwise I have pretty good confidence in this series with that fix to=20
-22/42 applied. I migrated Linux VMs back and forth on the same host with=20
-a few additional patches and it seems to work fine.
+$ gcc -fsyntax-only -std=c99 -pedantic -Wall -Wextra x.c
 
-    Stefan
+> x.c:3:7: warning: ISO C forbids empty initializer braces [-Wpedantic]
+>  } x = {};
+>        ^
+> x.c:3:1: warning: missing initializer for field 'a' of 'struct <anonymous>' [-Wmissing-field-initializers]
+>  } x = {};
+>  ^
+> x.c:2:7: note: 'a' declared here
+>    int a, b;
+>        ^
 
+If you replace "{}" with "{ 0 }", the same command line stays quiet.
 
+(I used: gcc (GCC) 4.8.5 20150623 (Red Hat 4.8.5-16).)
 
+> (Initializing a scalar with {} is a hard error with GCC).
 
->
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->   qapi/tpm.json                      |   7 +-
->   include/hw/acpi/tpm.h              |  65 ++++++++
->   include/sysemu/tpm.h               |   3 +
->   hw/i386/acpi-build.c               |  19 +++
->   hw/tpm/tpm_crb.c                   | 320 ++++++++++++++++++++++++++++=
-+++++++++
->   default-configs/i386-softmmu.mak   |   1 +
->   default-configs/x86_64-softmmu.mak |   1 +
->   hw/tpm/Makefile.objs               |   1 +
->   8 files changed, 414 insertions(+), 3 deletions(-)
->   create mode 100644 hw/tpm/tpm_crb.c
->
-> diff --git a/qapi/tpm.json b/qapi/tpm.json
-> index 7093f268fb..12a4509ad6 100644
-> --- a/qapi/tpm.json
-> +++ b/qapi/tpm.json
-> @@ -10,11 +10,12 @@
->   #
->   # An enumeration of TPM models
->   #
-> -# @tpm-tis: TPM TIS model
-> +# @tpm-tis: TPM TIS model (since 1.5)
-> +# @tpm-crb: TPM CRB model (since 2.11)
->   #
->   # Since: 1.5
->   ##
-> -{ 'enum': 'TpmModel', 'data': [ 'tpm-tis' ] }
-> +{ 'enum': 'TpmModel', 'data': [ 'tpm-tis', 'tpm-crb' ] }
->
->   ##
->   # @query-tpm-models:
-> @@ -28,7 +29,7 @@
->   # Example:
->   #
->   # -> { "execute": "query-tpm-models" }
-> -# <- { "return": [ "tpm-tis" ] }
-> +# <- { "return": [ "tpm-tis", "tpm-crb" ] }
->   #
->   ##
->   { 'command': 'query-tpm-models', 'returns': ['TpmModel'] }
-> diff --git a/include/hw/acpi/tpm.h b/include/hw/acpi/tpm.h
-> index 6d516c6a7f..c0b9a0ca6e 100644
-> --- a/include/hw/acpi/tpm.h
-> +++ b/include/hw/acpi/tpm.h
-> @@ -16,11 +16,75 @@
->   #ifndef HW_ACPI_TPM_H
->   #define HW_ACPI_TPM_H
->
-> +#include "qemu/osdep.h"
-> +
->   #define TPM_TIS_ADDR_BASE           0xFED40000
->   #define TPM_TIS_ADDR_SIZE           0x5000
->
->   #define TPM_TIS_IRQ                 5
->
-> +struct crb_regs {
-> +    union {
-> +        uint32_t loc_state;
-> +        struct {
-> +            unsigned tpm_established:1;
-> +            unsigned loc_assigned:1;
-> +            unsigned active_locality:3;
-> +            unsigned reserved:2;
-> +            unsigned tpm_reg_valid_sts:1;
-> +        } loc_state_bits;
-> +    };
-> +    uint32_t reserved1;
-> +    uint32_t loc_ctrl;
-> +    uint32_t loc_sts;
-> +    uint8_t reserved2[32];
-> +    union {
-> +        uint64_t intf_id;
-> +        struct {
-> +            unsigned type:4;
-> +            unsigned version:4;
-> +            unsigned cap_locality:1;
-> +            unsigned cap_crb_idle_bypass:1;
-> +            unsigned reserved1:1;
-> +            unsigned cap_data_xfer_size_support:2;
-> +            unsigned cap_fifo:1;
-> +            unsigned cap_crb:1;
-> +            unsigned cap_if_res:2;
-> +            unsigned if_selector:2;
-> +            unsigned if_selector_lock:1;
-> +            unsigned reserved2:4;
-> +            unsigned rid:8;
-> +            unsigned vid:16;
-> +            unsigned did:16;
-> +        } intf_id_bits;
-> +    };
-> +    uint64_t ctrl_ext;
-> +
-> +    uint32_t ctrl_req;
-> +    union {
-> +        uint32_t ctrl_sts;
-> +        struct {
-> +            unsigned tpm_sts:1;
-> +            unsigned tpm_idle:1;
-> +            unsigned reserved:30;
-> +        } ctrl_sts_bits;
-> +    };
-> +    uint32_t ctrl_cancel;
-> +    uint32_t ctrl_start;
-> +    uint32_t ctrl_int_enable;
-> +    uint32_t ctrl_int_sts;
-> +    uint32_t ctrl_cmd_size;
-> +    uint32_t ctrl_cmd_pa_low;
-> +    uint32_t ctrl_cmd_pa_high;
-> +    uint32_t ctrl_rsp_size;
-> +    uint64_t ctrl_rsp_pa;
-> +} QEMU_PACKED;
-> +
-> +#define TPM_CRB_ADDR_BASE           0xFED40000
-> +#define TPM_CRB_ADDR_SIZE           0x1000
-> +#define TPM_CRB_ADDR_CTRL \
-> +    (TPM_CRB_ADDR_BASE + offsetof(struct crb_regs, ctrl_req))
-> +
->   #define TPM_LOG_AREA_MINIMUM_SIZE   (64 * 1024)
->
->   #define TPM_TCPA_ACPI_CLASS_CLIENT  0
-> @@ -30,5 +94,6 @@
->   #define TPM2_ACPI_CLASS_SERVER      1
->
->   #define TPM2_START_METHOD_MMIO      6
-> +#define TPM2_START_METHOD_CRB       7
->
->   #endif /* HW_ACPI_TPM_H */
-> diff --git a/include/sysemu/tpm.h b/include/sysemu/tpm.h
-> index 8223ec621c..bdc6bde109 100644
-> --- a/include/sysemu/tpm.h
-> +++ b/include/sysemu/tpm.h
-> @@ -46,9 +46,12 @@ int tpm_init(void);
->   void tpm_cleanup(void);
->
->   #define TYPE_TPM_TIS                "tpm-tis"
-> +#define TYPE_TPM_CRB                "tpm-crb"
->
->   #define TPM_IS_TIS(chr)                             \
->       object_dynamic_cast(OBJECT(chr), TYPE_TPM_TIS)
-> +#define TPM_IS_CRB(chr)                             \
-> +    object_dynamic_cast(OBJECT(chr), TYPE_TPM_CRB)
->
->   static inline TPMIf *tpm_find(void)
->   {
-> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> index ee38b00e31..f9345c75e6 100644
-> --- a/hw/i386/acpi-build.c
-> +++ b/hw/i386/acpi-build.c
-> @@ -2224,6 +2224,22 @@ build_dsdt(GArray *table_data, BIOSLinker *linke=
-r,
->               aml_append(sb_scope, scope);
->           }
->       }
-> +
-> +    if (TPM_IS_CRB(tpm_find())) {
-> +        dev =3D aml_device("TPM");
-> +        aml_append(dev, aml_name_decl("_HID", aml_string("MSFT0101")))=
-;
-> +        crs =3D aml_resource_template();
-> +        aml_append(crs, aml_memory32_fixed(TPM_CRB_ADDR_BASE,
-> +                                           TPM_CRB_ADDR_SIZE, AML_READ=
-_WRITE));
-> +        aml_append(dev, aml_name_decl("_CRS", crs));
-> +
-> +        method =3D aml_method("_STA", 0, AML_NOTSERIALIZED);
-> +        aml_append(method, aml_return(aml_int(0x0f)));
-> +        aml_append(dev, method);
-> +
-> +        aml_append(sb_scope, dev);
-> +    }
-> +
->       aml_append(dsdt, sb_scope);
->
->       /* copy AML table into ACPI tables blob and patch header there */
-> @@ -2284,6 +2300,9 @@ build_tpm2(GArray *table_data, BIOSLinker *linker=
-)
->       if (TPM_IS_TIS(tpm_find())) {
->           tpm2_ptr->control_area_address =3D cpu_to_le64(0);
->           tpm2_ptr->start_method =3D cpu_to_le32(TPM2_START_METHOD_MMIO=
-);
-> +    } else if (TPM_IS_CRB(tpm_find())) {
-> +        tpm2_ptr->control_area_address =3D cpu_to_le32(TPM_CRB_ADDR_CT=
-RL);
-> +        tpm2_ptr->start_method =3D cpu_to_le32(TPM2_START_METHOD_CRB);
->       } else {
->           g_warn_if_reached();
->       }
-> diff --git a/hw/tpm/tpm_crb.c b/hw/tpm/tpm_crb.c
-> new file mode 100644
-> index 0000000000..64039ebc8e
-> --- /dev/null
-> +++ b/hw/tpm/tpm_crb.c
-> @@ -0,0 +1,320 @@
-> +/*
-> + * tpm_crb.c - QEMU's TPM CRB interface emulator
-> + *
-> + * Copyright (c) 2017 Red Hat, Inc.
-> + *
-> + * Authors:
-> + *   Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or =
-later.
-> + * See the COPYING file in the top-level directory.
-> + *
-> + * tpm_crb is a device for TPM 2.0 Command Response Buffer (CRB) Inter=
-face
-> + * as defined in TCG PC Client Platform TPM Profile (PTP) Specificatio=
-n
-> + * Family =E2=80=9C2.0=E2=80=9D Level 00 Revision 01.03 v22
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +
-> +#include "qemu-common.h"
-> +#include "qapi/error.h"
-> +#include "hw/sysbus.h"
-> +#include "exec/address-spaces.h"
-> +
-> +#include "hw/pci/pci_ids.h"
-> +#include "hw/acpi/tpm.h"
-> +#include "sysemu/tpm_backend.h"
-> +#include "tpm_int.h"
-> +#include "tpm_util.h"
-> +
-> +typedef struct CRBState {
-> +    SysBusDevice parent_obj;
-> +
-> +    MemoryRegion mmio;
-> +    MemoryRegion cmdmem;
-> +    char *backend;
-> +    TPMBackend *tpmbe;
-> +    TPMBackendCmd cmd;
-> +    struct crb_regs regs;
-> +} CRBState;
-> +
-> +#define CRB(obj) OBJECT_CHECK(CRBState, (obj), TYPE_TPM_CRB)
-> +
-> +#define DEBUG_CRB 0
-> +
-> +#define DPRINTF(fmt, ...) do {                  \
-> +        if (DEBUG_CRB) {                        \
-> +            printf(fmt, ## __VA_ARGS__);        \
-> +        }                                       \
-> +    } while (0);
-> +
-> +#define CRB_ADDR_LOC_STATE offsetof(struct crb_regs, loc_state)
-> +#define CRB_ADDR_LOC_CTRL offsetof(struct crb_regs, loc_ctrl)
-> +#define CRB_ADDR_CTRL_REQ offsetof(struct crb_regs, ctrl_req)
-> +#define CRB_ADDR_CTRL_CANCEL offsetof(struct crb_regs, ctrl_cancel)
-> +#define CRB_ADDR_CTRL_START offsetof(struct crb_regs, ctrl_start)
-> +
-> +#define CRB_INTF_TYPE_CRB_ACTIVE 0b1
-> +#define CRB_INTF_VERSION_CRB 0b1
-> +#define CRB_INTF_CAP_LOCALITY_0_ONLY 0b0
-> +#define CRB_INTF_CAP_IDLE_FAST 0b0
-> +#define CRB_INTF_CAP_XFER_SIZE_64 0b11
-> +#define CRB_INTF_CAP_FIFO_NOT_SUPPORTED 0b0
-> +#define CRB_INTF_CAP_CRB_SUPPORTED 0b1
-> +#define CRB_INTF_IF_SELECTOR_CRB 0b1
-> +#define CRB_INTF_IF_SELECTOR_UNLOCKED 0b0
-> +
-> +#define CRB_CTRL_CMD_SIZE (TPM_CRB_ADDR_SIZE - sizeof(struct crb_regs)=
-)
-> +
-> +enum crb_loc_ctrl {
-> +    CRB_LOC_CTRL_REQUEST_ACCESS =3D BIT(0),
-> +    CRB_LOC_CTRL_RELINQUISH =3D BIT(1),
-> +    CRB_LOC_CTRL_SEIZE =3D BIT(2),
-> +    CRB_LOC_CTRL_RESET_ESTABLISHMENT_BIT =3D BIT(3),
-> +};
-> +
-> +enum crb_ctrl_req {
-> +    CRB_CTRL_REQ_CMD_READY =3D BIT(0),
-> +    CRB_CTRL_REQ_GO_IDLE =3D BIT(1),
-> +};
-> +
-> +enum crb_ctrl_sts {
-> +    CRB_CTRL_STS_ERROR =3D BIT(0),
-> +    CRB_CTRL_STS_TPM_IDLE =3D BIT(1),
-> +};
-> +
-> +enum crb_start {
-> +    CRB_START_INVOKE =3D BIT(0),
-> +};
-> +
-> +enum crb_cancel {
-> +    CRB_CANCEL_INVOKE =3D BIT(0),
-> +};
-> +
-> +static const char *addr_desc(unsigned off)
-> +{
-> +    switch (off) {
-> +#define CASE(off)                               \
-> +    case offsetof(struct crb_regs, off):        \
-> +        return G_STRINGIFY(off)
-> +        CASE(loc_state);
-> +        CASE(reserved1);
-> +        CASE(loc_ctrl);
-> +        CASE(loc_sts);
-> +        CASE(reserved2);
-> +        CASE(intf_id);
-> +        CASE(ctrl_ext);
-> +        CASE(ctrl_req);
-> +        CASE(ctrl_sts);
-> +        CASE(ctrl_cancel);
-> +        CASE(ctrl_start);
-> +        CASE(ctrl_int_enable);
-> +        CASE(ctrl_int_sts);
-> +        CASE(ctrl_cmd_size);
-> +        CASE(ctrl_cmd_pa_low);
-> +        CASE(ctrl_cmd_pa_high);
-> +        CASE(ctrl_rsp_size);
-> +        CASE(ctrl_rsp_pa);
-> +#undef CASE
-> +    }
-> +    return NULL;
-> +}
-> +
-> +static uint64_t tpm_crb_mmio_read(void *opaque, hwaddr addr,
-> +                                  unsigned size)
-> +{
-> +    CRBState *s =3D CRB(opaque);
-> +    DPRINTF("CRB read %lx:%s %u\n", addr, addr_desc(addr), size);
-> +
-> +    /* all registers are 32-bit aligned */
-> +    if (addr % 4) {
-> +        return G_MAXUINT64;
-> +    }
-> +    return ((uint32_t *)&s->regs)[addr / 4];
-> +}
-> +
-> +static void tpm_crb_mmio_write(void *opaque, hwaddr addr,
-> +                               uint64_t val, unsigned size)
-> +{
-> +    CRBState *s =3D CRB(opaque);
-> +    DPRINTF("CRB write %lx:%s %lu %u\n", addr, addr_desc(addr), val, s=
-ize);
-> +
-> +    switch (addr) {
-> +    case CRB_ADDR_CTRL_REQ:
-> +        switch (val) {
-> +        case CRB_CTRL_REQ_CMD_READY:
-> +            s->regs.ctrl_sts_bits.tpm_idle =3D 0;
-> +            break;
-> +        case CRB_CTRL_REQ_GO_IDLE:
-> +            s->regs.ctrl_sts_bits.tpm_idle =3D 1;
-> +            break;
-> +        }
-> +        break;
-> +    case CRB_ADDR_CTRL_CANCEL:
-> +        if (val =3D=3D CRB_CANCEL_INVOKE && s->regs.ctrl_start & CRB_S=
-TART_INVOKE) {
-> +            tpm_backend_cancel_cmd(s->tpmbe);
-> +        }
-> +        break;
-> +    case CRB_ADDR_CTRL_START:
-> +        if (val =3D=3D CRB_START_INVOKE &&
-> +            !(s->regs.ctrl_start & CRB_START_INVOKE)) {
-> +            void *mem =3D memory_region_get_ram_ptr(&s->cmdmem);
-> +
-> +            s->regs.ctrl_start |=3D CRB_START_INVOKE;
-> +            s->cmd =3D (TPMBackendCmd) {
-> +                .in =3D mem,
-> +                .in_len =3D MIN(tpm_cmd_get_size(mem), CRB_CTRL_CMD_SI=
-ZE),
-> +                .out =3D mem,
-> +                .out_len =3D CRB_CTRL_CMD_SIZE,
-> +            };
-> +
-> +            tpm_backend_deliver_request(s->tpmbe, &s->cmd);
-> +        }
-> +        break;
-> +    case CRB_ADDR_LOC_CTRL:
-> +        switch (val) {
-> +        case CRB_LOC_CTRL_RESET_ESTABLISHMENT_BIT:
-> +            /* not loc 3 or 4 */
-> +            break;
-> +        case CRB_LOC_CTRL_RELINQUISH:
-> +            break;
-> +        case CRB_LOC_CTRL_REQUEST_ACCESS:
-> +            s->regs.loc_state_bits.loc_assigned =3D 1;
-> +            s->regs.loc_state_bits.tpm_reg_valid_sts =3D 1;
-> +            break;
-> +        }
-> +        break;
-> +    }
-> +}
-> +
-> +static const MemoryRegionOps tpm_crb_memory_ops =3D {
-> +    .read =3D tpm_crb_mmio_read,
-> +    .write =3D tpm_crb_mmio_write,
-> +    .endianness =3D DEVICE_LITTLE_ENDIAN,
-> +    .valid =3D {
-> +        .min_access_size =3D 1,
-> +        .max_access_size =3D 4,
-> +    },
-> +};
-> +
-> +static void tpm_crb_reset(DeviceState *dev)
-> +{
-> +    CRBState *s =3D CRB(dev);
-> +
-> +    s->regs =3D (struct crb_regs) {
-> +        .intf_id_bits =3D {
-> +            .type =3D CRB_INTF_TYPE_CRB_ACTIVE,
-> +            .version =3D CRB_INTF_VERSION_CRB,
-> +            .cap_locality =3D CRB_INTF_CAP_LOCALITY_0_ONLY,
-> +            .cap_crb_idle_bypass =3D CRB_INTF_CAP_IDLE_FAST,
-> +            .cap_data_xfer_size_support =3D CRB_INTF_CAP_XFER_SIZE_64,
-> +            .cap_fifo =3D CRB_INTF_CAP_FIFO_NOT_SUPPORTED,
-> +            .cap_crb =3D CRB_INTF_CAP_CRB_SUPPORTED,
-> +            .cap_if_res =3D 0b0,
-> +            .if_selector =3D CRB_INTF_IF_SELECTOR_CRB,
-> +            .if_selector_lock =3D CRB_INTF_IF_SELECTOR_UNLOCKED,
-> +            .rid =3D 0b0001,
-> +            .vid =3D PCI_VENDOR_ID_IBM,
-> +            .did =3D 0b0001,
-> +        },
-> +        .ctrl_cmd_size =3D CRB_CTRL_CMD_SIZE,
-> +        .ctrl_cmd_pa_low =3D TPM_CRB_ADDR_BASE + sizeof(struct crb_reg=
-s),
-> +        .ctrl_rsp_size =3D CRB_CTRL_CMD_SIZE,
-> +        .ctrl_rsp_pa =3D TPM_CRB_ADDR_BASE + sizeof(struct crb_regs),
-> +    };
-> +
-> +    tpm_backend_reset(s->tpmbe);
-> +    tpm_backend_startup_tpm(s->tpmbe);
-> +}
-> +
-> +static void tpm_crb_request_completed(TPMIf *ti)
-> +{
-> +    CRBState *s =3D CRB(ti);
-> +
-> +    s->regs.ctrl_start &=3D ~CRB_START_INVOKE;
-> +    /* TODO, in case of error: s->regs.ctrl_sts =3D CRB_CTRL_STS_ERROR=
- */
-> +}
-> +
-> +static enum TPMVersion tpm_crb_get_version(TPMIf *ti)
-> +{
-> +    CRBState *s =3D CRB(ti);
-> +
-> +    return tpm_backend_get_tpm_version(s->tpmbe);
-> +}
-> +
-> +static const VMStateDescription vmstate_tpm_crb =3D {
-> +    .name =3D "tpm-crb",
-> +    .unmigratable =3D 1,
-> +};
-> +
-> +static Property tpm_crb_properties[] =3D {
-> +    DEFINE_PROP_STRING("tpmdev", CRBState, backend),
-> +    DEFINE_PROP_END_OF_LIST(),
-> +};
-> +
-> +static void tpm_crb_realizefn(DeviceState *dev, Error **errp)
-> +{
-> +    CRBState *s =3D CRB(dev);
-> +    SysBusDevice *sbd =3D SYS_BUS_DEVICE(dev);
-> +
-> +    if (!tpm_find()) {
-> +        error_setg(errp, "at most one TPM device is permitted");
-> +        return;
-> +    }
-> +
-> +    s->tpmbe =3D qemu_find_tpm_be(s->backend);
-> +    if (!s->tpmbe) {
-> +        error_setg(errp, "tpm-crb: backend driver with id '%s' could n=
-ot be "
-> +                   "found", s->backend);
-> +        return;
-> +    }
-> +
-> +    if (tpm_backend_init(s->tpmbe, TPM_IF(s), errp)) {
-> +        return;
-> +    }
-> +
-> +    memory_region_init_io(&s->mmio, OBJECT(s), &tpm_crb_memory_ops, s,
-> +        "tpm-crb-mmio", sizeof(struct crb_regs));
-> +    memory_region_init_ram(&s->cmdmem, OBJECT(s),
-> +        "tpm-crb-cmd", CRB_CTRL_CMD_SIZE, errp);
-> +
-> +    sysbus_init_mmio(sbd, &s->mmio);
-> +    sysbus_mmio_map(sbd, 0, TPM_CRB_ADDR_BASE);
-> +    /* allocate ram in bios instead? */
-> +    memory_region_add_subregion(get_system_memory(),
-> +        TPM_CRB_ADDR_BASE + sizeof(struct crb_regs), &s->cmdmem);
-> +}
-> +
-> +static void tpm_crb_class_init(ObjectClass *klass, void *data)
-> +{
-> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
-> +    TPMIfClass *tc =3D TPM_IF_CLASS(klass);
-> +
-> +    dc->realize =3D tpm_crb_realizefn;
-> +    dc->props =3D tpm_crb_properties;
-> +    dc->reset =3D tpm_crb_reset;
-> +    dc->vmsd  =3D &vmstate_tpm_crb;
-> +    dc->user_creatable =3D true;
-> +    tc->model =3D TPM_MODEL_TPM_CRB;
-> +    tc->get_version =3D tpm_crb_get_version;
-> +    tc->request_completed =3D tpm_crb_request_completed;
-> +}
-> +
-> +static const TypeInfo tpm_crb_info =3D {
-> +    .name =3D TYPE_TPM_CRB,
-> +    .parent =3D TYPE_SYS_BUS_DEVICE,
-> +    .instance_size =3D sizeof(CRBState),
-> +    .class_init  =3D tpm_crb_class_init,
-> +    .interfaces =3D (InterfaceInfo[]) {
-> +        { TYPE_TPM_IF },
-> +        { }
-> +    }
-> +};
-> +
-> +static void tpm_crb_register(void)
-> +{
-> +    type_register_static(&tpm_crb_info);
-> +    tpm_register_model(TPM_MODEL_TPM_CRB);
-> +}
-> +
-> +type_init(tpm_crb_register)
-> diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-so=
-ftmmu.mak
-> index d2ab2f6655..c10afe953a 100644
-> --- a/default-configs/i386-softmmu.mak
-> +++ b/default-configs/i386-softmmu.mak
-> @@ -36,6 +36,7 @@ CONFIG_APPLESMC=3Dy
->   CONFIG_I8259=3Dy
->   CONFIG_PFLASH_CFI01=3Dy
->   CONFIG_TPM_TIS=3D$(CONFIG_TPM)
-> +CONFIG_TPM_CRB=3D$(CONFIG_TPM)
->   CONFIG_MC146818RTC=3Dy
->   CONFIG_PCI_PIIX=3Dy
->   CONFIG_WDT_IB700=3Dy
-> diff --git a/default-configs/x86_64-softmmu.mak b/default-configs/x86_6=
-4-softmmu.mak
-> index 9bde2f1c4b..1a6004f3f8 100644
-> --- a/default-configs/x86_64-softmmu.mak
-> +++ b/default-configs/x86_64-softmmu.mak
-> @@ -36,6 +36,7 @@ CONFIG_APPLESMC=3Dy
->   CONFIG_I8259=3Dy
->   CONFIG_PFLASH_CFI01=3Dy
->   CONFIG_TPM_TIS=3D$(CONFIG_TPM)
-> +CONFIG_TPM_CRB=3D$(CONFIG_TPM)
->   CONFIG_MC146818RTC=3Dy
->   CONFIG_PCI_PIIX=3Dy
->   CONFIG_WDT_IB700=3Dy
-> diff --git a/hw/tpm/Makefile.objs b/hw/tpm/Makefile.objs
-> index 41f0b7a590..5c98af0de4 100644
-> --- a/hw/tpm/Makefile.objs
-> +++ b/hw/tpm/Makefile.objs
-> @@ -1,3 +1,4 @@
->   common-obj-$(CONFIG_TPM_TIS) +=3D tpm_tis.o
-> +common-obj-$(CONFIG_TPM_CRB) +=3D tpm_crb.o
->   common-obj-$(CONFIG_TPM_PASSTHROUGH) +=3D tpm_passthrough.o tpm_util.=
-o
->   common-obj-$(CONFIG_TPM_EMULATOR) +=3D tpm_emulator.o tpm_util.o
+Thanks,
+Laszlo
