@@ -1,42 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40230)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40268)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alifm@linux.vnet.ibm.com>) id 1e5Xf9-0004BO-Of
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 09:48:36 -0400
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1e5XfK-0004GR-PM
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 09:48:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alifm@linux.vnet.ibm.com>) id 1e5Xf4-0007ln-QB
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 09:48:35 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:40800
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1e5XfG-0007pV-TP
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 09:48:46 -0400
+Received: from mail.uni-paderborn.de ([131.234.142.9]:39244)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alifm@linux.vnet.ibm.com>)
-	id 1e5Xf4-0007lX-JV
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 09:48:30 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v9KDikVF093891
-	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 09:48:26 -0400
-Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2dqgug4a2s-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 09:48:26 -0400
-Received: from localhost
-	by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <alifm@linux.vnet.ibm.com>;
-	Fri, 20 Oct 2017 09:48:26 -0400
-References: <20171020102517.28385-1-borntraeger@de.ibm.com>
-	<67132f0e-cc4d-312f-140a-1966f0d877c6@suse.de>
-	<7a65ad71-9c6d-ee0a-851c-ab6bd9806180@de.ibm.com>
-	<b4a828b6-b563-55f0-2952-8a3447a8a30a@de.ibm.com>
-From: Farhan Ali <alifm@linux.vnet.ibm.com>
-Date: Fri, 20 Oct 2017 09:48:22 -0400
+	(Exim 4.71) (envelope-from <kbastian@mail.uni-paderborn.de>)
+	id 1e5XfG-0007p9-GI
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 09:48:42 -0400
+From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Message-ID: <6968797c-f64c-69ff-2fa6-79c4fb3440c9@mail.uni-paderborn.de>
+Date: Fri, 20 Oct 2017 15:46:54 +0200
 MIME-Version: 1.0
-In-Reply-To: <b4a828b6-b563-55f0-2952-8a3447a8a30a@de.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Message-Id: <9292cbd5-49b5-c9da-cc34-33466818a02e@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH] s390-ccw: print carriage return with new
- lines
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [RFC] RISC-V Decoder generator
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,24 +26,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, Bjoern Walk <bwalk@linux.vnet.ibm.com>, David Hildenbrand <david@redhat.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel <qemu-devel@nongnu.org>, Halil Pasic <pasic@linux.vnet.ibm.com>, "Jason J . Herne" <jjherne@linux.vnet.ibm.com>, "Collin L. Walling" <walling@linux.vnet.ibm.com>, Richard Henderson <rth@twiddle.net>
+To: QEMU Developers <qemu-devel@nongnu.org>, RISC-V SW Dev <sw-dev@groups.riscv.org>
+
+Hi QEMU and RISC-V folks,
+
+I asked you for feedback some while ago regarding a modular RISC-V QEMU
+target (see discussion [1]). I tried getting it to work with the good
+old C preprocessor and quickly realized that it is too limiting. Instead
+I created a data-driven decoder generator written in python (see the
+code on github [2]) using YAML as a description language.
+
+I'd like to get some feedback whether this is acceptable to be
+upstreamed to QEMU or if you have any suggestions for improvements.
+Right now only RV32I instruction are implemented in this scheme.
+
+For this I will roughly sketch how the data format for RISC-V
+instructions works and then how the result after processing looks like.
+You can find the full tree on github [2] with all the relevant files in
+'target-riscv/decode-gen/'.
+
+The RISC-V data in YAML consists of:
+
+1) prefixes
+2) instruction formats
+3) instruction specification using the data of 1) and 2)
+
+1) prefixes have:
+   - name
+   - bitmask that identifies instructions belonging to it
+   - length that specifies the length in bits for all instructions with
+     this prefix
+
+Example prefix description for 16 bit instructions:
+
+16Bit: {
+    bitmask: ~0b11,
+    len: 16
+    }
+
+2) instruction formats have:
+    - name
+    - list of immediate fields
+    - list of 'normal' fields (e.g. register identifier)
+
+    The immediate fields are specified separately in the same file with:
+        - name
+        - data: in order list of the individual fields + possible sign i
+
+                extension
+        - fill: how is the immediate filled from the LSB (for now only
+                '0' fills are allowed)
+
+    Example for B-type immediate:
+        B: {data: [31s, 7,  30..25, 11..8], fill: '0'}
+        Note here that bit 31 is used for sign extension as indicated by
+        the 's'.
+
+    The 'normal' fields are similar to immediate fields but only have:
+        - name
+        - single field description
+
+    Example for 'rs1' field:
+	- rs1: 19..15
+
+Example for a full instruction format 'SB':
+    - SB: {
+      fields: [rs1,rs2],
+      immediates: [B]
+      }
+
+3) instruction specification have:
+    - name
+    - instruction format from 2)
+    - prefix from 1)
+    - keymap of opcode fields and the value they take for this
+      instruction
+    - func for binary translation
+
+    The opcode fields are specified separately in the same file in the
+    same manner as 'normal' opcode fields.
+    Example for FUNC3:
+        - FUNC3_32: 14..12
+
+Example for the 'BEQ' instruction:
+    BEQ: {format: SB, prefix: 32Bit, opcodes: {OP1_32: 99, FUNC3_32: 0},
+          func: gen_beq}
+
+    'OP1_32: 99' means that field OP1_32 defined by bits 6 until 0 have
+    to have the value 99
 
 
+The python script then converts these instructions into a tree of
+switch-case statements depending on the specified opcodes and generates
+at each case for one instruction two function calls:
 
-On 10/20/2017 07:02 AM, Christian Borntraeger wrote:
-> --- a/pc-bios/s390-ccw/sclp.c
-> +++ b/pc-bios/s390-ccw/sclp.c
-> @@ -83,7 +83,7 @@ long write(int fd, const void *str, size_t len)
->          return -EIO;
->      }
->
-> -    for (p = str; *p; ++p) {
-> +    for (p = str; len ; ++p, len--) {
->          if (data_len > SCCB_DATA_LEN - 1) {
->              return -EFBIG;
->          }
->
->
->
-The write function returns len, wouldn't this change make write return 0?
+1) decode_format_* depending on the instruction format used by this
+   instruction.
+   The decode_format_* functions are also generated by the script and
+   take of decoding the 'normal' fields and the immediate fields. This
+   data is stored in a data structure 'DisasFormats' which needs to be
+   passed to any translation function used by instructions.
+
+2) A call to the translation function defined by 'func' in 3)
+   These need to be defined by the developer in translate.c. For example
+   for LUI this looks like:
+
+static void gen_lui(CPURISCVState *env, DisasContext *ctx)
+{
+    if (ctx->fmt.field_rd == 0) {
+            return; /* NOP */
+    }
+    tcg_gen_movi_tl(cpu_gpr[ctx->fmt.field_rd], ctx->fmt.immediate_U);
+}
+
+Thanks for any comments,
+Bastian
+
+[1] https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg07735.html
+[2] https://github.com/bkoppelmann/riscv-qemu/tree/decoder
