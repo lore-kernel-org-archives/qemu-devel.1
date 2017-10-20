@@ -1,32 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35498)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37056)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e5fR1-0002KN-J7
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 18:06:32 -0400
+	id 1e5fc3-0006sj-Ty
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 18:17:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e5fQx-0003wd-Jd
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 18:06:31 -0400
-Received: from mail-qt0-x233.google.com ([2607:f8b0:400d:c0d::233]:45164)
+	id 1e5fbz-00016A-Ut
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 18:17:55 -0400
+Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:56381)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e5fQx-0003wX-Dm
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 18:06:27 -0400
-Received: by mail-qt0-x233.google.com with SMTP id p1so20217046qtg.2
-	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 15:06:27 -0700 (PDT)
+	id 1e5fbz-000165-Qr
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 18:17:51 -0400
+Received: by mail-qt0-x244.google.com with SMTP id z28so20202385qtz.13
+	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 15:17:51 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-References: <1508514204-16019-1-git-send-email-gabriel291075@gmail.com>
+References: <1508513949-15680-1-git-send-email-gabriel291075@gmail.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <8a805ab0-e41a-77da-73f2-40a0f1c39140@amsat.org>
-Date: Fri, 20 Oct 2017 19:06:23 -0300
+Message-ID: <52e67cee-c6e6-4df0-6882-6a39fdef473d@amsat.org>
+Date: Fri, 20 Oct 2017 19:17:48 -0300
 MIME-Version: 1.0
-In-Reply-To: <1508514204-16019-1-git-send-email-gabriel291075@gmail.com>
+In-Reply-To: <1508513949-15680-1-git-send-email-gabriel291075@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 10/11] kinetis_k64_flextimer.c has been
- added
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v3 04/11] kinetis_k64_sim.h has been added
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,7 +39,7 @@ Cc: peter.maydell@linaro.org
 
 Hi Gabriel,
 
-On 10/20/2017 12:43 PM, Gabriel Augusto Costa wrote:
+On 10/20/2017 12:39 PM, Gabriel Augusto Costa wrote:
 > I made a new arm machine with some peripherals. The machine is mk64fn1m0, a
 > cortex-m4 microcontroller from NXP Kinetis family. The machine can run a
 > simple arm binary file using UART0 in polling mode.
@@ -50,16 +49,19 @@ On 10/20/2017 12:43 PM, Gabriel Augusto Costa wrote:
 > 
 > Signed-off-by: Gabriel Augusto Costa <gabriel291075@gmail.com>
 > ---
->  hw/timer/kinetis_k64_flextimer.c | 137 +++++++++++++++++++++++++++++++++++++++
->  1 file changed, 137 insertions(+)
->  create mode 100644 hw/timer/kinetis_k64_flextimer.c
+>  include/hw/misc/kinetis_k64_sim.h | 56 +++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 56 insertions(+)
+>  create mode 100644 include/hw/misc/kinetis_k64_sim.h
 > 
-> diff --git a/hw/timer/kinetis_k64_flextimer.c b/hw/timer/kinetis_k64_flextimer.c
+> diff --git a/include/hw/misc/kinetis_k64_sim.h b/include/hw/misc/kinetis_k64_sim.h
 > new file mode 100644
-> index 0000000..7edad6d
+> index 0000000..2eb1f5c
 > --- /dev/null
-> +++ b/hw/timer/kinetis_k64_flextimer.c
-> @@ -0,0 +1,137 @@
+> +++ b/include/hw/misc/kinetis_k64_sim.h
+
+I'd rather name it kinetis_k64_system.h or kinetis_k64_sysctl.h
+
+> @@ -0,0 +1,56 @@
 > +/*
 > + * Kinetis K64 peripheral microcontroller emulation.
 > + *
@@ -71,133 +73,75 @@ On 10/20/2017 12:43 PM, Gabriel Augusto Costa wrote:
 > + *  (at your option) any later version.
 > + */
 > +
-> +/* Kinetis K64 series FLEXTIMER controller.  */
+> +/* Kinetis K64 series SIM controller.  */
 > +
-> +#include "qemu/osdep.h"
-> +#include "qapi/error.h"
+> +#ifndef KINETIS_SIM_H
+> +#define KINETIS_SIM_H
+> +
 > +#include "hw/sysbus.h"
-> +#include "hw/ssi/ssi.h"
-> +#include "hw/arm/arm.h"
-> +#include "hw/devices.h"
-> +#include "qemu/timer.h"
-> +#include "net/net.h"
-> +#include "hw/boards.h"
-> +#include "qemu/log.h"
-> +#include "exec/address-spaces.h"
-> +#include "sysemu/sysemu.h"
-> +#include "hw/char/pl011.h"
-> +#include "hw/misc/unimp.h"
-> +#include "hw/timer/kinetis_k64_flextimer.h"
-> +
-> +static const VMStateDescription vmstate_kinetis_k64_flextimer = {
-> +    .name = TYPE_KINETIS_K64_FLEXTIMER,
-> +    .version_id = 1,
-> +    .minimum_version_id = 1,
-> +    .fields = (VMStateField[]) {
-> +        VMSTATE_UINT32(SC, kinetis_k64_flextimer_state),
-> +        VMSTATE_UINT32(CNT, kinetis_k64_flextimer_state),
-> +/*        VMSTATE_UINT32(CONTROLS[0], kinetis_k64_flextimer_state),*/
-> +        VMSTATE_UINT32(CNTIN, kinetis_k64_flextimer_state),
-> +        VMSTATE_UINT32(STATUS, kinetis_k64_flextimer_state),
-> +        VMSTATE_UINT32(MODE, kinetis_k64_flextimer_state),
-> +        VMSTATE_UINT32(SYNC, kinetis_k64_flextimer_state),
-> +        VMSTATE_UINT32(OUTINIT, kinetis_k64_flextimer_state),
-> +        VMSTATE_UINT32(OUTMASK, kinetis_k64_flextimer_state),
-> +        VMSTATE_UINT32(COMBINE, kinetis_k64_flextimer_state),
-> +        VMSTATE_UINT32(DEADTIME, kinetis_k64_flextimer_state),
-> +        VMSTATE_UINT32(EXTTRIG, kinetis_k64_flextimer_state),
-> +        VMSTATE_UINT32(POL, kinetis_k64_flextimer_state),
-> +        VMSTATE_UINT32(FMS, kinetis_k64_flextimer_state),
-> +        VMSTATE_UINT32(FILTER, kinetis_k64_flextimer_state),
-> +        VMSTATE_UINT32(FLTCTRL, kinetis_k64_flextimer_state),
-> +        VMSTATE_UINT32(QDCTRL, kinetis_k64_flextimer_state),
-> +        VMSTATE_UINT32(CONF, kinetis_k64_flextimer_state),
-> +        VMSTATE_UINT32(FLTPOL, kinetis_k64_flextimer_state),
-> +        VMSTATE_UINT32(SYNCONF, kinetis_k64_flextimer_state),
-> +        VMSTATE_UINT32(INVCTRL, kinetis_k64_flextimer_state),
-> +        VMSTATE_UINT32(SWOCTRL, kinetis_k64_flextimer_state),
-> +        VMSTATE_UINT32(PWMLOAD, kinetis_k64_flextimer_state),
-> +        VMSTATE_END_OF_LIST()
-> +    }
-> +};
-> +
-> +static void kinetis_k64_flextimer_reset(DeviceState *dev)
-> +{
-> +    kinetis_k64_flextimer_state *s = KINETIS_K64_FLEXTIMER(dev);
-> +
-> +    s->CNT = 0x00;
-> +}
-> +
-> +static void kinetis_k64_flextimer_write(void *opaque, hwaddr offset,
-> +        uint64_t value, unsigned size)
-> +{
-> +/*    kinetis_k64_flextimer_state *s = (kinetis_k64_flextimer_state *)opaque;*/
-> +
-> +    value &= 0xFF;
-> +
-> +    switch (offset) {
-> +    default:
-> +        qemu_log_mask(LOG_GUEST_ERROR,
-> +            "kinetis_k64_flextimer: write at bad offset 0x%x\n",
-> +                (int)offset);
-> +    }
-> +}
-> +
-> +static uint64_t kinetis_k64_flextimer_read(void *opaque, hwaddr offset,
-> +        unsigned size)
-> +{
-> +/*    kinetis_k64_flextimer_state *s = (kinetis_k64_flextimer_state *)opaque;*/
-> +
-> +    switch (offset) {
-> +    default:
-> +        qemu_log_mask(LOG_GUEST_ERROR,
-> +            "kinetis_k64_flextimer: read at bad offset 0x%x\n",
-> +                (int)offset);
-> +    }
-> +    return 0;
-> +}
+> +#include "chardev/char-fe.h"
 
-what not use create_unimplemented_device() directly?
+not used
 
+> +#include "chardev/char-mux.h"
+
+not used
+
+> +#include "hw/hw.h"
 > +
-> +static const MemoryRegionOps kinetis_k64_flextimer_ops = {
-> +    .read = kinetis_k64_flextimer_read,
-> +    .write = kinetis_k64_flextimer_write,
-> +    .endianness = DEVICE_NATIVE_ENDIAN,
-> +};
+> +#define TYPE_KINETIS_K64_SIM "kinetis_k64_sim"
+> +#define KINETIS_K64_SIM(obj) \
+> +    OBJECT_CHECK(kinetis_k64_sim_state, (obj), TYPE_KINETIS_K64_SIM)
 > +
-> +static void kinetis_k64_flextimer_init(Object *obj)
-> +{
-> +    kinetis_k64_flextimer_state *s = KINETIS_K64_FLEXTIMER(obj);
-> +    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
+> +typedef struct {
+> +    SysBusDevice parent_obj;
 > +
-> +    memory_region_init_io(&s->iomem, obj, &kinetis_k64_flextimer_ops, s,
-> +            TYPE_KINETIS_K64_FLEXTIMER, 0x1000);
-> +    sysbus_init_mmio(sbd, &s->iomem);
-> +    sysbus_init_irq(sbd, &s->irq);
-> +}
+> +    MemoryRegion iomem;
 > +
-> +static void kinetis_k64_flextimer_class_init(ObjectClass *klass, void *data)
-> +{
-> +    DeviceClass *dc = DEVICE_CLASS(klass);
+> +    uint32_t SOPT1;     /**< System Options Register 1, offset: 0x0 */
+> +    uint32_t SOPT1CFG;  /**< SOPT1 Configuration Register, offset: 0x4 */
+> +    uint32_t SOPT2;     /**< System Options Register 2, offset: 0x1004 */
+> +    uint32_t SOPT4;     /**< System Options Register 4, offset: 0x100C */
+> +    uint32_t SOPT5;     /**< System Options Register 5, offset: 0x1010 */
+> +    uint32_t SOPT7;     /**< System Options Register 7, offset: 0x1018 */
+
+could be uint32_t SOPT[8] ...
+
+> +    uint32_t SDID;      /**< System Device Id Register, offset: 0x1024 */
+> +    uint32_t SCGC1;     /**< System Clock Gating Ctrl Reg 1, offset: 0x1028 */
+> +    uint32_t SCGC2;     /**< System Clock Gating Ctrl Reg 2, offset: 0x102C */
+> +    uint32_t SCGC3;     /**< System Clock Gating Ctrl Reg 3, offset: 0x1030 */
+> +    uint32_t SCGC4;     /**< System Clock Gating Ctrl Reg 4, offset: 0x1034 */
+> +    uint32_t SCGC5;     /**< System Clock Gating Ctrl Reg 5, offset: 0x1038 */
+> +    uint32_t SCGC6;     /**< System Clock Gating Ctrl Reg 6, offset: 0x103C */
+> +    uint32_t SCGC7;     /**< System Clock Gating Ctrl Reg 7, offset: 0x1040 */
+
+... and uint32_t SCGC[8]
+
+Then in the source I'd do:
+
+    case 0x0000:
+        value = s->SOPT[0];
+        break;
+
+    case 0x0004:
+        value = s->SOPTCFG[0];
+        break;
+
+    case 0x1004 ... 0x1018:
+        value = s->SOPT[(value & 0x1f) >> 2];
+        break;
+
+> +    uint32_t CLKDIV1;   /**< System Clock Divider Register 1, offset: 0x1044 */
+> +    uint32_t CLKDIV2;   /**< System Clock Divider Register 2, offset: 0x1048 */
+> +    uint32_t FCFG1;     /**< Flash Configuration Register 1, offset: 0x104C */
+> +    uint32_t FCFG2;     /**< Flash Configuration Register 2, offset: 0x1050 */
+> +    uint32_t UIDH;      /**< Unique Id Register High, offset: 0x1054 */
+> +    uint32_t UIDMH;     /**< Unique Id Register Mid-High, offset: 0x1058 */
+> +    uint32_t UIDML;     /**< Unique Id Register Mid Low, offset: 0x105C */
+> +    uint32_t UIDL;      /**< Unique Id Register Low, offset: 0x1060 */
 > +
-> +    dc->vmsd = &vmstate_kinetis_k64_flextimer;
-> +    dc->reset = kinetis_k64_flextimer_reset;
-> +    dc->desc = "Kinetis K64 series FlexTimer";
-> +}
+> +} kinetis_k64_sim_state;
 > +
-> +static const TypeInfo kinetis_k64_flextimer_info = {
-> +    .name          = TYPE_KINETIS_K64_FLEXTIMER,
-> +    .parent        = TYPE_SYS_BUS_DEVICE,
-> +    .instance_size = sizeof(kinetis_k64_flextimer_state),
-> +    .instance_init = kinetis_k64_flextimer_init,
-> +    .class_init    = kinetis_k64_flextimer_class_init,
-> +};
-> +
-> +static void kinetis_k64_flextimer_register_types(void)
-> +{
-> +    type_register_static(&kinetis_k64_flextimer_info);
-> +}
-> +
-> +type_init(kinetis_k64_flextimer_register_types)
+> +#endif
 > 
