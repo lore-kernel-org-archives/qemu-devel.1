@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44535)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44533)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e5WS4-00023g-Jq
+	(envelope-from <bounces@canonical.com>) id 1e5WS4-00023e-JC
 	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 08:31:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e5WRz-00078f-H4
+	(envelope-from <bounces@canonical.com>) id 1e5WRz-00078y-V3
 	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 08:31:00 -0400
-Received: from indium.canonical.com ([91.189.90.7]:60714)
+Received: from indium.canonical.com ([91.189.90.7]:60738)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1e5WRz-00078K-AX
+	id 1e5WRz-00078T-O6
 	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 08:30:55 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1e5WRx-0003wE-Ti
-	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 12:30:53 +0000
+	id 1e5WRy-0003w9-8W
+	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 12:30:54 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id DFB7D2E80C8
-	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 12:30:53 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 3BFBA2E80CB
+	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 12:30:54 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 20 Oct 2017 12:19:20 -0000
+Date: Fri, 20 Oct 2017 12:19:47 -0000
 From: Christophe Lyon <christophe.lyon+launchpad@gmail.com>
 Reply-To: Bug 1725267 <1725267@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <150850189101.17148.14929440782690831821.malonedeb@wampee.canonical.com>
-Message-Id: <150850196079.17731.1206107048143261694.malone@chaenomeles.canonical.com>
+Message-Id: <150850198797.17463.7840354209373096448.malone@wampee.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1725267] Re: armeb regression since qemu version
  2.8
@@ -39,9 +39,9 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-** Attachment added: "execution trace with qemu-2.7"
-   https://bugs.launchpad.net/qemu/+bug/1725267/+attachment/4978668/+files/=
-trace.2.7
+** Attachment added: "execution trace with qemu-2.10.1"
+   https://bugs.launchpad.net/qemu/+bug/1725267/+attachment/4978669/+files/=
+trace.2.10.1
 
 -- =
 
