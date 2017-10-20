@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59813)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59873)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1e5Vur-0003w0-4a
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 07:56:42 -0400
+	(envelope-from <cohuck@redhat.com>) id 1e5Vuv-00040Y-Rj
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 07:56:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1e5Vup-0004Bk-TT
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 07:56:41 -0400
+	(envelope-from <cohuck@redhat.com>) id 1e5Vuu-0004EZ-TT
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 07:56:45 -0400
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Fri, 20 Oct 2017 13:54:16 +0200
-Message-Id: <20171020115418.2050-45-cohuck@redhat.com>
+Date: Fri, 20 Oct 2017 13:54:17 +0200
+Message-Id: <20171020115418.2050-46-cohuck@redhat.com>
 In-Reply-To: <20171020115418.2050-1-cohuck@redhat.com>
 References: <20171020115418.2050-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL 44/46] tests: Enable the very simple virtio
- tests on s390x, too
+Subject: [Qemu-devel] [PULL 45/46] accel/tcg: allow to invalidate a write
+ TLB entry immediately
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,158 +23,89 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, rth@twiddle.net, agraf@suse.de, thuth@redhat.com, borntraeger@de.ibm.com, david@redhat.com, Cornelia Huck <cohuck@redhat.com>
 
-From: Thomas Huth <thuth@redhat.com>
+From: David Hildenbrand <david@redhat.com>
 
-These tests can easily be used on s390x, too. We just have to make
-sure to use the virtio-xxx-ccw devices instead of virtio-xxx-pci.
+Background: s390x implements Low-Address Protection (LAP). If LAP is
+enabled, writing to effective addresses (before any translation)
+0-511 and 4096-4607 triggers a protection exception.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <1508336428-20511-3-git-send-email-thuth@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
-Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+So we have subpage protection on the first two pages of every address
+space (where the lowcore - the CPU private data resides).
+
+By immediately invalidating the write entry but allowing the caller to
+continue, we force every write access onto these first two pages into
+the slow path. we will get a tlb fault with the specific accessed
+addresses and can then evaluate if protection applies or not.
+
+We have to make sure to ignore the invalid bit if tlb_fill() succeeds.
+
+Signed-off-by: David Hildenbrand <david@redhat.com>
+Message-Id: <20171016202358.3633-2-david@redhat.com>
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- tests/Makefile.include      |  9 ++++++---
- tests/virtio-balloon-test.c |  8 +++++---
- tests/virtio-console-test.c | 19 +++++++++++--------
- tests/virtio-serial-test.c  | 10 ++++++----
- 4 files changed, 28 insertions(+), 18 deletions(-)
+ accel/tcg/cputlb.c           | 5 ++++-
+ accel/tcg/softmmu_template.h | 4 ++--
+ include/exec/cpu-all.h       | 3 +++
+ 3 files changed, 9 insertions(+), 3 deletions(-)
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 4ca15e6817..70dc711bca 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -367,6 +367,9 @@ check-qtest-s390x-$(CONFIG_SLIRP) += tests/test-netfilter$(EXESUF)
- check-qtest-s390x-$(CONFIG_POSIX) += tests/test-filter-mirror$(EXESUF)
- check-qtest-s390x-$(CONFIG_POSIX) += tests/test-filter-redirector$(EXESUF)
- check-qtest-s390x-y += tests/drive_del-test$(EXESUF)
-+check-qtest-s390x-y += tests/virtio-balloon-test$(EXESUF)
-+check-qtest-s390x-y += tests/virtio-console-test$(EXESUF)
-+check-qtest-s390x-y += tests/virtio-serial-test$(EXESUF)
+diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
+index 5b1ef1442c..a23919c3a8 100644
+--- a/accel/tcg/cputlb.c
++++ b/accel/tcg/cputlb.c
+@@ -694,6 +694,9 @@ void tlb_set_page_with_attrs(CPUState *cpu, target_ulong vaddr,
+         } else {
+             tn.addr_write = address;
+         }
++        if (prot & PAGE_WRITE_INV) {
++            tn.addr_write |= TLB_INVALID_MASK;
++        }
+     }
  
- check-qtest-generic-y += tests/qom-test$(EXESUF)
- check-qtest-generic-y += tests/test-hmp$(EXESUF)
-@@ -754,14 +757,14 @@ tests/vmxnet3-test$(EXESUF): tests/vmxnet3-test.o
- tests/ne2000-test$(EXESUF): tests/ne2000-test.o
- tests/wdt_ib700-test$(EXESUF): tests/wdt_ib700-test.o
- tests/tco-test$(EXESUF): tests/tco-test.o $(libqos-pc-obj-y)
--tests/virtio-balloon-test$(EXESUF): tests/virtio-balloon-test.o
-+tests/virtio-balloon-test$(EXESUF): tests/virtio-balloon-test.o $(libqos-virtio-obj-y)
- tests/virtio-blk-test$(EXESUF): tests/virtio-blk-test.o $(libqos-virtio-obj-y)
- tests/virtio-net-test$(EXESUF): tests/virtio-net-test.o $(libqos-pc-obj-y) $(libqos-virtio-obj-y)
- tests/virtio-rng-test$(EXESUF): tests/virtio-rng-test.o $(libqos-pc-obj-y)
- tests/virtio-scsi-test$(EXESUF): tests/virtio-scsi-test.o $(libqos-virtio-obj-y)
- tests/virtio-9p-test$(EXESUF): tests/virtio-9p-test.o $(libqos-virtio-obj-y)
--tests/virtio-serial-test$(EXESUF): tests/virtio-serial-test.o
--tests/virtio-console-test$(EXESUF): tests/virtio-console-test.o
-+tests/virtio-serial-test$(EXESUF): tests/virtio-serial-test.o $(libqos-virtio-obj-y)
-+tests/virtio-console-test$(EXESUF): tests/virtio-console-test.o $(libqos-virtio-obj-y)
- tests/tpci200-test$(EXESUF): tests/tpci200-test.o
- tests/display-vga-test$(EXESUF): tests/display-vga-test.o
- tests/ipoctal232-test$(EXESUF): tests/ipoctal232-test.o
-diff --git a/tests/virtio-balloon-test.c b/tests/virtio-balloon-test.c
-index 0d0046bf25..0a07e036bb 100644
---- a/tests/virtio-balloon-test.c
-+++ b/tests/virtio-balloon-test.c
-@@ -9,9 +9,10 @@
+     /* Pairs with flag setting in tlb_reset_dirty_range */
+@@ -978,7 +981,7 @@ static void *atomic_mmu_lookup(CPUArchState *env, target_ulong addr,
+         if (!VICTIM_TLB_HIT(addr_write, addr)) {
+             tlb_fill(ENV_GET_CPU(env), addr, MMU_DATA_STORE, mmu_idx, retaddr);
+         }
+-        tlb_addr = tlbe->addr_write;
++        tlb_addr = tlbe->addr_write & ~TLB_INVALID_MASK;
+     }
  
- #include "qemu/osdep.h"
- #include "libqtest.h"
-+#include "libqos/virtio.h"
+     /* Check notdirty */
+diff --git a/accel/tcg/softmmu_template.h b/accel/tcg/softmmu_template.h
+index d7563292a5..3fc5144316 100644
+--- a/accel/tcg/softmmu_template.h
++++ b/accel/tcg/softmmu_template.h
+@@ -285,7 +285,7 @@ void helper_le_st_name(CPUArchState *env, target_ulong addr, DATA_TYPE val,
+         if (!VICTIM_TLB_HIT(addr_write, addr)) {
+             tlb_fill(ENV_GET_CPU(env), addr, MMU_DATA_STORE, mmu_idx, retaddr);
+         }
+-        tlb_addr = env->tlb_table[mmu_idx][index].addr_write;
++        tlb_addr = env->tlb_table[mmu_idx][index].addr_write & ~TLB_INVALID_MASK;
+     }
  
- /* Tests only initialization so far. TODO: Replace with functional tests */
--static void pci_nop(void)
-+static void balloon_nop(void)
- {
- }
+     /* Handle an IO access.  */
+@@ -361,7 +361,7 @@ void helper_be_st_name(CPUArchState *env, target_ulong addr, DATA_TYPE val,
+         if (!VICTIM_TLB_HIT(addr_write, addr)) {
+             tlb_fill(ENV_GET_CPU(env), addr, MMU_DATA_STORE, mmu_idx, retaddr);
+         }
+-        tlb_addr = env->tlb_table[mmu_idx][index].addr_write;
++        tlb_addr = env->tlb_table[mmu_idx][index].addr_write & ~TLB_INVALID_MASK;
+     }
  
-@@ -20,9 +21,10 @@ int main(int argc, char **argv)
-     int ret;
- 
-     g_test_init(&argc, &argv, NULL);
--    qtest_add_func("/virtio/balloon/pci/nop", pci_nop);
-+    qtest_add_func("/virtio/balloon/nop", balloon_nop);
- 
--    qtest_start("-device virtio-balloon-pci");
-+    global_qtest = qtest_startf("-device virtio-balloon-%s",
-+                                qvirtio_get_dev_type());
-     ret = g_test_run();
- 
-     qtest_end();
-diff --git a/tests/virtio-console-test.c b/tests/virtio-console-test.c
-index 1c3de072f4..945bae5a15 100644
---- a/tests/virtio-console-test.c
-+++ b/tests/virtio-console-test.c
-@@ -9,27 +9,30 @@
- 
- #include "qemu/osdep.h"
- #include "libqtest.h"
-+#include "libqos/virtio.h"
- 
- /* Tests only initialization so far. TODO: Replace with functional tests */
--static void console_pci_nop(void)
-+static void console_nop(void)
- {
--    qtest_start("-device virtio-serial-pci,id=vser0 "
--                "-device virtconsole,bus=vser0.0");
-+    global_qtest = qtest_startf("-device virtio-serial-%s,id=vser0 "
-+                                "-device virtconsole,bus=vser0.0",
-+                                qvirtio_get_dev_type());
-     qtest_end();
- }
- 
--static void serialport_pci_nop(void)
-+static void serialport_nop(void)
- {
--    qtest_start("-device virtio-serial-pci,id=vser0 "
--                "-device virtserialport,bus=vser0.0");
-+    global_qtest = qtest_startf("-device virtio-serial-%s,id=vser0 "
-+                                "-device virtserialport,bus=vser0.0",
-+                                qvirtio_get_dev_type());
-     qtest_end();
- }
- 
- int main(int argc, char **argv)
- {
-     g_test_init(&argc, &argv, NULL);
--    qtest_add_func("/virtio/console/pci/nop", console_pci_nop);
--    qtest_add_func("/virtio/serialport/pci/nop", serialport_pci_nop);
-+    qtest_add_func("/virtio/console/nop", console_nop);
-+    qtest_add_func("/virtio/serialport/nop", serialport_nop);
- 
-     return g_test_run();
- }
-diff --git a/tests/virtio-serial-test.c b/tests/virtio-serial-test.c
-index 7d1517dee3..7cc7060264 100644
---- a/tests/virtio-serial-test.c
-+++ b/tests/virtio-serial-test.c
-@@ -9,9 +9,10 @@
- 
- #include "qemu/osdep.h"
- #include "libqtest.h"
-+#include "libqos/virtio.h"
- 
- /* Tests only initialization so far. TODO: Replace with functional tests */
--static void pci_nop(void)
-+static void virtio_serial_nop(void)
- {
- }
- 
-@@ -27,10 +28,11 @@ int main(int argc, char **argv)
-     int ret;
- 
-     g_test_init(&argc, &argv, NULL);
--    qtest_add_func("/virtio/serial/pci/nop", pci_nop);
--    qtest_add_func("/virtio/serial/pci/hotplug", hotplug);
-+    qtest_add_func("/virtio/serial/nop", virtio_serial_nop);
-+    qtest_add_func("/virtio/serial/hotplug", hotplug);
- 
--    qtest_start("-device virtio-serial-pci");
-+    global_qtest = qtest_startf("-device virtio-serial-%s",
-+                                qvirtio_get_dev_type());
-     ret = g_test_run();
- 
-     qtest_end();
+     /* Handle an IO access.  */
+diff --git a/include/exec/cpu-all.h b/include/exec/cpu-all.h
+index 778031c3d7..0b141683f0 100644
+--- a/include/exec/cpu-all.h
++++ b/include/exec/cpu-all.h
+@@ -245,6 +245,9 @@ extern intptr_t qemu_host_page_mask;
+ /* original state of the write flag (used when tracking self-modifying
+    code */
+ #define PAGE_WRITE_ORG 0x0010
++/* Invalidate the TLB entry immediately, helpful for s390x
++ * Low-Address-Protection. Used with PAGE_WRITE in tlb_set_page_with_attrs() */
++#define PAGE_WRITE_INV 0x0040
+ #if defined(CONFIG_BSD) && defined(CONFIG_USER_ONLY)
+ /* FIXME: Code that sets/uses this is broken and needs to go away.  */
+ #define PAGE_RESERVED  0x0020
 -- 
 2.13.6
