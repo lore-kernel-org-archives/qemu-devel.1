@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45540)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45577)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1e5UqI-0004fQ-85
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 06:47:55 -0400
+	(envelope-from <stefanha@redhat.com>) id 1e5UqM-0004jI-JF
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 06:48:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1e5UqE-0005RH-8L
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 06:47:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50676)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1e5UqE-0005PD-1c
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 06:47:50 -0400
-Date: Fri, 20 Oct 2017 12:38:49 +0200
+	(envelope-from <stefanha@redhat.com>) id 1e5UqL-0005V5-Kc
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 06:47:58 -0400
+Date: Fri, 20 Oct 2017 12:47:39 +0200
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20171020103849.GB27352@stefanha-x1.localdomain>
-References: <1508443483-5429-1-git-send-email-alindsay@codeaurora.org>
+Message-ID: <20171020104739.GC27352@stefanha-x1.localdomain>
+References: <cover.1508390588.git.alistair.francis@xilinx.com>
+	<7f741376b50552aa58c943b710fffa3c24f28b2f.1508390588.git.alistair.francis@xilinx.com>
+	<51df0812-0119-412e-6017-935a6c226e3a@redhat.com>
+	<86f645a2-3640-be98-acff-c37cdaa1d66f@weilnetz.de>
+	<4d22f16a-15ce-3ac5-9812-83a4f9197b48@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1508443483-5429-1-git-send-email-alindsay@codeaurora.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] build: Don't force preserving permissions
- on config-devices.mak.old
+In-Reply-To: <4d22f16a-15ce-3ac5-9812-83a4f9197b48@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 42/46] util: Replace fprintf(stderr,
+ "*\n" with error_report()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,40 +27,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aaron Lindsay <alindsay@codeaurora.org>
-Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Stefan Weil <sw@weilnetz.de>, Paul Brook <paul@codesourcery.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Stefan Weil <sw@weilnetz.de>, Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, armbru@redhat.com, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, alistair23@gmail.com, Paolo Bonzini <pbonzini@redhat.com>
 
-On Thu, Oct 19, 2017 at 04:04:43PM -0400, Aaron Lindsay wrote:
-> I get the following error when building on an NFSv3 filesystem:
->=20
-> % make -j8
->   GEN     aarch64-softmmu/config-devices.mak.tmp
->   GEN     config-host.h
-> [snip]
->   GEN     qmp-marshal.c
->   GEN     aarch64-softmmu/config-devices.mak
-> cp: preserving permissions for =E2=80=98aarch64-softmmu/config-devices.=
-mak.old=E2=80=99: Operation not supported
-> make: *** Deleting file `aarch64-softmmu/config-devices.mak'
->   GEN     qapi-types.c
-> [snip]
->   CC      scsi/qemu-pr-helper.o
-> make: *** No rule to make target `config-all-devices.mak', needed by `s=
-ubdir-aarch64-softmmu'.  Stop.
-> make: *** Waiting for unfinished jobs....
->=20
-> Ideally you would only build on a filesystem with proper support, but I=
- haven't
-> been able to find a reason why preserving exact permissions is importan=
-t in
-> this case.
->=20
-> Signed-off-by: Aaron Lindsay <alindsay@codeaurora.org>
-> ---
->  Makefile | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+On Fri, Oct 20, 2017 at 08:27:41AM +0200, Thomas Huth wrote:
+> On 19.10.2017 21:47, Stefan Weil wrote:
+> > Am 19.10.2017 um 19:53 schrieb Thomas Huth:
+> >> On 19.10.2017 18:18, Alistair Francis wrote:
+> >>> Replace a large number of the fprintf(stderr, "*\n" calls with
+> >>> error_report(). The functions were renamed with these commands and then
+> >>> compiler issues where manually fixed.
+> >> [...]
+> >>> diff --git a/util/aio-posix.c b/util/aio-posix.c
+> >>> index 5946ac09f0..29fff51fcf 100644
+> >>> --- a/util/aio-posix.c
+> >>> +++ b/util/aio-posix.c
+> >>> @@ -15,6 +15,7 @@
+> >>>  
+> >>>  #include "qemu/osdep.h"
+> >>>  #include "qemu-common.h"
+> >>> +#include "qemu/error-report.h"
+> >>>  #include "block/block.h"
+> >>>  #include "qemu/rcu_queue.h"
+> >>>  #include "qemu/sockets.h"
+> >>> @@ -703,8 +704,8 @@ void aio_context_setup(AioContext *ctx)
+> >>>  {
+> >>>      /* TODO remove this in final patch submission */
+> >>>      if (getenv("QEMU_AIO_POLL_MAX_NS")) {
+> >>> -        fprintf(stderr, "The QEMU_AIO_POLL_MAX_NS environment variable has "
+> >>> -                "been replaced with -object iothread,poll-max-ns=NUM\n");
+> >>> +        error_report("The QEMU_AIO_POLL_MAX_NS environment variable has "
+> >>> +                "been replaced with -object iothread,poll-max-ns=NUM");
+> >>>          exit(1);
+> >>>      }
+> >>
+> >> The comment in front of this code block indicates that this should
+> >> rather be removed completely. Stefan, do you agree?
+> > 
+> > I assume you asked the other Stefan, but I think he'll agree as I do,
+> 
+> Right, the code has been introduced by this commit:
+> 
+> commit 4a1cba3802554a3b077d436002519ff1fb0c18bf
+> Author: Stefan Hajnoczi <stefanha@redhat.com>
+> Date:   Thu Dec 1 19:26:42 2016 +0000
+> 
+>     aio: add polling mode to AioContext
+> 
+> and apparently the environment variable has never been used in the
+> committed code base, so removing this code block sounds like the right
+> way to go.
 
-I cannot see a reason why $@.old must preserve timestamp/mode/ownership
-either:
+Yes, feel free to remove it.
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Initially the RFC patches used the QEMU_AIO_POLL_MAX_NS environment
+variable.  When I wrote a proper command-line interface for this setting
+I left the error to help any of the people testing this optimization
+migrate their scripts to the new interface.
+
+...Then I forgot to remove it for the final non-RFC patch which got
+merged :).
+
+Stefan
