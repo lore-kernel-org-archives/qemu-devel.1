@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59386)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38893)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1e5abi-0005NA-53
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 12:57:15 -0400
+	(envelope-from <groug@kaod.org>) id 1e5av5-0003RF-8e
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 13:17:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1e5abe-0000ZP-21
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 12:57:14 -0400
-Received: from mail-pf0-x233.google.com ([2607:f8b0:400e:c00::233]:43246)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1e5abd-0000Xy-QG
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 12:57:10 -0400
-Received: by mail-pf0-x233.google.com with SMTP id a8so11871139pfc.0
-	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 09:57:06 -0700 (PDT)
-References: <6968797c-f64c-69ff-2fa6-79c4fb3440c9@mail.uni-paderborn.de>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <1e99928e-885b-0724-f2aa-da39d88f6871@linaro.org>
-Date: Fri, 20 Oct 2017 09:57:02 -0700
+	(envelope-from <groug@kaod.org>) id 1e5av1-0004Zr-Vl
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 13:17:15 -0400
+Received: from 16.mo5.mail-out.ovh.net ([87.98.174.144]:45601)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1e5av1-0004Y5-PC
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 13:17:11 -0400
+Received: from player773.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 024BF1470F9
+	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 19:17:08 +0200 (CEST)
+From: Greg Kurz <groug@kaod.org>
+Date: Fri, 20 Oct 2017 19:17:06 +0200
+Message-ID: <150851982652.6179.3835155122843915432.stgit@bahia.lan>
 MIME-Version: 1.0
-In-Reply-To: <6968797c-f64c-69ff-2fa6-79c4fb3440c9@mail.uni-paderborn.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC] RISC-V Decoder generator
+Subject: [Qemu-devel] [PATCH] 9pfs: drop one user of struct V9fsFidState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,168 +27,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, QEMU Developers <qemu-devel@nongnu.org>, RISC-V SW Dev <sw-dev@groups.riscv.org>
+To: qemu-devel@nongnu.org
+Cc: Greg Kurz <groug@kaod.org>
 
-On 10/20/2017 06:46 AM, Bastian Koppelmann wrote:
-> The RISC-V data in YAML consists of:
-> 
-> 1) prefixes
-> 2) instruction formats
-> 3) instruction specification using the data of 1) and 2)
-> 
-> 1) prefixes have:
->    - name
->    - bitmask that identifies instructions belonging to it
->    - length that specifies the length in bits for all instructions with
->      this prefix
-> 
-> Example prefix description for 16 bit instructions:
-> 
-> 16Bit: {
->     bitmask: ~0b11,
->     len: 16
->     }
-> 
-> 2) instruction formats have:
->     - name
->     - list of immediate fields
->     - list of 'normal' fields (e.g. register identifier)
-> 
->     The immediate fields are specified separately in the same file with:
->         - name
->         - data: in order list of the individual fields + possible sign i
-> 
->                 extension
->         - fill: how is the immediate filled from the LSB (for now only
->                 '0' fills are allowed)
-> 
->     Example for B-type immediate:
->         B: {data: [31s, 7,  30..25, 11..8], fill: '0'}
->         Note here that bit 31 is used for sign extension as indicated by
->         the 's'.
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
+ hw/9pfs/9p.h |    8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-I think "append" might be a clearer name than "fill".
-
-Reading this for the first time, I wondered how you were specifying one bit of
-fill.  That only became clear when I saw
-
-    - U: {data: [31..20, 19..12], fill: '000000000000'}
-
-As for the generated GET_X_IMM, please use inline functions instead of macros.
-There doesn't appear to be any need for the preprocessor.
-
-> 3) instruction specification have:
->     - name
->     - instruction format from 2)
->     - prefix from 1)
->     - keymap of opcode fields and the value they take for this
->       instruction
->     - func for binary translation
-
-There's some redundant information here -- OP1_32 overlaps prefix.  You should
-either drop the redundancy (infer prefix from opcode) or validate it (assert
-that opcode matches prefix).
-
-
-> The python script then converts these instructions into a tree of
-> switch-case statements depending on the specified opcodes and generates
-> at each case for one instruction two function calls:
-> 
-> 1) decode_format_* depending on the instruction format used by this
->    instruction.
->    The decode_format_* functions are also generated by the script and
->    take of decoding the 'normal' fields and the immediate fields. This
->    data is stored in a data structure 'DisasFormats' which needs to be
->    passed to any translation function used by instructions.
-> 
-> 2) A call to the translation function defined by 'func' in 3)
->    These need to be defined by the developer in translate.c. For example
->    for LUI this looks like:
-> 
-> static void gen_lui(CPURISCVState *env, DisasContext *ctx)
-> {
->     if (ctx->fmt.field_rd == 0) {
->             return; /* NOP */
->     }
->     tcg_gen_movi_tl(cpu_gpr[ctx->fmt.field_rd], ctx->fmt.immediate_U);
-> }
-
-(As an aside, it's bad form to pass around ENV unless the function is going to
-have to read more code from guest memory.  Which isn't true in your case.)
-
-Unless you have a real use-case in mind, I'm not keen on all of the fields
-being accessible all of the time.
-
-You have all of the information in hand to do all of the proper checking with
-the compiler.  My suggestion is to have not one DisasFormats struct with all
-possible fields included, but one DisasFormatX struct per format containing
-only the fields present.  Then pass that separately to the function.
-
-E.g.
-
-static void gen_lui(DisasContext *ctx, DisasFormatU *fmt)
-{
-    if (fmt.field_rd == 0) {
-        return; /* NOP */
-    }
-    tcg_gen_movi_tl(cpu_gpr[fmt.field_rd], fmt->immediate_U);
-}
-
-Within the decode_32bit function, you could have
-
-  union {
-    DisasFormatR R;
-    DisasFormatI I;
-    ...
-  } fmts;
-
-  ...
-
-  case 0:
-      /* ADDI */
-      decode_format_I(ctx, &fmts.I);
-      gen_addi(ctx, &fmts.I);
-      break;
-
-etc.  You now have isolation on exactly the fields present in the format, and
-you have type checking on the function prototype that there is agreement
-between the decoder and the generation functions about the format.
-
-Not especially important, but how much effort would it be to determine that all
-valid insns below a certain point in the parse tree are the same format?  I was
-just looking at e.g.
-
-    case 35:
-        /* Decode FUNC3_32 */
-        switch (extract32(ctx->opcode, 12, 3)) {
-        case 0:
-            /* SB */
-            decode_format_S(ctx);
-            gen_sb(env, ctx);
-            break;
-        case 1:
-            /* SH */
-            decode_format_S(ctx);
-            gen_sh(env, ctx);
-            break;
-        case 2:
-            /* SW */
-            decode_format_S(ctx);
-            gen_sw(env, ctx);
-            break;
-        default:
-            kill_unknown(ctx, RISCV_EXCP_ILLEGAL_INST);
-            break;
-        }
-        break;
-
-and thinking that the decode_format_S could be hoisted above the switch.  The
-compiler won't do it because it's not used on the kill_unknown path.
-
-Major OP1 == 115 is another example with multiple sub-switches, but all insns
-are format I.
-
-All that said, this looks very readable.  Thank you.
-
-
-r~
+diff --git a/hw/9pfs/9p.h b/hw/9pfs/9p.h
+index d1cfeaf10e4f..cdfc4f4ce787 100644
+--- a/hw/9pfs/9p.h
++++ b/hw/9pfs/9p.h
+@@ -117,7 +117,7 @@ static inline char *rpath(FsContext *ctx, const char *path)
+ #define P9_IOHDRSZ 24
+ 
+ typedef struct V9fsPDU V9fsPDU;
+-struct V9fsState;
++typedef struct V9fsState V9fsState;
+ 
+ typedef struct {
+     uint32_t size_le;
+@@ -137,7 +137,7 @@ struct V9fsPDU
+     uint8_t id;
+     uint8_t cancelled;
+     CoQueue complete;
+-    struct V9fsState *s;
++    V9fsState *s;
+     QLIST_ENTRY(V9fsPDU) next;
+     uint32_t idx;
+ };
+@@ -230,7 +230,7 @@ struct V9fsFidState
+     V9fsFidState *rclm_lst;
+ };
+ 
+-typedef struct V9fsState
++struct V9fsState
+ {
+     QLIST_HEAD(, V9fsPDU) free_list;
+     QLIST_HEAD(, V9fsPDU) active_list;
+@@ -251,7 +251,7 @@ typedef struct V9fsState
+     Error *migration_blocker;
+     V9fsConf fsconf;
+     V9fsQID root_qid;
+-} V9fsState;
++};
+ 
+ /* 9p2000.L open flags */
+ #define P9_DOTL_RDONLY        00000000
