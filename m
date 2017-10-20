@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56227)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56528)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e5Tbo-00080n-Jx
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 05:28:53 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1e5Tdl-0000yP-5V
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 05:30:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e5Tbl-0000Ft-BY
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 05:28:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56384)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1e5Tbl-0000F0-3I
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 05:28:49 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 22CCD4792
-	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 09:28:48 +0000 (UTC)
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Fri, 20 Oct 2017 10:28:44 +0100
-Message-Id: <20171020092844.13880-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH] sockets: avoid leak of listen file descriptor
+	(envelope-from <peter.maydell@linaro.org>) id 1e5Tdk-00015F-6I
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 05:30:53 -0400
+Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:44365)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1e5Tdj-00014n-Vk
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 05:30:52 -0400
+Received: by mail-wr0-x241.google.com with SMTP id z55so4745672wrz.1
+	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 02:30:51 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <alpine.DEB.2.10.1710191354020.27209@sstabellini-ThinkPad-X260>
+References: <alpine.DEB.2.10.1710181439060.27209@sstabellini-ThinkPad-X260>
+	<CAFEAcA_v=UsQ4hfn2oVLt3MPU3yJUnHLfzZHrdkstQ0VVgSDbw@mail.gmail.com>
+	<alpine.DEB.2.10.1710191354020.27209@sstabellini-ThinkPad-X260>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 20 Oct 2017 10:30:30 +0100
+Message-ID: <CAFEAcA8uH1+V4uYsA=XuuxHOLKvLyZ56ieAaS5K9QNoLYspOsQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] fix WFI/WFE length in syndrome register
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,82 +30,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
+To: Stefano Stabellini <sstabellini@kernel.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Julien Grall <julien.grall@linaro.org>
 
-If we iterate over the full port range without successfully binding+listening
-on the socket, we'll try the next address, whereupon we overwrite the slisten
-file descriptor variable without closing it.
+On 19 October 2017 at 21:56, Stefano Stabellini <sstabellini@kernel.org> wrote:
+> On Thu, 19 Oct 2017, Peter Maydell wrote:
+>> On 18 October 2017 at 23:03, Stefano Stabellini <sstabellini@kernel.org> wrote:
+>> > WFI/E are 4 bytes long: set ARM_EL_IL_SHIFT in the syndrome.
+>> >
+>> > Signed-off-by: Stefano Stabellini <sstabellini@kernel.org>
+>> >
+>> > diff --git a/target/arm/internals.h b/target/arm/internals.h
+>> > index 1f6efef..cf8c966 100644
+>> > --- a/target/arm/internals.h
+>> > +++ b/target/arm/internals.h
+>> > @@ -398,6 +398,7 @@ static inline uint32_t syn_breakpoint(int same_el)
+>> >  static inline uint32_t syn_wfx(int cv, int cond, int ti)
+>> >  {
+>> >      return (EC_WFX_TRAP << ARM_EL_EC_SHIFT) |
+>> > +           (1 << ARM_EL_IL_SHIFT) |
+>> >             (cv << 24) | (cond << 20) | ti;
+>> >  }
+>>
+>> Hmm. What we do now is definitely wrong, but WFI and WFE can be 2 bytes:
+>> there is a T1 Thumb encoding that is 2 bytes.
+>>
+>> HELPER(wfi) doesn't get that right, though:
+>>     if (target_el) {
+>>         env->pc -= 4;
+>>         raise_exception(env, EXCP_UDEF, syn_wfx(1, 0xe, 0), target_el);
+>>     }
+>>
+>> So I think that HELPER(wfi) needs to be passed an extra
+>> parameter is_16bit, which it can then use both in its adjustment
+>> of env->pc and to pass as an extra parameter to syn_wfx(),
+>> which is then syn_wfx(int cv, int cond, int ti, bool is_16bit).
+>>
+>> (In theory HELPER(wfe) should also be passed is_16bit, but
+>> since it doesn't currently ever raise an exception it
+>> doesn't matter.)
+>
+> Wouldn't it be better to just check on env->thumb like
+> HELPER(cpsr_write_eret) for example?
 
-Rather than having two places where we open + close socket FDs on different
-iterations of nested for loops, re-arrange the code to always open+close
-within the same loop iteration.
+> diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
+> index 3914145..ea16c9a 100644
+> --- a/target/arm/op_helper.c
+> +++ b/target/arm/op_helper.c
+> @@ -476,8 +476,8 @@ void HELPER(wfi)(CPUARMState *env)
+>      }
+>
+>      if (target_el) {
+> -        env->pc -= 4;
+> -        raise_exception(env, EXCP_UDEF, syn_wfx(1, 0xe, 0), target_el);
+> +        env->pc -= env->thumb ? 2 : 4;
+> +        raise_exception(env, EXCP_UDEF, syn_wfx(1, 0xe, 0, env->thumb), target_el);
+>      }
+>
+>      cs->exception_index = EXCP_HLT;
 
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
----
- util/qemu-sockets.c | 31 +++++++++++++++++++------------
- 1 file changed, 19 insertions(+), 12 deletions(-)
+This doesn't work, because there is also a 32 bit Thumb
+encoding of WFI. env->thumb says "we are in thumb mode",
+which isn't the same as "this insn is 16 bits".
 
-diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
-index b47fb45885..a319338cca 100644
---- a/util/qemu-sockets.c
-+++ b/util/qemu-sockets.c
-@@ -207,7 +207,7 @@ static int inet_listen_saddr(InetSocketAddress *saddr,
-     char uaddr[INET6_ADDRSTRLEN+1];
-     char uport[33];
-     int rc, port_min, port_max, p;
--    int slisten = 0;
-+    int slisten = -1;
-     int saved_errno = 0;
-     bool socket_created = false;
-     Error *err = NULL;
-@@ -267,16 +267,28 @@ static int inet_listen_saddr(InetSocketAddress *saddr,
- 		        uaddr,INET6_ADDRSTRLEN,uport,32,
- 		        NI_NUMERICHOST | NI_NUMERICSERV);
- 
--        slisten = create_fast_reuse_socket(e);
--        if (slisten < 0) {
--            continue;
--        }
--
-         socket_created = true;
-         port_min = inet_getport(e);
-         port_max = saddr->has_to ? saddr->to + port_offset : port_min;
-         for (p = port_min; p <= port_max; p++) {
-             inet_setport(e, p);
-+
-+            slisten = create_fast_reuse_socket(e);
-+            if (slisten < 0) {
-+                /* First time we expect we might fail to create the socket
-+                 * eg if 'e' has AF_INET6 but ipv6 kmod is not loaded.
-+                 * Later iterations should always succeeed if first iteration
-+                 * worked though, so treat that as fatal.
-+                 */
-+                if (p == port_min) {
-+                    continue;
-+                } else {
-+                    error_setg_errno(errp, errno,
-+                                     "Failed to recreate failed listening socket");
-+                    goto listen_failed;
-+                }
-+            }
-+
-             rc = try_bind(slisten, saddr, e);
-             if (rc) {
-                 if (errno == EADDRINUSE) {
-@@ -299,12 +311,7 @@ static int inet_listen_saddr(InetSocketAddress *saddr,
-              * socket to allow bind attempts for subsequent ports:
-              */
-             closesocket(slisten);
--            slisten = create_fast_reuse_socket(e);
--            if (slisten < 0) {
--                error_setg_errno(errp, errno,
--                                 "Failed to recreate failed listening socket");
--                goto listen_failed;
--            }
-+            slisten = -1;
-         }
-     }
-     error_setg_errno(errp, errno,
--- 
-2.13.6
+thanks
+-- PMM
