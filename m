@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44876)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45540)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1e5UoS-0003W5-9k
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 06:46:01 -0400
+	(envelope-from <stefanha@redhat.com>) id 1e5UqI-0004fQ-85
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 06:47:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1e5UoO-0003yN-9g
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 06:46:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47104)
+	(envelope-from <stefanha@redhat.com>) id 1e5UqE-0005RH-8L
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 06:47:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50676)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1e5UoO-0003y5-3e
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 06:45:56 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id EDFBE5F73B
-	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 10:45:54 +0000 (UTC)
-References: <20171020101219.2378-1-pbonzini@redhat.com>
-	<1b56a63f-ab38-219b-6b2c-2a43c343e5f0@redhat.com>
-	<03c6bfa2-77b1-8ab6-482b-466aa2ac96b7@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <45f2f4cb-6385-9d50-0521-80528f7e18c1@redhat.com>
-Date: Fri, 20 Oct 2017 12:45:53 +0200
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1e5UqE-0005PD-1c
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 06:47:50 -0400
+Date: Fri, 20 Oct 2017 12:38:49 +0200
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20171020103849.GB27352@stefanha-x1.localdomain>
+References: <1508443483-5429-1-git-send-email-alindsay@codeaurora.org>
 MIME-Version: 1.0
-In-Reply-To: <03c6bfa2-77b1-8ab6-482b-466aa2ac96b7@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] build: disable -Wmissing-braces on older
- compilers
+Content-Disposition: inline
+In-Reply-To: <1508443483-5429-1-git-send-email-alindsay@codeaurora.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] build: Don't force preserving permissions
+ on config-devices.mak.old
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,28 +28,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+To: Aaron Lindsay <alindsay@codeaurora.org>
+Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Stefan Weil <sw@weilnetz.de>, Paul Brook <paul@codesourcery.com>
 
-On 10/20/17 12:37, Paolo Bonzini wrote:
-> On 20/10/2017 12:27, Laszlo Ersek wrote:
->>> +if compile_object "-Werror" "" ; then
->>> +  :
->>> +else
->> Is this an established idiom for the configure script, in place of:
->>
->>   if ! compile_object "-Werror" "" ; then
->>
->> ?
->>
->> Looks good to me otherwise.
-> 
-> I tend not use "if !".  In general that's just me, but in this case I
-> think it's useful to point out that a successful compile does nothing;
-> generally it's the successful compile that adjusts command line arguments.
+On Thu, Oct 19, 2017 at 04:04:43PM -0400, Aaron Lindsay wrote:
+> I get the following error when building on an NFSv3 filesystem:
+>=20
+> % make -j8
+>   GEN     aarch64-softmmu/config-devices.mak.tmp
+>   GEN     config-host.h
+> [snip]
+>   GEN     qmp-marshal.c
+>   GEN     aarch64-softmmu/config-devices.mak
+> cp: preserving permissions for =E2=80=98aarch64-softmmu/config-devices.=
+mak.old=E2=80=99: Operation not supported
+> make: *** Deleting file `aarch64-softmmu/config-devices.mak'
+>   GEN     qapi-types.c
+> [snip]
+>   CC      scsi/qemu-pr-helper.o
+> make: *** No rule to make target `config-all-devices.mak', needed by `s=
+ubdir-aarch64-softmmu'.  Stop.
+> make: *** Waiting for unfinished jobs....
+>=20
+> Ideally you would only build on a filesystem with proper support, but I=
+ haven't
+> been able to find a reason why preserving exact permissions is importan=
+t in
+> this case.
+>=20
+> Signed-off-by: Aaron Lindsay <alindsay@codeaurora.org>
+> ---
+>  Makefile | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 
-Thanks for the explanation.
+I cannot see a reason why $@.old must preserve timestamp/mode/ownership
+either:
 
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-
-Cheers
-Laszlo
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
