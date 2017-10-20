@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36880)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36893)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e5ZBn-0002Fh-SA
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 11:26:24 -0400
+	(envelope-from <eblake@redhat.com>) id 1e5ZBx-0002LO-Cu
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 11:26:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e5ZBk-0003PE-NY
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 11:26:23 -0400
-Received: from indium.canonical.com ([91.189.90.7]:54142)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1e5ZBk-0003Oc-HY
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 11:26:20 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1e5ZBh-0003RW-3U
-	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 15:26:17 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 9E2962E80EC
-	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 15:26:13 +0000 (UTC)
+	(envelope-from <eblake@redhat.com>) id 1e5ZBu-0003Rf-AO
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 11:26:33 -0400
+References: <20171020115803.14093-1-david@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <a889832b-ade3-f924-e49d-386052ae6ff0@redhat.com>
+Date: Fri, 20 Oct 2017 10:26:23 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 20 Oct 2017 15:12:42 -0000
-From: Christophe Lyon <christophe.lyon+launchpad@gmail.com>
-Reply-To: Bug 1725267 <1725267@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150850189101.17148.14929440782690831821.malonedeb@wampee.canonical.com>
-Message-Id: <150851236210.17710.344438373871611833.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1725267] Re: armeb regression since qemu version
- 2.8
+In-Reply-To: <20171020115803.14093-1-david@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="NnfPvXHHJMHmNne948b90g8OKVOppWaLq"
+Subject: Re: [Qemu-devel] [PATCH v1] target/s390x: change CPU type name to
+ "s390x-cpu"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,60 +24,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: Thomas Huth <thuth@redhat.com>, cohuck@redhat.com, Alexander Graf <agraf@suse.de>, borntraeger@de.ibm.com, qemu-s390x@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-Indeed I wish GCC tests printed information rather than just calling
-abort()...
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--NnfPvXHHJMHmNne948b90g8OKVOppWaLq
+From: Eric Blake <eblake@redhat.com>
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: Thomas Huth <thuth@redhat.com>, cohuck@redhat.com,
+ Alexander Graf <agraf@suse.de>, borntraeger@de.ibm.com,
+ qemu-s390x@nongnu.org, Igor Mammedov <imammedo@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
+Message-ID: <a889832b-ade3-f924-e49d-386052ae6ff0@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v1] target/s390x: change CPU type name to
+ "s390x-cpu"
+References: <20171020115803.14093-1-david@redhat.com>
+In-Reply-To: <20171020115803.14093-1-david@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-I'll add some printfs and see what this says.
+On 10/20/2017 06:58 AM, David Hildenbrand wrote:
+> For now, e.g. host-s390-cpu wasn't exposed to the user. cpu-add, -cpu
+> and the CPU model qmp interfaces didn't care about the actual type,
+> as that information was hidden.
+>=20
+> This changed with CPU hotplug via device_add. Now the type is visible t=
+o
+> the user. Before we get that supported in a stable version, this is our=
 
--- =
+> last chance to change it.
+>=20
+> So change it form "s390-cpu" to "s390x-cpu", to match the architecture
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1725267
+s/form/from/
 
-Title:
-  armeb regression since qemu version 2.8
+> name. Example names are then e.g. z14-s390x-cpu or qemu-s390x-cpu.
+>=20
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
 
-Status in QEMU:
-  New
 
-Bug description:
-  Hi,
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-  I have noticed a regression when I upgraded from qemu-armeb 2.7 to
-  2.8, and the problem is still present with version 2.10.1.
 
-  I am using qemu for GCC validation, noticed problems with testcases
-  involving atomics, I'm attaching here atomic-exchange-4.exe.
+--NnfPvXHHJMHmNne948b90g8OKVOppWaLq
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-  # with 2.7:
-  $ qemu-armeb -cpu any -R 0 -L $PWD -E LD_LIBRARY_PATH=3D$PWD/lib $PWD/ato=
-mic-exchange-4.exe
-  $ echo $?
-  0
-  # with 2.8, 2.10.1:
-  $ qemu-armeb -cpu any -R 0 -L $PWD -E LD_LIBRARY_PATH=3D$PWD/lib $PWD/ato=
-mic-exchange-4.exe
-  qemu: uncaught target signal 6 (Aborted) - core dumped
-  Aborted (core dumped)
-  $ echo $?
-  134
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-  The source code is gcc/testsuite/gcc.dg/atomic-exchange-4.c
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnqFZ8ACgkQp6FrSiUn
+Q2r8ogf+Kp85WSwxDFyrVvQ4DJEPApN56QyFOY/EhDbfNCwaBJp9GEJ6m82Sxpei
+QnYs2TxtsvdsaTVqOB862qodojLD7ddQBghR9+x/fhcLrMLBIDiZcXExlqbs0cUJ
+3frYv82+gJ/MM2mLljvo8flrXLEt2qvci8YwkBaR4FteUk49+L9unxdwwVrmDO0d
+KwPUaQXg4bLOicKdSgN+SUAN4iRGOeBAda4ske8g2wjOEGxNkjwV6IeMNkvOIyW3
+SpF0Lx6q/O+kl5f1O/5OaCSdyi8q+5jWrYZCm5BZ07cu+k7jF2yD5Z3VUBu5KeWU
+1F0T9T5zEyOwJHv1UWZjDgFoYFeMfw==
+=oGG8
+-----END PGP SIGNATURE-----
 
-  Running with -d in_asm shows a difference early in the startup code:
-  IN: _dl_sysdep_start
-  [...]
-  0x40a17790:  908ff103      addls	pc, pc, r3, lsl #2
-
-  and then the next address is not the same with qemu 2.7 and 2.10.1
-
-  I hope you have enough data/information to reproduce and confirm/fix
-  the problem.
-
-  Thanks
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1725267/+subscriptions
+--NnfPvXHHJMHmNne948b90g8OKVOppWaLq--
