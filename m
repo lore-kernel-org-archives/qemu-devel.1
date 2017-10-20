@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53086)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55828)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e5Kl0-0002z3-UU
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 20:01:48 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1e5Kyk-0005Z1-56
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 20:15:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e5Kkw-0005tO-Tb
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 20:01:46 -0400
-Received: from indium.canonical.com ([91.189.90.7]:33692)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1e5Kkw-0005s9-Ke
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 20:01:42 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1e5Kku-0008LD-J3
-	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 00:01:40 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 839652E80D9
-	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 00:01:40 +0000 (UTC)
+	(envelope-from <ehabkost@redhat.com>) id 1e5Kyg-0008Cx-3m
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 20:15:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41304)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1e5Kyf-0008CV-Qv
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 20:15:54 -0400
+Date: Thu, 19 Oct 2017 22:15:48 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20171020001548.GK2942@localhost.localdomain>
+References: <1508170976-96869-1-git-send-email-imammedo@redhat.com>
+	<1508170976-96869-5-git-send-email-imammedo@redhat.com>
+	<20171016165916.GI3246@localhost.localdomain>
+	<20171019104218.GB13245@umbus>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 19 Oct 2017 23:49:30 -0000
-From: Sean Feole <sean.feole@canonical.com>
-Reply-To: Bug 1719196 <1719196@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150626680089.6094.17724106932405637799.malonedeb@soybean.canonical.com>
-Message-Id: <150845697029.22640.5386292541009210803.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1719196] Re: [arm64 ocata] newly created
- instances are unable to raise network interfaces
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171019104218.GB13245@umbus>
+Subject: Re: [Qemu-devel] [RFC 4/6] CLI: add -paused option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,293 +29,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, eblake@redhat.com, armbru@redhat.com, pkrempa@redhat.com, peter.maydell@linaro.org, pbonzini@redhat.com, cohuck@redhat.com
 
-I've testing with the same packages listed in comment #28,  Confirmed
-that this now works..
+On Thu, Oct 19, 2017 at 09:42:18PM +1100, David Gibson wrote:
+> On Mon, Oct 16, 2017 at 02:59:16PM -0200, Eduardo Habkost wrote:
+> > On Mon, Oct 16, 2017 at 06:22:54PM +0200, Igor Mammedov wrote:
+> > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> > > ---
+> > >  include/sysemu/sysemu.h |  1 +
+> > >  qemu-options.hx         | 15 ++++++++++++++
+> > >  qmp.c                   |  5 +++++
+> > >  vl.c                    | 54 ++++++++++++++++++++++++++++++++++++++++++++++++-
+> > >  4 files changed, 74 insertions(+), 1 deletion(-)
+> > > 
+> > > diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+> > > index b213696..3feb94f 100644
+> > > --- a/include/sysemu/sysemu.h
+> > > +++ b/include/sysemu/sysemu.h
+> > > @@ -66,6 +66,7 @@ typedef enum WakeupReason {
+> > >      QEMU_WAKEUP_REASON_OTHER,
+> > >  } WakeupReason;
+> > >  
+> > > +void qemu_exit_preconfig_request(void);
+> > >  void qemu_system_reset_request(ShutdownCause reason);
+> > >  void qemu_system_suspend_request(void);
+> > >  void qemu_register_suspend_notifier(Notifier *notifier);
+> > > diff --git a/qemu-options.hx b/qemu-options.hx
+> > > index 39225ae..bd44db8 100644
+> > > --- a/qemu-options.hx
+> > > +++ b/qemu-options.hx
+> > > @@ -3498,6 +3498,21 @@ STEXI
+> > >  Run the emulation in single step mode.
+> > >  ETEXI
+> > >  
+> > > +DEF("paused", HAS_ARG, QEMU_OPTION_paused, \
+> > > +    "-paused [state=]postconf|preconf\n"
+> > > +    "                postconf: pause QEMU after machine is initialized\n"
+> > > +    "                preconf: pause QEMU before machine is initialized\n",
+> > > +    QEMU_ARCH_ALL)
+> > 
+> > I would like to allow pausing before machine-type is selected, so
+> > management could run query-machines before choosing a
+> > machine-type.  Would that need a third "-pause" mode, or will we
+> > be able to change "preconf" to pause before select_machine() is
+> > called?
+> > 
+> > The same probably applies to other things initialized before
+> > machine_run_board_init() that could be configurable using QMP,
+> > including but not limited to:
+> > * Accelerator configuration
+> > * Registering global properties
+> > * RAM size
+> > * SMP/CPU configuration
+> 
+> Yeah.. having a bunch of different possible pause stages to select
+> doesn't sound great.
 
-See attached log
-
-** Attachment added: "novaout.txt"
-   https://bugs.launchpad.net/libvirt/+bug/1719196/+attachment/4977254/+fil=
-es/novaout.txt
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1719196
-
-Title:
-  [arm64 ocata] newly created instances are unable to raise network
-  interfaces
-
-Status in Ubuntu Cloud Archive:
-  Fix Released
-Status in Ubuntu Cloud Archive ocata series:
-  Triaged
-Status in libvirt:
-  New
-Status in QEMU:
-  Fix Released
-Status in libvirt package in Ubuntu:
-  Invalid
-Status in qemu package in Ubuntu:
-  Fix Released
-Status in qemu source package in Zesty:
-  Incomplete
-
-Bug description:
-  arm64 Ocata ,
-
-  I'm testing to see I can get Ocata running on arm64 and using the
-  openstack-base bundle to deploy it.  I have added the bundle to the
-  log file attached to this bug.
-
-  When I create a new instance via nova, the VM comes up and runs,
-  however fails to raise its eth0 interface. This occurs on both
-  internal and external networks.
-
-  ubuntu@openstackaw:~$ nova list
-  +--------------------------------------+---------+--------+------------+-=
-------------+--------------------+
-  | ID                                   | Name    | Status | Task State | =
-Power State | Networks           |
-  +--------------------------------------+---------+--------+------------+-=
-------------+--------------------+
-  | dcaf6d51-f81e-4cbd-ac77-0c5d21bde57c | sfeole1 | ACTIVE | -          | =
-Running     | internal=3D10.5.5.3  |
-  | aa0b8aee-5650-41f4-8fa0-aeccdc763425 | sfeole2 | ACTIVE | -          | =
-Running     | internal=3D10.5.5.13 |
-  +--------------------------------------+---------+--------+------------+-=
-------------+--------------------+
-  ubuntu@openstackaw:~$ nova show aa0b8aee-5650-41f4-8fa0-aeccdc763425
-  +--------------------------------------+---------------------------------=
--------------------------+
-  | Property                             | Value                           =
-                         |
-  +--------------------------------------+---------------------------------=
--------------------------+
-  | OS-DCF:diskConfig                    | MANUAL                          =
-                         |
-  | OS-EXT-AZ:availability_zone          | nova                            =
-                         |
-  | OS-EXT-SRV-ATTR:host                 | awrep3                          =
-                         |
-  | OS-EXT-SRV-ATTR:hypervisor_hostname  | awrep3.maas                     =
-                         |
-  | OS-EXT-SRV-ATTR:instance_name        | instance-00000003               =
-                         |
-  | OS-EXT-STS:power_state               | 1                               =
-                         |
-  | OS-EXT-STS:task_state                | -                               =
-                         |
-  | OS-EXT-STS:vm_state                  | active                          =
-                         |
-  | OS-SRV-USG:launched_at               | 2017-09-24T14:23:08.000000      =
-                         |
-  | OS-SRV-USG:terminated_at             | -                               =
-                         |
-  | accessIPv4                           |                                 =
-                         |
-  | accessIPv6                           |                                 =
-                         |
-  | config_drive                         |                                 =
-                         |
-  | created                              | 2017-09-24T14:22:41Z            =
-                         |
-  | flavor                               | m1.small (717660ae-0440-4b19-a76=
-2-ffeb32a0575c)          |
-  | hostId                               | 5612a00671c47255d2ebd6737a64ec9b=
-d3a5866d1233ecf3e988b025 |
-  | id                                   | aa0b8aee-5650-41f4-8fa0-aeccdc76=
-3425                     |
-  | image                                | zestynosplash (e88fd1bd-f040-44d=
-8-9e7c-c462ccf4b945)     |
-  | internal network                     | 10.5.5.13                       =
-                         |
-  | key_name                             | mykey                           =
-                         |
-  | metadata                             | {}                              =
-                         |
-  | name                                 | sfeole2                         =
-                         |
-  | os-extended-volumes:volumes_attached | []                              =
-                         |
-  | progress                             | 0                               =
-                         |
-  | security_groups                      | default                         =
-                         |
-  | status                               | ACTIVE                          =
-                         |
-  | tenant_id                            | 9f7a21c1ad264fec81abc09f3960ad1d=
-                         |
-  | updated                              | 2017-09-24T14:23:09Z            =
-                         |
-  | user_id                              | e6bb6f5178a248c1b5ae66ed388f9040=
-                         |
-  +--------------------------------------+---------------------------------=
--------------------------+
+I agree.  The number of externally visible pause states should be
+as small as possible.
 
 
-  As seen above the instances boot an run.  Full Console output is
-  attached to this bug.
+>                       Could we avoid this by instead changing -S to
+> pause at the earliest possible spot, but having any monitor commands
+> that require a later stage automatically "fast forwarding" to the
+> right phase?
 
-  =
+That would hide the internal details from the outside.  Sounds
+nice, but adding new machine/device configuration QMP commands
+while hiding the QEMU state from the outside sounds impossible.
 
-  [  OK  ] Started Initial cloud-init job (pre-networking).
-  [  OK  ] Reached target Network (Pre).
-  [  OK  ] Started AppArmor initialization.
-           Starting Raise network interfaces...
-  [FAILED] Failed to start Raise network interfaces.
-  See 'systemctl status networking.service' for details.
-           Starting Initial cloud-init job (metadata service crawler)...
-  [  OK  ] Reached target Network.
-  [  315.051902] cloud-init[881]: Cloud-init v. 0.7.9 running 'init' at Fri=
-, 22 Sep 2017 18:29:15 +0000. Up 314.70 seconds.
-  [  315.057291] cloud-init[881]: ci-info: +++++++++++++++++++++++++++Net d=
-evice info+++++++++++++++++++++++++++
-  [  315.060338] cloud-init[881]: ci-info: +--------+------+-----------+---=
---------+-------+-------------------+
-  [  315.063308] cloud-init[881]: ci-info: | Device |  Up  |  Address  |   =
- Mask   | Scope |     Hw-Address    |
-  [  315.066304] cloud-init[881]: ci-info: +--------+------+-----------+---=
---------+-------+-------------------+
-  [  315.069303] cloud-init[881]: ci-info: | eth0:  | True |     .     |   =
-  .     |   .   | fa:16:3e:39:4c:48 |
-  [  315.072308] cloud-init[881]: ci-info: | eth0:  | True |     .     |   =
-  .     |   d   | fa:16:3e:39:4c:48 |
-  [  315.075260] cloud-init[881]: ci-info: |  lo:   | True | 127.0.0.1 | 25=
-5.0.0.0 |   .   |         .         |
-  [  315.078258] cloud-init[881]: ci-info: |  lo:   | True |     .     |   =
-  .     |   d   |         .         |
-  [  315.081249] cloud-init[881]: ci-info: +--------+------+-----------+---=
---------+-------+-------------------+
-  [  315.084240] cloud-init[881]: 2017-09-22 18:29:15,393 - url_helper.py[W=
-ARNING]: Calling 'http://169.254.169.254/2009-04-04/meta-data/instance-id' =
-failed [0/120s]: request error [HTTPConnectionPool(host=3D'169.254.169.254'=
-, port=3D80): Max retries exceeded with url: /2009-04-04/meta-data/instance=
--id (Caused by NewConnectionError('<requests.packages.urllib3.connection.HT=
-TPConnection object at 0xffffb10794e0>: Failed to establish a new connectio=
-n: [Errno 101] Network is unreachable',))]
+For example, if we use -S today, this works:
 
+  $ qemu-system-x86_64 -S -qmp stdio
+  <- {"QMP": {"version": {"qemu": {"micro": 0, "minor": 10, "major": 2}, "package": " (v2.10.0-83-g9375da7831)"}, "capabilities": []}}
+  -> {"execute":"qmp_capabilities"}
+  <- {"return": {}}
+  -> {"execute":"query-cpus"}
+  <- {"return": [{"arch": "x86", "current": true, "props": {"core-id": 0, "thread-id": 0, "socket-id": 0}, "CPU": 0, "qom_path": "/machine/unattached/device[0]", "pc": 4294967280, "halted": false, "thread_id": 4038}]}
 
-  =
+This means "query-cpus" needs to fast-forward to the CPU creation
+stage if we want to keep compatibility.
 
-  ----------------
+Now, assume we add a set-numa-node command like the one in this
+series.  e.g.:
 
+  $ qemu-system-x86_64 -S -qmp stdio
+  <- {"QMP": {"version": {"qemu": {"micro": 0, "minor": 10, "major": 2}, "package": " (v2.10.0-83-g9375da7831)"}, "capabilities": []}}
+  -> {"execute":"qmp_capabilities"}
+  <- {"return": {}}
+  -> {"execute":"set-numa-node" ... }
+  <- {"return": ...}
 
-  I have checked all services in neutron and made sure that they are
-  running and restarted in neutron-gateway
+The command will work only if machine initialization didn't run
+yet.
 
-  =
+But now an innocent-looking query command would change QEMU state
+in an unexpected way:
 
-   [ + ]  neutron-dhcp-agent
-   [ + ]  neutron-l3-agent
-   [ + ]  neutron-lbaasv2-agent
-   [ + ]  neutron-metadata-agent
-   [ + ]  neutron-metering-agent
-   [ + ]  neutron-openvswitch-agent
-   [ + ]  neutron-ovs-cleanup
+  $ qemu-system-x86_64 -S -qmp stdio
+  <- {"QMP": {"version": {"qemu": {"micro": 0, "minor": 10, "major": 2}, "package": " (v2.10.0-83-g9375da7831)"}, "capabilities": []}}
+  -> {"execute":"qmp_capabilities"}
+  <- {"return": {}}
+  -> {"execute":"query-cpus"}  [will silently fast-forward QEMU state]
+  <- {"return": [{"arch": "x86", "current": true, "props": {"core-id": 0, "thread-id": 0, "socket-id": 0}, "CPU": 0, "qom_path": "/machine/unattached/device[0]", "pc": 4294967280, "halted": false, "thread_id": 4038}]}
+  -> {"execute":"set-numa-node" ... }
+  <- {"error": ...}  [the command will fail because the machine was already created]
 
-  and have also restarted and checked the nova-compute logs for their
-  neutron counterparts.
+This means we do have a externally visible "too late to use
+set-numa-node" QEMU state, and query-cpus will have a externally
+visible side effect.  Every QMP command would need to document
+how it affects QEMU state in a externally visible way.
 
-  =
+If QEMU pause state is still going to be externally visible this
+way, I would prefer to let the client to explicitly tell what's
+the state they want QEMU to be, instead of making QEMU change
+state silently as a side effect of QMP commands.
 
-   [ + ]  neutron-openvswitch-agent
-   [ + ]  neutron-ovs-cleanup
+> 
+[...]
 
 
-   There are some warnings/errors in the neutron-gateway logs which I
-  have attached the full tarball in a separate attachment to this bug:
-
-  2017-09-24 14:39:33.152 10322 INFO ryu.base.app_manager [-] instantiating=
- app ryu.controller.ofp_handler of OFPHandler
-  2017-09-24 14:39:33.153 10322 INFO ryu.base.app_manager [-] instantiating=
- app ryu.app.ofctl.service of OfctlService
-  2017-09-24 14:39:39.577 10322 ERROR neutron.agent.ovsdb.impl_vsctl [req-2=
-f084ae8-13dc-47dc-b351-24c8f3c57067 - - - - -] Unable to execute ['ovs-vsct=
-l', '--timeout=3D10', '--oneline', '--format=3Djson', '--', '--id=3D@manage=
-r', 'create', 'Manager', 'target=3D"ptcp:6640:127.0.0.1"', '--', 'add', 'Op=
-en_vSwitch', '.', 'manager_options', '@manager']. Exception: Exit code: 1; =
-Stdin: ; Stdout: ; Stderr: ovs-vsctl: transaction error: {"details":"Transa=
-ction causes multiple rows in \"Manager\" table to have identical values (\=
-"ptcp:6640:127.0.0.1\") for index on column \"target\".  First row, with UU=
-ID e02a5f7f-bfd2-4a1d-ae3c-0321db4bd3fb, existed in the database before thi=
-s transaction and was not modified by the transaction.  Second row, with UU=
-ID 6e9aba3a-471a-4976-bffd-b7131bbe5377, was inserted by this transaction."=
-,"error":"constraint violation"}
-
-
-  These warnings/errors also occur on the nova-compute hosts in
-  /var/log/neutron/
-
-
-  =
-
-  2017-09-22 18:54:52.130 387556 INFO ryu.base.app_manager [-] instantiatin=
-g app ryu.app.ofctl.service of OfctlService
-  2017-09-22 18:54:56.124 387556 ERROR neutron.agent.ovsdb.impl_vsctl [req-=
-e291c2f9-a123-422c-be7c-fadaeb5decfa - - - - -] Unable to execute ['ovs-vsc=
-tl', '--timeout=3D10', '--oneline', '--format=3Djson', '--', '--id=3D@manag=
-er', 'create', 'Manager', 'target=3D"ptcp:6640:127.0.0.1"', '--', 'add', 'O=
-pen_vSwitch', '.', 'manager_options', '@manager']. Exception: Exit code: 1;=
- Stdin: ; Stdout: ; Stderr: ovs-vsctl: transaction error: {"details":"Trans=
-action causes multiple rows in \"Manager\" table to have identical values (=
-\"ptcp:6640:127.0.0.1\") for index on column \"target\".  First row, with U=
-UID 9f27ddee-9881-4cbc-9777-2f42fee735e9, was inserted by this transaction.=
-  Second row, with UUID ccf0e097-09d5-449c-b353-6b69781dc3f7, existed in th=
-e database before this transaction and was not modified by the transaction.=
-","error":"constraint violation"}
-
-
-  I'm not sure if the above error could be pertaining to the failure, I
-  have also attached those logs to this bug as well...
-
-  =
-
-  .
-  (neutron) agent-list
-  +--------------------------------------+----------------------+--------+-=
-------------------+-------+----------------+---------------------------+
-  | id                                   | agent_type           | host   | =
-availability_zone | alive | admin_state_up | binary                    |
-  +--------------------------------------+----------------------+--------+-=
-------------------+-------+----------------+---------------------------+
-  | 0cca03fb-abb2-4704-8b0b-e7d3e117d882 | DHCP agent           | awrep1 | =
-nova              | :-)   | True           | neutron-dhcp-agent        |
-  | 14a5fd52-fbc3-450c-96d5-4e9a65776dad | L3 agent             | awrep1 | =
-nova              | :-)   | True           | neutron-l3-agent          |
-  | 2ebc7238-5e61-41f8-bc60-df14ec6b226b | Loadbalancerv2 agent | awrep1 | =
-                  | :-)   | True           | neutron-lbaasv2-agent     |
-  | 4f6275be-fc8b-4994-bdac-13a4b76f6a83 | Metering agent       | awrep1 | =
-                  | :-)   | True           | neutron-metering-agent    |
-  | 86ecc6b0-c100-4298-b861-40c17516cc08 | Open vSwitch agent   | awrep1 | =
-                  | :-)   | True           | neutron-openvswitch-agent |
-  | 947ad3ab-650b-4b96-a520-00441ecb33e7 | Open vSwitch agent   | awrep4 | =
-                  | :-)   | True           | neutron-openvswitch-agent |
-  | 996b0692-7d19-4641-bec3-e057f4a856f6 | Open vSwitch agent   | awrep3 | =
-                  | :-)   | True           | neutron-openvswitch-agent |
-  | ab6b1065-0b98-4cf3-9f46-6bddba0c5e75 | Metadata agent       | awrep1 | =
-                  | :-)   | True           | neutron-metadata-agent    |
-  | fe24f622-b77c-4eed-ae22-18e4195cf763 | Open vSwitch agent   | awrep2 | =
-                  | :-)   | True           | neutron-openvswitch-agent |
-  +--------------------------------------+----------------------+--------+-=
-------------------+-------+----------------+---------------------------+
-
-  =
-
-  Should neutron-openvswitch be assigned to the 'nova' availability zone? =
-
-
-  I have also attached the ovs-vsctl show from a nova-compute host and
-  the neutron-gateway host to ensure that the open v switch routes are
-  correct.
-
-  =
-
-  I can supply more logs if required.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/cloud-archive/+bug/1719196/+subscriptions
+-- 
+Eduardo
