@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52048)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55828)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gabriel291075@gmail.com>) id 1e5eEo-0004A8-V8
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 16:49:52 -0400
+	(envelope-from <eblake@redhat.com>) id 1e5eXn-00010t-9d
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 17:09:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gabriel291075@gmail.com>) id 1e5eEn-0002ik-Qe
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 16:49:51 -0400
-Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:43117)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <gabriel291075@gmail.com>)
-	id 1e5eEn-0002iQ-Iv
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 16:49:49 -0400
-Received: by mail-pf0-x241.google.com with SMTP id a8so12650107pfc.0
-	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 13:49:49 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <2ed96187-82e5-c6b4-1bd1-14f68b583e24@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1e5eXk-0003bw-4U
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 17:09:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51298)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1e5eXj-0003b1-Rs
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 17:09:24 -0400
 References: <1508513838-15530-1-git-send-email-gabriel291075@gmail.com>
 	<2ed96187-82e5-c6b4-1bd1-14f68b583e24@redhat.com>
-From: Gabriel Costa <gabriel291075@gmail.com>
-Date: Fri, 20 Oct 2017 16:49:47 -0400
-Message-ID: <CAG+oHk-egX1xjU9av-XZfAiiXoFXvReZznC-46FzF0HrX7qS2A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+	<CAG+oHk-egX1xjU9av-XZfAiiXoFXvReZznC-46FzF0HrX7qS2A@mail.gmail.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <84bbb453-08ba-9c89-3cbc-80fede4d1859@redhat.com>
+Date: Fri, 20 Oct 2017 16:09:19 -0500
+MIME-Version: 1.0
+In-Reply-To: <CAG+oHk-egX1xjU9av-XZfAiiXoFXvReZznC-46FzF0HrX7qS2A@mail.gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="XKFHufpAxjr8pcbket6lRRdNJkSq89C4q"
 Subject: Re: [Qemu-devel] [PATCH v3 01/11] kinetis_k64_uart.h has been added
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -29,42 +29,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
+To: Gabriel Costa <gabriel291075@gmail.com>
 Cc: QEMU Developers <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>
 
-Thanks,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--XKFHufpAxjr8pcbket6lRRdNJkSq89C4q
+From: Eric Blake <eblake@redhat.com>
+To: Gabriel Costa <gabriel291075@gmail.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>,
+ Peter Maydell <peter.maydell@linaro.org>
+Message-ID: <84bbb453-08ba-9c89-3cbc-80fede4d1859@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 01/11] kinetis_k64_uart.h has been added
+References: <1508513838-15530-1-git-send-email-gabriel291075@gmail.com>
+ <2ed96187-82e5-c6b4-1bd1-14f68b583e24@redhat.com>
+ <CAG+oHk-egX1xjU9av-XZfAiiXoFXvReZznC-46FzF0HrX7qS2A@mail.gmail.com>
+In-Reply-To: <CAG+oHk-egX1xjU9av-XZfAiiXoFXvReZznC-46FzF0HrX7qS2A@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-I found an example in [Qemu-devel] and in the next time I will include it.
-also, I note now that I did not put [Qemu-devel] and arm: in the messages.
-Should I resend everything corrected?
+On 10/20/2017 03:49 PM, Gabriel Costa wrote:
+> Thanks,
+>=20
+> I found an example in [Qemu-devel] and in the next time I will include =
+it.
+> also, I note now that I did not put [Qemu-devel] and arm: in the messag=
+es.
+> Should I resend everything corrected?
+
+The list automatically prefixes [Qemu-devel], you don't have to do that
+(in fact, if you do, it can sometimes lead to duplicated [] tags,
+although the list server tries to not add another round of [] if the tag
+was already present).
+
+Resending things as a threaded series may make it easier to review your
+patches, or you may want to first wait and see if there are any comments
+on your v1 patches, in spite of them being unthreaded.  Up to you.
+
+Also note that we frown on top-posting on this list (it's better to trim
+unimportant parts of the message, and then stick your answers below the
+relevant quotation).
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
-On Fri, Oct 20, 2017 at 4:18 PM, Eric Blake <eblake@redhat.com> wrote:
+--XKFHufpAxjr8pcbket6lRRdNJkSq89C4q
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-> On 10/20/2017 10:37 AM, Gabriel Augusto Costa wrote:
-> > I made a new arm machine with some peripherals. The machine is
-> mk64fn1m0, a
-> > cortex-m4 microcontroller from NXP Kinetis family. The machine can run a
-> > simple arm binary file using UART0 in polling mode.
-> > I have prepared a series of patchs to include this machine:
->
-> s/patchs/patches/
->
-> > PATCH v3 n/11: It adds the machine and peripherals devices;
-> > PATCH v4 n/2: It changes the Make files to compile this machine.
->
-> Are the last three sentences really useful as part of the git commit
-> message, or are they comments better directed to a cover letter?
-> Remember, when sending a series, please include a 0/11 cover letter that
-> all other messages are in-reply-to, rather than creating 11 separate
-> top-level threads.
->
-> More patch submission tips can be found at:
-> https://wiki.qemu.org/Contribute/SubmitAPatch
->
-> --
-> Eric Blake, Principal Software Engineer
-> Red Hat, Inc.           +1-919-301-3266
-> Virtualization:  qemu.org | libvirt.org
->
->
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnqZgAACgkQp6FrSiUn
+Q2pXPwf/e13SkQfCR9kfTXJkm7qgMrKFqvuCScvLHHlKscJGOWaMmYMJAdIvj281
+RhtUKsOk674hV8OuI9hhpfQcj4QAUX/BbBbpXGx0uSu/XtS3fP6EJCs/5sZCWSU7
+8bID4wjFqAEgbYQcQ/4G3PCtbJ/tMbCPDdkkUPwppxAt3i+4l9yZpXjgQTeJrbGO
+9zOhaZNSHzUWXrCACu3JnE8mh0ycH/6s5ROpYaNfcF5VE6uXVoPqNp03KyiuSwrD
+o/Gi02lAr6HCR3R2UKPvbiPkQ8NF/H46d5cADOCD1vvnAKeXPE7j/JrUIAwjs43V
+yO2g4tF2/NePtE/OR0eztvInGDifeA==
+=q1R/
+-----END PGP SIGNATURE-----
+
+--XKFHufpAxjr8pcbket6lRRdNJkSq89C4q--
