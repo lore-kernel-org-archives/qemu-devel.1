@@ -1,28 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39051)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39683)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1e5LyN-0000Cr-Ef
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 21:19:41 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1e5M0x-0001AB-TO
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 21:22:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1e5LyJ-0003Nj-6e
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 21:19:39 -0400
-Received: from ozlabs.org ([103.22.144.67]:33249)
+	(envelope-from <dgibson@ozlabs.org>) id 1e5M0w-00051y-U9
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 21:22:19 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:48301)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1e5LyI-0003Ma-9U
-	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 21:19:35 -0400
-Date: Fri, 20 Oct 2017 12:19:17 +1100
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1e5M0w-0004zw-IS
+	for qemu-devel@nongnu.org; Thu, 19 Oct 2017 21:22:18 -0400
+Date: Fri, 20 Oct 2017 12:21:30 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20171020011917.GF13245@umbus>
+Message-ID: <20171020012130.GG13245@umbus>
 References: <1508170976-96869-1-git-send-email-imammedo@redhat.com>
-	<1508170976-96869-5-git-send-email-imammedo@redhat.com>
-	<20171016165916.GI3246@localhost.localdomain>
-	<20171019104218.GB13245@umbus>
-	<20171020001548.GK2942@localhost.localdomain>
+	<20171016163636.GI11975@redhat.com>
+	<20171017092702.5b82103b@nial.brq.redhat.com>
+	<20171017150759.GB31897@redhat.com>
+	<20171017180635.6a900616@nial.brq.redhat.com>
+	<20171018153010.GL9719@redhat.com>
+	<20171018202240.GD2942@localhost.localdomain>
+	<20171019114954.GC13245@umbus>
+	<58846850-bbe2-e1c4-2235-58b3f6709ba6@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="0rSojgWGcpz+ezC3"
+	protocol="application/pgp-signature"; boundary="UTZ8bGhNySVQ9LYl"
 Content-Disposition: inline
-In-Reply-To: <20171020001548.GK2942@localhost.localdomain>
-Subject: Re: [Qemu-devel] [RFC 4/6] CLI: add -paused option
+In-Reply-To: <58846850-bbe2-e1c4-2235-58b3f6709ba6@redhat.com>
+Subject: Re: [Qemu-devel] [RFC 0/6] enable numa configuration before
+ machine_init() from HMP/QMP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,166 +36,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, eblake@redhat.com, armbru@redhat.com, pkrempa@redhat.com, peter.maydell@linaro.org, pbonzini@redhat.com, cohuck@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Igor Mammedov <imammedo@redhat.com>, peter.maydell@linaro.org, pkrempa@redhat.com, cohuck@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com
 
 
---0rSojgWGcpz+ezC3
+--UTZ8bGhNySVQ9LYl
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Oct 19, 2017 at 10:15:48PM -0200, Eduardo Habkost wrote:
-> On Thu, Oct 19, 2017 at 09:42:18PM +1100, David Gibson wrote:
-> > On Mon, Oct 16, 2017 at 02:59:16PM -0200, Eduardo Habkost wrote:
-> > > On Mon, Oct 16, 2017 at 06:22:54PM +0200, Igor Mammedov wrote:
-> > > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> > > > ---
-> > > >  include/sysemu/sysemu.h |  1 +
-> > > >  qemu-options.hx         | 15 ++++++++++++++
-> > > >  qmp.c                   |  5 +++++
-> > > >  vl.c                    | 54 +++++++++++++++++++++++++++++++++++++=
-+++++++++++-
-> > > >  4 files changed, 74 insertions(+), 1 deletion(-)
-> > > >=20
-> > > > diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-> > > > index b213696..3feb94f 100644
-> > > > --- a/include/sysemu/sysemu.h
-> > > > +++ b/include/sysemu/sysemu.h
-> > > > @@ -66,6 +66,7 @@ typedef enum WakeupReason {
-> > > >      QEMU_WAKEUP_REASON_OTHER,
-> > > >  } WakeupReason;
-> > > > =20
-> > > > +void qemu_exit_preconfig_request(void);
-> > > >  void qemu_system_reset_request(ShutdownCause reason);
-> > > >  void qemu_system_suspend_request(void);
-> > > >  void qemu_register_suspend_notifier(Notifier *notifier);
-> > > > diff --git a/qemu-options.hx b/qemu-options.hx
-> > > > index 39225ae..bd44db8 100644
-> > > > --- a/qemu-options.hx
-> > > > +++ b/qemu-options.hx
-> > > > @@ -3498,6 +3498,21 @@ STEXI
-> > > >  Run the emulation in single step mode.
-> > > >  ETEXI
-> > > > =20
-> > > > +DEF("paused", HAS_ARG, QEMU_OPTION_paused, \
-> > > > +    "-paused [state=3D]postconf|preconf\n"
-> > > > +    "                postconf: pause QEMU after machine is initial=
-ized\n"
-> > > > +    "                preconf: pause QEMU before machine is initial=
-ized\n",
-> > > > +    QEMU_ARCH_ALL)
-> > >=20
-> > > I would like to allow pausing before machine-type is selected, so
-> > > management could run query-machines before choosing a
-> > > machine-type.  Would that need a third "-pause" mode, or will we
-> > > be able to change "preconf" to pause before select_machine() is
-> > > called?
-> > >=20
-> > > The same probably applies to other things initialized before
-> > > machine_run_board_init() that could be configurable using QMP,
-> > > including but not limited to:
-> > > * Accelerator configuration
-> > > * Registering global properties
-> > > * RAM size
-> > > * SMP/CPU configuration
+On Thu, Oct 19, 2017 at 02:23:04PM +0200, Paolo Bonzini wrote:
+> On 19/10/2017 13:49, David Gibson wrote:
+> > Note that describing socket/core/thread tuples as arch independent (or
+> > even machine independent) is.. debatable.  I mean it's flexible enough
+> > that most platforms can be fit to that scheme without too much
+> > straining.  But, there's no arch independent way of defining what each
+> > level means in terms of its properties.
 > >=20
-> > Yeah.. having a bunch of different possible pause stages to select
-> > doesn't sound great.
+> > So, for example, on spapr - being paravirt - there's no real
+> > distinction between cores and sockets, how you divide them up is
+> > completely arbitrary.
 >=20
-> I agree.  The number of externally visible pause states should be
-> as small as possible.
+> Same on x86, actually.
 >=20
+> It's _common_ that cores on the same socket share L3 cache and that a
+> socket spans an integer number of NUMA nodes, but it doesn't have to be
+> that way.
 >=20
-> >                       Could we avoid this by instead changing -S to
-> > pause at the earliest possible spot, but having any monitor commands
-> > that require a later stage automatically "fast forwarding" to the
-> > right phase?
->=20
-> That would hide the internal details from the outside.  Sounds
-> nice, but adding new machine/device configuration QMP commands
-> while hiding the QEMU state from the outside sounds impossible.
->=20
-> For example, if we use -S today, this works:
->=20
->   $ qemu-system-x86_64 -S -qmp stdio
->   <- {"QMP": {"version": {"qemu": {"micro": 0, "minor": 10, "major": 2}, =
-"package": " (v2.10.0-83-g9375da7831)"}, "capabilities": []}}
->   -> {"execute":"qmp_capabilities"}
->   <- {"return": {}}
->   -> {"execute":"query-cpus"}
->   <- {"return": [{"arch": "x86", "current": true, "props": {"core-id": 0,=
- "thread-id": 0, "socket-id": 0}, "CPU": 0, "qom_path": "/machine/unattache=
-d/device[0]", "pc": 4294967280, "halted": false, "thread_id": 4038}]}
->=20
-> This means "query-cpus" needs to fast-forward to the CPU creation
-> stage if we want to keep compatibility.
->=20
-> Now, assume we add a set-numa-node command like the one in this
-> series.  e.g.:
->=20
->   $ qemu-system-x86_64 -S -qmp stdio
->   <- {"QMP": {"version": {"qemu": {"micro": 0, "minor": 10, "major": 2}, =
-"package": " (v2.10.0-83-g9375da7831)"}, "capabilities": []}}
->   -> {"execute":"qmp_capabilities"}
->   <- {"return": {}}
->   -> {"execute":"set-numa-node" ... }
->   <- {"return": ...}
->=20
-> The command will work only if machine initialization didn't run
-> yet.
->=20
-> But now an innocent-looking query command would change QEMU state
-> in an unexpected way:
->=20
->   $ qemu-system-x86_64 -S -qmp stdio
->   <- {"QMP": {"version": {"qemu": {"micro": 0, "minor": 10, "major": 2}, =
-"package": " (v2.10.0-83-g9375da7831)"}, "capabilities": []}}
->   -> {"execute":"qmp_capabilities"}
->   <- {"return": {}}
->   -> {"execute":"query-cpus"}  [will silently fast-forward QEMU state]
->   <- {"return": [{"arch": "x86", "current": true, "props": {"core-id": 0,=
- "thread-id": 0, "socket-id": 0}, "CPU": 0, "qom_path": "/machine/unattache=
-d/device[0]", "pc": 4294967280, "halted": false, "thread_id": 4038}]}
->   -> {"execute":"set-numa-node" ... }
->   <- {"error": ...}  [the command will fail because the machine was alrea=
-dy created]
->=20
-> This means we do have a externally visible "too late to use
-> set-numa-node" QEMU state, and query-cpus will have a externally
-> visible side effect.  Every QMP command would need to document
-> how it affects QEMU state in a externally visible way.
->=20
-> If QEMU pause state is still going to be externally visible this
-> way, I would prefer to let the client to explicitly tell what's
-> the state they want QEMU to be, instead of making QEMU change
-> state silently as a side effect of QMP commands.
+> QEMU currently enforces the former (if it tells the guest at all that
+> there is an L3 cache), but not the latter.
 
-Yeah, good point.  My proposal would just have changed explicitly
-exposed ugly internal state to subtly exposed ugly internal state,
-which is probably worse :(.
-
-
-Ok.. next possibly bad idea..
-
-What about a "re-exec" monitor command; it would take what's
-essentially a new command line, and basically restart qemu from the
-beginning, reparsing this new command line, but without actually=20
-
-Pro:
-  * Mitigates Daniel Berrange's concern about lots of qemu
-    configuration being buried in the qmp session - if libvirt logged
-    its last "re-exec" that would have what is generally needed.
-  * Lets libvirt do assorted investigation of options, then rewind to
-    choose what it actually wants
-
-Con:
-  * Would require a bunch of auditing of structures/state to make sure
-    they can be re-initialized cleanly
-  * Would it be fast enough for libvirt to use?  Do we know if the
-    slowness which makes multiple qemu invocations by libvirt
-    unattractive is from the kernel/libc/ldso overhead, or from qemu's
-    internal start up processing?
+Ok.  Correct me if I'm wrong, but doesn't ACPI describe the NUMA
+architecture in terms of this thread/core/socket heirarchy?  That's
+not true for PAPR, where the NUMA topology is described in an
+independent set of (potentially arbitrarily nested) nodes.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -198,24 +77,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---0rSojgWGcpz+ezC3
+--UTZ8bGhNySVQ9LYl
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnpTxMACgkQbDjKyiDZ
-s5IHHw//SmDU0ReAEzTrCRGIjwdRdR56CYyh/A0rapko9X+9N2+YvmLYU1ZSSSVv
-A2g0S0hgM2ghtIX5pw2DYEFJ3P0fRYAJb+M4bnhDk/69vtHhz6/rTQw45Kfg0P2I
-y+4A+pgBQDR/OSO/WJCUCP7hbHRGCPCtiurnMlEIP2r6KLvLp8x1rjtx/DFkPERD
-t6zobdOd2OxBeup03XuYT5vz12F3zjNfd4CjJPJaEmW9n490bnDVRnjujGrUEErx
-ems9aVPcszdYs+hmbFhXAh0mBb5GKRJS7MRnXcEOaz8TLtnYe+PMU0UNFvBEMNNR
-I1utnewJSB466y5QXF4VQ+4PpqHzkPuasUUAQ1lARd3M9zec6hkXqNt2uwe1PzBA
-p6V5G9enUq5l2lrAUWSOujozQAQUm+7uiRL1th9t1BH+TAnOz56dk6iHeOnmTAKb
-KGhmDh49xJ6KkVaiprdwIMUQtrSyKdATb5Rx3AEO38i0livR7jP9CLZY9mTpyXXa
-7bCAwZ4CY3i50JUYLA70Bsxr54Tziv3Ao07slL4QG07omT/Ntvyq082h6tjDYYQS
-GJD29kQ+VuiWb+XHQlOolsOomncWzfTlb7QZp8RDAHDb6jt2NggSNe93/QD5fdHz
-ZBaqRNaNGoERu3fimk2KIl5///DXwUZXAopp2v219fEcIHhh17o=
-=NhuV
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnpT5oACgkQbDjKyiDZ
+s5IKRhAAvRd8XlNBed63GzKSYXZUgKrHPxpyI7xQMmc36zAkXE4gXsaaQNsr37pl
+m5ADtv+nfjU9Gkv344VQfim2Fb7+UoeTQOCnSZC1gX2mu1A5O3uXPaiNYE4JaBd5
+uJf4vE8kFziBDUVPkXYCZEEuFdKMPRo3i3YHSTESvrpBSrSPzfXVYs5g94EaRJ7L
+HC4Ft3KNe2SM3FYhS1BGGUmTc7LbM5No2Ofg8boI8wdNnsD4A5wrKqYr3opvjkXH
+Lx+iNuimDSnbFzH0DB/dy4SsbypwifqhyEfy3+SOwOQ9qBjDSLCIZkNL87y5Av1A
+MRLSkAv7rYxLu1PEyg+CTGNbGFq+99/JC+GDe2rwZfnK6731s8aIZpyOVZ0uPRG5
+xcfv6zSIm28WySMJEFUhyKbfTkmlwWCd4V7y+mhraXqqDNkhI8rL5UlXuOT1a5JL
+J1PncA3vnpRfyCa/Pfo1aQqXwcxdW2Nm/hM/R893EsJcTkgGqThl5VVVC7uG74d1
+lPEaZ1c7MsZGgv6wvL2WyYKBvcOlpWbp+K84hNRl4TYdAPWZ+XYnE/rBmLTQofV5
+jS+iqFtliZJIi3/V6dqIbTrElRC3pQxIiQjnXYRxuTizM04i0ySg57RCA25b1400
+U+FSKfxFkqPS84cnFZUiqYkng2t38u3J73zEAhkUZuGfkcdZkU4=
+=AFx1
 -----END PGP SIGNATURE-----
 
---0rSojgWGcpz+ezC3--
+--UTZ8bGhNySVQ9LYl--
