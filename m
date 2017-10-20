@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40408)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44309)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1e5SKQ-0002KD-VS
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 04:06:51 -0400
+	(envelope-from <cohuck@redhat.com>) id 1e5Scc-0005Jd-Eq
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 04:25:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1e5SKN-0005fj-R4
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 04:06:50 -0400
-References: <20171019222637.17890-1-eblake@redhat.com>
-	<20171019222637.17890-5-eblake@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <2ad2becb-7f62-a0d7-e8b8-a70a15b01fc2@virtuozzo.com>
-Date: Fri, 20 Oct 2017 11:06:44 +0300
+	(envelope-from <cohuck@redhat.com>) id 1e5ScY-0007mr-2f
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 04:25:38 -0400
+Date: Fri, 20 Oct 2017 10:25:25 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20171020102525.6cc2edb5.cohuck@redhat.com>
+In-Reply-To: <20171017141706.749cef7b.cohuck@redhat.com>
+References: <20171016202358.3633-1-david@redhat.com>
+	<20171017141706.749cef7b.cohuck@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20171019222637.17890-5-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v5 04/11] nbd/server: Report error for
- write to read-only export
+Subject: Re: [Qemu-devel] [PATCH v1 0/2] s390x/tcg: LAP support using
+ immediate TLB invalidation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,36 +24,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, qemu-block@nongnu.org
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Peter Maydell <peter.maydell@linaro.org>
 
-20.10.2017 01:26, Eric Blake wrote:
-> When the server is read-only, we were already reporting an error
-> message for NBD_CMD_WRITE_ZEROES, but failed to set errp for a
-> similar NBD_CMD_WRITE.  This will matter more once structured
-> replies allow the server to propagate the errp information back
-> to the client.  While at it, use an error message that makes a
-> bit more sense if viewed on the client side.
->
-> Note that when using qemu-io to test qemu-nbd behavior, it is
-> rather difficult to convince qemu-io to send protocol violations
-> (such as a read beyond bounds), because we have a lot of active
-> checking on the client side that a qemu-io request makes sense
-> before it ever goes over the wire to the server.  The case of a
-> client attempting a write when the server is started as
-> 'qemu-nbd -r' is one of the few places where we can easily test
-> error path handling, without having to resort to hacking in known
-> temporary bugs to either the server or client.  [Maybe we want a
-> future patch to the client to do up-front checking on writes to a
-> read-only export, the way it does up-front bounds checking; but I
-> don't see anything in the NBD spec that points to a protocol
-> violation in our current behavior.]
->
-> Signed-off-by: Eric Blake <eblake@redhat.com>
+On Tue, 17 Oct 2017 14:17:06 +0200
+Cornelia Huck <cohuck@redhat.com> wrote:
 
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> On Mon, 16 Oct 2017 22:23:56 +0200
+> David Hildenbrand <david@redhat.com> wrote:
+> 
+> > Details about Low-Address Protection can be found in description of
+> > patch 1 and 2. It is basically a subpage protection of the first two
+> > pages of every address space (for which it is enabled).
+> > 
+> > We can achieve this by simply directly invalidating the TLB entry and
+> > therefore forcing every write accesses onto these two pages into the slow
+> > path.
+> > 
+> > With this patch, I can boot Linux just fine (which uses LAP). This also
+> > makes all related kvm-unit-tests that we have pass.
+> > 
+> > 
+> > RFC -> v1:
+> > - fix LAP range check (Thomas)
+> > - SIGP fix got picked up
+> > 
+> > Based on: https://github.com/cohuck/qemu.git s390-next
+> > Available on: https://github.com/dhildenb/qemu.git s390x_lap
+> > 
+> > 
+> > David Hildenbrand (2):
+> >   accel/tcg: allow to invalidate a write TLB entry immediately
+> >   s390x/tcg: low-address protection support
+> > 
+> >  accel/tcg/cputlb.c           |  5 ++-
+> >  accel/tcg/softmmu_template.h |  4 +-
+> >  include/exec/cpu-all.h       |  3 ++
+> >  target/s390x/excp_helper.c   |  3 +-
+> >  target/s390x/mem_helper.c    |  8 ----
+> >  target/s390x/mmu_helper.c    | 94 +++++++++++++++++++++++++++-----------------
+> >  6 files changed, 69 insertions(+), 48 deletions(-)
+> >   
+> 
+> As the oom was not reproducible (and seems to be only a problem of the
+> machine being run with barely enough memory), I'm inclined to queue
+> this to s390-next after I got some acks/r-bs for patch 1.
 
+And as I want to send this in my last pull req before softfreeze, I
+included it anyway :)
 
--- 
-Best regards,
-Vladimir
+Thanks, applied.
