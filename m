@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35004)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35177)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <darren.kenny@oracle.com>) id 1e5U8m-0005vZ-TV
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 06:03:00 -0400
+	(envelope-from <darren.kenny@oracle.com>) id 1e5U9X-0006FO-FO
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 06:03:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <darren.kenny@oracle.com>) id 1e5U8g-0002Gb-V1
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 06:02:56 -0400
-Received: from aserp1040.oracle.com ([141.146.126.69]:28274)
+	(envelope-from <darren.kenny@oracle.com>) id 1e5U9T-0002nU-Gh
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 06:03:43 -0400
+Received: from userp1040.oracle.com ([156.151.31.81]:35738)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <darren.kenny@oracle.com>)
-	id 1e5U8g-0002El-Na
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 06:02:50 -0400
-Date: Fri, 20 Oct 2017 11:02:43 +0100
+	id 1e5U9T-0002mx-7u
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 06:03:39 -0400
+Date: Fri, 20 Oct 2017 11:03:33 +0100
 From: Darren Kenny <darren.kenny@oracle.com>
-Message-ID: <20171020100243.riam33tacf6smb7s@starbug-vm.ie.oracle.com>
+Message-ID: <20171020100333.dgjrpad3c4kt22oj@starbug-vm.ie.oracle.com>
 References: <20171020092844.13880-1-berrange@redhat.com>
+	<20171020095431.GG21172@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20171020092844.13880-1-berrange@redhat.com>
+In-Reply-To: <20171020095431.GG21172@redhat.com>
 Subject: Re: [Qemu-devel] [PATCH] sockets: avoid leak of listen file
  descriptor
 List-Id: <qemu-devel.nongnu.org>
@@ -31,88 +32,33 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: "Daniel P. Berrange" <berrange@redhat.com>
 Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 
-Hi Daniel,
-
-On Fri, Oct 20, 2017 at 10:28:44AM +0100, Daniel P. Berrange wrote:
->If we iterate over the full port range without successfully binding+listening
->on the socket, we'll try the next address, whereupon we overwrite the slisten
->file descriptor variable without closing it.
+On Fri, Oct 20, 2017 at 10:54:31AM +0100, Daniel P. Berrange wrote:
+>On Fri, Oct 20, 2017 at 10:28:44AM +0100, Daniel P. Berrange wrote:
+>> If we iterate over the full port range without successfully binding+listening
+>> on the socket, we'll try the next address, whereupon we overwrite the slisten
+>> file descriptor variable without closing it.
+>>
+>> Rather than having two places where we open + close socket FDs on different
+>> iterations of nested for loops, re-arrange the code to always open+close
+>> within the same loop iteration.
+>>
+>> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+>> ---
+>>  util/qemu-sockets.c | 31 +++++++++++++++++++------------
+>>  1 file changed, 19 insertions(+), 12 deletions(-)
 >
->Rather than having two places where we open + close socket FDs on different
->iterations of nested for loops, re-arrange the code to always open+close
->within the same loop iteration.
->
->Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
->---
-> util/qemu-sockets.c | 31 +++++++++++++++++++------------
-> 1 file changed, 19 insertions(+), 12 deletions(-)
->
->diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
->index b47fb45885..a319338cca 100644
->--- a/util/qemu-sockets.c
->+++ b/util/qemu-sockets.c
->@@ -207,7 +207,7 @@ static int inet_listen_saddr(InetSocketAddress *saddr,
->     char uaddr[INET6_ADDRSTRLEN+1];
->     char uport[33];
->     int rc, port_min, port_max, p;
->-    int slisten = 0;
->+    int slisten = -1;
->     int saved_errno = 0;
->     bool socket_created = false;
->     Error *err = NULL;
->@@ -267,16 +267,28 @@ static int inet_listen_saddr(InetSocketAddress *saddr,
-> 		        uaddr,INET6_ADDRSTRLEN,uport,32,
-> 		        NI_NUMERICHOST | NI_NUMERICSERV);
->
->-        slisten = create_fast_reuse_socket(e);
->-        if (slisten < 0) {
->-            continue;
->-        }
->-
->         socket_created = true;
+>Self-NACK this has a bug too
 
-Is this setting of socket_created correct now? Maybe it should be moved to
-before the try_bind() below?
-
->         port_min = inet_getport(e);
->         port_max = saddr->has_to ? saddr->to + port_offset : port_min;
->         for (p = port_min; p <= port_max; p++) {
->             inet_setport(e, p);
->+
->+            slisten = create_fast_reuse_socket(e);
->+            if (slisten < 0) {
->+                /* First time we expect we might fail to create the socket
->+                 * eg if 'e' has AF_INET6 but ipv6 kmod is not loaded.
->+                 * Later iterations should always succeeed if first iteration
->+                 * worked though, so treat that as fatal.
->+                 */
->+                if (p == port_min) {
->+                    continue;
->+                } else {
->+                    error_setg_errno(errp, errno,
->+                                     "Failed to recreate failed listening socket");
->+                    goto listen_failed;
->+                }
->+            }
->+
->             rc = try_bind(slisten, saddr, e);
->             if (rc) {
->                 if (errno == EADDRINUSE) {
->@@ -299,12 +311,7 @@ static int inet_listen_saddr(InetSocketAddress *saddr,
->              * socket to allow bind attempts for subsequent ports:
->              */
->             closesocket(slisten);
->-            slisten = create_fast_reuse_socket(e);
->-            if (slisten < 0) {
->-                error_setg_errno(errp, errno,
->-                                 "Failed to recreate failed listening socket");
->-                goto listen_failed;
->-            }
->+            slisten = -1;
->         }
->     }
->     error_setg_errno(errp, errno,
-
-Thanks,
+Missed this... 
 
 Darren.
+
+>
+>
+>Regards,
+>Daniel
+>-- 
+>|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+>|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+>|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+>
