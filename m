@@ -1,21 +1,45 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50740)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51518)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1e5YL4-0008DY-LU
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 10:31:55 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1e5YN9-00019o-51
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 10:34:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1e5YKy-00063u-NJ
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 10:31:54 -0400
-Date: Fri, 20 Oct 2017 16:31:24 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20171020143124.GB3667@localhost.localdomain>
-References: <20171012034720.11947-1-eblake@redhat.com>
-	<20171012034720.11947-8-eblake@redhat.com>
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1e5YN6-0007GM-1P
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 10:34:03 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:50970)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1e5YN5-0007Fn-P3
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 10:33:59 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v9KEUnkK104087
+	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 10:33:55 -0400
+Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2dqe5q76mg-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 10:33:54 -0400
+Received: from localhost
+	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Fri, 20 Oct 2017 15:33:52 +0100
+References: <20170913132752.8484-1-pasic@linux.vnet.ibm.com>
+	<20170913132752.8484-2-pasic@linux.vnet.ibm.com>
+	<20170914162603.1cdabd09.cohuck@redhat.com>
+	<0b42ef59-4366-175f-8dc7-bc3ed02e2fb4@linux.vnet.ibm.com>
+	<20170915092758.16ea52fc.cohuck@redhat.com>
+	<711b1e41-693a-de7d-9c13-fbe0f964c53c@linux.vnet.ibm.com>
+	<20171020150043.383b2117.cohuck@redhat.com>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Fri, 20 Oct 2017 16:33:47 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171012034720.11947-8-eblake@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v6 07/24] block: Convert
- bdrv_get_block_status() to bytes
+In-Reply-To: <20171020150043.383b2117.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <c17eb441-f22b-2e92-dd39-01c3caddec19@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 1/2] s390x/ccs: add ccw-tester emulated
+ device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,83 +48,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, famz@redhat.com, jsnow@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
-Am 12.10.2017 um 05:47 hat Eric Blake geschrieben:
-> We are gradually moving away from sector-based interfaces, towards
-> byte-based.  In the common case, allocation is unlikely to ever use
-> values that are not naturally sector-aligned, but it is possible
-> that byte-based values will let us be more precise about allocation
-> at the end of an unaligned file that can do byte-based access.
-> 
-> Changing the name of the function from bdrv_get_block_status() to
-> bdrv_block_status() ensures that the compiler enforces that all
-> callers are updated.  For now, the io.c layer still assert()s that
-> all callers are sector-aligned, but that can be relaxed when a later
-> patch implements byte-based block status in the drivers.
-> 
-> There was an inherent limitation in returning the offset via the
-> return value: we only have room for BDRV_BLOCK_OFFSET_MASK bits, which
-> means an offset can only be mapped for sector-aligned queries (or,
-> if we declare that non-aligned input is at the same relative position
-> modulo 512 of the answer), so the new interface also changes things to
-> return the offset via output through a parameter by reference rather
-> than mashed into the return value.  We'll have some glue code that
-> munges between the two styles until we finish converting all uses.
-> 
-> For the most part this patch is just the addition of scaling at the
-> callers followed by inverse scaling at bdrv_block_status(), coupled
-> with the tweak in calling convention.  But some code, particularly
-> bdrv_is_allocated(), gets a lot simpler because it no longer has to
-> mess with sectors.
-> 
-> For ease of review, bdrv_get_block_status_above() will be tackled
-> separately.
-> 
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> 
-> ---
-> v6: redo interface to return byte-based offset by reference [Kevin]
-> v5: drop pointless 'if (pnum)' [John], add comment
-> v4: no change
-> v3: clamp bytes to 32-bits, rather than asserting
-> v2: rebase to earlier changes
-> ---
->  include/block/block.h | 17 +++++++++--------
->  block/io.c            | 47 ++++++++++++++++++++++++++++++++++-------------
->  block/qcow2-cluster.c |  2 +-
->  qemu-img.c            | 25 ++++++++++++++-----------
->  4 files changed, 58 insertions(+), 33 deletions(-)
-> 
-> diff --git a/include/block/block.h b/include/block/block.h
-> index 440f3e9e39..7ac851f82f 100644
-> --- a/include/block/block.h
-> +++ b/include/block/block.h
-> @@ -121,7 +121,7 @@ typedef struct HDGeometry {
->  #define BDRV_REQUEST_MAX_BYTES (BDRV_REQUEST_MAX_SECTORS << BDRV_SECTOR_BITS)
-> 
->  /*
-> - * Allocation status flags for bdrv_get_block_status() and friends.
-> + * Allocation status flags for bdrv_block_status() and friends.
->   *
->   * Public flags:
->   * BDRV_BLOCK_DATA: allocation for data at offset is tied to this layer
-> @@ -136,10 +136,11 @@ typedef struct HDGeometry {
->   *                 that the block layer recompute the answer from the returned
->   *                 BDS; must be accompanied by just BDRV_BLOCK_OFFSET_VALID.
->   *
-> - * If BDRV_BLOCK_OFFSET_VALID is set, bits 9-62 (BDRV_BLOCK_OFFSET_MASK)
-> - * represent the offset in the returned BDS that is allocated for the
-> - * corresponding raw data; however, whether that offset actually contains
-> - * data also depends on BDRV_BLOCK_DATA and BDRV_BLOCK_ZERO, as follows:
-> + * If BDRV_BLOCK_OFFSET_VALID is set, bits 9-62 (BDRV_BLOCK_OFFSET_MASK) of
-> + * the return value (old interface) or the entire map parameter (new
-> + * interface) represent the offset in the returned BDS that is allocated for
-> + * the corresponding raw data.
 
-Are there any functions using the old interface left at the end of the
-series or do we want a final patch that removes the old interface from
-the description?
 
-Kevin
+On 10/20/2017 03:00 PM, Cornelia Huck wrote:
+> On Thu, 19 Oct 2017 18:39:37 +0200
+> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+> 
+>> On 09/15/2017 09:27 AM, Cornelia Huck wrote:
+>>>>>     
+>>>>>> +    DEFINE_PROP_UINT8("chpid_type", CcwTesterDevice, chpid_type,
+>>>>>> +                       0x98),  
+>>> This might also need re-evaluation - we should not really need a new
+>>> chpid type.
+>>>   
+>>
+>> I'm back at ccw-tester again (for v2). I've realized we did not agree
+>> on what to use here (chpid_type). Shall I use 0x25 (Fibre Channel) or
+>> EMULATED_CCW_3270_CHPID_TYPE, or even 0x32 (virtio-ccw) as a default
+>> value? And should EMULATED_CCW_3270_CHPID_TYPE be called like that
+>> (is it really supposed to be specific to 3270?
+>>
+>> Sorry I did not notice sooner.
+> 
+> It might make sense to pick whatever z/VM commonly uses for emulated
+> devices. (Or ask them if they reserved something explicitly for testing
+> -- that would be an even better match.)
+> 
+
+OK, I will approach the z/VM guys. About EMULATED_CCW_3270_CHPID_TYPE,
+does it really make sense to have a separate chpid type for 3270? (You
+have missed that question, so I'm asking it again).
+
+Halil
