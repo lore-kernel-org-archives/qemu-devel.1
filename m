@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35134)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35339)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <shorne@gmail.com>) id 1e5fPf-0001Q4-VX
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 18:05:08 -0400
+	(envelope-from <shorne@gmail.com>) id 1e5fQP-0001pH-En
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 18:05:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <shorne@gmail.com>) id 1e5fPb-0003I7-3G
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 18:05:07 -0400
-Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:51827)
+	(envelope-from <shorne@gmail.com>) id 1e5fQO-0003nT-LG
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 18:05:53 -0400
+Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:54248)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <shorne@gmail.com>) id 1e5fPa-0003Hi-TX
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 18:05:03 -0400
-Received: by mail-pf0-x244.google.com with SMTP id n14so12858831pfh.8
-	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 15:05:02 -0700 (PDT)
-Date: Sat, 21 Oct 2017 07:04:59 +0900
+	(Exim 4.71) (envelope-from <shorne@gmail.com>) id 1e5fQO-0003nE-FF
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 18:05:52 -0400
+Received: by mail-pf0-x243.google.com with SMTP id t188so12870027pfd.10
+	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 15:05:52 -0700 (PDT)
 From: Stafford Horne <shorne@gmail.com>
-Message-ID: <20171020220459.GD2694@lianli.shorne-pla.net>
-References: <20171013145714.2740-1-shorne@gmail.com>
-	<CAFEAcA-w9d1-FQ_E4Aes0dzdx_rNEm3XdKnkJDVrwAWq4ZxH9g@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA-w9d1-FQ_E4Aes0dzdx_rNEm3XdKnkJDVrwAWq4ZxH9g@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PULL 0/5] OpenRISC SMP Support
+Date: Sat, 21 Oct 2017 07:05:30 +0900
+Message-Id: <20171020220533.29186-3-shorne@gmail.com>
+In-Reply-To: <20171020220533.29186-1-shorne@gmail.com>
+References: <20171020220533.29186-1-shorne@gmail.com>
+Subject: [Qemu-devel] [PULL v2 2/5] target/openrisc: Make coreid and
+ numcores variable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,49 +26,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Development <qemu-devel@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>, QEMU Development <qemu-devel@nongnu.org>
+Cc: Stafford Horne <shorne@gmail.com>
 
-On Fri, Oct 20, 2017 at 05:51:13PM +0100, Peter Maydell wrote:
-> On 13 October 2017 at 15:57, Stafford Horne <shorne@gmail.com> wrote:
-> > Hello,
-> >
-> > Please consider for pull.
-> >
-> > The following changes since commit 7851197b812b383ae1208c5d86391c5179c8209d:
-> >
-> >   Update version for 2.10.1 release (2017-10-02 12:42:58 -0500)
-> >
-> > are available in the git repository at:
-> >
-> >   git://github.com/stffrdhrn/qemu.git tags/openrisc-20171113-smp-pr
-> >
-> > for you to fetch changes up to 017a118ebed8757ccdce6fa217640963579aeb13:
-> >
-> >   openrisc: Only kick cpu on timeout, not on update (2017-10-13 23:31:22 +0900)
-> >
-> > ----------------------------------------------------------------
-> > OpenRISC SMP patchset 20171113
-> >
-> > ----------------------------------------------------------------
-> > Stafford Horne (5):
-> >   openrisc/ompic: Add OpenRISC Multicore PIC (OMPIC)
-> >   target/openrisc: Make coreid and numcores variable
-> >   openrisc/cputimer: Perparation for Multicore
-> >   openrisc: Initial SMP support
-> >   openrisc: Only kick cpu on timeout, not on update
-> 
-> Hi -- I'm afraid this pull request doesn't apply to master.
-> Looking at it, that seems to be because you've based it on the
-> 2.10.1 branch. All pull requests for master need to be based
-> on master -- can you rebase to the right thing and resubmit,
-> please?
+Previously coreid and numcores were hard coded as 0 and 1 respectively
+as OpenRISC QEMU did not have multicore support.
 
-Yes, sorry.  I didnt realize 2.10.1 was a branch, I will stick to master from
-now on.
+Multicore support is now being added so these registers need to have
+configured values.
 
-I have done the rebase and there was one minor conflict due to the
-cpu_generic_init() changes.  I retested and everything looks good, please look
-out for the v2 PULL series.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Stafford Horne <shorne@gmail.com>
+---
+ target/openrisc/sys_helper.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
--Stafford
+diff --git a/target/openrisc/sys_helper.c b/target/openrisc/sys_helper.c
+index abdef5d6a5..dc6e5cc7f2 100644
+--- a/target/openrisc/sys_helper.c
++++ b/target/openrisc/sys_helper.c
+@@ -23,6 +23,7 @@
+ #include "exec/exec-all.h"
+ #include "exec/helper-proto.h"
+ #include "exception.h"
++#include "sysemu/sysemu.h"
+ 
+ #define TO_SPR(group, number) (((group) << 11) + (number))
+ 
+@@ -249,10 +250,10 @@ target_ulong HELPER(mfspr)(CPUOpenRISCState *env,
+         return env->esr;
+ 
+     case TO_SPR(0, 128): /* COREID */
+-        return 0;
++        return cpu->parent_obj.cpu_index;
+ 
+     case TO_SPR(0, 129): /* NUMCORES */
+-        return 1;
++        return max_cpus;
+ 
+     case TO_SPR(0, 1024) ... TO_SPR(0, 1024 + (16 * 32)): /* Shadow GPRs */
+         idx = (spr - 1024);
+-- 
+2.13.6
