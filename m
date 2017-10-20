@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58683)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58750)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1e5VtR-0002Zl-4J
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 07:55:14 -0400
+	(envelope-from <cohuck@redhat.com>) id 1e5VtW-0002fS-3h
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 07:55:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1e5VtP-0003Bo-PA
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 07:55:13 -0400
+	(envelope-from <cohuck@redhat.com>) id 1e5VtR-0003Dn-Tl
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 07:55:18 -0400
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Fri, 20 Oct 2017 13:53:46 +0200
-Message-Id: <20171020115418.2050-15-cohuck@redhat.com>
+Date: Fri, 20 Oct 2017 13:53:47 +0200
+Message-Id: <20171020115418.2050-16-cohuck@redhat.com>
 In-Reply-To: <20171020115418.2050-1-cohuck@redhat.com>
 References: <20171020115418.2050-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL 14/46] s390x/kvm: generalize SIGP stop and
- restart interrupt injection
+Subject: [Qemu-devel] [PULL 15/46] s390x/kvm: factor out storing of CPU
+ status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,175 +25,202 @@ Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, rth@twiddle.net, agraf@suse.de
 
 From: David Hildenbrand <david@redhat.com>
 
-Preparation for factoring it out into !kvm code.
+Factor it out into s390_store_status(), to be used also by TCG later on.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20170928203708.9376-13-david@redhat.com>
+Message-Id: <20170928203708.9376-14-david@redhat.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- target/s390x/internal.h  |  2 ++
- target/s390x/interrupt.c | 20 ++++++++++++++++++++
- target/s390x/kvm-stub.c  |  8 ++++++++
- target/s390x/kvm.c       | 33 +++++++++++++++++++++------------
- target/s390x/kvm_s390x.h |  2 ++
- 5 files changed, 53 insertions(+), 12 deletions(-)
+ target/s390x/helper.c   | 60 ++++++++++++++++++++++++++++++++++++++++++
+ target/s390x/internal.h |  2 ++
+ target/s390x/kvm.c      | 69 +++----------------------------------------------
+ 3 files changed, 65 insertions(+), 66 deletions(-)
 
+diff --git a/target/s390x/helper.c b/target/s390x/helper.c
+index baa18777f1..4c11822074 100644
+--- a/target/s390x/helper.c
++++ b/target/s390x/helper.c
+@@ -245,6 +245,66 @@ void s390_cpu_recompute_watchpoints(CPUState *cs)
+     }
+ }
+ 
++struct sigp_save_area {
++    uint64_t    fprs[16];                       /* 0x0000 */
++    uint64_t    grs[16];                        /* 0x0080 */
++    PSW         psw;                            /* 0x0100 */
++    uint8_t     pad_0x0110[0x0118 - 0x0110];    /* 0x0110 */
++    uint32_t    prefix;                         /* 0x0118 */
++    uint32_t    fpc;                            /* 0x011c */
++    uint8_t     pad_0x0120[0x0124 - 0x0120];    /* 0x0120 */
++    uint32_t    todpr;                          /* 0x0124 */
++    uint64_t    cputm;                          /* 0x0128 */
++    uint64_t    ckc;                            /* 0x0130 */
++    uint8_t     pad_0x0138[0x0140 - 0x0138];    /* 0x0138 */
++    uint32_t    ars[16];                        /* 0x0140 */
++    uint64_t    crs[16];                        /* 0x0384 */
++};
++QEMU_BUILD_BUG_ON(sizeof(struct sigp_save_area) != 512);
++
++int s390_store_status(S390CPU *cpu, hwaddr addr, bool store_arch)
++{
++    static const uint8_t ar_id = 1;
++    struct sigp_save_area *sa;
++    hwaddr len = sizeof(*sa);
++    int i;
++
++    sa = cpu_physical_memory_map(addr, &len, 1);
++    if (!sa) {
++        return -EFAULT;
++    }
++    if (len != sizeof(*sa)) {
++        cpu_physical_memory_unmap(sa, len, 1, 0);
++        return -EFAULT;
++    }
++
++    if (store_arch) {
++        cpu_physical_memory_write(offsetof(LowCore, ar_access_id), &ar_id, 1);
++    }
++    for (i = 0; i < 16; ++i) {
++        sa->fprs[i] = cpu_to_be64(get_freg(&cpu->env, i)->ll);
++    }
++    for (i = 0; i < 16; ++i) {
++        sa->grs[i] = cpu_to_be64(cpu->env.regs[i]);
++    }
++    sa->psw.addr = cpu_to_be64(cpu->env.psw.addr);
++    sa->psw.mask = cpu_to_be64(get_psw_mask(&cpu->env));
++    sa->prefix = cpu_to_be32(cpu->env.psa);
++    sa->fpc = cpu_to_be32(cpu->env.fpc);
++    sa->todpr = cpu_to_be32(cpu->env.todpr);
++    sa->cputm = cpu_to_be64(cpu->env.cputm);
++    sa->ckc = cpu_to_be64(cpu->env.ckc >> 8);
++    for (i = 0; i < 16; ++i) {
++        sa->ars[i] = cpu_to_be32(cpu->env.aregs[i]);
++    }
++    for (i = 0; i < 16; ++i) {
++        sa->ars[i] = cpu_to_be64(cpu->env.cregs[i]);
++    }
++
++    cpu_physical_memory_unmap(sa, len, 1, len);
++
++    return 0;
++}
+ #endif /* CONFIG_USER_ONLY */
+ 
+ void s390_cpu_dump_state(CPUState *cs, FILE *f, fprintf_function cpu_fprintf,
 diff --git a/target/s390x/internal.h b/target/s390x/internal.h
-index 6e500d6bb7..0ac026d30f 100644
+index 0ac026d30f..a301237c17 100644
 --- a/target/s390x/internal.h
 +++ b/target/s390x/internal.h
-@@ -369,6 +369,8 @@ bool s390_cpu_has_io_int(S390CPU *cpu);
- bool s390_cpu_has_ext_int(S390CPU *cpu);
- bool s390_cpu_has_mcck_int(S390CPU *cpu);
- bool s390_cpu_has_int(S390CPU *cpu);
-+void cpu_inject_restart(S390CPU *cpu);
-+void cpu_inject_stop(S390CPU *cpu);
- 
- 
- /* ioinst.c */
-diff --git a/target/s390x/interrupt.c b/target/s390x/interrupt.c
-index 83a0f194f8..462d45e95f 100644
---- a/target/s390x/interrupt.c
-+++ b/target/s390x/interrupt.c
-@@ -107,6 +107,26 @@ int cpu_inject_external_call(S390CPU *cpu, uint16_t src_cpu_addr)
+@@ -353,6 +353,8 @@ void s390x_tod_timer(void *opaque);
+ void s390x_cpu_timer(void *opaque);
+ void do_restart_interrupt(CPUS390XState *env);
+ void s390_handle_wait(S390CPU *cpu);
++#define S390_STORE_STATUS_DEF_ADDR offsetof(LowCore, floating_pt_save_area)
++int s390_store_status(S390CPU *cpu, hwaddr addr, bool store_arch);
+ #ifndef CONFIG_USER_ONLY
+ LowCore *cpu_map_lowcore(CPUS390XState *env);
+ void cpu_unmap_lowcore(LowCore *lowcore);
+diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+index 98fa1c59a9..aeea355cf3 100644
+--- a/target/s390x/kvm.c
++++ b/target/s390x/kvm.c
+@@ -1584,68 +1584,6 @@ static int do_store_adtl_status(S390CPU *cpu, hwaddr addr, hwaddr len)
      return 0;
  }
  
-+void cpu_inject_restart(S390CPU *cpu)
-+{
-+    if (kvm_enabled()) {
-+        kvm_s390_restart_interrupt(cpu);
-+        return;
-+    }
-+    /* FIXME TCG */
-+    g_assert_not_reached();
-+}
-+
-+void cpu_inject_stop(S390CPU *cpu)
-+{
-+    if (kvm_enabled()) {
-+        kvm_s390_stop_interrupt(cpu);
-+        return;
-+    }
-+    /* FIXME TCG */
-+    g_assert_not_reached();
-+}
-+
- static void cpu_inject_io(S390CPU *cpu, uint16_t subchannel_id,
-                           uint16_t subchannel_number,
-                           uint32_t io_int_parm, uint32_t io_int_word)
-diff --git a/target/s390x/kvm-stub.c b/target/s390x/kvm-stub.c
-index 43f02c2d69..b27ed2927a 100644
---- a/target/s390x/kvm-stub.c
-+++ b/target/s390x/kvm-stub.c
-@@ -119,3 +119,11 @@ int kvm_s390_set_mem_limit(uint64_t new_limit, uint64_t *hw_limit)
- void kvm_s390_crypto_reset(void)
- {
- }
-+
-+void kvm_s390_stop_interrupt(S390CPU *cpu)
-+{
-+}
-+
-+void kvm_s390_restart_interrupt(S390CPU *cpu)
-+{
-+}
-diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-index 2e75bda31a..98fa1c59a9 100644
---- a/target/s390x/kvm.c
-+++ b/target/s390x/kvm.c
-@@ -1539,9 +1539,6 @@ static void sigp_stop(CPUState *cs, run_on_cpu_data arg)
+-struct sigp_save_area {
+-    uint64_t    fprs[16];                       /* 0x0000 */
+-    uint64_t    grs[16];                        /* 0x0080 */
+-    PSW         psw;                            /* 0x0100 */
+-    uint8_t     pad_0x0110[0x0118 - 0x0110];    /* 0x0110 */
+-    uint32_t    prefix;                         /* 0x0118 */
+-    uint32_t    fpc;                            /* 0x011c */
+-    uint8_t     pad_0x0120[0x0124 - 0x0120];    /* 0x0120 */
+-    uint32_t    todpr;                          /* 0x0124 */
+-    uint64_t    cputm;                          /* 0x0128 */
+-    uint64_t    ckc;                            /* 0x0130 */
+-    uint8_t     pad_0x0138[0x0140 - 0x0138];    /* 0x0138 */
+-    uint32_t    ars[16];                        /* 0x0140 */
+-    uint64_t    crs[16];                        /* 0x0384 */
+-};
+-QEMU_BUILD_BUG_ON(sizeof(struct sigp_save_area) != 512);
+-
+-#define KVM_S390_STORE_STATUS_DEF_ADDR offsetof(LowCore, floating_pt_save_area)
+-static int kvm_s390_store_status(S390CPU *cpu, hwaddr addr, bool store_arch)
+-{
+-    static const uint8_t ar_id = 1;
+-    struct sigp_save_area *sa;
+-    hwaddr len = sizeof(*sa);
+-    int i;
+-
+-    sa = cpu_physical_memory_map(addr, &len, 1);
+-    if (!sa) {
+-        return -EFAULT;
+-    }
+-    if (len != sizeof(*sa)) {
+-        cpu_physical_memory_unmap(sa, len, 1, 0);
+-        return -EFAULT;
+-    }
+-
+-    if (store_arch) {
+-        cpu_physical_memory_write(offsetof(LowCore, ar_access_id), &ar_id, 1);
+-    }
+-    for (i = 0; i < 16; ++i) {
+-        sa->fprs[i] = cpu_to_be64(get_freg(&cpu->env, i)->ll);
+-    }
+-    for (i = 0; i < 16; ++i) {
+-        sa->grs[i] = cpu_to_be64(cpu->env.regs[i]);
+-    }
+-    sa->psw.addr = cpu_to_be64(cpu->env.psw.addr);
+-    sa->psw.mask = cpu_to_be64(get_psw_mask(&cpu->env));
+-    sa->prefix = cpu_to_be32(cpu->env.psa);
+-    sa->fpc = cpu_to_be32(cpu->env.fpc);
+-    sa->todpr = cpu_to_be32(cpu->env.todpr);
+-    sa->cputm = cpu_to_be64(cpu->env.cputm);
+-    sa->ckc = cpu_to_be64(cpu->env.ckc >> 8);
+-    for (i = 0; i < 16; ++i) {
+-        sa->ars[i] = cpu_to_be32(cpu->env.aregs[i]);
+-    }
+-    for (i = 0; i < 16; ++i) {
+-        sa->ars[i] = cpu_to_be64(cpu->env.cregs[i]);
+-    }
+-
+-    cpu_physical_memory_unmap(sa, len, 1, len);
+-
+-    return 0;
+-}
+-
+ static void sigp_stop_and_store_status(CPUState *cs, run_on_cpu_data arg)
  {
      S390CPU *cpu = S390_CPU(cs);
-     SigpInfo *si = arg.host_ptr;
--    struct kvm_s390_irq irq = {
--        .type = KVM_S390_SIGP_STOP,
--    };
- 
-     if (s390_cpu_get_state(cpu) != CPU_STATE_OPERATING) {
-         si->cc = SIGP_CC_ORDER_CODE_ACCEPTED;
-@@ -1554,7 +1551,7 @@ static void sigp_stop(CPUState *cs, run_on_cpu_data arg)
-     } else {
-         /* execute the stop function */
-         cpu->env.sigp_order = SIGP_STOP;
--        kvm_s390_vcpu_interrupt(cpu, &irq);
-+        cpu_inject_stop(cpu);
-     }
-     si->cc = SIGP_CC_ORDER_CODE_ACCEPTED;
- }
-@@ -1653,9 +1650,6 @@ static void sigp_stop_and_store_status(CPUState *cs, run_on_cpu_data arg)
- {
-     S390CPU *cpu = S390_CPU(cs);
-     SigpInfo *si = arg.host_ptr;
--    struct kvm_s390_irq irq = {
--        .type = KVM_S390_SIGP_STOP,
--    };
- 
-     /* disabled wait - sleeping in user space */
-     if (s390_cpu_get_state(cpu) == CPU_STATE_OPERATING && cs->halted) {
-@@ -1665,7 +1659,7 @@ static void sigp_stop_and_store_status(CPUState *cs, run_on_cpu_data arg)
-     switch (s390_cpu_get_state(cpu)) {
-     case CPU_STATE_OPERATING:
-         cpu->env.sigp_order = SIGP_STOP_STORE_STATUS;
--        kvm_s390_vcpu_interrupt(cpu, &irq);
-+        cpu_inject_stop(cpu);
-         /* store will be performed when handling the stop intercept */
-         break;
+@@ -1665,7 +1603,7 @@ static void sigp_stop_and_store_status(CPUState *cs, run_on_cpu_data arg)
      case CPU_STATE_STOPPED:
-@@ -1755,9 +1749,6 @@ static void sigp_restart(CPUState *cs, run_on_cpu_data arg)
- {
-     S390CPU *cpu = S390_CPU(cs);
-     SigpInfo *si = arg.host_ptr;
--    struct kvm_s390_irq irq = {
--        .type = KVM_S390_RESTART,
--    };
- 
-     switch (s390_cpu_get_state(cpu)) {
-     case CPU_STATE_STOPPED:
-@@ -1767,7 +1758,7 @@ static void sigp_restart(CPUState *cs, run_on_cpu_data arg)
-         s390_cpu_set_state(CPU_STATE_OPERATING, cpu);
-         break;
-     case CPU_STATE_OPERATING:
--        kvm_s390_vcpu_interrupt(cpu, &irq);
-+        cpu_inject_restart(cpu);
+         /* already stopped, just store the status */
+         cpu_synchronize_state(cs);
+-        kvm_s390_store_status(cpu, KVM_S390_STORE_STATUS_DEF_ADDR, true);
++        s390_store_status(cpu, S390_STORE_STATUS_DEF_ADDR, true);
          break;
      }
      si->cc = SIGP_CC_ORDER_CODE_ACCEPTED;
-@@ -2818,3 +2809,21 @@ void kvm_s390_apply_cpu_model(const S390CPUModel *model, Error **errp)
-         kvm_s390_enable_cmma();
-     }
- }
-+
-+void kvm_s390_restart_interrupt(S390CPU *cpu)
-+{
-+    struct kvm_s390_irq irq = {
-+        .type = KVM_S390_RESTART,
-+    };
-+
-+    kvm_s390_vcpu_interrupt(cpu, &irq);
-+}
-+
-+void kvm_s390_stop_interrupt(S390CPU *cpu)
-+{
-+    struct kvm_s390_irq irq = {
-+        .type = KVM_S390_SIGP_STOP,
-+    };
-+
-+    kvm_s390_vcpu_interrupt(cpu, &irq);
-+}
-diff --git a/target/s390x/kvm_s390x.h b/target/s390x/kvm_s390x.h
-index 501fc5aabd..46dbb742f0 100644
---- a/target/s390x/kvm_s390x.h
-+++ b/target/s390x/kvm_s390x.h
-@@ -42,6 +42,8 @@ void kvm_s390_cmma_reset(void);
- void kvm_s390_reset_vcpu(S390CPU *cpu);
- int kvm_s390_set_mem_limit(uint64_t new_limit, uint64_t *hw_limit);
- void kvm_s390_crypto_reset(void);
-+void kvm_s390_restart_interrupt(S390CPU *cpu);
-+void kvm_s390_stop_interrupt(S390CPU *cpu);
+@@ -1685,7 +1623,7 @@ static void sigp_store_status_at_address(CPUState *cs, run_on_cpu_data arg)
  
- /* implemented outside of target/s390x/ */
- int kvm_s390_inject_flic(struct kvm_s390_irq *irq);
+     cpu_synchronize_state(cs);
+ 
+-    if (kvm_s390_store_status(cpu, address, false)) {
++    if (s390_store_status(cpu, address, false)) {
+         set_sigp_status(si, SIGP_STAT_INVALID_PARAMETER);
+         return;
+     }
+@@ -2067,8 +2005,7 @@ static int handle_intercept(S390CPU *cpu)
+                 qemu_system_shutdown_request(SHUTDOWN_CAUSE_GUEST_SHUTDOWN);
+             }
+             if (cpu->env.sigp_order == SIGP_STOP_STORE_STATUS) {
+-                kvm_s390_store_status(cpu, KVM_S390_STORE_STATUS_DEF_ADDR,
+-                                      true);
++                s390_store_status(cpu, S390_STORE_STATUS_DEF_ADDR, true);
+             }
+             cpu->env.sigp_order = 0;
+             r = EXCP_HALTED;
 -- 
 2.13.6
