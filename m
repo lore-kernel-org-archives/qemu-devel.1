@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58849)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58882)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1e5Vtg-0002pN-P9
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 07:55:32 -0400
+	(envelope-from <cohuck@redhat.com>) id 1e5Vtk-0002rE-SK
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 07:55:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1e5Vtf-0003OL-UW
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 07:55:28 -0400
+	(envelope-from <cohuck@redhat.com>) id 1e5Vth-0003PV-Q8
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 07:55:32 -0400
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Fri, 20 Oct 2017 13:53:51 +0200
-Message-Id: <20171020115418.2050-20-cohuck@redhat.com>
+Date: Fri, 20 Oct 2017 13:53:52 +0200
+Message-Id: <20171020115418.2050-21-cohuck@redhat.com>
 In-Reply-To: <20171020115418.2050-1-cohuck@redhat.com>
 References: <20171020115418.2050-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL 19/46] s390x/kvm: factor out actual handling of
- STOP interrupts
+Subject: [Qemu-devel] [PULL 20/46] s390x/tcg: implement SIGP SENSE RUNNING
+ STATUS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,82 +25,80 @@ Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, rth@twiddle.net, agraf@suse.de
 
 From: David Hildenbrand <david@redhat.com>
 
-For KVM, the KVM module decides when a STOP can be performed (when the
-STOP interrupt can be processed). Factor it out so we can use it
-later for TCG.
+Preparation for TCG, for KVM is this is completely handled in the
+kernel.
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20170928203708.9376-19-david@redhat.com>
+Message-Id: <20170928203708.9376-20-david@redhat.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- target/s390x/internal.h |  1 +
- target/s390x/kvm.c      |  8 +-------
- target/s390x/sigp.c     | 15 ++++++++++++++-
- 3 files changed, 16 insertions(+), 8 deletions(-)
+ target/s390x/cpu.h  |  2 ++
+ target/s390x/sigp.c | 25 +++++++++++++++++++++++++
+ 2 files changed, 27 insertions(+)
 
-diff --git a/target/s390x/internal.h b/target/s390x/internal.h
-index d6ab45add4..2c3fc3fce0 100644
---- a/target/s390x/internal.h
-+++ b/target/s390x/internal.h
-@@ -418,5 +418,6 @@ void s390x_translate_init(void);
+diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+index f94d7f96e0..6b92b0751a 100644
+--- a/target/s390x/cpu.h
++++ b/target/s390x/cpu.h
+@@ -590,6 +590,7 @@ struct sysib_322 {
+ #define SIGP_SET_PREFIX        0x0d
+ #define SIGP_STORE_STATUS_ADDR 0x0e
+ #define SIGP_SET_ARCH          0x12
++#define SIGP_SENSE_RUNNING     0x15
+ #define SIGP_STORE_ADTL_STATUS 0x17
  
- /* sigp.c */
- int handle_sigp(CPUS390XState *env, uint8_t order, uint64_t r1, uint64_t r3);
-+void do_stop_interrupt(CPUS390XState *env);
+ /* SIGP condition codes */
+@@ -600,6 +601,7 @@ struct sysib_322 {
  
- #endif /* S390X_INTERNAL_H */
-diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-index b2e36559c8..88f27d75b9 100644
---- a/target/s390x/kvm.c
-+++ b/target/s390x/kvm.c
-@@ -1634,13 +1634,7 @@ static int handle_intercept(S390CPU *cpu)
-             r = EXCP_HALTED;
-             break;
-         case ICPT_CPU_STOP:
--            if (s390_cpu_set_state(CPU_STATE_STOPPED, cpu) == 0) {
--                qemu_system_shutdown_request(SHUTDOWN_CAUSE_GUEST_SHUTDOWN);
--            }
--            if (cpu->env.sigp_order == SIGP_STOP_STORE_STATUS) {
--                s390_store_status(cpu, S390_STORE_STATUS_DEF_ADDR, true);
--            }
--            cpu->env.sigp_order = 0;
-+            do_stop_interrupt(&cpu->env);
-             r = EXCP_HALTED;
-             break;
-         case ICPT_OPEREXC:
+ /* SIGP status bits */
+ #define SIGP_STAT_EQUIPMENT_CHECK   0x80000000UL
++#define SIGP_STAT_NOT_RUNNING       0x00000400UL
+ #define SIGP_STAT_INCORRECT_STATE   0x00000200UL
+ #define SIGP_STAT_INVALID_PARAMETER 0x00000100UL
+ #define SIGP_STAT_EXT_CALL_PENDING  0x00000080UL
 diff --git a/target/s390x/sigp.c b/target/s390x/sigp.c
-index 4813123aad..9587c3d319 100644
+index 9587c3d319..c57312b743 100644
 --- a/target/s390x/sigp.c
 +++ b/target/s390x/sigp.c
-@@ -81,7 +81,7 @@ static void sigp_stop_and_store_status(CPUState *cs, run_on_cpu_data arg)
-     case CPU_STATE_OPERATING:
-         cpu->env.sigp_order = SIGP_STOP_STORE_STATUS;
-         cpu_inject_stop(cpu);
--        /* store will be performed when handling the stop intercept */
-+        /* store will be performed in do_stop_interrup() */
-         break;
-     case CPU_STATE_STOPPED:
-         /* already stopped, just store the status */
-@@ -360,6 +360,19 @@ int s390_cpu_restart(S390CPU *cpu)
-     return 0;
+@@ -234,6 +234,28 @@ static void sigp_set_prefix(CPUState *cs, run_on_cpu_data arg)
+     si->cc = SIGP_CC_ORDER_CODE_ACCEPTED;
  }
  
-+void do_stop_interrupt(CPUS390XState *env)
++static void sigp_sense_running(S390CPU *dst_cpu, SigpInfo *si)
 +{
-+    S390CPU *cpu = s390_env_get_cpu(env);
++    if (!tcg_enabled()) {
++        /* handled in KVM */
++        set_sigp_status(si, SIGP_STAT_INVALID_ORDER);
++        return;
++    }
 +
-+    if (s390_cpu_set_state(CPU_STATE_STOPPED, cpu) == 0) {
-+        qemu_system_shutdown_request(SHUTDOWN_CAUSE_GUEST_SHUTDOWN);
++    /* sensing without locks is racy, but it's the same for real hw */
++    if (!s390_has_feat(S390_FEAT_SENSE_RUNNING_STATUS)) {
++        set_sigp_status(si, SIGP_STAT_INVALID_ORDER);
++        return;
 +    }
-+    if (cpu->env.sigp_order == SIGP_STOP_STORE_STATUS) {
-+        s390_store_status(cpu, S390_STORE_STATUS_DEF_ADDR, true);
++
++    /* If halted (which includes also STOPPED), it is not running */
++    if (CPU(dst_cpu)->halted) {
++        si->cc = SIGP_CC_ORDER_CODE_ACCEPTED;
++    } else {
++        set_sigp_status(si, SIGP_STAT_NOT_RUNNING);
 +    }
-+    env->sigp_order = 0;
 +}
 +
- void s390_init_sigp(void)
+ static int handle_sigp_single_dst(S390CPU *dst_cpu, uint8_t order,
+                                   uint64_t param, uint64_t *status_reg)
  {
-     qemu_mutex_init(&qemu_sigp_mutex);
+@@ -282,6 +304,9 @@ static int handle_sigp_single_dst(S390CPU *dst_cpu, uint8_t order,
+     case SIGP_CPU_RESET:
+         run_on_cpu(CPU(dst_cpu), sigp_cpu_reset, RUN_ON_CPU_HOST_PTR(&si));
+         break;
++    case SIGP_SENSE_RUNNING:
++        sigp_sense_running(dst_cpu, &si);
++        break;
+     default:
+         set_sigp_status(&si, SIGP_STAT_INVALID_ORDER);
+     }
 -- 
 2.13.6
