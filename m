@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35913)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36683)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1e5UEg-0007zX-FI
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 06:09:03 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1e5UHx-0000kp-UO
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 06:12:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1e5UEd-0005Gd-74
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 06:09:02 -0400
-Date: Fri, 20 Oct 2017 12:08:53 +0200
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20171020100853.GF21393@stefanha-x1.localdomain>
-References: <8e2160db-338f-f1dc-7f5e-8faa3dce7090@kamp.de>
-	<20171017114625.GB7660@dhcp-200-186.str.redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171017114625.GB7660@dhcp-200-186.str.redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] Clean Block Driver Shutdown
+	(envelope-from <pbonzini@redhat.com>) id 1e5UHu-0007VV-Mo
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 06:12:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38212)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1e5UHu-0007UB-HF
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 06:12:22 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5C0A15D5F4
+	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 10:12:21 +0000 (UTC)
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Fri, 20 Oct 2017 12:12:19 +0200
+Message-Id: <20171020101219.2378-1-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH] build: disable -Wmissing-braces on older
+ compilers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,40 +28,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Peter Lieven <pl@kamp.de>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>, armbru@redhat.com
+To: qemu-devel@nongnu.org
+Cc: eblake@redhat.com, lersek@redhat.com
 
-On Tue, Oct 17, 2017 at 01:46:25PM +0200, Kevin Wolf wrote:
-> Am 17.10.2017 um 12:33 hat Peter Lieven geschrieben:
-> > I noticed that Qemu quits at several points with an exit() if the
-> > supplied parameters in the commandline are incorrect. This at some
-> > stages happens after there have already been connections to storage
-> > backends established.
-> 
-> Maybe we need to come to the conclusion that exit() is always wrong,
-> even during the initialisation.
-> 
-> > These connections are not cleanly shut down in this case. For posix
-> > file backends that doesn't matter, but for other backends this leads
-> > to errors. E.g. iSCSI Targets log an aborted iSCSI connection due to
-> > tcp reset.
-> > 
-> > I wonder what is the best way to fix this. A simply call to
-> > bdrv_close_all() in an atexit handler seems to work.  But is this a
-> > good solution? Maybe register this handler only until the VM starts.
-> > Or do we need an atexit handler in each block driver that requires a
-> > clean shutdown?
-> 
-> No, definitely not code in every single block driver. We need to make
-> sure to properly clean up what has been started.
-> 
-> An atexit handler is probably relatively easy. I think it would be
-> cleaner to have proper error paths even in main(), like in every other
-> function. I'm not sure if this would be reasonably easy to achieve,
-> though.
+GCC 4.9 and newer stopped warning for missing braces around the
+"universal" C zero initializer {0}.  One such initializer sneaked
+into scsi/qemu-pr-helper.c and is breaking the build with such
+older GCC versions.
 
-I agree that converting from exit(3) to real error handling is cleanest.
-Doing so would also be a good opportunity to consolidate ad-hoc
-fprintf(stderr) and error_report() calls.
+Detect the lack of support for the idiom, and disable the warning
+in that case.
 
-Stefan
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+        Of course it's always possible to use "memset", but {0}
+        is neater in my opinion.
+
+ configure | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+diff --git a/configure b/configure
+index 7766e74125..0b2d595c6e 100755
+--- a/configure
++++ b/configure
+@@ -1651,6 +1651,19 @@ EOF
+   fi
+ fi
+ 
++# Disable -Wmissing-braces on older compilers that warn even for
++# the "universal" C zero initializer {0}.
++cat > $TMPC << EOF
++struct {
++  int a[2];
++} x = {0};
++EOF
++if compile_object "-Werror" "" ; then
++  :
++else
++  QEMU_CFLAGS="$QEMU_CFLAGS -Wno-missing-braces"
++fi
++
+ # Workaround for http://gcc.gnu.org/PR55489.  Happens with -fPIE/-fPIC and
+ # large functions that use global variables.  The bug is in all releases of
+ # GCC, but it became particularly acute in 4.6.x and 4.7.x.  It is fixed in
+-- 
+2.14.2
