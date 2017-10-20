@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49209)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50477)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Richard.Relph@amd.com>) id 1e5YFZ-0005N3-Kg
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 10:26:14 -0400
+	(envelope-from <bounces@canonical.com>) id 1e5YKE-0007AI-RW
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 10:31:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Richard.Relph@amd.com>) id 1e5YFW-0002ev-HE
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 10:26:13 -0400
-Received: from mail-by2nam03on0050.outbound.protection.outlook.com
-	([104.47.42.50]:3180
-	helo=NAM03-BY2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Richard.Relph@amd.com>)
-	id 1e5YFV-0002bG-UQ
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 10:26:10 -0400
-References: <69fd8746-b2bd-31d0-4d70-792f40ef2d79@amd.com>
-	<20170908131555.GD32645@redhat.com>
-	<9BF693FD-B1CD-4813-86B4-4A909D8847A1@amd.com>
-	<20170908145201.GJ32645@redhat.com>
-	<82d6b8f0-7101-1d59-5489-43b66107fbe0@amd.com>
-	<20171018071906-mutt-send-email-mst@kernel.org>
-	<20171018191847.GF3225@work-vm>
-	<20171019043254-mutt-send-email-mst@kernel.org>
-From: Richard Relph <richard.relph@amd.com>
-Message-ID: <668a4c8b-2309-1d43-edf5-6768c3008574@amd.com>
-Date: Fri, 20 Oct 2017 09:26:02 -0500
+	(envelope-from <bounces@canonical.com>) id 1e5YK8-0005Uu-W4
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 10:31:02 -0400
+Received: from indium.canonical.com ([91.189.90.7]:34448)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1e5YK8-0005Ul-Pq
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 10:30:56 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1e5YK5-0005gO-SS
+	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 14:30:54 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id C3CA02E80D9
+	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 14:30:53 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20171019043254-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] libvirt/QEMU/SEV interaction
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 20 Oct 2017 14:23:04 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Reply-To: Bug 1725267 <1725267@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150850189101.17148.14929440782690831821.malonedeb@wampee.canonical.com>
+Message-Id: <150850938464.27864.11041888151463342510.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1725267] Re: armeb regression since qemu version
+ 2.8
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,50 +37,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Brijesh Singh <brijesh.singh@amd.com>, "libvir-list@redhat.com" <libvir-list@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Lendacky, Thomas" <Thomas.Lendacky@amd.com>
+To: qemu-devel@nongnu.org
 
-On 10/18/17 8:35 PM, Michael S. Tsirkin wrote:
-> On Wed, Oct 18, 2017 at 08:18:48PM +0100, Dr. David Alan Gilbert wrote:
->> * Michael S. Tsirkin (mst@redhat.com) wrote:
->>> On Fri, Sep 08, 2017 at 10:48:10AM -0500, Brijesh Singh wrote:
->>>>>>       > 11. GO verifies the measurement and if measurement matches then it may
->>>>>>       >  give a secret blob -- which must be injected into the guest before
->>>>>>       >  libvirt starts the VM. If verification failed, GO will request cloud
->>>>>>       >  provider to destroy the VM.
->>>
->>> I realised I'm missing something here: how does GO limit the
->>> secret to the specific VM? For example, what prevents hypervisor
->>> from launching two VMs with the same GO's DH, getting measurement
->>> from 1st one but injecting the secret into the second one?
->>
->> Isn't that the 'trusted channel nonce currently associated with the
->> guest' in the guest context?
->>
->> Dave
-> 
-> Let me try to clarify the question. I understand that sometimes a key
-> is shared between VMs. If this is allowed, it seems that a hypervisor
-> can run any number of VMs with the same key. An unauthorised VM
-> will not get a measurement that guest owner authorizes, but
-> can the hypervisor get secret intended for an authorized VM and
-> then inject it into an unauthorized one sharing the same key?
+Ah, that's a false positive. We flipped the order we put entries in the
+AUXV in commit 7c4ee5bcc82e64, so the code divergence is just because
+now _dl_sysdep_start is processing the entries in the opposite order to
+what it used to. (The "addls pc, pc, r3, lsl #2" is jumping into the
+jump table for the switch on different AUXV entry tags.) The traces
+converge again at 0x40817830.
 
-Michael,
-     Yes, that's possible. This is why we recommend against a guest 
-owner authorizing key sharing. There's no way for the guest owner to 
-control what other guests the HV might install using the same key and 
-mapping the same memory to.
-     So a security-conscious customer, especially in a cloud 
-environment, should never enable key sharing.
+-- =
 
-Richard
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1725267
 
-> 
->>> Thanks,
->>>
->>> -- 
->>> MST
->>>
->> --
->> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Title:
+  armeb regression since qemu version 2.8
+
+Status in QEMU:
+  New
+
+Bug description:
+  Hi,
+
+  I have noticed a regression when I upgraded from qemu-armeb 2.7 to
+  2.8, and the problem is still present with version 2.10.1.
+
+  I am using qemu for GCC validation, noticed problems with testcases
+  involving atomics, I'm attaching here atomic-exchange-4.exe.
+
+  # with 2.7:
+  $ qemu-armeb -cpu any -R 0 -L $PWD -E LD_LIBRARY_PATH=3D$PWD/lib $PWD/ato=
+mic-exchange-4.exe
+  $ echo $?
+  0
+  # with 2.8, 2.10.1:
+  $ qemu-armeb -cpu any -R 0 -L $PWD -E LD_LIBRARY_PATH=3D$PWD/lib $PWD/ato=
+mic-exchange-4.exe
+  qemu: uncaught target signal 6 (Aborted) - core dumped
+  Aborted (core dumped)
+  $ echo $?
+  134
+
+  The source code is gcc/testsuite/gcc.dg/atomic-exchange-4.c
+
+  Running with -d in_asm shows a difference early in the startup code:
+  IN: _dl_sysdep_start
+  [...]
+  0x40a17790:  908ff103      addls	pc, pc, r3, lsl #2
+
+  and then the next address is not the same with qemu 2.7 and 2.10.1
+
+  I hope you have enough data/information to reproduce and confirm/fix
+  the problem.
+
+  Thanks
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1725267/+subscriptions
