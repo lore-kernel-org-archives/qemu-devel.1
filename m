@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58366)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59386)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e5aWI-0003NU-IM
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 12:51:39 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1e5abi-0005NA-53
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 12:57:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e5aWH-0005zt-R3
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 12:51:38 -0400
-Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:47228)
+	(envelope-from <richard.henderson@linaro.org>) id 1e5abe-0000ZP-21
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 12:57:14 -0400
+Received: from mail-pf0-x233.google.com ([2607:f8b0:400e:c00::233]:43246)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1e5aWH-0005xg-K7
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 12:51:37 -0400
-Received: by mail-wr0-x231.google.com with SMTP id y39so11883668wrd.4
-	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 09:51:35 -0700 (PDT)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1e5abd-0000Xy-QG
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 12:57:10 -0400
+Received: by mail-pf0-x233.google.com with SMTP id a8so11871139pfc.0
+	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 09:57:06 -0700 (PDT)
+References: <6968797c-f64c-69ff-2fa6-79c4fb3440c9@mail.uni-paderborn.de>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <1e99928e-885b-0724-f2aa-da39d88f6871@linaro.org>
+Date: Fri, 20 Oct 2017 09:57:02 -0700
 MIME-Version: 1.0
-In-Reply-To: <20171013145714.2740-1-shorne@gmail.com>
-References: <20171013145714.2740-1-shorne@gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 20 Oct 2017 17:51:13 +0100
-Message-ID: <CAFEAcA-w9d1-FQ_E4Aes0dzdx_rNEm3XdKnkJDVrwAWq4ZxH9g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/5] OpenRISC SMP Support
+In-Reply-To: <6968797c-f64c-69ff-2fa6-79c4fb3440c9@mail.uni-paderborn.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC] RISC-V Decoder generator
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,42 +30,168 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stafford Horne <shorne@gmail.com>
-Cc: QEMU Development <qemu-devel@nongnu.org>
+To: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, QEMU Developers <qemu-devel@nongnu.org>, RISC-V SW Dev <sw-dev@groups.riscv.org>
 
-On 13 October 2017 at 15:57, Stafford Horne <shorne@gmail.com> wrote:
-> Hello,
->
-> Please consider for pull.
->
-> The following changes since commit 7851197b812b383ae1208c5d86391c5179c8209d:
->
->   Update version for 2.10.1 release (2017-10-02 12:42:58 -0500)
->
-> are available in the git repository at:
->
->   git://github.com/stffrdhrn/qemu.git tags/openrisc-20171113-smp-pr
->
-> for you to fetch changes up to 017a118ebed8757ccdce6fa217640963579aeb13:
->
->   openrisc: Only kick cpu on timeout, not on update (2017-10-13 23:31:22 +0900)
->
-> ----------------------------------------------------------------
-> OpenRISC SMP patchset 20171113
->
-> ----------------------------------------------------------------
-> Stafford Horne (5):
->   openrisc/ompic: Add OpenRISC Multicore PIC (OMPIC)
->   target/openrisc: Make coreid and numcores variable
->   openrisc/cputimer: Perparation for Multicore
->   openrisc: Initial SMP support
->   openrisc: Only kick cpu on timeout, not on update
+On 10/20/2017 06:46 AM, Bastian Koppelmann wrote:
+> The RISC-V data in YAML consists of:
+> 
+> 1) prefixes
+> 2) instruction formats
+> 3) instruction specification using the data of 1) and 2)
+> 
+> 1) prefixes have:
+>    - name
+>    - bitmask that identifies instructions belonging to it
+>    - length that specifies the length in bits for all instructions with
+>      this prefix
+> 
+> Example prefix description for 16 bit instructions:
+> 
+> 16Bit: {
+>     bitmask: ~0b11,
+>     len: 16
+>     }
+> 
+> 2) instruction formats have:
+>     - name
+>     - list of immediate fields
+>     - list of 'normal' fields (e.g. register identifier)
+> 
+>     The immediate fields are specified separately in the same file with:
+>         - name
+>         - data: in order list of the individual fields + possible sign i
+> 
+>                 extension
+>         - fill: how is the immediate filled from the LSB (for now only
+>                 '0' fills are allowed)
+> 
+>     Example for B-type immediate:
+>         B: {data: [31s, 7,  30..25, 11..8], fill: '0'}
+>         Note here that bit 31 is used for sign extension as indicated by
+>         the 's'.
 
-Hi -- I'm afraid this pull request doesn't apply to master.
-Looking at it, that seems to be because you've based it on the
-2.10.1 branch. All pull requests for master need to be based
-on master -- can you rebase to the right thing and resubmit,
-please?
+I think "append" might be a clearer name than "fill".
 
-thanks
--- PMM
+Reading this for the first time, I wondered how you were specifying one bit of
+fill.  That only became clear when I saw
+
+    - U: {data: [31..20, 19..12], fill: '000000000000'}
+
+As for the generated GET_X_IMM, please use inline functions instead of macros.
+There doesn't appear to be any need for the preprocessor.
+
+> 3) instruction specification have:
+>     - name
+>     - instruction format from 2)
+>     - prefix from 1)
+>     - keymap of opcode fields and the value they take for this
+>       instruction
+>     - func for binary translation
+
+There's some redundant information here -- OP1_32 overlaps prefix.  You should
+either drop the redundancy (infer prefix from opcode) or validate it (assert
+that opcode matches prefix).
+
+
+> The python script then converts these instructions into a tree of
+> switch-case statements depending on the specified opcodes and generates
+> at each case for one instruction two function calls:
+> 
+> 1) decode_format_* depending on the instruction format used by this
+>    instruction.
+>    The decode_format_* functions are also generated by the script and
+>    take of decoding the 'normal' fields and the immediate fields. This
+>    data is stored in a data structure 'DisasFormats' which needs to be
+>    passed to any translation function used by instructions.
+> 
+> 2) A call to the translation function defined by 'func' in 3)
+>    These need to be defined by the developer in translate.c. For example
+>    for LUI this looks like:
+> 
+> static void gen_lui(CPURISCVState *env, DisasContext *ctx)
+> {
+>     if (ctx->fmt.field_rd == 0) {
+>             return; /* NOP */
+>     }
+>     tcg_gen_movi_tl(cpu_gpr[ctx->fmt.field_rd], ctx->fmt.immediate_U);
+> }
+
+(As an aside, it's bad form to pass around ENV unless the function is going to
+have to read more code from guest memory.  Which isn't true in your case.)
+
+Unless you have a real use-case in mind, I'm not keen on all of the fields
+being accessible all of the time.
+
+You have all of the information in hand to do all of the proper checking with
+the compiler.  My suggestion is to have not one DisasFormats struct with all
+possible fields included, but one DisasFormatX struct per format containing
+only the fields present.  Then pass that separately to the function.
+
+E.g.
+
+static void gen_lui(DisasContext *ctx, DisasFormatU *fmt)
+{
+    if (fmt.field_rd == 0) {
+        return; /* NOP */
+    }
+    tcg_gen_movi_tl(cpu_gpr[fmt.field_rd], fmt->immediate_U);
+}
+
+Within the decode_32bit function, you could have
+
+  union {
+    DisasFormatR R;
+    DisasFormatI I;
+    ...
+  } fmts;
+
+  ...
+
+  case 0:
+      /* ADDI */
+      decode_format_I(ctx, &fmts.I);
+      gen_addi(ctx, &fmts.I);
+      break;
+
+etc.  You now have isolation on exactly the fields present in the format, and
+you have type checking on the function prototype that there is agreement
+between the decoder and the generation functions about the format.
+
+Not especially important, but how much effort would it be to determine that all
+valid insns below a certain point in the parse tree are the same format?  I was
+just looking at e.g.
+
+    case 35:
+        /* Decode FUNC3_32 */
+        switch (extract32(ctx->opcode, 12, 3)) {
+        case 0:
+            /* SB */
+            decode_format_S(ctx);
+            gen_sb(env, ctx);
+            break;
+        case 1:
+            /* SH */
+            decode_format_S(ctx);
+            gen_sh(env, ctx);
+            break;
+        case 2:
+            /* SW */
+            decode_format_S(ctx);
+            gen_sw(env, ctx);
+            break;
+        default:
+            kill_unknown(ctx, RISCV_EXCP_ILLEGAL_INST);
+            break;
+        }
+        break;
+
+and thinking that the decode_format_S could be hoisted above the switch.  The
+compiler won't do it because it's not used on the kill_unknown path.
+
+Major OP1 == 115 is another example with multiple sub-switches, but all insns
+are format I.
+
+All that said, this looks very readable.  Thank you.
+
+
+r~
