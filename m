@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38893)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39025)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1e5av5-0003RF-8e
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 13:17:16 -0400
+	(envelope-from <groug@kaod.org>) id 1e5avY-0003gz-Qm
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 13:17:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1e5av1-0004Zr-Vl
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 13:17:15 -0400
-Received: from 16.mo5.mail-out.ovh.net ([87.98.174.144]:45601)
+	(envelope-from <groug@kaod.org>) id 1e5avV-0004qo-Dt
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 13:17:44 -0400
+Received: from 7.mo5.mail-out.ovh.net ([178.32.124.100]:36177)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1e5av1-0004Y5-PC
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 13:17:11 -0400
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1e5avV-0004q2-7a
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 13:17:41 -0400
 Received: from player773.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 024BF1470F9
-	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 19:17:08 +0200 (CEST)
+	by mo5.mail-out.ovh.net (Postfix) with ESMTP id E72A2147080
+	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 19:17:39 +0200 (CEST)
 From: Greg Kurz <groug@kaod.org>
-Date: Fri, 20 Oct 2017 19:17:06 +0200
-Message-ID: <150851982652.6179.3835155122843915432.stgit@bahia.lan>
+Date: Fri, 20 Oct 2017 19:17:38 +0200
+Message-ID: <150851985854.6309.16575977719112120440.stgit@bahia.lan>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH] 9pfs: drop one user of struct V9fsFidState
+Subject: [Qemu-devel] [PATCH] 9pfs: fix v9fs_mark_fids_unreclaim() return
+ value
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,48 +31,24 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Greg Kurz <groug@kaod.org>
 
+The return value of v9fs_mark_fids_unreclaim() is then propagated to
+pdu_complete(). It should be a negative errno, not -1.
+
 Signed-off-by: Greg Kurz <groug@kaod.org>
 ---
- hw/9pfs/9p.h |    8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ hw/9pfs/9p.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/9pfs/9p.h b/hw/9pfs/9p.h
-index d1cfeaf10e4f..cdfc4f4ce787 100644
---- a/hw/9pfs/9p.h
-+++ b/hw/9pfs/9p.h
-@@ -117,7 +117,7 @@ static inline char *rpath(FsContext *ctx, const char *path)
- #define P9_IOHDRSZ 24
- 
- typedef struct V9fsPDU V9fsPDU;
--struct V9fsState;
-+typedef struct V9fsState V9fsState;
- 
- typedef struct {
-     uint32_t size_le;
-@@ -137,7 +137,7 @@ struct V9fsPDU
-     uint8_t id;
-     uint8_t cancelled;
-     CoQueue complete;
--    struct V9fsState *s;
-+    V9fsState *s;
-     QLIST_ENTRY(V9fsPDU) next;
-     uint32_t idx;
- };
-@@ -230,7 +230,7 @@ struct V9fsFidState
-     V9fsFidState *rclm_lst;
- };
- 
--typedef struct V9fsState
-+struct V9fsState
- {
-     QLIST_HEAD(, V9fsPDU) free_list;
-     QLIST_HEAD(, V9fsPDU) active_list;
-@@ -251,7 +251,7 @@ typedef struct V9fsState
-     Error *migration_blocker;
-     V9fsConf fsconf;
-     V9fsQID root_qid;
--} V9fsState;
-+};
- 
- /* 9p2000.L open flags */
- #define P9_DOTL_RDONLY        00000000
+diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
+index f8bbac251dc9..52d46632fe15 100644
+--- a/hw/9pfs/9p.c
++++ b/hw/9pfs/9p.c
+@@ -512,7 +512,7 @@ static int coroutine_fn v9fs_mark_fids_unreclaim(V9fsPDU *pdu, V9fsPath *path)
+             /* reopen the file/dir if already closed */
+             err = v9fs_reopen_fid(pdu, fidp);
+             if (err < 0) {
+-                return -1;
++                return err;
+             }
+             /*
+              * Go back to head of fid list because
