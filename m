@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44305)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44330)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1e5gan-0005rb-6A
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 19:20:42 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1e5gap-0005uN-T0
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 19:20:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1e5gam-0007Zg-5l
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 19:20:41 -0400
-Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:52240)
+	(envelope-from <richard.henderson@linaro.org>) id 1e5gao-0007bF-Ud
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 19:20:43 -0400
+Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:47093)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1e5gal-0007ZS-Vk
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 19:20:40 -0400
-Received: by mail-pf0-x242.google.com with SMTP id e64so13061911pfk.9
-	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 16:20:39 -0700 (PDT)
+	id 1e5gao-0007b1-OM
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 19:20:42 -0400
+Received: by mail-pf0-x242.google.com with SMTP id p87so13073074pfj.3
+	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 16:20:42 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Fri, 20 Oct 2017 16:19:39 -0700
-Message-Id: <20171020232023.15010-9-richard.henderson@linaro.org>
+Date: Fri, 20 Oct 2017 16:19:41 -0700
+Message-Id: <20171020232023.15010-11-richard.henderson@linaro.org>
 In-Reply-To: <20171020232023.15010-1-richard.henderson@linaro.org>
 References: <20171020232023.15010-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v7 08/52] tcg: Introduce temp_arg,
- export temp_idx
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v7 10/52] tcg: Avoid loops against variable
+ bounds
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,109 +35,74 @@ Cc: cota@braap.org, f4bug@amsat.org, pbonzini@redhat.com, Richard Henderson <rth
 
 From: Richard Henderson <rth@twiddle.net>
 
-At the same time, adrop the TCGContext argument and use tcg_ctx instead.
+Copy s->nb_globals or s->nb_temps to a local variable for the purposes
+of iteration.  This should allow the compiler to use low-overhead
+looping constructs on some hosts.
 
 Reviewed-by: Emilio G. Cota <cota@braap.org>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- tcg/tcg.h | 12 ++++++++++++
- tcg/tcg.c | 19 ++++++-------------
- 2 files changed, 18 insertions(+), 13 deletions(-)
+ tcg/tcg.c | 27 ++++++++++-----------------
+ 1 file changed, 10 insertions(+), 17 deletions(-)
 
-diff --git a/tcg/tcg.h b/tcg/tcg.h
-index 5fcdec1fc5..828c1e70e5 100644
---- a/tcg/tcg.h
-+++ b/tcg/tcg.h
-@@ -729,6 +729,18 @@ struct TCGContext {
- extern TCGContext tcg_ctx;
- extern bool parallel_cpus;
- 
-+static inline size_t temp_idx(TCGTemp *ts)
-+{
-+    ptrdiff_t n = ts - tcg_ctx.temps;
-+    tcg_debug_assert(n >= 0 && n < tcg_ctx.nb_temps);
-+    return n;
-+}
-+
-+static inline TCGArg temp_arg(TCGTemp *ts)
-+{
-+    return temp_idx(ts);
-+}
-+
- static inline TCGTemp *arg_temp(TCGArg a)
- {
-     return a == TCG_CALL_DUMMY_ARG ? NULL : &tcg_ctx.temps[a];
 diff --git a/tcg/tcg.c b/tcg/tcg.c
-index e2a5f3f4c2..f6e76df3ba 100644
+index d08e34a9d8..840e65c0d4 100644
 --- a/tcg/tcg.c
 +++ b/tcg/tcg.c
-@@ -473,13 +473,6 @@ void tcg_func_start(TCGContext *s)
-     s->gen_next_op_idx = 1;
- }
+@@ -1159,23 +1159,16 @@ void tcg_gen_callN(TCGContext *s, void *func, TCGArg ret,
  
--static inline int temp_idx(TCGContext *s, TCGTemp *ts)
--{
--    ptrdiff_t n = ts - s->temps;
--    tcg_debug_assert(n >= 0 && n < s->nb_temps);
--    return n;
--}
--
- static inline TCGTemp *tcg_temp_alloc(TCGContext *s)
+ static void tcg_reg_alloc_start(TCGContext *s)
  {
-     int n = s->nb_temps++;
-@@ -516,7 +509,7 @@ static int tcg_global_reg_new_internal(TCGContext *s, TCGType type,
-     ts->name = name;
-     tcg_regset_set_reg(s->reserved_regs, reg);
- 
--    return temp_idx(s, ts);
-+    return temp_idx(ts);
- }
- 
- void tcg_set_frame(TCGContext *s, TCGReg reg, intptr_t start, intptr_t size)
-@@ -605,7 +598,7 @@ int tcg_global_mem_new_internal(TCGType type, TCGv_ptr base,
-         ts->mem_offset = offset;
-         ts->name = name;
+-    int i;
++    int i, n;
+     TCGTemp *ts;
+-    for(i = 0; i < s->nb_globals; i++) {
++
++    for (i = 0, n = s->nb_globals; i < n; i++) {
+         ts = &s->temps[i];
+-        if (ts->fixed_reg) {
+-            ts->val_type = TEMP_VAL_REG;
+-        } else {
+-            ts->val_type = TEMP_VAL_MEM;
+-        }
++        ts->val_type = (ts->fixed_reg ? TEMP_VAL_REG : TEMP_VAL_MEM);
      }
--    return temp_idx(s, ts);
-+    return temp_idx(ts);
- }
- 
- static int tcg_temp_new_internal(TCGType type, int temp_local)
-@@ -645,7 +638,7 @@ static int tcg_temp_new_internal(TCGType type, int temp_local)
-             ts->temp_allocated = 1;
-             ts->temp_local = temp_local;
-         }
--        idx = temp_idx(s, ts);
-+        idx = temp_idx(ts);
+-    for(i = s->nb_globals; i < s->nb_temps; i++) {
++    for (n = s->nb_temps; i < n; i++) {
+         ts = &s->temps[i];
+-        if (ts->temp_local) {
+-            ts->val_type = TEMP_VAL_MEM;
+-        } else {
+-            ts->val_type = TEMP_VAL_DEAD;
+-        }
++        ts->val_type = (ts->temp_local ? TEMP_VAL_MEM : TEMP_VAL_DEAD);
+         ts->mem_allocated = 0;
+         ts->fixed_reg = 0;
      }
- 
- #if defined(CONFIG_DEBUG_TCG)
-@@ -1193,7 +1186,7 @@ static void tcg_reg_alloc_start(TCGContext *s)
- static char *tcg_get_arg_str_ptr(TCGContext *s, char *buf, int buf_size,
-                                  TCGTemp *ts)
+@@ -2277,9 +2270,9 @@ static void temp_save(TCGContext *s, TCGTemp *ts, TCGRegSet allocated_regs)
+    temporary registers needs to be allocated to store a constant. */
+ static void save_globals(TCGContext *s, TCGRegSet allocated_regs)
  {
--    int idx = temp_idx(s, ts);
-+    int idx = temp_idx(ts);
+-    int i;
++    int i, n;
  
-     if (ts->temp_global) {
-         pstrcpy(buf, buf_size, ts->name);
-@@ -1941,7 +1934,7 @@ static bool liveness_pass_2(TCGContext *s, uint8_t *temp_state)
-                     TCGOp *lop = tcg_op_insert_before(s, op, lopc, 3);
+-    for (i = 0; i < s->nb_globals; i++) {
++    for (i = 0, n = s->nb_globals; i < n; i++) {
+         temp_save(s, &s->temps[i], allocated_regs);
+     }
+ }
+@@ -2289,9 +2282,9 @@ static void save_globals(TCGContext *s, TCGRegSet allocated_regs)
+    temporary registers needs to be allocated to store a constant. */
+ static void sync_globals(TCGContext *s, TCGRegSet allocated_regs)
+ {
+-    int i;
++    int i, n;
  
-                     lop->args[0] = dir;
--                    lop->args[1] = temp_idx(s, its->mem_base);
-+                    lop->args[1] = temp_arg(its->mem_base);
-                     lop->args[2] = its->mem_offset;
- 
-                     /* Loaded, but synced with memory.  */
-@@ -2012,7 +2005,7 @@ static bool liveness_pass_2(TCGContext *s, uint8_t *temp_state)
-                 TCGOp *sop = tcg_op_insert_after(s, op, sopc, 3);
- 
-                 sop->args[0] = dir;
--                sop->args[1] = temp_idx(s, its->mem_base);
-+                sop->args[1] = temp_arg(its->mem_base);
-                 sop->args[2] = its->mem_offset;
- 
-                 temp_state[arg] = TS_MEM;
+-    for (i = 0; i < s->nb_globals; i++) {
++    for (i = 0, n = s->nb_globals; i < n; i++) {
+         TCGTemp *ts = &s->temps[i];
+         tcg_debug_assert(ts->val_type != TEMP_VAL_REG
+                          || ts->fixed_reg
 -- 
 2.13.6
