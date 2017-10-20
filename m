@@ -1,15 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48558)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52156)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1e5bWk-000474-IO
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 13:56:11 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1e5bmW-0002AL-OS
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 14:12:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1e5bWj-0000UL-AH
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 13:56:10 -0400
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 20 Oct 2017 18:56:10 +0100
-Message-Id: <1508522170-22539-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH] translate.c: Fix usermode big-endian AArch32
- LDREXD and STREXD
+	(envelope-from <vsementsov@virtuozzo.com>) id 1e5bmU-0000gk-0x
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 14:12:28 -0400
+References: <20171019222637.17890-1-eblake@redhat.com>
+	<20171019222637.17890-6-eblake@redhat.com>
+	<ff85f750-2531-a687-199b-b3e0f6931e3a@virtuozzo.com>
+	<1a2498fc-47f8-e53c-b83e-47934cccc2ff@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <7c823fcf-a037-f198-e19b-c2571552b1a9@virtuozzo.com>
+Date: Fri, 20 Oct 2017 21:12:20 +0300
+MIME-Version: 1.0
+In-Reply-To: <1a2498fc-47f8-e53c-b83e-47934cccc2ff@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: base64
+Subject: Re: [Qemu-devel] [PATCH v5 05/11] nbd/server: Refactor zero-length
+ option check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,104 +27,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org, Richard Henderson <rth@twiddle.net>, christophe.lyon@linaro.org
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, qemu-block@nongnu.org
 
-For AArch32 LDREXD and STREXD, architecturally the 32-bit word at the
-lowest address is always Rt and the one at addr+4 is Rt2, even if the
-CPU is big-endian. Our implementation does these with a single
-64-bit store, so if we're big-endian then we need to put the two
-32-bit halves together in the opposite order to little-endian,
-so that they end up in the right places. We were trying to do
-this with the gen_aa32_frob64() function, but that is not correct
-for the usermode emulator, because there there is a distinction
-between "load a 64 bit value" (which does a BE 64-bit access
-and doesn't need swapping) and "load two 32 bit values as one
-64 bit access" (where we still need to do the swapping, like
-system mode BE32).
-
-Fixes: https://bugs.launchpad.net/qemu/+bug/1725267
-
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
-This is very much "last thing on Friday", but I'm going to be
-travelling next week so thought I'd shove it out for review
-and testing. It does fix the test case in the bug. I have
-not tested:
- * BE32 system mode
- * BE8
- * little endian :-)
-
-This should probably be cc: stable when it gets through
-review and testing.
----
- target/arm/translate.c | 40 +++++++++++++++++++++++++++++++++++-----
- 1 file changed, 35 insertions(+), 5 deletions(-)
-
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 4da1a4c..88892e0 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -7902,9 +7902,25 @@ static void gen_load_exclusive(DisasContext *s, int rt, int rt2,
-         TCGv_i32 tmp2 = tcg_temp_new_i32();
-         TCGv_i64 t64 = tcg_temp_new_i64();
- 
--        gen_aa32_ld_i64(s, t64, addr, get_mem_index(s), opc);
-+        /* For AArch32, architecturally the 32-bit word at the lowest
-+         * address is always Rt and the one at addr+4 is Rt2, even if
-+         * the CPU is big-endian. That means we don't want to do a
-+         * gen_aa32_ld_i64(), which invokes gen_aa32_frob64() as if
-+         * for an architecturally 64-bit access, but instead do a
-+         * 64-bit access using MO_BE if appropriate and then split
-+         * the two halves.
-+         * This only makes a difference for BE32 user-mode, where
-+         * frob64() must not flip the two halves of the 64-bit data
-+         * but this code must treat BE32 user-mode like BE32 system.
-+         */
-+        TCGv a = gen_aa32_addr(s, addr, opc);
-+        tcg_gen_qemu_ld_i64(t64, a, get_mem_index(s), opc);
-         tcg_gen_mov_i64(cpu_exclusive_val, t64);
--        tcg_gen_extr_i64_i32(tmp, tmp2, t64);
-+        if (s->be_data) {
-+            tcg_gen_extr_i64_i32(tmp2, tmp, t64);
-+        } else {
-+            tcg_gen_extr_i64_i32(tmp, tmp2, t64);
-+        }
-         tcg_temp_free_i64(t64);
- 
-         store_reg(s, rt2, tmp2);
-@@ -7953,15 +7969,29 @@ static void gen_store_exclusive(DisasContext *s, int rd, int rt, int rt2,
-         TCGv_i64 n64 = tcg_temp_new_i64();
- 
-         t2 = load_reg(s, rt2);
--        tcg_gen_concat_i32_i64(n64, t1, t2);
-+        /* For AArch32, architecturally the 32-bit word at the lowest
-+         * address is always Rt and the one at addr+4 is Rt2, even if
-+         * the CPU is big-endian. Since we're going to treat this as a
-+         * single 64-bit BE store, we need to put the two halves in the
-+         * opposite order for BE to LE, so that they end up in the right
-+         * places.
-+         * We don't want gen_aa32_frob64() because that does the wrong
-+         * thing for BE32 usermode.
-+         */
-+        if (s->be_data) {
-+            tcg_gen_concat_i32_i64(n64, t2, t1);
-+        } else {
-+            tcg_gen_concat_i32_i64(n64, t1, t2);
-+        }
-         tcg_temp_free_i32(t2);
--        gen_aa32_frob64(s, n64);
- 
-         tcg_gen_atomic_cmpxchg_i64(o64, taddr, cpu_exclusive_val, n64,
-                                    get_mem_index(s), opc);
-         tcg_temp_free_i64(n64);
- 
--        gen_aa32_frob64(s, o64);
-+        if (s->be_data) {
-+            tcg_gen_rotri_i64(o64, o64, 32);
-+        }
-         tcg_gen_setcond_i64(TCG_COND_NE, o64, o64, cpu_exclusive_val);
-         tcg_gen_extrl_i64_i32(t0, o64);
- 
--- 
-2.7.4
+MjAuMTAuMjAxNyAxODowNywgRXJpYyBCbGFrZSB3cm90ZToNCj4gT24gMTAvMjAvMjAxNyAw
+MzozNCBBTSwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+IDIwLjEw
+LjIwMTcgMDE6MjYsIEVyaWMgQmxha2Ugd3JvdGU6DQo+Pj4gQ29uc29saWRhdGUgdGhlIGNo
+ZWNrIGZvciBhIHplcm8tbGVuZ3RoIHBheWxvYWQgdG8gYW4gb3B0aW9uDQo+Pj4gaW50byBh
+IG5ldyBmdW5jdGlvbiwgbmJkX2NoZWNrX3plcm9fbGVuZ3RoKCk7IHRoaXMgY2hlY2sgd2ls
+bA0KPj4+IGFsc28gYmUgdXNlZCB3aGVuIGludHJvZHVjaW5nIHN1cHBvcnQgZm9yIHN0cnVj
+dHVyZWQgcmVwbGllcy4NCj4+Pg0KPj4+IEJ5IHN0aWNraW5nIGEgY2F0Y2gtYWxsIGNoZWNr
+IGF0IHRoZSBlbmQgb2YgdGhlIGxvb3AgZm9yDQo+Pj4gcHJvY2Vzc2luZyBvcHRpb25zLCB3
+ZSBjYW4gc2ltcGxpZnkgc2V2ZXJhbCBvZiB0aGUgaW50ZXJtZWRpYXRlDQo+Pj4gY2FzZXMu
+DQo+Pj4NCj4+PiBTaWduZWQtb2ZmLWJ5OiBFcmljIEJsYWtlIDxlYmxha2VAcmVkaGF0LmNv
+bT4NCj4+IGxvb2tzIGxpa2UgdHdvIHBhdGNoZXMgaW4gb25lLCBob3dldmVyIEknbSBub3Qg
+YWdhaW5zdCAoY29uc2lkZXJpbmcgbXkNCj4+IGJpZyBwYXRjaGVzID0pKS4NCj4+IEkndmUg
+YWxyZWFkeSBwdXQgYW4gci1iIGhlcmUgYnV0IHN1ZGRlbmx5IHVuZGVyc3Rvb2QgYSBoaWRk
+ZW4gYmVoYXZpb3INCj4+IGNoYW5nZSB5b3UndmUgbWFkZSwNCj4+IHdoaWNoIG1heSBjb25z
+aWRlcmVkIGxpa2UgYSBidWcsIHNlZSBiZWxvdy4NCj4+DQo+Pj4gKy8qIG5iZF9jaGVja196
+ZXJvX2xlbmd0aDogSGFuZGxlIGFueSB1bmV4cGVjdGVkIHBheWxvYWQuDQo+Pj4gKyAqIFJl
+dHVybjoNCj4+PiArICogLWVycm5vwqAgb24gZXJyb3IsIGVycnAgaXMgc2V0DQo+Pj4gKyAq
+IDDCoMKgwqDCoMKgwqAgb24gc3VjY2Vzc2Z1bCBuZWdvdGlhdGlvbiwgZXJycCBpcyBub3Qg
+c2V0DQo+Pj4gKyAqLw0KPj4+ICtzdGF0aWMgaW50IG5iZF9jaGVja196ZXJvX2xlbmd0aChO
+QkRDbGllbnQgKmNsaWVudCwgdWludDMyX3QgbGVuZ3RoLA0KPj4+ICvCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHVp
+bnQzMl90IG9wdGlvbiwgRXJyb3IgKiplcnJwKQ0KPj4+ICt7DQo+Pj4gK8KgwqDCoCBpZiAo
+IWxlbmd0aCkgew0KPj4+ICvCoMKgwqDCoMKgwqDCoCByZXR1cm4gMDsNCj4+PiArwqDCoMKg
+IH0NCj4+PiArwqDCoMKgIGlmIChuYmRfZHJvcChjbGllbnQtPmlvYywgbGVuZ3RoLCBlcnJw
+KSA8IDApIHsNCj4+PiArwqDCoMKgwqDCoMKgwqAgcmV0dXJuIC1FSU87DQo+Pj4gK8KgwqDC
+oCB9DQo+Pj4gK8KgwqDCoCByZXR1cm4gbmJkX25lZ290aWF0ZV9zZW5kX3JlcF9lcnIoY2xp
+ZW50LT5pb2MsDQo+Pj4gTkJEX1JFUF9FUlJfSU5WQUxJRCwgb3B0aW9uLA0KPj4+ICvCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoCBlcnJwLCAib3B0aW9uICVzIHNob3VsZCBoYXZlDQo+Pj4gemVy
+byBsZW5ndGgiLA0KPj4gbWF5IGJlIHF1b3RlcyBhcm91bmQgJXMgb3IgeW91ciB0cmFjZS1u
+b3RhdGlvbiAlZCAoJXMpIHdvdWxkIGJlIG1vcmUNCj4+IHJlYWRhYmxlDQo+IHF1b3RlcyBk
+b24ndCBodXJ0LCBidXQgc2luY2Ugbm9uZSBvZiB0aGUgb3B0aW9uIG5hbWVzIGNvbnRhaW4g
+c3BhY2VzLA0KDQp0d28gb2YgdGhlbTogImV4cG9ydCBuYW1lIiBhbmQgInN0cnVjdHVyZWQg
+cmVwbHkiDQoNCj4gaXQncyBub3QgcXVpdGUgYXMgaW1wb3J0YW50IGFzIHdoZW4geW91IGFy
+ZSBxdW90aW5nIGEgbWVzc2FnZSBzZW50IG92ZXINCj4gdGhlIHdpcmUuDQo+DQo+Pj4gK8Kg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgIG5iZF9vcHRfbG9va3VwKG9wdGlvbikpOw0KPj4+ICt9DQo+
+Pj4gKw0KPj4+ICDCoCAvKiBuYmRfbmVnb3RpYXRlX29wdGlvbnMNCj4+PiAgwqDCoCAqIFBy
+b2Nlc3MgYWxsIE5CRF9PUFRfKiBjbGllbnQgb3B0aW9uIGNvbW1hbmRzLCBkdXJpbmcgZml4
+ZWQgbmV3c3R5bGUNCj4+PiAgwqDCoCAqIG5lZ290aWF0aW9uLg0KPj4+IEBAIC02NzQsNyAr
+NjcyLDExIEBAIHN0YXRpYyBpbnQgbmJkX25lZ290aWF0ZV9vcHRpb25zKE5CRENsaWVudA0K
+Pj4+ICpjbGllbnQsIHVpbnQxNl90IG15ZmxhZ3MsDQo+Pj4gIMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgIH0NCj4+PiAgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgc3dpdGNoIChv
+cHRpb24pIHsNCj4+PiAgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgY2FzZSBOQkRfT1BU
+X1NUQVJUVExTOg0KPj4+IC3CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgdGlvYyA9
+IG5iZF9uZWdvdGlhdGVfaGFuZGxlX3N0YXJ0dGxzKGNsaWVudCwgbGVuZ3RoLA0KPj4+IGVy
+cnApOw0KPj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgcmV0ID0gbmJkX2No
+ZWNrX3plcm9fbGVuZ3RoKGNsaWVudCwgbGVuZ3RoLCBvcHRpb24sDQo+Pj4gZXJycCk7DQo+
+Pj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBpZiAocmV0IDwgMCkgew0KPj4+
+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCByZXR1cm4gcmV0Ow0K
+Pj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgfQ0KPj4gbm8sIHlvdSBzaG91
+bGQgbm90IGNvbnRpbnVlIGlmIGxlbmd0aD4wIChvbGQgYmVoYXZpb3IpLg0KPj4gbmJkX25l
+Z290aWF0ZV9zZW5kX3JlcF9lcnIgcmV0dXJucyAwIG9uIHN1Y2Nlc3MNCj4+IGluIG5iZF9j
+aGVja196ZXJvX2xlbmd0aCgpLg0KPiBPaCwgZ29vZCBjYXRjaC4gQnV0IGl0J3Mgc3VidGxl
+ciB0aGFuIHRoYXQuIEluIHRoZSBvbGQgY29kZSwNCj4gbmJkX25lZ290aWF0ZV9oYW5kbGVf
+c3RhcnR0bHMoKSByZXR1cm5zIE5VTEwgb24gbm9uLXplcm8gbGVuZ3RoIChldmVuIGlmDQo+
+IGl0IHNlbnQgYSBtZXNzYWdlIHRvIHRoZSBjbGllbnQpLCBiZWNhdXNlIHdlIHJlYWxseSB3
+YW50IHRvIGtpbGwgdGhlDQo+IGNvbm5lY3Rpb24gaWYgYSBjbGllbnQgY2FuJ3QgdHVybiBv
+biBUTFMgY29ycmVjdGx5Li4uDQo+DQo+Pj4gQEAgLTcxMiw5ICs3MTEsOSBAQCBzdGF0aWMg
+aW50IG5iZF9uZWdvdGlhdGVfb3B0aW9ucyhOQkRDbGllbnQNCj4+PiAqY2xpZW50LCB1aW50
+MTZfdCBteWZsYWdzLA0KPj4+ICDCoMKgwqDCoMKgwqDCoMKgwqAgfSBlbHNlIGlmIChmaXhl
+ZE5ld3N0eWxlKSB7DQo+Pj4gIMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHN3aXRjaCAo
+b3B0aW9uKSB7DQo+Pj4gIMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGNhc2UgTkJEX09Q
+VF9MSVNUOg0KPj4+IC3CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgcmV0ID0gbmJk
+X25lZ290aWF0ZV9oYW5kbGVfbGlzdChjbGllbnQsIGxlbmd0aCwgZXJycCk7DQo+Pj4gLcKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBpZiAocmV0IDwgMCkgew0KPj4+IC3CoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCByZXR1cm4gcmV0Ow0KPj4+ICvC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgcmV0ID0gbmJkX2NoZWNrX3plcm9fbGVu
+Z3RoKGNsaWVudCwgbGVuZ3RoLCBvcHRpb24sDQo+Pj4gZXJycCk7DQo+Pj4gK8KgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBpZiAoIXJldCkgew0KPj4gdGhlIHNhbWUgaGVyZQ0K
+Pj4NCj4gd2hpbGUgbmJkX25lZ290aWF0ZV9oYW5kbGVfbGlzdCgpIHVzZWQgdG8gcmV0dXJu
+IDAgaWYgdGhlIGNsaWVudCBzZW50DQo+IG5vbi16ZXJvIGxlbmd0aCAod2UgaGFuZGxlZCB0
+aGUgaW5jb3JyZWN0IG1lc3NhZ2UgZnJvbSB0aGUgY2xpZW50IGp1c3QNCj4gZmluZSwgYW5k
+IGNhbiBjb250aW51ZSBsaXN0ZW5pbmcgZm9yIG1vcmUgb3B0aW9ucykuDQo+DQo+IE1heWJl
+IEkgY2FuIGZpeCBpdCB3aXRoIGEgdHJpLXN0YXRlIHJldHVybjogMSBpZiBjb3JyZWN0IGxl
+bmd0aCwgMCBpZg0KPiBub256ZXJvIGxlbmd0aCBidXQgZXJyb3IgbWVzc2FnZSBzZW50IHN1
+Y2Nlc3NmdWxseSwgYW5kIG5lZ2F0aXZlIG9uDQo+IHRyYW5zbWlzc2lvbiBmYWlsdXJlOyBh
+bHRob3VnaCB0aGVuIGl0J3MgdHJpY2tpZXIgZm9yIGNhbGxlcnMuICBJJ2xsDQo+IGhhdmUg
+dG8gdGhpbmsgYWJvdXQgaXQuLi4NCj4NCj4+PiAgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqAgY2FzZSBOQkRfT1BUX1NUQVJUVExTOg0KPj4+IC3CoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqAgaWYgKG5iZF9kcm9wKGNsaWVudC0+aW9jLCBsZW5ndGgsIGVycnApIDwgMCkg
+ew0KPj4+IC3CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCByZXR1cm4g
+LUVJTzsNCj4+PiAtwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIH0NCj4+PiAtwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGlmIChjbGllbnQtPnRsc2NyZWRzKSB7DQo+
+Pj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBpZiAobGVuZ3RoKSB7DQo+Pj4g
+K8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHJldCA9IG5iZF9jaGVj
+a196ZXJvX2xlbmd0aChjbGllbnQsIGxlbmd0aCwNCj4+PiBvcHRpb24sIGVycnApOw0KPiBN
+YXliZSBleHBsaWNpdGx5IGNoZWNraW5nIGZvciBsZW5ndGggYXQgZWFjaCBjYWxsZXIgaXMg
+dGhlIHNpbXBsZXN0DQo+IGFwcHJvYWNoIGZvciBnZXR0aW5nIHRoZSBkZWNpc2lvbiBsb2dp
+YyBjb3JyZWN0LCBzaW5jZSBJIHJlYWxseSB3YXNuJ3QNCj4gYWJsZSB0byBhYnN0cmFjdCBh
+IGNsZWFuICJmYWlsdXJlIHRvIGNvbW11bmljYXRlIiB2cy4gImVycm9yIG1lc3NhZ2UNCj4g
+c2VudCwgZ28gb24gdG8gbmV4dCBtZXNzYWdlIG9yIGFib3J0IGNvbm5lY3Rpb24gYXMgYXBw
+cm9wcmlhdGUiIHZzLg0KPiAiZXZlcnl0aGluZyB2YWxpZGF0ZWQsIHByb2NlZWQgd2l0aCBy
+ZXN0IG9mIGhhbmRpbmcgY3VycmVudCBvcHRpb24iLg0KPg0KDQoNCi0tIA0KQmVzdCByZWdh
+cmRzLA0KVmxhZGltaXINCg0K
