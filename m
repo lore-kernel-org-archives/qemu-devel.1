@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54852)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55784)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1e5Wuy-0007o5-CX
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 09:00:53 -0400
+	(envelope-from <david@redhat.com>) id 1e5WzB-0001Pb-Ng
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 09:05:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1e5Wuv-00078n-6R
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 09:00:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60990)
+	(envelope-from <david@redhat.com>) id 1e5Wz5-0000GY-Pq
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 09:05:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42048)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1e5Wuu-00078U-W5
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 09:00:49 -0400
-Date: Fri, 20 Oct 2017 15:00:43 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20171020150043.383b2117.cohuck@redhat.com>
-In-Reply-To: <711b1e41-693a-de7d-9c13-fbe0f964c53c@linux.vnet.ibm.com>
-References: <20170913132752.8484-1-pasic@linux.vnet.ibm.com>
-	<20170913132752.8484-2-pasic@linux.vnet.ibm.com>
-	<20170914162603.1cdabd09.cohuck@redhat.com>
-	<0b42ef59-4366-175f-8dc7-bc3ed02e2fb4@linux.vnet.ibm.com>
-	<20170915092758.16ea52fc.cohuck@redhat.com>
-	<711b1e41-693a-de7d-9c13-fbe0f964c53c@linux.vnet.ibm.com>
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1e5Wz5-0000GO-G5
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 09:05:07 -0400
+References: <87y3oqugm7.fsf@marc-ibm.boeblingen.de.ibm.com>
+	<20171005121115.GD3946746@orkuz.home>
+	<87y3ok7n2n.fsf@marc-ibm.boeblingen.de.ibm.com>
+	<20171012120714.GA314661@orkuz.home>
+	<87mv4m6pp5.fsf@marc-ibm.boeblingen.de.ibm.com>
+	<7aa560cd-d35f-7feb-a9db-378d3e763a62@redhat.com>
+	<20171020125056.GN130425@orkuz.home>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <f43de685-b6d6-14fe-38d1-35481a6ac954@redhat.com>
+Date: Fri, 20 Oct 2017 15:04:57 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20171020125056.GN130425@orkuz.home>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/2] s390x/ccs: add ccw-tester emulated
- device
+Subject: Re: [Qemu-devel] [libvirt] Question about the host-model CPU mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,28 +33,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>
+To: Marc Hartmayer <mhartmay@linux.vnet.ibm.com>, libvir-list@redhat.com, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Boris Fiuczynski <fiuczy@linux.vnet.ibm.com>, "Jason J. Herne" <jjherne@linux.vnet.ibm.com>, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
 
-On Thu, 19 Oct 2017 18:39:37 +0200
-Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
-
-> On 09/15/2017 09:27 AM, Cornelia Huck wrote:
-> >>>     
-> >>>> +    DEFINE_PROP_UINT8("chpid_type", CcwTesterDevice, chpid_type,
-> >>>> +                       0x98),  
-> > This might also need re-evaluation - we should not really need a new
-> > chpid type.
-> >   
+On 20.10.2017 14:50, Jiri Denemark wrote:
+> On Fri, Oct 20, 2017 at 13:37:42 +0200, David Hildenbrand wrote:
+>> On 20.10.2017 13:09, Marc Hartmayer wrote:
+>>> we recently encountered the problem that the 'host-model' [1] has to be
+>>> related to the machine type of a domain. We have following problem:
+>>>
+>>>    Let's assume we've a z13 system with a QEMU 2.9 and we define a
+>>>    domain using the default s390-virtio-ccw machine together with the
+>>>    host-model CPU mode [1]. The definition will have the machine
+>>>    expanded to s390-virtio-ccw-2.9 but retain the host-model CPU mode
+>>>    in the domain definition. In a next step we upgrade to QEMU 2.10
+>>>    (first version to recognize z14). Everything is still fine, even
+>>>    though the machine runs in 2.9 compatibility mode. Finally we
+>>>    upgrade to a z14. As a consequence it is not possible to start the
+>>>    domain anymore as the machine type doesn't support our CPU host
+>>>    model (which is expanded at start time of the domain).
+>>
+>> Yes, the host model may vary depending on QEMU version and to some
+>> degree also on compatibility machines (although I always try to push
+>> people to not introduce any new such stuff).
+>>
+>> Quoting for the libvirt documentation: https://libvirt.org/formatdomain.html
+>>
+>> "host-model
+>>     The host-model mode is essentially a shortcut to copying host CPU
+>> definition from capabilities XML into domain XML. Since the CPU
+>> definition is copied just before starting a domain, exactly the same XML
+>> can be used on different hosts while still providing the best guest CPU
+>> each host supports."
+>>
+>> You're telling me that that copying does not happen, which seems to be
+>> the problematic part about this in my opinion.
+>>
+>> So I am not sure if probing anything else (as you noted below) is the
+>> correct thing to do. Copy it and you have a migration_safe and even
+>> static version of the _current_ host CPU.
 > 
-> I'm back at ccw-tester again (for v2). I've realized we did not agree
-> on what to use here (chpid_type). Shall I use 0x25 (Fibre Channel) or
-> EMULATED_CCW_3270_CHPID_TYPE, or even 0x32 (virtio-ccw) as a default
-> value? And should EMULATED_CCW_3270_CHPID_TYPE be called like that
-> (is it really supposed to be specific to 3270?
+> The thing is libvirt calls query-cpu-model-expansion to check what the
+> host CPU is. This 'host-model' CPU is replaced with the probed CPU model
+> when a domain starts. The problem described by Marc is that the probed
+> CPU model cannot be used universally with all machine types. So starting
+> a domain on such host with machine type s390-virtio-ccw-2.10 works, but
+> a domain with machine type s390-virtio-ccw-2.9 fails to start with the
+> same probed CPU model.
 > 
-> Sorry I did not notice sooner.
 
-It might make sense to pick whatever z/VM commonly uses for emulated
-devices. (Or ask them if they reserved something explicitly for testing
--- that would be an even better match.)
+My assumption would be that the CPU model is copied into the XML when
+the domain fist starts. This is what the documentation describes.
+
+So when upgrading QEMU, the CPU model in the XML is still the same
+(z13), even though something different is now reported in the host info
+after upgrading QEMU (z14).
+
+In this case it would continue to work.
+
+The problem is that the CPU model is not copied into the XML doesn't
+remain there, right? It is suddenly replaced with a z14 host model.
+
+> Jirka
+> 
+
+
+-- 
+
+Thanks,
+
+David
