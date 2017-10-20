@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40412)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40595)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gabriel291075@gmail.com>) id 1e5dBz-0004ZD-3v
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 15:42:52 -0400
+	(envelope-from <gabriel291075@gmail.com>) id 1e5dCb-0005QY-E2
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 15:43:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gabriel291075@gmail.com>) id 1e5dBw-0004ua-0u
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 15:42:51 -0400
-Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:48113)
+	(envelope-from <gabriel291075@gmail.com>) id 1e5dCY-0005Cq-Bh
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 15:43:29 -0400
+Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:56569)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <gabriel291075@gmail.com>)
-	id 1e5dBv-0004uE-Rr
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 15:42:47 -0400
-Received: by mail-qt0-x244.google.com with SMTP id z50so19808467qtj.4
-	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 12:42:47 -0700 (PDT)
+	id 1e5dCY-0005Cc-7C
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 15:43:26 -0400
+Received: by mail-qk0-x243.google.com with SMTP id l194so15635596qke.13
+	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 12:43:26 -0700 (PDT)
 From: Gabriel Augusto Costa <gabriel291075@gmail.com>
-Date: Fri, 20 Oct 2017 11:38:31 -0400
-Message-Id: <1508513911-15630-1-git-send-email-gabriel291075@gmail.com>
-Subject: [Qemu-devel] [PATCH v3 03/11] kinetis_k64_pmux.h has been added
+Date: Fri, 20 Oct 2017 11:39:09 -0400
+Message-Id: <1508513949-15680-1-git-send-email-gabriel291075@gmail.com>
+Subject: [Qemu-devel] [PATCH v3 04/11] kinetis_k64_sim.h has been added
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,16 +36,16 @@ PATCH v4 n/2: It changes the Make files to compile this machine.
 
 Signed-off-by: Gabriel Augusto Costa <gabriel291075@gmail.com>
 ---
- include/hw/misc/kinetis_k64_pmux.h | 73 ++++++++++++++++++++++++++++++++++++++
- 1 file changed, 73 insertions(+)
- create mode 100644 include/hw/misc/kinetis_k64_pmux.h
+ include/hw/misc/kinetis_k64_sim.h | 56 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 56 insertions(+)
+ create mode 100644 include/hw/misc/kinetis_k64_sim.h
 
-diff --git a/include/hw/misc/kinetis_k64_pmux.h b/include/hw/misc/kinetis_k64_pmux.h
+diff --git a/include/hw/misc/kinetis_k64_sim.h b/include/hw/misc/kinetis_k64_sim.h
 new file mode 100644
-index 0000000..fb6a6d5
+index 0000000..2eb1f5c
 --- /dev/null
-+++ b/include/hw/misc/kinetis_k64_pmux.h
-@@ -0,0 +1,73 @@
++++ b/include/hw/misc/kinetis_k64_sim.h
+@@ -0,0 +1,56 @@
 +/*
 + * Kinetis K64 peripheral microcontroller emulation.
 + *
@@ -57,66 +57,49 @@ index 0000000..fb6a6d5
 + *  (at your option) any later version.
 + */
 +
-+/* Kinetis K64 series PMUX controller.  */
++/* Kinetis K64 series SIM controller.  */
 +
-+#ifndef KINETIS_PMUX_H
-+#define KINETIS_PMUX_H
++#ifndef KINETIS_SIM_H
++#define KINETIS_SIM_H
 +
 +#include "hw/sysbus.h"
 +#include "chardev/char-fe.h"
 +#include "chardev/char-mux.h"
 +#include "hw/hw.h"
 +
-+#define TYPE_KINETIS_K64_PMUX "kinetis_k64_pmux"
-+#define KINETIS_K64_PMUX(obj) \
-+    OBJECT_CHECK(kinetis_k64_pmux_state, (obj), TYPE_KINETIS_K64_PMUX)
++#define TYPE_KINETIS_K64_SIM "kinetis_k64_sim"
++#define KINETIS_K64_SIM(obj) \
++    OBJECT_CHECK(kinetis_k64_sim_state, (obj), TYPE_KINETIS_K64_SIM)
 +
 +typedef struct {
 +    SysBusDevice parent_obj;
 +
 +    MemoryRegion iomem;
 +
-+    uint32_t PCR00;/**< Pin Control Register n, offset: 0x0, array step: 0x4 */
-+    uint32_t PCR01;     /**< Pin Control Register n, offset: 0x0, step: 0x4 */
-+    uint32_t PCR02;     /**< Pin Control Register n, offset: 0x0, step: 0x4 */
-+    uint32_t PCR03;     /**< Pin Control Register n, offset: 0x0, step: 0x4 */
-+    uint32_t PCR04;     /**< Pin Control Register n, offset: 0x0, step: 0x4 */
-+    uint32_t PCR05;     /**< Pin Control Register n, offset: 0x0, step: 0x4 */
-+    uint32_t PCR06;     /**< Pin Control Register n, offset: 0x0, step: 0x4 */
-+    uint32_t PCR07;     /**< Pin Control Register n, offset: 0x0, step: 0x4 */
-+    uint32_t PCR08;     /**< Pin Control Register n, offset: 0x0, step: 0x4 */
-+    uint32_t PCR09;     /**< Pin Control Register n, offset: 0x0, step: 0x4 */
-+    uint32_t PCR10;     /**< Pin Control Register n, offset: 0x0, step: 0x4 */
-+    uint32_t PCR11;     /**< Pin Control Register n, offset: 0x0, step: 0x4 */
-+    uint32_t PCR12;     /**< Pin Control Register n, offset: 0x0, step: 0x4 */
-+    uint32_t PCR13;     /**< Pin Control Register n, offset: 0x0, step: 0x4 */
-+    uint32_t PCR14;     /**< Pin Control Register n, offset: 0x0, step: 0x4 */
-+    uint32_t PCR15;     /**< Pin Control Register n, offset: 0x0, step: 0x4 */
-+    uint32_t PCR16;     /**< Pin Control Register n, offset: 0x0, step: 0x4 */
-+    uint32_t PCR17;     /**< Pin Control Register n, offset: 0x0, step: 0x4 */
-+    uint32_t PCR18;     /**< Pin Control Register n, offset: 0x0, step: 0x4 */
-+    uint32_t PCR19;     /**< Pin Control Register n, offset: 0x0, step: 0x4 */
-+    uint32_t PCR20;     /**< Pin Control Register n, offset: 0x0, step: 0x4 */
-+    uint32_t PCR21;     /**< Pin Control Register n, offset: 0x0, step: 0x4 */
-+    uint32_t PCR22;     /**< Pin Control Register n, offset: 0x0, step: 0x4 */
-+    uint32_t PCR23;     /**< Pin Control Register n, offset: 0x0, step: 0x4 */
-+    uint32_t PCR24;     /**< Pin Control Register n, offset: 0x0, step: 0x4 */
-+    uint32_t PCR25;     /**< Pin Control Register n, offset: 0x0, step: 0x4 */
-+    uint32_t PCR26;     /**< Pin Control Register n, offset: 0x0, step: 0x4 */
-+    uint32_t PCR27;     /**< Pin Control Register n, offset: 0x0, step: 0x4 */
-+    uint32_t PCR28;     /**< Pin Control Register n, offset: 0x0, step: 0x4 */
-+    uint32_t PCR29;     /**< Pin Control Register n, offset: 0x0, step: 0x4 */
-+    uint32_t PCR30;     /**< Pin Control Register n, offset: 0x0, step: 0x4 */
-+    uint32_t PCR31;     /**< Pin Control Register n, offset: 0x0, step: 0x4 */
-+    uint32_t GPCLR;     /**< Global Pin Control Low Register, offset: 0x80 */
-+    uint32_t GPCHR;     /**< Global Pin Control High Register, offset: 0x84 */
-+    uint32_t ISFR;      /**< Interrupt Status Flag Register, offset: 0xA0 */
-+    uint32_t DFER;      /**< Digital Filter Enable Register, offset: 0xC0 */
-+    uint32_t DFCR;      /**< Digital Filter Clock Register, offset: 0xC4 */
-+    uint32_t DFWR;      /**< Digital Filter Width Register, offset: 0xC8 */
++    uint32_t SOPT1;     /**< System Options Register 1, offset: 0x0 */
++    uint32_t SOPT1CFG;  /**< SOPT1 Configuration Register, offset: 0x4 */
++    uint32_t SOPT2;     /**< System Options Register 2, offset: 0x1004 */
++    uint32_t SOPT4;     /**< System Options Register 4, offset: 0x100C */
++    uint32_t SOPT5;     /**< System Options Register 5, offset: 0x1010 */
++    uint32_t SOPT7;     /**< System Options Register 7, offset: 0x1018 */
++    uint32_t SDID;      /**< System Device Id Register, offset: 0x1024 */
++    uint32_t SCGC1;     /**< System Clock Gating Ctrl Reg 1, offset: 0x1028 */
++    uint32_t SCGC2;     /**< System Clock Gating Ctrl Reg 2, offset: 0x102C */
++    uint32_t SCGC3;     /**< System Clock Gating Ctrl Reg 3, offset: 0x1030 */
++    uint32_t SCGC4;     /**< System Clock Gating Ctrl Reg 4, offset: 0x1034 */
++    uint32_t SCGC5;     /**< System Clock Gating Ctrl Reg 5, offset: 0x1038 */
++    uint32_t SCGC6;     /**< System Clock Gating Ctrl Reg 6, offset: 0x103C */
++    uint32_t SCGC7;     /**< System Clock Gating Ctrl Reg 7, offset: 0x1040 */
++    uint32_t CLKDIV1;   /**< System Clock Divider Register 1, offset: 0x1044 */
++    uint32_t CLKDIV2;   /**< System Clock Divider Register 2, offset: 0x1048 */
++    uint32_t FCFG1;     /**< Flash Configuration Register 1, offset: 0x104C */
++    uint32_t FCFG2;     /**< Flash Configuration Register 2, offset: 0x1050 */
++    uint32_t UIDH;      /**< Unique Id Register High, offset: 0x1054 */
++    uint32_t UIDMH;     /**< Unique Id Register Mid-High, offset: 0x1058 */
++    uint32_t UIDML;     /**< Unique Id Register Mid Low, offset: 0x105C */
++    uint32_t UIDL;      /**< Unique Id Register Low, offset: 0x1060 */
 +
-+    qemu_irq irq;
-+} kinetis_k64_pmux_state;
++} kinetis_k64_sim_state;
 +
 +#endif
 -- 
