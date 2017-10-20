@@ -1,36 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57110)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57413)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1e5Tfn-0002ht-1n
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 05:32:59 -0400
+	(envelope-from <li.shanlue@zte.com.cn>) id 1e5ThP-0003W2-3e
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 05:34:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1e5Tfj-0002Fr-VS
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 05:32:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55066)
+	(envelope-from <li.shanlue@zte.com.cn>) id 1e5ThK-00037z-7n
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 05:34:39 -0400
+Received: from mxhk.zte.com.cn ([63.217.80.70]:51110)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1e5Tfj-0002F5-Px
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 05:32:55 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BDF50820FE
-	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 09:32:54 +0000 (UTC)
-References: <20171018095807.101406-1-marcel@redhat.com>
-	<69cefa98-5681-5b12-719c-e13fcba969c4@redhat.com>
-	<9d4b1fa8-e670-556b-278d-4993ad41b512@redhat.com>
-	<1508418225.18146.1.camel@redhat.com>
-	<d231ac0a-bb7d-78aa-ddb4-8048cc7bdfd8@redhat.com>
-	<1508482525.18146.6.camel@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <c839fe51-fc84-b297-a669-d8b3a0001017@redhat.com>
-Date: Fri, 20 Oct 2017 11:32:42 +0200
-MIME-Version: 1.0
-In-Reply-To: <1508482525.18146.6.camel@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] hw/pci-host: Fix x86 Host Bridges 64bit
- PCI hole
+	(Exim 4.71) (envelope-from <li.shanlue@zte.com.cn>)
+	id 1e5ThJ-00037G-Sg
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 05:34:34 -0400
+Received: from mse02.zte.com.cn (unknown [10.30.3.21])
+	by Forcepoint Email with ESMTPS id B6C104DD33404B75923A
+	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 17:34:31 +0800 (CST)
+Received: from kjyxapp05.zte.com.cn ([10.30.12.204])
+	by mse02.zte.com.cn with SMTP id v9K9YOQp051632
+	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 17:34:24 +0800 (GMT-8)
+	(envelope-from li.shanlue@zte.com.cn)
+Date: Fri, 20 Oct 2017 17:34:27 +0800 (CST)
+Message-ID: <201710201734276973012@zte.com.cn>
+In-Reply-To: 201710201730444722808@zte.com.cn
+References: 201710201730444722808@zte.com.cn
+Mime-Version: 1.0
+From: <li.shanlue@zte.com.cn>
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: base64 
+Subject: Re: [Qemu-devel] =?utf-8?q?wurb_test_zt?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,55 +35,10 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, qemu-devel@nongnu.org
-Cc: mst@redhat.com, pbonzini@redhat.com, ehabkost@redhat.com, Igor Mammedov <imammedo@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: li.shanlue@zte.com.cn, qemu-devel@nongnu.org
 
-On 10/20/17 08:55, Gerd Hoffmann wrote:
->   Hi,
->=20
->>> commit message says:
->>>
->>> <quote>
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0It turns out that some 32 bit windows g=
-uests crash
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if 64 bit PCI hole size is >2G.
->>> </quote>
->>>
->>> Why this suddenly isn't a problem any more?
->>>
->>
->> I suppose it is, so we need a way to turn it "off".
->=20
-> Or have machine types behave differently, i.e. give q35 a large 64bit
-> hole and leave pc as-is.
-
-*If* we make it dependent on machine types at all, then please also make
-it versioned for Q35.
-
->=20
-> Devices with that large bars are most likely pci express anyway ...
->=20
->> This is how I started, however Eduardo and (and maybe Michael ?)
->> where against letting the upper management software to deal with
->> such a low low level detail. They simply can't take such a decision.
->> This is why the property you mentioned is not ever linked
->> in code anywhere! It is simply not implemented and not used.
->=20
-> Makes sense.
->=20
-> BTW:  Is it safe to just assume 40 bits physical is going to work?  My
-> workstation:
->=20
-> model name=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0: Intel(R) Core(TM) i7-77=
-00K CPU @ 4.20GHz
-> address sizes=C2=A0=C2=A0=C2=A0: 39 bits physical, 48 bits virtual
->=20
-> Does this imply ept is limited 39 bits physical too?
-
-Very good point to raise; "39 bits physical" on your workstation *does*
-imply that EPT is limited exactly the same way. I had run into this very
-problem while working on 64GB+ RAM enablement in OVMF. (Back then my
-laptop had: "address sizes : 36 bits physical, 48 bits virtual".)
-
-Thanks,
-Laszlo
+cmVwbHkgZm9yIGFuIG9yaWdpbmFsIG1haWwgZnJvbSBtYWlsIGdyb3VwIHN5c3RlbQoKCgoKCgoK
+5pS25Lu25Lq677yaIDxxZW11LWRldmVsQG5vbmdudS5vcmc+Owrml6Ug5pyfIO+8mjIwMTflubQx
+MOaciDIw5pelIDE3OjMyCuS4uyDpopgg77yaW1FlbXUtZGV2ZWxdIHd1cmIgdGVzdCB6dApJdCdz
+IGEgdGVzdCBtYWlsIGZvciB0ZXN0aW5nIHJlbGF0aXZlCmJldHdlZW4gdG9waWMgYW5kIHJlcGx5
+Lg==
