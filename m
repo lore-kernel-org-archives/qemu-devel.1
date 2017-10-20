@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40073)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40408)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1e5SIb-0001QA-SS
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 04:04:58 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1e5SKQ-0002KD-VS
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 04:06:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1e5SIY-0004fr-O8
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 04:04:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46750)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1e5SIY-0004fa-F1
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 04:04:54 -0400
-Date: Fri, 20 Oct 2017 09:04:46 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20171020080446.GA2272@work-vm>
-References: <20171018174013.22709-1-dgilbert@redhat.com>
-	<20171019043145.GA7850@pxdev.xzpeter.org>
-	<20171019112122.GF2281@work-vm>
-	<20171020024207.GA3990@pxdev.xzpeter.org>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1e5SKN-0005fj-R4
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 04:06:50 -0400
+References: <20171019222637.17890-1-eblake@redhat.com>
+	<20171019222637.17890-5-eblake@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <2ad2becb-7f62-a0d7-e8b8-a70a15b01fc2@virtuozzo.com>
+Date: Fri, 20 Oct 2017 11:06:44 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171020024207.GA3990@pxdev.xzpeter.org>
-Subject: Re: [Qemu-devel] [PATCH v3 0/7] migration: pause-before-switchover
+In-Reply-To: <20171019222637.17890-5-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH v5 04/11] nbd/server: Report error for
+ write to read-only export
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,83 +25,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, jdenemar@redhat.com, wangjie88@huawei.com, quintela@redhat.com, mreitz@redhat.com, berrange@redhat.com, eblake@redhat.com, fuweiwei2@huawei.com
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, qemu-block@nongnu.org
 
-* Peter Xu (peterx@redhat.com) wrote:
-> On Thu, Oct 19, 2017 at 12:21:23PM +0100, Dr. David Alan Gilbert wrote:
-> > * Peter Xu (peterx@redhat.com) wrote:
-> > > On Wed, Oct 18, 2017 at 06:40:06PM +0100, Dr. David Alan Gilbert (git) wrote:
-> > > 
-> > > [...]
-> > > 
-> > > > The precopy flow is:
-> > > > active->pre-switchover->device->completed
-> > > > 
-> > > > The postcopy flow is:
-> > > > active->pre-switchover->postcopy-active->completed
-> > > 
-> > > The naming is still slightly confusing to me:
-> > > 
-> > > (1) we have a capability called "pause-before-switchover", so it feels
-> > >     like there is something called "switchover" and if we enable this
-> > >     we'll pause before that point;
-> > > 
-> > > (2) we have a new status "pre-switchover", it feels like that's the
-> > >     point before we are in "switchover" state;
-> > > 
-> > > (3) we don't really have a "switchover" state, but instead it's called
-> > >     "device" which is exactly the "switchover" action.
-> > > 
-> > > Considering (1) and (2), I would prefer "device" state to be just
-> > > "switchover"...
-> > 
-> > Yes I stuck to pause-before-device and device originally; but
-> > what we're doing during the 'device' stage is mostly saving device
-> > state; the actual switchover occurs at the end.  So hmm.
-> 
-> That's fine to me.
-> 
-> > 
-> > > Further, not sure we can unify the state transition as well (say, we
-> > > add this switchover state even without cap "pause-before-switchover"
-> > > set, although it does not make much sense itself). Then, we can also
-> > > unify the precopy/postcopy state machine into one:
-> > > 
-> > > active->
-> > >   [pre-switchover->]      (optional, decided by "pause-before-switchover")
-> > >     switchover->
-> > >       [postcopy-active->] (optional, decided by "postcopy-arm")
-> > >         completed
-> > 
-> > I didn't want to change the state transition behaviour without the
-> > capability set, since that could upset an existing libvirt that would
-> > get confused by the new state.
-> 
-> Indeed.  However this (and also Juan's xbzrle cache size series) lets
-> me think about whether we should loosen the "compatibility" sometimes.
-> 
-> For most of the times, we are paying the compatibility bill by
-> complicating the code logic.  For this one, we satisfy live block
-> migration logic to introduce two new state transition paths (for
-> precopy and postcopy). I am just afraid we need to pay a larger bill
-> some day.
-> 
-> But I'd say it's only my worry; maybe it's just too superfluous.
+20.10.2017 01:26, Eric Blake wrote:
+> When the server is read-only, we were already reporting an error
+> message for NBD_CMD_WRITE_ZEROES, but failed to set errp for a
+> similar NBD_CMD_WRITE.  This will matter more once structured
+> replies allow the server to propagate the errp information back
+> to the client.  While at it, use an error message that makes a
+> bit more sense if viewed on the client side.
+>
+> Note that when using qemu-io to test qemu-nbd behavior, it is
+> rather difficult to convince qemu-io to send protocol violations
+> (such as a read beyond bounds), because we have a lot of active
+> checking on the client side that a qemu-io request makes sense
+> before it ever goes over the wire to the server.  The case of a
+> client attempting a write when the server is started as
+> 'qemu-nbd -r' is one of the few places where we can easily test
+> error path handling, without having to resort to hacking in known
+> temporary bugs to either the server or client.  [Maybe we want a
+> future patch to the client to do up-front checking on writes to a
+> read-only export, the way it does up-front bounds checking; but I
+> don't see anything in the NBD spec that points to a protocol
+> violation in our current behavior.]
+>
+> Signed-off-by: Eric Blake <eblake@redhat.com>
 
-Yes, it's true - almost all the behaviour we have forms part of our
-API that we expose to libvirt; we have to be pretty careful.
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-> (I provided all r-bs, so the series looks good to me after all)
 
-Thanks! One comment fix coming up soon as spotted by Jiri.
-
-Dave
-
-> 
-> Thanks,
-> 
-> -- 
-> Peter Xu
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+-- 
+Best regards,
+Vladimir
