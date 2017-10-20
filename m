@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50800)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50767)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1e5TFp-0005eM-5e
+	(envelope-from <dgilbert@redhat.com>) id 1e5TFm-0005eI-Rr
 	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 05:06:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1e5TFo-0004Ax-4n
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 05:06:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58410)
+	(envelope-from <dgilbert@redhat.com>) id 1e5TFl-00049v-MS
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 05:06:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49874)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1e5TFn-0004AT-SK
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 05:06:08 -0400
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1e5TFl-00049c-DV
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 05:06:05 -0400
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Fri, 20 Oct 2017 10:05:52 +0100
-Message-Id: <20171020090556.18631-4-dgilbert@redhat.com>
+Date: Fri, 20 Oct 2017 10:05:51 +0100
+Message-Id: <20171020090556.18631-3-dgilbert@redhat.com>
 In-Reply-To: <20171020090556.18631-1-dgilbert@redhat.com>
 References: <20171020090556.18631-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 3/7] migration: Wait for semaphore before
- completing migration
+Subject: [Qemu-devel] [PATCH v4 2/7] migration: Add 'pre-switchover' and
+ 'device' statuses
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,99 +29,75 @@ Cc: berrange@redhat.com, eblake@redhat.com, fuweiwei2@huawei.com
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Wait for a semaphore before completing the migration,
-if the previously added capability was enabled.
+Add two statuses for use when the 'pause-before-switchover'
+capability is enabled.
+
+'pre-switchover' is the state that we wait in for management
+to allow us to continue.
+'device' is the state we enter while serialising the devices
+after management gives us the OK.
 
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Reviewed-by: Peter Xu <peterx@redhat.com>
 ---
- migration/migration.c | 38 ++++++++++++++++++++++++++++++++++++++
- migration/migration.h |  3 +++
- 2 files changed, 41 insertions(+)
+ migration/migration.c | 6 ++++++
+ qapi/migration.json   | 8 +++++++-
+ 2 files changed, 13 insertions(+), 1 deletion(-)
 
 diff --git a/migration/migration.c b/migration/migration.c
-index 86ae0292f0..6c6d5e2c75 100644
+index fba3342368..86ae0292f0 100644
 --- a/migration/migration.c
 +++ b/migration/migration.c
-@@ -1968,6 +1968,39 @@ fail:
- }
+@@ -526,6 +526,8 @@ static bool migration_is_setup_or_active(int state)
+     case MIGRATION_STATUS_ACTIVE:
+     case MIGRATION_STATUS_POSTCOPY_ACTIVE:
+     case MIGRATION_STATUS_SETUP:
++    case MIGRATION_STATUS_PRE_SWITCHOVER:
++    case MIGRATION_STATUS_DEVICE:
+         return true;
  
- /**
-+ * migration_maybe_pause: Pause if required to by
-+ * migrate_pause_before_switchover called with the iothread locked
-+ * Returns: 0 on success
-+ */
-+static int migration_maybe_pause(MigrationState *s, int *current_active_state)
-+{
-+    if (!migrate_pause_before_switchover()) {
-+        return 0;
-+    }
-+
-+    /* Since leaving this state is not atomic with posting the semaphore
-+     * it's possible that someone could have issued multiple migrate_continue
-+     * and the semaphore is incorrectly positive at this point;
-+     * the docs say it's undefined to reinit a semaphore that's already
-+     * init'd, so use timedwait to eat up any existing posts.
-+     */
-+    while (qemu_sem_timedwait(&s->pause_sem, 1) == 0) {
-+        /* This block intentionally left blank */
-+    }
-+
-+    qemu_mutex_unlock_iothread();
-+    migrate_set_state(&s->state, *current_active_state,
-+                      MIGRATION_STATUS_PRE_SWITCHOVER);
-+    qemu_sem_wait(&s->pause_sem);
-+    migrate_set_state(&s->state, MIGRATION_STATUS_PRE_SWITCHOVER,
-+                      MIGRATION_STATUS_DEVICE);
-+    *current_active_state = MIGRATION_STATUS_DEVICE;
-+    qemu_mutex_lock_iothread();
-+
-+    return s->state == MIGRATION_STATUS_DEVICE ? 0 : -EINVAL;
-+}
-+
-+/**
-  * migration_completion: Used by migration_thread when there's not much left.
-  *   The caller 'breaks' the loop when this returns.
-  *
-@@ -1993,6 +2026,9 @@ static void migration_completion(MigrationState *s, int current_active_state,
-             bool inactivate = !migrate_colo_enabled();
-             ret = vm_stop_force_state(RUN_STATE_FINISH_MIGRATE);
-             if (ret >= 0) {
-+                ret = migration_maybe_pause(s, &current_active_state);
-+            }
-+            if (ret >= 0) {
-                 qemu_file_set_rate_limit(s->to_dst_file, INT64_MAX);
-                 ret = qemu_savevm_state_complete_precopy(s->to_dst_file, false,
-                                                          inactivate);
-@@ -2373,6 +2409,7 @@ static void migration_instance_finalize(Object *obj)
+     default:
+@@ -600,6 +602,8 @@ MigrationInfo *qmp_query_migrate(Error **errp)
+     case MIGRATION_STATUS_ACTIVE:
+     case MIGRATION_STATUS_CANCELLING:
+     case MIGRATION_STATUS_POSTCOPY_ACTIVE:
++    case MIGRATION_STATUS_PRE_SWITCHOVER:
++    case MIGRATION_STATUS_DEVICE:
+          /* TODO add some postcopy stats */
+         info->has_status = true;
+         info->has_total_time = true;
+@@ -1183,6 +1187,8 @@ bool migration_is_idle(void)
+     case MIGRATION_STATUS_ACTIVE:
+     case MIGRATION_STATUS_POSTCOPY_ACTIVE:
+     case MIGRATION_STATUS_COLO:
++    case MIGRATION_STATUS_PRE_SWITCHOVER:
++    case MIGRATION_STATUS_DEVICE:
+         return false;
+     case MIGRATION_STATUS__MAX:
+         g_assert_not_reached();
+diff --git a/qapi/migration.json b/qapi/migration.json
+index 4960231ba2..b56f95db64 100644
+--- a/qapi/migration.json
++++ b/qapi/migration.json
+@@ -96,12 +96,18 @@
+ # @colo: VM is in the process of fault tolerance, VM can not get into this
+ #        state unless colo capability is enabled for migration. (since 2.8)
+ #
++# @pre-switchover: Paused before device serialisation. (since 2.11)
++#
++# @device: During device serialisation when pause-before-switchover is enabled
++#        (since 2.11)
++#
+ # Since: 2.3
+ #
+ ##
+ { 'enum': 'MigrationStatus',
+   'data': [ 'none', 'setup', 'cancelling', 'cancelled',
+-            'active', 'postcopy-active', 'completed', 'failed', 'colo' ] }
++            'active', 'postcopy-active', 'completed', 'failed', 'colo',
++            'pre-switchover', 'device' ] }
  
-     g_free(params->tls_hostname);
-     g_free(params->tls_creds);
-+    qemu_sem_destroy(&ms->pause_sem);
- }
- 
- static void migration_instance_init(Object *obj)
-@@ -2383,6 +2420,7 @@ static void migration_instance_init(Object *obj)
-     ms->state = MIGRATION_STATUS_NONE;
-     ms->xbzrle_cache_size = DEFAULT_MIGRATE_CACHE_SIZE;
-     ms->mbps = -1;
-+    qemu_sem_init(&ms->pause_sem, 0);
- 
-     params->tls_hostname = g_strdup("");
-     params->tls_creds = g_strdup("");
-diff --git a/migration/migration.h b/migration/migration.h
-index 969866303e..cd988a99b9 100644
---- a/migration/migration.h
-+++ b/migration/migration.h
-@@ -121,6 +121,9 @@ struct MigrationState
-     /* Flag set once the migration thread called bdrv_inactivate_all */
-     bool block_inactive;
- 
-+    /* Migration is paused due to pause-before-switchover */
-+    QemuSemaphore pause_sem;
-+
-     /* The semaphore is used to notify COLO thread that failover is finished */
-     QemuSemaphore colo_exit_sem;
- 
+ ##
+ # @MigrationInfo:
 -- 
 2.13.6
