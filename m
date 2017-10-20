@@ -1,28 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48019)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48060)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1e5YAd-0002rz-9b
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 10:21:09 -0400
+	(envelope-from <bounces@canonical.com>) id 1e5YAj-00030X-Q2
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 10:21:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1e5YAa-00080h-3l
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 10:21:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60516)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1e5YAZ-00080O-QC
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 10:21:04 -0400
-Date: Fri, 20 Oct 2017 12:21:00 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20171020142100.GM2942@localhost.localdomain>
-References: <1508170976-96869-1-git-send-email-imammedo@redhat.com>
-	<1508170976-96869-5-git-send-email-imammedo@redhat.com>
-	<20171016165916.GI3246@localhost.localdomain>
-	<20171019104218.GB13245@umbus>
-	<20171020001548.GK2942@localhost.localdomain>
-	<20171020011917.GF13245@umbus>
+	(envelope-from <bounces@canonical.com>) id 1e5YAg-00083H-LP
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 10:21:13 -0400
+Received: from indium.canonical.com ([91.189.90.7]:60162)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1e5YAg-00082j-CM
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 10:21:10 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1e5YAe-00048K-2S
+	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 14:21:08 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 185592E80CC
+	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 14:21:07 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171020011917.GF13245@umbus>
-Subject: Re: [Qemu-devel] [RFC 4/6] CLI: add -paused option
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 20 Oct 2017 14:06:13 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Reply-To: Bug 1725267 <1725267@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150850189101.17148.14929440782690831821.malonedeb@wampee.canonical.com>
+Message-Id: <150850837357.17349.7115304496422959653.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1725267] Re: armeb regression since qemu version
+ 2.8
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,179 +37,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, eblake@redhat.com, armbru@redhat.com, pkrempa@redhat.com, peter.maydell@linaro.org, pbonzini@redhat.com, cohuck@redhat.com
+To: qemu-devel@nongnu.org
 
-On Fri, Oct 20, 2017 at 12:19:17PM +1100, David Gibson wrote:
-> On Thu, Oct 19, 2017 at 10:15:48PM -0200, Eduardo Habkost wrote:
-> > On Thu, Oct 19, 2017 at 09:42:18PM +1100, David Gibson wrote:
-> > > On Mon, Oct 16, 2017 at 02:59:16PM -0200, Eduardo Habkost wrote:
-> > > > On Mon, Oct 16, 2017 at 06:22:54PM +0200, Igor Mammedov wrote:
-> > > > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> > > > > ---
-> > > > >  include/sysemu/sysemu.h |  1 +
-> > > > >  qemu-options.hx         | 15 ++++++++++++++
-> > > > >  qmp.c                   |  5 +++++
-> > > > >  vl.c                    | 54 ++++++++++++++++++++++++++++++++++++++++++++++++-
-> > > > >  4 files changed, 74 insertions(+), 1 deletion(-)
-> > > > > 
-> > > > > diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-> > > > > index b213696..3feb94f 100644
-> > > > > --- a/include/sysemu/sysemu.h
-> > > > > +++ b/include/sysemu/sysemu.h
-> > > > > @@ -66,6 +66,7 @@ typedef enum WakeupReason {
-> > > > >      QEMU_WAKEUP_REASON_OTHER,
-> > > > >  } WakeupReason;
-> > > > >  
-> > > > > +void qemu_exit_preconfig_request(void);
-> > > > >  void qemu_system_reset_request(ShutdownCause reason);
-> > > > >  void qemu_system_suspend_request(void);
-> > > > >  void qemu_register_suspend_notifier(Notifier *notifier);
-> > > > > diff --git a/qemu-options.hx b/qemu-options.hx
-> > > > > index 39225ae..bd44db8 100644
-> > > > > --- a/qemu-options.hx
-> > > > > +++ b/qemu-options.hx
-> > > > > @@ -3498,6 +3498,21 @@ STEXI
-> > > > >  Run the emulation in single step mode.
-> > > > >  ETEXI
-> > > > >  
-> > > > > +DEF("paused", HAS_ARG, QEMU_OPTION_paused, \
-> > > > > +    "-paused [state=]postconf|preconf\n"
-> > > > > +    "                postconf: pause QEMU after machine is initialized\n"
-> > > > > +    "                preconf: pause QEMU before machine is initialized\n",
-> > > > > +    QEMU_ARCH_ALL)
-> > > > 
-> > > > I would like to allow pausing before machine-type is selected, so
-> > > > management could run query-machines before choosing a
-> > > > machine-type.  Would that need a third "-pause" mode, or will we
-> > > > be able to change "preconf" to pause before select_machine() is
-> > > > called?
-> > > > 
-> > > > The same probably applies to other things initialized before
-> > > > machine_run_board_init() that could be configurable using QMP,
-> > > > including but not limited to:
-> > > > * Accelerator configuration
-> > > > * Registering global properties
-> > > > * RAM size
-> > > > * SMP/CPU configuration
-> > > 
-> > > Yeah.. having a bunch of different possible pause stages to select
-> > > doesn't sound great.
-> > 
-> > I agree.  The number of externally visible pause states should be
-> > as small as possible.
-> > 
-> > 
-> > >                       Could we avoid this by instead changing -S to
-> > > pause at the earliest possible spot, but having any monitor commands
-> > > that require a later stage automatically "fast forwarding" to the
-> > > right phase?
-> > 
-> > That would hide the internal details from the outside.  Sounds
-> > nice, but adding new machine/device configuration QMP commands
-> > while hiding the QEMU state from the outside sounds impossible.
-> > 
-> > For example, if we use -S today, this works:
-> > 
-> >   $ qemu-system-x86_64 -S -qmp stdio
-> >   <- {"QMP": {"version": {"qemu": {"micro": 0, "minor": 10, "major": 2}, "package": " (v2.10.0-83-g9375da7831)"}, "capabilities": []}}
-> >   -> {"execute":"qmp_capabilities"}
-> >   <- {"return": {}}
-> >   -> {"execute":"query-cpus"}
-> >   <- {"return": [{"arch": "x86", "current": true, "props": {"core-id": 0, "thread-id": 0, "socket-id": 0}, "CPU": 0, "qom_path": "/machine/unattached/device[0]", "pc": 4294967280, "halted": false, "thread_id": 4038}]}
-> > 
-> > This means "query-cpus" needs to fast-forward to the CPU creation
-> > stage if we want to keep compatibility.
-> > 
-> > Now, assume we add a set-numa-node command like the one in this
-> > series.  e.g.:
-> > 
-> >   $ qemu-system-x86_64 -S -qmp stdio
-> >   <- {"QMP": {"version": {"qemu": {"micro": 0, "minor": 10, "major": 2}, "package": " (v2.10.0-83-g9375da7831)"}, "capabilities": []}}
-> >   -> {"execute":"qmp_capabilities"}
-> >   <- {"return": {}}
-> >   -> {"execute":"set-numa-node" ... }
-> >   <- {"return": ...}
-> > 
-> > The command will work only if machine initialization didn't run
-> > yet.
-> > 
-> > But now an innocent-looking query command would change QEMU state
-> > in an unexpected way:
-> > 
-> >   $ qemu-system-x86_64 -S -qmp stdio
-> >   <- {"QMP": {"version": {"qemu": {"micro": 0, "minor": 10, "major": 2}, "package": " (v2.10.0-83-g9375da7831)"}, "capabilities": []}}
-> >   -> {"execute":"qmp_capabilities"}
-> >   <- {"return": {}}
-> >   -> {"execute":"query-cpus"}  [will silently fast-forward QEMU state]
-> >   <- {"return": [{"arch": "x86", "current": true, "props": {"core-id": 0, "thread-id": 0, "socket-id": 0}, "CPU": 0, "qom_path": "/machine/unattached/device[0]", "pc": 4294967280, "halted": false, "thread_id": 4038}]}
-> >   -> {"execute":"set-numa-node" ... }
-> >   <- {"error": ...}  [the command will fail because the machine was already created]
-> > 
-> > This means we do have a externally visible "too late to use
-> > set-numa-node" QEMU state, and query-cpus will have a externally
-> > visible side effect.  Every QMP command would need to document
-> > how it affects QEMU state in a externally visible way.
-> > 
-> > If QEMU pause state is still going to be externally visible this
-> > way, I would prefer to let the client to explicitly tell what's
-> > the state they want QEMU to be, instead of making QEMU change
-> > state silently as a side effect of QMP commands.
-> 
-> Yeah, good point.  My proposal would just have changed explicitly
-> exposed ugly internal state to subtly exposed ugly internal state,
-> which is probably worse :(.
-> 
-> 
-> Ok.. next possibly bad idea..
-> 
-> What about a "re-exec" monitor command; it would take what's
-> essentially a new command line, and basically restart qemu from the
-> beginning, reparsing this new command line, but without actually 
-> 
-> Pro:
->   * Mitigates Daniel Berrange's concern about lots of qemu
->     configuration being buried in the qmp session - if libvirt logged
->     its last "re-exec" that would have what is generally needed.
->   * Lets libvirt do assorted investigation of options, then rewind to
->     choose what it actually wants
+I rather suspect something is going wrong when the dynamic loader
+attempts to paw through the ELF auxiliary vector...
 
-Sounds like a superset of Paolo's "-machine none" proposal[1].
-It would be a very simple interface, not sure it can be easily
-implemented efficiently.
+-- =
 
-[1] https://www.mail-archive.com/qemu-devel@nongnu.org/msg488618.html
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1725267
 
-> 
-> Con:
->   * Would require a bunch of auditing of structures/state to make sure
->     they can be re-initialized cleanly
+Title:
+  armeb regression since qemu version 2.8
 
-This sounds like a big obstacle.  QEMU still have too much global
-state outside the machine/qdev tree.
+Status in QEMU:
+  New
 
+Bug description:
+  Hi,
 
->   * Would it be fast enough for libvirt to use?  Do we know if the
->     slowness which makes multiple qemu invocations by libvirt
->     unattractive is from the kernel/libc/ldso overhead, or from qemu's
->     internal start up processing?
+  I have noticed a regression when I upgraded from qemu-armeb 2.7 to
+  2.8, and the problem is still present with version 2.10.1.
 
-My gut feeling is that this could be too slow, if the scope of
-"re-exec" is too big.
+  I am using qemu for GCC validation, noticed problems with testcases
+  involving atomics, I'm attaching here atomic-exchange-4.exe.
 
+  # with 2.7:
+  $ qemu-armeb -cpu any -R 0 -L $PWD -E LD_LIBRARY_PATH=3D$PWD/lib $PWD/ato=
+mic-exchange-4.exe
+  $ echo $?
+  0
+  # with 2.8, 2.10.1:
+  $ qemu-armeb -cpu any -R 0 -L $PWD -E LD_LIBRARY_PATH=3D$PWD/lib $PWD/ato=
+mic-exchange-4.exe
+  qemu: uncaught target signal 6 (Aborted) - core dumped
+  Aborted (core dumped)
+  $ echo $?
+  134
 
-Now, let me try to go to the opposite extreme: I think you had a
-good point in your previous proposal.  Why should we need to
-restart/re-execute anything at all just because some bit of
-configuration is being changed by libvirt?  Why commands like
-set-numa-node should require QEMU to be in a state that is not
-covered by -S?  If the guest is not running yet, there should be
-no reason to require clients to explicitly pause/continue/restart
-anything.
+  The source code is gcc/testsuite/gcc.dg/atomic-exchange-4.c
 
-(Translating this to my example above: why exactly have I assumed
-above that keeping "query-cpus" working would necessarily make
-set-numa-node stop working?)
+  Running with -d in_asm shows a difference early in the startup code:
+  IN: _dl_sysdep_start
+  [...]
+  0x40a17790:  908ff103      addls	pc, pc, r3, lsl #2
 
--- 
-Eduardo
+  and then the next address is not the same with qemu 2.7 and 2.10.1
+
+  I hope you have enough data/information to reproduce and confirm/fix
+  the problem.
+
+  Thanks
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1725267/+subscriptions
