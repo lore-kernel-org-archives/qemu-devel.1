@@ -1,34 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45105)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48802)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e5Q3b-0007wo-JJ
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 01:41:22 -0400
+	(envelope-from <clg@kaod.org>) id 1e5QX6-00046r-6M
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 02:11:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e5Q3W-0006Hx-J0
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 01:41:19 -0400
-Received: from indium.canonical.com ([91.189.90.7]:57616)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1e5Q3W-0006HP-6m
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 01:41:14 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1e5Q3U-00042n-GP
-	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 05:41:12 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 77F9B2E80D1
-	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 05:41:12 +0000 (UTC)
+	(envelope-from <clg@kaod.org>) id 1e5QX2-000647-Sh
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 02:11:48 -0400
+Received: from 2.mo5.mail-out.ovh.net ([178.33.109.111]:52165)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1e5QX2-00062W-IM
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 02:11:44 -0400
+Received: from player786.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo5.mail-out.ovh.net (Postfix) with ESMTP id A4778146551
+	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 08:11:42 +0200 (CEST)
+References: <20171019163546.2039-1-clg@kaod.org>
+	<20171019163546.2039-8-clg@kaod.org>
+	<218244ab-1bc6-6a21-f762-1ddd9ef79011@amsat.org>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <0507c02b-91da-9584-18f7-a8099e35102a@kaod.org>
+Date: Fri, 20 Oct 2017 08:11:35 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <218244ab-1bc6-6a21-f762-1ddd9ef79011@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 20 Oct 2017 05:31:15 -0000
-From: ChristianEhrhardt <1719196@bugs.launchpad.net>
-Reply-To: Bug 1719196 <1719196@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150626680089.6094.17724106932405637799.malonedeb@soybean.canonical.com>
-Message-Id: <150847747582.13542.17773816872037253003.launchpad@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1719196] Re: [arm64 ocata] newly created
- instances are unable to raise network interfaces
+Subject: Re: [Qemu-devel] [PATCH v6 7/8] misc: add pca9552 LED blinker model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,657 +32,607 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-
-** Description changed:
-
-+ [Impact]
-+ =
-
-+  * A change in qemu 2.8 (83d768b virtio: set ISR on dataplane =
-
-+    notifications) broke virtio handling on platforms without a =
-
-+    controller. Those encounter flaky networking due to missed IRQs
-+ =
-
-+  * Fix is a backport of the upstream fix b4b9862b: virtio: Fix no =
-
-+    interrupt when not creating msi controller
-+ =
-
-+ [Test Case]
-+ =
-
-+  * On Arm with Zesty (or Ocata) run a guest without PCI based devices
-+ =
-
-+  * Example in e.g. c#23
-+ =
-
-+  * Without the fix the networking does not work reliably (as it losses =
-
-+    IRQs), with the fix it works fine.
-+ =
-
-+ [Regression Potential]
-+ =
-
-+  * Changing the IRQ handling of virtio could affect virtio in general.
-+    But when reviwing the patch you'll see that it is small and actually =
-
-+    only changes to enable IRQ on one more place. That could cause more =
-
-+    IRQs than needed in the worst case, but those are usually not =
-
-+    breaking but only slowing things down. Also this fix is upstream =
-
-+    quite a while, increasing confidence.
-+ =
-
-+ [Other Info]
-+  =
-
-+  * There is currently 1720397 in flight in the SRU queue, so acceptance =
-
-+    of this upload has to wait until that completes.
-+ =
-
-+ ---
-+ =
-
-  arm64 Ocata ,
-  =
-
-  I'm testing to see I can get Ocata running on arm64 and using the
-  openstack-base bundle to deploy it.  I have added the bundle to the log
-  file attached to this bug.
-  =
-
-  When I create a new instance via nova, the VM comes up and runs, however
-  fails to raise its eth0 interface. This occurs on both internal and
-  external networks.
-  =
-
-  ubuntu@openstackaw:~$ nova list
-  +--------------------------------------+---------+--------+------------+-=
-------------+--------------------+
-  | ID                                   | Name    | Status | Task State | =
-Power State | Networks           |
-  +--------------------------------------+---------+--------+------------+-=
-------------+--------------------+
-  | dcaf6d51-f81e-4cbd-ac77-0c5d21bde57c | sfeole1 | ACTIVE | -          | =
-Running     | internal=3D10.5.5.3  |
-  | aa0b8aee-5650-41f4-8fa0-aeccdc763425 | sfeole2 | ACTIVE | -          | =
-Running     | internal=3D10.5.5.13 |
-  +--------------------------------------+---------+--------+------------+-=
-------------+--------------------+
-  ubuntu@openstackaw:~$ nova show aa0b8aee-5650-41f4-8fa0-aeccdc763425
-  +--------------------------------------+---------------------------------=
--------------------------+
-  | Property                             | Value                           =
-                         |
-  +--------------------------------------+---------------------------------=
--------------------------+
-  | OS-DCF:diskConfig                    | MANUAL                          =
-                         |
-  | OS-EXT-AZ:availability_zone          | nova                            =
-                         |
-  | OS-EXT-SRV-ATTR:host                 | awrep3                          =
-                         |
-  | OS-EXT-SRV-ATTR:hypervisor_hostname  | awrep3.maas                     =
-                         |
-  | OS-EXT-SRV-ATTR:instance_name        | instance-00000003               =
-                         |
-  | OS-EXT-STS:power_state               | 1                               =
-                         |
-  | OS-EXT-STS:task_state                | -                               =
-                         |
-  | OS-EXT-STS:vm_state                  | active                          =
-                         |
-  | OS-SRV-USG:launched_at               | 2017-09-24T14:23:08.000000      =
-                         |
-  | OS-SRV-USG:terminated_at             | -                               =
-                         |
-  | accessIPv4                           |                                 =
-                         |
-  | accessIPv6                           |                                 =
-                         |
-  | config_drive                         |                                 =
-                         |
-  | created                              | 2017-09-24T14:22:41Z            =
-                         |
-  | flavor                               | m1.small (717660ae-0440-4b19-a76=
-2-ffeb32a0575c)          |
-  | hostId                               | 5612a00671c47255d2ebd6737a64ec9b=
-d3a5866d1233ecf3e988b025 |
-  | id                                   | aa0b8aee-5650-41f4-8fa0-aeccdc76=
-3425                     |
-  | image                                | zestynosplash (e88fd1bd-f040-44d=
-8-9e7c-c462ccf4b945)     |
-  | internal network                     | 10.5.5.13                       =
-                         |
-  | key_name                             | mykey                           =
-                         |
-  | metadata                             | {}                              =
-                         |
-  | name                                 | sfeole2                         =
-                         |
-  | os-extended-volumes:volumes_attached | []                              =
-                         |
-  | progress                             | 0                               =
-                         |
-  | security_groups                      | default                         =
-                         |
-  | status                               | ACTIVE                          =
-                         |
-  | tenant_id                            | 9f7a21c1ad264fec81abc09f3960ad1d=
-                         |
-  | updated                              | 2017-09-24T14:23:09Z            =
-                         |
-  | user_id                              | e6bb6f5178a248c1b5ae66ed388f9040=
-                         |
-  +--------------------------------------+---------------------------------=
--------------------------+
-  =
-
-- =
-
-  As seen above the instances boot an run.  Full Console output is
-  attached to this bug.
-- =
-
-  =
-
-  [  OK  ] Started Initial cloud-init job (pre-networking).
-  [  OK  ] Reached target Network (Pre).
-  [  OK  ] Started AppArmor initialization.
--          Starting Raise network interfaces...
-+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Starting Raise netw=
-ork interfaces...
-  [FAILED] Failed to start Raise network interfaces.
-  See 'systemctl status networking.service' for details.
--          Starting Initial cloud-init job (metadata service crawler)...
-+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Starting Initial cl=
-oud-init job (metadata service crawler)...
-  [  OK  ] Reached target Network.
-  [  315.051902] cloud-init[881]: Cloud-init v. 0.7.9 running 'init' at Fri=
-, 22 Sep 2017 18:29:15 +0000. Up 314.70 seconds.
-  [  315.057291] cloud-init[881]: ci-info: +++++++++++++++++++++++++++Net d=
-evice info+++++++++++++++++++++++++++
-  [  315.060338] cloud-init[881]: ci-info: +--------+------+-----------+---=
---------+-------+-------------------+
-  [  315.063308] cloud-init[881]: ci-info: | Device |  Up  |  Address  |   =
- Mask   | Scope |     Hw-Address    |
-  [  315.066304] cloud-init[881]: ci-info: +--------+------+-----------+---=
---------+-------+-------------------+
-  [  315.069303] cloud-init[881]: ci-info: | eth0:  | True |     .     |   =
-  .     |   .   | fa:16:3e:39:4c:48 |
-  [  315.072308] cloud-init[881]: ci-info: | eth0:  | True |     .     |   =
-  .     |   d   | fa:16:3e:39:4c:48 |
-  [  315.075260] cloud-init[881]: ci-info: |  lo:   | True | 127.0.0.1 | 25=
-5.0.0.0 |   .   |         .         |
-  [  315.078258] cloud-init[881]: ci-info: |  lo:   | True |     .     |   =
-  .     |   d   |         .         |
-  [  315.081249] cloud-init[881]: ci-info: +--------+------+-----------+---=
---------+-------+-------------------+
-  [  315.084240] cloud-init[881]: 2017-09-22 18:29:15,393 - url_helper.py[W=
-ARNING]: Calling 'http://169.254.169.254/2009-04-04/meta-data/instance-id' =
-failed [0/120s]: request error [HTTPConnectionPool(host=3D'169.254.169.254'=
-, port=3D80): Max retries exceeded with url: /2009-04-04/meta-data/instance=
--id (Caused by NewConnectionError('<requests.packages.urllib3.connection.HT=
-TPConnection object at 0xffffb10794e0>: Failed to establish a new connectio=
-n: [Errno 101] Network is unreachable',))]
-  =
-
-- =
-
-- =
-
-  ----------------
-- =
-
-  =
-
-  I have checked all services in neutron and made sure that they are
-  running and restarted in neutron-gateway
-  =
-
-- =
-
--  [ + ]  neutron-dhcp-agent
--  [ + ]  neutron-l3-agent
--  [ + ]  neutron-lbaasv2-agent
--  [ + ]  neutron-metadata-agent
--  [ + ]  neutron-metering-agent
--  [ + ]  neutron-openvswitch-agent
--  [ + ]  neutron-ovs-cleanup
-+ =C2=A0[ + ]  neutron-dhcp-agent
-+ =C2=A0[ + ]  neutron-l3-agent
-+ =C2=A0[ + ]  neutron-lbaasv2-agent
-+ =C2=A0[ + ]  neutron-metadata-agent
-+ =C2=A0[ + ]  neutron-metering-agent
-+ =C2=A0[ + ]  neutron-openvswitch-agent
-+ =C2=A0[ + ]  neutron-ovs-cleanup
-  =
-
-  and have also restarted and checked the nova-compute logs for their
-  neutron counterparts.
-  =
-
-+ =C2=A0[ + ]  neutron-openvswitch-agent
-+ =C2=A0[ + ]  neutron-ovs-cleanup
-  =
-
--  [ + ]  neutron-openvswitch-agent
--  [ + ]  neutron-ovs-cleanup
-- =
-
-- =
-
--  There are some warnings/errors in the neutron-gateway logs which I have
-+ =C2=A0There are some warnings/errors in the neutron-gateway logs which I =
-have
-  attached the full tarball in a separate attachment to this bug:
-  =
-
-  2017-09-24 14:39:33.152 10322 INFO ryu.base.app_manager [-] instantiating=
- app ryu.controller.ofp_handler of OFPHandler
-  2017-09-24 14:39:33.153 10322 INFO ryu.base.app_manager [-] instantiating=
- app ryu.app.ofctl.service of OfctlService
-  2017-09-24 14:39:39.577 10322 ERROR neutron.agent.ovsdb.impl_vsctl [req-2=
-f084ae8-13dc-47dc-b351-24c8f3c57067 - - - - -] Unable to execute ['ovs-vsct=
-l', '--timeout=3D10', '--oneline', '--format=3Djson', '--', '--id=3D@manage=
-r', 'create', 'Manager', 'target=3D"ptcp:6640:127.0.0.1"', '--', 'add', 'Op=
-en_vSwitch', '.', 'manager_options', '@manager']. Exception: Exit code: 1; =
-Stdin: ; Stdout: ; Stderr: ovs-vsctl: transaction error: {"details":"Transa=
-ction causes multiple rows in \"Manager\" table to have identical values (\=
-"ptcp:6640:127.0.0.1\") for index on column \"target\".  First row, with UU=
-ID e02a5f7f-bfd2-4a1d-ae3c-0321db4bd3fb, existed in the database before thi=
-s transaction and was not modified by the transaction.  Second row, with UU=
-ID 6e9aba3a-471a-4976-bffd-b7131bbe5377, was inserted by this transaction."=
-,"error":"constraint violation"}
-  =
-
-- =
-
-  These warnings/errors also occur on the nova-compute hosts in
-  /var/log/neutron/
-- =
-
-- =
-
-  =
-
-  2017-09-22 18:54:52.130 387556 INFO ryu.base.app_manager [-] instantiatin=
-g app ryu.app.ofctl.service of OfctlService
-  2017-09-22 18:54:56.124 387556 ERROR neutron.agent.ovsdb.impl_vsctl [req-=
-e291c2f9-a123-422c-be7c-fadaeb5decfa - - - - -] Unable to execute ['ovs-vsc=
-tl', '--timeout=3D10', '--oneline', '--format=3Djson', '--', '--id=3D@manag=
-er', 'create', 'Manager', 'target=3D"ptcp:6640:127.0.0.1"', '--', 'add', 'O=
-pen_vSwitch', '.', 'manager_options', '@manager']. Exception: Exit code: 1;=
- Stdin: ; Stdout: ; Stderr: ovs-vsctl: transaction error: {"details":"Trans=
-action causes multiple rows in \"Manager\" table to have identical values (=
-\"ptcp:6640:127.0.0.1\") for index on column \"target\".  First row, with U=
-UID 9f27ddee-9881-4cbc-9777-2f42fee735e9, was inserted by this transaction.=
-  Second row, with UUID ccf0e097-09d5-449c-b353-6b69781dc3f7, existed in th=
-e database before this transaction and was not modified by the transaction.=
-","error":"constraint violation"}
-  =
-
-- =
-
-  I'm not sure if the above error could be pertaining to the failure, I
-  have also attached those logs to this bug as well...
-- =
-
-  =
-
-  .
-  (neutron) agent-list
-  +--------------------------------------+----------------------+--------+-=
-------------------+-------+----------------+---------------------------+
-  | id                                   | agent_type           | host   | =
-availability_zone | alive | admin_state_up | binary                    |
-  +--------------------------------------+----------------------+--------+-=
-------------------+-------+----------------+---------------------------+
-  | 0cca03fb-abb2-4704-8b0b-e7d3e117d882 | DHCP agent           | awrep1 | =
-nova              | :-)   | True           | neutron-dhcp-agent        |
-  | 14a5fd52-fbc3-450c-96d5-4e9a65776dad | L3 agent             | awrep1 | =
-nova              | :-)   | True           | neutron-l3-agent          |
-  | 2ebc7238-5e61-41f8-bc60-df14ec6b226b | Loadbalancerv2 agent | awrep1 | =
-                  | :-)   | True           | neutron-lbaasv2-agent     |
-  | 4f6275be-fc8b-4994-bdac-13a4b76f6a83 | Metering agent       | awrep1 | =
-                  | :-)   | True           | neutron-metering-agent    |
-  | 86ecc6b0-c100-4298-b861-40c17516cc08 | Open vSwitch agent   | awrep1 | =
-                  | :-)   | True           | neutron-openvswitch-agent |
-  | 947ad3ab-650b-4b96-a520-00441ecb33e7 | Open vSwitch agent   | awrep4 | =
-                  | :-)   | True           | neutron-openvswitch-agent |
-  | 996b0692-7d19-4641-bec3-e057f4a856f6 | Open vSwitch agent   | awrep3 | =
-                  | :-)   | True           | neutron-openvswitch-agent |
-  | ab6b1065-0b98-4cf3-9f46-6bddba0c5e75 | Metadata agent       | awrep1 | =
-                  | :-)   | True           | neutron-metadata-agent    |
-  | fe24f622-b77c-4eed-ae22-18e4195cf763 | Open vSwitch agent   | awrep2 | =
-                  | :-)   | True           | neutron-openvswitch-agent |
-  +--------------------------------------+----------------------+--------+-=
-------------------+-------+----------------+---------------------------+
-  =
-
-- =
-
-- Should neutron-openvswitch be assigned to the 'nova' availability zone? =
-
-+ Should neutron-openvswitch be assigned to the 'nova' availability zone?
-  =
-
-  I have also attached the ovs-vsctl show from a nova-compute host and the
-  neutron-gateway host to ensure that the open v switch routes are
-  correct.
-  =
-
-- =
-
-  I can supply more logs if required.
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1719196
-
-Title:
-  [arm64 ocata] newly created instances are unable to raise network
-  interfaces
-
-Status in Ubuntu Cloud Archive:
-  Fix Released
-Status in Ubuntu Cloud Archive ocata series:
-  Triaged
-Status in libvirt:
-  New
-Status in QEMU:
-  Fix Released
-Status in libvirt package in Ubuntu:
-  Invalid
-Status in qemu package in Ubuntu:
-  Fix Released
-Status in qemu source package in Zesty:
-  Incomplete
-
-Bug description:
-  [Impact]
-
-   * A change in qemu 2.8 (83d768b virtio: set ISR on dataplane =
-
-     notifications) broke virtio handling on platforms without a =
-
-     controller. Those encounter flaky networking due to missed IRQs
-
-   * Fix is a backport of the upstream fix b4b9862b: virtio: Fix no =
-
-     interrupt when not creating msi controller
-
-  [Test Case]
-
-   * On Arm with Zesty (or Ocata) run a guest without PCI based devices
-
-   * Example in e.g. c#23
-
-   * Without the fix the networking does not work reliably (as it losses =
-
-     IRQs), with the fix it works fine.
-
-  [Regression Potential]
-
-   * Changing the IRQ handling of virtio could affect virtio in general.
-     But when reviwing the patch you'll see that it is small and actually =
-
-     only changes to enable IRQ on one more place. That could cause more =
-
-     IRQs than needed in the worst case, but those are usually not =
-
-     breaking but only slowing things down. Also this fix is upstream =
-
-     quite a while, increasing confidence.
-
-  [Other Info]
-   =
-
-   * There is currently 1720397 in flight in the SRU queue, so acceptance =
-
-     of this upload has to wait until that completes.
-
-  ---
-
-  arm64 Ocata ,
-
-  I'm testing to see I can get Ocata running on arm64 and using the
-  openstack-base bundle to deploy it.  I have added the bundle to the
-  log file attached to this bug.
-
-  When I create a new instance via nova, the VM comes up and runs,
-  however fails to raise its eth0 interface. This occurs on both
-  internal and external networks.
-
-  ubuntu@openstackaw:~$ nova list
-  +--------------------------------------+---------+--------+------------+-=
-------------+--------------------+
-  | ID                                   | Name    | Status | Task State | =
-Power State | Networks           |
-  +--------------------------------------+---------+--------+------------+-=
-------------+--------------------+
-  | dcaf6d51-f81e-4cbd-ac77-0c5d21bde57c | sfeole1 | ACTIVE | -          | =
-Running     | internal=3D10.5.5.3  |
-  | aa0b8aee-5650-41f4-8fa0-aeccdc763425 | sfeole2 | ACTIVE | -          | =
-Running     | internal=3D10.5.5.13 |
-  +--------------------------------------+---------+--------+------------+-=
-------------+--------------------+
-  ubuntu@openstackaw:~$ nova show aa0b8aee-5650-41f4-8fa0-aeccdc763425
-  +--------------------------------------+---------------------------------=
--------------------------+
-  | Property                             | Value                           =
-                         |
-  +--------------------------------------+---------------------------------=
--------------------------+
-  | OS-DCF:diskConfig                    | MANUAL                          =
-                         |
-  | OS-EXT-AZ:availability_zone          | nova                            =
-                         |
-  | OS-EXT-SRV-ATTR:host                 | awrep3                          =
-                         |
-  | OS-EXT-SRV-ATTR:hypervisor_hostname  | awrep3.maas                     =
-                         |
-  | OS-EXT-SRV-ATTR:instance_name        | instance-00000003               =
-                         |
-  | OS-EXT-STS:power_state               | 1                               =
-                         |
-  | OS-EXT-STS:task_state                | -                               =
-                         |
-  | OS-EXT-STS:vm_state                  | active                          =
-                         |
-  | OS-SRV-USG:launched_at               | 2017-09-24T14:23:08.000000      =
-                         |
-  | OS-SRV-USG:terminated_at             | -                               =
-                         |
-  | accessIPv4                           |                                 =
-                         |
-  | accessIPv6                           |                                 =
-                         |
-  | config_drive                         |                                 =
-                         |
-  | created                              | 2017-09-24T14:22:41Z            =
-                         |
-  | flavor                               | m1.small (717660ae-0440-4b19-a76=
-2-ffeb32a0575c)          |
-  | hostId                               | 5612a00671c47255d2ebd6737a64ec9b=
-d3a5866d1233ecf3e988b025 |
-  | id                                   | aa0b8aee-5650-41f4-8fa0-aeccdc76=
-3425                     |
-  | image                                | zestynosplash (e88fd1bd-f040-44d=
-8-9e7c-c462ccf4b945)     |
-  | internal network                     | 10.5.5.13                       =
-                         |
-  | key_name                             | mykey                           =
-                         |
-  | metadata                             | {}                              =
-                         |
-  | name                                 | sfeole2                         =
-                         |
-  | os-extended-volumes:volumes_attached | []                              =
-                         |
-  | progress                             | 0                               =
-                         |
-  | security_groups                      | default                         =
-                         |
-  | status                               | ACTIVE                          =
-                         |
-  | tenant_id                            | 9f7a21c1ad264fec81abc09f3960ad1d=
-                         |
-  | updated                              | 2017-09-24T14:23:09Z            =
-                         |
-  | user_id                              | e6bb6f5178a248c1b5ae66ed388f9040=
-                         |
-  +--------------------------------------+---------------------------------=
--------------------------+
-
-  As seen above the instances boot an run.  Full Console output is
-  attached to this bug.
-
-  [  OK  ] Started Initial cloud-init job (pre-networking).
-  [  OK  ] Reached target Network (Pre).
-  [  OK  ] Started AppArmor initialization.
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Starting Raise netw=
-ork interfaces...
-  [FAILED] Failed to start Raise network interfaces.
-  See 'systemctl status networking.service' for details.
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Starting Initial cl=
-oud-init job (metadata service crawler)...
-  [  OK  ] Reached target Network.
-  [  315.051902] cloud-init[881]: Cloud-init v. 0.7.9 running 'init' at Fri=
-, 22 Sep 2017 18:29:15 +0000. Up 314.70 seconds.
-  [  315.057291] cloud-init[881]: ci-info: +++++++++++++++++++++++++++Net d=
-evice info+++++++++++++++++++++++++++
-  [  315.060338] cloud-init[881]: ci-info: +--------+------+-----------+---=
---------+-------+-------------------+
-  [  315.063308] cloud-init[881]: ci-info: | Device |  Up  |  Address  |   =
- Mask   | Scope |     Hw-Address    |
-  [  315.066304] cloud-init[881]: ci-info: +--------+------+-----------+---=
---------+-------+-------------------+
-  [  315.069303] cloud-init[881]: ci-info: | eth0:  | True |     .     |   =
-  .     |   .   | fa:16:3e:39:4c:48 |
-  [  315.072308] cloud-init[881]: ci-info: | eth0:  | True |     .     |   =
-  .     |   d   | fa:16:3e:39:4c:48 |
-  [  315.075260] cloud-init[881]: ci-info: |  lo:   | True | 127.0.0.1 | 25=
-5.0.0.0 |   .   |         .         |
-  [  315.078258] cloud-init[881]: ci-info: |  lo:   | True |     .     |   =
-  .     |   d   |         .         |
-  [  315.081249] cloud-init[881]: ci-info: +--------+------+-----------+---=
---------+-------+-------------------+
-  [  315.084240] cloud-init[881]: 2017-09-22 18:29:15,393 - url_helper.py[W=
-ARNING]: Calling 'http://169.254.169.254/2009-04-04/meta-data/instance-id' =
-failed [0/120s]: request error [HTTPConnectionPool(host=3D'169.254.169.254'=
-, port=3D80): Max retries exceeded with url: /2009-04-04/meta-data/instance=
--id (Caused by NewConnectionError('<requests.packages.urllib3.connection.HT=
-TPConnection object at 0xffffb10794e0>: Failed to establish a new connectio=
-n: [Errno 101] Network is unreachable',))]
-
-  ----------------
-
-  I have checked all services in neutron and made sure that they are
-  running and restarted in neutron-gateway
-
-  =C2=A0[ + ]  neutron-dhcp-agent
-  =C2=A0[ + ]  neutron-l3-agent
-  =C2=A0[ + ]  neutron-lbaasv2-agent
-  =C2=A0[ + ]  neutron-metadata-agent
-  =C2=A0[ + ]  neutron-metering-agent
-  =C2=A0[ + ]  neutron-openvswitch-agent
-  =C2=A0[ + ]  neutron-ovs-cleanup
-
-  and have also restarted and checked the nova-compute logs for their
-  neutron counterparts.
-
-  =C2=A0[ + ]  neutron-openvswitch-agent
-  =C2=A0[ + ]  neutron-ovs-cleanup
-
-  =C2=A0There are some warnings/errors in the neutron-gateway logs which I
-  have attached the full tarball in a separate attachment to this bug:
-
-  2017-09-24 14:39:33.152 10322 INFO ryu.base.app_manager [-] instantiating=
- app ryu.controller.ofp_handler of OFPHandler
-  2017-09-24 14:39:33.153 10322 INFO ryu.base.app_manager [-] instantiating=
- app ryu.app.ofctl.service of OfctlService
-  2017-09-24 14:39:39.577 10322 ERROR neutron.agent.ovsdb.impl_vsctl [req-2=
-f084ae8-13dc-47dc-b351-24c8f3c57067 - - - - -] Unable to execute ['ovs-vsct=
-l', '--timeout=3D10', '--oneline', '--format=3Djson', '--', '--id=3D@manage=
-r', 'create', 'Manager', 'target=3D"ptcp:6640:127.0.0.1"', '--', 'add', 'Op=
-en_vSwitch', '.', 'manager_options', '@manager']. Exception: Exit code: 1; =
-Stdin: ; Stdout: ; Stderr: ovs-vsctl: transaction error: {"details":"Transa=
-ction causes multiple rows in \"Manager\" table to have identical values (\=
-"ptcp:6640:127.0.0.1\") for index on column \"target\".  First row, with UU=
-ID e02a5f7f-bfd2-4a1d-ae3c-0321db4bd3fb, existed in the database before thi=
-s transaction and was not modified by the transaction.  Second row, with UU=
-ID 6e9aba3a-471a-4976-bffd-b7131bbe5377, was inserted by this transaction."=
-,"error":"constraint violation"}
-
-  These warnings/errors also occur on the nova-compute hosts in
-  /var/log/neutron/
-
-  2017-09-22 18:54:52.130 387556 INFO ryu.base.app_manager [-] instantiatin=
-g app ryu.app.ofctl.service of OfctlService
-  2017-09-22 18:54:56.124 387556 ERROR neutron.agent.ovsdb.impl_vsctl [req-=
-e291c2f9-a123-422c-be7c-fadaeb5decfa - - - - -] Unable to execute ['ovs-vsc=
-tl', '--timeout=3D10', '--oneline', '--format=3Djson', '--', '--id=3D@manag=
-er', 'create', 'Manager', 'target=3D"ptcp:6640:127.0.0.1"', '--', 'add', 'O=
-pen_vSwitch', '.', 'manager_options', '@manager']. Exception: Exit code: 1;=
- Stdin: ; Stdout: ; Stderr: ovs-vsctl: transaction error: {"details":"Trans=
-action causes multiple rows in \"Manager\" table to have identical values (=
-\"ptcp:6640:127.0.0.1\") for index on column \"target\".  First row, with U=
-UID 9f27ddee-9881-4cbc-9777-2f42fee735e9, was inserted by this transaction.=
-  Second row, with UUID ccf0e097-09d5-449c-b353-6b69781dc3f7, existed in th=
-e database before this transaction and was not modified by the transaction.=
-","error":"constraint violation"}
-
-  I'm not sure if the above error could be pertaining to the failure, I
-  have also attached those logs to this bug as well...
-
-  .
-  (neutron) agent-list
-  +--------------------------------------+----------------------+--------+-=
-------------------+-------+----------------+---------------------------+
-  | id                                   | agent_type           | host   | =
-availability_zone | alive | admin_state_up | binary                    |
-  +--------------------------------------+----------------------+--------+-=
-------------------+-------+----------------+---------------------------+
-  | 0cca03fb-abb2-4704-8b0b-e7d3e117d882 | DHCP agent           | awrep1 | =
-nova              | :-)   | True           | neutron-dhcp-agent        |
-  | 14a5fd52-fbc3-450c-96d5-4e9a65776dad | L3 agent             | awrep1 | =
-nova              | :-)   | True           | neutron-l3-agent          |
-  | 2ebc7238-5e61-41f8-bc60-df14ec6b226b | Loadbalancerv2 agent | awrep1 | =
-                  | :-)   | True           | neutron-lbaasv2-agent     |
-  | 4f6275be-fc8b-4994-bdac-13a4b76f6a83 | Metering agent       | awrep1 | =
-                  | :-)   | True           | neutron-metering-agent    |
-  | 86ecc6b0-c100-4298-b861-40c17516cc08 | Open vSwitch agent   | awrep1 | =
-                  | :-)   | True           | neutron-openvswitch-agent |
-  | 947ad3ab-650b-4b96-a520-00441ecb33e7 | Open vSwitch agent   | awrep4 | =
-                  | :-)   | True           | neutron-openvswitch-agent |
-  | 996b0692-7d19-4641-bec3-e057f4a856f6 | Open vSwitch agent   | awrep3 | =
-                  | :-)   | True           | neutron-openvswitch-agent |
-  | ab6b1065-0b98-4cf3-9f46-6bddba0c5e75 | Metadata agent       | awrep1 | =
-                  | :-)   | True           | neutron-metadata-agent    |
-  | fe24f622-b77c-4eed-ae22-18e4195cf763 | Open vSwitch agent   | awrep2 | =
-                  | :-)   | True           | neutron-openvswitch-agent |
-  +--------------------------------------+----------------------+--------+-=
-------------------+-------+----------------+---------------------------+
-
-  Should neutron-openvswitch be assigned to the 'nova' availability
-  zone?
-
-  I have also attached the ovs-vsctl show from a nova-compute host and
-  the neutron-gateway host to ensure that the open v switch routes are
-  correct.
-
-  I can supply more logs if required.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/cloud-archive/+bug/1719196/+subscriptions
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, Andrew Jeffery <andrew@aj.id.au>, Joel Stanley <joel@jms.id.au>
+
+On 10/20/2017 04:58 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+> Hi C=C3=A9dric,
+>=20
+> On 10/19/2017 01:35 PM, C=C3=A9dric Le Goater wrote:
+>> Specs are available here :
+>>
+>>     https://www.nxp.com/docs/en/application-note/AN264.pdf
+>>
+>> This is a simple model supporting the basic registers for led and GPIO
+>> mode. The device also supports two blinking rates but not the model
+>> yet.
+>>
+>> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+>> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+>> ---
+>>
+>>  Changes since v3:
+>>
+>>  - introduced auto-increment support
+>>  - removed the buffer collecting bytes on the bus
+>>  - improved reset
+>>  - used extract32
+>>  - added a unit test
+>>
+>>  Changes since v2:
+>>
+>>  - removed comments on the I2C buffer size, but kept the array. I did
+>>    not want to rewrite the buffer handling
+>>
+>>  default-configs/arm-softmmu.mak |   1 +
+>>  hw/misc/Makefile.objs           |   1 +
+>>  hw/misc/pca9552.c               | 259 +++++++++++++++++++++++++++++++=
++++++++++
+>>  include/hw/misc/pca9552.h       |  33 +++++
+>=20
+> If you mind using scripts/git.orderfile the review'd get easier :)
+
+I didn't know about it. I will take a look.
+>>  tests/Makefile.include          |   2 +
+>>  tests/pca9552-test.c            | 131 ++++++++++++++++++++
+>>  6 files changed, 427 insertions(+)
+>>  create mode 100644 hw/misc/pca9552.c
+>>  create mode 100644 include/hw/misc/pca9552.h
+>>  create mode 100644 tests/pca9552-test.c
+>>
+>> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-sof=
+tmmu.mak
+>> index 5059d134c816..d868d1095a6c 100644
+>> --- a/default-configs/arm-softmmu.mak
+>> +++ b/default-configs/arm-softmmu.mak
+>> @@ -16,6 +16,7 @@ CONFIG_TSC2005=3Dy
+>>  CONFIG_LM832X=3Dy
+>>  CONFIG_TMP105=3Dy
+>>  CONFIG_TMP421=3Dy
+>> +CONFIG_PCA9552=3Dy
+>>  CONFIG_STELLARIS=3Dy
+>>  CONFIG_STELLARIS_INPUT=3Dy
+>>  CONFIG_STELLARIS_ENET=3Dy
+>> diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
+>> index e8f0a02f35af..e4e22880dbbc 100644
+>> --- a/hw/misc/Makefile.objs
+>> +++ b/hw/misc/Makefile.objs
+>> @@ -7,6 +7,7 @@ common-obj-$(CONFIG_SGA) +=3D sga.o
+>>  common-obj-$(CONFIG_ISA_TESTDEV) +=3D pc-testdev.o
+>>  common-obj-$(CONFIG_PCI_TESTDEV) +=3D pci-testdev.o
+>>  common-obj-$(CONFIG_EDU) +=3D edu.o
+>> +common-obj-$(CONFIG_PCA9552) +=3D pca9552.o
+>> =20
+>>  common-obj-y +=3D unimp.o
+>> =20
+>> diff --git a/hw/misc/pca9552.c b/hw/misc/pca9552.c
+>> new file mode 100644
+>> index 000000000000..70ce6f038da2
+>> --- /dev/null
+>> +++ b/hw/misc/pca9552.c
+>> @@ -0,0 +1,259 @@
+>> +/*
+>> + * PCA9552 I2C LED blinker
+>> + *
+>> + *     https://www.nxp.com/docs/en/application-note/AN264.pdf
+>> + *
+>> + * Copyright (c) 2017, IBM Corporation.
+>> + *
+>> + * This work is licensed under the terms of the GNU GPL, version 2 or
+>> + * later. See the COPYING file in the top-level directory.
+>> + */
+>> +
+>> +#include "qemu/osdep.h"
+>> +#include "qemu/log.h"
+>> +#include "hw/hw.h"
+>> +#include "hw/misc/pca9552.h"
+>> +
+>> +/*
+>> + * Bits [0:3] are used to address a specific register.
+>> + */
+>> +#define PCA9552_INPUT0   0 /* read only input register 0 */
+>> +#define PCA9552_INPUT1   1 /* read only input register 1  */
+>> +#define PCA9552_PSC0     2 /* read/write frequency prescaler 0 */
+>> +#define PCA9552_PWM0     3 /* read/write PWM register 0 */
+>> +#define PCA9552_PSC1     4 /* read/write frequency prescaler 1 */
+>> +#define PCA9552_PWM1     5 /* read/write PWM register 1 */
+>> +#define PCA9552_LS0      6 /* read/write LED0 to LED3 selector */
+>> +#define PCA9552_LS1      7 /* read/write LED4 to LED7 selector */
+>> +#define PCA9552_LS2      8 /* read/write LED8 to LED11 selector */
+>> +#define PCA9552_LS3      9 /* read/write LED12 to LED15 selector */
+>=20
+> Since you use those in your test, can you move them to "hw/misc/pca9552=
+.h"?
+
+yes I could stuff them under "hw/misc/pca9552_reg.h" probably.
+
+>=20
+>> +
+>> +/*
+>> + * Bit [4] is used to activate the Auto-Increment option of the
+>> + * register address
+>> + */
+>> +#define PCA9552_AUTOINC  (1 << 4)
+>=20
+> ditto
+>=20
+>> +
+>> +#define PCA9552_LED_ON   0x0
+>> +#define PCA9552_LED_OFF  0x1
+>> +#define PCA9552_LED_PWM0 0x2
+>> +#define PCA9552_LED_PWM1 0x3
+>> +
+>> +static uint8_t pca9552_pin_get_config(PCA9552State *s, int pin)
+>> +{
+>> +    uint8_t reg   =3D PCA9552_LS0 + (pin / 4);
+>> +    uint8_t shift =3D (pin % 4) << 1;
+>> +
+>> +    return extract32(s->regs[reg], shift, 2);
+>> +}
+>> +
+>> +static void pca9552_update_pin_input(PCA9552State *s)
+>> +{
+>> +    int i;
+>> +
+>> +    for (i =3D 0; i < s->nr_leds; i++) {
+>> +        uint8_t input_reg =3D PCA9552_INPUT0 + (i / 8);
+>> +        uint8_t input_shift =3D (i % 8);
+>> +        uint8_t config =3D pca9552_pin_get_config(s, i);
+>> +
+>> +        switch (config) {
+>> +        case PCA9552_LED_ON:
+>> +            s->regs[input_reg] |=3D 1 << input_shift;
+>> +            break;
+>> +        case PCA9552_LED_OFF:
+>> +            s->regs[input_reg] &=3D ~(1 << input_shift);
+>> +            break;
+>> +        case PCA9552_LED_PWM0:
+>> +        case PCA9552_LED_PWM1:
+>> +            /* TODO */
+>> +        default:
+>> +            break;
+>> +        }
+>> +    }
+>> +}
+>> +
+>> +static uint8_t pca9552_read(PCA9552State *s, uint8_t reg)
+>> +{
+>> +    switch (reg) {
+>> +    case PCA9552_INPUT0:
+>> +    case PCA9552_INPUT1:
+>> +    case PCA9552_PSC0:
+>> +    case PCA9552_PWM0:
+>> +    case PCA9552_PSC1:
+>> +    case PCA9552_PWM1:
+>> +    case PCA9552_LS0:
+>> +    case PCA9552_LS1:
+>> +    case PCA9552_LS2:
+>> +    case PCA9552_LS3:
+>> +        return s->regs[reg];
+>> +    default:
+>> +        qemu_log_mask(LOG_GUEST_ERROR, "%s: unexpected read to regist=
+er %d\n",
+>> +                      __func__, reg);
+>> +        return 0xFF;
+>> +    }
+>> +}
+>> +
+>> +static void pca9552_write(PCA9552State *s, uint8_t reg, uint8_t data)
+>> +{
+>> +    switch (reg) {
+>> +    case PCA9552_PSC0:
+>> +    case PCA9552_PWM0:
+>> +    case PCA9552_PSC1:
+>> +    case PCA9552_PWM1:
+>> +        s->regs[reg] =3D data;
+>> +        break;
+>> +
+>> +    case PCA9552_LS0:
+>> +    case PCA9552_LS1:
+>> +    case PCA9552_LS2:
+>> +    case PCA9552_LS3:
+>> +        s->regs[reg] =3D data;
+>> +        pca9552_update_pin_input(s);
+>> +        break;
+>> +
+>> +    case PCA9552_INPUT0:
+>> +    case PCA9552_INPUT1:
+>> +    default:
+>> +        qemu_log_mask(LOG_GUEST_ERROR, "%s: unexpected write to regis=
+ter %d\n",
+>> +                      __func__, reg);
+>> +    }
+>> +}
+>> +
+>> +/*
+>> + * When Auto-Increment is on, the register address is incremented
+>> + * after each byte is sent to or received by the device. The index
+>> + * rollovers to 0 when the maximum register address is reached.
+>> + */
+>> +static void pca9552_autoinc(PCA9552State *s)
+>> +{
+>> +    if (s->pointer !=3D 0xFF && s->pointer & PCA9552_AUTOINC) {
+>> +        uint8_t reg =3D s->pointer & 0xf;
+>> +
+>> +        reg =3D (reg + 1) % (s->max_reg + 1);
+>> +        s->pointer =3D reg | PCA9552_AUTOINC;
+>> +    }
+>> +}
+>> +
+>> +static int pca9552_recv(I2CSlave *i2c)
+>> +{
+>> +    PCA9552State *s =3D PCA9552(i2c);
+>> +    uint8_t ret;
+>> +
+>> +    ret =3D pca9552_read(s, s->pointer & 0xf);
+>> +
+>> +    /*
+>> +     * From the Specs:
+>> +     *
+>> +     *     Important Note: When a Read sequence is initiated and the
+>> +     *     AI bit is set to Logic Level 1, the Read Sequence MUST
+>> +     *     start by a register different from 0.
+>> +     *
+>> +     * I don't know what should be done in this case, so throw an
+>> +     * error.
+>> +     */
+>> +    if (s->pointer =3D=3D PCA9552_AUTOINC) {
+>> +        qemu_log_mask(LOG_GUEST_ERROR,
+>> +                      "%s: Autoincrement read starting with register =
+0\n",
+>> +                      __func__);
+>> +    }
+>> +
+>> +    pca9552_autoinc(s);
+>> +
+>> +    return ret;
+>> +}
+>> +
+>> +static int pca9552_send(I2CSlave *i2c, uint8_t data)
+>> +{
+>> +    PCA9552State *s =3D PCA9552(i2c);
+>> +
+>> +    /* First byte sent by is the register address */
+>> +    if (s->len =3D=3D 0) {
+>> +        s->pointer =3D data;
+>> +        s->len++;
+>> +    } else {
+>> +        pca9552_write(s, s->pointer & 0xf, data);
+>> +
+>> +        pca9552_autoinc(s);
+>> +    }
+>> +
+>> +    return 0;
+>> +}
+>> +
+>> +static int pca9552_event(I2CSlave *i2c, enum i2c_event event)
+>> +{
+>> +    PCA9552State *s =3D PCA9552(i2c);
+>> +
+>> +    s->len =3D 0;
+>> +    return 0;
+>> +}
+>> +
+>> +static const VMStateDescription pca9552_vmstate =3D {
+>> +    .name =3D "PCA9552",
+>> +    .version_id =3D 0,
+>> +    .minimum_version_id =3D 0,
+>> +    .fields =3D (VMStateField[]) {
+>> +        VMSTATE_UINT8(len, PCA9552State),
+>> +        VMSTATE_UINT8(pointer, PCA9552State),
+>> +        VMSTATE_UINT8_ARRAY(regs, PCA9552State, PCA9552_NR_REGS),
+>> +        VMSTATE_I2C_SLAVE(i2c, PCA9552State),
+>> +        VMSTATE_END_OF_LIST()
+>> +    }
+>> +};
+>> +
+>> +static void pca9552_reset(DeviceState *dev)
+>> +{
+>> +    PCA9552State *s =3D PCA9552(dev);
+>> +
+>> +    s->regs[PCA9552_PSC0] =3D 0xFF;
+>> +    s->regs[PCA9552_PWM0] =3D 0x80;
+>> +    s->regs[PCA9552_PSC1] =3D 0xFF;
+>> +    s->regs[PCA9552_PWM1] =3D 0x80;
+>> +    s->regs[PCA9552_LS0] =3D 0x55; /* all OFF */
+>> +    s->regs[PCA9552_LS1] =3D 0x55;
+>> +    s->regs[PCA9552_LS2] =3D 0x55;
+>> +    s->regs[PCA9552_LS3] =3D 0x55;
+>> +
+>> +    pca9552_update_pin_input(s);
+>> +
+>> +    s->pointer =3D 0xFF;
+>> +    s->len =3D 0;
+>> +}
+>> +
+>> +static void pca9552_initfn(Object *obj)
+>> +{
+>> +    PCA9552State *s =3D PCA9552(obj);
+>> +
+>> +    /* If support for the other PCA955X devices are implemented, thes=
+e
+>> +     * constant values might be part of class structure describing th=
+e
+>> +     * PCA955X device
+>> +     */
+>> +    s->max_reg =3D PCA9552_LS3;
+>=20
+> Looks a bit weird, why not use PCA9552_NR_REGS here so pca9552_autoinc(=
+)
+> becomes simply:
+>=20
+>     reg +=3D 1;
+>     reg %=3D s->max_reg;
+>=20
+> ?
+
+because I expect someone (me, maybe) to add support for the=20
+PCA9550,1,3 devices and, in that case, regs[] could be shared=20
+and PCA9552_NR_REGS would represent the maximum of the maximum=20
+number of registers for all devices.
+=20
+>> +    s->nr_leds =3D 16;
+
+this value would change also for each device.
+
+=20
+>> +}
+>> +
+>> +static void pca9552_class_init(ObjectClass *klass, void *data)
+>> +{
+>> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
+>> +    I2CSlaveClass *k =3D I2C_SLAVE_CLASS(klass);
+>> +
+>> +    k->event =3D pca9552_event;
+>> +    k->recv =3D pca9552_recv;
+>> +    k->send =3D pca9552_send;
+>> +    dc->reset =3D pca9552_reset;
+>> +    dc->vmsd =3D &pca9552_vmstate;
+>> +}
+>> +
+>> +static const TypeInfo pca9552_info =3D {
+>> +    .name          =3D TYPE_PCA9552,
+>> +    .parent        =3D TYPE_I2C_SLAVE,
+>> +    .instance_init =3D pca9552_initfn,
+>> +    .instance_size =3D sizeof(PCA9552State),
+>> +    .class_init    =3D pca9552_class_init,
+>> +};
+>> +
+>> +static void pca9552_register_types(void)
+>> +{
+>> +    type_register_static(&pca9552_info);
+>> +}
+>> +
+>> +type_init(pca9552_register_types)
+>> diff --git a/include/hw/misc/pca9552.h b/include/hw/misc/pca9552.h
+>> new file mode 100644
+>> index 000000000000..5df8d6407ca7
+>> --- /dev/null
+>> +++ b/include/hw/misc/pca9552.h
+>> @@ -0,0 +1,33 @@
+>> +/*
+>> + * PCA9552 I2C LED blinker
+>> + *
+>> + * Copyright (c) 2017, IBM Corporation.
+>> + *
+>> + * This work is licensed under the terms of the GNU GPL, version 2 or
+>> + * later. See the COPYING file in the top-level directory.
+>> + */
+>> +#ifndef PCA9552_H
+>> +#define PCA9552_H
+>> +
+>> +#include "hw/i2c/i2c.h"
+>> +
+>> +#define TYPE_PCA9552 "pca9552"
+>> +#define PCA9552(obj) OBJECT_CHECK(PCA9552State, (obj), TYPE_PCA9552)
+>> +
+>> +
+>> +#define PCA9552_NR_REGS 10
+>=20
+> This could be an enum (or not, matter of taste).
+
+a define is fine IMO.
+
+>> +
+>> +typedef struct PCA9552State {
+>> +    /*< private >*/
+>> +    I2CSlave i2c;
+>> +    /*< public >*/
+>> +
+>> +    uint8_t len;
+>> +    uint8_t pointer;
+>> +
+>> +    uint8_t regs[PCA9552_NR_REGS];
+>> +    uint8_t max_reg;
+>> +    uint8_t nr_leds;
+>> +} PCA9552State;
+>> +
+>> +#endif
+>> diff --git a/tests/Makefile.include b/tests/Makefile.include
+>> index 4ca15e681703..8ac2595c8512 100644
+>> --- a/tests/Makefile.include
+>> +++ b/tests/Makefile.include
+>> @@ -347,6 +347,7 @@ check-qtest-sparc64-y =3D tests/endianness-test$(E=
+XESUF)
+>>  check-qtest-sparc64-y +=3D tests/prom-env-test$(EXESUF)
+>> =20
+>>  check-qtest-arm-y =3D tests/tmp105-test$(EXESUF)
+>> +check-qtest-arm-y +=3D tests/pca9552-test$(EXESUF)
+>>  check-qtest-arm-y +=3D tests/ds1338-test$(EXESUF)
+>>  check-qtest-arm-y +=3D tests/m25p80-test$(EXESUF)
+>>  gcov-files-arm-y +=3D hw/misc/tmp105.c
+>> @@ -739,6 +740,7 @@ tests/bios-tables-test$(EXESUF): tests/bios-tables=
+-test.o \
+>>  	tests/boot-sector.o tests/acpi-utils.o $(libqos-obj-y)
+>>  tests/pxe-test$(EXESUF): tests/pxe-test.o tests/boot-sector.o $(libqo=
+s-obj-y)
+>>  tests/tmp105-test$(EXESUF): tests/tmp105-test.o $(libqos-omap-obj-y)
+>> +tests/pca9552-test$(EXESUF): tests/pca9552-test.o $(libqos-omap-obj-y=
+)
+>>  tests/ds1338-test$(EXESUF): tests/ds1338-test.o $(libqos-imx-obj-y)
+>>  tests/m25p80-test$(EXESUF): tests/m25p80-test.o
+>>  tests/i440fx-test$(EXESUF): tests/i440fx-test.o $(libqos-pc-obj-y)
+>> diff --git a/tests/pca9552-test.c b/tests/pca9552-test.c
+>> new file mode 100644
+>> index 000000000000..53414452a12e
+>> --- /dev/null
+>> +++ b/tests/pca9552-test.c
+>> @@ -0,0 +1,131 @@
+>> +/*
+>> + * QTest testcase for the PCA9552 LED blinker
+>> + *
+>> + * Copyright (c) 2017, IBM Corporation.
+>> + *
+>> + * This work is licensed under the terms of the GNU GPL, version 2 or=
+ later.
+>> + * See the COPYING file in the top-level directory.
+>> + */
+>> +
+>> +#include "qemu/osdep.h"
+>> +
+>=20
+> #include "hw/misc/pca9552.h"
+>=20
+>> +#include "libqtest.h"
+>> +#include "libqos/i2c.h"
+>> +
+>> +#define PCA9552_INPUT0   0 /* read only input register 0 */
+>> +#define PCA9552_INPUT1   1 /* read only input register 1  */
+>> +#define PCA9552_PSC0     2 /* read/write frequency prescaler 0 */
+>> +#define PCA9552_PWM0     3 /* read/write PWM register 0 */
+>> +#define PCA9552_PSC1     4 /* read/write frequency prescaler 1 */
+>> +#define PCA9552_PWM1     5 /* read/write PWM register 1 */
+>> +#define PCA9552_LS0      6 /* read/write LED0 to LED3 selector */
+>> +#define PCA9552_LS1      7 /* read/write LED4 to LED7 selector */
+>> +#define PCA9552_LS2      8 /* read/write LED8 to LED11 selector */
+>> +#define PCA9552_LS3      9 /* read/write LED12 to LED15 selector */
+>> +
+>> +#define PCA9552_AUTOINC  (1 << 4)
+>> +
+>> +
+>> +#define OMAP2_I2C_1_BASE 0x48070000
+>=20
+> Can you define that in "hw/arm/omap.h" ?
+
+I suppose I can to share it with tmp105-test.c
+
+>> +
+>> +#define PCA9552_TEST_ID   "pca9552-test"
+>> +#define PCA9552_TEST_ADDR 0x60
+>> +
+>> +static I2CAdapter *i2c;
+>> +
+>> +static uint8_t pca9552_get8(I2CAdapter *i2c, uint8_t addr, uint8_t re=
+g)
+>> +{
+>> +    uint8_t resp[1];
+>> +    i2c_send(i2c, addr, &reg, 1);
+>> +    i2c_recv(i2c, addr, resp, 1);
+>> +    return resp[0];
+>> +}
+>> +
+>> +static void pca9552_set8(I2CAdapter *i2c, uint8_t addr, uint8_t reg,
+>> +                         uint8_t value)
+>> +{
+>> +    uint8_t cmd[2];
+>> +    uint8_t resp[1];
+>> +
+>> +    cmd[0] =3D reg;
+>> +    cmd[1] =3D value;
+>> +    i2c_send(i2c, addr, cmd, 2);
+>> +    i2c_recv(i2c, addr, resp, 1);
+>> +    g_assert_cmphex(resp[0], =3D=3D, cmd[1]);
+>> +}
+>> +
+>> +static void receive_autoinc(void)
+>> +{
+>> +    uint8_t resp;
+>> +    uint8_t reg =3D PCA9552_LS0 | PCA9552_AUTOINC;
+>> +
+>> +    i2c_send(i2c, PCA9552_TEST_ADDR, &reg, 1);
+>> +
+>> +    /* PCA9552_LS0 */
+>> +    i2c_recv(i2c, PCA9552_TEST_ADDR, &resp, 1);
+>> +    g_assert_cmphex(resp, =3D=3D, 0x54);
+>> +
+>> +    /* PCA9552_LS1 */
+>> +    i2c_recv(i2c, PCA9552_TEST_ADDR, &resp, 1);
+>> +    g_assert_cmphex(resp, =3D=3D, 0x55);
+>> +
+>> +    /* PCA9552_LS2 */
+>> +    i2c_recv(i2c, PCA9552_TEST_ADDR, &resp, 1);
+>> +    g_assert_cmphex(resp, =3D=3D, 0x55);
+>> +
+>> +    /* PCA9552_LS3 */
+>> +    i2c_recv(i2c, PCA9552_TEST_ADDR, &resp, 1);
+>> +    g_assert_cmphex(resp, =3D=3D, 0x54);
+>> +}
+>> +
+>> +static void send_and_receive(void)
+>> +{
+>> +    uint8_t value;
+>> +
+>> +    value =3D pca9552_get8(i2c, PCA9552_TEST_ADDR, PCA9552_LS0);
+>> +    g_assert_cmphex(value, =3D=3D, 0x55);
+>> +
+>> +    value =3D pca9552_get8(i2c, PCA9552_TEST_ADDR, PCA9552_INPUT0);
+>> +    g_assert_cmphex(value, =3D=3D, 0x0);
+>> +
+>> +    /* Switch on LED 0 */
+>> +    pca9552_set8(i2c, PCA9552_TEST_ADDR, PCA9552_LS0, 0x54);
+>> +    value =3D pca9552_get8(i2c, PCA9552_TEST_ADDR, PCA9552_LS0);
+>> +    g_assert_cmphex(value, =3D=3D, 0x54);
+>> +
+>> +    value =3D pca9552_get8(i2c, PCA9552_TEST_ADDR, PCA9552_INPUT0);
+>> +    g_assert_cmphex(value, =3D=3D, 0x01);
+>> +
+>> +    /* Switch on LED 12 */
+>> +    pca9552_set8(i2c, PCA9552_TEST_ADDR, PCA9552_LS3, 0x54);
+>> +    value =3D pca9552_get8(i2c, PCA9552_TEST_ADDR, PCA9552_LS3);
+>> +    g_assert_cmphex(value, =3D=3D, 0x54);
+>> +
+>> +    value =3D pca9552_get8(i2c, PCA9552_TEST_ADDR, PCA9552_INPUT1);
+>> +    g_assert_cmphex(value, =3D=3D, 0x10);
+>> +}
+>> +
+>> +int main(int argc, char **argv)
+>> +{
+>> +    QTestState *s =3D NULL;
+>> +    int ret;
+>> +
+>> +    g_test_init(&argc, &argv, NULL);
+>> +
+>> +    s =3D qtest_start("-machine n800 "
+>> +                    "-device pca9552,bus=3Di2c-bus.0,id=3D" PCA9552_T=
+EST_ID
+>> +                    ",address=3D0x60");
+>> +    i2c =3D omap_i2c_create(OMAP2_I2C_1_BASE);
+>> +
+>> +    qtest_add_func("/pca9552/tx-rx", send_and_receive);
+>> +    qtest_add_func("/pca9552/rx-autoinc", receive_autoinc);
+>> +
+>> +    ret =3D g_test_run();
+>> +
+>> +    if (s) {
+>> +        qtest_quit(s);
+>> +    }
+>> +    g_free(i2c);
+>> +
+>> +    return ret;
+>> +}
+>>
+>=20
+> If Peter accept to queue 1-6, I'd appreciate if you can address my few
+> suggestions then resend 7-8; else if you don't have time:
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+
+I rather address your suggestions in follow ups if you don't mind.
+
+Thanks for the review,
+
+C.
+
+> Regards,
+>=20
+> Phil.
+>=20
