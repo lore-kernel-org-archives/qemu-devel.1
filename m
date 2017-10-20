@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46196)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47407)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1e5Sl0-00080t-LI
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 04:34:24 -0400
+	(envelope-from <kwolf@redhat.com>) id 1e5Ssz-0001KA-RI
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 04:42:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1e5Skt-0004up-In
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 04:34:18 -0400
-References: <20171019222637.17890-1-eblake@redhat.com>
-	<20171019222637.17890-6-eblake@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <ff85f750-2531-a687-199b-b3e0f6931e3a@virtuozzo.com>
-Date: Fri, 20 Oct 2017 11:34:08 +0300
+	(envelope-from <kwolf@redhat.com>) id 1e5Ssz-0000dd-3O
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 04:42:33 -0400
+Date: Fri, 20 Oct 2017 10:42:21 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20171020084221.GA3667@localhost.localdomain>
+References: <20171004114008.14849-1-berrange@redhat.com>
+	<20171004114008.14849-3-berrange@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20171019222637.17890-6-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v5 05/11] nbd/server: Refactor zero-length
- option check
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171004114008.14849-3-berrange@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v1 2/2] ide: support reporting of rotation
+ rate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,207 +24,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, qemu-block@nongnu.org
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
 
-20.10.2017 01:26, Eric Blake wrote:
-> Consolidate the check for a zero-length payload to an option
-> into a new function, nbd_check_zero_length(); this check will
-> also be used when introducing support for structured replies.
->
-> By sticking a catch-all check at the end of the loop for
-> processing options, we can simplify several of the intermediate
-> cases.
->
-> Signed-off-by: Eric Blake <eblake@redhat.com>
+[ Cc: qemu-block ]
 
-looks like two patches in one, however I'm not against (considering my 
-big patches =)).
-I've already put an r-b here but suddenly understood a hidden behavior 
-change you've made,
-which may considered like a bug, see below.
-
+Am 04.10.2017 um 13:40 hat Daniel P. Berrange geschrieben:
+> The Linux kernel will query the ATA IDENTITY DEVICE data, word 217
+> to determine the rotations per minute of the disk. If this has
+> the value 1, it is taken to be an SSD and so Linux sets the
+> 'rotational' flag to 0 for the I/O queue and will stop using that
+> disk as a source of random entropy. Other operating systems may
+> also take into account rotation rate when setting up default
+> behaviour.
+> 
+> Mgmt apps should be able to set the rotation rate for virtualized
+> block devices, based on characteristics of the host storage in use,
+> so that the guest OS gets sensible behaviour out of the box. This
+> patch thus adds a 'rotation-rate' parameter for 'ide-hd' device
+> types.
+> 
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 > ---
->   nbd/server.c | 76 +++++++++++++++++++++++++++---------------------------------
->   1 file changed, 34 insertions(+), 42 deletions(-)
->
-> diff --git a/nbd/server.c b/nbd/server.c
-> index 05ff7470d5..b3f7e0b18e 100644
-> --- a/nbd/server.c
-> +++ b/nbd/server.c
-> @@ -253,21 +253,10 @@ static int nbd_negotiate_send_rep_list(QIOChannel *ioc, NBDExport *exp,
->
->   /* Process the NBD_OPT_LIST command, with a potential series of replies.
->    * Return -errno on error, 0 on success. */
-> -static int nbd_negotiate_handle_list(NBDClient *client, uint32_t length,
-> -                                     Error **errp)
-> +static int nbd_negotiate_handle_list(NBDClient *client, Error **errp)
->   {
->       NBDExport *exp;
->
-> -    if (length) {
-> -        if (nbd_drop(client->ioc, length, errp) < 0) {
-> -            return -EIO;
-> -        }
-> -        return nbd_negotiate_send_rep_err(client->ioc,
-> -                                          NBD_REP_ERR_INVALID, NBD_OPT_LIST,
-> -                                          errp,
-> -                                          "OPT_LIST should not have length");
-> -    }
-> -
->       /* For each export, send a NBD_REP_SERVER reply. */
->       QTAILQ_FOREACH(exp, &exports, next) {
->           if (nbd_negotiate_send_rep_list(client->ioc, exp, errp)) {
-> @@ -531,7 +520,6 @@ static int nbd_negotiate_handle_info(NBDClient *client, uint32_t length,
->   /* Handle NBD_OPT_STARTTLS. Return NULL to drop connection, or else the
->    * new channel for all further (now-encrypted) communication. */
->   static QIOChannel *nbd_negotiate_handle_starttls(NBDClient *client,
-> -                                                 uint32_t length,
->                                                    Error **errp)
->   {
->       QIOChannel *ioc;
-> @@ -540,15 +528,6 @@ static QIOChannel *nbd_negotiate_handle_starttls(NBDClient *client,
->
->       trace_nbd_negotiate_handle_starttls();
->       ioc = client->ioc;
-> -    if (length) {
-> -        if (nbd_drop(ioc, length, errp) < 0) {
-> -            return NULL;
-> -        }
-> -        nbd_negotiate_send_rep_err(ioc, NBD_REP_ERR_INVALID, NBD_OPT_STARTTLS,
-> -                                   errp,
-> -                                   "OPT_STARTTLS should not have length");
-> -        return NULL;
-> -    }
->
->       if (nbd_negotiate_send_rep(client->ioc, NBD_REP_ACK,
->                                  NBD_OPT_STARTTLS, errp) < 0) {
-> @@ -584,6 +563,25 @@ static QIOChannel *nbd_negotiate_handle_starttls(NBDClient *client,
->       return QIO_CHANNEL(tioc);
->   }
->
-> +/* nbd_check_zero_length: Handle any unexpected payload.
-> + * Return:
-> + * -errno  on error, errp is set
-> + * 0       on successful negotiation, errp is not set
-> + */
-> +static int nbd_check_zero_length(NBDClient *client, uint32_t length,
-> +                                 uint32_t option, Error **errp)
-> +{
-> +    if (!length) {
-> +        return 0;
-> +    }
-> +    if (nbd_drop(client->ioc, length, errp) < 0) {
-> +        return -EIO;
-> +    }
-> +    return nbd_negotiate_send_rep_err(client->ioc, NBD_REP_ERR_INVALID, option,
-> +                                      errp, "option %s should have zero length",
+>  hw/ide/core.c             | 1 +
+>  hw/ide/qdev.c             | 1 +
+>  include/hw/ide/internal.h | 8 ++++++++
+>  3 files changed, 10 insertions(+)
+> 
+> diff --git a/hw/ide/core.c b/hw/ide/core.c
+> index 5f1cd3b91f..a04766aee7 100644
+> --- a/hw/ide/core.c
+> +++ b/hw/ide/core.c
+> @@ -208,6 +208,7 @@ static void ide_identify(IDEState *s)
+>      if (dev && dev->conf.discard_granularity) {
+>          put_le16(p + 169, 1); /* TRIM support */
+>      }
+> +    put_le16(p + 217, dev->rotation_rate); /* Nominal media rotation rate */
 
-may be quotes around %s or your trace-notation %d (%s) would be more 
-readable
+Coverity points out that all other dereferences of dev have a NULL check
+first. Are we sure that it is always non-NULL?
 
-> +                                      nbd_opt_lookup(option));
-> +}
-> +
->   /* nbd_negotiate_options
->    * Process all NBD_OPT_* client option commands, during fixed newstyle
->    * negotiation.
-> @@ -674,7 +672,11 @@ static int nbd_negotiate_options(NBDClient *client, uint16_t myflags,
->               }
->               switch (option) {
->               case NBD_OPT_STARTTLS:
-> -                tioc = nbd_negotiate_handle_starttls(client, length, errp);
-> +                ret = nbd_check_zero_length(client, length, option, errp);
-> +                if (ret < 0) {
-> +                    return ret;
-> +                }
+A follow-up patch is necessary either way. Either fix the missing NULL
+check here or remove useless NULL checks in the other places.
 
-no, you should not continue if length>0 (old behavior). 
-nbd_negotiate_send_rep_err returns 0 on success
-in nbd_check_zero_length().
-
-> +                tioc = nbd_negotiate_handle_starttls(client, errp);
->                   if (!tioc) {
->                       return -EIO;
->                   }
-> @@ -698,9 +700,6 @@ static int nbd_negotiate_options(NBDClient *client, uint16_t myflags,
->                                                    "Option 0x%" PRIx32
->                                                    "not permitted before TLS",
->                                                    option);
-> -                if (ret < 0) {
-> -                    return ret;
-> -                }
->                   /* Let the client keep trying, unless they asked to
->                    * quit. In this mode, we've already sent an error, so
->                    * we can't ack the abort.  */
-> @@ -712,9 +711,9 @@ static int nbd_negotiate_options(NBDClient *client, uint16_t myflags,
->           } else if (fixedNewstyle) {
->               switch (option) {
->               case NBD_OPT_LIST:
-> -                ret = nbd_negotiate_handle_list(client, length, errp);
-> -                if (ret < 0) {
-> -                    return ret;
-> +                ret = nbd_check_zero_length(client, length, option, errp);
-> +                if (!ret) {
-
-the same here
-
-> +                    ret = nbd_negotiate_handle_list(client, errp);
->                   }
->                   break;
->
-> @@ -738,16 +737,12 @@ static int nbd_negotiate_options(NBDClient *client, uint16_t myflags,
->                       assert(option == NBD_OPT_GO);
->                       return 0;
->                   }
-> -                if (ret) {
-> -                    return ret;
-> -                }
->                   break;
->
->               case NBD_OPT_STARTTLS:
-> -                if (nbd_drop(client->ioc, length, errp) < 0) {
-> -                    return -EIO;
-> -                }
-> -                if (client->tlscreds) {
-> +                if (length) {
-> +                    ret = nbd_check_zero_length(client, length, option, errp);
-> +                } else if (client->tlscreds) {
->                       ret = nbd_negotiate_send_rep_err(client->ioc,
->                                                        NBD_REP_ERR_INVALID,
->                                                        option, errp,
-> @@ -758,9 +753,6 @@ static int nbd_negotiate_options(NBDClient *client, uint16_t myflags,
->                                                        option, errp,
->                                                        "TLS not configured");
->                   }
-> -                if (ret < 0) {
-> -                    return ret;
-> -                }
->                   break;
->               default:
->                   if (nbd_drop(client->ioc, length, errp) < 0) {
-> @@ -772,9 +764,6 @@ static int nbd_negotiate_options(NBDClient *client, uint16_t myflags,
->                                                    "Unsupported option 0x%"
->                                                    PRIx32 " (%s)", option,
->                                                    nbd_opt_lookup(option));
-> -                if (ret < 0) {
-> -                    return ret;
-> -                }
->                   break;
->               }
->           } else {
-> @@ -794,6 +783,9 @@ static int nbd_negotiate_options(NBDClient *client, uint16_t myflags,
->                   return -EINVAL;
->               }
->           }
-> +        if (ret < 0) {
-> +            return ret;
-> +        }
->       }
->   }
->
-
-
--- 
-Best regards,
-Vladimir
+Kevin
