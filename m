@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58579)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58871)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1e5RR3-000563-BN
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 03:09:38 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1e5RSJ-0005wu-2d
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 03:10:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1e5RR0-0000ap-5Z
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 03:09:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33548)
+	(envelope-from <pbonzini@redhat.com>) id 1e5RSF-0001GE-R1
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 03:10:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33274)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1e5RQz-0000aH-Uw
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 03:09:34 -0400
-Date: Fri, 20 Oct 2017 15:09:27 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20171020070927.GF29815@lemon>
-References: <20171016131644.9565-1-kraxel@redhat.com>
-	<20171016131644.9565-8-kraxel@redhat.com>
-	<e41b2fbc-98ed-cabb-4236-2126b887626c@redhat.com>
-	<58a70aa2-c318-b9de-de07-540b7c19d423@redhat.com>
-	<c10f4e46-1e65-496d-4450-a5462973cc23@redhat.com>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1e5RSF-0001Fn-Kr
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 03:10:51 -0400
+References: <20171016172609.23422-1-richard.henderson@linaro.org>
+	<20171018224518.GA28532@flamenco>
+	<5381cf3d-00c9-1c05-c973-5934311d654d@redhat.com>
+	<20171019201149.GA15218@flamenco>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <64241d68-b526-3dc1-a264-fa9e6d634527@redhat.com>
+Date: Fri, 20 Oct 2017 09:10:38 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c10f4e46-1e65-496d-4450-a5462973cc23@redhat.com>
-Subject: Re: [Qemu-devel] [PULL 07/11] tools: add qemu-keymap
+In-Reply-To: <20171019201149.GA15218@flamenco>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v6 00/50] tcg tb_lock removal
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,37 +30,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+To: "Emilio G. Cota" <cota@braap.org>
+Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 
-On Fri, 10/20 08:52, Thomas Huth wrote:
-> On 20.10.2017 00:12, Eric Blake wrote:
-> > On 10/19/2017 05:09 PM, Eric Blake wrote:
-> >> On 10/16/2017 08:16 AM, Gerd Hoffmann wrote:
-> >>> qemu-keymap generates qemu reverse keymaps from xkb keymaps,
-> >>> which can be used with the qemu "-k" command line switch.
-> >>>
-> >>> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> >>> Message-id: 20171005153330.19210-2-kraxel@redhat.com
-> >>> ---
-> >>>  configure     |  23 ++++++
-> >>>  Makefile      |   5 ++
-> >>>  qemu-keymap.c | 258 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-> >>>  3 files changed, 286 insertions(+)
-> >>>  create mode 100644 qemu-keymap.c
-> >>
-> >> For in-tree builds, this forgot to update .gitignore so that
-> >> 'qemu-keymap' isn't accidentally checked in via 'git add -a'.
-> > 
-> > And on a related note, commit 2e1d70b pollutes the tree with a new
-> > ui/shader/texture-blit-flip-vert.h, that should also be mentioned in
-> > .gitignore.
+On 19/10/2017 22:11, Emilio G. Cota wrote:
+> On Thu, Oct 19, 2017 at 15:05:17 +0200, Paolo Bonzini wrote:
+>> On 19/10/2017 00:45, Emilio G. Cota wrote:
+>>> I have just pushed a branch on top of this series that includes
+>>> 10 patches that further pave the way for the removal of tb_lock:
+>>>
+>>>   https://github.com/cota/qemu/tree/multi-tcg-v6-plus
+>>
+>> I started reviewing those,
 > 
-> Since this seems to happen regularly: I wonder whether we could add a
-> check to patchew that tests whether the output of "git status" is clean
-> at the end of an in-tree compilation process?
+> Nice, thanks!
+> 
+>> I have a few questions:
+>>
+>> 1) why is tcg_region_tree separate from tcg_region_state?  Would it make
+>> sense to prepare a linked list of tcg_region_state structs, and reuse
+>> the region lock for the region tree?
+> 
+> I think the naming here might be confusing; "tcg_region_state" should be
+> understood as "tcg_region_global_state". IOW, there is no per-region struct.
+> 
+> That said, the array of per-region trees could be embedded in this global
+> struct. I was hesitant to do so because then one could think that
+> region_state.lock and rt.lock are somehow related; they are not.
 
-Sounds good, I'll try to write a $QEMU_SRC/tests/docker/test-cleanness patch
-first.
+Ok, this is clearer now.
 
-Fam
+>> 2) in tb_for_each_tagged_safe, could the "prev" argument instead be
+>> "next", like
+> 
+> Is this just to make them closer to the macros in queue.h?
+> 
+> In this case tracking *prev in the loop (rather than next) is
+> useful because it makes removing the "current" element very simple:
+
+This actually makes a lot of sense.  Maybe we should change queue.h the
+other way. ;)
+
+Can you rename "prev" to "pprev" though?
+
+Paolo
