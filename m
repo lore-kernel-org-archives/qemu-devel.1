@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39837)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41023)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1e5ZNM-0008NM-EB
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 11:38:21 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1e5ZTC-0002gV-Nu
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 11:44:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1e5ZNJ-0001KR-3w
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 11:38:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54136)
+	(envelope-from <pbonzini@redhat.com>) id 1e5ZT9-0004wY-KZ
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 11:44:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36866)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1e5ZNI-0001Ji-Qe
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 11:38:17 -0400
-Date: Fri, 20 Oct 2017 13:38:12 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20171020153812.GN2942@localhost.localdomain>
-References: <1508170976-96869-1-git-send-email-imammedo@redhat.com>
-	<1508170976-96869-5-git-send-email-imammedo@redhat.com>
-	<20171016163515.GH11975@redhat.com>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1e5ZT9-0004w1-ES
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 11:44:19 -0400
+References: <20171020101219.2378-1-pbonzini@redhat.com>
+	<CAFEAcA9uEmoxgF4Ra9+u==kyou3GHw9BzuXJn1RGuraikY1h3Q@mail.gmail.com>
+	<9695ca9b-6275-d7bf-1c3b-147aeab25473@redhat.com>
+	<ec107687-d109-9eaa-780c-851f73971178@redhat.com>
+	<d7f4739b-0318-ef87-67a9-73a9c5e836c0@redhat.com>
+	<f0573dbb-c81e-c3c3-b0a6-8bafc9d0b2ac@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <fc9827f0-e041-fb31-a77a-f4ed78a635a9@redhat.com>
+Date: Fri, 20 Oct 2017 17:44:13 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171016163515.GH11975@redhat.com>
-Subject: Re: [Qemu-devel] [RFC 4/6] CLI: add -paused option
+In-Reply-To: <f0573dbb-c81e-c3c3-b0a6-8bafc9d0b2ac@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] build: disable -Wmissing-braces on older
+ compilers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,69 +33,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, peter.maydell@linaro.org, pkrempa@redhat.com, cohuck@redhat.com, armbru@redhat.com, pbonzini@redhat.com, david@gibson.dropbear.id.au
+To: Laszlo Ersek <lersek@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Mon, Oct 16, 2017 at 05:35:15PM +0100, Daniel P. Berrange wrote:
-> On Mon, Oct 16, 2017 at 06:22:54PM +0200, Igor Mammedov wrote:
+On 20/10/2017 17:32, Laszlo Ersek wrote:
+> On 10/20/17 17:09, Paolo Bonzini wrote:
+>> On 20/10/2017 17:08, Laszlo Ersek wrote:
+>>> My remark below might matter even less, but:
+>>>
+>>> I'd find it regrettable if we suppressed a wrong gcc warning about a
+>>> valid C construct by replacing the construct with a GNU-ism that is
+>>> *not* standard C. :/
+>>
+>> Is {} to initialize structs a GNUism?
 > 
-> This really needs to have a commit message that provides justification
-> for why this option is needed when we already have -S that is used
-> to allow configuration before the guest starts.
+> It is;
 > 
-> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> > ---
-> >  include/sysemu/sysemu.h |  1 +
-> >  qemu-options.hx         | 15 ++++++++++++++
-> >  qmp.c                   |  5 +++++
-> >  vl.c                    | 54 ++++++++++++++++++++++++++++++++++++++++++++++++-
-> >  4 files changed, 74 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-> > index b213696..3feb94f 100644
-> > --- a/include/sysemu/sysemu.h
-> > +++ b/include/sysemu/sysemu.h
-> > @@ -66,6 +66,7 @@ typedef enum WakeupReason {
-> >      QEMU_WAKEUP_REASON_OTHER,
-> >  } WakeupReason;
-> >  
-> > +void qemu_exit_preconfig_request(void);
-> >  void qemu_system_reset_request(ShutdownCause reason);
-> >  void qemu_system_suspend_request(void);
-> >  void qemu_register_suspend_notifier(Notifier *notifier);
-> > diff --git a/qemu-options.hx b/qemu-options.hx
-> > index 39225ae..bd44db8 100644
-> > --- a/qemu-options.hx
-> > +++ b/qemu-options.hx
-> > @@ -3498,6 +3498,21 @@ STEXI
-> >  Run the emulation in single step mode.
-> >  ETEXI
-> >  
-> > +DEF("paused", HAS_ARG, QEMU_OPTION_paused, \
-> > +    "-paused [state=]postconf|preconf\n"
-> > +    "                postconf: pause QEMU after machine is initialized\n"
-> > +    "                preconf: pause QEMU before machine is initialized\n",
-> > +    QEMU_ARCH_ALL)
-> > +STEXI
-> > +@item -paused
-> > +@findex -paused
-> > +if set enabled interactive configuration stages before machine emulation starts.
-> > +'postconf' option value mimics -S option behaviour where machine is created
-> > +but emulation isn't started. 'preconf' option value pauses QEMU before machine
-> > +is created, which allows to query and configure properties affecting machine
-> > +initialization. Use monitor/QMP command 'cont' to go to exit paused state.
-> > +ETEXI
+>> struct {
+>>   int a, b;
+>> } x = {};
 > 
-> To me it feels rather unpleasant to be exposing this kind of detailed knowledge
-> about the steps QEMU goes through when consttructing the machine and expecting
-> the mgmt application to synchronize certain monitor actions against this.
+> $ gcc -fsyntax-only -std=c99 -pedantic -Wall -Wextra x.c
+> 
+>> x.c:3:7: warning: ISO C forbids empty initializer braces [-Wpedantic]
+>>  } x = {};
+>>        ^
+>> x.c:3:1: warning: missing initializer for field 'a' of 'struct <anonymous>' [-Wmissing-field-initializers]
+>>  } x = {};
+>>  ^
+>> x.c:2:7: note: 'a' declared here
+>>    int a, b;
+>>        ^
+> 
+> If you replace "{}" with "{ 0 }", the same command line stays quiet.
+> 
+> (I used: gcc (GCC) 4.8.5 20150623 (Red Hat 4.8.5-16).)
 
-After discussing some ideas with David in this thread, I think
-you have a really good point here: I don't see a reason why
-set-numa-node should require anything except -S, except for the
-way our machine initialization code work.  In other words, why
-should we generate the NUMA tables at
-machine_run_board_init()-time and not at vm_start()-time?
+Oh.  So there _was_ some logic to my original configure patch.
+Currently we have 82 occurrences of empty initializers and 92
+occurrences of {0}, so I think it makes sense to go ahead with it.
 
--- 
-Eduardo
+On the other hand, without a more precise option than -Wpedantic, empty
+initializers are going to creep in again.
+
+Paolo
