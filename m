@@ -1,31 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46860)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47517)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e5dgt-00020Q-SQ
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 16:14:48 -0400
+	(envelope-from <eblake@redhat.com>) id 1e5dku-0004D5-JS
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 16:18:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e5dgp-0004Pd-Se
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 16:14:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43890)
+	(envelope-from <eblake@redhat.com>) id 1e5dkq-0006LX-KA
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 16:18:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54434)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1e5dgp-0004PJ-Jg
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 16:14:43 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D8F086A13
-	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 20:14:41 +0000 (UTC)
-References: <20171020141243.27845-1-berrange@redhat.com>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1e5dkq-0006Ks-9d
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 16:18:52 -0400
+References: <1508513838-15530-1-git-send-email-gabriel291075@gmail.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <7769fa10-629b-7006-1340-648d0cc2adb8@redhat.com>
-Date: Fri, 20 Oct 2017 15:14:40 -0500
+Message-ID: <2ed96187-82e5-c6b4-1bd1-14f68b583e24@redhat.com>
+Date: Fri, 20 Oct 2017 15:18:48 -0500
 MIME-Version: 1.0
-In-Reply-To: <20171020141243.27845-1-berrange@redhat.com>
+In-Reply-To: <1508513838-15530-1-git-send-email-gabriel291075@gmail.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="MsvCRCPiinQc0hcsjppQN6dMerGuoR1L8"
-Subject: Re: [Qemu-devel] [PATCH v2] sockets: avoid leak of listen file
- descriptor
+	boundary="O6Edo2e4FR1NiUlBkAB1Sui7527vfCLfG"
+Subject: Re: [Qemu-devel] [PATCH v3 01/11] kinetis_k64_uart.h has been added
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,53 +27,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+To: Gabriel Augusto Costa <gabriel291075@gmail.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---MsvCRCPiinQc0hcsjppQN6dMerGuoR1L8
+--O6Edo2e4FR1NiUlBkAB1Sui7527vfCLfG
 From: Eric Blake <eblake@redhat.com>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <7769fa10-629b-7006-1340-648d0cc2adb8@redhat.com>
-Subject: Re: [PATCH v2] sockets: avoid leak of listen file descriptor
-References: <20171020141243.27845-1-berrange@redhat.com>
-In-Reply-To: <20171020141243.27845-1-berrange@redhat.com>
+To: Gabriel Augusto Costa <gabriel291075@gmail.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org
+Message-ID: <2ed96187-82e5-c6b4-1bd1-14f68b583e24@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 01/11] kinetis_k64_uart.h has been added
+References: <1508513838-15530-1-git-send-email-gabriel291075@gmail.com>
+In-Reply-To: <1508513838-15530-1-git-send-email-gabriel291075@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 10/20/2017 09:12 AM, Daniel P. Berrange wrote:
-> If we iterate over the full port range without successfully binding+lis=
-tening
-> on the socket, we'll try the next address, whereupon we overwrite the s=
-listen
-> file descriptor variable without closing it.
->=20
-> Rather than having two places where we open + close socket FDs on diffe=
-rent
-> iterations of nested for loops, re-arrange the code to always open+clos=
-e
-> within the same loop iteration.
->=20
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> ---
->  util/qemu-sockets.c | 52 +++++++++++++++++++++++++++++----------------=
--------
->  1 file changed, 29 insertions(+), 23 deletions(-)
->=20
+On 10/20/2017 10:37 AM, Gabriel Augusto Costa wrote:
+> I made a new arm machine with some peripherals. The machine is mk64fn1m=
+0, a
+> cortex-m4 microcontroller from NXP Kinetis family. The machine can run =
+a
+> simple arm binary file using UART0 in polling mode.
+> I have prepared a series of patchs to include this machine:
 
-> +            slisten =3D create_fast_reuse_socket(e);
-> +            if (slisten < 0) {
-> +                /* First time we expect we might fail to create the so=
-cket
-> +                 * eg if 'e' has AF_INET6 but ipv6 kmod is not loaded.=
+s/patchs/patches/
 
-> +                 * Later iterations should always succeeed if first it=
-eration
+> PATCH v3 n/11: It adds the machine and peripherals devices;
+> PATCH v4 n/2: It changes the Make files to compile this machine.
 
-s/succeeed/succeed/
+Are the last three sentences really useful as part of the git commit
+message, or are they comments better directed to a cover letter?
+Remember, when sending a series, please include a 0/11 cover letter that
+all other messages are in-reply-to, rather than creating 11 separate
+top-level threads.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+More patch submission tips can be found at:
+https://wiki.qemu.org/Contribute/SubmitAPatch
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -88,7 +70,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---MsvCRCPiinQc0hcsjppQN6dMerGuoR1L8
+--O6Edo2e4FR1NiUlBkAB1Sui7527vfCLfG
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -97,14 +79,14 @@ Content-Disposition: attachment; filename="signature.asc"
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnqWTAACgkQp6FrSiUn
-Q2ouCggAnWiPtvOD+RFQRgEoaM2pV7khAjSDSFiIaXPyYp9v12hegJUZVVGJ/sW7
-gIDOxhgBEMFCLiHFYOJsZelgOL1giNwnl20V+pC0ld8kn5JpatSTOe3FgTF/aL7F
-Ld/6MJng3DR+j3jOYu+Xjyf+s5vVWOQrDVeNi3bdFXQxjMtbWZ996Nfd2Qq9hEMd
-BuiTKQKkryFHd/hEUUz0+j7KUNCB8zLsl3wuukBzjly9wti4FuFCSI4QKRvprh4t
-NfKsbuWkV7cFf0INCbBfhxPGuD4p4KTMU9TnOhLQ0EN0oJMLh4SJQgiQsZZOPKFT
-5/ilcVOVeE+V9CHO6o2sK60OCXZl9Q==
-=NRn0
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnqWigACgkQp6FrSiUn
+Q2rUdQgAoMfuzv111hpLWxglgRTdgfKwWuQmkyXPHNBa4mQI4sx/l/Dhr1e/3fxy
+hH6gORL7Qr4Jm/d5m0Ru48V5Ioy2obkwyRBXXipzTMNH3KrWVcY9pXg8yE3RHrdv
+D3FOb4pJFradCLX/snT1Vz62Un8u8c4Hb82YgP9T2kvnp2FgPt1IeYTazruQntAN
+K7+JIk+krM9KPjXjIwCxzUgVc4A12/lQDUDoFH50e292PKXqZCatKWzbfTZVSZ8E
+V+gOJan3FZuBDsTps9twz6spK2EH8ycVugJiiAmXuIIOIbeO+vd9o6zNYBNvbtCz
+JldZi0BRukbAjqvtii9JVxqxJadD4A==
+=lURM
 -----END PGP SIGNATURE-----
 
---MsvCRCPiinQc0hcsjppQN6dMerGuoR1L8--
+--O6Edo2e4FR1NiUlBkAB1Sui7527vfCLfG--
