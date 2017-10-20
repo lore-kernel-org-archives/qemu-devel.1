@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45577)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45806)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1e5UqM-0004jI-JF
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 06:48:00 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1e5Uqz-00052e-3P
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 06:48:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1e5UqL-0005V5-Kc
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 06:47:58 -0400
-Date: Fri, 20 Oct 2017 12:47:39 +0200
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20171020104739.GC27352@stefanha-x1.localdomain>
-References: <cover.1508390588.git.alistair.francis@xilinx.com>
-	<7f741376b50552aa58c943b710fffa3c24f28b2f.1508390588.git.alistair.francis@xilinx.com>
-	<51df0812-0119-412e-6017-935a6c226e3a@redhat.com>
-	<86f645a2-3640-be98-acff-c37cdaa1d66f@weilnetz.de>
-	<4d22f16a-15ce-3ac5-9812-83a4f9197b48@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1e5Uqy-0005xN-EL
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 06:48:37 -0400
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:55688)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1e5Uqy-0005ws-7D
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 06:48:36 -0400
+Received: by mail-wm0-x243.google.com with SMTP id u138so21820752wmu.4
+	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 03:48:36 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4d22f16a-15ce-3ac5-9812-83a4f9197b48@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 42/46] util: Replace fprintf(stderr,
- "*\n" with error_report()
+In-Reply-To: <20171020101219.2378-1-pbonzini@redhat.com>
+References: <20171020101219.2378-1-pbonzini@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 20 Oct 2017 11:48:14 +0100
+Message-ID: <CAFEAcA9uEmoxgF4Ra9+u==kyou3GHw9BzuXJn1RGuraikY1h3Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] build: disable -Wmissing-braces on older
+ compilers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,65 +29,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Stefan Weil <sw@weilnetz.de>, Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, armbru@redhat.com, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, alistair23@gmail.com, Paolo Bonzini <pbonzini@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Laszlo Ersek <lersek@redhat.com>
 
-On Fri, Oct 20, 2017 at 08:27:41AM +0200, Thomas Huth wrote:
-> On 19.10.2017 21:47, Stefan Weil wrote:
-> > Am 19.10.2017 um 19:53 schrieb Thomas Huth:
-> >> On 19.10.2017 18:18, Alistair Francis wrote:
-> >>> Replace a large number of the fprintf(stderr, "*\n" calls with
-> >>> error_report(). The functions were renamed with these commands and then
-> >>> compiler issues where manually fixed.
-> >> [...]
-> >>> diff --git a/util/aio-posix.c b/util/aio-posix.c
-> >>> index 5946ac09f0..29fff51fcf 100644
-> >>> --- a/util/aio-posix.c
-> >>> +++ b/util/aio-posix.c
-> >>> @@ -15,6 +15,7 @@
-> >>>  
-> >>>  #include "qemu/osdep.h"
-> >>>  #include "qemu-common.h"
-> >>> +#include "qemu/error-report.h"
-> >>>  #include "block/block.h"
-> >>>  #include "qemu/rcu_queue.h"
-> >>>  #include "qemu/sockets.h"
-> >>> @@ -703,8 +704,8 @@ void aio_context_setup(AioContext *ctx)
-> >>>  {
-> >>>      /* TODO remove this in final patch submission */
-> >>>      if (getenv("QEMU_AIO_POLL_MAX_NS")) {
-> >>> -        fprintf(stderr, "The QEMU_AIO_POLL_MAX_NS environment variable has "
-> >>> -                "been replaced with -object iothread,poll-max-ns=NUM\n");
-> >>> +        error_report("The QEMU_AIO_POLL_MAX_NS environment variable has "
-> >>> +                "been replaced with -object iothread,poll-max-ns=NUM");
-> >>>          exit(1);
-> >>>      }
-> >>
-> >> The comment in front of this code block indicates that this should
-> >> rather be removed completely. Stefan, do you agree?
-> > 
-> > I assume you asked the other Stefan, but I think he'll agree as I do,
-> 
-> Right, the code has been introduced by this commit:
-> 
-> commit 4a1cba3802554a3b077d436002519ff1fb0c18bf
-> Author: Stefan Hajnoczi <stefanha@redhat.com>
-> Date:   Thu Dec 1 19:26:42 2016 +0000
-> 
->     aio: add polling mode to AioContext
-> 
-> and apparently the environment variable has never been used in the
-> committed code base, so removing this code block sounds like the right
-> way to go.
+On 20 October 2017 at 11:12, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> GCC 4.9 and newer stopped warning for missing braces around the
+> "universal" C zero initializer {0}.  One such initializer sneaked
+> into scsi/qemu-pr-helper.c and is breaking the build with such
+> older GCC versions.
+>
+> Detect the lack of support for the idiom, and disable the warning
+> in that case.
+>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
-Yes, feel free to remove it.
+AFAIK "{}" will work and not be warned about anywhere (we
+use it extensively already) so you don't need to fall back to
+memset...
 
-Initially the RFC patches used the QEMU_AIO_POLL_MAX_NS environment
-variable.  When I wrote a proper command-line interface for this setting
-I left the error to help any of the people testing this optimization
-migrate their scripts to the new interface.
-
-...Then I forgot to remove it for the final non-RFC patch which got
-merged :).
-
-Stefan
+thanks
+-- PMM
