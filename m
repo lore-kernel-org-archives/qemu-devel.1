@@ -1,23 +1,46 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40268)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40531)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1e5XfK-0004GR-PM
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 09:48:48 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1e5Xfv-0004ed-UT
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 09:49:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1e5XfG-0007pV-TP
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 09:48:46 -0400
-Received: from mail.uni-paderborn.de ([131.234.142.9]:39244)
+	(envelope-from <borntraeger@de.ibm.com>) id 1e5Xfr-0008AT-28
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 09:49:24 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:38218
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kbastian@mail.uni-paderborn.de>)
-	id 1e5XfG-0007p9-GI
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 09:48:42 -0400
-From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Message-ID: <6968797c-f64c-69ff-2fa6-79c4fb3440c9@mail.uni-paderborn.de>
-Date: Fri, 20 Oct 2017 15:46:54 +0200
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1e5Xfq-0008A8-SF
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 09:49:18 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v9KDnFn6127392
+	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 09:49:15 -0400
+Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2dqja2g6t1-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 09:49:15 -0400
+Received: from localhost
+	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Fri, 20 Oct 2017 14:49:07 +0100
+References: <87y3oqugm7.fsf@marc-ibm.boeblingen.de.ibm.com>
+	<20171005121115.GD3946746@orkuz.home>
+	<87y3ok7n2n.fsf@marc-ibm.boeblingen.de.ibm.com>
+	<20171012120714.GA314661@orkuz.home>
+	<87mv4m6pp5.fsf@marc-ibm.boeblingen.de.ibm.com>
+	<0aab6dae-a926-c106-9bc5-68561a9bef5c@redhat.com>
+	<0dae2b6c-9164-efc7-5c67-0e4aa5eb4a21@de.ibm.com>
+	<fcf03f16-389e-83b5-77bf-d7a50151005c@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Fri, 20 Oct 2017 15:49:04 +0200
 MIME-Version: 1.0
+In-Reply-To: <fcf03f16-389e-83b5-77bf-d7a50151005c@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RFC] RISC-V Decoder generator
+Content-Transfer-Encoding: 7bit
+Message-Id: <2bfd5f45-3db1-b6c7-3162-43be564cfa05@de.ibm.com>
+Subject: Re: [Qemu-devel] [libvirt] Question about the host-model CPU mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,121 +49,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>, RISC-V SW Dev <sw-dev@groups.riscv.org>
-
-Hi QEMU and RISC-V folks,
-
-I asked you for feedback some while ago regarding a modular RISC-V QEMU
-target (see discussion [1]). I tried getting it to work with the good
-old C preprocessor and quickly realized that it is too limiting. Instead
-I created a data-driven decoder generator written in python (see the
-code on github [2]) using YAML as a description language.
-
-I'd like to get some feedback whether this is acceptable to be
-upstreamed to QEMU or if you have any suggestions for improvements.
-Right now only RV32I instruction are implemented in this scheme.
-
-For this I will roughly sketch how the data format for RISC-V
-instructions works and then how the result after processing looks like.
-You can find the full tree on github [2] with all the relevant files in
-'target-riscv/decode-gen/'.
-
-The RISC-V data in YAML consists of:
-
-1) prefixes
-2) instruction formats
-3) instruction specification using the data of 1) and 2)
-
-1) prefixes have:
-   - name
-   - bitmask that identifies instructions belonging to it
-   - length that specifies the length in bits for all instructions with
-     this prefix
-
-Example prefix description for 16 bit instructions:
-
-16Bit: {
-    bitmask: ~0b11,
-    len: 16
-    }
-
-2) instruction formats have:
-    - name
-    - list of immediate fields
-    - list of 'normal' fields (e.g. register identifier)
-
-    The immediate fields are specified separately in the same file with:
-        - name
-        - data: in order list of the individual fields + possible sign i
-
-                extension
-        - fill: how is the immediate filled from the LSB (for now only
-                '0' fills are allowed)
-
-    Example for B-type immediate:
-        B: {data: [31s, 7,  30..25, 11..8], fill: '0'}
-        Note here that bit 31 is used for sign extension as indicated by
-        the 's'.
-
-    The 'normal' fields are similar to immediate fields but only have:
-        - name
-        - single field description
-
-    Example for 'rs1' field:
-	- rs1: 19..15
-
-Example for a full instruction format 'SB':
-    - SB: {
-      fields: [rs1,rs2],
-      immediates: [B]
-      }
-
-3) instruction specification have:
-    - name
-    - instruction format from 2)
-    - prefix from 1)
-    - keymap of opcode fields and the value they take for this
-      instruction
-    - func for binary translation
-
-    The opcode fields are specified separately in the same file in the
-    same manner as 'normal' opcode fields.
-    Example for FUNC3:
-        - FUNC3_32: 14..12
-
-Example for the 'BEQ' instruction:
-    BEQ: {format: SB, prefix: 32Bit, opcodes: {OP1_32: 99, FUNC3_32: 0},
-          func: gen_beq}
-
-    'OP1_32: 99' means that field OP1_32 defined by bits 6 until 0 have
-    to have the value 99
+To: David Hildenbrand <david@redhat.com>, Marc Hartmayer <mhartmay@linux.vnet.ibm.com>, libvir-list@redhat.com, qemu-devel@nongnu.org
+Cc: Jiri Denemark <jdenemar@redhat.com>, Boris Fiuczynski <fiuczy@linux.vnet.ibm.com>, "Jason J. Herne" <jjherne@linux.vnet.ibm.com>, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
 
 
-The python script then converts these instructions into a tree of
-switch-case statements depending on the specified opcodes and generates
-at each case for one instruction two function calls:
 
-1) decode_format_* depending on the instruction format used by this
-   instruction.
-   The decode_format_* functions are also generated by the script and
-   take of decoding the 'normal' fields and the immediate fields. This
-   data is stored in a data structure 'DisasFormats' which needs to be
-   passed to any translation function used by instructions.
+On 10/20/2017 03:43 PM, David Hildenbrand wrote:
+> On 20.10.2017 15:36, Christian Borntraeger wrote:
+>>
+>>
+>> On 10/20/2017 03:16 PM, David Hildenbrand wrote:
+>>>
+>>>> Hi all,
+>>>>
+>>>> we recently encountered the problem that the 'host-model' [1] has to be
+>>>> related to the machine type of a domain. We have following problem:
+>>>>
+>>>>    Let's assume we've a z13 system with a QEMU 2.9 and we define a
+>>>>    domain using the default s390-virtio-ccw machine together with the
+>>>>    host-model CPU mode [1]. The definition will have the machine
+>>>>    expanded to s390-virtio-ccw-2.9 but retain the host-model CPU mode
+>>>>    in the domain definition. In a next step we upgrade to QEMU 2.10
+>>>>    (first version to recognize z14). Everything is still fine, even
+>>>>    though the machine runs in 2.9 compatibility mode. Finally we
+>>>>    upgrade to a z14. As a consequence it is not possible to start the
+>>>>    domain anymore as the machine type doesn't support our CPU host
+>>>>    model (which is expanded at start time of the domain).
+>>>
+>>> Actually, what is the cause of that problem? I assume it is the gs
+>>> feature (gs_allowed)?
+>>>
+>>> We should really avoid such things (..._allowed) for CPU model features
+>>> in the future and clue all new such stuff to cpumodel_allowed.
+>>
+>> Yes, starting a guest with
+>>    <os>
+>>     <type arch='s390x' machine='s390-ccw-virtio-2.9'>hvm</type>
+>>   </os>
+>>   <cpu mode='host-model'/>
+>>
+>> results in
+>>
+>> qemu-system-s390x: Some features requested in the CPU model are not available in the configuration: gs 
+>>
+>> Tying it to cpumodel_allowed would not help, migration-wise though.
+>> libvirt would still transform
+>>
+>>    <os>
+>>     <type arch='s390x' machine='s390-ccw-virtio-2.9'>hvm</type>
+>>   </os>
+>>   <cpu mode='host-model'/>
+> 
+> My point was, that the host model would have to be copied and _remain_
+> there when s390-ccw-virtio was expanded to s390-ccw-virtio-2.9.
+> 
+> So really replacing <cpu mode='host-model'/> by the model z13-base....
+> This would at least fix this issue. Just like s390-ccw-virtio get's
+> replaced and remains thats way.
+> 
+> But this might for sure have other problems.
 
-2) A call to the translation function defined by 'func' in 3)
-   These need to be defined by the developer in translate.c. For example
-   for LUI this looks like:
+The problem goes much further.
+A fresh guest with
 
-static void gen_lui(CPURISCVState *env, DisasContext *ctx)
-{
-    if (ctx->fmt.field_rd == 0) {
-            return; /* NOP */
-    }
-    tcg_gen_movi_tl(cpu_gpr[ctx->fmt.field_rd], ctx->fmt.immediate_U);
-}
+    <os>
+     <type arch='s390x' machine='s390-ccw-virtio-2.9'>hvm</type>
+   </os>
+   <cpu mode='host-model'/>
 
-Thanks for any comments,
-Bastian
-
-[1] https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg07735.html
-[2] https://github.com/bkoppelmann/riscv-qemu/tree/decoder
+does not start. No migration from an older system is necessary.
