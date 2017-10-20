@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48296)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49418)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1e5V4c-0001Fy-JM
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 07:02:43 -0400
+	(envelope-from <thuth@redhat.com>) id 1e5V8i-0003gq-Eh
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 07:06:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1e5V4U-0006Tv-Dd
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 07:02:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37204)
+	(envelope-from <thuth@redhat.com>) id 1e5V8f-00010D-Aq
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 07:06:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58764)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1e5V4U-0006TK-6q
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 07:02:34 -0400
-References: <20171020101219.2378-1-pbonzini@redhat.com>
-	<CAFEAcA9uEmoxgF4Ra9+u==kyou3GHw9BzuXJn1RGuraikY1h3Q@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <9695ca9b-6275-d7bf-1c3b-147aeab25473@redhat.com>
-Date: Fri, 20 Oct 2017 13:02:21 +0200
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1e5V8f-0000zj-44
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 07:06:53 -0400
+References: <d34ce785-80bb-c4f5-4e35-2ec71b00344d@msgid.tls.msk.ru>
+	<1508495342.18146.8.camel@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <9e4910ab-c841-a814-8cc1-879ddb924b7c@redhat.com>
+Date: Fri, 20 Oct 2017 13:06:47 +0200
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9uEmoxgF4Ra9+u==kyou3GHw9BzuXJn1RGuraikY1h3Q@mail.gmail.com>
+In-Reply-To: <1508495342.18146.8.camel@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] build: disable -Wmissing-braces on older
- compilers
+Subject: Re: [Qemu-devel] SDL2 issues
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,31 +28,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Laszlo Ersek <lersek@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>, qemu-devel qemu-devel <qemu-devel@nongnu.org>
 
-On 20/10/2017 12:48, Peter Maydell wrote:
-> On 20 October 2017 at 11:12, Paolo Bonzini <pbonzini@redhat.com> wrote:
->> GCC 4.9 and newer stopped warning for missing braces around the
->> "universal" C zero initializer {0}.  One such initializer sneaked
->> into scsi/qemu-pr-helper.c and is breaking the build with such
->> older GCC versions.
+On 20.10.2017 12:29, Gerd Hoffmann wrote:
+> On Fri, 2017-10-20 at 13:05 +0300, Michael Tokarev wrote:
+>> Hello
 >>
->> Detect the lack of support for the idiom, and disable the warning
->> in that case.
+>> After we tried to switch from SDL1 to SDL2 in Debian qemu,
+>> we receives quite some reports about various issues.
 >>
->> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>> We use 2.10.1 version of qemu.
+>>
+>> Example of the issues: http://bugs.debian.org/879193
 > 
-> AFAIK "{}" will work and not be warned about anywhere (we
-> use it extensively already) so you don't need to fall back to
-> memset...
+> Doesn't reproduce.
+> 
+>> http://bugs.debian.org/870025 - a few patches at the bottom
+> 
+> Those patches should go to the mailing list.
+> 
+>> http://bugs.debian.org/878087
+> 
+> Yes, -k is simply not supported with sdl2.
+> Those remappings should be done in the guest instead.
+> 
+>> What's the status of SDL2 support in qemu? I've seen it is
+>> the default now if SDL2 is present on the system (it was
+>> SDL1 before).
+> 
+> Yep.  Long term I want drop SDL1, this is the first step.
+> 
+>> Also, what's the status of SDL _audio_ support, is it needed
+>> at all once we have alsa, pa and oss?
+> 
+> Dunno how well mixing sdl display with non-sdl audio works.  Feel free
+> to send a patch dropping sdl audio to the list to check what people
+> think about that ;)
 
-Doh, of course that will work in scsi/qemu-pr-helper.c.  In general you
-can use {0} but not {} to initialize a scalar, like
+I think we've had that topic before: SDL audio is still required for
+some non-Linux systems like Haiku, so please don't remove it, even if
+SDL audio still needs some love with SDL2 to get really usable there again.
 
-	IDontKnowIfItsAnArrayOrPointer x = {};	//might fail
-	IDontKnowIfItsAnArrayOrPointer x = {0};	//always works
-
-I'm not sure if that matters.
-
-Paolo
+ Thomas
