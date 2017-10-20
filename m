@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51665)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51681)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1e5Qr9-0001d2-QE
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 02:32:32 -0400
+	(envelope-from <famz@redhat.com>) id 1e5QrB-0001dT-3l
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 02:32:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1e5Qr5-0007NR-WB
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 02:32:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48650)
+	(envelope-from <famz@redhat.com>) id 1e5QrA-0007PB-0Y
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 02:32:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46372)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1e5Qr5-0007NC-Qc
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 02:32:27 -0400
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1e5Qr9-0007Or-Qb
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 02:32:31 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Fri, 20 Oct 2017 14:32:15 +0800
-Message-Id: <20171020063219.2035-2-famz@redhat.com>
+Date: Fri, 20 Oct 2017 14:32:17 +0800
+Message-Id: <20171020063219.2035-4-famz@redhat.com>
 In-Reply-To: <20171020063219.2035-1-famz@redhat.com>
 References: <20171020063219.2035-1-famz@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 1/5] docker: Don't allocate tty unless DEBUG=1
+Subject: [Qemu-devel] [PULL 3/5] docker: allow running from srcdir !=
+ builddir build
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,37 +27,40 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>
 
-The existence of tty in the container seems to urge gcc into colorizing
-the errors, but the escape chars will clutter the report once turned
-into email replies on patchew. Move -t to debug mode.
+From: Paolo Bonzini <pbonzini@redhat.com>
 
-Reported-by: Eric Blake <eblake@redhat.com>
-Signed-off-by: Fam Zheng <famz@redhat.com>
-Message-Id: <20171013011954.9975-1-famz@redhat.com>
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+The new script uses "git submodule", which is picky about being invoked
+from the top of the git checkout.  Invoke the script from $(SRC_PATH)
+to avoid git's wrath.
+
+Fixes: b7f404201e45e99da23b9764dec27ce5f965cdcd
+Cc: Fam Zheng <famz@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+
+Message-Id: <1508331989-142364-1-git-send-email-pbonzini@redhat.com>
+Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
  tests/docker/Makefile.include | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.includ=
-e
-index 6f9ea196a7..ab939f2bec 100644
+diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
+index 38874ec03d..02cd520590 100644
 --- a/tests/docker/Makefile.include
 +++ b/tests/docker/Makefile.include
-@@ -134,10 +134,10 @@ docker-run: docker-qemu-src
- 			"  COPYING $(EXECUTABLE) to $(IMAGE)"))
- 	$(call quiet-command,						\
- 		$(SRC_PATH)/tests/docker/docker.py run 			\
--			$(if $(NOUSER),,-u $(shell id -u)) -t 		\
-+			$(if $(NOUSER),,-u $(shell id -u)) 		\
- 			--security-opt seccomp=3Dunconfined		\
- 			$(if $V,,--rm) 					\
--			$(if $(DEBUG),-i,)				\
-+			$(if $(DEBUG),-ti,)				\
- 			$(if $(NETWORK),$(if $(subst $(NETWORK),,1),--net=3D$(NETWORK)),--net=
-=3Dnone) \
- 			-e TARGET_LIST=3D$(TARGET_LIST) 			\
- 			-e EXTRA_CONFIGURE_OPTS=3D"$(EXTRA_CONFIGURE_OPTS)" \
---=20
+@@ -18,11 +18,11 @@ TESTS ?= %
+ IMAGES ?= %
+ 
+ CUR_TIME := $(shell date +%Y-%m-%d-%H.%M.%S.$$$$)
+-DOCKER_SRC_COPY := docker-src.$(CUR_TIME)
++DOCKER_SRC_COPY := $(BUILD_DIR)/docker-src.$(CUR_TIME)
+ 
+ $(DOCKER_SRC_COPY):
+ 	@mkdir $@
+-	$(call quiet-command, $(SRC_PATH)/scripts/archive-source.sh $@/qemu.tar, \
++	$(call quiet-command, cd $(SRC_PATH) && scripts/archive-source.sh $@/qemu.tar, \
+ 		"GEN", "$@/qemu.tar")
+ 	$(call quiet-command, cp $(SRC_PATH)/tests/docker/run $@/run, \
+ 		"COPY","RUNNER")
+-- 
 2.13.5
