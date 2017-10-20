@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36320)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36315)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=4594c9e72=Ian.Jackson@citrix.com>)
-	id 1e5XVc-0005A1-8L
+	id 1e5XVc-00059u-1r
 	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 09:38:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=4594c9e72=Ian.Jackson@citrix.com>)
-	id 1e5XVX-0002sj-MR
+	id 1e5XVX-0002sQ-BW
 	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 09:38:44 -0400
 Received: from smtp02.citrix.com ([66.165.176.63]:19492)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
 	(envelope-from <prvs=4594c9e72=Ian.Jackson@citrix.com>)
-	id 1e5XVX-0002qS-EN
+	id 1e5XVX-0002qS-4i
 	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 09:38:39 -0400
 From: Ian Jackson <ian.jackson@eu.citrix.com>
-Date: Fri, 20 Oct 2017 14:38:17 +0100
-Message-ID: <1508506702-17704-3-git-send-email-ian.jackson@eu.citrix.com>
-In-Reply-To: <1508506702-17704-1-git-send-email-ian.jackson@eu.citrix.com>
+Date: Fri, 20 Oct 2017 14:38:15 +0100
+Message-ID: <1508506702-17704-1-git-send-email-ian.jackson@eu.citrix.com>
+In-Reply-To: <23017.64539.31230.43449@mariner.uk.xensource.com>
 References: <23017.64539.31230.43449@mariner.uk.xensource.com>
-	<1508506702-17704-1-git-send-email-ian.jackson@eu.citrix.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v5.1 3/8] xen: defer call to xen_restrict until
- just before os_setup_post
+Subject: [Qemu-devel] [PATCH v5.1 1/8] xen: link against xentoolcore
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,146 +29,56 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Ross Lagerwall <ross.lagerwall@citrix.com>, Anthony PERARD <anthony.perard@citrix.com>, Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org, Ian Jackson <ian.jackson@eu.citrix.com>, Ian Jackson <Ian.Jackson@eu.citrix.com>
+Cc: Ross Lagerwall <ross.lagerwall@citrix.com>, Anthony PERARD <anthony.perard@citrix.com>, Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org, Ian Jackson <Ian.Jackson@eu.citrix.com>
 
-We need to restrict *all* the control fds that qemu opens.  Looking in
-/proc/PID/fd shows there are many; their allocation seems scattered
-throughout Xen support code in qemu.
+From: Anthony PERARD <anthony.perard@citrix.com>
 
-We must postpone the restrict call until roughly the same time as qemu
-changes its uid, chroots (if applicable), and so on.
-
-There doesn't seem to be an appropriate hook already.  The RunState
-change hook fires at different times depending on exactly what mode
-qemu is operating in.
-
-And it appears that no-one but the Xen code wants a hook at this phase
-of execution.  So, introduce a bare call to a new function
-xen_setup_post, just before os_setup_post.  Also provide the
-appropriate stub for when Xen compilation is disabled.
-
-We do the restriction before rather than after os_setup_post, because
-xen_restrict may need to open /dev/null, and os_setup_post might have
-called chroot.
-
-Currently this does not work with migration, because when running as
-the Xen device model qemu needs to signal to the toolstack that it is
-ready.  It currently does this using xenstore, and for incoming
-migration (but not for ordinary startup) that happens after
-os_setup_post.
-
-It is correct that this happens late: we want the incoming migration
-stream to be processed by a restricted qemu.  The fix for this will be
-to do the startup notification a different way, without using
-xenstore.  (QMP is probably a reasonable choice.)
-
-So for now this restriction feature cannot be used in conjunction with
-migration.  (Note that this is not a regression in this patch, because
-previously the -xen-restrict-domid call was, in fact, simply
-ineffective!)  We will revisit this in the Xen 4.11 release cycle.
+Xen libraries in 4.10 include a new xentoolcore library.  This
+contains the xentoolcore_restrict_all function which we are about to
+want to use.
 
 Signed-off-by: Ian Jackson <Ian.Jackson@eu.citrix.com>
-Reviewed-by: Anthony PERARD <anthony.perard@citrix.com>
 ---
-v5: Discuss problems with migration startup notification
-    in the commit message.
-v3: Do xen_setup_post just before, not just after, os_setup_post,
-    to improve interaction with chroot.  Thanks to Ross Lagerwall.
+v5: More truthful commit message.
 ---
- hw/i386/xen/xen-hvm.c   |  8 --------
- hw/xen/xen-common.c     | 13 +++++++++++++
- include/sysemu/sysemu.h |  2 ++
- stubs/xen-hvm.c         |  5 +++++
- vl.c                    |  1 +
- 5 files changed, 21 insertions(+), 8 deletions(-)
+ configure | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/hw/i386/xen/xen-hvm.c b/hw/i386/xen/xen-hvm.c
-index d9ccd5d..7b60ec6 100644
---- a/hw/i386/xen/xen-hvm.c
-+++ b/hw/i386/xen/xen-hvm.c
-@@ -1254,14 +1254,6 @@ void xen_hvm_init(PCMachineState *pcms, MemoryRegion **ram_memory)
-         goto err;
-     }
+diff --git a/configure b/configure
+index fd7e3a5..6f691df 100755
+--- a/configure
++++ b/configure
+@@ -2072,7 +2072,7 @@ if test "$xen" != "no" ; then
+       $($pkg_config --modversion xencontrol | sed 's/\./ /g') )"
+     xen=yes
+     xen_pc="xencontrol xenstore xenguest xenforeignmemory xengnttab"
+-    xen_pc="$xen_pc xenevtchn xendevicemodel"
++    xen_pc="$xen_pc xenevtchn xendevicemodel xentoolcore"
+     QEMU_CFLAGS="$QEMU_CFLAGS $($pkg_config --cflags $xen_pc)"
+     libs_softmmu="$($pkg_config --libs $xen_pc) $libs_softmmu"
+     LDFLAGS="$($pkg_config --libs $xen_pc) $LDFLAGS"
+@@ -2104,18 +2104,20 @@ EOF
+         cat > $TMPC <<EOF &&
+ #undef XC_WANT_COMPAT_MAP_FOREIGN_API
+ #include <xenforeignmemory.h>
++#include <xentoolcore.h>
+ int main(void) {
+   xenforeignmemory_handle *xfmem;
  
--    if (xen_domid_restrict) {
--        rc = xen_restrict(xen_domid);
--        if (rc < 0) {
--            error_report("failed to restrict: error %d", errno);
--            goto err;
--        }
--    }
--
-     xen_create_ioreq_server(xen_domid, &state->ioservid);
+   xfmem = xenforeignmemory_open(0, 0);
+   xenforeignmemory_map2(xfmem, 0, 0, 0, 0, 0, 0, 0);
++  xentoolcore_restrict_all(0);
  
-     state->exit.notify = xen_exit_notifier;
-diff --git a/hw/xen/xen-common.c b/hw/xen/xen-common.c
-index 632a938..4056420 100644
---- a/hw/xen/xen-common.c
-+++ b/hw/xen/xen-common.c
-@@ -117,6 +117,19 @@ static void xen_change_state_handler(void *opaque, int running,
-     }
+   return 0;
  }
- 
-+void xen_setup_post(void)
-+{
-+    int rc;
-+
-+    if (xen_domid_restrict) {
-+        rc = xen_restrict(xen_domid);
-+        if (rc < 0) {
-+            perror("xen: failed to restrict");
-+            exit(1);
-+        }
-+    }
-+}
-+
- static int xen_init(MachineState *ms)
- {
-     xen_xc = xc_interface_open(0, 0, 0);
-diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-index b213696..b064a55 100644
---- a/include/sysemu/sysemu.h
-+++ b/include/sysemu/sysemu.h
-@@ -93,6 +93,8 @@ void qemu_remove_machine_init_done_notifier(Notifier *notify);
- 
- void qemu_announce_self(void);
- 
-+void xen_setup_post(void);
-+
- extern int autostart;
- 
- typedef enum {
-diff --git a/stubs/xen-hvm.c b/stubs/xen-hvm.c
-index 3ca6c51..9701feb 100644
---- a/stubs/xen-hvm.c
-+++ b/stubs/xen-hvm.c
-@@ -13,6 +13,7 @@
- #include "hw/xen/xen.h"
- #include "exec/memory.h"
- #include "qmp-commands.h"
-+#include "sysemu/sysemu.h"
- 
- int xen_pci_slot_get_pirq(PCIDevice *pci_dev, int irq_num)
- {
-@@ -61,3 +62,7 @@ void xen_hvm_init(PCMachineState *pcms, MemoryRegion **ram_memory)
- void qmp_xen_set_global_dirty_log(bool enable, Error **errp)
- {
- }
-+
-+void xen_setup_post(void)
-+{
-+}
-diff --git a/vl.c b/vl.c
-index fb1f05b..ca06553 100644
---- a/vl.c
-+++ b/vl.c
-@@ -4792,6 +4792,7 @@ int main(int argc, char **argv, char **envp)
-         vm_start();
-     }
- 
-+    xen_setup_post();
-     os_setup_post();
- 
-     main_loop();
+ EOF
+-        compile_prog "" "$xen_libs -lxendevicemodel $xen_stable_libs"
++        compile_prog "" "$xen_libs -lxendevicemodel $xen_stable_libs -lxentoolcore"
+       then
+-      xen_stable_libs="-lxendevicemodel $xen_stable_libs"
++      xen_stable_libs="-lxendevicemodel $xen_stable_libs -lxentoolcore"
+       xen_ctrl_version=41000
+       xen=yes
+     elif
 -- 
 2.1.4
