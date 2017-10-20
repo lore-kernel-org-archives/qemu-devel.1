@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44809)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44874)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1e5gbc-0006Zy-KM
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 19:21:33 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1e5gbg-0006k1-9n
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 19:21:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1e5gbZ-0007yx-CB
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 19:21:32 -0400
-Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:47295)
+	(envelope-from <richard.henderson@linaro.org>) id 1e5gbf-00082Q-B7
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 19:21:36 -0400
+Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:47101)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1e5gbZ-0007yX-0O
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 19:21:29 -0400
-Received: by mail-pf0-x244.google.com with SMTP id z11so13061239pfk.4
-	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 16:21:28 -0700 (PDT)
+	id 1e5gbf-000822-52
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 19:21:35 -0400
+Received: by mail-pf0-x243.google.com with SMTP id p87so13075443pfj.3
+	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 16:21:35 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Fri, 20 Oct 2017 16:20:14 -0700
-Message-Id: <20171020232023.15010-44-richard.henderson@linaro.org>
+Date: Fri, 20 Oct 2017 16:20:18 -0700
+Message-Id: <20171020232023.15010-48-richard.henderson@linaro.org>
 In-Reply-To: <20171020232023.15010-1-richard.henderson@linaro.org>
 References: <20171020232023.15010-1-richard.henderson@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v7 43/52] gen-icount: fold exitreq_label into
- TCGContext
+Subject: [Qemu-devel] [PATCH v7 47/52] osdep: introduce
+ qemu_mprotect_rwx/none
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,66 +32,78 @@ Cc: cota@braap.org, f4bug@amsat.org, pbonzini@redhat.com
 
 From: "Emilio G. Cota" <cota@braap.org>
 
-Groundwork for supporting multiple TCG contexts.
-
 Reviewed-by: Richard Henderson <rth@twiddle.net>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- include/exec/gen-icount.h | 7 +++----
- tcg/tcg.h                 | 2 ++
- 2 files changed, 5 insertions(+), 4 deletions(-)
+ include/qemu/osdep.h |  2 ++
+ util/osdep.c         | 41 +++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 43 insertions(+)
 
-diff --git a/include/exec/gen-icount.h b/include/exec/gen-icount.h
-index c58b0b2585..fe80176462 100644
---- a/include/exec/gen-icount.h
-+++ b/include/exec/gen-icount.h
-@@ -6,13 +6,12 @@
- /* Helpers for instruction counting code generation.  */
- 
- static int icount_start_insn_idx;
--static TCGLabel *exitreq_label;
- 
- static inline void gen_tb_start(TranslationBlock *tb)
- {
-     TCGv_i32 count, imm;
- 
--    exitreq_label = gen_new_label();
-+    tcg_ctx->exitreq_label = gen_new_label();
-     if (tb_cflags(tb) & CF_USE_ICOUNT) {
-         count = tcg_temp_local_new_i32();
-     } else {
-@@ -34,7 +33,7 @@ static inline void gen_tb_start(TranslationBlock *tb)
-         tcg_temp_free_i32(imm);
-     }
- 
--    tcg_gen_brcondi_i32(TCG_COND_LT, count, 0, exitreq_label);
-+    tcg_gen_brcondi_i32(TCG_COND_LT, count, 0, tcg_ctx->exitreq_label);
- 
-     if (tb_cflags(tb) & CF_USE_ICOUNT) {
-         tcg_gen_st16_i32(count, tcg_ctx->tcg_env,
-@@ -52,7 +51,7 @@ static inline void gen_tb_end(TranslationBlock *tb, int num_insns)
-         tcg_set_insn_param(icount_start_insn_idx, 1, num_insns);
-     }
- 
--    gen_set_label(exitreq_label);
-+    gen_set_label(tcg_ctx->exitreq_label);
-     tcg_gen_exit_tb((uintptr_t)tb + TB_EXIT_REQUESTED);
- 
-     /* Terminate the linked list.  */
-diff --git a/tcg/tcg.h b/tcg/tcg.h
-index 6741f06200..d468c076b1 100644
---- a/tcg/tcg.h
-+++ b/tcg/tcg.h
-@@ -675,6 +675,8 @@ struct TCGContext {
-     struct TCGLabelPoolData *pool_labels;
+diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
+index 826650c58a..281782d526 100644
+--- a/include/qemu/osdep.h
++++ b/include/qemu/osdep.h
+@@ -371,6 +371,8 @@ void sigaction_invoke(struct sigaction *action,
  #endif
  
-+    TCGLabel *exitreq_label;
-+
-     TCGTempSet free_temps[TCG_TYPE_COUNT * 2];
-     TCGTemp temps[TCG_MAX_TEMPS]; /* globals first, temps after */
+ int qemu_madvise(void *addr, size_t len, int advice);
++int qemu_mprotect_rwx(void *addr, size_t size);
++int qemu_mprotect_none(void *addr, size_t size);
  
+ int qemu_open(const char *name, int flags, ...);
+ int qemu_close(int fd);
+diff --git a/util/osdep.c b/util/osdep.c
+index a479fedc4a..1231f9f876 100644
+--- a/util/osdep.c
++++ b/util/osdep.c
+@@ -73,6 +73,47 @@ int qemu_madvise(void *addr, size_t len, int advice)
+ #endif
+ }
+ 
++static int qemu_mprotect__osdep(void *addr, size_t size, int prot)
++{
++    g_assert(!((uintptr_t)addr & ~qemu_real_host_page_mask));
++    g_assert(!(size & ~qemu_real_host_page_mask));
++
++#ifdef _WIN32
++    DWORD old_protect;
++
++    if (!VirtualProtect(addr, size, prot, &old_protect)) {
++        error_report("%s: VirtualProtect failed with error code %ld",
++                     __func__, GetLastError());
++        return -1;
++    }
++    return 0;
++#else
++    if (mprotect(addr, size, prot)) {
++        error_report("%s: mprotect failed: %s", __func__, strerror(errno));
++        return -1;
++    }
++    return 0;
++#endif
++}
++
++int qemu_mprotect_rwx(void *addr, size_t size)
++{
++#ifdef _WIN32
++    return qemu_mprotect__osdep(addr, size, PAGE_EXECUTE_READWRITE);
++#else
++    return qemu_mprotect__osdep(addr, size, PROT_READ | PROT_WRITE | PROT_EXEC);
++#endif
++}
++
++int qemu_mprotect_none(void *addr, size_t size)
++{
++#ifdef _WIN32
++    return qemu_mprotect__osdep(addr, size, PAGE_NOACCESS);
++#else
++    return qemu_mprotect__osdep(addr, size, PROT_NONE);
++#endif
++}
++
+ #ifndef _WIN32
+ 
+ static int fcntl_op_setlk = -1;
 -- 
 2.13.6
