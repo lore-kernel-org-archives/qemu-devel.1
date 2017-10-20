@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58671)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59045)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nutarojj@ornl.gov>) id 1e5Yot-0004M7-PR
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 11:02:45 -0400
+	(envelope-from <kwolf@redhat.com>) id 1e5YqM-0006oq-Aa
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 11:04:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nutarojj@ornl.gov>) id 1e5Yon-0006GV-W3
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 11:02:43 -0400
-Received: from mta01.ornl.gov ([128.219.177.137]:25888)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <nutarojj@ornl.gov>) id 1e5Yon-0006Fo-NG
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 11:02:37 -0400
-From: "Nutaro, James J." <nutarojj@ornl.gov>
-Date: Fri, 20 Oct 2017 15:02:16 +0000
-Message-ID: <545610a4882f4c5494b30b7eab66b984@EXCHCS32.ornl.gov>
-References: <CADHp1NwU=HowMfgBGtcwnY25v_fL6qZ2gd469a2oZY+QQi2uFw@mail.gmail.com>
-	<20171019205409.GA4170@flamenco>
-In-Reply-To: <20171019205409.GA4170@flamenco>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <kwolf@redhat.com>) id 1e5YqG-00078t-K9
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 11:04:14 -0400
+Date: Fri, 20 Oct 2017 17:03:49 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20171020150349.GC3667@localhost.localdomain>
+References: <20171012034720.11947-1-eblake@redhat.com>
+	<20171012034720.11947-13-eblake@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] Running Qemu in discrete time/step by step
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171012034720.11947-13-eblake@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v6 12/24] block: Convert
+ bdrv_get_block_status_above() to bytes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,70 +24,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "'Emilio G. Cota'" <cota@braap.org>, Matt <mattator@gmail.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Hajime Tazaki <tazaki@wide.ad.jp>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, famz@redhat.com, jsnow@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>, Jeff Cody <jcody@redhat.com>
 
-Thanks for taking a look at the patch. The most recent version of the patch=
- will also work with KVM if you need to speed things up. You can find it he=
-re:
+Am 12.10.2017 um 05:47 hat Eric Blake geschrieben:
+> We are gradually moving away from sector-based interfaces, towards
+> byte-based.  In the common case, allocation is unlikely to ever use
+> values that are not naturally sector-aligned, but it is possible
+> that byte-based values will let us be more precise about allocation
+> at the end of an unaligned file that can do byte-based access.
+> 
+> Changing the name of the function from bdrv_get_block_status_above()
+> to bdrv_block_status_above() ensures that the compiler enforces that
+> all callers are updated.  Likewise, since it a byte interface allows
+> an offset mapping that might not be sector aligned, split the mapping
+> out of the return value and into a pass-by-reference parameter.  For
+> now, the io.c layer still assert()s that all uses are sector-aligned,
+> but that can be relaxed when a later patch implements byte-based
+> block status in the drivers.
+> 
+> For the most part this patch is just the addition of scaling at the
+> callers followed by inverse scaling at bdrv_block_status(), plus
+> updates for the new split return interface.  But some code,
+> particularly bdrv_block_status(), gets a lot simpler because it no
+> longer has to mess with sectors.  Likewise, mirror code no longer
+> computes s->granularity >> BDRV_SECTOR_BITS, and can therefore drop
+> an assertion about alignment because the loop no longer depends on
+> alignment (never mind that we don't really have a driver that
+> reports sub-sector alignments, so it's not really possible to test
+> the effect of sub-sector mirroring).  Fix a neighboring assertion to
+> use is_power_of_2 while there.
+> 
+> For ease of review, bdrv_get_block_status() was tackled separately.
+> 
+> Signed-off-by: Eric Blake <eblake@redhat.com>
 
-https://patchwork.kernel.org/patch/9960369/
+>  int bdrv_block_status(BlockDriverState *bs, int64_t offset, int64_t bytes,
+>                        int64_t *pnum, int64_t *map, BlockDriverState **file)
+>  {
+> -    int64_t ret;
+> -    int n;
+> -
+> -    assert(QEMU_IS_ALIGNED(offset | bytes, BDRV_SECTOR_SIZE));
+> -    assert(pnum);
+> -    /*
+> -     * The contract allows us to return pnum smaller than bytes, even
+> -     * if the next query would see the same status; we truncate the
+> -     * request to avoid overflowing the driver's 32-bit interface.
+> -     */
+> -    bytes = MIN(bytes, BDRV_REQUEST_MAX_BYTES);
 
-Somehow I messed up that post and it shows V8 when it should be V9.
+Is the limitation to BDRV_REQUEST_MAX_BYTES going away without being
+replaced by a new one in bdrv_co_block_status()? What protects us now
+from 32-bit truncation?
 
-You can get the simulator that it works with at=20
-
-https://sourceforge.net/projects/adevs/
-
-If nothing else, this simulator would give you a blue print for integration=
- with another tool.
-
-Jim
-
------Original Message-----
-From: Emilio G. Cota [mailto:cota@braap.org]=20
-Sent: Thursday, October 19, 2017 4:54 PM
-To: Matt
-Cc: qemu-devel@nongnu.org; Hajime Tazaki; Nutaro, James J.
-Subject: Re: [Qemu-devel] Running Qemu in discrete time/step by step
-
-On Thu, Oct 19, 2017 at 14:14:12 +0900, Matt wrote:
-(snip)
-> - VMSimint does nearly that, it runs Qemu in discrete time but
-> interface it with a JAVA simulator
-> http://www.ikr.uni-stuttgart.de/Content/Publications/Archive/We_SIMUTools=
-_2014_40209.pdf
-> (with the code http://www.ikr.uni-stuttgart.de/Content/IKRSimLib/Download=
-/)
-> - http://web.ornl.gov/~nutarojj/adevs/ does sthg similar too
-
-Nutaro's work to interface with QEMU has been posted on the list:
-  https://patchwork.kernel.org/patch/9572497/
-I'm Cc'ing him in case he's not subscribed to the list.
-
-
-> My questions would be:
-> 1/ do you know of any other related work ?
-
-Is QEMU's record/replay mode of any use to you? Note that as is the
-case with Nutaro's patch, you'll need icount mode (i.e. single-core)
-enabled.
-
-> 2/ I believe there is interest from the research side but would it be
-> possible to merge either approach or a similar one (adevs patch
-> doesn't seem too big ~500 lines), would that be of interest for the
-> Qemu comminity too ?
-> 3/ if yes to 2. How to proceed, which one would be favorite ? if no,
-> what should be improved ? or would that be a definitive no ?
-
-I think the adevs approach is reasonable. The patch hasn't gotten much
-attention I guess because not many people care about this feature.
-But if you could review the patch and certify that it works for you
-(i.e. it works with simulators other than adevs), that could only help
-the patch getting in.
-
-That said, I make no merging decisions so take this as just my opinion.
-
-Cheers,
-
-		Emilio
+Kevin
