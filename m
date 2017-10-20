@@ -1,21 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59045)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59300)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1e5YqM-0006oq-Aa
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 11:04:18 -0400
+	(envelope-from <dan.j.williams@intel.com>) id 1e5YrI-0007Xr-N5
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 11:05:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1e5YqG-00078t-K9
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 11:04:14 -0400
-Date: Fri, 20 Oct 2017 17:03:49 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20171020150349.GC3667@localhost.localdomain>
-References: <20171012034720.11947-1-eblake@redhat.com>
-	<20171012034720.11947-13-eblake@redhat.com>
+	(envelope-from <dan.j.williams@intel.com>) id 1e5YrH-00080w-Oj
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 11:05:12 -0400
+Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:47134)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <dan.j.williams@intel.com>)
+	id 1e5YrH-00080U-JD
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 11:05:11 -0400
+Received: by mail-oi0-x242.google.com with SMTP id h200so20463368oib.4
+	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 08:05:11 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171012034720.11947-13-eblake@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v6 12/24] block: Convert
- bdrv_get_block_status_above() to bytes
+In-Reply-To: <20171020080049.GA25471@infradead.org>
+References: <20171012155027.3277-1-pagupta@redhat.com>
+	<20171012155027.3277-3-pagupta@redhat.com>
+	<20171017071633.GA9207@infradead.org>
+	<1441791227.21027037.1508226056893.JavaMail.zimbra@redhat.com>
+	<20171017080236.GA27649@infradead.org>
+	<670833322.21037148.1508229041158.JavaMail.zimbra@redhat.com>
+	<20171018130339.GB29767@stefanha-x1.localdomain>
+	<CAPcyv4h6aFkyHhh4R4DTznbSCLf9CuBoszk0Q1gB5EKNcp_SeQ@mail.gmail.com>
+	<20171019080149.GB10089@infradead.org>
+	<CAPcyv4j=Cdp68C15HddKaErpve2UGRfSTiL6bHiS=3gQybz9pg@mail.gmail.com>
+	<20171020080049.GA25471@infradead.org>
+From: Dan Williams <dan.j.williams@intel.com>
+Date: Fri, 20 Oct 2017 08:05:09 -0700
+Message-ID: <CAPcyv4hHjCpm4AnLz2SdtjNMasV182Cw-jA+Cv9DjmE1Fa26kA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [RFC 2/2] KVM: add virtio-pmem driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,58 +38,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, famz@redhat.com, jsnow@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>, Jeff Cody <jcody@redhat.com>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, Pankaj Gupta <pagupta@redhat.com>, Kevin Wolf <kwolf@redhat.com>, haozhong zhang <haozhong.zhang@intel.com>, Jan Kara <jack@suse.cz>, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>, KVM list <kvm@vger.kernel.org>, David Hildenbrand <david@redhat.com>, linux-nvdimm <linux-nvdimm@ml01.01.org>, ross zwisler <ross.zwisler@intel.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Qemu Developers <qemu-devel@nongnu.org>, Linux MM <linux-mm@kvack.org>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Nitesh Narayan Lal <nilal@redhat.com>
 
-Am 12.10.2017 um 05:47 hat Eric Blake geschrieben:
-> We are gradually moving away from sector-based interfaces, towards
-> byte-based.  In the common case, allocation is unlikely to ever use
-> values that are not naturally sector-aligned, but it is possible
-> that byte-based values will let us be more precise about allocation
-> at the end of an unaligned file that can do byte-based access.
-> 
-> Changing the name of the function from bdrv_get_block_status_above()
-> to bdrv_block_status_above() ensures that the compiler enforces that
-> all callers are updated.  Likewise, since it a byte interface allows
-> an offset mapping that might not be sector aligned, split the mapping
-> out of the return value and into a pass-by-reference parameter.  For
-> now, the io.c layer still assert()s that all uses are sector-aligned,
-> but that can be relaxed when a later patch implements byte-based
-> block status in the drivers.
-> 
-> For the most part this patch is just the addition of scaling at the
-> callers followed by inverse scaling at bdrv_block_status(), plus
-> updates for the new split return interface.  But some code,
-> particularly bdrv_block_status(), gets a lot simpler because it no
-> longer has to mess with sectors.  Likewise, mirror code no longer
-> computes s->granularity >> BDRV_SECTOR_BITS, and can therefore drop
-> an assertion about alignment because the loop no longer depends on
-> alignment (never mind that we don't really have a driver that
-> reports sub-sector alignments, so it's not really possible to test
-> the effect of sub-sector mirroring).  Fix a neighboring assertion to
-> use is_power_of_2 while there.
-> 
-> For ease of review, bdrv_get_block_status() was tackled separately.
-> 
-> Signed-off-by: Eric Blake <eblake@redhat.com>
+On Fri, Oct 20, 2017 at 1:00 AM, Christoph Hellwig <hch@infradead.org> wrote:
+> On Thu, Oct 19, 2017 at 11:21:26AM -0700, Dan Williams wrote:
+>> The difference is that nvdimm_flush() is not mandatory, and that the
+>> platform will automatically perform the same flush at power-fail.
+>> Applications should be able to assume that if they are using MAP_SYNC
+>> that no other coordination with the kernel or the hypervisor is
+>> necessary.
+>>
+>> Advertising this as a generic Persistent Memory range to the guest
+>> means that the guest could theoretically use it with device-dax where
+>> there is no driver or filesystem sync interface. The hypervisor will
+>> be waiting for flush notifications and the guest will just issue cache
+>> flushes and sfence instructions. So, as far as I can see we need to
+>> differentiate this virtio-model from standard "Persistent Memory" to
+>> the guest and remove the possibility of guests/applications making the
+>> wrong assumption.
+>
+> So add a flag that it is not.  We already have the nd_volatile type,
+> that is special.  For now only in Linux, but I think adding this type
+> to the spec eventually would be very useful for efficiently exposing
+> directly mappable device to VM guests.
 
->  int bdrv_block_status(BlockDriverState *bs, int64_t offset, int64_t bytes,
->                        int64_t *pnum, int64_t *map, BlockDriverState **file)
->  {
-> -    int64_t ret;
-> -    int n;
-> -
-> -    assert(QEMU_IS_ALIGNED(offset | bytes, BDRV_SECTOR_SIZE));
-> -    assert(pnum);
-> -    /*
-> -     * The contract allows us to return pnum smaller than bytes, even
-> -     * if the next query would see the same status; we truncate the
-> -     * request to avoid overflowing the driver's 32-bit interface.
-> -     */
-> -    bytes = MIN(bytes, BDRV_REQUEST_MAX_BYTES);
+Right, that's the same recommendation I gave.
 
-Is the limitation to BDRV_REQUEST_MAX_BYTES going away without being
-replaced by a new one in bdrv_co_block_status()? What protects us now
-from 32-bit truncation?
+    https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg08404.html
 
-Kevin
+...so maybe I'm misunderstanding your concern? It sounds like we're on
+the same page.
