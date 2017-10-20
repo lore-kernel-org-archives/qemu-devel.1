@@ -1,40 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43091)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44535)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1e5WOf-0007e1-PP
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 08:27:30 -0400
+	(envelope-from <bounces@canonical.com>) id 1e5WS4-00023g-Jq
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 08:31:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1e5WOa-0005Jx-Mz
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 08:27:29 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:51308)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1e5WOa-0005Jm-EV
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 08:27:24 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v9KCQCIB007738
-	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 08:27:20 -0400
-Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2dqg1mbt8d-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 08:27:20 -0400
-Received: from localhost
-	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Fri, 20 Oct 2017 13:27:17 +0100
-References: <20171020102517.28385-1-borntraeger@de.ibm.com>
-	<20171020133100.1dcec567.cohuck@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Fri, 20 Oct 2017 14:27:12 +0200
+	(envelope-from <bounces@canonical.com>) id 1e5WRz-00078f-H4
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 08:31:00 -0400
+Received: from indium.canonical.com ([91.189.90.7]:60714)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1e5WRz-00078K-AX
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 08:30:55 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1e5WRx-0003wE-Ti
+	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 12:30:53 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id DFB7D2E80C8
+	for <qemu-devel@nongnu.org>; Fri, 20 Oct 2017 12:30:53 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20171020133100.1dcec567.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <83d262ee-47e8-61c7-77cd-bbfc53d692c5@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH] s390-ccw: print carriage return with new
- lines
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 20 Oct 2017 12:19:20 -0000
+From: Christophe Lyon <christophe.lyon+launchpad@gmail.com>
+Reply-To: Bug 1725267 <1725267@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150850189101.17148.14929440782690831821.malonedeb@wampee.canonical.com>
+Message-Id: <150850196079.17731.1206107048143261694.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1725267] Re: armeb regression since qemu version
+ 2.8
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,49 +37,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Richard Henderson <rth@twiddle.net>, Bjoern Walk <bwalk@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, "Jason J . Herne" <jjherne@linux.vnet.ibm.com>, "Collin L. Walling" <walling@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org
 
+** Attachment added: "execution trace with qemu-2.7"
+   https://bugs.launchpad.net/qemu/+bug/1725267/+attachment/4978668/+files/=
+trace.2.7
 
+-- =
 
-On 10/20/2017 01:31 PM, Cornelia Huck wrote:
-> On Fri, 20 Oct 2017 12:25:17 +0200
-> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
-> 
->> From: "Collin L. Walling" <walling@linux.vnet.ibm.com>
->>
->> The sclp console in the s390 bios writes raw data,
->> leading console emulators (such as virsh console) to
->> treat a new line ('\n') as just a new line instead
->> of as a Unix line feed. Because of this, output
->> appears in a "stair case" pattern.
->>
->> Let's print \r\n on every occurrence of a new line
->> in the string passed to write to amend this issue.
->>
->> This is in sync with the guest Linux code in
->> drivers/s390/char/sclp_vt220.c which also does a line feed
->> conversion  in the console part of the driver. 
->>
->> This fixes the s390-ccw and s390-netboot output like
->> $ virsh start test --console
->> Domain test started
->> Connected to domain test
->> Escape character is ^]
->> Network boot starting...
->>                           Using MAC address: 02:01:02:03:04:05
->>                                                                 Requesting information via DHCP:  010
->>
->> Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
->> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
->> ---
->>  pc-bios/s390-ccw/s390-ccw.h |  3 +++
->>  pc-bios/s390-ccw/sclp.c     | 17 ++++++++++++++---
->>  2 files changed, 17 insertions(+), 3 deletions(-)
-> 
-> I'd defer that to a second pullreq before softfreeze where we can
-> collect the stragglers (currently building a pullreq). And I'd also
-> like to delegate that second pullreq to you, as I'll be busy/offline
-> after KVM Forum.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1725267
 
-Sure I can do that in a 2nd pull req after KVM forum.
+Title:
+  armeb regression since qemu version 2.8
+
+Status in QEMU:
+  New
+
+Bug description:
+  Hi,
+
+  I have noticed a regression when I upgraded from qemu-armeb 2.7 to
+  2.8, and the problem is still present with version 2.10.1.
+
+  I am using qemu for GCC validation, noticed problems with testcases
+  involving atomics, I'm attaching here atomic-exchange-4.exe.
+
+  # with 2.7:
+  $ qemu-armeb -cpu any -R 0 -L $PWD -E LD_LIBRARY_PATH=3D$PWD/lib $PWD/ato=
+mic-exchange-4.exe
+  $ echo $?
+  0
+  # with 2.8, 2.10.1:
+  $ qemu-armeb -cpu any -R 0 -L $PWD -E LD_LIBRARY_PATH=3D$PWD/lib $PWD/ato=
+mic-exchange-4.exe
+  qemu: uncaught target signal 6 (Aborted) - core dumped
+  Aborted (core dumped)
+  $ echo $?
+  134
+
+  The source code is gcc/testsuite/gcc.dg/atomic-exchange-4.c
+
+  Running with -d in_asm shows a difference early in the startup code:
+  IN: _dl_sysdep_start
+  [...]
+  0x40a17790:  908ff103      addls	pc, pc, r3, lsl #2
+
+  and then the next address is not the same with qemu 2.7 and 2.10.1
+
+  I hope you have enough data/information to reproduce and confirm/fix
+  the problem.
+
+  Thanks
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1725267/+subscriptions
