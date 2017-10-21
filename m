@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60023)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45335)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <francisco.iglesias@feimtech.se>) id 1e5wxv-0003jp-9h
-	for qemu-devel@nongnu.org; Sat, 21 Oct 2017 12:49:39 -0400
+	(envelope-from <sstabellini@kernel.org>) id 1e5y9f-0007zO-Qa
+	for qemu-devel@nongnu.org; Sat, 21 Oct 2017 14:05:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <francisco.iglesias@feimtech.se>) id 1e5wxu-0005CS-JE
-	for qemu-devel@nongnu.org; Sat, 21 Oct 2017 12:49:39 -0400
-Received: from ec2-52-28-205-119.eu-central-1.compute.amazonaws.com
-	([52.28.205.119]:57302
-	helo=ip-172-31-28-221.eu-central-1.compute.internal)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <francisco.iglesias@feimtech.se>)
-	id 1e5wxu-00057W-DB
-	for qemu-devel@nongnu.org; Sat, 21 Oct 2017 12:49:38 -0400
-From: Francisco Iglesias <francisco.iglesias@feimtech.se>
-Date: Sat, 21 Oct 2017 16:35:13 +0200
-Message-Id: <20171021143521.31685-5-francisco.iglesias@feimtech.se>
-In-Reply-To: <20171021143521.31685-1-francisco.iglesias@feimtech.se>
-References: <20171021143521.31685-1-francisco.iglesias@feimtech.se>
-Subject: [Qemu-devel] [PATCH 04/12] m25p80: Add support for n25q512a11 and
- n25q512a13
+	(envelope-from <sstabellini@kernel.org>) id 1e5y9e-00027D-Ru
+	for qemu-devel@nongnu.org; Sat, 21 Oct 2017 14:05:51 -0400
+Date: Sat, 21 Oct 2017 11:05:41 -0700 (PDT)
+From: Stefano Stabellini <sstabellini@kernel.org>
+In-Reply-To: <CAFEAcA8uH1+V4uYsA=XuuxHOLKvLyZ56ieAaS5K9QNoLYspOsQ@mail.gmail.com>
+Message-ID: <alpine.DEB.2.10.1710201110160.27209@sstabellini-ThinkPad-X260>
+References: <alpine.DEB.2.10.1710181439060.27209@sstabellini-ThinkPad-X260>
+	<CAFEAcA_v=UsQ4hfn2oVLt3MPU3yJUnHLfzZHrdkstQ0VVgSDbw@mail.gmail.com>
+	<alpine.DEB.2.10.1710191354020.27209@sstabellini-ThinkPad-X260>
+	<CAFEAcA8uH1+V4uYsA=XuuxHOLKvLyZ56ieAaS5K9QNoLYspOsQ@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: Re: [Qemu-devel] [PATCH] fix WFI/WFE length in syndrome register
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,28 +24,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, francisco.iglesias@feimtech.se
-Cc: edgari@xilinx.com, alistai@xilinx.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Stefano Stabellini <sstabellini@kernel.org>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Julien Grall <julien.grall@linaro.org>
 
-Add support for Micron (Numonyx) n25q512a11 and n25q512a13 flashes.
+On Fri, 20 Oct 2017, Peter Maydell wrote:
+> On 19 October 2017 at 21:56, Stefano Stabellini <sstabellini@kernel.org> wrote:
+> > On Thu, 19 Oct 2017, Peter Maydell wrote:
+> >> On 18 October 2017 at 23:03, Stefano Stabellini <sstabellini@kernel.org> wrote:
+> >> > WFI/E are 4 bytes long: set ARM_EL_IL_SHIFT in the syndrome.
+> >> >
+> >> > Signed-off-by: Stefano Stabellini <sstabellini@kernel.org>
+> >> >
+> >> > diff --git a/target/arm/internals.h b/target/arm/internals.h
+> >> > index 1f6efef..cf8c966 100644
+> >> > --- a/target/arm/internals.h
+> >> > +++ b/target/arm/internals.h
+> >> > @@ -398,6 +398,7 @@ static inline uint32_t syn_breakpoint(int same_el)
+> >> >  static inline uint32_t syn_wfx(int cv, int cond, int ti)
+> >> >  {
+> >> >      return (EC_WFX_TRAP << ARM_EL_EC_SHIFT) |
+> >> > +           (1 << ARM_EL_IL_SHIFT) |
+> >> >             (cv << 24) | (cond << 20) | ti;
+> >> >  }
+> >>
+> >> Hmm. What we do now is definitely wrong, but WFI and WFE can be 2 bytes:
+> >> there is a T1 Thumb encoding that is 2 bytes.
+> >>
+> >> HELPER(wfi) doesn't get that right, though:
+> >>     if (target_el) {
+> >>         env->pc -= 4;
+> >>         raise_exception(env, EXCP_UDEF, syn_wfx(1, 0xe, 0), target_el);
+> >>     }
+> >>
+> >> So I think that HELPER(wfi) needs to be passed an extra
+> >> parameter is_16bit, which it can then use both in its adjustment
+> >> of env->pc and to pass as an extra parameter to syn_wfx(),
+> >> which is then syn_wfx(int cv, int cond, int ti, bool is_16bit).
+> >>
+> >> (In theory HELPER(wfe) should also be passed is_16bit, but
+> >> since it doesn't currently ever raise an exception it
+> >> doesn't matter.)
+> >
+> > Wouldn't it be better to just check on env->thumb like
+> > HELPER(cpsr_write_eret) for example?
+> 
+> > diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
+> > index 3914145..ea16c9a 100644
+> > --- a/target/arm/op_helper.c
+> > +++ b/target/arm/op_helper.c
+> > @@ -476,8 +476,8 @@ void HELPER(wfi)(CPUARMState *env)
+> >      }
+> >
+> >      if (target_el) {
+> > -        env->pc -= 4;
+> > -        raise_exception(env, EXCP_UDEF, syn_wfx(1, 0xe, 0), target_el);
+> > +        env->pc -= env->thumb ? 2 : 4;
+> > +        raise_exception(env, EXCP_UDEF, syn_wfx(1, 0xe, 0, env->thumb), target_el);
+> >      }
+> >
+> >      cs->exception_index = EXCP_HLT;
+> 
+> This doesn't work, because there is also a 32 bit Thumb
+> encoding of WFI. env->thumb says "we are in thumb mode",
+> which isn't the same as "this insn is 16 bits".
 
-Signed-off-by: Francisco Iglesias <francisco.iglesias@feimtech.se>
----
- hw/block/m25p80.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/hw/block/m25p80.c b/hw/block/m25p80.c
-index 3d2975c..7f3fcc4 100644
---- a/hw/block/m25p80.c
-+++ b/hw/block/m25p80.c
-@@ -240,6 +240,8 @@ static const FlashPartInfo known_devices[] = {
-     { INFO("n25q128a13",  0x20ba18,      0,  64 << 10, 256, ER_4K) },
-     { INFO("n25q256a11",  0x20bb19,      0,  64 << 10, 512, ER_4K) },
-     { INFO("n25q256a13",  0x20ba19,      0,  64 << 10, 512, ER_4K) },
-+    { INFO("n25q512a11",  0x20bb20,      0,  64 << 10, 1024, ER_4K) },
-+    { INFO("n25q512a13",  0x20ba20,      0,  64 << 10, 1024, ER_4K) },
-     { INFO("n25q128",     0x20ba18,      0,  64 << 10, 256, 0) },
-     { INFO("n25q256a",    0x20ba19,      0,  64 << 10, 512, ER_4K) },
-     { INFO("n25q512a",    0x20ba20,      0,  64 << 10, 1024, ER_4K) },
--- 
-2.9.3
+OK, I understand your suggestion now. I'll send a new patch.
