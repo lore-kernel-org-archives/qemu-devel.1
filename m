@@ -1,16 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45041)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39671)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Paul.Burton@mips.com>) id 1e5gbr-0006wU-KZ
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 19:21:48 -0400
+	(envelope-from <cota@braap.org>) id 1e5jc9-0001gG-6L
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 22:34:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Paul.Burton@mips.com>) id 1e5gbo-00087Q-3V
-	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 19:21:47 -0400
-From: Paul Burton <paul.burton@mips.com>
-Date: Fri, 20 Oct 2017 16:21:14 -0700
-Message-ID: <20171020232114.5475-1-paul.burton@mips.com>
+	(envelope-from <cota@braap.org>) id 1e5jc6-0000sR-3O
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 22:34:17 -0400
+Received: from out4-smtp.messagingengine.com ([66.111.4.28]:38881)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1e5jc5-0000pl-Pd
+	for qemu-devel@nongnu.org; Fri, 20 Oct 2017 22:34:14 -0400
+Date: Fri, 20 Oct 2017 22:34:10 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20171021023410.GA27478@flamenco>
+References: <20171016172609.23422-1-richard.henderson@linaro.org>
+	<20171018224518.GA28532@flamenco>
+	<5381cf3d-00c9-1c05-c973-5934311d654d@redhat.com>
+	<20171019201149.GA15218@flamenco>
+	<64241d68-b526-3dc1-a264-fa9e6d634527@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH] Update Paul Burton's email address
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <64241d68-b526-3dc1-a264-fa9e6d634527@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v6 00/50] tcg tb_lock removal
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,58 +30,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Yongbok Kim <yongbok.kim@mips.com>
-Cc: Paul Burton <paul.burton@imgtec.com>, Laurent Vivier <laurent@vivier.eu>, Michael Tokarev <mjt@tls.msk.ru>, Yongbok Kim <yongbok.kim@imgtec.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 
-From: Paul Burton <paul.burton@imgtec.com>
+On Fri, Oct 20, 2017 at 09:10:38 +0200, Paolo Bonzini wrote:
+> >> 2) in tb_for_each_tagged_safe, could the "prev" argument instead be
+> >> "next", like
+> > 
+> > Is this just to make them closer to the macros in queue.h?
+> > 
+> > In this case tracking *prev in the loop (rather than next) is
+> > useful because it makes removing the "current" element very simple:
+> 
+> This actually makes a lot of sense.  Maybe we should change queue.h the
+> other way. ;)
 
-Update my email address from paul.burton@imgtec.com to
-paul.burton@mips.com, since MIPS will soon no longer be a part of
-Imagination Technologies & as such the @imgtec.com address will soon
-cease to function.
+Turns out this works here but it isn't as general-purpose as it
+might look. In this case it works because we don't free the tb. If
+we did, then we'd either need a branch in the iterator or a third
+*next pointer.
 
-A mapping is added in .mailmap such that git reports the new @mips.com
-address, and get_maintainer.pl in turn reports it when examining git
-history. Whilst here add a mapping for my also-defunct
-paul@archlinuxmips.org email address too.
+In fact, the macro wouldn't be safe even if it tracked *next, since
+on a removal *pprev must not be updated to the removed item.
+IOW, the caller must be the one keeping track of *pprev, for otherwise
+things break after the first removal. (Again, this doesn't affect this
+particular instance, because its only caller stops iterating after
+a removal.)
 
-Signed-off-by: Paul Burton <paul.burton@imgtec.com>
-Cc: Laurent Vivier <laurent@vivier.eu>
-Cc: Michael Tokarev <mjt@tls.msk.ru>
-Cc: Yongbok Kim <yongbok.kim@imgtec.com>
-Cc: Yongbok Kim <yongbok.kim@mips.com>
-Cc: qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org
----
- .mailmap    | 2 ++
- MAINTAINERS | 2 +-
- 2 files changed, 3 insertions(+), 1 deletion(-)
+I have therefore given up on the macro and changed its only caller to
+update *pprev. IMO it's less pretty, but more robust.
 
-diff --git a/.mailmap b/.mailmap
-index 28defa1b2c..dda7e3fa5f 100644
---- a/.mailmap
-+++ b/.mailmap
-@@ -10,6 +10,8 @@ Edgar E. Iglesias <edgar.iglesias@gmail.com> edgar_igl <edgar_igl@c046a42c-6fe2-
- Fabrice Bellard <fabrice@bellard.org> bellard <bellard@c046a42c-6fe2-441c-8c8c-71466251a162>
- Jocelyn Mayer <l_indien@magic.fr> j_mayer <j_mayer@c046a42c-6fe2-441c-8c8c-71466251a162>
- Paul Brook <paul@codesourcery.com> pbrook <pbrook@c046a42c-6fe2-441c-8c8c-71466251a162>
-+Paul Burton <paul.burton@mips.com> <paul.burton@imgtec.com>
-+Paul Burton <paul.burton@mips.com> <paul@archlinuxmips.org>
- Thiemo Seufer <ths@networkno.de> ths <ths@c046a42c-6fe2-441c-8c8c-71466251a162>
- malc <av1474@comtv.ru> malc <malc@c046a42c-6fe2-441c-8c8c-71466251a162>
- # There is also a:
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 12175425a7..0a400c57c4 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -642,7 +642,7 @@ S: Odd Fixes
- F: hw/mips/mips_fulong2e.c
- 
- Boston
--M: Paul Burton <paul.burton@imgtec.com>
-+M: Paul Burton <paul.burton@mips.com>
- S: Maintained
- F: hw/core/loader-fit.c
- F: hw/mips/boston.c
--- 
-2.14.2
+The updated branch with the changes you suggested (plus the above) is
+available at:
+  https://github.com/cota/qemu/tree/multi-tcg-v6-plus2
+
+Thanks,
+
+		Emilio
