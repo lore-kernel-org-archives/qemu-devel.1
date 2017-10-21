@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47580)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47751)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <frasse.iglesias@gmail.com>) id 1e61j0-0000OS-OJ
-	for qemu-devel@nongnu.org; Sat, 21 Oct 2017 17:54:35 -0400
+	(envelope-from <frasse.iglesias@gmail.com>) id 1e61j9-0000Qw-Fy
+	for qemu-devel@nongnu.org; Sat, 21 Oct 2017 17:54:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <frasse.iglesias@gmail.com>) id 1e61iz-0002PF-Jz
-	for qemu-devel@nongnu.org; Sat, 21 Oct 2017 17:54:34 -0400
-Received: from mail-lf0-x242.google.com ([2a00:1450:4010:c07::242]:54759)
+	(envelope-from <frasse.iglesias@gmail.com>) id 1e61j7-0002we-T0
+	for qemu-devel@nongnu.org; Sat, 21 Oct 2017 17:54:43 -0400
+Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:53846)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <frasse.iglesias@gmail.com>)
-	id 1e61iz-0002M7-D7
-	for qemu-devel@nongnu.org; Sat, 21 Oct 2017 17:54:33 -0400
-Received: by mail-lf0-x242.google.com with SMTP id d10so16435543lfg.11
-	for <qemu-devel@nongnu.org>; Sat, 21 Oct 2017 14:54:33 -0700 (PDT)
+	id 1e61j7-0002s1-MA
+	for qemu-devel@nongnu.org; Sat, 21 Oct 2017 17:54:41 -0400
+Received: by mail-lf0-x241.google.com with SMTP id l23so16439241lfk.10
+	for <qemu-devel@nongnu.org>; Sat, 21 Oct 2017 14:54:41 -0700 (PDT)
 From: Francisco Iglesias <frasse.iglesias@gmail.com>
-Date: Sat, 21 Oct 2017 23:54:14 +0200
-Message-Id: <20171021215420.19787-7-frasse.iglesias@gmail.com>
+Date: Sat, 21 Oct 2017 23:54:20 +0200
+Message-Id: <20171021215420.19787-13-frasse.iglesias@gmail.com>
 In-Reply-To: <20171021215420.19787-1-frasse.iglesias@gmail.com>
 References: <20171021215420.19787-1-frasse.iglesias@gmail.com>
-Subject: [Qemu-devel] [PATCH v2 06/12] xilinx_spips: Update striping to be
- big-endian bit order
+Subject: [Qemu-devel] [PATCH v2 12/12] xlnx-zcu102: Add support for the
+ ZynqMP QSPI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,67 +30,121 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: edgari@xilinx.com, alistai@xilinx.com, francisco.iglesias@feimtech.se
 
-Update striping functionality to be big-endian bit order and output even
-bits into lower memory and odd bits into upper.
+Add support for the ZynqMP QSPI and connect Numonyx n25q512a11 flashes
+to it.
 
 Signed-off-by: Francisco Iglesias <frasse.iglesias@gmail.com>
 ---
- hw/ssi/xilinx_spips.c | 19 ++++++++++---------
- 1 file changed, 10 insertions(+), 9 deletions(-)
+ hw/arm/xlnx-zcu102.c         | 23 +++++++++++++++++++++++
+ hw/arm/xlnx-zynqmp.c         | 24 ++++++++++++++++++++++++
+ include/hw/arm/xlnx-zynqmp.h |  5 +++++
+ 3 files changed, 52 insertions(+)
 
-diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
-index 93b9e43..d052fc6 100644
---- a/hw/ssi/xilinx_spips.c
-+++ b/hw/ssi/xilinx_spips.c
-@@ -209,14 +209,14 @@ static void xilinx_spips_reset(DeviceState *d)
-     xilinx_spips_update_cs_lines(s);
- }
- 
--/* N way (num) in place bit striper. Lay out row wise bits (LSB to MSB)
-+/* N way (num) in place bit striper. Lay out row wise bits (MSB to LSB)
-  * column wise (from element 0 to N-1). num is the length of x, and dir
-  * reverses the direction of the transform. Best illustrated by example:
-  * Each digit in the below array is a single bit (num == 3):
-  *
-- * {{ 76543210, }  ----- stripe (dir == false) -----> {{ FCheb630, }
-- *  { hgfedcba, }                                      { GDAfc741, }
-- *  { HGFEDCBA, }} <---- upstripe (dir == true) -----  { HEBgda52, }}
-+ * {{ 76543210, }  ----- stripe (dir == false) -----> {{ 741gdaFC, }
-+ *  { hgfedcba, }                                      { 630fcHEB, }
-+ *  { HGFEDCBA, }} <---- upstripe (dir == true) -----  { 52hebGDA, }}
-  */
- 
- static inline void stripe8(uint8_t *x, int num, bool dir)
-@@ -224,15 +224,15 @@ static inline void stripe8(uint8_t *x, int num, bool dir)
-     uint8_t r[num];
-     memset(r, 0, sizeof(uint8_t) * num);
-     int idx[2] = {0, 0};
--    int bit[2] = {0, 0};
-+    int bit[2] = {0, 7};
-     int d = dir;
- 
-     for (idx[0] = 0; idx[0] < num; ++idx[0]) {
--        for (bit[0] = 0; bit[0] < 8; ++bit[0]) {
--            r[idx[d]] |= x[idx[!d]] & 1 << bit[!d] ? 1 << bit[d] : 0;
-+        for (bit[0] = 7; bit[0] != -1; bit[0] += -1) {
-+            r[idx[!d]] |= x[idx[d]] & 1 << bit[d] ? 1 << bit[!d] : 0;
-             idx[1] = (idx[1] + 1) % num;
-             if (!idx[1]) {
--                bit[1]++;
-+                bit[1] += -1;
-             }
-         }
+diff --git a/hw/arm/xlnx-zcu102.c b/hw/arm/xlnx-zcu102.c
+index 519a16e..7d61972 100644
+--- a/hw/arm/xlnx-zcu102.c
++++ b/hw/arm/xlnx-zcu102.c
+@@ -150,6 +150,29 @@ static void xlnx_zynqmp_init(XlnxZCU102 *s, MachineState *machine)
+         sysbus_connect_irq(SYS_BUS_DEVICE(&s->soc.spi[i]), 1, cs_line);
      }
-@@ -267,8 +267,9 @@ static void xilinx_spips_flush_txfifo(XilinxSPIPS *s)
-         }
  
-         for (i = 0; i < num_effective_busses(s); ++i) {
-+            int bus = num_effective_busses(s) - 1 - i;
-             DB_PRINT_L(debug_level, "tx = %02x\n", tx_rx[i]);
--            tx_rx[i] = ssi_transfer(s->spi[i], (uint32_t)tx_rx[i]);
-+            tx_rx[i] = ssi_transfer(s->spi[bus], (uint32_t)tx_rx[i]);
-             DB_PRINT_L(debug_level, "rx = %02x\n", tx_rx[i]);
-         }
++    for (i = 0; i < XLNX_ZYNQMP_NUM_QSPI_FLASH; i++) {
++        SSIBus *spi_bus;
++        DeviceState *flash_dev;
++        qemu_irq cs_line;
++        DriveInfo *dinfo = drive_get_next(IF_MTD);
++        int bus = i / XLNX_ZYNQMP_NUM_QSPI_BUS_CS;
++        gchar *bus_name = g_strdup_printf("qspi%d", bus);
++
++        spi_bus = (SSIBus *)qdev_get_child_bus(DEVICE(&s->soc), bus_name);
++        g_free(bus_name);
++
++        flash_dev = ssi_create_slave_no_init(spi_bus, "n25q512a11");
++        if (dinfo) {
++            qdev_prop_set_drive(flash_dev, "drive", blk_by_legacy_dinfo(dinfo),
++                                &error_fatal);
++        }
++        qdev_init_nofail(flash_dev);
++
++        cs_line = qdev_get_gpio_in_named(flash_dev, SSI_GPIO_CS, 0);
++
++        sysbus_connect_irq(SYS_BUS_DEVICE(&s->soc.qspi), i + 1, cs_line);
++    }
++
+     /* TODO create and connect IDE devices for ide_drive_get() */
+ 
+     xlnx_zcu102_binfo.ram_size = ram_size;
+diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
+index d4b6560..f7c8b4b 100644
+--- a/hw/arm/xlnx-zynqmp.c
++++ b/hw/arm/xlnx-zynqmp.c
+@@ -40,6 +40,10 @@
+ #define SATA_ADDR           0xFD0C0000
+ #define SATA_NUM_PORTS      2
+ 
++#define QSPI_ADDR           0xff0f0000
++#define LQSPI_ADDR          0xc0000000
++#define QSPI_IRQ            15
++
+ #define DP_ADDR             0xfd4a0000
+ #define DP_IRQ              113
+ 
+@@ -169,6 +173,9 @@ static void xlnx_zynqmp_init(Object *obj)
+         qdev_set_parent_bus(DEVICE(&s->spi[i]), sysbus_get_default());
+     }
+ 
++    object_initialize(&s->qspi, sizeof(s->qspi), TYPE_XLNX_ZYNQMP_QSPIPS);
++    qdev_set_parent_bus(DEVICE(&s->qspi), sysbus_get_default());
++
+     object_initialize(&s->dp, sizeof(s->dp), TYPE_XLNX_DP);
+     qdev_set_parent_bus(DEVICE(&s->dp), sysbus_get_default());
+ 
+@@ -405,6 +412,23 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
+         g_free(bus_name);
+     }
+ 
++    object_property_set_bool(OBJECT(&s->qspi), true, "realized", &err);
++    sysbus_mmio_map(SYS_BUS_DEVICE(&s->qspi), 0, QSPI_ADDR);
++    sysbus_mmio_map(SYS_BUS_DEVICE(&s->qspi), 1, LQSPI_ADDR);
++    sysbus_connect_irq(SYS_BUS_DEVICE(&s->qspi), 0, gic_spi[QSPI_IRQ]);
++    for (i = 0; i < XLNX_ZYNQMP_NUM_QSPI_BUS; i++) {
++        gchar *bus_name;
++        gchar *target_bus;
++        /* Alias controller SPI bus to the SoC itself */
++        bus_name = g_strdup_printf("qspi%d", i);
++        target_bus = g_strdup_printf("spi%d", i);
++        object_property_add_alias(OBJECT(s), bus_name,
++                                  OBJECT(&s->qspi), target_bus,
++                                  &error_abort);
++        g_free(bus_name);
++        g_free(target_bus);
++    }
++
+     object_property_set_bool(OBJECT(&s->dp), true, "realized", &err);
+     if (err) {
+         error_propagate(errp, err);
+diff --git a/include/hw/arm/xlnx-zynqmp.h b/include/hw/arm/xlnx-zynqmp.h
+index 6eff81a..3e6fb9b 100644
+--- a/include/hw/arm/xlnx-zynqmp.h
++++ b/include/hw/arm/xlnx-zynqmp.h
+@@ -40,6 +40,10 @@
+ #define XLNX_ZYNQMP_NUM_SDHCI 2
+ #define XLNX_ZYNQMP_NUM_SPIS 2
+ 
++#define XLNX_ZYNQMP_NUM_QSPI_BUS 2
++#define XLNX_ZYNQMP_NUM_QSPI_BUS_CS 2
++#define XLNX_ZYNQMP_NUM_QSPI_FLASH 4
++
+ #define XLNX_ZYNQMP_NUM_OCM_BANKS 4
+ #define XLNX_ZYNQMP_OCM_RAM_0_ADDRESS 0xFFFC0000
+ #define XLNX_ZYNQMP_OCM_RAM_SIZE 0x10000
+@@ -83,6 +87,7 @@ typedef struct XlnxZynqMPState {
+     SysbusAHCIState sata;
+     SDHCIState sdhci[XLNX_ZYNQMP_NUM_SDHCI];
+     XilinxSPIPS spi[XLNX_ZYNQMP_NUM_SPIS];
++    XlnxZynqMPQSPIPS qspi;
+     XlnxDPState dp;
+     XlnxDPDMAState dpdma;
  
 -- 
 2.9.3
