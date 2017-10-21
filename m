@@ -1,29 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35653)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52993)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e5qsv-00048H-60
-	for qemu-devel@nongnu.org; Sat, 21 Oct 2017 06:20:06 -0400
+	(envelope-from <balaton@eik.bme.hu>) id 1e5t6f-0006Xs-V2
+	for qemu-devel@nongnu.org; Sat, 21 Oct 2017 08:42:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e5qsu-0008GJ-8h
-	for qemu-devel@nongnu.org; Sat, 21 Oct 2017 06:20:05 -0400
-Received: from mail-wr0-x22b.google.com ([2a00:1450:400c:c0c::22b]:45721)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1e5qsu-0008G8-2v
-	for qemu-devel@nongnu.org; Sat, 21 Oct 2017 06:20:04 -0400
-Received: by mail-wr0-x22b.google.com with SMTP id y9so1006460wrb.2
-	for <qemu-devel@nongnu.org>; Sat, 21 Oct 2017 03:20:04 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <ae32fdee-2233-a99a-1fc9-0da58cf4d846@weilnetz.de>
-References: <1508443483-5429-1-git-send-email-alindsay@codeaurora.org>
-	<CAFEAcA-R-3F8US1RGJVNyVnC81z9+1dd3Liq0tmVSNz1eDszbA@mail.gmail.com>
-	<3d46d0f4463f337593b7347812f2de7e@codeaurora.org>
-	<ae32fdee-2233-a99a-1fc9-0da58cf4d846@weilnetz.de>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sat, 21 Oct 2017 11:19:42 +0100
-Message-ID: <CAFEAcA_KQyBAQ_cjTr8-pqSAibJOFc1mQF0yFgNyQNyzn8NzGg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] build: Don't force preserving permissions
- on config-devices.mak.old
+	(envelope-from <balaton@eik.bme.hu>) id 1e5t6c-0000az-Sy
+	for qemu-devel@nongnu.org; Sat, 21 Oct 2017 08:42:26 -0400
+Received: from zero.eik.bme.hu ([152.66.115.2]:11559)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1e5t6c-0000Y9-HZ
+	for qemu-devel@nongnu.org; Sat, 21 Oct 2017 08:42:22 -0400
+From: BALATON Zoltan <balaton@eik.bme.hu>
+Date: Sat, 21 Oct 2017 13:24:51 +0200
+Message-Id: <20171021124213.84AEC7456EF@zero.eik.bme.hu>
+Subject: [Qemu-devel] [PATCH] exec: Fix section_covers_addr() for sections
+ with non-zero offset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,30 +22,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Weil <sw@weilnetz.de>
-Cc: Aaron Lindsay <alindsay@codeaurora.org>, QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, Paul Brook <paul@codesourcery.com>
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Fam Zheng <famz@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
-On 20 October 2017 at 20:08, Stefan Weil <sw@weilnetz.de> wrote:
-> Am 20.10.2017 um 20:24 schrieb alindsay@codeaurora.org:
->> On 2017-10-20 05:27, Peter Maydell wrote:
->>> Do we even need this code at all? As far as I can tell from
->>> the git logs, the idea is to support users who hand-modify
->>> config-devices.mak. But do we want to support that? I would
->>> think of config-devices.mak as an internal part of the build
->>> machinery, and the bit you can edit as a user is the stuff
->>> in default-configs/.
->
-> It's a long time since I wrote that code, but when I look at
-> the commit message for my commit 012f0879234, it was written
-> for users who do _not_ hand-modify config-devices.mak. They
-> had a problem when they updated the code from git and the
-> new version had changed some of the device configurations
-> which were used to build config-devices.mak.
+When a section with non-0 offset_within_region field is tested to
+cover an address the offset should be taken into account as well.
 
-Right, but it's only this complicated set of conditions
-because we seem to be also trying to support the hand-modify
-case. Otherwise we could just generate the new version
-and copy it into place if it's changed, unconditionally...
+This fixes a crash caused by picking the wrong memory region in
+address_space_lookup_region seen with client code accessing a device
+model that uses alias memory regions.
 
-thanks
--- PMM
+Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+---
+This seems to fix the problem described in
+http://lists.nongnu.org/archive/html/qemu-devel/2017-10/msg03356.html
+but I'm not completely sure about it. This seems to be introduced in
+729633c exec: Introduce AddressSpaceDispatch.mru_section and the patch
+before that which split off section_covers_addr from phys_page_find so
+this patch also changes that caller. Is that OK to do? It appears to
+work but I don't know this part of QEMU.
+
+Also the bug seems to be caused by section_covers_addr accepting
+sii3112.bar5 when that's the mru_section instead of picking
+sii3112.bar0 (which it picks when going through phys_page_find) when
+client code is accessing 0xc08001006 from this address map (full
+address map is at above URL):
+
+address-space: memory
+    0000000c08000000-0000000c0800ffff (prio 0, i/o): alias isa_mmio @io 0000000000000000-000000000000ffff
+
+address-space: I/O
+  0000000000000000-000000000000ffff (prio 0, i/o): io
+    0000000000001000-0000000000001007 (prio 1, i/o): alias sii3112.bar0 @sii3112.bar5 0000000000000080-0000000000000087
+    0000000000001008-000000000000100b (prio 1, i/o): alias sii3112.bar1 @sii3112.bar5 0000000000000088-000000000000008b
+    0000000000001010-0000000000001017 (prio 1, i/o): alias sii3112.bar2 @sii3112.bar5 00000000000000c0-00000000000000c7
+    0000000000001018-000000000000101b (prio 1, i/o): alias sii3112.bar3 @sii3112.bar5 00000000000000c8-00000000000000cb
+    0000000000001020-000000000000102f (prio 1, i/o): alias sii3112.bar4 @sii3112.bar5 0000000000000000-000000000000000f
+
+which this patch fixes but would the same problem happen if the
+mru_section is bar5 but bar4 is accessed? I could not reproduce that
+case but then the offset is 0 but in this case the address would be
+above 0xc08001020 and size is 0xf so they probably won't match. But
+this is only because of the size of the region. Could that mean the
+bug is caused by something else and should be fixed elsewhere?
+
+---
+ exec.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/exec.c b/exec.c
+index db5ae23..a915817 100644
+--- a/exec.c
++++ b/exec.c
+@@ -370,7 +370,8 @@ static inline bool section_covers_addr(const MemoryRegionSection *section,
+      * the section must cover the entire address space.
+      */
+     return int128_gethi(section->size) ||
+-           range_covers_byte(section->offset_within_address_space,
++           range_covers_byte(section->offset_within_address_space +
++                             section->offset_within_region,
+                              int128_getlo(section->size), addr);
+ }
+ 
+-- 
+2.7.6
