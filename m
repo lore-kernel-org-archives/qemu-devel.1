@@ -1,21 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45335)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46403)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1e5y9f-0007zO-Qa
-	for qemu-devel@nongnu.org; Sat, 21 Oct 2017 14:05:52 -0400
+	(envelope-from <sstabellini@kernel.org>) id 1e5yDP-0000fs-8q
+	for qemu-devel@nongnu.org; Sat, 21 Oct 2017 14:09:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1e5y9e-00027D-Ru
-	for qemu-devel@nongnu.org; Sat, 21 Oct 2017 14:05:51 -0400
-Date: Sat, 21 Oct 2017 11:05:41 -0700 (PDT)
+	(envelope-from <sstabellini@kernel.org>) id 1e5yDO-0004a8-0x
+	for qemu-devel@nongnu.org; Sat, 21 Oct 2017 14:09:43 -0400
+Date: Sat, 21 Oct 2017 11:09:33 -0700 (PDT)
 From: Stefano Stabellini <sstabellini@kernel.org>
-In-Reply-To: <CAFEAcA8uH1+V4uYsA=XuuxHOLKvLyZ56ieAaS5K9QNoLYspOsQ@mail.gmail.com>
-Message-ID: <alpine.DEB.2.10.1710201110160.27209@sstabellini-ThinkPad-X260>
-References: <alpine.DEB.2.10.1710181439060.27209@sstabellini-ThinkPad-X260>
-	<CAFEAcA_v=UsQ4hfn2oVLt3MPU3yJUnHLfzZHrdkstQ0VVgSDbw@mail.gmail.com>
-	<alpine.DEB.2.10.1710191354020.27209@sstabellini-ThinkPad-X260>
-	<CAFEAcA8uH1+V4uYsA=XuuxHOLKvLyZ56ieAaS5K9QNoLYspOsQ@mail.gmail.com>
+Message-ID: <alpine.DEB.2.10.1710211105550.27209@sstabellini-ThinkPad-X260>
 MIME-Version: 1.0
 Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: Re: [Qemu-devel] [PATCH] fix WFI/WFE length in syndrome register
+Subject: [Qemu-devel] [PATCH v2] fix WFI/WFE length in syndrome register
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,68 +19,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Stefano Stabellini <sstabellini@kernel.org>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Julien Grall <julien.grall@linaro.org>
+To: peter.maydell@linaro.org
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, sstabellini@kernel.org
 
-On Fri, 20 Oct 2017, Peter Maydell wrote:
-> On 19 October 2017 at 21:56, Stefano Stabellini <sstabellini@kernel.org> wrote:
-> > On Thu, 19 Oct 2017, Peter Maydell wrote:
-> >> On 18 October 2017 at 23:03, Stefano Stabellini <sstabellini@kernel.org> wrote:
-> >> > WFI/E are 4 bytes long: set ARM_EL_IL_SHIFT in the syndrome.
-> >> >
-> >> > Signed-off-by: Stefano Stabellini <sstabellini@kernel.org>
-> >> >
-> >> > diff --git a/target/arm/internals.h b/target/arm/internals.h
-> >> > index 1f6efef..cf8c966 100644
-> >> > --- a/target/arm/internals.h
-> >> > +++ b/target/arm/internals.h
-> >> > @@ -398,6 +398,7 @@ static inline uint32_t syn_breakpoint(int same_el)
-> >> >  static inline uint32_t syn_wfx(int cv, int cond, int ti)
-> >> >  {
-> >> >      return (EC_WFX_TRAP << ARM_EL_EC_SHIFT) |
-> >> > +           (1 << ARM_EL_IL_SHIFT) |
-> >> >             (cv << 24) | (cond << 20) | ti;
-> >> >  }
-> >>
-> >> Hmm. What we do now is definitely wrong, but WFI and WFE can be 2 bytes:
-> >> there is a T1 Thumb encoding that is 2 bytes.
-> >>
-> >> HELPER(wfi) doesn't get that right, though:
-> >>     if (target_el) {
-> >>         env->pc -= 4;
-> >>         raise_exception(env, EXCP_UDEF, syn_wfx(1, 0xe, 0), target_el);
-> >>     }
-> >>
-> >> So I think that HELPER(wfi) needs to be passed an extra
-> >> parameter is_16bit, which it can then use both in its adjustment
-> >> of env->pc and to pass as an extra parameter to syn_wfx(),
-> >> which is then syn_wfx(int cv, int cond, int ti, bool is_16bit).
-> >>
-> >> (In theory HELPER(wfe) should also be passed is_16bit, but
-> >> since it doesn't currently ever raise an exception it
-> >> doesn't matter.)
-> >
-> > Wouldn't it be better to just check on env->thumb like
-> > HELPER(cpsr_write_eret) for example?
-> 
-> > diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
-> > index 3914145..ea16c9a 100644
-> > --- a/target/arm/op_helper.c
-> > +++ b/target/arm/op_helper.c
-> > @@ -476,8 +476,8 @@ void HELPER(wfi)(CPUARMState *env)
-> >      }
-> >
-> >      if (target_el) {
-> > -        env->pc -= 4;
-> > -        raise_exception(env, EXCP_UDEF, syn_wfx(1, 0xe, 0), target_el);
-> > +        env->pc -= env->thumb ? 2 : 4;
-> > +        raise_exception(env, EXCP_UDEF, syn_wfx(1, 0xe, 0, env->thumb), target_el);
-> >      }
-> >
-> >      cs->exception_index = EXCP_HLT;
-> 
-> This doesn't work, because there is also a 32 bit Thumb
-> encoding of WFI. env->thumb says "we are in thumb mode",
-> which isn't the same as "this insn is 16 bits".
+WFI/E are often, but not always, 4 bytes long. When they are, we need to
+set ARM_EL_IL_SHIFT in the syndrome register.
 
-OK, I understand your suggestion now. I'll send a new patch.
+Pass the instruction length to HELPER(wfi), use it to decrement pc
+appropriately and to pass an is_16bit flag to syn_wfx, which sets
+ARM_EL_IL_SHIFT if needed.
+
+Signed-off-by: Stefano Stabellini <sstabellini@kernel.org>
+
+diff --git a/target/arm/helper.h b/target/arm/helper.h
+index 2cf6f74..439d228 100644
+--- a/target/arm/helper.h
++++ b/target/arm/helper.h
+@@ -48,7 +48,7 @@ DEF_HELPER_FLAGS_3(sel_flags, TCG_CALL_NO_RWG_SE,
+ DEF_HELPER_2(exception_internal, void, env, i32)
+ DEF_HELPER_4(exception_with_syndrome, void, env, i32, i32, i32)
+ DEF_HELPER_1(setend, void, env)
+-DEF_HELPER_1(wfi, void, env)
++DEF_HELPER_2(wfi, void, env, i32)
+ DEF_HELPER_1(wfe, void, env)
+ DEF_HELPER_1(yield, void, env)
+ DEF_HELPER_1(pre_hvc, void, env)
+diff --git a/target/arm/internals.h b/target/arm/internals.h
+index 5a5af38..6792df2 100644
+--- a/target/arm/internals.h
++++ b/target/arm/internals.h
+@@ -428,9 +428,10 @@ static inline uint32_t syn_breakpoint(int same_el)
+         | ARM_EL_IL | 0x22;
+ }
+ 
+-static inline uint32_t syn_wfx(int cv, int cond, int ti)
++static inline uint32_t syn_wfx(int cv, int cond, int ti, bool is_16bit)
+ {
+     return (EC_WFX_TRAP << ARM_EL_EC_SHIFT) |
++           (is_16bit ? 0 : (1 << ARM_EL_IL_SHIFT)) |
+            (cv << 24) | (cond << 20) | ti;
+ }
+ 
+diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
+index 045c312..30039c5 100644
+--- a/target/arm/op_helper.c
++++ b/target/arm/op_helper.c
+@@ -463,7 +463,7 @@ static inline int check_wfx_trap(CPUARMState *env, bool is_wfe)
+     return 0;
+ }
+ 
+-void HELPER(wfi)(CPUARMState *env)
++void HELPER(wfi)(CPUARMState *env, uint32_t insn_len)
+ {
+     CPUState *cs = CPU(arm_env_get_cpu(env));
+     int target_el = check_wfx_trap(env, false);
+@@ -476,8 +476,9 @@ void HELPER(wfi)(CPUARMState *env)
+     }
+ 
+     if (target_el) {
+-        env->pc -= 4;
+-        raise_exception(env, EXCP_UDEF, syn_wfx(1, 0xe, 0), target_el);
++        env->pc -= insn_len;
++        raise_exception(env, EXCP_UDEF, syn_wfx(1, 0xe, 0, insn_len == 2),
++                        target_el);
+     }
+ 
+     cs->exception_index = EXCP_HLT;
+diff --git a/target/arm/psci.c b/target/arm/psci.c
+index fc34b26..eb7b88e 100644
+--- a/target/arm/psci.c
++++ b/target/arm/psci.c
+@@ -189,7 +189,7 @@ void arm_handle_psci_call(ARMCPU *cpu)
+         } else {
+             env->regs[0] = 0;
+         }
+-        helper_wfi(env);
++        helper_wfi(env, 4);
+         break;
+     case QEMU_PSCI_0_1_FN_MIGRATE:
+     case QEMU_PSCI_0_2_FN_MIGRATE:
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index a39b9d3..6f74589 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -11380,17 +11380,20 @@ static void aarch64_tr_tb_stop(DisasContextBase *dcbase, CPUState *cpu)
+             gen_helper_yield(cpu_env);
+             break;
+         case DISAS_WFI:
++        {
++            TCGv_i32 tmp = tcg_const_i32((dc->insn & (1U << 31)) ? 4 : 2);
+             /* This is a special case because we don't want to just halt the CPU
+              * if trying to debug across a WFI.
+              */
+             gen_a64_set_pc_im(dc->pc);
+-            gen_helper_wfi(cpu_env);
++            gen_helper_wfi(cpu_env, tmp);
+             /* The helper doesn't necessarily throw an exception, but we
+              * must go back to the main loop to check for interrupts anyway.
+              */
+             tcg_gen_exit_tb(0);
+             break;
+         }
++        }
+     }
+ 
+     /* Functions above can change dc->pc, so re-align db->pc_next */
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index 4da1a4c..a89518f 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -12325,12 +12325,15 @@ static void arm_tr_tb_stop(DisasContextBase *dcbase, CPUState *cpu)
+             /* nothing more to generate */
+             break;
+         case DISAS_WFI:
+-            gen_helper_wfi(cpu_env);
++        {
++            TCGv_i32 tmp = tcg_const_i32((dc->insn & (1U << 31)) ? 4 : 2);
++            gen_helper_wfi(cpu_env, tmp);
+             /* The helper doesn't necessarily throw an exception, but we
+              * must go back to the main loop to check for interrupts anyway.
+              */
+             tcg_gen_exit_tb(0);
+             break;
++        }
+         case DISAS_WFE:
+             gen_helper_wfe(cpu_env);
+             break;
