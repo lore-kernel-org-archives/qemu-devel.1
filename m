@@ -1,30 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57146)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59865)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wu.rongbing@zte.com.cn>) id 1e5lxG-0002hO-Ry
-	for qemu-devel@nongnu.org; Sat, 21 Oct 2017 01:04:16 -0400
+	(envelope-from <lizhengui@huawei.com>) id 1e5mQc-0007bp-1f
+	for qemu-devel@nongnu.org; Sat, 21 Oct 2017 01:34:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wu.rongbing@zte.com.cn>) id 1e5lxC-0007QG-0D
-	for qemu-devel@nongnu.org; Sat, 21 Oct 2017 01:04:14 -0400
-Received: from out1.zte.com.cn ([202.103.147.172]:50728 helo=mxct.zte.com.cn)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wu.rongbing@zte.com.cn>)
-	id 1e5lxB-0007PR-KV
-	for qemu-devel@nongnu.org; Sat, 21 Oct 2017 01:04:09 -0400
-Received: from mse01.zte.com.cn (unknown [10.30.3.20])
-	by Forcepoint Email with ESMTPS id E1498FD6C0DDA5A0AF2A
-	for <qemu-devel@nongnu.org>; Sat, 21 Oct 2017 13:04:06 +0800 (CST)
-Received: from kjyxh01app01.zte.com.cn ([10.30.12.226])
-	by mse01.zte.com.cn with SMTP id v9L53w2h003763
-	for <qemu-devel@nongnu.org>; Sat, 21 Oct 2017 13:03:58 +0800 (GMT-8)
-	(envelope-from wu.rongbing@zte.com.cn)
-Date: Sat, 21 Oct 2017 13:03:55 +0800 (CST)
-Message-ID: <201710211303557960000@zte.com.cn>
-Mime-Version: 1.0
-From: <wu.rongbing@zte.com.cn>
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: base64 
-Subject: [Qemu-devel] =?utf-8?q?Industrial_Park_Nanshan_District?=
+	(envelope-from <lizhengui@huawei.com>) id 1e5mQa-0003Kg-IU
+	for qemu-devel@nongnu.org; Sat, 21 Oct 2017 01:34:33 -0400
+From: Zhengui Li <lizhengui@huawei.com>
+Date: Sat, 21 Oct 2017 13:34:00 +0800
+Message-ID: <1508564040-120700-1-git-send-email-lizhengui@huawei.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH] block: all I/O should be completed before
+ removing throttle timers.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,6 +20,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: kwolf@redhat.com, jcody@redhat.com, mreitz@redhat.com, pbonzini@redhat.com
+Cc: lizhengui@huawei.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, eric.fangyi@huawei.com, subo7@huawei.com, lina.lulina@huawei.com, xieyingtai@huawei.com, sochin.jiang@huawei.com, wangjie88@huawei.com
 
-WlRFIENvcnBvcmF0aW9uIEhpLXRlY2ggUm9hZCBTb3V0aCw=
+From: Zhengui <lizhengui@huawei.com>
+
+In blk_remove_bs, all I/O should be completed before removing throttle
+timers. If there has inflight I/O, removing throttle timers here will
+cause the inflight I/O never return.
+This patch add bdrv_drained_begin before throttle_timers_detach_aio_context
+to let all I/O completed before removing throttle timers.
+
+Signed-off-by: Zhengui <lizhengui@huawei.com>
+---
+ block/block-backend.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/block/block-backend.c b/block/block-backend.c
+index 45d9101..9edc452 100644
+--- a/block/block-backend.c
++++ b/block/block-backend.c
+@@ -660,7 +660,11 @@ void blk_remove_bs(BlockBackend *blk)
+     notifier_list_notify(&blk->remove_bs_notifiers, blk);
+     if (blk->public.throttle_group_member.throttle_state) {
+         tt = &blk->public.throttle_group_member.throttle_timers;
++        BlockDriverState *bs;
++        bs = blk_bs(blk);
++        bdrv_drained_begin(bs);
+         throttle_timers_detach_aio_context(tt);
++        bdrv_drained_end(bs);
+     }
+ 
+     blk_update_root_state(blk);
+-- 
+2.7.2.windows.1
