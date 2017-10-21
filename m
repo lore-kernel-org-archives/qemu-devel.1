@@ -1,16 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46403)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46839)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1e5yDP-0000fs-8q
-	for qemu-devel@nongnu.org; Sat, 21 Oct 2017 14:09:44 -0400
+	(envelope-from <no-reply@patchew.org>) id 1e5yHM-0001YQ-C0
+	for qemu-devel@nongnu.org; Sat, 21 Oct 2017 14:13:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1e5yDO-0004a8-0x
-	for qemu-devel@nongnu.org; Sat, 21 Oct 2017 14:09:43 -0400
-Date: Sat, 21 Oct 2017 11:09:33 -0700 (PDT)
-From: Stefano Stabellini <sstabellini@kernel.org>
-Message-ID: <alpine.DEB.2.10.1710211105550.27209@sstabellini-ThinkPad-X260>
+	(envelope-from <no-reply@patchew.org>) id 1e5yHJ-00071B-64
+	for qemu-devel@nongnu.org; Sat, 21 Oct 2017 14:13:48 -0400
+Resent-Message-Id: <E1e5yHJ-00071B-64@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21396)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1e5yHI-0006zb-UG
+	for qemu-devel@nongnu.org; Sat, 21 Oct 2017 14:13:45 -0400
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <150860960587.476.13639554045849369874@b58463cdfd5f>
+In-Reply-To: <alpine.DEB.2.10.1710211105550.27209@sstabellini-ThinkPad-X260>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: [Qemu-devel] [PATCH v2] fix WFI/WFE length in syndrome register
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Sat, 21 Oct 2017 11:13:26 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v2] fix WFI/WFE length in syndrome register
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,129 +28,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, sstabellini@kernel.org
+To: sstabellini@kernel.org
+Cc: famz@redhat.com, peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org
 
-WFI/E are often, but not always, 4 bytes long. When they are, we need to
-set ARM_EL_IL_SHIFT in the syndrome register.
-
-Pass the instruction length to HELPER(wfi), use it to decrement pc
-appropriately and to pass an is_16bit flag to syn_wfx, which sets
-ARM_EL_IL_SHIFT if needed.
-
-Signed-off-by: Stefano Stabellini <sstabellini@kernel.org>
-
-diff --git a/target/arm/helper.h b/target/arm/helper.h
-index 2cf6f74..439d228 100644
---- a/target/arm/helper.h
-+++ b/target/arm/helper.h
-@@ -48,7 +48,7 @@ DEF_HELPER_FLAGS_3(sel_flags, TCG_CALL_NO_RWG_SE,
- DEF_HELPER_2(exception_internal, void, env, i32)
- DEF_HELPER_4(exception_with_syndrome, void, env, i32, i32, i32)
- DEF_HELPER_1(setend, void, env)
--DEF_HELPER_1(wfi, void, env)
-+DEF_HELPER_2(wfi, void, env, i32)
- DEF_HELPER_1(wfe, void, env)
- DEF_HELPER_1(yield, void, env)
- DEF_HELPER_1(pre_hvc, void, env)
-diff --git a/target/arm/internals.h b/target/arm/internals.h
-index 5a5af38..6792df2 100644
---- a/target/arm/internals.h
-+++ b/target/arm/internals.h
-@@ -428,9 +428,10 @@ static inline uint32_t syn_breakpoint(int same_el)
-         | ARM_EL_IL | 0x22;
- }
- 
--static inline uint32_t syn_wfx(int cv, int cond, int ti)
-+static inline uint32_t syn_wfx(int cv, int cond, int ti, bool is_16bit)
- {
-     return (EC_WFX_TRAP << ARM_EL_EC_SHIFT) |
-+           (is_16bit ? 0 : (1 << ARM_EL_IL_SHIFT)) |
-            (cv << 24) | (cond << 20) | ti;
- }
- 
-diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
-index 045c312..30039c5 100644
---- a/target/arm/op_helper.c
-+++ b/target/arm/op_helper.c
-@@ -463,7 +463,7 @@ static inline int check_wfx_trap(CPUARMState *env, bool is_wfe)
-     return 0;
- }
- 
--void HELPER(wfi)(CPUARMState *env)
-+void HELPER(wfi)(CPUARMState *env, uint32_t insn_len)
- {
-     CPUState *cs = CPU(arm_env_get_cpu(env));
-     int target_el = check_wfx_trap(env, false);
-@@ -476,8 +476,9 @@ void HELPER(wfi)(CPUARMState *env)
-     }
- 
-     if (target_el) {
--        env->pc -= 4;
--        raise_exception(env, EXCP_UDEF, syn_wfx(1, 0xe, 0), target_el);
-+        env->pc -= insn_len;
-+        raise_exception(env, EXCP_UDEF, syn_wfx(1, 0xe, 0, insn_len == 2),
-+                        target_el);
-     }
- 
-     cs->exception_index = EXCP_HLT;
-diff --git a/target/arm/psci.c b/target/arm/psci.c
-index fc34b26..eb7b88e 100644
---- a/target/arm/psci.c
-+++ b/target/arm/psci.c
-@@ -189,7 +189,7 @@ void arm_handle_psci_call(ARMCPU *cpu)
-         } else {
-             env->regs[0] = 0;
-         }
--        helper_wfi(env);
-+        helper_wfi(env, 4);
-         break;
-     case QEMU_PSCI_0_1_FN_MIGRATE:
-     case QEMU_PSCI_0_2_FN_MIGRATE:
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index a39b9d3..6f74589 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -11380,17 +11380,20 @@ static void aarch64_tr_tb_stop(DisasContextBase *dcbase, CPUState *cpu)
-             gen_helper_yield(cpu_env);
-             break;
-         case DISAS_WFI:
-+        {
-+            TCGv_i32 tmp = tcg_const_i32((dc->insn & (1U << 31)) ? 4 : 2);
-             /* This is a special case because we don't want to just halt the CPU
-              * if trying to debug across a WFI.
-              */
-             gen_a64_set_pc_im(dc->pc);
--            gen_helper_wfi(cpu_env);
-+            gen_helper_wfi(cpu_env, tmp);
-             /* The helper doesn't necessarily throw an exception, but we
-              * must go back to the main loop to check for interrupts anyway.
-              */
-             tcg_gen_exit_tb(0);
-             break;
-         }
-+        }
-     }
- 
-     /* Functions above can change dc->pc, so re-align db->pc_next */
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 4da1a4c..a89518f 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -12325,12 +12325,15 @@ static void arm_tr_tb_stop(DisasContextBase *dcbase, CPUState *cpu)
-             /* nothing more to generate */
-             break;
-         case DISAS_WFI:
--            gen_helper_wfi(cpu_env);
-+        {
-+            TCGv_i32 tmp = tcg_const_i32((dc->insn & (1U << 31)) ? 4 : 2);
-+            gen_helper_wfi(cpu_env, tmp);
-             /* The helper doesn't necessarily throw an exception, but we
-              * must go back to the main loop to check for interrupts anyway.
-              */
-             tcg_gen_exit_tb(0);
-             break;
-+        }
-         case DISAS_WFE:
-             gen_helper_wfe(cpu_env);
-             break;
+SGksCgpUaGlzIHNlcmllcyBmYWlsZWQgYXV0b21hdGljIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5k
+IHRoZSB0ZXN0aW5nIGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZl
+IGRvY2tlciBpbnN0YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHku
+CgpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogYWxwaW5lLkRFQi4yLjEwLjE3MTAyMTExMDU1NTAu
+MjcyMDlAc3N0YWJlbGxpbmktVGhpbmtQYWQtWDI2MApTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BB
+VENIIHYyXSBmaXggV0ZJL1dGRSBsZW5ndGggaW4gc3luZHJvbWUgcmVnaXN0ZXIKCj09PSBURVNU
+IFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKc2V0IC1lCmdpdCBzdWJtb2R1bGUgdXBkYXRl
+IC0taW5pdCBkdGMKIyBMZXQgZG9ja2VyIHRlc3RzIGR1bXAgZW52aXJvbm1lbnQgaW5mbwpleHBv
+cnQgU0hPV19FTlY9MQpleHBvcnQgSj04CnRpbWUgbWFrZSBkb2NrZXItdGVzdC1xdWlja0BjZW50
+b3M2CnRpbWUgbWFrZSBkb2NrZXItdGVzdC1idWlsZEBtaW4tZ2xpYgp0aW1lIG1ha2UgZG9ja2Vy
+LXRlc3QtbWluZ3dAZmVkb3JhCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1ibG9ja0BmZWRvcmEKPT09
+IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3
+ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3Fl
+bXUKICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy9hbHBpbmUuREVCLjIuMTAuMTcx
+MDIxMTEwNTU1MC4yNzIwOUBzc3RhYmVsbGluaS1UaGlua1BhZC1YMjYwIC0+IHBhdGNoZXcvYWxw
+aW5lLkRFQi4yLjEwLjE3MTAyMTExMDU1NTAuMjcyMDlAc3N0YWJlbGxpbmktVGhpbmtQYWQtWDI2
+MApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmQ3MzA1ZjYzYWYgZml4IFdGSS9XRkUg
+bGVuZ3RoIGluIHN5bmRyb21lIHJlZ2lzdGVyCgo9PT0gT1VUUFVUIEJFR0lOID09PQpTdWJtb2R1
+bGUgJ2R0YycgKGdpdDovL2dpdC5xZW11LXByb2plY3Qub3JnL2R0Yy5naXQpIHJlZ2lzdGVyZWQg
+Zm9yIHBhdGggJ2R0YycKQ2xvbmluZyBpbnRvICcvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAt
+bWZpa3k3ZG8vc3JjL2R0YycuLi4KZmF0YWw6IHJlYWQgZXJyb3I6IENvbm5lY3Rpb24gcmVzZXQg
+YnkgcGVlcgpmYXRhbDogY2xvbmUgb2YgJ2dpdDovL2dpdC5xZW11LXByb2plY3Qub3JnL2R0Yy5n
+aXQnIGludG8gc3VibW9kdWxlIHBhdGggJy92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC1tZmlr
+eTdkby9zcmMvZHRjJyBmYWlsZWQKRmFpbGVkIHRvIGNsb25lICdkdGMnLiBSZXRyeSBzY2hlZHVs
+ZWQKQ2xvbmluZyBpbnRvICcvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtbWZpa3k3ZG8vc3Jj
+L2R0YycuLi4KZmF0YWw6IHJlYWQgZXJyb3I6IENvbm5lY3Rpb24gcmVzZXQgYnkgcGVlcgpmYXRh
+bDogY2xvbmUgb2YgJ2dpdDovL2dpdC5xZW11LXByb2plY3Qub3JnL2R0Yy5naXQnIGludG8gc3Vi
+bW9kdWxlIHBhdGggJy92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC1tZmlreTdkby9zcmMvZHRj
+JyBmYWlsZWQKRmFpbGVkIHRvIGNsb25lICdkdGMnIGEgc2Vjb25kIHRpbWUsIGFib3J0aW5nCj09
+PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0K
+RW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcu
+b3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlz
+dHMub3Jn
