@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47762)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33740)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <frasse.iglesias@gmail.com>) id 1e61jA-0000R9-Mk
-	for qemu-devel@nongnu.org; Sat, 21 Oct 2017 17:54:47 -0400
+	(envelope-from <no-reply@patchew.org>) id 1e67vp-0000Ur-Uz
+	for qemu-devel@nongnu.org; Sun, 22 Oct 2017 00:32:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <frasse.iglesias@gmail.com>) id 1e61j7-0002sk-3K
-	for qemu-devel@nongnu.org; Sat, 21 Oct 2017 17:54:44 -0400
-Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:54760)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <frasse.iglesias@gmail.com>)
-	id 1e61j6-0002o0-KQ
-	for qemu-devel@nongnu.org; Sat, 21 Oct 2017 17:54:41 -0400
-Received: by mail-lf0-x243.google.com with SMTP id d10so16435636lfg.11
-	for <qemu-devel@nongnu.org>; Sat, 21 Oct 2017 14:54:40 -0700 (PDT)
-From: Francisco Iglesias <frasse.iglesias@gmail.com>
-Date: Sat, 21 Oct 2017 23:54:19 +0200
-Message-Id: <20171021215420.19787-12-frasse.iglesias@gmail.com>
-In-Reply-To: <20171021215420.19787-1-frasse.iglesias@gmail.com>
-References: <20171021215420.19787-1-frasse.iglesias@gmail.com>
-Subject: [Qemu-devel] [PATCH v2 11/12] xilinx_spips: Add support for the
- ZynqMP Generic QSPI
+	(envelope-from <no-reply@patchew.org>) id 1e67vl-00079V-DW
+	for qemu-devel@nongnu.org; Sun, 22 Oct 2017 00:32:13 -0400
+Resent-Message-Id: <E1e67vl-00079V-DW@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21302)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1e67vl-000798-6C
+	for qemu-devel@nongnu.org; Sun, 22 Oct 2017 00:32:09 -0400
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <150854664904.473.17800374500111420302@b58463cdfd5f>
+In-Reply-To: <20171020232023.15010-1-richard.henderson@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 20 Oct 2017 17:44:10 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v7 00/52] tcg queued patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,795 +28,194 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: edgari@xilinx.com, alistai@xilinx.com, francisco.iglesias@feimtech.se
+To: richard.henderson@linaro.org
+Cc: famz@redhat.com, qemu-devel@nongnu.org, pbonzini@redhat.com, cota@braap.org, f4bug@amsat.org
 
-Add support for the Zynq Ultrascale MPSoc Generic QSPI.
-
-Signed-off-by: Francisco Iglesias <frasse.iglesias@gmail.com>
----
- default-configs/arm-softmmu.mak |   1 +
- hw/ssi/xilinx_spips.c           | 510 ++++++++++++++++++++++++++++++++++++----
- include/hw/ssi/xilinx_spips.h   |  31 ++-
- 3 files changed, 494 insertions(+), 48 deletions(-)
-
-diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
-index 5059d13..d09fd34 100644
---- a/default-configs/arm-softmmu.mak
-+++ b/default-configs/arm-softmmu.mak
-@@ -130,3 +130,4 @@ CONFIG_SMBIOS=y
- CONFIG_ASPEED_SOC=y
- CONFIG_GPIO_KEY=y
- CONFIG_MSF2=y
-+CONFIG_XILINX_AXI=y
-diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
-index c360af7..0aaa5c8 100644
---- a/hw/ssi/xilinx_spips.c
-+++ b/hw/ssi/xilinx_spips.c
-@@ -31,6 +31,7 @@
- #include "hw/ssi/xilinx_spips.h"
- #include "qapi/error.h"
- #include "hw/register.h"
-+#include "sysemu/dma.h"
- #include "migration/blocker.h"
- 
- #ifndef XILINX_SPIPS_ERR_DEBUG
-@@ -69,13 +70,31 @@
- #define R_INTR_DIS          (0x0C / 4)
- #define R_INTR_MASK         (0x10 / 4)
- #define IXR_TX_FIFO_UNDERFLOW   (1 << 6)
-+/* Poll timeout not implemented */
-+#define IXR_RX_FIFO_EMPTY       (1 << 11)
-+#define IXR_GENERIC_FIFO_FULL   (1 << 10)
-+#define IXR_GENERIC_FIFO_NOT_FULL (1 << 9)
-+#define IXR_TX_FIFO_EMPTY       (1 << 8)
-+#define IXR_GENERIC_FIFO_EMPTY  (1 << 7)
- #define IXR_RX_FIFO_FULL        (1 << 5)
- #define IXR_RX_FIFO_NOT_EMPTY   (1 << 4)
- #define IXR_TX_FIFO_FULL        (1 << 3)
- #define IXR_TX_FIFO_NOT_FULL    (1 << 2)
- #define IXR_TX_FIFO_MODE_FAIL   (1 << 1)
- #define IXR_RX_FIFO_OVERFLOW    (1 << 0)
--#define IXR_ALL                 ((IXR_TX_FIFO_UNDERFLOW<<1)-1)
-+#define IXR_ALL                 ((1 << 13) - 1)
-+#define GQSPI_IXR_MASK          0xFBE
-+
-+#define IXR_SELF_CLEAR \
-+(IXR_GENERIC_FIFO_EMPTY \
-+| IXR_GENERIC_FIFO_FULL  \
-+| IXR_GENERIC_FIFO_NOT_FULL \
-+| IXR_TX_FIFO_EMPTY \
-+| IXR_TX_FIFO_FULL  \
-+| IXR_TX_FIFO_NOT_FULL \
-+| IXR_RX_FIFO_EMPTY \
-+| IXR_RX_FIFO_FULL  \
-+| IXR_RX_FIFO_NOT_EMPTY)
- 
- #define R_EN                (0x14 / 4)
- #define R_DELAY             (0x18 / 4)
-@@ -118,9 +137,63 @@
- 
- #define R_MOD_ID            (0xFC / 4)
- 
-+#define R_GQSPI_SELECT          (0x144 / 4)
-+    FIELD(GQSPI_SELECT, GENERIC_QSPI_EN, 0, 1)
-+#define R_GQSPI_ISR         (0x104 / 4)
-+#define R_GQSPI_IER         (0x108 / 4)
-+#define R_GQSPI_IDR         (0x10c / 4)
-+#define R_GQSPI_IMR         (0x110 / 4)
-+#define R_GQSPI_TX_THRESH   (0x128 / 4)
-+#define R_GQSPI_RX_THRESH   (0x12c / 4)
-+
-+#define R_GQSPI_CNFG        (0x100 / 4)
-+    FIELD(GQSPI_CNFG, MODE_EN, 30, 2)
-+    FIELD(GQSPI_CNFG, GEN_FIFO_START_MODE, 29, 1)
-+    FIELD(GQSPI_CNFG, GEN_FIFO_START, 28, 1)
-+    FIELD(GQSPI_CNFG, ENDIAN, 26, 1)
-+    /* Poll timeout not implemented */
-+    FIELD(GQSPI_CNFG, EN_POLL_TIMEOUT, 20, 1)
-+    /* QEMU doesnt care about any of these last three */
-+    FIELD(GQSPI_CNFG, BR, 3, 3)
-+    FIELD(GQSPI_CNFG, CPH, 2, 1)
-+    FIELD(GQSPI_CNFG, CPL, 1, 1)
-+
-+#define R_GQSPI_GEN_FIFO        (0x140 / 4)
-+
-+#define R_GQSPI_TXD             (0x11c / 4)
-+#define R_GQSPI_RXD             (0x120 / 4)
-+
-+#define R_GQSPI_FIFO_CTRL       (0x14c / 4)
-+    FIELD(GQSPI_FIFO_CTRL, RX_FIFO_RESET, 2, 1)
-+    FIELD(GQSPI_FIFO_CTRL, TX_FIFO_RESET, 1, 1)
-+    FIELD(GQSPI_FIFO_CTRL, GENERIC_FIFO_RESET, 0, 1)
-+
-+#define R_GQSPI_GFIFO_THRESH    (0x150 / 4)
-+
-+#define R_GQSPI_DATA_STS (0x15c / 4)
-+
-+/* We use the snapshot register to hold the core state for the currently
-+ * or most recently executed command. So the generic fifo format is defined
-+ * for the snapshot register
-+ */
-+#define R_GQSPI_GF_SNAPSHOT (0x160 / 4)
-+    FIELD(GQSPI_GF_SNAPSHOT, POLL, 19, 1)
-+    FIELD(GQSPI_GF_SNAPSHOT, STRIPE, 18, 1)
-+    FIELD(GQSPI_GF_SNAPSHOT, RECIEVE, 17, 1)
-+    FIELD(GQSPI_GF_SNAPSHOT, TRANSMIT, 16, 1)
-+    FIELD(GQSPI_GF_SNAPSHOT, DATA_BUS_SELECT, 14, 2)
-+    FIELD(GQSPI_GF_SNAPSHOT, CHIP_SELECT, 12, 2)
-+    FIELD(GQSPI_GF_SNAPSHOT, SPI_MODE, 10, 2)
-+    FIELD(GQSPI_GF_SNAPSHOT, EXPONENT, 9, 1)
-+    FIELD(GQSPI_GF_SNAPSHOT, DATA_XFER, 8, 1)
-+    FIELD(GQSPI_GF_SNAPSHOT, IMMEDIATE_DATA, 0, 8)
-+
-+#define R_GQSPI_MOD_ID        (0x168 / 4)
-+#define R_GQSPI_MOD_ID_VALUE  0x010A0000
-+
- /* size of TXRX FIFOs */
--#define RXFF_A          32
--#define TXFF_A          32
-+#define RXFF_A          (128)
-+#define TXFF_A          (128)
- 
- #define RXFF_A_Q          (64 * 4)
- #define TXFF_A_Q          (64 * 4)
-@@ -133,6 +206,7 @@
- #define SNOOP_NONE 0xEE
- #define SNOOP_STRIPING 0
- 
-+#define ZYNQMP_ONLY(a) ((zynqmp) ? (a) : (0))
- 
- static inline int num_effective_busses(XilinxSPIPS *s)
- {
-@@ -140,37 +214,61 @@ static inline int num_effective_busses(XilinxSPIPS *s)
-             s->regs[R_LQSPI_CFG] & LQSPI_CFG_TWO_MEM) ? s->num_busses : 1;
- }
- 
--static inline bool xilinx_spips_cs_is_set(XilinxSPIPS *s, int i, int field)
--{
--    return ~field & (1 << i) && (s->regs[R_CONFIG] & MANUAL_CS
--                    || !fifo8_is_empty(&s->tx_fifo));
-+static void xilinx_spips_update_cs_lines_legacy_mangle(XilinxSPIPS *s,
-+                                                       int *field) {
-+    *field = ~((s->regs[R_CONFIG] & CS) >> CS_SHIFT);
-+    /* In dual parallel, mirror low CS to both */
-+    if (num_effective_busses(s) == 2) {
-+        /* Single bit chip-select for qspi */
-+        *field &= 0x1;
-+        *field |= *field << 1;
-+    /* Dual stack U-Page */
-+    } else if (s->regs[R_LQSPI_CFG] & LQSPI_CFG_TWO_MEM &&
-+               s->regs[R_LQSPI_STS] & LQSPI_CFG_U_PAGE) {
-+        /* Single bit chip-select for qspi */
-+        *field &= 0x1;
-+        /* change from CS0 to CS1 */
-+        *field <<= 1;
-+    }
-+    /* Auto CS */
-+    if (!(s->regs[R_CONFIG] & MANUAL_CS) &&
-+        fifo8_is_empty(&s->tx_fifo)) {
-+        *field = 0;
-+    }
-+}
-+
-+static void xilinx_spips_update_cs_lines_generic_mangle(XilinxSPIPS *s,
-+                                                        int *field) {
-+    *field = ARRAY_FIELD_EX32(s->regs, GQSPI_GF_SNAPSHOT, CHIP_SELECT);
- }
- 
- static void xilinx_spips_update_cs_lines(XilinxSPIPS *s)
- {
--    int i, j;
--    bool found = false;
--    int field = s->regs[R_CONFIG] >> CS_SHIFT;
-+    int i;
-+    int field = 0;
- 
--    for (i = 0; i < s->num_cs; i++) {
--        for (j = 0; j < num_effective_busses(s); j++) {
--            int upage = !!(s->regs[R_LQSPI_STS] & LQSPI_CFG_U_PAGE);
--            int cs_to_set = (j * s->num_cs + i + upage) %
--                                (s->num_cs * s->num_busses);
--
--            if (xilinx_spips_cs_is_set(s, i, field) && !found) {
--                DB_PRINT_L(0, "selecting slave %d\n", i);
--                qemu_set_irq(s->cs_lines[cs_to_set], 0);
--            } else {
--                DB_PRINT_L(0, "deselecting slave %d\n", i);
--                qemu_set_irq(s->cs_lines[cs_to_set], 1);
--            }
-+    if (!ARRAY_FIELD_EX32(s->regs, GQSPI_SELECT, GENERIC_QSPI_EN)) {
-+        xilinx_spips_update_cs_lines_legacy_mangle(s, &field);
-+    } else {
-+        if (!s->regs[R_GQSPI_GF_SNAPSHOT]) {
-+            return;
-         }
--        if (xilinx_spips_cs_is_set(s, i, field)) {
--            found = true;
-+        xilinx_spips_update_cs_lines_generic_mangle(s, &field);
-+    }
-+
-+    for (i = 0; i < s->num_cs; i++) {
-+        bool old_state = s->cs_lines_state[i];
-+        bool new_state = field & (1 << i);
-+
-+        if (old_state != new_state) {
-+            s->cs_lines_state[i] = new_state;
-+            s->rx_discard = ARRAY_FIELD_EX32(s->regs, CMND, RX_DISCARD);
-+            DB_PRINT_L(0, "%sselecting slave %d\n", new_state ? "" : "de", i);
-         }
-+        qemu_set_irq(s->cs_lines[i], !new_state);
-     }
--    if (!found) {
-+
-+    if (!(field & ((1 << s->num_cs) - 1))) {
-         s->snoop_state = SNOOP_CHECKING;
-         s->cmd_dummies = 0;
-         s->link_state = 1;
-@@ -182,22 +280,53 @@ static void xilinx_spips_update_cs_lines(XilinxSPIPS *s)
- 
- static void xilinx_spips_update_ixr(XilinxSPIPS *s)
- {
--    if (s->regs[R_LQSPI_CFG] & LQSPI_CFG_LQ_MODE) {
--        return;
-+    int new_irqline;
-+    uint32_t qspi_int, gqspi_int;
-+    bool zynqmp = false;
-+
-+    if (object_dynamic_cast(OBJECT(s), TYPE_XLNX_ZYNQMP_QSPIPS)) {
-+        zynqmp = true;
-     }
--    /* These are set/cleared as they occur */
--    s->regs[R_INTR_STATUS] &= (IXR_TX_FIFO_UNDERFLOW | IXR_RX_FIFO_OVERFLOW |
--                                IXR_TX_FIFO_MODE_FAIL);
-+
-     /* these are pure functions of fifo state, set them here */
--    s->regs[R_INTR_STATUS] |=
--        (fifo8_is_full(&s->rx_fifo) ? IXR_RX_FIFO_FULL : 0) |
--        (s->rx_fifo.num >= s->regs[R_RX_THRES] ? IXR_RX_FIFO_NOT_EMPTY : 0) |
--        (fifo8_is_full(&s->tx_fifo) ? IXR_TX_FIFO_FULL : 0) |
--        (s->tx_fifo.num < s->regs[R_TX_THRES] ? IXR_TX_FIFO_NOT_FULL : 0);
-+    s->regs[R_GQSPI_ISR] &= ~IXR_SELF_CLEAR;
-+    s->regs[R_GQSPI_ISR] |=
-+        (fifo32_is_empty(&s->fifo_g) ? IXR_GENERIC_FIFO_EMPTY : 0) |
-+        (fifo32_is_full(&s->fifo_g) ? IXR_GENERIC_FIFO_FULL : 0) |
-+        (s->fifo_g.fifo.num < s->regs[R_GQSPI_GFIFO_THRESH] ?
-+                                    IXR_GENERIC_FIFO_NOT_FULL : 0) |
-+
-+        (fifo8_is_empty(&s->rx_fifo_g) ? IXR_RX_FIFO_EMPTY : 0) |
-+        (fifo8_is_full(&s->rx_fifo_g) ? IXR_RX_FIFO_FULL : 0) |
-+        (s->rx_fifo_g.num >= s->regs[R_GQSPI_RX_THRESH] ?
-+                                    IXR_RX_FIFO_NOT_EMPTY : 0) |
-+
-+        (fifo8_is_empty(&s->tx_fifo_g) ? IXR_TX_FIFO_EMPTY : 0) |
-+        (fifo8_is_full(&s->tx_fifo_g) ? IXR_TX_FIFO_FULL : 0) |
-+        (s->tx_fifo_g.num < s->regs[R_GQSPI_TX_THRESH] ?
-+                                    IXR_TX_FIFO_NOT_FULL : 0);
-+
-+    if (!(s->regs[R_LQSPI_CFG] & LQSPI_CFG_LQ_MODE)) {
-+        s->regs[R_INTR_STATUS] &= ~IXR_SELF_CLEAR;
-+        s->regs[R_INTR_STATUS] |=
-+            (fifo8_is_full(&s->rx_fifo) ? IXR_RX_FIFO_FULL : 0) |
-+            (s->rx_fifo.num >= s->regs[R_RX_THRES] ?
-+                                    IXR_RX_FIFO_NOT_EMPTY : 0) |
-+            ZYNQMP_ONLY(fifo8_is_empty(&s->tx_fifo) ? IXR_TX_FIFO_EMPTY : 0) |
-+            (fifo8_is_full(&s->tx_fifo) ? IXR_TX_FIFO_FULL : 0) |
-+            (s->tx_fifo.num < s->regs[R_TX_THRES] ? IXR_TX_FIFO_NOT_FULL : 0);
-+    }
-+
-+    /* QSPI/SPI Interrupt Trigger Status */
-+    qspi_int = s->regs[R_INTR_MASK] & s->regs[R_INTR_STATUS];
-+    /* GQSPI Interrupt Trigger Status */
-+    gqspi_int = (~s->regs[R_GQSPI_IMR]) & s->regs[R_GQSPI_ISR] &
-+                   GQSPI_IXR_MASK;
-     /* drive external interrupt pin */
--    int new_irqline = !!(s->regs[R_INTR_MASK] & s->regs[R_INTR_STATUS] &
--                                                                IXR_ALL);
-+    new_irqline = !!((qspi_int | gqspi_int) & IXR_ALL);
-     if (new_irqline != s->irqline) {
-+        DB_PRINT_L(0, "IRQ state is changing %" PRIx32 " -> %" PRIx32 "\n",
-+                   s->irqline, new_irqline);
-         s->irqline = new_irqline;
-         qemu_set_irq(s->irq, s->irqline);
-     }
-@@ -214,11 +343,18 @@ static void xilinx_spips_reset(DeviceState *d)
- 
-     fifo8_reset(&s->rx_fifo);
-     fifo8_reset(&s->rx_fifo);
-+    fifo8_reset(&s->rx_fifo_g);
-+    fifo8_reset(&s->rx_fifo_g);
-+    fifo32_reset(&s->fifo_g);
-     /* non zero resets */
-     s->regs[R_CONFIG] |= MODEFAIL_GEN_EN;
-     s->regs[R_SLAVE_IDLE_COUNT] = 0xFF;
-     s->regs[R_TX_THRES] = 1;
-     s->regs[R_RX_THRES] = 1;
-+    s->regs[R_GQSPI_TX_THRESH] = 1;
-+    s->regs[R_GQSPI_RX_THRESH] = 1;
-+    s->regs[R_GQSPI_GFIFO_THRESH] = 1;
-+    s->regs[R_GQSPI_IMR] = GQSPI_IXR_MASK;
-     /* FIXME: move magic number definition somewhere sensible */
-     s->regs[R_MOD_ID] = 0x01090106;
-     s->regs[R_LQSPI_CFG] = R_LQSPI_CFG_RESET;
-@@ -228,6 +364,7 @@ static void xilinx_spips_reset(DeviceState *d)
-     s->snoop_state = SNOOP_CHECKING;
-     s->cmd_dummies = 0;
-     s->man_start_com = false;
-+    s->man_start_com_g = false;
-     xilinx_spips_update_ixr(s);
-     xilinx_spips_update_cs_lines(s);
- }
-@@ -262,6 +399,141 @@ static inline void stripe8(uint8_t *x, int num, bool dir)
-     memcpy(x, r, sizeof(uint8_t) * num);
- }
- 
-+static void xilinx_spips_flush_fifo_g(XilinxSPIPS *s)
-+{
-+    while (s->regs[R_GQSPI_DATA_STS] || !fifo32_is_empty(&s->fifo_g)) {
-+        uint8_t tx_rx[2];
-+        int num_stripes;
-+        int i;
-+        uint8_t busses;
-+
-+        /* memset() get's optimised out and results in the kernel seeing bogus
-+         * data and complaining. So until memset_s() is supported let's just do
-+         * it like this.
-+         */
-+        memset(tx_rx, 0, sizeof(tx_rx));
-+        i = tx_rx[0];
-+        i += tx_rx[1];
-+
-+        if (!s->regs[R_GQSPI_DATA_STS]) {
-+            uint8_t imm;
-+
-+            s->regs[R_GQSPI_GF_SNAPSHOT] = fifo32_pop(&s->fifo_g);
-+            DB_PRINT_L(0, "Popped GQSPI command %" PRIx32 "\n",
-+                       s->regs[R_GQSPI_GF_SNAPSHOT]);
-+            if (!s->regs[R_GQSPI_GF_SNAPSHOT]) {
-+                DB_PRINT_L(0, "Dummy GQSPI Delay Command Entry, Do nothing");
-+                continue;
-+            }
-+            xilinx_spips_update_cs_lines(s);
-+
-+            imm = ARRAY_FIELD_EX32(s->regs, GQSPI_GF_SNAPSHOT, IMMEDIATE_DATA);
-+            if (!ARRAY_FIELD_EX32(s->regs, GQSPI_GF_SNAPSHOT, DATA_XFER)) {
-+                /* immedate transfer */
-+                if (ARRAY_FIELD_EX32(s->regs, GQSPI_GF_SNAPSHOT, TRANSMIT) ||
-+                    ARRAY_FIELD_EX32(s->regs, GQSPI_GF_SNAPSHOT, RECIEVE)) {
-+                    s->regs[R_GQSPI_DATA_STS] = 1;
-+                /* CS setup/hold - do nothing */
-+                } else {
-+                    s->regs[R_GQSPI_DATA_STS] = 0;
-+                }
-+            /* exponential transfer */
-+            } else if (ARRAY_FIELD_EX32(s->regs, GQSPI_GF_SNAPSHOT, EXPONENT)) {
-+                if (imm > 31) {
-+                    qemu_log_mask(LOG_UNIMP, "QSPI exponential transfer too"
-+                                  " long - 2 ^ %" PRId8 " requested\n", imm);
-+                }
-+                s->regs[R_GQSPI_DATA_STS] = 1ul << imm;
-+            /* non-exponential data transfer */
-+            } else {
-+                s->regs[R_GQSPI_DATA_STS] = imm;
-+            }
-+        }
-+
-+        /* Zero length transfer? no thanks! */
-+        if (!s->regs[R_GQSPI_DATA_STS]) {
-+            continue;
-+        }
-+
-+        if (ARRAY_FIELD_EX32(s->regs, GQSPI_GF_SNAPSHOT, RECIEVE) &&
-+            fifo8_is_full(&s->rx_fifo_g)) {
-+            /* No space in RX fifo for transfer - try again later */
-+            return;
-+        }
-+
-+        num_stripes = ARRAY_FIELD_EX32(s->regs,
-+                                       GQSPI_GF_SNAPSHOT, STRIPE) ? 2 : 1;
-+        if (!ARRAY_FIELD_EX32(s->regs, GQSPI_GF_SNAPSHOT, TRANSMIT) &&
-+            !ARRAY_FIELD_EX32(s->regs, GQSPI_GF_SNAPSHOT, RECIEVE)) {
-+            num_stripes = 1;
-+        }
-+
-+        if (!ARRAY_FIELD_EX32(s->regs, GQSPI_GF_SNAPSHOT, DATA_XFER)) {
-+            tx_rx[0] = ARRAY_FIELD_EX32(s->regs,
-+                                        GQSPI_GF_SNAPSHOT, IMMEDIATE_DATA);
-+        } else if (ARRAY_FIELD_EX32(s->regs, GQSPI_GF_SNAPSHOT, TRANSMIT)) {
-+            for (i = 0; i < num_stripes; ++i) {
-+                if (!fifo8_is_empty(&s->tx_fifo_g)) {
-+                    tx_rx[i] = fifo8_pop(&s->tx_fifo_g);
-+                    s->tx_fifo_g_align++;
-+                } else {
-+                    return;
-+                }
-+            }
-+        }
-+        if (num_stripes == 1) {
-+            /* mirror */
-+            for (i = 1; i < 2; ++i) {
-+                tx_rx[i] = tx_rx[0];
-+            }
-+        }
-+
-+        busses = ARRAY_FIELD_EX32(s->regs, GQSPI_GF_SNAPSHOT, DATA_BUS_SELECT);
-+        for (i = 0; i < 2; ++i) {
-+            if (busses & (1 << i)) {
-+                DB_PRINT_L(1, "bus %d tx = %02x\n", i, tx_rx[i]);
-+            }
-+            tx_rx[i] = ssi_transfer(s->spi[i], tx_rx[i]);
-+            if (busses & (1 << i)) {
-+                DB_PRINT_L(1, "bus %d rx = %02x\n", i, tx_rx[i]);
-+            }
-+        }
-+
-+        switch (busses) {
-+        case 0x3:
-+            if (num_stripes == 2) {
-+                s->regs[R_GQSPI_DATA_STS]--;
-+            }
-+            /* fallthrough */
-+        default:
-+            if (s->regs[R_GQSPI_DATA_STS] != 0) {
-+                /* Don't let this wrap around */
-+                s->regs[R_GQSPI_DATA_STS]--;
-+            }
-+        }
-+
-+        if (ARRAY_FIELD_EX32(s->regs, GQSPI_GF_SNAPSHOT, RECIEVE)) {
-+            for (i = 0; i < 2; ++i) {
-+                if (busses & (1 << i)) {
-+                    DB_PRINT_L(1, "bus %d push_byte = %02x\n",
-+                               i, tx_rx[i]);
-+                   fifo8_push(&s->rx_fifo_g, tx_rx[i]);
-+                   s->rx_fifo_g_align++;
-+                }
-+            }
-+        }
-+
-+        if (!s->regs[R_GQSPI_DATA_STS]) {
-+            for (; s->tx_fifo_g_align % 4; s->tx_fifo_g_align++) {
-+                fifo8_pop(&s->tx_fifo_g);
-+            }
-+            for (; s->rx_fifo_g_align % 4; s->rx_fifo_g_align++) {
-+                fifo8_push(&s->rx_fifo_g, 0);
-+            }
-+        }
-+    }
-+}
-+
- static int xilinx_spips_num_dummies(XilinxQSPIPS *qs, uint8_t command)
- {
-     if (!qs) {
-@@ -327,9 +599,6 @@ static void xilinx_spips_flush_txfifo(XilinxSPIPS *s)
-         uint8_t addr_length;
- 
-         if (fifo8_is_empty(&s->tx_fifo)) {
--            if (!(s->regs[R_LQSPI_CFG] & LQSPI_CFG_LQ_MODE)) {
--                s->regs[R_INTR_STATUS] |= IXR_TX_FIFO_UNDERFLOW;
--            }
-             xilinx_spips_update_ixr(s);
-             return;
-         } else if (s->snoop_state == SNOOP_STRIPING) {
-@@ -490,16 +759,31 @@ static void xilinx_spips_check_zero_pump(XilinxSPIPS *s)
- 
- static void xilinx_spips_check_flush(XilinxSPIPS *s)
- {
--    if (s->man_start_com ||
--        (!fifo8_is_empty(&s->tx_fifo) &&
--         !(s->regs[R_CONFIG] & MAN_START_EN))) {
--        xilinx_spips_check_zero_pump(s);
--        xilinx_spips_flush_txfifo(s);
-+    bool gqspi_has_work = s->regs[R_GQSPI_DATA_STS] ||
-+                          !fifo32_is_empty(&s->fifo_g);
-+
-+    if (ARRAY_FIELD_EX32(s->regs, GQSPI_SELECT, GENERIC_QSPI_EN)) {
-+        if (s->man_start_com_g ||
-+            (gqspi_has_work &&
-+             !ARRAY_FIELD_EX32(s->regs, GQSPI_CNFG, GEN_FIFO_START_MODE))) {
-+            xilinx_spips_flush_fifo_g(s);
-+        }
-+    } else {
-+        if (s->man_start_com ||
-+            (!fifo8_is_empty(&s->tx_fifo) &&
-+             !(s->regs[R_CONFIG] & MAN_START_EN))) {
-+            xilinx_spips_check_zero_pump(s);
-+            xilinx_spips_flush_txfifo(s);
-+        }
-     }
- 
-     if (fifo8_is_empty(&s->tx_fifo) && !s->regs[R_TRANSFER_SIZE]) {
-         s->man_start_com = false;
-     }
-+
-+    if (!gqspi_has_work) {
-+        s->man_start_com_g = false;
-+    }
-     xilinx_spips_update_ixr(s);
- }
- 
-@@ -514,6 +798,54 @@ static inline int rx_data_bytes(XilinxSPIPS *s, uint8_t *value, int max)
-     return max - i;
- }
- 
-+static const void *pop_buf(Fifo8 *fifo, uint32_t max, uint32_t *num)
-+{
-+    void *ret;
-+
-+    if (max == 0 || max > fifo->num) {
-+        abort();
-+    }
-+    *num = MIN(fifo->capacity - fifo->head, max);
-+    ret = &fifo->data[fifo->head];
-+    fifo->head += *num;
-+    fifo->head %= fifo->capacity;
-+    fifo->num -= *num;
-+    return ret;
-+}
-+
-+static void xlnx_zynqmp_qspips_notify(void *opaque)
-+{
-+    XlnxZynqMPQSPIPS *rq = XLNX_ZYNQMP_QSPIPS(opaque);
-+    XilinxSPIPS *s = XILINX_SPIPS(rq);
-+    Fifo8 *recv_fifo;
-+
-+    if (ARRAY_FIELD_EX32(s->regs, GQSPI_SELECT, GENERIC_QSPI_EN)) {
-+        if (!(ARRAY_FIELD_EX32(s->regs, GQSPI_CNFG, MODE_EN) == 2)) {
-+            return;
-+        }
-+        recv_fifo = &s->rx_fifo_g;
-+    } else {
-+        if (!(s->regs[R_CMND] & R_CMND_DMA_EN)) {
-+            return;
-+        }
-+        recv_fifo = &s->rx_fifo;
-+    }
-+
-+    while (recv_fifo->num >= 4
-+           && stream_can_push(rq->dma, xlnx_zynqmp_qspips_notify, rq))
-+    {
-+        size_t ret;
-+        uint32_t num;
-+        const void *rxd = pop_buf(recv_fifo, 4, &num);
-+
-+        memcpy(rq->dma_buf, rxd, num);
-+
-+        ret = stream_push(rq->dma, rq->dma_buf, 4);
-+        assert(ret == 4);
-+        xilinx_spips_check_flush(s);
-+    }
-+}
-+
- static uint64_t xilinx_spips_read(void *opaque, hwaddr addr,
-                                                         unsigned size)
- {
-@@ -522,6 +854,8 @@ static uint64_t xilinx_spips_read(void *opaque, hwaddr addr,
-     uint32_t ret;
-     uint8_t rx_buf[4];
-     int shortfall;
-+    const void *rxd;
-+    uint32_t rx_num;
- 
-     memset(rx_buf, 0, sizeof(rx_buf));
- 
-@@ -563,6 +897,21 @@ static uint64_t xilinx_spips_read(void *opaque, hwaddr addr,
-             ret <<= 8 * shortfall;
-         }
-         DB_PRINT_L(0, "addr=" TARGET_FMT_plx " = %x\n", addr * 4, ret);
-+        xilinx_spips_check_flush(s);
-+        xilinx_spips_update_ixr(s);
-+        return ret;
-+    case R_GQSPI_RXD:
-+        if (fifo8_is_empty(&s->rx_fifo_g)) {
-+            qemu_log_mask(LOG_GUEST_ERROR, "Read from empty GQSPI RX FIFO\n");
-+            return 0;
-+        }
-+        rxd = pop_buf(&s->rx_fifo_g, 4, &rx_num);
-+        assert(!(rx_num % 4));
-+        memcpy(rx_buf, rxd, rx_num);
-+        ret = ARRAY_FIELD_EX32(s->regs, GQSPI_CNFG, ENDIAN) ?
-+              cpu_to_be32(*(uint32_t *)rx_buf) :
-+              cpu_to_le32(*(uint32_t *)rx_buf);
-+        xilinx_spips_check_flush(s);
-         xilinx_spips_update_ixr(s);
-         return ret;
-     }
-@@ -624,6 +973,49 @@ static void xilinx_spips_write(void *opaque, hwaddr addr,
-         tx_data_bytes(&s->tx_fifo, (uint32_t)value, tx_btt,
-                       s->regs[R_CONFIG] & R_CONFIG_ENDIAN);
-         goto no_reg_update;
-+    case R_GQSPI_CNFG:
-+        mask = ~(R_GQSPI_CNFG_GEN_FIFO_START_MASK);
-+        if (FIELD_EX32(value, GQSPI_CNFG, GEN_FIFO_START) &&
-+            ARRAY_FIELD_EX32(s->regs, GQSPI_CNFG, GEN_FIFO_START_MODE)) {
-+            s->man_start_com_g = true;
-+        }
-+        break;
-+    case R_GQSPI_GEN_FIFO:
-+        if (!fifo32_is_full(&s->fifo_g)) {
-+            fifo32_push(&s->fifo_g, value);
-+        }
-+        goto no_reg_update;
-+    case R_GQSPI_TXD:
-+        tx_data_bytes(&s->tx_fifo_g, (uint32_t)value, 4,
-+                      ARRAY_FIELD_EX32(s->regs, GQSPI_CNFG, ENDIAN));
-+        goto no_reg_update;
-+    case R_GQSPI_FIFO_CTRL:
-+        mask = 0;
-+        if (FIELD_EX32(value, GQSPI_FIFO_CTRL, GENERIC_FIFO_RESET)) {
-+            fifo32_reset(&s->fifo_g);
-+        }
-+        if (FIELD_EX32(value, GQSPI_FIFO_CTRL, TX_FIFO_RESET)) {
-+            fifo8_reset(&s->tx_fifo_g);
-+        }
-+        if (FIELD_EX32(value, GQSPI_FIFO_CTRL, RX_FIFO_RESET)) {
-+            fifo8_reset(&s->rx_fifo_g);
-+        }
-+        break;
-+    case R_GQSPI_IDR:
-+        s->regs[R_GQSPI_IMR] |= value;
-+        goto no_reg_update;
-+    case R_GQSPI_IER:
-+        s->regs[R_GQSPI_IMR] &= ~value;
-+        goto no_reg_update;
-+    case R_GQSPI_ISR:
-+        s->regs[R_GQSPI_ISR] &= ~value;
-+        goto no_reg_update;
-+    case R_GQSPI_IMR:
-+    case R_GQSPI_RXD:
-+    case R_GQSPI_GF_SNAPSHOT:
-+    case R_GQSPI_MOD_ID:
-+        mask = 0;
-+        break;
-     }
-     s->regs[addr] = (s->regs[addr] & ~mask) | (value & mask);
- no_reg_update:
-@@ -667,6 +1059,9 @@ static void xilinx_qspips_write(void *opaque, hwaddr addr,
-     if (s->regs[R_CMND] & R_CMND_RXFIFO_DRAIN) {
-         fifo8_reset(&s->rx_fifo);
-     }
-+    if (object_dynamic_cast(OBJECT(s), TYPE_XLNX_ZYNQMP_QSPIPS)) {
-+        xlnx_zynqmp_qspips_notify(s);
-+    }
- }
- 
- static const MemoryRegionOps qspips_ops = {
-@@ -812,6 +1207,7 @@ static void xilinx_spips_realize(DeviceState *dev, Error **errp)
-     }
- 
-     s->cs_lines = g_new0(qemu_irq, s->num_cs * s->num_busses);
-+    s->cs_lines_state = g_new0(bool, s->num_cs * s->num_busses);
-     for (i = 0, cs = s->cs_lines; i < s->num_busses; ++i, cs += s->num_cs) {
-         ssi_auto_connect_slaves(DEVICE(s), cs, s->spi[i]);
-     }
-@@ -829,6 +1225,9 @@ static void xilinx_spips_realize(DeviceState *dev, Error **errp)
- 
-     fifo8_create(&s->rx_fifo, xsc->rx_fifo_size);
-     fifo8_create(&s->tx_fifo, xsc->tx_fifo_size);
-+    fifo8_create(&s->rx_fifo_g, xsc->rx_fifo_size);
-+    fifo8_create(&s->tx_fifo_g, xsc->tx_fifo_size);
-+    fifo32_create(&s->fifo_g, 32);
- }
- 
- static void xilinx_qspips_realize(DeviceState *dev, Error **errp)
-@@ -860,6 +1259,17 @@ static void xilinx_qspips_realize(DeviceState *dev, Error **errp)
-     }
- }
- 
-+static void xlnx_zynqmp_qspips_init(Object *obj)
-+{
-+    XlnxZynqMPQSPIPS *rq = XLNX_ZYNQMP_QSPIPS(obj);
-+
-+    object_property_add_link(obj, "stream-connected-dma", TYPE_STREAM_SLAVE,
-+                             (Object **)&rq->dma,
-+                             object_property_allow_set_link,
-+                             OBJ_PROP_LINK_UNREF_ON_RELEASE,
-+                             NULL);
-+}
-+
- static int xilinx_spips_post_load(void *opaque, int version_id)
- {
-     xilinx_spips_update_ixr((XilinxSPIPS *)opaque);
-@@ -940,10 +1350,18 @@ static const TypeInfo xilinx_qspips_info = {
-     .class_init = xilinx_qspips_class_init,
- };
- 
-+static const TypeInfo xlnx_zynqmp_qspips_info = {
-+    .name  = TYPE_XLNX_ZYNQMP_QSPIPS,
-+    .parent = TYPE_XILINX_QSPIPS,
-+    .instance_size  = sizeof(XlnxZynqMPQSPIPS),
-+    .instance_init = xlnx_zynqmp_qspips_init,
-+};
-+
- static void xilinx_spips_register_types(void)
- {
-     type_register_static(&xilinx_spips_info);
-     type_register_static(&xilinx_qspips_info);
-+    type_register_static(&xlnx_zynqmp_qspips_info);
- }
- 
- type_init(xilinx_spips_register_types)
-diff --git a/include/hw/ssi/xilinx_spips.h b/include/hw/ssi/xilinx_spips.h
-index df6e245..ecfeb28 100644
---- a/include/hw/ssi/xilinx_spips.h
-+++ b/include/hw/ssi/xilinx_spips.h
-@@ -26,11 +26,12 @@
- #define XILINX_SPIPS_H
- 
- #include "hw/ssi/ssi.h"
--#include "qemu/fifo8.h"
-+#include "qemu/fifo32.h"
-+#include "hw/stream.h"
- 
- typedef struct XilinxSPIPS XilinxSPIPS;
- 
--#define XLNX_SPIPS_R_MAX        (0x100 / 4)
-+#define XLNX_SPIPS_R_MAX        0x200
- 
- /* Bite off 4k chunks at a time */
- #define LQSPI_CACHE_SIZE 1024
-@@ -66,10 +67,24 @@ struct XilinxSPIPS {
-     uint8_t link_state_next;
-     uint8_t link_state_next_when;
-     qemu_irq *cs_lines;
-+    bool *cs_lines_state;
-     SSIBus **spi;
- 
-     Fifo8 rx_fifo;
-     Fifo8 tx_fifo;
-+    /* GQSPI has seperate tx/rx fifos */
-+    Fifo8 rx_fifo_g;
-+    Fifo8 tx_fifo_g;
-+    /*
-+     * at the end of each generic command, misaligned extra bytes are discard
-+     * or padded to tx and rx respectively to round it out (and avoid need for
-+     * individual byte access. Since we use byte fifos, keep track of the
-+     * alignment WRT to word access.
-+     */
-+    uint8_t rx_fifo_g_align;
-+    uint8_t tx_fifo_g_align;
-+
-+    Fifo32 fifo_g;
- 
-     uint8_t num_txrx_bytes;
-     uint32_t rx_discard;
-@@ -77,6 +92,7 @@ struct XilinxSPIPS {
-     uint32_t regs[XLNX_SPIPS_R_MAX];
- 
-     bool man_start_com;
-+    bool man_start_com_g;
- };
- 
- typedef struct {
-@@ -88,6 +104,13 @@ typedef struct {
-     bool mmio_execution_enabled;
- } XilinxQSPIPS;
- 
-+typedef struct {
-+    XilinxQSPIPS parent_obj;
-+
-+    StreamSlave *dma;
-+    uint8_t dma_buf[4];
-+} XlnxZynqMPQSPIPS;
-+
- typedef struct XilinxSPIPSClass {
-     SysBusDeviceClass parent_class;
- 
-@@ -99,6 +122,7 @@ typedef struct XilinxSPIPSClass {
- 
- #define TYPE_XILINX_SPIPS "xlnx.ps7-spi"
- #define TYPE_XILINX_QSPIPS "xlnx.ps7-qspi"
-+#define TYPE_XLNX_ZYNQMP_QSPIPS "xlnx.usmp-gqspi"
- 
- #define XILINX_SPIPS(obj) \
-      OBJECT_CHECK(XilinxSPIPS, (obj), TYPE_XILINX_SPIPS)
-@@ -110,4 +134,7 @@ typedef struct XilinxSPIPSClass {
- #define XILINX_QSPIPS(obj) \
-      OBJECT_CHECK(XilinxQSPIPS, (obj), TYPE_XILINX_QSPIPS)
- 
-+#define XLNX_ZYNQMP_QSPIPS(obj) \
-+     OBJECT_CHECK(XlnxZynqMPQSPIPS, (obj), TYPE_XLNX_ZYNQMP_QSPIPS)
-+
- #endif /* XILINX_SPIPS_H */
--- 
-2.9.3
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTcxMDIwMjMyMDIzLjE1MDEwLTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJv
+Lm9yZwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHY3IDAwLzUyXSB0Y2cgcXVldWVkIHBh
+dGNoZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpu
+PTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpn
+aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBk
+aWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJz
+ZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRD
+SCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEg
+Z2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1h
+aWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBu
+PSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBk
+YXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0
+byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjg4NGQ5ZWNjMGUgdHJhbnNsYXRlLWFsbDogZXhpdCBmcm9t
+IHRiX3BoeXNfaW52YWxpZGF0ZSBpZiBxaHRfcmVtb3ZlIGZhaWxzCjVmZGU2ZDRiODQgdGNnOiBJ
+bml0aWFsaXplIGNwdV9lbnYgZ2VuZXJpY2FsbHkKMjk3NDUxM2YzYSB0Y2c6IGVuYWJsZSBtdWx0
+aXBsZSBUQ0cgY29udGV4dHMgaW4gc29mdG1tdQoyODdjMGMzMGViIHRjZzogaW50cm9kdWNlIHJl
+Z2lvbnMgdG8gc3BsaXQgY29kZV9nZW5fYnVmZmVyCjgxMjNmMzU0ZTggdHJhbnNsYXRlLWFsbDog
+dXNlIHFlbXVfcHJvdGVjdF9yd3gvbm9uZSBoZWxwZXJzCmEzMGRiOWZmMGMgb3NkZXA6IGludHJv
+ZHVjZSBxZW11X21wcm90ZWN0X3J3eC9ub25lCjNkNmQ1ZmEwMTEgdGNnOiBhbGxvY2F0ZSBvcHRp
+bWl6ZXIgdGVtcHMgd2l0aCB0Y2dfbWFsbG9jCjI3NzhkMWVlODAgdGNnOiBkaXN0cmlidXRlIHBy
+b2ZpbGluZyBjb3VudGVycyBhY3Jvc3MgVENHQ29udGV4dCdzCjg3MzU2YzA1ZWMgdGNnOiBpbnRy
+b2R1Y2UgKip0Y2dfY3R4cyB0byBrZWVwIHRyYWNrIG9mIGFsbCBUQ0dDb250ZXh0J3MKZWY5ODE4
+ZGI2ZCBnZW4taWNvdW50OiBmb2xkIGV4aXRyZXFfbGFiZWwgaW50byBUQ0dDb250ZXh0CjUwZjVm
+MmYzZjEgdGNnOiBkZWZpbmUgdGNnX2luaXRfY3R4IGFuZCBtYWtlIHRjZ19jdHggYSBwb2ludGVy
+CjEwZjM3ZTE4ZTggdGNnOiB0YWtlIHRiX2N0eCBvdXQgb2YgVENHQ29udGV4dApmZmYyYjMwZmUy
+IHRyYW5zbGF0ZS1hbGw6IHJlcG9ydCBjb3JyZWN0IGF2ZyBob3N0IFRCIHNpemUKYjE0MzllYjIx
+NSBleGVjLWFsbDogcmVuYW1lIHRiX2ZyZWUgdG8gdGJfcmVtb3ZlCmE5ZmQ0NTg2NjQgdHJhbnNs
+YXRlLWFsbDogdXNlIGEgYmluYXJ5IHNlYXJjaCB0cmVlIHRvIHRyYWNrIFRCcyBpbiBUQkNvbnRl
+eHQKNzBkYjVkMmRlNiB0Y2c6IFJlbW92ZSBDRl9JR05PUkVfSUNPVU5UCmY0OWY4MzQ4NGEgdGNn
+OiBBZGQgQ0ZfTEFTVF9JTyArIENGX1VTRV9JQ09VTlQgdG8gQ0ZfSEFTSF9NQVNLCjA2NWFlYWZi
+OWYgY3B1LWV4ZWM6IGxvb2t1cC9nZW5lcmF0ZSBUQiBvdXRzaWRlIGV4Y2x1c2l2ZSByZWdpb24g
+ZHVyaW5nIHN0ZXBfYXRvbWljCjU2NWE2YTJmNWYgdGNnOiBjaGVjayBDRl9QQVJBTExFTCBpbnN0
+ZWFkIG9mIHBhcmFsbGVsX2NwdXMKMzU0NWJmZWE2ZiB0YXJnZXQvc3BhcmM6IGNoZWNrIENGX1BB
+UkFMTEVMIGluc3RlYWQgb2YgcGFyYWxsZWxfY3B1cwowZmQyMzFkNjBjIHRhcmdldC9zaDQ6IGNo
+ZWNrIENGX1BBUkFMTEVMIGluc3RlYWQgb2YgcGFyYWxsZWxfY3B1cwpkNzZmMTkzMTI0IHRhcmdl
+dC9zMzkweDogY2hlY2sgQ0ZfUEFSQUxMRUwgaW5zdGVhZCBvZiBwYXJhbGxlbF9jcHVzCmE3MDI3
+NjgyNzkgdGFyZ2V0L202OGs6IGNoZWNrIENGX1BBUkFMTEVMIGluc3RlYWQgb2YgcGFyYWxsZWxf
+Y3B1cwplYWJmNWVjM2I0IHRhcmdldC9pMzg2OiBjaGVjayBDRl9QQVJBTExFTCBpbnN0ZWFkIG9m
+IHBhcmFsbGVsX2NwdXMKODYzZjE5YjgwNiB0YXJnZXQvaHBwYTogY2hlY2sgQ0ZfUEFSQUxMRUwg
+aW5zdGVhZCBvZiBwYXJhbGxlbF9jcHVzCmQwMWM4MzYzOTkgdGFyZ2V0L2FybTogY2hlY2sgQ0Zf
+UEFSQUxMRUwgaW5zdGVhZCBvZiBwYXJhbGxlbF9jcHVzCjZmN2JjYzVjMDEgdGNnOiBjb252ZXJ0
+IHRiLT5jZmxhZ3MgcmVhZHMgdG8gdGJfY2ZsYWdzKHRiKQo3OWFhNzE5MzFmIHRjZzogSW5jbHVk
+ZSBDRl9DT1VOVF9NQVNLIGluIENGX0hBU0hfTUFTSwpiZDg1OTZjOTkwIHRjZzogQWRkIENQVVN0
+YXRlIGNmbGFnc19uZXh0X3RiCmNjOTRiMThlMjEgdGNnOiBkZWZpbmUgQ0ZfUEFSQUxMRUwgYW5k
+IHVzZSBpdCBmb3IgVEIgaGFzaGluZyBhbG9uZyB3aXRoIENGX0NPVU5UX01BU0sKNzVlNmQ3Y2Vi
+ZSB0Y2c6IFVzZSBwb2ludGVycyBpbiBUQ0dPcC0+YXJncwpjOWIzZjA5MjRkIHRjZzogVXNlIG9m
+ZnNldHMgbm90IGluZGljZXMgZm9yIFRDR3ZfKgplYzc5OGU5MjA2IHFvbTogSW50cm9kdWNlIENQ
+VUNsYXNzLnRjZ19pbml0aWFsaXplCjA3ZDMzNGFiNzUgdGNnOiBSZW1vdmUgVENHVl9FUVVBTCoK
+MGM3OTdiNTNiNiB0Y2c6IFJlbW92ZSBHRVRfVENHVl8qIGFuZCBNQUtFX1RDR1ZfKgphMTZjNjVk
+ZmFlIHRjZzogSW50cm9kdWNlIHRlbXBfdGNndl97aTMyLCBpNjQsIHB0cn0KOGRkMzA0ZmM3NSB0
+Y2c6IEludHJvZHVjZSB0Y2d2X3tpMzIsIGk2NCwgcHRyfV97YXJnLCB0ZW1wfQo0MjgzMGMzNDNk
+IHRjZzogUHVzaCB0Y2dfY3R4IGludG8gdGNnX2dlbl9jYWxsTgpmMzg4MmU5ODY2IHRjZzogUHVz
+aCB0Y2dfY3R4IGludG8gZ2VuZXJhdG9yIGZ1bmN0aW9ucwpmZTk2NDExY2EwIHRjZzogVXNlIHBl
+ci10ZW1wIHN0YXRlIGRhdGEgaW4gb3B0aW1pemUKNTFkMzMxMjM1OSB0Y2c6IFJlbW92ZSB1bnVz
+ZWQgVENHX0NBTExfRFVNTVlfVENHVgplY2FmYzNiOTI3IHRjZzogQ2hhbmdlIHRlbXBfYWxsb2Nh
+dGVfZnJhbWUgYXJnIHRvIFRDR1RlbXAKMTQ5YmQ2MWEwMCB0Y2c6IEF2b2lkIGxvb3BzIGFnYWlu
+c3QgdmFyaWFibGUgYm91bmRzCmYzYTQyMGQ2YzggdGNnOiBVc2UgcGVyLXRlbXAgc3RhdGUgZGF0
+YSBpbiBsaXZlbmVzcwpmNmIzZTczMTQxIHRjZzogSW50cm9kdWNlIHRlbXBfYXJnLCBleHBvcnQg
+dGVtcF9pZHgKMGE3NjRiZDAzNSB0Y2c6IFJldHVybiBOVUxMIHRlbXAgZm9yIFRDR19DQUxMX0RV
+TU1ZX0FSRwo5M2Q4YzEwZDM0IHRjZzogQWRkIHRlbXBfZ2xvYmFsIGJpdCB0byBUQ0dUZW1wCjE1
+YjZjN2VkMzkgdGNnOiBJbnRyb2R1Y2UgYXJnX3RlbXAKMGVmZTY4MjdjYyB0Y2c6IFByb3BhZ2F0
+ZSBUQ0dPcCBkb3duIHRvIGFsbG9jYXRvcnMKM2M1NmY0Zjk2YyB0Y2c6IFByb3BhZ2F0ZSBhcmdz
+IHRvIG9wLT5hcmdzIGluIHRjZy5jCmE3NzBiOGQ2ZmUgdGNnOiBQcm9wYWdhdGUgYXJncyB0byBv
+cC0+YXJncyBpbiBvcHRpbWl6ZXIKMzFkYTlmYWYzNiB0Y2c6IE1lcmdlIG9wY29kZSBhcmd1bWVu
+dHMgaW50byBUQ0dPcAoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS81Mjog
+dGNnOiBNZXJnZSBvcGNvZGUgYXJndW1lbnRzIGludG8gVENHT3AuLi4KRVJST1I6IHNwYWNlcyBw
+cm9oaWJpdGVkIGFyb3VuZCB0aGF0ICc6JyAoY3R4Old4VykKIzQ4MjogRklMRTogdGNnL3RjZy5o
+OjYxMzoKKyAgICB1bnNpZ25lZCBjYWxsaSAgOiA0OyAgICAgICAgLyogMTIgKi8KICAgICAgICAg
+ICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlcyBwcm9oaWJpdGVkIGFyb3VuZCB0aGF0ICc6JyAo
+Y3R4Old4VykKIzQ4MzogRklMRTogdGNnL3RjZy5oOjYxNDoKKyAgICB1bnNpZ25lZCBjYWxsbyAg
+OiAyOyAgICAgICAgLyogMTQgKi8KICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNl
+IHByb2hpYml0ZWQgYmVmb3JlIHRoYXQgJzonIChjdHg6V3hXKQojNDg0OiBGSUxFOiB0Y2cvdGNn
+Lmg6NjE1OgorICAgIHVuc2lnbmVkICAgICAgICA6IDI7ICAgICAgICAvKiAxNiAqLwogICAgICAg
+ICAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2VzIHByb2hpYml0ZWQgYXJvdW5kIHRoYXQgJzon
+IChjdHg6V3hXKQojNDg5OiBGSUxFOiB0Y2cvdGNnLmg6NjE4OgorICAgIHVuc2lnbmVkIHByZXYg
+ICA6IDE2OyAgICAgICAvKiAzMiAqLwogICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogc3Bh
+Y2VzIHByb2hpYml0ZWQgYXJvdW5kIHRoYXQgJzonIChjdHg6V3hXKQojNDkwOiBGSUxFOiB0Y2cv
+dGNnLmg6NjE5OgorICAgIHVuc2lnbmVkIG5leHQgICA6IDE2OyAgICAgICAvKiA0OCAqLwogICAg
+ICAgICAgICAgICAgICAgICBeCgp0b3RhbDogNSBlcnJvcnMsIDAgd2FybmluZ3MsIDQ4NSBsaW5l
+cyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4g
+IElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0
+byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2lu
+ZyBQQVRDSCAyLzUyOiB0Y2c6IFByb3BhZ2F0ZSBhcmdzIHRvIG9wLT5hcmdzIGluIG9wdGltaXpl
+ci4uLgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICctJyAoY3R4OlZ4VikKIzY0
+OTogRklMRTogdGNnL29wdGltaXplLmM6MTE2NToKKyAgICAgICAgICAgICAgICB0Y2dfb3B0X2dl
+bl9tb3Yocywgb3AsIG9wLT5hcmdzWzBdLCBvcC0+YXJnc1s0LXRtcF0pOwogICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgp0b3Rh
+bDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDkxMiBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhh
+cyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMK
+YXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNI
+RUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAzLzUyOiB0Y2c6IFByb3Bh
+Z2F0ZSBhcmdzIHRvIG9wLT5hcmdzIGluIHRjZy5jLi4uCkNoZWNraW5nIFBBVENIIDQvNTI6IHRj
+ZzogUHJvcGFnYXRlIFRDR09wIGRvd24gdG8gYWxsb2NhdG9ycy4uLgpDaGVja2luZyBQQVRDSCA1
+LzUyOiB0Y2c6IEludHJvZHVjZSBhcmdfdGVtcC4uLgpDaGVja2luZyBQQVRDSCA2LzUyOiB0Y2c6
+IEFkZCB0ZW1wX2dsb2JhbCBiaXQgdG8gVENHVGVtcC4uLgpDaGVja2luZyBQQVRDSCA3LzUyOiB0
+Y2c6IFJldHVybiBOVUxMIHRlbXAgZm9yIFRDR19DQUxMX0RVTU1ZX0FSRy4uLgpDaGVja2luZyBQ
+QVRDSCA4LzUyOiB0Y2c6IEludHJvZHVjZSB0ZW1wX2FyZywgZXhwb3J0IHRlbXBfaWR4Li4uCkNo
+ZWNraW5nIFBBVENIIDkvNTI6IHRjZzogVXNlIHBlci10ZW1wIHN0YXRlIGRhdGEgaW4gbGl2ZW5l
+c3MuLi4KV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzE4NzogRklMRTogdGNnL3Rj
+Zy5jOjE4MDg6CisgICAgICAgICAgICB9IGVsc2UgaWYgKGFyZ190ZW1wKG9wLT5hcmdzWzBdKS0+
+c3RhdGUgPT0gVFNfREVBRCAmJiBoYXZlX29wY19uZXcyKSB7Cgp0b3RhbDogMCBlcnJvcnMsIDEg
+d2FybmluZ3MsIDQ0MSBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVt
+cywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0
+aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJ
+TlRBSU5FUlMuCkNoZWNraW5nIFBBVENIIDEwLzUyOiB0Y2c6IEF2b2lkIGxvb3BzIGFnYWluc3Qg
+dmFyaWFibGUgYm91bmRzLi4uCkNoZWNraW5nIFBBVENIIDExLzUyOiB0Y2c6IENoYW5nZSB0ZW1w
+X2FsbG9jYXRlX2ZyYW1lIGFyZyB0byBUQ0dUZW1wLi4uCkNoZWNraW5nIFBBVENIIDEyLzUyOiB0
+Y2c6IFJlbW92ZSB1bnVzZWQgVENHX0NBTExfRFVNTVlfVENHVi4uLgpDaGVja2luZyBQQVRDSCAx
+My81MjogdGNnOiBVc2UgcGVyLXRlbXAgc3RhdGUgZGF0YSBpbiBvcHRpbWl6ZS4uLgpDaGVja2lu
+ZyBQQVRDSCAxNC81MjogdGNnOiBQdXNoIHRjZ19jdHggaW50byBnZW5lcmF0b3IgZnVuY3Rpb25z
+Li4uCkNoZWNraW5nIFBBVENIIDE1LzUyOiB0Y2c6IFB1c2ggdGNnX2N0eCBpbnRvIHRjZ19nZW5f
+Y2FsbE4uLi4KQ2hlY2tpbmcgUEFUQ0ggMTYvNTI6IHRjZzogSW50cm9kdWNlIHRjZ3Zfe2kzMiwg
+aTY0LCBwdHJ9X3thcmcsIHRlbXB9Li4uCkNoZWNraW5nIFBBVENIIDE3LzUyOiB0Y2c6IEludHJv
+ZHVjZSB0ZW1wX3RjZ3Zfe2kzMiwgaTY0LCBwdHJ9Li4uCkNoZWNraW5nIFBBVENIIDE4LzUyOiB0
+Y2c6IFJlbW92ZSBHRVRfVENHVl8qIGFuZCBNQUtFX1RDR1ZfKi4uLgpDaGVja2luZyBQQVRDSCAx
+OS81MjogdGNnOiBSZW1vdmUgVENHVl9FUVVBTCouLi4KQ2hlY2tpbmcgUEFUQ0ggMjAvNTI6IHFv
+bTogSW50cm9kdWNlIENQVUNsYXNzLnRjZ19pbml0aWFsaXplLi4uCkNoZWNraW5nIFBBVENIIDIx
+LzUyOiB0Y2c6IFVzZSBvZmZzZXRzIG5vdCBpbmRpY2VzIGZvciBUQ0d2XyouLi4KQ2hlY2tpbmcg
+UEFUQ0ggMjIvNTI6IHRjZzogVXNlIHBvaW50ZXJzIGluIFRDR09wLT5hcmdzLi4uCkNoZWNraW5n
+IFBBVENIIDIzLzUyOiB0Y2c6IGRlZmluZSBDRl9QQVJBTExFTCBhbmQgdXNlIGl0IGZvciBUQiBo
+YXNoaW5nIGFsb25nIHdpdGggQ0ZfQ09VTlRfTUFTSy4uLgpDaGVja2luZyBQQVRDSCAyNC81Mjog
+dGNnOiBBZGQgQ1BVU3RhdGUgY2ZsYWdzX25leHRfdGIuLi4KQ2hlY2tpbmcgUEFUQ0ggMjUvNTI6
+IHRjZzogSW5jbHVkZSBDRl9DT1VOVF9NQVNLIGluIENGX0hBU0hfTUFTSy4uLgpDaGVja2luZyBQ
+QVRDSCAyNi81MjogdGNnOiBjb252ZXJ0IHRiLT5jZmxhZ3MgcmVhZHMgdG8gdGJfY2ZsYWdzKHRi
+KS4uLgpFUlJPUjogcmV0dXJuIGlzIG5vdCBhIGZ1bmN0aW9uLCBwYXJlbnRoZXNlcyBhcmUgbm90
+IHJlcXVpcmVkCiMxMDM6IEZJTEU6IHRhcmdldC9hbHBoYS90cmFuc2xhdGUuYzo0NTg6CisgICAg
+cmV0dXJuICgodGJfY2ZsYWdzKGN0eC0+YmFzZS50YikgJiBDRl9MQVNUX0lPKQoKV0FSTklORzog
+bGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzIxOTogRklMRTogdGFyZ2V0L2hwcGEvdHJhbnNsYXRl
+LmM6NDcyOgorICAgIGlmICgodGJfY2ZsYWdzKGN0eC0+YmFzZS50YikgJiBDRl9MQVNUX0lPKSB8
+fCBjdHgtPmJhc2Uuc2luZ2xlc3RlcF9lbmFibGVkKSB7Cgp0b3RhbDogMSBlcnJvcnMsIDEgd2Fy
+bmluZ3MsIDkyNCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywg
+cGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZl
+cyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRB
+SU5FUlMuCgpDaGVja2luZyBQQVRDSCAyNy81MjogdGFyZ2V0L2FybTogY2hlY2sgQ0ZfUEFSQUxM
+RUwgaW5zdGVhZCBvZiBwYXJhbGxlbF9jcHVzLi4uCkNoZWNraW5nIFBBVENIIDI4LzUyOiB0YXJn
+ZXQvaHBwYTogY2hlY2sgQ0ZfUEFSQUxMRUwgaW5zdGVhZCBvZiBwYXJhbGxlbF9jcHVzLi4uCkNo
+ZWNraW5nIFBBVENIIDI5LzUyOiB0YXJnZXQvaTM4NjogY2hlY2sgQ0ZfUEFSQUxMRUwgaW5zdGVh
+ZCBvZiBwYXJhbGxlbF9jcHVzLi4uCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMy
+MzogRklMRTogdGFyZ2V0L2kzODYvdHJhbnNsYXRlLmM6NTMxMDoKKyAgICAgICAgICAgIGlmICgo
+cy0+cHJlZml4ICYgUFJFRklYX0xPQ0spICYmICh0Yl9jZmxhZ3Mocy0+YmFzZS50YikgJiBDRl9Q
+QVJBTExFTCkpIHsKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMzMjogRklMRTog
+dGFyZ2V0L2kzODYvdHJhbnNsYXRlLmM6NTMyMToKKyAgICAgICAgICAgIGlmICgocy0+cHJlZml4
+ICYgUFJFRklYX0xPQ0spICYmICh0Yl9jZmxhZ3Mocy0+YmFzZS50YikgJiBDRl9QQVJBTExFTCkp
+IHsKCnRvdGFsOiAwIGVycm9ycywgMiB3YXJuaW5ncywgMTYgbGluZXMgY2hlY2tlZAoKWW91ciBw
+YXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2Ug
+ZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIs
+IHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgpDaGVja2luZyBQQVRDSCAzMC81MjogdGFy
+Z2V0L202OGs6IGNoZWNrIENGX1BBUkFMTEVMIGluc3RlYWQgb2YgcGFyYWxsZWxfY3B1cy4uLgpD
+aGVja2luZyBQQVRDSCAzMS81MjogdGFyZ2V0L3MzOTB4OiBjaGVjayBDRl9QQVJBTExFTCBpbnN0
+ZWFkIG9mIHBhcmFsbGVsX2NwdXMuLi4KQ2hlY2tpbmcgUEFUQ0ggMzIvNTI6IHRhcmdldC9zaDQ6
+IGNoZWNrIENGX1BBUkFMTEVMIGluc3RlYWQgb2YgcGFyYWxsZWxfY3B1cy4uLgpDaGVja2luZyBQ
+QVRDSCAzMy81MjogdGFyZ2V0L3NwYXJjOiBjaGVjayBDRl9QQVJBTExFTCBpbnN0ZWFkIG9mIHBh
+cmFsbGVsX2NwdXMuLi4KQ2hlY2tpbmcgUEFUQ0ggMzQvNTI6IHRjZzogY2hlY2sgQ0ZfUEFSQUxM
+RUwgaW5zdGVhZCBvZiBwYXJhbGxlbF9jcHVzLi4uCkNoZWNraW5nIFBBVENIIDM1LzUyOiBjcHUt
+ZXhlYzogbG9va3VwL2dlbmVyYXRlIFRCIG91dHNpZGUgZXhjbHVzaXZlIHJlZ2lvbiBkdXJpbmcg
+c3RlcF9hdG9taWMuLi4KQ2hlY2tpbmcgUEFUQ0ggMzYvNTI6IHRjZzogQWRkIENGX0xBU1RfSU8g
+KyBDRl9VU0VfSUNPVU5UIHRvIENGX0hBU0hfTUFTSy4uLgpDaGVja2luZyBQQVRDSCAzNy81Mjog
+dGNnOiBSZW1vdmUgQ0ZfSUdOT1JFX0lDT1VOVC4uLgpDaGVja2luZyBQQVRDSCAzOC81MjogdHJh
+bnNsYXRlLWFsbDogdXNlIGEgYmluYXJ5IHNlYXJjaCB0cmVlIHRvIHRyYWNrIFRCcyBpbiBUQkNv
+bnRleHQuLi4KQ2hlY2tpbmcgUEFUQ0ggMzkvNTI6IGV4ZWMtYWxsOiByZW5hbWUgdGJfZnJlZSB0
+byB0Yl9yZW1vdmUuLi4KQ2hlY2tpbmcgUEFUQ0ggNDAvNTI6IHRyYW5zbGF0ZS1hbGw6IHJlcG9y
+dCBjb3JyZWN0IGF2ZyBob3N0IFRCIHNpemUuLi4KQ2hlY2tpbmcgUEFUQ0ggNDEvNTI6IHRjZzog
+dGFrZSB0Yl9jdHggb3V0IG9mIFRDR0NvbnRleHQuLi4KQ2hlY2tpbmcgUEFUQ0ggNDIvNTI6IHRj
+ZzogZGVmaW5lIHRjZ19pbml0X2N0eCBhbmQgbWFrZSB0Y2dfY3R4IGEgcG9pbnRlci4uLgpDaGVj
+a2luZyBQQVRDSCA0My81MjogZ2VuLWljb3VudDogZm9sZCBleGl0cmVxX2xhYmVsIGludG8gVENH
+Q29udGV4dC4uLgpDaGVja2luZyBQQVRDSCA0NC81MjogdGNnOiBpbnRyb2R1Y2UgKip0Y2dfY3R4
+cyB0byBrZWVwIHRyYWNrIG9mIGFsbCBUQ0dDb250ZXh0J3MuLi4KQ2hlY2tpbmcgUEFUQ0ggNDUv
+NTI6IHRjZzogZGlzdHJpYnV0ZSBwcm9maWxpbmcgY291bnRlcnMgYWNyb3NzIFRDR0NvbnRleHQn
+cy4uLgpDaGVja2luZyBQQVRDSCA0Ni81MjogdGNnOiBhbGxvY2F0ZSBvcHRpbWl6ZXIgdGVtcHMg
+d2l0aCB0Y2dfbWFsbG9jLi4uCkNoZWNraW5nIFBBVENIIDQ3LzUyOiBvc2RlcDogaW50cm9kdWNl
+IHFlbXVfbXByb3RlY3Rfcnd4L25vbmUuLi4KQ2hlY2tpbmcgUEFUQ0ggNDgvNTI6IHRyYW5zbGF0
+ZS1hbGw6IHVzZSBxZW11X3Byb3RlY3Rfcnd4L25vbmUgaGVscGVycy4uLgpDaGVja2luZyBQQVRD
+SCA0OS81MjogdGNnOiBpbnRyb2R1Y2UgcmVnaW9ucyB0byBzcGxpdCBjb2RlX2dlbl9idWZmZXIu
+Li4KQ2hlY2tpbmcgUEFUQ0ggNTAvNTI6IHRjZzogZW5hYmxlIG11bHRpcGxlIFRDRyBjb250ZXh0
+cyBpbiBzb2Z0bW11Li4uCkNoZWNraW5nIFBBVENIIDUxLzUyOiB0Y2c6IEluaXRpYWxpemUgY3B1
+X2VudiBnZW5lcmljYWxseS4uLgpFUlJPUjogZG8gbm90IGluaXRpYWxpc2UgZ2xvYmFscyB0byAw
+IG9yIE5VTEwKIzY0NTogRklMRTogdGNnL3RjZy5jOjEyNDoKK1RDR3ZfZW52IGNwdV9lbnYgPSAw
+OwoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCA1NjcgbGluZXMgY2hlY2tlZAoKWW91ciBw
+YXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2Ug
+ZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIs
+IHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggNTIvNTI6IHRy
+YW5zbGF0ZS1hbGw6IGV4aXQgZnJvbSB0Yl9waHlzX2ludmFsaWRhdGUgaWYgcWh0X3JlbW92ZSBm
+YWlscy4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2Rl
+OiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6
+Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2
+ZWxAZnJlZWxpc3RzLm9yZw==
