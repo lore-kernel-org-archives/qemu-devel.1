@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38567)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39024)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e6bCv-00022s-1K
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 07:47:50 -0400
+	(envelope-from <eblake@redhat.com>) id 1e6bGJ-0002ne-Ce
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 07:51:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e6bCs-0001oB-Ep
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 07:47:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43422)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1e6bCs-0001nt-82
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 07:47:46 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D9A565F7BE
-	for <qemu-devel@nongnu.org>; Mon, 23 Oct 2017 11:47:44 +0000 (UTC)
-Date: Mon, 23 Oct 2017 12:47:37 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20171023114737.GK16472@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20171023095910.23202-1-marcandre.lureau@redhat.com>
-	<20171023095910.23202-6-marcandre.lureau@redhat.com>
-	<20171023113611.GJ16472@redhat.com>
-	<680041197.30689263.1508758917529.JavaMail.zimbra@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1e6bGD-0003Zk-Tb
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 07:51:19 -0400
+References: <20171019222637.17890-1-eblake@redhat.com>
+	<20171019222637.17890-7-eblake@redhat.com>
+	<fc70554b-fe64-0b33-af5f-142259d56036@virtuozzo.com>
+	<ae7945f3-c0c0-2238-7ad6-0f92cffaa816@redhat.com>
+	<821df5a9-bc7d-a2d9-140f-4bd4e0bd72b1@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <5e3d7dc8-a186-fa1f-4f0f-9e4ee20bf187@redhat.com>
+Date: Sat, 21 Oct 2017 11:02:15 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <680041197.30689263.1508758917529.JavaMail.zimbra@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 5/6] Add memfd based hostmem
+In-Reply-To: <821df5a9-bc7d-a2d9-140f-4bd4e0bd72b1@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="ODaf6pf7KGPuj2udMq6TO9886ReKEVvi9"
+Subject: Re: [Qemu-devel] [PATCH v5 06/11] nbd: Minimal structured read for
+ server
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,67 +28,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, Igor Mammedov <imammedo@redhat.com>, ehabkost@redhat.com
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, qemu-block@nongnu.org
 
-On Mon, Oct 23, 2017 at 07:41:57AM -0400, Marc-Andr=C3=A9 Lureau wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--ODaf6pf7KGPuj2udMq6TO9886ReKEVvi9
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, qemu-block@nongnu.org
+Message-ID: <5e3d7dc8-a186-fa1f-4f0f-9e4ee20bf187@redhat.com>
+Subject: Re: [PATCH v5 06/11] nbd: Minimal structured read for server
+References: <20171019222637.17890-1-eblake@redhat.com>
+ <20171019222637.17890-7-eblake@redhat.com>
+ <fc70554b-fe64-0b33-af5f-142259d56036@virtuozzo.com>
+ <ae7945f3-c0c0-2238-7ad6-0f92cffaa816@redhat.com>
+ <821df5a9-bc7d-a2d9-140f-4bd4e0bd72b1@virtuozzo.com>
+In-Reply-To: <821df5a9-bc7d-a2d9-140f-4bd4e0bd72b1@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 10/20/2017 02:30 PM, Vladimir Sementsov-Ogievskiy wrote:
+
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 } else if (client->structured_reply) {
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret =3D nbd_negotiate_send_=
+rep_err(
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 cli=
+ent->ioc, NBD_REP_ERR_INVALID, option,
+>>>> errp,
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "st=
+ructured reply already negotiated");
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 } else {
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret =3D nbd_negotiate_send_=
+rep(client->ioc,
+>>>> NBD_REP_ACK,
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 opt=
+ion, errp);
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 }
+>>> you've dropped "if (ret < 0) { return ret }", but the following two
+>>> lines should not be
+>>> executed if ret < 0.. May be it doesn't matter (we will abort connect=
+ion
+>>> anyway after switch {}) but
+>>> it looks strange.
+>>>
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 client->structured_reply =3D true;
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 myflags |=3D NBD_FLAG_SEND_DF;
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 break;
+>> Indeed, these two lines are harmless due to the catch-all 'ret < 0'
+>> after the switch at the tail end of the loop (which is why I dropped t=
+he
+>> 'if' here).
+>>
+>>
 >=20
+> yes. but it looks strange) Anyway,
+> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 >=20
-> ----- Original Message -----
-> > On Mon, Oct 23, 2017 at 10:59:09AM +0100, Marc-Andr=C3=A9 Lureau wrot=
-e:
-> > > Add a new memory backend, similar to hostmem-file, except that it
-> > > doesn't need to create files. It also enforces memory sealing.
-> > >=20
-> > > This backend is mainly useful for sharing the memory with other
-> > > processes.
-> > >=20
-> > > Note that Linux supports transparent huge-pages of shmem/memfd memo=
-ry
-> > > since 4.8. It is relatively easier to set up THP than a dedicate
-> > > hugepage mount point by using "madvise" in
-> > > /sys/kernel/mm/transparent_hugepage/shmem_enabled.
-> > >=20
-> > > Since 4.14, memfd allows to set hugetlb requirement explicitly.
-> > >=20
-> > > Usage:
-> > > -object memory-backend-memfd,id=3Dmem1,size=3D1G
-> >=20
-> > [snip]
-> >=20
-> > > +static void
-> > > +memfd_backend_class_init(ObjectClass *oc, void *data)
-> > > +{
-> > > +    HostMemoryBackendClass *bc =3D MEMORY_BACKEND_CLASS(oc);
-> > > +
-> > > +    bc->alloc =3D memfd_backend_memory_alloc;
-> > > +
-> > > +    object_class_property_add_bool(oc, "hugetlb",
-> > > +                                   memfd_backend_get_hugetlb,
-> > > +                                   memfd_backend_set_hugetlb,
-> > > +                                   &error_abort);
-> >=20
-> > I tend to think that instead of a bool hugetlb, we should take an
-> > integer page size instead eg  hugepagesize=3D2M instead of hugetlb=3D=
-true
-> >=20
->=20
-> Well, how would you then create a memfd without explicit hugetlb
-> request or one with default hugetlb size?
 
-Hmm, yes, libvirt would not need that, but that would be useful still for
-direct QEMU users.
+On second thought, modifying client->structured_reply when we
+successfully replied with an error is wrong.  So v6 will hoist the
+modifications into the last else branch.
 
-> I think size should be a different property. I'll add it.
-
-Yep ok
-
-Regards,
-Daniel
 --=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--ODaf6pf7KGPuj2udMq6TO9886ReKEVvi9
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnrb4cACgkQp6FrSiUn
+Q2qzYQf8CQGpG5D52A/VEGfD7rOOE/RTxJ1EySZdYW05Slhm9QXeI24ISbjwN28f
+Puhf9bJS5PMWxjHCCyyAJcuFzvrUTi+gDFHcdiy6uHJgd5vwU0zkE/Hxe7IRZxhL
+OnzkfdNeFSwiO0AEsITbGuGk5VpR7AoWN+cvqehP2si/msdRcKJK81jQNbsyFmlT
+hQ895EDBzeM3xij0fMrGAW2iaxFIOQSlZJGKMauZ0UE6EiKm8zultlCiVrPR+UP3
+Y86DtkGk7XLuS0M/MFpf7l5Hecm6XMBmm6SOO+Rhmy9MJB1Q6QH5YM3L7kYlnBvj
+ocrpj/uH+ibz0UNr4YcWzzSAr1cCYw==
+=atnI
+-----END PGP SIGNATURE-----
+
+--ODaf6pf7KGPuj2udMq6TO9886ReKEVvi9--
