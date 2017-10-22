@@ -1,32 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37258)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37267)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1e64PP-0002CQ-IB
+	(envelope-from <richard.henderson@linaro.org>) id 1e64PQ-0002CR-4b
 	for qemu-devel@nongnu.org; Sat, 21 Oct 2017 20:46:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1e64PN-0008Cv-DB
-	for qemu-devel@nongnu.org; Sat, 21 Oct 2017 20:46:31 -0400
-Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:54795)
+	(envelope-from <richard.henderson@linaro.org>) id 1e64PP-0008Eq-0w
+	for qemu-devel@nongnu.org; Sat, 21 Oct 2017 20:46:32 -0400
+Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:48323)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1e64PN-0008C2-5J
-	for qemu-devel@nongnu.org; Sat, 21 Oct 2017 20:46:29 -0400
-Received: by mail-pg0-x241.google.com with SMTP id l24so9199298pgu.11
-	for <qemu-devel@nongnu.org>; Sat, 21 Oct 2017 17:46:29 -0700 (PDT)
+	id 1e64PO-0008Dw-O3
+	for qemu-devel@nongnu.org; Sat, 21 Oct 2017 20:46:30 -0400
+Received: by mail-pg0-x242.google.com with SMTP id v78so9203667pgb.5
+	for <qemu-devel@nongnu.org>; Sat, 21 Oct 2017 17:46:30 -0700 (PDT)
 Received: from cloudburst.twiddle.net (174-21-9-158.tukw.qwest.net.
 	[174.21.9.158]) by smtp.gmail.com with ESMTPSA id
-	j12sm5766728pgs.35.2017.10.21.17.46.26 for <qemu-devel@nongnu.org>
+	j12sm5766728pgs.35.2017.10.21.17.46.27 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Sat, 21 Oct 2017 17:46:26 -0700 (PDT)
+	Sat, 21 Oct 2017 17:46:28 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sat, 21 Oct 2017 17:46:12 -0700
-Message-Id: <20171022004621.28372-3-richard.henderson@linaro.org>
+Date: Sat, 21 Oct 2017 17:46:13 -0700
+Message-Id: <20171022004621.28372-4-richard.henderson@linaro.org>
 In-Reply-To: <20171022004621.28372-1-richard.henderson@linaro.org>
 References: <20171022004621.28372-1-richard.henderson@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v7 02/11] target/ppc: Convert to disas_set_info
- hook
+Subject: [Qemu-devel] [PATCH v7 03/11] target/arm: Move BE32 disassembler
+ fixup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,140 +34,147 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+The Capstone disassembler has its own big-endian fixup.
+Doing this twice does not work, of course.  Move our current
+fixup from target/arm/cpu.c to disas/arm.c.
+
+This makes read_memory_inner_func unused and can be removed.
+
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- disas.c                     | 33 ---------------------------------
- monitor.c                   |  5 -----
- target/ppc/translate.c      |  5 +----
- target/ppc/translate_init.c | 21 +++++++++++++++++++++
- 4 files changed, 22 insertions(+), 42 deletions(-)
+ include/disas/bfd.h |  7 -------
+ disas/arm.c         | 21 ++++++++++++++++-----
+ target/arm/cpu.c    | 19 -------------------
+ 3 files changed, 16 insertions(+), 31 deletions(-)
 
-diff --git a/disas.c b/disas.c
-index 7e22a80da6..88d16fbd57 100644
---- a/disas.c
-+++ b/disas.c
-@@ -204,23 +204,6 @@ void target_disas(FILE *out, CPUState *cpu, target_ulong code,
-         cc->disas_set_info(cpu, &s.info);
-     }
+diff --git a/include/disas/bfd.h b/include/disas/bfd.h
+index d99da68267..2852f80ed6 100644
+--- a/include/disas/bfd.h
++++ b/include/disas/bfd.h
+@@ -307,12 +307,6 @@ typedef struct disassemble_info {
+     (bfd_vma memaddr, bfd_byte *myaddr, int length,
+ 	     struct disassemble_info *info);
  
--#if defined(TARGET_PPC)
--    if ((flags >> 16) & 1) {
--        s.info.endian = BFD_ENDIAN_LITTLE;
--    }
--    if (flags & 0xFFFF) {
--        /* If we have a precise definition of the instruction set, use it. */
--        s.info.mach = flags & 0xFFFF;
--    } else {
--#ifdef TARGET_PPC64
--        s.info.mach = bfd_mach_ppc64;
--#else
--        s.info.mach = bfd_mach_ppc;
--#endif
--    }
--    s.info.disassembler_options = (char *)"any";
--    s.info.print_insn = print_insn_ppc;
--#endif
-     if (s.info.print_insn == NULL) {
-         s.info.print_insn = print_insn_od_target;
-     }
-@@ -380,22 +363,6 @@ void monitor_disas(Monitor *mon, CPUState *cpu,
-         cc->disas_set_info(cpu, &s.info);
-     }
- 
--#if defined(TARGET_PPC)
--    if (flags & 0xFFFF) {
--        /* If we have a precise definition of the instruction set, use it. */
--        s.info.mach = flags & 0xFFFF;
--    } else {
--#ifdef TARGET_PPC64
--        s.info.mach = bfd_mach_ppc64;
--#else
--        s.info.mach = bfd_mach_ppc;
--#endif
--    }
--    if ((flags >> 16) & 1) {
--        s.info.endian = BFD_ENDIAN_LITTLE;
--    }
--    s.info.print_insn = print_insn_ppc;
--#endif
-     if (!s.info.print_insn) {
-         monitor_printf(mon, "0x" TARGET_FMT_lx
-                        ": Asm output not supported on this arch\n", pc);
-diff --git a/monitor.c b/monitor.c
-index a736ae9a81..2164dfcc3b 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -1310,11 +1310,6 @@ static void memory_dump(Monitor *mon, int count, int format, int wsize,
- 
-     if (format == 'i') {
-         int flags = 0;
--#ifdef TARGET_PPC
--        CPUArchState *env = mon_get_cpu_env();
--        flags = msr_le << 16;
--        flags |= env->bfd_mach;
--#endif
-         monitor_disas(mon, cs, addr, count, is_physical, flags);
-         return;
-     }
-diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-index a81ff69d75..cddbf92564 100644
---- a/target/ppc/translate.c
-+++ b/target/ppc/translate.c
-@@ -7407,12 +7407,9 @@ void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
- #if defined(DEBUG_DISAS)
-     if (qemu_loglevel_mask(CPU_LOG_TB_IN_ASM)
-         && qemu_log_in_addr_range(pc_start)) {
--        int flags;
--        flags = env->bfd_mach;
--        flags |= ctx.le_mode << 16;
-         qemu_log_lock();
-         qemu_log("IN: %s\n", lookup_symbol(pc_start));
--        log_target_disas(cs, pc_start, ctx.nip - pc_start, flags);
-+        log_target_disas(cs, pc_start, ctx.nip - pc_start, 0);
-         qemu_log("\n");
-         qemu_log_unlock();
-     }
-diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
-index 7b9bf6a773..9b4353437a 100644
---- a/target/ppc/translate_init.c
-+++ b/target/ppc/translate_init.c
-@@ -10519,6 +10519,26 @@ static gchar *ppc_gdb_arch_name(CPUState *cs)
- #endif
+-  /* A place to stash the real read_memory_func if read_memory_func wants to
+-     do some funky address arithmetic or similar (e.g. for ARM BE32 mode).  */
+-  int (*read_memory_inner_func)
+-    (bfd_vma memaddr, bfd_byte *myaddr, int length,
+-             struct disassemble_info *info);
+-
+   /* Function which should be called if we get an error that we can't
+      recover from.  STATUS is the errno value from read_memory_func and
+      MEMADDR is the address that we were trying to read.  INFO is a
+@@ -479,7 +473,6 @@ int generic_symbol_at_address(bfd_vma, struct disassemble_info *);
+   (INFO).buffer_vma = 0, \
+   (INFO).buffer_length = 0, \
+   (INFO).read_memory_func = buffer_read_memory, \
+-  (INFO).read_memory_inner_func = NULL, \
+   (INFO).memory_error_func = perror_memory, \
+   (INFO).print_address_func = generic_print_address, \
+   (INFO).print_insn = NULL, \
+diff --git a/disas/arm.c b/disas/arm.c
+index 27396dd3e1..9967c45990 100644
+--- a/disas/arm.c
++++ b/disas/arm.c
+@@ -70,6 +70,17 @@ static void floatformat_to_double (unsigned char *data, double *dest)
+     *dest = u.f;
  }
  
-+static void ppc_disas_set_info(CPUState *cs, disassemble_info *info)
++static int arm_read_memory(bfd_vma memaddr, bfd_byte *b, int length,
++                           struct disassemble_info *info)
 +{
-+    PowerPCCPU *cpu = POWERPC_CPU(cs);
-+    CPUPPCState *env = &cpu->env;
++    assert((info->flags & INSN_ARM_BE32) == 0 || length == 2 || length == 4);
 +
-+    if ((env->hflags >> MSR_LE) & 1) {
-+        info->endian = BFD_ENDIAN_LITTLE;
++    if ((info->flags & INSN_ARM_BE32) != 0 && length == 2) {
++        memaddr ^= 2;
 +    }
-+    info->mach = env->bfd_mach;
-+    if (!env->bfd_mach) {
-+#ifdef TARGET_PPC64
-+        info->mach = bfd_mach_ppc64;
-+#else
-+        info->mach = bfd_mach_ppc;
-+#endif
-+    }
-+    info->disassembler_options = (char *)"any";
-+    info->print_insn = print_insn_ppc;
++    return info->read_memory_func(memaddr, b, length, info);
 +}
 +
- static Property ppc_cpu_properties[] = {
-     DEFINE_PROP_BOOL("pre-2.8-migration", PowerPCCPU, pre_2_8_migration, false),
-     DEFINE_PROP_BOOL("pre-2.10-migration", PowerPCCPU, pre_2_10_migration,
-@@ -10582,6 +10602,7 @@ static void ppc_cpu_class_init(ObjectClass *oc, void *data)
- #ifndef CONFIG_USER_ONLY
-     cc->virtio_is_big_endian = ppc_cpu_is_big_endian;
- #endif
-+    cc->disas_set_info = ppc_disas_set_info;
+ /* End of qemu specific additions.  */
  
-     dc->fw_name = "PowerPC,UNKNOWN";
+ struct opcode32
+@@ -3810,7 +3821,7 @@ find_ifthen_state (bfd_vma pc, struct disassemble_info *info,
+ 	  return;
+ 	}
+       addr -= 2;
+-      status = info->read_memory_func (addr, (bfd_byte *)b, 2, info);
++      status = arm_read_memory (addr, (bfd_byte *)b, 2, info);
+       if (status)
+ 	return;
+ 
+@@ -3882,7 +3893,7 @@ print_insn_arm (bfd_vma pc, struct disassemble_info *info)
+       info->bytes_per_chunk = size;
+       printer = print_insn_data;
+ 
+-      status = info->read_memory_func (pc, (bfd_byte *)b, size, info);
++      status = arm_read_memory (pc, (bfd_byte *)b, size, info);
+       given = 0;
+       if (little)
+ 	for (i = size - 1; i >= 0; i--)
+@@ -3899,7 +3910,7 @@ print_insn_arm (bfd_vma pc, struct disassemble_info *info)
+       info->bytes_per_chunk = 4;
+       size = 4;
+ 
+-      status = info->read_memory_func (pc, (bfd_byte *)b, 4, info);
++      status = arm_read_memory (pc, (bfd_byte *)b, 4, info);
+       if (little)
+ 	given = (b[0]) | (b[1] << 8) | (b[2] << 16) | ((unsigned)b[3] << 24);
+       else
+@@ -3915,7 +3926,7 @@ print_insn_arm (bfd_vma pc, struct disassemble_info *info)
+       info->bytes_per_chunk = 2;
+       size = 2;
+ 
+-      status = info->read_memory_func (pc, (bfd_byte *)b, 2, info);
++      status = arm_read_memory (pc, (bfd_byte *)b, 2, info);
+       if (little)
+ 	given = (b[0]) | (b[1] << 8);
+       else
+@@ -3929,7 +3940,7 @@ print_insn_arm (bfd_vma pc, struct disassemble_info *info)
+ 	      || (given & 0xF800) == 0xF000
+ 	      || (given & 0xF800) == 0xE800)
+ 	    {
+-	      status = info->read_memory_func (pc + 2, (bfd_byte *)b, 2, info);
++	      status = arm_read_memory (pc + 2, (bfd_byte *)b, 2, info);
+ 	      if (little)
+ 		given = (b[0]) | (b[1] << 8) | (given << 16);
+ 	      else
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index 88578f360e..82dad0b721 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -473,21 +473,6 @@ print_insn_thumb1(bfd_vma pc, disassemble_info *info)
+   return print_insn_arm(pc | 1, info);
  }
+ 
+-static int arm_read_memory_func(bfd_vma memaddr, bfd_byte *b,
+-                                int length, struct disassemble_info *info)
+-{
+-    assert(info->read_memory_inner_func);
+-    assert((info->flags & INSN_ARM_BE32) == 0 || length == 2 || length == 4);
+-
+-    if ((info->flags & INSN_ARM_BE32) != 0 && length == 2) {
+-        assert(info->endian == BFD_ENDIAN_LITTLE);
+-        return info->read_memory_inner_func(memaddr ^ 2, (bfd_byte *)b, 2,
+-                                            info);
+-    } else {
+-        return info->read_memory_inner_func(memaddr, b, length, info);
+-    }
+-}
+-
+ static void arm_disas_set_info(CPUState *cpu, disassemble_info *info)
+ {
+     ARMCPU *ac = ARM_CPU(cpu);
+@@ -513,10 +498,6 @@ static void arm_disas_set_info(CPUState *cpu, disassemble_info *info)
+         info->endian = BFD_ENDIAN_BIG;
+ #endif
+     }
+-    if (info->read_memory_inner_func == NULL) {
+-        info->read_memory_inner_func = info->read_memory_func;
+-        info->read_memory_func = arm_read_memory_func;
+-    }
+     info->flags &= ~INSN_ARM_BE32;
+     if (arm_sctlr_b(env)) {
+         info->flags |= INSN_ARM_BE32;
 -- 
 2.13.6
