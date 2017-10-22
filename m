@@ -1,32 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37386)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37399)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1e64Pa-0002Iq-MS
-	for qemu-devel@nongnu.org; Sat, 21 Oct 2017 20:46:43 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1e64Pc-0002Kg-FT
+	for qemu-devel@nongnu.org; Sat, 21 Oct 2017 20:46:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1e64PZ-0008Pe-GJ
-	for qemu-devel@nongnu.org; Sat, 21 Oct 2017 20:46:42 -0400
-Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:51804)
+	(envelope-from <richard.henderson@linaro.org>) id 1e64Pb-0008Re-4m
+	for qemu-devel@nongnu.org; Sat, 21 Oct 2017 20:46:44 -0400
+Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:48324)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1e64PZ-0008Or-8u
-	for qemu-devel@nongnu.org; Sat, 21 Oct 2017 20:46:41 -0400
-Received: by mail-pg0-x241.google.com with SMTP id p9so9199815pgc.8
-	for <qemu-devel@nongnu.org>; Sat, 21 Oct 2017 17:46:41 -0700 (PDT)
+	id 1e64Pa-0008Qq-V2
+	for qemu-devel@nongnu.org; Sat, 21 Oct 2017 20:46:43 -0400
+Received: by mail-pg0-x242.google.com with SMTP id v78so9203814pgb.5
+	for <qemu-devel@nongnu.org>; Sat, 21 Oct 2017 17:46:42 -0700 (PDT)
 Received: from cloudburst.twiddle.net (174-21-9-158.tukw.qwest.net.
 	[174.21.9.158]) by smtp.gmail.com with ESMTPSA id
-	j12sm5766728pgs.35.2017.10.21.17.46.38 for <qemu-devel@nongnu.org>
+	j12sm5766728pgs.35.2017.10.21.17.46.40 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Sat, 21 Oct 2017 17:46:38 -0700 (PDT)
+	Sat, 21 Oct 2017 17:46:40 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sat, 21 Oct 2017 17:46:20 -0700
-Message-Id: <20171022004621.28372-11-richard.henderson@linaro.org>
+Date: Sat, 21 Oct 2017 17:46:21 -0700
+Message-Id: <20171022004621.28372-12-richard.henderson@linaro.org>
 In-Reply-To: <20171022004621.28372-1-richard.henderson@linaro.org>
 References: <20171022004621.28372-1-richard.henderson@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v7 10/11] disas: Remove
- monitor_disas_is_physical
+Subject: [Qemu-devel] [PATCH v7 11/11] disas: Add capstone as submodule
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,55 +33,153 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Even though there is only one monitor, and thus no race on this
-global data object, there is also no point in having it.  We can
-just as well record the decision in the read_memory_function that
-we select.
+Do not require the submodule, but use it if present.  Allow the
+command-line to override system or git submodule either way.
 
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- disas.c | 16 ++++------------
- 1 file changed, 4 insertions(+), 12 deletions(-)
+ Makefile    | 13 +++++++++++++
+ .gitmodules |  3 +++
+ capstone    |  1 +
+ configure   | 60 +++++++++++++++++++++++++++++++++++++++++++++++++-----------
+ 4 files changed, 66 insertions(+), 11 deletions(-)
+ create mode 160000 capstone
 
-diff --git a/disas.c b/disas.c
-index e52e776a60..92b389d25f 100644
---- a/disas.c
-+++ b/disas.c
-@@ -512,19 +512,11 @@ const char *lookup_symbol(target_ulong orig_addr)
+diff --git a/Makefile b/Makefile
+index 9372742f86..beecc85bee 100644
+--- a/Makefile
++++ b/Makefile
+@@ -383,6 +383,19 @@ subdir-dtc: .git-submodule-status dtc/libfdt dtc/tests
+ dtc/%: .git-submodule-status
+ 	mkdir -p $@
  
- #include "monitor/monitor.h"
++# Overriding CFLAGS causes us to lose defines added in the sub-makefile.
++# Not overriding CFLAGS leads to mis-matches between compilation modes.
++# Therefore we replicate some of the logic in the sub-makefile.
++CAP_CFLAGS = $(subst -Werror,,$(CFLAGS) $(QEMU_CFLAGS))
++CAP_CFLAGS += -DCAPSTONE_USE_SYS_DYN_MEM
++CAP_CFLAGS += -DCAPSTONE_HAS_ARM
++CAP_CFLAGS += -DCAPSTONE_HAS_ARM64
++CAP_CFLAGS += -DCAPSTONE_HAS_POWERPC
++CAP_CFLAGS += -DCAPSTONE_HAS_X86
++
++subdir-capstone: .git-submodule-status
++	$(call quiet-command,$(MAKE) -C $(SRC_PATH)/capstone CAPSTONE_SHARED=no BUILDDIR="$(BUILD_DIR)/capstone" CC="$(CC)" AR="$(AR)" LD="$(LD)" CFLAGS="$(CAP_CFLAGS)" $(SUBDIR_MAKEFLAGS) $(BUILD_DIR)/capstone/libcapstone.a)
++
+ $(SUBDIR_RULES): libqemuutil.a $(common-obj-y) $(chardev-obj-y) \
+ 	$(qom-obj-y) $(crypto-aes-obj-$(CONFIG_USER_ONLY))
  
--static int monitor_disas_is_physical;
--
- static int
--monitor_read_memory (bfd_vma memaddr, bfd_byte *myaddr, int length,
-+physical_read_memory(bfd_vma memaddr, bfd_byte *myaddr, int length,
-                      struct disassemble_info *info)
- {
--    CPUDebug *s = container_of(info, CPUDebug, info);
--
--    if (monitor_disas_is_physical) {
--        cpu_physical_memory_read(memaddr, myaddr, length);
--    } else {
--        cpu_memory_rw_debug(s->cpu, memaddr, myaddr, length, 0);
--    }
-+    cpu_physical_memory_read(memaddr, myaddr, length);
-     return 0;
- }
+diff --git a/.gitmodules b/.gitmodules
+index 7c981a42b6..1500579638 100644
+--- a/.gitmodules
++++ b/.gitmodules
+@@ -37,3 +37,6 @@
+ [submodule "ui/keycodemapdb"]
+ 	path = ui/keycodemapdb
+ 	url = git://git.qemu.org/keycodemapdb.git
++[submodule "capstone"]
++	path = capstone
++	url = git://git.qemu.org/capstone.git
+diff --git a/capstone b/capstone
+new file mode 160000
+index 0000000000..a279481dbf
+--- /dev/null
++++ b/capstone
+@@ -0,0 +1 @@
++Subproject commit a279481dbfd54bb1e2336d771e89978cc6d43176
+diff --git a/configure b/configure
+index 26e5ce7787..2807569f9f 100755
+--- a/configure
++++ b/configure
+@@ -1299,6 +1299,10 @@ for opt do
+   ;;
+   --enable-capstone) capstone="yes"
+   ;;
++  --enable-capstone=git) capstone="git"
++  ;;
++  --enable-capstone=system) capstone="system"
++  ;;
+   *)
+       echo "ERROR: unknown option $opt"
+       echo "Try '$0 --help' for more information"
+@@ -4419,18 +4423,49 @@ fi
+ ##########################################
+ # capstone
  
-@@ -539,8 +531,8 @@ void monitor_disas(Monitor *mon, CPUState *cpu,
-     INIT_DISASSEMBLE_INFO(s.info, (FILE *)mon, monitor_fprintf);
+-if test "$capstone" != no; then
+-  if $pkg_config capstone; then
+-    capstone=yes
++case "$capstone" in
++  "" | yes)
++    if $pkg_config capstone; then
++      capstone=system
++    elif test -e "${source_path}/.git" ; then
++      capstone=git
++    elif test -e "${source_path}/capstone/Makefile" ; then
++      capstone=internal
++    elif test -z "$capstone" ; then
++      capstone=no
++    else
++      feature_not_found "capstone" "Install capstone devel or git submodule"
++    fi
++    ;;
++
++  system)
++    if ! $pkg_config capstone; then
++      feature_not_found "capstone" "Install capstone devel"
++    fi
++    ;;
++esac
++
++case "$capstone" in
++  git | internal)
++    if test "$capstone" = git; then
++      git_submodules="${git_submodules} capstone"
++    fi
++    mkdir -p capstone
++    QEMU_CFLAGS="$QEMU_CFLAGS -I\$(SRC_PATH)/capstone/include"
++    LIBS="\$(BUILD_DIR)/capstone/libcapstone.a $LIBS"
++    ;;
++
++  system)
+     QEMU_CFLAGS="$QEMU_CFLAGS $($pkg_config --cflags capstone)"
+     LIBS="$($pkg_config --libs capstone) $LIBS"
+-  else
+-    if test "$capstone" = yes; then
+-      feature_not_found capstone
+-    fi
+-    capstone=no
+-  fi
+-fi
++    ;;
++
++  no)
++    ;;
++  *)
++    error_exit "Unknown state for capstone: $capstone"
++    ;;
++esac
  
-     s.cpu = cpu;
--    monitor_disas_is_physical = is_physical;
--    s.info.read_memory_func = monitor_read_memory;
-+    s.info.read_memory_func
-+        = (is_physical ? physical_read_memory : target_read_memory);
-     s.info.print_address_func = generic_print_address;
-     s.info.buffer_vma = pc;
-     s.info.cap_arch = -1;
+ ##########################################
+ # check if we have fdatasync
+@@ -6165,7 +6200,7 @@ fi
+ if test "$ivshmem" = "yes" ; then
+   echo "CONFIG_IVSHMEM=y" >> $config_host_mak
+ fi
+-if test "$capstone" = "yes" ; then
++if test "$capstone" != "no" ; then
+   echo "CONFIG_CAPSTONE=y" >> $config_host_mak
+ fi
+ 
+@@ -6650,6 +6685,9 @@ done # for target in $targets
+ if [ "$dtc_internal" = "yes" ]; then
+   echo "config-host.h: subdir-dtc" >> $config_host_mak
+ fi
++if [ "$capstone" = "git" -o "$capstone" = "internal" ]; then
++  echo "config-host.h: subdir-capstone" >> $config_host_mak
++fi
+ 
+ if test "$numa" = "yes"; then
+   echo "CONFIG_NUMA=y" >> $config_host_mak
 -- 
 2.13.6
