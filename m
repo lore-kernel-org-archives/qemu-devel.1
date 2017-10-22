@@ -1,22 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51935)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39867)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1e6BHs-000615-86
-	for qemu-devel@nongnu.org; Sun, 22 Oct 2017 04:07:13 -0400
+	(envelope-from <sundeep.lkml@gmail.com>) id 1e6Go6-0005Ht-6x
+	for qemu-devel@nongnu.org; Sun, 22 Oct 2017 10:00:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1e6BHo-0002V3-0S
-	for qemu-devel@nongnu.org; Sun, 22 Oct 2017 04:07:12 -0400
-Date: Sun, 22 Oct 2017 16:33:15 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20171022053315.GA15297@umbus>
-References: <20171020175548.2566-1-programmingkidx@gmail.com>
-	<f9bd98f1-d45c-6d3a-c35c-c67da67c881f@linaro.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="zhXaljGHf11kAtnf"
-Content-Disposition: inline
-In-Reply-To: <f9bd98f1-d45c-6d3a-c35c-c67da67c881f@linaro.org>
-Subject: Re: [Qemu-devel] [libfdt][PATCH v2] implement strnlen for systems
- that need it
+	(envelope-from <sundeep.lkml@gmail.com>) id 1e6Go3-0002b1-5d
+	for qemu-devel@nongnu.org; Sun, 22 Oct 2017 10:00:50 -0400
+From: Subbaraya Sundeep <sundeep.lkml@gmail.com>
+Date: Sun, 22 Oct 2017 18:58:02 +0530
+Message-Id: <1508678882-4327-1-git-send-email-sundeep.lkml@gmail.com>
+Subject: [Qemu-devel] [Qemu devel v3 PATCH] msf2: Remove dead code reported
+ by Coverity
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,58 +18,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: John Arbuckle <programmingkidx@gmail.com>, devicetree-compiler@vger.kernel.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, qemu-arm@nongnu.org
+Cc: peter.maydell@linaro.org, crosthwaite.peter@gmail.com, alistair23@gmail.com, f4bug@amsat.org, imammedo@redhat.com, pbonzini@redhat.com, darren.kenny@oracle.com, Subbaraya Sundeep <sundeep.lkml@gmail.com>
 
+Fixed incorrect frame size mask, validated maximum frame
+size in spi_write and removed dead code.
 
---zhXaljGHf11kAtnf
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: Subbaraya Sundeep <sundeep.lkml@gmail.com>
+---
+v3:
+	Added comment that [31:6] bits are reserved in R_SPI_DFSIZE
+	register and logged incorrect value too in guest error(suggested
+    by Darren). 
+v2:
+    else if -> else in set_fifodepth
+    log guest error when frame size is more than 32
 
-On Fri, Oct 20, 2017 at 04:44:58PM -0700, Richard Henderson wrote:
-> On 10/20/2017 10:55 AM, John Arbuckle wrote:
-> > +static inline size_t strnlen(const char *string, size_t max_count)
-> > +{
-> > +    size_t count;
-> > +    for (count =3D 0; count < max_count; count++) {
-> > +        if (string[count] =3D=3D '\0') {
-> > +            break;
-> > +        }
-> > +    }
-> > +    return count;
->=20
-> Not to nitpick, but
->=20
->   const char *p =3D memchr(string, 0, max_count);
->   return p ? max_count : p - string;
+ hw/ssi/mss-spi.c | 18 ++++++++++++++----
+ 1 file changed, 14 insertions(+), 4 deletions(-)
 
-Richard's right, that's definitely a better implementation.
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---zhXaljGHf11kAtnf
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnsLZYACgkQbDjKyiDZ
-s5K9kBAAop+caHzn2iij3iA9mNQV52uY2KdWbKW1+s9SL874WYAQFasuB0lkoAwI
-yLvnYg+XMoFIjC8G+++Q7kJhbt3a01XdbDH/+/ZfVBHGe52HshLjd1VTISGwp7Cf
-wVolYbIFW83EIwU1OTXZynmfbFC8Rrb1lsgrHah93GHCLnFnk4814BaPdd0rVnee
-sjOMykWnHGfcgVi8TuoAfoBKl771AOWo4sbq8j+bqWSz8/sThTIceTbSFux6NNTD
-ImzHLKiYqBAVKrH+4Ix6USrEn6Ka/bmatVGcAKOtJ/qMBelLvK7kFLg2YIJfSUNI
-mfsh+ii398lHuethEtnERyeiVE6suXnPYTUgS9u97Xe67VeuE2B0IHscWcNMuist
-f1wpBmVduLVyC4r28d+zxlaiUg82l62hJ8etZ/3yCDZF8EFYQTvym8sgiq8RgoPb
-rYj4qVtP34OqRgPWO0oGV6WKGFY2kGthgnse532FGJj5dxMGRcFGEdmE2BPuC9zQ
-rKJVZQCuU4fHajj8lm03zyh2mEPplYgd7sTmJM2ZKM7Z5Y8LuqKcrUkW4RSKSrD2
-rM6epXgtnOTsiYuGUFSbNkCsz3/DV7SCBJktyMG7OpHpaL4kX8H33LpGriLY36lM
-K57u1rzy1OH1rYXtU9wp/IpXm6l/uU8Bll11nKP3kHLSLJv9KUk=
-=CIw8
------END PGP SIGNATURE-----
-
---zhXaljGHf11kAtnf--
+diff --git a/hw/ssi/mss-spi.c b/hw/ssi/mss-spi.c
+index 5a8e308..e1b6227 100644
+--- a/hw/ssi/mss-spi.c
++++ b/hw/ssi/mss-spi.c
+@@ -76,9 +76,10 @@
+ #define C_BIGFIFO            (1 << 29)
+ #define C_RESET              (1 << 31)
+ 
+-#define FRAMESZ_MASK         0x1F
++#define FRAMESZ_MASK         0x3F
+ #define FMCOUNT_MASK         0x00FFFF00
+ #define FMCOUNT_SHIFT        8
++#define FRAMESZ_MAX          32
+ 
+ static void txfifo_reset(MSSSpiState *s)
+ {
+@@ -104,10 +105,8 @@ static void set_fifodepth(MSSSpiState *s)
+         s->fifo_depth = 32;
+     } else if (size <= 16) {
+         s->fifo_depth = 16;
+-    } else if (size <= 32) {
+-        s->fifo_depth = 8;
+     } else {
+-        s->fifo_depth = 4;
++        s->fifo_depth = 8;
+     }
+ }
+ 
+@@ -301,6 +300,17 @@ static void spi_write(void *opaque, hwaddr addr,
+         if (s->enabled) {
+             break;
+         }
++        /*
++         * [31:6] bits are reserved bits and for future use.
++         * [5:0] are for frame size. Only [5:0] bits are validated
++         * during write, [31:6] bits are untouched.
++         */
++        if ((value & FRAMESZ_MASK) > FRAMESZ_MAX) {
++            qemu_log_mask(LOG_GUEST_ERROR, "%s: Incorrect size %d provided."
++                         "Maximum frame size is %d\n",
++                         __func__, value & FRAMESZ_MASK, FRAMESZ_MAX);
++            break;
++        }
+         s->regs[R_SPI_DFSIZE] = value;
+         break;
+ 
+-- 
+2.5.0
