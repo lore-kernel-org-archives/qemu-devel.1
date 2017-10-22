@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46782)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47867)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1e6H52-0004a9-0U
-	for qemu-devel@nongnu.org; Sun, 22 Oct 2017 10:18:20 -0400
+	(envelope-from <geoff@hostfission.com>) id 1e6HAU-0006Ao-3E
+	for qemu-devel@nongnu.org; Sun, 22 Oct 2017 10:23:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1e6H4x-0001NC-2Y
-	for qemu-devel@nongnu.org; Sun, 22 Oct 2017 10:18:19 -0400
-Received: from mail.uni-paderborn.de ([131.234.142.9]:35436)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kbastian@mail.uni-paderborn.de>)
-	id 1e6H4w-0001Mo-O3
-	for qemu-devel@nongnu.org; Sun, 22 Oct 2017 10:18:15 -0400
-References: <6968797c-f64c-69ff-2fa6-79c4fb3440c9@mail.uni-paderborn.de>
-	<20171021064444.GJ30459@redhat.com>
-From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Message-ID: <978b4e0a-8a9c-68e9-5c3d-a1cca51b947c@mail.uni-paderborn.de>
-Date: Sun, 22 Oct 2017 15:22:49 +0200
+	(envelope-from <geoff@hostfission.com>) id 1e6HAP-00040x-5Y
+	for qemu-devel@nongnu.org; Sun, 22 Oct 2017 10:23:58 -0400
+Received: from mail1.hostfission.com ([139.99.139.48]:41008)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <geoff@hostfission.com>) id 1e6HAO-0003z7-Qj
+	for qemu-devel@nongnu.org; Sun, 22 Oct 2017 10:23:53 -0400
+Received: from www1.hostfission.com (www1.hostfission.com [139.99.139.52])
+	by mail1.hostfission.com (Postfix) with ESMTP id E93DE422A1
+	for <qemu-devel@nongnu.org>; Sun, 22 Oct 2017 21:47:57 +1100 (AEDT)
 MIME-Version: 1.0
-In-Reply-To: <20171021064444.GJ30459@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [sw-dev] [RFC] RISC-V Decoder generator
+Date: Sun, 22 Oct 2017 21:47:57 +1100
+From: geoff@hostfission.com
+Message-ID: <088c92d5c3be0715c46f20e8b0ba0a0f@hostfission.com>
+Subject: [Qemu-devel] PCI Passthrough + AMD + NPT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,37 +28,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Richard W.M. Jones" <rjones@redhat.com>
-Cc: RISC-V SW Dev <sw-dev@groups.riscv.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
-Hi Richard,
+Hi All,
 
-On 10/21/2017 08:44 AM, Richard W.M. Jones wrote:
-> On Fri, Oct 20, 2017 at 03:46:54PM +0200, Bastian Koppelmann wrote:
->> I asked you for feedback some while ago regarding a modular RISC-V QEMU
->> target (see discussion [1]). I tried getting it to work with the good
->> old C preprocessor and quickly realized that it is too limiting. Instead
->> I created a data-driven decoder generator written in python (see the
->> code on github [2]) using YAML as a description language.
->>
->> I'd like to get some feedback whether this is acceptable to be
->> upstreamed to QEMU or if you have any suggestions for improvements.
->> Right now only RV32I instruction are implemented in this scheme.
-> 
-> My suggestion would be to reimplement (part of) the s390x decoder
-> using this scheme.  That would give us a direct comparison of how your
-> scheme is better or worse than the existing macros.
+I have started to dig into why ntp seems to slow down graphics 
+performance on
+AMD systems using PCI passthrough and figured I would report what I have 
+so far
+discovered. I have noted the primary point of failure seems to be 
+specifically
+with PhysX. This is why people only see a slow down in certain games, 
+not
+everything uses PhysX.
 
-Yeah that would be a great test. However I'm not sure if it's worth the
-effort. AFAIK s390x will not be extended with new instructions, so there
-is no need for a new scheme unless it helps making the code better
-maintainable. But that's up to the s390x maintainers.
+Using FluidMark[1] the problem is immediately obvious, showing extremely 
+low
+FPS on light/medium workloads with ntp enabled, and extreme fluididy and 
+high
+FPS with ntp disabled.
 
-> 
-> Will you be at the KVM Forum next week?
+Switching nVidia to use CPU makes no difference to the performance when 
+ntp
+is enabled, which seems to indicate that PhysX is falling back to CPU 
+due to
+a failure of some kind to initialize.
 
-No, sorry. I'm at the verge of graduating from University, so my time is
-very limited right now :(
+With ntp turned off, and nVidia set to use the CPU for PhysX I see an
+identical performance drop off in FluidMark as I see when ntp is 
+enabled, this
+would seem to confirm this suspicion.
 
-Cheers,
-Bastian
+Since other features such as APIC is only available if ntp is enabled, 
+it
+could be something down stream of ntp that is getting disabled as a
+consequence of turning off ntp. It might be interesting to see if we can 
+get
+some diagnostics information out of PhysX to see what if any error or 
+debugging
+information it might provide when it falls back to CPU.
+
+1: 
+http://www.geeks3d.com/20130308/fluidmark-1-5-1-physx-benchmark-fluid-sph-simulation-opengl-download/
+
+Kind Regards,
+Geoffrey McRae
