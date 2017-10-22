@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37511)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39963)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <darren.kenny@oracle.com>) id 1e6LJ8-0005Zl-Lx
-	for qemu-devel@nongnu.org; Sun, 22 Oct 2017 14:49:11 -0400
+	(envelope-from <ian@freebsd.org>) id 1e6LZo-0008HD-Be
+	for qemu-devel@nongnu.org; Sun, 22 Oct 2017 15:06:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <darren.kenny@oracle.com>) id 1e6LJ7-0003sd-QL
-	for qemu-devel@nongnu.org; Sun, 22 Oct 2017 14:49:10 -0400
-Date: Sun, 22 Oct 2017 19:48:47 +0100
-From: Darren Kenny <darren.kenny@oracle.com>
-Message-ID: <20171022184847.xgkhvteu67ajxq3d@starbug-vm.ie.oracle.com>
-References: <1508678882-4327-1-git-send-email-sundeep.lkml@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-In-Reply-To: <1508678882-4327-1-git-send-email-sundeep.lkml@gmail.com>
-Subject: Re: [Qemu-devel] [Qemu devel v3 PATCH] msf2: Remove dead code
- reported by Coverity
+	(envelope-from <ian@freebsd.org>) id 1e6LZl-0001q2-7s
+	for qemu-devel@nongnu.org; Sun, 22 Oct 2017 15:06:24 -0400
+Received: from outbound1b.ore.mailhop.org ([54.200.247.200]:15750)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ian@freebsd.org>) id 1e6LZl-0001mS-1u
+	for qemu-devel@nongnu.org; Sun, 22 Oct 2017 15:06:21 -0400
+Message-ID: <1508699172.7314.12.camel@freebsd.org>
+From: Ian Lepore <ian@freebsd.org>
+Date: Sun, 22 Oct 2017 13:06:12 -0600
+In-Reply-To: <82BA0070-FFBB-4868-AE48-D7A3671621C5@gmail.com>
+References: <20171020175548.2566-1-programmingkidx@gmail.com>
+	<f9bd98f1-d45c-6d3a-c35c-c67da67c881f@linaro.org>
+	<20171022053315.GA15297@umbus>
+	<82BA0070-FFBB-4868-AE48-D7A3671621C5@gmail.com>
+Content-Type: text/plain; charset="ISO-8859-1"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [libfdt][PATCH v2] implement strnlen for systems
+ that need it
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,80 +30,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Subbaraya Sundeep <sundeep.lkml@gmail.com>
-Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, crosthwaite.peter@gmail.com, f4bug@amsat.org, alistair23@gmail.com, pbonzini@redhat.com, imammedo@redhat.com
+To: Programmingkid <programmingkidx@gmail.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: Richard Henderson <richard.henderson@linaro.org>, devicetree-compiler@vger.kernel.org, "list@suse.de:PowerPC list:PowerPC" <qemu-ppc@nongnu.org>, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>
 
-On Sun, Oct 22, 2017 at 06:58:02PM +0530, Subbaraya Sundeep wrote:
->Fixed incorrect frame size mask, validated maximum frame
->size in spi_write and removed dead code.
->
->Signed-off-by: Subbaraya Sundeep <sundeep.lkml@gmail.com>
->---
->v3:
->	Added comment that [31:6] bits are reserved in R_SPI_DFSIZE
->	register and logged incorrect value too in guest error(suggested
->    by Darren).
->v2:
->    else if -> else in set_fifodepth
->    log guest error when frame size is more than 32
->
-> hw/ssi/mss-spi.c | 18 ++++++++++++++----
-> 1 file changed, 14 insertions(+), 4 deletions(-)
->
->diff --git a/hw/ssi/mss-spi.c b/hw/ssi/mss-spi.c
->index 5a8e308..e1b6227 100644
->--- a/hw/ssi/mss-spi.c
->+++ b/hw/ssi/mss-spi.c
->@@ -76,9 +76,10 @@
-> #define C_BIGFIFO            (1 << 29)
-> #define C_RESET              (1 << 31)
->
->-#define FRAMESZ_MASK         0x1F
->+#define FRAMESZ_MASK         0x3F
-> #define FMCOUNT_MASK         0x00FFFF00
-> #define FMCOUNT_SHIFT        8
->+#define FRAMESZ_MAX          32
->
-> static void txfifo_reset(MSSSpiState *s)
+On Sun, 2017-10-22 at 10:41 -0400, Programmingkid wrote:
+> > 
+> > On Oct 22, 2017, at 1:33 AM, David Gibson  wrote:
+> > 
+> > On Fri, Oct 20, 2017 at 04:44:58PM -0700, Richard Henderson wrote:
+> > > 
+> > > On 10/20/2017 10:55 AM, John Arbuckle wrote:
+> > > > 
+> > > > +static inline size_t strnlen(const char *string, size_t max_count)
+> > > > +{
+> > > > +    size_t count;
+> > > > +    for (count = 0; count < max_count; count++) {
+> > > > +        if (string[count] == '\0') {
+> > > > +            break;
+> > > > +        }
+> > > > +    }
+> > > > +    return count;
+> > > Not to nitpick, but
+> > > 
+> > >  const char *p = memchr(string, 0, max_count);
+> > >  return p ? max_count : p - string;
+> > Richard's right, that's definitely a better implementation.
+> His implementation is smaller, but this one is even smaller. Plus it uses the familiar strlen() function:
+> 
+> size_t strnlen(const char *string, size_t max_count)
 > {
->@@ -104,10 +105,8 @@ static void set_fifodepth(MSSSpiState *s)
->         s->fifo_depth = 32;
->     } else if (size <= 16) {
->         s->fifo_depth = 16;
->-    } else if (size <= 32) {
->-        s->fifo_depth = 8;
->     } else {
->-        s->fifo_depth = 4;
->+        s->fifo_depth = 8;
->     }
+>     return strlen(string) < max_count ? strlen(string) : max_count;
 > }
->
->@@ -301,6 +300,17 @@ static void spi_write(void *opaque, hwaddr addr,
->         if (s->enabled) {
->             break;
->         }
->+        /*
->+         * [31:6] bits are reserved bits and for future use.
->+         * [5:0] are for frame size. Only [5:0] bits are validated
->+         * during write, [31:6] bits are untouched.
->+         */
->+        if ((value & FRAMESZ_MASK) > FRAMESZ_MAX) {
->+            qemu_log_mask(LOG_GUEST_ERROR, "%s: Incorrect size %d provided."
->+                         "Maximum frame size is %d\n",
->+                         __func__, value & FRAMESZ_MASK, FRAMESZ_MAX);
 
-Nitpicking here really, but shouldn't the %d be %u since value is a uint32_t?
+That is not a proper implementation of strnlen(), which is not supposed
+to access any source-string bytes beyond max_count.
 
-Thanks,
-
-Darren.
-
->+            break;
->+        }
->         s->regs[R_SPI_DFSIZE] = value;
->         break;
->
->-- 
->2.5.0
->
->
+-- Ian
