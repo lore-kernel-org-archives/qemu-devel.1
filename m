@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47867)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48952)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <geoff@hostfission.com>) id 1e6HAU-0006Ao-3E
-	for qemu-devel@nongnu.org; Sun, 22 Oct 2017 10:23:59 -0400
+	(envelope-from <programmingkidx@gmail.com>) id 1e6HGH-0007rm-Gr
+	for qemu-devel@nongnu.org; Sun, 22 Oct 2017 10:29:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <geoff@hostfission.com>) id 1e6HAP-00040x-5Y
-	for qemu-devel@nongnu.org; Sun, 22 Oct 2017 10:23:58 -0400
-Received: from mail1.hostfission.com ([139.99.139.48]:41008)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <geoff@hostfission.com>) id 1e6HAO-0003z7-Qj
-	for qemu-devel@nongnu.org; Sun, 22 Oct 2017 10:23:53 -0400
-Received: from www1.hostfission.com (www1.hostfission.com [139.99.139.52])
-	by mail1.hostfission.com (Postfix) with ESMTP id E93DE422A1
-	for <qemu-devel@nongnu.org>; Sun, 22 Oct 2017 21:47:57 +1100 (AEDT)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date: Sun, 22 Oct 2017 21:47:57 +1100
-From: geoff@hostfission.com
-Message-ID: <088c92d5c3be0715c46f20e8b0ba0a0f@hostfission.com>
-Subject: [Qemu-devel] PCI Passthrough + AMD + NPT
+	(envelope-from <programmingkidx@gmail.com>) id 1e6HGG-0007js-MU
+	for qemu-devel@nongnu.org; Sun, 22 Oct 2017 10:29:57 -0400
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+From: Programmingkid <programmingkidx@gmail.com>
+In-Reply-To: <CAFEAcA8WnzZpdTWjJafLDjTCOpT_=azr6T+8UAnMNyDiD2ZxAQ@mail.gmail.com>
+Date: Sun, 22 Oct 2017 10:29:47 -0400
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <A2F88E43-0C42-4BD5-BF51-23C4550D780E@gmail.com>
+References: <20171020175548.2566-1-programmingkidx@gmail.com>
+	<f9bd98f1-d45c-6d3a-c35c-c67da67c881f@linaro.org>
+	<CAFEAcA8WnzZpdTWjJafLDjTCOpT_=azr6T+8UAnMNyDiD2ZxAQ@mail.gmail.com>
+Subject: Re: [Qemu-devel] [libfdt][PATCH v2] implement strnlen for systems
+ that need it
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,48 +25,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Richard Henderson <richard.henderson@linaro.org>, David Gibson <david@gibson.dropbear.id.au>, devicetree-compiler@vger.kernel.org, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-Hi All,
 
-I have started to dig into why ntp seems to slow down graphics 
-performance on
-AMD systems using PCI passthrough and figured I would report what I have 
-so far
-discovered. I have noted the primary point of failure seems to be 
-specifically
-with PhysX. This is why people only see a slow down in certain games, 
-not
-everything uses PhysX.
+> On Oct 22, 2017, at 9:37 AM, Peter Maydell <peter.maydell@linaro.org> =
+wrote:
+>=20
+> On 21 October 2017 at 00:44, Richard Henderson
+> <richard.henderson@linaro.org> wrote:
+>> On 10/20/2017 10:55 AM, John Arbuckle wrote:
+>>> +static inline size_t strnlen(const char *string, size_t max_count)
+>>> +{
+>>> +    size_t count;
+>>> +    for (count =3D 0; count < max_count; count++) {
+>>> +        if (string[count] =3D=3D '\0') {
+>>> +            break;
+>>> +        }
+>>> +    }
+>>> +    return count;
+>>=20
+>> Not to nitpick, but
+>>=20
+>>  const char *p =3D memchr(string, 0, max_count);
+>>  return p ? max_count : p - string;
+>=20
+> Am I misreading that, or do you have the ?: arms the wrong way
+> around there?
+>=20
+> thanks
+> -- PMM
 
-Using FluidMark[1] the problem is immediately obvious, showing extremely 
-low
-FPS on light/medium workloads with ntp enabled, and extreme fluididy and 
-high
-FPS with ntp disabled.
+Yes. It should read:
 
-Switching nVidia to use CPU makes no difference to the performance when 
-ntp
-is enabled, which seems to indicate that PhysX is falling back to CPU 
-due to
-a failure of some kind to initialize.
-
-With ntp turned off, and nVidia set to use the CPU for PhysX I see an
-identical performance drop off in FluidMark as I see when ntp is 
-enabled, this
-would seem to confirm this suspicion.
-
-Since other features such as APIC is only available if ntp is enabled, 
-it
-could be something down stream of ntp that is getting disabled as a
-consequence of turning off ntp. It might be interesting to see if we can 
-get
-some diagnostics information out of PhysX to see what if any error or 
-debugging
-information it might provide when it falls back to CPU.
-
-1: 
-http://www.geeks3d.com/20130308/fluidmark-1-5-1-physx-benchmark-fluid-sph-simulation-opengl-download/
-
-Kind Regards,
-Geoffrey McRae
+return p ? p - string : max_count;=
