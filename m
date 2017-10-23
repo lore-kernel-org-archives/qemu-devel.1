@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58595)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58611)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <root@ucloud.localdomain>) id 1e6aYY-0003TF-Lc
+	(envelope-from <root@ucloud.localdomain>) id 1e6aYZ-0003UA-Ns
 	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 07:06:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <root@ucloud.localdomain>) id 1e6aYU-0006kz-70
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 07:06:06 -0400
-Received: from [120.132.1.243] (port=37763 helo=ucloud.localdomain)
+	(envelope-from <root@ucloud.localdomain>) id 1e6aYU-0006ku-6j
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 07:06:07 -0400
+Received: from [120.132.1.243] (port=37762 helo=ucloud.localdomain)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <root@ucloud.localdomain>) id 1e6aYT-0006kG-PP
+	(envelope-from <root@ucloud.localdomain>) id 1e6aYT-0006kE-PX
 	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 07:06:02 -0400
 From: zhiyong.wu@ucloud.cn
-Date: Tue, 24 Oct 2017 03:27:59 +0800
-Message-Id: <1508786879-32603-1-git-send-email-zhiyong.wu@ucloud.cn>
+Date: Tue, 24 Oct 2017 03:26:28 +0800
+Message-Id: <1508786788-32557-1-git-send-email-zhiyong.wu@ucloud.cn>
 Subject: [Qemu-devel] [PATCH] COLO: remove the operation to clear connection
  list
 List-Id: <qemu-devel.nongnu.org>
