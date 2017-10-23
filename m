@@ -1,25 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35306)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35868)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e6d8t-0003fZ-FQ
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 09:51:49 -0400
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e6dBN-0004S8-Kg
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 09:54:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e6d8s-00028G-Lx
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 09:51:47 -0400
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:49821)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1e6d8s-00027v-Eu
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 09:51:46 -0400
-Received: by mail-wm0-x242.google.com with SMTP id b189so9630295wmd.4
-	for <qemu-devel@nongnu.org>; Mon, 23 Oct 2017 06:51:46 -0700 (PDT)
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e6dBI-0002xl-PH
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 09:54:21 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36906
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
+	id 1e6dBI-0002wS-Io
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 09:54:16 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v9NDs9oC074349
+	for <qemu-devel@nongnu.org>; Mon, 23 Oct 2017 09:54:11 -0400
+Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2dsh6y1uym-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 23 Oct 2017 09:54:10 -0400
+Received: from localhost
+	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
+	Mon, 23 Oct 2017 07:53:50 -0600
+References: <20171023120200.DE9BC74569A@zero.eik.bme.hu>
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Date: Mon, 23 Oct 2017 09:53:46 -0400
 MIME-Version: 1.0
-In-Reply-To: <64A6EC25-B7C7-460C-AB34-4BDF26AEEC4E@gmail.com>
-References: <64A6EC25-B7C7-460C-AB34-4BDF26AEEC4E@gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 23 Oct 2017 14:51:24 +0100
-Message-ID: <CAFEAcA_h_r5KdLuRLZYdm+mu1rAe+4C_nHrCSGPSwe7kUxxxsQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] Qemu query ( support for new board)
+In-Reply-To: <20171023120200.DE9BC74569A@zero.eik.bme.hu>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Message-Id: <0d188b16-7824-81d4-6bae-58f0cb77a452@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v2] Fix compile with --disable-tpm
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,44 +41,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fahad Butt <fahadbutt214@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: BALATON Zoltan <balaton@eik.bme.hu>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Philippe Mathieu-Daude <f4bug@amsat.org>
 
-On 23 October 2017 at 12:57, Fahad Butt <fahadbutt214@gmail.com> wrote:
-> 1- I want to know whether qemu can be cycle accurate or not? from
-> my search i believe it is not cycle accurate. But is it possible?
-> Cycle accuracy?
+On 10/23/2017 06:24 AM, BALATON Zoltan wrote:
+> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 
-You're correct that QEMU is not cycle accurate. In general for
-modern complex CPUs cycle accurate emulation is pretty much
-impossible (except for approaches involving running the actual
-RTL of the CPU), because the level of effort required to create
-a cycle accurate model approaches the level of effort required
-to create the CPU in the first place (and you need a lot of
-information about the internals of the CPU which is not known
-to anybody outside the company which designed that CPU), so it's
-just impractical. For something simple like the Cortex-M4 it's
-probably still possible at least in theory, but QEMU certainly
-doesn't attempt it and I don't offhand know of any emulators that do.
+Tested-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
 
-> 2- I want to emulate my cortex m4 hardware using qemu. But this
-> discovery board isnt directly supported by qemu. What needs to
-> be done to support another cortex m4 discovery board for emulation?
 
-You would need to write device models to emulate all the relevant
-devices on the board, the SoC, etc. You should think of this as
-about the same amount of work as it would be to write device
-drivers for all those devices -- it's quite a lot of work.
-
-For many cases, it doesn't actually matter what the exact
-device and board hardware is, and you can use some other
-board model that QEMU already implements. This does require
-your guest RTOS/code to have support for that board, though.
-
-> 3- is the Floating point unit and the DSP instructions supported by QEMU?
-
-We definitely don't currently implement the FPU. I think we
-do support the DSP instructions.
-
-thanks
--- PMM
+> ---
+>   tpm.c | 35 ++++++++++++++++++-----------------
+>   1 file changed, 18 insertions(+), 17 deletions(-)
+>
+> diff --git a/tpm.c b/tpm.c
+> index 45520f5..ed78ead 100644
+> --- a/tpm.c
+> +++ b/tpm.c
+> @@ -30,8 +30,6 @@ void tpm_register_model(enum TpmModel model)
+>       tpm_models[model] = true;
+>   }
+>
+> -#ifdef CONFIG_TPM
+> -
+>   static const TPMBackendClass *
+>   tpm_be_find_by_type(enum TpmType type)
+>   {
+> @@ -48,6 +46,8 @@ tpm_be_find_by_type(enum TpmType type)
+>       return TPM_BACKEND_CLASS(oc);
+>   }
+>
+> +#ifdef CONFIG_TPM
+> +
+>   /*
+>    * Walk the list of available TPM backend drivers and display them on the
+>    * screen.
+> @@ -146,20 +146,6 @@ static int tpm_init_tpmdev(void *dummy, QemuOpts *opts, Error **errp)
+>   }
+>
+>   /*
+> - * Walk the list of TPM backend drivers that are in use and call their
+> - * destroy function to have them cleaned up.
+> - */
+> -void tpm_cleanup(void)
+> -{
+> -    TPMBackend *drv, *next;
+> -
+> -    QLIST_FOREACH_SAFE(drv, &tpm_backends, list, next) {
+> -        QLIST_REMOVE(drv, list);
+> -        object_unref(OBJECT(drv));
+> -    }
+> -}
+> -
+> -/*
+>    * Initialize the TPM. Process the tpmdev command line options describing the
+>    * TPM backend.
+>    */
+> @@ -195,6 +181,20 @@ int tpm_config_parse(QemuOptsList *opts_list, const char *optarg)
+>   #endif /* CONFIG_TPM */
+>
+>   /*
+> + * Walk the list of TPM backend drivers that are in use and call their
+> + * destroy function to have them cleaned up.
+> + */
+> +void tpm_cleanup(void)
+> +{
+> +    TPMBackend *drv, *next;
+> +
+> +    QLIST_FOREACH_SAFE(drv, &tpm_backends, list, next) {
+> +        QLIST_REMOVE(drv, list);
+> +        object_unref(OBJECT(drv));
+> +    }
+> +}
+> +
+> +/*
+>    * Walk the list of active TPM backends and collect information about them
+>    * following the schema description in qapi-schema.json.
+>    */
+> @@ -208,8 +208,9 @@ TPMInfoList *qmp_query_tpm(Error **errp)
+>               continue;
+>           }
+>           info = g_new0(TPMInfoList, 1);
+> +#ifdef CONFIG_TPM
+>           info->value = tpm_backend_query_tpm(drv);
+> -
+> +#endif
+>           if (!cur_item) {
+>               head = cur_item = info;
+>           } else {
