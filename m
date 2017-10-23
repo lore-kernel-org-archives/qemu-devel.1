@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36835)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39343)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1e6Ytp-0005y1-2g
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 05:19:57 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1e6Z3T-0004jQ-K4
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 05:29:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1e6Ytl-0005YR-3v
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 05:19:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56370)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1e6Z3Q-0000J1-GP
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 05:29:55 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:16993 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1e6Ytk-0005YB-UF
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 05:19:53 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0DC9D356C4
-	for <qemu-devel@nongnu.org>; Mon, 23 Oct 2017 09:19:52 +0000 (UTC)
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Mon, 23 Oct 2017 11:19:38 +0200
-Message-Id: <20171023091947.20771-1-kraxel@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 0/9] Input 20171023 patches
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1e6Z3Q-0000GQ-3z
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 05:29:52 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Mon, 23 Oct 2017 12:29:45 +0300
+Message-Id: <20171023092945.54532-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH] block/snapshot: dirty all dirty bitmaps on
+ snapshot-switch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,47 +23,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: mreitz@redhat.com, kwolf@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, vsementsov@virtuozzo.com
 
-The following changes since commit e822e81e350825dd94f41ee2538ff1432b812e=
-b9:
+Snapshot-switch actually changes active state of disk so it should
+reflect on dirty bitmaps. Otherwise next incremental backup using
+these bitmaps will be invalid.
 
-  Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request'=
- into staging (2017-10-20 15:04:00 +0100)
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ block/snapshot.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-are available in the git repository at:
-
-  git://git.kraxel.org/qemu tags/input-20171023-pull-request
-
-for you to fetch changes up to 2182608f1ca00f4559486e9173a8e4242dd2d65d:
-
-  ui: pull in latest keycodemapdb (2017-10-23 10:50:02 +0200)
-
-----------------------------------------------------------------
-input: fixes for ui input code and ps/2 keyboard (mostly sysrq key)
-
-----------------------------------------------------------------
-
-Daniel P. Berrange (9):
-  input: use hex in ps2 keycode trace events
-  ui: fix crash with sendkey and raw key numbers
-  ui: use correct union field for key number
-  ps2: fix scancodes sent for Alt-Print key combination (aka SysRq)
-  ps2: fix scancodes sent for Shift/Ctrl+Print key combination
-  ps2: fix scancodess sent for Pause key in AT set 1
-  ps2: fix scancodes sent for Ctrl+Pause key combination
-  ui: normalize the 'sysrq' key into the 'print' key
-  ui: pull in latest keycodemapdb
-
- hw/input/ps2.c        | 207 +++++++++++++++++++++++++++++++++++++++++---=
-------
- ui/input-legacy.c     |   5 ++
- ui/input.c            |  16 +++-
- hw/input/trace-events |   3 +-
- qapi/ui.json          |   7 ++
- ui/keycodemapdb       |   2 +-
- 6 files changed, 201 insertions(+), 39 deletions(-)
-
---=20
-2.9.3
+diff --git a/block/snapshot.c b/block/snapshot.c
+index a46564e7b7..1d5ab5f90f 100644
+--- a/block/snapshot.c
++++ b/block/snapshot.c
+@@ -181,10 +181,24 @@ int bdrv_snapshot_goto(BlockDriverState *bs,
+ {
+     BlockDriver *drv = bs->drv;
+     int ret, open_ret;
++    int64_t len;
+ 
+     if (!drv) {
+         return -ENOMEDIUM;
+     }
++
++    len = bdrv_getlength(bs);
++    if (len < 0) {
++        return len;
++    }
++    /* We should set all bits in all enabled dirty bitmaps, because dirty
++     * bitmaps reflect active state of disk and snapshot switch operation
++     * actually dirties active state.
++     * TODO: It may make sense not to set all bits but analyze block status of
++     * current state and destination snapshot and do not set bits corresponding
++     * to both-zero or both-unallocated areas. */
++    bdrv_set_dirty(bs, 0, len);
++
+     if (drv->bdrv_snapshot_goto) {
+         return drv->bdrv_snapshot_goto(bs, snapshot_id);
+     }
+-- 
+2.11.1
