@@ -1,33 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56437)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57215)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1e6eie-0001pc-HV
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 11:32:49 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1e6elm-0002cp-G4
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 11:36:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1e6eib-0003Ha-Do
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 11:32:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50450)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1e6eib-0003HG-5x
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 11:32:45 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 033384E906
-	for <qemu-devel@nongnu.org>; Mon, 23 Oct 2017 15:32:44 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20171023143242.GD2522@work-vm> (David Alan Gilbert's message of
-	"Mon, 23 Oct 2017 15:32:42 +0100")
-References: <20171018103633.5549-1-quintela@redhat.com>
-	<20171018103633.5549-9-quintela@redhat.com>
-	<20171023143242.GD2522@work-vm>
-Reply-To: quintela@redhat.com
-Date: Mon, 23 Oct 2017 17:32:38 +0200
-Message-ID: <87wp3l98x5.fsf@secure.laptop>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2 08/10] migration: No need to return the
- size of the cache
+	(envelope-from <eric.auger@redhat.com>) id 1e6ell-0004iE-Gq
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 11:36:02 -0400
+From: Eric Auger <eric.auger@redhat.com>
+Date: Mon, 23 Oct 2017 17:35:33 +0200
+Message-Id: <1508772937-21054-1-git-send-email-eric.auger@redhat.com>
+Subject: [Qemu-devel] [RFC v2 0/4] vITS Reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,145 +17,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org, wanghaibin.wang@huawei.com
+Cc: vijay.kilari@gmail.com, drjones@redhat.com, wei@redhat.com, quintela@redhat.com, dgilbert@redhat.com, christoffer.dall@linaro.org, wu.wubin@huawei.com
 
-"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> * Juan Quintela (quintela@redhat.com) wrote:
->> After the previous commits, we make sure that the value passed is
->> right, or we just drop an error.  So now we return if there is one
->> error or we have setup correctly the value passed.
->> 
->> Signed-off-by: Juan Quintela <quintela@redhat.com>
->> ---
->>  migration/migration.c | 6 ++----
->>  migration/ram.c       | 8 +++-----
->>  migration/ram.h       | 2 +-
->>  3 files changed, 6 insertions(+), 10 deletions(-)
->> 
->> diff --git a/migration/migration.c b/migration/migration.c
->> index 3feffb5e26..f3d4503ce2 100644
->> --- a/migration/migration.c
->> +++ b/migration/migration.c
->> @@ -1371,14 +1371,12 @@ void qmp_migrate_cancel(Error **errp)
->>  void qmp_migrate_set_cache_size(int64_t value, Error **errp)
->>  {
->>      MigrationState *s = migrate_get_current();
->> -    int64_t new_size;
->>  
->> -    new_size = xbzrle_cache_resize(value, errp);
->> -    if (new_size < 0) {
->> +    if (xbzrle_cache_resize(value, errp) < 0) {
->
-> That's not consistent with the function below; it returns
-> '0 or negative' for error; this check only tests for negative
-> as an error.
+At the moment the ITS is not properly reset. On System reset or
+reboot, previous ITS register values and caches are left
+unchanged. Some of the registers might point to some guest RAM
+tables which are not valid anymore. This leads to state
+inconsistencies that are detected by the kernel save/restore
+code. And eventually this may cause qemu abort.
 
-int xbzrle_cache_resize(int64_t new_size, Error **errp)
-{
-    PageCache *new_cache;
-    int64_t ret = 0;
+The two first patches would need to be cc'ed stable. Assuming
+patches 1-5 of "[PATCH v5 00/10] vITS Migration fixes and reset" 
+ also are cc'ed stable, they fix the above issue, without 
+implementing a dedicated ITS KVM device reset IOCTL.
+Patches 3-4 use the new reset IOCTL which clarifies the reset
+process.
 
-    /* Check for truncation */
-    if (new_size != (size_t)new_size) {
-        error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "cache size",
-                   "exceeding address space");
-        return -1;
-    }
+The series is in RFC state as it depends on:
+[1] [PATCH v5 00/10] vITS Migration fixes and reset
 
-    if (new_size == migrate_xbzrle_cache_size()) {
-        /* nothing to do */
-        return new_size;
-    }
+Best Regards
 
-    XBZRLE_cache_lock();
+Eric
 
-    if (XBZRLE.cache != NULL) {
-        new_cache = cache_init(new_size, TARGET_PAGE_SIZE, errp);
-        if (!new_cache) {
-            ret = -1;
-            goto out;
-        }
+The series is available at:
+https://github.com/eauger/qemu/tree/v2.10-its-reset-v2
 
-        cache_fini(XBZRLE.cache);
-        XBZRLE.cache = new_cache;
-    }
-out:
-    XBZRLE_cache_unlock();
-    return ret;
-}
+History:
+v1 -> v2:
+- Clarify why abort should be removed for save. Leave abort
+  for restore.
+- Adopt the same reset infra as vgic
+- introduce "hw/intc/arm_gicv3_its: Implement a minimalist reset"
+  which perform individual register writes. This is sufficient to
+  fix the issues without ioctl
 
+Eric Auger (4):
+  hw/intc/arm_gicv3_its: Don't abort on table save failure
+  hw/intc/arm_gicv3_its: Implement a minimalist reset
+  linux-headers: Partial header update for ITS reset
+  hw/intc/arm_gicv3_its: Implement full reset
 
-That is the function that we end having.
--1 means error
-0 means success (yes, I should have changed the return new_size to
-return 0).
+ hw/intc/arm_gicv3_its_kvm.c   | 53 +++++++++++++++++++++++++++++++++++++------
+ linux-headers/asm-arm/kvm.h   |  1 +
+ linux-headers/asm-arm64/kvm.h |  1 +
+ 3 files changed, 48 insertions(+), 7 deletions(-)
 
-I *think* it is ok.  Notice that this is after we have changed all users
-to know that it returns an error or set the value that it has been
-passed.
-
-Later, Juan.
-
-
->
-> Dave
->
->>          return;
->>      }
->>  
->> -    s->xbzrle_cache_size = new_size;
->> +    s->xbzrle_cache_size = value;
->>  }
->>  
->>  int64_t qmp_query_migrate_cache_size(Error **errp)
->> diff --git a/migration/ram.c b/migration/ram.c
->> index c84f22d759..ed4d3c6295 100644
->> --- a/migration/ram.c
->> +++ b/migration/ram.c
->> @@ -111,15 +111,15 @@ static void XBZRLE_cache_unlock(void)
->>   * migration may be using the cache and might finish during this call,
->>   * hence changes to the cache are protected by XBZRLE.lock().
->>   *
->> - * Returns the new_size or negative in case of error.
->> + * Returns the 0 or negative in case of error.
->>   *
->>   * @new_size: new cache size
->>   * @errp: set *errp if the check failed, with reason
->>   */
->> -int64_t xbzrle_cache_resize(int64_t new_size, Error **errp)
->> +int xbzrle_cache_resize(int64_t new_size, Error **errp)
->>  {
->>      PageCache *new_cache;
->> -    int64_t ret;
->> +    int64_t ret = 0;
->>  
->>      /* Check for truncation */
->>      if (new_size != (size_t)new_size) {
->> @@ -152,8 +152,6 @@ int64_t xbzrle_cache_resize(int64_t new_size, Error **errp)
->>          cache_fini(XBZRLE.cache);
->>          XBZRLE.cache = new_cache;
->>      }
->> -
->> -    ret = new_size;
->>  out:
->>      XBZRLE_cache_unlock();
->>      return ret;
->> diff --git a/migration/ram.h b/migration/ram.h
->> index 511b3dc582..c8ae382b5b 100644
->> --- a/migration/ram.h
->> +++ b/migration/ram.h
->> @@ -35,7 +35,7 @@
->>  extern MigrationStats ram_counters;
->>  extern XBZRLECacheStats xbzrle_counters;
->>  
->> -int64_t xbzrle_cache_resize(int64_t new_size, Error **errp);
->> +int xbzrle_cache_resize(int64_t new_size, Error **errp);
->>  uint64_t ram_bytes_remaining(void);
->>  uint64_t ram_bytes_total(void);
->>  
->> -- 
->> 2.13.6
->> 
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+-- 
+2.5.5
