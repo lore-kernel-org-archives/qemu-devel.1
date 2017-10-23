@@ -1,20 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42342)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42902)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <keith.busch@intel.com>) id 1e6dfd-0006kX-G5
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 10:25:38 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1e6di6-0008PM-6N
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 10:28:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <keith.busch@intel.com>) id 1e6dfc-000492-Q9
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 10:25:37 -0400
-Date: Mon, 23 Oct 2017 08:30:01 -0600
-From: Keith Busch <keith.busch@intel.com>
-Message-ID: <20171023143001.GC30713@localhost.localdomain>
-References: <1508568856-17545-1-git-send-email-minwoo.im.dev@gmail.com>
+	(envelope-from <dgilbert@redhat.com>) id 1e6di2-0004rG-9m
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 10:28:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45678)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1e6di2-0004qt-3P
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 10:28:06 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 37C1D4B7C
+	for <qemu-devel@nongnu.org>; Mon, 23 Oct 2017 14:28:05 +0000 (UTC)
+Date: Mon, 23 Oct 2017 15:27:59 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20171023142758.GC2522@work-vm>
+References: <20171018103633.5549-1-quintela@redhat.com>
+	<20171018103633.5549-8-quintela@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1508568856-17545-1-git-send-email-minwoo.im.dev@gmail.com>
-Subject: Re: [Qemu-devel] [Qemu-block][PATCH] qemu-block: add support HMB
- with feature commands.
+In-Reply-To: <20171018103633.5549-8-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 07/10] migration: Don't play games with
+ the requested cache size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,16 +34,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Minwoo Im <minwoo.im.dev@gmail.com>
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
 
-On Sat, Oct 21, 2017 at 03:54:16PM +0900, Minwoo Im wrote:
-> Add support HMB(Host Memory Block) with feature commands(Get Feature, Set Feature).
-> nvme-4.14 tree supports HMB features.
-> This patch will make nvme controller to return 32MiB preferred size of HMB to host via identify command.
-> Set Feature, Get Feature implemented for HMB.
+* Juan Quintela (quintela@redhat.com) wrote:
+> Now that we check that the value passed is a power of 2, we don't need
+> to play games when comparing what is the size that is going to take
+> the cache.
 > 
-> Signed-off-by: Minwoo Im <minwoo.im.dev@gmail.com>
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> ---
+>  migration/ram.c | 11 ++++++-----
+>  1 file changed, 6 insertions(+), 5 deletions(-)
+> 
+> diff --git a/migration/ram.c b/migration/ram.c
+> index 47501460c8..c84f22d759 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -135,12 +135,14 @@ int64_t xbzrle_cache_resize(int64_t new_size, Error **errp)
+>          return -1;
+>      }
+>  
+> +    if (new_size == migrate_xbzrle_cache_size()) {
+> +        /* nothing to do */
+> +        return new_size;
+> +    }
+> +
 
-Nak; this patch doesn't have a use for host memory. It's just advertising
-the need without ever accessing it.
+OK, that's interesting - this test is before the XBZRLE != NULL check;
+so the old code would cause allocation if there was no cache;  but I
+think ram_state_init makes that irrelevant, so we're OK.
+
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+>      XBZRLE_cache_lock();
+>  
+>      if (XBZRLE.cache != NULL) {
+> -        if (pow2floor(new_size) == migrate_xbzrle_cache_size()) {
+> -            goto out_new_size;
+> -        }
+>          new_cache = cache_init(new_size, TARGET_PAGE_SIZE, errp);
+>          if (!new_cache) {
+>              ret = -1;
+> @@ -151,8 +153,7 @@ int64_t xbzrle_cache_resize(int64_t new_size, Error **errp)
+>          XBZRLE.cache = new_cache;
+>      }
+>  
+> -out_new_size:
+> -    ret = pow2floor(new_size);
+> +    ret = new_size;
+>  out:
+>      XBZRLE_cache_unlock();
+>      return ret;
+> -- 
+> 2.13.6
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
