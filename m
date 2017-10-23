@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52800)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53311)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gabriel291075@gmail.com>) id 1e6jSM-0000oo-2V
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 16:36:19 -0400
+	(envelope-from <gabriel291075@gmail.com>) id 1e6jUs-0001We-Lf
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 16:38:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gabriel291075@gmail.com>) id 1e6jSK-0003ai-Go
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 16:36:18 -0400
-Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:47476)
+	(envelope-from <gabriel291075@gmail.com>) id 1e6jUr-0004cI-CV
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 16:38:54 -0400
+Received: from mail-pf0-x22f.google.com ([2607:f8b0:400e:c00::22f]:55503)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <gabriel291075@gmail.com>)
-	id 1e6jSK-0003a6-7t
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 16:36:16 -0400
-Received: by mail-pf0-x243.google.com with SMTP id z11so17941324pfk.4
-	for <qemu-devel@nongnu.org>; Mon, 23 Oct 2017 13:36:15 -0700 (PDT)
+	id 1e6jUr-0004bw-3r
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 16:38:53 -0400
+Received: by mail-pf0-x22f.google.com with SMTP id 17so17959163pfn.12
+	for <qemu-devel@nongnu.org>; Mon, 23 Oct 2017 13:38:52 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <52e67cee-c6e6-4df0-6882-6a39fdef473d@amsat.org>
-References: <1508513949-15680-1-git-send-email-gabriel291075@gmail.com>
-	<52e67cee-c6e6-4df0-6882-6a39fdef473d@amsat.org>
+In-Reply-To: <78733847-5a74-a234-3c6e-9562e916f114@amsat.org>
+References: <1508417443-31849-1-git-send-email-gabriel291075@gmail.com>
+	<78733847-5a74-a234-3c6e-9562e916f114@amsat.org>
 From: Gabriel Costa <gabriel291075@gmail.com>
-Date: Mon, 23 Oct 2017 16:36:14 -0400
-Message-ID: <CAG+oHk83yBxw7JB7u15yy6KkhOwvhy=Epe_HOh3c_SdfnQ=5EQ@mail.gmail.com>
+Date: Mon, 23 Oct 2017 16:38:51 -0400
+Message-ID: <CAG+oHk-9VpKkYQQQDaD76ZpvmFtFWr=nfi+f8dicWwVUk=edig@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 04/11] kinetis_k64_sim.h has been added
+Subject: Re: [Qemu-devel] [PATCH v1] arm: Adding new arm machine,
+ Kinetis K64 MK64FN1M0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,145 +37,74 @@ Cc: QEMU Developers <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro
 Hi Philippe,
 
 Thanks for all your comments!
-The name SIM came from kinetis datasheet, it is the name of the peripheral.
-I believe others families of kinetis microcontrollers uses the same name.
+I will put all this corrections for the next patch, also I removed the
+FlexTimer, it is not necessary to do this basic emulation.
 
-On Fri, Oct 20, 2017 at 6:17 PM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
+Thanks,
+
+Gabriel
+
+
+On Fri, Oct 20, 2017 at 6:25 PM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
 rg>
 wrote:
 
-> Hi Gabriel,
->
-> On 10/20/2017 12:39 PM, Gabriel Augusto Costa wrote:
-> > I made a new arm machine with some peripherals. The machine is
-> mk64fn1m0, a
-> > cortex-m4 microcontroller from NXP Kinetis family. The machine can run =
-a
-> > simple arm binary file using UART0 in polling mode.
-> > I have prepared a series of patchs to include this machine:
-> > PATCH v3 n/11: It adds the machine and peripherals devices;
-> > PATCH v4 n/2: It changes the Make files to compile this machine.
-> >
-> > Signed-off-by: Gabriel Augusto Costa <gabriel291075@gmail.com>
-> > ---
-> >  include/hw/misc/kinetis_k64_sim.h | 56 ++++++++++++++++++++++++++++++
-> +++++++++
-> >  1 file changed, 56 insertions(+)
-> >  create mode 100644 include/hw/misc/kinetis_k64_sim.h
-> >
-> > diff --git a/include/hw/misc/kinetis_k64_sim.h
-> b/include/hw/misc/kinetis_k64_sim.h
-> > new file mode 100644
-> > index 0000000..2eb1f5c
-> > --- /dev/null
-> > +++ b/include/hw/misc/kinetis_k64_sim.h
->
-> I'd rather name it kinetis_k64_system.h or kinetis_k64_sysctl.h
->
-> > @@ -0,0 +1,56 @@
-> > +/*
-> > + * Kinetis K64 peripheral microcontroller emulation.
-> > + *
-> > + * Copyright (c) 2017 Advantech Wireless
-> > + * Written by Gabriel Costa <gabriel291075@gmail.com>
-> > + *
-> > + *  This program is free software; you can redistribute it and/or modi=
-fy
-> > + *  it under the terms of the GNU General Public License version 2 or
-> > + *  (at your option) any later version.
-> > + */
+> > +/*    dev =3D sysbus_create_simple(TYPE_KINETIS_SPI, 0x4002C000,
+> > +            qdev_get_gpio_in(nvic, 31)); *SPI0*/
+> > +/*    dev =3D sysbus_create_simple(TYPE_KINETIS_SPI, 0x4002D000,
+> > +            qdev_get_gpio_in(nvic, 33)); *SPI1*/
+> > +/*    dev =3D sysbus_create_simple(TYPE_KINETIS_ADC, 0x4003B000,
+> > +            qdev_get_gpio_in(nvic, 31)); *ADC0*/
+> > +/*    dev =3D sysbus_create_simple(TYPE_KINETIS_DAC, 0x4002F000,
+> > +            qdev_get_gpio_in(nvic, 33)); *DAC0*/
+> > +/*    dev =3D sysbus_create_simple(TYPE_KINETIS_I2C, 0x40066000,
+> > +            qdev_get_gpio_in(nvic, 31)); *I2C0*/
+> > +/*    dev =3D sysbus_create_simple(TYPE_KINETIS_I2C, 0x40067000,
+> > +            qdev_get_gpio_in(nvic, 33)); *I2C1*/
 > > +
-> > +/* Kinetis K64 series SIM controller.  */
+> > +//    sysbus_create_simple(TYPE_KINETIS_K64_UART, 0x4006A000,
+> > +//            qdev_get_gpio_in(nvic, 31)); /*UART0*/
+> > +    kinetis_k64_uart_create(0x4006A000, qdev_get_gpio_in(nvic, 31),
+> > +            serial_hds[0]);
+> > +/*    dev =3D sysbus_create_simple(TYPE_KINETIS_K64_UART, 0x4006B000,
+> > +            qdev_get_gpio_in(nvic, 33)); *UART1*/
+> > +/*    dev =3D sysbus_create_simple(TYPE_KINETIS_K64_UART, 0x4006C000,
+> > +            qdev_get_gpio_in(nvic, 35)); *UART2*/
+> > +/*    dev =3D sysbus_create_simple(TYPE_KINETIS_K64_UART, 0x4006D000,
+> > +            qdev_get_gpio_in(nvic, 37)); *UART3*/
 > > +
-> > +#ifndef KINETIS_SIM_H
-> > +#define KINETIS_SIM_H
+> > +/*    dev =3D sysbus_create_simple(TYPE_KINETIS_SPI, 0x400AC000,
+> > +            qdev_get_gpio_in(nvic, 65)); *SPI2*/
+> > +/*    dev =3D sysbus_create_simple(TYPE_KINETIS_ADC, 0x400BB000,
+> > +            qdev_get_gpio_in(nvic, 73)); *ADC1*/
+> > +/*    dev =3D sysbus_create_simple(TYPE_KINETIS_I2C, 0x400E6000,
+> > +            qdev_get_gpio_in(nvic, 74)); *I2C2*/
 > > +
-> > +#include "hw/sysbus.h"
-> > +#include "chardev/char-fe.h"
+> > +/*    dev =3D sysbus_create_simple(TYPE_KINETIS_K64_UART, 0x400EA000,
+> > +            qdev_get_gpio_in(nvic, 66)); *UART4*/
+> > +/*    dev =3D sysbus_create_simple(TYPE_KINETIS_K64_UART, 0x400EB000,
+> > +            qdev_get_gpio_in(nvic, 68)); *UART5*/
 >
-> not used
+> Just create those with create_unimplemented_device() instead...
 >
-> > +#include "chardev/char-mux.h"
->
-> not used
->
-> > +#include "hw/hw.h"
 > > +
-> > +#define TYPE_KINETIS_K64_SIM "kinetis_k64_sim"
-> > +#define KINETIS_K64_SIM(obj) \
-> > +    OBJECT_CHECK(kinetis_k64_sim_state, (obj), TYPE_KINETIS_K64_SIM)
-> > +
-> > +typedef struct {
-> > +    SysBusDevice parent_obj;
-> > +
-> > +    MemoryRegion iomem;
-> > +
-> > +    uint32_t SOPT1;     /**< System Options Register 1, offset: 0x0 */
-> > +    uint32_t SOPT1CFG;  /**< SOPT1 Configuration Register, offset: 0x4
-> */
-> > +    uint32_t SOPT2;     /**< System Options Register 2, offset: 0x1004
-> */
-> > +    uint32_t SOPT4;     /**< System Options Register 4, offset: 0x100C
-> */
-> > +    uint32_t SOPT5;     /**< System Options Register 5, offset: 0x1010
-> */
-> > +    uint32_t SOPT7;     /**< System Options Register 7, offset: 0x1018
-> */
->
-> could be uint32_t SOPT[8] ...
->
-> > +    uint32_t SDID;      /**< System Device Id Register, offset: 0x1024
-> */
-> > +    uint32_t SCGC1;     /**< System Clock Gating Ctrl Reg 1, offset:
-> 0x1028 */
-> > +    uint32_t SCGC2;     /**< System Clock Gating Ctrl Reg 2, offset:
-> 0x102C */
-> > +    uint32_t SCGC3;     /**< System Clock Gating Ctrl Reg 3, offset:
-> 0x1030 */
-> > +    uint32_t SCGC4;     /**< System Clock Gating Ctrl Reg 4, offset:
-> 0x1034 */
-> > +    uint32_t SCGC5;     /**< System Clock Gating Ctrl Reg 5, offset:
-> 0x1038 */
-> > +    uint32_t SCGC6;     /**< System Clock Gating Ctrl Reg 6, offset:
-> 0x103C */
-> > +    uint32_t SCGC7;     /**< System Clock Gating Ctrl Reg 7, offset:
-> 0x1040 */
->
-> ... and uint32_t SCGC[8]
->
-> Then in the source I'd do:
->
->     case 0x0000:
->         value =3D s->SOPT[0];
->         break;
->
->     case 0x0004:
->         value =3D s->SOPTCFG[0];
->         break;
->
->     case 0x1004 ... 0x1018:
->         value =3D s->SOPT[(value & 0x1f) >> 2];
->         break;
->
-> > +    uint32_t CLKDIV1;   /**< System Clock Divider Register 1, offset:
-> 0x1044 */
-> > +    uint32_t CLKDIV2;   /**< System Clock Divider Register 2, offset:
-> 0x1048 */
-> > +    uint32_t FCFG1;     /**< Flash Configuration Register 1, offset:
-> 0x104C */
-> > +    uint32_t FCFG2;     /**< Flash Configuration Register 2, offset:
-> 0x1050 */
-> > +    uint32_t UIDH;      /**< Unique Id Register High, offset: 0x1054 *=
-/
-> > +    uint32_t UIDMH;     /**< Unique Id Register Mid-High, offset:
-> 0x1058 */
-> > +    uint32_t UIDML;     /**< Unique Id Register Mid Low, offset: 0x105=
-C
-> */
-> > +    uint32_t UIDL;      /**< Unique Id Register Low, offset: 0x1060 */
-> > +
-> > +} kinetis_k64_sim_state;
-> > +
-> > +#endif
-> >
+> > +    create_unimplemented_device("peripheral_bridge_0",  0x40000000,
+> 0x1000);
+> > +    create_unimplemented_device("Crossbar_Switch",      0x40004000,
+> 0x1000);
+> > +    create_unimplemented_device("DMA_Controller",       0x40008000,
+> 0x1000);
+> > +    create_unimplemented_device("DMA_Controller_t",     0x40009000,
+> 0x1000);
+> > +    create_unimplemented_device("FlexBus",              0x4000C000,
+> 0x1000);
+> > +    create_unimplemented_device("MPU",                  0x4000D000,
+> 0x1000);
+> > +    create_unimplemented_device("Flash_mem_ctrl",       0x4001F000,
+> 0x1000);
+> > +    create_unimplemented_device("Flash_mem",            0x40020000,
+> 0x1000);
+> > +    create_unimplemented_device("DMA_ch_multiplexer",   0x40021000,
+> 0x1000);
+> > +}
 >
