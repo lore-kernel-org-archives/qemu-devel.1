@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59242)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60546)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1e6W8K-00046D-SF
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 02:22:45 -0400
+	(envelope-from <famz@redhat.com>) id 1e6WGP-0005Bv-4S
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 02:31:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1e6W8G-00065f-T0
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 02:22:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34854)
+	(envelope-from <famz@redhat.com>) id 1e6WGM-0000MD-04
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 02:31:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43988)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1e6W8G-00065S-K8
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 02:22:40 -0400
-Date: Mon, 23 Oct 2017 14:22:37 +0800
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1e6WGL-0000LV-QC
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 02:31:01 -0400
+Date: Mon, 23 Oct 2017 14:30:52 +0800
 From: Fam Zheng <famz@redhat.com>
-Message-ID: <20171023062237.GG29815@lemon>
-References: <20171018073841.30062-1-famz@redhat.com>
-	<150831409774.377.7665751901178175493@b58463cdfd5f>
-	<20171018082836.GD9443@lemon> <20171018083549.GB9719@redhat.com>
-	<20171020125107.GM21172@redhat.com>
+Message-ID: <20171023063052.GH29815@lemon>
+References: <150872266046.482.7079735783547819304@b58463cdfd5f>
+	<d60aa469-248e-1e09-c3e6-20c696050865@cn.fujitsu.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20171020125107.GM21172@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] docker: Fix PATH for ccache
+In-Reply-To: <d60aa469-248e-1e09-c3e6-20c696050865@cn.fujitsu.com>
+Subject: Re: [Qemu-devel] [PATCH v4] NUMA: Enable adding NUMA node implicitly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,58 +27,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: alex.bennee@linaro.org, qemu-devel@nongnu.org, f4bug@amsat.org
+To: Dou Liyang <douly.fnst@cn.fujitsu.com>
+Cc: qemu-devel@nongnu.org, thuth@redhat.com, indou.takao@jp.fujitsu.com, ehabkost@redhat.com, mst@redhat.com, izumi.taku@jp.fujitsu.com, david@redhat.com, f4bug@amsat.org, alistair23@gmail.com, imammedo@redhat.com, marcel@redhat.com, pbonzini@redhat.com, rth@twiddle.net, patchew-devel@freelists.org
 
-On Fri, 10/20 13:51, Daniel P. Berrange wrote:
-> On Wed, Oct 18, 2017 at 09:35:49AM +0100, Daniel P. Berrange wrote:
-> > On Wed, Oct 18, 2017 at 04:28:36PM +0800, Fam Zheng wrote:
-> > > On Wed, 10/18 01:08, no-reply@patchew.org wrote:
-> > > > Your branch is up-to-date with 'origin/test'.
-> > > > Submodule 'dtc' (git://git.qemu-project.org/dtc.git) registered for path 'dtc'
-> > > > Cloning into '/var/tmp/patchew-tester-tmp-jhpnlaz0/src/docker-src.2017-10-18-04.03.32.32287/qemu.tar.vroot/dtc'...
-> > > > fatal: unable to connect to git.qemu-project.org:
-> > > > git.qemu-project.org[0: 172.99.69.163]: errno=Connection timed out
-> > > > 
-> > > > fatal: clone of 'git://git.qemu-project.org/dtc.git' into submodule path '/var/tmp/patchew-tester-tmp-jhpnlaz0/src/docker-src.2017-10-18-04.03.32.32287/qemu.tar.vroot/dtc' failed
-> > > > Failed to clone 'dtc'. Retry scheduled
-> > > > Cloning into '/var/tmp/patchew-tester-tmp-jhpnlaz0/src/docker-src.2017-10-18-04.03.32.32287/qemu.tar.vroot/dtc'...
-> > > > fatal: unable to connect to git.qemu-project.org:
-> > > > git.qemu-project.org[0: 172.99.69.163]: errno=Connection timed out
-> > > > 
-> > > > fatal: clone of 'git://git.qemu-project.org/dtc.git' into submodule path '/var/tmp/patchew-tester-tmp-jhpnlaz0/src/docker-src.2017-10-18-04.03.32.32287/qemu.tar.vroot/dtc' failed
-> > > > Failed to clone 'dtc' a second time, aborting
-> > > > failed to init submodule dtc
-> > > 
-> > > So now patchew is less robust on network hiccups: a number of the same "git
-> > > submodule update --init" calls have succeeded above, so this is incidental. Any
-> > > idea how to improve that? Maybe if there is a checkout from $QEMU_SRC, clone/cp
-> > > from there instead of fetch from submodule remote?
+On Mon, 10/23 09:54, Dou Liyang wrote:
+> Hi Fam,
+> 
+> At 10/23/2017 09:37 AM, no-reply@patchew.org wrote:
+> > Hi,
 > > 
-> > If patchew has unreliable connectivity to git.qemu.org then the best thing
-> > is probably have a background job that mirrors the git.qemu.org repos on
-> > the patchew server. Then have the test job modify .gitmodules to point to
-> > your local mirror. That way, network access is used during the background
-> > job only, and actual builds just get a local clone from the cache.
+> > This series failed automatic build test. Please find the testing commands and
+> > their output below. If you have docker installed, you can probably reproduce it
+> > locally.
+> > 
+> > Type: series
+> > Message-id: 1508722422-3861-1-git-send-email-douly.fnst@cn.fujitsu.com
+> > Subject: [Qemu-devel] [PATCH v4] NUMA: Enable adding NUMA node implicitly
+> > 
+> > === TEST SCRIPT BEGIN ===
+> > #!/bin/bash
+> > set -e
+> > git submodule update --init dtc
+> > # Let docker tests dump environment info
+> > export SHOW_ENV=1
+> > export J=8
+> > time make docker-test-quick@centos6
+> > time make docker-test-build@min-glib
+> > time make docker-test-mingw@fedora
+> > time make docker-test-block@fedora
+> > === TEST SCRIPT END ===
+> > 
+> > Updating 3c8cf5a9c21ff8782164d1def7f44bd888713384
+> > From https://github.com/patchew-project/qemu
+> >  * [new tag]               patchew/1508722422-3861-1-git-send-email-douly.fnst@cn.fujitsu.com -> patchew/1508722422-3861-1-git-send-email-douly.fnst@cn.fujitsu.com
+> >  t [tag update]            patchew/cover.1508329282.git.riku.voipio@linaro.org -> patchew/cover.1508329282.git.riku.voipio@linaro.org
+> > Switched to a new branch 'test'
+> > b8c0d922bf NUMA: Enable adding NUMA node implicitly
+> > 
+> > === OUTPUT BEGIN ===
+> > Submodule 'dtc' (git://git.qemu-project.org/dtc.git) registered for path 'dtc'
+> > Cloning into '/var/tmp/patchew-tester-tmp-z9ao6big/src/dtc'...
+> > fatal: Could not read from remote repository.
+> > 
 > 
-> I thought of a simpler way to address this.
-> 
-> Currently patchew runs 4 docker jobs, and each one triggers creation of
-> the $(DOCKER_SRC_COPY) rule. This runs archive-source.sh 4 times, because
-> $(DOCKER_SRC_COPY) contains the current timestamp and so is different
-> each time we run it.
-> 
-> If you override DOCKER_SRC_COPY with the current git change hash, then
-> you would end up using the same archive for all 4 jobs, and so only do
-> the checkouts once
->  
->   make docker-foo   DOCKER_SRC_COPY=docker-src.`git rev-parse HEAD`
+> Wow, It seems there are something wrong with the test robot.
 
-I'm fine with that, just not sure about if this handles uncommitted changes
-correctly? It certainly isn't a concern on patchew, but may be a problem for
-developers.
-
-Your previous idea about mirroring submodules to local makes much sense, I can
-try it though.
+Yes, I'm looking into that! Thanks.
 
 Fam
