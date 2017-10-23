@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41015)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42961)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mattator@gmail.com>) id 1e6ZBn-0007n9-WE
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 05:38:33 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1e6ZL2-0001Dm-IM
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 05:48:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mattator@gmail.com>) id 1e6ZBm-0003KF-PT
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 05:38:32 -0400
-Received: from mail-yw0-x234.google.com ([2607:f8b0:4002:c05::234]:51321)
+	(envelope-from <peter.maydell@linaro.org>) id 1e6ZL0-0006sl-Sc
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 05:48:03 -0400
+Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:50858)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mattator@gmail.com>) id 1e6ZBm-0003Ji-KE
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 05:38:30 -0400
-Received: by mail-yw0-x234.google.com with SMTP id k3so11481525ywk.8
-	for <qemu-devel@nongnu.org>; Mon, 23 Oct 2017 02:38:29 -0700 (PDT)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1e6ZL0-0006sX-LX
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 05:48:02 -0400
+Received: by mail-wr0-x231.google.com with SMTP id p96so2795712wrb.7
+	for <qemu-devel@nongnu.org>; Mon, 23 Oct 2017 02:48:02 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <545610a4882f4c5494b30b7eab66b984@EXCHCS32.ornl.gov>
+In-Reply-To: <CADHp1NxzGr_ijvGrUbmZf0NuUv+JwJZeA=8h4tZNn++SBA1yUw@mail.gmail.com>
 References: <CADHp1NwU=HowMfgBGtcwnY25v_fL6qZ2gd469a2oZY+QQi2uFw@mail.gmail.com>
 	<20171019205409.GA4170@flamenco>
 	<545610a4882f4c5494b30b7eab66b984@EXCHCS32.ornl.gov>
-From: Matt <mattator@gmail.com>
-Date: Mon, 23 Oct 2017 18:38:28 +0900
-Message-ID: <CADHp1NxzGr_ijvGrUbmZf0NuUv+JwJZeA=8h4tZNn++SBA1yUw@mail.gmail.com>
+	<CADHp1NxzGr_ijvGrUbmZf0NuUv+JwJZeA=8h4tZNn++SBA1yUw@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 23 Oct 2017 10:47:41 +0100
+Message-ID: <CAFEAcA-d_g2f20R18sJHwXU_NM4xtNM=n5HL2BF8G4YEzeghnA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Subject: Re: [Qemu-devel] Running Qemu in discrete time/step by step
 List-Id: <qemu-devel.nongnu.org>
@@ -29,86 +31,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Nutaro, James J." <nutarojj@ornl.gov>
-Cc: "Emilio G. Cota" <cota@braap.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Hajime Tazaki <tazaki@wide.ad.jp>
+To: Matt <mattator@gmail.com>
+Cc: "Nutaro, James J." <nutarojj@ornl.gov>, "Emilio G. Cota" <cota@braap.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Hajime Tazaki <tazaki@wide.ad.jp>
 
-I did not know about Qemu's record/replay mode which is an interesting
-feature but unneeded if a  2nd qemu run with the same inputs generated
-the same outputs (as it's the case with DCE).
-@nutaro Thanks for the updated patch. I will have a look at adevs. On
-a related note https://github.com/qemu/qemu/blob/master/docs/replay.txt
-enumerates different sources of indeterminism
-==
-Replaying of the execution of virtual machine is bound by sources of
-non-determinism. These are inputs from clock and peripheral devices,
-and QEMU thread scheduling. Thread scheduling affect on processing events
-from timers, asynchronous input-output, and bottom halves.
-==
+On 23 October 2017 at 10:38, Matt <mattator@gmail.com> wrote:
+> I did not know about Qemu's record/replay mode which is an interesting
+> feature but unneeded if a  2nd qemu run with the same inputs generated
+> the same outputs (as it's the case with DCE).
 
-Do you manage to achieve perfect reproducibility with adevs + qemu ?
-If yes, is there any publication describing how you achieve this ?
+Depends what you're trying to do. Deterministic execution is
+a prerequisite for record-and-replay, and sometimes determinism
+is all you need, but record-and-replay can provide more than that.
 
-Best regards
-matt
-
-2017-10-21 0:02 GMT+09:00 Nutaro, James J. <nutarojj@ornl.gov>:
-> Thanks for taking a look at the patch. The most recent version of the patch will also work with KVM if you need to speed things up. You can find it here:
->
-> https://patchwork.kernel.org/patch/9960369/
->
-> Somehow I messed up that post and it shows V8 when it should be V9.
->
-> You can get the simulator that it works with at
->
-> https://sourceforge.net/projects/adevs/
->
-> If nothing else, this simulator would give you a blue print for integration with another tool.
->
-> Jim
->
-> -----Original Message-----
-> From: Emilio G. Cota [mailto:cota@braap.org]
-> Sent: Thursday, October 19, 2017 4:54 PM
-> To: Matt
-> Cc: qemu-devel@nongnu.org; Hajime Tazaki; Nutaro, James J.
-> Subject: Re: [Qemu-devel] Running Qemu in discrete time/step by step
->
-> On Thu, Oct 19, 2017 at 14:14:12 +0900, Matt wrote:
-> (snip)
->> - VMSimint does nearly that, it runs Qemu in discrete time but
->> interface it with a JAVA simulator
->> http://www.ikr.uni-stuttgart.de/Content/Publications/Archive/We_SIMUTools_2014_40209.pdf
->> (with the code http://www.ikr.uni-stuttgart.de/Content/IKRSimLib/Download/)
->> - http://web.ornl.gov/~nutarojj/adevs/ does sthg similar too
->
-> Nutaro's work to interface with QEMU has been posted on the list:
->   https://patchwork.kernel.org/patch/9572497/
-> I'm Cc'ing him in case he's not subscribed to the list.
->
->
->> My questions would be:
->> 1/ do you know of any other related work ?
->
-> Is QEMU's record/replay mode of any use to you? Note that as is the
-> case with Nutaro's patch, you'll need icount mode (i.e. single-core)
-> enabled.
->
->> 2/ I believe there is interest from the research side but would it be
->> possible to merge either approach or a similar one (adevs patch
->> doesn't seem too big ~500 lines), would that be of interest for the
->> Qemu comminity too ?
->> 3/ if yes to 2. How to proceed, which one would be favorite ? if no,
->> what should be improved ? or would that be a definitive no ?
->
-> I think the adevs approach is reasonable. The patch hasn't gotten much
-> attention I guess because not many people care about this feature.
-> But if you could review the patch and certify that it works for you
-> (i.e. it works with simulators other than adevs), that could only help
-> the patch getting in.
->
-> That said, I make no merging decisions so take this as just my opinion.
->
-> Cheers,
->
->                 Emilio
->
+thanks
+-- PMM
