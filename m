@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35911)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35944)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1e6fHW-0005tR-CC
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 12:08:51 -0400
+	(envelope-from <quintela@redhat.com>) id 1e6fHY-0005ul-KS
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 12:08:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1e6fHU-0000T7-H2
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 12:08:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37286)
+	(envelope-from <quintela@redhat.com>) id 1e6fHX-0000WV-4e
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 12:08:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47910)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1e6fHU-0000SN-Ab
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 12:08:48 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 71F14C0587E6
-	for <qemu-devel@nongnu.org>; Mon, 23 Oct 2017 16:08:47 +0000 (UTC)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1e6fHW-0000VG-Rq
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 12:08:51 -0400
 From: Juan Quintela <quintela@redhat.com>
-Date: Mon, 23 Oct 2017 18:07:55 +0200
-Message-Id: <20171023160800.20540-17-quintela@redhat.com>
+Date: Mon, 23 Oct 2017 18:07:56 +0200
+Message-Id: <20171023160800.20540-18-quintela@redhat.com>
 In-Reply-To: <20171023160800.20540-1-quintela@redhat.com>
 References: <20171023160800.20540-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PULL 16/21] migration: new ram_init_bitmaps()
+Subject: [Qemu-devel] [PULL 17/21] migration: postcopy_place_page factoring
+ out
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,98 +25,117 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
+Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com, Alexey Perevalov <a.perevalov@samsung.com>
 
-From: Peter Xu <peterx@redhat.com>
+From: Alexey Perevalov <a.perevalov@samsung.com>
 
-Rearrange the bitmap initialization and the first sync.  Since at it,
-make sure the locks are taken/released in correct order (I moved RCU
-unlock upper - though it may not affect much).
+Need to mark copied pages as closer as possible to the place where it
+tracks down. That will be necessary in futher patch.
 
-Signed-off-by: Peter Xu <peterx@redhat.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
 Reviewed-by: Juan Quintela <quintela@redhat.com>
+Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- migration/ram.c | 51 ++++++++++++++++++++++++++++++---------------------
- 1 file changed, 30 insertions(+), 21 deletions(-)
+ migration/postcopy-ram.c | 13 +++++++------
+ migration/postcopy-ram.h |  4 ++--
+ migration/ram.c          |  4 ++--
+ 3 files changed, 11 insertions(+), 10 deletions(-)
 
+diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+index 0de68e8b25..d3073b93b5 100644
+--- a/migration/postcopy-ram.c
++++ b/migration/postcopy-ram.c
+@@ -646,9 +646,10 @@ int postcopy_ram_enable_notify(MigrationIncomingState *mis)
+  * returns 0 on success
+  */
+ int postcopy_place_page(MigrationIncomingState *mis, void *host, void *from,
+-                        size_t pagesize)
++                        RAMBlock *rb)
+ {
+     struct uffdio_copy copy_struct;
++    size_t pagesize = qemu_ram_pagesize(rb);
+ 
+     copy_struct.dst = (uint64_t)(uintptr_t)host;
+     copy_struct.src = (uint64_t)(uintptr_t)from;
+@@ -677,11 +678,11 @@ int postcopy_place_page(MigrationIncomingState *mis, void *host, void *from,
+  * returns 0 on success
+  */
+ int postcopy_place_page_zero(MigrationIncomingState *mis, void *host,
+-                             size_t pagesize)
++                             RAMBlock *rb)
+ {
+     trace_postcopy_place_page_zero(host);
+ 
+-    if (pagesize == getpagesize()) {
++    if (qemu_ram_pagesize(rb) == getpagesize()) {
+         struct uffdio_zeropage zero_struct;
+         zero_struct.range.start = (uint64_t)(uintptr_t)host;
+         zero_struct.range.len = getpagesize();
+@@ -711,7 +712,7 @@ int postcopy_place_page_zero(MigrationIncomingState *mis, void *host,
+             memset(mis->postcopy_tmp_zero_page, '\0', mis->largest_page_size);
+         }
+         return postcopy_place_page(mis, host, mis->postcopy_tmp_zero_page,
+-                                   pagesize);
++                                   rb);
+     }
+ 
+     return 0;
+@@ -774,14 +775,14 @@ int postcopy_ram_enable_notify(MigrationIncomingState *mis)
+ }
+ 
+ int postcopy_place_page(MigrationIncomingState *mis, void *host, void *from,
+-                        size_t pagesize)
++                        RAMBlock *rb)
+ {
+     assert(0);
+     return -1;
+ }
+ 
+ int postcopy_place_page_zero(MigrationIncomingState *mis, void *host,
+-                        size_t pagesize)
++                        RAMBlock *rb)
+ {
+     assert(0);
+     return -1;
+diff --git a/migration/postcopy-ram.h b/migration/postcopy-ram.h
+index 587a8b86a7..77ea0fd264 100644
+--- a/migration/postcopy-ram.h
++++ b/migration/postcopy-ram.h
+@@ -72,14 +72,14 @@ void postcopy_discard_send_finish(MigrationState *ms,
+  * returns 0 on success
+  */
+ int postcopy_place_page(MigrationIncomingState *mis, void *host, void *from,
+-                        size_t pagesize);
++                        RAMBlock *rb);
+ 
+ /*
+  * Place a zero page at (host) atomically
+  * returns 0 on success
+  */
+ int postcopy_place_page_zero(MigrationIncomingState *mis, void *host,
+-                             size_t pagesize);
++                             RAMBlock *rb);
+ 
+ /* The current postcopy state is read/set by postcopy_state_get/set
+  * which update it atomically.
 diff --git a/migration/ram.c b/migration/ram.c
-index 60f9cfe8be..1b19a899c9 100644
+index 1b19a899c9..bd4fc5ceb4 100644
 --- a/migration/ram.c
 +++ b/migration/ram.c
-@@ -2110,30 +2110,15 @@ static int ram_state_init(RAMState **rsp)
-     return 0;
- }
+@@ -2753,10 +2753,10 @@ static int ram_load_postcopy(QEMUFile *f)
  
--static int ram_init_all(RAMState **rsp)
-+static void ram_list_init_bitmaps(void)
- {
--    if (ram_state_init(rsp)) {
--        return -1;
--    }
--
--    if (xbzrle_init()) {
--        ram_state_cleanup(rsp);
--        return -1;
--    }
--
--    /* For memory_global_dirty_log_start below.  */
--    qemu_mutex_lock_iothread();
--
--    qemu_mutex_lock_ramlist();
--    rcu_read_lock();
-+    RAMBlock *block;
-+    unsigned long pages;
- 
-     /* Skip setting bitmap if there is no RAM */
-     if (ram_bytes_total()) {
--        RAMBlock *block;
--
-         QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
--            unsigned long pages = block->max_length >> TARGET_PAGE_BITS;
--
-+            pages = block->max_length >> TARGET_PAGE_BITS;
-             block->bmap = bitmap_new(pages);
-             bitmap_set(block->bmap, 0, pages);
-             if (migrate_postcopy_ram()) {
-@@ -2142,12 +2127,36 @@ static int ram_init_all(RAMState **rsp)
+             if (all_zero) {
+                 ret = postcopy_place_page_zero(mis, place_dest,
+-                                               block->page_size);
++                                               block);
+             } else {
+                 ret = postcopy_place_page(mis, place_dest,
+-                                          place_source, block->page_size);
++                                          place_source, block);
              }
          }
-     }
-+}
- 
-+static void ram_init_bitmaps(RAMState *rs)
-+{
-+    /* For memory_global_dirty_log_start below.  */
-+    qemu_mutex_lock_iothread();
-+    qemu_mutex_lock_ramlist();
-+    rcu_read_lock();
-+
-+    ram_list_init_bitmaps();
-     memory_global_dirty_log_start();
--    migration_bitmap_sync(*rsp);
-+    migration_bitmap_sync(rs);
-+
-+    rcu_read_unlock();
-     qemu_mutex_unlock_ramlist();
-     qemu_mutex_unlock_iothread();
--    rcu_read_unlock();
-+}
-+
-+static int ram_init_all(RAMState **rsp)
-+{
-+    if (ram_state_init(rsp)) {
-+        return -1;
-+    }
-+
-+    if (xbzrle_init()) {
-+        ram_state_cleanup(rsp);
-+        return -1;
-+    }
-+
-+    ram_init_bitmaps(*rsp);
- 
-     return 0;
- }
+         if (!ret) {
 -- 
 2.13.6
