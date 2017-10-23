@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36028)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36005)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1e6fHh-00060x-Ku
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 12:09:02 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1e6fHg-0000ga-H5
+	(envelope-from <quintela@redhat.com>) id 1e6fHg-0005zg-Br
 	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 12:09:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38284)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1e6fHg-0000fd-8M
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <quintela@redhat.com>) id 1e6fHc-0000cW-Mh
 	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 12:09:00 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6C06B5D9EA
-	for <qemu-devel@nongnu.org>; Mon, 23 Oct 2017 16:08:59 +0000 (UTC)
+Received: from mx1.redhat.com ([209.132.183.28]:19606)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1e6fHc-0000bS-Da
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 12:08:56 -0400
 From: Juan Quintela <quintela@redhat.com>
-Date: Mon, 23 Oct 2017 18:08:00 +0200
-Message-Id: <20171023160800.20540-22-quintela@redhat.com>
+Date: Mon, 23 Oct 2017 18:07:58 +0200
+Message-Id: <20171023160800.20540-20-quintela@redhat.com>
 In-Reply-To: <20171023160800.20540-1-quintela@redhat.com>
 References: <20171023160800.20540-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PULL 21/21] migration: Improve migration thread error
- handling
+Subject: [Qemu-devel] [PULL 19/21] migration: add bitmap for received page
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,111 +24,221 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
+Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com, Alexey Perevalov <a.perevalov@samsung.com>
 
-We now report errors also when we finish migration, not only on info
-migrate.  We plan to use this error from several places, and we want
-the first error to happen to win, so we add an mutex to order it.
+From: Alexey Perevalov <a.perevalov@samsung.com>
 
-Signed-off-by: Juan Quintela <quintela@redhat.com>
+This patch adds ability to track down already received
+pages, it's necessary for calculation vCPU block time in
+postcopy migration feature, and for recovery after
+postcopy migration failure.
+
+Also it's necessary to solve shared memory issue in
+postcopy livemigration. Information about received pages
+will be transferred to the software virtual bridge
+(e.g. OVS-VSWITCHD), to avoid fallocate (unmap) for
+already received pages. fallocate syscall is required for
+remmaped shared memory, due to remmaping itself blocks
+ioctl(UFFDIO_COPY, ioctl in this case will end with EEXIT
+error (struct page is exists after remmap).
+
+Bitmap is placed into RAMBlock as another postcopy/precopy
+related bitmaps.
+
+Reviewed-by: Peter Xu <peterx@redhat.com>
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Peter Xu <peterx@redhat.com>
+Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
+Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- migration/migration.c | 19 ++++++++++++++++---
- migration/migration.h |  7 ++++++-
- migration/tls.c       |  1 -
- 3 files changed, 22 insertions(+), 5 deletions(-)
+ include/exec/ram_addr.h  | 10 ++++++++++
+ migration/postcopy-ram.c | 17 ++++++++++++-----
+ migration/ram.c          | 40 ++++++++++++++++++++++++++++++++++++++++
+ migration/ram.h          |  5 +++++
+ 4 files changed, 67 insertions(+), 5 deletions(-)
 
-diff --git a/migration/migration.c b/migration/migration.c
-index a058f8b46d..62761d5705 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -1084,19 +1084,30 @@ static void migrate_fd_cleanup(void *opaque)
-                           MIGRATION_STATUS_CANCELLED);
-     }
+diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
+index d017639f7e..6cbc02aa0f 100644
+--- a/include/exec/ram_addr.h
++++ b/include/exec/ram_addr.h
+@@ -47,6 +47,8 @@ struct RAMBlock {
+      * of the postcopy phase
+      */
+     unsigned long *unsentmap;
++    /* bitmap of already received pages in postcopy */
++    unsigned long *receivedmap;
+ };
  
-+    if (s->error) {
-+        /* It is used on info migrate.  We can't free it */
-+        error_report_err(error_copy(s->error));
-+    }
-     notifier_list_notify(&migration_state_notifiers, s);
-     block_cleanup_parameters(s);
+ static inline bool offset_in_ramblock(RAMBlock *b, ram_addr_t offset)
+@@ -60,6 +62,14 @@ static inline void *ramblock_ptr(RAMBlock *block, ram_addr_t offset)
+     return (char *)block->host + offset;
  }
  
-+void migrate_set_error(MigrationState *s, const Error *error)
++static inline unsigned long int ramblock_recv_bitmap_offset(void *host_addr,
++                                                            RAMBlock *rb)
 +{
-+    qemu_mutex_lock(&s->error_mutex);
-+    if (!s->error) {
-+        s->error = error_copy(error);
-+    }
-+    qemu_mutex_unlock(&s->error_mutex);
++    uint64_t host_addr_offset =
++            (uint64_t)(uintptr_t)(host_addr - (void *)rb->host);
++    return host_addr_offset >> TARGET_PAGE_BITS;
 +}
 +
- void migrate_fd_error(MigrationState *s, const Error *error)
- {
-     trace_migrate_fd_error(error_get_pretty(error));
-     assert(s->to_dst_file == NULL);
-     migrate_set_state(&s->state, MIGRATION_STATUS_SETUP,
-                       MIGRATION_STATUS_FAILED);
--    if (!s->error) {
--        s->error = error_copy(error);
--    }
-+    migrate_set_error(s, error);
-     notifier_list_notify(&migration_state_notifiers, s);
-     block_cleanup_parameters(s);
+ long qemu_getrampagesize(void);
+ unsigned long last_ram_page(void);
+ RAMBlock *qemu_ram_alloc_from_file(ram_addr_t size, MemoryRegion *mr,
+diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+index 8bf6432567..bec6c2c66b 100644
+--- a/migration/postcopy-ram.c
++++ b/migration/postcopy-ram.c
+@@ -642,22 +642,28 @@ int postcopy_ram_enable_notify(MigrationIncomingState *mis)
  }
-@@ -2427,6 +2438,7 @@ static void migration_instance_finalize(Object *obj)
-     MigrationState *ms = MIGRATION_OBJ(obj);
-     MigrationParameters *params = &ms->parameters;
  
-+    qemu_mutex_destroy(&ms->error_mutex);
-     g_free(params->tls_hostname);
-     g_free(params->tls_creds);
-     qemu_sem_destroy(&ms->pause_sem);
-@@ -2441,6 +2453,7 @@ static void migration_instance_init(Object *obj)
-     ms->xbzrle_cache_size = DEFAULT_MIGRATE_CACHE_SIZE;
-     ms->mbps = -1;
-     qemu_sem_init(&ms->pause_sem, 0);
-+    qemu_mutex_init(&ms->error_mutex);
- 
-     params->tls_hostname = g_strdup("");
-     params->tls_creds = g_strdup("");
-diff --git a/migration/migration.h b/migration/migration.h
-index cd988a99b9..8ccdd7a577 100644
---- a/migration/migration.h
-+++ b/migration/migration.h
-@@ -132,8 +132,12 @@ struct MigrationState
-     int64_t colo_checkpoint_time;
-     QEMUTimer *colo_delay_timer;
- 
--    /* The last error that occurred */
-+    /* The first error that has occurred.
-+       We used the mutex to be able to return the 1st error message */
-     Error *error;
-+    /* mutex to protect errp */
-+    QemuMutex error_mutex;
-+
-     /* Do we have to clean up -b/-i from old migrate parameters */
-     /* This feature is deprecated and will be removed */
-     bool must_remove_block_options;
-@@ -162,6 +166,7 @@ bool  migration_has_all_channels(void);
- 
- uint64_t migrate_max_downtime(void);
- 
-+void migrate_set_error(MigrationState *s, const Error *error);
- void migrate_fd_error(MigrationState *s, const Error *error);
- 
- void migrate_fd_connect(MigrationState *s);
-diff --git a/migration/tls.c b/migration/tls.c
-index 596e8790bd..026a008667 100644
---- a/migration/tls.c
-+++ b/migration/tls.c
-@@ -119,7 +119,6 @@ static void migration_tls_outgoing_handshake(QIOTask *task,
-     if (qio_task_propagate_error(task, &err)) {
-         trace_migration_tls_outgoing_handshake_error(error_get_pretty(err));
-         migrate_fd_error(s, err);
--        error_free(err);
+ static int qemu_ufd_copy_ioctl(int userfault_fd, void *host_addr,
+-        void *from_addr, uint64_t pagesize)
++                               void *from_addr, uint64_t pagesize, RAMBlock *rb)
+ {
++    int ret;
+     if (from_addr) {
+         struct uffdio_copy copy_struct;
+         copy_struct.dst = (uint64_t)(uintptr_t)host_addr;
+         copy_struct.src = (uint64_t)(uintptr_t)from_addr;
+         copy_struct.len = pagesize;
+         copy_struct.mode = 0;
+-        return ioctl(userfault_fd, UFFDIO_COPY, &copy_struct);
++        ret = ioctl(userfault_fd, UFFDIO_COPY, &copy_struct);
      } else {
-         trace_migration_tls_outgoing_handshake_complete();
-         migration_channel_connect(s, ioc, NULL);
+         struct uffdio_zeropage zero_struct;
+         zero_struct.range.start = (uint64_t)(uintptr_t)host_addr;
+         zero_struct.range.len = pagesize;
+         zero_struct.mode = 0;
+-        return ioctl(userfault_fd, UFFDIO_ZEROPAGE, &zero_struct);
++        ret = ioctl(userfault_fd, UFFDIO_ZEROPAGE, &zero_struct);
+     }
++    if (!ret) {
++        ramblock_recv_bitmap_set_range(rb, host_addr,
++                                       pagesize / qemu_target_page_size());
++    }
++    return ret;
+ }
+ 
+ /*
+@@ -674,7 +680,7 @@ int postcopy_place_page(MigrationIncomingState *mis, void *host, void *from,
+      * which would be slightly cheaper, but we'd have to be careful
+      * of the order of updating our page state.
+      */
+-    if (qemu_ufd_copy_ioctl(mis->userfault_fd, host, from, pagesize)) {
++    if (qemu_ufd_copy_ioctl(mis->userfault_fd, host, from, pagesize, rb)) {
+         int e = errno;
+         error_report("%s: %s copy host: %p from: %p (size: %zd)",
+                      __func__, strerror(e), host, from, pagesize);
+@@ -696,7 +702,8 @@ int postcopy_place_page_zero(MigrationIncomingState *mis, void *host,
+     trace_postcopy_place_page_zero(host);
+ 
+     if (qemu_ram_pagesize(rb) == getpagesize()) {
+-        if (qemu_ufd_copy_ioctl(mis->userfault_fd, host, NULL, getpagesize())) {
++        if (qemu_ufd_copy_ioctl(mis->userfault_fd, host, NULL, getpagesize(),
++                                rb)) {
+             int e = errno;
+             error_report("%s: %s zero host: %p",
+                          __func__, strerror(e), host);
+diff --git a/migration/ram.c b/migration/ram.c
+index bd4fc5ceb4..7f6327f708 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -45,6 +45,7 @@
+ #include "qapi/qmp/qerror.h"
+ #include "trace.h"
+ #include "exec/ram_addr.h"
++#include "exec/target_page.h"
+ #include "qemu/rcu_queue.h"
+ #include "migration/colo.h"
+ #include "migration/block.h"
+@@ -158,6 +159,35 @@ out:
+     return ret;
+ }
+ 
++static void ramblock_recv_map_init(void)
++{
++    RAMBlock *rb;
++
++    RAMBLOCK_FOREACH(rb) {
++        assert(!rb->receivedmap);
++        rb->receivedmap = bitmap_new(rb->max_length >> qemu_target_page_bits());
++    }
++}
++
++int ramblock_recv_bitmap_test(RAMBlock *rb, void *host_addr)
++{
++    return test_bit(ramblock_recv_bitmap_offset(host_addr, rb),
++                    rb->receivedmap);
++}
++
++void ramblock_recv_bitmap_set(RAMBlock *rb, void *host_addr)
++{
++    set_bit_atomic(ramblock_recv_bitmap_offset(host_addr, rb), rb->receivedmap);
++}
++
++void ramblock_recv_bitmap_set_range(RAMBlock *rb, void *host_addr,
++                                    size_t nr)
++{
++    bitmap_set_atomic(rb->receivedmap,
++                      ramblock_recv_bitmap_offset(host_addr, rb),
++                      nr);
++}
++
+ /*
+  * An outstanding page request, on the source, having been received
+  * and queued
+@@ -2021,6 +2051,8 @@ int ram_discard_range(const char *rbname, uint64_t start, size_t length)
+         goto err;
+     }
+ 
++    bitmap_clear(rb->receivedmap, start >> qemu_target_page_bits(),
++                 length >> qemu_target_page_bits());
+     ret = ram_block_discard_range(rb, start, length);
+ 
+ err:
+@@ -2607,13 +2639,20 @@ static int ram_load_setup(QEMUFile *f, void *opaque)
+ {
+     xbzrle_load_setup();
+     compress_threads_load_setup();
++    ramblock_recv_map_init();
+     return 0;
+ }
+ 
+ static int ram_load_cleanup(void *opaque)
+ {
++    RAMBlock *rb;
+     xbzrle_load_cleanup();
+     compress_threads_load_cleanup();
++
++    RAMBLOCK_FOREACH(rb) {
++        g_free(rb->receivedmap);
++        rb->receivedmap = NULL;
++    }
+     return 0;
+ }
+ 
+@@ -2828,6 +2867,7 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
+                 ret = -EINVAL;
+                 break;
+             }
++            ramblock_recv_bitmap_set(block, host);
+             trace_ram_load_loop(block->idstr, (uint64_t)addr, flags, host);
+         }
+ 
+diff --git a/migration/ram.h b/migration/ram.h
+index 511b3dc582..f9f7eef894 100644
+--- a/migration/ram.h
++++ b/migration/ram.h
+@@ -57,4 +57,9 @@ int ram_discard_range(const char *block_name, uint64_t start, size_t length);
+ int ram_postcopy_incoming_init(MigrationIncomingState *mis);
+ 
+ void ram_handle_compressed(void *host, uint8_t ch, uint64_t size);
++
++int ramblock_recv_bitmap_test(RAMBlock *rb, void *host_addr);
++void ramblock_recv_bitmap_set(RAMBlock *rb, void *host_addr);
++void ramblock_recv_bitmap_set_range(RAMBlock *rb, void *host_addr, size_t nr);
++
+ #endif
 -- 
 2.13.6
