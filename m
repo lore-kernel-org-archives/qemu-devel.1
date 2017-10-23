@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47267)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47289)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1e6XhF-00076J-CY
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 04:02:54 -0400
+	(envelope-from <kraxel@redhat.com>) id 1e6XhH-00076p-Ri
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 04:02:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1e6XhC-0006TB-AI
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 04:02:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46318)
+	(envelope-from <kraxel@redhat.com>) id 1e6XhH-0006Wb-2F
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 04:02:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:11751)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1e6XhC-0006Sb-3r
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 04:02:50 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B17E85D9E5
-	for <qemu-devel@nongnu.org>; Mon, 23 Oct 2017 08:02:48 +0000 (UTC)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1e6XhG-0006W5-S7
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 04:02:54 -0400
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Mon, 23 Oct 2017 10:02:42 +0200
-Message-Id: <20171023080245.31300-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 0/3] Fixes 20171023 patches
+Date: Mon, 23 Oct 2017 10:02:43 +0200
+Message-Id: <20171023080245.31300-2-kraxel@redhat.com>
+In-Reply-To: <20171023080245.31300-1-kraxel@redhat.com>
+References: <20171023080245.31300-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PULL 1/3] configure: disable qemu-keymap for
+ linux-user qemu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,38 +25,43 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Laurent Vivier <laurent@vivier.eu>, Gerd Hoffmann <kraxel@redhat.com>
 
-The following changes since commit e822e81e350825dd94f41ee2538ff1432b812eb9:
+From: Laurent Vivier <laurent@vivier.eu>
 
-  Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request' into staging (2017-10-20 15:04:00 +0100)
+We don't need qemu-keymap when we build only linux-user qemu.
 
-are available in the git repository at:
+When we compile in static mode, the libxkbcommon is detected
+by configure if the shared one is available, but cannot
+be linked if the static version is not available.
 
-  git://git.kraxel.org/qemu tags/fixes-20171023-pull-request
+As we don't need it for qemu-linux-user, and we generally need
+a static link to use it in a chroot, disable qemu-keymap in
+this case.
 
-for you to fetch changes up to 8172bdb2d0c829462f8c4fb2cb54a768d295a747:
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+Message-id: 20171019191606.14129-1-laurent@vivier.eu
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ configure | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-  scripts: don't throw away stderr when checking out git submodules (2017-10-23 08:10:18 +0200)
-
-----------------------------------------------------------------
-fixes for the fallout of the recent ui and keymap merges.
-
-----------------------------------------------------------------
-
-Daniel P. Berrange (1):
-  scripts: don't throw away stderr when checking out git submodules
-
-Gerd Hoffmann (1):
-  ui: add qemu-keymap and shader to .gitignore
-
-Laurent Vivier (1):
-  configure: disable qemu-keymap for linux-user qemu
-
- configure                | 6 +++---
- .gitignore               | 2 ++
- scripts/git-submodule.sh | 2 +-
- 3 files changed, 6 insertions(+), 4 deletions(-)
-
+diff --git a/configure b/configure
+index 6f21aaf989..03547cea6a 100755
+--- a/configure
++++ b/configure
+@@ -5136,9 +5136,9 @@ if test "$softmmu" = yes ; then
+     fi
+     mpath=no
+   fi
+-fi
+-if test "$xkbcommon" = "yes"; then
+-  tools="qemu-keymap\$(EXESUF) $tools"
++  if test "$xkbcommon" = "yes"; then
++    tools="qemu-keymap\$(EXESUF) $tools"
++  fi
+ fi
+ 
+ # Probe for guest agent support/options
 -- 
 2.9.3
