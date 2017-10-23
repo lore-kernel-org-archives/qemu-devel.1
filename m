@@ -1,25 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37997)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38704)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e6kWn-0005Q5-De
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 17:44:59 -0400
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e6kZN-0006Y5-Ln
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 17:47:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e6kWl-0005JE-QZ
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 17:44:57 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1508784509-29377-1-git-send-email-thuth@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <058f5cc2-ea09-0912-7425-e801cd32ab17@amsat.org>
-Date: Mon, 23 Oct 2017 18:44:35 -0300
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e6kZK-0007ST-IH
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 17:47:37 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:50101
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
+	id 1e6kZK-0007S7-Cg
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 17:47:34 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v9NLiRcK038686
+	for <qemu-devel@nongnu.org>; Mon, 23 Oct 2017 17:47:30 -0400
+Received: from e36.co.us.ibm.com (e36.co.us.ibm.com [32.97.110.154])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2dsheuc229-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 23 Oct 2017 17:47:30 -0400
+Received: from localhost
+	by e36.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
+	Mon, 23 Oct 2017 15:47:29 -0600
+References: <20171023213359.23025-1-f4bug@amsat.org>
+	<20171023213359.23025-4-f4bug@amsat.org>
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Date: Mon, 23 Oct 2017 17:47:23 -0400
 MIME-Version: 1.0
-In-Reply-To: <1508784509-29377-1-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH] hw/ide/ahci: Move allwinner
- code into a separate file
+In-Reply-To: <20171023213359.23025-4-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Message-Id: <d72adc87-3cc6-a6cd-8fc8-50ba8e0fbe88@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 3/3] vl: remove unnecessary #ifdef
+ CONFIG_TPM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,276 +43,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, John Snow <jsnow@redhat.com>
-Cc: qemu-trivial@nongnu.org, qemu-arm@nongnu.org, qemu-block@nongnu.org
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, BALATON Zoltan <balaton@eik.bme.hu>, "Richard W . M . Jones" <rjones@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>
 
-On 10/23/2017 03:48 PM, Thomas Huth wrote:
-> The allwinner code is only needed for the allwinner board (for which
-> we also have a separate CONFIG_ALLWINNER_A10 config switch), so it
-> does not make sense that we compile this for all the other boards
-> that need AHCI, too. Let's move it to a separate file that is only
-> compiled when CONFIG_ALLWINNER_A10 is set.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
+On 10/23/2017 05:33 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+> a stub is now provided.
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 > ---
->  hw/ide/Makefile.objs    |   1 +
->  hw/ide/ahci-allwinner.c | 127 ++++++++++++++++++++++++++++++++++++++++++++++++
->  hw/ide/ahci.c           |  95 ------------------------------------
->  3 files changed, 128 insertions(+), 95 deletions(-)
->  create mode 100644 hw/ide/ahci-allwinner.c
-> 
-> diff --git a/hw/ide/Makefile.objs b/hw/ide/Makefile.objs
-> index 729e9bd..f0edca3 100644
-> --- a/hw/ide/Makefile.objs
-> +++ b/hw/ide/Makefile.objs
-> @@ -10,3 +10,4 @@ common-obj-$(CONFIG_IDE_VIA) += via.o
->  common-obj-$(CONFIG_MICRODRIVE) += microdrive.o
->  common-obj-$(CONFIG_AHCI) += ahci.o
->  common-obj-$(CONFIG_AHCI) += ich.o
-> +common-obj-$(CONFIG_ALLWINNER_A10) += ahci-allwinner.o
-> diff --git a/hw/ide/ahci-allwinner.c b/hw/ide/ahci-allwinner.c
-> new file mode 100644
-> index 0000000..c3f1604
-> --- /dev/null
-> +++ b/hw/ide/ahci-allwinner.c
-> @@ -0,0 +1,127 @@
-> +/*
-> + * QEMU Allwinner AHCI Emulation
-> + *
-> + * This program is free software; you can redistribute it and/or
-> + * modify it under the terms of the GNU General Public License
-> + * as published by the Free Software Foundation; either version 2
-> + * of the License, or (at your option) any later version.
-> + *
-> + * This program is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> + * GNU General Public License for more details.
-> + *
-> + * You should have received a copy of the GNU General Public License
-> + * along with this program; if not, see <http://www.gnu.org/licenses/>.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "hw/hw.h"
-> +#include "qemu/error-report.h"
-> +#include "sysemu/block-backend.h"
-> +#include "sysemu/dma.h"
-> +#include "hw/ide/internal.h"
-> +#include "hw/ide/ahci_internal.h"
-> +
-> +#include "trace.h"
-> +
-> +#define ALLWINNER_AHCI_BISTAFR    ((0xa0 - ALLWINNER_AHCI_MMIO_OFF) / 4)
-> +#define ALLWINNER_AHCI_BISTCR     ((0xa4 - ALLWINNER_AHCI_MMIO_OFF) / 4)
-> +#define ALLWINNER_AHCI_BISTFCTR   ((0xa8 - ALLWINNER_AHCI_MMIO_OFF) / 4)
-> +#define ALLWINNER_AHCI_BISTSR     ((0xac - ALLWINNER_AHCI_MMIO_OFF) / 4)
-> +#define ALLWINNER_AHCI_BISTDECR   ((0xb0 - ALLWINNER_AHCI_MMIO_OFF) / 4)
-> +#define ALLWINNER_AHCI_DIAGNR0    ((0xb4 - ALLWINNER_AHCI_MMIO_OFF) / 4)
-> +#define ALLWINNER_AHCI_DIAGNR1    ((0xb8 - ALLWINNER_AHCI_MMIO_OFF) / 4)
-> +#define ALLWINNER_AHCI_OOBR       ((0xbc - ALLWINNER_AHCI_MMIO_OFF) / 4)
-> +#define ALLWINNER_AHCI_PHYCS0R    ((0xc0 - ALLWINNER_AHCI_MMIO_OFF) / 4)
-> +#define ALLWINNER_AHCI_PHYCS1R    ((0xc4 - ALLWINNER_AHCI_MMIO_OFF) / 4)
-> +#define ALLWINNER_AHCI_PHYCS2R    ((0xc8 - ALLWINNER_AHCI_MMIO_OFF) / 4)
-> +#define ALLWINNER_AHCI_TIMER1MS   ((0xe0 - ALLWINNER_AHCI_MMIO_OFF) / 4)
-> +#define ALLWINNER_AHCI_GPARAM1R   ((0xe8 - ALLWINNER_AHCI_MMIO_OFF) / 4)
-> +#define ALLWINNER_AHCI_GPARAM2R   ((0xec - ALLWINNER_AHCI_MMIO_OFF) / 4)
-> +#define ALLWINNER_AHCI_PPARAMR    ((0xf0 - ALLWINNER_AHCI_MMIO_OFF) / 4)
-> +#define ALLWINNER_AHCI_TESTR      ((0xf4 - ALLWINNER_AHCI_MMIO_OFF) / 4)
-> +#define ALLWINNER_AHCI_VERSIONR   ((0xf8 - ALLWINNER_AHCI_MMIO_OFF) / 4)
-> +#define ALLWINNER_AHCI_IDR        ((0xfc - ALLWINNER_AHCI_MMIO_OFF) / 4)
-> +#define ALLWINNER_AHCI_RWCR       ((0xfc - ALLWINNER_AHCI_MMIO_OFF) / 4)
-> +
-> +static uint64_t allwinner_ahci_mem_read(void *opaque, hwaddr addr,
-> +                                        unsigned size)
-> +{
-> +    AllwinnerAHCIState *a = opaque;
-> +    AHCIState *s = &(SYSBUS_AHCI(a)->ahci);
-> +    uint64_t val = a->regs[addr / 4];
-> +
-> +    switch (addr / 4) {
-> +    case ALLWINNER_AHCI_PHYCS0R:
-> +        val |= 0x2 << 28;
-> +        break;
-> +    case ALLWINNER_AHCI_PHYCS2R:
-> +        val &= ~(0x1 << 24);
-> +        break;
-> +    }
-> +    trace_allwinner_ahci_mem_read(s, a, addr, val, size);
-> +    return  val;
-> +}
-> +
-> +static void allwinner_ahci_mem_write(void *opaque, hwaddr addr,
-> +                                     uint64_t val, unsigned size)
-> +{
-> +    AllwinnerAHCIState *a = opaque;
-> +    AHCIState *s = &(SYSBUS_AHCI(a)->ahci);
-> +
-> +    trace_allwinner_ahci_mem_write(s, a, addr, val, size);
-> +    a->regs[addr / 4] = val;
-> +}
-> +
-> +static const MemoryRegionOps allwinner_ahci_mem_ops = {
-> +    .read = allwinner_ahci_mem_read,
-> +    .write = allwinner_ahci_mem_write,
-> +    .valid.min_access_size = 4,
-> +    .valid.max_access_size = 4,
-> +    .endianness = DEVICE_LITTLE_ENDIAN,
-> +};
-> +
-> +static void allwinner_ahci_init(Object *obj)
-> +{
-> +    SysbusAHCIState *s = SYSBUS_AHCI(obj);
-> +    AllwinnerAHCIState *a = ALLWINNER_AHCI(obj);
-> +
-> +    memory_region_init_io(&a->mmio, OBJECT(obj), &allwinner_ahci_mem_ops, a,
-> +                          "allwinner-ahci", ALLWINNER_AHCI_MMIO_SIZE);
-> +    memory_region_add_subregion(&s->ahci.mem, ALLWINNER_AHCI_MMIO_OFF,
-> +                                &a->mmio);
-> +}
-> +
-> +static const VMStateDescription vmstate_allwinner_ahci = {
-> +    .name = "allwinner-ahci",
-> +    .version_id = 1,
-> +    .minimum_version_id = 1,
-> +    .fields = (VMStateField[]) {
-> +        VMSTATE_UINT32_ARRAY(regs, AllwinnerAHCIState,
-> +                             ALLWINNER_AHCI_MMIO_SIZE / 4),
-> +        VMSTATE_END_OF_LIST()
-> +    }
-> +};
-> +
-> +static void allwinner_ahci_class_init(ObjectClass *klass, void *data)
-> +{
-> +    DeviceClass *dc = DEVICE_CLASS(klass);
-> +
-> +    dc->vmsd = &vmstate_allwinner_ahci;
-> +}
-> +
-> +static const TypeInfo allwinner_ahci_info = {
-> +    .name          = TYPE_ALLWINNER_AHCI,
-> +    .parent        = TYPE_SYSBUS_AHCI,
-> +    .instance_size = sizeof(AllwinnerAHCIState),
-> +    .instance_init = allwinner_ahci_init,
-> +    .class_init    = allwinner_ahci_class_init,
-> +};
-> +
-> +static void sysbus_ahci_register_types(void)
-> +{
-> +    type_register_static(&allwinner_ahci_info);
-> +}
-> +
-> +type_init(sysbus_ahci_register_types)
-> diff --git a/hw/ide/ahci.c b/hw/ide/ahci.c
-> index 32d1296..373311f 100644
-> --- a/hw/ide/ahci.c
-> +++ b/hw/ide/ahci.c
-> @@ -1737,104 +1737,9 @@ static const TypeInfo sysbus_ahci_info = {
->      .class_init    = sysbus_ahci_class_init,
->  };
->  
-> -#define ALLWINNER_AHCI_BISTAFR    ((0xa0 - ALLWINNER_AHCI_MMIO_OFF) / 4)
-> -#define ALLWINNER_AHCI_BISTCR     ((0xa4 - ALLWINNER_AHCI_MMIO_OFF) / 4)
-> -#define ALLWINNER_AHCI_BISTFCTR   ((0xa8 - ALLWINNER_AHCI_MMIO_OFF) / 4)
-> -#define ALLWINNER_AHCI_BISTSR     ((0xac - ALLWINNER_AHCI_MMIO_OFF) / 4)
-> -#define ALLWINNER_AHCI_BISTDECR   ((0xb0 - ALLWINNER_AHCI_MMIO_OFF) / 4)
-> -#define ALLWINNER_AHCI_DIAGNR0    ((0xb4 - ALLWINNER_AHCI_MMIO_OFF) / 4)
-> -#define ALLWINNER_AHCI_DIAGNR1    ((0xb8 - ALLWINNER_AHCI_MMIO_OFF) / 4)
-> -#define ALLWINNER_AHCI_OOBR       ((0xbc - ALLWINNER_AHCI_MMIO_OFF) / 4)
-> -#define ALLWINNER_AHCI_PHYCS0R    ((0xc0 - ALLWINNER_AHCI_MMIO_OFF) / 4)
-> -#define ALLWINNER_AHCI_PHYCS1R    ((0xc4 - ALLWINNER_AHCI_MMIO_OFF) / 4)
-> -#define ALLWINNER_AHCI_PHYCS2R    ((0xc8 - ALLWINNER_AHCI_MMIO_OFF) / 4)
-> -#define ALLWINNER_AHCI_TIMER1MS   ((0xe0 - ALLWINNER_AHCI_MMIO_OFF) / 4)
-> -#define ALLWINNER_AHCI_GPARAM1R   ((0xe8 - ALLWINNER_AHCI_MMIO_OFF) / 4)
-> -#define ALLWINNER_AHCI_GPARAM2R   ((0xec - ALLWINNER_AHCI_MMIO_OFF) / 4)
-> -#define ALLWINNER_AHCI_PPARAMR    ((0xf0 - ALLWINNER_AHCI_MMIO_OFF) / 4)
-> -#define ALLWINNER_AHCI_TESTR      ((0xf4 - ALLWINNER_AHCI_MMIO_OFF) / 4)
-> -#define ALLWINNER_AHCI_VERSIONR   ((0xf8 - ALLWINNER_AHCI_MMIO_OFF) / 4)
-> -#define ALLWINNER_AHCI_IDR        ((0xfc - ALLWINNER_AHCI_MMIO_OFF) / 4)
-> -#define ALLWINNER_AHCI_RWCR       ((0xfc - ALLWINNER_AHCI_MMIO_OFF) / 4)
-> -
-> -static uint64_t allwinner_ahci_mem_read(void *opaque, hwaddr addr,
-> -                                        unsigned size)
-> -{
-> -    AllwinnerAHCIState *a = opaque;
-> -    AHCIState *s = &(SYSBUS_AHCI(a)->ahci);
-> -    uint64_t val = a->regs[addr/4];
-> -
-> -    switch (addr / 4) {
-> -    case ALLWINNER_AHCI_PHYCS0R:
-> -        val |= 0x2 << 28;
-> -        break;
-> -    case ALLWINNER_AHCI_PHYCS2R:
-> -        val &= ~(0x1 << 24);
-> -        break;
-> -    }
-> -    trace_allwinner_ahci_mem_read(s, a, addr, val, size);
-> -    return  val;
-> -}
-> -
-> -static void allwinner_ahci_mem_write(void *opaque, hwaddr addr,
-> -                                     uint64_t val, unsigned size)
-> -{
-> -    AllwinnerAHCIState *a = opaque;
-> -    AHCIState *s = &(SYSBUS_AHCI(a)->ahci);
-> -
-> -    trace_allwinner_ahci_mem_write(s, a, addr, val, size);
-> -    a->regs[addr/4] = val;
-> -}
-> -
-> -static const MemoryRegionOps allwinner_ahci_mem_ops = {
-> -    .read = allwinner_ahci_mem_read,
-> -    .write = allwinner_ahci_mem_write,
-> -    .valid.min_access_size = 4,
-> -    .valid.max_access_size = 4,
-> -    .endianness = DEVICE_LITTLE_ENDIAN,
-> -};
-> -
-> -static void allwinner_ahci_init(Object *obj)
-> -{
-> -    SysbusAHCIState *s = SYSBUS_AHCI(obj);
-> -    AllwinnerAHCIState *a = ALLWINNER_AHCI(obj);
-> -
-> -    memory_region_init_io(&a->mmio, OBJECT(obj), &allwinner_ahci_mem_ops, a,
-> -                          "allwinner-ahci", ALLWINNER_AHCI_MMIO_SIZE);
-> -    memory_region_add_subregion(&s->ahci.mem, ALLWINNER_AHCI_MMIO_OFF,
-> -                                &a->mmio);
-> -}
-> -
-> -static const VMStateDescription vmstate_allwinner_ahci = {
-> -    .name = "allwinner-ahci",
-> -    .version_id = 1,
-> -    .minimum_version_id = 1,
-> -    .fields = (VMStateField[]) {
-> -        VMSTATE_UINT32_ARRAY(regs, AllwinnerAHCIState,
-> -                             ALLWINNER_AHCI_MMIO_SIZE/4),
-> -        VMSTATE_END_OF_LIST()
-> -    }
-> -};
-> -
-> -static void allwinner_ahci_class_init(ObjectClass *klass, void *data)
-> -{
-> -    DeviceClass *dc = DEVICE_CLASS(klass);
-> -
-> -    dc->vmsd = &vmstate_allwinner_ahci;
-> -}
-> -
-> -static const TypeInfo allwinner_ahci_info = {
-> -    .name          = TYPE_ALLWINNER_AHCI,
-> -    .parent        = TYPE_SYSBUS_AHCI,
-> -    .instance_size = sizeof(AllwinnerAHCIState),
-> -    .instance_init = allwinner_ahci_init,
-> -    .class_init    = allwinner_ahci_class_init,
-> -};
-> -
->  static void sysbus_ahci_register_types(void)
->  {
->      type_register_static(&sysbus_ahci_info);
-> -    type_register_static(&allwinner_ahci_info);
->  }
->  
->  type_init(sysbus_ahci_register_types)
-> 
+>   vl.c | 2 --
+>   1 file changed, 2 deletions(-)
+>
+> diff --git a/vl.c b/vl.c
+> index 0723835bbf..ec299099ff 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -4624,11 +4624,9 @@ int main(int argc, char **argv, char **envp)
+>           exit(1);
+>       }
+>
+> -#ifdef CONFIG_TPM
+>       if (tpm_init() < 0) {
+>           exit(1);
+>       }
+> -#endif
+>
+>       /* init the bluetooth world */
+>       if (foreach_device_config(DEV_BT, bt_parse))
+
+
+Now you should be able to also remove the #ifdef CONFIG_TPM from ./tpm.c.
+
+    Stefan
