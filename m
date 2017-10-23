@@ -1,36 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54885)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57088)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1e6VYu-0007d9-F2
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 01:46:09 -0400
+	(envelope-from <peterx@redhat.com>) id 1e6VuJ-0001ke-FO
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 02:08:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1e6VYr-0002ZG-ET
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 01:46:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34320)
+	(envelope-from <peterx@redhat.com>) id 1e6VuD-0000aS-IA
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 02:08:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38390)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1e6VYr-0002XK-7w
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 01:46:05 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CF00581DF4
-	for <qemu-devel@nongnu.org>; Mon, 23 Oct 2017 05:46:02 +0000 (UTC)
-Message-ID: <1508737557.16488.1.camel@redhat.com>
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Mon, 23 Oct 2017 07:45:57 +0200
-In-Reply-To: <f58bd55b-5a32-bbe1-90e6-79c5b1036355@redhat.com>
-References: <20171018095807.101406-1-marcel@redhat.com>
-	<69cefa98-5681-5b12-719c-e13fcba969c4@redhat.com>
-	<9d4b1fa8-e670-556b-278d-4993ad41b512@redhat.com>
-	<1508418225.18146.1.camel@redhat.com>
-	<d231ac0a-bb7d-78aa-ddb4-8048cc7bdfd8@redhat.com>
-	<1508482525.18146.6.camel@redhat.com>
-	<f58bd55b-5a32-bbe1-90e6-79c5b1036355@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] hw/pci-host: Fix x86 Host Bridges 64bit
- PCI hole
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1e6VuD-0000aB-By
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 02:08:09 -0400
+Date: Mon, 23 Oct 2017 14:07:54 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20171023060754.GD3990@pxdev.xzpeter.org>
+References: <20170929033844.26935-1-peterx@redhat.com>
+	<20170929033844.26935-14-peterx@redhat.com>
+	<20171012125045.GF5957@stefanha-x1.localdomain>
+	<20171016075039.GD4166@pxdev.xzpeter.org>
+	<20171018153115.GD31848@stefanha-x1.localdomain>
+	<20171019063649.GX4166@pxdev.xzpeter.org>
+	<20171019131311.GE6205@stefanha-x1.localdomain>
+	<657cdf86-237d-c68e-75ed-6f9a0ea0ac34@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <657cdf86-237d-c68e-75ed-6f9a0ea0ac34@redhat.com>
+Subject: Re: [Qemu-devel] [RFC v2 13/22] monitor: separate QMP parser and
+ dispatcher
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,18 +34,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>, Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org
-Cc: mst@redhat.com, pbonzini@redhat.com, ehabkost@redhat.com, Igor Mammedov <imammedo@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org, "Daniel P . Berrange" <berrange@redhat.com>, Stefan Hajnoczi <shajnocz@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-  Hi,
-
-> The guest will still run with 40 bits physical!
-> (judging the code anyway, I hope I am wrong)
+On Fri, Oct 20, 2017 at 11:19:44AM +0200, Paolo Bonzini wrote:
+> On 19/10/2017 15:13, Stefan Hajnoczi wrote:
+> > Up to you.  I don't remember the details of out_lock usage well enough
+> > to know whether using the lock for the queues is good or bad.
 > 
-> Then, the stakes are not so big, the Guest kernel will disregard
-> the 64bit hole since is not CPU addressable and go on.
+> out_lock is called like that because it's only writes that can be done
+> from multiple threads (at both the chardev and monitor level).
+> IOThreads in particular want to generate QMP events.
+> 
+> out_lock protects the monitor's own output buffer, while the character
+> device layer has its own locking (chr_write_lock).  chr_write_lock
+> protects calls to the chr_write method of the Chardev object and writes
+> to the character device's logfd.
+> 
+> Renaming out_lock and reusing it is just fine if the lock is only held
+> for short periods of time.  But maybe it's simpler to just introduce
+> another lock, since the out_lock rules are very simple.
 
-But then there is no working 64bit hole for hotplug ...
+OK, let me use a new lock.  Thanks for explaining!
 
-cheers,
-  Gerd
+-- 
+Peter Xu
