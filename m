@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46352)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50674)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1e6MIl-0008IN-Ue
-	for qemu-devel@nongnu.org; Sun, 22 Oct 2017 15:52:53 -0400
+	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1e6QyG-0005jL-4V
+	for qemu-devel@nongnu.org; Sun, 22 Oct 2017 20:52:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1e6MIk-0001va-V3
-	for qemu-devel@nongnu.org; Sun, 22 Oct 2017 15:52:52 -0400
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-From: Programmingkid <programmingkidx@gmail.com>
-In-Reply-To: <1508699172.7314.12.camel@freebsd.org>
-Date: Sun, 22 Oct 2017 15:52:43 -0400
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <5DBD5EDC-4F6C-4A75-ADB0-C1A52532A323@gmail.com>
-References: <20171020175548.2566-1-programmingkidx@gmail.com>
-	<f9bd98f1-d45c-6d3a-c35c-c67da67c881f@linaro.org>
-	<20171022053315.GA15297@umbus>
-	<82BA0070-FFBB-4868-AE48-D7A3671621C5@gmail.com>
-	<1508699172.7314.12.camel@freebsd.org>
-Subject: Re: [Qemu-devel] [libfdt][PATCH v2] implement strnlen for systems
- that need it
+	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1e6QyD-0005v5-2G
+	for qemu-devel@nongnu.org; Sun, 22 Oct 2017 20:52:00 -0400
+Received: from mail.cn.fujitsu.com ([183.91.158.132]:37516
+	helo=heian.cn.fujitsu.com) by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1e6QyC-0005rq-MK
+	for qemu-devel@nongnu.org; Sun, 22 Oct 2017 20:51:56 -0400
+References: <1508298538-28753-1-git-send-email-douly.fnst@cn.fujitsu.com>
+	<66ec5354-d66c-a4e0-aea3-bc1ca428d2a8@cn.fujitsu.com>
+	<20171020191523.GQ2942@localhost.localdomain>
+From: Dou Liyang <douly.fnst@cn.fujitsu.com>
+Message-ID: <0db84774-3526-467a-d638-6cb821e34d52@cn.fujitsu.com>
+Date: Mon, 23 Oct 2017 08:51:45 +0800
+MIME-Version: 1.0
+In-Reply-To: <20171020191523.GQ2942@localhost.localdomain>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] ACPI/unit-test: Add a testcase for RAM
+ allocation in numa node
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,55 +29,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ian Lepore <ian@freebsd.org>
-Cc: David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <richard.henderson@linaro.org>, devicetree-compiler@vger.kernel.org, "list@suse.de:PowerPC list:PowerPC" <qemu-ppc@nongnu.org>, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org
+
+Hi Eduardo,
+
+Thanks for your reply.
+
+At 10/21/2017 03:15 AM, Eduardo Habkost wrote:
+> On Wed, Oct 18, 2017 at 11:50:32AM +0800, Dou Liyang wrote:
+>>
+>> At 10/18/2017 11:48 AM, Dou Liyang wrote:
+>>> As QEMU supports the memory-less node, it is possible that there is
+>>> no RAM in the first numa node(also be called as node0). eg:
+>>>   ... \
+>>>   -m 128,slots=3,maxmem=1G \
+>>>   -numa node -numa node,mem=128M \
+>>>
+>>> But, this makes it hard for QEMU to build a known-to-work ACPI SRAT
+>>> table. Only fixing it is not enough.
+>>>
+>>> Add a testcase for this situation to make sure the ACPI table is
+>>> correct for guest.
+>>>
+>>> Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
+>>> Signed-off-by: Dou Liyang <douly.fnst@cn.fujitsu.com>
+>>> ---
+>>> Changelog:
+>>>
+>>> This patch can pass the 'make check' in Peter's machine,
+>>
+>> Oops,  s/can/can not  :-).
+>>
+>> Thanks,
+>> 	dou.
+>>
+>>> But, in my own and Eduardo's machine, we can pass it.
+>>>
+>>> So I rebase and spilt it independently.
+>
+> Thanks!
+>
+>>>
+>>> Peter:
+>>>
+>>> could you help me test it in your machine.
+>>> then, give me the output files, such as /tmp/asl-6QYK7Y.dsl and /tmp/asl-1H1I7Y.dsl file.
+>
+> As the failures reported by Peter were about the *.memhp test
+> case files, I think this patch is unlikely to be the cause of
+> those failures.  I believe the problem is at:
+>
+>   From: Dou Liyang <douly.fnst@cn.fujitsu.com>
+>   Date: Fri, 1 Sep 2017 10:10:03 +0800
+>   Message-ID: <1504231805-30957-3-git-send-email-douly.fnst@cn.fujitsu.com>
+>   Subject: [PATCH v6 2/4] hw/acpi-build: Make assignment statement
+>            of next_base easy to read
+>
+
+This patch is just used for readability. so I discard it. and, we
+need a test case for the commit
+
+   4926403c250f ("hw/acpi-build: Fix SRAT memory building in case of 
+node 0 without RAM")
+
+So, I re-post this patch. ;-)
 
 
-> On Oct 22, 2017, at 3:06 PM, Ian Lepore <ian@freebsd.org> wrote:
->=20
-> On Sun, 2017-10-22 at 10:41 -0400, Programmingkid wrote:
->>>=20
->>> On Oct 22, 2017, at 1:33 AM, David Gibson  wrote:
->>>=20
->>> On Fri, Oct 20, 2017 at 04:44:58PM -0700, Richard Henderson wrote:
->>>>=20
->>>> On 10/20/2017 10:55 AM, John Arbuckle wrote:
->>>>>=20
->>>>> +static inline size_t strnlen(const char *string, size_t =
-max_count)
->>>>> +{
->>>>> +    size_t count;
->>>>> +    for (count =3D 0; count < max_count; count++) {
->>>>> +        if (string[count] =3D=3D '\0') {
->>>>> +            break;
->>>>> +        }
->>>>> +    }
->>>>> +    return count;
->>>> Not to nitpick, but
->>>>=20
->>>>  const char *p =3D memchr(string, 0, max_count);
->>>>  return p ? max_count : p - string;
->>> Richard's right, that's definitely a better implementation.
->> His implementation is smaller, but this one is even smaller. Plus it =
-uses the familiar strlen() function:
->>=20
->> size_t strnlen(const char *string, size_t max_count)
->> {
->>     return strlen(string) < max_count ? strlen(string) : max_count;
->> }
->=20
-> That is not a proper implementation of strnlen(), which is not =
-supposed
-> to access any source-string bytes beyond max_count.
->=20
-> -- Ian
+> However, I would still like to get test results from Peter before
+> applying this patch again.
 
-http://pubs.opengroup.org/onlinepubs/9699919799/functions/strlen.html
-This specification document should help anyone who wants more info.
+I see.
 
-The first implementation using the loop would never access anything =
-beyond max_count. My second implementation does go beyond max_count. The =
-implementation using memchr() will probably live up the requirement so I =
-guess it wins.
-
-Thank you Ian for this information.=20
+Thanks,
+	dou
