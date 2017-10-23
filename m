@@ -1,19 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46548)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47521)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Yongbok.Kim@imgtec.com>) id 1e6e0M-0004ob-0n
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 10:47:03 -0400
+	(envelope-from <berrange@redhat.com>) id 1e6e4B-0007Nz-5w
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 10:51:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Yongbok.Kim@imgtec.com>) id 1e6e0L-0004Xr-0K
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 10:47:02 -0400
-From: Yongbok Kim <yongbok.kim@imgtec.com>
-Date: Mon, 23 Oct 2017 15:46:35 +0100
-Message-ID: <1508769996-5747-3-git-send-email-yongbok.kim@imgtec.com>
-In-Reply-To: <1508769996-5747-1-git-send-email-yongbok.kim@imgtec.com>
-References: <1508769996-5747-1-git-send-email-yongbok.kim@imgtec.com>
+	(envelope-from <berrange@redhat.com>) id 1e6e48-0006hf-2G
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 10:50:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48836)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1e6e47-0006hA-PI
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 10:50:55 -0400
+Date: Mon, 23 Oct 2017 15:50:50 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20171023145050.GM16472@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20171019160419.11611-1-ross.lagerwall@citrix.com>
+	<20171019162420.GA8408@redhat.com>
+	<2c1c1652-7a70-7330-98b2-9225b35670a8@citrix.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PULL 2/3] MAINTAINERS: Update James Hogan's email
- address
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <2c1c1652-7a70-7330-98b2-9225b35670a8@citrix.com>
+Subject: Re: [Qemu-devel] [PATCH v1] os-posix: Add -unshare option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,53 +29,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: James Hogan <james.hogan@imgtec.com>, Michael Tokarev <mjt@tls.msk.ru>, Laurent Vivier <laurent@vivier.eu>, qemu-trivial@nongnu.org
+To: Ross Lagerwall <ross.lagerwall@citrix.com>
+Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
 
-From: James Hogan <james.hogan@imgtec.com>
+On Mon, Oct 23, 2017 at 03:30:05PM +0100, Ross Lagerwall wrote:
+> On 10/19/2017 05:24 PM, Daniel P. Berrange wrote:
+> > On Thu, Oct 19, 2017 at 05:04:19PM +0100, Ross Lagerwall wrote:
+> > > Add an option to allow calling unshare() just before starting guest
+> > > execution. The option allows unsharing one or more of the mount
+> > > namespace, the network namespace, and the IPC namespace. This is useful
+> > > to restrict the ability of QEMU to cause damage to the system should it
+> > > be compromised.
+> > > 
+> > > An example of using this would be to have QEMU open a QMP socket at
+> > > startup and unshare the network namespace. The instance of QEMU could
+> > > still be controlled by the QMP socket since that belongs in the original
+> > > namespace, but if QEMU were compromised it wouldn't be able to open any
+> > > new connections, even to other processes on the same machine.
+> > 
+> > Unless I'm misunderstanding you, what's described here is already possible
+> > by just using the 'unshare' command to spawn QEMU:
+> > 
+> >    # unshare --ipc --mount --net qemu-system-x86_64 -qmp unix:/tmp/foo,server -vnc :1
+> >    qemu-system-x86_64: -qmp unix:/tmp/foo,server: QEMU waiting for connection on: disconnected:unix:/tmp/foo,server
+> > 
+> > And in another shell I can still access the QMP socket from the original host
+> > namespace
+> 
+> So that works because UNIX domains sockets are not restricted by network
+> namespaces. But if you try to connect to the VNC server listening on TCP
+> port 5901, it won't work.
+> 
+> > 
+> >    # ./scripts/qmp/qmp-shell /tmp/foo
+> >    Welcome to the QMP low-level shell!
+> >    Connected to QEMU 2.9.1
+> > 
+> >    (QEMU) query-kvm
+> >    {"return": {"enabled": false, "present": true}}
+> > 
+> > 
+> > FWIW, even if that were not possible, you could still do it by wrapping the
+> > qmp-shell in an 'nsenter' call. eg
+> > 
+> >    nsenter --target $QEMUPID --net ./scripts/qmp/qmp-shell /tmp/foo
+> 
+> I have a single process which connects to all the QEMUs' listening VNC
+> sockets so I'm not sure that this would work.
 
-Update my imgtec.com email address to my kernel.org one in MAINTAINERS
-as MIPS will soon no longer be part of Imagination Technologies, and add
-a mapping in .mailcap so get_maintainer.pl reports the right address.
+Yes, it can still work - you simply need to use set() to temporarily
+switch into QEMU's namespace, and then switch back again afterwards
 
-Signed-off-by: James Hogan <james.hogan@imgtec.com>
-Cc: Michael Tokarev <mjt@tls.msk.ru>
-Cc: Laurent Vivier <laurent@vivier.eu>
-Cc: qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-[Yongbok Kim:
-  Updated message subject]
-Signed-off-by: Yongbok Kim <yongbok.kim@imgtec.com>
----
- .mailmap    |    1 +
- MAINTAINERS |    2 +-
- 2 files changed, 2 insertions(+), 1 deletions(-)
+  oldns = open("/proc/self/ns/net")
+  newns = open("/proc/$PID-OF-QEMU/ns/net")
+  setns(newns, CLONE_NEWNET)
 
-diff --git a/.mailmap b/.mailmap
-index 28defa1..5aec1bd 100644
---- a/.mailmap
-+++ b/.mailmap
-@@ -8,6 +8,7 @@ Aurelien Jarno <aurelien@aurel32.net> aurel32 <aurel32@c046a42c-6fe2-441c-8c8c-7
- Blue Swirl <blauwirbel@gmail.com> blueswir1 <blueswir1@c046a42c-6fe2-441c-8c8c-71466251a162>
- Edgar E. Iglesias <edgar.iglesias@gmail.com> edgar_igl <edgar_igl@c046a42c-6fe2-441c-8c8c-71466251a162>
- Fabrice Bellard <fabrice@bellard.org> bellard <bellard@c046a42c-6fe2-441c-8c8c-71466251a162>
-+James Hogan <jhogan@kernel.org> <james.hogan@imgtec.com>
- Jocelyn Mayer <l_indien@magic.fr> j_mayer <j_mayer@c046a42c-6fe2-441c-8c8c-71466251a162>
- Paul Brook <paul@codesourcery.com> pbrook <pbrook@c046a42c-6fe2-441c-8c8c-71466251a162>
- Thiemo Seufer <ths@networkno.de> ths <ths@c046a42c-6fe2-441c-8c8c-71466251a162>
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 245f7d5..1aedc9f 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -285,7 +285,7 @@ S: Maintained
- F: target/arm/kvm.c
- 
- MIPS
--M: James Hogan <james.hogan@imgtec.com>
-+M: James Hogan <jhogan@kernel.org>
- S: Maintained
- F: target/mips/kvm.c
- 
+  ...open connection to VNC...
+  
+  setns(oldns, CLONE_NEWNET)
+
+  ...use connection to VNC...
+
+The setns() call is thread-local, so you can safely use different
+namespaces in each thread if you need to have concurrent comms with
+many QEMUs.
+
+Regards,
+Daniel
 -- 
-1.7.1
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
