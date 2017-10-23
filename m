@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36828)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35624)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dkang@isi.edu>) id 1e6dFx-0005dJ-GN
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 09:59:09 -0400
+	(envelope-from <quintela@redhat.com>) id 1e6fGt-0005S0-QS
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 12:08:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dkang@isi.edu>) id 1e6dFs-0005ei-M1
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 09:59:05 -0400
-Received: from mail-d.ads.isi.edu ([128.9.180.199]:25883)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <dkang@isi.edu>) id 1e6dFs-0005dz-By
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 09:59:00 -0400
-From: Dong-In Kang <dkang@isi.edu>
-Date: Mon, 23 Oct 2017 13:58:41 +0000
-Message-ID: <4C52EA7A-EAD4-4B1F-A7AC-BA3C839D26BC@isi.edu>
-Content-Language: en-US
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Subject: [Qemu-devel] Is Cortex-R8 support planned?
+	(envelope-from <quintela@redhat.com>) id 1e6fGr-000888-VN
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 12:08:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41600)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1e6fGr-00087P-PF
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 12:08:09 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E9B042CE94F
+	for <qemu-devel@nongnu.org>; Mon, 23 Oct 2017 16:08:08 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+Date: Mon, 23 Oct 2017 18:07:40 +0200
+Message-Id: <20171023160800.20540-2-quintela@redhat.com>
+In-Reply-To: <20171023160800.20540-1-quintela@redhat.com>
+References: <20171023160800.20540-1-quintela@redhat.com>
+Subject: [Qemu-devel] [PULL 01/21] migration: Fix migrate_test_apply for
+ multifd parameters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,9 +30,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-DQpIZWxsbywNCg0KSSBrbm93IHRoZXJlIGlzIG5vIHN1cHBvcnQgZm9yIENvcnRleC1SOCBndWVz
-dCBhcmNoaXRlY3R1cmUgbm93Lg0KSXMgaXQgcGxhbm5lZD8NCkhvdyBtdWNoIG1hbi1ob3VyIHdv
-dWxkIGJlIG5lZWRlZCB0byBpbXBsZW1lbnQgQ29ydGV4LVI4IHN1cHBvcnQgZm9yIFFlbXU/DQoN
-ClRoYW5rcywNCkRhdmlkDQoNCg==
+They were missing when introduced on the tree
+
+Signed-off-by: Juan Quintela <quintela@redhat.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
+---
+ migration/migration.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/migration/migration.c b/migration/migration.c
+index 98429dc843..fb62a639d8 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -865,6 +865,12 @@ static void migrate_params_test_apply(MigrateSetParameters *params,
+     if (params->has_block_incremental) {
+         dest->block_incremental = params->block_incremental;
+     }
++    if (params->has_x_multifd_channels) {
++        dest->x_multifd_channels = params->x_multifd_channels;
++    }
++    if (params->has_x_multifd_page_count) {
++        dest->x_multifd_page_count = params->x_multifd_page_count;
++    }
+ }
+ 
+ static void migrate_params_apply(MigrateSetParameters *params)
+-- 
+2.13.6
