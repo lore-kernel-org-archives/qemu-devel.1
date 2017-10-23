@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42011)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45386)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1e6bSX-0006ni-5F
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 08:04:03 -0400
+	(envelope-from <bounces@canonical.com>) id 1e6bjY-0005Qv-2g
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 08:21:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1e6bSS-0000Ei-UG
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 08:03:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60030)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1e6bSS-0000E0-LT
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 08:03:52 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BCC5D81DFF
-	for <qemu-devel@nongnu.org>; Mon, 23 Oct 2017 12:03:51 +0000 (UTC)
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Mon, 23 Oct 2017 14:03:15 +0200
-Message-Id: <20171023120317.8296-3-kraxel@redhat.com>
-In-Reply-To: <20171023120317.8296-1-kraxel@redhat.com>
-References: <20171023120317.8296-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH 2/4] gtk: make GtkGlArea usage a runtime option
+	(envelope-from <bounces@canonical.com>) id 1e6bjU-0000bp-Mw
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 08:21:32 -0400
+Received: from indium.canonical.com ([91.189.90.7]:60074)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1e6bjU-0000bT-G6
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 08:21:28 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1e6bjS-00055D-65
+	for <qemu-devel@nongnu.org>; Mon, 23 Oct 2017 12:21:26 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 250622E80CC
+	for <qemu-devel@nongnu.org>; Mon, 23 Oct 2017 12:21:26 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 23 Oct 2017 12:14:28 -0000
+From: Daniel Berrange <1725707@bugs.launchpad.net>
+Reply-To: Bug 1725707 <1725707@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150859618440.18353.4071279587956365769.malonedeb@chaenomeles.canonical.com>
+Message-Id: <150876086860.17961.10125921373649548007.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1725707] Re: QEMU sends excess VNC data to
+ websockify even when network is poor
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,166 +38,100 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-Compile gtk with both opengl code variants (GtkGlArea widget and
-egl context).  This allows to select the code path at runtime.
+NB, if websockify crashes, then that is a serious flaw in websockify -
+it shouldn't read an unbounded amount of data from QEMU, if it is unable
+to send it onto the client.  If websockify stopped reading data from
+QEMU, then QEMU would in turn stop sending it once the TCP buffer was
+full
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- include/ui/gtk.h |  2 ++
- ui/gtk.c         | 53 +++++++++++++++++++++++++++++------------------------
- ui/Makefile.objs |  3 +--
- 3 files changed, 32 insertions(+), 26 deletions(-)
+-- =
 
-diff --git a/include/ui/gtk.h b/include/ui/gtk.h
-index 849c896eef..f6dafc5961 100644
---- a/include/ui/gtk.h
-+++ b/include/ui/gtk.h
-@@ -90,6 +90,8 @@ typedef struct VirtualConsole {
-     };
- } VirtualConsole;
- 
-+extern bool gtk_use_gl_area;
-+
- /* ui/gtk.c */
- void gd_update_windowsize(VirtualConsole *vc);
- 
-diff --git a/ui/gtk.c b/ui/gtk.c
-index 342e96fbe9..33cd848db3 100644
---- a/ui/gtk.c
-+++ b/ui/gtk.c
-@@ -191,6 +191,8 @@ typedef struct VCChardev {
- #define TYPE_CHARDEV_VC "chardev-vc"
- #define VC_CHARDEV(obj) OBJECT_CHECK(VCChardev, (obj), TYPE_CHARDEV_VC)
- 
-+bool gtk_use_gl_area;
-+
- static void gd_grab_pointer(VirtualConsole *vc, const char *reason);
- static void gd_ungrab_pointer(GtkDisplayState *s);
- static void gd_grab_keyboard(VirtualConsole *vc, const char *reason);
-@@ -401,7 +403,7 @@ static void gd_update_full_redraw(VirtualConsole *vc)
-     int ww, wh;
-     gdk_drawable_get_size(gtk_widget_get_window(area), &ww, &wh);
- #if defined(CONFIG_GTK_GL)
--    if (vc->gfx.gls) {
-+    if (vc->gfx.gls && gtk_use_gl_area) {
-         gtk_gl_area_queue_render(GTK_GL_AREA(vc->gfx.drawing_area));
-         return;
-     }
-@@ -673,7 +675,7 @@ static const DisplayChangeListenerOps dcl_gl_area_ops = {
-     .dpy_gl_update           = gd_gl_area_scanout_flush,
- };
- 
--#else
-+#endif /* CONFIG_GTK_GL */
- 
- static const DisplayChangeListenerOps dcl_egl_ops = {
-     .dpy_name             = "gtk-egl",
-@@ -693,7 +695,6 @@ static const DisplayChangeListenerOps dcl_egl_ops = {
-     .dpy_gl_update           = gd_egl_scanout_flush,
- };
- 
--#endif /* CONFIG_GTK_GL */
- #endif /* CONFIG_OPENGL */
- 
- /** QEMU Events **/
-@@ -787,13 +788,13 @@ static gboolean gd_draw_event(GtkWidget *widget, cairo_t *cr, void *opaque)
- 
- #if defined(CONFIG_OPENGL)
-     if (vc->gfx.gls) {
--#if defined(CONFIG_GTK_GL)
--        /* invoke render callback please */
--        return FALSE;
--#else
--        gd_egl_draw(vc);
--        return TRUE;
--#endif
-+        if (gtk_use_gl_area) {
-+            /* invoke render callback please */
-+            return FALSE;
-+        } else {
-+            gd_egl_draw(vc);
-+            return TRUE;
-+        }
-     }
- #endif
- 
-@@ -1899,7 +1900,7 @@ static void gd_connect_vc_gfx_signals(VirtualConsole *vc)
-     g_signal_connect(vc->gfx.drawing_area, "draw",
-                      G_CALLBACK(gd_draw_event), vc);
- #if defined(CONFIG_GTK_GL)
--    if (display_opengl) {
-+    if (gtk_use_gl_area) {
-         /* wire up GtkGlArea events */
-         g_signal_connect(vc->gfx.drawing_area, "render",
-                          G_CALLBACK(gd_render_event), vc);
-@@ -2022,26 +2023,29 @@ static GSList *gd_vc_gfx_init(GtkDisplayState *s, VirtualConsole *vc,
- #if defined(CONFIG_OPENGL)
-     if (display_opengl) {
- #if defined(CONFIG_GTK_GL)
--        vc->gfx.drawing_area = gtk_gl_area_new();
--        vc->gfx.dcl.ops = &dcl_gl_area_ops;
--#else
--        vc->gfx.drawing_area = gtk_drawing_area_new();
--        /*
--         * gtk_widget_set_double_buffered() was deprecated in 3.14.
--         * It is required for opengl rendering on X11 though.  A
--         * proper replacement (native opengl support) is only
--         * available in 3.16+.  Silence the warning if possible.
--         */
-+        if (gtk_use_gl_area) {
-+            vc->gfx.drawing_area = gtk_gl_area_new();
-+            vc->gfx.dcl.ops = &dcl_gl_area_ops;
-+        } else
-+#endif /* CONFIG_GTK_GL */
-+        {
-+            vc->gfx.drawing_area = gtk_drawing_area_new();
-+            /*
-+             * gtk_widget_set_double_buffered() was deprecated in 3.14.
-+             * It is required for opengl rendering on X11 though.  A
-+             * proper replacement (native opengl support) is only
-+             * available in 3.16+.  Silence the warning if possible.
-+             */
- #ifdef CONFIG_PRAGMA_DIAGNOSTIC_AVAILABLE
- #pragma GCC diagnostic push
- #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
- #endif
--        gtk_widget_set_double_buffered(vc->gfx.drawing_area, FALSE);
-+            gtk_widget_set_double_buffered(vc->gfx.drawing_area, FALSE);
- #ifdef CONFIG_PRAGMA_DIAGNOSTIC_AVAILABLE
- #pragma GCC diagnostic pop
- #endif
--        vc->gfx.dcl.ops = &dcl_egl_ops;
--#endif /* CONFIG_GTK_GL */
-+            vc->gfx.dcl.ops = &dcl_egl_ops;
-+        }
-     } else
- #endif
-     {
-@@ -2371,6 +2375,7 @@ void early_gtk_display_init(int opengl)
-     case 1: /* on */
- #if defined(CONFIG_OPENGL)
- #if defined(CONFIG_GTK_GL)
-+        gtk_use_gl_area = true;
-         gtk_gl_area_init();
- #else
-         gtk_egl_init();
-diff --git a/ui/Makefile.objs b/ui/Makefile.objs
-index ec8533d6d9..45703e7c85 100644
---- a/ui/Makefile.objs
-+++ b/ui/Makefile.objs
-@@ -37,10 +37,9 @@ common-obj-y += egl-context.o
- common-obj-$(CONFIG_OPENGL_DMABUF) += egl-headless.o
- ifeq ($(CONFIG_GTK_GL),y)
- common-obj-$(CONFIG_GTK) += gtk-gl-area.o
--else
-+endif
- common-obj-$(CONFIG_GTK) += gtk-egl.o
- endif
--endif
- 
- gtk.o-cflags := $(GTK_CFLAGS) $(VTE_CFLAGS)
- gtk-egl.o-cflags := $(GTK_CFLAGS) $(VTE_CFLAGS)
--- 
-2.9.3
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1725707
+
+Title:
+  QEMU sends excess VNC data to websockify even when network is poor
+
+Status in QEMU:
+  New
+
+Bug description:
+  Description of problem
+  -------------------------
+  In my latest topic, I reported a bug relate to QEMU's websocket:
+  https://bugs.launchpad.net/qemu/+bug/1718964
+
+  It has been fixed but someone mentioned that he met the same problem when=
+ using QEMU with a standalone websocket proxy.
+  That makes me confused because in that scenario QEMU will get a "RAW" VNC=
+ connection.
+  So I did a test and found that there indeed existed some problems. The pr=
+oblem is:
+
+  When the client's network is poor (on a low speed WAN), QEMU still
+  sends a lot of data to the websocket proxy, then the client get stuck.
+  It seems that only QEMU has this problem, other VNC servers works
+  fine.
+
+  Environment
+  -------------------------
+  All of the following versions have been tested:
+
+  QEMU: 2.8.1.1 / 2.9.1 / 2.10.1 / master (Up to date)
+  Host OS: Ubuntu 16.04 Server LTS / CentOS 7 x86_64_1611
+  Websocket Proxy: websockify 0.6.0 / 0.7.0 / 0.8.0 / master
+  VNC Web Client: noVNC 0.5.1 / 0.61 / 0.62 / master
+  Other VNC Servers: TigerVNC 1.8 / x11vnc 0.9.13 / TightVNC 2.8.8
+
+  Steps to reproduce:
+  -------------------------
+  100% reproducible.
+
+  1. Launch a QEMU instance (No need websocket option):
+  qemu-system-x86_64 -enable-kvm -m 6G ./win_x64.qcow2 -vnc :0
+
+  2. Launch websockify on a separate host and connect to QEMU's VNC port
+
+  3. Open VNC Web Client (noVNC/vnc.html) in browser and connect to
+  websockify
+
+  4. Play a video (e.g. Watch YouTube) on VM (To produce a lot of frame
+  buffer update)
+
+  5. Limit (e.g. Use NetLimiter) the client inbound bandwidth to 300KB/S
+  (To simulate a low speed WAN)
+
+  6. Then client's output gets stuck(less than 1 fps), the cursor is
+  almost impossible to move
+
+  7. Monitor network traffic on the proxy server
+
+  Current result:
+  -------------------------
+  Monitor Downlink/Uplink network traffic on the proxy server
+  (Refer to the attachments for more details).
+
+  1. Used with QEMU
+  - D: 5.9 MB/s U: 5.7 MB/s (Client on LAN)
+  - D: 4.3 MB/s U: 334 KB/s (Client on WAN)
+
+  2. Used with other VNC servers
+  - D: 5.9 MB/s U: 5.6 MB/s (Client on LAN)
+  - D: 369 KB/s U: 328 KB/s (Client on WAN)
+
+  It is found that when the client's network is poor, all the VNC
+  servers (tigervnc/x11vnc/tightvnc) will reduce the VNC data send to
+  websocket proxy (uplink and downlink symmetry), but QEMU never drop
+  any frames and still sends a lot of data to websockify, the client has
+  no capacity to accept so much data, more and more data are accumulated
+  in the websockify, then it crashes.
+
+  Expected results:
+  -------------------------
+  When the client's network is poor (WAN), QEMU will reduce the VNC data se=
+nd to websocket proxy.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1725707/+subscriptions
