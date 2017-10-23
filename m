@@ -1,20 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46608)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46648)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1e6j4e-0000cT-5T
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 16:11:51 -0400
+	(envelope-from <andrew.smirnov@gmail.com>) id 1e6j4j-0000iN-HD
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 16:11:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1e6j4b-0002eS-MC
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 16:11:48 -0400
+	(envelope-from <andrew.smirnov@gmail.com>) id 1e6j4g-0002fw-Je
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 16:11:53 -0400
 From: Andrey Smirnov <andrew.smirnov@gmail.com>
-Date: Mon, 23 Oct 2017 13:10:50 -0700
-Message-Id: <20171023201055.21973-23-andrew.smirnov@gmail.com>
+Date: Mon, 23 Oct 2017 13:10:54 -0700
+Message-Id: <20171023201055.21973-27-andrew.smirnov@gmail.com>
 In-Reply-To: <20171023201055.21973-1-andrew.smirnov@gmail.com>
 References: <20171023201055.21973-1-andrew.smirnov@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 22/27] pci: Add support for Designware IP
- block
+Subject: [Qemu-devel] [PATCH v2 26/27] i.MX: Add i.MX7 SOC implementation.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,10 +25,31 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org
 Cc: Andrey Smirnov <andrew.smirnov@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, yurovsky@gmail.com
 
-Add code needed to get a functional PCI subsytem when using in
-conjunction with upstream Linux guest (4.13+). Tested to work against
-"e1000e" (network adapter, using MSI interrupts) as well as
-"usb-ehci" (USB controller, using legacy PCI interrupts).
+The following interfaces are partially or fully emulated:
+
+    * up to 2 Cortex A9 cores (SMP works with PSCI)
+    * A7 MPCORE (identical to A15 MPCORE)
+    * 4 GPTs modules
+    * 7 GPIO controllers
+    * 2 IOMUXC controllers
+    * 1 CCM module
+    * 1 SVNS module
+    * 1 SRC module
+    * 1 GPCv2 controller
+    * 4 eCSPI controllers
+    * 4 I2C controllers
+    * 7 i.MX UART controllers
+    * 2 FlexCAN controllers
+    * 2 Ethernet controllers (FEC)
+    * 3 SD controllers (USDHC)
+    * 4 WDT modules
+    * 1 SDMA module
+    * 1 GPR module
+    * 2 USBMISC modules
+    * 2 ADC modules
+    * 1 PCIe controller
+
+Tested to boot and work with upstream Linux (4.13+) guest.
 
 Cc: Peter Maydell <peter.maydell@linaro.org>
 Cc: Jason Wang <jasowang@redhat.com>
@@ -39,763 +59,860 @@ Cc: qemu-arm@nongnu.org
 Cc: yurovsky@gmail.com
 Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
 ---
- default-configs/arm-softmmu.mak  |   2 +
- hw/pci-host/Makefile.objs        |   2 +
- hw/pci-host/designware.c         | 614 +++++++++++++++++++++++++++++++++++++++
- include/hw/pci-host/designware.h |  92 ++++++
- include/hw/pci/pci_ids.h         |   2 +
- 5 files changed, 712 insertions(+)
- create mode 100644 hw/pci-host/designware.c
- create mode 100644 include/hw/pci-host/designware.h
+ default-configs/arm-softmmu.mak |   1 +
+ hw/arm/Makefile.objs            |   2 +
+ hw/arm/fsl-imx7.c               | 596 ++++++++++++++++++++++++++++++++++++++++
+ include/hw/arm/fsl-imx7.h       | 217 +++++++++++++++
+ 4 files changed, 816 insertions(+)
+ create mode 100644 hw/arm/fsl-imx7.c
+ create mode 100644 include/hw/arm/fsl-imx7.h
 
 diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
-index bbdd3c1d8b..225ebbd90a 100644
+index 225ebbd90a..a2f318d6dd 100644
 --- a/default-configs/arm-softmmu.mak
 +++ b/default-configs/arm-softmmu.mak
-@@ -129,3 +129,5 @@ CONFIG_ACPI=y
- CONFIG_SMBIOS=y
- CONFIG_ASPEED_SOC=y
- CONFIG_GPIO_KEY=y
+@@ -118,6 +118,7 @@ CONFIG_ALLWINNER_A10=y
+ CONFIG_FSL_IMX6=y
+ CONFIG_FSL_IMX31=y
+ CONFIG_FSL_IMX25=y
++CONFIG_FSL_IMX7=y
+ 
+ CONFIG_IMX_I2C=y
+ 
+diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
+index a2e56ecaae..33f6051ae3 100644
+--- a/hw/arm/Makefile.objs
++++ b/hw/arm/Makefile.objs
+@@ -19,3 +19,5 @@ obj-$(CONFIG_FSL_IMX31) += fsl-imx31.o kzm.o
+ obj-$(CONFIG_FSL_IMX6) += fsl-imx6.o sabrelite.o
+ obj-$(CONFIG_ASPEED_SOC) += aspeed_soc.o aspeed.o
+ obj-$(CONFIG_MPS2) += mps2.o
++obj-$(CONFIG_FSL_IMX7) += fsl-imx7.o
 +
-+CONFIG_PCI_DESIGNWARE=y
-diff --git a/hw/pci-host/Makefile.objs b/hw/pci-host/Makefile.objs
-index 9c7909cf44..0e2c0a123b 100644
---- a/hw/pci-host/Makefile.objs
-+++ b/hw/pci-host/Makefile.objs
-@@ -17,3 +17,5 @@ common-obj-$(CONFIG_PCI_PIIX) += piix.o
- common-obj-$(CONFIG_PCI_Q35) += q35.o
- common-obj-$(CONFIG_PCI_GENERIC) += gpex.o
- common-obj-$(CONFIG_PCI_XILINX) += xilinx-pcie.o
-+
-+common-obj-$(CONFIG_PCI_DESIGNWARE) += designware.o
-diff --git a/hw/pci-host/designware.c b/hw/pci-host/designware.c
+diff --git a/hw/arm/fsl-imx7.c b/hw/arm/fsl-imx7.c
 new file mode 100644
-index 0000000000..7ae4126d96
+index 0000000000..f1a6a79179
 --- /dev/null
-+++ b/hw/pci-host/designware.c
-@@ -0,0 +1,614 @@
++++ b/hw/arm/fsl-imx7.c
+@@ -0,0 +1,596 @@
 +/*
 + * Copyright (c) 2017, Impinj, Inc.
 + *
-+ * Designware PCIe IP block emulation
++ * i.MX7 SoC definitions
 + *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2 of the License, or (at your option) any later version.
++ * Author: Andrey Smirnov <andrew.smirnov@gmail.com>
 + *
-+ * This library is distributed in the hope that it will be useful,
++ * Based on hw/arm/fsl-imx6.c
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
 + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see
-+ * <http://www.gnu.org/licenses/>.
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
++ * GNU General Public License for more details.
 + */
 +
 +#include "qemu/osdep.h"
 +#include "qapi/error.h"
-+#include "hw/pci/msi.h"
-+#include "hw/pci/pci_bridge.h"
-+#include "hw/pci/pci_host.h"
-+#include "hw/pci/pcie_port.h"
-+#include "hw/pci-host/designware.h"
++#include "qemu-common.h"
++#include "hw/arm/fsl-imx7.h"
++#include "sysemu/sysemu.h"
++#include "qemu/error-report.h"
 +
-+#define PCIE_PORT_LINK_CONTROL          0x710
++#define NAME_SIZE 20
 +
-+#define PCIE_PHY_DEBUG_R1               0x72C
-+#define PCIE_PHY_DEBUG_R1_XMLH_LINK_UP  BIT(4)
-+
-+#define PCIE_LINK_WIDTH_SPEED_CONTROL   0x80C
-+
-+#define PCIE_MSI_ADDR_LO                0x820
-+#define PCIE_MSI_ADDR_HI                0x824
-+#define PCIE_MSI_INTR0_ENABLE           0x828
-+#define PCIE_MSI_INTR0_MASK             0x82C
-+#define PCIE_MSI_INTR0_STATUS           0x830
-+
-+#define PCIE_ATU_VIEWPORT               0x900
-+#define PCIE_ATU_REGION_INBOUND         (0x1 << 31)
-+#define PCIE_ATU_REGION_OUTBOUND        (0x0 << 31)
-+#define PCIE_ATU_REGION_INDEX2          (0x2 << 0)
-+#define PCIE_ATU_REGION_INDEX1          (0x1 << 0)
-+#define PCIE_ATU_REGION_INDEX0          (0x0 << 0)
-+#define PCIE_ATU_CR1                    0x904
-+#define PCIE_ATU_TYPE_MEM               (0x0 << 0)
-+#define PCIE_ATU_TYPE_IO                (0x2 << 0)
-+#define PCIE_ATU_TYPE_CFG0              (0x4 << 0)
-+#define PCIE_ATU_TYPE_CFG1              (0x5 << 0)
-+#define PCIE_ATU_CR2                    0x908
-+#define PCIE_ATU_ENABLE                 (0x1 << 31)
-+#define PCIE_ATU_BAR_MODE_ENABLE        (0x1 << 30)
-+#define PCIE_ATU_LOWER_BASE             0x90C
-+#define PCIE_ATU_UPPER_BASE             0x910
-+#define PCIE_ATU_LIMIT                  0x914
-+#define PCIE_ATU_LOWER_TARGET           0x918
-+#define PCIE_ATU_BUS(x)                 (((x) >> 24) & 0xff)
-+#define PCIE_ATU_DEVFN(x)               (((x) >> 16) & 0xff)
-+#define PCIE_ATU_UPPER_TARGET           0x91C
-+
-+static DesignwarePCIEHost *
-+designware_pcie_root_to_host(DesignwarePCIERoot *root)
++static void fsl_imx7_init(Object *obj)
 +{
-+    BusState *bus = qdev_get_parent_bus(DEVICE(root));
-+    return DESIGNWARE_PCIE_HOST(bus->parent);
-+}
++    BusState *sysbus = sysbus_get_default();
++    FslIMX7State *s = FSL_IMX7(obj);
++    char name[NAME_SIZE];
++    int i;
 +
-+static void designware_pcie_root_msi_write(void *opaque, hwaddr addr,
-+                                           uint64_t val, unsigned len)
-+{
-+    DesignwarePCIERoot *root = DESIGNWARE_PCIE_ROOT(opaque);
-+    DesignwarePCIEHost *host = designware_pcie_root_to_host(root);
-+
-+    root->msi.intr[0].status |= (1 << val) & root->msi.intr[0].enable;
-+
-+    if (root->msi.intr[0].status & ~root->msi.intr[0].mask) {
-+        qemu_set_irq(host->pci.irqs[0], 1);
-+    }
-+}
-+
-+const MemoryRegionOps designware_pci_host_msi_ops = {
-+    .write = designware_pcie_root_msi_write,
-+    .endianness = DEVICE_NATIVE_ENDIAN,
-+};
-+
-+static void designware_pcie_root_update_msi_mapping(DesignwarePCIERoot *root)
-+
-+{
-+    DesignwarePCIEHost *host = designware_pcie_root_to_host(root);
-+    MemoryRegion *address_space = &host->pci.memory;
-+    MemoryRegion *mem = &root->msi.iomem;
-+    const uint64_t base = root->msi.base;
-+    const bool enable = root->msi.intr[0].enable;
-+
-+    if (memory_region_is_mapped(mem)) {
-+        memory_region_del_subregion(address_space, mem);
-+        object_unparent(OBJECT(mem));
++    if (smp_cpus > FSL_IMX7_NUM_CPUS) {
++        error_report("%s: Only %d CPUs are supported (%d requested)",
++                     TYPE_FSL_IMX7, FSL_IMX7_NUM_CPUS, smp_cpus);
++        exit(1);
 +    }
 +
-+    if (enable) {
-+        memory_region_init_io(mem, OBJECT(root),
-+                              &designware_pci_host_msi_ops,
-+                              root, "pcie-msi", 0x1000);
-+
-+        memory_region_add_subregion(address_space, base, mem);
-+    }
-+}
-+
-+static DesignwarePCIEViewport *
-+designware_pcie_root_get_current_viewport(DesignwarePCIERoot *root)
-+{
-+    const unsigned int idx = root->atu_viewport & 0xF;
-+    const unsigned int dir = !!(root->atu_viewport & PCIE_ATU_REGION_INBOUND);
-+    return &root->viewports[dir][idx];
-+}
-+
-+static uint32_t
-+designware_pcie_root_config_read(PCIDevice *d, uint32_t address, int len)
-+{
-+    DesignwarePCIERoot *root = DESIGNWARE_PCIE_ROOT(d);
-+    DesignwarePCIEViewport *viewport =
-+        designware_pcie_root_get_current_viewport(root);
-+
-+    uint32_t val;
-+
-+    switch (address) {
-+    case PCIE_PORT_LINK_CONTROL:
-+    case PCIE_LINK_WIDTH_SPEED_CONTROL:
-+        val = 0xDEADBEEF;
-+        /* No-op */
-+        break;
-+
-+    case PCIE_MSI_ADDR_LO:
-+        val = root->msi.base;
-+        break;
-+
-+    case PCIE_MSI_ADDR_HI:
-+        val = root->msi.base >> 32;
-+        break;
-+
-+    case PCIE_MSI_INTR0_ENABLE:
-+        val = root->msi.intr[0].enable;
-+        break;
-+
-+    case PCIE_MSI_INTR0_MASK:
-+        val = root->msi.intr[0].mask;
-+        break;
-+
-+    case PCIE_MSI_INTR0_STATUS:
-+        val = root->msi.intr[0].status;
-+        break;
-+
-+    case PCIE_PHY_DEBUG_R1:
-+        val = PCIE_PHY_DEBUG_R1_XMLH_LINK_UP;
-+        break;
-+
-+    case PCIE_ATU_VIEWPORT:
-+        val = root->atu_viewport;
-+        break;
-+
-+    case PCIE_ATU_LOWER_BASE:
-+        val = viewport->base;
-+        break;
-+
-+    case PCIE_ATU_UPPER_BASE:
-+        val = viewport->base >> 32;
-+        break;
-+
-+    case PCIE_ATU_LOWER_TARGET:
-+        val = viewport->target;
-+        break;
-+
-+    case PCIE_ATU_UPPER_TARGET:
-+        val = viewport->target >> 32;
-+        break;
-+
-+    case PCIE_ATU_LIMIT:
-+        val = viewport->limit;
-+        break;
-+
-+    case PCIE_ATU_CR1:
-+    case PCIE_ATU_CR2:          /* FALLTHROUGH */
-+        val = viewport->cr[(address - PCIE_ATU_CR1) / sizeof(uint32_t)];
-+        break;
-+
-+    default:
-+        val = pci_default_read_config(d, address, len);
-+        break;
-+    }
-+
-+    return val;
-+}
-+
-+static uint64_t designware_pcie_root_data_read(void *opaque,
-+                                               hwaddr addr, unsigned len)
-+{
-+    DesignwarePCIERoot *root = DESIGNWARE_PCIE_ROOT(opaque);
-+    DesignwarePCIEViewport *viewport =
-+        designware_pcie_root_get_current_viewport(root);
-+
-+    const uint8_t busnum = PCIE_ATU_BUS(viewport->target);
-+    const uint8_t devfn  = PCIE_ATU_DEVFN(viewport->target);
-+    PCIBus    *pcibus    = PCI_DEVICE(root)->bus;
-+    PCIDevice *pcidev    = pci_find_device(pcibus, busnum, devfn);
-+
-+    if (pcidev) {
-+        addr &= PCI_CONFIG_SPACE_SIZE - 1;
-+
-+        return pci_host_config_read_common(pcidev, addr,
-+                                           PCI_CONFIG_SPACE_SIZE, len);
-+    }
-+
-+    return UINT64_MAX;
-+}
-+
-+static void designware_pcie_root_data_write(void *opaque, hwaddr addr,
-+                                            uint64_t val, unsigned len)
-+{
-+    DesignwarePCIERoot *root = DESIGNWARE_PCIE_ROOT(opaque);
-+    DesignwarePCIEViewport *viewport =
-+        designware_pcie_root_get_current_viewport(root);
-+    const uint8_t busnum = PCIE_ATU_BUS(viewport->target);
-+    const uint8_t devfn  = PCIE_ATU_DEVFN(viewport->target);
-+    PCIBus    *pcibus    = PCI_DEVICE(root)->bus;
-+    PCIDevice *pcidev    = pci_find_device(pcibus, busnum, devfn);
-+
-+    if (pcidev) {
-+        addr &= PCI_CONFIG_SPACE_SIZE - 1;
-+        pci_host_config_write_common(pcidev, addr,
-+                                     PCI_CONFIG_SPACE_SIZE,
-+                                     val, len);
-+    }
-+}
-+
-+const MemoryRegionOps designware_pci_host_conf_ops = {
-+    .read = designware_pcie_root_data_read,
-+    .write = designware_pcie_root_data_write,
-+    .endianness = DEVICE_NATIVE_ENDIAN,
-+};
-+
-+static void designware_pcie_update_viewport(DesignwarePCIERoot *root,
-+                                            DesignwarePCIEViewport *viewport)
-+{
-+    DesignwarePCIEHost *host = designware_pcie_root_to_host(root);
-+
-+    MemoryRegion *mem     = &viewport->memory;
-+    const uint64_t target = viewport->target;
-+    const uint64_t base   = viewport->base;
-+    const uint64_t size   = (uint64_t)viewport->limit - base + 1;
-+    const bool inbound    = viewport->inbound;
-+
-+    MemoryRegion *source, *destination;
-+    const char *direction;
-+    char *name;
-+
-+    if (inbound) {
-+        source      = &host->pci.address_space_root;
-+        destination = get_system_memory();
-+        direction   = "Inbound";
-+    } else {
-+        source      = get_system_memory();
-+        destination = &host->pci.memory;
-+        direction   = "Outbound";
-+    }
-+
-+    if (memory_region_is_mapped(mem)) {
-+        /* Before we modify anything, unmap and destroy the region */
-+        memory_region_del_subregion(source, mem);
-+        object_unparent(OBJECT(mem));
-+    }
-+
-+    name = g_strdup_printf("PCI %s Viewport %p", direction, viewport);
-+
-+    switch (viewport->cr[0]) {
-+    case PCIE_ATU_TYPE_MEM:
-+        memory_region_init_alias(mem, OBJECT(root), name,
-+                                 destination, target, size);
-+        break;
-+    case PCIE_ATU_TYPE_CFG0:
-+    case PCIE_ATU_TYPE_CFG1:    /* FALLTHROUGH */
-+        if (inbound) {
-+            goto exit;
-+        }
-+
-+        memory_region_init_io(mem, OBJECT(root),
-+                              &designware_pci_host_conf_ops,
-+                              root, name, size);
-+        break;
-+    }
-+
-+    if (inbound) {
-+        memory_region_add_subregion_overlap(source, base,
-+                                            mem, -1);
-+    } else {
-+        memory_region_add_subregion(source, base, mem);
-+    }
-+
-+ exit:
-+    g_free(name);
-+}
-+
-+static void designware_pcie_root_config_write(PCIDevice *d, uint32_t address,
-+                                              uint32_t val, int len)
-+{
-+    DesignwarePCIERoot *root = DESIGNWARE_PCIE_ROOT(d);
-+    DesignwarePCIEHost *host = designware_pcie_root_to_host(root);
-+    DesignwarePCIEViewport *viewport =
-+        designware_pcie_root_get_current_viewport(root);
-+
-+    switch (address) {
-+    case PCIE_PORT_LINK_CONTROL:
-+    case PCIE_LINK_WIDTH_SPEED_CONTROL:
-+    case PCIE_PHY_DEBUG_R1:
-+        /* No-op */
-+        break;
-+
-+    case PCIE_MSI_ADDR_LO:
-+        root->msi.base &= 0xFFFFFFFF00000000ULL;
-+        root->msi.base |= val;
-+        break;
-+
-+    case PCIE_MSI_ADDR_HI:
-+        root->msi.base &= 0x00000000FFFFFFFFULL;
-+        root->msi.base |= (uint64_t)val << 32;
-+        break;
-+
-+    case PCIE_MSI_INTR0_ENABLE: {
-+        const bool update_msi_mapping = !root->msi.intr[0].enable ^ !!val;
-+
-+        root->msi.intr[0].enable = val;
-+
-+        if (update_msi_mapping) {
-+            designware_pcie_root_update_msi_mapping(root);
-+        }
-+        break;
-+    }
-+
-+    case PCIE_MSI_INTR0_MASK:
-+        root->msi.intr[0].mask = val;
-+        break;
-+
-+    case PCIE_MSI_INTR0_STATUS:
-+        root->msi.intr[0].status ^= val;
-+        if (!root->msi.intr[0].status) {
-+            qemu_set_irq(host->pci.irqs[0], 0);
-+        }
-+        break;
-+
-+    case PCIE_ATU_VIEWPORT:
-+        root->atu_viewport = val;
-+        break;
-+
-+    case PCIE_ATU_LOWER_BASE:
-+        viewport->base &= 0xFFFFFFFF00000000ULL;
-+        viewport->base |= val;
-+        break;
-+
-+    case PCIE_ATU_UPPER_BASE:
-+        viewport->base &= 0x00000000FFFFFFFFULL;
-+        viewport->base |= (uint64_t)val << 32;
-+        break;
-+
-+    case PCIE_ATU_LOWER_TARGET:
-+        viewport->target &= 0xFFFFFFFF00000000ULL;
-+        viewport->target |= val;
-+        break;
-+
-+    case PCIE_ATU_UPPER_TARGET:
-+        viewport->target &= 0x00000000FFFFFFFFULL;
-+        viewport->target |= val;
-+        break;
-+
-+    case PCIE_ATU_LIMIT:
-+        viewport->limit = val;
-+        break;
-+
-+    case PCIE_ATU_CR1:
-+        viewport->cr[0] = val;
-+        break;
-+    case PCIE_ATU_CR2:
-+        viewport->cr[1] = val;
-+
-+        if (viewport->cr[1] & PCIE_ATU_ENABLE) {
-+            designware_pcie_update_viewport(root, viewport);
-+         }
-+        break;
-+
-+    default:
-+        pci_bridge_write_config(d, address, val, len);
-+        break;
-+    }
-+}
-+
-+static int designware_pcie_root_init(PCIDevice *dev)
-+{
-+    DesignwarePCIERoot *root = DESIGNWARE_PCIE_ROOT(dev);
-+    PCIBridge *br = PCI_BRIDGE(dev);
-+    DesignwarePCIEViewport *viewport;
-+    size_t i;
-+
-+    br->bus_name  = "dw-pcie";
-+
-+    pci_set_word(dev->config + PCI_COMMAND,
-+                 PCI_COMMAND_MEMORY | PCI_COMMAND_MASTER);
-+
-+    pci_config_set_interrupt_pin(dev->config, 1);
-+    pci_bridge_initfn(dev, TYPE_PCI_BUS);
-+
-+    pcie_port_init_reg(dev);
-+
-+    pcie_cap_init(dev, 0x70, PCI_EXP_TYPE_ROOT_PORT,
-+                  0, &error_fatal);
-+
-+    msi_nonbroken = true;
-+    msi_init(dev, 0x50, 32, true, true, &error_fatal);
-+
-+    for (i = 0; i < DESIGNWARE_PCIE_NUM_VIEWPORTS; i++) {
-+        viewport = &root->viewports[DESIGNWARE_PCIE_VIEWPORT_INBOUND][i];
-+        viewport->inbound = true;
++    for (i = 0; i < smp_cpus; i++) {
++        object_initialize(&s->cpu[i], sizeof(s->cpu[i]),
++                          "cortex-a7-" TYPE_ARM_CPU);
++        snprintf(name, NAME_SIZE, "cpu%d", i);
++        object_property_add_child(obj, name, OBJECT(&s->cpu[i]),
++                                  &error_fatal);
 +    }
 +
 +    /*
-+     * If no inbound iATU windows are configured, HW defaults to
-+     * letting inbound TLPs to pass in. We emulate that by exlicitly
-+     * configuring first inbound window to cover all of target's
-+     * address space.
-+     *
-+     * NOTE: This will not work correctly for the case when first
-+     * configured inbound window is window 0
++     * A7MPCORE
 +     */
-+    viewport = &root->viewports[DESIGNWARE_PCIE_VIEWPORT_INBOUND][0];
-+    viewport->base   = 0x0000000000000000ULL;
-+    viewport->target = 0x0000000000000000ULL;
-+    viewport->limit  = UINT32_MAX;
-+    viewport->cr[0]  = PCIE_ATU_TYPE_MEM;
-+
-+    designware_pcie_update_viewport(root, viewport);
-+
-+    return 0;
-+}
-+
-+static void designware_pcie_set_irq(void *opaque, int irq_num, int level)
-+{
-+    DesignwarePCIEHost *host = DESIGNWARE_PCIE_HOST(opaque);
-+
-+    qemu_set_irq(host->pci.irqs[irq_num], level);
-+}
-+
-+static const char *designware_pcie_host_root_bus_path(PCIHostState *host_bridge,
-+                                                      PCIBus *rootbus)
-+{
-+    return "0000:00";
-+}
-+
-+
-+static void designware_pcie_root_class_init(ObjectClass *klass, void *data)
-+{
-+    PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
-+
-+    k->vendor_id = PCI_VENDOR_ID_SYNOPSYS;
-+    k->device_id = 0xABCD;
-+    k->revision = 0;
-+    k->class_id = PCI_CLASS_BRIDGE_HOST;
-+    k->is_express = true;
-+    k->is_bridge = true;
-+    k->init = designware_pcie_root_init;
-+    k->exit = pci_bridge_exitfn;
-+    dc->reset = pci_bridge_reset;
-+    k->config_read = designware_pcie_root_config_read;
-+    k->config_write = designware_pcie_root_config_write;
++    object_initialize(&s->a7mpcore, sizeof(s->a7mpcore), TYPE_A15MPCORE_PRIV);
++    qdev_set_parent_bus(DEVICE(&s->a7mpcore), sysbus);
++    object_property_add_child(obj, "a7mpcore",
++                              OBJECT(&s->a7mpcore), &error_fatal);
 +
 +    /*
-+     * PCI-facing part of the host bridge, not usable without the
-+     * host-facing part, which can't be device_add'ed, yet.
++     * GPIOs 1 to 7
 +     */
++    for (i = 0; i < FSL_IMX7_NUM_GPIOS; i++) {
++        object_initialize(&s->gpio[i], sizeof(s->gpio[i]),
++                          TYPE_IMX_GPIO);
++        qdev_set_parent_bus(DEVICE(&s->gpio[i]), sysbus);
++        snprintf(name, NAME_SIZE, "gpio%d", i);
++        object_property_add_child(obj, name,
++                                  OBJECT(&s->gpio[i]), &error_fatal);
++    }
++
++    /*
++     * IOMUXC and IOMUXC_LPSR
++     */
++    for (i = 0; i < FSL_IMX7_NUM_IOMUXCS; i++) {
++        object_initialize(&s->iomuxc[i], sizeof(s->iomuxc[i]),
++                          TYPE_IMX7_IOMUXC);
++        qdev_set_parent_bus(DEVICE(&s->iomuxc[i]), sysbus);
++        snprintf(name, NAME_SIZE, "iomuxc%d", i);
++        object_property_add_child(obj, name,
++                                  OBJECT(&s->iomuxc[i]), &error_fatal);
++    }
++
++    /*
++     * GPT1, 2, 3, 4
++     */
++    for (i = 0; i < FSL_IMX7_NUM_GPTS; i++) {
++        object_initialize(&s->gpt[i], sizeof(s->gpt[i]), TYPE_IMX7_GPT);
++        qdev_set_parent_bus(DEVICE(&s->gpt[i]), sysbus);
++        snprintf(name, NAME_SIZE, "gpt%d", i);
++        object_property_add_child(obj, name, OBJECT(&s->gpt[i]),
++                                  &error_fatal);
++    }
++
++    /*
++     * CCM
++     */
++    object_initialize(&s->ccm, sizeof(s->ccm), TYPE_IMX7_CCM);
++    qdev_set_parent_bus(DEVICE(&s->ccm), sysbus);
++    object_property_add_child(obj, "ccm", OBJECT(&s->ccm), &error_fatal);
++
++    /*
++     * GPCv2
++     */
++    object_initialize(&s->gpcv2, sizeof(s->gpcv2), TYPE_IMX_GPCV2);
++    qdev_set_parent_bus(DEVICE(&s->gpcv2), sysbus);
++    object_property_add_child(obj, "gpcv2", OBJECT(&s->gpcv2), &error_fatal);
++
++    for (i = 0; i < FSL_IMX7_NUM_ECSPIS; i++) {
++        object_initialize(&s->spi[i], sizeof(s->spi[i]), TYPE_IMX_SPI);
++        qdev_set_parent_bus(DEVICE(&s->spi[i]), sysbus_get_default());
++        snprintf(name, NAME_SIZE, "spi%d", i + 1);
++        object_property_add_child(obj, name, OBJECT(&s->spi[i]), NULL);
++    }
++
++
++    for (i = 0; i < FSL_IMX7_NUM_I2CS; i++) {
++        object_initialize(&s->i2c[i], sizeof(s->i2c[i]), TYPE_IMX_I2C);
++        qdev_set_parent_bus(DEVICE(&s->i2c[i]), sysbus_get_default());
++        snprintf(name, NAME_SIZE, "i2c%d", i + 1);
++        object_property_add_child(obj, name, OBJECT(&s->i2c[i]), NULL);
++    }
++
++    /*
++     * UART
++     */
++    for (i = 0; i < FSL_IMX7_NUM_UARTS; i++) {
++            object_initialize(&s->uart[i], sizeof(s->uart[i]), TYPE_IMX_SERIAL);
++            qdev_set_parent_bus(DEVICE(&s->uart[i]), sysbus);
++            snprintf(name, NAME_SIZE, "uart%d", i);
++            object_property_add_child(obj, name, OBJECT(&s->uart[i]),
++                                      &error_fatal);
++    }
++
++    /*
++     * FlexCAN1 and 2
++     */
++
++    for (i = 0; i < FSL_IMX7_NUM_FLEXCANS; i++) {
++            object_initialize(&s->flexcan[i],
++                              sizeof(s->flexcan[i]), TYPE_IMX_FLEXCAN);
++            qdev_set_parent_bus(DEVICE(&s->flexcan[i]), sysbus);
++            snprintf(name, NAME_SIZE, "flexcan%d", i);
++            object_property_add_child(obj, name, OBJECT(&s->flexcan[i]),
++                                      &error_fatal);
++    }
++
++    /*
++     * Ethernet
++     */
++    for (i = 0; i < FSL_IMX7_NUM_ETHS; i++) {
++            object_initialize(&s->eth[i], sizeof(s->eth[i]), TYPE_IMX_ENET);
++            qdev_set_parent_bus(DEVICE(&s->eth[i]), sysbus);
++            snprintf(name, NAME_SIZE, "eth%d", i);
++            object_property_add_child(obj, name, OBJECT(&s->eth[i]),
++                                      &error_fatal);
++    }
++
++    /*
++     * SDHCI
++     */
++    for (i = 0; i < FSL_IMX7_NUM_USDHCS; i++) {
++            object_initialize(&s->usdhc[i], sizeof(s->usdhc[i]),
++                              TYPE_IMX_USDHC);
++            qdev_set_parent_bus(DEVICE(&s->usdhc[i]), sysbus);
++            snprintf(name, NAME_SIZE, "usdhc%d", i);
++            object_property_add_child(obj, name, OBJECT(&s->usdhc[i]),
++                                      &error_fatal);
++    }
++
++    /*
++     * SNVS
++     */
++    object_initialize(&s->snvs, sizeof(s->snvs), TYPE_IMX7_SNVS);
++    qdev_set_parent_bus(DEVICE(&s->snvs), sysbus);
++    object_property_add_child(obj, "snvs", OBJECT(&s->snvs), &error_fatal);
++
++    /*
++     * SRC
++     */
++    object_initialize(&s->src, sizeof(s->src), TYPE_IMX7_SRC);
++    qdev_set_parent_bus(DEVICE(&s->src), sysbus);
++    object_property_add_child(obj, "src", OBJECT(&s->src), &error_fatal);
++
++    /*
++     * Watchdog
++     */
++    for (i = 0; i < FSL_IMX7_NUM_WDTS; i++) {
++            object_initialize(&s->wdt[i], sizeof(s->wdt[i]), TYPE_IMX2_WDT);
++            qdev_set_parent_bus(DEVICE(&s->wdt[i]), sysbus);
++            snprintf(name, NAME_SIZE, "wdt%d", i);
++            object_property_add_child(obj, name, OBJECT(&s->wdt[i]),
++                                      &error_fatal);
++    }
++
++    /*
++     * SDMA
++     */
++    object_initialize(&s->sdma, sizeof(s->sdma), TYPE_IMX_SDMA);
++    qdev_set_parent_bus(DEVICE(&s->sdma), sysbus);
++    object_property_add_child(obj, "sdma", OBJECT(&s->sdma), &error_fatal);
++
++    /*
++     * GPR
++     */
++    object_initialize(&s->gpr, sizeof(s->gpr), TYPE_IMX7_GPR);
++    qdev_set_parent_bus(DEVICE(&s->gpr), sysbus);
++    object_property_add_child(obj, "gpr", OBJECT(&s->gpr), &error_fatal);
++
++    object_initialize(&s->pcie, sizeof(s->pcie), TYPE_DESIGNWARE_PCIE_HOST);
++    qdev_set_parent_bus(DEVICE(&s->pcie), sysbus);
++    object_property_add_child(obj, "pcie", OBJECT(&s->pcie), &error_fatal);
++
++    for (i = 0; i < FSL_IMX7_NUM_USBMISCS; i++) {
++        object_initialize(&s->usbmisc[i],
++                          sizeof(s->usbmisc[i]), TYPE_IMX_USBMISC);
++        qdev_set_parent_bus(DEVICE(&s->usbmisc[i]), sysbus);
++        snprintf(name, NAME_SIZE, "usbmisc%d", i);
++        object_property_add_child(obj, name,
++                                  OBJECT(&s->usbmisc[i]), &error_fatal);
++    }
++
++    for (i = 0; i < FSL_IMX7_NUM_ADCS; i++) {
++        object_initialize(&s->adc[i], sizeof(s->adc[i]), TYPE_IMX7_ADC);
++        qdev_set_parent_bus(DEVICE(&s->adc[i]), sysbus);
++        snprintf(name, NAME_SIZE, "adc%d", i);
++        object_property_add_child(obj, name,
++                                  OBJECT(&s->adc[i]), &error_fatal);
++    }
++}
++
++static void fsl_imx7_realize(DeviceState *dev, Error **errp)
++{
++    FslIMX7State *s = FSL_IMX7(dev);
++    Object *o;
++    int i;
++    qemu_irq irq;
++
++    for (i = 0; i < smp_cpus; i++) {
++        o = OBJECT(&s->cpu[i]);
++
++        object_property_set_int(o, QEMU_PSCI_CONDUIT_SMC,
++                                "psci-conduit", &error_abort);
++
++        /* On uniprocessor, the CBAR is set to 0 */
++        if (smp_cpus > 1) {
++            object_property_set_int(o, FSL_IMX7_A7MPCORE_ADDR,
++                                    "reset-cbar", &error_abort);
++        }
++
++        if (i) {
++            /* Secondary CPUs start in PSCI powered-down state */
++            object_property_set_bool(o, true,
++                                     "start-powered-off", &error_abort);
++        }
++
++        object_property_set_bool(o, true, "realized", &error_abort);
++    }
++
++    /*
++     * A7MPCORE
++     */
++    object_property_set_int(OBJECT(&s->a7mpcore), smp_cpus, "num-cpu",
++                            &error_abort);
++    object_property_set_int(OBJECT(&s->a7mpcore),
++                            FSL_IMX7_MAX_IRQ + GIC_INTERNAL,
++                            "num-irq", &error_abort);
++
++    object_property_set_bool(OBJECT(&s->a7mpcore), true, "realized",
++                             &error_abort);
++
++    sysbus_mmio_map(SYS_BUS_DEVICE(&s->a7mpcore), 0, FSL_IMX7_A7MPCORE_ADDR);
++
++    for (i = 0; i < smp_cpus; i++) {
++        SysBusDevice *sbd = SYS_BUS_DEVICE(&s->a7mpcore);
++        DeviceState  *d   = DEVICE(qemu_get_cpu(i));
++
++        irq = qdev_get_gpio_in(d, ARM_CPU_IRQ);
++        sysbus_connect_irq(sbd, i, irq);
++        irq = qdev_get_gpio_in(d, ARM_CPU_FIQ);
++        sysbus_connect_irq(sbd, i + smp_cpus, irq);
++    }
++
++
++    /*
++     * GPT1, 2, 3, 4
++     */
++    for (i = 0; i < FSL_IMX7_NUM_GPTS; i++) {
++        static const hwaddr FSL_IMX7_GPTn_ADDR[FSL_IMX7_NUM_GPTS] = {
++            FSL_IMX7_GPT1_ADDR,
++            FSL_IMX7_GPT2_ADDR,
++            FSL_IMX7_GPT3_ADDR,
++            FSL_IMX7_GPT4_ADDR,
++        };
++
++        s->gpt[i].ccm = IMX_CCM(&s->ccm);
++        object_property_set_bool(OBJECT(&s->gpt[i]), true, "realized",
++                                 &error_abort);
++        sysbus_mmio_map(SYS_BUS_DEVICE(&s->gpt[i]), 0, FSL_IMX7_GPTn_ADDR[i]);
++    }
++
++    for (i = 0; i < FSL_IMX7_NUM_GPIOS; i++) {
++        static const hwaddr FSL_IMX7_GPIOn_ADDR[FSL_IMX7_NUM_GPIOS] = {
++            FSL_IMX7_GPIO1_ADDR,
++            FSL_IMX7_GPIO2_ADDR,
++            FSL_IMX7_GPIO3_ADDR,
++            FSL_IMX7_GPIO4_ADDR,
++            FSL_IMX7_GPIO5_ADDR,
++            FSL_IMX7_GPIO6_ADDR,
++            FSL_IMX7_GPIO7_ADDR,
++        };
++
++        object_property_set_bool(OBJECT(&s->gpio[i]), true, "realized",
++                                 &error_abort);
++        sysbus_mmio_map(SYS_BUS_DEVICE(&s->gpio[i]), 0, FSL_IMX7_GPIOn_ADDR[i]);
++    }
++
++    /*
++     * IOMUXC and IOMUXC_LPSR
++     */
++    for (i = 0; i < FSL_IMX7_NUM_IOMUXCS; i++) {
++        static const hwaddr FSL_IMX7_IOMUXCn_ADDR[FSL_IMX7_NUM_IOMUXCS] = {
++            FSL_IMX7_IOMUXC_ADDR,
++            FSL_IMX7_IOMUXC_LPSR_ADDR,
++        };
++
++        object_property_set_bool(OBJECT(&s->iomuxc[i]), true, "realized",
++                                 &error_abort);
++        sysbus_mmio_map(SYS_BUS_DEVICE(&s->iomuxc[i]), 0,
++                        FSL_IMX7_IOMUXCn_ADDR[i]);
++    }
++
++    /*
++     * CCM
++     */
++    object_property_set_bool(OBJECT(&s->ccm), true, "realized", &error_abort);
++
++    sysbus_mmio_map(SYS_BUS_DEVICE(&s->ccm), 0, FSL_IMX7_CCM_ADDR);
++
++    /*
++     * GPCv2
++     */
++    object_property_set_bool(OBJECT(&s->gpcv2), true,
++                             "realized", &error_abort);
++    sysbus_mmio_map(SYS_BUS_DEVICE(&s->gpcv2), 0, FSL_IMX7_GPC_ADDR);
++
++    /* Initialize all ECSPI */
++    for (i = 0; i < FSL_IMX7_NUM_ECSPIS; i++) {
++        static const hwaddr FSL_IMX7_SPIn_ADDR[FSL_IMX7_NUM_ECSPIS] = {
++            FSL_IMX7_ECSPI1_ADDR,
++            FSL_IMX7_ECSPI2_ADDR,
++            FSL_IMX7_ECSPI3_ADDR,
++            FSL_IMX7_ECSPI4_ADDR,
++        };
++
++        static const hwaddr FSL_IMX7_SPIn_IRQ[FSL_IMX7_NUM_ECSPIS] = {
++            FSL_IMX7_ECSPI1_IRQ,
++            FSL_IMX7_ECSPI2_IRQ,
++            FSL_IMX7_ECSPI3_IRQ,
++            FSL_IMX7_ECSPI4_IRQ,
++        };
++
++        /* Initialize the SPI */
++        object_property_set_bool(OBJECT(&s->spi[i]), true, "realized",
++                                 &error_abort);
++        sysbus_mmio_map(SYS_BUS_DEVICE(&s->spi[i]), 0,
++                        FSL_IMX7_SPIn_ADDR[i]);
++        sysbus_connect_irq(SYS_BUS_DEVICE(&s->spi[i]), 0,
++                           qdev_get_gpio_in(DEVICE(&s->a7mpcore),
++                                            FSL_IMX7_SPIn_IRQ[i]));
++    }
++
++    for (i = 0; i < FSL_IMX7_NUM_I2CS; i++) {
++        static const hwaddr FSL_IMX7_I2Cn_ADDR[FSL_IMX7_NUM_I2CS] = {
++            FSL_IMX7_I2C1_ADDR,
++            FSL_IMX7_I2C2_ADDR,
++            FSL_IMX7_I2C3_ADDR,
++            FSL_IMX7_I2C4_ADDR,
++        };
++
++        static const hwaddr FSL_IMX7_I2Cn_IRQ[FSL_IMX7_NUM_I2CS] = {
++            FSL_IMX7_I2C1_IRQ,
++            FSL_IMX7_I2C2_IRQ,
++            FSL_IMX7_I2C3_IRQ,
++            FSL_IMX7_I2C4_IRQ,
++        };
++
++        object_property_set_bool(OBJECT(&s->i2c[i]), true, "realized",
++                                 &error_abort);
++        sysbus_mmio_map(SYS_BUS_DEVICE(&s->i2c[i]), 0, FSL_IMX7_I2Cn_ADDR[i]);
++
++        sysbus_connect_irq(SYS_BUS_DEVICE(&s->i2c[i]), 0,
++                           qdev_get_gpio_in(DEVICE(&s->a7mpcore),
++                                            FSL_IMX7_I2Cn_IRQ[i]));
++    }
++
++    /*
++     * UART
++     */
++    for (i = 0; i < FSL_IMX7_NUM_UARTS; i++) {
++        static const hwaddr FSL_IMX7_UARTn_ADDR[FSL_IMX7_NUM_UARTS] = {
++            FSL_IMX7_UART1_ADDR,
++            FSL_IMX7_UART2_ADDR,
++            FSL_IMX7_UART3_ADDR,
++            FSL_IMX7_UART4_ADDR,
++            FSL_IMX7_UART5_ADDR,
++            FSL_IMX7_UART6_ADDR,
++            FSL_IMX7_UART7_ADDR,
++        };
++
++        static const int FSL_IMX7_UARTn_IRQ[FSL_IMX7_NUM_UARTS] = {
++            FSL_IMX7_UART1_IRQ,
++            FSL_IMX7_UART2_IRQ,
++            FSL_IMX7_UART3_IRQ,
++            FSL_IMX7_UART4_IRQ,
++            FSL_IMX7_UART5_IRQ,
++            FSL_IMX7_UART6_IRQ,
++            FSL_IMX7_UART7_IRQ,
++        };
++
++
++        if (i < MAX_SERIAL_PORTS) {
++            qdev_prop_set_chr(DEVICE(&s->uart[i]), "chardev", serial_hds[i]);
++        }
++
++        object_property_set_bool(OBJECT(&s->uart[i]), true, "realized",
++                                 &error_abort);
++
++        sysbus_mmio_map(SYS_BUS_DEVICE(&s->uart[i]), 0, FSL_IMX7_UARTn_ADDR[i]);
++
++        irq = qdev_get_gpio_in(DEVICE(&s->a7mpcore), FSL_IMX7_UARTn_IRQ[i]);
++        sysbus_connect_irq(SYS_BUS_DEVICE(&s->uart[i]), 0, irq);
++    }
++
++    for (i = 0; i < FSL_IMX7_NUM_FLEXCANS; i++) {
++        static const hwaddr FSL_IMX7_FLEXCANn_ADDR[FSL_IMX7_NUM_FLEXCANS] = {
++            FSL_IMX7_FLEXCAN1_ADDR,
++            FSL_IMX7_FLEXCAN2_ADDR,
++        };
++
++        object_property_set_bool(OBJECT(&s->flexcan[i]), true, "realized",
++                                 &error_abort);
++        sysbus_mmio_map(SYS_BUS_DEVICE(&s->flexcan[i]), 0,
++                        FSL_IMX7_FLEXCANn_ADDR[i]);
++    }
++
++    /*
++     * Ethernet
++     */
++    for (i = 0; i < FSL_IMX7_NUM_ETHS; i++) {
++        static const hwaddr FSL_IMX7_ENETn_ADDR[FSL_IMX7_NUM_ETHS] = {
++            FSL_IMX7_ENET1_ADDR,
++            FSL_IMX7_ENET2_ADDR,
++        };
++
++        object_property_set_uint(OBJECT(&s->eth[i]), FSL_IMX7_ETH_NUM_TX_RINGS,
++                                 "tx-ring-num", &error_abort);
++        qdev_set_nic_properties(DEVICE(&s->eth[i]), &nd_table[i]);
++        object_property_set_bool(OBJECT(&s->eth[i]), true, "realized",
++                                 &error_abort);
++
++        sysbus_mmio_map(SYS_BUS_DEVICE(&s->eth[i]), 0, FSL_IMX7_ENETn_ADDR[i]);
++
++        irq = qdev_get_gpio_in(DEVICE(&s->a7mpcore), FSL_IMX7_ENET_IRQ(i, 0));
++        sysbus_connect_irq(SYS_BUS_DEVICE(&s->eth[i]), 0, irq);
++        irq = qdev_get_gpio_in(DEVICE(&s->a7mpcore), FSL_IMX7_ENET_IRQ(i, 3));
++        sysbus_connect_irq(SYS_BUS_DEVICE(&s->eth[i]), 1, irq);
++    }
++
++    /*
++     * USDHC
++     */
++    for (i = 0; i < FSL_IMX7_NUM_USDHCS; i++) {
++        static const hwaddr FSL_IMX7_USDHCn_ADDR[FSL_IMX7_NUM_USDHCS] = {
++            FSL_IMX7_USDHC1_ADDR,
++            FSL_IMX7_USDHC2_ADDR,
++            FSL_IMX7_USDHC3_ADDR,
++        };
++
++        static const int FSL_IMX7_USDHCn_IRQ[FSL_IMX7_NUM_USDHCS] = {
++            FSL_IMX7_USDHC1_IRQ,
++            FSL_IMX7_USDHC2_IRQ,
++            FSL_IMX7_USDHC3_IRQ,
++        };
++
++        object_property_set_bool(OBJECT(&s->usdhc[i]), true, "realized",
++                                 &error_abort);
++
++        sysbus_mmio_map(SYS_BUS_DEVICE(&s->usdhc[i]), 0,
++                        FSL_IMX7_USDHCn_ADDR[i]);
++
++        irq = qdev_get_gpio_in(DEVICE(&s->a7mpcore), FSL_IMX7_USDHCn_IRQ[i]);
++        sysbus_connect_irq(SYS_BUS_DEVICE(&s->usdhc[i]), 0, irq);
++    }
++
++    /*
++     * SNVS
++     */
++    object_property_set_bool(OBJECT(&s->snvs), true, "realized", &error_abort);
++    sysbus_mmio_map(SYS_BUS_DEVICE(&s->snvs), 0, FSL_IMX7_SNVS_ADDR);
++
++    /*
++     * SRC
++     */
++    object_property_set_bool(OBJECT(&s->src), true, "realized", &error_abort);
++    sysbus_mmio_map(SYS_BUS_DEVICE(&s->src), 0, FSL_IMX7_SRC_ADDR);
++
++    /*
++     * Watchdog
++     */
++    for (i = 0; i < FSL_IMX7_NUM_WDTS; i++) {
++        static const hwaddr FSL_IMX7_WDOGn_ADDR[FSL_IMX7_NUM_WDTS] = {
++            FSL_IMX7_WDOG1_ADDR,
++            FSL_IMX7_WDOG2_ADDR,
++            FSL_IMX7_WDOG3_ADDR,
++            FSL_IMX7_WDOG4_ADDR,
++        };
++
++        object_property_set_bool(OBJECT(&s->wdt[i]), true, "realized",
++                                 &error_abort);
++
++        sysbus_mmio_map(SYS_BUS_DEVICE(&s->wdt[i]), 0, FSL_IMX7_WDOGn_ADDR[i]);
++    }
++
++    /*
++     * SDMA
++     */
++    object_property_set_bool(OBJECT(&s->sdma), true, "realized", &error_abort);
++    sysbus_mmio_map(SYS_BUS_DEVICE(&s->sdma), 0, FSL_IMX7_SDMA_ADDR);
++
++    object_property_set_bool(OBJECT(&s->gpr), true, "realized",
++                             &error_abort);
++    sysbus_mmio_map(SYS_BUS_DEVICE(&s->gpr), 0, FSL_IMX7_GPR_ADDR);
++
++    object_property_set_bool(OBJECT(&s->pcie), true,
++                             "realized", &error_abort);
++    sysbus_mmio_map(SYS_BUS_DEVICE(&s->pcie), 0, FSL_IMX7_PCIE_REG_ADDR);
++
++    irq = qdev_get_gpio_in(DEVICE(&s->a7mpcore), FSL_IMX7_PCI_INTA_IRQ);
++    sysbus_connect_irq(SYS_BUS_DEVICE(&s->pcie), 0, irq);
++    irq = qdev_get_gpio_in(DEVICE(&s->a7mpcore), FSL_IMX7_PCI_INTB_IRQ);
++    sysbus_connect_irq(SYS_BUS_DEVICE(&s->pcie), 1, irq);
++    irq = qdev_get_gpio_in(DEVICE(&s->a7mpcore), FSL_IMX7_PCI_INTC_IRQ);
++    sysbus_connect_irq(SYS_BUS_DEVICE(&s->pcie), 2, irq);
++    irq = qdev_get_gpio_in(DEVICE(&s->a7mpcore), FSL_IMX7_PCI_INTD_IRQ);
++    sysbus_connect_irq(SYS_BUS_DEVICE(&s->pcie), 3, irq);
++
++
++    for (i = 0; i < FSL_IMX7_NUM_USBMISCS; i++) {
++        static const hwaddr FSL_IMX7_USBMISCn_ADDR[FSL_IMX7_NUM_USBMISCS] = {
++            FSL_IMX7_USBMISC1_ADDR,
++            FSL_IMX7_USBMISC2_ADDR,
++        };
++
++        object_property_set_bool(OBJECT(&s->usbmisc[i]), true, "realized",
++                                 &error_abort);
++        sysbus_mmio_map(SYS_BUS_DEVICE(&s->usbmisc[i]), 0,
++                        FSL_IMX7_USBMISCn_ADDR[i]);
++    }
++
++    for (i = 0; i < FSL_IMX7_NUM_ADCS; i++) {
++        static const hwaddr FSL_IMX7_ADCn_ADDR[FSL_IMX7_NUM_ADCS] = {
++            FSL_IMX7_ADC1_ADDR,
++            FSL_IMX7_ADC2_ADDR,
++        };
++
++        object_property_set_bool(OBJECT(&s->adc[i]), true, "realized",
++                                 &error_abort);
++        sysbus_mmio_map(SYS_BUS_DEVICE(&s->adc[i]), 0,
++                        FSL_IMX7_ADCn_ADDR[i]);
++    }
++}
++
++static void fsl_imx7_class_init(ObjectClass *oc, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(oc);
++
++    dc->realize = fsl_imx7_realize;
++
++    /* Reason: Uses serial_hds and nd_table in realize() directly */
 +    dc->user_creatable = false;
++    dc->desc = "i.MX7 SOC";
 +}
 +
-+static uint64_t designware_pcie_host_mmio_read(void *opaque, hwaddr addr,
-+                                               unsigned int size)
-+{
-+    PCIHostState *pci = PCI_HOST_BRIDGE(opaque);
-+    PCIDevice *device = pci_find_device(pci->bus, 0, 0);
-+
-+    return pci_host_config_read_common(device,
-+                                       addr,
-+                                       pci_config_size(device),
-+                                       size);
-+}
-+
-+static void designware_pcie_host_mmio_write(void *opaque, hwaddr addr,
-+                                            uint64_t val, unsigned int size)
-+{
-+    PCIHostState *pci = PCI_HOST_BRIDGE(opaque);
-+    PCIDevice *device = pci_find_device(pci->bus, 0, 0);
-+
-+    return pci_host_config_write_common(device,
-+                                        addr,
-+                                        pci_config_size(device),
-+                                        val, size);
-+}
-+
-+static const MemoryRegionOps designware_pci_mmio_ops = {
-+    .read       = designware_pcie_host_mmio_read,
-+    .write      = designware_pcie_host_mmio_write,
-+    .endianness = DEVICE_NATIVE_ENDIAN,
++static const TypeInfo fsl_imx7_type_info = {
++    .name = TYPE_FSL_IMX7,
++    .parent = TYPE_DEVICE,
++    .instance_size = sizeof(FslIMX7State),
++    .instance_init = fsl_imx7_init,
++    .class_init = fsl_imx7_class_init,
 +};
 +
-+static AddressSpace *designware_pcie_host_set_iommu(PCIBus *bus, void *opaque,
-+                                                    int devfn)
++static void fsl_imx7_register_types(void)
 +{
-+    DesignwarePCIEHost *s = DESIGNWARE_PCIE_HOST(opaque);
-+
-+    return &s->pci.address_space;
++    type_register_static(&fsl_imx7_type_info);
 +}
-+
-+static void designware_pcie_host_realize(DeviceState *dev, Error **errp)
-+{
-+    PCIHostState *pci = PCI_HOST_BRIDGE(dev);
-+    DesignwarePCIEHost *s = DESIGNWARE_PCIE_HOST(dev);
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
-+    size_t i;
-+
-+    for (i = 0; i < ARRAY_SIZE(s->pci.irqs); i++) {
-+        sysbus_init_irq(sbd, &s->pci.irqs[i]);
-+    }
-+
-+    memory_region_init_io(&s->mmio,
-+                          OBJECT(s),
-+                          &designware_pci_mmio_ops,
-+                          s,
-+                          "pcie.reg", 4 * 1024);
-+    sysbus_init_mmio(sbd, &s->mmio);
-+
-+    memory_region_init(&s->pci.io, OBJECT(s), "pcie-pio", 16);
-+    memory_region_init(&s->pci.memory, OBJECT(s),
-+                       "pcie-bus-memory",
-+                       UINT64_MAX);
-+
-+    pci->bus = pci_register_bus(dev, "pcie",
-+                                designware_pcie_set_irq,
-+                                pci_swizzle_map_irq_fn,
-+                                s,
-+                                &s->pci.memory,
-+                                &s->pci.io,
-+                                0, 4,
-+                                TYPE_PCIE_BUS);
-+
-+    memory_region_init(&s->pci.address_space_root,
-+                       OBJECT(s),
-+                       "pcie-bus-address-space-root",
-+                       UINT64_MAX);
-+    memory_region_add_subregion(&s->pci.address_space_root,
-+                                0x0, &s->pci.memory);
-+    address_space_init(&s->pci.address_space,
-+                       &s->pci.address_space_root,
-+                       "pcie-bus-address-space");
-+    pci_setup_iommu(pci->bus, designware_pcie_host_set_iommu, s);
-+
-+    qdev_set_parent_bus(DEVICE(&s->root), BUS(pci->bus));
-+    qdev_init_nofail(DEVICE(&s->root));
-+}
-+
-+static void designware_pcie_host_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+    PCIHostBridgeClass *hc = PCI_HOST_BRIDGE_CLASS(klass);
-+
-+    hc->root_bus_path = designware_pcie_host_root_bus_path;
-+    dc->realize = designware_pcie_host_realize;
-+    set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
-+    dc->fw_name = "pci";
-+}
-+
-+static void designware_pcie_host_init(Object *obj)
-+{
-+    DesignwarePCIEHost *s = DESIGNWARE_PCIE_HOST(obj);
-+    DesignwarePCIERoot *root = &s->root;
-+
-+    object_initialize(root, sizeof(*root), TYPE_DESIGNWARE_PCIE_ROOT);
-+    object_property_add_child(obj, "root", OBJECT(root), NULL);
-+    qdev_prop_set_int32(DEVICE(root), "addr", PCI_DEVFN(0, 0));
-+    qdev_prop_set_bit(DEVICE(root), "multifunction", false);
-+}
-+
-+static const TypeInfo designware_pcie_root_info = {
-+    .name = TYPE_DESIGNWARE_PCIE_ROOT,
-+    .parent = TYPE_PCI_BRIDGE,
-+    .instance_size = sizeof(DesignwarePCIERoot),
-+    .class_init = designware_pcie_root_class_init,
-+};
-+
-+static const TypeInfo designware_pcie_host_info = {
-+    .name       = TYPE_DESIGNWARE_PCIE_HOST,
-+    .parent     = TYPE_PCI_HOST_BRIDGE,
-+    .instance_size = sizeof(DesignwarePCIEHost),
-+    .instance_init = designware_pcie_host_init,
-+    .class_init = designware_pcie_host_class_init,
-+};
-+
-+static void designware_pcie_register(void)
-+{
-+    type_register_static(&designware_pcie_root_info);
-+    type_register_static(&designware_pcie_host_info);
-+}
-+type_init(designware_pcie_register)
-+
-+/* 00:00.0 Class 0604: 16c3:abcd */
-diff --git a/include/hw/pci-host/designware.h b/include/hw/pci-host/designware.h
++type_init(fsl_imx7_register_types)
+diff --git a/include/hw/arm/fsl-imx7.h b/include/hw/arm/fsl-imx7.h
 new file mode 100644
-index 0000000000..c1eabfa16b
+index 0000000000..24c9cc2e46
 --- /dev/null
-+++ b/include/hw/pci-host/designware.h
-@@ -0,0 +1,92 @@
++++ b/include/hw/arm/fsl-imx7.h
+@@ -0,0 +1,217 @@
 +/*
 + * Copyright (c) 2017, Impinj, Inc.
 + *
-+ * Designware PCIe IP block emulation
++ * i.MX7 SoC definitions
 + *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2 of the License, or (at your option) any later version.
++ * Author: Andrey Smirnov <andrew.smirnov@gmail.com>
 + *
-+ * This library is distributed in the hope that it will be useful,
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; version 2 of the License.
++ *
++ * This program is distributed in the hope that it will be useful,
 + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see
-+ * <http://www.gnu.org/licenses/>.
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
++ * GNU General Public License for more details.
 + */
 +
-+#ifndef DESIGNWARE_H
-+#define DESIGNWARE_H
++#ifndef FSL_IMX7_H
++#define FSL_IMX7_H
 +
-+#include "hw/hw.h"
-+#include "hw/sysbus.h"
-+#include "hw/pci/pci.h"
-+#include "hw/pci/pci_bus.h"
-+#include "hw/pci/pcie_host.h"
++#include "hw/arm/arm.h"
++#include "hw/cpu/a15mpcore.h"
++#include "hw/intc/imx_gpcv2.h"
++#include "hw/misc/imx7_ccm.h"
++#include "hw/misc/imx7_snvs.h"
++#include "hw/misc/imx7_iomuxc.h"
++#include "hw/misc/imx7_adc.h"
++#include "hw/misc/imx_flexcan.h"
++#include "hw/misc/imx7_gpr.h"
++#include "hw/misc/imx7_src.h"
++#include "hw/misc/imx6_src.h"
++#include "hw/misc/imx2_wdt.h"
++#include "hw/gpio/imx_gpio.h"
++#include "hw/char/imx_serial.h"
++#include "hw/timer/imx_gpt.h"
++#include "hw/timer/imx_epit.h"
++#include "hw/i2c/imx_i2c.h"
++#include "hw/gpio/imx_gpio.h"
++#include "hw/dma/imx_sdma.h"
++#include "hw/sd/sdhci.h"
++#include "hw/usb/imx-usbmisc.h"
++#include "hw/ssi/imx_spi.h"
++#include "hw/net/imx_fec.h"
++#include "hw/pci-host/designware.h"
++#include "exec/memory.h"
++#include "cpu.h"
 +
-+#define TYPE_DESIGNWARE_PCIE_HOST "designware-pcie-host"
-+#define DESIGNWARE_PCIE_HOST(obj) \
-+     OBJECT_CHECK(DesignwarePCIEHost, (obj), TYPE_DESIGNWARE_PCIE_HOST)
++#define TYPE_FSL_IMX7 "fsl,imx7"
++#define FSL_IMX7(obj) OBJECT_CHECK(FslIMX7State, (obj), TYPE_FSL_IMX7)
 +
-+#define TYPE_DESIGNWARE_PCIE_ROOT "designware-pcie-root"
-+#define DESIGNWARE_PCIE_ROOT(obj) \
-+     OBJECT_CHECK(DesignwarePCIERoot, (obj), TYPE_DESIGNWARE_PCIE_ROOT)
++enum FslIMX7Configuration {
++    FSL_IMX7_NUM_CPUS         = 2,
++    FSL_IMX7_NUM_UARTS        = 7,
++    FSL_IMX7_NUM_ETHS         = 2,
++    FSL_IMX7_ETH_NUM_TX_RINGS = 3,
++    FSL_IMX7_NUM_USDHCS       = 3,
++    FSL_IMX7_NUM_WDTS         = 4,
++    FSL_IMX7_NUM_GPTS         = 4,
++    FSL_IMX7_NUM_IOMUXCS      = 2,
++    FSL_IMX7_NUM_GPIOS        = 7,
++    FSL_IMX7_NUM_I2CS         = 4,
++    FSL_IMX7_NUM_ECSPIS       = 4,
++    FSL_IMX7_NUM_FLEXCANS     = 2,
++    FSL_IMX7_NUM_USBMISCS     = 2,
++    FSL_IMX7_NUM_ADCS         = 2,
++};
 +
-+typedef struct DesignwarePCIEViewport {
-+    MemoryRegion memory;
++typedef struct FslIMX7State {
++    /*< private >*/
++    DeviceState    parent_obj;
 +
-+    uint64_t base;
-+    uint64_t target;
-+    uint32_t limit;
-+    uint32_t cr[2];
++    /*< public >*/
++    ARMCPU          cpu[FSL_IMX7_NUM_CPUS];
++    A15MPPrivState  a7mpcore;
++    IMXGPTState     gpt[FSL_IMX7_NUM_GPTS];
++    IMXGPIOState    gpio[FSL_IMX7_NUM_GPIOS];
++    IMX7IOMUXCState iomuxc[FSL_IMX7_NUM_IOMUXCS];
++    IMX7CCMState    ccm;
++    IMX7SNVSState   snvs;
++    IMX7SRCState    src;
++    IMXGPCv2State   gpcv2;
++    IMXSPIState     spi[FSL_IMX7_NUM_ECSPIS];
++    IMXI2CState     i2c[FSL_IMX7_NUM_I2CS];
++    IMXSerialState  uart[FSL_IMX7_NUM_UARTS];
++    IMXFlexCANState flexcan[FSL_IMX7_NUM_FLEXCANS];
++    IMXFECState     eth[FSL_IMX7_NUM_ETHS];
++    SDHCIState      usdhc[FSL_IMX7_NUM_USDHCS];
++    IMX2WdtState    wdt[FSL_IMX7_NUM_WDTS];
++    IMXSDMAState    sdma;
++    IMX7GPRState    gpr;
++    IMXUSBMiscState usbmisc[FSL_IMX7_NUM_USBMISCS];
++    IMX7ADCState    adc[FSL_IMX7_NUM_ADCS];
 +
-+    bool inbound;
-+} DesignwarePCIEViewport;
++    DesignwarePCIEHost pcie;
++} FslIMX7State;
 +
-+typedef struct DesignwarePCIERoot {
-+    PCIBridge parent_obj;
++enum FslIMX7MemoryMap {
++    FSL_IMX7_MMDC_ADDR            = 0x80000000,
++    FSL_IMX7_MMDC_SIZE            = 2 * 1024 * 1024 * 1024UL,
 +
-+    uint32_t atu_viewport;
++    FSL_IMX7_GPIO1_ADDR           = 0x30200000,
++    FSL_IMX7_GPIO2_ADDR           = 0x30210000,
++    FSL_IMX7_GPIO3_ADDR           = 0x30220000,
++    FSL_IMX7_GPIO4_ADDR           = 0x30230000,
++    FSL_IMX7_GPIO5_ADDR           = 0x30240000,
++    FSL_IMX7_GPIO6_ADDR           = 0x30250000,
++    FSL_IMX7_GPIO7_ADDR           = 0x30260000,
 +
-+#define DESIGNWARE_PCIE_VIEWPORT_OUTBOUND    0
-+#define DESIGNWARE_PCIE_VIEWPORT_INBOUND     1
-+#define DESIGNWARE_PCIE_NUM_VIEWPORTS        4
++    FSL_IMX7_IOMUXC_LPSR_GPR_ADDR = 0x30270000,
 +
-+    DesignwarePCIEViewport viewports[2][DESIGNWARE_PCIE_NUM_VIEWPORTS];
++    FSL_IMX7_WDOG1_ADDR           = 0x30280000,
++    FSL_IMX7_WDOG2_ADDR           = 0x30290000,
++    FSL_IMX7_WDOG3_ADDR           = 0x302A0000,
++    FSL_IMX7_WDOG4_ADDR           = 0x302B0000,
 +
-+    struct {
-+        uint64_t     base;
-+        MemoryRegion iomem;
++    FSL_IMX7_IOMUXC_LPSR_ADDR     = 0x302C0000,
 +
-+        struct {
-+            uint32_t enable;
-+            uint32_t mask;
-+            uint32_t status;
-+        } intr[1];
-+    } msi;
-+} DesignwarePCIERoot;
++    FSL_IMX7_GPT1_ADDR            = 0x302D0000,
++    FSL_IMX7_GPT2_ADDR            = 0x302E0000,
++    FSL_IMX7_GPT3_ADDR            = 0x302F0000,
++    FSL_IMX7_GPT4_ADDR            = 0x30300000,
 +
-+typedef struct DesignwarePCIEHost {
-+    PCIHostState parent_obj;
++    FSL_IMX7_IOMUXC_ADDR          = 0x30330000,
++    FSL_IMX7_IOMUXC_GPR_ADDR      = 0x30340000,
 +
-+    bool link_up;
++    FSL_IMX7_CCM_ADDR             = 0x30360000,
++    FSL_IMX7_SNVS_ADDR            = 0x30370000,
 +
-+    DesignwarePCIERoot root;
++    FSL_IMX7_SRC_ADDR             = 0x30390000,
 +
-+    struct {
-+        AddressSpace address_space;
-+        MemoryRegion address_space_root;
++    FSL_IMX7_ADC1_ADDR            = 0x30610000,
++    FSL_IMX7_ADC2_ADDR            = 0x30620000,
 +
-+        MemoryRegion memory;
-+        MemoryRegion io;
++    FSL_IMX7_GPC_ADDR             = 0x303A0000,
 +
-+        qemu_irq     irqs[4];
-+    } pci;
++    FSL_IMX7_I2C1_ADDR            = 0x30A20000,
++    FSL_IMX7_I2C2_ADDR            = 0x30A30000,
++    FSL_IMX7_I2C3_ADDR            = 0x30A40000,
++    FSL_IMX7_I2C4_ADDR            = 0x30A50000,
 +
-+    MemoryRegion mmio;
-+} DesignwarePCIEHost;
++    FSL_IMX7_ECSPI1_ADDR          = 0x30820000,
++    FSL_IMX7_ECSPI2_ADDR          = 0x30830000,
++    FSL_IMX7_ECSPI3_ADDR          = 0x30840000,
++    FSL_IMX7_ECSPI4_ADDR          = 0x30630000,
 +
-+#endif  /* DESIGNWARE_H */
-diff --git a/include/hw/pci/pci_ids.h b/include/hw/pci/pci_ids.h
-index 3752ddc93a..e2816d054f 100644
---- a/include/hw/pci/pci_ids.h
-+++ b/include/hw/pci/pci_ids.h
-@@ -264,4 +264,6 @@
- #define PCI_VENDOR_ID_TEWS               0x1498
- #define PCI_DEVICE_ID_TEWS_TPCI200       0x30C8
- 
-+#define PCI_VENDOR_ID_SYNOPSYS           0x16C3
++    FSL_IMX7_UART1_ADDR           = 0x30860000,
++    /*
++     * Some versions of the reference manual claim that UART2 is @
++     * 0x30870000, but experiments with HW + DT files in upstream
++     * Linux kernel show that not to be true and that block is
++     * acutally located @ 0x30890000
++     */
++    FSL_IMX7_UART2_ADDR           = 0x30890000,
++    FSL_IMX7_UART3_ADDR           = 0x30880000,
++    FSL_IMX7_UART4_ADDR           = 0x30A60000,
++    FSL_IMX7_UART5_ADDR           = 0x30A70000,
++    FSL_IMX7_UART6_ADDR           = 0x30A80000,
++    FSL_IMX7_UART7_ADDR           = 0x30A90000,
 +
- #endif
++    FSL_IMX7_FLEXCAN1_ADDR        = 0x30A00000,
++    FSL_IMX7_FLEXCAN2_ADDR        = 0x30A10000,
++
++    FSL_IMX7_ENET1_ADDR           = 0x30BE0000,
++    FSL_IMX7_ENET2_ADDR           = 0x30BF0000,
++
++    FSL_IMX7_USBMISC1_ADDR        = 0x30B10200,
++    FSL_IMX7_USBMISC2_ADDR        = 0x30B20200,
++
++    FSL_IMX7_USDHC1_ADDR          = 0x30B40000,
++    FSL_IMX7_USDHC2_ADDR          = 0x30B50000,
++    FSL_IMX7_USDHC3_ADDR          = 0x30B60000,
++
++    FSL_IMX7_SDMA_ADDR            = 0x30BD0000,
++
++    FSL_IMX7_A7MPCORE_ADDR        = 0x31000000,
++
++    FSL_IMX7_PCIE_REG_ADDR        = 0x33800000,
++    FSL_IMX7_PCIE_REG_SIZE        = 16 * 1024,
++
++    FSL_IMX7_GPR_ADDR             = 0x30340000,
++};
++
++enum FslIMX7IRQs {
++    FSL_IMX7_USDHC1_IRQ   = 22,
++    FSL_IMX7_USDHC2_IRQ   = 23,
++    FSL_IMX7_USDHC3_IRQ   = 24,
++
++    FSL_IMX7_UART1_IRQ    = 26,
++    FSL_IMX7_UART2_IRQ    = 27,
++    FSL_IMX7_UART3_IRQ    = 28,
++    FSL_IMX7_UART4_IRQ    = 29,
++    FSL_IMX7_UART5_IRQ    = 30,
++    FSL_IMX7_UART6_IRQ    = 16,
++
++    FSL_IMX7_ECSPI1_IRQ   = 31,
++    FSL_IMX7_ECSPI2_IRQ   = 32,
++    FSL_IMX7_ECSPI3_IRQ   = 33,
++    FSL_IMX7_ECSPI4_IRQ   = 34,
++
++    FSL_IMX7_I2C1_IRQ     = 35,
++    FSL_IMX7_I2C2_IRQ     = 36,
++    FSL_IMX7_I2C3_IRQ     = 37,
++    FSL_IMX7_I2C4_IRQ     = 38,
++
++    FSL_IMX7_PCI_INTA_IRQ = 122,
++    FSL_IMX7_PCI_INTB_IRQ = 123,
++    FSL_IMX7_PCI_INTC_IRQ = 124,
++    FSL_IMX7_PCI_INTD_IRQ = 125,
++
++    FSL_IMX7_UART7_IRQ    = 126,
++
++#define FSL_IMX7_ENET_IRQ(i, n)  ((n) + ((i) ? 100 : 118))
++
++    FSL_IMX7_MAX_IRQ      = 128,
++};
++
++#endif /* FSL_IMX7_H */
 -- 
 2.13.5
