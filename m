@@ -1,22 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52366)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54885)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1e6V88-0003Xw-Dj
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 01:18:29 -0400
+	(envelope-from <kraxel@redhat.com>) id 1e6VYu-0007d9-F2
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 01:46:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1e6V87-0008Gt-KO
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 01:18:28 -0400
-Date: Mon, 23 Oct 2017 13:18:19 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20171023051819.GD17374@lemon>
-References: <1508678882-4327-1-git-send-email-sundeep.lkml@gmail.com>
-	<150868113318.482.11705826106714639873@b58463cdfd5f>
-	<CALHRZuqhSJC9t3Xrc6-yd3EKcaNUp3NyR+i3FW=i4C7Y16acxA@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CALHRZuqhSJC9t3Xrc6-yd3EKcaNUp3NyR+i3FW=i4C7Y16acxA@mail.gmail.com>
-Subject: Re: [Qemu-devel] [Qemu devel v3 PATCH] msf2: Remove dead code
- reported by Coverity
+	(envelope-from <kraxel@redhat.com>) id 1e6VYr-0002ZG-ET
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 01:46:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34320)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1e6VYr-0002XK-7w
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 01:46:05 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id CF00581DF4
+	for <qemu-devel@nongnu.org>; Mon, 23 Oct 2017 05:46:02 +0000 (UTC)
+Message-ID: <1508737557.16488.1.camel@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Mon, 23 Oct 2017 07:45:57 +0200
+In-Reply-To: <f58bd55b-5a32-bbe1-90e6-79c5b1036355@redhat.com>
+References: <20171018095807.101406-1-marcel@redhat.com>
+	<69cefa98-5681-5b12-719c-e13fcba969c4@redhat.com>
+	<9d4b1fa8-e670-556b-278d-4993ad41b512@redhat.com>
+	<1508418225.18146.1.camel@redhat.com>
+	<d231ac0a-bb7d-78aa-ddb4-8048cc7bdfd8@redhat.com>
+	<1508482525.18146.6.camel@redhat.com>
+	<f58bd55b-5a32-bbe1-90e6-79c5b1036355@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] hw/pci-host: Fix x86 Host Bridges 64bit
+ PCI hole
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,25 +39,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: sundeep subbaraya <sundeep.lkml@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Darren Kenny <darren.kenny@oracle.com>, Igor Mammedov <imammedo@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Alistair Francis <alistair23@gmail.com>
+To: Marcel Apfelbaum <marcel@redhat.com>, Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org
+Cc: mst@redhat.com, pbonzini@redhat.com, ehabkost@redhat.com, Igor Mammedov <imammedo@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-On Mon, 10/23 08:59, sundeep subbaraya wrote:
-> > Cloning into '/var/tmp/patchew-tester-tmp-egubaaoc/src/dtc'...
-> > fatal: Could not read from remote repository.
-> >
-> > Please make sure you have the correct access rights
-> > and the repository exists.
-> > fatal: clone of 'git://git.qemu-project.org/dtc.git' into submodule path
-> > '/var/tmp/patchew-tester-tmp-egubaaoc/src/dtc' failed
-> > Failed to clone 'dtc' a second time, aborting
-> > === OUTPUT END ===
-> >
-> > Test command exited with code: 1
-> >
+  Hi,
+
+> The guest will still run with 40 bits physical!
+> (judging the code anyway, I hope I am wrong)
 > 
-> I did not understand. Is the error related to my patch?
+> Then, the stakes are not so big, the Guest kernel will disregard
+> the 64bit hole since is not CPU addressable and go on.
 
-Nope, there is something wrong with the testing bot.
+But then there is no working 64bit hole for hotplug ...
 
-Fam
+cheers,
+  Gerd
