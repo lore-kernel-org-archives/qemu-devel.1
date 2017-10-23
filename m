@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58669)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33454)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1e6gZz-0005KN-Rv
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 13:32:00 -0400
+	(envelope-from <cota@braap.org>) id 1e6gf3-0006Ob-Hl
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 13:37:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1e6gZw-0002Bi-L6
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 13:31:59 -0400
-Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:50669)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1e6gZw-0002Ay-DR
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 13:31:56 -0400
-Received: by mail-wr0-x243.google.com with SMTP id p96so4313284wrb.7
-	for <qemu-devel@nongnu.org>; Mon, 23 Oct 2017 10:31:56 -0700 (PDT)
-Date: Mon, 23 Oct 2017 19:31:52 +0200
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20171023173152.GD15029@stefanha-x1.localdomain>
-References: <20171013132507.GH20515@redhat.com>
+	(envelope-from <cota@braap.org>) id 1e6gf0-0006UQ-Bf
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 13:37:13 -0400
+Received: from out4-smtp.messagingengine.com ([66.111.4.28]:47999)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1e6gf0-0006Tw-5v
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 13:37:10 -0400
+Date: Mon, 23 Oct 2017 13:37:09 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20171023173709.GF6901@flamenco>
+References: <20171020232023.15010-1-richard.henderson@linaro.org>
+	<20171020232023.15010-22-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20171013132507.GH20515@redhat.com>
-Subject: Re: [Qemu-devel] QEMU CII Best Practices record
+In-Reply-To: <20171020232023.15010-22-richard.henderson@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH v7 21/52] tcg: Use offsets not indices for
+ TCGv_*
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,40 +28,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org, f4bug@amsat.org, pbonzini@redhat.com
 
-On Fri, Oct 13, 2017 at 02:25:07PM +0100, Daniel P. Berrange wrote:
-> Many projects these days are recording progress wrt CII best practices
-> for FLOOS projects. I filled out a record for QEMU:
+On Fri, Oct 20, 2017 at 16:19:52 -0700, Richard Henderson wrote:
+> Using the offset of a temporary, relative to TCGContext, rather than
+> its index means that we don't use 0.  That leaves offset 0 free for
+> a NULL representation without having to leave index 0 unused.
 > 
->   https://bestpractices.coreinfrastructure.org/projects/1309
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  tcg/tcg.h | 37 ++++++++++++++++++++-----------------
+>  1 file changed, 20 insertions(+), 17 deletions(-)
 > 
-> I only looked at the 'Passing' criteria, not considered the 'Silver' and
-> 'Gold' criteria. So if anyone else wants to contribute, register an
-> account there and tell me the username whereupon I can add you as a
-> collaborator.
-> 
-> Two items I don't think QEMU achieves for the basic "Passing" criteria
-> 
->  -  The release notes MUST identify every publicly known vulnerability
->     that is fixed in each new release.
-> 
->     I don't see a list of CVEs mentioned in our release Changelogs or
->     indeed a historic list of CVEs anywhere even outside the release
->     notes ?
-> 
->  - It is SUGGESTED that if the software produced by the project includes
->    software written using a memory-unsafe language (e.g., C or C++), then
->    at least one dynamic tool (e.g., a fuzzer or web application scanner)
->    be routinely used in combination with a mechanism to detect memory
->    safety problems such as buffer overwrites.
-> 
->    NB this is not 'coverity' which falls under the 'static anlaysis'
->    group. I'm unclear if anyone in the community does regular fuzzing
->    or analysis with ASAN & equiv ?
+> diff --git a/tcg/tcg.h b/tcg/tcg.h
+> index 8f692bc6cf..7fe0fb9e07 100644
+> --- a/tcg/tcg.h
+> +++ b/tcg/tcg.h
+> @@ -429,13 +429,13 @@ typedef TCGv_ptr TCGv_env;
+>  #endif
+(snip)
+>  /* used to align parameters */
+> -#define TCG_CALL_DUMMY_ARG      ((TCGArg)(-1))
+> +#define TCG_CALL_DUMMY_ARG      ((TCGArg)0)
 
-I'm not aware of automated ASAN or Valgrind runs although developers
-tend to run them in ad-hoc fashion during development.
+We're doing something clever here (on a first read I thought TCGContext
+was a typo), so I'd leave a comment somewhere. TCG_CALL_DUMMY_ARG might
+be a good place to do so; a copy of the commit's message should suffice.
 
-Stefan
+Reviewed-by: Emilio G. Cota <cota@braap.org>
+
+		E.
