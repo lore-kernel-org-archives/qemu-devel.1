@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38936)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40314)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1e6fQx-0005bx-2Q
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 12:18:37 -0400
+	(envelope-from <cota@braap.org>) id 1e6fVW-0000jg-TF
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 12:23:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1e6fQv-0000sw-V9
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 12:18:35 -0400
-Date: Mon, 23 Oct 2017 18:18:25 +0200
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20171023161825.GE10220@stefanha-x1.localdomain>
-References: <1508568856-17545-1-git-send-email-minwoo.im.dev@gmail.com>
+	(envelope-from <cota@braap.org>) id 1e6fVT-0003rP-Pp
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 12:23:18 -0400
+Received: from out4-smtp.messagingengine.com ([66.111.4.28]:32911)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1e6fVT-0003qL-Ha
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 12:23:15 -0400
+Date: Mon, 23 Oct 2017 12:23:12 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20171023162312.GA5089@flamenco>
+References: <1487097476-14259-1-git-send-email-nutarojj@ornl.gov>
+	<1505857386-23049-1-git-send-email-nutarojj@ornl.gov>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1508568856-17545-1-git-send-email-minwoo.im.dev@gmail.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] qemu-block: add support HMB
- with feature commands.
+In-Reply-To: <1505857386-23049-1-git-send-email-nutarojj@ornl.gov>
+Subject: Re: [Qemu-devel] [PATCH V8] qqq: module for synchronizing with a
+ simulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,152 +28,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Minwoo Im <minwoo.im.dev@gmail.com>
-Cc: qemu-block@nongnu.org, Keith Busch <keith.busch@intel.com>, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: nutarojj@ornl.gov
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com
 
-On Sat, Oct 21, 2017 at 03:54:16PM +0900, Minwoo Im wrote:
-> Add support HMB(Host Memory Block) with feature commands(Get Feature, Set Feature).
-> nvme-4.14 tree supports HMB features.
-> This patch will make nvme controller to return 32MiB preferred size of HMB to host via identify command.
-> Set Feature, Get Feature implemented for HMB.
-> 
-> Signed-off-by: Minwoo Im <minwoo.im.dev@gmail.com>
-> ---
->  hw/block/nvme.c | 35 +++++++++++++++++++++++++++++++++++
->  hw/block/nvme.h | 21 ++++++++++++++++++++-
->  2 files changed, 55 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-> index 6071dc1..d351781 100644
-> --- a/hw/block/nvme.c
-> +++ b/hw/block/nvme.c
-> @@ -605,6 +605,23 @@ static uint16_t nvme_identify(NvmeCtrl *n, NvmeCmd *cmd)
->      }
->  }
->  
-> +static uint32_t nvme_get_feature_hmb(NvmeCtrl *n, NvmeCmd *cmd)
-> +{
-> +    uint32_t result = n->hmb_flag.flag;
-> +    uint64_t prp1 = le64_to_cpu(cmd->prp1);
-> +    uint64_t prp2 = le64_to_cpu(cmd->prp2);
-> +    NvmeHmbAttr attr = {0, };
+On Tue, Sep 19, 2017 at 17:43:06 -0400, nutarojj@ornl.gov wrote:
+> += Synchronizing the virtual clock with an external source =
 > +
-> +    attr.hsize = cpu_to_le32(n->hmb_attr.hsize);
-> +    attr.hmdlal = cpu_to_le32(n->hmb_attr.hmdlal);
-> +    attr.hmdlau = cpu_to_le32(n->hmb_attr.hmdlau);
-> +    attr.hmdlec = cpu_to_le32(n->hmb_attr.hmdlec);
+> +QEMU has a protocol for synchronizing its virtual clock
+> +with the clock of a simulator in which QEMU is embedded
+> +as a component. This options is enabled with the -qqq
+> +argument, and it should generally be accompanied by the
+> +following additional command line arguments:
 > +
-> +    nvme_dma_read_prp(n, (uint8_t *)&attr, sizeof(attr), prp1, prp2);
+> +-icount 1,sleep=off -rtc clock=vm
+> +  or
+> +-enable-kvm -rtc clock=vm
+> +
+> +The -qqq argument is used to supply a file descriptor
+> +for a Unix socket, which is used for synchronization.
+> +The procedure for launching QEMU in is synchronization
+> +mode has three steps:
+> +
+> +(1) Create a socket pair with the Linux socketpair function.
+> +    The code segment that does this might look like
 
-This read can fail if prp1/prp2 are invalid.  How should the error be
-reported?
+I thought a little bit about this patch. I think the feature is useful
+and should eventually be provided by QEMU.
 
-> +
-> +    return result;
-> +}
-> +
->  static uint16_t nvme_get_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
->  {
->      uint32_t dw10 = le32_to_cpu(cmd->cdw10);
-> @@ -617,6 +634,9 @@ static uint16_t nvme_get_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
->      case NVME_NUMBER_OF_QUEUES:
->          result = cpu_to_le32((n->num_queues - 1) | ((n->num_queues - 1) << 16));
->          break;
-> +    case NVME_HOST_MEMORY_BUFFER:
-> +        result = nvme_get_feature_hmb(n, cmd);
-> +        break;
->      default:
->          return NVME_INVALID_FIELD | NVME_DNR;
->      }
-> @@ -625,6 +645,16 @@ static uint16_t nvme_get_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
->      return NVME_SUCCESS;
->  }
->  
-> +static void nvme_set_feature_hmb(NvmeCtrl *n, NvmeCmd *cmd)
-> +{
-> +    n->hmb_flag.flag = le32_to_cpu(cmd->cdw11);
-> +
-> +    n->hmb_attr.hsize = le32_to_cpu(cmd->cdw12);
-> +    n->hmb_attr.hmdlal = le32_to_cpu(cmd->cdw13);
-> +    n->hmb_attr.hmdlau = le32_to_cpu(cmd->cdw14);
-> +    n->hmb_attr.hmdlec = le32_to_cpu(cmd->cdw15);
-> +}
-> +
->  static uint16_t nvme_set_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
->  {
->      uint32_t dw10 = le32_to_cpu(cmd->cdw10);
-> @@ -638,6 +668,9 @@ static uint16_t nvme_set_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
->          req->cqe.result =
->              cpu_to_le32((n->num_queues - 1) | ((n->num_queues - 1) << 16));
->          break;
-> +    case NVME_HOST_MEMORY_BUFFER:
-> +        nvme_set_feature_hmb(n, cmd);
-> +        break;
->      default:
->          return NVME_INVALID_FIELD | NVME_DNR;
->      }
-> @@ -985,6 +1018,8 @@ static int nvme_init(PCIDevice *pci_dev)
->      id->oacs = cpu_to_le16(0);
->      id->frmw = 7 << 1;
->      id->lpa = 1 << 0;
-> +    id->hmpre = 0x2000;
+The part I'm not sure about is the socket interface; for instance,
+it isn't cross-platform.
 
-Missing cpu_to_le32()?
+A better alternative might be to expose this functionality to plugins,
+and let the plugins deal with the external world--socket or whatever
+IPC is appropriate on the platform they're meant to be run.
 
-> +    id->hmmin = 0x0;
->      id->sqes = (0x6 << 4) | 0x6;
->      id->cqes = (0x4 << 4) | 0x4;
->      id->nn = cpu_to_le32(n->num_namespaces);
-> diff --git a/hw/block/nvme.h b/hw/block/nvme.h
-> index 6aab338..fab748b 100644
-> --- a/hw/block/nvme.h
-> +++ b/hw/block/nvme.h
-> @@ -552,7 +552,10 @@ typedef struct NvmeIdCtrl {
->      uint8_t     lpa;
->      uint8_t     elpe;
->      uint8_t     npss;
-> -    uint8_t     rsvd511[248];
-> +    uint8_t     rsvd271[8];
-> +    uint32_t    hmpre;
-> +    uint32_t    hmmin;
-> +    uint8_t     rsvd511[232];
->      uint8_t     sqes;
->      uint8_t     cqes;
->      uint16_t    rsvd515;
-> @@ -623,9 +626,22 @@ enum NvmeFeatureIds {
->      NVME_INTERRUPT_VECTOR_CONF      = 0x9,
->      NVME_WRITE_ATOMICITY            = 0xa,
->      NVME_ASYNCHRONOUS_EVENT_CONF    = 0xb,
-> +    NVME_HOST_MEMORY_BUFFER         = 0xd,
->      NVME_SOFTWARE_PROGRESS_MARKER   = 0x80
->  };
->  
-> +typedef struct NvmeHmbFlag {
-> +    uint32_t    flag;
-> +} NvmeHmbFlag;
-> +
-> +typedef struct NvmeHmbAttr {
-> +    uint32_t    hsize;
-> +    uint32_t    hmdlal;
-> +    uint32_t    hmdlau;
-> +    uint32_t    hmdlec;
-> +    uint8_t     rsvd4095[4080];
-> +} NvmeHmbAttr;
-> +
->  typedef struct NvmeRangeType {
->      uint8_t     type;
->      uint8_t     attributes;
-> @@ -776,6 +792,9 @@ typedef struct NvmeCtrl {
->      uint32_t    cmbloc;
->      uint8_t     *cmbuf;
->  
-> +    NvmeHmbFlag hmb_flag;
-> +    NvmeHmbAttr hmb_attr;
-> +
->      char            *serial;
->      NvmeNamespace   *namespaces;
->      NvmeSQueue      **sq;
-> -- 
-> 2.7.4
-> 
-> 
+Of course the plugin interface is still under discussion. I think though
+it should be fairly easy to expose this functionality to plugins. I'll take
+a look at in the next few weeks, hopefully also supporting MTTCG instances
+(with some collaboration/hack from the plugin, I'm afraid).
+
+Thanks,
+
+		Emilio
