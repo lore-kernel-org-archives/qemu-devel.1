@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35944)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36007)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1e6fHY-0005ul-KS
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 12:08:54 -0400
+	(envelope-from <quintela@redhat.com>) id 1e6fHg-0005zi-Ch
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 12:09:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1e6fHX-0000WV-4e
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 12:08:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47910)
+	(envelope-from <quintela@redhat.com>) id 1e6fHe-0000ea-Ly
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 12:09:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45148)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1e6fHW-0000VG-Rq
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 12:08:51 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1e6fHe-0000dd-Fe
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 12:08:58 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 96750BBD8
+	for <qemu-devel@nongnu.org>; Mon, 23 Oct 2017 16:08:57 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Mon, 23 Oct 2017 18:07:56 +0200
-Message-Id: <20171023160800.20540-18-quintela@redhat.com>
+Date: Mon, 23 Oct 2017 18:07:59 +0200
+Message-Id: <20171023160800.20540-21-quintela@redhat.com>
 In-Reply-To: <20171023160800.20540-1-quintela@redhat.com>
 References: <20171023160800.20540-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PULL 17/21] migration: postcopy_place_page factoring
- out
+Subject: [Qemu-devel] [PULL 20/21] qapi: Fix grammar in x-multifd-page-count
+ descriptions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,117 +31,44 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com, Alexey Perevalov <a.perevalov@samsung.com>
+Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-From: Alexey Perevalov <a.perevalov@samsung.com>
-
-Need to mark copied pages as closer as possible to the place where it
-tracks down. That will be necessary in futher patch.
-
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Peter Xu <peterx@redhat.com>
-Reviewed-by: Juan Quintela <quintela@redhat.com>
-Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
+Reported-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- migration/postcopy-ram.c | 13 +++++++------
- migration/postcopy-ram.h |  4 ++--
- migration/ram.c          |  4 ++--
- 3 files changed, 11 insertions(+), 10 deletions(-)
+ qapi/migration.json | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-index 0de68e8b25..d3073b93b5 100644
---- a/migration/postcopy-ram.c
-+++ b/migration/postcopy-ram.c
-@@ -646,9 +646,10 @@ int postcopy_ram_enable_notify(MigrationIncomingState *mis)
-  * returns 0 on success
-  */
- int postcopy_place_page(MigrationIncomingState *mis, void *host, void *from,
--                        size_t pagesize)
-+                        RAMBlock *rb)
- {
-     struct uffdio_copy copy_struct;
-+    size_t pagesize = qemu_ram_pagesize(rb);
- 
-     copy_struct.dst = (uint64_t)(uintptr_t)host;
-     copy_struct.src = (uint64_t)(uintptr_t)from;
-@@ -677,11 +678,11 @@ int postcopy_place_page(MigrationIncomingState *mis, void *host, void *from,
-  * returns 0 on success
-  */
- int postcopy_place_page_zero(MigrationIncomingState *mis, void *host,
--                             size_t pagesize)
-+                             RAMBlock *rb)
- {
-     trace_postcopy_place_page_zero(host);
- 
--    if (pagesize == getpagesize()) {
-+    if (qemu_ram_pagesize(rb) == getpagesize()) {
-         struct uffdio_zeropage zero_struct;
-         zero_struct.range.start = (uint64_t)(uintptr_t)host;
-         zero_struct.range.len = getpagesize();
-@@ -711,7 +712,7 @@ int postcopy_place_page_zero(MigrationIncomingState *mis, void *host,
-             memset(mis->postcopy_tmp_zero_page, '\0', mis->largest_page_size);
-         }
-         return postcopy_place_page(mis, host, mis->postcopy_tmp_zero_page,
--                                   pagesize);
-+                                   rb);
-     }
- 
-     return 0;
-@@ -774,14 +775,14 @@ int postcopy_ram_enable_notify(MigrationIncomingState *mis)
- }
- 
- int postcopy_place_page(MigrationIncomingState *mis, void *host, void *from,
--                        size_t pagesize)
-+                        RAMBlock *rb)
- {
-     assert(0);
-     return -1;
- }
- 
- int postcopy_place_page_zero(MigrationIncomingState *mis, void *host,
--                        size_t pagesize)
-+                        RAMBlock *rb)
- {
-     assert(0);
-     return -1;
-diff --git a/migration/postcopy-ram.h b/migration/postcopy-ram.h
-index 587a8b86a7..77ea0fd264 100644
---- a/migration/postcopy-ram.h
-+++ b/migration/postcopy-ram.h
-@@ -72,14 +72,14 @@ void postcopy_discard_send_finish(MigrationState *ms,
-  * returns 0 on success
-  */
- int postcopy_place_page(MigrationIncomingState *mis, void *host, void *from,
--                        size_t pagesize);
-+                        RAMBlock *rb);
- 
- /*
-  * Place a zero page at (host) atomically
-  * returns 0 on success
-  */
- int postcopy_place_page_zero(MigrationIncomingState *mis, void *host,
--                             size_t pagesize);
-+                             RAMBlock *rb);
- 
- /* The current postcopy state is read/set by postcopy_state_get/set
-  * which update it atomically.
-diff --git a/migration/ram.c b/migration/ram.c
-index 1b19a899c9..bd4fc5ceb4 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -2753,10 +2753,10 @@ static int ram_load_postcopy(QEMUFile *f)
- 
-             if (all_zero) {
-                 ret = postcopy_place_page_zero(mis, place_dest,
--                                               block->page_size);
-+                                               block);
-             } else {
-                 ret = postcopy_place_page(mis, place_dest,
--                                          place_source, block->page_size);
-+                                          place_source, block);
-             }
-         }
-         if (!ret) {
+diff --git a/qapi/migration.json b/qapi/migration.json
+index 272f191551..6ae866e1aa 100644
+--- a/qapi/migration.json
++++ b/qapi/migration.json
+@@ -480,7 +480,7 @@
+ #                     number of sockets used for migration.  The
+ #                     default value is 2 (since 2.11)
+ #
+-# @x-multifd-page-count: Number of pages sent together to a thread
++# @x-multifd-page-count: Number of pages sent together to a thread.
+ #                        The default value is 16 (since 2.11)
+ #
+ # Since: 2.4
+@@ -551,7 +551,7 @@
+ #                     number of sockets used for migration.  The
+ #                     default value is 2 (since 2.11)
+ #
+-# @x-multifd-page-count: Number of pages sent together to a thread
++# @x-multifd-page-count: Number of pages sent together to a thread.
+ #                        The default value is 16 (since 2.11)
+ #
+ # Since: 2.4
+@@ -647,7 +647,7 @@
+ #                     number of sockets used for migration.
+ #                     The default value is 2 (since 2.11)
+ #
+-# @x-multifd-page-count: Number of pages sent together to a thread
++# @x-multifd-page-count: Number of pages sent together to a thread.
+ #                        The default value is 16 (since 2.11)
+ #
+ # Since: 2.4
 -- 
 2.13.6
