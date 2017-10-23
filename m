@@ -1,40 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40228)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41015)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1e6Z8v-0006hB-T7
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 05:35:35 -0400
+	(envelope-from <mattator@gmail.com>) id 1e6ZBn-0007n9-WE
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 05:38:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1e6Z8s-0002Rp-QE
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 05:35:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52998)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1e6Z8s-0002RW-Jt
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 05:35:30 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6D0D0882FF
-	for <qemu-devel@nongnu.org>; Mon, 23 Oct 2017 09:35:29 +0000 (UTC)
-References: <20171018095807.101406-1-marcel@redhat.com>
-	<69cefa98-5681-5b12-719c-e13fcba969c4@redhat.com>
-	<9d4b1fa8-e670-556b-278d-4993ad41b512@redhat.com>
-	<1508418225.18146.1.camel@redhat.com>
-	<d231ac0a-bb7d-78aa-ddb4-8048cc7bdfd8@redhat.com>
-	<1508482525.18146.6.camel@redhat.com>
-	<f58bd55b-5a32-bbe1-90e6-79c5b1036355@redhat.com>
-	<1508737557.16488.1.camel@redhat.com>
-	<083108b4-6300-6302-d8c8-108fc6ae07fb@redhat.com>
-	<1508750176.16488.6.camel@redhat.com>
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <b343425f-5186-8c93-e3f7-7b2e0322151e@redhat.com>
-Date: Mon, 23 Oct 2017 12:35:17 +0300
+	(envelope-from <mattator@gmail.com>) id 1e6ZBm-0003KF-PT
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 05:38:32 -0400
+Received: from mail-yw0-x234.google.com ([2607:f8b0:4002:c05::234]:51321)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mattator@gmail.com>) id 1e6ZBm-0003Ji-KE
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 05:38:30 -0400
+Received: by mail-yw0-x234.google.com with SMTP id k3so11481525ywk.8
+	for <qemu-devel@nongnu.org>; Mon, 23 Oct 2017 02:38:29 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1508750176.16488.6.camel@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] hw/pci-host: Fix x86 Host Bridges 64bit
- PCI hole
+In-Reply-To: <545610a4882f4c5494b30b7eab66b984@EXCHCS32.ornl.gov>
+References: <CADHp1NwU=HowMfgBGtcwnY25v_fL6qZ2gd469a2oZY+QQi2uFw@mail.gmail.com>
+	<20171019205409.GA4170@flamenco>
+	<545610a4882f4c5494b30b7eab66b984@EXCHCS32.ornl.gov>
+From: Matt <mattator@gmail.com>
+Date: Mon, 23 Oct 2017 18:38:28 +0900
+Message-ID: <CADHp1NxzGr_ijvGrUbmZf0NuUv+JwJZeA=8h4tZNn++SBA1yUw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] Running Qemu in discrete time/step by step
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,40 +29,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org
-Cc: mst@redhat.com, pbonzini@redhat.com, ehabkost@redhat.com, Igor Mammedov <imammedo@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: "Nutaro, James J." <nutarojj@ornl.gov>
+Cc: "Emilio G. Cota" <cota@braap.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Hajime Tazaki <tazaki@wide.ad.jp>
 
-On 23/10/2017 12:16, Gerd Hoffmann wrote:
-> On Mon, 2017-10-23 at 11:46 +0300, Marcel Apfelbaum wrote:
->> On 23/10/2017 8:45, Gerd Hoffmann wrote:
->>>  =C2=A0=C2=A0=C2=A0Hi,
->>>
->>>> The guest will still run with 40 bits physical!
->>>> (judging the code anyway, I hope I am wrong)
->>>>
->>>> Then, the stakes are not so big, the Guest kernel will disregard
->>>> the 64bit hole since is not CPU addressable and go on.
->>>
->>> But then there is no working 64bit hole for hotplug ...
->>>
->>
->> Hosts with old CPUs are not fit for modern PCIe devices
->> having large BARs anyway, no 64bit hole in this case would
->> be OK, I think.
->=20
-> Well, my workstation which has only 39 bits physical is kaby lake.
-> If you classify this as "old cpu", what is a new cpu then?
->=20
+I did not know about Qemu's record/replay mode which is an interesting
+feature but unneeded if a  2nd qemu run with the same inputs generated
+the same outputs (as it's the case with DCE).
+@nutaro Thanks for the updated patch. I will have a look at adevs. On
+a related note https://github.com/qemu/qemu/blob/master/docs/replay.txt
+enumerates different sources of indeterminism
+==
+Replaying of the execution of virtual machine is bound by sources of
+non-determinism. These are inputs from clock and peripheral devices,
+and QEMU thread scheduling. Thread scheduling affect on processing events
+from timers, asynchronous input-output, and bottom halves.
+==
 
-Maybe the term "old" was not the best ...,  server CPU
-intended for bigger hosts with a lot of RAM?
+Do you manage to achieve perfect reproducibility with adevs + qemu ?
+If yes, is there any publication describing how you achieve this ?
 
-Anyway, having a 32G PCI hotplug window for Q35 should be OK,
-for now.
+Best regards
+matt
 
-Thanks,
-Marcel
-
-> cheers,
->    Gerd
->=20
+2017-10-21 0:02 GMT+09:00 Nutaro, James J. <nutarojj@ornl.gov>:
+> Thanks for taking a look at the patch. The most recent version of the patch will also work with KVM if you need to speed things up. You can find it here:
+>
+> https://patchwork.kernel.org/patch/9960369/
+>
+> Somehow I messed up that post and it shows V8 when it should be V9.
+>
+> You can get the simulator that it works with at
+>
+> https://sourceforge.net/projects/adevs/
+>
+> If nothing else, this simulator would give you a blue print for integration with another tool.
+>
+> Jim
+>
+> -----Original Message-----
+> From: Emilio G. Cota [mailto:cota@braap.org]
+> Sent: Thursday, October 19, 2017 4:54 PM
+> To: Matt
+> Cc: qemu-devel@nongnu.org; Hajime Tazaki; Nutaro, James J.
+> Subject: Re: [Qemu-devel] Running Qemu in discrete time/step by step
+>
+> On Thu, Oct 19, 2017 at 14:14:12 +0900, Matt wrote:
+> (snip)
+>> - VMSimint does nearly that, it runs Qemu in discrete time but
+>> interface it with a JAVA simulator
+>> http://www.ikr.uni-stuttgart.de/Content/Publications/Archive/We_SIMUTools_2014_40209.pdf
+>> (with the code http://www.ikr.uni-stuttgart.de/Content/IKRSimLib/Download/)
+>> - http://web.ornl.gov/~nutarojj/adevs/ does sthg similar too
+>
+> Nutaro's work to interface with QEMU has been posted on the list:
+>   https://patchwork.kernel.org/patch/9572497/
+> I'm Cc'ing him in case he's not subscribed to the list.
+>
+>
+>> My questions would be:
+>> 1/ do you know of any other related work ?
+>
+> Is QEMU's record/replay mode of any use to you? Note that as is the
+> case with Nutaro's patch, you'll need icount mode (i.e. single-core)
+> enabled.
+>
+>> 2/ I believe there is interest from the research side but would it be
+>> possible to merge either approach or a similar one (adevs patch
+>> doesn't seem too big ~500 lines), would that be of interest for the
+>> Qemu comminity too ?
+>> 3/ if yes to 2. How to proceed, which one would be favorite ? if no,
+>> what should be improved ? or would that be a definitive no ?
+>
+> I think the adevs approach is reasonable. The patch hasn't gotten much
+> attention I guess because not many people care about this feature.
+> But if you could review the patch and certify that it works for you
+> (i.e. it works with simulators other than adevs), that could only help
+> the patch getting in.
+>
+> That said, I make no merging decisions so take this as just my opinion.
+>
+> Cheers,
+>
+>                 Emilio
+>
