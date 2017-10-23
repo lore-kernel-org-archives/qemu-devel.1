@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57279)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58125)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e6YJH-0003Kq-4Q
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 04:42:12 -0400
+	(envelope-from <imammedo@redhat.com>) id 1e6YMl-0004AR-MH
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 04:45:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e6YJD-0008FD-6M
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 04:42:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41156)
+	(envelope-from <imammedo@redhat.com>) id 1e6YMk-00019v-0Z
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 04:45:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41604)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1e6YJD-0008Ew-0F
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 04:42:07 -0400
-Date: Mon, 23 Oct 2017 09:42:01 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20171023084201.GC16472@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20171020141027.17010-1-berrange@redhat.com>
-	<d2200140-bdeb-1746-20a2-15b1fb283c28@redhat.com>
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1e6YMj-00019h-NJ
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 04:45:45 -0400
+Date: Mon, 23 Oct 2017 10:45:41 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20171023104541.4963fcc4@nial.brq.redhat.com>
+In-Reply-To: <20171020195309.GV2942@localhost.localdomain>
+References: <1508170976-96869-1-git-send-email-imammedo@redhat.com>
+	<20171016163636.GI11975@redhat.com>
+	<20171017092702.5b82103b@nial.brq.redhat.com>
+	<20171017150759.GB31897@redhat.com>
+	<20171017180635.6a900616@nial.brq.redhat.com>
+	<20171018153010.GL9719@redhat.com>
+	<20171018202240.GD2942@localhost.localdomain>
+	<20171019114954.GC13245@umbus>
+	<58846850-bbe2-e1c4-2235-58b3f6709ba6@redhat.com>
+	<20171020012130.GG13245@umbus>
+	<20171020195309.GV2942@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <d2200140-bdeb-1746-20a2-15b1fb283c28@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] build: allow setting a custom GIT binary
- for transparent proxying
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC 0/6] enable numa configuration before
+ machine_init() from HMP/QMP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,30 +37,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, "Chen, Farrah" <farrah.chen@intel.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: David Gibson <david@gibson.dropbear.id.au>, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, peter.maydell@linaro.org, pkrempa@redhat.com, cohuck@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com
 
-On Fri, Oct 20, 2017 at 03:06:58PM -0500, Eric Blake wrote:
-> On 10/20/2017 09:10 AM, Daniel P. Berrange wrote:
-> > Some users can't run a bare 'git' command, due to need for a transparent
-> > proxying solution such as 'tsocks'. This adds an argument to configure to
-> > let users specify such a thing:
+On Fri, 20 Oct 2017 17:53:09 -0200
+Eduardo Habkost <ehabkost@redhat.com> wrote:
+
+> On Fri, Oct 20, 2017 at 12:21:30PM +1100, David Gibson wrote:
+> > On Thu, Oct 19, 2017 at 02:23:04PM +0200, Paolo Bonzini wrote:  
+> > > On 19/10/2017 13:49, David Gibson wrote:  
+> > > > Note that describing socket/core/thread tuples as arch independent (or
+> > > > even machine independent) is.. debatable.  I mean it's flexible enough
+> > > > that most platforms can be fit to that scheme without too much
+> > > > straining.  But, there's no arch independent way of defining what each
+> > > > level means in terms of its properties.
+> > > > 
+> > > > So, for example, on spapr - being paravirt - there's no real
+> > > > distinction between cores and sockets, how you divide them up is
+> > > > completely arbitrary.  
+> > > 
+> > > Same on x86, actually.
+> > > 
+> > > It's _common_ that cores on the same socket share L3 cache and that a
+> > > socket spans an integer number of NUMA nodes, but it doesn't have to be
+> > > that way.
+> > > 
+> > > QEMU currently enforces the former (if it tells the guest at all that
+> > > there is an L3 cache), but not the latter.  
 > > 
-> >   ./configure --with-git="tsocks git"
-> > 
-> > The submodule script is also updated to give the user a hint about using this
-> > flag, if we fail to checkout modules.
+> > Ok.  Correct me if I'm wrong, but doesn't ACPI describe the NUMA
+> > architecture in terms of this thread/core/socket heirarchy?  That's
+> > not true for PAPR, where the NUMA topology is described in an
+> > independent set of (potentially arbitrarily nested) nodes.  
 > 
-> Does my hint about using 'git config url.XYZ.insteadof git://...' do the
-> trick without needing this patch?
+> On PC, ACPI NUMA information only refer to CPU APIC IDs, which
+> identify individual CPU threads; it doesn't care about CPU
+> socket/core/thread topology.  If I'm not mistaken, the
+> socket/core/thread topology is not represented in ACPI at all.
+ACPI does node mapping per logical cpu (thread) in SRAT table,
+so virtually we are able to describe insane configurations.
+That however doesn't mean that we should go outside of
+what real hw does and confuse guest which may have certain
+expectations.
 
-IIUC, that only works if the developer can't access 'git://' URLs but
-can access 'https://' URLs. So supporting tunnelling via a tsocks like
-program looks like a more generalized solution to me.
+Currently for x86 expectations are that cpus are mapped to numa
+nodes either by whole cores or whole sockets (AMD and Intel cpus
+respectively). In future it might change.
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+
+> Some guest OSes, however, may get very confused if they see an
+> unexpected NUMA/CPU topology.  IIRC, it was possible to make old
+> Linux kernel versions panic by generating a weird topology.
+
+There where bugs that where fixed on QEMU or guest kernel side
+when unexpected mapping were present. While we can 'fix' guest
+expectation in linux kernel it might be not possible for other
+OSes one more reason we shouldn't allow blind assignment by mgmt.
