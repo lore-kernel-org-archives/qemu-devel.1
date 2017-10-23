@@ -1,24 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54843)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56613)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1e6gLr-00019k-76
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 13:17:24 -0400
+	(envelope-from <prasad.singamsetty@oracle.com>) id 1e6gSH-0002lu-42
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 13:24:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1e6gLq-0003fK-8l
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 13:17:23 -0400
-References: <20171004114008.14849-1-berrange@redhat.com>
-	<20171004114008.14849-3-berrange@redhat.com>
-	<20171020084221.GA3667@localhost.localdomain>
-	<20171020090219.GC21172@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <16e20a84-913c-5cf6-7203-720c393b2718@redhat.com>
-Date: Mon, 23 Oct 2017 13:17:12 -0400
+	(envelope-from <prasad.singamsetty@oracle.com>) id 1e6gSD-000386-2z
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 13:24:01 -0400
+Received: from userp1040.oracle.com ([156.151.31.81]:48847)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <prasad.singamsetty@oracle.com>)
+	id 1e6gSC-00036y-QC
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 13:23:57 -0400
+References: <a41b88a6-4882-1abc-b6e2-e42acf03c198@oracle.com>
+	<20171013170143.GB3370@work-vm> <20171013111403.293919fe@t450s.home>
+	<20171015035318.GA22780@pxdev.xzpeter.org>
+	<c4d07be9-7d9b-71fa-e84c-e393138f7a84@oracle.com>
+	<20171017035604.GJ4166@pxdev.xzpeter.org>
+	<2c478fc6-bb9a-3ac3-1f5d-c853b13dc8a1@oracle.com>
+	<20171019033359.GR4166@pxdev.xzpeter.org>
+	<a5eb5b41-a490-11dc-450c-86983460cd5b@oracle.com>
+	<20171023063759.GE3990@pxdev.xzpeter.org>
+From: Prasad Singamsetty <prasad.singamsetty@oracle.com>
+Message-ID: <d2b2e250-9493-5e08-16a8-f410e51d2bf0@oracle.com>
+Date: Mon, 23 Oct 2017 10:23:43 -0700
 MIME-Version: 1.0
-In-Reply-To: <20171020090219.GC21172@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20171023063759.GE3990@pxdev.xzpeter.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 2/2] ide: support reporting of rotation
- rate
+Subject: Re: [Qemu-devel] host physical address width issues/questions for
+ x86_64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,68 +37,182 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org
+To: Peter Xu <peterx@redhat.com>
+Cc: ehabkost@redhat.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org, Alex Williamson <alex.williamson@redhat.com>, Sunit Jain <sunit.jain@oracle.com>, pbonzini@redhat.com, rth@twiddle.net, "Michael S. Tsirkin" <mst@redhat.com>
 
 
 
-On 10/20/2017 05:02 AM, Daniel P. Berrange wrote:
-> On Fri, Oct 20, 2017 at 10:42:21AM +0200, Kevin Wolf wrote:
->> [ Cc: qemu-block ]
+On 10/22/2017 11:37 PM, Peter Xu wrote:
+> On Fri, Oct 20, 2017 at 03:54:21PM -0700, Prasad Singamsetty wrote:
 >>
->> Am 04.10.2017 um 13:40 hat Daniel P. Berrange geschrieben:
->>> The Linux kernel will query the ATA IDENTITY DEVICE data, word 217
->>> to determine the rotations per minute of the disk. If this has
->>> the value 1, it is taken to be an SSD and so Linux sets the
->>> 'rotational' flag to 0 for the I/O queue and will stop using that
->>> disk as a source of random entropy. Other operating systems may
->>> also take into account rotation rate when setting up default
->>> behaviour.
->>>
->>> Mgmt apps should be able to set the rotation rate for virtualized
->>> block devices, based on characteristics of the host storage in use,
->>> so that the guest OS gets sensible behaviour out of the box. This
->>> patch thus adds a 'rotation-rate' parameter for 'ide-hd' device
->>> types.
->>>
->>> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
->>> ---
->>>  hw/ide/core.c             | 1 +
->>>  hw/ide/qdev.c             | 1 +
->>>  include/hw/ide/internal.h | 8 ++++++++
->>>  3 files changed, 10 insertions(+)
->>>
->>> diff --git a/hw/ide/core.c b/hw/ide/core.c
->>> index 5f1cd3b91f..a04766aee7 100644
->>> --- a/hw/ide/core.c
->>> +++ b/hw/ide/core.c
->>> @@ -208,6 +208,7 @@ static void ide_identify(IDEState *s)
->>>      if (dev && dev->conf.discard_granularity) {
->>>          put_le16(p + 169, 1); /* TRIM support */
->>>      }
->>> +    put_le16(p + 217, dev->rotation_rate); /* Nominal media rotation rate */
 >>
->> Coverity points out that all other dereferences of dev have a NULL check
->> first. Are we sure that it is always non-NULL?
+>> On 10/18/2017 8:33 PM, Peter Xu wrote:
+>>> On Wed, Oct 18, 2017 at 10:19:31AM -0700, Prasad Singamsetty wrote:
+>>>>
+>>>>
+>>>> On 10/16/2017 8:56 PM, Peter Xu wrote:
+>>>>> On Mon, Oct 16, 2017 at 10:02:25AM -0700, Prasad Singamsetty wrote:
+>>>>>>
+>>>>>>
+>>>>>> On 10/14/2017 8:53 PM, Peter Xu wrote:
+>>>>>>> On Fri, Oct 13, 2017 at 11:14:03AM -0600, Alex Williamson wrote:
+>>>>>>>> On Fri, 13 Oct 2017 18:01:44 +0100
+>>>>>>>> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+>>>>>>>>
+>>>>>>>>> * Prasad Singamsetty (prasad.singamsetty@oracle.com) wrote:
+>>>>>>>>>> Hi,
+>>>>>>>>>>
+>>>>>>>>>> I am new to the alias. I have some questions on this subject
+>>>>>>>>>> and seek some clarifications from the experts in the team.
+>>>>>>>>>> I ran into a couple of issues when I tried with large configuration
+>>>>>>>>>> ( >= 1TB memory, > 255 CPUs) for x86_64 guest machine.
+>>>>>>>>>>
+>>>>>>>>>> 1. QEMU uses the default value of 40 (TCG_PHYS_ADDR_BITS) for address
+>>>>>>>>>>     width if user has not specified phys-bits or host-phys-bits=true
+>>>>>>>>>>     property. The default value is obviously not sufficient and
+>>>>>>>>>>     causing guest kernel to crash if configured with >= 1TB
+>>>>>>>>>>     memory. Depending on the linux kernel version in the guest the
+>>>>>>>>>>     panic was in different code paths. The workaround is for the
+>>>>>>>>>>     user to specify the phys-bits property or set the property
+>>>>>>>>>>     host-phys-bits=true.
+>>>>>>>>>>
+>>>>>>>>>>     QUESTIONS:
+>>>>>>>> ...
+>>>>>>>>>> 2. host_address_width in DMAR table structure
+>>>>>>>>>>
+>>>>>>>>>>     In this case, the default value is set to 39
+>>>>>>>>>>     (VTD_HOST_ADDRESS_WIDTH - 1). With interrupt remapping
+>>>>>>>>>>     enabled for the intel iommu and the guest is configured
+>>>>>>>>>>     with > 255 cpus and >= 1TB memory, the guest kernel hangs
+>>>>>>>>>>     during boot up. This need to be fixed.
+>>>>>>>>>>
+>>>>>>>>>>     QUESTION:
+>>>>>>>>>>     The question here again is can we fix this to use the
+>>>>>>>>>>     real address width from the host as the default?
+>>>>>>>>>
+>>>>>>>>> I don't know DMAR stuff; chatting to Alex (cc'd) it does sound
+>>>>>>>>> like that's an ommission that should be fixed.
+>>>>>>>>
+>>>>>>>> [CC +Peter]
+>>>>>>>>
+>>>>>>>> On physical hardware VT-d supports either 39 or 48 bit address widths
+>>>>>>>> and generally you'd expect a sufficiently capable IOMMU to be matched
+>>>>>>>> with the CPU.  Seems QEMU has only implemented a lower bit width and
+>>>>>>>> it should probably be forcing phys bits of the VM to 39 to match until
+>>>>>>>> the extended width can be implemented.  Thanks,
+>>>>>>>>
+>>>>>>>> Alex
+>>>>>>>
+>>>>>>> There were patches that tried to enable 48 bits GAW but it was
+>>>>>>> not accepted somehow:
+>>>>>>>
+>>>>>>>    https://lists.gnu.org/archive/html/qemu-devel/2016-12/msg01886.html
+>>>>>>>
+>>>>>>> Would this help in any way?
+>>>>>>>
+>>>>>>
+>>>>>> Thanks Alex for the patch info. Just curious why the patch was not
+>>>>>> accepted. Any way, I will try it.
+>>>>>
+>>>>> I don't sure I know the reason.  Anyway, it originated from one of
+>>>>> Fam's request for some NVMe tests.  If it can really help for your use
+>>>>> case as well, please feel free to revive those patches, or let me know
+>>>>> so that I can respin.  Thanks,
+>>>>>
+>>>>
+>>>> Thanks Peter. I will start with your patch and see if I can get
+>>>> it to work first.
+>>>>
+>>>> A quick question. Looking at the code, it doesn't look like there
+>>>> is a way to disable dma remapping. User may have a case where he
+>>>> is interested only in interrupt remapping (for > 255 cpus) and
+>>>> not DMA remapping. Is that scenario considered before?
+>>>
+>>> It can be done in the guest if the guest doesn't want DMAR.
+>>>
+>>> Note that there are two isolated kernel tunables for the VT-d device:
+>>>
+>>> - intel_iommu: "on" to turn on DMAR, "off" to turn off DMAR
+>>> - intremap:    "on" to turn on IR, "off" to turn off IR
+>>>
+>>> So even if guest has "intel_iommu=off" in its boot parameter, IR will
+>>> still be on by default (or specify it explicitly using "intremap=on").
 >>
->> A follow-up patch is necessary either way. Either fix the missing NULL
->> check here or remove useless NULL checks in the other places.
+>> Thanks Peter. I think I figured out the problem in my test case
+>> due to VTD_HOST_ADDRESS_WIDTH.
+>>
+>> Problem scenario:
+>>
+>> Guest kernel (machine type q35) is configured with 1TB memory.
+>> With interrupt remapping enabled, the interrupt remapping
+>> table is allocated by the guest kernel which can be any
+>> where in the available physical memory. In my test case,
+>> the physical address of the table is 0xfc3ec00000. And
+>> this gets truncated by vtd_interrupt_remap_table_setup()
+>> function to 0x7c3ec00000. This causes guest kernel to
+>> get invalid data later on and it loops forever in
+>> qi_submit_sync() in the guest kernel trying check fault
+>> status.
+>>
+>> This is after applying the patch from Peter Xu. The patch
+>> is incomplete as the VTD_HAW_MASK is unchanged so it is
+>> defined for 39 bits. There are several other masks defined
+>> based on this in accessing iommu data structures. So, more
+>> changes needed to implement Peter's approach of providing
+>> x-aw-bits property.
 > 
-> 'dev' comes from:
+> Indeed.
 > 
->     IDEDevice *dev = s->unit ? s->bus->slave : s->bus->master;
+>>
+>> Proposal:
+>>
+>> We can simply change the VTD_HOST_ADDRESS_WIDTH to 48 bits
+>> with out any other changes to the code. The current set of
+>> features in the intel iommu emulator code works for q35
+>> machine type and it doesn't have any other side effect.
+>> Since the remapping tables are allocated by the guest kernel
+>> they are always within the phys-bits range and as long
+>> as the same range supported by intel iommu code in QEMU
+>> it works fine. For the current q35 machine type, all the
+>> supported cpus have <= 48 bits as the physical address
+>> width. For short term, just changing the VTD_HOST_ADDRESS_WIDTH
+>> to 48 should work fine for q35. I tried this and it seems
+>> to work fine.
 > 
-> IIUC, this is choosing either the first or the second unit on the IDE
-> bus. Presumably this can be lead to dev==NULL, when the guest OS calls
-> identify on a unit that doesn't have a drive attached. Soo the NULL
-> checks looks like its required to me.
-> 
-> Regards,
-> Daniel
-> 
+> I'm fine to change that macro, but IMHO only changing that line may
+> break backward compatibility of old guests (at least it'll change the
+> max address width reported in ACPI).  So I am not sure that's good.
 
-I'm sorry I didn't notice. I had an unexpected LOA, has this been addressed?
+Could you refer to any specifics on compatibility issues with old
+guests?  The guest linux kernel doesn't seem to report any problem
+with address width in DMAR reported doesn't match with what is
+supported in the host cpu. I would like to better understand the gaps
+we have here.
 
-CC me and I will take care of it.
+What other machine types intel iommu is supported with the current
+implementation? Is there any test suite that can test intel iommu
+functionality on supported guest types?
 
---John
+> 
+> I would prefer still using the new property ("x-aw-bits", or change
+> the name as you prefer) when people really want the 48 bits address
+> width, or even bigger ones in the future.  It makes sure that 39 bits
+> are still the default.
+> 
+> CCing Michael who maintains VT-d emulation codes.
+
+Thanks.
+--Prasad
+
+> 
+>>
+>> For long term, the VTD_HOST_ADDRESS_WIDTH has to match with
+>> host cpu address width. If necessary we may need to define
+>> a new machine type to keep VTD_HOST_ADDRESS_WIDTH value to
+>> match with the host cpu.
+>>
+>> Please let me know if you have any comments or suggestions
+>> on this.
+> 
+> Thanks,
+> 
