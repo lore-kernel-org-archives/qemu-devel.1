@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58731)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58748)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <makovick@gmail.com>) id 1e6jxK-00082Z-2Z
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 17:08:18 -0400
+	(envelope-from <makovick@gmail.com>) id 1e6jxM-000836-SX
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 17:08:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <makovick@gmail.com>) id 1e6jxG-0000s7-Tc
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 17:08:18 -0400
-Received: from mail-wr0-x232.google.com ([2a00:1450:400c:c0c::232]:49296)
+	(envelope-from <makovick@gmail.com>) id 1e6jxM-0000uH-5H
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 17:08:20 -0400
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:47704)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <makovick@gmail.com>) id 1e6jxG-0000rk-NJ
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 17:08:14 -0400
-Received: by mail-wr0-x232.google.com with SMTP id g90so18710824wrd.6
-	for <qemu-devel@nongnu.org>; Mon, 23 Oct 2017 14:08:14 -0700 (PDT)
-Received: from localhost.localdomain (ip-89-177-122-165.net.upcbroadband.cz.
-	[89.177.122.165])
-	by smtp.gmail.com with ESMTPSA id 25sm7199893wrv.8.2017.10.23.14.08.12
-	for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Mon, 23 Oct 2017 14:08:12 -0700 (PDT)
+	(Exim 4.71) (envelope-from <makovick@gmail.com>) id 1e6jxL-0000u7-Uy
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 17:08:20 -0400
+Received: by mail-wm0-x244.google.com with SMTP id t69so11975959wmt.2
+	for <qemu-devel@nongnu.org>; Mon, 23 Oct 2017 14:08:19 -0700 (PDT)
 From: Jindrich Makovicka <makovick@gmail.com>
-Date: Mon, 23 Oct 2017 23:07:56 +0200
-Message-Id: <20171023210803.20998-1-makovick@gmail.com>
-Subject: [Qemu-devel] SDL2 various fixes
+Date: Mon, 23 Oct 2017 23:07:57 +0200
+Message-Id: <20171023210803.20998-2-makovick@gmail.com>
+In-Reply-To: <20171023210803.20998-1-makovick@gmail.com>
+References: <20171023210803.20998-1-makovick@gmail.com>
+Subject: [Qemu-devel] [PATCH 1/7] sdl2: Fix broken display updating after
+ the window is hidden
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,20 +27,29 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Jindrich Makovicka <makovick@gmail.com>
 
-Hi,
+With SDL 2.0.6, calling SDL_ShowWindow during SDL_WINDOWEVENT_HIDDEN
+blocks all subsequent display updates.
+---
+ ui/sdl2.c | 5 -----
+ 1 file changed, 5 deletions(-)
 
-I am sending a couple of patches I needed to apply to make the
-SDL2 GUI work reasonably on Debian Sid, which recently switched
-from SDL1.
-
-The main issue is that the QEMU window stops updating when it is
-minimized, or after a virtual desktop switch. Then, there are
-some regressions due to recently added terminals in multiple
-windows, and some issues with fullscreen mode and window scaling.
-
-I am using MATE desktop 1.18 and SDL 2.0.6.
-
-Regards,
---
-Jindrich Makovicka
+diff --git a/ui/sdl2.c b/ui/sdl2.c
+index 53dd447fd2..7f51933234 100644
+--- a/ui/sdl2.c
++++ b/ui/sdl2.c
+@@ -576,11 +576,6 @@ static void handle_windowevent(SDL_Event *ev)
+             SDL_HideWindow(scon->real_window);
+         }
+         break;
+-    case SDL_WINDOWEVENT_HIDDEN:
+-        if (!scon->hidden) {
+-            SDL_ShowWindow(scon->real_window);
+-        }
+-        break;
+     }
+ }
+ 
+-- 
+2.15.0.rc0
