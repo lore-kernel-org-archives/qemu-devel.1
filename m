@@ -1,30 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40246)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58545)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fahadbutt214@gmail.com>) id 1e6bMF-0004eu-Na
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 07:57:28 -0400
+	(envelope-from <bounces@canonical.com>) id 1e6con-0003ei-5m
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 09:31:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fahadbutt214@gmail.com>) id 1e6bMD-00064U-5p
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 07:57:27 -0400
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:45680)
+	(envelope-from <bounces@canonical.com>) id 1e6cok-0001eY-3E
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 09:31:01 -0400
+Received: from indium.canonical.com ([91.189.90.7]:54786)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <fahadbutt214@gmail.com>)
-	id 1e6bMC-00063l-Vs
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 07:57:25 -0400
-Received: by mail-wm0-x243.google.com with SMTP id q124so9018228wmb.0
-	for <qemu-devel@nongnu.org>; Mon, 23 Oct 2017 04:57:23 -0700 (PDT)
-Received: from [10.0.158.46] (msw-v.fe.bosch.de. [194.39.218.13])
-	by smtp.gmail.com with ESMTPSA id w14sm4585909wmd.9.2017.10.23.04.57.21
-	for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Mon, 23 Oct 2017 04:57:21 -0700 (PDT)
-From: Fahad Butt <fahadbutt214@gmail.com>
-Content-Type: text/plain;
-	charset=us-ascii
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1e6coj-0001e4-T7
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 09:30:58 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1e6coh-0003I4-PD
+	for <qemu-devel@nongnu.org>; Mon, 23 Oct 2017 13:30:55 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id B980A2E80CC
+	for <qemu-devel@nongnu.org>; Mon, 23 Oct 2017 13:30:55 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Mime-Version: 1.0 (1.0)
-Date: Mon, 23 Oct 2017 13:57:19 +0200
-Message-Id: <64A6EC25-B7C7-460C-AB34-4BDF26AEEC4E@gmail.com>
-Subject: [Qemu-devel] Qemu query ( support for new board)
+Date: Mon, 23 Oct 2017 13:17:09 -0000
+From: Julian Andres Klode <julian.klode@gmail.com>
+Reply-To: Bug 1726394 <1726394@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150876459007.17533.9812313883985505054.malonedeb@wampee.canonical.com>
+Message-Id: <150876462954.18471.17999369685637074902.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1726394] Re: Passes through prctl(PR_SET_SECCOMP,
+ SECCOMP_MODE_FILTER, address)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,24 +39,31 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Greetings qemu community,
+Returning EINVAL would make sense, as that's what a pre-seccomp kernel
+or a kernel built without seccomp support would do.
 
-I am a master student here in germany and currently doing my master thesis. I=
- want to use qemu for emulation and i just have few questions and will be ve=
-ry happy to get thek all answered by you experts:
+-- =
 
-1- I want to know whether qemu can be cycle accurate or not? from my search i=
- believe it is not cycle accurate. But is it possible? Cycle accuracy? If no=
-t.  Can you suggest any emulator for a cortex m4 processor based board?
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1726394
 
-2- I want to emulate my cortex m4 hardware using qemu. But this discovery bo=
-ard isnt directly supported by qemu. What needs to be done to support anothe=
-r cortex m4 discovery board for emulation?
+Title:
+  Passes through prctl(PR_SET_SECCOMP, SECCOMP_MODE_FILTER, address)
 
-3- is the Floating point unit and the DSP instructions supported by QEMU?
+Status in QEMU:
+  New
 
-Please try to answer my questions asap. I will be really thankful and it is a=
- big puzzle in my master thesis. Thank you very much.=20
+Bug description:
+  qemu-user passes through prctl(PR_SET_SECCOMP, SECCOMP_MODE_FILTER,
+  address) unmodified, but the third argument is an address to a BPF
+  filter, causing an EFAULT. Now, the filter is architecture-specifc, so
+  you can't just rewrite the addresses, so the safest bet is to just
+  return an error here.
 
-Best regards,
-Fahad masood=
+  I guess you should just return EINVAL, but not sure. I'd really like
+  something that can be identified, so seccomp errors can be ignored
+  when it's not supported.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1726394/+subscriptions
