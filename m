@@ -1,32 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33549)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41086)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1e6WNK-0006Yf-IS
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 02:38:16 -0400
+	(envelope-from <jdenemar@redhat.com>) id 1e6X7Z-0007BY-9D
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 03:26:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1e6WNH-0002pY-DX
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 02:38:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47134)
+	(envelope-from <jdenemar@redhat.com>) id 1e6X7W-0003JK-50
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 03:26:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34488)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1e6WNH-0002pH-3M
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 02:38:11 -0400
-Date: Mon, 23 Oct 2017 14:37:59 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20171023063759.GE3990@pxdev.xzpeter.org>
-References: <a41b88a6-4882-1abc-b6e2-e42acf03c198@oracle.com>
-	<20171013170143.GB3370@work-vm>
-	<20171013111403.293919fe@t450s.home>
-	<20171015035318.GA22780@pxdev.xzpeter.org>
-	<c4d07be9-7d9b-71fa-e84c-e393138f7a84@oracle.com>
-	<20171017035604.GJ4166@pxdev.xzpeter.org>
-	<2c478fc6-bb9a-3ac3-1f5d-c853b13dc8a1@oracle.com>
-	<20171019033359.GR4166@pxdev.xzpeter.org>
-	<a5eb5b41-a490-11dc-450c-86983460cd5b@oracle.com>
+	(Exim 4.71) (envelope-from <jdenemar@redhat.com>) id 1e6X7V-0003Ix-UU
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 03:25:58 -0400
+Date: Mon, 23 Oct 2017 09:25:46 +0200
+From: Jiri Denemark <jdenemar@redhat.com>
+Message-ID: <20171023072546.GO130425@orkuz.home>
+References: <87y3oqugm7.fsf@marc-ibm.boeblingen.de.ibm.com>
+	<20171005121115.GD3946746@orkuz.home>
+	<87y3ok7n2n.fsf@marc-ibm.boeblingen.de.ibm.com>
+	<20171012120714.GA314661@orkuz.home>
+	<87mv4m6pp5.fsf@marc-ibm.boeblingen.de.ibm.com>
+	<7aa560cd-d35f-7feb-a9db-378d3e763a62@redhat.com>
+	<20171020125056.GN130425@orkuz.home>
+	<f43de685-b6d6-14fe-38d1-35481a6ac954@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <a5eb5b41-a490-11dc-450c-86983460cd5b@oracle.com>
-Subject: Re: [Qemu-devel] host physical address width issues/questions for
- x86_64
+In-Reply-To: <f43de685-b6d6-14fe-38d1-35481a6ac954@redhat.com>
+Subject: Re: [Qemu-devel] [libvirt] Question about the host-model CPU mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,166 +33,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Prasad Singamsetty <prasad.singamsetty@oracle.com>
-Cc: ehabkost@redhat.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org, Alex Williamson <alex.williamson@redhat.com>, Sunit Jain <sunit.jain@oracle.com>, pbonzini@redhat.com, rth@twiddle.net, "Michael S. Tsirkin" <mst@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: Marc Hartmayer <mhartmay@linux.vnet.ibm.com>, libvir-list@redhat.com, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Boris Fiuczynski <fiuczy@linux.vnet.ibm.com>, "Jason J. Herne" <jjherne@linux.vnet.ibm.com>, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
 
-On Fri, Oct 20, 2017 at 03:54:21PM -0700, Prasad Singamsetty wrote:
+On Fri, Oct 20, 2017 at 15:04:57 +0200, David Hildenbrand wrote:
+> On 20.10.2017 14:50, Jiri Denemark wrote:
+> > The thing is libvirt calls query-cpu-model-expansion to check what the
+> > host CPU is. This 'host-model' CPU is replaced with the probed CPU model
+> > when a domain starts. The problem described by Marc is that the probed
+> > CPU model cannot be used universally with all machine types. So starting
+> > a domain on such host with machine type s390-virtio-ccw-2.10 works, but
+> > a domain with machine type s390-virtio-ccw-2.9 fails to start with the
+> > same probed CPU model.
+> > 
 > 
-> 
-> On 10/18/2017 8:33 PM, Peter Xu wrote:
-> >On Wed, Oct 18, 2017 at 10:19:31AM -0700, Prasad Singamsetty wrote:
-> >>
-> >>
-> >>On 10/16/2017 8:56 PM, Peter Xu wrote:
-> >>>On Mon, Oct 16, 2017 at 10:02:25AM -0700, Prasad Singamsetty wrote:
-> >>>>
-> >>>>
-> >>>>On 10/14/2017 8:53 PM, Peter Xu wrote:
-> >>>>>On Fri, Oct 13, 2017 at 11:14:03AM -0600, Alex Williamson wrote:
-> >>>>>>On Fri, 13 Oct 2017 18:01:44 +0100
-> >>>>>>"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> >>>>>>
-> >>>>>>>* Prasad Singamsetty (prasad.singamsetty@oracle.com) wrote:
-> >>>>>>>>Hi,
-> >>>>>>>>
-> >>>>>>>>I am new to the alias. I have some questions on this subject
-> >>>>>>>>and seek some clarifications from the experts in the team.
-> >>>>>>>>I ran into a couple of issues when I tried with large configuration
-> >>>>>>>>( >= 1TB memory, > 255 CPUs) for x86_64 guest machine.
-> >>>>>>>>
-> >>>>>>>>1. QEMU uses the default value of 40 (TCG_PHYS_ADDR_BITS) for address
-> >>>>>>>>    width if user has not specified phys-bits or host-phys-bits=true
-> >>>>>>>>    property. The default value is obviously not sufficient and
-> >>>>>>>>    causing guest kernel to crash if configured with >= 1TB
-> >>>>>>>>    memory. Depending on the linux kernel version in the guest the
-> >>>>>>>>    panic was in different code paths. The workaround is for the
-> >>>>>>>>    user to specify the phys-bits property or set the property
-> >>>>>>>>    host-phys-bits=true.
-> >>>>>>>>
-> >>>>>>>>    QUESTIONS:
-> >>>>>>...
-> >>>>>>>>2. host_address_width in DMAR table structure
-> >>>>>>>>
-> >>>>>>>>    In this case, the default value is set to 39
-> >>>>>>>>    (VTD_HOST_ADDRESS_WIDTH - 1). With interrupt remapping
-> >>>>>>>>    enabled for the intel iommu and the guest is configured
-> >>>>>>>>    with > 255 cpus and >= 1TB memory, the guest kernel hangs
-> >>>>>>>>    during boot up. This need to be fixed.
-> >>>>>>>>
-> >>>>>>>>    QUESTION:
-> >>>>>>>>    The question here again is can we fix this to use the
-> >>>>>>>>    real address width from the host as the default?
-> >>>>>>>
-> >>>>>>>I don't know DMAR stuff; chatting to Alex (cc'd) it does sound
-> >>>>>>>like that's an ommission that should be fixed.
-> >>>>>>
-> >>>>>>[CC +Peter]
-> >>>>>>
-> >>>>>>On physical hardware VT-d supports either 39 or 48 bit address widths
-> >>>>>>and generally you'd expect a sufficiently capable IOMMU to be matched
-> >>>>>>with the CPU.  Seems QEMU has only implemented a lower bit width and
-> >>>>>>it should probably be forcing phys bits of the VM to 39 to match until
-> >>>>>>the extended width can be implemented.  Thanks,
-> >>>>>>
-> >>>>>>Alex
-> >>>>>
-> >>>>>There were patches that tried to enable 48 bits GAW but it was
-> >>>>>not accepted somehow:
-> >>>>>
-> >>>>>   https://lists.gnu.org/archive/html/qemu-devel/2016-12/msg01886.html
-> >>>>>
-> >>>>>Would this help in any way?
-> >>>>>
-> >>>>
-> >>>>Thanks Alex for the patch info. Just curious why the patch was not
-> >>>>accepted. Any way, I will try it.
-> >>>
-> >>>I don't sure I know the reason.  Anyway, it originated from one of
-> >>>Fam's request for some NVMe tests.  If it can really help for your use
-> >>>case as well, please feel free to revive those patches, or let me know
-> >>>so that I can respin.  Thanks,
-> >>>
-> >>
-> >>Thanks Peter. I will start with your patch and see if I can get
-> >>it to work first.
-> >>
-> >>A quick question. Looking at the code, it doesn't look like there
-> >>is a way to disable dma remapping. User may have a case where he
-> >>is interested only in interrupt remapping (for > 255 cpus) and
-> >>not DMA remapping. Is that scenario considered before?
-> >
-> >It can be done in the guest if the guest doesn't want DMAR.
-> >
-> >Note that there are two isolated kernel tunables for the VT-d device:
-> >
-> >- intel_iommu: "on" to turn on DMAR, "off" to turn off DMAR
-> >- intremap:    "on" to turn on IR, "off" to turn off IR
-> >
-> >So even if guest has "intel_iommu=off" in its boot parameter, IR will
-> >still be on by default (or specify it explicitly using "intremap=on").
-> 
-> Thanks Peter. I think I figured out the problem in my test case
-> due to VTD_HOST_ADDRESS_WIDTH.
-> 
-> Problem scenario:
-> 
-> Guest kernel (machine type q35) is configured with 1TB memory.
-> With interrupt remapping enabled, the interrupt remapping
-> table is allocated by the guest kernel which can be any
-> where in the available physical memory. In my test case,
-> the physical address of the table is 0xfc3ec00000. And
-> this gets truncated by vtd_interrupt_remap_table_setup()
-> function to 0x7c3ec00000. This causes guest kernel to
-> get invalid data later on and it loops forever in
-> qi_submit_sync() in the guest kernel trying check fault
-> status.
-> 
-> This is after applying the patch from Peter Xu. The patch
-> is incomplete as the VTD_HAW_MASK is unchanged so it is
-> defined for 39 bits. There are several other masks defined
-> based on this in accessing iommu data structures. So, more
-> changes needed to implement Peter's approach of providing
-> x-aw-bits property.
+> My assumption would be that the CPU model is copied into the XML when
+> the domain fist starts. This is what the documentation describes.
 
-Indeed.
+The CPU model is copied into the XML each time the domain starts.
 
+> So when upgrading QEMU, the CPU model in the XML is still the same
+> (z13), even though something different is now reported in the host info
+> after upgrading QEMU (z14).
 > 
-> Proposal:
+> In this case it would continue to work.
 > 
-> We can simply change the VTD_HOST_ADDRESS_WIDTH to 48 bits
-> with out any other changes to the code. The current set of
-> features in the intel iommu emulator code works for q35
-> machine type and it doesn't have any other side effect.
-> Since the remapping tables are allocated by the guest kernel
-> they are always within the phys-bits range and as long
-> as the same range supported by intel iommu code in QEMU
-> it works fine. For the current q35 machine type, all the
-> supported cpus have <= 48 bits as the physical address
-> width. For short term, just changing the VTD_HOST_ADDRESS_WIDTH
-> to 48 should work fine for q35. I tried this and it seems
-> to work fine.
+> The problem is that the CPU model is not copied into the XML doesn't
+> remain there, right? It is suddenly replaced with a z14 host model.
 
-I'm fine to change that macro, but IMHO only changing that line may
-break backward compatibility of old guests (at least it'll change the
-max address width reported in ACPI).  So I am not sure that's good.
+Even preserving the actual CPU model in the XML from the first start
+wouldn't solve the issue. You can always create a new domain with
+s390-virtio-ccw-2.9 machine type even on the upgraded host.
 
-I would prefer still using the new property ("x-aw-bits", or change
-the name as you prefer) when people really want the 48 bits address
-width, or even bigger ones in the future.  It makes sure that 39 bits
-are still the default.
-
-CCing Michael who maintains VT-d emulation codes.
-
-> 
-> For long term, the VTD_HOST_ADDRESS_WIDTH has to match with
-> host cpu address width. If necessary we may need to define
-> a new machine type to keep VTD_HOST_ADDRESS_WIDTH value to
-> match with the host cpu.
-> 
-> Please let me know if you have any comments or suggestions
-> on this.
-
-Thanks,
-
--- 
-Peter Xu
+Jirka
