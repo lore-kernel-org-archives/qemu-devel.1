@@ -1,27 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41400)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42083)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e6fZt-0003uP-FJ
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 12:27:50 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1e6fcd-00069k-OW
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 12:30:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e6fZs-0006Qa-7C
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 12:27:49 -0400
-Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:57128)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1e6fZs-0006Pu-0Q
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 12:27:48 -0400
-Received: by mail-wm0-x233.google.com with SMTP id z3so4002287wme.5
-	for <qemu-devel@nongnu.org>; Mon, 23 Oct 2017 09:27:47 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20171023160959.GC10220@stefanha-x1.localdomain>
-References: <20171023025016.3088-1-programmingkidx@gmail.com>
-	<20171023160959.GC10220@stefanha-x1.localdomain>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 23 Oct 2017 17:27:26 +0100
-Message-ID: <CAFEAcA_13y2-uM11Ko_79TpEsfpFWMTz2-mAiwFseHfAM5CPgA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [libfdt][PATCH v3] implement strnlen for systems
- that need it
+	(envelope-from <eric.auger@redhat.com>) id 1e6fcZ-0007YG-SO
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 12:30:39 -0400
+From: Eric Auger <eric.auger@redhat.com>
+Date: Mon, 23 Oct 2017 18:30:11 +0200
+Message-Id: <1508776211-22175-1-git-send-email-eric.auger@redhat.com>
+Subject: [Qemu-devel] [PATCH] hw/pci-host/gpex: Improve INTX to gsi routing
+ error checking
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,29 +18,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: John Arbuckle <programmingkidx@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <richard.henderson@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, devicetree-compiler@vger.kernel.org, ian@freebsd.org
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: alex.williamson@redhat.com, drjones@redhat.com
 
-On 23 October 2017 at 17:09, Stefan Hajnoczi <stefanha@gmail.com> wrote:
->> +/* strnlen() is not available on Mac OS < 10.7 */
->> +# if (MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_7)
->
-> Does this cover the case where MAC_OS_X_VERSION_MAX_ALLOWED is set to
-> <1070 on a 10.7+ build machine?  It's possible that the <string.h>
-> header would define strnlen() and your code redefines the function
-> (compiler error).
+We exposed gpex_set_irq_num() for machines to set the INTx to
+GSI routing. However if the machine forgets to call that
+function we currently do not check the association was properly
+done. Let's initialize gsi values to -1 and if this value is
+found in gpex_route_intx_pin_to_irq, set the routing mode as
+disabled.
 
-In that case you don't want to use the strnlen() declaration
-from the header, you want the inline somehow, because even if
-the declaration is present and using it doesn't fail compile
-the definition won't be around at runtime.
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+---
+ hw/pci-host/gpex.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
-> It would be best to check how <string.h>, <Availability.h>, and
-> <AvailabilityMacros.h> work to make sure that all cases are handled.  I
-> don't have access to a Mac right now, sorry.
-
-It uses the clang 'attribute availability' syntax:
-https://clang.llvm.org/docs/AttributeReference.html#availability
-
-thanks
--- PMM
+diff --git a/hw/pci-host/gpex.c b/hw/pci-host/gpex.c
+index 4090793..edf305b 100644
+--- a/hw/pci-host/gpex.c
++++ b/hw/pci-host/gpex.c
+@@ -57,9 +57,14 @@ static PCIINTxRoute gpex_route_intx_pin_to_irq(void *opaque, int pin)
+ {
+     PCIINTxRoute route;
+     GPEXHost *s = opaque;
++    int gsi = s->irq_num[pin];
+ 
+-    route.mode = PCI_INTX_ENABLED;
+-    route.irq = s->irq_num[pin];
++    route.irq = gsi;
++    if (gsi < 0) {
++        route.mode = PCI_INTX_DISABLED;
++    } else {
++        route.mode = PCI_INTX_ENABLED;
++    }
+ 
+     return route;
+ }
+@@ -81,6 +86,7 @@ static void gpex_host_realize(DeviceState *dev, Error **errp)
+     sysbus_init_mmio(sbd, &s->io_ioport);
+     for (i = 0; i < GPEX_NUM_IRQS; i++) {
+         sysbus_init_irq(sbd, &s->irq[i]);
++        s->irq_num[i] = -1;
+     }
+ 
+     pci->bus = pci_register_bus(dev, "pcie.0", gpex_set_irq,
+-- 
+2.5.5
