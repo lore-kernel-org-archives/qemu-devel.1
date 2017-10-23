@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36007)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35979)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1e6fHg-0005zi-Ch
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 12:09:01 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1e6fHe-0000ea-Ly
+	(envelope-from <quintela@redhat.com>) id 1e6fHc-0005wh-BO
 	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 12:09:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45148)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <quintela@redhat.com>) id 1e6fHa-0000Zp-3d
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 12:08:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59732)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1e6fHe-0000dd-Fe
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 12:08:58 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 96750BBD8
-	for <qemu-devel@nongnu.org>; Mon, 23 Oct 2017 16:08:57 +0000 (UTC)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1e6fHZ-0000Ye-Rv
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 12:08:54 -0400
 From: Juan Quintela <quintela@redhat.com>
-Date: Mon, 23 Oct 2017 18:07:59 +0200
-Message-Id: <20171023160800.20540-21-quintela@redhat.com>
+Date: Mon, 23 Oct 2017 18:07:57 +0200
+Message-Id: <20171023160800.20540-19-quintela@redhat.com>
 In-Reply-To: <20171023160800.20540-1-quintela@redhat.com>
 References: <20171023160800.20540-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PULL 20/21] qapi: Fix grammar in x-multifd-page-count
- descriptions
+Subject: [Qemu-devel] [PULL 18/21] migration: introduce qemu_ufd_copy_ioctl
+ helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,44 +25,88 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
+Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com, Alexey Perevalov <a.perevalov@samsung.com>
 
-Reported-by: Eric Blake <eblake@redhat.com>
+From: Alexey Perevalov <a.perevalov@samsung.com>
+
+Just for placing auxilary operations inside helper,
+auxilary operations like: track received pages,
+notify about copying operation in futher patches.
+
+Reviewed-by: Juan Quintela <quintela@redhat.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
+Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- qapi/migration.json | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ migration/postcopy-ram.c | 34 +++++++++++++++++++++-------------
+ 1 file changed, 21 insertions(+), 13 deletions(-)
 
-diff --git a/qapi/migration.json b/qapi/migration.json
-index 272f191551..6ae866e1aa 100644
---- a/qapi/migration.json
-+++ b/qapi/migration.json
-@@ -480,7 +480,7 @@
- #                     number of sockets used for migration.  The
- #                     default value is 2 (since 2.11)
- #
--# @x-multifd-page-count: Number of pages sent together to a thread
-+# @x-multifd-page-count: Number of pages sent together to a thread.
- #                        The default value is 16 (since 2.11)
- #
- # Since: 2.4
-@@ -551,7 +551,7 @@
- #                     number of sockets used for migration.  The
- #                     default value is 2 (since 2.11)
- #
--# @x-multifd-page-count: Number of pages sent together to a thread
-+# @x-multifd-page-count: Number of pages sent together to a thread.
- #                        The default value is 16 (since 2.11)
- #
- # Since: 2.4
-@@ -647,7 +647,7 @@
- #                     number of sockets used for migration.
- #                     The default value is 2 (since 2.11)
- #
--# @x-multifd-page-count: Number of pages sent together to a thread
-+# @x-multifd-page-count: Number of pages sent together to a thread.
- #                        The default value is 16 (since 2.11)
- #
- # Since: 2.4
+diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+index d3073b93b5..8bf6432567 100644
+--- a/migration/postcopy-ram.c
++++ b/migration/postcopy-ram.c
+@@ -641,6 +641,25 @@ int postcopy_ram_enable_notify(MigrationIncomingState *mis)
+     return 0;
+ }
+ 
++static int qemu_ufd_copy_ioctl(int userfault_fd, void *host_addr,
++        void *from_addr, uint64_t pagesize)
++{
++    if (from_addr) {
++        struct uffdio_copy copy_struct;
++        copy_struct.dst = (uint64_t)(uintptr_t)host_addr;
++        copy_struct.src = (uint64_t)(uintptr_t)from_addr;
++        copy_struct.len = pagesize;
++        copy_struct.mode = 0;
++        return ioctl(userfault_fd, UFFDIO_COPY, &copy_struct);
++    } else {
++        struct uffdio_zeropage zero_struct;
++        zero_struct.range.start = (uint64_t)(uintptr_t)host_addr;
++        zero_struct.range.len = pagesize;
++        zero_struct.mode = 0;
++        return ioctl(userfault_fd, UFFDIO_ZEROPAGE, &zero_struct);
++    }
++}
++
+ /*
+  * Place a host page (from) at (host) atomically
+  * returns 0 on success
+@@ -648,20 +667,14 @@ int postcopy_ram_enable_notify(MigrationIncomingState *mis)
+ int postcopy_place_page(MigrationIncomingState *mis, void *host, void *from,
+                         RAMBlock *rb)
+ {
+-    struct uffdio_copy copy_struct;
+     size_t pagesize = qemu_ram_pagesize(rb);
+ 
+-    copy_struct.dst = (uint64_t)(uintptr_t)host;
+-    copy_struct.src = (uint64_t)(uintptr_t)from;
+-    copy_struct.len = pagesize;
+-    copy_struct.mode = 0;
+-
+     /* copy also acks to the kernel waking the stalled thread up
+      * TODO: We can inhibit that ack and only do it if it was requested
+      * which would be slightly cheaper, but we'd have to be careful
+      * of the order of updating our page state.
+      */
+-    if (ioctl(mis->userfault_fd, UFFDIO_COPY, &copy_struct)) {
++    if (qemu_ufd_copy_ioctl(mis->userfault_fd, host, from, pagesize)) {
+         int e = errno;
+         error_report("%s: %s copy host: %p from: %p (size: %zd)",
+                      __func__, strerror(e), host, from, pagesize);
+@@ -683,12 +696,7 @@ int postcopy_place_page_zero(MigrationIncomingState *mis, void *host,
+     trace_postcopy_place_page_zero(host);
+ 
+     if (qemu_ram_pagesize(rb) == getpagesize()) {
+-        struct uffdio_zeropage zero_struct;
+-        zero_struct.range.start = (uint64_t)(uintptr_t)host;
+-        zero_struct.range.len = getpagesize();
+-        zero_struct.mode = 0;
+-
+-        if (ioctl(mis->userfault_fd, UFFDIO_ZEROPAGE, &zero_struct)) {
++        if (qemu_ufd_copy_ioctl(mis->userfault_fd, host, NULL, getpagesize())) {
+             int e = errno;
+             error_report("%s: %s zero host: %p",
+                          __func__, strerror(e), host);
 -- 
 2.13.6
