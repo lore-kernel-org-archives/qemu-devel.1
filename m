@@ -1,23 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58359)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35872)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1e6S0i-0001Rr-KU
-	for qemu-devel@nongnu.org; Sun, 22 Oct 2017 21:58:37 -0400
+	(envelope-from <programmingkidx@gmail.com>) id 1e6Sp0-0007Lj-Pf
+	for qemu-devel@nongnu.org; Sun, 22 Oct 2017 22:50:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1e6S0f-0001kh-HL
-	for qemu-devel@nongnu.org; Sun, 22 Oct 2017 21:58:36 -0400
-Received: from mail.cn.fujitsu.com ([183.91.158.132]:21288
-	helo=heian.cn.fujitsu.com) by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1e6S0f-0001jV-4h
-	for qemu-devel@nongnu.org; Sun, 22 Oct 2017 21:58:33 -0400
-References: <150872266458.482.9599261292286121536@b58463cdfd5f>
-From: Dou Liyang <douly.fnst@cn.fujitsu.com>
-Message-ID: <ca9a9b19-9a75-b5e0-ef3b-3c00a38b59f2@cn.fujitsu.com>
-Date: Mon, 23 Oct 2017 09:58:24 +0800
-MIME-Version: 1.0
-In-Reply-To: <150872266458.482.9599261292286121536@b58463cdfd5f>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4] NUMA: Enable adding NUMA node implicitly
+	(envelope-from <programmingkidx@gmail.com>) id 1e6Sov-0005Ji-TM
+	for qemu-devel@nongnu.org; Sun, 22 Oct 2017 22:50:34 -0400
+From: John Arbuckle <programmingkidx@gmail.com>
+Date: Sun, 22 Oct 2017 22:50:16 -0400
+Message-Id: <20171023025016.3088-1-programmingkidx@gmail.com>
+Subject: [Qemu-devel] [libfdt][PATCH v3] implement strnlen for systems that
+ need it
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,41 +18,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, famz@redhat.com
-Cc: thuth@redhat.com, indou.takao@jp.fujitsu.com, ehabkost@redhat.com, mst@redhat.com, izumi.taku@jp.fujitsu.com, david@redhat.com, f4bug@amsat.org, alistair23@gmail.com, imammedo@redhat.com, marcel@redhat.com, pbonzini@redhat.com, rth@twiddle.net, patchew-devel@freelists.org
+To: david@gibson.dropbear.id.au, richard.henderson@linaro.org, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, peter.maydell@linaro.org, devicetree-compiler@vger.kernel.org, ian@freebsd.org
+Cc: John Arbuckle <programmingkidx@gmail.com>
 
-Hi, Fam
+Prior the Mac OS 10.7, the function strnlen() was not available. This patch
+implements strnlen() on Mac OS X versions that are below 10.7.
 
-At 10/23/2017 09:37 AM, no-reply@patchew.org wrote:
-> Hi,
->
-> This series failed build test on s390x host. Please find the details below.
->
-> Type: series
-> Message-id: 1508722422-3861-1-git-send-email-douly.fnst@cn.fujitsu.com
-> Subject: [Qemu-devel] [PATCH v4] NUMA: Enable adding NUMA node implicitly
+Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
+---
+v3 changes:
+- Replaced loop with memchr()
 
->   GEN     hw/pci/trace.h
->   GEN     hw/s390x/trace.h
->   GEN     hw/vfio/trace.h
->   GEN     hw/acpi/trace.h
->   GEN     hw/arm/trace.h
->   GEN     hw/alpha/trace.h
-> Makefile:30: recipe for target 'git-submodule-update' failed
-> make: *** [git-submodule-update] Error 1
+v2 changes:
+- Simplified the code to make it static inline'ed
+- Changed the type of count to size_t
 
-It also seems that there are something mistake in our test machines.
+ libfdt/libfdt_env.h | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
 
-Thanks,
-	dou.
-
-> make: *** Waiting for unfinished jobs....
-> === OUTPUT END ===
->
-> Test command exited with code: 2
->
->
-> ---
-> Email generated automatically by Patchew [http://patchew.org/].
-> Please send your feedback to patchew-devel@freelists.org
->
+diff --git a/libfdt/libfdt_env.h b/libfdt/libfdt_env.h
+index 952056c..d43b66b 100644
+--- a/libfdt/libfdt_env.h
++++ b/libfdt/libfdt_env.h
+@@ -109,4 +109,28 @@ static inline fdt64_t cpu_to_fdt64(uint64_t x)
+ #undef CPU_TO_FDT16
+ #undef EXTRACT_BYTE
+ 
++#ifdef __APPLE__
++#include <AvailabilityMacros.h>
++
++#define MAC_OS_X_VERSION_10_7 1070
++
++/* strnlen() is not available on Mac OS < 10.7 */
++# if (MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_7)
++
++/*
++ * strnlen: returns the length of a string or max_count - which ever is smallest
++ * Input 1 string: the string whose size is to be determined
++ * Input 2 max_count: the maximum value returned by this function
++ * Output: length of the string or max_count (the smallest of the two)
++ */
++static inline size_t strnlen(const char *string, size_t max_count)
++{
++    const char *p = memchr(string, 0, max_count);
++    return p ? p - string : max_count;
++}
++
++#endif /* (MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_7) */
++
++#endif /* __APPLE__ */
++
+ #endif /* _LIBFDT_ENV_H */
+-- 
+2.10.2
