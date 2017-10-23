@@ -1,31 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43901)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46507)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1e6dmi-0001mX-Ar
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 10:33:00 -0400
+	(envelope-from <Yongbok.Kim@imgtec.com>) id 1e6e0E-0004k5-FF
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 10:46:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1e6dme-0006VW-9r
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 10:32:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50844)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1e6dme-0006VJ-22
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 10:32:52 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 257C3149
-	for <qemu-devel@nongnu.org>; Mon, 23 Oct 2017 14:32:51 +0000 (UTC)
-Date: Mon, 23 Oct 2017 15:32:42 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20171023143242.GD2522@work-vm>
-References: <20171018103633.5549-1-quintela@redhat.com>
-	<20171018103633.5549-9-quintela@redhat.com>
+	(envelope-from <Yongbok.Kim@imgtec.com>) id 1e6e0D-0004V7-Qw
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 10:46:54 -0400
+Received: from mailapp01.imgtec.com ([195.59.15.196]:19687)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <Yongbok.Kim@imgtec.com>) id 1e6e0D-0004RN-Jq
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 10:46:53 -0400
+Received: from hhmail02.hh.imgtec.org (unknown [10.100.10.20])
+	by Forcepoint Email with ESMTPS id 1106AD9914E55
+	for <qemu-devel@nongnu.org>; Mon, 23 Oct 2017 15:46:38 +0100 (IST)
+From: Yongbok Kim <yongbok.kim@imgtec.com>
+Date: Mon, 23 Oct 2017 15:46:33 +0100
+Message-ID: <1508769996-5747-1-git-send-email-yongbok.kim@imgtec.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171018103633.5549-9-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 08/10] migration: No need to return the
- size of the cache
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 0/3] MIPS queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,96 +27,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
+To: qemu-devel@nongnu.org
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> After the previous commits, we make sure that the value passed is
-> right, or we just drop an error.  So now we return if there is one
-> error or we have setup correctly the value passed.
-> 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> ---
->  migration/migration.c | 6 ++----
->  migration/ram.c       | 8 +++-----
->  migration/ram.h       | 2 +-
->  3 files changed, 6 insertions(+), 10 deletions(-)
-> 
-> diff --git a/migration/migration.c b/migration/migration.c
-> index 3feffb5e26..f3d4503ce2 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -1371,14 +1371,12 @@ void qmp_migrate_cancel(Error **errp)
->  void qmp_migrate_set_cache_size(int64_t value, Error **errp)
->  {
->      MigrationState *s = migrate_get_current();
-> -    int64_t new_size;
->  
-> -    new_size = xbzrle_cache_resize(value, errp);
-> -    if (new_size < 0) {
-> +    if (xbzrle_cache_resize(value, errp) < 0) {
+The following changes since commit e822e81e350825dd94f41ee2538ff1432b812e=
+b9:
 
-That's not consistent with the function below; it returns
-'0 or negative' for error; this check only tests for negative
-as an error.
+  Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request'=
+ into staging (2017-10-20 15:04:00 +0100)
 
-Dave
+are available in the git repository at:
 
->          return;
->      }
->  
-> -    s->xbzrle_cache_size = new_size;
-> +    s->xbzrle_cache_size = value;
->  }
->  
->  int64_t qmp_query_migrate_cache_size(Error **errp)
-> diff --git a/migration/ram.c b/migration/ram.c
-> index c84f22d759..ed4d3c6295 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -111,15 +111,15 @@ static void XBZRLE_cache_unlock(void)
->   * migration may be using the cache and might finish during this call,
->   * hence changes to the cache are protected by XBZRLE.lock().
->   *
-> - * Returns the new_size or negative in case of error.
-> + * Returns the 0 or negative in case of error.
->   *
->   * @new_size: new cache size
->   * @errp: set *errp if the check failed, with reason
->   */
-> -int64_t xbzrle_cache_resize(int64_t new_size, Error **errp)
-> +int xbzrle_cache_resize(int64_t new_size, Error **errp)
->  {
->      PageCache *new_cache;
-> -    int64_t ret;
-> +    int64_t ret = 0;
->  
->      /* Check for truncation */
->      if (new_size != (size_t)new_size) {
-> @@ -152,8 +152,6 @@ int64_t xbzrle_cache_resize(int64_t new_size, Error **errp)
->          cache_fini(XBZRLE.cache);
->          XBZRLE.cache = new_cache;
->      }
-> -
-> -    ret = new_size;
->  out:
->      XBZRLE_cache_unlock();
->      return ret;
-> diff --git a/migration/ram.h b/migration/ram.h
-> index 511b3dc582..c8ae382b5b 100644
-> --- a/migration/ram.h
-> +++ b/migration/ram.h
-> @@ -35,7 +35,7 @@
->  extern MigrationStats ram_counters;
->  extern XBZRLECacheStats xbzrle_counters;
->  
-> -int64_t xbzrle_cache_resize(int64_t new_size, Error **errp);
-> +int xbzrle_cache_resize(int64_t new_size, Error **errp);
->  uint64_t ram_bytes_remaining(void);
->  uint64_t ram_bytes_total(void);
->  
-> -- 
-> 2.13.6
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+  git://github.com/yongbok/upstream-qemu.git target-mips.next
+
+----------------------------------------------------------------
+MIPS patches 2017-10-23
+
+Changes:
+Update email addresses of Yongbok Kim, James Hogan and Paul Burton.
+
+----------------------------------------------------------------
+
+James Hogan (1):
+  MAINTAINERS: Update James Hogan's email address
+
+Paul Burton (1):
+  MAINTAINERS: Update Paul Burton's email address
+
+Yongbok Kim (1):
+  MAINTAINERS: Update Yongbok Kim's email address
+
+ .mailmap    |    3 +++
+ MAINTAINERS |   10 +++++-----
+ 2 files changed, 8 insertions(+), 5 deletions(-)
