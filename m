@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34139)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34138)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e6i3G-0007TL-5T
+	(envelope-from <bounces@canonical.com>) id 1e6i3G-0007TK-5S
 	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 15:06:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e6i3B-0004XK-5f
+	(envelope-from <bounces@canonical.com>) id 1e6i3B-0004Xb-H2
 	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 15:06:18 -0400
-Received: from indium.canonical.com ([91.189.90.7]:37344)
+Received: from indium.canonical.com ([91.189.90.7]:37372)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1e6i3A-0004WX-UY
+	id 1e6i3B-0004Wu-96
 	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 15:06:13 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1e6i38-0003o9-Rk
+	id 1e6i39-0003oa-RE
 	for <qemu-devel@nongnu.org>; Mon, 23 Oct 2017 19:06:11 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id CFB202E80D0
-	for <qemu-devel@nongnu.org>; Mon, 23 Oct 2017 19:06:10 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 9E0482E80CD
+	for <qemu-devel@nongnu.org>; Mon, 23 Oct 2017 19:06:11 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 23 Oct 2017 18:57:47 -0000
+Date: Mon, 23 Oct 2017 18:57:48 -0000
 From: "Laszlo Ersek \(Red Hat\)" <lersek@redhat.com>
-Reply-To: Bug 1715700 <1715700@bugs.launchpad.net>
+Reply-To: Bug 1714331 <1714331@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <150480187483.29281.9921794433489304819.malonedeb@chaenomeles.canonical.com>
-Message-Id: <150878506728.17616.17990526428109987843.malone@wampee.canonical.com>
+References: <150420685550.8035.5310753798215250364.malonedeb@soybean.canonical.com>
+Message-Id: <150878506856.18173.12928388211734925708.malone@chaenomeles.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1715700] Re: Windows 7 guest won't boot on qemu
- 2.10 (works on 2.9)
+Subject: [Qemu-devel] [Bug 1714331] Re: Virtual machines not working anymore
+ on 2.10
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,42 +45,104 @@ See also LP#1725560.
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1715700
+https://bugs.launchpad.net/bugs/1714331
 
 Title:
-  Windows 7 guest won't boot on qemu 2.10 (works on 2.9)
+  Virtual machines not working anymore on 2.10
 
 Status in QEMU:
-  Fix Committed
+  New
 
 Bug description:
-  Qemu version: 2.10 stable.
-  Guest: Windows 7 SP1 x64, virtio drivers are already installed in the gue=
-st.
-  Command line:
-  qemu-system-x86_64 \
-      -nodefaults \
-      -nodefconfig \
-      -machine type=3Dq35,accel=3Dkvm \
-      -enable-kvm \
-      -cpu host \
-      -m 2048 \
-      -vga virtio \
-      -boot menu=3Don \
-      -smbios file=3D/path/dmidecode_BIOS.bin \
-      -acpitable file=3D/path/acpi_slic.bin \
-      -bios /path/OVMF_CODE.fd \
-      -net none \
-      -drive if=3Dvirtio,media=3Ddisk,file=3D/media/win7.qcow2 \
-      -device pcie-root-port \
-      -device ich9-usb-ehci1 \
-      -device ich9-usb-uhci1 \
-      -device ich9-usb-uhci2 \
-      -device ich9-usb-uhci3
+  Using 2.10, my virtual machine(s) don't work anymore. This happens
+  100% of the times.
 
-  Windows hangs at boot with waving flag screen (flag doesn't freeze,
-  keeps waving indefinitely). Same command line boots fine with Qemu
-  2.9. I tried changing machine type to pc-q35-2.9 - same result.
+  -----
+
+  I use QEMU compiling it from source, on Ubuntu 16.04 amd64. This is
+  the configure command:
+
+      configure --target-list=3Dx86_64-softmmu --enable-debug --enable-gtk
+  --enable-spice --audio-drv-list=3Dpa
+
+  I have one virtual disk, with a Windows 10 64-bit, which I launch in
+  two different ways; both work perfectly on 2.9 (and used to do on 2.8,
+  but I haven't used it for a long time).
+
+  This is the first way:
+
+      qemu-system-x86_64
+        -drive if=3Dpflash,format=3Draw,readonly,file=3D/path/to/OVMF_CODE.=
+fd
+        -drive if=3Dpflash,format=3Draw,file=3D/tmp/OVMF_VARS.fd.tmp
+        -enable-kvm
+        -machine q35,accel=3Dkvm,mem-merge=3Doff
+        -cpu host,kvm=3Doff,hv_vendor_id=3Dvgaptrocks,hv_relaxed,hv_spinloc=
+ks=3D0x1fff,hv_vapic,hv_time
+        -smp 4,cores=3D4,sockets=3D1,threads=3D1
+        -m 4096
+        -display gtk
+        -vga qxl
+        -rtc base=3Dlocaltime
+        -serial none
+        -parallel none
+        -usb
+        -device usb-host,vendorid=3D0xNNNN,productid=3D0xNNNN
+        -device usb-host,vendorid=3D0xNNNN,productid=3D0xNNNN
+        -device usb-host,vendorid=3D0xNNNN,productid=3D0xNNNN
+        -device usb-host,vendorid=3D0xNNNN,productid=3D0xNNNN
+        -device virtio-scsi-pci,id=3Dscsi
+        -drive file=3D/path/to/image-diff.img,id=3Dhdd1,format=3Dqcow2,if=
+=3Dnone,cache=3Dwriteback
+        -device scsi-hd,drive=3Dhdd1
+        -net nic,model=3Dvirtio
+        -net user
+
+  On QEMU 2.10, I get the `Recovery - Your PC/Device needs to be
+  repaired` windows screen; on 2.9, it boots regularly.
+
+  This is the second way:
+
+      qemu-system-x86_64
+        -drive if=3Dpflash,format=3Draw,readonly,file=3D/path/to/OVMF_CODE.=
+fd
+        -drive if=3Dpflash,format=3Draw,file=3D/tmp/OVMF_VARS.fd.tmp
+        -enable-kvm
+        -machine q35,accel=3Dkvm,mem-merge=3Doff
+        -cpu host,kvm=3Doff,hv_vendor_id=3Dvgaptrocks,hv_relaxed,hv_spinloc=
+ks=3D0x1fff,hv_vapic,hv_time
+        -smp 4,cores=3D4,sockets=3D1,threads=3D1
+        -m 10240
+        -vga none
+        -rtc base=3Dlocaltime
+        -serial none
+        -parallel none
+        -usb
+        -device vfio-pci,host=3D01:00.0,multifunction=3Don
+        -device vfio-pci,host=3D01:00.1
+        -device usb-host,vendorid=3D0xNNNN,productid=3D0xNNNN
+        -device usb-host,vendorid=3D0xNNNN,productid=3D0xNNNN
+        -device usb-host,vendorid=3D0xNNNN,productid=3D0xNNNN
+        -device usb-host,vendorid=3D0xNNNN,productid=3D0xNNNN
+        -device usb-host,vendorid=3D0xNNNN,productid=3D0xNNNN
+        -device usb-host,vendorid=3D0xNNNN,productid=3D0xNNNN
+        -device virtio-scsi-pci,id=3Dscsi
+        -drive file=3D/path/to/image-diff.img,id=3Dhdd1,format=3Dqcow2,if=
+=3Dnone,cache=3Dwriteback
+        -device scsi-hd,drive=3Dhdd1
+        -net nic,model=3Dvirtio
+        -net user
+
+  On QEMU 2.10, I get the debug window on the linux monitor, and blank scre=
+en on VFIO one (no BIOS screen at all); after 10/20 seconds, QEMU crashes w=
+ithout any message.
+  On 2.9, this works perfectly.
+
+  -----
+
+  I am able to perform a git bisect, if that helps, but if this is the
+  case, I'd need this issue to be reviewed, since bisecting is going to
+  take me a lot of time.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1715700/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1714331/+subscriptions
