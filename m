@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45386)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45785)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e6bjY-0005Qv-2g
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 08:21:33 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1e6bmJ-0006f6-MG
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 08:24:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e6bjU-0000bp-Mw
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 08:21:32 -0400
-Received: from indium.canonical.com ([91.189.90.7]:60074)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1e6bjU-0000bT-G6
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 08:21:28 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1e6bjS-00055D-65
-	for <qemu-devel@nongnu.org>; Mon, 23 Oct 2017 12:21:26 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 250622E80CC
-	for <qemu-devel@nongnu.org>; Mon, 23 Oct 2017 12:21:26 +0000 (UTC)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1e6bmG-0001Q9-Hw
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 08:24:23 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:38355 helo=relay.sw.ru)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1e6bmG-0001NS-4r
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 08:24:20 -0400
+References: <20171019222637.17890-1-eblake@redhat.com>
+	<20171019222637.17890-12-eblake@redhat.com>
+	<1ffafe3a-ecd0-74b0-ac76-3a93dee3fb6a@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <07fc7ff8-1d31-7fe4-b93e-3ddc407bc479@virtuozzo.com>
+Date: Mon, 23 Oct 2017 15:24:10 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 23 Oct 2017 12:14:28 -0000
-From: Daniel Berrange <1725707@bugs.launchpad.net>
-Reply-To: Bug 1725707 <1725707@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150859618440.18353.4071279587956365769.malonedeb@chaenomeles.canonical.com>
-Message-Id: <150876086860.17961.10125921373649548007.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1725707] Re: QEMU sends excess VNC data to
- websockify even when network is poor
+In-Reply-To: <1ffafe3a-ecd0-74b0-ac76-3a93dee3fb6a@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH v5 11/11] nbd: Minimal structured read for
+ client
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,101 +31,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, pbonzini@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, nbd list <nbd@other.debian.org>
 
-NB, if websockify crashes, then that is a serious flaw in websockify -
-it shouldn't read an unbounded amount of data from QEMU, if it is unable
-to send it onto the client.  If websockify stopped reading data from
-QEMU, then QEMU would in turn stop sending it once the TCP buffer was
-full
+23.10.2017 14:57, Eric Blake wrote:
+> On 10/19/2017 05:26 PM, Eric Blake wrote:
+>> From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>>
+>> Minimal implementation: for structured error only error_report error
+>> message.
+>>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> Signed-off-by: Eric Blake <eblake@redhat.com>
+>>
+>> +static int nbd_parse_offset_hole_payload(NBDStructuredReplyChunk *chunk,
+>> +                                         uint8_t *payload, QEMUIOVector *qiov,
+>> +                                         Error **errp)
+>> +{
+>> +    uint64_t offset;
+>> +    uint32_t hole_size;
+>> +
+>> +    if (chunk->length != sizeof(offset) + sizeof(hole_size)) {
+>> +        error_setg(errp, "Protocol error: invalid payload for "
+>> +                         "NBD_REPLY_TYPE_OFFSET_HOLE");
+>> +        return -EINVAL;
+>> +    }
+>> +
+>> +    offset = payload_advance64(&payload);
+>> +    hole_size = payload_advance32(&payload);
+>> +
+>> +    if (offset > qiov->size - hole_size) {
+>> +        error_setg(errp, "Protocol error: server sent chunk exceeding requested"
+>> +                         " region");
+>> +        return -EINVAL;
+>> +    }
+>> +
+>> +    qemu_iovec_memset(qiov, offset, 0, hole_size);
+> Ouch. We have a discrepancy here, that needs clarification in the NBD
+> spec (cc'd).  In your server implementation, you are returning the
+> offset as sent by the client (that is, all offsets are absolute to the
+> size of the export).  But in this client implementation, you are
+> computing where to decode the zeroes by treating offset as though it
+> were relative to the request, rather than absolute to the export.
+>
+> Or, in numbers, if I request a read of 2k starting at an offset of 4k,
+> the server implementation returns an offset of 4k, and the client
+> rejects the message because 4k is larger than the 2k request.
+>
+> I think that absolute numbers are better to work with than
+> request-relative, but don't see anything in the proposed spec that
+> states one way or the other, so this is your chance to agree with my
+> preference or else argue why request-relative offsets are nicer, before
+> wordsmithing a change to the spec to make it obvious which semantics are
+> intended.  Then I can change either the server to match (if we want
+> request-relative) or the client to remember the original offset it sent
+> in order to turn absolute answers from the server back into
+> request-relative offsets for where to place the zeroes (if we go with
+> absolute offsets).
+>
 
--- =
+I am for absolute offsets too. Here is my mistake (hehe, terrible bug, 
+good catch).
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1725707
-
-Title:
-  QEMU sends excess VNC data to websockify even when network is poor
-
-Status in QEMU:
-  New
-
-Bug description:
-  Description of problem
-  -------------------------
-  In my latest topic, I reported a bug relate to QEMU's websocket:
-  https://bugs.launchpad.net/qemu/+bug/1718964
-
-  It has been fixed but someone mentioned that he met the same problem when=
- using QEMU with a standalone websocket proxy.
-  That makes me confused because in that scenario QEMU will get a "RAW" VNC=
- connection.
-  So I did a test and found that there indeed existed some problems. The pr=
-oblem is:
-
-  When the client's network is poor (on a low speed WAN), QEMU still
-  sends a lot of data to the websocket proxy, then the client get stuck.
-  It seems that only QEMU has this problem, other VNC servers works
-  fine.
-
-  Environment
-  -------------------------
-  All of the following versions have been tested:
-
-  QEMU: 2.8.1.1 / 2.9.1 / 2.10.1 / master (Up to date)
-  Host OS: Ubuntu 16.04 Server LTS / CentOS 7 x86_64_1611
-  Websocket Proxy: websockify 0.6.0 / 0.7.0 / 0.8.0 / master
-  VNC Web Client: noVNC 0.5.1 / 0.61 / 0.62 / master
-  Other VNC Servers: TigerVNC 1.8 / x11vnc 0.9.13 / TightVNC 2.8.8
-
-  Steps to reproduce:
-  -------------------------
-  100% reproducible.
-
-  1. Launch a QEMU instance (No need websocket option):
-  qemu-system-x86_64 -enable-kvm -m 6G ./win_x64.qcow2 -vnc :0
-
-  2. Launch websockify on a separate host and connect to QEMU's VNC port
-
-  3. Open VNC Web Client (noVNC/vnc.html) in browser and connect to
-  websockify
-
-  4. Play a video (e.g. Watch YouTube) on VM (To produce a lot of frame
-  buffer update)
-
-  5. Limit (e.g. Use NetLimiter) the client inbound bandwidth to 300KB/S
-  (To simulate a low speed WAN)
-
-  6. Then client's output gets stuck(less than 1 fps), the cursor is
-  almost impossible to move
-
-  7. Monitor network traffic on the proxy server
-
-  Current result:
-  -------------------------
-  Monitor Downlink/Uplink network traffic on the proxy server
-  (Refer to the attachments for more details).
-
-  1. Used with QEMU
-  - D: 5.9 MB/s U: 5.7 MB/s (Client on LAN)
-  - D: 4.3 MB/s U: 334 KB/s (Client on WAN)
-
-  2. Used with other VNC servers
-  - D: 5.9 MB/s U: 5.6 MB/s (Client on LAN)
-  - D: 369 KB/s U: 328 KB/s (Client on WAN)
-
-  It is found that when the client's network is poor, all the VNC
-  servers (tigervnc/x11vnc/tightvnc) will reduce the VNC data send to
-  websocket proxy (uplink and downlink symmetry), but QEMU never drop
-  any frames and still sends a lot of data to websockify, the client has
-  no capacity to accept so much data, more and more data are accumulated
-  in the websockify, then it crashes.
-
-  Expected results:
-  -------------------------
-  When the client's network is poor (WAN), QEMU will reduce the VNC data se=
-nd to websocket proxy.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1725707/+subscriptions
+-- 
+Best regards,
+Vladimir
