@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57605)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58731)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1e6jsz-0006fm-Tw
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 17:03:50 -0400
+	(envelope-from <makovick@gmail.com>) id 1e6jxK-00082Z-2Z
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 17:08:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1e6jsw-0007Dz-Pr
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 17:03:49 -0400
-Date: Mon, 23 Oct 2017 22:03:42 +0100
-From: "Richard W.M. Jones" <rjones@redhat.com>
-Message-ID: <20171023210342.GD18719@redhat.com>
-References: <20171019075031.25507-1-rjones@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171019075031.25507-1-rjones@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] tpm: Don't call tpm_cleanup unless
- CONFIG_TPM.
+	(envelope-from <makovick@gmail.com>) id 1e6jxG-0000s7-Tc
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 17:08:18 -0400
+Received: from mail-wr0-x232.google.com ([2a00:1450:400c:c0c::232]:49296)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <makovick@gmail.com>) id 1e6jxG-0000rk-NJ
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 17:08:14 -0400
+Received: by mail-wr0-x232.google.com with SMTP id g90so18710824wrd.6
+	for <qemu-devel@nongnu.org>; Mon, 23 Oct 2017 14:08:14 -0700 (PDT)
+Received: from localhost.localdomain (ip-89-177-122-165.net.upcbroadband.cz.
+	[89.177.122.165])
+	by smtp.gmail.com with ESMTPSA id 25sm7199893wrv.8.2017.10.23.14.08.12
+	for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Mon, 23 Oct 2017 14:08:12 -0700 (PDT)
+From: Jindrich Makovicka <makovick@gmail.com>
+Date: Mon, 23 Oct 2017 23:07:56 +0200
+Message-Id: <20171023210803.20998-1-makovick@gmail.com>
+Subject: [Qemu-devel] SDL2 various fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,27 +30,20 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, pbonzini@redhat.com, amarnath.valluri@intel.com, marcandre.lureau@gmail.com, stefanb@linux.vnet.ibm.com
 
+Hi,
 
-Since I posted this, there are more failures with --disable-tpm ...
+I am sending a couple of patches I needed to apply to make the
+SDL2 GUI work reasonably on Debian Sid, which recently switched
+from SDL1.
 
-  LINK    x86_64-softmmu/qemu-system-x86_64
-../vl.o: In function `main':
-/home/rjones/d/qemu/vl.c:4908: undefined reference to `tpm_cleanup'
-../tpm.o: In function `qmp_query_tpm_types':
-/home/rjones/d/qemu/tpm.c:230: undefined reference to `tpm_be_find_by_type'
-../tpm.o: In function `qmp_query_tpm_types':
-tpm.c:(.text+0x4a): undefined reference to `tpm_be_find_by_type'
-tpm.c:(.text+0x7a): undefined reference to `tpm_be_find_by_type'
-collect2: error: ld returned 1 exit status
-make[1]: *** [Makefile:193: qemu-system-x86_64] Error 1
+The main issue is that the QEMU window stops updating when it is
+minimized, or after a virtual desktop switch. Then, there are
+some regressions due to recently added terminals in multiple
+windows, and some issues with fullscreen mode and window scaling.
 
-Rich.
+I am using MATE desktop 1.18 and SDL 2.0.6.
 
--- 
-Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
-Read my programming and virtualization blog: http://rwmj.wordpress.com
-virt-p2v converts physical machines to virtual machines.  Boot with a
-live CD or over the network (PXE) and turn machines into KVM guests.
-http://libguestfs.org/virt-v2v
+Regards,
+--
+Jindrich Makovicka
