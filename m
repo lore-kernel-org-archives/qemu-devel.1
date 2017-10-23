@@ -1,20 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40018)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46171)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sundeep.lkml@gmail.com>) id 1e6TQQ-0004PR-UC
-	for qemu-devel@nongnu.org; Sun, 22 Oct 2017 23:29:16 -0400
+	(envelope-from <changpeng.liu@intel.com>) id 1e6UK7-0003Yi-WD
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 00:26:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sundeep.lkml@gmail.com>) id 1e6TQP-0003pg-Lk
-	for qemu-devel@nongnu.org; Sun, 22 Oct 2017 23:29:14 -0400
+	(envelope-from <changpeng.liu@intel.com>) id 1e6UK4-0003ED-RJ
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 00:26:47 -0400
+Received: from mga04.intel.com ([192.55.52.120]:43595)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <changpeng.liu@intel.com>)
+	id 1e6UK4-0003D2-Gs
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 00:26:44 -0400
+From: "Liu, Changpeng" <changpeng.liu@intel.com>
+Date: Mon, 23 Oct 2017 04:26:36 +0000
+Message-ID: <FF7FC980937D6342B9D289F5F3C7C2625B5D8EB6@SHSMSX103.ccr.corp.intel.com>
+References: <1508390650-19115-1-git-send-email-changpeng.liu@intel.com>
+	<1508390650-19115-3-git-send-email-changpeng.liu@intel.com>
+	<20171019151745.GH6205@stefanha-x1.localdomain>
+	<FF7FC980937D6342B9D289F5F3C7C2625B5D8682@SHSMSX103.ccr.corp.intel.com>
+	<20171020095435.GD21393@stefanha-x1.localdomain>
+In-Reply-To: <20171020095435.GD21393@stefanha-x1.localdomain>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-In-Reply-To: <150868113318.482.11705826106714639873@b58463cdfd5f>
-References: <1508678882-4327-1-git-send-email-sundeep.lkml@gmail.com>
-	<150868113318.482.11705826106714639873@b58463cdfd5f>
-From: sundeep subbaraya <sundeep.lkml@gmail.com>
-Date: Mon, 23 Oct 2017 08:59:12 +0530
-Message-ID: <CALHRZuqhSJC9t3Xrc6-yd3EKcaNUp3NyR+i3FW=i4C7Y16acxA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Qemu devel v3 PATCH] msf2: Remove dead code
- reported by Coverity
+Subject: Re: [Qemu-devel] [PATCH v4 2/4] vhost-user-blk: introduce a new
+ vhost-user-blk host device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,80 +33,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>
-Cc: famz@redhat.com, qemu-arm <qemu-arm@nongnu.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Alistair Francis <alistair23@gmail.com>, Darren Kenny <darren.kenny@oracle.com>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>, "felipe@nutanix.com" <felipe@nutanix.com>, "Harris, James R" <james.r.harris@intel.com>
 
-Hi Peter,
 
-On Sun, Oct 22, 2017 at 7:35 PM, <no-reply@patchew.org> wrote:
 
-> Hi,
->
-> This series failed automatic build test. Please find the testing commands
+> -----Original Message-----
+> From: Stefan Hajnoczi [mailto:stefanha@gmail.com]
+> Sent: Friday, October 20, 2017 5:55 PM
+> To: Liu, Changpeng <changpeng.liu@intel.com>
+> Cc: qemu-devel@nongnu.org; pbonzini@redhat.com; mst@redhat.com;
+> marcandre.lureau@redhat.com; felipe@nutanix.com; Harris, James R
+> <james.r.harris@intel.com>
+> Subject: Re: [PATCH v4 2/4] vhost-user-blk: introduce a new vhost-user-bl=
+k host
+> device
+>=20
+> On Fri, Oct 20, 2017 at 01:47:58AM +0000, Liu, Changpeng wrote:
+> > > > +static Property vhost_user_blk_properties[] =3D {
+> > > > +    DEFINE_PROP_CHR("chardev", VHostUserBlk, chardev),
+> > > > +    DEFINE_PROP_UINT16("num_queues", VHostUserBlk, num_queues, 1),
+> > > > +    DEFINE_PROP_UINT32("queue_size", VHostUserBlk, queue_size, 128=
+),
+> > > > +    DEFINE_PROP_BIT64("f_size_max", VHostUserBlk, host_features,
+> > > > +                      VIRTIO_BLK_F_SIZE_MAX, true),
+> > > > +    DEFINE_PROP_BIT64("f_sizemax", VHostUserBlk, host_features,
+> > > > +                      VIRTIO_BLK_F_SIZE_MAX, true),
+> > > > +    DEFINE_PROP_BIT64("f_segmax", VHostUserBlk, host_features,
+> > > > +                      VIRTIO_BLK_F_SEG_MAX, true),
+> > > > +    DEFINE_PROP_BIT64("f_geometry", VHostUserBlk, host_features,
+> > > > +                      VIRTIO_BLK_F_GEOMETRY, true),
+> > > > +    DEFINE_PROP_BIT64("f_readonly", VHostUserBlk, host_features,
+> > > > +                      VIRTIO_BLK_F_RO, false),
+> > > > +    DEFINE_PROP_BIT64("f_blocksize", VHostUserBlk, host_features,
+> > > > +                      VIRTIO_BLK_F_BLK_SIZE, true),
+> > > > +    DEFINE_PROP_BIT64("f_topology", VHostUserBlk, host_features,
+> > > > +                      VIRTIO_BLK_F_TOPOLOGY, true),
+> > > > +    DEFINE_PROP_BIT64("f_multiqueue", VHostUserBlk, host_features,
+> > > > +                      VIRTIO_BLK_F_MQ, true),
+> > > > +    DEFINE_PROP_BIT64("f_flush", VHostUserBlk, host_features,
+> > > > +                      VIRTIO_BLK_F_FLUSH, true),
+> > > > +    DEFINE_PROP_BIT64("f_barrier", VHostUserBlk, host_features,
+> > > > +                      VIRTIO_BLK_F_BARRIER, false),
+> > > > +    DEFINE_PROP_BIT64("f_scsi", VHostUserBlk, host_features,
+> > > > +                      VIRTIO_BLK_F_SCSI, false),
+> > > > +    DEFINE_PROP_BIT64("f_wce", VHostUserBlk, host_features,
+> > > > +                      VIRTIO_BLK_F_WCE, false),
+> > >
+> > > Please explain how feature negotation works.  The vhost-user slave
+> > > advertises support features in the return value from
+> > > VHOST_USER_GET_FEATURES.  How does this additional feature mask work
 > and
-> their output below. If you have docker installed, you can probably
-> reproduce it
-> locally.
->
-> Type: series
-> Message-id: 1508678882-4327-1-git-send-email-sundeep.lkml@gmail.com
-> Subject: [Qemu-devel] [Qemu devel v3 PATCH] msf2: Remove dead code
-> reported by Coverity
->
-> === TEST SCRIPT BEGIN ===
-> #!/bin/bash
-> set -e
-> git submodule update --init dtc
-> # Let docker tests dump environment info
-> export SHOW_ENV=1
-> export J=8
-> time make docker-test-quick@centos6
-> time make docker-test-build@min-glib
-> time make docker-test-mingw@fedora
-> time make docker-test-block@fedora
-> === TEST SCRIPT END ===
->
-> Updating 3c8cf5a9c21ff8782164d1def7f44bd888713384
-> From https://github.com/patchew-project/qemu
->  * [new tag]               patchew/1508678882-4327-1-git-
-> send-email-sundeep.lkml@gmail.com -> patchew/1508678882-4327-1-git-
-> send-email-sundeep.lkml@gmail.com
-> Switched to a new branch 'test'
-> a1c66b66e7 msf2: Remove dead code reported by Coverity
->
-> === OUTPUT BEGIN ===
-> Submodule 'dtc' (git://git.qemu-project.org/dtc.git) registered for path
-> 'dtc'
-> Cloning into '/var/tmp/patchew-tester-tmp-egubaaoc/src/dtc'...
-> fatal: Could not read from remote repository.
->
-> Please make sure you have the correct access rights
-> and the repository exists.
-> fatal: clone of 'git://git.qemu-project.org/dtc.git' into submodule path
-> '/var/tmp/patchew-tester-tmp-egubaaoc/src/dtc' failed
-> Failed to clone 'dtc'. Retry scheduled
-> Cloning into '/var/tmp/patchew-tester-tmp-egubaaoc/src/dtc'...
-> fatal: Could not read from remote repository.
->
-> Please make sure you have the correct access rights
-> and the repository exists.
-> fatal: clone of 'git://git.qemu-project.org/dtc.git' into submodule path
-> '/var/tmp/patchew-tester-tmp-egubaaoc/src/dtc' failed
-> Failed to clone 'dtc' a second time, aborting
-> === OUTPUT END ===
->
-> Test command exited with code: 1
->
-
-I did not understand. Is the error related to my patch?
-
-Thanks,
-Sundeep
-
-
->
->
-> ---
-> Email generated automatically by Patchew [http://patchew.org/].
-> Please send your feedback to patchew-devel@freelists.org
->
+> > > why is it useful?
+> > According to Paolo's previous comments, VIRTIO_BLK_F_WCE/
+> VIRTIO_BLK_F_SCSI/ VIRTIO_BLK_F_BARRIER
+> > should be removed. Here I added all the feature flags just want to avoi=
+d the
+> case that vhost-user slave target
+> > can support but Qemu vhost block driver cannot support it.
+>=20
+> Please explain a bit more how these options can be used.
+>=20
+> When I looked at the vhost code it seemed like the vhost slave can
+> report any feature bits it wishes (even things QEMU doesn't know about).
+> What is the purpose of override some of the feature bits on the QEMU
+> command-line?
+Hi Stefan,
+Here I added a switch which can override vhost-slave's feature bits, for ex=
+ample, vhost-slave reported `VIRTIO_BLK_F_RO`,
+but Qemu vhost-master can disable it through command line when started the =
+Qemu. Users don't need to change any
+vhost-slave's code to disable this feature, and this is also aligned with v=
+host-scsi and vhost-net's implementation.
+>=20
+> Stefan
