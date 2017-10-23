@@ -1,34 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58125)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58127)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e6YMl-0004AR-MH
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 04:45:48 -0400
+	(envelope-from <kraxel@redhat.com>) id 1e6YMl-0004AS-Rr
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 04:45:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e6YMk-00019v-0Z
+	(envelope-from <kraxel@redhat.com>) id 1e6YMk-0001AM-SO
 	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 04:45:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41604)
+Received: from mx1.redhat.com ([209.132.183.28]:47708)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1e6YMj-00019h-NJ
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 04:45:45 -0400
-Date: Mon, 23 Oct 2017 10:45:41 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20171023104541.4963fcc4@nial.brq.redhat.com>
-In-Reply-To: <20171020195309.GV2942@localhost.localdomain>
-References: <1508170976-96869-1-git-send-email-imammedo@redhat.com>
-	<20171016163636.GI11975@redhat.com>
-	<20171017092702.5b82103b@nial.brq.redhat.com>
-	<20171017150759.GB31897@redhat.com>
-	<20171017180635.6a900616@nial.brq.redhat.com>
-	<20171018153010.GL9719@redhat.com>
-	<20171018202240.GD2942@localhost.localdomain>
-	<20171019114954.GC13245@umbus>
-	<58846850-bbe2-e1c4-2235-58b3f6709ba6@redhat.com>
-	<20171020012130.GG13245@umbus>
-	<20171020195309.GV2942@localhost.localdomain>
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1e6YMk-0001A5-K2
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 04:45:46 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A1346C0587C0
+	for <qemu-devel@nongnu.org>; Mon, 23 Oct 2017 08:45:45 +0000 (UTC)
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Mon, 23 Oct 2017 10:45:38 +0200
+Message-Id: <20171023084538.18210-2-kraxel@redhat.com>
+In-Reply-To: <20171023084538.18210-1-kraxel@redhat.com>
+References: <20171023084538.18210-1-kraxel@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC 0/6] enable numa configuration before
- machine_init() from HMP/QMP
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 1/1] usb-ccid: remove needless migration state
+ code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,59 +33,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, peter.maydell@linaro.org, pkrempa@redhat.com, cohuck@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-On Fri, 20 Oct 2017 17:53:09 -0200
-Eduardo Habkost <ehabkost@redhat.com> wrote:
+From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-> On Fri, Oct 20, 2017 at 12:21:30PM +1100, David Gibson wrote:
-> > On Thu, Oct 19, 2017 at 02:23:04PM +0200, Paolo Bonzini wrote:  
-> > > On 19/10/2017 13:49, David Gibson wrote:  
-> > > > Note that describing socket/core/thread tuples as arch independent (or
-> > > > even machine independent) is.. debatable.  I mean it's flexible enough
-> > > > that most platforms can be fit to that scheme without too much
-> > > > straining.  But, there's no arch independent way of defining what each
-> > > > level means in terms of its properties.
-> > > > 
-> > > > So, for example, on spapr - being paravirt - there's no real
-> > > > distinction between cores and sockets, how you divide them up is
-> > > > completely arbitrary.  
-> > > 
-> > > Same on x86, actually.
-> > > 
-> > > It's _common_ that cores on the same socket share L3 cache and that a
-> > > socket spans an integer number of NUMA nodes, but it doesn't have to be
-> > > that way.
-> > > 
-> > > QEMU currently enforces the former (if it tells the guest at all that
-> > > there is an L3 cache), but not the latter.  
-> > 
-> > Ok.  Correct me if I'm wrong, but doesn't ACPI describe the NUMA
-> > architecture in terms of this thread/core/socket heirarchy?  That's
-> > not true for PAPR, where the NUMA topology is described in an
-> > independent set of (potentially arbitrarily nested) nodes.  
-> 
-> On PC, ACPI NUMA information only refer to CPU APIC IDs, which
-> identify individual CPU threads; it doesn't care about CPU
-> socket/core/thread topology.  If I'm not mistaken, the
-> socket/core/thread topology is not represented in ACPI at all.
-ACPI does node mapping per logical cpu (thread) in SRAT table,
-so virtually we are able to describe insane configurations.
-That however doesn't mean that we should go outside of
-what real hw does and confuse guest which may have certain
-expectations.
+This code appears to be unused since its introduction. We need to keep
+the state_vmstate field byte in VMState for compatibility reasons.
 
-Currently for x86 expectations are that cpus are mapped to numa
-nodes either by whole cores or whole sockets (AMD and Intel cpus
-respectively). In future it might change.
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Message-id: 20171013125533.9153-1-marcandre.lureau@redhat.com
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ hw/usb/dev-smartcard-reader.c | 23 +----------------------
+ 1 file changed, 1 insertion(+), 22 deletions(-)
 
-
-> Some guest OSes, however, may get very confused if they see an
-> unexpected NUMA/CPU topology.  IIRC, it was possible to make old
-> Linux kernel versions panic by generating a weird topology.
-
-There where bugs that where fixed on QEMU or guest kernel side
-when unexpected mapping were present. While we can 'fix' guest
-expectation in linux kernel it might be not possible for other
-OSes one more reason we shouldn't allow blind assignment by mgmt.
+diff --git a/hw/usb/dev-smartcard-reader.c b/hw/usb/dev-smartcard-reader.=
+c
+index 0c77d2a41d..e334d3be11 100644
+--- a/hw/usb/dev-smartcard-reader.c
++++ b/hw/usb/dev-smartcard-reader.c
+@@ -270,11 +270,6 @@ typedef struct BulkIn {
+     uint32_t pos;
+ } BulkIn;
+=20
+-enum {
+-    MIGRATION_NONE,
+-    MIGRATION_MIGRATED,
+-};
+-
+ typedef struct CCIDBus {
+     BusState qbus;
+ } CCIDBus;
+@@ -306,9 +301,6 @@ typedef struct USBCCIDState {
+     CCID_ProtocolDataStructure abProtocolDataStructure;
+     uint32_t ulProtocolDataStructureSize;
+     uint32_t state_vmstate;
+-    uint32_t migration_target_ip;
+-    uint16_t migration_target_port;
+-    uint8_t  migration_state;
+     uint8_t  bmSlotICCState;
+     uint8_t  powered;
+     uint8_t  notify_slot_change;
+@@ -1243,9 +1235,6 @@ int ccid_card_ccid_attach(CCIDCardState *card)
+     USBCCIDState *s =3D USB_CCID_DEV(dev);
+=20
+     DPRINTF(s, 1, "CCID Attach\n");
+-    if (s->migration_state =3D=3D MIGRATION_MIGRATED) {
+-        s->migration_state =3D MIGRATION_NONE;
+-    }
+     return 0;
+ }
+=20
+@@ -1341,9 +1330,6 @@ static void ccid_realize(USBDevice *dev, Error **er=
+rp)
+     s->intr =3D usb_ep_get(dev, USB_TOKEN_IN, CCID_INT_IN_EP);
+     s->bulk =3D usb_ep_get(dev, USB_TOKEN_IN, CCID_BULK_IN_EP);
+     s->card =3D NULL;
+-    s->migration_state =3D MIGRATION_NONE;
+-    s->migration_target_ip =3D 0;
+-    s->migration_target_port =3D 0;
+     s->dev.speed =3D USB_SPEED_FULL;
+     s->dev.speedmask =3D USB_SPEED_MASK_FULL;
+     s->notify_slot_change =3D false;
+@@ -1379,13 +1365,6 @@ static int ccid_pre_save(void *opaque)
+     USBCCIDState *s =3D opaque;
+=20
+     s->state_vmstate =3D s->dev.state;
+-    if (s->dev.attached) {
+-        /*
+-         * Migrating an open device, ignore reconnection CHR_EVENT to av=
+oid an
+-         * erroneous detach.
+-         */
+-        s->migration_state =3D MIGRATION_MIGRATED;
+-    }
+=20
+     return 0;
+ }
+@@ -1452,7 +1431,7 @@ static VMStateDescription ccid_vmstate =3D {
+         VMSTATE_STRUCT_ARRAY(pending_answers, USBCCIDState,
+                         PENDING_ANSWERS_NUM, 1, answer_vmstate, Answer),
+         VMSTATE_UINT32(pending_answers_num, USBCCIDState),
+-        VMSTATE_UINT8(migration_state, USBCCIDState),
++        VMSTATE_UNUSED(1), /* was migration_state */
+         VMSTATE_UINT32(state_vmstate, USBCCIDState),
+         VMSTATE_END_OF_LIST()
+     }
+--=20
+2.9.3
