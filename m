@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55335)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40246)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e6cVz-0000V5-Gb
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 09:11:36 -0400
+	(envelope-from <fahadbutt214@gmail.com>) id 1e6bMF-0004eu-Na
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 07:57:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e6cVv-00086D-Iz
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 09:11:35 -0400
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:54109)
+	(envelope-from <fahadbutt214@gmail.com>) id 1e6bMD-00064U-5p
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 07:57:27 -0400
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:45680)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1e6cVv-00085d-A8
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 09:11:31 -0400
-Received: by mail-wr0-x242.google.com with SMTP id u40so11440996wrf.10
-	for <qemu-devel@nongnu.org>; Mon, 23 Oct 2017 06:11:31 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20171023122719.17199-1-Jason@zx2c4.com>
-References: <20171023122719.17199-1-Jason@zx2c4.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 23 Oct 2017 14:11:09 +0100
-Message-ID: <CAFEAcA_PM5Fjx2Pk58h75p9vaZwFcusQdXuwy9tbDtc=EaoOJg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH] hw/arm/virt: support 4 serial
- ports
+	(Exim 4.71) (envelope-from <fahadbutt214@gmail.com>)
+	id 1e6bMC-00063l-Vs
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 07:57:25 -0400
+Received: by mail-wm0-x243.google.com with SMTP id q124so9018228wmb.0
+	for <qemu-devel@nongnu.org>; Mon, 23 Oct 2017 04:57:23 -0700 (PDT)
+Received: from [10.0.158.46] (msw-v.fe.bosch.de. [194.39.218.13])
+	by smtp.gmail.com with ESMTPSA id w14sm4585909wmd.9.2017.10.23.04.57.21
+	for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Mon, 23 Oct 2017 04:57:21 -0700 (PDT)
+From: Fahad Butt <fahadbutt214@gmail.com>
+Content-Type: text/plain;
+	charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0 (1.0)
+Date: Mon, 23 Oct 2017 13:57:19 +0200
+Message-Id: <64A6EC25-B7C7-460C-AB34-4BDF26AEEC4E@gmail.com>
+Subject: [Qemu-devel] Qemu query ( support for new board)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,33 +33,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>
+To: qemu-devel@nongnu.org
 
-On 23 October 2017 at 13:27, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
-> The QEMU man page says:
->
->        -serial dev
->            This option can be used several times to
->            simulate up to 4 serial ports.
->
-> However, the ARM virt machine erroneously only provides 1 serial port.
-> This patch fixes it by populating 4 of them.
->
-> But, unfortunately, this patch doesn't actually work. Sending it to the
-> list as inspiration for somebody on the ARM team who might be able to do
-> this more properly.
+Greetings qemu community,
 
-This is really the documentation being wrong -- that is actually
-a PC specific thing. In QEMU generally, -serial can be used
-for as many serial ports as the machine model provides, up
-to a maximum of four.
+I am a master student here in germany and currently doing my master thesis. I=
+ want to use qemu for emulation and i just have few questions and will be ve=
+ry happy to get thek all answered by you experts:
 
-Why do you want more than one serial port in the virt board?
-If there's a good reason we can add more, but mostly I only
-expected that one would be needed, for the console.
-(If you're using the TrustZone/EL3 support then there's
-a second UART for the Secure world.)
+1- I want to know whether qemu can be cycle accurate or not? from my search i=
+ believe it is not cycle accurate. But is it possible? Cycle accuracy? If no=
+t.  Can you suggest any emulator for a cortex m4 processor based board?
 
-thanks
--- PMM
+2- I want to emulate my cortex m4 hardware using qemu. But this discovery bo=
+ard isnt directly supported by qemu. What needs to be done to support anothe=
+r cortex m4 discovery board for emulation?
+
+3- is the Floating point unit and the DSP instructions supported by QEMU?
+
+Please try to answer my questions asap. I will be really thankful and it is a=
+ big puzzle in my master thesis. Thank you very much.=20
+
+Best regards,
+Fahad masood=
