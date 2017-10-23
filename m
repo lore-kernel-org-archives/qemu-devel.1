@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33563)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33941)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <farrah.chen@intel.com>) id 1e6d13-0000sg-8v
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 09:43:42 -0400
+	(envelope-from <berrange@redhat.com>) id 1e6d3X-0001bi-DC
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 09:46:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <farrah.chen@intel.com>) id 1e6d10-0006yu-58
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 09:43:41 -0400
-Received: from mga07.intel.com ([134.134.136.100]:11413)
+	(envelope-from <berrange@redhat.com>) id 1e6d3R-00085a-CA
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 09:46:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40101)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <farrah.chen@intel.com>)
-	id 1e6d0z-0006yP-Rt
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 09:43:38 -0400
-From: "Chen, Farrah" <farrah.chen@intel.com>
-Date: Mon, 23 Oct 2017 13:43:30 +0000
-Message-ID: <1B925CC0CD9F3341B32D442251E7E1DC39106402@shsmsx102.ccr.corp.intel.com>
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1e6d3R-00085A-5F
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 09:46:09 -0400
+Date: Mon, 23 Oct 2017 14:46:03 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20171023134603.GL16472@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
 References: <1B925CC0CD9F3341B32D442251E7E1DC391048B2@shsmsx102.ccr.corp.intel.com>
 	<CAFEAcA81-ht6tTc-nwiios3pjnWjNC49gZp8RQAOdNntM3tkUw@mail.gmail.com>
-In-Reply-To: <CAFEAcA81-ht6tTc-nwiios3pjnWjNC49gZp8RQAOdNntM3tkUw@mail.gmail.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	<1B925CC0CD9F3341B32D442251E7E1DC39106402@shsmsx102.ccr.corp.intel.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1B925CC0CD9F3341B32D442251E7E1DC39106402@shsmsx102.ccr.corp.intel.com>
 Subject: Re: [Qemu-devel] qemu compile error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -29,46 +29,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, "Daniel P. Berrange" <berrange@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Hu, Robert" <robert.hu@intel.com>
+To: "Chen, Farrah" <farrah.chen@intel.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Hu, Robert" <robert.hu@intel.com>
 
-VGhhbmsgeW91IHZlcnkgbXVjaCENCkkgcmVtb3ZlZCAiMT4vZGV2L251bGwgMj4mMSIgaW4gc2Ny
-aXB0cy9naXQtc3VibW9kdWxlLnNoIGFuZCBmb3VuZCBJIGNhbid0IGdpdCBjbG9uZSBnaXQ6Ly9n
-aXQucWVtdS1wcm9qZWN0Lm9yZy9kdGMuZ2l0IHdpdGhvdXQgdHNvY2tzLg0KSSB1c2VkIERhbmll
-bCdzIGFwcHJvYWNoLCBjcmVhdGVkIHRoZSB3cmFwcGVyIHNjcmlwdCBjYWxsZWQgJ2dpdCcgdGhh
-dCBydW5zICdleGVjIHRzb2NrcyAvdXNyL2Jpbi9naXQgIiRAIicsIGl0IHN1Y2NlZWRlZC4NCkNv
-bnNpZGVyaW5nIHdlIHN0aWxsIG5lZWQgdG8gdXNlIGJhcmUgJ2dpdCcgIHRvIGFjY2VzcyBvdXIg
-aW50ZXJuYWwgcmVwbywgc28sIGZvciB0aGUgdGltZSBiZWluZywgSSB1c2UgdHNvY2tzIHRvIGdp
-dCBjbG9uZSBnaXQ6Ly9naXQucWVtdS1wcm9qZWN0Lm9yZy9kdGMuZ2l0IGFuZCBnaXQ6Ly9naXQu
-cWVtdS5vcmcva2V5Y29kZW1hcGRiLmdpdCBmaXJzdCwgdGhlbiBtb2RpZmllZCB1cmwgaW4gLmdp
-dG1vZHVsZXMgYmVmb3JlIGNvbXBpbGluZy4gSXQgd29ya3MuDQoNCg0KVGhhbmtzLA0KRmFuDQoN
-CiANCi0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQpGcm9tOiBQZXRlciBNYXlkZWxsIFttYWls
-dG86cGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnXSANClNlbnQ6IEZyaWRheSwgT2N0b2JlciAyMCwg
-MjAxNyA4OjQyIFBNDQpUbzogQ2hlbiwgRmFycmFoIDxmYXJyYWguY2hlbkBpbnRlbC5jb20+DQpD
-YzogcWVtdS1kZXZlbEBub25nbnUub3JnOyBIdSwgUm9iZXJ0IDxyb2JlcnQuaHVAaW50ZWwuY29t
-PjsgRGFuaWVsIFAuIEJlcnJhbmdlIDxiZXJyYW5nZUByZWRoYXQuY29tPg0KU3ViamVjdDogUmU6
-IFtRZW11LWRldmVsXSBxZW11IGNvbXBpbGUgZXJyb3INCg0KT24gMjAgT2N0b2JlciAyMDE3IGF0
-IDEzOjEzLCBDaGVuLCBGYXJyYWggPGZhcnJhaC5jaGVuQGludGVsLmNvbT4gd3JvdGU6DQo+IEhp
-LA0KPg0KPiBXaGVuIEkgYnVpbGQgcWVtdSB3aXRoIGNvbW1pdCBmcm9tIGFlZjQ1ZDUxZDEyMDRm
-MzMzNWZiOTlkZTY2NThlMGM1NjEyYzJiNjcgdG8gdGhlIGxhdGVzdCBvbmUsIHRoZSBmb2xsb3dp
-bmcgZXJyb3Igb2NjdXJyZWQ6DQo+DQo+IHRzb2NrcyBnaXQgY2xvbmUgZ2l0Oi8vZ2l0LnFlbXUu
-b3JnL3FlbXUuZ2l0IGNkIHFlbXUNCj4NCj4gLi9jb25maWd1cmUgLS10YXJnZXQtbGlzdD14ODZf
-NjQtc29mdG1tdSAtLWVuYWJsZS1rdm0gLS1lbmFibGUtdm5jIA0KPiAtLWRpc2FibGUtZ3RrIC0t
-ZW5hYmxlLWxpYnVzYiAtLWVuYWJsZS1udW1hIC0tZGlzYWJsZS1zZGwgbWFrZQ0KPiAgIEdFTiAg
-ICAgY29uZmlnLWhvc3QuaA0KPiAgIEdJVCAgICAgZHRjDQo+ICAgR0VOICAgICB0cmFjZS9nZW5l
-cmF0ZWQtdGNnLXRyYWNlcnMuaA0KPiAgIEdFTiAgICAgdHJhY2UvZ2VuZXJhdGVkLWhlbHBlcnMt
-d3JhcHBlcnMuaA0KPiAgIEdFTiAgICAgdHJhY2UvZ2VuZXJhdGVkLWhlbHBlcnMuaA0KPiAgIEdF
-TiAgICAgbW9kdWxlX2Jsb2NrLmgNCj4gICBHRU4gICAgIHRyYWNlL2dlbmVyYXRlZC1oZWxwZXJz
-LmMNCj4gbWFrZTogKioqIFtnaXQtc3VibW9kdWxlLXVwZGF0ZV0gRXJyb3IgMQ0KDQpEYW4gLS0g
-SSB0aG91Z2h0IHdlIHdlcmUgZ29pbmcgdG8gbm90IGhhdmUgdGhlIGdpdC1zdWJtb2R1bGUuc2gg
-c2NyaXB0IHRocm93IGF3YXkgdGhlIGVycm9ycyBmcm9tIGdpdCwgYnV0IHRoZSB2ZXJzaW9uIGlu
-IG1hc3RlciBzdGlsbCBzZWVtcyB0byBkbyB0aGF0Li4uDQoNCkZhbjogdGhpcyBoYXBwZW5zIGJl
-Y2F1c2Ugd2UgdHJpZWQgdG8gcnVuIGEgJ2dpdCBzdWJtb2R1bGUnDQpjb21tYW5kIGFuZCBpdCBm
-YWlsZWQuIElmIHlvdSBlZGl0IHNjcmlwdHMvZ2l0LXN1Ym1vZHVsZS5zaCB0byByZW1vdmUgdGhl
-ICIxPi9kZXYvbnVsbCAyPiYxIiBwYXJ0IG9mIHRoZSAnZ2l0IHN1Ym1vZHVsZSB1cGRhdGUnIGNv
-bW1hbmQgbGluZSB0aGVuIHJlcnVuIG1ha2UgaXQgc2hvdWxkIHByaW50IHRoZSBlcnJvciBtZXNz
-YWdlcyBmcm9tIGdpdCB3aGljaCB3aWxsIHRlbGwgeW91IHdoYXQgdGhlIHByb2JsZW0gaXMuDQoN
-CihUaGUgZmFjdCB5b3UgbmVlZGVkIHRvIHNheSAndHNvY2tzIGdpdCBjbG9uZS4uLicgb24geW91
-ciBvcmlnaW5hbCBjb21tYW5kIHN1Z2dlc3RzIHRvIG1lIHRoYXQgdGhlIHByb2JsZW0gaXMgdGhh
-dCBwbGFpbiAnZ2l0IHN1Ym1vZHVsZSB1cGRhdGUnIGNhbid0IGFjY2VzcyB0aGUgZ2l0IHJlcG8u
-KQ0KDQp0aGFua3MNCi0tIFBNTQ0K
+On Mon, Oct 23, 2017 at 01:43:30PM +0000, Chen, Farrah wrote:
+> Thank you very much!
+> I removed "1>/dev/null 2>&1" in scripts/git-submodule.sh and found I can't
+> git clone git://git.qemu-project.org/dtc.git without tsocks.
+> I used Daniel's approach, created the wrapper script called 'git' that runs
+> 'exec tsocks /usr/bin/git "$@"', it succeeded.
+> Considering we still need to use bare 'git'  to access our internal repo,
+> so, for the time being, I use tsocks to git clone
+> git://git.qemu-project.org/dtc.git and git://git.qemu.org/keycodemapdb.git
+> first, then modified url in .gitmodules before compiling. It works.
+
+To avoid need to create the wrapper script, I copied you on a patch that
+would let you run
+
+  ./configure --with-git="tsocks git"
+
+As a further alternative, I think it might also be possible to just run
+
+  tsocks ./scripts/git-submodule.sh dtc ui/keycodemapdb
+
+immediately after configure, but before running make.
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
