@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47312)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52192)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1e6XhT-0007GM-AE
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 04:03:14 -0400
+	(envelope-from <imammedo@redhat.com>) id 1e6Xvv-0005d5-NB
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 04:18:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1e6XhP-0006bn-Di
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 04:03:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47038)
+	(envelope-from <imammedo@redhat.com>) id 1e6Xvq-0006vU-OR
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 04:18:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59528)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1e6XhP-0006b6-8Z
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 04:03:03 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 519B42D0FB3
-	for <qemu-devel@nongnu.org>; Mon, 23 Oct 2017 08:03:02 +0000 (UTC)
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Mon, 23 Oct 2017 10:02:45 +0200
-Message-Id: <20171023080245.31300-4-kraxel@redhat.com>
-In-Reply-To: <20171023080245.31300-1-kraxel@redhat.com>
-References: <20171023080245.31300-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 3/3] scripts: don't throw away stderr when
- checking out git submodules
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1e6Xvq-0006v1-FL
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 04:17:58 -0400
+Date: Mon, 23 Oct 2017 10:17:52 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20171023101752.427a51d9@nial.brq.redhat.com>
+In-Reply-To: <20171020195309.GV2942@localhost.localdomain>
+References: <1508170976-96869-1-git-send-email-imammedo@redhat.com>
+	<20171016163636.GI11975@redhat.com>
+	<20171017092702.5b82103b@nial.brq.redhat.com>
+	<20171017150759.GB31897@redhat.com>
+	<20171017180635.6a900616@nial.brq.redhat.com>
+	<20171018153010.GL9719@redhat.com>
+	<20171018202240.GD2942@localhost.localdomain>
+	<20171019114954.GC13245@umbus>
+	<58846850-bbe2-e1c4-2235-58b3f6709ba6@redhat.com>
+	<20171020012130.GG13245@umbus>
+	<20171020195309.GV2942@localhost.localdomain>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC 0/6] enable numa configuration before
+ machine_init() from HMP/QMP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,34 +37,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: David Gibson <david@gibson.dropbear.id.au>, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, peter.maydell@linaro.org, pkrempa@redhat.com, cohuck@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com
 
-From: "Daniel P. Berrange" <berrange@redhat.com>
+On Fri, 20 Oct 2017 17:53:09 -0200
+Eduardo Habkost <ehabkost@redhat.com> wrote:
 
-The stderr from git is important if git fails to checkout modules
-due to network problems, or other unexpected errors.
-
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Message-id: 20171020130748.22983-1-berrange@redhat.com
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- scripts/git-submodule.sh | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/scripts/git-submodule.sh b/scripts/git-submodule.sh
-index d8fbc7e47e..08932a35f0 100755
---- a/scripts/git-submodule.sh
-+++ b/scripts/git-submodule.sh
-@@ -32,7 +32,7 @@ status)
-     exit $?
-     ;;
- update)
--    git submodule update --init $modules 1>/dev/null 2>&1
-+    git submodule update --init $modules 1>/dev/null
-     git submodule status $modules > "${substat}"
-     ;;
- esac
--- 
-2.9.3
+> On Fri, Oct 20, 2017 at 12:21:30PM +1100, David Gibson wrote:
+> > On Thu, Oct 19, 2017 at 02:23:04PM +0200, Paolo Bonzini wrote:  
+> > > On 19/10/2017 13:49, David Gibson wrote:  
+> > > > Note that describing socket/core/thread tuples as arch independent (or
+> > > > even machine independent) is.. debatable.  I mean it's flexible enough
+> > > > that most platforms can be fit to that scheme without too much
+> > > > straining.  But, there's no arch independent way of defining what each
+> > > > level means in terms of its properties.
+> > > > 
+> > > > So, for example, on spapr - being paravirt - there's no real
+> > > > distinction between cores and sockets, how you divide them up is
+> > > > completely arbitrary.  
+> > > 
+> > > Same on x86, actually.
+> > > 
+> > > It's _common_ that cores on the same socket share L3 cache and that a
+> > > socket spans an integer number of NUMA nodes, but it doesn't have to be
+> > > that way.
+> > > 
+> > > QEMU currently enforces the former (if it tells the guest at all that
+> > > there is an L3 cache), but not the latter.  
+> > 
+> > Ok.  Correct me if I'm wrong, but doesn't ACPI describe the NUMA
+> > architecture in terms of this thread/core/socket heirarchy?  That's
+> > not true for PAPR, where the NUMA topology is described in an
+> > independent set of (potentially arbitrarily nested) nodes.  
+> 
+> On PC, ACPI NUMA information only refer to CPU APIC IDs, which
+> identify individual CPU threads; it doesn't care about CPU
+> socket/core/thread topology.  If I'm not mistaken, the
+> socket/core/thread topology is not represented in ACPI at all.
+> 
+> Some guest OSes, however, may get very confused if they see an
+> unexpected NUMA/CPU topology.  IIRC, it was possible to make old
+> Linux kernel versions panic by generating a weird topology.
+It doesn't mean that it's right thing to do random mapping.
+Even if it doesn't crash linux guest anymore, it might have
+performance implications on running guest. I'd assume it
+outweighs a 1 restart configure cost at domain xml creation time,
+the rest of the times vm is started it can reuse cached options.
