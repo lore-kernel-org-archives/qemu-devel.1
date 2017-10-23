@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33941)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34639)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e6d3X-0001bi-DC
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 09:46:16 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1e6d6L-0002b8-U0
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 09:49:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e6d3R-00085a-CA
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 09:46:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40101)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1e6d3R-00085A-5F
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 09:46:09 -0400
-Date: Mon, 23 Oct 2017 14:46:03 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20171023134603.GL16472@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <1B925CC0CD9F3341B32D442251E7E1DC391048B2@shsmsx102.ccr.corp.intel.com>
-	<CAFEAcA81-ht6tTc-nwiios3pjnWjNC49gZp8RQAOdNntM3tkUw@mail.gmail.com>
-	<1B925CC0CD9F3341B32D442251E7E1DC39106402@shsmsx102.ccr.corp.intel.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1e6d6H-0000lX-36
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 09:49:09 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20171023122719.17199-1-Jason@zx2c4.com>
+	<CAFEAcA_PM5Fjx2Pk58h75p9vaZwFcusQdXuwy9tbDtc=EaoOJg@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <10e16ca3-175b-9f34-65e7-031b883b7201@amsat.org>
+Date: Mon, 23 Oct 2017 10:48:58 -0300
 MIME-Version: 1.0
+In-Reply-To: <CAFEAcA_PM5Fjx2Pk58h75p9vaZwFcusQdXuwy9tbDtc=EaoOJg@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1B925CC0CD9F3341B32D442251E7E1DC39106402@shsmsx102.ccr.corp.intel.com>
-Subject: Re: [Qemu-devel] qemu compile error
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH] hw/arm/virt: support 4 serial
+ ports
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,34 +29,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Chen, Farrah" <farrah.chen@intel.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Hu, Robert" <robert.hu@intel.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>, QEMU Trivial <qemu-trivial@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Mon, Oct 23, 2017 at 01:43:30PM +0000, Chen, Farrah wrote:
-> Thank you very much!
-> I removed "1>/dev/null 2>&1" in scripts/git-submodule.sh and found I can't
-> git clone git://git.qemu-project.org/dtc.git without tsocks.
-> I used Daniel's approach, created the wrapper script called 'git' that runs
-> 'exec tsocks /usr/bin/git "$@"', it succeeded.
-> Considering we still need to use bare 'git'  to access our internal repo,
-> so, for the time being, I use tsocks to git clone
-> git://git.qemu-project.org/dtc.git and git://git.qemu.org/keycodemapdb.git
-> first, then modified url in .gitmodules before compiling. It works.
+Hi Peter,
 
-To avoid need to create the wrapper script, I copied you on a patch that
-would let you run
+On 10/23/2017 10:11 AM, Peter Maydell wrote:
+> This is really the documentation being wrong -- that is actually
+> a PC specific thing. In QEMU generally, -serial can be used
+> for as many serial ports as the machine model provides, up
+> to a maximum of four.
 
-  ./configure --with-git="tsocks git"
-
-As a further alternative, I think it might also be possible to just run
-
-  tsocks ./scripts/git-submodule.sh dtc ui/keycodemapdb
-
-immediately after configure, but before running make.
+FYI I'm still working on not having QEMU so tied to his PC origins.
+I won't make it before soft freeze although :(
 
 Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+
+Phil.
