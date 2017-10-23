@@ -1,32 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51656)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52157)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e6Zwi-0008AX-CY
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 06:27:01 -0400
+	(envelope-from <balaton@eik.bme.hu>) id 1e6Zyu-0000M5-2p
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 06:29:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e6Zwe-0004tL-FF
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 06:27:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39986)
+	(envelope-from <balaton@eik.bme.hu>) id 1e6Zyq-0005Tp-37
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 06:29:16 -0400
+Received: from zero.eik.bme.hu ([152.66.115.2]:13316)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1e6Zwe-0004t9-83
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 06:26:56 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4B7E17E425
-	for <qemu-devel@nongnu.org>; Mon, 23 Oct 2017 10:26:55 +0000 (UTC)
-Date: Mon, 23 Oct 2017 11:26:48 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20171023102648.GG16472@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20171023095910.23202-1-marcandre.lureau@redhat.com>
-	<20171023095910.23202-7-marcandre.lureau@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20171023095910.23202-7-marcandre.lureau@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 6/6] tests: use memfd in vhost-user-test
+	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1e6Zyp-0005Sh-SQ
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 06:29:12 -0400
+From: BALATON Zoltan <balaton@eik.bme.hu>
+Date: Mon, 23 Oct 2017 12:24:59 +0200
+Message-Id: <20171023102903.256AF7456A0@zero.eik.bme.hu>
+Subject: [Qemu-devel] [PATCH] Fix compile with --disable-tpm
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,27 +21,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, ehabkost@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Stefan Berger <stefanb@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Mon, Oct 23, 2017 at 10:59:10AM +0100, Marc-Andr=C3=A9 Lureau wrote:
-> This will exercise the memfd memory backend and should generally be
-> better for testing than memory-backend-file (thanks to anonymous files
-> and sealing).
+Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+---
+ tpm.c | 7 ++++---
+ vl.c  | 2 ++
+ 2 files changed, 6 insertions(+), 3 deletions(-)
 
-Since we'll support vhost-user with both backends, it would be preferrabl=
-e
-to test both backends so we don't loose test coverage of the memory-backe=
-nd-file
-which is what's actually used in practice right now.
-
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+diff --git a/tpm.c b/tpm.c
+index 45520f5..b625cd4 100644
+--- a/tpm.c
++++ b/tpm.c
+@@ -30,8 +30,6 @@ void tpm_register_model(enum TpmModel model)
+     tpm_models[model] = true;
+ }
+ 
+-#ifdef CONFIG_TPM
+-
+ static const TPMBackendClass *
+ tpm_be_find_by_type(enum TpmType type)
+ {
+@@ -48,6 +46,8 @@ tpm_be_find_by_type(enum TpmType type)
+     return TPM_BACKEND_CLASS(oc);
+ }
+ 
++#ifdef CONFIG_TPM
++
+ /*
+  * Walk the list of available TPM backend drivers and display them on the
+  * screen.
+@@ -208,8 +208,9 @@ TPMInfoList *qmp_query_tpm(Error **errp)
+             continue;
+         }
+         info = g_new0(TPMInfoList, 1);
++#ifdef CONFIG_TPM
+         info->value = tpm_backend_query_tpm(drv);
+-
++#endif
+         if (!cur_item) {
+             head = cur_item = info;
+         } else {
+diff --git a/vl.c b/vl.c
+index 0723835..dbfd06d 100644
+--- a/vl.c
++++ b/vl.c
+@@ -4905,7 +4905,9 @@ int main(int argc, char **argv, char **envp)
+     res_free();
+ 
+     /* vhost-user must be cleaned up before chardevs.  */
++#ifdef CONFIG_TPM
+     tpm_cleanup();
++#endif
+     net_cleanup();
+     audio_cleanup();
+     monitor_cleanup();
+-- 
+2.7.6
