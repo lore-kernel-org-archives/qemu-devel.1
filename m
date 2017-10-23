@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46497)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46575)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1e6j4X-0000XY-RU
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 16:11:44 -0400
+	(envelope-from <andrew.smirnov@gmail.com>) id 1e6j4c-0000ac-J5
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 16:11:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1e6j4W-0002cP-KR
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 16:11:41 -0400
+	(envelope-from <andrew.smirnov@gmail.com>) id 1e6j4a-0002dv-7n
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 16:11:46 -0400
 From: Andrey Smirnov <andrew.smirnov@gmail.com>
-Date: Mon, 23 Oct 2017 13:10:48 -0700
-Message-Id: <20171023201055.21973-21-andrew.smirnov@gmail.com>
+Date: Mon, 23 Oct 2017 13:10:52 -0700
+Message-Id: <20171023201055.21973-25-andrew.smirnov@gmail.com>
 In-Reply-To: <20171023201055.21973-1-andrew.smirnov@gmail.com>
 References: <20171023201055.21973-1-andrew.smirnov@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 20/27] i.MX: Add code to emulate FlexCAN IP
- block
+Subject: [Qemu-devel] [PATCH v2 24/27] i.MX: Add code to emulate i.MX7 ADC
+ IP block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,35 +36,35 @@ Cc: qemu-arm@nongnu.org
 Cc: yurovsky@gmail.com
 Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
 ---
- hw/misc/Makefile.objs         |  1 +
- hw/misc/imx_flexcan.c         | 99 +++++++++++++++++++++++++++++++++++++++++++
- include/hw/misc/imx_flexcan.h | 22 ++++++++++
+ hw/misc/Makefile.objs      |  1 +
+ hw/misc/imx7_adc.c         | 99 ++++++++++++++++++++++++++++++++++++++++++++++
+ include/hw/misc/imx7_adc.h | 22 +++++++++++
  3 files changed, 122 insertions(+)
- create mode 100644 hw/misc/imx_flexcan.c
- create mode 100644 include/hw/misc/imx_flexcan.h
+ create mode 100644 hw/misc/imx7_adc.c
+ create mode 100644 include/hw/misc/imx7_adc.h
 
 diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-index 492c535330..943b22af40 100644
+index c9944161bd..b578bd0cba 100644
 --- a/hw/misc/Makefile.objs
 +++ b/hw/misc/Makefile.objs
-@@ -38,6 +38,7 @@ obj-$(CONFIG_IMX) += imx7_ccm.o
- obj-$(CONFIG_IMX) += imx2_wdt.o
+@@ -39,6 +39,7 @@ obj-$(CONFIG_IMX) += imx2_wdt.o
  obj-$(CONFIG_IMX) += imx7_snvs.o
  obj-$(CONFIG_IMX) += imx7_iomuxc.o
-+obj-$(CONFIG_IMX) += imx_flexcan.o
+ obj-$(CONFIG_IMX) += imx_flexcan.o
++obj-$(CONFIG_IMX) += imx7_adc.o
+ obj-$(CONFIG_IMX) += imx7_gpr.o
  obj-$(CONFIG_MILKYMIST) += milkymist-hpdmc.o
  obj-$(CONFIG_MILKYMIST) += milkymist-pfpu.o
- obj-$(CONFIG_MAINSTONE) += mst_fpga.o
-diff --git a/hw/misc/imx_flexcan.c b/hw/misc/imx_flexcan.c
+diff --git a/hw/misc/imx7_adc.c b/hw/misc/imx7_adc.c
 new file mode 100644
-index 0000000000..dd4d3d6dc1
+index 0000000000..7945e99075
 --- /dev/null
-+++ b/hw/misc/imx_flexcan.c
++++ b/hw/misc/imx7_adc.c
 @@ -0,0 +1,99 @@
 +/*
 + * Copyright (c) 2017, Impinj, Inc.
 + *
-+ * i.MX FlexCAN block emulation code
++ * i.MX7 ADC block emulation code
 + *
 + * Author: Andrey Smirnov <andrew.smirnov@gmail.com>
 + *
@@ -73,33 +73,33 @@ index 0000000000..dd4d3d6dc1
 + */
 +
 +#include "qemu/osdep.h"
-+#include "hw/misc/imx_flexcan.h"
++#include "hw/misc/imx7_adc.h"
 +#include "qemu/log.h"
 +
-+static void imx_flexcan_reset(DeviceState *dev)
++static void imx7_adc_reset(DeviceState *dev)
 +{
-+    IMXFlexCANState *s = IMX_FLEXCAN(dev);
++    IMX7ADCState *s = IMX7_ADC(dev);
 +
 +    memset(s->regs, 0, sizeof(s->regs));
 +}
 +
-+static uint64_t imx_flexcan_read(void *opaque, hwaddr offset,
++static uint64_t imx7_adc_read(void *opaque, hwaddr offset,
 +                               unsigned size)
 +{
-+    IMXFlexCANState *s = opaque;
++    IMX7ADCState *s = opaque;
 +    return s->regs[offset / sizeof(uint32_t)];
 +}
 +
-+static void imx_flexcan_write(void *opaque, hwaddr offset,
++static void imx7_adc_write(void *opaque, hwaddr offset,
 +                            uint64_t value, unsigned size)
 +{
-+    IMXFlexCANState *s = opaque;
++    IMX7ADCState *s = opaque;
 +    s->regs[offset / sizeof(uint32_t)] = value;
 +}
 +
-+static const struct MemoryRegionOps imx_flexcan_ops = {
-+    .read = imx_flexcan_read,
-+    .write = imx_flexcan_write,
++static const struct MemoryRegionOps imx7_adc_ops = {
++    .read = imx7_adc_read,
++    .write = imx7_adc_write,
 +    .endianness = DEVICE_NATIVE_ENDIAN,
 +    .impl = {
 +        /*
@@ -114,79 +114,79 @@ index 0000000000..dd4d3d6dc1
 +    },
 +};
 +
-+static void imx_flexcan_init(Object *obj)
++static void imx7_adc_init(Object *obj)
 +{
 +    SysBusDevice *sd = SYS_BUS_DEVICE(obj);
-+    IMXFlexCANState *s = IMX_FLEXCAN(obj);
++    IMX7ADCState *s = IMX7_ADC(obj);
 +
 +    memory_region_init_io(&s->iomem,
 +                          obj,
-+                          &imx_flexcan_ops,
++                          &imx7_adc_ops,
 +                          s,
-+                          TYPE_IMX_FLEXCAN ".iomem",
++                          TYPE_IMX7_ADC ".iomem",
 +                          sizeof(s->regs));
 +    sysbus_init_mmio(sd, &s->iomem);
 +}
 +
-+static const VMStateDescription vmstate_imx_flexcan = {
-+    .name = TYPE_IMX_FLEXCAN,
++static const VMStateDescription vmstate_imx7_adc = {
++    .name = TYPE_IMX7_ADC,
 +    .version_id = 1,
 +    .minimum_version_id = 1,
 +    .fields = (VMStateField[]) {
-+        VMSTATE_UINT32_ARRAY(regs, IMXFlexCANState, FLEXCAN_NUM),
++        VMSTATE_UINT32_ARRAY(regs, IMX7ADCState, ADC_NUM),
 +        VMSTATE_END_OF_LIST()
 +    },
 +};
 +
-+static void imx_flexcan_class_init(ObjectClass *klass, void *data)
++static void imx7_adc_class_init(ObjectClass *klass, void *data)
 +{
 +    DeviceClass *dc = DEVICE_CLASS(klass);
 +
-+    dc->reset = imx_flexcan_reset;
-+    dc->vmsd  = &vmstate_imx_flexcan;
-+    dc->desc  = "i.MX FlexCAN Module";
++    dc->reset = imx7_adc_reset;
++    dc->vmsd  = &vmstate_imx7_adc;
++    dc->desc  = "i.MX ADC Module";
 +}
 +
-+static const TypeInfo imx_flexcan_info = {
-+    .name          = TYPE_IMX_FLEXCAN,
++static const TypeInfo imx7_adc_info = {
++    .name          = TYPE_IMX7_ADC,
 +    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(IMXFlexCANState),
-+    .instance_init = imx_flexcan_init,
-+    .class_init    = imx_flexcan_class_init,
++    .instance_size = sizeof(IMX7ADCState),
++    .instance_init = imx7_adc_init,
++    .class_init    = imx7_adc_class_init,
 +};
 +
-+static void imx_flexcan_register_type(void)
++static void imx7_adc_register_type(void)
 +{
-+    type_register_static(&imx_flexcan_info);
++    type_register_static(&imx7_adc_info);
 +}
-+type_init(imx_flexcan_register_type)
-diff --git a/include/hw/misc/imx_flexcan.h b/include/hw/misc/imx_flexcan.h
++type_init(imx7_adc_register_type)
+diff --git a/include/hw/misc/imx7_adc.h b/include/hw/misc/imx7_adc.h
 new file mode 100644
-index 0000000000..da9980cf86
+index 0000000000..4a61c52caf
 --- /dev/null
-+++ b/include/hw/misc/imx_flexcan.h
++++ b/include/hw/misc/imx7_adc.h
 @@ -0,0 +1,22 @@
-+#ifndef IMX_FLEXCAN_H
-+#define IMX_FLEXCAN_H
++#ifndef IMX7_ADC_H
++#define IMX7_ADC_H
 +
 +#include "hw/sysbus.h"
 +
-+enum IMXFlexCANRegisters {
-+    FLEXCAN_NUM = 0x9E0 / sizeof(uint32_t) + 1,
++enum IMX7ADCRegisters {
++    ADC_NUM = 0x130 / sizeof(uint32_t) + 1,
 +};
 +
-+typedef struct IMXFlexCANState {
++typedef struct IMX7ADCState {
 +    /*< private >*/
 +    SysBusDevice parent_obj;
 +
 +    /*< public >*/
 +    MemoryRegion iomem;
-+    uint32_t     regs[FLEXCAN_NUM];
-+} IMXFlexCANState;
++    uint32_t     regs[ADC_NUM];
++} IMX7ADCState;
 +
-+#define TYPE_IMX_FLEXCAN "imx-flexcan"
-+#define IMX_FLEXCAN(obj) OBJECT_CHECK(IMXFlexCANState, (obj), TYPE_IMX_FLEXCAN)
++#define TYPE_IMX7_ADC "imx7-adc"
++#define IMX7_ADC(obj) OBJECT_CHECK(IMX7ADCState, (obj), TYPE_IMX7_ADC)
 +
-+#endif /* IMX_FLEXCAN_H */
++#endif /* IMX7_ADC_H */
 -- 
 2.13.5
