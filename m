@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33571)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35441)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stou4r@gmail.com>) id 1e6kAi-0006Uk-Do
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 17:22:09 -0400
+	(envelope-from <nutarojj@ornl.gov>) id 1e6kLx-00086F-HO
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 17:33:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stou4r@gmail.com>) id 1e6kAh-0003PM-MK
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 17:22:08 -0400
-Received: from mail-pg0-x22e.google.com ([2607:f8b0:400e:c05::22e]:52186)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stou4r@gmail.com>) id 1e6kAh-0003P0-Gm
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 17:22:07 -0400
-Received: by mail-pg0-x22e.google.com with SMTP id p9so12760314pgc.8
-	for <qemu-devel@nongnu.org>; Mon, 23 Oct 2017 14:22:07 -0700 (PDT)
+	(envelope-from <nutarojj@ornl.gov>) id 1e6kLu-0008J4-CX
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 17:33:45 -0400
+Received: from mta02.ornl.gov ([128.219.177.136]:22877)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <nutarojj@ornl.gov>) id 1e6kLu-0008Hz-46
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 17:33:42 -0400
+From: "Nutaro, James J." <nutarojj@ornl.gov>
+Date: Mon, 23 Oct 2017 21:33:12 +0000
+Message-ID: <0cf277479d9f46939d0eb18b7bdc46c8@EXCHCS32.ornl.gov>
+References: <CADHp1NwU=HowMfgBGtcwnY25v_fL6qZ2gd469a2oZY+QQi2uFw@mail.gmail.com>
+	<20171019205409.GA4170@flamenco>
+	<545610a4882f4c5494b30b7eab66b984@EXCHCS32.ornl.gov>
+	<CADHp1NxzGr_ijvGrUbmZf0NuUv+JwJZeA=8h4tZNn++SBA1yUw@mail.gmail.com>
+In-Reply-To: <CADHp1NxzGr_ijvGrUbmZf0NuUv+JwJZeA=8h4tZNn++SBA1yUw@mail.gmail.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-From: Deema B <stou4r@gmail.com>
-Date: Mon, 23 Oct 2017 14:22:05 -0700
-Message-ID: <CACw_XP_8GrqEa4GcK06BrZJjjvGu=BJKZB6DTVtoJrd1YcRFWw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] Command line option "-option-rom" doesn't take the ROM
- file
+Subject: Re: [Qemu-devel] Running Qemu in discrete time/step by step
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,19 +30,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: 'Matt' <mattator@gmail.com>
+Cc: "Emilio G. Cota" <cota@braap.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Hajime Tazaki <tazaki@wide.ad.jp>
 
-Hi,
-
-I'm trying to use the -option-rom option to supply my own virtio OpROM.
-
-I am not able to see the ROM being launch (the built-in version comes up
-instead).
-The only way I am able to make it work is to rebuild the Qemu and iPXE
-together.
-
-I'm assuming this is working feature, and I'm simply doing something wrong.
-Appreciate any suggestions, pointers, and to hear your experience with this
-particular option.
-
-- Deema
+SSBkb24ndCBleHBlY3QgZXhhY3QgcmVwZWF0YWJpbGl0eSwgYnV0IEkgaGF2ZW4ndCB0ZXN0ZWQg
+Zm9yIGl0IGVpdGhlci4gVGhlIG1hY2hpbmVyeSB0aGF0IHByZXZlbnRzIHJlcGVhdGFiaWxpdHkg
+d2l0aCByZXBsYXkgd2lsbCBwcm9iYWJseSBoYXZlIHRoZSBzYW1lIGVmZmVjdCBpbiB0aGUgYWRl
+dnMvcWVtdSBzaW11bGF0b3IuDQoNCi0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQpGcm9tOiBN
+YXR0IFttYWlsdG86bWF0dGF0b3JAZ21haWwuY29tXSANClNlbnQ6IE1vbmRheSwgT2N0b2JlciAy
+MywgMjAxNyA1OjM4IEFNDQpUbzogTnV0YXJvLCBKYW1lcyBKLg0KQ2M6IEVtaWxpbyBHLiBDb3Rh
+OyBxZW11LWRldmVsQG5vbmdudS5vcmc7IEhhamltZSBUYXpha2kNClN1YmplY3Q6IFJlOiBbUWVt
+dS1kZXZlbF0gUnVubmluZyBRZW11IGluIGRpc2NyZXRlIHRpbWUvc3RlcCBieSBzdGVwDQoNCkkg
+ZGlkIG5vdCBrbm93IGFib3V0IFFlbXUncyByZWNvcmQvcmVwbGF5IG1vZGUgd2hpY2ggaXMgYW4g
+aW50ZXJlc3RpbmcNCmZlYXR1cmUgYnV0IHVubmVlZGVkIGlmIGEgIDJuZCBxZW11IHJ1biB3aXRo
+IHRoZSBzYW1lIGlucHV0cyBnZW5lcmF0ZWQNCnRoZSBzYW1lIG91dHB1dHMgKGFzIGl0J3MgdGhl
+IGNhc2Ugd2l0aCBEQ0UpLg0KQG51dGFybyBUaGFua3MgZm9yIHRoZSB1cGRhdGVkIHBhdGNoLiBJ
+IHdpbGwgaGF2ZSBhIGxvb2sgYXQgYWRldnMuIE9uDQphIHJlbGF0ZWQgbm90ZSBodHRwczovL2dp
+dGh1Yi5jb20vcWVtdS9xZW11L2Jsb2IvbWFzdGVyL2RvY3MvcmVwbGF5LnR4dA0KZW51bWVyYXRl
+cyBkaWZmZXJlbnQgc291cmNlcyBvZiBpbmRldGVybWluaXNtDQo9PQ0KUmVwbGF5aW5nIG9mIHRo
+ZSBleGVjdXRpb24gb2YgdmlydHVhbCBtYWNoaW5lIGlzIGJvdW5kIGJ5IHNvdXJjZXMgb2YNCm5v
+bi1kZXRlcm1pbmlzbS4gVGhlc2UgYXJlIGlucHV0cyBmcm9tIGNsb2NrIGFuZCBwZXJpcGhlcmFs
+IGRldmljZXMsDQphbmQgUUVNVSB0aHJlYWQgc2NoZWR1bGluZy4gVGhyZWFkIHNjaGVkdWxpbmcg
+YWZmZWN0IG9uIHByb2Nlc3NpbmcgZXZlbnRzDQpmcm9tIHRpbWVycywgYXN5bmNocm9ub3VzIGlu
+cHV0LW91dHB1dCwgYW5kIGJvdHRvbSBoYWx2ZXMuDQo9PQ0KDQpEbyB5b3UgbWFuYWdlIHRvIGFj
+aGlldmUgcGVyZmVjdCByZXByb2R1Y2liaWxpdHkgd2l0aCBhZGV2cyArIHFlbXUgPw0KSWYgeWVz
+LCBpcyB0aGVyZSBhbnkgcHVibGljYXRpb24gZGVzY3JpYmluZyBob3cgeW91IGFjaGlldmUgdGhp
+cyA/DQoNCkJlc3QgcmVnYXJkcw0KbWF0dA0KDQoyMDE3LTEwLTIxIDA6MDIgR01UKzA5OjAwIE51
+dGFybywgSmFtZXMgSi4gPG51dGFyb2pqQG9ybmwuZ292PjoNCj4gVGhhbmtzIGZvciB0YWtpbmcg
+YSBsb29rIGF0IHRoZSBwYXRjaC4gVGhlIG1vc3QgcmVjZW50IHZlcnNpb24gb2YgdGhlIHBhdGNo
+IHdpbGwgYWxzbyB3b3JrIHdpdGggS1ZNIGlmIHlvdSBuZWVkIHRvIHNwZWVkIHRoaW5ncyB1cC4g
+WW91IGNhbiBmaW5kIGl0IGhlcmU6DQo+DQo+IGh0dHBzOi8vcGF0Y2h3b3JrLmtlcm5lbC5vcmcv
+cGF0Y2gvOTk2MDM2OS8NCj4NCj4gU29tZWhvdyBJIG1lc3NlZCB1cCB0aGF0IHBvc3QgYW5kIGl0
+IHNob3dzIFY4IHdoZW4gaXQgc2hvdWxkIGJlIFY5Lg0KPg0KPiBZb3UgY2FuIGdldCB0aGUgc2lt
+dWxhdG9yIHRoYXQgaXQgd29ya3Mgd2l0aCBhdA0KPg0KPiBodHRwczovL3NvdXJjZWZvcmdlLm5l
+dC9wcm9qZWN0cy9hZGV2cy8NCj4NCj4gSWYgbm90aGluZyBlbHNlLCB0aGlzIHNpbXVsYXRvciB3
+b3VsZCBnaXZlIHlvdSBhIGJsdWUgcHJpbnQgZm9yIGludGVncmF0aW9uIHdpdGggYW5vdGhlciB0
+b29sLg0KPg0KPiBKaW0NCj4NCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTog
+RW1pbGlvIEcuIENvdGEgW21haWx0bzpjb3RhQGJyYWFwLm9yZ10NCj4gU2VudDogVGh1cnNkYXks
+IE9jdG9iZXIgMTksIDIwMTcgNDo1NCBQTQ0KPiBUbzogTWF0dA0KPiBDYzogcWVtdS1kZXZlbEBu
+b25nbnUub3JnOyBIYWppbWUgVGF6YWtpOyBOdXRhcm8sIEphbWVzIEouDQo+IFN1YmplY3Q6IFJl
+OiBbUWVtdS1kZXZlbF0gUnVubmluZyBRZW11IGluIGRpc2NyZXRlIHRpbWUvc3RlcCBieSBzdGVw
+DQo+DQo+IE9uIFRodSwgT2N0IDE5LCAyMDE3IGF0IDE0OjE0OjEyICswOTAwLCBNYXR0IHdyb3Rl
+Og0KPiAoc25pcCkNCj4+IC0gVk1TaW1pbnQgZG9lcyBuZWFybHkgdGhhdCwgaXQgcnVucyBRZW11
+IGluIGRpc2NyZXRlIHRpbWUgYnV0DQo+PiBpbnRlcmZhY2UgaXQgd2l0aCBhIEpBVkEgc2ltdWxh
+dG9yDQo+PiBodHRwOi8vd3d3Lmlrci51bmktc3R1dHRnYXJ0LmRlL0NvbnRlbnQvUHVibGljYXRp
+b25zL0FyY2hpdmUvV2VfU0lNVVRvb2xzXzIwMTRfNDAyMDkucGRmDQo+PiAod2l0aCB0aGUgY29k
+ZSBodHRwOi8vd3d3Lmlrci51bmktc3R1dHRnYXJ0LmRlL0NvbnRlbnQvSUtSU2ltTGliL0Rvd25s
+b2FkLykNCj4+IC0gaHR0cDovL3dlYi5vcm5sLmdvdi9+bnV0YXJvamovYWRldnMvIGRvZXMgc3Ro
+ZyBzaW1pbGFyIHRvbw0KPg0KPiBOdXRhcm8ncyB3b3JrIHRvIGludGVyZmFjZSB3aXRoIFFFTVUg
+aGFzIGJlZW4gcG9zdGVkIG9uIHRoZSBsaXN0Og0KPiAgIGh0dHBzOi8vcGF0Y2h3b3JrLmtlcm5l
+bC5vcmcvcGF0Y2gvOTU3MjQ5Ny8NCj4gSSdtIENjJ2luZyBoaW0gaW4gY2FzZSBoZSdzIG5vdCBz
+dWJzY3JpYmVkIHRvIHRoZSBsaXN0Lg0KPg0KPg0KPj4gTXkgcXVlc3Rpb25zIHdvdWxkIGJlOg0K
+Pj4gMS8gZG8geW91IGtub3cgb2YgYW55IG90aGVyIHJlbGF0ZWQgd29yayA/DQo+DQo+IElzIFFF
+TVUncyByZWNvcmQvcmVwbGF5IG1vZGUgb2YgYW55IHVzZSB0byB5b3U/IE5vdGUgdGhhdCBhcyBp
+cyB0aGUNCj4gY2FzZSB3aXRoIE51dGFybydzIHBhdGNoLCB5b3UnbGwgbmVlZCBpY291bnQgbW9k
+ZSAoaS5lLiBzaW5nbGUtY29yZSkNCj4gZW5hYmxlZC4NCj4NCj4+IDIvIEkgYmVsaWV2ZSB0aGVy
+ZSBpcyBpbnRlcmVzdCBmcm9tIHRoZSByZXNlYXJjaCBzaWRlIGJ1dCB3b3VsZCBpdCBiZQ0KPj4g
+cG9zc2libGUgdG8gbWVyZ2UgZWl0aGVyIGFwcHJvYWNoIG9yIGEgc2ltaWxhciBvbmUgKGFkZXZz
+IHBhdGNoDQo+PiBkb2Vzbid0IHNlZW0gdG9vIGJpZyB+NTAwIGxpbmVzKSwgd291bGQgdGhhdCBi
+ZSBvZiBpbnRlcmVzdCBmb3IgdGhlDQo+PiBRZW11IGNvbW1pbml0eSB0b28gPw0KPj4gMy8gaWYg
+eWVzIHRvIDIuIEhvdyB0byBwcm9jZWVkLCB3aGljaCBvbmUgd291bGQgYmUgZmF2b3JpdGUgPyBp
+ZiBubywNCj4+IHdoYXQgc2hvdWxkIGJlIGltcHJvdmVkID8gb3Igd291bGQgdGhhdCBiZSBhIGRl
+ZmluaXRpdmUgbm8gPw0KPg0KPiBJIHRoaW5rIHRoZSBhZGV2cyBhcHByb2FjaCBpcyByZWFzb25h
+YmxlLiBUaGUgcGF0Y2ggaGFzbid0IGdvdHRlbiBtdWNoDQo+IGF0dGVudGlvbiBJIGd1ZXNzIGJl
+Y2F1c2Ugbm90IG1hbnkgcGVvcGxlIGNhcmUgYWJvdXQgdGhpcyBmZWF0dXJlLg0KPiBCdXQgaWYg
+eW91IGNvdWxkIHJldmlldyB0aGUgcGF0Y2ggYW5kIGNlcnRpZnkgdGhhdCBpdCB3b3JrcyBmb3Ig
+eW91DQo+IChpLmUuIGl0IHdvcmtzIHdpdGggc2ltdWxhdG9ycyBvdGhlciB0aGFuIGFkZXZzKSwg
+dGhhdCBjb3VsZCBvbmx5IGhlbHANCj4gdGhlIHBhdGNoIGdldHRpbmcgaW4uDQo+DQo+IFRoYXQg
+c2FpZCwgSSBtYWtlIG5vIG1lcmdpbmcgZGVjaXNpb25zIHNvIHRha2UgdGhpcyBhcyBqdXN0IG15
+IG9waW5pb24uDQo+DQo+IENoZWVycywNCj4NCj4gICAgICAgICAgICAgICAgIEVtaWxpbw0KPg0K
+DQo=
