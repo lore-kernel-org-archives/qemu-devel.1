@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58127)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58135)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1e6YMl-0004AS-Rr
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 04:45:53 -0400
+	(envelope-from <kraxel@redhat.com>) id 1e6YMm-0004AT-Eg
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 04:45:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1e6YMk-0001AM-SO
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 04:45:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47708)
+	(envelope-from <kraxel@redhat.com>) id 1e6YMi-00019V-Js
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 04:45:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47536)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1e6YMk-0001A5-K2
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 04:45:46 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1e6YMi-00019E-Dx
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 04:45:44 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A1346C0587C0
-	for <qemu-devel@nongnu.org>; Mon, 23 Oct 2017 08:45:45 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 73FC6C0587CD
+	for <qemu-devel@nongnu.org>; Mon, 23 Oct 2017 08:45:43 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Mon, 23 Oct 2017 10:45:38 +0200
-Message-Id: <20171023084538.18210-2-kraxel@redhat.com>
-In-Reply-To: <20171023084538.18210-1-kraxel@redhat.com>
-References: <20171023084538.18210-1-kraxel@redhat.com>
+Date: Mon, 23 Oct 2017 10:45:37 +0200
+Message-Id: <20171023084538.18210-1-kraxel@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 1/1] usb-ccid: remove needless migration state
- code
+Subject: [Qemu-devel] [PULL 0/1] Usb 20171023 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,91 +31,33 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+The following changes since commit e822e81e350825dd94f41ee2538ff1432b812e=
+b9:
 
-This code appears to be unused since its introduction. We need to keep
-the state_vmstate field byte in VMState for compatibility reasons.
+  Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request'=
+ into staging (2017-10-20 15:04:00 +0100)
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Message-id: 20171013125533.9153-1-marcandre.lureau@redhat.com
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
+are available in the git repository at:
+
+  git://git.kraxel.org/qemu tags/usb-20171023-pull-request
+
+for you to fetch changes up to 31bd59db446de48eb985b4e1c0e31dae10fc35f8:
+
+  usb-ccid: remove needless migration state code (2017-10-23 10:05:28 +02=
+00)
+
+----------------------------------------------------------------
+usb: ccid fix.
+
+----------------------------------------------------------------
+
+Marc-Andr=C3=A9 Lureau (1):
+  usb-ccid: remove needless migration state code
+
  hw/usb/dev-smartcard-reader.c | 23 +----------------------
  1 file changed, 1 insertion(+), 22 deletions(-)
 
-diff --git a/hw/usb/dev-smartcard-reader.c b/hw/usb/dev-smartcard-reader.=
-c
-index 0c77d2a41d..e334d3be11 100644
---- a/hw/usb/dev-smartcard-reader.c
-+++ b/hw/usb/dev-smartcard-reader.c
-@@ -270,11 +270,6 @@ typedef struct BulkIn {
-     uint32_t pos;
- } BulkIn;
-=20
--enum {
--    MIGRATION_NONE,
--    MIGRATION_MIGRATED,
--};
--
- typedef struct CCIDBus {
-     BusState qbus;
- } CCIDBus;
-@@ -306,9 +301,6 @@ typedef struct USBCCIDState {
-     CCID_ProtocolDataStructure abProtocolDataStructure;
-     uint32_t ulProtocolDataStructureSize;
-     uint32_t state_vmstate;
--    uint32_t migration_target_ip;
--    uint16_t migration_target_port;
--    uint8_t  migration_state;
-     uint8_t  bmSlotICCState;
-     uint8_t  powered;
-     uint8_t  notify_slot_change;
-@@ -1243,9 +1235,6 @@ int ccid_card_ccid_attach(CCIDCardState *card)
-     USBCCIDState *s =3D USB_CCID_DEV(dev);
-=20
-     DPRINTF(s, 1, "CCID Attach\n");
--    if (s->migration_state =3D=3D MIGRATION_MIGRATED) {
--        s->migration_state =3D MIGRATION_NONE;
--    }
-     return 0;
- }
-=20
-@@ -1341,9 +1330,6 @@ static void ccid_realize(USBDevice *dev, Error **er=
-rp)
-     s->intr =3D usb_ep_get(dev, USB_TOKEN_IN, CCID_INT_IN_EP);
-     s->bulk =3D usb_ep_get(dev, USB_TOKEN_IN, CCID_BULK_IN_EP);
-     s->card =3D NULL;
--    s->migration_state =3D MIGRATION_NONE;
--    s->migration_target_ip =3D 0;
--    s->migration_target_port =3D 0;
-     s->dev.speed =3D USB_SPEED_FULL;
-     s->dev.speedmask =3D USB_SPEED_MASK_FULL;
-     s->notify_slot_change =3D false;
-@@ -1379,13 +1365,6 @@ static int ccid_pre_save(void *opaque)
-     USBCCIDState *s =3D opaque;
-=20
-     s->state_vmstate =3D s->dev.state;
--    if (s->dev.attached) {
--        /*
--         * Migrating an open device, ignore reconnection CHR_EVENT to av=
-oid an
--         * erroneous detach.
--         */
--        s->migration_state =3D MIGRATION_MIGRATED;
--    }
-=20
-     return 0;
- }
-@@ -1452,7 +1431,7 @@ static VMStateDescription ccid_vmstate =3D {
-         VMSTATE_STRUCT_ARRAY(pending_answers, USBCCIDState,
-                         PENDING_ANSWERS_NUM, 1, answer_vmstate, Answer),
-         VMSTATE_UINT32(pending_answers_num, USBCCIDState),
--        VMSTATE_UINT8(migration_state, USBCCIDState),
-+        VMSTATE_UNUSED(1), /* was migration_state */
-         VMSTATE_UINT32(state_vmstate, USBCCIDState),
-         VMSTATE_END_OF_LIST()
-     }
 --=20
 2.9.3
