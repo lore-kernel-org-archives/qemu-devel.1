@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46576)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46580)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1e6j4c-0000ag-JP
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 16:11:47 -0400
+	(envelope-from <andrew.smirnov@gmail.com>) id 1e6j4c-0000at-LK
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 16:11:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1e6j4a-0002e0-86
+	(envelope-from <andrew.smirnov@gmail.com>) id 1e6j4a-0002e7-E2
 	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 16:11:46 -0400
 From: Andrey Smirnov <andrew.smirnov@gmail.com>
-Date: Mon, 23 Oct 2017 13:10:45 -0700
-Message-Id: <20171023201055.21973-18-andrew.smirnov@gmail.com>
+Date: Mon, 23 Oct 2017 13:10:51 -0700
+Message-Id: <20171023201055.21973-24-andrew.smirnov@gmail.com>
 In-Reply-To: <20171023201055.21973-1-andrew.smirnov@gmail.com>
 References: <20171023201055.21973-1-andrew.smirnov@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 17/27] i.MX: Add code to emulate i.MX7
- IOMUXC IP block
+Subject: [Qemu-devel] [PATCH v2 23/27] i.MX: Add code to emulate i.MX7
+ USBMISC IP block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,30 +36,30 @@ Cc: qemu-arm@nongnu.org
 Cc: yurovsky@gmail.com
 Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
 ---
- hw/misc/Makefile.objs         |  1 +
- hw/misc/imx7_iomuxc.c         | 99 +++++++++++++++++++++++++++++++++++++++++++
- include/hw/misc/imx7_iomuxc.h | 22 ++++++++++
+ hw/usb/Makefile.objs         |  1 +
+ hw/usb/imx-usbmisc.c         | 99 ++++++++++++++++++++++++++++++++++++++++++++
+ include/hw/usb/imx-usbmisc.h | 22 ++++++++++
  3 files changed, 122 insertions(+)
- create mode 100644 hw/misc/imx7_iomuxc.c
- create mode 100644 include/hw/misc/imx7_iomuxc.h
+ create mode 100644 hw/usb/imx-usbmisc.c
+ create mode 100644 include/hw/usb/imx-usbmisc.h
 
-diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-index 16cee88e0f..492c535330 100644
---- a/hw/misc/Makefile.objs
-+++ b/hw/misc/Makefile.objs
-@@ -37,6 +37,7 @@ obj-$(CONFIG_IMX) += imx6_src.o
- obj-$(CONFIG_IMX) += imx7_ccm.o
- obj-$(CONFIG_IMX) += imx2_wdt.o
- obj-$(CONFIG_IMX) += imx7_snvs.o
-+obj-$(CONFIG_IMX) += imx7_iomuxc.o
- obj-$(CONFIG_MILKYMIST) += milkymist-hpdmc.o
- obj-$(CONFIG_MILKYMIST) += milkymist-pfpu.o
- obj-$(CONFIG_MAINSTONE) += mst_fpga.o
-diff --git a/hw/misc/imx7_iomuxc.c b/hw/misc/imx7_iomuxc.c
+diff --git a/hw/usb/Makefile.objs b/hw/usb/Makefile.objs
+index 97f1c4561a..813359fadc 100644
+--- a/hw/usb/Makefile.objs
++++ b/hw/usb/Makefile.objs
+@@ -12,6 +12,7 @@ common-obj-$(CONFIG_USB_XHCI_NEC) += hcd-xhci-nec.o
+ common-obj-$(CONFIG_USB_MUSB) += hcd-musb.o
+ 
+ obj-$(CONFIG_TUSB6010) += tusb6010.o
++obj-$(CONFIG_IMX)      += imx-usbmisc.o
+ 
+ # emulated usb devices
+ common-obj-$(CONFIG_USB) += dev-hub.o
+diff --git a/hw/usb/imx-usbmisc.c b/hw/usb/imx-usbmisc.c
 new file mode 100644
-index 0000000000..aa26a7485f
+index 0000000000..d5e236a4be
 --- /dev/null
-+++ b/hw/misc/imx7_iomuxc.c
++++ b/hw/usb/imx-usbmisc.c
 @@ -0,0 +1,99 @@
 +/*
 + * Copyright (c) 2017, Impinj, Inc.
@@ -73,33 +73,33 @@ index 0000000000..aa26a7485f
 + */
 +
 +#include "qemu/osdep.h"
-+#include "hw/misc/imx7_iomuxc.h"
++#include "hw/usb/imx-usbmisc.h"
 +#include "qemu/log.h"
 +
-+static void imx7_iomuxc_reset(DeviceState *dev)
++static void imx_usbmisc_reset(DeviceState *dev)
 +{
-+    IMX7IOMUXCState *s = IMX7_IOMUXC(dev);
++    IMXUSBMiscState *s = IMX_USBMISC(dev);
 +
 +    memset(s->regs, 0, sizeof(s->regs));
 +}
 +
-+static uint64_t imx7_iomuxc_read(void *opaque, hwaddr offset,
++static uint64_t imx_usbmisc_read(void *opaque, hwaddr offset,
 +                               unsigned size)
 +{
-+    IMX7IOMUXCState *s = opaque;
++    IMXUSBMiscState *s = opaque;
 +    return s->regs[offset / sizeof(uint32_t)];
 +}
 +
-+static void imx7_iomuxc_write(void *opaque, hwaddr offset,
++static void imx_usbmisc_write(void *opaque, hwaddr offset,
 +                            uint64_t value, unsigned size)
 +{
-+    IMX7IOMUXCState *s = opaque;
++    IMXUSBMiscState *s = opaque;
 +    s->regs[offset / sizeof(uint32_t)] = value;
 +}
 +
-+static const struct MemoryRegionOps imx7_iomuxc_ops = {
-+    .read = imx7_iomuxc_read,
-+    .write = imx7_iomuxc_write,
++static const struct MemoryRegionOps imx_usbmisc_ops = {
++    .read = imx_usbmisc_read,
++    .write = imx_usbmisc_write,
 +    .endianness = DEVICE_NATIVE_ENDIAN,
 +    .impl = {
 +        /*
@@ -114,79 +114,79 @@ index 0000000000..aa26a7485f
 +    },
 +};
 +
-+static void imx7_iomuxc_init(Object *obj)
++static void imx_usbmisc_init(Object *obj)
 +{
 +    SysBusDevice *sd = SYS_BUS_DEVICE(obj);
-+    IMX7IOMUXCState *s = IMX7_IOMUXC(obj);
++    IMXUSBMiscState *s = IMX_USBMISC(obj);
 +
 +    memory_region_init_io(&s->iomem,
 +                          obj,
-+                          &imx7_iomuxc_ops,
++                          &imx_usbmisc_ops,
 +                          s,
-+                          TYPE_IMX7_IOMUXC ".iomem",
++                          TYPE_IMX_USBMISC ".iomem",
 +                          sizeof(s->regs));
 +    sysbus_init_mmio(sd, &s->iomem);
 +}
 +
-+static const VMStateDescription vmstate_imx7_iomuxc = {
-+    .name = TYPE_IMX7_IOMUXC,
++static const VMStateDescription vmstate_imx_usbmisc = {
++    .name = TYPE_IMX_USBMISC,
 +    .version_id = 1,
 +    .minimum_version_id = 1,
 +    .fields = (VMStateField[]) {
-+        VMSTATE_UINT32_ARRAY(regs, IMX7IOMUXCState, IOMUXC_NUM),
++        VMSTATE_UINT32_ARRAY(regs, IMXUSBMiscState, USBMISC_NUM),
 +        VMSTATE_END_OF_LIST()
 +    },
 +};
 +
-+static void imx7_iomuxc_class_init(ObjectClass *klass, void *data)
++static void imx_usbmisc_class_init(ObjectClass *klass, void *data)
 +{
 +    DeviceClass *dc = DEVICE_CLASS(klass);
 +
-+    dc->reset = imx7_iomuxc_reset;
-+    dc->vmsd  = &vmstate_imx7_iomuxc;
++    dc->reset = imx_usbmisc_reset;
++    dc->vmsd  = &vmstate_imx_usbmisc;
 +    dc->desc  = "i.MX IOMUXC Module";
 +}
 +
-+static const TypeInfo imx7_iomuxc_info = {
-+    .name          = TYPE_IMX7_IOMUXC,
++static const TypeInfo imx_usbmisc_info = {
++    .name          = TYPE_IMX_USBMISC,
 +    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(IMX7IOMUXCState),
-+    .instance_init = imx7_iomuxc_init,
-+    .class_init    = imx7_iomuxc_class_init,
++    .instance_size = sizeof(IMXUSBMiscState),
++    .instance_init = imx_usbmisc_init,
++    .class_init    = imx_usbmisc_class_init,
 +};
 +
-+static void imx7_iomuxc_register_type(void)
++static void imx_usbmisc_register_type(void)
 +{
-+    type_register_static(&imx7_iomuxc_info);
++    type_register_static(&imx_usbmisc_info);
 +}
-+type_init(imx7_iomuxc_register_type)
-diff --git a/include/hw/misc/imx7_iomuxc.h b/include/hw/misc/imx7_iomuxc.h
++type_init(imx_usbmisc_register_type)
+diff --git a/include/hw/usb/imx-usbmisc.h b/include/hw/usb/imx-usbmisc.h
 new file mode 100644
-index 0000000000..7041a1ff42
+index 0000000000..64b06f3d3c
 --- /dev/null
-+++ b/include/hw/misc/imx7_iomuxc.h
++++ b/include/hw/usb/imx-usbmisc.h
 @@ -0,0 +1,22 @@
-+#ifndef IMX7_IOMUXC_H
-+#define IMX7_IOMUXC_H
++#ifndef IMX_USBMISC_H
++#define IMX_USBMISC_H
 +
 +#include "hw/sysbus.h"
 +
-+enum IMX7IOMUXCRegisters {
-+    IOMUXC_NUM = 0x740 / sizeof(uint32_t),
++enum IMXUSBMiscRegisters {
++    USBMISC_NUM = 0x24 / sizeof(uint32_t) + 1,
 +};
 +
-+typedef struct IMX7IOMUXCState {
++typedef struct IMXUSBMiscState {
 +    /*< private >*/
 +    SysBusDevice parent_obj;
 +
 +    /*< public >*/
 +    MemoryRegion iomem;
-+    uint32_t     regs[IOMUXC_NUM];
-+} IMX7IOMUXCState;
++    uint32_t     regs[USBMISC_NUM];
++} IMXUSBMiscState;
 +
-+#define TYPE_IMX7_IOMUXC "imx7-iomuxc"
-+#define IMX7_IOMUXC(obj) OBJECT_CHECK(IMX7IOMUXCState, (obj), TYPE_IMX7_IOMUXC)
++#define TYPE_IMX_USBMISC "imx-usbmisc"
++#define IMX_USBMISC(obj) OBJECT_CHECK(IMXUSBMiscState, (obj), TYPE_IMX_USBMISC)
 +
-+#endif /* IMX7_IOMUXC_H */
++#endif /* IMX_USBMISC_H */
 -- 
 2.13.5
