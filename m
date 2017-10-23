@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40314)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41400)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1e6fVW-0000jg-TF
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 12:23:19 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1e6fZt-0003uP-FJ
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 12:27:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1e6fVT-0003rP-Pp
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 12:23:18 -0400
-Received: from out4-smtp.messagingengine.com ([66.111.4.28]:32911)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1e6fVT-0003qL-Ha
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 12:23:15 -0400
-Date: Mon, 23 Oct 2017 12:23:12 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20171023162312.GA5089@flamenco>
-References: <1487097476-14259-1-git-send-email-nutarojj@ornl.gov>
-	<1505857386-23049-1-git-send-email-nutarojj@ornl.gov>
+	(envelope-from <peter.maydell@linaro.org>) id 1e6fZs-0006Qa-7C
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 12:27:49 -0400
+Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:57128)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1e6fZs-0006Pu-0Q
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 12:27:48 -0400
+Received: by mail-wm0-x233.google.com with SMTP id z3so4002287wme.5
+	for <qemu-devel@nongnu.org>; Mon, 23 Oct 2017 09:27:47 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1505857386-23049-1-git-send-email-nutarojj@ornl.gov>
-Subject: Re: [Qemu-devel] [PATCH V8] qqq: module for synchronizing with a
- simulation
+In-Reply-To: <20171023160959.GC10220@stefanha-x1.localdomain>
+References: <20171023025016.3088-1-programmingkidx@gmail.com>
+	<20171023160959.GC10220@stefanha-x1.localdomain>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 23 Oct 2017 17:27:26 +0100
+Message-ID: <CAFEAcA_13y2-uM11Ko_79TpEsfpFWMTz2-mAiwFseHfAM5CPgA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [libfdt][PATCH v3] implement strnlen for systems
+ that need it
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,45 +30,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: nutarojj@ornl.gov
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: John Arbuckle <programmingkidx@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <richard.henderson@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, devicetree-compiler@vger.kernel.org, ian@freebsd.org
 
-On Tue, Sep 19, 2017 at 17:43:06 -0400, nutarojj@ornl.gov wrote:
-> += Synchronizing the virtual clock with an external source =
-> +
-> +QEMU has a protocol for synchronizing its virtual clock
-> +with the clock of a simulator in which QEMU is embedded
-> +as a component. This options is enabled with the -qqq
-> +argument, and it should generally be accompanied by the
-> +following additional command line arguments:
-> +
-> +-icount 1,sleep=off -rtc clock=vm
-> +  or
-> +-enable-kvm -rtc clock=vm
-> +
-> +The -qqq argument is used to supply a file descriptor
-> +for a Unix socket, which is used for synchronization.
-> +The procedure for launching QEMU in is synchronization
-> +mode has three steps:
-> +
-> +(1) Create a socket pair with the Linux socketpair function.
-> +    The code segment that does this might look like
+On 23 October 2017 at 17:09, Stefan Hajnoczi <stefanha@gmail.com> wrote:
+>> +/* strnlen() is not available on Mac OS < 10.7 */
+>> +# if (MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_7)
+>
+> Does this cover the case where MAC_OS_X_VERSION_MAX_ALLOWED is set to
+> <1070 on a 10.7+ build machine?  It's possible that the <string.h>
+> header would define strnlen() and your code redefines the function
+> (compiler error).
 
-I thought a little bit about this patch. I think the feature is useful
-and should eventually be provided by QEMU.
+In that case you don't want to use the strnlen() declaration
+from the header, you want the inline somehow, because even if
+the declaration is present and using it doesn't fail compile
+the definition won't be around at runtime.
 
-The part I'm not sure about is the socket interface; for instance,
-it isn't cross-platform.
+> It would be best to check how <string.h>, <Availability.h>, and
+> <AvailabilityMacros.h> work to make sure that all cases are handled.  I
+> don't have access to a Mac right now, sorry.
 
-A better alternative might be to expose this functionality to plugins,
-and let the plugins deal with the external world--socket or whatever
-IPC is appropriate on the platform they're meant to be run.
+It uses the clang 'attribute availability' syntax:
+https://clang.llvm.org/docs/AttributeReference.html#availability
 
-Of course the plugin interface is still under discussion. I think though
-it should be fairly easy to expose this functionality to plugins. I'll take
-a look at in the next few weeks, hopefully also supporting MTTCG instances
-(with some collaboration/hack from the plugin, I'm afraid).
-
-Thanks,
-
-		Emilio
+thanks
+-- PMM
