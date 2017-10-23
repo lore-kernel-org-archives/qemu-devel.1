@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57088)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59242)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1e6VuJ-0001ke-FO
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 02:08:16 -0400
+	(envelope-from <famz@redhat.com>) id 1e6W8K-00046D-SF
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 02:22:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1e6VuD-0000aS-IA
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 02:08:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38390)
+	(envelope-from <famz@redhat.com>) id 1e6W8G-00065f-T0
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 02:22:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34854)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1e6VuD-0000aB-By
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 02:08:09 -0400
-Date: Mon, 23 Oct 2017 14:07:54 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20171023060754.GD3990@pxdev.xzpeter.org>
-References: <20170929033844.26935-1-peterx@redhat.com>
-	<20170929033844.26935-14-peterx@redhat.com>
-	<20171012125045.GF5957@stefanha-x1.localdomain>
-	<20171016075039.GD4166@pxdev.xzpeter.org>
-	<20171018153115.GD31848@stefanha-x1.localdomain>
-	<20171019063649.GX4166@pxdev.xzpeter.org>
-	<20171019131311.GE6205@stefanha-x1.localdomain>
-	<657cdf86-237d-c68e-75ed-6f9a0ea0ac34@redhat.com>
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1e6W8G-00065S-K8
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 02:22:40 -0400
+Date: Mon, 23 Oct 2017 14:22:37 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20171023062237.GG29815@lemon>
+References: <20171018073841.30062-1-famz@redhat.com>
+	<150831409774.377.7665751901178175493@b58463cdfd5f>
+	<20171018082836.GD9443@lemon> <20171018083549.GB9719@redhat.com>
+	<20171020125107.GM21172@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <657cdf86-237d-c68e-75ed-6f9a0ea0ac34@redhat.com>
-Subject: Re: [Qemu-devel] [RFC v2 13/22] monitor: separate QMP parser and
- dispatcher
+In-Reply-To: <20171020125107.GM21172@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] docker: Fix PATH for ccache
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,28 +29,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org, "Daniel P . Berrange" <berrange@redhat.com>, Stefan Hajnoczi <shajnocz@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: alex.bennee@linaro.org, qemu-devel@nongnu.org, f4bug@amsat.org
 
-On Fri, Oct 20, 2017 at 11:19:44AM +0200, Paolo Bonzini wrote:
-> On 19/10/2017 15:13, Stefan Hajnoczi wrote:
-> > Up to you.  I don't remember the details of out_lock usage well enough
-> > to know whether using the lock for the queues is good or bad.
+On Fri, 10/20 13:51, Daniel P. Berrange wrote:
+> On Wed, Oct 18, 2017 at 09:35:49AM +0100, Daniel P. Berrange wrote:
+> > On Wed, Oct 18, 2017 at 04:28:36PM +0800, Fam Zheng wrote:
+> > > On Wed, 10/18 01:08, no-reply@patchew.org wrote:
+> > > > Your branch is up-to-date with 'origin/test'.
+> > > > Submodule 'dtc' (git://git.qemu-project.org/dtc.git) registered for path 'dtc'
+> > > > Cloning into '/var/tmp/patchew-tester-tmp-jhpnlaz0/src/docker-src.2017-10-18-04.03.32.32287/qemu.tar.vroot/dtc'...
+> > > > fatal: unable to connect to git.qemu-project.org:
+> > > > git.qemu-project.org[0: 172.99.69.163]: errno=Connection timed out
+> > > > 
+> > > > fatal: clone of 'git://git.qemu-project.org/dtc.git' into submodule path '/var/tmp/patchew-tester-tmp-jhpnlaz0/src/docker-src.2017-10-18-04.03.32.32287/qemu.tar.vroot/dtc' failed
+> > > > Failed to clone 'dtc'. Retry scheduled
+> > > > Cloning into '/var/tmp/patchew-tester-tmp-jhpnlaz0/src/docker-src.2017-10-18-04.03.32.32287/qemu.tar.vroot/dtc'...
+> > > > fatal: unable to connect to git.qemu-project.org:
+> > > > git.qemu-project.org[0: 172.99.69.163]: errno=Connection timed out
+> > > > 
+> > > > fatal: clone of 'git://git.qemu-project.org/dtc.git' into submodule path '/var/tmp/patchew-tester-tmp-jhpnlaz0/src/docker-src.2017-10-18-04.03.32.32287/qemu.tar.vroot/dtc' failed
+> > > > Failed to clone 'dtc' a second time, aborting
+> > > > failed to init submodule dtc
+> > > 
+> > > So now patchew is less robust on network hiccups: a number of the same "git
+> > > submodule update --init" calls have succeeded above, so this is incidental. Any
+> > > idea how to improve that? Maybe if there is a checkout from $QEMU_SRC, clone/cp
+> > > from there instead of fetch from submodule remote?
+> > 
+> > If patchew has unreliable connectivity to git.qemu.org then the best thing
+> > is probably have a background job that mirrors the git.qemu.org repos on
+> > the patchew server. Then have the test job modify .gitmodules to point to
+> > your local mirror. That way, network access is used during the background
+> > job only, and actual builds just get a local clone from the cache.
 > 
-> out_lock is called like that because it's only writes that can be done
-> from multiple threads (at both the chardev and monitor level).
-> IOThreads in particular want to generate QMP events.
+> I thought of a simpler way to address this.
 > 
-> out_lock protects the monitor's own output buffer, while the character
-> device layer has its own locking (chr_write_lock).  chr_write_lock
-> protects calls to the chr_write method of the Chardev object and writes
-> to the character device's logfd.
+> Currently patchew runs 4 docker jobs, and each one triggers creation of
+> the $(DOCKER_SRC_COPY) rule. This runs archive-source.sh 4 times, because
+> $(DOCKER_SRC_COPY) contains the current timestamp and so is different
+> each time we run it.
 > 
-> Renaming out_lock and reusing it is just fine if the lock is only held
-> for short periods of time.  But maybe it's simpler to just introduce
-> another lock, since the out_lock rules are very simple.
+> If you override DOCKER_SRC_COPY with the current git change hash, then
+> you would end up using the same archive for all 4 jobs, and so only do
+> the checkouts once
+>  
+>   make docker-foo   DOCKER_SRC_COPY=docker-src.`git rev-parse HEAD`
 
-OK, let me use a new lock.  Thanks for explaining!
+I'm fine with that, just not sure about if this handles uncommitted changes
+correctly? It certainly isn't a concern on patchew, but may be a problem for
+developers.
 
--- 
-Peter Xu
+Your previous idea about mirroring submodules to local makes much sense, I can
+try it though.
+
+Fam
