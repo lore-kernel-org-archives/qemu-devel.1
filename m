@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50674)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53343)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1e6QyG-0005jL-4V
-	for qemu-devel@nongnu.org; Sun, 22 Oct 2017 20:52:01 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1e6RKv-0008QT-46
+	for qemu-devel@nongnu.org; Sun, 22 Oct 2017 21:15:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1e6QyD-0005v5-2G
-	for qemu-devel@nongnu.org; Sun, 22 Oct 2017 20:52:00 -0400
-Received: from mail.cn.fujitsu.com ([183.91.158.132]:37516
-	helo=heian.cn.fujitsu.com) by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1e6QyC-0005rq-MK
-	for qemu-devel@nongnu.org; Sun, 22 Oct 2017 20:51:56 -0400
-References: <1508298538-28753-1-git-send-email-douly.fnst@cn.fujitsu.com>
-	<66ec5354-d66c-a4e0-aea3-bc1ca428d2a8@cn.fujitsu.com>
-	<20171020191523.GQ2942@localhost.localdomain>
-From: Dou Liyang <douly.fnst@cn.fujitsu.com>
-Message-ID: <0db84774-3526-467a-d638-6cb821e34d52@cn.fujitsu.com>
-Date: Mon, 23 Oct 2017 08:51:45 +0800
+	(envelope-from <pbonzini@redhat.com>) id 1e6RKq-0006T4-50
+	for qemu-devel@nongnu.org; Sun, 22 Oct 2017 21:15:25 -0400
+Received: from mail-wr0-f196.google.com ([209.85.128.196]:47618)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1e6RKp-0006R9-OM
+	for qemu-devel@nongnu.org; Sun, 22 Oct 2017 21:15:20 -0400
+Received: by mail-wr0-f196.google.com with SMTP id y39so15763134wrd.4
+	for <qemu-devel@nongnu.org>; Sun, 22 Oct 2017 18:15:18 -0700 (PDT)
+References: <20171022161312.4xlitnw2bknvv7ml@ubuntu>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <240b64ec-0236-a4ee-2e6a-f39800a9f9b0@redhat.com>
+Date: Mon, 23 Oct 2017 03:15:15 +0200
 MIME-Version: 1.0
-In-Reply-To: <20171020191523.GQ2942@localhost.localdomain>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] ACPI/unit-test: Add a testcase for RAM
- allocation in numa node
+In-Reply-To: <20171022161312.4xlitnw2bknvv7ml@ubuntu>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] Unable to clone git repository from git.qemu.org
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,77 +29,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org
+To: "=?UTF-8?Q?Eduardo_A._Bustamante_L=c3=b3pez?=" <dualbus@gmail.com>, qemu-devel@nongnu.org
 
-Hi Eduardo,
+On 22/10/2017 18:13, Eduardo A. Bustamante López wrote:
+> (please keep me CC'ed, I'm not subscribed)
+> 
+> Hi,
+> 
+> I apologize if this is not the right mailing list for this report. I'm unable to clone the git repository from
+> git://git.qemu.org/qemu.git (which is listed on https://www.qemu.org/contribute/).
+> 
+> I'm getting TCP RST's when I try to clone it, as indicated by the packet capture:
+> 
+>   dualbus@ubuntu:~/src/qemu$ git clone git://git.qemu.org/qemu.git
+>   Cloning into 'qemu'...
+>   fatal: read error: Connection reset by peer
+> 
+>   dualbus@ubuntu:~/src/qemu$ git clone git://git.qemu.org/qemu.git
+>   Cloning into 'qemu'...
+>   fatal: Could not read from remote repository.
+>   
+>   Please make sure you have the correct access rights
+>   and the repository exists.
 
-Thanks for your reply.
+Thanks for your report, we will look into it soon.  In the meanwhile,
+you can use the github mirror:
 
-At 10/21/2017 03:15 AM, Eduardo Habkost wrote:
-> On Wed, Oct 18, 2017 at 11:50:32AM +0800, Dou Liyang wrote:
->>
->> At 10/18/2017 11:48 AM, Dou Liyang wrote:
->>> As QEMU supports the memory-less node, it is possible that there is
->>> no RAM in the first numa node(also be called as node0). eg:
->>>   ... \
->>>   -m 128,slots=3,maxmem=1G \
->>>   -numa node -numa node,mem=128M \
->>>
->>> But, this makes it hard for QEMU to build a known-to-work ACPI SRAT
->>> table. Only fixing it is not enough.
->>>
->>> Add a testcase for this situation to make sure the ACPI table is
->>> correct for guest.
->>>
->>> Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
->>> Signed-off-by: Dou Liyang <douly.fnst@cn.fujitsu.com>
->>> ---
->>> Changelog:
->>>
->>> This patch can pass the 'make check' in Peter's machine,
->>
->> Oops,  s/can/can not  :-).
->>
->> Thanks,
->> 	dou.
->>
->>> But, in my own and Eduardo's machine, we can pass it.
->>>
->>> So I rebase and spilt it independently.
->
-> Thanks!
->
->>>
->>> Peter:
->>>
->>> could you help me test it in your machine.
->>> then, give me the output files, such as /tmp/asl-6QYK7Y.dsl and /tmp/asl-1H1I7Y.dsl file.
->
-> As the failures reported by Peter were about the *.memhp test
-> case files, I think this patch is unlikely to be the cause of
-> those failures.  I believe the problem is at:
->
->   From: Dou Liyang <douly.fnst@cn.fujitsu.com>
->   Date: Fri, 1 Sep 2017 10:10:03 +0800
->   Message-ID: <1504231805-30957-3-git-send-email-douly.fnst@cn.fujitsu.com>
->   Subject: [PATCH v6 2/4] hw/acpi-build: Make assignment statement
->            of next_base easy to read
->
+   git clone git://github.com/qemu/qemu
 
-This patch is just used for readability. so I discard it. and, we
-need a test case for the commit
+Paolo
 
-   4926403c250f ("hw/acpi-build: Fix SRAT memory building in case of 
-node 0 without RAM")
-
-So, I re-post this patch. ;-)
-
-
-> However, I would still like to get test results from Peter before
-> applying this patch again.
-
-I see.
-
-Thanks,
-	dou
+> 
+>   ---
+> 
+>   dualbus@ubuntu:~$ sudo tcpdump -n 'host git.qemu.org'
+>   tcpdump: verbose output suppressed, use -v or -vv for full protocol decode
+>   listening on eno1, link-type EN10MB (Ethernet), capture size 262144 bytes
+>   10:29:34.459497 IP 192.168.1.108.43168 > 172.99.69.163.9418: Flags [S], seq 1870728944, win 29200, options [mss 1460,sackOK,TS val 500213983 ecr 0,nop,wscale 7], length 0
+>   10:29:35.487129 IP 192.168.1.108.43168 > 172.99.69.163.9418: Flags [S], seq 1870728944, win 29200, options [mss 1460,sackOK,TS val 500214240 ecr 0,nop,wscale 7], length 0
+>   10:29:35.487854 IP 172.99.69.163.9418 > 192.168.1.108.43168: Flags [S.], seq 1436706601, ack 1870728945, win 28960, options [mss 1380,sackOK,TS val 3511630652 ecr 500213983,nop,wscale 10], length 0
+>   10:29:35.487949 IP 192.168.1.108.43168 > 172.99.69.163.9418: Flags [.], ack 1, win 229, options [nop,nop,TS val 500214240 ecr 3511630652], length 0
+>   10:29:35.488077 IP 192.168.1.108.43168 > 172.99.69.163.9418: Flags [P.], seq 1:49, ack 1, win 229, options [nop,nop,TS val 500214240 ecr 3511630652], length 48
+>   10:29:36.604320 IP 172.99.69.163.9418 > 192.168.1.108.43168: Flags [S.], seq 1436706601, ack 1870728945, win 28960, options [mss 1380,sackOK,TS val 3511631678 ecr 500213983,nop,wscale 10], length 0
+>   10:29:36.604378 IP 192.168.1.108.43168 > 172.99.69.163.9418: Flags [.], ack 1, win 229, options [nop,nop,TS val 500214519 ecr 3511630652], length 0
+>   10:29:36.608418 IP 172.99.69.163.9418 > 192.168.1.108.43168: Flags [.], ack 49, win 29, options [nop,nop,TS val 3511631682 ecr 500214240], length 0
+>   10:29:36.608943 IP 172.99.69.163.9418 > 192.168.1.108.43168: Flags [R.], seq 1, ack 49, win 29, options [nop,nop,TS val 0 ecr 500214240], length 0
+>   10:29:37.553793 IP 172.99.69.163.9418 > 192.168.1.108.43168: Flags [R.], seq 1, ack 49, win 229, length 0
+>   10:29:40.037068 IP 192.168.1.108.43170 > 172.99.69.163.9418: Flags [S], seq 4085609936, win 29200, options [mss 1460,sackOK,TS val 500215377 ecr 0,nop,wscale 7], length 0
+>   10:29:41.038109 IP 172.99.69.163.9418 > 192.168.1.108.43170: Flags [S.], seq 1040747289, ack 4085609937, win 28960, options [mss 1380,sackOK,TS val 3511636236 ecr 500215377,nop,wscale 10], length 0
+>   10:29:41.038218 IP 192.168.1.108.43170 > 172.99.69.163.9418: Flags [.], ack 1, win 229, options [nop,nop,TS val 500215627 ecr 3511636236], length 0
+>   10:29:41.038398 IP 192.168.1.108.43170 > 172.99.69.163.9418: Flags [P.], seq 1:49, ack 1, win 229, options [nop,nop,TS val 500215627 ecr 3511636236], length 48
+>   10:29:42.111622 IP 172.99.69.163.9418 > 192.168.1.108.43170: Flags [F.], seq 1, ack 1, win 29, options [nop,nop,TS val 3511637236 ecr 500215627], length 0
+>   10:29:42.113384 IP 192.168.1.108.43170 > 172.99.69.163.9418: Flags [F.], seq 49, ack 2, win 229, options [nop,nop,TS val 500215896 ecr 3511637236], length 0
+>   10:29:42.121555 IP 172.99.69.163.9418 > 192.168.1.108.43170: Flags [R], seq 1040747290, win 0, length 0
+>   10:29:43.121773 IP 172.99.69.163.9418 > 192.168.1.108.43170: Flags [R.], seq 2, ack 50, win 229, length 0
+>   ^C
+>   18 packets captured
+>   27 packets received by filter
+>   0 packets dropped by kernel
+> 
+> 
+> I was able to clone it via HTTPS, but now I'm having issues updating the git submodules
+> 
+>   dualbus@ubuntu:~/src/qemu/qemu$ git submodule update ui/keycodemapdb
+>   Cloning into '/home/dualbus/src/qemu/qemu/ui/keycodemapdb'...
+>   fatal: Could not read from remote repository.
+>   
+>   Please make sure you have the correct access rights
+>   and the repository exists.
+>   fatal: clone of 'git://git.qemu.org/keycodemapdb.git' into submodule path '/home/dualbus/src/qemu/qemu/ui/keycodemapdb'
+>   failed
+>   Failed to clone 'ui/keycodemapdb'. Retry scheduled
+>   Cloning into '/home/dualbus/src/qemu/qemu/ui/keycodemapdb'...
+>   fatal: Could not read from remote repository.
+>   
+>   Please make sure you have the correct access rights
+>   and the repository exists.
+>   fatal: clone of 'git://git.qemu.org/keycodemapdb.git' into submodule path '/home/dualbus/src/qemu/qemu/ui/keycodemapdb'
+>   failed
+>   Failed to clone 'ui/keycodemapdb' a second time, aborting
+> 
