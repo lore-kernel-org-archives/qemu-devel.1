@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46462)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46497)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1e6j4W-0000W3-GT
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 16:11:43 -0400
+	(envelope-from <andrew.smirnov@gmail.com>) id 1e6j4X-0000XY-RU
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 16:11:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1e6j4T-0002ak-JO
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 16:11:40 -0400
+	(envelope-from <andrew.smirnov@gmail.com>) id 1e6j4W-0002cP-KR
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 16:11:41 -0400
 From: Andrey Smirnov <andrew.smirnov@gmail.com>
-Date: Mon, 23 Oct 2017 13:10:44 -0700
-Message-Id: <20171023201055.21973-17-andrew.smirnov@gmail.com>
+Date: Mon, 23 Oct 2017 13:10:48 -0700
+Message-Id: <20171023201055.21973-21-andrew.smirnov@gmail.com>
 In-Reply-To: <20171023201055.21973-1-andrew.smirnov@gmail.com>
 References: <20171023201055.21973-1-andrew.smirnov@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 16/27] i.MX: Add code to emulate GPCv2 IP
+Subject: [Qemu-devel] [PATCH v2 20/27] i.MX: Add code to emulate FlexCAN IP
  block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -36,36 +36,35 @@ Cc: qemu-arm@nongnu.org
 Cc: yurovsky@gmail.com
 Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
 ---
- hw/intc/Makefile.objs       |   2 +-
- hw/intc/imx_gpcv2.c         | 125 ++++++++++++++++++++++++++++++++++++++++++++
- include/hw/intc/imx_gpcv2.h |  22 ++++++++
- 3 files changed, 148 insertions(+), 1 deletion(-)
- create mode 100644 hw/intc/imx_gpcv2.c
- create mode 100644 include/hw/intc/imx_gpcv2.h
+ hw/misc/Makefile.objs         |  1 +
+ hw/misc/imx_flexcan.c         | 99 +++++++++++++++++++++++++++++++++++++++++++
+ include/hw/misc/imx_flexcan.h | 22 ++++++++++
+ 3 files changed, 122 insertions(+)
+ create mode 100644 hw/misc/imx_flexcan.c
+ create mode 100644 include/hw/misc/imx_flexcan.h
 
-diff --git a/hw/intc/Makefile.objs b/hw/intc/Makefile.objs
-index 78426a7daf..db234901aa 100644
---- a/hw/intc/Makefile.objs
-+++ b/hw/intc/Makefile.objs
-@@ -4,7 +4,7 @@ common-obj-$(CONFIG_PL190) += pl190.o
- common-obj-$(CONFIG_PUV3) += puv3_intc.o
- common-obj-$(CONFIG_XILINX) += xilinx_intc.o
- common-obj-$(CONFIG_ETRAXFS) += etraxfs_pic.o
--common-obj-$(CONFIG_IMX) += imx_avic.o
-+common-obj-$(CONFIG_IMX) += imx_avic.o imx_gpcv2.o
- common-obj-$(CONFIG_LM32) += lm32_pic.o
- common-obj-$(CONFIG_REALVIEW) += realview_gic.o
- common-obj-$(CONFIG_SLAVIO) += slavio_intctl.o
-diff --git a/hw/intc/imx_gpcv2.c b/hw/intc/imx_gpcv2.c
+diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
+index 492c535330..943b22af40 100644
+--- a/hw/misc/Makefile.objs
++++ b/hw/misc/Makefile.objs
+@@ -38,6 +38,7 @@ obj-$(CONFIG_IMX) += imx7_ccm.o
+ obj-$(CONFIG_IMX) += imx2_wdt.o
+ obj-$(CONFIG_IMX) += imx7_snvs.o
+ obj-$(CONFIG_IMX) += imx7_iomuxc.o
++obj-$(CONFIG_IMX) += imx_flexcan.o
+ obj-$(CONFIG_MILKYMIST) += milkymist-hpdmc.o
+ obj-$(CONFIG_MILKYMIST) += milkymist-pfpu.o
+ obj-$(CONFIG_MAINSTONE) += mst_fpga.o
+diff --git a/hw/misc/imx_flexcan.c b/hw/misc/imx_flexcan.c
 new file mode 100644
-index 0000000000..496ed31b78
+index 0000000000..dd4d3d6dc1
 --- /dev/null
-+++ b/hw/intc/imx_gpcv2.c
-@@ -0,0 +1,125 @@
++++ b/hw/misc/imx_flexcan.c
+@@ -0,0 +1,99 @@
 +/*
 + * Copyright (c) 2017, Impinj, Inc.
 + *
-+ * i.MX7 GPCv2 block emulation code
++ * i.MX FlexCAN block emulation code
 + *
 + * Author: Andrey Smirnov <andrew.smirnov@gmail.com>
 + *
@@ -74,59 +73,33 @@ index 0000000000..496ed31b78
 + */
 +
 +#include "qemu/osdep.h"
-+#include "hw/intc/imx_gpcv2.h"
++#include "hw/misc/imx_flexcan.h"
 +#include "qemu/log.h"
 +
-+#define GPC_PU_PGC_SW_PUP_REQ       0x0f8
-+#define GPC_PU_PGC_SW_PDN_REQ       0x104
-+
-+#define USB_HSIC_PHY_SW_Pxx_REQ     BIT(4)
-+#define USB_OTG2_PHY_SW_Pxx_REQ     BIT(3)
-+#define USB_OTG1_PHY_SW_Pxx_REQ     BIT(2)
-+#define PCIE_PHY_SW_Pxx_REQ         BIT(1)
-+#define MIPI_PHY_SW_Pxx_REQ         BIT(0)
-+
-+
-+static void imx_gpcv2_reset(DeviceState *dev)
++static void imx_flexcan_reset(DeviceState *dev)
 +{
-+    IMXGPCv2State *s = IMX_GPCV2(dev);
++    IMXFlexCANState *s = IMX_FLEXCAN(dev);
 +
 +    memset(s->regs, 0, sizeof(s->regs));
 +}
 +
-+static uint64_t imx_gpcv2_read(void *opaque, hwaddr offset,
++static uint64_t imx_flexcan_read(void *opaque, hwaddr offset,
 +                               unsigned size)
 +{
-+    IMXGPCv2State *s = opaque;
-+
++    IMXFlexCANState *s = opaque;
 +    return s->regs[offset / sizeof(uint32_t)];
 +}
 +
-+static void imx_gpcv2_write(void *opaque, hwaddr offset,
++static void imx_flexcan_write(void *opaque, hwaddr offset,
 +                            uint64_t value, unsigned size)
 +{
-+    IMXGPCv2State *s = opaque;
-+    const size_t idx = offset / sizeof(uint32_t);
-+
-+    s->regs[idx] = value;
-+
-+    /*
-+     * Real HW will clear those bits once as a way to indicate that
-+     * power up request is complete
-+     */
-+    if (offset == GPC_PU_PGC_SW_PUP_REQ ||
-+        offset == GPC_PU_PGC_SW_PDN_REQ) {
-+        s->regs[idx] &= ~(USB_HSIC_PHY_SW_Pxx_REQ |
-+                          USB_OTG2_PHY_SW_Pxx_REQ |
-+                          USB_OTG1_PHY_SW_Pxx_REQ |
-+                          PCIE_PHY_SW_Pxx_REQ     |
-+                          MIPI_PHY_SW_Pxx_REQ);
-+    }
++    IMXFlexCANState *s = opaque;
++    s->regs[offset / sizeof(uint32_t)] = value;
 +}
 +
-+static const struct MemoryRegionOps imx_gpcv2_ops = {
-+    .read = imx_gpcv2_read,
-+    .write = imx_gpcv2_write,
++static const struct MemoryRegionOps imx_flexcan_ops = {
++    .read = imx_flexcan_read,
++    .write = imx_flexcan_write,
 +    .endianness = DEVICE_NATIVE_ENDIAN,
 +    .impl = {
 +        /*
@@ -141,79 +114,79 @@ index 0000000000..496ed31b78
 +    },
 +};
 +
-+static void imx_gpcv2_init(Object *obj)
++static void imx_flexcan_init(Object *obj)
 +{
 +    SysBusDevice *sd = SYS_BUS_DEVICE(obj);
-+    IMXGPCv2State *s = IMX_GPCV2(obj);
++    IMXFlexCANState *s = IMX_FLEXCAN(obj);
 +
 +    memory_region_init_io(&s->iomem,
 +                          obj,
-+                          &imx_gpcv2_ops,
++                          &imx_flexcan_ops,
 +                          s,
-+                          TYPE_IMX_GPCV2 ".iomem",
++                          TYPE_IMX_FLEXCAN ".iomem",
 +                          sizeof(s->regs));
 +    sysbus_init_mmio(sd, &s->iomem);
 +}
 +
-+static const VMStateDescription vmstate_imx_gpcv2 = {
-+    .name = TYPE_IMX_GPCV2,
++static const VMStateDescription vmstate_imx_flexcan = {
++    .name = TYPE_IMX_FLEXCAN,
 +    .version_id = 1,
 +    .minimum_version_id = 1,
 +    .fields = (VMStateField[]) {
-+        VMSTATE_UINT32_ARRAY(regs, IMXGPCv2State, GPC_NUM),
++        VMSTATE_UINT32_ARRAY(regs, IMXFlexCANState, FLEXCAN_NUM),
 +        VMSTATE_END_OF_LIST()
 +    },
 +};
 +
-+static void imx_gpcv2_class_init(ObjectClass *klass, void *data)
++static void imx_flexcan_class_init(ObjectClass *klass, void *data)
 +{
 +    DeviceClass *dc = DEVICE_CLASS(klass);
 +
-+    dc->reset = imx_gpcv2_reset;
-+    dc->vmsd  = &vmstate_imx_gpcv2;
-+    dc->desc  = "i.MX GPCv2 Module";
++    dc->reset = imx_flexcan_reset;
++    dc->vmsd  = &vmstate_imx_flexcan;
++    dc->desc  = "i.MX FlexCAN Module";
 +}
 +
-+static const TypeInfo imx_gpcv2_info = {
-+    .name          = TYPE_IMX_GPCV2,
++static const TypeInfo imx_flexcan_info = {
++    .name          = TYPE_IMX_FLEXCAN,
 +    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(IMXGPCv2State),
-+    .instance_init = imx_gpcv2_init,
-+    .class_init    = imx_gpcv2_class_init,
++    .instance_size = sizeof(IMXFlexCANState),
++    .instance_init = imx_flexcan_init,
++    .class_init    = imx_flexcan_class_init,
 +};
 +
-+static void imx_gpcv2_register_type(void)
++static void imx_flexcan_register_type(void)
 +{
-+    type_register_static(&imx_gpcv2_info);
++    type_register_static(&imx_flexcan_info);
 +}
-+type_init(imx_gpcv2_register_type)
-diff --git a/include/hw/intc/imx_gpcv2.h b/include/hw/intc/imx_gpcv2.h
++type_init(imx_flexcan_register_type)
+diff --git a/include/hw/misc/imx_flexcan.h b/include/hw/misc/imx_flexcan.h
 new file mode 100644
-index 0000000000..ed978b24bb
+index 0000000000..da9980cf86
 --- /dev/null
-+++ b/include/hw/intc/imx_gpcv2.h
++++ b/include/hw/misc/imx_flexcan.h
 @@ -0,0 +1,22 @@
-+#ifndef IMX_GPCV2_H
-+#define IMX_GPCV2_H
++#ifndef IMX_FLEXCAN_H
++#define IMX_FLEXCAN_H
 +
 +#include "hw/sysbus.h"
 +
-+enum IMXGPCv2Registers {
-+    GPC_NUM        = 0xE00 / sizeof(uint32_t),
++enum IMXFlexCANRegisters {
++    FLEXCAN_NUM = 0x9E0 / sizeof(uint32_t) + 1,
 +};
 +
-+typedef struct IMXGPCv2State {
++typedef struct IMXFlexCANState {
 +    /*< private >*/
 +    SysBusDevice parent_obj;
 +
 +    /*< public >*/
 +    MemoryRegion iomem;
-+    uint32_t     regs[GPC_NUM];
-+} IMXGPCv2State;
++    uint32_t     regs[FLEXCAN_NUM];
++} IMXFlexCANState;
 +
-+#define TYPE_IMX_GPCV2 "imx-gpcv2"
-+#define IMX_GPCV2(obj) OBJECT_CHECK(IMXGPCv2State, (obj), TYPE_IMX_GPCV2)
++#define TYPE_IMX_FLEXCAN "imx-flexcan"
++#define IMX_FLEXCAN(obj) OBJECT_CHECK(IMXFlexCANState, (obj), TYPE_IMX_FLEXCAN)
 +
-+#endif /* IMX_GPCV2_H */
++#endif /* IMX_FLEXCAN_H */
 -- 
 2.13.5
