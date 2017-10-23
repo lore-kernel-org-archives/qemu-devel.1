@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44941)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44959)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1e6ZW7-0005So-5n
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 05:59:32 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1e6ZW8-0005UT-QR
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 05:59:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1e6ZW4-0002xs-4C
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 05:59:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36954)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1e6ZW7-0002zb-Ho
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 05:59:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60922)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1e6ZW3-0002xh-RI
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 05:59:28 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+	id 1e6ZW7-0002zC-9S
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 05:59:31 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CFA9E5F7BE
-	for <qemu-devel@nongnu.org>; Mon, 23 Oct 2017 09:59:26 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 37AF236809
+	for <qemu-devel@nongnu.org>; Mon, 23 Oct 2017 09:59:30 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Mon, 23 Oct 2017 10:59:07 +0100
-Message-Id: <20171023095910.23202-4-marcandre.lureau@redhat.com>
+Date: Mon, 23 Oct 2017 10:59:09 +0100
+Message-Id: <20171023095910.23202-6-marcandre.lureau@redhat.com>
 In-Reply-To: <20171023095910.23202-1-marcandre.lureau@redhat.com>
 References: <20171023095910.23202-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v5 3/6] memfd: add error argument,
- instead of perror()
+Subject: [Qemu-devel] [PATCH v5 5/6] Add memfd based hostmem
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,199 +34,219 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, ehabkost@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: pbonzini@redhat.com, ehabkost@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
-This will allow callers to silence error report when the call is
-allowed to failed.
+Add a new memory backend, similar to hostmem-file, except that it
+doesn't need to create files. It also enforces memory sealing.
+
+This backend is mainly useful for sharing the memory with other
+processes.
+
+Note that Linux supports transparent huge-pages of shmem/memfd memory
+since 4.8. It is relatively easier to set up THP than a dedicate
+hugepage mount point by using "madvise" in
+/sys/kernel/mm/transparent_hugepage/shmem_enabled.
+
+Since 4.14, memfd allows to set hugetlb requirement explicitly.
+
+Usage:
+-object memory-backend-memfd,id=3Dmem1,size=3D1G
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- include/qemu/memfd.h |  5 +++--
- hw/virtio/vhost.c    |  8 +++++++-
- util/memfd.c         | 57 +++++++++++++++++++++++++++-------------------=
-------
- 3 files changed, 40 insertions(+), 30 deletions(-)
+ backends/hostmem-memfd.c | 124 +++++++++++++++++++++++++++++++++++++++++=
+++++++
+ tests/vhost-user-test.c  |   2 +-
+ backends/Makefile.objs   |   2 +
+ qemu-options.hx          |  15 ++++++
+ 4 files changed, 142 insertions(+), 1 deletion(-)
+ create mode 100644 backends/hostmem-memfd.c
 
-diff --git a/include/qemu/memfd.h b/include/qemu/memfd.h
-index 41c24d807c..b9d09873b5 100644
---- a/include/qemu/memfd.h
-+++ b/include/qemu/memfd.h
-@@ -16,9 +16,10 @@
- #define F_SEAL_WRITE    0x0008  /* prevent writes */
- #endif
-=20
--int qemu_memfd_create(const char *name, size_t size, unsigned int seals)=
-;
-+int qemu_memfd_create(const char *name, size_t size, unsigned int seals,
-+                      Error **errp);
- void *qemu_memfd_alloc(const char *name, size_t size, unsigned int seals=
-,
--                       int *fd);
-+                       int *fd, Error **errp);
- void qemu_memfd_free(void *ptr, size_t size, int fd);
- bool qemu_memfd_check(void);
-=20
-diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-index ddc42f0f93..63ec0e8315 100644
---- a/hw/virtio/vhost.c
-+++ b/hw/virtio/vhost.c
-@@ -329,6 +329,7 @@ static uint64_t vhost_get_log_size(struct vhost_dev *=
-dev)
-=20
- static struct vhost_log *vhost_log_alloc(uint64_t size, bool share)
- {
-+    Error *err =3D NULL;
-     struct vhost_log *log;
-     uint64_t logsize =3D size * sizeof(*(log->log));
-     int fd =3D -1;
-@@ -337,7 +338,12 @@ static struct vhost_log *vhost_log_alloc(uint64_t si=
-ze, bool share)
-     if (share) {
-         log->log =3D qemu_memfd_alloc("vhost-log", logsize,
-                                     F_SEAL_GROW | F_SEAL_SHRINK | F_SEAL=
-_SEAL,
--                                    &fd);
-+                                    &fd, &err);
-+        if (err) {
-+            error_report_err(err);
-+            g_free(log);
-+            return NULL;
-+        }
-         memset(log->log, 0, logsize);
-     } else {
-         log->log =3D g_malloc0(logsize);
-diff --git a/util/memfd.c b/util/memfd.c
-index b5b7a41347..f890976a0e 100644
---- a/util/memfd.c
-+++ b/util/memfd.c
-@@ -27,6 +27,7 @@
-=20
- #include "qemu/osdep.h"
-=20
+diff --git a/backends/hostmem-memfd.c b/backends/hostmem-memfd.c
+new file mode 100644
+index 0000000000..448591556a
+--- /dev/null
++++ b/backends/hostmem-memfd.c
+@@ -0,0 +1,124 @@
++/*
++ * QEMU host memfd memory backend
++ *
++ * Copyright (C) 2016 Red Hat Inc
++ *
++ * Authors:
++ *   Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
++ * See the COPYING file in the top-level directory.
++ */
++#include "qemu/osdep.h"
++#include "qemu-common.h"
++#include "sysemu/hostmem.h"
++#include "sysemu/sysemu.h"
++#include "qom/object_interfaces.h"
++#include "qemu/memfd.h"
 +#include "qapi/error.h"
- #include "qemu/memfd.h"
-=20
- #ifdef CONFIG_MEMFD
-@@ -53,11 +54,11 @@ static int memfd_create(const char *name, unsigned in=
-t flags)
- #define MFD_ALLOW_SEALING 0x0002U
- #endif
-=20
--int qemu_memfd_create(const char *name, size_t size, unsigned int seals)
-+int qemu_memfd_create(const char *name, size_t size,
-+                      unsigned int seals, Error **errp)
- {
--    int mfd =3D -1;
--
- #ifdef CONFIG_LINUX
-+    int mfd =3D -1;
-     unsigned int flags =3D MFD_CLOEXEC;
-=20
-     if (seals) {
-@@ -66,23 +67,26 @@ int qemu_memfd_create(const char *name, size_t size, =
-unsigned int seals)
-=20
-     mfd =3D memfd_create(name, flags);
-     if (mfd < 0) {
--        return -1;
-+        goto err;
-     }
-=20
-     if (ftruncate(mfd, size) =3D=3D -1) {
--        perror("ftruncate");
--        close(mfd);
--        return -1;
-+        goto err;
-     }
-=20
-     if (seals && fcntl(mfd, F_ADD_SEALS, seals) =3D=3D -1) {
--        perror("fcntl");
--        close(mfd);
--        return -1;
-+        goto err;
-     }
--#endif
-=20
-     return mfd;
 +
-+err:
-+    if (mfd >=3D 0) {
-+        close(mfd);
++#define TYPE_MEMORY_BACKEND_MEMFD "memory-backend-memfd"
++
++#define MEMORY_BACKEND_MEMFD(obj)                                       =
+ \
++    OBJECT_CHECK(HostMemoryBackendMemfd, (obj), TYPE_MEMORY_BACKEND_MEMF=
+D)
++
++typedef struct HostMemoryBackendMemfd HostMemoryBackendMemfd;
++
++struct HostMemoryBackendMemfd {
++    HostMemoryBackend parent_obj;
++
++    bool hugetlb;
++    bool seal;
++};
++
++static void
++memfd_backend_memory_alloc(HostMemoryBackend *backend, Error **errp)
++{
++    HostMemoryBackendMemfd *m =3D MEMORY_BACKEND_MEMFD(backend);
++    int fd;
++
++    if (!backend->size) {
++        error_setg(errp, "can't create backend with size 0");
++        return;
 +    }
-+#endif
-+    error_setg_errno(errp, errno, "failed to create memfd");
-+    return -1;
- }
-=20
- /*
-@@ -92,14 +96,14 @@ int qemu_memfd_create(const char *name, size_t size, =
-unsigned int seals)
-  * sealing.
-  */
- void *qemu_memfd_alloc(const char *name, size_t size, unsigned int seals=
++
++    if (host_memory_backend_mr_inited(backend)) {
++        return;
++    }
++
++    backend->force_prealloc =3D mem_prealloc;
++    fd =3D qemu_memfd_create(TYPE_MEMORY_BACKEND_MEMFD, backend->size,
++                           m->hugetlb, m->seal ?
++                           F_SEAL_GROW | F_SEAL_SHRINK | F_SEAL_SEAL : 0=
 ,
--                       int *fd)
-+                       int *fd, Error **errp)
- {
-     void *ptr;
--    int mfd =3D qemu_memfd_create(name, size, seals);
-+    int mfd =3D qemu_memfd_create(name, size, seals, NULL);
-=20
-     /* some systems have memfd without sealing */
-     if (mfd =3D=3D -1) {
--        mfd =3D qemu_memfd_create(name, size, 0);
-+        mfd =3D qemu_memfd_create(name, size, 0, NULL);
-     }
-=20
-     if (mfd =3D=3D -1) {
-@@ -111,27 +115,26 @@ void *qemu_memfd_alloc(const char *name, size_t siz=
-e, unsigned int seals,
-         unlink(fname);
-         g_free(fname);
-=20
--        if (mfd =3D=3D -1) {
--            perror("mkstemp");
--            return NULL;
--        }
--
--        if (ftruncate(mfd, size) =3D=3D -1) {
--            perror("ftruncate");
--            close(mfd);
--            return NULL;
-+        if (mfd =3D=3D -1 ||
-+            ftruncate(mfd, size) =3D=3D -1) {
-+            goto err;
-         }
-     }
-=20
-     ptr =3D mmap(0, size, PROT_READ | PROT_WRITE, MAP_SHARED, mfd, 0);
-     if (ptr =3D=3D MAP_FAILED) {
--        perror("mmap");
--        close(mfd);
--        return NULL;
-+        goto err;
-     }
-=20
-     *fd =3D mfd;
-     return ptr;
-+
-+err:
-+    error_setg_errno(errp, errno, "failed to allocate shared memory");
-+    if (mfd >=3D 0) {
-+        close(mfd);
++                           errp);
++    if (fd =3D=3D -1) {
++        return;
 +    }
-+    return NULL;
- }
++
++    memory_region_init_ram_from_fd(&backend->mr, OBJECT(backend),
++                                   object_get_canonical_path(OBJECT(back=
+end)),
++                                   backend->size, true, fd, errp);
++}
++
++static bool memfd_backend_get_hugetlb(Object *o, Error **errp)
++{
++    return MEMORY_BACKEND_MEMFD(o)->hugetlb;
++}
++
++static void memfd_backend_set_hugetlb(Object *o, bool value,
++                                                 Error **errp)
++{
++    MEMORY_BACKEND_MEMFD(o)->hugetlb =3D value;
++}
++
++static bool memfd_backend_get_seal(Object *o, Error **errp)
++{
++    return MEMORY_BACKEND_MEMFD(o)->seal;
++}
++
++static void memfd_backend_set_seal(Object *o, bool value,
++                                   Error **errp)
++{
++    MEMORY_BACKEND_MEMFD(o)->seal =3D value;
++}
++
++static void
++memfd_backend_instance_init(Object *obj)
++{
++    HostMemoryBackendMemfd *m =3D MEMORY_BACKEND_MEMFD(obj);
++
++    /* default to sealed file */
++    m->seal =3D true;
++}
++
++static void
++memfd_backend_class_init(ObjectClass *oc, void *data)
++{
++    HostMemoryBackendClass *bc =3D MEMORY_BACKEND_CLASS(oc);
++
++    bc->alloc =3D memfd_backend_memory_alloc;
++
++    object_class_property_add_bool(oc, "hugetlb",
++                                   memfd_backend_get_hugetlb,
++                                   memfd_backend_set_hugetlb,
++                                   &error_abort);
++    object_class_property_add_bool(oc, "seal",
++                                   memfd_backend_get_seal,
++                                   memfd_backend_set_seal,
++                                   &error_abort);
++}
++
++static const TypeInfo memfd_backend_info =3D {
++    .name =3D TYPE_MEMORY_BACKEND_MEMFD,
++    .parent =3D TYPE_MEMORY_BACKEND,
++    .instance_init =3D memfd_backend_instance_init,
++    .class_init =3D memfd_backend_class_init,
++    .instance_size =3D sizeof(HostMemoryBackendMemfd),
++};
++
++static void register_types(void)
++{
++    type_register_static(&memfd_backend_info);
++}
++
++type_init(register_types);
+diff --git a/tests/vhost-user-test.c b/tests/vhost-user-test.c
+index 4b98018478..830f1e4026 100644
+--- a/tests/vhost-user-test.c
++++ b/tests/vhost-user-test.c
+@@ -31,7 +31,7 @@
+ #include <linux/virtio_net.h>
+ #include <sys/vfs.h>
 =20
- void qemu_memfd_free(void *ptr, size_t size, int fd)
-@@ -159,7 +162,7 @@ bool qemu_memfd_check(void)
-         int fd;
-         void *ptr;
+-#define VHOST_USER_NET_TESTS_WORKING 0 /* broken as of 2.10.0 */
++#define VHOST_USER_NET_TESTS_WORKING 1 /* broken as of 2.10.0 */
 =20
--        ptr =3D qemu_memfd_alloc("test", 4096, 0, &fd);
-+        ptr =3D qemu_memfd_alloc("test", 4096, 0, &fd, NULL);
-         memfd_check =3D ptr ? MEMFD_OK : MEMFD_KO;
-         qemu_memfd_free(ptr, 4096, fd);
-     }
+ /* GLIB version compatibility flags */
+ #if !GLIB_CHECK_VERSION(2, 26, 0)
+diff --git a/backends/Makefile.objs b/backends/Makefile.objs
+index 0400799efd..67eeeba5fc 100644
+--- a/backends/Makefile.objs
++++ b/backends/Makefile.objs
+@@ -8,3 +8,5 @@ common-obj-$(CONFIG_LINUX) +=3D hostmem-file.o
+=20
+ common-obj-y +=3D cryptodev.o
+ common-obj-y +=3D cryptodev-builtin.o
++
++common-obj-$(CONFIG_LINUX) +=3D hostmem-memfd.o
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 3728e9b4dd..5828caefeb 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -4208,6 +4208,21 @@ that @option{discard-data} is only an optimization=
+, and QEMU
+ might not discard file contents if it aborts unexpectedly or is
+ terminated using SIGKILL.
+=20
++@item -object memory-backend-memfd,id=3D@var{id},size=3D@var{size},seal=3D=
+@var{on|off},hugetlb=3D@var{on|off}
++
++Creates an anonymous memory file backend object, which allows QEMU to
++share the memory with an external process in some cases (e.g. when
++using vhost-user). The memory is allocated with memfd and optional
++sealing. (Linux only)
++
++The @option{id} parameter is a unique ID that will be used to
++reference this memory region when configuring the @option{-numa}
++argument. The @option{size} option provides the size of the memory
++region, and accepts common suffixes, eg @option{500M}. The
++@option{seal} option creates a sealed-file, that will block further
++resizing the memory ('on' by default). The @option{hugetlb} option
++specify the file to be created resides in the hugetlbfs filesystem.
++
+ @item -object rng-random,id=3D@var{id},filename=3D@var{/dev/random}
+=20
+ Creates a random number generator backend which obtains entropy from
 --=20
 2.15.0.rc0.40.gaefcc5f6f
