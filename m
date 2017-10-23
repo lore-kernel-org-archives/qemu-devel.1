@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46128)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46131)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1e6j4F-00009c-IA
+	(envelope-from <andrew.smirnov@gmail.com>) id 1e6j4F-00009g-M9
 	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 16:11:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1e6j4E-0002Th-ON
+	(envelope-from <andrew.smirnov@gmail.com>) id 1e6j4E-0002TZ-G4
 	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 16:11:23 -0400
 From: Andrey Smirnov <andrew.smirnov@gmail.com>
-Date: Mon, 23 Oct 2017 13:10:32 -0700
-Message-Id: <20171023201055.21973-5-andrew.smirnov@gmail.com>
+Date: Mon, 23 Oct 2017 13:10:31 -0700
+Message-Id: <20171023201055.21973-4-andrew.smirnov@gmail.com>
 In-Reply-To: <20171023201055.21973-1-andrew.smirnov@gmail.com>
 References: <20171023201055.21973-1-andrew.smirnov@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 04/27] imx_fec: Use ENET_FTRL to determine
- truncation length
+Subject: [Qemu-devel] [PATCH v2 03/27] imx_fec: Change queue flushing
+ heuristics
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,12 +26,50 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org
 Cc: Andrey Smirnov <andrew.smirnov@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, yurovsky@gmail.com
 
-Frame truncation length, TRUNC_FL, is determined by the contents of
-ENET_FTRL register, so convert the code to use it instead of a
-hardcoded constant.
+In current implementation, packet queue flushing logic seem to suffer
+from a deadlock like scenario if a packet is received by the interface
+before before Rx ring is initialized by Guest's driver. Consider the
+following sequence of events:
 
-To avoid the case where TRUNC_FL is greater that ENET_MAX_FRAME_SIZE,
-increase the value of the latter to its theoretical maximum of 16K.
+	1. A QEMU instance is started against a TAP device on Linux
+	   host, running Linux guest, e. g., something to the effect
+	   of:
+
+	   qemu-system-arm \
+	      -net nic,model=imx.fec,netdev=lan0 \
+	      netdev tap,id=lan0,ifname=tap0,script=no,downscript=no \
+	      ... rest of the arguments ...
+
+	2. Once QEMU starts, but before guest reaches the point where
+	   FEC deriver is done initializing the HW, Guest, via TAP
+	   interface, receives a number of multicast MDNS packets from
+	   Host (not necessarily true for every OS, but it happens at
+	   least on Fedora 25)
+
+	3. Recieving a packet in such a state results in
+	   imx_eth_can_receive() returning '0', which in turn causes
+	   tap_send() to disable corresponding event (tap.c:203)
+
+	4. Once Guest's driver reaches the point where it is ready to
+	   recieve packets it prepares Rx ring descriptors and writes
+	   ENET_RDAR_RDAR to ENET_RDAR register to indicate to HW that
+	   more descriptors are ready. And at this points emulation
+	   layer does this:
+
+	   	 s->regs[index] = ENET_RDAR_RDAR;
+                 imx_eth_enable_rx(s);
+
+	   which, combined with:
+
+	   	  if (!s->regs[ENET_RDAR]) {
+		     qemu_flush_queued_packets(qemu_get_queue(s->nic));
+		  }
+
+	   results in Rx queue never being flushed and corresponding
+	   I/O event beign disabled.
+
+To prevent the problem, change the code to always flush packet queue
+when ENET_RDAR transitions 0 -> ENET_RDAR_RDAR.
 
 Cc: Peter Maydell <peter.maydell@linaro.org>
 Cc: Jason Wang <jasowang@redhat.com>
@@ -41,45 +79,79 @@ Cc: qemu-arm@nongnu.org
 Cc: yurovsky@gmail.com
 Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
 ---
- hw/net/imx_fec.c         | 4 ++--
- include/hw/net/imx_fec.h | 3 ++-
- 2 files changed, 4 insertions(+), 3 deletions(-)
+ hw/net/imx_fec.c         | 12 ++++++------
+ include/hw/net/imx_fec.h |  1 +
+ 2 files changed, 7 insertions(+), 6 deletions(-)
 
 diff --git a/hw/net/imx_fec.c b/hw/net/imx_fec.c
-index eb034ffd0c..dda0816fb3 100644
+index 8b2e4b8ffe..eb034ffd0c 100644
 --- a/hw/net/imx_fec.c
 +++ b/hw/net/imx_fec.c
-@@ -1052,8 +1052,8 @@ static ssize_t imx_enet_receive(NetClientState *nc, const uint8_t *buf,
-     crc_ptr = (uint8_t *) &crc;
+@@ -533,7 +533,7 @@ static void imx_eth_do_tx(IMXFECState *s)
+     }
+ }
  
-     /* Huge frames are truncted.  */
--    if (size > ENET_MAX_FRAME_SIZE) {
--        size = ENET_MAX_FRAME_SIZE;
-+    if (size > s->regs[ENET_FTRL]) {
-+        size = s->regs[ENET_FTRL];
-         flags |= ENET_BD_TR | ENET_BD_LG;
+-static void imx_eth_enable_rx(IMXFECState *s)
++static void imx_eth_enable_rx(IMXFECState *s, bool flush)
+ {
+     IMXFECBufDesc bd;
+     bool rx_ring_full;
+@@ -544,7 +544,7 @@ static void imx_eth_enable_rx(IMXFECState *s)
+ 
+     if (rx_ring_full) {
+         FEC_PRINTF("RX buffer full\n");
+-    } else if (!s->regs[ENET_RDAR]) {
++    } else if (flush) {
+         qemu_flush_queued_packets(qemu_get_queue(s->nic));
      }
  
+@@ -807,7 +807,7 @@ static void imx_eth_write(void *opaque, hwaddr offset, uint64_t value,
+         if (s->regs[ENET_ECR] & ENET_ECR_ETHEREN) {
+             if (!s->regs[index]) {
+                 s->regs[index] = ENET_RDAR_RDAR;
+-                imx_eth_enable_rx(s);
++                imx_eth_enable_rx(s, true);
+             }
+         } else {
+             s->regs[index] = 0;
+@@ -930,7 +930,7 @@ static int imx_eth_can_receive(NetClientState *nc)
+ 
+     FEC_PRINTF("\n");
+ 
+-    return s->regs[ENET_RDAR] ? 1 : 0;
++    return !!s->regs[ENET_RDAR];
+ }
+ 
+ static ssize_t imx_fec_receive(NetClientState *nc, const uint8_t *buf,
+@@ -1020,7 +1020,7 @@ static ssize_t imx_fec_receive(NetClientState *nc, const uint8_t *buf,
+         }
+     }
+     s->rx_descriptor = addr;
+-    imx_eth_enable_rx(s);
++    imx_eth_enable_rx(s, false);
+     imx_eth_update(s);
+     return len;
+ }
+@@ -1116,7 +1116,7 @@ static ssize_t imx_enet_receive(NetClientState *nc, const uint8_t *buf,
+         }
+     }
+     s->rx_descriptor = addr;
+-    imx_eth_enable_rx(s);
++    imx_eth_enable_rx(s, false);
+     imx_eth_update(s);
+     return len;
+ }
 diff --git a/include/hw/net/imx_fec.h b/include/hw/net/imx_fec.h
-index 4bc8f03ec2..0fcc4f0c71 100644
+index 62ad473b05..4bc8f03ec2 100644
 --- a/include/hw/net/imx_fec.h
 +++ b/include/hw/net/imx_fec.h
-@@ -86,7 +86,6 @@
- #define ENET_TCCR3             393
- #define ENET_MAX               400
+@@ -252,6 +252,7 @@ typedef struct IMXFECState {
+     uint32_t phy_int_mask;
  
--#define ENET_MAX_FRAME_SIZE    2032
+     bool is_fec;
++    bool needs_flush;
+ } IMXFECState;
  
- /* EIR and EIMR */
- #define ENET_INT_HB            (1 << 31)
-@@ -155,6 +154,8 @@
- #define ENET_RCR_NLC           (1 << 30)
- #define ENET_RCR_GRS           (1 << 31)
- 
-+#define ENET_MAX_FRAME_SIZE    (1 << ENET_RCR_MAX_FL_LENGTH)
-+
- /* TCR */
- #define ENET_TCR_GTS           (1 << 0)
- #define ENET_TCR_FDEN          (1 << 2)
+ #endif
 -- 
 2.13.5
