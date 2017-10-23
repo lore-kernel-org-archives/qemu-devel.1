@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34335)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37998)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1e6gin-0007zV-Vd
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 13:41:07 -0400
+	(envelope-from <cota@braap.org>) id 1e6gup-0001Vm-OD
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 13:53:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1e6gin-0000dr-4u
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 13:41:06 -0400
-Date: Mon, 23 Oct 2017 19:40:56 +0200
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20171023174056.GE15029@stefanha-x1.localdomain>
-References: <1508564040-120700-1-git-send-email-lizhengui@huawei.com>
+	(envelope-from <cota@braap.org>) id 1e6gul-0002mU-30
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 13:53:31 -0400
+Received: from out4-smtp.messagingengine.com ([66.111.4.28]:56657)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1e6guk-0002ln-SD
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 13:53:27 -0400
+Date: Mon, 23 Oct 2017 13:53:25 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20171023175325.GH6901@flamenco>
+References: <20171020232023.15010-1-richard.henderson@linaro.org>
+	<20171020232023.15010-25-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1508564040-120700-1-git-send-email-lizhengui@huawei.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block: all I/O should be
- completed before removing throttle timers.
+In-Reply-To: <20171020232023.15010-25-richard.henderson@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH v7 24/52] tcg: Add CPUState cflags_next_tb
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,24 +27,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zhengui Li <lizhengui@huawei.com>
-Cc: kwolf@redhat.com, jcody@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, lina.lulina@huawei.com, qemu-block@nongnu.org, subo7@huawei.com, eric.fangyi@huawei.com, qemu-devel@nongnu.org, wangjie88@huawei.com, sochin.jiang@huawei.com
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org, f4bug@amsat.org, pbonzini@redhat.com
 
-On Sat, Oct 21, 2017 at 01:34:00PM +0800, Zhengui Li wrote:
-> From: Zhengui <lizhengui@huawei.com>
+On Fri, Oct 20, 2017 at 16:19:55 -0700, Richard Henderson wrote:
+> We were generating code during tb_invalidate_phys_page_range,
+> check_watchpoint, cpu_io_recompile, and (seemingly) discarding
+> the TB, assuming that it would magically be picked up during
+> the next iteration through the cpu_exec loop.
 > 
-> In blk_remove_bs, all I/O should be completed before removing throttle
-> timers. If there has inflight I/O, removing throttle timers here will
-> cause the inflight I/O never return.
-> This patch add bdrv_drained_begin before throttle_timers_detach_aio_context
-> to let all I/O completed before removing throttle timers.
+> Instead, record the desired cflags in CPUState so that we request
+> the proper TB so that there is no more magic.
 > 
-> Signed-off-by: Zhengui <lizhengui@huawei.com>
-> ---
->  block/block-backend.c | 4 ++++
->  1 file changed, 4 insertions(+)
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
-Related (but not equivalent) patch here:
-https://patchwork.kernel.org/patch/9970023/
+Reviewed-by: Emilio G. Cota <cota@braap.org>
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+This does indeed fix icount with and without MTTCG. Nice!
+
+		E.
