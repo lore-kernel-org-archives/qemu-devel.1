@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49664)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50276)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e727a-0006I0-Ux
-	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 12:32:07 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1e729m-000753-AZ
+	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 12:34:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e727a-0003ae-6F
-	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 12:32:06 -0400
-Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:55660)
+	(envelope-from <peter.maydell@linaro.org>) id 1e729l-0004fJ-8I
+	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 12:34:22 -0400
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:57113)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1e727Z-0003aI-VX
-	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 12:32:06 -0400
-Received: by mail-wr0-x243.google.com with SMTP id l8so8430758wre.12
-	for <qemu-devel@nongnu.org>; Tue, 24 Oct 2017 09:32:05 -0700 (PDT)
+	id 1e729l-0004eZ-2l
+	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 12:34:21 -0400
+Received: by mail-wm0-x241.google.com with SMTP id z3so10551582wme.5
+	for <qemu-devel@nongnu.org>; Tue, 24 Oct 2017 09:34:20 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_-b5kb=_jDeDbCGugmzvcuUGKvWV0myThVJuTDbg9jNA@mail.gmail.com>
-References: <alpine.DEB.2.10.1710211105550.27209@sstabellini-ThinkPad-X260>
-	<CAFEAcA_-b5kb=_jDeDbCGugmzvcuUGKvWV0myThVJuTDbg9jNA@mail.gmail.com>
+In-Reply-To: <20171024162752.GA21671@redhat.com>
+References: <20171024085853.32615-1-aik@ozlabs.ru>
+	<20171024162752.GA21671@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 24 Oct 2017 17:31:44 +0100
-Message-ID: <CAFEAcA9Zcm4tEbYXJhsp=ZDCoQDZjd53XuM6T+cxfL7fj5QxCw@mail.gmail.com>
+Date: Tue, 24 Oct 2017 17:33:59 +0100
+Message-ID: <CAFEAcA-eX2+Qv15AZn3W4xrKbL092yos8LM+L2_AXvHKtsHwUQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2] fix WFI/WFE length in syndrome register
+Subject: Re: [Qemu-devel] [RFC PATCH qemu] git-submodule.sh: Do not try
+ writing to source directory if not necessary
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,33 +30,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Stabellini <sstabellini@kernel.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 24 October 2017 at 16:53, Peter Maydell <peter.maydell@linaro.org> wrote:
-> On 21 October 2017 at 19:09, Stefano Stabellini <sstabellini@kernel.org> wrote:
->> diff --git a/target/arm/translate.c b/target/arm/translate.c
->> index 4da1a4c..a89518f 100644
->> --- a/target/arm/translate.c
->> +++ b/target/arm/translate.c
->> @@ -12325,12 +12325,15 @@ static void arm_tr_tb_stop(DisasContextBase *dcbase, CPUState *cpu)
->>              /* nothing more to generate */
->>              break;
->>          case DISAS_WFI:
->> -            gen_helper_wfi(cpu_env);
->> +        {
->> +            TCGv_i32 tmp = tcg_const_i32((dc->insn & (1U << 31)) ? 4 : 2);
+On 24 October 2017 at 17:27, Daniel P. Berrange <berrange@redhat.com> wrote:
+> On Tue, Oct 24, 2017 at 07:58:53PM +1100, Alexey Kardashevskiy wrote:
+>> I compile out of tree on a remote guest system where I mount the
+>> source directory as "readonly" and build directory as "rw" and
+>> scripts/git-submodule.sh tries writing to the source directory even when
+>> I manually update modules on a host machine which is quite annoying.
+>>
+>> Is this something acceptable? Or I am missing something here?
 >
-> This won't work, because dc->insn is only populated by the translate-a64.c
-> A64 translator, not by the A32/T32 code. I guess 'principle of least
-> surprise' suggests we should populate it for Thumb and ARM too.
+> How did you update the modules - did you manually run  'git submodule update...'
+> or did you use the git-submodule.sh script on your host machine ?
+>
+> If you run git-submodule.sh on the host, then it should save the status
+> file, and then when you run make on the guest system, it should notice
+> that you're already updated and never even invoke 'git-submodule.sh update'
+>
+> I'm not against your proposal below, but I'm curious why you're seeing
+> 'git-submodule.sh update' being run by make in the first place.
 
-...and also, this code path is used for both A32 and Thumb instruction
-sets, so just looking at the top bit of dc->insn isn't sufficient, because
-you might have the A32 encoding with a cond field with the top bit clear.
-You can either look also at dc->thumb, or alternatively have a new
-field is_16bit in DisasContext which you populate in arm_tr_translate_insn()
-and thumb_tr_translate_insn().
+I don't think "git checkout on the fileserver, then build on the
+remote machine" is a particularly weird workflow. I'm starting
+to feel that the idea of doing git updates during "make" is not
+so good as it initially seemed; it's just not something that
+people expect to have happen during the build step.
 
 thanks
 -- PMM
