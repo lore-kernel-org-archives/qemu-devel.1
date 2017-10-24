@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34413)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40512)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e71AQ-0004jj-Rl
-	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 11:31:00 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1e71Wa-000205-BD
+	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 11:53:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e71AK-0006wx-HW
-	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 11:30:58 -0400
-Received: from indium.canonical.com ([91.189.90.7]:53542)
+	(envelope-from <peter.maydell@linaro.org>) id 1e71WZ-0002jp-Ey
+	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 11:53:52 -0400
+Received: from mail-wr0-x233.google.com ([2a00:1450:400c:c0c::233]:53425)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1e71AK-0006vm-9X
-	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 11:30:52 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1e71AI-0005vQ-3H
-	for <qemu-devel@nongnu.org>; Tue, 24 Oct 2017 15:30:50 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id EF5E12E80D1
-	for <qemu-devel@nongnu.org>; Tue, 24 Oct 2017 15:30:49 +0000 (UTC)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1e71WZ-0002jQ-7q
+	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 11:53:51 -0400
+Received: by mail-wr0-x233.google.com with SMTP id u40so15305943wrf.10
+	for <qemu-devel@nongnu.org>; Tue, 24 Oct 2017 08:53:51 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 24 Oct 2017 15:22:03 -0000
-From: Jim Hall <1726910@bugs.launchpad.net>
-Reply-To: Bug 1726910 <1726910@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <150885852349.17651.9958840122130941388.malonedeb@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1726910] [NEW] UI request: add a function key
- toolbar (f1-f12)
+In-Reply-To: <alpine.DEB.2.10.1710211105550.27209@sstabellini-ThinkPad-X260>
+References: <alpine.DEB.2.10.1710211105550.27209@sstabellini-ThinkPad-X260>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 24 Oct 2017 16:53:29 +0100
+Message-ID: <CAFEAcA_-b5kb=_jDeDbCGugmzvcuUGKvWV0myThVJuTDbg9jNA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2] fix WFI/WFE length in syndrome register
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,68 +28,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Stefano Stabellini <sstabellini@kernel.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-Public bug reported:
+On 21 October 2017 at 19:09, Stefano Stabellini <sstabellini@kernel.org> wrote:
+> WFI/E are often, but not always, 4 bytes long. When they are, we need to
+> set ARM_EL_IL_SHIFT in the syndrome register.
+>
+> Pass the instruction length to HELPER(wfi), use it to decrement pc
+> appropriately and to pass an is_16bit flag to syn_wfx, which sets
+> ARM_EL_IL_SHIFT if needed.
+>
+> Signed-off-by: Stefano Stabellini <sstabellini@kernel.org>
 
-I run old DOS programs under FreeDOS using QEMU.
+> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+> index a39b9d3..6f74589 100644
+> --- a/target/arm/translate-a64.c
+> +++ b/target/arm/translate-a64.c
+> @@ -11380,17 +11380,20 @@ static void aarch64_tr_tb_stop(DisasContextBase *dcbase, CPUState *cpu)
+>              gen_helper_yield(cpu_env);
+>              break;
+>          case DISAS_WFI:
+> +        {
+> +            TCGv_i32 tmp = tcg_const_i32((dc->insn & (1U << 31)) ? 4 : 2);
 
-It's common when running/testing DOS applications to use the function
-keys. Some of these (such as F10) are intercepted by the window system.
-For example, some DOS program installers use F10 to install the
-software, but F10 is intecepted by the window system.
+This is the A64 translator, we know that WFI (like every instruction)
+is 32 bit.
 
-The standard solution is to jump to the QEMU console and use sendkey to
-send a specific function key to the QEMU guest (often needed for
-'sendkey f10'). But this does not seem to be very user friendly for new
-users. Nor is it very fast if you need to this often.
+>              /* This is a special case because we don't want to just halt the CPU
+>               * if trying to debug across a WFI.
+>               */
+>              gen_a64_set_pc_im(dc->pc);
+> -            gen_helper_wfi(cpu_env);
+> +            gen_helper_wfi(cpu_env, tmp);
 
-I propose QEMU add a toolbar with the function keys.
+As Philippe says, you need to free the TCG temp here.
 
-I've attached a mockup of one possible design, with a simple toolbar for
-F1-F12. A possible modification would be to add "modifier" buttons for
-Ctrl and Shift and Alt to make it easier for users to enter combinations
-like Ctrl-F12 or Alt-F10 or Shift-F1.
+>              /* The helper doesn't necessarily throw an exception, but we
+>               * must go back to the main loop to check for interrupts anyway.
+>               */
+>              tcg_gen_exit_tb(0);
+>              break;
+>          }
+> +        }
+>      }
+>
+>      /* Functions above can change dc->pc, so re-align db->pc_next */
+> diff --git a/target/arm/translate.c b/target/arm/translate.c
+> index 4da1a4c..a89518f 100644
+> --- a/target/arm/translate.c
+> +++ b/target/arm/translate.c
+> @@ -12325,12 +12325,15 @@ static void arm_tr_tb_stop(DisasContextBase *dcbase, CPUState *cpu)
+>              /* nothing more to generate */
+>              break;
+>          case DISAS_WFI:
+> -            gen_helper_wfi(cpu_env);
+> +        {
+> +            TCGv_i32 tmp = tcg_const_i32((dc->insn & (1U << 31)) ? 4 : 2);
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+This won't work, because dc->insn is only populated by the translate-a64.c
+A64 translator, not by the A32/T32 code. I guess 'principle of least
+surprise' suggests we should populate it for Thumb and ARM too.
 
-** Attachment added: "mockup of QEMU interface with a toolbar"
-   https://bugs.launchpad.net/bugs/1726910/+attachment/4991533/+files/qemu-=
-mockup.png
+> +            gen_helper_wfi(cpu_env, tmp);
+>              /* The helper doesn't necessarily throw an exception, but we
+>               * must go back to the main loop to check for interrupts anyway.
+>               */
+>              tcg_gen_exit_tb(0);
+>              break;
+> +        }
+>          case DISAS_WFE:
+>              gen_helper_wfe(cpu_env);
+>              break;
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1726910
-
-Title:
-  UI request: add a function key toolbar (f1-f12)
-
-Status in QEMU:
-  New
-
-Bug description:
-  I run old DOS programs under FreeDOS using QEMU.
-
-  It's common when running/testing DOS applications to use the function
-  keys. Some of these (such as F10) are intercepted by the window
-  system. For example, some DOS program installers use F10 to install
-  the software, but F10 is intecepted by the window system.
-
-  The standard solution is to jump to the QEMU console and use sendkey
-  to send a specific function key to the QEMU guest (often needed for
-  'sendkey f10'). But this does not seem to be very user friendly for
-  new users. Nor is it very fast if you need to this often.
-
-  I propose QEMU add a toolbar with the function keys.
-
-  I've attached a mockup of one possible design, with a simple toolbar
-  for F1-F12. A possible modification would be to add "modifier" buttons
-  for Ctrl and Shift and Alt to make it easier for users to enter
-  combinations like Ctrl-F12 or Alt-F10 or Shift-F1.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1726910/+subscriptions
+thanks
+-- PMM
