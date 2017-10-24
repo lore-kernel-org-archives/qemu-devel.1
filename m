@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37231)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44005)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stou4r@gmail.com>) id 1e74mm-0005o5-Cd
-	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 15:22:49 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1e753b-00017v-9I
+	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 15:40:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stou4r@gmail.com>) id 1e74ml-0008PT-CC
-	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 15:22:48 -0400
-Received: from mail-pg0-x232.google.com ([2607:f8b0:400e:c05::232]:48665)
+	(envelope-from <richard.henderson@linaro.org>) id 1e753W-0003Db-9b
+	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 15:40:11 -0400
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:52295)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stou4r@gmail.com>) id 1e74ml-0008Ob-5c
-	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 15:22:47 -0400
-Received: by mail-pg0-x232.google.com with SMTP id v78so15302416pgb.5
-	for <qemu-devel@nongnu.org>; Tue, 24 Oct 2017 12:22:46 -0700 (PDT)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1e753W-0003Cz-2C
+	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 15:40:06 -0400
+Received: by mail-wm0-x242.google.com with SMTP id 78so15618501wmb.1
+	for <qemu-devel@nongnu.org>; Tue, 24 Oct 2017 12:40:05 -0700 (PDT)
+References: <20171022004621.28372-1-richard.henderson@linaro.org>
+	<20171022004621.28372-12-richard.henderson@linaro.org>
+	<14d023ad-e635-3a56-533b-2575a03266c4@amsat.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <4880c661-9e6e-e31c-c0cc-810e67d8efea@linaro.org>
+Date: Tue, 24 Oct 2017 21:40:01 +0200
 MIME-Version: 1.0
-In-Reply-To: <20171024115032.GA18756@stefanha-x1.localdomain>
-References: <CACw_XP_8GrqEa4GcK06BrZJjjvGu=BJKZB6DTVtoJrd1YcRFWw@mail.gmail.com>
-	<20171024115032.GA18756@stefanha-x1.localdomain>
-From: Deema B <stou4r@gmail.com>
-Date: Tue, 24 Oct 2017 12:22:45 -0700
-Message-ID: <CACw_XP-pUdB-JCThpoibqAF0D4Fi+AS-j3tthtLdWMmLm2X9Wg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] Command line option "-option-rom" doesn't take the
- ROM file
+In-Reply-To: <14d023ad-e635-3a56-533b-2575a03266c4@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v7 11/11] disas: Add capstone as submodule
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,35 +32,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: qemu-devel@nongnu.org
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
 
-Thank you, Stefan!  That worked.
-Sorry for the double email, I'm learning quickly :)
+On 10/24/2017 06:45 PM, Philippe Mathieu-Daudé wrote:
+> Hi Richard,
+> 
+> On 10/21/2017 09:46 PM, Richard Henderson wrote:
+>> Do not require the submodule, but use it if present.  Allow the
+>> command-line to override system or git submodule either way.
+>>
+>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+>> ---
+>>  Makefile    | 13 +++++++++++++
+>>  .gitmodules |  3 +++
+>>  capstone    |  1 +
+>>  configure   | 60 +++++++++++++++++++++++++++++++++++++++++++++++++-----------
+>>  4 files changed, 66 insertions(+), 11 deletions(-)
+>>  create mode 160000 capstone
+>>
+>> diff --git a/Makefile b/Makefile
+>> index 9372742f86..beecc85bee 100644
+>> --- a/Makefile
+>> +++ b/Makefile
+>> @@ -383,6 +383,19 @@ subdir-dtc: .git-submodule-status dtc/libfdt dtc/tests
+>>  dtc/%: .git-submodule-status
+>>  	mkdir -p $@
+>>  
+>> +# Overriding CFLAGS causes us to lose defines added in the sub-makefile.
+>> +# Not overriding CFLAGS leads to mis-matches between compilation modes.
+>> +# Therefore we replicate some of the logic in the sub-makefile.
+> 
+> I'm having plenty of "missing-prototypes" warnings:
 
-On Tue, Oct 24, 2017 at 4:50 AM, Stefan Hajnoczi <stefanha@gmail.com> wrote:
+Yes, we use lots of -Wfoo that upstream Capstone does not.  I do strip -Werror,
+so at least it builds.  Are you suggesting that I drop most of our extra -Wfoo?
 
-> On Mon, Oct 23, 2017 at 02:22:05PM -0700, Deema B wrote:
-> > I'm trying to use the -option-rom option to supply my own virtio OpROM.
-> >
-> > I am not able to see the ROM being launch (the built-in version comes up
-> > instead).
-> > The only way I am able to make it work is to rebuild the Qemu and iPXE
-> > together.
-> >
-> > I'm assuming this is working feature, and I'm simply doing something
-> wrong.
-> > Appreciate any suggestions, pointers, and to hear your experience with
-> this
-> > particular option.
->
-> Hi Deema,
-> You can specify the option ROM on a per-device basis:
->
->   -device virtio-net-pci,romfile=my-ipxe.rom,...
->
-> The advantage of this approach is that there is no conflict between the
-> global -option-rom file and the default file loaded by the NIC device.
->
-> Stefan
->
+I suppose that's reasonable.  We don't want our developers worrying about
+warnings coming from upstream code.  If in fact you believe that most of our
+developers won't just install libcapstone-dev and be done?
+
+
+r~
