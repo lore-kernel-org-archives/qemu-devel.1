@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53815)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56615)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <frasse.iglesias@gmail.com>) id 1e75Qp-0002Wi-I7
-	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 16:04:12 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1e76iE-0006kc-4O
+	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 17:26:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <frasse.iglesias@gmail.com>) id 1e75Ql-0003Bz-G9
-	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 16:04:11 -0400
-Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:52205)
+	(envelope-from <richard.henderson@linaro.org>) id 1e76iA-0006DK-1y
+	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 17:26:14 -0400
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:53475)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <frasse.iglesias@gmail.com>)
-	id 1e75Ql-0003B4-9G
-	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 16:04:07 -0400
-Received: by mail-lf0-x241.google.com with SMTP id r129so25370101lff.8
-	for <qemu-devel@nongnu.org>; Tue, 24 Oct 2017 13:04:07 -0700 (PDT)
-From: Francisco Iglesias <frasse.iglesias@gmail.com>
-Date: Tue, 24 Oct 2017 22:04:01 +0200
-Message-Id: <20171024200401.28299-1-frasse.iglesias@gmail.com>
-In-Reply-To: <20171024195139.28179-1-frasse.iglesias@gmail.com>
-References: <20171024195139.28179-1-frasse.iglesias@gmail.com>
-Subject: [Qemu-devel] [PATCH v3 09/13] xilinx_spips: Add support for zero
- pumping
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1e76i9-0006D0-QP
+	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 17:26:09 -0400
+Received: by mail-wr0-x242.google.com with SMTP id u40so16165112wrf.10
+	for <qemu-devel@nongnu.org>; Tue, 24 Oct 2017 14:26:09 -0700 (PDT)
+References: <6968797c-f64c-69ff-2fa6-79c4fb3440c9@mail.uni-paderborn.de>
+	<20171021064444.GJ30459@redhat.com>
+	<978b4e0a-8a9c-68e9-5c3d-a1cca51b947c@mail.uni-paderborn.de>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <7e8f34bd-85a4-2c85-311b-52275c6b1719@linaro.org>
+Date: Tue, 24 Oct 2017 23:25:58 +0200
+MIME-Version: 1.0
+In-Reply-To: <978b4e0a-8a9c-68e9-5c3d-a1cca51b947c@mail.uni-paderborn.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [sw-dev] [RFC] RISC-V Decoder generator
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,122 +32,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: edgari@xilinx.com, alistai@xilinx.com, francisco.iglesias@feimtech.se
+To: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, "Richard W.M. Jones" <rjones@redhat.com>
+Cc: RISC-V SW Dev <sw-dev@groups.riscv.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-Add support for zero pumping according to the transfer size register.
+On 10/22/2017 03:22 PM, Bastian Koppelmann wrote:
+> Hi Richard,
+> 
+> On 10/21/2017 08:44 AM, Richard W.M. Jones wrote:
+>> On Fri, Oct 20, 2017 at 03:46:54PM +0200, Bastian Koppelmann wrote:
+>>> I asked you for feedback some while ago regarding a modular RISC-V QEMU
+>>> target (see discussion [1]). I tried getting it to work with the good
+>>> old C preprocessor and quickly realized that it is too limiting. Instead
+>>> I created a data-driven decoder generator written in python (see the
+>>> code on github [2]) using YAML as a description language.
+>>>
+>>> I'd like to get some feedback whether this is acceptable to be
+>>> upstreamed to QEMU or if you have any suggestions for improvements.
+>>> Right now only RV32I instruction are implemented in this scheme.
+>>
+>> My suggestion would be to reimplement (part of) the s390x decoder
+>> using this scheme.  That would give us a direct comparison of how your
+>> scheme is better or worse than the existing macros.
+> 
+> Yeah that would be a great test. However I'm not sure if it's worth the
+> effort. AFAIK s390x will not be extended with new instructions, so there
+> is no need for a new scheme unless it helps making the code better
+> maintainable. But that's up to the s390x maintainers.
 
-Signed-off-by: Francisco Iglesias <frasse.iglesias@gmail.com>
----
- hw/ssi/xilinx_spips.c         | 47 ++++++++++++++++++++++++++++++++++++-------
- include/hw/ssi/xilinx_spips.h |  2 ++
- 2 files changed, 42 insertions(+), 7 deletions(-)
+s390x has been getting regular updates and new instructions.
 
-diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
-index ad9f1a0..df5d908 100644
---- a/hw/ssi/xilinx_spips.c
-+++ b/hw/ssi/xilinx_spips.c
-@@ -109,6 +109,7 @@
-     FIELD(CMND, DUMMY_CYCLES, 2, 6)
- #define R_CMND_DMA_EN         (1 << 1)
- #define R_CMND_PUSH_WAIT      (1 << 0)
-+#define R_TRANSFER_SIZE     (0xc4 / 4)
- #define R_LQSPI_STS         (0xA4 / 4)
- #define LQSPI_STS_WR_RECVD      (1 << 1)
- 
-@@ -222,6 +223,7 @@ static void xilinx_spips_reset(DeviceState *d)
-     s->link_state_next_when = 0;
-     s->snoop_state = SNOOP_CHECKING;
-     s->cmd_dummies = 0;
-+    s->man_start_com = false;
-     xilinx_spips_update_ixr(s);
-     xilinx_spips_update_cs_lines(s);
- }
-@@ -459,6 +461,41 @@ static inline void tx_data_bytes(Fifo8 *fifo, uint32_t value, int num, bool be)
-     }
- }
- 
-+static void xilinx_spips_check_zero_pump(XilinxSPIPS *s)
-+{
-+    if (!s->regs[R_TRANSFER_SIZE]) {
-+        return;
-+    }
-+    if (!fifo8_is_empty(&s->tx_fifo) && s->regs[R_CMND] & R_CMND_PUSH_WAIT) {
-+        return;
-+    }
-+    /*
-+     * The zero pump must never fill tx fifo such that rx overflow is
-+     * possible
-+     */
-+    while (s->regs[R_TRANSFER_SIZE] &&
-+           s->rx_fifo.num + s->tx_fifo.num < RXFF_A_Q - 3) {
-+        /* endianess just doesn't matter when zero pumping */
-+        tx_data_bytes(&s->tx_fifo, 0, 4, false);
-+        s->regs[R_TRANSFER_SIZE] &= ~0x03ull;
-+        s->regs[R_TRANSFER_SIZE] -= 4;
-+    }
-+}
-+
-+static void xilinx_spips_check_flush(XilinxSPIPS *s)
-+{
-+    if (s->man_start_com ||
-+        (!fifo8_is_empty(&s->tx_fifo) &&
-+         !(s->regs[R_CONFIG] & MAN_START_EN))) {
-+        xilinx_spips_check_zero_pump(s);
-+        xilinx_spips_flush_txfifo(s);
-+    }
-+    if (fifo8_is_empty(&s->tx_fifo) && !s->regs[R_TRANSFER_SIZE]) {
-+        s->man_start_com = false;
-+    }
-+    xilinx_spips_update_ixr(s);
-+}
-+
- static inline int rx_data_bytes(Fifo8 *fifo, uint8_t *value, int max)
- {
-     int i;
-@@ -528,7 +565,6 @@ static void xilinx_spips_write(void *opaque, hwaddr addr,
-                                         uint64_t value, unsigned size)
- {
-     int mask = ~0;
--    int man_start_com = 0;
-     XilinxSPIPS *s = opaque;
- 
-     DB_PRINT_L(0, "addr=" TARGET_FMT_plx " = %x\n", addr, (unsigned)value);
-@@ -536,8 +572,8 @@ static void xilinx_spips_write(void *opaque, hwaddr addr,
-     switch (addr) {
-     case R_CONFIG:
-         mask = ~(R_CONFIG_RSVD | MAN_START_COM);
--        if (value & MAN_START_COM) {
--            man_start_com = 1;
-+        if ((value & MAN_START_COM) && (s->regs[R_CONFIG] & MAN_START_EN)) {
-+            s->man_start_com = true;
-         }
-         break;
-     case R_INTR_STATUS:
-@@ -583,10 +619,7 @@ static void xilinx_spips_write(void *opaque, hwaddr addr,
-     s->regs[addr] = (s->regs[addr] & ~mask) | (value & mask);
- no_reg_update:
-     xilinx_spips_update_cs_lines(s);
--    if ((man_start_com && s->regs[R_CONFIG] & MAN_START_EN) ||
--            (fifo8_is_empty(&s->tx_fifo) && s->regs[R_CONFIG] & MAN_START_EN)) {
--        xilinx_spips_flush_txfifo(s);
--    }
-+    xilinx_spips_check_flush(s);
-     xilinx_spips_update_cs_lines(s);
-     xilinx_spips_update_ixr(s);
- }
-diff --git a/include/hw/ssi/xilinx_spips.h b/include/hw/ssi/xilinx_spips.h
-index 036f86f..df6e245 100644
---- a/include/hw/ssi/xilinx_spips.h
-+++ b/include/hw/ssi/xilinx_spips.h
-@@ -75,6 +75,8 @@ struct XilinxSPIPS {
-     uint32_t rx_discard;
- 
-     uint32_t regs[XLNX_SPIPS_R_MAX];
-+
-+    bool man_start_com;
- };
- 
- typedef struct {
--- 
-2.9.3
+However, s390x is much more regular in its opcode placement wrt the various
+insn formats, so it's slightly easier to decode than riscv.
+
+In addition, the s390x translator has more sophisticated handling of operands
+and writeback than you have for riscv at present.  That is, where we indicate
+that particular register or memory arguments should be loaded into TCG
+temporaries; storing the result; computing the PSW flags; etc.  This is because
+there are so many CISC instruction variants where arguments come from whereever.
+
+So, really, I think it would be a large amount of work to extend this riscv
+translator to handle s390x, and would largely be a waste.
+
+It would perhaps more interesting to apply it to other risc targets.  But that
+is surely out of scope for one patch set.
+
+
+r~
