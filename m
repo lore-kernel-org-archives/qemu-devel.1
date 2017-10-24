@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53267)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53312)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1e72Jp-00030u-8f
-	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 12:44:46 -0400
+	(envelope-from <Andrew.Baumann@microsoft.com>) id 1e72K7-0003EI-CF
+	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 12:45:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1e72Jo-0004dx-BG
-	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 12:44:45 -0400
-Date: Tue, 24 Oct 2017 18:31:23 +0200
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20171024163123.GF15297@umbus>
-References: <20171020175548.2566-1-programmingkidx@gmail.com>
-	<f9bd98f1-d45c-6d3a-c35c-c67da67c881f@linaro.org>
-	<20171022053315.GA15297@umbus>
-	<4CE427C5-BD1A-4911-9B10-CC1C0F80FD12@gmail.com>
+	(envelope-from <Andrew.Baumann@microsoft.com>) id 1e72K3-0004wu-Ei
+	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 12:45:03 -0400
+From: Andrew Baumann <Andrew.Baumann@microsoft.com>
+Date: Tue, 24 Oct 2017 16:44:56 +0000
+Message-ID: <MWHPR21MB01591543E188B048145985709E470@MWHPR21MB0159.namprd21.prod.outlook.com>
+References: <CADYoBw2dogvU6-3vChG4js0BNdyTPG8eDvMSRoU50eTX_9DdEQ@mail.gmail.com>
+	<MWHPR21MB01590CD596A992C93E01B5079E460@MWHPR21MB0159.namprd21.prod.outlook.com>
+	<CADYoBw1ksGDo26-PC4eMnyqxZQoZkXNLDeGoWfcRHs-SfTCJkw@mail.gmail.com>
+In-Reply-To: <CADYoBw1ksGDo26-PC4eMnyqxZQoZkXNLDeGoWfcRHs-SfTCJkw@mail.gmail.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="SnV5plBeK2Ge1I9g"
-Content-Disposition: inline
-In-Reply-To: <4CE427C5-BD1A-4911-9B10-CC1C0F80FD12@gmail.com>
-Subject: Re: [Qemu-devel] [libfdt][PATCH v2] implement strnlen for systems
- that need it
+Subject: Re: [Qemu-devel] [PATCH] BCM2837 and machine raspi3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,71 +25,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Programmingkid <programmingkidx@gmail.com>
-Cc: Richard Henderson <richard.henderson@linaro.org>, devicetree-compiler@vger.kernel.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: bzt bzt <bztemail@gmail.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>
 
-
---SnV5plBeK2Ge1I9g
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Tue, Oct 24, 2017 at 12:16:47AM -0400, Programmingkid wrote:
->=20
-> > On Oct 22, 2017, at 1:33 AM, David Gibson <david@gibson.dropbear.id.au>=
- wrote:
-> >=20
-> > On Fri, Oct 20, 2017 at 04:44:58PM -0700, Richard Henderson wrote:
-> >> On 10/20/2017 10:55 AM, John Arbuckle wrote:
-> >>> +static inline size_t strnlen(const char *string, size_t max_count)
-> >>> +{
-> >>> +    size_t count;
-> >>> +    for (count =3D 0; count < max_count; count++) {
-> >>> +        if (string[count] =3D=3D '\0') {
-> >>> +            break;
-> >>> +        }
-> >>> +    }
-> >>> +    return count;
-> >>=20
-> >> Not to nitpick, but
-> >>=20
-> >>  const char *p =3D memchr(string, 0, max_count);
-> >>  return p ? max_count : p - string;
-> >=20
-> > Richard's right, that's definitely a better implementation.
->=20
-> I was just wondering, what if we rewrote the code to use strlen()
-> instead of strnlen(). Would that be an acceptable solution?
-
-Only if you can do so safely - i.e. without accessing memory beyond
-what we're supposed to.  I don't think you'll be able to do that
-without effectively re-implementing strnlen(), there's a reason I used
-it in the first place, after all.
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---SnV5plBeK2Ge1I9g
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnvatgACgkQbDjKyiDZ
-s5KwLhAAmey8dTn74tEtPlMGB1lHJ9dliNd7Af2sXcDVOsj7A/TEc28vrgN1mjI0
-52V9DmDkIjI0oMFW8nh6WNNUFJnHZ4JbZ8EMhp2/kHY6UPwCdKboAfEGK/xX99zj
-qejrhAlg+urvleqgdtZ11Tvgl+nDZL0VCxcpbWJiDAKUQ3H8BdEa6TTfoZmZn8BH
-fP/rekdJRBAKmGdrJfIrZWv+KUCKNuVb5x6dA8VN5/dl+I2BVB41V1O3LOCZ7wHG
-ahSDHNu0r9LtCtddTBuFZH9gKGkvtT9c6O+y0CYD92Gzs1fg0VXqhFAJGOJWUup5
-uYhMFVeCMHqyOzPmqa3dG04TfParBZUWar1BiUtXYxNujp89ce/hn4zH4RiiM9OR
-ltmSwaQFMS9CFnQvDCCWWiQ0WXK1zRFCeg6h/SsaKPnJSNkLBjJ16IYLrjjlF3e3
-/QQhUhaum/1gTrAynzH0se/chsiJULYwjtCDCsovsKs1MfbNEDmYSLuP8KrcBtN4
-146uC+uNjHPQqol4nGLyMIGKH3ZfUD/FAcGrG9RY4DvsTJJongKGXPf0HOieoorg
-EReANXffTTRxSiNfkufp1+jACzWgoocD9Lto1YdVXarcA9MaOYODog5ZePRYpfSC
-uUAoW7UZbfTupASJxBVootIwBSnTGiNItwVsUnlLScjEjKh6O3Q=
-=hESA
------END PGP SIGNATURE-----
-
---SnV5plBeK2Ge1I9g--
+PiBGcm9tOiBienQgYnp0IFttYWlsdG86Ynp0ZW1haWxAZ21haWwuY29tXQ0KPiBTZW50OiBUdWVz
+ZGF5LCAyNCBPY3RvYmVyIDIwMTcgMDI6NTQNCj4gT24gTW9uLCBPY3QgMjMsIDIwMTcgYXQgNjoz
+NCBQTSwgQW5kcmV3IEJhdW1hbm4gd3JvdGU6DQo+IAlBcmUgdGhlcmUgYW55IGNoYW5nZXMgZnJv
+bSBiY20yODM2IG90aGVyIHRoYW4gdGhlIENQVSBtb2RlbD8NCj4gDQo+IA0KPiAJRHVwbGljYXRp
+bmcgdGhlIHdob2xlIGZpbGUganVzdCB0byBoYXZlIGEgZGlmZmVyZW50IENQVSBzZWVtcyBsaWtl
+IGEgYmFkDQo+IGlkZWEgdG8gbWUuIEkgd291bGQgc3VnZ2VzdCBwYXJhbWV0ZXJpc2luZyB0aGUg
+Q1BVIG1vZGVsIGluIGJjbTI4MzYgKGFuZA0KPiBtYXliZSBub3RpbmcgaW4gaGVhZGVyIGNvbW1l
+bnRzIGV0Yy4gdGhhdCBpdCBjYW4gYWxzbyBtb2RlbCAyODM3KSwgYW5kIHRoZW4NCj4gaW5zdGFu
+dGlhdGluZyBpdCBmcm9tIHJhc3BpLmMgd2l0aCB0aGUgY29ycmVjdCBDUFUgdHlwZSBkZXBlbmRp
+bmcgb24gd2hpY2gNCj4gbWFjaGluZSBpcyBiZWluZyB1c2VkLiBUaGF0IHdpbGwgYWxzbyByZWR1
+Y2UgdGhlIHNpemUgb2YgdGhlIHBhdGNoIHNpZ25pZmljYW50bHksDQo+IHdoaWNoIHdpbGwgbWFr
+ZSBpdCBlYXNpZXIgdG8gZ2V0IGl0IHJldmlld2VkLg0KPiANCj4gDQo+IA0KPiBGb3Igbm93LCB0
+aGVyZSdzIG5vIG1vcmUgZGlmZmVyZW5jZSBpbiB0aGUgZW11bGF0aW9uIHRoYW4gdGhlIENQVSwg
+YnV0DQo+IEJDTTI4MzcgaGFzIGEgbG90IG1vcmUgdG8gb2ZmZXIgKDQwIGJpdCBhZGRyZXNzIHNw
+YWNlLCB3aWZpLCBibHVldG9vdGggZXRjLikuIFNvDQo+IHNvb25lciBvciBsYXRlciBpdCB3aWxs
+IG5lZWQgaXQncyBvd24gc291cmNlIGZpbGUgdG8gc3VwcG9ydCBhbGwgb2YgdGhhdCB3aXRob3V0
+DQo+IGdldHRpbmcgdGhlIGNvZGUgbWVzc3kuIEkgaGF2ZSBhc2tlZCBQZXRlciB3aGV0aGVyIGl0
+IGRvZXMgd29ydGggd3JpdGluZw0KPiBmdXR1cmUgcHJvb2YgY29kZSwgb3Iga2VlcCB0aGUgY2hh
+bmdlIGF0IHRoZSBiYXJlIG1pbmltdW0sIGJ1dCBoYWQgbm8gYW5zd2VyDQo+IHlldC4NCg0KSSBz
+ZWUuIFRoZSBhZGRyZXNzIHNwYWNlIHNpemUgc291bmRzIGxpa2UgaXQgd291bGQgYWZmZWN0IHRo
+ZSBTb0MgKGFsdGhvdWdoIGlzIHRoZXJlIHJlYWxseSA0MCBiaXRzIG9mIHVzYWJsZSBwaHlzaWNh
+bCBhZGRyZXNzIHNwYWNlIGJleW9uZCB0aGUgY29yZT8pLiBJZiBpdCdzIGxpa2UgcGkyLCBob3dl
+dmVyLCB0aGUgd2lmaSBhbmQgQlQgYXJlIGJvdGggYmVoaW5kIFVTQiwgc28gdGhhdCB3b3VsZCBi
+ZSBoYW5kbGVkIG1vcmUgbmF0dXJhbGx5IGluIHRoZSBib2FyZCBtb2RlbCAocmFzcGkuYykgdGhh
+biB0aGUgU29DLg0KDQo+IFdlbGwsIGJjbTI4MzcgaXMgYmFja3dhcmQgY29tcGF0aWJsZSB3aXRo
+IHRoZSBiY20yODM2LCBidXQgaGFzIGEgbG90IG1vcmUNCj4gcmVnaXN0ZXJzIGFuZCBhIGRpZmZl
+cmVudCBib290IHVwIHByb2Nlc3MgKGRpZmZlcmVudCBhZGRyZXNzIGFuZCBubyBhdGFncykuIFRo
+ZQ0KPiBjb21tb24gZnVuY3Rpb25hbGl0eSBpcyBhbHJlYWR5IGluIGJjbTI4MzVfcGVyaXBoZXJh
+bHMsIGFuZCB0aGUgTU1JTw0KPiBhZGRyZXNzIGNoYW5nZSBmcm9tIGJjbTI4MzUgdG8gYmNtMjgz
+NiBoYXMgYWxyZWFkeSBiZWVuIGFkZGVkIGJ5IHlvdS4NCj4gV2hhdCdzIGRpZmZlcmVudCBpcyBh
+IGxvdCBtb3JlIGRldmljZXMsIHdoaWNoIGltaG8gd291bGQgYmUgdW53aXNlIHRvIGFkZCB0bw0K
+PiBiY20yODM1IG9yIGVpdGhlciB0byBiY20yODM2LiBTbyB0byBiZSBmdXR1cmUgcHJvb2YgSSd2
+ZSBjcmVhdGVkIGEgc2VwYXJhdGVkDQo+IGZpbGUsIGJ1dCB5b3UgYXJlIHJpZ2h0IGF0IHRoZSBj
+dXJyZW50IGxldmVsIG9mIGVtdWxhdGlvbiBpdCdzIG5vdCBuZWNlc3NhcnkuDQoNClJpZ2h0LCBi
+dXQgYXMgSSB3cm90ZSBhYm92ZSBpZiB0aG9zZSBkZXZpY2VzIGFyZSBiZWhpbmQgVVNCIHRoYXQn
+cyBub3QgcGFydCBvZiB0aGUgU29DIG1vZGVsLCBhbmQgYmVsb25ncyBpbiB0aGUgYm9hcmQgbG9n
+aWMuIElmICJtb3JlIHJlZ2lzdGVycyIganVzdCByZWZlcnMgdG8gdGhlIENQVSwgdGhlbiB0aGF0
+J3MgaXJyZWxldmFudC4gSWYgdGhlcmUgYXJlIHJlYWxseSBtb3JlIGRldmljZXMgLyBkZXZpY2Ug
+cmVnaXN0ZXJzIG9uIHRoZSBzeXN0ZW0gYnVzLCB0aGVuIHRoYXQgY2FsbHMgZm9yIGEgZGVlcGVy
+IGNoYW5nZSBpbiB0aGUgU29DIG1vZGVsIGFuZCBwZXJoYXBzIGEgbmV3IGltcGxlbWVudGF0aW9u
+Lg0KDQo+IAlTaW1pbGFybHksIHRoaXMgbG9va3MgbGlrZSBhIGNsb25lIG9mIHJhc3BpMl9pbml0
+LiBJIHRoaW5rIGl0IHdvdWxkIGJlIGJldHRlcg0KPiB0byBoYXZlIG9uZSBmdW5jdGlvbiwgcGFy
+YW1ldHJpc2VkIGlmIG5lZWRlZC4NCj4gDQo+IA0KPiANCj4gRm9yIG5vdywgeWVzLiBCdXQgdGhl
+IGV4dHJhIGRldmljZXMgYmNtMjgzNyBoYXZlIHdpbGwgbmVlZCBleHRyYSBpbml0aWFsaXphdGlv
+biwNCj4gYW5kIEkgdGhvdWdoIGl0IHdvdWxkIGJlIGNsZWFyZXIgdG8gc2VwYXJhdGUgaW4gYWR2
+YW5jZS4gQWdhaW4sIEkndmUgYXNrZWQgUGV0ZXINCj4gYWJvdXQgdGhpcywgYnV0IGhhZCBubyBy
+ZXNwb25zZS4gQXMgSSBzZWUgaGF2aW5nIGEgcGFyYW1ldHJpc2VkIHNpbmdsZSBmdW5jdGlvbg0K
+PiBpcyBzaW1wbGllciBmb3Igbm93LCBidXQgY291bGQgbGVhZCB0byBhIG1lc3N5IGNvZGUgbGF0
+ZXIgd2hlbiBhbGwgdGhlIFNvQw0KPiBmZWF0dXJlcyB3aWxsIGJlIGFkZGVkLiBCdXQgSSdtIGFp
+bid0IG5vIGV4cGVydCBvbiBxZW11IHNvdXJjZSwgdGhpcyBpcyBteSBmaXJzdA0KPiBwYXRjaCwg
+c28gSSdtIG9wZW4gdG8gc3VnZ2VzdGlvbnMhIDotKQ0KDQpJJ20gbW9yZSBvcGVuIHRvIHRoZSBu
+ZWVkIGZvciBldm9sdXRpb24gaW4gdGhlIG1hY2hpbmUgaW5pdCBsb2dpYyAocmFzcGkuYyksIHNv
+IHNwbGl0dGluZyB0aGVyZSBtYWtlcyBtb3JlIHNlbnNlIHRvIG1lIHRoYW4gaW4gYmNtMjgzNi83
+Lg0KDQpJIHNlZSB5b3UganVzdCBwb3N0ZWQgYW5vdGhlciBwYXRjaC4gRldJVywgdGhpcyBpc24n
+dCBxdWl0ZSB3aGF0IEkgd2FzIHByb3Bvc2luZyAtLSByYXRoZXIgdGhhbiBoYXZlIGJjbTI3MzYu
+YyB0YWtlIGEgdmVyc2lvbiBudW1iZXIgdGhhdCBpcyAyIG9yIDMsIEkgd291bGQganVzdCBwYXNz
+IGl0IHRoZSBDUFUgbW9kZWwgdG8gaW5zdGFudGlhdGUuIEJ1dCBhdCB0aGlzIHBvaW50IEkgdGhp
+bmsgaXQncyBiZXN0IHdhaXRpbmcgZm9yIG9uZSBvZiB0aGUgUWVtdSBtYWludGFpbmVycyB0byBj
+aGltZSBpbiBhbmQgc2VlIHdoYXQgdGhleSBwcmVmZXIuDQoNCkFuZHJldw0K
