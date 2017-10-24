@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46164)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46865)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <changpeng.liu@intel.com>) id 1e6nGS-0007WY-Fi
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 20:40:18 -0400
+	(envelope-from <changpeng.liu@intel.com>) id 1e6nKi-0000Wr-JG
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 20:44:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <changpeng.liu@intel.com>) id 1e6nGP-0005du-BO
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 20:40:16 -0400
-Received: from mga07.intel.com ([134.134.136.100]:44922)
+	(envelope-from <changpeng.liu@intel.com>) id 1e6nKf-0008Lv-C7
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 20:44:40 -0400
+Received: from mga06.intel.com ([134.134.136.31]:50963)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <changpeng.liu@intel.com>)
-	id 1e6nGO-0005bV-VA
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 20:40:13 -0400
+	id 1e6nKe-0008Kw-Vc
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 20:44:37 -0400
 From: "Liu, Changpeng" <changpeng.liu@intel.com>
-Date: Tue, 24 Oct 2017 00:40:06 +0000
-Message-ID: <FF7FC980937D6342B9D289F5F3C7C2625B5D91EE@SHSMSX103.ccr.corp.intel.com>
+Date: Tue, 24 Oct 2017 00:44:30 +0000
+Message-ID: <FF7FC980937D6342B9D289F5F3C7C2625B5D9206@SHSMSX103.ccr.corp.intel.com>
 References: <1508390650-19115-1-git-send-email-changpeng.liu@intel.com>
 	<1508390650-19115-3-git-send-email-changpeng.liu@intel.com>
 	<20171019151745.GH6205@stefanha-x1.localdomain>
 	<FF7FC980937D6342B9D289F5F3C7C2625B5D8682@SHSMSX103.ccr.corp.intel.com>
 	<20171020095435.GD21393@stefanha-x1.localdomain>
 	<FF7FC980937D6342B9D289F5F3C7C2625B5D8EB6@SHSMSX103.ccr.corp.intel.com>
-	<20171023155223-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20171023155223-mutt-send-email-mst@kernel.org>
+	<20171023171146.GB15029@stefanha-x1.localdomain>
+In-Reply-To: <20171023171146.GB15029@stefanha-x1.localdomain>
 Content-Language: en-US
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
@@ -35,18 +35,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>, "felipe@nutanix.com" <felipe@nutanix.com>, "Harris, James R" <james.r.harris@intel.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>, "felipe@nutanix.com" <felipe@nutanix.com>, "Harris, James R" <james.r.harris@intel.com>
 
 
 
 > -----Original Message-----
-> From: Michael S. Tsirkin [mailto:mst@redhat.com]
-> Sent: Monday, October 23, 2017 8:55 PM
+> From: Stefan Hajnoczi [mailto:stefanha@gmail.com]
+> Sent: Tuesday, October 24, 2017 1:12 AM
 > To: Liu, Changpeng <changpeng.liu@intel.com>
-> Cc: Stefan Hajnoczi <stefanha@gmail.com>; qemu-devel@nongnu.org;
-> pbonzini@redhat.com; marcandre.lureau@redhat.com; felipe@nutanix.com;
-> Harris, James R <james.r.harris@intel.com>
+> Cc: qemu-devel@nongnu.org; pbonzini@redhat.com; mst@redhat.com;
+> marcandre.lureau@redhat.com; felipe@nutanix.com; Harris, James R
+> <james.r.harris@intel.com>
 > Subject: Re: [PATCH v4 2/4] vhost-user-blk: introduce a new vhost-user-bl=
 k host
 > device
@@ -139,14 +139,18 @@ the
 th vhost-
 > scsi and vhost-net's implementation.
 >=20
-> Yes but I don't see these properties in virtio_blk_properties. Please
-> make the names consistent at least when virtio-blk has them.
-> I am pretty sure you don't want to expose e.g. _F_SCSI.
-Yes, I should remove F_SCSI/F_WCE/F_BARRIER features, Virtio-blk hardcoded =
-4 features: VIRTIO_BLK_F_SEG_MAX/VIRTIO_BLK_F_GEOMETRY/
-VIRTIO_BLK_F_TOPOLOGY/VIRTIO_BLK_F_BLK_SIZE, and extra several configuratio=
-n parameters for VIRTIO_BLK_F_CONFIG_WCE/VIRTIO_BLK_F_MQ,
-I can change those feature bits same as virtio-blk.
+> You said vhost-master can disable features but the code doesn't seem to
+> work that way:
 >=20
+> +    /* Turn on pre-defined features */
+> +    features |=3D s->host_features;
+User can append parameter when started Qemu: e.g: f_readonly=3Dfalse to dis=
+able it.
 >=20
-> > > Stefan
+> If the use case isn't clear please remove these properties for now.
+I can make it the same with virtio-blk, hardcoded the mandatory features, a=
+nd put=20
+VIRTIO_BLK_F_MQ/VIRTIO_BLK_F_RO/VIRTIO_BLK_F_CONFIG_WCE configurable. Thoug=
+hts?
+>=20
+> Stefan
