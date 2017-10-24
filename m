@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52019)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54584)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1e6wie-0002bB-Sh
-	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 06:46:01 -0400
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1e6ww2-0005Fd-Dr
+	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 06:59:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1e6wib-0000Na-PA
-	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 06:46:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37946)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1e6wib-0000N8-G2
-	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 06:45:57 -0400
-Date: Tue, 24 Oct 2017 11:45:53 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20171024104552.GC3780@work-vm>
-References: <20171023151310.6462-1-vadim.galitsyn@profitbricks.com>
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1e6wvz-0006Eh-BU
+	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 06:59:50 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:41860)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1e6wvy-0006CK-VB
+	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 06:59:47 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20171023151310.6462-1-vadim.galitsyn@profitbricks.com>
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Date: Tue, 24 Oct 2017 13:59:41 +0300
+From: Mihail Abakumov <mikhail.abakumov@ispras.ru>
+In-Reply-To: <CAKmqyKMrFGWDctvuPMFyEGqBm6QMF2VTArqV6v2rONVeUa8SrA@mail.gmail.com>
+References: <150642384156.3900.3326424823772221077.stgit@Misha-PC.lan02.inno>
+	<150642387446.3900.8629683985208127854.stgit@Misha-PC.lan02.inno>
+	<CAKmqyKMrFGWDctvuPMFyEGqBm6QMF2VTArqV6v2rONVeUa8SrA@mail.gmail.com>
+Message-ID: <c23218e7b44a0f2f2616bd83f5328cd0@ispras.ru>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] QMP, HMP: introduce 'writeconfig' command
+Subject: Re: [Qemu-devel] [PATCH 05/43] windbg: added helper features
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,59 +29,136 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vadim Galitsyn <vadim.galitsyn@profitbricks.com>
-Cc: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+To: Alistair Francis <alistair23@gmail.com>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Stefan Weil <sw@weilnetz.de>, lprosek@redhat.com, dovgaluk@ispras.ru, rkagan@virtuozzo.com, Paolo Bonzini <pbonzini@redhat.com>, den@openvz.org
 
-* Vadim Galitsyn (vadim.galitsyn@profitbricks.com) wrote:
-> Hi Guys,
+Alistair Francis =D0=BF=D0=B8=D1=81=D0=B0=D0=BB 2017-09-26 20:13:
+> On Tue, Sep 26, 2017 at 4:04 AM, Mihail Abakumov
+> <mikhail.abakumov@ispras.ru> wrote:
+>> Added some helper features for windbgstub.
+>>=20
+>> Signed-off-by: Mihail Abakumov <mikhail.abakumov@ispras.ru>
+>> Signed-off-by: Pavel Dovgalyuk <dovgaluk@ispras.ru>
+>> Signed-off-by: Dmitriy Koltunov <koltunov@ispras.ru>
+>> ---
+>>  include/exec/windbgstub-utils.h |   46=20
+>> +++++++++++++++++++++++++++++++++++++++
+>>  include/exec/windbgstub.h       |    3 +++
+>>  windbgstub.c                    |    1 +
+>>  3 files changed, 50 insertions(+)
+>>=20
+>> diff --git a/include/exec/windbgstub-utils.h=20
+>> b/include/exec/windbgstub-utils.h
+>> index 2390597f1f..65f336e4bf 100755
+>> --- a/include/exec/windbgstub-utils.h
+>> +++ b/include/exec/windbgstub-utils.h
+>> @@ -13,7 +13,53 @@
+>>  #define WINDBGSTUB_UTILS_H
+>>=20
+>>  #include "qemu/osdep.h"
+>> +#include "qemu/error-report.h"
+>> +#include "cpu.h"
+>>  #include "exec/windbgstub.h"
+>>  #include "exec/windbgkd.h"
+>>=20
+>> +#ifndef TARGET_I386
+>> +#error Unsupported Architecture
+>> +#endif
+>> +#ifdef TARGET_X86_64 /* Unimplemented yet */
+>> +#error Unsupported Architecture
+>> +#endif
+>> +
+>> +#if (WINDBG_DEBUG_ON)
+>> +
+>> +# define WINDBG_DEBUG(...) do {    \
+>> +    printf("Debug: " __VA_ARGS__); \
+>> +    printf("\n");                  \
+>> +} while (false)
+>> +
+>> +# define WINDBG_ERROR(...) do {    \
+>> +    printf("Error: " __VA_ARGS__); \
+>> +    printf("\n");                  \
+>> +} while (false)
 >=20
-> This thread is a continuation of discussion started in
-> http://lists.nongnu.org/archive/html/qemu-devel/2017-02/msg03182.html.
+> Use qemu_log() instead of printf().
 >=20
-> This series introduces =E2=80=98writeconfig=E2=80=99 command support fo=
-r QMP and HMP monitors. This functionality might be useful for live migra=
-tion for cases when guest configuration was modified in runtime (for exam=
-ple as a result of hot- plug/unplug operations) and actual Qemu command l=
-ine no longer reflects setup exposed to guest.
+> Have a look as some other files for the usual way we handle debug=20
+> printing.
 >=20
-> Original series has =E2=80=98qemu_opts=E2=80=99 patch as well (http://l=
-ists.nongnu.org/archive/html/qemu-devel/2017-02/msg03183.html) because HM=
-P=E2=80=99s =E2=80=98object_add=E2=80=99 result was not reflected in =E2=80=
-=98writeconfig=E2=80=99 output. Later I found that QMP=E2=80=99s =E2=80=98=
-object-add=E2=80=99 has the same issue. Anyway, I don=E2=80=99t include =E2=
-=80=98qemu_opts=E2=80=99 patches here because Markus mentioned (here http=
-://lists.nongnu.org/archive/html/qemu-devel/2017-02/msg03476.html) that t=
-his functionality is going to be reworked in some future and such patches=
- might collide with the rework process.
->=20
-> Markus, could you please post if you have an update on this topic? Curr=
-ent =E2=80=98master=E2=80=99 branch (9993c82dc2f5ce58b41d708b765e1a717ad4=
-281d) still has the issue.
->=20
-> Also, Markus mentioned that once configuration was changed during live =
-migration -- it might be an issue because =E2=80=98writeconfig=E2=80=99 d=
-ata became outdated (and might be make sense to think about to embed this=
- data into migration stream itself). In the same time David said that thi=
-s is another problem which is unrelated to this patch series. What is you=
-r current opinion on this topic? Can we consider these patches to be incl=
-uded into =E2=80=98master=E2=80=99 taking into account that not all confi=
-guration is dumped by =E2=80=98writeconfig=E2=80=99 (=E2=80=98object_add=E2=
-=80=99 problem), but this can be fixed later?
 
-I don't see anything wrong with having a 'writeconfig' command - we
-already have the command line equivalent - that is assuming hotplug
-etc all cause the values written to be correct.
+Thanks for your feedback. I'm replaced printf() with qemu_log().
 
-The data becoming outdated doesn't sound like a big issue to me;
-it's the management layer that's doing any hotplugs, it can reissue
-another 'writeconfig' command.
+You can find new version here:
+    =20
+https://lists.nongnu.org/archive/html/qemu-devel/2017-10/msg03912.html
 
-Dave
+>> +
+>> +#else
+>> +
+>> +# define WINDBG_DEBUG(...)
+>> +# define WINDBG_ERROR(...) error_report(WINDBG ": " __VA_ARGS__)
+>> +
+>> +#endif
+>> +
+>> +#define FMT_ADDR "addr:0x" TARGET_FMT_lx
+>> +#define FMT_ERR  "Error:%d"
+>> +
+>> +#define UINT8_P(ptr) ((uint8_t *) (ptr))
+>> +#define UINT32_P(ptr) ((uint32_t *) (ptr))
+>> +#define FIELD_P(type, field, ptr) ((typeof_field(type, field) *)=20
+>> (ptr))
+>> +#define PTR(var) UINT8_P(&var)
+>> +
+>> +#define M64_SIZE sizeof(DBGKD_MANIPULATE_STATE64)
+>> +
+>> +#define sizeof_field(type, field) sizeof(((type *) NULL)->field)
+>> +
+>> +#define READ_VMEM(cpu, addr, type) ({                         \
+>> +    type _t;                                                  \
+>> +    cpu_memory_rw_debug(cpu, addr, PTR(_t), sizeof(type), 0); \
+>> +    _t;                                                       \
+>> +})
+>> +
+>>  #endif
+>> diff --git a/include/exec/windbgstub.h b/include/exec/windbgstub.h
+>> index 1a6e1cc6e5..703fc26b8f 100755
+>> --- a/include/exec/windbgstub.h
+>> +++ b/include/exec/windbgstub.h
+>> @@ -12,6 +12,9 @@
+>>  #ifndef WINDBGSTUB_H
+>>  #define WINDBGSTUB_H
+>>=20
+>> +#define WINDBG "windbg"
+>> +#define WINDBG_DEBUG_ON false
+>=20
+> You should have a check here to see if the user has already set
+> WINDBG_DEBUG_ON to allow people to set it during build time.
+>=20
+> Thanks,
+> Alistair
+>=20
 
->=20
-> Best regards,
-> Vadim
->=20
->=20
+Yes, you're right. I done it.
+
+>> +
+>>  int windbg_server_start(const char *device);
+>>=20
+>>  #endif
+>> diff --git a/windbgstub.c b/windbgstub.c
+>> index 4951f59203..3830446988 100755
+>> --- a/windbgstub.c
+>> +++ b/windbgstub.c
+>> @@ -11,6 +11,7 @@
+>>=20
+>>  #include "qemu/osdep.h"
+>>  #include "exec/windbgstub.h"
+>> +#include "exec/windbgstub-utils.h"
+>>=20
+>>  int windbg_server_start(const char *device)
+>>  {
+>>=20
+>>=20
+
 --
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Thanks,
+Mihail Abakumov
