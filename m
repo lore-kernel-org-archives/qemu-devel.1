@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46122)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51363)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <will.deacon@arm.com>) id 1e6wKF-0005kz-UB
-	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 06:20:51 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1e6we1-0001el-Cx
+	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 06:41:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <will.deacon@arm.com>) id 1e6wK6-0005nQ-Bd
-	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 06:20:47 -0400
-Date: Tue, 24 Oct 2017 11:20:29 +0100
-From: Will Deacon <will.deacon@arm.com>
-Message-ID: <20171024102029.GE17909@arm.com>
-References: <1504286483-23327-1-git-send-email-eric.auger@redhat.com>
-	<20171024053802.GA22835@virtx40>
+	(envelope-from <dgilbert@redhat.com>) id 1e6wdx-0006JD-3A
+	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 06:41:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34160)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1e6wdw-0006IM-QP
+	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 06:41:09 -0400
+Date: Tue, 24 Oct 2017 11:41:01 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20171024104100.GB3780@work-vm>
+References: <20171023151310.6462-1-vadim.galitsyn@profitbricks.com>
+	<20171023151310.6462-3-vadim.galitsyn@profitbricks.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20171024053802.GA22835@virtx40>
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v7 00/20] ARM SMMUv3 Emulation
- Support
+In-Reply-To: <20171023151310.6462-3-vadim.galitsyn@profitbricks.com>
+Subject: Re: [Qemu-devel] [PATCH 2/4] hmp: introduce 'writeconfig' command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,80 +27,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Linu Cherian <linuc.decode@gmail.com>
-Cc: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com, peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org, prem.mallappa@gmail.com, alex.williamson@redhat.com, mohun106@gmail.com, drjones@redhat.com, tcain@qti.qualcomm.com, Radha.Chintakuntla@cavium.com, Sunil.Goutham@cavium.com, mst@redhat.com, jean-philippe.brucker@arm.com, tn@semihalf.com, robin.murphy@arm.com, peterx@redhat.com, bharat.bhushan@nxp.com, christoffer.dall@linaro.org, wtownsen@redhat.com
+To: Vadim Galitsyn <vadim.galitsyn@profitbricks.com>
+Cc: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, Eduardo Otubo <eduardo.otubo@profitbricks.com>
 
-On Tue, Oct 24, 2017 at 11:08:02AM +0530, Linu Cherian wrote:
-> On Fri Sep 01, 2017 at 07:21:03PM +0200, Eric Auger wrote:
-> > This series implements the emulation code for ARM SMMUv3.
-> > 
-> > Changes since v6:
-> > - DPDK testpmd now running on guest with 2 assigned VFs
-> > - Changed the instantiation method: add the following option to
-> >   the QEMU command line
-> >   -device smmuv3 # for virtio/vhost use cases
-> >   -device smmuv3,caching-mode # for vfio use cases (based on [1])
-> > - splitted the series into smaller patches to allow the review
-> > - the VFIO integration based on "tlbi-on-map" smmuv3 driver
-> >   is isolated from the rest: last 2 patches, not for upstream.
-> >   This is shipped for testing/bench until a better solution is found.
-> > - Reworked permission flag checks and event generation
-> > 
-> > testing:
-> > - in dt and ACPI modes
-> > - virtio-net-pci and vhost-net devices using dma ops with various
-> >   guest page sizes [2]
-> > - assigned VFs using dma ops [3]:
-> >   - AMD Overdrive and igbvf passthrough (using gsi direct mapping)
-> >   - Cavium ThunderX and ixgbevf passthrough (using KVM MSI routing)
-> > - DPDK testpmd on guest running with VFIO user space drivers (2 igbvf) [3]
-> >   with guest and host page size equal (4kB)
-> > 
-> > Known limitations:
-> > - no VMSAv8-32 suport
-> > - no nested stage support (S1 + S2)
-> > - no support for HYP mappings
-> > - register fine emulation, commands, interrupts and errors were
-> >   not accurately tested. Handling is sufficient to run use cases
-> >   described above though.
-> > - interrupts and event generation not observed yet.
-> > 
-> > Best Regards
-> > 
-> > Eric
-> >
+* Vadim Galitsyn (vadim.galitsyn@profitbricks.com) wrote:
+> Add 'writeconfig' command for HMP monitor. This command is a
+> sibling of QMP command 'writeconfig'.
 > 
-> Was looking at options to get rid of the existing hacks we have
-> in this implementation (last two patches) and also to reduce the map/unmap/translation 
-> overhead for the guest kernel devices.
+> This is a simple way to keep track of current state of VM
+> after series of hotplugs and/or hotunplugs of different devices.
 > 
-> Interestingly, the nested stage translation + smmu emulation at kernel
->  that we were exploring, has been already tried by Will Deacon. 
-> https://www.linuxplumbersconf.org/2014/ocw/system/presentations/2019/original/vsmmu-lpc14.pdf
-> https://lists.gnu.org/archive/html/qemu-devel/2015-06/msg03379.html
+> Signed-off-by: Vadim Galitsyn <vadim.galitsyn@profitbricks.com>
+> Signed-off-by: Eduardo Otubo <eduardo.otubo@profitbricks.com>
+> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Cc: qemu-devel@nongnu.org
+
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+> ---
+>  hmp.h           |  1 +
+>  hmp.c           |  9 +++++++++
+>  hmp-commands.hx | 17 +++++++++++++++++
+>  3 files changed, 27 insertions(+)
 > 
+> diff --git a/hmp.h b/hmp.h
+> index 3605003e4c..2730b7f7b9 100644
+> --- a/hmp.h
+> +++ b/hmp.h
+> @@ -146,5 +146,6 @@ void hmp_info_ramblock(Monitor *mon, const QDict *qdict);
+>  void hmp_hotpluggable_cpus(Monitor *mon, const QDict *qdict);
+>  void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict);
+>  void hmp_info_memory_size_summary(Monitor *mon, const QDict *qdict);
+> +void hmp_writeconfig(Monitor *mon, const QDict *qdict);
+>  
+>  #endif
+> diff --git a/hmp.c b/hmp.c
+> index ec61329ebb..20af8ab870 100644
+> --- a/hmp.c
+> +++ b/hmp.c
+> @@ -2901,3 +2901,12 @@ void hmp_info_memory_size_summary(Monitor *mon, const QDict *qdict)
+>      }
+>      hmp_handle_error(mon, &err);
+>  }
+> +
+> +void hmp_writeconfig(Monitor *mon, const QDict *qdict)
+> +{
+> +     const char *file = qdict_get_str(qdict, "file");
+> +     Error *err = NULL;
+> +
+> +     qmp_writeconfig(file, &err);
+> +     hmp_handle_error(mon, &err);
+> +}
+> diff --git a/hmp-commands.hx b/hmp-commands.hx
+> index 1941e19932..98a3dc4b66 100644
+> --- a/hmp-commands.hx
+> +++ b/hmp-commands.hx
+> @@ -1858,6 +1858,23 @@ ETEXI
+>          .sub_table  = info_cmds,
+>      },
+>  
+> +    {
+> +        .name       = "writeconfig",
+> +        .args_type  = "file:F",
+> +        .params     = "file",
+> +        .help       = "dump current configuration into specified file",
+> +        .cmd        = hmp_writeconfig,
+> +    },
+> +
+> +STEXI
+> +@item writeconfig @var{file}
+> +@findex writeconfig
+> +Dump current configuration into specified @var{file}.
+> +@example
+> +(qemu) writeconfig /tmp/qemu.conf
+> +@end example
+> +ETEXI
+> +
+>  STEXI
+>  @end table
+>  ETEXI
+> -- 
+> 2.13.1.394.g41dd433
 > 
-> It would be nice to understand, why this solution was not pursued atleast for vfio-pci devices.
-> OR
-> If you have already plans to do nested stage support in the future, would be interested to know 
-> about it.
-
-I don't plan to revive that code. I got something well on the way to working
-for SMMUv2, but it had some pretty major issues:
-
-1. A huge amount of emulation code in the kernel
-2. A horribly complicated user ABI
-3. Keeping track of internal hardware caching state was a nightmare, so
-   over-invalidation was rife
-4. Errata workarounds meant trapping all SMMU accesses (inc. for stage 1)
-5. I remember having issues with interrupts, but this was likely
-   SMMUv2-specific
-6. There was no scope for code re-use with other SMMU implementations (e.g.
-   SMMUv3)
-
-Overall, it was just an unmaintainable, non-performant
-security-flaw-waiting-to-happen so I parked it. That's some of the
-background behind me preferring a virtio-iommu approach, because there's
-the potential for kernel acceleration using something like vhost.
-
-Will
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
