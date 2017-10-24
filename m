@@ -1,33 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49858)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50889)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1e6ykj-00028J-M9
-	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 08:56:19 -0400
+	(envelope-from <stefanha@gmail.com>) id 1e6ypE-0003Hp-7T
+	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 09:01:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1e6ykf-0006Fw-CA
-	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 08:56:17 -0400
-Received: from mail-wr0-x22d.google.com ([2a00:1450:400c:c0c::22d]:54733)
+	(envelope-from <stefanha@gmail.com>) id 1e6yp8-0000mF-KN
+	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 09:00:56 -0400
+Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:53389)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1e6ykf-0006FQ-0w
-	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 08:56:13 -0400
-Received: by mail-wr0-x22d.google.com with SMTP id o44so20556446wrf.11
-	for <qemu-devel@nongnu.org>; Tue, 24 Oct 2017 05:56:12 -0700 (PDT)
-Date: Tue, 24 Oct 2017 14:53:23 +0200
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1e6yp8-0000lP-Ch
+	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 09:00:50 -0400
+Received: by mail-wm0-x235.google.com with SMTP id r196so3219259wmf.2
+	for <qemu-devel@nongnu.org>; Tue, 24 Oct 2017 06:00:50 -0700 (PDT)
+Date: Tue, 24 Oct 2017 14:35:53 +0200
 From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20171024125323.GH18756@stefanha-x1.localdomain>
-References: <1508390650-19115-1-git-send-email-changpeng.liu@intel.com>
-	<1508390650-19115-3-git-send-email-changpeng.liu@intel.com>
-	<20171019151745.GH6205@stefanha-x1.localdomain>
-	<FF7FC980937D6342B9D289F5F3C7C2625B5D8682@SHSMSX103.ccr.corp.intel.com>
-	<20171020095435.GD21393@stefanha-x1.localdomain>
-	<FF7FC980937D6342B9D289F5F3C7C2625B5D8EB6@SHSMSX103.ccr.corp.intel.com>
-	<20171023171146.GB15029@stefanha-x1.localdomain>
-	<FF7FC980937D6342B9D289F5F3C7C2625B5D9206@SHSMSX103.ccr.corp.intel.com>
+Message-ID: <20171024123553.GG18756@stefanha-x1.localdomain>
+References: <20171019160419.11611-1-ross.lagerwall@citrix.com>
+	<20171019162420.GA8408@redhat.com>
+	<2c1c1652-7a70-7330-98b2-9225b35670a8@citrix.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <FF7FC980937D6342B9D289F5F3C7C2625B5D9206@SHSMSX103.ccr.corp.intel.com>
-Subject: Re: [Qemu-devel] [PATCH v4 2/4] vhost-user-blk: introduce a new
- vhost-user-blk host device
+In-Reply-To: <2c1c1652-7a70-7330-98b2-9225b35670a8@citrix.com>
+Subject: Re: [Qemu-devel] [PATCH v1] os-posix: Add -unshare option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,123 +30,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Liu, Changpeng" <changpeng.liu@intel.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>, "felipe@nutanix.com" <felipe@nutanix.com>, "Harris, James R" <james.r.harris@intel.com>
+To: Ross Lagerwall <ross.lagerwall@citrix.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
 
-On Tue, Oct 24, 2017 at 12:44:30AM +0000, Liu, Changpeng wrote:
+On Mon, Oct 23, 2017 at 03:30:05PM +0100, Ross Lagerwall wrote:
+> On 10/19/2017 05:24 PM, Daniel P. Berrange wrote:
+> > On Thu, Oct 19, 2017 at 05:04:19PM +0100, Ross Lagerwall wrote:
+> > > Add an option to allow calling unshare() just before starting guest
+> > > execution. The option allows unsharing one or more of the mount
+> > > namespace, the network namespace, and the IPC namespace. This is useful
+> > > to restrict the ability of QEMU to cause damage to the system should it
+> > > be compromised.
+> > > 
+> > > An example of using this would be to have QEMU open a QMP socket at
+> > > startup and unshare the network namespace. The instance of QEMU could
+> > > still be controlled by the QMP socket since that belongs in the original
+> > > namespace, but if QEMU were compromised it wouldn't be able to open any
+> > > new connections, even to other processes on the same machine.
+> > 
+> > Unless I'm misunderstanding you, what's described here is already possible
+> > by just using the 'unshare' command to spawn QEMU:
+> > 
+> >    # unshare --ipc --mount --net qemu-system-x86_64 -qmp unix:/tmp/foo,server -vnc :1
+> >    qemu-system-x86_64: -qmp unix:/tmp/foo,server: QEMU waiting for connection on: disconnected:unix:/tmp/foo,server
+> > 
+> > And in another shell I can still access the QMP socket from the original host
+> > namespace
 > 
-> 
-> > -----Original Message-----
-> > From: Stefan Hajnoczi [mailto:stefanha@gmail.com]
-> > Sent: Tuesday, October 24, 2017 1:12 AM
-> > To: Liu, Changpeng <changpeng.liu@intel.com>
-> > Cc: qemu-devel@nongnu.org; pbonzini@redhat.com; mst@redhat.com;
-> > marcandre.lureau@redhat.com; felipe@nutanix.com; Harris, James R
-> > <james.r.harris@intel.com>
-> > Subject: Re: [PATCH v4 2/4] vhost-user-blk: introduce a new vhost-user-blk host
-> > device
-> > 
-> > On Mon, Oct 23, 2017 at 04:26:36AM +0000, Liu, Changpeng wrote:
-> > >
-> > >
-> > > > -----Original Message-----
-> > > > From: Stefan Hajnoczi [mailto:stefanha@gmail.com]
-> > > > Sent: Friday, October 20, 2017 5:55 PM
-> > > > To: Liu, Changpeng <changpeng.liu@intel.com>
-> > > > Cc: qemu-devel@nongnu.org; pbonzini@redhat.com; mst@redhat.com;
-> > > > marcandre.lureau@redhat.com; felipe@nutanix.com; Harris, James R
-> > > > <james.r.harris@intel.com>
-> > > > Subject: Re: [PATCH v4 2/4] vhost-user-blk: introduce a new vhost-user-blk
-> > host
-> > > > device
-> > > >
-> > > > On Fri, Oct 20, 2017 at 01:47:58AM +0000, Liu, Changpeng wrote:
-> > > > > > > +static Property vhost_user_blk_properties[] = {
-> > > > > > > +    DEFINE_PROP_CHR("chardev", VHostUserBlk, chardev),
-> > > > > > > +    DEFINE_PROP_UINT16("num_queues", VHostUserBlk, num_queues,
-> > 1),
-> > > > > > > +    DEFINE_PROP_UINT32("queue_size", VHostUserBlk, queue_size, 128),
-> > > > > > > +    DEFINE_PROP_BIT64("f_size_max", VHostUserBlk, host_features,
-> > > > > > > +                      VIRTIO_BLK_F_SIZE_MAX, true),
-> > > > > > > +    DEFINE_PROP_BIT64("f_sizemax", VHostUserBlk, host_features,
-> > > > > > > +                      VIRTIO_BLK_F_SIZE_MAX, true),
-> > > > > > > +    DEFINE_PROP_BIT64("f_segmax", VHostUserBlk, host_features,
-> > > > > > > +                      VIRTIO_BLK_F_SEG_MAX, true),
-> > > > > > > +    DEFINE_PROP_BIT64("f_geometry", VHostUserBlk, host_features,
-> > > > > > > +                      VIRTIO_BLK_F_GEOMETRY, true),
-> > > > > > > +    DEFINE_PROP_BIT64("f_readonly", VHostUserBlk, host_features,
-> > > > > > > +                      VIRTIO_BLK_F_RO, false),
-> > > > > > > +    DEFINE_PROP_BIT64("f_blocksize", VHostUserBlk, host_features,
-> > > > > > > +                      VIRTIO_BLK_F_BLK_SIZE, true),
-> > > > > > > +    DEFINE_PROP_BIT64("f_topology", VHostUserBlk, host_features,
-> > > > > > > +                      VIRTIO_BLK_F_TOPOLOGY, true),
-> > > > > > > +    DEFINE_PROP_BIT64("f_multiqueue", VHostUserBlk, host_features,
-> > > > > > > +                      VIRTIO_BLK_F_MQ, true),
-> > > > > > > +    DEFINE_PROP_BIT64("f_flush", VHostUserBlk, host_features,
-> > > > > > > +                      VIRTIO_BLK_F_FLUSH, true),
-> > > > > > > +    DEFINE_PROP_BIT64("f_barrier", VHostUserBlk, host_features,
-> > > > > > > +                      VIRTIO_BLK_F_BARRIER, false),
-> > > > > > > +    DEFINE_PROP_BIT64("f_scsi", VHostUserBlk, host_features,
-> > > > > > > +                      VIRTIO_BLK_F_SCSI, false),
-> > > > > > > +    DEFINE_PROP_BIT64("f_wce", VHostUserBlk, host_features,
-> > > > > > > +                      VIRTIO_BLK_F_WCE, false),
-> > > > > >
-> > > > > > Please explain how feature negotation works.  The vhost-user slave
-> > > > > > advertises support features in the return value from
-> > > > > > VHOST_USER_GET_FEATURES.  How does this additional feature mask
-> > work
-> > > > and
-> > > > > > why is it useful?
-> > > > > According to Paolo's previous comments, VIRTIO_BLK_F_WCE/
-> > > > VIRTIO_BLK_F_SCSI/ VIRTIO_BLK_F_BARRIER
-> > > > > should be removed. Here I added all the feature flags just want to avoid
-> > the
-> > > > case that vhost-user slave target
-> > > > > can support but Qemu vhost block driver cannot support it.
-> > > >
-> > > > Please explain a bit more how these options can be used.
-> > > >
-> > > > When I looked at the vhost code it seemed like the vhost slave can
-> > > > report any feature bits it wishes (even things QEMU doesn't know about).
-> > > > What is the purpose of override some of the feature bits on the QEMU
-> > > > command-line?
-> > > Hi Stefan,
-> > > Here I added a switch which can override vhost-slave's feature bits, for
-> > example, vhost-slave reported `VIRTIO_BLK_F_RO`,
-> > > but Qemu vhost-master can disable it through command line when started the
-> > Qemu. Users don't need to change any
-> > > vhost-slave's code to disable this feature, and this is also aligned with vhost-
-> > scsi and vhost-net's implementation.
-> > 
-> > You said vhost-master can disable features but the code doesn't seem to
-> > work that way:
-> > 
-> > +    /* Turn on pre-defined features */
-> > +    features |= s->host_features;
-> User can append parameter when started Qemu: e.g: f_readonly=false to disable it.
+> So that works because UNIX domains sockets are not restricted by network
+> namespaces.
 
-No, f_readonly=false has no effect if the vhost slave replies with f_readonly
-to the VHOST_USER_GET_FEATURES message.
+Slightly pedantic but hopefully interesting:
 
-Take a look at the hw/virtio/vhost.c code:
+It's not correct to say that UNIX domain sockets are not restricted by
+network namespaces, it's more complicated than that.  UNIX domain
+sockets fall into several groups:
 
-  uint64_t vhost_get_features(struct vhost_dev *hdev, const int *feature_bits,
-                              uint64_t features)
-  {
-      const int *bit = feature_bits;
-      while (*bit != VHOST_INVALID_FEATURE_BIT) {
-          uint64_t bit_mask = (1ULL << *bit);
-          if (!(hdev->features & bit_mask)) {
-              features &= ~bit_mask;
-          }
-          bit++;
-      }
-      return features;
-  }
+1. pathname (i.e. they have an inode on disk) sockets are namespaced by
+   the mount namespace, not the network namespace.  These sockets can
+   only be accessed if the thread's mount (filesystem) namespace can
+   reach the inode.
 
-If f_readonly=false then features |= s->host_features will not contain
-f_readonly but it doesn't matter because if hdev->features (this value
-comes from the vhost slave) has f_readonly we will not clear the bit!
+2. unnamed (e.g. socketpair(2)) sockets can never be looked up in any
+   namespace anyway, only fork() or file descriptor passing transfers
+   them between processes.  Namespaces are irrelevant here.
 
-So again, what is the purpose of the f_* properties?  I don't understand
-the semantics, it seems useless.
+3. abstract (sun_path[0] == '\0') sockets are affected by the network
+   namespace.
+
+Stefan
