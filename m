@@ -1,33 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45470)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46764)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e71om-0000ba-MC
-	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 12:12:41 -0400
+	(envelope-from <prvs=463712e83=anthony.perard@citrix.com>)
+	id 1e71uN-0001UH-J0
+	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 12:18:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e71oj-0001zS-Gc
-	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 12:12:40 -0400
-Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:43862)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e71oj-0001zE-Bm
-	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 12:12:37 -0400
-Received: by mail-qk0-x241.google.com with SMTP id w134so26942926qkb.0
-	for <qemu-devel@nongnu.org>; Tue, 24 Oct 2017 09:12:36 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
+	(envelope-from <prvs=463712e83=anthony.perard@citrix.com>)
+	id 1e71uM-0004R6-Gk
+	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 12:18:27 -0400
+Date: Tue, 24 Oct 2017 17:15:27 +0100
+From: Anthony PERARD <anthony.perard@citrix.com>
+Message-ID: <20171024161527.GG1885@perard.uk.xensource.com>
 References: <cover.1508390588.git.alistair.francis@xilinx.com>
-	<d34071814ded4ba1ffd2482b3bdfbb71175fc06f.1508390588.git.alistair.francis@xilinx.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <9c20cefb-7bb1-8324-820f-a2caa538bbe7@amsat.org>
-Date: Tue, 24 Oct 2017 13:12:33 -0300
+	<ad7c1de551fbc497743e4dd60335a75cb5365a15.1508390588.git.alistair.francis@xilinx.com>
 MIME-Version: 1.0
-In-Reply-To: <d34071814ded4ba1ffd2482b3bdfbb71175fc06f.1508390588.git.alistair.francis@xilinx.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 40/46] hw/watchdog: Replace
- fprintf(stderr, "*\n" with error_report()
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <ad7c1de551fbc497743e4dd60335a75cb5365a15.1508390588.git.alistair.francis@xilinx.com>
+Subject: Re: [Qemu-devel] [PATCH v3 01/46] Replace all occurances of
+ __FUNCTION__ with __func__
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,146 +26,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org
-Cc: alistair23@gmail.com, armbru@redhat.com
+To: Alistair Francis <alistair.francis@xilinx.com>
+Cc: qemu-devel@nongnu.org, alistair23@gmail.com, armbru@redhat.com, Gerd Hoffmann <kraxel@redhat.com>, Andrzej Zaborowski <balrogg@gmail.com>, Stefano Stabellini <sstabellini@kernel.org>, John Snow <jsnow@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@imgtec.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-arm@nongnu.org, qemu-block@nongnu.org, xen-devel@lists.xenproject.org
 
-On 10/19/2017 01:18 PM, Alistair Francis wrote:
-> Replace a large number of the fprintf(stderr, "*\n" calls with
-> error_report(). The functions were renamed with these commands and then
-> compiler issues where manually fixed.
+On Thu, Oct 19, 2017 at 09:15:41AM -0700, Alistair Francis wrote:
+> Replace all occurs of __FUNCTION__ except for the check in checkpatch
+> with the non GCC specific __func__.
 > 
-> find ./* -type f -exec sed -i \
->     'N;N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> 
-> Some lines where then manually tweaked to pass checkpatch.
+> One line in hcd-musb.c was manually tweaked to pass checkpatch.
 > 
 > Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-> ---
-> V2:
->  - Split hw patch into individual directories
-> 
->  hw/watchdog/watchdog.c     | 9 +++++----
->  hw/watchdog/wdt_i6300esb.c | 8 +++++---
->  2 files changed, 10 insertions(+), 7 deletions(-)
-> 
-> diff --git a/hw/watchdog/watchdog.c b/hw/watchdog/watchdog.c
-> index 670114ecfe..d6d11ef1e5 100644
-> --- a/hw/watchdog/watchdog.c
-> +++ b/hw/watchdog/watchdog.c
-> @@ -20,6 +20,7 @@
->   */
->  
->  #include "qemu/osdep.h"
-> +#include "qemu/error-report.h"
->  #include "qemu/option.h"
->  #include "qemu/config-file.h"
->  #include "qemu/queue.h"
-> @@ -52,7 +53,7 @@ int select_watchdog(const char *p)
->      /* -watchdog ? lists available devices and exits cleanly. */
->      if (is_help_option(p)) {
->          QLIST_FOREACH(model, &watchdog_list, entry) {
-> -            fprintf(stderr, "\t%s\t%s\n",
-> +            error_report("\t%s\t%s",
->                       model->wdt_name, model->wdt_description);
+> Cc: Gerd Hoffmann <kraxel@redhat.com>
+> Cc: Andrzej Zaborowski <balrogg@gmail.com>
+> Cc: Stefano Stabellini <sstabellini@kernel.org>
+> Cc: Anthony Perard <anthony.perard@citrix.com>
+> Cc: John Snow <jsnow@redhat.com>
+> Cc: Aurelien Jarno <aurelien@aurel32.net>
+> Cc: Yongbok Kim <yongbok.kim@imgtec.com>
+> Cc: Peter Crosthwaite <crosthwaite.peter@gmail.com>
+> Cc: Stefan Hajnoczi <stefanha@redhat.com>
+> Cc: Fam Zheng <famz@redhat.com>
+> Cc: Juan Quintela <quintela@redhat.com>
+> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> Cc: qemu-arm@nongnu.org
+> Cc: qemu-block@nongnu.org
+> Cc: xen-devel@lists.xenproject.org
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-align?
+Reviewed-by: Anthony PERARD <anthony.perard@citrix.com>
 
->          }
->          return 2;
-> @@ -68,9 +69,9 @@ int select_watchdog(const char *p)
->          }
->      }
->  
-> -    fprintf(stderr, "Unknown -watchdog device. Supported devices are:\n");
-> +    error_report("Unknown -watchdog device. Supported devices are:");
->      QLIST_FOREACH(model, &watchdog_list, entry) {
-> -        fprintf(stderr, "\t%s\t%s\n",
-> +        error_report("\t%s\t%s",
->                   model->wdt_name, model->wdt_description);
-
-align?
-
->      }
->      return 1;
-> @@ -126,7 +127,7 @@ void watchdog_perform_action(void)
->  
->      case WATCHDOG_ACTION_DEBUG:
->          qapi_event_send_watchdog(WATCHDOG_ACTION_DEBUG, &error_abort);
-> -        fprintf(stderr, "watchdog: timer fired\n");
-> +        error_report("watchdog: timer fired");
->          break;
->  
->      case WATCHDOG_ACTION_NONE:
-> diff --git a/hw/watchdog/wdt_i6300esb.c b/hw/watchdog/wdt_i6300esb.c
-> index e596b0804d..c5f5190e55 100644
-> --- a/hw/watchdog/wdt_i6300esb.c
-> +++ b/hw/watchdog/wdt_i6300esb.c
-> @@ -20,7 +20,7 @@
->   */
->  
->  #include "qemu/osdep.h"
-> -
-> +#include "qemu/error-report.h"
->  #include "qemu-common.h"
->  #include "qemu/timer.h"
->  #include "sysemu/watchdog.h"
-> @@ -186,10 +186,12 @@ static void i6300esb_timer_expired(void *vp)
->          /* What to do at the end of stage 1? */
->          switch (d->int_type) {
->          case INT_TYPE_IRQ:
-> -            fprintf(stderr, "i6300esb_timer_expired: I would send APIC 1 INT 10 here if I knew how (XXX)\n");
-> +            error_report("i6300esb_timer_expired: I would send APIC 1 INT 10"
-> +                          "here if I knew how (XXX)");
-
-I'm not sure this is an useful message...
-
-What about:
-
-               qemu_log_mask(LOG_UNIMP,
-                            "i6300esb: tmr expired but System "
-                            "APIC 1 INT10 _NOT_ emitted\n");
->              break;
->          case INT_TYPE_SMI:
-> -            fprintf(stderr, "i6300esb_timer_expired: I would send SMI here if I knew how (XXX)\n");
-> +            error_report("i6300esb_timer_expired: I would send SMI here if I"
-> +                         "knew how (XXX)");
-
-               qemu_log_mask(LOG_UNIMP,
-                            "i6300esb: tmr expired but System "
-                            "Management Interrupt _NOT_ emitted\n");
-
->              break;
->          }
->  
-> 
+-- 
+Anthony PERARD
