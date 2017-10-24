@@ -1,32 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33697)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34026)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e6pDU-0008CF-B8
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 22:45:21 -0400
+	id 1e6pGC-0000VF-5M
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 22:48:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e6pDQ-0006R3-6l
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 22:45:20 -0400
-Received: from mail-qt0-x235.google.com ([2607:f8b0:400d:c0d::235]:48139)
+	id 1e6pG9-0007pR-3S
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 22:48:08 -0400
+Received: from mail-qt0-x230.google.com ([2607:f8b0:400d:c0d::230]:51999)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e6pDP-0006Qo-Sd
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 22:45:16 -0400
-Received: by mail-qt0-x235.google.com with SMTP id f8so28725879qta.5
-	for <qemu-devel@nongnu.org>; Mon, 23 Oct 2017 19:45:15 -0700 (PDT)
+	id 1e6pG8-0007pL-VO
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 22:48:05 -0400
+Received: by mail-qt0-x230.google.com with SMTP id h4so28710720qtk.8
+	for <qemu-devel@nongnu.org>; Mon, 23 Oct 2017 19:48:04 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 References: <20171020232023.15010-1-richard.henderson@linaro.org>
-	<20171020232023.15010-6-richard.henderson@linaro.org>
+	<20171020232023.15010-9-richard.henderson@linaro.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <923e3eda-b557-b7fa-c27b-99b7681df221@amsat.org>
-Date: Mon, 23 Oct 2017 23:45:12 -0300
+Message-ID: <1641896e-b9b4-f663-0e4b-da363fa8c608@amsat.org>
+Date: Mon, 23 Oct 2017 23:47:57 -0300
 MIME-Version: 1.0
-In-Reply-To: <20171020232023.15010-6-richard.henderson@linaro.org>
+In-Reply-To: <20171020232023.15010-9-richard.henderson@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v7 05/52] tcg: Introduce arg_temp
+Subject: Re: [Qemu-devel] [PATCH v7 08/52] tcg: Introduce temp_arg,
+ export temp_idx
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,14 +42,14 @@ Cc: cota@braap.org, pbonzini@redhat.com, Richard Henderson <rth@twiddle.net>
 On 10/20/2017 08:19 PM, Richard Henderson wrote:
 > From: Richard Henderson <rth@twiddle.net>
 > 
+> At the same time, adrop the TCGContext argument and use tcg_ctx instead.
+> 
 > Reviewed-by: Emilio G. Cota <cota@braap.org>
-> Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 > Signed-off-by: Richard Henderson <rth@twiddle.net>
 
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
 > ---
->  tcg/tcg.h      |  5 +++++
->  tcg/optimize.c |  4 ++--
->  tcg/tcg.c      | 51 +++++++++++++++++++++++++--------------------------
->  3 files changed, 32 insertions(+), 28 deletions(-)
+>  tcg/tcg.h | 12 ++++++++++++
+>  tcg/tcg.c | 19 ++++++-------------
+>  2 files changed, 18 insertions(+), 13 deletions(-)
