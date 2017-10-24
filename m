@@ -1,34 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38762)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39120)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e6poa-0002Zm-LV
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 23:23:41 -0400
+	(envelope-from <lizhengui@huawei.com>) id 1e6psK-0003ct-3L
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 23:27:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e6poX-0000db-Ib
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 23:23:40 -0400
-Received: from mail-qt0-x22d.google.com ([2607:f8b0:400d:c0d::22d]:47454)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e6poX-0000dL-De
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 23:23:37 -0400
-Received: by mail-qt0-x22d.google.com with SMTP id z50so28780244qtj.4
-	for <qemu-devel@nongnu.org>; Mon, 23 Oct 2017 20:23:37 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20171020232023.15010-1-richard.henderson@linaro.org>
-	<20171020232023.15010-22-richard.henderson@linaro.org>
-	<20171023173709.GF6901@flamenco>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <4af64099-78dd-f46e-cf95-50c851c2a564@amsat.org>
-Date: Tue, 24 Oct 2017 00:23:34 -0300
+	(envelope-from <lizhengui@huawei.com>) id 1e6psG-0002n1-Uv
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 23:27:32 -0400
+From: lizhengui <lizhengui@huawei.com>
+Date: Tue, 24 Oct 2017 03:27:05 +0000
+Message-ID: <68B56AECEFB25A418ADB9417F6178A5310916363@dggemi507-mbx.china.huawei.com>
+References: <1508564040-120700-1-git-send-email-lizhengui@huawei.com>
+	<20171023174056.GE15029@stefanha-x1.localdomain>
+In-Reply-To: <20171023174056.GE15029@stefanha-x1.localdomain>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="gb2312"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <20171023173709.GF6901@flamenco>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v7 21/52] tcg: Use offsets not indices for
- TCGv_*
+Subject: [Qemu-devel] =?gb2312?b?tPC4tDogW1FlbXUtYmxvY2tdIFtQQVRDSF0gYmxv?=
+ =?gb2312?b?Y2s6IGFsbCBJL08gc2hvdWxkIGJlIGNvbXBsZXRlZCBiZWZvcmUgcmVtb3Zp?=
+ =?gb2312?b?bmcgdGhyb3R0bGUgdGltZXJzLg==?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,21 +26,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>, Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "jcody@redhat.com" <jcody@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "Lulina (A)" <lina.lulina@huawei.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "Subo (A)" <subo7@huawei.com>, "Fangyi (C)" <eric.fangyi@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "wangjie (P)" <wangjie88@huawei.com>, "jiangxiaoqing (C)" <sochin.jiang@huawei.com>
 
-On 10/23/2017 02:37 PM, Emilio G. Cota wrote:
-> On Fri, Oct 20, 2017 at 16:19:52 -0700, Richard Henderson wrote:
->> Using the offset of a temporary, relative to TCGContext, rather than
->> its index means that we don't use 0.  That leaves offset 0 free for
->> a NULL representation without having to leave index 0 unused.
-[...]
->>  /* used to align parameters */
->> -#define TCG_CALL_DUMMY_ARG      ((TCGArg)(-1))
->> +#define TCG_CALL_DUMMY_ARG      ((TCGArg)0)
-> 
-> We're doing something clever here (on a first read I thought TCGContext
-> was a typo), so I'd leave a comment somewhere. TCG_CALL_DUMMY_ARG might
-> be a good place to do so; a copy of the commit's message should suffice.
-
-agreed.
+T2ujrHRoYW5rcyBmb3IgeW91ciByZXBseS4NCg0KLS0tLS3Tyrz+1K28/i0tLS0tDQq3orz+yMs6
+IFN0ZWZhbiBIYWpub2N6aSBbbWFpbHRvOnN0ZWZhbmhhQGdtYWlsLmNvbV0gDQq3osvNyrG85Dog
+MjAxN8TqMTDUwjI0yNUgMTo0MQ0KytW8/sjLOiBsaXpoZW5ndWkNCrOty806IGt3b2xmQHJlZGhh
+dC5jb207IGpjb2R5QHJlZGhhdC5jb207IG1yZWl0ekByZWRoYXQuY29tOyBwYm9uemluaUByZWRo
+YXQuY29tOyBMdWxpbmEgKEEpOyBxZW11LWJsb2NrQG5vbmdudS5vcmc7IFN1Ym8gKEEpOyBGYW5n
+eWkgKEMpOyBxZW11LWRldmVsQG5vbmdudS5vcmc7IHdhbmdqaWUgKFApOyBqaWFuZ3hpYW9xaW5n
+IChDKQ0K1vfM4jogUmU6IFtRZW11LWJsb2NrXSBbUEFUQ0hdIGJsb2NrOiBhbGwgSS9PIHNob3Vs
+ZCBiZSBjb21wbGV0ZWQgYmVmb3JlIHJlbW92aW5nIHRocm90dGxlIHRpbWVycy4NCg0KT24gU2F0
+LCBPY3QgMjEsIDIwMTcgYXQgMDE6MzQ6MDBQTSArMDgwMCwgWmhlbmd1aSBMaSB3cm90ZToNCj4g
+RnJvbTogWmhlbmd1aSA8bGl6aGVuZ3VpQGh1YXdlaS5jb20+DQo+IA0KPiBJbiBibGtfcmVtb3Zl
+X2JzLCBhbGwgSS9PIHNob3VsZCBiZSBjb21wbGV0ZWQgYmVmb3JlIHJlbW92aW5nIHRocm90dGxl
+IA0KPiB0aW1lcnMuIElmIHRoZXJlIGhhcyBpbmZsaWdodCBJL08sIHJlbW92aW5nIHRocm90dGxl
+IHRpbWVycyBoZXJlIHdpbGwgDQo+IGNhdXNlIHRoZSBpbmZsaWdodCBJL08gbmV2ZXIgcmV0dXJu
+Lg0KPiBUaGlzIHBhdGNoIGFkZCBiZHJ2X2RyYWluZWRfYmVnaW4gYmVmb3JlIA0KPiB0aHJvdHRs
+ZV90aW1lcnNfZGV0YWNoX2Fpb19jb250ZXh0DQo+IHRvIGxldCBhbGwgSS9PIGNvbXBsZXRlZCBi
+ZWZvcmUgcmVtb3ZpbmcgdGhyb3R0bGUgdGltZXJzLg0KPiANCj4gU2lnbmVkLW9mZi1ieTogWmhl
+bmd1aSA8bGl6aGVuZ3VpQGh1YXdlaS5jb20+DQo+IC0tLQ0KPiAgYmxvY2svYmxvY2stYmFja2Vu
+ZC5jIHwgNCArKysrDQo+ICAxIGZpbGUgY2hhbmdlZCwgNCBpbnNlcnRpb25zKCspDQoNClJlbGF0
+ZWQgKGJ1dCBub3QgZXF1aXZhbGVudCkgcGF0Y2ggaGVyZToNCmh0dHBzOi8vcGF0Y2h3b3JrLmtl
+cm5lbC5vcmcvcGF0Y2gvOTk3MDAyMy8NCg0KUmV2aWV3ZWQtYnk6IFN0ZWZhbiBIYWpub2N6aSA8
+c3RlZmFuaGFAcmVkaGF0LmNvbT4NCg==
