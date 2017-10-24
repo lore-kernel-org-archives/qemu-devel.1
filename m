@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60637)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37317)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <linuc.decode@gmail.com>) id 1e72er-0002fk-1k
-	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 13:06:30 -0400
+	(envelope-from <prvs=463712e83=anthony.perard@citrix.com>)
+	id 1e730w-0006Ri-6Q
+	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 13:29:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <linuc.decode@gmail.com>) id 1e72ep-0000rb-Ss
-	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 13:06:29 -0400
-Date: Tue, 24 Oct 2017 22:36:07 +0530
-From: Linu Cherian <linuc.decode@gmail.com>
-Message-ID: <20171024170607.GA4906@linu-Latitude-E5470>
-References: <1504286483-23327-1-git-send-email-eric.auger@redhat.com>
-	<20171024053802.GA22835@virtx40> <20171024102029.GE17909@arm.com>
+	(envelope-from <prvs=463712e83=anthony.perard@citrix.com>)
+	id 1e730s-0005Dp-63
+	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 13:29:18 -0400
+Received: from smtp02.citrix.com ([66.165.176.63]:41166)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=463712e83=anthony.perard@citrix.com>)
+	id 1e730r-0005D6-UX
+	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 13:29:14 -0400
+Date: Tue, 24 Oct 2017 18:29:11 +0100
+From: Anthony PERARD <anthony.perard@citrix.com>
+Message-ID: <20171024172911.GH1885@perard.uk.xensource.com>
+References: <23017.64539.31230.43449@mariner.uk.xensource.com>
+	<1508506702-17704-1-git-send-email-ian.jackson@eu.citrix.com>
+	<1508506702-17704-7-git-send-email-ian.jackson@eu.citrix.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <20171024102029.GE17909@arm.com>
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v7 00/20] ARM SMMUv3 Emulation
- Support
+In-Reply-To: <1508506702-17704-7-git-send-email-ian.jackson@eu.citrix.com>
+Subject: Re: [Qemu-devel] [PATCH v5.1 7/8] os-posix: Provide new -runas
+ <uid>:<gid> facility
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,85 +32,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Will Deacon <will.deacon@arm.com>
-Cc: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com, peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org, prem.mallappa@gmail.com, alex.williamson@redhat.com, mohun106@gmail.com, drjones@redhat.com, tcain@qti.qualcomm.com, Radha.Chintakuntla@cavium.com, Sunil.Goutham@cavium.com, mst@redhat.com, jean-philippe.brucker@arm.com, tn@semihalf.com, robin.murphy@arm.com, peterx@redhat.com, bharat.bhushan@nxp.com, christoffer.dall@linaro.org, wtownsen@redhat.com, linu.cherian@cavium.com
+To: Ian Jackson <ian.jackson@eu.citrix.com>
+Cc: qemu-devel@nongnu.org, Ross Lagerwall <ross.lagerwall@citrix.com>, Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org
 
-Hi Will,
+On Fri, Oct 20, 2017 at 02:38:21PM +0100, Ian Jackson wrote:
+> +static bool os_parse_runas_uid_gid(const char *optarg)
+> +{
+> +    unsigned long lv;
+> +    char *ep;
+> +    uid_t got_uid;
+> +    gid_t got_gid;
+> +    int rc;
+> +
+> +    errno = 0;
+> +    lv = strtoul(optarg, &ep, 0); /* can't qemu_strtoul, want *ep==':' */
 
-On Tue, Oct 24, 2017 at 11:20:29AM +0100, Will Deacon wrote:
-> On Tue, Oct 24, 2017 at 11:08:02AM +0530, Linu Cherian wrote:
-> > On Fri Sep 01, 2017 at 07:21:03PM +0200, Eric Auger wrote:
-> > > This series implements the emulation code for ARM SMMUv3.
-> > > 
-> > > Changes since v6:
-> > > - DPDK testpmd now running on guest with 2 assigned VFs
-> > > - Changed the instantiation method: add the following option to
-> > >   the QEMU command line
-> > >   -device smmuv3 # for virtio/vhost use cases
-> > >   -device smmuv3,caching-mode # for vfio use cases (based on [1])
-> > > - splitted the series into smaller patches to allow the review
-> > > - the VFIO integration based on "tlbi-on-map" smmuv3 driver
-> > >   is isolated from the rest: last 2 patches, not for upstream.
-> > >   This is shipped for testing/bench until a better solution is found.
-> > > - Reworked permission flag checks and event generation
-> > > 
-> > > testing:
-> > > - in dt and ACPI modes
-> > > - virtio-net-pci and vhost-net devices using dma ops with various
-> > >   guest page sizes [2]
-> > > - assigned VFs using dma ops [3]:
-> > >   - AMD Overdrive and igbvf passthrough (using gsi direct mapping)
-> > >   - Cavium ThunderX and ixgbevf passthrough (using KVM MSI routing)
-> > > - DPDK testpmd on guest running with VFIO user space drivers (2 igbvf) [3]
-> > >   with guest and host page size equal (4kB)
-> > > 
-> > > Known limitations:
-> > > - no VMSAv8-32 suport
-> > > - no nested stage support (S1 + S2)
-> > > - no support for HYP mappings
-> > > - register fine emulation, commands, interrupts and errors were
-> > >   not accurately tested. Handling is sufficient to run use cases
-> > >   described above though.
-> > > - interrupts and event generation not observed yet.
-> > > 
-> > > Best Regards
-> > > 
-> > > Eric
-> > >
-> > 
-> > Was looking at options to get rid of the existing hacks we have
-> > in this implementation (last two patches) and also to reduce the map/unmap/translation 
-> > overhead for the guest kernel devices.
-> > 
-> > Interestingly, the nested stage translation + smmu emulation at kernel
-> >  that we were exploring, has been already tried by Will Deacon. 
-> > https://www.linuxplumbersconf.org/2014/ocw/system/presentations/2019/original/vsmmu-lpc14.pdf
-> > https://lists.gnu.org/archive/html/qemu-devel/2015-06/msg03379.html
-> > 
-> > 
-> > It would be nice to understand, why this solution was not pursued atleast for vfio-pci devices.
-> > OR
-> > If you have already plans to do nested stage support in the future, would be interested to know 
-> > about it.
-> 
-> I don't plan to revive that code. I got something well on the way to working
-> for SMMUv2, but it had some pretty major issues:
-> 
-> 1. A huge amount of emulation code in the kernel
-> 2. A horribly complicated user ABI
-> 3. Keeping track of internal hardware caching state was a nightmare, so
->    over-invalidation was rife
-> 4. Errata workarounds meant trapping all SMMU accesses (inc. for stage 1)
-> 5. I remember having issues with interrupts, but this was likely
->    SMMUv2-specific
-> 6. There was no scope for code re-use with other SMMU implementations (e.g.
->    SMMUv3)
-> 
-> Overall, it was just an unmaintainable, non-performant
-> security-flaw-waiting-to-happen so I parked it. That's some of the
-> background behind me preferring a virtio-iommu approach, because there's
-> the potential for kernel acceleration using something like vhost.
-> 
-> Will
+Should strtoul base be 10? If that matter.
 
-Thanks for the explanation.
+> +    got_uid = lv; /* overflow here is ID in C99 */
+> +    if (errno || *ep != ':' || got_uid != lv || got_uid == (uid_t)-1) {
+> +        return false;
+> +    }
+> +
+> +    lv = 0;
+> +    rc = qemu_strtoul(ep + 1, 0, 0, &lv);
+> +    got_gid = lv; /* overflow here is ID in C99 */
+> +    if (rc || got_gid != lv || got_gid == (gid_t)-1) {
+> +        return false;
+> +    }
+> +
+> +    user_uid = got_uid;
+> +    user_gid = got_gid;
+> +    return true;
+> +}
+> +
+>  /*
+>   * Parse OS specific command line options.
+>   * return 0 if option handled, -1 otherwise
+> @@ -145,8 +175,10 @@ void os_parse_cmd_args(int index, const char *optarg)
+>  #endif
+>      case QEMU_OPTION_runas:
+>          user_pwd = getpwnam(optarg);
+> -        if (!user_pwd) {
+> -            fprintf(stderr, "User \"%s\" doesn't exist\n", optarg);
+> +        if (!user_pwd && !os_parse_runas_uid_gid(optarg)) {
+> +            fprintf(stderr,
+> +                    "User \"%s\" doesn't exist (and is not <uid>.<gid>)\n",
+
+The error message have not been update, I think it should be <uid>:<gid>
+
+> +                    optarg);
+>              exit(1);
+>          }
+>          break;
+
+With the error message fix:
+Reviewed-by: Anthony PERARD <anthony.perard@citrix.com>
+
+-- 
+Anthony PERARD
