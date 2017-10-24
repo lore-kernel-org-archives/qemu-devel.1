@@ -1,19 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37062)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46122)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bztemail@gmail.com>) id 1e6vuB-0006QO-9F
-	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 05:53:55 -0400
+	(envelope-from <will.deacon@arm.com>) id 1e6wKF-0005kz-UB
+	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 06:20:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bztemail@gmail.com>) id 1e6vu9-0008RC-9G
-	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 05:53:51 -0400
+	(envelope-from <will.deacon@arm.com>) id 1e6wK6-0005nQ-Bd
+	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 06:20:47 -0400
+Date: Tue, 24 Oct 2017 11:20:29 +0100
+From: Will Deacon <will.deacon@arm.com>
+Message-ID: <20171024102029.GE17909@arm.com>
+References: <1504286483-23327-1-git-send-email-eric.auger@redhat.com>
+	<20171024053802.GA22835@virtx40>
 MIME-Version: 1.0
-In-Reply-To: <MWHPR21MB01590CD596A992C93E01B5079E460@MWHPR21MB0159.namprd21.prod.outlook.com>
-References: <CADYoBw2dogvU6-3vChG4js0BNdyTPG8eDvMSRoU50eTX_9DdEQ@mail.gmail.com>
-	<MWHPR21MB01590CD596A992C93E01B5079E460@MWHPR21MB0159.namprd21.prod.outlook.com>
-From: bzt bzt <bztemail@gmail.com>
-Date: Tue, 24 Oct 2017 11:53:46 +0200
-Message-ID: <CADYoBw1ksGDo26-PC4eMnyqxZQoZkXNLDeGoWfcRHs-SfTCJkw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] BCM2837 and machine raspi3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171024053802.GA22835@virtx40>
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v7 00/20] ARM SMMUv3 Emulation
+ Support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,189 +24,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Baumann <Andrew.Baumann@microsoft.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>
+To: Linu Cherian <linuc.decode@gmail.com>
+Cc: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com, peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org, prem.mallappa@gmail.com, alex.williamson@redhat.com, mohun106@gmail.com, drjones@redhat.com, tcain@qti.qualcomm.com, Radha.Chintakuntla@cavium.com, Sunil.Goutham@cavium.com, mst@redhat.com, jean-philippe.brucker@arm.com, tn@semihalf.com, robin.murphy@arm.com, peterx@redhat.com, bharat.bhushan@nxp.com, christoffer.dall@linaro.org, wtownsen@redhat.com
 
-Hi Andrew!
-
-On Mon, Oct 23, 2017 at 6:34 PM, Andrew Baumann <
-Andrew.Baumann@microsoft.com> wrote:
-
-> > From: Qemu-devel On Behalf Of bzt bzt
-> > Sent: Sunday, 22 October 2017 06:21
+On Tue, Oct 24, 2017 at 11:08:02AM +0530, Linu Cherian wrote:
+> On Fri Sep 01, 2017 at 07:21:03PM +0200, Eric Auger wrote:
+> > This series implements the emulation code for ARM SMMUv3.
+> > 
+> > Changes since v6:
+> > - DPDK testpmd now running on guest with 2 assigned VFs
+> > - Changed the instantiation method: add the following option to
+> >   the QEMU command line
+> >   -device smmuv3 # for virtio/vhost use cases
+> >   -device smmuv3,caching-mode # for vfio use cases (based on [1])
+> > - splitted the series into smaller patches to allow the review
+> > - the VFIO integration based on "tlbi-on-map" smmuv3 driver
+> >   is isolated from the rest: last 2 patches, not for upstream.
+> >   This is shipped for testing/bench until a better solution is found.
+> > - Reworked permission flag checks and event generation
+> > 
+> > testing:
+> > - in dt and ACPI modes
+> > - virtio-net-pci and vhost-net devices using dma ops with various
+> >   guest page sizes [2]
+> > - assigned VFs using dma ops [3]:
+> >   - AMD Overdrive and igbvf passthrough (using gsi direct mapping)
+> >   - Cavium ThunderX and ixgbevf passthrough (using KVM MSI routing)
+> > - DPDK testpmd on guest running with VFIO user space drivers (2 igbvf) [3]
+> >   with guest and host page size equal (4kB)
+> > 
+> > Known limitations:
+> > - no VMSAv8-32 suport
+> > - no nested stage support (S1 + S2)
+> > - no support for HYP mappings
+> > - register fine emulation, commands, interrupts and errors were
+> >   not accurately tested. Handling is sufficient to run use cases
+> >   described above though.
+> > - interrupts and event generation not observed yet.
+> > 
+> > Best Regards
+> > 
+> > Eric
 > >
-> > I've added support for "-M raspi3" to qemu. This is my first patch, I
-> hope
-> > it's okay. The github repo is here: https://github.com/bztsrc/
-> qemu-raspi3
-> > in case my patch does not work for some reason.
->
-> Thanks for the patch!
->
+> 
+> Was looking at options to get rid of the existing hacks we have
+> in this implementation (last two patches) and also to reduce the map/unmap/translation 
+> overhead for the guest kernel devices.
+> 
+> Interestingly, the nested stage translation + smmu emulation at kernel
+>  that we were exploring, has been already tried by Will Deacon. 
+> https://www.linuxplumbersconf.org/2014/ocw/system/presentations/2019/original/vsmmu-lpc14.pdf
+> https://lists.gnu.org/archive/html/qemu-devel/2015-06/msg03379.html
+> 
+> 
+> It would be nice to understand, why this solution was not pursued atleast for vfio-pci devices.
+> OR
+> If you have already plans to do nested stage support in the future, would be interested to know 
+> about it.
 
-Welcome!
+I don't plan to revive that code. I got something well on the way to working
+for SMMUv2, but it had some pretty major issues:
 
+1. A huge amount of emulation code in the kernel
+2. A horribly complicated user ABI
+3. Keeping track of internal hardware caching state was a nightmare, so
+   over-invalidation was rife
+4. Errata workarounds meant trapping all SMMU accesses (inc. for stage 1)
+5. I remember having issues with interrupts, but this was likely
+   SMMUv2-specific
+6. There was no scope for code re-use with other SMMU implementations (e.g.
+   SMMUv3)
 
->
-> [...]
->
-> > Subject: [PATCH] BCM2837 and machine raspi3
->
-> *add
->
-> [...]
->
-> > --- /dev/null
-> > +++ b/hw/arm/bcm2837.c
-> > @@ -0,0 +1,179 @@
-> > +/*
-> > + * Raspberry Pi emulation (c) 2012 Gregory Estrade
-> > + * Upstreaming code cleanup [including bcm2835_*] (c) 2013 Jan Petrous
-> > + *
-> > + * Rasperry Pi 2 emulation and refactoring Copyright (c) 2015, Microsoft
-> > + * Written by Andrew Baumann
-> > + *
-> > + * Raspberry Pi 3 emulation 2017 by bzt
-> > + *
-> > + * This code is licensed under the GNU GPLv2 and later.
-> > + */
-> > +
-> > +#include "qemu/osdep.h"
-> > +#include "qapi/error.h"
-> > +#include "qemu-common.h"
-> > +#include "cpu.h"
-> > +#include "hw/arm/bcm2836.h"
-> > +#include "hw/arm/bcm2837.h"
-> > +#include "hw/arm/raspi_platform.h"
-> > +#include "hw/sysbus.h"
-> > +#include "exec/address-spaces.h"
-> > +
-> > +/* According to
-> > https://www.raspberrypi.org/documentation/hardware/raspberrypi/bcm2837/
-> > README.md
-> > + * The underlying architecture of the BCM2837 is identical to the
-> BCM2836.
-> > The only significant
-> > + * difference is the replacement of the ARMv7 quad core cluster with a
-> > quad-core ARM Cortex A53
-> > + * (ARMv8) cluster. So we use cortex-a53- here. */
->
-> Are there any changes from bcm2836 other than the CPU model?
+Overall, it was just an unmaintainable, non-performant
+security-flaw-waiting-to-happen so I parked it. That's some of the
+background behind me preferring a virtio-iommu approach, because there's
+the potential for kernel acceleration using something like vhost.
 
-
-> Duplicating the whole file just to have a different CPU seems like a bad
-> idea to me. I would suggest parameterising the CPU model in bcm2836 (and
-> maybe noting in header comments etc. that it can also model 2837), and then
-> instantiating it from raspi.c with the correct CPU type depending on which
-> machine is being used. That will also reduce the size of the patch
-> significantly, which will make it easier to get it reviewed.
->
-
-For now, there's no more difference in the emulation than the CPU, but
-BCM2837 has a lot more to offer (40 bit address space, wifi, bluetooth
-etc.). So sooner or later it will need it's own source file to support all
-of that without getting the code messy. I have asked Peter whether it does
-worth writing future proof code, or keep the change at the bare minimum,
-but had no answer yet.
-
-
->
-> (Alternatively, if there are minor but non-trivial differences between
-> 2836 and 2837 other than the CPU model, you may want to create something
-> like bcm2835_peripherals that contains all the functionality common to
-> both. But I suspect that isn't the case here.)
->
-
-Well, bcm2837 is backward compatible with the bcm2836, but has a lot more
-registers and a different boot up process (different address and no atags).
-The common functionality is already in bcm2835_peripherals, and the MMIO
-address change from bcm2835 to bcm2836 has already been added by you.
-What's different is a lot more devices, which imho would be unwise to add
-to bcm2835 or either to bcm2836. So to be future proof I've created a
-separated file, but you are right at the current level of emulation it's
-not necessary.
-
-
->
-> > --- a/hw/arm/raspi.c
-> > +++ b/hw/arm/raspi.c
-> [...]
-> > @@ -171,3 +177,62 @@ static void raspi2_machine_init(MachineClass *mc)
-> >      mc->ignore_memory_transaction_failures = true;
-> >  };
-> >  DEFINE_MACHINE("raspi2", raspi2_machine_init)
-> > +
-> > +static void raspi3_init(MachineState *machine)
-> > +{
-> > +    RasPiState *s = g_new0(RasPiState, 1);
-> > +    uint32_t vcram_size;
-> > +    DriveInfo *di;
-> > +    BlockBackend *blk;
-> > +    BusState *bus;
-> > +    DeviceState *carddev;
-> > +
-> > +    object_initialize(&s->soc, sizeof(s->soc), TYPE_BCM2837);
-> > +    object_property_add_child(OBJECT(machine), "soc", OBJECT(&s->soc),
-> > +                              &error_abort);
-> > +
-> > +    /* Allocate and map RAM */
-> > +    memory_region_allocate_system_memory(&s->ram, OBJECT(machine),
-> > "ram",
-> > +                                         machine->ram_size);
-> > +    /* FIXME: Remove when we have custom CPU address space support */
-> > +    memory_region_add_subregion_overlap(get_system_memory(), 0, &s-
-> > >ram,
-> > 0);
-> > +
-> > +    /* Setup the SOC */
-> > +    object_property_add_const_link(OBJECT(&s->soc), "ram", OBJECT(&s-
-> > >ram),
-> > +                                   &error_abort);
-> > +    object_property_set_int(OBJECT(&s->soc), smp_cpus, "enabled-cpus",
-> > +                            &error_abort);
-> > +    object_property_set_int(OBJECT(&s->soc), 0xa02082, "board-rev",
-> > +                            &error_abort);
-> > +    object_property_set_bool(OBJECT(&s->soc), true, "realized",
-> > &error_abort);
-> > +
-> > +    /* Create and plug in the SD cards */
-> > +    di = drive_get_next(IF_SD);
-> > +    blk = di ? blk_by_legacy_dinfo(di) : NULL;
-> > +    bus = qdev_get_child_bus(DEVICE(&s->soc), "sd-bus");
-> > +    if (bus == NULL) {
-> > +        error_report("No SD bus found in SOC object");
-> > +        exit(1);
-> > +    }
-> > +    carddev = qdev_create(bus, TYPE_SD_CARD);
-> > +    qdev_prop_set_drive(carddev, "drive", blk, &error_fatal);
-> > +    object_property_set_bool(OBJECT(carddev), true, "realized",
-> > &error_fatal);
-> > +
-> > +    vcram_size = object_property_get_uint(OBJECT(&s->soc),
-> "vcram-size",
-> > +                                          &error_abort);
-> > +    setup_boot(machine, 3, machine->ram_size - vcram_size);
-> > +}
->
-> Similarly, this looks like a clone of raspi2_init. I think it would be
-> better to have one function, parametrised if needed.
->
-
-For now, yes. But the extra devices bcm2837 have will need extra
-initialization, and I though it would be clearer to separate in advance.
-Again, I've asked Peter about this, but had no response. As I see having a
-parametrised single function is simplier for now, but could lead to a messy
-code later when all the SoC features will be added. But I'm ain't no expert
-on qemu source, this is my first patch, so I'm open to suggestions! :-)
-
-Summa summarum, which one is preferred? Think of the future or keep it at a
-bare minimum?
-
-Cheers,
-bzt
-
-
->
-> Regards,
-> Andrew
->
+Will
