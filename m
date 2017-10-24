@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56018)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58465)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1e6x1o-0006rb-0p
-	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 07:05:53 -0400
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1e6xEH-0000BU-43
+	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 07:18:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1e6x1m-000144-58
-	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 07:05:48 -0400
-Date: Tue, 24 Oct 2017 13:05:32 +0200 (CEST)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-In-Reply-To: <CADYoBw1ksGDo26-PC4eMnyqxZQoZkXNLDeGoWfcRHs-SfTCJkw@mail.gmail.com>
-Message-ID: <alpine.BSF.2.21.1710241246330.82180@zero.eik.bme.hu>
-References: <CADYoBw2dogvU6-3vChG4js0BNdyTPG8eDvMSRoU50eTX_9DdEQ@mail.gmail.com>
-	<MWHPR21MB01590CD596A992C93E01B5079E460@MWHPR21MB0159.namprd21.prod.outlook.com>
-	<CADYoBw1ksGDo26-PC4eMnyqxZQoZkXNLDeGoWfcRHs-SfTCJkw@mail.gmail.com>
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1e6xED-00078s-VZ
+	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 07:18:41 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:44480)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1e6xED-00077S-K3
+	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 07:18:37 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-Subject: Re: [Qemu-devel] [PATCH] BCM2837 and machine raspi3
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Date: Tue, 24 Oct 2017 14:18:34 +0300
+From: Mihail Abakumov <mikhail.abakumov@ispras.ru>
+In-Reply-To: <CAKmqyKOm2NXzbs0CW_=oy2nNhJrx0iNfTyckbWN4FnsKZ9xF+A@mail.gmail.com>
+References: <150642384156.3900.3326424823772221077.stgit@Misha-PC.lan02.inno>
+	<CAKmqyKOm2NXzbs0CW_=oy2nNhJrx0iNfTyckbWN4FnsKZ9xF+A@mail.gmail.com>
+Message-ID: <82f7445bfb0e2470fa69a539f0e72c25@ispras.ru>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 00/43] Windbg supporting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,78 +28,150 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: bzt bzt <bztemail@gmail.com>
-Cc: Andrew Baumann <Andrew.Baumann@microsoft.com>, Peter Maydell <peter.maydell@linaro.org>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Alistair Francis <alistair23@gmail.com>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Stefan Weil <sw@weilnetz.de>, lprosek@redhat.com, dovgaluk@ispras.ru, rkagan@virtuozzo.com, Paolo Bonzini <pbonzini@redhat.com>, den@openvz.org
 
-On Tue, 24 Oct 2017, bzt bzt wrote:
-> On Mon, Oct 23, 2017 at 6:34 PM, Andrew Baumann <Andrew.Baumann@microsoft.com> wrote:
->>> +/* According to
->>> https://www.raspberrypi.org/documentation/hardware/raspberrypi/bcm2837/
->>> README.md
->>> + * The underlying architecture of the BCM2837 is identical to the
->> BCM2836.
->>> The only significant
->>> + * difference is the replacement of the ARMv7 quad core cluster with a
->>> quad-core ARM Cortex A53
->>> + * (ARMv8) cluster. So we use cortex-a53- here. */
->>
->> Are there any changes from bcm2836 other than the CPU model?
->
->
->> Duplicating the whole file just to have a different CPU seems like a bad
->> idea to me. I would suggest parameterising the CPU model in bcm2836 (and
->> maybe noting in header comments etc. that it can also model 2837), and then
->> instantiating it from raspi.c with the correct CPU type depending on which
->> machine is being used. That will also reduce the size of the patch
->> significantly, which will make it easier to get it reviewed.
->>
->
-> For now, there's no more difference in the emulation than the CPU, but
-> BCM2837 has a lot more to offer (40 bit address space, wifi, bluetooth
-> etc.). So sooner or later it will need it's own source file to support all
-> of that without getting the code messy. I have asked Peter whether it does
-> worth writing future proof code, or keep the change at the bare minimum,
-> but had no answer yet.
->
->
->>
->> (Alternatively, if there are minor but non-trivial differences between
->> 2836 and 2837 other than the CPU model, you may want to create something
->> like bcm2835_peripherals that contains all the functionality common to
->> both. But I suspect that isn't the case here.)
->>
->
-> Well, bcm2837 is backward compatible with the bcm2836, but has a lot more
-> registers and a different boot up process (different address and no atags).
-> The common functionality is already in bcm2835_peripherals, and the MMIO
-> address change from bcm2835 to bcm2836 has already been added by you.
-> What's different is a lot more devices, which imho would be unwise to add
-> to bcm2835 or either to bcm2836. So to be future proof I've created a
-> separated file, but you are right at the current level of emulation it's
-> not necessary.
-[...]
->> Similarly, this looks like a clone of raspi2_init. I think it would be
->> better to have one function, parametrised if needed.
->>
->
-> For now, yes. But the extra devices bcm2837 have will need extra
-> initialization, and I though it would be clearer to separate in advance.
-> Again, I've asked Peter about this, but had no response. As I see having a
-> parametrised single function is simplier for now, but could lead to a messy
-> code later when all the SoC features will be added. But I'm ain't no expert
-> on qemu source, this is my first patch, so I'm open to suggestions! :-)
->
-> Summa summarum, which one is preferred? Think of the future or keep it at a
-> bare minimum?
+Alistair Francis =D0=BF=D0=B8=D1=81=D0=B0=D0=BB 2017-09-26 20:26:
+> On Tue, Sep 26, 2017 at 4:04 AM, Mihail Abakumov
+> <mikhail.abakumov@ispras.ru> wrote:
+>> We made the debugger module WinDbg (like GDB) for QEMU. This is the=20
+>> replacement of the remote stub in Windows kernel. Used for remote=20
+>> Windows kernel debugging without debugging mode.
+>>=20
+>> WinDbg is a multipurpose debugger for the Microsoft Windows computer=20
+>> operating system, distributed by Microsoft. Recent versions of WinDbg=20
+>> have been and are being distributed as part of the free Debugging=20
+>> Tools for Windows suite.
+>>=20
+>> How to start debugging QEMU using WinDbg:
+>>   Run QEMU with next option:
+>>     -windbg pipe:<name>
+>>   QEMU will start and pause for waiting WinDbg connection.
+>>   Run WinDbg with next options:
+>>     -b -k com:pipe,baud=3D115200,port=3D\\.\pipe\<name>,resets=3D0
+>>   Wait for debugger connect to kernel.
+>>=20
+>> Note: You can add Symbol Search Path in WinDbg such as=20
+>> srv*c:\tmp*http://msdl.microsoft.com/download/symbols.
+>>=20
+>> How it works:
+>> The WinDbg debugger has the possibility of connecting to a remote=20
+>> debug service (Kdsrv.exe) in the Windows kernel. Therefore, it is=20
+>> possible to connect to the guest system running in the QEMU emulator.=20
+>> Kernel debugging is possible only with the enabled debugging mode, may=
+=20
+>> change at the same time. Our module of WinDbg debugger for QEMU is an=20
+>> alternative of the remote debugging service in the kernel. Thus, the=20
+>> debugger connects to the debugging module, not to the kernel of the=20
+>> operating system. The module obtains all the necessary information=20
+>> answering debugger requests from the QEMU emulator. At the same time=20
+>> for debugging there is no need to enable debugging mode in the kernel.=
+=20
+>> This leads to hidden debugging. Our module supports all features of=20
+>> WinDbg regarding remote debugging, besides interception of events and=20
+>> exceptions. Only i386 is supported now.
+>>=20
+>> ---
+>=20
+> This looks pretty cool! Thanks for sending the patches.
+>=20
+> I had a quick look through it. I think something worth keeping in mind
+> is that ideally we want this to support every target. So generally
+> it's best to have the target specific code in the target/ directory
+> and then make the stubs all generic. At the moment it looks like there
+> is a fair bit of x86 specific code in the debugger.
+>=20
+> I guess this is a weird case though as Windows only runs on x86, but
+> in the future it sounds like ARM will be supported and it'd be great
+> if this could be easily extended to support that.
+>=20
+> Thanks,
+> Alistair
+>=20
 
-I don't feel I have a deciding word in this but to share my opinion I 
-think it's better to keep it in one file avoiding too much code 
-duplication as long as those features that would make the implementations 
-different aren't added now. Then when those features are added the files 
-could be split or the best way can be decided at that point based on how 
-those features will be implemented so no need to think that far ahead now. 
-This would make patches easier to review now and maintaining the common 
-code easier until they are different enough so a split needs to be done.
+Once again, thank you for your feedback.
 
-Regrads,
-BALATON Zoltan
+I done it. I moved the target specific code in the 'target/' directory=20
+and made the stub for unsupported 'targets'.
+Problems with targets received by Patchew I've already fixed.
+
+Thanks,
+Mihail Abakumov
+
+>>=20
+>> Mihail Abakumov (43):
+>>       windbg: added empty windbgstub files
+>>       windbg: added windbg's KD header file
+>>       windbg: modified windbgkd.h
+>>       windbg: added '-windbg' option
+>>       windbg: added helper features
+>>       windbg: added WindbgState
+>>       windbg: added chardev
+>>       windbg: hook to wrmsr operation
+>>       windbg: handler of fs/gs register
+>>       windbg: structures for parsing data stream
+>>       windbg: parsing data stream
+>>       windbg: send data and control packets
+>>       windbg: handler of parsing context
+>>       windbg: init DBGKD_ANY_WAIT_STATE_CHANGE
+>>       windbg: sized data buffer
+>>       windbg: generate ExceptionStateChange
+>>       windbg: generate LoadSymbolsStateChange
+>>       windbg: windbg_vm_stop
+>>       windbg: implemented windbg_process_control_packet
+>>       windbg: implemented windbg_process_data_packet
+>>       windbg: implemented windbg_process_manipulate_packet
+>>       windbg: implemented kd_api_read_virtual_memory and=20
+>> kd_api_read_virtual_memory
+>>       windbg: kernel's structures
+>>       windbg: implemented kd_api_get_context and kd_api_set_context
+>>       windbg: implemented kd_api_read_control_space and=20
+>> kd_api_write_control_space
+>>       windbg: implemented windbg_read_context
+>>       windbg: implemented windbg_write_context
+>>       windbg: implemented windbg_read_ks_regs
+>>       windbg: implemented windbg_write_ks_regs
+>>       windbg: implemented windbg_set_sr
+>>       windbg: implemented windbg_set_dr
+>>       windbg: implemented windbg_set_dr7
+>>       windbg: implemented windbg_hw_breakpoint_insert and=20
+>> windbg_hw_breakpoint_remove
+>>       windbg: implemented kd_api_write_breakpoint and=20
+>> kd_api_restore_breakpoint
+>>       windbg: debug exception subscribing
+>>       windbg: implemented kd_api_continue
+>>       windbg: implemented kd_api_read_io_space and=20
+>> kd_api_write_io_space
+>>       windbg: implemented kd_api_read_physical_memory and=20
+>> kd_api_write_physical_memory
+>>       windbg: implemented kd_api_get_version
+>>       windbg: implemented kd_api_read_msr and kd_api_write_msr
+>>       windbg: implemented kd_api_search_memory
+>>       windbg: implemented kd_api_fill_memory
+>>       windbg: implemented kd_api_query_memory
+>>=20
+>>=20
+>>  Makefile.target                 |    5
+>>  cpus.c                          |   18
+>>  gdbstub.c                       |    4
+>>  include/exec/windbgkd.h         | 1030 ++++++++++++++++++++++
+>>  include/exec/windbgstub-utils.h |  132 +++
+>>  include/exec/windbgstub.h       |   21
+>>  include/sysemu/sysemu.h         |    2
+>>  qemu-options.hx                 |    8
+>>  target/i386/misc_helper.c       |    3
+>>  vl.c                            |    8
+>>  windbgstub-utils.c              | 1788=20
+>> +++++++++++++++++++++++++++++++++++++++
+>>  windbgstub.c                    |  464 ++++++++++
+>>  12 files changed, 3482 insertions(+), 1 deletion(-)
+>>  create mode 100755 include/exec/windbgkd.h
+>>  create mode 100755 include/exec/windbgstub-utils.h
+>>  create mode 100755 include/exec/windbgstub.h
+>>  create mode 100755 windbgstub-utils.c
+>>  create mode 100755 windbgstub.c
+>>=20
+>> --
+>> Thanks,
+>> Mihail Abakumov
+>>=20
