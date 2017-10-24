@@ -1,33 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43231)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45470)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e71fS-0006WY-6B
-	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 12:03:07 -0400
+	id 1e71om-0000ba-MC
+	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 12:12:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e71fP-00073C-24
-	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 12:03:02 -0400
-Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:45723)
+	id 1e71oj-0001zS-Gc
+	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 12:12:40 -0400
+Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:43862)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e71fO-00072w-TC
-	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 12:02:59 -0400
-Received: by mail-qk0-x241.google.com with SMTP id f199so26897924qke.2
-	for <qemu-devel@nongnu.org>; Tue, 24 Oct 2017 09:02:58 -0700 (PDT)
+	id 1e71oj-0001zE-Bm
+	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 12:12:37 -0400
+Received: by mail-qk0-x241.google.com with SMTP id w134so26942926qkb.0
+	for <qemu-devel@nongnu.org>; Tue, 24 Oct 2017 09:12:36 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 References: <cover.1508390588.git.alistair.francis@xilinx.com>
-	<e875fc6ca98b01cb94f175b60048fa863ec423ce.1508390588.git.alistair.francis@xilinx.com>
+	<d34071814ded4ba1ffd2482b3bdfbb71175fc06f.1508390588.git.alistair.francis@xilinx.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <4f056aaa-60f2-0dba-814f-515cea179ec5@amsat.org>
-Date: Tue, 24 Oct 2017 13:02:55 -0300
+Message-ID: <9c20cefb-7bb1-8324-820f-a2caa538bbe7@amsat.org>
+Date: Tue, 24 Oct 2017 13:12:33 -0300
 MIME-Version: 1.0
-In-Reply-To: <e875fc6ca98b01cb94f175b60048fa863ec423ce.1508390588.git.alistair.francis@xilinx.com>
+In-Reply-To: <d34071814ded4ba1ffd2482b3bdfbb71175fc06f.1508390588.git.alistair.francis@xilinx.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 34/46] hw/sd: Replace fprintf(stderr,
- "*\n" with error_report()
+Subject: Re: [Qemu-devel] [PATCH v3 40/46] hw/watchdog: Replace
+ fprintf(stderr, "*\n" with error_report()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,7 +39,7 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org
 Cc: alistair23@gmail.com, armbru@redhat.com
 
-On 10/19/2017 01:17 PM, Alistair Francis wrote:
+On 10/19/2017 01:18 PM, Alistair Francis wrote:
 > Replace a large number of the fprintf(stderr, "*\n" calls with
 > error_report(). The functions were renamed with these commands and then
 > compiler issues where manually fixed.
@@ -80,106 +80,102 @@ On 10/19/2017 01:17 PM, Alistair Francis wrote:
 > 
 > Some lines where then manually tweaked to pass checkpatch.
 > 
-> Some of the prints in hw/sd/sd.c were manually converted to using
-> DPRINTF() instead.
-> 
 > Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
 > ---
-> V3:
->  - Fixup some DPRINTF() prints being wrong
 > V2:
 >  - Split hw patch into individual directories
 > 
->  hw/sd/pl181.c |  5 +++--
->  hw/sd/sd.c    | 15 ++++++++-------
->  2 files changed, 11 insertions(+), 9 deletions(-)
+>  hw/watchdog/watchdog.c     | 9 +++++----
+>  hw/watchdog/wdt_i6300esb.c | 8 +++++---
+>  2 files changed, 10 insertions(+), 7 deletions(-)
 > 
-> diff --git a/hw/sd/pl181.c b/hw/sd/pl181.c
-> index 55c8098ecd..2b878a0c5e 100644
-> --- a/hw/sd/pl181.c
-> +++ b/hw/sd/pl181.c
-> @@ -8,6 +8,7 @@
+> diff --git a/hw/watchdog/watchdog.c b/hw/watchdog/watchdog.c
+> index 670114ecfe..d6d11ef1e5 100644
+> --- a/hw/watchdog/watchdog.c
+> +++ b/hw/watchdog/watchdog.c
+> @@ -20,6 +20,7 @@
 >   */
 >  
 >  #include "qemu/osdep.h"
 > +#include "qemu/error-report.h"
->  #include "sysemu/block-backend.h"
->  #include "sysemu/blockdev.h"
->  #include "hw/sysbus.h"
-> @@ -146,7 +147,7 @@ static void pl181_fifo_push(PL181State *s, uint32_t value)
->      int n;
->  
->      if (s->fifo_len == PL181_FIFO_LEN) {
-> -        fprintf(stderr, "pl181: FIFO overflow\n");
-> +        error_report("pl181: FIFO overflow");
->          return;
->      }
->      n = (s->fifo_pos + s->fifo_len) & (PL181_FIFO_LEN - 1);
-> @@ -160,7 +161,7 @@ static uint32_t pl181_fifo_pop(PL181State *s)
->      uint32_t value;
->  
->      if (s->fifo_len == 0) {
-> -        fprintf(stderr, "pl181: FIFO underflow\n");
-> +        error_report("pl181: FIFO underflow");
->          return 0;
->      }
->      value = s->fifo[s->fifo_pos];
-> diff --git a/hw/sd/sd.c b/hw/sd/sd.c
-> index 35347a5bbc..5d7fa3e418 100644
-> --- a/hw/sd/sd.c
-> +++ b/hw/sd/sd.c
-> @@ -700,7 +700,7 @@ static void sd_lock_command(SDState *sd)
->          sd->card_status &= ~CARD_IS_LOCKED;
->          sd->pwd_len = 0;
->          /* Erasing the entire card here! */
-> -        fprintf(stderr, "SD: Card force-erased by CMD42\n");
-> +        error_report("SD: Card force-erased by CMD42");
->          return;
->      }
->  
-> @@ -1282,7 +1282,7 @@ static sd_rsp_type_t sd_normal_command(SDState *sd,
->          return sd_r1;
->  
->      case 56:	/* CMD56:  GEN_CMD */
-> -        fprintf(stderr, "SD: GEN_CMD 0x%08x\n", req.arg);
-> +        error_report("SD: GEN_CMD 0x%08x", req.arg);
->  
->          switch (sd->state) {
->          case sd_transfer_state:
-> @@ -1564,9 +1564,10 @@ send_response:
->      if (rsplen) {
->          int i;
->          DPRINTF("Response:");
-> -        for (i = 0; i < rsplen; i++)
-> -            fprintf(stderr, " %02x", response[i]);
-> -        fprintf(stderr, " state %d\n", sd->state);
-> +        for (i = 0; i < rsplen; i++) {
-> +            DPRINTF(" %02x", response[i]);
-> +        }
-> +        DPRINTF(" state %d\n", sd->state);
+>  #include "qemu/option.h"
+>  #include "qemu/config-file.h"
+>  #include "qemu/queue.h"
+> @@ -52,7 +53,7 @@ int select_watchdog(const char *p)
+>      /* -watchdog ? lists available devices and exits cleanly. */
+>      if (is_help_option(p)) {
+>          QLIST_FOREACH(model, &watchdog_list, entry) {
+> -            fprintf(stderr, "\t%s\t%s\n",
+> +            error_report("\t%s\t%s",
+>                       model->wdt_name, model->wdt_description);
 
-We'll get ride of those later.
+align?
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
->      } else {
->          DPRINTF("No response %d\n", sd->state);
+>          }
+>          return 2;
+> @@ -68,9 +69,9 @@ int select_watchdog(const char *p)
+>          }
 >      }
-> @@ -1580,14 +1581,14 @@ static void sd_blk_read(SDState *sd, uint64_t addr, uint32_t len)
->      DPRINTF("sd_blk_read: addr = 0x%08llx, len = %d\n",
->              (unsigned long long) addr, len);
->      if (!sd->blk || blk_pread(sd->blk, addr, sd->data, len) < 0) {
-> -        fprintf(stderr, "sd_blk_read: read error on host side\n");
-> +        error_report("sd_blk_read: read error on host side");
->      }
->  }
 >  
->  static void sd_blk_write(SDState *sd, uint64_t addr, uint32_t len)
->  {
->      if (!sd->blk || blk_pwrite(sd->blk, addr, sd->data, len, 0) < 0) {
-> -        fprintf(stderr, "sd_blk_write: write error on host side\n");
-> +        error_report("sd_blk_write: write error on host side");
+> -    fprintf(stderr, "Unknown -watchdog device. Supported devices are:\n");
+> +    error_report("Unknown -watchdog device. Supported devices are:");
+>      QLIST_FOREACH(model, &watchdog_list, entry) {
+> -        fprintf(stderr, "\t%s\t%s\n",
+> +        error_report("\t%s\t%s",
+>                   model->wdt_name, model->wdt_description);
+
+align?
+
 >      }
->  }
+>      return 1;
+> @@ -126,7 +127,7 @@ void watchdog_perform_action(void)
+>  
+>      case WATCHDOG_ACTION_DEBUG:
+>          qapi_event_send_watchdog(WATCHDOG_ACTION_DEBUG, &error_abort);
+> -        fprintf(stderr, "watchdog: timer fired\n");
+> +        error_report("watchdog: timer fired");
+>          break;
+>  
+>      case WATCHDOG_ACTION_NONE:
+> diff --git a/hw/watchdog/wdt_i6300esb.c b/hw/watchdog/wdt_i6300esb.c
+> index e596b0804d..c5f5190e55 100644
+> --- a/hw/watchdog/wdt_i6300esb.c
+> +++ b/hw/watchdog/wdt_i6300esb.c
+> @@ -20,7 +20,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -
+> +#include "qemu/error-report.h"
+>  #include "qemu-common.h"
+>  #include "qemu/timer.h"
+>  #include "sysemu/watchdog.h"
+> @@ -186,10 +186,12 @@ static void i6300esb_timer_expired(void *vp)
+>          /* What to do at the end of stage 1? */
+>          switch (d->int_type) {
+>          case INT_TYPE_IRQ:
+> -            fprintf(stderr, "i6300esb_timer_expired: I would send APIC 1 INT 10 here if I knew how (XXX)\n");
+> +            error_report("i6300esb_timer_expired: I would send APIC 1 INT 10"
+> +                          "here if I knew how (XXX)");
+
+I'm not sure this is an useful message...
+
+What about:
+
+               qemu_log_mask(LOG_UNIMP,
+                            "i6300esb: tmr expired but System "
+                            "APIC 1 INT10 _NOT_ emitted\n");
+>              break;
+>          case INT_TYPE_SMI:
+> -            fprintf(stderr, "i6300esb_timer_expired: I would send SMI here if I knew how (XXX)\n");
+> +            error_report("i6300esb_timer_expired: I would send SMI here if I"
+> +                         "knew how (XXX)");
+
+               qemu_log_mask(LOG_UNIMP,
+                            "i6300esb: tmr expired but System "
+                            "Management Interrupt _NOT_ emitted\n");
+
+>              break;
+>          }
 >  
 > 
