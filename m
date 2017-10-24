@@ -1,32 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36978)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37236)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e6pdL-0008Q9-RX
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 23:12:05 -0400
+	(envelope-from <programmingkidx@gmail.com>) id 1e6peY-0000Z5-MW
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 23:13:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e6pdI-0002s0-Ku
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 23:12:03 -0400
-Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:56127)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e6pdI-0002rh-F5
-	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 23:12:00 -0400
-Received: by mail-qk0-x242.google.com with SMTP id x82so24600060qkb.12
-	for <qemu-devel@nongnu.org>; Mon, 23 Oct 2017 20:12:00 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20171020232023.15010-1-richard.henderson@linaro.org>
-	<20171020232023.15010-20-richard.henderson@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <55d38c32-ada1-7a7a-0a60-980b3c0b8a7d@amsat.org>
-Date: Tue, 24 Oct 2017 00:11:55 -0300
-MIME-Version: 1.0
-In-Reply-To: <20171020232023.15010-20-richard.henderson@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v7 19/52] tcg: Remove TCGV_EQUAL*
+	(envelope-from <programmingkidx@gmail.com>) id 1e6peV-0003Pp-Hy
+	for qemu-devel@nongnu.org; Mon, 23 Oct 2017 23:13:18 -0400
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+From: Programmingkid <programmingkidx@gmail.com>
+In-Reply-To: <20171023160959.GC10220@stefanha-x1.localdomain>
+Date: Mon, 23 Oct 2017 23:13:13 -0400
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <2ACA132F-70DF-488A-AE41-59FFF08E8755@gmail.com>
+References: <20171023025016.3088-1-programmingkidx@gmail.com>
+	<20171023160959.GC10220@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] [libfdt][PATCH v3] implement strnlen for systems
+ that need it
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,179 +24,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-Cc: cota@braap.org, pbonzini@redhat.com
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: david@gibson.dropbear.id.au, richard.henderson@linaro.org, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, peter.maydell@linaro.org, devicetree-compiler@vger.kernel.org, ian@freebsd.org
 
-On 10/20/2017 08:19 PM, Richard Henderson wrote:
-> When we used structures for TCGv_*, we needed a macro in order to
-> perform a comparison.  Now that we use pointers, this is just clutter.
-> 
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  tcg/tcg-op.h            | 6 ++----
->  tcg/tcg.h               | 4 ----
->  target/cris/translate.c | 6 +++---
->  target/i386/translate.c | 6 +++---
->  target/m68k/translate.c | 2 +-
->  target/ppc/translate.c  | 4 ++--
->  6 files changed, 11 insertions(+), 17 deletions(-)
-> 
-> diff --git a/tcg/tcg-op.h b/tcg/tcg-op.h
-> index ab2f3c6cee..3129159907 100644
-> --- a/tcg/tcg-op.h
-> +++ b/tcg/tcg-op.h
-> @@ -328,7 +328,7 @@ static inline void tcg_gen_discard_i32(TCGv_i32 arg)
->  
->  static inline void tcg_gen_mov_i32(TCGv_i32 ret, TCGv_i32 arg)
->  {
-> -    if (!TCGV_EQUAL_I32(ret, arg)) {
-> +    if (ret != arg) {
->          tcg_gen_op2_i32(INDEX_op_mov_i32, ret, arg);
->      }
->  }
-> @@ -522,7 +522,7 @@ static inline void tcg_gen_discard_i64(TCGv_i64 arg)
->  
->  static inline void tcg_gen_mov_i64(TCGv_i64 ret, TCGv_i64 arg)
->  {
-> -    if (!TCGV_EQUAL_I64(ret, arg)) {
-> +    if (ret != arg) {
->          tcg_gen_op2_i64(INDEX_op_mov_i64, ret, arg);
->      }
->  }
-> @@ -809,7 +809,6 @@ void tcg_gen_lookup_and_goto_ptr(void);
->  #define tcg_temp_free tcg_temp_free_i32
->  #define TCGV_UNUSED(x) TCGV_UNUSED_I32(x)
->  #define TCGV_IS_UNUSED(x) TCGV_IS_UNUSED_I32(x)
-> -#define TCGV_EQUAL(a, b) TCGV_EQUAL_I32(a, b)
->  #define tcg_gen_qemu_ld_tl tcg_gen_qemu_ld_i32
->  #define tcg_gen_qemu_st_tl tcg_gen_qemu_st_i32
->  #else
-> @@ -820,7 +819,6 @@ void tcg_gen_lookup_and_goto_ptr(void);
->  #define tcg_temp_free tcg_temp_free_i64
->  #define TCGV_UNUSED(x) TCGV_UNUSED_I64(x)
->  #define TCGV_IS_UNUSED(x) TCGV_IS_UNUSED_I64(x)
-> -#define TCGV_EQUAL(a, b) TCGV_EQUAL_I64(a, b)
->  #define tcg_gen_qemu_ld_tl tcg_gen_qemu_ld_i64
->  #define tcg_gen_qemu_st_tl tcg_gen_qemu_st_i64
->  #endif
-> diff --git a/tcg/tcg.h b/tcg/tcg.h
-> index b7fac0db8a..8f692bc6cf 100644
-> --- a/tcg/tcg.h
-> +++ b/tcg/tcg.h
-> @@ -428,10 +428,6 @@ typedef TCGv_ptr TCGv_env;
->  #error Unhandled TARGET_LONG_BITS value
->  #endif
->  
-> -#define TCGV_EQUAL_I32(a, b) ((a) == (b))
-> -#define TCGV_EQUAL_I64(a, b) ((a) == (b))
-> -#define TCGV_EQUAL_PTR(a, b) ((a) == (b))
-> -
->  /* Dummy definition to avoid compiler warnings.  */
->  #define TCGV_UNUSED_I32(x) (x = (TCGv_i32)-1)
->  #define TCGV_UNUSED_I64(x) (x = (TCGv_i64)-1)
-> diff --git a/target/cris/translate.c b/target/cris/translate.c
-> index 38a999e6f1..55a9202777 100644
-> --- a/target/cris/translate.c
-> +++ b/target/cris/translate.c
-> @@ -839,7 +839,7 @@ static void cris_alu(DisasContext *dc, int op,
->          }
->          tcg_gen_or_tl(d, d, tmp);
->      }
-> -    if (!TCGV_EQUAL(tmp, d)) {
-> +    if (tmp != d) {
->          tcg_temp_free(tmp);
->      }
->  }
-> @@ -1162,7 +1162,7 @@ static inline void t_gen_sext(TCGv d, TCGv s, int size)
->          tcg_gen_ext8s_i32(d, s);
->      } else if (size == 2) {
->          tcg_gen_ext16s_i32(d, s);
-> -    } else if (!TCGV_EQUAL(d, s)) {
-> +    } else {
->          tcg_gen_mov_tl(d, s);
->      }
->  }
-> @@ -1173,7 +1173,7 @@ static inline void t_gen_zext(TCGv d, TCGv s, int size)
->          tcg_gen_ext8u_i32(d, s);
->      } else if (size == 2) {
->          tcg_gen_ext16u_i32(d, s);
-> -    } else if (!TCGV_EQUAL(d, s)) {
-> +    } else {
->          tcg_gen_mov_tl(d, s);
->      }
->  }
-> diff --git a/target/i386/translate.c b/target/i386/translate.c
-> index 5f24a2de3c..d6697f721c 100644
-> --- a/target/i386/translate.c
-> +++ b/target/i386/translate.c
-> @@ -742,7 +742,7 @@ static CCPrepare gen_prepare_eflags_c(DisasContext *s, TCGv reg)
->          size = s->cc_op - CC_OP_SUBB;
->          t1 = gen_ext_tl(cpu_tmp0, cpu_cc_src, size, false);
->          /* If no temporary was used, be careful not to alias t1 and t0.  */
-> -        t0 = TCGV_EQUAL(t1, cpu_cc_src) ? cpu_tmp0 : reg;
-> +        t0 = t1 == cpu_cc_src ? cpu_tmp0 : reg;
 
-As I noticed in a previous patch, this expression is a bit easier/faster
-to read/review with parenthesis are used:
+> On Oct 23, 2017, at 12:09 PM, Stefan Hajnoczi <stefanha@gmail.com> =
+wrote:
+>=20
+> On Sun, Oct 22, 2017 at 10:50:16PM -0400, John Arbuckle wrote:
+>> Prior the Mac OS 10.7, the function strnlen() was not available. This =
+patch
+>> implements strnlen() on Mac OS X versions that are below 10.7.
+>>=20
+>> Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
+>> ---
+>> v3 changes:
+>> - Replaced loop with memchr()
+>>=20
+>> v2 changes:
+>> - Simplified the code to make it static inline'ed
+>> - Changed the type of count to size_t
+>>=20
+>> libfdt/libfdt_env.h | 24 ++++++++++++++++++++++++
+>> 1 file changed, 24 insertions(+)
+>>=20
+>> diff --git a/libfdt/libfdt_env.h b/libfdt/libfdt_env.h
+>> index 952056c..d43b66b 100644
+>> --- a/libfdt/libfdt_env.h
+>> +++ b/libfdt/libfdt_env.h
+>> @@ -109,4 +109,28 @@ static inline fdt64_t cpu_to_fdt64(uint64_t x)
+>> #undef CPU_TO_FDT16
+>> #undef EXTRACT_BYTE
+>>=20
+>> +#ifdef __APPLE__
+>> +#include <AvailabilityMacros.h>
+>> +
+>> +#define MAC_OS_X_VERSION_10_7 1070
+>=20
+> Apple has already defined MAC_OS_X_VERSION_10_7 here:
+> =
+https://opensource.apple.com/source/xnu/xnu-1699.24.8/EXTERNAL_HEADERS/Ava=
+ilabilityMacros.h
+>=20
+> To avoid a compiler warning, please use:
+>=20
+> #ifndef MAC_OS_X_VERSION_10_7
+> #define MAC_OS_X_VERSION_10_7 1070
+> #endif
 
-           t0 = (t1 == cpu_cc_src ? cpu_tmp0 : reg);
+Sounds logical.
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>=20
+>> +/* strnlen() is not available on Mac OS < 10.7 */
+>> +# if (MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_7)
+>=20
+> Does this cover the case where MAC_OS_X_VERSION_MAX_ALLOWED is set to
+> <1070 on a 10.7+ build machine?  It's possible that the <string.h>
+> header would define strnlen() and your code redefines the function
+> (compiler error).
 
->          tcg_gen_mov_tl(t0, cpu_cc_srcT);
->          gen_extu(size, t0);
->          goto add_sub;
-> @@ -951,7 +951,7 @@ static CCPrepare gen_prepare_cc(DisasContext *s, int b, TCGv reg)
->              break;
->          case JCC_L:
->              gen_compute_eflags(s);
-> -            if (TCGV_EQUAL(reg, cpu_cc_src)) {
-> +            if (reg == cpu_cc_src) {
->                  reg = cpu_tmp0;
->              }
->              tcg_gen_shri_tl(reg, cpu_cc_src, 4); /* CC_O -> CC_S */
-> @@ -962,7 +962,7 @@ static CCPrepare gen_prepare_cc(DisasContext *s, int b, TCGv reg)
->          default:
->          case JCC_LE:
->              gen_compute_eflags(s);
-> -            if (TCGV_EQUAL(reg, cpu_cc_src)) {
-> +            if (reg == cpu_cc_src) {
->                  reg = cpu_tmp0;
->              }
->              tcg_gen_shri_tl(reg, cpu_cc_src, 4); /* CC_O -> CC_S */
-> diff --git a/target/m68k/translate.c b/target/m68k/translate.c
-> index d738f32f9c..63b1552669 100644
-> --- a/target/m68k/translate.c
-> +++ b/target/m68k/translate.c
-> @@ -58,7 +58,7 @@ static TCGv_i64 cpu_macc[4];
->  #define QREG_SP         get_areg(s, 7)
->  
->  static TCGv NULL_QREG;
-> -#define IS_NULL_QREG(t) (TCGV_EQUAL(t, NULL_QREG))
-> +#define IS_NULL_QREG(t) (t == NULL_QREG)
->  /* Used to distinguish stores from bad addressing modes.  */
->  static TCGv store_dummy;
->  
-> diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-> index a81ff69d75..616cf8f50e 100644
-> --- a/target/ppc/translate.c
-> +++ b/target/ppc/translate.c
-> @@ -902,7 +902,7 @@ static inline void gen_op_arith_add(DisasContext *ctx, TCGv ret, TCGv arg1,
->          gen_set_Rc0(ctx, t0);
->      }
->  
-> -    if (!TCGV_EQUAL(t0, ret)) {
-> +    if (t0 != ret) {
->          tcg_gen_mov_tl(ret, t0);
->          tcg_temp_free(t0);
->      }
-> @@ -1438,7 +1438,7 @@ static inline void gen_op_arith_subf(DisasContext *ctx, TCGv ret, TCGv arg1,
->          gen_set_Rc0(ctx, t0);
->      }
->  
-> -    if (!TCGV_EQUAL(t0, ret)) {
-> +    if (t0 != ret) {
->          tcg_gen_mov_tl(ret, t0);
->          tcg_temp_free(t0);
->      }
-> 
+If MAC_OS_X_VERSION_MAX_ALLOWED is equal to 1070 then this code would =
+not be executed. This branch would only be taken if =
+MAC_OS_X_VERSION_MAX_ALLOWED is less than 1070. So there would not be a =
+compiler error.
+
+>=20
+> It would be best to check how <string.h>, <Availability.h>, and
+> <AvailabilityMacros.h> work to make sure that all cases are handled.  =
+I
+> don't have access to a Mac right now, sorry.
+>=20
+> Perhaps this approach works better:
+>=20
+> # ifndef MAC_OS_X_VERSION_10_7
+
+I think you are saying I should remove the "#ifdef __APPLE__" code and =
+just check to see if MAC_OS_X_VERSION_10_7 is defined. That might work =
+on Mac OS 10.6 and 10.5, but it would probably cause problems with =
+non-Mac-OS platforms.=20
