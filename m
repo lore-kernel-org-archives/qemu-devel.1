@@ -1,22 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36645)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39213)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e6tgM-00041c-4x
-	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 03:31:27 -0400
+	(envelope-from <bounces@canonical.com>) id 1e6tpe-0005pV-6C
+	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 03:41:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e6tgL-0004sk-3Z
-	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 03:31:26 -0400
-References: <20171019222637.17890-1-eblake@redhat.com>
-	<20171019222637.17890-12-eblake@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <59e54507-ba07-6e06-e849-660b595a96d7@redhat.com>
-Date: Tue, 24 Oct 2017 02:31:14 -0500
+	(envelope-from <bounces@canonical.com>) id 1e6tpY-0000Z0-GX
+	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 03:41:02 -0400
+Received: from indium.canonical.com ([91.189.90.7]:52842)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1e6tpY-0000Xz-AN
+	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 03:40:56 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1e6tpV-00059d-S6
+	for <qemu-devel@nongnu.org>; Tue, 24 Oct 2017 07:40:53 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id D2BB82E80C0
+	for <qemu-devel@nongnu.org>; Tue, 24 Oct 2017 07:40:53 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20171019222637.17890-12-eblake@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="qfmLMwop6DQCIg0kNQJwMD1dafoLvfkoU"
-Subject: Re: [Qemu-devel] [PATCH v5 11/11] nbd: Minimal structured read for
- client
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 24 Oct 2017 07:35:42 -0000
+From: Richard Jones <rjones@redhat.com>
+Reply-To: Bug 1726733 <1726733@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <150883054273.17842.2005412492234406727.malonedeb@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] =?utf-8?b?W0J1ZyAxNzI2NzMzXSBbTkVXXSDigJhxZW11LWlt?=
+ =?utf-8?q?g_info_replication=3A=E2=80=99_causes_segfault?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,87 +37,49 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, pbonzini@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---qfmLMwop6DQCIg0kNQJwMD1dafoLvfkoU
-From: Eric Blake <eblake@redhat.com>
-To: qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, pbonzini@redhat.com,
- vsementsov@virtuozzo.com, qemu-block@nongnu.org,
- Max Reitz <mreitz@redhat.com>
-Message-ID: <59e54507-ba07-6e06-e849-660b595a96d7@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v5 11/11] nbd: Minimal structured read for
- client
-References: <20171019222637.17890-1-eblake@redhat.com>
- <20171019222637.17890-12-eblake@redhat.com>
-In-Reply-To: <20171019222637.17890-12-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Public bug reported:
 
-On 10/19/2017 05:26 PM, Eric Blake wrote:
-> From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->=20
-> Minimal implementation: for structured error only error_report error
-> message.
->=20
+Typing the literal command =E2=80=98qemu-img info replication:=E2=80=99 cau=
+ses a
+segfault.  Note that =E2=80=98replication:=E2=80=99 is not a filename.
 
-> +
-> +    /* In-out fields, set by client before nbd_receive_negotiate() and=
+$ ./qemu-img info replication:
+qemu-img: block.c:2609: bdrv_open_inherit: Assertion `!!(flags & BDRV_O_PRO=
+TOCOL) =3D=3D !!drv->bdrv_file_open' failed.
+Aborted (core dumped)
 
-> +     * updated by server results during nbd_receive_negotiate() */
-> +    bool structured_reply;
-> +
+This was originally found by Han Han and reported in Fedora:
+https://bugzilla.redhat.com/show_bug.cgi?id=3D1505652
 
-> +++ b/nbd/client.c
-> @@ -685,6 +685,16 @@ int nbd_receive_negotiate(QIOChannel *ioc, const c=
-har *name,
->          if (fixedNewStyle) {
->              int result;
->=20
-> +            if (info->structured_reply) {
-> +                result =3D nbd_request_simple_option(ioc,
-> +                                                   NBD_OPT_STRUCTURED_=
-REPLY,
-> +                                                   errp);
-> +                if (result < 0) {
-> +                    goto fail;
-> +                }
-> +                info->structured_reply =3D result =3D=3D 1;
-> +            }
-> +
+** Affects: qemu
+     Importance: Undecided
+         Status: New
 
-Another bug fix: if we are not fixedNewStyle, then the client cannot
-request structured_reply from the server, so we must clear
-info->structure_reply before returning to the client.  Fixing that
-cleans up a lot of the iotests failures (since iotests tends to run
-old-style servers that cannot negotiate options - maybe we should
-improve that, since newstyle is better, but that's a task for another day=
-).
+-- =
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1726733
 
+Title:
+  =E2=80=98qemu-img info replication:=E2=80=99 causes segfault
 
---qfmLMwop6DQCIg0kNQJwMD1dafoLvfkoU
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Status in QEMU:
+  New
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+Bug description:
+  Typing the literal command =E2=80=98qemu-img info replication:=E2=80=99 c=
+auses a
+  segfault.  Note that =E2=80=98replication:=E2=80=99 is not a filename.
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnu7EIACgkQp6FrSiUn
-Q2pY8AgArwr7ocB2Nq8nP2xgZjlJRruSEYqfM79HSIoYfABN/66gVdi4Rw0rRjTq
-WkBk9mcDisudWyaZywPq5CqaBxajTtBjqnYXFP+Z5U/XUjUfsIhfsb5AXt9Zxeb0
-i/r1Bik8H7Z+r7X8tsEkVyGYOOM4PsHuQxaOrKyl3aU42Ep5st36zEtj7cZIt1on
-X3wpMLvNIsV9reQvnvx60KE0XWjDqODvgwPsjtJ/8T1uXNs0mn63v3lrHgiPGhnx
-WIg1UvomkfmEoxohOB9EpcAD45CT6b9k2urW0ALanS44IVyHcMX6npytortwMGnQ
-XcG9j17iFv3kEm+wDb3ePqgEHBKPUA==
-=tkqx
------END PGP SIGNATURE-----
+  $ ./qemu-img info replication:
+  qemu-img: block.c:2609: bdrv_open_inherit: Assertion `!!(flags & BDRV_O_P=
+ROTOCOL) =3D=3D !!drv->bdrv_file_open' failed.
+  Aborted (core dumped)
 
---qfmLMwop6DQCIg0kNQJwMD1dafoLvfkoU--
+  This was originally found by Han Han and reported in Fedora:
+  https://bugzilla.redhat.com/show_bug.cgi?id=3D1505652
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1726733/+subscriptions
