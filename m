@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48344)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48262)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <frasse.iglesias@gmail.com>) id 1e75F5-0002xF-VA
-	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 15:52:04 -0400
+	(envelope-from <frasse.iglesias@gmail.com>) id 1e75F1-0002uJ-3Z
+	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 15:52:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <frasse.iglesias@gmail.com>) id 1e75F4-0003ea-R8
-	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 15:52:04 -0400
-Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:52350)
+	(envelope-from <frasse.iglesias@gmail.com>) id 1e75Ey-0003UG-1F
+	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 15:51:59 -0400
+Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:47340)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <frasse.iglesias@gmail.com>)
-	id 1e75F4-0003dC-GE
-	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 15:52:02 -0400
-Received: by mail-lf0-x243.google.com with SMTP id b190so25280963lfg.9
-	for <qemu-devel@nongnu.org>; Tue, 24 Oct 2017 12:52:02 -0700 (PDT)
+	id 1e75Ex-0003T4-Lj
+	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 15:51:55 -0400
+Received: by mail-lf0-x243.google.com with SMTP id k40so25315925lfi.4
+	for <qemu-devel@nongnu.org>; Tue, 24 Oct 2017 12:51:55 -0700 (PDT)
 From: Francisco Iglesias <frasse.iglesias@gmail.com>
-Date: Tue, 24 Oct 2017 21:51:39 +0200
-Message-Id: <20171024195139.28179-14-frasse.iglesias@gmail.com>
+Date: Tue, 24 Oct 2017 21:51:34 +0200
+Message-Id: <20171024195139.28179-9-frasse.iglesias@gmail.com>
 In-Reply-To: <20171024195139.28179-1-frasse.iglesias@gmail.com>
 References: <20171024195139.28179-1-frasse.iglesias@gmail.com>
-Subject: [Qemu-devel] [PATCH v3 13/13] xlnx-zcu102: Add support for the
- ZynqMP QSPI
+Subject: [Qemu-devel] [PATCH v3 08/13] xilinx_spips: Make tx/rx_data_bytes
+ more generic and reusable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,121 +30,143 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: edgari@xilinx.com, alistai@xilinx.com, francisco.iglesias@feimtech.se
 
-Add support for the ZynqMP QSPI (consisting of the Generic QSPI and Legacy
-QSPI) and connect Numonyx n25q512a11 flashes to it.
+Make tx/rx_data_bytes more generic so they can be reused (when adding
+support for the Zynqmp Generic QSPI).
 
 Signed-off-by: Francisco Iglesias <frasse.iglesias@gmail.com>
 ---
- hw/arm/xlnx-zcu102.c         | 23 +++++++++++++++++++++++
- hw/arm/xlnx-zynqmp.c         | 24 ++++++++++++++++++++++++
- include/hw/arm/xlnx-zynqmp.h |  5 +++++
- 3 files changed, 52 insertions(+)
+ hw/ssi/xilinx_spips.c | 64 +++++++++++++++++++++++++++++----------------------
+ 1 file changed, 37 insertions(+), 27 deletions(-)
 
-diff --git a/hw/arm/xlnx-zcu102.c b/hw/arm/xlnx-zcu102.c
-index 519a16e..7d61972 100644
---- a/hw/arm/xlnx-zcu102.c
-+++ b/hw/arm/xlnx-zcu102.c
-@@ -150,6 +150,29 @@ static void xlnx_zynqmp_init(XlnxZCU102 *s, MachineState *machine)
-         sysbus_connect_irq(SYS_BUS_DEVICE(&s->soc.spi[i]), 1, cs_line);
+diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
+index 2ee70e9..ad9f1a0 100644
+--- a/hw/ssi/xilinx_spips.c
++++ b/hw/ssi/xilinx_spips.c
+@@ -47,7 +47,7 @@
+ /* config register */
+ #define R_CONFIG            (0x00 / 4)
+ #define IFMODE              (1U << 31)
+-#define ENDIAN              (1 << 26)
++#define R_CONFIG_ENDIAN     (1 << 26)
+ #define MODEFAIL_GEN_EN     (1 << 17)
+ #define MAN_START_COM       (1 << 16)
+ #define MAN_START_EN        (1 << 15)
+@@ -445,13 +445,28 @@ static void xilinx_spips_flush_txfifo(XilinxSPIPS *s)
      }
+ }
  
-+    for (i = 0; i < XLNX_ZYNQMP_NUM_QSPI_FLASH; i++) {
-+        SSIBus *spi_bus;
-+        DeviceState *flash_dev;
-+        qemu_irq cs_line;
-+        DriveInfo *dinfo = drive_get_next(IF_MTD);
-+        int bus = i / XLNX_ZYNQMP_NUM_QSPI_BUS_CS;
-+        gchar *bus_name = g_strdup_printf("qspi%d", bus);
-+
-+        spi_bus = (SSIBus *)qdev_get_child_bus(DEVICE(&s->soc), bus_name);
-+        g_free(bus_name);
-+
-+        flash_dev = ssi_create_slave_no_init(spi_bus, "n25q512a11");
-+        if (dinfo) {
-+            qdev_prop_set_drive(flash_dev, "drive", blk_by_legacy_dinfo(dinfo),
-+                                &error_fatal);
+-static inline void rx_data_bytes(XilinxSPIPS *s, uint8_t *value, int max)
++static inline void tx_data_bytes(Fifo8 *fifo, uint32_t value, int num, bool be)
+ {
+     int i;
++    for (i = 0; i < num && !fifo8_is_full(fifo); ++i) {
++        if (be) {
++            fifo8_push(fifo, (uint8_t)(value >> 24));
++            value <<= 8;
++        } else {
++            fifo8_push(fifo, (uint8_t)value);
++            value >>= 8;
 +        }
-+        qdev_init_nofail(flash_dev);
-+
-+        cs_line = qdev_get_gpio_in_named(flash_dev, SSI_GPIO_CS, 0);
-+
-+        sysbus_connect_irq(SYS_BUS_DEVICE(&s->soc.qspi), i + 1, cs_line);
 +    }
++}
+ 
+-    for (i = 0; i < max && !fifo8_is_empty(&s->rx_fifo); ++i) {
+-        value[i] = fifo8_pop(&s->rx_fifo);
++static inline int rx_data_bytes(Fifo8 *fifo, uint8_t *value, int max)
++{
++    int i;
 +
-     /* TODO create and connect IDE devices for ide_drive_get() */
- 
-     xlnx_zcu102_binfo.ram_size = ram_size;
-diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
-index d4b6560..f7c8b4b 100644
---- a/hw/arm/xlnx-zynqmp.c
-+++ b/hw/arm/xlnx-zynqmp.c
-@@ -40,6 +40,10 @@
- #define SATA_ADDR           0xFD0C0000
- #define SATA_NUM_PORTS      2
- 
-+#define QSPI_ADDR           0xff0f0000
-+#define LQSPI_ADDR          0xc0000000
-+#define QSPI_IRQ            15
-+
- #define DP_ADDR             0xfd4a0000
- #define DP_IRQ              113
- 
-@@ -169,6 +173,9 @@ static void xlnx_zynqmp_init(Object *obj)
-         qdev_set_parent_bus(DEVICE(&s->spi[i]), sysbus_get_default());
++    for (i = 0; i < max && !fifo8_is_empty(fifo); ++i) {
++        value[i] = fifo8_pop(fifo);
      }
++    return max - i;
+ }
  
-+    object_initialize(&s->qspi, sizeof(s->qspi), TYPE_XLNX_ZYNQMP_QSPIPS);
-+    qdev_set_parent_bus(DEVICE(&s->qspi), sysbus_get_default());
-+
-     object_initialize(&s->dp, sizeof(s->dp), TYPE_XLNX_DP);
-     qdev_set_parent_bus(DEVICE(&s->dp), sysbus_get_default());
+ static uint64_t xilinx_spips_read(void *opaque, hwaddr addr,
+@@ -461,6 +476,7 @@ static uint64_t xilinx_spips_read(void *opaque, hwaddr addr,
+     uint32_t mask = ~0;
+     uint32_t ret;
+     uint8_t rx_buf[4];
++    int shortfall;
  
-@@ -405,6 +412,23 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
-         g_free(bus_name);
+     addr >>= 2;
+     switch (addr) {
+@@ -491,9 +507,13 @@ static uint64_t xilinx_spips_read(void *opaque, hwaddr addr,
+         break;
+     case R_RX_DATA:
+         memset(rx_buf, 0, sizeof(rx_buf));
+-        rx_data_bytes(s, rx_buf, s->num_txrx_bytes);
+-        ret = s->regs[R_CONFIG] & ENDIAN ? cpu_to_be32(*(uint32_t *)rx_buf)
+-                        : cpu_to_le32(*(uint32_t *)rx_buf);
++        shortfall = rx_data_bytes(&s->rx_fifo, rx_buf, s->num_txrx_bytes);
++        ret = s->regs[R_CONFIG] & R_CONFIG_ENDIAN ?
++                        cpu_to_be32(*(uint32_t *)rx_buf) :
++                        cpu_to_le32(*(uint32_t *)rx_buf);
++        if (!(s->regs[R_CONFIG] & R_CONFIG_ENDIAN)) {
++            ret <<= 8 * shortfall;
++        }
+         DB_PRINT_L(0, "addr=" TARGET_FMT_plx " = %x\n", addr * 4, ret);
+         xilinx_spips_update_ixr(s);
+         return ret;
+@@ -504,20 +524,6 @@ static uint64_t xilinx_spips_read(void *opaque, hwaddr addr,
+ 
+ }
+ 
+-static inline void tx_data_bytes(XilinxSPIPS *s, uint32_t value, int num)
+-{
+-    int i;
+-    for (i = 0; i < num && !fifo8_is_full(&s->tx_fifo); ++i) {
+-        if (s->regs[R_CONFIG] & ENDIAN) {
+-            fifo8_push(&s->tx_fifo, (uint8_t)(value >> 24));
+-            value <<= 8;
+-        } else {
+-            fifo8_push(&s->tx_fifo, (uint8_t)value);
+-            value >>= 8;
+-        }
+-    }
+-}
+-
+ static void xilinx_spips_write(void *opaque, hwaddr addr,
+                                         uint64_t value, unsigned size)
+ {
+@@ -558,16 +564,20 @@ static void xilinx_spips_write(void *opaque, hwaddr addr,
+         mask = 0;
+         break;
+     case R_TX_DATA:
+-        tx_data_bytes(s, (uint32_t)value, s->num_txrx_bytes);
++        tx_data_bytes(&s->tx_fifo, (uint32_t)value, s->num_txrx_bytes,
++                      s->regs[R_CONFIG] & R_CONFIG_ENDIAN);
+         goto no_reg_update;
+     case R_TXD1:
+-        tx_data_bytes(s, (uint32_t)value, 1);
++        tx_data_bytes(&s->tx_fifo, (uint32_t)value, 1,
++                      s->regs[R_CONFIG] & R_CONFIG_ENDIAN);
+         goto no_reg_update;
+     case R_TXD2:
+-        tx_data_bytes(s, (uint32_t)value, 2);
++        tx_data_bytes(&s->tx_fifo, (uint32_t)value, 2,
++                      s->regs[R_CONFIG] & R_CONFIG_ENDIAN);
+         goto no_reg_update;
+     case R_TXD3:
+-        tx_data_bytes(s, (uint32_t)value, 3);
++        tx_data_bytes(&s->tx_fifo, (uint32_t)value, 3,
++                      s->regs[R_CONFIG] & R_CONFIG_ENDIAN);
+         goto no_reg_update;
      }
+     s->regs[addr] = (s->regs[addr] & ~mask) | (value & mask);
+@@ -677,11 +687,11 @@ static void lqspi_load_cache(void *opaque, hwaddr addr)
  
-+    object_property_set_bool(OBJECT(&s->qspi), true, "realized", &err);
-+    sysbus_mmio_map(SYS_BUS_DEVICE(&s->qspi), 0, QSPI_ADDR);
-+    sysbus_mmio_map(SYS_BUS_DEVICE(&s->qspi), 1, LQSPI_ADDR);
-+    sysbus_connect_irq(SYS_BUS_DEVICE(&s->qspi), 0, gic_spi[QSPI_IRQ]);
-+    for (i = 0; i < XLNX_ZYNQMP_NUM_QSPI_BUS; i++) {
-+        gchar *bus_name;
-+        gchar *target_bus;
-+        /* Alias controller SPI bus to the SoC itself */
-+        bus_name = g_strdup_printf("qspi%d", i);
-+        target_bus = g_strdup_printf("spi%d", i);
-+        object_property_add_alias(OBJECT(s), bus_name,
-+                                  OBJECT(&s->qspi), target_bus,
-+                                  &error_abort);
-+        g_free(bus_name);
-+        g_free(target_bus);
-+    }
-+
-     object_property_set_bool(OBJECT(&s->dp), true, "realized", &err);
-     if (err) {
-         error_propagate(errp, err);
-diff --git a/include/hw/arm/xlnx-zynqmp.h b/include/hw/arm/xlnx-zynqmp.h
-index 6eff81a..3e6fb9b 100644
---- a/include/hw/arm/xlnx-zynqmp.h
-+++ b/include/hw/arm/xlnx-zynqmp.h
-@@ -40,6 +40,10 @@
- #define XLNX_ZYNQMP_NUM_SDHCI 2
- #define XLNX_ZYNQMP_NUM_SPIS 2
- 
-+#define XLNX_ZYNQMP_NUM_QSPI_BUS 2
-+#define XLNX_ZYNQMP_NUM_QSPI_BUS_CS 2
-+#define XLNX_ZYNQMP_NUM_QSPI_FLASH 4
-+
- #define XLNX_ZYNQMP_NUM_OCM_BANKS 4
- #define XLNX_ZYNQMP_OCM_RAM_0_ADDRESS 0xFFFC0000
- #define XLNX_ZYNQMP_OCM_RAM_SIZE 0x10000
-@@ -83,6 +87,7 @@ typedef struct XlnxZynqMPState {
-     SysbusAHCIState sata;
-     SDHCIState sdhci[XLNX_ZYNQMP_NUM_SDHCI];
-     XilinxSPIPS spi[XLNX_ZYNQMP_NUM_SPIS];
-+    XlnxZynqMPQSPIPS qspi;
-     XlnxDPState dp;
-     XlnxDPDMAState dpdma;
+         while (cache_entry < LQSPI_CACHE_SIZE) {
+             for (i = 0; i < 64; ++i) {
+-                tx_data_bytes(s, 0, 1);
++                tx_data_bytes(&s->tx_fifo, 0, 1, false);
+             }
+             xilinx_spips_flush_txfifo(s);
+             for (i = 0; i < 64; ++i) {
+-                rx_data_bytes(s, &q->lqspi_buf[cache_entry++], 1);
++                rx_data_bytes(&s->rx_fifo, &q->lqspi_buf[cache_entry++], 1);
+             }
+         }
  
 -- 
 2.9.3
