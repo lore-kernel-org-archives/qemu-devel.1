@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54881)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55081)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1e7IMl-0006Pa-JW
-	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 05:52:52 -0400
+	(envelope-from <cohuck@redhat.com>) id 1e7IN1-0006e1-5X
+	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 05:53:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1e7IMi-0001Ds-Eo
-	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 05:52:51 -0400
-Date: Tue, 24 Oct 2017 14:18:22 +0200
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20171024121822.GE18756@stefanha-x1.localdomain>
-References: <20171023025016.3088-1-programmingkidx@gmail.com>
-	<20171023160959.GC10220@stefanha-x1.localdomain>
-	<CAFEAcA_13y2-uM11Ko_79TpEsfpFWMTz2-mAiwFseHfAM5CPgA@mail.gmail.com>
+	(envelope-from <cohuck@redhat.com>) id 1e7IMy-0001XV-15
+	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 05:53:07 -0400
+Date: Wed, 25 Oct 2017 11:52:45 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20171025115245.7702c8aa.cohuck@redhat.com>
+In-Reply-To: <20171020115803.14093-1-david@redhat.com>
+References: <20171020115803.14093-1-david@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA_13y2-uM11Ko_79TpEsfpFWMTz2-mAiwFseHfAM5CPgA@mail.gmail.com>
-Subject: Re: [Qemu-devel] [libfdt][PATCH v3] implement strnlen for systems
- that need it
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1] target/s390x: change CPU type name to
+ "s390x-cpu"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,32 +23,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: John Arbuckle <programmingkidx@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <richard.henderson@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, devicetree-compiler@vger.kernel.org, ian@freebsd.org
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, borntraeger@de.ibm.com, Igor Mammedov <imammedo@redhat.com>
 
-On Mon, Oct 23, 2017 at 05:27:26PM +0100, Peter Maydell wrote:
-> On 23 October 2017 at 17:09, Stefan Hajnoczi <stefanha@gmail.com> wrote:
-> >> +/* strnlen() is not available on Mac OS < 10.7 */
-> >> +# if (MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_7)
-> >
-> > Does this cover the case where MAC_OS_X_VERSION_MAX_ALLOWED is set to
-> > <1070 on a 10.7+ build machine?  It's possible that the <string.h>
-> > header would define strnlen() and your code redefines the function
-> > (compiler error).
+On Fri, 20 Oct 2017 13:58:03 +0200
+David Hildenbrand <david@redhat.com> wrote:
+
+> For now, e.g. host-s390-cpu wasn't exposed to the user. cpu-add, -cpu
+> and the CPU model qmp interfaces didn't care about the actual type,
+> as that information was hidden.
 > 
-> In that case you don't want to use the strnlen() declaration
-> from the header, you want the inline somehow, because even if
-> the declaration is present and using it doesn't fail compile
-> the definition won't be around at runtime.
+> This changed with CPU hotplug via device_add. Now the type is visible to
+> the user. Before we get that supported in a stable version, this is our
+> last chance to change it.
+> 
+> So change it form "s390-cpu" to "s390x-cpu", to match the architecture
+> name. Example names are then e.g. z14-s390x-cpu or qemu-s390x-cpu.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  qapi-schema.json          | 4 ++--
+>  target/s390x/cpu-qom.h    | 2 +-
+>  target/s390x/cpu_models.c | 4 ++--
+>  3 files changed, 5 insertions(+), 5 deletions(-)
 
-Perhaps one way around this case is to:
-
-# if !defined(MAC_OS_X_VERSION_10_7) || (MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_7)
-#  include <string.h> /* make sure it isn't included again */
-#  define strnlen fdt_strnlen
-static inline fdt_strnlen(...) { ... }
-
-This way the symbol strnlen() isn't used and the system headers cannot
-cause problems.
-
-Stefan
+Acked-by: Cornelia Huck <cohuck@redhat.com>
