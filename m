@@ -1,19 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51883)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54071)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1e7Qm4-0001gU-1m
-	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 14:51:33 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1e7Qxx-0003NK-HH
+	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 15:03:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1e7Qm3-0000Ut-Ao
-	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 14:51:32 -0400
-Date: Wed, 25 Oct 2017 11:51:22 -0700 (PDT)
-From: Stefano Stabellini <sstabellini@kernel.org>
-In-Reply-To: <CAFEAcA_M2Y+Qv==YJtuA32ZZO78+nKG+uwr_+sJv++HC9NtmuQ@mail.gmail.com>
-Message-ID: <alpine.DEB.2.10.1710251150470.574@sstabellini-ThinkPad-X260>
-References: <alpine.DEB.2.10.1710241055160.574@sstabellini-ThinkPad-X260>
-	<CAFEAcA_M2Y+Qv==YJtuA32ZZO78+nKG+uwr_+sJv++HC9NtmuQ@mail.gmail.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1e7Qxw-0002J4-Qu
+	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 15:03:49 -0400
+Received: from mail-wr0-x22c.google.com ([2a00:1450:400c:c0c::22c]:50232)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1e7Qxw-0002Ia-J4
+	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 15:03:48 -0400
+Received: by mail-wr0-x22c.google.com with SMTP id p96so988863wrb.7
+	for <qemu-devel@nongnu.org>; Wed, 25 Oct 2017 12:03:48 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: Re: [Qemu-devel] [PATCH v3] fix WFI/WFE length in syndrome register
+In-Reply-To: <20171025093535.10175-1-richard.henderson@linaro.org>
+References: <20171025093535.10175-1-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 25 Oct 2017 20:03:26 +0100
+Message-ID: <CAFEAcA85d8qB71wczyfXuqjq9h2SfW2NF=cR+digk13Wo9FwUw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/51] tcg queued patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,48 +28,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Stefano Stabellini <sstabellini@kernel.org>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Wed, 25 Oct 2017, Peter Maydell wrote:
-> On 24 October 2017 at 18:59, Stefano Stabellini <sstabellini@kernel.org> wrote:
-> > WFI/E are often, but not always, 4 bytes long. When they are, we need to
-> > set ARM_EL_IL_SHIFT in the syndrome register.
-> >
-> > Pass the instruction length to HELPER(wfi), use it to decrement pc
-> > appropriately and to pass an is_16bit flag to syn_wfx, which sets
-> > ARM_EL_IL_SHIFT if needed.
-> >
-> > Set dc->insn in both arm_tr_translate_insn and thumb_tr_translate_insn.
-> >
-> > Signed-off-by: Stefano Stabellini <sstabellini@kernel.org>
-> 
-> > diff --git a/target/arm/translate.c b/target/arm/translate.c
-> > index 4da1a4c..0a7b67c 100644
-> > --- a/target/arm/translate.c
-> > +++ b/target/arm/translate.c
-> > @@ -12124,6 +12124,7 @@ static void arm_tr_translate_insn(DisasContextBase *dcbase, CPUState *cpu)
-> >      }
-> >
-> >      insn = arm_ldl_code(env, dc->pc, dc->sctlr_b);
-> > +    dc->insn = insn;
-> >      dc->pc += 4;
-> >      disas_arm_insn(dc, insn);
-> >
-> > @@ -12191,6 +12192,7 @@ static void thumb_tr_translate_insn(DisasContextBase *dcbase, CPUState *cpu)
-> >      }
-> >
-> >      insn = arm_lduw_code(env, dc->pc, dc->sctlr_b);
-> > +    dc->insn = insn;
-> >      is_16bit = thumb_insn_is_16bit(dc, insn);
-> >      dc->pc += 2;
-> >      if (!is_16bit) {
-> 
-> This isn't quite in the right place, because it's before we load the
-> second half of a 32 bit Thumb insn, so it won't give dc->insn the
-> correct full width insn value in that case.
-> 
-> I'm going to take this patch into target-arm.next and fix it up locally
-> rather than making you spin a v4.
+On 25 October 2017 at 10:34, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> Primarily Emilio's work toward removing tb_lock, with fixes.
+> But there are some other tcg-related patches that are queued.
+>
+>
+> r~
+>
+>
+> The following changes since commit 3d7196d43bfe12efe98568cb60057e273652b99b:
+>
+>   Merge remote-tracking branch 'remotes/kraxel/tags/usb-20171023-pull-request' into staging (2017-10-24 16:05:57 +0100)
+>
+> are available in the git repository at:
+>
+>   git://github.com/rth7680/qemu.git tags/pull-tcg-20171025
+>
+> for you to fetch changes up to cc689485ee3e9dca05765326ee8fd619a6ec48f0:
+>
+>   translate-all: exit from tb_phys_invalidate if qht_remove fails (2017-10-24 13:53:42 -0700)
+>
+> ----------------------------------------------------------------
+> TCG patch queue
+>
 
-Thank you! :-)
+Applied, thanks.
+
+-- PMM
