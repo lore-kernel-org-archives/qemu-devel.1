@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59958)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60619)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e7y13-0007BH-K2
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 02:21:15 -0400
+	(envelope-from <no-reply@patchew.org>) id 1e7y2Z-0007sh-84
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 02:22:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e7y0z-00072P-Hs
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 02:21:13 -0400
-Received: from indium.canonical.com ([91.189.90.7]:34560)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1e7y0z-00070v-7U
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 02:21:09 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1e7y0w-0003sa-By
-	for <qemu-devel@nongnu.org>; Fri, 27 Oct 2017 06:21:06 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 411B42E80CE
-	for <qemu-devel@nongnu.org>; Fri, 27 Oct 2017 06:21:06 +0000 (UTC)
+	(envelope-from <no-reply@patchew.org>) id 1e7y2V-0001L8-0o
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 02:22:47 -0400
+Resent-Message-Id: <E1e7y2V-0001L8-0o@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21335)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1e7y2U-00014W-Pq
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 02:22:42 -0400
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <150892758097.30.13922469292993888302@bafd83ae6430>
+In-Reply-To: <20171025093535.10175-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 27 Oct 2017 06:13:10 -0000
-From: ChristianEhrhardt <1719196@bugs.launchpad.net>
-Reply-To: Bug 1719196 <1719196@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150626680089.6094.17724106932405637799.malonedeb@soybean.canonical.com>
-Message-Id: <150908479073.5027.15976261299317878543.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1719196] Re: [arm64 ocata] newly created
- instances are unable to raise network interfaces
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 25 Oct 2017 03:33:01 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PULL 00/51] tcg queued patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,331 +28,195 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: richard.henderson@linaro.org
+Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org
 
-Thanks for the FYI Brian.
-I see it in pending-SRUs as it should be.
-I added the -needed tags to be "correct".
-
-@Andrew/Sean - could you test proposed and set verified then (assuming
-it works like the ppa did)
-
-
-Odd - this really seems to hit everything, not only LP timeouts.
-There are also dep8 regressions listed on systemd which make no sense in re=
-lation to the fix.
-The test history on arm is borked since February [1], so I ask you to overr=
-ide and ignore that.
-On s390x it at least works sometimes, but the log [2] doesn't look much bet=
-ter, but there at least it hits a different issue than before - I'm retrigg=
-ering this for now - but likely ask to ignore that as well - but I'll take =
-a look at the retry first.
-
-
-[1]: http://autopkgtest.ubuntu.com/packages/s/systemd/zesty/armhf
-[2]: http://autopkgtest.ubuntu.com/packages/s/systemd/zesty/s390x
-
-** Tags added: verification-needed verification-needed-zesty
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1719196
-
-Title:
-  [arm64 ocata] newly created instances are unable to raise network
-  interfaces
-
-Status in Ubuntu Cloud Archive:
-  Fix Released
-Status in Ubuntu Cloud Archive ocata series:
-  Triaged
-Status in libvirt:
-  New
-Status in QEMU:
-  Fix Released
-Status in libvirt package in Ubuntu:
-  Invalid
-Status in qemu package in Ubuntu:
-  Fix Released
-Status in qemu source package in Zesty:
-  Fix Committed
-
-Bug description:
-  [Impact]
-
-   * A change in qemu 2.8 (83d768b virtio: set ISR on dataplane =
-
-     notifications) broke virtio handling on platforms without a =
-
-     controller. Those encounter flaky networking due to missed IRQs
-
-   * Fix is a backport of the upstream fix b4b9862b: virtio: Fix no =
-
-     interrupt when not creating msi controller
-
-  [Test Case]
-
-   * On Arm with Zesty (or Ocata) run a guest without PCI based devices
-
-   * Example in e.g. c#23
-
-   * Without the fix the networking does not work reliably (as it losses =
-
-     IRQs), with the fix it works fine.
-
-  [Regression Potential]
-
-   * Changing the IRQ handling of virtio could affect virtio in general.
-     But when reviwing the patch you'll see that it is small and actually =
-
-     only changes to enable IRQ on one more place. That could cause more =
-
-     IRQs than needed in the worst case, but those are usually not =
-
-     breaking but only slowing things down. Also this fix is upstream =
-
-     quite a while, increasing confidence.
-
-  [Other Info]
-   =
-
-   * There is currently 1720397 in flight in the SRU queue, so acceptance =
-
-     of this upload has to wait until that completes.
-
-  ---
-
-  arm64 Ocata ,
-
-  I'm testing to see I can get Ocata running on arm64 and using the
-  openstack-base bundle to deploy it.  I have added the bundle to the
-  log file attached to this bug.
-
-  When I create a new instance via nova, the VM comes up and runs,
-  however fails to raise its eth0 interface. This occurs on both
-  internal and external networks.
-
-  ubuntu@openstackaw:~$ nova list
-  +--------------------------------------+---------+--------+------------+-=
-------------+--------------------+
-  | ID                                   | Name    | Status | Task State | =
-Power State | Networks           |
-  +--------------------------------------+---------+--------+------------+-=
-------------+--------------------+
-  | dcaf6d51-f81e-4cbd-ac77-0c5d21bde57c | sfeole1 | ACTIVE | -          | =
-Running     | internal=3D10.5.5.3  |
-  | aa0b8aee-5650-41f4-8fa0-aeccdc763425 | sfeole2 | ACTIVE | -          | =
-Running     | internal=3D10.5.5.13 |
-  +--------------------------------------+---------+--------+------------+-=
-------------+--------------------+
-  ubuntu@openstackaw:~$ nova show aa0b8aee-5650-41f4-8fa0-aeccdc763425
-  +--------------------------------------+---------------------------------=
--------------------------+
-  | Property                             | Value                           =
-                         |
-  +--------------------------------------+---------------------------------=
--------------------------+
-  | OS-DCF:diskConfig                    | MANUAL                          =
-                         |
-  | OS-EXT-AZ:availability_zone          | nova                            =
-                         |
-  | OS-EXT-SRV-ATTR:host                 | awrep3                          =
-                         |
-  | OS-EXT-SRV-ATTR:hypervisor_hostname  | awrep3.maas                     =
-                         |
-  | OS-EXT-SRV-ATTR:instance_name        | instance-00000003               =
-                         |
-  | OS-EXT-STS:power_state               | 1                               =
-                         |
-  | OS-EXT-STS:task_state                | -                               =
-                         |
-  | OS-EXT-STS:vm_state                  | active                          =
-                         |
-  | OS-SRV-USG:launched_at               | 2017-09-24T14:23:08.000000      =
-                         |
-  | OS-SRV-USG:terminated_at             | -                               =
-                         |
-  | accessIPv4                           |                                 =
-                         |
-  | accessIPv6                           |                                 =
-                         |
-  | config_drive                         |                                 =
-                         |
-  | created                              | 2017-09-24T14:22:41Z            =
-                         |
-  | flavor                               | m1.small (717660ae-0440-4b19-a76=
-2-ffeb32a0575c)          |
-  | hostId                               | 5612a00671c47255d2ebd6737a64ec9b=
-d3a5866d1233ecf3e988b025 |
-  | id                                   | aa0b8aee-5650-41f4-8fa0-aeccdc76=
-3425                     |
-  | image                                | zestynosplash (e88fd1bd-f040-44d=
-8-9e7c-c462ccf4b945)     |
-  | internal network                     | 10.5.5.13                       =
-                         |
-  | key_name                             | mykey                           =
-                         |
-  | metadata                             | {}                              =
-                         |
-  | name                                 | sfeole2                         =
-                         |
-  | os-extended-volumes:volumes_attached | []                              =
-                         |
-  | progress                             | 0                               =
-                         |
-  | security_groups                      | default                         =
-                         |
-  | status                               | ACTIVE                          =
-                         |
-  | tenant_id                            | 9f7a21c1ad264fec81abc09f3960ad1d=
-                         |
-  | updated                              | 2017-09-24T14:23:09Z            =
-                         |
-  | user_id                              | e6bb6f5178a248c1b5ae66ed388f9040=
-                         |
-  +--------------------------------------+---------------------------------=
--------------------------+
-
-  As seen above the instances boot an run.  Full Console output is
-  attached to this bug.
-
-  [  OK  ] Started Initial cloud-init job (pre-networking).
-  [  OK  ] Reached target Network (Pre).
-  [  OK  ] Started AppArmor initialization.
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Starting Raise netw=
-ork interfaces...
-  [FAILED] Failed to start Raise network interfaces.
-  See 'systemctl status networking.service' for details.
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Starting Initial cl=
-oud-init job (metadata service crawler)...
-  [  OK  ] Reached target Network.
-  [  315.051902] cloud-init[881]: Cloud-init v. 0.7.9 running 'init' at Fri=
-, 22 Sep 2017 18:29:15 +0000. Up 314.70 seconds.
-  [  315.057291] cloud-init[881]: ci-info: +++++++++++++++++++++++++++Net d=
-evice info+++++++++++++++++++++++++++
-  [  315.060338] cloud-init[881]: ci-info: +--------+------+-----------+---=
---------+-------+-------------------+
-  [  315.063308] cloud-init[881]: ci-info: | Device |  Up  |  Address  |   =
- Mask   | Scope |     Hw-Address    |
-  [  315.066304] cloud-init[881]: ci-info: +--------+------+-----------+---=
---------+-------+-------------------+
-  [  315.069303] cloud-init[881]: ci-info: | eth0:  | True |     .     |   =
-  .     |   .   | fa:16:3e:39:4c:48 |
-  [  315.072308] cloud-init[881]: ci-info: | eth0:  | True |     .     |   =
-  .     |   d   | fa:16:3e:39:4c:48 |
-  [  315.075260] cloud-init[881]: ci-info: |  lo:   | True | 127.0.0.1 | 25=
-5.0.0.0 |   .   |         .         |
-  [  315.078258] cloud-init[881]: ci-info: |  lo:   | True |     .     |   =
-  .     |   d   |         .         |
-  [  315.081249] cloud-init[881]: ci-info: +--------+------+-----------+---=
---------+-------+-------------------+
-  [  315.084240] cloud-init[881]: 2017-09-22 18:29:15,393 - url_helper.py[W=
-ARNING]: Calling 'http://169.254.169.254/2009-04-04/meta-data/instance-id' =
-failed [0/120s]: request error [HTTPConnectionPool(host=3D'169.254.169.254'=
-, port=3D80): Max retries exceeded with url: /2009-04-04/meta-data/instance=
--id (Caused by NewConnectionError('<requests.packages.urllib3.connection.HT=
-TPConnection object at 0xffffb10794e0>: Failed to establish a new connectio=
-n: [Errno 101] Network is unreachable',))]
-
-  ----------------
-
-  I have checked all services in neutron and made sure that they are
-  running and restarted in neutron-gateway
-
-  =C2=A0[ + ]  neutron-dhcp-agent
-  =C2=A0[ + ]  neutron-l3-agent
-  =C2=A0[ + ]  neutron-lbaasv2-agent
-  =C2=A0[ + ]  neutron-metadata-agent
-  =C2=A0[ + ]  neutron-metering-agent
-  =C2=A0[ + ]  neutron-openvswitch-agent
-  =C2=A0[ + ]  neutron-ovs-cleanup
-
-  and have also restarted and checked the nova-compute logs for their
-  neutron counterparts.
-
-  =C2=A0[ + ]  neutron-openvswitch-agent
-  =C2=A0[ + ]  neutron-ovs-cleanup
-
-  =C2=A0There are some warnings/errors in the neutron-gateway logs which I
-  have attached the full tarball in a separate attachment to this bug:
-
-  2017-09-24 14:39:33.152 10322 INFO ryu.base.app_manager [-] instantiating=
- app ryu.controller.ofp_handler of OFPHandler
-  2017-09-24 14:39:33.153 10322 INFO ryu.base.app_manager [-] instantiating=
- app ryu.app.ofctl.service of OfctlService
-  2017-09-24 14:39:39.577 10322 ERROR neutron.agent.ovsdb.impl_vsctl [req-2=
-f084ae8-13dc-47dc-b351-24c8f3c57067 - - - - -] Unable to execute ['ovs-vsct=
-l', '--timeout=3D10', '--oneline', '--format=3Djson', '--', '--id=3D@manage=
-r', 'create', 'Manager', 'target=3D"ptcp:6640:127.0.0.1"', '--', 'add', 'Op=
-en_vSwitch', '.', 'manager_options', '@manager']. Exception: Exit code: 1; =
-Stdin: ; Stdout: ; Stderr: ovs-vsctl: transaction error: {"details":"Transa=
-ction causes multiple rows in \"Manager\" table to have identical values (\=
-"ptcp:6640:127.0.0.1\") for index on column \"target\".  First row, with UU=
-ID e02a5f7f-bfd2-4a1d-ae3c-0321db4bd3fb, existed in the database before thi=
-s transaction and was not modified by the transaction.  Second row, with UU=
-ID 6e9aba3a-471a-4976-bffd-b7131bbe5377, was inserted by this transaction."=
-,"error":"constraint violation"}
-
-  These warnings/errors also occur on the nova-compute hosts in
-  /var/log/neutron/
-
-  2017-09-22 18:54:52.130 387556 INFO ryu.base.app_manager [-] instantiatin=
-g app ryu.app.ofctl.service of OfctlService
-  2017-09-22 18:54:56.124 387556 ERROR neutron.agent.ovsdb.impl_vsctl [req-=
-e291c2f9-a123-422c-be7c-fadaeb5decfa - - - - -] Unable to execute ['ovs-vsc=
-tl', '--timeout=3D10', '--oneline', '--format=3Djson', '--', '--id=3D@manag=
-er', 'create', 'Manager', 'target=3D"ptcp:6640:127.0.0.1"', '--', 'add', 'O=
-pen_vSwitch', '.', 'manager_options', '@manager']. Exception: Exit code: 1;=
- Stdin: ; Stdout: ; Stderr: ovs-vsctl: transaction error: {"details":"Trans=
-action causes multiple rows in \"Manager\" table to have identical values (=
-\"ptcp:6640:127.0.0.1\") for index on column \"target\".  First row, with U=
-UID 9f27ddee-9881-4cbc-9777-2f42fee735e9, was inserted by this transaction.=
-  Second row, with UUID ccf0e097-09d5-449c-b353-6b69781dc3f7, existed in th=
-e database before this transaction and was not modified by the transaction.=
-","error":"constraint violation"}
-
-  I'm not sure if the above error could be pertaining to the failure, I
-  have also attached those logs to this bug as well...
-
-  .
-  (neutron) agent-list
-  +--------------------------------------+----------------------+--------+-=
-------------------+-------+----------------+---------------------------+
-  | id                                   | agent_type           | host   | =
-availability_zone | alive | admin_state_up | binary                    |
-  +--------------------------------------+----------------------+--------+-=
-------------------+-------+----------------+---------------------------+
-  | 0cca03fb-abb2-4704-8b0b-e7d3e117d882 | DHCP agent           | awrep1 | =
-nova              | :-)   | True           | neutron-dhcp-agent        |
-  | 14a5fd52-fbc3-450c-96d5-4e9a65776dad | L3 agent             | awrep1 | =
-nova              | :-)   | True           | neutron-l3-agent          |
-  | 2ebc7238-5e61-41f8-bc60-df14ec6b226b | Loadbalancerv2 agent | awrep1 | =
-                  | :-)   | True           | neutron-lbaasv2-agent     |
-  | 4f6275be-fc8b-4994-bdac-13a4b76f6a83 | Metering agent       | awrep1 | =
-                  | :-)   | True           | neutron-metering-agent    |
-  | 86ecc6b0-c100-4298-b861-40c17516cc08 | Open vSwitch agent   | awrep1 | =
-                  | :-)   | True           | neutron-openvswitch-agent |
-  | 947ad3ab-650b-4b96-a520-00441ecb33e7 | Open vSwitch agent   | awrep4 | =
-                  | :-)   | True           | neutron-openvswitch-agent |
-  | 996b0692-7d19-4641-bec3-e057f4a856f6 | Open vSwitch agent   | awrep3 | =
-                  | :-)   | True           | neutron-openvswitch-agent |
-  | ab6b1065-0b98-4cf3-9f46-6bddba0c5e75 | Metadata agent       | awrep1 | =
-                  | :-)   | True           | neutron-metadata-agent    |
-  | fe24f622-b77c-4eed-ae22-18e4195cf763 | Open vSwitch agent   | awrep2 | =
-                  | :-)   | True           | neutron-openvswitch-agent |
-  +--------------------------------------+----------------------+--------+-=
-------------------+-------+----------------+---------------------------+
-
-  Should neutron-openvswitch be assigned to the 'nova' availability
-  zone?
-
-  I have also attached the ovs-vsctl show from a nova-compute host and
-  the neutron-gateway host to ensure that the open v switch routes are
-  correct.
-
-  I can supply more logs if required.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/cloud-archive/+bug/1719196/+subscriptions
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
+ZGV2ZWxdIFtQVUxMIDAwLzUxXSB0Y2cgcXVldWVkIHBhdGNoZXMKVHlwZTogc2VyaWVzCk1lc3Nh
+Z2UtaWQ6IDIwMTcxMDI1MDkzNTM1LjEwMTc1LTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJvLm9y
+ZwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0
+b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBj
+b25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYu
+cmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRC
+QVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRu
+LyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQg
+c2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJh
+Y2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgo
+bisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGlu
+ZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9n
+aXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgICAgICAg
+IHBhdGNoZXcvMjAxNzEwMjUwOTM1MzUuMTAxNzUtMS1yaWNoYXJkLmhlbmRlcnNvbkBsaW5hcm8u
+b3JnIC0+IHBhdGNoZXcvMjAxNzEwMjUwOTM1MzUuMTAxNzUtMS1yaWNoYXJkLmhlbmRlcnNvbkBs
+aW5hcm8ub3JnClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKNzc2MjZhMDQxYyB0cmFu
+c2xhdGUtYWxsOiBleGl0IGZyb20gdGJfcGh5c19pbnZhbGlkYXRlIGlmIHFodF9yZW1vdmUgZmFp
+bHMKNGE5MGY0ZWJlOSB0Y2c6IEluaXRpYWxpemUgY3B1X2VudiBnZW5lcmljYWxseQoyMTUyYzQx
+YmQzIHRjZzogZW5hYmxlIG11bHRpcGxlIFRDRyBjb250ZXh0cyBpbiBzb2Z0bW11CjU4Y2NhYzI1
+NjEgdGNnOiBpbnRyb2R1Y2UgcmVnaW9ucyB0byBzcGxpdCBjb2RlX2dlbl9idWZmZXIKOTEyN2Zl
+NWI2NCB0cmFuc2xhdGUtYWxsOiB1c2UgcWVtdV9wcm90ZWN0X3J3eC9ub25lIGhlbHBlcnMKODZh
+YmZkOWU5MiBvc2RlcDogaW50cm9kdWNlIHFlbXVfbXByb3RlY3Rfcnd4L25vbmUKYjk4YWU3MzYw
+ZiB0Y2c6IGFsbG9jYXRlIG9wdGltaXplciB0ZW1wcyB3aXRoIHRjZ19tYWxsb2MKMzU2ZGIwYmFi
+OCB0Y2c6IGRpc3RyaWJ1dGUgcHJvZmlsaW5nIGNvdW50ZXJzIGFjcm9zcyBUQ0dDb250ZXh0J3MK
+OGI1MjkyMmM0NSB0Y2c6IGludHJvZHVjZSAqKnRjZ19jdHhzIHRvIGtlZXAgdHJhY2sgb2YgYWxs
+IFRDR0NvbnRleHQncwoxZjgxZWVjZDNhIGdlbi1pY291bnQ6IGZvbGQgZXhpdHJlcV9sYWJlbCBp
+bnRvIFRDR0NvbnRleHQKNTllNGEzOGMyNiB0Y2c6IGRlZmluZSB0Y2dfaW5pdF9jdHggYW5kIG1h
+a2UgdGNnX2N0eCBhIHBvaW50ZXIKMzEwM2M0N2FhZiB0Y2c6IHRha2UgdGJfY3R4IG91dCBvZiBU
+Q0dDb250ZXh0CjBiZjlmNjA1MTggdHJhbnNsYXRlLWFsbDogcmVwb3J0IGNvcnJlY3QgYXZnIGhv
+c3QgVEIgc2l6ZQozYzg4MzA2ZWMyIGV4ZWMtYWxsOiByZW5hbWUgdGJfZnJlZSB0byB0Yl9yZW1v
+dmUKNDI4NTdkNDRiYSB0cmFuc2xhdGUtYWxsOiB1c2UgYSBiaW5hcnkgc2VhcmNoIHRyZWUgdG8g
+dHJhY2sgVEJzIGluIFRCQ29udGV4dAo2NWVlZGY5ZThkIHRjZzogUmVtb3ZlIENGX0lHTk9SRV9J
+Q09VTlQKZDRjOTk0NzMxNiB0Y2c6IEFkZCBDRl9MQVNUX0lPICsgQ0ZfVVNFX0lDT1VOVCB0byBD
+Rl9IQVNIX01BU0sKZjgyM2JkZDM5ZCBjcHUtZXhlYzogbG9va3VwL2dlbmVyYXRlIFRCIG91dHNp
+ZGUgZXhjbHVzaXZlIHJlZ2lvbiBkdXJpbmcgc3RlcF9hdG9taWMKMTAyODc1NzBjNyB0Y2c6IGNo
+ZWNrIENGX1BBUkFMTEVMIGluc3RlYWQgb2YgcGFyYWxsZWxfY3B1cwowZTVhZDZlNzllIHRhcmdl
+dC9zcGFyYzogY2hlY2sgQ0ZfUEFSQUxMRUwgaW5zdGVhZCBvZiBwYXJhbGxlbF9jcHVzCjU2MDI0
+MjI5YzggdGFyZ2V0L3NoNDogY2hlY2sgQ0ZfUEFSQUxMRUwgaW5zdGVhZCBvZiBwYXJhbGxlbF9j
+cHVzCjFkZTM4NjNiNWIgdGFyZ2V0L3MzOTB4OiBjaGVjayBDRl9QQVJBTExFTCBpbnN0ZWFkIG9m
+IHBhcmFsbGVsX2NwdXMKNDAyMzViYzNjMSB0YXJnZXQvbTY4azogY2hlY2sgQ0ZfUEFSQUxMRUwg
+aW5zdGVhZCBvZiBwYXJhbGxlbF9jcHVzCjA3YWU3OWU4NTMgdGFyZ2V0L2kzODY6IGNoZWNrIENG
+X1BBUkFMTEVMIGluc3RlYWQgb2YgcGFyYWxsZWxfY3B1cwphZjk2OGRjZGZhIHRhcmdldC9ocHBh
+OiBjaGVjayBDRl9QQVJBTExFTCBpbnN0ZWFkIG9mIHBhcmFsbGVsX2NwdXMKOGFlOWMzNzY1NSB0
+YXJnZXQvYXJtOiBjaGVjayBDRl9QQVJBTExFTCBpbnN0ZWFkIG9mIHBhcmFsbGVsX2NwdXMKYzY5
+MDNmNjFiOCB0Y2c6IGNvbnZlcnQgdGItPmNmbGFncyByZWFkcyB0byB0Yl9jZmxhZ3ModGIpCjg1
+N2U5YmFjZTcgdGNnOiBJbmNsdWRlIENGX0NPVU5UX01BU0sgaW4gQ0ZfSEFTSF9NQVNLCjY2NGMw
+YTk4OGYgdGNnOiBBZGQgQ1BVU3RhdGUgY2ZsYWdzX25leHRfdGIKZDAwYTE3MDhkNCB0Y2c6IGRl
+ZmluZSBDRl9QQVJBTExFTCBhbmQgdXNlIGl0IGZvciBUQiBoYXNoaW5nIGFsb25nIHdpdGggQ0Zf
+Q09VTlRfTUFTSwphYjY2MzZmYWNjIHRjZzogVXNlIG9mZnNldHMgbm90IGluZGljZXMgZm9yIFRD
+R3ZfKgoxNThhOWVmNzI3IHFvbTogSW50cm9kdWNlIENQVUNsYXNzLnRjZ19pbml0aWFsaXplCjJj
+MzgzNmJjODAgdGNnOiBSZW1vdmUgVENHVl9FUVVBTCoKMzdiYThjZThlOSB0Y2c6IFJlbW92ZSBH
+RVRfVENHVl8qIGFuZCBNQUtFX1RDR1ZfKgphYzFiY2FjNmM5IHRjZzogSW50cm9kdWNlIHRlbXBf
+dGNndl97aTMyLGk2NCxwdHJ9CjdhMjY2OGZhMTggdGNnOiBJbnRyb2R1Y2UgdGNndl97aTMyLCBp
+NjQsIHB0cn1fe2FyZywgdGVtcH0KNTA3MTJmZDM4YiB0Y2c6IFB1c2ggdGNnX2N0eCBpbnRvIHRj
+Z19nZW5fY2FsbE4KOWUwMTE1M2QwNSB0Y2c6IFB1c2ggdGNnX2N0eCBpbnRvIGdlbmVyYXRvciBm
+dW5jdGlvbnMKODQ5NmE1MjM2YiB0Y2c6IFVzZSBwZXItdGVtcCBzdGF0ZSBkYXRhIGluIG9wdGlt
+aXplCjgxOGI4YWI1MWYgdGNnOiBSZW1vdmUgdW51c2VkIFRDR19DQUxMX0RVTU1ZX1RDR1YKNzJi
+YmIwNDcwMiB0Y2c6IENoYW5nZSB0ZW1wX2FsbG9jYXRlX2ZyYW1lIGFyZyB0byBUQ0dUZW1wCjdk
+MzU2MDQyNjIgdGNnOiBBdm9pZCBsb29wcyBhZ2FpbnN0IHZhcmlhYmxlIGJvdW5kcwpmYTI5NTlj
+NWNhIHRjZzogVXNlIHBlci10ZW1wIHN0YXRlIGRhdGEgaW4gbGl2ZW5lc3MKOTg4ZDFiMTM3OCB0
+Y2c6IEludHJvZHVjZSB0ZW1wX2FyZywgZXhwb3J0IHRlbXBfaWR4CmQyNzVlOGM5OTYgdGNnOiBS
+ZXR1cm4gTlVMTCB0ZW1wIGZvciBUQ0dfQ0FMTF9EVU1NWV9BUkcKOWE2ZmQ5NGNiNCB0Y2c6IEFk
+ZCB0ZW1wX2dsb2JhbCBiaXQgdG8gVENHVGVtcAoyMWRiOTRlMzdlIHRjZzogSW50cm9kdWNlIGFy
+Z190ZW1wCmExZDlkMzgxYjcgdGNnOiBQcm9wYWdhdGUgVENHT3AgZG93biB0byBhbGxvY2F0b3Jz
+CjM3ZTllOWViNjIgdGNnOiBQcm9wYWdhdGUgYXJncyB0byBvcC0+YXJncyBpbiB0Y2cuYwphMzQx
+MzRhYTExIHRjZzogUHJvcGFnYXRlIGFyZ3MgdG8gb3AtPmFyZ3MgaW4gb3B0aW1pemVyCmM5MTJh
+YzQyN2UgdGNnOiBNZXJnZSBvcGNvZGUgYXJndW1lbnRzIGludG8gVENHT3AKCj09PSBPVVRQVVQg
+QkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvNTE6IHRjZzogTWVyZ2Ugb3Bjb2RlIGFyZ3VtZW50
+cyBpbnRvIFRDR09wLi4uCkVSUk9SOiBzcGFjZXMgcHJvaGliaXRlZCBhcm91bmQgdGhhdCAnOicg
+KGN0eDpXeFcpCiM0ODI6IEZJTEU6IHRjZy90Y2cuaDo2MTM6CisgICAgdW5zaWduZWQgY2FsbGkg
+IDogNDsgICAgICAgIC8qIDEyICovCiAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFj
+ZXMgcHJvaGliaXRlZCBhcm91bmQgdGhhdCAnOicgKGN0eDpXeFcpCiM0ODM6IEZJTEU6IHRjZy90
+Y2cuaDo2MTQ6CisgICAgdW5zaWduZWQgY2FsbG8gIDogMjsgICAgICAgIC8qIDE0ICovCiAgICAg
+ICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJlZm9yZSB0aGF0ICc6
+JyAoY3R4Old4VykKIzQ4NDogRklMRTogdGNnL3RjZy5oOjYxNToKKyAgICB1bnNpZ25lZCAgICAg
+ICAgOiAyOyAgICAgICAgLyogMTYgKi8KICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNw
+YWNlcyBwcm9oaWJpdGVkIGFyb3VuZCB0aGF0ICc6JyAoY3R4Old4VykKIzQ4OTogRklMRTogdGNn
+L3RjZy5oOjYxODoKKyAgICB1bnNpZ25lZCBwcmV2ICAgOiAxNjsgICAgICAgLyogMzIgKi8KICAg
+ICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlcyBwcm9oaWJpdGVkIGFyb3VuZCB0aGF0
+ICc6JyAoY3R4Old4VykKIzQ5MDogRklMRTogdGNnL3RjZy5oOjYxOToKKyAgICB1bnNpZ25lZCBu
+ZXh0ICAgOiAxNjsgICAgICAgLyogNDggKi8KICAgICAgICAgICAgICAgICAgICAgXgoKdG90YWw6
+IDUgZXJyb3JzLCAwIHdhcm5pbmdzLCA0ODUgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMg
+c3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFy
+ZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVD
+S1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMi81MTogdGNnOiBQcm9wYWdh
+dGUgYXJncyB0byBvcC0+YXJncyBpbiBvcHRpbWl6ZXIuLi4KRVJST1I6IHNwYWNlcyByZXF1aXJl
+ZCBhcm91bmQgdGhhdCAnLScgKGN0eDpWeFYpCiM2NDk6IEZJTEU6IHRjZy9vcHRpbWl6ZS5jOjEx
+NjU6CisgICAgICAgICAgICAgICAgdGNnX29wdF9nZW5fbW92KHMsIG9wLCBvcC0+YXJnc1swXSwg
+b3AtPmFyZ3NbNC10bXBdKTsKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgXgoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCA5
+MTIgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSBy
+ZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0
+IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoK
+Q2hlY2tpbmcgUEFUQ0ggMy81MTogdGNnOiBQcm9wYWdhdGUgYXJncyB0byBvcC0+YXJncyBpbiB0
+Y2cuYy4uLgpDaGVja2luZyBQQVRDSCA0LzUxOiB0Y2c6IFByb3BhZ2F0ZSBUQ0dPcCBkb3duIHRv
+IGFsbG9jYXRvcnMuLi4KQ2hlY2tpbmcgUEFUQ0ggNS81MTogdGNnOiBJbnRyb2R1Y2UgYXJnX3Rl
+bXAuLi4KQ2hlY2tpbmcgUEFUQ0ggNi81MTogdGNnOiBBZGQgdGVtcF9nbG9iYWwgYml0IHRvIFRD
+R1RlbXAuLi4KQ2hlY2tpbmcgUEFUQ0ggNy81MTogdGNnOiBSZXR1cm4gTlVMTCB0ZW1wIGZvciBU
+Q0dfQ0FMTF9EVU1NWV9BUkcuLi4KQ2hlY2tpbmcgUEFUQ0ggOC81MTogdGNnOiBJbnRyb2R1Y2Ug
+dGVtcF9hcmcsIGV4cG9ydCB0ZW1wX2lkeC4uLgpDaGVja2luZyBQQVRDSCA5LzUxOiB0Y2c6IFVz
+ZSBwZXItdGVtcCBzdGF0ZSBkYXRhIGluIGxpdmVuZXNzLi4uCldBUk5JTkc6IGxpbmUgb3ZlciA4
+MCBjaGFyYWN0ZXJzCiMxODc6IEZJTEU6IHRjZy90Y2cuYzoxODA4OgorICAgICAgICAgICAgfSBl
+bHNlIGlmIChhcmdfdGVtcChvcC0+YXJnc1swXSktPnN0YXRlID09IFRTX0RFQUQgJiYgaGF2ZV9v
+cGNfbmV3MikgewoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA0NDEgbGluZXMgY2hlY2tl
+ZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkg
+b2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1h
+aW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgpDaGVja2luZyBQQVRDSCAx
+MC81MTogdGNnOiBBdm9pZCBsb29wcyBhZ2FpbnN0IHZhcmlhYmxlIGJvdW5kcy4uLgpDaGVja2lu
+ZyBQQVRDSCAxMS81MTogdGNnOiBDaGFuZ2UgdGVtcF9hbGxvY2F0ZV9mcmFtZSBhcmcgdG8gVENH
+VGVtcC4uLgpDaGVja2luZyBQQVRDSCAxMi81MTogdGNnOiBSZW1vdmUgdW51c2VkIFRDR19DQUxM
+X0RVTU1ZX1RDR1YuLi4KQ2hlY2tpbmcgUEFUQ0ggMTMvNTE6IHRjZzogVXNlIHBlci10ZW1wIHN0
+YXRlIGRhdGEgaW4gb3B0aW1pemUuLi4KQ2hlY2tpbmcgUEFUQ0ggMTQvNTE6IHRjZzogUHVzaCB0
+Y2dfY3R4IGludG8gZ2VuZXJhdG9yIGZ1bmN0aW9ucy4uLgpDaGVja2luZyBQQVRDSCAxNS81MTog
+dGNnOiBQdXNoIHRjZ19jdHggaW50byB0Y2dfZ2VuX2NhbGxOLi4uCkNoZWNraW5nIFBBVENIIDE2
+LzUxOiB0Y2c6IEludHJvZHVjZSB0Y2d2X3tpMzIsIGk2NCwgcHRyfV97YXJnLCB0ZW1wfS4uLgpD
+aGVja2luZyBQQVRDSCAxNy81MTogdGNnOiBJbnRyb2R1Y2UgdGVtcF90Y2d2X3tpMzIsaTY0LHB0
+cn0uLi4KQ2hlY2tpbmcgUEFUQ0ggMTgvNTE6IHRjZzogUmVtb3ZlIEdFVF9UQ0dWXyogYW5kIE1B
+S0VfVENHVl8qLi4uCkNoZWNraW5nIFBBVENIIDE5LzUxOiB0Y2c6IFJlbW92ZSBUQ0dWX0VRVUFM
+Ki4uLgpDaGVja2luZyBQQVRDSCAyMC81MTogcW9tOiBJbnRyb2R1Y2UgQ1BVQ2xhc3MudGNnX2lu
+aXRpYWxpemUuLi4KQ2hlY2tpbmcgUEFUQ0ggMjEvNTE6IHRjZzogVXNlIG9mZnNldHMgbm90IGlu
+ZGljZXMgZm9yIFRDR3ZfKi4uLgpDaGVja2luZyBQQVRDSCAyMi81MTogdGNnOiBkZWZpbmUgQ0Zf
+UEFSQUxMRUwgYW5kIHVzZSBpdCBmb3IgVEIgaGFzaGluZyBhbG9uZyB3aXRoIENGX0NPVU5UX01B
+U0suLi4KQ2hlY2tpbmcgUEFUQ0ggMjMvNTE6IHRjZzogQWRkIENQVVN0YXRlIGNmbGFnc19uZXh0
+X3RiLi4uCkNoZWNraW5nIFBBVENIIDI0LzUxOiB0Y2c6IEluY2x1ZGUgQ0ZfQ09VTlRfTUFTSyBp
+biBDRl9IQVNIX01BU0suLi4KQ2hlY2tpbmcgUEFUQ0ggMjUvNTE6IHRjZzogY29udmVydCB0Yi0+
+Y2ZsYWdzIHJlYWRzIHRvIHRiX2NmbGFncyh0YikuLi4KRVJST1I6IHJldHVybiBpcyBub3QgYSBm
+dW5jdGlvbiwgcGFyZW50aGVzZXMgYXJlIG5vdCByZXF1aXJlZAojMTAzOiBGSUxFOiB0YXJnZXQv
+YWxwaGEvdHJhbnNsYXRlLmM6NDU4OgorICAgIHJldHVybiAoKHRiX2NmbGFncyhjdHgtPmJhc2Uu
+dGIpICYgQ0ZfTEFTVF9JTykKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMyMTk6
+IEZJTEU6IHRhcmdldC9ocHBhL3RyYW5zbGF0ZS5jOjQ3MjoKKyAgICBpZiAoKHRiX2NmbGFncyhj
+dHgtPmJhc2UudGIpICYgQ0ZfTEFTVF9JTykgfHwgY3R4LT5iYXNlLnNpbmdsZXN0ZXBfZW5hYmxl
+ZCkgewoKdG90YWw6IDEgZXJyb3JzLCAxIHdhcm5pbmdzLCA5MjQgbGluZXMgY2hlY2tlZAoKWW91
+ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhl
+c2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWlu
+ZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMjYvNTE6
+IHRhcmdldC9hcm06IGNoZWNrIENGX1BBUkFMTEVMIGluc3RlYWQgb2YgcGFyYWxsZWxfY3B1cy4u
+LgpDaGVja2luZyBQQVRDSCAyNy81MTogdGFyZ2V0L2hwcGE6IGNoZWNrIENGX1BBUkFMTEVMIGlu
+c3RlYWQgb2YgcGFyYWxsZWxfY3B1cy4uLgpDaGVja2luZyBQQVRDSCAyOC81MTogdGFyZ2V0L2kz
+ODY6IGNoZWNrIENGX1BBUkFMTEVMIGluc3RlYWQgb2YgcGFyYWxsZWxfY3B1cy4uLgpXQVJOSU5H
+OiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMjM6IEZJTEU6IHRhcmdldC9pMzg2L3RyYW5zbGF0
+ZS5jOjUzMTA6CisgICAgICAgICAgICBpZiAoKHMtPnByZWZpeCAmIFBSRUZJWF9MT0NLKSAmJiAo
+dGJfY2ZsYWdzKHMtPmJhc2UudGIpICYgQ0ZfUEFSQUxMRUwpKSB7CgpXQVJOSU5HOiBsaW5lIG92
+ZXIgODAgY2hhcmFjdGVycwojMzI6IEZJTEU6IHRhcmdldC9pMzg2L3RyYW5zbGF0ZS5jOjUzMjE6
+CisgICAgICAgICAgICBpZiAoKHMtPnByZWZpeCAmIFBSRUZJWF9MT0NLKSAmJiAodGJfY2ZsYWdz
+KHMtPmJhc2UudGIpICYgQ0ZfUEFSQUxMRUwpKSB7Cgp0b3RhbDogMCBlcnJvcnMsIDIgd2Fybmlu
+Z3MsIDE2IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVh
+c2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJl
+cG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVS
+Uy4KQ2hlY2tpbmcgUEFUQ0ggMjkvNTE6IHRhcmdldC9tNjhrOiBjaGVjayBDRl9QQVJBTExFTCBp
+bnN0ZWFkIG9mIHBhcmFsbGVsX2NwdXMuLi4KQ2hlY2tpbmcgUEFUQ0ggMzAvNTE6IHRhcmdldC9z
+MzkweDogY2hlY2sgQ0ZfUEFSQUxMRUwgaW5zdGVhZCBvZiBwYXJhbGxlbF9jcHVzLi4uCkNoZWNr
+aW5nIFBBVENIIDMxLzUxOiB0YXJnZXQvc2g0OiBjaGVjayBDRl9QQVJBTExFTCBpbnN0ZWFkIG9m
+IHBhcmFsbGVsX2NwdXMuLi4KQ2hlY2tpbmcgUEFUQ0ggMzIvNTE6IHRhcmdldC9zcGFyYzogY2hl
+Y2sgQ0ZfUEFSQUxMRUwgaW5zdGVhZCBvZiBwYXJhbGxlbF9jcHVzLi4uCkNoZWNraW5nIFBBVENI
+IDMzLzUxOiB0Y2c6IGNoZWNrIENGX1BBUkFMTEVMIGluc3RlYWQgb2YgcGFyYWxsZWxfY3B1cy4u
+LgpDaGVja2luZyBQQVRDSCAzNC81MTogY3B1LWV4ZWM6IGxvb2t1cC9nZW5lcmF0ZSBUQiBvdXRz
+aWRlIGV4Y2x1c2l2ZSByZWdpb24gZHVyaW5nIHN0ZXBfYXRvbWljLi4uCkNoZWNraW5nIFBBVENI
+IDM1LzUxOiB0Y2c6IEFkZCBDRl9MQVNUX0lPICsgQ0ZfVVNFX0lDT1VOVCB0byBDRl9IQVNIX01B
+U0suLi4KQ2hlY2tpbmcgUEFUQ0ggMzYvNTE6IHRjZzogUmVtb3ZlIENGX0lHTk9SRV9JQ09VTlQu
+Li4KQ2hlY2tpbmcgUEFUQ0ggMzcvNTE6IHRyYW5zbGF0ZS1hbGw6IHVzZSBhIGJpbmFyeSBzZWFy
+Y2ggdHJlZSB0byB0cmFjayBUQnMgaW4gVEJDb250ZXh0Li4uCkNoZWNraW5nIFBBVENIIDM4LzUx
+OiBleGVjLWFsbDogcmVuYW1lIHRiX2ZyZWUgdG8gdGJfcmVtb3ZlLi4uCkNoZWNraW5nIFBBVENI
+IDM5LzUxOiB0cmFuc2xhdGUtYWxsOiByZXBvcnQgY29ycmVjdCBhdmcgaG9zdCBUQiBzaXplLi4u
+CkNoZWNraW5nIFBBVENIIDQwLzUxOiB0Y2c6IHRha2UgdGJfY3R4IG91dCBvZiBUQ0dDb250ZXh0
+Li4uCkNoZWNraW5nIFBBVENIIDQxLzUxOiB0Y2c6IGRlZmluZSB0Y2dfaW5pdF9jdHggYW5kIG1h
+a2UgdGNnX2N0eCBhIHBvaW50ZXIuLi4KQ2hlY2tpbmcgUEFUQ0ggNDIvNTE6IGdlbi1pY291bnQ6
+IGZvbGQgZXhpdHJlcV9sYWJlbCBpbnRvIFRDR0NvbnRleHQuLi4KQ2hlY2tpbmcgUEFUQ0ggNDMv
+NTE6IHRjZzogaW50cm9kdWNlICoqdGNnX2N0eHMgdG8ga2VlcCB0cmFjayBvZiBhbGwgVENHQ29u
+dGV4dCdzLi4uCkNoZWNraW5nIFBBVENIIDQ0LzUxOiB0Y2c6IGRpc3RyaWJ1dGUgcHJvZmlsaW5n
+IGNvdW50ZXJzIGFjcm9zcyBUQ0dDb250ZXh0J3MuLi4KQ2hlY2tpbmcgUEFUQ0ggNDUvNTE6IHRj
+ZzogYWxsb2NhdGUgb3B0aW1pemVyIHRlbXBzIHdpdGggdGNnX21hbGxvYy4uLgpDaGVja2luZyBQ
+QVRDSCA0Ni81MTogb3NkZXA6IGludHJvZHVjZSBxZW11X21wcm90ZWN0X3J3eC9ub25lLi4uCkNo
+ZWNraW5nIFBBVENIIDQ3LzUxOiB0cmFuc2xhdGUtYWxsOiB1c2UgcWVtdV9wcm90ZWN0X3J3eC9u
+b25lIGhlbHBlcnMuLi4KQ2hlY2tpbmcgUEFUQ0ggNDgvNTE6IHRjZzogaW50cm9kdWNlIHJlZ2lv
+bnMgdG8gc3BsaXQgY29kZV9nZW5fYnVmZmVyLi4uCkNoZWNraW5nIFBBVENIIDQ5LzUxOiB0Y2c6
+IGVuYWJsZSBtdWx0aXBsZSBUQ0cgY29udGV4dHMgaW4gc29mdG1tdS4uLgpDaGVja2luZyBQQVRD
+SCA1MC81MTogdGNnOiBJbml0aWFsaXplIGNwdV9lbnYgZ2VuZXJpY2FsbHkuLi4KRVJST1I6IGRv
+IG5vdCBpbml0aWFsaXNlIGdsb2JhbHMgdG8gMCBvciBOVUxMCiM2NDU6IEZJTEU6IHRjZy90Y2cu
+YzoxMjQ6CitUQ0d2X2VudiBjcHVfZW52ID0gMDsKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5n
+cywgNTY3IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVh
+c2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJl
+cG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVS
+Uy4KCkNoZWNraW5nIFBBVENIIDUxLzUxOiB0cmFuc2xhdGUtYWxsOiBleGl0IGZyb20gdGJfcGh5
+c19pbnZhbGlkYXRlIGlmIHFodF9yZW1vdmUgZmFpbHMuLi4KPT09IE9VVFBVVCBFTkQgPT09CgpU
+ZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0
+b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQg
+eW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
