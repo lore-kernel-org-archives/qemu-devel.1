@@ -1,15 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44069)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57113)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zachriggle@gmail.com>) id 1e78JX-0008Mp-Gw
-	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 19:08:52 -0400
+	(envelope-from <sundeep.lkml@gmail.com>) id 1e7BRZ-0006HE-GF
+	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 22:29:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zachriggle@gmail.com>) id 1e78JW-0002ix-Dx
-	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 19:08:51 -0400
-From: Zach Riggle <zachriggle@gmail.com>
-Date: Tue, 24 Oct 2017 18:07:58 -0500
-Message-Id: <20171024230758.31779-1-riggle@google.com>
-Subject: [Qemu-devel] [PATCH] linux-user: fix is_proc_myself to check the
- paths via realpath
+	(envelope-from <sundeep.lkml@gmail.com>) id 1e7BRW-0007Cl-Bp
+	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 22:29:21 -0400
+From: Subbaraya Sundeep <sundeep.lkml@gmail.com>
+Date: Wed, 25 Oct 2017 07:59:04 +0530
+Message-Id: <1508898544-10307-1-git-send-email-sundeep.lkml@gmail.com>
+Subject: [Qemu-devel] [Qemu devel V4 PATCH] msf2: Remove dead code reported
+ by Coverity
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,80 +18,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Zach Riggle <zachriggle@gmail.com>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, "open list:All patches CC here" <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org, qemu-arm@nongnu.org
+Cc: peter.maydell@linaro.org, crosthwaite.peter@gmail.com, alistair23@gmail.com, f4bug@amsat.org, imammedo@redhat.com, pbonzini@redhat.com, darren.kenny@oracle.com, Subbaraya Sundeep <sundeep.lkml@gmail.com>
 
-From: Zach Riggle <zachriggle@gmail.com>
+Fixed incorrect frame size mask, validated maximum frame
+size in spi_write and removed dead code.
 
-Previously, it was possible to get a handle to the "real" /proc/self/mem
-by creating a symlink to it and opening the symlink, or opening e.g.
-"./mem" after chdir'ing to "/proc/self".
-
-    $ ln -s /proc/self self
-    $ cat self/maps
-    60000000-602bc000 r-xp 00000000 fc:01 270375                             /usr/bin/qemu-arm-static
-    604bc000-6050f000 rw-p 002bc000 fc:01 270375                             /usr/bin/qemu-arm-static
-    ...
-
-Signed-off-by: Zach Riggle <zachriggle@gmail.com>
+Signed-off-by: Subbaraya Sundeep <sundeep.lkml@gmail.com>
 ---
- linux-user/syscall.c | 44 +++++++++++++++++++++++++-------------------
- 1 file changed, 25 insertions(+), 19 deletions(-)
+v4:
+	changed %d to %u while logging frame size error.
+v3:
+	Added comment that [31:6] bits are reserved in R_SPI_DFSIZE
+	register and logged incorrect value too in guest error(suggested
+	by Darren).
+v2:
+	else if -> else in set_fifodepth
+	log guest error when frame size is more than 32
 
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 9bf901fa11..8fef3bb28e 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -7496,26 +7496,32 @@ static int open_self_auxv(void *cpu_env, int fd)
+ hw/ssi/mss-spi.c | 18 ++++++++++++++----
+ 1 file changed, 14 insertions(+), 4 deletions(-)
 
- static int is_proc_myself(const char *filename, const char *entry)
+diff --git a/hw/ssi/mss-spi.c b/hw/ssi/mss-spi.c
+index 5a8e308..d60daba 100644
+--- a/hw/ssi/mss-spi.c
++++ b/hw/ssi/mss-spi.c
+@@ -76,9 +76,10 @@
+ #define C_BIGFIFO            (1 << 29)
+ #define C_RESET              (1 << 31)
+ 
+-#define FRAMESZ_MASK         0x1F
++#define FRAMESZ_MASK         0x3F
+ #define FMCOUNT_MASK         0x00FFFF00
+ #define FMCOUNT_SHIFT        8
++#define FRAMESZ_MAX          32
+ 
+ static void txfifo_reset(MSSSpiState *s)
  {
--    if (!strncmp(filename, "/proc/", strlen("/proc/"))) {
--        filename += strlen("/proc/");
--        if (!strncmp(filename, "self/", strlen("self/"))) {
--            filename += strlen("self/");
--        } else if (*filename >= '1' && *filename <= '9') {
--            char myself[80];
--            snprintf(myself, sizeof(myself), "%d/", getpid());
--            if (!strncmp(filename, myself, strlen(myself))) {
--                filename += strlen(myself);
--            } else {
--                return 0;
--            }
--        } else {
--            return 0;
--        }
--        if (!strcmp(filename, entry)) {
--            return 1;
--        }
-+    char proc_self_entry[PATH_MAX + 1];
-+    char proc_self_entry_realpath[PATH_MAX + 1];
-+    char filename_realpath[PATH_MAX + 1];
-+
-+    if(PATH_MAX < snprintf(proc_self_entry, sizeof(proc_self_entry), "/proc/self/%s", entry)) {
-+        /* Full path to "entry" is too long to fit in the buffer */
-+        return 0;
+@@ -104,10 +105,8 @@ static void set_fifodepth(MSSSpiState *s)
+         s->fifo_depth = 32;
+     } else if (size <= 16) {
+         s->fifo_depth = 16;
+-    } else if (size <= 32) {
+-        s->fifo_depth = 8;
+     } else {
+-        s->fifo_depth = 4;
++        s->fifo_depth = 8;
      }
--    return 0;
-+
-+    if (!realpath(filename, filename_realpath)) {
-+        /* File does not exist, or can't be canonicalized */
-+        return 0;
-+    }
-+
-+    if (!realpath(proc_self_entry, proc_self_entry_realpath)) {
-+        /* Procfs entry does not exist */
-+        return 0;
-+    }
-+
-+    if (strcmp(filename_realpath, proc_self_entry_realpath) != 0) {
-+        /* Paths are different */
-+        return 0;
-+    }
-+
-+    /* filename refers to /proc/self/<entry> */
-+    return 1;
  }
-
- #if defined(HOST_WORDS_BIGENDIAN) != defined(TARGET_WORDS_BIGENDIAN)
---
-2.14.3
+ 
+@@ -301,6 +300,17 @@ static void spi_write(void *opaque, hwaddr addr,
+         if (s->enabled) {
+             break;
+         }
++        /*
++         * [31:6] bits are reserved bits and for future use.
++         * [5:0] are for frame size. Only [5:0] bits are validated
++         * during write, [31:6] bits are untouched.
++         */
++        if ((value & FRAMESZ_MASK) > FRAMESZ_MAX) {
++            qemu_log_mask(LOG_GUEST_ERROR, "%s: Incorrect size %u provided."
++                         "Maximum frame size is %u\n",
++                         __func__, value & FRAMESZ_MASK, FRAMESZ_MAX);
++            break;
++        }
+         s->regs[R_SPI_DFSIZE] = value;
+         break;
+ 
+-- 
+2.5.0
