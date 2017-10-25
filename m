@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43710)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43675)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1e7O5z-0000Ti-TK
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1e7O5y-0000Te-QV
 	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 11:59:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1e7O5y-00072S-Qf
-	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 11:59:55 -0400
-Received: from chuckie.co.uk ([82.165.15.123]:58402
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1e7O5w-0006z7-6r
+	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 11:59:54 -0400
+Received: from chuckie.co.uk ([82.165.15.123]:58382
 	helo=s16892447.onlinehome-server.info)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1e7O5y-00071a-Jt
-	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 11:59:54 -0400
+	id 1e7O5w-0006sN-0V
+	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 11:59:52 -0400
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Wed, 25 Oct 2017 16:59:21 +0100
-Message-Id: <1508947167-5304-8-git-send-email-mark.cave-ayland@ilande.co.uk>
-In-Reply-To: <1508947167-5304-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-References: <1508947167-5304-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCHv4 07/13] esp: move TYPE_ESP and SysBusESPState
- from esp.c to esp.h
+Date: Wed, 25 Oct 2017 16:59:14 +0100
+Message-Id: <1508947167-5304-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCHv4 00/13] sun4m: sparc32_dma tidy-ups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,74 +27,62 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, atar4qemu@gmail.com
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-This enables them to be used outside of esp.c.
+This patchset aims to tidy-up the sparc32_dma code by improving the
+modelling of the espdma/ledma devices using both QOM and the memory
+API which didn't exist when the code was first written.
+
+The result is that it is now possible to remove both the iommu_opaque
+and is_ledma workarounds from the code, and the code for wiring up
+the espdma/ledma and respective devices is also a lot more readable.
 
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-CC: Paolo Bonzini <pbonzini@redhat.com>
-Reviewed-by: Artyom Tarasenko <atar4qemu@gmail.com>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
----
- hw/scsi/esp.c         |   13 -------------
- include/hw/scsi/esp.h |   14 ++++++++++++++
- 2 files changed, 14 insertions(+), 13 deletions(-)
 
-diff --git a/hw/scsi/esp.c b/hw/scsi/esp.c
-index 22c2d91..ee586e7 100644
---- a/hw/scsi/esp.c
-+++ b/hw/scsi/esp.c
-@@ -592,19 +592,6 @@ const VMStateDescription vmstate_esp = {
-     }
- };
- 
--#define TYPE_ESP "esp"
--#define ESP_STATE(obj) OBJECT_CHECK(SysBusESPState, (obj), TYPE_ESP)
--
--typedef struct {
--    /*< private >*/
--    SysBusDevice parent_obj;
--    /*< public >*/
--
--    MemoryRegion iomem;
--    uint32_t it_shift;
--    ESPState esp;
--} SysBusESPState;
--
- static void sysbus_esp_mem_write(void *opaque, hwaddr addr,
-                                  uint64_t val, unsigned int size)
- {
-diff --git a/include/hw/scsi/esp.h b/include/hw/scsi/esp.h
-index d2c4886..3b160f8 100644
---- a/include/hw/scsi/esp.h
-+++ b/include/hw/scsi/esp.h
-@@ -2,6 +2,7 @@
- #define QEMU_HW_ESP_H
- 
- #include "hw/scsi/scsi.h"
-+#include "hw/sysbus.h"
- 
- /* esp.c */
- #define ESP_MAX_DEVS 7
-@@ -52,6 +53,19 @@ struct ESPState {
-     void (*dma_cb)(ESPState *s);
- };
- 
-+#define TYPE_ESP "esp"
-+#define ESP_STATE(obj) OBJECT_CHECK(SysBusESPState, (obj), TYPE_ESP)
-+
-+typedef struct {
-+    /*< private >*/
-+    SysBusDevice parent_obj;
-+    /*< public >*/
-+
-+    MemoryRegion iomem;
-+    uint32_t it_shift;
-+    ESPState esp;
-+} SysBusESPState;
-+
- #define ESP_TCLO   0x0
- #define ESP_TCMID  0x1
- #define ESP_FIFO   0x2
+v4:
+- Rebase onto git master
+- Update patch 9 to move lance QOM macros/SysBusPCNetState from sun4m.h to lance.h as suggested by Peter
+- Add Reviewed-by from Peter for patch 7
+
+v3:
+- Add missing sysbus.h include to esp.h in patch 7
+
+v2:
+- Make esp/lance devices children of espdma/ledma devices respectively
+- Add len parameter to ledma/espdma tracepoints
+
+
+Mark Cave-Ayland (13):
+  sparc32_dma: rename SPARC32_DMA type to SPARC32_DMA_DEVICE
+  sparc32_dma: split esp and le into separate DMA devices
+  sparc32_dma: move type declarations from sparc32_dma.c to
+    sparc32_dma.h
+  sun4m: move DMA device wiring from sparc32_dma_init() to
+    sun4m_hw_init()
+  sun4m_iommu: move TYPE_SUN4M_IOMMU declaration to sun4m.h
+  sparc32_dma: use object link instead of qdev property to pass IOMMU
+    reference
+  esp: move TYPE_ESP and SysBusESPState from esp.c to esp.h
+  sparc32_dma: make esp device child of espdma device
+  lance: move TYPE_LANCE and SysBusPCNetState from lance.c to lance.h
+  sparc32_dma: make lance device child of ledma device
+  sparc32_dma: introduce new SPARC32_DMA type container object
+  sparc32_dma: remove is_ledma hack and replace with memory region
+    alias
+  sparc32_dma: add len to esp/le DMA memory tracing
+
+ hw/dma/sparc32_dma.c           |  235 +++++++++++++++++++++++++++++-----------
+ hw/dma/sun4m_iommu.c           |   14 ---
+ hw/dma/trace-events            |    8 +-
+ hw/net/lance.c                 |   11 +-
+ hw/scsi/esp.c                  |   13 ---
+ hw/sparc/sun4m.c               |   82 ++++++--------
+ include/hw/net/lance.h         |   41 +++++++
+ include/hw/scsi/esp.h          |   14 +++
+ include/hw/sparc/sparc32_dma.h |   55 ++++++++++
+ include/hw/sparc/sun4m.h       |   16 +++
+ 10 files changed, 336 insertions(+), 153 deletions(-)
+ create mode 100644 include/hw/net/lance.h
+
 -- 
 1.7.10.4
