@@ -1,37 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52379)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52501)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e7E2G-0002m4-97
-	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 01:15:27 -0400
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e7E2S-0002t1-IC
+	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 01:15:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e7E2D-0002G0-1t
-	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 01:15:24 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:56330)
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e7E2P-0002OH-C5
+	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 01:15:36 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:55566
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1e7E2C-0002Ed-LC
-	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 01:15:20 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v9P5Dxgf103789
-	for <qemu-devel@nongnu.org>; Wed, 25 Oct 2017 01:15:14 -0400
-Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2dte19f5jw-1
+	id 1e7E2P-0002Nk-6O
+	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 01:15:33 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v9P5FUuP048462
+	for <qemu-devel@nongnu.org>; Wed, 25 Oct 2017 01:15:31 -0400
+Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2dtj6xr8j9-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 25 Oct 2017 01:15:14 -0400
+	for <qemu-devel@nongnu.org>; Wed, 25 Oct 2017 01:15:29 -0400
 Received: from localhost
-	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Wed, 25 Oct 2017 01:15:13 -0400
+	Wed, 25 Oct 2017 01:15:10 -0400
 From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Wed, 25 Oct 2017 01:14:58 -0400
+Date: Wed, 25 Oct 2017 01:14:56 -0400
 In-Reply-To: <1508908500-25274-1-git-send-email-stefanb@linux.vnet.ibm.com>
 References: <1508908500-25274-1-git-send-email-stefanb@linux.vnet.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Message-Id: <1508908500-25274-4-git-send-email-stefanb@linux.vnet.ibm.com>
+Message-Id: <1508908500-25274-2-git-send-email-stefanb@linux.vnet.ibm.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 3/5] tpm: remove unnecessary #ifdef CONFIG_TPM
+Subject: [Qemu-devel] [PATCH 1/5] tpm: add missing include
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,40 +46,33 @@ Cc: peter.maydell@linaro.org, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@a
 
 From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-Makefile.objs now checks for $(CONFIG_TPM).
+else file including "sysemu/tpm.h" fails to compile:
 
-Suggested-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+  In file included from qemu/stubs/tpm.c:2:0:
+  qemu/include/sysemu/tpm.h:36:19: error: implicit declaration of functio=
+n =E2=80=98object_resolve_path_type=E2=80=99 [-Werror=3Dimplicit-function=
+-declaration]
+       Object *obj =3D object_resolve_path_type("", TYPE_TPM_TIS, NULL);
+                     ^~~~~~~~~~~~~~~~~~~~~~~~
+
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Reviewed-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Reviewed-by: Juan Quintela <quintela@redhat.com>
+Tested-by: Richard W.M. Jones <rjones@redhat.com>
 Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
 ---
- tpm.c | 4 ----
- 1 file changed, 4 deletions(-)
+ include/sysemu/tpm.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/tpm.c b/tpm.c
-index 45520f5..ab5d29e 100644
---- a/tpm.c
-+++ b/tpm.c
-@@ -30,8 +30,6 @@ void tpm_register_model(enum TpmModel model)
-     tpm_models[model] =3D true;
- }
+diff --git a/include/sysemu/tpm.h b/include/sysemu/tpm.h
+index c8afa17..d7a2bd8 100644
+--- a/include/sysemu/tpm.h
++++ b/include/sysemu/tpm.h
+@@ -13,6 +13,7 @@
+ #define QEMU_TPM_H
 =20
--#ifdef CONFIG_TPM
--
- static const TPMBackendClass *
- tpm_be_find_by_type(enum TpmType type)
- {
-@@ -192,8 +190,6 @@ int tpm_config_parse(QemuOptsList *opts_list, const c=
-har *optarg)
-     return 0;
- }
+ #include "qemu/option.h"
++#include "qom/object.h"
 =20
--#endif /* CONFIG_TPM */
--
- /*
-  * Walk the list of active TPM backends and collect information about th=
-em
-  * following the schema description in qapi-schema.json.
+ typedef struct TPMState TPMState;
+=20
 --=20
 2.5.5
