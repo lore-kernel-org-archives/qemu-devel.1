@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47940)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33927)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=4640428ab=anthony.perard@citrix.com>)
-	id 1e7JIq-000402-6s
-	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 06:52:53 -0400
+	(envelope-from <batmanustc@gmail.com>) id 1e7KDX-0005ci-LT
+	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 07:51:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=4640428ab=anthony.perard@citrix.com>)
-	id 1e7JIn-0003k5-5G
-	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 06:52:52 -0400
-Received: from smtp02.citrix.com ([66.165.176.63]:44176)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=4640428ab=anthony.perard@citrix.com>)
-	id 1e7JIm-0003jA-T6
-	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 06:52:49 -0400
-Date: Wed, 25 Oct 2017 11:52:35 +0100
-From: Anthony PERARD <anthony.perard@citrix.com>
-Message-ID: <20171025105235.GI1885@perard.uk.xensource.com>
-References: <20171020082538.17124-1-pbonzini@redhat.com>
+	(envelope-from <batmanustc@gmail.com>) id 1e7KDV-00030g-Kh
+	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 07:51:27 -0400
+Received: from mail-qk0-x236.google.com ([2607:f8b0:400d:c09::236]:46503)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <batmanustc@gmail.com>)
+	id 1e7KDV-000302-Dr
+	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 07:51:25 -0400
+Received: by mail-qk0-x236.google.com with SMTP id k123so30097252qke.3
+	for <qemu-devel@nongnu.org>; Wed, 25 Oct 2017 04:51:25 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20171020082538.17124-1-pbonzini@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] pci-assign: Remove
+In-Reply-To: <20171025104438.GA3107@work-vm>
+References: <CAOE=1Z2jr8qrXnHe1nRVCTvuAQbVyJSoUbM=1aWbhw2m2pPmSw@mail.gmail.com>
+	<20171025104438.GA3107@work-vm>
+From: Sam <batmanustc@gmail.com>
+Date: Wed, 25 Oct 2017 19:51:24 +0800
+Message-ID: <CAOE=1Z1VW9Ca+n8xcovqDs+EaS0GnCx2TF1ZHqt7zcKRv8pc0g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] Why qemu log start late and qemu start guest so
+ long while using '-mem-prealloc' option?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,66 +30,175 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Fri, Oct 20, 2017 at 10:25:38AM +0200, Paolo Bonzini wrote:
-> Legacy PCI device assignment has been removed from Linux in 4.12,
-> and had been deprecated 2 years ago there.  We can remove it from
-> QEMU as well.
-> 
-> The ROM loading code was shared with Xen PCI passthrough, so move
-> it to hw/xen.
-> 
-> Cc: Stefano Stabellini <sstabellini@kernel.org>
-> Cc: Anthony Perard <anthony.perard@citrix.com>
-> Cc: xen-devel@lists.xenproject.org
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->         Xen parts only compile-tested.
-> 
->  docs/qdev-device-use.txt                           |   12 +-
->  hw/i386/Makefile.objs                              |    1 -
->  hw/i386/kvm/Makefile.objs                          |    2 +-
->  hw/i386/kvm/pci-assign.c                           | 1883 --------------------
->  hw/xen/Makefile.objs                               |    1 +
->  .../xen_pt_load_rom.c}                             |    4 +-
->  include/hw/pci/pci-assign.h                        |   27 -
->  qdev-monitor.c                                     |    1 -
->  scripts/device-crash-test                          |    2 -
->  9 files changed, 6 insertions(+), 1927 deletions(-)
->  delete mode 100644 hw/i386/kvm/pci-assign.c
->  rename hw/{i386/pci-assign-load-rom.c => xen/xen_pt_load_rom.c} (96%)
->  delete mode 100644 include/hw/pci/pci-assign.h
-> 
-> diff --git a/hw/i386/pci-assign-load-rom.c b/hw/xen/xen_pt_load_rom.c
-> similarity index 96%
-> rename from hw/i386/pci-assign-load-rom.c
-> rename to hw/xen/xen_pt_load_rom.c
-> index 43429b66be..2bc3b6c092 100644
-> --- a/hw/i386/pci-assign-load-rom.c
-> +++ b/hw/xen/xen_pt_load_rom.c
-> @@ -12,7 +12,7 @@
->  #include "qemu/range.h"
->  #include "sysemu/sysemu.h"
->  #include "hw/pci/pci.h"
-> -#include "hw/pci/pci-assign.h"
-> +#include "xen_pt.h"
->  
->  /*
->   * Scan the assigned devices for the devices that have an option ROM, and then
-> @@ -80,7 +80,7 @@ close_rom:
->      fseek(fp, 0, SEEK_SET);
->      val = 0;
->      if (!fwrite(&val, 1, 1, fp)) {
-> -        DEBUG("%s\n", "Failed to disable pci-sysfs rom file");
-> +        XEN_PT_WARN("%s\n", "Failed to disable pci-sysfs rom file");
+So if I remove '-mem-prealloc' option, the qemu will not mmap while
+starting guest vm? Or will mmap after some thing? Or will mmap when admin
+to trigger it by qemu command?
 
-XEN_PT_WARN takes an extra argument, it should read:
-XEN_PT_WARN(dev, "%s\n", "Failed to disable pci-sysfs rom file");
+2017-10-25 18:44 GMT+08:00 Dr. David Alan Gilbert <dgilbert@redhat.com>:
 
-With that fixed:
-Acked-by: Anthony PERARD <anthony.perard@citrix.com>
-
--- 
-Anthony PERARD
+> * Sam (batmanustc@gmail.com) wrote:
+> > Hi all,
+> >
+> > I'm using qemu to start vm in huge page enviroment, I use CMD1 and CMD2
+> to
+> > test the time of start of a vm, CMD1 contains option '-mem-prealloc',
+> CMD2
+> > does not contain this.
+> >
+> > I found while using CMD1, the time to run this command is longer then
+> CMD2.
+> > For words, I know this option is to wait memory ready, but for code, I
+> > don't know where is the different with CMD1 and CMD2.
+> >
+> > As I print log of CMD1 and CMD2, I found for CMD1, there are about 10
+> > second to print first log. I don't know for '-mem-prealloc' option, what
+> > qemu wait for? thank you~
+>
+> It's waiting for the kernel to allocate that 40GB of RAM that you asked
+> for, and as huge pages.
+>
+> If you strace  it you'll probably see it sitting in an madvise or mmap
+> for all the extra time.
+>
+> Dave
+>
+> >
+> > detail of test:
+> >
+> > CMD1="$QEMU_CMD -D qemu.log -trace events=qemu-events-all -enable-kvm
+> -cpu
+> > qemu64,+vmx,+ssse3,+sse4.1,+sse4.2,+x2apic,+aes,+avx,+vme,
+> +pat,+ss,+pclmulqdq,+xsave,level=13
+> > -machine pc,accel=kvm -chardev
+> > socket,id=hmqmondev,port=55908,host=127.0.0.1,nodelay,server,nowait -mon
+> > chardev=hmqmondev,id=hmqmon,mode=readline -rtc
+> > base=utc,clock=host,driftfix=none -usb -device usb-tablet -daemonize
+> > -nodefaults -nodefconfig -no-kvm-pit-reinjection -global
+> > kvm-pit.lost_tick_policy=discard -vga std -k en-us -smp 8 -name
+> > gangyewei-qemutime-1 -m 40960 -boot order=cdn -vnc :8,password -drive
+> > file=$DISK_0,if=none,id=drive_0,format=qcow2,cache=none,aio=native
+> -device
+> > virtio-blk-pci,id=dev_drive_0,drive=drive_0,bus=pci.0,addr=0x5 -drive
+> > file=$DISK_1,if=none,id=drive_1,format=qcow2,cache=none,aio=native
+> -device
+> > virtio-blk-pci,id=dev_drive_1,drive=drive_1,bus=pci.0,addr=0x6 -drive
+> > file=$DISK_2,if=none,id=drive_2,format=qcow2,cache=none,aio=native
+> -device
+> > virtio-blk-pci,id=dev_drive_2,drive=drive_2,bus=pci.0,addr=0x7 -device
+> > ide-cd,drive=ide0-cd0,bus=ide.1,unit=1 -drive
+> > id=ide0-cd0,media=cdrom,if=none -chardev
+> > socket,id=char-n-52b49b80,path=/usr/local/var/run/
+> openvswitch/n-52b49b80,server
+> > -netdev type=vhost-user,id=n-52b49b80,chardev=char-n-52b49b80,
+> vhostforce=on
+> > -device
+> > virtio-net-pci,netdev=n-52b49b80,mac=00:22:52:b4:9b:
+> 80,id=netdev-n-52b49b80,addr=0xf$(nic_speed
+> > 10000) -object
+> > memory-backend-file,id=mem,size=40960M,mem-path=/mnt/huge,share=on -numa
+> > node,memdev=mem -pidfile $PID_FILE -chardev
+> > socket,path=/opt/cloud/workspace/servers/4511f52a-
+> f450-40d3-9417-a1e0a27ed507/qga.sock,server,nowait,id=qga0
+> > -device virtio-serial -device
+> > virtserialport,chardev=qga0,name=org.qemu.guest_agent.0"
+> >
+> > CMD2="$QEMU_CMD -D qemu.log -trace events=qemu-events-all -enable-kvm
+> -cpu
+> > qemu64,+vmx,+ssse3,+sse4.1,+sse4.2,+x2apic,+aes,+avx,+vme,
+> +pat,+ss,+pclmulqdq,+xsave,level=13
+> > -machine pc,accel=kvm -chardev
+> > socket,id=hmqmondev,port=55908,host=127.0.0.1,nodelay,server,nowait -mon
+> > chardev=hmqmondev,id=hmqmon,mode=readline -rtc
+> > base=utc,clock=host,driftfix=none -usb -device usb-tablet -daemonize
+> > -nodefaults -nodefconfig -no-kvm-pit-reinjection -global
+> > kvm-pit.lost_tick_policy=discard -vga std -k en-us -smp 8 -name
+> > gangyewei-qemutime-1 -m 40960 -boot order=cdn -vnc :8,password -drive
+> > file=$DISK_0,if=none,id=drive_0,format=qcow2,cache=none,aio=native
+> -device
+> > virtio-blk-pci,id=dev_drive_0,drive=drive_0,bus=pci.0,addr=0x5 -drive
+> > file=$DISK_1,if=none,id=drive_1,format=qcow2,cache=none,aio=native
+> -device
+> > virtio-blk-pci,id=dev_drive_1,drive=drive_1,bus=pci.0,addr=0x6 -drive
+> > file=$DISK_2,if=none,id=drive_2,format=qcow2,cache=none,aio=native
+> -device
+> > virtio-blk-pci,id=dev_drive_2,drive=drive_2,bus=pci.0,addr=0x7 -device
+> > ide-cd,drive=ide0-cd0,bus=ide.1,unit=1 -drive
+> > id=ide0-cd0,media=cdrom,if=none -chardev
+> > socket,id=char-n-52b49b80,path=/usr/local/var/run/
+> openvswitch/n-52b49b80,server
+> > -netdev type=vhost-user,id=n-52b49b80,chardev=char-n-52b49b80,
+> vhostforce=on
+> > -device
+> > virtio-net-pci,netdev=n-52b49b80,mac=00:22:52:b4:9b:
+> 80,id=netdev-n-52b49b80,addr=0xf$(nic_speed
+> > 10000) -object
+> > memory-backend-file,id=mem,size=40960M,mem-path=/mnt/huge,share=on -numa
+> > node,memdev=mem -mem-prealloc -pidfile $PID_FILE -chardev
+> > socket,path=/opt/cloud/workspace/servers/4511f52a-
+> f450-40d3-9417-a1e0a27ed507/qga.sock,server,nowait,id=qga0
+> > -device virtio-serial -device
+> > virtserialport,chardev=qga0,name=org.qemu.guest_agent.0"
+> >
+> >
+> > time to run CMD1:
+> > [root@yf-mos-test-net14 4511f52a-f450-40d3-9417-a1e0a27ed507]# sh
+> startvm
+> > ls: cannot access
+> > /opt/cloud/workspace/servers/4511f52a-f450-40d3-9417-
+> a1e0a27ed507/STATEFILE*:
+> > No such file or directory
+> > Wed Oct 25 16:52:51 CST 2017  (unix time is 1508921571)
+> > qemu-system-x86_64_2.6.0:qemu-events-all:1045: WARNING: trace event
+> > 'qxl_interface_set_mm_time' is not traceable
+> > qemu-system-x86_64_2.6.0:qemu-events-all:1046: WARNING: trace event
+> > 'qxl_io_write_vga' is not traceable
+> > qemu-system-x86_64_2.6.0:qemu-events-all:1318: WARNING: trace event
+> > 'exec_tb' is not traceable
+> > qemu-system-x86_64_2.6.0:qemu-events-all:1319: WARNING: trace event
+> > 'exec_tb_nocache' is not traceable
+> > qemu-system-x86_64_2.6.0:qemu-events-all:1320: WARNING: trace event
+> > 'exec_tb_exit' is not traceable
+> > qemu-system-x86_64_2.6.0: -no-kvm-pit-reinjection: warning: deprecated,
+> > replaced by -global kvm-pit.lost_tick_policy=discard
+> > Wed Oct 25 16:53:02 CST 2017  (unix time is 1508921582)
+> > qemu started
+> >
+> > first log of CMD1:
+> > 45704@1508921581.767831:qio_channel_socket_new Socket new
+> ioc=0x55555640efd0
+> > I don't know why first log happends in 1508921581, not the start up time,
+> > which is 1508921571.
+> >
+> >
+> > time to run CMD2:
+> > [root@yf-mos-test-net14 4511f52a-f450-40d3-9417-a1e0a27ed507]# sh
+> startvm
+> > ls: cannot access
+> > /opt/cloud/workspace/servers/4511f52a-f450-40d3-9417-
+> a1e0a27ed507/STATEFILE*:
+> > No such file or directory
+> > Wed Oct 25 18:15:35 CST 2017
+> > qemu-system-x86_64_2.6.0:qemu-events-all:1045: WARNING: trace event
+> > 'qxl_interface_set_mm_time' is not traceable
+> > qemu-system-x86_64_2.6.0:qemu-events-all:1046: WARNING: trace event
+> > 'qxl_io_write_vga' is not traceable
+> > qemu-system-x86_64_2.6.0:qemu-events-all:1318: WARNING: trace event
+> > 'exec_tb' is not traceable
+> > qemu-system-x86_64_2.6.0:qemu-events-all:1319: WARNING: trace event
+> > 'exec_tb_nocache' is not traceable
+> > qemu-system-x86_64_2.6.0:qemu-events-all:1320: WARNING: trace event
+> > 'exec_tb_exit' is not traceable
+> > qemu-system-x86_64_2.6.0: -no-kvm-pit-reinjection: warning: deprecated,
+> > replaced by -global kvm-pit.lost_tick_policy=discard
+> > Wed Oct 25 18:15:36 CST 2017
+> > qemu started
+> >
+> > first log of CMD1:
+> > 45167@1508926535.502360:qio_channel_socket_new Socket new
+> ioc=0x55555640efd0
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>
