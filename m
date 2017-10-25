@@ -1,30 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34626)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43121)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e7T8t-000061-2m
-	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 17:23:16 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1e7Tgu-000651-OI
+	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 17:58:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e7T8n-0007OS-Vp
-	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 17:23:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40305)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1e7T8n-0007MO-P2
-	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 17:23:09 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6EB4F7EBDB
-	for <qemu-devel@nongnu.org>; Wed, 25 Oct 2017 21:23:06 +0000 (UTC)
-Date: Wed, 25 Oct 2017 22:23:02 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20171025212302.GE30132@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20171025173526.GE2484@work-vm>
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1e7Tgs-0007DD-0b
+	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 17:58:24 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:43350)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
+	id 1e7Tgr-0007Al-OO
+	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 17:58:21 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v9PLsvgI059917
+	for <qemu-devel@nongnu.org>; Wed, 25 Oct 2017 17:58:16 -0400
+Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2du0kdx6a3-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 25 Oct 2017 17:58:16 -0400
+Received: from localhost
+	by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
+	Wed, 25 Oct 2017 17:58:14 -0400
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20171025173526.GE2484@work-vm>
-Subject: Re: [Qemu-devel] Crash with odd chardev setup
+Content-Transfer-Encoding: quoted-printable
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+In-Reply-To: <20170929233102.4b068e2f@fiorina>
+References: <20170929091122.22726-1-chen_han_xiao@126.com>
+	<20170929233102.4b068e2f@fiorina>
+Date: Wed, 25 Oct 2017 16:58:07 -0500
+Message-Id: <150896868721.17721.8644098584872122342@sif>
+Subject: Re: [Qemu-devel] [PATCH] qga-win: fall back to hardcoded user and
+ group names if LookupAccountSidW failed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,56 +42,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: =?utf-8?b?VG9tw6HFoSBHb2xlbWJpb3Zza8O9?= <tgolembi@redhat.com>, Chen Hanxiao <chen_han_xiao@126.com>
 Cc: qemu-devel@nongnu.org
 
-On Wed, Oct 25, 2017 at 07:00:14PM +0100, Dr. David Alan Gilbert wrote:
-> Hi Dan,
->   I've got a crash in head (and 2.10) which is a bit of a heisenbug;
-> I can trigger it with:
-> 
-> ./qemu-system-x86_64 -netdev tap,id=hostnet0,vhost=on,fd=10   -chardev socket,id=charchannel0,path=/tmp/org.qemu.guest_agent.0,server,nowait  -monitor stdio -vnc :0
-> 
-> and then 'q' to quit.
+Quoting Tom=C3=A1=C5=A1 Golembiovsk=C3=BD (2017-09-29 16:31:02)
+> On Fri, 29 Sep 2017 17:11:22 +0800
+> Chen Hanxiao <chen_han_xiao@126.com> wrote:
+> =
 
-Hmm, that doesn't trigger for me on git master at least.
+> > From: Chen Hanxiao <chenhanxiao@gmail.com>
+> > =
 
-> Note I'm not doing a redirect in of fd 10.
+> > On some of windows (win08 sp2),
+> > it doesn't work by calling LookupAccountSidW with
+> > well-known SIDs,
+> > We got an error:
+> >     error 997 overlapped I/O operation is in progress
+> > =
 
-So it's trying & failing to setup the tap dev, right ?
+> > But hardcoded names work.
+> > =
 
-eg you see this:
+> > This patch introduces a workaroud for this issue:
+> > if LookupAccountSidW failed, try hardcoded one.
+> > =
 
-#  ./x86_64-softmmu/qemu-system-x86_64 -netdev tap,id=hostnet0,vhost=on,fd=10   -chardev socket,id=charchannel0,path=/tmp/org.qemu.guest_agent.0,server,nowait  -monitor stdio -vnc :0
-qemu-system-x86_64: -netdev tap,id=hostnet0,vhost=on,fd=10: TUNGETIFF ioctl() failed: Invalid argument
-QEMU 2.10.50 monitor - type 'help' for more information
-(qemu) qemu-system-x86_64: warning: netdev hostnet0 has no peer
+> > Signed-off-by: Chen Hanxiao <chenhanxiao@gmail.com>
+> > ---
+> >  qga/vss-win32/install.cpp | 10 ++++++++--
+> >  1 file changed, 8 insertions(+), 2 deletions(-)
+> > =
 
-(qemu) q
+> =
 
+> I wonder if it's caused by qga itself or a race/conflict with some other
+> app. But still...
+> =
 
-Except it crashes at the end ?
+> =
 
+> Reviewed-by: Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com>
 
-> It goes away if I remove either the -netdev or the -chardev option.
-> 
-> It doesn't trigger under gdb, but fortunately we get a core:
-> 
-> #0  0x000055a226d94a2e in socket_listen_cleanup (fd=<optimized out>, errp=errp@entry=0x7fff3585e8c0)
->     at /root/qemu/util/qemu-sockets.c:1077
->     1077	    if (addr->type == SOCKET_ADDRESS_TYPE_UNIX
->     1078	        && addr->u.q_unix.path) {
->     1079	        if (unlink(addr->u.q_unix.path) < 0 && errno != ENOENT) {
+I think it might be getNameByStringSID()/LookupAccountSidW() reporting a
+stale GetLastError() value.
 
-Can you see from the core whether one of those pointers is NULL, or is there
-a complete garbage pointer ?
+Does this fix the issue?
 
-I wonder if it triggers if you run QEMU under valgrind ? 
+diff --git a/qga/vss-win32/install.cpp b/qga/vss-win32/install.cpp
+index ba7c94eb25..94c921e8de 100644
+--- a/qga/vss-win32/install.cpp
++++ b/qga/vss-win32/install.cpp
+@@ -149,9 +149,10 @@ static HRESULT getNameByStringSID(
+     wchar_t domainName[BUFFER_SIZE];
+ =
 
+     chk(ConvertStringSidToSidW(sid, &psid));
+-    LookupAccountSidW(NULL, psid, buffer, bufferLen,
+-                domainName, &domainNameLen, &groupType);
+-    hr =3D HRESULT_FROM_WIN32(GetLastError());
++    if (!LookupAccountSidW(NULL, psid, buffer, bufferLen,
++                           domainName, &domainNameLen, &groupType)) {
++        hr =3D HRESULT_FROM_WIN32(GetLastError());
++    }
+ =
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+     LocalFree(psid);
+
+> =
+
+> =
+
+> -- =
+
+> Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com>
+>=20
