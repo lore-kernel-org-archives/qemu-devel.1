@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35524)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35523)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1e7EYe-0000sv-87
+	(envelope-from <quintela@redhat.com>) id 1e7EYe-0000sw-83
 	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 01:48:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1e7EYa-0004Of-BB
+	(envelope-from <quintela@redhat.com>) id 1e7EYc-0004RG-2i
 	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 01:48:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36932)
+Received: from mx1.redhat.com ([209.132.183.28]:43180)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1e7EYa-0004Nr-57
-	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 01:48:48 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1e7EYb-0004Pr-T6
+	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 01:48:50 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
 	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3630883F3E
-	for <qemu-devel@nongnu.org>; Wed, 25 Oct 2017 05:48:47 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id DA7554A706
+	for <qemu-devel@nongnu.org>; Wed, 25 Oct 2017 05:48:48 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Wed, 25 Oct 2017 07:48:37 +0200
-Message-Id: <20171025054842.24883-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 0/5] Make xbzrle_cache_size a migration
- parameter
+Date: Wed, 25 Oct 2017 07:48:38 +0200
+Message-Id: <20171025054842.24883-2-quintela@redhat.com>
+In-Reply-To: <20171025054842.24883-1-quintela@redhat.com>
+References: <20171025054842.24883-1-quintela@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 1/5] migration: Make sure that we pass the
+ right cache size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,82 +33,44 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
+Instead of passing silently round down the number of pages, make it an
+error that the cache size is not a power of 2.
 
-Hi
+Signed-off-by: Juan Quintela <quintela@redhat.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ migration/page_cache.c | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
 
-On v3:
-- rebase on top of last migration pull requset
-- improve comments (dave suggestion)
-- always return 0 in case of error
-- checked with ovirt/openstack/libvirt people that making value a
-  power of two is not a problem.
-- should I drop the last patch, or sent it?
-
-
-Please revieww.
-
-[v2]
-
-- rebase
-- fix comments about power of 2 instead of multiple of two
-- minor typo on error message
-- use Error * when setting values
-
-After asking people of libvirt/ovirt/openstack, it appears that there
-is no problem about restricting cache_size to real values.  We give
-back one error and they had to handle errors already.
-
-Please review, Juan.
-
-[v1]
-
-I started looking at xbzrle_cache_size and saw that it was not a parameter.
-How difficult could it be?  HaHa
-
-- x-multifd-page-count and x-multifd-channels were not o
-  migrate_test_apply
-
-- page_cache.c has parameters that were not used (max_item_age)
-
-- page cache types were random.  Move almost all to int/size_t as
-  appropiate
-
-- error handling was split in three functions:
-  xbzrle_cache_resize
-  cache_init
-  qmp_set_cache_size
-  Make some sense of it and use Error*
-
-- We pass one value to qmp_migrate_cache_size it asigned pow2log() of
-  that value, and cache_init() used a power of two.  Make sure that
-  the value passed is right.
-
-- Now I am able to make xbzrle_cache_size a parameter!!!!
-
-- Now that I have arrived here, I tried to make the json types for
-  migartion parameters the real ones instead of everything is an int64.
-  I will be happy if libvirt people checked this.
-
-Please review, Juan.
-
-
-*** BLURB HERE ***
-
-Juan Quintela (5):
-  migration: Make sure that we pass the right cache size
-  migration: Don't play games with the requested cache size
-  migration: No need to return the size of the cache
-  migration: Make xbzrle_cache_size a migration parameter
-  migration: [RFC] Use proper types in json
-
- hmp.c                  | 34 ++++++++++++------
- migration/migration.c  | 94 ++++++++++++++++++++++++++++----------------------
- migration/migration.h  |  1 -
- migration/page_cache.c | 12 ++++---
- migration/ram.c        | 20 ++++-------
- migration/ram.h        |  2 +-
- qapi/migration.json    | 44 ++++++++++++++++-------
- 7 files changed, 122 insertions(+), 85 deletions(-)
-
+diff --git a/migration/page_cache.c b/migration/page_cache.c
+index 9a9d13d6a2..96268c3aea 100644
+--- a/migration/page_cache.c
++++ b/migration/page_cache.c
+@@ -58,6 +58,13 @@ PageCache *cache_init(int64_t new_size, size_t page_size, Error **errp)
+         return NULL;
+     }
+ 
++    /* round down to the nearest power of 2 */
++    if (!is_power_of_2(num_pages)) {
++        error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "cache size",
++                   "is not a power of two number of pages");
++        return NULL;
++    }
++
+     /* We prefer not to abort if there is no memory */
+     cache = g_try_malloc(sizeof(*cache));
+     if (!cache) {
+@@ -65,11 +72,6 @@ PageCache *cache_init(int64_t new_size, size_t page_size, Error **errp)
+                    "Failed to allocate cache");
+         return NULL;
+     }
+-    /* round down to the nearest power of 2 */
+-    if (!is_power_of_2(num_pages)) {
+-        num_pages = pow2floor(num_pages);
+-        DPRINTF("rounding down to %" PRId64 "\n", num_pages);
+-    }
+     cache->page_size = page_size;
+     cache->num_items = 0;
+     cache->max_num_items = num_pages;
 -- 
 2.13.6
