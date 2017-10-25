@@ -1,25 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46388)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49475)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e7Mm4-0000iR-Vb
-	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 10:35:22 -0400
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e7MvK-0003Dj-Jn
+	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 10:44:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e7Mm4-00035R-2x
-	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 10:35:17 -0400
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:54736)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1e7Mm3-00032m-Ps
-	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 10:35:16 -0400
-Received: by mail-wr0-x242.google.com with SMTP id o44so189079wrf.11
-	for <qemu-devel@nongnu.org>; Wed, 25 Oct 2017 07:35:15 -0700 (PDT)
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e7MvG-0007J0-GW
+	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 10:44:50 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35386
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
+	id 1e7MvG-0007IG-BD
+	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 10:44:46 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v9PEfOF4131753
+	for <qemu-devel@nongnu.org>; Wed, 25 Oct 2017 10:44:42 -0400
+Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2dtvckh26c-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 25 Oct 2017 10:44:42 -0400
+Received: from localhost
+	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
+	Wed, 25 Oct 2017 08:44:42 -0600
+References: <1508908500-25274-1-git-send-email-stefanb@linux.vnet.ibm.com>
+	<1ce3317d-8833-7e2e-9b4d-93acb45317a1@amsat.org>
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Date: Wed, 25 Oct 2017 10:44:37 -0400
 MIME-Version: 1.0
-In-Reply-To: <alpine.DEB.2.10.1710241055160.574@sstabellini-ThinkPad-X260>
-References: <alpine.DEB.2.10.1710241055160.574@sstabellini-ThinkPad-X260>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 25 Oct 2017 15:34:53 +0100
-Message-ID: <CAFEAcA_M2Y+Qv==YJtuA32ZZO78+nKG+uwr_+sJv++HC9NtmuQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3] fix WFI/WFE length in syndrome register
+In-Reply-To: <1ce3317d-8833-7e2e-9b4d-93acb45317a1@amsat.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Message-Id: <57a468ed-26c4-a0e4-79a0-03a84eefc65a@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 0/5] Merge tpm 2017/10/24
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,48 +42,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Stabellini <sstabellini@kernel.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, peter.maydell@linaro.org
+Cc: qemu-devel@nongnu.org
 
-On 24 October 2017 at 18:59, Stefano Stabellini <sstabellini@kernel.org> wrote:
-> WFI/E are often, but not always, 4 bytes long. When they are, we need to
-> set ARM_EL_IL_SHIFT in the syndrome register.
+On 10/25/2017 09:05 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+> Hi Stefan,
 >
-> Pass the instruction length to HELPER(wfi), use it to decrement pc
-> appropriately and to pass an is_16bit flag to syn_wfx, which sets
-> ARM_EL_IL_SHIFT if needed.
+> On 10/25/2017 02:14 AM, Stefan Berger wrote:
+>> *The following changes since commit 3d7196d43bfe12efe98568cb60057e2736=
+52b99b:
+>>
+>>    Merge remote-tracking branch 'remotes/kraxel/tags/usb-20171023-pull=
+-request' into staging (2017-10-24 16:05:57 +0100)
+>>
+>> are available in the git repository at:
+>>
+>>    git://github.com/stefanberger/qemu-tpm.git tags/pull-tpm-2017-10-24=
+-1
+>>
+>> for you to fetch changes up to 298d8b81d45d2297f88d93604bd5eebfd653d6c=
+f:
+> The tag is correct,
 >
-> Set dc->insn in both arm_tr_translate_insn and thumb_tr_translate_insn.
+>    $ git tag -v pull-tpm-2017-10-24-1
+>    tag pull-tpm-2017-10-24-1
+>    tagger Stefan Berger <stefanb@linux.vnet.ibm.com> 1508908015 -0400
+>    gpg: Good signature from "Stefan Berger <stefanb@linux.vnet.ibm.com>=
+"
+>    Merge tpm 2017/10/24 v1
 >
-> Signed-off-by: Stefano Stabellini <sstabellini@kernel.org>
+> However you sent it as a PATCH series, I'm not sure this will correctly
+> trigger Peter's farm-building scripts.
 
-> diff --git a/target/arm/translate.c b/target/arm/translate.c
-> index 4da1a4c..0a7b67c 100644
-> --- a/target/arm/translate.c
-> +++ b/target/arm/translate.c
-> @@ -12124,6 +12124,7 @@ static void arm_tr_translate_insn(DisasContextBase *dcbase, CPUState *cpu)
->      }
->
->      insn = arm_ldl_code(env, dc->pc, dc->sctlr_b);
-> +    dc->insn = insn;
->      dc->pc += 4;
->      disas_arm_insn(dc, insn);
->
-> @@ -12191,6 +12192,7 @@ static void thumb_tr_translate_insn(DisasContextBase *dcbase, CPUState *cpu)
->      }
->
->      insn = arm_lduw_code(env, dc->pc, dc->sctlr_b);
-> +    dc->insn = insn;
->      is_16bit = thumb_insn_is_16bit(dc, insn);
->      dc->pc += 2;
->      if (!is_16bit) {
+Will resend. Was late last night...
 
-This isn't quite in the right place, because it's before we load the
-second half of a 32 bit Thumb insn, so it won't give dc->insn the
-correct full width insn value in that case.
+>
+> Also I suggest you to add some description such "This fixes a build
+> issue using --disable-tpm" in the cover letter.
 
-I'm going to take this patch into target-arm.next and fix it up locally
-rather than making you spin a v4.
+Good idea.
 
-thanks
--- PMM
+   Cheers,
+      Stefan
+
+>
+> Regards,
+>
+> Phil.
+>
+>
