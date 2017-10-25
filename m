@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41608)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58461)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e7Rrc-0002EK-7b
-	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 16:01:21 -0400
+	(envelope-from <frasse.iglesias@gmail.com>) id 1e7SpV-0004Sb-Hp
+	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 17:03:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e7RrZ-0004YZ-6M
-	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 16:01:20 -0400
-Received: from indium.canonical.com ([91.189.90.7]:41070)
+	(envelope-from <frasse.iglesias@gmail.com>) id 1e7SpU-0001Z2-F4
+	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 17:03:13 -0400
+Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:48274)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1e7RrY-0004Xj-W6
-	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 16:01:17 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1e7RrX-0004zs-7N
-	for <qemu-devel@nongnu.org>; Wed, 25 Oct 2017 20:01:15 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 2CFA42E807E
-	for <qemu-devel@nongnu.org>; Wed, 25 Oct 2017 20:01:15 +0000 (UTC)
+	(Exim 4.71) (envelope-from <frasse.iglesias@gmail.com>)
+	id 1e7SpU-0001YI-6J
+	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 17:03:12 -0400
+Received: by mail-pf0-x243.google.com with SMTP id b79so858963pfk.5
+	for <qemu-devel@nongnu.org>; Wed, 25 Oct 2017 14:03:11 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 25 Oct 2017 19:54:47 -0000
-From: Julian Andres Klode <julian.klode@gmail.com>
-Reply-To: Bug 1726394 <1726394@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150876459007.17533.9812313883985505054.malonedeb@wampee.canonical.com>
-Message-Id: <150896128722.18283.2493902992854758189.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1726394] Re: Passes through prctl(PR_SET_SECCOMP,
- SECCOMP_MODE_FILTER, address)
+In-Reply-To: <e8ac6787-38cb-c1e9-4ca4-6a5887887bd8@gmail.com>
+References: <20171024195139.28179-1-frasse.iglesias@gmail.com>
+	<20171024195139.28179-3-frasse.iglesias@gmail.com>
+	<e8ac6787-38cb-c1e9-4ca4-6a5887887bd8@gmail.com>
+From: francisco iglesias <frasse.iglesias@gmail.com>
+Date: Wed, 25 Oct 2017 23:03:09 +0200
+Message-ID: <CAAYMZQvLOqQRhz4BgndHSNg+fBi=XOK3m41T5XTQCYBsYBscUA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v3 02/13] m25p80: Add support for SST READ
+ ID 0x90/0xAB commands
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,45 +31,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "mar.krzeminski" <mar.krzeminski@gmail.com>
+Cc: qemu-devel@nongnu.org, edgari@xilinx.com, alistai@xilinx.com, Francisco Iglesias <francisco.iglesias@feimtech.se>
 
-I worked around this in APT for now by ignoring EFAULT or rather,
-printing a warning. It would be nice to not do this though.
+Good day Marcin,
 
-** Also affects: qemu (Ubuntu)
-   Importance: Undecided
-       Status: New
+Thank you for your excellent review comments! I will correct the patches in
+the next version of the patch series (v4).
 
-** Changed in: qemu (Ubuntu)
-   Importance: Undecided =3D> Medium
+Best regards,
+Francisco Iglesias
 
-** Changed in: qemu (Ubuntu)
-       Status: New =3D> Triaged
 
--- =
+On 25 October 2017 at 20:12, mar.krzeminski <mar.krzeminski@gmail.com>
+wrote:
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1726394
-
-Title:
-  Passes through prctl(PR_SET_SECCOMP, SECCOMP_MODE_FILTER, address)
-
-Status in QEMU:
-  New
-Status in qemu package in Ubuntu:
-  Triaged
-
-Bug description:
-  qemu-user passes through prctl(PR_SET_SECCOMP, SECCOMP_MODE_FILTER,
-  address) unmodified, but the third argument is an address to a BPF
-  filter, causing an EFAULT. Now, the filter is architecture-specifc, so
-  you can't just rewrite the addresses, so the safest bet is to just
-  return an error here.
-
-  I guess you should just return EINVAL, but not sure. I'd really like
-  something that can be identified, so seccomp errors can be ignored
-  when it's not supported.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1726394/+subscriptions
+>
+>
+> W dniu 24.10.2017 o 21:51, Francisco Iglesias pisze:
+>
+> Add support for SST READ ID 0x90/0xAB commands for reading out the flash
+>> manufacuter ID and device ID.
+>>
+>> Signed-off-by: Francisco Iglesias <frasse.iglesias@gmail.com>
+>> ---
+>>   hw/block/m25p80.c | 20 ++++++++++++++++++++
+>>   1 file changed, 20 insertions(+)
+>>
+>> diff --git a/hw/block/m25p80.c b/hw/block/m25p80.c
+>> index 2971519..c85e8fa 100644
+>> --- a/hw/block/m25p80.c
+>> +++ b/hw/block/m25p80.c
+>> @@ -355,6 +355,8 @@ typedef enum {
+>>       DPP = 0xa2,
+>>       QPP = 0x32,
+>>       QPP_4 = 0x34,
+>> +    RDID_90 = 0x90,
+>> +    RDID_AB = 0xab,
+>>         ERASE_4K = 0x20,
+>>       ERASE4_4K = 0x21,
+>> @@ -405,6 +407,7 @@ typedef enum {
+>>       MAN_MACRONIX,
+>>       MAN_NUMONYX,
+>>       MAN_WINBOND,
+>> +    MAN_SST,
+>>       MAN_GENERIC,
+>>   } Manufacturer;
+>>   @@ -476,6 +479,8 @@ static inline Manufacturer get_man(Flash *s)
+>>           return MAN_SPANSION;
+>>       case 0xC2:
+>>           return MAN_MACRONIX;
+>> +    case 0xBF:
+>> +        return MAN_SST;
+>>       default:
+>>           return MAN_GENERIC;
+>>       }
+>> @@ -1018,6 +1023,21 @@ static void decode_new_cmd(Flash *s, uint32_t
+>> value)
+>>           s->state = STATE_READING_DATA;
+>>           break;
+>>   +    case RDID_90:
+>> +    case RDID_AB:
+>> +        DB_PRINT_L(0, "populated manf/dev ID\n");
+>> +        if (get_man(s) == MAN_SST) {
+>> +            s->data[0] = s->pi->id[0];
+>> +            s->data[1] = s->pi->id[2];
+>> +            s->pos = 0;
+>> +            s->len = 2;
+>> +            s->data_read_loop = true;
+>> +            s->state = STATE_READING_DATA;
+>>
+> I am not sure about this. I am looking at SST25WF080 datasheet, and it
+> seem that those commands
+> also expect address, and based on that returns manufacturer id or device
+> id.
+>
+>> +        } else {
+>> +            qemu_log_mask(LOG_GUEST_ERROR, "M25P80: Unknown cmd %x\n",
+>> value);
+>> +        }
+>> +        break;
+>> +
+>>       case BULK_ERASE:
+>>           if (s->write_enable) {
+>>               DB_PRINT_L(0, "chip erase\n");
+>>
+> Regard,
+> Marcin
+>
