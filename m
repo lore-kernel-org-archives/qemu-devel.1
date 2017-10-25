@@ -1,34 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56382)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57282)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e7Lf3-00080P-60
-	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 09:23:58 -0400
+	id 1e7Lj5-0000Tf-1E
+	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 09:28:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e7Lf0-0000nZ-1k
-	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 09:23:57 -0400
-Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:52496)
+	id 1e7Lj1-0003VK-TN
+	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 09:28:07 -0400
+Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:49418)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e7Lez-0000nL-SA
-	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 09:23:53 -0400
-Received: by mail-qt0-x243.google.com with SMTP id 31so34668633qtz.9
-	for <qemu-devel@nongnu.org>; Wed, 25 Oct 2017 06:23:53 -0700 (PDT)
+	id 1e7Lj1-0003Un-OU
+	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 09:28:03 -0400
+Received: by mail-qk0-x242.google.com with SMTP id q83so30450759qke.6
+	for <qemu-devel@nongnu.org>; Wed, 25 Oct 2017 06:28:03 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 References: <20171022004621.28372-1-richard.henderson@linaro.org>
-	<20171022004621.28372-12-richard.henderson@linaro.org>
-	<14d023ad-e635-3a56-533b-2575a03266c4@amsat.org>
-	<4880c661-9e6e-e31c-c0cc-810e67d8efea@linaro.org>
+	<20171022004621.28372-5-richard.henderson@linaro.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <ee41dd65-92e1-3697-a508-e574c0494b4e@amsat.org>
-Date: Wed, 25 Oct 2017 10:23:45 -0300
+Message-ID: <0940372e-9d61-a1a3-e05c-7bbd89941aae@amsat.org>
+Date: Wed, 25 Oct 2017 10:27:37 -0300
 MIME-Version: 1.0
-In-Reply-To: <4880c661-9e6e-e31c-c0cc-810e67d8efea@linaro.org>
+In-Reply-To: <20171022004621.28372-5-richard.henderson@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v7 11/11] disas: Add capstone as submodule
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v7 04/11] target/arm: Don't set
+ INSN_ARM_BE32 for CONFIG_USER_ONLY
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,61 +40,52 @@ To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 
 Hi Richard,
 
->> On 10/21/2017 09:46 PM, Richard Henderson wrote:
->>> Do not require the submodule, but use it if present.  Allow the
->>> command-line to override system or git submodule either way.
->>>
->>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
->>> ---
->>>  Makefile    | 13 +++++++++++++
->>>  .gitmodules |  3 +++
->>>  capstone    |  1 +
->>>  configure   | 60 +++++++++++++++++++++++++++++++++++++++++++++++++-----------
->>>  4 files changed, 66 insertions(+), 11 deletions(-)
->>>  create mode 160000 capstone
->>>
->>> diff --git a/Makefile b/Makefile
->>> index 9372742f86..beecc85bee 100644
->>> --- a/Makefile
->>> +++ b/Makefile
->>> @@ -383,6 +383,19 @@ subdir-dtc: .git-submodule-status dtc/libfdt dtc/tests
->>>  dtc/%: .git-submodule-status
->>>  	mkdir -p $@
->>>  
->>> +# Overriding CFLAGS causes us to lose defines added in the sub-makefile.
->>> +# Not overriding CFLAGS leads to mis-matches between compilation modes.
->>> +# Therefore we replicate some of the logic in the sub-makefile.
->>
->> I'm having plenty of "missing-prototypes" warnings:
+On 10/21/2017 09:46 PM, Richard Henderson wrote:
+> This matches translator behaviour in arm_lduw_code.
 > 
-> Yes, we use lots of -Wfoo that upstream Capstone does not.  I do strip -Werror,
-> so at least it builds.  Are you suggesting that I drop most of our extra -Wfoo?
+> Fixes: https://bugs.launchpad.net/qemu/+bug/1724485
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/arm/cpu.c | 9 +++++++--
+>  1 file changed, 7 insertions(+), 2 deletions(-)
+> 
+> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+> index 82dad0b721..a92d86faa0 100644
+> --- a/target/arm/cpu.c
+> +++ b/target/arm/cpu.c
+> @@ -477,6 +477,7 @@ static void arm_disas_set_info(CPUState *cpu, disassemble_info *info)
+>  {
+>      ARMCPU *ac = ARM_CPU(cpu);
+>      CPUARMState *env = &ac->env;
+> +    bool sctlr_b;
+>  
+>      if (is_a64(env)) {
+>          /* We might not be compiled with the A64 disassembler
+> @@ -491,7 +492,9 @@ static void arm_disas_set_info(CPUState *cpu, disassemble_info *info)
+>      } else {
+>          info->print_insn = print_insn_arm;
+>      }
+> -    if (bswap_code(arm_sctlr_b(env))) {
+> +
+> +    sctlr_b = arm_sctlr_b(env);
+> +    if (bswap_code(sctlr_b)) {
+>  #ifdef TARGET_WORDS_BIGENDIAN
+>          info->endian = BFD_ENDIAN_LITTLE;
+>  #else
+> @@ -499,9 +502,11 @@ static void arm_disas_set_info(CPUState *cpu, disassemble_info *info)
+>  #endif
+>      }
+>      info->flags &= ~INSN_ARM_BE32;
+> -    if (arm_sctlr_b(env)) {
+> +#ifndef CONFIG_USER_ONLY
+> +    if (sctlr_b) {
 
-Exactly. It's unlikely we try to modify capstone code in the submodule
-to silent the warnings, there is enough QEMU work to do :P
-I'd personally go with:
+Even though I could test the whole series, I couldn't hand-test this
+particular case yet.
 
-CAP_CFLAGS = $(CFLAGS) $(QEMU_CFLAGS) -w
+Not a big deal anyway ;)
 
-At worst if there is an error while building capstone, it will still get
-displayed.
-
-> I suppose that's reasonable.  We don't want our developers worrying about
-> warnings coming from upstream code.  If in fact you believe that most of our
-> developers won't just install libcapstone-dev and be done?
-
-This was my first reflex, but then you added the git feature and I just
-wanted to test it.
-
-Usually if I don't need a cutting edge feature, I try to use distrib
-packages, to keep my environment closer to other developers.
-
-A big part of QEMU developers uses Redhat/Fedora or Debian/Ubuntu and
-there is an effort to verify QEMU still builds with those distribs using
-the Travis CI. Now there even are VMs for BSD folks :)
-
-So I'd not worry about distrib packages and these upstream warnings.
-
-Regards,
-
-Phil.
+>          info->flags |= INSN_ARM_BE32;
+>      }
+> +#endif
+>  }
