@@ -1,38 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50945)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53894)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1e7UFc-0005nx-Uj
-	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 18:34:18 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1e7UaB-0000DU-3M
+	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 18:55:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1e7UFZ-0005Tf-IL
-	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 18:34:16 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:35672)
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1e7Ua6-0005Lb-6e
+	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 18:55:31 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35174
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1e7UFZ-0005TN-9U
-	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 18:34:13 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	id 1e7Ua6-0005Kv-0Z
+	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 18:55:26 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v9PMXN5p033477
-	for <qemu-devel@nongnu.org>; Wed, 25 Oct 2017 18:34:08 -0400
-Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2du0k27dtg-1
+	v9PMsINS135663
+	for <qemu-devel@nongnu.org>; Wed, 25 Oct 2017 18:55:22 -0400
+Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2du0k1yu4a-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 25 Oct 2017 18:34:08 -0400
+	for <qemu-devel@nongnu.org>; Wed, 25 Oct 2017 18:55:21 -0400
 Received: from localhost
-	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Wed, 25 Oct 2017 18:34:07 -0400
+	Wed, 25 Oct 2017 16:55:21 -0600
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-In-Reply-To: <20171017064142.4519-1-chen_han_xiao@126.com>
-References: <20171017064142.4519-1-chen_han_xiao@126.com>
-Date: Wed, 25 Oct 2017 17:33:52 -0500
-Message-Id: <150897083249.17721.1016197639694178384@sif>
-Subject: Re: [Qemu-devel] [Resend][PATCH] qga-win: don't hang if vss hold
- writes timeout
+In-Reply-To: <20170822135504.21612-1-bishara@daynix.com>
+References: <20170822135504.21612-1-bishara@daynix.com>
+Date: Wed, 25 Oct 2017 17:55:09 -0500
+Message-Id: <150897210930.17721.1680868416724067795@sif>
+Subject: Re: [Qemu-devel] [PATCH v2] qga-win: Updating guest_set_time action
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,84 +41,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Chen Hanxiao <chen_han_xiao@126.com>, qemu-devel@nongnu.org
-Cc: Tomoki Sekiyama <tomoki.sekiyama@gmail.com>
+To: Bishara AbuHattoum <bishara@daynix.com>, qemu-devel@nongnu.org
+Cc: Sameeh Jubran <sameeh@daynix.com>, Yan Vugenfirer <yan@daynix.com>
 
-Quoting Chen Hanxiao (2017-10-17 01:41:42)
-> From: Chen Hanxiao <chenhanxiao@gmail.com>
+Quoting Bishara AbuHattoum (2017-08-22 08:55:04)
+>   At the moment, Windows libraries don't provide a way to access
+>   RTC, so, a workaround is to use the Windows w32tm command to
+>   resync the time.
+>   Related bugzilla: https://bugzilla.redhat.com/show_bug.cgi?id=3D1183874
 > =
 
-> When VM is in a heavy IO, if the command "guest-fsfreeze-freeze"
-> is executed, VSS may timeout when trying to hold writes.
-> =
+> Signed-off-by: Bishara AbuHattoum <bishara@daynix.com>
 
-> Inside guest, Event ID 12298(VSS_ERROR_HOLD_WRITES_TIMEOUT)
-> is logged in the Event Viewer.
-> =
-
-> At that time, if we call AbortBackup, qga may hang forever.
-> =
-
-> This patch will solve this issue.
-> =
-
-> Cc: Michael Roth <mdroth@linux.vnet.ibm.com>
-> Cc: Tomoki Sekiyama <tomoki.sekiyama@gmail.com>
-> =
-
-> Reviewed-by: Tomoki Sekiyama <tomoki.sekiyama@gmail.com>
-> Signed-off-by: Chen Hanxiao <chenhanxiao@gmail.com>
-
-Thanks, applied to QGA tree:
-
+Thanks, applied to qga tree:
   https://github.com/mdroth/qemu/commits/qga
 
-Unless I missed another thread though, I don't think Tomoki gave it
-an actual Reviewed-by, just a "looks good", so I've removed it from
-the patch. (A "looks good" is certainly helpful, particularly in this
-case, but actual Signed-off-by/Tested-by/Reviewed-by tags should
-only be added if they were explicitly provided by the person in
-question since they imply some level of accountability if something
-goes wrong. Less formal tags like Suggested-by/Reported-by/etc are
-generally okay though).
-
 > ---
->  qga/vss-win32/requester.cpp | 12 ++++++++++++
->  1 file changed, 12 insertions(+)
+>  configure            |  2 +-
+>  qga/commands-win32.c | 36 +++++++++++++++++++++++++++++++++++-
+>  2 files changed, 36 insertions(+), 2 deletions(-)
 > =
 
-> diff --git a/qga/vss-win32/requester.cpp b/qga/vss-win32/requester.cpp
-> index 301762d8b1..3d9c9716c0 100644
-> --- a/qga/vss-win32/requester.cpp
-> +++ b/qga/vss-win32/requester.cpp
-> @@ -419,6 +419,16 @@ void requester_freeze(int *num_vols, ErrorSet *errse=
-t)
->              break;
->          }
+> diff --git a/configure b/configure
+> index dd73cce62f..2c044ba2ca 100755
+> --- a/configure
+> +++ b/configure
+> @@ -824,7 +824,7 @@ if test "$mingw32" =3D "yes" ; then
+>    sysconfdir=3D"\${prefix}"
+>    local_statedir=3D
+>    confsuffix=3D""
+> -  libs_qga=3D"-lws2_32 -lwinmm -lpowrprof -lwtsapi32 -liphlpapi -lnetapi=
+32 $libs_qga"
+> +  libs_qga=3D"-lws2_32 -lwinmm -lpowrprof -lwtsapi32 -lwininet -liphlpap=
+i -lnetapi32 $libs_qga"
+>  fi
+> =
+
+>  werror=3D""
+> diff --git a/qga/commands-win32.c b/qga/commands-win32.c
+> index 619dbd2bc2..fbd7eb7bbb 100644
+> --- a/qga/commands-win32.c
+> +++ b/qga/commands-win32.c
+> @@ -29,6 +29,7 @@
+>  #endif
+>  #include <lm.h>
+>  #include <wtsapi32.h>
+> +#include <wininet.h>
+> =
+
+>  #include "qga/guest-agent-core.h"
+>  #include "qga/vss-win32.h"
+> @@ -1277,8 +1278,41 @@ void qmp_guest_set_time(bool has_time, int64_t tim=
+e_ns, Error **errp)
+>           * RTC yet:
+>           *
+>           * https://msdn.microsoft.com/en-us/library/aa908981.aspx
+> +         *
+> +         * Instead, a workaround is to use the Windows win32tm command to
+> +         * resync the time using the Windows Time service.
+>           */
+> -        error_setg(errp, "Time argument is required on this platform");
+> +        LPVOID msg_buffer;
+> +        DWORD ret_flags;
+> +
+> +        HRESULT hr =3D system("w32tm /resync /nowait");
+> +
+> +        if (GetLastError() !=3D 0) {
+> +            strerror_s((LPTSTR) & msg_buffer, 0, errno);
+> +            error_setg(errp, "system(...) failed: %s", (LPCTSTR)msg_buff=
+er);
+> +        } else if (hr !=3D 0) {
+> +            if (hr =3D=3D HRESULT_FROM_WIN32(ERROR_SERVICE_NOT_ACTIVE)) {
+> +                error_setg(errp, "Windows Time service not running on th=
+e "
+> +                                 "guest");
+> +            } else {
+> +                if (!FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER |
+> +                                   FORMAT_MESSAGE_FROM_SYSTEM |
+> +                                   FORMAT_MESSAGE_IGNORE_INSERTS, NULL,
+> +                                   (DWORD)hr, MAKELANGID(LANG_NEUTRAL,
+> +                                   SUBLANG_DEFAULT), (LPTSTR) & msg_buff=
+er, 0,
+> +                                   NULL)) {
+> +                    error_setg(errp, "w32tm failed with error (0x%lx), c=
+ouldn'"
+> +                                     "t retrieve error message", hr);
+> +                } else {
+> +                    error_setg(errp, "w32tm failed with error (0x%lx): %=
+s", hr,
+> +                               (LPCTSTR)msg_buffer);
+> +                    LocalFree(msg_buffer);
+> +                }
+> +            }
+> +        } else if (!InternetGetConnectedState(&ret_flags, 0)) {
+> +            error_setg(errp, "No internet connection on guest, sync not "
+> +                             "accurate");
+> +        }
+>          return;
 >      }
-> +
-> +    if (wait_status =3D=3D WAIT_TIMEOUT) {
-> +        err_set(errset, E_FAIL,
-> +                "timeout when try to receive Frozen event from VSS provi=
-der");
-> +        /* If we are here, VSS had timeout.
-> +         * Don't call AbortBackup, just return directly.
-> +         */
-> +        goto out1;
-> +    }
-> +
->      if (wait_status !=3D WAIT_OBJECT_0) {
->          err_set(errset, E_FAIL,
->                  "couldn't receive Frozen event from VSS provider");
-> @@ -432,6 +442,8 @@ out:
->      if (vss_ctx.pVssbc) {
->          vss_ctx.pVssbc->AbortBackup();
->      }
-> +
-> +out1:
->      requester_cleanup();
->      CoUninitialize();
->  }
+> =
+
 > -- =
 
 > 2.13.5
