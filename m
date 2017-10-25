@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39627)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41074)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e7NtA-0001B7-9H
-	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 11:46:46 -0400
+	(envelope-from <david@redhat.com>) id 1e7Nwu-0003mx-UQ
+	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 11:50:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e7Nt8-0005pk-GU
-	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 11:46:40 -0400
-Received: from indium.canonical.com ([91.189.90.7]:35142)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1e7Nt8-0005nv-AO
-	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 11:46:38 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1e7Nt7-000123-2g
-	for <qemu-devel@nongnu.org>; Wed, 25 Oct 2017 15:46:37 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 0D78E2E806E
-	for <qemu-devel@nongnu.org>; Wed, 25 Oct 2017 15:46:37 +0000 (UTC)
+	(envelope-from <david@redhat.com>) id 1e7Nwr-0004AQ-H4
+	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 11:50:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42460)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1e7Nwq-00048U-SZ
+	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 11:50:29 -0400
+References: <20171020145437.18549-1-borntraeger@de.ibm.com>
+	<d028d04a-9c28-af10-3410-f9007867cc05@de.ibm.com>
+	<1ac27ce2-091d-e1b7-fc94-ebdf696a35e9@redhat.com>
+	<9f4037d8-93a3-be0f-8cb4-4424158e236b@linux.vnet.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <a7b30204-a854-afde-af01-234520cc6d7b@redhat.com>
+Date: Wed, 25 Oct 2017 17:50:13 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 25 Oct 2017 15:26:09 -0000
-From: Thomas Huth <1359930@bugs.launchpad.net>
-Reply-To: Bug 1359930 <1359930@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20140821193444.13152.52372.malonedeb@wampee.canonical.com>
-Message-Id: <150894516930.18213.6894907344862839617.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1359930] Re: [ARMv5] Integrator/CP regression
- when reading FPSID register
+In-Reply-To: <9f4037d8-93a3-be0f-8cb4-4424158e236b@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH/QEMU] s390x/kvm: use cpu_model_available
+ for guarded storage on compat machines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,78 +31,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Boris Fiuczynski <fiuczy@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Marc Hartmayer <mhartmay@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: libvir-list@redhat.com, qemu-devel@nongnu.org, Jiri Denemark <jdenemar@redhat.com>, "Jason J . Herne" <jjherne@linux.vnet.ibm.com>, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>, Halil Pasic <pasic@linux.vnet.ibm.com>
 
-Patch had been included here:
-https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3Ded1f13d607e2c64c66bea=
-49d
+On 25.10.2017 17:09, Boris Fiuczynski wrote:
+> On 10/25/2017 12:23 PM, David Hildenbrand wrote:
+>> On 25.10.2017 12:18, Christian Borntraeger wrote:
+>>> Ping, I plan to submit belows patch for 2.11. We can then still look into
+>>> a libvirt<->qemu interface for limiting host-model depending on machine versions
+>>> (or not).
+>>
+>> I think this would be sufficient for now.
+>>
+>> Having different host models, depending on the the machine type sounds
+>> wrong. But maybe we'll need it in the future.
+>>
+> 
+> David, I disagree if your proposal is to generally tolerate new cpu 
+> features in old machine types. This *might* work for gs but how do you 
+> guaranty that guests do not behave differently/wrong when suddenly new 
+> cpu features are made available to guest when (re-)starting them.
+> That is my feedback for the qemu side of this mater.
 
-** Changed in: qemu
-       Status: New =3D> Fix Released
+Just re-reading this section, so what you mean is:
 
--- =
+a) guest is started, host model is copied and used. guest works.
+b) guest is stopped.
+c) QEMU/KVM/HW is updated.
+d) guest is started, new host model is copied. guest no longer works.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1359930
+d) could be because there are now some additional features with e.g.
+broken guest implementation or now missing features.
 
-Title:
-  [ARMv5] Integrator/CP regression when reading FPSID register
 
-Status in HelenOS branches:
-  New
-Status in QEMU:
-  Fix Released
+What you propose (if I am not wrong) is a to bind features somehow to a
+QEMU machine. I think that should never be done. You could not catch now
+missing features.
 
-Bug description:
-  There seems to be a regression in QEMU 2.1.0 which demonstrates itself
-  when running the attached HelenOS Integrator/CP (i.e. ARMv5) image. The
-  offending instruction seems to be:
+What would you think about a persistent host-model copy option? So
+instead of copying at every start, only copy and replace it once in the XML?
 
-    vmrs r0, fpsid
+Easy to specify by the user and no CPU feature changes will happend
+"blindly".
 
-  Upon its execution, HelenOS kernel receives an Undefined instruction
-  exception (which it does not anticipate at that point) and crashes.
 
-  QEMU 2.0.0 was not affected by this issue.
+-- 
 
-  Command line to reproduce with QEMU 2.1.0:
+Thanks,
 
-  $ qemu-system-arm -M integratorcp -kernel image.boot -s -S &
-  $ /usr/local/cross/arm32/bin/arm-linux-gnueabi-gdb =
-
-  ...
-  (gdb) target remote localhost:1234
-  Remote debugging using localhost:1234
-  warning: Can not parse XML target description; XML support was disabled a=
-t compile time
-  0x00000000 in ?? ()
-  (gdb) symbol-file kernel/kernel.raw
-  Reading symbols from /home/jermar/software/HelenOS.mainline/kernel/kernel=
-.raw...done.
-  (gdb) break ras_check
-  Breakpoint 1 at 0x80a021bc: file arch/arm32/src/ras.c, line 67.
-  (gdb) c
-  Continuing.
-
-  Breakpoint 1, ras_check (n=3D1, istate=3D0x813e7f70) at arch/arm32/src/ra=
-s.c:67
-  67	{
-  (gdb) set radix 16
-  Input and output radices now set to decimal 16, hex 10, octal 20.
-  (gdb) print istate->pc
-  $1 =3D 0x80a02458
-  (gdb) disassemble 0x80a02458
-  Dump of assembler code for function fpsid_read:
-     0x80a02454 <+0>:	vmrs	r0, fpsid                           <=3D=3D=3D=
-=3D=3D=3D=3D UNDEFINED EXCEPTION INSTRUCTION
-     0x80a02458 <+4>:	mov	pc, lr
-  End of assembler dump.
-
-  =
-
-  The Undefined instruction exception is not expected at this point when ex=
-ecuting the VMRS r0,fpsid instruction.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/helenos/+bug/1359930/+subscriptions
+David
