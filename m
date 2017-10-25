@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45977)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46089)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1e7I6v-0000FM-7O
-	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 05:36:33 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1e7I70-0000K8-Fu
+	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 05:36:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1e7I6t-00008g-FL
-	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 05:36:29 -0400
-Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:56390)
+	(envelope-from <richard.henderson@linaro.org>) id 1e7I6z-0000Ft-Bp
+	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 05:36:34 -0400
+Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:46648)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1e7I6t-00007p-95
-	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 05:36:27 -0400
-Received: by mail-wr0-x243.google.com with SMTP id r79so23326216wrb.13
-	for <qemu-devel@nongnu.org>; Wed, 25 Oct 2017 02:36:27 -0700 (PDT)
+	id 1e7I6z-0000Ex-5B
+	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 05:36:33 -0400
+Received: by mail-wr0-x244.google.com with SMTP id l1so23340136wrc.3
+	for <qemu-devel@nongnu.org>; Wed, 25 Oct 2017 02:36:33 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed, 25 Oct 2017 11:35:22 +0200
-Message-Id: <20171025093535.10175-39-richard.henderson@linaro.org>
+Date: Wed, 25 Oct 2017 11:35:27 +0200
+Message-Id: <20171025093535.10175-44-richard.henderson@linaro.org>
 In-Reply-To: <20171025093535.10175-1-richard.henderson@linaro.org>
 References: <20171025093535.10175-1-richard.henderson@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 38/51] exec-all: rename tb_free to tb_remove
+Subject: [Qemu-devel] [PULL 43/51] tcg: introduce **tcg_ctxs to keep track
+ of all TCGContext's
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,75 +32,43 @@ Cc: peter.maydell@linaro.org, "Emilio G. Cota" <cota@braap.org>
 
 From: "Emilio G. Cota" <cota@braap.org>
 
-We don't really free anything in this function anymore; we just remove
-the TB from the binary search tree.
+Groundwork for supporting multiple TCG contexts.
 
-Suggested-by: Alex Bennée <alex.bennee@linaro.org>
+Note that having n_tcg_ctxs is unnecessary. However, it is
+convenient to have it, since it will simplify iterating over the
+array: we'll have just a for loop instead of having to iterate
+over a NULL-terminated array (which would require n+1 elems)
+or having to check with ifdef's for usermode/softmmu.
+
 Reviewed-by: Richard Henderson <rth@twiddle.net>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- include/exec/exec-all.h   | 2 +-
- accel/tcg/cpu-exec.c      | 2 +-
- accel/tcg/translate-all.c | 6 +++---
- 3 files changed, 5 insertions(+), 5 deletions(-)
+ tcg/tcg.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
-index e2d598082e..923ece3e9b 100644
---- a/include/exec/exec-all.h
-+++ b/include/exec/exec-all.h
-@@ -388,7 +388,7 @@ static inline uint32_t curr_cflags(void)
-          | (use_icount ? CF_USE_ICOUNT : 0);
- }
+diff --git a/tcg/tcg.c b/tcg/tcg.c
+index 62f418ac8a..24ef6df6b5 100644
+--- a/tcg/tcg.c
++++ b/tcg/tcg.c
+@@ -118,6 +118,9 @@ static bool tcg_out_ldst_finalize(TCGContext *s);
  
--void tb_free(TranslationBlock *tb);
-+void tb_remove(TranslationBlock *tb);
- void tb_flush(CPUState *cpu);
- void tb_phys_invalidate(TranslationBlock *tb, tb_page_addr_t page_addr);
- TranslationBlock *tb_htable_lookup(CPUState *cpu, target_ulong pc,
-diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
-index b44c7941aa..9b58cdee28 100644
---- a/accel/tcg/cpu-exec.c
-+++ b/accel/tcg/cpu-exec.c
-@@ -220,7 +220,7 @@ static void cpu_exec_nocache(CPUState *cpu, int max_cycles,
+ #define TCG_HIGHWATER 1024
  
-     tb_lock();
-     tb_phys_invalidate(tb, -1);
--    tb_free(tb);
-+    tb_remove(tb);
-     tb_unlock();
- }
- #endif
-diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index 678e5ab61e..e929ccb30b 100644
---- a/accel/tcg/translate-all.c
-+++ b/accel/tcg/translate-all.c
-@@ -373,7 +373,7 @@ bool cpu_restore_state(CPUState *cpu, uintptr_t retaddr)
-         if (tb->cflags & CF_NOCACHE) {
-             /* one-shot translation, invalidate it immediately */
-             tb_phys_invalidate(tb, -1);
--            tb_free(tb);
-+            tb_remove(tb);
-         }
-         r = true;
-     }
-@@ -872,7 +872,7 @@ static TranslationBlock *tb_alloc(target_ulong pc)
- }
++static TCGContext **tcg_ctxs;
++static unsigned int n_tcg_ctxs;
++
+ static TCGRegSet tcg_target_available_regs[2];
+ static TCGRegSet tcg_target_call_clobber_regs;
  
- /* Called with tb_lock held.  */
--void tb_free(TranslationBlock *tb)
-+void tb_remove(TranslationBlock *tb)
- {
-     assert_tb_locked();
- 
-@@ -1811,7 +1811,7 @@ void cpu_io_recompile(CPUState *cpu, uintptr_t retaddr)
-              * cpu_exec_nocache() */
-             tb_phys_invalidate(tb->orig_tb, -1);
-         }
--        tb_free(tb);
-+        tb_remove(tb);
+@@ -384,6 +387,8 @@ void tcg_context_init(TCGContext *s)
      }
  
-     /* TODO: If env->pc != tb->pc (i.e. the faulting instruction was not
+     tcg_ctx = s;
++    tcg_ctxs = &tcg_ctx;
++    n_tcg_ctxs = 1;
+ }
+ 
+ /*
 -- 
 2.13.6
