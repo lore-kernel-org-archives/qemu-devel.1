@@ -1,29 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38836)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52318)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1e7DKJ-00067d-1p
-	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 00:30:00 -0400
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e7E2A-0002iy-Oi
+	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 01:15:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1e7DKF-0002Gq-UZ
-	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 00:29:59 -0400
-Received: from mail-pg0-x232.google.com ([2607:f8b0:400e:c05::232]:51458)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1e7DKF-0002Fi-N3
-	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 00:29:55 -0400
-Received: by mail-pg0-x232.google.com with SMTP id p9so16320531pgc.8
-	for <qemu-devel@nongnu.org>; Tue, 24 Oct 2017 21:29:55 -0700 (PDT)
-Received: from [10.61.2.175] ([122.99.82.10])
-	by smtp.googlemail.com with ESMTPSA id
-	q70sm3333837pfj.39.2017.10.24.21.29.52 for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Tue, 24 Oct 2017 21:29:53 -0700 (PDT)
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Message-ID: <f512ef4b-11ac-0cd2-0037-4608f2059669@ozlabs.ru>
-Date: Wed, 25 Oct 2017 15:29:50 +1100
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e7E27-00028q-Cu
+	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 01:15:18 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:33680
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
+	id 1e7E27-00027Q-5g
+	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 01:15:15 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v9P5DuWv046432
+	for <qemu-devel@nongnu.org>; Wed, 25 Oct 2017 01:15:14 -0400
+Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2dtcvcj4aq-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 25 Oct 2017 01:15:14 -0400
+Received: from localhost
+	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
+	Wed, 25 Oct 2017 01:15:14 -0400
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Date: Wed, 25 Oct 2017 01:14:59 -0400
+In-Reply-To: <1508908500-25274-1-git-send-email-stefanb@linux.vnet.ibm.com>
+References: <1508908500-25274-1-git-send-email-stefanb@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-AU
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] iotest 194 fails on vhdx
+Content-Type: text/plain; charset=UTF-8
+Message-Id: <1508908500-25274-5-git-send-email-stefanb@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 4/5] vl: remove unnecessary #ifdef CONFIG_TPM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,80 +41,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Stefan Berger <stefanb@linux.vnet.ibm.com>
 
-Hi!
+From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-The latest QEMU fails on:
-tests/qemu-iotests/check -vhdx 194
+a stub is now provided.
 
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Tested-by: Richard W.M. Jones <rjones@redhat.com>
+Reviewed-by: Juan Quintela <quintela@redhat.com>
+Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+---
+ vl.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-/home/aik/pbuild/qemu-aikhostos2-ppc64-softmmu-debug-build/ppc64-softmmu/qemu-system-ppc64
-\
- -chardev socket,id=mon,path=/home/aik/qemudest-monitor.sock \
- -mon chardev=mon,mode=control \
- -display none \
- -vga none \
- -machine accel=qtest \
- -nodefaults \
- -incoming unix:/home/aik/qemu-migration.sock \
- -drive if=virtio,id=drive0,file=/home/aik/dest.img,format=vhdx,cache=writeback
-
-
-GDB says it is assert(!(bs->open_flags & BDRV_O_INACTIVE)). The very same
-test passes with a qcow2 image. Does it look any familiar to anyone? Where
-to start digging from? Thanks.
-
-
-
-(gdb) r
-Starting program:
-/home/aik/pbuild/qemu-aikhostos2-ppc64-softmmu-debug-build/ppc64-softmmu/qemu-system-ppc64
--chardev socket,id=mon,path=/home/a
-ik/qemudest-monitor.sock -mon chardev=mon,mode=control -display none -vga
-none -machine accel=qtest -nodefaults -incoming unix:/home/aik/qemu-mi
-gration.sock -drive
-if=virtio,id=drive0,file=/home/aik/dest.img,format=vhdx,cache=writeback
-[Thread debugging using libthread_db enabled]
-Using host libthread_db library "/lib64/libthread_db.so.1".
-[New Thread 0x7ffff698eb80 (LWP 70705)]
-[New Thread 0x7ffff607eb80 (LWP 70706)]
-qemu-system-ppc64: /home/aik/p/qemu/block/io.c:1601: bdrv_co_pwritev:
-Assertion `!(bs->open_flags & 0x0800)' failed.
-
-Program received signal SIGABRT, Aborted.
-0x00007ffff77deff0 in raise () from /lib64/libc.so.6
-(gdb) bt
-#0  0x00007ffff77deff0 in raise () from /lib64/libc.so.6
-#1  0x00007ffff77e136c in abort () from /lib64/libc.so.6
-#2  0x00007ffff77d4c44 in __assert_fail_base () from /lib64/libc.so.6
-#3  0x00007ffff77d4d34 in __assert_fail () from /lib64/libc.so.6
-#4  0x000000001074ce44 in bdrv_co_pwritev (child=0x111c6160, offset=65536,
-bytes=80, qiov=0x7fffffffe090, flags=0)
-    at /home/aik/p/qemu/block/io.c:1601
-#5  0x0000000010749408 in bdrv_rw_co_entry (opaque=0x7fffffffdfa0) at
-/home/aik/p/qemu/block/io.c:620
-#6  0x0000000010857188 in coroutine_trampoline (i0=287156048, i1=0) at
-/home/aik/p/qemu/util/coroutine-ucontext.c:79
-#7  0x00007ffff77f2b9c in makecontext () from /lib64/libc.so.6
-#8  0x0000000000000000 in ?? ()
-(gdb) p bs->open_flags
-No symbol "bs" in current context.
-(gdb) up
-#1  0x00007ffff77e136c in abort () from /lib64/libc.so.6
-(gdb)
-#2  0x00007ffff77d4c44 in __assert_fail_base () from /lib64/libc.so.6
-(gdb)
-#3  0x00007ffff77d4d34 in __assert_fail () from /lib64/libc.so.6
-(gdb)
-#4  0x000000001074ce44 in bdrv_co_pwritev (child=0x111c6160, offset=65536,
-bytes=80, qiov=0x7fffffffe090, flags=0)
-    at /home/aik/p/qemu/block/io.c:1601
-1601        assert(!(bs->open_flags & BDRV_O_INACTIVE));
-(gdb) p/x bs->open_flags
-$2 = 0xe802
-(gdb)
-
-
--- 
-Alexey
+diff --git a/vl.c b/vl.c
+index 0723835..ec29909 100644
+--- a/vl.c
++++ b/vl.c
+@@ -4624,11 +4624,9 @@ int main(int argc, char **argv, char **envp)
+         exit(1);
+     }
+=20
+-#ifdef CONFIG_TPM
+     if (tpm_init() < 0) {
+         exit(1);
+     }
+-#endif
+=20
+     /* init the bluetooth world */
+     if (foreach_device_config(DEV_BT, bt_parse))
+--=20
+2.5.5
