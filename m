@@ -1,29 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52895)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57034)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mar.krzeminski@gmail.com>) id 1e7N5s-00011y-Ed
-	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 10:55:48 -0400
+	(envelope-from <fiuczy@linux.vnet.ibm.com>) id 1e7NJS-0006kd-7P
+	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 11:09:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mar.krzeminski@gmail.com>) id 1e7N5p-0002if-7n
-	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 10:55:44 -0400
-Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:56996)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mar.krzeminski@gmail.com>)
-	id 1e7N5o-0002hG-W2
-	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 10:55:41 -0400
-Received: by mail-lf0-x241.google.com with SMTP id 90so274277lfs.13
-	for <qemu-devel@nongnu.org>; Wed, 25 Oct 2017 07:55:40 -0700 (PDT)
-References: <20171024195139.28179-1-frasse.iglesias@gmail.com>
-	<20171024195139.28179-4-frasse.iglesias@gmail.com>
-From: "mar.krzeminski" <mar.krzeminski@gmail.com>
-Message-ID: <3e0fa080-b53f-3af5-9940-858bbed188ba@gmail.com>
-Date: Wed, 25 Oct 2017 16:55:37 +0200
+	(envelope-from <fiuczy@linux.vnet.ibm.com>) id 1e7NJM-0001ak-6c
+	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 11:09:46 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59050
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <fiuczy@linux.vnet.ibm.com>)
+	id 1e7NJL-0001WH-U0
+	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 11:09:40 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v9PF3Dfo144432
+	for <qemu-devel@nongnu.org>; Wed, 25 Oct 2017 11:09:35 -0400
+Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2dtu63pxnr-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 25 Oct 2017 11:09:34 -0400
+Received: from localhost
+	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <fiuczy@linux.vnet.ibm.com>;
+	Wed, 25 Oct 2017 16:09:32 +0100
+References: <20171020145437.18549-1-borntraeger@de.ibm.com>
+	<d028d04a-9c28-af10-3410-f9007867cc05@de.ibm.com>
+	<1ac27ce2-091d-e1b7-fc94-ebdf696a35e9@redhat.com>
+From: Boris Fiuczynski <fiuczy@linux.vnet.ibm.com>
+Date: Wed, 25 Oct 2017 17:09:28 +0200
 MIME-Version: 1.0
-In-Reply-To: <20171024195139.28179-4-frasse.iglesias@gmail.com>
+In-Reply-To: <1ac27ce2-091d-e1b7-fc94-ebdf696a35e9@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-AU
-Subject: Re: [Qemu-devel] [PATCH v3 03/13] m25p80: Add support for BRRD/BRWR
- and BULK_ERASE (0x60)
+Content-Language: en-US
+Message-Id: <9f4037d8-93a3-be0f-8cb4-4424158e236b@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH/QEMU] s390x/kvm: use cpu_model_available
+ for guarded storage on compat machines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,84 +45,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Francisco Iglesias <frasse.iglesias@gmail.com>, qemu-devel@nongnu.org
-Cc: edgari@xilinx.com, alistai@xilinx.com, francisco.iglesias@feimtech.se
+To: David Hildenbrand <david@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Marc Hartmayer <mhartmay@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: libvir-list@redhat.com, qemu-devel@nongnu.org, Jiri Denemark <jdenemar@redhat.com>, "Jason J . Herne" <jjherne@linux.vnet.ibm.com>, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>, Halil Pasic <pasic@linux.vnet.ibm.com>
 
+On 10/25/2017 12:23 PM, David Hildenbrand wrote:
+> On 25.10.2017 12:18, Christian Borntraeger wrote:
+>> Ping, I plan to submit belows patch for 2.11. We can then still look i=
+nto
+>> a libvirt<->qemu interface for limiting host-model depending on machin=
+e versions
+>> (or not).
+>=20
+> I think this would be sufficient for now.
+>=20
+> Having different host models, depending on the the machine type sounds
+> wrong. But maybe we'll need it in the future.
+>=20
 
+David, I disagree if your proposal is to generally tolerate new cpu=20
+features in old machine types. This *might* work for gs but how do you=20
+guaranty that guests do not behave differently/wrong when suddenly new=20
+cpu features are made available to guest when (re-)starting them.
+That is my feedback for the qemu side of this mater.
 
-W dniu 24.10.2017 o 21:51, Francisco Iglesias pisze:
-> Add support for the bank address register access commands (BRRD/BRWR) and
-> the BULK_ERASE (0x60) command.
->
-> Signed-off-by: Francisco Iglesias <frasse.iglesias@gmail.com>
-> ---
->   hw/block/m25p80.c | 20 ++++++++++++++++++++
->   1 file changed, 20 insertions(+)
->
-> diff --git a/hw/block/m25p80.c b/hw/block/m25p80.c
-> index c85e8fa..3d2975c 100644
-> --- a/hw/block/m25p80.c
-> +++ b/hw/block/m25p80.c
-> @@ -331,6 +331,8 @@ typedef enum {
->       WRDI = 0x4,
->       RDSR = 0x5,
->       WREN = 0x6,
-> +    BRRD = 0x16,
-> +    BRWR = 0x17,
-Above commands look to be equivalent to 
-EXTEND_ADDR_READ/EXTEND_ADDR_WRITE from Micron.
-IMO both could fall in the same case block.
+Regarding the libvirt side of this:
+When looking at https://libvirt.org/formatdomain.html#elementsCPU I=20
+found the following sentence:
+Since the CPU definition is copied just before starting a domain,=20
+exactly the same XML can be used on different hosts while still=20
+providing the best guest CPU each host supports.
 
->       JEDEC_READ = 0x9f,
->       BULK_ERASE = 0xc7,
->       READ_FSR = 0x70,
-> @@ -368,6 +370,8 @@ typedef enum {
->       EN_4BYTE_ADDR = 0xB7,
->       EX_4BYTE_ADDR = 0xE9,
->   
-> +    BULK_ERASE_60 = 0x60,
-> +
->       EXTEND_ADDR_READ = 0xC8,
->       EXTEND_ADDR_WRITE = 0xC5,
->   
-> @@ -975,6 +979,15 @@ static void decode_new_cmd(Flash *s, uint32_t value)
->           }
->           break;
->   
-> +    case BRWR:
-> +        if (s->write_enable) {
-> +            s->needed_bytes = 1;
-> +            s->pos = 0;
-> +            s->len = 0;
-> +            s->state = STATE_COLLECTING_DATA;
-> +        }
-> +        break;
-> +
->       case WRDI:
->           s->write_enable = false;
->           break;
-> @@ -1004,6 +1017,12 @@ static void decode_new_cmd(Flash *s, uint32_t value)
->           s->state = STATE_READING_DATA;
->           break;
->   
-> +    case BRRD:
-> +        s->pos = 0;
-> +        s->len = 1;
-> +        s->state = STATE_READING_DATA;
-> +        break;
-> +
-I can not see any code where you are actually filling the register 
-value. s->ear could be used for that as well.
->       case JEDEC_READ:
->           DB_PRINT_L(0, "populated jedec code\n");
->           for (i = 0; i < s->pi->id_len; i++) {
-> @@ -1038,6 +1057,7 @@ static void decode_new_cmd(Flash *s, uint32_t value)
->           }
->           break;
->   
-> +    case BULK_ERASE_60:
->       case BULK_ERASE:
->           if (s->write_enable) {
->               DB_PRINT_L(0, "chip erase\n");
-Regards,
-Marcin
+My interpretation of "the best guest CPU each host supports" is that=20
+besides limiting factors like hardware, kernel and qemu capabilities the=20
+requested machine type for the guest is a limiting factor as well.
+
+Nevertheless if my interpretation is found to be incorrect than we=20
+should think about another new cpu mode that includes the machine type=20
+into the "best guest CPU" detection.
+My assumption is that we must not require the users to know which cpu=20
+model they manually need to define to match a specific machine type
+AND we want to guarantee that guests run without risking any side=20
+effects by tolerating any additional cpu features.
+
+--=20
+Mit freundlichen Gr=C3=BC=C3=9Fen/Kind regards
+    Boris Fiuczynski
+
+IBM Deutschland Research & Development GmbH
+Vorsitzender des Aufsichtsrats: Martina K=C3=B6deritz
+Gesch=C3=A4ftsf=C3=BChrung: Dirk Wittkopp
+Sitz der Gesellschaft: B=C3=B6blingen
+Registergericht: Amtsgericht Stuttgart, HRB 243294
