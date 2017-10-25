@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39057)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40222)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <batmanustc@gmail.com>) id 1e7ZFP-0006HN-FG
-	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 23:54:24 -0400
+	(envelope-from <no-reply@patchew.org>) id 1e7ZPM-0007ds-0Z
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 00:04:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <batmanustc@gmail.com>) id 1e7ZFO-00066k-6W
-	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 23:54:23 -0400
-Received: from mail-qt0-x233.google.com ([2607:f8b0:400d:c0d::233]:51119)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <batmanustc@gmail.com>)
-	id 1e7ZFO-00065V-1W
-	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 23:54:22 -0400
-Received: by mail-qt0-x233.google.com with SMTP id d9so2711279qtd.7
-	for <qemu-devel@nongnu.org>; Wed, 25 Oct 2017 20:54:21 -0700 (PDT)
+	(envelope-from <no-reply@patchew.org>) id 1e7ZPI-0006qM-Sp
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 00:04:40 -0400
+Resent-Message-Id: <E1e7ZPI-0006qM-Sp@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21498)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1e7ZPI-0006hP-Ja
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 00:04:36 -0400
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <150894820803.30.14909284007656779758@bafd83ae6430>
+In-Reply-To: <1508947167-5304-1-git-send-email-mark.cave-ayland@ilande.co.uk>
 MIME-Version: 1.0
-In-Reply-To: <CAOE=1Z31T6nHcO4P6GWW8GK_o0VB66HivPc-m1LZRh_x6nY_6g@mail.gmail.com>
-References: <CAOE=1Z31T6nHcO4P6GWW8GK_o0VB66HivPc-m1LZRh_x6nY_6g@mail.gmail.com>
-From: Sam <batmanustc@gmail.com>
-Date: Thu, 26 Oct 2017 11:54:20 +0800
-Message-ID: <CAOE=1Z2fEjHHAeAi2DA8kpP7Bc_iy0eY_KTDFFk01=0_Y+1jww@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] Qemu start VM in huge page without '-mem-prealloc'
- will get memory leak?
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 25 Oct 2017 09:16:48 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCHv4 00/13] sun4m: sparc32_dma tidy-ups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,53 +28,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>
+To: mark.cave-ayland@ilande.co.uk
+Cc: famz@redhat.com, qemu-devel@nongnu.org, atar4qemu@gmail.com
 
-BTW, I start VM by this command, and then stop it, then memory leak happens.
-
-To compare, I start another VM, and wait for about 10 minutes, and then
-kill it as I does above, then no memory leak happens.
-
-So is this a bug of KVM or qemu ?
-
-2017-10-26 11:09 GMT+08:00 Sam <batmanustc@gmail.com>:
-
-> For qemu-2.6.0, in huge page (1G) environment, after kill the qemu
-> process, memory which is alloc for the vm could not be released. Detail is
-> bellow.
-> Or should I use some specific command to stop vm? I want to know if there
-> someone has the same problem?
->
-> The start up command is:
->
-> CMD1="$QEMU_CMD -D qemu.log -trace events=qemu-events-all -enable-kvm -cpu
-> qemu64,+vmx,+ssse3,+sse4.1,+sse4.2,+x2apic,+aes,+avx,+vme,+
-> pat,+ss,+pclmulqdq,+xsave,level=13 -machine pc,accel=kvm -chardev
-> socket,id=hmqmondev,port=55908,host=127.0.0.1,nodelay,server,nowait -mon
-> chardev=hmqmondev,id=hmqmon,mode=readline -rtc
-> base=utc,clock=host,driftfix=none -usb -device usb-tablet -daemonize
-> -nodefaults -nodefconfig -no-kvm-pit-reinjection -global
-> kvm-pit.lost_tick_policy=discard -vga std -k en-us -smp 8 -name
-> gangyewei-qemutime-1 -m 40960 -boot order=cdn -vnc :8,password -drive
-> file=$DISK_0,if=none,id=drive_0,format=qcow2,cache=none,aio=native
-> -device virtio-blk-pci,id=dev_drive_0,drive=drive_0,bus=pci.0,addr=0x5
-> -drive file=$DISK_1,if=none,id=drive_1,format=qcow2,cache=none,aio=native
-> -device virtio-blk-pci,id=dev_drive_1,drive=drive_1,bus=pci.0,addr=0x6
-> -drive file=$DISK_2,if=none,id=drive_2,format=qcow2,cache=none,aio=native
-> -device virtio-blk-pci,id=dev_drive_2,drive=drive_2,bus=pci.0,addr=0x7
-> -device ide-cd,drive=ide0-cd0,bus=ide.1,unit=1 -drive
-> id=ide0-cd0,media=cdrom,if=none -chardev socket,id=char-n-52b49b80,path
-> =/usr/local/var/run/openvswitch/n-52b49b80,server -netdev
-> type=vhost-user,id=n-52b49b80,chardev=char-n-52b49b80,vhostforce=on
-> -device virtio-net-pci,netdev=n-52b49b80,mac=00:22:52:b4:9b:80,id=
-> netdev-n-52b49b80,addr=0xf$(nic_speed 10000) -object
-> memory-backend-file,id=mem,size=40960M,mem-path=/mnt/huge,share=on -numa
-> node,memdev=mem -pidfile $PID_FILE -chardev socket,path=/opt/cloud/workspa
-> ce/servers/4511f52a-f450-40d3-9417-a1e0a27ed507/qga.sock,server,nowait,id=qga0
-> -device virtio-serial -device virtserialport,chardev=qga0,na
-> me=org.qemu.guest_agent.0"
->
-> The stop script is just kill this process.
->
-> the result of `cat /proc/meminfo` show memory is still there.
->
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
+ZGV2ZWxdIFtQQVRDSHY0IDAwLzEzXSBzdW40bTogc3BhcmMzMl9kbWEgdGlkeS11cHMKVHlwZTog
+c2VyaWVzCk1lc3NhZ2UtaWQ6IDE1MDg5NDcxNjctNTMwNC0xLWdpdC1zZW5kLWVtYWlsLW1hcmsu
+Y2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jp
+bi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8
+IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApn
+aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAt
+LWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAg
+ZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0l
+cyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRz
+L2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAg
+ICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1Qg
+U0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4
+ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICog
+W25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8xNTA4OTQ3MTY3LTUzMDQtMS1naXQtc2Vu
+ZC1lbWFpbC1tYXJrLmNhdmUtYXlsYW5kQGlsYW5kZS5jby51ayAtPiBwYXRjaGV3LzE1MDg5NDcx
+NjctNTMwNC0xLWdpdC1zZW5kLWVtYWlsLW1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrClN3
+aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKMzZlZGE5ZGQ3MyBzcGFyYzMyX2RtYTogYWRk
+IGxlbiB0byBlc3AvbGUgRE1BIG1lbW9yeSB0cmFjaW5nCmFjNjMwNzlkMjMgc3BhcmMzMl9kbWE6
+IHJlbW92ZSBpc19sZWRtYSBoYWNrIGFuZCByZXBsYWNlIHdpdGggbWVtb3J5IHJlZ2lvbiBhbGlh
+cwowZTgxM2ZiYzhhIHNwYXJjMzJfZG1hOiBpbnRyb2R1Y2UgbmV3IFNQQVJDMzJfRE1BIHR5cGUg
+Y29udGFpbmVyIG9iamVjdAoyYWM3N2ZhOGMwIHNwYXJjMzJfZG1hOiBtYWtlIGxhbmNlIGRldmlj
+ZSBjaGlsZCBvZiBsZWRtYSBkZXZpY2UKNjdjMzY0Y2IzYSBsYW5jZTogbW92ZSBUWVBFX0xBTkNF
+IGFuZCBTeXNCdXNQQ05ldFN0YXRlIGZyb20gbGFuY2UuYyB0byBsYW5jZS5oCjYzYTY5ZmI3ZmYg
+c3BhcmMzMl9kbWE6IG1ha2UgZXNwIGRldmljZSBjaGlsZCBvZiBlc3BkbWEgZGV2aWNlCjZhYWIz
+OTllMWIgZXNwOiBtb3ZlIFRZUEVfRVNQIGFuZCBTeXNCdXNFU1BTdGF0ZSBmcm9tIGVzcC5jIHRv
+IGVzcC5oCjM3OGY1ZmU2YTUgc3BhcmMzMl9kbWE6IHVzZSBvYmplY3QgbGluayBpbnN0ZWFkIG9m
+IHFkZXYgcHJvcGVydHkgdG8gcGFzcyBJT01NVSByZWZlcmVuY2UKYTkyNzA0MDk1NSBzdW40bV9p
+b21tdTogbW92ZSBUWVBFX1NVTjRNX0lPTU1VIGRlY2xhcmF0aW9uIHRvIHN1bjRtLmgKODM2N2Yz
+Y2RkMCBzdW40bTogbW92ZSBETUEgZGV2aWNlIHdpcmluZyBmcm9tIHNwYXJjMzJfZG1hX2luaXQo
+KSB0byBzdW40bV9od19pbml0KCkKMWI0ODY4OTUzZiBzcGFyYzMyX2RtYTogbW92ZSB0eXBlIGRl
+Y2xhcmF0aW9ucyBmcm9tIHNwYXJjMzJfZG1hLmMgdG8gc3BhcmMzMl9kbWEuaAowMThmN2JkMTM1
+IHNwYXJjMzJfZG1hOiBzcGxpdCBlc3AgYW5kIGxlIGludG8gc2VwYXJhdGUgRE1BIGRldmljZXMK
+MmNhNDNmZDc4NyBzcGFyYzMyX2RtYTogcmVuYW1lIFNQQVJDMzJfRE1BIHR5cGUgdG8gU1BBUkMz
+Ml9ETUFfREVWSUNFCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzEzOiBz
+cGFyYzMyX2RtYTogcmVuYW1lIFNQQVJDMzJfRE1BIHR5cGUgdG8gU1BBUkMzMl9ETUFfREVWSUNF
+Li4uCkNoZWNraW5nIFBBVENIIDIvMTM6IHNwYXJjMzJfZG1hOiBzcGxpdCBlc3AgYW5kIGxlIGlu
+dG8gc2VwYXJhdGUgRE1BIGRldmljZXMuLi4KQ2hlY2tpbmcgUEFUQ0ggMy8xMzogc3BhcmMzMl9k
+bWE6IG1vdmUgdHlwZSBkZWNsYXJhdGlvbnMgZnJvbSBzcGFyYzMyX2RtYS5jIHRvIHNwYXJjMzJf
+ZG1hLmguLi4KQ2hlY2tpbmcgUEFUQ0ggNC8xMzogc3VuNG06IG1vdmUgRE1BIGRldmljZSB3aXJp
+bmcgZnJvbSBzcGFyYzMyX2RtYV9pbml0KCkgdG8gc3VuNG1faHdfaW5pdCgpLi4uCkVSUk9SOiBz
+cGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJyonIChjdHg6V3hWKQojNTI6IEZJTEU6IGh3L3Nw
+YXJjL3N1bjRtLmM6ODI0OgorICAgIHFlbXVfaXJxICpjcHVfaXJxc1tNQVhfQ1BVU10sIHNsYXZp
+b19pcnFbMzJdLCBzbGF2aW9fY3B1X2lycVtNQVhfQ1BVU107CiAgICAgICAgICAgICAgXgoKdG90
+YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCA2NiBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhh
+cyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMK
+YXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNI
+RUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA1LzEzOiBzdW40bV9pb21t
+dTogbW92ZSBUWVBFX1NVTjRNX0lPTU1VIGRlY2xhcmF0aW9uIHRvIHN1bjRtLmguLi4KQ2hlY2tp
+bmcgUEFUQ0ggNi8xMzogc3BhcmMzMl9kbWE6IHVzZSBvYmplY3QgbGluayBpbnN0ZWFkIG9mIHFk
+ZXYgcHJvcGVydHkgdG8gcGFzcyBJT01NVSByZWZlcmVuY2UuLi4KQ2hlY2tpbmcgUEFUQ0ggNy8x
+MzogZXNwOiBtb3ZlIFRZUEVfRVNQIGFuZCBTeXNCdXNFU1BTdGF0ZSBmcm9tIGVzcC5jIHRvIGVz
+cC5oLi4uCkNoZWNraW5nIFBBVENIIDgvMTM6IHNwYXJjMzJfZG1hOiBtYWtlIGVzcCBkZXZpY2Ug
+Y2hpbGQgb2YgZXNwZG1hIGRldmljZS4uLgpDaGVja2luZyBQQVRDSCA5LzEzOiBsYW5jZTogbW92
+ZSBUWVBFX0xBTkNFIGFuZCBTeXNCdXNQQ05ldFN0YXRlIGZyb20gbGFuY2UuYyB0byBsYW5jZS5o
+Li4uCkNoZWNraW5nIFBBVENIIDEwLzEzOiBzcGFyYzMyX2RtYTogbWFrZSBsYW5jZSBkZXZpY2Ug
+Y2hpbGQgb2YgbGVkbWEgZGV2aWNlLi4uCkNoZWNraW5nIFBBVENIIDExLzEzOiBzcGFyYzMyX2Rt
+YTogaW50cm9kdWNlIG5ldyBTUEFSQzMyX0RNQSB0eXBlIGNvbnRhaW5lciBvYmplY3QuLi4KQ2hl
+Y2tpbmcgUEFUQ0ggMTIvMTM6IHNwYXJjMzJfZG1hOiByZW1vdmUgaXNfbGVkbWEgaGFjayBhbmQg
+cmVwbGFjZSB3aXRoIG1lbW9yeSByZWdpb24gYWxpYXMuLi4KQ2hlY2tpbmcgUEFUQ0ggMTMvMTM6
+IHNwYXJjMzJfZG1hOiBhZGQgbGVuIHRvIGVzcC9sZSBETUEgbWVtb3J5IHRyYWNpbmcuLi4KPT09
+IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpF
+bWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5v
+cmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0
+cy5vcmc=
