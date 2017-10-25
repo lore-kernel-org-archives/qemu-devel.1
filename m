@@ -1,34 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39659)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39626)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e7NtB-0001Bs-Q6
-	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 11:46:43 -0400
+	(envelope-from <bounces@canonical.com>) id 1e7NtA-0001B6-8l
+	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 11:46:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e7NtA-0005w2-Tu
-	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 11:46:41 -0400
-Received: from indium.canonical.com ([91.189.90.7]:35218)
+	(envelope-from <bounces@canonical.com>) id 1e7Nt7-0005o4-Jp
+	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 11:46:40 -0400
+Received: from indium.canonical.com ([91.189.90.7]:35092)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1e7NtA-0005sG-NM
-	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 11:46:40 -0400
+	id 1e7Nt7-0005mT-D2
+	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 11:46:37 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1e7Nt8-000104-O8
-	for <qemu-devel@nongnu.org>; Wed, 25 Oct 2017 15:46:38 +0000
+	id 1e7Nt6-0000zz-5m
+	for <qemu-devel@nongnu.org>; Wed, 25 Oct 2017 15:46:36 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id B55082E806B
-	for <qemu-devel@nongnu.org>; Wed, 25 Oct 2017 15:46:38 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 2ABBF2E806E
+	for <qemu-devel@nongnu.org>; Wed, 25 Oct 2017 15:46:36 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 25 Oct 2017 15:34:31 -0000
-From: Thomas Huth <1336801@bugs.launchpad.net>
-Reply-To: Bug 1336801 <1336801@bugs.launchpad.net>
+Date: Wed, 25 Oct 2017 15:28:11 -0000
+From: Thomas Huth <1361618@bugs.launchpad.net>
+Reply-To: Bug 1361618 <1361618@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20140702141735.10601.33631.malonedeb@gac.canonical.com>
-Message-Id: <150894567182.16992.18025125336600368832.malone@gac.canonical.com>
+References: <20140826114417.27583.20809.malonedeb@soybean.canonical.com>
+Message-Id: <150894529167.17063.14407525850223365085.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1336801] Re: 12.04 guest hangs on a 14.04 host
- server with cirrus graphics
+Subject: [Qemu-devel] [Bug 1361618] Re: sparc cg3 1152x900 display abnormal
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,42 +38,37 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Triaging old bug tickets... can you still reproduce this issue with the
-latest version of QEMU? Or could we close this ticket nowadays?
+Setting this to "invalid" since it's apparently rather a firmware than a
+QEMU issue.
 
 ** Changed in: qemu
-       Status: New =3D> Incomplete
+       Status: New =3D> Invalid
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1336801
+https://bugs.launchpad.net/bugs/1361618
 
 Title:
-  12.04 guest hangs on a 14.04 host  server with cirrus graphics
+  sparc cg3 1152x900 display abnormal
 
 Status in QEMU:
-  Incomplete
-Status in qemu package in Ubuntu:
-  Incomplete
+  Invalid
 
 Bug description:
-  A new 12.04.4 server guest installation hangs on a 14.04 server host
-  machine.
+  when I use -vga cg3 -g 1152x900 with qemu-system-sparc, the display is ab=
+normal
+  I had try qemu-2.1.0 on win2003 with openBIOS or OBP
+      qemu-system-sparc.exe -vga cg3 -g 1152x900
+  or
+      qemu-system-sparc.exe -vga cg3 -g 1152x900 -bios ss5.bin
 
-  I did the following:
+  I also try qemu-2.0.2 on debian 6.0.1a i686 on VirtualBox host win2003
+  with same command, in vnc view, the display is same as on win2003.
 
-  Created a new Virtual Machine with the Ubuntu 12.04 template using virt-m=
-anager
-  Ran through the installation without a hitch to install a LAMP+SSH server=
-. All standard options apart from that.
-  On reboot the 12.04 guest started but then hung after doing fsck step.
-  Trying different options (change disk driver, etc) made it progress a cou=
-ple more steps but still hung.
-
-  The thing that fixed it in the end was to switch to a VGA display
-  driver, away from the default.
+  If I don't use -g 1152x900 parameter, everything is OK, sunOS 4.1.4
+  work well.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1336801/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1361618/+subscriptions
