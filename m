@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38142)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41544)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <changpeng.liu@intel.com>) id 1e7Aap-0006pU-99
-	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 21:34:52 -0400
+	(envelope-from <aik@ozlabs.ru>) id 1e7Aky-0000Nq-R2
+	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 21:45:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <changpeng.liu@intel.com>) id 1e7Aal-0005Im-5v
-	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 21:34:51 -0400
-Received: from mga03.intel.com ([134.134.136.65]:61807)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <changpeng.liu@intel.com>)
-	id 1e7Aak-0005Df-Re
-	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 21:34:47 -0400
-From: "Liu, Changpeng" <changpeng.liu@intel.com>
-Date: Wed, 25 Oct 2017 01:34:39 +0000
-Message-ID: <FF7FC980937D6342B9D289F5F3C7C2625B5D97A2@SHSMSX103.ccr.corp.intel.com>
-References: <1508390650-19115-1-git-send-email-changpeng.liu@intel.com>
-	<1508390650-19115-3-git-send-email-changpeng.liu@intel.com>
-	<20171019151745.GH6205@stefanha-x1.localdomain>
-	<FF7FC980937D6342B9D289F5F3C7C2625B5D8682@SHSMSX103.ccr.corp.intel.com>
-	<20171020095435.GD21393@stefanha-x1.localdomain>
-	<FF7FC980937D6342B9D289F5F3C7C2625B5D8EB6@SHSMSX103.ccr.corp.intel.com>
-	<20171023171146.GB15029@stefanha-x1.localdomain>
-	<FF7FC980937D6342B9D289F5F3C7C2625B5D9206@SHSMSX103.ccr.corp.intel.com>
-	<20171024125323.GH18756@stefanha-x1.localdomain>
-In-Reply-To: <20171024125323.GH18756@stefanha-x1.localdomain>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <aik@ozlabs.ru>) id 1e7Aku-0004L8-OO
+	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 21:45:20 -0400
+Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:48458)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1e7Aku-0004KD-1T
+	for qemu-devel@nongnu.org; Tue, 24 Oct 2017 21:45:16 -0400
+Received: by mail-pg0-x244.google.com with SMTP id v78so16025297pgb.5
+	for <qemu-devel@nongnu.org>; Tue, 24 Oct 2017 18:45:15 -0700 (PDT)
+References: <20171024085853.32615-1-aik@ozlabs.ru>
+	<20171024162752.GA21671@redhat.com>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <ef1eab70-8c55-0d75-e516-16ef6a419d04@ozlabs.ru>
+Date: Wed, 25 Oct 2017 12:45:10 +1100
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v4 2/4] vhost-user-blk: introduce a new
- vhost-user-blk host device
+In-Reply-To: <20171024162752.GA21671@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-AU
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH qemu] git-submodule.sh: Do not try
+ writing to source directory if not necessary
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,206 +31,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>, "felipe@nutanix.com" <felipe@nutanix.com>, "Harris, James R" <james.r.harris@intel.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org
+
+On 25/10/17 03:27, Daniel P. Berrange wrote:
+> On Tue, Oct 24, 2017 at 07:58:53PM +1100, Alexey Kardashevskiy wrote:
+>> The new git-submodule.sh script writes .git-submodule-status to
+>> the source directory every time no matter what. This makes it conditional.
+>>
+>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+>> ---
+>>
+>> I compile out of tree on a remote guest system where I mount the
+>> source directory as "readonly" and build directory as "rw" and
+>> scripts/git-submodule.sh tries writing to the source directory even when
+>> I manually update modules on a host machine which is quite annoying.
+>>
+>> Is this something acceptable? Or I am missing something here?
+> 
+> How did you update the modules - did you manually run  'git submodule update...'
+> or did you use the git-submodule.sh script on your host machine ?
 
 
+I run scripts/git-submodule.sh. Which is not thrilling either as I rather
+expect source tree not to be affected in any way when running "make".
 
-> -----Original Message-----
-> From: Stefan Hajnoczi [mailto:stefanha@gmail.com]
-> Sent: Tuesday, October 24, 2017 8:53 PM
-> To: Liu, Changpeng <changpeng.liu@intel.com>
-> Cc: qemu-devel@nongnu.org; pbonzini@redhat.com; mst@redhat.com;
-> marcandre.lureau@redhat.com; felipe@nutanix.com; Harris, James R
-> <james.r.harris@intel.com>
-> Subject: Re: [PATCH v4 2/4] vhost-user-blk: introduce a new vhost-user-bl=
-k host
-> device
->=20
-> On Tue, Oct 24, 2017 at 12:44:30AM +0000, Liu, Changpeng wrote:
-> >
-> >
-> > > -----Original Message-----
-> > > From: Stefan Hajnoczi [mailto:stefanha@gmail.com]
-> > > Sent: Tuesday, October 24, 2017 1:12 AM
-> > > To: Liu, Changpeng <changpeng.liu@intel.com>
-> > > Cc: qemu-devel@nongnu.org; pbonzini@redhat.com; mst@redhat.com;
-> > > marcandre.lureau@redhat.com; felipe@nutanix.com; Harris, James R
-> > > <james.r.harris@intel.com>
-> > > Subject: Re: [PATCH v4 2/4] vhost-user-blk: introduce a new vhost-use=
-r-blk
-> host
-> > > device
-> > >
-> > > On Mon, Oct 23, 2017 at 04:26:36AM +0000, Liu, Changpeng wrote:
-> > > >
-> > > >
-> > > > > -----Original Message-----
-> > > > > From: Stefan Hajnoczi [mailto:stefanha@gmail.com]
-> > > > > Sent: Friday, October 20, 2017 5:55 PM
-> > > > > To: Liu, Changpeng <changpeng.liu@intel.com>
-> > > > > Cc: qemu-devel@nongnu.org; pbonzini@redhat.com; mst@redhat.com;
-> > > > > marcandre.lureau@redhat.com; felipe@nutanix.com; Harris, James R
-> > > > > <james.r.harris@intel.com>
-> > > > > Subject: Re: [PATCH v4 2/4] vhost-user-blk: introduce a new vhost=
--user-blk
-> > > host
-> > > > > device
-> > > > >
-> > > > > On Fri, Oct 20, 2017 at 01:47:58AM +0000, Liu, Changpeng wrote:
-> > > > > > > > +static Property vhost_user_blk_properties[] =3D {
-> > > > > > > > +    DEFINE_PROP_CHR("chardev", VHostUserBlk, chardev),
-> > > > > > > > +    DEFINE_PROP_UINT16("num_queues", VHostUserBlk,
-> num_queues,
-> > > 1),
-> > > > > > > > +    DEFINE_PROP_UINT32("queue_size", VHostUserBlk, queue_s=
-ize,
-> 128),
-> > > > > > > > +    DEFINE_PROP_BIT64("f_size_max", VHostUserBlk, host_fea=
-tures,
-> > > > > > > > +                      VIRTIO_BLK_F_SIZE_MAX, true),
-> > > > > > > > +    DEFINE_PROP_BIT64("f_sizemax", VHostUserBlk, host_feat=
-ures,
-> > > > > > > > +                      VIRTIO_BLK_F_SIZE_MAX, true),
-> > > > > > > > +    DEFINE_PROP_BIT64("f_segmax", VHostUserBlk, host_featu=
-res,
-> > > > > > > > +                      VIRTIO_BLK_F_SEG_MAX, true),
-> > > > > > > > +    DEFINE_PROP_BIT64("f_geometry", VHostUserBlk, host_fea=
-tures,
-> > > > > > > > +                      VIRTIO_BLK_F_GEOMETRY, true),
-> > > > > > > > +    DEFINE_PROP_BIT64("f_readonly", VHostUserBlk, host_fea=
-tures,
-> > > > > > > > +                      VIRTIO_BLK_F_RO, false),
-> > > > > > > > +    DEFINE_PROP_BIT64("f_blocksize", VHostUserBlk, host_fe=
-atures,
-> > > > > > > > +                      VIRTIO_BLK_F_BLK_SIZE, true),
-> > > > > > > > +    DEFINE_PROP_BIT64("f_topology", VHostUserBlk, host_fea=
-tures,
-> > > > > > > > +                      VIRTIO_BLK_F_TOPOLOGY, true),
-> > > > > > > > +    DEFINE_PROP_BIT64("f_multiqueue", VHostUserBlk,
-> host_features,
-> > > > > > > > +                      VIRTIO_BLK_F_MQ, true),
-> > > > > > > > +    DEFINE_PROP_BIT64("f_flush", VHostUserBlk, host_featur=
-es,
-> > > > > > > > +                      VIRTIO_BLK_F_FLUSH, true),
-> > > > > > > > +    DEFINE_PROP_BIT64("f_barrier", VHostUserBlk, host_feat=
-ures,
-> > > > > > > > +                      VIRTIO_BLK_F_BARRIER, false),
-> > > > > > > > +    DEFINE_PROP_BIT64("f_scsi", VHostUserBlk, host_feature=
-s,
-> > > > > > > > +                      VIRTIO_BLK_F_SCSI, false),
-> > > > > > > > +    DEFINE_PROP_BIT64("f_wce", VHostUserBlk, host_features=
-,
-> > > > > > > > +                      VIRTIO_BLK_F_WCE, false),
-> > > > > > >
-> > > > > > > Please explain how feature negotation works.  The vhost-user =
-slave
-> > > > > > > advertises support features in the return value from
-> > > > > > > VHOST_USER_GET_FEATURES.  How does this additional feature ma=
-sk
-> > > work
-> > > > > and
-> > > > > > > why is it useful?
-> > > > > > According to Paolo's previous comments, VIRTIO_BLK_F_WCE/
-> > > > > VIRTIO_BLK_F_SCSI/ VIRTIO_BLK_F_BARRIER
-> > > > > > should be removed. Here I added all the feature flags just want=
- to avoid
-> > > the
-> > > > > case that vhost-user slave target
-> > > > > > can support but Qemu vhost block driver cannot support it.
-> > > > >
-> > > > > Please explain a bit more how these options can be used.
-> > > > >
-> > > > > When I looked at the vhost code it seemed like the vhost slave ca=
-n
-> > > > > report any feature bits it wishes (even things QEMU doesn't know =
-about).
-> > > > > What is the purpose of override some of the feature bits on the Q=
-EMU
-> > > > > command-line?
-> > > > Hi Stefan,
-> > > > Here I added a switch which can override vhost-slave's feature bits=
-, for
-> > > example, vhost-slave reported `VIRTIO_BLK_F_RO`,
-> > > > but Qemu vhost-master can disable it through command line when star=
-ted
-> the
-> > > Qemu. Users don't need to change any
-> > > > vhost-slave's code to disable this feature, and this is also aligne=
-d with
-> vhost-
-> > > scsi and vhost-net's implementation.
-> > >
-> > > You said vhost-master can disable features but the code doesn't seem =
-to
-> > > work that way:
-> > >
-> > > +    /* Turn on pre-defined features */
-> > > +    features |=3D s->host_features;
-> > User can append parameter when started Qemu: e.g: f_readonly=3Dfalse to
-> disable it.
->=20
-> No, f_readonly=3Dfalse has no effect if the vhost slave replies with f_re=
-adonly
-> to the VHOST_USER_GET_FEATURES message.
->=20
-> Take a look at the hw/virtio/vhost.c code:
->=20
->   uint64_t vhost_get_features(struct vhost_dev *hdev, const int *feature_=
-bits,
->                               uint64_t features)
->   {
->       const int *bit =3D feature_bits;
->       while (*bit !=3D VHOST_INVALID_FEATURE_BIT) {
->           uint64_t bit_mask =3D (1ULL << *bit);
->           if (!(hdev->features & bit_mask)) {
->               features &=3D ~bit_mask;
->           }
->           bit++;
->       }
->       return features;
->   }
->=20
-> If f_readonly=3Dfalse then features |=3D s->host_features will not contai=
-n
-> f_readonly but it doesn't matter because if hdev->features (this value
-> comes from the vhost slave) has f_readonly we will not clear the bit!
->=20
-> So again, what is the purpose of the f_* properties?  I don't understand
-> the semantics, it seems useless.
-Hi Stefan,
-I hate this piece of code too, :). There are several feature definitions in=
- VirtIODevice and vhost_dev,
-I printed the features in the function: vhost_user_blk_get_features, my tes=
-t vhost-slave also provides RO feature, and
-I started Qemu with f_readonly=3Dfalse:
 
-static uint64_t vhost_user_blk_get_features(VirtIODevice *vdev,
-                                            uint64_t features,
-                                            Error **errp)
-{
-    VHostUserBlk *s =3D VHOST_USER_BLK(vdev);
-    uint64_t get_features;
+> If you run git-submodule.sh on the host, then it should save the status
+> file, and then when you run make on the guest system, it should notice
+> that you're already updated and never even invoke 'git-submodule.sh update'
 
-    /* Turn on pre-defined host features */
-    fprintf(stdout, "Features %"PRIx64"\n", features);
-    features |=3D s->host_features;
-    fprintf(stdout, "Turn On Predefined Features %"PRIx64"\n", features);
-    fprintf(stdout, "VHOST Features %"PRIx64"\n", s->dev.features);
 
-    get_features =3D vhost_get_features(&s->dev, user_feature_bits, feature=
-s);
-    fprintf(stdout, "Get Features %"PRIx64"\n", get_features);
+scripts/git-submodule.sh also tries writing to the source directory (I
+should probably have fixed that branch too) but this failure is not fatal
+for "make" but makes it want to try "update" and then "make" fails.
 
-    return get_features;
-}
 
-Here is the result, RO feature is bit5:
-Features 179000000, This is VirtIODevice->host_features.
-Turn On Predefined Features 179001ed7, RO bit is masked here.
-VHOST Features 141001466, vhost_dev-> features, you can see that RO bit is =
-set here.
-Get Features 149001446, this is the final result, RO bit is masked finally.
+> I'm not against your proposal below, but I'm curious why you're seeing
+> 'git-submodule.sh update' being run by make in the first place.
+> 
+>>
+>> ---
+>>  scripts/git-submodule.sh | 4 +++-
+>>  1 file changed, 3 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/scripts/git-submodule.sh b/scripts/git-submodule.sh
+>> index d8fbc7e47e..b642994a67 100755
+>> --- a/scripts/git-submodule.sh
+>> +++ b/scripts/git-submodule.sh
+>> @@ -33,6 +33,8 @@ status)
+>>      ;;
+>>  update)
+>>      git submodule update --init $modules 1>/dev/null 2>&1
+>> -    git submodule status $modules > "${substat}"
+>> +    substat_tmp=$(mktemp)
+>> +    git submodule status $modules > "$substat_tmp"
+>> +    diff "${substat_tmp}" "${substat}" || mv "${substat_tmp}" "${substat}"
+>>      ;;
+>>  esac
+>> -- 
+>> 2.11.0
+>>
+> 
+> Regards,
+> Daniel
+> 
 
-Similar with vhost-scsi and vhost-net, I think this part of logic is correc=
-t.
+
+-- 
+Alexey
