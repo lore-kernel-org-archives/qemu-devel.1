@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60934)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33706)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e7iA1-0006Jj-9r
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 09:25:29 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1e7iDr-0001Gt-1N
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 09:29:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e7i9w-0006cg-Ev
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 09:25:25 -0400
-Received: from indium.canonical.com ([91.189.90.7]:45794)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1e7i9w-0006bb-7c
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 09:25:20 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1e7i9u-00077l-SP
-	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 13:25:18 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id D2E6A2E80CE
-	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 13:25:18 +0000 (UTC)
+	(envelope-from <dgilbert@redhat.com>) id 1e7iDl-00019w-UE
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 09:29:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44868)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1e7iDl-00018a-Kt
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 09:29:17 -0400
+Date: Thu, 26 Oct 2017 14:29:12 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20171026132911.GC2585@work-vm>
+References: <CAOE=1Z31T6nHcO4P6GWW8GK_o0VB66HivPc-m1LZRh_x6nY_6g@mail.gmail.com>
+	<CAOE=1Z2fEjHHAeAi2DA8kpP7Bc_iy0eY_KTDFFk01=0_Y+1jww@mail.gmail.com>
+	<CAOE=1Z2Rjg3b7P1VJw6FDvnTwu7JtZWQ_PD4nBQgghpn1M=B6w@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 26 Oct 2017 13:13:06 -0000
-From: Thomas Huth <657006@bugs.launchpad.net>
-Reply-To: Bug 657006 <657006@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20101008180054.4876.62094.malonedeb@palladium.canonical.com>
-Message-Id: <150902358626.17096.9892702318273302823.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 657006] Re: arm v7M - svc insn doesn't trigger
- PendSV handler
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAOE=1Z2Rjg3b7P1VJw6FDvnTwu7JtZWQ_PD4nBQgghpn1M=B6w@mail.gmail.com>
+Subject: Re: [Qemu-devel] Qemu start VM in huge page without '-mem-prealloc'
+ will get memory leak?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,84 +29,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Sam <batmanustc@gmail.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Triaging old bug tickets... can you still reproduce this issue with the
-latest version of QEMU? Or could we close this ticket nowadays?
+* Sam (batmanustc@gmail.com) wrote:
+> I don't know if this process is:
+> 1. qemu call kernel API to alloc 40G memory.
+> 2. qemu process is killed by hand.
+> 3. kernel alloc 40G memory, but qemu process is down, then this 40G is left
+> in kernel.
 
-** Changed in: qemu
-       Status: New =3D> Incomplete
+It might be interesting to check the files in:
+/sys/kernel/mm/hugepages/hugepages-2048kB
 
--- =
+what do free_hugepages and nr_hugepages say?
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/657006
+Is there a file left in /mnt/huge ?
 
-Title:
-  arm v7M - svc insn doesn't trigger PendSV handler
+Dave
 
-Status in QEMU:
-  Incomplete
-
-Bug description:
-  The svc instruction doesn't work as expected.
-
-  -> qemu 0.13.0 rc1 (git)
-
-  Test : demo with freeRTOS (for example
-  FreeRTOS-6.0.5/Demo/CORTEX_LM3S811_GCC) with the card lm3s811evb.
-
-  If we start the scheduler, it will call that function (__attribute__
-  (( naked ))) :
-
-  void vPortStartFirstTask( void )
-
-  {
-
-          __asm volatile(
-
-                                          " ldr r0, =3D0xE000ED08   \n" /*
-  Use the NVIC offset register to locate the stack. */
-
-                                          " ldr r0, [r0]
-  \n"
-
-                                          " ldr r0, [r0]
-  \n"
-
-                                          " msr msp, r0
-  \n" /* Set the msp back to the start of the stack. */
-
-                                          " svc 0
-  \n" /* System call to start first task. */
-
-                                  );
-
-  }
-
-  The 4 first lines in asm work fine. The scv 0 call will rise the right in=
-terrupt in qemu (line 151, in arm_gic.c, best_irq =3D 15). However, it will=
- never call the PendSV Handler (xPortPendSVHandler here). This function is =
-recorded in the nvic vector.
-  Next, (after the svc), the processor will execute the line after in code =
-(this is a naked function) so the next function written after vPortStartFir=
-stTask in the code.
-
-  =
-
-  command line :
-  console 1 : qemu-system-arm -M lm3s6965evb -kernel gcc/RTOSDemo.axf -s -S
-  console 2 : arm-none-eabi-gdb -ex "target remote localhost:1234" gcc/RTOS=
-Demo.axf
-
-  arm-none-eabi from http://www.codesourcery.com/sgpp/lite/arm/portal/relea=
-se1294
-  Same error with another project with arm-elf
-
-  processor : arm cortex m3
-
-  host : gentoo (2.6.35-r9) (without kqemu)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/657006/+subscriptions
+> 
+> 2017-10-26 11:54 GMT+08:00 Sam <batmanustc@gmail.com>:
+> 
+> > BTW, I start VM by this command, and then stop it, then memory leak
+> > happens.
+> >
+> > To compare, I start another VM, and wait for about 10 minutes, and then
+> > kill it as I does above, then no memory leak happens.
+> >
+> > So is this a bug of KVM or qemu ?
+> >
+> > 2017-10-26 11:09 GMT+08:00 Sam <batmanustc@gmail.com>:
+> >
+> >> For qemu-2.6.0, in huge page (1G) environment, after kill the qemu
+> >> process, memory which is alloc for the vm could not be released. Detail is
+> >> bellow.
+> >> Or should I use some specific command to stop vm? I want to know if there
+> >> someone has the same problem?
+> >>
+> >> The start up command is:
+> >>
+> >> CMD1="$QEMU_CMD -D qemu.log -trace events=qemu-events-all -enable-kvm
+> >> -cpu qemu64,+vmx,+ssse3,+sse4.1,+sse4.2,+x2apic,+aes,+avx,+vme,+p
+> >> at,+ss,+pclmulqdq,+xsave,level=13 -machine pc,accel=kvm -chardev
+> >> socket,id=hmqmondev,port=55908,host=127.0.0.1,nodelay,server,nowait -mon
+> >> chardev=hmqmondev,id=hmqmon,mode=readline -rtc
+> >> base=utc,clock=host,driftfix=none -usb -device usb-tablet -daemonize
+> >> -nodefaults -nodefconfig -no-kvm-pit-reinjection -global
+> >> kvm-pit.lost_tick_policy=discard -vga std -k en-us -smp 8 -name
+> >> gangyewei-qemutime-1 -m 40960 -boot order=cdn -vnc :8,password -drive
+> >> file=$DISK_0,if=none,id=drive_0,format=qcow2,cache=none,aio=native
+> >> -device virtio-blk-pci,id=dev_drive_0,drive=drive_0,bus=pci.0,addr=0x5
+> >> -drive file=$DISK_1,if=none,id=drive_1,format=qcow2,cache=none,aio=native
+> >> -device virtio-blk-pci,id=dev_drive_1,drive=drive_1,bus=pci.0,addr=0x6
+> >> -drive file=$DISK_2,if=none,id=drive_2,format=qcow2,cache=none,aio=native
+> >> -device virtio-blk-pci,id=dev_drive_2,drive=drive_2,bus=pci.0,addr=0x7
+> >> -device ide-cd,drive=ide0-cd0,bus=ide.1,unit=1 -drive
+> >> id=ide0-cd0,media=cdrom,if=none -chardev socket,id=char-n-52b49b80,path
+> >> =/usr/local/var/run/openvswitch/n-52b49b80,server -netdev
+> >> type=vhost-user,id=n-52b49b80,chardev=char-n-52b49b80,vhostforce=on
+> >> -device virtio-net-pci,netdev=n-52b49b80,mac=00:22:52:b4:9b:80,id=ne
+> >> tdev-n-52b49b80,addr=0xf$(nic_speed 10000) -object
+> >> memory-backend-file,id=mem,size=40960M,mem-path=/mnt/huge,share=on -numa
+> >> node,memdev=mem -pidfile $PID_FILE -chardev socket,path=/opt/cloud/
+> >> workspace/servers/4511f52a-f450-40d3-9417-a1e0a27ed507/qga.sock,server,nowait,id=qga0
+> >> -device virtio-serial -device virtserialport,chardev=qga0,na
+> >> me=org.qemu.guest_agent.0"
+> >>
+> >> The stop script is just kill this process.
+> >>
+> >> the result of `cat /proc/meminfo` show memory is still there.
+> >>
+> >
+> >
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
