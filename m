@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46877)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46878)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1e7cxt-0004eZ-6A
+	(envelope-from <quintela@redhat.com>) id 1e7cxt-0004ea-6N
 	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 03:52:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1e7cxo-0007vT-97
+	(envelope-from <quintela@redhat.com>) id 1e7cxr-0007xi-Nw
 	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 03:52:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45440)
+Received: from mx1.redhat.com ([209.132.183.28]:34398)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1e7cxo-0007uf-2g
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 03:52:28 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1e7cxr-0007x4-G8
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 03:52:31 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
 	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 02534C047B75
-	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 07:52:27 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8202F2CE94B
+	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 07:52:30 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Thu, 26 Oct 2017 09:52:12 +0200
-Message-Id: <20171026075222.27798-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 00/10] Add make check tests for Migration
+Date: Thu, 26 Oct 2017 09:52:14 +0200
+Message-Id: <20171026075222.27798-3-quintela@redhat.com>
+In-Reply-To: <20171026075222.27798-1-quintela@redhat.com>
+References: <20171026075222.27798-1-quintela@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 02/10] tests: Refactor setting of
+ parameters/capabilities
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,78 +33,146 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
+So we can use them in future tests
 
-Hi
+Signed-off-by: Juan Quintela <quintela@redhat.com>
+---
+ tests/migration-test.c | 101 +++++++++++++++++++++++++++++++------------------
+ 1 file changed, 64 insertions(+), 37 deletions(-)
 
-This is on top of my set_cache_size series.
-
-big changes is this v2:
-- to make review easier, I started renaming postcopy-test.c to migration-test.c
-- Did cleanups/refactoring there
-- Don't use global-qtest anymore
-- check that the parameters that we sent got really set
-- RFH: comrpress threads tests is not working for some weird reason.  Using the same code on command line works.
-  still investigating why.
-
-ToDoo:
-
-- tcp: after discussions with dave, we ended in conclusion that we
-  need to use the 0 port and let the system gives us a free one
-
-  But .... that means that we need to be able to get that port back somehow.
-  "info migrate" woring on destination side?
-
-- compression threads.  There is some weird interaction with the test
-  hardness and every migration thread get waiting in a different
-  semaphore.  Investigating if it is a race/bug/whateverr
-
-- deprecated commands: There was a suggestion to make
-  migrate_set_parameter look at the parameter name and test old/new
-  depending on something.  Not sure what to do here.
-
-- testing commands: Is there a way to launch qemu and just sent
-  qmp/hmp commands without having to really run anything else?
-
-Please review,.
-
-Later, Juan.
-
-[v1]
-- add test for precopy for unix/tcp
-  exec and fd to came, don't know how to test rdma without hardware
-- add tests using deprecated interfaces
-- add test for xbzrle
-  Note to myself, there is no way to set the cache size with migraton_set_parameters
-- Add test for compress threads
-  disabled on the series, right now it appears that compression is not working at all
-- Move postcopy to use new results
-  Idea is to move it on top of migration-test.c, but first I want some reviews on basic idea
-
-Please, review.
-
-Juan.
-
-
-
-*** BLURB HERE ***
-
-Juan Quintela (10):
-  tests: rename postcopy-test to migration-test
-  tests: Refactor setting of parameters/capabilities
-  tests: Factorize out migrate_test_start/end
-  tests: Don't abuse global_qtest
-  tests: check that migration parameters are really assigned
-  tests: Add migration precopy test
-  tests: Add basic migration precopy tcp test
-  tests: Add precopy test using deprecated commands
-  tests: Add migration xbzrle test
-  [RFH] tests: Add migration compress threads tests
-
- MAINTAINERS                                 |   1 +
- tests/Makefile.include                      |   6 +-
- tests/{postcopy-test.c => migration-test.c} | 492 ++++++++++++++++++++++------
- 3 files changed, 394 insertions(+), 105 deletions(-)
- rename tests/{postcopy-test.c => migration-test.c} (59%)
-
+diff --git a/tests/migration-test.c b/tests/migration-test.c
+index 55c4aed719..19a1445076 100644
+--- a/tests/migration-test.c
++++ b/tests/migration-test.c
+@@ -351,12 +351,69 @@ static void cleanup(const char *filename)
+     g_free(path);
+ }
+ 
++static void migrate_set_downtime(QTestState *who, const char *value)
++{
++    QDict *rsp;
++    gchar *cmd;
++
++    cmd = g_strdup_printf("{ 'execute': 'migrate_set_downtime',"
++                          "'arguments': { 'value': %s } }", value);
++    rsp = qtest_qmp(who, cmd);
++    g_free(cmd);
++    g_assert(qdict_haskey(rsp, "return"));
++    QDECREF(rsp);
++}
++
++static void migrate_set_speed(QTestState *who, const char *value)
++{
++    QDict *rsp;
++    gchar *cmd;
++
++    cmd = g_strdup_printf("{ 'execute': 'migrate_set_speed',"
++                          "'arguments': { 'value': %s } }", value);
++    rsp = qtest_qmp(who, cmd);
++    g_free(cmd);
++    g_assert(qdict_haskey(rsp, "return"));
++    QDECREF(rsp);
++}
++
++static void migrate_set_capability(QTestState *who, const char *capability,
++                                   const char *value)
++{
++    QDict *rsp;
++    gchar *cmd;
++
++    cmd = g_strdup_printf("{ 'execute': 'migrate-set-capabilities',"
++                          "'arguments': { "
++                          "'capabilities': [ { "
++                          "'capability': '%s', 'state': %s } ] } }",
++                          capability, value);
++    rsp = qtest_qmp(who, cmd);
++    g_free(cmd);
++    g_assert(qdict_haskey(rsp, "return"));
++    QDECREF(rsp);
++}
++
++static void migrate(QTestState *who, const char *uri)
++{
++    QDict *rsp;
++    gchar *cmd;
++
++    cmd = g_strdup_printf("{ 'execute': 'migrate',"
++                          "'arguments': { 'uri': '%s' } }",
++                          uri);
++    rsp = qtest_qmp(who, cmd);
++    g_free(cmd);
++    g_assert(qdict_haskey(rsp, "return"));
++    QDECREF(rsp);
++}
++
+ static void test_migrate(void)
+ {
+     char *uri = g_strdup_printf("unix:%s/migsocket", tmpfs);
+     QTestState *global = global_qtest, *from, *to;
+     unsigned char dest_byte_a, dest_byte_b, dest_byte_c, dest_byte_d;
+-    gchar *cmd, *cmd_src, *cmd_dst;
++    gchar *cmd_src, *cmd_dst;
+     QDict *rsp;
+ 
+     char *bootpath = g_strdup_printf("%s/bootsect", tmpfs);
+@@ -405,52 +462,22 @@ static void test_migrate(void)
+     to = qtest_init(cmd_dst);
+     g_free(cmd_dst);
+ 
+-    global_qtest = from;
+-    rsp = qmp("{ 'execute': 'migrate-set-capabilities',"
+-                  "'arguments': { "
+-                      "'capabilities': [ {"
+-                          "'capability': 'postcopy-ram',"
+-                          "'state': true } ] } }");
+-    g_assert(qdict_haskey(rsp, "return"));
+-    QDECREF(rsp);
+-
+-    global_qtest = to;
+-    rsp = qmp("{ 'execute': 'migrate-set-capabilities',"
+-                  "'arguments': { "
+-                      "'capabilities': [ {"
+-                          "'capability': 'postcopy-ram',"
+-                          "'state': true } ] } }");
+-    g_assert(qdict_haskey(rsp, "return"));
+-    QDECREF(rsp);
++    migrate_set_capability(from, "postcopy-ram", "true");
++    migrate_set_capability(to, "postcopy-ram", "true");
+ 
+     /* We want to pick a speed slow enough that the test completes
+      * quickly, but that it doesn't complete precopy even on a slow
+      * machine, so also set the downtime.
+      */
+-    global_qtest = from;
+-    rsp = qmp("{ 'execute': 'migrate_set_speed',"
+-              "'arguments': { 'value': 100000000 } }");
+-    g_assert(qdict_haskey(rsp, "return"));
+-    QDECREF(rsp);
+-
+-    /* 1ms downtime - it should never finish precopy */
+-    rsp = qmp("{ 'execute': 'migrate_set_downtime',"
+-              "'arguments': { 'value': 0.001 } }");
+-    g_assert(qdict_haskey(rsp, "return"));
+-    QDECREF(rsp);
+-
++    migrate_set_speed(from, "100000000");
++    migrate_set_downtime(from, "0.001");
+ 
+     /* Wait for the first serial output from the source */
+     wait_for_serial("src_serial");
+ 
+-    cmd = g_strdup_printf("{ 'execute': 'migrate',"
+-                          "'arguments': { 'uri': '%s' } }",
+-                          uri);
+-    rsp = qmp(cmd);
+-    g_free(cmd);
+-    g_assert(qdict_haskey(rsp, "return"));
+-    QDECREF(rsp);
++    migrate(from, uri);
+ 
++    global_qtest = from;
+     wait_for_migration_pass();
+ 
+     rsp = return_or_event(qmp("{ 'execute': 'migrate-start-postcopy' }"));
 -- 
 2.13.6
