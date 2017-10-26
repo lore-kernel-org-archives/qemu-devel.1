@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58816)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58828)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1e7i3M-0000bQ-Kn
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 09:18:33 -0400
+	(envelope-from <kwolf@redhat.com>) id 1e7i3N-0000ca-L0
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 09:18:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1e7i3G-00023H-Gy
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 09:18:32 -0400
+	(envelope-from <kwolf@redhat.com>) id 1e7i3M-000275-LB
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 09:18:33 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Thu, 26 Oct 2017 15:17:19 +0200
-Message-Id: <20171026131741.5059-14-kwolf@redhat.com>
+Date: Thu, 26 Oct 2017 15:17:22 +0200
+Message-Id: <20171026131741.5059-17-kwolf@redhat.com>
 In-Reply-To: <20171026131741.5059-1-kwolf@redhat.com>
 References: <20171026131741.5059-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 13/35] block: Switch
- bdrv_co_get_block_status_above() to byte-based
+Subject: [Qemu-devel] [PULL 16/35] qemu-img: Speed up compare on
+ pre-allocated larger file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,137 +25,87 @@ Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
 From: Eric Blake <eblake@redhat.com>
 
-We are gradually converting to byte-based interfaces, as they are
-easier to reason about than sector-based.  Convert another internal
-type (no semantic change), and rename it to match the corresponding
-public function rename.
+Compare the following images with all-zero contents:
+$ truncate --size 1M A
+$ qemu-img create -f qcow2 -o preallocation=off B 1G
+$ qemu-img create -f qcow2 -o preallocation=metadata C 1G
+
+On my machine, the difference is noticeable for pre-patch speeds,
+with more than an order of magnitude in difference caused by the
+choice of preallocation in the qcow2 file:
+
+$ time ./qemu-img compare -f raw -F qcow2 A B
+Warning: Image size mismatch!
+Images are identical.
+
+real	0m0.014s
+user	0m0.007s
+sys	0m0.007s
+
+$ time ./qemu-img compare -f raw -F qcow2 A C
+Warning: Image size mismatch!
+Images are identical.
+
+real	0m0.341s
+user	0m0.144s
+sys	0m0.188s
+
+Why? Because bdrv_is_allocated() returns false for image B but
+true for image C, throwing away the fact that both images know
+via lseek(SEEK_HOLE) that the entire image still reads as zero.
+>From there, qemu-img ends up calling bdrv_pread() for every byte
+of the tail, instead of quickly looking for the next allocation.
+The solution: use block_status instead of is_allocated, giving:
+
+$ time ./qemu-img compare -f raw -F qcow2 A C
+Warning: Image size mismatch!
+Images are identical.
+
+real	0m0.014s
+user	0m0.011s
+sys	0m0.003s
+
+which is on par with the speeds for no pre-allocation.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/io.c | 68 ++++++++++++++++++++++----------------------------------------
- 1 file changed, 24 insertions(+), 44 deletions(-)
+ qemu-img.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/block/io.c b/block/io.c
-index 3a9a4c5db9..61b3477cd1 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -1976,33 +1976,26 @@ early_out:
-     return ret;
- }
+diff --git a/qemu-img.c b/qemu-img.c
+index cfa28d41d5..e4b84c4f56 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -1480,11 +1480,11 @@ static int img_compare(int argc, char **argv)
+         while (sector_num < progress_base) {
+             int64_t count;
  
--static int64_t coroutine_fn bdrv_co_get_block_status_above(BlockDriverState *bs,
--        BlockDriverState *base,
--        bool want_zero,
--        int64_t sector_num,
--        int nb_sectors,
--        int *pnum,
--        BlockDriverState **file)
-+static int coroutine_fn bdrv_co_block_status_above(BlockDriverState *bs,
-+                                                   BlockDriverState *base,
-+                                                   bool want_zero,
-+                                                   int64_t offset,
-+                                                   int64_t bytes,
-+                                                   int64_t *pnum,
-+                                                   int64_t *map,
-+                                                   BlockDriverState **file)
- {
-     BlockDriverState *p;
--    int64_t ret = 0;
-+    int ret = 0;
-     bool first = true;
--    int64_t map = 0;
+-            ret = bdrv_is_allocated_above(blk_bs(blk_over), NULL,
++            ret = bdrv_block_status_above(blk_bs(blk_over), NULL,
+                                           sector_num * BDRV_SECTOR_SIZE,
+                                           (progress_base - sector_num) *
+                                           BDRV_SECTOR_SIZE,
+-                                          &count);
++                                          &count, NULL, NULL);
+             if (ret < 0) {
+                 ret = 3;
+                 error_report("Sector allocation test failed for %s",
+@@ -1492,11 +1492,11 @@ static int img_compare(int argc, char **argv)
+                 goto out;
  
-     assert(bs != base);
-     for (p = bs; p != base; p = backing_bs(p)) {
--        int64_t count;
--
--        ret = bdrv_co_block_status(p, want_zero,
--                                   sector_num * BDRV_SECTOR_SIZE,
--                                   nb_sectors * BDRV_SECTOR_SIZE, &count,
--                                   &map, file);
-+        ret = bdrv_co_block_status(p, want_zero, offset, bytes, pnum, map,
-+                                   file);
-         if (ret < 0) {
-             break;
-         }
--        assert(QEMU_IS_ALIGNED(count | map, BDRV_SECTOR_SIZE));
--        ret |= map;
--        *pnum = count >> BDRV_SECTOR_BITS;
-         if (ret & BDRV_BLOCK_ZERO && ret & BDRV_BLOCK_EOF && !first) {
-             /*
-              * Reading beyond the end of the file continues to read
-@@ -2010,47 +2003,35 @@ static int64_t coroutine_fn bdrv_co_get_block_status_above(BlockDriverState *bs,
-              * unallocated length we learned from an earlier
-              * iteration.
-              */
--            *pnum = nb_sectors;
-+            *pnum = bytes;
-         }
-         if (ret & (BDRV_BLOCK_ZERO | BDRV_BLOCK_DATA)) {
-             break;
-         }
--        /* [sector_num, pnum] unallocated on this layer, which could be only
--         * the first part of [sector_num, nb_sectors].  */
--        nb_sectors = MIN(nb_sectors, *pnum);
-+        /* [offset, pnum] unallocated on this layer, which could be only
-+         * the first part of [offset, bytes].  */
-+        bytes = MIN(bytes, *pnum);
-         first = false;
-     }
-     return ret;
- }
- 
- /* Coroutine wrapper for bdrv_get_block_status_above() */
--static void coroutine_fn bdrv_get_block_status_above_co_entry(void *opaque)
-+static void coroutine_fn bdrv_block_status_above_co_entry(void *opaque)
- {
-     BdrvCoBlockStatusData *data = opaque;
--    int n = 0;
--    int64_t ret;
- 
--    ret = bdrv_co_get_block_status_above(data->bs, data->base,
--                                         data->want_zero,
--                                         data->offset >> BDRV_SECTOR_BITS,
--                                         data->bytes >> BDRV_SECTOR_BITS,
--                                         &n,
--                                         data->file);
--    if (ret < 0) {
--        assert(INT_MIN <= ret);
--        data->ret = ret;
--    } else {
--        *data->pnum = n * BDRV_SECTOR_SIZE;
--        *data->map = ret & BDRV_BLOCK_OFFSET_MASK;
--        data->ret = ret & ~BDRV_BLOCK_OFFSET_MASK;
--    }
-+    data->ret = bdrv_co_block_status_above(data->bs, data->base,
-+                                           data->want_zero,
-+                                           data->offset, data->bytes,
-+                                           data->pnum, data->map, data->file);
-     data->done = true;
- }
- 
- /*
-- * Synchronous wrapper around bdrv_co_get_block_status_above().
-+ * Synchronous wrapper around bdrv_co_block_status_above().
-  *
-- * See bdrv_co_get_block_status_above() for details.
-+ * See bdrv_co_block_status_above() for details.
-  */
- static int bdrv_common_block_status_above(BlockDriverState *bs,
-                                           BlockDriverState *base,
-@@ -2074,10 +2055,9 @@ static int bdrv_common_block_status_above(BlockDriverState *bs,
- 
-     if (qemu_in_coroutine()) {
-         /* Fast-path if already in coroutine context */
--        bdrv_get_block_status_above_co_entry(&data);
-+        bdrv_block_status_above_co_entry(&data);
-     } else {
--        co = qemu_coroutine_create(bdrv_get_block_status_above_co_entry,
--                                   &data);
-+        co = qemu_coroutine_create(bdrv_block_status_above_co_entry, &data);
-         bdrv_coroutine_enter(bs, co);
-         BDRV_POLL_WHILE(bs, !data.done);
-     }
+             }
+-            /* TODO relax this once bdrv_is_allocated_above does not enforce
++            /* TODO relax this once bdrv_block_status_above does not enforce
+              * sector alignment */
+             assert(QEMU_IS_ALIGNED(count, BDRV_SECTOR_SIZE));
+             nb_sectors = count >> BDRV_SECTOR_BITS;
+-            if (ret) {
++            if (ret & BDRV_BLOCK_ALLOCATED && !(ret & BDRV_BLOCK_ZERO)) {
+                 nb_sectors = MIN(nb_sectors, IO_BUF_SIZE >> BDRV_SECTOR_BITS);
+                 ret = check_empty_sectors(blk_over, sector_num, nb_sectors,
+                                           filename_over, buf1, quiet);
 -- 
 2.13.6
