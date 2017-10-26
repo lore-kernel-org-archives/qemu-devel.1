@@ -1,33 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57447)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33023)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1e7dZM-0005Sq-UP
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 04:31:17 -0400
+	(envelope-from <darren.kenny@oracle.com>) id 1e7dtQ-0000WA-LE
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 04:52:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1e7dZJ-0006Xl-RT
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 04:31:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35760)
+	(envelope-from <darren.kenny@oracle.com>) id 1e7dtL-00054V-NA
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 04:52:00 -0400
+Received: from aserp1040.oracle.com ([141.146.126.69]:24586)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1e7dZJ-0006XK-IT
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 04:31:13 -0400
-Date: Thu, 26 Oct 2017 16:30:57 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20171026083057.GB6526@pxdev.xzpeter.org>
-References: <20171013170143.GB3370@work-vm>
-	<20171013111403.293919fe@t450s.home>
-	<20171015035318.GA22780@pxdev.xzpeter.org>
-	<c4d07be9-7d9b-71fa-e84c-e393138f7a84@oracle.com>
-	<20171017035604.GJ4166@pxdev.xzpeter.org>
-	<2c478fc6-bb9a-3ac3-1f5d-c853b13dc8a1@oracle.com>
-	<20171019033359.GR4166@pxdev.xzpeter.org>
-	<a5eb5b41-a490-11dc-450c-86983460cd5b@oracle.com>
-	<20171023063759.GE3990@pxdev.xzpeter.org>
-	<d2b2e250-9493-5e08-16a8-f410e51d2bf0@oracle.com>
+	(Exim 4.71) (envelope-from <darren.kenny@oracle.com>)
+	id 1e7dtL-00051Y-Fn
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 04:51:55 -0400
+Date: Thu, 26 Oct 2017 09:51:47 +0100
+From: Darren Kenny <darren.kenny@oracle.com>
+Message-ID: <20171026085147.xja2lh5s6tvu7je5@starbug-vm.ie.oracle.com>
+References: <20171026013445.45605-1-aik@ozlabs.ru>
+	<20171026071317.y3qjb2rsire25bz3@starbug-vm.ie.oracle.com>
+	<8e81eed1-d16a-a289-f07e-4a083e232b79@ozlabs.ru>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Disposition: inline
-In-Reply-To: <d2b2e250-9493-5e08-16a8-f410e51d2bf0@oracle.com>
-Subject: Re: [Qemu-devel] host physical address width issues/questions for
- x86_64
+In-Reply-To: <8e81eed1-d16a-a289-f07e-4a083e232b79@ozlabs.ru>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH qemu v2] git-submodule.sh: Do not try
+ writing to source directory if not necessary
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,81 +31,194 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Prasad Singamsetty <prasad.singamsetty@oracle.com>
-Cc: ehabkost@redhat.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org, Alex Williamson <alex.williamson@redhat.com>, Sunit Jain <sunit.jain@oracle.com>, pbonzini@redhat.com, rth@twiddle.net, "Michael S. Tsirkin" <mst@redhat.com>
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: qemu-devel@nongnu.org
 
-On Mon, Oct 23, 2017 at 10:23:43AM -0700, Prasad Singamsetty wrote:
+On Thu, Oct 26, 2017 at 07:18:24PM +1100, Alexey Kardashevskiy wrote:
+>On 26/10/17 18:13, Darren Kenny wrote:
+>> Hi Alexey,
+>>
+>> On Thu, Oct 26, 2017 at 12:34:45PM +1100, Alexey Kardashevskiy wrote:
+>>> The new git-submodule.sh script writes .git-submodule-status to
+>>> the source directory every time no matter what. This makes it conditi=
+onal.
+>>>
+>>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+>>> ---
+>>> Changes:
+>>> v2:
+>>> * fixed "status" branch too
+>>> ---
+>>> scripts/git-submodule.sh | 15 ++++++++++-----
+>>> 1 file changed, 10 insertions(+), 5 deletions(-)
+>>>
+>>> diff --git a/scripts/git-submodule.sh b/scripts/git-submodule.sh
+>>> index d8fbc7e47e..ae038d2e58 100755
+>>> --- a/scripts/git-submodule.sh
+>>> +++ b/scripts/git-submodule.sh
+>>> @@ -23,16 +23,21 @@ then
+>>> =C2=A0=C2=A0=C2=A0 exit 1
+>>> fi
+>>>
+>>> +substat_tmp=3D$(mktemp)
+>>> +
+>>> case "$command" in
+>>> status)
+>>> =C2=A0=C2=A0=C2=A0 test -f "$substat" || exit 1
+>>> -=C2=A0=C2=A0=C2=A0 trap "rm -f ${substat}.tmp" EXIT
+>>> -=C2=A0=C2=A0=C2=A0 git submodule status $modules > "${substat}.tmp"
+>>> -=C2=A0=C2=A0=C2=A0 diff "${substat}" "${substat}.tmp" >/dev/null
+>>> -=C2=A0=C2=A0=C2=A0 exit $?
+>>> +=C2=A0=C2=A0=C2=A0 git submodule status $modules > "$substat_tmp"
+>>> +=C2=A0=C2=A0=C2=A0 diff "${substat_tmp}" "${substat}" > /dev/null
+>>> =C2=A0=C2=A0=C2=A0 ;;
+>>> update)
+>>> =C2=A0=C2=A0=C2=A0 git submodule update --init $modules 1>/dev/null 2=
+>&1
+>>> -=C2=A0=C2=A0=C2=A0 git submodule status $modules > "${substat}"
+>>> +=C2=A0=C2=A0=C2=A0 git submodule status $modules > "$substat_tmp"
+>>> +=C2=A0=C2=A0=C2=A0 diff "${substat_tmp}" "${substat}" || mv "${subst=
+at_tmp}" "${substat}"
+>>
+>> Maybe you intended this, but the diff output here will be output to
+>> the screen - if you don't mean this to happen you might want to
+>> redirect the output.
+>
+>
+>Well, if I do:
+>
+>diff "${substat_tmp}" "${substat}" 1>/dev/null 2>&1 || mv "${substat_tmp=
+}"
+>"${substat}"
+>
+>mv: inter-device move failed: '/tmp/tmp.gfcsXCSv4W' to
+>'.git-submodule-status'; unable to remove target: Read-only file system
+>
+>
+>and with my current variant it is:
+>
+>
+>  GIT     ui/keycodemapdb dtc
+>1d0
+><  558cd81bdd432769b59bff01240c44f82cfb1a9d dtc (v1.4.4)
+>2a2
+>>  558cd81bdd432769b59bff01240c44f82cfb1a9d dtc (v1.4.4)
+>mv: inter-device move failed: '/tmp/tmp.4ol9mymsZj' to
+>'.git-submodule-status'; unable to remove target: Read-only file system
+>
+>
 
-[...]
+That's strange behaviour for adding a redirect... Maybe it's your
+use of 1>/dev/null instead of just >/dev/null.
 
-> >>Proposal:
-> >>
-> >>We can simply change the VTD_HOST_ADDRESS_WIDTH to 48 bits
-> >>with out any other changes to the code. The current set of
-> >>features in the intel iommu emulator code works for q35
-> >>machine type and it doesn't have any other side effect.
-> >>Since the remapping tables are allocated by the guest kernel
-> >>they are always within the phys-bits range and as long
-> >>as the same range supported by intel iommu code in QEMU
-> >>it works fine. For the current q35 machine type, all the
-> >>supported cpus have <= 48 bits as the physical address
-> >>width. For short term, just changing the VTD_HOST_ADDRESS_WIDTH
-> >>to 48 should work fine for q35. I tried this and it seems
-> >>to work fine.
-> >
-> >I'm fine to change that macro, but IMHO only changing that line may
-> >break backward compatibility of old guests (at least it'll change the
-> >max address width reported in ACPI).  So I am not sure that's good.
-> 
-> Could you refer to any specifics on compatibility issues with old
-> guests?  The guest linux kernel doesn't seem to report any problem
-> with address width in DMAR reported doesn't match with what is
-> supported in the host cpu. I would like to better understand the gaps
-> we have here.
+TBH, /tmp should not be read-only in a normally running system.
 
-I mean for example when an old vIOMMU-enabled QEMU migrates to this
-new QEMU.  When the guest first probes the DMAR device using the old
-QEMU it should have seen 39 bits GAW, but after the migration to your
-new QEMU instance it'll become 48 bits.  This can confuse the guest in
-some way.  I'm not sure whether that would be a real problem but I
-would rather just introduce the new property for 48 bits to avoid that
-problem.
+To avoid the redirect at all then maybe use 'diff -q' instead.
 
-> 
-> What other machine types intel iommu is supported with the current
-> implementation? Is there any test suite that can test intel iommu
-> functionality on supported guest types?
+>which gives some clue about what is going on (I swapped 2 lines in
+>.git-submodule-status to trigger this).
+>
+>
+>>
+>> From other lines it looks like you would prefer it wasn't output.
+>>
+>>> =C2=A0=C2=A0=C2=A0 ;;
+>>> esac
+>>> +
+>>> +myret=3D$?
+>>
+>> Any small change is likely to break the value of myret here.
+>>
+>> You may want to put the above assignment as directly below the
+>> commands that you want to record as the exit status, and maybe
+>> initialize it before the case statement to the default value.
+>>
+>> For example, if somehow (not sure it's possible today) $command was
+>> not one of the values in the case statement, the value of $? here
+>> would be the return value of mktemp, which may not be your
+>> intention.
+>>
+>>
+>>> +rm "${substat_tmp}" 2>/dev/null
+>>
+>> Rather than doing this redirect, a simple rm -f will achieve what
+>> you want here - that is why makefiles tend to use it.
+>
+>I really do not like shell :) I gave up to using "trap", seems doing the
+>right thing and no messing is needed with "exit".
+>
+>
+>diff --git a/scripts/git-submodule.sh b/scripts/git-submodule.sh
+>index d8fbc7e47e..12f80c14a0 100755
+>--- a/scripts/git-submodule.sh
+>+++ b/scripts/git-submodule.sh
+>@@ -23,16 +23,18 @@ then
+>     exit 1
+> fi
+>
+>+substat_tmp=3D$(mktemp)
+>+trap "rm -f $substat_tmp" 0
+>+
+> case "$command" in
+> status)
+>     test -f "$substat" || exit 1
+>-    trap "rm -f ${substat}.tmp" EXIT
+>-    git submodule status $modules > "${substat}.tmp"
+>-    diff "${substat}" "${substat}.tmp" >/dev/null
+>-    exit $?
+>+    git submodule status $modules > "$substat_tmp"
+>+    diff "${substat_tmp}" "${substat}" > /dev/null
+>     ;;
+> update)
+>     git submodule update --init $modules 1>/dev/null 2>&1
+>-    git submodule status $modules > "${substat}"
+>+    git submodule status $modules > "$substat_tmp"
+>+    diff "${substat_tmp}" "${substat}" || mv "${substat_tmp}" "${substa=
+t}"
+>     ;;
+> esac
+>
+>
+>Is this good enough to repost?
 
-I don't think there are lots of tests on VT-d emulation.  There are a
-few in kvm-unit-tests for the simplest DMAR and IR tests though, but I
-don't think they are checking against compatibility problems.
+If the exit code is not important here, then it should be OK,
+subject to my comments about using 'diff -q' instead.
+
+If the exit code is important in this script I would still suggest
+being explicit about it, by setting myret=3D0 before the case, and
+then myret=3D$? after calls to diff, and finally an exit $myret.
+
+>
+>
+>
+>ps. out of curiosity - your mail has "Mail-Followup-To" - is that intent=
+ional?
+
+I'm using the default in Neomutt, which suggests that is should be
+used to avoid duplicate e-mails when responding to lists.=20
+
+   https://www.neomutt.org/guide/advancedusage.html#using-lists
+
+I've not changed from the default behaviour, but maybe it's not how
+people like to do it here... ;)
 
 Thanks,
 
-> 
-> >
-> >I would prefer still using the new property ("x-aw-bits", or change
-> >the name as you prefer) when people really want the 48 bits address
-> >width, or even bigger ones in the future.  It makes sure that 39 bits
-> >are still the default.
-> >
-> >CCing Michael who maintains VT-d emulation codes.
-> 
-> Thanks.
-> --Prasad
-> 
-> >
-> >>
-> >>For long term, the VTD_HOST_ADDRESS_WIDTH has to match with
-> >>host cpu address width. If necessary we may need to define
-> >>a new machine type to keep VTD_HOST_ADDRESS_WIDTH value to
-> >>match with the host cpu.
-> >>
-> >>Please let me know if you have any comments or suggestions
-> >>on this.
-> >
-> >Thanks,
-> >
-
--- 
-Peter Xu
+Darren.
+>
+>
+>>
+>> Thanks,
+>>
+>> Darren.
+>>
+>>> +exit $myret
+>>> --=C2=A0
+>>> 2.11.0
+>>>
+>>>
+>
+>
+>--=20
+>Alexey
+>
