@@ -1,18 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49020)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49612)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1e7WzW-0002Q6-3E
-	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 21:29:51 -0400
+	(envelope-from <aik@ozlabs.ru>) id 1e7X4N-0003bE-HO
+	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 21:34:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1e7WzS-0003bn-VZ
-	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 21:29:50 -0400
-Received: from ozlabs.ru ([107.173.13.209]:56160)
+	(envelope-from <aik@ozlabs.ru>) id 1e7X4K-0006xg-FD
+	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 21:34:51 -0400
+Received: from ozlabs.ru ([107.173.13.209]:57096)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1e7WzS-0003aG-PJ
-	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 21:29:46 -0400
+	(envelope-from <aik@ozlabs.ru>) id 1e7X4K-0006xW-90
+	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 21:34:48 -0400
 From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Date: Thu, 26 Oct 2017 12:29:10 +1100
-Message-Id: <20171026012910.45515-1-aik@ozlabs.ru>
-Subject: [Qemu-devel] [PATCH qemu] machine: Polish  -machine xxx,help
+Date: Thu, 26 Oct 2017 12:34:45 +1100
+Message-Id: <20171026013445.45605-1-aik@ozlabs.ru>
+Subject: [Qemu-devel] [PATCH qemu v2] git-submodule.sh: Do not try writing
+ to source directory if not necessary
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,37 +23,50 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, "Daniel P. Berrange" <berrange@redhat.com>
 
-The "-machine xxx,help" prints kernel-irqchip possible values as
-"OnOffSplit", this adds separators to the printed line.
+The new git-submodule.sh script writes .git-submodule-status to
+the source directory every time no matter what. This makes it conditional.
 
 Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 ---
-
-aik@fstn1-p1:~$ ./qemu-system-ppc64 -machine pseries,help 2>&1 | grep kernel-irqchip
-
-Was:
-pseries-2.11.kernel-irqchip=OnOffSplit (Configure KVM in-kernel irqchip)
-
-Now:
-pseries-2.11.kernel-irqchip=On|Off|Split (Configure KVM in-kernel irqchip)
+Changes:
+v2:
+* fixed "status" branch too
 ---
- hw/core/machine.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ scripts/git-submodule.sh | 15 ++++++++++-----
+ 1 file changed, 10 insertions(+), 5 deletions(-)
 
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index 36c2fb069c..ea89cf706e 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -506,7 +506,7 @@ static void machine_class_init(ObjectClass *oc, void *data)
-     object_class_property_set_description(oc, "accel",
-         "Accelerator list", &error_abort);
+diff --git a/scripts/git-submodule.sh b/scripts/git-submodule.sh
+index d8fbc7e47e..ae038d2e58 100755
+--- a/scripts/git-submodule.sh
++++ b/scripts/git-submodule.sh
+@@ -23,16 +23,21 @@ then
+     exit 1
+ fi
  
--    object_class_property_add(oc, "kernel-irqchip", "OnOffSplit",
-+    object_class_property_add(oc, "kernel-irqchip", "On|Off|Split",
-         NULL, machine_set_kernel_irqchip,
-         NULL, NULL, &error_abort);
-     object_class_property_set_description(oc, "kernel-irqchip",
++substat_tmp=$(mktemp)
++
+ case "$command" in
+ status)
+     test -f "$substat" || exit 1
+-    trap "rm -f ${substat}.tmp" EXIT
+-    git submodule status $modules > "${substat}.tmp"
+-    diff "${substat}" "${substat}.tmp" >/dev/null
+-    exit $?
++    git submodule status $modules > "$substat_tmp"
++    diff "${substat_tmp}" "${substat}" > /dev/null
+     ;;
+ update)
+     git submodule update --init $modules 1>/dev/null 2>&1
+-    git submodule status $modules > "${substat}"
++    git submodule status $modules > "$substat_tmp"
++    diff "${substat_tmp}" "${substat}" || mv "${substat_tmp}" "${substat}"
+     ;;
+ esac
++
++myret=$?
++rm "${substat_tmp}" 2>/dev/null
++exit $myret
 -- 
 2.11.0
