@@ -1,30 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52847)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53236)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1e7dEu-0006bp-1z
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 04:10:12 -0400
+	(envelope-from <jcody@redhat.com>) id 1e7dGS-0007Yx-2R
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 04:11:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1e7dEq-00036G-3E
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 04:10:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52204)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1e7dEp-000361-Qa
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 04:10:04 -0400
-References: <20171020145437.18549-1-borntraeger@de.ibm.com>
-	<d028d04a-9c28-af10-3410-f9007867cc05@de.ibm.com>
-	<1ac27ce2-091d-e1b7-fc94-ebdf696a35e9@redhat.com>
-	<9f4037d8-93a3-be0f-8cb4-4424158e236b@linux.vnet.ibm.com>
-	<a7b30204-a854-afde-af01-234520cc6d7b@redhat.com>
-	<87wp3jqips.fsf@marc-ibm.boeblingen.de.ibm.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <04fe8f34-6f23-93d4-f388-ad7f03a24ca7@redhat.com>
-Date: Thu, 26 Oct 2017 10:09:46 +0200
+	(envelope-from <jcody@redhat.com>) id 1e7dGQ-0004Kp-R3
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 04:11:44 -0400
+Date: Thu, 26 Oct 2017 04:11:34 -0400
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20171026081134.GA28110@localhost.localdomain>
+References: <20171026075947.9597-1-mreitz@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <87wp3jqips.fsf@marc-ibm.boeblingen.de.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH/QEMU] s390x/kvm: use cpu_model_available
- for guarded storage on compat machines
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171026075947.9597-1-mreitz@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] qemu-img.1: Image
+ invalidation on qemu-img commit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,100 +23,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marc Hartmayer <mhartmay@linux.vnet.ibm.com>, Boris Fiuczynski <fiuczy@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: libvir-list@redhat.com, qemu-devel@nongnu.org, Jiri Denemark <jdenemar@redhat.com>, "Jason J . Herne" <jjherne@linux.vnet.ibm.com>, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>, Halil Pasic <pasic@linux.vnet.ibm.com>
+To: Max Reitz <mreitz@redhat.com>
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 
-On 25.10.2017 18:45, Marc Hartmayer wrote:
-> On Wed, Oct 25, 2017 at 05:50 PM +0200, David Hildenbrand <david@redhat=
-.com> wrote:
->> On 25.10.2017 17:09, Boris Fiuczynski wrote:
->>> On 10/25/2017 12:23 PM, David Hildenbrand wrote:
->>>> On 25.10.2017 12:18, Christian Borntraeger wrote:
->>>>> Ping, I plan to submit belows patch for 2.11. We can then still loo=
-k into
->>>>> a libvirt<->qemu interface for limiting host-model depending on mac=
-hine versions
->>>>> (or not).
->>>>
->>>> I think this would be sufficient for now.
->>>>
->>>> Having different host models, depending on the the machine type soun=
-ds
->>>> wrong. But maybe we'll need it in the future.
->>>>
->>>
->>> David, I disagree if your proposal is to generally tolerate new cpu
->>> features in old machine types. This *might* work for gs but how do yo=
-u
->>> guaranty that guests do not behave differently/wrong when suddenly ne=
-w
->>> cpu features are made available to guest when (re-)starting them.
->>> That is my feedback for the qemu side of this mater.
->>
->> Just re-reading this section, so what you mean is:
->>
->> a) guest is started, host model is copied and used. guest works.
->> b) guest is stopped.
->> c) QEMU/KVM/HW is updated.
->> d) guest is started, new host model is copied. guest no longer works.
->>
->> d) could be because there are now some additional features with e.g.
->> broken guest implementation or now missing features.
->>
->>
->> What you propose (if I am not wrong) is a to bind features somehow to =
-a
->> QEMU machine. I think that should never be done. You could not catch n=
-ow
->> missing features.
->=20
-> What exactly do you mean by the last sentence?
+On Thu, Oct 26, 2017 at 09:59:47AM +0200, Max Reitz wrote:
+> qemu-img commit invalidates all images between base and top.  This
+> should be mentioned in the man page.
+> 
+> Suggested-by: Ping Li <pingl@redhat.com>
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+>  qemu-img.texi | 9 ++++-----
+>  1 file changed, 4 insertions(+), 5 deletions(-)
+> 
+> diff --git a/qemu-img.texi b/qemu-img.texi
+> index ee5c5940d3..fdcf120f36 100644
+> --- a/qemu-img.texi
+> +++ b/qemu-img.texi
+> @@ -274,11 +274,10 @@ If the backing chain of the given image file @var{filename} has more than one
+>  layer, the backing file into which the changes will be committed may be
+>  specified as @var{base} (which has to be part of @var{filename}'s backing
+>  chain). If @var{base} is not specified, the immediate backing file of the top
+> -image (which is @var{filename}) will be used. For reasons of consistency,
+> -explicitly specifying @var{base} will always imply @code{-d} (since emptying an
+> -image after committing to an indirect backing file would lead to different data
+> -being read from the image due to content in the intermediate backing chain
+> -overruling the commit target).
+> +image (which is @var{filename}) will be used. Note that after a commit operation
+> +all images between @var{base} and the top image will be invalid and may return
+> +garbage data when read. For this reason, @code{-b} implies @code{-d} (so that
+> +the top image stays valid).
+>  
+>  @item compare [-f @var{fmt}] [-F @var{fmt}] [-T @var{src_cache}] [-p] [-s] [-q] @var{filename1} @var{filename2}
+>  
+> -- 
+> 2.13.6
+> 
+>
 
-In general, up/downgrading QEMU/KVM/HW can lead to the removal of feature=
-s.
-
-Another example is the "nested" flag for KVM. toggling that can lead to
-the host feature looking differently (+/- SIE features).
-
-So if you really want to make sure that a VM XML that once ran perfectly
-fine on a host will still run after any QEMU/KVM/HW changes on that host:
-
-a) specify an explicit CPU model, not the host model (e.g. "z13")
-b) copy the host model to the XML persistently.
-
-Linking any of that to the machine types is in my opinion the very wrong
-approach.
-
->=20
->>
->> What would you think about a persistent host-model copy option? So
->> instead of copying at every start, only copy and replace it once in th=
-e XML?
->>
->> Easy to specify by the user and no CPU feature changes will happend
->> "blindly".
->>
->>
->> --
->>
->> Thanks,
->>
->> David
->>
-> --
-> Beste Gr=C3=BC=C3=9Fe / Kind regards
->    Marc Hartmayer
->=20
-> IBM Deutschland Research & Development GmbH
-> Vorsitzende des Aufsichtsrats: Martina Koederitz
-> Gesch=C3=A4ftsf=C3=BChrung: Dirk Wittkopp
-> Sitz der Gesellschaft: B=C3=B6blingen
-> Registergericht: Amtsgericht Stuttgart, HRB 243294
->=20
-
-
---=20
-
-Thanks,
-
-David
+Reviewed-by: Jeff Cody <jcody@redhat.com>
