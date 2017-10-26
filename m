@@ -1,14 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58402)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58417)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1e7i2l-0008WN-0T
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 09:17:56 -0400
+	(envelope-from <kwolf@redhat.com>) id 1e7i2m-00005H-1H
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 09:17:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1e7i2j-0001WY-Oy
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 09:17:54 -0400
+	(envelope-from <kwolf@redhat.com>) id 1e7i2l-0001Xz-1H
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 09:17:56 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Thu, 26 Oct 2017 15:17:06 +0200
-Message-Id: <20171026131741.5059-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 00/35] Block layer patches
+Date: Thu, 26 Oct 2017 15:17:08 +0200
+Message-Id: <20171026131741.5059-3-kwolf@redhat.com>
+In-Reply-To: <20171026131741.5059-1-kwolf@redhat.com>
+References: <20171026131741.5059-1-kwolf@redhat.com>
+Subject: [Qemu-devel] [PULL 02/35] qemu-iotests: Test backing_fmt with
+ backing node reference
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,95 +23,43 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-The following changes since commit ae49fbbcd8e4e9d8bf7131add34773f579e1aff7:
+This changes test case 191 to include a backing image that has
+backing_fmt set in the image file, but is referenced by node name in the
+qemu command line.
 
-  Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20171025' into staging (2017-10-25 16:38:57 +0100)
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+---
+ tests/qemu-iotests/191     | 3 ++-
+ tests/qemu-iotests/191.out | 2 +-
+ 2 files changed, 3 insertions(+), 2 deletions(-)
 
-are available in the git repository at:
-
-  git://repo.or.cz/qemu/kevin.git tags/for-upstream
-
-for you to fetch changes up to 4254d01ce4eec9a3ccf320d14e2da132b8ad4a51:
-
-  Merge remote-tracking branch 'mreitz/tags/pull-block-2017-10-26' into queue-block (2017-10-26 15:02:40 +0200)
-
-----------------------------------------------------------------
-Block layer patches
-
-----------------------------------------------------------------
-Alberto Garcia (1):
-      qcow2: Use BDRV_SECTOR_BITS instead of its literal value
-
-Eric Blake (24):
-      block: Allow NULL file for bdrv_get_block_status()
-      block: Add flag to avoid wasted work in bdrv_is_allocated()
-      block: Make bdrv_round_to_clusters() signature more useful
-      qcow2: Switch is_zero_sectors() to byte-based
-      block: Switch bdrv_make_zero() to byte-based
-      qemu-img: Switch get_block_status() to byte-based
-      block: Convert bdrv_get_block_status() to bytes
-      block: Switch bdrv_co_get_block_status() to byte-based
-      block: Switch BdrvCoGetBlockStatusData to byte-based
-      block: Switch bdrv_common_block_status_above() to byte-based
-      block: Switch bdrv_co_get_block_status_above() to byte-based
-      block: Convert bdrv_get_block_status_above() to bytes
-      qemu-img: Simplify logic in img_compare()
-      qemu-img: Speed up compare on pre-allocated larger file
-      qemu-img: Add find_nonzero()
-      qemu-img: Drop redundant error message in compare
-      qemu-img: Change check_empty_sectors() to byte-based
-      qemu-img: Change compare_sectors() to be byte-based
-      qemu-img: Change img_rebase() to be byte-based
-      qemu-img: Change img_compare() to be byte-based
-      block: Align block status requests
-      block: Reduce bdrv_aligned_preadv() rounding
-      qcow2: Reduce is_zero() rounding
-      qemu-io: Relax 'alloc' now that block-status doesn't assert
-
-Kevin Wolf (2):
-      qemu-iotests: Test backing_fmt with backing node reference
-      Merge remote-tracking branch 'mreitz/tags/pull-block-2017-10-26' into queue-block
-
-Max Reitz (8):
-      qemu-img.1: Image invalidation on qemu-img commit
-      iotests: Add test for dataplane mirroring
-      iotests: Pull _filter_actual_image_size from 67/87
-      iotests: Filter actual image size in 184 and 191
-      qcow2: Emit errp when truncating the image tail
-      qcow2: Fix unaligned preallocated truncation
-      qcow2: Always execute preallocate() in a coroutine
-      iotests: Add cluster_size=64k to 125
-
-Peter Krempa (1):
-      block: don't add 'driver' to options when referring to backing via node name
-
- include/block/block.h            |  29 ++-
- include/block/block_int.h        |  11 +-
- block.c                          |   3 +-
- block/blkdebug.c                 |  13 +-
- block/io.c                       | 334 ++++++++++++++++-----------
- block/mirror.c                   |  26 +--
- block/qcow2-cluster.c            |   2 +-
- block/qcow2.c                    | 116 ++++++----
- qemu-img.c                       | 381 ++++++++++++++-----------------
- qemu-io-cmds.c                   |  13 --
- block/trace-events               |   2 +-
- qemu-img.texi                    |   9 +-
- tests/qemu-iotests/067           |   2 +-
- tests/qemu-iotests/074.out       |   2 -
- tests/qemu-iotests/087           |   2 +-
- tests/qemu-iotests/125           |   7 +-
- tests/qemu-iotests/125.out       | 480 +++++++++++++++++++++++++++++++++++----
- tests/qemu-iotests/127           |  97 ++++++++
- tests/qemu-iotests/127.out       |  14 ++
- tests/qemu-iotests/177           |  12 +-
- tests/qemu-iotests/177.out       |  19 +-
- tests/qemu-iotests/184           |   3 +-
- tests/qemu-iotests/184.out       |   6 +-
- tests/qemu-iotests/191           |   7 +-
- tests/qemu-iotests/191.out       |  48 ++--
- tests/qemu-iotests/common.filter |   6 +
- tests/qemu-iotests/group         |   1 +
- 27 files changed, 1102 insertions(+), 543 deletions(-)
- create mode 100755 tests/qemu-iotests/127
- create mode 100644 tests/qemu-iotests/127.out
+diff --git a/tests/qemu-iotests/191 b/tests/qemu-iotests/191
+index ac2b88fd78..28bdea8f98 100755
+--- a/tests/qemu-iotests/191
++++ b/tests/qemu-iotests/191
+@@ -56,7 +56,8 @@ echo === Preparing and starting VM ===
+ echo
+ 
+ TEST_IMG="${TEST_IMG}.base" _make_test_img $size
+-TEST_IMG="${TEST_IMG}.mid" _make_test_img -b "${TEST_IMG}.base"
++IMGOPTS=$(_optstr_add "$IMGOPTS" "backing_fmt=$IMGFMT") \
++    TEST_IMG="${TEST_IMG}.mid" _make_test_img -b "${TEST_IMG}.base"
+ _make_test_img -b "${TEST_IMG}.mid"
+ TEST_IMG="${TEST_IMG}.ovl2" _make_test_img -b "${TEST_IMG}.mid"
+ 
+diff --git a/tests/qemu-iotests/191.out b/tests/qemu-iotests/191.out
+index 7bfcd2d5d8..6157fa520f 100644
+--- a/tests/qemu-iotests/191.out
++++ b/tests/qemu-iotests/191.out
+@@ -3,7 +3,7 @@ QA output created by 191
+ === Preparing and starting VM ===
+ 
+ Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=67108864
+-Formatting 'TEST_DIR/t.IMGFMT.mid', fmt=IMGFMT size=67108864 backing_file=TEST_DIR/t.IMGFMT.base
++Formatting 'TEST_DIR/t.IMGFMT.mid', fmt=IMGFMT size=67108864 backing_file=TEST_DIR/t.IMGFMT.base backing_fmt=IMGFMT
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864 backing_file=TEST_DIR/t.IMGFMT.mid
+ Formatting 'TEST_DIR/t.IMGFMT.ovl2', fmt=IMGFMT size=67108864 backing_file=TEST_DIR/t.IMGFMT.mid
+ wrote 65536/65536 bytes at offset 1048576
+-- 
+2.13.6
