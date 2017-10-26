@@ -1,25 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46142)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49127)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e7hC1-0002Ts-22
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 08:23:26 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1e7hQH-0005YK-8O
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 08:38:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e7hBx-0003ij-CU
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 08:23:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:21933)
+	(envelope-from <dgilbert@redhat.com>) id 1e7hQE-0006PB-2z
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 08:38:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44958)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1e7hBx-0003hi-5t
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 08:23:21 -0400
-Date: Thu, 26 Oct 2017 13:23:16 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20171026122316.GC10055@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20171026013445.45605-1-aik@ozlabs.ru>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1e7hQD-0006MS-S0
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 08:38:05 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D200A7E384
+	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 12:38:03 +0000 (UTC)
+Date: Thu, 26 Oct 2017 13:37:55 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20171026123754.GB2585@work-vm>
+References: <20171025054842.24883-1-quintela@redhat.com>
+	<20171025054842.24883-4-quintela@redhat.com>
+	<20171025172835.GD2484@work-vm> <87mv4emlpk.fsf@secure.laptop>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20171026013445.45605-1-aik@ozlabs.ru>
-Subject: Re: [Qemu-devel] [PATCH qemu v2] git-submodule.sh: Do not try
- writing to source directory if not necessary
+In-Reply-To: <87mv4emlpk.fsf@secure.laptop>
+Subject: Re: [Qemu-devel] [PATCH v3 3/5] migration: No need to return the
+ size of the cache
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,82 +35,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: qemu-devel@nongnu.org
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
 
-On Thu, Oct 26, 2017 at 12:34:45PM +1100, Alexey Kardashevskiy wrote:
-> The new git-submodule.sh script writes .git-submodule-status to
-> the source directory every time no matter what. This makes it conditional.
+* Juan Quintela (quintela@redhat.com) wrote:
+> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> > * Juan Quintela (quintela@redhat.com) wrote:
+> >> After the previous commits, we make sure that the value passed is
+> >> right, or we just drop an error.  So now we return if there is one
+> >> error or we have setup correctly the value passed.
+> >> 
+> >> Signed-off-by: Juan Quintela <quintela@redhat.com>
 > 
-> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-> ---
-> Changes:
-> v2:
-> * fixed "status" branch too
-> ---
->  scripts/git-submodule.sh | 15 ++++++++++-----
->  1 file changed, 10 insertions(+), 5 deletions(-)
+> > OK, this shares the same oddity as the original which is
+> >   XBZRLE.cache = NULL    is not an error.
+> >
+> > but, since that is the same as the original;
 > 
-> diff --git a/scripts/git-submodule.sh b/scripts/git-submodule.sh
-> index d8fbc7e47e..ae038d2e58 100755
-> --- a/scripts/git-submodule.sh
-> +++ b/scripts/git-submodule.sh
-> @@ -23,16 +23,21 @@ then
->      exit 1
->  fi
->  
-> +substat_tmp=$(mktemp)
-> +
->  case "$command" in
->  status)
->      test -f "$substat" || exit 1
-> -    trap "rm -f ${substat}.tmp" EXIT
+> Hi
+> 
+> It is a normal case.  You can change the cache size in the middle of
+> migration or outside migration.
+> 
+> If we are not in the middle of migration, cache is NULL.
 
-I don't see a need to change this to run a rm later - it is fine as is.
-
-> -    git submodule status $modules > "${substat}.tmp"
-> -    diff "${substat}" "${substat}.tmp" >/dev/null
-> -    exit $?
-> +    git submodule status $modules > "$substat_tmp"
-> +    diff "${substat_tmp}" "${substat}" > /dev/null
->      ;;
->  update)
->      git submodule update --init $modules 1>/dev/null 2>&1
-> -    git submodule status $modules > "${substat}"
-> +    git submodule status $modules > "$substat_tmp"
-> +    diff "${substat_tmp}" "${substat}" || mv "${substat_tmp}" "${substat}"
->      ;;
-
-This update command doesn't need changing - it is fine as it exists
-already. Once the status command is fix, the update command will never
-be run when the submodules are already up2date. 
+Ah OK, so yes,
 
 
-Essentially all we need is this
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-diff --git a/scripts/git-submodule.sh b/scripts/git-submodule.sh
-index 08932a35f0..67a33e5d79 100755
---- a/scripts/git-submodule.sh
-+++ b/scripts/git-submodule.sh
-@@ -26,9 +26,10 @@ fi
- case "$command" in
- status)
-     test -f "$substat" || exit 1
--    trap "rm -f ${substat}.tmp" EXIT
--    git submodule status $modules > "${substat}.tmp"
--    diff "${substat}" "${substat}.tmp" >/dev/null
-+    substat_tmp=$(mktemp)
-+    trap "rm -f ${substat_tmp}" EXIT
-+    git submodule status $modules > "${substat_tmp}"
-+    diff "${substat}" "${substat_tmp}" >/dev/null
-     exit $?
-     ;;
- update)
-
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+> Later, Juan.
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
