@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46958)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47008)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1e7cxz-0004iz-JO
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 03:52:44 -0400
+	(envelope-from <quintela@redhat.com>) id 1e7cy7-0004oL-JK
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 03:52:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1e7cxy-00082k-LD
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 03:52:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53078)
+	(envelope-from <quintela@redhat.com>) id 1e7cy6-00086k-Mn
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 03:52:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53232)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1e7cxy-00082G-Bs
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 03:52:38 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1e7cy6-00086O-Gw
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 03:52:46 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
 	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 53299883B1
-	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 07:52:37 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8171A8210D
+	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 07:52:45 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Thu, 26 Oct 2017 09:52:18 +0200
-Message-Id: <20171026075222.27798-7-quintela@redhat.com>
+Date: Thu, 26 Oct 2017 09:52:20 +0200
+Message-Id: <20171026075222.27798-9-quintela@redhat.com>
 In-Reply-To: <20171026075222.27798-1-quintela@redhat.com>
 References: <20171026075222.27798-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 06/10] tests: Add migration precopy test
+Subject: [Qemu-devel] [PATCH v2 08/10] tests: Add precopy test using
+ deprecated commands
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,53 +33,34 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
+Once there, make postcopy test to use the new commands now that we
+have other test for deprecated ones
+
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- tests/migration-test.c | 68 ++++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 66 insertions(+), 2 deletions(-)
+ tests/migration-test.c | 48 ++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 46 insertions(+), 2 deletions(-)
 
 diff --git a/tests/migration-test.c b/tests/migration-test.c
-index be598d3257..a8718770c9 100644
+index 338254bafe..b72dff3917 100644
 --- a/tests/migration-test.c
 +++ b/tests/migration-test.c
-@@ -401,6 +401,22 @@ static void migrate_set_speed(QTestState *who, const char *value)
-     migrate_check_parameter(who, "max-bandwidth", value);
- }
+@@ -545,8 +545,8 @@ static void test_postcopy(void)
+      * quickly, but that it doesn't complete precopy even on a slow
+      * machine, so also set the downtime.
+      */
+-    migrate_set_speed(from, "100000000");
+-    migrate_set_downtime(from, 0.001);
++    migrate_set_parameter(from, "max-bandwidth", "1000000000");
++    migrate_set_parameter(from, "downtime-limit", "1");
  
-+static void migrate_set_parameter(QTestState *who, const char *parameter,
-+                                  const char *value)
-+{
-+    QDict *rsp;
-+    gchar *cmd;
-+
-+    cmd = g_strdup_printf("{ 'execute': 'migrate-set-parameters',"
-+                          "'arguments': { '%s': %s } }",
-+                          parameter, value);
-+    rsp = qtest_qmp(who, cmd);
-+    g_free(cmd);
-+    g_assert(qdict_haskey(rsp, "return"));
-+    QDECREF(rsp);
-+    migrate_check_parameter(who, parameter, value);
-+}
-+
- static void migrate_set_capability(QTestState *who, const char *capability,
-                                    const char *value)
- {
-@@ -514,7 +530,7 @@ static void test_migrate_end(QTestState *from, QTestState *to)
-     cleanup("dest_serial");
- }
- 
--static void test_migrate(void)
-+static void test_postcopy(void)
- {
-     char *uri = g_strdup_printf("unix:%s/migsocket", tmpfs);
-     QTestState *from, *to;
-@@ -557,6 +573,53 @@ static void test_migrate(void)
+     /* Wait for the first serial output from the source */
+     wait_for_serial("src_serial");
+@@ -573,6 +573,49 @@ static void test_postcopy(void)
      test_migrate_end(from, to);
  }
  
-+
-+static void test_precopy(const char *uri)
++static void test_precopy_deprecated(const char *uri)
 +{
 +    QTestState *from, *to;
 +
@@ -88,11 +70,10 @@ index be598d3257..a8718770c9 100644
 +     * quickly, but that it doesn't complete precopy even on a slow
 +     * machine, so also set the downtime.
 +     */
-+    /* 1 ms */
-+    migrate_set_parameter(from, "downtime-limit", "1");
-+    /* 1GB/s slow*/
-+    migrate_set_parameter(from, "max-bandwidth", "1000000000");
-+
++    /* 100 ms */
++    migrate_set_downtime(from, 0.001);
++    /* 1MB/s slow*/
++    migrate_set_speed(from, "1000000000");
 +
 +    /* Wait for the first serial output from the source */
 +    wait_for_serial("src_serial");
@@ -101,13 +82,12 @@ index be598d3257..a8718770c9 100644
 +
 +    wait_for_migration_pass(from);
 +
-+    /* 1GB/s now it should converge */
-+    migrate_set_parameter(from, "downtime-limit", "300");
++    /* 300ms it should converge */
++    migrate_set_downtime(from, 0.3);
 +
 +    if (!got_stop) {
 +        qtest_qmp_eventwait(from, "STOP");
 +    }
-+
 +    qtest_qmp_eventwait(to, "RESUME");
 +
 +    wait_for_serial("dest_serial");
@@ -116,26 +96,23 @@ index be598d3257..a8718770c9 100644
 +    test_migrate_end(from, to);
 +}
 +
-+static void test_precopy_unix(void)
++static void test_deprecated_unix(void)
 +{
 +    char *uri = g_strdup_printf("unix:%s/migsocket", tmpfs);
 +
-+    test_precopy(uri);
++    test_precopy_deprecated(uri);
 +    g_free(uri);
 +}
-+
- int main(int argc, char **argv)
+ 
+ static void test_precopy(const char *uri)
  {
-     char template[] = "/tmp/migration-test-XXXXXX";
-@@ -576,7 +639,8 @@ int main(int argc, char **argv)
+@@ -648,6 +691,7 @@ int main(int argc, char **argv)
  
-     module_call_init(MODULE_INIT_QOM);
- 
--    qtest_add_func("/migration/postcopy/unix", test_migrate);
-+    qtest_add_func("/migration/precopy/unix", test_precopy_unix);
-+    qtest_add_func("/migration/postcopy/unix", test_postcopy);
+     qtest_add_func("/migration/precopy/unix", test_precopy_unix);
+     qtest_add_func("/migration/precopy/tcp", test_precopy_tcp);
++    qtest_add_func("/migration/deprecated/unix", test_deprecated_unix);
+     qtest_add_func("/migration/postcopy/unix", test_postcopy);
  
      ret = g_test_run();
- 
 -- 
 2.13.6
