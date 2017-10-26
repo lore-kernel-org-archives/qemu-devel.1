@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59307)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59302)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1e7i3x-00019C-4Q
+	(envelope-from <kwolf@redhat.com>) id 1e7i3w-00017o-HF
 	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 09:19:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1e7i3s-0002Zf-QG
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 09:19:09 -0400
+	(envelope-from <kwolf@redhat.com>) id 1e7i3r-0002YX-7Y
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 09:19:08 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Thu, 26 Oct 2017 15:17:35 +0200
-Message-Id: <20171026131741.5059-30-kwolf@redhat.com>
+Date: Thu, 26 Oct 2017 15:17:37 +0200
+Message-Id: <20171026131741.5059-32-kwolf@redhat.com>
 In-Reply-To: <20171026131741.5059-1-kwolf@redhat.com>
 References: <20171026131741.5059-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 29/35] iotests: Add test for dataplane mirroring
+Subject: [Qemu-devel] [PULL 31/35] iotests: Filter actual image size in 184
+ and 191
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,152 +25,298 @@ Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
 From: Max Reitz <mreitz@redhat.com>
 
+Whenever the actual image size is not part of the test, it should be
+filtered as it depends on the host filesystem.
+
 Signed-off-by: Max Reitz <mreitz@redhat.com>
-Message-id: 20170929170843.3711-1-mreitz@redhat.com
+Message-id: 20171009163456.485-3-mreitz@redhat.com
 Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Jeff Cody <jcody@redhat.com>
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/qemu-iotests/127     | 97 ++++++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/127.out | 14 +++++++
- tests/qemu-iotests/group   |  1 +
- 3 files changed, 112 insertions(+)
- create mode 100755 tests/qemu-iotests/127
- create mode 100644 tests/qemu-iotests/127.out
+ tests/qemu-iotests/184     |  3 ++-
+ tests/qemu-iotests/184.out |  6 +++---
+ tests/qemu-iotests/191     |  4 ++--
+ tests/qemu-iotests/191.out | 46 +++++++++++++++++++++++-----------------------
+ 4 files changed, 30 insertions(+), 29 deletions(-)
 
-diff --git a/tests/qemu-iotests/127 b/tests/qemu-iotests/127
-new file mode 100755
-index 0000000000..9e0d7d3be8
---- /dev/null
-+++ b/tests/qemu-iotests/127
-@@ -0,0 +1,97 @@
-+#!/bin/bash
-+#
-+# Test case for mirroring with dataplane
-+#
-+# Copyright (C) 2017 Red Hat, Inc.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+# creator
-+owner=mreitz@redhat.com
-+
-+seq=$(basename $0)
-+echo "QA output created by $seq"
-+
-+here=$PWD
-+status=1    # failure is the default!
-+
-+_cleanup()
-+{
-+    _cleanup_qemu
-+    _cleanup_test_img
-+    _rm_test_img "$TEST_IMG.overlay0"
-+    _rm_test_img "$TEST_IMG.overlay1"
-+}
-+trap "_cleanup; exit \$status" 0 1 2 3 15
-+
-+# get standard environment, filters and qemu instance handling
-+. ./common.rc
-+. ./common.filter
-+. ./common.qemu
-+
-+_supported_fmt qcow2
-+_supported_proto file
-+_supported_os Linux
-+
-+IMG_SIZE=64K
-+
-+_make_test_img $IMG_SIZE
-+TEST_IMG="$TEST_IMG.overlay0" _make_test_img -b "$TEST_IMG" $IMG_SIZE
-+TEST_IMG="$TEST_IMG.overlay1" _make_test_img -b "$TEST_IMG" $IMG_SIZE
-+
-+# So that we actually have something to mirror and the job does not return
-+# immediately (which may be bad because then we cannot know whether the
-+# 'return' or the 'BLOCK_JOB_READY' comes first).
-+$QEMU_IO -c 'write 0 42' "$TEST_IMG.overlay0" | _filter_qemu_io
-+
-+# We cannot use virtio-blk here because that does not actually set the attached
-+# BB's AioContext in qtest mode
-+_launch_qemu \
-+    -object iothread,id=iothr \
-+    -blockdev node-name=source,driver=$IMGFMT,file.driver=file,file.filename="$TEST_IMG.overlay0" \
-+    -device virtio-scsi,id=scsi-bus,iothread=iothr \
-+    -device scsi-hd,bus=scsi-bus.0,drive=source
-+
-+_send_qemu_cmd $QEMU_HANDLE \
-+    "{ 'execute': 'qmp_capabilities' }" \
-+    'return'
-+
-+_send_qemu_cmd $QEMU_HANDLE \
-+    "{ 'execute': 'drive-mirror',
-+       'arguments': {
-+           'job-id': 'mirror',
-+           'device': 'source',
-+           'target': '$TEST_IMG.overlay1',
-+           'mode':   'existing',
-+           'sync':   'top'
-+       } }" \
-+    'BLOCK_JOB_READY'
-+
-+# The backing BDS should be assigned the overlay's AioContext
-+_send_qemu_cmd $QEMU_HANDLE \
-+    "{ 'execute': 'block-job-complete',
-+       'arguments': { 'device': 'mirror' } }" \
-+    'BLOCK_JOB_COMPLETED'
-+
-+_send_qemu_cmd $QEMU_HANDLE \
-+    "{ 'execute': 'quit' }" \
-+    'return'
-+
-+wait=yes _cleanup_qemu
-+
-+# success, all done
-+echo '*** done'
-+rm -f $seq.full
-+status=0
-diff --git a/tests/qemu-iotests/127.out b/tests/qemu-iotests/127.out
-new file mode 100644
-index 0000000000..543d075005
---- /dev/null
-+++ b/tests/qemu-iotests/127.out
-@@ -0,0 +1,14 @@
-+QA output created by 127
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=65536
-+Formatting 'TEST_DIR/t.IMGFMT.overlay0', fmt=IMGFMT size=65536 backing_file=TEST_DIR/t.IMGFMT
-+Formatting 'TEST_DIR/t.IMGFMT.overlay1', fmt=IMGFMT size=65536 backing_file=TEST_DIR/t.IMGFMT
-+wrote 42/42 bytes at offset 0
-+42 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+{"return": {}}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "mirror", "len": 65536, "offset": 65536, "speed": 0, "type": "mirror"}}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "mirror", "len": 65536, "offset": 65536, "speed": 0, "type": "mirror"}}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-+*** done
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index 83da427c0a..24e5ad1b79 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -133,6 +133,7 @@
- 124 rw auto backing
- 125 rw auto
- 126 rw auto backing
-+127 rw auto backing quick
- 128 rw auto quick
- 129 rw auto quick
- 130 rw auto quick
+diff --git a/tests/qemu-iotests/184 b/tests/qemu-iotests/184
+index 704f38f936..ee96c99af3 100755
+--- a/tests/qemu-iotests/184
++++ b/tests/qemu-iotests/184
+@@ -51,7 +51,8 @@ function do_run_qemu()
+ function run_qemu()
+ {
+     do_run_qemu "$@" 2>&1 | _filter_testdir | _filter_qemu | _filter_qmp\
+-                          | _filter_qemu_io | _filter_generated_node_ids
++                          | _filter_qemu_io | _filter_generated_node_ids \
++                          | _filter_actual_image_size
+ }
+ 
+ _make_test_img 64M
+diff --git a/tests/qemu-iotests/184.out b/tests/qemu-iotests/184.out
+index 0aed1a2220..4dc7984a85 100644
+--- a/tests/qemu-iotests/184.out
++++ b/tests/qemu-iotests/184.out
+@@ -32,7 +32,7 @@ Testing:
+                 "filename": "json:{\"throttle-group\": \"group0\", \"driver\": \"throttle\", \"file\": {\"driver\": \"qcow2\", \"file\": {\"driver\": \"file\", \"filename\": \"TEST_DIR/t.qcow2\"}}}",
+                 "cluster-size": 65536,
+                 "format": "throttle",
+-                "actual-size": 200704,
++                "actual-size": SIZE,
+                 "dirty-flag": false
+             },
+             "iops_wr": 0,
+@@ -62,7 +62,7 @@ Testing:
+                 "filename": "TEST_DIR/t.qcow2",
+                 "cluster-size": 65536,
+                 "format": "qcow2",
+-                "actual-size": 200704,
++                "actual-size": SIZE,
+                 "format-specific": {
+                     "type": "qcow2",
+                     "data": {
+@@ -100,7 +100,7 @@ Testing:
+                 "virtual-size": 197120,
+                 "filename": "TEST_DIR/t.qcow2",
+                 "format": "file",
+-                "actual-size": 200704,
++                "actual-size": SIZE,
+                 "dirty-flag": false
+             },
+             "iops_wr": 0,
+diff --git a/tests/qemu-iotests/191 b/tests/qemu-iotests/191
+index 28bdea8f98..ad785e10b1 100755
+--- a/tests/qemu-iotests/191
++++ b/tests/qemu-iotests/191
+@@ -92,7 +92,7 @@ echo === Check that both top and top2 point to base now ===
+ echo
+ 
+ _send_qemu_cmd $h "{ 'execute': 'query-named-block-nodes' }" "^}" |
+-    _filter_generated_node_ids
++    _filter_generated_node_ids | _filter_actual_image_size
+ 
+ _send_qemu_cmd $h "{ 'execute': 'quit' }" "^}"
+ wait=1 _cleanup_qemu
+@@ -140,7 +140,7 @@ echo === Check that both top and top2 point to base now ===
+ echo
+ 
+ _send_qemu_cmd $h "{ 'execute': 'query-named-block-nodes' }" "^}" |
+-    _filter_generated_node_ids
++    _filter_generated_node_ids | _filter_actual_image_size
+ 
+ _send_qemu_cmd $h "{ 'execute': 'quit' }" "^}"
+ wait=1 _cleanup_qemu
+diff --git a/tests/qemu-iotests/191.out b/tests/qemu-iotests/191.out
+index 6157fa520f..73c0ed454c 100644
+--- a/tests/qemu-iotests/191.out
++++ b/tests/qemu-iotests/191.out
+@@ -47,7 +47,7 @@ wrote 65536/65536 bytes at offset 1048576
+                     "filename": "TEST_DIR/t.qcow2.base",
+                     "cluster-size": 65536,
+                     "format": "qcow2",
+-                    "actual-size": 397312,
++                    "actual-size": SIZE,
+                     "format-specific": {
+                         "type": "qcow2",
+                         "data": {
+@@ -64,7 +64,7 @@ wrote 65536/65536 bytes at offset 1048576
+                 "filename": "TEST_DIR/t.qcow2.ovl2",
+                 "cluster-size": 65536,
+                 "format": "qcow2",
+-                "actual-size": 200704,
++                "actual-size": SIZE,
+                 "format-specific": {
+                     "type": "qcow2",
+                     "data": {
+@@ -105,7 +105,7 @@ wrote 65536/65536 bytes at offset 1048576
+                 "virtual-size": 197120,
+                 "filename": "TEST_DIR/t.qcow2.ovl2",
+                 "format": "file",
+-                "actual-size": 200704,
++                "actual-size": SIZE,
+                 "dirty-flag": false
+             },
+             "iops_wr": 0,
+@@ -136,7 +136,7 @@ wrote 65536/65536 bytes at offset 1048576
+                     "filename": "TEST_DIR/t.qcow2.base",
+                     "cluster-size": 65536,
+                     "format": "qcow2",
+-                    "actual-size": 397312,
++                    "actual-size": SIZE,
+                     "format-specific": {
+                         "type": "qcow2",
+                         "data": {
+@@ -153,7 +153,7 @@ wrote 65536/65536 bytes at offset 1048576
+                 "filename": "TEST_DIR/t.qcow2",
+                 "cluster-size": 65536,
+                 "format": "qcow2",
+-                "actual-size": 200704,
++                "actual-size": SIZE,
+                 "format-specific": {
+                     "type": "qcow2",
+                     "data": {
+@@ -194,7 +194,7 @@ wrote 65536/65536 bytes at offset 1048576
+                 "virtual-size": 197120,
+                 "filename": "TEST_DIR/t.qcow2",
+                 "format": "file",
+-                "actual-size": 200704,
++                "actual-size": SIZE,
+                 "dirty-flag": false
+             },
+             "iops_wr": 0,
+@@ -225,7 +225,7 @@ wrote 65536/65536 bytes at offset 1048576
+                     "filename": "TEST_DIR/t.qcow2.base",
+                     "cluster-size": 65536,
+                     "format": "qcow2",
+-                    "actual-size": 397312,
++                    "actual-size": SIZE,
+                     "format-specific": {
+                         "type": "qcow2",
+                         "data": {
+@@ -242,7 +242,7 @@ wrote 65536/65536 bytes at offset 1048576
+                 "filename": "TEST_DIR/t.qcow2.mid",
+                 "cluster-size": 65536,
+                 "format": "qcow2",
+-                "actual-size": 397312,
++                "actual-size": SIZE,
+                 "format-specific": {
+                     "type": "qcow2",
+                     "data": {
+@@ -283,7 +283,7 @@ wrote 65536/65536 bytes at offset 1048576
+                 "virtual-size": 393216,
+                 "filename": "TEST_DIR/t.qcow2.mid",
+                 "format": "file",
+-                "actual-size": 397312,
++                "actual-size": SIZE,
+                 "dirty-flag": false
+             },
+             "iops_wr": 0,
+@@ -313,7 +313,7 @@ wrote 65536/65536 bytes at offset 1048576
+                 "filename": "TEST_DIR/t.qcow2.base",
+                 "cluster-size": 65536,
+                 "format": "qcow2",
+-                "actual-size": 397312,
++                "actual-size": SIZE,
+                 "format-specific": {
+                     "type": "qcow2",
+                     "data": {
+@@ -351,7 +351,7 @@ wrote 65536/65536 bytes at offset 1048576
+                 "virtual-size": 393216,
+                 "filename": "TEST_DIR/t.qcow2.base",
+                 "format": "file",
+-                "actual-size": 397312,
++                "actual-size": SIZE,
+                 "dirty-flag": false
+             },
+             "iops_wr": 0,
+@@ -450,7 +450,7 @@ wrote 65536/65536 bytes at offset 1048576
+                     "filename": "TEST_DIR/t.qcow2.base",
+                     "cluster-size": 65536,
+                     "format": "qcow2",
+-                    "actual-size": 397312,
++                    "actual-size": SIZE,
+                     "format-specific": {
+                         "type": "qcow2",
+                         "data": {
+@@ -467,7 +467,7 @@ wrote 65536/65536 bytes at offset 1048576
+                 "filename": "TEST_DIR/t.qcow2.ovl2",
+                 "cluster-size": 65536,
+                 "format": "qcow2",
+-                "actual-size": 200704,
++                "actual-size": SIZE,
+                 "format-specific": {
+                     "type": "qcow2",
+                     "data": {
+@@ -508,7 +508,7 @@ wrote 65536/65536 bytes at offset 1048576
+                 "virtual-size": 197120,
+                 "filename": "TEST_DIR/t.qcow2.ovl2",
+                 "format": "file",
+-                "actual-size": 200704,
++                "actual-size": SIZE,
+                 "dirty-flag": false
+             },
+             "iops_wr": 0,
+@@ -540,7 +540,7 @@ wrote 65536/65536 bytes at offset 1048576
+                         "filename": "TEST_DIR/t.qcow2.base",
+                         "cluster-size": 65536,
+                         "format": "qcow2",
+-                        "actual-size": 397312,
++                        "actual-size": SIZE,
+                         "format-specific": {
+                             "type": "qcow2",
+                             "data": {
+@@ -557,7 +557,7 @@ wrote 65536/65536 bytes at offset 1048576
+                     "filename": "TEST_DIR/t.qcow2.ovl2",
+                     "cluster-size": 65536,
+                     "format": "qcow2",
+-                    "actual-size": 200704,
++                    "actual-size": SIZE,
+                     "format-specific": {
+                         "type": "qcow2",
+                         "data": {
+@@ -576,7 +576,7 @@ wrote 65536/65536 bytes at offset 1048576
+                 "filename": "TEST_DIR/t.qcow2.ovl3",
+                 "cluster-size": 65536,
+                 "format": "qcow2",
+-                "actual-size": 200704,
++                "actual-size": SIZE,
+                 "format-specific": {
+                     "type": "qcow2",
+                     "data": {
+@@ -617,7 +617,7 @@ wrote 65536/65536 bytes at offset 1048576
+                 "virtual-size": 197120,
+                 "filename": "TEST_DIR/t.qcow2.ovl3",
+                 "format": "file",
+-                "actual-size": 200704,
++                "actual-size": SIZE,
+                 "dirty-flag": false
+             },
+             "iops_wr": 0,
+@@ -647,7 +647,7 @@ wrote 65536/65536 bytes at offset 1048576
+                 "filename": "TEST_DIR/t.qcow2.base",
+                 "cluster-size": 65536,
+                 "format": "qcow2",
+-                "actual-size": 397312,
++                "actual-size": SIZE,
+                 "format-specific": {
+                     "type": "qcow2",
+                     "data": {
+@@ -685,7 +685,7 @@ wrote 65536/65536 bytes at offset 1048576
+                 "virtual-size": 393216,
+                 "filename": "TEST_DIR/t.qcow2.base",
+                 "format": "file",
+-                "actual-size": 397312,
++                "actual-size": SIZE,
+                 "dirty-flag": false
+             },
+             "iops_wr": 0,
+@@ -716,7 +716,7 @@ wrote 65536/65536 bytes at offset 1048576
+                     "filename": "TEST_DIR/t.qcow2.base",
+                     "cluster-size": 65536,
+                     "format": "qcow2",
+-                    "actual-size": 397312,
++                    "actual-size": SIZE,
+                     "format-specific": {
+                         "type": "qcow2",
+                         "data": {
+@@ -733,7 +733,7 @@ wrote 65536/65536 bytes at offset 1048576
+                 "filename": "TEST_DIR/t.qcow2",
+                 "cluster-size": 65536,
+                 "format": "qcow2",
+-                "actual-size": 200704,
++                "actual-size": SIZE,
+                 "format-specific": {
+                     "type": "qcow2",
+                     "data": {
+@@ -774,7 +774,7 @@ wrote 65536/65536 bytes at offset 1048576
+                 "virtual-size": 197120,
+                 "filename": "TEST_DIR/t.qcow2",
+                 "format": "file",
+-                "actual-size": 200704,
++                "actual-size": SIZE,
+                 "dirty-flag": false
+             },
+             "iops_wr": 0,
 -- 
 2.13.6
