@@ -1,41 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54826)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55356)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1e7fdY-0005GU-GD
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 06:43:45 -0400
+	(envelope-from <a175818323@gmail.com>) id 1e7ffa-000632-RM
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 06:45:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1e7fdV-00077y-Dh
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 06:43:44 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:41142)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1e7fdV-00076h-55
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 06:43:41 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v9QAftZV035319
-	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 06:43:36 -0400
-Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2dudvf909p-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 06:43:33 -0400
-Received: from localhost
-	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Thu, 26 Oct 2017 11:43:29 +0100
-References: <20171020145437.18549-1-borntraeger@de.ibm.com>
-	<46a65cf7-8c60-3aac-de93-95be25360f11@linux.vnet.ibm.com>
-	<7da3a9f3-918f-3859-1f5e-eee028c2586d@de.ibm.com>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Thu, 26 Oct 2017 12:43:26 +0200
+	(envelope-from <a175818323@gmail.com>) id 1e7ffW-0008IT-Cl
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 06:45:50 -0400
+Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:43415)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <a175818323@gmail.com>)
+	id 1e7ffW-0008HY-59
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 06:45:46 -0400
+Received: by mail-oi0-x242.google.com with SMTP id c77so4882725oig.0
+	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 03:45:45 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <7da3a9f3-918f-3859-1f5e-eee028c2586d@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Message-Id: <4d92c2d7-41a2-b527-d913-2505d9c00713@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH/QEMU] s390x/kvm: use cpu_model_available
- for guarded storage on compat machines
+In-Reply-To: <20170829214929.31136.21144.stgit@gimli.home>
+References: <20170829214929.31136.21144.stgit@gimli.home>
+From: Bob Chen <a175818323@gmail.com>
+Date: Thu, 26 Oct 2017 18:45:44 +0800
+Message-ID: <CAMxP3BRze3uBxUoKwPNUO-SPBGWHQBLc+5qF08HBn7vnyhwEWw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 0/3] vfio/pci: Add NVIDIA GPUDirect P2P
+ clique support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,65 +29,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>, Marc Hartmayer <mhartmay@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: libvir-list@redhat.com, qemu-devel@nongnu.org, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>, "Jason J . Herne" <jjherne@linux.vnet.ibm.com>, Boris Fiuczynski <fiuczy@linux.vnet.ibm.com>, Jiri Denemark <jdenemar@redhat.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: qemu-devel@nongnu.org
+
+There seem to be some bugs in these patches, causing my VM failed to boot.
+
+Test case:
+
+0. Merge these 3 patches in to release 2.10.1
+
+1. qemu-system-x86_64_2.10.1  ... \
+-device vfio-pci,host=04:00.0 \
+-device vfio-pci,host=05:00.0 \
+-device vfio-pci,host=08:00.0 \
+-device vfio-pci,host=09:00.0 \
+-device vfio-pci,host=85:00.0 \
+-device vfio-pci,host=86:00.0 \
+-device vfio-pci,host=89:00.0 \
+-device vfio-pci,host=8a:00.0 ...
+
+The guest was able to boot up.
+
+2. qemu-system-x86_64_2.10.1  ... \
+-device vfio-pci,host=04:00.0,x-nv-gpudirect-clique=0 \
+-device vfio-pci,host=05:00.0,x-nv-gpudirect-clique=0 \
+-device vfio-pci,host=08:00.0,x-nv-gpudirect-clique=0 \
+-device vfio-pci,host=09:00.0,x-nv-gpudirect-clique=0 \
+-device vfio-pci,host=85:00.0,x-nv-gpudirect-clique=8 \
+-device vfio-pci,host=86:00.0,x-nv-gpudirect-clique=8 \
+-device vfio-pci,host=89:00.0,x-nv-gpudirect-clique=8 \
+-device vfio-pci,host=8a:00.0,x-nv-gpudirect-clique=8 \
+
+Hang. VNC couldn't connect.
 
 
+My personal patch used to work, although it was done by straightforward
+hacking and not that friendly to read.
 
-On 10/26/2017 10:13 AM, Christian Borntraeger wrote:
-> 
-> 
-> On 10/26/2017 01:35 AM, Halil Pasic wrote:
->  try the most interesting scenarios out.
->>
->> The idea of the patch is very clear, but I don't understand the bigger gs
->> feature context fully.
->>
->> From what I read in the code, the attempt to enable the gs capability in
->> the kernel is made regardless of the cpu model. If the attempt was
->> successful kvm_s390_get_gs will keep returning true. That would in turn
->> affect migration, as far as I see (usages of kvm_s390_get_gs). I could
->> not figure out how does gs being turned off via cpu-model (-cpu
->> z14,gs=off) does turn of gs support -- at least not the details. I wanted
->> to give a timely review, so I've limited myself there. 
-> 
-> When the CPU model turns off gs, facility bit 133 will be turned off.
-> Then the kernel does the right thing, see priv.c handle_gs.
-> 
-> guarded storage is enabled lazily. Whenever the guest issues a Gs instruction
-> we will get an exit and only enable GS if facility 133 is set.
-> 
->>
->> From what I see, this patch does what it advertises, and since I think
->> it's the right thing to do in the current situation I gonna give it an:
->> Acked-by: Halil Pasic <pasic@linux.vnet.ibm.com>
->>
->> At the same time, I would prefer the commit message being reworded. IMHO
->> this patch is a good stop-gap measure, but essentially it trades an
->> annoying and obvious bug for a subtle and hopefully painless one.
->>
->> Let me explain this last statement. For starters, I  do share some of the
->> concerns Boris has voiced.  I won't repeat those. Same goes for the
->> example Christian paraphrased previously, and the the fear of an implicit
->> requirement for having to support a Cartesian product of the advertised
->> machine-types and cpu-models (for each qemu binary).
-> 
-> I will try to come up with a patch description that explains the open issues
-> and it will tell that additional might or might not be necessary depending
-> on followup discussions.
+--- a/hw/vfio/pci.c
++++ b/hw/vfio/pci.c
 
-I would be already happy with adding something like:
-During the discussion enabling cpu-model features for preexisting
-machine-types came out as at least controversial. We agreed to implement
-this patch as a stop-gap measure for the next release. What is a clean
-enough solution shall be decided without time pressure.
+ @@static int vfio_initfn(PCIDevice *pdev)
 
-> I will schedule this patch for 2.11 then.
-> 
+    vfio_add_emulated_long(vdev, 0xc8, 0x50080009, ~0);
+    if (count < 4)
+    {
+        vfio_add_emulated_long(vdev, 0xcc, 0x00005032, ~0);
+    }
+    else
+    {
+        vfio_add_emulated_long(vdev, 0xcc, 0x00085032, ~0);
+    }
+    vfio_add_emulated_word(vdev, 0x78, 0xc810, ~0);
 
-Sounds like a plan.
+2017-08-30 6:05 GMT+08:00 Alex Williamson <alex.williamson@redhat.com>:
 
-Cheers,
-Halil
-
-> 
+> NVIDIA has a specification for exposing a virtual vendor capability
+> which provides a hint to guest drivers as to which sets of GPUs can
+> support direct peer-to-peer DMA.  Devices with the same clique ID are
+> expected to support this.  The user can specify a clique ID for an
+> NVIDIA graphics device using the new vfio-pci x-nv-gpudirect-clique=
+> option, where valid clique IDs are a 4-bit integer.  It's entirely the
+> user's responsibility to specify sets of devices for which P2P works
+> correctly and provides some benefit.  This is only useful for DMA
+> between NVIDIA GPUs, therefore it's only useful to specify cliques
+> comprised of more than one GPU.  Furthermore, this does not enable DMA
+> between VMs, there is no change to VM DMA mapping, this only exposes
+> hints about existing DMA paths to the guest driver.  Thanks,
+>
+> Alex
+>
+> ---
+>
+> Alex Williamson (3):
+>       vfio/pci: Do not unwind on error
+>       vfio/pci: Add virtual capabilities quirk infrastructure
+>       vfio/pci: Add NVIDIA GPUDirect Cliques support
+>
+>
+>  hw/vfio/pci-quirks.c |  114 ++++++++++++++++++++++++++++++
+> ++++++++++++++++++++
+>  hw/vfio/pci.c        |   17 +++++++
+>  hw/vfio/pci.h        |    4 ++
+>  3 files changed, 133 insertions(+), 2 deletions(-)
+>
