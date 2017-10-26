@@ -1,26 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57813)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34931)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e7bTY-0001z2-Bb
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 02:17:09 -0400
+	(envelope-from <aik@ozlabs.ru>) id 1e7bwg-0006IP-M0
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 02:47:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e7bTX-0001N9-Hz
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 02:17:08 -0400
-Received: from mail-wr0-x22c.google.com ([2a00:1450:400c:c0c::22c]:44268)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1e7bTX-0001MD-Ap
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 02:17:07 -0400
-Received: by mail-wr0-x22c.google.com with SMTP id z55so2071768wrz.1
-	for <qemu-devel@nongnu.org>; Wed, 25 Oct 2017 23:17:07 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA99zpvcgk2EuXkrcOY+8rHeRkJhH4GqViJkEgQV3bdWFg@mail.gmail.com>
-References: <20171025123056.3165-1-richard.henderson@linaro.org>
-	<CAFEAcA99zpvcgk2EuXkrcOY+8rHeRkJhH4GqViJkEgQV3bdWFg@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 26 Oct 2017 07:16:45 +0100
-Message-ID: <CAFEAcA9XdoV0YVw+q7op_vafe9X0JTiQdYmGcmPgqRR3qhUYrQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/11] Disassembler patches
+	(envelope-from <aik@ozlabs.ru>) id 1e7bwc-0004kC-DB
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 02:47:14 -0400
+Received: from ozlabs.ru ([107.173.13.209]:55926)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <aik@ozlabs.ru>) id 1e7bwc-0004jc-78
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 02:47:10 -0400
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Date: Thu, 26 Oct 2017 17:46:35 +1100
+Message-Id: <20171026064635.7179-1-aik@ozlabs.ru>
+Subject: [Qemu-devel] [PATCH qemu] fdc: Exit if ISA controller does not
+ support DMA
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,25 +22,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "Daniel P. Berrange" <berrange@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>
 
-On 26 October 2017 at 07:07, Peter Maydell <peter.maydell@linaro.org> wrote:
-> Hi. This failed to build for Windows:
+A "powernv" machine type defines an ISA bus but it does not add any DMA
+controller to it so it is possible to hit assert(fdctrl->dma) by
+adding "-machine powernv -device isa-fdc".
 
-Also, after it failed and I backed out the merge, the next thing I
-tried to build failed everywhere with:
+This replaces assert() with an error message.
 
-warning: unable to rmdir capstone: Directory not empty
-error: pathspec 'capstone' did not match any file(s) known to git.
-error: pathspec 'capstone' did not match any file(s) known to git.
+Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+---
 
-That's bad, because it suggests that bisection is going to break
-across this merge commit.
+Is it a must for ISA to have DMA controllers?
 
-Dan, is this going to be a generic problem with the new submodule
-stuff, or is it specific to something with how the capstone
-submodule is being handled in this patchset?
 
-thanks
--- PMM
+---
+ hw/block/fdc.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/hw/block/fdc.c b/hw/block/fdc.c
+index 67f78ac702..ed8b367572 100644
+--- a/hw/block/fdc.c
++++ b/hw/block/fdc.c
+@@ -2700,7 +2700,10 @@ static void isabus_fdc_realize(DeviceState *dev, Error **errp)
+     fdctrl->dma_chann = isa->dma;
+     if (fdctrl->dma_chann != -1) {
+         fdctrl->dma = isa_get_dma(isa_bus_from_device(isadev), isa->dma);
+-        assert(fdctrl->dma);
++        if (!fdctrl->dma) {
++            error_setg(errp, "ISA controller does not support DMA, exiting");
++            return;
++        }
+     }
+ 
+     qdev_set_legacy_instance_id(dev, isa->iobase, 2);
+-- 
+2.11.0
