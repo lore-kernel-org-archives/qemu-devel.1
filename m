@@ -1,26 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58323)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34167)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1e7rkB-0006WO-1k
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 19:39:24 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1e7rw1-00085t-BU
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 19:51:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1e7rk7-00042b-4Z
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 19:39:23 -0400
-Resent-Message-Id: <E1e7rk7-00042b-4Z@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21444)
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1e7rvy-0007aN-8Y
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 19:51:37 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:54218
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1e7rk6-00040a-UC
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 19:39:19 -0400
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <150906111456.132.9588767896574275978@bafd83ae6430>
-In-Reply-To: <20171026233054.21133-1-mdroth@linux.vnet.ibm.com>
-MIME-Version: 1.0
+	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
+	id 1e7rvy-0007Zp-2K
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 19:51:34 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v9QNeRtd021080
+	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 19:51:29 -0400
+Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2dusbcs06k-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 19:51:29 -0400
+Received: from localhost
+	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
+	Thu, 26 Oct 2017 17:51:28 -0600
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 26 Oct 2017 16:38:35 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH 0/6] qga: add support for re-opening
- channel on error
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+In-Reply-To: <20170813155849.11368-1-sameeh@daynix.com>
+References: <20170813155849.11368-1-sameeh@daynix.com>
+Date: Thu, 26 Oct 2017 18:51:13 -0500
+Message-Id: <150906187318.17222.17361197183146152660@sif>
+Subject: Re: [Qemu-devel] [PATCH 0/3]
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,49 +41,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mdroth@linux.vnet.ibm.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, yan@daynix.com, daniel@daynix.com, sameeh@daynix.com
+To: Sameeh Jubran <sameeh@daynix.com>, qemu-devel@nongnu.org
+Cc: yan@daynix.com
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtQQVRDSCAwLzZdIHFnYTogYWRkIHN1cHBvcnQgZm9yIHJlLW9wZW5pbmcgY2hhbm5l
-bCBvbiBlcnJvcgpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMjAxNzEwMjYyMzMwNTQuMjExMzMt
-MS1tZHJvdGhAbGludXgudm5ldC5pYm0uY29tCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMh
-L2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0Uu
-LiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQg
-MApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxv
-ZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwog
-ICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1h
-dD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3Jp
-cHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAg
-ICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRF
-U1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0
-YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUK
-ICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE3MTAyNjIzMzA1NC4yMTEzMy0x
-LW1kcm90aEBsaW51eC52bmV0LmlibS5jb20gLT4gcGF0Y2hldy8yMDE3MTAyNjIzMzA1NC4yMTEz
-My0xLW1kcm90aEBsaW51eC52bmV0LmlibS5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0
-ZXN0JwoyYzBhZDdkOTQ3IHFnYS13aW46IHJlcG9ydCBzcGVjaWZpYyBlcnJvciB3aGVuIGZhaWxp
-bmcgdG8gb3BlbiBjaGFubmVsCjAyMDFlZWY2MWQgcWdhLXdpbjogaW5zdGFsbCBzZXJ2aWNlIHdp
-dGggLS1yZXRyeS1wYXRoIHNldCBieSBkZWZhdWx0CjQzMmQ2ODUxZmYgcWdhOiBhZGQgLS1yZXRy
-eS1wYXRoIG9wdGlvbiBmb3IgcmUtaW5pdGlhbGl6aW5nIGNoYW5uZWwgb24gZmFpbHVyZQpkMjQy
-YjE5MDU3IHFnYTogbW92ZSB3MzIgc2VydmljZSBoYW5kbGluZyBvdXQgb2YgcnVuX2FnZW50KCkK
-NTIyZWE0NTYyZSBxZ2E6IGhhbmcgR0FDb25maWcvc29ja2V0X2FjdGl2YXRpb24gb2ZmIG9mIEdB
-U3RhdGUgZ2xvYmFsCjYxNWM1ODA4M2YgcWdhOiBncm91cCBhZ2VudCBpbml0L2NsZWFudXAgaW5p
-dCBzZXBhcmF0ZSByb3V0aW5lcwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0gg
-MS82OiBxZ2E6IGdyb3VwIGFnZW50IGluaXQvY2xlYW51cCBpbml0IHNlcGFyYXRlIHJvdXRpbmVz
-Li4uCkVSUk9SOiBVc2UgZ19hc3NlcnQgb3IgZ19hc3NlcnRfbm90X3JlYWNoZWQKIzI5OiBGSUxF
-OiBxZ2EvbWFpbi5jOjEyNTc6CisgICAgZ19hc3NlcnRfbnVsbChnYV9zdGF0ZSk7Cgp0b3RhbDog
-MSBlcnJvcnMsIDAgd2FybmluZ3MsIDE0MyBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBz
-dHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJl
-IGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNL
-UEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAyLzY6IHFnYTogaGFuZyBHQUNv
-bmZpZy9zb2NrZXRfYWN0aXZhdGlvbiBvZmYgb2YgR0FTdGF0ZSBnbG9iYWwuLi4KQ2hlY2tpbmcg
-UEFUQ0ggMy82OiBxZ2E6IG1vdmUgdzMyIHNlcnZpY2UgaGFuZGxpbmcgb3V0IG9mIHJ1bl9hZ2Vu
-dCgpLi4uCkNoZWNraW5nIFBBVENIIDQvNjogcWdhOiBhZGQgLS1yZXRyeS1wYXRoIG9wdGlvbiBm
-b3IgcmUtaW5pdGlhbGl6aW5nIGNoYW5uZWwgb24gZmFpbHVyZS4uLgpDaGVja2luZyBQQVRDSCA1
-LzY6IHFnYS13aW46IGluc3RhbGwgc2VydmljZSB3aXRoIC0tcmV0cnktcGF0aCBzZXQgYnkgZGVm
-YXVsdC4uLgpDaGVja2luZyBQQVRDSCA2LzY6IHFnYS13aW46IHJlcG9ydCBzcGVjaWZpYyBlcnJv
-ciB3aGVuIGZhaWxpbmcgdG8gb3BlbiBjaGFubmVsLi4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVz
-dCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9t
-YXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlv
-dXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
+Quoting Sameeh Jubran (2017-08-13 10:58:46)
+> From: Sameeh Jubran <sjubran@redhat.com>
+> =
+
+> This series fixes qemu-ga's behaviour upon facing a missing serial/serial
+> driver by listening to the serial device's events.
+> =
+
+> For more info on why this series is needed checkout the commit message
+> of the third patch and the following bugzilla: https://bugzilla.redhat.co=
+m/show_bug.cgi?id=3D990629.
+> =
+
+> Sameeh Jubran (3):
+>   qga: Channel: Add functions for checking serial status
+>   qga: main: make qga config and socket activation global
+>   qga: Prevent qemu-ga exit if serial doesn't exist
+
+Hi Sameeh,
+
+The event handling stuff is spiffy and could be useful for other use-cases
+(e.g. cpu/mem hotplug events that can be consumed by management), but since
+the actual bug here is somewhat of an edge case (we *could* just tell
+people that installing the agent before virtio-serial drivers is a bug,
+or that unplugging the agent's communication channel is a bad idea),
+I'm not too comfortable with adding this much complexity unless there's
+a stronger argument for it.
+
+There's also a couple issues I had with this series as it stands, namely
+the lack of a ./configure check for udev (which could cause build
+breakage in some environments), and a lot of spillage of GAConfig into
+qga/channel-*, which I think could be avoided.
+
+I've sent an alternative series that I think we should consider as it
+uses a much simpler mechanism to implement this support (basically
+just periodically retrying the channel if it doesn't exist, or if it
+disappears for whatever reason). I've tested it on Windows, but would
+be good to confirm that it adequately addresses the use-case you were
+looking at. Thanks!
+
+> =
+
+>  Makefile            |   4 +
+>  qga/channel-posix.c |  54 ++++++++++
+>  qga/channel-win32.c |  60 +++++++++++
+>  qga/channel.h       |   9 ++
+>  qga/main.c          | 284 ++++++++++++++++++++++++++++++++++++++++++++++=
+------
+>  qga/service-win32.h |   4 +
+>  6 files changed, 385 insertions(+), 30 deletions(-)
+> =
+
+> -- =
+
+> 2.9.4
+>=20
