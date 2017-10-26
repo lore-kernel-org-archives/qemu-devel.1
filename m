@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56154)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57987)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1e7qWy-0002rO-5H
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 18:21:41 -0400
+	(envelope-from <sstabellini@kernel.org>) id 1e7qbh-00041F-Vy
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 18:26:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1e7qWv-0001Xq-0v
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 18:21:40 -0400
-Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:61803)
+	(envelope-from <sstabellini@kernel.org>) id 1e7qbe-0006S5-QR
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 18:26:33 -0400
+Received: from mail.kernel.org ([198.145.29.99]:50902)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1e7qWu-0001Mm-L8
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 18:21:36 -0400
-Date: Fri, 27 Oct 2017 00:21:27 +0200 (CEST)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-In-Reply-To: <20171021124213.84AEC7456EF@zero.eik.bme.hu>
-Message-ID: <alpine.BSF.2.21.1710270020350.57430@zero.eik.bme.hu>
-References: <20171021124213.84AEC7456EF@zero.eik.bme.hu>
+	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
+	id 1e7qbe-0006Rg-KA
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 18:26:30 -0400
+Date: Thu, 26 Oct 2017 15:26:27 -0700 (PDT)
+From: Stefano Stabellini <sstabellini@kernel.org>
+In-Reply-To: <1508506702-17704-6-git-send-email-ian.jackson@eu.citrix.com>
+Message-ID: <alpine.DEB.2.10.1710261525120.3086@sstabellini-ThinkPad-X260>
+References: <23017.64539.31230.43449@mariner.uk.xensource.com>
+	<1508506702-17704-1-git-send-email-ian.jackson@eu.citrix.com>
+	<1508506702-17704-6-git-send-email-ian.jackson@eu.citrix.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-Subject: Re: [Qemu-devel] [PATCH] exec: Fix section_covers_addr() for
- sections with non-zero offset
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: Re: [Qemu-devel] [PATCH v5.1 6/8] xen: destroy_hvm_domain: Try
+ xendevicemodel_shutdown
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,70 +29,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Fam Zheng <famz@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
+To: Ian Jackson <ian.jackson@eu.citrix.com>
+Cc: qemu-devel@nongnu.org, Ross Lagerwall <ross.lagerwall@citrix.com>, Anthony PERARD <anthony.perard@citrix.com>, Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org
 
-On Sat, 21 Oct 2017, BALATON Zoltan wrote:
-> When a section with non-0 offset_within_region field is tested to
-> cover an address the offset should be taken into account as well.
->
-> This fixes a crash caused by picking the wrong memory region in
-> address_space_lookup_region seen with client code accessing a device
-> model that uses alias memory regions.
->
-> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+On Fri, 20 Oct 2017, Ian Jackson wrote:
+> xc_interface_open etc. is not going to work if we have dropped
+> privilege, but xendevicemodel_shutdown will if everything is new
+> enough.
+> 
+> xendevicemodel_shutdown is only availabe in Xen 4.10 and later, so
+> provide a stub for earlier versions.
+> 
+> Signed-off-by: Ian Jackson <Ian.Jackson@eu.citrix.com>
+> Reviewed-by: Anthony PERARD <anthony.perard@citrix.com>
 > ---
-
-Ping? http://patchwork.ozlabs.org/project/qemu-devel/list/?series=9457
-
-> This seems to fix the problem described in
-> http://lists.nongnu.org/archive/html/qemu-devel/2017-10/msg03356.html
-> but I'm not completely sure about it. This seems to be introduced in
-> 729633c exec: Introduce AddressSpaceDispatch.mru_section and the patch
-> before that which split off section_covers_addr from phys_page_find so
-> this patch also changes that caller. Is that OK to do? It appears to
-> work but I don't know this part of QEMU.
->
-> Also the bug seems to be caused by section_covers_addr accepting
-> sii3112.bar5 when that's the mru_section instead of picking
-> sii3112.bar0 (which it picks when going through phys_page_find) when
-> client code is accessing 0xc08001006 from this address map (full
-> address map is at above URL):
->
-> address-space: memory
->    0000000c08000000-0000000c0800ffff (prio 0, i/o): alias isa_mmio @io 0000000000000000-000000000000ffff
->
-> address-space: I/O
->  0000000000000000-000000000000ffff (prio 0, i/o): io
->    0000000000001000-0000000000001007 (prio 1, i/o): alias sii3112.bar0 @sii3112.bar5 0000000000000080-0000000000000087
->    0000000000001008-000000000000100b (prio 1, i/o): alias sii3112.bar1 @sii3112.bar5 0000000000000088-000000000000008b
->    0000000000001010-0000000000001017 (prio 1, i/o): alias sii3112.bar2 @sii3112.bar5 00000000000000c0-00000000000000c7
->    0000000000001018-000000000000101b (prio 1, i/o): alias sii3112.bar3 @sii3112.bar5 00000000000000c8-00000000000000cb
->    0000000000001020-000000000000102f (prio 1, i/o): alias sii3112.bar4 @sii3112.bar5 0000000000000000-000000000000000f
->
-> which this patch fixes but would the same problem happen if the
-> mru_section is bar5 but bar4 is accessed? I could not reproduce that
-> case but then the offset is 0 but in this case the address would be
-> above 0xc08001020 and size is 0xf so they probably won't match. But
-> this is only because of the size of the region. Could that mean the
-> bug is caused by something else and should be fixed elsewhere?
->
+> v2: Add compatibility stub for Xen < 4.10.
+>     Fix coding style.
 > ---
-> exec.c | 3 ++-
-> 1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/exec.c b/exec.c
-> index db5ae23..a915817 100644
-> --- a/exec.c
-> +++ b/exec.c
-> @@ -370,7 +370,8 @@ static inline bool section_covers_addr(const MemoryRegionSection *section,
->      * the section must cover the entire address space.
->      */
->     return int128_gethi(section->size) ||
-> -           range_covers_byte(section->offset_within_address_space,
-> +           range_covers_byte(section->offset_within_address_space +
-> +                             section->offset_within_region,
->                              int128_getlo(section->size), addr);
-> }
->
->
+>  hw/i386/xen/xen-hvm.c       | 10 ++++++++++
+>  include/hw/xen/xen_common.h |  7 +++++++
+>  2 files changed, 17 insertions(+)
+> 
+> diff --git a/hw/i386/xen/xen-hvm.c b/hw/i386/xen/xen-hvm.c
+> index 83420cd..25b8b14 100644
+> --- a/hw/i386/xen/xen-hvm.c
+> +++ b/hw/i386/xen/xen-hvm.c
+> @@ -1386,9 +1386,19 @@ void destroy_hvm_domain(bool reboot)
+>  {
+>      xc_interface *xc_handle;
+>      int sts;
+> +    int rc;
+>  
+>      unsigned int reason = reboot ? SHUTDOWN_reboot : SHUTDOWN_poweroff;
+>  
+> +    if (xen_dmod) {
+> +        rc = xendevicemodel_shutdown(xen_dmod, xen_domid, reason);
+> +        if (!rc) {
+> +            return;
+> +        }
+> +        perror("xendevicemodel_shutdown failed");
+
+I don't think is a good idea to print an error because this is actually
+a normal condition when QEMU is build and run against an older Xen.
+Users might get confused when looking at the logs.
+
+But it would be correct to print an error if errno != ENOTTY.
+
+
+> +        /* well, try the old thing then */
+> +    }
+> +
+>      xc_handle = xc_interface_open(0, 0, 0);
+>      if (xc_handle == NULL) {
+>          fprintf(stderr, "Cannot acquire xenctrl handle\n");
+> diff --git a/include/hw/xen/xen_common.h b/include/hw/xen/xen_common.h
+> index 8efdb8a..1d6fb57 100644
+> --- a/include/hw/xen/xen_common.h
+> +++ b/include/hw/xen/xen_common.h
+> @@ -108,6 +108,13 @@ static inline int xentoolcore_restrict_all(domid_t domid)
+>      return -1;
+>  }
+>  
+> +static inline int xendevicemodel_shutdown(xendevicemodel_handle *dmod,
+> +                                          domid_t domid, unsigned int reason)
+> +{
+> +    errno = ENOTTY;
+> +    return -1;
+> +}
+> +
+>  #else /* CONFIG_XEN_CTRL_INTERFACE_VERSION >= 41000 */
+>  
+>  #include <xentoolcore.h>
+> -- 
+> 2.1.4
+> 
