@@ -1,29 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51937)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55232)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1e7j8F-0006k3-Cj
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 10:27:40 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1e7jGn-0005V6-BE
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 10:36:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1e7j8C-0008SO-LW
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 10:27:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49146)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1e7j8C-0008R0-EA
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 10:27:36 -0400
-Date: Thu, 26 Oct 2017 17:27:31 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20171026172631-mutt-send-email-mst@kernel.org>
-References: <1502842933-8323-1-git-send-email-tianyu.lan@intel.com>
-	<34042934-782b-6bcc-b9b2-de7a1816cfb7@redhat.com>
-	<3ababa62-f055-5bbb-b9b9-c55ada8368dd@intel.com>
-	<20170818163854.GY3108@localhost.localdomain>
-	<471a4bdc-d381-4a70-0107-3150df6f5cf6@intel.com>
-	<20171026121943.GB26955@localhost.localdomain>
+	(envelope-from <peter.maydell@linaro.org>) id 1e7jGm-0006Nr-Hx
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 10:36:29 -0400
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:48713)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1e7jGm-0006Mu-Af
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 10:36:28 -0400
+Received: by mail-wm0-x242.google.com with SMTP id p75so8419174wmg.3
+	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 07:36:28 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20171026121943.GB26955@localhost.localdomain>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] x86: Skip check apic_id_limit for Xen
+In-Reply-To: <CAHmME9oyBvAV8FF9QMHyF46n8Ct6KZqThQVih2ipQmivD94Cag@mail.gmail.com>
+References: <20171023122719.17199-1-Jason@zx2c4.com>
+	<CAFEAcA_PM5Fjx2Pk58h75p9vaZwFcusQdXuwy9tbDtc=EaoOJg@mail.gmail.com>
+	<10e16ca3-175b-9f34-65e7-031b883b7201@amsat.org>
+	<CAHmME9qtBiuAEnkCeuMd7EdeZveTVa4UOf+AQhMCFye0SYJY=Q@mail.gmail.com>
+	<20171026133445.kemzfgvpbmtcogsl@kamzik.brq.redhat.com>
+	<CAHmME9oyBvAV8FF9QMHyF46n8Ct6KZqThQVih2ipQmivD94Cag@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 26 Oct 2017 15:36:06 +0100
+Message-ID: <CAFEAcA8O6YyS1tSzaydckFpsqpb8HXgW5PJe-VTWud_5YGdW5A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH] hw/arm/virt: support 4 serial
+ ports
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,51 +34,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Lan Tianyu <tianyu.lan@intel.com>, qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, anthony.perard@citrix.com, Paolo Bonzini <pbonzini@redhat.com>, rth@twiddle.net
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc: Andrew Jones <drjones@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, QEMU Trivial <qemu-trivial@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Thu, Oct 26, 2017 at 02:19:43PM +0200, Eduardo Habkost wrote:
-> On Mon, Aug 21, 2017 at 10:22:15AM +0800, Lan Tianyu wrote:
-> > On 2017=E5=B9=B408=E6=9C=8819=E6=97=A5 00:38, Eduardo Habkost wrote:
-> > > On Thu, Aug 17, 2017 at 09:37:10AM +0800, Lan Tianyu wrote:
-> > >> On 2017=E5=B9=B408=E6=9C=8816=E6=97=A5 19:21, Paolo Bonzini wrote:
-> > >>> On 16/08/2017 02:22, Lan Tianyu wrote:
-> > >>>> Xen vIOMMU device model will be in Xen hypervisor. Skip vIOMMU
-> > >>>> check for Xen here when vcpu number is more than 255.
-> > >>>
-> > >>> I think you still need to do a check for vIOMMU being enabled.
-> > >>
-> > >> Yes, this will be done in the Xen tool stack and Qemu doesn't have=
- such
-> > >> knowledge. Operations of create, destroy Xen vIOMMU will be done i=
-n the
-> > >> Xen tool stack.
-> > >=20
-> > > Shouldn't we make QEMU have knowledge of the vIOMMU device, then?
-> > > Won't QEMU need to know about it eventually?
-> > >=20
-> >=20
-> > Hi Eduardo:
-> >      Thanks for your review.
-> >      Xen has some guest modes which doesn't use Qemu and we tried to
-> > make Xen vIOMMU framework compatible with all guest modes. So far, we
-> > are adding interrupt remapping function for Xen vIOMMU and find qemu
-> > doesn't need to know Xen vIOMMU. The check of vcpu number > 255 here
-> > will be done in Xen side and so skip the check in Qemu to avoid block=
-ing
-> > Xen creating >255 vcpus.
-> >      We may make Qemu have knowledge of the vIOMMU device if it's
-> > necessary when adding new function.
->=20
-> I was expecting it to go through the PC tree, but I will queue it
-> on x86-next instead.
+On 26 October 2017 at 15:13, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+> The problem with this approach is that then different architectures
+> need different fancy options, which makes things a hassle. With the
+> old guarantee of each machine providing four serial ports
 
-I was waiting for an ack from you or Paolo as you participated in the
-discussion. But sure, go ahead
+This has *never* been guaranteed or indeed true. It's just happened
+to be true for the x86 PC machine and perhaps for some others that
+you've been using. For instance, the MIPS boston board only has
+one uart. highbank has one. integratorcp has 2. The microblaze
+boards only have one uart. And so on. In cases where we're
+modelling real hardware, if the real board only has one UART
+then we're only going to provide one UART, so in some cases you
+just have to deal with that and have some way in your communication
+protocol to multiplex across a single communications channel.
 
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
+> Could we just do the simple patch of adding four pl011s in there?
 
+I'm still thinking about this. (You definitely can't have four,
+though, because we already have 2 in the trustzone-enabled
+config, so we can only add another 2.)
 
-
-> --=20
-> Eduardo
+thanks
+-- PMM
