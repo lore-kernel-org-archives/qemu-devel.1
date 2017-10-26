@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40844)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41718)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tgolembi@redhat.com>) id 1e7icP-0005ef-Ta
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 09:54:46 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1e7ifw-0008HD-Rr
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 09:58:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tgolembi@redhat.com>) id 1e7icL-0005eD-Qy
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 09:54:45 -0400
-Received: from mail-wr0-f194.google.com ([209.85.128.194]:53650)
+	(envelope-from <richard.henderson@linaro.org>) id 1e7ift-0008D1-LA
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 09:58:24 -0400
+Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:49415)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tgolembi@redhat.com>) id 1e7icL-0005bJ-K3
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 09:54:41 -0400
-Received: by mail-wr0-f194.google.com with SMTP id u40so3236959wrf.10
-	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 06:54:40 -0700 (PDT)
-Date: Thu, 26 Oct 2017 15:54:37 +0200
-From: =?UTF-8?B?VG9tw6HFoSBHb2xlbWJpb3Zza8O9?= <tgolembi@redhat.com>
-Message-ID: <20171026155437.5f260b7b@fiorina>
-In-Reply-To: <150896868721.17721.8644098584872122342@sif>
-References: <20170929091122.22726-1-chen_han_xiao@126.com>
-	<20170929233102.4b068e2f@fiorina>
-	<150896868721.17721.8644098584872122342@sif>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] qga-win: fall back to hardcoded user and
- group names if LookupAccountSidW failed
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1e7ift-0008Bc-Cm
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 09:58:21 -0400
+Received: by mail-wr0-x243.google.com with SMTP id g90so3260195wrd.6
+	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 06:58:21 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Thu, 26 Oct 2017 15:58:14 +0200
+Message-Id: <20171026135814.20773-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH] tcg: Avoid setting tcg_initialize if
+ !CONFIG_TCG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,75 +25,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Roth <mdroth@linux.vnet.ibm.com>
-Cc: Chen Hanxiao <chen_han_xiao@126.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: ehabkost@redhat.com, peter.maydell@linaro.org
 
-On Wed, 25 Oct 2017 16:58:07 -0500
-Michael Roth <mdroth@linux.vnet.ibm.com> wrote:
+Fix the build for --disable-tcg.
 
-> Quoting Tom=C3=A1=C5=A1 Golembiovsk=C3=BD (2017-09-29 16:31:02)
-> > On Fri, 29 Sep 2017 17:11:22 +0800
-> > Chen Hanxiao <chen_han_xiao@126.com> wrote:
-> >  =20
-> > > From: Chen Hanxiao <chenhanxiao@gmail.com>
-> > >=20
-> > > On some of windows (win08 sp2),
-> > > it doesn't work by calling LookupAccountSidW with
-> > > well-known SIDs,
-> > > We got an error:
-> > >     error 997 overlapped I/O operation is in progress
-> > >=20
-> > > But hardcoded names work.
-> > >=20
-> > > This patch introduces a workaroud for this issue:
-> > > if LookupAccountSidW failed, try hardcoded one.
-> > >=20
-> > > Signed-off-by: Chen Hanxiao <chenhanxiao@gmail.com>
-> > > ---
-> > >  qga/vss-win32/install.cpp | 10 ++++++++--
-> > >  1 file changed, 8 insertions(+), 2 deletions(-)
-> > >  =20
-> >=20
-> > I wonder if it's caused by qga itself or a race/conflict with some other
-> > app. But still...
-> >=20
-> >=20
-> > Reviewed-by: Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com> =20
->=20
-> I think it might be getNameByStringSID()/LookupAccountSidW() reporting a
-> stale GetLastError() value.
->=20
+Fixes: 55c3ceef61fcf06fc98ddc752b7cce788ce7680b
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/arm/cpu.c            | 2 ++
+ target/i386/cpu.c           | 2 ++
+ target/mips/cpu.c           | 2 ++
+ target/ppc/translate_init.c | 2 ++
+ target/s390x/cpu.c          | 2 ++
+ 5 files changed, 10 insertions(+)
 
-I suppose you're right! Taking a closer look there's one more issue with
-getNameByStringSID(). The call ConvertStringSidToSidW() does not return
-HRESULT so using chk() makes no sense.
-
-I propose slightly modified version of your fix:
-
-diff --git a/qga/vss-win32/install.cpp b/qga/vss-win32/install.cpp
-index ba7c94eb25..65f68f94a3 100644
---- a/qga/vss-win32/install.cpp
-+++ b/qga/vss-win32/install.cpp
-@@ -148,10 +148,15 @@ static HRESULT getNameByStringSID(
-     DWORD domainNameLen =3D BUFFER_SIZE;
-     wchar_t domainName[BUFFER_SIZE];
-=20
--    chk(ConvertStringSidToSidW(sid, &psid));
--    LookupAccountSidW(NULL, psid, buffer, bufferLen,
--                domainName, &domainNameLen, &groupType);
--    hr =3D HRESULT_FROM_WIN32(GetLastError());
-+    if (!ConvertStringSidToSidW(sid, &psid) {
-+        hr =3D HRESULT_FROM_WIN32(GetLastError());
-+        goto out;
-+    }
-+    if (!LookupAccountSidW(NULL, psid, buffer, bufferLen,
-+                           domainName, &domainNameLen, &groupType)) {
-+        hr =3D HRESULT_FROM_WIN32(GetLastError());
-+        /* Fall through and free psid */
-+    }
-=20
-     LocalFree(psid);
-=20
-
---=20
-Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com>
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index 056284985d..a7f03eabe8 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -1760,7 +1760,9 @@ static void arm_cpu_class_init(ObjectClass *oc, void *data)
+ #endif
+ 
+     cc->disas_set_info = arm_disas_set_info;
++#ifdef CONFIG_TCG
+     cc->tcg_initialize = arm_translate_init;
++#endif
+ }
+ 
+ static void cpu_register(const ARMCPUInfo *info)
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 53ec94ac9b..2f556c0ea3 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -4212,7 +4212,9 @@ static void x86_cpu_common_class_init(ObjectClass *oc, void *data)
+ #endif
+     cc->cpu_exec_enter = x86_cpu_exec_enter;
+     cc->cpu_exec_exit = x86_cpu_exec_exit;
++#ifdef CONFIG_TCG
+     cc->tcg_initialize = tcg_x86_init;
++#endif
+ 
+     dc->user_creatable = true;
+ }
+diff --git a/target/mips/cpu.c b/target/mips/cpu.c
+index 0ae70288dd..80812f3e08 100644
+--- a/target/mips/cpu.c
++++ b/target/mips/cpu.c
+@@ -198,7 +198,9 @@ static void mips_cpu_class_init(ObjectClass *c, void *data)
+     cc->vmsd = &vmstate_mips_cpu;
+ #endif
+     cc->disas_set_info = mips_cpu_disas_set_info;
++#ifdef CONFIG_TCG
+     cc->tcg_initialize = mips_tcg_init;
++#endif
+ 
+     cc->gdb_num_core_regs = 73;
+     cc->gdb_stop_before_watchpoint = true;
+diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
+index 13436e4760..61a9552c1c 100644
+--- a/target/ppc/translate_init.c
++++ b/target/ppc/translate_init.c
+@@ -10578,7 +10578,9 @@ static void ppc_cpu_class_init(ObjectClass *oc, void *data)
+ #ifndef CONFIG_USER_ONLY
+     cc->virtio_is_big_endian = ppc_cpu_is_big_endian;
+ #endif
++#ifdef CONFIG_TCG
+     cc->tcg_initialize = ppc_translate_init;
++#endif
+ 
+     dc->fw_name = "PowerPC,UNKNOWN";
+ }
+diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
+index 824dfd6b65..ae3cee91a2 100644
+--- a/target/s390x/cpu.c
++++ b/target/s390x/cpu.c
+@@ -497,7 +497,9 @@ static void s390_cpu_class_init(ObjectClass *oc, void *data)
+ #endif
+ #endif
+     cc->disas_set_info = s390_cpu_disas_set_info;
++#ifdef CONFIG_TCG
+     cc->tcg_initialize = s390x_translate_init;
++#endif
+ 
+     cc->gdb_num_core_regs = S390_NUM_CORE_REGS;
+     cc->gdb_core_xml_file = "s390x-core64.xml";
+-- 
+2.13.6
