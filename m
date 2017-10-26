@@ -1,33 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54644)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54852)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e7dLO-0000di-NG
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 04:16:51 -0400
+	(envelope-from <cohuck@redhat.com>) id 1e7dLt-0000wK-3i
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 04:17:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e7dLK-00076s-Qq
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 04:16:50 -0400
-Received: from indium.canonical.com ([91.189.90.7]:50812)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1e7dLK-00074S-KW
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 04:16:46 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1e7dLI-0006DB-AE
-	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 08:16:44 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 411AC2E80C3
-	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 08:16:44 +0000 (UTC)
+	(envelope-from <cohuck@redhat.com>) id 1e7dLp-0007oo-TB
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 04:17:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54382)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1e7dLp-0007nX-M3
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 04:17:17 -0400
+Date: Thu, 26 Oct 2017 10:17:09 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20171026101709.7c7b47ff.cohuck@redhat.com>
+In-Reply-To: <20171020145437.18549-1-borntraeger@de.ibm.com>
+References: <20171020145437.18549-1-borntraeger@de.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 26 Oct 2017 07:59:30 -0000
-From: Thomas Huth <1342686@bugs.launchpad.net>
-Reply-To: Bug 1342686 <1342686@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20140716121553.1821.18365.malonedeb@gac.canonical.com>
-Message-Id: <150900477123.27724.12171478307432416619.launchpad@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1342686] Re: Windows 95 setup hangs
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH/QEMU] s390x/kvm: use cpu_model_available
+ for guarded storage on compat machines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,46 +27,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: Marc Hartmayer <mhartmay@linux.vnet.ibm.com>, libvir-list@redhat.com, qemu-devel@nongnu.org, Jiri Denemark <jdenemar@redhat.com>, Boris Fiuczynski <fiuczy@linux.vnet.ibm.com>, "Jason J . Herne" <jjherne@linux.vnet.ibm.com>, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
 
-** Changed in: qemu
-       Status: Incomplete =3D> Triaged
+On Fri, 20 Oct 2017 16:54:37 +0200
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 
--- =
+> Starting a guest with
+>    <os>
+>     <type arch='s390x' machine='s390-ccw-virtio-2.9'>hvm</type>
+>   </os>
+>   <cpu mode='host-model'/>
+> 
+> on an IBM z14 results in
+> 
+> "qemu-system-s390x: Some features requested in the CPU model are not
+> available in the configuration: gs"
+> 
+> This is because guarded storage is fenced for compat machines that did not have
+> guarded storage support, but libvirt expands the cpu model according to the
+> latest available machine.
+> 
+> While this prevents future migration abort (by not starting the guest at all),
+> not being able to start a "host-model" guest is very much unexpected.  As it
+> turns out, even if we would modify libvirt to not expand the cpu model to
+> contain "gs" for compat machines, it cannot guarantee that a migration will
+> succeed. For example if the kernel changes its features (or the user has
+> nested=1 on one host but not on the other) the migration will fail
+> nevertheless.  So instead of fencing "gs" for machines <= 2.9 lets allow it for
+> all machine types that support the CPU model. This will make "host-model"
+> runnable all the time, while relying on the CPU model to reject invalid
+> migration attempts.
+> 
+> Suggested-by: David Hildenbrand <david@redhat.com>
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> ---
+>  hw/s390x/s390-virtio-ccw.c         | 8 --------
+>  include/hw/s390x/s390-virtio-ccw.h | 3 ---
+>  target/s390x/kvm.c                 | 2 +-
+>  3 files changed, 1 insertion(+), 12 deletions(-)
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1342686
-
-Title:
-  Windows 95 setup hangs
-
-Status in QEMU:
-  Triaged
-
-Bug description:
-  Windows 95 (first version, not 95A or OSR2) setup hangs on QEMU version 2=
-.0.0. It was compiled from the sources on Fedora 20. =
-
-  Setup starts without problems, it goes through the first phase and then h=
-angs on the "Getting ready to run Windows 95 for the first time..." screen =
-(http://www.guidebookgallery.org/screenshots/win95#win95startupshutdownspla=
-sh1correctaspect).
-
-  Steps to reproduce:
-  qemu-img create -f qcow2 win95.img 2G
-  qemu -L . -machine isapc -cpu pentium -m 32 -vga std -soundhw sb16 -hda w=
-in95.img -cdrom POLWIN95.ISO -fda BOOT95A.IMA -boot a
-  after this select default options everywhere. When it asks to remove the =
-boot floppy do "eject floppy0" and confirm.
-  It displays the "Getting ready to run Windows 95 for the first time..." a=
-nd hangs.
-
-  The same behavior can be observed on 2.1.0-rc2. On 1.7.1 It hangs
-  immediately after this screen, it hangs on displaying a underscore
-  cursor.
-
-  I managed to complete the setup on QEMU 1.6.2.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1342686/+subscriptions
+Acked-by: Cornelia Huck <cohuck@redhat.com>
