@@ -1,36 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55231)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58323)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1e7rdR-0001eh-MA
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 19:32:26 -0400
+	(envelope-from <no-reply@patchew.org>) id 1e7rkB-0006WO-1k
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 19:39:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1e7rdN-000664-Pk
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 19:32:25 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:44098
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <no-reply@patchew.org>) id 1e7rk7-00042b-4Z
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 19:39:23 -0400
+Resent-Message-Id: <E1e7rk7-00042b-4Z@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21444)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1e7rdN-0005Pj-KM
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 19:32:21 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v9QNTbEa076063
-	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 19:31:17 -0400
-Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2dunp59cj3-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 19:31:17 -0400
-Received: from localhost
-	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Thu, 26 Oct 2017 19:31:16 -0400
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Thu, 26 Oct 2017 18:30:50 -0500
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1e7rk6-00040a-UC
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 19:39:19 -0400
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <150906111456.132.9588767896574275978@bafd83ae6430>
 In-Reply-To: <20171026233054.21133-1-mdroth@linux.vnet.ibm.com>
-References: <20171026233054.21133-1-mdroth@linux.vnet.ibm.com>
-Message-Id: <20171026233054.21133-3-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 2/6] qga: hang GAConfig/socket_activation off
- of GAState global
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 26 Oct 2017 16:38:35 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH 0/6] qga: add support for re-opening
+ channel on error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,136 +29,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: sameeh@daynix.com, yan@daynix.com, daniel@daynix.com
+To: mdroth@linux.vnet.ibm.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, yan@daynix.com, daniel@daynix.com, sameeh@daynix.com
 
-For w32 services we rely on the global GAState to access resources
-associated with the agent within service_main(). Currently this is
-sufficient for starting the agent since we open the channel once prior
-to calling service_main(), and simply start the GMainLoop to start the
-agent from within service_main().
-
-Eventually we want to be able to also [re-]open the communication
-channel from within service_main(), which requires access to
-config/socket_activation variables, so we hang them off GAState in
-preparation for that.
-
-Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
----
- qga/main.c | 54 +++++++++++++++++++++++++++++-------------------------
- 1 file changed, 29 insertions(+), 25 deletions(-)
-
-diff --git a/qga/main.c b/qga/main.c
-index 73aa9ac507..6826cd5f45 100644
---- a/qga/main.c
-+++ b/qga/main.c
-@@ -66,6 +66,25 @@ typedef struct GAPersistentState {
-     int64_t fd_counter;
- } GAPersistentState;
- 
-+typedef struct GAConfig {
-+    char *channel_path;
-+    char *method;
-+    char *log_filepath;
-+    char *pid_filepath;
-+#ifdef CONFIG_FSFREEZE
-+    char *fsfreeze_hook;
-+#endif
-+    char *state_dir;
-+#ifdef _WIN32
-+    const char *service;
-+#endif
-+    gchar *bliststr; /* blacklist may point to this string */
-+    GList *blacklist;
-+    int daemonize;
-+    GLogLevelFlags log_level;
-+    int dumpconf;
-+} GAConfig;
-+
- struct GAState {
-     JSONMessageParser parser;
-     GMainLoop *main_loop;
-@@ -91,6 +110,8 @@ struct GAState {
- #endif
-     gchar *pstate_filepath;
-     GAPersistentState pstate;
-+    GAConfig *config;
-+    int socket_activation;
- };
- 
- struct GAState *ga_state;
-@@ -944,25 +965,6 @@ static GList *split_list(const gchar *str, const gchar *delim)
-     return list;
- }
- 
--typedef struct GAConfig {
--    char *channel_path;
--    char *method;
--    char *log_filepath;
--    char *pid_filepath;
--#ifdef CONFIG_FSFREEZE
--    char *fsfreeze_hook;
--#endif
--    char *state_dir;
--#ifdef _WIN32
--    const char *service;
--#endif
--    gchar *bliststr; /* blacklist may point to this string */
--    GList *blacklist;
--    int daemonize;
--    GLogLevelFlags log_level;
--    int dumpconf;
--} GAConfig;
--
- static void config_load(GAConfig *config)
- {
-     GError *gerr = NULL;
-@@ -1250,7 +1252,7 @@ static bool check_is_frozen(GAState *s)
-     return false;
- }
- 
--static GAState *initialize_agent(GAConfig *config)
-+static GAState *initialize_agent(GAConfig *config, int socket_activation)
- {
-     GAState *s = g_new0(GAState, 1);
- 
-@@ -1343,6 +1345,8 @@ static GAState *initialize_agent(GAConfig *config)
- 
-     s->main_loop = g_main_loop_new(NULL, false);
- 
-+    s->config = config;
-+    s->socket_activation = socket_activation;
-     ga_state = s;
-     return s;
- }
-@@ -1366,10 +1370,10 @@ static void cleanup_agent(GAState *s)
-     ga_state = NULL;
- }
- 
--static int run_agent(GAState *s, GAConfig *config, int socket_activation)
-+static int run_agent(GAState *s)
- {
--    if (!channel_init(ga_state, config->method, config->channel_path,
--                      socket_activation ? FIRST_SOCKET_ACTIVATION_FD : -1)) {
-+    if (!channel_init(s, s->config->method, s->config->channel_path,
-+                      s->socket_activation ? FIRST_SOCKET_ACTIVATION_FD : -1)) {
-         g_critical("failed to initialize guest agent channel");
-         return EXIT_FAILURE;
-     }
-@@ -1464,12 +1468,12 @@ int main(int argc, char **argv)
-         goto end;
-     }
- 
--    s = initialize_agent(config);
-+    s = initialize_agent(config, socket_activation);
-     if (!s) {
-         g_critical("error initializing guest agent");
-         goto end;
-     }
--    ret = run_agent(s, config, socket_activation);
-+    ret = run_agent(s);
-     cleanup_agent(s);
- 
- end:
--- 
-2.11.0
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
+ZGV2ZWxdIFtQQVRDSCAwLzZdIHFnYTogYWRkIHN1cHBvcnQgZm9yIHJlLW9wZW5pbmcgY2hhbm5l
+bCBvbiBlcnJvcgpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMjAxNzEwMjYyMzMwNTQuMjExMzMt
+MS1tZHJvdGhAbGludXgudm5ldC5pYm0uY29tCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMh
+L2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0Uu
+LiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQg
+MApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxv
+ZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwog
+ICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1h
+dD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3Jp
+cHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAg
+ICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRF
+U1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0
+YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUK
+ICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE3MTAyNjIzMzA1NC4yMTEzMy0x
+LW1kcm90aEBsaW51eC52bmV0LmlibS5jb20gLT4gcGF0Y2hldy8yMDE3MTAyNjIzMzA1NC4yMTEz
+My0xLW1kcm90aEBsaW51eC52bmV0LmlibS5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0
+ZXN0JwoyYzBhZDdkOTQ3IHFnYS13aW46IHJlcG9ydCBzcGVjaWZpYyBlcnJvciB3aGVuIGZhaWxp
+bmcgdG8gb3BlbiBjaGFubmVsCjAyMDFlZWY2MWQgcWdhLXdpbjogaW5zdGFsbCBzZXJ2aWNlIHdp
+dGggLS1yZXRyeS1wYXRoIHNldCBieSBkZWZhdWx0CjQzMmQ2ODUxZmYgcWdhOiBhZGQgLS1yZXRy
+eS1wYXRoIG9wdGlvbiBmb3IgcmUtaW5pdGlhbGl6aW5nIGNoYW5uZWwgb24gZmFpbHVyZQpkMjQy
+YjE5MDU3IHFnYTogbW92ZSB3MzIgc2VydmljZSBoYW5kbGluZyBvdXQgb2YgcnVuX2FnZW50KCkK
+NTIyZWE0NTYyZSBxZ2E6IGhhbmcgR0FDb25maWcvc29ja2V0X2FjdGl2YXRpb24gb2ZmIG9mIEdB
+U3RhdGUgZ2xvYmFsCjYxNWM1ODA4M2YgcWdhOiBncm91cCBhZ2VudCBpbml0L2NsZWFudXAgaW5p
+dCBzZXBhcmF0ZSByb3V0aW5lcwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0gg
+MS82OiBxZ2E6IGdyb3VwIGFnZW50IGluaXQvY2xlYW51cCBpbml0IHNlcGFyYXRlIHJvdXRpbmVz
+Li4uCkVSUk9SOiBVc2UgZ19hc3NlcnQgb3IgZ19hc3NlcnRfbm90X3JlYWNoZWQKIzI5OiBGSUxF
+OiBxZ2EvbWFpbi5jOjEyNTc6CisgICAgZ19hc3NlcnRfbnVsbChnYV9zdGF0ZSk7Cgp0b3RhbDog
+MSBlcnJvcnMsIDAgd2FybmluZ3MsIDE0MyBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBz
+dHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJl
+IGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNL
+UEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAyLzY6IHFnYTogaGFuZyBHQUNv
+bmZpZy9zb2NrZXRfYWN0aXZhdGlvbiBvZmYgb2YgR0FTdGF0ZSBnbG9iYWwuLi4KQ2hlY2tpbmcg
+UEFUQ0ggMy82OiBxZ2E6IG1vdmUgdzMyIHNlcnZpY2UgaGFuZGxpbmcgb3V0IG9mIHJ1bl9hZ2Vu
+dCgpLi4uCkNoZWNraW5nIFBBVENIIDQvNjogcWdhOiBhZGQgLS1yZXRyeS1wYXRoIG9wdGlvbiBm
+b3IgcmUtaW5pdGlhbGl6aW5nIGNoYW5uZWwgb24gZmFpbHVyZS4uLgpDaGVja2luZyBQQVRDSCA1
+LzY6IHFnYS13aW46IGluc3RhbGwgc2VydmljZSB3aXRoIC0tcmV0cnktcGF0aCBzZXQgYnkgZGVm
+YXVsdC4uLgpDaGVja2luZyBQQVRDSCA2LzY6IHFnYS13aW46IHJlcG9ydCBzcGVjaWZpYyBlcnJv
+ciB3aGVuIGZhaWxpbmcgdG8gb3BlbiBjaGFubmVsLi4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVz
+dCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9t
+YXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlv
+dXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
