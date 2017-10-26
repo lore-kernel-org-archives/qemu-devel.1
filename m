@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44807)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44814)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1e7ioN-0005kV-T4
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 10:07:13 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1e7ioP-0005lu-Fr
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 10:07:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1e7ioE-0001QA-HC
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 10:07:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53474)
+	(envelope-from <ehabkost@redhat.com>) id 1e7ioM-0001X1-4v
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 10:07:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59824)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1e7ioE-0001P2-As
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 10:06:58 -0400
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1e7ioL-0001WT-Ui
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 10:07:06 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Thu, 26 Oct 2017 16:03:59 +0200
-Message-Id: <20171026140404.21948-35-ehabkost@redhat.com>
+Date: Thu, 26 Oct 2017 16:04:00 +0200
+Message-Id: <20171026140404.21948-36-ehabkost@redhat.com>
 In-Reply-To: <20171026140404.21948-1-ehabkost@redhat.com>
 References: <20171026140404.21948-1-ehabkost@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 34/39] mips: fulong2e: replace cpu_model with
- cpu_type
+Subject: [Qemu-devel] [PULL 35/39] mips: Magnum/Acer Pica 61: replace
+ cpu_model with cpu_type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,45 +34,54 @@ From: Igor Mammedov <imammedo@redhat.com>
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Message-Id: <1507211474-188400-38-git-send-email-imammedo@redhat.com>
+Reviewed-by: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
+Message-Id: <1507211474-188400-39-git-send-email-imammedo@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- hw/mips/mips_fulong2e.c | 7 ++-----
- 1 file changed, 2 insertions(+), 5 deletions(-)
+ hw/mips/mips_jazz.c | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
 
-diff --git a/hw/mips/mips_fulong2e.c b/hw/mips/mips_fulong2e.c
-index 75318680e1..146cf0fccd 100644
---- a/hw/mips/mips_fulong2e.c
-+++ b/hw/mips/mips_fulong2e.c
-@@ -258,7 +258,6 @@ static void network_init (PCIBus *pci_bus)
- static void mips_fulong2e_init(MachineState *machine)
+diff --git a/hw/mips/mips_jazz.c b/hw/mips/mips_jazz.c
+index 7e6626dc88..fe4f17389f 100644
+--- a/hw/mips/mips_jazz.c
++++ b/hw/mips/mips_jazz.c
+@@ -122,7 +122,6 @@ static void mips_jazz_init(MachineState *machine,
+                            enum jazz_model_e jazz_model)
  {
-     ram_addr_t ram_size =3D machine->ram_size;
+     MemoryRegion *address_space =3D get_system_memory();
 -    const char *cpu_model =3D machine->cpu_model;
-     const char *kernel_filename =3D machine->kernel_filename;
-     const char *kernel_cmdline =3D machine->kernel_cmdline;
-     const char *initrd_filename =3D machine->initrd_filename;
-@@ -277,10 +276,7 @@ static void mips_fulong2e_init(MachineState *machine=
-)
-     CPUMIPSState *env;
+     char *filename;
+     int bios_size, n;
+     MIPSCPU *cpu;
+@@ -148,10 +147,7 @@ static void mips_jazz_init(MachineState *machine,
+     MemoryRegion *bios2 =3D g_new(MemoryRegion, 1);
 =20
      /* init CPUs */
 -    if (cpu_model =3D=3D NULL) {
--        cpu_model =3D "Loongson-2E";
+-        cpu_model =3D "R4000";
 -    }
 -    cpu =3D MIPS_CPU(cpu_generic_init(TYPE_MIPS_CPU, cpu_model));
 +    cpu =3D MIPS_CPU(cpu_create(machine->cpu_type));
      env =3D &cpu->env;
-=20
      qemu_register_reset(main_cpu_reset, cpu);
-@@ -385,6 +381,7 @@ static void mips_fulong2e_machine_init(MachineClass *=
-mc)
-     mc->desc =3D "Fulong 2e mini pc";
-     mc->init =3D mips_fulong2e_init;
-     mc->block_default_type =3D IF_IDE;
-+    mc->default_cpu_type =3D MIPS_CPU_TYPE_NAME("Loongson-2E");
+=20
+@@ -349,6 +345,7 @@ static void mips_magnum_class_init(ObjectClass *oc, v=
+oid *data)
+     mc->desc =3D "MIPS Magnum";
+     mc->init =3D mips_magnum_init;
+     mc->block_default_type =3D IF_SCSI;
++    mc->default_cpu_type =3D MIPS_CPU_TYPE_NAME("R4000");
  }
 =20
- DEFINE_MACHINE("fulong2e", mips_fulong2e_machine_init)
+ static const TypeInfo mips_magnum_type =3D {
+@@ -364,6 +361,7 @@ static void mips_pica61_class_init(ObjectClass *oc, v=
+oid *data)
+     mc->desc =3D "Acer Pica 61";
+     mc->init =3D mips_pica61_init;
+     mc->block_default_type =3D IF_SCSI;
++    mc->default_cpu_type =3D MIPS_CPU_TYPE_NAME("R4000");
+ }
+=20
+ static const TypeInfo mips_pica61_type =3D {
 --=20
 2.13.6
