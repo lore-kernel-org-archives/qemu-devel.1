@@ -1,20 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53236)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53900)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1e7dGS-0007Yx-2R
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 04:11:45 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1e7dIH-0008M8-RX
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 04:13:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1e7dGQ-0004Kp-R3
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 04:11:44 -0400
-Date: Thu, 26 Oct 2017 04:11:34 -0400
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20171026081134.GA28110@localhost.localdomain>
-References: <20171026075947.9597-1-mreitz@redhat.com>
+	(envelope-from <borntraeger@de.ibm.com>) id 1e7dID-0005MZ-MX
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 04:13:37 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60552)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1e7dID-0005M1-Dk
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 04:13:33 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v9Q8DHdH078676
+	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 04:13:28 -0400
+Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2dubxdr8xu-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 04:13:27 -0400
+Received: from localhost
+	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Thu, 26 Oct 2017 09:13:25 +0100
+References: <20171020145437.18549-1-borntraeger@de.ibm.com>
+	<46a65cf7-8c60-3aac-de93-95be25360f11@linux.vnet.ibm.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Thu, 26 Oct 2017 10:13:21 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171026075947.9597-1-mreitz@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] qemu-img.1: Image
- invalidation on qemu-img commit
+In-Reply-To: <46a65cf7-8c60-3aac-de93-95be25360f11@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <7da3a9f3-918f-3859-1f5e-eee028c2586d@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH/QEMU] s390x/kvm: use cpu_model_available
+ for guarded storage on compat machines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,42 +43,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+To: Halil Pasic <pasic@linux.vnet.ibm.com>, Marc Hartmayer <mhartmay@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: libvir-list@redhat.com, qemu-devel@nongnu.org, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>, "Jason J . Herne" <jjherne@linux.vnet.ibm.com>, Boris Fiuczynski <fiuczy@linux.vnet.ibm.com>, Jiri Denemark <jdenemar@redhat.com>
 
-On Thu, Oct 26, 2017 at 09:59:47AM +0200, Max Reitz wrote:
-> qemu-img commit invalidates all images between base and top.  This
-> should be mentioned in the man page.
-> 
-> Suggested-by: Ping Li <pingl@redhat.com>
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
->  qemu-img.texi | 9 ++++-----
->  1 file changed, 4 insertions(+), 5 deletions(-)
-> 
-> diff --git a/qemu-img.texi b/qemu-img.texi
-> index ee5c5940d3..fdcf120f36 100644
-> --- a/qemu-img.texi
-> +++ b/qemu-img.texi
-> @@ -274,11 +274,10 @@ If the backing chain of the given image file @var{filename} has more than one
->  layer, the backing file into which the changes will be committed may be
->  specified as @var{base} (which has to be part of @var{filename}'s backing
->  chain). If @var{base} is not specified, the immediate backing file of the top
-> -image (which is @var{filename}) will be used. For reasons of consistency,
-> -explicitly specifying @var{base} will always imply @code{-d} (since emptying an
-> -image after committing to an indirect backing file would lead to different data
-> -being read from the image due to content in the intermediate backing chain
-> -overruling the commit target).
-> +image (which is @var{filename}) will be used. Note that after a commit operation
-> +all images between @var{base} and the top image will be invalid and may return
-> +garbage data when read. For this reason, @code{-b} implies @code{-d} (so that
-> +the top image stays valid).
->  
->  @item compare [-f @var{fmt}] [-F @var{fmt}] [-T @var{src_cache}] [-p] [-s] [-q] @var{filename1} @var{filename2}
->  
-> -- 
-> 2.13.6
-> 
->
 
-Reviewed-by: Jeff Cody <jcody@redhat.com>
+
+On 10/26/2017 01:35 AM, Halil Pasic wrote:
+ try the most interesting scenarios out.
+> 
+> The idea of the patch is very clear, but I don't understand the bigger gs
+> feature context fully.
+> 
+> From what I read in the code, the attempt to enable the gs capability in
+> the kernel is made regardless of the cpu model. If the attempt was
+> successful kvm_s390_get_gs will keep returning true. That would in turn
+> affect migration, as far as I see (usages of kvm_s390_get_gs). I could
+> not figure out how does gs being turned off via cpu-model (-cpu
+> z14,gs=off) does turn of gs support -- at least not the details. I wanted
+> to give a timely review, so I've limited myself there. 
+
+When the CPU model turns off gs, facility bit 133 will be turned off.
+Then the kernel does the right thing, see priv.c handle_gs.
+
+guarded storage is enabled lazily. Whenever the guest issues a Gs instruction
+we will get an exit and only enable GS if facility 133 is set.
+
+> 
+> From what I see, this patch does what it advertises, and since I think
+> it's the right thing to do in the current situation I gonna give it an:
+> Acked-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+> 
+> At the same time, I would prefer the commit message being reworded. IMHO
+> this patch is a good stop-gap measure, but essentially it trades an
+> annoying and obvious bug for a subtle and hopefully painless one.
+> 
+> Let me explain this last statement. For starters, I  do share some of the
+> concerns Boris has voiced.  I won't repeat those. Same goes for the
+> example Christian paraphrased previously, and the the fear of an implicit
+> requirement for having to support a Cartesian product of the advertised
+> machine-types and cpu-models (for each qemu binary).
+
+I will try to come up with a patch description that explains the open issues
+and it will tell that additional might or might not be necessary depending
+on followup discussions.
+I will schedule this patch for 2.11 then.
