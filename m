@@ -1,40 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53900)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54644)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1e7dIH-0008M8-RX
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 04:13:38 -0400
+	(envelope-from <bounces@canonical.com>) id 1e7dLO-0000di-NG
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 04:16:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1e7dID-0005MZ-MX
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 04:13:37 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60552)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1e7dID-0005M1-Dk
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 04:13:33 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v9Q8DHdH078676
-	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 04:13:28 -0400
-Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2dubxdr8xu-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 04:13:27 -0400
-Received: from localhost
-	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Thu, 26 Oct 2017 09:13:25 +0100
-References: <20171020145437.18549-1-borntraeger@de.ibm.com>
-	<46a65cf7-8c60-3aac-de93-95be25360f11@linux.vnet.ibm.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Thu, 26 Oct 2017 10:13:21 +0200
+	(envelope-from <bounces@canonical.com>) id 1e7dLK-00076s-Qq
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 04:16:50 -0400
+Received: from indium.canonical.com ([91.189.90.7]:50812)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1e7dLK-00074S-KW
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 04:16:46 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1e7dLI-0006DB-AE
+	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 08:16:44 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 411AC2E80C3
+	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 08:16:44 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <46a65cf7-8c60-3aac-de93-95be25360f11@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <7da3a9f3-918f-3859-1f5e-eee028c2586d@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH/QEMU] s390x/kvm: use cpu_model_available
- for guarded storage on compat machines
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 26 Oct 2017 07:59:30 -0000
+From: Thomas Huth <1342686@bugs.launchpad.net>
+Reply-To: Bug 1342686 <1342686@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20140716121553.1821.18365.malonedeb@gac.canonical.com>
+Message-Id: <150900477123.27724.12171478307432416619.launchpad@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1342686] Re: Windows 95 setup hangs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,47 +36,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>, Marc Hartmayer <mhartmay@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: libvir-list@redhat.com, qemu-devel@nongnu.org, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>, "Jason J . Herne" <jjherne@linux.vnet.ibm.com>, Boris Fiuczynski <fiuczy@linux.vnet.ibm.com>, Jiri Denemark <jdenemar@redhat.com>
+To: qemu-devel@nongnu.org
 
+** Changed in: qemu
+       Status: Incomplete =3D> Triaged
 
+-- =
 
-On 10/26/2017 01:35 AM, Halil Pasic wrote:
- try the most interesting scenarios out.
-> 
-> The idea of the patch is very clear, but I don't understand the bigger gs
-> feature context fully.
-> 
-> From what I read in the code, the attempt to enable the gs capability in
-> the kernel is made regardless of the cpu model. If the attempt was
-> successful kvm_s390_get_gs will keep returning true. That would in turn
-> affect migration, as far as I see (usages of kvm_s390_get_gs). I could
-> not figure out how does gs being turned off via cpu-model (-cpu
-> z14,gs=off) does turn of gs support -- at least not the details. I wanted
-> to give a timely review, so I've limited myself there. 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1342686
 
-When the CPU model turns off gs, facility bit 133 will be turned off.
-Then the kernel does the right thing, see priv.c handle_gs.
+Title:
+  Windows 95 setup hangs
 
-guarded storage is enabled lazily. Whenever the guest issues a Gs instruction
-we will get an exit and only enable GS if facility 133 is set.
+Status in QEMU:
+  Triaged
 
-> 
-> From what I see, this patch does what it advertises, and since I think
-> it's the right thing to do in the current situation I gonna give it an:
-> Acked-by: Halil Pasic <pasic@linux.vnet.ibm.com>
-> 
-> At the same time, I would prefer the commit message being reworded. IMHO
-> this patch is a good stop-gap measure, but essentially it trades an
-> annoying and obvious bug for a subtle and hopefully painless one.
-> 
-> Let me explain this last statement. For starters, I  do share some of the
-> concerns Boris has voiced.  I won't repeat those. Same goes for the
-> example Christian paraphrased previously, and the the fear of an implicit
-> requirement for having to support a Cartesian product of the advertised
-> machine-types and cpu-models (for each qemu binary).
+Bug description:
+  Windows 95 (first version, not 95A or OSR2) setup hangs on QEMU version 2=
+.0.0. It was compiled from the sources on Fedora 20. =
 
-I will try to come up with a patch description that explains the open issues
-and it will tell that additional might or might not be necessary depending
-on followup discussions.
-I will schedule this patch for 2.11 then.
+  Setup starts without problems, it goes through the first phase and then h=
+angs on the "Getting ready to run Windows 95 for the first time..." screen =
+(http://www.guidebookgallery.org/screenshots/win95#win95startupshutdownspla=
+sh1correctaspect).
+
+  Steps to reproduce:
+  qemu-img create -f qcow2 win95.img 2G
+  qemu -L . -machine isapc -cpu pentium -m 32 -vga std -soundhw sb16 -hda w=
+in95.img -cdrom POLWIN95.ISO -fda BOOT95A.IMA -boot a
+  after this select default options everywhere. When it asks to remove the =
+boot floppy do "eject floppy0" and confirm.
+  It displays the "Getting ready to run Windows 95 for the first time..." a=
+nd hangs.
+
+  The same behavior can be observed on 2.1.0-rc2. On 1.7.1 It hangs
+  immediately after this screen, it hangs on displaying a underscore
+  cursor.
+
+  I managed to complete the setup on QEMU 1.6.2.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1342686/+subscriptions
