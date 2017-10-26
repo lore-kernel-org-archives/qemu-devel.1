@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56471)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35563)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1e7fjz-0007rx-4e
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 06:50:26 -0400
+	(envelope-from <chen_han_xiao@126.com>) id 1e7gS1-0001Dt-JM
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 07:35:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1e7fjt-0002kW-3K
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 06:50:23 -0400
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:51912)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1e7fjs-0002k1-SJ
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 06:50:17 -0400
-Received: by mail-wr0-x242.google.com with SMTP id j15so2718646wre.8
-	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 03:50:16 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-Date: Thu, 26 Oct 2017 12:50:07 +0200
-Message-Id: <20171026105007.31777-5-richard.henderson@linaro.org>
-In-Reply-To: <20171026105007.31777-1-richard.henderson@linaro.org>
-References: <20171026105007.31777-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 4/4] target/i386: Fix ANDN (bmi)
+	(envelope-from <chen_han_xiao@126.com>) id 1e7gRy-0002Z6-DQ
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 07:35:53 -0400
+Received: from m50-156.163.com ([123.125.50.156]:11045)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <chen_han_xiao@126.com>) id 1e7gRx-0002YR-Nh
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 07:35:50 -0400
+Date: Thu, 26 Oct 2017 19:01:47 +0800 (CST)
+From: "Chen Hanxiao" <chen_han_xiao@126.com>
+In-Reply-To: <150901197477.2572.8281272155306151642@sif>
+References: <20170929091122.22726-1-chen_han_xiao@126.com>
+	<20170929233102.4b068e2f@fiorina>
+	<150896868721.17721.8644098584872122342@sif>
+	<7f4779f8.a9e3.15f58023405.Coremail.chen_han_xiao@126.com>
+	<150901197477.2572.8281272155306151642@sif>
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=UTF-8
+MIME-Version: 1.0
+Message-ID: <3d0fccaf.b41a.15f58586052.Coremail.chen_han_xiao@126.com>
+Subject: Re: [Qemu-devel] [PATCH] qga-win: fall back to hardcoded user and
+ group names if LookupAccountSidW failed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,62 +31,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, ehabkost@redhat.com, Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>, Richard Henderson <rth@twiddle.net>
+To: Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: =?UTF-8?Q?Tom=C3=A1=C5=A1_Golembiovsk=C3=BD?= <tgolembi@redhat.com>, qemu-devel@nongnu.org
 
-From: Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>
-
-Operands on ANDN are swapped.
-
-Tested with the following function:
-
-long test_andn(long v1, long v2){
-	return (~v1 & v2);
-}
-
-Compiled with:
-
-gcc kk.c -mbmi -O3 -Wall
-
-0000000000000910 <test_andn>:
- 910:c4 e2 c0 f2 c6       	andn   %rsi,%rdi,%rax
- 915:c3                   	retq
- 916:66 2e 0f 1f 84 00 00 	nopw   %cs:0x0(%rax,%rax,1)
- 91d:00 00 00
-
-and
-
-gcc kk.c -march=native -O3 -Wall
-
-0000000000000930 <test_andn>:
- 930:   48 f7 d7                not    %rdi
- 933:   48 89 f8                mov    %rdi,%rax
- 936:   48 21 f0                and    %rsi,%rax
- 939:   c3                      retq
- 93a:   66 0f 1f 44 00 00       nopw   0x0(%rax,%rax,1)
-
-The test showed than -mbmi version behaved differently than the
--march native version.
-
-Signed-off-by: Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>
-Message-Id: <20170713215137.5307-1-ricardo.ribalda@gmail.com>
-Signed-off-by: Richard Henderson <rth@twiddle.net>
----
- target/i386/translate.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/target/i386/translate.c b/target/i386/translate.c
-index dd464b98b0..96cd04c6de 100644
---- a/target/i386/translate.c
-+++ b/target/i386/translate.c
-@@ -3810,7 +3810,7 @@ static void gen_sse(CPUX86State *env, DisasContext *s, int b,
-                 }
-                 ot = mo_64_32(s->dflag);
-                 gen_ldst_modrm(env, s, modrm, ot, OR_TMP0, 0);
--                tcg_gen_andc_tl(cpu_T0, cpu_regs[s->vex_v], cpu_T0);
-+                tcg_gen_andc_tl(cpu_T0, cpu_T0, cpu_regs[s->vex_v]);
-                 gen_op_mov_reg_v(ot, reg, cpu_T0);
-                 gen_op_update1_cc();
-                 set_cc_op(s, CC_OP_LOGICB + ot);
--- 
-2.13.6
+CkF0IDIwMTctMTAtMjYgMTc6NTk6MzQsICJNaWNoYWVsIFJvdGgiIDxtZHJvdGhAbGludXgudm5l
+dC5pYm0uY29tPiB3cm90ZToKPlF1b3RpbmcgQ2hlbiBIYW54aWFvICgyMDE3LTEwLTI2IDA0OjI3
+OjQwKQo+PiAKPj4gCj4+IEF0IDIwMTctMTAtMjYgMDU6NTg6MDcsICJNaWNoYWVsIFJvdGgiIDxt
+ZHJvdGhAbGludXgudm5ldC5pYm0uY29tPiB3cm90ZToKPj4gPlF1b3RpbmcgVG9tw6HFoSBHb2xl
+bWJpb3Zza8O9ICgyMDE3LTA5LTI5IDE2OjMxOjAyKQo+PiA+PiBPbiBGcmksIDI5IFNlcCAyMDE3
+IDE3OjExOjIyICswODAwCj4+ID4+IENoZW4gSGFueGlhbyA8Y2hlbl9oYW5feGlhb0AxMjYuY29t
+PiB3cm90ZToKPj4gPj4gCj4+ID4+ID4gRnJvbTogQ2hlbiBIYW54aWFvIDxjaGVuaGFueGlhb0Bn
+bWFpbC5jb20+Cj4+ID4+ID4gCj4+ID4+ID4gT24gc29tZSBvZiB3aW5kb3dzICh3aW4wOCBzcDIp
+LAo+PiA+PiA+IGl0IGRvZXNuJ3Qgd29yayBieSBjYWxsaW5nIExvb2t1cEFjY291bnRTaWRXIHdp
+dGgKPj4gPj4gPiB3ZWxsLWtub3duIFNJRHMsCj4+ID4+ID4gV2UgZ290IGFuIGVycm9yOgo+PiA+
+PiA+ICAgICBlcnJvciA5OTcgb3ZlcmxhcHBlZCBJL08gb3BlcmF0aW9uIGlzIGluIHByb2dyZXNz
+Cj4+ID4+ID4gCj4+ID4+ID4gQnV0IGhhcmRjb2RlZCBuYW1lcyB3b3JrLgo+PiA+PiA+IAo+PiA+
+PiA+IFRoaXMgcGF0Y2ggaW50cm9kdWNlcyBhIHdvcmthcm91ZCBmb3IgdGhpcyBpc3N1ZToKPj4g
+Pj4gPiBpZiBMb29rdXBBY2NvdW50U2lkVyBmYWlsZWQsIHRyeSBoYXJkY29kZWQgb25lLgo+PiA+
+PiA+IAo+PiA+PiA+IFNpZ25lZC1vZmYtYnk6IENoZW4gSGFueGlhbyA8Y2hlbmhhbnhpYW9AZ21h
+aWwuY29tPgo+PiA+PiA+IC0tLQo+PiA+PiA+ICBxZ2EvdnNzLXdpbjMyL2luc3RhbGwuY3BwIHwg
+MTAgKysrKysrKystLQo+PiA+PiA+ICAxIGZpbGUgY2hhbmdlZCwgOCBpbnNlcnRpb25zKCspLCAy
+IGRlbGV0aW9ucygtKQo+PiA+PiA+IAo+PiA+PiAKPj4gPj4gSSB3b25kZXIgaWYgaXQncyBjYXVz
+ZWQgYnkgcWdhIGl0c2VsZiBvciBhIHJhY2UvY29uZmxpY3Qgd2l0aCBzb21lIG90aGVyCj4+ID4+
+IGFwcC4gQnV0IHN0aWxsLi4uCj4+ID4+IAo+PiA+PiAKPj4gPj4gUmV2aWV3ZWQtYnk6IFRvbcOh
+xaEgR29sZW1iaW92c2vDvSA8dGdvbGVtYmlAcmVkaGF0LmNvbT4KPj4gPgo+PiA+SSB0aGluayBp
+dCBtaWdodCBiZSBnZXROYW1lQnlTdHJpbmdTSUQoKS9Mb29rdXBBY2NvdW50U2lkVygpIHJlcG9y
+dGluZyBhCj4+ID5zdGFsZSBHZXRMYXN0RXJyb3IoKSB2YWx1ZS4KPj4gPgo+PiA+RG9lcyB0aGlz
+IGZpeCB0aGUgaXNzdWU/Cj4+IAo+PiBOb3QgZXhhY3RseS4KPj4gSSB0ZXN0ZWQgeW91ciBwYXRj
+aCBzZXZlcmFsIHRpbWVzLCBpdCBpbXByb3ZlZCBncmVhdGx5Lgo+PiBCdXQgZmFpbGVkIG9ubHkg
+b25lIHRpbWUsCj4+IGdvdCBhbm90aGVyIGVycm9yIDE3MjIuCj4KPkhtbSwgd2FzIHRoYXQgZXJy
+b3IgYWxzbyBmcm9tIHRoZSBnZXROYW1lQnlTdHJpbmdTSUQoKSBjYWxsPwoKSSBkb24ndCBrbm93
+IGhvdyB0byB0cmFjZSBxZW11LWdhLXdpbiwKYnV0IGFkZGVkIHNvbWUgZnByaW50ZihzdGRvdXQp
+LgoKKyAgICBociA9IGdldE5hbWVCeVN0cmluZ1NJRChhZG1pbmlzdHJhdG9yc0dyb3VwU0lELCBi
+dWZmZXIsICZidWZmZXJMZW4pOworICAgIGlmIChGQUlMRUQoaHIpKSB7CgpJIHNhdyBteSBsb2dz
+IGluc2lkZSBpZiAoRkFJTEVEKGhyKSkgewoKQnV0IGl0IGxvb2tzIHdlaXJkLCBhcyB5b3VyIHBh
+dGNoIGFscmVhZHkgZGVhbGluZyB3aXRoIHRoaXMgc2VuYXJpby4KCgpSZWdhcmRzLAotIENoZW4K
+Cj4KPj4gCj4+IEJ1aWxkIHdpdGggbXkgZmFsbGJhY2sgcGF0Y2ggYW5kIHlvdXIgc3VnZ2VzdGlv
+biwgCj4+IGluc3RhbGxhdGlvbiB3b3JrIHBlcmZlY3RseS4KPgo+VGhhbmtzIGZvciB0ZXN0aW5n
+Lgo+Cj4+IAo=
