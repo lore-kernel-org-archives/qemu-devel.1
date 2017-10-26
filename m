@@ -1,33 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37973)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38113)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e7cFT-0002Hn-N8
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 03:06:40 -0400
+	(envelope-from <quintela@redhat.com>) id 1e7cG2-0002v0-GW
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 03:07:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e7cFQ-0002cd-G6
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 03:06:39 -0400
-Received: from indium.canonical.com ([91.189.90.7]:60188)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1e7cFQ-0002cJ-AQ
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 03:06:36 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1e7cFO-0007xM-Bq
-	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 07:06:34 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 521AC2E80C7
-	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 07:06:34 +0000 (UTC)
+	(envelope-from <quintela@redhat.com>) id 1e7cFz-0002pq-Cr
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 03:07:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36156)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1e7cFz-0002pK-6P
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 03:07:11 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 97EFE7D0E0
+	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 07:07:09 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20171025172835.GD2484@work-vm> (David Alan Gilbert's message of
+	"Wed, 25 Oct 2017 18:28:36 +0100")
+References: <20171025054842.24883-1-quintela@redhat.com>
+	<20171025054842.24883-4-quintela@redhat.com>
+	<20171025172835.GD2484@work-vm>
+Reply-To: quintela@redhat.com
+Date: Thu, 26 Oct 2017 09:07:03 +0200
+Message-ID: <87mv4emlpk.fsf@secure.laptop>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 26 Oct 2017 06:47:28 -0000
-From: =?utf-8?q?Piotr_Gli=C5=BAniewicz?= <glizda@gmail.com>
-Reply-To: Bug 1342686 <1342686@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20140716121553.1821.18365.malonedeb@gac.canonical.com>
-Message-Id: <150900044876.17363.16136312647227763673.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1342686] Re: Windows 95 setup hangs
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v3 3/5] migration: No need to return the
+ size of the cache
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,47 +36,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
 
-I've tried the recent QEMU 2.10 (Windows build
-qemu-w64-setup-20171006.exe) and the bug is still there. It hangs right
-after "Getting ready to run Windows 95 for the first time..." screen.
+"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> * Juan Quintela (quintela@redhat.com) wrote:
+>> After the previous commits, we make sure that the value passed is
+>> right, or we just drop an error.  So now we return if there is one
+>> error or we have setup correctly the value passed.
+>> 
+>> Signed-off-by: Juan Quintela <quintela@redhat.com>
 
--- =
+> OK, this shares the same oddity as the original which is
+>   XBZRLE.cache = NULL    is not an error.
+>
+> but, since that is the same as the original;
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1342686
+Hi
 
-Title:
-  Windows 95 setup hangs
+It is a normal case.  You can change the cache size in the middle of
+migration or outside migration.
 
-Status in QEMU:
-  Incomplete
+If we are not in the middle of migration, cache is NULL.
 
-Bug description:
-  Windows 95 (first version, not 95A or OSR2) setup hangs on QEMU version 2=
-.0.0. It was compiled from the sources on Fedora 20. =
-
-  Setup starts without problems, it goes through the first phase and then h=
-angs on the "Getting ready to run Windows 95 for the first time..." screen =
-(http://www.guidebookgallery.org/screenshots/win95#win95startupshutdownspla=
-sh1correctaspect).
-
-  Steps to reproduce:
-  qemu-img create -f qcow2 win95.img 2G
-  qemu -L . -machine isapc -cpu pentium -m 32 -vga std -soundhw sb16 -hda w=
-in95.img -cdrom POLWIN95.ISO -fda BOOT95A.IMA -boot a
-  after this select default options everywhere. When it asks to remove the =
-boot floppy do "eject floppy0" and confirm.
-  It displays the "Getting ready to run Windows 95 for the first time..." a=
-nd hangs.
-
-  The same behavior can be observed on 2.1.0-rc2. On 1.7.1 It hangs
-  immediately after this screen, it hangs on displaying a underscore
-  cursor.
-
-  I managed to complete the setup on QEMU 1.6.2.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1342686/+subscriptions
+Later, Juan.
