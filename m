@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43908)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43935)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1e7imB-0003mN-EK
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 10:04:57 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1e7imG-0003q6-9h
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 10:05:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1e7im5-0007CT-I5
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 10:04:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57402)
+	(envelope-from <ehabkost@redhat.com>) id 1e7imA-0007I8-HA
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 10:04:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43384)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1e7im5-0007BC-8l
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 10:04:45 -0400
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1e7imA-0007Gs-1B
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 10:04:50 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Thu, 26 Oct 2017 16:03:33 +0200
-Message-Id: <20171026140404.21948-9-ehabkost@redhat.com>
+Date: Thu, 26 Oct 2017 16:03:34 +0200
+Message-Id: <20171026140404.21948-10-ehabkost@redhat.com>
 In-Reply-To: <20171026140404.21948-1-ehabkost@redhat.com>
 References: <20171026140404.21948-1-ehabkost@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 08/39] m68k: cleanup cpu type name composition
+Subject: [Qemu-devel] [PULL 09/39] m68k: an5206: use generic cpu_model
+ parsing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,137 +32,47 @@ Cc: qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>
 
 From: Igor Mammedov <imammedo@redhat.com>
 
-use new M68K_CPU_TYPE_NAME to compose CPU type names
-and get rid of intermediate M68kCPUInfo/register_cpu_type()
-which is replaced by static TypeInfo array.
-
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Acked-by: Thomas Huth <huth@tuxfamily.org>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Acked-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <1507211474-188400-12-git-send-email-imammedo@redhat.com>
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Message-Id: <1507211474-188400-13-git-send-email-imammedo@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- target/m68k/cpu.h |  3 +++
- target/m68k/cpu.c | 75 ++++++++++++++++++++-----------------------------=
-------
- 2 files changed, 30 insertions(+), 48 deletions(-)
+ hw/m68k/an5206.c | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
 
-diff --git a/target/m68k/cpu.h b/target/m68k/cpu.h
-index d9365476e5..afae5f68ac 100644
---- a/target/m68k/cpu.h
-+++ b/target/m68k/cpu.h
-@@ -323,6 +323,9 @@ void register_m68k_insns (CPUM68KState *env);
-=20
- #define cpu_init(cpu_model) cpu_generic_init(TYPE_M68K_CPU, cpu_model)
-=20
-+#define M68K_CPU_TYPE_SUFFIX "-" TYPE_M68K_CPU
-+#define M68K_CPU_TYPE_NAME(model) model M68K_CPU_TYPE_SUFFIX
-+
- #define cpu_signal_handler cpu_m68k_signal_handler
- #define cpu_list m68k_cpu_list
-=20
-diff --git a/target/m68k/cpu.c b/target/m68k/cpu.c
-index 5da19e570b..0a3dd83548 100644
---- a/target/m68k/cpu.c
-+++ b/target/m68k/cpu.c
-@@ -87,7 +87,7 @@ static ObjectClass *m68k_cpu_class_by_name(const char *=
-cpu_model)
-     ObjectClass *oc;
-     char *typename;
-=20
--    typename =3D g_strdup_printf("%s-" TYPE_M68K_CPU, cpu_model);
-+    typename =3D g_strdup_printf(M68K_CPU_TYPE_NAME("%s"), cpu_model);
-     oc =3D object_class_by_name(typename);
-     g_free(typename);
-     if (oc !=3D NULL && (object_class_dynamic_cast(oc, TYPE_M68K_CPU) =3D=
-=3D NULL ||
-@@ -202,23 +202,6 @@ static void any_cpu_initfn(Object *obj)
-     m68k_set_feature(env, M68K_FEATURE_WORD_INDEX);
- }
-=20
--typedef struct M68kCPUInfo {
--    const char *name;
--    void (*instance_init)(Object *obj);
--} M68kCPUInfo;
--
--static const M68kCPUInfo m68k_cpus[] =3D {
--    { .name =3D "m68000", .instance_init =3D m68000_cpu_initfn },
--    { .name =3D "m68020", .instance_init =3D m68020_cpu_initfn },
--    { .name =3D "m68030", .instance_init =3D m68030_cpu_initfn },
--    { .name =3D "m68040", .instance_init =3D m68040_cpu_initfn },
--    { .name =3D "m68060", .instance_init =3D m68060_cpu_initfn },
--    { .name =3D "m5206", .instance_init =3D m5206_cpu_initfn },
--    { .name =3D "m5208", .instance_init =3D m5208_cpu_initfn },
--    { .name =3D "cfv4e", .instance_init =3D cfv4e_cpu_initfn },
--    { .name =3D "any",   .instance_init =3D any_cpu_initfn },
--};
--
- static void m68k_cpu_realizefn(DeviceState *dev, Error **errp)
+diff --git a/hw/m68k/an5206.c b/hw/m68k/an5206.c
+index db634cbe89..5e067ea1c3 100644
+--- a/hw/m68k/an5206.c
++++ b/hw/m68k/an5206.c
+@@ -28,7 +28,6 @@
+ static void an5206_init(MachineState *machine)
  {
-     CPUState *cs =3D CPU(dev);
-@@ -290,36 +273,32 @@ static void m68k_cpu_class_init(ObjectClass *c, voi=
-d *data)
-     dc->vmsd =3D &vmstate_m68k_cpu;
+     ram_addr_t ram_size =3D machine->ram_size;
+-    const char *cpu_model =3D machine->cpu_model;
+     const char *kernel_filename =3D machine->kernel_filename;
+     M68kCPU *cpu;
+     CPUM68KState *env;
+@@ -39,10 +38,7 @@ static void an5206_init(MachineState *machine)
+     MemoryRegion *ram =3D g_new(MemoryRegion, 1);
+     MemoryRegion *sram =3D g_new(MemoryRegion, 1);
+=20
+-    if (!cpu_model) {
+-        cpu_model =3D "m5206";
+-    }
+-    cpu =3D M68K_CPU(cpu_generic_init(TYPE_M68K_CPU, cpu_model));
++    cpu =3D M68K_CPU(cpu_create(machine->cpu_type));
+     env =3D &cpu->env;
+=20
+     /* Initialize CPU registers.  */
+@@ -94,6 +90,7 @@ static void an5206_machine_init(MachineClass *mc)
+ {
+     mc->desc =3D "Arnewsh 5206";
+     mc->init =3D an5206_init;
++    mc->default_cpu_type =3D M68K_CPU_TYPE_NAME("m5206");
  }
 =20
--static void register_cpu_type(const M68kCPUInfo *info)
--{
--    TypeInfo type_info =3D {
--        .parent =3D TYPE_M68K_CPU,
--        .instance_init =3D info->instance_init,
--    };
--
--    type_info.name =3D g_strdup_printf("%s-" TYPE_M68K_CPU, info->name);
--    type_register(&type_info);
--    g_free((void *)type_info.name);
--}
-+#define DEFINE_M68K_CPU_TYPE(cpu_model, initfn) \
-+    {                                           \
-+        .name =3D M68K_CPU_TYPE_NAME(cpu_model),  \
-+        .instance_init =3D initfn,                \
-+        .parent =3D TYPE_M68K_CPU,                \
-+    }
-=20
--static const TypeInfo m68k_cpu_type_info =3D {
--    .name =3D TYPE_M68K_CPU,
--    .parent =3D TYPE_CPU,
--    .instance_size =3D sizeof(M68kCPU),
--    .instance_init =3D m68k_cpu_initfn,
--    .abstract =3D true,
--    .class_size =3D sizeof(M68kCPUClass),
--    .class_init =3D m68k_cpu_class_init,
-+static const TypeInfo m68k_cpus_type_infos[] =3D {
-+    { /* base class should be registered first */
-+        .name =3D TYPE_M68K_CPU,
-+        .parent =3D TYPE_CPU,
-+        .instance_size =3D sizeof(M68kCPU),
-+        .instance_init =3D m68k_cpu_initfn,
-+        .abstract =3D true,
-+        .class_size =3D sizeof(M68kCPUClass),
-+        .class_init =3D m68k_cpu_class_init,
-+    },
-+    DEFINE_M68K_CPU_TYPE("m68000", m68000_cpu_initfn),
-+    DEFINE_M68K_CPU_TYPE("m68020", m68020_cpu_initfn),
-+    DEFINE_M68K_CPU_TYPE("m68030", m68030_cpu_initfn),
-+    DEFINE_M68K_CPU_TYPE("m68040", m68040_cpu_initfn),
-+    DEFINE_M68K_CPU_TYPE("m68060", m68060_cpu_initfn),
-+    DEFINE_M68K_CPU_TYPE("m5206", m5206_cpu_initfn),
-+    DEFINE_M68K_CPU_TYPE("m5208", m5208_cpu_initfn),
-+    DEFINE_M68K_CPU_TYPE("cfv4e", cfv4e_cpu_initfn),
-+    DEFINE_M68K_CPU_TYPE("any", any_cpu_initfn),
- };
-=20
--static void m68k_cpu_register_types(void)
--{
--    int i;
--
--    type_register_static(&m68k_cpu_type_info);
--    for (i =3D 0; i < ARRAY_SIZE(m68k_cpus); i++) {
--        register_cpu_type(&m68k_cpus[i]);
--    }
--}
--
--type_init(m68k_cpu_register_types)
-+DEFINE_TYPES(m68k_cpus_type_infos)
+ DEFINE_MACHINE("an5206", an5206_machine_init)
 --=20
 2.13.6
