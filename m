@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44283)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44363)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1e7in3-0004av-D4
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 10:05:51 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1e7inD-0004jX-J2
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 10:05:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1e7in2-0008Hr-F1
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 10:05:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51556)
+	(envelope-from <ehabkost@redhat.com>) id 1e7in7-0008QS-Or
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 10:05:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46150)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1e7in2-0008Gm-6Y
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 10:05:44 -0400
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1e7in7-0008P5-F5
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 10:05:49 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Thu, 26 Oct 2017 16:03:44 +0200
-Message-Id: <20171026140404.21948-20-ehabkost@redhat.com>
+Date: Thu, 26 Oct 2017 16:03:45 +0200
+Message-Id: <20171026140404.21948-21-ehabkost@redhat.com>
 In-Reply-To: <20171026140404.21948-1-ehabkost@redhat.com>
 References: <20171026140404.21948-1-ehabkost@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 19/39] sh4: simplify superh_cpu_class_by_name()
+Subject: [Qemu-devel] [PULL 20/39] sh4: remove SuperHCPUClass::name field
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,89 +31,95 @@ Cc: qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>
 
 From: Igor Mammedov <imammedo@redhat.com>
 
-currently for sh4 cpu_model argument for '-cpu' option
-could be either 'cpu model' name or cpu_typename.
+the field contains upper-cased cpu model name and is used
+for printing supported cpu model names for '-cpu help'.
 
-however typically '-cpu' takes 'cpu model' name and
-cpu type for sh4 target isn't advertised publicly
-('-cpu help' prints only 'cpu model' names) so we
-shouldn't care about this use case (it's more of a bug).
+Considering that cpu model lookup in superh_cpu_class_by_name()
+is case-insensitive, we can drop upper-casing when
+printing supported cpus list and use cpu type directly
+to do the same by cutting out SUPERH_CPU_TYPE_SUFFIX from
+typename.
 
-1. Drop '-cpu cpu_typename' to align with the rest of
-   targets.
-2. Compose searched for typename from cpu model and use
-   it with object_class_by_name() directly instead of
-   over-complicated
-       object_class_get_list()
-       g_slist_find_custom() + superh_cpu_name_compare()
-
-With #1 droped, #2 could be used for both lookups which
-simplifies superh_cpu_class_by_name() quite a bit.
+It allows to remove SuperHCPUClass::name, which practically
+duplicates names defined by TYPE_SH*_CPU definitions and
+simplify sh*_class_init()/SuperHCPUClass a bit.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Acked-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Message-Id: <1507211474-188400-23-git-send-email-imammedo@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Message-Id: <1507211474-188400-24-git-send-email-imammedo@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- target/sh4/cpu.c | 34 ++++++++++++----------------------
- 1 file changed, 12 insertions(+), 22 deletions(-)
+ target/sh4/cpu-qom.h |  2 --
+ target/sh4/cpu.c     | 10 +++-------
+ 2 files changed, 3 insertions(+), 9 deletions(-)
 
+diff --git a/target/sh4/cpu-qom.h b/target/sh4/cpu-qom.h
+index 17deeb661b..0f9fb4dd31 100644
+--- a/target/sh4/cpu-qom.h
++++ b/target/sh4/cpu-qom.h
+@@ -39,7 +39,6 @@
+  * SuperHCPUClass:
+  * @parent_realize: The parent class' realize handler.
+  * @parent_reset: The parent class' reset handler.
+- * @name: The name.
+  * @pvr: Processor Version Register
+  * @prr: Processor Revision Register
+  * @cvr: Cache Version Register
+@@ -54,7 +53,6 @@ typedef struct SuperHCPUClass {
+     DeviceRealize parent_realize;
+     void (*parent_reset)(CPUState *cpu);
+=20
+-    const char *name;
+     uint32_t pvr;
+     uint32_t prr;
+     uint32_t cvr;
 diff --git a/target/sh4/cpu.c b/target/sh4/cpu.c
-index ec6db61bdf..972c809d8c 100644
+index 972c809d8c..e0b99fbc89 100644
 --- a/target/sh4/cpu.c
 +++ b/target/sh4/cpu.c
-@@ -120,36 +120,26 @@ void sh4_cpu_list(FILE *f, fprintf_function cpu_fpr=
-intf)
-     g_slist_free(list);
- }
+@@ -98,12 +98,11 @@ static gint superh_cpu_list_compare(gconstpointer a, =
+gconstpointer b)
 =20
--static gint superh_cpu_name_compare(gconstpointer a, gconstpointer b)
--{
--    const SuperHCPUClass *scc =3D SUPERH_CPU_CLASS(a);
--    const char *name =3D b;
--
--    return strcasecmp(scc->name, name);
--}
--
- static ObjectClass *superh_cpu_class_by_name(const char *cpu_model)
+ static void superh_cpu_list_entry(gpointer data, gpointer user_data)
  {
-     ObjectClass *oc;
--    GSList *list, *item;
-+    char *s, *typename =3D NULL;
+-    ObjectClass *oc =3D data;
+-    SuperHCPUClass *scc =3D SUPERH_CPU_CLASS(oc);
+     SuperHCPUListState *s =3D user_data;
++    const char *typename =3D object_class_get_name(OBJECT_CLASS(data));
++    int len =3D strlen(typename) - strlen(SUPERH_CPU_TYPE_SUFFIX);
 =20
--    if (strcasecmp(cpu_model, "any") =3D=3D 0) {
--        return object_class_by_name(TYPE_SH7750R_CPU);
-+    s =3D g_ascii_strdown(cpu_model, -1);
-+    if (strcmp(s, "any") =3D=3D 0) {
-+        oc =3D object_class_by_name(TYPE_SH7750R_CPU);
-+        goto out;
-     }
-=20
--    oc =3D object_class_by_name(cpu_model);
--    if (oc !=3D NULL && object_class_dynamic_cast(oc, TYPE_SUPERH_CPU) !=
-=3D NULL
--        && !object_class_is_abstract(oc)) {
--        return oc;
-+    typename =3D g_strdup_printf(SUPERH_CPU_TYPE_NAME("%s"), s);
-+    oc =3D object_class_by_name(typename);
-+    if (oc !=3D NULL && object_class_is_abstract(oc)) {
-+        oc =3D NULL;
-     }
-=20
--    oc =3D NULL;
--    list =3D object_class_get_list(TYPE_SUPERH_CPU, false);
--    item =3D g_slist_find_custom(list, cpu_model, superh_cpu_name_compar=
-e);
--    if (item !=3D NULL) {
--        oc =3D item->data;
--    }
--    g_slist_free(list);
-+out:
-+    g_free(s);
-+    g_free(typename);
-     return oc;
+-    (*s->cpu_fprintf)(s->file, "%s\n",
+-                      scc->name);
++    (*s->cpu_fprintf)(s->file, "%.*s\n", len, typename);
  }
 =20
+ void sh4_cpu_list(FILE *f, fprintf_function cpu_fprintf)
+@@ -156,7 +155,6 @@ static void sh7750r_class_init(ObjectClass *oc, void =
+*data)
+ {
+     SuperHCPUClass *scc =3D SUPERH_CPU_CLASS(oc);
+=20
+-    scc->name =3D "SH7750R";
+     scc->pvr =3D 0x00050000;
+     scc->prr =3D 0x00000100;
+     scc->cvr =3D 0x00110000;
+@@ -175,7 +173,6 @@ static void sh7751r_class_init(ObjectClass *oc, void =
+*data)
+ {
+     SuperHCPUClass *scc =3D SUPERH_CPU_CLASS(oc);
+=20
+-    scc->name =3D "SH7751R";
+     scc->pvr =3D 0x04050005;
+     scc->prr =3D 0x00000113;
+     scc->cvr =3D 0x00110000; /* Neutered caches, should be 0x20480000 */
+@@ -194,7 +191,6 @@ static void sh7785_class_init(ObjectClass *oc, void *=
+data)
+ {
+     SuperHCPUClass *scc =3D SUPERH_CPU_CLASS(oc);
+=20
+-    scc->name =3D "SH7785";
+     scc->pvr =3D 0x10300700;
+     scc->prr =3D 0x00000200;
+     scc->cvr =3D 0x71440211;
 --=20
 2.13.6
