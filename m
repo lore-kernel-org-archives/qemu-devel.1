@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43377)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45495)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1e7cf4-0001m8-50
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 03:33:06 -0400
+	(envelope-from <aik@ozlabs.ru>) id 1e7crM-0003Sx-KX
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 03:45:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1e7cf3-0003P4-3c
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 03:33:05 -0400
-References: <BC29A004BA570342A4CC0044A3845572CFCE5592@H3CMLB12-EX.srv.huawei-3com.com>
-	<20171025133115.GA23458@lemon>
-	<BC29A004BA570342A4CC0044A3845572CFCE5962@H3CMLB12-EX.srv.huawei-3com.com>
-	<f10f73b8-6b6b-a30e-a147-b7fcaa28b182@redhat.com>
-	<BC29A004BA570342A4CC0044A3845572CFCE5D44@H3CMLB12-EX.srv.huawei-3com.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <c9c95933-c70c-f16c-dd70-9b66aede987a@redhat.com>
-Date: Thu, 26 Oct 2017 09:32:50 +0200
+	(envelope-from <aik@ozlabs.ru>) id 1e7crI-0002kA-9j
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 03:45:48 -0400
+Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:52265)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1e7crH-0002jI-VS
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 03:45:44 -0400
+Received: by mail-pg0-x243.google.com with SMTP id a192so2034087pge.9
+	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 00:45:43 -0700 (PDT)
+References: <20171024085853.32615-1-aik@ozlabs.ru>
+	<20171024162752.GA21671@redhat.com>
+	<ef1eab70-8c55-0d75-e516-16ef6a419d04@ozlabs.ru>
+	<20171025065755.GB27237@redhat.com>
+	<6b823cd9-ef9d-a704-ed25-91f360018eca@ozlabs.ru>
+	<20171025211129.GD30132@redhat.com>
+	<a862a41b-45c6-7b3e-9290-92abfa856e76@ozlabs.ru>
+	<20171026070253.GB5847@redhat.com>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <6dbce328-c404-403f-a1ae-32de5fc742cf@ozlabs.ru>
+Date: Thu, 26 Oct 2017 18:45:37 +1100
 MIME-Version: 1.0
-In-Reply-To: <BC29A004BA570342A4CC0044A3845572CFCE5D44@H3CMLB12-EX.srv.huawei-3com.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="1SUvOoKcF8eGp0KF64BfUcl40tG9SGUGo"
-Subject: Re: [Qemu-devel] Block format 'raw' does not support the option
- 'locking' when disable image locking with option locking=off
+In-Reply-To: <20171026070253.GB5847@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-AU
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH qemu] git-submodule.sh: Do not try
+ writing to source directory if not necessary
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,57 +37,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Changlimin <changlimin@h3c.com>, Fam Zheng <famz@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---1SUvOoKcF8eGp0KF64BfUcl40tG9SGUGo
-From: Max Reitz <mreitz@redhat.com>
-To: Changlimin <changlimin@h3c.com>, Fam Zheng <famz@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Qemu-block <qemu-block@nongnu.org>
-Message-ID: <c9c95933-c70c-f16c-dd70-9b66aede987a@redhat.com>
-Subject: Re: [Qemu-devel] Block format 'raw' does not support the option
- 'locking' when disable image locking with option locking=off
-References: <BC29A004BA570342A4CC0044A3845572CFCE5592@H3CMLB12-EX.srv.huawei-3com.com>
- <20171025133115.GA23458@lemon>
- <BC29A004BA570342A4CC0044A3845572CFCE5962@H3CMLB12-EX.srv.huawei-3com.com>
- <f10f73b8-6b6b-a30e-a147-b7fcaa28b182@redhat.com>
- <BC29A004BA570342A4CC0044A3845572CFCE5D44@H3CMLB12-EX.srv.huawei-3com.com>
-In-Reply-To: <BC29A004BA570342A4CC0044A3845572CFCE5D44@H3CMLB12-EX.srv.huawei-3com.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 26/10/17 18:02, Daniel P. Berrange wrote:
+> On Thu, Oct 26, 2017 at 11:54:59AM +1100, Alexey Kardashevskiy wrote:
+>> On 26/10/17 08:11, Daniel P. Berrange wrote:
+>>> On Wed, Oct 25, 2017 at 07:10:40PM +1100, Alexey Kardashevskiy wrote:
+>>>> On 25/10/17 17:57, Daniel P. Berrange wrote:
+>>>>> On Wed, Oct 25, 2017 at 12:45:10PM +1100, Alexey Kardashevskiy wrote:
+>>>>>> On 25/10/17 03:27, Daniel P. Berrange wrote:
+>>>>>>> On Tue, Oct 24, 2017 at 07:58:53PM +1100, Alexey Kardashevskiy wrote:
+>>>>>>>> The new git-submodule.sh script writes .git-submodule-status to
+>>>>>>>> the source directory every time no matter what. This makes it conditional.
+>>>>>>>>
+>>>>>>>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+>>>>>>>> ---
+>>>>>>>>
+>>>>>>>> I compile out of tree on a remote guest system where I mount the
+>>>>>>>> source directory as "readonly" and build directory as "rw" and
+>>>>>>>> scripts/git-submodule.sh tries writing to the source directory even when
+>>>>>>>> I manually update modules on a host machine which is quite annoying.
+>>>>>>>>
+>>>>>>>> Is this something acceptable? Or I am missing something here?
+>>>>>>>
+>>>>>>> How did you update the modules - did you manually run  'git submodule update...'
+>>>>>>> or did you use the git-submodule.sh script on your host machine ?
+>>>>>>
+>>>>>>
+>>>>>> I run scripts/git-submodule.sh. Which is not thrilling either as I rather
+>>>>>> expect source tree not to be affected in any way when running "make".
+>>>>>
+>>>>> Oh, did you pass the list of sub-modules to it when running
+>>>>>
+>>>>> eg, ./scripts/git-submodule.sh update ui/keycodemapdb
+>>>>>
+>>>>> the list of submodules you need is printed in the configure output summary.
+>>>>
+>>>> Sure, otherwise it does nothing.
+>>>>
+>>>>
+>>>>>
+>>>>>>> If you run git-submodule.sh on the host, then it should save the status
+>>>>>>> file, and then when you run make on the guest system, it should notice
+>>>>>>> that you're already updated and never even invoke 'git-submodule.sh update'
+>>>>>>
+>>>>>>
+>>>>>> scripts/git-submodule.sh also tries writing to the source directory (I
+>>>>>> should probably have fixed that branch too) but this failure is not fatal
+>>>>>> for "make" but makes it want to try "update" and then "make" fails.
+>>>>>
+>>>>> This shouldn't have happened in your case though, if you have already run
+>>>>> 'git-submodule.sh update ...list of modules...' on the host machine, with
+>>>>> the same list of modules that the guest 'configure' printed out.
+>>>>
+>>>> It does not matter if I run git-submodule.sh or not - "git-submodule.sh
+>>>> status" will try writing to the read only folder anyway and it will fail
+>>>> and Makefile's  git_module_status will be set to 1.
+>>>
+>>>
+>>> Ahhhh, great, now I understand why you're hitting the problem !
+>>>
+>>>> If I do as below (and that's what I should have done as I said), then
+>>>> "git-submodule.sh update" is not invoked and we are good. I am not
+>>>> reposting it yet as 1) my shell skills are crap (need to delete the temp
+>>>> file or rewrite the whole thing not to use temp file or rewrite it in
+>>>> python - why do not people use python everywhere?!) 2) I still hope we stop
+>>>> doing this from Makefile :)
+>>>
+>>> I agree using a tmpfile is the right fix here.
+>>
+>>
+>> I still think not doing "git update" from Makefile is the right fix here,
+>> is that a final decision? Why cannot "configure" do this (and ideally have
+>> a way not to do this at all, like --no-git-submodules-update)?  Just
+>> checking...
+> 
+> That ends up doing exactly the same thing. We would need to make sure that
+> configure gets re-run when the submodules change.
 
-On 2017-10-26 09:18, Changlimin wrote:
-> If the qcow2 file is created with preallocation=3Dfull, I think metadat=
-a will not corrupt when it is shared between two vms? Snapshot is not req=
-uired.=20
->=20
-> Is this right?
 
-I wouldn't count on it.
+Submodules change once/twice a year so we could live quite happily without
+this automation imho. What if I do not want submodules to be updated in
+order to reproduce some bug and confirm that the newer version of submodule
+has fixed it?
 
-If you really want to take the risk, you can probably use the
-file.locking=3Doff option again.
-
-Max
+btw I looked now to my tree with upstream QEMU and dtc in that tree is 8
+month old (v1.4.4 and there is v1.4.5 available). Is not it supposed to
+update to something more recent automatically? git-submodule.sh does not do
+checkout or pull.
 
 
---1SUvOoKcF8eGp0KF64BfUcl40tG9SGUGo
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+> So you just go from having
+> 'make' run git-submodule.sh, to have make run config.status which runs
+> configure, which runs git-submodule.sh. 
 
------BEGIN PGP SIGNATURE-----
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlnxj6MSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AQ8wIAL9es6xNwIpVoXhF/A/oOMTUvkI3eSTq
-fzsa/jIPhyJ/8ShAWERr1kovkxVwx5R2/sn3DFfKsAhDExXcA1WhxxvrFUA/lv0R
-AIKA9LBzBS9S2AFgmkdbQvsvjTs/Z1PqlQImWvMQpTg61ojkQff20WK5LBJFEBQs
-E4TpNpAl6dgufZZt2/q89wRgCZ4iBWd/7LGLTh8dOFl0xPOagdIKOZlEWafmaX7n
-cuaEqI8P6bXuW1dvy4iPbK0Oc2a2kWNx0EKMaTyBxzB+Ux5E+qjby6tBFJ9abv/7
-AEmixmEpJf/q0+oD/XE1sTjXHKylOUlwqYtcCkOOP4l29hbtcc6GQ9k=
-=gUCw
------END PGP SIGNATURE-----
 
---1SUvOoKcF8eGp0KF64BfUcl40tG9SGUGo--
+
+
+-- 
+Alexey
