@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56426)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57813)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e7bKU-0000hA-4U
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 02:07:47 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1e7bTY-0001z2-Bb
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 02:17:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e7bKT-0001Zq-29
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 02:07:46 -0400
-Received: from mail-wm0-x22a.google.com ([2a00:1450:400c:c09::22a]:50863)
+	(envelope-from <peter.maydell@linaro.org>) id 1e7bTX-0001N9-Hz
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 02:17:08 -0400
+Received: from mail-wr0-x22c.google.com ([2a00:1450:400c:c0c::22c]:44268)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1e7bKS-0001Zf-Pk
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 02:07:44 -0400
-Received: by mail-wm0-x22a.google.com with SMTP id s66so554757wmf.5
-	for <qemu-devel@nongnu.org>; Wed, 25 Oct 2017 23:07:44 -0700 (PDT)
+	id 1e7bTX-0001MD-Ap
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 02:17:07 -0400
+Received: by mail-wr0-x22c.google.com with SMTP id z55so2071768wrz.1
+	for <qemu-devel@nongnu.org>; Wed, 25 Oct 2017 23:17:07 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20171025123056.3165-1-richard.henderson@linaro.org>
+In-Reply-To: <CAFEAcA99zpvcgk2EuXkrcOY+8rHeRkJhH4GqViJkEgQV3bdWFg@mail.gmail.com>
 References: <20171025123056.3165-1-richard.henderson@linaro.org>
+	<CAFEAcA99zpvcgk2EuXkrcOY+8rHeRkJhH4GqViJkEgQV3bdWFg@mail.gmail.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 26 Oct 2017 07:07:23 +0100
-Message-ID: <CAFEAcA99zpvcgk2EuXkrcOY+8rHeRkJhH4GqViJkEgQV3bdWFg@mail.gmail.com>
+Date: Thu, 26 Oct 2017 07:16:45 +0100
+Message-ID: <CAFEAcA9XdoV0YVw+q7op_vafe9X0JTiQdYmGcmPgqRR3qhUYrQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Subject: Re: [Qemu-devel] [PULL 00/11] Disassembler patches
 List-Id: <qemu-devel.nongnu.org>
@@ -29,46 +30,24 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "Daniel P. Berrange" <berrange@redhat.com>
 
-On 25 October 2017 at 13:30, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> Support for Capstone, plus an arm32 fix.
->
->
-> r~
->
->
-> The following changes since commit 3d7196d43bfe12efe98568cb60057e273652b99b:
->
->   Merge remote-tracking branch 'remotes/kraxel/tags/usb-20171023-pull-request' into staging (2017-10-24 16:05:57 +0100)
->
-> are available in the git repository at:
->
->   git://github.com/rth7680/qemu.git tags/pull-dis-20171025
->
-> for you to fetch changes up to 383b90bc6a15f4b18ec34f9c0287b26f9a89fcb8:
->
->   disas: Add capstone as submodule (2017-10-25 11:55:21 +0200)
->
-> ----------------------------------------------------------------
-> Capstone disassembler
+On 26 October 2017 at 07:07, Peter Maydell <peter.maydell@linaro.org> wrote:
+> Hi. This failed to build for Windows:
 
+Also, after it failed and I backed out the merge, the next thing I
+tried to build failed everywhere with:
 
-Hi. This failed to build for Windows:
+warning: unable to rmdir capstone: Directory not empty
+error: pathspec 'capstone' did not match any file(s) known to git.
+error: pathspec 'capstone' did not match any file(s) known to git.
 
-make[1]: *** No rule to make target
-'/home/petmay01/linaro/qemu-for-merges/build/w32-new/capstone/libcapstone.a'.
-Stop.
-Makefile:399: recipe for target 'subdir-capstone' failed
+That's bad, because it suggests that bisection is going to break
+across this merge commit.
 
-FreeBSD ar also prints a warning:
-  AR      libcapstone.a
-ar: warning: creating /root/qemu/build/all/capstone/libcapstone.a
-
-though the build otherwise succeeds. Is it possible to silence this?
-(Otherwise it shows up in my build output scripts; I could silence it
-there but it would be neater if it just wasn't emitted.)
+Dan, is this going to be a generic problem with the new submodule
+stuff, or is it specific to something with how the capstone
+submodule is being handled in this patchset?
 
 thanks
 -- PMM
