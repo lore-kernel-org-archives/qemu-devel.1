@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39788)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39785)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1e7k3w-0006iJ-QI
+	(envelope-from <richard.henderson@linaro.org>) id 1e7k3w-0006iG-QG
 	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 11:27:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1e7k3s-0005f8-0t
+	(envelope-from <richard.henderson@linaro.org>) id 1e7k3s-0005g1-Gj
 	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 11:27:15 -0400
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:54238)
+Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:51132)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1e7k3r-0005e6-Q2
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 11:27:11 -0400
-Received: by mail-wm0-x243.google.com with SMTP id r196so9130506wmf.2
-	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 08:27:11 -0700 (PDT)
+	id 1e7k3s-0005eZ-9q
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 11:27:12 -0400
+Received: by mail-wr0-x244.google.com with SMTP id p96so3542637wrb.7
+	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 08:27:12 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Thu, 26 Oct 2017 17:27:03 +0200
-Message-Id: <20171026152704.24525-2-richard.henderson@linaro.org>
-In-Reply-To: <20171026152704.24525-1-richard.henderson@linaro.org>
-References: <20171026152704.24525-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 1/2] tcg: Allow constant pool entries in the
- prologue
+Date: Thu, 26 Oct 2017 17:27:02 +0200
+Message-Id: <20171026152704.24525-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH 0/2] tcg constant pool fixups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,96 +27,36 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-s390x@nongnu.org, laurent.desnogues@gmail.com
 
-Both ARMv6 and AArch64 currently may drop complex guest_base values
-into the constant pool.  But generic code wasn't expecting that, and
-the pool is not emitted.  Correct that.
+As noted by Laurent in private mail, foo-linux-user is currently
+broken on aarch64 host in unususal circumstances.  By inspection,
+the same thing could happen for armv6 host.  My testing is always
+on armv7 hardware, so I wouldn't have seen this.
 
-Reported-by: Laurent Desnogues <laurent.desnogues@gmail.com>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- tcg/tcg.c | 49 ++++++++++++++++++++++++++++++++++++++++++-------
- 1 file changed, 42 insertions(+), 7 deletions(-)
+With that fixed, the s390x code can be simplified a bit to take
+advantage of this.
 
-diff --git a/tcg/tcg.c b/tcg/tcg.c
-index 683ff4abb7..c22f1c4441 100644
---- a/tcg/tcg.c
-+++ b/tcg/tcg.c
-@@ -771,12 +771,32 @@ void tcg_prologue_init(TCGContext *s)
- 
-     /* Put the prologue at the beginning of code_gen_buffer.  */
-     buf0 = s->code_gen_buffer;
-+    total_size = s->code_gen_buffer_size;
-     s->code_ptr = buf0;
-     s->code_buf = buf0;
-+    s->data_gen_ptr = NULL;
-     s->code_gen_prologue = buf0;
- 
-+    /* Compute a high-water mark, at which we voluntarily flush the buffer
-+       and start over.  The size here is arbitrary, significantly larger
-+       than we expect the code generation for any one opcode to require.  */
-+    s->code_gen_highwater = s->code_gen_buffer + (total_size - TCG_HIGHWATER);
-+
-+#ifdef TCG_TARGET_NEED_POOL_LABELS
-+    s->pool_labels = NULL;
-+#endif
-+
-     /* Generate the prologue.  */
-     tcg_target_qemu_prologue(s);
-+
-+#ifdef TCG_TARGET_NEED_POOL_LABELS
-+    /* Allow the prologue to put e.g. guest_base into a pool entry.  */
-+    {
-+        bool ok = tcg_out_pool_finalize(s);
-+        tcg_debug_assert(ok);
-+    }
-+#endif
-+
-     buf1 = s->code_ptr;
-     flush_icache_range((uintptr_t)buf0, (uintptr_t)buf1);
- 
-@@ -785,21 +805,36 @@ void tcg_prologue_init(TCGContext *s)
-     s->code_gen_ptr = buf1;
-     s->code_gen_buffer = buf1;
-     s->code_buf = buf1;
--    total_size = s->code_gen_buffer_size - prologue_size;
-+    total_size -= prologue_size;
-     s->code_gen_buffer_size = total_size;
- 
--    /* Compute a high-water mark, at which we voluntarily flush the buffer
--       and start over.  The size here is arbitrary, significantly larger
--       than we expect the code generation for any one opcode to require.  */
--    s->code_gen_highwater = s->code_gen_buffer + (total_size - TCG_HIGHWATER);
--
-     tcg_register_jit(s->code_gen_buffer, total_size);
- 
- #ifdef DEBUG_DISAS
-     if (qemu_loglevel_mask(CPU_LOG_TB_OUT_ASM)) {
-         qemu_log_lock();
-         qemu_log("PROLOGUE: [size=%zu]\n", prologue_size);
--        log_disas(buf0, prologue_size);
-+        if (s->data_gen_ptr) {
-+            size_t code_size = s->data_gen_ptr - buf0;
-+            size_t data_size = prologue_size - code_size;
-+            size_t i;
-+
-+            log_disas(buf0, code_size);
-+
-+            for (i = 0; i < data_size; i += sizeof(tcg_target_ulong)) {
-+                if (sizeof(tcg_target_ulong) == 8) {
-+                    qemu_log("0x%08" PRIxPTR ":  .quad  0x%016" PRIx64 "\n",
-+                             (uintptr_t)s->data_gen_ptr + i,
-+                             *(uint64_t *)(s->data_gen_ptr + i));
-+                } else {
-+                    qemu_log("0x%08" PRIxPTR ":  .long  0x%08x\n",
-+                             (uintptr_t)s->data_gen_ptr + i,
-+                             *(uint32_t *)(s->data_gen_ptr + i));
-+                }
-+            }
-+        } else {
-+            log_disas(buf0, prologue_size);
-+        }
-         qemu_log("\n");
-         qemu_log_flush();
-         qemu_log_unlock();
+If the s390x maintainers could test this, I would appreciate it. 
+The test case is
+
+  ./i386-linux-user/qemu-i386 -B 0x111231000 ./some-static-i386
+
+e.g. using the binary in the busyboxes tarball linked from
+
+  https://wiki.qemu.org/Testing#User_mode_emulation
+
+although any staticly linked binary would work.
+
+
+r~
+
+
+Richard Henderson (2):
+  tcg: Allow constant pool entries in the prologue
+  tcg/s390x: Use constant pool for prologue
+
+ tcg/s390/tcg-target.inc.c | 44 ++++++++++++------------------------------
+ tcg/tcg.c                 | 49 ++++++++++++++++++++++++++++++++++++++++-------
+ 2 files changed, 54 insertions(+), 39 deletions(-)
+
 -- 
 2.13.6
