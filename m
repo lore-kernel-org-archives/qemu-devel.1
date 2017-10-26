@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56072)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56076)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e7l3w-0002AL-NG
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 12:31:21 -0400
+	(envelope-from <bounces@canonical.com>) id 1e7l3w-0002AO-OI
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 12:31:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e7l3s-0003I6-HF
+	(envelope-from <bounces@canonical.com>) id 1e7l3s-0003IF-Kd
 	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 12:31:20 -0400
-Received: from indium.canonical.com ([91.189.90.7]:44548)
+Received: from indium.canonical.com ([91.189.90.7]:44574)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1e7l3s-0003Hn-Ay
+	id 1e7l3s-0003Hs-E2
 	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 12:31:16 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1e7l3q-0000y2-NU
-	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 16:31:14 +0000
+	id 1e7l3r-0000xi-0K
+	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 16:31:15 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id AAD5F2E80CC
-	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 16:31:14 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 008232E80CC
+	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 16:31:15 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 26 Oct 2017 16:11:05 -0000
+Date: Thu, 26 Oct 2017 16:13:37 -0000
 From: OIiver <1368178@bugs.launchpad.net>
 Reply-To: Bug 1368178 <1368178@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <20140911114353.25076.30246.malonedeb@soybean.canonical.com>
-Message-Id: <150903426523.4453.5351702824693208039.malone@gac.canonical.com>
+Message-Id: <150903441794.4275.2452872769753096735.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1368178] Re: Windows ME falsely detects qemu's
  videocards as Number Nine Imagine 128
@@ -39,20 +39,10 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-I am still using Kubuntu 16.04.3 LTS and that is shipped with QEMU 2.5.0
+Addition to my last comment.
 
-# qemu-system-i386 --version
-QEMU emulator version 2.5.0 (Debian 1:2.5+dfsg-5ubuntu10.16)
-
-I am not planning to go into the hassle to install QEMU latest on
-16.04.3 LTS.
-
-Could you delay the closing of the ticket until Kubuntu 18.04 LTS is releas=
-ed?
-Then i could test it with the QEMU version that will be shipped with Kubunt=
-u 18.04 LTS.
-
-As an alternative, i could also do the test with QEMU 2.5 instead.
+Ubuntu 17.10 is now shipped with QEMU 2.10. Thus we can expect that
+18.04 LTS will be shipped with QEMU 2.10 or later, too.
 
 -- =
 
