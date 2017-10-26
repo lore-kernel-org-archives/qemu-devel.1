@@ -1,41 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46911)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47006)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1e7exH-0002wS-UV
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 06:00:09 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1e7exx-0003Pb-9D
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 06:00:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1e7exD-0008Kt-2a
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 06:00:04 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:40172)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1e7exC-0008Ii-PW
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 05:59:58 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v9Q9xIl8113597
-	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 05:59:54 -0400
-Received: from e18.ny.us.ibm.com (e18.ny.us.ibm.com [129.33.205.208])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2dudc60mne-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 05:59:52 -0400
-Received: from localhost
-	by e18.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Thu, 26 Oct 2017 05:59:51 -0400
-Content-Type: text/plain; charset="utf-8"
+	(envelope-from <richard.henderson@linaro.org>) id 1e7exr-0000n7-42
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 06:00:45 -0400
+Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:51554)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1e7exq-0000mY-Q6
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 06:00:39 -0400
+Received: by mail-wr0-x243.google.com with SMTP id j15so2596740wre.8
+	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 03:00:38 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Thu, 26 Oct 2017 12:00:31 +0200
+Message-Id: <20171026100031.19042-2-richard.henderson@linaro.org>
+In-Reply-To: <20171026100031.19042-1-richard.henderson@linaro.org>
+References: <20171026100031.19042-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-In-Reply-To: <7f4779f8.a9e3.15f58023405.Coremail.chen_han_xiao@126.com>
-References: <20170929091122.22726-1-chen_han_xiao@126.com>
-	<20170929233102.4b068e2f@fiorina>
-	<150896868721.17721.8644098584872122342@sif>
-	<7f4779f8.a9e3.15f58023405.Coremail.chen_han_xiao@126.com>
-Date: Thu, 26 Oct 2017 04:59:34 -0500
-Message-Id: <150901197477.2572.8281272155306151642@sif>
-Subject: Re: [Qemu-devel] [PATCH] qga-win: fall back to hardcoded user and
- group names if LookupAccountSidW failed
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL v2 11/11] disas: Add capstone as submodule
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,109 +29,168 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Chen Hanxiao <chen_han_xiao@126.com>
-Cc: =?utf-8?b?VG9tw6HFoSBHb2xlbWJpb3Zza8O9?= <tgolembi@redhat.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org
 
-Quoting Chen Hanxiao (2017-10-26 04:27:40)
-> =
+Do not require the submodule, but use it if present.  Allow the
+command-line to override system or git submodule either way.
 
-> =
+Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ Makefile    | 15 ++++++++++++++
+ .gitmodules |  3 +++
+ capstone    |  1 +
+ configure   | 68 +++++++++++++++++++++++++++++++++++++++++++++++++++----------
+ 4 files changed, 76 insertions(+), 11 deletions(-)
+ create mode 160000 capstone
 
-> At 2017-10-26 05:58:07, "Michael Roth" <mdroth@linux.vnet.ibm.com> wrote:
-> >Quoting Tom=C3=A1=C5=A1 Golembiovsk=C3=BD (2017-09-29 16:31:02)
-> >> On Fri, 29 Sep 2017 17:11:22 +0800
-> >> Chen Hanxiao <chen_han_xiao@126.com> wrote:
-> >> =
-
-> >> > From: Chen Hanxiao <chenhanxiao@gmail.com>
-> >> > =
-
-> >> > On some of windows (win08 sp2),
-> >> > it doesn't work by calling LookupAccountSidW with
-> >> > well-known SIDs,
-> >> > We got an error:
-> >> >     error 997 overlapped I/O operation is in progress
-> >> > =
-
-> >> > But hardcoded names work.
-> >> > =
-
-> >> > This patch introduces a workaroud for this issue:
-> >> > if LookupAccountSidW failed, try hardcoded one.
-> >> > =
-
-> >> > Signed-off-by: Chen Hanxiao <chenhanxiao@gmail.com>
-> >> > ---
-> >> >  qga/vss-win32/install.cpp | 10 ++++++++--
-> >> >  1 file changed, 8 insertions(+), 2 deletions(-)
-> >> > =
-
-> >> =
-
-> >> I wonder if it's caused by qga itself or a race/conflict with some oth=
-er
-> >> app. But still...
-> >> =
-
-> >> =
-
-> >> Reviewed-by: Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com>
-> >
-> >I think it might be getNameByStringSID()/LookupAccountSidW() reporting a
-> >stale GetLastError() value.
-> >
-> >Does this fix the issue?
-> =
-
-> Not exactly.
-> I tested your patch several times, it improved greatly.
-> But failed only one time,
-> got another error 1722.
-
-Hmm, was that error also from the getNameByStringSID() call?
-
-> =
-
-> Build with my fallback patch and your suggestion, =
-
-> installation work perfectly.
-
-Thanks for testing.
-
-> =
-
-> Regards,
-> - Chen
-> =
-
-> >
-> >diff --git a/qga/vss-win32/install.cpp b/qga/vss-win32/install.cpp
-> >index ba7c94eb25..94c921e8de 100644
-> >--- a/qga/vss-win32/install.cpp
-> >+++ b/qga/vss-win32/install.cpp
-> >@@ -149,9 +149,10 @@ static HRESULT getNameByStringSID(
-> >     wchar_t domainName[BUFFER_SIZE];
-> > =
-
-> >     chk(ConvertStringSidToSidW(sid, &psid));
-> >-    LookupAccountSidW(NULL, psid, buffer, bufferLen,
-> >-                domainName, &domainNameLen, &groupType);
-> >-    hr =3D HRESULT_FROM_WIN32(GetLastError());
-> >+    if (!LookupAccountSidW(NULL, psid, buffer, bufferLen,
-> >+                           domainName, &domainNameLen, &groupType)) {
-> >+        hr =3D HRESULT_FROM_WIN32(GetLastError());
-> >+    }
-> > =
-
-> >     LocalFree(psid);
-> >
-> >> =
-
-> >> =
-
-> >> -- =
-
-> >> Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com>
-> >> =
-
-> >
+diff --git a/Makefile b/Makefile
+index 9372742f86..ec73acfa9a 100644
+--- a/Makefile
++++ b/Makefile
+@@ -383,6 +383,21 @@ subdir-dtc: .git-submodule-status dtc/libfdt dtc/tests
+ dtc/%: .git-submodule-status
+ 	mkdir -p $@
+ 
++# Overriding CFLAGS causes us to lose defines added in the sub-makefile.
++# Not overriding CFLAGS leads to mis-matches between compilation modes.
++# Therefore we replicate some of the logic in the sub-makefile.
++# Remove all the extra -Warning flags that QEMU uses that Capstone doesn't;
++# no need to annoy QEMU developers with such things.
++CAP_CFLAGS = $(patsubst -W%,,$(CFLAGS) $(QEMU_CFLAGS))
++CAP_CFLAGS += -DCAPSTONE_USE_SYS_DYN_MEM
++CAP_CFLAGS += -DCAPSTONE_HAS_ARM
++CAP_CFLAGS += -DCAPSTONE_HAS_ARM64
++CAP_CFLAGS += -DCAPSTONE_HAS_POWERPC
++CAP_CFLAGS += -DCAPSTONE_HAS_X86
++
++subdir-capstone: .git-submodule-status
++	$(call quiet-command,$(MAKE) -C $(SRC_PATH)/capstone CAPSTONE_SHARED=no BUILDDIR="$(BUILD_DIR)/capstone" CC="$(CC)" AR="$(AR)" LD="$(LD)" CFLAGS="$(CAP_CFLAGS)" $(SUBDIR_MAKEFLAGS) $(BUILD_DIR)/capstone/$(LIBCAPSTONE))
++
+ $(SUBDIR_RULES): libqemuutil.a $(common-obj-y) $(chardev-obj-y) \
+ 	$(qom-obj-y) $(crypto-aes-obj-$(CONFIG_USER_ONLY))
+ 
+diff --git a/.gitmodules b/.gitmodules
+index 7c981a42b6..1500579638 100644
+--- a/.gitmodules
++++ b/.gitmodules
+@@ -37,3 +37,6 @@
+ [submodule "ui/keycodemapdb"]
+ 	path = ui/keycodemapdb
+ 	url = git://git.qemu.org/keycodemapdb.git
++[submodule "capstone"]
++	path = capstone
++	url = git://git.qemu.org/capstone.git
+diff --git a/capstone b/capstone
+new file mode 160000
+index 0000000000..22ead3e0bf
+--- /dev/null
++++ b/capstone
+@@ -0,0 +1 @@
++Subproject commit 22ead3e0bfdb87516656453336160e0a37b066bf
+diff --git a/configure b/configure
+index d06ad64058..23eddc2f50 100755
+--- a/configure
++++ b/configure
+@@ -1299,6 +1299,10 @@ for opt do
+   ;;
+   --enable-capstone) capstone="yes"
+   ;;
++  --enable-capstone=git) capstone="git"
++  ;;
++  --enable-capstone=system) capstone="system"
++  ;;
+   *)
+       echo "ERROR: unknown option $opt"
+       echo "Try '$0 --help' for more information"
+@@ -4419,18 +4423,54 @@ fi
+ ##########################################
+ # capstone
+ 
+-if test "$capstone" != no; then
+-  if $pkg_config capstone; then
+-    capstone=yes
++case "$capstone" in
++  "" | yes)
++    if $pkg_config capstone; then
++      capstone=system
++    elif test -e "${source_path}/.git" ; then
++      capstone=git
++    elif test -e "${source_path}/capstone/Makefile" ; then
++      capstone=internal
++    elif test -z "$capstone" ; then
++      capstone=no
++    else
++      feature_not_found "capstone" "Install capstone devel or git submodule"
++    fi
++    ;;
++
++  system)
++    if ! $pkg_config capstone; then
++      feature_not_found "capstone" "Install capstone devel"
++    fi
++    ;;
++esac
++
++case "$capstone" in
++  git | internal)
++    if test "$capstone" = git; then
++      git_submodules="${git_submodules} capstone"
++    fi
++    mkdir -p capstone
++    QEMU_CFLAGS="$QEMU_CFLAGS -I\$(SRC_PATH)/capstone/include"
++    if test "$mingw32" = "yes"; then
++      LIBCAPSTONE=capstone.lib
++    else
++      LIBCAPSTONE=libcapstone.a
++    fi
++    LIBS="-L\$(BUILD_DIR)/capstone -lcapstone $LIBS"
++    ;;
++
++  system)
+     QEMU_CFLAGS="$QEMU_CFLAGS $($pkg_config --cflags capstone)"
+     LIBS="$($pkg_config --libs capstone) $LIBS"
+-  else
+-    if test "$capstone" = yes; then
+-      feature_not_found capstone
+-    fi
+-    capstone=no
+-  fi
+-fi
++    ;;
++
++  no)
++    ;;
++  *)
++    error_exit "Unknown state for capstone: $capstone"
++    ;;
++esac
+ 
+ ##########################################
+ # check if we have fdatasync
+@@ -6165,7 +6205,7 @@ fi
+ if test "$ivshmem" = "yes" ; then
+   echo "CONFIG_IVSHMEM=y" >> $config_host_mak
+ fi
+-if test "$capstone" = "yes" ; then
++if test "$capstone" != "no" ; then
+   echo "CONFIG_CAPSTONE=y" >> $config_host_mak
+ fi
+ 
+@@ -6650,6 +6690,12 @@ done # for target in $targets
+ if [ "$dtc_internal" = "yes" ]; then
+   echo "config-host.h: subdir-dtc" >> $config_host_mak
+ fi
++if [ "$capstone" = "git" -o "$capstone" = "internal" ]; then
++  echo "config-host.h: subdir-capstone" >> $config_host_mak
++fi
++if test -n "$LIBCAPSTONE"; then
++  echo "LIBCAPSTONE=$LIBCAPSTONE" >> $config_host_mak
++fi
+ 
+ if test "$numa" = "yes"; then
+   echo "CONFIG_NUMA=y" >> $config_host_mak
+-- 
+2.13.6
