@@ -1,16 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56074)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60471)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gabriel291075@gmail.com>) id 1e7jIz-0007Jp-95
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 10:38:46 -0400
+	(envelope-from <xiechanglong.d@gmail.com>) id 1e7jVx-0007Z4-KE
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 10:52:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gabriel291075@gmail.com>) id 1e7jIy-0007m3-7x
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 10:38:45 -0400
-From: Gabriel Costa <gabriel291075@gmail.com>
-Date: Thu, 26 Oct 2017 06:34:13 -0400
-Message-Id: <1509014053-28134-7-git-send-email-costa@advantech.ca>
-In-Reply-To: <1509014053-28134-1-git-send-email-costa@advantech.ca>
-References: <1509014053-28134-1-git-send-email-costa@advantech.ca>
-Subject: [Qemu-devel] [PATCH v6]arm: Makefiles to kinetis k64 platform
+	(envelope-from <xiechanglong.d@gmail.com>) id 1e7jVw-0007VA-KA
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 10:52:09 -0400
+MIME-Version: 1.0
+In-Reply-To: <1508914283-2531-1-git-send-email-wang.guang55@zte.com.cn>
+References: <1508914283-2531-1-git-send-email-wang.guang55@zte.com.cn>
+From: Xie Changlong <xiechanglong.d@gmail.com>
+Date: Thu, 26 Oct 2017 22:52:06 +0800
+Message-ID: <CAOk4XWrCceEep-PU2tJ+Kax+Bp=C0=eLPqTCBw564DCj4wO3jA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] replication: Fix replication open fail
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,58 +22,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-arm@nongnu.org, peter.maydell@linaro.org, f4bug@amsat.org, Gabriel Augusto Costa <gabriel291075@gmail.com>
+To: Wang Guang <wang.guang55@zte.com.cn>, Kevin Wolf <kwolf@redhat.com>, Wen Congyang <wencongyang2@huawei.com>, Max Reitz <mreitz@redhat.com>
+Cc: Zhang Hailiang <zhang.zhanghailiang@huawei.com>, zhangckid@gmail.com, qemu-devel <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>, Wang Yong <wang.yong155@zte.com.cn>
 
-From: Gabriel Augusto Costa <gabriel291075@gmail.com>
+=E5=9C=A8 10/25/2017 2:51 PM, Wang Guang =E5=86=99=E9=81=93:
+> replication_child_perm request write
+> permissions for all child which will lead bdrv_check_perm fail.
+> replication_child_perm() should request write
+> permissions only if it is writable itself.
+>
+> Signed-off-by: Wang Guang <wang.guang55@zte.com.cn>
+> Signed-off-by: Wang Yong <wang.yong155@zte.com.cn>
 
-This file change the Makefiles to compile the mk64fn1m0 machine.
+Thanks, this patch fixs the problem in
+http://lists.nongnu.org/archive/html/qemu-devel/2017-08/msg03358.html.
 
-Signed-off-by: Gabriel Augusto Costa <gabriel291075@gmail.com>
----
- default-configs/arm-softmmu.mak | 1 +
- hw/arm/Makefile.objs            | 1 +
- hw/char/Makefile.objs           | 1 +
- hw/misc/Makefile.objs           | 3 +++
- 4 files changed, 6 insertions(+)
+Reviewed-by: Xie Changlong <xiechanglong@cmss.chinamobile.com>
 
-diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
-index 5059d13..a835d4f
---- a/default-configs/arm-softmmu.mak
-+++ b/default-configs/arm-softmmu.mak
-@@ -130,3 +130,4 @@ CONFIG_SMBIOS=y
- CONFIG_ASPEED_SOC=y
- CONFIG_GPIO_KEY=y
- CONFIG_MSF2=y
-+CONFIG_KINETIS_K64=y
-diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
-index 2794e08..874a38a
---- a/hw/arm/Makefile.objs
-+++ b/hw/arm/Makefile.objs
-@@ -20,3 +20,4 @@ obj-$(CONFIG_FSL_IMX6) += fsl-imx6.o sabrelite.o
- obj-$(CONFIG_ASPEED_SOC) += aspeed_soc.o aspeed.o
- obj-$(CONFIG_MPS2) += mps2.o
- obj-$(CONFIG_MSF2) += msf2-soc.o msf2-som.o
-+obj-$(CONFIG_KINETIS_K64) += mk64fn1m0.o
-diff --git a/hw/char/Makefile.objs b/hw/char/Makefile.objs
-index 1bcd37e..75b194c
---- a/hw/char/Makefile.objs
-+++ b/hw/char/Makefile.objs
-@@ -31,3 +31,4 @@ common-obj-$(CONFIG_SCLPCONSOLE) += sclpconsole.o sclpconsole-lm.o
- 
- obj-$(CONFIG_VIRTIO) += virtio-serial-bus.o
- obj-$(CONFIG_TERMINAL3270) += terminal3270.o
-+obj-$(CONFIG_KINETIS_K64) += kinetis_k64_uart.o
-diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-index 19202d9..c5c8589
---- a/hw/misc/Makefile.objs
-+++ b/hw/misc/Makefile.objs
-@@ -61,3 +61,6 @@ obj-$(CONFIG_AUX) += auxbus.o
- obj-$(CONFIG_ASPEED_SOC) += aspeed_scu.o aspeed_sdmc.o
- obj-y += mmio_interface.o
- obj-$(CONFIG_MSF2) += msf2-sysreg.o
-+obj-$(CONFIG_KINETIS_K64) += kinetis_k64_mcg.o
-+obj-$(CONFIG_KINETIS_K64) += kinetis_k64_pmux.o
-+obj-$(CONFIG_KINETIS_K64) += kinetis_k64_system.o
--- 
-2.1.4
+> ---
+>   block/replication.c | 11 +++++++----
+>   1 file changed, 7 insertions(+), 4 deletions(-)
+>
+> diff --git a/block/replication.c b/block/replication.c
+> index 3a4e682..1c95d67 100644
+> --- a/block/replication.c
+> +++ b/block/replication.c
+> @@ -161,10 +161,13 @@ static void replication_child_perm(BlockDriverState=
+ *bs, BdrvChild *c,
+>                                      uint64_t perm, uint64_t shared,
+>                                      uint64_t *nperm, uint64_t *nshared)
+>   {
+> -    *nperm =3D *nshared =3D BLK_PERM_CONSISTENT_READ \
+> -                        | BLK_PERM_WRITE \
+> -                        | BLK_PERM_WRITE_UNCHANGED;
+> -
+> +    *nperm =3D BLK_PERM_CONSISTENT_READ;
+> +    if ((bs->open_flags & (BDRV_O_INACTIVE | BDRV_O_RDWR)) =3D=3D BDRV_O=
+_RDWR) {
+> +        *nperm |=3D BLK_PERM_WRITE;
+> +    }
+> +    *nshared =3D BLK_PERM_CONSISTENT_READ \
+> +               | BLK_PERM_WRITE \
+> +               | BLK_PERM_WRITE_UNCHANGED;
+>       return;
+>   }
+>
+>
+
+--=20
+Thanks
+     -Xie
