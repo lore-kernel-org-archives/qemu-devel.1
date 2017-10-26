@@ -1,30 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51554)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51937)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e7j6p-0005YK-OL
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 10:26:15 -0400
+	(envelope-from <mst@redhat.com>) id 1e7j8F-0006k3-Cj
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 10:27:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e7j6l-0007Vx-UO
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 10:26:11 -0400
-Received: from mail-wm0-x22e.google.com ([2a00:1450:400c:c09::22e]:43868)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1e7j6l-0007VD-Ni
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 10:26:07 -0400
-Received: by mail-wm0-x22e.google.com with SMTP id m72so19652465wmc.0
-	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 07:26:07 -0700 (PDT)
+	(envelope-from <mst@redhat.com>) id 1e7j8C-0008SO-LW
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 10:27:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49146)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1e7j8C-0008R0-EA
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 10:27:36 -0400
+Date: Thu, 26 Oct 2017 17:27:31 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20171026172631-mutt-send-email-mst@kernel.org>
+References: <1502842933-8323-1-git-send-email-tianyu.lan@intel.com>
+	<34042934-782b-6bcc-b9b2-de7a1816cfb7@redhat.com>
+	<3ababa62-f055-5bbb-b9b9-c55ada8368dd@intel.com>
+	<20170818163854.GY3108@localhost.localdomain>
+	<471a4bdc-d381-4a70-0107-3150df6f5cf6@intel.com>
+	<20171026121943.GB26955@localhost.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <20171026100645.GA24581@redhat.com>
-References: <20171025123056.3165-1-richard.henderson@linaro.org>
-	<CAFEAcA99zpvcgk2EuXkrcOY+8rHeRkJhH4GqViJkEgQV3bdWFg@mail.gmail.com>
-	<CAFEAcA9XdoV0YVw+q7op_vafe9X0JTiQdYmGcmPgqRR3qhUYrQ@mail.gmail.com>
-	<20171026070608.GC5847@redhat.com>
-	<CAFEAcA8f7jJsM3=4bZG8fE_kTm6jueC-rF6ga0mdUvzMDSpLwQ@mail.gmail.com>
-	<20171026100645.GA24581@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 26 Oct 2017 15:25:45 +0100
-Message-ID: <CAFEAcA8BiPnA2d0bmjrMd6fJ9NwXnqbFtJt4WBofzpFEMaJ2rA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/11] Disassembler patches
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20171026121943.GB26955@localhost.localdomain>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] x86: Skip check apic_id_limit for Xen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,27 +32,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Richard Henderson <richard.henderson@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Lan Tianyu <tianyu.lan@intel.com>, qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, anthony.perard@citrix.com, Paolo Bonzini <pbonzini@redhat.com>, rth@twiddle.net
 
-On 26 October 2017 at 11:06, Daniel P. Berrange <berrange@redhat.com> wrote:
-> Do we really expect make/configure todo the right thing when going
-> backwards in time ?  I've always assumed that if you go back in time
-> when you need to do a 'git clean -f -x d' and re-run configure from
-> scratch. Certainly in the past various makefile changes in QEMU would
-> break, or silently not correctly recompile stuff when going backwards
-> in time.
+On Thu, Oct 26, 2017 at 02:19:43PM +0200, Eduardo Habkost wrote:
+> On Mon, Aug 21, 2017 at 10:22:15AM +0800, Lan Tianyu wrote:
+> > On 2017=E5=B9=B408=E6=9C=8819=E6=97=A5 00:38, Eduardo Habkost wrote:
+> > > On Thu, Aug 17, 2017 at 09:37:10AM +0800, Lan Tianyu wrote:
+> > >> On 2017=E5=B9=B408=E6=9C=8816=E6=97=A5 19:21, Paolo Bonzini wrote:
+> > >>> On 16/08/2017 02:22, Lan Tianyu wrote:
+> > >>>> Xen vIOMMU device model will be in Xen hypervisor. Skip vIOMMU
+> > >>>> check for Xen here when vcpu number is more than 255.
+> > >>>
+> > >>> I think you still need to do a check for vIOMMU being enabled.
+> > >>
+> > >> Yes, this will be done in the Xen tool stack and Qemu doesn't have=
+ such
+> > >> knowledge. Operations of create, destroy Xen vIOMMU will be done i=
+n the
+> > >> Xen tool stack.
+> > >=20
+> > > Shouldn't we make QEMU have knowledge of the vIOMMU device, then?
+> > > Won't QEMU need to know about it eventually?
+> > >=20
+> >=20
+> > Hi Eduardo:
+> >      Thanks for your review.
+> >      Xen has some guest modes which doesn't use Qemu and we tried to
+> > make Xen vIOMMU framework compatible with all guest modes. So far, we
+> > are adding interrupt remapping function for Xen vIOMMU and find qemu
+> > doesn't need to know Xen vIOMMU. The check of vcpu number > 255 here
+> > will be done in Xen side and so skip the check in Qemu to avoid block=
+ing
+> > Xen creating >255 vcpus.
+> >      We may make Qemu have knowledge of the vIOMMU device if it's
+> > necessary when adding new function.
+>=20
+> I was expecting it to go through the PC tree, but I will queue it
+> on x86-next instead.
 
-Yes. Occasionally we accidentally break this, as you note, and then
-git bisection across that kind of boundary requires a painful build
-from clean. But almost always bisection (across small spans of history)
-works without having to do that, as do things like "check out this
-branch I was working on a month ago and do a build without bothering
-to clean first".
+I was waiting for an ack from you or Paolo as you participated in the
+discussion. But sure, go ahead
 
-In this case you broke my standard workflow for rolling back from
-an attempted merge that didn't actually build, which IME is a pretty
-rare thing to have go wrong.
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
 
-thanks
--- PMM
+
+
+> --=20
+> Eduardo
