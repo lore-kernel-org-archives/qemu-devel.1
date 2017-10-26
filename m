@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52258)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56072)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Jason@zx2c4.com>) id 1e7kpA-0005xR-VQ
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 12:16:10 -0400
+	(envelope-from <bounces@canonical.com>) id 1e7l3w-0002AL-NG
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 12:31:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Jason@zx2c4.com>) id 1e7kp8-0001sb-Ae
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 12:16:04 -0400
+	(envelope-from <bounces@canonical.com>) id 1e7l3s-0003I6-HF
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 12:31:20 -0400
+Received: from indium.canonical.com ([91.189.90.7]:44548)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1e7l3s-0003Hn-Ay
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 12:31:16 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1e7l3q-0000y2-NU
+	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 16:31:14 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id AAD5F2E80CC
+	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 16:31:14 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8O6YyS1tSzaydckFpsqpb8HXgW5PJe-VTWud_5YGdW5A@mail.gmail.com>
-References: <20171023122719.17199-1-Jason@zx2c4.com>
-	<CAFEAcA_PM5Fjx2Pk58h75p9vaZwFcusQdXuwy9tbDtc=EaoOJg@mail.gmail.com>
-	<10e16ca3-175b-9f34-65e7-031b883b7201@amsat.org>
-	<CAHmME9qtBiuAEnkCeuMd7EdeZveTVa4UOf+AQhMCFye0SYJY=Q@mail.gmail.com>
-	<20171026133445.kemzfgvpbmtcogsl@kamzik.brq.redhat.com>
-	<CAHmME9oyBvAV8FF9QMHyF46n8Ct6KZqThQVih2ipQmivD94Cag@mail.gmail.com>
-	<CAFEAcA8O6YyS1tSzaydckFpsqpb8HXgW5PJe-VTWud_5YGdW5A@mail.gmail.com>
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date: Thu, 26 Oct 2017 18:15:57 +0200
-Message-ID: <CAHmME9pE79krWx-zD=VGiScT4c=4TZ1wVxYFiF3m+8wsx9Fqeg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH] hw/arm/virt: support 4 serial
- ports
+Date: Thu, 26 Oct 2017 16:11:05 -0000
+From: OIiver <1368178@bugs.launchpad.net>
+Reply-To: Bug 1368178 <1368178@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20140911114353.25076.30246.malonedeb@soybean.canonical.com>
+Message-Id: <150903426523.4453.5351702824693208039.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1368178] Re: Windows ME falsely detects qemu's
+ videocards as Number Nine Imagine 128
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,37 +37,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Andrew Jones <drjones@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, QEMU Trivial <qemu-trivial@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
-On Thu, Oct 26, 2017 at 4:36 PM, Peter Maydell <peter.maydell@linaro.org> w=
-rote:
-> This has *never* been guaranteed or indeed true. It's just happened
-> to be true for the x86 PC machine and perhaps for some others that
-> you've been using. For instance, the MIPS boston board only has
-> one uart. highbank has one. integratorcp has 2. The microblaze
-> boards only have one uart. And so on. In cases where we're
-> modelling real hardware, if the real board only has one UART
-> then we're only going to provide one UART, so in some cases you
-> just have to deal with that and have some way in your communication
-> protocol to multiplex across a single communications channel.
+I am still using Kubuntu 16.04.3 LTS and that is shipped with QEMU 2.5.0
 
-Interesting. Malta provides quite a few, which is what I'm using on
-MIPS, so I guess I've benefited from the uniformity. Since the ARM
-virt machine is virtual, it seems like it'd be worthwhile to make it
-broadly useful, and adding a few more serial outputs is basically
-free.
+# qemu-system-i386 --version
+QEMU emulator version 2.5.0 (Debian 1:2.5+dfsg-5ubuntu10.16)
 
-Right now on build.wireguard.com, I'm just using this horrendous patch
-that hopefully hurts to look at: https://=D7=90.cc/iKBdlvI3/patch (since I
-only need 2). The goal would be for everything else to remain the same
-in the deployment, but to not have to use that patch.
+I am not planning to go into the hassle to install QEMU latest on
+16.04.3 LTS.
+
+Could you delay the closing of the ticket until Kubuntu 18.04 LTS is releas=
+ed?
+Then i could test it with the QEMU version that will be shipped with Kubunt=
+u 18.04 LTS.
+
+As an alternative, i could also do the test with QEMU 2.5 instead.
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1368178
+
+Title:
+  Windows ME falsely detects qemu's videocards as Number Nine Imagine
+  128
+
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  A fresh installation of  Windows Millennium Edition (Windows ME,
+  WinME) as guest OS on qemu interprets qemu's videocards as Number Nine
+  Imagine  128 with the consequence, that
+
+  1. It is impossible to change color depth.
+  2. WinME uses the i128.drv Driver that is shipped with WinMe.
+  3. Forcing WinME to use other drivers has no effect.
+
+  =
+
+  It also doesn't matter what option for -vga was given to QEMU at command =
+line.
+  cirrus, std,   vmware,  qxl etc. all have no effect, the videocard detect=
+ed by Windows Me stays at Number Nine Imagine 128.
+
+  Even selecting another driver in WinME and forcing WinME to use
+  drivers such as the Cirrus Logic 5446 PCI driver has no effect.
+
+  I also want to mention, that the BIOS isn't detected by WinME properly.
+  The device manager of WinME shows errors with the Plug & Play BIOS driver=
+ BIOS.vxd.
+
+  =
+
+  That is the QEMU Version:
+
+  # qemu-system-i386 --version                                             =
+                                                                           =
+                                                  =
+
+  QEMU emulator version 2.0.0 (Debian 2.0.0+dfsg-2ubuntu1.3), Copyright (c)=
+ 2003-2008 Fabrice Bellard                  =
 
 
->> Could we just do the simple patch of adding four pl011s in there?
->
-> I'm still thinking about this. (You definitely can't have four,
-> though, because we already have 2 in the trustzone-enabled
-> config, so we can only add another 2.)
+  And this was the complete command line, that was given: =
 
-The trustzone one could be the 5th? Since it's only useful for trustzone.
+  # sudo /usr/bin/qemu-system-i386 -hda WinME_QEMU.img -cdrom drivers.iso -=
+boot c -no-acpi -no-hpet -soundhw sb16 -net nic -cpu pentium3 -m 256 -vga c=
+irrus
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1368178/+subscriptions
