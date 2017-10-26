@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44505)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44535)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1e7inS-0004xY-6A
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 10:06:15 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1e7inV-00051A-OJ
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 10:06:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1e7inN-0000N7-6D
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 10:06:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34870)
+	(envelope-from <ehabkost@redhat.com>) id 1e7inU-0000YM-Gu
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 10:06:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37708)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1e7inM-0000MN-U5
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 10:06:05 -0400
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1e7inU-0000X1-7s
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 10:06:12 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Thu, 26 Oct 2017 16:03:48 +0200
-Message-Id: <20171026140404.21948-24-ehabkost@redhat.com>
+Date: Thu, 26 Oct 2017 16:03:49 +0200
+Message-Id: <20171026140404.21948-25-ehabkost@redhat.com>
 In-Reply-To: <20171026140404.21948-1-ehabkost@redhat.com>
 References: <20171026140404.21948-1-ehabkost@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 23/39] xtensa: lx60/lx200/ml605/kc705: use
- generic cpu_model parsing
+Subject: [Qemu-devel] [PULL 24/39] unicore32: cleanup cpu type name
+ composition
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,78 +32,139 @@ Cc: qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>
 
 From: Igor Mammedov <imammedo@redhat.com>
 
+use new UNICORE32_CPU_TYPE_NAME to compose CPU type
+name and get rid of intermediate
+   UniCore32CPUInfo/uc32_cpu_register_types()
+which is replaced by static TypeInfo array and
+type_init_from_array()
+
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Message-Id: <1507211474-188400-27-git-send-email-imammedo@redhat.com>
+Message-Id: <1507211474-188400-28-git-send-email-imammedo@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- hw/xtensa/xtfpga.c | 11 +++++------
- 1 file changed, 5 insertions(+), 6 deletions(-)
+ target/unicore32/cpu.h |  3 +++
+ target/unicore32/cpu.c | 61 +++++++++++++++++---------------------------=
+------
+ 2 files changed, 23 insertions(+), 41 deletions(-)
 
-diff --git a/hw/xtensa/xtfpga.c b/hw/xtensa/xtfpga.c
-index a19ccebdba..1971ecfdc5 100644
---- a/hw/xtensa/xtfpga.c
-+++ b/hw/xtensa/xtfpga.c
-@@ -220,19 +220,14 @@ static void lx_init(const LxBoardDesc *board, Machi=
-neState *machine)
-     DriveInfo *dinfo;
-     pflash_t *flash =3D NULL;
-     QemuOpts *machine_opts =3D qemu_get_machine_opts();
--    const char *cpu_model =3D machine->cpu_model;
-     const char *kernel_filename =3D qemu_opt_get(machine_opts, "kernel")=
-;
-     const char *kernel_cmdline =3D qemu_opt_get(machine_opts, "append");
-     const char *dtb_filename =3D qemu_opt_get(machine_opts, "dtb");
-     const char *initrd_filename =3D qemu_opt_get(machine_opts, "initrd")=
-;
-     int n;
+diff --git a/target/unicore32/cpu.h b/target/unicore32/cpu.h
+index 7724108281..3dc6fbc6c7 100644
+--- a/target/unicore32/cpu.h
++++ b/target/unicore32/cpu.h
+@@ -167,6 +167,9 @@ static inline int cpu_mmu_index(CPUUniCore32State *en=
+v, bool ifetch)
 =20
--    if (!cpu_model) {
--        cpu_model =3D XTENSA_DEFAULT_CPU_MODEL;
--    }
+ #define cpu_init(cpu_model) cpu_generic_init(TYPE_UNICORE32_CPU, cpu_mod=
+el)
+=20
++#define UNICORE32_CPU_TYPE_SUFFIX "-" TYPE_UNICORE32_CPU
++#define UNICORE32_CPU_TYPE_NAME(model) model UNICORE32_CPU_TYPE_SUFFIX
++
+ static inline void cpu_get_tb_cpu_state(CPUUniCore32State *env, target_u=
+long *pc,
+                                         target_ulong *cs_base, uint32_t =
+*flags)
+ {
+diff --git a/target/unicore32/cpu.c b/target/unicore32/cpu.c
+index 526604ff78..17dc1504d7 100644
+--- a/target/unicore32/cpu.c
++++ b/target/unicore32/cpu.c
+@@ -44,7 +44,7 @@ static ObjectClass *uc32_cpu_class_by_name(const char *=
+cpu_model)
+     ObjectClass *oc;
+     char *typename;
+=20
+-    typename =3D g_strdup_printf("%s-" TYPE_UNICORE32_CPU, cpu_model);
++    typename =3D g_strdup_printf(UNICORE32_CPU_TYPE_NAME("%s"), cpu_mode=
+l);
+     oc =3D object_class_by_name(typename);
+     g_free(typename);
+     if (oc !=3D NULL && (!object_class_dynamic_cast(oc, TYPE_UNICORE32_C=
+PU) ||
+@@ -54,11 +54,6 @@ static ObjectClass *uc32_cpu_class_by_name(const char =
+*cpu_model)
+     return oc;
+ }
+=20
+-typedef struct UniCore32CPUInfo {
+-    const char *name;
+-    void (*instance_init)(Object *obj);
+-} UniCore32CPUInfo;
 -
-     for (n =3D 0; n < smp_cpus; n++) {
--        cpu =3D XTENSA_CPU(cpu_generic_init(TYPE_XTENSA_CPU, cpu_model))=
-;
-+        cpu =3D XTENSA_CPU(cpu_create(machine->cpu_type));
-         env =3D &cpu->env;
-=20
-         env->sregs[PRID] =3D n;
-@@ -454,6 +449,7 @@ static void xtensa_lx60_class_init(ObjectClass *oc, v=
-oid *data)
-     mc->desc =3D "lx60 EVB (" XTENSA_DEFAULT_CPU_MODEL ")";
-     mc->init =3D xtensa_lx60_init;
-     mc->max_cpus =3D 4;
-+    mc->default_cpu_type =3D XTENSA_DEFAULT_CPU_TYPE;
+ static void unicore_ii_cpu_initfn(Object *obj)
+ {
+     UniCore32CPU *cpu =3D UNICORE32_CPU(obj);
+@@ -90,11 +85,6 @@ static void uc32_any_cpu_initfn(Object *obj)
+     set_snan_bit_is_one(1, &env->ucf64.fp_status);
  }
 =20
- static const TypeInfo xtensa_lx60_type =3D {
-@@ -469,6 +465,7 @@ static void xtensa_lx200_class_init(ObjectClass *oc, =
-void *data)
-     mc->desc =3D "lx200 EVB (" XTENSA_DEFAULT_CPU_MODEL ")";
-     mc->init =3D xtensa_lx200_init;
-     mc->max_cpus =3D 4;
-+    mc->default_cpu_type =3D XTENSA_DEFAULT_CPU_TYPE;
+-static const UniCore32CPUInfo uc32_cpus[] =3D {
+-    { .name =3D "UniCore-II", .instance_init =3D unicore_ii_cpu_initfn }=
+,
+-    { .name =3D "any",        .instance_init =3D uc32_any_cpu_initfn },
+-};
+-
+ static void uc32_cpu_realizefn(DeviceState *dev, Error **errp)
+ {
+     CPUState *cs =3D CPU(dev);
+@@ -160,36 +150,25 @@ static void uc32_cpu_class_init(ObjectClass *oc, vo=
+id *data)
+     dc->vmsd =3D &vmstate_uc32_cpu;
  }
 =20
- static const TypeInfo xtensa_lx200_type =3D {
-@@ -484,6 +481,7 @@ static void xtensa_ml605_class_init(ObjectClass *oc, =
-void *data)
-     mc->desc =3D "ml605 EVB (" XTENSA_DEFAULT_CPU_MODEL ")";
-     mc->init =3D xtensa_ml605_init;
-     mc->max_cpus =3D 4;
-+    mc->default_cpu_type =3D XTENSA_DEFAULT_CPU_TYPE;
- }
+-static void uc32_register_cpu_type(const UniCore32CPUInfo *info)
+-{
+-    TypeInfo type_info =3D {
+-        .parent =3D TYPE_UNICORE32_CPU,
+-        .instance_init =3D info->instance_init,
+-    };
+-
+-    type_info.name =3D g_strdup_printf("%s-" TYPE_UNICORE32_CPU, info->n=
+ame);
+-    type_register(&type_info);
+-    g_free((void *)type_info.name);
+-}
++#define DEFINE_UNICORE32_CPU_TYPE(cpu_model, initfn) \
++    {                                                \
++        .parent =3D TYPE_UNICORE32_CPU,                \
++        .instance_init =3D initfn,                     \
++        .name =3D UNICORE32_CPU_TYPE_NAME(cpu_model),  \
++    }
 =20
- static const TypeInfo xtensa_ml605_type =3D {
-@@ -499,6 +497,7 @@ static void xtensa_kc705_class_init(ObjectClass *oc, =
-void *data)
-     mc->desc =3D "kc705 EVB (" XTENSA_DEFAULT_CPU_MODEL ")";
-     mc->init =3D xtensa_kc705_init;
-     mc->max_cpus =3D 4;
-+    mc->default_cpu_type =3D XTENSA_DEFAULT_CPU_TYPE;
- }
+-static const TypeInfo uc32_cpu_type_info =3D {
+-    .name =3D TYPE_UNICORE32_CPU,
+-    .parent =3D TYPE_CPU,
+-    .instance_size =3D sizeof(UniCore32CPU),
+-    .instance_init =3D uc32_cpu_initfn,
+-    .abstract =3D true,
+-    .class_size =3D sizeof(UniCore32CPUClass),
+-    .class_init =3D uc32_cpu_class_init,
++static const TypeInfo uc32_cpu_type_infos[] =3D {
++    {
++        .name =3D TYPE_UNICORE32_CPU,
++        .parent =3D TYPE_CPU,
++        .instance_size =3D sizeof(UniCore32CPU),
++        .instance_init =3D uc32_cpu_initfn,
++        .abstract =3D true,
++        .class_size =3D sizeof(UniCore32CPUClass),
++        .class_init =3D uc32_cpu_class_init,
++    },
++    DEFINE_UNICORE32_CPU_TYPE("UniCore-II", unicore_ii_cpu_initfn),
++    DEFINE_UNICORE32_CPU_TYPE("any", uc32_any_cpu_initfn),
+ };
 =20
- static const TypeInfo xtensa_kc705_type =3D {
+-static void uc32_cpu_register_types(void)
+-{
+-    int i;
+-
+-    type_register_static(&uc32_cpu_type_info);
+-    for (i =3D 0; i < ARRAY_SIZE(uc32_cpus); i++) {
+-        uc32_register_cpu_type(&uc32_cpus[i]);
+-    }
+-}
+-
+-type_init(uc32_cpu_register_types)
++DEFINE_TYPES(uc32_cpu_type_infos)
 --=20
 2.13.6
