@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54994)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60030)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1e7Xo3-0003R1-MF
-	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 22:22:04 -0400
+	(envelope-from <batmanustc@gmail.com>) id 1e7YYK-0007zT-T6
+	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 23:09:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1e7Xnz-0005gK-MX
-	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 22:22:03 -0400
-Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:45035)
+	(envelope-from <batmanustc@gmail.com>) id 1e7YYJ-0001i6-8Z
+	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 23:09:52 -0400
+Received: from mail-qt0-x22f.google.com ([2607:f8b0:400d:c0d::22f]:48590)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1e7Xnz-0005eJ-DN
-	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 22:21:59 -0400
-Received: by mail-pf0-x244.google.com with SMTP id x7so1396909pfa.1
-	for <qemu-devel@nongnu.org>; Wed, 25 Oct 2017 19:21:58 -0700 (PDT)
-References: <20171019021505.30576-1-aik@ozlabs.ru>
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Message-ID: <49acf956-eb59-2171-6c2c-23d69148efd8@ozlabs.ru>
-Date: Thu, 26 Oct 2017 13:21:53 +1100
+	(Exim 4.71) (envelope-from <batmanustc@gmail.com>)
+	id 1e7YYJ-0001hO-2w
+	for qemu-devel@nongnu.org; Wed, 25 Oct 2017 23:09:51 -0400
+Received: by mail-qt0-x22f.google.com with SMTP id f8so2642899qta.5
+	for <qemu-devel@nongnu.org>; Wed, 25 Oct 2017 20:09:51 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20171019021505.30576-1-aik@ozlabs.ru>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-AU
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH qemu v3] pci: Initialize pci_dev->name
- before use
+From: Sam <batmanustc@gmail.com>
+Date: Thu, 26 Oct 2017 11:09:49 +0800
+Message-ID: <CAOE=1Z31T6nHcO4P6GWW8GK_o0VB66HivPc-m1LZRh_x6nY_6g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: [Qemu-devel] Qemu start VM in huge page without '-mem-prealloc'
+ will get memory leak?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,57 +27,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
+To: QEMU Developers <qemu-devel@nongnu.org>
 
-On 19/10/17 13:15, Alexey Kardashevskiy wrote:
-> This moves pci_dev->name initialization earlier so
-> pci_dev->bus_master_as could get a name instead of an empty string.
-> 
-> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> Reviewed-by: Peter Xu <peterx@redhat.com>
-> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+For qemu-2.6.0, in huge page (1G) environment, after kill the qemu process,
+memory which is alloc for the vm could not be released. Detail is bellow.
+Or should I use some specific command to stop vm? I want to know if there
+someone has the same problem?
 
+The start up command is:
 
+CMD1="$QEMU_CMD -D qemu.log -trace events=qemu-events-all -enable-kvm -cpu
+qemu64,+vmx,+ssse3,+sse4.1,+sse4.2,+x2apic,+aes,+avx,+vme,
++pat,+ss,+pclmulqdq,+xsave,level=13 -machine pc,accel=kvm -chardev
+socket,id=hmqmondev,port=55908,host=127.0.0.1,nodelay,server,nowait -mon
+chardev=hmqmondev,id=hmqmon,mode=readline -rtc
+base=utc,clock=host,driftfix=none
+-usb -device usb-tablet -daemonize -nodefaults -nodefconfig
+-no-kvm-pit-reinjection -global kvm-pit.lost_tick_policy=discard -vga std
+-k en-us -smp 8 -name gangyewei-qemutime-1 -m 40960 -boot order=cdn -vnc
+:8,password -drive file=$DISK_0,if=none,id=drive_
+0,format=qcow2,cache=none,aio=native -device virtio-blk-pci,id=dev_drive_0,
+drive=drive_0,bus=pci.0,addr=0x5 -drive file=$DISK_1,if=none,id=drive_
+1,format=qcow2,cache=none,aio=native -device virtio-blk-pci,id=dev_drive_1,
+drive=drive_1,bus=pci.0,addr=0x6 -drive file=$DISK_2,if=none,id=drive_
+2,format=qcow2,cache=none,aio=native -device virtio-blk-pci,id=dev_drive_2,
+drive=drive_2,bus=pci.0,addr=0x7 -device ide-cd,drive=ide0-cd0,bus=ide.1,unit=1
+-drive id=ide0-cd0,media=cdrom,if=none -chardev socket,id=char-n-52b49b80,
+path=/usr/local/var/run/openvswitch/n-52b49b80,server -netdev
+type=vhost-user,id=n-52b49b80,chardev=char-n-52b49b80,vhostforce=on -device
+virtio-net-pci,netdev=n-52b49b80,mac=00:22:52:b4:9b:
+80,id=netdev-n-52b49b80,addr=0xf$(nic_speed 10000) -object
+memory-backend-file,id=mem,size=40960M,mem-path=/mnt/huge,share=on -numa
+node,memdev=mem -pidfile $PID_FILE -chardev socket,path=/opt/cloud/
+workspace/servers/4511f52a-f450-40d3-9417-a1e0a27ed507/qga.sock,server,nowait,id=qga0
+-device virtio-serial -device virtserialport,chardev=qga0,
+name=org.qemu.guest_agent.0"
 
-Ping?
+The stop script is just kill this process.
 
-> ---
-> 
-> Changes:
-> v3:
-> * more "reviewed-by"
-> * fixed spelling in commit log
-> 
-> v2:
-> * fixed mistype in the commit log
-> * added "rb"
-> ---
->  hw/pci/pci.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-> index 5ed3c8dca4..b2d139bd9a 100644
-> --- a/hw/pci/pci.c
-> +++ b/hw/pci/pci.c
-> @@ -1030,6 +1030,7 @@ static PCIDevice *do_pci_register_device(PCIDevice *pci_dev, PCIBus *bus,
->  
->      pci_dev->devfn = devfn;
->      pci_dev->requester_id_cache = pci_req_id_cache_get(pci_dev);
-> +    pstrcpy(pci_dev->name, sizeof(pci_dev->name), name);
->  
->      memory_region_init(&pci_dev->bus_master_container_region, OBJECT(pci_dev),
->                         "bus master container", UINT64_MAX);
-> @@ -1039,7 +1040,6 @@ static PCIDevice *do_pci_register_device(PCIDevice *pci_dev, PCIBus *bus,
->      if (qdev_hotplug) {
->          pci_init_bus_master(pci_dev);
->      }
-> -    pstrcpy(pci_dev->name, sizeof(pci_dev->name), name);
->      pci_dev->irq_state = 0;
->      pci_config_alloc(pci_dev);
->  
-> 
-
-
--- 
-Alexey
+the result of `cat /proc/meminfo` show memory is still there.
