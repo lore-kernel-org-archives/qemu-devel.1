@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59154)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59283)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1e7i3k-0000wZ-MN
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 09:19:00 -0400
+	(envelope-from <kwolf@redhat.com>) id 1e7i3u-000175-Nt
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 09:19:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1e7i3i-0002QO-33
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 09:18:56 -0400
+	(envelope-from <kwolf@redhat.com>) id 1e7i3q-0002Y0-O5
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 09:19:06 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Thu, 26 Oct 2017 15:17:33 +0200
-Message-Id: <20171026131741.5059-28-kwolf@redhat.com>
+Date: Thu, 26 Oct 2017 15:17:36 +0200
+Message-Id: <20171026131741.5059-31-kwolf@redhat.com>
 In-Reply-To: <20171026131741.5059-1-kwolf@redhat.com>
 References: <20171026131741.5059-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 27/35] qemu-img.1: Image invalidation on
- qemu-img commit
+Subject: [Qemu-devel] [PULL 30/35] iotests: Pull _filter_actual_image_size
+ from 67/87
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,36 +25,64 @@ Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
 From: Max Reitz <mreitz@redhat.com>
 
-qemu-img commit invalidates all images between base and top.  This
-should be mentioned in the man page.
+Tests 067 and 087 filter the actual image size because it depends on the
+host filesystem (and is not part of the respective test).  Since this is
+generally true, we should have a common filter function for this, so
+let's pull out the sed line from both tests into such a function.
 
-Suggested-by: Ping Li <pingl@redhat.com>
 Signed-off-by: Max Reitz <mreitz@redhat.com>
+Message-id: 20171009163456.485-2-mreitz@redhat.com
+Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Jeff Cody <jcody@redhat.com>
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- qemu-img.texi | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+ tests/qemu-iotests/067           | 2 +-
+ tests/qemu-iotests/087           | 2 +-
+ tests/qemu-iotests/common.filter | 6 ++++++
+ 3 files changed, 8 insertions(+), 2 deletions(-)
 
-diff --git a/qemu-img.texi b/qemu-img.texi
-index ee5c5940d3..fdcf120f36 100644
---- a/qemu-img.texi
-+++ b/qemu-img.texi
-@@ -274,11 +274,10 @@ If the backing chain of the given image file @var{filename} has more than one
- layer, the backing file into which the changes will be committed may be
- specified as @var{base} (which has to be part of @var{filename}'s backing
- chain). If @var{base} is not specified, the immediate backing file of the top
--image (which is @var{filename}) will be used. For reasons of consistency,
--explicitly specifying @var{base} will always imply @code{-d} (since emptying an
--image after committing to an indirect backing file would lead to different data
--being read from the image due to content in the intermediate backing chain
--overruling the commit target).
-+image (which is @var{filename}) will be used. Note that after a commit operation
-+all images between @var{base} and the top image will be invalid and may return
-+garbage data when read. For this reason, @code{-b} implies @code{-d} (so that
-+the top image stays valid).
+diff --git a/tests/qemu-iotests/067 b/tests/qemu-iotests/067
+index ee9595f0da..9d561ef786 100755
+--- a/tests/qemu-iotests/067
++++ b/tests/qemu-iotests/067
+@@ -56,7 +56,7 @@ _filter_qmp_events()
+ function run_qemu()
+ {
+     do_run_qemu "$@" 2>&1 | _filter_testdir | _filter_qmp | _filter_qemu \
+-                          | sed -e 's/\("actual-size":\s*\)[0-9]\+/\1SIZE/g' \
++                          | _filter_actual_image_size \
+                           | _filter_generated_node_ids | _filter_qmp_events
+ }
  
- @item compare [-f @var{fmt}] [-F @var{fmt}] [-T @var{src_cache}] [-p] [-s] [-q] @var{filename1} @var{filename2}
+diff --git a/tests/qemu-iotests/087 b/tests/qemu-iotests/087
+index f8e4903f4f..27ab6c5151 100755
+--- a/tests/qemu-iotests/087
++++ b/tests/qemu-iotests/087
+@@ -46,7 +46,7 @@ function run_qemu()
+ {
+     do_run_qemu "$@" 2>&1 | _filter_testdir | _filter_qmp \
+                           | _filter_qemu | _filter_imgfmt \
+-                          | sed -e 's/\("actual-size":\s*\)[0-9]\+/\1SIZE/g'
++                          | _filter_actual_image_size
+ }
  
+ size=128M
+diff --git a/tests/qemu-iotests/common.filter b/tests/qemu-iotests/common.filter
+index 227b37e941..873ca6b104 100644
+--- a/tests/qemu-iotests/common.filter
++++ b/tests/qemu-iotests/common.filter
+@@ -105,6 +105,12 @@ _filter_block_job_len()
+     sed -e 's/, "len": [0-9]\+,/, "len": LEN,/g'
+ }
+ 
++# replace actual image size (depends on the host filesystem)
++_filter_actual_image_size()
++{
++    sed -s 's/\("actual-size":\s*\)[0-9]\+/\1SIZE/g'
++}
++
+ # replace driver-specific options in the "Formatting..." line
+ _filter_img_create()
+ {
 -- 
 2.13.6
