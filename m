@@ -1,19 +1,12 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57081)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57463)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e7l7o-0003sF-34
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 12:35:21 -0400
+	(envelope-from <Jason@zx2c4.com>) id 1e7l9B-0004aS-Dd
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 12:36:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e7l7n-00063g-Bm
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 12:35:20 -0400
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:45274)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1e7l7m-00062h-Q4
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 12:35:19 -0400
-Received: by mail-wm0-x243.google.com with SMTP id q124so9143364wmb.0
-	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 09:35:18 -0700 (PDT)
+	(envelope-from <Jason@zx2c4.com>) id 1e7l97-0007QZ-B9
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 12:36:45 -0400
 MIME-Version: 1.0
-In-Reply-To: <CAHmME9pE79krWx-zD=VGiScT4c=4TZ1wVxYFiF3m+8wsx9Fqeg@mail.gmail.com>
+In-Reply-To: <CAFEAcA9XoeXDCQCmRBehntWSo0WGRBsaMDmC8QCqgU1K8jAF_A@mail.gmail.com>
 References: <20171023122719.17199-1-Jason@zx2c4.com>
 	<CAFEAcA_PM5Fjx2Pk58h75p9vaZwFcusQdXuwy9tbDtc=EaoOJg@mail.gmail.com>
 	<10e16ca3-175b-9f34-65e7-031b883b7201@amsat.org>
@@ -22,9 +15,10 @@ References: <20171023122719.17199-1-Jason@zx2c4.com>
 	<CAHmME9oyBvAV8FF9QMHyF46n8Ct6KZqThQVih2ipQmivD94Cag@mail.gmail.com>
 	<CAFEAcA8O6YyS1tSzaydckFpsqpb8HXgW5PJe-VTWud_5YGdW5A@mail.gmail.com>
 	<CAHmME9pE79krWx-zD=VGiScT4c=4TZ1wVxYFiF3m+8wsx9Fqeg@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 26 Oct 2017 17:34:56 +0100
-Message-ID: <CAFEAcA9XoeXDCQCmRBehntWSo0WGRBsaMDmC8QCqgU1K8jAF_A@mail.gmail.com>
+	<CAFEAcA9XoeXDCQCmRBehntWSo0WGRBsaMDmC8QCqgU1K8jAF_A@mail.gmail.com>
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date: Thu, 26 Oct 2017 18:36:37 +0200
+Message-ID: <CAHmME9qSJSPjANce_cWN6nm=qJsncfczgk7PoPa0xkOHmZjLUA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH] hw/arm/virt: support 4 serial
  ports
@@ -36,19 +30,13 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
+To: Peter Maydell <peter.maydell@linaro.org>
 Cc: Andrew Jones <drjones@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, QEMU Trivial <qemu-trivial@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 26 October 2017 at 17:15, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
-> On Thu, Oct 26, 2017 at 4:36 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
->> I'm still thinking about this. (You definitely can't have four,
->> though, because we already have 2 in the trustzone-enabled
->> config, so we can only add another 2.)
->
-> The trustzone one could be the 5th? Since it's only useful for trustzone.
+On Thu, Oct 26, 2017 at 6:34 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
+> Reordering it would break existing users of the trustzone uart,
+> whose command lines would stop working.
 
-Reordering it would break existing users of the trustzone uart,
-whose command lines would stop working.
-
-thanks
--- PMM
+I thought this was the reason for all of those virt26, virt28,etc
+types -- people who want stability code the revision into their
+scripts. Everybody else then gets the latest.
