@@ -1,27 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40298)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43427)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <batmanustc@gmail.com>) id 1e7eMl-0005f8-4x
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 05:22:20 -0400
+	(envelope-from <alistair23@gmail.com>) id 1e7ec9-0007jy-0c
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 05:38:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <batmanustc@gmail.com>) id 1e7eMg-0003R7-Of
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 05:22:19 -0400
-Received: from mail-qk0-x234.google.com ([2607:f8b0:400d:c09::234]:45839)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <batmanustc@gmail.com>)
-	id 1e7eMg-0003Qk-JH
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 05:22:14 -0400
-Received: by mail-qk0-x234.google.com with SMTP id f199so3423920qke.2
-	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 02:22:14 -0700 (PDT)
+	(envelope-from <alistair23@gmail.com>) id 1e7ec8-0005UW-1C
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 05:38:13 -0400
 MIME-Version: 1.0
-In-Reply-To: <CAOE=1Z2fEjHHAeAi2DA8kpP7Bc_iy0eY_KTDFFk01=0_Y+1jww@mail.gmail.com>
-References: <CAOE=1Z31T6nHcO4P6GWW8GK_o0VB66HivPc-m1LZRh_x6nY_6g@mail.gmail.com>
-	<CAOE=1Z2fEjHHAeAi2DA8kpP7Bc_iy0eY_KTDFFk01=0_Y+1jww@mail.gmail.com>
-From: Sam <batmanustc@gmail.com>
-Date: Thu, 26 Oct 2017 17:22:13 +0800
-Message-ID: <CAOE=1Z2Rjg3b7P1VJw6FDvnTwu7JtZWQ_PD4nBQgghpn1M=B6w@mail.gmail.com>
+In-Reply-To: <1508898544-10307-1-git-send-email-sundeep.lkml@gmail.com>
+References: <1508898544-10307-1-git-send-email-sundeep.lkml@gmail.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Thu, 26 Oct 2017 11:37:39 +0200
+Message-ID: <CAKmqyKPJ2Dh4skNnPBpkKFjAMB5Uh9vfy7FEMeiBNMatoKzhwg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] Qemu start VM in huge page without '-mem-prealloc'
- will get memory leak?
+Subject: Re: [Qemu-devel] [Qemu devel V4 PATCH] msf2: Remove dead code
+ reported by Coverity
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,64 +22,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>
+To: Subbaraya Sundeep <sundeep.lkml@gmail.com>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, darren.kenny@oracle.com
 
-I don't know if this process is:
-1. qemu call kernel API to alloc 40G memory.
-2. qemu process is killed by hand.
-3. kernel alloc 40G memory, but qemu process is down, then this 40G is left
-in kernel.
+On Wed, Oct 25, 2017 at 4:29 AM, Subbaraya Sundeep
+<sundeep.lkml@gmail.com> wrote:
+> Fixed incorrect frame size mask, validated maximum frame
+> size in spi_write and removed dead code.
+>
+> Signed-off-by: Subbaraya Sundeep <sundeep.lkml@gmail.com>
 
-2017-10-26 11:54 GMT+08:00 Sam <batmanustc@gmail.com>:
+Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
 
-> BTW, I start VM by this command, and then stop it, then memory leak
-> happens.
+> ---
+> v4:
+>         changed %d to %u while logging frame size error.
+> v3:
+>         Added comment that [31:6] bits are reserved in R_SPI_DFSIZE
+>         register and logged incorrect value too in guest error(suggested
+>         by Darren).
+> v2:
+>         else if -> else in set_fifodepth
+>         log guest error when frame size is more than 32
 >
-> To compare, I start another VM, and wait for about 10 minutes, and then
-> kill it as I does above, then no memory leak happens.
+>  hw/ssi/mss-spi.c | 18 ++++++++++++++----
+>  1 file changed, 14 insertions(+), 4 deletions(-)
 >
-> So is this a bug of KVM or qemu ?
+> diff --git a/hw/ssi/mss-spi.c b/hw/ssi/mss-spi.c
+> index 5a8e308..d60daba 100644
+> --- a/hw/ssi/mss-spi.c
+> +++ b/hw/ssi/mss-spi.c
+> @@ -76,9 +76,10 @@
+>  #define C_BIGFIFO            (1 << 29)
+>  #define C_RESET              (1 << 31)
 >
-> 2017-10-26 11:09 GMT+08:00 Sam <batmanustc@gmail.com>:
+> -#define FRAMESZ_MASK         0x1F
+> +#define FRAMESZ_MASK         0x3F
+>  #define FMCOUNT_MASK         0x00FFFF00
+>  #define FMCOUNT_SHIFT        8
+> +#define FRAMESZ_MAX          32
 >
->> For qemu-2.6.0, in huge page (1G) environment, after kill the qemu
->> process, memory which is alloc for the vm could not be released. Detail is
->> bellow.
->> Or should I use some specific command to stop vm? I want to know if there
->> someone has the same problem?
->>
->> The start up command is:
->>
->> CMD1="$QEMU_CMD -D qemu.log -trace events=qemu-events-all -enable-kvm
->> -cpu qemu64,+vmx,+ssse3,+sse4.1,+sse4.2,+x2apic,+aes,+avx,+vme,+p
->> at,+ss,+pclmulqdq,+xsave,level=13 -machine pc,accel=kvm -chardev
->> socket,id=hmqmondev,port=55908,host=127.0.0.1,nodelay,server,nowait -mon
->> chardev=hmqmondev,id=hmqmon,mode=readline -rtc
->> base=utc,clock=host,driftfix=none -usb -device usb-tablet -daemonize
->> -nodefaults -nodefconfig -no-kvm-pit-reinjection -global
->> kvm-pit.lost_tick_policy=discard -vga std -k en-us -smp 8 -name
->> gangyewei-qemutime-1 -m 40960 -boot order=cdn -vnc :8,password -drive
->> file=$DISK_0,if=none,id=drive_0,format=qcow2,cache=none,aio=native
->> -device virtio-blk-pci,id=dev_drive_0,drive=drive_0,bus=pci.0,addr=0x5
->> -drive file=$DISK_1,if=none,id=drive_1,format=qcow2,cache=none,aio=native
->> -device virtio-blk-pci,id=dev_drive_1,drive=drive_1,bus=pci.0,addr=0x6
->> -drive file=$DISK_2,if=none,id=drive_2,format=qcow2,cache=none,aio=native
->> -device virtio-blk-pci,id=dev_drive_2,drive=drive_2,bus=pci.0,addr=0x7
->> -device ide-cd,drive=ide0-cd0,bus=ide.1,unit=1 -drive
->> id=ide0-cd0,media=cdrom,if=none -chardev socket,id=char-n-52b49b80,path
->> =/usr/local/var/run/openvswitch/n-52b49b80,server -netdev
->> type=vhost-user,id=n-52b49b80,chardev=char-n-52b49b80,vhostforce=on
->> -device virtio-net-pci,netdev=n-52b49b80,mac=00:22:52:b4:9b:80,id=ne
->> tdev-n-52b49b80,addr=0xf$(nic_speed 10000) -object
->> memory-backend-file,id=mem,size=40960M,mem-path=/mnt/huge,share=on -numa
->> node,memdev=mem -pidfile $PID_FILE -chardev socket,path=/opt/cloud/
->> workspace/servers/4511f52a-f450-40d3-9417-a1e0a27ed507/qga.sock,server,nowait,id=qga0
->> -device virtio-serial -device virtserialport,chardev=qga0,na
->> me=org.qemu.guest_agent.0"
->>
->> The stop script is just kill this process.
->>
->> the result of `cat /proc/meminfo` show memory is still there.
->>
+>  static void txfifo_reset(MSSSpiState *s)
+>  {
+> @@ -104,10 +105,8 @@ static void set_fifodepth(MSSSpiState *s)
+>          s->fifo_depth = 32;
+>      } else if (size <= 16) {
+>          s->fifo_depth = 16;
+> -    } else if (size <= 32) {
+> -        s->fifo_depth = 8;
+>      } else {
+> -        s->fifo_depth = 4;
+> +        s->fifo_depth = 8;
+>      }
+>  }
 >
+> @@ -301,6 +300,17 @@ static void spi_write(void *opaque, hwaddr addr,
+>          if (s->enabled) {
+>              break;
+>          }
+> +        /*
+> +         * [31:6] bits are reserved bits and for future use.
+> +         * [5:0] are for frame size. Only [5:0] bits are validated
+> +         * during write, [31:6] bits are untouched.
+> +         */
+> +        if ((value & FRAMESZ_MASK) > FRAMESZ_MAX) {
+> +            qemu_log_mask(LOG_GUEST_ERROR, "%s: Incorrect size %u provided."
+> +                         "Maximum frame size is %u\n",
+> +                         __func__, value & FRAMESZ_MASK, FRAMESZ_MAX);
+> +            break;
+> +        }
+>          s->regs[R_SPI_DFSIZE] = value;
+>          break;
+>
+> --
+> 2.5.0
 >
