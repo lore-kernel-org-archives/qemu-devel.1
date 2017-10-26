@@ -1,22 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41718)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42715)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1e7ifw-0008HD-Rr
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 09:58:25 -0400
+	(envelope-from <bounces@canonical.com>) id 1e7iiW-0001F4-HP
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 10:01:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1e7ift-0008D1-LA
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 09:58:24 -0400
-Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:49415)
+	(envelope-from <bounces@canonical.com>) id 1e7iiT-0002rT-A3
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 10:01:04 -0400
+Received: from indium.canonical.com ([91.189.90.7]:57572)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1e7ift-0008Bc-Cm
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 09:58:21 -0400
-Received: by mail-wr0-x243.google.com with SMTP id g90so3260195wrd.6
-	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 06:58:21 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-Date: Thu, 26 Oct 2017 15:58:14 +0200
-Message-Id: <20171026135814.20773-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH] tcg: Avoid setting tcg_initialize if
- !CONFIG_TCG
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1e7iiT-0002qI-3g
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 10:01:01 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1e7iiR-000766-64
+	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 14:00:59 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 2CB042E80C9
+	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 14:00:59 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 26 Oct 2017 13:55:16 -0000
+From: Christophe Lyon <christophe.lyon+launchpad@gmail.com>
+Reply-To: Bug 1727737 <1727737@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150902607840.5143.15937446061017284272.malonedeb@chaenomeles.canonical.com>
+Message-Id: <150902611696.19943.13330574177366822897.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1727737] Re: qemu-arm stalls on a GCC sanitizer
+ test since qemu-2.7
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,89 +38,51 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: ehabkost@redhat.com, peter.maydell@linaro.org
 
-Fix the build for --disable-tcg.
+** Attachment added: "tarball with testcase and libs"
+   https://bugs.launchpad.net/qemu/+bug/1727737/+attachment/4996620/+files/=
+qemu-bug-gcc-sanitizers.tar.xz
 
-Fixes: 55c3ceef61fcf06fc98ddc752b7cce788ce7680b
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/arm/cpu.c            | 2 ++
- target/i386/cpu.c           | 2 ++
- target/mips/cpu.c           | 2 ++
- target/ppc/translate_init.c | 2 ++
- target/s390x/cpu.c          | 2 ++
- 5 files changed, 10 insertions(+)
+-- =
 
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index 056284985d..a7f03eabe8 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -1760,7 +1760,9 @@ static void arm_cpu_class_init(ObjectClass *oc, void *data)
- #endif
- 
-     cc->disas_set_info = arm_disas_set_info;
-+#ifdef CONFIG_TCG
-     cc->tcg_initialize = arm_translate_init;
-+#endif
- }
- 
- static void cpu_register(const ARMCPUInfo *info)
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 53ec94ac9b..2f556c0ea3 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -4212,7 +4212,9 @@ static void x86_cpu_common_class_init(ObjectClass *oc, void *data)
- #endif
-     cc->cpu_exec_enter = x86_cpu_exec_enter;
-     cc->cpu_exec_exit = x86_cpu_exec_exit;
-+#ifdef CONFIG_TCG
-     cc->tcg_initialize = tcg_x86_init;
-+#endif
- 
-     dc->user_creatable = true;
- }
-diff --git a/target/mips/cpu.c b/target/mips/cpu.c
-index 0ae70288dd..80812f3e08 100644
---- a/target/mips/cpu.c
-+++ b/target/mips/cpu.c
-@@ -198,7 +198,9 @@ static void mips_cpu_class_init(ObjectClass *c, void *data)
-     cc->vmsd = &vmstate_mips_cpu;
- #endif
-     cc->disas_set_info = mips_cpu_disas_set_info;
-+#ifdef CONFIG_TCG
-     cc->tcg_initialize = mips_tcg_init;
-+#endif
- 
-     cc->gdb_num_core_regs = 73;
-     cc->gdb_stop_before_watchpoint = true;
-diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
-index 13436e4760..61a9552c1c 100644
---- a/target/ppc/translate_init.c
-+++ b/target/ppc/translate_init.c
-@@ -10578,7 +10578,9 @@ static void ppc_cpu_class_init(ObjectClass *oc, void *data)
- #ifndef CONFIG_USER_ONLY
-     cc->virtio_is_big_endian = ppc_cpu_is_big_endian;
- #endif
-+#ifdef CONFIG_TCG
-     cc->tcg_initialize = ppc_translate_init;
-+#endif
- 
-     dc->fw_name = "PowerPC,UNKNOWN";
- }
-diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
-index 824dfd6b65..ae3cee91a2 100644
---- a/target/s390x/cpu.c
-+++ b/target/s390x/cpu.c
-@@ -497,7 +497,9 @@ static void s390_cpu_class_init(ObjectClass *oc, void *data)
- #endif
- #endif
-     cc->disas_set_info = s390_cpu_disas_set_info;
-+#ifdef CONFIG_TCG
-     cc->tcg_initialize = s390x_translate_init;
-+#endif
- 
-     cc->gdb_num_core_regs = S390_NUM_CORE_REGS;
-     cc->gdb_core_xml_file = "s390x-core64.xml";
--- 
-2.13.6
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1727737
+
+Title:
+  qemu-arm stalls on a GCC sanitizer test since qemu-2.7
+
+Status in QEMU:
+  New
+
+Bug description:
+  Hi,
+
+  I have noticed that several GCC/sanitizer tests fail with timeout when
+  executed under QEMU.
+
+  After a bit of investigation, I have noticed that this worked with
+  qemu-2.7, and started failing with qemu-2.8, and still fails with
+  qemu-2.10.1
+
+  I'm attaching a tarball containing:
+  alloca_instruments_all_paddings.exe : the testcase, and the needed libs:
+  lib/librt.so.1
+  lib/libdl.so.2
+  lib/ld-linux-armhf.so.3
+  lib/libasan.so.5
+  lib/libc.so.6
+  lib/libgcc_s.so.1
+  lib/libpthread.so.0
+  lib/libm.so.6
+
+  To reproduce the problem:
+  $ qemu-arm -cpu any -R 0 -L $PWD $PWD/alloca_instruments_all_paddings.exe
+  returns in less than a second with qemu-2.7, and never with qemu-2.8
+
+  Using -d in_asm suggests that the program "almost" completes and qemu see=
+ms to stall on:
+  0x40b6eb44: e08f4004 add r4, pc, r4
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1727737/+subscriptions
