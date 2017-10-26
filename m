@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39134)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39513)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1e7cKZ-00059p-U0
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 03:11:56 -0400
+	(envelope-from <darren.kenny@oracle.com>) id 1e7cM3-0005ul-5x
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 03:13:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1e7cKW-0005S2-OQ
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 03:11:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51676)
+	(envelope-from <darren.kenny@oracle.com>) id 1e7cM0-00069b-1F
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 03:13:27 -0400
+Received: from aserp1040.oracle.com ([141.146.126.69]:39912)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1e7cKW-0005RE-FM
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 03:11:52 -0400
-References: <BC29A004BA570342A4CC0044A3845572CFCE5592@H3CMLB12-EX.srv.huawei-3com.com>
-	<20171025133115.GA23458@lemon>
-	<BC29A004BA570342A4CC0044A3845572CFCE5962@H3CMLB12-EX.srv.huawei-3com.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <f10f73b8-6b6b-a30e-a147-b7fcaa28b182@redhat.com>
-Date: Thu, 26 Oct 2017 09:11:46 +0200
+	(Exim 4.71) (envelope-from <darren.kenny@oracle.com>)
+	id 1e7cLz-00068P-Nu
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 03:13:23 -0400
+Date: Thu, 26 Oct 2017 08:13:17 +0100
+From: Darren Kenny <darren.kenny@oracle.com>
+Message-ID: <20171026071317.y3qjb2rsire25bz3@starbug-vm.ie.oracle.com>
+References: <20171026013445.45605-1-aik@ozlabs.ru>
 MIME-Version: 1.0
-In-Reply-To: <BC29A004BA570342A4CC0044A3845572CFCE5962@H3CMLB12-EX.srv.huawei-3com.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="xcxxtJarGcoTRq9EuvUmoVOa5BvDeiAPq"
-Subject: Re: [Qemu-devel] Block format 'raw' does not support the option
- 'locking' when disable image locking with option locking=off
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20171026013445.45605-1-aik@ozlabs.ru>
+Subject: Re: [Qemu-devel] [PATCH qemu v2] git-submodule.sh: Do not try
+ writing to source directory if not necessary
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,55 +28,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Changlimin <changlimin@h3c.com>, Fam Zheng <famz@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---xcxxtJarGcoTRq9EuvUmoVOa5BvDeiAPq
-From: Max Reitz <mreitz@redhat.com>
-To: Changlimin <changlimin@h3c.com>, Fam Zheng <famz@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Message-ID: <f10f73b8-6b6b-a30e-a147-b7fcaa28b182@redhat.com>
-Subject: Re: [Qemu-devel] Block format 'raw' does not support the option
- 'locking' when disable image locking with option locking=off
-References: <BC29A004BA570342A4CC0044A3845572CFCE5592@H3CMLB12-EX.srv.huawei-3com.com>
- <20171025133115.GA23458@lemon>
- <BC29A004BA570342A4CC0044A3845572CFCE5962@H3CMLB12-EX.srv.huawei-3com.com>
-In-Reply-To: <BC29A004BA570342A4CC0044A3845572CFCE5962@H3CMLB12-EX.srv.huawei-3com.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Hi Alexey,
 
-On 2017-10-26 03:06, Changlimin wrote:
-> share-rw=3Don is good for raw format file, but bad for qcow2 format fil=
-e:
->=20
-> Failed to get "write" lock
-> Is another process using the image?
->=20
-> Is this intented?
+On Thu, Oct 26, 2017 at 12:34:45PM +1100, Alexey Kardashevskiy wrote:
+>The new git-submodule.sh script writes .git-submodule-status to
+>the source directory every time no matter what. This makes it conditional.
+>
+>Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+>---
+>Changes:
+>v2:
+>* fixed "status" branch too
+>---
+> scripts/git-submodule.sh | 15 ++++++++++-----
+> 1 file changed, 10 insertions(+), 5 deletions(-)
+>
+>diff --git a/scripts/git-submodule.sh b/scripts/git-submodule.sh
+>index d8fbc7e47e..ae038d2e58 100755
+>--- a/scripts/git-submodule.sh
+>+++ b/scripts/git-submodule.sh
+>@@ -23,16 +23,21 @@ then
+>     exit 1
+> fi
+>
+>+substat_tmp=$(mktemp)
+>+
+> case "$command" in
+> status)
+>     test -f "$substat" || exit 1
+>-    trap "rm -f ${substat}.tmp" EXIT
+>-    git submodule status $modules > "${substat}.tmp"
+>-    diff "${substat}" "${substat}.tmp" >/dev/null
+>-    exit $?
+>+    git submodule status $modules > "$substat_tmp"
+>+    diff "${substat_tmp}" "${substat}" > /dev/null
+>     ;;
+> update)
+>     git submodule update --init $modules 1>/dev/null 2>&1
+>-    git submodule status $modules > "${substat}"
+>+    git submodule status $modules > "$substat_tmp"
+>+    diff "${substat_tmp}" "${substat}" || mv "${substat_tmp}" "${substat}"
 
-Yes, because you can never share qcow2 image files between VMs.  The
-qcow2 format itself does not support this, as it may lead to metadata
-corruption.
+Maybe you intended this, but the diff output here will be output to
+the screen - if you don't mean this to happen you might want to
+redirect the output.
 
-Max
+>From other lines it looks like you would prefer it wasn't output.
+
+>     ;;
+> esac
+>+
+>+myret=$?
+
+Any small change is likely to break the value of myret here.
+
+You may want to put the above assignment as directly below the
+commands that you want to record as the exit status, and maybe
+initialize it before the case statement to the default value.
+
+For example, if somehow (not sure it's possible today) $command was
+not one of the values in the case statement, the value of $? here
+would be the return value of mktemp, which may not be your
+intention.
 
 
---xcxxtJarGcoTRq9EuvUmoVOa5BvDeiAPq
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+>+rm "${substat_tmp}" 2>/dev/null
 
------BEGIN PGP SIGNATURE-----
+Rather than doing this redirect, a simple rm -f will achieve what
+you want here - that is why makefiles tend to use it.
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlnxirISHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9ABA0H/07M1/RRe4us+Y1tKI3KiIYBuejK/kVf
-xm5vWNT5oO/a74mN03Svop++9TDAGk+R3ZXO6n6+Hfy6CFewc2a5kX3BzCsDr+8U
-Xe9F0ROK6d8iY/ZTxQEifSO0WI7fOZB5lCgAxUMbIJGrp6BbGs01dLXxFIhWsB4s
-Ydv6Ec0diC+7ebK5A4AoBZryz2ZLrHSKFWlFX93yd2ulWv1Tkurvn/msqKFmKTFZ
-FGqsglzOqa7VkQmDIDjWCvNR/lAJwnSl79cKyz7ao6TLoY830cx3pHjqQ2Wpb0xg
-U6jwymDsAAP+5q+iNH4CaCfu0NhSIy3/cSGMjl4PYalzLcrfjGrt+fA=
-=HScl
------END PGP SIGNATURE-----
+Thanks,
 
---xcxxtJarGcoTRq9EuvUmoVOa5BvDeiAPq--
+Darren.
+
+>+exit $myret
+>-- 
+>2.11.0
+>
+>
