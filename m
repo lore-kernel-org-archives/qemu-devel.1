@@ -1,31 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60813)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35086)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1e7jXG-0008KK-HK
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 10:53:32 -0400
+	(envelope-from <mst@redhat.com>) id 1e7jiQ-0002qR-Ae
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 11:05:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1e7jXB-00087L-JU
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 10:53:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34540)
+	(envelope-from <mst@redhat.com>) id 1e7jiK-000871-1q
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 11:05:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53738)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1e7jXB-00086z-9x
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 10:53:25 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 23A264E906
-	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 14:53:24 +0000 (UTC)
-Date: Thu, 26 Oct 2017 17:53:12 +0300
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1e7jiJ-00086G-Os
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 11:04:55 -0400
+Date: Thu, 26 Oct 2017 18:04:45 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20171026173918-mutt-send-email-mst@kernel.org>
-References: <20171026124425.17957-1-jfreimann@redhat.com>
-	<20171026124425.17957-3-jfreimann@redhat.com>
+Message-ID: <20171026180427-mutt-send-email-mst@kernel.org>
+References: <20171013111403.293919fe@t450s.home>
+	<20171015035318.GA22780@pxdev.xzpeter.org>
+	<c4d07be9-7d9b-71fa-e84c-e393138f7a84@oracle.com>
+	<20171017035604.GJ4166@pxdev.xzpeter.org>
+	<2c478fc6-bb9a-3ac3-1f5d-c853b13dc8a1@oracle.com>
+	<20171019033359.GR4166@pxdev.xzpeter.org>
+	<a5eb5b41-a490-11dc-450c-86983460cd5b@oracle.com>
+	<20171023063759.GE3990@pxdev.xzpeter.org>
+	<d2b2e250-9493-5e08-16a8-f410e51d2bf0@oracle.com>
+	<20171026083057.GB6526@pxdev.xzpeter.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20171026124425.17957-3-jfreimann@redhat.com>
-Subject: Re: [Qemu-devel] [v3 2/2] tests/pxe-test: add testcase using
- vhost-user-bridge
+In-Reply-To: <20171026083057.GB6526@pxdev.xzpeter.org>
+Subject: Re: [Qemu-devel] host physical address width issues/questions for
+ x86_64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,205 +36,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jens Freimann <jfreimann@redhat.com>
-Cc: qemu-devel@nongnu.org, victork@redhat.com, maxime.coquelin@redhat.com, jasowang@redhat.com, stefanha@redhat.com
+To: Peter Xu <peterx@redhat.com>
+Cc: Prasad Singamsetty <prasad.singamsetty@oracle.com>, ehabkost@redhat.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org, Alex Williamson <alex.williamson@redhat.com>, Sunit Jain <sunit.jain@oracle.com>, pbonzini@redhat.com, rth@twiddle.net
 
-On Thu, Oct 26, 2017 at 02:44:25PM +0200, Jens Freimann wrote:
-> From: Jens Freimann <jfreiman@redhat.com>
+On Thu, Oct 26, 2017 at 04:30:57PM +0800, Peter Xu wrote:
+> On Mon, Oct 23, 2017 at 10:23:43AM -0700, Prasad Singamsetty wrote:
 > 
-> Add a PXE testcase tunneling traffic through vhost-user-bridge process.
-> Create a vhost-user-bridge process and connect it to qemu via a socket.
+> [...]
 > 
-> Signed-off-by: Jens Freimann <jfreimann@redhat.com>
-> ---
->  tests/Makefile.include |   4 +-
->  tests/pxe-test.c       | 111 +++++++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 114 insertions(+), 1 deletion(-)
+> > >>Proposal:
+> > >>
+> > >>We can simply change the VTD_HOST_ADDRESS_WIDTH to 48 bits
+> > >>with out any other changes to the code. The current set of
+> > >>features in the intel iommu emulator code works for q35
+> > >>machine type and it doesn't have any other side effect.
+> > >>Since the remapping tables are allocated by the guest kernel
+> > >>they are always within the phys-bits range and as long
+> > >>as the same range supported by intel iommu code in QEMU
+> > >>it works fine. For the current q35 machine type, all the
+> > >>supported cpus have <= 48 bits as the physical address
+> > >>width. For short term, just changing the VTD_HOST_ADDRESS_WIDTH
+> > >>to 48 should work fine for q35. I tried this and it seems
+> > >>to work fine.
+> > >
+> > >I'm fine to change that macro, but IMHO only changing that line may
+> > >break backward compatibility of old guests (at least it'll change the
+> > >max address width reported in ACPI).  So I am not sure that's good.
+> > 
+> > Could you refer to any specifics on compatibility issues with old
+> > guests?  The guest linux kernel doesn't seem to report any problem
+> > with address width in DMAR reported doesn't match with what is
+> > supported in the host cpu. I would like to better understand the gaps
+> > we have here.
 > 
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index 70dc711bca..6cdb783753 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -740,7 +740,8 @@ tests/boot-order-test$(EXESUF): tests/boot-order-test.o $(libqos-obj-y)
->  tests/boot-serial-test$(EXESUF): tests/boot-serial-test.o $(libqos-obj-y)
->  tests/bios-tables-test$(EXESUF): tests/bios-tables-test.o \
->  	tests/boot-sector.o tests/acpi-utils.o $(libqos-obj-y)
-> -tests/pxe-test$(EXESUF): tests/pxe-test.o tests/boot-sector.o $(libqos-obj-y)
-> +tests/pxe-test$(EXESUF): tests/pxe-test.o tests/boot-sector.o \
-> +    tests/vhost-user-bridge$(EXESUF) $(libqos-obj-y)
->  tests/tmp105-test$(EXESUF): tests/tmp105-test.o $(libqos-omap-obj-y)
->  tests/ds1338-test$(EXESUF): tests/ds1338-test.o $(libqos-imx-obj-y)
->  tests/m25p80-test$(EXESUF): tests/m25p80-test.o
-> @@ -849,6 +850,7 @@ $(patsubst %, check-qtest-%, $(QTEST_TARGETS)): check-qtest-%: subdir-%-softmmu
->  	$(if $(CONFIG_GCOV),@rm -f *.gcda */*.gcda */*/*.gcda */*/*/*.gcda,)
->  	$(call quiet-command,QTEST_QEMU_BINARY=$*-softmmu/qemu-system-$* \
->  		QTEST_QEMU_IMG=qemu-img$(EXESUF) \
-> +		QTEST_VUBR_BINARY=./tests/vhost-user-bridge$(EXESUF) \
->  		MALLOC_PERTURB_=$${MALLOC_PERTURB_:-$$(( $${RANDOM:-0} % 255 + 1))} \
->  		gtester $(GTESTER_OPTIONS) -m=$(SPEED) $(check-qtest-$*-y) $(check-qtest-generic-y),"GTESTER","$@")
->  	$(if $(CONFIG_GCOV),@for f in $(gcov-files-$*-y) $(gcov-files-generic-y); do \
-> diff --git a/tests/pxe-test.c b/tests/pxe-test.c
-> index 937f29e631..d2646ee86d 100644
-> --- a/tests/pxe-test.c
-> +++ b/tests/pxe-test.c
-> @@ -7,6 +7,7 @@
->   *  Michael S. Tsirkin <mst@redhat.com>,
->   *  Victor Kaplansky <victork@redhat.com>
->   *  Thomas Huth <thuth@redhat.com>
-> + *  Jens Freimann <jfreiman@redhat.com>
->   *
->   * This work is licensed under the terms of the GNU GPL, version 2 or later.
->   * See the COPYING file in the top-level directory.
-> @@ -14,14 +15,123 @@
->  
->  #include "qemu/osdep.h"
->  #include <glib/gstdio.h>
-> +#include <glib.h>
->  #include "qemu-common.h"
->  #include "libqtest.h"
->  #include "boot-sector.h"
->  
-> +#define LPORT 5555
+> I mean for example when an old vIOMMU-enabled QEMU migrates to this
+> new QEMU.  When the guest first probes the DMAR device using the old
+> QEMU it should have seen 39 bits GAW, but after the migration to your
+> new QEMU instance it'll become 48 bits.  This can confuse the guest in
+> some way.  I'm not sure whether that would be a real problem but I
+> would rather just introduce the new property for 48 bits to avoid that
+> problem.
 
-Is this used anywhere?
+Right.
 
-> +#define RPORT 4444
-
-Using a known port is problematic as you can't run
-many instances of the test then. I think you want an option
-to bind in the parent.
-
->  #define NETNAME "net0"
-> +#define QEMU_CMD_MEM    "--enable-kvm -m %d "\
-
-enable-kvm won't work on boxes without kvm.
-Pls use same technique as other tests to only use kvm
-when available.
-
-> +                        "-object memory-backend-file,id=mem,size=%dM,"\
-> +                        "mem-path=%s,share=on -numa node,memdev=mem -mem-prealloc "
-
-Do we really need prealloc? And why?
-
-> +#define QEMU_CMD_CHR    " -chardev socket,id=%s,path=%s"
-> +#define QEMU_CMD_NETDEV " -device virtio-net-pci,netdev=net0 "\
-> +                        " -netdev vhost-user,id=net0,chardev=%s,vhostforce "\
-> +                        " -netdev user,id=n0,tftp=./,bootfile=%s "\
-> +                        " -netdev socket,id=n1,fd=%d"
-> +#define QEMU_CMD_NET    " -device virtio-net-pci,netdev=n0 "\
-> +                        " -device virtio-net-pci,netdev=n1 "
-> +
-> +#define QEMU_CMD        QEMU_CMD_MEM QEMU_CMD_CHR \
-> +                        QEMU_CMD_NETDEV QEMU_CMD_NET
-> +
-> +#define VUBR_SOCK "vubr.sock"
-> +#define MEMSZ 1024
->  
->  static char disk[] = "tests/pxe-test-disk-XXXXXX";
->  
-> +static int vubr_create_socket(struct sockaddr_in *si_remote, int rport)
-> +{
-> +    int sock;
-> +
-> +    si_remote->sin_addr.s_addr = htonl(INADDR_LOOPBACK);
-> +    sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-> +    if (sock == -1) {
-> +        g_test_message("socket creation failed\n");
-> +        return -1;
-> +    }
-> +    if (connect(sock, (struct sockaddr *) si_remote, sizeof(*si_remote))) {
-> +        g_test_message("connect failed: %s", strerror(errno));
-> +        return -1;
-> +    }
-> +
-> +    return sock;
-> +}
-> +
-> +static void vubr_watch(GPid pid, gint status, gpointer data)
-> +{
-> +    g_assert_cmpint(status, ==, 0);
-> +    g_spawn_close_pid(pid);
-> +}
-> +
-> +static void abrt_handler(void *data)
-> +{
-> +    int *pid = data;
-> +
-> +    g_spawn_close_pid(*pid);
-> +    kill(*pid, SIGTERM);
-> +    waitpid(*pid, NULL, 0);
-> +}
-> +
-> +static void test_pxe_vhost_user(void)
-> +{
-> +    char template[] = "/tmp/vhost-user-bridge-XXXXXX";
-> +    gchar * vubr_args[] = {NULL, NULL, NULL, NULL};
-> +    struct sockaddr_in si_remote = {
-> +        .sin_family = AF_INET,
-> +        .sin_port = htons(RPORT),
-> +    };
-> +    const char *hugefs = NULL;
-> +    const char *tmpfs = NULL;
-> +    GError *error = NULL;
-> +    char *vubr_binary;
-> +    char *qemu_args;
-> +    GPid vubr_pid;
-> +    int sock = -1;
-> +
-> +    qtest_add_abrt_handler(abrt_handler, &vubr_pid);
-> +    tmpfs = mkdtemp(template);
-> +    if (!tmpfs) {
-> +        g_test_message("mkdtemp on path(%s): %s\n",
-> +                       template, strerror(errno));
-> +    }
-
-defer above until we know it's used (no hugetlbfs?)
-
-> +    vubr_binary = getenv("QTEST_VUBR_BINARY");
-> +    g_assert(vubr_binary);
-> +    vubr_args[0] = g_strdup_printf("%s", vubr_binary);
-> +    vubr_args[1] = g_strdup_printf("-u");
-> +    vubr_args[2] = g_strdup_printf("%s/%s", tmpfs, VUBR_SOCK);
-> +    g_spawn_async(NULL, vubr_args, NULL,
-> +                  G_SPAWN_SEARCH_PATH |
-> +                  G_SPAWN_DO_NOT_REAP_CHILD,
-> +                  NULL, NULL, &vubr_pid, &error);
-> +    g_assert_no_error(error);
-> +    g_child_watch_add(vubr_pid, vubr_watch, NULL);
-> +
-> +    hugefs = getenv("QTEST_HUGETLBFS_PATH");
-> +    if (!hugefs) {
-> +        hugefs = tmpfs;
-> +    }
-> +    sock = vubr_create_socket(&si_remote, RPORT);
-> +    g_assert_cmpint(sock, !=, -1);
-> +    qemu_args = g_strdup_printf(QEMU_CMD, MEMSZ, MEMSZ, (hugefs),
-> +                                "char0", vubr_args[2], "char0",
-> +                                disk, sock);
-> +    qtest_start(qemu_args);
-> +    boot_sector_test();
-> +    qtest_quit(global_qtest);
-> +    g_free(qemu_args);
-> +    g_free(vubr_args[0]);
-> +    g_free(vubr_args[1]);
-> +    g_free(vubr_args[2]);
-> +    g_assert_cmpint(g_remove(g_strdup_printf("%s/%s", tmpfs, VUBR_SOCK)),
-> +                    ==, 0);
-> +    g_assert_cmpint(g_remove(g_strdup_printf("%s", disk)), ==, 0);
-> +    g_assert_cmpint(g_rmdir(tmpfs), ==, 0);
-> +    g_assert_cmpint(kill(vubr_pid, SIGTERM), ==, 0);
-> +}
-> +
->  static void test_pxe_one(const char *params, bool ipv6)
->  {
->      char *args;
-> @@ -77,6 +187,7 @@ int main(int argc, char *argv[])
->              qtest_add_data_func("pxe/pcnet", "pcnet", test_pxe_ipv4);
->              qtest_add_data_func("pxe/rtl8139", "rtl8139", test_pxe_ipv4);
->              qtest_add_data_func("pxe/vmxnet3", "vmxnet3", test_pxe_ipv4);
-> +            qtest_add_func("pxe/vhost-user", test_pxe_vhost_user);
->          }
->      } else if (strcmp(arch, "ppc64") == 0) {
->          qtest_add_func("pxe/spapr-vlan", test_pxe_spapr_vlan);
+> > 
+> > What other machine types intel iommu is supported with the current
+> > implementation? Is there any test suite that can test intel iommu
+> > functionality on supported guest types?
+> 
+> I don't think there are lots of tests on VT-d emulation.  There are a
+> few in kvm-unit-tests for the simplest DMAR and IR tests though, but I
+> don't think they are checking against compatibility problems.
+> 
+> Thanks,
+> 
+> > 
+> > >
+> > >I would prefer still using the new property ("x-aw-bits", or change
+> > >the name as you prefer) when people really want the 48 bits address
+> > >width, or even bigger ones in the future.  It makes sure that 39 bits
+> > >are still the default.
+> > >
+> > >CCing Michael who maintains VT-d emulation codes.
+> > 
+> > Thanks.
+> > --Prasad
+> > 
+> > >
+> > >>
+> > >>For long term, the VTD_HOST_ADDRESS_WIDTH has to match with
+> > >>host cpu address width. If necessary we may need to define
+> > >>a new machine type to keep VTD_HOST_ADDRESS_WIDTH value to
+> > >>match with the host cpu.
+> > >>
+> > >>Please let me know if you have any comments or suggestions
+> > >>on this.
+> > >
+> > >Thanks,
+> > >
+> 
 > -- 
-> 2.13.6
+> Peter Xu
