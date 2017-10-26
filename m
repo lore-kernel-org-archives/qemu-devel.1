@@ -1,31 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36993)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37209)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e7cBy-0008Vf-L5
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 03:03:06 -0400
+	(envelope-from <amarnath.valluri@intel.com>) id 1e7cD3-0000Y5-9W
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 03:04:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e7cBv-00015T-GR
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 03:03:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58924)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1e7cBv-000150-6M
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 03:02:59 -0400
-Date: Thu, 26 Oct 2017 08:02:53 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20171026070253.GB5847@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20171024085853.32615-1-aik@ozlabs.ru>
-	<20171024162752.GA21671@redhat.com>
-	<ef1eab70-8c55-0d75-e516-16ef6a419d04@ozlabs.ru>
-	<20171025065755.GB27237@redhat.com>
-	<6b823cd9-ef9d-a704-ed25-91f360018eca@ozlabs.ru>
-	<20171025211129.GD30132@redhat.com>
-	<a862a41b-45c6-7b3e-9290-92abfa856e76@ozlabs.ru>
+	(envelope-from <amarnath.valluri@intel.com>) id 1e7cD0-0001WK-0c
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 03:04:09 -0400
+From: "Valluri, Amarnath" <amarnath.valluri@intel.com>
+Date: Thu, 26 Oct 2017 07:03:58 +0000
+Message-ID: <1509001479.3135.19.camel@intel.com>
+References: <20171024122045.30072-1-f4bug@amsat.org>
+	<20171024122045.30072-5-f4bug@amsat.org>
+In-Reply-To: <20171024122045.30072-5-f4bug@amsat.org>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <6817469F645DD24685CB257BEB260746@intel.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <a862a41b-45c6-7b3e-9290-92abfa856e76@ozlabs.ru>
-Subject: Re: [Qemu-devel] [RFC PATCH qemu] git-submodule.sh: Do not try
- writing to source directory if not necessary
+Subject: Re: [Qemu-devel] [PATCH v2 4/4] vl: remove unnecessary #ifdef
+ CONFIG_TPM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,89 +26,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: qemu-devel@nongnu.org
+To: "f4bug@amsat.org" <f4bug@amsat.org>
+Cc: "dgilbert@redhat.com" <dgilbert@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>, "peterx@redhat.com" <peterx@redhat.com>, "marcandre.lureau@gmail.com" <marcandre.lureau@gmail.com>
 
-On Thu, Oct 26, 2017 at 11:54:59AM +1100, Alexey Kardashevskiy wrote:
-> On 26/10/17 08:11, Daniel P. Berrange wrote:
-> > On Wed, Oct 25, 2017 at 07:10:40PM +1100, Alexey Kardashevskiy wrote:
-> >> On 25/10/17 17:57, Daniel P. Berrange wrote:
-> >>> On Wed, Oct 25, 2017 at 12:45:10PM +1100, Alexey Kardashevskiy wrote:
-> >>>> On 25/10/17 03:27, Daniel P. Berrange wrote:
-> >>>>> On Tue, Oct 24, 2017 at 07:58:53PM +1100, Alexey Kardashevskiy wrote:
-> >>>>>> The new git-submodule.sh script writes .git-submodule-status to
-> >>>>>> the source directory every time no matter what. This makes it conditional.
-> >>>>>>
-> >>>>>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-> >>>>>> ---
-> >>>>>>
-> >>>>>> I compile out of tree on a remote guest system where I mount the
-> >>>>>> source directory as "readonly" and build directory as "rw" and
-> >>>>>> scripts/git-submodule.sh tries writing to the source directory even when
-> >>>>>> I manually update modules on a host machine which is quite annoying.
-> >>>>>>
-> >>>>>> Is this something acceptable? Or I am missing something here?
-> >>>>>
-> >>>>> How did you update the modules - did you manually run  'git submodule update...'
-> >>>>> or did you use the git-submodule.sh script on your host machine ?
-> >>>>
-> >>>>
-> >>>> I run scripts/git-submodule.sh. Which is not thrilling either as I rather
-> >>>> expect source tree not to be affected in any way when running "make".
-> >>>
-> >>> Oh, did you pass the list of sub-modules to it when running
-> >>>
-> >>> eg, ./scripts/git-submodule.sh update ui/keycodemapdb
-> >>>
-> >>> the list of submodules you need is printed in the configure output summary.
-> >>
-> >> Sure, otherwise it does nothing.
-> >>
-> >>
-> >>>
-> >>>>> If you run git-submodule.sh on the host, then it should save the status
-> >>>>> file, and then when you run make on the guest system, it should notice
-> >>>>> that you're already updated and never even invoke 'git-submodule.sh update'
-> >>>>
-> >>>>
-> >>>> scripts/git-submodule.sh also tries writing to the source directory (I
-> >>>> should probably have fixed that branch too) but this failure is not fatal
-> >>>> for "make" but makes it want to try "update" and then "make" fails.
-> >>>
-> >>> This shouldn't have happened in your case though, if you have already run
-> >>> 'git-submodule.sh update ...list of modules...' on the host machine, with
-> >>> the same list of modules that the guest 'configure' printed out.
-> >>
-> >> It does not matter if I run git-submodule.sh or not - "git-submodule.sh
-> >> status" will try writing to the read only folder anyway and it will fail
-> >> and Makefile's  git_module_status will be set to 1.
-> > 
-> > 
-> > Ahhhh, great, now I understand why you're hitting the problem !
-> > 
-> >> If I do as below (and that's what I should have done as I said), then
-> >> "git-submodule.sh update" is not invoked and we are good. I am not
-> >> reposting it yet as 1) my shell skills are crap (need to delete the temp
-> >> file or rewrite the whole thing not to use temp file or rewrite it in
-> >> python - why do not people use python everywhere?!) 2) I still hope we stop
-> >> doing this from Makefile :)
-> > 
-> > I agree using a tmpfile is the right fix here.
-> 
-> 
-> I still think not doing "git update" from Makefile is the right fix here,
-> is that a final decision? Why cannot "configure" do this (and ideally have
-> a way not to do this at all, like --no-git-submodules-update)?  Just
-> checking...
-
-That ends up doing exactly the same thing. We would need to make sure that
-configure gets re-run when the submodules change. So you just go from having
-'make' run git-submodule.sh, to have make run config.status which runs
-configure, which runs git-submodule.sh. 
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+T24gVHVlLCAyMDE3LTEwLTI0IGF0IDA5OjIwIC0wMzAwLCBQaGlsaXBwZSBNYXRoaWV1LURhdWTD
+qSB3cm90ZToNCj4gYSBzdHViIGlzIG5vdyBwcm92aWRlZC4NCj4gDQo+IFNpZ25lZC1vZmYtYnk6
+IFBoaWxpcHBlIE1hdGhpZXUtRGF1ZMOpIDxmNGJ1Z0BhbXNhdC5vcmc+DQo+IFRlc3RlZC1ieTog
+UmljaGFyZCBXLk0uIEpvbmVzIDxyam9uZXNAcmVkaGF0LmNvbT4NCg0KUmV2aWV3ZWQtYnk6IEFt
+YXJuYXRoIFZhbGx1cmkgPGFtYXJuYXRoLnZhbGx1cmlAaW50ZWwuY29tPg0KDQo+IC0tLQ0KPiDC
+oHZsLmMgfCAyIC0tDQo+IMKgMSBmaWxlIGNoYW5nZWQsIDIgZGVsZXRpb25zKC0pDQo+IFJldmll
+d2VkLWJ5Og0KPiBkaWZmIC0tZ2l0IGEvdmwuYyBiL3ZsLmMNCj4gaW5kZXggMDcyMzgzNWJiZi4u
+ZWMyOTkwOTlmZiAxMDA2NDQNCj4gLS0tIGEvdmwuYw0KPiArKysgYi92bC5jDQo+IEBAIC00NjI0
+LDExICs0NjI0LDkgQEAgaW50IG1haW4oaW50IGFyZ2MsIGNoYXIgKiphcmd2LCBjaGFyICoqZW52
+cCkNCj4gwqDCoMKgwqDCoMKgwqDCoMKgZXhpdCgxKTsNCj4gwqDCoMKgwqDCoH0NCj4gwqANCj4g
+LSNpZmRlZiBDT05GSUdfVFBNDQo+IMKgwqDCoMKgwqBpZiAodHBtX2luaXQoKSA8IDApIHsNCj4g
+wqDCoMKgwqDCoMKgwqDCoMKgZXhpdCgxKTsNCj4gwqDCoMKgwqDCoH0NCj4gLSNlbmRpZg0KPiDC
+oA0KPiDCoMKgwqDCoMKgLyogaW5pdCB0aGUgYmx1ZXRvb3RoIHdvcmxkICovDQo+IMKgwqDCoMKg
+wqBpZiAoZm9yZWFjaF9kZXZpY2VfY29uZmlnKERFVl9CVCwgYnRfcGFyc2UpKQ==
