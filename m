@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40359)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41012)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <changlimin@h3c.com>) id 1e7cR2-0007WC-9y
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 03:18:37 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1e7cUV-0008TL-RN
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 03:22:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <changlimin@h3c.com>) id 1e7cQz-00018K-4l
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 03:18:36 -0400
-Received: from smtp.h3c.com ([60.191.123.56]:55713 helo=h3cmg01-ex.h3c.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <changlimin@h3c.com>) id 1e7cQy-000151-ED
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 03:18:33 -0400
-From: Changlimin <changlimin@h3c.com>
-Date: Thu, 26 Oct 2017 07:18:01 +0000
-Message-ID: <BC29A004BA570342A4CC0044A3845572CFCE5D44@H3CMLB12-EX.srv.huawei-3com.com>
-References: <BC29A004BA570342A4CC0044A3845572CFCE5592@H3CMLB12-EX.srv.huawei-3com.com>
-	<20171025133115.GA23458@lemon>
-	<BC29A004BA570342A4CC0044A3845572CFCE5962@H3CMLB12-EX.srv.huawei-3com.com>
-	<f10f73b8-6b6b-a30e-a147-b7fcaa28b182@redhat.com>
-In-Reply-To: <f10f73b8-6b6b-a30e-a147-b7fcaa28b182@redhat.com>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <peter.maydell@linaro.org>) id 1e7cUU-0003k7-SQ
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 03:22:11 -0400
+Received: from mail-wm0-x22e.google.com ([2a00:1450:400c:c09::22e]:54483)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1e7cUU-0003jo-L9
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 03:22:10 -0400
+Received: by mail-wm0-x22e.google.com with SMTP id r68so6162364wmr.3
+	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 00:22:10 -0700 (PDT)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] Block format 'raw' does not support the option
- 'locking' when disable image locking with option locking=off
+In-Reply-To: <20171026070608.GC5847@redhat.com>
+References: <20171025123056.3165-1-richard.henderson@linaro.org>
+	<CAFEAcA99zpvcgk2EuXkrcOY+8rHeRkJhH4GqViJkEgQV3bdWFg@mail.gmail.com>
+	<CAFEAcA9XdoV0YVw+q7op_vafe9X0JTiQdYmGcmPgqRR3qhUYrQ@mail.gmail.com>
+	<20171026070608.GC5847@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 26 Oct 2017 08:21:48 +0100
+Message-ID: <CAFEAcA8f7jJsM3=4bZG8fE_kTm6jueC-rF6ga0mdUvzMDSpLwQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/11] Disassembler patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,22 +31,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, Fam Zheng <famz@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Richard Henderson <richard.henderson@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-SWYgdGhlIHFjb3cyIGZpbGUgaXMgY3JlYXRlZCB3aXRoIHByZWFsbG9jYXRpb249ZnVsbCwgSSB0
-aGluayBtZXRhZGF0YSB3aWxsIG5vdCBjb3JydXB0IHdoZW4gaXQgaXMgc2hhcmVkIGJldHdlZW4g
-dHdvIHZtcz8gU25hcHNob3QgaXMgbm90IHJlcXVpcmVkLiANCg0KSXMgdGhpcyByaWdodD8NCg0K
-QlINCkNoYW5nIGxpbWluDQoNCi0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQpGcm9tOiBNYXgg
-UmVpdHogW21haWx0bzptcmVpdHpAcmVkaGF0LmNvbV0gDQpTZW50OiBUaHVyc2RheSwgT2N0b2Jl
-ciAyNiwgMjAxNyAzOjEyIFBNDQpUbzogY2hhbmdsaW1pbiAwMDE0OCAoQ2xvdWQpOyBGYW0gWmhl
-bmcNCkNjOiBxZW11LWRldmVsQG5vbmdudS5vcmcNClN1YmplY3Q6IFJlOiBbUWVtdS1kZXZlbF0g
-QmxvY2sgZm9ybWF0ICdyYXcnIGRvZXMgbm90IHN1cHBvcnQgdGhlIG9wdGlvbiAnbG9ja2luZycg
-d2hlbiBkaXNhYmxlIGltYWdlIGxvY2tpbmcgd2l0aCBvcHRpb24gbG9ja2luZz1vZmYNCg0KT24g
-MjAxNy0xMC0yNiAwMzowNiwgQ2hhbmdsaW1pbiB3cm90ZToNCj4gc2hhcmUtcnc9b24gaXMgZ29v
-ZCBmb3IgcmF3IGZvcm1hdCBmaWxlLCBidXQgYmFkIGZvciBxY293MiBmb3JtYXQgZmlsZToNCj4g
-DQo+IEZhaWxlZCB0byBnZXQgIndyaXRlIiBsb2NrDQo+IElzIGFub3RoZXIgcHJvY2VzcyB1c2lu
-ZyB0aGUgaW1hZ2U/DQo+IA0KPiBJcyB0aGlzIGludGVudGVkPw0KDQpZZXMsIGJlY2F1c2UgeW91
-IGNhbiBuZXZlciBzaGFyZSBxY293MiBpbWFnZSBmaWxlcyBiZXR3ZWVuIFZNcy4gIFRoZQ0KcWNv
-dzIgZm9ybWF0IGl0c2VsZiBkb2VzIG5vdCBzdXBwb3J0IHRoaXMsIGFzIGl0IG1heSBsZWFkIHRv
-IG1ldGFkYXRhIGNvcnJ1cHRpb24uDQoNCk1heA0KDQo=
+On 26 October 2017 at 08:06, Daniel P. Berrange <berrange@redhat.com> wrote:
+> I'm not sure what's giving you the 'pathspec' message though ? I would
+> expect anything to ignore the capstone dir - its just like any other
+> untracked file once you go back in time before it was committed.
+
+Sorry, just realized that was the output of my filtering of the
+log. Here's what I should have quoted:
+
+>From git://git.linaro.org/people/pmaydell/qemu-arm
+ + a872ea5...6315472 staging    -> pmaydell/staging  (forced update)
+warning: unable to rmdir capstone: Directory not empty
+error: pathspec 'capstone' did not match any file(s) known to git.
+Did you forget to 'git add'?
+make: Entering directory `/home/pm215/qemu/build/all'
+config-host.mak is out-of-date, running configure
+  GIT     ui/keycodemapdb dtc capstone
+make[1]: *** No rule to make target `all'.  Stop.
+error: pathspec 'capstone' did not match any file(s) known to git.
+Did you forget to 'git add'?
+make: *** [git-submodule-update] Error 1
+make: *** Waiting for unfinished jobs....
+make: *** [subdir-capstone] Error 2
+Install prefix    /usr/local
+BIOS directory    /usr/local/share/qemu
+firmware path     /usr/local/share/qemu-firmware
+binary directory  /usr/local/bin
+[rest of configure output skipped]
+replication support yes
+VxHS block device no
+make: Leaving directory `/home/pm215/qemu/build/all'
+
+It looks like the git update script thinks that there ought to
+be a 'capstone' submodule, which of course there isn't any more,
+so it barfs trying to update it.
+
+thanks
+-- PMM
