@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46957)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51375)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e7o6F-0004iw-CJ
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 15:45:57 -0400
+	(envelope-from <bounces@canonical.com>) id 1e7oGo-0008KO-Rn
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 15:56:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e7o6B-0004ZU-Cu
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 15:45:55 -0400
-Received: from indium.canonical.com ([91.189.90.7]:52276)
+	(envelope-from <bounces@canonical.com>) id 1e7oGk-0006fK-Rd
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 15:56:50 -0400
+Received: from indium.canonical.com ([91.189.90.7]:55818)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1e7o6B-0004WG-3K
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 15:45:51 -0400
+	id 1e7oGk-0006dx-Hj
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 15:56:46 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1e7o67-00034d-KB
-	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 19:45:47 +0000
+	id 1e7oGi-0004SG-0O
+	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 19:56:44 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 948A62E80D5
-	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 19:45:47 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id D436E2E8060
+	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 19:56:43 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 26 Oct 2017 19:32:50 -0000
+Date: Thu, 26 Oct 2017 19:49:50 -0000
 From: Brian Murray <brian@ubuntu.com>
 Reply-To: Bug 1719196 <1719196@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <150626680089.6094.17724106932405637799.malonedeb@soybean.canonical.com>
-Message-Id: <150904637220.4887.8545102392227031537.launchpad@chaenomeles.canonical.com>
+Message-Id: <150904739091.3843.2726152064948181684.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1719196] Re: [arm64 ocata] newly created
  instances are unable to raise network interfaces
@@ -39,8 +39,8 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-** Changed in: qemu (Ubuntu Zesty)
-       Status: Incomplete =3D> Fix Committed
+I accepted this but Launchpad timed out when the SRU testing comment was
+being added.
 
 -- =
 
