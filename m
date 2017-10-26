@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55303)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55418)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1e7dN4-0001aj-Ga
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 04:18:35 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1e7dNl-00025I-6g
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 04:19:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1e7dMz-0000ft-W8
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 04:18:33 -0400
-Received: from mail-io0-x241.google.com ([2607:f8b0:4001:c06::241]:50111)
+	(envelope-from <peter.maydell@linaro.org>) id 1e7dNk-0001qJ-3m
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 04:19:17 -0400
+Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:46820)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1e7dMz-0000fN-Od
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 04:18:29 -0400
-Received: by mail-io0-x241.google.com with SMTP id n137so3830015iod.6
-	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 01:18:29 -0700 (PDT)
-References: <20171026013445.45605-1-aik@ozlabs.ru>
-	<20171026071317.y3qjb2rsire25bz3@starbug-vm.ie.oracle.com>
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Message-ID: <8e81eed1-d16a-a289-f07e-4a083e232b79@ozlabs.ru>
-Date: Thu, 26 Oct 2017 19:18:24 +1100
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1e7dNj-0001nt-TU
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 04:19:16 -0400
+Received: by mail-wm0-x236.google.com with SMTP id m72so6260215wmc.1
+	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 01:19:15 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20171026071317.y3qjb2rsire25bz3@starbug-vm.ie.oracle.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-AU
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH qemu v2] git-submodule.sh: Do not try
+In-Reply-To: <6dbce328-c404-403f-a1ae-32de5fc742cf@ozlabs.ru>
+References: <20171024085853.32615-1-aik@ozlabs.ru>
+	<20171024162752.GA21671@redhat.com>
+	<ef1eab70-8c55-0d75-e516-16ef6a419d04@ozlabs.ru>
+	<20171025065755.GB27237@redhat.com>
+	<6b823cd9-ef9d-a704-ed25-91f360018eca@ozlabs.ru>
+	<20171025211129.GD30132@redhat.com>
+	<a862a41b-45c6-7b3e-9290-92abfa856e76@ozlabs.ru>
+	<20171026070253.GB5847@redhat.com>
+	<6dbce328-c404-403f-a1ae-32de5fc742cf@ozlabs.ru>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 26 Oct 2017 09:18:54 +0100
+Message-ID: <CAFEAcA9KCim0bwHU_CVc5bxteOKVtiZCTR0uaRqkvn1ENi0NeA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [RFC PATCH qemu] git-submodule.sh: Do not try
  writing to source directory if not necessary
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -31,157 +37,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Darren Kenny <darren.kenny@oracle.com>
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 26/10/17 18:13, Darren Kenny wrote:
-> Hi Alexey,
-> 
-> On Thu, Oct 26, 2017 at 12:34:45PM +1100, Alexey Kardashevskiy wrote:
->> The new git-submodule.sh script writes .git-submodule-status to
->> the source directory every time no matter what. This makes it conditional.
->>
->> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
->> ---
->> Changes:
->> v2:
->> * fixed "status" branch too
->> ---
->> scripts/git-submodule.sh | 15 ++++++++++-----
->> 1 file changed, 10 insertions(+), 5 deletions(-)
->>
->> diff --git a/scripts/git-submodule.sh b/scripts/git-submodule.sh
->> index d8fbc7e47e..ae038d2e58 100755
->> --- a/scripts/git-submodule.sh
->> +++ b/scripts/git-submodule.sh
->> @@ -23,16 +23,21 @@ then
->>     exit 1
->> fi
->>
->> +substat_tmp=$(mktemp)
->> +
->> case "$command" in
->> status)
->>     test -f "$substat" || exit 1
->> -    trap "rm -f ${substat}.tmp" EXIT
->> -    git submodule status $modules > "${substat}.tmp"
->> -    diff "${substat}" "${substat}.tmp" >/dev/null
->> -    exit $?
->> +    git submodule status $modules > "$substat_tmp"
->> +    diff "${substat_tmp}" "${substat}" > /dev/null
->>     ;;
->> update)
->>     git submodule update --init $modules 1>/dev/null 2>&1
->> -    git submodule status $modules > "${substat}"
->> +    git submodule status $modules > "$substat_tmp"
->> +    diff "${substat_tmp}" "${substat}" || mv "${substat_tmp}" "${substat}"
-> 
-> Maybe you intended this, but the diff output here will be output to
-> the screen - if you don't mean this to happen you might want to
-> redirect the output.
+On 26 October 2017 at 08:45, Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+> Submodules change once/twice a year so we could live quite happily without
+> this automation imho.
 
+This is a significant underestimate. The openbios submodule alone
+has been updated 12 times this year.
 
-Well, if I do:
+> What if I do not want submodules to be updated in
+> order to reproduce some bug and confirm that the newer version of submodule
+> has fixed it?
 
-diff "${substat_tmp}" "${substat}" 1>/dev/null 2>&1 || mv "${substat_tmp}"
-"${substat}"
+The only thing we support is "use the version of the submodule that
+goes with the git commit of QEMU that they're supposed to go with".
+The only reason we have this automation at all is that git submodule
+is a broken design that doesn't update the submodule automatically
+on git checkout/git branch etc.
 
-mv: inter-device move failed: '/tmp/tmp.gfcsXCSv4W' to
-'.git-submodule-status'; unable to remove target: Read-only file system
+I'm not a huge fan of this automation as we have it at the moment, but
+we do need to do something just to work around the terrible terrible
+stock git behaviour :-(
 
+> btw I looked now to my tree with upstream QEMU and dtc in that tree is 8
+> month old (v1.4.4 and there is v1.4.5 available). Is not it supposed to
+> update to something more recent automatically? git-submodule.sh does not do
+> checkout or pull.
 
-and with my current variant it is:
+We update the submodules when we need to update them (which for
+dependencies like dtc is usually "when we have some requirement
+that mandates a newer version".)
 
-
-  GIT     ui/keycodemapdb dtc
-1d0
-<  558cd81bdd432769b59bff01240c44f82cfb1a9d dtc (v1.4.4)
-2a2
->  558cd81bdd432769b59bff01240c44f82cfb1a9d dtc (v1.4.4)
-mv: inter-device move failed: '/tmp/tmp.4ol9mymsZj' to
-'.git-submodule-status'; unable to remove target: Read-only file system
-
-
-which gives some clue about what is going on (I swapped 2 lines in
-.git-submodule-status to trigger this).
-
-
-> 
-> From other lines it looks like you would prefer it wasn't output.
-> 
->>     ;;
->> esac
->> +
->> +myret=$?
-> 
-> Any small change is likely to break the value of myret here.
-> 
-> You may want to put the above assignment as directly below the
-> commands that you want to record as the exit status, and maybe
-> initialize it before the case statement to the default value.
-> 
-> For example, if somehow (not sure it's possible today) $command was
-> not one of the values in the case statement, the value of $? here
-> would be the return value of mktemp, which may not be your
-> intention.
-> 
-> 
->> +rm "${substat_tmp}" 2>/dev/null
-> 
-> Rather than doing this redirect, a simple rm -f will achieve what
-> you want here - that is why makefiles tend to use it.
-
-I really do not like shell :) I gave up to using "trap", seems doing the
-right thing and no messing is needed with "exit".
-
-
-diff --git a/scripts/git-submodule.sh b/scripts/git-submodule.sh
-index d8fbc7e47e..12f80c14a0 100755
---- a/scripts/git-submodule.sh
-+++ b/scripts/git-submodule.sh
-@@ -23,16 +23,18 @@ then
-     exit 1
- fi
-
-+substat_tmp=$(mktemp)
-+trap "rm -f $substat_tmp" 0
-+
- case "$command" in
- status)
-     test -f "$substat" || exit 1
--    trap "rm -f ${substat}.tmp" EXIT
--    git submodule status $modules > "${substat}.tmp"
--    diff "${substat}" "${substat}.tmp" >/dev/null
--    exit $?
-+    git submodule status $modules > "$substat_tmp"
-+    diff "${substat_tmp}" "${substat}" > /dev/null
-     ;;
- update)
-     git submodule update --init $modules 1>/dev/null 2>&1
--    git submodule status $modules > "${substat}"
-+    git submodule status $modules > "$substat_tmp"
-+    diff "${substat_tmp}" "${substat}" || mv "${substat_tmp}" "${substat}"
-     ;;
- esac
-
-
-Is this good enough to repost?
-
-
-
-ps. out of curiosity - your mail has "Mail-Followup-To" - is that intentional?
-
-
-> 
-> Thanks,
-> 
-> Darren.
-> 
->> +exit $myret
->> -- 
->> 2.11.0
->>
->>
-
-
--- 
-Alexey
+thanks
+-- PMM
