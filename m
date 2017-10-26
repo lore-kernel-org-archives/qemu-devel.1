@@ -1,32 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34695)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35290)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e7iHa-0004eq-TM
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 09:33:16 -0400
+	(envelope-from <drjones@redhat.com>) id 1e7iJJ-00063j-Ad
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 09:35:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e7iHW-0004mS-HO
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 09:33:14 -0400
-Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:56680)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e7iHW-0004mD-CG
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 09:33:10 -0400
-Received: by mail-qt0-x241.google.com with SMTP id z28so4225875qtz.13
-	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 06:33:10 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20171026130426.10626-1-berrange@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <5670f64b-15e5-0747-8ab0-c329a83537ee@amsat.org>
-Date: Thu, 26 Oct 2017 10:33:01 -0300
+	(envelope-from <drjones@redhat.com>) id 1e7iJI-0006VM-Gh
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 09:35:01 -0400
+Date: Thu, 26 Oct 2017 15:34:45 +0200
+From: Andrew Jones <drjones@redhat.com>
+Message-ID: <20171026133445.kemzfgvpbmtcogsl@kamzik.brq.redhat.com>
+References: <20171023122719.17199-1-Jason@zx2c4.com>
+	<CAFEAcA_PM5Fjx2Pk58h75p9vaZwFcusQdXuwy9tbDtc=EaoOJg@mail.gmail.com>
+	<10e16ca3-175b-9f34-65e7-031b883b7201@amsat.org>
+	<CAHmME9qtBiuAEnkCeuMd7EdeZveTVa4UOf+AQhMCFye0SYJY=Q@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20171026130426.10626-1-berrange@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] build: allow automatic git submodule
- updates to be disabled
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHmME9qtBiuAEnkCeuMd7EdeZveTVa4UOf+AQhMCFye0SYJY=Q@mail.gmail.com>
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH] hw/arm/virt: support 4 serial
+ ports
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,121 +26,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, Peter Maydell <peter.maydell@linaro.org>
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 10/26/2017 10:04 AM, Daniel P. Berrange wrote:
-> Some people building QEMU use VPATH builds where the source directory is on a
-> read-only volume. In such a case 'scripts/git-submodules.sh update' will always
-> fail and users are required to run it manually themselves on their original
-> writable source directory.
+On Tue, Oct 24, 2017 at 07:57:37PM +0200, Jason A. Donenfeld wrote:
+> Hey folks,
 > 
-> While this is already supported, it is nice to give users a command line flag
-> to configure to permanently disable automatic submodule updates, as it means
-> they won't get hard to diagnose failures from git-submodules.sh at an arbitrary
-> later date.
+> In case you're curious, this is the kind of hideous workaround
+> required until this is fixed:
 > 
-> This patch thus introduces a flag '--disable-git-update' which will prevent
-> 'make' from ever running 'scripts/git-submodules.sh update'. It will still run
-> the 'status' command to determine if a submodule update is needed, but when it
-> does this it'll simply stop and print a message instructing the developer what
-> todo. eg
+> https://git.zx2c4.com/WireGuard/commit/?id=2456a56729f7247bf88476317fed0ac822a31e92
 > 
-> $ ./configure  --target-list=x86_64-softmmu --disable-git-update
-> ...snip...
-> 
-> $ make
->   GEN     config-host.h
->   GEN     trace/generated-tcg-tracers.h
->   GEN     trace/generated-helpers-wrappers.h
->   GEN     trace/generated-helpers.h
->   GEN     trace/generated-helpers.c
->   GEN     module_block.h
-> 
-> GIT submodule checkout is out of date. Please run
->   scripts/git-submodule.sh update ui/keycodemapdb
-> from the source directory checkout /home/berrange/src/virt/qemu
+> Please let me know if you intend to fix this or if you will accept
+> working patches from me for it, or if you simply don't care.
+>
 
-Clean :)
+You could make the PL011 user instantiate-able and make the necessary
+changes to use the dynamic FDT node generation framework (sysbus-fdt),
+and then you'd be able to add as many additional UARTs as you like to
+mach-virt's platform bus. I played around with that idea once, and have
+some patches rotting somewhere that could maybe be dug back up.
 
-> 
-> make: *** [Makefile:31: git-submodule-update] Error 1
-> 
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
-> ---
->  Makefile  | 11 +++++++++++
->  configure |  9 ++++++++-
->  2 files changed, 19 insertions(+), 1 deletion(-)
-> 
-> diff --git a/Makefile b/Makefile
-> index 4c9d0eaef2..cefb75dc8d 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -26,12 +26,23 @@ ifeq (0,$(MAKELEVEL))
->    )
->  
->  ifeq (1,$(git_module_status))
-> +ifeq (no,$(GIT_UPDATE))
-> +git-submodule-update:
-> +	$(call quiet-command, \
-> +            echo && \
-> +            echo "GIT submodule checkout is out of date. Please run" && \
-> +            echo "  scripts/git-submodule.sh update $(GIT_SUBMODULES)" && \
-> +            echo "from the source directory checkout $(SRC_PATH)" && \
-> +            echo && \
-> +            exit 1)
-> +else
->  git-submodule-update:
->  	$(call quiet-command, \
->            (cd $(SRC_PATH) && GIT="$(GIT)" ./scripts/git-submodule.sh update $(GIT_SUBMODULES)), \
->            "GIT","$(GIT_SUBMODULES)")
->  endif
->  endif
-> +endif
->  
->  .git-submodule-status: git-submodule-update config-host.mak
->  
-> diff --git a/configure b/configure
-> index ce5a2d0105..2e3b5fc145 100755
-> --- a/configure
-> +++ b/configure
-> @@ -267,8 +267,10 @@ stack_protector=""
->  
->  if test -e "$source_path/.git"
->  then
-> +    git_update=yes
->      git_submodules="ui/keycodemapdb"
->  else
-> +    git_update=no
->      git_submodules=""
->  fi
->  git="git"
-> @@ -1297,11 +1299,15 @@ for opt do
->    ;;
->    --with-git=*) git="$optarg"
->    ;;
-> +  --enable-git-update) git_update=yes
-> +  ;;
-> +  --disable-git-update) git_update=no
-> +  ;;
->    *)
->        echo "ERROR: unknown option $opt"
->        echo "Try '$0 --help' for more information"
->        exit 1
-> -  ;;
-> +      ;;
->    esac
->  done
->  
-> @@ -5534,6 +5540,7 @@ echo "qemu_localedir=$qemu_localedir" >> $config_host_mak
->  echo "libs_softmmu=$libs_softmmu" >> $config_host_mak
->  echo "GIT=$git" >> $config_host_mak
->  echo "GIT_SUBMODULES=$git_submodules" >> $config_host_mak
-> +echo "GIT_UPDATE=$git_update" >> $config_host_mak
->  
->  echo "ARCH=$ARCH" >> $config_host_mak
->  
-> 
+drew
