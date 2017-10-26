@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46905)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46940)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1e7cxu-0004en-GG
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 03:52:35 -0400
+	(envelope-from <quintela@redhat.com>) id 1e7cxx-0004gm-Fd
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 03:52:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1e7cxt-0007yr-Ea
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 03:52:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:27153)
+	(envelope-from <quintela@redhat.com>) id 1e7cxw-00081j-PN
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 03:52:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34794)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1e7cxt-0007yC-6W
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 03:52:33 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1e7cxw-00081I-Ja
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 03:52:36 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
 	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 313F780B2A
-	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 07:52:32 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9EB0A2CE97B
+	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 07:52:35 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Thu, 26 Oct 2017 09:52:15 +0200
-Message-Id: <20171026075222.27798-4-quintela@redhat.com>
+Date: Thu, 26 Oct 2017 09:52:17 +0200
+Message-Id: <20171026075222.27798-6-quintela@redhat.com>
 In-Reply-To: <20171026075222.27798-1-quintela@redhat.com>
 References: <20171026075222.27798-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 03/10] tests: Factorize out
- migrate_test_start/end
+Subject: [Qemu-devel] [PATCH v2 05/10] tests: check that migration
+ parameters are really assigned
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,150 +33,71 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-We fix global_test users left and right
-
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- tests/migration-test.c | 86 ++++++++++++++++++++++++++++----------------------
- 1 file changed, 48 insertions(+), 38 deletions(-)
+ tests/migration-test.c | 27 ++++++++++++++++++++++++---
+ 1 file changed, 24 insertions(+), 3 deletions(-)
 
 diff --git a/tests/migration-test.c b/tests/migration-test.c
-index 19a1445076..91fb0277d6 100644
+index c429a13403..be598d3257 100644
 --- a/tests/migration-test.c
 +++ b/tests/migration-test.c
-@@ -301,7 +301,7 @@ static void wait_for_migration_pass(void)
-     } while (pass == initial_pass && !got_stop);
+@@ -354,17 +354,37 @@ static void cleanup(const char *filename)
+     g_free(path);
  }
  
--static void check_guests_ram(void)
-+static void check_guests_ram(QTestState *who)
+-static void migrate_set_downtime(QTestState *who, const char *value)
++static void migrate_check_parameter(QTestState *who, const char *parameter,
++                                    const char *value)
++{
++    QDict *rsp, *rsp_return;
++    const char *result;
++
++    rsp = wait_command(who, "{ 'execute': 'query-migrate-parameters' }");
++    rsp_return = qdict_get_qdict(rsp, "return");
++    result = g_strdup_printf("%" PRId64,
++                             qdict_get_try_int(rsp_return,  parameter, -1));
++    g_assert_cmpstr(result, ==, value);
++    QDECREF(rsp);
++}
++
++static void migrate_set_downtime(QTestState *who, const double value)
  {
-     /* Our ASM test will have been incrementing one byte from each page from
-      * 1MB to <100MB in order.
-@@ -316,13 +316,13 @@ static void check_guests_ram(void)
-     bool hit_edge = false;
-     bool bad = false;
+     QDict *rsp;
+     gchar *cmd;
++    char *expected;
++    int64_t result_int;
  
--    qtest_memread(global_qtest, start_address, &first_byte, 1);
-+    qtest_memread(who, start_address, &first_byte, 1);
-     last_byte = first_byte;
- 
-     for (address = start_address + 4096; address < end_address; address += 4096)
-     {
-         uint8_t b;
--        qtest_memread(global_qtest, address, &b, 1);
-+        qtest_memread(who, address, &b, 1);
-         if (b != last_byte) {
-             if (((b + 1) % 256) == last_byte && !hit_edge) {
-                 /* This is OK, the guest stopped at the point of
-@@ -408,14 +408,10 @@ static void migrate(QTestState *who, const char *uri)
+     cmd = g_strdup_printf("{ 'execute': 'migrate_set_downtime',"
+-                          "'arguments': { 'value': %s } }", value);
++                          "'arguments': { 'value': %g } }", value);
+     rsp = qtest_qmp(who, cmd);
+     g_free(cmd);
+     g_assert(qdict_haskey(rsp, "return"));
      QDECREF(rsp);
++    result_int = value * 1000L;
++    expected = g_strdup_printf("%" PRId64, result_int);
++    migrate_check_parameter(who, "downtime-limit", expected);
++    g_free(expected);
  }
  
--static void test_migrate(void)
-+static void test_migrate_start(QTestState **from, QTestState **to,
-+                               const char *uri)
- {
--    char *uri = g_strdup_printf("unix:%s/migsocket", tmpfs);
--    QTestState *global = global_qtest, *from, *to;
--    unsigned char dest_byte_a, dest_byte_b, dest_byte_c, dest_byte_d;
-     gchar *cmd_src, *cmd_dst;
--    QDict *rsp;
--
-     char *bootpath = g_strdup_printf("%s/bootsect", tmpfs);
-     const char *arch = qtest_get_arch();
- 
-@@ -456,11 +452,51 @@ static void test_migrate(void)
- 
-     g_free(bootpath);
- 
--    from = qtest_start(cmd_src);
-+    *from = qtest_start(cmd_src);
-     g_free(cmd_src);
- 
--    to = qtest_init(cmd_dst);
-+    *to = qtest_init(cmd_dst);
-     g_free(cmd_dst);
-+}
-+
-+static void test_migrate_end(QTestState *from, QTestState *to)
-+{
-+    unsigned char dest_byte_a, dest_byte_b, dest_byte_c, dest_byte_d;
-+
-+    qtest_quit(from);
-+
-+    qtest_memread(to, start_address, &dest_byte_a, 1);
-+
-+    /* Destination still running, wait for a byte to change */
-+    do {
-+        qtest_memread(to, start_address, &dest_byte_b, 1);
-+        usleep(10 * 1000);
-+    } while (dest_byte_a == dest_byte_b);
-+
-+    qtest_qmp_discard_response(to, "{ 'execute' : 'stop'}");
-+    /* With it stopped, check nothing changes */
-+    qtest_memread(to, start_address, &dest_byte_c, 1);
-+    sleep(1);
-+    qtest_memread(to, start_address, &dest_byte_d, 1);
-+    g_assert_cmpint(dest_byte_c, ==, dest_byte_d);
-+
-+    check_guests_ram(to);
-+
-+    qtest_quit(to);
-+
-+    cleanup("bootsect");
-+    cleanup("migsocket");
-+    cleanup("src_serial");
-+    cleanup("dest_serial");
-+}
-+
-+static void test_migrate(void)
-+{
-+    char *uri = g_strdup_printf("unix:%s/migsocket", tmpfs);
-+    QTestState *global = global_qtest, *from, *to;
-+    QDict *rsp;
-+
-+    test_migrate_start(&from, &to, uri);
- 
-     migrate_set_capability(from, "postcopy-ram", "true");
-     migrate_set_capability(to, "postcopy-ram", "true");
-@@ -495,36 +531,10 @@ static void test_migrate(void)
-     global_qtest = from;
-     wait_for_migration_complete();
- 
--    qtest_quit(from);
--
--    global_qtest = to;
--
--    qtest_memread(to, start_address, &dest_byte_a, 1);
--
--    /* Destination still running, wait for a byte to change */
--    do {
--        qtest_memread(to, start_address, &dest_byte_b, 1);
--        usleep(10 * 1000);
--    } while (dest_byte_a == dest_byte_b);
--
--    qmp_discard_response("{ 'execute' : 'stop'}");
--    /* With it stopped, check nothing changes */
--    qtest_memread(to, start_address, &dest_byte_c, 1);
--    sleep(1);
--    qtest_memread(to, start_address, &dest_byte_d, 1);
--    g_assert_cmpint(dest_byte_c, ==, dest_byte_d);
--
--    check_guests_ram();
--
--    qtest_quit(to);
-     g_free(uri);
--
-     global_qtest = global;
- 
--    cleanup("bootsect");
--    cleanup("migsocket");
--    cleanup("src_serial");
--    cleanup("dest_serial");
-+    test_migrate_end(from, to);
+ static void migrate_set_speed(QTestState *who, const char *value)
+@@ -378,6 +398,7 @@ static void migrate_set_speed(QTestState *who, const char *value)
+     g_free(cmd);
+     g_assert(qdict_haskey(rsp, "return"));
+     QDECREF(rsp);
++    migrate_check_parameter(who, "max-bandwidth", value);
  }
  
- int main(int argc, char **argv)
+ static void migrate_set_capability(QTestState *who, const char *capability,
+@@ -509,7 +530,7 @@ static void test_migrate(void)
+      * machine, so also set the downtime.
+      */
+     migrate_set_speed(from, "100000000");
+-    migrate_set_downtime(from, "0.001");
++    migrate_set_downtime(from, 0.001);
+ 
+     /* Wait for the first serial output from the source */
+     wait_for_serial("src_serial");
 -- 
 2.13.6
