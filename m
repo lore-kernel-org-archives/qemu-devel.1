@@ -1,34 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45495)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46876)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1e7crM-0003Sx-KX
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 03:45:50 -0400
+	(envelope-from <quintela@redhat.com>) id 1e7cxt-0004eY-6A
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 03:52:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1e7crI-0002kA-9j
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 03:45:48 -0400
-Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:52265)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1e7crH-0002jI-VS
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 03:45:44 -0400
-Received: by mail-pg0-x243.google.com with SMTP id a192so2034087pge.9
-	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 00:45:43 -0700 (PDT)
-References: <20171024085853.32615-1-aik@ozlabs.ru>
-	<20171024162752.GA21671@redhat.com>
-	<ef1eab70-8c55-0d75-e516-16ef6a419d04@ozlabs.ru>
-	<20171025065755.GB27237@redhat.com>
-	<6b823cd9-ef9d-a704-ed25-91f360018eca@ozlabs.ru>
-	<20171025211129.GD30132@redhat.com>
-	<a862a41b-45c6-7b3e-9290-92abfa856e76@ozlabs.ru>
-	<20171026070253.GB5847@redhat.com>
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Message-ID: <6dbce328-c404-403f-a1ae-32de5fc742cf@ozlabs.ru>
-Date: Thu, 26 Oct 2017 18:45:37 +1100
-MIME-Version: 1.0
-In-Reply-To: <20171026070253.GB5847@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-AU
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH qemu] git-submodule.sh: Do not try
- writing to source directory if not necessary
+	(envelope-from <quintela@redhat.com>) id 1e7cxq-0007wh-6i
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 03:52:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34326)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1e7cxp-0007wD-UQ
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 03:52:30 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D0BA937EE9
+	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 07:52:28 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+Date: Thu, 26 Oct 2017 09:52:13 +0200
+Message-Id: <20171026075222.27798-2-quintela@redhat.com>
+In-Reply-To: <20171026075222.27798-1-quintela@redhat.com>
+References: <20171026075222.27798-1-quintela@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 01/10] tests: rename postcopy-test to
+ migration-test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,104 +30,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-On 26/10/17 18:02, Daniel P. Berrange wrote:
-> On Thu, Oct 26, 2017 at 11:54:59AM +1100, Alexey Kardashevskiy wrote:
->> On 26/10/17 08:11, Daniel P. Berrange wrote:
->>> On Wed, Oct 25, 2017 at 07:10:40PM +1100, Alexey Kardashevskiy wrote:
->>>> On 25/10/17 17:57, Daniel P. Berrange wrote:
->>>>> On Wed, Oct 25, 2017 at 12:45:10PM +1100, Alexey Kardashevskiy wrote:
->>>>>> On 25/10/17 03:27, Daniel P. Berrange wrote:
->>>>>>> On Tue, Oct 24, 2017 at 07:58:53PM +1100, Alexey Kardashevskiy wrote:
->>>>>>>> The new git-submodule.sh script writes .git-submodule-status to
->>>>>>>> the source directory every time no matter what. This makes it conditional.
->>>>>>>>
->>>>>>>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
->>>>>>>> ---
->>>>>>>>
->>>>>>>> I compile out of tree on a remote guest system where I mount the
->>>>>>>> source directory as "readonly" and build directory as "rw" and
->>>>>>>> scripts/git-submodule.sh tries writing to the source directory even when
->>>>>>>> I manually update modules on a host machine which is quite annoying.
->>>>>>>>
->>>>>>>> Is this something acceptable? Or I am missing something here?
->>>>>>>
->>>>>>> How did you update the modules - did you manually run  'git submodule update...'
->>>>>>> or did you use the git-submodule.sh script on your host machine ?
->>>>>>
->>>>>>
->>>>>> I run scripts/git-submodule.sh. Which is not thrilling either as I rather
->>>>>> expect source tree not to be affected in any way when running "make".
->>>>>
->>>>> Oh, did you pass the list of sub-modules to it when running
->>>>>
->>>>> eg, ./scripts/git-submodule.sh update ui/keycodemapdb
->>>>>
->>>>> the list of submodules you need is printed in the configure output summary.
->>>>
->>>> Sure, otherwise it does nothing.
->>>>
->>>>
->>>>>
->>>>>>> If you run git-submodule.sh on the host, then it should save the status
->>>>>>> file, and then when you run make on the guest system, it should notice
->>>>>>> that you're already updated and never even invoke 'git-submodule.sh update'
->>>>>>
->>>>>>
->>>>>> scripts/git-submodule.sh also tries writing to the source directory (I
->>>>>> should probably have fixed that branch too) but this failure is not fatal
->>>>>> for "make" but makes it want to try "update" and then "make" fails.
->>>>>
->>>>> This shouldn't have happened in your case though, if you have already run
->>>>> 'git-submodule.sh update ...list of modules...' on the host machine, with
->>>>> the same list of modules that the guest 'configure' printed out.
->>>>
->>>> It does not matter if I run git-submodule.sh or not - "git-submodule.sh
->>>> status" will try writing to the read only folder anyway and it will fail
->>>> and Makefile's  git_module_status will be set to 1.
->>>
->>>
->>> Ahhhh, great, now I understand why you're hitting the problem !
->>>
->>>> If I do as below (and that's what I should have done as I said), then
->>>> "git-submodule.sh update" is not invoked and we are good. I am not
->>>> reposting it yet as 1) my shell skills are crap (need to delete the temp
->>>> file or rewrite the whole thing not to use temp file or rewrite it in
->>>> python - why do not people use python everywhere?!) 2) I still hope we stop
->>>> doing this from Makefile :)
->>>
->>> I agree using a tmpfile is the right fix here.
->>
->>
->> I still think not doing "git update" from Makefile is the right fix here,
->> is that a final decision? Why cannot "configure" do this (and ideally have
->> a way not to do this at all, like --no-git-submodules-update)?  Just
->> checking...
-> 
-> That ends up doing exactly the same thing. We would need to make sure that
-> configure gets re-run when the submodules change.
+Instead of repeating the code, we are going to bo more tests on this file
 
+Signed-off-by: Juan Quintela <quintela@redhat.com>
+---
+ MAINTAINERS                                 | 1 +
+ tests/Makefile.include                      | 6 +++---
+ tests/{postcopy-test.c => migration-test.c} | 8 +++-----
+ 3 files changed, 7 insertions(+), 8 deletions(-)
+ rename tests/{postcopy-test.c => migration-test.c} (98%)
 
-Submodules change once/twice a year so we could live quite happily without
-this automation imho. What if I do not want submodules to be updated in
-order to reproduce some bug and confirm that the newer version of submodule
-has fixed it?
-
-btw I looked now to my tree with upstream QEMU and dtc in that tree is 8
-month old (v1.4.4 and there is v1.4.5 available). Is not it supposed to
-update to something more recent automatically? git-submodule.sh does not do
-checkout or pull.
-
-
-> So you just go from having
-> 'make' run git-submodule.sh, to have make run config.status which runs
-> configure, which runs git-submodule.sh. 
-
-
-
-
-
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 12175425a7..8d0a3de734 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1562,6 +1562,7 @@ F: include/migration/
+ F: migration/
+ F: scripts/vmstate-static-checker.py
+ F: tests/vmstate-static-checker-data/
++F: tests/migration-test.c
+ F: docs/devel/migration.txt
+ F: qapi/migration.json
+ 
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 70dc711bca..434a2ce868 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -287,7 +287,7 @@ endif
+ check-qtest-i386-$(CONFIG_SLIRP) += tests/test-netfilter$(EXESUF)
+ check-qtest-i386-$(CONFIG_POSIX) += tests/test-filter-mirror$(EXESUF)
+ check-qtest-i386-$(CONFIG_POSIX) += tests/test-filter-redirector$(EXESUF)
+-check-qtest-i386-y += tests/postcopy-test$(EXESUF)
++check-qtest-i386-y += tests/migration-test$(EXESUF)
+ check-qtest-i386-y += tests/test-x86-cpuid-compat$(EXESUF)
+ check-qtest-i386-y += tests/numa-test$(EXESUF)
+ check-qtest-x86_64-y += $(check-qtest-i386-y)
+@@ -315,7 +315,7 @@ check-qtest-ppc64-y += tests/boot-order-test$(EXESUF)
+ check-qtest-ppc64-y += tests/prom-env-test$(EXESUF)
+ check-qtest-ppc64-y += tests/pnv-xscom-test$(EXESUF)
+ check-qtest-ppc64-y += tests/drive_del-test$(EXESUF)
+-check-qtest-ppc64-y += tests/postcopy-test$(EXESUF)
++check-qtest-ppc64-y += tests/migration-test$(EXESUF)
+ check-qtest-ppc64-y += tests/boot-serial-test$(EXESUF)
+ check-qtest-ppc64-y += tests/rtas-test$(EXESUF)
+ check-qtest-ppc64-$(CONFIG_SLIRP) += tests/pxe-test$(EXESUF)
+@@ -784,7 +784,7 @@ tests/usb-hcd-uhci-test$(EXESUF): tests/usb-hcd-uhci-test.o $(libqos-usb-obj-y)
+ tests/usb-hcd-ehci-test$(EXESUF): tests/usb-hcd-ehci-test.o $(libqos-usb-obj-y)
+ tests/usb-hcd-xhci-test$(EXESUF): tests/usb-hcd-xhci-test.o $(libqos-usb-obj-y)
+ tests/pc-cpu-test$(EXESUF): tests/pc-cpu-test.o
+-tests/postcopy-test$(EXESUF): tests/postcopy-test.o
++tests/migration-test$(EXESUF): tests/migration-test.o
+ tests/vhost-user-test$(EXESUF): tests/vhost-user-test.o $(test-util-obj-y) \
+ 	$(qtest-obj-y) $(test-io-obj-y) $(libqos-virtio-obj-y) $(libqos-pc-obj-y) \
+ 	$(chardev-obj-y)
+diff --git a/tests/postcopy-test.c b/tests/migration-test.c
+similarity index 98%
+rename from tests/postcopy-test.c
+rename to tests/migration-test.c
+index 8142f2ab90..55c4aed719 100644
+--- a/tests/postcopy-test.c
++++ b/tests/migration-test.c
+@@ -1,5 +1,5 @@
+ /*
+- * QTest testcase for postcopy
++ * QTest testcase for migration
+  *
+  * Copyright (c) 2016 Red Hat, Inc. and/or its affiliates
+  *   based on the vhost-user-test.c that is:
+@@ -243,8 +243,6 @@ static QDict *return_or_event(QDict *response)
+ /*
+  * It's tricky to use qemu's migration event capability with qtest,
+  * events suddenly appearing confuse the qmp()/hmp() responses.
+- * so wait for a couple of passes to have happened before
+- * going postcopy.
+  */
+ 
+ static uint64_t get_migration_pass(void)
+@@ -504,7 +502,7 @@ static void test_migrate(void)
+ 
+ int main(int argc, char **argv)
+ {
+-    char template[] = "/tmp/postcopy-test-XXXXXX";
++    char template[] = "/tmp/migration-test-XXXXXX";
+     int ret;
+ 
+     g_test_init(&argc, &argv, NULL);
+@@ -521,7 +519,7 @@ int main(int argc, char **argv)
+ 
+     module_call_init(MODULE_INIT_QOM);
+ 
+-    qtest_add_func("/postcopy", test_migrate);
++    qtest_add_func("/migration/postcopy/unix", test_migrate);
+ 
+     ret = g_test_run();
+ 
 -- 
-Alexey
+2.13.6
