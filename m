@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44134)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44137)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1e7img-0004Fl-D5
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 10:05:24 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1e7imh-0004GU-0I
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 10:05:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1e7imf-0007vf-G6
+	(envelope-from <ehabkost@redhat.com>) id 1e7ima-0007n7-UP
 	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 10:05:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33982)
+Received: from mx1.redhat.com ([209.132.183.28]:59622)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1e7imf-0007tI-67
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 10:05:21 -0400
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1e7ima-0007lF-Mq
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 10:05:16 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Thu, 26 Oct 2017 16:03:40 +0200
-Message-Id: <20171026140404.21948-16-ehabkost@redhat.com>
+Date: Thu, 26 Oct 2017 16:03:39 +0200
+Message-Id: <20171026140404.21948-15-ehabkost@redhat.com>
 In-Reply-To: <20171026140404.21948-1-ehabkost@redhat.com>
 References: <20171026140404.21948-1-ehabkost@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 15/39] openrisc: use generic cpu_model parsing
+Subject: [Qemu-devel] [PULL 14/39] openrisc: cleanup cpu type name
+ composition
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,50 +32,139 @@ Cc: qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>
 
 From: Igor Mammedov <imammedo@redhat.com>
 
+use new OPENRISC_CPU_TYPE_NAME to compose CPU type name and get
+rid of intermediate OpenRISCCPUInfo/openrisc_cpu_register_types()
+which is replaced by static TypeInfo array.
+
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Message-Id: <1507211474-188400-19-git-send-email-imammedo@redhat.com>
+Message-Id: <1507211474-188400-18-git-send-email-imammedo@redhat.com>
 Acked-by: Stafford Horne <shorne@gmail.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- hw/openrisc/openrisc_sim.c | 8 ++------
- 1 file changed, 2 insertions(+), 6 deletions(-)
+ target/openrisc/cpu.h |  3 +++
+ target/openrisc/cpu.c | 69 +++++++++++++++++----------------------------=
+------
+ 2 files changed, 26 insertions(+), 46 deletions(-)
 
-diff --git a/hw/openrisc/openrisc_sim.c b/hw/openrisc/openrisc_sim.c
-index 58638c6ecd..e9558f1ca4 100644
---- a/hw/openrisc/openrisc_sim.c
-+++ b/hw/openrisc/openrisc_sim.c
-@@ -125,7 +125,6 @@ static void openrisc_load_kernel(ram_addr_t ram_size,
- static void openrisc_sim_init(MachineState *machine)
- {
-     ram_addr_t ram_size =3D machine->ram_size;
--    const char *cpu_model =3D machine->cpu_model;
-     const char *kernel_filename =3D machine->kernel_filename;
-     OpenRISCCPU *cpu =3D NULL;
-     MemoryRegion *ram;
-@@ -133,12 +132,8 @@ static void openrisc_sim_init(MachineState *machine)
-     qemu_irq serial_irq;
-     int n;
+diff --git a/target/openrisc/cpu.h b/target/openrisc/cpu.h
+index 892dc4210f..cc22dc8871 100644
+--- a/target/openrisc/cpu.h
++++ b/target/openrisc/cpu.h
+@@ -392,6 +392,9 @@ int cpu_openrisc_get_phys_data(OpenRISCCPU *cpu,
 =20
--    if (!cpu_model) {
--        cpu_model =3D "or1200";
--    }
--
-     for (n =3D 0; n < smp_cpus; n++) {
--        cpu =3D OPENRISC_CPU(cpu_generic_init(TYPE_OPENRISC_CPU, cpu_mod=
-el));
-+        cpu =3D OPENRISC_CPU(cpu_create(machine->cpu_type));
-         if (cpu =3D=3D NULL) {
-             fprintf(stderr, "Unable to find CPU definition!\n");
-             exit(1);
-@@ -180,6 +175,7 @@ static void openrisc_sim_machine_init(MachineClass *m=
-c)
-     mc->init =3D openrisc_sim_init;
-     mc->max_cpus =3D 2;
-     mc->is_default =3D 1;
-+    mc->default_cpu_type =3D OPENRISC_CPU_TYPE_NAME("or1200");
+ #define cpu_init(cpu_model) cpu_generic_init(TYPE_OPENRISC_CPU, cpu_mode=
+l)
+=20
++#define OPENRISC_CPU_TYPE_SUFFIX "-" TYPE_OPENRISC_CPU
++#define OPENRISC_CPU_TYPE_NAME(model) model OPENRISC_CPU_TYPE_SUFFIX
++
+ #include "exec/cpu-all.h"
+=20
+ #define TB_FLAGS_DFLAG 1
+diff --git a/target/openrisc/cpu.c b/target/openrisc/cpu.c
+index a8db869e50..e0394b8b06 100644
+--- a/target/openrisc/cpu.c
++++ b/target/openrisc/cpu.c
+@@ -101,7 +101,7 @@ static ObjectClass *openrisc_cpu_class_by_name(const =
+char *cpu_model)
+     ObjectClass *oc;
+     char *typename;
+=20
+-    typename =3D g_strdup_printf("%s-" TYPE_OPENRISC_CPU, cpu_model);
++    typename =3D g_strdup_printf(OPENRISC_CPU_TYPE_NAME("%s"), cpu_model=
+);
+     oc =3D object_class_by_name(typename);
+     g_free(typename);
+     if (oc !=3D NULL && (!object_class_dynamic_cast(oc, TYPE_OPENRISC_CP=
+U) ||
+@@ -126,16 +126,6 @@ static void openrisc_any_initfn(Object *obj)
+     cpu->env.cpucfgr =3D CPUCFGR_NSGF | CPUCFGR_OB32S | CPUCFGR_EVBARP;
  }
 =20
- DEFINE_MACHINE("or1k-sim", openrisc_sim_machine_init)
+-typedef struct OpenRISCCPUInfo {
+-    const char *name;
+-    void (*initfn)(Object *obj);
+-} OpenRISCCPUInfo;
+-
+-static const OpenRISCCPUInfo openrisc_cpus[] =3D {
+-    { .name =3D "or1200",      .initfn =3D or1200_initfn },
+-    { .name =3D "any",         .initfn =3D openrisc_any_initfn },
+-};
+-
+ static void openrisc_cpu_class_init(ObjectClass *oc, void *data)
+ {
+     OpenRISCCPUClass *occ =3D OPENRISC_CPU_CLASS(oc);
+@@ -166,40 +156,6 @@ static void openrisc_cpu_class_init(ObjectClass *oc,=
+ void *data)
+     cc->tcg_initialize =3D openrisc_translate_init;
+ }
+=20
+-static void cpu_register(const OpenRISCCPUInfo *info)
+-{
+-    TypeInfo type_info =3D {
+-        .parent =3D TYPE_OPENRISC_CPU,
+-        .instance_size =3D sizeof(OpenRISCCPU),
+-        .instance_init =3D info->initfn,
+-        .class_size =3D sizeof(OpenRISCCPUClass),
+-    };
+-
+-    type_info.name =3D g_strdup_printf("%s-" TYPE_OPENRISC_CPU, info->na=
+me);
+-    type_register(&type_info);
+-    g_free((void *)type_info.name);
+-}
+-
+-static const TypeInfo openrisc_cpu_type_info =3D {
+-    .name =3D TYPE_OPENRISC_CPU,
+-    .parent =3D TYPE_CPU,
+-    .instance_size =3D sizeof(OpenRISCCPU),
+-    .instance_init =3D openrisc_cpu_initfn,
+-    .abstract =3D true,
+-    .class_size =3D sizeof(OpenRISCCPUClass),
+-    .class_init =3D openrisc_cpu_class_init,
+-};
+-
+-static void openrisc_cpu_register_types(void)
+-{
+-    int i;
+-
+-    type_register_static(&openrisc_cpu_type_info);
+-    for (i =3D 0; i < ARRAY_SIZE(openrisc_cpus); i++) {
+-        cpu_register(&openrisc_cpus[i]);
+-    }
+-}
+-
+ /* Sort alphabetically by type name, except for "any". */
+ static gint openrisc_cpu_list_compare(gconstpointer a, gconstpointer b)
+ {
+@@ -248,4 +204,25 @@ void cpu_openrisc_list(FILE *f, fprintf_function cpu=
+_fprintf)
+     g_slist_free(list);
+ }
+=20
+-type_init(openrisc_cpu_register_types)
++#define DEFINE_OPENRISC_CPU_TYPE(cpu_model, initfn) \
++    {                                               \
++        .parent =3D TYPE_OPENRISC_CPU,                \
++        .instance_init =3D initfn,                    \
++        .name =3D OPENRISC_CPU_TYPE_NAME(cpu_model),  \
++    }
++
++static const TypeInfo openrisc_cpus_type_infos[] =3D {
++    { /* base class should be registered first */
++        .name =3D TYPE_OPENRISC_CPU,
++        .parent =3D TYPE_CPU,
++        .instance_size =3D sizeof(OpenRISCCPU),
++        .instance_init =3D openrisc_cpu_initfn,
++        .abstract =3D true,
++        .class_size =3D sizeof(OpenRISCCPUClass),
++        .class_init =3D openrisc_cpu_class_init,
++    },
++    DEFINE_OPENRISC_CPU_TYPE("or1200", or1200_initfn),
++    DEFINE_OPENRISC_CPU_TYPE("any", openrisc_any_initfn),
++};
++
++DEFINE_TYPES(openrisc_cpus_type_infos)
 --=20
 2.13.6
