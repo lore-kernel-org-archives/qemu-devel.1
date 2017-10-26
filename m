@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58417)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58449)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1e7i2m-00005H-1H
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 09:17:57 -0400
+	(envelope-from <kwolf@redhat.com>) id 1e7i2o-000073-GV
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 09:18:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1e7i2l-0001Xz-1H
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 09:17:56 -0400
+	(envelope-from <kwolf@redhat.com>) id 1e7i2n-0001cG-A5
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 09:17:58 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Thu, 26 Oct 2017 15:17:08 +0200
-Message-Id: <20171026131741.5059-3-kwolf@redhat.com>
+Date: Thu, 26 Oct 2017 15:17:07 +0200
+Message-Id: <20171026131741.5059-2-kwolf@redhat.com>
 In-Reply-To: <20171026131741.5059-1-kwolf@redhat.com>
 References: <20171026131741.5059-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 02/35] qemu-iotests: Test backing_fmt with
- backing node reference
+Subject: [Qemu-devel] [PULL 01/35] block: don't add 'driver' to options when
+ referring to backing via node name
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,43 +23,40 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-This changes test case 191 to include a backing image that has
-backing_fmt set in the image file, but is referenced by node name in the
-qemu command line.
+From: Peter Krempa <pkrempa@redhat.com>
 
+When referring to a backing file of an image via node name
+bdrv_open_backing_file would add the 'driver' option to the option list
+filling it with the backing format driver. This breaks construction of
+the backing chain via -blockdev, as bdrv_open_inherit reports an error
+if both 'reference' and 'options' are provided.
+
+$ qemu-img create -f raw /tmp/backing.raw 64M
+$ qemu-img create -f qcow2 -F raw -b /tmp/backing.raw /tmp/test.qcow2
+$ qemu-system-x86_64 \
+  -blockdev driver=file,filename=/tmp/backing.raw,node-name=backing \
+  -blockdev driver=qcow2,file.driver=file,file.filename=/tmp/test.qcow2,node-name=root,backing=backing
+qemu-system-x86_64: -blockdev driver=qcow2,file.driver=file,file.filename=/tmp/test.qcow2,node-name=root,backing=backing: Could not open backing file: Cannot reference an existing block device with additional options or a new filename
+
+Signed-off-by: Peter Krempa <pkrempa@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- tests/qemu-iotests/191     | 3 ++-
- tests/qemu-iotests/191.out | 2 +-
- 2 files changed, 3 insertions(+), 2 deletions(-)
+ block.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/tests/qemu-iotests/191 b/tests/qemu-iotests/191
-index ac2b88fd78..28bdea8f98 100755
---- a/tests/qemu-iotests/191
-+++ b/tests/qemu-iotests/191
-@@ -56,7 +56,8 @@ echo === Preparing and starting VM ===
- echo
+diff --git a/block.c b/block.c
+index 46eb1728da..684cb018da 100644
+--- a/block.c
++++ b/block.c
+@@ -2245,7 +2245,8 @@ int bdrv_open_backing_file(BlockDriverState *bs, QDict *parent_options,
+         goto free_exit;
+     }
  
- TEST_IMG="${TEST_IMG}.base" _make_test_img $size
--TEST_IMG="${TEST_IMG}.mid" _make_test_img -b "${TEST_IMG}.base"
-+IMGOPTS=$(_optstr_add "$IMGOPTS" "backing_fmt=$IMGFMT") \
-+    TEST_IMG="${TEST_IMG}.mid" _make_test_img -b "${TEST_IMG}.base"
- _make_test_img -b "${TEST_IMG}.mid"
- TEST_IMG="${TEST_IMG}.ovl2" _make_test_img -b "${TEST_IMG}.mid"
+-    if (bs->backing_format[0] != '\0' && !qdict_haskey(options, "driver")) {
++    if (!reference &&
++        bs->backing_format[0] != '\0' && !qdict_haskey(options, "driver")) {
+         qdict_put_str(options, "driver", bs->backing_format);
+     }
  
-diff --git a/tests/qemu-iotests/191.out b/tests/qemu-iotests/191.out
-index 7bfcd2d5d8..6157fa520f 100644
---- a/tests/qemu-iotests/191.out
-+++ b/tests/qemu-iotests/191.out
-@@ -3,7 +3,7 @@ QA output created by 191
- === Preparing and starting VM ===
- 
- Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=67108864
--Formatting 'TEST_DIR/t.IMGFMT.mid', fmt=IMGFMT size=67108864 backing_file=TEST_DIR/t.IMGFMT.base
-+Formatting 'TEST_DIR/t.IMGFMT.mid', fmt=IMGFMT size=67108864 backing_file=TEST_DIR/t.IMGFMT.base backing_fmt=IMGFMT
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864 backing_file=TEST_DIR/t.IMGFMT.mid
- Formatting 'TEST_DIR/t.IMGFMT.ovl2', fmt=IMGFMT size=67108864 backing_file=TEST_DIR/t.IMGFMT.mid
- wrote 65536/65536 bytes at offset 1048576
 -- 
 2.13.6
