@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56643)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33610)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zachriggle@gmail.com>) id 1e7pMW-0005ie-Kg
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 17:06:49 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1e7pYj-0007h6-LI
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 17:19:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zachriggle@gmail.com>) id 1e7pMV-0002DU-BC
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 17:06:48 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1e7pYg-0004c7-Ha
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 17:19:25 -0400
+Date: Thu, 26 Oct 2017 23:12:00 +0200
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20171026211200.GA3181@umbus>
+References: <20170630183736.13222-1-rth@twiddle.net>
+	<1b8ff383-9d0b-d178-cd76-8c3b48aaead8@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20171025033442.44872-1-zachriggle@gmail.com>
-References: <20171024230758.31779-1-riggle@google.com>
-	<20171025033442.44872-1-zachriggle@gmail.com>
-From: Zach Riggle <zachriggle@gmail.com>
-Date: Thu, 26 Oct 2017 16:06:22 -0500
-Message-ID: <CAMP9c5=whCgR4qkOPDRKZ+adpWEPiVM=BwZp_r7qCAR7UAsWAQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2] linux-user: fix is_proc_myself to check
- the paths via realpath
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="gBBFr7Ir9EOA20Yy"
+Content-Disposition: inline
+In-Reply-To: <1b8ff383-9d0b-d178-cd76-8c3b48aaead8@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] target/ppc: Use
+ tcg_gen_lookup_and_goto_ptr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,95 +25,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zach Riggle <zachriggle@gmail.com>
-Cc: qemu-trivial@nongnu.org, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, "open list:All patches CC here" <qemu-devel@nongnu.org>
-
-Friendly ping :)
-
-I've updated the patch with v2 which addresses the style issue
+To: Thomas Huth <thuth@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
 
-*Zach Riggle*
+--gBBFr7Ir9EOA20Yy
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Oct 24, 2017 at 10:34 PM, Zach Riggle <zachriggle@gmail.com> wrote:
+On Thu, Oct 26, 2017 at 02:22:57PM +0200, Thomas Huth wrote:
+> On 30.06.2017 20:37, Richard Henderson wrote:
+> > Cc: qemu-ppc@nongnu.org
+> > Signed-off-by: Richard Henderson <rth@twiddle.net>
+> > ---
+> >  target/ppc/translate.c | 23 ++++++++---------------
+> >  1 file changed, 8 insertions(+), 15 deletions(-)
+>=20
+> *ping*
+>=20
+> Richard, David, any chance that we can still get this in for 2.11? I
+> think this would be quite a nice performance improvement for PPC TCG...
 
-> Previously, it was possible to get a handle to the "real" /proc/self/mem
-> by creating a symlink to it and opening the symlink, or opening e.g.
-> "./mem" after chdir'ing to "/proc/self".
->
->     $ ln -s /proc/self self
->     $ cat self/maps
->     60000000-602bc000 r-xp 00000000 fc:01 270375
->    /usr/bin/qemu-arm-static
->     604bc000-6050f000 rw-p 002bc000 fc:01 270375
->    /usr/bin/qemu-arm-static
->     ...
->
-> Signed-off-by: Zach Riggle <zachriggle@gmail.com>
-> ---
->  linux-user/syscall.c | 47 ++++++++++++++++++++++++++++-------------------
->  1 file changed, 28 insertions(+), 19 deletions(-)
->
-> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> index 9bf901fa11..6c1f28a1f7 100644
-> --- a/linux-user/syscall.c
-> +++ b/linux-user/syscall.c
-> @@ -7496,26 +7496,35 @@ static int open_self_auxv(void *cpu_env, int fd)
->
->  static int is_proc_myself(const char *filename, const char *entry)
->  {
-> -    if (!strncmp(filename, "/proc/", strlen("/proc/"))) {
-> -        filename += strlen("/proc/");
-> -        if (!strncmp(filename, "self/", strlen("self/"))) {
-> -            filename += strlen("self/");
-> -        } else if (*filename >= '1' && *filename <= '9') {
-> -            char myself[80];
-> -            snprintf(myself, sizeof(myself), "%d/", getpid());
-> -            if (!strncmp(filename, myself, strlen(myself))) {
-> -                filename += strlen(myself);
-> -            } else {
-> -                return 0;
-> -            }
-> -        } else {
-> -            return 0;
-> -        }
-> -        if (!strcmp(filename, entry)) {
-> -            return 1;
-> -        }
-> +    char proc_self_entry[PATH_MAX + 1];
-> +    char proc_self_entry_realpath[PATH_MAX + 1];
-> +    char filename_realpath[PATH_MAX + 1];
-> +
-> +    if (PATH_MAX < snprintf(proc_self_entry,
-> +                            sizeof(proc_self_entry),
-> +                            "/proc/self/%s",
-> +                            entry)) {
-> +        /* Full path to "entry" is too long to fit in the buffer */
-> +        return 0;
->      }
-> -    return 0;
-> +
-> +    if (!realpath(filename, filename_realpath)) {
-> +        /* File does not exist, or can't be canonicalized */
-> +        return 0;
-> +    }
-> +
-> +    if (!realpath(proc_self_entry, proc_self_entry_realpath)) {
-> +        /* Procfs entry does not exist */
-> +        return 0;
-> +    }
-> +
-> +    if (strcmp(filename_realpath, proc_self_entry_realpath) != 0) {
-> +        /* Paths are different */
-> +        return 0;
-> +    }
-> +
-> +    /* filename refers to /proc/self/<entry> */
-> +    return 1;
->  }
->
->  #if defined(HOST_WORDS_BIGENDIAN) != defined(TARGET_WORDS_BIGENDIAN)
-> --
-> 2.14.3
->
->
+Uh.. sorry, I don't even remember this patch.
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--gBBFr7Ir9EOA20Yy
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnyT50ACgkQbDjKyiDZ
+s5KWqg/7BC2qKw48kiq7kqW4VhdJhrOSjfJInYCxC77+Wx4eIV8ZaHGjfaEdWot0
+49iK1pNQqGph8lTNSPreMkZNGRCVTDM4OBecXV8OaCBS8vZ3vwJhHos6XB1eJttj
+k6nhaWswaUcFyVXwrUpMyyx+Fy4vWI5oUZuMXiHyg5cgK2JaM8HXRyOOXvp3Pk5V
+UcQ2i38y4OXaue8wXHItL4/H0XOHhblDFVf3W/WxZrXpTnZBY5ytRJOfg8Lq9JbF
+mAygq3M4i+VBGPj8V6JSxiOCgoeWDqUJuEZDd95eGHWsHTbJDNpgDvxXUja7ElJB
+bKb+KdJp1KxKBSHcVFRNXGySXUIpYs9VEhi3ziyIUWHdaiCnNWAnWmNJ0io5oVY1
+29eBxJ0oEFBd4Z27lQMHvMfkO8PZBvWNmDMpSHHYBFDYO/ynOEj4v9UIwZ7RU9RV
+PCP+3jFHhlB3yYtVfUx0bUUXM+HmZjLxuzVnmBKfziOdL9o36FsJb6c/vRV3OQ9s
+osIhUXXYs1ncPiwtB5UwqWB6X3b/malDNTMycbABOZvIp8YmxUYfUUZl8L8E9f5a
+fFbKCCV20IEKeubxjcp/SBYxD58EoFLIaTWuERBfXVZ89kx7HDYqNVEWnFSBCf1T
+q3TUhXBxTiWj26FvN73htUrJW/gIHfD+AiVGlB1d9NxZeaFRQYg=
+=G/Eg
+-----END PGP SIGNATURE-----
+
+--gBBFr7Ir9EOA20Yy--
