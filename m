@@ -1,34 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56076)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57081)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e7l3w-0002AO-OI
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 12:31:22 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1e7l7o-0003sF-34
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 12:35:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e7l3s-0003IF-Kd
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 12:31:20 -0400
-Received: from indium.canonical.com ([91.189.90.7]:44574)
+	(envelope-from <peter.maydell@linaro.org>) id 1e7l7n-00063g-Bm
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 12:35:20 -0400
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:45274)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1e7l3s-0003Hs-E2
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 12:31:16 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1e7l3r-0000xi-0K
-	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 16:31:15 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 008232E80CC
-	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 16:31:15 +0000 (UTC)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1e7l7m-00062h-Q4
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 12:35:19 -0400
+Received: by mail-wm0-x243.google.com with SMTP id q124so9143364wmb.0
+	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 09:35:18 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 26 Oct 2017 16:13:37 -0000
-From: OIiver <1368178@bugs.launchpad.net>
-Reply-To: Bug 1368178 <1368178@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20140911114353.25076.30246.malonedeb@soybean.canonical.com>
-Message-Id: <150903441794.4275.2452872769753096735.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1368178] Re: Windows ME falsely detects qemu's
- videocards as Number Nine Imagine 128
+In-Reply-To: <CAHmME9pE79krWx-zD=VGiScT4c=4TZ1wVxYFiF3m+8wsx9Fqeg@mail.gmail.com>
+References: <20171023122719.17199-1-Jason@zx2c4.com>
+	<CAFEAcA_PM5Fjx2Pk58h75p9vaZwFcusQdXuwy9tbDtc=EaoOJg@mail.gmail.com>
+	<10e16ca3-175b-9f34-65e7-031b883b7201@amsat.org>
+	<CAHmME9qtBiuAEnkCeuMd7EdeZveTVa4UOf+AQhMCFye0SYJY=Q@mail.gmail.com>
+	<20171026133445.kemzfgvpbmtcogsl@kamzik.brq.redhat.com>
+	<CAHmME9oyBvAV8FF9QMHyF46n8Ct6KZqThQVih2ipQmivD94Cag@mail.gmail.com>
+	<CAFEAcA8O6YyS1tSzaydckFpsqpb8HXgW5PJe-VTWud_5YGdW5A@mail.gmail.com>
+	<CAHmME9pE79krWx-zD=VGiScT4c=4TZ1wVxYFiF3m+8wsx9Fqeg@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 26 Oct 2017 17:34:56 +0100
+Message-ID: <CAFEAcA9XoeXDCQCmRBehntWSo0WGRBsaMDmC8QCqgU1K8jAF_A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH] hw/arm/virt: support 4 serial
+ ports
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,66 +36,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc: Andrew Jones <drjones@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, QEMU Trivial <qemu-trivial@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-Addition to my last comment.
+On 26 October 2017 at 17:15, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+> On Thu, Oct 26, 2017 at 4:36 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
+>> I'm still thinking about this. (You definitely can't have four,
+>> though, because we already have 2 in the trustzone-enabled
+>> config, so we can only add another 2.)
+>
+> The trustzone one could be the 5th? Since it's only useful for trustzone.
 
-Ubuntu 17.10 is now shipped with QEMU 2.10. Thus we can expect that
-18.04 LTS will be shipped with QEMU 2.10 or later, too.
+Reordering it would break existing users of the trustzone uart,
+whose command lines would stop working.
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1368178
-
-Title:
-  Windows ME falsely detects qemu's videocards as Number Nine Imagine
-  128
-
-Status in QEMU:
-  Incomplete
-
-Bug description:
-  A fresh installation of  Windows Millennium Edition (Windows ME,
-  WinME) as guest OS on qemu interprets qemu's videocards as Number Nine
-  Imagine  128 with the consequence, that
-
-  1. It is impossible to change color depth.
-  2. WinME uses the i128.drv Driver that is shipped with WinMe.
-  3. Forcing WinME to use other drivers has no effect.
-
-  =
-
-  It also doesn't matter what option for -vga was given to QEMU at command =
-line.
-  cirrus, std,   vmware,  qxl etc. all have no effect, the videocard detect=
-ed by Windows Me stays at Number Nine Imagine 128.
-
-  Even selecting another driver in WinME and forcing WinME to use
-  drivers such as the Cirrus Logic 5446 PCI driver has no effect.
-
-  I also want to mention, that the BIOS isn't detected by WinME properly.
-  The device manager of WinME shows errors with the Plug & Play BIOS driver=
- BIOS.vxd.
-
-  =
-
-  That is the QEMU Version:
-
-  # qemu-system-i386 --version                                             =
-                                                                           =
-                                                  =
-
-  QEMU emulator version 2.0.0 (Debian 2.0.0+dfsg-2ubuntu1.3), Copyright (c)=
- 2003-2008 Fabrice Bellard                  =
-
-
-  And this was the complete command line, that was given: =
-
-  # sudo /usr/bin/qemu-system-i386 -hda WinME_QEMU.img -cdrom drivers.iso -=
-boot c -no-acpi -no-hpet -soundhw sb16 -net nic -cpu pentium3 -m 256 -vga c=
-irrus
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1368178/+subscriptions
+thanks
+-- PMM
