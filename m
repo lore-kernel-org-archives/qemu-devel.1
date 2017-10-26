@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56031)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56057)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gabriel291075@gmail.com>) id 1e7jIx-0007IT-Qx
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 10:38:45 -0400
+	(envelope-from <gabriel291075@gmail.com>) id 1e7jIy-0007JE-LI
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 10:38:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gabriel291075@gmail.com>) id 1e7jIw-0007jF-5s
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 10:38:43 -0400
+	(envelope-from <gabriel291075@gmail.com>) id 1e7jIx-0007ke-8n
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 10:38:44 -0400
 From: Gabriel Costa <gabriel291075@gmail.com>
-Date: Thu, 26 Oct 2017 06:34:11 -0400
-Message-Id: <1509014053-28134-5-git-send-email-costa@advantech.ca>
+Date: Thu, 26 Oct 2017 06:34:12 -0400
+Message-Id: <1509014053-28134-6-git-send-email-costa@advantech.ca>
 In-Reply-To: <1509014053-28134-1-git-send-email-costa@advantech.ca>
 References: <1509014053-28134-1-git-send-email-costa@advantech.ca>
-Subject: [Qemu-devel] [PATCH v5 4/5]arm: kinetis_k64_uart
+Subject: [Qemu-devel] [PATCH v5 5/5]arm: mk64fn1m0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,27 +24,23 @@ Cc: qemu-arm@nongnu.org, peter.maydell@linaro.org, f4bug@amsat.org, Gabriel Augu
 
 From: Gabriel Augusto Costa <gabriel291075@gmail.com>
 
-This Patch include kinetis_k64_uart.c and .h
-uart means Universal Asynchronous Receiver/Transmitter (UART)
-More information about this peripheral can be found at:
-pag 1529, K64P144M120SF5RM.pdf.
+This Patch include mk64fn1m0.c that describe the kinetis k64 machine and
+some peripherals.
 
 Signed-off-by: Gabriel Augusto Costa <gabriel291075@gmail.com>
 ---
- hw/char/kinetis_k64_uart.c         | 342 +++++++++++++++++++++++++++++++++++++
- include/hw/char/kinetis_k64_uart.h |  79 +++++++++
- 2 files changed, 421 insertions(+)
- create mode 100644 hw/char/kinetis_k64_uart.c
- create mode 100644 include/hw/char/kinetis_k64_uart.h
+ hw/arm/mk64fn1m0.c | 136 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 136 insertions(+)
+ create mode 100644 hw/arm/mk64fn1m0.c
 
-diff --git a/hw/char/kinetis_k64_uart.c b/hw/char/kinetis_k64_uart.c
+diff --git a/hw/arm/mk64fn1m0.c b/hw/arm/mk64fn1m0.c
 new file mode 100644
-index 0000000..fc9327d
+index 0000000..618791c
 --- /dev/null
-+++ b/hw/char/kinetis_k64_uart.c
-@@ -0,0 +1,342 @@
++++ b/hw/arm/mk64fn1m0.c
+@@ -0,0 +1,136 @@
 +/*
-+ * Kinetis K64 peripheral microcontroller emulation.
++ * Kinetis K64 MK64FN1M0 microcontroller emulation.
 + *
 + * Copyright (c) 2017 Advantech Wireless
 + * Written by Gabriel Costa <gabriel291075@gmail.com>
@@ -55,420 +51,129 @@ index 0000000..fc9327d
 + */
 +
 +#include "qemu/osdep.h"
++#include "qapi/error.h"
 +#include "hw/sysbus.h"
++#include "hw/ssi/ssi.h"
++#include "hw/arm/arm.h"
++#include "hw/devices.h"
++#include "qemu/timer.h"
++#include "hw/i2c/i2c.h"
++#include "net/net.h"
++#include "hw/boards.h"
 +#include "qemu/log.h"
++#include "exec/address-spaces.h"
++#include "sysemu/sysemu.h"
++#include "hw/char/pl011.h"
++#include "hw/misc/unimp.h"
++#include "cpu.h"
 +#include "hw/char/kinetis_k64_uart.h"
++#include "hw/misc/kinetis_k64_system.h"
++#include "hw/misc/kinetis_k64_mcg.h"
++#include "hw/misc/kinetis_k64_pmux.h"
 +
-+static const VMStateDescription vmstate_kinetis_k64_uart = {
-+    .name = TYPE_KINETIS_K64_UART,
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT8(BDH, kinetis_k64_uart_state),
-+        VMSTATE_UINT8(BDL, kinetis_k64_uart_state),
-+        VMSTATE_UINT8(C1, kinetis_k64_uart_state),
-+        VMSTATE_UINT8(C2, kinetis_k64_uart_state),
-+        VMSTATE_UINT8(S1, kinetis_k64_uart_state),
-+        VMSTATE_UINT8(S2, kinetis_k64_uart_state),
-+        VMSTATE_UINT8(C3, kinetis_k64_uart_state),
-+        VMSTATE_UINT8(D, kinetis_k64_uart_state),
-+        VMSTATE_UINT8(MA1, kinetis_k64_uart_state),
-+        VMSTATE_UINT8(MA2, kinetis_k64_uart_state),
-+        VMSTATE_UINT8(C4, kinetis_k64_uart_state),
-+        VMSTATE_UINT8(C5, kinetis_k64_uart_state),
-+        VMSTATE_UINT8(ED, kinetis_k64_uart_state),
-+        VMSTATE_UINT8(MODEM, kinetis_k64_uart_state),
-+        VMSTATE_UINT8(IR, kinetis_k64_uart_state),
-+        VMSTATE_UINT8(PFIFO, kinetis_k64_uart_state),
-+        VMSTATE_UINT8(CFIFO, kinetis_k64_uart_state),
-+        VMSTATE_UINT8(SFIFO, kinetis_k64_uart_state),
-+        VMSTATE_UINT8(TWFIFO, kinetis_k64_uart_state),
-+        VMSTATE_UINT8(TCFIFO, kinetis_k64_uart_state),
-+        VMSTATE_UINT8(RWFIFO, kinetis_k64_uart_state),
-+        VMSTATE_UINT8(RCFIFO, kinetis_k64_uart_state),
-+        VMSTATE_UINT8(C7816, kinetis_k64_uart_state),
-+        VMSTATE_UINT8(IE7816, kinetis_k64_uart_state),
-+        VMSTATE_UINT8(IS7816, kinetis_k64_uart_state),
-+        VMSTATE_UINT8(WP7816Tx, kinetis_k64_uart_state),
-+        VMSTATE_UINT8(WN7816, kinetis_k64_uart_state),
-+        VMSTATE_UINT8(WF7816, kinetis_k64_uart_state),
-+        VMSTATE_UINT8(ET7816, kinetis_k64_uart_state),
-+        VMSTATE_UINT8(TL7816, kinetis_k64_uart_state),
-+        VMSTATE_END_OF_LIST()
++#define FLASH_SIZE              (1024 * 1024)
++#define FLASH_BASE_ADDRESS      (0x00000000)
++#define SRAM_SIZE               (192 * 1024)
++#define SRAM_BASE_ADDRESS       (0x20000000)
++
++#define NUM_IRQ_LINES 85
++
++/* System controller.  */
++
++static void do_sys_reset(void *opaque, int n, int level)
++{
++    if (level) {
++        qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
 +    }
++}
++
++/* Interruptions at pag.77 of K64P144M120F5RM.pdf */
++
++static void mk64fn1m0_init_mach(MachineState *ms, const char *kernel_filename)
++{
++    DeviceState *nvic;
++
++    MemoryRegion *system_memory = get_system_memory();
++    MemoryRegion *sram = g_new(MemoryRegion, 1);
++    MemoryRegion *flash = g_new(MemoryRegion, 1);
++
++    memory_region_init_ram(flash, NULL, "k64.flash", FLASH_SIZE, &error_fatal);
++    memory_region_set_readonly(flash, true);
++    memory_region_add_subregion(system_memory, FLASH_BASE_ADDRESS, flash);
++    memory_region_init_ram(sram, NULL, "k64.sram", SRAM_SIZE, &error_fatal);
++    memory_region_add_subregion(system_memory, SRAM_BASE_ADDRESS, sram);
++    nvic = armv7m_init(system_memory, FLASH_SIZE, NUM_IRQ_LINES,
++            ms->kernel_filename, ms->cpu_type);
++    qdev_connect_gpio_out_named(nvic, "SYSRESETREQ", 0,
++            qemu_allocate_irq(&do_sys_reset, NULL, 0));
++
++    sysbus_create_simple(TYPE_KINETIS_K64_SIM, 0x40048000, NULL);
++    sysbus_create_simple(TYPE_KINETIS_K64_MCG, 0x40064000, NULL);
++    sysbus_create_simple(TYPE_KINETIS_K64_PMUX, 0x40049000,
++            qdev_get_gpio_in(nvic, 59));
++    sysbus_create_simple(TYPE_KINETIS_K64_PMUX, 0x4004A000,
++            qdev_get_gpio_in(nvic, 60));
++    sysbus_create_simple(TYPE_KINETIS_K64_PMUX, 0x4004B000,
++            qdev_get_gpio_in(nvic, 61));
++    sysbus_create_simple(TYPE_KINETIS_K64_PMUX, 0x4004C000,
++            qdev_get_gpio_in(nvic, 62));
++    sysbus_create_simple(TYPE_KINETIS_K64_PMUX, 0x4004D000,
++            qdev_get_gpio_in(nvic, 63));
++    create_unimplemented_device("kinetis_k64_spi0",  0x4002C000, 0x1000);
++    create_unimplemented_device("kinetis_k64_spi1",  0x4002D000, 0x1000);
++    create_unimplemented_device("kinetis_k64_adc0",  0x4003B000, 0x1000);
++    create_unimplemented_device("kinetis_k64_dac",   0x4002F000, 0x1000);
++    create_unimplemented_device("kinetis_k64_i2c0",  0x40066000, 0x1000);
++    create_unimplemented_device("kinetis_k64_i2c1",  0x40067000, 0x1000);
++    kinetis_k64_uart_create(0x4006A000, qdev_get_gpio_in(nvic, 31),
++            serial_hds[0]);
++    create_unimplemented_device("kinetis_k64_uart1", 0x4006B000, 0x1000);
++    create_unimplemented_device("kinetis_k64_uart2", 0x4006C000, 0x1000);
++    create_unimplemented_device("kinetis_k64_uart3", 0x4006D000, 0x1000);
++    create_unimplemented_device("kinetis_k64_spi2",  0x400AC000, 0x1000);
++    create_unimplemented_device("kinetis_k64_adc1",  0x400BB000, 0x1000);
++    create_unimplemented_device("kinetis_k64_i2c2",  0x400E6000, 0x1000);
++    create_unimplemented_device("kinetis_k64_uart4", 0x400EA000, 0x1000);
++    create_unimplemented_device("kinetis_k64_uart5", 0x400EB000, 0x1000);
++    create_unimplemented_device("peripheral_brdg_0", 0x40000000, 0x1000);
++    create_unimplemented_device("Crossbar_Switch",   0x40004000, 0x1000);
++    create_unimplemented_device("DMA_Controller",    0x40008000, 0x1000);
++    create_unimplemented_device("DMA_Controller_t",  0x40009000, 0x1000);
++    create_unimplemented_device("FlexBus",           0x4000C000, 0x1000);
++    create_unimplemented_device("MPU",               0x4000D000, 0x1000);
++    create_unimplemented_device("Flash_mem_ctrl",    0x4001F000, 0x1000);
++    create_unimplemented_device("Flash_mem",         0x40020000, 0x1000);
++    create_unimplemented_device("DMA_ch_multiplx",   0x40021000, 0x1000);
++}
++
++static void mk64fn1m0_init(MachineState *machine)
++{
++    const char *kernel_filename = machine->kernel_filename;
++    mk64fn1m0_init_mach(machine, kernel_filename);
++}
++
++static void mk64fn1m0_class_init(ObjectClass *oc, void *data)
++{
++    MachineClass *mc = MACHINE_CLASS(oc);
++
++    mc->desc = "Kinetis K64 MCU (Cortex-M4)";
++    mc->init = mk64fn1m0_init;
++    mc->ignore_memory_transaction_failures = true;
++    mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-m4");
++    mc->max_cpus = 1;
++}
++
++static const TypeInfo mk64_type = {
++    .name = MACHINE_TYPE_NAME("mk64fn1m0"),
++    .parent = TYPE_MACHINE,
++    .class_init = mk64fn1m0_class_init,
 +};
 +
-+static void kinetis_k64_uart_reset(DeviceState *dev)
++static void mk64fn1m0_machine_init(void)
 +{
-+    kinetis_k64_uart_state *s = KINETIS_K64_UART(dev);
-+
-+    s->BDH = 0x00;
-+    s->BDL = 0x04;
-+    s->C1 = 0x00;
-+    s->C2 = 0x00;
-+    s->S1 = 0xC0;
-+    s->S2 = 0x00;
-+    s->C3 = 0x00;
-+    s->D = 0x00;
-+    s->MA1 = 0x00;
-+    s->MA2 = 0x00;
-+    s->C4 = 0x00;
-+    s->C5 = 0x00;
-+    s->ED = 0x00;
-+    s->MODEM = 0x00;
-+    s->IR = 0x00;
-+    s->PFIFO = 0x00;
-+    s->CFIFO = 0x00;
-+    s->SFIFO = 0xC0;
-+    s->TWFIFO = 0x00;
-+    s->TCFIFO = 0x00;
-+    s->RWFIFO = 0x01;
-+    s->RCFIFO = 0x00;
-+    s->C7816 = 0x00;
-+    s->IE7816 = 0x00;
-+    s->IS7816 = 0x00;
-+    s->WP7816Tx = 0x0A;
-+    s->WN7816 = 0x00;
-+    s->WF7816 = 0x01;
-+    s->ET7816 = 0x00;
-+    s->TL7816 = 0x00;
-+
-+    qemu_set_irq(s->irq, 0);
++    type_register_static(&mk64_type);
 +}
 +
-+static void kinetis_k64_uart_write(void *opaque, hwaddr offset, uint64_t value,
-+        unsigned size)
-+{
-+    kinetis_k64_uart_state *s = (kinetis_k64_uart_state *)opaque;
-+
-+    value &= 0xFF;
-+
-+    switch (offset) {
-+    case 0x00:
-+        s->BDH = value;
-+        break;
-+    case 0x01:
-+        s->BDL = value;
-+        break;
-+    case 0x02:
-+        s->C1 = value;
-+        break;
-+    case 0x03:
-+        s->C2 = value;
-+        break;
-+    case 0x05:
-+        s->S2 = value;
-+        break;
-+    case 0x06:
-+        s->C3 = value;
-+        break;
-+    case 0x07:
-+        s->D = value;
-+        qemu_chr_fe_write_all(&s->chr, &s->D, 1);
-+        break;
-+    case 0x08:
-+        s->MA1 = value;
-+        break;
-+    case 0x09:
-+        s->MA2 = value;
-+        break;
-+    case 0x0A:
-+        s->C4 = value;
-+        break;
-+    case 0x0B:
-+        s->C5 = value;
-+        break;
-+    case 0x0D:
-+        s->MODEM = value;
-+        break;
-+    case 0x0E:
-+        s->IR = value;
-+        break;
-+    case 0x10:
-+        s->PFIFO = value;
-+        break;
-+    case 0x11:
-+        s->CFIFO = value;
-+        break;
-+    case 0x12:
-+        s->SFIFO = value;
-+        break;
-+    case 0x13:
-+        s->TWFIFO = value;
-+        break;
-+    case 0x15:
-+        s->RWFIFO = value;
-+        break;
-+    case 0x18:
-+        s->C7816 = value;
-+        break;
-+    case 0x19:
-+        s->IE7816 = value;
-+        break;
-+    case 0x1A:
-+        s->IS7816 = value;
-+        break;
-+    case 0x1B:
-+        s->WP7816Tx = value;
-+        break;
-+    case 0x1C:
-+        s->WN7816 = value;
-+        break;
-+    case 0x1D:
-+        s->WF7816 = value;
-+        break;
-+    case 0x1E:
-+        s->ET7816 = value;
-+        break;
-+    case 0x1F:
-+        s->TL7816 = value;
-+        break;
-+    default:
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                "kinetis_k64_uart: write at bad offset 0x%x\n",
-+                (int)offset);
-+    }
-+}
-+
-+static uint64_t kinetis_k64_uart_read(void *opaque, hwaddr offset,
-+        unsigned size)
-+{
-+    kinetis_k64_uart_state *s = (kinetis_k64_uart_state *)opaque;
-+
-+    switch (offset) {
-+    case 0x00:
-+        return s->BDH;
-+    case 0x01:
-+        return s->BDL;
-+    case 0x02:
-+        return s->C1;
-+    case 0x03:
-+        return s->C2;
-+    case 0x04:
-+        return s->S1;
-+    case 0x05:
-+        return s->S2;
-+    case 0x06:
-+        return s->C3;
-+    case 0x07:
-+        s->RCFIFO = 0;
-+        qemu_chr_fe_accept_input(&s->chr);
-+        return s->D;
-+    case 0x08:
-+        return s->MA1;
-+    case 0x09:
-+        return s->MA2;
-+    case 0x0A:
-+        return s->C4;
-+    case 0x0B:
-+        return s->C5;
-+    case 0x0C:
-+        return s->ED;
-+    case 0x0D:
-+        return s->MODEM;
-+    case 0x0E:
-+        return s->IR;
-+    case 0x10:
-+        return s->PFIFO;
-+    case 0x11:
-+        return s->CFIFO;
-+    case 0x12:
-+        return s->SFIFO;
-+    case 0x13:
-+        return s->TWFIFO;
-+    case 0x14:
-+        return s->TCFIFO;
-+    case 0x15:
-+        return s->RWFIFO;
-+    case 0x16:
-+        return s->RCFIFO;
-+    case 0x18:
-+        return s->C7816;
-+    case 0x19:
-+        return s->IE7816;
-+    case 0x1A:
-+        return s->IS7816;
-+    case 0x1B:
-+        return s->WP7816Tx;
-+    case 0x1C:
-+        return s->WN7816;
-+    case 0x1D:
-+        return s->WF7816;
-+    case 0x1E:
-+        return s->ET7816;
-+    case 0x1F:
-+        return s->TL7816;
-+    default:
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                "kinetis_k64_uart: read at bad offset 0x%x\n", (int)offset);
-+        return 0;
-+    }
-+}
-+
-+static const MemoryRegionOps kinetis_k64_uart_ops = {
-+    .read = kinetis_k64_uart_read,
-+    .write = kinetis_k64_uart_write,
-+    .endianness = DEVICE_NATIVE_ENDIAN,
-+};
-+
-+static int kinetis_k64_uart_can_receive(void *opaque)
-+{
-+    kinetis_k64_uart_state *s = (kinetis_k64_uart_state *)opaque;
-+
-+    if (s->RCFIFO == 0) {
-+        return 1; /*Can read a byte*/
-+    } else {
-+        return 0; /*Cannot read a byte*/
-+    }
-+}
-+
-+static void kinetis_k64_uart_receive(void *opaque, const uint8_t *buf, int size)
-+{
-+    kinetis_k64_uart_state *s = (kinetis_k64_uart_state *)opaque;
-+
-+    if (size > 0) {
-+        if (buf != NULL) {
-+            s->D = buf[0];
-+            s->RCFIFO = 1;
-+        }
-+    }
-+}
-+
-+static void kinetis_k64_uart_realize(DeviceState *dev, Error **errp)
-+{
-+    kinetis_k64_uart_state *s = KINETIS_K64_UART(dev);
-+
-+    qemu_chr_fe_set_handlers(&s->chr, kinetis_k64_uart_can_receive,
-+                             kinetis_k64_uart_receive, NULL, NULL,
-+                             s, NULL, true);
-+}
-+
-+static Property kinetis_k64_uart_properties[] = {
-+    DEFINE_PROP_CHR("chardev", kinetis_k64_uart_state, chr),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void kinetis_k64_uart_init(Object *obj)
-+{
-+    kinetis_k64_uart_state *s = KINETIS_K64_UART(obj);
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
-+
-+    memory_region_init_io(&s->iomem, obj, &kinetis_k64_uart_ops, s,
-+            TYPE_KINETIS_K64_UART, 0x1000);
-+    sysbus_init_mmio(sbd, &s->iomem);
-+    sysbus_init_irq(sbd, &s->irq);
-+}
-+
-+static void kinetis_k64_uart_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    dc->vmsd = &vmstate_kinetis_k64_uart;
-+    dc->reset = kinetis_k64_uart_reset;
-+    dc->desc = "Kinetis K64 series UART";
-+    dc->hotpluggable = false;
-+    dc->props = kinetis_k64_uart_properties;
-+    dc->realize = kinetis_k64_uart_realize;
-+}
-+
-+static const TypeInfo kinetis_k64_uart_info = {
-+    .name          = TYPE_KINETIS_K64_UART,
-+    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(kinetis_k64_uart_state),
-+    .instance_init = kinetis_k64_uart_init,
-+    .class_init    = kinetis_k64_uart_class_init,
-+};
-+
-+static void kinetis_k64_uart_register_types(void)
-+{
-+    type_register_static(&kinetis_k64_uart_info);
-+}
-+
-+type_init(kinetis_k64_uart_register_types)
-diff --git a/include/hw/char/kinetis_k64_uart.h b/include/hw/char/kinetis_k64_uart.h
-new file mode 100644
-index 0000000..5b57d0d
---- /dev/null
-+++ b/include/hw/char/kinetis_k64_uart.h
-@@ -0,0 +1,79 @@
-+/*
-+ * Kinetis K64 peripheral microcontroller emulation.
-+ *
-+ * Copyright (c) 2017 Advantech Wireless
-+ * Written by Gabriel Costa <gabriel291075@gmail.com>
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License version 2 or
-+ *  (at your option) any later version.
-+ */
-+
-+#ifndef KINETIS_UART_H
-+#define KINETIS_UART_H
-+
-+#include "hw/sysbus.h"
-+#include "chardev/char-fe.h"
-+#include "hw/hw.h"
-+
-+#define TYPE_KINETIS_K64_UART "kinetis_k64_uart"
-+#define KINETIS_K64_UART(obj) \
-+    OBJECT_CHECK(kinetis_k64_uart_state, (obj), TYPE_KINETIS_K64_UART)
-+
-+typedef struct {
-+    SysBusDevice parent_obj;
-+
-+    MemoryRegion iomem;
-+
-+    uint8_t BDH;
-+    uint8_t BDL;
-+    uint8_t C1;
-+    uint8_t C2;
-+    uint8_t S1;
-+    uint8_t S2;
-+    uint8_t C3;
-+    uint8_t D;
-+    uint8_t MA1;
-+    uint8_t MA2;
-+    uint8_t C4;
-+    uint8_t C5;
-+    uint8_t ED;
-+    uint8_t MODEM;
-+    uint8_t IR;
-+    uint8_t PFIFO;
-+    uint8_t CFIFO;
-+    uint8_t SFIFO;
-+    uint8_t TWFIFO;
-+    uint8_t TCFIFO;
-+    uint8_t RWFIFO;
-+    uint8_t RCFIFO;
-+    uint8_t C7816;
-+    uint8_t IE7816;
-+    uint8_t IS7816;
-+    uint8_t WP7816Tx;
-+    uint8_t WN7816;
-+    uint8_t WF7816;
-+    uint8_t ET7816;
-+    uint8_t TL7816;
-+
-+    qemu_irq irq;
-+    CharBackend chr;
-+} kinetis_k64_uart_state;
-+
-+static inline DeviceState *kinetis_k64_uart_create(hwaddr addr, qemu_irq irq,
-+        Chardev *chr)
-+{
-+    DeviceState *dev;
-+    SysBusDevice *s;
-+
-+    dev = qdev_create(NULL, TYPE_KINETIS_K64_UART);
-+    qdev_prop_set_chr(dev, "chardev", chr);
-+    qdev_init_nofail(dev);
-+    s = SYS_BUS_DEVICE(dev);
-+    sysbus_mmio_map(s, 0, addr);
-+    sysbus_connect_irq(s, 0, irq);
-+
-+    return dev;
-+}
-+
-+#endif
++type_init(mk64fn1m0_machine_init)
 -- 
 2.1.4
