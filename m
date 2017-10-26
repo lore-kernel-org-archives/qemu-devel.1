@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48241)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48272)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e7f3l-0006WF-Dj
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 06:06:46 -0400
+	(envelope-from <berrange@redhat.com>) id 1e7f3v-0006aZ-C3
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 06:06:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e7f3g-0005pG-G0
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 06:06:45 -0400
-Received: from indium.canonical.com ([91.189.90.7]:42304)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1e7f3g-0005oc-9r
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 06:06:40 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1e7f3f-00027e-8s
-	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 10:06:39 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 2B5C82E80C3
-	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 10:06:39 +0000 (UTC)
+	(envelope-from <berrange@redhat.com>) id 1e7f3r-0005wZ-GY
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 06:06:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58556)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1e7f3r-0005wO-7F
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 06:06:51 -0400
+Date: Thu, 26 Oct 2017 11:06:45 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20171026100645.GA24581@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20171025123056.3165-1-richard.henderson@linaro.org>
+	<CAFEAcA99zpvcgk2EuXkrcOY+8rHeRkJhH4GqViJkEgQV3bdWFg@mail.gmail.com>
+	<CAFEAcA9XdoV0YVw+q7op_vafe9X0JTiQdYmGcmPgqRR3qhUYrQ@mail.gmail.com>
+	<20171026070608.GC5847@redhat.com>
+	<CAFEAcA8f7jJsM3=4bZG8fE_kTm6jueC-rF6ga0mdUvzMDSpLwQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 26 Oct 2017 09:55:05 -0000
-From: Thomas Huth <1127053@bugs.launchpad.net>
-Reply-To: Bug 1127053 <1127053@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20130216085307.29031.52810.malonedeb@chaenomeles.canonical.com>
-Message-Id: <150901170566.17568.2996198735785432296.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1127053] Re: assertion failed in exec.c while
- attempting to start a guest (latest commit)
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA8f7jJsM3=4bZG8fE_kTm6jueC-rF6ga0mdUvzMDSpLwQ@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PULL 00/11] Disassembler patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,60 +31,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Richard Henderson <richard.henderson@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-Triaging old bug tickets... can you still reproduce this issue with the
-latest version of QEMU? Or could we close this ticket nowadays?
+On Thu, Oct 26, 2017 at 08:21:48AM +0100, Peter Maydell wrote:
+> On 26 October 2017 at 08:06, Daniel P. Berrange <berrange@redhat.com> wrote:
+> > I'm not sure what's giving you the 'pathspec' message though ? I would
+> > expect anything to ignore the capstone dir - its just like any other
+> > untracked file once you go back in time before it was committed.
+> 
+> Sorry, just realized that was the output of my filtering of the
+> log. Here's what I should have quoted:
+> 
+> From git://git.linaro.org/people/pmaydell/qemu-arm
+>  + a872ea5...6315472 staging    -> pmaydell/staging  (forced update)
+> warning: unable to rmdir capstone: Directory not empty
+> error: pathspec 'capstone' did not match any file(s) known to git.
+> Did you forget to 'git add'?
+> make: Entering directory `/home/pm215/qemu/build/all'
+> config-host.mak is out-of-date, running configure
+>   GIT     ui/keycodemapdb dtc capstone
+> make[1]: *** No rule to make target `all'.  Stop.
+> error: pathspec 'capstone' did not match any file(s) known to git.
+> Did you forget to 'git add'?
+> make: *** [git-submodule-update] Error 1
+> make: *** Waiting for unfinished jobs....
+> make: *** [subdir-capstone] Error 2
+> Install prefix    /usr/local
+> BIOS directory    /usr/local/share/qemu
+> firmware path     /usr/local/share/qemu-firmware
+> binary directory  /usr/local/bin
+> [rest of configure output skipped]
+> replication support yes
+> VxHS block device no
+> make: Leaving directory `/home/pm215/qemu/build/all'
+> 
+> It looks like the git update script thinks that there ought to
+> be a 'capstone' submodule, which of course there isn't any more,
+> so it barfs trying to update it.
 
-** Changed in: qemu
-       Status: New =3D> Incomplete
+Yeah, ok that makes more sense.  The 'config-host.mak' rules have the
+list of desired submodules and those correspond to the state when you
+ran configure with the patches applied.
 
--- =
+Do we really expect make/configure todo the right thing when going
+backwards in time ?  I've always assumed that if you go back in time
+when you need to do a 'git clean -f -x d' and re-run configure from
+scratch. Certainly in the past various makefile changes in QEMU would
+break, or silently not correctly recompile stuff when going backwards
+in time.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1127053
 
-Title:
-  assertion failed in exec.c while attempting to start a guest (latest
-  commit)
-
-Status in QEMU:
-  Incomplete
-
-Bug description:
-  Hi team,
-
-  I decided to try the latest commit on git (previously used version
-  1.3.0), and I got failed assertions while attempting to start my
-  guests:
-
-  eclipse ~ # qemu-kvm -enable-kvm -hda arch.img -m 4096 -smp sockets=3D1,c=
-ores=3D4 -vnc :0 -cpu host -vga std -net nic,model=3De1000,macaddr=3D00:00:=
-00:00:00:00 -net tap,ifname=3Dvm0 -qmp tcp:0.0.0.0:4900,server,nowait
-  qemu-kvm: /var/tmp/portage/app-emulation/qemu-9999/work/qemu-9999/exec.c:=
-982: qemu_ram_set_idstr: Assertion `!new_block->idstr[0]' failed.
-  Aborted
-
-  The assertion seems valid, so whatever's causing it is probably to
-  blame. I haven't dug around much to find out what calls the method
-  (qemu_ram_set_idstr()), but that is probably the best place to start.
-
-  The host contains a Xeon E3-1240 CPU, virtualising a bunch of guests
-  one of which is Arch Linux 64-bit, if that helps.
-
-  eclipse ~ # qemu-kvm -version
-  QEMU emulator version 1.4.50, Copyright (c) 2003-2008 Fabrice Bellard
-
-  It looks like this assertion happens if you call the executable
-  without any parameters as well:
-
-  eclipse ~ # qemu-kvm
-  qemu-kvm: /var/tmp/portage/app-emulation/qemu-9999/work/qemu-9999/exec.c:=
-982: qemu_ram_set_idstr: Assertion `!new_block->idstr[0]' failed.
-  Aborted
-
-  Thanks.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1127053/+subscriptions
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
