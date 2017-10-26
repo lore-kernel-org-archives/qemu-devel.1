@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43339)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55409)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1e7Zp5-00042H-QQ
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 00:31:17 -0400
+	(envelope-from <sundeep.lkml@gmail.com>) id 1e7bCs-00081m-C9
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 01:59:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1e7Zp1-0001GH-SM
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 00:31:15 -0400
-Resent-Message-Id: <E1e7Zp1-0001GH-SM@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21328)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1e7Zp1-0001FT-Jw
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 00:31:11 -0400
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <150893543141.30.10392329675787115853@bafd83ae6430>
-In-Reply-To: <20171025123056.3165-1-richard.henderson@linaro.org>
+	(envelope-from <sundeep.lkml@gmail.com>) id 1e7bCr-0003sb-Au
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 01:59:54 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 25 Oct 2017 05:43:52 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PULL 00/11] Disassembler patches
+In-Reply-To: <20171025084542.g65k7bv65j6nhaby@starbug-vm.ie.oracle.com>
+References: <1508898544-10307-1-git-send-email-sundeep.lkml@gmail.com>
+	<20171025084542.g65k7bv65j6nhaby@starbug-vm.ie.oracle.com>
+From: sundeep subbaraya <sundeep.lkml@gmail.com>
+Date: Thu, 26 Oct 2017 11:29:51 +0530
+Message-ID: <CALHRZurvgp-eHqBWqwSaU6AGMg9L4vwJTHNv0z4FoAd4eeAVfw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Qemu devel V4 PATCH] msf2: Remove dead code
+ reported by Coverity
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,74 +23,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: richard.henderson@linaro.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: Subbaraya Sundeep <sundeep.lkml@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Alistair Francis <alistair23@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtQVUxMIDAwLzExXSBEaXNhc3NlbWJsZXIgcGF0Y2hlcwpUeXBlOiBzZXJpZXMKTWVz
-c2FnZS1pZDogMjAxNzEwMjUxMjMwNTYuMzE2NS0xLXJpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5v
-cmcKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEK
-dG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQg
-Y29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZm
-LnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAk
-QkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAk
-bi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0
-IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxi
-YWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQo
-KG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRp
-bmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8v
-Z2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAg
-ICBwYXRjaGV3LzE1MDgwMDYzNDItNTMwNC0xLWdpdC1zZW5kLWVtYWlsLW1hcmsuY2F2ZS1heWxh
-bmRAaWxhbmRlLmNvLnVrIC0+IHBhdGNoZXcvMTUwODAwNjM0Mi01MzA0LTEtZ2l0LXNlbmQtZW1h
-aWwtbWFyay5jYXZlLWF5bGFuZEBpbGFuZGUuY28udWsKICogW25ldyB0YWddICAgICAgICAgICAg
-ICAgcGF0Y2hldy8yMDE3MTAyNTEyMzA1Ni4zMTY1LTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJv
-Lm9yZyAtPiBwYXRjaGV3LzIwMTcxMDI1MTIzMDU2LjMxNjUtMS1yaWNoYXJkLmhlbmRlcnNvbkBs
-aW5hcm8ub3JnClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKMWI4NzA0OWM1MiBkaXNh
-czogQWRkIGNhcHN0b25lIGFzIHN1Ym1vZHVsZQoxYTE0OTM2OWRmIGRpc2FzOiBSZW1vdmUgbW9u
-aXRvcl9kaXNhc19pc19waHlzaWNhbAo2YzM1ZTY3MDZjIHBwYzogU3VwcG9ydCBDYXBzdG9uZSBp
-biBkaXNhc19zZXRfaW5mbwo1MmUxMDc1MmNhIGFybTogU3VwcG9ydCBDYXBzdG9uZSBpbiBkaXNh
-c19zZXRfaW5mbwo0YjMxZjM5ZTgxIGkzODY6IFN1cHBvcnQgQ2Fwc3RvbmUgaW4gZGlzYXNfc2V0
-X2luZm8KMjc5ZTA0NmRjMSBkaXNhczogU3VwcG9ydCB0aGUgQ2Fwc3RvbmUgZGlzYXNzZW1ibGVy
-IGxpYnJhcnkKNGRhNDM0NWVjZiBkaXNhczogUmVtb3ZlIHVudXNlZCBmbGFncyBhcmd1bWVudHMK
-OWU1NjE0NDFhNiB0YXJnZXQvYXJtOiBEb24ndCBzZXQgSU5TTl9BUk1fQkUzMiBmb3IgQ09ORklH
-X1VTRVJfT05MWQo5YzI1ZDYzYWMyIHRhcmdldC9hcm06IE1vdmUgQkUzMiBkaXNhc3NlbWJsZXIg
-Zml4dXAKNjgzNjI1Njk0NiB0YXJnZXQvcHBjOiBDb252ZXJ0IHRvIGRpc2FzX3NldF9pbmZvIGhv
-b2sKNjY3YjU1MWNjNyB0YXJnZXQvaTM4NjogQ29udmVydCB0byBkaXNhc19zZXRfaW5mbyBob29r
-Cgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzExOiB0YXJnZXQvaTM4Njog
-Q29udmVydCB0byBkaXNhc19zZXRfaW5mbyBob29rLi4uCkNoZWNraW5nIFBBVENIIDIvMTE6IHRh
-cmdldC9wcGM6IENvbnZlcnQgdG8gZGlzYXNfc2V0X2luZm8gaG9vay4uLgpDaGVja2luZyBQQVRD
-SCAzLzExOiB0YXJnZXQvYXJtOiBNb3ZlIEJFMzIgZGlzYXNzZW1ibGVyIGZpeHVwLi4uCkVSUk9S
-OiBzcGFjZSBwcm9oaWJpdGVkIGJldHdlZW4gZnVuY3Rpb24gbmFtZSBhbmQgb3BlbiBwYXJlbnRo
-ZXNpcyAnKCcKIzQ2OiBGSUxFOiBkaXNhcy9hcm0uYzozODI0OgorICAgICAgc3RhdHVzID0gYXJt
-X3JlYWRfbWVtb3J5IChhZGRyLCAoYmZkX2J5dGUgKiliLCAyLCBpbmZvKTsKCkVSUk9SOiBzcGFj
-ZSBwcm9oaWJpdGVkIGJldHdlZW4gZnVuY3Rpb24gbmFtZSBhbmQgb3BlbiBwYXJlbnRoZXNpcyAn
-KCcKIzU1OiBGSUxFOiBkaXNhcy9hcm0uYzozODk2OgorICAgICAgc3RhdHVzID0gYXJtX3JlYWRf
-bWVtb3J5IChwYywgKGJmZF9ieXRlICopYiwgc2l6ZSwgaW5mbyk7CgpFUlJPUjogc3BhY2UgcHJv
-aGliaXRlZCBiZXR3ZWVuIGZ1bmN0aW9uIG5hbWUgYW5kIG9wZW4gcGFyZW50aGVzaXMgJygnCiM2
-NDogRklMRTogZGlzYXMvYXJtLmM6MzkxMzoKKyAgICAgIHN0YXR1cyA9IGFybV9yZWFkX21lbW9y
-eSAocGMsIChiZmRfYnl0ZSAqKWIsIDQsIGluZm8pOwoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQg
-YmV0d2VlbiBmdW5jdGlvbiBuYW1lIGFuZCBvcGVuIHBhcmVudGhlc2lzICcoJwojNzM6IEZJTEU6
-IGRpc2FzL2FybS5jOjM5Mjk6CisgICAgICBzdGF0dXMgPSBhcm1fcmVhZF9tZW1vcnkgKHBjLCAo
-YmZkX2J5dGUgKiliLCAyLCBpbmZvKTsKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIg
-dXNlIHRhYnMKIzgyOiBGSUxFOiBkaXNhcy9hcm0uYzozOTQzOgorXkkgICAgICBzdGF0dXMgPSBh
-cm1fcmVhZF9tZW1vcnkgKHBjICsgMiwgKGJmZF9ieXRlICopYiwgMiwgaW5mbyk7JAoKRVJST1I6
-IHNwYWNlIHByb2hpYml0ZWQgYmV0d2VlbiBmdW5jdGlvbiBuYW1lIGFuZCBvcGVuIHBhcmVudGhl
-c2lzICcoJwojODI6IEZJTEU6IGRpc2FzL2FybS5jOjM5NDM6CisJICAgICAgc3RhdHVzID0gYXJt
-X3JlYWRfbWVtb3J5IChwYyArIDIsIChiZmRfYnl0ZSAqKWIsIDIsIGluZm8pOwoKdG90YWw6IDYg
-ZXJyb3JzLCAwIHdhcm5pbmdzLCAxMDcgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5
-bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBm
-YWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BB
-VENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggNC8xMTogdGFyZ2V0L2FybTogRG9u
-J3Qgc2V0IElOU05fQVJNX0JFMzIgZm9yIENPTkZJR19VU0VSX09OTFkuLi4KQ2hlY2tpbmcgUEFU
-Q0ggNS8xMTogZGlzYXM6IFJlbW92ZSB1bnVzZWQgZmxhZ3MgYXJndW1lbnRzLi4uCkNoZWNraW5n
-IFBBVENIIDYvMTE6IGRpc2FzOiBTdXBwb3J0IHRoZSBDYXBzdG9uZSBkaXNhc3NlbWJsZXIgbGli
-cmFyeS4uLgpDaGVja2luZyBQQVRDSCA3LzExOiBpMzg2OiBTdXBwb3J0IENhcHN0b25lIGluIGRp
-c2FzX3NldF9pbmZvLi4uCkNoZWNraW5nIFBBVENIIDgvMTE6IGFybTogU3VwcG9ydCBDYXBzdG9u
-ZSBpbiBkaXNhc19zZXRfaW5mby4uLgpDaGVja2luZyBQQVRDSCA5LzExOiBwcGM6IFN1cHBvcnQg
-Q2Fwc3RvbmUgaW4gZGlzYXNfc2V0X2luZm8uLi4KQ2hlY2tpbmcgUEFUQ0ggMTAvMTE6IGRpc2Fz
-OiBSZW1vdmUgbW9uaXRvcl9kaXNhc19pc19waHlzaWNhbC4uLgpDaGVja2luZyBQQVRDSCAxMS8x
-MTogZGlzYXM6IEFkZCBjYXBzdG9uZSBhcyBzdWJtb2R1bGUuLi4KPT09IE9VVFBVVCBFTkQgPT09
-CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQg
-YXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNl
-bmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
+On Wed, Oct 25, 2017 at 2:15 PM, Darren Kenny <darren.kenny@oracle.com>
+wrote:
+
+> LGTM now, thanks.
+>
+> Reviewed-by: Darren Kenny <darren.kenny@oracle.com>
+>
+
+Thanks Darren,
+
+Sundeep
+
+>
+> Thanks,
+>
+> Darren.
+>
+>
+> On Wed, Oct 25, 2017 at 07:59:04AM +0530, Subbaraya Sundeep wrote:
+>
+>> Fixed incorrect frame size mask, validated maximum frame
+>> size in spi_write and removed dead code.
+>>
+>> Signed-off-by: Subbaraya Sundeep <sundeep.lkml@gmail.com>
+>> ---
+>> v4:
+>>         changed %d to %u while logging frame size error.
+>> v3:
+>>         Added comment that [31:6] bits are reserved in R_SPI_DFSIZE
+>>         register and logged incorrect value too in guest error(suggested
+>>         by Darren).
+>> v2:
+>>         else if -> else in set_fifodepth
+>>         log guest error when frame size is more than 32
+>>
+>> hw/ssi/mss-spi.c | 18 ++++++++++++++----
+>> 1 file changed, 14 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/hw/ssi/mss-spi.c b/hw/ssi/mss-spi.c
+>> index 5a8e308..d60daba 100644
+>> --- a/hw/ssi/mss-spi.c
+>> +++ b/hw/ssi/mss-spi.c
+>> @@ -76,9 +76,10 @@
+>> #define C_BIGFIFO            (1 << 29)
+>> #define C_RESET              (1 << 31)
+>>
+>> -#define FRAMESZ_MASK         0x1F
+>> +#define FRAMESZ_MASK         0x3F
+>> #define FMCOUNT_MASK         0x00FFFF00
+>> #define FMCOUNT_SHIFT        8
+>> +#define FRAMESZ_MAX          32
+>>
+>> static void txfifo_reset(MSSSpiState *s)
+>> {
+>> @@ -104,10 +105,8 @@ static void set_fifodepth(MSSSpiState *s)
+>>         s->fifo_depth = 32;
+>>     } else if (size <= 16) {
+>>         s->fifo_depth = 16;
+>> -    } else if (size <= 32) {
+>> -        s->fifo_depth = 8;
+>>     } else {
+>> -        s->fifo_depth = 4;
+>> +        s->fifo_depth = 8;
+>>     }
+>> }
+>>
+>> @@ -301,6 +300,17 @@ static void spi_write(void *opaque, hwaddr addr,
+>>         if (s->enabled) {
+>>             break;
+>>         }
+>> +        /*
+>> +         * [31:6] bits are reserved bits and for future use.
+>> +         * [5:0] are for frame size. Only [5:0] bits are validated
+>> +         * during write, [31:6] bits are untouched.
+>> +         */
+>> +        if ((value & FRAMESZ_MASK) > FRAMESZ_MAX) {
+>> +            qemu_log_mask(LOG_GUEST_ERROR, "%s: Incorrect size %u
+>> provided."
+>> +                         "Maximum frame size is %u\n",
+>> +                         __func__, value & FRAMESZ_MASK, FRAMESZ_MAX);
+>> +            break;
+>> +        }
+>>         s->regs[R_SPI_DFSIZE] = value;
+>>         break;
+>>
+>> --
+>> 2.5.0
+>>
+>>
+>>
