@@ -1,22 +1,45 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57865)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58307)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1e85FA-0001sU-RE
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 10:04:20 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1e85H9-0002q9-Up
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 10:06:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1e85F9-0000EZ-R2
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 10:04:16 -0400
-Date: Fri, 27 Oct 2017 16:03:59 +0200
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20171027140359.GD7115@umbus>
-References: <1508493233-1166-1-git-send-email-thuth@redhat.com>
-	<1508748555.16488.4.camel@redhat.com>
+	(envelope-from <borntraeger@de.ibm.com>) id 1e85H5-0003IF-8B
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 10:06:19 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:48850
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1e85H4-0003HZ-V0
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 10:06:15 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v9RE1sEF040179
+	for <qemu-devel@nongnu.org>; Fri, 27 Oct 2017 10:06:11 -0400
+Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2dv2xqaj0w-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 27 Oct 2017 10:06:10 -0400
+Received: from localhost
+	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Fri, 27 Oct 2017 15:06:08 +0100
+References: <20171020145437.18549-1-borntraeger@de.ibm.com>
+	<c76678f3-70df-e963-12b8-208c5c2a1578@linux.vnet.ibm.com>
+	<b40f75d4-2280-fc66-b92f-34717b51ed47@linux.vnet.ibm.com>
+	<d7a16f29-1420-d723-4a42-ac549e3f4f52@de.ibm.com>
+	<03b0c516-7044-d71e-1b1f-c3bef84ac812@de.ibm.com>
+	<108a9258-f245-f0bc-44cd-29f6528d34d4@linux.vnet.ibm.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Fri, 27 Oct 2017 16:06:04 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="NklN7DEeGtkPCoo3"
-Content-Disposition: inline
-In-Reply-To: <1508748555.16488.4.camel@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] hw/display/sm501: Fix comment in
- sm501_sysbus_class_init()
+In-Reply-To: <108a9258-f245-f0bc-44cd-29f6528d34d4@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <277f202a-212b-2868-06e0-62c262909c03@de.ibm.com>
+Subject: Re: [Qemu-devel] [libvirt] [PATCH/QEMU] s390x/kvm: use
+ cpu_model_available for guarded storage on compat machines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,71 +48,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, BALATON Zoltan <balaton@eik.bme.hu>
+To: Halil Pasic <pasic@linux.vnet.ibm.com>, jjherne@linux.vnet.ibm.com, Marc Hartmayer <mhartmay@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: libvir-list@redhat.com, Jiri Denemark <jdenemar@redhat.com>, qemu-devel@nongnu.org
 
 
---NklN7DEeGtkPCoo3
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Mon, Oct 23, 2017 at 10:49:15AM +0200, Gerd Hoffmann wrote:
-> On Fri, 2017-10-20 at 11:53 +0200, Thomas Huth wrote:
-> > The "cannot_instantiate_with_device_add_yet" flag has been renamed
-> > to "user_creatable" a while ago.
-> >=20
-> > Signed-off-by: Thomas Huth <thuth@redhat.com>
-> > ---
-> > =A0hw/display/sm501.c | 2 +-
-> > =A01 file changed, 1 insertion(+), 1 deletion(-)
-> >=20
-> > diff --git a/hw/display/sm501.c b/hw/display/sm501.c
-> > index 6eddac9..7f18224 100644
-> > --- a/hw/display/sm501.c
-> > +++ b/hw/display/sm501.c
-> > @@ -1758,7 +1758,7 @@ static void sm501_sysbus_class_init(ObjectClass
-> > *klass, void *data)
-> > =A0=A0=A0=A0=A0dc->reset =3D sm501_reset_sysbus;
-> > =A0=A0=A0=A0=A0dc->vmsd =3D &vmstate_sm501_sysbus;
-> > =A0=A0=A0=A0=A0/* Note: pointer property "chr-state" may remain null, t=
-hus
-> > -=A0=A0=A0=A0=A0* no need for dc->cannot_instantiate_with_device_add_ye=
-t =3D
-> > true;
-> > +=A0=A0=A0=A0=A0* no need for dc->user_creatable =3D false;
-> > =A0=A0=A0=A0=A0=A0*/
-> > =A0}
-> > =A0
->=20
-> Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
+On 10/27/2017 03:40 PM, Halil Pasic wrote:
+> 
+> 
+> On 10/27/2017 02:57 PM, Christian Borntraeger wrote:
+>>
+>>
+>> On 10/27/2017 02:45 PM, Christian Borntraeger wrote:
+>>>
+>>>
+>>> On 10/27/2017 02:31 PM, Halil Pasic wrote:
+>>> gs is explicitly disabled.
+>>>>
+>>>> Now that I think about it, maybe the 2.9 binary is going to reject
+>>>> the explicit gs flag altogether, because it's unknown.
+>>>>
+>>>> Isn't this a problem? 
+>>>
+>>> No. This is exactly the _solution_ and not the problem. The target will reject
+>>> unknown cpu features and migration will be aborted. This is exactly what the CPU
+>>> model is for.
+> 
+> I'm not sure we talk abut the same thing. I'm talking about the following. I
+> want to disable a cpu-model feature for the sake of migration (because I know
+> that binary version X does not support the feature, because it does not know
+> about it). Now if I do it via let's say -cpu z13,gs=off on let's say 2.11,
+> and start with the exact same command line (-cpu z13,gs=off) on lets say 2.9
+> my migration will explode because of the unknown feature I'm specifying
+> not to be used.
 
-Applied to ppc-for-2.11, thanks.
+The migration will be rejected because the target qemu will not startup.
+You can easily simulate that, e.g. by doing
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+qemu-system-s390x -cpu z13,notyetknown=off
+qemu-system-s390x: can't apply global z13-s390x-cpu.notyetknown=off: Property '.notyetknown' not found
 
---NklN7DEeGtkPCoo3
-Content-Type: application/pgp-signature; name="signature.asc"
+But libvirt will not use a full model (and the disable things) instead it will
+use the base model and add things. (So libvirt should never use xxx=off)
 
------BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnzPM8ACgkQbDjKyiDZ
-s5Kwiw/9FVAGVJXIDtxpsw2T/6v4hLOupXk7KNLbOBG391y7ujOvwiHeYPkDhFB2
-JYnGuLp50IxI9LpGETTltLVtPO+xO27k7ugaziMscRZmm0+9zdlJkAM2o7Anf3iC
-qOb7fFILyOfxVTZRfktxY2FN4NfFRTd7O18WJC8SP9/nsYLrRIg1b1TJD2Fgx95d
-IQkQLg9b0Ufa2gpjJGYyhAZAN/NgwLC1MMWt7dDBVIWc+GlKRSoUZE8cgifW/mAy
-hW7TFkEwIpkb48xbOIkyqjM/gnOCrDPVv0nqiD/8Ny/eb2kOvshwNnESZevPhbkr
-Cmi66a2uUVznbvHxjigY5yzcn5j40S29G0jdbmDzk6vhSQDKMwS6TsOAxj3B6KIh
-nL3yGEEGf87//z02nJl8Ls/RmNuccNNMSCQseqJoADUNVs6OmdhpFT/ZrDd0e81/
-eJjl5t4jV2tLy0fQa1UK05/ArtK33vlZ5QOWpCghOyhuCmBoGA07IiuM38gvyyvq
-prlpqJ27h5oBuR+xylxLEYLEY/0bBOk1BvSlGT4c02LX/SsMR4mMcR+6wIB0Di7V
-BLn8D8JAf1rfy9QpWJkLo76YyvtwAOH0hl5D44V4bZLOk/ggYRTdId2h9JxB+VDu
-Q46H3vpyXIRZ2vgi5cwS9vY7pj+G8EBjPQRPyOPVUQm52BGHI8Y=
-=feLP
------END PGP SIGNATURE-----
+I think this is really not an issue. If you specify a feature that is not known then
+QEMU will not start on the target and migration is rejected. The guest continues to run
+on the source. So if you specify a "too new" facility yourself its really a user error.
+Everything that uses an explicit model (e.g. -cpu z13 or -cpu,sief2=on) will work, but only
+as long as the conditions are met. If you specify -cpu z14, it does not matter if it fails
+if the kernel or QEMU is too old, or if you just happen to run on a z13.
 
---NklN7DEeGtkPCoo3--
+The  only question is/was:  what is about "host-model".
+With my patch (+ the gs fixup) the following things will work:
+- host-model will work on z13
+- host-model will work on z14 (any machine version)
+- host model on z13 and then migrating to z14 will work (any machine version)
+- host model on z13 and then migrating to z14 and then migrating back will work (any version)
+- qemu with fixup + host model on z14 with machine version 2.10 can be migrated
+
+The only thing that does not work is
+- qemu with fixup + host model on z14 with machine 2.9 can not be migrated to qemu 2.9 on z14.
+
+Now: this would have not worked anyway, because qemu 2.9 does not know z14. So in theory 
+QEMU must forbit z14 for compat machines (which we do not know).
+
+I talked to several people and it seems that on x86 the host model will also enable new features
+that are not known by older QEMUs and its considered works as designed. (see also Jiris mail)
+
+
+> 
+> Well I'm not sure what I describe is relevant. My thinking is along the lines
+> some features are added incrementally. How do use those of the features not included
+> in -base model which both of my environments support and disable those that
+> are unsupported by one of the environments.
+> 
+> I will think about it some more. I've asked Boris about this situation,
+> and he did not put my mind at ease (to be more precise he seemed to
+> see this as a potential problem too), so I've decided to mention it.
+> Sorry if I've generated some unnecessary noise.
+> 
+> I think the root of the problem is that I don't understand the difference between
+> z13-base and z13, and the associated rules and expected/intended usages. 
+
+z13-base contains only those features that a guaranteed to be there (there is
+the list of non-hypervisor managed features). z13 is z13-base + all features that
+will be available in a reasonably recent kernel+qemu combination and make sense
+to be there a default. So it might happen that you cannot start -cpu z14, e.g. 
+if you run on a kernel < 4.12.
+
+ 
+>> FWIW, I think in your particular case the QEMU will reject the z14 cpu and not even come
+>> to checking the gs. 
+>>
+> 
+> I had a z13 cpu model in mind. I don't mention a z14 cpu-model (QEMU, not hw) in
+> my whole email.
+> 
+> Regards,
+> Halil
+> 
