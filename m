@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57287)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57430)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e824Q-0001G3-QZ
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 06:40:59 -0400
+	(envelope-from <eblake@redhat.com>) id 1e824W-0001MT-73
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 06:41:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e824P-0005cK-Rf
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 06:40:58 -0400
+	(envelope-from <eblake@redhat.com>) id 1e824T-0005ff-2N
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 06:41:04 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Fri, 27 Oct 2017 12:40:31 +0200
-Message-Id: <20171027104037.8319-7-eblake@redhat.com>
+Date: Fri, 27 Oct 2017 12:40:33 +0200
+Message-Id: <20171027104037.8319-9-eblake@redhat.com>
 In-Reply-To: <20171027104037.8319-1-eblake@redhat.com>
 References: <20171027104037.8319-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v6 06/12] nbd/server: Refactor zero-length
- option check
+Subject: [Qemu-devel] [PATCH v6 08/12] nbd/server: Include human-readable
+ message in structured errors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,155 +23,105 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: pbonzini@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org
 
-Consolidate the response for a non-zero-length option payload
-into a new function, nbd_reject_length().  This check will
-also be used when introducing support for structured replies.
-
-Note that STARTTLS response differs based on time: if the connection
-is still unencrypted, we set fatal to true (a client that can't
-request TLS correctly may still think that we are ready to start
-the TLS handshake, so we must disconnect); while if the connection
-is already encrypted, the client is sending a bogus request but
-is no longer at risk of being confused by continuing the connection.
+The NBD spec permits including a human-readable error string if
+structured replies are in force, so we might as well send the
+client the message that we logged on any error.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
 ---
-v6: split, rework logic to avoid subtle regression on starttls [Vladimir]
-v5: new patch
+v6: add R-b
+v5: allow NULL msg, cast away const for ease of use [Vladimir]; send
+correct length over the wire
 ---
- nbd/server.c | 74 +++++++++++++++++++++++++++++++++++++-----------------------
- 1 file changed, 46 insertions(+), 28 deletions(-)
+ nbd/server.c     | 20 +++++++++++++-------
+ nbd/trace-events |  2 +-
+ 2 files changed, 14 insertions(+), 8 deletions(-)
 
 diff --git a/nbd/server.c b/nbd/server.c
-index 6af708662d..a98f5622c9 100644
+index 5d6d9a2ddd..ea9fe9970f 100644
 --- a/nbd/server.c
 +++ b/nbd/server.c
-@@ -253,21 +253,10 @@ static int nbd_negotiate_send_rep_list(QIOChannel *ioc, NBDExport *exp,
-
- /* Process the NBD_OPT_LIST command, with a potential series of replies.
-  * Return -errno on error, 0 on success. */
--static int nbd_negotiate_handle_list(NBDClient *client, uint32_t length,
--                                     Error **errp)
-+static int nbd_negotiate_handle_list(NBDClient *client, Error **errp)
+@@ -1295,24 +1295,25 @@ static int coroutine_fn nbd_co_send_structured_read(NBDClient *client,
+ static int coroutine_fn nbd_co_send_structured_error(NBDClient *client,
+                                                      uint64_t handle,
+                                                      uint32_t error,
++                                                     const char *msg,
+                                                      Error **errp)
  {
-     NBDExport *exp;
+     NBDStructuredError chunk;
+     int nbd_err = system_errno_to_nbd_errno(error);
+     struct iovec iov[] = {
+         {.iov_base = &chunk, .iov_len = sizeof(chunk)},
+-        /* FIXME: Support human-readable error message */
++        {.iov_base = (char *)msg, .iov_len = msg ? strlen(msg) : 0},
+     };
 
--    if (length) {
--        if (nbd_drop(client->ioc, length, errp) < 0) {
--            return -EIO;
--        }
--        return nbd_negotiate_send_rep_err(client->ioc,
--                                          NBD_REP_ERR_INVALID, NBD_OPT_LIST,
--                                          errp,
--                                          "OPT_LIST should not have length");
--    }
--
-     /* For each export, send a NBD_REP_SERVER reply. */
-     QTAILQ_FOREACH(exp, &exports, next) {
-         if (nbd_negotiate_send_rep_list(client->ioc, exp, errp)) {
-@@ -531,7 +520,6 @@ static int nbd_negotiate_handle_info(NBDClient *client, uint32_t length,
- /* Handle NBD_OPT_STARTTLS. Return NULL to drop connection, or else the
-  * new channel for all further (now-encrypted) communication. */
- static QIOChannel *nbd_negotiate_handle_starttls(NBDClient *client,
--                                                 uint32_t length,
-                                                  Error **errp)
- {
-     QIOChannel *ioc;
-@@ -540,15 +528,6 @@ static QIOChannel *nbd_negotiate_handle_starttls(NBDClient *client,
+     assert(nbd_err);
+     trace_nbd_co_send_structured_error(handle, nbd_err,
+-                                       nbd_err_lookup(nbd_err));
++                                       nbd_err_lookup(nbd_err), msg ? msg : "");
+     set_be_chunk(&chunk.h, NBD_REPLY_FLAG_DONE, NBD_REPLY_TYPE_ERROR, handle,
+-                 sizeof(chunk) - sizeof(chunk.h));
++                 sizeof(chunk) - sizeof(chunk.h) + iov[1].iov_len);
+     stl_be_p(&chunk.error, nbd_err);
+-    stw_be_p(&chunk.message_length, 0);
++    stw_be_p(&chunk.message_length, iov[1].iov_len);
 
-     trace_nbd_negotiate_handle_starttls();
-     ioc = client->ioc;
--    if (length) {
--        if (nbd_drop(ioc, length, errp) < 0) {
--            return NULL;
--        }
--        nbd_negotiate_send_rep_err(ioc, NBD_REP_ERR_INVALID, NBD_OPT_STARTTLS,
--                                   errp,
--                                   "OPT_STARTTLS should not have length");
--        return NULL;
--    }
-
-     if (nbd_negotiate_send_rep(client->ioc, NBD_REP_ACK,
-                                NBD_OPT_STARTTLS, errp) < 0) {
-@@ -584,6 +563,34 @@ static QIOChannel *nbd_negotiate_handle_starttls(NBDClient *client,
-     return QIO_CHANNEL(tioc);
+-    return nbd_co_send_iov(client, iov, 1, errp);
++    return nbd_co_send_iov(client, iov, 1 + !!iov[1].iov_len, errp);
  }
 
-+/* nbd_reject_length: Handle any unexpected payload.
-+ * @fatal requests that we quit talking to the client, even if we are able
-+ * to successfully send an error to the guest.
-+ * Return:
-+ * -errno  transmission error occurred or @fatal was requested, errp is set
-+ * 0       error message successfully sent to client, errp is not set
-+ */
-+static int nbd_reject_length(NBDClient *client, uint32_t length,
-+                             uint32_t option, bool fatal, Error **errp)
-+{
-+    int ret;
-+
-+    assert(length);
-+    if (nbd_drop(client->ioc, length, errp) < 0) {
-+        return -EIO;
-+    }
-+    ret = nbd_negotiate_send_rep_err(client->ioc, NBD_REP_ERR_INVALID,
-+                                     option, errp,
-+                                     "option '%s' should have zero length",
-+                                     nbd_opt_lookup(option));
-+    if (fatal && !ret) {
-+        error_setg(errp, "option '%s' should have zero length",
-+                   nbd_opt_lookup(option));
-+        return -EINVAL;
-+    }
-+    return ret;
-+}
-+
- /* nbd_negotiate_options
-  * Process all NBD_OPT_* client option commands, during fixed newstyle
-  * negotiation.
-@@ -674,7 +681,13 @@ static int nbd_negotiate_options(NBDClient *client, uint16_t myflags,
-             }
-             switch (option) {
-             case NBD_OPT_STARTTLS:
--                tioc = nbd_negotiate_handle_starttls(client, length, errp);
-+                if (length) {
-+                    /* Unconditionally drop the connection if the client
-+                     * can't start a TLS negotiation correctly */
-+                    nbd_reject_length(client, length, option, true, errp);
-+                    return -EINVAL;
-+                }
-+                tioc = nbd_negotiate_handle_starttls(client, errp);
-                 if (!tioc) {
-                     return -EIO;
-                 }
-@@ -709,7 +722,12 @@ static int nbd_negotiate_options(NBDClient *client, uint16_t myflags,
-         } else if (fixedNewstyle) {
-             switch (option) {
-             case NBD_OPT_LIST:
--                ret = nbd_negotiate_handle_list(client, length, errp);
-+                if (length) {
-+                    ret = nbd_reject_length(client, length, option, false,
-+                                            errp);
-+                } else {
-+                    ret = nbd_negotiate_handle_list(client, errp);
-+                }
-                 break;
+ /* nbd_co_receive_request
+@@ -1413,6 +1414,7 @@ static coroutine_fn void nbd_trip(void *opaque)
+     int flags;
+     int reply_data_len = 0;
+     Error *local_err = NULL;
++    char *msg = NULL;
 
-             case NBD_OPT_ABORT:
-@@ -735,10 +753,10 @@ static int nbd_negotiate_options(NBDClient *client, uint16_t myflags,
-                 break;
+     trace_nbd_trip();
+     if (client->closing) {
+@@ -1529,14 +1531,17 @@ reply:
+     if (local_err) {
+         /* If we get here, local_err was not a fatal error, and should be sent
+          * to the client. */
++        assert(ret < 0);
++        msg = g_strdup(error_get_pretty(local_err));
+         error_report_err(local_err);
+         local_err = NULL;
+     }
 
-             case NBD_OPT_STARTTLS:
--                if (nbd_drop(client->ioc, length, errp) < 0) {
--                    return -EIO;
--                }
--                if (client->tlscreds) {
-+                if (length) {
-+                    ret = nbd_reject_length(client, length, option, false,
-+                                            errp);
-+                } else if (client->tlscreds) {
-                     ret = nbd_negotiate_send_rep_err(client->ioc,
-                                                      NBD_REP_ERR_INVALID,
-                                                      option, errp,
+-    if (client->structured_reply && request.type == NBD_CMD_READ) {
++    if (client->structured_reply &&
++        (ret < 0 || request.type == NBD_CMD_READ)) {
+         if (ret < 0) {
+             ret = nbd_co_send_structured_error(req->client, request.handle,
+-                                               -ret, &local_err);
++                                               -ret, msg, &local_err);
+         } else {
+             ret = nbd_co_send_structured_read(req->client, request.handle,
+                                               request.from, req->data,
+@@ -1547,6 +1552,7 @@ reply:
+                                        ret < 0 ? -ret : 0,
+                                        req->data, reply_data_len, &local_err);
+     }
++    g_free(msg);
+     if (ret < 0) {
+         error_prepend(&local_err, "Failed to send reply: ");
+         goto disconnect;
+diff --git a/nbd/trace-events b/nbd/trace-events
+index 6894f8bbb4..52150bd738 100644
+--- a/nbd/trace-events
++++ b/nbd/trace-events
+@@ -57,7 +57,7 @@ nbd_blk_aio_attached(const char *name, void *ctx) "Export %s: Attaching clients
+ nbd_blk_aio_detach(const char *name, void *ctx) "Export %s: Detaching clients from AIO context %p\n"
+ nbd_co_send_simple_reply(uint64_t handle, uint32_t error, const char *errname, int len) "Send simple reply: handle = %" PRIu64 ", error = %" PRIu32 " (%s), len = %d"
+ nbd_co_send_structured_read(uint64_t handle, uint64_t offset, void *data, size_t size) "Send structured read data reply: handle = %" PRIu64 ", offset = %" PRIu64 ", data = %p, len = %zu"
+-nbd_co_send_structured_error(uint64_t handle, int err, const char *errname) "Send structured error reply: handle = %" PRIu64 ", error = %d (%s)"
++nbd_co_send_structured_error(uint64_t handle, int err, const char *errname, const char *msg) "Send structured error reply: handle = %" PRIu64 ", error = %d (%s), msg = '%s'"
+ nbd_co_receive_request_decode_type(uint64_t handle, uint16_t type, const char *name) "Decoding type: handle = %" PRIu64 ", type = %" PRIu16 " (%s)"
+ nbd_co_receive_request_payload_received(uint64_t handle, uint32_t len) "Payload received: handle = %" PRIu64 ", len = %" PRIu32
+ nbd_co_receive_request_cmd_write(uint32_t len) "Reading %" PRIu32 " byte(s)"
 -- 
 2.13.6
