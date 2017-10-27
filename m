@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34192)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34244)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1e85Wi-0005Yy-30
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 10:22:26 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1e85Wm-0005g3-D9
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 10:22:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1e85Wh-0000kY-7v
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 10:22:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47128)
+	(envelope-from <ehabkost@redhat.com>) id 1e85Wl-0000qD-Hy
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 10:22:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59884)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1e85Wh-0000jj-1g
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 10:22:23 -0400
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1e85Wl-0000p5-C0
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 10:22:27 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Fri, 27 Oct 2017 16:20:43 +0200
-Message-Id: <20171027142107.15542-16-ehabkost@redhat.com>
+Date: Fri, 27 Oct 2017 16:20:44 +0200
+Message-Id: <20171027142107.15542-17-ehabkost@redhat.com>
 In-Reply-To: <20171027142107.15542-1-ehabkost@redhat.com>
 References: <20171027142107.15542-1-ehabkost@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 15/39] openrisc: use generic cpu_model parsing
+Subject: [Qemu-devel] [PULL v2 16/39] sh4: r2d: use generic cpu_model parsing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,48 +33,44 @@ From: Igor Mammedov <imammedo@redhat.com>
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Message-Id: <1507211474-188400-19-git-send-email-imammedo@redhat.com>
-Acked-by: Stafford Horne <shorne@gmail.com>
+Message-Id: <1507211474-188400-20-git-send-email-imammedo@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- hw/openrisc/openrisc_sim.c | 8 ++------
+ hw/sh4/r2d.c | 8 ++------
  1 file changed, 2 insertions(+), 6 deletions(-)
 
-diff --git a/hw/openrisc/openrisc_sim.c b/hw/openrisc/openrisc_sim.c
-index 58638c6ecd..e9558f1ca4 100644
---- a/hw/openrisc/openrisc_sim.c
-+++ b/hw/openrisc/openrisc_sim.c
-@@ -125,7 +125,6 @@ static void openrisc_load_kernel(ram_addr_t ram_size,
- static void openrisc_sim_init(MachineState *machine)
+diff --git a/hw/sh4/r2d.c b/hw/sh4/r2d.c
+index 16b9ed2db2..458ed83297 100644
+--- a/hw/sh4/r2d.c
++++ b/hw/sh4/r2d.c
+@@ -225,7 +225,6 @@ static struct QEMU_PACKED
+=20
+ static void r2d_init(MachineState *machine)
  {
-     ram_addr_t ram_size =3D machine->ram_size;
 -    const char *cpu_model =3D machine->cpu_model;
      const char *kernel_filename =3D machine->kernel_filename;
-     OpenRISCCPU *cpu =3D NULL;
-     MemoryRegion *ram;
-@@ -133,12 +132,8 @@ static void openrisc_sim_init(MachineState *machine)
-     qemu_irq serial_irq;
-     int n;
+     const char *kernel_cmdline =3D machine->kernel_cmdline;
+     const char *initrd_filename =3D machine->initrd_filename;
+@@ -242,11 +241,7 @@ static void r2d_init(MachineState *machine)
+     MemoryRegion *address_space_mem =3D get_system_memory();
+     PCIBus *pci_bus;
 =20
--    if (!cpu_model) {
--        cpu_model =3D "or1200";
+-    if (cpu_model =3D=3D NULL) {
+-        cpu_model =3D "SH7751R";
 -    }
 -
-     for (n =3D 0; n < smp_cpus; n++) {
--        cpu =3D OPENRISC_CPU(cpu_generic_init(TYPE_OPENRISC_CPU, cpu_mod=
-el));
-+        cpu =3D OPENRISC_CPU(cpu_create(machine->cpu_type));
-         if (cpu =3D=3D NULL) {
-             fprintf(stderr, "Unable to find CPU definition!\n");
-             exit(1);
-@@ -180,6 +175,7 @@ static void openrisc_sim_machine_init(MachineClass *m=
-c)
-     mc->init =3D openrisc_sim_init;
-     mc->max_cpus =3D 2;
-     mc->is_default =3D 1;
-+    mc->default_cpu_type =3D OPENRISC_CPU_TYPE_NAME("or1200");
+-    cpu =3D SUPERH_CPU(cpu_generic_init(TYPE_SUPERH_CPU, cpu_model));
++    cpu =3D SUPERH_CPU(cpu_create(machine->cpu_type));
+     env =3D &cpu->env;
+=20
+     reset_info =3D g_malloc0(sizeof(ResetData));
+@@ -365,6 +360,7 @@ static void r2d_machine_init(MachineClass *mc)
+     mc->desc =3D "r2d-plus board";
+     mc->init =3D r2d_init;
+     mc->block_default_type =3D IF_IDE;
++    mc->default_cpu_type =3D TYPE_SH7751R_CPU;
  }
 =20
- DEFINE_MACHINE("or1k-sim", openrisc_sim_machine_init)
+ DEFINE_MACHINE("r2d", r2d_machine_init)
 --=20
 2.13.6
