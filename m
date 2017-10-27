@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34375)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34387)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1e85XA-0006he-UT
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 10:22:53 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1e85XH-0006w6-Os
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 10:23:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1e85XA-0001My-0J
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 10:22:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39676)
+	(envelope-from <ehabkost@redhat.com>) id 1e85XE-0001RC-Kq
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 10:22:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33234)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1e85X9-0001M6-QB
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 10:22:51 -0400
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1e85XE-0001QS-Dw
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 10:22:56 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Fri, 27 Oct 2017 16:20:49 +0200
-Message-Id: <20171027142107.15542-22-ehabkost@redhat.com>
+Date: Fri, 27 Oct 2017 16:20:50 +0200
+Message-Id: <20171027142107.15542-23-ehabkost@redhat.com>
 In-Reply-To: <20171027142107.15542-1-ehabkost@redhat.com>
 References: <20171027142107.15542-1-ehabkost@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 21/39] xtensa: cleanup cpu type name
- composition
+Subject: [Qemu-devel] [PULL v2 22/39] xtensa: sim: use generic cpu_model
+ parsing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,71 +32,44 @@ Cc: qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>
 
 From: Igor Mammedov <imammedo@redhat.com>
 
-use new XTENSA_CPU_TYPE_NAME to compose CPU type name
-to bring xtensa in line with all other targets that
-will similar macro.
-
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Message-Id: <1507211474-188400-25-git-send-email-imammedo@redhat.com>
+Message-Id: <1507211474-188400-26-git-send-email-imammedo@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- target/xtensa/cpu.h    | 4 ++++
- target/xtensa/cpu.c    | 2 +-
- target/xtensa/helper.c | 2 +-
- 3 files changed, 6 insertions(+), 2 deletions(-)
+ hw/xtensa/sim.c | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
 
-diff --git a/target/xtensa/cpu.h b/target/xtensa/cpu.h
-index 48033313c5..b17d7d96e9 100644
---- a/target/xtensa/cpu.h
-+++ b/target/xtensa/cpu.h
-@@ -469,11 +469,15 @@ void xtensa_cpu_do_unaligned_access(CPUState *cpu, =
-vaddr addr,
- #define cpu_signal_handler cpu_xtensa_signal_handler
- #define cpu_list xtensa_cpu_list
+diff --git a/hw/xtensa/sim.c b/hw/xtensa/sim.c
+index b3580b11fa..2bb883b664 100644
+--- a/hw/xtensa/sim.c
++++ b/hw/xtensa/sim.c
+@@ -75,16 +75,11 @@ static void xtensa_sim_init(MachineState *machine)
+     XtensaCPU *cpu =3D NULL;
+     CPUXtensaState *env =3D NULL;
+     ram_addr_t ram_size =3D machine->ram_size;
+-    const char *cpu_model =3D machine->cpu_model;
+     const char *kernel_filename =3D machine->kernel_filename;
+     int n;
 =20
-+#define XTENSA_CPU_TYPE_SUFFIX "-" TYPE_XTENSA_CPU
-+#define XTENSA_CPU_TYPE_NAME(model) model XTENSA_CPU_TYPE_SUFFIX
-+
- #ifdef TARGET_WORDS_BIGENDIAN
- #define XTENSA_DEFAULT_CPU_MODEL "fsf"
- #else
- #define XTENSA_DEFAULT_CPU_MODEL "dc232b"
- #endif
-+#define XTENSA_DEFAULT_CPU_TYPE XTENSA_CPU_TYPE_NAME(XTENSA_DEFAULT_CPU_=
-MODEL)
+-    if (!cpu_model) {
+-        cpu_model =3D XTENSA_DEFAULT_CPU_MODEL;
+-    }
+-
+     for (n =3D 0; n < smp_cpus; n++) {
+-        cpu =3D XTENSA_CPU(cpu_generic_init(TYPE_XTENSA_CPU, cpu_model))=
+;
++        cpu =3D XTENSA_CPU(cpu_create(machine->cpu_type));
+         env =3D &cpu->env;
 =20
- #define cpu_init(cpu_model) cpu_generic_init(TYPE_XTENSA_CPU, cpu_model)
-=20
-diff --git a/target/xtensa/cpu.c b/target/xtensa/cpu.c
-index a5651e5dab..91961789a5 100644
---- a/target/xtensa/cpu.c
-+++ b/target/xtensa/cpu.c
-@@ -83,7 +83,7 @@ static ObjectClass *xtensa_cpu_class_by_name(const char=
- *cpu_model)
-     ObjectClass *oc;
-     char *typename;
-=20
--    typename =3D g_strdup_printf("%s-" TYPE_XTENSA_CPU, cpu_model);
-+    typename =3D g_strdup_printf(XTENSA_CPU_TYPE_NAME("%s"), cpu_model);
-     oc =3D object_class_by_name(typename);
-     g_free(typename);
-     if (oc =3D=3D NULL || !object_class_dynamic_cast(oc, TYPE_XTENSA_CPU=
-) ||
-diff --git a/target/xtensa/helper.c b/target/xtensa/helper.c
-index e8fba20918..216f1988aa 100644
---- a/target/xtensa/helper.c
-+++ b/target/xtensa/helper.c
-@@ -76,7 +76,7 @@ void xtensa_register_core(XtensaConfigList *node)
-=20
-     node->next =3D xtensa_cores;
-     xtensa_cores =3D node;
--    type.name =3D g_strdup_printf("%s-" TYPE_XTENSA_CPU, node->config->n=
-ame);
-+    type.name =3D g_strdup_printf(XTENSA_CPU_TYPE_NAME("%s"), node->conf=
-ig->name);
-     type_register(&type);
-     g_free((gpointer)type.name);
+         env->sregs[PRID] =3D n;
+@@ -133,6 +128,7 @@ static void xtensa_sim_machine_init(MachineClass *mc)
+     mc->init =3D xtensa_sim_init;
+     mc->max_cpus =3D 4;
+     mc->no_serial =3D 1;
++    mc->default_cpu_type =3D XTENSA_DEFAULT_CPU_TYPE;
  }
+=20
+ DEFINE_MACHINE("sim", xtensa_sim_machine_init)
 --=20
 2.13.6
