@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57429)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57498)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e824W-0001MS-6r
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 06:41:05 -0400
+	(envelope-from <eblake@redhat.com>) id 1e824c-0001Tt-DM
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 06:41:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e824R-0005eI-Pu
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 06:41:04 -0400
+	(envelope-from <eblake@redhat.com>) id 1e824b-0005nE-F1
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 06:41:10 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Fri, 27 Oct 2017 12:40:32 +0200
-Message-Id: <20171027104037.8319-8-eblake@redhat.com>
+Date: Fri, 27 Oct 2017 12:40:34 +0200
+Message-Id: <20171027104037.8319-10-eblake@redhat.com>
 In-Reply-To: <20171027104037.8319-1-eblake@redhat.com>
 References: <20171027104037.8319-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v6 07/12] nbd: Minimal structured read for
- server
+Subject: [Qemu-devel] [PATCH v6 09/12] nbd/client: refactor
+ nbd_receive_starttls
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,193 +25,123 @@ Cc: pbonzini@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org
 
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-Minimal implementation of structured read: one structured reply chunk,
-no segmentation.
-Minimal structured error implementation: no text message.
-Support DF flag, but just ignore it, as there is no segmentation any
-way.
+Split out nbd_request_simple_option to be reused for structured reply
+option.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Signed-off-by: Eric Blake <eblake@redhat.com>
 
 ---
-v6: only set structured_reply when replying with ack [Vladimir]
-v5: correct DF flag spelling, include errname in trace, handle any bogus
-payload from option
-v4: better _DF flag handling, convert errno to wire format, add
-comments and tracing, rework structured error for less churn when adding
-text message later, don't kill connection on redundant client option
+v6: error message tweak [Vladimir]
+v5: only check length for ACK responses
+v4: reduce redundant traces, typo fix in commit message
 ---
- nbd/server.c     | 107 +++++++++++++++++++++++++++++++++++++++++++++++++------
- nbd/trace-events |   2 ++
- 2 files changed, 99 insertions(+), 10 deletions(-)
+ nbd/client.c     | 70 ++++++++++++++++++++++++++++++++++++++------------------
+ nbd/trace-events |  4 +---
+ 2 files changed, 49 insertions(+), 25 deletions(-)
 
-diff --git a/nbd/server.c b/nbd/server.c
-index a98f5622c9..5d6d9a2ddd 100644
---- a/nbd/server.c
-+++ b/nbd/server.c
-@@ -100,6 +100,8 @@ struct NBDClient {
-     QTAILQ_ENTRY(NBDClient) next;
-     int nb_requests;
-     bool closing;
-+
-+    bool structured_reply;
- };
-
- /* That's all folks */
-@@ -768,6 +770,23 @@ static int nbd_negotiate_options(NBDClient *client, uint16_t myflags,
-                                                      "TLS not configured");
-                 }
-                 break;
-+
-+            case NBD_OPT_STRUCTURED_REPLY:
-+                if (length) {
-+                    ret = nbd_reject_length(client, length, option, false,
-+                                            errp);
-+                } else if (client->structured_reply) {
-+                    ret = nbd_negotiate_send_rep_err(
-+                        client->ioc, NBD_REP_ERR_INVALID, option, errp,
-+                        "structured reply already negotiated");
-+                } else {
-+                    ret = nbd_negotiate_send_rep(client->ioc, NBD_REP_ACK,
-+                                                 option, errp);
-+                    client->structured_reply = true;
-+                    myflags |= NBD_FLAG_SEND_DF;
-+                }
-+                break;
-+
-             default:
-                 if (nbd_drop(client->ioc, length, errp) < 0) {
-                     return -EIO;
-@@ -1242,6 +1261,60 @@ static int nbd_co_send_simple_reply(NBDClient *client,
-     return nbd_co_send_iov(client, iov, len ? 2 : 1, errp);
+diff --git a/nbd/client.c b/nbd/client.c
+index 50f36b511e..9acf745b79 100644
+--- a/nbd/client.c
++++ b/nbd/client.c
+@@ -508,35 +508,61 @@ static int nbd_receive_query_exports(QIOChannel *ioc,
+     }
  }
 
-+static inline void set_be_chunk(NBDStructuredReplyChunk *chunk, uint16_t flags,
-+                                uint16_t type, uint64_t handle, uint32_t length)
++/* nbd_request_simple_option: Send an option request, and parse the reply
++ * return 1 for successful negotiation,
++ *        0 if operation is unsupported,
++ *        -1 with errp set for any other error
++ */
++static int nbd_request_simple_option(QIOChannel *ioc, int opt, Error **errp)
 +{
-+    stl_be_p(&chunk->magic, NBD_STRUCTURED_REPLY_MAGIC);
-+    stw_be_p(&chunk->flags, flags);
-+    stw_be_p(&chunk->type, type);
-+    stq_be_p(&chunk->handle, handle);
-+    stl_be_p(&chunk->length, length);
-+}
++    nbd_opt_reply reply;
++    int error;
 +
-+static int coroutine_fn nbd_co_send_structured_read(NBDClient *client,
-+                                                    uint64_t handle,
-+                                                    uint64_t offset,
-+                                                    void *data,
-+                                                    size_t size,
-+                                                    Error **errp)
-+{
-+    NBDStructuredRead chunk;
-+    struct iovec iov[] = {
-+        {.iov_base = &chunk, .iov_len = sizeof(chunk)},
-+        {.iov_base = data, .iov_len = size}
-+    };
-+
-+    trace_nbd_co_send_structured_read(handle, offset, data, size);
-+    set_be_chunk(&chunk.h, NBD_REPLY_FLAG_DONE, NBD_REPLY_TYPE_OFFSET_DATA,
-+                 handle, sizeof(chunk) - sizeof(chunk.h) + size);
-+    stq_be_p(&chunk.offset, offset);
-+
-+    return nbd_co_send_iov(client, iov, 2, errp);
-+}
-+
-+static int coroutine_fn nbd_co_send_structured_error(NBDClient *client,
-+                                                     uint64_t handle,
-+                                                     uint32_t error,
-+                                                     Error **errp)
-+{
-+    NBDStructuredError chunk;
-+    int nbd_err = system_errno_to_nbd_errno(error);
-+    struct iovec iov[] = {
-+        {.iov_base = &chunk, .iov_len = sizeof(chunk)},
-+        /* FIXME: Support human-readable error message */
-+    };
-+
-+    assert(nbd_err);
-+    trace_nbd_co_send_structured_error(handle, nbd_err,
-+                                       nbd_err_lookup(nbd_err));
-+    set_be_chunk(&chunk.h, NBD_REPLY_FLAG_DONE, NBD_REPLY_TYPE_ERROR, handle,
-+                 sizeof(chunk) - sizeof(chunk.h));
-+    stl_be_p(&chunk.error, nbd_err);
-+    stw_be_p(&chunk.message_length, 0);
-+
-+    return nbd_co_send_iov(client, iov, 1, errp);
-+}
-+
- /* nbd_co_receive_request
-  * Collect a client request. Return 0 if request looks valid, -EIO to drop
-  * connection right away, and any other negative value to report an error to
-@@ -1252,6 +1325,7 @@ static int nbd_co_receive_request(NBDRequestData *req, NBDRequest *request,
-                                   Error **errp)
- {
-     NBDClient *client = req->client;
-+    int valid_flags;
-
-     g_assert(qemu_in_coroutine());
-     assert(client->recv_coroutine == qemu_coroutine_self());
-@@ -1313,13 +1387,15 @@ static int nbd_co_receive_request(NBDRequestData *req, NBDRequest *request,
-                    (uint64_t)client->exp->size);
-         return request->type == NBD_CMD_WRITE ? -ENOSPC : -EINVAL;
-     }
--    if (request->flags & ~(NBD_CMD_FLAG_FUA | NBD_CMD_FLAG_NO_HOLE)) {
--        error_setg(errp, "unsupported flags (got 0x%x)", request->flags);
--        return -EINVAL;
-+    valid_flags = NBD_CMD_FLAG_FUA;
-+    if (request->type == NBD_CMD_READ && client->structured_reply) {
-+        valid_flags |= NBD_CMD_FLAG_DF;
-+    } else if (request->type == NBD_CMD_WRITE_ZEROES) {
-+        valid_flags |= NBD_CMD_FLAG_NO_HOLE;
-     }
--    if (request->type != NBD_CMD_WRITE_ZEROES &&
--        (request->flags & NBD_CMD_FLAG_NO_HOLE)) {
--        error_setg(errp, "unexpected flags (got 0x%x)", request->flags);
-+    if (request->flags & ~valid_flags) {
-+        error_setg(errp, "unsupported flags for command %s (got 0x%x)",
-+                   nbd_cmd_lookup(request->type), request->flags);
-         return -EINVAL;
-     }
-
-@@ -1457,10 +1533,21 @@ reply:
-         local_err = NULL;
-     }
-
--    if (nbd_co_send_simple_reply(req->client, request.handle,
--                                 ret < 0 ? -ret : 0,
--                                 req->data, reply_data_len, &local_err) < 0)
--    {
-+    if (client->structured_reply && request.type == NBD_CMD_READ) {
-+        if (ret < 0) {
-+            ret = nbd_co_send_structured_error(req->client, request.handle,
-+                                               -ret, &local_err);
-+        } else {
-+            ret = nbd_co_send_structured_read(req->client, request.handle,
-+                                              request.from, req->data,
-+                                              reply_data_len, &local_err);
-+        }
-+    } else {
-+        ret = nbd_co_send_simple_reply(req->client, request.handle,
-+                                       ret < 0 ? -ret : 0,
-+                                       req->data, reply_data_len, &local_err);
++    if (nbd_send_option_request(ioc, opt, 0, NULL, errp) < 0) {
++        return -1;
 +    }
-+    if (ret < 0) {
-         error_prepend(&local_err, "Failed to send reply: ");
-         goto disconnect;
++
++    if (nbd_receive_option_reply(ioc, opt, &reply, errp) < 0) {
++        return -1;
++    }
++    error = nbd_handle_reply_err(ioc, &reply, errp);
++    if (error <= 0) {
++        return error;
++    }
++
++    if (reply.type != NBD_REP_ACK) {
++        error_setg(errp, "Server answered option %d (%s) with unexpected "
++                   "reply %" PRIx32 " (%s)", opt, nbd_opt_lookup(opt),
++                   reply.type, nbd_rep_lookup(reply.type));
++        nbd_send_opt_abort(ioc);
++        return -1;
++    }
++
++    if (reply.length != 0) {
++        error_setg(errp, "Option %d ('%s') response length is %" PRIu32
++                   " (it should be zero)", opt, nbd_opt_lookup(opt),
++                   reply.length);
++        nbd_send_opt_abort(ioc);
++        return -1;
++    }
++
++    return 1;
++}
++
+ static QIOChannel *nbd_receive_starttls(QIOChannel *ioc,
+                                         QCryptoTLSCreds *tlscreds,
+                                         const char *hostname, Error **errp)
+ {
+-    nbd_opt_reply reply;
++    int ret;
+     QIOChannelTLS *tioc;
+     struct NBDTLSHandshakeData data = { 0 };
+
+-    trace_nbd_receive_starttls_request();
+-    if (nbd_send_option_request(ioc, NBD_OPT_STARTTLS, 0, NULL, errp) < 0) {
+-        return NULL;
+-    }
+-
+-    trace_nbd_receive_starttls_reply();
+-    if (nbd_receive_option_reply(ioc, NBD_OPT_STARTTLS, &reply, errp) < 0) {
+-        return NULL;
+-    }
+-
+-    if (reply.type != NBD_REP_ACK) {
+-        error_setg(errp, "Server rejected request to start TLS %" PRIx32,
+-                   reply.type);
+-        nbd_send_opt_abort(ioc);
+-        return NULL;
+-    }
+-
+-    if (reply.length != 0) {
+-        error_setg(errp, "Start TLS response was not zero %" PRIu32,
+-                   reply.length);
+-        nbd_send_opt_abort(ioc);
++    ret = nbd_request_simple_option(ioc, NBD_OPT_STARTTLS, errp);
++    if (ret <= 0) {
++        if (ret == 0) {
++            error_setg(errp, "Server don't support STARTTLS option");
++            nbd_send_opt_abort(ioc);
++        }
+         return NULL;
      }
+
 diff --git a/nbd/trace-events b/nbd/trace-events
-index ab3d7dad4f..6894f8bbb4 100644
+index 52150bd738..596df96575 100644
 --- a/nbd/trace-events
 +++ b/nbd/trace-events
-@@ -56,6 +56,8 @@ nbd_receive_request(uint32_t magic, uint16_t flags, uint16_t type, uint64_t from
- nbd_blk_aio_attached(const char *name, void *ctx) "Export %s: Attaching clients to AIO context %p\n"
- nbd_blk_aio_detach(const char *name, void *ctx) "Export %s: Detaching clients from AIO context %p\n"
- nbd_co_send_simple_reply(uint64_t handle, uint32_t error, const char *errname, int len) "Send simple reply: handle = %" PRIu64 ", error = %" PRIu32 " (%s), len = %d"
-+nbd_co_send_structured_read(uint64_t handle, uint64_t offset, void *data, size_t size) "Send structured read data reply: handle = %" PRIu64 ", offset = %" PRIu64 ", data = %p, len = %zu"
-+nbd_co_send_structured_error(uint64_t handle, int err, const char *errname) "Send structured error reply: handle = %" PRIu64 ", error = %d (%s)"
- nbd_co_receive_request_decode_type(uint64_t handle, uint16_t type, const char *name) "Decoding type: handle = %" PRIu64 ", type = %" PRIu16 " (%s)"
- nbd_co_receive_request_payload_received(uint64_t handle, uint32_t len) "Payload received: handle = %" PRIu64 ", len = %" PRIu32
- nbd_co_receive_request_cmd_write(uint32_t len) "Reading %" PRIu32 " byte(s)"
+@@ -8,9 +8,7 @@ nbd_opt_go_info_unknown(int info, const char *name) "Ignoring unknown info %d (%
+ nbd_opt_go_info_block_size(uint32_t minimum, uint32_t preferred, uint32_t maximum) "Block sizes are 0x%" PRIx32 ", 0x%" PRIx32 ", 0x%" PRIx32
+ nbd_receive_query_exports_start(const char *wantname) "Querying export list for '%s'"
+ nbd_receive_query_exports_success(const char *wantname) "Found desired export name '%s'"
+-nbd_receive_starttls_request(void) "Requesting TLS from server"
+-nbd_receive_starttls_reply(void) "Getting TLS reply from server"
+-nbd_receive_starttls_new_client(void) "TLS request approved, setting up TLS"
++nbd_receive_starttls_new_client(void) "Setting up TLS"
+ nbd_receive_starttls_tls_handshake(void) "Starting TLS handshake"
+ nbd_receive_negotiate(void *tlscreds, const char *hostname) "Receiving negotiation tlscreds=%p hostname=%s"
+ nbd_receive_negotiate_magic(uint64_t magic) "Magic is 0x%" PRIx64
 -- 
 2.13.6
