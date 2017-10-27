@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55307)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58855)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1e83MV-0005Vk-P0
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 08:03:45 -0400
+	(envelope-from <den@virtuozzo.com>) id 1e83WQ-0000Xs-HJ
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 08:13:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1e83MR-0003OQ-FD
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 08:03:43 -0400
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:51959)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1e83MR-0003NS-6e
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 08:03:39 -0400
-Received: by mail-wr0-x242.google.com with SMTP id j15so5968240wre.8
-	for <qemu-devel@nongnu.org>; Fri, 27 Oct 2017 05:03:38 -0700 (PDT)
+	(envelope-from <den@virtuozzo.com>) id 1e83WK-0000V5-7z
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 08:13:58 -0400
+References: <cover.1509094209.git.jcody@redhat.com>
+	<2f0114c773e8fb917a7a54acccfd2e2adfb6e066.1509094209.git.jcody@redhat.com>
+From: "Denis V. Lunev" <den@openvz.org>
+Message-ID: <bd009057-1ca8-ab7b-1132-902647a2c082@openvz.org>
+Date: Fri, 27 Oct 2017 14:13:43 +0200
 MIME-Version: 1.0
-In-Reply-To: <CAAYMZQthOPZxTQMvAQ+UgRWu8skt2sb0R3QEzQzcW2EvQXThMg@mail.gmail.com>
-References: <20171027055612.2488-1-frasse.iglesias@gmail.com>
-	<20171027055612.2488-14-frasse.iglesias@gmail.com>
-	<CAKmqyKPh9VXd554dGtBiMeXHvmWLZ8C7+saLJ5Bv+PFVNpqgoQ@mail.gmail.com>
-	<CAAYMZQthOPZxTQMvAQ+UgRWu8skt2sb0R3QEzQzcW2EvQXThMg@mail.gmail.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Fri, 27 Oct 2017 14:03:06 +0200
-Message-ID: <CAKmqyKPpUwyUgMhy9e2D+uTUjBPqhZmXj+T6BnFstZZUPe0s7w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v4 13/13] xlnx-zcu102: Add support for the
- ZynqMP QSPI
+In-Reply-To: <2f0114c773e8fb917a7a54acccfd2e2adfb6e066.1509094209.git.jcody@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH 3/4] block/parallels: Don't update header
+ until the first actual write
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,165 +25,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: francisco iglesias <frasse.iglesias@gmail.com>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Edgar Iglesias <edgari@xilinx.com>, Alistair Francis <alistai@xilinx.com>, francisco.iglesias@feimtech.se, "mar.krzeminski" <mar.krzeminski@gmail.com>
+To: Jeff Cody <jcody@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, aik@ozlabs.ru, mreitz@redhat.com, stefanha@redhat.com
 
-On Fri, Oct 27, 2017 at 11:17 AM, francisco iglesias
-<frasse.iglesias@gmail.com> wrote:
-> Dear alistair,
+On 10/27/2017 10:57 AM, Jeff Cody wrote:
+> The on disk image format 'inuse' header field is updated blindly if the
+> image is opened RDWR.  This can cause problems if the QEMU runstate is
+> set to INMIGRATE, at which point the underlying file is set to INACTIVE.
+> This causes an assert in bdrv_co_pwritev().
 >
-> Thank you for the review comments! I will update according them in the next
-> version of the patch series! About your question, I might have misunderstod,
-> but isn't the alias "qspi"? (s/"qspi{0,1}"  ->  s->qspi/"spi{0,1}")
-
-Ah! Now I think I understand. The buses on the QSPI device are still
-labeled "spi", is that correct?
-
-Alistair
-
+> Do something similar to what is done in VHDX; latch the first write, and
+> update the header the first time we modify the file.
 >
-> Best regards,
-> Francisco Iglesias
+> Signed-off-by: Jeff Cody <jcody@redhat.com>
+> ---
+>  block/parallels.c | 25 ++++++++++++++++++++-----
+>  1 file changed, 20 insertions(+), 5 deletions(-)
 >
-> On 27 Oct 2017 10:49, "Alistair Francis" <alistair23@gmail.com> wrote:
->>
->> On Fri, Oct 27, 2017 at 7:56 AM, Francisco Iglesias
->> <frasse.iglesias@gmail.com> wrote:
->> > Add support for the ZynqMP QSPI (consisting of the Generic QSPI and
->> > Legacy
->> > QSPI) and connect Numonyx n25q512a11 flashes to it.
->> >
->> > Signed-off-by: Francisco Iglesias <frasse.iglesias@gmail.com>
->> > ---
->> >  hw/arm/xlnx-zcu102.c         | 23 +++++++++++++++++++++++
->> >  hw/arm/xlnx-zynqmp.c         | 24 ++++++++++++++++++++++++
->> >  include/hw/arm/xlnx-zynqmp.h |  5 +++++
->> >  3 files changed, 52 insertions(+)
->> >
->> > diff --git a/hw/arm/xlnx-zcu102.c b/hw/arm/xlnx-zcu102.c
->> > index 519a16e..7d61972 100644
->> > --- a/hw/arm/xlnx-zcu102.c
->> > +++ b/hw/arm/xlnx-zcu102.c
->> > @@ -150,6 +150,29 @@ static void xlnx_zynqmp_init(XlnxZCU102 *s,
->> > MachineState *machine)
->> >          sysbus_connect_irq(SYS_BUS_DEVICE(&s->soc.spi[i]), 1, cs_line);
->> >      }
->> >
->> > +    for (i = 0; i < XLNX_ZYNQMP_NUM_QSPI_FLASH; i++) {
->> > +        SSIBus *spi_bus;
->> > +        DeviceState *flash_dev;
->> > +        qemu_irq cs_line;
->> > +        DriveInfo *dinfo = drive_get_next(IF_MTD);
->> > +        int bus = i / XLNX_ZYNQMP_NUM_QSPI_BUS_CS;
->> > +        gchar *bus_name = g_strdup_printf("qspi%d", bus);
->> > +
->> > +        spi_bus = (SSIBus *)qdev_get_child_bus(DEVICE(&s->soc),
->> > bus_name);
->> > +        g_free(bus_name);
->> > +
->> > +        flash_dev = ssi_create_slave_no_init(spi_bus, "n25q512a11");
->> > +        if (dinfo) {
->> > +            qdev_prop_set_drive(flash_dev, "drive",
->> > blk_by_legacy_dinfo(dinfo),
->> > +                                &error_fatal);
->> > +        }
->> > +        qdev_init_nofail(flash_dev);
->> > +
->> > +        cs_line = qdev_get_gpio_in_named(flash_dev, SSI_GPIO_CS, 0);
->> > +
->> > +        sysbus_connect_irq(SYS_BUS_DEVICE(&s->soc.qspi), i + 1,
->> > cs_line);
->> > +    }
->> > +
->> >      /* TODO create and connect IDE devices for ide_drive_get() */
->> >
->> >      xlnx_zcu102_binfo.ram_size = ram_size;
->> > diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
->> > index d4b6560..f7c8b4b 100644
->> > --- a/hw/arm/xlnx-zynqmp.c
->> > +++ b/hw/arm/xlnx-zynqmp.c
->> > @@ -40,6 +40,10 @@
->> >  #define SATA_ADDR           0xFD0C0000
->> >  #define SATA_NUM_PORTS      2
->> >
->> > +#define QSPI_ADDR           0xff0f0000
->> > +#define LQSPI_ADDR          0xc0000000
->> > +#define QSPI_IRQ            15
->> > +
->> >  #define DP_ADDR             0xfd4a0000
->> >  #define DP_IRQ              113
->> >
->> > @@ -169,6 +173,9 @@ static void xlnx_zynqmp_init(Object *obj)
->> >          qdev_set_parent_bus(DEVICE(&s->spi[i]), sysbus_get_default());
->> >      }
->> >
->> > +    object_initialize(&s->qspi, sizeof(s->qspi),
->> > TYPE_XLNX_ZYNQMP_QSPIPS);
->> > +    qdev_set_parent_bus(DEVICE(&s->qspi), sysbus_get_default());
->> > +
->> >      object_initialize(&s->dp, sizeof(s->dp), TYPE_XLNX_DP);
->> >      qdev_set_parent_bus(DEVICE(&s->dp), sysbus_get_default());
->> >
->> > @@ -405,6 +412,23 @@ static void xlnx_zynqmp_realize(DeviceState *dev,
->> > Error **errp)
->> >          g_free(bus_name);
->> >      }
->> >
->> > +    object_property_set_bool(OBJECT(&s->qspi), true, "realized", &err);
->> > +    sysbus_mmio_map(SYS_BUS_DEVICE(&s->qspi), 0, QSPI_ADDR);
->> > +    sysbus_mmio_map(SYS_BUS_DEVICE(&s->qspi), 1, LQSPI_ADDR);
->> > +    sysbus_connect_irq(SYS_BUS_DEVICE(&s->qspi), 0, gic_spi[QSPI_IRQ]);
->>
->> New line here
->>
->> > +    for (i = 0; i < XLNX_ZYNQMP_NUM_QSPI_BUS; i++) {
->> > +        gchar *bus_name;
->> > +        gchar *target_bus;
->>
->> New line here
->>
->> > +        /* Alias controller SPI bus to the SoC itself */
->> > +        bus_name = g_strdup_printf("qspi%d", i);
->> > +        target_bus = g_strdup_printf("spi%d", i);
->> > +        object_property_add_alias(OBJECT(s), bus_name,
->> > +                                  OBJECT(&s->qspi), target_bus,
->>
->> Why do we alias qspi to spi?
->>
->> Alistair
->>
->> > +                                  &error_abort);
->> > +        g_free(bus_name);
->> > +        g_free(target_bus);
->> > +    }
->> > +
->> >      object_property_set_bool(OBJECT(&s->dp), true, "realized", &err);
->> >      if (err) {
->> >          error_propagate(errp, err);
->> > diff --git a/include/hw/arm/xlnx-zynqmp.h b/include/hw/arm/xlnx-zynqmp.h
->> > index 6eff81a..3e6fb9b 100644
->> > --- a/include/hw/arm/xlnx-zynqmp.h
->> > +++ b/include/hw/arm/xlnx-zynqmp.h
->> > @@ -40,6 +40,10 @@
->> >  #define XLNX_ZYNQMP_NUM_SDHCI 2
->> >  #define XLNX_ZYNQMP_NUM_SPIS 2
->> >
->> > +#define XLNX_ZYNQMP_NUM_QSPI_BUS 2
->> > +#define XLNX_ZYNQMP_NUM_QSPI_BUS_CS 2
->> > +#define XLNX_ZYNQMP_NUM_QSPI_FLASH 4
->> > +
->> >  #define XLNX_ZYNQMP_NUM_OCM_BANKS 4
->> >  #define XLNX_ZYNQMP_OCM_RAM_0_ADDRESS 0xFFFC0000
->> >  #define XLNX_ZYNQMP_OCM_RAM_SIZE 0x10000
->> > @@ -83,6 +87,7 @@ typedef struct XlnxZynqMPState {
->> >      SysbusAHCIState sata;
->> >      SDHCIState sdhci[XLNX_ZYNQMP_NUM_SDHCI];
->> >      XilinxSPIPS spi[XLNX_ZYNQMP_NUM_SPIS];
->> > +    XlnxZynqMPQSPIPS qspi;
->> >      XlnxDPState dp;
->> >      XlnxDPDMAState dpdma;
->> >
->> > --
->> > 2.9.3
->> >
->> >
+> diff --git a/block/parallels.c b/block/parallels.c
+> index fed199eccd..c560e2fcf2 100644
+> --- a/block/parallels.c
+> +++ b/block/parallels.c
+> @@ -100,6 +100,8 @@ typedef struct BDRVParallelsState {
+>      unsigned int tracks;
+>  
+>      unsigned int off_multiplier;
+> +
+> +    bool first_write_latch;
+>  } BDRVParallelsState;
+>  
+>  
+> @@ -317,6 +319,16 @@ static coroutine_fn int parallels_co_writev(BlockDriverState *bs,
+>      QEMUIOVector hd_qiov;
+>      int ret = 0;
+>  
+> +    if (s->first_write_latch) {
+> +        s->first_write_latch = false;
+> +        qemu_co_mutex_lock(&s->lock);
+> +        ret = parallels_update_header(bs);
+> +        qemu_co_mutex_unlock(&s->lock);
+> +    }
+> +    if (ret < 0) {
+> +        return ret;
+> +    }
+> +
+>      qemu_iovec_init(&hd_qiov, qiov->niov);
+>  
+>      while (nb_sectors > 0) {
+> @@ -416,6 +428,9 @@ static int parallels_check(BlockDriverState *bs, BdrvCheckResult *res,
+>              /* parallels_close will do the job right */
+>              res->corruptions_fixed++;
+>              s->header_unclean = false;
+> +            /* set that a write has occurred, so that parallels_close() will
+> +             * update the inuse field in the header */
+> +            s->first_write_latch = false;
+>          }
+>      }
+>  
+> @@ -597,6 +612,8 @@ static int parallels_open(BlockDriverState *bs, QDict *options, int flags,
+>      Error *local_err = NULL;
+>      char *buf;
+>  
+> +    s->first_write_latch = true;
+> +
+>      bs->file = bdrv_open_child(NULL, options, "file", bs, &child_file,
+>                                 false, errp);
+>      if (!bs->file) {
+> @@ -710,10 +727,6 @@ static int parallels_open(BlockDriverState *bs, QDict *options, int flags,
+>  
+>      if (flags & BDRV_O_RDWR) {
+>          s->header->inuse = cpu_to_le32(HEADER_INUSE_MAGIC);
+> -        ret = parallels_update_header(bs);
+> -        if (ret < 0) {
+> -            goto fail;
+> -        }
+>      }
+>  
+>      s->bat_dirty_block = 4 * getpagesize();
+> @@ -741,7 +754,9 @@ static void parallels_close(BlockDriverState *bs)
+>  {
+>      BDRVParallelsState *s = bs->opaque;
+>  
+> -    if (bs->open_flags & BDRV_O_RDWR) {
+> +    /* Only need to update the header, if we ever actually wrote to the
+> +     * image at all */
+> +    if ((bs->open_flags & BDRV_O_RDWR) && !s->first_write_latch) {
+>          s->header->inuse = 0;
+>          parallels_update_header(bs);
+>      }
+Reviewed-by: Denis V. Lunev <den@openvz.org>
