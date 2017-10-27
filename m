@@ -1,30 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39304)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60762)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <frasse.iglesias@gmail.com>) id 1e843j-00058a-Fq
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 08:48:25 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1e83cX-0003Bm-5B
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 08:20:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <frasse.iglesias@gmail.com>) id 1e843h-0007Sa-N9
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 08:48:23 -0400
-Received: from mail-pg0-x235.google.com ([2607:f8b0:400e:c05::235]:45429)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <frasse.iglesias@gmail.com>)
-	id 1e843h-0007Rg-Cy
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 08:48:21 -0400
-Received: by mail-pg0-x235.google.com with SMTP id b192so5233001pga.2
-	for <qemu-devel@nongnu.org>; Fri, 27 Oct 2017 05:48:21 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <CAKmqyKPpUwyUgMhy9e2D+uTUjBPqhZmXj+T6BnFstZZUPe0s7w@mail.gmail.com>
-References: <20171027055612.2488-1-frasse.iglesias@gmail.com>
-	<20171027055612.2488-14-frasse.iglesias@gmail.com>
-	<CAKmqyKPh9VXd554dGtBiMeXHvmWLZ8C7+saLJ5Bv+PFVNpqgoQ@mail.gmail.com>
-	<CAAYMZQthOPZxTQMvAQ+UgRWu8skt2sb0R3QEzQzcW2EvQXThMg@mail.gmail.com>
-	<CAKmqyKPpUwyUgMhy9e2D+uTUjBPqhZmXj+T6BnFstZZUPe0s7w@mail.gmail.com>
-From: francisco iglesias <frasse.iglesias@gmail.com>
-Date: Fri, 27 Oct 2017 14:48:19 +0200
-Message-ID: <CAAYMZQsM63X9LHr4AgO_nqGzJFnBHWA43+=Pfvp4s58_XDWz8Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v4 13/13] xlnx-zcu102: Add support for the
- ZynqMP QSPI
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1e83cT-0006hq-1r
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 08:20:17 -0400
+Received: from chuckie.co.uk ([82.165.15.123]:33175
+	helo=s16892447.onlinehome-server.info)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1e83cS-0006Zj-K9
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 08:20:12 -0400
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Date: Fri, 27 Oct 2017 13:19:48 +0100
+Message-Id: <1509106789-8626-4-git-send-email-mark.cave-ayland@ilande.co.uk>
+In-Reply-To: <1509106789-8626-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+References: <1509106789-8626-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+Subject: [Qemu-devel] [PATCHv2 3/4] sun4m_iommu: remove legacy
+ sparc_iommu_memory_rw() function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,185 +26,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair23@gmail.com>
-Cc: qemu-devel@nongnu.org, edgari@xilinx.com, Alistair Francis <alistai@xilinx.com>, francisco.iglesias@feimtech.se, "mar.krzeminski" <mar.krzeminski@gmail.com>
+To: qemu-devel@nongnu.org, atar4qemu@gmail.com
 
-Good day Alistair,
+With the switch to the IOMMU memory region and DMA API, this is no longer
+required.
 
-Yes exactly! The qspi aliases on the soc (named "qspi%d") targets the spi
-busses on the qspi dev (named "spi%d"). I did it this way in hope that the
-code resembles how we connect the SST flashes to the standard spi devices.
-Would you like me to do this in an other way or do you possibly think the
-approach is ok?
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+---
+ hw/dma/sun4m_iommu.c     |   33 ---------------------------------
+ include/hw/sparc/sun4m.h |   16 ----------------
+ 2 files changed, 49 deletions(-)
 
-Best regards,
-Francisco Iglesias
-
-
-On 27 Oct 2017 14:03, "Alistair Francis" <alistair23@gmail.com> wrote:
-
-On Fri, Oct 27, 2017 at 11:17 AM, francisco iglesias
-<frasse.iglesias@gmail.com> wrote:
-> Dear alistair,
->
-> Thank you for the review comments! I will update according them in the
-next
-> version of the patch series! About your question, I might have
-misunderstod,
-> but isn't the alias "qspi"? (s/"qspi{0,1}"  ->  s->qspi/"spi{0,1}")
-
-Ah! Now I think I understand. The buses on the QSPI device are still
-labeled "spi", is that correct?
-
-Alistair
-
->
-> Best regards,
-> Francisco Iglesias
->
-> On 27 Oct 2017 10:49, "Alistair Francis" <alistair23@gmail.com> wrote:
->>
->> On Fri, Oct 27, 2017 at 7:56 AM, Francisco Iglesias
->> <frasse.iglesias@gmail.com> wrote:
->> > Add support for the ZynqMP QSPI (consisting of the Generic QSPI and
->> > Legacy
->> > QSPI) and connect Numonyx n25q512a11 flashes to it.
->> >
->> > Signed-off-by: Francisco Iglesias <frasse.iglesias@gmail.com>
->> > ---
->> >  hw/arm/xlnx-zcu102.c         | 23 +++++++++++++++++++++++
->> >  hw/arm/xlnx-zynqmp.c         | 24 ++++++++++++++++++++++++
->> >  include/hw/arm/xlnx-zynqmp.h |  5 +++++
->> >  3 files changed, 52 insertions(+)
->> >
->> > diff --git a/hw/arm/xlnx-zcu102.c b/hw/arm/xlnx-zcu102.c
->> > index 519a16e..7d61972 100644
->> > --- a/hw/arm/xlnx-zcu102.c
->> > +++ b/hw/arm/xlnx-zcu102.c
->> > @@ -150,6 +150,29 @@ static void xlnx_zynqmp_init(XlnxZCU102 *s,
->> > MachineState *machine)
->> >          sysbus_connect_irq(SYS_BUS_DEVICE(&s->soc.spi[i]), 1,
-cs_line);
->> >      }
->> >
->> > +    for (i = 0; i < XLNX_ZYNQMP_NUM_QSPI_FLASH; i++) {
->> > +        SSIBus *spi_bus;
->> > +        DeviceState *flash_dev;
->> > +        qemu_irq cs_line;
->> > +        DriveInfo *dinfo = drive_get_next(IF_MTD);
->> > +        int bus = i / XLNX_ZYNQMP_NUM_QSPI_BUS_CS;
->> > +        gchar *bus_name = g_strdup_printf("qspi%d", bus);
->> > +
->> > +        spi_bus = (SSIBus *)qdev_get_child_bus(DEVICE(&s->soc),
->> > bus_name);
->> > +        g_free(bus_name);
->> > +
->> > +        flash_dev = ssi_create_slave_no_init(spi_bus, "n25q512a11");
->> > +        if (dinfo) {
->> > +            qdev_prop_set_drive(flash_dev, "drive",
->> > blk_by_legacy_dinfo(dinfo),
->> > +                                &error_fatal);
->> > +        }
->> > +        qdev_init_nofail(flash_dev);
->> > +
->> > +        cs_line = qdev_get_gpio_in_named(flash_dev, SSI_GPIO_CS, 0);
->> > +
->> > +        sysbus_connect_irq(SYS_BUS_DEVICE(&s->soc.qspi), i + 1,
->> > cs_line);
->> > +    }
->> > +
->> >      /* TODO create and connect IDE devices for ide_drive_get() */
->> >
->> >      xlnx_zcu102_binfo.ram_size = ram_size;
->> > diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
->> > index d4b6560..f7c8b4b 100644
->> > --- a/hw/arm/xlnx-zynqmp.c
->> > +++ b/hw/arm/xlnx-zynqmp.c
->> > @@ -40,6 +40,10 @@
->> >  #define SATA_ADDR           0xFD0C0000
->> >  #define SATA_NUM_PORTS      2
->> >
->> > +#define QSPI_ADDR           0xff0f0000
->> > +#define LQSPI_ADDR          0xc0000000
->> > +#define QSPI_IRQ            15
->> > +
->> >  #define DP_ADDR             0xfd4a0000
->> >  #define DP_IRQ              113
->> >
->> > @@ -169,6 +173,9 @@ static void xlnx_zynqmp_init(Object *obj)
->> >          qdev_set_parent_bus(DEVICE(&s->spi[i]), sysbus_get_default());
->> >      }
->> >
->> > +    object_initialize(&s->qspi, sizeof(s->qspi),
->> > TYPE_XLNX_ZYNQMP_QSPIPS);
->> > +    qdev_set_parent_bus(DEVICE(&s->qspi), sysbus_get_default());
->> > +
->> >      object_initialize(&s->dp, sizeof(s->dp), TYPE_XLNX_DP);
->> >      qdev_set_parent_bus(DEVICE(&s->dp), sysbus_get_default());
->> >
->> > @@ -405,6 +412,23 @@ static void xlnx_zynqmp_realize(DeviceState *dev,
->> > Error **errp)
->> >          g_free(bus_name);
->> >      }
->> >
->> > +    object_property_set_bool(OBJECT(&s->qspi), true, "realized",
-&err);
->> > +    sysbus_mmio_map(SYS_BUS_DEVICE(&s->qspi), 0, QSPI_ADDR);
->> > +    sysbus_mmio_map(SYS_BUS_DEVICE(&s->qspi), 1, LQSPI_ADDR);
->> > +    sysbus_connect_irq(SYS_BUS_DEVICE(&s->qspi), 0,
-gic_spi[QSPI_IRQ]);
->>
->> New line here
->>
->> > +    for (i = 0; i < XLNX_ZYNQMP_NUM_QSPI_BUS; i++) {
->> > +        gchar *bus_name;
->> > +        gchar *target_bus;
->>
->> New line here
->>
->> > +        /* Alias controller SPI bus to the SoC itself */
->> > +        bus_name = g_strdup_printf("qspi%d", i);
->> > +        target_bus = g_strdup_printf("spi%d", i);
->> > +        object_property_add_alias(OBJECT(s), bus_name,
->> > +                                  OBJECT(&s->qspi), target_bus,
->>
->> Why do we alias qspi to spi?
->>
->> Alistair
->>
->> > +                                  &error_abort);
->> > +        g_free(bus_name);
->> > +        g_free(target_bus);
->> > +    }
->> > +
->> >      object_property_set_bool(OBJECT(&s->dp), true, "realized", &err);
->> >      if (err) {
->> >          error_propagate(errp, err);
->> > diff --git a/include/hw/arm/xlnx-zynqmp.h
-b/include/hw/arm/xlnx-zynqmp.h
->> > index 6eff81a..3e6fb9b 100644
->> > --- a/include/hw/arm/xlnx-zynqmp.h
->> > +++ b/include/hw/arm/xlnx-zynqmp.h
->> > @@ -40,6 +40,10 @@
->> >  #define XLNX_ZYNQMP_NUM_SDHCI 2
->> >  #define XLNX_ZYNQMP_NUM_SPIS 2
->> >
->> > +#define XLNX_ZYNQMP_NUM_QSPI_BUS 2
->> > +#define XLNX_ZYNQMP_NUM_QSPI_BUS_CS 2
->> > +#define XLNX_ZYNQMP_NUM_QSPI_FLASH 4
->> > +
->> >  #define XLNX_ZYNQMP_NUM_OCM_BANKS 4
->> >  #define XLNX_ZYNQMP_OCM_RAM_0_ADDRESS 0xFFFC0000
->> >  #define XLNX_ZYNQMP_OCM_RAM_SIZE 0x10000
->> > @@ -83,6 +87,7 @@ typedef struct XlnxZynqMPState {
->> >      SysbusAHCIState sata;
->> >      SDHCIState sdhci[XLNX_ZYNQMP_NUM_SDHCI];
->> >      XilinxSPIPS spi[XLNX_ZYNQMP_NUM_SPIS];
->> > +    XlnxZynqMPQSPIPS qspi;
->> >      XlnxDPState dp;
->> >      XlnxDPDMAState dpdma;
->> >
->> > --
->> > 2.9.3
->> >
->> >
+diff --git a/hw/dma/sun4m_iommu.c b/hw/dma/sun4m_iommu.c
+index ce21a22..30a05e8 100644
+--- a/hw/dma/sun4m_iommu.c
++++ b/hw/dma/sun4m_iommu.c
+@@ -321,39 +321,6 @@ static IOMMUTLBEntry sun4m_translate_iommu(IOMMUMemoryRegion *iommu,
+     return ret;
+ }
+ 
+-void sparc_iommu_memory_rw(void *opaque, hwaddr addr,
+-                           uint8_t *buf, int len, int is_write)
+-{
+-    int l;
+-    uint32_t flags;
+-    hwaddr page, phys_addr;
+-
+-    while (len > 0) {
+-        page = addr & IOMMU_PAGE_MASK;
+-        l = (page + IOMMU_PAGE_SIZE) - addr;
+-        if (l > len)
+-            l = len;
+-        flags = iommu_page_get_flags(opaque, page);
+-        if (!(flags & IOPTE_VALID)) {
+-            iommu_bad_addr(opaque, page, is_write);
+-            return;
+-        }
+-        phys_addr = iommu_translate_pa(addr, flags);
+-        if (is_write) {
+-            if (!(flags & IOPTE_WRITE)) {
+-                iommu_bad_addr(opaque, page, is_write);
+-                return;
+-            }
+-            cpu_physical_memory_write(phys_addr, buf, l);
+-        } else {
+-            cpu_physical_memory_read(phys_addr, buf, l);
+-        }
+-        len -= l;
+-        buf += l;
+-        addr += l;
+-    }
+-}
+-
+ static const VMStateDescription vmstate_iommu = {
+     .name ="iommu",
+     .version_id = 2,
+diff --git a/include/hw/sparc/sun4m.h b/include/hw/sparc/sun4m.h
+index 6e21e10..c2d0448 100644
+--- a/include/hw/sparc/sun4m.h
++++ b/include/hw/sparc/sun4m.h
+@@ -29,22 +29,6 @@ typedef struct IOMMUState {
+     uint32_t version;
+ } IOMMUState;
+ 
+-void sparc_iommu_memory_rw(void *opaque, hwaddr addr,
+-                                 uint8_t *buf, int len, int is_write);
+-static inline void sparc_iommu_memory_read(void *opaque,
+-                                           hwaddr addr,
+-                                           uint8_t *buf, int len)
+-{
+-    sparc_iommu_memory_rw(opaque, addr, buf, len, 0);
+-}
+-
+-static inline void sparc_iommu_memory_write(void *opaque,
+-                                            hwaddr addr,
+-                                            uint8_t *buf, int len)
+-{
+-    sparc_iommu_memory_rw(opaque, addr, buf, len, 1);
+-}
+-
+ /* sparc32_dma.c */
+ #include "hw/sparc/sparc32_dma.h"
+ 
+-- 
+1.7.10.4
