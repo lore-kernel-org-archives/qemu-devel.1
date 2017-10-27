@@ -1,32 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55858)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41449)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e7z5O-00045c-Ec
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 03:29:47 -0400
+	(envelope-from <sameeh@daynix.com>) id 1e7zhE-0001dy-5E
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 04:08:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e7z5L-0000mv-53
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 03:29:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60532)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1e7z5K-0000kx-Rs
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 03:29:43 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id AED282027A
-	for <qemu-devel@nongnu.org>; Fri, 27 Oct 2017 07:29:40 +0000 (UTC)
-Date: Fri, 27 Oct 2017 08:29:34 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20171027072934.GA30999@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20171023091947.20771-1-kraxel@redhat.com>
-	<20171023091947.20771-5-kraxel@redhat.com>
+	(envelope-from <sameeh@daynix.com>) id 1e7zhA-00030w-0G
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 04:08:52 -0400
+Received: from mail-io0-x243.google.com ([2607:f8b0:4001:c06::243]:46668)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <sameeh@daynix.com>) id 1e7zh9-00030i-Lk
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 04:08:47 -0400
+Received: by mail-io0-x243.google.com with SMTP id 101so10997708ioj.3
+	for <qemu-devel@nongnu.org>; Fri, 27 Oct 2017 01:08:47 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20171023091947.20771-5-kraxel@redhat.com>
-Subject: Re: [Qemu-devel] [PULL 4/9] ps2: fix scancodes sent for Alt-Print
- key combination (aka SysRq)
+In-Reply-To: <150906187318.17222.17361197183146152660@sif>
+References: <20170813155849.11368-1-sameeh@daynix.com>
+	<150906187318.17222.17361197183146152660@sif>
+From: Sameeh Jubran <sameeh@daynix.com>
+Date: Fri, 27 Oct 2017 11:08:46 +0300
+Message-ID: <CAKPgXcGfgdMUt3tYKynrn+0nioi+qju10E+Jg9tjRhhObtUNqg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 0/3]
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,132 +28,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Yan Vugenfirer <yan@daynix.com>
 
-On Mon, Oct 23, 2017 at 11:19:42AM +0200, Gerd Hoffmann wrote:
-> From: "Daniel P. Berrange" <berrange@redhat.com>
-> 
-> The 'Print' key is special in the AT set 1 / set 2 scancode definitions.
-> 
-> An unmodified 'Print' key is supposed to send
-> 
->  AT Set 1:  e0 2a e0 37 (Down)  e0 b7 e0 aa (Up)
->  AT Set 2:  e0 12 e0 7c (Down)  e0 f0 7c e0 f0 12 (Up)
-> 
-> which QEMU gets right. When pressed in combination with the 'Alt_L' or 'Alt_R'
-> keys (which signify SysRq), the scancodes are required to follow a different
-> scheme. With Alt_L, the expected sequences are
-> 
->  AT set 1:  38, 54 (Down) d4, b8 (Up)
->  AT set 2:  11, 84 (Down) f0 84, f0 11 (Up)
-> 
-> And with Alt_R
-> 
->  AT set 1:  e0 38, 54 (Down) d4, e0 b8 (Up)
->  AT set 2:  e0 11, 84 (Down) f0 84, f0 e0 11 (Up)
-> 
-> It is actually slightly more complicated than that, because (according results
-> of 'showkey -s', keyboards will in fact first release the currently pressed
-> modifier before sending the sequence above (which effectively re-presses &
-> then releases the modifier) and finally re-press the original modifier
-> afterwards. IOW, with Alt_L we need to send
-> 
->  AT set 1:  b8, 38, 54 (Down) d4, b8, 38 (Up)
->  AT set 2:  f0 11, 11, 84 (Down) f0 84, f0 11, 11 (Up)
-> 
-> And with Alt_R
-> 
->  AT set 1:  e0 b8, e0 38, 54 (Down) d4, e0 b8, e0 38 (Up)
->  AT set 2:  e0 f0 11, e0 11, 84 (Down) f0 84, e0 f0 11, e0 11 (Up)
-> 
-> The AT set 3 scancodes have no special handling for Alt-Print.
-> 
-> Rather than fixing the handling of the 'print' key in the ps2 driver to consider
-> the Alt modifiers, way back, a patch was commited that defined an extra 'sysrq'
-> key name:
-> 
->   commit f2289cb6924afc97b2a75d21bfc9217024d11741
->   Author: balrog <balrog@c046a42c-6fe2-441c-8c8c-71466251a162>
->   Date:   Wed Jun 4 10:14:16 2008 +0000
-> 
->     Add sysrq to key names known by "sendkey".
-> 
->     Adding sysrq keycode to the table enabling running sysrq debugging in
->     the guest via the monitor sendkey command, like:
-> 
->     (qemu) sendkey alt-sysrq-t
-> 
->     Tested on x86-64 target and Linux guest.
-> 
->     Signed-off-by: Ryan Harper <ryanh@us.ibm.com>
-> 
-> With this patch QEMU would send
-> 
->  AT set 1:  38, 54 (Down) d4, b8 (Up)
->  AT set 2:  11, 84 (Down) f0 84, f0 11 (Up)
-> 
-> but this doesn't match what actual real keyboards send, as it is not releasing
-> the original modifier & pressing it again afterwards. In addition the original
-> problem remains, and a new problem was added:
-> 
->   - The sequence 'alt-print-t' is still broken, acting as if 'print-t' was
->     requested
->   - The sequence 'sysrq-t' is broken, injecting an undefine scancode sequence
->     tot he guest os (bare 0x54)
-> 
-> To deal with this mess we make these changes to the ps2 code, so that we track
-> the state of modifier keys (Alt, Shift, Ctrl - both left & right). Then we can
-> vary what scancodes are sent for Q_KEY_CODE_PRINT according to the Alt key
-> modifier state
-> 
-> Interestingly, it appears that of operating systems I've checked (Linux, FreeBSD
-> and OpenSolaris), none of them actually bother to validate the full sequences
-> for a unmodified 'Print' key. They all just ignore the leading "e0 2a" and
-> trigger based off "e0 37" alone. The latter two byte sequence is what keyboards
-> send with 'Print' is combined with 'Shift' or 'Ctrl' modifiers.
-> 
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> Message-id: 20171019142848.572-5-berrange@redhat.com
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
->  hw/input/ps2.c        | 137 ++++++++++++++++++++++++++++++++++++++++++--------
->  hw/input/trace-events |   1 +
->  2 files changed, 118 insertions(+), 20 deletions(-)
-> 
-> diff --git a/hw/input/ps2.c b/hw/input/ps2.c
-> index dff3f1e024..1e6f6ae9b6 100644
-> --- a/hw/input/ps2.c
-> +++ b/hw/input/ps2.c
-> @@ -78,6 +78,14 @@
->  
->  #define PS2_QUEUE_SIZE 16  /* Buffer size required by PS/2 protocol */
->  
-> +/* Bits for 'modifiers' field in PS2KbdState */
-> +#define MOD_CTRL_L  (1 << 0)
-> +#define MOD_SHIFT_L (1 << 1)
-> +#define MOD_ALT_L   (1 << 2)
-> +#define MOD_CTRL_R  (1 << 3)
-> +#define MOD_SHIFT_R (1 << 4)
-> +#define MOD_ALT_R   (1 << 5)
-> +
->  typedef struct {
->      /* Keep the data array 256 bytes long, which compatibility
->       with older qemu versions. */
-> @@ -99,6 +107,7 @@ typedef struct {
->      int scancode_set; /* 1=XT, 2=AT, 3=PS/2 */
->      int ledstate;
->      bool need_high_bit;
-> +    unsigned int modifiers; /* bitmask of MOD_* constants above */
->  } PS2KbdState;
+On Fri, Oct 27, 2017 at 2:51 AM, Michael Roth <mdroth@linux.vnet.ibm.com>
+wrote:
 
-No one confirmed whether or not this new field needs to be added to the
-VMSTATE sections, and if so, how todo this in a back compatible manner....
+> Quoting Sameeh Jubran (2017-08-13 10:58:46)
+> > From: Sameeh Jubran <sjubran@redhat.com>
+> >
+> > This series fixes qemu-ga's behaviour upon facing a missing serial/serial
+> > driver by listening to the serial device's events.
+> >
+> > For more info on why this series is needed checkout the commit message
+> > of the third patch and the following bugzilla:
+> https://bugzilla.redhat.com/show_bug.cgi?id=990629.
+> >
+> > Sameeh Jubran (3):
+> >   qga: Channel: Add functions for checking serial status
+> >   qga: main: make qga config and socket activation global
+> >   qga: Prevent qemu-ga exit if serial doesn't exist
+>
+> Hi Sameeh,
+>
+> The event handling stuff is spiffy and could be useful for other use-cases
+> (e.g. cpu/mem hotplug events that can be consumed by management), but since
+> the actual bug here is somewhat of an edge case (we *could* just tell
+> people that installing the agent before virtio-serial drivers is a bug,
+> or that unplugging the agent's communication channel is a bad idea),
+> I'm not too comfortable with adding this much complexity unless there's
+> a stronger argument for it.
+>
+I can relate to your concerns, it is somehow an edge case but I think that
+this
+is the elegant way to handle it instead of just polling forever. This patch
+series
+is more related to Windows than Linux as this edge case is much more common
+on Windows since when the virtio-serial driver is installed sometimes
+usually
+it requires a post-installation reboot and when the system is up, qemu-ga
+runs before
+the virtio-serial driver is fully configured and it fails to load and then
+another reboot is needed.
 
 
-Regards,
-Daniel
+>
+> There's also a couple issues I had with this series as it stands, namely
+> the lack of a ./configure check for udev (which could cause build
+> breakage in some environments), and a lot of spillage of GAConfig into
+> qga/channel-*, which I think could be avoided.
+>
+I think we can use the --retry with linux clients and use the device
+notifications
+API provided by Windows as it is supported since xp.
+
+>
+> I've sent an alternative series that I think we should consider as it
+> uses a much simpler mechanism to implement this support (basically
+> just periodically retrying the channel if it doesn't exist, or if it
+> disappears for whatever reason). I've tested it on Windows, but would
+> be good to confirm that it adequately addresses the use-case you were
+> looking at. Thanks!
+>
+I haven't tested it yet, but I think it might solve the issue. Your series
+is much
+simpler and less intrusive to the code but I don't think this is the right
+approach.
+
+>
+> >
+> >  Makefile            |   4 +
+> >  qga/channel-posix.c |  54 ++++++++++
+> >  qga/channel-win32.c |  60 +++++++++++
+> >  qga/channel.h       |   9 ++
+> >  qga/main.c          | 284 ++++++++++++++++++++++++++++++
+> ++++++++++++++++------
+> >  qga/service-win32.h |   4 +
+> >  6 files changed, 385 insertions(+), 30 deletions(-)
+> >
+> > --
+> > 2.9.4
+> >
+>
+>
+
+
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Respectfully,
+*Sameeh Jubran*
+*Linkedin <https://il.linkedin.com/pub/sameeh-jubran/87/747/a8a>*
+*Software Engineer @ Daynix <http://www.daynix.com>.*
