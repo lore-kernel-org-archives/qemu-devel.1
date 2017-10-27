@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58182)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35073)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zachriggle@gmail.com>) id 1e89yx-0001tH-1s
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 15:07:52 -0400
+	(envelope-from <eblake@redhat.com>) id 1e8ARY-00076g-F9
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 15:37:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zachriggle@gmail.com>) id 1e89yv-0000w3-GA
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 15:07:51 -0400
+	(envelope-from <eblake@redhat.com>) id 1e8ARU-0001JU-J0
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 15:37:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38020)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1e8ARU-0001Hu-8a
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 15:37:20 -0400
+References: <CAFEAcA_0S6T768-60MVkXP1Y0MpmOzTQr8p-N_W1PhbG_n2d-Q@mail.gmail.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <c890a67d-2481-e946-72d5-fe5c22acd837@redhat.com>
+Date: Fri, 27 Oct 2017 21:36:48 +0200
 MIME-Version: 1.0
-In-Reply-To: <CAMP9c5mm7icy06goXr3iiOEgqPbzyaWDt775+9+L=oxnqwRhpA@mail.gmail.com>
-References: <20171024230758.31779-1-riggle@google.com>
-	<20171025033442.44872-1-zachriggle@gmail.com>
-	<CAMP9c5=whCgR4qkOPDRKZ+adpWEPiVM=BwZp_r7qCAR7UAsWAQ@mail.gmail.com>
-	<20171027093600.GA29513@kos.to>
-	<CAMP9c5mm7icy06goXr3iiOEgqPbzyaWDt775+9+L=oxnqwRhpA@mail.gmail.com>
-From: Zach Riggle <zachriggle@gmail.com>
-Date: Fri, 27 Oct 2017 14:07:24 -0500
-Message-ID: <CAMP9c5kTQmKd7GVE8DZzvY8tTtWV=tLsgV1ptWPKhEAh=J-maQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2] linux-user: fix is_proc_myself to check
- the paths via realpath
+In-Reply-To: <CAFEAcA_0S6T768-60MVkXP1Y0MpmOzTQr8p-N_W1PhbG_n2d-Q@mail.gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="dmO4J2mPlrCkB3RATnb19LK2fiB6VJa8k"
+Subject: Re: [Qemu-devel] Key signing party at KVM Forum 2017
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,143 +27,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Riku Voipio <riku.voipio@iki.fi>
-Cc: qemu-trivial@nongnu.org, Laurent Vivier <laurent@vivier.eu>, "open list:All patches CC here" <qemu-devel@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-Another case that may be more relevant for general QEMU use, is that the
-current code fails if the software under test has poor path-handling code.
-For example, any of
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--dmO4J2mPlrCkB3RATnb19LK2fiB6VJa8k
+From: Eric Blake <eblake@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
+Message-ID: <c890a67d-2481-e946-72d5-fe5c22acd837@redhat.com>
+Subject: Re: [Qemu-devel] Key signing party at KVM Forum 2017
+References: <CAFEAcA_0S6T768-60MVkXP1Y0MpmOzTQr8p-N_W1PhbG_n2d-Q@mail.gmail.com>
+In-Reply-To: <CAFEAcA_0S6T768-60MVkXP1Y0MpmOzTQr8p-N_W1PhbG_n2d-Q@mail.gmail.com>
+Content-Type: multipart/mixed;
+ boundary="------------75BA0923AD17B64E33FCE488"
 
-- //proc/self/maps
-- /proc//self/maps
-- /proc/self//maps
+--------------75BA0923AD17B64E33FCE488
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Will all return the non-emulated results.  Those examples are just path
-canonicalization issues and could be resolved with e.g.
-canonicalize_file_name, but I'm not sure if QEMU allows GNU extensions --
-and realpath() is portable.
+On 10/16/2017 07:19 PM, Peter Maydell wrote:
+> It looks like at least five people whose keys I'd like to sign
+> are going to be at KVM Forum this year, so it seems worth having
+> a proper key signing party rather than just me ad-hoc finding
+> people and checking their ID. I am particularly interested
+> in signing keys for people who are or expect they might be
+> sending me pull requests.
 
+Thanks again to Peter for hosting this key signing party.
 
+Now that the 14 participants (presumably) have the paper with 2
+checkmarks per entry (one that the person claiming the key(s) read their
+personal notation and it matched what your master sheet says, the other
+that you were happy with the id provided by that person), the next step
+is to sign those 16 keys and either upload your signature, or to send an
+encrypted mail to the key owner and have them upload your signature.
+The latter is arguably a better assurance that the system worked; the
+pius application can help with that, although it is not mandatory and
+you can use direct gpg commands instead. (For those following along that
+were not in the party, yes, we had 2 more keys than participants, as a
+couple of participants had 2 keys that they wanted signed)
 
+I'm attaching a bash script that I used to see which signatures I still
+need to follow up on (both where someone has not yet signed my key, and
+where I need to send my signature to someone); as usual, please
+double-check it before blindly running it.
 
-*Zach Riggle*
+If you want more help running pius for signing and sending the signed
+key to a particular recipient, see a previous mail of mine on the topic:
 
-On Fri, Oct 27, 2017 at 12:05 PM, Zach Riggle <zachriggle@gmail.com> wrote:
+https://lists.gnu.org/archive/html/qemu-devel/2013-11/msg01477.html
 
-> The symlink was just an easy test case.  Doing cd proc && cat ./self/maps
-> will achieve the same thing.
->
-> One instance where this matters is for testing IoT device firmware
-> exploits, where one might do a GET request against
-> ../../../../../../proc/self/maps in order to bypass ASLR.  Currently,
-> this will return the memory layout of QEMU, not the emulated memory layout
-> of the software under test.
->
->
-> *Zach Riggle*
->
-> On Fri, Oct 27, 2017 at 4:36 AM, Riku Voipio <riku.voipio@iki.fi> wrote:
->
->> On Thu, Oct 26, 2017 at 04:06:22PM -0500, Zach Riggle wrote:
->> > Friendly ping :)
->> >
->> > I've updated the patch with v2 which addresses the style issue
->>
->> I'll have a look at it soon.
->>
->> >
->> > *Zach Riggle*
->> >
->> > On Tue, Oct 24, 2017 at 10:34 PM, Zach Riggle <zachriggle@gmail.com>
->> wrote:
->> >
->> > > Previously, it was possible to get a handle to the "real"
->> /proc/self/mem
->> > > by creating a symlink to it and opening the symlink, or opening e.g.
->> > > "./mem" after chdir'ing to "/proc/self"
->>
->> When is this a problem? Symlinking to /proc/self seems to be a quite
->> weird usecase.
->>
->> > >
->> > >     $ ln -s /proc/self self
->> > >     $ cat self/maps
->> > >     60000000-602bc000 r-xp 00000000 fc:01 270375
->> > >    /usr/bin/qemu-arm-static
->> > >     604bc000-6050f000 rw-p 002bc000 fc:01 270375
->> > >    /usr/bin/qemu-arm-static
->> > >     ...
->> > >
->> > > Signed-off-by: Zach Riggle <zachriggle@gmail.com>
->> > > ---
->> > >  linux-user/syscall.c | 47 ++++++++++++++++++++++++++++--
->> -----------------
->> > >  1 file changed, 28 insertions(+), 19 deletions(-)
->> > >
->> > > diff --git a/linux-user/syscall.c b/linux-user/syscall.c
->> > > index 9bf901fa11..6c1f28a1f7 100644
->> > > --- a/linux-user/syscall.c
->> > > +++ b/linux-user/syscall.c
->> > > @@ -7496,26 +7496,35 @@ static int open_self_auxv(void *cpu_env, int
->> fd)
->> > >
->> > >  static int is_proc_myself(const char *filename, const char *entry)
->> > >  {
->> > > -    if (!strncmp(filename, "/proc/", strlen("/proc/"))) {
->> > > -        filename += strlen("/proc/");
->> > > -        if (!strncmp(filename, "self/", strlen("self/"))) {
->> > > -            filename += strlen("self/");
->> > > -        } else if (*filename >= '1' && *filename <= '9') {
->> > > -            char myself[80];
->> > > -            snprintf(myself, sizeof(myself), "%d/", getpid());
->> > > -            if (!strncmp(filename, myself, strlen(myself))) {
->> > > -                filename += strlen(myself);
->> > > -            } else {
->> > > -                return 0;
->> > > -            }
->> > > -        } else {
->> > > -            return 0;
->> > > -        }
->> > > -        if (!strcmp(filename, entry)) {
->> > > -            return 1;
->> > > -        }
->> > > +    char proc_self_entry[PATH_MAX + 1];
->> > > +    char proc_self_entry_realpath[PATH_MAX + 1];
->> > > +    char filename_realpath[PATH_MAX + 1];
->> > > +
->> > > +    if (PATH_MAX < snprintf(proc_self_entry,
->> > > +                            sizeof(proc_self_entry),
->> > > +                            "/proc/self/%s",
->> > > +                            entry)) {
->> > > +        /* Full path to "entry" is too long to fit in the buffer */
->> > > +        return 0;
->> > >      }
->> > > -    return 0;
->> > > +
->> > > +    if (!realpath(filename, filename_realpath)) {
->> > > +        /* File does not exist, or can't be canonicalized */
->> > > +        return 0;
->> > > +    }
->> > > +
->> > > +    if (!realpath(proc_self_entry, proc_self_entry_realpath)) {
->> > > +        /* Procfs entry does not exist */
->> > > +        return 0;
->> > > +    }
->> > > +
->> > > +    if (strcmp(filename_realpath, proc_self_entry_realpath) != 0) {
->> > > +        /* Paths are different */
->> > > +        return 0;
->> > > +    }
->> > > +
->> > > +    /* filename refers to /proc/self/<entry> */
->> > > +    return 1;
->> > >  }
->> > >
->> > >  #if defined(HOST_WORDS_BIGENDIAN) != defined(TARGET_WORDS_BIGENDIAN)
->> > > --
->> > > 2.14.3
->> > >
->> > >
->>
->
->
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+--------------75BA0923AD17B64E33FCE488
+Content-Type: text/plain; charset=UTF-8;
+ name="cross-sign"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+ filename="cross-sign"
+
+IyEvYmluL2Jhc2gKIyBDcm9zcy1jaGVjayBmb3Iga2V5LXNpZ25pbmcgcGFydHkgZm9sbG93
+dXAKIyBDdXJyZW50bHkgdHVuZWQgZm9yIEtWTSBGb3J1bSAyMDE3CgpNRT0kezAjIyovfQoK
+Y2FzZSAkIyBpbgogIDEpIG15X2lkPSQxIDs7CiAgKikgZWNobyAiVXNhZ2U6ICRNRSBZT1VS
+X0dQR19LRVlfSUQiIDE+JjI7IGV4aXQgMTs7CmVzYWMKCjogJHt1c2VfdGVtcF9rZXlyaW5n
+PXl9CjogJHtyZWZyZXNoPXl9CgojIEtleSBJRHMgb2YgdGhlIHBlb3BsZSB3aG8gcGFydGlj
+aXBhdGVkIGluIHRoZSBrdm0gZ3BnIGtleS1zaWduaW5nLgprZXlzPScKYmU4NmViYjQxNTEw
+NGZkZgphN2ExNmI0YTI1Mjc0MzZhCmI5MGJjN2FiZTdjNDFlNjUKMGQ4NzIxZDgyODM4Yzdk
+OAowNTE2MzMxZWJjNWJmZGU3CmFkMTI3MGNjNGRkMDI3OWIKNjRkZjM4ZThhZjdlMjE1Zgo5
+Y2E0YWJiMzgxYWI3M2M4CjcxZDRkNWU1ODIyZjczZDYKZGFlOGUxMDk3NTk2OWNlNQo1YmNh
+OGFlMGYxNDE5MWQ0CjNjMjUyNWVkMTQzNjBjZGUKZGYzMmU3YzBmMGZmZjlhMgpmNDA3ZGIw
+MDYxZDVjZjQwCjdmMDliMjcyYzg4ZjJmZDYKY2EzNTYyNGM2YTkxNzFjNgonCgojIEdpdmVu
+IGdwZyAtLWxpc3Qtc2lnIC4uLiBvdXRwdXQsIHByaW50IG9ubHkgdGhvc2UgbGluZXMgdGhh
+dCBzdGFydAojIHdpdGggInVpZCIgYW5kIGNvbnRhaW4gYW4gIkAiOyBwcmludCBlYWNoIHVu
+aXF1ZSBuYW1lIG9ubHkgb25jZS4KdWlkX25hbWVfZmlsdGVyKCkgeyBncmVwICdedWlkLipA
+JyB8IHNvcnQgLXQnPCcgLXUgLWsxLDEgfAoJCQlzZWQgJ3MvXnVpZFtbOnNwYWNlOl1dKi8g
+IC8nOyB9CgppZiB0ZXN0ICIkdXNlX3RlbXBfa2V5cmluZyIgPSB5OyB0aGVuCiAgIyBDcmVh
+dGUgYSB0ZW1wb3JhcnkgZGlyZWN0b3J5IGluIHdoaWNoIHRvIGRvd25sb2FkIGtleXMuCiAg
+ZXhwb3J0IEdOVVBHSE9NRT0kKG1rdGVtcCAtZCkKCiAgIyBSZW1vdmUgaXQgdXBvbiBpbnRl
+cnJ1cHQgYW5kIHVwb24gbm9ybWFsIHRlcm1pbmF0aW9uLgogIGZvciBzaWcgaW4gMSAyIDMg
+MTMgMTU7IGRvIGV2YWwgInRyYXAgJ2V4aXQgJChleHByICRzaWcgKyAxMjgpJyAkc2lnIjsK
+ZG9uZQogIHRyYXAgJ3JtIC1mciAiJEdOVVBHSE9NRSInIDAKCiAgIyBVc2UgYSBzZXJ2ZXIg
+dGhhdCdzIGJldHRlciB0aGFuIHRoZSBkZWZhdWx0LgogIGVjaG8ga2V5c2VydmVyIGhrcDov
+L3Bvb2wuc2tzLWtleXNlcnZlcnMubmV0ID4gIiRHTlVQR0hPTUUvZ3BnLmNvbmYiCgogICMg
+R2V0IGxhdGVzdCBrZXlzL3NpZ25hdHVyZXMgZnJvbSBrZXkgc2VydmVycy4KICBncGcgLS1y
+ZWN2LWtleXMgJChlY2hvICRrZXlzKQplbHNlCiAgdGVzdCAiJHJlZnJlc2giID0geSBcCiAg
+ICAmJiBncGcgLS1yZWZyZXNoLWtleXMgJChlY2hvICRrZXlzKQpmaQoKZWNobwplY2hvIHdo
+byBhcHBlYXJzIG5vdCB0byBoYXZlIHNpZ25lZCAkbXlfaWQ6CnM9JChncGcgLS1saXN0LXNp
+ZyAkbXlfaWQpCmdwZyAtLWxpc3Qta2V5cyBcCiAgICAkKGZvciBpIGluICQoZWNobyAka2V5
+cyk7IGRvIGVjaG8gIiRzIiB8IGdyZXAgLXFpICRpIHx8IGVjaG8gJGk7IGRvbmUpIFwKICB8
+IHVpZF9uYW1lX2ZpbHRlcgplY2hvCgplY2hvIHdobyBoYXMgbm90IHlldCB1cGxvYWRlZCBh
+IHNpZ25hdHVyZSBieSAkbXlfaWQgb24gdGhlaXIga2V5Ogpmb3IgaSBpbiAkKGVjaG8gJGtl
+eXMpOyBkbwogIGdwZyAtLWxpc3Qtc2lnICRpIHwgZ3JlcCAtcWkgJG15X2lkIHx8IGdwZyAt
+LWxpc3Qta2V5ICRpCmRvbmUgfCB1aWRfbmFtZV9maWx0ZXIK
+--------------75BA0923AD17B64E33FCE488--
+
+--dmO4J2mPlrCkB3RATnb19LK2fiB6VJa8k
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnzitAACgkQp6FrSiUn
+Q2rtMggAmI1xeDUhW4Blk+68EULd3tIjN8loB79X09wjFgx1DGkO5IzShM9jQyoh
+YRDYN3Zj1x+sQI0oGUA/xn29qvUHMEhAHuogCAZiJcJI7CTBq0UugEkHkgAt8WqD
+a6em6jl+mSpza0Wmjz8REQN7rQN4ro5VdquNAnKdiUVp1tY6n6M3j2bFmSkfC7dp
+QhyHm5uSkmRfE2kV1DdTgeSmNCkeZDz6r8Q9Il8mp34h2tZSFceuNC/u6CRPPleN
+fc/+XvHIFsBGOCuzWc2sztACFu6tAtU3LdJ1urqavszV0NNfFIEy6gDhuOmLfynj
+o90kcs+Qtz8OFNqSFOtBuEiEI4EJPQ==
+=egsn
+-----END PGP SIGNATURE-----
+
+--dmO4J2mPlrCkB3RATnb19LK2fiB6VJa8k--
