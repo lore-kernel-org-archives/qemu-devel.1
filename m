@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46471)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50993)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tianyu.lan@intel.com>) id 1e7tbj-0000mh-Af
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 21:38:48 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1e7tn7-0002Yj-DW
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 21:50:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tianyu.lan@intel.com>) id 1e7tbf-0005ee-E8
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 21:38:47 -0400
-Received: from mga07.intel.com ([134.134.136.100]:38285)
+	(envelope-from <dgilbert@redhat.com>) id 1e7tn4-000614-At
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 21:50:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44614)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <tianyu.lan@intel.com>)
-	id 1e7tbf-0005cp-3Q
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 21:38:43 -0400
-References: <1502842933-8323-1-git-send-email-tianyu.lan@intel.com>
-	<34042934-782b-6bcc-b9b2-de7a1816cfb7@redhat.com>
-	<3ababa62-f055-5bbb-b9b9-c55ada8368dd@intel.com>
-	<20170818163854.GY3108@localhost.localdomain>
-	<471a4bdc-d381-4a70-0107-3150df6f5cf6@intel.com>
-	<20171026121943.GB26955@localhost.localdomain>
-	<20171026172631-mutt-send-email-mst@kernel.org>
-From: Lan Tianyu <tianyu.lan@intel.com>
-Message-ID: <a30bfc99-5bc4-0cdc-5eba-e1df1b2667f8@intel.com>
-Date: Fri, 27 Oct 2017 09:30:59 +0800
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1e7tn4-00060C-2S
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 21:50:30 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B9882356D9
+	for <qemu-devel@nongnu.org>; Fri, 27 Oct 2017 01:50:28 +0000 (UTC)
+Date: Fri, 27 Oct 2017 02:50:22 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20171027015022.GA11576@work-vm>
+References: <20171026075222.27798-1-quintela@redhat.com>
+	<20171026075222.27798-2-quintela@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20171026172631-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] x86: Skip check apic_id_limit for Xen
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171026075222.27798-2-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 01/10] tests: rename postcopy-test to
+ migration-test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,50 +34,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, anthony.perard@citrix.com, Paolo Bonzini <pbonzini@redhat.com>, rth@twiddle.net
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
 
-On 2017年10月26日 22:27, Michael S. Tsirkin wrote:
-> On Thu, Oct 26, 2017 at 02:19:43PM +0200, Eduardo Habkost wrote:
->> On Mon, Aug 21, 2017 at 10:22:15AM +0800, Lan Tianyu wrote:
->>> On 2017年08月19日 00:38, Eduardo Habkost wrote:
->>>> On Thu, Aug 17, 2017 at 09:37:10AM +0800, Lan Tianyu wrote:
->>>>> On 2017年08月16日 19:21, Paolo Bonzini wrote:
->>>>>> On 16/08/2017 02:22, Lan Tianyu wrote:
->>>>>>> Xen vIOMMU device model will be in Xen hypervisor. Skip vIOMMU
->>>>>>> check for Xen here when vcpu number is more than 255.
->>>>>>
->>>>>> I think you still need to do a check for vIOMMU being enabled.
->>>>>
->>>>> Yes, this will be done in the Xen tool stack and Qemu doesn't have such
->>>>> knowledge. Operations of create, destroy Xen vIOMMU will be done in the
->>>>> Xen tool stack.
->>>>
->>>> Shouldn't we make QEMU have knowledge of the vIOMMU device, then?
->>>> Won't QEMU need to know about it eventually?
->>>>
->>>
->>> Hi Eduardo:
->>>      Thanks for your review.
->>>      Xen has some guest modes which doesn't use Qemu and we tried to
->>> make Xen vIOMMU framework compatible with all guest modes. So far, we
->>> are adding interrupt remapping function for Xen vIOMMU and find qemu
->>> doesn't need to know Xen vIOMMU. The check of vcpu number > 255 here
->>> will be done in Xen side and so skip the check in Qemu to avoid blocking
->>> Xen creating >255 vcpus.
->>>      We may make Qemu have knowledge of the vIOMMU device if it's
->>> necessary when adding new function.
->>
->> I was expecting it to go through the PC tree, but I will queue it
->> on x86-next instead.
+* Juan Quintela (quintela@redhat.com) wrote:
+> Instead of repeating the code, we are going to bo more tests on this file
 > 
-> I was waiting for an ack from you or Paolo as you participated in the
-> discussion. But sure, go ahead
-> 
-> Acked-by: Michael S. Tsirkin <mst@redhat.com>
-> 
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
 
-Great. Thanks.
--- 
-Best regards
-Tianyu Lan
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+> ---
+>  MAINTAINERS                                 | 1 +
+>  tests/Makefile.include                      | 6 +++---
+>  tests/{postcopy-test.c => migration-test.c} | 8 +++-----
+>  3 files changed, 7 insertions(+), 8 deletions(-)
+>  rename tests/{postcopy-test.c => migration-test.c} (98%)
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 12175425a7..8d0a3de734 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -1562,6 +1562,7 @@ F: include/migration/
+>  F: migration/
+>  F: scripts/vmstate-static-checker.py
+>  F: tests/vmstate-static-checker-data/
+> +F: tests/migration-test.c
+>  F: docs/devel/migration.txt
+>  F: qapi/migration.json
+>  
+> diff --git a/tests/Makefile.include b/tests/Makefile.include
+> index 70dc711bca..434a2ce868 100644
+> --- a/tests/Makefile.include
+> +++ b/tests/Makefile.include
+> @@ -287,7 +287,7 @@ endif
+>  check-qtest-i386-$(CONFIG_SLIRP) += tests/test-netfilter$(EXESUF)
+>  check-qtest-i386-$(CONFIG_POSIX) += tests/test-filter-mirror$(EXESUF)
+>  check-qtest-i386-$(CONFIG_POSIX) += tests/test-filter-redirector$(EXESUF)
+> -check-qtest-i386-y += tests/postcopy-test$(EXESUF)
+> +check-qtest-i386-y += tests/migration-test$(EXESUF)
+>  check-qtest-i386-y += tests/test-x86-cpuid-compat$(EXESUF)
+>  check-qtest-i386-y += tests/numa-test$(EXESUF)
+>  check-qtest-x86_64-y += $(check-qtest-i386-y)
+> @@ -315,7 +315,7 @@ check-qtest-ppc64-y += tests/boot-order-test$(EXESUF)
+>  check-qtest-ppc64-y += tests/prom-env-test$(EXESUF)
+>  check-qtest-ppc64-y += tests/pnv-xscom-test$(EXESUF)
+>  check-qtest-ppc64-y += tests/drive_del-test$(EXESUF)
+> -check-qtest-ppc64-y += tests/postcopy-test$(EXESUF)
+> +check-qtest-ppc64-y += tests/migration-test$(EXESUF)
+>  check-qtest-ppc64-y += tests/boot-serial-test$(EXESUF)
+>  check-qtest-ppc64-y += tests/rtas-test$(EXESUF)
+>  check-qtest-ppc64-$(CONFIG_SLIRP) += tests/pxe-test$(EXESUF)
+> @@ -784,7 +784,7 @@ tests/usb-hcd-uhci-test$(EXESUF): tests/usb-hcd-uhci-test.o $(libqos-usb-obj-y)
+>  tests/usb-hcd-ehci-test$(EXESUF): tests/usb-hcd-ehci-test.o $(libqos-usb-obj-y)
+>  tests/usb-hcd-xhci-test$(EXESUF): tests/usb-hcd-xhci-test.o $(libqos-usb-obj-y)
+>  tests/pc-cpu-test$(EXESUF): tests/pc-cpu-test.o
+> -tests/postcopy-test$(EXESUF): tests/postcopy-test.o
+> +tests/migration-test$(EXESUF): tests/migration-test.o
+>  tests/vhost-user-test$(EXESUF): tests/vhost-user-test.o $(test-util-obj-y) \
+>  	$(qtest-obj-y) $(test-io-obj-y) $(libqos-virtio-obj-y) $(libqos-pc-obj-y) \
+>  	$(chardev-obj-y)
+> diff --git a/tests/postcopy-test.c b/tests/migration-test.c
+> similarity index 98%
+> rename from tests/postcopy-test.c
+> rename to tests/migration-test.c
+> index 8142f2ab90..55c4aed719 100644
+> --- a/tests/postcopy-test.c
+> +++ b/tests/migration-test.c
+> @@ -1,5 +1,5 @@
+>  /*
+> - * QTest testcase for postcopy
+> + * QTest testcase for migration
+>   *
+>   * Copyright (c) 2016 Red Hat, Inc. and/or its affiliates
+>   *   based on the vhost-user-test.c that is:
+> @@ -243,8 +243,6 @@ static QDict *return_or_event(QDict *response)
+>  /*
+>   * It's tricky to use qemu's migration event capability with qtest,
+>   * events suddenly appearing confuse the qmp()/hmp() responses.
+> - * so wait for a couple of passes to have happened before
+> - * going postcopy.
+>   */
+>  
+>  static uint64_t get_migration_pass(void)
+> @@ -504,7 +502,7 @@ static void test_migrate(void)
+>  
+>  int main(int argc, char **argv)
+>  {
+> -    char template[] = "/tmp/postcopy-test-XXXXXX";
+> +    char template[] = "/tmp/migration-test-XXXXXX";
+>      int ret;
+>  
+>      g_test_init(&argc, &argv, NULL);
+> @@ -521,7 +519,7 @@ int main(int argc, char **argv)
+>  
+>      module_call_init(MODULE_INIT_QOM);
+>  
+> -    qtest_add_func("/postcopy", test_migrate);
+> +    qtest_add_func("/migration/postcopy/unix", test_migrate);
+>  
+>      ret = g_test_run();
+>  
+> -- 
+> 2.13.6
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
