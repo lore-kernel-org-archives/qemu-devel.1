@@ -1,30 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57258)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57230)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=466efc5b4=Ian.Jackson@citrix.com>)
-	id 1e824P-0001ES-O8
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 06:40:58 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=466efc5b4=Ian.Jackson@citrix.com>)
-	id 1e824M-0005aE-Mg
+	(envelope-from <eblake@redhat.com>) id 1e824O-0001DA-Cj
 	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 06:40:57 -0400
-Received: from smtp02.citrix.com ([66.165.176.63]:36492)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=466efc5b4=Ian.Jackson@citrix.com>)
-	id 1e824M-0005Yu-GP
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 06:40:54 -0400
-From: Ian Jackson <ian.jackson@eu.citrix.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Message-ID: <23027.3371.608274.406875@mariner.uk.xensource.com>
-Date: Fri, 27 Oct 2017 11:40:43 +0100
-In-Reply-To: <alpine.DEB.2.10.1710261527150.3086@sstabellini-ThinkPad-X260>
-References: <23017.64539.31230.43449@mariner.uk.xensource.com>
-	<1508506702-17704-1-git-send-email-ian.jackson@eu.citrix.com>
-	<1508506702-17704-8-git-send-email-ian.jackson@eu.citrix.com>
-	<alpine.DEB.2.10.1710261527150.3086@sstabellini-ThinkPad-X260>
-Subject: Re: [Qemu-devel] [PATCH v5.1 8/8] configure: do_compiler: Dump some
- extra info under bash
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <eblake@redhat.com>) id 1e824N-0005aZ-HL
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 06:40:56 -0400
+From: Eric Blake <eblake@redhat.com>
+Date: Fri, 27 Oct 2017 12:40:29 +0200
+Message-Id: <20171027104037.8319-5-eblake@redhat.com>
+In-Reply-To: <20171027104037.8319-1-eblake@redhat.com>
+References: <20171027104037.8319-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH v6 04/12] nbd/server: Report error for write to
+ read-only export
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,13 +20,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Stabellini <sstabellini@kernel.org>
-Cc: qemu-devel@nongnu.org, Ross Lagerwall <ross.lagerwall@citrix.com>, Anthony PERARD <anthony.perard@citrix.com>, Juergen Gross <jgross@suse.com>, xen-devel@lists.xenproject.org, peter.maydell@linaro.org, pbonzini@redhat.com, famz@redhat.com, kraxel@redhat.com, stefanha@redhat.com
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org
 
-Stefano Stabellini writes ("Re: [PATCH v5.1 8/8] configure: do_compiler: Dump some extra info under bash"):
-> CC'ing the maintainers for this.
+When the server is read-only, we were already reporting an error
+message for NBD_CMD_WRITE_ZEROES, but failed to set errp for a
+similar NBD_CMD_WRITE.  This will matter more once structured
+replies allow the server to propagate the errp information back
+to the client.  While at it, use an error message that makes a
+bit more sense if viewed on the client side.
 
-Thanks, but scripts/get_maintainer.pl seems to print different
-information for me... (see my other mail)
+Note that when using qemu-io to test qemu-nbd behavior, it is
+rather difficult to convince qemu-io to send protocol violations
+(such as a read beyond bounds), because we have a lot of active
+checking on the client side that a qemu-io request makes sense
+before it ever goes over the wire to the server.  The case of a
+client attempting a write when the server is started as
+'qemu-nbd -r' is one of the few places where we can easily test
+error path handling, without having to resort to hacking in known
+temporary bugs to either the server or client.  [Maybe we want a
+future patch to the client to do up-front checking on writes to a
+read-only export, the way it does up-front bounds checking; but I
+don't see anything in the NBD spec that points to a protocol
+violation in our current behavior.]
 
-Ian.
+Signed-off-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+
+---
+v6: add R-b
+v5: new patch
+---
+ nbd/server.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/nbd/server.c b/nbd/server.c
+index efb6003364..05ff7470d5 100644
+--- a/nbd/server.c
++++ b/nbd/server.c
+@@ -1381,6 +1381,7 @@ static coroutine_fn void nbd_trip(void *opaque)
+         break;
+     case NBD_CMD_WRITE:
+         if (exp->nbdflags & NBD_FLAG_READ_ONLY) {
++            error_setg(&local_err, "Export is read-only");
+             ret = -EROFS;
+             break;
+         }
+@@ -1398,7 +1399,7 @@ static coroutine_fn void nbd_trip(void *opaque)
+         break;
+     case NBD_CMD_WRITE_ZEROES:
+         if (exp->nbdflags & NBD_FLAG_READ_ONLY) {
+-            error_setg(&local_err, "Server is read-only, return error");
++            error_setg(&local_err, "Export is read-only");
+             ret = -EROFS;
+             break;
+         }
+-- 
+2.13.6
