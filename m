@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33977)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34026)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1e85WE-0002ex-SY
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 10:21:55 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1e85WL-0004cw-NI
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 10:22:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1e85WD-00005v-QX
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 10:21:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54268)
+	(envelope-from <ehabkost@redhat.com>) id 1e85WI-0000B4-Io
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 10:22:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33602)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1e85WD-00005B-Ko
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 10:21:53 -0400
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1e85WI-0000AN-C3
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 10:21:58 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Fri, 27 Oct 2017 16:20:37 +0200
-Message-Id: <20171027142107.15542-10-ehabkost@redhat.com>
+Date: Fri, 27 Oct 2017 16:20:38 +0200
+Message-Id: <20171027142107.15542-11-ehabkost@redhat.com>
 In-Reply-To: <20171027142107.15542-1-ehabkost@redhat.com>
 References: <20171027142107.15542-1-ehabkost@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 09/39] m68k: an5206: use generic cpu_model
+Subject: [Qemu-devel] [PULL v2 10/39] m68k: mcf5208: use generic cpu_model
  parsing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -36,43 +36,44 @@ Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 Acked-by: Thomas Huth <huth@tuxfamily.org>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <1507211474-188400-13-git-send-email-imammedo@redhat.com>
+Message-Id: <1507211474-188400-14-git-send-email-imammedo@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- hw/m68k/an5206.c | 7 ++-----
+ hw/m68k/mcf5208.c | 7 ++-----
  1 file changed, 2 insertions(+), 5 deletions(-)
 
-diff --git a/hw/m68k/an5206.c b/hw/m68k/an5206.c
-index db634cbe89..5e067ea1c3 100644
---- a/hw/m68k/an5206.c
-+++ b/hw/m68k/an5206.c
-@@ -28,7 +28,6 @@
- static void an5206_init(MachineState *machine)
+diff --git a/hw/m68k/mcf5208.c b/hw/m68k/mcf5208.c
+index 68589c36d2..fac0d09cbc 100644
+--- a/hw/m68k/mcf5208.c
++++ b/hw/m68k/mcf5208.c
+@@ -218,7 +218,6 @@ static void mcf_fec_init(MemoryRegion *sysmem, NICInf=
+o *nd, hwaddr base,
+ static void mcf5208evb_init(MachineState *machine)
  {
      ram_addr_t ram_size =3D machine->ram_size;
 -    const char *cpu_model =3D machine->cpu_model;
      const char *kernel_filename =3D machine->kernel_filename;
      M68kCPU *cpu;
      CPUM68KState *env;
-@@ -39,10 +38,7 @@ static void an5206_init(MachineState *machine)
+@@ -230,10 +229,7 @@ static void mcf5208evb_init(MachineState *machine)
      MemoryRegion *ram =3D g_new(MemoryRegion, 1);
      MemoryRegion *sram =3D g_new(MemoryRegion, 1);
 =20
 -    if (!cpu_model) {
--        cpu_model =3D "m5206";
+-        cpu_model =3D "m5208";
 -    }
 -    cpu =3D M68K_CPU(cpu_generic_init(TYPE_M68K_CPU, cpu_model));
 +    cpu =3D M68K_CPU(cpu_create(machine->cpu_type));
      env =3D &cpu->env;
 =20
      /* Initialize CPU registers.  */
-@@ -94,6 +90,7 @@ static void an5206_machine_init(MachineClass *mc)
- {
-     mc->desc =3D "Arnewsh 5206";
-     mc->init =3D an5206_init;
-+    mc->default_cpu_type =3D M68K_CPU_TYPE_NAME("m5206");
+@@ -322,6 +318,7 @@ static void mcf5208evb_machine_init(MachineClass *mc)
+     mc->desc =3D "MCF5206EVB";
+     mc->init =3D mcf5208evb_init;
+     mc->is_default =3D 1;
++    mc->default_cpu_type =3D M68K_CPU_TYPE_NAME("m5208");
  }
 =20
- DEFINE_MACHINE("an5206", an5206_machine_init)
+ DEFINE_MACHINE("mcf5208evb", mcf5208evb_machine_init)
 --=20
 2.13.6
