@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55256)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57865)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1e857i-0007mG-8W
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 09:56:35 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1e85FA-0001sU-RE
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 10:04:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1e857h-0000G6-9t
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 09:56:34 -0400
-Date: Fri, 27 Oct 2017 15:55:27 +0200
+	(envelope-from <dgibson@ozlabs.org>) id 1e85F9-0000EZ-R2
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 10:04:16 -0400
+Date: Fri, 27 Oct 2017 16:03:59 +0200
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20171027135527.GC7115@umbus>
-References: <20170630183736.13222-1-rth@twiddle.net>
-	<1b8ff383-9d0b-d178-cd76-8c3b48aaead8@redhat.com>
-	<20171026211200.GA3181@umbus> <20171027134422.GB7115@umbus>
+Message-ID: <20171027140359.GD7115@umbus>
+References: <1508493233-1166-1-git-send-email-thuth@redhat.com>
+	<1508748555.16488.4.camel@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="OBd5C1Lgu00Gd/Tn"
+	protocol="application/pgp-signature"; boundary="NklN7DEeGtkPCoo3"
 Content-Disposition: inline
-In-Reply-To: <20171027134422.GB7115@umbus>
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] target/ppc: Use
- tcg_gen_lookup_and_goto_ptr
+In-Reply-To: <1508748555.16488.4.camel@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] hw/display/sm501: Fix comment in
+ sm501_sysbus_class_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,40 +25,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, BALATON Zoltan <balaton@eik.bme.hu>
 
 
---OBd5C1Lgu00Gd/Tn
-Content-Type: text/plain; charset=us-ascii
+--NklN7DEeGtkPCoo3
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Oct 27, 2017 at 03:44:22PM +0200, David Gibson wrote:
-> On Thu, Oct 26, 2017 at 11:12:00PM +0200, David Gibson wrote:
-> > On Thu, Oct 26, 2017 at 02:22:57PM +0200, Thomas Huth wrote:
-> > > On 30.06.2017 20:37, Richard Henderson wrote:
-> > > > Cc: qemu-ppc@nongnu.org
-> > > > Signed-off-by: Richard Henderson <rth@twiddle.net>
-> > > > ---
-> > > >  target/ppc/translate.c | 23 ++++++++---------------
-> > > >  1 file changed, 8 insertions(+), 15 deletions(-)
-> > >=20
-> > > *ping*
-> > >=20
-> > > Richard, David, any chance that we can still get this in for 2.11? I
-> > > think this would be quite a nice performance improvement for PPC TCG.=
-=2E.
+On Mon, Oct 23, 2017 at 10:49:15AM +0200, Gerd Hoffmann wrote:
+> On Fri, 2017-10-20 at 11:53 +0200, Thomas Huth wrote:
+> > The "cannot_instantiate_with_device_add_yet" flag has been renamed
+> > to "user_creatable" a while ago.
 > >=20
-> > Uh.. sorry, I don't even remember this patch.
+> > Signed-off-by: Thomas Huth <thuth@redhat.com>
+> > ---
+> > =A0hw/display/sm501.c | 2 +-
+> > =A01 file changed, 1 insertion(+), 1 deletion(-)
+> >=20
+> > diff --git a/hw/display/sm501.c b/hw/display/sm501.c
+> > index 6eddac9..7f18224 100644
+> > --- a/hw/display/sm501.c
+> > +++ b/hw/display/sm501.c
+> > @@ -1758,7 +1758,7 @@ static void sm501_sysbus_class_init(ObjectClass
+> > *klass, void *data)
+> > =A0=A0=A0=A0=A0dc->reset =3D sm501_reset_sysbus;
+> > =A0=A0=A0=A0=A0dc->vmsd =3D &vmstate_sm501_sysbus;
+> > =A0=A0=A0=A0=A0/* Note: pointer property "chr-state" may remain null, t=
+hus
+> > -=A0=A0=A0=A0=A0* no need for dc->cannot_instantiate_with_device_add_ye=
+t =3D
+> > true;
+> > +=A0=A0=A0=A0=A0* no need for dc->user_creatable =3D false;
+> > =A0=A0=A0=A0=A0=A0*/
+> > =A0}
+> > =A0
 >=20
-> Managed to dig it out of my archives.  Looks like the problem was it
-> was just sent to the lists, not CCed to me.  I'm not generally able to
-> keep up with the lists, and I must have missed it on my periodic scans
-> through the list.  I've applied it now.
+> Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
 
-=2E. and now I've unapplied it, because it doesn't compile.  Richard,
-can you resend a current version?
+Applied to ppc-for-2.11, thanks.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -67,24 +72,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---OBd5C1Lgu00Gd/Tn
+--NklN7DEeGtkPCoo3
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnzOs0ACgkQbDjKyiDZ
-s5KciBAA1yI7bsaJPgMF0yOFTKVd6XeYxeKYA1sdi/DrJdgpK3mcaINqEv4HJzuk
-ktw8OdQrf+60zntj0okKfPplhOQPWW4ykDfRg4C5lyrHxzvWauMmwylToAr3sBIt
-mCIEfpkox1NDLKDe2nJM7Wn2wuVY0IgroYhpJJ+NQXQ1CPJ9pVnbG/HJrX2hxy5I
-wDr7z4t2+M6x1hI+grifJL+nXt46GODK6qu7SMpd3qfWKli3h8w1DhrfeTmc76wm
-T4xk2JeHIZdB6SN7214exCjCKJa0UCZJHcJq3zUMHJj2MqhpaexP1Kh86YKUQUf5
-P0WlbvVXdSuRiT80w0tC7CMxZNHjjlWWarfLmuriYi7rYyUmNnUcb2mqKnJD0TeL
-R5aYPiAxV6zp5vrvEgTzvAI75X97w38rlyo1dbQ8fQCIB6e7VYJVCJkAklJbyiiP
-mRWnxuO57SVaDgxQy2c+MRkEITjylYFmiY+BkYysqQbt5nt+hWqfzuaBB2LAZPpc
-g5Y3BDNRzL6uVCeoYhLel0EymyexrcaLJwHJOiD8HI9FC9saFNiu2ut8AQ1RTfG4
-ESnc2IeMOgkfm4+8O74hou193YUDmuwF07NBpKZYH6xGgKLMcIhXKwaXnrnhmpBA
-iCEiW4Of7ACFrfSWOSHBeD7ysFIUZRfhkgP1MjIDddXJuRyi2Eo=
-=8WCA
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnzPM8ACgkQbDjKyiDZ
+s5Kwiw/9FVAGVJXIDtxpsw2T/6v4hLOupXk7KNLbOBG391y7ujOvwiHeYPkDhFB2
+JYnGuLp50IxI9LpGETTltLVtPO+xO27k7ugaziMscRZmm0+9zdlJkAM2o7Anf3iC
+qOb7fFILyOfxVTZRfktxY2FN4NfFRTd7O18WJC8SP9/nsYLrRIg1b1TJD2Fgx95d
+IQkQLg9b0Ufa2gpjJGYyhAZAN/NgwLC1MMWt7dDBVIWc+GlKRSoUZE8cgifW/mAy
+hW7TFkEwIpkb48xbOIkyqjM/gnOCrDPVv0nqiD/8Ny/eb2kOvshwNnESZevPhbkr
+Cmi66a2uUVznbvHxjigY5yzcn5j40S29G0jdbmDzk6vhSQDKMwS6TsOAxj3B6KIh
+nL3yGEEGf87//z02nJl8Ls/RmNuccNNMSCQseqJoADUNVs6OmdhpFT/ZrDd0e81/
+eJjl5t4jV2tLy0fQa1UK05/ArtK33vlZ5QOWpCghOyhuCmBoGA07IiuM38gvyyvq
+prlpqJ27h5oBuR+xylxLEYLEY/0bBOk1BvSlGT4c02LX/SsMR4mMcR+6wIB0Di7V
+BLn8D8JAf1rfy9QpWJkLo76YyvtwAOH0hl5D44V4bZLOk/ggYRTdId2h9JxB+VDu
+Q46H3vpyXIRZ2vgi5cwS9vY7pj+G8EBjPQRPyOPVUQm52BGHI8Y=
+=feLP
 -----END PGP SIGNATURE-----
 
---OBd5C1Lgu00Gd/Tn--
+--NklN7DEeGtkPCoo3--
