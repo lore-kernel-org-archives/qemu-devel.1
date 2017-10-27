@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48886)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49793)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e7ymQ-00077A-H3
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 03:10:11 -0400
+	(envelope-from <jcody@redhat.com>) id 1e7yoz-000844-HP
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 03:12:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e7ymP-0007ri-7E
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 03:10:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57530)
+	(envelope-from <jcody@redhat.com>) id 1e7you-0002R5-GP
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 03:12:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34388)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1e7ymO-0007qY-UF
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 03:10:09 -0400
-Date: Fri, 27 Oct 2017 08:10:03 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20171027071003.GB24218@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20171026130426.10626-1-berrange@redhat.com>
-	<5670f64b-15e5-0747-8ab0-c329a83537ee@amsat.org>
-	<9b36faef-8798-9d3c-3803-c1800f3a4e2f@ozlabs.ru>
+	(Exim 4.71) (envelope-from <jcody@redhat.com>) id 1e7you-0002QY-7S
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 03:12:44 -0400
+Date: Fri, 27 Oct 2017 03:12:41 -0400
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20171027071241.GA30326@localhost.localdomain>
+References: <f512ef4b-11ac-0cd2-0037-4608f2059669@ozlabs.ru>
+	<d80a7e33-f055-d59e-8aff-2ed1f9a79c83@ozlabs.ru>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <9b36faef-8798-9d3c-3803-c1800f3a4e2f@ozlabs.ru>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] build: allow automatic git submodule
- updates to be disabled
+In-Reply-To: <d80a7e33-f055-d59e-8aff-2ed1f9a79c83@ozlabs.ru>
+Subject: Re: [Qemu-devel] iotest 194 fails on vhdx
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,74 +28,122 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On Fri, Oct 27, 2017 at 03:10:17PM +1100, Alexey Kardashevskiy wrote:
-> On 27/10/17 00:33, Philippe Mathieu-Daud=C3=A9 wrote:
-> > On 10/26/2017 10:04 AM, Daniel P. Berrange wrote:
-> >> Some people building QEMU use VPATH builds where the source director=
-y is on a
-> >> read-only volume. In such a case 'scripts/git-submodules.sh update' =
-will always
-> >> fail and users are required to run it manually themselves on their o=
-riginal
-> >> writable source directory.
-> >>
-> >> While this is already supported, it is nice to give users a command =
-line flag
-> >> to configure to permanently disable automatic submodule updates, as =
-it means
-> >> they won't get hard to diagnose failures from git-submodules.sh at a=
-n arbitrary
-> >> later date.
-> >>
-> >> This patch thus introduces a flag '--disable-git-update' which will =
-prevent
-> >> 'make' from ever running 'scripts/git-submodules.sh update'. It will=
- still run
-> >> the 'status' command to determine if a submodule update is needed, b=
-ut when it
-> >> does this it'll simply stop and print a message instructing the deve=
-loper what
-> >> todo. eg
-> >>
-> >> $ ./configure  --target-list=3Dx86_64-softmmu --disable-git-update
-> >> ...snip...
-> >>
-> >> $ make
-> >>   GEN     config-host.h
-> >>   GEN     trace/generated-tcg-tracers.h
-> >>   GEN     trace/generated-helpers-wrappers.h
-> >>   GEN     trace/generated-helpers.h
-> >>   GEN     trace/generated-helpers.c
-> >>   GEN     module_block.h
-> >>
-> >> GIT submodule checkout is out of date. Please run
-> >>   scripts/git-submodule.sh update ui/keycodemapdb
-> >> from the source directory checkout /home/berrange/src/virt/qemu
-> >=20
-> > Clean :)
-> >=20
-> >>
-> >> make: *** [Makefile:31: git-submodule-update] Error 1
-> >>
-> >> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> >=20
-> > Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->=20
->=20
-> What tree did you apply on top of? Does not apply for me :-/
+On Wed, Oct 25, 2017 at 05:06:37PM +1100, Alexey Kardashevskiy wrote:
+> On 25/10/17 15:29, Alexey Kardashevskiy wrote:
+> > Hi!
+> > 
+> > The latest QEMU fails on:
+> > tests/qemu-iotests/check -vhdx 194
+> 
+> 
+> Bit more details:
+> 
+> 1. the assert started appearing from
+> https://git.qemu.org/?p=qemu.git;a=commit;h=09e0c771e47 - this one just
+> added the assert;
+> 
+> 2. if removed, then another assert alerts:
+> qemu-system-ppc64: /home/aik/p/qemu/block/io.c:1423: bdrv_aligned_pwritev:
+> Assertion `child->perm & BLK_PERM_WRITE' failed.
+> 
+> child->perm == 1 when this happens.
+> 
+> Any clues?
+> 
 
-Oh sorry, I forgot that it was on-top of my previously sent patch:
+Yes - what is happening is that if the VHDX image file is open RDWR, we
+update the VHDX header.  However, since we are INMIGRATE, the
+underlying file bs is marked as INACTIVE, and we are caught by the assert.
 
-https://lists.gnu.org/archive/html/qemu-devel/2017-10/msg05054.html
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+However, per the spec the header file and data guids only need to be updated
+before the first modification is made.  We already have a latching call to
+update the headers on the first write to the VHDX image (in vhdx_co_writev),
+so the call to vhdx_update_headers() in vhdx_open() is a bug, and can be
+removed.
+
+Once that is fixed, 194 still fails for VHDX, but it doesn't crash.  The
+failure is expected, because VHDX does not support migration (VMDK fails the
+same way).  So test 194 should also be updated to exclude image formats that
+set migration blockers.
+
+(Patches sent)
+
+-Jeff
+
+> > 
+> > 
+> > /home/aik/pbuild/qemu-aikhostos2-ppc64-softmmu-debug-build/ppc64-softmmu/qemu-system-ppc64
+> > \
+> >  -chardev socket,id=mon,path=/home/aik/qemudest-monitor.sock \
+> >  -mon chardev=mon,mode=control \
+> >  -display none \
+> >  -vga none \
+> >  -machine accel=qtest \
+> >  -nodefaults \
+> >  -incoming unix:/home/aik/qemu-migration.sock \
+> >  -drive if=virtio,id=drive0,file=/home/aik/dest.img,format=vhdx,cache=writeback
+> > 
+> > 
+> > GDB says it is assert(!(bs->open_flags & BDRV_O_INACTIVE)). The very same
+> > test passes with a qcow2 image. Does it look any familiar to anyone? Where
+> > to start digging from? Thanks.
+> > 
+> > 
+> > 
+> > (gdb) r
+> > Starting program:
+> > /home/aik/pbuild/qemu-aikhostos2-ppc64-softmmu-debug-build/ppc64-softmmu/qemu-system-ppc64
+> > -chardev socket,id=mon,path=/home/a
+> > ik/qemudest-monitor.sock -mon chardev=mon,mode=control -display none -vga
+> > none -machine accel=qtest -nodefaults -incoming unix:/home/aik/qemu-mi
+> > gration.sock -drive
+> > if=virtio,id=drive0,file=/home/aik/dest.img,format=vhdx,cache=writeback
+> > [Thread debugging using libthread_db enabled]
+> > Using host libthread_db library "/lib64/libthread_db.so.1".
+> > [New Thread 0x7ffff698eb80 (LWP 70705)]
+> > [New Thread 0x7ffff607eb80 (LWP 70706)]
+> > qemu-system-ppc64: /home/aik/p/qemu/block/io.c:1601: bdrv_co_pwritev:
+> > Assertion `!(bs->open_flags & 0x0800)' failed.
+> > 
+> > Program received signal SIGABRT, Aborted.
+> > 0x00007ffff77deff0 in raise () from /lib64/libc.so.6
+> > (gdb) bt
+> > #0  0x00007ffff77deff0 in raise () from /lib64/libc.so.6
+> > #1  0x00007ffff77e136c in abort () from /lib64/libc.so.6
+> > #2  0x00007ffff77d4c44 in __assert_fail_base () from /lib64/libc.so.6
+> > #3  0x00007ffff77d4d34 in __assert_fail () from /lib64/libc.so.6
+> > #4  0x000000001074ce44 in bdrv_co_pwritev (child=0x111c6160, offset=65536,
+> > bytes=80, qiov=0x7fffffffe090, flags=0)
+> >     at /home/aik/p/qemu/block/io.c:1601
+> > #5  0x0000000010749408 in bdrv_rw_co_entry (opaque=0x7fffffffdfa0) at
+> > /home/aik/p/qemu/block/io.c:620
+> > #6  0x0000000010857188 in coroutine_trampoline (i0=287156048, i1=0) at
+> > /home/aik/p/qemu/util/coroutine-ucontext.c:79
+> > #7  0x00007ffff77f2b9c in makecontext () from /lib64/libc.so.6
+> > #8  0x0000000000000000 in ?? ()
+> > (gdb) p bs->open_flags
+> > No symbol "bs" in current context.
+> > (gdb) up
+> > #1  0x00007ffff77e136c in abort () from /lib64/libc.so.6
+> > (gdb)
+> > #2  0x00007ffff77d4c44 in __assert_fail_base () from /lib64/libc.so.6
+> > (gdb)
+> > #3  0x00007ffff77d4d34 in __assert_fail () from /lib64/libc.so.6
+> > (gdb)
+> > #4  0x000000001074ce44 in bdrv_co_pwritev (child=0x111c6160, offset=65536,
+> > bytes=80, qiov=0x7fffffffe090, flags=0)
+> >     at /home/aik/p/qemu/block/io.c:1601
+> > 1601        assert(!(bs->open_flags & BDRV_O_INACTIVE));
+> > (gdb) p/x bs->open_flags
+> > $2 = 0xe802
+> > (gdb)
+> > 
+> > 
+> 
+> 
+> -- 
+> Alexey
+> 
