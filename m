@@ -1,21 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57939)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60155)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1e8CcH-00029X-R4
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 17:56:39 -0400
+	(envelope-from <bounces@canonical.com>) id 1e8Cru-0005QW-GE
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 18:12:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1e8CcG-0001zs-JW
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 17:56:37 -0400
-Date: Fri, 27 Oct 2017 23:45:42 +0200
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20171027214542.GG7115@umbus>
-References: <20171027165814.29122-1-richard.henderson@linaro.org>
+	(envelope-from <bounces@canonical.com>) id 1e8Crr-0001qn-AF
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 18:12:46 -0400
+Received: from indium.canonical.com ([91.189.90.7]:40718)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1e8Crr-0001ov-3O
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 18:12:43 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1e8Crn-0003YD-S6
+	for <qemu-devel@nongnu.org>; Fri, 27 Oct 2017 22:12:40 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id C6BB82E81C1
+	for <qemu-devel@nongnu.org>; Fri, 27 Oct 2017 22:12:26 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="gvF4niNJ+uBMJnEh"
-Content-Disposition: inline
-In-Reply-To: <20171027165814.29122-1-richard.henderson@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH v2] target/ppc: Use
- tcg_gen_lookup_and_goto_ptr
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 27 Oct 2017 21:54:56 -0000
+From: Thomas Huth <1366836@bugs.launchpad.net>
+Reply-To: Bug 1366836 <1366836@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20140908144705.25513.64209.malonedeb@soybean.canonical.com>
+Message-Id: <150914129749.3843.9514152111881683708.launchpad@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1366836] Re: Core2Duo and KVM may not boot Win8
+ properly on 3.x kernels
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,123 +37,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
 
+** Changed in: qemu
+       Status: Incomplete =3D> Fix Released
 
---gvF4niNJ+uBMJnEh
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+-- =
 
-On Fri, Oct 27, 2017 at 06:58:14PM +0200, Richard Henderson wrote:
-> From: Richard Henderson <rth@twiddle.net>
->=20
-> Signed-off-by: Richard Henderson <rth@twiddle.net>
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1366836
 
-Applied,thanks.
+Title:
+  Core2Duo and KVM may not boot Win8 properly on 3.x kernels
 
-> ---
-> Rebased and updated for changes to tcg_gen_lookup_and_goto_ptr.
->=20
-> ---
->  target/ppc/translate.c | 23 ++++++++---------------
->  1 file changed, 8 insertions(+), 15 deletions(-)
->=20
-> diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-> index 998fbed848..4075fc8589 100644
-> --- a/target/ppc/translate.c
-> +++ b/target/ppc/translate.c
-> @@ -3419,7 +3419,7 @@ static inline bool use_goto_tb(DisasContext *ctx, t=
-arget_ulong dest)
->  }
-> =20
->  /***                                Branch                              =
-   ***/
-> -static inline void gen_goto_tb(DisasContext *ctx, int n, target_ulong de=
-st)
-> +static void gen_goto_tb(DisasContext *ctx, int n, target_ulong dest)
->  {
->      if (NARROW_MODE(ctx)) {
->          dest =3D (uint32_t) dest;
-> @@ -3441,7 +3441,7 @@ static inline void gen_goto_tb(DisasContext *ctx, i=
-nt n, target_ulong dest)
->                  gen_debug_exception(ctx);
->              }
->          }
-> -        tcg_gen_exit_tb(0);
-> +        tcg_gen_lookup_and_goto_ptr();
->      }
->  }
-> =20
-> @@ -3479,7 +3479,7 @@ static void gen_b(DisasContext *ctx)
->  #define BCOND_CTR 2
->  #define BCOND_TAR 3
-> =20
-> -static inline void gen_bcond(DisasContext *ctx, int type)
-> +static void gen_bcond(DisasContext *ctx, int type)
->  {
->      uint32_t bo =3D BO(ctx->opcode);
->      TCGLabel *l1;
-> @@ -3543,26 +3543,19 @@ static inline void gen_bcond(DisasContext *ctx, i=
-nt type)
->          } else {
->              gen_goto_tb(ctx, 0, li);
->          }
-> -        if ((bo & 0x14) !=3D 0x14) {
-> -            gen_set_label(l1);
-> -            gen_goto_tb(ctx, 1, ctx->nip);
-> -        }
->      } else {
->          if (NARROW_MODE(ctx)) {
->              tcg_gen_andi_tl(cpu_nip, target, (uint32_t)~3);
->          } else {
->              tcg_gen_andi_tl(cpu_nip, target, ~3);
->          }
-> -        tcg_gen_exit_tb(0);
-> -        if ((bo & 0x14) !=3D 0x14) {
-> -            gen_set_label(l1);
-> -            gen_update_nip(ctx, ctx->nip);
-> -            tcg_gen_exit_tb(0);
-> -        }
-> -    }
-> -    if (type =3D=3D BCOND_LR || type =3D=3D BCOND_CTR || type =3D=3D BCO=
-ND_TAR) {
-> +        tcg_gen_lookup_and_goto_ptr();
->          tcg_temp_free(target);
->      }
-> +    if ((bo & 0x14) !=3D 0x14) {
-> +        gen_set_label(l1);
-> +        gen_goto_tb(ctx, 1, ctx->nip);
-> +    }
->  }
-> =20
->  static void gen_bc(DisasContext *ctx)
+Status in QEMU:
+  Fix Released
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+Bug description:
+  When I start up QEMU w/ KVM 1.7.0 on a Core2Duo machine running a vanilla=
+ kernel 3.4.67 or 3.10.12 to run a Windows 8.0 guest, the guest freezes at =
+Windows 8 boot without any error.
+  When I dump the CPU registers via "info registers", nothing changes, that=
+ means the system really stalled. Same happens with QEMU 2.0.0 and QEMU 2.1=
+.0.
+  It stalls when the Windows logo is displayed and the balled circle starts=
+ rotating.
 
---gvF4niNJ+uBMJnEh
-Content-Type: application/pgp-signature; name="signature.asc"
+  But - when I run the very same guest using Kernel 2.6.32.12 and QEMU
+  1.7.0 or 2.0.0 on the host side it works on the Core2Duo. Also the
+  system above but just with an i3 or i5 CPU it works fine.
 
------BEGIN PGP SIGNATURE-----
+  I already disabled networking and USB for the guest and changed the graph=
+ics
+  card - no effect. I assume that some mean bits and bytes have to be set up
+  properly to get the thing running.
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnzqQMACgkQbDjKyiDZ
-s5KhihAAiA7DQ2ru6yyQzuvYX+fSAI8D4F1cTOln3ET9A/k1+w++axsnvEZ0/wiL
-zXdB1I+cIV9G9Sw/kynp7eZmfsMLRgUUhjHoa/k3EpnBaxmTHsaItt0fMTSpc2Jd
-mt4wbEHSzRqh0eiBPpb9/RDKQngFFWye2RDKo0pepO3wLmGngW6zirD2iVq5m9Bs
-CKAbTQX8OHh4MxKdijn6GmQct3/fb/G4zRhhFjV1cFXH7MbgTtC56lZCAcrsh1Xa
-ZGS6ItH304k1+tbMDZvZIwbAufOk6Gh5TYfONWYrX+Gdlfrd8BRjNpBuBdWueYhn
-97RkP/vjq9XyUvLFZJpfUjtv6PigiHocfebbHdJOb7vmzd+lfUks+BZL6CPWnjg6
-a/bWYYNX7oNOWCh4Ba43uhIjEiG3qebtDCrTzB4Qi3vgYgaY018iwg+R080bvEhx
-TB30XLBr+CSD7vsL7QE/4ZWqxUOa0R2LOKe0Z9KAlnmY7ZiUlTOBIHkzLSnksSE7
-zGE7yY38h9pq+7xZ9yk47ZvEZ2Ax3hGg1QEiNflCgKXSmcmuWlev7bOsJkoLVz8y
-spo7GLaXE1l/96wkw+P8mrnMKSukMrvIOTFcngqZ/daQRA+m1X/fjB2xNOfMAoFS
-owYccfSsv/d0IkP0AXp7cMiv+RzzZPL9Z4I/jozb+LgQMDJSurc=
-=S86k
------END PGP SIGNATURE-----
+  Seems to be related to a kvm/processor incompatibility.
 
---gvF4niNJ+uBMJnEh--
+  Windows XP runs on all combinations without any issues. Windows 8.1
+  guests have the same issues as Windows 8.0.
+
+  An example command line that does not boot Windows 8 is:
+  qemu-system-x86_64 -machine pc-i440fx-1.5,accel=3Dkvm,kernel_irqchip=3Dof=
+f -daemonize -cpu kvm32,+sep,+nx -nodefaults -vga std -readconfig /usr/X11R=
+6/X11etc/ich9-ehci-uhci.cfg -device usb-host,bus=3Dehci.0,hostport=3D1.2 -d=
+evice usb-tablet -drive file=3D/dev/sdb,cache=3Dwritethrough,if=3Dnone,id=
+=3Dx -device ide-drive,drive=3Dx -m 1024 -monitor telnet:127.0.0.1:5100,now=
+ait,server -vnc :1 -L /usr/X11R6/share/qemu -boot c -localtime -enable-kvm =
+-no-shutdown
+
+  enabling the kernel_irqchip, removing the sep, disabling usb, changing
+  the machine type or changing the monitor type (SDL or VNC) has no
+  effect.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1366836/+subscriptions
