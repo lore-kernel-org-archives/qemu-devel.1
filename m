@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37346)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39652)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eswierk@skyportsystems.com>) id 1e7uRK-0000Pe-P8
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 22:32:07 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1e7uWQ-0001L0-P9
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 22:37:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eswierk@skyportsystems.com>) id 1e7uRF-0007Mn-S8
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 22:32:06 -0400
-Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:51866)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <eswierk@skyportsystems.com>)
-	id 1e7uRF-0007Ly-Lw
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 22:32:01 -0400
-Received: by mail-pg0-x242.google.com with SMTP id p9so4163982pgc.8
-	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 19:32:01 -0700 (PDT)
-From: Ed Swierk <eswierk@skyportsystems.com>
-Date: Thu, 26 Oct 2017 19:31:33 -0700
-Message-Id: <1509071493-82242-1-git-send-email-eswierk@skyportsystems.com>
-In-Reply-To: <5e031fcf-9f97-7d32-2e41-6868f75d284b@redhat.com>
-References: <5e031fcf-9f97-7d32-2e41-6868f75d284b@redhat.com>
-Subject: Re: [Qemu-devel] [RFC v2] e1000: Faulty tx checksum offload
- corrupts packets
+	(envelope-from <dgilbert@redhat.com>) id 1e7uWL-0004VO-JX
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 22:37:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58610)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1e7uWL-0004U6-Ae
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 22:37:17 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 251B07E42F
+	for <qemu-devel@nongnu.org>; Fri, 27 Oct 2017 02:37:16 +0000 (UTC)
+Date: Fri, 27 Oct 2017 03:37:08 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20171027023706.GD2585@work-vm>
+References: <20171026075222.27798-1-quintela@redhat.com>
+	<20171026075222.27798-5-quintela@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171026075222.27798-5-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 04/10] tests: Don't abuse global_qtest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,101 +33,166 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: Ed Swierk <eswierk@skyportsystems.com>, Dmitry Fleytman <dmitry@daynix.com>, qemu-devel@nongnu.org
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
 
-On Mon, Oct 23, 2017 at 8:28 PM, Jason Wang <jasowang@redhat.com> wrote:
+* Juan Quintela (quintela@redhat.com) wrote:
+> As we have two guests running, just pass always who we want to send a
+> message to.  Once there, refactor return_or_event() into wait_command.
 > 
-> On 2017年10月24日 08:22, Ed Swierk wrote:
-> > (Another layer of icing on the cake is that QEMU ignores the
-> > requirement that a UDP checksum computed as zero be sent as 0xffff,
-> > since zero is a special value meaning no checksum. So even when QEMU
-> > doesn't corrupt the packet data, the packet sometimes leaves the box
-> > with no checksum at all.)
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+
+Hmm was there anything else anywhere that relied on global_qtest?
+Hopefully not.
+
+
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+> ---
+>  tests/migration-test.c | 55 +++++++++++++++++++++++++-------------------------
+>  1 file changed, 27 insertions(+), 28 deletions(-)
 > 
-> Please submit another patch for this.
-
-Will do.
-
-> > I have instrumented QEMU and reproduced this behavior with a Windows
-> > 10 guest, rather easily with a TCP iperf and a UDP iperf running in
-> > parallel. I have also attempted a fix, which is below in very rough
-> > form.
+> diff --git a/tests/migration-test.c b/tests/migration-test.c
+> index 91fb0277d6..c429a13403 100644
+> --- a/tests/migration-test.c
+> +++ b/tests/migration-test.c
+> @@ -223,20 +223,23 @@ static void wait_for_serial(const char *side)
+>  /*
+>   * Events can get in the way of responses we are actually waiting for.
+>   */
+> -static QDict *return_or_event(QDict *response)
+> +static QDict *wait_command(QTestState *who, const char *command)
+>  {
+>      const char *event_string;
+> -    if (!qdict_haskey(response, "event")) {
+> -        return response;
+> -    }
+> +    QDict *response;
+> +
+> +    response = qtest_qmp(who, command);
+>  
+> -    /* OK, it was an event */
+> -    event_string = qdict_get_str(response, "event");
+> -    if (!strcmp(event_string, "STOP")) {
+> -        got_stop = true;
+> +    while (qdict_haskey(response, "event")) {
+> +        /* OK, it was an event */
+> +        event_string = qdict_get_str(response, "event");
+> +        if (!strcmp(event_string, "STOP")) {
+> +            got_stop = true;
+> +        }
+> +        QDECREF(response);
+> +        response = qtest_qmp_receive(who);
+>      }
+> -    QDECREF(response);
+> -    return return_or_event(qtest_qmp_receive(global_qtest));
+> +    return response;
+>  }
+>  
+>  
+> @@ -245,12 +248,12 @@ static QDict *return_or_event(QDict *response)
+>   * events suddenly appearing confuse the qmp()/hmp() responses.
+>   */
+>  
+> -static uint64_t get_migration_pass(void)
+> +static uint64_t get_migration_pass(QTestState *who)
+>  {
+>      QDict *rsp, *rsp_return, *rsp_ram;
+>      uint64_t result;
+>  
+> -    rsp = return_or_event(qmp("{ 'execute': 'query-migrate' }"));
+> +    rsp = wait_command(who, "{ 'execute': 'query-migrate' }");
+>      rsp_return = qdict_get_qdict(rsp, "return");
+>      if (!qdict_haskey(rsp_return, "ram")) {
+>          /* Still in setup */
+> @@ -263,7 +266,7 @@ static uint64_t get_migration_pass(void)
+>      return result;
+>  }
+>  
+> -static void wait_for_migration_complete(void)
+> +static void wait_for_migration_complete(QTestState *who)
+>  {
+>      QDict *rsp, *rsp_return;
+>      bool completed;
+> @@ -271,7 +274,7 @@ static void wait_for_migration_complete(void)
+>      do {
+>          const char *status;
+>  
+> -        rsp = return_or_event(qmp("{ 'execute': 'query-migrate' }"));
+> +        rsp = wait_command(who, "{ 'execute': 'query-migrate' }");
+>          rsp_return = qdict_get_qdict(rsp, "return");
+>          status = qdict_get_str(rsp_return, "status");
+>          completed = strcmp(status, "completed") == 0;
+> @@ -281,14 +284,14 @@ static void wait_for_migration_complete(void)
+>      } while (!completed);
+>  }
+>  
+> -static void wait_for_migration_pass(void)
+> +static void wait_for_migration_pass(QTestState *who)
+>  {
+> -    uint64_t initial_pass = get_migration_pass();
+> +    uint64_t initial_pass = get_migration_pass(who);
+>      uint64_t pass;
+>  
+>      /* Wait for the 1st sync */
+>      do {
+> -        initial_pass = get_migration_pass();
+> +        initial_pass = get_migration_pass(who);
+>          if (got_stop || initial_pass) {
+>              break;
+>          }
+> @@ -297,7 +300,7 @@ static void wait_for_migration_pass(void)
+>  
+>      do {
+>          usleep(1000 * 100);
+> -        pass = get_migration_pass();
+> +        pass = get_migration_pass(who);
+>      } while (pass == initial_pass && !got_stop);
+>  }
+>  
+> @@ -493,7 +496,7 @@ static void test_migrate_end(QTestState *from, QTestState *to)
+>  static void test_migrate(void)
+>  {
+>      char *uri = g_strdup_printf("unix:%s/migsocket", tmpfs);
+> -    QTestState *global = global_qtest, *from, *to;
+> +    QTestState *from, *to;
+>      QDict *rsp;
+>  
+>      test_migrate_start(&from, &to, uri);
+> @@ -513,26 +516,22 @@ static void test_migrate(void)
+>  
+>      migrate(from, uri);
+>  
+> -    global_qtest = from;
+> -    wait_for_migration_pass();
+> +    wait_for_migration_pass(from);
+>  
+> -    rsp = return_or_event(qmp("{ 'execute': 'migrate-start-postcopy' }"));
+> +    rsp = wait_command(from, "{ 'execute': 'migrate-start-postcopy' }");
+>      g_assert(qdict_haskey(rsp, "return"));
+>      QDECREF(rsp);
+>  
+>      if (!got_stop) {
+> -        qmp_eventwait("STOP");
+> +        qtest_qmp_eventwait(from, "STOP");
+>      }
+>  
+> -    global_qtest = to;
+> -    qmp_eventwait("RESUME");
+> +    qtest_qmp_eventwait(to, "RESUME");
+>  
+>      wait_for_serial("dest_serial");
+> -    global_qtest = from;
+> -    wait_for_migration_complete();
+> +    wait_for_migration_complete(from);
+>  
+>      g_free(uri);
+> -    global_qtest = global;
+>  
+>      test_migrate_end(from, to);
+>  }
+> -- 
+> 2.13.6
 > 
-> How do you instrument qemu? Can this be reproduced without this?
-
-I can reproduce the bug with just the patchlet below. It would be even
-better to devise a test that detects the corruption without modifying
-QEMU, as that could be used as a regression test after the bug itself
-is fixed. I'll have to ponder that.
-
-> > One puzzle is what to do about e1000e: it shares shares some data
-> > structures and a bit of code with e1000, but little else, which is
-> > surprising given how similar they are (or should be). The e1000e's
-> > handling of TCP segmentation offload and checksum offload is totally
-> > different, and problematic for other reasons (it totally ignores most
-> > of the context parameters provided by the driver and basically does
-> > what it thinks is best by digging into the packet data). Is this
-> > divergence intentional?
-> 
-> Somehow, and if we can find a way to unify the codes, it would be better.
-> 
-> > Is there a reason not to change e1000e as long
-> > as I'm trying to make e1000 more datasheet-conformant?
-> 
-> Please fix them individually.
-
-I went ahead and reimplemented e1000 as a variant of e1000e. It's just
-a proof of concept, but hopefully a step towards eliminating the
-redundancy and manintaining just one codebase rather than two. Please
-see the patch series I'm sending separately.
-
-Anyway, here's how I catch the tx checksum offload bug, with a Windows
-guest running one TCP iperf and one UDP iperf simultaneously through
-the same e1000 interface.
-
- --- a/hw/net/e1000.c
- +++ b/hw/net/e1000.c
- @@ -534,6 +534,30 @@ e1000_send_packet(E1000State *s, const uint8_t *buf, int size)
-  }
-  
-  static void
- +debug_csum(struct e1000_tx *tp, uint16_t oldsum)
- +{
- +    e1000x_txd_props *props = &tp->props;
- +    uint8_t proto = tp->data[14 + 9];
- +    uint32_t sumoff = props->tucso - props->tucss;
- +
- +    if ((proto == 17 && sumoff != 6) ||
- +        (proto == 6 && sumoff != 16)) {
- +        DBGOUT(TXERR, "txsum bug! ver %d src %08x dst %08x len %d proto %d "
- +               "cptse %d sum_needed %x oldsum %x newsum %x realsum %x\n",
- +               tp->data[14] >> 4,
- +               ldl_be_p(tp->data + 14 + 12),
- +               ldl_be_p(tp->data + 14 + 16),
- +               lduw_be_p(tp->data + 14 + 2),
- +               proto,
- +               props->cptse,
- +               props->sum_needed,
- +               oldsum,
- +               lduw_be_p(tp->data + props->tucso),
- +               lduw_be_p(tp->data + props->tucss + (proto == 6 ? 16 : 6)));
- +    }
- +}
- +
- +static void
-  xmit_seg(E1000State *s)
-  {
-      uint16_t len;
- @@ -577,8 +601,10 @@ xmit_seg(E1000State *s)
-      }
-  
-      if (tp->props.sum_needed & E1000_TXD_POPTS_TXSM) {
- +        uint16_t oldsum = lduw_be_p(tp->data + tp->props.tucso);
-          putsum(tp->data, tp->size, tp->props.tucso,
-                 tp->props.tucss, tp->props.tucse);
- +        debug_csum(tp, oldsum);
-      }
-      if (tp->props.sum_needed & E1000_TXD_POPTS_IXSM) {
-          putsum(tp->data, tp->size, tp->props.ipcso,
- 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
