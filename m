@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50701)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50726)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <frasse.iglesias@gmail.com>) id 1e7xd2-0005YJ-P8
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 01:56:25 -0400
+	(envelope-from <frasse.iglesias@gmail.com>) id 1e7xd8-0005bs-Rr
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 01:56:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <frasse.iglesias@gmail.com>) id 1e7xd2-0007oN-1s
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 01:56:24 -0400
-Received: from mail-lf0-x242.google.com ([2a00:1450:4010:c07::242]:46272)
+	(envelope-from <frasse.iglesias@gmail.com>) id 1e7xd3-0007r1-G3
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 01:56:26 -0400
+Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:46272)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <frasse.iglesias@gmail.com>)
-	id 1e7xd1-0007mL-Qx
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 01:56:23 -0400
-Received: by mail-lf0-x242.google.com with SMTP id g70so6144019lfl.3
-	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 22:56:23 -0700 (PDT)
+	id 1e7xd3-0007oj-91
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 01:56:25 -0400
+Received: by mail-lf0-x243.google.com with SMTP id g70so6144077lfl.3
+	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 22:56:25 -0700 (PDT)
 From: Francisco Iglesias <frasse.iglesias@gmail.com>
-Date: Fri, 27 Oct 2017 07:56:03 +0200
-Message-Id: <20171027055612.2488-5-frasse.iglesias@gmail.com>
+Date: Fri, 27 Oct 2017 07:56:04 +0200
+Message-Id: <20171027055612.2488-6-frasse.iglesias@gmail.com>
 In-Reply-To: <20171027055612.2488-1-frasse.iglesias@gmail.com>
 References: <20171027055612.2488-1-frasse.iglesias@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4 04/13] m25p80: Add support for n25q512a11
- and n25q512a13
+Subject: [Qemu-devel] [PATCH v4 05/13] xilinx_spips: Move FlashCMD,
+ XilinxQSPIPS and XilinxSPIPSClass
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,26 +30,126 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: edgari@xilinx.com, alistai@xilinx.com, francisco.iglesias@feimtech.se, mar.krzeminski@gmail.com
 
-Add support for Micron (Numonyx) n25q512a11 and n25q512a13 flashes.
+Move the FlashCMD enum, XilinxQSPIPS and XilinxSPIPSClass structures to the
+header for consistency. Also move out a define and remove two dubbel included
+headers (while touching the code). Finally, add 4 byte address commands to the
+FlashCMD enum.
 
 Signed-off-by: Francisco Iglesias <frasse.iglesias@gmail.com>
-Acked-by: Marcin Krzemiński <mar.krzeminski@gmail.com>
 ---
- hw/block/m25p80.c | 2 ++
- 1 file changed, 2 insertions(+)
+ hw/ssi/xilinx_spips.c         | 35 -----------------------------------
+ include/hw/ssi/xilinx_spips.h | 34 ++++++++++++++++++++++++++++++++++
+ 2 files changed, 34 insertions(+), 35 deletions(-)
 
-diff --git a/hw/block/m25p80.c b/hw/block/m25p80.c
-index cf39e36..054dc6f 100644
---- a/hw/block/m25p80.c
-+++ b/hw/block/m25p80.c
-@@ -240,6 +240,8 @@ static const FlashPartInfo known_devices[] = {
-     { INFO("n25q128a13",  0x20ba18,      0,  64 << 10, 256, ER_4K) },
-     { INFO("n25q256a11",  0x20bb19,      0,  64 << 10, 512, ER_4K) },
-     { INFO("n25q256a13",  0x20ba19,      0,  64 << 10, 512, ER_4K) },
-+    { INFO("n25q512a11",  0x20bb20,      0,  64 << 10, 1024, ER_4K) },
-+    { INFO("n25q512a13",  0x20ba20,      0,  64 << 10, 1024, ER_4K) },
-     { INFO("n25q128",     0x20ba18,      0,  64 << 10, 256, 0) },
-     { INFO("n25q256a",    0x20ba19,      0,  64 << 10, 512, ER_4K) },
-     { INFO("n25q512a",    0x20ba20,      0,  64 << 10, 1024, ER_4K) },
+diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
+index ef56d35..559fa79 100644
+--- a/hw/ssi/xilinx_spips.c
++++ b/hw/ssi/xilinx_spips.c
+@@ -27,8 +27,6 @@
+ #include "sysemu/sysemu.h"
+ #include "hw/ptimer.h"
+ #include "qemu/log.h"
+-#include "qemu/fifo8.h"
+-#include "hw/ssi/ssi.h"
+ #include "qemu/bitops.h"
+ #include "hw/ssi/xilinx_spips.h"
+ #include "qapi/error.h"
+@@ -116,44 +114,11 @@
+ 
+ /* 16MB per linear region */
+ #define LQSPI_ADDRESS_BITS 24
+-/* Bite off 4k chunks at a time */
+-#define LQSPI_CACHE_SIZE 1024
+ 
+ #define SNOOP_CHECKING 0xFF
+ #define SNOOP_NONE 0xFE
+ #define SNOOP_STRIPING 0
+ 
+-typedef enum {
+-    READ = 0x3,
+-    FAST_READ = 0xb,
+-    DOR = 0x3b,
+-    QOR = 0x6b,
+-    DIOR = 0xbb,
+-    QIOR = 0xeb,
+-
+-    PP = 0x2,
+-    DPP = 0xa2,
+-    QPP = 0x32,
+-} FlashCMD;
+-
+-typedef struct {
+-    XilinxSPIPS parent_obj;
+-
+-    uint8_t lqspi_buf[LQSPI_CACHE_SIZE];
+-    hwaddr lqspi_cached_addr;
+-    Error *migration_blocker;
+-    bool mmio_execution_enabled;
+-} XilinxQSPIPS;
+-
+-typedef struct XilinxSPIPSClass {
+-    SysBusDeviceClass parent_class;
+-
+-    const MemoryRegionOps *reg_ops;
+-
+-    uint32_t rx_fifo_size;
+-    uint32_t tx_fifo_size;
+-} XilinxSPIPSClass;
+-
+ static inline int num_effective_busses(XilinxSPIPS *s)
+ {
+     return (s->regs[R_LQSPI_CFG] & LQSPI_CFG_SEP_BUS &&
+diff --git a/include/hw/ssi/xilinx_spips.h b/include/hw/ssi/xilinx_spips.h
+index 06aa096..7f9e2fc 100644
+--- a/include/hw/ssi/xilinx_spips.h
++++ b/include/hw/ssi/xilinx_spips.h
+@@ -32,6 +32,22 @@ typedef struct XilinxSPIPS XilinxSPIPS;
+ 
+ #define XLNX_SPIPS_R_MAX        (0x100 / 4)
+ 
++/* Bite off 4k chunks at a time */
++#define LQSPI_CACHE_SIZE 1024
++
++typedef enum {
++    READ = 0x3,         READ_4 = 0x13,
++    FAST_READ = 0xb,    FAST_READ_4 = 0x0c,
++    DOR = 0x3b,         DOR_4 = 0x3c,
++    QOR = 0x6b,         QOR_4 = 0x6c,
++    DIOR = 0xbb,        DIOR_4 = 0xbc,
++    QIOR = 0xeb,        QIOR_4 = 0xec,
++
++    PP = 0x2,           PP_4 = 0x12,
++    DPP = 0xa2,
++    QPP = 0x32,         QPP_4 = 0x34,
++} FlashCMD;
++
+ struct XilinxSPIPS {
+     SysBusDevice parent_obj;
+ 
+@@ -56,6 +72,24 @@ struct XilinxSPIPS {
+     uint32_t regs[XLNX_SPIPS_R_MAX];
+ };
+ 
++typedef struct {
++    XilinxSPIPS parent_obj;
++
++    uint8_t lqspi_buf[LQSPI_CACHE_SIZE];
++    hwaddr lqspi_cached_addr;
++    Error *migration_blocker;
++    bool mmio_execution_enabled;
++} XilinxQSPIPS;
++
++typedef struct XilinxSPIPSClass {
++    SysBusDeviceClass parent_class;
++
++    const MemoryRegionOps *reg_ops;
++
++    uint32_t rx_fifo_size;
++    uint32_t tx_fifo_size;
++} XilinxSPIPSClass;
++
+ #define TYPE_XILINX_SPIPS "xlnx.ps7-spi"
+ #define TYPE_XILINX_QSPIPS "xlnx.ps7-qspi"
+ 
 -- 
 2.9.3
