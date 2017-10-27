@@ -1,32 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45813)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46441)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <frasse.iglesias@gmail.com>) id 1e865A-0004VJ-DZ
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 10:58:02 -0400
+	(envelope-from <eblake@redhat.com>) id 1e867B-0006IF-Fh
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 11:00:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <frasse.iglesias@gmail.com>) id 1e8658-0002uT-F7
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 10:58:00 -0400
-Received: from mail-pg0-x232.google.com ([2607:f8b0:400e:c05::232]:52896)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <frasse.iglesias@gmail.com>)
-	id 1e8658-0002tp-4c
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 10:57:58 -0400
-Received: by mail-pg0-x232.google.com with SMTP id a192so5473198pge.9
-	for <qemu-devel@nongnu.org>; Fri, 27 Oct 2017 07:57:57 -0700 (PDT)
+	(envelope-from <eblake@redhat.com>) id 1e8677-0004eM-Kq
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 11:00:05 -0400
+References: <150910197146.135.17776883444899005130@bafd83ae6430>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <b42deeae-9ec5-0c2f-f14b-33dc99229ec2@redhat.com>
+Date: Fri, 27 Oct 2017 16:59:47 +0200
 MIME-Version: 1.0
-In-Reply-To: <CAKmqyKNcZtpGjTOYe4siE8=H0EHyQPcz=3ZLRFP8JK_J7AdZ4A@mail.gmail.com>
-References: <20171027055612.2488-1-frasse.iglesias@gmail.com>
-	<20171027055612.2488-14-frasse.iglesias@gmail.com>
-	<CAKmqyKPh9VXd554dGtBiMeXHvmWLZ8C7+saLJ5Bv+PFVNpqgoQ@mail.gmail.com>
-	<CAAYMZQthOPZxTQMvAQ+UgRWu8skt2sb0R3QEzQzcW2EvQXThMg@mail.gmail.com>
-	<CAKmqyKPpUwyUgMhy9e2D+uTUjBPqhZmXj+T6BnFstZZUPe0s7w@mail.gmail.com>
-	<CAAYMZQsM63X9LHr4AgO_nqGzJFnBHWA43+=Pfvp4s58_XDWz8Q@mail.gmail.com>
-	<CAKmqyKNcZtpGjTOYe4siE8=H0EHyQPcz=3ZLRFP8JK_J7AdZ4A@mail.gmail.com>
-From: francisco iglesias <frasse.iglesias@gmail.com>
-Date: Fri, 27 Oct 2017 16:57:56 +0200
-Message-ID: <CAAYMZQu7k31bbf+e9pY67xDgw+PZeQSam4zWBAegVDT=ZMvu4w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v4 13/13] xlnx-zcu102: Add support for the
- ZynqMP QSPI
+In-Reply-To: <150910197146.135.17776883444899005130@bafd83ae6430>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="qRqOMi4RFiJuiTbDV6jMKmJmFIBrDVABx"
+Subject: Re: [Qemu-devel] [PATCH v6 00/12] nbd minimal structured read
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,217 +23,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair23@gmail.com>
-Cc: qemu-devel@nongnu.org, edgari@xilinx.com, Alistair Francis <alistai@xilinx.com>, francisco.iglesias@feimtech.se, "mar.krzeminski" <mar.krzeminski@gmail.com>
+To: qemu-devel@nongnu.org
+Cc: famz@redhat.com, pbonzini@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org
 
-Hello again Alistair,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--qRqOMi4RFiJuiTbDV6jMKmJmFIBrDVABx
+From: Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: famz@redhat.com, pbonzini@redhat.com, vsementsov@virtuozzo.com,
+ qemu-block@nongnu.org
+Message-ID: <b42deeae-9ec5-0c2f-f14b-33dc99229ec2@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v6 00/12] nbd minimal structured read
+References: <150910197146.135.17776883444899005130@bafd83ae6430>
+In-Reply-To: <150910197146.135.17776883444899005130@bafd83ae6430>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Thank you very much for the review! The new lines will be added into the
-next version of the patch series (v5).
+On 10/27/2017 12:59 PM, no-reply@patchew.org wrote:
+> Hi,
+>=20
+> This series failed build test on ppc host. Please find the details belo=
+w.
+>=20
 
-Best regards,
-Francisco Iglesias
+> /var/tmp/patchew-tester-tmp-xb4sc6ly/src/nbd/server.c: In function =E2=80=
+=98nbd_co_client_start=E2=80=99:
+> /var/tmp/patchew-tester-tmp-xb4sc6ly/src/nbd/server.c:819:12: error: =E2=
+=80=98ret=E2=80=99 may be used uninitialized in this function [-Werror=3D=
+maybe-uninitialized]
+>          if (ret < 0) {
+>             ^
+> /var/tmp/patchew-tester-tmp-xb4sc6ly/src/nbd/server.c:647:13: note: =E2=
+=80=98ret=E2=80=99 was declared here
+>          int ret;
+>              ^
 
-On 27 Oct 2017 16:41, "Alistair Francis" <alistair23@gmail.com> wrote:
+Real bug when reporting success on NBD_OPT_STARTTLS.
 
-> On Fri, Oct 27, 2017 at 2:48 PM, francisco iglesias
-> <frasse.iglesias@gmail.com> wrote:
-> > Good day Alistair,
-> >
-> > Yes exactly! The qspi aliases on the soc (named "qspi%d") targets the spi
-> > busses on the qspi dev (named "spi%d"). I did it this way in hope that
-> the
-> > code resembles how we connect the SST flashes to the standard spi
-> devices.
-> > Would you like me to do this in an other way or do you possibly think the
-> > approach is ok?
->
-> This looks fine to me.
->
-> Once you make those new line changes I mentioned:
->
-> Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
->
-> Alistair
->
->
-> >
-> > Best regards,
-> > Francisco Iglesias
-> >
-> >
-> > On 27 Oct 2017 14:03, "Alistair Francis" <alistair23@gmail.com> wrote:
-> >
-> > On Fri, Oct 27, 2017 at 11:17 AM, francisco iglesias
-> > <frasse.iglesias@gmail.com> wrote:
-> >> Dear alistair,
-> >>
-> >> Thank you for the review comments! I will update according them in the
-> >> next
-> >> version of the patch series! About your question, I might have
-> >> misunderstod,
-> >> but isn't the alias "qspi"? (s/"qspi{0,1}"  ->  s->qspi/"spi{0,1}")
-> >
-> > Ah! Now I think I understand. The buses on the QSPI device are still
-> > labeled "spi", is that correct?
-> >
-> > Alistair
-> >
-> >>
-> >> Best regards,
-> >> Francisco Iglesias
-> >>
-> >> On 27 Oct 2017 10:49, "Alistair Francis" <alistair23@gmail.com> wrote:
-> >>>
-> >>> On Fri, Oct 27, 2017 at 7:56 AM, Francisco Iglesias
-> >>> <frasse.iglesias@gmail.com> wrote:
-> >>> > Add support for the ZynqMP QSPI (consisting of the Generic QSPI and
-> >>> > Legacy
-> >>> > QSPI) and connect Numonyx n25q512a11 flashes to it.
-> >>> >
-> >>> > Signed-off-by: Francisco Iglesias <frasse.iglesias@gmail.com>
-> >>> > ---
-> >>> >  hw/arm/xlnx-zcu102.c         | 23 +++++++++++++++++++++++
-> >>> >  hw/arm/xlnx-zynqmp.c         | 24 ++++++++++++++++++++++++
-> >>> >  include/hw/arm/xlnx-zynqmp.h |  5 +++++
-> >>> >  3 files changed, 52 insertions(+)
-> >>> >
-> >>> > diff --git a/hw/arm/xlnx-zcu102.c b/hw/arm/xlnx-zcu102.c
-> >>> > index 519a16e..7d61972 100644
-> >>> > --- a/hw/arm/xlnx-zcu102.c
-> >>> > +++ b/hw/arm/xlnx-zcu102.c
-> >>> > @@ -150,6 +150,29 @@ static void xlnx_zynqmp_init(XlnxZCU102 *s,
-> >>> > MachineState *machine)
-> >>> >          sysbus_connect_irq(SYS_BUS_DEVICE(&s->soc.spi[i]), 1,
-> >>> > cs_line);
-> >>> >      }
-> >>> >
-> >>> > +    for (i = 0; i < XLNX_ZYNQMP_NUM_QSPI_FLASH; i++) {
-> >>> > +        SSIBus *spi_bus;
-> >>> > +        DeviceState *flash_dev;
-> >>> > +        qemu_irq cs_line;
-> >>> > +        DriveInfo *dinfo = drive_get_next(IF_MTD);
-> >>> > +        int bus = i / XLNX_ZYNQMP_NUM_QSPI_BUS_CS;
-> >>> > +        gchar *bus_name = g_strdup_printf("qspi%d", bus);
-> >>> > +
-> >>> > +        spi_bus = (SSIBus *)qdev_get_child_bus(DEVICE(&s->soc),
-> >>> > bus_name);
-> >>> > +        g_free(bus_name);
-> >>> > +
-> >>> > +        flash_dev = ssi_create_slave_no_init(spi_bus,
-> "n25q512a11");
-> >>> > +        if (dinfo) {
-> >>> > +            qdev_prop_set_drive(flash_dev, "drive",
-> >>> > blk_by_legacy_dinfo(dinfo),
-> >>> > +                                &error_fatal);
-> >>> > +        }
-> >>> > +        qdev_init_nofail(flash_dev);
-> >>> > +
-> >>> > +        cs_line = qdev_get_gpio_in_named(flash_dev, SSI_GPIO_CS,
-> 0);
-> >>> > +
-> >>> > +        sysbus_connect_irq(SYS_BUS_DEVICE(&s->soc.qspi), i + 1,
-> >>> > cs_line);
-> >>> > +    }
-> >>> > +
-> >>> >      /* TODO create and connect IDE devices for ide_drive_get() */
-> >>> >
-> >>> >      xlnx_zcu102_binfo.ram_size = ram_size;
-> >>> > diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
-> >>> > index d4b6560..f7c8b4b 100644
-> >>> > --- a/hw/arm/xlnx-zynqmp.c
-> >>> > +++ b/hw/arm/xlnx-zynqmp.c
-> >>> > @@ -40,6 +40,10 @@
-> >>> >  #define SATA_ADDR           0xFD0C0000
-> >>> >  #define SATA_NUM_PORTS      2
-> >>> >
-> >>> > +#define QSPI_ADDR           0xff0f0000
-> >>> > +#define LQSPI_ADDR          0xc0000000
-> >>> > +#define QSPI_IRQ            15
-> >>> > +
-> >>> >  #define DP_ADDR             0xfd4a0000
-> >>> >  #define DP_IRQ              113
-> >>> >
-> >>> > @@ -169,6 +173,9 @@ static void xlnx_zynqmp_init(Object *obj)
-> >>> >          qdev_set_parent_bus(DEVICE(&s->spi[i]),
-> sysbus_get_default());
-> >>> >      }
-> >>> >
-> >>> > +    object_initialize(&s->qspi, sizeof(s->qspi),
-> >>> > TYPE_XLNX_ZYNQMP_QSPIPS);
-> >>> > +    qdev_set_parent_bus(DEVICE(&s->qspi), sysbus_get_default());
-> >>> > +
-> >>> >      object_initialize(&s->dp, sizeof(s->dp), TYPE_XLNX_DP);
-> >>> >      qdev_set_parent_bus(DEVICE(&s->dp), sysbus_get_default());
-> >>> >
-> >>> > @@ -405,6 +412,23 @@ static void xlnx_zynqmp_realize(DeviceState
-> *dev,
-> >>> > Error **errp)
-> >>> >          g_free(bus_name);
-> >>> >      }
-> >>> >
-> >>> > +    object_property_set_bool(OBJECT(&s->qspi), true, "realized",
-> >>> > &err);
-> >>> > +    sysbus_mmio_map(SYS_BUS_DEVICE(&s->qspi), 0, QSPI_ADDR);
-> >>> > +    sysbus_mmio_map(SYS_BUS_DEVICE(&s->qspi), 1, LQSPI_ADDR);
-> >>> > +    sysbus_connect_irq(SYS_BUS_DEVICE(&s->qspi), 0,
-> >>> > gic_spi[QSPI_IRQ]);
-> >>>
-> >>> New line here
-> >>>
-> >>> > +    for (i = 0; i < XLNX_ZYNQMP_NUM_QSPI_BUS; i++) {
-> >>> > +        gchar *bus_name;
-> >>> > +        gchar *target_bus;
-> >>>
-> >>> New line here
-> >>>
-> >>> > +        /* Alias controller SPI bus to the SoC itself */
-> >>> > +        bus_name = g_strdup_printf("qspi%d", i);
-> >>> > +        target_bus = g_strdup_printf("spi%d", i);
-> >>> > +        object_property_add_alias(OBJECT(s), bus_name,
-> >>> > +                                  OBJECT(&s->qspi), target_bus,
-> >>>
-> >>> Why do we alias qspi to spi?
-> >>>
-> >>> Alistair
-> >>>
-> >>> > +                                  &error_abort);
-> >>> > +        g_free(bus_name);
-> >>> > +        g_free(target_bus);
-> >>> > +    }
-> >>> > +
-> >>> >      object_property_set_bool(OBJECT(&s->dp), true, "realized",
-> &err);
-> >>> >      if (err) {
-> >>> >          error_propagate(errp, err);
-> >>> > diff --git a/include/hw/arm/xlnx-zynqmp.h
-> >>> > b/include/hw/arm/xlnx-zynqmp.h
-> >>> > index 6eff81a..3e6fb9b 100644
-> >>> > --- a/include/hw/arm/xlnx-zynqmp.h
-> >>> > +++ b/include/hw/arm/xlnx-zynqmp.h
-> >>> > @@ -40,6 +40,10 @@
-> >>> >  #define XLNX_ZYNQMP_NUM_SDHCI 2
-> >>> >  #define XLNX_ZYNQMP_NUM_SPIS 2
-> >>> >
-> >>> > +#define XLNX_ZYNQMP_NUM_QSPI_BUS 2
-> >>> > +#define XLNX_ZYNQMP_NUM_QSPI_BUS_CS 2
-> >>> > +#define XLNX_ZYNQMP_NUM_QSPI_FLASH 4
-> >>> > +
-> >>> >  #define XLNX_ZYNQMP_NUM_OCM_BANKS 4
-> >>> >  #define XLNX_ZYNQMP_OCM_RAM_0_ADDRESS 0xFFFC0000
-> >>> >  #define XLNX_ZYNQMP_OCM_RAM_SIZE 0x10000
-> >>> > @@ -83,6 +87,7 @@ typedef struct XlnxZynqMPState {
-> >>> >      SysbusAHCIState sata;
-> >>> >      SDHCIState sdhci[XLNX_ZYNQMP_NUM_SDHCI];
-> >>> >      XilinxSPIPS spi[XLNX_ZYNQMP_NUM_SPIS];
-> >>> > +    XlnxZynqMPQSPIPS qspi;
-> >>> >      XlnxDPState dp;
-> >>> >      XlnxDPDMAState dpdma;
-> >>> >
-> >>> > --
-> >>> > 2.9.3
-> >>> >
-> >>> >
-> >
-> >
->
+This should fix it; I'll squash it into the right place in the series.
+
+diff --git i/nbd/server.c w/nbd/server.c
+index ea9fe9970f..2b617f3cd1 100644
+--- i/nbd/server.c
++++ w/nbd/server.c
+@@ -693,6 +693,7 @@ static int nbd_negotiate_options(NBDClient *client,
+uint16_t myflags,
+                 if (!tioc) {
+                     return -EIO;
+                 }
++                ret =3D 0;
+                 object_unref(OBJECT(client->ioc));
+                 client->ioc =3D QIO_CHANNEL(tioc);
+                 break;
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--qRqOMi4RFiJuiTbDV6jMKmJmFIBrDVABx
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnzSeMACgkQp6FrSiUn
+Q2oyPQf+J0DxF4PPvEyfK/oy0EIC8C1TqeLd2MJAyyPe2P8UN9oz4tRXKJTEBaVy
+AJYAi51w3yHzSRWff66Tg39MAsxq3McxofTHILiWIYKBI0urg5Ix19qMoa0pR9sR
+vSPaP2pGVGFxPT+QUDyOAm/5MEYepYeU+t3pmFOMtCg5CItLXcX5gxscXWUzJyq/
+sd/c78zJ4boC79vzl03T7G0rwbqcPIlPU9dPwgBLDpq0CCJBghZU5r2CS+n2v+D3
+w8j50wjIopz/CLFe9mOzgWn2PCNCbTLwimOKlEKC829dT+MhxQKOf71if6fXNQGV
+WeOJGwJckDgJI1+cqEkhaC+SBY8vQA==
+=nCMy
+-----END PGP SIGNATURE-----
+
+--qRqOMi4RFiJuiTbDV6jMKmJmFIBrDVABx--
