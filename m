@@ -1,35 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40057)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40044)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e8Def-0002g5-Kd
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e8Dee-0002f6-UA
 	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 19:03:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e8Dec-00040Q-7i
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 19:03:09 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:41506)
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e8DeY-0003wT-S9
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 19:03:08 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:56922
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1e8Deb-0003yi-VI
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 19:03:06 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v9RN1xrK063039
-	for <qemu-devel@nongnu.org>; Fri, 27 Oct 2017 19:03:02 -0400
-Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2dv8s5vv0w-1
+	id 1e8DeY-0003vh-Jo
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 19:03:02 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v9RMwlUk034069
+	for <qemu-devel@nongnu.org>; Fri, 27 Oct 2017 19:02:56 -0400
+Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2dv8bdnvvm-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 27 Oct 2017 19:03:01 -0400
+	for <qemu-devel@nongnu.org>; Fri, 27 Oct 2017 19:02:55 -0400
 Received: from localhost
-	by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Fri, 27 Oct 2017 19:03:00 -0400
+	Fri, 27 Oct 2017 19:02:55 -0400
 From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Fri, 27 Oct 2017 19:02:41 -0400
+Date: Fri, 27 Oct 2017 19:02:37 -0400
 In-Reply-To: <1509145361-11218-1-git-send-email-stefanb@linux.vnet.ibm.com>
 References: <1509145361-11218-1-git-send-email-stefanb@linux.vnet.ibm.com>
-Message-Id: <1509145361-11218-8-git-send-email-stefanb@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v2 7/7] tpm: extend TPM CRB with state
- migration support
+Message-Id: <1509145361-11218-4-git-send-email-stefanb@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v2 3/7] tpm: implement
+ tpm_backend_wait_cmd_completed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,133 +42,54 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: amarnath.valluri@intel.com, marcandre.lureau@gmail.com, Stefan Berger <stefanb@linux.vnet.ibm.com>
 
-We need to synchronize with the backend thread to make sure that a command
-being processed by the external TPM emulator has completed and its
-response been received. In case the bottom half did not run, we run the
-function it is supposed to run.
+Implement tpm_backend_wait_cmd_completed to synchronize with the
+backend (thread) for the completion of a command.
 
 Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
 ---
- hw/tpm/tpm_crb.c | 73 ++++++++++++++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 68 insertions(+), 5 deletions(-)
+ backends/tpm.c               | 10 ++++++++++
+ include/sysemu/tpm_backend.h |  8 ++++++++
+ 2 files changed, 18 insertions(+)
 
-diff --git a/hw/tpm/tpm_crb.c b/hw/tpm/tpm_crb.c
-index 64039eb..a81431e 100644
---- a/hw/tpm/tpm_crb.c
-+++ b/hw/tpm/tpm_crb.c
-@@ -27,6 +27,8 @@
- #include "tpm_int.h"
- #include "tpm_util.h"
- 
-+#define CRB_CTRL_CMD_SIZE (TPM_CRB_ADDR_SIZE - sizeof(struct crb_regs))
-+
- typedef struct CRBState {
-     SysBusDevice parent_obj;
- 
-@@ -36,6 +38,7 @@ typedef struct CRBState {
-     TPMBackend *tpmbe;
-     TPMBackendCmd cmd;
-     struct crb_regs regs;
-+    unsigned char buf[CRB_CTRL_CMD_SIZE];
- } CRBState;
- 
- #define CRB(obj) OBJECT_CHECK(CRBState, (obj), TYPE_TPM_CRB)
-@@ -64,8 +67,6 @@ typedef struct CRBState {
- #define CRB_INTF_IF_SELECTOR_CRB 0b1
- #define CRB_INTF_IF_SELECTOR_UNLOCKED 0b0
- 
--#define CRB_CTRL_CMD_SIZE (TPM_CRB_ADDR_SIZE - sizeof(struct crb_regs))
--
- enum crb_loc_ctrl {
-     CRB_LOC_CTRL_REQUEST_ACCESS = BIT(0),
-     CRB_LOC_CTRL_RELINQUISH = BIT(1),
-@@ -227,12 +228,17 @@ static void tpm_crb_reset(DeviceState *dev)
-     tpm_backend_startup_tpm(s->tpmbe);
+diff --git a/backends/tpm.c b/backends/tpm.c
+index 2f60166..6e26832 100644
+--- a/backends/tpm.c
++++ b/backends/tpm.c
+@@ -28,6 +28,16 @@ void tpm_backend_cmd_completed(TPMBackend *s)
+     qemu_mutex_unlock(&s->state_lock);
  }
  
-+static void _tpm_crb_request_completed(CRBState *s)
++void tpm_backend_wait_cmd_completed(TPMBackend *s)
 +{
-+    s->regs.ctrl_start &= ~CRB_START_INVOKE;
-+    /* TODO, in case of error: s->regs.ctrl_sts = CRB_CTRL_STS_ERROR */
++    qemu_mutex_lock(&s->state_lock);
++
++    if (s->tpm_busy) {
++        qemu_cond_wait(&s->cmd_complete, &s->state_lock);
++    }
++    qemu_mutex_unlock(&s->state_lock);
 +}
 +
- static void tpm_crb_request_completed(TPMIf *ti)
+ static void tpm_backend_request_completed_bh(void *opaque)
  {
-     CRBState *s = CRB(ti);
+     TPMBackend *s = TPM_BACKEND(opaque);
+diff --git a/include/sysemu/tpm_backend.h b/include/sysemu/tpm_backend.h
+index e08c51d..8c271f4 100644
+--- a/include/sysemu/tpm_backend.h
++++ b/include/sysemu/tpm_backend.h
+@@ -207,6 +207,14 @@ TPMInfo *tpm_backend_query_tpm(TPMBackend *s);
+  */
+ void tpm_backend_cmd_completed(TPMBackend *s);
  
--    s->regs.ctrl_start &= ~CRB_START_INVOKE;
--    /* TODO, in case of error: s->regs.ctrl_sts = CRB_CTRL_STS_ERROR */
-+    _tpm_crb_request_completed(s);
- }
++/**
++ * tpm_backend_wait_cmd_completed:
++ * @s: the backend
++ *
++ * Wait the backend to not be busy anymore
++ */
++void tpm_backend_wait_cmd_completed(TPMBackend *s);
++
+ TPMBackend *qemu_find_tpm_be(const char *id);
  
- static enum TPMVersion tpm_crb_get_version(TPMIf *ti)
-@@ -242,9 +248,66 @@ static enum TPMVersion tpm_crb_get_version(TPMIf *ti)
-     return tpm_backend_get_tpm_version(s->tpmbe);
- }
- 
-+/* persistent state handling */
-+
-+static int tpm_crb_pre_save(void *opaque)
-+{
-+    CRBState *s = opaque;
-+    void *mem = memory_region_get_ram_ptr(&s->cmdmem);
-+
-+    /*
-+     * Synchronize with backend completion.
-+     */
-+    tpm_backend_wait_cmd_completed(s->tpmbe);
-+
-+    if (s->regs.ctrl_start & CRB_START_INVOKE) {
-+        _tpm_crb_request_completed(s);
-+    }
-+
-+    memcpy(s->buf, mem, sizeof(s->buf));
-+
-+    return 0;
-+}
-+
-+static int tpm_crb_post_load(void *opaque,
-+                             int version_id __attribute__((unused)))
-+{
-+    CRBState *s = opaque;
-+    void *mem = memory_region_get_ram_ptr(&s->cmdmem);
-+
-+    memcpy(mem, s->buf, sizeof(s->buf));
-+
-+    return 0;
-+}
-+
- static const VMStateDescription vmstate_tpm_crb = {
-     .name = "tpm-crb",
--    .unmigratable = 1,
-+    .version_id = 1,
-+    .minimum_version_id = 0,
-+    .minimum_version_id_old = 0,
-+    .pre_save  = tpm_crb_pre_save,
-+    .post_load = tpm_crb_post_load,
-+    .fields      = (VMStateField[]) {
-+        VMSTATE_UINT32(regs.loc_state, CRBState),
-+        VMSTATE_UINT32(regs.loc_ctrl, CRBState),
-+        VMSTATE_UINT32(regs.loc_sts, CRBState),
-+        VMSTATE_UINT64(regs.intf_id, CRBState),
-+        VMSTATE_UINT64(regs.ctrl_ext, CRBState),
-+        VMSTATE_UINT32(regs.ctrl_req, CRBState),
-+        VMSTATE_UINT32(regs.ctrl_sts, CRBState),
-+        VMSTATE_UINT32(regs.ctrl_cancel, CRBState),
-+        VMSTATE_UINT32(regs.ctrl_start, CRBState),
-+        VMSTATE_UINT32(regs.ctrl_int_enable, CRBState),
-+        VMSTATE_UINT32(regs.ctrl_int_sts, CRBState),
-+        VMSTATE_UINT32(regs.ctrl_cmd_size, CRBState),
-+        VMSTATE_UINT32(regs.ctrl_cmd_pa_low, CRBState),
-+        VMSTATE_UINT32(regs.ctrl_rsp_size, CRBState),
-+        VMSTATE_UINT64(regs.ctrl_rsp_pa, CRBState),
-+
-+        VMSTATE_UINT8_ARRAY(buf, CRBState, CRB_CTRL_CMD_SIZE),
-+
-+        VMSTATE_END_OF_LIST(),
-+    }
- };
- 
- static Property tpm_crb_properties[] = {
+ void tpm_register_model(enum TpmModel model);
 -- 
 2.5.5
