@@ -1,31 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59587)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37346)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1e7uBR-0005ZX-OE
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 22:15:42 -0400
+	(envelope-from <eswierk@skyportsystems.com>) id 1e7uRK-0000Pe-P8
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 22:32:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1e7uBO-0000Ey-IZ
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 22:15:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42752)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1e7uBO-0000E2-AT
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 22:15:38 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1D41FC04AC4C
-	for <qemu-devel@nongnu.org>; Fri, 27 Oct 2017 02:15:37 +0000 (UTC)
-Date: Fri, 27 Oct 2017 03:15:30 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20171027021530.GC11576@work-vm>
-References: <20171026075222.27798-1-quintela@redhat.com>
-	<20171026075222.27798-4-quintela@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171026075222.27798-4-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 03/10] tests: Factorize out
- migrate_test_start/end
+	(envelope-from <eswierk@skyportsystems.com>) id 1e7uRF-0007Mn-S8
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 22:32:06 -0400
+Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:51866)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <eswierk@skyportsystems.com>)
+	id 1e7uRF-0007Ly-Lw
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 22:32:01 -0400
+Received: by mail-pg0-x242.google.com with SMTP id p9so4163982pgc.8
+	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 19:32:01 -0700 (PDT)
+From: Ed Swierk <eswierk@skyportsystems.com>
+Date: Thu, 26 Oct 2017 19:31:33 -0700
+Message-Id: <1509071493-82242-1-git-send-email-eswierk@skyportsystems.com>
+In-Reply-To: <5e031fcf-9f97-7d32-2e41-6868f75d284b@redhat.com>
+References: <5e031fcf-9f97-7d32-2e41-6868f75d284b@redhat.com>
+Subject: Re: [Qemu-devel] [RFC v2] e1000: Faulty tx checksum offload
+ corrupts packets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,160 +27,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
+To: Jason Wang <jasowang@redhat.com>
+Cc: Ed Swierk <eswierk@skyportsystems.com>, Dmitry Fleytman <dmitry@daynix.com>, qemu-devel@nongnu.org
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> We fix global_test users left and right
+On Mon, Oct 23, 2017 at 8:28 PM, Jason Wang <jasowang@redhat.com> wrote:
 > 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> On 2017年10月24日 08:22, Ed Swierk wrote:
+> > (Another layer of icing on the cake is that QEMU ignores the
+> > requirement that a UDP checksum computed as zero be sent as 0xffff,
+> > since zero is a special value meaning no checksum. So even when QEMU
+> > doesn't corrupt the packet data, the packet sometimes leaves the box
+> > with no checksum at all.)
+> 
+> Please submit another patch for this.
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Will do.
 
-> ---
->  tests/migration-test.c | 86 ++++++++++++++++++++++++++++----------------------
->  1 file changed, 48 insertions(+), 38 deletions(-)
+> > I have instrumented QEMU and reproduced this behavior with a Windows
+> > 10 guest, rather easily with a TCP iperf and a UDP iperf running in
+> > parallel. I have also attempted a fix, which is below in very rough
+> > form.
 > 
-> diff --git a/tests/migration-test.c b/tests/migration-test.c
-> index 19a1445076..91fb0277d6 100644
-> --- a/tests/migration-test.c
-> +++ b/tests/migration-test.c
-> @@ -301,7 +301,7 @@ static void wait_for_migration_pass(void)
->      } while (pass == initial_pass && !got_stop);
->  }
->  
-> -static void check_guests_ram(void)
-> +static void check_guests_ram(QTestState *who)
->  {
->      /* Our ASM test will have been incrementing one byte from each page from
->       * 1MB to <100MB in order.
-> @@ -316,13 +316,13 @@ static void check_guests_ram(void)
->      bool hit_edge = false;
->      bool bad = false;
->  
-> -    qtest_memread(global_qtest, start_address, &first_byte, 1);
-> +    qtest_memread(who, start_address, &first_byte, 1);
->      last_byte = first_byte;
->  
->      for (address = start_address + 4096; address < end_address; address += 4096)
->      {
->          uint8_t b;
-> -        qtest_memread(global_qtest, address, &b, 1);
-> +        qtest_memread(who, address, &b, 1);
->          if (b != last_byte) {
->              if (((b + 1) % 256) == last_byte && !hit_edge) {
->                  /* This is OK, the guest stopped at the point of
-> @@ -408,14 +408,10 @@ static void migrate(QTestState *who, const char *uri)
->      QDECREF(rsp);
->  }
->  
-> -static void test_migrate(void)
-> +static void test_migrate_start(QTestState **from, QTestState **to,
-> +                               const char *uri)
->  {
-> -    char *uri = g_strdup_printf("unix:%s/migsocket", tmpfs);
-> -    QTestState *global = global_qtest, *from, *to;
-> -    unsigned char dest_byte_a, dest_byte_b, dest_byte_c, dest_byte_d;
->      gchar *cmd_src, *cmd_dst;
-> -    QDict *rsp;
-> -
->      char *bootpath = g_strdup_printf("%s/bootsect", tmpfs);
->      const char *arch = qtest_get_arch();
->  
-> @@ -456,11 +452,51 @@ static void test_migrate(void)
->  
->      g_free(bootpath);
->  
-> -    from = qtest_start(cmd_src);
-> +    *from = qtest_start(cmd_src);
->      g_free(cmd_src);
->  
-> -    to = qtest_init(cmd_dst);
-> +    *to = qtest_init(cmd_dst);
->      g_free(cmd_dst);
-> +}
-> +
-> +static void test_migrate_end(QTestState *from, QTestState *to)
-> +{
-> +    unsigned char dest_byte_a, dest_byte_b, dest_byte_c, dest_byte_d;
-> +
-> +    qtest_quit(from);
-> +
-> +    qtest_memread(to, start_address, &dest_byte_a, 1);
-> +
-> +    /* Destination still running, wait for a byte to change */
-> +    do {
-> +        qtest_memread(to, start_address, &dest_byte_b, 1);
-> +        usleep(10 * 1000);
-> +    } while (dest_byte_a == dest_byte_b);
-> +
-> +    qtest_qmp_discard_response(to, "{ 'execute' : 'stop'}");
-> +    /* With it stopped, check nothing changes */
-> +    qtest_memread(to, start_address, &dest_byte_c, 1);
-> +    sleep(1);
-> +    qtest_memread(to, start_address, &dest_byte_d, 1);
-> +    g_assert_cmpint(dest_byte_c, ==, dest_byte_d);
-> +
-> +    check_guests_ram(to);
-> +
-> +    qtest_quit(to);
-> +
-> +    cleanup("bootsect");
-> +    cleanup("migsocket");
-> +    cleanup("src_serial");
-> +    cleanup("dest_serial");
-> +}
-> +
-> +static void test_migrate(void)
-> +{
-> +    char *uri = g_strdup_printf("unix:%s/migsocket", tmpfs);
-> +    QTestState *global = global_qtest, *from, *to;
-> +    QDict *rsp;
-> +
-> +    test_migrate_start(&from, &to, uri);
->  
->      migrate_set_capability(from, "postcopy-ram", "true");
->      migrate_set_capability(to, "postcopy-ram", "true");
-> @@ -495,36 +531,10 @@ static void test_migrate(void)
->      global_qtest = from;
->      wait_for_migration_complete();
->  
-> -    qtest_quit(from);
-> -
-> -    global_qtest = to;
-> -
-> -    qtest_memread(to, start_address, &dest_byte_a, 1);
-> -
-> -    /* Destination still running, wait for a byte to change */
-> -    do {
-> -        qtest_memread(to, start_address, &dest_byte_b, 1);
-> -        usleep(10 * 1000);
-> -    } while (dest_byte_a == dest_byte_b);
-> -
-> -    qmp_discard_response("{ 'execute' : 'stop'}");
-> -    /* With it stopped, check nothing changes */
-> -    qtest_memread(to, start_address, &dest_byte_c, 1);
-> -    sleep(1);
-> -    qtest_memread(to, start_address, &dest_byte_d, 1);
-> -    g_assert_cmpint(dest_byte_c, ==, dest_byte_d);
-> -
-> -    check_guests_ram();
-> -
-> -    qtest_quit(to);
->      g_free(uri);
-> -
->      global_qtest = global;
->  
-> -    cleanup("bootsect");
-> -    cleanup("migsocket");
-> -    cleanup("src_serial");
-> -    cleanup("dest_serial");
-> +    test_migrate_end(from, to);
->  }
->  
->  int main(int argc, char **argv)
-> -- 
-> 2.13.6
+> How do you instrument qemu? Can this be reproduced without this?
+
+I can reproduce the bug with just the patchlet below. It would be even
+better to devise a test that detects the corruption without modifying
+QEMU, as that could be used as a regression test after the bug itself
+is fixed. I'll have to ponder that.
+
+> > One puzzle is what to do about e1000e: it shares shares some data
+> > structures and a bit of code with e1000, but little else, which is
+> > surprising given how similar they are (or should be). The e1000e's
+> > handling of TCP segmentation offload and checksum offload is totally
+> > different, and problematic for other reasons (it totally ignores most
+> > of the context parameters provided by the driver and basically does
+> > what it thinks is best by digging into the packet data). Is this
+> > divergence intentional?
 > 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> Somehow, and if we can find a way to unify the codes, it would be better.
+> 
+> > Is there a reason not to change e1000e as long
+> > as I'm trying to make e1000 more datasheet-conformant?
+> 
+> Please fix them individually.
+
+I went ahead and reimplemented e1000 as a variant of e1000e. It's just
+a proof of concept, but hopefully a step towards eliminating the
+redundancy and manintaining just one codebase rather than two. Please
+see the patch series I'm sending separately.
+
+Anyway, here's how I catch the tx checksum offload bug, with a Windows
+guest running one TCP iperf and one UDP iperf simultaneously through
+the same e1000 interface.
+
+ --- a/hw/net/e1000.c
+ +++ b/hw/net/e1000.c
+ @@ -534,6 +534,30 @@ e1000_send_packet(E1000State *s, const uint8_t *buf, int size)
+  }
+  
+  static void
+ +debug_csum(struct e1000_tx *tp, uint16_t oldsum)
+ +{
+ +    e1000x_txd_props *props = &tp->props;
+ +    uint8_t proto = tp->data[14 + 9];
+ +    uint32_t sumoff = props->tucso - props->tucss;
+ +
+ +    if ((proto == 17 && sumoff != 6) ||
+ +        (proto == 6 && sumoff != 16)) {
+ +        DBGOUT(TXERR, "txsum bug! ver %d src %08x dst %08x len %d proto %d "
+ +               "cptse %d sum_needed %x oldsum %x newsum %x realsum %x\n",
+ +               tp->data[14] >> 4,
+ +               ldl_be_p(tp->data + 14 + 12),
+ +               ldl_be_p(tp->data + 14 + 16),
+ +               lduw_be_p(tp->data + 14 + 2),
+ +               proto,
+ +               props->cptse,
+ +               props->sum_needed,
+ +               oldsum,
+ +               lduw_be_p(tp->data + props->tucso),
+ +               lduw_be_p(tp->data + props->tucss + (proto == 6 ? 16 : 6)));
+ +    }
+ +}
+ +
+ +static void
+  xmit_seg(E1000State *s)
+  {
+      uint16_t len;
+ @@ -577,8 +601,10 @@ xmit_seg(E1000State *s)
+      }
+  
+      if (tp->props.sum_needed & E1000_TXD_POPTS_TXSM) {
+ +        uint16_t oldsum = lduw_be_p(tp->data + tp->props.tucso);
+          putsum(tp->data, tp->size, tp->props.tucso,
+                 tp->props.tucss, tp->props.tucse);
+ +        debug_csum(tp, oldsum);
+      }
+      if (tp->props.sum_needed & E1000_TXD_POPTS_IXSM) {
+          putsum(tp->data, tp->size, tp->props.ipcso,
+ 
