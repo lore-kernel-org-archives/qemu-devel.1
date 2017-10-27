@@ -1,31 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40902)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41671)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1e85p7-00013W-6W
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 10:41:28 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1e85qu-0002ew-Jo
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 10:43:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1e85p0-00022K-PQ
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 10:41:25 -0400
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:44967)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1e85p0-0001wE-Fe
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 10:41:18 -0400
-Received: by mail-wr0-x244.google.com with SMTP id z55so6401237wrz.1
-	for <qemu-devel@nongnu.org>; Fri, 27 Oct 2017 07:41:18 -0700 (PDT)
+	(envelope-from <dgibson@ozlabs.org>) id 1e85qq-0007XZ-DB
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 10:43:16 -0400
+Date: Fri, 27 Oct 2017 16:42:58 +0200
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20171027144258.GF7115@umbus>
+References: <20171020143852.2443-1-mdavidsaver@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CAAYMZQsM63X9LHr4AgO_nqGzJFnBHWA43+=Pfvp4s58_XDWz8Q@mail.gmail.com>
-References: <20171027055612.2488-1-frasse.iglesias@gmail.com>
-	<20171027055612.2488-14-frasse.iglesias@gmail.com>
-	<CAKmqyKPh9VXd554dGtBiMeXHvmWLZ8C7+saLJ5Bv+PFVNpqgoQ@mail.gmail.com>
-	<CAAYMZQthOPZxTQMvAQ+UgRWu8skt2sb0R3QEzQzcW2EvQXThMg@mail.gmail.com>
-	<CAKmqyKPpUwyUgMhy9e2D+uTUjBPqhZmXj+T6BnFstZZUPe0s7w@mail.gmail.com>
-	<CAAYMZQsM63X9LHr4AgO_nqGzJFnBHWA43+=Pfvp4s58_XDWz8Q@mail.gmail.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Fri, 27 Oct 2017 16:40:46 +0200
-Message-ID: <CAKmqyKNcZtpGjTOYe4siE8=H0EHyQPcz=3ZLRFP8JK_J7AdZ4A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v4 13/13] xlnx-zcu102: Add support for the
- ZynqMP QSPI
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="AH+kv8CCoFf6qPuz"
+Content-Disposition: inline
+In-Reply-To: <20171020143852.2443-1-mdavidsaver@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH] e500: ppce500_init_mpic() return device
+ instead of IRQ array
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,199 +24,169 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: francisco iglesias <frasse.iglesias@gmail.com>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Edgar Iglesias <edgari@xilinx.com>, Alistair Francis <alistai@xilinx.com>, francisco.iglesias@feimtech.se, "mar.krzeminski" <mar.krzeminski@gmail.com>
-
-On Fri, Oct 27, 2017 at 2:48 PM, francisco iglesias
-<frasse.iglesias@gmail.com> wrote:
-> Good day Alistair,
->
-> Yes exactly! The qspi aliases on the soc (named "qspi%d") targets the spi
-> busses on the qspi dev (named "spi%d"). I did it this way in hope that the
-> code resembles how we connect the SST flashes to the standard spi devices.
-> Would you like me to do this in an other way or do you possibly think the
-> approach is ok?
-
-This looks fine to me.
-
-Once you make those new line changes I mentioned:
-
-Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
-
-Alistair
+To: Michael Davidsaver <mdavidsaver@gmail.com>
+Cc: Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
 
->
-> Best regards,
-> Francisco Iglesias
->
->
-> On 27 Oct 2017 14:03, "Alistair Francis" <alistair23@gmail.com> wrote:
->
-> On Fri, Oct 27, 2017 at 11:17 AM, francisco iglesias
-> <frasse.iglesias@gmail.com> wrote:
->> Dear alistair,
->>
->> Thank you for the review comments! I will update according them in the
->> next
->> version of the patch series! About your question, I might have
->> misunderstod,
->> but isn't the alias "qspi"? (s/"qspi{0,1}"  ->  s->qspi/"spi{0,1}")
->
-> Ah! Now I think I understand. The buses on the QSPI device are still
-> labeled "spi", is that correct?
->
-> Alistair
->
->>
->> Best regards,
->> Francisco Iglesias
->>
->> On 27 Oct 2017 10:49, "Alistair Francis" <alistair23@gmail.com> wrote:
->>>
->>> On Fri, Oct 27, 2017 at 7:56 AM, Francisco Iglesias
->>> <frasse.iglesias@gmail.com> wrote:
->>> > Add support for the ZynqMP QSPI (consisting of the Generic QSPI and
->>> > Legacy
->>> > QSPI) and connect Numonyx n25q512a11 flashes to it.
->>> >
->>> > Signed-off-by: Francisco Iglesias <frasse.iglesias@gmail.com>
->>> > ---
->>> >  hw/arm/xlnx-zcu102.c         | 23 +++++++++++++++++++++++
->>> >  hw/arm/xlnx-zynqmp.c         | 24 ++++++++++++++++++++++++
->>> >  include/hw/arm/xlnx-zynqmp.h |  5 +++++
->>> >  3 files changed, 52 insertions(+)
->>> >
->>> > diff --git a/hw/arm/xlnx-zcu102.c b/hw/arm/xlnx-zcu102.c
->>> > index 519a16e..7d61972 100644
->>> > --- a/hw/arm/xlnx-zcu102.c
->>> > +++ b/hw/arm/xlnx-zcu102.c
->>> > @@ -150,6 +150,29 @@ static void xlnx_zynqmp_init(XlnxZCU102 *s,
->>> > MachineState *machine)
->>> >          sysbus_connect_irq(SYS_BUS_DEVICE(&s->soc.spi[i]), 1,
->>> > cs_line);
->>> >      }
->>> >
->>> > +    for (i = 0; i < XLNX_ZYNQMP_NUM_QSPI_FLASH; i++) {
->>> > +        SSIBus *spi_bus;
->>> > +        DeviceState *flash_dev;
->>> > +        qemu_irq cs_line;
->>> > +        DriveInfo *dinfo = drive_get_next(IF_MTD);
->>> > +        int bus = i / XLNX_ZYNQMP_NUM_QSPI_BUS_CS;
->>> > +        gchar *bus_name = g_strdup_printf("qspi%d", bus);
->>> > +
->>> > +        spi_bus = (SSIBus *)qdev_get_child_bus(DEVICE(&s->soc),
->>> > bus_name);
->>> > +        g_free(bus_name);
->>> > +
->>> > +        flash_dev = ssi_create_slave_no_init(spi_bus, "n25q512a11");
->>> > +        if (dinfo) {
->>> > +            qdev_prop_set_drive(flash_dev, "drive",
->>> > blk_by_legacy_dinfo(dinfo),
->>> > +                                &error_fatal);
->>> > +        }
->>> > +        qdev_init_nofail(flash_dev);
->>> > +
->>> > +        cs_line = qdev_get_gpio_in_named(flash_dev, SSI_GPIO_CS, 0);
->>> > +
->>> > +        sysbus_connect_irq(SYS_BUS_DEVICE(&s->soc.qspi), i + 1,
->>> > cs_line);
->>> > +    }
->>> > +
->>> >      /* TODO create and connect IDE devices for ide_drive_get() */
->>> >
->>> >      xlnx_zcu102_binfo.ram_size = ram_size;
->>> > diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
->>> > index d4b6560..f7c8b4b 100644
->>> > --- a/hw/arm/xlnx-zynqmp.c
->>> > +++ b/hw/arm/xlnx-zynqmp.c
->>> > @@ -40,6 +40,10 @@
->>> >  #define SATA_ADDR           0xFD0C0000
->>> >  #define SATA_NUM_PORTS      2
->>> >
->>> > +#define QSPI_ADDR           0xff0f0000
->>> > +#define LQSPI_ADDR          0xc0000000
->>> > +#define QSPI_IRQ            15
->>> > +
->>> >  #define DP_ADDR             0xfd4a0000
->>> >  #define DP_IRQ              113
->>> >
->>> > @@ -169,6 +173,9 @@ static void xlnx_zynqmp_init(Object *obj)
->>> >          qdev_set_parent_bus(DEVICE(&s->spi[i]), sysbus_get_default());
->>> >      }
->>> >
->>> > +    object_initialize(&s->qspi, sizeof(s->qspi),
->>> > TYPE_XLNX_ZYNQMP_QSPIPS);
->>> > +    qdev_set_parent_bus(DEVICE(&s->qspi), sysbus_get_default());
->>> > +
->>> >      object_initialize(&s->dp, sizeof(s->dp), TYPE_XLNX_DP);
->>> >      qdev_set_parent_bus(DEVICE(&s->dp), sysbus_get_default());
->>> >
->>> > @@ -405,6 +412,23 @@ static void xlnx_zynqmp_realize(DeviceState *dev,
->>> > Error **errp)
->>> >          g_free(bus_name);
->>> >      }
->>> >
->>> > +    object_property_set_bool(OBJECT(&s->qspi), true, "realized",
->>> > &err);
->>> > +    sysbus_mmio_map(SYS_BUS_DEVICE(&s->qspi), 0, QSPI_ADDR);
->>> > +    sysbus_mmio_map(SYS_BUS_DEVICE(&s->qspi), 1, LQSPI_ADDR);
->>> > +    sysbus_connect_irq(SYS_BUS_DEVICE(&s->qspi), 0,
->>> > gic_spi[QSPI_IRQ]);
->>>
->>> New line here
->>>
->>> > +    for (i = 0; i < XLNX_ZYNQMP_NUM_QSPI_BUS; i++) {
->>> > +        gchar *bus_name;
->>> > +        gchar *target_bus;
->>>
->>> New line here
->>>
->>> > +        /* Alias controller SPI bus to the SoC itself */
->>> > +        bus_name = g_strdup_printf("qspi%d", i);
->>> > +        target_bus = g_strdup_printf("spi%d", i);
->>> > +        object_property_add_alias(OBJECT(s), bus_name,
->>> > +                                  OBJECT(&s->qspi), target_bus,
->>>
->>> Why do we alias qspi to spi?
->>>
->>> Alistair
->>>
->>> > +                                  &error_abort);
->>> > +        g_free(bus_name);
->>> > +        g_free(target_bus);
->>> > +    }
->>> > +
->>> >      object_property_set_bool(OBJECT(&s->dp), true, "realized", &err);
->>> >      if (err) {
->>> >          error_propagate(errp, err);
->>> > diff --git a/include/hw/arm/xlnx-zynqmp.h
->>> > b/include/hw/arm/xlnx-zynqmp.h
->>> > index 6eff81a..3e6fb9b 100644
->>> > --- a/include/hw/arm/xlnx-zynqmp.h
->>> > +++ b/include/hw/arm/xlnx-zynqmp.h
->>> > @@ -40,6 +40,10 @@
->>> >  #define XLNX_ZYNQMP_NUM_SDHCI 2
->>> >  #define XLNX_ZYNQMP_NUM_SPIS 2
->>> >
->>> > +#define XLNX_ZYNQMP_NUM_QSPI_BUS 2
->>> > +#define XLNX_ZYNQMP_NUM_QSPI_BUS_CS 2
->>> > +#define XLNX_ZYNQMP_NUM_QSPI_FLASH 4
->>> > +
->>> >  #define XLNX_ZYNQMP_NUM_OCM_BANKS 4
->>> >  #define XLNX_ZYNQMP_OCM_RAM_0_ADDRESS 0xFFFC0000
->>> >  #define XLNX_ZYNQMP_OCM_RAM_SIZE 0x10000
->>> > @@ -83,6 +87,7 @@ typedef struct XlnxZynqMPState {
->>> >      SysbusAHCIState sata;
->>> >      SDHCIState sdhci[XLNX_ZYNQMP_NUM_SDHCI];
->>> >      XilinxSPIPS spi[XLNX_ZYNQMP_NUM_SPIS];
->>> > +    XlnxZynqMPQSPIPS qspi;
->>> >      XlnxDPState dp;
->>> >      XlnxDPDMAState dpdma;
->>> >
->>> > --
->>> > 2.9.3
->>> >
->>> >
->
->
+--AH+kv8CCoFf6qPuz
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Fri, Oct 20, 2017 at 09:38:52AM -0500, Michael Davidsaver wrote:
+> Actual number of interrupt pins isn't known
+> in ppce500_init_mpic() so a hardcoded number
+> was used, which causes a crash with older openpic.
+>=20
+> Instead, return the DeviceState* and change ppce500_init()
+> to call qdev_get_gpio_in() to get only the irq pins
+> which are needed.
+>=20
+> Signed-off-by: Michael Davidsaver <mdavidsaver@gmail.com>
+
+Applied to ppc-for-2.11.
+
+> ---
+>  hw/ppc/e500.c | 32 +++++++++++++-------------------
+>  1 file changed, 13 insertions(+), 19 deletions(-)
+>=20
+> diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
+> index b8d786c479..33adc809ba 100644
+> --- a/hw/ppc/e500.c
+> +++ b/hw/ppc/e500.c
+> @@ -729,15 +729,13 @@ static DeviceState *ppce500_init_mpic_kvm(PPCE500Pa=
+rams *params,
+>      return dev;
+>  }
+> =20
+> -static qemu_irq *ppce500_init_mpic(MachineState *machine, PPCE500Params =
+*params,
+> -                                   MemoryRegion *ccsr, qemu_irq **irqs)
+> +static DeviceState *ppce500_init_mpic(MachineState *machine,
+> +                                      PPCE500Params *params,
+> +                                      MemoryRegion *ccsr,
+> +                                      qemu_irq **irqs)
+>  {
+> -    qemu_irq *mpic;
+>      DeviceState *dev =3D NULL;
+>      SysBusDevice *s;
+> -    int i;
+> -
+> -    mpic =3D g_new0(qemu_irq, 256);
+> =20
+>      if (kvm_enabled()) {
+>          Error *err =3D NULL;
+> @@ -756,15 +754,11 @@ static qemu_irq *ppce500_init_mpic(MachineState *ma=
+chine, PPCE500Params *params,
+>          dev =3D ppce500_init_mpic_qemu(params, irqs);
+>      }
+> =20
+> -    for (i =3D 0; i < 256; i++) {
+> -        mpic[i] =3D qdev_get_gpio_in(dev, i);
+> -    }
+> -
+>      s =3D SYS_BUS_DEVICE(dev);
+>      memory_region_add_subregion(ccsr, MPC8544_MPIC_REGS_OFFSET,
+>                                  s->mmio[0].memory);
+> =20
+> -    return mpic;
+> +    return dev;
+>  }
+> =20
+>  static void ppce500_power_off(void *opaque, int line, int on)
+> @@ -796,8 +790,8 @@ void ppce500_init(MachineState *machine, PPCE500Param=
+s *params)
+>      /* irq num for pin INTA, INTB, INTC and INTD is 1, 2, 3 and
+>       * 4 respectively */
+>      unsigned int pci_irq_nrs[PCI_NUM_PINS] =3D {1, 2, 3, 4};
+> -    qemu_irq **irqs, *mpic;
+> -    DeviceState *dev;
+> +    qemu_irq **irqs;
+> +    DeviceState *dev, *mpicdev;
+>      CPUPPCState *firstenv =3D NULL;
+>      MemoryRegion *ccsr_addr_space;
+>      SysBusDevice *s;
+> @@ -866,18 +860,18 @@ void ppce500_init(MachineState *machine, PPCE500Par=
+ams *params)
+>      memory_region_add_subregion(address_space_mem, params->ccsrbar_base,
+>                                  ccsr_addr_space);
+> =20
+> -    mpic =3D ppce500_init_mpic(machine, params, ccsr_addr_space, irqs);
+> +    mpicdev =3D ppce500_init_mpic(machine, params, ccsr_addr_space, irqs=
+);
+> =20
+>      /* Serial */
+>      if (serial_hds[0]) {
+>          serial_mm_init(ccsr_addr_space, MPC8544_SERIAL0_REGS_OFFSET,
+> -                       0, mpic[42], 399193,
+> +                       0, qdev_get_gpio_in(mpicdev, 42), 399193,
+>                         serial_hds[0], DEVICE_BIG_ENDIAN);
+>      }
+> =20
+>      if (serial_hds[1]) {
+>          serial_mm_init(ccsr_addr_space, MPC8544_SERIAL1_REGS_OFFSET,
+> -                       0, mpic[42], 399193,
+> +                       0, qdev_get_gpio_in(mpicdev, 42), 399193,
+>                         serial_hds[1], DEVICE_BIG_ENDIAN);
+>      }
+> =20
+> @@ -896,7 +890,7 @@ void ppce500_init(MachineState *machine, PPCE500Param=
+s *params)
+>      qdev_init_nofail(dev);
+>      s =3D SYS_BUS_DEVICE(dev);
+>      for (i =3D 0; i < PCI_NUM_PINS; i++) {
+> -        sysbus_connect_irq(s, i, mpic[pci_irq_nrs[i]]);
+> +        sysbus_connect_irq(s, i, qdev_get_gpio_in(mpicdev, pci_irq_nrs[i=
+]));
+>      }
+> =20
+>      memory_region_add_subregion(ccsr_addr_space, MPC8544_PCI_REGS_OFFSET,
+> @@ -927,7 +921,7 @@ void ppce500_init(MachineState *machine, PPCE500Param=
+s *params)
+>          dev =3D qdev_create(NULL, "mpc8xxx_gpio");
+>          s =3D SYS_BUS_DEVICE(dev);
+>          qdev_init_nofail(dev);
+> -        sysbus_connect_irq(s, 0, mpic[MPC8XXX_GPIO_IRQ]);
+> +        sysbus_connect_irq(s, 0, qdev_get_gpio_in(mpicdev, MPC8XXX_GPIO_=
+IRQ));
+>          memory_region_add_subregion(ccsr_addr_space, MPC8XXX_GPIO_OFFSET,
+>                                      sysbus_mmio_get_region(s, 0));
+> =20
+> @@ -947,7 +941,7 @@ void ppce500_init(MachineState *machine, PPCE500Param=
+s *params)
+> =20
+>          for (i =3D 0; i < params->platform_bus_num_irqs; i++) {
+>              int irqn =3D params->platform_bus_first_irq + i;
+> -            sysbus_connect_irq(s, i, mpic[irqn]);
+> +            sysbus_connect_irq(s, i, qdev_get_gpio_in(mpicdev, irqn));
+>          }
+> =20
+>          memory_region_add_subregion(address_space_mem,
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--AH+kv8CCoFf6qPuz
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnzRfIACgkQbDjKyiDZ
+s5K5XA/8C39Io5NqmsbIsDFWuOnYCfwlVDgcaOjFqHnz4qeaVavAhDAYsHYEaW6I
+dJLU1D3O27Ns/J1LFL0JmtNaUDiPJN4ACPLojeN0hRD+iPf1h6mp4t9Js/CKbQQH
+UC+DfWzBmS0gtkSjrRoKOOE6lOXL9MAqprqInR4E6cnV0Icdb8VS5niPMR1wjtvP
+EdMqF1G+Of3gRfCRcOgcZ5aR+Zl78E9MY5etPYUYcM3F2WRb6CGekb+vSKO7eMiP
+zDUkICWxXDWubTA/YbaLXmKSrhrTKOMEM7Bs2TcWplghvIIXNMe0t5bPjL8f1e0x
+OCrXKtYe01BgD8pp5ClBIiCbAg9XqMvMJZQqDQ2LnmxwLPVv1wujkcfzp4/OezwQ
+XtuQrggwVeMHLwItGPcnhO0BDKFBzGiezSE7J+BYQNV+C4s84hkw/JryN+x2Xc5e
+THcYH9fFLmrnGK3fpe6HRnEHXNL7AWDjx9UepslWNv0ovZv950EpTpJ69EOXCvbC
+CsMKPQTmnbN29GrzaOb22kVjaJcgx3WtSQt6XqZyxcweYeok/od+teNidfO37+3c
+IUyL1lTehp/taZdf/J7qkEn9JRsca1Ex2X75ljItGr6sOj7QsJfbnpQ7ZTwUq0Ok
+Lm223DFk7ZqKwYCBmmUC/EysybU71zvRyHVqcxh5Pdoe6JjDTcQ=
+=MC2v
+-----END PGP SIGNATURE-----
+
+--AH+kv8CCoFf6qPuz--
