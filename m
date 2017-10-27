@@ -1,28 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39027)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40009)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1e8DWV-0001OO-CQ
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 18:54:44 -0400
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e8Dec-0002eV-9P
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 19:03:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1e8DWQ-0007Xd-Hk
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 18:54:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57956)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1e8DWQ-0007Ue-Bq
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 18:54:38 -0400
-References: <20171026135814.20773-1-richard.henderson@linaro.org>
-	<20171026173758.GA2334@flamenco>
-	<163ef388-2b1f-21f3-5434-286eb8f3078d@amsat.org>
-	<ffb0a910-c5e6-2aa3-4a4c-b9c0a25b1b9b@amsat.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <dc49bcea-13ee-b299-fd07-3e1eadfd9583@redhat.com>
-Date: Sat, 28 Oct 2017 00:54:28 +0200
-MIME-Version: 1.0
-In-Reply-To: <ffb0a910-c5e6-2aa3-4a4c-b9c0a25b1b9b@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] tcg: Avoid setting tcg_initialize if
- !CONFIG_TCG
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e8DeU-0003oW-4e
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 19:03:06 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:45776
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
+	id 1e8DeT-0003np-VD
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 19:02:58 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v9RMwm7c023967
+	for <qemu-devel@nongnu.org>; Fri, 27 Oct 2017 19:02:53 -0400
+Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2dvdeb986a-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 27 Oct 2017 19:02:53 -0400
+Received: from localhost
+	by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
+	Fri, 27 Oct 2017 19:02:52 -0400
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Date: Fri, 27 Oct 2017 19:02:34 -0400
+Message-Id: <1509145361-11218-1-git-send-email-stefanb@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v2 0/7] tpm: Extend TPM with state migration
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,17 +37,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, "Emilio G. Cota" <cota@braap.org>, Richard Henderson <richard.henderson@linaro.org>
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, ehabkost@redhat.com, Yang Zhong <yang.zhong@intel.com>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: amarnath.valluri@intel.com, marcandre.lureau@gmail.com, Stefan Berger <stefanb@linux.vnet.ibm.com>
 
-On 26/10/2017 21:03, Philippe Mathieu-Daud=C3=A9 wrote:
->> AFAIK the only target that is so far supposed to work with
->> --disable-tcg is i386. The configure script however lets you try to
->> build without TCG if the host has an alternative accelerator (e.g. KVM=
-),
->> but that build is likely to fail. [ just confirmed this with aarch64 ]
-> What about s390x?
+This set of patches implements support for migrating the state of the
+external 'swtpm' TPM emulator as well as that of the emulated device
+interfaces. I have primarily tested this with TPM 1.2 so far, but it
+also seems to work with TPM 2 and the CRB interface.
 
-s390x and ppc64 supposedly support --disable-tcg?
+This series applies on top of Marc-Andre's patch set with all 42 patches
+applied (21 of them have been applied).
 
-Paolo
+One of the challenges that is addressed by this set of patches is the fact
+that the TPM emulator may be processing a command while the state
+serialization of the devices is supposed to happen. A necessary first step
+has been implemented here that ensures that a response has been received
+from the exernal emulator and the bottom half function, which delivers the
+response and adjusts device registers (TIS or CRB), has been executed,
+before the device's state is serialized.
+
+A subsequent extension may need to address the live migration loop and delay
+the serialization of devices until the response from the external TPM has
+been received. Though the likelihood that someone executes a long-lasting
+TPM command while this is occurring is certainly rare.
+
+   Stefan
+
+Stefan Berger (7):
+  tpm: Introduce condition to notify waiters of completed command
+  tpm: Introduce condition in TPM backend for notification
+  tpm: implement tpm_backend_wait_cmd_completed
+  tpm: Implement tpm_sized_buffer_reset
+  tpm: extend TPM emulator with state migration support
+  tpm: extend TPM TIS with state migration support
+  tpm: extend TPM CRB with state migration support
+
+ backends/tpm.c               |  29 ++++
+ hw/tpm/tpm_crb.c             |  73 +++++++++-
+ hw/tpm/tpm_emulator.c        | 309 +++++++++++++++++++++++++++++++++++++++++--
+ hw/tpm/tpm_tis.c             | 151 +++++++++++++++++++--
+ hw/tpm/tpm_util.c            |   7 +
+ hw/tpm/tpm_util.h            |   7 +
+ include/sysemu/tpm_backend.h |  22 +++
+ 7 files changed, 572 insertions(+), 26 deletions(-)
+
+-- 
+2.5.5
