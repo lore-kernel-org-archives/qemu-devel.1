@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56249)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58466)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1e80Kb-0001Xv-A8
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 04:49:34 -0400
+	(envelope-from <berrange@redhat.com>) id 1e80Qq-0002cL-3y
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 04:56:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1e80Ka-00016f-8Q
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 04:49:33 -0400
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:51049)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1e80KZ-000168-VD
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 04:49:32 -0400
-Received: by mail-wr0-x244.google.com with SMTP id p96so5483664wrb.7
-	for <qemu-devel@nongnu.org>; Fri, 27 Oct 2017 01:49:31 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20171027055612.2488-14-frasse.iglesias@gmail.com>
-References: <20171027055612.2488-1-frasse.iglesias@gmail.com>
-	<20171027055612.2488-14-frasse.iglesias@gmail.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Fri, 27 Oct 2017 10:49:00 +0200
-Message-ID: <CAKmqyKPh9VXd554dGtBiMeXHvmWLZ8C7+saLJ5Bv+PFVNpqgoQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v4 13/13] xlnx-zcu102: Add support for the
- ZynqMP QSPI
+	(envelope-from <berrange@redhat.com>) id 1e80Ql-00087U-4B
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 04:56:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60262)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1e80Qk-00083Y-SD
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 04:55:55 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6A95FA7E5
+	for <qemu-devel@nongnu.org>; Fri, 27 Oct 2017 08:55:53 +0000 (UTC)
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Date: Fri, 27 Oct 2017 09:55:48 +0100
+Message-Id: <20171027085548.3472-1-berrange@redhat.com>
+Subject: [Qemu-devel] [PATCH] net: detect errors from probing vnet hdr flag
+ for TAP devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,139 +28,197 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Francisco Iglesias <frasse.iglesias@gmail.com>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Edgar Iglesias <edgari@xilinx.com>, Alistair Francis <alistai@xilinx.com>, francisco.iglesias@feimtech.se, "mar.krzeminski" <mar.krzeminski@gmail.com>
+To: qemu-devel@nongnu.org
+Cc: "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Jason Wang <jasowang@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-On Fri, Oct 27, 2017 at 7:56 AM, Francisco Iglesias
-<frasse.iglesias@gmail.com> wrote:
-> Add support for the ZynqMP QSPI (consisting of the Generic QSPI and Legacy
-> QSPI) and connect Numonyx n25q512a11 flashes to it.
->
-> Signed-off-by: Francisco Iglesias <frasse.iglesias@gmail.com>
-> ---
->  hw/arm/xlnx-zcu102.c         | 23 +++++++++++++++++++++++
->  hw/arm/xlnx-zynqmp.c         | 24 ++++++++++++++++++++++++
->  include/hw/arm/xlnx-zynqmp.h |  5 +++++
->  3 files changed, 52 insertions(+)
->
-> diff --git a/hw/arm/xlnx-zcu102.c b/hw/arm/xlnx-zcu102.c
-> index 519a16e..7d61972 100644
-> --- a/hw/arm/xlnx-zcu102.c
-> +++ b/hw/arm/xlnx-zcu102.c
-> @@ -150,6 +150,29 @@ static void xlnx_zynqmp_init(XlnxZCU102 *s, MachineState *machine)
->          sysbus_connect_irq(SYS_BUS_DEVICE(&s->soc.spi[i]), 1, cs_line);
->      }
->
-> +    for (i = 0; i < XLNX_ZYNQMP_NUM_QSPI_FLASH; i++) {
-> +        SSIBus *spi_bus;
-> +        DeviceState *flash_dev;
-> +        qemu_irq cs_line;
-> +        DriveInfo *dinfo = drive_get_next(IF_MTD);
-> +        int bus = i / XLNX_ZYNQMP_NUM_QSPI_BUS_CS;
-> +        gchar *bus_name = g_strdup_printf("qspi%d", bus);
-> +
-> +        spi_bus = (SSIBus *)qdev_get_child_bus(DEVICE(&s->soc), bus_name);
-> +        g_free(bus_name);
-> +
-> +        flash_dev = ssi_create_slave_no_init(spi_bus, "n25q512a11");
-> +        if (dinfo) {
-> +            qdev_prop_set_drive(flash_dev, "drive", blk_by_legacy_dinfo(dinfo),
-> +                                &error_fatal);
-> +        }
-> +        qdev_init_nofail(flash_dev);
-> +
-> +        cs_line = qdev_get_gpio_in_named(flash_dev, SSI_GPIO_CS, 0);
-> +
-> +        sysbus_connect_irq(SYS_BUS_DEVICE(&s->soc.qspi), i + 1, cs_line);
-> +    }
-> +
->      /* TODO create and connect IDE devices for ide_drive_get() */
->
->      xlnx_zcu102_binfo.ram_size = ram_size;
-> diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
-> index d4b6560..f7c8b4b 100644
-> --- a/hw/arm/xlnx-zynqmp.c
-> +++ b/hw/arm/xlnx-zynqmp.c
-> @@ -40,6 +40,10 @@
->  #define SATA_ADDR           0xFD0C0000
->  #define SATA_NUM_PORTS      2
->
-> +#define QSPI_ADDR           0xff0f0000
-> +#define LQSPI_ADDR          0xc0000000
-> +#define QSPI_IRQ            15
-> +
->  #define DP_ADDR             0xfd4a0000
->  #define DP_IRQ              113
->
-> @@ -169,6 +173,9 @@ static void xlnx_zynqmp_init(Object *obj)
->          qdev_set_parent_bus(DEVICE(&s->spi[i]), sysbus_get_default());
->      }
->
-> +    object_initialize(&s->qspi, sizeof(s->qspi), TYPE_XLNX_ZYNQMP_QSPIPS);
-> +    qdev_set_parent_bus(DEVICE(&s->qspi), sysbus_get_default());
-> +
->      object_initialize(&s->dp, sizeof(s->dp), TYPE_XLNX_DP);
->      qdev_set_parent_bus(DEVICE(&s->dp), sysbus_get_default());
->
-> @@ -405,6 +412,23 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
->          g_free(bus_name);
->      }
->
-> +    object_property_set_bool(OBJECT(&s->qspi), true, "realized", &err);
-> +    sysbus_mmio_map(SYS_BUS_DEVICE(&s->qspi), 0, QSPI_ADDR);
-> +    sysbus_mmio_map(SYS_BUS_DEVICE(&s->qspi), 1, LQSPI_ADDR);
-> +    sysbus_connect_irq(SYS_BUS_DEVICE(&s->qspi), 0, gic_spi[QSPI_IRQ]);
+When QEMU sets up a tap based network device backend, it mostly ignores errors
+reported from various ioctl() calls it makes, assuming the TAP file descriptor
+is valid. This assumption can easily be violated when the user is passing in a
+pre-opened file descriptor. At best, the ioctls may fail with a -EBADF, but if
+the user passes in a bogus FD number that happens to clash with a FD number that
+QEMU has opened internally for another reason, a wide variety of errnos may
+result, as the TUNGETIFF ioctl number may map to a completely different command
+on a different type of file.
 
-New line here
+By ignoring all these errors, QEMU sets up a zombie network backend that will
+never pass any data. Even worse, when QEMU shuts down, or that network backend
+is hot-removed, it will close this bogus file descriptor, which could belong to
+another QEMU device backend.
 
-> +    for (i = 0; i < XLNX_ZYNQMP_NUM_QSPI_BUS; i++) {
-> +        gchar *bus_name;
-> +        gchar *target_bus;
+There's no obvious guaranteed reliable way to detect that a FD genuinely is a
+TAP device, as opposed to a UNIX socket, or pipe, or something else. Checking
+the errno from probing vnet hdr flag though, does catch the big common cases.
+ie calling TUNGETIFF will return EBADF for an invalid FD, and ENOTTY when FD is
+a UNIX socket, or pipe which catches accidental collisions with FDs used for
+stdio, or monitor socket.
 
-New line here
+Previously the example below where bogus fd 9 collides with the FD used for the
+chardev saw:
 
-> +        /* Alias controller SPI bus to the SoC itself */
-> +        bus_name = g_strdup_printf("qspi%d", i);
-> +        target_bus = g_strdup_printf("spi%d", i);
-> +        object_property_add_alias(OBJECT(s), bus_name,
-> +                                  OBJECT(&s->qspi), target_bus,
+$ ./x86_64-softmmu/qemu-system-x86_64 -netdev tap,id=hostnet0,fd=9 \
+  -chardev socket,id=charchannel0,path=/tmp/qga,server,nowait \
+  -monitor stdio -vnc :0
+qemu-system-x86_64: -netdev tap,id=hostnet0,fd=9: TUNGETIFF ioctl() failed: Inappropriate ioctl for device
+TUNSETOFFLOAD ioctl() failed: Bad address
+QEMU 2.9.1 monitor - type 'help' for more information
+(qemu) Warning: netdev hostnet0 has no peer
 
-Why do we alias qspi to spi?
+which gives a running QEMU with a zombie network backend.
 
-Alistair
+With this change applied we get an error message and QEMU immediately exits
+before carrying on and making a bigger disaster:
 
-> +                                  &error_abort);
-> +        g_free(bus_name);
-> +        g_free(target_bus);
-> +    }
-> +
->      object_property_set_bool(OBJECT(&s->dp), true, "realized", &err);
->      if (err) {
->          error_propagate(errp, err);
-> diff --git a/include/hw/arm/xlnx-zynqmp.h b/include/hw/arm/xlnx-zynqmp.h
-> index 6eff81a..3e6fb9b 100644
-> --- a/include/hw/arm/xlnx-zynqmp.h
-> +++ b/include/hw/arm/xlnx-zynqmp.h
-> @@ -40,6 +40,10 @@
->  #define XLNX_ZYNQMP_NUM_SDHCI 2
->  #define XLNX_ZYNQMP_NUM_SPIS 2
->
-> +#define XLNX_ZYNQMP_NUM_QSPI_BUS 2
-> +#define XLNX_ZYNQMP_NUM_QSPI_BUS_CS 2
-> +#define XLNX_ZYNQMP_NUM_QSPI_FLASH 4
-> +
->  #define XLNX_ZYNQMP_NUM_OCM_BANKS 4
->  #define XLNX_ZYNQMP_OCM_RAM_0_ADDRESS 0xFFFC0000
->  #define XLNX_ZYNQMP_OCM_RAM_SIZE 0x10000
-> @@ -83,6 +87,7 @@ typedef struct XlnxZynqMPState {
->      SysbusAHCIState sata;
->      SDHCIState sdhci[XLNX_ZYNQMP_NUM_SDHCI];
->      XilinxSPIPS spi[XLNX_ZYNQMP_NUM_SPIS];
-> +    XlnxZynqMPQSPIPS qspi;
->      XlnxDPState dp;
->      XlnxDPDMAState dpdma;
->
-> --
-> 2.9.3
->
->
+$ ./x86_64-softmmu/qemu-system-x86_64 -netdev tap,id=hostnet0,fd=9 \
+  -chardev socket,id=charchannel0,path=/tmp/qga,server,nowait \
+  -monitor stdio -vnc :0
+qemu-system-x86_64: -netdev tap,id=hostnet0,vhost=on,fd=9: Unable to query TUNGETIFF on FD 9: Inappropriate ioctl for device
+
+Reported-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+---
+ net/tap-bsd.c     |  2 +-
+ net/tap-linux.c   | 12 +++++++++---
+ net/tap-solaris.c |  2 +-
+ net/tap-stub.c    |  2 +-
+ net/tap.c         | 25 ++++++++++++++++++++-----
+ net/tap_int.h     |  2 +-
+ 6 files changed, 33 insertions(+), 12 deletions(-)
+
+diff --git a/net/tap-bsd.c b/net/tap-bsd.c
+index 6c9692263d..4f1d633b08 100644
+--- a/net/tap-bsd.c
++++ b/net/tap-bsd.c
+@@ -211,7 +211,7 @@ void tap_set_sndbuf(int fd, const NetdevTapOptions *tap, Error **errp)
+ {
+ }
+ 
+-int tap_probe_vnet_hdr(int fd)
++int tap_probe_vnet_hdr(int fd, Error **errp)
+ {
+     return 0;
+ }
+diff --git a/net/tap-linux.c b/net/tap-linux.c
+index 535b1ddb61..de74928407 100644
+--- a/net/tap-linux.c
++++ b/net/tap-linux.c
+@@ -147,13 +147,19 @@ void tap_set_sndbuf(int fd, const NetdevTapOptions *tap, Error **errp)
+     }
+ }
+ 
+-int tap_probe_vnet_hdr(int fd)
++int tap_probe_vnet_hdr(int fd, Error **errp)
+ {
+     struct ifreq ifr;
+ 
+     if (ioctl(fd, TUNGETIFF, &ifr) != 0) {
+-        error_report("TUNGETIFF ioctl() failed: %s", strerror(errno));
+-        return 0;
++        /* Kernel pre-dates TUNGETIFF support */
++        if (errno == -EINVAL) {
++            return 0;
++        } else {
++            error_setg_errno(errp, errno,
++                             "Unable to query TUNGETIFF on FD %d", fd);
++            return -1;
++        }
+     }
+ 
+     return ifr.ifr_flags & IFF_VNET_HDR;
+diff --git a/net/tap-solaris.c b/net/tap-solaris.c
+index a2a92356c1..3437838a92 100644
+--- a/net/tap-solaris.c
++++ b/net/tap-solaris.c
+@@ -206,7 +206,7 @@ void tap_set_sndbuf(int fd, const NetdevTapOptions *tap, Error **errp)
+ {
+ }
+ 
+-int tap_probe_vnet_hdr(int fd)
++int tap_probe_vnet_hdr(int fd, Error **errp)
+ {
+     return 0;
+ }
+diff --git a/net/tap-stub.c b/net/tap-stub.c
+index a9ab8f8293..de525a2e69 100644
+--- a/net/tap-stub.c
++++ b/net/tap-stub.c
+@@ -37,7 +37,7 @@ void tap_set_sndbuf(int fd, const NetdevTapOptions *tap, Error **errp)
+ {
+ }
+ 
+-int tap_probe_vnet_hdr(int fd)
++int tap_probe_vnet_hdr(int fd, Error **errp)
+ {
+     return 0;
+ }
+diff --git a/net/tap.c b/net/tap.c
+index 979e622e60..763fd2d9b2 100644
+--- a/net/tap.c
++++ b/net/tap.c
+@@ -592,7 +592,11 @@ int net_init_bridge(const Netdev *netdev, const char *name,
+     }
+ 
+     fcntl(fd, F_SETFL, O_NONBLOCK);
+-    vnet_hdr = tap_probe_vnet_hdr(fd);
++    vnet_hdr = tap_probe_vnet_hdr(fd, errp);
++    if (vnet_hdr < 0) {
++        close(fd);
++        return -1;
++    }
+     s = net_tap_fd_init(peer, "bridge", name, fd, vnet_hdr);
+ 
+     snprintf(s->nc.info_str, sizeof(s->nc.info_str), "helper=%s,br=%s", helper,
+@@ -779,7 +783,11 @@ int net_init_tap(const Netdev *netdev, const char *name,
+ 
+         fcntl(fd, F_SETFL, O_NONBLOCK);
+ 
+-        vnet_hdr = tap_probe_vnet_hdr(fd);
++        vnet_hdr = tap_probe_vnet_hdr(fd, errp);
++        if (vnet_hdr < 0) {
++            close(fd);
++            return -1;
++        }
+ 
+         net_init_tap_one(tap, peer, "tap", name, NULL,
+                          script, downscript,
+@@ -825,8 +833,11 @@ int net_init_tap(const Netdev *netdev, const char *name,
+             fcntl(fd, F_SETFL, O_NONBLOCK);
+ 
+             if (i == 0) {
+-                vnet_hdr = tap_probe_vnet_hdr(fd);
+-            } else if (vnet_hdr != tap_probe_vnet_hdr(fd)) {
++                vnet_hdr = tap_probe_vnet_hdr(fd, errp);
++                if (vnet_hdr < 0) {
++                    goto free_fail;
++                }
++            } else if (vnet_hdr != tap_probe_vnet_hdr(fd, NULL)) {
+                 error_setg(errp,
+                            "vnet_hdr not consistent across given tap fds");
+                 goto free_fail;
+@@ -870,7 +881,11 @@ free_fail:
+         }
+ 
+         fcntl(fd, F_SETFL, O_NONBLOCK);
+-        vnet_hdr = tap_probe_vnet_hdr(fd);
++        vnet_hdr = tap_probe_vnet_hdr(fd, errp);
++        if (vnet_hdr < 0) {
++            close(fd);
++            return -1;
++        }
+ 
+         net_init_tap_one(tap, peer, "bridge", name, ifname,
+                          script, downscript, vhostfdname,
+diff --git a/net/tap_int.h b/net/tap_int.h
+index ae6888f74a..0d13768615 100644
+--- a/net/tap_int.h
++++ b/net/tap_int.h
+@@ -35,7 +35,7 @@ int tap_open(char *ifname, int ifname_size, int *vnet_hdr,
+ ssize_t tap_read_packet(int tapfd, uint8_t *buf, int maxlen);
+ 
+ void tap_set_sndbuf(int fd, const NetdevTapOptions *tap, Error **errp);
+-int tap_probe_vnet_hdr(int fd);
++int tap_probe_vnet_hdr(int fd, Error **errp);
+ int tap_probe_vnet_hdr_len(int fd, int len);
+ int tap_probe_has_ufo(int fd);
+ void tap_fd_set_offload(int fd, int csum, int tso4, int tso6, int ecn, int ufo);
+-- 
+2.13.6
