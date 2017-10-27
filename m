@@ -1,16 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49036)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53200)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gabriel291075@gmail.com>) id 1e87V5-0006uC-44
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 12:28:54 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1e87ii-0004JS-TX
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 12:42:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gabriel291075@gmail.com>) id 1e87V3-0003Ac-O1
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 12:28:51 -0400
-From: Gabriel Costa <gabriel291075@gmail.com>
-Date: Fri, 27 Oct 2017 08:24:15 -0400
-Message-Id: <1509107055-21978-6-git-send-email-costa@advantech.ca>
-In-Reply-To: <1509107055-21978-1-git-send-email-costa@advantech.ca>
-References: <1509107055-21978-1-git-send-email-costa@advantech.ca>
-Subject: [Qemu-devel]  [PATCH v7 5/5] arm: kinetis_mk64fn1m0 machine
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1e87id-0000bA-Va
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 12:42:56 -0400
+Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:51099)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1e87id-0000aR-RG
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 12:42:51 -0400
+Received: by mail-qt0-x241.google.com with SMTP id d9so9153707qtd.7
+	for <qemu-devel@nongnu.org>; Fri, 27 Oct 2017 09:42:51 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1508947167-5304-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <de8125f4-fb99-1f9e-f7a8-7f1f9c4f0b5a@amsat.org>
+Date: Fri, 27 Oct 2017 13:42:43 -0300
+MIME-Version: 1.0
+In-Reply-To: <1508947167-5304-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCHv4 00/13] sun4m: sparc32_dma tidy-ups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,181 +34,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-arm@nongnu.org, peter.maydell@linaro.org, f4bug@amsat.org, Gabriel Augusto Costa <gabriel291075@gmail.com>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, atar4qemu@gmail.com
 
-This Patch include mk64fn1m0.c that describe the kinetis k64 machine and
-some peripherals.
-Also, include changes in Makefile.objs and arm-softmmu.mak to compile
-this machine.
+Hi Mark,
 
-Signed-off-by: Gabriel Augusto Costa <gabriel291075@gmail.com>
----
- default-configs/arm-softmmu.mak |   1 +
- hw/arm/Makefile.objs            |   1 +
- hw/arm/mk64fn1m0.c              | 136 ++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 138 insertions(+)
- create mode 100644 hw/arm/mk64fn1m0.c
+On 10/25/2017 12:59 PM, Mark Cave-Ayland wrote:
+> This patchset aims to tidy-up the sparc32_dma code by improving the
+> modelling of the espdma/ledma devices using both QOM and the memory
+> API which didn't exist when the code was first written.
+> 
+> The result is that it is now possible to remove both the iommu_opaque
+> and is_ledma workarounds from the code, and the code for wiring up
+> the espdma/ledma and respective devices is also a lot more readable.
+> 
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
-index 5059d13..a835d4f 100644
---- a/default-configs/arm-softmmu.mak
-+++ b/default-configs/arm-softmmu.mak
-@@ -130,3 +130,4 @@ CONFIG_SMBIOS=y
- CONFIG_ASPEED_SOC=y
- CONFIG_GPIO_KEY=y
- CONFIG_MSF2=y
-+CONFIG_KINETIS_K64=y
-diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
-index 2794e08..874a38a 100644
---- a/hw/arm/Makefile.objs
-+++ b/hw/arm/Makefile.objs
-@@ -20,3 +20,4 @@ obj-$(CONFIG_FSL_IMX6) += fsl-imx6.o sabrelite.o
- obj-$(CONFIG_ASPEED_SOC) += aspeed_soc.o aspeed.o
- obj-$(CONFIG_MPS2) += mps2.o
- obj-$(CONFIG_MSF2) += msf2-soc.o msf2-som.o
-+obj-$(CONFIG_KINETIS_K64) += mk64fn1m0.o
-diff --git a/hw/arm/mk64fn1m0.c b/hw/arm/mk64fn1m0.c
-new file mode 100644
-index 0000000..618791c
---- /dev/null
-+++ b/hw/arm/mk64fn1m0.c
-@@ -0,0 +1,136 @@
-+/*
-+ * Kinetis K64 MK64FN1M0 microcontroller emulation.
-+ *
-+ * Copyright (c) 2017 Advantech Wireless
-+ * Written by Gabriel Costa <gabriel291075@gmail.com>
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License version 2 or
-+ *  (at your option) any later version.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+#include "hw/sysbus.h"
-+#include "hw/ssi/ssi.h"
-+#include "hw/arm/arm.h"
-+#include "hw/devices.h"
-+#include "qemu/timer.h"
-+#include "hw/i2c/i2c.h"
-+#include "net/net.h"
-+#include "hw/boards.h"
-+#include "qemu/log.h"
-+#include "exec/address-spaces.h"
-+#include "sysemu/sysemu.h"
-+#include "hw/char/pl011.h"
-+#include "hw/misc/unimp.h"
-+#include "cpu.h"
-+#include "hw/char/kinetis_k64_uart.h"
-+#include "hw/misc/kinetis_k64_system.h"
-+#include "hw/misc/kinetis_k64_mcg.h"
-+#include "hw/misc/kinetis_k64_pmux.h"
-+
-+#define FLASH_SIZE              (1024 * 1024)
-+#define FLASH_BASE_ADDRESS      (0x00000000)
-+#define SRAM_SIZE               (192 * 1024)
-+#define SRAM_BASE_ADDRESS       (0x20000000)
-+
-+#define NUM_IRQ_LINES 85
-+
-+/* System controller.  */
-+
-+static void do_sys_reset(void *opaque, int n, int level)
-+{
-+    if (level) {
-+        qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
-+    }
-+}
-+
-+/* Interruptions at pag.77 of K64P144M120F5RM.pdf */
-+
-+static void mk64fn1m0_init_mach(MachineState *ms, const char *kernel_filename)
-+{
-+    DeviceState *nvic;
-+
-+    MemoryRegion *system_memory = get_system_memory();
-+    MemoryRegion *sram = g_new(MemoryRegion, 1);
-+    MemoryRegion *flash = g_new(MemoryRegion, 1);
-+
-+    memory_region_init_ram(flash, NULL, "k64.flash", FLASH_SIZE, &error_fatal);
-+    memory_region_set_readonly(flash, true);
-+    memory_region_add_subregion(system_memory, FLASH_BASE_ADDRESS, flash);
-+    memory_region_init_ram(sram, NULL, "k64.sram", SRAM_SIZE, &error_fatal);
-+    memory_region_add_subregion(system_memory, SRAM_BASE_ADDRESS, sram);
-+    nvic = armv7m_init(system_memory, FLASH_SIZE, NUM_IRQ_LINES,
-+            ms->kernel_filename, ms->cpu_type);
-+    qdev_connect_gpio_out_named(nvic, "SYSRESETREQ", 0,
-+            qemu_allocate_irq(&do_sys_reset, NULL, 0));
-+
-+    sysbus_create_simple(TYPE_KINETIS_K64_SIM, 0x40048000, NULL);
-+    sysbus_create_simple(TYPE_KINETIS_K64_MCG, 0x40064000, NULL);
-+    sysbus_create_simple(TYPE_KINETIS_K64_PMUX, 0x40049000,
-+            qdev_get_gpio_in(nvic, 59));
-+    sysbus_create_simple(TYPE_KINETIS_K64_PMUX, 0x4004A000,
-+            qdev_get_gpio_in(nvic, 60));
-+    sysbus_create_simple(TYPE_KINETIS_K64_PMUX, 0x4004B000,
-+            qdev_get_gpio_in(nvic, 61));
-+    sysbus_create_simple(TYPE_KINETIS_K64_PMUX, 0x4004C000,
-+            qdev_get_gpio_in(nvic, 62));
-+    sysbus_create_simple(TYPE_KINETIS_K64_PMUX, 0x4004D000,
-+            qdev_get_gpio_in(nvic, 63));
-+    create_unimplemented_device("kinetis_k64_spi0",  0x4002C000, 0x1000);
-+    create_unimplemented_device("kinetis_k64_spi1",  0x4002D000, 0x1000);
-+    create_unimplemented_device("kinetis_k64_adc0",  0x4003B000, 0x1000);
-+    create_unimplemented_device("kinetis_k64_dac",   0x4002F000, 0x1000);
-+    create_unimplemented_device("kinetis_k64_i2c0",  0x40066000, 0x1000);
-+    create_unimplemented_device("kinetis_k64_i2c1",  0x40067000, 0x1000);
-+    kinetis_k64_uart_create(0x4006A000, qdev_get_gpio_in(nvic, 31),
-+            serial_hds[0]);
-+    create_unimplemented_device("kinetis_k64_uart1", 0x4006B000, 0x1000);
-+    create_unimplemented_device("kinetis_k64_uart2", 0x4006C000, 0x1000);
-+    create_unimplemented_device("kinetis_k64_uart3", 0x4006D000, 0x1000);
-+    create_unimplemented_device("kinetis_k64_spi2",  0x400AC000, 0x1000);
-+    create_unimplemented_device("kinetis_k64_adc1",  0x400BB000, 0x1000);
-+    create_unimplemented_device("kinetis_k64_i2c2",  0x400E6000, 0x1000);
-+    create_unimplemented_device("kinetis_k64_uart4", 0x400EA000, 0x1000);
-+    create_unimplemented_device("kinetis_k64_uart5", 0x400EB000, 0x1000);
-+    create_unimplemented_device("peripheral_brdg_0", 0x40000000, 0x1000);
-+    create_unimplemented_device("Crossbar_Switch",   0x40004000, 0x1000);
-+    create_unimplemented_device("DMA_Controller",    0x40008000, 0x1000);
-+    create_unimplemented_device("DMA_Controller_t",  0x40009000, 0x1000);
-+    create_unimplemented_device("FlexBus",           0x4000C000, 0x1000);
-+    create_unimplemented_device("MPU",               0x4000D000, 0x1000);
-+    create_unimplemented_device("Flash_mem_ctrl",    0x4001F000, 0x1000);
-+    create_unimplemented_device("Flash_mem",         0x40020000, 0x1000);
-+    create_unimplemented_device("DMA_ch_multiplx",   0x40021000, 0x1000);
-+}
-+
-+static void mk64fn1m0_init(MachineState *machine)
-+{
-+    const char *kernel_filename = machine->kernel_filename;
-+    mk64fn1m0_init_mach(machine, kernel_filename);
-+}
-+
-+static void mk64fn1m0_class_init(ObjectClass *oc, void *data)
-+{
-+    MachineClass *mc = MACHINE_CLASS(oc);
-+
-+    mc->desc = "Kinetis K64 MCU (Cortex-M4)";
-+    mc->init = mk64fn1m0_init;
-+    mc->ignore_memory_transaction_failures = true;
-+    mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-m4");
-+    mc->max_cpus = 1;
-+}
-+
-+static const TypeInfo mk64_type = {
-+    .name = MACHINE_TYPE_NAME("mk64fn1m0"),
-+    .parent = TYPE_MACHINE,
-+    .class_init = mk64fn1m0_class_init,
-+};
-+
-+static void mk64fn1m0_machine_init(void)
-+{
-+    type_register_static(&mk64_type);
-+}
-+
-+type_init(mk64fn1m0_machine_init)
--- 
-2.1.4
+The whole series:
+
+Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
+If you don't accept my comments (or don't have time) about keeping
+"hw/sparc/sparc32_dma.h" generic and moving network/scsi parts in
+"hw/sparc/sun4m.h" you can still add to your series:
+
+Acked-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
+Also while testing your series on a Debian image, I noted your series
+results faster, I timed:
+
+master: 104s
+your series: 85s (>20% faster!)
+
+Regards,
+
+Phil.
+
+> 
+> v4:
+> - Rebase onto git master
+> - Update patch 9 to move lance QOM macros/SysBusPCNetState from sun4m.h to lance.h as suggested by Peter
+> - Add Reviewed-by from Peter for patch 7
+> 
+> v3:
+> - Add missing sysbus.h include to esp.h in patch 7
+> 
+> v2:
+> - Make esp/lance devices children of espdma/ledma devices respectively
+> - Add len parameter to ledma/espdma tracepoints
+> 
+> 
+> Mark Cave-Ayland (13):
+>   sparc32_dma: rename SPARC32_DMA type to SPARC32_DMA_DEVICE
+>   sparc32_dma: split esp and le into separate DMA devices
+>   sparc32_dma: move type declarations from sparc32_dma.c to
+>     sparc32_dma.h
+>   sun4m: move DMA device wiring from sparc32_dma_init() to
+>     sun4m_hw_init()
+>   sun4m_iommu: move TYPE_SUN4M_IOMMU declaration to sun4m.h
+>   sparc32_dma: use object link instead of qdev property to pass IOMMU
+>     reference
+>   esp: move TYPE_ESP and SysBusESPState from esp.c to esp.h
+>   sparc32_dma: make esp device child of espdma device
+>   lance: move TYPE_LANCE and SysBusPCNetState from lance.c to lance.h
+>   sparc32_dma: make lance device child of ledma device
+>   sparc32_dma: introduce new SPARC32_DMA type container object
+>   sparc32_dma: remove is_ledma hack and replace with memory region
+>     alias
+>   sparc32_dma: add len to esp/le DMA memory tracing
+> 
+>  hw/dma/sparc32_dma.c           |  235 +++++++++++++++++++++++++++++-----------
+>  hw/dma/sun4m_iommu.c           |   14 ---
+>  hw/dma/trace-events            |    8 +-
+>  hw/net/lance.c                 |   11 +-
+>  hw/scsi/esp.c                  |   13 ---
+>  hw/sparc/sun4m.c               |   82 ++++++--------
+>  include/hw/net/lance.h         |   41 +++++++
+>  include/hw/scsi/esp.h          |   14 +++
+>  include/hw/sparc/sparc32_dma.h |   55 ++++++++++
+>  include/hw/sparc/sun4m.h       |   16 +++
+>  10 files changed, 336 insertions(+), 153 deletions(-)
+>  create mode 100644 include/hw/net/lance.h
+> 
