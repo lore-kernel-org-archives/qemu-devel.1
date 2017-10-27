@@ -1,30 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50366)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50853)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=466efc5b4=Ian.Jackson@citrix.com>)
-	id 1e81hQ-0003kv-9D
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 06:17:13 -0400
+	(envelope-from <jcody@redhat.com>) id 1e81is-0004oH-Ur
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 06:18:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=466efc5b4=Ian.Jackson@citrix.com>)
-	id 1e81hM-0004rW-4v
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 06:17:12 -0400
-Received: from smtp02.citrix.com ([66.165.176.63]:33113)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=466efc5b4=Ian.Jackson@citrix.com>)
-	id 1e81hL-0004q4-UF
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 06:17:08 -0400
-From: Ian Jackson <ian.jackson@eu.citrix.com>
+	(envelope-from <jcody@redhat.com>) id 1e81is-0007lI-1r
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 06:18:42 -0400
+Date: Fri, 27 Oct 2017 06:18:30 -0400
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20171027101830.GB30326@localhost.localdomain>
+References: <cover.1509094209.git.jcody@redhat.com>
+	<2f0114c773e8fb917a7a54acccfd2e2adfb6e066.1509094209.git.jcody@redhat.com>
+	<20171027090919.GB3368@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Message-ID: <23027.1942.14349.815707@mariner.uk.xensource.com>
-Date: Fri, 27 Oct 2017 11:16:54 +0100
-In-Reply-To: <alpine.DEB.2.10.1710261525120.3086@sstabellini-ThinkPad-X260>
-References: <23017.64539.31230.43449@mariner.uk.xensource.com>
-	<1508506702-17704-1-git-send-email-ian.jackson@eu.citrix.com>
-	<1508506702-17704-6-git-send-email-ian.jackson@eu.citrix.com>
-	<alpine.DEB.2.10.1710261525120.3086@sstabellini-ThinkPad-X260>
-Subject: Re: [Qemu-devel] [PATCH v5.1 6/8] xen: destroy_hvm_domain: Try
- xendevicemodel_shutdown
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171027090919.GB3368@localhost.localdomain>
+Subject: Re: [Qemu-devel] [PATCH 3/4] block/parallels: Don't update header
+ until the first actual write
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,48 +25,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Stabellini <sstabellini@kernel.org>
-Cc: qemu-devel@nongnu.org, Ross Lagerwall <ross.lagerwall@citrix.com>, Anthony PERARD <anthony.perard@citrix.com>, Juergen Gross <jgross@suse.com>, xen-devel@lists.xenproject.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, aik@ozlabs.ru, mreitz@redhat.com, den@openvz.org, stefanha@redhat.com
 
-Stefano Stabellini writes ("Re: [PATCH v5.1 6/8] xen: destroy_hvm_domain: Try xendevicemodel_shutdown"):
-> On Fri, 20 Oct 2017, Ian Jackson wrote:
-> > xc_interface_open etc. is not going to work if we have dropped
-> > privilege, but xendevicemodel_shutdown will if everything is new
-> > enough.
+On Fri, Oct 27, 2017 at 11:09:19AM +0200, Kevin Wolf wrote:
+> Am 27.10.2017 um 10:57 hat Jeff Cody geschrieben:
+> > The on disk image format 'inuse' header field is updated blindly if the
+> > image is opened RDWR.  This can cause problems if the QEMU runstate is
+> > set to INMIGRATE, at which point the underlying file is set to INACTIVE.
+> > This causes an assert in bdrv_co_pwritev().
 > > 
-> > xendevicemodel_shutdown is only availabe in Xen 4.10 and later, so
-> > provide a stub for earlier versions.
-...
-> > +    if (xen_dmod) {
-> > +        rc = xendevicemodel_shutdown(xen_dmod, xen_domid, reason);
-> > +        if (!rc) {
-> > +            return;
-> > +        }
-> > +        perror("xendevicemodel_shutdown failed");
+> > Do something similar to what is done in VHDX; latch the first write, and
+> > update the header the first time we modify the file.
+> > 
+> > Signed-off-by: Jeff Cody <jcody@redhat.com>
 > 
-> I don't think is a good idea to print an error because this is actually
-> a normal condition when QEMU is build and run against an older Xen.
-> Users might get confused when looking at the logs.
+> For VHDX, it seems that we have to have the header update in the write
+> path anyway, so it might be justifiable, but I think for parallels, it's
+> just ugly.
+> 
 
-Oh.  Yes.  I wrote this before I provided the fallback stub in
-xen_common.h, and therefore before I properly understood the approach
-taken to fallbacks.  The fallback logic here is not correct.
+A bit ugly.  I think we could get around VHDX needing to do it as well; it
+does it in the write path for two scenarios:
 
-> But it would be correct to print an error if errno != ENOTTY.
+    * First normal write, or
+    * Journal log replay, if dirty, on open (if r/w)
 
-Indeed.
+The log check happens early in vhdx_open().  If it does not write anything,
+then we can just write the headers during the open like normal, if we are
+R/W (and !BDRV_O_INACTIVE, of course).
 
-I have changed it to read like this:
+> The conservative approach to this would be doing the header write in
+> .bdrv_open() only if BDRV_O_INACTIVE is cleared, and otherwise do it
+> during .bdrv_invalidate_cache().
 
-    if (xen_dmod) {
-        rc = xendevicemodel_shutdown(xen_dmod, xen_domid, reason);
-        if (!rc) {
-            return;
-        }
-        if (errno != ENOTTY /* old Xen */)
-            perror("xendevicemodel_shutdown failed");
-        /* well, try the old thing then */
-    }
+What scenarios cause BDRV_O_INACTIVE to not be set on bs, but set on
+bs->file-bs?
 
-Thanks,
-Ian.
+> By the way, random design thought: It might make sense to change
+> .bdrv_open() so that it always opens inactive images and then call
+> .bdrv_invalidate_cache() (possibly renamed to .bdrv_activate())
+> unconditionally even without migration.
+> 
+> Kevin
