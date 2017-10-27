@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34497)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34485)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1e85Xb-0007oG-Nw
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 10:23:20 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1e85XY-0001iH-KS
+	(envelope-from <ehabkost@redhat.com>) id 1e85XY-0007f5-T5
 	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 10:23:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50744)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1e85XY-0001hI-Ef
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <ehabkost@redhat.com>) id 1e85XU-0001dY-Lx
 	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 10:23:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33680)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1e85XU-0001cU-Cy
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 10:23:12 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Fri, 27 Oct 2017 16:20:55 +0200
-Message-Id: <20171027142107.15542-28-ehabkost@redhat.com>
+Date: Fri, 27 Oct 2017 16:20:54 +0200
+Message-Id: <20171027142107.15542-27-ehabkost@redhat.com>
 In-Reply-To: <20171027142107.15542-1-ehabkost@redhat.com>
 References: <20171027142107.15542-1-ehabkost@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 27/39] tricore: use generic cpu_model parsing
+Subject: [Qemu-devel] [PULL v2 26/39] tricore: cleanup cpu type name
+ composition
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,40 +32,133 @@ Cc: qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>
 
 From: Igor Mammedov <imammedo@redhat.com>
 
+introduce TRICORE_CPU_TYPE_NAME macro and use it to construct
+cpu type names. While at it move cpu type_infos into one
+array and register it directly with type_init_from_array()
+instead of custom tricore_cpu_register_types()/cpu_register()
+
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Message-Id: <1507211474-188400-31-git-send-email-imammedo@redhat.com>
+Message-Id: <1507211474-188400-30-git-send-email-imammedo@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- hw/tricore/tricore_testboard.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ target/tricore/cpu.h |  2 ++
+ target/tricore/cpu.c | 68 ++++++++++++++++------------------------------=
+------
+ 2 files changed, 22 insertions(+), 48 deletions(-)
 
-diff --git a/hw/tricore/tricore_testboard.c b/hw/tricore/tricore_testboar=
-d.c
-index 0486f8a1d9..ac75eb2128 100644
---- a/hw/tricore/tricore_testboard.c
-+++ b/hw/tricore/tricore_testboard.c
-@@ -71,10 +71,7 @@ static void tricore_testboard_init(MachineState *machi=
-ne, int board_id)
-     MemoryRegion *pcp_data =3D g_new(MemoryRegion, 1);
-     MemoryRegion *pcp_text =3D g_new(MemoryRegion, 1);
+diff --git a/target/tricore/cpu.h b/target/tricore/cpu.h
+index bc53c40774..f41d2ceb69 100644
+--- a/target/tricore/cpu.h
++++ b/target/tricore/cpu.h
+@@ -413,6 +413,8 @@ static inline void cpu_get_tb_cpu_state(CPUTriCoreSta=
+te *env, target_ulong *pc,
 =20
--    if (!machine->cpu_model) {
--        machine->cpu_model =3D "tc1796";
--    }
--    cpu =3D TRICORE_CPU(cpu_generic_init(TYPE_TRICORE_CPU, machine->cpu_=
-model));
-+    cpu =3D TRICORE_CPU(cpu_create(machine->cpu_type));
-     env =3D &cpu->env;
-     memory_region_init_ram(ext_cram, NULL, "powerlink_ext_c.ram",
-                            2 * 1024 * 1024, &error_fatal);
-@@ -114,6 +111,7 @@ static void ttb_machine_init(MachineClass *mc)
-     mc->desc =3D "a minimal TriCore board";
-     mc->init =3D tricoreboard_init;
-     mc->is_default =3D 0;
-+    mc->default_cpu_type =3D TRICORE_CPU_TYPE_NAME("tc1796");
+ #define cpu_init(cpu_model) cpu_generic_init(TYPE_TRICORE_CPU, cpu_model=
+)
+=20
++#define TRICORE_CPU_TYPE_SUFFIX "-" TYPE_TRICORE_CPU
++#define TRICORE_CPU_TYPE_NAME(model) model TRICORE_CPU_TYPE_SUFFIX
+=20
+ /* helpers.c */
+ int cpu_tricore_handle_mmu_fault(CPUState *cpu, target_ulong address,
+diff --git a/target/tricore/cpu.c b/target/tricore/cpu.c
+index cd93806d47..179c997aa4 100644
+--- a/target/tricore/cpu.c
++++ b/target/tricore/cpu.c
+@@ -116,7 +116,7 @@ static ObjectClass *tricore_cpu_class_by_name(const c=
+har *cpu_model)
+     ObjectClass *oc;
+     char *typename;
+=20
+-    typename =3D g_strdup_printf("%s-" TYPE_TRICORE_CPU, cpu_model);
++    typename =3D g_strdup_printf(TRICORE_CPU_TYPE_NAME("%s"), cpu_model)=
+;
+     oc =3D object_class_by_name(typename);
+     g_free(typename);
+     if (!oc || !object_class_dynamic_cast(oc, TYPE_TRICORE_CPU) ||
+@@ -147,19 +147,6 @@ static void tc27x_initfn(Object *obj)
+     set_feature(&cpu->env, TRICORE_FEATURE_161);
  }
 =20
- DEFINE_MACHINE("tricore_testboard", ttb_machine_init)
+-typedef struct TriCoreCPUInfo {
+-    const char *name;
+-    void (*initfn)(Object *obj);
+-    void (*class_init)(ObjectClass *oc, void *data);
+-} TriCoreCPUInfo;
+-
+-static const TriCoreCPUInfo tricore_cpus[] =3D {
+-    { .name =3D "tc1796",      .initfn =3D tc1796_initfn },
+-    { .name =3D "tc1797",      .initfn =3D tc1797_initfn },
+-    { .name =3D "tc27x",       .initfn =3D tc27x_initfn },
+-    { .name =3D NULL }
+-};
+-
+ static void tricore_cpu_class_init(ObjectClass *c, void *data)
+ {
+     TriCoreCPUClass *mcc =3D TRICORE_CPU_CLASS(c);
+@@ -181,41 +168,26 @@ static void tricore_cpu_class_init(ObjectClass *c, =
+void *data)
+     cc->tcg_initialize =3D tricore_tcg_init;
+ }
+=20
+-static void cpu_register(const TriCoreCPUInfo *info)
+-{
+-    TypeInfo type_info =3D {
+-        .parent =3D TYPE_TRICORE_CPU,
++#define DEFINE_TRICORE_CPU_TYPE(cpu_model, initfn) \
++    {                                              \
++        .parent =3D TYPE_TRICORE_CPU,                \
++        .instance_init =3D initfn,                   \
++        .name =3D TRICORE_CPU_TYPE_NAME(cpu_model),  \
++    }
++
++static const TypeInfo tricore_cpu_type_infos[] =3D {
++    {
++        .name =3D TYPE_TRICORE_CPU,
++        .parent =3D TYPE_CPU,
+         .instance_size =3D sizeof(TriCoreCPU),
+-        .instance_init =3D info->initfn,
++        .instance_init =3D tricore_cpu_initfn,
++        .abstract =3D true,
+         .class_size =3D sizeof(TriCoreCPUClass),
+-        .class_init =3D info->class_init,
+-    };
+-
+-    type_info.name =3D g_strdup_printf("%s-" TYPE_TRICORE_CPU, info->nam=
+e);
+-    type_register(&type_info);
+-    g_free((void *)type_info.name);
+-}
+-
+-static const TypeInfo tricore_cpu_type_info =3D {
+-    .name =3D TYPE_TRICORE_CPU,
+-    .parent =3D TYPE_CPU,
+-    .instance_size =3D sizeof(TriCoreCPU),
+-    .instance_init =3D tricore_cpu_initfn,
+-    .abstract =3D true,
+-    .class_size =3D sizeof(TriCoreCPUClass),
+-    .class_init =3D tricore_cpu_class_init,
++        .class_init =3D tricore_cpu_class_init,
++    },
++    DEFINE_TRICORE_CPU_TYPE("tc1796", tc1796_initfn),
++    DEFINE_TRICORE_CPU_TYPE("tc1797", tc1797_initfn),
++    DEFINE_TRICORE_CPU_TYPE("tc27x", tc27x_initfn),
+ };
+=20
+-static void tricore_cpu_register_types(void)
+-{
+-    const TriCoreCPUInfo *info =3D tricore_cpus;
+-
+-    type_register_static(&tricore_cpu_type_info);
+-
+-    while (info->name) {
+-        cpu_register(info);
+-        info++;
+-    }
+-}
+-
+-type_init(tricore_cpu_register_types)
++DEFINE_TYPES(tricore_cpu_type_infos)
 --=20
 2.13.6
