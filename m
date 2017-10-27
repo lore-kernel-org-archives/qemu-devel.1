@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33717)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35319)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1e87xn-0007ly-A3
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 12:58:32 -0400
+	(envelope-from <zachriggle@gmail.com>) id 1e884v-0000os-Gw
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 13:05:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1e87xj-0001hY-5w
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 12:58:31 -0400
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:53722)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1e87xi-0001W5-Td
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 12:58:27 -0400
-Received: by mail-wm0-x244.google.com with SMTP id r196so5028858wmf.2
-	for <qemu-devel@nongnu.org>; Fri, 27 Oct 2017 09:58:26 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-Date: Fri, 27 Oct 2017 18:58:14 +0200
-Message-Id: <20171027165814.29122-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v2] target/ppc: Use tcg_gen_lookup_and_goto_ptr
+	(envelope-from <zachriggle@gmail.com>) id 1e884u-0002Hs-3U
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 13:05:53 -0400
+MIME-Version: 1.0
+In-Reply-To: <20171027093600.GA29513@kos.to>
+References: <20171024230758.31779-1-riggle@google.com>
+	<20171025033442.44872-1-zachriggle@gmail.com>
+	<CAMP9c5=whCgR4qkOPDRKZ+adpWEPiVM=BwZp_r7qCAR7UAsWAQ@mail.gmail.com>
+	<20171027093600.GA29513@kos.to>
+From: Zach Riggle <zachriggle@gmail.com>
+Date: Fri, 27 Oct 2017 12:05:24 -0500
+Message-ID: <CAMP9c5mm7icy06goXr3iiOEgqPbzyaWDt775+9+L=oxnqwRhpA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2] linux-user: fix is_proc_myself to check
+ the paths via realpath
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,81 +25,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: david@gibson.dropbear.id.au, qemu-ppc@nongnu.org, Richard Henderson <rth@twiddle.net>
+To: Riku Voipio <riku.voipio@iki.fi>
+Cc: qemu-trivial@nongnu.org, Laurent Vivier <laurent@vivier.eu>, "open list:All patches CC here" <qemu-devel@nongnu.org>
 
-From: Richard Henderson <rth@twiddle.net>
+The symlink was just an easy test case.  Doing cd proc && cat ./self/maps
+will achieve the same thing.
 
-Signed-off-by: Richard Henderson <rth@twiddle.net>
----
-Rebased and updated for changes to tcg_gen_lookup_and_goto_ptr.
+One instance where this matters is for testing IoT device firmware
+exploits, where one might do a GET request against
+../../../../../../proc/self/maps in order to bypass ASLR.  Currently, this
+will return the memory layout of QEMU, not the emulated memory layout of
+the software under test.
 
----
- target/ppc/translate.c | 23 ++++++++---------------
- 1 file changed, 8 insertions(+), 15 deletions(-)
 
-diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-index 998fbed848..4075fc8589 100644
---- a/target/ppc/translate.c
-+++ b/target/ppc/translate.c
-@@ -3419,7 +3419,7 @@ static inline bool use_goto_tb(DisasContext *ctx, target_ulong dest)
- }
- 
- /***                                Branch                                 ***/
--static inline void gen_goto_tb(DisasContext *ctx, int n, target_ulong dest)
-+static void gen_goto_tb(DisasContext *ctx, int n, target_ulong dest)
- {
-     if (NARROW_MODE(ctx)) {
-         dest = (uint32_t) dest;
-@@ -3441,7 +3441,7 @@ static inline void gen_goto_tb(DisasContext *ctx, int n, target_ulong dest)
-                 gen_debug_exception(ctx);
-             }
-         }
--        tcg_gen_exit_tb(0);
-+        tcg_gen_lookup_and_goto_ptr();
-     }
- }
- 
-@@ -3479,7 +3479,7 @@ static void gen_b(DisasContext *ctx)
- #define BCOND_CTR 2
- #define BCOND_TAR 3
- 
--static inline void gen_bcond(DisasContext *ctx, int type)
-+static void gen_bcond(DisasContext *ctx, int type)
- {
-     uint32_t bo = BO(ctx->opcode);
-     TCGLabel *l1;
-@@ -3543,26 +3543,19 @@ static inline void gen_bcond(DisasContext *ctx, int type)
-         } else {
-             gen_goto_tb(ctx, 0, li);
-         }
--        if ((bo & 0x14) != 0x14) {
--            gen_set_label(l1);
--            gen_goto_tb(ctx, 1, ctx->nip);
--        }
-     } else {
-         if (NARROW_MODE(ctx)) {
-             tcg_gen_andi_tl(cpu_nip, target, (uint32_t)~3);
-         } else {
-             tcg_gen_andi_tl(cpu_nip, target, ~3);
-         }
--        tcg_gen_exit_tb(0);
--        if ((bo & 0x14) != 0x14) {
--            gen_set_label(l1);
--            gen_update_nip(ctx, ctx->nip);
--            tcg_gen_exit_tb(0);
--        }
--    }
--    if (type == BCOND_LR || type == BCOND_CTR || type == BCOND_TAR) {
-+        tcg_gen_lookup_and_goto_ptr();
-         tcg_temp_free(target);
-     }
-+    if ((bo & 0x14) != 0x14) {
-+        gen_set_label(l1);
-+        gen_goto_tb(ctx, 1, ctx->nip);
-+    }
- }
- 
- static void gen_bc(DisasContext *ctx)
--- 
-2.13.6
+*Zach Riggle*
+
+On Fri, Oct 27, 2017 at 4:36 AM, Riku Voipio <riku.voipio@iki.fi> wrote:
+
+> On Thu, Oct 26, 2017 at 04:06:22PM -0500, Zach Riggle wrote:
+> > Friendly ping :)
+> >
+> > I've updated the patch with v2 which addresses the style issue
+>
+> I'll have a look at it soon.
+>
+> >
+> > *Zach Riggle*
+> >
+> > On Tue, Oct 24, 2017 at 10:34 PM, Zach Riggle <zachriggle@gmail.com>
+> wrote:
+> >
+> > > Previously, it was possible to get a handle to the "real"
+> /proc/self/mem
+> > > by creating a symlink to it and opening the symlink, or opening e.g.
+> > > "./mem" after chdir'ing to "/proc/self"
+>
+> When is this a problem? Symlinking to /proc/self seems to be a quite weird
+> usecase.
+>
+> > >
+> > >     $ ln -s /proc/self self
+> > >     $ cat self/maps
+> > >     60000000-602bc000 r-xp 00000000 fc:01 270375
+> > >    /usr/bin/qemu-arm-static
+> > >     604bc000-6050f000 rw-p 002bc000 fc:01 270375
+> > >    /usr/bin/qemu-arm-static
+> > >     ...
+> > >
+> > > Signed-off-by: Zach Riggle <zachriggle@gmail.com>
+> > > ---
+> > >  linux-user/syscall.c | 47 ++++++++++++++++++++++++++++--
+> -----------------
+> > >  1 file changed, 28 insertions(+), 19 deletions(-)
+> > >
+> > > diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+> > > index 9bf901fa11..6c1f28a1f7 100644
+> > > --- a/linux-user/syscall.c
+> > > +++ b/linux-user/syscall.c
+> > > @@ -7496,26 +7496,35 @@ static int open_self_auxv(void *cpu_env, int
+> fd)
+> > >
+> > >  static int is_proc_myself(const char *filename, const char *entry)
+> > >  {
+> > > -    if (!strncmp(filename, "/proc/", strlen("/proc/"))) {
+> > > -        filename += strlen("/proc/");
+> > > -        if (!strncmp(filename, "self/", strlen("self/"))) {
+> > > -            filename += strlen("self/");
+> > > -        } else if (*filename >= '1' && *filename <= '9') {
+> > > -            char myself[80];
+> > > -            snprintf(myself, sizeof(myself), "%d/", getpid());
+> > > -            if (!strncmp(filename, myself, strlen(myself))) {
+> > > -                filename += strlen(myself);
+> > > -            } else {
+> > > -                return 0;
+> > > -            }
+> > > -        } else {
+> > > -            return 0;
+> > > -        }
+> > > -        if (!strcmp(filename, entry)) {
+> > > -            return 1;
+> > > -        }
+> > > +    char proc_self_entry[PATH_MAX + 1];
+> > > +    char proc_self_entry_realpath[PATH_MAX + 1];
+> > > +    char filename_realpath[PATH_MAX + 1];
+> > > +
+> > > +    if (PATH_MAX < snprintf(proc_self_entry,
+> > > +                            sizeof(proc_self_entry),
+> > > +                            "/proc/self/%s",
+> > > +                            entry)) {
+> > > +        /* Full path to "entry" is too long to fit in the buffer */
+> > > +        return 0;
+> > >      }
+> > > -    return 0;
+> > > +
+> > > +    if (!realpath(filename, filename_realpath)) {
+> > > +        /* File does not exist, or can't be canonicalized */
+> > > +        return 0;
+> > > +    }
+> > > +
+> > > +    if (!realpath(proc_self_entry, proc_self_entry_realpath)) {
+> > > +        /* Procfs entry does not exist */
+> > > +        return 0;
+> > > +    }
+> > > +
+> > > +    if (strcmp(filename_realpath, proc_self_entry_realpath) != 0) {
+> > > +        /* Paths are different */
+> > > +        return 0;
+> > > +    }
+> > > +
+> > > +    /* filename refers to /proc/self/<entry> */
+> > > +    return 1;
+> > >  }
+> > >
+> > >  #if defined(HOST_WORDS_BIGENDIAN) != defined(TARGET_WORDS_BIGENDIAN)
+> > > --
+> > > 2.14.3
+> > >
+> > >
+>
