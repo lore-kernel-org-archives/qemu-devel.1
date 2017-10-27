@@ -1,54 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57338)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57587)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1e86je-0000Mj-4x
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 11:39:51 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1e86kc-00010D-JV
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 11:40:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1e86jb-0006dH-1r
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 11:39:50 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:50394
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1e86ja-0006cr-Rv
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 11:39:46 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v9RFaelP120314
-	for <qemu-devel@nongnu.org>; Fri, 27 Oct 2017 11:39:43 -0400
-Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2dv3t5dbx3-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 27 Oct 2017 11:39:43 -0400
-Received: from localhost
-	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Fri, 27 Oct 2017 16:39:41 +0100
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
-	[9.149.105.58])
-	by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with
-	ESMTP id v9RFddAL28311666
-	for <qemu-devel@nongnu.org>; Fri, 27 Oct 2017 15:39:39 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 887C84C04A
-	for <qemu-devel@nongnu.org>; Fri, 27 Oct 2017 16:35:14 +0100 (BST)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 4F5CB4C040
-	for <qemu-devel@nongnu.org>; Fri, 27 Oct 2017 16:35:14 +0100 (BST)
-Received: from oc3836556865.ibm.com (unknown [9.152.224.35])
-	by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP
-	for <qemu-devel@nongnu.org>; Fri, 27 Oct 2017 16:35:14 +0100 (BST)
-References: <1509114613-10601-1-git-send-email-walling@linux.vnet.ibm.com>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Fri, 27 Oct 2017 17:39:38 +0200
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1e86kZ-0007yc-Eg
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 11:40:50 -0400
+Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:48798)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1e86kZ-0007yP-9M
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 11:40:47 -0400
+Received: by mail-qk0-x243.google.com with SMTP id d67so8832892qkg.5
+	for <qemu-devel@nongnu.org>; Fri, 27 Oct 2017 08:40:47 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1508947167-5304-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<1508947167-5304-3-git-send-email-mark.cave-ayland@ilande.co.uk>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <5c59fbb5-69a9-1c3b-1e94-8b99ef054da6@amsat.org>
+Date: Fri, 27 Oct 2017 12:40:43 -0300
 MIME-Version: 1.0
-In-Reply-To: <1509114613-10601-1-git-send-email-walling@linux.vnet.ibm.com>
+In-Reply-To: <1508947167-5304-3-git-send-email-mark.cave-ayland@ilande.co.uk>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Message-Id: <5d039f30-4896-fef3-3b1c-a2be4edcf13b@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v3] s390-ccw: print carriage return with
- new lines
+Subject: Re: [Qemu-devel] [PATCHv4 02/13] sparc32_dma: split esp and le into
+ separate DMA devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -57,122 +36,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, atar4qemu@gmail.com
 
+On 10/25/2017 12:59 PM, Mark Cave-Ayland wrote:
+> Due to slight differences in behaviour accessing the registers for the
+> esp and le devices, create two separate SPARC32_DMA_DEVICE types and
+> update the sun4m machine to use.
+> 
+> Note that by using different device types we already know the size of
+> the register block and the value of is_ledma at init time, allowing us to
+> drop the SPARC32_DMA_DEVICE realize function and the is_ledma device
+> property.
+> 
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> Reviewed-by: Artyom Tarasenko <atar4qemu@gmail.com>
 
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-On 10/27/2017 04:30 PM, Collin L. Walling wrote:
-> The sclp console in the s390 bios writes raw data,
-> leading console emulators (such as virsh console) to
-> treat a new line ('\n') as just a new line instead
-> of as a Unix line feed. Because of this, output
-> appears in a "stair case" pattern.
-> 
-> Let's print \r\n on every occurrence of a new line
-> in the string passed to write to amend this issue.
-> 
-> This is in sync with the guest Linux code in
-> drivers/s390/char/sclp_vt220.c which also does a line feed
-> conversion  in the console part of the driver. 
-> 
-> This fixes the s390-ccw and s390-netboot output like
-> $ virsh start test --console
-> Domain test started
-> Connected to domain test
-> Escape character is ^]
-> Network boot starting...
->                           Using MAC address: 02:01:02:03:04:05
->                                                                 Requesting information via DHCP:  010
-> 
-> Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
-> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
 > ---
->  pc-bios/s390-ccw/sclp.c | 24 +++++++++++++++++++++---
->  1 file changed, 21 insertions(+), 3 deletions(-)
+>  hw/dma/sparc32_dma.c |   63 ++++++++++++++++++++++++++++++++++++++++----------
+>  hw/sparc/sun4m.c     |    3 +--
+>  2 files changed, 52 insertions(+), 14 deletions(-)
 > 
-> diff --git a/pc-bios/s390-ccw/sclp.c b/pc-bios/s390-ccw/sclp.c
-> index 486fce1..a57006e 100644
-> --- a/pc-bios/s390-ccw/sclp.c
-> +++ b/pc-bios/s390-ccw/sclp.c
-> @@ -68,17 +68,35 @@ void sclp_setup(void)
->  long write(int fd, const void *str, size_t len)
+> diff --git a/hw/dma/sparc32_dma.c b/hw/dma/sparc32_dma.c
+> index a8d31c1..e4ff4a8 100644
+> --- a/hw/dma/sparc32_dma.c
+> +++ b/hw/dma/sparc32_dma.c
+> @@ -78,6 +78,22 @@ struct DMADeviceState {
+>      uint32_t is_ledma;
+>  };
+>  
+> +#define TYPE_SPARC32_ESPDMA_DEVICE "sparc32-espdma"
+> +#define SPARC32_ESPDMA_DEVICE(obj) OBJECT_CHECK(ESPDMADeviceState, (obj), \
+> +                                                TYPE_SPARC32_ESPDMA_DEVICE)
+> +
+> +typedef struct ESPDMADeviceState {
+> +    DMADeviceState parent_obj;
+> +} ESPDMADeviceState;
+> +
+> +#define TYPE_SPARC32_LEDMA_DEVICE "sparc32-ledma"
+> +#define SPARC32_LEDMA_DEVICE(obj) OBJECT_CHECK(LEDMADeviceState, (obj), \
+> +                                               TYPE_SPARC32_LEDMA_DEVICE)
+> +
+> +typedef struct LEDMADeviceState {
+> +    DMADeviceState parent_obj;
+> +} LEDMADeviceState;
+> +
+>  enum {
+>      GPIO_RESET = 0,
+>      GPIO_DMA,
+> @@ -285,19 +301,8 @@ static void sparc32_dma_device_init(Object *obj)
+>      qdev_init_gpio_out(dev, s->gpio, 2);
+>  }
+>  
+> -static void sparc32_dma_device_realize(DeviceState *dev, Error **errp)
+> -{
+> -    DMADeviceState *s = SPARC32_DMA_DEVICE(dev);
+> -    int reg_size;
+> -
+> -    reg_size = s->is_ledma ? DMA_ETH_SIZE : DMA_SIZE;
+> -    memory_region_init_io(&s->iomem, OBJECT(dev), &dma_mem_ops, s,
+> -                          "dma", reg_size);
+> -}
+> -
+>  static Property sparc32_dma_device_properties[] = {
+>      DEFINE_PROP_PTR("iommu_opaque", DMADeviceState, iommu),
+> -    DEFINE_PROP_UINT32("is_ledma", DMADeviceState, is_ledma, 0),
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+>  
+> @@ -308,7 +313,6 @@ static void sparc32_dma_device_class_init(ObjectClass *klass, void *data)
+>      dc->reset = sparc32_dma_device_reset;
+>      dc->vmsd = &vmstate_sparc32_dma_device;
+>      dc->props = sparc32_dma_device_properties;
+> -    dc->realize = sparc32_dma_device_realize;
+>      /* Reason: pointer property "iommu_opaque" */
+>      dc->user_creatable = false;
+>  }
+> @@ -316,14 +320,49 @@ static void sparc32_dma_device_class_init(ObjectClass *klass, void *data)
+>  static const TypeInfo sparc32_dma_device_info = {
+>      .name          = TYPE_SPARC32_DMA_DEVICE,
+>      .parent        = TYPE_SYS_BUS_DEVICE,
+> +    .abstract      = true,
+>      .instance_size = sizeof(DMADeviceState),
+>      .instance_init = sparc32_dma_device_init,
+>      .class_init    = sparc32_dma_device_class_init,
+>  };
+>  
+> +static void sparc32_espdma_device_init(Object *obj)
+> +{
+> +    DMADeviceState *s = SPARC32_DMA_DEVICE(obj);
+> +
+> +    memory_region_init_io(&s->iomem, OBJECT(s), &dma_mem_ops, s,
+> +                          "espdma-mmio", DMA_SIZE);
+> +    s->is_ledma = 0;
+> +}
+> +
+> +static const TypeInfo sparc32_espdma_device_info = {
+> +    .name          = TYPE_SPARC32_ESPDMA_DEVICE,
+> +    .parent        = TYPE_SPARC32_DMA_DEVICE,
+> +    .instance_size = sizeof(ESPDMADeviceState),
+> +    .instance_init = sparc32_espdma_device_init,
+> +};
+> +
+> +static void sparc32_ledma_device_init(Object *obj)
+> +{
+> +    DMADeviceState *s = SPARC32_DMA_DEVICE(obj);
+> +
+> +    memory_region_init_io(&s->iomem, OBJECT(s), &dma_mem_ops, s,
+> +                          "ledma-mmio", DMA_ETH_SIZE);
+> +    s->is_ledma = 1;
+> +}
+> +
+> +static const TypeInfo sparc32_ledma_device_info = {
+> +    .name          = TYPE_SPARC32_LEDMA_DEVICE,
+> +    .parent        = TYPE_SPARC32_DMA_DEVICE,
+> +    .instance_size = sizeof(LEDMADeviceState),
+> +    .instance_init = sparc32_ledma_device_init,
+> +};
+> +
+>  static void sparc32_dma_register_types(void)
 >  {
->      WriteEventData *sccb = (void *)_sccb;
-> +    const char *p = str;
-> +    size_t data_len = 0;
-> +    size_t i;
+>      type_register_static(&sparc32_dma_device_info);
+> +    type_register_static(&sparc32_espdma_device_info);
+> +    type_register_static(&sparc32_ledma_device_info);
+>  }
+>  
+>  type_init(sparc32_dma_register_types)
+> diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
+> index 82c553c..88a9752 100644
+> --- a/hw/sparc/sun4m.c
+> +++ b/hw/sparc/sun4m.c
+> @@ -313,9 +313,8 @@ static void *sparc32_dma_init(hwaddr daddr, qemu_irq parent_irq,
+>      DeviceState *dev;
+>      SysBusDevice *s;
+>  
+> -    dev = qdev_create(NULL, "sparc32-dma-device");
+> +    dev = qdev_create(NULL, is_ledma ? "sparc32-ledma" : "sparc32-espdma");
+>      qdev_prop_set_ptr(dev, "iommu_opaque", iommu);
+> -    qdev_prop_set_uint32(dev, "is_ledma", is_ledma);
+>      qdev_init_nofail(dev);
+>      s = SYS_BUS_DEVICE(dev);
+>      sysbus_connect_irq(s, 0, parent_irq);
 > 
->      if (fd != 1 && fd != 2) {
->          return -EIO;
->      }
-> 
-> -    sccb->h.length = sizeof(WriteEventData) + len;
-> +    for (i = len; i > 0; i--) > +        if (data_len + 1 >= SCCB_DATA_LEN) {
-> +            /* We would overflow the sccb buffer, abort early */
-> +            len = i;
-
-This is not correct. Write is supposed to return the number
-of bytes written. In this case the number of the bytes of the
-original string which have been processed (so the client
-code can resume at that place, using the nuber of bytes
-transferred via sclp_service_call would be wrong if at least
-one \n was processed).
-
-Here you return the number of the bytes remaining, as i goes
-from len to 0 and not the other way around. By the way Alex's
-version was correct.
-
-> +            break;
-> +        }
-> +
-> +        if (*p == '\n') {
-> +            /* Terminal emulators might need \r\n, so generate it */
-> +            sccb->data[data_len++] = '\r';
-> +        }
-> +
-> +        sccb->data[data_len++] = *p;
-> +        p++;
-> +    }
-> +
-> +    sccb->h.length = sizeof(WriteEventData) + data_len;
->      sccb->h.function_code = SCLP_FC_NORMAL_WRITE;
-> -    sccb->ebh.length = sizeof(EventBufferHeader) + len;
-> +    sccb->ebh.length = sizeof(EventBufferHeader) + data_len;
->      sccb->ebh.type = SCLP_EVENT_ASCII_CONSOLE_DATA;
->      sccb->ebh.flags = 0;
-> -    memcpy(sccb->data, str, len);
-> 
->      sclp_service_call(SCLP_CMD_WRITE_EVENT_DATA, sccb);
-> 
-I would have wrote the loop part like this:
--    sccb->h.length = sizeof(WriteEventData) + len;
-+    for (i = 0; i < len; ++i) {
-+        if (data_len + 1 >= SCCB_DATA_LEN) {
-+            /* We would overflow the sccb buffer, abort early */
-+            len = i;
-+            break;
-+        }
-+
-+        if (str[i] == '\n') {
-+            /* Terminal emulators might need \r\n, so generate it */
-+            sccb->data[data_len++] = '\r';
-+        }
-+
-+        sccb->data[data_len++] = str[i];
-+    }
-+
-+    sccb->h.length = sizeof(WriteEventData) + data_len;
-
-This way you don't need p, and the loop steps trough the str indexed by
-i while sccb->data is indexed by data_len. data_len is incremented each
-time after we have written to the buffer (that's why postfix ++)
-and i is incremented on each iteration (that's why normal prefix ++).
-
-Btw I would also rename i to str_i and data_len to data_i to better
-reflect this.
-
-The cosmetics aren't important though, so it's probably better to go
-with what we have already discussed as Alex's version.
-
-Regards,
-Halil
