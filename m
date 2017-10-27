@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35450)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38073)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent.desnogues@gmail.com>) id 1e7wtr-0007ec-Nv
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 01:09:44 -0400
+	(envelope-from <aik@ozlabs.ru>) id 1e7x22-0000ae-MN
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 01:18:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent.desnogues@gmail.com>) id 1e7wtq-00023L-Lj
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 01:09:43 -0400
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:52666)
+	(envelope-from <aik@ozlabs.ru>) id 1e7x1z-0003Ze-Ge
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 01:18:10 -0400
+Received: from mail-io0-x244.google.com ([2607:f8b0:4001:c06::244]:56278)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent.desnogues@gmail.com>)
-	id 1e7wtq-00022x-FX
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 01:09:42 -0400
-Received: by mail-oi0-x242.google.com with SMTP id c202so9220000oih.9
-	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 22:09:42 -0700 (PDT)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1e7x1z-0003Z6-7w
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 01:18:07 -0400
+Received: by mail-io0-x244.google.com with SMTP id p186so10173063ioe.12
+	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 22:18:06 -0700 (PDT)
+References: <20171026130426.10626-1-berrange@redhat.com>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <c66feebb-854a-f2e5-da98-7180bf42ac8f@ozlabs.ru>
+Date: Fri, 27 Oct 2017 16:18:00 +1100
 MIME-Version: 1.0
-In-Reply-To: <20171026152704.24525-2-richard.henderson@linaro.org>
-References: <20171026152704.24525-1-richard.henderson@linaro.org>
-	<20171026152704.24525-2-richard.henderson@linaro.org>
-From: Laurent Desnogues <laurent.desnogues@gmail.com>
-Date: Fri, 27 Oct 2017 07:09:40 +0200
-Message-ID: <CABoDooOpLTCnxi6gV0+NH2btnOwf-boF+bzjEKDNHUw4ovpyrw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 1/2] tcg: Allow constant pool entries in
- the prologue
+In-Reply-To: <20171026130426.10626-1-berrange@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-AU
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] build: allow automatic git submodule
+ updates to be disabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,113 +30,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>
 
-Hello,
-
-On Thu, Oct 26, 2017 at 5:27 PM, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> Both ARMv6 and AArch64 currently may drop complex guest_base values
-> into the constant pool.  But generic code wasn't expecting that, and
-> the pool is not emitted.  Correct that.
->
-> Reported-by: Laurent Desnogues <laurent.desnogues@gmail.com>
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-
-Tested-by: Laurent Desnogues <laurent.desnogues@gmail.com>
-
-on an AArch64 host and with running qemu on qemu.
-
-Thanks for taking care of the issue,
-
-Laurent
-
+On 27/10/17 00:04, Daniel P. Berrange wrote:
+> Some people building QEMU use VPATH builds where the source directory is on a
+> read-only volume. In such a case 'scripts/git-submodules.sh update' will always
+> fail and users are required to run it manually themselves on their original
+> writable source directory.
+> 
+> While this is already supported, it is nice to give users a command line flag
+> to configure to permanently disable automatic submodule updates, as it means
+> they won't get hard to diagnose failures from git-submodules.sh at an arbitrary
+> later date.
+> 
+> This patch thus introduces a flag '--disable-git-update' which will prevent
+> 'make' from ever running 'scripts/git-submodules.sh update'. It will still run
+> the 'status' command to determine if a submodule update is needed, but when it
+> does this it'll simply stop and print a message instructing the developer what
+> todo. eg
+> 
+> $ ./configure  --target-list=x86_64-softmmu --disable-git-update
+> ...snip...
+> 
+> $ make
+>   GEN     config-host.h
+>   GEN     trace/generated-tcg-tracers.h
+>   GEN     trace/generated-helpers-wrappers.h
+>   GEN     trace/generated-helpers.h
+>   GEN     trace/generated-helpers.c
+>   GEN     module_block.h
+> 
+> GIT submodule checkout is out of date. Please run
+>   scripts/git-submodule.sh update ui/keycodemapdb
+> from the source directory checkout /home/berrange/src/virt/qemu
+> 
+> make: *** [Makefile:31: git-submodule-update] Error 1
+> 
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 > ---
->  tcg/tcg.c | 49 ++++++++++++++++++++++++++++++++++++++++++-------
->  1 file changed, 42 insertions(+), 7 deletions(-)
->
-> diff --git a/tcg/tcg.c b/tcg/tcg.c
-> index 683ff4abb7..c22f1c4441 100644
-> --- a/tcg/tcg.c
-> +++ b/tcg/tcg.c
-> @@ -771,12 +771,32 @@ void tcg_prologue_init(TCGContext *s)
->
->      /* Put the prologue at the beginning of code_gen_buffer.  */
->      buf0 = s->code_gen_buffer;
-> +    total_size = s->code_gen_buffer_size;
->      s->code_ptr = buf0;
->      s->code_buf = buf0;
-> +    s->data_gen_ptr = NULL;
->      s->code_gen_prologue = buf0;
->
-> +    /* Compute a high-water mark, at which we voluntarily flush the buffer
-> +       and start over.  The size here is arbitrary, significantly larger
-> +       than we expect the code generation for any one opcode to require.  */
-> +    s->code_gen_highwater = s->code_gen_buffer + (total_size - TCG_HIGHWATER);
-> +
-> +#ifdef TCG_TARGET_NEED_POOL_LABELS
-> +    s->pool_labels = NULL;
-> +#endif
-> +
->      /* Generate the prologue.  */
->      tcg_target_qemu_prologue(s);
-> +
-> +#ifdef TCG_TARGET_NEED_POOL_LABELS
-> +    /* Allow the prologue to put e.g. guest_base into a pool entry.  */
-> +    {
-> +        bool ok = tcg_out_pool_finalize(s);
-> +        tcg_debug_assert(ok);
-> +    }
-> +#endif
-> +
->      buf1 = s->code_ptr;
->      flush_icache_range((uintptr_t)buf0, (uintptr_t)buf1);
->
-> @@ -785,21 +805,36 @@ void tcg_prologue_init(TCGContext *s)
->      s->code_gen_ptr = buf1;
->      s->code_gen_buffer = buf1;
->      s->code_buf = buf1;
-> -    total_size = s->code_gen_buffer_size - prologue_size;
-> +    total_size -= prologue_size;
->      s->code_gen_buffer_size = total_size;
->
-> -    /* Compute a high-water mark, at which we voluntarily flush the buffer
-> -       and start over.  The size here is arbitrary, significantly larger
-> -       than we expect the code generation for any one opcode to require.  */
-> -    s->code_gen_highwater = s->code_gen_buffer + (total_size - TCG_HIGHWATER);
-> -
->      tcg_register_jit(s->code_gen_buffer, total_size);
->
->  #ifdef DEBUG_DISAS
->      if (qemu_loglevel_mask(CPU_LOG_TB_OUT_ASM)) {
->          qemu_log_lock();
->          qemu_log("PROLOGUE: [size=%zu]\n", prologue_size);
-> -        log_disas(buf0, prologue_size);
-> +        if (s->data_gen_ptr) {
-> +            size_t code_size = s->data_gen_ptr - buf0;
-> +            size_t data_size = prologue_size - code_size;
-> +            size_t i;
-> +
-> +            log_disas(buf0, code_size);
-> +
-> +            for (i = 0; i < data_size; i += sizeof(tcg_target_ulong)) {
-> +                if (sizeof(tcg_target_ulong) == 8) {
-> +                    qemu_log("0x%08" PRIxPTR ":  .quad  0x%016" PRIx64 "\n",
-> +                             (uintptr_t)s->data_gen_ptr + i,
-> +                             *(uint64_t *)(s->data_gen_ptr + i));
-> +                } else {
-> +                    qemu_log("0x%08" PRIxPTR ":  .long  0x%08x\n",
-> +                             (uintptr_t)s->data_gen_ptr + i,
-> +                             *(uint32_t *)(s->data_gen_ptr + i));
-> +                }
-> +            }
-> +        } else {
-> +            log_disas(buf0, prologue_size);
-> +        }
->          qemu_log("\n");
->          qemu_log_flush();
->          qemu_log_unlock();
-> --
-> 2.13.6
->
+>  Makefile  | 11 +++++++++++
+>  configure |  9 ++++++++-
+>  2 files changed, 19 insertions(+), 1 deletion(-)
+> 
+> diff --git a/Makefile b/Makefile
+> index 4c9d0eaef2..cefb75dc8d 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -26,12 +26,23 @@ ifeq (0,$(MAKELEVEL))
+>    )
+>  
+>  ifeq (1,$(git_module_status))
+> +ifeq (no,$(GIT_UPDATE))
+> +git-submodule-update:
+> +	$(call quiet-command, \
+> +            echo && \
+> +            echo "GIT submodule checkout is out of date. Please run" && \
+> +            echo "  scripts/git-submodule.sh update $(GIT_SUBMODULES)" && \
+> +            echo "from the source directory checkout $(SRC_PATH)" && \
+
+
+I'd love to see this warning when $GIT_UPDATE!=no too. Now it is:
+
+  GIT     ui/keycodemapdb dtc
+./scripts/git-submodule.sh: 36: ./scripts/git-submodule.sh: cannot create
+.git-submodule-status: Read-only file system
+Makefile:40: recipe for target 'git-submodule-update' failed
+
+
+Other than that, looks nice, thanks for fixing it.
+
+
+
+-- 
+Alexey
