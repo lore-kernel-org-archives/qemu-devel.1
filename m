@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34643)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34684)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1e85Xr-0008Us-Hq
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 10:23:38 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1e85Xv-00009t-W0
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 10:23:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1e85Xq-00023b-KM
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 10:23:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34494)
+	(envelope-from <ehabkost@redhat.com>) id 1e85Xv-00029g-4A
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 10:23:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51670)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1e85Xq-00022K-EN
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 10:23:34 -0400
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1e85Xu-00028s-U3
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 10:23:39 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Fri, 27 Oct 2017 16:20:59 +0200
-Message-Id: <20171027142107.15542-32-ehabkost@redhat.com>
+Date: Fri, 27 Oct 2017 16:21:00 +0200
+Message-Id: <20171027142107.15542-33-ehabkost@redhat.com>
 In-Reply-To: <20171027142107.15542-1-ehabkost@redhat.com>
 References: <20171027142107.15542-1-ehabkost@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 31/39] sparc: leon3: use generic cpu_model
- parsing
+Subject: [Qemu-devel] [PULL v2 32/39] mips: use object_new() instead of
+ gnew()+object_initialize()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,51 +32,60 @@ Cc: qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>
 
 From: Igor Mammedov <imammedo@redhat.com>
 
+object_initialize() is intended for inplace initialization of
+objects, but here it's first allocated with g_new0() and then
+initialized with object_initialize(). QEMU already has API
+to do this (object_new), so do object creation with suitable
+for usecase API.
+
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Tested-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Message-Id: <1507211474-188400-35-git-send-email-imammedo@redhat.com>
-Reviewed-by: Artyom Tarasenko <atar4qemu@gmail.com>
+Message-Id: <1507211474-188400-36-git-send-email-imammedo@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- hw/sparc/leon3.c | 8 ++------
- 1 file changed, 2 insertions(+), 6 deletions(-)
+ hw/mips/boston.c     | 3 +--
+ hw/mips/mips_malta.c | 3 +--
+ 2 files changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/hw/sparc/leon3.c b/hw/sparc/leon3.c
-index ec2816bf94..8c66d5af24 100644
---- a/hw/sparc/leon3.c
-+++ b/hw/sparc/leon3.c
-@@ -107,7 +107,6 @@ static void leon3_set_pil_in(void *opaque, uint32_t p=
-il_in)
- static void leon3_generic_hw_init(MachineState *machine)
+diff --git a/hw/mips/boston.c b/hw/mips/boston.c
+index 776ee283e1..e815be6a6c 100644
+--- a/hw/mips/boston.c
++++ b/hw/mips/boston.c
+@@ -460,7 +460,6 @@ static void boston_mach_init(MachineState *machine)
+=20
+     s =3D BOSTON(dev);
+     s->mach =3D machine;
+-    s->cps =3D g_new0(MIPSCPSState, 1);
+=20
+     if (!cpu_supports_cps_smp(cpu_model)) {
+         error_report("Boston requires CPUs which support CPS");
+@@ -469,7 +468,7 @@ static void boston_mach_init(MachineState *machine)
+=20
+     is_64b =3D cpu_supports_isa(cpu_model, ISA_MIPS64);
+=20
+-    object_initialize(s->cps, sizeof(MIPSCPSState), TYPE_MIPS_CPS);
++    s->cps =3D MIPS_CPS(object_new(TYPE_MIPS_CPS));
+     qdev_set_parent_bus(DEVICE(s->cps), sysbus_get_default());
+=20
+     object_property_set_str(OBJECT(s->cps), cpu_model, "cpu-model", &err=
+);
+diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
+index 2adb9bcf89..b6a58c7f21 100644
+--- a/hw/mips/mips_malta.c
++++ b/hw/mips/mips_malta.c
+@@ -949,9 +949,8 @@ static void create_cps(MaltaState *s, const char *cpu=
+_model,
+                        qemu_irq *cbus_irq, qemu_irq *i8259_irq)
  {
-     ram_addr_t ram_size =3D machine->ram_size;
--    const char *cpu_model =3D machine->cpu_model;
-     const char *kernel_filename =3D machine->kernel_filename;
-     SPARCCPU *cpu;
-     CPUSPARCState   *env;
-@@ -122,11 +121,7 @@ static void leon3_generic_hw_init(MachineState *mach=
-ine)
-     ResetData  *reset_info;
+     Error *err =3D NULL;
+-    s->cps =3D g_new0(MIPSCPSState, 1);
 =20
-     /* Init CPU */
--    if (!cpu_model) {
--        cpu_model =3D "LEON3";
--    }
--
--    cpu =3D SPARC_CPU(cpu_generic_init(TYPE_SPARC_CPU, cpu_model));
-+    cpu =3D SPARC_CPU(cpu_create(machine->cpu_type));
-     env =3D &cpu->env;
+-    object_initialize(s->cps, sizeof(MIPSCPSState), TYPE_MIPS_CPS);
++    s->cps =3D MIPS_CPS(object_new(TYPE_MIPS_CPS));
+     qdev_set_parent_bus(DEVICE(s->cps), sysbus_get_default());
 =20
-     cpu_sparc_set_id(env, 0);
-@@ -222,6 +217,7 @@ static void leon3_generic_machine_init(MachineClass *=
-mc)
- {
-     mc->desc =3D "Leon-3 generic";
-     mc->init =3D leon3_generic_hw_init;
-+    mc->default_cpu_type =3D SPARC_CPU_TYPE_NAME("LEON3");
- }
-=20
- DEFINE_MACHINE("leon3_generic", leon3_generic_machine_init)
+     object_property_set_str(OBJECT(s->cps), cpu_model, "cpu-model", &err=
+);
 --=20
 2.13.6
