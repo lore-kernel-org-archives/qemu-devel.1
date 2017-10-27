@@ -1,40 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43194)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45813)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1e85uH-0005VN-Gb
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 10:46:46 -0400
+	(envelope-from <frasse.iglesias@gmail.com>) id 1e865A-0004VJ-DZ
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 10:58:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1e85uA-00077w-Hr
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 10:46:45 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:56938
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1e85uA-00076Q-CP
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 10:46:38 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v9REkGsM036665
-	for <qemu-devel@nongnu.org>; Fri, 27 Oct 2017 10:46:35 -0400
-Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2dv6pjgpdv-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 27 Oct 2017 10:46:34 -0400
-Received: from localhost
-	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Fri, 27 Oct 2017 15:46:30 +0100
-References: <1509114613-10601-1-git-send-email-walling@linux.vnet.ibm.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Fri, 27 Oct 2017 16:46:25 +0200
+	(envelope-from <frasse.iglesias@gmail.com>) id 1e8658-0002uT-F7
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 10:58:00 -0400
+Received: from mail-pg0-x232.google.com ([2607:f8b0:400e:c05::232]:52896)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <frasse.iglesias@gmail.com>)
+	id 1e8658-0002tp-4c
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 10:57:58 -0400
+Received: by mail-pg0-x232.google.com with SMTP id a192so5473198pge.9
+	for <qemu-devel@nongnu.org>; Fri, 27 Oct 2017 07:57:57 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1509114613-10601-1-git-send-email-walling@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <ab482340-6ac0-5f1a-2e24-3e2f9278a5bb@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v3] s390-ccw: print carriage return with
- new lines
+In-Reply-To: <CAKmqyKNcZtpGjTOYe4siE8=H0EHyQPcz=3ZLRFP8JK_J7AdZ4A@mail.gmail.com>
+References: <20171027055612.2488-1-frasse.iglesias@gmail.com>
+	<20171027055612.2488-14-frasse.iglesias@gmail.com>
+	<CAKmqyKPh9VXd554dGtBiMeXHvmWLZ8C7+saLJ5Bv+PFVNpqgoQ@mail.gmail.com>
+	<CAAYMZQthOPZxTQMvAQ+UgRWu8skt2sb0R3QEzQzcW2EvQXThMg@mail.gmail.com>
+	<CAKmqyKPpUwyUgMhy9e2D+uTUjBPqhZmXj+T6BnFstZZUPe0s7w@mail.gmail.com>
+	<CAAYMZQsM63X9LHr4AgO_nqGzJFnBHWA43+=Pfvp4s58_XDWz8Q@mail.gmail.com>
+	<CAKmqyKNcZtpGjTOYe4siE8=H0EHyQPcz=3ZLRFP8JK_J7AdZ4A@mail.gmail.com>
+From: francisco iglesias <frasse.iglesias@gmail.com>
+Date: Fri, 27 Oct 2017 16:57:56 +0200
+Message-ID: <CAAYMZQu7k31bbf+e9pY67xDgw+PZeQSam4zWBAegVDT=ZMvu4w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v4 13/13] xlnx-zcu102: Add support for the
+ ZynqMP QSPI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,35 +35,217 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Collin L. Walling" <walling@linux.vnet.ibm.com>, cohuck@redhat.com
-Cc: thuth@redhat.com, bwalk@linux.vnet.ibm.com, david@redhat.com, pmorel@linux.vnet.ibm.com, qemu-devel@nongnu.org, agraf@suse.de, pasic@linux.vnet.ibm.com, jjherne@linux.vnet.ibm.com, rth@twiddle.net
+To: Alistair Francis <alistair23@gmail.com>
+Cc: qemu-devel@nongnu.org, edgari@xilinx.com, Alistair Francis <alistai@xilinx.com>, francisco.iglesias@feimtech.se, "mar.krzeminski" <mar.krzeminski@gmail.com>
 
+Hello again Alistair,
 
+Thank you very much for the review! The new lines will be added into the
+next version of the patch series (v5).
 
-On 10/27/2017 04:30 PM, Collin L. Walling wrote:
-> The sclp console in the s390 bios writes raw data,
-> leading console emulators (such as virsh console) to
-> treat a new line ('\n') as just a new line instead
-> of as a Unix line feed. Because of this, output
-> appears in a "stair case" pattern.
-> 
-> Let's print \r\n on every occurrence of a new line
-> in the string passed to write to amend this issue.
-> 
-> This is in sync with the guest Linux code in
-> drivers/s390/char/sclp_vt220.c which also does a line feed
-> conversion  in the console part of the driver. 
-> 
-> This fixes the s390-ccw and s390-netboot output like
-> $ virsh start test --console
-> Domain test started
-> Connected to domain test
-> Escape character is ^]
-> Network boot starting...
->                           Using MAC address: 02:01:02:03:04:05
->                                                                 Requesting information via DHCP:  010
-> 
-> Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
-> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Best regards,
+Francisco Iglesias
 
-FWIW, please remove my signed-off-by when resending.
+On 27 Oct 2017 16:41, "Alistair Francis" <alistair23@gmail.com> wrote:
+
+> On Fri, Oct 27, 2017 at 2:48 PM, francisco iglesias
+> <frasse.iglesias@gmail.com> wrote:
+> > Good day Alistair,
+> >
+> > Yes exactly! The qspi aliases on the soc (named "qspi%d") targets the spi
+> > busses on the qspi dev (named "spi%d"). I did it this way in hope that
+> the
+> > code resembles how we connect the SST flashes to the standard spi
+> devices.
+> > Would you like me to do this in an other way or do you possibly think the
+> > approach is ok?
+>
+> This looks fine to me.
+>
+> Once you make those new line changes I mentioned:
+>
+> Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
+>
+> Alistair
+>
+>
+> >
+> > Best regards,
+> > Francisco Iglesias
+> >
+> >
+> > On 27 Oct 2017 14:03, "Alistair Francis" <alistair23@gmail.com> wrote:
+> >
+> > On Fri, Oct 27, 2017 at 11:17 AM, francisco iglesias
+> > <frasse.iglesias@gmail.com> wrote:
+> >> Dear alistair,
+> >>
+> >> Thank you for the review comments! I will update according them in the
+> >> next
+> >> version of the patch series! About your question, I might have
+> >> misunderstod,
+> >> but isn't the alias "qspi"? (s/"qspi{0,1}"  ->  s->qspi/"spi{0,1}")
+> >
+> > Ah! Now I think I understand. The buses on the QSPI device are still
+> > labeled "spi", is that correct?
+> >
+> > Alistair
+> >
+> >>
+> >> Best regards,
+> >> Francisco Iglesias
+> >>
+> >> On 27 Oct 2017 10:49, "Alistair Francis" <alistair23@gmail.com> wrote:
+> >>>
+> >>> On Fri, Oct 27, 2017 at 7:56 AM, Francisco Iglesias
+> >>> <frasse.iglesias@gmail.com> wrote:
+> >>> > Add support for the ZynqMP QSPI (consisting of the Generic QSPI and
+> >>> > Legacy
+> >>> > QSPI) and connect Numonyx n25q512a11 flashes to it.
+> >>> >
+> >>> > Signed-off-by: Francisco Iglesias <frasse.iglesias@gmail.com>
+> >>> > ---
+> >>> >  hw/arm/xlnx-zcu102.c         | 23 +++++++++++++++++++++++
+> >>> >  hw/arm/xlnx-zynqmp.c         | 24 ++++++++++++++++++++++++
+> >>> >  include/hw/arm/xlnx-zynqmp.h |  5 +++++
+> >>> >  3 files changed, 52 insertions(+)
+> >>> >
+> >>> > diff --git a/hw/arm/xlnx-zcu102.c b/hw/arm/xlnx-zcu102.c
+> >>> > index 519a16e..7d61972 100644
+> >>> > --- a/hw/arm/xlnx-zcu102.c
+> >>> > +++ b/hw/arm/xlnx-zcu102.c
+> >>> > @@ -150,6 +150,29 @@ static void xlnx_zynqmp_init(XlnxZCU102 *s,
+> >>> > MachineState *machine)
+> >>> >          sysbus_connect_irq(SYS_BUS_DEVICE(&s->soc.spi[i]), 1,
+> >>> > cs_line);
+> >>> >      }
+> >>> >
+> >>> > +    for (i = 0; i < XLNX_ZYNQMP_NUM_QSPI_FLASH; i++) {
+> >>> > +        SSIBus *spi_bus;
+> >>> > +        DeviceState *flash_dev;
+> >>> > +        qemu_irq cs_line;
+> >>> > +        DriveInfo *dinfo = drive_get_next(IF_MTD);
+> >>> > +        int bus = i / XLNX_ZYNQMP_NUM_QSPI_BUS_CS;
+> >>> > +        gchar *bus_name = g_strdup_printf("qspi%d", bus);
+> >>> > +
+> >>> > +        spi_bus = (SSIBus *)qdev_get_child_bus(DEVICE(&s->soc),
+> >>> > bus_name);
+> >>> > +        g_free(bus_name);
+> >>> > +
+> >>> > +        flash_dev = ssi_create_slave_no_init(spi_bus,
+> "n25q512a11");
+> >>> > +        if (dinfo) {
+> >>> > +            qdev_prop_set_drive(flash_dev, "drive",
+> >>> > blk_by_legacy_dinfo(dinfo),
+> >>> > +                                &error_fatal);
+> >>> > +        }
+> >>> > +        qdev_init_nofail(flash_dev);
+> >>> > +
+> >>> > +        cs_line = qdev_get_gpio_in_named(flash_dev, SSI_GPIO_CS,
+> 0);
+> >>> > +
+> >>> > +        sysbus_connect_irq(SYS_BUS_DEVICE(&s->soc.qspi), i + 1,
+> >>> > cs_line);
+> >>> > +    }
+> >>> > +
+> >>> >      /* TODO create and connect IDE devices for ide_drive_get() */
+> >>> >
+> >>> >      xlnx_zcu102_binfo.ram_size = ram_size;
+> >>> > diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
+> >>> > index d4b6560..f7c8b4b 100644
+> >>> > --- a/hw/arm/xlnx-zynqmp.c
+> >>> > +++ b/hw/arm/xlnx-zynqmp.c
+> >>> > @@ -40,6 +40,10 @@
+> >>> >  #define SATA_ADDR           0xFD0C0000
+> >>> >  #define SATA_NUM_PORTS      2
+> >>> >
+> >>> > +#define QSPI_ADDR           0xff0f0000
+> >>> > +#define LQSPI_ADDR          0xc0000000
+> >>> > +#define QSPI_IRQ            15
+> >>> > +
+> >>> >  #define DP_ADDR             0xfd4a0000
+> >>> >  #define DP_IRQ              113
+> >>> >
+> >>> > @@ -169,6 +173,9 @@ static void xlnx_zynqmp_init(Object *obj)
+> >>> >          qdev_set_parent_bus(DEVICE(&s->spi[i]),
+> sysbus_get_default());
+> >>> >      }
+> >>> >
+> >>> > +    object_initialize(&s->qspi, sizeof(s->qspi),
+> >>> > TYPE_XLNX_ZYNQMP_QSPIPS);
+> >>> > +    qdev_set_parent_bus(DEVICE(&s->qspi), sysbus_get_default());
+> >>> > +
+> >>> >      object_initialize(&s->dp, sizeof(s->dp), TYPE_XLNX_DP);
+> >>> >      qdev_set_parent_bus(DEVICE(&s->dp), sysbus_get_default());
+> >>> >
+> >>> > @@ -405,6 +412,23 @@ static void xlnx_zynqmp_realize(DeviceState
+> *dev,
+> >>> > Error **errp)
+> >>> >          g_free(bus_name);
+> >>> >      }
+> >>> >
+> >>> > +    object_property_set_bool(OBJECT(&s->qspi), true, "realized",
+> >>> > &err);
+> >>> > +    sysbus_mmio_map(SYS_BUS_DEVICE(&s->qspi), 0, QSPI_ADDR);
+> >>> > +    sysbus_mmio_map(SYS_BUS_DEVICE(&s->qspi), 1, LQSPI_ADDR);
+> >>> > +    sysbus_connect_irq(SYS_BUS_DEVICE(&s->qspi), 0,
+> >>> > gic_spi[QSPI_IRQ]);
+> >>>
+> >>> New line here
+> >>>
+> >>> > +    for (i = 0; i < XLNX_ZYNQMP_NUM_QSPI_BUS; i++) {
+> >>> > +        gchar *bus_name;
+> >>> > +        gchar *target_bus;
+> >>>
+> >>> New line here
+> >>>
+> >>> > +        /* Alias controller SPI bus to the SoC itself */
+> >>> > +        bus_name = g_strdup_printf("qspi%d", i);
+> >>> > +        target_bus = g_strdup_printf("spi%d", i);
+> >>> > +        object_property_add_alias(OBJECT(s), bus_name,
+> >>> > +                                  OBJECT(&s->qspi), target_bus,
+> >>>
+> >>> Why do we alias qspi to spi?
+> >>>
+> >>> Alistair
+> >>>
+> >>> > +                                  &error_abort);
+> >>> > +        g_free(bus_name);
+> >>> > +        g_free(target_bus);
+> >>> > +    }
+> >>> > +
+> >>> >      object_property_set_bool(OBJECT(&s->dp), true, "realized",
+> &err);
+> >>> >      if (err) {
+> >>> >          error_propagate(errp, err);
+> >>> > diff --git a/include/hw/arm/xlnx-zynqmp.h
+> >>> > b/include/hw/arm/xlnx-zynqmp.h
+> >>> > index 6eff81a..3e6fb9b 100644
+> >>> > --- a/include/hw/arm/xlnx-zynqmp.h
+> >>> > +++ b/include/hw/arm/xlnx-zynqmp.h
+> >>> > @@ -40,6 +40,10 @@
+> >>> >  #define XLNX_ZYNQMP_NUM_SDHCI 2
+> >>> >  #define XLNX_ZYNQMP_NUM_SPIS 2
+> >>> >
+> >>> > +#define XLNX_ZYNQMP_NUM_QSPI_BUS 2
+> >>> > +#define XLNX_ZYNQMP_NUM_QSPI_BUS_CS 2
+> >>> > +#define XLNX_ZYNQMP_NUM_QSPI_FLASH 4
+> >>> > +
+> >>> >  #define XLNX_ZYNQMP_NUM_OCM_BANKS 4
+> >>> >  #define XLNX_ZYNQMP_OCM_RAM_0_ADDRESS 0xFFFC0000
+> >>> >  #define XLNX_ZYNQMP_OCM_RAM_SIZE 0x10000
+> >>> > @@ -83,6 +87,7 @@ typedef struct XlnxZynqMPState {
+> >>> >      SysbusAHCIState sata;
+> >>> >      SDHCIState sdhci[XLNX_ZYNQMP_NUM_SDHCI];
+> >>> >      XilinxSPIPS spi[XLNX_ZYNQMP_NUM_SPIS];
+> >>> > +    XlnxZynqMPQSPIPS qspi;
+> >>> >      XlnxDPState dp;
+> >>> >      XlnxDPDMAState dpdma;
+> >>> >
+> >>> > --
+> >>> > 2.9.3
+> >>> >
+> >>> >
+> >
+> >
+>
