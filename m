@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50993)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52374)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1e7tn7-0002Yj-DW
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 21:50:34 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1e7tqk-0003MD-KW
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 21:54:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1e7tn4-000614-At
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 21:50:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44614)
+	(envelope-from <dgilbert@redhat.com>) id 1e7tqh-0000xP-Ie
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 21:54:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35550)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1e7tn4-00060C-2S
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 21:50:30 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1e7tqh-0000wL-91
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 21:54:15 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B9882356D9
-	for <qemu-devel@nongnu.org>; Fri, 27 Oct 2017 01:50:28 +0000 (UTC)
-Date: Fri, 27 Oct 2017 02:50:22 +0100
+	by mx1.redhat.com (Postfix) with ESMTPS id 31BB685541
+	for <qemu-devel@nongnu.org>; Fri, 27 Oct 2017 01:54:14 +0000 (UTC)
+Date: Fri, 27 Oct 2017 02:54:07 +0100
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20171027015022.GA11576@work-vm>
+Message-ID: <20171027015407.GB11576@work-vm>
 References: <20171026075222.27798-1-quintela@redhat.com>
-	<20171026075222.27798-2-quintela@redhat.com>
+	<20171026075222.27798-3-quintela@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20171026075222.27798-2-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 01/10] tests: rename postcopy-test to
- migration-test
+In-Reply-To: <20171026075222.27798-3-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 02/10] tests: Refactor setting of
+ parameters/capabilities
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,103 +38,154 @@ To: Juan Quintela <quintela@redhat.com>
 Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
 
 * Juan Quintela (quintela@redhat.com) wrote:
-> Instead of repeating the code, we are going to bo more tests on this file
+> So we can use them in future tests
 > 
 > Signed-off-by: Juan Quintela <quintela@redhat.com>
+> ---
+>  tests/migration-test.c | 101 +++++++++++++++++++++++++++++++------------------
+>  1 file changed, 64 insertions(+), 37 deletions(-)
+> 
+> diff --git a/tests/migration-test.c b/tests/migration-test.c
+> index 55c4aed719..19a1445076 100644
+> --- a/tests/migration-test.c
+> +++ b/tests/migration-test.c
+> @@ -351,12 +351,69 @@ static void cleanup(const char *filename)
+>      g_free(path);
+>  }
+>  
+> +static void migrate_set_downtime(QTestState *who, const char *value)
+> +{
+> +    QDict *rsp;
+> +    gchar *cmd;
+> +
+> +    cmd = g_strdup_printf("{ 'execute': 'migrate_set_downtime',"
+> +                          "'arguments': { 'value': %s } }", value);
+> +    rsp = qtest_qmp(who, cmd);
+> +    g_free(cmd);
+> +    g_assert(qdict_haskey(rsp, "return"));
+> +    QDECREF(rsp);
+> +}
+> +
+> +static void migrate_set_speed(QTestState *who, const char *value)
+> +{
+> +    QDict *rsp;
+> +    gchar *cmd;
+> +
+> +    cmd = g_strdup_printf("{ 'execute': 'migrate_set_speed',"
+> +                          "'arguments': { 'value': %s } }", value);
+> +    rsp = qtest_qmp(who, cmd);
+> +    g_free(cmd);
+> +    g_assert(qdict_haskey(rsp, "return"));
+> +    QDECREF(rsp);
+> +}
+> +
+> +static void migrate_set_capability(QTestState *who, const char *capability,
+> +                                   const char *value)
+> +{
+
+I'd be tempted to make value a bool here; but it's still better
+than where we were so,
+
 
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-> ---
->  MAINTAINERS                                 | 1 +
->  tests/Makefile.include                      | 6 +++---
->  tests/{postcopy-test.c => migration-test.c} | 8 +++-----
->  3 files changed, 7 insertions(+), 8 deletions(-)
->  rename tests/{postcopy-test.c => migration-test.c} (98%)
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 12175425a7..8d0a3de734 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -1562,6 +1562,7 @@ F: include/migration/
->  F: migration/
->  F: scripts/vmstate-static-checker.py
->  F: tests/vmstate-static-checker-data/
-> +F: tests/migration-test.c
->  F: docs/devel/migration.txt
->  F: qapi/migration.json
->  
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index 70dc711bca..434a2ce868 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -287,7 +287,7 @@ endif
->  check-qtest-i386-$(CONFIG_SLIRP) += tests/test-netfilter$(EXESUF)
->  check-qtest-i386-$(CONFIG_POSIX) += tests/test-filter-mirror$(EXESUF)
->  check-qtest-i386-$(CONFIG_POSIX) += tests/test-filter-redirector$(EXESUF)
-> -check-qtest-i386-y += tests/postcopy-test$(EXESUF)
-> +check-qtest-i386-y += tests/migration-test$(EXESUF)
->  check-qtest-i386-y += tests/test-x86-cpuid-compat$(EXESUF)
->  check-qtest-i386-y += tests/numa-test$(EXESUF)
->  check-qtest-x86_64-y += $(check-qtest-i386-y)
-> @@ -315,7 +315,7 @@ check-qtest-ppc64-y += tests/boot-order-test$(EXESUF)
->  check-qtest-ppc64-y += tests/prom-env-test$(EXESUF)
->  check-qtest-ppc64-y += tests/pnv-xscom-test$(EXESUF)
->  check-qtest-ppc64-y += tests/drive_del-test$(EXESUF)
-> -check-qtest-ppc64-y += tests/postcopy-test$(EXESUF)
-> +check-qtest-ppc64-y += tests/migration-test$(EXESUF)
->  check-qtest-ppc64-y += tests/boot-serial-test$(EXESUF)
->  check-qtest-ppc64-y += tests/rtas-test$(EXESUF)
->  check-qtest-ppc64-$(CONFIG_SLIRP) += tests/pxe-test$(EXESUF)
-> @@ -784,7 +784,7 @@ tests/usb-hcd-uhci-test$(EXESUF): tests/usb-hcd-uhci-test.o $(libqos-usb-obj-y)
->  tests/usb-hcd-ehci-test$(EXESUF): tests/usb-hcd-ehci-test.o $(libqos-usb-obj-y)
->  tests/usb-hcd-xhci-test$(EXESUF): tests/usb-hcd-xhci-test.o $(libqos-usb-obj-y)
->  tests/pc-cpu-test$(EXESUF): tests/pc-cpu-test.o
-> -tests/postcopy-test$(EXESUF): tests/postcopy-test.o
-> +tests/migration-test$(EXESUF): tests/migration-test.o
->  tests/vhost-user-test$(EXESUF): tests/vhost-user-test.o $(test-util-obj-y) \
->  	$(qtest-obj-y) $(test-io-obj-y) $(libqos-virtio-obj-y) $(libqos-pc-obj-y) \
->  	$(chardev-obj-y)
-> diff --git a/tests/postcopy-test.c b/tests/migration-test.c
-> similarity index 98%
-> rename from tests/postcopy-test.c
-> rename to tests/migration-test.c
-> index 8142f2ab90..55c4aed719 100644
-> --- a/tests/postcopy-test.c
-> +++ b/tests/migration-test.c
-> @@ -1,5 +1,5 @@
->  /*
-> - * QTest testcase for postcopy
-> + * QTest testcase for migration
->   *
->   * Copyright (c) 2016 Red Hat, Inc. and/or its affiliates
->   *   based on the vhost-user-test.c that is:
-> @@ -243,8 +243,6 @@ static QDict *return_or_event(QDict *response)
->  /*
->   * It's tricky to use qemu's migration event capability with qtest,
->   * events suddenly appearing confuse the qmp()/hmp() responses.
-> - * so wait for a couple of passes to have happened before
-> - * going postcopy.
->   */
->  
->  static uint64_t get_migration_pass(void)
-> @@ -504,7 +502,7 @@ static void test_migrate(void)
->  
->  int main(int argc, char **argv)
+> +    QDict *rsp;
+> +    gchar *cmd;
+> +
+> +    cmd = g_strdup_printf("{ 'execute': 'migrate-set-capabilities',"
+> +                          "'arguments': { "
+> +                          "'capabilities': [ { "
+> +                          "'capability': '%s', 'state': %s } ] } }",
+> +                          capability, value);
+> +    rsp = qtest_qmp(who, cmd);
+> +    g_free(cmd);
+> +    g_assert(qdict_haskey(rsp, "return"));
+> +    QDECREF(rsp);
+> +}
+> +
+> +static void migrate(QTestState *who, const char *uri)
+> +{
+> +    QDict *rsp;
+> +    gchar *cmd;
+> +
+> +    cmd = g_strdup_printf("{ 'execute': 'migrate',"
+> +                          "'arguments': { 'uri': '%s' } }",
+> +                          uri);
+> +    rsp = qtest_qmp(who, cmd);
+> +    g_free(cmd);
+> +    g_assert(qdict_haskey(rsp, "return"));
+> +    QDECREF(rsp);
+> +}
+> +
+>  static void test_migrate(void)
 >  {
-> -    char template[] = "/tmp/postcopy-test-XXXXXX";
-> +    char template[] = "/tmp/migration-test-XXXXXX";
->      int ret;
+>      char *uri = g_strdup_printf("unix:%s/migsocket", tmpfs);
+>      QTestState *global = global_qtest, *from, *to;
+>      unsigned char dest_byte_a, dest_byte_b, dest_byte_c, dest_byte_d;
+> -    gchar *cmd, *cmd_src, *cmd_dst;
+> +    gchar *cmd_src, *cmd_dst;
+>      QDict *rsp;
 >  
->      g_test_init(&argc, &argv, NULL);
-> @@ -521,7 +519,7 @@ int main(int argc, char **argv)
+>      char *bootpath = g_strdup_printf("%s/bootsect", tmpfs);
+> @@ -405,52 +462,22 @@ static void test_migrate(void)
+>      to = qtest_init(cmd_dst);
+>      g_free(cmd_dst);
 >  
->      module_call_init(MODULE_INIT_QOM);
+> -    global_qtest = from;
+> -    rsp = qmp("{ 'execute': 'migrate-set-capabilities',"
+> -                  "'arguments': { "
+> -                      "'capabilities': [ {"
+> -                          "'capability': 'postcopy-ram',"
+> -                          "'state': true } ] } }");
+> -    g_assert(qdict_haskey(rsp, "return"));
+> -    QDECREF(rsp);
+> -
+> -    global_qtest = to;
+> -    rsp = qmp("{ 'execute': 'migrate-set-capabilities',"
+> -                  "'arguments': { "
+> -                      "'capabilities': [ {"
+> -                          "'capability': 'postcopy-ram',"
+> -                          "'state': true } ] } }");
+> -    g_assert(qdict_haskey(rsp, "return"));
+> -    QDECREF(rsp);
+> +    migrate_set_capability(from, "postcopy-ram", "true");
+> +    migrate_set_capability(to, "postcopy-ram", "true");
 >  
-> -    qtest_add_func("/postcopy", test_migrate);
-> +    qtest_add_func("/migration/postcopy/unix", test_migrate);
+>      /* We want to pick a speed slow enough that the test completes
+>       * quickly, but that it doesn't complete precopy even on a slow
+>       * machine, so also set the downtime.
+>       */
+> -    global_qtest = from;
+> -    rsp = qmp("{ 'execute': 'migrate_set_speed',"
+> -              "'arguments': { 'value': 100000000 } }");
+> -    g_assert(qdict_haskey(rsp, "return"));
+> -    QDECREF(rsp);
+> -
+> -    /* 1ms downtime - it should never finish precopy */
+> -    rsp = qmp("{ 'execute': 'migrate_set_downtime',"
+> -              "'arguments': { 'value': 0.001 } }");
+> -    g_assert(qdict_haskey(rsp, "return"));
+> -    QDECREF(rsp);
+> -
+> +    migrate_set_speed(from, "100000000");
+> +    migrate_set_downtime(from, "0.001");
 >  
->      ret = g_test_run();
+>      /* Wait for the first serial output from the source */
+>      wait_for_serial("src_serial");
 >  
+> -    cmd = g_strdup_printf("{ 'execute': 'migrate',"
+> -                          "'arguments': { 'uri': '%s' } }",
+> -                          uri);
+> -    rsp = qmp(cmd);
+> -    g_free(cmd);
+> -    g_assert(qdict_haskey(rsp, "return"));
+> -    QDECREF(rsp);
+> +    migrate(from, uri);
+>  
+> +    global_qtest = from;
+>      wait_for_migration_pass();
+>  
+>      rsp = return_or_event(qmp("{ 'execute': 'migrate-start-postcopy' }"));
 > -- 
 > 2.13.6
 > 
