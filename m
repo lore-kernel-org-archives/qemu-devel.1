@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56100)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56261)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e87mx-0005BO-A4
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 12:47:21 -0400
+	(envelope-from <bounces@canonical.com>) id 1e87n5-0005Db-C8
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 12:47:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e87mv-00043X-M1
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 12:47:19 -0400
-Received: from indium.canonical.com ([91.189.90.7]:51836)
+	(envelope-from <bounces@canonical.com>) id 1e87n1-0004UC-9R
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 12:47:27 -0400
+Received: from indium.canonical.com ([91.189.90.7]:52086)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1e87mv-0003xN-Ca
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 12:47:17 -0400
+	id 1e87n0-0004Nx-Vz
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 12:47:23 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1e87mt-0001Je-8r
-	for <qemu-devel@nongnu.org>; Fri, 27 Oct 2017 16:47:15 +0000
+	id 1e87my-0001QZ-FW
+	for <qemu-devel@nongnu.org>; Fri, 27 Oct 2017 16:47:20 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 395F32E80CC
-	for <qemu-devel@nongnu.org>; Fri, 27 Oct 2017 16:47:15 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 3B7C82E80CD
+	for <qemu-devel@nongnu.org>; Fri, 27 Oct 2017 16:47:20 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 27 Oct 2017 16:28:02 -0000
+Date: Fri, 27 Oct 2017 16:28:39 -0000
 From: Bug Watch Updater <697197@bugs.launchpad.net>
 Reply-To: Bug 697197 <697197@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <20110104122142.23014.63077.malonedeb@gandwana.canonical.com>
-Message-Id: <150912168281.4405.10228554865923789666.launchpad@loganberry.canonical.com>
+Message-Id: <150912171998.4405.2100049521656894163.launchpad@loganberry.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 697197] Re: Empty password allows access to VNC
  in libvirt
@@ -39,8 +39,8 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Launchpad has imported 3 comments from the remote bug at
-https://bugzilla.redhat.com/show_bug.cgi?id=3D667097.
+Launchpad has imported 5 comments from the remote bug at
+https://bugzilla.redhat.com/show_bug.cgi?id=3D668589.
 
 If you reply to an imported comment from within Launchpad, your comment
 will be sent to the remote bug automatically. Read more about
@@ -48,88 +48,72 @@ Launchpad's inter-bugtracker facilities at
 https://help.launchpad.net/InterBugTracking.
 
 ------------------------------------------------------------------------
-On 2011-01-04T12:30:55+00:00 Neil wrote:
+On 2011-01-10T20:45:01+00:00 Petr wrote:
 
 Description of problem:
+The semantics of the ',password' option to -vnc are that it enables the VNC=
+ auth scheme. If the VNC server password is unset or empty string, all atte=
+mpts to authenticate with the server will be explicitly blocked.
 
-The help for 'vnc_password' in qemu.conf states "An empty string will
-still enable passwords, but be rejected by QEMU effectively preventing
-any use of VNC.".
+This allows applications to enable and selectively allow access for a
+period of time, before clearing the password again to prevent further
+access.
 
-Yet if you set vnc_password=3D"" then you can access the VNC console
-without any password prompt at all - just as you can if the entry is
-hashed out.
+Upstream changes have introduced a flaw by disabling all authentication
+when the password was cleared with upstream commit [1].
 
-Version-Release number of selected component (if applicable):
-
-libvirtd (libvirt) 0.8.3
-
-
-How reproducible:
-
-Every time by configuration
-
-Steps to Reproduce:
-1. Create a VNC console without a password.
-2. Set vnc_password=3D"" in /etc/libvirt/qemu.conf
-3. Start up a guest and access the VNC console with a client. =
-
-  =
-
-Actual results:
-
-You get straight into the console with no prompts.
-
-
-Expected results:
-
-Should have come up with a prompt and rejected the access. Or the
-instructions in the qemu.conf file need changing to take account of the
-current behaviour.
-
-Additional info:
+[1]
+http://www.qemu.com/qemu.git/commit/?id=3D52c18be9e99dabe295321153fda7fce9f=
+76647ac
 
 Reply at:
-https://bugs.launchpad.net/ubuntu/+source/libvirt/+bug/697197/comments/2
+https://bugs.launchpad.net/ubuntu/+source/libvirt/+bug/697197/comments/9
 
 ------------------------------------------------------------------------
-On 2011-01-04T12:48:32+00:00 Neil wrote:
+On 2011-01-28T18:02:42+00:00 Neil wrote:
 
-Similarly if you set the passwd attribute to '' in the vnc graphics XML
-stanza.
+Created attachment 475841
+Fix to vnc password semantics
+
+This patch corrects the flaw in qemu-kvm
+
+Please see http://launchpad.net/bugs/697197 for testing performed.
 
 Reply at:
-https://bugs.launchpad.net/ubuntu/+source/libvirt/+bug/697197/comments/3
+https://bugs.launchpad.net/ubuntu/+source/libvirt/+bug/697197/comments/15
 
 ------------------------------------------------------------------------
-On 2011-01-07T14:45:34+00:00 Daniel wrote:
+On 2011-02-28T11:09:05+00:00 Petr wrote:
 
-This is not a libvirt bug. This is caused by a flaw in particular QEMU
-version you are using, which silently disables auth when the password is
-set to "". This bug was introduced in QEMU in this bogus commit
+Created qemu tracking bugs for this issue
 
-commit 52c18be9e99dabe295321153fda7fce9f76647ac
-Author: Zachary Amsden <zamsden@redhat.com>
-Date:   Thu Jul 30 00:15:01 2009 -1000
-
-    When using stdio monitor and VNC display, one can set or clear a VNC
-password; this should set or turn off VNC authentication as well.
+Affects: fedora-all [bug 680886]
 
 Reply at:
-https://bugs.launchpad.net/ubuntu/+source/libvirt/+bug/697197/comments/5
+https://bugs.launchpad.net/ubuntu/+source/libvirt/+bug/697197/comments/31
 
+------------------------------------------------------------------------
+On 2011-03-10T20:11:32+00:00 errata-xmlrpc wrote:
 
-** Changed in: libvirt
-       Status: Unknown =3D> Invalid
+This issue has been addressed in following products:
 
-** Changed in: libvirt
-   Importance: Unknown =3D> Medium
+  Red Hat Enterprise Linux 6
 
-** Changed in: qemu-kvm
-       Status: Unknown =3D> Fix Released
+Via RHSA-2011:0345 https://rhn.redhat.com/errata/RHSA-2011-0345.html
 
-** Changed in: qemu-kvm
-   Importance: Unknown =3D> Medium
+Reply at:
+https://bugs.launchpad.net/ubuntu/+source/libvirt/+bug/697197/comments/32
+
+------------------------------------------------------------------------
+On 2012-03-30T17:33:58+00:00 Petr wrote:
+
+Statement:
+
+This issue does not affect versions of kvm package as shipped with Red
+Hat Enterprise Linux 5.
+
+Reply at:
+https://bugs.launchpad.net/ubuntu/+source/libvirt/+bug/697197/comments/33
 
 -- =
 
