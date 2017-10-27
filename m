@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55948)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59598)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1e7v84-0001AW-2Z
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 23:16:17 -0400
+	(envelope-from <batmanustc@gmail.com>) id 1e7vK0-0003Kb-JS
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 23:28:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1e7v80-0008Gb-4L
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 23:16:16 -0400
-Received: from mail.cn.fujitsu.com ([183.91.158.132]:25075
-	helo=heian.cn.fujitsu.com) by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1e7v7z-0008Am-8M
-	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 23:16:12 -0400
-From: Dou Liyang <douly.fnst@cn.fujitsu.com>
-Date: Fri, 27 Oct 2017 11:15:54 +0800
-Message-ID: <1509074154-25109-1-git-send-email-douly.fnst@cn.fujitsu.com>
+	(envelope-from <batmanustc@gmail.com>) id 1e7vJy-0002Rq-VI
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 23:28:36 -0400
+Received: from mail-qt0-x22d.google.com ([2607:f8b0:400d:c0d::22d]:54921)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <batmanustc@gmail.com>)
+	id 1e7vJy-0002RV-Om
+	for qemu-devel@nongnu.org; Thu, 26 Oct 2017 23:28:34 -0400
+Received: by mail-qt0-x22d.google.com with SMTP id z19so6869159qtg.11
+	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 20:28:34 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v5] NUMA: Enable adding NUMA node implicitly
+In-Reply-To: <20171026140203.GG10055@redhat.com>
+References: <CAOE=1Z31T6nHcO4P6GWW8GK_o0VB66HivPc-m1LZRh_x6nY_6g@mail.gmail.com>
+	<20171026140203.GG10055@redhat.com>
+From: Sam <batmanustc@gmail.com>
+Date: Fri, 27 Oct 2017 11:28:33 +0800
+Message-ID: <CAOE=1Z3Umt+mLDKyJ04qRsH-E=EPYC2ozeHm5a3jbqF0=yv-hQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] Qemu start VM in huge page without '-mem-prealloc'
+ will get memory leak?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,178 +30,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Dou Liyang <douly.fnst@cn.fujitsu.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, David Hildenbrand <david@redhat.com>, Thomas Huth <thuth@redhat.com>, Alistair Francis <alistair23@gmail.com>, f4bug@amsat.org, Takao Indoh <indou.takao@jp.fujitsu.com>, Izumi Taku <izumi.taku@jp.fujitsu.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Linux and Windows need ACPI SRAT table to make memory hotplug work properly,
-however currently QEMU doesn't create SRAT table if numa options aren't present
-on CLI.
+After restart ovs-dpdk(which is openvswitch with dpdk lib), memory is
+released.
 
-Which breaks both linux and windows guests in certain conditions:
- * Windows: won't enable memory hotplug without SRAT table at all
- * Linux: if QEMU is started with initial memory all below 4Gb and no SRAT table
-   present, guest kernel will use nommu DMA ops, which breaks 32bit hw drivers
-   when memory is hotplugged and guest tries to use it with that drivers.
+But problem is in product environment, I could not restart ovs-dpdk......
 
-Fix above issues by automatically creating a numa node when QEMU is started with
-memory hotplug enabled but without '-numa' options on CLI.
-(PS: auto-create numa node only for new machine types so not to break migration).
+So I think I'd better wait for 10 second to avoid this bug, or use
+'-mem-prealloc' to start vm.
 
-Which would provide SRAT table to guests without explicit -numa options on CLI
-and would allow:
- * Windows: to enable memory hotplug
- * Linux: switch to SWIOTLB DMA ops, to bounce DMA transfers to 32bit allocated
-   buffers that legacy drivers/hw can handle.
+The reason I want to remove '-mem-prealloc' is to reduce the start time of
+VM, but now it seems I have to do more test.
 
-[Rewritten by Igor]
+2017-10-26 22:02 GMT+08:00 Daniel P. Berrange <berrange@redhat.com>:
 
-Reported-by: Thadeu Lima de Souza Cascardo <cascardo@canonical.com>
-Suggested-by: Igor Mammedov <imammedo@redhat.com>
-Signed-off-by: Dou Liyang <douly.fnst@cn.fujitsu.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Richard Henderson <rth@twiddle.net>
-Cc: Eduardo Habkost <ehabkost@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Marcel Apfelbaum <marcel@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>
-Cc: David Hildenbrand <david@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>
-Cc: Alistair Francis <alistair23@gmail.com>
-Cc: f4bug@amsat.org
-Cc: Takao Indoh <indou.takao@jp.fujitsu.com>
-Cc: Izumi Taku <izumi.taku@jp.fujitsu.com>
----
-changelog V4 --> V5:
-
-  - Avoid calling qemu_opts_parse*()
-  - Add a new NUMA node by calling parse_numa_node() directly
-  - Remove the redundant argument in parse_numa_opts()
-
-These all were suggested by Eduardo.
-
----
- hw/i386/pc.c        |  1 +
- hw/i386/pc_piix.c   |  1 +
- hw/i386/pc_q35.c    |  1 +
- include/hw/boards.h |  1 +
- numa.c              | 21 ++++++++++++++++++++-
- vl.c                |  3 +--
- 6 files changed, 25 insertions(+), 3 deletions(-)
-
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 8e307f7..ec4eb97 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -2325,6 +2325,7 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
-     mc->cpu_index_to_instance_props = pc_cpu_index_to_props;
-     mc->get_default_cpu_node_id = pc_get_default_cpu_node_id;
-     mc->possible_cpu_arch_ids = pc_possible_cpu_arch_ids;
-+    mc->auto_enable_numa_with_memhp = true;
-     mc->has_hotpluggable_cpus = true;
-     mc->default_boot_order = "cad";
-     mc->hot_add_cpu = pc_hot_add_cpu;
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index f79d5cb..5e47528 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -446,6 +446,7 @@ static void pc_i440fx_2_10_machine_options(MachineClass *m)
-     m->is_default = 0;
-     m->alias = NULL;
-     SET_MACHINE_COMPAT(m, PC_COMPAT_2_10);
-+    m->auto_enable_numa_with_memhp = false;
- }
- 
- DEFINE_I440FX_MACHINE(v2_10, "pc-i440fx-2.10", NULL,
-diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-index da3ea60..d606004 100644
---- a/hw/i386/pc_q35.c
-+++ b/hw/i386/pc_q35.c
-@@ -318,6 +318,7 @@ static void pc_q35_2_10_machine_options(MachineClass *m)
-     m->alias = NULL;
-     SET_MACHINE_COMPAT(m, PC_COMPAT_2_10);
-     m->numa_auto_assign_ram = numa_legacy_auto_assign_ram;
-+    m->auto_enable_numa_with_memhp = false;
- }
- 
- DEFINE_Q35_MACHINE(v2_10, "pc-q35-2.10", NULL,
-diff --git a/include/hw/boards.h b/include/hw/boards.h
-index 191a5b3..f1077f1 100644
---- a/include/hw/boards.h
-+++ b/include/hw/boards.h
-@@ -192,6 +192,7 @@ struct MachineClass {
-     bool ignore_memory_transaction_failures;
-     int numa_mem_align_shift;
-     const char **valid_cpu_types;
-+    bool auto_enable_numa_with_memhp;
-     void (*numa_auto_assign_ram)(MachineClass *mc, NodeInfo *nodes,
-                                  int nb_nodes, ram_addr_t size);
- 
-diff --git a/numa.c b/numa.c
-index 100a67f..4d12f30 100644
---- a/numa.c
-+++ b/numa.c
-@@ -221,6 +221,7 @@ static void parse_numa_node(MachineState *ms, NumaNodeOptions *node,
-     }
-     numa_info[nodenr].present = true;
-     max_numa_nodeid = MAX(max_numa_nodeid, nodenr + 1);
-+    nb_numa_nodes++;
- }
- 
- static void parse_numa_distance(NumaDistOptions *dist, Error **errp)
-@@ -281,7 +282,6 @@ static int parse_numa(void *opaque, QemuOpts *opts, Error **errp)
-         if (err) {
-             goto end;
-         }
--        nb_numa_nodes++;
-         break;
-     case NUMA_OPTIONS_TYPE_DIST:
-         parse_numa_distance(&object->u.dist, &err);
-@@ -432,6 +432,25 @@ void parse_numa_opts(MachineState *ms)
-         exit(1);
-     }
- 
-+    /*
-+     * If memory hotplug is enabled (slots > 0) but without '-numa'
-+     * options explicitly on CLI, guestes will break.
-+     *
-+     *   Windows: won't enable memory hotplug without SRAT table at all
-+     *
-+     *   Linux: if QEMU is started with initial memory all below 4Gb
-+     *   and no SRAT table present, guest kernel will use nommu DMA ops,
-+     *   which breaks 32bit hw drivers when memory is hotplugged and
-+     *   guest tries to use it with that drivers.
-+     *
-+     * Enable NUMA implicitly by adding a new NUMA node automatically.
-+     */
-+    if (ms->ram_slots > 0 && nb_numa_nodes == 0 &&
-+        mc->auto_enable_numa_with_memhp) {
-+            NumaNodeOptions node = { };
-+            parse_numa_node(ms, &node, NULL, NULL);
-+    }
-+
-     assert(max_numa_nodeid <= MAX_NODES);
- 
-     /* No support for sparse NUMA node IDs yet: */
-diff --git a/vl.c b/vl.c
-index ec29909..be332d1 100644
---- a/vl.c
-+++ b/vl.c
-@@ -4675,8 +4675,6 @@ int main(int argc, char **argv, char **envp)
-     default_drive(default_floppy, snapshot, IF_FLOPPY, 0, FD_OPTS);
-     default_drive(default_sdcard, snapshot, IF_SD, 0, SD_OPTS);
- 
--    parse_numa_opts(current_machine);
--
-     if (qemu_opts_foreach(qemu_find_opts("mon"),
-                           mon_init_func, NULL, NULL)) {
-         exit(1);
-@@ -4726,6 +4724,7 @@ int main(int argc, char **argv, char **envp)
-     current_machine->boot_order = boot_order;
-     current_machine->cpu_model = cpu_model;
- 
-+    parse_numa_opts(current_machine);
- 
-     /* parse features once if machine provides default cpu_type */
-     if (machine_class->default_cpu_type) {
--- 
-2.5.5
+> On Thu, Oct 26, 2017 at 11:09:49AM +0800, Sam wrote:
+> > For qemu-2.6.0, in huge page (1G) environment, after kill the qemu
+> process,
+> > memory which is alloc for the vm could not be released. Detail is bellow.
+> > Or should I use some specific command to stop vm? I want to know if there
+> > someone has the same problem?
+> >
+> > The start up command is:
+> >
+> > CMD1="$QEMU_CMD -D qemu.log -trace events=qemu-events-all -enable-kvm
+> -cpu
+> > qemu64,+vmx,+ssse3,+sse4.1,+sse4.2,+x2apic,+aes,+avx,+vme,
+> > +pat,+ss,+pclmulqdq,+xsave,level=13 -machine pc,accel=kvm -chardev
+> > socket,id=hmqmondev,port=55908,host=127.0.0.1,nodelay,server,nowait -mon
+> > chardev=hmqmondev,id=hmqmon,mode=readline -rtc
+> > base=utc,clock=host,driftfix=none
+> > -usb -device usb-tablet -daemonize -nodefaults -nodefconfig
+> > -no-kvm-pit-reinjection -global kvm-pit.lost_tick_policy=discard -vga
+> std
+> > -k en-us -smp 8 -name gangyewei-qemutime-1 -m 40960 -boot order=cdn -vnc
+> > :8,password -drive file=$DISK_0,if=none,id=drive_
+> > 0,format=qcow2,cache=none,aio=native -device
+> virtio-blk-pci,id=dev_drive_0,
+> > drive=drive_0,bus=pci.0,addr=0x5 -drive file=$DISK_1,if=none,id=drive_
+> > 1,format=qcow2,cache=none,aio=native -device
+> virtio-blk-pci,id=dev_drive_1,
+> > drive=drive_1,bus=pci.0,addr=0x6 -drive file=$DISK_2,if=none,id=drive_
+> > 2,format=qcow2,cache=none,aio=native -device
+> virtio-blk-pci,id=dev_drive_2,
+> > drive=drive_2,bus=pci.0,addr=0x7 -device ide-cd,drive=ide0-cd0,bus=ide.
+> 1,unit=1
+> > -drive id=ide0-cd0,media=cdrom,if=none -chardev
+> socket,id=char-n-52b49b80,
+> > path=/usr/local/var/run/openvswitch/n-52b49b80,server -netdev
+> > type=vhost-user,id=n-52b49b80,chardev=char-n-52b49b80,vhostforce=on
+> -device
+>
+>
+> Ok, here you have a vhost-user network device associated with a UNIX
+> socket
+>
+> > virtio-net-pci,netdev=n-52b49b80,mac=00:22:52:b4:9b:
+> > 80,id=netdev-n-52b49b80,addr=0xf$(nic_speed 10000) -object
+> > memory-backend-file,id=mem,size=40960M,mem-path=/mnt/huge,share=on -numa
+>
+> and here the QEMU RAM is marked shared.
+>
+> > node,memdev=mem -pidfile $PID_FILE -chardev socket,path=/opt/cloud/
+> > workspace/servers/4511f52a-f450-40d3-9417-a1e0a27ed507/
+> qga.sock,server,nowait,id=qga0
+> > -device virtio-serial -device virtserialport,chardev=qga0,
+> > name=org.qemu.guest_agent.0"
+> >
+> > The stop script is just kill this process.
+> >
+> > the result of `cat /proc/meminfo` show memory is still there.
+>
+> I expect what has happened is that QEMU has connected to openvsiwtch via
+> the
+> vhost-user netdev you have, and shared its guest RAM with openvswitch. Now
+> the openvswitch process has the 40G RAM page mapped.
+>
+> Now you kill QEMU and QEMU exits and the kernel releases all its RAM
+> mappings,
+> but the 40G guest RAM mapping is still used by openvswitch.
+>
+> IOW, I suspect that openvswitch is not releasing the RAM mapping when QEMU
+> exits, and so it stays resident.
+>
+> Take a look at the openvswitch processes to see if any of them have the
+> 40GB RAM mapping still shown.
+>
+>
+> Regards,
+> Daniel
+> --
+> |: https://berrange.com      -o-    https://www.flickr.com/photos/
+> dberrange :|
+> |: https://libvirt.org         -o-
+> https://fstop138.berrange.com :|
+> |: https://entangle-photo.org    -o-    https://www.instagram.com/
+> dberrange :|
+>
