@@ -1,30 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55446)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57127)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=466efc5b4=Ian.Jackson@citrix.com>)
-	id 1e81xS-0007nR-60
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 06:33:51 -0400
+	(envelope-from <eblake@redhat.com>) id 1e824G-00017V-Tz
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 06:40:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=466efc5b4=Ian.Jackson@citrix.com>)
-	id 1e81xP-0007aM-1u
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 06:33:46 -0400
-Received: from smtp02.citrix.com ([66.165.176.63]:41592)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=466efc5b4=Ian.Jackson@citrix.com>)
-	id 1e81xO-0007Zk-Sb
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 06:33:42 -0400
-From: Ian Jackson <ian.jackson@eu.citrix.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Message-ID: <23027.2948.565265.523879@mariner.uk.xensource.com>
-Date: Fri, 27 Oct 2017 11:33:40 +0100
-In-Reply-To: <alpine.DEB.2.10.1710261528450.3086@sstabellini-ThinkPad-X260>
-References: <23017.64539.31230.43449@mariner.uk.xensource.com>
-	<1508506702-17704-1-git-send-email-ian.jackson@eu.citrix.com>
-	<1508506702-17704-7-git-send-email-ian.jackson@eu.citrix.com>
-	<alpine.DEB.2.10.1710261528450.3086@sstabellini-ThinkPad-X260>
-Subject: Re: [Qemu-devel] [PATCH v5.1 7/8] os-posix: Provide new -runas
- <uid>:<gid> facility
+	(envelope-from <eblake@redhat.com>) id 1e824G-0005Ua-14
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 06:40:48 -0400
+From: Eric Blake <eblake@redhat.com>
+Date: Fri, 27 Oct 2017 12:40:25 +0200
+Message-Id: <20171027104037.8319-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH v6 00/12] nbd minimal structured read
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,29 +17,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Stabellini <sstabellini@kernel.org>
-Cc: qemu-devel@nongnu.org, Ross Lagerwall <ross.lagerwall@citrix.com>, Anthony PERARD <anthony.perard@citrix.com>, Juergen Gross <jgross@suse.com>, xen-devel@lists.xenproject.org, peter.maydell@linaro.org, pbonzini@redhat.com, famz@redhat.com, kraxel@redhat.com, stefanha@redhat.com
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org
 
-Stefano Stabellini writes ("Re: [PATCH v5.1 7/8] os-posix: Provide new -runas <uid>:<gid> facility"):
-> CC'ing the maintainers (scripts/get_maintainer.pl is your friend)
+I've incorporated a few more tweaks since v5, addressing the various
+bugs I pointed out there:
+https://lists.gnu.org/archive/html/qemu-devel/2017-10/msg04817.html
+- make sure iotests pass
+- split a large patch
+- consistently use absolute offsets
+- clean up awkward logic in handling option requests
 
-I don't know what your scripts/get_maintainer.pl does, but mine
-says:
+I plan to send a pull request before Tuesday's freeze deadline; with a
+plan to do lots of interoperability testing (including validation of
+behavior against a server that sends more than one chunk for a read),
+and with any resulting bug fixes trying to land as soon as possible
+during the freeze.
 
-  get_maintainer.pl: No maintainers found, printing recent contributors.
-  get_maintainer.pl: Do not blindly cc: them on patches!  Use common sense.
+I'm also a bit disappointed that iotest 83 is more verbose. I'll post a
+follow RFC that undoes the verbosity regression, as evidence that we
+should probably be tracing things instead; such a cleanup would count
+as a bug fix, even if my pull request includes this series as-is.
 
-  Anthony PERARD <anthony.perard@citrix.com> (commit_signer:1/2=50%)
-  Paolo Bonzini <pbonzini@redhat.com> (commit_signer:1/2=50%,commit_signer:11/57=19%)
-  Ian Jackson <Ian.Jackson@eu.citrix.com> (commit_signer:1/2=50%)
-  Michael Tokarev <mjt@tls.msk.ru> (commit_signer:12/57=21%)
-  Eric Blake <eblake@redhat.com> (commit_signer:10/57=18%)
-  Thomas Huth <thuth@redhat.com> (commit_signer:8/57=14%)
-  Markus Armbruster <armbru@redhat.com> (commit_signer:8/57=14%)
-  qemu-devel@nongnu.org (open list:POSIX)
+001/12:[----] [--] 'nbd: Include error names in trace messages'
+002/12:[----] [--] 'nbd: Move nbd_errno_to_system_errno() to public header'
+003/12:[----] [--] 'nbd: Expose constants and structs for structured read'
+004/12:[----] [--] 'nbd/server: Report error for write to read-only export'
+005/12:[down] 'nbd/server: Simplify nbd_negotiate_options loop'
+006/12:[0066] [FC] 'nbd/server: Refactor zero-length option check'
+007/12:[0007] [FC] 'nbd: Minimal structured read for server'
+008/12:[----] [--] 'nbd/server: Include human-readable message in structured errors'
+009/12:[0004] [FC] 'nbd/client: refactor nbd_receive_starttls'
+010/12:[----] [--] 'nbd/client: prepare nbd_receive_reply for structured reply'
+011/12:[----] [--] 'nbd: Move nbd_read() to common header'
+012/12:[0055] [FC] 'nbd: Minimal structured read for client'
 
-I have added Paolo, Markus and Daniel Berrange to the CCs of my patch
-on the basis that they have commented already...
+Eric Blake (8):
+  nbd: Include error names in trace messages
+  nbd: Move nbd_errno_to_system_errno() to public header
+  nbd: Expose constants and structs for structured read
+  nbd/server: Report error for write to read-only export
+  nbd/server: Simplify nbd_negotiate_options loop
+  nbd/server: Refactor zero-length option check
+  nbd/server: Include human-readable message in structured errors
+  nbd: Move nbd_read() to common header
 
-Thanks,
-Ian.
+Vladimir Sementsov-Ogievskiy (4):
+  nbd: Minimal structured read for server
+  nbd/client: refactor nbd_receive_starttls
+  nbd/client: prepare nbd_receive_reply for structured reply
+  nbd: Minimal structured read for client
+
+ block/nbd-client.h         |   1 +
+ include/block/nbd.h        | 106 +++++++++-
+ nbd/nbd-internal.h         |  23 +--
+ block/nbd-client.c         | 492 ++++++++++++++++++++++++++++++++++++++++++---
+ nbd/client.c               | 217 +++++++++++++-------
+ nbd/common.c               |  84 ++++++++
+ nbd/server.c               | 209 ++++++++++++++-----
+ nbd/trace-events           |  15 +-
+ tests/qemu-iotests/083.out |  15 ++
+ 9 files changed, 968 insertions(+), 194 deletions(-)
+
+-- 
+2.13.6
