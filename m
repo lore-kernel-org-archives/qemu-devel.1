@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38073)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50657)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1e7x22-0000ae-MN
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 01:18:11 -0400
+	(envelope-from <frasse.iglesias@gmail.com>) id 1e7xd0-0005Xz-1a
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 01:56:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1e7x1z-0003Ze-Ge
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 01:18:10 -0400
-Received: from mail-io0-x244.google.com ([2607:f8b0:4001:c06::244]:56278)
+	(envelope-from <frasse.iglesias@gmail.com>) id 1e7xcy-0007jM-32
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 01:56:22 -0400
+Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:45971)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1e7x1z-0003Z6-7w
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 01:18:07 -0400
-Received: by mail-io0-x244.google.com with SMTP id p186so10173063ioe.12
-	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 22:18:06 -0700 (PDT)
-References: <20171026130426.10626-1-berrange@redhat.com>
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Message-ID: <c66feebb-854a-f2e5-da98-7180bf42ac8f@ozlabs.ru>
-Date: Fri, 27 Oct 2017 16:18:00 +1100
+	(Exim 4.71) (envelope-from <frasse.iglesias@gmail.com>)
+	id 1e7xcx-0007hm-RX
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 01:56:20 -0400
+Received: by mail-lf0-x241.google.com with SMTP id n69so6141733lfn.2
+	for <qemu-devel@nongnu.org>; Thu, 26 Oct 2017 22:56:19 -0700 (PDT)
+From: Francisco Iglesias <frasse.iglesias@gmail.com>
+Date: Fri, 27 Oct 2017 07:56:00 +0200
+Message-Id: <20171027055612.2488-2-frasse.iglesias@gmail.com>
+In-Reply-To: <20171027055612.2488-1-frasse.iglesias@gmail.com>
+References: <20171027055612.2488-1-frasse.iglesias@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20171026130426.10626-1-berrange@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-AU
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] build: allow automatic git submodule
- updates to be disabled
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v4 01/13] m25p80: Add support for continuous
+ read out of RDSR and READ_FSR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,77 +30,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: edgari@xilinx.com, alistai@xilinx.com, francisco.iglesias@feimtech.se, mar.krzeminski@gmail.com
 
-On 27/10/17 00:04, Daniel P. Berrange wrote:
-> Some people building QEMU use VPATH builds where the source directory is on a
-> read-only volume. In such a case 'scripts/git-submodules.sh update' will always
-> fail and users are required to run it manually themselves on their original
-> writable source directory.
-> 
-> While this is already supported, it is nice to give users a command line flag
-> to configure to permanently disable automatic submodule updates, as it means
-> they won't get hard to diagnose failures from git-submodules.sh at an arbitrary
-> later date.
-> 
-> This patch thus introduces a flag '--disable-git-update' which will prevent
-> 'make' from ever running 'scripts/git-submodules.sh update'. It will still run
-> the 'status' command to determine if a submodule update is needed, but when it
-> does this it'll simply stop and print a message instructing the developer what
-> todo. eg
-> 
-> $ ./configure  --target-list=x86_64-softmmu --disable-git-update
-> ...snip...
-> 
-> $ make
->   GEN     config-host.h
->   GEN     trace/generated-tcg-tracers.h
->   GEN     trace/generated-helpers-wrappers.h
->   GEN     trace/generated-helpers.h
->   GEN     trace/generated-helpers.c
->   GEN     module_block.h
-> 
-> GIT submodule checkout is out of date. Please run
->   scripts/git-submodule.sh update ui/keycodemapdb
-> from the source directory checkout /home/berrange/src/virt/qemu
-> 
-> make: *** [Makefile:31: git-submodule-update] Error 1
-> 
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> ---
->  Makefile  | 11 +++++++++++
->  configure |  9 ++++++++-
->  2 files changed, 19 insertions(+), 1 deletion(-)
-> 
-> diff --git a/Makefile b/Makefile
-> index 4c9d0eaef2..cefb75dc8d 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -26,12 +26,23 @@ ifeq (0,$(MAKELEVEL))
->    )
->  
->  ifeq (1,$(git_module_status))
-> +ifeq (no,$(GIT_UPDATE))
-> +git-submodule-update:
-> +	$(call quiet-command, \
-> +            echo && \
-> +            echo "GIT submodule checkout is out of date. Please run" && \
-> +            echo "  scripts/git-submodule.sh update $(GIT_SUBMODULES)" && \
-> +            echo "from the source directory checkout $(SRC_PATH)" && \
+Add support for continuous read out of the RDSR and READ_FSR status
+registers until the chip select is deasserted. This feature is supported
+by amongst others 1 or more flashtypes manufactured by Numonyx (Micron),
+Windbond, SST, Gigadevice, Eon and Macronix.
 
+Signed-off-by: Francisco Iglesias <frasse.iglesias@gmail.com>
+Acked-by: Marcin Krzemiński <mar.krzeminski@gmail.com>
+---
+ hw/block/m25p80.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-I'd love to see this warning when $GIT_UPDATE!=no too. Now it is:
-
-  GIT     ui/keycodemapdb dtc
-./scripts/git-submodule.sh: 36: ./scripts/git-submodule.sh: cannot create
-.git-submodule-status: Read-only file system
-Makefile:40: recipe for target 'git-submodule-update' failed
-
-
-Other than that, looks nice, thanks for fixing it.
-
-
-
+diff --git a/hw/block/m25p80.c b/hw/block/m25p80.c
+index a2438b9..2971519 100644
+--- a/hw/block/m25p80.c
++++ b/hw/block/m25p80.c
+@@ -423,6 +423,7 @@ typedef struct Flash {
+     uint8_t data[M25P80_INTERNAL_DATA_BUFFER_SZ];
+     uint32_t len;
+     uint32_t pos;
++    bool data_read_loop;
+     uint8_t needed_bytes;
+     uint8_t cmd_in_progress;
+     uint32_t cur_addr;
+@@ -983,6 +984,7 @@ static void decode_new_cmd(Flash *s, uint32_t value)
+         }
+         s->pos = 0;
+         s->len = 1;
++        s->data_read_loop = true;
+         s->state = STATE_READING_DATA;
+         break;
+ 
+@@ -993,6 +995,7 @@ static void decode_new_cmd(Flash *s, uint32_t value)
+         }
+         s->pos = 0;
+         s->len = 1;
++        s->data_read_loop = true;
+         s->state = STATE_READING_DATA;
+         break;
+ 
+@@ -1133,6 +1136,7 @@ static int m25p80_cs(SSISlave *ss, bool select)
+         s->pos = 0;
+         s->state = STATE_IDLE;
+         flash_sync_dirty(s, -1);
++        s->data_read_loop = false;
+     }
+ 
+     DB_PRINT_L(0, "%sselect\n", select ? "de" : "");
+@@ -1198,7 +1202,9 @@ static uint32_t m25p80_transfer8(SSISlave *ss, uint32_t tx)
+         s->pos++;
+         if (s->pos == s->len) {
+             s->pos = 0;
+-            s->state = STATE_IDLE;
++            if (!s->data_read_loop) {
++                s->state = STATE_IDLE;
++            }
+         }
+         break;
+ 
 -- 
-Alexey
+2.9.3
