@@ -1,22 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35319)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37895)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zachriggle@gmail.com>) id 1e884v-0000os-Gw
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 13:05:55 -0400
+	(envelope-from <jdenemar@redhat.com>) id 1e88GF-0003Sb-5l
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 13:17:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zachriggle@gmail.com>) id 1e884u-0002Hs-3U
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 13:05:53 -0400
+	(envelope-from <jdenemar@redhat.com>) id 1e88GB-0000wq-Sn
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 13:17:35 -0400
+Received: from cz-mail-1.axfone.eu ([80.79.25.77]:60520)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <jdenemar@redhat.com>) id 1e88GB-0000vb-LH
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 13:17:31 -0400
+Date: Fri, 27 Oct 2017 19:12:31 +0200
+From: Jiri Denemark <jdenemar@redhat.com>
+Message-ID: <20171027171231.GI4938@orkuz.home>
+References: <20171020145437.18549-1-borntraeger@de.ibm.com>
+	<c76678f3-70df-e963-12b8-208c5c2a1578@linux.vnet.ibm.com>
+	<b40f75d4-2280-fc66-b92f-34717b51ed47@linux.vnet.ibm.com>
+	<d7a16f29-1420-d723-4a42-ac549e3f4f52@de.ibm.com>
+	<03b0c516-7044-d71e-1b1f-c3bef84ac812@de.ibm.com>
+	<108a9258-f245-f0bc-44cd-29f6528d34d4@linux.vnet.ibm.com>
+	<277f202a-212b-2868-06e0-62c262909c03@de.ibm.com>
+	<a98a959b-dc89-a75b-6479-9d8c2d9666b7@linux.vnet.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20171027093600.GA29513@kos.to>
-References: <20171024230758.31779-1-riggle@google.com>
-	<20171025033442.44872-1-zachriggle@gmail.com>
-	<CAMP9c5=whCgR4qkOPDRKZ+adpWEPiVM=BwZp_r7qCAR7UAsWAQ@mail.gmail.com>
-	<20171027093600.GA29513@kos.to>
-From: Zach Riggle <zachriggle@gmail.com>
-Date: Fri, 27 Oct 2017 12:05:24 -0500
-Message-ID: <CAMP9c5mm7icy06goXr3iiOEgqPbzyaWDt775+9+L=oxnqwRhpA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2] linux-user: fix is_proc_myself to check
- the paths via realpath
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a98a959b-dc89-a75b-6479-9d8c2d9666b7@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [libvirt] [PATCH/QEMU] s390x/kvm: use
+ cpu_model_available for guarded storage on compat machines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,121 +34,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Riku Voipio <riku.voipio@iki.fi>
-Cc: qemu-trivial@nongnu.org, Laurent Vivier <laurent@vivier.eu>, "open list:All patches CC here" <qemu-devel@nongnu.org>
+To: Halil Pasic <pasic@linux.vnet.ibm.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, jjherne@linux.vnet.ibm.com, Marc Hartmayer <mhartmay@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>, libvir-list@redhat.com, qemu-devel@nongnu.org, Boris Fiuczynski <fiuczy@linux.vnet.ibm.com>
 
-The symlink was just an easy test case.  Doing cd proc && cat ./self/maps
-will achieve the same thing.
+On Fri, Oct 27, 2017 at 17:18:44 +0200, Halil Pasic wrote:
+> On 10/27/2017 04:06 PM, Christian Borntraeger wrote:
+...
+> > I talked to several people and it seems that on x86 the host model will also enable new features
+> > that are not known by older QEMUs and its considered works as designed. (see also Jiris mail)
+> 
+> Yes, I've seen that. It would be nice though if this design was easier to
+> find in written. Unfortunately I can read minds only to a very limited extent,
+> and the written stuff I've read did not give me a full understanding of the
+> design -- although the entity to blame for this could be my limited intellect.
 
-One instance where this matters is for testing IoT device firmware
-exploits, where one might do a GET request against
-../../../../../../proc/self/maps in order to bypass ASLR.  Currently, this
-will return the memory layout of QEMU, not the emulated memory layout of
-the software under test.
+I think it's more likely the documentation is just not perfect. I'll
+look at it and try to make it better. I know about some parts which need
+to be clarified thanks to this discussion.
 
-
-*Zach Riggle*
-
-On Fri, Oct 27, 2017 at 4:36 AM, Riku Voipio <riku.voipio@iki.fi> wrote:
-
-> On Thu, Oct 26, 2017 at 04:06:22PM -0500, Zach Riggle wrote:
-> > Friendly ping :)
-> >
-> > I've updated the patch with v2 which addresses the style issue
->
-> I'll have a look at it soon.
->
-> >
-> > *Zach Riggle*
-> >
-> > On Tue, Oct 24, 2017 at 10:34 PM, Zach Riggle <zachriggle@gmail.com>
-> wrote:
-> >
-> > > Previously, it was possible to get a handle to the "real"
-> /proc/self/mem
-> > > by creating a symlink to it and opening the symlink, or opening e.g.
-> > > "./mem" after chdir'ing to "/proc/self"
->
-> When is this a problem? Symlinking to /proc/self seems to be a quite weird
-> usecase.
->
-> > >
-> > >     $ ln -s /proc/self self
-> > >     $ cat self/maps
-> > >     60000000-602bc000 r-xp 00000000 fc:01 270375
-> > >    /usr/bin/qemu-arm-static
-> > >     604bc000-6050f000 rw-p 002bc000 fc:01 270375
-> > >    /usr/bin/qemu-arm-static
-> > >     ...
-> > >
-> > > Signed-off-by: Zach Riggle <zachriggle@gmail.com>
-> > > ---
-> > >  linux-user/syscall.c | 47 ++++++++++++++++++++++++++++--
-> -----------------
-> > >  1 file changed, 28 insertions(+), 19 deletions(-)
-> > >
-> > > diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> > > index 9bf901fa11..6c1f28a1f7 100644
-> > > --- a/linux-user/syscall.c
-> > > +++ b/linux-user/syscall.c
-> > > @@ -7496,26 +7496,35 @@ static int open_self_auxv(void *cpu_env, int
-> fd)
-> > >
-> > >  static int is_proc_myself(const char *filename, const char *entry)
-> > >  {
-> > > -    if (!strncmp(filename, "/proc/", strlen("/proc/"))) {
-> > > -        filename += strlen("/proc/");
-> > > -        if (!strncmp(filename, "self/", strlen("self/"))) {
-> > > -            filename += strlen("self/");
-> > > -        } else if (*filename >= '1' && *filename <= '9') {
-> > > -            char myself[80];
-> > > -            snprintf(myself, sizeof(myself), "%d/", getpid());
-> > > -            if (!strncmp(filename, myself, strlen(myself))) {
-> > > -                filename += strlen(myself);
-> > > -            } else {
-> > > -                return 0;
-> > > -            }
-> > > -        } else {
-> > > -            return 0;
-> > > -        }
-> > > -        if (!strcmp(filename, entry)) {
-> > > -            return 1;
-> > > -        }
-> > > +    char proc_self_entry[PATH_MAX + 1];
-> > > +    char proc_self_entry_realpath[PATH_MAX + 1];
-> > > +    char filename_realpath[PATH_MAX + 1];
-> > > +
-> > > +    if (PATH_MAX < snprintf(proc_self_entry,
-> > > +                            sizeof(proc_self_entry),
-> > > +                            "/proc/self/%s",
-> > > +                            entry)) {
-> > > +        /* Full path to "entry" is too long to fit in the buffer */
-> > > +        return 0;
-> > >      }
-> > > -    return 0;
-> > > +
-> > > +    if (!realpath(filename, filename_realpath)) {
-> > > +        /* File does not exist, or can't be canonicalized */
-> > > +        return 0;
-> > > +    }
-> > > +
-> > > +    if (!realpath(proc_self_entry, proc_self_entry_realpath)) {
-> > > +        /* Procfs entry does not exist */
-> > > +        return 0;
-> > > +    }
-> > > +
-> > > +    if (strcmp(filename_realpath, proc_self_entry_realpath) != 0) {
-> > > +        /* Paths are different */
-> > > +        return 0;
-> > > +    }
-> > > +
-> > > +    /* filename refers to /proc/self/<entry> */
-> > > +    return 1;
-> > >  }
-> > >
-> > >  #if defined(HOST_WORDS_BIGENDIAN) != defined(TARGET_WORDS_BIGENDIAN)
-> > > --
-> > > 2.14.3
-> > >
-> > >
->
+Jirka
