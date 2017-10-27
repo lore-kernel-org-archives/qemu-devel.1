@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57936)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57939)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1e8CcH-00029W-L2
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 17:56:38 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1e8CcH-00029X-R4
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 17:56:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1e8CcG-0001zv-JX
+	(envelope-from <dgibson@ozlabs.org>) id 1e8CcG-0001zs-JW
 	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 17:56:37 -0400
-Date: Fri, 27 Oct 2017 23:46:33 +0200
+Date: Fri, 27 Oct 2017 23:45:42 +0200
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20171027214633.GH7115@umbus>
-References: <20171026011346.5758-1-programmingkidx@gmail.com>
+Message-ID: <20171027214542.GG7115@umbus>
+References: <20171027165814.29122-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="CNfT9TXqV7nd4cfk"
+	protocol="application/pgp-signature"; boundary="gvF4niNJ+uBMJnEh"
 Content-Disposition: inline
-In-Reply-To: <20171026011346.5758-1-programmingkidx@gmail.com>
-Subject: Re: [Qemu-devel] [libfdt][PATCH v4] implement strnlen for systems
- that need it
+In-Reply-To: <20171027165814.29122-1-richard.henderson@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH v2] target/ppc: Use
+ tcg_gen_lookup_and_goto_ptr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,78 +24,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Arbuckle <programmingkidx@gmail.com>
-Cc: stefanha@gmail.com, peter.maydell@linaro.org, richard.henderson@linaro.org, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, devicetree-compiler@vger.kernel.org, ian@freebsd.org
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Richard Henderson <rth@twiddle.net>
 
 
---CNfT9TXqV7nd4cfk
+--gvF4niNJ+uBMJnEh
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Oct 25, 2017 at 09:13:46PM -0400, John Arbuckle wrote:
-> Prior the Mac OS 10.7, the function strnlen() was not available. This pat=
-ch
-> implements strnlen() on Mac OS X versions that are below 10.7.
+On Fri, Oct 27, 2017 at 06:58:14PM +0200, Richard Henderson wrote:
+> From: Richard Henderson <rth@twiddle.net>
 >=20
-> Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
+> Signed-off-by: Richard Henderson <rth@twiddle.net>
 
-Applied, thanks.
+Applied,thanks.
 
 > ---
-> v4 changes:
-> - Added check for definition of MAC_OS_X_VERSION_10_7
-> - Renamed strnlen to fdt_strnlen
-> - Added macro that defines strnlen as fdt_strnlen
+> Rebased and updated for changes to tcg_gen_lookup_and_goto_ptr.
 >=20
-> v3 changes:
-> - Replaced loop with memchr()
+> ---
+>  target/ppc/translate.c | 23 ++++++++---------------
+>  1 file changed, 8 insertions(+), 15 deletions(-)
 >=20
-> v2 changes:
-> - Simplified the code to make it static inline'ed
-> - Changed the type of count to size_t
->=20
->  libfdt/libfdt_env.h | 27 +++++++++++++++++++++++++++
->  1 file changed, 27 insertions(+)
->=20
-> diff --git a/libfdt/libfdt_env.h b/libfdt/libfdt_env.h
-> index 952056c..41fac04 100644
-> --- a/libfdt/libfdt_env.h
-> +++ b/libfdt/libfdt_env.h
-> @@ -109,4 +109,31 @@ static inline fdt64_t cpu_to_fdt64(uint64_t x)
->  #undef CPU_TO_FDT16
->  #undef EXTRACT_BYTE
+> diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+> index 998fbed848..4075fc8589 100644
+> --- a/target/ppc/translate.c
+> +++ b/target/ppc/translate.c
+> @@ -3419,7 +3419,7 @@ static inline bool use_goto_tb(DisasContext *ctx, t=
+arget_ulong dest)
+>  }
 > =20
-> +#ifdef __APPLE__
-> +#include <AvailabilityMacros.h>
-> +
-> +/* strnlen() is not available on Mac OS < 10.7 */
-> +# if !defined(MAC_OS_X_VERSION_10_7) || (MAC_OS_X_VERSION_MAX_ALLOWED < \
-> +                                         MAC_OS_X_VERSION_10_7)
-> +
-> +#define strnlen fdt_strnlen
-> +
-> +/*
-> + * fdt_strnlen: returns the length of a string or max_count - which ever=
- is
-> + * smallest.
-> + * Input 1 string: the string whose size is to be determined
-> + * Input 2 max_count: the maximum value returned by this function
-> + * Output: length of the string or max_count (the smallest of the two)
-> + */
-> +static inline size_t fdt_strnlen(const char *string, size_t max_count)
-> +{
-> +    const char *p =3D memchr(string, 0, max_count);
-> +    return p ? p - string : max_count;
-> +}
-> +
-> +#endif /* !defined(MAC_OS_X_VERSION_10_7) || (MAC_OS_X_VERSION_MAX_ALLOW=
-ED <
-> +          MAC_OS_X_VERSION_10_7) */
-> +
-> +#endif /* __APPLE__ */
-> +
->  #endif /* _LIBFDT_ENV_H */
+>  /***                                Branch                              =
+   ***/
+> -static inline void gen_goto_tb(DisasContext *ctx, int n, target_ulong de=
+st)
+> +static void gen_goto_tb(DisasContext *ctx, int n, target_ulong dest)
+>  {
+>      if (NARROW_MODE(ctx)) {
+>          dest =3D (uint32_t) dest;
+> @@ -3441,7 +3441,7 @@ static inline void gen_goto_tb(DisasContext *ctx, i=
+nt n, target_ulong dest)
+>                  gen_debug_exception(ctx);
+>              }
+>          }
+> -        tcg_gen_exit_tb(0);
+> +        tcg_gen_lookup_and_goto_ptr();
+>      }
+>  }
+> =20
+> @@ -3479,7 +3479,7 @@ static void gen_b(DisasContext *ctx)
+>  #define BCOND_CTR 2
+>  #define BCOND_TAR 3
+> =20
+> -static inline void gen_bcond(DisasContext *ctx, int type)
+> +static void gen_bcond(DisasContext *ctx, int type)
+>  {
+>      uint32_t bo =3D BO(ctx->opcode);
+>      TCGLabel *l1;
+> @@ -3543,26 +3543,19 @@ static inline void gen_bcond(DisasContext *ctx, i=
+nt type)
+>          } else {
+>              gen_goto_tb(ctx, 0, li);
+>          }
+> -        if ((bo & 0x14) !=3D 0x14) {
+> -            gen_set_label(l1);
+> -            gen_goto_tb(ctx, 1, ctx->nip);
+> -        }
+>      } else {
+>          if (NARROW_MODE(ctx)) {
+>              tcg_gen_andi_tl(cpu_nip, target, (uint32_t)~3);
+>          } else {
+>              tcg_gen_andi_tl(cpu_nip, target, ~3);
+>          }
+> -        tcg_gen_exit_tb(0);
+> -        if ((bo & 0x14) !=3D 0x14) {
+> -            gen_set_label(l1);
+> -            gen_update_nip(ctx, ctx->nip);
+> -            tcg_gen_exit_tb(0);
+> -        }
+> -    }
+> -    if (type =3D=3D BCOND_LR || type =3D=3D BCOND_CTR || type =3D=3D BCO=
+ND_TAR) {
+> +        tcg_gen_lookup_and_goto_ptr();
+>          tcg_temp_free(target);
+>      }
+> +    if ((bo & 0x14) !=3D 0x14) {
+> +        gen_set_label(l1);
+> +        gen_goto_tb(ctx, 1, ctx->nip);
+> +    }
+>  }
+> =20
+>  static void gen_bc(DisasContext *ctx)
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -103,24 +123,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---CNfT9TXqV7nd4cfk
+--gvF4niNJ+uBMJnEh
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnzqTkACgkQbDjKyiDZ
-s5KnRQ/8DcR/3t230Rv3539PivJ2Z18wKQAYU0Hr8OL5hBQv2vMx7+UkyK78qzmZ
-SEYJRl6fGDrpJJnchMXs71kGrTRJ4/BwiLU7mKYx3gUaQ6zD/qbZX3ow8khvzh8d
-A094OeWC3FsLh3evgbgxjLGLpU2bqbIWe9K6taJusbflL2lqNRI2MTH/FIOMDAQd
-i1g8DYquPCsKf/I8nvwR+nHye8UffImPAdxvBkZU40DvYZszm/ChBBp5li0l1mrV
-adJ9zOQcf3XfonNS0EmO4wX7NPFB0Q5oFOPK8KVGWZku9fRNWGyOJVU/zhcLL6NG
-DvklbH88hj1+E0KyPRSvF+V8csTziuLVgtpu6kn0Us6WCEGVWbLY3QoZ6uaym1MY
-eVTpfZX5/q1ELAmyb2PnmzuR82A8zxFp9jWcLMhxogcRyCSkBibBcpI3Vbndsqtu
-ki7E6H677c09DldI5aOitVw9f/8IYxTC7leXv2AKT6zzMOfcguEjWF4lWrM+UZBs
-FI/Oss07Vi/1SZyVT+TL/3S1vQ6mWOiG+JfsjdDAM7HiUgbPBVT1JGCiMFv5B5rp
-GfDz7f7YUYGFVyJxYv4Yi7Ble0KJ2tb6kJ+c04OpCOEaDeaGDKSNY853SmG5IguA
-BRFiRBwfYvrDk7TC2z8OAanvWloKVKm6f2ft5pAAG3dv+5D4a2I=
-=MzBN
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnzqQMACgkQbDjKyiDZ
+s5KhihAAiA7DQ2ru6yyQzuvYX+fSAI8D4F1cTOln3ET9A/k1+w++axsnvEZ0/wiL
+zXdB1I+cIV9G9Sw/kynp7eZmfsMLRgUUhjHoa/k3EpnBaxmTHsaItt0fMTSpc2Jd
+mt4wbEHSzRqh0eiBPpb9/RDKQngFFWye2RDKo0pepO3wLmGngW6zirD2iVq5m9Bs
+CKAbTQX8OHh4MxKdijn6GmQct3/fb/G4zRhhFjV1cFXH7MbgTtC56lZCAcrsh1Xa
+ZGS6ItH304k1+tbMDZvZIwbAufOk6Gh5TYfONWYrX+Gdlfrd8BRjNpBuBdWueYhn
+97RkP/vjq9XyUvLFZJpfUjtv6PigiHocfebbHdJOb7vmzd+lfUks+BZL6CPWnjg6
+a/bWYYNX7oNOWCh4Ba43uhIjEiG3qebtDCrTzB4Qi3vgYgaY018iwg+R080bvEhx
+TB30XLBr+CSD7vsL7QE/4ZWqxUOa0R2LOKe0Z9KAlnmY7ZiUlTOBIHkzLSnksSE7
+zGE7yY38h9pq+7xZ9yk47ZvEZ2Ax3hGg1QEiNflCgKXSmcmuWlev7bOsJkoLVz8y
+spo7GLaXE1l/96wkw+P8mrnMKSukMrvIOTFcngqZ/daQRA+m1X/fjB2xNOfMAoFS
+owYccfSsv/d0IkP0AXp7cMiv+RzzZPL9Z4I/jozb+LgQMDJSurc=
+=S86k
 -----END PGP SIGNATURE-----
 
---CNfT9TXqV7nd4cfk--
+--gvF4niNJ+uBMJnEh--
