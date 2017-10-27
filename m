@@ -1,42 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38763)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35362)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1e841e-0003yW-Be
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 08:46:18 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1e83lx-0000sC-Ht
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 08:30:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1e841b-0004Kl-9O
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 08:46:14 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35880
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1e841b-0004JX-1v
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 08:46:11 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v9RCjhI5172362
-	for <qemu-devel@nongnu.org>; Fri, 27 Oct 2017 08:46:02 -0400
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2dv2xq6dt7-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 27 Oct 2017 08:46:01 -0400
-Received: from localhost
-	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Fri, 27 Oct 2017 13:45:59 +0100
-References: <20171020145437.18549-1-borntraeger@de.ibm.com>
-	<c76678f3-70df-e963-12b8-208c5c2a1578@linux.vnet.ibm.com>
-	<b40f75d4-2280-fc66-b92f-34717b51ed47@linux.vnet.ibm.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Fri, 27 Oct 2017 14:45:55 +0200
+	(envelope-from <dgilbert@redhat.com>) id 1e83ls-0004NE-Jc
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 08:30:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53380)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1e83ls-0004LI-DQ
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 08:29:56 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 63E85883C3
+	for <qemu-devel@nongnu.org>; Fri, 27 Oct 2017 12:29:55 +0000 (UTC)
+Date: Fri, 27 Oct 2017 13:29:48 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20171027122948.GA2135@work-vm>
+References: <20171027085633.14367-1-berrange@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <b40f75d4-2280-fc66-b92f-34717b51ed47@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <d7a16f29-1420-d723-4a42-ac549e3f4f52@de.ibm.com>
-Subject: Re: [Qemu-devel] [libvirt] [PATCH/QEMU] s390x/kvm: use
- cpu_model_available for guarded storage on compat machines
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171027085633.14367-1-berrange@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] sockets: avoid crash when cleaning up
+ sockets for an invalid FD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,19 +33,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>, jjherne@linux.vnet.ibm.com, Marc Hartmayer <mhartmay@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: libvir-list@redhat.com, Jiri Denemark <jdenemar@redhat.com>, qemu-devel@nongnu.org
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-
-
-On 10/27/2017 02:31 PM, Halil Pasic wrote:
-gs is explicitly disabled.
+* Daniel P. Berrange (berrange@redhat.com) wrote:
+> If socket_listen_cleanup is passed an invalid FD, then querying the socket
+> local address will fail. We must thus be prepared for the returned addr to
+> be NULL
 > 
-> Now that I think about it, maybe the 2.9 binary is going to reject
-> the explicit gs flag altogether, because it's unknown.
-> 
-> Isn't this a problem? 
+> Reported-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 
-No. This is exactly the _solution_ and not the problem. The target will reject
-unknown cpu features and migration will be aborted. This is exactly what the CPU
-model is for.
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+> ---
+>  util/qemu-sockets.c | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
+> index b47fb45885..c7fdaa63fb 100644
+> --- a/util/qemu-sockets.c
+> +++ b/util/qemu-sockets.c
+> @@ -1073,6 +1073,9 @@ void socket_listen_cleanup(int fd, Error **errp)
+>      SocketAddress *addr;
+>  
+>      addr = socket_local_address(fd, errp);
+> +    if (!addr) {
+> +        return;
+> +    }
+>  
+>      if (addr->type == SOCKET_ADDRESS_TYPE_UNIX
+>          && addr->u.q_unix.path) {
+> -- 
+> 2.13.6
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
