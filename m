@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44348)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45785)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <frederic.konrad@adacore.com>) id 1e84M1-0001FE-2X
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 09:07:18 -0400
+	(envelope-from <frederic.konrad@adacore.com>) id 1e84SE-0002xm-KV
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 09:13:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <frederic.konrad@adacore.com>) id 1e84M0-0006CR-1j
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 09:07:17 -0400
-Received: from mel.act-europe.fr ([2a02:2ab8:224:1::a0a:d2]:46996
-	helo=smtp.eu.adacore.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <frederic.konrad@adacore.com>)
-	id 1e84Lz-0006AF-Qf
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 09:07:15 -0400
+	(envelope-from <frederic.konrad@adacore.com>) id 1e84SC-0005Ql-UX
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 09:13:42 -0400
 References: <1509014053-28134-1-git-send-email-costa@advantech.ca>
-	<1509014053-28134-7-git-send-email-costa@advantech.ca>
+	<1509014053-28134-2-git-send-email-costa@advantech.ca>
 From: KONRAD Frederic <frederic.konrad@adacore.com>
-Message-ID: <d48801c9-4801-d271-2d13-e08a518391fc@adacore.com>
-Date: Fri, 27 Oct 2017 15:07:10 +0200
+Message-ID: <0b80890b-be8a-a632-35aa-16f76f30d068@adacore.com>
+Date: Fri, 27 Oct 2017 15:13:29 +0200
 MIME-Version: 1.0
-In-Reply-To: <1509014053-28134-7-git-send-email-costa@advantech.ca>
+In-Reply-To: <1509014053-28134-2-git-send-email-costa@advantech.ca>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v6]arm: Makefiles to kinetis k64 platform
+Subject: Re: [Qemu-devel] [PATCH v5 1/5]arm: kinetis_k64_mcg
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,69 +27,295 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Gabriel Costa <gabriel291075@gmail.com>
 Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, qemu-arm@nongnu.org, f4bug@amsat.org
 
-Hi,
-
-Why does this patch has a v6 prefix? And it seems some patches
-are missing.
-To send your patches I suggest you use git send-email.
-
-About this patch:
-Each Makefile modification should go in the patch which
-introduces the new model.
-eg:
-hw/char/Makefile.objs must be modified in 4/5 kinetis_k64_uart.
-
-Fred
 
 On 10/26/2017 12:34 PM, Gabriel Costa wrote:
 > From: Gabriel Augusto Costa <gabriel291075@gmail.com>
 > 
-> This file change the Makefiles to compile the mk64fn1m0 machine.
+> This Patch include kinetis_k64_mcg.c and .h
+> mcg means Multipurpose Clock Generator (MCG)
+> More information about this peripheral can be found at:
+> pag 579, K64P144M120SF5RM.pdf.
 > 
 > Signed-off-by: Gabriel Augusto Costa <gabriel291075@gmail.com>
 > ---
->   default-configs/arm-softmmu.mak | 1 +
->   hw/arm/Makefile.objs            | 1 +
->   hw/char/Makefile.objs           | 1 +
->   hw/misc/Makefile.objs           | 3 +++
->   4 files changed, 6 insertions(+)
+>   hw/misc/kinetis_k64_mcg.c         | 208 ++++++++++++++++++++++++++++++++++++++
+>   include/hw/misc/kinetis_k64_mcg.h |  43 ++++++++
+>   2 files changed, 251 insertions(+)
+>   create mode 100644 hw/misc/kinetis_k64_mcg.c
+>   create mode 100644 include/hw/misc/kinetis_k64_mcg.h
 > 
-> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
-> index 5059d13..a835d4f
-> --- a/default-configs/arm-softmmu.mak
-> +++ b/default-configs/arm-softmmu.mak
-> @@ -130,3 +130,4 @@ CONFIG_SMBIOS=y
->   CONFIG_ASPEED_SOC=y
->   CONFIG_GPIO_KEY=y
->   CONFIG_MSF2=y
-> +CONFIG_KINETIS_K64=y
-> diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
-> index 2794e08..874a38a
-> --- a/hw/arm/Makefile.objs
-> +++ b/hw/arm/Makefile.objs
-> @@ -20,3 +20,4 @@ obj-$(CONFIG_FSL_IMX6) += fsl-imx6.o sabrelite.o
->   obj-$(CONFIG_ASPEED_SOC) += aspeed_soc.o aspeed.o
->   obj-$(CONFIG_MPS2) += mps2.o
->   obj-$(CONFIG_MSF2) += msf2-soc.o msf2-som.o
-> +obj-$(CONFIG_KINETIS_K64) += mk64fn1m0.o
-> diff --git a/hw/char/Makefile.objs b/hw/char/Makefile.objs
-> index 1bcd37e..75b194c
-> --- a/hw/char/Makefile.objs
-> +++ b/hw/char/Makefile.objs
-> @@ -31,3 +31,4 @@ common-obj-$(CONFIG_SCLPCONSOLE) += sclpconsole.o sclpconsole-lm.o
->   
->   obj-$(CONFIG_VIRTIO) += virtio-serial-bus.o
->   obj-$(CONFIG_TERMINAL3270) += terminal3270.o
-> +obj-$(CONFIG_KINETIS_K64) += kinetis_k64_uart.o
-> diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-> index 19202d9..c5c8589
-> --- a/hw/misc/Makefile.objs
-> +++ b/hw/misc/Makefile.objs
-> @@ -61,3 +61,6 @@ obj-$(CONFIG_AUX) += auxbus.o
->   obj-$(CONFIG_ASPEED_SOC) += aspeed_scu.o aspeed_sdmc.o
->   obj-y += mmio_interface.o
->   obj-$(CONFIG_MSF2) += msf2-sysreg.o
-> +obj-$(CONFIG_KINETIS_K64) += kinetis_k64_mcg.o
-> +obj-$(CONFIG_KINETIS_K64) += kinetis_k64_pmux.o
-> +obj-$(CONFIG_KINETIS_K64) += kinetis_k64_system.o
+> diff --git a/hw/misc/kinetis_k64_mcg.c b/hw/misc/kinetis_k64_mcg.c
+> new file mode 100644
+> index 0000000..654f96b
+> --- /dev/null
+> +++ b/hw/misc/kinetis_k64_mcg.c
+> @@ -0,0 +1,208 @@
+> +/*
+> + * Kinetis K64 peripheral microcontroller emulation.
+> + *
+> + * Copyright (c) 2017 Advantech Wireless
+> + * Written by Gabriel Costa <gabriel291075@gmail.com>
+> + *
+> + *  This program is free software; you can redistribute it and/or modify
+> + *  it under the terms of the GNU General Public License version 2 or
+> + *  (at your option) any later version.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "hw/sysbus.h"
+> +#include "qemu/log.h"
+> +#include "hw/misc/kinetis_k64_mcg.h"
+> +
+> +static const VMStateDescription vmstate_kinetis_k64_mcg = {
+> +    .name = TYPE_KINETIS_K64_MCG,
+> +    .version_id = 1,
+> +    .minimum_version_id = 1,
+> +    .fields = (VMStateField[]) {
+> +        VMSTATE_UINT8(C1, kinetis_k64_mcg_state),
+> +        VMSTATE_UINT8(C2, kinetis_k64_mcg_state),
+> +        VMSTATE_UINT8(C3, kinetis_k64_mcg_state),
+> +        VMSTATE_UINT8(C4, kinetis_k64_mcg_state),
+> +        VMSTATE_UINT8(C5, kinetis_k64_mcg_state),
+> +        VMSTATE_UINT8(C6, kinetis_k64_mcg_state),
+> +        VMSTATE_UINT8(S, kinetis_k64_mcg_state),
+> +        VMSTATE_UINT8(SC, kinetis_k64_mcg_state),
+> +        VMSTATE_UINT8(ATCVH, kinetis_k64_mcg_state),
+> +        VMSTATE_UINT8(ATCVL, kinetis_k64_mcg_state),
+> +        VMSTATE_UINT8(C7, kinetis_k64_mcg_state),
+> +        VMSTATE_UINT8(C8, kinetis_k64_mcg_state),
+> +        VMSTATE_END_OF_LIST()
+> +    }
+> +};
+> +
+> +static void kinetis_k64_mcg_reset(DeviceState *dev)
+> +{
+> +    kinetis_k64_mcg_state *s = KINETIS_K64_MCG(dev);
+> +
+> +    s->C1 = 0x04;
+> +    s->C2 = 0x80;
+> +    s->C3 = 0x00;
+> +    s->C4 = 0x00;
+> +    s->C5 = 0x00;
+> +    s->C6 = 0x00;
+> +    s->S = 0x10;
+> +    s->SC = 0x02;
+> +    s->ATCVH = 0x00;
+> +    s->ATCVL = 0x00;
+> +    s->C7 = 0x00;
+> +    s->C8 = 0x80;
+> +}
+> +
+> +static void kinetis_k64_mcg_write(void *opaque, hwaddr offset, uint64_t value,
+> +        unsigned size)
+> +{
+> +    kinetis_k64_mcg_state *s = (kinetis_k64_mcg_state *)opaque;
+> +
+> +    value &= 0xFF;
+> +
+> +    switch (offset) {
+> +    case 0x00:
+> +        if (value & 1 << 2) { /*IREFS*/
+> +            s->S = 0;
+> +            s->S |= 1 << 3; /*10 Enconding 2 - External ref clk is selected*/
+> +        }
+> +        if ((s->C1 & 0x80) && (value >> 6 == 0)) {
+> +            s->S |= 1 << 2; /*11 Enconding 3 - Output of the PLL is selected*/
+> +        }
+> +        s->C1 = value;
+> +        break;
+> +    case 0x01:
+> +        s->C2 = value;
+> +        break;
+> +    case 0x02:
+> +        s->C3 = value;
+> +        break;
+> +    case 0x03:
+> +        s->C4 = value;
+> +        break;
+> +    case 0x04:
+> +        s->C5 = value;
+> +        if (s->C5 & 1 << 6) { /*PLLCLKEN0*/
+> +            s->S |= 1 << 6;  /*LOCK0*/
+> +        }
+> +        break;
+> +    case 0x05:
+> +        s->C6 = value;
+> +        if (s->C6 & 1 << 6) { /*PLLS*/
+> +            s->S |= 1 << 5;  /*PLLST*/
+> +        }
+> +        break;
+> +    case 0x06:
+> +        s->S = value;
+> +        break;
+> +    case 0x08:
+> +        s->SC = value;
+> +        break;
+> +    case 0x0A:
+> +        s->ATCVH = value;
+> +        break;
+> +    case 0x0B:
+> +        s->ATCVL = value;
+> +        break;
+> +    case 0x0C:
+> +        s->C7 = value;
+> +        break;
+> +    case 0x0D:
+> +        s->C8 = value;
+> +        break;
+> +    default:
+> +        qemu_log_mask(LOG_GUEST_ERROR,
+> +                "kinetis_k64_mcg: write at bad offset 0x%x\n", (int)offset);
+
+I'd use HWADDR_PRIX here instead of %x.
+
+> +    }
+> +}
+> +
+> +static uint64_t kinetis_k64_mcg_read(void *opaque, hwaddr offset, unsigned size)
+> +{
+> +    kinetis_k64_mcg_state *s = (kinetis_k64_mcg_state *)opaque;
+> +    uint8_t value;
+> +
+> +    switch (offset) {
+> +    case 0x00:
+> +        value = s->C1;
+> +        break;
+> +    case 0x01:
+> +        value = s->C2;
+> +        break;
+> +    case 0x02:
+> +        value = s->C3;
+> +        break;
+> +    case 0x03:
+> +        value = s->C4;
+> +        break;
+> +    case 0x04:
+> +        value = s->C5;
+> +        break;
+> +    case 0x05:
+> +        value = s->C6;
+> +        break;
+> +    case 0x06:
+> +        value = s->S;
+> +        break;
+> +    case 0x08:
+> +        value = s->SC;
+> +        break;
+> +    case 0x0A:
+> +        value = s->ATCVH;
+> +        break;
+> +    case 0x0B:
+> +        value = s->ATCVL;
+> +        break;
+> +    case 0x0C:
+> +        value = s->C7;
+> +        break;
+> +    case 0x0D:
+> +        value = s->C8;
+> +        break;
+> +    default:
+> +        qemu_log_mask(LOG_GUEST_ERROR,
+> +                "kinetis_k64_mcg: read at bad offset 0x%x\n", (int)offset);
+
+The same.
+
+> +        return 0;
+> +    }
+> +    return value;
+> +}
+> +
+> +static const MemoryRegionOps kinetis_k64_mcg_ops = {
+> +    .read = kinetis_k64_mcg_read,
+> +    .write = kinetis_k64_mcg_write,
+> +    .endianness = DEVICE_NATIVE_ENDIAN,
+> +};
+> +
+> +static void kinetis_k64_mcg_init(Object *obj)
+> +{
+> +    kinetis_k64_mcg_state *s = KINETIS_K64_MCG(obj);
+> +    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
+> +
+> +    memory_region_init_io(&s->iomem, obj, &kinetis_k64_mcg_ops, s,
+> +            TYPE_KINETIS_K64_MCG, 0x1000);
+> +    sysbus_init_mmio(sbd, &s->iomem);
+> +    sysbus_init_irq(sbd, &s->irq);
+> +}
+> +
+> +static void kinetis_k64_mcg_class_init(ObjectClass *klass, void *data)
+> +{
+> +    DeviceClass *dc = DEVICE_CLASS(klass);
+> +
+> +    dc->vmsd = &vmstate_kinetis_k64_mcg;
+> +    dc->reset = kinetis_k64_mcg_reset;
+> +    dc->desc = "Kinetis K64 series MCG";
+> +}
+> +
+> +static const TypeInfo kinetis_k64_mcg_info = {
+> +    .name          = TYPE_KINETIS_K64_MCG,
+> +    .parent        = TYPE_SYS_BUS_DEVICE,
+> +    .instance_size = sizeof(kinetis_k64_mcg_state),
+> +    .instance_init = kinetis_k64_mcg_init,
+> +    .class_init    = kinetis_k64_mcg_class_init,
+> +};
+> +
+> +static void kinetis_k64_mcg_register_types(void)
+> +{
+> +    type_register_static(&kinetis_k64_mcg_info);
+> +}
+> +
+> +type_init(kinetis_k64_mcg_register_types)
+> diff --git a/include/hw/misc/kinetis_k64_mcg.h b/include/hw/misc/kinetis_k64_mcg.h
+> new file mode 100644
+> index 0000000..3f105c5
+> --- /dev/null
+> +++ b/include/hw/misc/kinetis_k64_mcg.h
+> @@ -0,0 +1,43 @@
+> +/*
+> + * Kinetis K64 peripheral microcontroller emulation.
+> + *
+> + * Copyright (c) 2017 Advantech Wireless
+> + * Written by Gabriel Costa <gabriel291075@gmail.com>
+> + *
+> + *  This program is free software; you can redistribute it and/or modify
+> + *  it under the terms of the GNU General Public License version 2 or
+> + *  (at your option) any later version.
+> + */
+> +
+> +#ifndef KINETIS_MCG_H
+> +#define KINETIS_MCG_H
+> +
+> +#include "hw/sysbus.h"
+> +#include "hw/hw.h"
+> +
+> +#define TYPE_KINETIS_K64_MCG "kinetis_k64_mcg"
+> +#define KINETIS_K64_MCG(obj) \
+> +    OBJECT_CHECK(kinetis_k64_mcg_state, (obj), TYPE_KINETIS_K64_MCG)
+> +
+> +typedef struct {
+
+typedef struct kinetis_k64_mcg_state {
+
+Fred
+
+> +    SysBusDevice parent_obj;
+> +
+> +    MemoryRegion iomem;
+> +
+> +    uint8_t C1;
+> +    uint8_t C2;
+> +    uint8_t C3;
+> +    uint8_t C4;
+> +    uint8_t C5;
+> +    uint8_t C6;
+> +    uint8_t S;
+> +    uint8_t SC;
+> +    uint8_t ATCVH;
+> +    uint8_t ATCVL;
+> +    uint8_t C7;
+> +    uint8_t C8;
+> +
+> +    qemu_irq irq;
+> +} kinetis_k64_mcg_state;
+> +
+> +#endif
 > 
