@@ -1,19 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59315)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59326)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1e80T2-0003v2-9I
+	(envelope-from <jcody@redhat.com>) id 1e80T3-0003vh-1h
 	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 04:58:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1e80T1-0001gj-Bv
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 04:58:16 -0400
+	(envelope-from <jcody@redhat.com>) id 1e80T2-0001hk-BI
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 04:58:17 -0400
 From: Jeff Cody <jcody@redhat.com>
-Date: Fri, 27 Oct 2017 04:57:53 -0400
-Message-Id: <8d958396d786b6777c71de1a2138e92ef2915649.1509094209.git.jcody@redhat.com>
+Date: Fri, 27 Oct 2017 04:57:54 -0400
+Message-Id: <c65b4384161f471c489966d5a98261b7971bce8c.1509094209.git.jcody@redhat.com>
 In-Reply-To: <cover.1509094209.git.jcody@redhat.com>
 References: <cover.1509094209.git.jcody@redhat.com>
 In-Reply-To: <cover.1509094209.git.jcody@redhat.com>
 References: <cover.1509094209.git.jcody@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/4] block/vhdx.c: Don't blindly update the
- header
+Subject: [Qemu-devel] [PATCH 2/4] block/parallels: code movement
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,45 +24,54 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, kwolf@redhat.com, aik@ozlabs.ru, mreitz@redhat.com, den@openvz.org, stefanha@redhat.com
 
-The VHDX specification requires that before user data modification of
-the vhdx image, the VHDX header file and data GUIDs need to be updated.
-In vhdx_open(), if the image is set to RDWR, we go ahead and update the
-header.
+Code movement, to make subsequent patches simpler.
 
-However, just because the image is set to RDWR does not mean we can go
-ahead and write at this point - specifically, if the QEMU run state is
-INMIGRATE, the underlying file BS may be set to inactive via the BDS
-open flag of BDRV_O_INACTIVE.  Attempting to write under this condition
-will cause an assert in bdrv_co_pwritev().
-
-We can alternatively latch the first time the image is written.  And lo
-and behold, we do just that, via vhdx_user_visible_write() in
-vhdx_co_writev().  This means the call to vhdx_update_headers() in
-vhdx_open() is likely just vestigial, and can be removed.
-
-Reported-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 Signed-off-by: Jeff Cody <jcody@redhat.com>
 ---
- block/vhdx.c | 7 -------
- 1 file changed, 7 deletions(-)
+ block/parallels.c | 24 ++++++++++++------------
+ 1 file changed, 12 insertions(+), 12 deletions(-)
 
-diff --git a/block/vhdx.c b/block/vhdx.c
-index 7ae4589879..9956933da6 100644
---- a/block/vhdx.c
-+++ b/block/vhdx.c
-@@ -1008,13 +1008,6 @@ static int vhdx_open(BlockDriverState *bs, QDict *options, int flags,
-         goto fail;
-     }
+diff --git a/block/parallels.c b/block/parallels.c
+index 2b6c6e5709..fed199eccd 100644
+--- a/block/parallels.c
++++ b/block/parallels.c
+@@ -159,6 +159,18 @@ static int cluster_remainder(BDRVParallelsState *s, int64_t sector_num,
+     return MIN(nb_sectors, ret);
+ }
  
--    if (flags & BDRV_O_RDWR) {
--        ret = vhdx_update_headers(bs, s, false, NULL);
--        if (ret < 0) {
--            goto fail;
--        }
--    }
--
-     /* TODO: differencing files */
- 
++static int parallels_update_header(BlockDriverState *bs)
++{
++    BDRVParallelsState *s = bs->opaque;
++    unsigned size = MAX(bdrv_opt_mem_align(bs->file->bs),
++                        sizeof(ParallelsHeader));
++
++    if (size > s->header_size) {
++        size = s->header_size;
++    }
++    return bdrv_pwrite_sync(bs->file, 0, s->header, size);
++}
++
+ static int64_t block_status(BDRVParallelsState *s, int64_t sector_num,
+                             int nb_sectors, int *pnum)
+ {
+@@ -575,18 +587,6 @@ static int parallels_probe(const uint8_t *buf, int buf_size,
      return 0;
+ }
+ 
+-static int parallels_update_header(BlockDriverState *bs)
+-{
+-    BDRVParallelsState *s = bs->opaque;
+-    unsigned size = MAX(bdrv_opt_mem_align(bs->file->bs),
+-                        sizeof(ParallelsHeader));
+-
+-    if (size > s->header_size) {
+-        size = s->header_size;
+-    }
+-    return bdrv_pwrite_sync(bs->file, 0, s->header, size);
+-}
+-
+ static int parallels_open(BlockDriverState *bs, QDict *options, int flags,
+                           Error **errp)
+ {
 -- 
 2.13.6
