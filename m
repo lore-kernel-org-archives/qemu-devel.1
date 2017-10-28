@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49751)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52838)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e8KAF-0000Fo-Jy
-	for qemu-devel@nongnu.org; Sat, 28 Oct 2017 02:00:17 -0400
+	(envelope-from <alistair23@gmail.com>) id 1e8KMh-0002hr-Df
+	for qemu-devel@nongnu.org; Sat, 28 Oct 2017 02:13:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e8KAE-00085X-SN
-	for qemu-devel@nongnu.org; Sat, 28 Oct 2017 02:00:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52760)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1e8KAE-00083w-K3
-	for qemu-devel@nongnu.org; Sat, 28 Oct 2017 02:00:10 -0400
-References: <7CA6B03C-DFAA-4A15-9E33-E3FAD6647140@gmail.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <38c3125f-b050-c0ba-282f-bc1e9e11d297@redhat.com>
-Date: Sat, 28 Oct 2017 08:00:05 +0200
+	(envelope-from <alistair23@gmail.com>) id 1e8KMg-0004zK-Cz
+	for qemu-devel@nongnu.org; Sat, 28 Oct 2017 02:13:03 -0400
+Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:56722)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1e8KMg-0004yE-44
+	for qemu-devel@nongnu.org; Sat, 28 Oct 2017 02:13:02 -0400
+Received: by mail-wr0-x241.google.com with SMTP id r79so7857894wrb.13
+	for <qemu-devel@nongnu.org>; Fri, 27 Oct 2017 23:13:02 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <7CA6B03C-DFAA-4A15-9E33-E3FAD6647140@gmail.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="G3IARhkR8PQvS341oXbFg6XgoU585O79G"
-Subject: Re: [Qemu-devel] drive_add: file names with spaces
+Sender: alistair23@gmail.com
+In-Reply-To: <cb2390f6-61e7-7f9b-0e94-a0f2abf88af3@amsat.org>
+References: <382833937419ccd4de5de9b65f74ca561cfa328d.1509114880.git.alistair.francis@xilinx.com>
+	<cb2390f6-61e7-7f9b-0e94-a0f2abf88af3@amsat.org>
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Sat, 28 Oct 2017 08:12:30 +0200
+Message-ID: <CAKmqyKNbq7dYR8iaBVbbG=Nvp=iYdqdH9O=uHR8RHV+m3ovJJA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v1 1/1] xlnx-zcu102: Specify the number of
+ max CPUs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,58 +32,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Programmingkid <programmingkidx@gmail.com>, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Edgar Iglesias <edgar.iglesias@xilinx.com>, Edgar Iglesias <edgar.iglesias@gmail.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---G3IARhkR8PQvS341oXbFg6XgoU585O79G
-From: Eric Blake <eblake@redhat.com>
-To: Programmingkid <programmingkidx@gmail.com>,
- "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
-Message-ID: <38c3125f-b050-c0ba-282f-bc1e9e11d297@redhat.com>
-Subject: Re: [Qemu-devel] drive_add: file names with spaces
-References: <7CA6B03C-DFAA-4A15-9E33-E3FAD6647140@gmail.com>
-In-Reply-To: <7CA6B03C-DFAA-4A15-9E33-E3FAD6647140@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Fri, Oct 27, 2017 at 8:22 PM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
+rg> wrote:
+> Hi Alistair,
+>
+> On 10/27/2017 11:35 AM, Alistair Francis wrote:
+>> Specify the number of CPUs that can run on ZynqMP.
+>>
+>> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+>> ---
+>>
+>>  hw/arm/xlnx-zcu102.c | 1 +
+>>  1 file changed, 1 insertion(+)
+>>
+>> diff --git a/hw/arm/xlnx-zcu102.c b/hw/arm/xlnx-zcu102.c
+>> index 519a16ed98..b86c048bb3 100644
+>> --- a/hw/arm/xlnx-zcu102.c
+>> +++ b/hw/arm/xlnx-zcu102.c
+>> @@ -240,6 +240,7 @@ static void xlnx_zcu102_machine_class_init(ObjectCla=
+ss *oc, void *data)
+>>      mc->block_default_type =3D IF_IDE;
+>>      mc->units_per_default_bus =3D 1;
+>>      mc->ignore_memory_transaction_failures =3D true;
+>> +    mc->max_cpus =3D 6;
+>
+> This can be self-explanatory:
+>
+>     mc->max_cpus =3D XLNX_ZYNQMP_NUM_APU_CPUS + XLNX_ZYNQMP_NUM_RPU_CPUS;
 
-On 10/28/2017 06:44 AM, Programmingkid wrote:
-> I'm trying to use an image file that has spaces in its file name (and s=
-ometimes in the path) to be used as a USB flash drive. When I try adding =
-the image file using the drive_add command I see this error: drive_add: e=
-xtraneous characters at the end of the line
->=20
-> I have tried using single and double quotes around the file name but th=
-is does not help. Is there a way to use files that have spaces in it's na=
-me with drive_add?
+Ah good point.
 
-Not in HMP, which lacks quoting.  (Unless you want to patch HMP to learn
-quoting)
+I won't be able to update that until I'm back from holidays.
 
-But using spaces in filenames works fine in QMP.
+>
+> Then:
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Thanks!
+Alistair
 
-
---G3IARhkR8PQvS341oXbFg6XgoU585O79G
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAln0HOUACgkQp6FrSiUn
-Q2oEEwf/cOpriml4koJjgm3y46QFnWvTERtx3ZO1bZY+nnqJCIWRJQhPfjT1G9HP
-q00K60ugCBJv/xr4xf59JYl9NZ6x65F2NPs8/OVYRzzsoG35PWbSChksxrMPXYEl
-7z1xmBCpenOjU4EZXpSM8Lx/4LoREUhjNlZmOhHu/Ukxu6v/+S81WbDsPZ2Qd2VX
-8SYXqPi6tH1I2KBLYRJQp4UJBVNXo8fsQmXnfjZzfNvhD5/eydtXMtA4dbWhEYn9
-hPGyqO2uFo0eVnjOVfJbYo7V1VIDYC6K+XhOxI7A/dmYy0y8q6hQoC2p5xNSt1l1
-9iDgTCOjq+N6ab3b6RwkPk9zeBMIzA==
-=udYz
------END PGP SIGNATURE-----
-
---G3IARhkR8PQvS341oXbFg6XgoU585O79G--
+>
+>>  }
+>>
+>>  static const TypeInfo xlnx_zcu102_machine_init_typeinfo =3D {
+>>
