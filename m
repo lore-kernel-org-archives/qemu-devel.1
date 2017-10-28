@@ -1,34 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59352)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60082)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e8Tgn-00036O-4s
-	for qemu-devel@nongnu.org; Sat, 28 Oct 2017 12:10:29 -0400
+	(envelope-from <bounces@canonical.com>) id 1e8Tm0-0004ax-2q
+	for qemu-devel@nongnu.org; Sat, 28 Oct 2017 12:15:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e8Tgj-0003Ca-4n
-	for qemu-devel@nongnu.org; Sat, 28 Oct 2017 12:10:25 -0400
-Received: from indium.canonical.com ([91.189.90.7]:47336)
+	(envelope-from <bounces@canonical.com>) id 1e8Tlw-0007eq-2q
+	for qemu-devel@nongnu.org; Sat, 28 Oct 2017 12:15:48 -0400
+Received: from indium.canonical.com ([91.189.90.7]:47520)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1e8Tgi-0003BL-UQ
-	for qemu-devel@nongnu.org; Sat, 28 Oct 2017 12:10:21 -0400
+	id 1e8Tlv-0007cs-Sp
+	for qemu-devel@nongnu.org; Sat, 28 Oct 2017 12:15:44 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1e8Tgg-0007E7-Vr
-	for <qemu-devel@nongnu.org>; Sat, 28 Oct 2017 16:10:18 +0000
+	id 1e8Tlu-0007RO-Vz
+	for <qemu-devel@nongnu.org>; Sat, 28 Oct 2017 16:15:43 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id B29D32E80CB
-	for <qemu-devel@nongnu.org>; Sat, 28 Oct 2017 16:10:18 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id F0AE02E80C7
+	for <qemu-devel@nongnu.org>; Sat, 28 Oct 2017 16:15:42 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 28 Oct 2017 15:58:45 -0000
-From: Brad Smith <902720@bugs.launchpad.net>
-Reply-To: Bug 902720 <902720@bugs.launchpad.net>
+Date: Sat, 28 Oct 2017 16:07:44 -0000
+From: =?utf-8?q?W=C3=BCstengecko?= <1728256@bugs.launchpad.net>
+Reply-To: Bug 1728256 <1728256@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20111211064733.26491.7785.malonedeb@soybean.canonical.com>
-Message-Id: <150920632602.9476.4210736686745972791.malone@wampee.canonical.com>
+Message-Id: <150920686502.20214.12572544661418580428.malonedeb@soybean.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 902720] Re: TIME_MAX not set correctly for
- OpenBSD in qemu-common.h
+Subject: [Qemu-devel] [Bug 1728256] [NEW] (Regression) Memory corruption in
+ Windows 10 guest / amd64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,42 +38,70 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Since this bug report was filed OpenBSD has switched from 32-bit time_t
-to 64-bit time_t on all archs (yes, including 32-bit archs like i386,
-arm, powerpc). So instead of INT_MAX TIME_MAX should now be set to
-LLONG_MAX.
+Public bug reported:
+
+I have a Win 10 Pro x64 guest inside a qemu/kvm running on an Arch x86_64 h=
+ost. The VM has a physical GPU passed through, as well as the physical USB =
+controllers, as well as a dedicated SSD attached via SATA; you can find the=
+ complete libvirt xml here: https://pastebin.com/U1ZAXBNg
+I built qemu from source using the qemu-minimal-git AUR package; you can fi=
+nd the build script here: https://aur.archlinux.org/cgit/aur.git/tree/PKGBU=
+ILD?h=3Dqemu-minimal-git (if you aren't familiar with Arch, this is essenti=
+ally a bash script where build() and package() are run to build the files, =
+and then install them into the $pkgdir to later tar them up.)
+
+Starting with qemu v2.10.0, Windows crashes randomly with a bluescreen
+about CRITICAL_STRUCTURE_CORRUPTION. I also tested the git heads
+f90ea7ba7c, 861cd431c9 and e822e81e35, before I went back to v2.9.0,
+which is running stable for over 50 hours right now.
+
+During my tests I found that locking the memory pages alleviates the
+problem somewhat, but never completely avoids it. However, with the
+crashes occuring randomly, that could as well be false conclusions; I
+had crashes within minutes after boot with that too.
+
+I will now start `git bisect`ing; if you have any other suggestions on
+what I could try or possible patches feel free to leave them with me.
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/902720
+https://bugs.launchpad.net/bugs/1728256
 
 Title:
-  TIME_MAX not set correctly for OpenBSD in qemu-common.h
+  (Regression) Memory corruption in Windows 10 guest / amd64
 
 Status in QEMU:
-  Incomplete
+  New
 
 Bug description:
-  Looking at the OpenBSD buildbot logs I noticed a warning that appears to =
-be a bug in the code.
-  OpenBSD has a 32-bit time_t on all archs at the moment (32-bit and 64-bit=
-).
+  I have a Win 10 Pro x64 guest inside a qemu/kvm running on an Arch x86_64=
+ host. The VM has a physical GPU passed through, as well as the physical US=
+B controllers, as well as a dedicated SSD attached via SATA; you can find t=
+he complete libvirt xml here: https://pastebin.com/U1ZAXBNg
+  I built qemu from source using the qemu-minimal-git AUR package; you can =
+find the build script here: https://aur.archlinux.org/cgit/aur.git/tree/PKG=
+BUILD?h=3Dqemu-minimal-git (if you aren't familiar with Arch, this is essen=
+tially a bash script where build() and package() are run to build the files=
+, and then install them into the $pkgdir to later tar them up.)
 
-    CC    i386-softmmu/monitor.o
-  /buildbot-qemu/default_openbsd_current/build/monitor.c: In function 'expi=
-re_password':
-  /buildbot-qemu/default_openbsd_current/build/monitor.c:944: warning: over=
-flow in implicit constant conversion
+  Starting with qemu v2.10.0, Windows crashes randomly with a bluescreen
+  about CRITICAL_STRUCTURE_CORRUPTION. I also tested the git heads
+  f90ea7ba7c, 861cd431c9 and e822e81e35, before I went back to v2.9.0,
+  which is running stable for over 50 hours right now.
 
-  qemu-common.h has...
+  During my tests I found that locking the memory pages alleviates the
+  problem somewhat, but never completely avoids it. However, with the
+  crashes occuring randomly, that could as well be false conclusions; I
+  had crashes within minutes after boot with that too.
 
-  #ifndef TIME_MAX
-  #define TIME_MAX LONG_MAX
-  #endif
-
-  for OpenBSD this should be INT_MAX.
+  I will now start `git bisect`ing; if you have any other suggestions on
+  what I could try or possible patches feel free to leave them with me.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/902720/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1728256/+subscriptions
