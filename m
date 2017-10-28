@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34248)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34249)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e8RGF-0007Uv-Of
-	for qemu-devel@nongnu.org; Sat, 28 Oct 2017 09:34:52 -0400
+	(envelope-from <bounces@canonical.com>) id 1e8RGF-0007Uw-Ow
+	for qemu-devel@nongnu.org; Sat, 28 Oct 2017 09:34:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e8RGA-0001U4-SL
+	(envelope-from <bounces@canonical.com>) id 1e8RGA-0001U8-SS
 	for qemu-devel@nongnu.org; Sat, 28 Oct 2017 09:34:51 -0400
-Received: from indium.canonical.com ([91.189.90.7]:53040)
+Received: from indium.canonical.com ([91.189.90.7]:53030)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1e8RGA-0001Sz-MA
+	id 1e8RGA-0001Sq-MG
 	for qemu-devel@nongnu.org; Sat, 28 Oct 2017 09:34:46 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1e8RG9-00027F-CY
+	id 1e8RG9-00027A-4I
 	for <qemu-devel@nongnu.org>; Sat, 28 Oct 2017 13:34:45 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 5DFA42E80C7
+	by loganberry.canonical.com (Postfix) with ESMTP id 14F192E8056
 	for <qemu-devel@nongnu.org>; Sat, 28 Oct 2017 13:34:45 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 28 Oct 2017 13:24:12 -0000
-From: Thomas Huth <1332297@bugs.launchpad.net>
-Reply-To: Bug 1332297 <1332297@bugs.launchpad.net>
+Date: Sat, 28 Oct 2017 13:21:05 -0000
+From: Thomas Huth <1338591@bugs.launchpad.net>
+Reply-To: Bug 1338591 <1338591@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20140619191312.10674.6213.malonedeb@soybean.canonical.com>
-Message-Id: <150919705257.4089.9234022235936087664.malone@gac.canonical.com>
+References: <20140707141907.27349.18846.malonedeb@gac.canonical.com>
+Message-Id: <150919686523.4768.93030758061644920.malone@chaenomeles.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1332297] Re: qemu-img: crash on check of an image
- with large value in the 'size' header field
+Subject: [Qemu-devel] [Bug 1338591] Re: Cursor jumps on shape change with
+ vmware vga
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,8 +39,9 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-QEMU nowadays seems to report "Check failed: Cannot allocate memory" ...
-so I assume that is OK and we can now close this bug?
+Triaging old bug tickets... can you still reproduce this issue with the
+latest version of QEMU? Or could we close this ticket nowadays?
+
 
 ** Changed in: qemu
        Status: New =3D> Incomplete
@@ -49,29 +50,40 @@ so I assume that is OK and we can now close this bug?
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1332297
+https://bugs.launchpad.net/bugs/1338591
 
 Title:
-  qemu-img: crash on check of an image with large value in the 'size'
-  header field
+  Cursor jumps on shape change with vmware vga
 
 Status in QEMU:
   Incomplete
 
 Bug description:
-  The qemu-img crashes on the next command:
+  I launch QEMU with the following command line:
 
-  qemu-img check test_image
+  qemu-system-i386 /home/ruslan/iso/Windoze/qemuxp.img -m 512 -display
+  sdl -vga vmware -enable-kvm
 
-  'test_image' can be found in the attachment. It's a fuzzed test image
-  with the qcow2 image header only. Suppositional cause of the failure
-  is the value of 'size' header field set to maximum uint_64 value.
+  The guest OS is Windows XP. To reproduce the problem, do this:
 
-  System information:
+  0. Make sure guest is WinXP (don't know if it's really necessary), use vm=
+ware VGA
+  1. Set mouse cursor theme to default black&white theme, i.e. that without=
+ any translucency etc.
+  2. Open a text editor, e.g. built-in notepad
+  3. Move the cursor inside text entry widget
+  4. See the cursor jumping away. You basically can't enter the cursor ther=
+e.
 
-  qemu.git: 6baa963f4dcc2118
-  Host: Linux 3.14.7-200.fc20.x86_64 #1 SMP Wed Jun 11 22:38:05 UTC 2014 x8=
-6_64  GNU/Linux
+  This also reproduces with MS Word 2003 even with oxy-white cursor
+  theme (i.e. that with translucency) =E2=80=94 seems Word uses its plain
+  black&transparent cursor for I-beam cursor.
+
+  This doesn't happen with other VGAs, i.e. cirrus and std.
+
+  I used qemu git master to test this. qemu-system-i386 --version
+  reports version 2.0.90, git describe says v2.1.0-rc0-1-g9d9de25. This
+  also happened in earlier QEMU versions, like 1.5.x and older.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1332297/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1338591/+subscriptions
