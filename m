@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59166)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33474)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1e8Kk6-0005U4-38
-	for qemu-devel@nongnu.org; Sat, 28 Oct 2017 02:37:15 -0400
+	(envelope-from <aik@ozlabs.ru>) id 1e8L3i-0007jN-IB
+	for qemu-devel@nongnu.org; Sat, 28 Oct 2017 02:57:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1e8Kk1-0000G6-WA
-	for qemu-devel@nongnu.org; Sat, 28 Oct 2017 02:37:14 -0400
-Received: from mail-io0-x241.google.com ([2607:f8b0:4001:c06::241]:47660)
+	(envelope-from <aik@ozlabs.ru>) id 1e8L3f-00012D-Gr
+	for qemu-devel@nongnu.org; Sat, 28 Oct 2017 02:57:30 -0400
+Received: from mail-io0-x233.google.com ([2607:f8b0:4001:c06::233]:55809)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1e8Kk1-0000Dg-O5
-	for qemu-devel@nongnu.org; Sat, 28 Oct 2017 02:37:09 -0400
-Received: by mail-io0-x241.google.com with SMTP id h70so17049646ioi.4
-	for <qemu-devel@nongnu.org>; Fri, 27 Oct 2017 23:37:08 -0700 (PDT)
-References: <20171027131412.18830-1-berrange@redhat.com>
-	<20171027131412.18830-3-berrange@redhat.com>
-	<c287efce-4926-32dd-b591-e02ad5edf8fc@redhat.com>
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1e8L3f-0000za-B0
+	for qemu-devel@nongnu.org; Sat, 28 Oct 2017 02:57:27 -0400
+Received: by mail-io0-x233.google.com with SMTP id p186so17066284ioe.12
+	for <qemu-devel@nongnu.org>; Fri, 27 Oct 2017 23:57:24 -0700 (PDT)
+References: <f512ef4b-11ac-0cd2-0037-4608f2059669@ozlabs.ru>
+	<d80a7e33-f055-d59e-8aff-2ed1f9a79c83@ozlabs.ru>
+	<20171027071241.GA30326@localhost.localdomain>
 From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Message-ID: <7e123f2a-4248-72e6-8194-1458cfd8ef60@ozlabs.ru>
-Date: Sat, 28 Oct 2017 17:37:01 +1100
+Message-ID: <12b21c38-3d03-929b-aea0-7de5efe55d56@ozlabs.ru>
+Date: Sat, 28 Oct 2017 17:57:18 +1100
 MIME-Version: 1.0
-In-Reply-To: <c287efce-4926-32dd-b591-e02ad5edf8fc@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="pceOeNIP1h0r43VC8VLnmQJura9JGef8w"
-Subject: Re: [Qemu-devel] [PATCH v2 2/4] build: don't create temporary files
- in source dir
+In-Reply-To: <20171027071241.GA30326@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-AU
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] iotest 194 fails on vhdx
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,89 +31,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: Jeff Cody <jcody@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---pceOeNIP1h0r43VC8VLnmQJura9JGef8w
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-To: Eric Blake <eblake@redhat.com>, "Daniel P. Berrange"
- <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <7e123f2a-4248-72e6-8194-1458cfd8ef60@ozlabs.ru>
-Subject: Re: [Qemu-devel] [PATCH v2 2/4] build: don't create temporary files
- in source dir
-References: <20171027131412.18830-1-berrange@redhat.com>
- <20171027131412.18830-3-berrange@redhat.com>
- <c287efce-4926-32dd-b591-e02ad5edf8fc@redhat.com>
-In-Reply-To: <c287efce-4926-32dd-b591-e02ad5edf8fc@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 28/10/17 16:25, Eric Blake wrote:
-> On 10/27/2017 03:14 PM, Daniel P. Berrange wrote:
->> There are cases where users do VPATH builds with the source directory =
-being on
->> a read-only volume. In such a case they have to manually run the comma=
-nd
->> 'git-submodule.sh ...modules...'  manually ahead of time. When checkin=
-g for
->=20
-> One of the two "manually" can be removed (either one, and the sentence
-> still makes sense)
->=20
->> status we should not then write into the source dir.
+On 27/10/17 18:12, Jeff Cody wrote:
+> On Wed, Oct 25, 2017 at 05:06:37PM +1100, Alexey Kardashevskiy wrote:
+>> On 25/10/17 15:29, Alexey Kardashevskiy wrote:
+>>> Hi!
+>>>
+>>> The latest QEMU fails on:
+>>> tests/qemu-iotests/check -vhdx 194
 >>
->> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
->> ---
->>  scripts/git-submodule.sh | 8 ++++----
->>  1 file changed, 4 insertions(+), 4 deletions(-)
 >>
->> diff --git a/scripts/git-submodule.sh b/scripts/git-submodule.sh
->> index c66567d409..586ff32293 100755
->> --- a/scripts/git-submodule.sh
->> +++ b/scripts/git-submodule.sh
->> @@ -31,10 +31,10 @@ fi
->>  case "$command" in
->>  status)
->>      test -f "$substat" || exit 1
->> -    trap "rm -f ${substat}.tmp" EXIT
->> -    $GIT submodule status $modules > "${substat}.tmp"
->> -    test $? -ne 0 && error "failed to query git submodule status"
->> -    diff "${substat}" "${substat}.tmp" >/dev/null
->> +    substat_tmp=3D$(mktemp)
->=20
-> Is mktemp portable enough?  Hopefully so.
+>> Bit more details:
+>>
+>> 1. the assert started appearing from
+>> https://git.qemu.org/?p=qemu.git;a=commit;h=09e0c771e47 - this one just
+>> added the assert;
+>>
+>> 2. if removed, then another assert alerts:
+>> qemu-system-ppc64: /home/aik/p/qemu/block/io.c:1423: bdrv_aligned_pwritev:
+>> Assertion `child->perm & BLK_PERM_WRITE' failed.
+>>
+>> child->perm == 1 when this happens.
+>>
+>> Any clues?
+>>
+> 
+> Yes - what is happening is that if the VHDX image file is open RDWR, we
+> update the VHDX header.  However, since we are INMIGRATE, the
+> underlying file bs is marked as INACTIVE, and we are caught by the assert.
+> 
+> 
+> However, per the spec the header file and data guids only need to be updated
+> before the first modification is made.  We already have a latching call to
+> update the headers on the first write to the VHDX image (in vhdx_co_writev),
+> so the call to vhdx_update_headers() in vhdx_open() is a bug, and can be
+> removed.
+> 
+> Once that is fixed, 194 still fails for VHDX, but it doesn't crash.  The
+> failure is expected, because VHDX does not support migration (VMDK fails the
+> same way). 
 
-It could also be some fixed file name in the build directory.
+Probably a very ignorant question but how can an image format not support
+migration at all? Is not it simple writing blocks, one-by-one? Thanks.
 
 
---=20
+> So test 194 should also be updated to exclude image formats that
+> set migration blockers.
+> 
+> (Patches sent)
+-- 
 Alexey
-
-
---pceOeNIP1h0r43VC8VLnmQJura9JGef8w
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQJCBAEBCAAsFiEEZSrPibrORRTHQ99dhhM92CvBILkFAln0JY0OHGFpa0Bvemxh
-YnMucnUACgkQhhM92CvBILmdxQ/+O17dXO0jOJ/n7zSGn6FsjiQ/dlvFpMbxN4N1
-ulGvme0CCh1nPVPYODbbXZzD4JZLwLU+TRvQjIJ0WwlWtve2Adlnd5FFP1tzNAdC
-tBKNf/aIvvBwFNpNZJ8duJzkWfh9t0pCegWY4jYTOmsxzhU073UEqswtWak7+Wx3
-2mUZSrLQQjDucQpRtoF2GW0gQ5f4U/uhkrkLnswxDSBOG9aZ6fMRf8r+18wNeO51
-mkNXDTto0swrd4Y+JIS4vpKfP7sEd7RBlsriKEypUbVoM/lAIs1UMex1zVWpduXK
-LPjwnWYbg5rReycE53RKThHgPGtVafeljBbNVzIHxQChUAt2dP8EAomG8AXskR7X
-8vgQZrCz3MpOPQzumE+Hvb+oYbthXfrNJhH1XV+XFN24MuFFh9Hil3OHdBhkaJwh
-ui9CrWYReXkyW+1dCOfIS8LWEpB8XnjWP6YzXAVkU7L/lLJrNi8zZzZAybFeKZ8R
-nMlhRqtQRBqyDAwaOQlDvltgE1lBKMDVuzS0zn04BK/8fJrN+7cXR4SQiTRsp7N4
-1derMC02HWsQSXf1rxrUBIJN5OXZjiEXjccpmOcNjcJkDI8+hO7u1VENT/bL7+nX
-rCA+fLNfEZ6FMm5gt7YOMYyJF1RA7cfwq/w3NSdm1sDKZb3PRN3s8kqXBssWA9IM
-trlLBUA=
-=Kho9
------END PGP SIGNATURE-----
-
---pceOeNIP1h0r43VC8VLnmQJura9JGef8w--
