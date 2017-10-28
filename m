@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59920)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34248)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e8R1n-0003xg-Pc
-	for qemu-devel@nongnu.org; Sat, 28 Oct 2017 09:19:58 -0400
+	(envelope-from <bounces@canonical.com>) id 1e8RGF-0007Uv-Of
+	for qemu-devel@nongnu.org; Sat, 28 Oct 2017 09:34:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e8R1k-0008IP-Vv
-	for qemu-devel@nongnu.org; Sat, 28 Oct 2017 09:19:55 -0400
-Received: from indium.canonical.com ([91.189.90.7]:52134)
+	(envelope-from <bounces@canonical.com>) id 1e8RGA-0001U4-SL
+	for qemu-devel@nongnu.org; Sat, 28 Oct 2017 09:34:51 -0400
+Received: from indium.canonical.com ([91.189.90.7]:53040)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1e8R1k-0008H9-PN
-	for qemu-devel@nongnu.org; Sat, 28 Oct 2017 09:19:52 -0400
+	id 1e8RGA-0001Sz-MA
+	for qemu-devel@nongnu.org; Sat, 28 Oct 2017 09:34:46 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1e8R1j-0001Rl-TZ
-	for <qemu-devel@nongnu.org>; Sat, 28 Oct 2017 13:19:51 +0000
+	id 1e8RG9-00027F-CY
+	for <qemu-devel@nongnu.org>; Sat, 28 Oct 2017 13:34:45 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id DC5E12E80C7
-	for <qemu-devel@nongnu.org>; Sat, 28 Oct 2017 13:19:51 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 5DFA42E80C7
+	for <qemu-devel@nongnu.org>; Sat, 28 Oct 2017 13:34:45 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 28 Oct 2017 13:04:51 -0000
-From: Thomas Huth <1338957@bugs.launchpad.net>
-Reply-To: Bug 1338957 <1338957@bugs.launchpad.net>
+Date: Sat, 28 Oct 2017 13:24:12 -0000
+From: Thomas Huth <1332297@bugs.launchpad.net>
+Reply-To: Bug 1332297 <1332297@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20140708091208.10184.15528.malonedeb@soybean.canonical.com>
-Message-Id: <150919589194.4122.9434229492569189875.malone@gac.canonical.com>
+References: <20140619191312.10674.6213.malonedeb@soybean.canonical.com>
+Message-Id: <150919705257.4089.9234022235936087664.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1338957] Re: RFE: add an event to report block
- devices watermark
+Subject: [Qemu-devel] [Bug 1332297] Re: qemu-img: crash on check of an image
+ with large value in the 'size' header field
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,44 +39,39 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Upstream here:
-https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3De2462113b2003085ad16f=
-15e1
+QEMU nowadays seems to report "Check failed: Cannot allocate memory" ...
+so I assume that is OK and we can now close this bug?
 
 ** Changed in: qemu
-       Status: New =3D> Fix Released
+       Status: New =3D> Incomplete
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1338957
+https://bugs.launchpad.net/bugs/1332297
 
 Title:
-  RFE: add an event to report block devices watermark
+  qemu-img: crash on check of an image with large value in the 'size'
+  header field
 
 Status in QEMU:
-  Fix Released
+  Incomplete
 
 Bug description:
-  Add an event to report if a block device usage exceeds a threshold.
-  The threshold should be configurable with a monitor command. The event
-  should report the affected block device. Additional useful information
-  could be the offset of the highest sector , like in the query-
-  blockstats output.
+  The qemu-img crashes on the next command:
 
-  Rationale for the RFE
-  Managing applications, like oVirt (http://www.ovirt.org), make extensive =
-use of thin-provisioned disk images.
-  In order to let the guest run flawlessly and be not unnecessarily paused,=
- oVirt sets a watermark and automatically resized the image once the waterm=
-ark is reached or exceeded.
+  qemu-img check test_image
 
-  In order to detect the mark crossing, the managing application has no cho=
-ice than aggressively polling the QEMU monitor
-  using the query-blockstats command. This lead to unnecessary system load,=
- and is made even worse under scale: scenarios
-  with hunderds of VM are becoming not unusual.
+  'test_image' can be found in the attachment. It's a fuzzed test image
+  with the qcow2 image header only. Suppositional cause of the failure
+  is the value of 'size' header field set to maximum uint_64 value.
+
+  System information:
+
+  qemu.git: 6baa963f4dcc2118
+  Host: Linux 3.14.7-200.fc20.x86_64 #1 SMP Wed Jun 11 22:38:05 UTC 2014 x8=
+6_64  GNU/Linux
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1338957/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1332297/+subscriptions
