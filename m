@@ -1,23 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38947)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41487)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1e8Lbo-0006WE-1d
-	for qemu-devel@nongnu.org; Sat, 28 Oct 2017 03:32:44 -0400
+	(envelope-from <thuth@redhat.com>) id 1e8Lrz-00005c-Lu
+	for qemu-devel@nongnu.org; Sat, 28 Oct 2017 03:49:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1e8Lbj-0001SU-4s
-	for qemu-devel@nongnu.org; Sat, 28 Oct 2017 03:32:44 -0400
-Received: from mail-by2nam01on0067.outbound.protection.outlook.com
-	([104.47.34.67]:18080
-	helo=NAM01-BY2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1e8Lbi-0001Qa-OK
-	for qemu-devel@nongnu.org; Sat, 28 Oct 2017 03:32:39 -0400
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Sat, 28 Oct 2017 00:28:16 -0700
-Message-ID: <08178b4217d1692297b8c9620b6d13a80bfb6822.1509175660.git.alistair.francis@xilinx.com>
+	(envelope-from <thuth@redhat.com>) id 1e8Lrv-0003Sp-Qi
+	for qemu-devel@nongnu.org; Sat, 28 Oct 2017 03:49:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39560)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1e8Lrv-0003SC-LS
+	for qemu-devel@nongnu.org; Sat, 28 Oct 2017 03:49:23 -0400
+References: <20171026135814.20773-1-richard.henderson@linaro.org>
+	<20171026173758.GA2334@flamenco>
+	<163ef388-2b1f-21f3-5434-286eb8f3078d@amsat.org>
+	<ffb0a910-c5e6-2aa3-4a4c-b9c0a25b1b9b@amsat.org>
+	<dc49bcea-13ee-b299-fd07-3e1eadfd9583@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <e945351e-20d3-a93e-f969-1cfc4ed4bdba@redhat.com>
+Date: Sat, 28 Oct 2017 09:48:58 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2 1/1] xlnx-zcu102: Specify the number of max
- CPUs
+In-Reply-To: <dc49bcea-13ee-b299-fd07-3e1eadfd9583@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] tcg: Avoid setting tcg_initialize if
+ !CONFIG_TCG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,31 +32,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, peter.maydell@linaro.org
-Cc: alistair.francis@xilinx.com, alistair23@gmail.com, edgar.iglesias@xilinx.com, edgar.iglesias@gmail.com, f4bug@amsat.org
+To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, "Emilio G. Cota" <cota@braap.org>, Richard Henderson <richard.henderson@linaro.org>
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, ehabkost@redhat.com, Yang Zhong <yang.zhong@intel.com>, David Hildenbrand <david@redhat.com>
 
-Specify the number of CPUs that can run on ZynqMP.
+On 28.10.2017 00:54, Paolo Bonzini wrote:
+> On 26/10/2017 21:03, Philippe Mathieu-Daud=C3=A9 wrote:
+>>> AFAIK the only target that is so far supposed to work with
+>>> --disable-tcg is i386. The configure script however lets you try to
+>>> build without TCG if the host has an alternative accelerator (e.g. KV=
+M),
+>>> but that build is likely to fail. [ just confirmed this with aarch64 =
+]
+>> What about s390x?
+>=20
+> s390x and ppc64 supposedly support --disable-tcg?
 
-Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-Reviewed-by: Philippe Mathieu-Daud <f4bug@amsat.org>
----
-V2:
- - Use macros
+s390x supports --disable-tcg, but ppc64 does not support it yet.
 
- hw/arm/xlnx-zcu102.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/hw/arm/xlnx-zcu102.c b/hw/arm/xlnx-zcu102.c
-index 519a16ed98..e2d15a1c9d 100644
---- a/hw/arm/xlnx-zcu102.c
-+++ b/hw/arm/xlnx-zcu102.c
-@@ -240,6 +240,7 @@ static void xlnx_zcu102_machine_class_init(ObjectClass *oc, void *data)
-     mc->block_default_type = IF_IDE;
-     mc->units_per_default_bus = 1;
-     mc->ignore_memory_transaction_failures = true;
-+    mc->max_cpus = XLNX_ZYNQMP_NUM_APU_CPUS + XLNX_ZYNQMP_NUM_RPU_CPUS;
- }
- 
- static const TypeInfo xlnx_zcu102_machine_init_typeinfo = {
--- 
-2.11.0
+ Thomas
