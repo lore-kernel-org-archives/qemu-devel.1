@@ -1,33 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58414)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38634)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e8FAp-0007nW-J8
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 20:40:29 -0400
+	(envelope-from <aik@ozlabs.ru>) id 1e8Fuq-0005Bv-Tc
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 21:28:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e8FAk-0007tV-Ce
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 20:40:27 -0400
-Received: from indium.canonical.com ([91.189.90.7]:59788)
+	(envelope-from <aik@ozlabs.ru>) id 1e8Ful-0008IJ-Ue
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 21:28:00 -0400
+Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:56709)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1e8FAk-0007t8-0S
-	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 20:40:22 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1e8FAh-0002RQ-TK
-	for <qemu-devel@nongnu.org>; Sat, 28 Oct 2017 00:40:20 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id D71682E80CD
-	for <qemu-devel@nongnu.org>; Sat, 28 Oct 2017 00:40:19 +0000 (UTC)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1e8Ful-0008HZ-Lf
+	for qemu-devel@nongnu.org; Fri, 27 Oct 2017 21:27:55 -0400
+Received: by mail-pg0-x241.google.com with SMTP id m18so6490077pgd.13
+	for <qemu-devel@nongnu.org>; Fri, 27 Oct 2017 18:27:55 -0700 (PDT)
+References: <20171027131412.18830-1-berrange@redhat.com>
+	<20171027131412.18830-5-berrange@redhat.com>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <f440be99-e1dc-267f-50fd-52d03533f62a@ozlabs.ru>
+Date: Sat, 28 Oct 2017 12:27:49 +1100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sat, 28 Oct 2017 00:22:57 -0000
-From: Bug Watch Updater <524447@bugs.launchpad.net>
-Reply-To: Bug 524447 <524447@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20100219141749.18571.12250.malonedeb@wampee.canonical.com>
-Message-Id: <150915017793.3122.15744235500775165385.launchpad@loganberry.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 524447] Re: virsh save is very slow
+In-Reply-To: <20171027131412.18830-5-berrange@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-AU
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 4/4] build: don't fail if given a git
+ submodule which does not exist
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,114 +31,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>
 
-Launchpad has imported 4 comments from the remote bug at
-https://bugzilla.redhat.com/show_bug.cgi?id=3D599091.
+On 28/10/17 00:14, Daniel P. Berrange wrote:
+> If going back in time in git history, across a commit that introduces a new
+> submodule, the 'git-submodule.sh' script will fail, causing rebuild to fail.
+> 
+> This is because config-host.mak contains a GIT_SUBMODULES variable that lists
+> a submodule that only exists in the later commit. config-host.mak won't get
+> repopulated until config.status is invoked, but make won't get this far due to
+> the submodule error.
+> 
+> This change makes 'git-submodule.sh' check whether each module is known to git
+> and drops any which are not present. A warning message will be printed when any
+> submodule is dropped in this manner.
+> 
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> ---
+>  scripts/git-submodule.sh | 16 ++++++++++++++--
+>  1 file changed, 14 insertions(+), 2 deletions(-)
+> 
+> diff --git a/scripts/git-submodule.sh b/scripts/git-submodule.sh
+> index 30fd83db55..60b3b9bdeb 100755
+> --- a/scripts/git-submodule.sh
+> +++ b/scripts/git-submodule.sh
+> @@ -7,7 +7,7 @@ substat=".git-submodule-status"
+>  
+>  command=$1
+>  shift
+> -modules="$@"
+> +maybe_modules="$@"
+>  
+>  test -z "$GIT" && GIT=git
+>  
+> @@ -16,12 +16,24 @@ error() {
+>      exit 1
+>  }
+>  
+> -if test -z "$modules"
+> +if test -z "$maybe_modules"
+>  then
+>      test -e $substat || touch $substat
+>      exit 0
+>  fi
+>  
+> +modules=""
+> +for m in $maybe_modules
+> +do
+> +    $GIT submodule status $m 1> /dev/null 2>&1
+> +    if test $? == 0
 
-If you reply to an imported comment from within Launchpad, your comment
-will be sent to the remote bug automatically. Read more about
-Launchpad's inter-bugtracker facilities at
-https://help.launchpad.net/InterBugTracking.
 
-------------------------------------------------------------------------
-On 2010-06-02T16:38:36+00:00 Cole wrote:
+./scripts/git-submodule.sh: 29: test: 0: unexpected operator
 
-See https://bugs.launchpad.net/ubuntu/+source/qemu-
-kvm/+bug/524447/comments/5
+This helps:
 
-Apparently increasing the dd block size greatly increases the speed of
-the domain save operation.
-
-Reply at:
-https://bugs.launchpad.net/ubuntu/+source/libvirt/+bug/524447/comments/6
-
-------------------------------------------------------------------------
-On 2010-06-07T17:56:00+00:00 Laine wrote:
-
-commit 20206a4bc9f1293c69eca79290a55a5fa19976d5 in libvirt git changes
-the dd blocksize to 1M. This decreased the time required for a save of a
-suspended 512MB guest from 3min47sec to 56sec.
-
-Reply at:
-https://bugs.launchpad.net/ubuntu/+source/libvirt/+bug/524447/comments/8
-
-------------------------------------------------------------------------
-On 2010-06-10T12:19:33+00:00 Eric wrote:
-
-An additional patch avoids the overhead of seeking to a 1M alignment:
-https://www.redhat.com/archives/libvir-list/2010-June/msg00239.html
-
-Reply at:
-https://bugs.launchpad.net/ubuntu/+source/libvirt/+bug/524447/comments/9
-
-------------------------------------------------------------------------
-On 2010-07-21T16:48:55+00:00 Daniel wrote:
-
-This is included in 0.8.2. In addition upstream QEMU has identified &
-fixed a flaw that had significant speed impact
-
-Reply at:
-https://bugs.launchpad.net/ubuntu/+source/libvirt/+bug/524447/comments/15
+-    if test $? == 0
++    if test "$?" -eq "0"
 
 
-** Changed in: libvirt
-       Status: Unknown =3D> Fix Released
 
-** Changed in: libvirt
-   Importance: Unknown =3D> Medium
+> +    then
+> +        modules="$modules $m"
+> +    else
+> +        echo "warn: ignoring non-existant submodule $m"
+> +    fi
+> +done
+> +
+>  if ! test -e ".git"
+>  then
+>      echo "$0: unexpectedly called with submodules but no git checkout exists"
+> 
 
--- =
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/524447
-
-Title:
-  virsh save is very slow
-
-Status in libvirt:
-  Fix Released
-Status in QEMU:
-  Fix Released
-Status in libvirt package in Ubuntu:
-  Invalid
-Status in qemu-kvm package in Ubuntu:
-  Fix Released
-Status in libvirt source package in Lucid:
-  Won't Fix
-Status in qemu-kvm source package in Lucid:
-  Fix Released
-Status in libvirt source package in Maverick:
-  Won't Fix
-Status in qemu-kvm source package in Maverick:
-  Won't Fix
-Status in qemu-kvm package in Debian:
-  Fix Released
-
-Bug description:
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-  SRU Justification:
-  1. impact: 'qemu save' is slow
-  2. how addressed: a patch upstream fixes the case when a file does not an=
-nounce when it is ready.
-  3. patch: see the patch in linked bzr trees
-  4. TEST CASE: see comment #4 for a specific recipe
-  5. regression potential:  this patch only touches the vm save path.
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-  As reported here: http://www.redhat.com/archives/libvir-
-  list/2009-December/msg00203.html
-
-  "virsh save" is very slow - it writes the image at around 1MB/sec on
-  my test system.
-
-  (I think I saw a bug report for this issue on Fedora's bugzilla, but I
-  can't find it now...)
-
-  Confirmed under Karmic.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/libvirt/+bug/524447/+subscriptions
+-- 
+Alexey
