@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49191)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49751)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e8K8w-00082V-2D
-	for qemu-devel@nongnu.org; Sat, 28 Oct 2017 01:58:51 -0400
+	(envelope-from <eblake@redhat.com>) id 1e8KAF-0000Fo-Jy
+	for qemu-devel@nongnu.org; Sat, 28 Oct 2017 02:00:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e8K8s-00070T-55
-	for qemu-devel@nongnu.org; Sat, 28 Oct 2017 01:58:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48528)
+	(envelope-from <eblake@redhat.com>) id 1e8KAE-00085X-SN
+	for qemu-devel@nongnu.org; Sat, 28 Oct 2017 02:00:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52760)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1e8K8r-0006yR-Sr
-	for qemu-devel@nongnu.org; Sat, 28 Oct 2017 01:58:46 -0400
-References: <20171027131412.18830-1-berrange@redhat.com>
-	<20171027131412.18830-5-berrange@redhat.com>
-	<f440be99-e1dc-267f-50fd-52d03533f62a@ozlabs.ru>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1e8KAE-00083w-K3
+	for qemu-devel@nongnu.org; Sat, 28 Oct 2017 02:00:10 -0400
+References: <7CA6B03C-DFAA-4A15-9E33-E3FAD6647140@gmail.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <a2372c0e-86dc-1d94-2509-ae3860cf7044@redhat.com>
-Date: Sat, 28 Oct 2017 07:58:37 +0200
+Message-ID: <38c3125f-b050-c0ba-282f-bc1e9e11d297@redhat.com>
+Date: Sat, 28 Oct 2017 08:00:05 +0200
 MIME-Version: 1.0
-In-Reply-To: <f440be99-e1dc-267f-50fd-52d03533f62a@ozlabs.ru>
+In-Reply-To: <7CA6B03C-DFAA-4A15-9E33-E3FAD6647140@gmail.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="gfCV4V1JPvd8S481Du3nSw8uIGiBrueRC"
-Subject: Re: [Qemu-devel] [PATCH v2 4/4] build: don't fail if given a git
- submodule which does not exist
+	boundary="G3IARhkR8PQvS341oXbFg6XgoU585O79G"
+Subject: Re: [Qemu-devel] drive_add: file names with spaces
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,50 +27,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>, "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: Programmingkid <programmingkidx@gmail.com>, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---gfCV4V1JPvd8S481Du3nSw8uIGiBrueRC
+--G3IARhkR8PQvS341oXbFg6XgoU585O79G
 From: Eric Blake <eblake@redhat.com>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>,
- "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <a2372c0e-86dc-1d94-2509-ae3860cf7044@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 4/4] build: don't fail if given a git
- submodule which does not exist
-References: <20171027131412.18830-1-berrange@redhat.com>
- <20171027131412.18830-5-berrange@redhat.com>
- <f440be99-e1dc-267f-50fd-52d03533f62a@ozlabs.ru>
-In-Reply-To: <f440be99-e1dc-267f-50fd-52d03533f62a@ozlabs.ru>
+To: Programmingkid <programmingkidx@gmail.com>,
+ "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
+Message-ID: <38c3125f-b050-c0ba-282f-bc1e9e11d297@redhat.com>
+Subject: Re: [Qemu-devel] drive_add: file names with spaces
+References: <7CA6B03C-DFAA-4A15-9E33-E3FAD6647140@gmail.com>
+In-Reply-To: <7CA6B03C-DFAA-4A15-9E33-E3FAD6647140@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 10/28/2017 03:27 AM, Alexey Kardashevskiy wrote:
-> On 28/10/17 00:14, Daniel P. Berrange wrote:
->> If going back in time in git history, across a commit that introduces =
-a new
->> submodule, the 'git-submodule.sh' script will fail, causing rebuild to=
- fail.
->>
-
->> +do
->> +    $GIT submodule status $m 1> /dev/null 2>&1
->> +    if test $? =3D=3D 0
+On 10/28/2017 06:44 AM, Programmingkid wrote:
+> I'm trying to use an image file that has spaces in its file name (and s=
+ometimes in the path) to be used as a USB flash drive. When I try adding =
+the image file using the drive_add command I see this error: drive_add: e=
+xtraneous characters at the end of the line
 >=20
->=20
-> ./scripts/git-submodule.sh: 29: test: 0: unexpected operator
+> I have tried using single and double quotes around the file name but th=
+is does not help. Is there a way to use files that have spaces in it's na=
+me with drive_add?
 
-Ah, right, =3D=3D is a bashism.
+Not in HMP, which lacks quoting.  (Unless you want to patch HMP to learn
+quoting)
 
->=20
-> This helps:
->=20
-> -    if test $? =3D=3D 0
-> +    if test "$?" -eq "0"
-
-Or 'if test $? =3D 0'
+But using spaces in filenames works fine in QMP.
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -81,7 +62,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---gfCV4V1JPvd8S481Du3nSw8uIGiBrueRC
+--G3IARhkR8PQvS341oXbFg6XgoU585O79G
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -90,14 +71,14 @@ Content-Disposition: attachment; filename="signature.asc"
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAln0HI0ACgkQp6FrSiUn
-Q2pjBAgAmVnF/jWGTwo4+gqXXylv3stlV33eptDZvTv+NlS2lp20jW52Ua3jdYFC
-aj2Met7ogcgQeJzcKlyuj2Ij3PZPHgVt39haTwa5TenYeNzn0hnI4qVE+T92QUqz
-LhPf3qGOS5CQeK39RRdpZGKOtm3Sh492hyQlLJYDVPH5ieKISHdy/2U1jvogmOa8
-y4FWXFEKamgcADMb2xNN8OaRSCzJOSsDuMbFupUIuX9A7/jDORyyULIbqRROxECp
-/geeBTi0hiTgNNhwLQPiFoMo4QQlx3i5sxNx3UecqDAKDq+yn0NFThMiY3fFHNUI
-73aDNZ0K9oeRvdeXIjEgcU5/lYJR4Q==
-=xBI/
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAln0HOUACgkQp6FrSiUn
+Q2oEEwf/cOpriml4koJjgm3y46QFnWvTERtx3ZO1bZY+nnqJCIWRJQhPfjT1G9HP
+q00K60ugCBJv/xr4xf59JYl9NZ6x65F2NPs8/OVYRzzsoG35PWbSChksxrMPXYEl
+7z1xmBCpenOjU4EZXpSM8Lx/4LoREUhjNlZmOhHu/Ukxu6v/+S81WbDsPZ2Qd2VX
+8SYXqPi6tH1I2KBLYRJQp4UJBVNXo8fsQmXnfjZzfNvhD5/eydtXMtA4dbWhEYn9
+hPGyqO2uFo0eVnjOVfJbYo7V1VIDYC6K+XhOxI7A/dmYy0y8q6hQoC2p5xNSt1l1
+9iDgTCOjq+N6ab3b6RwkPk9zeBMIzA==
+=udYz
 -----END PGP SIGNATURE-----
 
---gfCV4V1JPvd8S481Du3nSw8uIGiBrueRC--
+--G3IARhkR8PQvS341oXbFg6XgoU585O79G--
