@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45920)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49191)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e8K0b-0004ld-Cm
-	for qemu-devel@nongnu.org; Sat, 28 Oct 2017 01:50:16 -0400
+	(envelope-from <eblake@redhat.com>) id 1e8K8w-00082V-2D
+	for qemu-devel@nongnu.org; Sat, 28 Oct 2017 01:58:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e8K0Z-0000ld-JH
-	for qemu-devel@nongnu.org; Sat, 28 Oct 2017 01:50:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43130)
+	(envelope-from <eblake@redhat.com>) id 1e8K8s-00070T-55
+	for qemu-devel@nongnu.org; Sat, 28 Oct 2017 01:58:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48528)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1e8K0Z-0000kw-A2
-	for qemu-devel@nongnu.org; Sat, 28 Oct 2017 01:50:11 -0400
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1e8K8r-0006yR-Sr
+	for qemu-devel@nongnu.org; Sat, 28 Oct 2017 01:58:46 -0400
 References: <20171027131412.18830-1-berrange@redhat.com>
+	<20171027131412.18830-5-berrange@redhat.com>
+	<f440be99-e1dc-267f-50fd-52d03533f62a@ozlabs.ru>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <2e4935ec-febf-6c13-9856-999f3db64bc2@redhat.com>
-Date: Sat, 28 Oct 2017 07:34:40 +0200
+Message-ID: <a2372c0e-86dc-1d94-2509-ae3860cf7044@redhat.com>
+Date: Sat, 28 Oct 2017 07:58:37 +0200
 MIME-Version: 1.0
-In-Reply-To: <20171027131412.18830-1-berrange@redhat.com>
+In-Reply-To: <f440be99-e1dc-267f-50fd-52d03533f62a@ozlabs.ru>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="2MhpOxkVT0dCDWEtQBpoTOjTouka4DvnO"
-Subject: Re: [Qemu-devel] [PATCH v2 0/4] Various improvements to submodule
- handling
+	boundary="gfCV4V1JPvd8S481Du3nSw8uIGiBrueRC"
+Subject: Re: [Qemu-devel] [PATCH v2 4/4] build: don't fail if given a git
+ submodule which does not exist
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,50 +30,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: Alexey Kardashevskiy <aik@ozlabs.ru>, "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---2MhpOxkVT0dCDWEtQBpoTOjTouka4DvnO
+--gfCV4V1JPvd8S481Du3nSw8uIGiBrueRC
 From: Eric Blake <eblake@redhat.com>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>,
- Peter Maydell <peter.maydell@linaro.org>,
+To: Alexey Kardashevskiy <aik@ozlabs.ru>,
+ "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
  =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <2e4935ec-febf-6c13-9856-999f3db64bc2@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 0/4] Various improvements to submodule
- handling
+Message-ID: <a2372c0e-86dc-1d94-2509-ae3860cf7044@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 4/4] build: don't fail if given a git
+ submodule which does not exist
 References: <20171027131412.18830-1-berrange@redhat.com>
-In-Reply-To: <20171027131412.18830-1-berrange@redhat.com>
+ <20171027131412.18830-5-berrange@redhat.com>
+ <f440be99-e1dc-267f-50fd-52d03533f62a@ozlabs.ru>
+In-Reply-To: <f440be99-e1dc-267f-50fd-52d03533f62a@ozlabs.ru>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 10/27/2017 03:14 PM, Daniel P. Berrange wrote:
-> I've sent a variety of improvements to submodule handling as separate p=
-atches
-> and its getting slightly confusing. So here is a series with all patche=
-s added
-> together. I've also included a fix that helps us go backwards in time a=
-cross
-> the introduction of a submodule.
->=20
-> Daniel P. Berrange (4):
->   build: allow setting a custom GIT binary for transparent proxying
->   build: don't create temporary files in source dir
->   build: allow automatic git submodule updates to be disabled
->   build: don't fail if given a git submodule which does not exist
+On 10/28/2017 03:27 AM, Alexey Kardashevskiy wrote:
+> On 28/10/17 00:14, Daniel P. Berrange wrote:
+>> If going back in time in git history, across a commit that introduces =
+a new
+>> submodule, the 'git-submodule.sh' script will fail, causing rebuild to=
+ fail.
+>>
 
-I have some minor comments on a couple of individual patches, but for
-the series:
-Reviewed-by: Eric Blake <eblake@redhat.com>
+>> +do
+>> +    $GIT submodule status $m 1> /dev/null 2>&1
+>> +    if test $? =3D=3D 0
+>=20
+>=20
+> ./scripts/git-submodule.sh: 29: test: 0: unexpected operator
+
+Ah, right, =3D=3D is a bashism.
 
 >=20
->  Makefile                 | 15 ++++++++++--
->  configure                | 14 +++++++++++-
->  scripts/git-submodule.sh | 59 ++++++++++++++++++++++++++++++++++++++++=
---------
->  3 files changed, 76 insertions(+), 12 deletions(-)
+> This helps:
 >=20
+> -    if test $? =3D=3D 0
+> +    if test "$?" -eq "0"
+
+Or 'if test $? =3D 0'
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -79,7 +81,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---2MhpOxkVT0dCDWEtQBpoTOjTouka4DvnO
+--gfCV4V1JPvd8S481Du3nSw8uIGiBrueRC
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -88,14 +90,14 @@ Content-Disposition: attachment; filename="signature.asc"
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAln0FvAACgkQp6FrSiUn
-Q2q3Iwf+Lo/OyaLwfAPwhWUKDnNz11qW0zs5IOYP3iHlm2B+ozQmbKhknnaaw5LQ
-pTnieAiIODsU0KhoEk9ktSwguMGdTzv6PIxD/u6rcfxC8PhC9getPK7i1MyDPIvn
-nvCfyuGGUEBqwa5BmH7wSRHqHDmGTqmua1kwKp420Tp++MMQkfEHkuF9UfwiU8oG
-G/HgxT1l7pdieFqSlG8gQQPBHL3gEJie6rVrTTFI2z38qDFMeGIHvjEOyL2bwkyR
-0LO+3QTSuMRZTECZ8d10Qiz4tpV68gzk84A79M/wcCOnDeDE2NYV3mhMpTBeZOue
-CvzjaXq3SW4bXuOS2hOAaVNvhb/I2w==
-=s2Gt
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAln0HI0ACgkQp6FrSiUn
+Q2pjBAgAmVnF/jWGTwo4+gqXXylv3stlV33eptDZvTv+NlS2lp20jW52Ua3jdYFC
+aj2Met7ogcgQeJzcKlyuj2Ij3PZPHgVt39haTwa5TenYeNzn0hnI4qVE+T92QUqz
+LhPf3qGOS5CQeK39RRdpZGKOtm3Sh492hyQlLJYDVPH5ieKISHdy/2U1jvogmOa8
+y4FWXFEKamgcADMb2xNN8OaRSCzJOSsDuMbFupUIuX9A7/jDORyyULIbqRROxECp
+/geeBTi0hiTgNNhwLQPiFoMo4QQlx3i5sxNx3UecqDAKDq+yn0NFThMiY3fFHNUI
+73aDNZ0K9oeRvdeXIjEgcU5/lYJR4Q==
+=xBI/
 -----END PGP SIGNATURE-----
 
---2MhpOxkVT0dCDWEtQBpoTOjTouka4DvnO--
+--gfCV4V1JPvd8S481Du3nSw8uIGiBrueRC--
