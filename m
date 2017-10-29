@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47953)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50280)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1e8naI-0002j9-BQ
-	for qemu-devel@nongnu.org; Sun, 29 Oct 2017 09:25:03 -0400
+	(envelope-from <peterx@redhat.com>) id 1e8npm-0004vB-7r
+	for qemu-devel@nongnu.org; Sun, 29 Oct 2017 09:41:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1e8naF-00034S-5x
-	for qemu-devel@nongnu.org; Sun, 29 Oct 2017 09:25:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45246)
+	(envelope-from <peterx@redhat.com>) id 1e8nph-0003BP-8d
+	for qemu-devel@nongnu.org; Sun, 29 Oct 2017 09:41:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:32888)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1e8naE-00033z-T0
-	for qemu-devel@nongnu.org; Sun, 29 Oct 2017 09:24:59 -0400
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1e8npg-0003B3-Vt
+	for qemu-devel@nongnu.org; Sun, 29 Oct 2017 09:40:57 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
 	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 006ACB652
-	for <qemu-devel@nongnu.org>; Sun, 29 Oct 2017 13:24:57 +0000 (UTC)
-Date: Sun, 29 Oct 2017 14:24:53 +0100
+	by mx1.redhat.com (Postfix) with ESMTPS id C23B8C03BD52
+	for <qemu-devel@nongnu.org>; Sun, 29 Oct 2017 13:40:54 +0000 (UTC)
+Date: Sun, 29 Oct 2017 14:40:51 +0100
 From: Peter Xu <peterx@redhat.com>
-Message-ID: <20171029132453.GA4227@pxdev.xzpeter.org>
+Message-ID: <20171029134051.GA9859@pxdev.xzpeter.org>
 References: <20171026075222.27798-1-quintela@redhat.com>
-	<20171026075222.27798-6-quintela@redhat.com>
+	<20171026075222.27798-9-quintela@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20171026075222.27798-6-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 05/10] tests: check that migration
- parameters are really assigned
+In-Reply-To: <20171026075222.27798-9-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 08/10] tests: Add precopy test using
+ deprecated commands
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,77 +37,95 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Juan Quintela <quintela@redhat.com>
 Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, lvivier@redhat.com
 
-On Thu, Oct 26, 2017 at 09:52:17AM +0200, Juan Quintela wrote:
+On Thu, Oct 26, 2017 at 09:52:20AM +0200, Juan Quintela wrote:
+> Once there, make postcopy test to use the new commands now that we
+> have other test for deprecated ones
+> 
 > Signed-off-by: Juan Quintela <quintela@redhat.com>
 > ---
->  tests/migration-test.c | 27 ++++++++++++++++++++++++---
->  1 file changed, 24 insertions(+), 3 deletions(-)
+>  tests/migration-test.c | 48 ++++++++++++++++++++++++++++++++++++++++++++++--
+>  1 file changed, 46 insertions(+), 2 deletions(-)
 > 
 > diff --git a/tests/migration-test.c b/tests/migration-test.c
-> index c429a13403..be598d3257 100644
+> index 338254bafe..b72dff3917 100644
 > --- a/tests/migration-test.c
 > +++ b/tests/migration-test.c
-> @@ -354,17 +354,37 @@ static void cleanup(const char *filename)
->      g_free(path);
->  }
->  
-> -static void migrate_set_downtime(QTestState *who, const char *value)
-> +static void migrate_check_parameter(QTestState *who, const char *parameter,
-> +                                    const char *value)
-> +{
-> +    QDict *rsp, *rsp_return;
-> +    const char *result;
-> +
-> +    rsp = wait_command(who, "{ 'execute': 'query-migrate-parameters' }");
-> +    rsp_return = qdict_get_qdict(rsp, "return");
-> +    result = g_strdup_printf("%" PRId64,
-> +                             qdict_get_try_int(rsp_return,  parameter, -1));
-> +    g_assert_cmpstr(result, ==, value);
-> +    QDECREF(rsp);
-
-Maybe we need to free "result" as well?  I see a pull request already,
-so maybe another fix patch on top.  Thanks,
-
-> +}
-> +
-> +static void migrate_set_downtime(QTestState *who, const double value)
->  {
->      QDict *rsp;
->      gchar *cmd;
-> +    char *expected;
-> +    int64_t result_int;
->  
->      cmd = g_strdup_printf("{ 'execute': 'migrate_set_downtime',"
-> -                          "'arguments': { 'value': %s } }", value);
-> +                          "'arguments': { 'value': %g } }", value);
->      rsp = qtest_qmp(who, cmd);
->      g_free(cmd);
->      g_assert(qdict_haskey(rsp, "return"));
->      QDECREF(rsp);
-> +    result_int = value * 1000L;
-> +    expected = g_strdup_printf("%" PRId64, result_int);
-> +    migrate_check_parameter(who, "downtime-limit", expected);
-> +    g_free(expected);
->  }
->  
->  static void migrate_set_speed(QTestState *who, const char *value)
-> @@ -378,6 +398,7 @@ static void migrate_set_speed(QTestState *who, const char *value)
->      g_free(cmd);
->      g_assert(qdict_haskey(rsp, "return"));
->      QDECREF(rsp);
-> +    migrate_check_parameter(who, "max-bandwidth", value);
->  }
->  
->  static void migrate_set_capability(QTestState *who, const char *capability,
-> @@ -509,7 +530,7 @@ static void test_migrate(void)
+> @@ -545,8 +545,8 @@ static void test_postcopy(void)
+>       * quickly, but that it doesn't complete precopy even on a slow
 >       * machine, so also set the downtime.
 >       */
->      migrate_set_speed(from, "100000000");
-> -    migrate_set_downtime(from, "0.001");
-> +    migrate_set_downtime(from, 0.001);
+> -    migrate_set_speed(from, "100000000");
+> -    migrate_set_downtime(from, 0.001);
+> +    migrate_set_parameter(from, "max-bandwidth", "1000000000");
+> +    migrate_set_parameter(from, "downtime-limit", "1");
 >  
 >      /* Wait for the first serial output from the source */
 >      wait_for_serial("src_serial");
+> @@ -573,6 +573,49 @@ static void test_postcopy(void)
+>      test_migrate_end(from, to);
+>  }
+>  
+> +static void test_precopy_deprecated(const char *uri)
+> +{
+> +    QTestState *from, *to;
+> +
+> +    test_migrate_start(&from, &to, uri);
+> +
+> +    /* We want to pick a speed slow enough that the test completes
+> +     * quickly, but that it doesn't complete precopy even on a slow
+> +     * machine, so also set the downtime.
+> +     */
+> +    /* 100 ms */
+> +    migrate_set_downtime(from, 0.001);
+> +    /* 1MB/s slow*/
+> +    migrate_set_speed(from, "1000000000");
+> +
+> +    /* Wait for the first serial output from the source */
+> +    wait_for_serial("src_serial");
+> +
+> +    migrate(from, uri);
+> +
+> +    wait_for_migration_pass(from);
+> +
+> +    /* 300ms it should converge */
+> +    migrate_set_downtime(from, 0.3);
+> +
+> +    if (!got_stop) {
+> +        qtest_qmp_eventwait(from, "STOP");
+> +    }
+> +    qtest_qmp_eventwait(to, "RESUME");
+> +
+> +    wait_for_serial("dest_serial");
+> +    wait_for_migration_complete(from);
+> +
+> +    test_migrate_end(from, to);
+
+Again, instead of doing real migration to test deprecated commands,
+how about just set/check them one by one?  After all we have
+migrate_check_parameter() now, which seems even easier than before.
+
+Thanks,
+
+> +}
+> +
+> +static void test_deprecated_unix(void)
+> +{
+> +    char *uri = g_strdup_printf("unix:%s/migsocket", tmpfs);
+> +
+> +    test_precopy_deprecated(uri);
+> +    g_free(uri);
+> +}
+>  
+>  static void test_precopy(const char *uri)
+>  {
+> @@ -648,6 +691,7 @@ int main(int argc, char **argv)
+>  
+>      qtest_add_func("/migration/precopy/unix", test_precopy_unix);
+>      qtest_add_func("/migration/precopy/tcp", test_precopy_tcp);
+> +    qtest_add_func("/migration/deprecated/unix", test_deprecated_unix);
+>      qtest_add_func("/migration/postcopy/unix", test_postcopy);
+>  
+>      ret = g_test_run();
 > -- 
 > 2.13.6
 > 
