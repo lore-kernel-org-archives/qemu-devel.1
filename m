@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46592)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58605)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e8tN0-0002u7-9T
-	for qemu-devel@nongnu.org; Sun, 29 Oct 2017 15:35:43 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1e8uLv-00044h-UV
+	for qemu-devel@nongnu.org; Sun, 29 Oct 2017 16:38:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e8tMv-0004n9-Cp
-	for qemu-devel@nongnu.org; Sun, 29 Oct 2017 15:35:42 -0400
-Received: from indium.canonical.com ([91.189.90.7]:55840)
+	(envelope-from <peter.maydell@linaro.org>) id 1e8uLv-0004nt-0R
+	for qemu-devel@nongnu.org; Sun, 29 Oct 2017 16:38:39 -0400
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:50351)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1e8tMv-0004mb-5Y
-	for qemu-devel@nongnu.org; Sun, 29 Oct 2017 15:35:37 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1e8tMs-0002mK-3s
-	for <qemu-devel@nongnu.org>; Sun, 29 Oct 2017 19:35:34 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 1B54D2E80C3
-	for <qemu-devel@nongnu.org>; Sun, 29 Oct 2017 19:35:34 +0000 (UTC)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1e8uLq-0004iu-By
+	for qemu-devel@nongnu.org; Sun, 29 Oct 2017 16:38:38 -0400
+Received: by mail-wm0-x242.google.com with SMTP id s66so11977585wmf.5
+	for <qemu-devel@nongnu.org>; Sun, 29 Oct 2017 13:38:33 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sun, 29 Oct 2017 19:24:28 -0000
-From: Kevin <1728448@bugs.launchpad.net>
-Reply-To: Bug 1728448 <1728448@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <150930506825.20259.326196094575831329.malonedeb@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1728448] [NEW] qemu-system-arm segmentation fault
- with cpu cortex-m*
+In-Reply-To: <150930506825.20259.326196094575831329.malonedeb@soybean.canonical.com>
+References: <150930506825.20259.326196094575831329.malonedeb@soybean.canonical.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sun, 29 Oct 2017 20:38:12 +0000
+Message-ID: <CAFEAcA_Zvi4jLUaXPAekt0d4Gpbg5B8=r4OgRbhkrKXAvvhjfw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Bug 1728448] [NEW] qemu-system-arm segmentation
+ fault with cpu cortex-m*
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,80 +29,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Bug 1728448 <1728448@bugs.launchpad.net>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Public bug reported:
+On 29 October 2017 at 19:24, Kevin <1728448@bugs.launchpad.net> wrote:
+> I try to run an emulation with qemu-system-arm under a cpu cortex-m3 but
+> any execution under the processor result by a segmentation fault.
+>
+> My command is : qemu-system-arm -m 256 -M versatilepb -cpu cortex-m3
+> -kernel ~/qemu/wheezy/vmlinuz-3.2.0-4-versatile -initrd
+> ~/qemu/wheezy/initrd.img-3.2.0-4-versatile -hda ~/qemu/wheezy/hda.img
+> -append 'root=/dev/sda1'
 
-I try to run an emulation with qemu-system-arm under a cpu cortex-m3 but
-any execution under the processor result by a segmentation fault.
+This command line is never going to work, for multiple reasons.
+Unfortunately QEMU currently doesn't do a good job of identifying
+option combinations which we know are wrong (like -cpu cortex-m3
+with -M versatilepb) and printing an error message.
 
-My command is : qemu-system-arm -m 256 -M versatilepb -cpu cortex-m3
--kernel ~/qemu/wheezy/vmlinuz-3.2.0-4-versatile -initrd
-~/qemu/wheezy/initrd.img-3.2.0-4-versatile -hda ~/qemu/wheezy/hda.img
--append 'root=3D/dev/sda1'
+The major problem here is that the cortex-m3 is a microcontroller,
+which is significantly different from the 'A-profile' devices
+that Linux runs on. It has no MMU and usually 16MB of RAM or less:
+why are you trying to run Linux on it? This will never work.
 
-If a lauch the emulation without specifying a cpu equivalent to
-cortex-m*, the vm opens up well and works but I absolutely need to run
-it under cortex-m3.
+Secondly, the "versatilepb" board is not a board which you can
+use a Cortex-M3 with -- it's only intended to work with certain
+CPUs, mainly the arm926.
 
+Thirdly, that looks like a prebuilt versatile kernel image -- it
+probably won't work with a random CPU that's not the one the
+versatile has, and it *definitely* won't work with the M3.
 
-Do you have any idea why I have this problem only with this type of process=
-or ?
+Basic rule of thumb for QEMU ARM boards -- don't try to specify
+"-cpu" unless you have documentation that specifically tells you
+to. You're much more likely to create something that's just
+a broken config that guest software can't handle. This is
+always true for the Cortex-M3 -- unless the board is intended
+to work with the M3 and is creating the correct interrupt
+controller, you'll just end up with a broken model.
 
-I also try with other boards different from versatilepb but I have the
-same result.
+If you need to use the Cortex-M3 then use one of the boards
+which works with it -- lm3s6965evb, lm3s811evb, mps2-an385,
+mps2-an511, or netduino2. You'll also need to run guest code
+which is actually built for the board you're using and for
+the Cortex-M3 (likely some kind of RTOS, or bare metal code.)
+The MPS2 boards have the most RAM, but they're only in recent
+QEMU versions.
 
-I am under ubuntu 17 64bits during my test.
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
-
-** Tags: arm cortex cpu qemu segfault
-
-** Tags added: qemu
-
-** Tags added: arm
-
-** Tags added: cortex cpu
-
-** Tags added: segfault
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1728448
-
-Title:
-  qemu-system-arm segmentation fault with cpu cortex-m*
-
-Status in QEMU:
-  New
-
-Bug description:
-  I try to run an emulation with qemu-system-arm under a cpu cortex-m3
-  but any execution under the processor result by a segmentation fault.
-
-  My command is : qemu-system-arm -m 256 -M versatilepb -cpu cortex-m3
-  -kernel ~/qemu/wheezy/vmlinuz-3.2.0-4-versatile -initrd
-  ~/qemu/wheezy/initrd.img-3.2.0-4-versatile -hda ~/qemu/wheezy/hda.img
-  -append 'root=3D/dev/sda1'
-
-  If a lauch the emulation without specifying a cpu equivalent to
-  cortex-m*, the vm opens up well and works but I absolutely need to run
-  it under cortex-m3.
-
-  =
-
-  Do you have any idea why I have this problem only with this type of proce=
-ssor ?
-
-  I also try with other boards different from versatilepb but I have the
-  same result.
-
-  I am under ubuntu 17 64bits during my test.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1728448/+subscriptions
+thanks
+-- PMM
