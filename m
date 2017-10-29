@@ -1,33 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36123)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38604)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1e8izc-0000nO-R8
-	for qemu-devel@nongnu.org; Sun, 29 Oct 2017 04:30:56 -0400
+	(envelope-from <kwolf@redhat.com>) id 1e8jRR-00048R-I7
+	for qemu-devel@nongnu.org; Sun, 29 Oct 2017 04:59:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1e8izX-0005Z1-Th
-	for qemu-devel@nongnu.org; Sun, 29 Oct 2017 04:30:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41022)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1e8izX-0005YF-OE
-	for qemu-devel@nongnu.org; Sun, 29 Oct 2017 04:30:47 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CDDA681DFF
-	for <qemu-devel@nongnu.org>; Sun, 29 Oct 2017 08:30:46 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20171027034713.GA13631@work-vm> (David Alan Gilbert's message of
-	"Fri, 27 Oct 2017 04:47:14 +0100")
-References: <20171026075222.27798-1-quintela@redhat.com>
-	<20171026075222.27798-6-quintela@redhat.com>
-	<20171027034713.GA13631@work-vm>
-Reply-To: quintela@redhat.com
-Date: Sun, 29 Oct 2017 09:30:44 +0100
-Message-ID: <87ineycq4r.fsf@secure.laptop>
+	(envelope-from <kwolf@redhat.com>) id 1e8jRQ-0006OO-RO
+	for qemu-devel@nongnu.org; Sun, 29 Oct 2017 04:59:37 -0400
+Date: Sun, 29 Oct 2017 09:59:24 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20171029085924.GA3812@localhost.localdomain>
+References: <cover.1509094209.git.jcody@redhat.com>
+	<2f0114c773e8fb917a7a54acccfd2e2adfb6e066.1509094209.git.jcody@redhat.com>
+	<20171027090919.GB3368@localhost.localdomain>
+	<20171027101830.GB30326@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2 05/10] tests: check that migration
- parameters are really assigned
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171027101830.GB30326@localhost.localdomain>
+Subject: Re: [Qemu-devel] [PATCH 3/4] block/parallels: Don't update header
+ until the first actual write
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,53 +26,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
+To: Jeff Cody <jcody@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, aik@ozlabs.ru, mreitz@redhat.com, den@openvz.org, stefanha@redhat.com
 
-"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> * Juan Quintela (quintela@redhat.com) wrote:
->> Signed-off-by: Juan Quintela <quintela@redhat.com>
->> ---
->>  tests/migration-test.c | 27 ++++++++++++++++++++++++---
->>  1 file changed, 24 insertions(+), 3 deletions(-)
->> 
->> diff --git a/tests/migration-test.c b/tests/migration-test.c
->> index c429a13403..be598d3257 100644
->> --- a/tests/migration-test.c
->> +++ b/tests/migration-test.c
->> @@ -354,17 +354,37 @@ static void cleanup(const char *filename)
->>      g_free(path);
->>  }
->>  
->> -static void migrate_set_downtime(QTestState *who, const char *value)
->> +static void migrate_check_parameter(QTestState *who, const char *parameter,
->> +                                    const char *value)
->> +{
->> +    QDict *rsp, *rsp_return;
->> +    const char *result;
->> +
->> +    rsp = wait_command(who, "{ 'execute': 'query-migrate-parameters' }");
->> +    rsp_return = qdict_get_qdict(rsp, "return");
->> +    result = g_strdup_printf("%" PRId64,
->> +                             qdict_get_try_int(rsp_return,  parameter, -1));
->> +    g_assert_cmpstr(result, ==, value);
->> +    QDECREF(rsp);
->> +}
->> +
->> +static void migrate_set_downtime(QTestState *who, const double value)
->>  {
->>      QDict *rsp;
->>      gchar *cmd;
->> +    char *expected;
->> +    int64_t result_int;
->>  
->>      cmd = g_strdup_printf("{ 'execute': 'migrate_set_downtime',"
->> -                          "'arguments': { 'value': %s } }", value);
->> +                          "'arguments': { 'value': %g } }", value);
->
-> I wonder if that will hit any FP representation problems for some
-> values?
+Am 27.10.2017 um 12:18 hat Jeff Cody geschrieben:
+> On Fri, Oct 27, 2017 at 11:09:19AM +0200, Kevin Wolf wrote:
+> > Am 27.10.2017 um 10:57 hat Jeff Cody geschrieben:
+> > > The on disk image format 'inuse' header field is updated blindly if the
+> > > image is opened RDWR.  This can cause problems if the QEMU runstate is
+> > > set to INMIGRATE, at which point the underlying file is set to INACTIVE.
+> > > This causes an assert in bdrv_co_pwritev().
+> > > 
+> > > Do something similar to what is done in VHDX; latch the first write, and
+> > > update the header the first time we modify the file.
+> > > 
+> > > Signed-off-by: Jeff Cody <jcody@redhat.com>
+> > 
+> > For VHDX, it seems that we have to have the header update in the write
+> > path anyway, so it might be justifiable, but I think for parallels, it's
+> > just ugly.
+> > 
+> 
+> A bit ugly.  I think we could get around VHDX needing to do it as well; it
+> does it in the write path for two scenarios:
+> 
+>     * First normal write, or
+>     * Journal log replay, if dirty, on open (if r/w)
+> 
+> The log check happens early in vhdx_open().  If it does not write anything,
+> then we can just write the headers during the open like normal, if we are
+> R/W (and !BDRV_O_INACTIVE, of course).
 
-This is a deprecated function, so .....
+Technically, you can do the same as I suggest for parallels, the
+difference is just that by the letter, the VHDX spec seems to require
+that you update the header on the first write (going by the comment in
+our VHDX driver...).
 
-Thanks, Juan.
+> > The conservative approach to this would be doing the header write in
+> > .bdrv_open() only if BDRV_O_INACTIVE is cleared, and otherwise do it
+> > during .bdrv_invalidate_cache().
+> 
+> What scenarios cause BDRV_O_INACTIVE to not be set on bs, but set on
+> bs->file-bs?
+
+Bugs? :-)
+
+Kevin
+
+> 
+> > By the way, random design thought: It might make sense to change
+> > .bdrv_open() so that it always opens inactive images and then call
+> > .bdrv_invalidate_cache() (possibly renamed to .bdrv_activate())
+> > unconditionally even without migration.
+> > 
+> > Kevin
