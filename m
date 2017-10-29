@@ -1,18 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43124)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55291)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pixo@polepetko.eu>) id 1e8vdo-0001TA-4P
-	for qemu-devel@nongnu.org; Sun, 29 Oct 2017 18:01:13 -0400
+	(envelope-from <pisa@cmp.felk.cvut.cz>) id 1e8wJ6-0006is-4L
+	for qemu-devel@nongnu.org; Sun, 29 Oct 2017 18:43:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pixo@polepetko.eu>) id 1e8vdl-0001le-3P
-	for qemu-devel@nongnu.org; Sun, 29 Oct 2017 18:01:12 -0400
-Received: from [77.247.229.177] (port=51420 helo=neth.polepetko.eu)
+	(envelope-from <pisa@cmp.felk.cvut.cz>) id 1e8wJ3-0000TH-0i
+	for qemu-devel@nongnu.org; Sun, 29 Oct 2017 18:43:52 -0400
+Received: from relay.felk.cvut.cz ([2001:718:2:1611:0:1:0:70]:53331)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pixo@polepetko.eu>) id 1e8vdk-0001j8-TQ
-	for qemu-devel@nongnu.org; Sun, 29 Oct 2017 18:01:09 -0400
-From: Stanislav Lanci <pixo@polepetko.eu>
-Date: Sun, 29 Oct 2017 22:22:24 +0100
-Message-Id: <20171029212224.2777-1-pixo@polepetko.eu>
-Subject: [Qemu-devel] [PATCH] AMD Processor Topology Information
+	(envelope-from <pisa@cmp.felk.cvut.cz>) id 1e8wJ2-0000Rt-LH
+	for qemu-devel@nongnu.org; Sun, 29 Oct 2017 18:43:48 -0400
+From: Pavel Pisa <pisa@cmp.felk.cvut.cz>
+Date: Sun, 29 Oct 2017 23:43:11 +0100
+References: <cover.1508885974.git.pisa@cmp.felk.cvut.cz>
+	<28f27d84714abd1e85144a5679eaa3147f4ca023.1508885974.git.pisa@cmp.felk.cvut.cz>
+	<35454964-58da-e9d1-f960-c7cff8a9e054@adacore.com>
+In-Reply-To: <35454964-58da-e9d1-f960-c7cff8a9e054@adacore.com>
+MIME-Version: 1.0
+Content-Type: Text/Plain;
+  charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+Message-Id: <201710292343.11885.pisa@cmp.felk.cvut.cz>
+Subject: Re: [Qemu-devel] [PATCH 1/6] CAN bus simple SJA1000 PCI card
+ emulation for QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,52 +31,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Stanislav Lanci <pixo@polepetko.eu>
+To: KONRAD Frederic <frederic.konrad@adacore.com>
+Cc: qemu-devel@nongnu.org, Marek Vasut <marex@denx.de>, Stefan Hajnoczi <stefanha@gmail.com>, Deniz Eren <deniz.eren@icloud.com>, Jan Kiszka <jan.kiszka@siemens.com>, Oliver Hartkopp <socketcan@hartkopp.net>
 
-Add CPUID 0x8000001E for describing AMD Processor Topology Information
-Disables warning about smt for 17h family of AMD CPUs
+Hello Fred,
 
-Signed-off-by: Stanislav Lanci <pixo@polepetko.eu>
----
- target/i386/cpu.c | 18 +++++++++++++++++-
- 1 file changed, 17 insertions(+), 1 deletion(-)
+thanks much for review and remarks.
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index ddc45abd70..5885b2dd9e 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -3072,6 +3072,22 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
-             *edx = 0;
-         }
-         break;
-+    case 0x8000001E:
-+        /* AMD CPU Topology */
-+        if (env->cpuid_vendor1 != CPUID_VENDOR_INTEL_1 ||
-+            env->cpuid_vendor2 != CPUID_VENDOR_INTEL_2 ||
-+            env->cpuid_vendor3 != CPUID_VENDOR_INTEL_3) {
-+            *eax = cpu->apic_id;
-+            *ebx = (cs->nr_threads - 1 ) << 8 | cpu->core_id;
-+            *ecx = cpu->socket_id;
-+            *edx = 0;
-+        } else {
-+            *eax = 0;
-+            *ebx = 0;
-+            *ecx = 0;
-+            *edx = 0;
-+        }
-+        break;
-     case 0xC0000000:
-         *eax = env->cpuid_xlevel2;
-         *ebx = 0;
-@@ -3742,7 +3758,7 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
-      * NOTE: the following code has to follow qemu_init_vcpu(). Otherwise
-      * cs->nr_threads hasn't be populated yet and the checking is incorrect.
-      */
--    if (!IS_INTEL_CPU(env) && cs->nr_threads > 1 && !ht_warned) {
-+    if (!IS_INTEL_CPU(env) && cs->nr_threads > 1 && !ht_warned && (env->cpuid_version & 0xFF00F00) != 0x800F00) {
-         error_report("AMD CPU doesn't support hyperthreading. Please configure"
-                      " -smp options properly.");
-         ht_warned = true;
--- 
-2.14.2
+On Friday 27 of October 2017 16:18:31 KONRAD Frederic wrote:
+> Hi Pavel,
+>
+> On 10/25/2017 01:12 AM, pisa@cmp.felk.cvut.cz wrote:
+> > From: Pavel Pisa <pisa@cmp.felk.cvut.cz>
+> >
+> > The work is based on Jin Yang GSoC 2013 work funded
+> > by Google and mentored in frame of RTEMS project GSoC
+> > slot donated to QEMU.
+> >
+> > Rewritten for QEMU-2.0+ versions and architecture cleanup
+> > by Pavel Pisa (Czech Technical University in Prague).
+> >
+> > The core SJA1000 support is independent of provided
+> > PCI board. The simple core CAN bus infrastructure
+> > is independent as well.
+> >
+> > Connection to the real host CAN bus network through
+> > SocketCAN network interface is available for Linux
+> > host system as well.
+> >
+> > Signed-off-by: Pavel Pisa <pisa@cmp.felk.cvut.cz>
+> > ---
+> >   default-configs/pci.mak |   2 +
+> >   hw/Makefile.objs        |   1 +
+> >   hw/can/Makefile.objs    |   5 +
+> >   hw/can/can_core.c       | 374 +++++++++++++++++++
+>
+> Correct me if I'm wrong but this file above doesn't introduce
+> SJA1000 PCI board? If not it should be in a separate patch.
+
+May be it would worth to make patches more finegrained.
+But on the other hand initial CAN support is not so
+large and keeping one complete emulation in single
+example board in initial patch can be better to read.
+
+Logical finegrained division is
+
+CAN bus emulation core functions and connection to Linux SocketCAN host
+  include/can/can_emu.h
+  hw/can/can_core.c
+
+CAN bus basic SJA1000 chip register level emulation
+  hw/can/can_sja1000.c
+  hw/can/can_sja1000.h
+
+CAN bus simple SJA1000 memory mapped PCI card example
+  hw/can/can_pci.c
+This one is questionable, because it exists only for testing
+and uses some random VID DID.
+Do you suggest to omit it now when real world compatible
+HW is included by next patches.
+
+CAN bus Kvaser PCI CAN-S (single SJA1000 channel) emulation added.
+  hw/can/can_kvaser_pci.c
+
+CAN bus PCM-3680I PCI (dual SJA1000 channel) emulation added.
+  hw/can/can_pcm3680_pci.c
+
+CAN bus MIOe-3680 PCI (dual SJA1000 channel) emulation added.
+  hw/can/can_mioe3680_pci.c
+
+If you think that this is more logical even that the first
+commits introduce something which cannot be tested/compiles
+only into library, then I rearrange patchyes this way.
+
+> > +#ifdef DEBUG_CAN
+> > +static void can_display_msg(struct qemu_can_frame *msg)
+> > +{
+> > +    int i;
+> > +
+> > +    printf("%03X [%01d]:", (msg->can_id & 0x1fffffff), msg->can_dlc);
+> > +    for (i = 0; i < msg->can_dlc; i++) {
+> > +        printf("  %02X", msg->data[i]);
+> > +    }
+> > +    printf("\n");
+> > +}
+> > +#endif
+>
+> This might bitrot, I suggest doing something like
+>
+> #ifndef DEBUG_CAN
+> #define DEBUG_CAN 0
+> #endif /* DEBUG_CAN */
+>
+> and then
+>
+> if (DEBUG_CAN) {
+>    printf(...);
+>    ...
+> }
+>
+> so it's compiled/checked anyway.
+
+OK, makes sense. Hopefully GCC doe not start to warn
+about (intentionally) dead code.
+
+I would wait one or two days for some others review
+and if there is no remark or suggestions I reorganize
+patches according to your suggestions and post
+them again. I hope that there is chance the the patches
+could be accepted to mainline. The years has passed
+from the first sending for review already.
+This CAN emulation support is not so great and shiny
+but I think that it is usable basic start and possibility
+to test embedded systems in emulators is critical
+for development and getting critical even more now,
+when Linux enters automotive control systems after
+initial automotive entertainment.
+Support for D_CAN, CAN FD etc. should follow one day,
+I do not understand how automotive companies could
+exist without such development tool.
+
+Thanks,
+
+Pavel
