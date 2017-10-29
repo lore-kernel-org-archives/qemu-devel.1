@@ -1,24 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47698)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58276)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1e8kiS-00041O-IZ
-	for qemu-devel@nongnu.org; Sun, 29 Oct 2017 06:21:17 -0400
+	(envelope-from <bounces@canonical.com>) id 1e8lnv-00071I-HQ
+	for qemu-devel@nongnu.org; Sun, 29 Oct 2017 07:31:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1e8kiP-00047P-EY
-	for qemu-devel@nongnu.org; Sun, 29 Oct 2017 06:21:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35812)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1e8kiP-00046V-7s
-	for qemu-devel@nongnu.org; Sun, 29 Oct 2017 06:21:13 -0400
-Date: Sun, 29 Oct 2017 10:21:07 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20171029102106.GA2841@work-vm>
-References: <7CA6B03C-DFAA-4A15-9E33-E3FAD6647140@gmail.com>
-	<38c3125f-b050-c0ba-282f-bc1e9e11d297@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1e8lns-0002yr-Cj
+	for qemu-devel@nongnu.org; Sun, 29 Oct 2017 07:30:59 -0400
+Received: from indium.canonical.com ([91.189.90.7]:57930)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1e8lns-0002x1-60
+	for qemu-devel@nongnu.org; Sun, 29 Oct 2017 07:30:56 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1e8lnq-0006LS-Fc
+	for <qemu-devel@nongnu.org>; Sun, 29 Oct 2017 11:30:54 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 741772E80C9
+	for <qemu-devel@nongnu.org>; Sun, 29 Oct 2017 11:30:54 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <38c3125f-b050-c0ba-282f-bc1e9e11d297@redhat.com>
-Subject: Re: [Qemu-devel] drive_add: file names with spaces
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sun, 29 Oct 2017 11:25:03 -0000
+From: Geoffrey McRae <1722884@bugs.launchpad.net>
+Reply-To: Bug 1722884 <1722884@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150774787109.964.13450141235232669497.malonedeb@chaenomeles.canonical.com>
+Message-Id: <150927630377.3780.8211816102555574486.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1722884] Re: keyboard input while mouse moving
+ triggers mouse failure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,39 +37,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Programmingkid <programmingkidx@gmail.com>, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
-* Eric Blake (eblake@redhat.com) wrote:
-> On 10/28/2017 06:44 AM, Programmingkid wrote:
-> > I'm trying to use an image file that has spaces in its file name (and sometimes in the path) to be used as a USB flash drive. When I try adding the image file using the drive_add command I see this error: drive_add: extraneous characters at the end of the line
-> > 
-> > I have tried using single and double quotes around the file name but this does not help. Is there a way to use files that have spaces in it's name with drive_add?
-> 
-> Not in HMP, which lacks quoting.  (Unless you want to patch HMP to learn
-> quoting)
+I believe I am onto the cause of this issue, because the input events
+are coming from a multi threaded source (in my instance spice) keyboard
+and mouse input share common code paths without any thread interlocking.
 
-I think it's already got that code at least in some places.
-monitor_parse_arguments calls get_str, and get_str understands " wrapped
-arguments.
+Since keyboard input takes priority over mouse, when more mouse events
+are being handled it is overwriting and swapping out the data the guest
+was expecting with mouse input data.
 
-drive_add 1 "file=foo bar"
+In short, there is a race condition here.
 
-gives me:
-Could not open 'foo bar': No such file or directory
+-- =
 
-so I think that's doing the right thing.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1722884
 
-Dave
+Title:
+  keyboard input while mouse moving triggers mouse failure
 
-> But using spaces in filenames works fine in QMP.
-> 
-> -- 
-> Eric Blake, Principal Software Engineer
-> Red Hat, Inc.           +1-919-301-3266
-> Virtualization:  qemu.org | libvirt.org
-> 
+Status in QEMU:
+  New
 
+Bug description:
+  When QEMU is getting a ton of mouse input events if keys are pressed
+  on the keyboard the scan code will be corrupted causing erroneous
+  behavior. I have confirmed this problem in the latest version in git
+  (530049bc1dcc24c1178a29d99ca08b6dd08413e0).
 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+  After the erroneous behavior the operating system issues a keyboard
+  reset which prevents the mouse from functioning until the operating
+  system is restarted.
+
+  This seems to only occur if the PS2 mouse is being used as the input,
+  the tablet input device doesn't exhibit this behavior.
+
+  The same problem was reported here also:
+  https://openxt.atlassian.net/browse/OXT-562
+
+  Host  : Debian 9
+  CPU   : Ryzen 1700X
+  RAM   : 16GB
+  Kernel: 4.12.0-0.bpo.2-amd64
+
+  Guest : Windows 10 (KVM)
+  RAM   : 8GB (1GB Huge pages)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1722884/+subscriptions
