@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45967)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45970)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <frasse.iglesias@gmail.com>) id 1e8kbJ-0006UD-0z
+	(envelope-from <frasse.iglesias@gmail.com>) id 1e8kbJ-0006UE-7F
 	for qemu-devel@nongnu.org; Sun, 29 Oct 2017 06:13:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <frasse.iglesias@gmail.com>) id 1e8kbG-0007oM-US
-	for qemu-devel@nongnu.org; Sun, 29 Oct 2017 06:13:52 -0400
-Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:55084)
+	(envelope-from <frasse.iglesias@gmail.com>) id 1e8kbI-0007pN-93
+	for qemu-devel@nongnu.org; Sun, 29 Oct 2017 06:13:53 -0400
+Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:56413)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <frasse.iglesias@gmail.com>)
-	id 1e8kbG-0007mx-N7
-	for qemu-devel@nongnu.org; Sun, 29 Oct 2017 06:13:50 -0400
-Received: by mail-lf0-x243.google.com with SMTP id a2so11637261lfh.11
-	for <qemu-devel@nongnu.org>; Sun, 29 Oct 2017 03:13:50 -0700 (PDT)
+	id 1e8kbI-0007oZ-1Q
+	for qemu-devel@nongnu.org; Sun, 29 Oct 2017 06:13:52 -0400
+Received: by mail-lf0-x244.google.com with SMTP id 90so11649040lfs.13
+	for <qemu-devel@nongnu.org>; Sun, 29 Oct 2017 03:13:51 -0700 (PDT)
 From: Francisco Iglesias <frasse.iglesias@gmail.com>
-Date: Sun, 29 Oct 2017 11:13:31 +0100
-Message-Id: <20171029101343.15544-2-frasse.iglesias@gmail.com>
+Date: Sun, 29 Oct 2017 11:13:32 +0100
+Message-Id: <20171029101343.15544-3-frasse.iglesias@gmail.com>
 In-Reply-To: <20171029101343.15544-1-frasse.iglesias@gmail.com>
 References: <20171029101343.15544-1-frasse.iglesias@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v5 01/13] m25p80: Add support for continuous
- read out of RDSR and READ_FSR
+Subject: [Qemu-devel] [PATCH v5 02/13] m25p80: Add support for SST READ ID
+ 0x90/0xAB commands
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,64 +30,76 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: edgari@xilinx.com, alistai@xilinx.com, francisco.iglesias@feimtech.se, mar.krzeminski@gmail.com
 
-Add support for continuous read out of the RDSR and READ_FSR status
-registers until the chip select is deasserted. This feature is supported
-by amongst others 1 or more flashtypes manufactured by Numonyx (Micron),
-Windbond, SST, Gigadevice, Eon and Macronix.
+Add support for SST READ ID 0x90/0xAB commands for reading out the flash
+manufacuter ID and device ID.
 
 Signed-off-by: Francisco Iglesias <frasse.iglesias@gmail.com>
-Acked-by: Marcin Krzemiński <mar.krzeminski@gmail.com>
 Acked-by: Alistair Francis <alistair.francis@xilinx.com>
 ---
- hw/block/m25p80.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ hw/block/m25p80.c | 23 +++++++++++++++++++++++
+ 1 file changed, 23 insertions(+)
 
 diff --git a/hw/block/m25p80.c b/hw/block/m25p80.c
-index a2438b9..2971519 100644
+index 2971519..7a5c137 100644
 --- a/hw/block/m25p80.c
 +++ b/hw/block/m25p80.c
-@@ -423,6 +423,7 @@ typedef struct Flash {
-     uint8_t data[M25P80_INTERNAL_DATA_BUFFER_SZ];
-     uint32_t len;
-     uint32_t pos;
-+    bool data_read_loop;
-     uint8_t needed_bytes;
-     uint8_t cmd_in_progress;
-     uint32_t cur_addr;
-@@ -983,6 +984,7 @@ static void decode_new_cmd(Flash *s, uint32_t value)
-         }
-         s->pos = 0;
-         s->len = 1;
-+        s->data_read_loop = true;
-         s->state = STATE_READING_DATA;
-         break;
+@@ -355,6 +355,8 @@ typedef enum {
+     DPP = 0xa2,
+     QPP = 0x32,
+     QPP_4 = 0x34,
++    RDID_90 = 0x90,
++    RDID_AB = 0xab,
  
-@@ -993,6 +995,7 @@ static void decode_new_cmd(Flash *s, uint32_t value)
-         }
-         s->pos = 0;
-         s->len = 1;
-+        s->data_read_loop = true;
-         s->state = STATE_READING_DATA;
-         break;
+     ERASE_4K = 0x20,
+     ERASE4_4K = 0x21,
+@@ -405,6 +407,7 @@ typedef enum {
+     MAN_MACRONIX,
+     MAN_NUMONYX,
+     MAN_WINBOND,
++    MAN_SST,
+     MAN_GENERIC,
+ } Manufacturer;
  
-@@ -1133,6 +1136,7 @@ static int m25p80_cs(SSISlave *ss, bool select)
-         s->pos = 0;
-         s->state = STATE_IDLE;
-         flash_sync_dirty(s, -1);
-+        s->data_read_loop = false;
+@@ -476,6 +479,8 @@ static inline Manufacturer get_man(Flash *s)
+         return MAN_SPANSION;
+     case 0xC2:
+         return MAN_MACRONIX;
++    case 0xBF:
++        return MAN_SST;
+     default:
+         return MAN_GENERIC;
      }
- 
-     DB_PRINT_L(0, "%sselect\n", select ? "de" : "");
-@@ -1198,7 +1202,9 @@ static uint32_t m25p80_transfer8(SSISlave *ss, uint32_t tx)
-         s->pos++;
-         if (s->pos == s->len) {
-             s->pos = 0;
--            s->state = STATE_IDLE;
-+            if (!s->data_read_loop) {
-+                s->state = STATE_IDLE;
-+            }
-         }
+@@ -711,6 +716,22 @@ static void complete_collecting_data(Flash *s)
+     case WEVCR:
+         s->enh_volatile_cfg = s->data[0];
          break;
- 
++    case RDID_90:
++    case RDID_AB:
++        if (get_man(s) == MAN_SST && s->cur_addr <= 1) {
++            if (s->cur_addr) {
++                s->data[0] = s->pi->id[2];
++                s->data[1] = s->pi->id[0];
++            } else {
++                s->data[0] = s->pi->id[0];
++                s->data[1] = s->pi->id[2];
++            }
++            s->pos = 0;
++            s->len = 2;
++            s->data_read_loop = true;
++            s->state = STATE_READING_DATA;
++        }
++        break;
+     default:
+         break;
+     }
+@@ -926,6 +947,8 @@ static void decode_new_cmd(Flash *s, uint32_t value)
+     case PP4:
+     case PP4_4:
+     case DIE_ERASE:
++    case RDID_90:
++    case RDID_AB:
+         s->needed_bytes = get_addr_length(s);
+         s->pos = 0;
+         s->len = 0;
 -- 
 2.9.3
