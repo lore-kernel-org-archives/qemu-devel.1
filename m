@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50591)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50605)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e9H7G-0008To-V4
+	(envelope-from <eblake@redhat.com>) id 1e9H7H-0008UW-JD
 	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 16:57:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e9H7G-0001FB-28
+	(envelope-from <eblake@redhat.com>) id 1e9H7G-0001Fv-HJ
 	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 16:57:03 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Mon, 30 Oct 2017 21:56:29 +0100
-Message-Id: <20171030205636.14236-6-eblake@redhat.com>
+Date: Mon, 30 Oct 2017 21:56:30 +0100
+Message-Id: <20171030205636.14236-7-eblake@redhat.com>
 In-Reply-To: <20171030205636.14236-1-eblake@redhat.com>
 References: <20171030205636.14236-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PULL 05/12] nbd/server: Simplify
- nbd_negotiate_options loop
+Subject: [Qemu-devel] [PULL 06/12] nbd/server: Refactor zero-length option
+ check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,88 +23,154 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
 
-Instead of making each caller check whether a transmission error
-occurred, we can sink a common error check to the end of the loop.
+Consolidate the response for a non-zero-length option payload
+into a new function, nbd_reject_length().  This check will
+also be used when introducing support for structured replies.
+
+Note that STARTTLS response differs based on time: if the connection
+is still unencrypted, we set fatal to true (a client that can't
+request TLS correctly may still think that we are ready to start
+the TLS handshake, so we must disconnect); while if the connection
+is already encrypted, the client is sending a bogus request but
+is no longer at risk of being confused by continuing the connection.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20171027104037.8319-6-eblake@redhat.com>
-[eblake: squash in compiler warning fix]
+Message-Id: <20171027104037.8319-7-eblake@redhat.com>
+[eblake: correct return value on STARTTLS]
 Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- nbd/server.c | 19 ++++---------------
- 1 file changed, 4 insertions(+), 15 deletions(-)
+ nbd/server.c | 74 +++++++++++++++++++++++++++++++++++++-----------------------
+ 1 file changed, 46 insertions(+), 28 deletions(-)
 
 diff --git a/nbd/server.c b/nbd/server.c
-index 05ff7470d5..2f03059b4c 100644
+index 2f03059b4c..cf815603a6 100644
 --- a/nbd/server.c
 +++ b/nbd/server.c
-@@ -678,6 +678,7 @@ static int nbd_negotiate_options(NBDClient *client, uint16_t myflags,
+@@ -253,21 +253,10 @@ static int nbd_negotiate_send_rep_list(QIOChannel *ioc, NBDExport *exp,
+
+ /* Process the NBD_OPT_LIST command, with a potential series of replies.
+  * Return -errno on error, 0 on success. */
+-static int nbd_negotiate_handle_list(NBDClient *client, uint32_t length,
+-                                     Error **errp)
++static int nbd_negotiate_handle_list(NBDClient *client, Error **errp)
+ {
+     NBDExport *exp;
+
+-    if (length) {
+-        if (nbd_drop(client->ioc, length, errp) < 0) {
+-            return -EIO;
+-        }
+-        return nbd_negotiate_send_rep_err(client->ioc,
+-                                          NBD_REP_ERR_INVALID, NBD_OPT_LIST,
+-                                          errp,
+-                                          "OPT_LIST should not have length");
+-    }
+-
+     /* For each export, send a NBD_REP_SERVER reply. */
+     QTAILQ_FOREACH(exp, &exports, next) {
+         if (nbd_negotiate_send_rep_list(client->ioc, exp, errp)) {
+@@ -531,7 +520,6 @@ static int nbd_negotiate_handle_info(NBDClient *client, uint32_t length,
+ /* Handle NBD_OPT_STARTTLS. Return NULL to drop connection, or else the
+  * new channel for all further (now-encrypted) communication. */
+ static QIOChannel *nbd_negotiate_handle_starttls(NBDClient *client,
+-                                                 uint32_t length,
+                                                  Error **errp)
+ {
+     QIOChannel *ioc;
+@@ -540,15 +528,6 @@ static QIOChannel *nbd_negotiate_handle_starttls(NBDClient *client,
+
+     trace_nbd_negotiate_handle_starttls();
+     ioc = client->ioc;
+-    if (length) {
+-        if (nbd_drop(ioc, length, errp) < 0) {
+-            return NULL;
+-        }
+-        nbd_negotiate_send_rep_err(ioc, NBD_REP_ERR_INVALID, NBD_OPT_STARTTLS,
+-                                   errp,
+-                                   "OPT_STARTTLS should not have length");
+-        return NULL;
+-    }
+
+     if (nbd_negotiate_send_rep(client->ioc, NBD_REP_ACK,
+                                NBD_OPT_STARTTLS, errp) < 0) {
+@@ -584,6 +563,34 @@ static QIOChannel *nbd_negotiate_handle_starttls(NBDClient *client,
+     return QIO_CHANNEL(tioc);
+ }
+
++/* nbd_reject_length: Handle any unexpected payload.
++ * @fatal requests that we quit talking to the client, even if we are able
++ * to successfully send an error to the guest.
++ * Return:
++ * -errno  transmission error occurred or @fatal was requested, errp is set
++ * 0       error message successfully sent to client, errp is not set
++ */
++static int nbd_reject_length(NBDClient *client, uint32_t length,
++                             uint32_t option, bool fatal, Error **errp)
++{
++    int ret;
++
++    assert(length);
++    if (nbd_drop(client->ioc, length, errp) < 0) {
++        return -EIO;
++    }
++    ret = nbd_negotiate_send_rep_err(client->ioc, NBD_REP_ERR_INVALID,
++                                     option, errp,
++                                     "option '%s' should have zero length",
++                                     nbd_opt_lookup(option));
++    if (fatal && !ret) {
++        error_setg(errp, "option '%s' should have zero length",
++                   nbd_opt_lookup(option));
++        return -EINVAL;
++    }
++    return ret;
++}
++
+ /* nbd_negotiate_options
+  * Process all NBD_OPT_* client option commands, during fixed newstyle
+  * negotiation.
+@@ -674,7 +681,13 @@ static int nbd_negotiate_options(NBDClient *client, uint16_t myflags,
+             }
+             switch (option) {
+             case NBD_OPT_STARTTLS:
+-                tioc = nbd_negotiate_handle_starttls(client, length, errp);
++                if (length) {
++                    /* Unconditionally drop the connection if the client
++                     * can't start a TLS negotiation correctly */
++                    return nbd_reject_length(client, length, option, true,
++                                             errp);
++                }
++                tioc = nbd_negotiate_handle_starttls(client, errp);
                  if (!tioc) {
                      return -EIO;
                  }
-+                ret = 0;
-                 object_unref(OBJECT(client->ioc));
-                 client->ioc = QIO_CHANNEL(tioc);
-                 break;
-@@ -698,9 +699,6 @@ static int nbd_negotiate_options(NBDClient *client, uint16_t myflags,
-                                                  "Option 0x%" PRIx32
-                                                  "not permitted before TLS",
-                                                  option);
--                if (ret < 0) {
--                    return ret;
--                }
-                 /* Let the client keep trying, unless they asked to
-                  * quit. In this mode, we've already sent an error, so
-                  * we can't ack the abort.  */
-@@ -713,9 +711,6 @@ static int nbd_negotiate_options(NBDClient *client, uint16_t myflags,
+@@ -710,7 +723,12 @@ static int nbd_negotiate_options(NBDClient *client, uint16_t myflags,
+         } else if (fixedNewstyle) {
              switch (option) {
              case NBD_OPT_LIST:
-                 ret = nbd_negotiate_handle_list(client, length, errp);
--                if (ret < 0) {
--                    return ret;
--                }
+-                ret = nbd_negotiate_handle_list(client, length, errp);
++                if (length) {
++                    ret = nbd_reject_length(client, length, option, false,
++                                            errp);
++                } else {
++                    ret = nbd_negotiate_handle_list(client, errp);
++                }
                  break;
 
              case NBD_OPT_ABORT:
-@@ -738,9 +733,6 @@ static int nbd_negotiate_options(NBDClient *client, uint16_t myflags,
-                     assert(option == NBD_OPT_GO);
-                     return 0;
-                 }
--                if (ret) {
--                    return ret;
--                }
+@@ -736,10 +754,10 @@ static int nbd_negotiate_options(NBDClient *client, uint16_t myflags,
                  break;
 
              case NBD_OPT_STARTTLS:
-@@ -758,9 +750,6 @@ static int nbd_negotiate_options(NBDClient *client, uint16_t myflags,
+-                if (nbd_drop(client->ioc, length, errp) < 0) {
+-                    return -EIO;
+-                }
+-                if (client->tlscreds) {
++                if (length) {
++                    ret = nbd_reject_length(client, length, option, false,
++                                            errp);
++                } else if (client->tlscreds) {
+                     ret = nbd_negotiate_send_rep_err(client->ioc,
+                                                      NBD_REP_ERR_INVALID,
                                                       option, errp,
-                                                      "TLS not configured");
-                 }
--                if (ret < 0) {
--                    return ret;
--                }
-                 break;
-             default:
-                 if (nbd_drop(client->ioc, length, errp) < 0) {
-@@ -772,9 +761,6 @@ static int nbd_negotiate_options(NBDClient *client, uint16_t myflags,
-                                                  "Unsupported option 0x%"
-                                                  PRIx32 " (%s)", option,
-                                                  nbd_opt_lookup(option));
--                if (ret < 0) {
--                    return ret;
--                }
-                 break;
-             }
-         } else {
-@@ -794,6 +780,9 @@ static int nbd_negotiate_options(NBDClient *client, uint16_t myflags,
-                 return -EINVAL;
-             }
-         }
-+        if (ret < 0) {
-+            return ret;
-+        }
-     }
- }
-
 -- 
 2.13.6
