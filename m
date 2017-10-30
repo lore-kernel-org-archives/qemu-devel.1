@@ -1,46 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51879)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52093)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1e9FGa-0006o1-0i
-	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 14:58:33 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1e9FII-0007Tu-OF
+	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 15:00:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1e9FGV-0003R3-M0
-	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 14:58:32 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44178)
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1e9FID-00047D-Le
+	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 15:00:18 -0400
+Received: from chuckie.co.uk ([82.165.15.123]:45836
+	helo=s16892447.onlinehome-server.info)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1e9FGV-0003Qv-DA
-	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 14:58:27 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v9UIvN6D022708
-	for <qemu-devel@nongnu.org>; Mon, 30 Oct 2017 14:58:22 -0400
-Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2dx6n6jxba-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 30 Oct 2017 14:58:22 -0400
-Received: from localhost
-	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Mon, 30 Oct 2017 18:58:19 -0000
-References: <1507124979-8880-1-git-send-email-pmorel@linux.vnet.ibm.com>
-	<feea3ded-fecc-50ff-fe70-09e63966933b@de.ibm.com>
-	<20171030134233.6aaa81a1.cohuck@redhat.com>
-	<54504556-d508-e86f-388b-b07fa7576978@de.ibm.com>
-	<90f3e3b9-be67-cda8-4ff8-20dac42090c7@linux.vnet.ibm.com>
-	<b0bd0d34-548d-b461-7397-9ab92fb4e6fc@de.ibm.com>
-	<20171030175937.23ef49a8.cohuck@redhat.com>
-	<2f5c22e1-e9c2-9fb2-e0ce-4d19dc005d8e@de.ibm.com>
-	<7c945da5-aca6-7fd6-ebe1-55c89b5567f5@linux.vnet.ibm.com>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Mon, 30 Oct 2017 19:58:15 +0100
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1e9FID-000460-6V
+	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 15:00:13 -0400
+References: <1508947167-5304-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<de8125f4-fb99-1f9e-f7a8-7f1f9c4f0b5a@amsat.org>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <836e7a63-c841-a866-c82c-04bf785420ca@ilande.co.uk>
+Date: Mon, 30 Oct 2017 19:00:01 +0000
 MIME-Version: 1.0
-In-Reply-To: <7c945da5-aca6-7fd6-ebe1-55c89b5567f5@linux.vnet.ibm.com>
+In-Reply-To: <de8125f4-fb99-1f9e-f7a8-7f1f9c4f0b5a@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Message-Id: <13099ab4-3afe-04ea-f6eb-f0acffd06f9c@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v1 0/5][RFC] Refactoring of AIS support
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCHv4 00/13] sun4m: sparc32_dma tidy-ups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -49,92 +30,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pierre Morel <pmorel@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: zyimin@linux.vnet.ibm.com, qemu-devel@nongnu.org, agraf@suse.de, qemu-s390x@nongnu.org
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, atar4qemu@gmail.com
 
-     =20
+On 27/10/17 17:42, Philippe Mathieu-Daudé wrote:
 
-On 10/30/2017 06:38 PM, Pierre Morel wrote:
-> On 30/10/2017 18:08, Christian Borntraeger wrote:
+> Hi Mark,
+> 
+> On 10/25/2017 12:59 PM, Mark Cave-Ayland wrote:
+>> This patchset aims to tidy-up the sparc32_dma code by improving the
+>> modelling of the espdma/ledma devices using both QOM and the memory
+>> API which didn't exist when the code was first written.
 >>
->> On 10/30/2017 05:59 PM, Cornelia Huck wrote:
->>> On Mon, 30 Oct 2017 14:48:23 +0100
->>> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
->>>
->>>
->>>> FWIW, I am testing a guest patch that enables zPCI without AIS. Its =
-as simple as
->>>>
->>>>
->>>> diff --git a/arch/s390/pci/pci.c b/arch/s390/pci/pci.c
->>>> index 7b30af5..9b24836 100644
->>>> --- a/arch/s390/pci/pci.c
->>>> +++ b/arch/s390/pci/pci.c
->>>> @@ -953,7 +953,7 @@ static int __init pci_base_init(void)
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!s390_pci_probe=
-)
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 return 0;
->>>> =C2=A0 -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!test_facility(69) =
-|| !test_facility(71) || !test_facility(72))
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!test_facility(69) || !tes=
-t_facility(71))
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 return 0;
->>>> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 rc =3D zpci_=
-debug_init();
->>>> diff --git a/arch/s390/pci/pci_insn.c b/arch/s390/pci/pci_insn.c
->>>> index ea34086..61f8c82 100644
->>>> --- a/arch/s390/pci/pci_insn.c
->>>> +++ b/arch/s390/pci/pci_insn.c
->>>> @@ -7,6 +7,7 @@
->>>> =C2=A0 #include <linux/export.h>
->>>> =C2=A0 #include <linux/errno.h>
->>>> =C2=A0 #include <linux/delay.h>
->>>> +#include <asm/facility.h>
->>>> =C2=A0 #include <asm/pci_insn.h>
->>>> =C2=A0 #include <asm/pci_debug.h>
->>>> =C2=A0 #include <asm/processor.h>
->>>> @@ -93,6 +94,8 @@ int zpci_refresh_trans(u64 fn, u64 addr, u64 range=
-)
->>>> =C2=A0 /* Set Interruption Controls */
->>>> =C2=A0 void zpci_set_irq_ctrl(u16 ctl, char *unused, u8 isc)
->>>> =C2=A0 {
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!test_facility(72))
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0 return;
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 asm volatile (
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 "=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .insn=C2=
-=A0=C2=A0 rsy,0xeb00000000d1,%[ctl],%[isc],%[u]\n"
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 : : [ctl] "d" (ctl), [isc] "d" (isc << 27), [=
-u] "Q" (*unused));
->>>>
->>>
->>> Sounds good. Presumably this makes the adapter interrupt handling wor=
-k
->>> as for virtio (and qdio)? Is there any ais-less pci hardware out in t=
-he
->>> wild?
-
-@Connie:
-Do you have something in mind, or is curiosity the only reason for asking=
-?
-
->>>
+>> The result is that it is now possible to remove both the iommu_opaque
+>> and is_ledma workarounds from the code, and the code for wiring up
+>> the espdma/ledma and respective devices is also a lot more readable.
 >>
->> ais is z specific, not PCI specific. So PCI cards should not care as f=
-ar as I can tell.
->>
->>
->=20
-> I bet Conny meant PCI hardware globaly, including zPCI adapters.
-> I bet none but I will better ask Sebastian or Gerald if they know.
->=20
+>> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> 
+> The whole series:
+> 
+> Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> 
+> If you don't accept my comments (or don't have time) about keeping
+> "hw/sparc/sparc32_dma.h" generic and moving network/scsi parts in
+> "hw/sparc/sun4m.h" you can still add to your series:
+> 
+> Acked-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-I side with Christian: it is a machine thing and not a card thing. So
-the question is if there is a z machine which supports zpci but does
-not support AIS. My guess is that such a machine was never produced.
+Thanks for the review, I've added your R-B tags to the individual
+patches. Note that while potentially I could move the network/scsi parts
+to hw/sparc/sun4m.h I feel that it's a slightly better match for the
+SPARC32 DMA container device to remain in sparc32_dma.c. So for these
+patches I've just added your A-B tag.
 
-Halil
+> Also while testing your series on a Debian image, I noted your series
+> results faster, I timed:
+> 
+> master: 104s
+> your series: 85s (>20% faster!)
+
+Really? Is that for just this patchset or also with the v2 IOMMU
+patchset applied on top? I can't immediately see how moving the logic
+into sparc32_dma.c could make a difference here...
+
+
+ATB,
+
+Mark.
