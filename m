@@ -1,20 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48446)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52474)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1e9Bij-0008Br-AX
-	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 11:11:25 -0400
+	(envelope-from <programmingkidx@gmail.com>) id 1e9Bty-0002Az-KV
+	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 11:22:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1e9Bii-00035p-Ef
-	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 11:11:21 -0400
-Date: Mon, 30 Oct 2017 16:11:06 +0100
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20171030151106.GD3549@localhost.localdomain>
-References: <20171029125338.25988-1-kwolf@redhat.com>
-MIME-Version: 1.0
+	(envelope-from <programmingkidx@gmail.com>) id 1e9Btu-0002Dy-IE
+	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 11:22:58 -0400
+Received: from mail-io0-x230.google.com ([2607:f8b0:4001:c06::230]:54696)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+	id 1e9Btu-0002Di-DI
+	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 11:22:54 -0400
+Received: by mail-io0-x230.google.com with SMTP id e89so27934372ioi.11
+	for <qemu-devel@nongnu.org>; Mon, 30 Oct 2017 08:22:54 -0700 (PDT)
 Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171029125338.25988-1-kwolf@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] qemu-iotests: Use -nographic
- in 182
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+From: Programmingkid <programmingkidx@gmail.com>
+In-Reply-To: <20171030143220.GA5438@work-vm>
+Date: Mon, 30 Oct 2017 11:22:51 -0400
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <C5B22F13-6DE1-48A8-BB7D-5A65826CB3CC@gmail.com>
+References: <7CA6B03C-DFAA-4A15-9E33-E3FAD6647140@gmail.com>
+	<38c3125f-b050-c0ba-282f-bc1e9e11d297@redhat.com>
+	<20171029102106.GA2841@work-vm>
+	<847196B3-8C4D-4B8E-A6A4-5ADAEC73FF62@gmail.com>
+	<20171030143220.GA5438@work-vm>
+Subject: Re: [Qemu-devel] drive_add: file names with spaces
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,36 +33,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
 
-On Sun, Oct 29, 2017 at 01:53:38PM +0100, Kevin Wolf wrote:
-> This avoids that random UI frontend error messages end up in the output.
-> In particular, we were seeing this line in CI error logs:
-> 
-> +Unable to init server: Could not connect: Connection refused
-> 
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  tests/qemu-iotests/182 | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/tests/qemu-iotests/182 b/tests/qemu-iotests/182
-> index 2e078ceed8..4b31592fb8 100755
-> --- a/tests/qemu-iotests/182
-> +++ b/tests/qemu-iotests/182
-> @@ -62,7 +62,7 @@ _launch_qemu -drive file=$TEST_IMG,if=none,id=drive0,file.locking=on \
->  
->  echo
->  echo "Starting a second QEMU using the same image should fail"
-> -echo 'quit' | $QEMU -monitor stdio \
-> +echo 'quit' | $QEMU -nographic -monitor stdio \
->      -drive file=$TEST_IMG,if=none,id=drive0,file.locking=on \
->      -device $virtioblk,drive=drive0 2>&1 | _filter_testdir 2>&1 |
->      _filter_qemu |
-> -- 
-> 2.13.6
-> 
->
 
-Reviewed-by: Jeff Cody <jcody@redhat.com>
+> On Oct 30, 2017, at 10:32 AM, Dr. David Alan Gilbert =
+<dgilbert@redhat.com> wrote:
+>=20
+> * Programmingkid (programmingkidx@gmail.com) wrote:
+>>=20
+>>> On Oct 29, 2017, at 6:21 AM, Dr. David Alan Gilbert =
+<dgilbert@redhat.com> wrote:
+>>>=20
+>>> * Eric Blake (eblake@redhat.com) wrote:
+>>>> On 10/28/2017 06:44 AM, Programmingkid wrote:
+>>>>> I'm trying to use an image file that has spaces in its file name =
+(and sometimes in the path) to be used as a USB flash drive. When I try =
+adding the image file using the drive_add command I see this error: =
+drive_add: extraneous characters at the end of the line
+>>>>>=20
+>>>>> I have tried using single and double quotes around the file name =
+but this does not help. Is there a way to use files that have spaces in =
+it's name with drive_add?
+>>>>=20
+>>>> Not in HMP, which lacks quoting.  (Unless you want to patch HMP to =
+learn
+>>>> quoting)
+>>>=20
+>>> I think it's already got that code at least in some places.
+>>> monitor_parse_arguments calls get_str, and get_str understands " =
+wrapped
+>>> arguments.
+>>>=20
+>>> drive_add 1 "file=3Dfoo bar"
+>>>=20
+>>> gives me:
+>>> Could not open 'foo bar': No such file or directory
+>>>=20
+>>> so I think that's doing the right thing.
+>>>=20
+>>> Dave
+>>>=20
+>>>> But using spaces in filenames works fine in QMP.
+>>>>=20
+>>>> --=20
+>>>> Eric Blake, Principal Software Engineer
+>>>> Red Hat, Inc.           +1-919-301-3266
+>>>> Virtualization:  qemu.org | libvirt.org
+>>>>=20
+>>>=20
+>>>=20
+>>> --
+>>> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>>=20
+>> Thank you so much for this info. It solved my problem :)
+>=20
+> Now, the real challenge is how to deal with a filename with a comma =
+in;
+>   drive_add 1 "file=3Dfoo,bar"
+>   Could not open 'foo': No such file or directory
+
+I think the logical thing to do is not to depend on characters like =
+spaces and commas to indicate a change in field. This would mean a =
+change to how the user could specify arguments to a command. My first =
+thought is to use a json-like syntax like this:
+
+CMD: drive_add
+File: <full path of file>
+ID: mydrive
+
+but this would still have the problem with newline characters in the =
+file name. Spaces, commas, single and double quotes would be usable. =
+Newline characters in file names are rare enough that we might consider =
+ignoring this case altogether.=20
+
+Another option is using a tag based system that would be able to handle =
+every character. Something like this:
+
+drive_add 0 <file> /users/user/some path </file> <id> mydrive </id>
+
+The only way this system would fail if the text "</file>" was in the =
+file name.=20
+
+Any solutions you wish to share?=
