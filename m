@@ -1,23 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39116)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39118)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1e9GbK-0007tN-E5
-	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 16:24:03 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1e9GbK-0007tP-EQ
+	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 16:24:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1e9GbI-0006Hk-Bi
+	(envelope-from <dgilbert@redhat.com>) id 1e9GbJ-0006IB-Fs
 	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 16:24:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47720)
+Received: from mx1.redhat.com ([209.132.183.28]:35810)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1e9GbI-0006HS-2a
-	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 16:24:00 -0400
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1e9GbJ-0006Hs-7Q
+	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 16:24:01 -0400
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Mon, 30 Oct 2017 20:23:55 +0000
-Message-Id: <20171030202356.11047-2-dgilbert@redhat.com>
+Date: Mon, 30 Oct 2017 20:23:56 +0000
+Message-Id: <20171030202356.11047-3-dgilbert@redhat.com>
 In-Reply-To: <20171030202356.11047-1-dgilbert@redhat.com>
 References: <20171030202356.11047-1-dgilbert@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 1/2] hmp: Replace error_report_err
+Subject: [Qemu-devel] [PULL 2/2] monitor: fix dangling CPU pointer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,110 +25,98 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, groug@kaod.org, lu.zhipeng@zte.com.cn
 
-From: ZhiPeng Lu <lu.zhipeng@zte.com.cn>
+From: Greg Kurz <groug@kaod.org>
 
-Use hmp_handle_error instend of error_report_err to set error.
+If a CPU selected with the "cpu" command is hot-unplugged then "info cpus"
+causes QEMU to exit:
 
-Signed-off-by: ZhiPeng Lu <lu.zhipeng@zte.com.cn>
-Reviewed-by: Jiyun Fan <fan.jiyun@zte.com.cn>
-Message-Id: <1508411793-22868-1-git-send-email-lu.zhipeng@zte.com.cn>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+(qemu) device_del cpu1
+(qemu) info cpus
+qemu:qemu_cpu_kick_thread: No such process
+
+This happens because "cpu" stores the pointer to the selected CPU into
+the monitor structure. When the CPU is hot-unplugged, we end up with a
+dangling pointer. The "info cpus" command then does:
+
+hmp_info_cpus()
+ monitor_get_cpu_index()
+  mon_get_cpu()
+   cpu_synchronize_state() <--- called with dangling pointer
+
+This could cause a QEMU crash as well.
+
+This patch switches the monitor to store the QOM path instead of a
+pointer to the current CPU. The path is then resolved when needed.
+If the resolution fails, we assume that the CPU was removed and the
+path is resetted to the default (ie, path of first_cpu).
+
+Reported-by: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
+Suggested-by: Igor Mammedov <imammedo@redhat.com>
+Signed-off-by: Greg Kurz <groug@kaod.org>
+Message-Id: <150822818243.26242.12993827911736928961.stgit@bahia.lan>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- hmp.c | 26 ++++++++------------------
- 1 file changed, 8 insertions(+), 18 deletions(-)
+ monitor.c | 23 ++++++++++++++++++-----
+ 1 file changed, 18 insertions(+), 5 deletions(-)
 
-diff --git a/hmp.c b/hmp.c
-index a01be50daa..35a7041824 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -670,7 +670,7 @@ void hmp_info_vnc(Monitor *mon, const QDict *qdict)
-=20
-     info2l =3D qmp_query_vnc_servers(&err);
-     if (err) {
--        error_report_err(err);
-+        hmp_handle_error(mon, &err);
-         return;
+diff --git a/monitor.c b/monitor.c
+index 7a802a345e..e36fb5308d 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -200,7 +200,7 @@ struct Monitor {
+ 
+     ReadLineState *rs;
+     MonitorQMP qmp;
+-    CPUState *mon_cpu;
++    gchar *mon_cpu_path;
+     BlockCompletionFunc *password_completion_cb;
+     void *password_opaque;
+     mon_cmd_t *cmd_table;
+@@ -579,6 +579,7 @@ static void monitor_data_init(Monitor *mon)
+ 
+ static void monitor_data_destroy(Monitor *mon)
+ {
++    g_free(mon->mon_cpu_path);
+     qemu_chr_fe_deinit(&mon->chr, false);
+     if (monitor_is_qmp(mon)) {
+         json_message_parser_destroy(&mon->qmp.parser);
+@@ -1047,20 +1048,32 @@ int monitor_set_cpu(int cpu_index)
+     if (cpu == NULL) {
+         return -1;
      }
-     if (!info2l) {
-@@ -785,7 +785,7 @@ void hmp_info_balloon(Monitor *mon, const QDict *qdic=
-t)
-=20
-     info =3D qmp_query_balloon(&err);
-     if (err) {
--        error_report_err(err);
-+        hmp_handle_error(mon, &err);
-         return;
+-    cur_mon->mon_cpu = cpu;
++    g_free(cur_mon->mon_cpu_path);
++    cur_mon->mon_cpu_path = object_get_canonical_path(OBJECT(cpu));
+     return 0;
+ }
+ 
+ CPUState *mon_get_cpu(void)
+ {
+-    if (!cur_mon->mon_cpu) {
++    CPUState *cpu;
++
++    if (cur_mon->mon_cpu_path) {
++        cpu = (CPUState *) object_resolve_path_type(cur_mon->mon_cpu_path,
++                                                    TYPE_CPU, NULL);
++        if (!cpu) {
++            g_free(cur_mon->mon_cpu_path);
++            cur_mon->mon_cpu_path = NULL;
++        }
++    }
++    if (!cur_mon->mon_cpu_path) {
+         if (!first_cpu) {
+             return NULL;
+         }
+         monitor_set_cpu(first_cpu->cpu_index);
++        cpu = first_cpu;
      }
-=20
-@@ -1128,7 +1128,7 @@ void hmp_ringbuf_read(Monitor *mon, const QDict *qd=
-ict)
-=20
-     data =3D qmp_ringbuf_read(chardev, size, false, 0, &err);
-     if (err) {
--        error_report_err(err);
-+        hmp_handle_error(mon, &err);
-         return;
-     }
-=20
-@@ -1195,9 +1195,7 @@ void hmp_balloon(Monitor *mon, const QDict *qdict)
-     Error *err =3D NULL;
-=20
-     qmp_balloon(value, &err);
--    if (err) {
--        error_report_err(err);
--    }
-+    hmp_handle_error(mon, &err);
+-    cpu_synchronize_state(cur_mon->mon_cpu);
+-    return cur_mon->mon_cpu;
++    cpu_synchronize_state(cpu);
++    return cpu;
  }
-=20
- void hmp_block_resize(Monitor *mon, const QDict *qdict)
-@@ -1534,10 +1532,7 @@ void hmp_migrate_set_cache_size(Monitor *mon, cons=
-t QDict *qdict)
-     Error *err =3D NULL;
-=20
-     qmp_migrate_set_cache_size(value, &err);
--    if (err) {
--        error_report_err(err);
--        return;
--    }
-+    hmp_handle_error(mon, &err);
- }
-=20
- /* Kept for backwards compatibility */
-@@ -1568,10 +1563,7 @@ void hmp_migrate_set_capability(Monitor *mon, cons=
-t QDict *qdict)
-=20
- end:
-     qapi_free_MigrationCapabilityStatusList(caps);
--
--    if (err) {
--        error_report_err(err);
--    }
-+    hmp_handle_error(mon, &err);
- }
-=20
- void hmp_migrate_set_parameter(Monitor *mon, const QDict *qdict)
-@@ -1680,9 +1672,7 @@ void hmp_migrate_set_parameter(Monitor *mon, const =
-QDict *qdict)
-  cleanup:
-     qapi_free_MigrateSetParameters(p);
-     visit_free(v);
--    if (err) {
--        error_report_err(err);
--    }
-+    hmp_handle_error(mon, &err);
- }
-=20
- void hmp_client_migrate_info(Monitor *mon, const QDict *qdict)
-@@ -1936,7 +1926,7 @@ void hmp_migrate(Monitor *mon, const QDict *qdict)
-=20
-     qmp_migrate(uri, !!blk, blk, !!inc, inc, false, false, &err);
-     if (err) {
--        error_report_err(err);
-+        hmp_handle_error(mon, &err);
-         return;
-     }
-=20
---=20
+ 
+ CPUArchState *mon_get_cpu_env(void)
+-- 
 2.14.3
