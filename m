@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52126)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52831)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e983k-0004Ot-Gt
-	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 07:16:54 -0400
+	(envelope-from <quintela@redhat.com>) id 1e988A-0005Pb-Tg
+	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 07:21:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e983j-00050e-K9
-	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 07:16:48 -0400
-Received: from mail-wr0-x22d.google.com ([2a00:1450:400c:c0c::22d]:45698)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1e983j-00050C-CA
-	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 07:16:47 -0400
-Received: by mail-wr0-x22d.google.com with SMTP id y9so12143227wrb.2
-	for <qemu-devel@nongnu.org>; Mon, 30 Oct 2017 04:16:47 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20171027142107.15542-1-ehabkost@redhat.com>
-References: <20171027142107.15542-1-ehabkost@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 30 Oct 2017 11:16:25 +0000
-Message-ID: <CAFEAcA-=HBBcAurcURvVRd5w5z20fWHqR25dnOk8RzQTUUP2tw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL v2 00/39] x86/cpu/numa queue, 2017-10-27
+	(envelope-from <quintela@redhat.com>) id 1e9886-0007iJ-0S
+	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 07:21:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57692)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1e9885-0007hk-RD
+	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 07:21:17 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D377FFED0
+	for <qemu-devel@nongnu.org>; Mon, 30 Oct 2017 11:21:16 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+Date: Mon, 30 Oct 2017 12:21:06 +0100
+Message-Id: <20171030112112.6952-1-quintela@redhat.com>
+Subject: [Qemu-devel] [PATCH 0/6] Improve info migrate output on destination
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,30 +27,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-On 27 October 2017 at 15:20, Eduardo Habkost <ehabkost@redhat.com> wrote:
-> Change in v2:
-> * Include sh4-linux-user fixup sent by Igor
->   (at: "sh4: simplify superh_cpu_class_by_name()")
->
-> The following changes since commit 74d7fc7f6385158b8a5c524c61baaef1b66f3dac:
->
->   tcg: Avoid setting tcg_initialize if !CONFIG_TCG (2017-10-26 17:47:36 +0100)
->
-> are available in the git repository at:
->
->   git://github.com/ehabkost/qemu.git tags/x86-and-machine-pull-request
->
-> for you to fetch changes up to 1a26f46692320f1981c95967e0d5af4443b5f0b1:
->
->   x86: Skip check apic_id_limit for Xen (2017-10-27 16:04:28 +0200)
->
-> ----------------------------------------------------------------
-> x86/cpu/numa queue, 2017-10-27
->
+Hi
 
-Applied, thanks.
+This series (on top of my last pull requset) do:
 
--- PMM
+- Make update port for address work for port 0.
+  Right now we only update the _port_ that we ask for, not the one that we receive.
+- Print global options as everything else (i.e. one by line, and on/off)
+- Move addr cleanup to the place where we created it
+- Create an uri migration parameter
+- Fill the migrate parameter and set it.
+- make the uri parameter optional for migrate
+
+Please review.
+
+Later, Juan.
+
+Juan Quintela (6):
+  qio: Make port 0 work for qio
+  migration: print features as on off
+  migration: free addr in the same function that we created it
+  migration: Create uri parameter
+  migration: Now set the migration uri
+  migration: make migrate uri parameter optional
+
+ hmp-commands.hx       |  4 ++--
+ hmp.c                 | 12 +++++++++--
+ migration/migration.c | 59 ++++++++++++++++++++++++++++++++++++++++-----------
+ migration/migration.h |  2 ++
+ migration/socket.c    | 11 ++++++++--
+ qapi/migration.json   | 20 +++++++++++++----
+ util/qemu-sockets.c   | 11 ++++++----
+ 7 files changed, 93 insertions(+), 26 deletions(-)
+
+-- 
+2.13.6
