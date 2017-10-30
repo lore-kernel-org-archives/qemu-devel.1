@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42465)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44493)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1e99Hh-0007g7-Ut
-	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 08:35:21 -0400
+	(envelope-from <cohuck@redhat.com>) id 1e99Ot-0000wN-4l
+	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 08:42:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1e99He-0000Ql-SU
-	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 08:35:17 -0400
-References: <20171027104037.8319-1-eblake@redhat.com>
-	<20171027104546.8582-1-eblake@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <87d8006a-f345-452c-033d-1769982395bc@virtuozzo.com>
-Date: Mon, 30 Oct 2017 15:34:54 +0300
+	(envelope-from <cohuck@redhat.com>) id 1e99Oq-0005T9-1S
+	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 08:42:43 -0400
+Date: Mon, 30 Oct 2017 13:42:33 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20171030134233.6aaa81a1.cohuck@redhat.com>
+In-Reply-To: <feea3ded-fecc-50ff-fe70-09e63966933b@de.ibm.com>
+References: <1507124979-8880-1-git-send-email-pmorel@linux.vnet.ibm.com>
+	<feea3ded-fecc-50ff-fe70-09e63966933b@de.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20171027104546.8582-1-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [RFC PATCH v6 13/12] tweak test 83 verbosity
+Subject: Re: [Qemu-devel] [PATCH v1 0/5][RFC] Refactoring of AIS support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,48 +23,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org, agraf@suse.de, zyimin@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, qemu-s390x@nongnu.org
 
-27.10.2017 13:45, Eric Blake wrote:
-> Commenting these two lines is enough to avoid the change to 083.out
-> in 12/12.  That is evidence that we may want these two lines to be
-> trace points rather than error messages; or maybe we really do like
-> the extra verbosity in the case of an unexpected communication break.
->
-> This patch does not meet coding guidelines, and I'm not proud enough
-> of it to give S-o-b, but I'm posting it for conversation.
->
-> ---
->   block/nbd-client.c | 5 +++--
->   1 file changed, 3 insertions(+), 2 deletions(-)
->
-> diff --git a/block/nbd-client.c b/block/nbd-client.c
-> index b44d4d4a01..e063b3fbc0 100644
-> --- a/block/nbd-client.c
-> +++ b/block/nbd-client.c
-> @@ -654,7 +654,8 @@ static int nbd_co_request(BlockDriverState *bs, NBDRequest *request,
->
->       ret = nbd_co_receive_return_code(client, request->handle, &local_err);
->       if (local_err) {
-> -        error_report_err(local_err);
-> +        assert(ret < 0);
-> +//        error_report_err(local_err);
->       }
->       return ret;
->   }
-> @@ -682,7 +683,7 @@ int nbd_client_co_preadv(BlockDriverState *bs, uint64_t offset,
->       ret = nbd_co_receive_cmdread_reply(client, request.handle, offset, qiov,
->                                          &local_err);
->       if (ret < 0) {
-> -        error_report_err(local_err);
-> +        //error_report_err(local_err);
->       }
->       return ret;
->   }
+On Mon, 30 Oct 2017 09:28:09 +0100
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 
-commenting is not ok, you should call error_free instead.
+> Now I thought about that for a while and I start to think that we cannot implement ais
+> in QEMU and cover all cases.
+> One aspect was certainly passthrough (like you handled in patch 4).
+> Another aspect is that some interrupts might be injected from the kernel - even for
+> emulated devices. e.g. virtio-pci together with vhost-net, will inject interrupts via
+> the set_irq callback. I think disabling irqfd for these cases is not a good idea.
 
--- 
-Best regards,
-Vladimir
+Is there still a fallback for irqfd emulation?
+
+> 
+> So what about adding a new KVM capability (for 4.14), fixup the other things in
+> QEMU and then bind it to the new capability?
+
+For 4.15, surely?
+
+Probably the only way we can make this work correctly...
