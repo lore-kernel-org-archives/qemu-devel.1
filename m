@@ -1,33 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35974)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36232)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e90hS-0000Pu-Ha
-	for qemu-devel@nongnu.org; Sun, 29 Oct 2017 23:25:19 -0400
+	id 1e90jK-00019v-T8
+	for qemu-devel@nongnu.org; Sun, 29 Oct 2017 23:27:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e90hP-0003AW-CQ
-	for qemu-devel@nongnu.org; Sun, 29 Oct 2017 23:25:18 -0400
-Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:47855)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e90hP-0003AC-39
-	for qemu-devel@nongnu.org; Sun, 29 Oct 2017 23:25:15 -0400
-Received: by mail-qt0-x243.google.com with SMTP id z50so14754627qtj.4
-	for <qemu-devel@nongnu.org>; Sun, 29 Oct 2017 20:25:15 -0700 (PDT)
+	id 1e90jH-0004ik-Pw
+	for qemu-devel@nongnu.org; Sun, 29 Oct 2017 23:27:14 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-References: <20171026135814.20773-1-richard.henderson@linaro.org>
-	<CAFEAcA8mVtira5AMwwASg9+eRx=nge-SR2YEnNnEoxF86wNHqA@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <16b4f2f3-28ee-7e5b-d477-547e02fc6a94@amsat.org>
-Date: Mon, 30 Oct 2017 00:25:03 -0300
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Date: Mon, 30 Oct 2017 00:25:21 -0300
+Message-Id: <20171030032521.2441-1-f4bug@amsat.org>
+In-Reply-To: <08178b4217d1692297b8c9620b6d13a80bfb6822.1509175660.git.alistair.francis@xilinx.com>
+References: <08178b4217d1692297b8c9620b6d13a80bfb6822.1509175660.git.alistair.francis@xilinx.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8mVtira5AMwwASg9+eRx=nge-SR2YEnNnEoxF86wNHqA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] tcg: Avoid setting tcg_initialize if
- !CONFIG_TCG
+Subject: [Qemu-devel] [PATCH v3] xlnx-zcu102: Specify the number of max CPUs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,32 +26,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@gmail.com>
+Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, alistair23@gmail.com
 
-Hi Peter,
+From: Alistair Francis <alistair.francis@xilinx.com>
 
-On 10/27/2017 04:03 AM, Peter Maydell wrote:
-> On 26 October 2017 at 14:58, Richard Henderson
-> <richard.henderson@linaro.org> wrote:
->> Fix the build for --disable-tcg.
->>
->> Fixes: 55c3ceef61fcf06fc98ddc752b7cce788ce7680b
->> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
->> ---
-> 
-> Applied to master as a buildfix, thanks.
+Specify the number of CPUs that can run on ZynqMP.
 
-I couldn't see this buildfix merged in /master so I provided another
-version using stubs and details about offending commits there:
+Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+V3:
+ - Fix my ASCII noncompliant last name in Reviewed-by tag :(
+ - added Tested-by for what it's worth
+ 
+V2:
+ - Use macros
 
-http://lists.nongnu.org/archive/html/qemu-devel/2017-10/msg06530.html
+ hw/arm/xlnx-zcu102.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-In case you didn't pushed to /master you might consider this series instead.
-
-I didn't include ARM/MIPS/PPC since they don't support building without
-TCG (yet).
-
-Regards,
-
-Phil.
+diff --git a/hw/arm/xlnx-zcu102.c b/hw/arm/xlnx-zcu102.c
+index 519a16ed98..e2d15a1c9d 100644
+--- a/hw/arm/xlnx-zcu102.c
++++ b/hw/arm/xlnx-zcu102.c
+@@ -240,6 +240,7 @@ static void xlnx_zcu102_machine_class_init(ObjectClass *oc, void *data)
+     mc->block_default_type = IF_IDE;
+     mc->units_per_default_bus = 1;
+     mc->ignore_memory_transaction_failures = true;
++    mc->max_cpus = XLNX_ZYNQMP_NUM_APU_CPUS + XLNX_ZYNQMP_NUM_RPU_CPUS;
+ }
+ 
+ static const TypeInfo xlnx_zcu102_machine_init_typeinfo = {
+-- 
+2.15.0.rc2
