@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52346)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52372)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1e99w2-0002GK-6r
-	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 09:16:59 -0400
+	(envelope-from <a.perevalov@samsung.com>) id 1e99w3-0002GY-Jj
+	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 09:17:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1e99vx-000453-7l
-	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 09:16:58 -0400
-Received: from mailout1.w1.samsung.com ([210.118.77.11]:51546)
+	(envelope-from <a.perevalov@samsung.com>) id 1e99vx-000458-8G
+	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 09:16:59 -0400
+Received: from mailout2.w1.samsung.com ([210.118.77.12]:35957)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <a.perevalov@samsung.com>)
-	id 1e99vw-00042F-RN
+	id 1e99vw-000423-SB
 	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 09:16:53 -0400
 From: Alexey Perevalov <a.perevalov@samsung.com>
-Date: Mon, 30 Oct 2017 16:16:25 +0300
-Message-id: <1509369390-8285-2-git-send-email-a.perevalov@samsung.com>
-In-reply-to: <1509369390-8285-1-git-send-email-a.perevalov@samsung.com>
-References: <1509369390-8285-1-git-send-email-a.perevalov@samsung.com>
-	<CGME20171030131647eucas1p2ea569225550a2250ee75f76b482b7498@eucas1p2.samsung.com>
-Subject: [Qemu-devel] [PATCH v12 1/6] migration: introduce
- postcopy-blocktime capability
+Date: Mon, 30 Oct 2017 16:16:24 +0300
+Message-id: <1509369390-8285-1-git-send-email-a.perevalov@samsung.com>
+References: <CGME20171030131646eucas1p14d2fcb39b4916be2960719f68413c082@eucas1p1.samsung.com>
+Subject: [Qemu-devel] [PATCH v12 0/6] calculate blocktime for postcopy live
+ migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,72 +27,124 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alexey Perevalov <a.perevalov@samsung.com>, quintela@redhat.com, peterx@redhat.com, i.maximets@samsung.com, heetae82.ahn@samsung.com, dgilbert@redhat.com
 
-Right now it could be used on destination side to
-enable vCPU blocktime calculation for postcopy live migration.
-vCPU blocktime - it's time since vCPU thread was put into
-interruptible sleep, till memory page was copied and thread awake.
+This is 12th version.
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
----
- migration/migration.c | 9 +++++++++
- migration/migration.h | 1 +
- qapi/migration.json   | 6 +++++-
- 3 files changed, 15 insertions(+), 1 deletion(-)
+The rationale for that idea is following:
+vCPU could suspend during postcopy live migration until faulted
+page is not copied into kernel. Downtime on source side it's a value -
+time interval since source turn vCPU off, till destination start runnig
+vCPU. But that value was proper value for precopy migration it really shows
+amount of time when vCPU is down. But not for postcopy migration, because
+several vCPU threads could susppend after vCPU was started. That is important
+to estimate packet drop for SDN software.
 
-diff --git a/migration/migration.c b/migration/migration.c
-index 62761d5..c5244ae 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -1492,6 +1492,15 @@ bool migrate_zero_blocks(void)
-     return s->enabled_capabilities[MIGRATION_CAPABILITY_ZERO_BLOCKS];
- }
- 
-+bool migrate_postcopy_blocktime(void)
-+{
-+    MigrationState *s;
-+
-+    s = migrate_get_current();
-+
-+    return s->enabled_capabilities[MIGRATION_CAPABILITY_POSTCOPY_BLOCKTIME];
-+}
-+
- bool migrate_use_compression(void)
- {
-     MigrationState *s;
-diff --git a/migration/migration.h b/migration/migration.h
-index 8ccdd7a..5f5e527 100644
---- a/migration/migration.h
-+++ b/migration/migration.h
-@@ -202,6 +202,7 @@ int migrate_compress_level(void);
- int migrate_compress_threads(void);
- int migrate_decompress_threads(void);
- bool migrate_use_events(void);
-+bool migrate_postcopy_blocktime(void);
- 
- /* Sending on the return path - generic and then for each message type */
- void migrate_send_rp_shut(MigrationIncomingState *mis,
-diff --git a/qapi/migration.json b/qapi/migration.json
-index 6ae866e..c20caf4 100644
---- a/qapi/migration.json
-+++ b/qapi/migration.json
-@@ -352,12 +352,16 @@
- #
- # @x-multifd: Use more than one fd for migration (since 2.11)
- #
-+# @postcopy-blocktime: Calculate downtime for postcopy live migration
-+#                     (since 2.11)
-+#
- # Since: 1.2
- ##
- { 'enum': 'MigrationCapability',
-   'data': ['xbzrle', 'rdma-pin-all', 'auto-converge', 'zero-blocks',
-            'compress', 'events', 'postcopy-ram', 'x-colo', 'release-ram',
--           'block', 'return-path', 'pause-before-switchover', 'x-multifd' ] }
-+           'block', 'return-path', 'pause-before-switchover', 'x-multifd',
-+           'postcopy-blocktime' ] }
- 
- ##
- # @MigrationCapabilityStatus:
+(V11 -> V12)
+    - don't read read vcpu_times twice in mark_postcopy_blocktime_end (comment
+from David)
+    - migration-test doesn't touch got_stop due to multiple tests, and some
+code changes due to latest migration-test refactoring.
+
+(V10 -> V11)
+    - rebase
+    - update documentation (comment from David)
+    - postcopy_notifier was removed from PostcopyBlocktimeContext (comment from
+David)
+    - fix "since 2.10" for postcopy-vcpu-blocktime (comment from Eric)
+    - fix order in mark_postcopy_blocktime_begin/end (comment from David),
+but I think it still have a slim race condition
+    - remove error_report from fill_destination_postcopy_migration_info (comment
+from David)
+
+(V9 -> V10)
+    - rebase
+    - patch "update kernel header for UFFD_FEATURE_*" has changed,
+and was generated by  scripts/update-linux-headers.sh as David suggested. 
+
+(V8 -> V9)
+    - rebase
+    - traces
+
+(V7 -> V8)
+    - just one comma in
+"migration: fix hardcoded function name in error report"
+It was really missed, but fixed in futher patch.
+
+(V6 -> V7)
+    - copied bitmap was placed into RAMBlock as another migration
+related bitmaps.
+    - Ordering of mark_postcopy_blocktime_end call and ordering
+of checking copied bitmap were changed.
+    - linewrap style defects
+    - new patch "postcopy_place_page factoring out"
+    - postcopy_ram_supported_by_host accepts
+MigrationIncomingState in qmp_migrate_set_capabilities
+    - minor fixes of documentation. 
+    and huge description of get_postcopy_total_blocktime was
+moved. Davids comment.
+
+(V5 -> V6)
+    - blocktime was added into hmp command. Comment from David.
+    - bitmap for copied pages was added as well as check in *_begin/_end
+functions. Patch uses just introduced RAMBLOCK_FOREACH. Comment from David.
+    - description of receive_ufd_features/request_ufd_features. Comment from David.
+    - commit message headers/@since references were modified. Comment from Eric.
+    - also typos in documentation. Comment from Eric.
+    - style and description of field in MigrationInfo. Comment from Eric.
+    - ufd_check_and_apply (former ufd_version_check) is calling twice,
+so my previous patch contained double allocation of blocktime context and
+as a result memory leak. In this patch series it was fixed.
+
+(V4 -> V5)
+    - fill_destination_postcopy_migration_info empty stub was missed for none linux
+build
+
+(V3 -> V4)
+    - get rid of Downtime as a name for vCPU waiting time during postcopy migration
+    - PostcopyBlocktimeContext renamed (it was just BlocktimeContext)
+    - atomic operations are used for dealing with fields of PostcopyBlocktimeContext
+affected in both threads.
+    - hardcoded function names in error_report were replaced to %s and __line__
+    - this patch set includes postcopy-downtime capability, but it used on
+destination, coupled with not possibility to return calculated downtime back
+to source to show it in query-migrate, it looks like a big trade off
+    - UFFD_API have to be sent notwithstanding need or not to ask kernel
+for a feature, due to kernel expects it in any case (see patch comment)
+    - postcopy_downtime included into query-migrate output
+    - also this patch set includes trivial fix
+migration: fix hardcoded function name in error report
+maybe that is a candidate for qemu-trivial mailing list, but I already
+sent "migration: Fixed code style" and it was unclaimed.
+
+(V2 -> V3)
+    - Downtime calculation approach was changed, thanks to Peter Xu
+    - Due to previous point no more need to keep GTree as well as bitmap of cpus.
+So glib changes aren't included in this patch set, it could be resent in
+another patch set, if it will be a good reason for it.
+    - No procfs traces in this patchset, if somebody wants it, you could get it
+from patchwork site to track down page fault initiators.
+    - UFFD_FEATURE_THREAD_ID is requesting only when kernel supports it
+    - It doesn't send back the downtime, just trace it
+
+Patch set is based on commit 3be480ebb8fdcc99f0a4fcbbf36ec5642a16a10b
+and Juan Quintela's series "tests: Add migration compress threads tests"
+
+Alexey Perevalov (6):
+  migration: introduce postcopy-blocktime capability
+  migration: add postcopy blocktime ctx into MigrationIncomingState
+  migration: calculate vCPU blocktime on dst side
+  migration: postcopy_blocktime documentation
+  migration: add blocktime calculation into migration-test
+  migration: add postcopy total blocktime into query-migrate
+
+ docs/devel/migration.txt |  13 +++
+ hmp.c                    |  15 +++
+ migration/migration.c    |  51 +++++++++-
+ migration/migration.h    |  13 +++
+ migration/postcopy-ram.c | 258 ++++++++++++++++++++++++++++++++++++++++++++++-
+ migration/trace-events   |   6 +-
+ qapi/migration.json      |  17 +++-
+ tests/migration-test.c   |  16 +++
+ 8 files changed, 381 insertions(+), 8 deletions(-)
+
 -- 
 2.7.4
