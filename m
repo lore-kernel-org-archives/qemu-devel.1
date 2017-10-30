@@ -1,33 +1,46 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51034)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51879)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e9FDd-0005cf-BA
-	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 14:55:31 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1e9FGa-0006o1-0i
+	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 14:58:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e9FDb-00026L-OW
-	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 14:55:29 -0400
-Received: from mail-io0-x243.google.com ([2607:f8b0:4001:c06::243]:45216)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e9FDb-000269-HP
-	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 14:55:27 -0400
-Received: by mail-io0-x243.google.com with SMTP id i38so29519459iod.2
-	for <qemu-devel@nongnu.org>; Mon, 30 Oct 2017 11:55:27 -0700 (PDT)
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1e9FGV-0003R3-M0
+	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 14:58:32 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44178)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1e9FGV-0003Qv-DA
+	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 14:58:27 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v9UIvN6D022708
+	for <qemu-devel@nongnu.org>; Mon, 30 Oct 2017 14:58:22 -0400
+Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2dx6n6jxba-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 30 Oct 2017 14:58:22 -0400
+Received: from localhost
+	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Mon, 30 Oct 2017 18:58:19 -0000
+References: <1507124979-8880-1-git-send-email-pmorel@linux.vnet.ibm.com>
+	<feea3ded-fecc-50ff-fe70-09e63966933b@de.ibm.com>
+	<20171030134233.6aaa81a1.cohuck@redhat.com>
+	<54504556-d508-e86f-388b-b07fa7576978@de.ibm.com>
+	<90f3e3b9-be67-cda8-4ff8-20dac42090c7@linux.vnet.ibm.com>
+	<b0bd0d34-548d-b461-7397-9ab92fb4e6fc@de.ibm.com>
+	<20171030175937.23ef49a8.cohuck@redhat.com>
+	<2f5c22e1-e9c2-9fb2-e0ce-4d19dc005d8e@de.ibm.com>
+	<7c945da5-aca6-7fd6-ebe1-55c89b5567f5@linux.vnet.ibm.com>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Mon, 30 Oct 2017 19:58:15 +0100
 MIME-Version: 1.0
-Sender: philippe.mathieu.daude@gmail.com
-In-Reply-To: <f8ffbceb-6b34-92e3-6cb4-663396c02813@ilande.co.uk>
-References: <1508947167-5304-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<1508947167-5304-12-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<ce56b1d1-72a8-5e7f-027e-6ddd02238072@amsat.org>
-	<f8ffbceb-6b34-92e3-6cb4-663396c02813@ilande.co.uk>
-From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Date: Mon, 30 Oct 2017 15:55:25 -0300
-Message-ID: <CAAdtpL6zYVo38KC-tHAwRrsrTkNQ5ZPr0f_kYDYvbxLT9M4DTA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <7c945da5-aca6-7fd6-ebe1-55c89b5567f5@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Message-Id: <13099ab4-3afe-04ea-f6eb-f0acffd06f9c@linux.vnet.ibm.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCHv4 11/13] sparc32_dma: introduce new
- SPARC32_DMA type container object
+Subject: Re: [Qemu-devel] [PATCH v1 0/5][RFC] Refactoring of AIS support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,272 +49,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Artyom Tarasenko <atar4qemu@gmail.com>
+To: Pierre Morel <pmorel@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: zyimin@linux.vnet.ibm.com, qemu-devel@nongnu.org, agraf@suse.de, qemu-s390x@nongnu.org
 
-On Mon, Oct 30, 2017 at 3:51 PM, Mark Cave-Ayland
-<mark.cave-ayland@ilande.co.uk> wrote:
-> On 27/10/17 17:18, Philippe Mathieu-Daud=C3=A9 wrote:
->> On 10/25/2017 12:59 PM, Mark Cave-Ayland wrote:
->>> Create a new SPARC32_DMA container object (including an appropriate con=
-tainer
->>> memory region) and add instances of the SPARC32_ESPDMA_DEVICE and
->>> SPARC32_LEDMA_DEVICE as child objects. The benefit is that most of the =
-gpio
->>> wiring complexity between esp/espdma and lance/ledma is now hidden with=
-in the
->>> SPARC32_DMA realize function.
->>>
->>> Since the sun4m IOMMU is already QOMified we can find a reference to
->>> it using object_resolve_path_type() allowing us to completely remove al=
-l external
->>> references to the iommu pointer.
->>>
->>> Finally we rework sun4m's sparc32_dma_init() to invoke the new SPARC32_=
-DMA object
->>> and wire up the remaining board memory regions/IRQs.
->>>
->>> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
->>> Reviewed-by: Artyom Tarasenko <atar4qemu@gmail.com>
->>> ---
->>>  hw/dma/sparc32_dma.c           |   70 ++++++++++++++++++++++++++++++++=
-++++++++
->>>  hw/sparc/sun4m.c               |   66 ++++++++++++++++++--------------=
------
->>>  include/hw/sparc/sparc32_dma.h |   12 +++++++
->>>  3 files changed, 114 insertions(+), 34 deletions(-)
->>>
->>> diff --git a/hw/dma/sparc32_dma.c b/hw/dma/sparc32_dma.c
->>> index d4cff74..582b7cc 100644
->>> --- a/hw/dma/sparc32_dma.c
->>> +++ b/hw/dma/sparc32_dma.c
->>> @@ -30,6 +30,7 @@
->>>  #include "hw/sparc/sparc32_dma.h"
->>>  #include "hw/sparc/sun4m.h"
->>>  #include "hw/sysbus.h"
->>> +#include "qapi/error.h"
->>>  #include "trace.h"
->>>
->>>  /*
->>> @@ -369,11 +370,80 @@ static const TypeInfo sparc32_ledma_device_info =
-=3D {
->>>      .class_init    =3D sparc32_ledma_device_class_init,
->>>  };
->>>
->>> +static void sparc32_dma_realize(DeviceState *dev, Error **errp)
->>> +{
->>> +    SPARC32DMAState *s =3D SPARC32_DMA(dev);
->>> +    DeviceState *espdma, *esp, *ledma, *lance;
->>> +    SysBusDevice *sbd;
->>> +    Object *iommu;
->>> +
->>> +    iommu =3D object_resolve_path_type("", TYPE_SUN4M_IOMMU, NULL);
->>> +    if (!iommu) {
->>> +        error_setg(errp, "unable to locate sun4m IOMMU device");
->>> +        return;
->>> +    }
->>> +
->>> +    espdma =3D qdev_create(NULL, TYPE_SPARC32_ESPDMA_DEVICE);
->>> +    object_property_set_link(OBJECT(espdma), iommu, "iommu", errp);
->>> +    object_property_add_child(OBJECT(s), "espdma", OBJECT(espdma), err=
-p);
->>> +    qdev_init_nofail(espdma);
->>> +
->>> +    esp =3D DEVICE(object_resolve_path_component(OBJECT(espdma), "esp"=
-));
->>
->> TYPE_ESP?
->>
->>> +    sbd =3D SYS_BUS_DEVICE(esp);
->>> +    sysbus_connect_irq(sbd, 0, qdev_get_gpio_in(espdma, 0));
->>> +    qdev_connect_gpio_out(espdma, 0, qdev_get_gpio_in(esp, 0));
->>> +    qdev_connect_gpio_out(espdma, 1, qdev_get_gpio_in(esp, 1));
->>> +
->>> +    sbd =3D SYS_BUS_DEVICE(espdma);
->>> +    memory_region_add_subregion(&s->dmamem, 0x0,
->>> +                                sysbus_mmio_get_region(sbd, 0));
->>> +
->>> +    ledma =3D qdev_create(NULL, TYPE_SPARC32_LEDMA_DEVICE);
->>> +    object_property_set_link(OBJECT(ledma), iommu, "iommu", errp);
->>> +    object_property_add_child(OBJECT(s), "ledma", OBJECT(ledma), errp)=
-;
->>> +    qdev_init_nofail(ledma);
->>> +
->>> +    lance =3D DEVICE(object_resolve_path_component(OBJECT(ledma), "lan=
-ce"));
->>
->> TYPE_LANCE?
->>
->>> +    sbd =3D SYS_BUS_DEVICE(lance);
->>> +    sysbus_connect_irq(sbd, 0, qdev_get_gpio_in(ledma, 0));
->>> +    qdev_connect_gpio_out(ledma, 0, qdev_get_gpio_in(lance, 0));
->>> +
->>> +    sbd =3D SYS_BUS_DEVICE(ledma);
->>> +    memory_region_add_subregion(&s->dmamem, 0x10,
->>> +                                sysbus_mmio_get_region(sbd, 0));
->>> +}
->>> +
->>> +static void sparc32_dma_init(Object *obj)
->>> +{
->>> +    SPARC32DMAState *s =3D SPARC32_DMA(obj);
->>> +    SysBusDevice *sbd =3D SYS_BUS_DEVICE(obj);
->>> +
->>> +    memory_region_init(&s->dmamem, OBJECT(s), "dma", DMA_SIZE + DMA_ET=
-H_SIZE);
->>> +    sysbus_init_mmio(sbd, &s->dmamem);
->>> +}
->>> +
->>> +static void sparc32_dma_class_init(ObjectClass *klass, void *data)
->>> +{
->>> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
->>> +
->>> +    dc->realize =3D sparc32_dma_realize;
->>> +}
->>> +
->>> +static const TypeInfo sparc32_dma_info =3D {
->>> +    .name          =3D TYPE_SPARC32_DMA,
->>> +    .parent        =3D TYPE_SYS_BUS_DEVICE,
->>> +    .instance_size =3D sizeof(SPARC32DMAState),
->>> +    .instance_init =3D sparc32_dma_init,
->>> +    .class_init    =3D sparc32_dma_class_init,
->>> +};
->>> +
->>> +
->>>  static void sparc32_dma_register_types(void)
->>>  {
->>>      type_register_static(&sparc32_dma_device_info);
->>>      type_register_static(&sparc32_espdma_device_info);
->>>      type_register_static(&sparc32_ledma_device_info);
->>> +    type_register_static(&sparc32_dma_info);
->>>  }
->>>
->>>  type_init(sparc32_dma_register_types)
->>> diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
->>> index ae486a4..5017ae5 100644
->>> --- a/hw/sparc/sun4m.c
->>> +++ b/hw/sparc/sun4m.c
->>> @@ -307,18 +307,36 @@ static void *iommu_init(hwaddr addr, uint32_t ver=
-sion, qemu_irq irq)
->>>      return s;
->>>  }
->>>
->>> -static void *sparc32_dma_init(hwaddr daddr, void *iommu, int is_ledma)
->>> +static void *sparc32_dma_init(hwaddr dma_base,
->>> +                              hwaddr esp_base, qemu_irq espdma_irq,
->>> +                              hwaddr le_base, qemu_irq ledma_irq)
->>>  {
->>> -    DeviceState *dev;
->>> -    SysBusDevice *s;
->>> +    DeviceState *dma;
->>> +    ESPDMADeviceState *espdma;
->>> +    LEDMADeviceState *ledma;
->>> +    SysBusESPState *esp;
->>> +    SysBusPCNetState *lance;
->>>
->>> -    dev =3D qdev_create(NULL, is_ledma ? "sparc32-ledma" : "sparc32-es=
-pdma");
->>
->> TYPE_SPARC32_LEDMA_DEVICE, TYPE_SPARC32_ESPDMA_DEVICE
->>
->>> -    object_property_set_link(OBJECT(dev), OBJECT(iommu), "iommu", &err=
-or_abort);
->>> -    qdev_init_nofail(dev);
->>> -    s =3D SYS_BUS_DEVICE(dev);
->>> -    sysbus_mmio_map(s, 0, daddr);
->>> +    dma =3D qdev_create(NULL, TYPE_SPARC32_DMA);
->>> +    qdev_init_nofail(dma);
->>> +    sysbus_mmio_map(SYS_BUS_DEVICE(dma), 0, dma_base);
->>>
->>> -    return s;
->>> +    espdma =3D SPARC32_ESPDMA_DEVICE(object_resolve_path_component(
->>> +                                   OBJECT(dma), "espdma"));
->>> +    sysbus_connect_irq(SYS_BUS_DEVICE(espdma), 0, espdma_irq);
->>> +
->>> +    esp =3D ESP_STATE(object_resolve_path_component(OBJECT(espdma), "e=
-sp"));
->>
->> TYPE_ESP?
->>
->>> +    sysbus_mmio_map(SYS_BUS_DEVICE(esp), 0, esp_base);
->>> +
->>> +    ledma =3D SPARC32_LEDMA_DEVICE(object_resolve_path_component(
->>> +                                 OBJECT(dma), "ledma"));
->>> +    sysbus_connect_irq(SYS_BUS_DEVICE(ledma), 0, ledma_irq);
->>> +
->>> +    lance =3D SYSBUS_PCNET(object_resolve_path_component(
->>> +                         OBJECT(ledma), "lance"));
->>
->> TYPE_LANCE?
->>
->>> +    sysbus_mmio_map(SYS_BUS_DEVICE(lance), 0, le_base);
->>> +
->>> +    return dma;
->>>  }
->>>
->>>  static DeviceState *slavio_intctl_init(hwaddr addr,
->>> @@ -798,9 +816,7 @@ static void sun4m_hw_init(const struct sun4m_hwdef =
-*hwdef,
->>>      DeviceState *slavio_intctl;
->>>      const char *cpu_model =3D machine->cpu_model;
->>>      unsigned int i;
->>> -    void *iommu, *nvram;
->>> -    DeviceState *espdma, *esp, *ledma, *lance;
->>> -    SysBusDevice *sbd;
->>> +    void *nvram;
->>>      qemu_irq *cpu_irqs[MAX_CPUS], slavio_irq[32], slavio_cpu_irq[MAX_C=
-PUS];
->>>      qemu_irq fdc_tc;
->>>      unsigned long kernel_size;
->>> @@ -848,8 +864,7 @@ static void sun4m_hw_init(const struct sun4m_hwdef =
-*hwdef,
->>>          afx_init(hwdef->afx_base);
->>>      }
->>>
->>> -    iommu =3D iommu_init(hwdef->iommu_base, hwdef->iommu_version,
->>> -                       slavio_irq[30]);
->>> +    iommu_init(hwdef->iommu_base, hwdef->iommu_version, slavio_irq[30]=
-);
->>>
->>>      if (hwdef->iommu_pad_base) {
->>>          /* On the real hardware (SS-5, LX) the MMU is not padded, but =
-aliased.
->>> @@ -859,26 +874,9 @@ static void sun4m_hw_init(const struct sun4m_hwdef=
- *hwdef,
->>>          empty_slot_init(hwdef->iommu_pad_base,hwdef->iommu_pad_len);
->>>      }
->>>
->>> -    espdma =3D sparc32_dma_init(hwdef->dma_base, iommu, 0);
->>> -    sbd =3D SYS_BUS_DEVICE(espdma);
->>> -    sysbus_connect_irq(sbd, 0, slavio_irq[18]);
->>> -
->>> -    esp =3D DEVICE(object_resolve_path_component(OBJECT(espdma), "esp"=
-));
->>> -    sbd =3D SYS_BUS_DEVICE(esp);
->>> -    sysbus_mmio_map(sbd, 0, hwdef->esp_base);
->>> -    sysbus_connect_irq(sbd, 0, qdev_get_gpio_in(espdma, 0));
->>> -    qdev_connect_gpio_out(espdma, 0, qdev_get_gpio_in(esp, 0));
->>> -    qdev_connect_gpio_out(espdma, 1, qdev_get_gpio_in(esp, 1));
->>> -
->>> -    ledma =3D sparc32_dma_init(hwdef->dma_base + 16ULL, iommu, 1);
->>> -    sbd =3D SYS_BUS_DEVICE(ledma);
->>> -    sysbus_connect_irq(sbd, 0, slavio_irq[16]);
->>> -
->>> -    lance =3D DEVICE(object_resolve_path_component(OBJECT(ledma), "lan=
-ce"));
->>> -    sbd =3D SYS_BUS_DEVICE(lance);
->>> -    sysbus_mmio_map(sbd, 0, hwdef->le_base);
->>> -    sysbus_connect_irq(sbd, 0, qdev_get_gpio_in(ledma, 0));
->>> -    qdev_connect_gpio_out(ledma, 0, qdev_get_gpio_in(lance, 0));
->>> +    sparc32_dma_init(hwdef->dma_base,
->>> +                     hwdef->esp_base, slavio_irq[18],
->>> +                     hwdef->le_base, slavio_irq[16]);
->>>
->>>      if (graphic_depth !=3D 8 && graphic_depth !=3D 24) {
->>>          error_report("Unsupported depth: %d", graphic_depth);
->
-> I disagree with using the TYPE_* macros for the link property names
-> because semantically we aren't referencing the type, it just so happens
-> that I've used the same name as the type for the property name and I'd
-> like to keep this distinction.
+     =20
 
-OK.
+On 10/30/2017 06:38 PM, Pierre Morel wrote:
+> On 30/10/2017 18:08, Christian Borntraeger wrote:
+>>
+>> On 10/30/2017 05:59 PM, Cornelia Huck wrote:
+>>> On Mon, 30 Oct 2017 14:48:23 +0100
+>>> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+>>>
+>>>
+>>>> FWIW, I am testing a guest patch that enables zPCI without AIS. Its =
+as simple as
+>>>>
+>>>>
+>>>> diff --git a/arch/s390/pci/pci.c b/arch/s390/pci/pci.c
+>>>> index 7b30af5..9b24836 100644
+>>>> --- a/arch/s390/pci/pci.c
+>>>> +++ b/arch/s390/pci/pci.c
+>>>> @@ -953,7 +953,7 @@ static int __init pci_base_init(void)
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!s390_pci_probe=
+)
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 return 0;
+>>>> =C2=A0 -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!test_facility(69) =
+|| !test_facility(71) || !test_facility(72))
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!test_facility(69) || !tes=
+t_facility(71))
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 return 0;
+>>>> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 rc =3D zpci_=
+debug_init();
+>>>> diff --git a/arch/s390/pci/pci_insn.c b/arch/s390/pci/pci_insn.c
+>>>> index ea34086..61f8c82 100644
+>>>> --- a/arch/s390/pci/pci_insn.c
+>>>> +++ b/arch/s390/pci/pci_insn.c
+>>>> @@ -7,6 +7,7 @@
+>>>> =C2=A0 #include <linux/export.h>
+>>>> =C2=A0 #include <linux/errno.h>
+>>>> =C2=A0 #include <linux/delay.h>
+>>>> +#include <asm/facility.h>
+>>>> =C2=A0 #include <asm/pci_insn.h>
+>>>> =C2=A0 #include <asm/pci_debug.h>
+>>>> =C2=A0 #include <asm/processor.h>
+>>>> @@ -93,6 +94,8 @@ int zpci_refresh_trans(u64 fn, u64 addr, u64 range=
+)
+>>>> =C2=A0 /* Set Interruption Controls */
+>>>> =C2=A0 void zpci_set_irq_ctrl(u16 ctl, char *unused, u8 isc)
+>>>> =C2=A0 {
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!test_facility(72))
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0 return;
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 asm volatile (
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 "=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .insn=C2=
+=A0=C2=A0 rsy,0xeb00000000d1,%[ctl],%[isc],%[u]\n"
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 : : [ctl] "d" (ctl), [isc] "d" (isc << 27), [=
+u] "Q" (*unused));
+>>>>
+>>>
+>>> Sounds good. Presumably this makes the adapter interrupt handling wor=
+k
+>>> as for virtio (and qdio)? Is there any ais-less pci hardware out in t=
+he
+>>> wild?
+
+@Connie:
+Do you have something in mind, or is curiosity the only reason for asking=
+?
+
+>>>
+>>
+>> ais is z specific, not PCI specific. So PCI cards should not care as f=
+ar as I can tell.
+>>
+>>
+>=20
+> I bet Conny meant PCI hardware globaly, including zPCI adapters.
+> I bet none but I will better ask Sebastian or Gerald if they know.
+>=20
+
+I side with Christian: it is a machine thing and not a card thing. So
+the question is if there is a z machine which supports zpci but does
+not support AIS. My guess is that such a machine was never produced.
+
+Halil
