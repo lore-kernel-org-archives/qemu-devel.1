@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35418)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49062)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1e8xKK-00073N-UJ
-	for qemu-devel@nongnu.org; Sun, 29 Oct 2017 19:49:14 -0400
+	(envelope-from <programmingkidx@gmail.com>) id 1e8z25-0001bB-JM
+	for qemu-devel@nongnu.org; Sun, 29 Oct 2017 21:38:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1e8xKH-0001CB-Ry
-	for qemu-devel@nongnu.org; Sun, 29 Oct 2017 19:49:12 -0400
-Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:44217)
+	(envelope-from <programmingkidx@gmail.com>) id 1e8z22-0001dL-GQ
+	for qemu-devel@nongnu.org; Sun, 29 Oct 2017 21:38:29 -0400
+Received: from mail-io0-x235.google.com ([2607:f8b0:4001:c06::235]:54002)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1e8xKH-0001Bv-Kq
-	for qemu-devel@nongnu.org; Sun, 29 Oct 2017 19:49:09 -0400
-Received: by mail-pf0-x243.google.com with SMTP id x7so9467805pfa.1
-	for <qemu-devel@nongnu.org>; Sun, 29 Oct 2017 16:49:09 -0700 (PDT)
-References: <20171027131412.18830-1-berrange@redhat.com>
-	<20171027131412.18830-2-berrange@redhat.com>
-	<f1716a0f-6c6d-7704-e628-3c4cfc1a6bf2@ozlabs.ru>
-	<20171028204505.GA21304@redhat.com>
-	<8f0324f3-a0c8-a4b0-357b-8b8ff7e75d08@ozlabs.ru>
-	<20171029075727.GA21571@redhat.com>
-	<a34b48cd-c112-7812-4e8a-2ba2db1a18e2@ozlabs.ru>
-	<20171029162902.GA14433@redhat.com>
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Message-ID: <a3f3604c-4a6d-f99b-0542-f8a4d02a3c7f@ozlabs.ru>
-Date: Mon, 30 Oct 2017 10:49:01 +1100
-MIME-Version: 1.0
-In-Reply-To: <20171029162902.GA14433@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-AU
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 1/4] build: allow setting a custom GIT
- binary for transparent proxying
+	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+	id 1e8z22-0001d9-B8
+	for qemu-devel@nongnu.org; Sun, 29 Oct 2017 21:38:26 -0400
+Received: by mail-io0-x235.google.com with SMTP id 189so23726304iow.10
+	for <qemu-devel@nongnu.org>; Sun, 29 Oct 2017 18:38:26 -0700 (PDT)
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+From: Programmingkid <programmingkidx@gmail.com>
+In-Reply-To: <20171029102106.GA2841@work-vm>
+Date: Sun, 29 Oct 2017 21:38:22 -0400
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <847196B3-8C4D-4B8E-A6A4-5ADAEC73FF62@gmail.com>
+References: <7CA6B03C-DFAA-4A15-9E33-E3FAD6647140@gmail.com>
+	<38c3125f-b050-c0ba-282f-bc1e9e11d297@redhat.com>
+	<20171029102106.GA2841@work-vm>
+Subject: Re: [Qemu-devel] drive_add: file names with spaces
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,68 +31,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>
-
-On 30/10/17 03:29, Daniel P. Berrange wrote:
-> On Mon, Oct 30, 2017 at 01:08:56AM +1100, Alexey Kardashevskiy wrote:
->>
->> I run ./scripts/git-submodule.sh on a server (where source directory is
->> writeable), them "rm .git-submodule-status", then run "Makefile" on a build
->> machine (which has the source directory mounted as read-only). I basically
->> recreate the situation where I was when I just discovered this brand new
->> ./scripts/git-submodule.sh.
-> 
-> Don't rm the .git-submodule-status. That means 'make' thinks the modules
-> are out of date.
-> 
-> Just run 'scripts/git-submodules.sh ...mods..' on the writable source
-> dir, and then run 'make' on the build machine.
-> 
->> I know that now, all I am asking is an error message to print exact command
->> to run...
-> 
-> If you hadn't deleted the .git-submodule-status, it would have worked fine.
-
-No.
-
-I do this on a server:
-
-[vpl1 qemu]$ git co v2.10.0
-At this point no .git-submodule-status is expected/required/exist.
-
-[vpl1 qemu]$ ssh aikhostos2 make -C /home/aik/pbuild/qemu-aikhostos2-ppc64/
--j24
-
-Configure succeeds, compiles just fine, it has been working like this for
-years.
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
 
 
-Now:
+> On Oct 29, 2017, at 6:21 AM, Dr. David Alan Gilbert =
+<dgilbert@redhat.com> wrote:
+>=20
+> * Eric Blake (eblake@redhat.com) wrote:
+>> On 10/28/2017 06:44 AM, Programmingkid wrote:
+>>> I'm trying to use an image file that has spaces in its file name =
+(and sometimes in the path) to be used as a USB flash drive. When I try =
+adding the image file using the drive_add command I see this error: =
+drive_add: extraneous characters at the end of the line
+>>>=20
+>>> I have tried using single and double quotes around the file name but =
+this does not help. Is there a way to use files that have spaces in it's =
+name with drive_add?
+>>=20
+>> Not in HMP, which lacks quoting.  (Unless you want to patch HMP to =
+learn
+>> quoting)
+>=20
+> I think it's already got that code at least in some places.
+> monitor_parse_arguments calls get_str, and get_str understands " =
+wrapped
+> arguments.
+>=20
+> drive_add 1 "file=3Dfoo bar"
+>=20
+> gives me:
+> Could not open 'foo bar': No such file or directory
+>=20
+> so I think that's doing the right thing.
+>=20
+> Dave
+>=20
+>> But using spaces in filenames works fine in QMP.
+>>=20
+>> --=20
+>> Eric Blake, Principal Software Engineer
+>> Red Hat, Inc.           +1-919-301-3266
+>> Virtualization:  qemu.org | libvirt.org
+>>=20
+>=20
+>=20
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
-[vpl1 qemu]$ git co git-submodule  (this is your stuff)
-[vpl1 qemu]$ ssh aikhostos2 make -C /home/aik/pbuild/qemu-aikhostos2-ppc64/
--j24
-touch: cannot touch ‘.git-submodule-status’: Read-only file system
-make: Entering directory `/home/aik/pbuild/qemu-aikhostos2-ppc64'
-  GEN     ppc64-softmmu/config-devices.mak.tmp
-[...]
-
-./scripts/git-submodule.sh: line 74: .git-submodule-status: Read-only file
-system
-./scripts/git-submodule.sh: failed to save git submodule status
-make: *** [git-submodule-update] Error 1
-
-
-What, why? Out of nowhere we write to read-only folder and we do not even
-bother telling why.
-
-Am I the only one who would be confused by this change?
-
-
-I only delete that file because I am testing the real situation which I
-saw. Looks like nobody else is really testing this :(
-
-
--- 
-Alexey
+Thank you so much for this info. It solved my problem :)
