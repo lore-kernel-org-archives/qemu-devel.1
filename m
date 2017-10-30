@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47398)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50406)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e9Gzf-000728-MY
-	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 16:49:12 -0400
+	(envelope-from <eblake@redhat.com>) id 1e9H74-0008JI-8T
+	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 16:56:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e9Gzc-0003bV-JE
-	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 16:49:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34948)
+	(envelope-from <eblake@redhat.com>) id 1e9H6z-0000uE-EW
+	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 16:56:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49580)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1e9Gzc-0003au-Cq
-	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 16:49:08 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1e9H6z-0000tm-83
+	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 16:56:45 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4BBE413AA3
-	for <qemu-devel@nongnu.org>; Mon, 30 Oct 2017 20:49:07 +0000 (UTC)
-Date: Mon, 30 Oct 2017 21:48:20 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20171030204820.GA15154@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20171030112112.6952-1-quintela@redhat.com>
-	<20171030112112.6952-2-quintela@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20171030112112.6952-2-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/6] qio: Make port 0 work for qio
+	by mx1.redhat.com (Postfix) with ESMTPS id F14EC85A04
+	for <qemu-devel@nongnu.org>; Mon, 30 Oct 2017 20:56:43 +0000 (UTC)
+Received: from red.redhat.com (ovpn-123-123.rdu2.redhat.com [10.10.123.123])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 6F5705C3FF
+	for <qemu-devel@nongnu.org>; Mon, 30 Oct 2017 20:56:40 +0000 (UTC)
+From: Eric Blake <eblake@redhat.com>
+Date: Mon, 30 Oct 2017 21:56:24 +0100
+Message-Id: <20171030205636.14236-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PULL 00/12] NBD patches prior to 2.11 soft freeze
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,41 +30,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
+To: qemu-devel@nongnu.org
 
-On Mon, Oct 30, 2017 at 12:21:07PM +0100, Juan Quintela wrote:
-> For tcp sockets we read back what is the socket/address.  So we know
-> what is the port that we are listening into.
-> 
-> Looked all callers of the function, and they just create the addr, use
-> it, and drop it, so no problem that we always update the port in the
-> address.
+The following changes since commit abf6e752e55b2f5afb48303429dea2db7c3a62de:
 
-Can you explain more why you need this ?
+  Merge remote-tracking branch 'remotes/borntraeger/tags/s390x-20171030' into staging (2017-10-30 13:02:45 +0000)
 
-Nothing should be using the socket_listen() method directly any more IIRC,
-and for the QIOChannelSocket classes, you should not rely on the address that
-you pass in, being the same as the one that ultimately gets passed into the
-socket_listen() method.
+are available in the git repository at:
 
-Patches that I have pending change things so that listening happens in two
-phases. First we take the SocketAddress and do DNS resolution to create
-mutliple new SocketAddress structs. These are then passed into the lowlevel
-socket_listen() method. So with that happening, even if you update the address
-in socket_listen() that info won't get back upto the caller.
+  git://repo.or.cz/qemu/ericb.git tags/pull-nbd-2017-10-30
 
-If you have a QIOChannelSocket instance, and you want to know what port it
-ended up listening on, you should call qio_channel_socket_get_local_address()
-method instead, which returns a dynamically popualted SocketAddress struct.
-This should mean socket_listen() never needs to update the address that it
-binds on.
+for you to fetch changes up to f140e3000371e67ff4e00df3213e2d576d9c91be:
 
-IOW, I think this patch is redundant.
+  nbd: Minimal structured read for client (2017-10-30 21:48:41 +0100)
 
-Regards,
-Daniel
+----------------------------------------------------------------
+nbd patches for 2017-10-30
+
+Vladimir Sementsov-Ogievskiy (some patches co-authored by Eric Blake):
+00/12 nbd minimal structured read
+
+----------------------------------------------------------------
+Eric Blake (8):
+      nbd: Include error names in trace messages
+      nbd: Move nbd_errno_to_system_errno() to public header
+      nbd: Expose constants and structs for structured read
+      nbd/server: Report error for write to read-only export
+      nbd/server: Simplify nbd_negotiate_options loop
+      nbd/server: Refactor zero-length option check
+      nbd/server: Include human-readable message in structured errors
+      nbd: Move nbd_read() to common header
+
+Vladimir Sementsov-Ogievskiy (4):
+      nbd: Minimal structured read for server
+      nbd/client: refactor nbd_receive_starttls
+      nbd/client: prepare nbd_receive_reply for structured reply
+      nbd: Minimal structured read for client
+
+ block/nbd-client.h         |   1 +
+ include/block/nbd.h        | 106 +++++++++-
+ nbd/nbd-internal.h         |  23 +--
+ block/nbd-client.c         | 492 ++++++++++++++++++++++++++++++++++++++++++---
+ nbd/client.c               | 217 +++++++++++++-------
+ nbd/common.c               |  84 ++++++++
+ nbd/server.c               | 210 ++++++++++++++-----
+ nbd/trace-events           |  15 +-
+ tests/qemu-iotests/083.out |  15 ++
+ 9 files changed, 969 insertions(+), 194 deletions(-)
+
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+2.13.6
