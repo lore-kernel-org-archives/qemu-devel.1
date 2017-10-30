@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49062)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33514)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1e8z25-0001bB-JM
-	for qemu-devel@nongnu.org; Sun, 29 Oct 2017 21:38:30 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1e90Q9-0004BX-Nb
+	for qemu-devel@nongnu.org; Sun, 29 Oct 2017 23:07:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1e8z22-0001dL-GQ
-	for qemu-devel@nongnu.org; Sun, 29 Oct 2017 21:38:29 -0400
-Received: from mail-io0-x235.google.com ([2607:f8b0:4001:c06::235]:54002)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1e90Q6-00078w-Id
+	for qemu-devel@nongnu.org; Sun, 29 Oct 2017 23:07:25 -0400
+Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:44262)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
-	id 1e8z22-0001d9-B8
-	for qemu-devel@nongnu.org; Sun, 29 Oct 2017 21:38:26 -0400
-Received: by mail-io0-x235.google.com with SMTP id 189so23726304iow.10
-	for <qemu-devel@nongnu.org>; Sun, 29 Oct 2017 18:38:26 -0700 (PDT)
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-From: Programmingkid <programmingkidx@gmail.com>
-In-Reply-To: <20171029102106.GA2841@work-vm>
-Date: Sun, 29 Oct 2017 21:38:22 -0400
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <847196B3-8C4D-4B8E-A6A4-5ADAEC73FF62@gmail.com>
-References: <7CA6B03C-DFAA-4A15-9E33-E3FAD6647140@gmail.com>
-	<38c3125f-b050-c0ba-282f-bc1e9e11d297@redhat.com>
-	<20171029102106.GA2841@work-vm>
-Subject: Re: [Qemu-devel] drive_add: file names with spaces
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1e90Q6-00078f-EI
+	for qemu-devel@nongnu.org; Sun, 29 Oct 2017 23:07:22 -0400
+Received: by mail-qk0-x244.google.com with SMTP id r64so14533996qkc.1
+	for <qemu-devel@nongnu.org>; Sun, 29 Oct 2017 20:07:21 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Date: Mon, 30 Oct 2017 00:05:48 -0300
+Message-Id: <20171030030553.21259-1-f4bug@amsat.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH 0/5] build fixes for --disable-tcg
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,52 +31,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
+To: Richard Henderson <richard.henderson@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, "Emilio G . Cota" <cota@braap.org>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, Yang Zhong <yang.zhong@intel.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
 
+Hi,
 
-> On Oct 29, 2017, at 6:21 AM, Dr. David Alan Gilbert =
-<dgilbert@redhat.com> wrote:
->=20
-> * Eric Blake (eblake@redhat.com) wrote:
->> On 10/28/2017 06:44 AM, Programmingkid wrote:
->>> I'm trying to use an image file that has spaces in its file name =
-(and sometimes in the path) to be used as a USB flash drive. When I try =
-adding the image file using the drive_add command I see this error: =
-drive_add: extraneous characters at the end of the line
->>>=20
->>> I have tried using single and double quotes around the file name but =
-this does not help. Is there a way to use files that have spaces in it's =
-name with drive_add?
->>=20
->> Not in HMP, which lacks quoting.  (Unless you want to patch HMP to =
-learn
->> quoting)
->=20
-> I think it's already got that code at least in some places.
-> monitor_parse_arguments calls get_str, and get_str understands " =
-wrapped
-> arguments.
->=20
-> drive_add 1 "file=3Dfoo bar"
->=20
-> gives me:
-> Could not open 'foo bar': No such file or directory
->=20
-> so I think that's doing the right thing.
->=20
-> Dave
->=20
->> But using spaces in filenames works fine in QMP.
->>=20
->> --=20
->> Eric Blake, Principal Software Engineer
->> Red Hat, Inc.           +1-919-301-3266
->> Virtualization:  qemu.org | libvirt.org
->>=20
->=20
->=20
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+This series add missing stubs (as suggested by Eduardo in [1]) to build
+the i386/s390x targets with --disable-tcg (the only targets building without
+TCG so far).
 
-Thank you so much for this info. It solved my problem :)
+For git workflow ease, I split by offending commit (so one can branch from
+this particular commit and cherry-pick the corresponding fix[es]).
+
+Regards,
+
+Phil.
+
+[1]: http://lists.nongnu.org/archive/html/qemu-devel/2017-10/msg06094.html
+
+Philippe Mathieu-Daudé (5):
+  accel/tcg: add missing target-independent stubs
+  target/i386: tcg stubs
+  target/s390x: tcg stubs
+  accel/tcg: add a stub for tcg_region_init()
+  accel/tcg: add a stub for tcg_register_thread()
+
+ accel/stubs/tcg-stub.c     | 27 +++++++++++++++++++++++++++
+ target/i386/tcg-stub.c     | 13 +++++++++++++
+ target/s390x/tcg-stub.c    | 13 +++++++++++++
+ target/i386/Makefile.objs  |  1 +
+ target/s390x/Makefile.objs |  1 +
+ 5 files changed, 55 insertions(+)
+ create mode 100644 target/i386/tcg-stub.c
+ create mode 100644 target/s390x/tcg-stub.c
+
+-- 
+2.15.0.rc2
