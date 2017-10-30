@@ -1,28 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54915)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55046)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e9C5D-0004rX-Rl
-	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 11:34:37 -0400
+	(envelope-from <akrowiak@linux.vnet.ibm.com>) id 1e9C5P-0004ya-VI
+	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 11:34:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e9C57-00075H-Ub
-	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 11:34:35 -0400
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:54841)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1e9C57-00074c-Nn
-	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 11:34:29 -0400
-Received: by mail-wm0-x241.google.com with SMTP id r68so17306406wmr.3
-	for <qemu-devel@nongnu.org>; Mon, 30 Oct 2017 08:34:29 -0700 (PDT)
+	(envelope-from <akrowiak@linux.vnet.ibm.com>) id 1e9C5K-0007IF-L3
+	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 11:34:47 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:39424
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <akrowiak@linux.vnet.ibm.com>)
+	id 1e9C5K-0007GO-Cx
+	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 11:34:42 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v9UFY5SM003297
+	for <qemu-devel@nongnu.org>; Mon, 30 Oct 2017 11:34:38 -0400
+Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2dx64pk5u1-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 30 Oct 2017 11:34:37 -0400
+Received: from localhost
+	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <akrowiak@linux.vnet.ibm.com>;
+	Mon, 30 Oct 2017 09:34:37 -0600
+References: <1507916344-3896-1-git-send-email-akrowiak@linux.vnet.ibm.com>
+	<20171029121122.122412ca.cohuck@redhat.com>
+	<e49b2898-a5b3-ff39-3c6e-b1708f1c8425@de.ibm.com>
+From: Tony Krowiak <akrowiak@linux.vnet.ibm.com>
+Date: Mon, 30 Oct 2017 11:34:25 -0400
 MIME-Version: 1.0
-In-Reply-To: <676bb129-8e09-1e83-7340-66c770d04537@amsat.org>
-References: <20171030040056.11780-1-f4bug@amsat.org>
-	<20171030082029.GY2993@localhost.localdomain>
-	<676bb129-8e09-1e83-7340-66c770d04537@amsat.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 30 Oct 2017 15:34:07 +0000
-Message-ID: <CAFEAcA-ceY6g2rWTdLK9VUUTh=ENPcy1CWAZ+xARr9YFva--pA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH] vl: only display available accelerators
+In-Reply-To: <e49b2898-a5b3-ff39-3c6e-b1708f1c8425@de.ibm.com>
+Content-Language: en-US
+Message-Id: <950a0a3b-f02d-bc9d-3edd-c381075f4e2d@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC 00/19] KVM: s390/crypto/vfio: guest dedicated
+ crypto adapters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,34 +45,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Thomas Huth <thuth@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Markus Armbruster <armbru@redhat.com>, Peter Xu <peterx@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, "Emilio G . Cota" <cota@braap.org>, Anthony Perard <anthony.perard@citrix.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, freude@de.ibm.com, schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com, kwankhede@nvidia.com, bjsdjshi@linux.vnet.ibm.com, pbonzini@redhat.com, alex.williamson@redhat.com, pmorel@linux.vnet.ibm.com, alifm@linux.vnet.ibm.com, mjrosato@linux.vnet.ibm.com, qemu-s390x@nongnu.org, jjherne@linux.vnet.ibm.com, thuth@redhat.com, pasic@linux.vnet.ibm.com, qemu-devel <qemu-devel@nongnu.org>, Erik Skultety <eskultet@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-On 30 October 2017 at 15:01, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> =
-wrote:
-> On 10/30/2017 05:20 AM, Eduardo Habkost wrote:
->> On Mon, Oct 30, 2017 at 01:00:56AM -0300, Philippe Mathieu-Daud=C3=A9 wr=
-ote:
->>>     - I don't think this is the nicest way, too much #ifdef'fery in mai=
-n()
+On 10/30/2017 04:57 AM, Christian Borntraeger wrote:
+> adding qemu devel and add Daniel and Erik from libvirt to keep them in the loop.
+>
+> On 10/29/2017 12:11 PM, Cornelia Huck wrote:
+>> On Fri, 13 Oct 2017 13:38:45 -0400
+>> Tony Krowiak <akrowiak@linux.vnet.ibm.com> wrote:
 >>
->> I suggest using object_class_get_list(TYPE_ACCEL, false).
+>>> Tony Krowiak (19):
+>>>    KVM: s390: SIE considerations for AP Queue virtualization
+>>>    KVM: s390: refactor crypto initialization
+>>>    s390/zcrypt: new AP matrix bus
+>>>    s390/zcrypt: create an AP matrix device on the AP matrix bus
+>>>    s390/zcrypt: base implementation of AP matrix device driver
+>>>    s390/zcrypt: register matrix device with VFIO mediated device
+>>>      framework
+>>>    KVM: s390: introduce AP matrix configuration interface
+>>>    s390/zcrypt: support for assigning adapters to matrix mdev
+>>>    s390/zcrypt: validate adapter assignment
+>>>    s390/zcrypt: sysfs interfaces supporting AP domain assignment
+>>>    s390/zcrypt: validate domain assignment
+>>>    s390/zcrypt: sysfs support for control domain assignment
+>>>    s390/zcrypt: validate control domain assignment
+>>>    KVM: s390: Connect the AP mediated matrix device to KVM
+>>>    s390/zcrypt: introduce ioctl access to VFIO AP Matrix driver
+>>>    KVM: s390: interface to configure KVM guest's AP matrix
+>>>    KVM: s390: validate input to AP matrix config interface
+>>>    KVM: s390: New ioctl to configure KVM guest's AP matrix
+>>>    s390/facilities: enable AP facilities needed by guest
+>> I'll try to summarize all of this in my own words, both to make sure I
+>> understand the design correctly and to give others a different view on
+>> this.
+>>
+>> [I'm completely disregarding control domains here.]
+>>
+>> On s390, we have cryptographic coprocessor cards, which are modeled on
+>> Linux as devices on the AP bus. There's also a concept called domains,
+>> which means an individual queue of a crypto device is basically a
+>> (card,domain) tuple. We model this something like the following
+>> (assuming we have access to cards 3 and 4 and domains 1 and 2):
+>>
+>> AP -> card3 -> queue (3,1)
+>>              -> queue (3,2)
+>>     -> card4 -> queue (4,1)
+>>              -> queue (4,2)
+>>
+>> (The AP bus is a bit different for backwards compat.)
+>>
+>> If we want to virtualize this, we can use a feature provided by the
+>> hardware. We basically attach a satellite control block to our main
+>> hardware virtualization control block and the hardware takes care of
+>> (mostly) everything.
+>>
+>> For this control block, we don't specify explicit tuples, but a list of
+>> cards and a list of domains. The guest will get access to the cross
+>> product.
+>>
+>> Because of this, we need to take care that the lists provided to
+>> different guests don't overlap; i.e., we need to enforce sane
+>> configurations. Otherwise, one guest may get access to things like
+>> secret keys for another guest.
+>>
+>> The idea of this patch set is to introduce a new device, the matrix
+>> device. This matrix device hangs off a different root and acts as the
+>> node where mdev devices hang off.
+>>
+>> If you now want to give the tuples (4,1) and (4,2), you need to do the
+>> following:
+>>
+>> - Unbind the (4,1) and (4,2) tuples from their ap bus driver.
+>> - Bind the (4,1) and (4,2) tuples to the ap matrix driver.
+>> - Create the mediated device.
+>> - Assign card 4 and domains 1 and 2.
+>>
+>> QEMU will now simply consume the mediated device and things should work.
+>>
+> This is probably the shortest possible summary I can imagine.
+> Tony can you double check if it matches your understanding as well?
 >
-> OK, this gives:
->
-> $ qemu-system-x86_64 -accel help
-> Possible accelerators:
->   xen
->   kvm
->   qtest
->
-> I was not aware of the qtest accel :)
-
-We should special-case that one out, as it's only intended to be
-used by our test cases. (In an ideal world we'd diagnose "you
-used '-accel qtest' but didn't also pass '-qtest something'
-to set up the communications channel with the test harness"
-better than just SIGTERMing. But it's test code :-))
-
-thanks
--- PMM
+Yes, this is a concise summary of the patch set.
