@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52083)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36437)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1e939R-0007rq-87
-	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 02:02:22 -0400
+	(envelope-from <jasowang@redhat.com>) id 1e94dm-0001eG-Gq
+	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 03:37:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1e939N-0000BH-4S
-	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 02:02:21 -0400
-Resent-Message-Id: <E1e939N-0000BH-4S@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21438)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1e939M-000055-TZ
-	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 02:02:17 -0400
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <150931529743.150.14757874647334408657@bafd83ae6430>
-In-Reply-To: <20171029212224.2777-1-pixo@polepetko.eu>
+	(envelope-from <jasowang@redhat.com>) id 1e94di-0005S8-HX
+	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 03:37:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60996)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1e94di-0005R9-8d
+	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 03:37:42 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 500ED5F7B2
+	for <qemu-devel@nongnu.org>; Mon, 30 Oct 2017 07:37:40 +0000 (UTC)
+References: <20171027085548.3472-1-berrange@redhat.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <92d471c6-2d30-01fe-ddfb-ca872d32f45b@redhat.com>
+Date: Mon, 30 Oct 2017 15:37:33 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Sun, 29 Oct 2017 15:14:58 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH] AMD Processor Topology Information
+In-Reply-To: <20171027085548.3472-1-berrange@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] net: detect errors from probing vnet hdr
+ flag for TAP devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,39 +34,239 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pixo@polepetko.eu
-Cc: famz@redhat.com, qemu-devel@nongnu.org
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtQQVRDSF0gQU1EIFByb2Nlc3NvciBUb3BvbG9neSBJbmZvcm1hdGlvbgpUeXBlOiBz
-ZXJpZXMKTWVzc2FnZS1pZDogMjAxNzEwMjkyMTIyMjQuMjc3Ny0xLXBpeG9AcG9sZXBldGtvLmV1
-Cgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRv
-dGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNv
-bmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5y
-ZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJB
-U0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4v
-JHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBz
-aG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFj
-ayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChu
-KzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5n
-IDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dp
-dGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgICAgICAg
-cGF0Y2hldy8yMDE3MTAyOTIxMjIyNC4yNzc3LTEtcGl4b0Bwb2xlcGV0a28uZXUgLT4gcGF0Y2hl
-dy8yMDE3MTAyOTIxMjIyNC4yNzc3LTEtcGl4b0Bwb2xlcGV0a28uZXUKU3dpdGNoZWQgdG8gYSBu
-ZXcgYnJhbmNoICd0ZXN0JwpiMTBlYTc0NzBkIEFNRCBQcm9jZXNzb3IgVG9wb2xvZ3kgSW5mb3Jt
-YXRpb24KCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMTogQU1EIFByb2Nl
-c3NvciBUb3BvbG9neSBJbmZvcm1hdGlvbi4uLgpFUlJPUjogc3BhY2UgcHJvaGliaXRlZCBiZWZv
-cmUgdGhhdCBjbG9zZSBwYXJlbnRoZXNpcyAnKScKIzI2OiBGSUxFOiB0YXJnZXQvaTM4Ni9jcHUu
-YzozMTE5OgorICAgICAgICAgICAgKmVieCA9IChjcy0+bnJfdGhyZWFkcyAtIDEgKSA8PCA4IHwg
-Y3B1LT5jb3JlX2lkOwoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM0NDogRklMRTog
-dGFyZ2V0L2kzODYvY3B1LmM6Mzc5NjoKKyAgICBpZiAoIUlTX0lOVEVMX0NQVShlbnYpICYmIGNz
-LT5ucl90aHJlYWRzID4gMSAmJiAhaHRfd2FybmVkICYmIChlbnYtPmNwdWlkX3ZlcnNpb24gJiAw
-eEZGMDBGMDApICE9IDB4ODAwRjAwKSB7Cgp0b3RhbDogMiBlcnJvcnMsIDAgd2FybmluZ3MsIDMw
-IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2
-aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0
-aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09
-PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0K
-RW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcu
-b3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlz
-dHMub3Jn
+
+
+On 2017=E5=B9=B410=E6=9C=8827=E6=97=A5 16:55, Daniel P. Berrange wrote:
+> When QEMU sets up a tap based network device backend, it mostly ignores=
+ errors
+> reported from various ioctl() calls it makes, assuming the TAP file des=
+criptor
+> is valid. This assumption can easily be violated when the user is passi=
+ng in a
+> pre-opened file descriptor. At best, the ioctls may fail with a -EBADF,=
+ but if
+> the user passes in a bogus FD number that happens to clash with a FD nu=
+mber that
+> QEMU has opened internally for another reason, a wide variety of errnos=
+ may
+> result, as the TUNGETIFF ioctl number may map to a completely different=
+ command
+> on a different type of file.
+>
+> By ignoring all these errors, QEMU sets up a zombie network backend tha=
+t will
+> never pass any data. Even worse, when QEMU shuts down, or that network =
+backend
+> is hot-removed, it will close this bogus file descriptor, which could b=
+elong to
+> another QEMU device backend.
+>
+> There's no obvious guaranteed reliable way to detect that a FD genuinel=
+y is a
+> TAP device, as opposed to a UNIX socket, or pipe, or something else. Ch=
+ecking
+> the errno from probing vnet hdr flag though, does catch the big common =
+cases.
+> ie calling TUNGETIFF will return EBADF for an invalid FD, and ENOTTY wh=
+en FD is
+> a UNIX socket, or pipe which catches accidental collisions with FDs use=
+d for
+> stdio, or monitor socket.
+>
+> Previously the example below where bogus fd 9 collides with the FD used=
+ for the
+> chardev saw:
+>
+> $ ./x86_64-softmmu/qemu-system-x86_64 -netdev tap,id=3Dhostnet0,fd=3D9 =
+\
+>    -chardev socket,id=3Dcharchannel0,path=3D/tmp/qga,server,nowait \
+>    -monitor stdio -vnc :0
+> qemu-system-x86_64: -netdev tap,id=3Dhostnet0,fd=3D9: TUNGETIFF ioctl()=
+ failed: Inappropriate ioctl for device
+> TUNSETOFFLOAD ioctl() failed: Bad address
+> QEMU 2.9.1 monitor - type 'help' for more information
+> (qemu) Warning: netdev hostnet0 has no peer
+>
+> which gives a running QEMU with a zombie network backend.
+>
+> With this change applied we get an error message and QEMU immediately e=
+xits
+> before carrying on and making a bigger disaster:
+>
+> $ ./x86_64-softmmu/qemu-system-x86_64 -netdev tap,id=3Dhostnet0,fd=3D9 =
+\
+>    -chardev socket,id=3Dcharchannel0,path=3D/tmp/qga,server,nowait \
+>    -monitor stdio -vnc :0
+> qemu-system-x86_64: -netdev tap,id=3Dhostnet0,vhost=3Don,fd=3D9: Unable=
+ to query TUNGETIFF on FD 9: Inappropriate ioctl for device
+>
+> Reported-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> ---
+>   net/tap-bsd.c     |  2 +-
+>   net/tap-linux.c   | 12 +++++++++---
+>   net/tap-solaris.c |  2 +-
+>   net/tap-stub.c    |  2 +-
+>   net/tap.c         | 25 ++++++++++++++++++++-----
+>   net/tap_int.h     |  2 +-
+>   6 files changed, 33 insertions(+), 12 deletions(-)
+>
+> diff --git a/net/tap-bsd.c b/net/tap-bsd.c
+> index 6c9692263d..4f1d633b08 100644
+> --- a/net/tap-bsd.c
+> +++ b/net/tap-bsd.c
+> @@ -211,7 +211,7 @@ void tap_set_sndbuf(int fd, const NetdevTapOptions =
+*tap, Error **errp)
+>   {
+>   }
+>  =20
+> -int tap_probe_vnet_hdr(int fd)
+> +int tap_probe_vnet_hdr(int fd, Error **errp)
+>   {
+>       return 0;
+>   }
+> diff --git a/net/tap-linux.c b/net/tap-linux.c
+> index 535b1ddb61..de74928407 100644
+> --- a/net/tap-linux.c
+> +++ b/net/tap-linux.c
+> @@ -147,13 +147,19 @@ void tap_set_sndbuf(int fd, const NetdevTapOption=
+s *tap, Error **errp)
+>       }
+>   }
+>  =20
+> -int tap_probe_vnet_hdr(int fd)
+> +int tap_probe_vnet_hdr(int fd, Error **errp)
+>   {
+>       struct ifreq ifr;
+>  =20
+>       if (ioctl(fd, TUNGETIFF, &ifr) !=3D 0) {
+> -        error_report("TUNGETIFF ioctl() failed: %s", strerror(errno));
+> -        return 0;
+> +        /* Kernel pre-dates TUNGETIFF support */
+> +        if (errno =3D=3D -EINVAL) {
+> +            return 0;
+
+This looks still unsafe, e.g some other device may return -EINVAL too.
+
+Is this better to check stat.st_rdev through fstat()?
+
+Thanks
+
+> +        } else {
+> +            error_setg_errno(errp, errno,
+> +                             "Unable to query TUNGETIFF on FD %d", fd)=
+;
+> +            return -1;
+> +        }
+>       }
+>  =20
+>       return ifr.ifr_flags & IFF_VNET_HDR;
+> diff --git a/net/tap-solaris.c b/net/tap-solaris.c
+> index a2a92356c1..3437838a92 100644
+> --- a/net/tap-solaris.c
+> +++ b/net/tap-solaris.c
+> @@ -206,7 +206,7 @@ void tap_set_sndbuf(int fd, const NetdevTapOptions =
+*tap, Error **errp)
+>   {
+>   }
+>  =20
+> -int tap_probe_vnet_hdr(int fd)
+> +int tap_probe_vnet_hdr(int fd, Error **errp)
+>   {
+>       return 0;
+>   }
+> diff --git a/net/tap-stub.c b/net/tap-stub.c
+> index a9ab8f8293..de525a2e69 100644
+> --- a/net/tap-stub.c
+> +++ b/net/tap-stub.c
+> @@ -37,7 +37,7 @@ void tap_set_sndbuf(int fd, const NetdevTapOptions *t=
+ap, Error **errp)
+>   {
+>   }
+>  =20
+> -int tap_probe_vnet_hdr(int fd)
+> +int tap_probe_vnet_hdr(int fd, Error **errp)
+>   {
+>       return 0;
+>   }
+> diff --git a/net/tap.c b/net/tap.c
+> index 979e622e60..763fd2d9b2 100644
+> --- a/net/tap.c
+> +++ b/net/tap.c
+> @@ -592,7 +592,11 @@ int net_init_bridge(const Netdev *netdev, const ch=
+ar *name,
+>       }
+>  =20
+>       fcntl(fd, F_SETFL, O_NONBLOCK);
+> -    vnet_hdr =3D tap_probe_vnet_hdr(fd);
+> +    vnet_hdr =3D tap_probe_vnet_hdr(fd, errp);
+> +    if (vnet_hdr < 0) {
+> +        close(fd);
+> +        return -1;
+> +    }
+>       s =3D net_tap_fd_init(peer, "bridge", name, fd, vnet_hdr);
+>  =20
+>       snprintf(s->nc.info_str, sizeof(s->nc.info_str), "helper=3D%s,br=3D=
+%s", helper,
+> @@ -779,7 +783,11 @@ int net_init_tap(const Netdev *netdev, const char =
+*name,
+>  =20
+>           fcntl(fd, F_SETFL, O_NONBLOCK);
+>  =20
+> -        vnet_hdr =3D tap_probe_vnet_hdr(fd);
+> +        vnet_hdr =3D tap_probe_vnet_hdr(fd, errp);
+> +        if (vnet_hdr < 0) {
+> +            close(fd);
+> +            return -1;
+> +        }
+>  =20
+>           net_init_tap_one(tap, peer, "tap", name, NULL,
+>                            script, downscript,
+> @@ -825,8 +833,11 @@ int net_init_tap(const Netdev *netdev, const char =
+*name,
+>               fcntl(fd, F_SETFL, O_NONBLOCK);
+>  =20
+>               if (i =3D=3D 0) {
+> -                vnet_hdr =3D tap_probe_vnet_hdr(fd);
+> -            } else if (vnet_hdr !=3D tap_probe_vnet_hdr(fd)) {
+> +                vnet_hdr =3D tap_probe_vnet_hdr(fd, errp);
+> +                if (vnet_hdr < 0) {
+> +                    goto free_fail;
+> +                }
+> +            } else if (vnet_hdr !=3D tap_probe_vnet_hdr(fd, NULL)) {
+>                   error_setg(errp,
+>                              "vnet_hdr not consistent across given tap =
+fds");
+>                   goto free_fail;
+> @@ -870,7 +881,11 @@ free_fail:
+>           }
+>  =20
+>           fcntl(fd, F_SETFL, O_NONBLOCK);
+> -        vnet_hdr =3D tap_probe_vnet_hdr(fd);
+> +        vnet_hdr =3D tap_probe_vnet_hdr(fd, errp);
+> +        if (vnet_hdr < 0) {
+> +            close(fd);
+> +            return -1;
+> +        }
+>  =20
+>           net_init_tap_one(tap, peer, "bridge", name, ifname,
+>                            script, downscript, vhostfdname,
+> diff --git a/net/tap_int.h b/net/tap_int.h
+> index ae6888f74a..0d13768615 100644
+> --- a/net/tap_int.h
+> +++ b/net/tap_int.h
+> @@ -35,7 +35,7 @@ int tap_open(char *ifname, int ifname_size, int *vnet=
+_hdr,
+>   ssize_t tap_read_packet(int tapfd, uint8_t *buf, int maxlen);
+>  =20
+>   void tap_set_sndbuf(int fd, const NetdevTapOptions *tap, Error **errp=
+);
+> -int tap_probe_vnet_hdr(int fd);
+> +int tap_probe_vnet_hdr(int fd, Error **errp);
+>   int tap_probe_vnet_hdr_len(int fd, int len);
+>   int tap_probe_has_ufo(int fd);
+>   void tap_fd_set_offload(int fd, int csum, int tso4, int tso6, int ecn=
+, int ufo);
