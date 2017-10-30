@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35125)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35649)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e96oi-00069K-3Q
-	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 05:57:12 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1e96qX-0006nM-QI
+	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 05:59:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e96oh-0002HQ-8N
-	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 05:57:12 -0400
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:55466)
+	(envelope-from <peter.maydell@linaro.org>) id 1e96qX-0003L6-6U
+	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 05:59:05 -0400
+Received: from mail-wm0-x230.google.com ([2a00:1450:400c:c09::230]:45330)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1e96oh-0002H0-1O
-	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 05:57:11 -0400
-Received: by mail-wr0-x244.google.com with SMTP id l8so11877500wre.12
-	for <qemu-devel@nongnu.org>; Mon, 30 Oct 2017 02:57:10 -0700 (PDT)
+	id 1e96qX-0003K9-00
+	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 05:59:05 -0400
+Received: by mail-wm0-x230.google.com with SMTP id y80so7777155wmd.0
+	for <qemu-devel@nongnu.org>; Mon, 30 Oct 2017 02:59:04 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20171030032521.2441-1-f4bug@amsat.org>
-References: <08178b4217d1692297b8c9620b6d13a80bfb6822.1509175660.git.alistair.francis@xilinx.com>
-	<20171030032521.2441-1-f4bug@amsat.org>
+In-Reply-To: <1508898544-10307-1-git-send-email-sundeep.lkml@gmail.com>
+References: <1508898544-10307-1-git-send-email-sundeep.lkml@gmail.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 30 Oct 2017 09:56:49 +0000
-Message-ID: <CAFEAcA-bwavBtd0Xe2gYtY3pWjHjrccAtUNfiSD2w4xt7PbrCA@mail.gmail.com>
+Date: Mon, 30 Oct 2017 09:58:43 +0000
+Message-ID: <CAFEAcA8yX6QKngPT8sbssDo+UOsH9cyCshrXigMkwTk2uoNWmw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3] xlnx-zcu102: Specify the number of max
- CPUs
+Subject: Re: [Qemu-devel] [Qemu devel V4 PATCH] msf2: Remove dead code
+ reported by Coverity
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,43 +29,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Alistair Francis <alistair23@gmail.com>
+To: Subbaraya Sundeep <sundeep.lkml@gmail.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alistair Francis <alistair23@gmail.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, darren.kenny@oracle.com
 
-On 30 October 2017 at 03:25, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> =
-wrote:
-> From: Alistair Francis <alistair.francis@xilinx.com>
+On 25 October 2017 at 03:29, Subbaraya Sundeep <sundeep.lkml@gmail.com> wrote:
+> Fixed incorrect frame size mask, validated maximum frame
+> size in spi_write and removed dead code.
 >
-> Specify the number of CPUs that can run on ZynqMP.
->
-> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> Tested-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> Signed-off-by: Subbaraya Sundeep <sundeep.lkml@gmail.com>
 > ---
-> V3:
->  - Fix my ASCII noncompliant last name in Reviewed-by tag :(
->  - added Tested-by for what it's worth
+> v4:
+>         changed %d to %u while logging frame size error.
+> v3:
+>         Added comment that [31:6] bits are reserved in R_SPI_DFSIZE
+>         register and logged incorrect value too in guest error(suggested
+>         by Darren).
+> v2:
+>         else if -> else in set_fifodepth
+>         log guest error when frame size is more than 32
 >
-> V2:
->  - Use macros
+>  hw/ssi/mss-spi.c | 18 ++++++++++++++----
+>  1 file changed, 14 insertions(+), 4 deletions(-)
 >
->  hw/arm/xlnx-zcu102.c | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/hw/arm/xlnx-zcu102.c b/hw/arm/xlnx-zcu102.c
-> index 519a16ed98..e2d15a1c9d 100644
-> --- a/hw/arm/xlnx-zcu102.c
-> +++ b/hw/arm/xlnx-zcu102.c
-> @@ -240,6 +240,7 @@ static void xlnx_zcu102_machine_class_init(ObjectClas=
-s *oc, void *data)
->      mc->block_default_type =3D IF_IDE;
->      mc->units_per_default_bus =3D 1;
->      mc->ignore_memory_transaction_failures =3D true;
-> +    mc->max_cpus =3D XLNX_ZYNQMP_NUM_APU_CPUS + XLNX_ZYNQMP_NUM_RPU_CPUS=
-;
->  }
->
->  static const TypeInfo xlnx_zcu102_machine_init_typeinfo =3D {
+
 
 
 Applied to target-arm.next, thanks.
