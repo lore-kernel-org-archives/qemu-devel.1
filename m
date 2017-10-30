@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36437)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38161)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1e94dm-0001eG-Gq
-	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 03:37:47 -0400
+	(envelope-from <mattator@gmail.com>) id 1e94pQ-0003fR-K4
+	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 03:49:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1e94di-0005S8-HX
-	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 03:37:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60996)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1e94di-0005R9-8d
-	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 03:37:42 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 500ED5F7B2
-	for <qemu-devel@nongnu.org>; Mon, 30 Oct 2017 07:37:40 +0000 (UTC)
-References: <20171027085548.3472-1-berrange@redhat.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <92d471c6-2d30-01fe-ddfb-ca872d32f45b@redhat.com>
-Date: Mon, 30 Oct 2017 15:37:33 +0800
+	(envelope-from <mattator@gmail.com>) id 1e94pP-0005Dq-AN
+	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 03:49:48 -0400
+Received: from mail-yw0-x234.google.com ([2607:f8b0:4002:c05::234]:48965)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mattator@gmail.com>) id 1e94pP-0005Dd-48
+	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 03:49:47 -0400
+Received: by mail-yw0-x234.google.com with SMTP id q1so10752817ywh.5
+	for <qemu-devel@nongnu.org>; Mon, 30 Oct 2017 00:49:46 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20171027085548.3472-1-berrange@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] net: detect errors from probing vnet hdr
- flag for TAP devices
+In-Reply-To: <0cf277479d9f46939d0eb18b7bdc46c8@EXCHCS32.ornl.gov>
+References: <CADHp1NwU=HowMfgBGtcwnY25v_fL6qZ2gd469a2oZY+QQi2uFw@mail.gmail.com>
+	<20171019205409.GA4170@flamenco>
+	<545610a4882f4c5494b30b7eab66b984@EXCHCS32.ornl.gov>
+	<CADHp1NxzGr_ijvGrUbmZf0NuUv+JwJZeA=8h4tZNn++SBA1yUw@mail.gmail.com>
+	<0cf277479d9f46939d0eb18b7bdc46c8@EXCHCS32.ornl.gov>
+From: Matt <mattator@gmail.com>
+Date: Mon, 30 Oct 2017 16:49:45 +0900
+Message-ID: <CADHp1NyfO3OeUs4tuCGgiAt6Ksfm+s4d6Y+HVqxStKYgnzhL2g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] Running Qemu in discrete time/step by step
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,239 +31,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: "Nutaro, James J." <nutarojj@ornl.gov>
+Cc: "Emilio G. Cota" <cota@braap.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Hajime Tazaki <tazaki@wide.ad.jp>
 
+Within the context of a simulator, qemu runs with a limited set of
+devices so that removes some indeterminism but not all I guess.
 
+VMsimint boasts exact reproducibility because they control all
+outputs/inputs. I tried to look into their patch but the patch is
+empty and instead there seems to be the partial (full ?) tree of qemu
+1.6.
+I suspect this might be quite some work to port this to the latest
+qemu. It's sad because I really like the approach :)
+(qemu changes in the latest archive of
+http://www.ikr.uni-stuttgart.de/Content/IKRSimLib/Download/)
 
-On 2017=E5=B9=B410=E6=9C=8827=E6=97=A5 16:55, Daniel P. Berrange wrote:
-> When QEMU sets up a tap based network device backend, it mostly ignores=
- errors
-> reported from various ioctl() calls it makes, assuming the TAP file des=
-criptor
-> is valid. This assumption can easily be violated when the user is passi=
-ng in a
-> pre-opened file descriptor. At best, the ioctls may fail with a -EBADF,=
- but if
-> the user passes in a bogus FD number that happens to clash with a FD nu=
-mber that
-> QEMU has opened internally for another reason, a wide variety of errnos=
- may
-> result, as the TUNGETIFF ioctl number may map to a completely different=
- command
-> on a different type of file.
->
-> By ignoring all these errors, QEMU sets up a zombie network backend tha=
-t will
-> never pass any data. Even worse, when QEMU shuts down, or that network =
-backend
-> is hot-removed, it will close this bogus file descriptor, which could b=
-elong to
-> another QEMU device backend.
->
-> There's no obvious guaranteed reliable way to detect that a FD genuinel=
-y is a
-> TAP device, as opposed to a UNIX socket, or pipe, or something else. Ch=
-ecking
-> the errno from probing vnet hdr flag though, does catch the big common =
-cases.
-> ie calling TUNGETIFF will return EBADF for an invalid FD, and ENOTTY wh=
-en FD is
-> a UNIX socket, or pipe which catches accidental collisions with FDs use=
-d for
-> stdio, or monitor socket.
->
-> Previously the example below where bogus fd 9 collides with the FD used=
- for the
-> chardev saw:
->
-> $ ./x86_64-softmmu/qemu-system-x86_64 -netdev tap,id=3Dhostnet0,fd=3D9 =
-\
->    -chardev socket,id=3Dcharchannel0,path=3D/tmp/qga,server,nowait \
->    -monitor stdio -vnc :0
-> qemu-system-x86_64: -netdev tap,id=3Dhostnet0,fd=3D9: TUNGETIFF ioctl()=
- failed: Inappropriate ioctl for device
-> TUNSETOFFLOAD ioctl() failed: Bad address
-> QEMU 2.9.1 monitor - type 'help' for more information
-> (qemu) Warning: netdev hostnet0 has no peer
->
-> which gives a running QEMU with a zombie network backend.
->
-> With this change applied we get an error message and QEMU immediately e=
-xits
-> before carrying on and making a bigger disaster:
->
-> $ ./x86_64-softmmu/qemu-system-x86_64 -netdev tap,id=3Dhostnet0,fd=3D9 =
-\
->    -chardev socket,id=3Dcharchannel0,path=3D/tmp/qga,server,nowait \
->    -monitor stdio -vnc :0
-> qemu-system-x86_64: -netdev tap,id=3Dhostnet0,vhost=3Don,fd=3D9: Unable=
- to query TUNGETIFF on FD 9: Inappropriate ioctl for device
->
-> Reported-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> ---
->   net/tap-bsd.c     |  2 +-
->   net/tap-linux.c   | 12 +++++++++---
->   net/tap-solaris.c |  2 +-
->   net/tap-stub.c    |  2 +-
->   net/tap.c         | 25 ++++++++++++++++++++-----
->   net/tap_int.h     |  2 +-
->   6 files changed, 33 insertions(+), 12 deletions(-)
->
-> diff --git a/net/tap-bsd.c b/net/tap-bsd.c
-> index 6c9692263d..4f1d633b08 100644
-> --- a/net/tap-bsd.c
-> +++ b/net/tap-bsd.c
-> @@ -211,7 +211,7 @@ void tap_set_sndbuf(int fd, const NetdevTapOptions =
-*tap, Error **errp)
->   {
->   }
->  =20
-> -int tap_probe_vnet_hdr(int fd)
-> +int tap_probe_vnet_hdr(int fd, Error **errp)
->   {
->       return 0;
->   }
-> diff --git a/net/tap-linux.c b/net/tap-linux.c
-> index 535b1ddb61..de74928407 100644
-> --- a/net/tap-linux.c
-> +++ b/net/tap-linux.c
-> @@ -147,13 +147,19 @@ void tap_set_sndbuf(int fd, const NetdevTapOption=
-s *tap, Error **errp)
->       }
->   }
->  =20
-> -int tap_probe_vnet_hdr(int fd)
-> +int tap_probe_vnet_hdr(int fd, Error **errp)
->   {
->       struct ifreq ifr;
->  =20
->       if (ioctl(fd, TUNGETIFF, &ifr) !=3D 0) {
-> -        error_report("TUNGETIFF ioctl() failed: %s", strerror(errno));
-> -        return 0;
-> +        /* Kernel pre-dates TUNGETIFF support */
-> +        if (errno =3D=3D -EINVAL) {
-> +            return 0;
+I guess I will stick to DCE with the hope that qemu considers the
+usecase and make it easier.
 
-This looks still unsafe, e.g some other device may return -EINVAL too.
+Cheers
 
-Is this better to check stat.st_rdev through fstat()?
-
-Thanks
-
-> +        } else {
-> +            error_setg_errno(errp, errno,
-> +                             "Unable to query TUNGETIFF on FD %d", fd)=
-;
-> +            return -1;
-> +        }
->       }
->  =20
->       return ifr.ifr_flags & IFF_VNET_HDR;
-> diff --git a/net/tap-solaris.c b/net/tap-solaris.c
-> index a2a92356c1..3437838a92 100644
-> --- a/net/tap-solaris.c
-> +++ b/net/tap-solaris.c
-> @@ -206,7 +206,7 @@ void tap_set_sndbuf(int fd, const NetdevTapOptions =
-*tap, Error **errp)
->   {
->   }
->  =20
-> -int tap_probe_vnet_hdr(int fd)
-> +int tap_probe_vnet_hdr(int fd, Error **errp)
->   {
->       return 0;
->   }
-> diff --git a/net/tap-stub.c b/net/tap-stub.c
-> index a9ab8f8293..de525a2e69 100644
-> --- a/net/tap-stub.c
-> +++ b/net/tap-stub.c
-> @@ -37,7 +37,7 @@ void tap_set_sndbuf(int fd, const NetdevTapOptions *t=
-ap, Error **errp)
->   {
->   }
->  =20
-> -int tap_probe_vnet_hdr(int fd)
-> +int tap_probe_vnet_hdr(int fd, Error **errp)
->   {
->       return 0;
->   }
-> diff --git a/net/tap.c b/net/tap.c
-> index 979e622e60..763fd2d9b2 100644
-> --- a/net/tap.c
-> +++ b/net/tap.c
-> @@ -592,7 +592,11 @@ int net_init_bridge(const Netdev *netdev, const ch=
-ar *name,
->       }
->  =20
->       fcntl(fd, F_SETFL, O_NONBLOCK);
-> -    vnet_hdr =3D tap_probe_vnet_hdr(fd);
-> +    vnet_hdr =3D tap_probe_vnet_hdr(fd, errp);
-> +    if (vnet_hdr < 0) {
-> +        close(fd);
-> +        return -1;
-> +    }
->       s =3D net_tap_fd_init(peer, "bridge", name, fd, vnet_hdr);
->  =20
->       snprintf(s->nc.info_str, sizeof(s->nc.info_str), "helper=3D%s,br=3D=
-%s", helper,
-> @@ -779,7 +783,11 @@ int net_init_tap(const Netdev *netdev, const char =
-*name,
->  =20
->           fcntl(fd, F_SETFL, O_NONBLOCK);
->  =20
-> -        vnet_hdr =3D tap_probe_vnet_hdr(fd);
-> +        vnet_hdr =3D tap_probe_vnet_hdr(fd, errp);
-> +        if (vnet_hdr < 0) {
-> +            close(fd);
-> +            return -1;
-> +        }
->  =20
->           net_init_tap_one(tap, peer, "tap", name, NULL,
->                            script, downscript,
-> @@ -825,8 +833,11 @@ int net_init_tap(const Netdev *netdev, const char =
-*name,
->               fcntl(fd, F_SETFL, O_NONBLOCK);
->  =20
->               if (i =3D=3D 0) {
-> -                vnet_hdr =3D tap_probe_vnet_hdr(fd);
-> -            } else if (vnet_hdr !=3D tap_probe_vnet_hdr(fd)) {
-> +                vnet_hdr =3D tap_probe_vnet_hdr(fd, errp);
-> +                if (vnet_hdr < 0) {
-> +                    goto free_fail;
-> +                }
-> +            } else if (vnet_hdr !=3D tap_probe_vnet_hdr(fd, NULL)) {
->                   error_setg(errp,
->                              "vnet_hdr not consistent across given tap =
-fds");
->                   goto free_fail;
-> @@ -870,7 +881,11 @@ free_fail:
->           }
->  =20
->           fcntl(fd, F_SETFL, O_NONBLOCK);
-> -        vnet_hdr =3D tap_probe_vnet_hdr(fd);
-> +        vnet_hdr =3D tap_probe_vnet_hdr(fd, errp);
-> +        if (vnet_hdr < 0) {
-> +            close(fd);
-> +            return -1;
-> +        }
->  =20
->           net_init_tap_one(tap, peer, "bridge", name, ifname,
->                            script, downscript, vhostfdname,
-> diff --git a/net/tap_int.h b/net/tap_int.h
-> index ae6888f74a..0d13768615 100644
-> --- a/net/tap_int.h
-> +++ b/net/tap_int.h
-> @@ -35,7 +35,7 @@ int tap_open(char *ifname, int ifname_size, int *vnet=
-_hdr,
->   ssize_t tap_read_packet(int tapfd, uint8_t *buf, int maxlen);
->  =20
->   void tap_set_sndbuf(int fd, const NetdevTapOptions *tap, Error **errp=
-);
-> -int tap_probe_vnet_hdr(int fd);
-> +int tap_probe_vnet_hdr(int fd, Error **errp);
->   int tap_probe_vnet_hdr_len(int fd, int len);
->   int tap_probe_has_ufo(int fd);
->   void tap_fd_set_offload(int fd, int csum, int tso4, int tso6, int ecn=
-, int ufo);
+2017-10-24 6:33 GMT+09:00 Nutaro, James J. <nutarojj@ornl.gov>:
+> I don't expect exact repeatability, but I haven't tested for it either. The machinery that prevents repeatability with replay will probably have the same effect in the adevs/qemu simulator.
+>
+> -----Original Message-----
+> From: Matt [mailto:mattator@gmail.com]
+> Sent: Monday, October 23, 2017 5:38 AM
+> To: Nutaro, James J.
+> Cc: Emilio G. Cota; qemu-devel@nongnu.org; Hajime Tazaki
+> Subject: Re: [Qemu-devel] Running Qemu in discrete time/step by step
+>
+> I did not know about Qemu's record/replay mode which is an interesting
+> feature but unneeded if a  2nd qemu run with the same inputs generated
+> the same outputs (as it's the case with DCE).
+> @nutaro Thanks for the updated patch. I will have a look at adevs. On
+> a related note https://github.com/qemu/qemu/blob/master/docs/replay.txt
+> enumerates different sources of indeterminism
+> ==
+> Replaying of the execution of virtual machine is bound by sources of
+> non-determinism. These are inputs from clock and peripheral devices,
+> and QEMU thread scheduling. Thread scheduling affect on processing events
+> from timers, asynchronous input-output, and bottom halves.
+> ==
+>
+> Do you manage to achieve perfect reproducibility with adevs + qemu ?
+> If yes, is there any publication describing how you achieve this ?
+>
+> Best regards
+> matt
+>
+> 2017-10-21 0:02 GMT+09:00 Nutaro, James J. <nutarojj@ornl.gov>:
+>> Thanks for taking a look at the patch. The most recent version of the patch will also work with KVM if you need to speed things up. You can find it here:
+>>
+>> https://patchwork.kernel.org/patch/9960369/
+>>
+>> Somehow I messed up that post and it shows V8 when it should be V9.
+>>
+>> You can get the simulator that it works with at
+>>
+>> https://sourceforge.net/projects/adevs/
+>>
+>> If nothing else, this simulator would give you a blue print for integration with another tool.
+>>
+>> Jim
+>>
+>> -----Original Message-----
+>> From: Emilio G. Cota [mailto:cota@braap.org]
+>> Sent: Thursday, October 19, 2017 4:54 PM
+>> To: Matt
+>> Cc: qemu-devel@nongnu.org; Hajime Tazaki; Nutaro, James J.
+>> Subject: Re: [Qemu-devel] Running Qemu in discrete time/step by step
+>>
+>> On Thu, Oct 19, 2017 at 14:14:12 +0900, Matt wrote:
+>> (snip)
+>>> - VMSimint does nearly that, it runs Qemu in discrete time but
+>>> interface it with a JAVA simulator
+>>> http://www.ikr.uni-stuttgart.de/Content/Publications/Archive/We_SIMUTools_2014_40209.pdf
+>>> (with the code http://www.ikr.uni-stuttgart.de/Content/IKRSimLib/Download/)
+>>> - http://web.ornl.gov/~nutarojj/adevs/ does sthg similar too
+>>
+>> Nutaro's work to interface with QEMU has been posted on the list:
+>>   https://patchwork.kernel.org/patch/9572497/
+>> I'm Cc'ing him in case he's not subscribed to the list.
+>>
+>>
+>>> My questions would be:
+>>> 1/ do you know of any other related work ?
+>>
+>> Is QEMU's record/replay mode of any use to you? Note that as is the
+>> case with Nutaro's patch, you'll need icount mode (i.e. single-core)
+>> enabled.
+>>
+>>> 2/ I believe there is interest from the research side but would it be
+>>> possible to merge either approach or a similar one (adevs patch
+>>> doesn't seem too big ~500 lines), would that be of interest for the
+>>> Qemu comminity too ?
+>>> 3/ if yes to 2. How to proceed, which one would be favorite ? if no,
+>>> what should be improved ? or would that be a definitive no ?
+>>
+>> I think the adevs approach is reasonable. The patch hasn't gotten much
+>> attention I guess because not many people care about this feature.
+>> But if you could review the patch and certify that it works for you
+>> (i.e. it works with simulators other than adevs), that could only help
+>> the patch getting in.
+>>
+>> That said, I make no merging decisions so take this as just my opinion.
+>>
+>> Cheers,
+>>
+>>                 Emilio
+>>
+>
