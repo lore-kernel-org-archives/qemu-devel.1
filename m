@@ -1,32 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42721)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43105)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1e9EfK-0003yH-FX
-	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 14:20:06 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1e9Eh0-0004sz-0n
+	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 14:21:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1e9EfH-0003Fo-Aq
-	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 14:20:02 -0400
-Received: from chuckie.co.uk ([82.165.15.123]:45640
-	helo=s16892447.onlinehome-server.info)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1e9EfH-0003FX-3b
-	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 14:19:59 -0400
-References: <1508947167-5304-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<1508947167-5304-10-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<CAFEAcA8DGeoNWxr9Y-vRXmtR5=7+EMQqfpt5cs7x2qTcfRZR4Q@mail.gmail.com>
-	<98d12504-4523-2a5c-aefa-4b01e1c6c7df@ilande.co.uk>
-	<a169c6f0-4a82-cd3c-7f83-0a6394c06e98@ilande.co.uk>
-	<CAFEAcA9u3kw6LnwE3ZnExdcmMM42AuycnLOppiX7wXdeKk5hcw@mail.gmail.com>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <ef818927-9c2e-37cd-91a1-8b5bf40ad8e1@ilande.co.uk>
-Date: Mon, 30 Oct 2017 18:19:45 +0000
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1e9Egw-00044i-Lj
+	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 14:21:46 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Date: Mon, 30 Oct 2017 15:20:21 -0300
+Message-Id: <20171030182021.2175-1-f4bug@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9u3kw6LnwE3ZnExdcmMM42AuycnLOppiX7wXdeKk5hcw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCHv4 09/13] lance: move TYPE_LANCE and
- SysBusPCNetState from lance.c to lance.h
+Subject: [Qemu-devel] [PATCH RESEND] vl: only display available accelerators
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,55 +24,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Jason Wang <jasowang@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Artyom Tarasenko <atar4qemu@gmail.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Peter Xu <peterx@redhat.com>, Markus Armbruster <armbru@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, "Emilio G . Cota" <cota@braap.org>, Eric Blake <eblake@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On 30/10/17 13:22, Peter Maydell wrote:
+examples configuring with '--enable-kvm --disable-tcg'
 
-> On 30 October 2017 at 13:10, Mark Cave-Ayland
-> <mark.cave-ayland@ilande.co.uk> wrote:
->> On 26/10/17 11:12, Mark Cave-Ayland wrote:
->>> On 25/10/17 18:47, Peter Maydell wrote:
->>>> On 25 October 2017 at 16:59, Mark Cave-Ayland wrote:
->>>>> --- /dev/null
->>>>> +++ b/include/hw/net/lance.h
->>>>> @@ -0,0 +1,41 @@
->>>>> +/*
->>>>> + * QEMU AMD PC-Net II (Am79C970A) emulation
->>>>
->>>> Filename says this is Lance ethernet, but the comment says it's PC-Net ?
->>>
->>> According to the datasheet for Am79C970A, the original Lance is an
->>> Am7990 device and the Am79C970A aka PCNet-PCI II as emulated by QEMU is
->>> register-compatible with it.
->>>
->>> I guess the comment above is more technically correct, but I'm happy to
->>> adjust it in my local tree if you still feel it needs to change?
-> 
-> I think we should have a comment that says what the file is
-> for. Since this is a different file from pcnet.h, we should
-> have a comment that isn't the same as the pcnet.h one.
-> I don't particularly mind what it says, as long as it briefly
-> explains what's in the file (and by implication what distinguishes
-> things in this file from things in the other).
+- before
 
-Okay then how about something along the lines of:
+  $ qemu-system-x86_64 -accel help
+  Possible accelerators: kvm, xen, hax, tcg
 
- * QEMU Lance (Am7990) device emulation
- *
- * Copyright (c) 2004 Antony T Curtis
- * Copyright (c) 2017 Mark Cave-Ayland
- *
- * This represents the Sparc32 lance (Am7990) ethernet device which is
- * an earlier register-compatible member of the AMD PC-Net II
- * (Am79C970A) family.
+  $ qemu-system-x86_64 -accel tcg
+  qemu-system-x86_64: -machine accel=tcg: No accelerator found
 
-In reality pcnet.c/pcnet.h are just the inner workings of the pcnet-pci
-and lance devices. The comments in pcnet-pci.c and lance.c are identical
-except for the Sparc32 reference and it was the same header from
-pcnet-pci.c that I used as the basis for my last patch.
+  # qemu-system-x86_64 -accel hax
+  qemu-system-x86_64: -machine accel=hax: No accelerator found
 
+- after
 
-ATB,
+  $ qemu-system-x86_64 -accel help
+  Possible accelerators:
+    xen
+    kvm
 
-Mark.
+Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+resend without RFC in subject...
+
+since RFC:
+  - use much cleaner object_class_get_list(TYPE_ACCEL, false)
+
+ vl.c | 39 ++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 34 insertions(+), 5 deletions(-)
+
+diff --git a/vl.c b/vl.c
+index ec299099ff..0f13641715 100644
+--- a/vl.c
++++ b/vl.c
+@@ -2764,6 +2764,39 @@ static gint machine_class_cmp(gconstpointer a, gconstpointer b)
+     exit(!name || !is_help_option(name));
+ }
+ 
++static void accel_list_entry(gpointer data, gpointer user_data)
++{
++    ObjectClass *oc = data;
++    const char *typename = object_class_get_name(oc);
++    int len;
++
++    if (!qtest_driver() && !g_strcmp0(typename, ACCEL_CLASS_NAME("qtest"))) {
++        return; /* used by test cases */
++    }
++
++    len = strlen(typename) - strlen("-" TYPE_ACCEL);
++    if (len > 0) {
++        error_printf("  %.*s\n", len, typename);
++    }
++}
++
++static void accel_parse(const char *name, QemuOpts *accel_opts)
++{
++    const char *optarg = qemu_opt_get(accel_opts, "accel");
++    GSList *list;
++
++    if (!is_help_option(optarg)) {
++        return;
++    }
++
++    list = object_class_get_list(TYPE_ACCEL, false);
++    error_printf("Possible accelerators:\n");
++    g_slist_foreach(list, accel_list_entry, NULL);
++    g_slist_free(list);
++
++    exit(0);
++}
++
+ void qemu_add_exit_notifier(Notifier *notify)
+ {
+     notifier_list_add(&exit_notifiers, notify);
+@@ -3881,11 +3914,7 @@ int main(int argc, char **argv, char **envp)
+             case QEMU_OPTION_accel:
+                 accel_opts = qemu_opts_parse_noisily(qemu_find_opts("accel"),
+                                                      optarg, true);
+-                optarg = qemu_opt_get(accel_opts, "accel");
+-                if (!optarg || is_help_option(optarg)) {
+-                    error_printf("Possible accelerators: kvm, xen, hax, tcg\n");
+-                    exit(0);
+-                }
++                accel_parse(optarg, accel_opts);
+                 opts = qemu_opts_create(qemu_find_opts("machine"), NULL,
+                                         false, &error_abort);
+                 qemu_opt_set(opts, "accel", optarg, &error_abort);
+-- 
+2.15.0.rc2
