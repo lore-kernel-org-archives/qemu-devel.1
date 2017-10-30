@@ -1,29 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46544)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48446)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1e9Bdi-0005fo-R8
-	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 11:06:11 -0400
+	(envelope-from <jcody@redhat.com>) id 1e9Bij-0008Br-AX
+	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 11:11:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1e9Bdc-0000Xv-BY
-	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 11:06:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53590)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1e9Bdc-0000Wz-2v
-	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 11:06:04 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 98DFC49010
-	for <qemu-devel@nongnu.org>; Mon, 30 Oct 2017 15:06:02 +0000 (UTC)
-Date: Mon, 30 Oct 2017 15:05:57 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20171030150556.GA8941@work-vm>
-References: <20171030102830.4469-1-kraxel@redhat.com>
+	(envelope-from <jcody@redhat.com>) id 1e9Bii-00035p-Ef
+	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 11:11:21 -0400
+Date: Mon, 30 Oct 2017 16:11:06 +0100
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20171030151106.GD3549@localhost.localdomain>
+References: <20171029125338.25988-1-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20171030102830.4469-1-kraxel@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] vga: fix region checks in wraparound case
+In-Reply-To: <20171029125338.25988-1-kwolf@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] qemu-iotests: Use -nographic
+ in 182
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,40 +23,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org
 
-* Gerd Hoffmann (kraxel@redhat.com) wrote:
-> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-
-Makes more sense to me;
-
-
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
+On Sun, Oct 29, 2017 at 01:53:38PM +0100, Kevin Wolf wrote:
+> This avoids that random UI frontend error messages end up in the output.
+> In particular, we were seeing this line in CI error logs:
+> 
+> +Unable to init server: Could not connect: Connection refused
+> 
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > ---
->  hw/display/vga.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  tests/qemu-iotests/182 | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/hw/display/vga.c b/hw/display/vga.c
-> index 1d19f6b..a64a094 100644
-> --- a/hw/display/vga.c
-> +++ b/hw/display/vga.c
-> @@ -1666,9 +1666,9 @@ static void vga_draw_graphic(VGACommonState *s, int full_update)
->              /* scanline wraps from end of video memory to the start */
->              assert(force_shadow);
->              update = memory_region_snapshot_get_dirty(&s->vram, snap,
-> -                                                      page0, 0);
-> +                                                      page0, s->vbe_size - page0);
->              update |= memory_region_snapshot_get_dirty(&s->vram, snap,
-> -                                                       page1, 0);
-> +                                                       0, page1);
->          } else {
->              update = memory_region_snapshot_get_dirty(&s->vram, snap,
->                                                        page0, page1 - page0);
+> diff --git a/tests/qemu-iotests/182 b/tests/qemu-iotests/182
+> index 2e078ceed8..4b31592fb8 100755
+> --- a/tests/qemu-iotests/182
+> +++ b/tests/qemu-iotests/182
+> @@ -62,7 +62,7 @@ _launch_qemu -drive file=$TEST_IMG,if=none,id=drive0,file.locking=on \
+>  
+>  echo
+>  echo "Starting a second QEMU using the same image should fail"
+> -echo 'quit' | $QEMU -monitor stdio \
+> +echo 'quit' | $QEMU -nographic -monitor stdio \
+>      -drive file=$TEST_IMG,if=none,id=drive0,file.locking=on \
+>      -device $virtioblk,drive=drive0 2>&1 | _filter_testdir 2>&1 |
+>      _filter_qemu |
 > -- 
-> 2.9.3
+> 2.13.6
 > 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>
+
+Reviewed-by: Jeff Cody <jcody@redhat.com>
