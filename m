@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36232)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40408)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e90jK-00019v-T8
-	for qemu-devel@nongnu.org; Sun, 29 Oct 2017 23:27:15 -0400
+	id 1e91HL-0005sJ-Ej
+	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 00:02:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e90jH-0004ik-Pw
-	for qemu-devel@nongnu.org; Sun, 29 Oct 2017 23:27:14 -0400
+	id 1e91HF-0003Mp-JR
+	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 00:02:23 -0400
+Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:45700)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1e91HF-0003Ma-Ek
+	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 00:02:17 -0400
+Received: by mail-qk0-x241.google.com with SMTP id f199so14630666qke.2
+	for <qemu-devel@nongnu.org>; Sun, 29 Oct 2017 21:02:17 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Mon, 30 Oct 2017 00:25:21 -0300
-Message-Id: <20171030032521.2441-1-f4bug@amsat.org>
-In-Reply-To: <08178b4217d1692297b8c9620b6d13a80bfb6822.1509175660.git.alistair.francis@xilinx.com>
-References: <08178b4217d1692297b8c9620b6d13a80bfb6822.1509175660.git.alistair.francis@xilinx.com>
+Date: Mon, 30 Oct 2017 01:00:56 -0300
+Message-Id: <20171030040056.11780-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3] xlnx-zcu102: Specify the number of max CPUs
+Subject: [Qemu-devel] [RFC PATCH] vl: only display available accelerators
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,38 +31,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@gmail.com>
-Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, alistair23@gmail.com
+To: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Peter Xu <peterx@redhat.com>, Markus Armbruster <armbru@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, "Emilio G . Cota" <cota@braap.org>, Eric Blake <eblake@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-From: Alistair Francis <alistair.francis@xilinx.com>
+examples configuring with '--enable-kvm --disable-tcg'
 
-Specify the number of CPUs that can run on ZynqMP.
+- before
 
-Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+  $ qemu-system-x86_64 -accel help
+  Possible accelerators: kvm, xen, hax, tcg
+
+  $ qemu-system-x86_64 -accel tcg
+  qemu-system-x86_64: -machine accel=tcg: No accelerator found
+
+  # qemu-system-x86_64 -accel hax
+  qemu-system-x86_64: -machine accel=hax: No accelerator found
+
+  # qemu-system-x86_64 -accel xen
+  xencall: error: Could not obtain handle on privileged command interface: No such file or directory
+  xen be core: xen be core: can't open xen interface
+  can't open xen interface
+  qemu-system-x86_64: failed to initialize Xen: Operation not permitted
+
+- after
+
+  $ qemu-system-x86_64 -accel help
+  Possible accelerators: kvm
+
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
-V3:
- - Fix my ASCII noncompliant last name in Reviewed-by tag :(
- - added Tested-by for what it's worth
- 
-V2:
- - Use macros
+RFC because:
+    - I don't think this is the nicest way, too much #ifdef'fery in main()
+    - I'm not sure the correct use of CONFIG_KVM_IS_POSSIBLE
+    - shouldn't CONFIG_XEN/CONFIG_HAX be as poisoned as CONFIG_KVM?
 
- hw/arm/xlnx-zcu102.c | 1 +
- 1 file changed, 1 insertion(+)
+ vl.c | 15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
 
-diff --git a/hw/arm/xlnx-zcu102.c b/hw/arm/xlnx-zcu102.c
-index 519a16ed98..e2d15a1c9d 100644
---- a/hw/arm/xlnx-zcu102.c
-+++ b/hw/arm/xlnx-zcu102.c
-@@ -240,6 +240,7 @@ static void xlnx_zcu102_machine_class_init(ObjectClass *oc, void *data)
-     mc->block_default_type = IF_IDE;
-     mc->units_per_default_bus = 1;
-     mc->ignore_memory_transaction_failures = true;
-+    mc->max_cpus = XLNX_ZYNQMP_NUM_APU_CPUS + XLNX_ZYNQMP_NUM_RPU_CPUS;
- }
- 
- static const TypeInfo xlnx_zcu102_machine_init_typeinfo = {
+diff --git a/vl.c b/vl.c
+index ec299099ff..13fce86a6e 100644
+--- a/vl.c
++++ b/vl.c
+@@ -3883,7 +3883,20 @@ int main(int argc, char **argv, char **envp)
+                                                      optarg, true);
+                 optarg = qemu_opt_get(accel_opts, "accel");
+                 if (!optarg || is_help_option(optarg)) {
+-                    error_printf("Possible accelerators: kvm, xen, hax, tcg\n");
++                    error_printf("Possible accelerators: ");
++#ifdef CONFIG_KVM_IS_POSSIBLE
++                    error_printf("kvm ");
++#endif
++#ifdef CONFIG_XEN
++                    error_printf("xen ");
++#endif
++#ifdef CONFIG_HAX
++                    error_printf("hax ");
++#endif
++#ifdef CONFIG_TCG
++                    error_printf("tcg ");
++#endif
++                    error_printf("\n");
+                     exit(0);
+                 }
+                 opts = qemu_opts_create(qemu_find_opts("machine"), NULL,
 -- 
 2.15.0.rc2
