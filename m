@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42187)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42356)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1e9EdI-0002f9-PJ
-	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 14:17:57 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1e9Edx-0003E9-Uk
+	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 14:18:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1e9EdE-0002BJ-QC
-	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 14:17:56 -0400
-References: <20171030163309.75770-1-vsementsov@virtuozzo.com>
-	<20171030163309.75770-6-vsementsov@virtuozzo.com>
-	<20171030173159.GD8941@work-vm>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <3ae0a76b-f600-2101-e177-65054345bf7b@virtuozzo.com>
-Date: Mon, 30 Oct 2017 21:17:43 +0300
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1e9Edx-0002be-7j
+	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 14:18:37 -0400
 MIME-Version: 1.0
-In-Reply-To: <20171030173159.GD8941@work-vm>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v8 05/14] migration: introduce
- postcopy-only pending
+Sender: philippe.mathieu.daude@gmail.com
+In-Reply-To: <20171030181459.1951-1-f4bug@amsat.org>
+References: <20171030181459.1951-1-f4bug@amsat.org>
+From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Date: Mon, 30 Oct 2017 15:18:35 -0300
+Message-ID: <CAAdtpL44=a-Ws5OQNQCwXN_TYgQFMxnitRrM2hjCCRSSZna7hw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH] vl: only display available accelerators
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,25 +25,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, pbonzini@redhat.com, armbru@redhat.com, eblake@redhat.com, famz@redhat.com, stefanha@redhat.com, amit.shah@redhat.com, quintela@redhat.com, mreitz@redhat.com, kwolf@redhat.com, peter.maydell@linaro.org, den@openvz.org, jsnow@redhat.com, lirans@il.ibm.com
+To: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Peter Xu <peterx@redhat.com>, Markus Armbruster <armbru@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>
+Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, "Emilio G . Cota" <cota@braap.org>, Eric Blake <eblake@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-30.10.2017 20:31, Dr. David Alan Gilbert wrote:
-> * Vladimir Sementsov-Ogievskiy (vsementsov@virtuozzo.com) wrote:
->> There would be savevm states (dirty-bitmap) which can migrate only in
->> postcopy stage. The corresponding pending is introduced here.
->>
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> Reviewed-by: Juan Quintela <quintela@redhat.com>
-> Note the error patchew picked up on this for s390 which has
-> cmma_save_pending.
+Oops this isn't RFC anymore, this one is v1 ... sorry!
+
+On Mon, Oct 30, 2017 at 3:14 PM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
+rg> wrote:
+[...]
+> ---
+> since RFC:
+>   - use much cleaner object_class_get_list(TYPE_ACCEL, false)
 >
-> Dave
-
-Thanks for pointing here, I'll update the patch.
-
-
-
--- 
-Best regards,
-Vladimir
+>  vl.c | 39 ++++++++++++++++++++++++++++++++++-----
+>  1 file changed, 34 insertions(+), 5 deletions(-)
