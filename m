@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38826)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39889)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1e9B1M-0003wv-RO
-	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 10:26:33 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1e9B7A-0005Vc-0K
+	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 10:32:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1e9B1M-0008Iq-4d
-	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 10:26:32 -0400
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <20170929165347.29658-9-mreitz@redhat.com>
-References: <20170929165347.29658-1-mreitz@redhat.com>
-	<20170929165347.29658-9-mreitz@redhat.com>
-Date: Mon, 30 Oct 2017 15:25:49 +0100
-Message-ID: <w51k1zck902.fsf@maestria.local.igalia.com>
+	(envelope-from <dgilbert@redhat.com>) id 1e9B74-0002z7-AU
+	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 10:32:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43848)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1e9B74-0002xY-3t
+	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 10:32:26 -0400
+Date: Mon, 30 Oct 2017 14:32:21 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20171030143220.GA5438@work-vm>
+References: <7CA6B03C-DFAA-4A15-9E33-E3FAD6647140@gmail.com>
+	<38c3125f-b050-c0ba-282f-bc1e9e11d297@redhat.com>
+	<20171029102106.GA2841@work-vm>
+	<847196B3-8C4D-4B8E-A6A4-5ADAEC73FF62@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v6 08/25] block: Add
- bdrv_make_absolute_filename()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <847196B3-8C4D-4B8E-A6A4-5ADAEC73FF62@gmail.com>
+Subject: Re: [Qemu-devel] drive_add: file names with spaces
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,18 +29,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, John Snow <jsnow@redhat.com>
+To: Programmingkid <programmingkidx@gmail.com>
+Cc: "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
 
-On Fri 29 Sep 2017 06:53:30 PM CEST, Max Reitz wrote:
-> This is a general function for making a filename that is relative to a
-> certain BDS absolute.
->
-> It calls bdrv_get_full_backing_filename_from_filename() for now, but
-> that will be changed in a follow-up patch.
->
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
+* Programmingkid (programmingkidx@gmail.com) wrote:
+> 
+> > On Oct 29, 2017, at 6:21 AM, Dr. David Alan Gilbert <dgilbert@redhat.com> wrote:
+> > 
+> > * Eric Blake (eblake@redhat.com) wrote:
+> >> On 10/28/2017 06:44 AM, Programmingkid wrote:
+> >>> I'm trying to use an image file that has spaces in its file name (and sometimes in the path) to be used as a USB flash drive. When I try adding the image file using the drive_add command I see this error: drive_add: extraneous characters at the end of the line
+> >>> 
+> >>> I have tried using single and double quotes around the file name but this does not help. Is there a way to use files that have spaces in it's name with drive_add?
+> >> 
+> >> Not in HMP, which lacks quoting.  (Unless you want to patch HMP to learn
+> >> quoting)
+> > 
+> > I think it's already got that code at least in some places.
+> > monitor_parse_arguments calls get_str, and get_str understands " wrapped
+> > arguments.
+> > 
+> > drive_add 1 "file=foo bar"
+> > 
+> > gives me:
+> > Could not open 'foo bar': No such file or directory
+> > 
+> > so I think that's doing the right thing.
+> > 
+> > Dave
+> > 
+> >> But using spaces in filenames works fine in QMP.
+> >> 
+> >> -- 
+> >> Eric Blake, Principal Software Engineer
+> >> Red Hat, Inc.           +1-919-301-3266
+> >> Virtualization:  qemu.org | libvirt.org
+> >> 
+> > 
+> > 
+> > --
+> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> 
+> Thank you so much for this info. It solved my problem :)
 
-Reviewed-by: Alberto Garcia <berto@igalia.com>
+Now, the real challenge is how to deal with a filename with a comma in;
+   drive_add 1 "file=foo,bar"
+   Could not open 'foo': No such file or directory
 
-Berto
+Dave
+
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
