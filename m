@@ -1,42 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52926)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53414)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <akrowiak@linux.vnet.ibm.com>) id 1e9FMj-000068-S9
-	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 15:04:54 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1e9FQG-00011H-H1
+	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 15:08:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <akrowiak@linux.vnet.ibm.com>) id 1e9FMf-0006RS-27
-	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 15:04:53 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35772
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1e9FQD-0007p4-A8
+	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 15:08:32 -0400
+Received: from chuckie.co.uk ([82.165.15.123]:45880
+	helo=s16892447.onlinehome-server.info)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <akrowiak@linux.vnet.ibm.com>)
-	id 1e9FMe-0006RD-TA
-	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 15:04:48 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v9UJ3tnT109114
-	for <qemu-devel@nongnu.org>; Mon, 30 Oct 2017 15:04:45 -0400
-Received: from e38.co.us.ibm.com (e38.co.us.ibm.com [32.97.110.159])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2dx7begw3x-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 30 Oct 2017 15:04:44 -0400
-Received: from localhost
-	by e38.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <akrowiak@linux.vnet.ibm.com>;
-	Mon, 30 Oct 2017 13:04:43 -0600
-References: <1507916344-3896-1-git-send-email-akrowiak@linux.vnet.ibm.com>
-	<20171029121122.122412ca.cohuck@redhat.com>
-	<e49b2898-a5b3-ff39-3c6e-b1708f1c8425@de.ibm.com>
-From: Tony Krowiak <akrowiak@linux.vnet.ibm.com>
-Date: Mon, 30 Oct 2017 15:04:35 -0400
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1e9FQD-0007ou-2h
+	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 15:08:29 -0400
+References: <1508947167-5304-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<1508947167-5304-10-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<CAFEAcA8DGeoNWxr9Y-vRXmtR5=7+EMQqfpt5cs7x2qTcfRZR4Q@mail.gmail.com>
+	<98d12504-4523-2a5c-aefa-4b01e1c6c7df@ilande.co.uk>
+	<a169c6f0-4a82-cd3c-7f83-0a6394c06e98@ilande.co.uk>
+	<CAFEAcA9u3kw6LnwE3ZnExdcmMM42AuycnLOppiX7wXdeKk5hcw@mail.gmail.com>
+	<ef818927-9c2e-37cd-91a1-8b5bf40ad8e1@ilande.co.uk>
+	<74c257be-f3dc-ebf9-7a55-0eefe46ce93e@amsat.org>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <b50513a9-0f19-afaa-31b1-6219d84b82f0@ilande.co.uk>
+Date: Mon, 30 Oct 2017 19:08:19 +0000
 MIME-Version: 1.0
-In-Reply-To: <e49b2898-a5b3-ff39-3c6e-b1708f1c8425@de.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <74c257be-f3dc-ebf9-7a55-0eefe46ce93e@amsat.org>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Message-Id: <61214ce9-c3de-44b7-2a53-585f3acb16fe@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [RFC 00/19] KVM: s390/crypto/vfio: guest dedicated
- crypto adapters
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCHv4 09/13] lance: move TYPE_LANCE and
+ SysBusPCNetState from lance.c to lance.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,85 +37,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, freude@de.ibm.com, schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com, kwankhede@nvidia.com, bjsdjshi@linux.vnet.ibm.com, pbonzini@redhat.com, alex.williamson@redhat.com, pmorel@linux.vnet.ibm.com, alifm@linux.vnet.ibm.com, mjrosato@linux.vnet.ibm.com, qemu-s390x@nongnu.org, jjherne@linux.vnet.ibm.com, thuth@redhat.com, pasic@linux.vnet.ibm.com, qemu-devel <qemu-devel@nongnu.org>, Erik Skultety <eskultet@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>
+Cc: Jason Wang <jasowang@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Artyom Tarasenko <atar4qemu@gmail.com>
 
-On 10/30/2017 04:57 AM, Christian Borntraeger wrote:
-> adding qemu devel and add Daniel and Erik from libvirt to keep them in the loop.
->
-> On 10/29/2017 12:11 PM, Cornelia Huck wrote:
->> On Fri, 13 Oct 2017 13:38:45 -0400
->> Tony Krowiak <akrowiak@linux.vnet.ibm.com> wrote:
+On 30/10/17 18:45, Philippe Mathieu-Daudé wrote:
+
+>>>>>>> +/*
+>>>>>>> + * QEMU AMD PC-Net II (Am79C970A) emulation
+>>>>>>
+>>>>>> Filename says this is Lance ethernet, but the comment says it's PC-Net ?
+>>>>>
+>>>>> According to the datasheet for Am79C970A, the original Lance is an
+>>>>> Am7990 device and the Am79C970A aka PCNet-PCI II as emulated by QEMU is
+>>>>> register-compatible with it.
+>>>>>
+>>>>> I guess the comment above is more technically correct, but I'm happy to
+>>>>> adjust it in my local tree if you still feel it needs to change?
+>>>
+>>> I think we should have a comment that says what the file is
+>>> for. Since this is a different file from pcnet.h, we should
+>>> have a comment that isn't the same as the pcnet.h one.
+>>> I don't particularly mind what it says, as long as it briefly
+>>> explains what's in the file (and by implication what distinguishes
+>>> things in this file from things in the other).
 >>
->>> Tony Krowiak (19):
->>>    KVM: s390: SIE considerations for AP Queue virtualization
->>>    KVM: s390: refactor crypto initialization
->>>    s390/zcrypt: new AP matrix bus
->>>    s390/zcrypt: create an AP matrix device on the AP matrix bus
->>>    s390/zcrypt: base implementation of AP matrix device driver
->>>    s390/zcrypt: register matrix device with VFIO mediated device
->>>      framework
->>>    KVM: s390: introduce AP matrix configuration interface
->>>    s390/zcrypt: support for assigning adapters to matrix mdev
->>>    s390/zcrypt: validate adapter assignment
->>>    s390/zcrypt: sysfs interfaces supporting AP domain assignment
->>>    s390/zcrypt: validate domain assignment
->>>    s390/zcrypt: sysfs support for control domain assignment
->>>    s390/zcrypt: validate control domain assignment
->>>    KVM: s390: Connect the AP mediated matrix device to KVM
->>>    s390/zcrypt: introduce ioctl access to VFIO AP Matrix driver
->>>    KVM: s390: interface to configure KVM guest's AP matrix
->>>    KVM: s390: validate input to AP matrix config interface
->>>    KVM: s390: New ioctl to configure KVM guest's AP matrix
->>>    s390/facilities: enable AP facilities needed by guest
->> I'll try to summarize all of this in my own words, both to make sure I
->> understand the design correctly and to give others a different view on
->> this.
+>> Okay then how about something along the lines of:
 >>
->> [I'm completely disregarding control domains here.]
+>>  * QEMU Lance (Am7990) device emulation
+>>  *
+>>  * Copyright (c) 2004 Antony T Curtis
+>>  * Copyright (c) 2017 Mark Cave-Ayland
+>>  *
+>>  * This represents the Sparc32 lance (Am7990) ethernet device which is
+>>  * an earlier register-compatible member of the AMD PC-Net II
+>>  * (Am79C970A) family.
 >>
->> On s390, we have cryptographic coprocessor cards, which are modeled on
->> Linux as devices on the AP bus. There's also a concept called domains,
->> which means an individual queue of a crypto device is basically a
->> (card,domain) tuple. We model this something like the following
->> (assuming we have access to cards 3 and 4 and domains 1 and 2):
->>
->> AP -> card3 -> queue (3,1)
->>              -> queue (3,2)
->>     -> card4 -> queue (4,1)
->>              -> queue (4,2)
->>
->> (The AP bus is a bit different for backwards compat.)
->>
->> If we want to virtualize this, we can use a feature provided by the
->> hardware. We basically attach a satellite control block to our main
->> hardware virtualization control block and the hardware takes care of
->> (mostly) everything.
->>
->> For this control block, we don't specify explicit tuples, but a list of
->> cards and a list of domains. The guest will get access to the cross
->> product.
->>
->> Because of this, we need to take care that the lists provided to
->> different guests don't overlap; i.e., we need to enforce sane
->> configurations. Otherwise, one guest may get access to things like
->> secret keys for another guest.
->>
->> The idea of this patch set is to introduce a new device, the matrix
->> device. This matrix device hangs off a different root and acts as the
->> node where mdev devices hang off.
->>
->> If you now want to give the tuples (4,1) and (4,2), you need to do the
->> following:
->>
->> - Unbind the (4,1) and (4,2) tuples from their ap bus driver.
->> - Bind the (4,1) and (4,2) tuples to the ap matrix driver.
->> - Create the mediated device.
->> - Assign card 4 and domains 1 and 2.
->>
->> QEMU will now simply consume the mediated device and things should work.
->>
-> This is probably the shortest possible summary I can imagine.
-> Tony can you double check if it matches your understanding as well?
-This is a concise and accurate summary.
->
+>> In reality pcnet.c/pcnet.h are just the inner workings of the pcnet-pci
+>> and lance devices. The comments in pcnet-pci.c and lance.c are identical
+>> except for the Sparc32 reference and it was the same header from
+>> pcnet-pci.c that I used as the basis for my last patch.
+> 
+> You are right the PCnet family is based on the Lance one, but it seems
+> nobody remembers the Lance origin, the "PC-Net" took over.
+> 
+> Maybe we can agree with the different families having an unique
+> "hw/net/pcnet_lance.h" header with all Lance/PC-Net related XXX_TYPEs,
+> what do you think?
+
+This is definitely a good idea in principle, however the lance device in
+its current form cannot work for anything other than SPARC32 because of
+the the word-size byte swaps for FIFO transfers which occur for DMA
+transfers (see the code for ledma_memory_read/ledma_memory_write).
+
+I think in its current form the patch allows for someone to potentially
+implement this later for other architectures (e.g x86) so while I don't
+want to disallow this in future, it isn't really within the scope of
+this particular patchset.
+
+
+ATB,
+
+Mark.
