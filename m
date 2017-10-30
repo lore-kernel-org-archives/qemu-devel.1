@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39949)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40688)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pisa@cmp.felk.cvut.cz>) id 1e99A0-0003Zu-Al
-	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 08:27:28 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1e99C5-0004s7-Om
+	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 08:29:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pisa@cmp.felk.cvut.cz>) id 1e999w-0004Ho-F7
-	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 08:27:20 -0400
-Received: from smtp8.web4u.cz ([81.91.87.88]:48173 helo=mx-8.mail.web4u.cz)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pisa@cmp.felk.cvut.cz>)
-	id 1e999v-0004H0-WF
-	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 08:27:16 -0400
-From: Pavel Pisa <pisa@cmp.felk.cvut.cz>
-Date: Mon, 30 Oct 2017 13:27:12 +0100
-References: <cover.1508885974.git.pisa@cmp.felk.cvut.cz>
-	<1d51d638-6046-2f7a-890d-a9d1fd0889a7@denx.de>
-	<f453335b-6a6b-ae22-eecd-cec048db14e3@adacore.com>
-In-Reply-To: <f453335b-6a6b-ae22-eecd-cec048db14e3@adacore.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1e99C2-0005pp-0u
+	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 08:29:29 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <CAEfK_46AuSH-eTjq=jrBM_zcFE0GNDaS2BaDhtagY-dq-5tf4g@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <399f73fc-1e10-0f10-e804-a21be1126c84@amsat.org>
+Date: Mon, 30 Oct 2017 09:29:13 -0300
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-Message-Id: <201710301327.12315.pisa@cmp.felk.cvut.cz>
-Subject: Re: [Qemu-devel] [PATCH 1/6] CAN bus simple SJA1000 PCI card
- emulation for QEMU
+In-Reply-To: <CAEfK_46AuSH-eTjq=jrBM_zcFE0GNDaS2BaDhtagY-dq-5tf4g@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] nvme: Add tracing v3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,67 +27,912 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: KONRAD Frederic <frederic.konrad@adacore.com>
-Cc: Marek Vasut <marex@denx.de>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@gmail.com>, Deniz Eren <deniz.eren@icloud.com>, Jan Kiszka <jan.kiszka@siemens.com>, Oliver Hartkopp <socketcan@hartkopp.net>
+To: Doug Gale <doug16k@gmail.com>, qemu-block@nongnu.org, qemu-devel <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, peter.maydell@linaro.org, Markus Armbruster <armbru@redhat.com>, mreitz@redhat.com, keith.busch@intel.com, pbonzini@redhat.com
 
-Hello Marek and Konrad,
+Hi Doug,
 
-On Monday 30 of October 2017 12:38:12 KONRAD Frederic wrote:
-> On 10/30/2017 11:51 AM, Marek Vasut wrote:
-> > On 10/30/2017 10:19 AM, KONRAD Frederic wrote:
-> >
-> > [...]
-> >
-> >>> CAN bus MIOe-3680 PCI (dual SJA1000 channel) emulation added.
-> >>>     hw/can/can_mioe3680_pci.c
-> >>>
-> >>> If you think that this is more logical even that the first
-> >>> commits introduce something which cannot be tested/compiles
-> >>> only into library, then I rearrange patchyes this way.
-> >>
-> >> I don't know all those PCI cards. But if the simple SJA1000
-> >> doesn't exist in real life maybe better dropping it?
-> >
-> > SJA1000 is the only sensible card to emulate IMO, at least initially,
-> > it's the de-facto standard for CAN devices.
-> >
-> > [...]
->
-> I was talking of "CAN bus simple SJA1000 memory mapped PCI card
-> example" which according to Pavel is an example device with
-> custom vendor/device ids?
+On 10/12/2017 04:07 PM, Doug Gale wrote:
+> From c7f12a5949458fdd195b5e0b52f158e8f114f203 Mon Sep 17 00:00:00 2001
+> From: Doug Gale <doug16k@gmail.com>
+> Date: Thu, 12 Oct 2017 14:29:07 -0400
+> Subject: [PATCH] nvme: Add tracing
+> 
+> Add trace output for commands, errors, and undefined behavior.
+> Add guest error log output for undefined behavior.
+> Report and ignore invalid undefined accesses to MMIO.
+> Annotate unlikely error checks with unlikely.
+> 
+> Signed-off-by: Doug Gale <doug16k@gmail.com>
+> ---
+>  hw/block/nvme.c       | 347 ++++++++++++++++++++++++++++++++++++++++++--------
+>  hw/block/trace-events |  93 ++++++++++++++
+>  2 files changed, 387 insertions(+), 53 deletions(-)
+> 
+> diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+> index 9aa32692a3..adac19f5b0 100644
+> --- a/hw/block/nvme.c
+> +++ b/hw/block/nvme.c
+> @@ -34,8 +34,17 @@
+>  #include "qapi/visitor.h"
+>  #include "sysemu/block-backend.h"
+> 
+> +#include "qemu/log.h"
+> +#include "trace.h"
+>  #include "nvme.h"
+> 
+> +#define NVME_GUEST_ERR(trace, fmt, ...) \
+> +    do { \
+> +        (trace_##trace)(__VA_ARGS__); \
+> +        qemu_log_mask(LOG_GUEST_ERROR, #trace \
+> +            " in %s: " fmt "\n", __func__, ## __VA_ARGS__); \
+> +    } while (0)
+> +
+>  static void nvme_process_sq(void *opaque);
+> 
+>  static void nvme_addr_read(NvmeCtrl *n, hwaddr addr, void *buf, int size)
+> @@ -86,10 +95,14 @@ static void nvme_isr_notify(NvmeCtrl *n, NvmeCQueue *cq)
+>  {
+>      if (cq->irq_enabled) {
+>          if (msix_enabled(&(n->parent_obj))) {
+> +            trace_nvme_irq_msix(cq->vector);
+>              msix_notify(&(n->parent_obj), cq->vector);
+>          } else {
+> +            trace_nvme_irq_pin();
+>              pci_irq_pulse(&n->parent_obj);
+>          }
+> +    } else {
+> +        trace_nvme_irq_masked();
+>      }
+>  }
+> 
+> @@ -100,7 +113,8 @@ static uint16_t nvme_map_prp(QEMUSGList *qsg,
+> QEMUIOVector *iov, uint64_t prp1,
+>      trans_len = MIN(len, trans_len);
+>      int num_prps = (len >> n->page_bits) + 1;
+> 
+> -    if (!prp1) {
+> +    if (unlikely(!prp1)) {
+> +        trace_nvme_err_invalid_prp();
+>          return NVME_INVALID_FIELD | NVME_DNR;
+>      } else if (n->cmbsz && prp1 >= n->ctrl_mem.addr &&
+>                 prp1 < n->ctrl_mem.addr + int128_get64(n->ctrl_mem.size)) {
+> @@ -113,7 +127,8 @@ static uint16_t nvme_map_prp(QEMUSGList *qsg,
+> QEMUIOVector *iov, uint64_t prp1,
+>      }
+>      len -= trans_len;
+>      if (len) {
+> -        if (!prp2) {
+> +        if (unlikely(!prp2)) {
+> +            trace_nvme_err_invalid_prp2_missing();
+>              goto unmap;
+>          }
+>          if (len > n->page_size) {
+> @@ -128,7 +143,8 @@ static uint16_t nvme_map_prp(QEMUSGList *qsg,
+> QEMUIOVector *iov, uint64_t prp1,
+>                  uint64_t prp_ent = le64_to_cpu(prp_list[i]);
+> 
+>                  if (i == n->max_prp_ents - 1 && len > n->page_size) {
+> -                    if (!prp_ent || prp_ent & (n->page_size - 1)) {
+> +                    if (unlikely(!prp_ent || prp_ent & (n->page_size - 1))) {
+> +                        trace_nvme_err_invalid_prplist_ent(prp_ent);
+>                          goto unmap;
+>                      }
+> 
+> @@ -140,7 +156,8 @@ static uint16_t nvme_map_prp(QEMUSGList *qsg,
+> QEMUIOVector *iov, uint64_t prp1,
+>                      prp_ent = le64_to_cpu(prp_list[i]);
+>                  }
+> 
+> -                if (!prp_ent || prp_ent & (n->page_size - 1)) {
+> +                if (unlikely(!prp_ent || prp_ent & (n->page_size - 1))) {
+> +                    trace_nvme_err_invalid_prplist_ent(prp_ent);
+>                      goto unmap;
+>                  }
+> 
+> @@ -154,7 +171,8 @@ static uint16_t nvme_map_prp(QEMUSGList *qsg,
+> QEMUIOVector *iov, uint64_t prp1,
+>                  i++;
+>              }
+>          } else {
+> -            if (prp2 & (n->page_size - 1)) {
+> +            if (unlikely(prp2 & (n->page_size - 1))) {
+> +                trace_nvme_err_invalid_prp2_align(prp2);
+>                  goto unmap;
+>              }
+>              if (qsg->nsg) {
+> @@ -178,16 +196,20 @@ static uint16_t nvme_dma_read_prp(NvmeCtrl *n,
+> uint8_t *ptr, uint32_t len,
+>      QEMUIOVector iov;
+>      uint16_t status = NVME_SUCCESS;
+> 
+> +    trace_nvme_dma_read(prp1, prp2);
+> +
+>      if (nvme_map_prp(&qsg, &iov, prp1, prp2, len, n)) {
+>          return NVME_INVALID_FIELD | NVME_DNR;
+>      }
+>      if (qsg.nsg > 0) {
+> -        if (dma_buf_read(ptr, len, &qsg)) {
+> +        if (unlikely(dma_buf_read(ptr, len, &qsg))) {
+> +            trace_nvme_err_invalid_dma();
+>              status = NVME_INVALID_FIELD | NVME_DNR;
+>          }
+>          qemu_sglist_destroy(&qsg);
+>      } else {
+> -        if (qemu_iovec_to_buf(&iov, 0, ptr, len) != len) {
+> +        if (unlikely(qemu_iovec_to_buf(&iov, 0, ptr, len) != len)) {
+> +            trace_nvme_err_invalid_dma();
+>              status = NVME_INVALID_FIELD | NVME_DNR;
+>          }
+>          qemu_iovec_destroy(&iov);
+> @@ -273,7 +295,8 @@ static uint16_t nvme_write_zeros(NvmeCtrl *n,
+> NvmeNamespace *ns, NvmeCmd *cmd,
+>      uint64_t aio_slba = slba << (data_shift - BDRV_SECTOR_BITS);
+>      uint32_t aio_nlb = nlb << (data_shift - BDRV_SECTOR_BITS);
+> 
+> -    if (slba + nlb > ns->id_ns.nsze) {
+> +    if (unlikely(slba + nlb > ns->id_ns.nsze)) {
+> +        trace_nvme_err_invalid_lba_range(slba, nlb, ns->id_ns.nsze);
+>          return NVME_LBA_RANGE | NVME_DNR;
+>      }
+> 
+> @@ -301,8 +324,11 @@ static uint16_t nvme_rw(NvmeCtrl *n,
+> NvmeNamespace *ns, NvmeCmd *cmd,
+>      int is_write = rw->opcode == NVME_CMD_WRITE ? 1 : 0;
+>      enum BlockAcctType acct = is_write ? BLOCK_ACCT_WRITE : BLOCK_ACCT_READ;
+> 
+> -    if ((slba + nlb) > ns->id_ns.nsze) {
+> +    trace_nvme_rw(is_write ? "write" : "read", nlb, data_size, slba);
+> +
+> +    if (unlikely((slba + nlb) > ns->id_ns.nsze)) {
+>          block_acct_invalid(blk_get_stats(n->conf.blk), acct);
+> +        trace_nvme_err_invalid_lba_range(slba, nlb, ns->id_ns.nsze);
+>          return NVME_LBA_RANGE | NVME_DNR;
+>      }
+> 
+> @@ -336,7 +362,8 @@ static uint16_t nvme_io_cmd(NvmeCtrl *n, NvmeCmd
+> *cmd, NvmeRequest *req)
+>      NvmeNamespace *ns;
+>      uint32_t nsid = le32_to_cpu(cmd->nsid);
+> 
+> -    if (nsid == 0 || nsid > n->num_namespaces) {
+> +    if (unlikely(nsid == 0 || nsid > n->num_namespaces)) {
+> +        trace_nvme_err_invalid_ns(nsid, n->num_namespaces);
+>          return NVME_INVALID_NSID | NVME_DNR;
+>      }
+> 
+> @@ -350,6 +377,7 @@ static uint16_t nvme_io_cmd(NvmeCtrl *n, NvmeCmd
+> *cmd, NvmeRequest *req)
+>      case NVME_CMD_READ:
+>          return nvme_rw(n, ns, cmd, req);
+>      default:
+> +        trace_nvme_err_invalid_opc(cmd->opcode);
+>          return NVME_INVALID_OPCODE | NVME_DNR;
+>      }
+>  }
+> @@ -373,10 +401,13 @@ static uint16_t nvme_del_sq(NvmeCtrl *n, NvmeCmd *cmd)
+>      NvmeCQueue *cq;
+>      uint16_t qid = le16_to_cpu(c->qid);
+> 
+> -    if (!qid || nvme_check_sqid(n, qid)) {
+> +    if (unlikely(!qid || nvme_check_sqid(n, qid))) {
+> +        trace_nvme_err_invalid_del_sq(qid);
+>          return NVME_INVALID_QID | NVME_DNR;
+>      }
+> 
+> +    trace_nvme_del_sq(qid);
+> +
+>      sq = n->sq[qid];
+>      while (!QTAILQ_EMPTY(&sq->out_req_list)) {
+>          req = QTAILQ_FIRST(&sq->out_req_list);
+> @@ -439,19 +470,26 @@ static uint16_t nvme_create_sq(NvmeCtrl *n, NvmeCmd *cmd)
+>      uint16_t qflags = le16_to_cpu(c->sq_flags);
+>      uint64_t prp1 = le64_to_cpu(c->prp1);
+> 
+> -    if (!cqid || nvme_check_cqid(n, cqid)) {
+> +    trace_nvme_create_sq(prp1, sqid, cqid, qsize, qflags);
+> +
+> +    if (unlikely(!cqid || nvme_check_cqid(n, cqid))) {
+> +        trace_nvme_err_invalid_create_sq_cqid(cqid);
+>          return NVME_INVALID_CQID | NVME_DNR;
+>      }
+> -    if (!sqid || !nvme_check_sqid(n, sqid)) {
+> +    if (unlikely(!sqid || !nvme_check_sqid(n, sqid))) {
+> +        trace_nvme_err_invalid_create_sq_sqid(sqid);
+>          return NVME_INVALID_QID | NVME_DNR;
+>      }
+> -    if (!qsize || qsize > NVME_CAP_MQES(n->bar.cap)) {
+> +    if (unlikely(!qsize || qsize > NVME_CAP_MQES(n->bar.cap))) {
+> +        trace_nvme_err_invalid_create_sq_size(qsize);
+>          return NVME_MAX_QSIZE_EXCEEDED | NVME_DNR;
+>      }
+> -    if (!prp1 || prp1 & (n->page_size - 1)) {
+> +    if (unlikely(!prp1 || prp1 & (n->page_size - 1))) {
+> +        trace_nvme_err_invalid_create_sq_addr(prp1);
+>          return NVME_INVALID_FIELD | NVME_DNR;
+>      }
+> -    if (!(NVME_SQ_FLAGS_PC(qflags))) {
+> +    if (unlikely(!(NVME_SQ_FLAGS_PC(qflags)))) {
+> +        trace_nvme_err_invalid_create_sq_qflags(NVME_SQ_FLAGS_PC(qflags));
+>          return NVME_INVALID_FIELD | NVME_DNR;
+>      }
+>      sq = g_malloc0(sizeof(*sq));
+> @@ -476,14 +514,17 @@ static uint16_t nvme_del_cq(NvmeCtrl *n, NvmeCmd *cmd)
+>      NvmeCQueue *cq;
+>      uint16_t qid = le16_to_cpu(c->qid);
+> 
+> -    if (!qid || nvme_check_cqid(n, qid)) {
+> +    if (unlikely(!qid || nvme_check_cqid(n, qid))) {
+> +        trace_nvme_err_invalid_del_cq_cqid(qid);
+>          return NVME_INVALID_CQID | NVME_DNR;
+>      }
+> 
+>      cq = n->cq[qid];
+> -    if (!QTAILQ_EMPTY(&cq->sq_list)) {
+> +    if (unlikely(!QTAILQ_EMPTY(&cq->sq_list))) {
+> +        trace_nvme_err_invalid_del_cq_notempty(qid);
+>          return NVME_INVALID_QUEUE_DEL;
+>      }
+> +    trace_nvme_del_cq(qid);
+>      nvme_free_cq(cq, n);
+>      return NVME_SUCCESS;
+>  }
+> @@ -516,19 +557,27 @@ static uint16_t nvme_create_cq(NvmeCtrl *n, NvmeCmd *cmd)
+>      uint16_t qflags = le16_to_cpu(c->cq_flags);
+>      uint64_t prp1 = le64_to_cpu(c->prp1);
+> 
+> -    if (!cqid || !nvme_check_cqid(n, cqid)) {
+> +    trace_nvme_create_cq(prp1, cqid, vector, qsize, qflags,
+> +                         NVME_CQ_FLAGS_IEN(qflags) != 0);
+> +
+> +    if (unlikely(!cqid || !nvme_check_cqid(n, cqid))) {
+> +        trace_nvme_err_invalid_create_cq_cqid(cqid);
+>          return NVME_INVALID_CQID | NVME_DNR;
+>      }
+> -    if (!qsize || qsize > NVME_CAP_MQES(n->bar.cap)) {
+> +    if (unlikely(!qsize || qsize > NVME_CAP_MQES(n->bar.cap))) {
+> +        trace_nvme_err_invalid_create_cq_size(qsize);
+>          return NVME_MAX_QSIZE_EXCEEDED | NVME_DNR;
+>      }
+> -    if (!prp1) {
+> +    if (unlikely(!prp1)) {
+> +        trace_nvme_err_invalid_create_cq_addr(prp1);
+>          return NVME_INVALID_FIELD | NVME_DNR;
+>      }
+> -    if (vector > n->num_queues) {
+> +    if (unlikely(vector > n->num_queues)) {
+> +        trace_nvme_err_invalid_create_cq_vector(vector);
+>          return NVME_INVALID_IRQ_VECTOR | NVME_DNR;
+>      }
+> -    if (!(NVME_CQ_FLAGS_PC(qflags))) {
+> +    if (unlikely(!(NVME_CQ_FLAGS_PC(qflags)))) {
+> +        trace_nvme_err_invalid_create_cq_qflags(NVME_CQ_FLAGS_PC(qflags));
+>          return NVME_INVALID_FIELD | NVME_DNR;
+>      }
+> 
+> @@ -543,6 +592,8 @@ static uint16_t nvme_identify_ctrl(NvmeCtrl *n,
+> NvmeIdentify *c)
+>      uint64_t prp1 = le64_to_cpu(c->prp1);
+>      uint64_t prp2 = le64_to_cpu(c->prp2);
+> 
+> +    trace_nvme_identify_ctrl();
+> +
+>      return nvme_dma_read_prp(n, (uint8_t *)&n->id_ctrl, sizeof(n->id_ctrl),
+>          prp1, prp2);
+>  }
+> @@ -554,11 +605,15 @@ static uint16_t nvme_identify_ns(NvmeCtrl *n,
+> NvmeIdentify *c)
+>      uint64_t prp1 = le64_to_cpu(c->prp1);
+>      uint64_t prp2 = le64_to_cpu(c->prp2);
+> 
+> -    if (nsid == 0 || nsid > n->num_namespaces) {
+> +    trace_nvme_identify_ns(nsid);
+> +
+> +    if (unlikely(nsid == 0 || nsid > n->num_namespaces)) {
+> +        trace_nvme_err_invalid_ns(nsid, n->num_namespaces);
+>          return NVME_INVALID_NSID | NVME_DNR;
+>      }
+> 
+>      ns = &n->namespaces[nsid - 1];
+> +
+>      return nvme_dma_read_prp(n, (uint8_t *)&ns->id_ns, sizeof(ns->id_ns),
+>          prp1, prp2);
+>  }
+> @@ -573,6 +628,8 @@ static uint16_t nvme_identify_nslist(NvmeCtrl *n,
+> NvmeIdentify *c)
+>      uint16_t ret;
+>      int i, j = 0;
+> 
+> +    trace_nvme_identify_nslist(min_nsid);
+> +
+>      list = g_malloc0(data_len);
+>      for (i = 0; i < n->num_namespaces; i++) {
+>          if (i < min_nsid) {
+> @@ -601,6 +658,7 @@ static uint16_t nvme_identify(NvmeCtrl *n, NvmeCmd *cmd)
+>      case 0x02:
+>          return nvme_identify_nslist(n, c);
+>      default:
+> +        trace_nvme_err_invalid_identify_cns(le32_to_cpu(c->cns));
+>          return NVME_INVALID_FIELD | NVME_DNR;
+>      }
+>  }
+> @@ -613,11 +671,14 @@ static uint16_t nvme_get_feature(NvmeCtrl *n,
+> NvmeCmd *cmd, NvmeRequest *req)
+>      switch (dw10) {
+>      case NVME_VOLATILE_WRITE_CACHE:
+>          result = blk_enable_write_cache(n->conf.blk);
+> +        trace_nvme_getfeat_vwcache(result ? "enabled" : "disabled");
+>          break;
+>      case NVME_NUMBER_OF_QUEUES:
+>          result = cpu_to_le32((n->num_queues - 2) | ((n->num_queues -
+> 2) << 16));
+> +        trace_nvme_getfeat_numq(result);
+>          break;
+>      default:
+> +        trace_nvme_err_invalid_getfeat(dw10);
+>          return NVME_INVALID_FIELD | NVME_DNR;
+>      }
+> 
+> @@ -635,10 +696,14 @@ static uint16_t nvme_set_feature(NvmeCtrl *n,
+> NvmeCmd *cmd, NvmeRequest *req)
+>          blk_set_enable_write_cache(n->conf.blk, dw11 & 1);
+>          break;
+>      case NVME_NUMBER_OF_QUEUES:
+> +        trace_nvme_setfeat_numq((dw11 & 0xFFFF) + 1,
+> +                                ((dw11 >> 16) & 0xFFFF) + 1,
+> +                                n->num_queues - 1, n->num_queues - 1);
+>          req->cqe.result =
+>              cpu_to_le32((n->num_queues - 2) | ((n->num_queues - 2) << 16));
+>          break;
+>      default:
+> +        trace_nvme_err_invalid_setfeat(dw10);
+>          return NVME_INVALID_FIELD | NVME_DNR;
+>      }
+>      return NVME_SUCCESS;
+> @@ -662,6 +727,7 @@ static uint16_t nvme_admin_cmd(NvmeCtrl *n,
+> NvmeCmd *cmd, NvmeRequest *req)
+>      case NVME_ADM_CMD_GET_FEATURES:
+>          return nvme_get_feature(n, cmd, req);
+>      default:
+> +        trace_nvme_err_invalid_admin_opc(cmd->opcode);
+>          return NVME_INVALID_OPCODE | NVME_DNR;
+>      }
+>  }
+> @@ -721,15 +787,78 @@ static int nvme_start_ctrl(NvmeCtrl *n)
+>      uint32_t page_bits = NVME_CC_MPS(n->bar.cc) + 12;
+>      uint32_t page_size = 1 << page_bits;
+> 
+> -    if (n->cq[0] || n->sq[0] || !n->bar.asq || !n->bar.acq ||
+> -            n->bar.asq & (page_size - 1) || n->bar.acq & (page_size - 1) ||
+> -            NVME_CC_MPS(n->bar.cc) < NVME_CAP_MPSMIN(n->bar.cap) ||
+> -            NVME_CC_MPS(n->bar.cc) > NVME_CAP_MPSMAX(n->bar.cap) ||
+> -            NVME_CC_IOCQES(n->bar.cc) < NVME_CTRL_CQES_MIN(n->id_ctrl.cqes) ||
+> -            NVME_CC_IOCQES(n->bar.cc) > NVME_CTRL_CQES_MAX(n->id_ctrl.cqes) ||
+> -            NVME_CC_IOSQES(n->bar.cc) < NVME_CTRL_SQES_MIN(n->id_ctrl.sqes) ||
+> -            NVME_CC_IOSQES(n->bar.cc) > NVME_CTRL_SQES_MAX(n->id_ctrl.sqes) ||
+> -            !NVME_AQA_ASQS(n->bar.aqa) || !NVME_AQA_ACQS(n->bar.aqa)) {
+> +    if (unlikely(n->cq[0])) {
+> +        trace_nvme_err_startfail_cq();
+> +        return -1;
+> +    }
+> +    if (unlikely(n->sq[0])) {
+> +        trace_nvme_err_startfail_sq();
+> +        return -1;
+> +    }
+> +    if (unlikely(!n->bar.asq)) {
+> +        trace_nvme_err_startfail_nbarasq();
+> +        return -1;
+> +    }
+> +    if (unlikely(!n->bar.acq)) {
+> +        trace_nvme_err_startfail_nbaracq();
+> +        return -1;
+> +    }
+> +    if (unlikely(n->bar.asq & (page_size - 1))) {
+> +        trace_nvme_err_startfail_asq_misaligned(n->bar.asq);
+> +        return -1;
+> +    }
+> +    if (unlikely(n->bar.acq & (page_size - 1))) {
+> +        trace_nvme_err_startfail_acq_misaligned(n->bar.acq);
+> +        return -1;
+> +    }
+> +    if (unlikely(NVME_CC_MPS(n->bar.cc) <
+> +                 NVME_CAP_MPSMIN(n->bar.cap))) {
+> +        trace_nvme_err_startfail_page_too_small(
+> +                    NVME_CC_MPS(n->bar.cc),
+> +                    NVME_CAP_MPSMIN(n->bar.cap));
+> +        return -1;
+> +    }
+> +    if (unlikely(NVME_CC_MPS(n->bar.cc) >
+> +                 NVME_CAP_MPSMAX(n->bar.cap))) {
+> +        trace_nvme_err_startfail_page_too_large(
+> +                    NVME_CC_MPS(n->bar.cc),
+> +                    NVME_CAP_MPSMAX(n->bar.cap));
+> +        return -1;
+> +    }
+> +    if (unlikely(NVME_CC_IOCQES(n->bar.cc) <
+> +                 NVME_CTRL_CQES_MIN(n->id_ctrl.cqes))) {
+> +        trace_nvme_err_startfail_cqent_too_small(
+> +                    NVME_CC_IOCQES(n->bar.cc),
+> +                    NVME_CTRL_CQES_MIN(n->bar.cap));
+> +        return -1;
+> +    }
+> +    if (unlikely(NVME_CC_IOCQES(n->bar.cc) >
+> +                 NVME_CTRL_CQES_MAX(n->id_ctrl.cqes))) {
+> +        trace_nvme_err_startfail_cqent_too_large(
+> +                    NVME_CC_IOCQES(n->bar.cc),
+> +                    NVME_CTRL_CQES_MAX(n->bar.cap));
+> +        return -1;
+> +    }
+> +    if (unlikely(NVME_CC_IOSQES(n->bar.cc) <
+> +                 NVME_CTRL_SQES_MIN(n->id_ctrl.sqes))) {
+> +        trace_nvme_err_startfail_sqent_too_small(
+> +                    NVME_CC_IOSQES(n->bar.cc),
+> +                    NVME_CTRL_SQES_MIN(n->bar.cap));
+> +        return -1;
+> +    }
+> +    if (unlikely(NVME_CC_IOSQES(n->bar.cc) >
+> +                 NVME_CTRL_SQES_MAX(n->id_ctrl.sqes))) {
+> +        trace_nvme_err_startfail_sqent_too_large(
+> +                    NVME_CC_IOSQES(n->bar.cc),
+> +                    NVME_CTRL_SQES_MAX(n->bar.cap));
+> +        return -1;
+> +    }
+> +    if (unlikely(!NVME_AQA_ASQS(n->bar.aqa))) {
+> +        trace_nvme_err_startfail_asqent_sz_zero();
+> +        return -1;
+> +    }
+> +    if (unlikely(!NVME_AQA_ACQS(n->bar.aqa))) {
+> +        trace_nvme_err_startfail_acqent_sz_zero();
+>          return -1;
+>      }
+> 
+> @@ -749,16 +878,48 @@ static int nvme_start_ctrl(NvmeCtrl *n)
+>  static void nvme_write_bar(NvmeCtrl *n, hwaddr offset, uint64_t data,
+>      unsigned size)
+>  {
+> +    if (unlikely(offset & (sizeof(uint32_t) - 1))) {
+> +        NVME_GUEST_ERR(nvme_ub_mmiowr_misaligned32,
+> +                       "MMIO write not 32-bit aligned,"
+> +                       " offset=0x%"PRIx64", ignored", offset);
+> +        return;
 
-That is right, SJA1000 chip was and is the goal for now.
-But on PCI addnon cards, it is usually accessed through some
-PCI<->local bridge chip. Sometimes a little obscure intended
-for ISDN communication for example etc. And bridges needs
-to be emulated for real hardware to gate interrupts, provide
-identifications etc. To make simple start for a student during
-original GSoC, I have defined as the first target the "board"
-where SJA1000 is connected directly to one and only one PCI BAR
-and IRQ is routed directly to INTA. As a VID is used RedHat or similar
-VID used for virtual QEMU devices and device ID is some arbitrarily
-chosen number. So if this card should stay then we should try to
-really reserve the Device ID.
+This is a logical change.
 
-But we have three QEMU device models implementing real boards
-using SJA1000 chips now. I have contributed Kvaser which we
-use in many application at university and another two boards
-are contributed by Deniz Eren
+> +    }
+> +
+> +    if (unlikely(size < sizeof(uint32_t))) {
+> +        NVME_GUEST_ERR(nvme_ub_mmiowr_toosmall,
+> +                       "MMIO write smaller than 32-bits,"
+> +                       " offset=0x%"PRIx64", size=%u, ignored",
+> +                       offset, size);
+> +        return;
 
-CAN bus Kvaser PCI CAN-S (single SJA1000 channel) emulation added.
-CAN bus PCM-3680I PCI (dual SJA1000 channel) emulation added.
-CAN bus MIOe-3680 PCI (dual SJA1000 channel) emulation added.
+ditto
 
-The simple SJA1000 PCI board is friendly for initial diver
-implementation for some other OS, because you deal only with
-single memory mapped BAR. But it is necessary to adapt such
-driver for some real hardware anyway, because I am not aware
-of any so straightforward board model. So drop of this example is not
-big lost and MIOe-3680 is memory mapped as well so it is enough
-for mamory-mapped SJA1000 driver testing. Kvaser an PCM-3680I
-are IO mapped.
+> +    }
+> +
+>      switch (offset) {
+> -    case 0xc:
+> +    case 0xc:   /* INTMS */
+> +        if (unlikely(msix_enabled(&(n->parent_obj)))) {
+> +            NVME_GUEST_ERR(nvme_ub_mmiowr_intmask_with_msix,
+> +                           "undefined access to interrupt mask set"
+> +                           " when MSI-X is enabled, ignored");
+> +            return;
 
-Best wishes,
+ditto
 
-Pavel
+> +        }
+>          n->bar.intms |= data & 0xffffffff;
+>          n->bar.intmc = n->bar.intms;
+> +        trace_nvme_mmio_intm_set(data & 0xffffffff,
+> +                                 n->bar.intmc);
+>          break;
+> -    case 0x10:
+> +    case 0x10:  /* INTMC */
+> +        if (unlikely(msix_enabled(&(n->parent_obj)))) {
+> +            NVME_GUEST_ERR(nvme_ub_mmiowr_intmask_with_msix,
+> +                           "undefined access to interrupt mask clr"
+> +                           " when MSI-X is enabled, ignored");
+> +            return;
+
+ditto
+
+> +        }
+>          n->bar.intms &= ~(data & 0xffffffff);
+>          n->bar.intmc = n->bar.intms;
+> +        trace_nvme_mmio_intm_clr(data & 0xffffffff,
+> +                                 n->bar.intmc);
+>          break;
+> -    case 0x14:
+> +    case 0x14:  /* CC */
+> +        trace_nvme_mmio_cfg(data & 0xffffffff);
+>          /* Windows first sends data, then sends enable bit */
+>          if (!NVME_CC_EN(data) && !NVME_CC_EN(n->bar.cc) &&
+>              !NVME_CC_SHN(data) && !NVME_CC_SHN(n->bar.cc))
+> @@ -768,40 +929,82 @@ static void nvme_write_bar(NvmeCtrl *n, hwaddr
+> offset, uint64_t data,
+> 
+>          if (NVME_CC_EN(data) && !NVME_CC_EN(n->bar.cc)) {
+>              n->bar.cc = data;
+> -            if (nvme_start_ctrl(n)) {
+> +            if (unlikely(nvme_start_ctrl(n))) {
+> +                trace_nvme_err_startfail();
+>                  n->bar.csts = NVME_CSTS_FAILED;
+>              } else {
+> +                trace_nvme_mmio_start_success();
+>                  n->bar.csts = NVME_CSTS_READY;
+>              }
+>          } else if (!NVME_CC_EN(data) && NVME_CC_EN(n->bar.cc)) {
+> +            trace_nvme_mmio_stopped();
+>              nvme_clear_ctrl(n);
+>              n->bar.csts &= ~NVME_CSTS_READY;
+>          }
+>          if (NVME_CC_SHN(data) && !(NVME_CC_SHN(n->bar.cc))) {
+> -                nvme_clear_ctrl(n);
+> -                n->bar.cc = data;
+> -                n->bar.csts |= NVME_CSTS_SHST_COMPLETE;
+> +            trace_nvme_mmio_shutdown_set();
+> +            nvme_clear_ctrl(n);
+> +            n->bar.cc = data;
+> +            n->bar.csts |= NVME_CSTS_SHST_COMPLETE;
+>          } else if (!NVME_CC_SHN(data) && NVME_CC_SHN(n->bar.cc)) {
+> -                n->bar.csts &= ~NVME_CSTS_SHST_COMPLETE;
+> -                n->bar.cc = data;
+> +            trace_nvme_mmio_shutdown_cleared();
+> +            n->bar.csts &= ~NVME_CSTS_SHST_COMPLETE;
+> +            n->bar.cc = data;
+>          }
+>          break;
+> -    case 0x24:
+> +    case 0x1C:  /* CSTS */
+> +        if (data & (1 << 4)) {
+> +            NVME_GUEST_ERR(nvme_ub_mmiowr_ssreset_w1c_unsupported,
+> +                           "attempted to W1C CSTS.NSSRO"
+> +                           " but CAP.NSSRS is zero (not supported)");
+> +        } else if (data != 0) {
+> +            NVME_GUEST_ERR(nvme_ub_mmiowr_ro_csts,
+> +                           "attempted to set a read only bit"
+> +                           " of controller status");
+> +        }
+> +        break;
+> +    case 0x20:  /* NSSR */
+> +        if (data == 0x4E564D65) {
+> +            trace_nvme_ub_mmiowr_ssreset_unsupported();
+> +        } else {
+> +            /* The spec says that writes of other values have no effect */
+> +            return;
+> +        }
+> +        break;
+> +    case 0x24:  /* AQA */
+>          n->bar.aqa = data & 0xffffffff;
+> +        trace_nvme_mmio_aqattr(data & 0xffffffff);
+>          break;
+> -    case 0x28:
+> +    case 0x28:  /* ASQ */
+>          n->bar.asq = data;
+> +        trace_nvme_mmio_asqaddr(data);
+>          break;
+> -    case 0x2c:
+> +    case 0x2c:  /* ASQ hi */
+>          n->bar.asq |= data << 32;
+> +        trace_nvme_mmio_asqaddr_hi(data, n->bar.asq);
+>          break;
+> -    case 0x30:
+> +    case 0x30:  /* ACQ */
+> +        trace_nvme_mmio_acqaddr(data);
+>          n->bar.acq = data;
+>          break;
+> -    case 0x34:
+> +    case 0x34:  /* ACQ hi */
+>          n->bar.acq |= data << 32;
+> +        trace_nvme_mmio_acqaddr_hi(data, n->bar.acq);
+>          break;
+> +    case 0x38:  /* CMBLOC */
+> +        NVME_GUEST_ERR(nvme_ub_mmiowr_cmbloc_reserved,
+> +                       "invalid write to reserved CMBLOC"
+> +                       " when CMBSZ is zero, ignored");
+> +        return;
+> +    case 0x3C:  /* CMBSZ */
+> +        NVME_GUEST_ERR(nvme_ub_mmiowr_cmbsz_readonly,
+> +                       "invalid write to read only CMBSZ, ignored");
+> +        return;
+>      default:
+> +        NVME_GUEST_ERR(nvme_ub_mmiowr_invalid,
+> +                       "invalid MMIO write,"
+> +                       " offset=0x%"PRIx64", data=%"PRIx64"",
+> +                       offset, data);
+>          break;
+>      }
+>  }
+> @@ -812,9 +1015,22 @@ static uint64_t nvme_mmio_read(void *opaque,
+> hwaddr addr, unsigned size)
+>      uint8_t *ptr = (uint8_t *)&n->bar;
+>      uint64_t val = 0;
+> 
+> -    if (addr < sizeof(n->bar)) {
+> +    if (unlikely(addr & (sizeof(uint32_t) - 1))) {
+> +        NVME_GUEST_ERR(nvme_ub_mmiord_misaligned32,
+> +                       "MMIO read not 32-bit aligned,"
+> +                       " offset=0x%"PRIx64", returning 0", addr);
+> +    } else if (unlikely(size < sizeof(uint32_t))) {
+> +        NVME_GUEST_ERR(nvme_ub_mmiord_toosmall,
+> +                       "MMIO read smaller than 32-bits,"
+> +                       " offset=0x%"PRIx64", returning 0", addr);
+> +    } else if (addr < sizeof(n->bar)) {
+
+logical change...
+
+Please keep logical changes in a separate commit with appropriate
+description, it helps git workflow like while bisecting to find bugs,
+else one could ignore this commit due to the unharmful "add tracing"
+description.
+
+Thanks,
+
+Phil.
+
+>          memcpy(&val, ptr + addr, size);
+> +    } else {
+> +        NVME_GUEST_ERR(nvme_ub_mmiord_invalid_ofs,
+> +                       "MMIO read beyond last register,"
+> +                       " offset=0x%"PRIx64", returning 0", addr);
+>      }
+> +
+>      return val;
+>  }
+> 
+> @@ -822,22 +1038,36 @@ static void nvme_process_db(NvmeCtrl *n, hwaddr
+> addr, int val)
+>  {
+>      uint32_t qid;
+> 
+> -    if (addr & ((1 << 2) - 1)) {
+> +    if (unlikely(addr & ((1 << 2) - 1))) {
+> +        NVME_GUEST_ERR(nvme_ub_db_wr_misaligned,
+> +                       "doorbell write not 32-bit aligned,"
+> +                       " offset=0x%"PRIx64", ignoring", addr);
+>          return;
+>      }
+> 
+>      if (((addr - 0x1000) >> 2) & 1) {
+> +        /* Completion queue doorbell write */
+> +
+>          uint16_t new_head = val & 0xffff;
+>          int start_sqs;
+>          NvmeCQueue *cq;
+> 
+>          qid = (addr - (0x1000 + (1 << 2))) >> 3;
+> -        if (nvme_check_cqid(n, qid)) {
+> +        if (unlikely(nvme_check_cqid(n, qid))) {
+> +            NVME_GUEST_ERR(nvme_ub_db_wr_invalid_cq,
+> +                           "completion queue doorbell write"
+> +                           " for nonexistent queue,"
+> +                           " sqid=%"PRIu32", ignoring", qid);
+>              return;
+>          }
+> 
+>          cq = n->cq[qid];
+> -        if (new_head >= cq->size) {
+> +        if (unlikely(new_head >= cq->size)) {
+> +            NVME_GUEST_ERR(nvme_ub_db_wr_invalid_cqhead,
+> +                           "completion queue doorbell write value"
+> +                           " beyond queue size, sqid=%"PRIu32","
+> +                           " new_head=%"PRIu16", ignoring",
+> +                           qid, new_head);
+>              return;
+>          }
+> 
+> @@ -855,16 +1085,27 @@ static void nvme_process_db(NvmeCtrl *n, hwaddr
+> addr, int val)
+>              nvme_isr_notify(n, cq);
+>          }
+>      } else {
+> +        /* Submission queue doorbell write */
+> +
+>          uint16_t new_tail = val & 0xffff;
+>          NvmeSQueue *sq;
+> 
+>          qid = (addr - 0x1000) >> 3;
+> -        if (nvme_check_sqid(n, qid)) {
+> +        if (unlikely(nvme_check_sqid(n, qid))) {
+> +            NVME_GUEST_ERR(nvme_ub_db_wr_invalid_sq,
+> +                           "submission queue doorbell write"
+> +                           " for nonexistent queue,"
+> +                           " sqid=%"PRIu32", ignoring", qid);
+>              return;
+>          }
+> 
+>          sq = n->sq[qid];
+> -        if (new_tail >= sq->size) {
+> +        if (unlikely(new_tail >= sq->size)) {
+> +            NVME_GUEST_ERR(nvme_ub_db_wr_invalid_sqtail,
+> +                           "submission queue doorbell write value"
+> +                           " beyond queue size, sqid=%"PRIu32","
+> +                           " new_tail=%"PRIu16", ignoring",
+> +                           qid, new_tail);
+>              return;
+>          }
+> 
+> diff --git a/hw/block/trace-events b/hw/block/trace-events
+> index cb6767b3ee..59f269d936 100644
+> --- a/hw/block/trace-events
+> +++ b/hw/block/trace-events
+> @@ -10,3 +10,96 @@ virtio_blk_submit_multireq(void *vdev, void *mrb,
+> int start, int num_reqs, uint6
+>  # hw/block/hd-geometry.c
+>  hd_geometry_lchs_guess(void *blk, int cyls, int heads, int secs) "blk
+> %p LCHS %d %d %d"
+>  hd_geometry_guess(void *blk, uint32_t cyls, uint32_t heads, uint32_t
+> secs, int trans) "blk %p CHS %u %u %u trans %d"
+> +
+> +# hw/block/nvme.c
+> +# nvme traces for successful events
+> +nvme_irq_msix(uint32_t vector) "raising MSI-X IRQ vector %u"
+> +nvme_irq_pin(void) "pulsing IRQ pin"
+> +nvme_irq_masked(void) "IRQ is masked"
+> +nvme_dma_read(uint64_t prp1, uint64_t prp2) "DMA read,
+> prp1=0x%"PRIx64" prp2=0x%"PRIx64""
+> +nvme_rw(char const *verb, uint32_t blk_count, uint64_t byte_count,
+> uint64_t lba) "%s %"PRIu32" blocks (%"PRIu64" bytes) from LBA
+> %"PRIu64""
+> +nvme_create_sq(uint64_t addr, uint16_t sqid, uint16_t cqid, uint16_t
+> qsize, uint16_t qflags) "create submission queue, addr=0x%"PRIx64",
+> sqid=%"PRIu16", cqid=%"PRIu16", qsize=%"PRIu16", qflags=%"PRIu16""
+> +nvme_create_cq(uint64_t addr, uint16_t cqid, uint16_t vector,
+> uint16_t size, uint16_t qflags, int ien) "create completion queue,
+> addr=0x%"PRIx64", cqid=%"PRIu16", vector=%"PRIu16", qsize=%"PRIu16",
+> qflags=%"PRIu16", ien=%d"
+> +nvme_del_sq(uint16_t qid) "deleting submission queue sqid=%"PRIu16""
+> +nvme_del_cq(uint16_t cqid) "deleted completion queue, sqid=%"PRIu16""
+> +nvme_identify_ctrl(void) "identify controller"
+> +nvme_identify_ns(uint16_t ns) "identify namespace, nsid=%"PRIu16""
+> +nvme_identify_nslist(uint16_t ns) "identify namespace list, nsid=%"PRIu16""
+> +nvme_getfeat_vwcache(char const* result) "get feature volatile write
+> cache, result=%s"
+> +nvme_getfeat_numq(int result) "get feature number of queues, result=%d"
+> +nvme_setfeat_numq(int reqcq, int reqsq, int gotcq, int gotsq)
+> "requested cq_count=%d sq_count=%d, responding with cq_count=%d
+> sq_count=%d"
+> +nvme_mmio_intm_set(uint64_t data, uint64_t new_mask) "wrote MMIO,
+> interrupt mask set, data=0x%"PRIx64", new_mask=0x%"PRIx64""
+> +nvme_mmio_intm_clr(uint64_t data, uint64_t new_mask) "wrote MMIO,
+> interrupt mask clr, data=0x%"PRIx64", new_mask=0x%"PRIx64""
+> +nvme_mmio_cfg(uint64_t data) "wrote MMIO, config controller config=0x%"PRIx64""
+> +nvme_mmio_aqattr(uint64_t data) "wrote MMIO, admin queue
+> attributes=0x%"PRIx64""
+> +nvme_mmio_asqaddr(uint64_t data) "wrote MMIO, admin submission queue
+> address=0x%"PRIx64""
+> +nvme_mmio_acqaddr(uint64_t data) "wrote MMIO, admin completion queue
+> address=0x%"PRIx64""
+> +nvme_mmio_asqaddr_hi(uint64_t data, uint64_t new_addr) "wrote MMIO,
+> admin submission queue high half=0x%"PRIx64", new_address=0x%"PRIx64""
+> +nvme_mmio_acqaddr_hi(uint64_t data, uint64_t new_addr) "wrote MMIO,
+> admin completion queue high half=0x%"PRIx64", new_address=0x%"PRIx64""
+> +nvme_mmio_start_success(void) "setting controller enable bit succeeded"
+> +nvme_mmio_stopped(void) "cleared controller enable bit"
+> +nvme_mmio_shutdown_set(void) "shutdown bit set"
+> +nvme_mmio_shutdown_cleared(void) "shutdown bit cleared"
+> +
+> +# nvme traces for error conditions
+> +nvme_err_invalid_dma(void) "PRP/SGL is too small for transfer size"
+> +nvme_err_invalid_prplist_ent(uint64_t prplist) "PRP list entry is
+> null or not page aligned: 0x%"PRIx64""
+> +nvme_err_invalid_prp2_align(uint64_t prp2) "PRP2 is not page aligned:
+> 0x%"PRIx64""
+> +nvme_err_invalid_prp2_missing(void) "PRP2 is null and more data to be
+> transferred"
+> +nvme_err_invalid_field(void) "invalid field"
+> +nvme_err_invalid_prp(void) "invalid PRP"
+> +nvme_err_invalid_sgl(void) "invalid SGL"
+> +nvme_err_invalid_ns(uint32_t ns, uint32_t limit) "invalid namespace
+> %u not within 1-%u"
+> +nvme_err_invalid_opc(uint8_t opc) "invalid opcode 0x%"PRIx8""
+> +nvme_err_invalid_admin_opc(uint8_t opc) "invalid admin opcode 0x%"PRIx8""
+> +nvme_err_invalid_lba_range(uint64_t start, uint64_t len, uint64_t
+> limit) "Invalid LBA start=%"PRIu64" len=%"PRIu64" limit=%"PRIu64""
+> +nvme_err_invalid_del_sq(uint16_t qid) "invalid submission queue
+> deletion, sid=%"PRIu16""
+> +nvme_err_invalid_create_sq_cqid(uint16_t cqid) "failed creating
+> submission queue, invalid cqid=%"PRIu16""
+> +nvme_err_invalid_create_sq_sqid(uint16_t sqid) "failed creating
+> submission queue, invalid sqid=%"PRIu16""
+> +nvme_err_invalid_create_sq_size(uint16_t qsize) "failed creating
+> submission queue, invalid qsize=%"PRIu16""
+> +nvme_err_invalid_create_sq_addr(uint64_t addr) "failed creating
+> submission queue, addr=0x%"PRIx64""
+> +nvme_err_invalid_create_sq_qflags(uint16_t qflags) "failed creating
+> submission queue, qflags=%"PRIu16""
+> +nvme_err_invalid_del_cq_cqid(uint16_t cqid) "failed deleting
+> completion queue, cqid=%"PRIu16""
+> +nvme_err_invalid_del_cq_notempty(uint16_t cqid) "failed deleting
+> completion queue, it is not empty, cqid=%"PRIu16""
+> +nvme_err_invalid_create_cq_cqid(uint16_t cqid) "failed creating
+> completion queue, cqid=%"PRIu16""
+> +nvme_err_invalid_create_cq_size(uint16_t size) "failed creating
+> completion queue, size=%"PRIu16""
+> +nvme_err_invalid_create_cq_addr(uint64_t addr) "failed creating
+> completion queue, addr=0x%"PRIx64""
+> +nvme_err_invalid_create_cq_vector(uint16_t vector) "failed creating
+> completion queue, vector=%"PRIu16""
+> +nvme_err_invalid_create_cq_qflags(uint16_t qflags) "failed creating
+> completion queue, qflags=%"PRIu16""
+> +nvme_err_invalid_identify_cns(uint16_t cns) "identify, invalid cns=0x%"PRIx16""
+> +nvme_err_invalid_getfeat(int dw10) "invalid get features, dw10=0x%"PRIx32""
+> +nvme_err_invalid_setfeat(uint32_t dw10) "invalid set features,
+> dw10=0x%"PRIx32""
+> +nvme_err_startfail_cq(void) "nvme_start_ctrl failed because there are
+> non-admin completion queues"
+> +nvme_err_startfail_sq(void) "nvme_start_ctrl failed because there are
+> non-admin submission queues"
+> +nvme_err_startfail_nbarasq(void) "nvme_start_ctrl failed because the
+> admin submission queue address is null"
+> +nvme_err_startfail_nbaracq(void) "nvme_start_ctrl failed because the
+> admin completion queue address is null"
+> +nvme_err_startfail_asq_misaligned(uint64_t addr) "nvme_start_ctrl
+> failed because the admin submission queue address is misaligned:
+> 0x%"PRIx64""
+> +nvme_err_startfail_acq_misaligned(uint64_t addr) "nvme_start_ctrl
+> failed because the admin completion queue address is misaligned:
+> 0x%"PRIx64""
+> +nvme_err_startfail_page_too_small(uint8_t log2ps, uint8_t maxlog2ps)
+> "nvme_start_ctrl failed because the page size is too small:
+> log2size=%u, min=%u"
+> +nvme_err_startfail_page_too_large(uint8_t log2ps, uint8_t maxlog2ps)
+> "nvme_start_ctrl failed because the page size is too large:
+> log2size=%u, max=%u"
+> +nvme_err_startfail_cqent_too_small(uint8_t log2ps, uint8_t maxlog2ps)
+> "nvme_start_ctrl failed because the completion queue entry size is too
+> small: log2size=%u, min=%u"
+> +nvme_err_startfail_cqent_too_large(uint8_t log2ps, uint8_t maxlog2ps)
+> "nvme_start_ctrl failed because the completion queue entry size is too
+> large: log2size=%u, max=%u"
+> +nvme_err_startfail_sqent_too_small(uint8_t log2ps, uint8_t maxlog2ps)
+> "nvme_start_ctrl failed because the submission queue entry size is too
+> small: log2size=%u, min=%u"
+> +nvme_err_startfail_sqent_too_large(uint8_t log2ps, uint8_t maxlog2ps)
+> "nvme_start_ctrl failed because the submission queue entry size is too
+> large: log2size=%u, max=%u"
+> +nvme_err_startfail_asqent_sz_zero(void) "nvme_start_ctrl failed
+> because the admin submission queue size is zero"
+> +nvme_err_startfail_acqent_sz_zero(void) "nvme_start_ctrl failed
+> because the admin completion queue size is zero"
+> +nvme_err_startfail(void) "setting controller enable bit failed"
+> +
+> +# Traces for undefined behavior
+> +nvme_ub_mmiowr_misaligned32(uint64_t offset) "MMIO write not 32-bit
+> aligned, offset=0x%"PRIx64", ignored"
+> +nvme_ub_mmiowr_toosmall(uint64_t offset, unsigned size) "MMIO write
+> smaller than 32 bits, offset=0x%"PRIx64", size=%u, ignored"
+> +nvme_ub_mmiowr_intmask_with_msix(void) "undefined access to interrupt
+> mask set when MSI-X is enabled, ignored"
+> +nvme_ub_mmiowr_ro_csts(void) "attempted to set a read only bit of
+> controller status"
+> +nvme_ub_mmiowr_ssreset_w1c_unsupported(void) "attempted to W1C
+> CSTS.NSSRO but CAP.NSSRS is zero (not supported)"
+> +nvme_ub_mmiowr_ssreset_unsupported(void) "attempted NVM subsystem
+> reset but CAP.NSSRS is zero (not supported)"
+> +nvme_ub_mmiowr_cmbloc_reserved(void) "invalid write to reserved
+> CMBLOC when CMBSZ is zero, ignored"
+> +nvme_ub_mmiowr_cmbsz_readonly(void) "invalid write to read only CMBSZ, ignored"
+> +nvme_ub_mmiowr_invalid(uint64_t offset, uint64_t data) "invalid MMIO
+> write, offset=0x%"PRIx64", data=0x%"PRIx64""
+> +nvme_ub_mmiord_misaligned32(uint64_t offset) "MMIO read not 32-bit
+> aligned, offset=0x%"PRIx64", returning 0"
+> +nvme_ub_mmiord_toosmall(uint64_t offset) "MMIO read smaller than
+> 32-bits, offset=0x%"PRIx64", returning 0"
+> +nvme_ub_mmiord_invalid_ofs(uint64_t offset) "MMIO read beyond last
+> register, offset=0x%"PRIx64", returning 0"
+> +nvme_ub_db_wr_misaligned(uint64_t offset) "doorbell write not 32-bit
+> aligned, offset=0x%"PRIx64", ignoring"
+> +nvme_ub_db_wr_invalid_cq(uint32_t qid) "completion queue doorbell
+> write for nonexistent queue, cqid=%"PRIu32", ignoring"
+> +nvme_ub_db_wr_invalid_cqhead(uint32_t qid, uint16_t new_head)
+> "completion queue doorbell write value beyond queue size,
+> cqid=%"PRIu32", new_head=%"PRIu16", ignoring"
+> +nvme_ub_db_wr_invalid_sq(uint32_t qid) "submission queue doorbell
+> write for nonexistent queue, sqid=%"PRIu32", ignoring"
+> +nvme_ub_db_wr_invalid_sqtail(uint32_t qid, uint16_t new_tail)
+> "submission queue doorbell write value beyond queue size,
+> sqid=%"PRIu32", new_head=%"PRIu16", ignoring"
+> 
