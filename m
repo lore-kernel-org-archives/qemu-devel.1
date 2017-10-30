@@ -1,23 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52366)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53995)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1e99w3-0002GP-9I
-	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 09:17:08 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1e9A1m-0006cm-HX
+	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 09:22:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1e99vx-00045I-8y
-	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 09:16:59 -0400
-Received: from mailout2.w1.samsung.com ([210.118.77.12]:35964)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <a.perevalov@samsung.com>)
-	id 1e99vw-00043W-VJ
-	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 09:16:53 -0400
-From: Alexey Perevalov <a.perevalov@samsung.com>
-Date: Mon, 30 Oct 2017 16:16:26 +0300
-Message-id: <1509369390-8285-3-git-send-email-a.perevalov@samsung.com>
-In-reply-to: <1509369390-8285-1-git-send-email-a.perevalov@samsung.com>
-References: <1509369390-8285-1-git-send-email-a.perevalov@samsung.com>
-	<CGME20171030131647eucas1p1b5fb0616e683e78fdca767d267400f50@eucas1p1.samsung.com>
-Subject: [Qemu-devel] [PATCH v12 2/6] migration: add postcopy blocktime ctx
- into MigrationIncomingState
+	(envelope-from <peter.maydell@linaro.org>) id 1e9A1g-0008MR-TC
+	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 09:22:54 -0400
+Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:45049)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1e9A1g-0008Lq-Mu
+	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 09:22:48 -0400
+Received: by mail-wr0-x244.google.com with SMTP id z55so12598094wrz.1
+	for <qemu-devel@nongnu.org>; Mon, 30 Oct 2017 06:22:48 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <a169c6f0-4a82-cd3c-7f83-0a6394c06e98@ilande.co.uk>
+References: <1508947167-5304-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<1508947167-5304-10-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<CAFEAcA8DGeoNWxr9Y-vRXmtR5=7+EMQqfpt5cs7x2qTcfRZR4Q@mail.gmail.com>
+	<98d12504-4523-2a5c-aefa-4b01e1c6c7df@ilande.co.uk>
+	<a169c6f0-4a82-cd3c-7f83-0a6394c06e98@ilande.co.uk>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 30 Oct 2017 13:22:27 +0000
+Message-ID: <CAFEAcA9u3kw6LnwE3ZnExdcmMM42AuycnLOppiX7wXdeKk5hcw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCHv4 09/13] lance: move TYPE_LANCE and
+ SysBusPCNetState from lance.c to lance.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,147 +33,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Alexey Perevalov <a.perevalov@samsung.com>, quintela@redhat.com, peterx@redhat.com, i.maximets@samsung.com, heetae82.ahn@samsung.com, dgilbert@redhat.com
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: Jason Wang <jasowang@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Artyom Tarasenko <atar4qemu@gmail.com>
 
-This patch adds request to kernel space for UFFD_FEATURE_THREAD_ID,
-in case when this feature is provided by kernel.
+On 30 October 2017 at 13:10, Mark Cave-Ayland
+<mark.cave-ayland@ilande.co.uk> wrote:
+> On 26/10/17 11:12, Mark Cave-Ayland wrote:
+>> On 25/10/17 18:47, Peter Maydell wrote:
+>>> On 25 October 2017 at 16:59, Mark Cave-Ayland wrote:
+>>>> --- /dev/null
+>>>> +++ b/include/hw/net/lance.h
+>>>> @@ -0,0 +1,41 @@
+>>>> +/*
+>>>> + * QEMU AMD PC-Net II (Am79C970A) emulation
+>>>
+>>> Filename says this is Lance ethernet, but the comment says it's PC-Net ?
+>>
+>> According to the datasheet for Am79C970A, the original Lance is an
+>> Am7990 device and the Am79C970A aka PCNet-PCI II as emulated by QEMU is
+>> register-compatible with it.
+>>
+>> I guess the comment above is more technically correct, but I'm happy to
+>> adjust it in my local tree if you still feel it needs to change?
 
-PostcopyBlocktimeContext is incapsulated inside postcopy-ram.c,
-due to it's postcopy only feature.
-Also it defines PostcopyBlocktimeContext's instance live time.
-Information from PostcopyBlocktimeContext instance will be provided
-much after postcopy migration end, instance of PostcopyBlocktimeContext
-will live till QEMU exit, but part of it (vcpu_addr,
-page_fault_vcpu_time) used only during calculation, will be released
-when postcopy ended or failed.
+I think we should have a comment that says what the file is
+for. Since this is a different file from pcnet.h, we should
+have a comment that isn't the same as the pcnet.h one.
+I don't particularly mind what it says, as long as it briefly
+explains what's in the file (and by implication what distinguishes
+things in this file from things in the other).
 
-To enable postcopy blocktime calculation on destination, need to request
-proper capabiltiy (Patch for documentation will be at the tail of the patch
-set).
-
-As an example following command enable that capability, assume QEMU was
-started with
--chardev socket,id=charmonitor,path=/var/lib/migrate-vm-monitor.sock
-option to control it
-
-[root@host]#printf "{\"execute\" : \"qmp_capabilities\"}\r\n \
-{\"execute\": \"migrate-set-capabilities\" , \"arguments\":   {
-\"capabilities\": [ { \"capability\": \"postcopy-blocktime\", \"state\":
-true } ] } }" | nc -U /var/lib/migrate-vm-monitor.sock
-
-Or just with HMP
-(qemu) migrate_set_capability postcopy-blocktime on
-
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
----
- migration/migration.h    |  8 +++++++
- migration/postcopy-ram.c | 59 ++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 67 insertions(+)
-
-diff --git a/migration/migration.h b/migration/migration.h
-index 5f5e527..fb8d2ef 100644
---- a/migration/migration.h
-+++ b/migration/migration.h
-@@ -22,6 +22,8 @@
- #include "hw/qdev.h"
- #include "io/channel.h"
- 
-+struct PostcopyBlocktimeContext;
-+
- /* State for the incoming migration */
- struct MigrationIncomingState {
-     QEMUFile *from_src_file;
-@@ -59,6 +61,12 @@ struct MigrationIncomingState {
-     /* The coroutine we should enter (back) after failover */
-     Coroutine *migration_incoming_co;
-     QemuSemaphore colo_incoming_sem;
-+
-+    /*
-+     * PostcopyBlocktimeContext to keep information for postcopy
-+     * live migration, to calculate vCPU block time
-+     * */
-+    struct PostcopyBlocktimeContext *blocktime_ctx;
- };
- 
- MigrationIncomingState *migration_incoming_get_current(void);
-diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-index bec6c2c..c18ec5a 100644
---- a/migration/postcopy-ram.c
-+++ b/migration/postcopy-ram.c
-@@ -61,6 +61,52 @@ struct PostcopyDiscardState {
- #include <sys/eventfd.h>
- #include <linux/userfaultfd.h>
- 
-+typedef struct PostcopyBlocktimeContext {
-+    /* time when page fault initiated per vCPU */
-+    int64_t *page_fault_vcpu_time;
-+    /* page address per vCPU */
-+    uint64_t *vcpu_addr;
-+    int64_t total_blocktime;
-+    /* blocktime per vCPU */
-+    int64_t *vcpu_blocktime;
-+    /* point in time when last page fault was initiated */
-+    int64_t last_begin;
-+    /* number of vCPU are suspended */
-+    int smp_cpus_down;
-+
-+    /*
-+     * Handler for exit event, necessary for
-+     * releasing whole blocktime_ctx
-+     */
-+    Notifier exit_notifier;
-+} PostcopyBlocktimeContext;
-+
-+static void destroy_blocktime_context(struct PostcopyBlocktimeContext *ctx)
-+{
-+    g_free(ctx->page_fault_vcpu_time);
-+    g_free(ctx->vcpu_addr);
-+    g_free(ctx->vcpu_blocktime);
-+    g_free(ctx);
-+}
-+
-+static void migration_exit_cb(Notifier *n, void *data)
-+{
-+    PostcopyBlocktimeContext *ctx = container_of(n, PostcopyBlocktimeContext,
-+                                                 exit_notifier);
-+    destroy_blocktime_context(ctx);
-+}
-+
-+static struct PostcopyBlocktimeContext *blocktime_context_new(void)
-+{
-+    PostcopyBlocktimeContext *ctx = g_new0(PostcopyBlocktimeContext, 1);
-+    ctx->page_fault_vcpu_time = g_new0(int64_t, smp_cpus);
-+    ctx->vcpu_addr = g_new0(uint64_t, smp_cpus);
-+    ctx->vcpu_blocktime = g_new0(int64_t, smp_cpus);
-+
-+    ctx->exit_notifier.notify = migration_exit_cb;
-+    qemu_add_exit_notifier(&ctx->exit_notifier);
-+    return ctx;
-+}
- 
- /**
-  * receive_ufd_features: check userfault fd features, to request only supported
-@@ -153,6 +199,19 @@ static bool ufd_check_and_apply(int ufd, MigrationIncomingState *mis)
-         }
-     }
- 
-+#ifdef UFFD_FEATURE_THREAD_ID
-+    if (migrate_postcopy_blocktime() && mis &&
-+        UFFD_FEATURE_THREAD_ID & supported_features) {
-+        /* kernel supports that feature */
-+        /* don't create blocktime_context if it exists */
-+        if (!mis->blocktime_ctx) {
-+            mis->blocktime_ctx = blocktime_context_new();
-+        }
-+
-+        asked_features |= UFFD_FEATURE_THREAD_ID;
-+    }
-+#endif
-+
-     /*
-      * request features, even if asked_features is 0, due to
-      * kernel expects UFFD_API before UFFDIO_REGISTER, per
--- 
-2.7.4
+thanks
+-- PMM
