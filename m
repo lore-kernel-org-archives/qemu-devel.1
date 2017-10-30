@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39107)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42459)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1e974b-0002Nk-WE
-	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 06:13:42 -0400
+	(envelope-from <kraxel@redhat.com>) id 1e97Jb-0004Pa-NT
+	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 06:29:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1e974W-0002eV-BM
-	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 06:13:37 -0400
-Date: Mon, 30 Oct 2017 11:13:21 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20171030101321.GA2967@localhost.localdomain>
-References: <20171029125338.25988-1-kwolf@redhat.com>
-	<20171030083916.z5bglhjeiabfeoy5@eukaryote>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171030083916.z5bglhjeiabfeoy5@eukaryote>
-Subject: Re: [Qemu-devel] [PATCH] qemu-iotests: Use -nographic in 182
+	(envelope-from <kraxel@redhat.com>) id 1e97JY-0002hH-JS
+	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 06:29:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41502)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1e97JY-0002fW-Db
+	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 06:29:04 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4741AC0587E0
+	for <qemu-devel@nongnu.org>; Mon, 30 Oct 2017 10:29:02 +0000 (UTC)
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Mon, 30 Oct 2017 11:28:30 +0100
+Message-Id: <20171030102830.4469-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PATCH] vga: fix region checks in wraparound case
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,41 +27,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kashyap Chamarthy <kchamart@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Am 30.10.2017 um 09:39 hat Kashyap Chamarthy geschrieben:
-> On Sun, Oct 29, 2017 at 01:53:38PM +0100, Kevin Wolf wrote:
-> > This avoids that random UI frontend error messages end up in the output.
-> > In particular, we were seeing this line in CI error logs:
-> > 
-> > +Unable to init server: Could not connect: Connection refused
-> > 
-> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> > ---
-> >  tests/qemu-iotests/182 | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> > diff --git a/tests/qemu-iotests/182 b/tests/qemu-iotests/182
-> > index 2e078ceed8..4b31592fb8 100755
-> > --- a/tests/qemu-iotests/182
-> > +++ b/tests/qemu-iotests/182
-> > @@ -62,7 +62,7 @@ _launch_qemu -drive file=$TEST_IMG,if=none,id=drive0,file.locking=on \
-> >  
-> >  echo
-> >  echo "Starting a second QEMU using the same image should fail"
-> > -echo 'quit' | $QEMU -monitor stdio \
-> > +echo 'quit' | $QEMU -nographic -monitor stdio \
-> 
-> Isn't "-display none" preferred instead of "-nographic"?
-> 
-> Assuming you'll change it to "-display none":
-> 
->     Reviewed-by: Kashyap CHamarthy <kchamart@redhat.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ hw/display/vga.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-It's not the same thing, -nographic does more than just that, like
-redirecting the serial port to stdio. In this specific case, -display
-none should actually be enough, but for consistency I just did the same
-thing as other qemu-iotest cases are doing.
-
-Kevin
+diff --git a/hw/display/vga.c b/hw/display/vga.c
+index 1d19f6b..a64a094 100644
+--- a/hw/display/vga.c
++++ b/hw/display/vga.c
+@@ -1666,9 +1666,9 @@ static void vga_draw_graphic(VGACommonState *s, int full_update)
+             /* scanline wraps from end of video memory to the start */
+             assert(force_shadow);
+             update = memory_region_snapshot_get_dirty(&s->vram, snap,
+-                                                      page0, 0);
++                                                      page0, s->vbe_size - page0);
+             update |= memory_region_snapshot_get_dirty(&s->vram, snap,
+-                                                       page1, 0);
++                                                       0, page1);
+         } else {
+             update = memory_region_snapshot_get_dirty(&s->vram, snap,
+                                                       page0, page1 - page0);
+-- 
+2.9.3
