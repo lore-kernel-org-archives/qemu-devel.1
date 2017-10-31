@@ -1,26 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44483)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50545)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e9X6Z-0005X7-Ur
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 10:01:30 -0400
+	(envelope-from <dan.j.williams@intel.com>) id 1e9XPA-0000Rm-MA
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 10:20:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e9X6W-0003W3-0Q
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 10:01:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40950)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1e9X6V-0003UX-NB
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 10:01:19 -0400
-Date: Tue, 31 Oct 2017 15:01:14 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20171031150114.60e0958e@nial.brq.redhat.com>
-In-Reply-To: <20171019063151.GA13245@umbus>
-References: <1508170976-96869-4-git-send-email-imammedo@redhat.com>
-	<1508325132-70513-1-git-send-email-imammedo@redhat.com>
-	<20171019063151.GA13245@umbus>
+	(envelope-from <dan.j.williams@intel.com>) id 1e9XP9-0000jp-Ku
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 10:20:36 -0400
+Received: from mail-oi0-x234.google.com ([2607:f8b0:4003:c06::234]:48404)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <dan.j.williams@intel.com>)
+	id 1e9XP9-0000b9-DF
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 10:20:35 -0400
+Received: by mail-oi0-x234.google.com with SMTP id m198so26820562oig.5
+	for <qemu-devel@nongnu.org>; Tue, 31 Oct 2017 07:20:31 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v2 3/6] possible_cpus: add CPUArchId::type
- field
+In-Reply-To: <0a26793f-86f7-29e7-f61b-dc4c1ef08c8e@gmail.com>
+References: <1455443283.33337333.1500618150787.JavaMail.zimbra@redhat.com>
+	<CAPcyv4hpbk0jgp+mA=q05zVBV8ZSZvCvV68JJ4gjE3QhK70d1w@mail.gmail.com>
+	<20170724102330.GE652@quack2.suse.cz>
+	<1157879323.33809400.1500897967669.JavaMail.zimbra@redhat.com>
+	<20170724123752.GN652@quack2.suse.cz>
+	<1888117852.34216619.1500992835767.JavaMail.zimbra@redhat.com>
+	<CAPcyv4in28F3FOVKp9abvrggxPuXdbGynF5=ZvBXCrywoa06JA@mail.gmail.com>
+	<1501016375.26846.21.camel@redhat.com>
+	<1063764405.34607875.1501076841865.JavaMail.zimbra@redhat.com>
+	<1501104453.26846.45.camel@redhat.com>
+	<CAPcyv4hsqrqBxoipUHPAbSctuzbVWCRnT-gN08i9uhXTWY6iPQ@mail.gmail.com>
+	<1501112787.4073.49.camel@redhat.com>
+	<CAPcyv4gbC6Hx_4YsCfOd2t=fn=wPGp5h__1QH=-p40TPFNbFzA@mail.gmail.com>
+	<0a26793f-86f7-29e7-f61b-dc4c1ef08c8e@gmail.com>
+From: Dan Williams <dan.j.williams@intel.com>
+Date: Tue, 31 Oct 2017 07:20:29 -0700
+Message-ID: <CAPcyv4iw2cCpDmr+4kxsFvdy+iGZiz=ok-kLhsDKpqDy+szf-Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] KVM "fake DAX" flushing interface - discussion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,84 +41,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, pkrempa@redhat.com, ehabkost@redhat.com, pbonzini@redhat.com, drjones@redhat.com, cohuck@redhat.com
+To: Xiao Guangrong <xiaoguangrong.eric@gmail.com>
+Cc: Rik van Riel <riel@redhat.com>, Pankaj Gupta <pagupta@redhat.com>, Jan Kara <jack@suse.cz>, Stefan Hajnoczi <stefanha@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, kvm-devel <kvm@vger.kernel.org>, Qemu Developers <qemu-devel@nongnu.org>, "linux-nvdimm@lists.01.org" <linux-nvdimm@ml01.01.org>, ross zwisler <ross.zwisler@linux.intel.com>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Nitesh Narayan Lal <nilal@redhat.com>, Haozhong Zhang <haozhong.zhang@intel.com>, Ross Zwisler <ross.zwisler@intel.com>
 
-On Thu, 19 Oct 2017 17:31:51 +1100
-David Gibson <david@gibson.dropbear.id.au> wrote:
+On Tue, Oct 31, 2017 at 12:13 AM, Xiao Guangrong
+<xiaoguangrong.eric@gmail.com> wrote:
+>
+>
+> On 07/27/2017 08:54 AM, Dan Williams wrote:
+>
+>>> At that point, would it make sense to expose these special
+>>> virtio-pmem areas to the guest in a slightly different way,
+>>> so the regions that need virtio flushing are not bound by
+>>> the regular driver, and the regular driver can continue to
+>>> work for memory regions that are backed by actual pmem in
+>>> the host?
+>>
+>>
+>> Hmm, yes that could be feasible especially if it uses the ACPI NFIT
+>> mechanism. It would basically involve defining a new SPA (System
+>> Phyiscal Address) range GUID type, and then teaching libnvdimm to
+>> treat that as a new pmem device type.
+>
+>
+> I would prefer a new flush mechanism to a new memory type introduced
+> to NFIT, e.g, in that mechanism we can define request queues and
+> completion queues and any other features to make virtualization
+> friendly. That would be much simpler.
+>
 
-> On Wed, Oct 18, 2017 at 01:12:12PM +0200, Igor Mammedov wrote:
-> > For enabling early cpu to numa node configuration at runtime
-> > qmp_query_hotpluggable_cpus() should provide a list of available
-> > cpu slots at early stage, before machine_init() is called and
-> > the 1st cpu is created, so that mgmt might be able to call it
-> > and use output to set numa mapping.
-> > Use MachineClass::possible_cpu_arch_ids() callback to set
-> > cpu type info, along with the rest of possible cpu properties,
-> > to let machine define which cpu type* will be used.
-> > 
-> > * for SPAPR it will be a spapr core type and for ARM/s390x/x86
-> >   a respective descendant of CPUClass.
-> > 
-> > Move parse_numa_opts() in vl.c after cpu_model is parsed into
-> > cpu_type so that possible_cpu_arch_ids() would know which
-> > cpu_type to use during layout initialization.
-> > 
-> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>  
-> 
-> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-> 
-> > ---
-> >   v2:
-> >      - fix NULL dereference caused by not initialized
-> >        MachineState::cpu_type at the time parse_numa_opts()
-> >        were called
-> > ---
-> >  include/hw/boards.h        |  2 ++
-> >  hw/arm/virt.c              |  3 ++-
-> >  hw/core/machine.c          | 12 ++++++------
-> >  hw/i386/pc.c               |  4 +++-
-> >  hw/ppc/spapr.c             | 13 ++++++++-----
-> >  hw/s390x/s390-virtio-ccw.c |  1 +
-> >  vl.c                       |  3 +--
-> >  7 files changed, 23 insertions(+), 15 deletions(-)
-> > 
-> > diff --git a/include/hw/boards.h b/include/hw/boards.h
-> > index 191a5b3..fa21758 100644
-> > --- a/include/hw/boards.h
-> > +++ b/include/hw/boards.h
-> > @@ -80,6 +80,7 @@ void machine_set_cpu_numa_node(MachineState *machine,
-> >   * CPUArchId:
-> >   * @arch_id - architecture-dependent CPU ID of present or possible CPU  
-> 
-> I know this isn't really in scope for this patch, but is @arch_id here
-> supposed to have meaning defined by the target, or by the machine?
-> 
-> If it's the machime, it could do with a rename - "arch" means target
-> to most people (thanks to Linux).
-> 
-> If it's the target, it's kind of bogus, because it doesn't necessarily
-> have a clear meaning per target - get_arch_id in CPUClass has the same
-> problem, which is probably one reason it's basically only used by the
-> x86 code at present.
-> 
-> e.g. for target/ppc, what do we use?  There's the PIR, which is in the
-> CPU.. but only on some cpu models, not all.  There will generally be
-> some kind of master PIC id, but there are different PIC models on
-> different boards.  What goes in the devicetree?  Well only some
-> machines use devicetree, and they might define the cpu reg 
-> differently.
-> 
-> Board designs will generally try to make some if not all of those
-> possible values equal for simplicity, but there's still no real way of
-> defining a sensible arch_id independent of machine / board.
-I'd say arch_id is machine specific so far, it was introduced when we
-didn't have CpuInstanceProperties and at that time we considered only
-vcpus (threads) and doesn't really apply to spapr cores.
+No that's more confusing because now we are overloading the definition
+of persistent memory. I want this memory type identified from the top
+of the stack so it can appear differently in /proc/iomem and also
+implement this alternate flush communication.
 
-In general we could do away with arch_id and use CpuInstanceProperties
-instead, but arch_id also serves aux purpose, it allows machine to
-pre-calculate(cache) apic-id/mpidr values in one place and then they
-are/(could be) used by arch in-depended code to build acpi tables.
-So if we drop arch_id we would need to introduce a machine hook,
-which would translate CpuInstanceProperties into current arch_id.
+In what way is this "more complicated"? It was trivial to add support
+for the "volatile" NFIT range, this will not be any more complicated
+than that.
