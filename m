@@ -1,36 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57777)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49013)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1e9NFs-0001tY-I1
-	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 23:30:21 -0400
+	(envelope-from <bounces@canonical.com>) id 1e9OCW-0000sw-Iq
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 00:30:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1e9NFo-0005kg-J9
-	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 23:30:20 -0400
-Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:49365)
+	(envelope-from <bounces@canonical.com>) id 1e9OCR-0004LT-Ml
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 00:30:56 -0400
+Received: from indium.canonical.com ([91.189.90.7]:37632)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1e9NFo-0005js-BY
-	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 23:30:16 -0400
-Received: by mail-pf0-x242.google.com with SMTP id i5so12691525pfe.6
-	for <qemu-devel@nongnu.org>; Mon, 30 Oct 2017 20:30:15 -0700 (PDT)
-References: <20171027131412.18830-1-berrange@redhat.com>
-	<20171027131412.18830-2-berrange@redhat.com>
-	<f1716a0f-6c6d-7704-e628-3c4cfc1a6bf2@ozlabs.ru>
-	<20171028204505.GA21304@redhat.com>
-	<8f0324f3-a0c8-a4b0-357b-8b8ff7e75d08@ozlabs.ru>
-	<20171029075727.GA21571@redhat.com>
-	<a34b48cd-c112-7812-4e8a-2ba2db1a18e2@ozlabs.ru>
-	<20171029162902.GA14433@redhat.com>
-	<a3f3604c-4a6d-f99b-0542-f8a4d02a3c7f@ozlabs.ru>
-	<20171030075244.GB31767@redhat.com>
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Message-ID: <8ad0a68b-f089-ff81-1d46-919c1b104cb5@ozlabs.ru>
-Date: Tue, 31 Oct 2017 14:30:08 +1100
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1e9OCR-0004KM-Gm
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 00:30:51 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1e9OCQ-0002xS-Bf
+	for <qemu-devel@nongnu.org>; Tue, 31 Oct 2017 04:30:50 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 523EF2E80C7
+	for <qemu-devel@nongnu.org>; Tue, 31 Oct 2017 04:30:50 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20171030075244.GB31767@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-AU
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 1/4] build: allow setting a custom GIT
- binary for transparent proxying
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 31 Oct 2017 04:17:33 -0000
+From: Launchpad Bug Tracker <997631@bugs.launchpad.net>
+Reply-To: Bug 997631 <997631@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20120510132745.22119.25005.malonedeb@chaenomeles.canonical.com>
+Message-Id: <150942345402.24661.1325538486807789995.malone@loganberry.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 997631] Re: Windows 2008R2 very slow cold boot
+ when 4 CPUs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,70 +37,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
 
-On 30/10/17 18:52, Daniel P. Berrange wrote:
-> On Mon, Oct 30, 2017 at 10:49:01AM +1100, Alexey Kardashevskiy wrote:
->> On 30/10/17 03:29, Daniel P. Berrange wrote:
->>> On Mon, Oct 30, 2017 at 01:08:56AM +1100, Alexey Kardashevskiy wrote:
->>>>
->>>> I run ./scripts/git-submodule.sh on a server (where source directory is
->>>> writeable), them "rm .git-submodule-status", then run "Makefile" on a build
->>>> machine (which has the source directory mounted as read-only). I basically
->>>> recreate the situation where I was when I just discovered this brand new
->>>> ./scripts/git-submodule.sh.
->>>
->>> Don't rm the .git-submodule-status. That means 'make' thinks the modules
->>> are out of date.
->>>
->>> Just run 'scripts/git-submodules.sh ...mods..' on the writable source
->>> dir, and then run 'make' on the build machine.
->>>
->>>> I know that now, all I am asking is an error message to print exact command
->>>> to run...
->>>
->>> If you hadn't deleted the .git-submodule-status, it would have worked fine.
->>
->> No.
->>
->> I do this on a server:
->>
->> [vpl1 qemu]$ git co v2.10.0
->> At this point no .git-submodule-status is expected/required/exist.
->>
->> [vpl1 qemu]$ ssh aikhostos2 make -C /home/aik/pbuild/qemu-aikhostos2-ppc64/
->> -j24
->>
->> Configure succeeds, compiles just fine, it has been working like this for
->> years.
->>
->>
->> Now:
->>
->> [vpl1 qemu]$ git co git-submodule  (this is your stuff)
->> [vpl1 qemu]$ ssh aikhostos2 make -C /home/aik/pbuild/qemu-aikhostos2-ppc64/
->> -j24
->> touch: cannot touch ‘.git-submodule-status’: Read-only file system
->> make: Entering directory `/home/aik/pbuild/qemu-aikhostos2-ppc64'
->>   GEN     ppc64-softmmu/config-devices.mak.tmp
->> [...]
->>
->> ./scripts/git-submodule.sh: line 74: .git-submodule-status: Read-only file
->> system
->> ./scripts/git-submodule.sh: failed to save git submodule status
->> make: *** [git-submodule-update] Error 1
-> 
-> Oh I see, the git submodules list is empty because you have a previous
-> built source tree, so its shortcircuiting the extra check I added. Tihs
-> is easy enough to address
+[Expired for QEMU because there has been no activity for 60 days.]
 
+** Changed in: qemu
+       Status: Incomplete =3D> Expired
 
-btw why is the name "git-submodule.sh", not update-submodule.sh or
-update-git-submodule.sh on a par with update-linux-headers.sh?
+-- =
 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/997631
 
+Title:
+  Windows 2008R2 very slow cold boot when 4 CPUs
 
+Status in QEMU:
+  Expired
 
--- 
-Alexey
+Bug description:
+  Hi,
+
+  well, I'm in a similar boat as the one in #992067. But regardless any mem=
+ory-settings.
+  It takes "ages" in a cold-boot Windows 2008R2 with qemu-1.0.1, qemu-1.0.5=
+0 and latest-n-greatest from today ( 1.0.50 /qemu-1b3e76e ). It eats up 400=
+% host-cpu-load until login-prompt is shown on the console.
+
+  Meanwhile I tried couple of settings with "-cpu features (hv_spinlocks), =
+hv_relaxed and hv_vapic. ".
+  Due to some Clock-glitches I start qemu-system-x86_64 with "-no-hpet".
+
+  With 2 processors the system is up after 2 minutes, with 4 procs
+  almost 10 minutes... After a reset ( warmstart) the 4 proc-system is
+  up after a couple of 20 secs.
+
+  Hints welcome, though once started, the system seems to operate
+  "normally".
+
+  Thnx in@vance,
+
+  Oliver.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/997631/+subscriptions
