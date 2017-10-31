@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38071)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39289)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1e9Zv0-0003MN-Vl
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 13:01:43 -0400
+	(envelope-from <mst@redhat.com>) id 1e9ZzT-0004pc-69
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 13:06:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1e9Zus-0004ti-Hr
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 13:01:34 -0400
-Date: Tue, 31 Oct 2017 10:01:10 -0700 (PDT)
-From: Stefano Stabellini <sstabellini@kernel.org>
-In-Reply-To: <CAFEAcA8jwN81ZBCLA8HW=q5GAWKmZ=kAZAP9vGNN8RYkzYe=Pw@mail.gmail.com>
-Message-ID: <alpine.DEB.2.10.1710310959490.13766@sstabellini-ThinkPad-X260>
-References: <alpine.DEB.2.10.1710171708130.27209@sstabellini-ThinkPad-X260>
-	<CAFEAcA9zXAmNPL8TsLKSPbm8Er_KLK8Ubwth6=nL6WD87OmBQw@mail.gmail.com>
-	<CAFEAcA8jwN81ZBCLA8HW=q5GAWKmZ=kAZAP9vGNN8RYkzYe=Pw@mail.gmail.com>
+	(envelope-from <mst@redhat.com>) id 1e9ZzP-0004VV-4a
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 13:06:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49128)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1e9ZzO-0004Uu-RL
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 13:06:11 -0400
+Date: Tue, 31 Oct 2017 19:06:05 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20171031185505-mutt-send-email-mst@kernel.org>
+References: <33710E6CAA200E4583255F4FB666C4E21B120583@G01JPEXMBYT03>
+	<20171030181711-mutt-send-email-mst@kernel.org>
+	<33710E6CAA200E4583255F4FB666C4E21B153BF6@G01JPEXMBYT03>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: Re: [Qemu-devel] [PATCH] aarch64: advertise the GIC system register
- interface
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <33710E6CAA200E4583255F4FB666C4E21B153BF6@G01JPEXMBYT03>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 5/5] RFC: fw_cfg: add DMA write
+ operation in sysfs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,62 +30,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Stefano Stabellini <sstabellini@kernel.org>, QEMU Developers <qemu-devel@nongnu.org>, "xen-devel@lists.xen.org" <xen-devel@lists.xen.org>, julien.grall@arm.com, qemu-arm <qemu-arm@nongnu.org>
+To: "Hatayama, Daisuke" <d.hatayama@jp.fujitsu.com>
+Cc: "'marcandre.lureau@redhat.com'" <marcandre.lureau@redhat.com>, "'somlo@cmu.edu'" <somlo@cmu.edu>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "'qemu-devel@nongnu.org'" <qemu-devel@nongnu.org>
 
-On Tue, 31 Oct 2017, Peter Maydell wrote:
-> On 19 October 2017 at 15:46, Peter Maydell <peter.maydell@linaro.org> wrote:
-> > On 18 October 2017 at 01:10, Stefano Stabellini <sstabellini@kernel.org> wrote:
-> >> Advertise the presence of the GIC system register interface (1<<24)
-> >> according to H9.248 of the ARM ARM.
-> >>
-> >> This patch allows Xen to boot on QEMU aarch64.
-> >>
-> >> Signed-off-by: Stefano Stabellini <sstabellini@kernel.org>
-> >>
-> >> diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-> >> index 670c07a..a451763 100644
-> >> --- a/target/arm/cpu64.c
-> >> +++ b/target/arm/cpu64.c
-> >> @@ -136,7 +136,7 @@ static void aarch64_a57_initfn(Object *obj)
-> >>      cpu->id_isar3 = 0x01112131;
-> >>      cpu->id_isar4 = 0x00011142;
-> >>      cpu->id_isar5 = 0x00011121;
-> >> -    cpu->id_aa64pfr0 = 0x00002222;
-> >> +    cpu->id_aa64pfr0 = 0x01002222;
-> >>      cpu->id_aa64dfr0 = 0x10305106;
-> >>      cpu->pmceid0 = 0x00000000;
-> >>      cpu->pmceid1 = 0x00000000;
-> >> @@ -196,7 +196,7 @@ static void aarch64_a53_initfn(Object *obj)
-> >>      cpu->id_isar3 = 0x01112131;
-> >>      cpu->id_isar4 = 0x00011142;
-> >>      cpu->id_isar5 = 0x00011121;
-> >> -    cpu->id_aa64pfr0 = 0x00002222;
-> >> +    cpu->id_aa64pfr0 = 0x01002222;
-> >>      cpu->id_aa64dfr0 = 0x10305106;
-> >>      cpu->id_aa64isar0 = 0x00011120;
-> >>      cpu->id_aa64mmfr0 = 0x00001122; /* 40 bit physical addr */
-> >
-> > Whoops -- we missed this when we added the GICv3 support, because
-> > Linux doesn't check it.
-> >
-> > Applied to target-arm.next, thanks.
-> 
-> Unfortunately I've just noticed that this breaks booting Linux
-> in the "not using gicv3" case. This is because we don't actually
-> define the GICv3 cpu interface registers unless the board
-> instantiates a GICv3. We mustn't advertise the GICv3 sysregs
-> in the ID register unless we actually have them.
-> 
-> Not sure how best to fix this -- it's a consequence of the
-> design decision we made to have the sysregs implementation
-> be in the gicv3 code. There's no useful feature bit in the CPU
-> to hang this off either, it's an effect of whether the board
-> model happens to wire up a gicv3 or not. So we can only figure
-> this out fairly late on (probably at CPU reset time), which
-> is a bit tedious for getting ID reg values right.
-> 
-> In the meantime I've dropped this patch from target-arm.next.
+On Tue, Oct 31, 2017 at 09:55:39AM +0000, Hatayama, Daisuke wrote:
+>=20
+>=20
+> > -----Original Message-----
+> > From: linux-kernel-owner@vger.kernel.org
+> > [mailto:linux-kernel-owner@vger.kernel.org] On Behalf Of Michael S. T=
+sirkin
+> > Sent: Tuesday, October 31, 2017 1:19 AM
+> > To: Hatayama, Daisuke <d.hatayama@jp.fujitsu.com>
+> > Cc: 'marcandre.lureau@redhat.com' <marcandre.lureau@redhat.com>;
+> > 'somlo@cmu.edu' <somlo@cmu.edu>; linux-kernel@vger.kernel.org;
+> > 'qemu-devel@nongnu.org' <qemu-devel@nongnu.org>
+> > Subject: Re: [PATCH v3 5/5] RFC: fw_cfg: add DMA write operation in s=
+ysfs
+> >=20
+> > On Mon, Oct 30, 2017 at 11:07:20AM +0000, Hatayama, Daisuke wrote:
+> > > > From: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
+> > > >
+> > > > Since qemu 2.9, DMA write operations are allowed. However, usage =
+of this
+> > > > interface from kernel or user-space is strongly discouraged by th=
+e
+> > > > maintainers. This patch is meant for experimentations for now.
+> > > >
+> > >
+> > > Could you (or maintainers?) tell me how experimental the DMA write
+> > > operations from kernel are?
+> > >
+> > > From some technical reason?
+> > > Or simply there has not been enough test yet so far?
+> >=20
+> > The concern is security, talking from userspace to hypervisor
+> > might become a trivial DOS vector.
+> >=20
+> > If there's need for a specific entry to be accessible from userspace,
+> > I'd rather white-list it.
+> >=20
+>=20
+> Thanks for the explanation.
+>=20
+> If so, I guess the white-list is done in userspace qemu side,
+> and no additional change would be needed for this kernel-side patch set=
+ for the white-list feature.
+> Is this understanding correct?
 
-Fixing QEMU is harder than I expected. Would it be possible to update
-id_aa64pfr0 at CPU reset time? Like cpu->id_aa64pfr0 |= 0x01000000; ?
+No - host side has no idea whether it's guest userspace or
+kernel initiating the access.
+
+> > > > Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
+> > > > ---
+> > > >  drivers/firmware/qemu_fw_cfg.c | 21 ++++++++++++++++++++-
+> > > >  1 file changed, 20 insertions(+), 1 deletion(-)
+> > > >
+> > > > diff --git a/drivers/firmware/qemu_fw_cfg.c
+> > b/drivers/firmware/qemu_fw_cfg.c
+> > > > index 54b569da3257..e2f2ad1c9c0c 100644
+> > > > --- a/drivers/firmware/qemu_fw_cfg.c
+> > > > +++ b/drivers/firmware/qemu_fw_cfg.c
+> > > > @@ -524,9 +524,28 @@ static ssize_t fw_cfg_sysfs_read_raw(struct =
+file *filp,
+> > struct kobject *kobj,
+> > > >       return fw_cfg_read_blob(entry->f.select, buf, pos, count, t=
+rue);
+> > > >  }
+> > > >
+> > > > +static ssize_t fw_cfg_sysfs_write_raw(struct file *filp, struct =
+kobject
+> > *kobj,
+> > > > +                                   struct bin_attribute *bin_att=
+r,
+> > > > +                                   char *buf, loff_t pos, size_t=
+ count)
+> > > > +{
+> > > > +     struct fw_cfg_sysfs_entry *entry =3D to_entry(kobj);
+> > > > +
+> > > > +     if (!fw_cfg_dma_enabled())
+> > > > +             return -ENOTSUPP;
+> > > > +
+> > > > +     if (pos > entry->f.size)
+> > > > +             return -EINVAL;
+> > > > +
+> > > > +     if (count > entry->f.size - pos)
+> > > > +             count =3D entry->f.size - pos;
+> > > > +
+> > > > +     return fw_cfg_write_blob(entry->f.select, buf, pos, count);
+> > > > +}
+> > > > +
+> > > >  static struct bin_attribute fw_cfg_sysfs_attr_raw =3D {
+> > > > -     .attr =3D { .name =3D "raw", .mode =3D S_IRUSR },
+> > > > +     .attr =3D { .name =3D "raw", .mode =3D S_IRUSR | S_IWUSR },
+> > > >       .read =3D fw_cfg_sysfs_read_raw,
+> > > > +     .write =3D fw_cfg_sysfs_write_raw,
+> > > >  };
+> > > >
+> > > >  /*
+> > > > --
+> > > > 2.14.1.146.gd35faa819
+> > >
+> > > Thanks.
+> > > HATAYAMA, Daisuke
+> > >
+> >=20
+>=20
