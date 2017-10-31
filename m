@@ -1,41 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50390)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39105)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1e9JN3-00074p-Qh
-	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 19:21:31 -0400
+	(envelope-from <revol@free.fr>) id 1e9K4t-0005qr-Jm
+	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 20:06:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1e9JMy-0004TF-Ry
-	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 19:21:29 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:40928)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
-	id 1e9JMy-0004Sb-Jl
-	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 19:21:24 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v9UNK35S039498
-	for <qemu-devel@nongnu.org>; Mon, 30 Oct 2017 19:21:21 -0400
-Received: from e19.ny.us.ibm.com (e19.ny.us.ibm.com [129.33.205.209])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2dxaxg04g8-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 30 Oct 2017 19:21:21 -0400
-Received: from localhost
-	by e19.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
-	Mon, 30 Oct 2017 19:21:20 -0400
-From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-References: <20171026202250.6118-1-danielhb@linux.vnet.ibm.com>
-	<20171030201213.GA2911@umbus>
-	<047c570c-10a6-9255-0e4d-f3da594b0a5b@linux.vnet.ibm.com>
-Date: Mon, 30 Oct 2017 21:21:14 -0200
+	(envelope-from <revol@free.fr>) id 1e9K4s-0004A9-K3
+	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 20:06:47 -0400
+Received: from smtp5-g21.free.fr ([2a01:e0c:1:1599::14]:20204)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <revol@free.fr>) id 1e9K4s-000495-DN
+	for qemu-devel@nongnu.org; Mon, 30 Oct 2017 20:06:46 -0400
+Received: from [IPv6:2a01:e35:2f46:f520:f2de:f1ff:fe47:4134] (unknown
+	[IPv6:2a01:e35:2f46:f520:f2de:f1ff:fe47:4134])
+	(Authenticated sender: revol)
+	by smtp5-g21.free.fr (Postfix) with ESMTPA id 2F5585FF67
+	for <qemu-devel@nongnu.org>; Tue, 31 Oct 2017 01:06:41 +0100 (CET)
+From: =?UTF-8?Q?Fran=c3=a7ois_Revol?= <revol@free.fr>
+Message-ID: <0796ee13-e095-18d9-3f37-1e3130592180@free.fr>
+Date: Tue, 31 Oct 2017 01:06:41 +0100
 MIME-Version: 1.0
-In-Reply-To: <047c570c-10a6-9255-0e4d-f3da594b0a5b@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Language: en-US
-Message-Id: <b3c1aaa3-a373-c1ac-c1ce-19bfc6431e5a@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: fr
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v1 0/3] ppc: adding some RTAS
- calls in tests/libqos
+Subject: [Qemu-devel] Retrocomputing devroom at FOSDEM 2018
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,70 +30,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: lvivier@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com
+To: qemu-devel@nongnu.org
 
+Hi,
+I just found out someone managed to get a retrocomputing devroom
+accepted at FOSDEM:
 
+https://lists.fosdem.org/pipermail/retrocomputing-devroom/2017-October/00=
+0000.html
 
-On 10/30/2017 06:29 PM, Daniel Henrique Barboza wrote:
->
->
-> On 10/30/2017 06:12 PM, David Gibson wrote:
->> On Thu, Oct 26, 2017 at 06:22:47PM -0200, Daniel Henrique Barboza wrot=
-e:
->>> This series implements a few RTAS hypercalls in tests/libqos
->>> that, used together, implement the DRC state transition described
->>> in PAPR 2.7+, 13.4.
->>>
->>> This started as an attempt of implementing hot unplug qtests for the
->>> sPAPR machine but I've found a few issues that will require more time
->>> solving:
->>>
->>> - CPU hot unplug: for some reason the machine freezes after the
->>> callback is returned.
->>>
->>> - LMB hot unplug: not supported by the sPAPR machine if not
->>> set in CAS.
->>>
->>> I have a feeling that the CPU hot unplug=A0 issue might be related
->>> with the lack of CAS negotiation step as well, but only way to be
->>> sure is to further understanding how the CAS negotation interfere
->>> with the device hot unplug. If needed we'll have to implement the
->>> client architecture support hypercall as well in the future.
->>>
->>> Until then, I believe these hypercalls have a value of their own and
->>> are worth being pushed upstream.
->> Unfortunately, these changes break the Travis build on MacOS.
->
-> Hmpf .... how can I run this Travis build to see the errors? I've=20
-> searched
-> here and found out something about making a Github pull request and
-> then https://travis-ci.org/qemu/qemu runs the Travis build in the=20
-> request.
-> Is this a valid way of running it?
->
+https://www.elpauer.org/2017/10/retrocomputing-devroom-call-for-participa=
+tion/comment-page-1/
 
-Just managed to run the build and saw the error. I'll fix it in v2.
+Surely there are a lot of subjects in QEMU to talk about in such a
+devroom ;-)
 
-
-Daniel
-
->
-> Thanks,
->
-> Daniel
->
->>>
->>> Daniel Henrique Barboza (3):
->>> =A0=A0 tests: adding 'check_exception' RTAS implementation
->>> =A0=A0 tests: adding 'set_indicator' RTAS call
->>> =A0=A0 tests: ibm,configure-connector RTAS call implementation
->>>
->>> =A0 tests/libqos/rtas.c | 105 +++++++++++++++++++++++++
->>> =A0 tests/libqos/rtas.h |=A0=A0 5 ++
->>> =A0 tests/rtas-test.c=A0=A0 | 218=20
->>> ++++++++++++++++++++++++++++++++++++++++++++++++++++
->>> =A0 3 files changed, 328 insertions(+)
->>>
->
->
+Fran=C3=A7ois.
