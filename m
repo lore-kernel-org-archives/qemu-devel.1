@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57969)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38564)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1e9fY0-00087o-3e
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 19:02:17 -0400
+	(envelope-from <no-reply@patchew.org>) id 1e9gQl-0007p2-GY
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 19:58:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1e9fXv-0008Rf-SX
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 19:02:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47014)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1e9fXv-0008R3-J2
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 19:02:11 -0400
-From: John Snow <jsnow@redhat.com>
-Date: Tue, 31 Oct 2017 19:02:05 -0400
-Message-Id: <20171031230206.32731-2-jsnow@redhat.com>
-In-Reply-To: <20171031230206.32731-1-jsnow@redhat.com>
-References: <20171031230206.32731-1-jsnow@redhat.com>
+	(envelope-from <no-reply@patchew.org>) id 1e9gQi-0004T6-Cu
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 19:58:51 -0400
+Resent-Message-Id: <E1e9gQi-0004T6-Cu@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21460)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1e9gQi-0004Si-63
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 19:58:48 -0400
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <150946630259.171.17496594567648297745@bafd83ae6430>
+In-Reply-To: <20171031112457.10516.8971.stgit@pasha-VirtualBox>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 1/2] hw/ide/ahci: Move allwinner code into a
- separate file
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 31 Oct 2017 09:11:44 -0700 (PDT)
+Subject: Re: [Qemu-devel] [RFC PATCH 00/26] replay additions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,281 +28,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, jsnow@redhat.com, Thomas Huth <thuth@redhat.com>
+To: Pavel.Dovgaluk@ispras.ru
+Cc: famz@redhat.com, qemu-devel@nongnu.org, kwolf@redhat.com, peter.maydell@linaro.org, pavel.dovgaluk@ispras.ru, mst@redhat.com, jasowang@redhat.com, quintela@redhat.com, zuban32s@gmail.com, maria.klimushenkova@ispras.rudovgaluk@ispras.ru, kraxel@redhat.com, boost.lists@gmail.com, pbonzini@redhat.com, alex.bennee@linaro.org
 
-From: Thomas Huth <thuth@redhat.com>
-
-The allwinner code is only needed for the allwinner board (for which
-we also have a separate CONFIG_ALLWINNER_A10 config switch), so it
-does not make sense that we compile this for all the other boards
-that need AHCI, too. Let's move it to a separate file that is only
-compiled when CONFIG_ALLWINNER_A10 is set.
-
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Message-id: 1508784509-29377-1-git-send-email-thuth@redhat.com
-Signed-off-by: John Snow <jsnow@redhat.com>
----
- hw/ide/Makefile.objs    |   1 +
- hw/ide/ahci-allwinner.c | 127 ++++++++++++++++++++++++++++++++++++++++++=
-++++++
- hw/ide/ahci.c           |  95 ------------------------------------
- 3 files changed, 128 insertions(+), 95 deletions(-)
- create mode 100644 hw/ide/ahci-allwinner.c
-
-diff --git a/hw/ide/Makefile.objs b/hw/ide/Makefile.objs
-index 729e9bd..f0edca3 100644
---- a/hw/ide/Makefile.objs
-+++ b/hw/ide/Makefile.objs
-@@ -10,3 +10,4 @@ common-obj-$(CONFIG_IDE_VIA) +=3D via.o
- common-obj-$(CONFIG_MICRODRIVE) +=3D microdrive.o
- common-obj-$(CONFIG_AHCI) +=3D ahci.o
- common-obj-$(CONFIG_AHCI) +=3D ich.o
-+common-obj-$(CONFIG_ALLWINNER_A10) +=3D ahci-allwinner.o
-diff --git a/hw/ide/ahci-allwinner.c b/hw/ide/ahci-allwinner.c
-new file mode 100644
-index 0000000..c3f1604
---- /dev/null
-+++ b/hw/ide/ahci-allwinner.c
-@@ -0,0 +1,127 @@
-+/*
-+ * QEMU Allwinner AHCI Emulation
-+ *
-+ * This program is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU General Public License
-+ * as published by the Free Software Foundation; either version 2
-+ * of the License, or (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "hw/hw.h"
-+#include "qemu/error-report.h"
-+#include "sysemu/block-backend.h"
-+#include "sysemu/dma.h"
-+#include "hw/ide/internal.h"
-+#include "hw/ide/ahci_internal.h"
-+
-+#include "trace.h"
-+
-+#define ALLWINNER_AHCI_BISTAFR    ((0xa0 - ALLWINNER_AHCI_MMIO_OFF) / 4)
-+#define ALLWINNER_AHCI_BISTCR     ((0xa4 - ALLWINNER_AHCI_MMIO_OFF) / 4)
-+#define ALLWINNER_AHCI_BISTFCTR   ((0xa8 - ALLWINNER_AHCI_MMIO_OFF) / 4)
-+#define ALLWINNER_AHCI_BISTSR     ((0xac - ALLWINNER_AHCI_MMIO_OFF) / 4)
-+#define ALLWINNER_AHCI_BISTDECR   ((0xb0 - ALLWINNER_AHCI_MMIO_OFF) / 4)
-+#define ALLWINNER_AHCI_DIAGNR0    ((0xb4 - ALLWINNER_AHCI_MMIO_OFF) / 4)
-+#define ALLWINNER_AHCI_DIAGNR1    ((0xb8 - ALLWINNER_AHCI_MMIO_OFF) / 4)
-+#define ALLWINNER_AHCI_OOBR       ((0xbc - ALLWINNER_AHCI_MMIO_OFF) / 4)
-+#define ALLWINNER_AHCI_PHYCS0R    ((0xc0 - ALLWINNER_AHCI_MMIO_OFF) / 4)
-+#define ALLWINNER_AHCI_PHYCS1R    ((0xc4 - ALLWINNER_AHCI_MMIO_OFF) / 4)
-+#define ALLWINNER_AHCI_PHYCS2R    ((0xc8 - ALLWINNER_AHCI_MMIO_OFF) / 4)
-+#define ALLWINNER_AHCI_TIMER1MS   ((0xe0 - ALLWINNER_AHCI_MMIO_OFF) / 4)
-+#define ALLWINNER_AHCI_GPARAM1R   ((0xe8 - ALLWINNER_AHCI_MMIO_OFF) / 4)
-+#define ALLWINNER_AHCI_GPARAM2R   ((0xec - ALLWINNER_AHCI_MMIO_OFF) / 4)
-+#define ALLWINNER_AHCI_PPARAMR    ((0xf0 - ALLWINNER_AHCI_MMIO_OFF) / 4)
-+#define ALLWINNER_AHCI_TESTR      ((0xf4 - ALLWINNER_AHCI_MMIO_OFF) / 4)
-+#define ALLWINNER_AHCI_VERSIONR   ((0xf8 - ALLWINNER_AHCI_MMIO_OFF) / 4)
-+#define ALLWINNER_AHCI_IDR        ((0xfc - ALLWINNER_AHCI_MMIO_OFF) / 4)
-+#define ALLWINNER_AHCI_RWCR       ((0xfc - ALLWINNER_AHCI_MMIO_OFF) / 4)
-+
-+static uint64_t allwinner_ahci_mem_read(void *opaque, hwaddr addr,
-+                                        unsigned size)
-+{
-+    AllwinnerAHCIState *a =3D opaque;
-+    AHCIState *s =3D &(SYSBUS_AHCI(a)->ahci);
-+    uint64_t val =3D a->regs[addr / 4];
-+
-+    switch (addr / 4) {
-+    case ALLWINNER_AHCI_PHYCS0R:
-+        val |=3D 0x2 << 28;
-+        break;
-+    case ALLWINNER_AHCI_PHYCS2R:
-+        val &=3D ~(0x1 << 24);
-+        break;
-+    }
-+    trace_allwinner_ahci_mem_read(s, a, addr, val, size);
-+    return  val;
-+}
-+
-+static void allwinner_ahci_mem_write(void *opaque, hwaddr addr,
-+                                     uint64_t val, unsigned size)
-+{
-+    AllwinnerAHCIState *a =3D opaque;
-+    AHCIState *s =3D &(SYSBUS_AHCI(a)->ahci);
-+
-+    trace_allwinner_ahci_mem_write(s, a, addr, val, size);
-+    a->regs[addr / 4] =3D val;
-+}
-+
-+static const MemoryRegionOps allwinner_ahci_mem_ops =3D {
-+    .read =3D allwinner_ahci_mem_read,
-+    .write =3D allwinner_ahci_mem_write,
-+    .valid.min_access_size =3D 4,
-+    .valid.max_access_size =3D 4,
-+    .endianness =3D DEVICE_LITTLE_ENDIAN,
-+};
-+
-+static void allwinner_ahci_init(Object *obj)
-+{
-+    SysbusAHCIState *s =3D SYSBUS_AHCI(obj);
-+    AllwinnerAHCIState *a =3D ALLWINNER_AHCI(obj);
-+
-+    memory_region_init_io(&a->mmio, OBJECT(obj), &allwinner_ahci_mem_ops=
-, a,
-+                          "allwinner-ahci", ALLWINNER_AHCI_MMIO_SIZE);
-+    memory_region_add_subregion(&s->ahci.mem, ALLWINNER_AHCI_MMIO_OFF,
-+                                &a->mmio);
-+}
-+
-+static const VMStateDescription vmstate_allwinner_ahci =3D {
-+    .name =3D "allwinner-ahci",
-+    .version_id =3D 1,
-+    .minimum_version_id =3D 1,
-+    .fields =3D (VMStateField[]) {
-+        VMSTATE_UINT32_ARRAY(regs, AllwinnerAHCIState,
-+                             ALLWINNER_AHCI_MMIO_SIZE / 4),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static void allwinner_ahci_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc =3D DEVICE_CLASS(klass);
-+
-+    dc->vmsd =3D &vmstate_allwinner_ahci;
-+}
-+
-+static const TypeInfo allwinner_ahci_info =3D {
-+    .name          =3D TYPE_ALLWINNER_AHCI,
-+    .parent        =3D TYPE_SYSBUS_AHCI,
-+    .instance_size =3D sizeof(AllwinnerAHCIState),
-+    .instance_init =3D allwinner_ahci_init,
-+    .class_init    =3D allwinner_ahci_class_init,
-+};
-+
-+static void sysbus_ahci_register_types(void)
-+{
-+    type_register_static(&allwinner_ahci_info);
-+}
-+
-+type_init(sysbus_ahci_register_types)
-diff --git a/hw/ide/ahci.c b/hw/ide/ahci.c
-index 32d1296..373311f 100644
---- a/hw/ide/ahci.c
-+++ b/hw/ide/ahci.c
-@@ -1737,104 +1737,9 @@ static const TypeInfo sysbus_ahci_info =3D {
-     .class_init    =3D sysbus_ahci_class_init,
- };
-=20
--#define ALLWINNER_AHCI_BISTAFR    ((0xa0 - ALLWINNER_AHCI_MMIO_OFF) / 4)
--#define ALLWINNER_AHCI_BISTCR     ((0xa4 - ALLWINNER_AHCI_MMIO_OFF) / 4)
--#define ALLWINNER_AHCI_BISTFCTR   ((0xa8 - ALLWINNER_AHCI_MMIO_OFF) / 4)
--#define ALLWINNER_AHCI_BISTSR     ((0xac - ALLWINNER_AHCI_MMIO_OFF) / 4)
--#define ALLWINNER_AHCI_BISTDECR   ((0xb0 - ALLWINNER_AHCI_MMIO_OFF) / 4)
--#define ALLWINNER_AHCI_DIAGNR0    ((0xb4 - ALLWINNER_AHCI_MMIO_OFF) / 4)
--#define ALLWINNER_AHCI_DIAGNR1    ((0xb8 - ALLWINNER_AHCI_MMIO_OFF) / 4)
--#define ALLWINNER_AHCI_OOBR       ((0xbc - ALLWINNER_AHCI_MMIO_OFF) / 4)
--#define ALLWINNER_AHCI_PHYCS0R    ((0xc0 - ALLWINNER_AHCI_MMIO_OFF) / 4)
--#define ALLWINNER_AHCI_PHYCS1R    ((0xc4 - ALLWINNER_AHCI_MMIO_OFF) / 4)
--#define ALLWINNER_AHCI_PHYCS2R    ((0xc8 - ALLWINNER_AHCI_MMIO_OFF) / 4)
--#define ALLWINNER_AHCI_TIMER1MS   ((0xe0 - ALLWINNER_AHCI_MMIO_OFF) / 4)
--#define ALLWINNER_AHCI_GPARAM1R   ((0xe8 - ALLWINNER_AHCI_MMIO_OFF) / 4)
--#define ALLWINNER_AHCI_GPARAM2R   ((0xec - ALLWINNER_AHCI_MMIO_OFF) / 4)
--#define ALLWINNER_AHCI_PPARAMR    ((0xf0 - ALLWINNER_AHCI_MMIO_OFF) / 4)
--#define ALLWINNER_AHCI_TESTR      ((0xf4 - ALLWINNER_AHCI_MMIO_OFF) / 4)
--#define ALLWINNER_AHCI_VERSIONR   ((0xf8 - ALLWINNER_AHCI_MMIO_OFF) / 4)
--#define ALLWINNER_AHCI_IDR        ((0xfc - ALLWINNER_AHCI_MMIO_OFF) / 4)
--#define ALLWINNER_AHCI_RWCR       ((0xfc - ALLWINNER_AHCI_MMIO_OFF) / 4)
--
--static uint64_t allwinner_ahci_mem_read(void *opaque, hwaddr addr,
--                                        unsigned size)
--{
--    AllwinnerAHCIState *a =3D opaque;
--    AHCIState *s =3D &(SYSBUS_AHCI(a)->ahci);
--    uint64_t val =3D a->regs[addr/4];
--
--    switch (addr / 4) {
--    case ALLWINNER_AHCI_PHYCS0R:
--        val |=3D 0x2 << 28;
--        break;
--    case ALLWINNER_AHCI_PHYCS2R:
--        val &=3D ~(0x1 << 24);
--        break;
--    }
--    trace_allwinner_ahci_mem_read(s, a, addr, val, size);
--    return  val;
--}
--
--static void allwinner_ahci_mem_write(void *opaque, hwaddr addr,
--                                     uint64_t val, unsigned size)
--{
--    AllwinnerAHCIState *a =3D opaque;
--    AHCIState *s =3D &(SYSBUS_AHCI(a)->ahci);
--
--    trace_allwinner_ahci_mem_write(s, a, addr, val, size);
--    a->regs[addr/4] =3D val;
--}
--
--static const MemoryRegionOps allwinner_ahci_mem_ops =3D {
--    .read =3D allwinner_ahci_mem_read,
--    .write =3D allwinner_ahci_mem_write,
--    .valid.min_access_size =3D 4,
--    .valid.max_access_size =3D 4,
--    .endianness =3D DEVICE_LITTLE_ENDIAN,
--};
--
--static void allwinner_ahci_init(Object *obj)
--{
--    SysbusAHCIState *s =3D SYSBUS_AHCI(obj);
--    AllwinnerAHCIState *a =3D ALLWINNER_AHCI(obj);
--
--    memory_region_init_io(&a->mmio, OBJECT(obj), &allwinner_ahci_mem_ops=
-, a,
--                          "allwinner-ahci", ALLWINNER_AHCI_MMIO_SIZE);
--    memory_region_add_subregion(&s->ahci.mem, ALLWINNER_AHCI_MMIO_OFF,
--                                &a->mmio);
--}
--
--static const VMStateDescription vmstate_allwinner_ahci =3D {
--    .name =3D "allwinner-ahci",
--    .version_id =3D 1,
--    .minimum_version_id =3D 1,
--    .fields =3D (VMStateField[]) {
--        VMSTATE_UINT32_ARRAY(regs, AllwinnerAHCIState,
--                             ALLWINNER_AHCI_MMIO_SIZE/4),
--        VMSTATE_END_OF_LIST()
--    }
--};
--
--static void allwinner_ahci_class_init(ObjectClass *klass, void *data)
--{
--    DeviceClass *dc =3D DEVICE_CLASS(klass);
--
--    dc->vmsd =3D &vmstate_allwinner_ahci;
--}
--
--static const TypeInfo allwinner_ahci_info =3D {
--    .name          =3D TYPE_ALLWINNER_AHCI,
--    .parent        =3D TYPE_SYSBUS_AHCI,
--    .instance_size =3D sizeof(AllwinnerAHCIState),
--    .instance_init =3D allwinner_ahci_init,
--    .class_init    =3D allwinner_ahci_class_init,
--};
--
- static void sysbus_ahci_register_types(void)
- {
-     type_register_static(&sysbus_ahci_info);
--    type_register_static(&allwinner_ahci_info);
- }
-=20
- type_init(sysbus_ahci_register_types)
---=20
-2.9.5
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
+ZGV2ZWxdIFtSRkMgUEFUQ0ggMDAvMjZdIHJlcGxheSBhZGRpdGlvbnMKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTcxMDMxMTEyNDU3LjEwNTE2Ljg5NzEuc3RnaXRAcGFzaGEtVmlydHVhbEJv
+eAoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0
+b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBj
+b25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYu
+cmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRC
+QVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRu
+LyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQg
+c2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJh
+Y2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgo
+bisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGlu
+ZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9n
+aXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgICAgICAg
+IHBhdGNoZXcvMjAxNzEwMzExNTQ0MDcuNDE4NC0xLW1pY2hhZWwubmF3cm9ja2lAZ3RyaS5nYXRl
+Y2guZWR1IC0+IHBhdGNoZXcvMjAxNzEwMzExNTQ0MDcuNDE4NC0xLW1pY2hhZWwubmF3cm9ja2lA
+Z3RyaS5nYXRlY2guZWR1CiAqIFtuZXcgdGFnXSAgICAgICAgICAgICAgIHBhdGNoZXcvMjAxNzEw
+MzExNTU0MzUuNDYxOC0xLW1pY2hhZWwubmF3cm9ja2lAZ3RyaS5nYXRlY2guZWR1IC0+IHBhdGNo
+ZXcvMjAxNzEwMzExNTU0MzUuNDYxOC0xLW1pY2hhZWwubmF3cm9ja2lAZ3RyaS5nYXRlY2guZWR1
+ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKMjBkMGIxNzIzMiBzY3JpcHRzL3FlbXUt
+Z2RiL3RpbWVycy5weTogbmV3IGhlbHBlciB0byBkdW1wIHRpbWVyIHN0YXRlCjY0NDIxYTRmNTIg
+c2NyaXB0cy9yZXBsYXktZHVtcC5weTogcmVwbGF5IGxvZyBkdW1wZXIKNzAwY2E4MmE1NCBzY3Jp
+cHRzL2FuYWx5c2UtbG9ja3Mtc2ltcGxldHJhY2UucHk6IHNjcmlwdCB0byBhbmFseXNlIGxvY2sg
+dGltZXMKODA5Yzc3YTY5YiB1dGlsL3FlbXUtdGhyZWFkLSo6IGFkZCBxZW11X2xvY2ssIGxvY2tl
+ZCBhbmQgdW5sb2NrIHRyYWNlIGV2ZW50cwoxYzhlNmUwY2ZiIHNjcmlwdHMvcWVtdS1nZGI6IGFk
+ZCBzaW1wbGUgdGNnIGxvY2sgc3RhdHVzIGhlbHBlcgo3NWVkYTYxMDc2IHJlcGxheTogY2hlY2sg
+cmV0dXJuIHZhbHVlcyBvZiBmd3JpdGUKNGJmODJkZmNkNCByZXBsYXk6IGRvbid0IGRlc3Ryb3kg
+bXV0ZXggYXQgZXhpdApkMGMzZjRmOTg5IGNwdS1leGVjOiByZXNldCBleGl0IGZsYWcgYmVmb3Jl
+IGNhbGxpbmcgY3B1X2V4ZWNfbm9jYWNoZQozYjMwNTRhNjE3IGNwdS1leGVjOiBkb24ndCBvdmVy
+d3JpdGUgZXhjZXB0aW9uX2luZGV4CjM2MmQ4NjY3ODkgcmVwbGF5OiBwdXNoIHJlcGxheV9tdXRl
+eF9sb2NrIHVwIHRoZSBjYWxsIHRyZWUKOWEzZGQwNDMzYSByZXBsYXk6IG1ha2UgbG9ja2luZyB2
+aXNpYmxlIG91dHNpZGUgcmVwbGF5IGNvZGUKZDUyYThmYzJmZiByZXBsYXkvcmVwbGF5LWludGVy
+bmFsLmM6IHRyYWNrIGhvbGRpbmcgb2YgcmVwbGF5X2xvY2sKM2NhMTNjY2RhZiByZXBsYXkvcmVw
+bGF5LmM6IGJ1bXAgUkVQTEFZX1ZFUlNJT04gYWdhaW4KNTUzOGI5OTdhNCBjcHVzOiBvbmx5IHRh
+a2UgQlFMIGZvciBzbGVlcGluZyB0aHJlYWRzCjkzN2ExYWY5OWEgY3B1czogcHVzaCBCUUwgbG9j
+ayB0byBxZW11Xypfd2FpdF9pb19ldmVudAplZTAwNmVjZTJmIHRhcmdldC9hcm0vYXJtLXBvd2Vy
+dGN0bDogZHJvcCBCUUwgYXNzZXJ0aW9ucwowNGE4N2QzYTIzIGljb3VudDogZml4ZWQgc2F2aW5n
+L3Jlc3RvcmluZyBvZiBpY291bnQgd2FycCB0aW1lcnMKZGUyMzQxMTRhNCByZXBsYXk6IHNhdmUg
+cHJpb3IgdmFsdWUgb2YgdGhlIGhvc3QgY2xvY2sKMjBmYzJhNDc4OCByZXBsYXk6IG1ha2Ugc2Fm
+ZSB2bXN0b3AgYXQgcmVjb3JkL3JlcGxheQoxYTIzNTVhZjk4IHJlcGxheTogYWRkZWQgcmVwbGF5
+IGxvZyBmb3JtYXQgZGVzY3JpcHRpb24KMGY1YWIzN2RmYyByZXBsYXk6IGZpeCBzYXZlL2xvYWQg
+dm0gZm9yIG5vbi1lbXB0eSBxdWV1ZQoyMDBiOWI4YjM4IHJlcGxheTogZml4ZWQgcmVwbGF5X2Vu
+YWJsZV9ldmVudHMKNTZkYzljNjdjZCByZXBsYXk6IGZpeCBwcm9jZXNzaW5nIGFzeW5jIGV2ZW50
+cwo0NjQxOGQzNDJiIHJlcGxheTogZGlzYWJsZSBkZWZhdWx0IHNuYXBzaG90IGZvciByZWNvcmQv
+cmVwbGF5CjJkYzI5NGYzOTMgYmxrcmVwbGF5OiBjcmVhdGUgdGVtcG9yYXJ5IG92ZXJsYXkgZm9y
+IHVuZGVybGF5aW5nIGRldmljZXMKNWM2ZTJlMDAzMyBibG9jazogaW1wbGVtZW50IGJkcnZfc25h
+cHNob3RfZ290byBmb3IgYmxrcmVwbGF5Cgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQ
+QVRDSCAxLzI2OiBibG9jazogaW1wbGVtZW50IGJkcnZfc25hcHNob3RfZ290byBmb3IgYmxrcmVw
+bGF5Li4uCkNoZWNraW5nIFBBVENIIDIvMjY6IGJsa3JlcGxheTogY3JlYXRlIHRlbXBvcmFyeSBv
+dmVybGF5IGZvciB1bmRlcmxheWluZyBkZXZpY2VzLi4uCkNoZWNraW5nIFBBVENIIDMvMjY6IHJl
+cGxheTogZGlzYWJsZSBkZWZhdWx0IHNuYXBzaG90IGZvciByZWNvcmQvcmVwbGF5Li4uCkNoZWNr
+aW5nIFBBVENIIDQvMjY6IHJlcGxheTogZml4IHByb2Nlc3NpbmcgYXN5bmMgZXZlbnRzLi4uCkNo
+ZWNraW5nIFBBVENIIDUvMjY6IHJlcGxheTogZml4ZWQgcmVwbGF5X2VuYWJsZV9ldmVudHMuLi4K
+Q2hlY2tpbmcgUEFUQ0ggNi8yNjogcmVwbGF5OiBmaXggc2F2ZS9sb2FkIHZtIGZvciBub24tZW1w
+dHkgcXVldWUuLi4KRVJST1I6IEVycm9yIG1lc3NhZ2VzIHNob3VsZCBub3QgY29udGFpbiBuZXds
+aW5lcwojNjA6IEZJTEU6IG1pZ3JhdGlvbi9zYXZldm0uYzoyMzIyOgorICAgICAgICAgICAgICAg
+ICAgICAgInJpZ2h0IG5vdy4gVHJ5IG9uY2UgbW9yZSBsYXRlci5cbiIpOwoKdG90YWw6IDEgZXJy
+b3JzLCAwIHdhcm5pbmdzLCA0OCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBw
+cm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNl
+IHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0gg
+aW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA3LzI2OiByZXBsYXk6IGFkZGVkIHJlcGxh
+eSBsb2cgZm9ybWF0IGRlc2NyaXB0aW9uLi4uCkNoZWNraW5nIFBBVENIIDgvMjY6IHJlcGxheTog
+bWFrZSBzYWZlIHZtc3RvcCBhdCByZWNvcmQvcmVwbGF5Li4uCkVSUk9SOiBFcnJvciBtZXNzYWdl
+cyBzaG91bGQgbm90IGNvbnRhaW4gbmV3bGluZXMKIzQ1OiBGSUxFOiBtaWdyYXRpb24vc2F2ZXZt
+LmM6MjE0NzoKKyAgICAgICAgICAgICAgICAgICAgICJyaWdodCBub3cuIFRyeSBvbmNlIG1vcmUg
+bGF0ZXIuXG4iKTsKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMjMgbGluZXMgY2hlY2tl
+ZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkg
+b2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1h
+aW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0gg
+OS8yNjogcmVwbGF5OiBzYXZlIHByaW9yIHZhbHVlIG9mIHRoZSBob3N0IGNsb2NrLi4uCkNoZWNr
+aW5nIFBBVENIIDEwLzI2OiBpY291bnQ6IGZpeGVkIHNhdmluZy9yZXN0b3Jpbmcgb2YgaWNvdW50
+IHdhcnAgdGltZXJzLi4uCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJyonIChj
+dHg6VnhWKQojMTcxOiBGSUxFOiBjcHVzLmM6Njg4OgorICAgIC5zdWJzZWN0aW9ucyA9IChjb25z
+dCBWTVN0YXRlRGVzY3JpcHRpb24qW10pIHsKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgXgoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAxNzQgbGluZXMg
+Y2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJ
+ZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8g
+dGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcg
+UEFUQ0ggMTEvMjY6IHRhcmdldC9hcm0vYXJtLXBvd2VydGN0bDogZHJvcCBCUUwgYXNzZXJ0aW9u
+cy4uLgpDaGVja2luZyBQQVRDSCAxMi8yNjogY3B1czogcHVzaCBCUUwgbG9jayB0byBxZW11Xypf
+d2FpdF9pb19ldmVudC4uLgpDaGVja2luZyBQQVRDSCAxMy8yNjogY3B1czogb25seSB0YWtlIEJR
+TCBmb3Igc2xlZXBpbmcgdGhyZWFkcy4uLgpDaGVja2luZyBQQVRDSCAxNC8yNjogcmVwbGF5L3Jl
+cGxheS5jOiBidW1wIFJFUExBWV9WRVJTSU9OIGFnYWluLi4uCkNoZWNraW5nIFBBVENIIDE1LzI2
+OiByZXBsYXkvcmVwbGF5LWludGVybmFsLmM6IHRyYWNrIGhvbGRpbmcgb2YgcmVwbGF5X2xvY2su
+Li4KQ2hlY2tpbmcgUEFUQ0ggMTYvMjY6IHJlcGxheTogbWFrZSBsb2NraW5nIHZpc2libGUgb3V0
+c2lkZSByZXBsYXkgY29kZS4uLgpDaGVja2luZyBQQVRDSCAxNy8yNjogcmVwbGF5OiBwdXNoIHJl
+cGxheV9tdXRleF9sb2NrIHVwIHRoZSBjYWxsIHRyZWUuLi4KQ2hlY2tpbmcgUEFUQ0ggMTgvMjY6
+IGNwdS1leGVjOiBkb24ndCBvdmVyd3JpdGUgZXhjZXB0aW9uX2luZGV4Li4uCkNoZWNraW5nIFBB
+VENIIDE5LzI2OiBjcHUtZXhlYzogcmVzZXQgZXhpdCBmbGFnIGJlZm9yZSBjYWxsaW5nIGNwdV9l
+eGVjX25vY2FjaGUuLi4KQ2hlY2tpbmcgUEFUQ0ggMjAvMjY6IHJlcGxheTogZG9uJ3QgZGVzdHJv
+eSBtdXRleCBhdCBleGl0Li4uCkNoZWNraW5nIFBBVENIIDIxLzI2OiByZXBsYXk6IGNoZWNrIHJl
+dHVybiB2YWx1ZXMgb2YgZndyaXRlLi4uCkNoZWNraW5nIFBBVENIIDIyLzI2OiBzY3JpcHRzL3Fl
+bXUtZ2RiOiBhZGQgc2ltcGxlIHRjZyBsb2NrIHN0YXR1cyBoZWxwZXIuLi4KQ2hlY2tpbmcgUEFU
+Q0ggMjMvMjY6IHV0aWwvcWVtdS10aHJlYWQtKjogYWRkIHFlbXVfbG9jaywgbG9ja2VkIGFuZCB1
+bmxvY2sgdHJhY2UgZXZlbnRzLi4uCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMz
+MDogRklMRTogaW5jbHVkZS9xZW11L3RocmVhZC5oOjMwOgorI2RlZmluZSBxZW11X211dGV4X3Ry
+eWxvY2sobXV0ZXgpIHFlbXVfbXV0ZXhfdHJ5bG9ja19pbXBsKG11dGV4LCBfX0ZJTEVfXywgX19M
+SU5FX18pCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMzE6IEZJTEU6IGluY2x1
+ZGUvcWVtdS90aHJlYWQuaDozMToKKyNkZWZpbmUgcWVtdV9tdXRleF91bmxvY2sobXV0ZXgpIHFl
+bXVfbXV0ZXhfdW5sb2NrX2ltcGwobXV0ZXgsIF9fRklMRV9fLCBfX0xJTkVfXykKCkVSUk9SOiBs
+aW5lIG92ZXIgOTAgY2hhcmFjdGVycwojNDA6IEZJTEU6IGluY2x1ZGUvcWVtdS90aHJlYWQuaDo0
+NjoKK3ZvaWQgcWVtdV9jb25kX3dhaXRfaW1wbChRZW11Q29uZCAqY29uZCwgUWVtdU11dGV4ICpt
+dXRleCwgY29uc3QgY2hhciAqZmlsZSwgY29uc3QgaW50IGxpbmUpOwoKV0FSTklORzogbGluZSBv
+dmVyIDgwIGNoYXJhY3RlcnMKIzQyOiBGSUxFOiBpbmNsdWRlL3FlbXUvdGhyZWFkLmg6NDg6Cisj
+ZGVmaW5lIHFlbXVfY29uZF93YWl0KGNvbmQsIG11dGV4KSBxZW11X2NvbmRfd2FpdF9pbXBsKGNv
+bmQsIG11dGV4LCBfX0ZJTEVfXywgX19MSU5FX18pCgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJh
+Y3RlcnMKIzEwNzogRklMRTogdXRpbC9xZW11LXRocmVhZC1wb3NpeC5jOjE1ODoKK3ZvaWQgcWVt
+dV9jb25kX3dhaXRfaW1wbChRZW11Q29uZCAqY29uZCwgUWVtdU11dGV4ICptdXRleCwgY29uc3Qg
+Y2hhciAqZmlsZSwgY29uc3QgaW50IGxpbmUpCgp0b3RhbDogMiBlcnJvcnMsIDMgd2FybmluZ3Ms
+IDEwMyBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNl
+IHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBv
+cnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMu
+CgpDaGVja2luZyBQQVRDSCAyNC8yNjogc2NyaXB0cy9hbmFseXNlLWxvY2tzLXNpbXBsZXRyYWNl
+LnB5OiBzY3JpcHQgdG8gYW5hbHlzZSBsb2NrIHRpbWVzLi4uCkNoZWNraW5nIFBBVENIIDI1LzI2
+OiBzY3JpcHRzL3JlcGxheS1kdW1wLnB5OiByZXBsYXkgbG9nIGR1bXBlci4uLgpDaGVja2luZyBQ
+QVRDSCAyNi8yNjogc2NyaXB0cy9xZW11LWdkYi90aW1lcnMucHk6IG5ldyBoZWxwZXIgdG8gZHVt
+cCB0aW1lciBzdGF0ZS4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQg
+d2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNo
+ZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBh
+dGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
