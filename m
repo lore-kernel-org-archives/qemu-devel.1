@@ -1,34 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59296)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38272)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e9U8e-0008FJ-T6
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 06:51:25 -0400
+	(envelope-from <berto@igalia.com>) id 1e9UMC-0002pE-5K
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 07:05:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e9U8Y-0000cf-VK
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 06:51:20 -0400
-Received: from indium.canonical.com ([91.189.90.7]:51572)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1e9U8Y-0000YK-Pt
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 06:51:14 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1e9U8V-0000Wo-1G
-	for <qemu-devel@nongnu.org>; Tue, 31 Oct 2017 10:51:11 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id C245C2E80D5
-	for <qemu-devel@nongnu.org>; Tue, 31 Oct 2017 10:51:10 +0000 (UTC)
+	(envelope-from <berto@igalia.com>) id 1e9UM9-0004u6-0X
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 07:05:20 -0400
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20170929165347.29658-11-mreitz@redhat.com>
+References: <20170929165347.29658-1-mreitz@redhat.com>
+	<20170929165347.29658-11-mreitz@redhat.com>
+Date: Tue, 31 Oct 2017 12:05:01 +0100
+Message-ID: <w51po93lgrm.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 31 Oct 2017 10:38:05 -0000
-From: Iain Buclaw <1728325@bugs.launchpad.net>
-Reply-To: Bug 1728325 <1728325@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150923941073.9276.8418169350776607737.malonedeb@wampee.canonical.com>
-Message-Id: <150944628507.3811.11423338478705070555.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1728325] Re: POWER8: Wrong behaviour with
- float-to-int punning
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v6 10/25] block: Add bdrv_dirname()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,92 +22,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, John Snow <jsnow@redhat.com>
 
-The original code used a union.  It generates the same assembler all the
-same.
+On Fri 29 Sep 2017 06:53:32 PM CEST, Max Reitz wrote:
+> This function may be implemented by block drivers to derive a directory
+> name from a BDS. Concatenating this g_free()-able string with a relative
+> filename must result in a valid (not necessarily existing) filename, so
+> this is a function that should generally be not implemented by format
+> drivers, because this is protocol-specific.
+>
+> If a BDS's driver does not implement this function, bdrv_dirname() will
+> fall through to the BDS's file if it exists. If it does not, the
+> exact_filename field will be used to generate a directory name.
+>
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
 
-** Changed in: qemu
-       Status: Invalid =3D> New
+Reviewed-by: Alberto Garcia <berto@igalia.com>
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1728325
-
-Title:
-  POWER8: Wrong behaviour with float-to-int punning
-
-Status in QEMU:
-  New
-
-Bug description:
-  Building a reduced test program with 'gcc -O2 -fno-inline
-  -mcpu=3Dpower8' produces wrong results at runtime. I don't think gcc is
-  at fault here.
-
-  ---
-  #include <stdio.h>
-
-  int getWord(const float x)
-  {
-    return *(int*)&x;
-  }
-
-  void main()
-  {
-      int foo =3D getWord(+123.456f);
-      int bar =3D getWord(-123.456f);
-
-      printf("%d\n", foo);
-      printf("%d\n", bar);
-      return;
-  }
-  ---
-
-  This prints:
-  ---
-  0
-  0
-  ---
-
-  Compiling with 'gcc -O2 -fno-inline -mcpu=3Dpower7' and you instead get t=
-he expected result:
-  ---
-  1123477881
-  -1024005767
-  ---
-
-  =
-
-  The different between the two programs is:
-
-  --- power7.s
-  +++ power8.s
-  @@ -6,9 +6,9 @@
-   	.globl getWord
-   	.type	getWord, @function
-   getWord:
-  -	stfs 1,-16(1)
-  -	ori 2,2,0
-  -	lwa 3,-16(1)
-  +	xscvdpspn 0,1
-  +	mfvsrwz 3,0
-  +	extsw 3,3
-   	blr
-   	.long 0
-   	.byte 0,0,0,0,0,0,0,0
-          .size   getWord,.-getWord
-
-  =
-
-  Seems like qemu doesn't handle xscvdpspn/mfvsrwz correctly.
-
-  https://github.com/qemu/qemu/commit/7ee19fb9d682689d36c849576c808cf92e3ba=
-e40
-  https://github.com/qemu/qemu/commit/f5c0f7f981333da59cc35c3210d05ec1775c9=
-7c1
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1728325/+subscriptions
+Berto
