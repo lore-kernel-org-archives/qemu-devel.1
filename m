@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49043)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49540)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1e9agq-0005fa-Ul
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 13:51:06 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1e9ak5-0006Vm-6p
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 13:54:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1e9agn-00043w-SN
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 13:51:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35056)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1e9agn-00043K-Jy
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 13:51:01 -0400
-Date: Tue, 31 Oct 2017 17:50:49 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20171031175048.GI4526@work-vm>
-References: <20171031155435.4618-1-michael.nawrocki@gtri.gatech.edu>
-	<20171031155435.4618-3-michael.nawrocki@gtri.gatech.edu>
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1e9ak0-0005K1-By
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 13:54:25 -0400
+Received: from chuckie.co.uk ([82.165.15.123]:52508
+	helo=s16892447.onlinehome-server.info)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1e9ak0-0005IF-5J
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 13:54:20 -0400
+Date: Tue, 31 Oct 2017 17:50:38 +0000
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <20171031175037.GB29920@kentang.lan>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20171031155435.4618-3-michael.nawrocki@gtri.gatech.edu>
-Subject: Re: [Qemu-devel] [PATCH 2/2] Add i82559a eepro100 interface
+Subject: [Qemu-devel] [PULL] qemu-sparc update
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,85 +26,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mike Nawrocki <michael.nawrocki@gtri.gatech.edu>
-Cc: qemu-devel@nongnu.org, marcel@redhat.com, jasowang@redhat.com, mst@redhat.com
+To: qemu-devel@nongnu.org, peter.maydell@linaro.org
 
-* Mike Nawrocki (michael.nawrocki@gtri.gatech.edu) wrote:
-> Signed-off-by: Mike Nawrocki <michael.nawrocki@gtri.gatech.edu>
-> ---
->  hw/net/eepro100.c    | 2 +-
->  hw/pci/pci.c         | 2 ++
->  include/hw/pci/pci.h | 1 +
->  qemu-options.hx      | 2 +-
->  4 files changed, 5 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/net/eepro100.c b/hw/net/eepro100.c
-> index 91dd058010..2c7c5cdeb9 100644
-> --- a/hw/net/eepro100.c
-> +++ b/hw/net/eepro100.c
-> @@ -1973,7 +1973,7 @@ static E100PCIDeviceInfo e100_devices[] = {
->          .name = "i82559a",
->          .desc = "Intel i82559A Ethernet",
->          .device = i82559A,
-> -        .device_id = PCI_DEVICE_ID_INTEL_82557,
-> +        .device_id = PCI_DEVICE_ID_INTEL_82559,
+Hi Peter,
 
-Doesn't that break migration/compatibility - if one side suddenly
-sees a different device_id ?
+Here are the last set of changes for 2.11 which is the tidy up of the sun4m DMA
+devices along with the switch from the legacy sun4m IOMMU API to an IOMMU
+memory region instead. Please pull.
 
-Dave
 
->          .revision = 0x06,
->          .stats_size = 80,
->          .has_extended_tcb_support = true,
-> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-> index 5ed3c8dca4..1126ad1eb3 100644
-> --- a/hw/pci/pci.c
-> +++ b/hw/pci/pci.c
-> @@ -1826,6 +1826,7 @@ static const char * const pci_nic_models[] = {
->      "ne2k_pci",
->      "i82551",
->      "i82557b",
-> +    "i82559a",
->      "i82559er",
->      "rtl8139",
->      "e1000",
-> @@ -1839,6 +1840,7 @@ static const char * const pci_nic_names[] = {
->      "ne2k_pci",
->      "i82551",
->      "i82557b",
-> +    "i82559a",
->      "i82559er",
->      "rtl8139",
->      "e1000",
-> diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
-> index 8d02a0a383..f30e2cfb72 100644
-> --- a/include/hw/pci/pci.h
-> +++ b/include/hw/pci/pci.h
-> @@ -70,6 +70,7 @@ extern bool pci_available;
->  /* Intel (0x8086) */
->  #define PCI_DEVICE_ID_INTEL_82551IT      0x1209
->  #define PCI_DEVICE_ID_INTEL_82557        0x1229
-> +#define PCI_DEVICE_ID_INTEL_82559        0x1030
->  #define PCI_DEVICE_ID_INTEL_82801IR      0x2922
->  
->  /* Red Hat / Qumranet (for QEMU) -- see pci-ids.txt */
-> diff --git a/qemu-options.hx b/qemu-options.hx
-> index 3728e9b4dd..a39c7e44b3 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -2047,7 +2047,7 @@ that the card should have; this option currently only affects virtio cards; set
->  @var{v} = 0 to disable MSI-X. If no @option{-net} option is specified, a single
->  NIC is created.  QEMU can emulate several different models of network card.
->  Valid values for @var{type} are
-> -@code{virtio}, @code{i82551}, @code{i82557b}, @code{i82559er},
-> +@code{virtio}, @code{i82551}, @code{i82557b}, @code{i82559a}, @code{i82559er},
->  @code{ne2k_pci}, @code{ne2k_isa}, @code{pcnet}, @code{rtl8139},
->  @code{e1000}, @code{smc91c111}, @code{lance} and @code{mcf_fec}.
->  Not all devices are supported on all targets.  Use @code{-net nic,model=help}
-> -- 
-> 2.14.2
-> 
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+ATB,
+
+Mark.
+ 
+
+The following changes since commit 7fa00e204902cee0b33a0c60de87e87319d1809f:
+
+  Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20171031' into staging (2017-10-31 14:28:25 +0000)
+
+are available in the git repository at:
+
+
+  https://github.com/mcayland/qemu.git tags/qemu-sparc-signed
+
+for you to fetch changes up to badd3d62c619d24a5af62198374f42b7c510ee41:
+
+  sun4m: change TYPE_SUN4M_IOMMU macro from "iommu" to "sun4m-iommu" (2017-10-31 17:25:37 +0000)
+
+----------------------------------------------------------------
+qemu-sparc update
+
+----------------------------------------------------------------
+Mark Cave-Ayland (17):
+      sparc32_dma: rename SPARC32_DMA type to SPARC32_DMA_DEVICE
+      sparc32_dma: split esp and le into separate DMA devices
+      sparc32_dma: move type declarations from sparc32_dma.c to sparc32_dma.h
+      sun4m: move DMA device wiring from sparc32_dma_init() to sun4m_hw_init()
+      sun4m_iommu: move TYPE_SUN4M_IOMMU declaration to sun4m.h
+      sparc32_dma: use object link instead of qdev property to pass IOMMU reference
+      esp: move TYPE_ESP and SysBusESPState from esp.c to esp.h
+      sparc32_dma: make esp device child of espdma device
+      lance: move TYPE_LANCE and SysBusPCNetState from lance.c to lance.h
+      sparc32_dma: make lance device child of ledma device
+      sparc32_dma: introduce new SPARC32_DMA type container object
+      sparc32_dma: remove is_ledma hack and replace with memory region alias
+      sparc32_dma: add len to esp/le DMA memory tracing
+      sun4m: implement IOMMU translation using IOMMU memory region
+      sparc32_dma: switch over to using IOMMU memory region and DMA API
+      sun4m_iommu: remove legacy sparc_iommu_memory_rw() function
+      sun4m: change TYPE_SUN4M_IOMMU macro from "iommu" to "sun4m-iommu"
+
+ hw/dma/sparc32_dma.c           |  252 +++++++++++++++++++++++++++++-----------
+ hw/dma/sun4m_iommu.c           |  101 +++++++++-------
+ hw/dma/trace-events            |    8 +-
+ hw/net/lance.c                 |   11 +-
+ hw/scsi/esp.c                  |   13 ---
+ hw/sparc/sun4m.c               |   82 +++++--------
+ include/hw/net/lance.h         |   45 +++++++
+ include/hw/scsi/esp.h          |   14 +++
+ include/hw/sparc/sparc32_dma.h |   55 +++++++++
+ include/hw/sparc/sun4m.h       |   35 +++---
+ 10 files changed, 413 insertions(+), 203 deletions(-)
+ create mode 100644 include/hw/net/lance.h
