@@ -1,29 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36776)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37412)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <batmanustc@gmail.com>) id 1e9Oze-0000GV-5L
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 01:21:43 -0400
+	(envelope-from <yi.l.liu@linux.intel.com>) id 1e9P1Q-00012U-DU
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 01:23:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <batmanustc@gmail.com>) id 1e9OzZ-0003kX-W5
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 01:21:42 -0400
-Received: from mail-qt0-x22c.google.com ([2607:f8b0:400d:c0d::22c]:54756)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <batmanustc@gmail.com>)
-	id 1e9OzZ-0003kL-RH
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 01:21:37 -0400
-Received: by mail-qt0-x22c.google.com with SMTP id z19so19275911qtg.11
-	for <qemu-devel@nongnu.org>; Mon, 30 Oct 2017 22:21:37 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20171027070833.GA24218@redhat.com>
-References: <CAOE=1Z31T6nHcO4P6GWW8GK_o0VB66HivPc-m1LZRh_x6nY_6g@mail.gmail.com>
-	<20171026140203.GG10055@redhat.com>
-	<CAOE=1Z3Umt+mLDKyJ04qRsH-E=EPYC2ozeHm5a3jbqF0=yv-hQ@mail.gmail.com>
-	<20171027070833.GA24218@redhat.com>
-From: Sam <batmanustc@gmail.com>
-Date: Tue, 31 Oct 2017 13:21:36 +0800
-Message-ID: <CAOE=1Z0m+Wa42BYToj10cR2tTjBAGyKPaMtZgFvLNjG5VKMU6g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] Qemu start VM in huge page without '-mem-prealloc'
- will get memory leak?
+	(envelope-from <yi.l.liu@linux.intel.com>) id 1e9P1L-0004dq-KO
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 01:23:32 -0400
+Received: from mga07.intel.com ([134.134.136.100]:53480)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yi.l.liu@linux.intel.com>)
+	id 1e9P1L-0004cw-9v
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 01:23:27 -0400
+From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
+Date: Tue, 31 Oct 2017 13:06:59 +0800
+Message-Id: <1509426425-23890-1-git-send-email-yi.l.liu@linux.intel.com>
+Subject: [Qemu-devel] [PATCH 0/6] Introduce new iommu notifier framework
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,31 +22,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org, mst@redhat.com, david@gibson.dropbear.id.au, pbonzini@redhat.com, alex.williamson@redhat.com
+Cc: tianyu.lan@intel.com, yi.l.liu@intel.com, peterx@redhat.com, kevin.tian@intel.com, jasowang@redhat.com, "Liu, Yi L" <yi.l.liu@linux.intel.com>
 
-Why could I not find in ovs-dpdk maillist? could some one give the bug
-number?
+This patchset is a follow-up of Peter Xu's patchset as the link below.
+In brief, Peter's patchset is to introduce a common IOMMU object which
+is not depending on platform (x86/ppc/...), or bus (PCI/...). And based
+on it, a iommu object based notifier framework is introduced and also
+AddressSpaceOps is added to provide methods like getting IOMMUObject
+behind an AddressSpace. It could be used to detect the exposure of
+vIOMMU.
 
-2017-10-27 15:08 GMT+08:00 Daniel P. Berrange <berrange@redhat.com>:
+https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg05360.html
 
-> On Fri, Oct 27, 2017 at 11:28:33AM +0800, Sam wrote:
-> > After restart ovs-dpdk(which is openvswitch with dpdk lib), memory is
-> > released.
-> >
-> > But problem is in product environment, I could not restart ovs-dpdk......
->
-> This is a clear bug in ovs-dpdk then - it is failing to release memory
-> when QEMU exits.
->
->
-> Regards,
-> Daniel
-> --
-> |: https://berrange.com      -o-    https://www.flickr.com/photos/
-> dberrange :|
-> |: https://libvirt.org         -o-
-> https://fstop138.berrange.com :|
-> |: https://entangle-photo.org    -o-    https://www.instagram.com/
-> dberrange :|
->
+Here let me try to address why we need such change.
+
+I'm working on virt-SVM enabling for passthru devices on Intel platform.
+This work is to extend the existing intel iommu emulator in Qemu. Among
+the extensions, there are two requirements which ae related to the topic
+we are talking here.
+
+* intel iommu emulator needs to propagate a guest pasid table pointer
+  to host through VFIO. So that host intel iommu driver could set it to
+  its ctx table. With guest pasid table pointer set, host would be able
+  to get guest CR3 table after guest calls intel_svm_bind_mm(). Then HW
+  iommu could do nested translation to get GVA->GPA GPA->HPA. Thus enables
+  Shared Virtual Memory in guest.
+
+* intel iommu emulator needs to propagate guest's iotlb(1st level cache)
+  flush to host through VFIO.
+
+Since the two requirements need to talk with VFIO, so notifiers are
+needed. Meanwhile, the notifiers should be registered as long as there
+is vIOMMU exposed to guest.
+
+Qemu has an existing notifier framework based on MemoryRegion. And we
+are using it for MAP/UNMAP. However, we cannot use it here. Reason is
+as below:
+
+* IOMMU MemoryRegion notifiers depends on IOMMU MemoryRegion. If guest
+  iommu driver configs to bypass the IOVA adress translation. The address
+  space would be system ram address space. The MemoryRegion would be the
+  RAM MemoryRegion. Details can be got in Peter's patch to allow dynamic
+  switch of IOMMU region.
+  https://lists.gnu.org/archive/html/qemu-devel/2016-12/msg02690.html
+
+* virt-SVM requires guest to config to bypass the IOVA address translation
+  With such config, we can make sure host would have a GPA->HPA mapping,
+  and meanwhile intel iommu emulator could propagate the guest CR3 table
+  (GVA->GPA) to host. With nested translation, we are able to achieve
+  GVA->GPA and then GPA->HPA translation. However, if so, the IOMMU
+  MemoryRegion notifiers would not be registered. It means for virt-SVM,
+  we need another notifier framework.
+
+Based on Peter's patch, I did some clean up and fulfill the notifier
+framework based on IOMMUObject and also provide an example of the newly
+introduced notifier framework. The notifier framework introduced here
+is going to be used in my virt-SVM patchset.
+
+For virt-SVM design details, you may refer to svm RFC patch.
+https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg04925.html
+
+Liu, Yi L (3):
+  vfio: rename GuestIOMMU to be GuestIOMMUMR
+  vfio/pci: add notify framework based on IOMMUObject
+  vfio/pci: register vfio_iommu_bind_pasidtbl_notify notifier
+
+Peter Xu (3):
+  memory: rename existing iommu notifier to be iommu mr notifier
+  memory: introduce AddressSpaceOps and IOMMUObject
+  intel_iommu: provide AddressSpaceOps.iommu_get instance
+
+ hw/core/Makefile.objs         |  1 +
+ hw/core/iommu.c               | 58 ++++++++++++++++++++++++++++++++
+ hw/i386/amd_iommu.c           |  6 ++--
+ hw/i386/intel_iommu.c         | 41 +++++++++++++----------
+ hw/ppc/spapr_iommu.c          |  8 ++---
+ hw/s390x/s390-pci-bus.c       |  2 +-
+ hw/vfio/common.c              | 25 +++++++-------
+ hw/vfio/pci.c                 | 53 ++++++++++++++++++++++++++++-
+ hw/virtio/vhost.c             | 10 +++---
+ include/exec/memory.h         | 77 ++++++++++++++++++++++++++++---------------
+ include/hw/core/iommu.h       | 73 ++++++++++++++++++++++++++++++++++++++++
+ include/hw/i386/intel_iommu.h | 10 +++---
+ include/hw/vfio/vfio-common.h | 16 ++++++---
+ include/hw/virtio/vhost.h     |  4 +--
+ memory.c                      | 45 +++++++++++++++----------
+ 15 files changed, 331 insertions(+), 98 deletions(-)
+ create mode 100644 hw/core/iommu.c
+ create mode 100644 include/hw/core/iommu.h
+
+-- 
+1.9.1
