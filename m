@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50242)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50300)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1e9Ufn-0002zM-5U
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 07:25:36 -0400
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1e9Uft-000347-U6
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 07:25:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1e9Ufk-0007Ew-0o
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 07:25:35 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:45026)
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1e9Ufp-0007MA-NG
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 07:25:41 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:45044)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1e9Ufj-0007EP-PD
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 07:25:31 -0400
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1e9Ufp-0007LN-9r
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 07:25:37 -0400
 From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Date: Tue, 31 Oct 2017 14:25:31 +0300
-Message-ID: <20171031112531.10516.11827.stgit@pasha-VirtualBox>
+Date: Tue, 31 Oct 2017 14:25:37 +0300
+Message-ID: <20171031112537.10516.88278.stgit@pasha-VirtualBox>
 In-Reply-To: <20171031112457.10516.8971.stgit@pasha-VirtualBox>
 References: <20171031112457.10516.8971.stgit@pasha-VirtualBox>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [RFC PATCH 06/26] replay: fix save/load vm for
- non-empty queue
+Subject: [Qemu-devel] [RFC PATCH 07/26] replay: added replay log format
+ description
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,82 +30,91 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, boost.lists@gmail.com, quintela@redhat.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, kraxel@redhat.com, pavel.dovgaluk@ispras.ru, pbonzini@redhat.com, alex.bennee@linaro.org
 
-This patch does not allows saving/loading vmstate when
-replay events queue is not empty. There is no reliable
-way to save events queue, because it describes internal
-coroutine state. Therefore saving and loading operations
-should be deferred to another record/replay step.
+From: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+
+This patch adds description of the replay log file format
+into the docs/replay.txt.
 
 Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
 
 ---
- include/sysemu/replay.h  |    3 +++
- migration/savevm.c       |   13 +++++++++++++
- replay/replay-snapshot.c |    6 ++++++
- 3 files changed, 22 insertions(+)
+ docs/replay.txt |   69 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 69 insertions(+)
 
-diff --git a/include/sysemu/replay.h b/include/sysemu/replay.h
-index fa14d0e..b86d6bb 100644
---- a/include/sysemu/replay.h
-+++ b/include/sysemu/replay.h
-@@ -165,5 +165,8 @@ void replay_audio_in(int *recorded, void *samples, int *wpos, int size);
- /*! Called at the start of execution.
-     Loads or saves initial vmstate depending on execution mode. */
- void replay_vmstate_init(void);
-+/*! Called to ensure that replay state is consistent and VM snapshot
-+    can be created */
-+bool replay_can_snapshot(void);
- 
- #endif
-diff --git a/migration/savevm.c b/migration/savevm.c
-index 4a88228..20cebe1 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -52,6 +52,7 @@
- #include "qemu/cutils.h"
- #include "io/channel-buffer.h"
- #include "io/channel-file.h"
-+#include "sysemu/replay.h"
- 
- #ifndef ETH_P_RARP
- #define ETH_P_RARP 0x8035
-@@ -2141,6 +2142,12 @@ int save_snapshot(const char *name, Error **errp)
-     struct tm tm;
-     AioContext *aio_context;
- 
-+    if (!replay_can_snapshot()) {
-+        monitor_printf(mon, "Record/replay does not allow making snapshot "
-+                        "right now. Try once more later.\n");
-+        return ret;
-+    }
+diff --git a/docs/replay.txt b/docs/replay.txt
+index 486c1e0..c52407f 100644
+--- a/docs/replay.txt
++++ b/docs/replay.txt
+@@ -232,3 +232,72 @@ Audio devices
+ Audio data is recorded and replay automatically. The command line for recording
+ and replaying must contain identical specifications of audio hardware, e.g.:
+  -soundhw ac97
 +
-     if (!bdrv_all_can_snapshot(&bs)) {
-         error_setg(errp, "Device '%s' is writable but does not support "
-                    "snapshots", bdrv_get_device_name(bs));
-@@ -2310,6 +2317,12 @@ int load_snapshot(const char *name, Error **errp)
-     AioContext *aio_context;
-     MigrationIncomingState *mis = migration_incoming_get_current();
- 
-+    if (!replay_can_snapshot()) {
-+        error_report("Record/replay does not allow loading snapshot "
-+                     "right now. Try once more later.\n");
-+        return -EINVAL;
-+    }
++Replay log format
++-----------------
 +
-     if (!bdrv_all_can_snapshot(&bs)) {
-         error_setg(errp,
-                    "Device '%s' is writable but does not support snapshots",
-diff --git a/replay/replay-snapshot.c b/replay/replay-snapshot.c
-index b2e1076..7075986 100644
---- a/replay/replay-snapshot.c
-+++ b/replay/replay-snapshot.c
-@@ -83,3 +83,9 @@ void replay_vmstate_init(void)
-         }
-     }
- }
++Record/replay log consits of the header and the sequence of execution
++events. The header includes 4-byte replay version id and 8-byte reserved
++field. Version is updated every time replay log format changes to prevent
++using replay log created by another build of qemu.
 +
-+bool replay_can_snapshot(void)
-+{
-+    return replay_mode == REPLAY_MODE_NONE
-+        || !replay_has_events();
-+}
++The sequence of the events describes virtual machine state changes.
++It includes all non-deterministic inputs of VM, synchronization marks and
++instruction counts used to correctly inject inputs at replay.
++
++Synchronization marks (checkpoints) are used for synchronizing qemu threads
++that perform operations with virtual hardware. These operations may change
++system's state (e.g., change some register or generate interrupt) and
++therefore should execute synchronously with CPU thread.
++
++Every event in the log includes 1-byte event id and optional arguments.
++When argument is an array, it is stored as 4-byte array length
++and corresponding number of bytes with data.
++Here is the list of events that are written into the log:
++
++ - EVENT_INSTRUCTION. Instructions executed since last event.
++   Argument: 4-byte number of executed instructions.
++ - EVENT_INTERRUPT. Used to synchronize interrupt processing.
++ - EVENT_EXCEPTION. Used to synchronize exception handling.
++ - EVENT_ASYNC. This is a group of events. They are always processed
++   together with checkpoints. When such an event is generated, it is
++   stored in the queue and processed only when checkpoint occurs.
++   Every such event is followed by 1-byte checkpoint id and 1-byte
++   async event id from the following list:
++     - REPLAY_ASYNC_EVENT_BH. Bottom-half callback. This event synchronizes
++       callbacks that affect virtual machine state, but normally called
++       asyncronously.
++       Argument: 8-byte operation id.
++     - REPLAY_ASYNC_EVENT_INPUT. Input device event. Contains
++       parameters of keyboard and mouse input operations
++       (key press/release, mouse pointer movement).
++       Arguments: 9-16 bytes depending of input event.
++     - REPLAY_ASYNC_EVENT_INPUT_SYNC. Internal input synchronization event.
++     - REPLAY_ASYNC_EVENT_CHAR_READ. Character (e.g., serial port) device input
++       initiated by the sender.
++       Arguments: 1-byte character device id.
++                  Array with bytes were read.
++     - REPLAY_ASYNC_EVENT_BLOCK. Block device operation. Used to synchronize
++       operations with disk and flash drives with CPU.
++       Argument: 8-byte operation id.
++     - REPLAY_ASYNC_EVENT_NET. Incoming network packet.
++       Arguments: 1-byte network adapter id.
++                  4-byte packet flags.
++                  Array with packet bytes.
++ - EVENT_SHUTDOWN. Occurs when user sends shutdown event to qemu,
++   e.g., by closing the window.
++ - EVENT_CHAR_WRITE. Used to synchronize character output operations.
++   Arguments: 4-byte output function return value.
++              4-byte offset in the output array.
++ - EVENT_CHAR_READ_ALL. Used to synchronize character input operations,
++   initiated by qemu.
++   Argument: Array with bytes that were read.
++ - EVENT_CHAR_READ_ALL_ERROR. Unsuccessful character input operation,
++   initiated by qemu.
++   Argument: 4-byte error code.
++ - EVENT_CLOCK + clock_id. Group of events for host clock read operations.
++   Argument: 8-byte clock value.
++ - EVENT_CHECKPOINT + checkpoint_id. Checkpoint for synchronization of
++   CPU, internal threads, and asynchronous input events. May be followed
++   by one or more EVENT_ASYNC events.
++ - EVENT_END. Last event in the log.
