@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33863)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37747)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e9V0y-00057N-3Q
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 07:47:28 -0400
+	(envelope-from <mar.krzeminski@gmail.com>) id 1e9V8d-0000Mq-Mz
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 07:55:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e9V0x-0004Lq-7y
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 07:47:28 -0400
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:53909)
+	(envelope-from <mar.krzeminski@gmail.com>) id 1e9V8Z-0003e6-RE
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 07:55:23 -0400
+Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:57151)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1e9V0w-0004Kp-Vv
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 07:47:27 -0400
-Received: by mail-wr0-x242.google.com with SMTP id u40so15623743wrf.10
-	for <qemu-devel@nongnu.org>; Tue, 31 Oct 2017 04:47:26 -0700 (PDT)
+	(Exim 4.71) (envelope-from <mar.krzeminski@gmail.com>)
+	id 1e9V8Z-0003dW-BM
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 07:55:19 -0400
+Received: by mail-lf0-x241.google.com with SMTP id 90so18669408lfs.13
+	for <qemu-devel@nongnu.org>; Tue, 31 Oct 2017 04:55:19 -0700 (PDT)
+References: <20171029101343.15544-1-frasse.iglesias@gmail.com>
+	<20171029101343.15544-2-frasse.iglesias@gmail.com>
+	<a5d353da-2ec3-7563-cbab-f7399d0ccbf7@gmail.com>
+	<CAAYMZQtB_vQW1oTJYj627EOFeVynG-WYroVQrBubKNeKekdupg@mail.gmail.com>
+From: "mar.krzeminski" <mar.krzeminski@gmail.com>
+Message-ID: <23010cae-58b4-a14f-1e3e-2cd958d88ece@gmail.com>
+Date: Tue, 31 Oct 2017 12:55:15 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9zXAmNPL8TsLKSPbm8Er_KLK8Ubwth6=nL6WD87OmBQw@mail.gmail.com>
-References: <alpine.DEB.2.10.1710171708130.27209@sstabellini-ThinkPad-X260>
-	<CAFEAcA9zXAmNPL8TsLKSPbm8Er_KLK8Ubwth6=nL6WD87OmBQw@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 31 Oct 2017 11:47:04 +0000
-Message-ID: <CAFEAcA8jwN81ZBCLA8HW=q5GAWKmZ=kAZAP9vGNN8RYkzYe=Pw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] aarch64: advertise the GIC system register
- interface
+In-Reply-To: <CAAYMZQtB_vQW1oTJYj627EOFeVynG-WYroVQrBubKNeKekdupg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-AU
+Subject: Re: [Qemu-devel] [PATCH v5 01/13] m25p80: Add support for
+ continuous read out of RDSR and READ_FSR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,61 +34,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Stabellini <sstabellini@kernel.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "xen-devel@lists.xen.org" <xen-devel@lists.xen.org>, julien.grall@arm.com, qemu-arm <qemu-arm@nongnu.org>
+To: francisco iglesias <frasse.iglesias@gmail.com>
+Cc: qemu-devel@nongnu.org, edgari@xilinx.com, alistai@xilinx.com, francisco.iglesias@feimtech.se
 
-On 19 October 2017 at 15:46, Peter Maydell <peter.maydell@linaro.org> wrote:
-> On 18 October 2017 at 01:10, Stefano Stabellini <sstabellini@kernel.org> wrote:
->> Advertise the presence of the GIC system register interface (1<<24)
->> according to H9.248 of the ARM ARM.
->>
->> This patch allows Xen to boot on QEMU aarch64.
->>
->> Signed-off-by: Stefano Stabellini <sstabellini@kernel.org>
->>
->> diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
->> index 670c07a..a451763 100644
->> --- a/target/arm/cpu64.c
->> +++ b/target/arm/cpu64.c
->> @@ -136,7 +136,7 @@ static void aarch64_a57_initfn(Object *obj)
->>      cpu->id_isar3 = 0x01112131;
->>      cpu->id_isar4 = 0x00011142;
->>      cpu->id_isar5 = 0x00011121;
->> -    cpu->id_aa64pfr0 = 0x00002222;
->> +    cpu->id_aa64pfr0 = 0x01002222;
->>      cpu->id_aa64dfr0 = 0x10305106;
->>      cpu->pmceid0 = 0x00000000;
->>      cpu->pmceid1 = 0x00000000;
->> @@ -196,7 +196,7 @@ static void aarch64_a53_initfn(Object *obj)
->>      cpu->id_isar3 = 0x01112131;
->>      cpu->id_isar4 = 0x00011142;
->>      cpu->id_isar5 = 0x00011121;
->> -    cpu->id_aa64pfr0 = 0x00002222;
->> +    cpu->id_aa64pfr0 = 0x01002222;
->>      cpu->id_aa64dfr0 = 0x10305106;
->>      cpu->id_aa64isar0 = 0x00011120;
->>      cpu->id_aa64mmfr0 = 0x00001122; /* 40 bit physical addr */
+
+
+W dniu 31.10.2017 o 12:26, francisco iglesias pisze:
+> Hi Marcin,
 >
-> Whoops -- we missed this when we added the GICv3 support, because
-> Linux doesn't check it.
+> Huge thank you once again for reviewing and your time! I'll update 
+> above i next version of the patch series. I'll remove the Acks so the 
+> patch can be revisited (if it is ok for you that keep it just let me 
+> know and I'll do so!).
 >
-> Applied to target-arm.next, thanks.
+> Best regards,
+> Francisco Iglesias
+If you change the code please remove me Acks. It is no problem to review 
+again.
 
-Unfortunately I've just noticed that this breaks booting Linux
-in the "not using gicv3" case. This is because we don't actually
-define the GICv3 cpu interface registers unless the board
-instantiates a GICv3. We mustn't advertise the GICv3 sysregs
-in the ID register unless we actually have them.
-
-Not sure how best to fix this -- it's a consequence of the
-design decision we made to have the sysregs implementation
-be in the gicv3 code. There's no useful feature bit in the CPU
-to hang this off either, it's an effect of whether the board
-model happens to wire up a gicv3 or not. So we can only figure
-this out fairly late on (probably at CPU reset time), which
-is a bit tedious for getting ID reg values right.
-
-In the meantime I've dropped this patch from target-arm.next.
-
-thanks
--- PMM
+Thanks,
+Marcin
