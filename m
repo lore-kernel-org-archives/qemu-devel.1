@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38952)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40493)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1e9YLP-0001Fq-Ba
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 11:20:53 -0400
+	(envelope-from <Michael.Nawrocki@gtri.gatech.edu>)
+	id 1e9YPg-0004ZB-3l
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 11:25:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1e9YLO-0000s2-8d
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 11:20:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46364)
+	(envelope-from <Michael.Nawrocki@gtri.gatech.edu>)
+	id 1e9YPa-0004Vx-6P
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 11:25:12 -0400
+Received: from relay2.gtri.gatech.edu ([130.207.199.168]:47248)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1e9YLN-0000rY-WE
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 11:20:46 -0400
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Tue, 31 Oct 2017 16:19:38 +0100
-Message-Id: <20171031151938.14982-6-marcandre.lureau@redhat.com>
-In-Reply-To: <20171031151938.14982-1-marcandre.lureau@redhat.com>
-References: <20171031151938.14982-1-marcandre.lureau@redhat.com>
+	(Exim 4.71) (envelope-from <Michael.Nawrocki@gtri.gatech.edu>)
+	id 1e9YPa-0004Uh-25
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 11:25:06 -0400
+From: Mike Nawrocki <michael.nawrocki@gtri.gatech.edu>
+Date: Tue, 31 Oct 2017 11:24:43 -0400
+Message-ID: <20171031152443.3670-1-michael.nawrocki@gtri.gatech.edu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 5/5] fw_cfg: write vmcoreinfo details
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH] Enable 8-byte wide MMIO for 16550 serial
+ devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,155 +27,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: linux-kernel@vger.kernel.org
-Cc: somlo@cmu.edu, qemu-devel@nongnu.org, mst@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: mst@redhat.com, pbonzini@redhat.com, Mike Nawrocki <michael.nawrocki@gtri.gatech.edu>
 
-If the "etc/vmcoreinfo" fw_cfg file is present and we are not running
-the kdump kernel, write the addr/size of the vmcoreinfo ELF note.
+Some drivers for the PPMC7400 PowerPC evaluation board accesses the
+serial registers through the floating point unit (stfd/ldfd), which is
+an 8-byte wide access. This patch enables that behavior.
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Signed-off-by: Mike Nawrocki <michael.nawrocki@gtri.gatech.edu>
 ---
- drivers/firmware/qemu_fw_cfg.c | 87 ++++++++++++++++++++++++++++++++++++=
-+++++-
- 1 file changed, 86 insertions(+), 1 deletion(-)
+ hw/char/serial.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/firmware/qemu_fw_cfg.c b/drivers/firmware/qemu_fw_cf=
-g.c
-index 8ce5e49b7c62..ebd9bb134900 100644
---- a/drivers/firmware/qemu_fw_cfg.c
-+++ b/drivers/firmware/qemu_fw_cfg.c
-@@ -35,6 +35,8 @@
- #include <linux/ioport.h>
- #include <linux/delay.h>
- #include <linux/dma-mapping.h>
-+#include <linux/crash_core.h>
-+#include <linux/crash_dump.h>
-=20
- MODULE_AUTHOR("Gabriel L. Somlo <somlo@cmu.edu>");
- MODULE_DESCRIPTION("QEMU fw_cfg sysfs support");
-@@ -59,6 +61,8 @@ MODULE_LICENSE("GPL");
- /* fw_cfg "file name" is up to 56 characters (including terminating nul)=
- */
- #define FW_CFG_MAX_FILE_PATH 56
-=20
-+#define VMCOREINFO_FORMAT_ELF 0x1
-+
- /* platform device for dma mapping */
- static struct device *dev;
-=20
-@@ -127,7 +131,8 @@ static ssize_t fw_cfg_dma_transfer(void *address, u32=
- length, u32 control)
- 	dma_addr_t dma;
- 	ssize_t ret =3D length;
- 	enum dma_data_direction dir =3D
--		(control & FW_CFG_DMA_CTL_READ ? DMA_FROM_DEVICE : 0);
-+		(control & FW_CFG_DMA_CTL_READ ? DMA_FROM_DEVICE : 0) |
-+		(control & FW_CFG_DMA_CTL_WRITE ? DMA_TO_DEVICE : 0);
-=20
- 	if (address && length) {
- 		dma_addr =3D dma_map_single(dev, address, length, dir);
-@@ -225,6 +230,48 @@ static ssize_t fw_cfg_read_blob(u16 key,
- 	return ret;
+diff --git a/hw/char/serial.c b/hw/char/serial.c
+index 376bd2f240..c16c19a406 100644
+--- a/hw/char/serial.c
++++ b/hw/char/serial.c
+@@ -1005,7 +1005,7 @@ static void serial_mm_write(void *opaque, hwaddr addr,
+                             uint64_t value, unsigned size)
+ {
+     SerialState *s = opaque;
+-    value &= ~0u >> (32 - (size * 8));
++    value &= ~((uint64_t)0) >> (64 - (size * 8));
+     serial_ioport_write(s, addr >> s->it_shift, value, 1);
  }
-=20
-+#ifdef CONFIG_CRASH_CORE
-+/* write chunk of given fw_cfg blob (caller responsible for sanity-check=
-) */
-+static ssize_t fw_cfg_write_blob(u16 key,
-+				 void *buf, loff_t pos, size_t count)
-+{
-+	u32 glk =3D -1U;
-+	acpi_status status;
-+	ssize_t ret =3D count;
-+
-+	/* If we have ACPI, ensure mutual exclusion against any potential
-+	 * device access by the firmware, e.g. via AML methods:
-+	 */
-+	status =3D acpi_acquire_global_lock(ACPI_WAIT_FOREVER, &glk);
-+	if (ACPI_FAILURE(status) && status !=3D AE_NOT_CONFIGURED) {
-+		/* Should never get here */
-+		WARN(1, "%s: Failed to lock ACPI!\n", __func__);
-+		memset(buf, 0, count);
-+		return -EBUSY;
-+	}
-+
-+	mutex_lock(&fw_cfg_dev_lock);
-+	if (pos =3D=3D 0) {
-+		ret =3D fw_cfg_dma_transfer(buf, count, key << 16
-+					  | FW_CFG_DMA_CTL_SELECT
-+					  | FW_CFG_DMA_CTL_WRITE);
-+	} else {
-+		iowrite16(fw_cfg_sel_endianness(key), fw_cfg_reg_ctrl);
-+		ret =3D fw_cfg_dma_transfer(0, pos, FW_CFG_DMA_CTL_SKIP);
-+		if (ret < 0)
-+			goto end;
-+		ret =3D fw_cfg_dma_transfer(buf, count, FW_CFG_DMA_CTL_WRITE);
-+	}
-+
-+end:
-+	mutex_unlock(&fw_cfg_dev_lock);
-+
-+	acpi_release_global_lock(glk);
-+
-+	return ret;
-+}
-+#endif /* CONFIG_CRASH_CORE */
-+
- /* clean up fw_cfg device i/o */
- static void fw_cfg_io_cleanup(void)
- {
-@@ -343,6 +390,37 @@ struct fw_cfg_sysfs_entry {
- 	struct list_head list;
+ 
+@@ -1014,16 +1014,22 @@ static const MemoryRegionOps serial_mm_ops[3] = {
+         .read = serial_mm_read,
+         .write = serial_mm_write,
+         .endianness = DEVICE_NATIVE_ENDIAN,
++        .valid.max_access_size = 8,
++        .impl.max_access_size = 8,
+     },
+     [DEVICE_LITTLE_ENDIAN] = {
+         .read = serial_mm_read,
+         .write = serial_mm_write,
+         .endianness = DEVICE_LITTLE_ENDIAN,
++        .valid.max_access_size = 8,
++        .impl.max_access_size = 8,
+     },
+     [DEVICE_BIG_ENDIAN] = {
+         .read = serial_mm_read,
+         .write = serial_mm_write,
+         .endianness = DEVICE_BIG_ENDIAN,
++        .valid.max_access_size = 8,
++        .impl.max_access_size = 8,
+     },
  };
-=20
-+#ifdef CONFIG_CRASH_CORE
-+static ssize_t write_vmcoreinfo(const struct fw_cfg_file *f)
-+{
-+	struct vmci {
-+		__le16 host_format;
-+		__le16 guest_format;
-+		__le32 size;
-+		__le64 paddr;
-+	} __packed;
-+	struct vmci *data;
-+	ssize_t ret;
-+
-+	data =3D kmalloc(sizeof(struct vmci), GFP_KERNEL | GFP_DMA);
-+	if (!data)
-+		return -ENOMEM;
-+
-+	/* spare ourself reading host format support for now since we
-+	 * don't know what else to format - host may ignore ours
-+	 */
-+	*data =3D (struct vmci) {
-+		.guest_format =3D cpu_to_le16(VMCOREINFO_FORMAT_ELF),
-+		.size =3D cpu_to_le32(VMCOREINFO_NOTE_SIZE),
-+		.paddr =3D cpu_to_le64(paddr_vmcoreinfo_note())
-+	};
-+	ret =3D fw_cfg_write_blob(f->select, data, 0, sizeof(struct vmci));
-+
-+	kfree(data);
-+	return ret;
-+}
-+#endif /* CONFIG_CRASH_CORE */
-+
- /* get fw_cfg_sysfs_entry from kobject member */
- static inline struct fw_cfg_sysfs_entry *to_entry(struct kobject *kobj)
- {
-@@ -582,6 +660,13 @@ static int fw_cfg_register_file(const struct fw_cfg_=
-file *f)
- 	int err;
- 	struct fw_cfg_sysfs_entry *entry;
-=20
-+#ifdef CONFIG_CRASH_CORE
-+	if (strcmp(f->name, "etc/vmcoreinfo") =3D=3D 0 && !is_kdump_kernel()) {
-+		if (write_vmcoreinfo(f) < 0)
-+			pr_warn("fw_cfg: failed to write vmcoreinfo");
-+	}
-+#endif
-+
- 	/* allocate new entry */
- 	entry =3D kzalloc(sizeof(*entry), GFP_KERNEL);
- 	if (!entry)
---=20
-2.15.0.rc0.40.gaefcc5f6f
+ 
+-- 
+2.14.2
