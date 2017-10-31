@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57376)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57404)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1e9U5Q-0005Yd-N0
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 06:48:01 -0400
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1e9U5T-0005aU-NF
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 06:48:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1e9U5N-0003lf-L3
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 06:48:00 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:39814)
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1e9U5T-0003tO-0L
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 06:48:03 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:39826)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1e9U5N-0003lH-Bx
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 06:47:57 -0400
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1e9U5S-0003t2-On
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 06:48:02 -0400
 From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Date: Tue, 31 Oct 2017 13:47:57 +0300
-Message-ID: <20171031104757.3079.91058.stgit@pasha-VirtualBox>
+Date: Tue, 31 Oct 2017 13:48:02 +0300
+Message-ID: <20171031104802.3079.79946.stgit@pasha-VirtualBox>
 In-Reply-To: <20171031104741.3079.26584.stgit@pasha-VirtualBox>
 References: <20171031104741.3079.26584.stgit@pasha-VirtualBox>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [RFCPATCH03/20] replay: disable default snapshot for
- record/replay
+Subject: [Qemu-devel] [RFCPATCH04/20] replay: fix processing async events
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,33 +29,33 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dovgaluk@ispras.ru
 
-From: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
-
-This patch disables setting '-snapshot' option on by default
-in record/replay mode. This is needed for creating vmstates in record
-and replay modes.
+Asynchronous events saved at checkpoints may invoke
+callbacks when processed. These callbacks may also generate/read
+new events (e.g. clock reads). Therefore event processing flag must be
+reset before callback invocation.
 
 Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
 ---
- vl.c |    8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ replay/replay-events.c |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/vl.c b/vl.c
-index 7aa59f0..a8e0d03 100644
---- a/vl.c
-+++ b/vl.c
-@@ -3314,7 +3314,13 @@ int main(int argc, char **argv, char **envp)
-                 drive_add(IF_PFLASH, -1, optarg, PFLASH_OPTS);
-                 break;
-             case QEMU_OPTION_snapshot:
--                snapshot = 1;
-+                {
-+                    Error *blocker = NULL;
-+                    snapshot = 1;
-+                    error_setg(&blocker, QERR_REPLAY_NOT_SUPPORTED,
-+                               "-snapshot");
-+                    replay_add_blocker(blocker);
-+                }
-                 break;
-             case QEMU_OPTION_hdachs:
-                 {
+diff --git a/replay/replay-events.c b/replay/replay-events.c
+index 94a6dcc..768b505 100644
+--- a/replay/replay-events.c
++++ b/replay/replay-events.c
+@@ -295,13 +295,13 @@ void replay_read_events(int checkpoint)
+         if (!event) {
+             break;
+         }
++        replay_finish_event();
++        read_event_kind = -1;
+         replay_mutex_unlock();
+         replay_run_event(event);
+         replay_mutex_lock();
+ 
+         g_free(event);
+-        replay_finish_event();
+-        read_event_kind = -1;
+     }
+ }
+ 
