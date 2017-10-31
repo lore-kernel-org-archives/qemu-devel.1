@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51467)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57768)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1e9UhY-0004cw-F4
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 07:27:25 -0400
+	(envelope-from <no-reply@patchew.org>) id 1e9Urd-0004tf-CP
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 07:37:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1e9UhX-0001NB-Gd
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 07:27:24 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:45564)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1e9UhX-0001MT-5y
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 07:27:23 -0400
-From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Date: Tue, 31 Oct 2017 14:27:23 +0300
-Message-ID: <20171031112723.10516.89734.stgit@pasha-VirtualBox>
-In-Reply-To: <20171031112457.10516.8971.stgit@pasha-VirtualBox>
-References: <20171031112457.10516.8971.stgit@pasha-VirtualBox>
+	(envelope-from <no-reply@patchew.org>) id 1e9Ura-0004rW-8k
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 07:37:49 -0400
+Resent-Message-Id: <E1e9Ura-0004rW-8k@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21353)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1e9Ura-0004ox-1O
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 07:37:46 -0400
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <150944890436.171.17517658048327162090@bafd83ae6430>
+In-Reply-To: <20171031104813.3079.66585.stgit@pasha-VirtualBox>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [RFC PATCH 26/26] scripts/qemu-gdb/timers.py: new
- helper to dump timer state
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 31 Oct 2017 04:21:45 -0700 (PDT)
+Subject: Re: [Qemu-devel] [RFCPATCH06/20] replay: fix save/load vm for
+ non-empty queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,102 +29,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, boost.lists@gmail.com, quintela@redhat.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, kraxel@redhat.com, pavel.dovgaluk@ispras.ru, pbonzini@redhat.com, alex.bennee@linaro.org
+To: Pavel.Dovgaluk@ispras.ru
+Cc: famz@redhat.com, qemu-devel@nongnu.org, dovgaluk@ispras.ru
 
-From: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
-This introduces the qemu-gdb command "qemu timers" which will dump the
-state of the main timers in the system.
-
-Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-
----
- scripts/qemu-gdb.py       |    3 ++-
- scripts/qemugdb/timers.py |   54 +++++++++++++++++++++++++++++++++++++++=
-++++++
- 2 files changed, 56 insertions(+), 1 deletion(-)
- create mode 100644 scripts/qemugdb/timers.py
-
-diff --git a/scripts/qemu-gdb.py b/scripts/qemu-gdb.py
-index d58213e..690827e 100644
---- a/scripts/qemu-gdb.py
-+++ b/scripts/qemu-gdb.py
-@@ -26,7 +26,7 @@ import os, sys
-=20
- sys.path.append(os.path.dirname(__file__))
-=20
--from qemugdb import aio, mtree, coroutine, tcg
-+from qemugdb import aio, mtree, coroutine, tcg, timers
-=20
- class QemuCommand(gdb.Command):
-     '''Prefix for QEMU debug support commands'''
-@@ -39,6 +39,7 @@ coroutine.CoroutineCommand()
- mtree.MtreeCommand()
- aio.HandlersCommand()
- tcg.TCGLockStatusCommand()
-+timers.TimersCommand()
-=20
- coroutine.CoroutineSPFunction()
- coroutine.CoroutinePCFunction()
-diff --git a/scripts/qemugdb/timers.py b/scripts/qemugdb/timers.py
-new file mode 100644
-index 0000000..be71a00
---- /dev/null
-+++ b/scripts/qemugdb/timers.py
-@@ -0,0 +1,54 @@
-+#!/usr/bin/python
-+# GDB debugging support
-+#
-+# Copyright 2017 Linaro Ltd
-+#
-+# Author: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-+#
-+# This work is licensed under the terms of the GNU GPL, version 2.  See
-+# the COPYING file in the top-level directory.
-+
-+# 'qemu timers' -- display the current timerlists
-+
-+import gdb
-+
-+class TimersCommand(gdb.Command):
-+    '''Display the current QEMU timers'''
-+
-+    def __init__(self):
-+        'Register the class as a gdb command'
-+        gdb.Command.__init__(self, 'qemu timers', gdb.COMMAND_DATA,
-+                             gdb.COMPLETE_NONE)
-+
-+    def dump_timers(self, timer):
-+        "Follow a timer and recursively dump each one in the list."
-+        # timer should be of type QemuTimer
-+        gdb.write("    timer %s/%s (cb:%s,opq:%s)\n" % (
-+            timer['expire_time'],
-+            timer['scale'],
-+            timer['cb'],
-+            timer['opaque']))
-+
-+        if int(timer['next']) > 0:
-+            self.dump_timers(timer['next'])
-+
-+
-+    def process_timerlist(self, tlist, ttype):
-+        gdb.write("Processing %s timers\n" % (ttype))
-+        gdb.write("  clock %s is enabled:%s, last:%s\n" % (
-+            tlist['clock']['type'],
-+            tlist['clock']['enabled'],
-+            tlist['clock']['last']))
-+        if int(tlist['active_timers']) > 0:
-+            self.dump_timers(tlist['active_timers'])
-+
-+
-+    def invoke(self, arg, from_tty):
-+        'Run the command'
-+        main_timers =3D gdb.parse_and_eval("main_loop_tlg")
-+
-+        # This will break if QEMUClockType in timer.h is redfined
-+        self.process_timerlist(main_timers['tl'][0], "Realtime")
-+        self.process_timerlist(main_timers['tl'][1], "Virtual")
-+        self.process_timerlist(main_timers['tl'][2], "Host")
-+        self.process_timerlist(main_timers['tl'][3], "Virtual RT")
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
+ZGV2ZWxdIFtSRkNQQVRDSDA2LzIwXSByZXBsYXk6IGZpeCBzYXZlL2xvYWQgdm0gZm9yIG5vbi1l
+bXB0eSBxdWV1ZQpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMjAxNzEwMzExMDQ4MTMuMzA3OS42
+NjU4NS5zdGdpdEBwYXNoYS1WaXJ0dWFsQm94Cgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMh
+L2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0Uu
+LiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQg
+MApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxv
+ZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwog
+ICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1h
+dD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3Jp
+cHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAg
+ICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRF
+U1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0
+YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwpkN2I4YTFjNTc4IHJl
+cGxheTogZml4IHNhdmUvbG9hZCB2bSBmb3Igbm9uLWVtcHR5IHF1ZXVlCgo9PT0gT1VUUFVUIEJF
+R0lOID09PQpDaGVja2luZyBQQVRDSCAxLzE6IHJlcGxheTogZml4IHNhdmUvbG9hZCB2bSBmb3Ig
+bm9uLWVtcHR5IHF1ZXVlLi4uCkVSUk9SOiBFcnJvciBtZXNzYWdlcyBzaG91bGQgbm90IGNvbnRh
+aW4gbmV3bGluZXMKIzU5OiBGSUxFOiBtaWdyYXRpb24vc2F2ZXZtLmM6MjMyMjoKKyAgICAgICAg
+ICAgICAgICAgICAgICJyaWdodCBub3cuIFRyeSBvbmNlIG1vcmUgbGF0ZXIuXG4iKTsKCnRvdGFs
+OiAxIGVycm9ycywgMCB3YXJuaW5ncywgNDggbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMg
+c3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFy
+ZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVD
+S1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQg
+ZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBi
+eSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFj
+ayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
