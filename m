@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34217)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34757)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e9Zfi-0008Nx-13
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 12:45:51 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1e9ZhY-0000hI-2r
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 12:47:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e9Zfe-0004gb-Vf
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 12:45:50 -0400
-Received: from indium.canonical.com ([91.189.90.7]:52474)
+	(envelope-from <peter.maydell@linaro.org>) id 1e9ZhW-0005FL-UM
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 12:47:44 -0400
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:49225)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1e9Zfe-0004gT-Pa
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 12:45:46 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1e9Zfd-00054r-LP
-	for <qemu-devel@nongnu.org>; Tue, 31 Oct 2017 16:45:45 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id A0F252E80C3
-	for <qemu-devel@nongnu.org>; Tue, 31 Oct 2017 16:45:45 +0000 (UTC)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1e9ZhW-0005F3-Mz
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 12:47:42 -0400
+Received: by mail-wr0-x242.google.com with SMTP id g90so16539553wrd.6
+	for <qemu-devel@nongnu.org>; Tue, 31 Oct 2017 09:47:42 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 31 Oct 2017 16:28:17 -0000
-From: Barret <brho@cs.berkeley.edu>
-Reply-To: Bug 1318091 <1318091@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20140509224205.21323.62439.malonedeb@chaenomeles.canonical.com>
-Message-Id: <150946729805.20053.14453052346002235591.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1318091] Re: Perfctr MSRs not available to Guest
- OS on AMD Phenom II
+In-Reply-To: <92e2caac-31e2-d32f-1b71-810b8297736c@bitwagon.com>
+References: <92e2caac-31e2-d32f-1b71-810b8297736c@bitwagon.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 31 Oct 2017 16:47:20 +0000
+Message-ID: <CAFEAcA-3t01P6sJZ=ZUVjmoMt5Z_n61w8YEzBLakKPv2w_qMGw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] unfaithful emulation of system calls
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,87 +28,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: John Reiser <jreiser@bitwagon.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Hi -
+On 31 October 2017 at 16:18, John Reiser <jreiser@bitwagon.com> wrote:
+> On real Linux on PowerPC64, a system call trashes registers {r0, r4-r12,
+> ctr};
+> qemu-ppc64 preserves them.  [Both preserve: r13-r31, r1 (sp), r2 (TOC), r3
+> (set to
+> return value), lr (link register).]  Looking at the code in
+> qemu/linux-user/syscall.c
+> (tip commit 92c7ec5cd4d15c76218703f7bd3ca75bd46353b7), I do not see anything
+> which
+> "enforces the ABI", such as by setting all volatile registers to a random
+> value,
+> or a flag such as 0xA5A5A5...A5A5, or at least to 0.  qemu-user should.
+>
+> This raises the question, "What *is* the ABI for system calls?".
+> The documentation
+> http://refspecs.linuxfoundation.org/ELF/ppc64/PPC-elf64abi.html#REG
+> does not state explicitly that a system call is the same as a subroutine
+> call.
+> Indeed it isn't, because a system call preserves the link register lr,
+> but a subroutine call need not.
+>
+> So, how about qemu-user enforcing the ABI for system calls?
 
-I don't have the hardware readily available anymore, so I can't test it.
-Might as well close the bug.
+The ABI is in general "the caller can rely on register set A
+being preserved across the syscall instruction; it cannot rely
+on register set B being preserved" (for values of A and B that
+vary across architectures). The kernel doesn't guarantee
+that it is going to trash registers in set B; it merely does
+not provide the guarantee that it won't trash them. Exactly
+what happens for the set B regs is an implementation detail
+and one which could vary from kernel version to kernel version.
+qemu's linux-user mode implements the ABI; we happen to not
+trash things in set B because of our implementation, but that's
+OK because the ABI doesn't require us to trash them.
 
-Regarding Oliver's question, it doesn't sound like the same issue I had.
-I do recall that processor and qemu not supporting rdtscp (which is
-fine), so that problem might be some qemu startup script requesting
-features that aren't available.
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1318091
-
-Title:
-  Perfctr MSRs not available to Guest OS on AMD Phenom II
-
-Status in QEMU:
-  Incomplete
-
-Bug description:
-  The  AMD Phenom(tm) II X4 965 Processor (family 16, model 4, stepping
-  3) has the 4 architecturally supported perf counters at MSRs.  The
-  selectors are c001000-c001003, and the counters are c001004-c001007.
-  I've verified that the MSRs are there and working by manually setting
-  the MSRs with msr-tools to count cycles.
-
-  The processor does not support the extended perfctr or the perfctr_nb.
-  These are in cpuid leaf 8000_0001.  Qemu also sees that these cpuid
-  flags are not set, when I try launching with  -cpu
-  host,perfctr_core,check.  However, this flag is only for the extended
-  perfctr MSRs, which also happen to map the original four counters at
-  c0010200.
-
-  When I run a Guest OS, that OS is unable to use the perf counter
-  registers from c001000-7.  rdmsr and wrmsr complete, but the results
-  are always 0.  By contrast, a wrmsr to one of the c0010200 registers
-  causes a general protection fault (as it should, since those aren't
-  supported).
-
-  Kernel: 3.14.0-gentoo
-  Qemu: 2.0.0 (gentoo) and also with 2.0.50 (commit 06b4f00d5)
-  Qemu command: qemu-system-x86_64 -enable-kvm -cpu host -smp 8 -m 1024 -no=
-graphic -monitor /dev/pts/4 mnt/hdd.img
-  cat /proc/cpuinfo:
-  processor	: 3
-  vendor_id	: AuthenticAMD
-  cpu family	: 16
-  model		: 4
-  model name	: AMD Phenom(tm) II X4 965 Processor
-  stepping	: 3
-  cpu MHz		: 800.000
-  cache size	: 512 KB
-  physical id	: 0
-  siblings	: 4
-  core id		: 3
-  cpu cores	: 4
-  apicid		: 3
-  initial apicid	: 3
-  fpu		: yes
-  fpu_exception	: yes
-  cpuid level	: 5
-  wp		: yes
-  flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pa=
-t pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdt=
-scp lm 3dnowext 3dnow constant_tsc rep_good nopl nonstop_tsc extd_apicid pn=
-i monitor cx16 popcnt lahf_lm cmp_legacy svm extapic cr8_legacy abm sse4a m=
-isalignsse 3dnowprefetch osvw ibs skinit wdt hw_pstate npt lbrv svm_lock nr=
-ip_save
-  bogomips	: 6803.79
-  TLB size	: 1024 4K pages
-  clflush size	: 64
-  cache_alignment	: 64
-  address sizes	: 48 bits physical, 48 bits virtual
-  power management: ts ttp tm stc 100mhzsteps hwpstate
-
-  thanks.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1318091/+subscriptions
+thanks
+-- PMM
