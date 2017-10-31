@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56576)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56838)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1e9zkV-0003z9-56
-	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 16:36:32 -0400
+	(envelope-from <no-reply@patchew.org>) id 1e9zl3-0004Gp-Ts
+	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 16:37:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1e9zkT-0000yN-RH
-	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 16:36:31 -0400
-Date: Wed, 1 Nov 2017 16:36:20 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20171101203620.GA17963@flamenco>
-References: <20171025093535.10175-1-richard.henderson@linaro.org>
-	<4ab3bd81-925c-a281-614c-2cd87fce38b5@redhat.com>
+	(envelope-from <no-reply@patchew.org>) id 1e9zkz-0001dj-6J
+	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 16:37:05 -0400
+Resent-Message-Id: <E1e9zkz-0001dj-6J@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21495)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1e9zky-0001ca-US
+	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 16:37:01 -0400
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <150945407694.171.3840260638410608643@bafd83ae6430>
+In-Reply-To: <20171031104835.3079.2722.stgit@pasha-VirtualBox>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4ab3bd81-925c-a281-614c-2cd87fce38b5@redhat.com>
-Subject: Re: [Qemu-devel] [PULL 00/51] tcg queued patches
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 31 Oct 2017 05:47:57 -0700 (PDT)
+Subject: Re: [Qemu-devel] [RFCPATCH10/20] icount: fixed saving/restoring of
+ icount warp timers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,138 +29,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org, peter.maydell@linaro.org, qemu-arm@nongnu.org
+To: Pavel.Dovgaluk@ispras.ru
+Cc: famz@redhat.com, qemu-devel@nongnu.org, dovgaluk@ispras.ru
 
-On Wed, Nov 01, 2017 at 18:34:23 +0100, Thomas Huth wrote:
-> Seems like something in this patch series broke a couple of ARM boards
-> (smdkc210, nuri, raspi2, xlnx-ep108 and xlnx-zcu102). With current
-> master branch, I just get this error:
-> 
-> $ aarch64-softmmu/qemu-system-aarch64  -machine raspi2
-> **
-> ERROR:/home/thuth/devel/qemu/tcg/tcg.c:537:tcg_register_thread:
-> assertion failed: (n < max_cpus)
-> Aborted (core dumped)
-> 
-> Could you please have a look at this?
-
-Turns out some boards initialize a fixed number of vcpus, which
-can be > max_cpus.
-
-The below fixes the issue for me, although I'm not entirely happy
-with it because if -{smp,max}_cpus < machine_class->max_cpus, some
-TCG regions will be wasted. Not a huge deal (in most cases it will be
-2MB per unused vCPU), but a better fix might be to just honour -max_cpus
-for these boards. We might just not care enough though.
-
-		Emilio
-
----8<---
-
-Subject: [PATCH] hw: define and use machine_class->max_cpus_override
-
-max_cpus needs to be an upper bound on the number of vCPUs
-initialized; otherwise TCG region initialization breaks.
-
-Some boards initialize a hard-coded number of vCPUs; mark this
-with machine_class->max_cpus_override so that max_cpus is
-set to machine_class->max_cpus when set.
-
-Update the ARM boards that hard-code max_cpus, thereby letting
-them boot again.
-
-Reported-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: Emilio G. Cota <cota@braap.org>
----
- hw/arm/exynos4_boards.c | 2 ++
- hw/arm/raspi.c          | 1 +
- hw/arm/xlnx-zcu102.c    | 3 +++
- include/hw/boards.h     | 3 ++-
- vl.c                    | 4 ++++
- 5 files changed, 12 insertions(+), 1 deletion(-)
-
-diff --git a/hw/arm/exynos4_boards.c b/hw/arm/exynos4_boards.c
-index f1441ec..7071505 100644
---- a/hw/arm/exynos4_boards.c
-+++ b/hw/arm/exynos4_boards.c
-@@ -189,6 +189,7 @@ static void nuri_class_init(ObjectClass *oc, void *data)
-     mc->desc = "Samsung NURI board (Exynos4210)";
-     mc->init = nuri_init;
-     mc->max_cpus = EXYNOS4210_NCPUS;
-+    mc->max_cpus_override = 1;
-     mc->ignore_memory_transaction_failures = true;
- }
- 
-@@ -205,6 +206,7 @@ static void smdkc210_class_init(ObjectClass *oc, void *data)
-     mc->desc = "Samsung SMDKC210 board (Exynos4210)";
-     mc->init = smdkc210_init;
-     mc->max_cpus = EXYNOS4210_NCPUS;
-+    mc->max_cpus_override = 1;
-     mc->ignore_memory_transaction_failures = true;
- }
- 
-diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
-index 5941c9f..bf4eec3 100644
---- a/hw/arm/raspi.c
-+++ b/hw/arm/raspi.c
-@@ -167,6 +167,7 @@ static void raspi2_machine_init(MachineClass *mc)
-     mc->no_floppy = 1;
-     mc->no_cdrom = 1;
-     mc->max_cpus = BCM2836_NCPUS;
-+    mc->max_cpus_override = 1;
-     mc->default_ram_size = 1024 * 1024 * 1024;
-     mc->ignore_memory_transaction_failures = true;
- };
-diff --git a/hw/arm/xlnx-zcu102.c b/hw/arm/xlnx-zcu102.c
-index e2d15a1..f7e0004 100644
---- a/hw/arm/xlnx-zcu102.c
-+++ b/hw/arm/xlnx-zcu102.c
-@@ -185,6 +185,8 @@ static void xlnx_ep108_machine_class_init(ObjectClass *oc, void *data)
-     mc->block_default_type = IF_IDE;
-     mc->units_per_default_bus = 1;
-     mc->ignore_memory_transaction_failures = true;
-+    mc->max_cpus = XLNX_ZYNQMP_NUM_APU_CPUS + XLNX_ZYNQMP_NUM_RPU_CPUS;
-+    mc->max_cpus_override = 1;
- }
- 
- static const TypeInfo xlnx_ep108_machine_init_typeinfo = {
-@@ -241,6 +243,7 @@ static void xlnx_zcu102_machine_class_init(ObjectClass *oc, void *data)
-     mc->units_per_default_bus = 1;
-     mc->ignore_memory_transaction_failures = true;
-     mc->max_cpus = XLNX_ZYNQMP_NUM_APU_CPUS + XLNX_ZYNQMP_NUM_RPU_CPUS;
-+    mc->max_cpus_override = 1;
- }
- 
- static const TypeInfo xlnx_zcu102_machine_init_typeinfo = {
-diff --git a/include/hw/boards.h b/include/hw/boards.h
-index 191a5b3..724be45 100644
---- a/include/hw/boards.h
-+++ b/include/hw/boards.h
-@@ -176,7 +176,8 @@ struct MachineClass {
-         no_sdcard:1,
-         has_dynamic_sysbus:1,
-         pci_allow_0_address:1,
--        legacy_fw_cfg_order:1;
-+        legacy_fw_cfg_order:1,
-+        max_cpus_override:1;
-     int is_default;
-     const char *default_machine_opts;
-     const char *default_boot_order;
-diff --git a/vl.c b/vl.c
-index ec29909..b2f056a 100644
---- a/vl.c
-+++ b/vl.c
-@@ -4336,6 +4336,10 @@ int main(int argc, char **argv, char **envp)
-                      machine_class->name, machine_class->max_cpus);
-         exit(1);
-     }
-+    /* some machines initialize a hard-coded number of cpus */
-+    if (machine_class->max_cpus_override) {
-+        max_cpus = machine_class->max_cpus;
-+    }
- 
-     /*
-      * Get the default machine options from the machine if it is not already
--- 
-2.7.4
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
+ZGV2ZWxdIFtSRkNQQVRDSDEwLzIwXSBpY291bnQ6IGZpeGVkIHNhdmluZy9yZXN0b3Jpbmcgb2Yg
+aWNvdW50IHdhcnAgdGltZXJzClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAyMDE3MTAzMTEwNDgz
+NS4zMDc5LjI3MjIuc3RnaXRAcGFzaGEtVmlydHVhbEJveAoKPT09IFRFU1QgU0NSSVBUIEJFR0lO
+ID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5l
+ICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFt
+ZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIk
+KGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0
+czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEg
+LS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8
+IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxl
+ZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVk
+Cj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQx
+ZGVmN2Y0NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKODlkY2U0
+NGY1NyBpY291bnQ6IGZpeGVkIHNhdmluZy9yZXN0b3Jpbmcgb2YgaWNvdW50IHdhcnAgdGltZXJz
+Cgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzE6IGljb3VudDogZml4ZWQg
+c2F2aW5nL3Jlc3RvcmluZyBvZiBpY291bnQgd2FycCB0aW1lcnMuLi4KRVJST1I6IHNwYWNlcyBy
+ZXF1aXJlZCBhcm91bmQgdGhhdCAnKicgKGN0eDpWeFYpCiMxNzA6IEZJTEU6IGNwdXMuYzo2ODg6
+CisgICAgLnN1YnNlY3Rpb25zID0gKGNvbnN0IFZNU3RhdGVEZXNjcmlwdGlvbipbXSkgewogICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgp0b3RhbDogMSBlcnJv
+cnMsIDAgd2FybmluZ3MsIDE3NCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBw
+cm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNl
+IHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0gg
+aW4gTUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQg
+d2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNo
+ZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBh
+dGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
