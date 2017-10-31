@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57489)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57452)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1e9U5e-0005hK-OK
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 06:48:15 -0400
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1e9U5b-0005eS-NN
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 06:48:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1e9U5d-00042S-Rs
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 06:48:14 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:39860)
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1e9U5Y-0003xX-LG
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 06:48:11 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:39842)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1e9U5d-00041t-Jq
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 06:48:13 -0400
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1e9U5Y-0003xC-CM
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 06:48:08 -0400
 From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Date: Tue, 31 Oct 2017 13:48:13 +0300
-Message-ID: <20171031104813.3079.66585.stgit@pasha-VirtualBox>
+Date: Tue, 31 Oct 2017 13:48:08 +0300
+Message-ID: <20171031104808.3079.39409.stgit@pasha-VirtualBox>
 In-Reply-To: <20171031104741.3079.26584.stgit@pasha-VirtualBox>
 References: <20171031104741.3079.26584.stgit@pasha-VirtualBox>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [RFCPATCH06/20] replay: fix save/load vm for non-empty
- queue
+Subject: [Qemu-devel] [RFCPATCH05/20] replay: fixed replay_enable_events
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,81 +29,45 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dovgaluk@ispras.ru
 
-This patch does not allows saving/loading vmstate when
-replay events queue is not empty. There is no reliable
-way to save events queue, because it describes internal
-coroutine state. Therefore saving and loading operations
-should be deferred to another record/replay step.
+This patch fixes assignment to internal events_enabled variable.
+Now it is set only in record/replay mode. This affects the behavior
+of the external functions that check this flag.
 
 Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
 ---
- include/sysemu/replay.h  |    3 +++
- migration/savevm.c       |   13 +++++++++++++
- replay/replay-snapshot.c |    6 ++++++
- 3 files changed, 22 insertions(+)
+ replay/replay-events.c |    8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/include/sysemu/replay.h b/include/sysemu/replay.h
-index fa14d0e..b86d6bb 100644
---- a/include/sysemu/replay.h
-+++ b/include/sysemu/replay.h
-@@ -165,5 +165,8 @@ void replay_audio_in(int *recorded, void *samples, int *wpos, int size);
- /*! Called at the start of execution.
-     Loads or saves initial vmstate depending on execution mode. */
- void replay_vmstate_init(void);
-+/*! Called to ensure that replay state is consistent and VM snapshot
-+    can be created */
-+bool replay_can_snapshot(void);
+diff --git a/replay/replay-events.c b/replay/replay-events.c
+index 768b505..e858254 100644
+--- a/replay/replay-events.c
++++ b/replay/replay-events.c
+@@ -67,7 +67,9 @@ static void replay_run_event(Event *event)
  
- #endif
-diff --git a/migration/savevm.c b/migration/savevm.c
-index 4a88228..20cebe1 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -52,6 +52,7 @@
- #include "qemu/cutils.h"
- #include "io/channel-buffer.h"
- #include "io/channel-file.h"
-+#include "sysemu/replay.h"
- 
- #ifndef ETH_P_RARP
- #define ETH_P_RARP 0x8035
-@@ -2141,6 +2142,12 @@ int save_snapshot(const char *name, Error **errp)
-     struct tm tm;
-     AioContext *aio_context;
- 
-+    if (!replay_can_snapshot()) {
-+        monitor_printf(mon, "Record/replay does not allow making snapshot "
-+                        "right now. Try once more later.\n");
-+        return ret;
+ void replay_enable_events(void)
+ {
+-    events_enabled = true;
++    if (replay_mode != REPLAY_MODE_NONE) {
++        events_enabled = true;
 +    }
-+
-     if (!bdrv_all_can_snapshot(&bs)) {
-         error_setg(errp, "Device '%s' is writable but does not support "
-                    "snapshots", bdrv_get_device_name(bs));
-@@ -2310,6 +2317,12 @@ int load_snapshot(const char *name, Error **errp)
-     AioContext *aio_context;
-     MigrationIncomingState *mis = migration_incoming_get_current();
- 
-+    if (!replay_can_snapshot()) {
-+        error_report("Record/replay does not allow loading snapshot "
-+                     "right now. Try once more later.\n");
-+        return -EINVAL;
-+    }
-+
-     if (!bdrv_all_can_snapshot(&bs)) {
-         error_setg(errp,
-                    "Device '%s' is writable but does not support snapshots",
-diff --git a/replay/replay-snapshot.c b/replay/replay-snapshot.c
-index b2e1076..7075986 100644
---- a/replay/replay-snapshot.c
-+++ b/replay/replay-snapshot.c
-@@ -83,3 +83,9 @@ void replay_vmstate_init(void)
-         }
-     }
  }
-+
-+bool replay_can_snapshot(void)
-+{
-+    return replay_mode == REPLAY_MODE_NONE
-+        || !replay_has_events();
-+}
+ 
+ bool replay_has_events(void)
+@@ -141,7 +143,7 @@ void replay_add_event(ReplayAsyncEventKind event_kind,
+ 
+ void replay_bh_schedule_event(QEMUBH *bh)
+ {
+-    if (replay_mode != REPLAY_MODE_NONE && events_enabled) {
++    if (events_enabled) {
+         uint64_t id = replay_get_current_step();
+         replay_add_event(REPLAY_ASYNC_EVENT_BH, bh, NULL, id);
+     } else {
+@@ -161,7 +163,7 @@ void replay_add_input_sync_event(void)
+ 
+ void replay_block_event(QEMUBH *bh, uint64_t id)
+ {
+-    if (replay_mode != REPLAY_MODE_NONE && events_enabled) {
++    if (events_enabled) {
+         replay_add_event(REPLAY_ASYNC_EVENT_BLOCK, bh, NULL, id);
+     } else {
+         qemu_bh_schedule(bh);
