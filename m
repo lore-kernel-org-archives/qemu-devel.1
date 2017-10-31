@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37456)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37497)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yi.l.liu@linux.intel.com>) id 1e9P1S-00012n-Ms
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 01:23:36 -0400
+	(envelope-from <yi.l.liu@linux.intel.com>) id 1e9P1W-00015o-Io
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 01:23:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yi.l.liu@linux.intel.com>) id 1e9P1R-0004jJ-Tx
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 01:23:34 -0400
+	(envelope-from <yi.l.liu@linux.intel.com>) id 1e9P1V-0004nU-KD
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 01:23:38 -0400
 Received: from mga07.intel.com ([134.134.136.100]:53480)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yi.l.liu@linux.intel.com>)
-	id 1e9P1R-0004cw-Iu
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 01:23:33 -0400
+	id 1e9P1V-0004cw-Bi
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 01:23:37 -0400
 From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
-Date: Tue, 31 Oct 2017 13:07:02 +0800
-Message-Id: <1509426425-23890-4-git-send-email-yi.l.liu@linux.intel.com>
+Date: Tue, 31 Oct 2017 13:07:03 +0800
+Message-Id: <1509426425-23890-5-git-send-email-yi.l.liu@linux.intel.com>
 In-Reply-To: <1509426425-23890-1-git-send-email-yi.l.liu@linux.intel.com>
 References: <1509426425-23890-1-git-send-email-yi.l.liu@linux.intel.com>
-Subject: [Qemu-devel] [PATCH 3/6] intel_iommu: provide
- AddressSpaceOps.iommu_get instance
+Subject: [Qemu-devel] [PATCH 4/6] vfio: rename GuestIOMMU to be GuestIOMMUMR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,61 +27,101 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, mst@redhat.com, david@gibson.dropbear.id.au, pbonzini@redhat.com, alex.williamson@redhat.com
 Cc: tianyu.lan@intel.com, yi.l.liu@intel.com, peterx@redhat.com, kevin.tian@intel.com, jasowang@redhat.com, "Liu, Yi L" <yi.l.liu@linux.intel.com>
 
-From: Peter Xu <peterx@redhat.com>
+Rename GuestIOMMU to GuestIOMMUMR as the existing GuestIOMMU is
+for MemoryRegion related notifiers.
 
-Provide AddressSpaceOps.iommu_get() in Intel IOMMU emulator.
-
-Signed-off-by: Peter Xu <peterx@redhat.com>
 Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
 ---
- hw/i386/intel_iommu.c         | 7 +++++++
- include/hw/i386/intel_iommu.h | 2 ++
- 2 files changed, 9 insertions(+)
+ hw/vfio/common.c              | 15 ++++++++-------
+ include/hw/vfio/vfio-common.h |  8 ++++----
+ 2 files changed, 12 insertions(+), 11 deletions(-)
 
-diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-index e81c706..54343e5 100644
---- a/hw/i386/intel_iommu.c
-+++ b/hw/i386/intel_iommu.c
-@@ -2687,6 +2687,12 @@ static const MemoryRegionOps vtd_mem_ir_ops = {
-     },
- };
+diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+index 1f7d516..3d40bec 100644
+--- a/hw/vfio/common.c
++++ b/hw/vfio/common.c
+@@ -348,7 +348,7 @@ static bool vfio_get_vaddr(IOMMUTLBEntry *iotlb, void **vaddr,
  
-+static IOMMUObject *vtd_as_iommu_get(AddressSpace *as)
-+{
-+    VTDAddressSpace *vtd_dev_as = container_of(as, VTDAddressSpace, as);
-+    return &vtd_dev_as->iommu_object;
-+}
-+
- VTDAddressSpace *vtd_find_add_as(IntelIOMMUState *s, PCIBus *bus, int devfn)
+ static void vfio_iommu_map_notify(IOMMUMRNotifier *n, IOMMUTLBEntry *iotlb)
  {
-     uintptr_t key = (uintptr_t)bus;
-@@ -2748,6 +2754,7 @@ VTDAddressSpace *vtd_find_add_as(IntelIOMMUState *s, PCIBus *bus, int devfn)
-                                             VTD_INTERRUPT_ADDR_FIRST,
-                                             &vtd_dev_as->iommu_ir, 64);
-         address_space_init(&vtd_dev_as->as, &vtd_dev_as->root, name);
-+        vtd_dev_as->as.as_ops.iommu_get = vtd_as_iommu_get;
-         memory_region_add_subregion_overlap(&vtd_dev_as->root, 0,
-                                             &vtd_dev_as->sys_alias, 1);
-         memory_region_add_subregion_overlap(&vtd_dev_as->root, 0,
-diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.h
-index c85f9ff..a3c6d45 100644
---- a/include/hw/i386/intel_iommu.h
-+++ b/include/hw/i386/intel_iommu.h
-@@ -27,6 +27,7 @@
- #include "hw/i386/ioapic.h"
- #include "hw/pci/msi.h"
- #include "hw/sysbus.h"
-+#include "hw/core/iommu.h"
+-    VFIOGuestIOMMU *giommu = container_of(n, VFIOGuestIOMMU, n);
++    VFIOGuestIOMMUMR *giommu = container_of(n, VFIOGuestIOMMUMR, n);
+     VFIOContainer *container = giommu->container;
+     hwaddr iova = iotlb->iova + giommu->iommu_offset;
+     bool read_only;
+@@ -478,7 +478,7 @@ static void vfio_listener_region_add(MemoryListener *listener,
+     memory_region_ref(section->mr);
  
- #define TYPE_INTEL_IOMMU_DEVICE "intel-iommu"
- #define INTEL_IOMMU_DEVICE(obj) \
-@@ -90,6 +91,7 @@ struct VTDAddressSpace {
-     MemoryRegion sys_alias;
-     MemoryRegion iommu_ir;      /* Interrupt region: 0xfeeXXXXX */
-     IntelIOMMUState *iommu_state;
-+    IOMMUObject iommu_object;
-     VTDContextCacheEntry context_cache_entry;
- };
+     if (memory_region_is_iommu(section->mr)) {
+-        VFIOGuestIOMMU *giommu;
++        VFIOGuestIOMMUMR *giommu;
+         IOMMUMemoryRegion *iommu_mr = IOMMU_MEMORY_REGION(section->mr);
  
+         trace_vfio_listener_region_add_iommu(iova, end);
+@@ -500,7 +500,7 @@ static void vfio_listener_region_add(MemoryListener *listener,
+                                IOMMU_MR_EVENT_ALL,
+                                section->offset_within_region,
+                                int128_get64(llend));
+-        QLIST_INSERT_HEAD(&container->giommu_list, giommu, giommu_next);
++        QLIST_INSERT_HEAD(&container->giommu_mr_list, giommu, giommu_next);
+ 
+         memory_region_register_iommu_notifier(section->mr, &giommu->n);
+         memory_region_iommu_replay(giommu->iommu, &giommu->n);
+@@ -567,9 +567,9 @@ static void vfio_listener_region_del(MemoryListener *listener,
+     }
+ 
+     if (memory_region_is_iommu(section->mr)) {
+-        VFIOGuestIOMMU *giommu;
++        VFIOGuestIOMMUMR *giommu;
+ 
+-        QLIST_FOREACH(giommu, &container->giommu_list, giommu_next) {
++        QLIST_FOREACH(giommu, &container->giommu_mr_list, giommu_next) {
+             if (MEMORY_REGION(giommu->iommu) == section->mr &&
+                 giommu->n.start == section->offset_within_region) {
+                 memory_region_unregister_iommu_notifier(section->mr,
+@@ -1163,12 +1163,13 @@ static void vfio_disconnect_container(VFIOGroup *group)
+ 
+     if (QLIST_EMPTY(&container->group_list)) {
+         VFIOAddressSpace *space = container->space;
+-        VFIOGuestIOMMU *giommu, *tmp;
++        VFIOGuestIOMMUMR *giommu, *tmp;
+ 
+         vfio_listener_release(container);
+         QLIST_REMOVE(container, next);
+ 
+-        QLIST_FOREACH_SAFE(giommu, &container->giommu_list, giommu_next, tmp) {
++        QLIST_FOREACH_SAFE(giommu, &container->giommu_mr_list,
++                           giommu_next, tmp) {
+             memory_region_unregister_iommu_notifier(
+                     MEMORY_REGION(giommu->iommu), &giommu->n);
+             QLIST_REMOVE(giommu, giommu_next);
+diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
+index 865e3e7..702a085 100644
+--- a/include/hw/vfio/vfio-common.h
++++ b/include/hw/vfio/vfio-common.h
+@@ -87,19 +87,19 @@ typedef struct VFIOContainer {
+      * contiguous IOVA window.  We may need to generalize that in
+      * future
+      */
+-    QLIST_HEAD(, VFIOGuestIOMMU) giommu_list;
++    QLIST_HEAD(, VFIOGuestIOMMUMR) giommu_mr_list;
+     QLIST_HEAD(, VFIOHostDMAWindow) hostwin_list;
+     QLIST_HEAD(, VFIOGroup) group_list;
+     QLIST_ENTRY(VFIOContainer) next;
+ } VFIOContainer;
+ 
+-typedef struct VFIOGuestIOMMU {
++typedef struct VFIOGuestIOMMUMR {
+     VFIOContainer *container;
+     IOMMUMemoryRegion *iommu;
+     hwaddr iommu_offset;
+     IOMMUMRNotifier n;
+-    QLIST_ENTRY(VFIOGuestIOMMU) giommu_next;
+-} VFIOGuestIOMMU;
++    QLIST_ENTRY(VFIOGuestIOMMUMR) giommu_next;
++} VFIOGuestIOMMUMR;
+ 
+ typedef struct VFIOHostDMAWindow {
+     hwaddr min_iova;
 -- 
 1.9.1
