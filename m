@@ -1,35 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59239)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59285)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1e9dO4-0000yG-Aa
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 16:43:55 -0400
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1e9dO7-00010i-Aa
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 16:43:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1e9dO0-0004BS-Bq
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 16:43:52 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:48494
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1e9dO4-0004DO-PM
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 16:43:55 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:56388)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
-	id 1e9dO0-0004B4-68
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 16:43:48 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v9VKeLU1070345
-	for <qemu-devel@nongnu.org>; Tue, 31 Oct 2017 16:43:46 -0400
-Received: from e38.co.us.ibm.com (e38.co.us.ibm.com [32.97.110.159])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2dxva4vvn1-1
+	id 1e9dO4-0004CJ-Hi
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 16:43:52 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v9VKeoji086163
+	for <qemu-devel@nongnu.org>; Tue, 31 Oct 2017 16:43:51 -0400
+Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2dxv42nqf3-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 31 Oct 2017 16:43:46 -0400
+	for <qemu-devel@nongnu.org>; Tue, 31 Oct 2017 16:43:51 -0400
 Received: from localhost
-	by e38.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
-	Tue, 31 Oct 2017 14:43:45 -0600
+	Tue, 31 Oct 2017 14:43:50 -0600
 From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-Date: Tue, 31 Oct 2017 18:43:28 -0200
+Date: Tue, 31 Oct 2017 18:43:29 -0200
 In-Reply-To: <20171031204330.14803-1-danielhb@linux.vnet.ibm.com>
 References: <20171031204330.14803-1-danielhb@linux.vnet.ibm.com>
-Message-Id: <20171031204330.14803-3-danielhb@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v2 2/4] tests: adding 'set_indicator' RTAS call
+Message-Id: <20171031204330.14803-4-danielhb@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v2 3/4] tests: ibm,
+ configure-connector RTAS call implementation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,55 +41,64 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, mdroth@linux.vnet.ibm.com, lvivier@redhat.com
 
-'set_indicator' is a RTAS hypercall that is used to change
-the state of both physical and logical devices DRCs by setting
-allocation-state, isolation-state and dr-indicator.
+'ibm,configure-connector' hypercall is used by the guest OS
+to start the configuration of a given device, where the
+machine configures the said device and all its sub-devices,
+giving back FDTs to the caller for each sub-device.
 
-This patch implements the set_indicator RTAS call in
-tests/libqos/rtas.c, adding its test in tests/rtas-test.c.
+This hypercall is supposed to be called multiple times by the
+guest OS until it returns RTAS_OUT_SUCESS (code 0), indicating
+that the device is now properly configured and ready
+to be used, or a return value < 0 when an error occurs.
+
+This patch implements the 'ibm,configure-connector' RTAS
+hypercall in tests/libqos/rtas.c, with an extra test
+case for it inside tests/rtas-tests.c.
 
 Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
 ---
- tests/libqos/rtas.c | 33 ++++++++++++++++++++++++
- tests/libqos/rtas.h |  2 ++
- tests/rtas-test.c   | 73 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 108 insertions(+)
+ tests/libqos/rtas.c | 35 +++++++++++++++++++++++++++
+ tests/libqos/rtas.h |  1 +
+ tests/rtas-test.c   | 68 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 104 insertions(+)
 
 diff --git a/tests/libqos/rtas.c b/tests/libqos/rtas.c
-index fdeab448f7..ade572a84f 100644
+index ade572a84f..1cb9e2b495 100644
 --- a/tests/libqos/rtas.c
 +++ b/tests/libqos/rtas.c
-@@ -151,3 +151,36 @@ int qrtas_check_exception(QGuestAllocator *alloc, uint32_t mask,
+@@ -184,3 +184,38 @@ int qrtas_set_indicator(QGuestAllocator *alloc, uint32_t type, uint32_t idx,
  
      return ret[0];
  }
 +
 +/*
-+ * set_indicator as defined by PAPR 2.7+, 7.3.5.4
++ * ibm,configure-connector as defined by PAPR 2.7+, 13.5.3.5
 + *
-+ * nargs = 3
++ * nargs = 2
 + * nrets = 1
 + *
-+ * arg[0] = the type of the indicator
-+ * arg[1] = index of the specific indicator
-+ * arg[2] = desired new state
++ * args[0] and args[1] compose the 64 bit Work Area address.
 + *
-+ * Depending on the input, set_indicator will call set_isolation_state,
-+ * set_allocation_state or set_dr_indicator in hw/ppc/spapr_drc.c.
-+ * These functions allows the guest to control the state of hotplugged
-+ * and hot unplugged devices.
++ * This call will configure not only the device reported in the first
++ * offset of the Work Area but all of its siblingis as well, returning
++ * the FDT of each configured sub-device as well as a return code
++ * 'Next child', 'Next property' or 'Previous parent'. When the whole
++ * configuration is done, 'Configuration completed' (0) is returned.
++ *
++ * configure-connector will always reply with status code 'Next child'(2)
++ * on the first successful call. The DRC configuration will be
++ * completed when configure-connector returns status 0. Any return
++ * status < 0 indicates an error.
 + */
-+int qrtas_set_indicator(QGuestAllocator *alloc, uint32_t type, uint32_t idx,
-+                        uint32_t new_state)
++int qrtas_ibm_configure_connector(QGuestAllocator *alloc, uintptr_t wa_addr)
 +{
-+    uint32_t args[3], ret[1];
++    uint32_t args[2], ret[1];
 +    int res;
 +
-+    args[0] = type;
-+    args[1] = idx;
-+    args[2] = new_state;
++    args[0] = (uint32_t)(wa_addr);
++    args[1] = (uint32_t)(wa_addr >> 32);
 +
-+    res = qrtas_call(alloc, "set-indicator", 3, args, 1, ret);
++    res = qrtas_call(alloc, "ibm,configure-connector", 2, args, 1, ret);
 +    if (res != 0) {
 +        return -1;
 +    }
@@ -97,50 +106,37 @@ index fdeab448f7..ade572a84f 100644
 +    return ret[0];
 +}
 diff --git a/tests/libqos/rtas.h b/tests/libqos/rtas.h
-index 330ecfd397..9dfa18f32b 100644
+index 9dfa18f32b..35c44fb967 100644
 --- a/tests/libqos/rtas.h
 +++ b/tests/libqos/rtas.h
-@@ -14,4 +14,6 @@ int qrtas_ibm_write_pci_config(QGuestAllocator *alloc, uint64_t buid,
-                                uint32_t addr, uint32_t size, uint32_t val);
- int qrtas_check_exception(QGuestAllocator *alloc, uint32_t mask,
+@@ -16,4 +16,5 @@ int qrtas_check_exception(QGuestAllocator *alloc, uint32_t mask,
                            uint32_t buf_addr, uint32_t buf_len);
-+int qrtas_set_indicator(QGuestAllocator *alloc, uint32_t type, uint32_t idx,
-+                        uint32_t new_state);
+ int qrtas_set_indicator(QGuestAllocator *alloc, uint32_t type, uint32_t idx,
+                         uint32_t new_state);
++int qrtas_ibm_configure_connector(QGuestAllocator *alloc, uintptr_t wa_addr);
  #endif /* LIBQOS_RTAS_H */
 diff --git a/tests/rtas-test.c b/tests/rtas-test.c
-index c5a6080043..2c34b6e83c 100644
+index 2c34b6e83c..b3538bf878 100644
 --- a/tests/rtas-test.c
 +++ b/tests/rtas-test.c
-@@ -8,6 +8,13 @@
- #define EVENT_MASK_EPOW (1 << 30)
- #define EVENT_LOG_LEN 2048
+@@ -15,6 +15,8 @@
+ #define SPAPR_DR_ALLOCATION_STATE_USABLE  1
+ #define SPAPR_DR_ISOLATION_STATE_UNISOLATED 1
  
-+#define RTAS_SENSOR_TYPE_ISOLATION_STATE 9001
-+#define RTAS_SENSOR_TYPE_ALLOCATION_STATE 9003
-+#define SPAPR_DR_ISOLATION_STATE_ISOLATED 0
-+#define SPAPR_DR_ALLOCATION_STATE_UNUSABLE 0
-+#define SPAPR_DR_ALLOCATION_STATE_USABLE  1
-+#define SPAPR_DR_ISOLATION_STATE_UNISOLATED 1
++#define CC_WA_LEN 4096
 +
  static void test_rtas_get_time_of_day(void)
  {
      QOSState *qs;
-@@ -97,6 +104,71 @@ static void test_rtas_check_exception_hotplug_event(void)
+@@ -169,6 +171,70 @@ static void test_rtas_set_indicator(void)
      qtest_shutdown(qs);
  }
  
-+/*
-+ * To test the 'set-indicator' RTAS call we will hotplug a device
-+ * (in this case a CPU) and then make its DRC state go from
-+ * the starting state UNUSABLE(1) to UNISOLATE(3). These DRC
-+ * states transitions are described in further detail in
-+ * PAPR 2.7+ 13.4.
-+ */
-+static void test_rtas_set_indicator(void)
++static void test_rtas_ibm_configure_connector(void)
 +{
 +    QOSState *qs;
 +    uint64_t ret;
-+    uintptr_t guest_buf_addr;
++    uintptr_t guest_buf_addr, guest_drc_addr;
 +    uint32_t drc_index;
 +    uint8_t *buf = g_malloc0(EVENT_LOG_LEN);
 +
@@ -160,29 +156,12 @@ index c5a6080043..2c34b6e83c 100644
 +    g_assert_cmpint(ret, ==, 0);
 +
 +    /*
-+     * This time we can't ignore the event log written in the
-+     * check_exception call - we need the DRC index of the
-+     * recently added CPU to make the state changes using set_indicator.
-+     *
-+     * A bit of magic to go straight to the DRC index by checking the
-+     * error log format in hw/ppc/spapr_events.c:
-+     *
-+     * - rtas_error_log size = 8 bytes
-+     * - all other structures until the hotplug event log = 88 bytes
-+     * - inside the hotplug event log, skip 8 + 4 bytes to get to
-+     *   the drc_id union.
-+     *
-+     * This gives us a 108 bytes skip to get the drc info, which is
-+     * written in be32.
++     * Same 108 bytes offset magic used and explained in
++     * test_rtas_set_indicator.
 +     */
 +    drc_index = be32toh(*((uint32_t *)(buf + 108)));
 +    g_free(buf);
 +
-+    /*
-+     * According to the DRC state diagram, the guest first sets a device
-+     * to USABLE (2), then UNISOLATED (3). Both should return
-+     * RTAS_OUT_SUCCESS(0).
-+     */
 +    ret = qrtas_set_indicator(qs->alloc, RTAS_SENSOR_TYPE_ALLOCATION_STATE,
 +                              drc_index, SPAPR_DR_ALLOCATION_STATE_USABLE);
 +    g_assert_cmpint(ret, ==, 0);
@@ -191,17 +170,41 @@ index c5a6080043..2c34b6e83c 100644
 +                              drc_index, SPAPR_DR_ISOLATION_STATE_UNISOLATED);
 +    g_assert_cmpint(ret, ==, 0);
 +
++    /*
++     * Call ibm,configure-connector to finish the hotplugged device
++     * configuration, putting its DRC into 'ready' state.
++     *
++     * We're not interested in the generated FDTs during the config
++     * process, thus we simply keep calling configure-connector
++     * until it returns SUCCESS(0) or an error.
++     *
++     * The full explanation logic behind this process can be found
++     * at PAPR 2.7+, 13.5.3.5.
++     */
++    guest_drc_addr = guest_alloc(qs->alloc, CC_WA_LEN * sizeof(uint32_t));
++    writel(guest_drc_addr, drc_index);
++    writel(guest_drc_addr + sizeof(uint32_t), 0);
++
++    do {
++        ret = qrtas_ibm_configure_connector(qs->alloc, guest_drc_addr);
++    } while (ret > 0);
++
++    guest_free(qs->alloc, guest_drc_addr);
++
++    g_assert_cmpint(ret, ==, 0);
++
 +    qtest_shutdown(qs);
 +}
 +
  int main(int argc, char *argv[])
  {
      const char *arch = qtest_get_arch();
-@@ -112,6 +184,7 @@ int main(int argc, char *argv[])
-                    test_rtas_check_exception_no_events);
+@@ -185,6 +251,8 @@ int main(int argc, char *argv[])
      qtest_add_func("rtas/rtas-check-exception-hotplug-event",
                     test_rtas_check_exception_hotplug_event);
-+    qtest_add_func("rtas/test_rtas_set_indicator", test_rtas_set_indicator);
+     qtest_add_func("rtas/test_rtas_set_indicator", test_rtas_set_indicator);
++    qtest_add_func("rtas/test_rtas_ibm_configure_connector",
++                   test_rtas_ibm_configure_connector);
  
      return g_test_run();
  }
