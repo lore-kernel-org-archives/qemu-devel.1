@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50734)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50774)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1e9UgV-0003d4-Ht
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 07:26:20 -0400
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1e9Uga-0003hC-9V
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 07:26:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1e9UgS-0008RZ-EC
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 07:26:19 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:45206)
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1e9UgY-00009B-1P
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 07:26:24 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:45236)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1e9UgS-0008Qg-6Y
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 07:26:16 -0400
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1e9UgX-00007U-Pd
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 07:26:21 -0400
 From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Date: Tue, 31 Oct 2017 14:26:16 +0300
-Message-ID: <20171031112616.10516.6980.stgit@pasha-VirtualBox>
+Date: Tue, 31 Oct 2017 14:26:21 +0300
+Message-ID: <20171031112621.10516.38393.stgit@pasha-VirtualBox>
 In-Reply-To: <20171031112457.10516.8971.stgit@pasha-VirtualBox>
 References: <20171031112457.10516.8971.stgit@pasha-VirtualBox>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [RFC PATCH 14/26] replay/replay.c: bump REPLAY_VERSION
- again
+Subject: [Qemu-devel] [RFC PATCH 15/26] replay/replay-internal.c: track
+ holding of replay_lock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,43 +32,43 @@ Cc: kwolf@redhat.com, peter.maydell@linaro.org, boost.lists@gmail.com, quintela@
 
 From: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
-This time commit 802f045a5f61b781df55e4492d896b4d20503ba7 broke the
-replay file format. Also add a comment about this to
-replay-internal.h.
+This is modelled after the iothread mutex lock. We keep a TLS flag to
+indicate when that thread has acquired the lock and assert we don't
+double-lock or release when we shouldn't have.
 
 Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-Reviewed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+Tested-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
 
 ---
- replay/replay-internal.h |    2 +-
- replay/replay.c          |    2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ replay/replay-internal.c |   11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/replay/replay-internal.h b/replay/replay-internal.h
-index be96d7e..8e4c701 100644
---- a/replay/replay-internal.h
-+++ b/replay/replay-internal.h
-@@ -12,7 +12,7 @@
-  *
-  */
+diff --git a/replay/replay-internal.c b/replay/replay-internal.c
+index fca8514..157c863 100644
+--- a/replay/replay-internal.c
++++ b/replay/replay-internal.c
+@@ -179,13 +179,24 @@ void replay_mutex_destroy(void)
+     qemu_mutex_destroy(&lock);
+ }
 =20
--
-+/* Any changes to order/number of events will need to bump REPLAY_VERSIO=
-N */
- enum ReplayEvents {
-     /* for instruction event */
-     EVENT_INSTRUCTION,
-diff --git a/replay/replay.c b/replay/replay.c
-index ff58a5a..4f24498 100644
---- a/replay/replay.c
-+++ b/replay/replay.c
-@@ -22,7 +22,7 @@
++static __thread bool replay_locked;
++
++static bool replay_mutex_locked(void)
++{
++    return replay_locked;
++}
++
+ void replay_mutex_lock(void)
+ {
++    g_assert(!replay_mutex_locked());
+     qemu_mutex_lock(&lock);
++    replay_locked =3D true;
+ }
 =20
- /* Current version of the replay mechanism.
-    Increase it when file format changes. */
--#define REPLAY_VERSION              0xe02006
-+#define REPLAY_VERSION              0xe02007
- /* Size of replay log header */
- #define HEADER_SIZE                 (sizeof(uint32_t) + sizeof(uint64_t)=
-)
+ void replay_mutex_unlock(void)
+ {
++    g_assert(replay_mutex_locked());
++    replay_locked =3D false;
+     qemu_mutex_unlock(&lock);
+ }
 =20
