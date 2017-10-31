@@ -1,17 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53627)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56082)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Andrew.Baumann@microsoft.com>) id 1e9fBi-0004mU-Sd
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 18:39:18 -0400
+	(envelope-from <bounces@canonical.com>) id 1e9fNO-0006VL-Uz
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 18:51:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Andrew.Baumann@microsoft.com>) id 1e9fBg-0001wl-Rz
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 18:39:14 -0400
-From: Andrew Baumann <Andrew.Baumann@microsoft.com>
-Date: Tue, 31 Oct 2017 15:38:30 -0700
-Message-Id: <20171031223830.4608-1-Andrew.Baumann@microsoft.com>
+	(envelope-from <bounces@canonical.com>) id 1e9fNL-0000pX-P3
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 18:51:19 -0400
+Received: from indium.canonical.com ([91.189.90.7]:60230)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1e9fNL-0000pE-FQ
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 18:51:15 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1e9fNH-0004ou-3k
+	for <qemu-devel@nongnu.org>; Tue, 31 Oct 2017 22:51:11 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id DC6B52E8193
+	for <qemu-devel@nongnu.org>; Tue, 31 Oct 2017 22:51:08 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v4] arm: implement cache/shareability attribute
- bits for PAR registers
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 31 Oct 2017 22:43:42 -0000
+From: dann frazier <dann.frazier@canonical.com>
+Reply-To: Bug 1719196 <1719196@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150626680089.6094.17724106932405637799.malonedeb@soybean.canonical.com>
+Message-Id: <150948982295.19979.6891888978314227438.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1719196] Re: [arm64 ocata] newly created
+ instances are unable to raise network interfaces
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,349 +37,327 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, Andrew Baumann <Andrew.Baumann@microsoft.com>
+To: qemu-devel@nongnu.org
 
-On a successful address translation instruction, PAR is supposed to
-contain cacheability and shareability attributes determined by the
-translation. We previously returned 0 for these bits (in line with the
-general strategy of ignoring caches and memory attributes), but some
-guest OSes may depend on them.
+Thanks Christian - I've now verified this. I took a stepwise approach:
 
-This patch collects the attribute bits in the page-table walk, and
-updates PAR with the correct attributes for all LPAE translations.
-Short descriptor formats still return 0 for these bits, as in the
-prior implementation.
+1) We originally observed this issue w/ the ocata cloud archive on
+xenial, so I redeployed that. I verified that I was still seeing the
+problem. I then created a PPA[*] w/ an arm64 build of QEMU from the
+ocata-staging PPA, which is a backport of the zesty-proposed package,
+and upgraded my nova-compute nodes to this version. I rebooted my test
+guests, and the problem was resolved.
 
-Signed-off-by: Andrew Baumann <Andrew.Baumann@microsoft.com>
----
-v2:
- * return attrs via out parameter from get_phys_addr, rather than MemTxAttrs
- * move MAIR lookup/index inline, since it turned out to be simple
- * implement attributes for stage 2 translations
- * combine attributes from stages 1 and 2 when required
+2) I then updated my sources.list to point to zesty (w/ proposed
+enabled), and upgraded qemu-system-arm. This way I could test the actual
+build in zesty-proposed, as opposed to my backport. This continued to
+work.
 
-v3:
- * implement S2 allocation hints and check for cache-disabled
- * fix stage 2 shareability bits
- * fix combined allocation hints (always use stage 1 hints)
- * remove LOG_UNIMP message
+3) Finally, I dist-upgraded this system from xenial to zesty - so that
+I'm actually testing the zesty build in a zesty environment, and
+rebooted. Still worked :)
 
-v4:
- * fix hihint shift buglet in convert_stage2_attrs
- * remove TODO comment (what was there is complete)
- * mention relevant pseudocode procedures in comments
+[*] https://launchpad.net/~dannf/+archive/ubuntu/lp1719196
 
-Thanks,
-Andrew
+-- =
 
- target/arm/helper.c | 178 +++++++++++++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 164 insertions(+), 14 deletions(-)
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1719196
 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 96113fe989..f61fb3ef68 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -19,17 +19,23 @@
- #define ARM_CPU_FREQ 1000000000 /* FIXME: 1 GHz, should be configurable */
- 
- #ifndef CONFIG_USER_ONLY
-+/* Cacheability and shareability attributes for a memory access */
-+typedef struct ARMCacheAttrs {
-+    unsigned int attrs:8; /* as in the MAIR register encoding */
-+    unsigned int shareability:2; /* as in the SH field of the VMSAv8-64 PTEs */
-+} ARMCacheAttrs;
-+
- static bool get_phys_addr(CPUARMState *env, target_ulong address,
-                           MMUAccessType access_type, ARMMMUIdx mmu_idx,
-                           hwaddr *phys_ptr, MemTxAttrs *attrs, int *prot,
-                           target_ulong *page_size, uint32_t *fsr,
--                          ARMMMUFaultInfo *fi);
-+                          ARMMMUFaultInfo *fi, ARMCacheAttrs *cacheattrs);
- 
- static bool get_phys_addr_lpae(CPUARMState *env, target_ulong address,
-                                MMUAccessType access_type, ARMMMUIdx mmu_idx,
-                                hwaddr *phys_ptr, MemTxAttrs *txattrs, int *prot,
-                                target_ulong *page_size_ptr, uint32_t *fsr,
--                               ARMMMUFaultInfo *fi);
-+                               ARMMMUFaultInfo *fi, ARMCacheAttrs *cacheattrs);
- 
- /* Security attributes for an address, as returned by v8m_security_lookup. */
- typedef struct V8M_SAttributes {
-@@ -2159,9 +2165,10 @@ static uint64_t do_ats_write(CPUARMState *env, uint64_t value,
-     uint64_t par64;
-     MemTxAttrs attrs = {};
-     ARMMMUFaultInfo fi = {};
-+    ARMCacheAttrs cacheattrs = {};
- 
--    ret = get_phys_addr(env, value, access_type, mmu_idx,
--                        &phys_addr, &attrs, &prot, &page_size, &fsr, &fi);
-+    ret = get_phys_addr(env, value, access_type, mmu_idx, &phys_addr, &attrs,
-+                        &prot, &page_size, &fsr, &fi, &cacheattrs);
-     if (extended_addresses_enabled(env)) {
-         /* fsr is a DFSR/IFSR value for the long descriptor
-          * translation table format, but with WnR always clear.
-@@ -2173,7 +2180,8 @@ static uint64_t do_ats_write(CPUARMState *env, uint64_t value,
-             if (!attrs.secure) {
-                 par64 |= (1 << 9); /* NS */
-             }
--            /* We don't set the ATTR or SH fields in the PAR. */
-+            par64 |= (uint64_t)cacheattrs.attrs << 56; /* ATTR */
-+            par64 |= cacheattrs.shareability << 7; /* SH */
-         } else {
-             par64 |= 1; /* F */
-             par64 |= (fsr & 0x3f) << 1; /* FS */
-@@ -6925,7 +6933,7 @@ static bool v7m_read_half_insn(ARMCPU *cpu, ARMMMUIdx mmu_idx,
-         return false;
-     }
-     if (get_phys_addr(env, addr, MMU_INST_FETCH, mmu_idx,
--                      &physaddr, &attrs, &prot, &page_size, &fsr, &fi)) {
-+                      &physaddr, &attrs, &prot, &page_size, &fsr, &fi, NULL)) {
-         /* the MPU lookup failed */
-         env->v7m.cfsr[env->v7m.secure] |= R_V7M_CFSR_IACCVIOL_MASK;
-         armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_MEM, env->v7m.secure);
-@@ -8207,7 +8215,7 @@ static hwaddr S1_ptw_translate(CPUARMState *env, ARMMMUIdx mmu_idx,
-         int ret;
- 
-         ret = get_phys_addr_lpae(env, addr, 0, ARMMMUIdx_S2NS, &s2pa,
--                                 &txattrs, &s2prot, &s2size, fsr, fi);
-+                                 &txattrs, &s2prot, &s2size, fsr, fi, NULL);
-         if (ret) {
-             fi->s2addr = addr;
-             fi->stage2 = true;
-@@ -8608,11 +8616,41 @@ static bool check_s2_mmu_setup(ARMCPU *cpu, bool is_aa64, int level,
-     return true;
- }
- 
-+/* Translate from the 4-bit stage 2 representation of
-+ * memory attributes (without cache-allocation hints) to
-+ * the 8-bit representation of the stage 1 MAIR registers
-+ * (which includes allocation hints).
-+ *
-+ * ref: shared/translation/attrs/S2AttrDecode()
-+ *      .../S2ConvertAttrsHints()
-+ */
-+static uint8_t convert_stage2_attrs(CPUARMState *env, uint8_t s2attrs)
-+{
-+    uint8_t hiattr = extract32(s2attrs, 2, 2);
-+    uint8_t loattr = extract32(s2attrs, 0, 2);
-+    uint8_t hihint = 0, lohint = 0;
-+
-+    if (hiattr != 0) { /* normal memory */
-+        if ((env->cp15.hcr_el2 & HCR_CD) != 0) { /* cache disabled */
-+            hiattr = loattr = 1; /* non-cacheable */
-+        } else {
-+            if (hiattr != 1) { /* Write-through or write-back */
-+                hihint = 3; /* RW allocate */
-+            }
-+            if (loattr != 1) { /* Write-through or write-back */
-+                lohint = 3; /* RW allocate */
-+            }
-+        }
-+    }
-+
-+    return (hiattr << 6) | (hihint << 4) | (loattr << 2) | lohint;
-+}
-+
- static bool get_phys_addr_lpae(CPUARMState *env, target_ulong address,
-                                MMUAccessType access_type, ARMMMUIdx mmu_idx,
-                                hwaddr *phys_ptr, MemTxAttrs *txattrs, int *prot,
-                                target_ulong *page_size_ptr, uint32_t *fsr,
--                               ARMMMUFaultInfo *fi)
-+                               ARMMMUFaultInfo *fi, ARMCacheAttrs *cacheattrs)
- {
-     ARMCPU *cpu = arm_env_get_cpu(env);
-     CPUState *cs = CPU(cpu);
-@@ -8929,6 +8967,21 @@ static bool get_phys_addr_lpae(CPUARMState *env, target_ulong address,
-          */
-         txattrs->secure = false;
-     }
-+
-+    if (cacheattrs != NULL) {
-+        if (mmu_idx == ARMMMUIdx_S2NS) {
-+            cacheattrs->attrs = convert_stage2_attrs(env,
-+                                                     extract32(attrs, 0, 4));
-+        } else {
-+            /* Index into MAIR registers for cache attributes */
-+            uint8_t attrindx = extract32(attrs, 0, 3);
-+            uint64_t mair = env->cp15.mair_el[regime_el(env, mmu_idx)];
-+            assert(attrindx <= 7);
-+            cacheattrs->attrs = extract64(mair, attrindx * 8, 8);
-+        }
-+        cacheattrs->shareability = extract32(attrs, 6, 2);
-+    }
-+
-     *phys_ptr = descaddr;
-     *page_size_ptr = page_size;
-     return false;
-@@ -9490,6 +9543,93 @@ static bool get_phys_addr_pmsav5(CPUARMState *env, uint32_t address,
-     return false;
- }
- 
-+/* Combine either inner or outer cacheability attributes for normal
-+ * memory, according to table D4-42 and pseudocode procedure
-+ * CombineS1S2AttrHints() of ARM DDI 0487B.b (the ARMv8 ARM).
-+ *
-+ * NB: only stage 1 includes allocation hints (RW bits), leading to
-+ * some asymmetry.
-+ */
-+static uint8_t combine_cacheattr_nibble(uint8_t s1, uint8_t s2)
-+{
-+    if (s1 == 4 || s2 == 4) {
-+        /* non-cacheable has precedence */
-+        return 4;
-+    } else if (extract32(s1, 2, 2) == 0 || extract32(s1, 2, 2) == 2) {
-+        /* stage 1 write-through takes precedence */
-+        return s1;
-+    } else if (extract32(s2, 2, 2) == 2) {
-+        /* stage 2 write-through takes precedence, but the allocation hint
-+         * is still taken from stage 1
-+         */
-+        return (2 << 2) | extract32(s1, 0, 2);
-+    } else { /* write-back */
-+        return s1;
-+    }
-+}
-+
-+/* Combine S1 and S2 cacheability/shareability attributes, per D4.5.4
-+ * and CombineS1S2Desc()
-+ *
-+ * @s1:      Attributes from stage 1 walk
-+ * @s2:      Attributes from stage 2 walk
-+ */
-+static ARMCacheAttrs combine_cacheattrs(ARMCacheAttrs s1, ARMCacheAttrs s2)
-+{
-+    uint8_t s1lo = extract32(s1.attrs, 0, 4), s2lo = extract32(s2.attrs, 0, 4);
-+    uint8_t s1hi = extract32(s1.attrs, 4, 4), s2hi = extract32(s2.attrs, 4, 4);
-+    ARMCacheAttrs ret;
-+
-+    /* Combine shareability attributes (table D4-43) */
-+    if (s1.shareability == 2 || s2.shareability == 2) {
-+        /* if either are outer-shareable, the result is outer-shareable */
-+        ret.shareability = 2;
-+    } else if (s1.shareability == 3 || s2.shareability == 3) {
-+        /* if either are inner-shareable, the result is inner-shareable */
-+        ret.shareability = 3;
-+    } else {
-+        /* both non-shareable */
-+        ret.shareability = 0;
-+    }
-+
-+    /* Combine memory type and cacheability attributes */
-+    if (s1hi == 0 || s2hi == 0) {
-+        /* Device has precedence over normal */
-+        if (s1lo == 0 || s2lo == 0) {
-+            /* nGnRnE has precedence over anything */
-+            ret.attrs = 0;
-+        } else if (s1lo == 4 || s2lo == 4) {
-+            /* non-Reordering has precedence over Reordering */
-+            ret.attrs = 4;  /* nGnRE */
-+        } else if (s1lo == 8 || s2lo == 8) {
-+            /* non-Gathering has precedence over Gathering */
-+            ret.attrs = 8;  /* nGRE */
-+        } else {
-+            ret.attrs = 0xc; /* GRE */
-+        }
-+
-+        /* Any location for which the resultant memory type is any
-+         * type of Device memory is always treated as Outer Shareable.
-+         */
-+        ret.shareability = 2;
-+    } else { /* Normal memory */
-+        /* Outer/inner cacheability combine independently */
-+        ret.attrs = combine_cacheattr_nibble(s1hi, s2hi) << 4
-+                  | combine_cacheattr_nibble(s1lo, s2lo);
-+
-+        if (ret.attrs == 0x44) {
-+            /* Any location for which the resultant memory type is Normal
-+             * Inner Non-cacheable, Outer Non-cacheable is always treated
-+             * as Outer Shareable.
-+             */
-+            ret.shareability = 2;
-+        }
-+    }
-+
-+    return ret;
-+}
-+
-+
- /* get_phys_addr - get the physical address for this virtual address
-  *
-  * Find the physical address corresponding to the given virtual address,
-@@ -9514,12 +9654,14 @@ static bool get_phys_addr_pmsav5(CPUARMState *env, uint32_t address,
-  * @prot: set to the permissions for the page containing phys_ptr
-  * @page_size: set to the size of the page containing phys_ptr
-  * @fsr: set to the DFSR/IFSR value on failure
-+ * @fi: set to fault info if the translation fails
-+ * @cacheattrs: (if non-NULL) set to the cacheability/shareability attributes
-  */
- static bool get_phys_addr(CPUARMState *env, target_ulong address,
-                           MMUAccessType access_type, ARMMMUIdx mmu_idx,
-                           hwaddr *phys_ptr, MemTxAttrs *attrs, int *prot,
-                           target_ulong *page_size, uint32_t *fsr,
--                          ARMMMUFaultInfo *fi)
-+                          ARMMMUFaultInfo *fi, ARMCacheAttrs *cacheattrs)
- {
-     if (mmu_idx == ARMMMUIdx_S12NSE0 || mmu_idx == ARMMMUIdx_S12NSE1) {
-         /* Call ourselves recursively to do the stage 1 and then stage 2
-@@ -9529,10 +9671,11 @@ static bool get_phys_addr(CPUARMState *env, target_ulong address,
-             hwaddr ipa;
-             int s2_prot;
-             int ret;
-+            ARMCacheAttrs cacheattrs2 = {};
- 
-             ret = get_phys_addr(env, address, access_type,
-                                 stage_1_mmu_idx(mmu_idx), &ipa, attrs,
--                                prot, page_size, fsr, fi);
-+                                prot, page_size, fsr, fi, cacheattrs);
- 
-             /* If S1 fails or S2 is disabled, return early.  */
-             if (ret || regime_translation_disabled(env, ARMMMUIdx_S2NS)) {
-@@ -9543,10 +9686,17 @@ static bool get_phys_addr(CPUARMState *env, target_ulong address,
-             /* S1 is done. Now do S2 translation.  */
-             ret = get_phys_addr_lpae(env, ipa, access_type, ARMMMUIdx_S2NS,
-                                      phys_ptr, attrs, &s2_prot,
--                                     page_size, fsr, fi);
-+                                     page_size, fsr, fi,
-+                                     cacheattrs != NULL ? &cacheattrs2 : NULL);
-             fi->s2addr = ipa;
-             /* Combine the S1 and S2 perms.  */
-             *prot &= s2_prot;
-+
-+            /* Combine the S1 and S2 cache attributes, if needed */
-+            if (!ret && cacheattrs != NULL) {
-+                *cacheattrs = combine_cacheattrs(*cacheattrs, cacheattrs2);
-+            }
-+
-             return ret;
-         } else {
-             /*
-@@ -9617,7 +9767,7 @@ static bool get_phys_addr(CPUARMState *env, target_ulong address,
- 
-     if (regime_using_lpae_format(env, mmu_idx)) {
-         return get_phys_addr_lpae(env, address, access_type, mmu_idx, phys_ptr,
--                                  attrs, prot, page_size, fsr, fi);
-+                                  attrs, prot, page_size, fsr, fi, cacheattrs);
-     } else if (regime_sctlr(env, mmu_idx) & SCTLR_XP) {
-         return get_phys_addr_v6(env, address, access_type, mmu_idx, phys_ptr,
-                                 attrs, prot, page_size, fsr, fi);
-@@ -9645,7 +9795,7 @@ bool arm_tlb_fill(CPUState *cs, vaddr address,
- 
-     ret = get_phys_addr(env, address, access_type,
-                         core_to_arm_mmu_idx(env, mmu_idx), &phys_addr,
--                        &attrs, &prot, &page_size, fsr, fi);
-+                        &attrs, &prot, &page_size, fsr, fi, NULL);
-     if (!ret) {
-         /* Map a single [sub]page.  */
-         phys_addr &= TARGET_PAGE_MASK;
-@@ -9674,7 +9824,7 @@ hwaddr arm_cpu_get_phys_page_attrs_debug(CPUState *cs, vaddr addr,
-     *attrs = (MemTxAttrs) {};
- 
-     ret = get_phys_addr(env, addr, 0, mmu_idx, &phys_addr,
--                        attrs, &prot, &page_size, &fsr, &fi);
-+                        attrs, &prot, &page_size, &fsr, &fi, NULL);
- 
-     if (ret) {
-         return -1;
--- 
-2.14.2
+Title:
+  [arm64 ocata] newly created instances are unable to raise network
+  interfaces
+
+Status in Ubuntu Cloud Archive:
+  Fix Released
+Status in Ubuntu Cloud Archive ocata series:
+  Fix Committed
+Status in libvirt:
+  New
+Status in QEMU:
+  Fix Released
+Status in libvirt package in Ubuntu:
+  Invalid
+Status in qemu package in Ubuntu:
+  Fix Released
+Status in qemu source package in Zesty:
+  Fix Committed
+
+Bug description:
+  [Impact]
+
+   * A change in qemu 2.8 (83d768b virtio: set ISR on dataplane =
+
+     notifications) broke virtio handling on platforms without a =
+
+     controller. Those encounter flaky networking due to missed IRQs
+
+   * Fix is a backport of the upstream fix b4b9862b: virtio: Fix no =
+
+     interrupt when not creating msi controller
+
+  [Test Case]
+
+   * On Arm with Zesty (or Ocata) run a guest without PCI based devices
+
+   * Example in e.g. c#23
+
+   * Without the fix the networking does not work reliably (as it losses =
+
+     IRQs), with the fix it works fine.
+
+  [Regression Potential]
+
+   * Changing the IRQ handling of virtio could affect virtio in general.
+     But when reviwing the patch you'll see that it is small and actually =
+
+     only changes to enable IRQ on one more place. That could cause more =
+
+     IRQs than needed in the worst case, but those are usually not =
+
+     breaking but only slowing things down. Also this fix is upstream =
+
+     quite a while, increasing confidence.
+
+  [Other Info]
+   =
+
+   * There is currently 1720397 in flight in the SRU queue, so acceptance =
+
+     of this upload has to wait until that completes.
+
+  ---
+
+  arm64 Ocata ,
+
+  I'm testing to see I can get Ocata running on arm64 and using the
+  openstack-base bundle to deploy it.  I have added the bundle to the
+  log file attached to this bug.
+
+  When I create a new instance via nova, the VM comes up and runs,
+  however fails to raise its eth0 interface. This occurs on both
+  internal and external networks.
+
+  ubuntu@openstackaw:~$ nova list
+  +--------------------------------------+---------+--------+------------+-=
+------------+--------------------+
+  | ID                                   | Name    | Status | Task State | =
+Power State | Networks           |
+  +--------------------------------------+---------+--------+------------+-=
+------------+--------------------+
+  | dcaf6d51-f81e-4cbd-ac77-0c5d21bde57c | sfeole1 | ACTIVE | -          | =
+Running     | internal=3D10.5.5.3  |
+  | aa0b8aee-5650-41f4-8fa0-aeccdc763425 | sfeole2 | ACTIVE | -          | =
+Running     | internal=3D10.5.5.13 |
+  +--------------------------------------+---------+--------+------------+-=
+------------+--------------------+
+  ubuntu@openstackaw:~$ nova show aa0b8aee-5650-41f4-8fa0-aeccdc763425
+  +--------------------------------------+---------------------------------=
+-------------------------+
+  | Property                             | Value                           =
+                         |
+  +--------------------------------------+---------------------------------=
+-------------------------+
+  | OS-DCF:diskConfig                    | MANUAL                          =
+                         |
+  | OS-EXT-AZ:availability_zone          | nova                            =
+                         |
+  | OS-EXT-SRV-ATTR:host                 | awrep3                          =
+                         |
+  | OS-EXT-SRV-ATTR:hypervisor_hostname  | awrep3.maas                     =
+                         |
+  | OS-EXT-SRV-ATTR:instance_name        | instance-00000003               =
+                         |
+  | OS-EXT-STS:power_state               | 1                               =
+                         |
+  | OS-EXT-STS:task_state                | -                               =
+                         |
+  | OS-EXT-STS:vm_state                  | active                          =
+                         |
+  | OS-SRV-USG:launched_at               | 2017-09-24T14:23:08.000000      =
+                         |
+  | OS-SRV-USG:terminated_at             | -                               =
+                         |
+  | accessIPv4                           |                                 =
+                         |
+  | accessIPv6                           |                                 =
+                         |
+  | config_drive                         |                                 =
+                         |
+  | created                              | 2017-09-24T14:22:41Z            =
+                         |
+  | flavor                               | m1.small (717660ae-0440-4b19-a76=
+2-ffeb32a0575c)          |
+  | hostId                               | 5612a00671c47255d2ebd6737a64ec9b=
+d3a5866d1233ecf3e988b025 |
+  | id                                   | aa0b8aee-5650-41f4-8fa0-aeccdc76=
+3425                     |
+  | image                                | zestynosplash (e88fd1bd-f040-44d=
+8-9e7c-c462ccf4b945)     |
+  | internal network                     | 10.5.5.13                       =
+                         |
+  | key_name                             | mykey                           =
+                         |
+  | metadata                             | {}                              =
+                         |
+  | name                                 | sfeole2                         =
+                         |
+  | os-extended-volumes:volumes_attached | []                              =
+                         |
+  | progress                             | 0                               =
+                         |
+  | security_groups                      | default                         =
+                         |
+  | status                               | ACTIVE                          =
+                         |
+  | tenant_id                            | 9f7a21c1ad264fec81abc09f3960ad1d=
+                         |
+  | updated                              | 2017-09-24T14:23:09Z            =
+                         |
+  | user_id                              | e6bb6f5178a248c1b5ae66ed388f9040=
+                         |
+  +--------------------------------------+---------------------------------=
+-------------------------+
+
+  As seen above the instances boot an run.  Full Console output is
+  attached to this bug.
+
+  [  OK  ] Started Initial cloud-init job (pre-networking).
+  [  OK  ] Reached target Network (Pre).
+  [  OK  ] Started AppArmor initialization.
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Starting Raise netw=
+ork interfaces...
+  [FAILED] Failed to start Raise network interfaces.
+  See 'systemctl status networking.service' for details.
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Starting Initial cl=
+oud-init job (metadata service crawler)...
+  [  OK  ] Reached target Network.
+  [  315.051902] cloud-init[881]: Cloud-init v. 0.7.9 running 'init' at Fri=
+, 22 Sep 2017 18:29:15 +0000. Up 314.70 seconds.
+  [  315.057291] cloud-init[881]: ci-info: +++++++++++++++++++++++++++Net d=
+evice info+++++++++++++++++++++++++++
+  [  315.060338] cloud-init[881]: ci-info: +--------+------+-----------+---=
+--------+-------+-------------------+
+  [  315.063308] cloud-init[881]: ci-info: | Device |  Up  |  Address  |   =
+ Mask   | Scope |     Hw-Address    |
+  [  315.066304] cloud-init[881]: ci-info: +--------+------+-----------+---=
+--------+-------+-------------------+
+  [  315.069303] cloud-init[881]: ci-info: | eth0:  | True |     .     |   =
+  .     |   .   | fa:16:3e:39:4c:48 |
+  [  315.072308] cloud-init[881]: ci-info: | eth0:  | True |     .     |   =
+  .     |   d   | fa:16:3e:39:4c:48 |
+  [  315.075260] cloud-init[881]: ci-info: |  lo:   | True | 127.0.0.1 | 25=
+5.0.0.0 |   .   |         .         |
+  [  315.078258] cloud-init[881]: ci-info: |  lo:   | True |     .     |   =
+  .     |   d   |         .         |
+  [  315.081249] cloud-init[881]: ci-info: +--------+------+-----------+---=
+--------+-------+-------------------+
+  [  315.084240] cloud-init[881]: 2017-09-22 18:29:15,393 - url_helper.py[W=
+ARNING]: Calling 'http://169.254.169.254/2009-04-04/meta-data/instance-id' =
+failed [0/120s]: request error [HTTPConnectionPool(host=3D'169.254.169.254'=
+, port=3D80): Max retries exceeded with url: /2009-04-04/meta-data/instance=
+-id (Caused by NewConnectionError('<requests.packages.urllib3.connection.HT=
+TPConnection object at 0xffffb10794e0>: Failed to establish a new connectio=
+n: [Errno 101] Network is unreachable',))]
+
+  ----------------
+
+  I have checked all services in neutron and made sure that they are
+  running and restarted in neutron-gateway
+
+  =C2=A0[ + ]  neutron-dhcp-agent
+  =C2=A0[ + ]  neutron-l3-agent
+  =C2=A0[ + ]  neutron-lbaasv2-agent
+  =C2=A0[ + ]  neutron-metadata-agent
+  =C2=A0[ + ]  neutron-metering-agent
+  =C2=A0[ + ]  neutron-openvswitch-agent
+  =C2=A0[ + ]  neutron-ovs-cleanup
+
+  and have also restarted and checked the nova-compute logs for their
+  neutron counterparts.
+
+  =C2=A0[ + ]  neutron-openvswitch-agent
+  =C2=A0[ + ]  neutron-ovs-cleanup
+
+  =C2=A0There are some warnings/errors in the neutron-gateway logs which I
+  have attached the full tarball in a separate attachment to this bug:
+
+  2017-09-24 14:39:33.152 10322 INFO ryu.base.app_manager [-] instantiating=
+ app ryu.controller.ofp_handler of OFPHandler
+  2017-09-24 14:39:33.153 10322 INFO ryu.base.app_manager [-] instantiating=
+ app ryu.app.ofctl.service of OfctlService
+  2017-09-24 14:39:39.577 10322 ERROR neutron.agent.ovsdb.impl_vsctl [req-2=
+f084ae8-13dc-47dc-b351-24c8f3c57067 - - - - -] Unable to execute ['ovs-vsct=
+l', '--timeout=3D10', '--oneline', '--format=3Djson', '--', '--id=3D@manage=
+r', 'create', 'Manager', 'target=3D"ptcp:6640:127.0.0.1"', '--', 'add', 'Op=
+en_vSwitch', '.', 'manager_options', '@manager']. Exception: Exit code: 1; =
+Stdin: ; Stdout: ; Stderr: ovs-vsctl: transaction error: {"details":"Transa=
+ction causes multiple rows in \"Manager\" table to have identical values (\=
+"ptcp:6640:127.0.0.1\") for index on column \"target\".  First row, with UU=
+ID e02a5f7f-bfd2-4a1d-ae3c-0321db4bd3fb, existed in the database before thi=
+s transaction and was not modified by the transaction.  Second row, with UU=
+ID 6e9aba3a-471a-4976-bffd-b7131bbe5377, was inserted by this transaction."=
+,"error":"constraint violation"}
+
+  These warnings/errors also occur on the nova-compute hosts in
+  /var/log/neutron/
+
+  2017-09-22 18:54:52.130 387556 INFO ryu.base.app_manager [-] instantiatin=
+g app ryu.app.ofctl.service of OfctlService
+  2017-09-22 18:54:56.124 387556 ERROR neutron.agent.ovsdb.impl_vsctl [req-=
+e291c2f9-a123-422c-be7c-fadaeb5decfa - - - - -] Unable to execute ['ovs-vsc=
+tl', '--timeout=3D10', '--oneline', '--format=3Djson', '--', '--id=3D@manag=
+er', 'create', 'Manager', 'target=3D"ptcp:6640:127.0.0.1"', '--', 'add', 'O=
+pen_vSwitch', '.', 'manager_options', '@manager']. Exception: Exit code: 1;=
+ Stdin: ; Stdout: ; Stderr: ovs-vsctl: transaction error: {"details":"Trans=
+action causes multiple rows in \"Manager\" table to have identical values (=
+\"ptcp:6640:127.0.0.1\") for index on column \"target\".  First row, with U=
+UID 9f27ddee-9881-4cbc-9777-2f42fee735e9, was inserted by this transaction.=
+  Second row, with UUID ccf0e097-09d5-449c-b353-6b69781dc3f7, existed in th=
+e database before this transaction and was not modified by the transaction.=
+","error":"constraint violation"}
+
+  I'm not sure if the above error could be pertaining to the failure, I
+  have also attached those logs to this bug as well...
+
+  .
+  (neutron) agent-list
+  +--------------------------------------+----------------------+--------+-=
+------------------+-------+----------------+---------------------------+
+  | id                                   | agent_type           | host   | =
+availability_zone | alive | admin_state_up | binary                    |
+  +--------------------------------------+----------------------+--------+-=
+------------------+-------+----------------+---------------------------+
+  | 0cca03fb-abb2-4704-8b0b-e7d3e117d882 | DHCP agent           | awrep1 | =
+nova              | :-)   | True           | neutron-dhcp-agent        |
+  | 14a5fd52-fbc3-450c-96d5-4e9a65776dad | L3 agent             | awrep1 | =
+nova              | :-)   | True           | neutron-l3-agent          |
+  | 2ebc7238-5e61-41f8-bc60-df14ec6b226b | Loadbalancerv2 agent | awrep1 | =
+                  | :-)   | True           | neutron-lbaasv2-agent     |
+  | 4f6275be-fc8b-4994-bdac-13a4b76f6a83 | Metering agent       | awrep1 | =
+                  | :-)   | True           | neutron-metering-agent    |
+  | 86ecc6b0-c100-4298-b861-40c17516cc08 | Open vSwitch agent   | awrep1 | =
+                  | :-)   | True           | neutron-openvswitch-agent |
+  | 947ad3ab-650b-4b96-a520-00441ecb33e7 | Open vSwitch agent   | awrep4 | =
+                  | :-)   | True           | neutron-openvswitch-agent |
+  | 996b0692-7d19-4641-bec3-e057f4a856f6 | Open vSwitch agent   | awrep3 | =
+                  | :-)   | True           | neutron-openvswitch-agent |
+  | ab6b1065-0b98-4cf3-9f46-6bddba0c5e75 | Metadata agent       | awrep1 | =
+                  | :-)   | True           | neutron-metadata-agent    |
+  | fe24f622-b77c-4eed-ae22-18e4195cf763 | Open vSwitch agent   | awrep2 | =
+                  | :-)   | True           | neutron-openvswitch-agent |
+  +--------------------------------------+----------------------+--------+-=
+------------------+-------+----------------+---------------------------+
+
+  Should neutron-openvswitch be assigned to the 'nova' availability
+  zone?
+
+  I have also attached the ovs-vsctl show from a nova-compute host and
+  the neutron-gateway host to ensure that the open v switch routes are
+  correct.
+
+  I can supply more logs if required.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/cloud-archive/+bug/1719196/+subscriptions
