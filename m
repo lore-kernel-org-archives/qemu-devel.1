@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57224)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58059)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1e9WDM-0008Sp-K9
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 09:04:22 -0400
+	(envelope-from <Andrew.Baumann@microsoft.com>) id 1e9WGq-00010C-F2
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 09:07:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1e9WDG-0001Nr-Gs
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 09:04:20 -0400
-Resent-Message-Id: <E1e9WDG-0001Nr-Gs@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21358)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1e9WDG-0001N1-7k
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 09:04:14 -0400
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <150945410417.171.566633983795592141@bafd83ae6430>
-In-Reply-To: <20171031110641.5836.43266.stgit@pasha-VirtualBox>
+	(envelope-from <Andrew.Baumann@microsoft.com>) id 1e9WGl-0003s1-FE
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 09:07:56 -0400
+From: Andrew Baumann <Andrew.Baumann@microsoft.com>
+Date: Tue, 31 Oct 2017 13:07:36 +0000
+Message-ID: <MWHPR21MB015998D56801F7253F33D1FB9E5E0@MWHPR21MB0159.namprd21.prod.outlook.com>
+References: <20171031130223.220-1-Andrew.Baumann@microsoft.com>
+In-Reply-To: <20171031130223.220-1-Andrew.Baumann@microsoft.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 31 Oct 2017 05:48:24 -0700 (PDT)
-Subject: Re: [Qemu-devel] [RFC PATCH 00/26] replay additions
+Subject: Re: [Qemu-devel] [PATCH v3] arm: implement cache/shareability
+ attribute bits for PAR registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,121 +24,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel.Dovgaluk@ispras.ru
-Cc: famz@redhat.com, qemu-devel@nongnu.org, dovgaluk@ispras.ru
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtSRkMgUEFUQ0ggMDAvMjZdIHJlcGxheSBhZGRpdGlvbnMKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTcxMDMxMTEwNjQxLjU4MzYuNDMyNjYuc3RnaXRAcGFzaGEtVmlydHVhbEJv
-eAoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0
-b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBj
-b25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYu
-cmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRC
-QVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRu
-LyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQg
-c2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJh
-Y2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgo
-bisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGlu
-ZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEg
-bmV3IGJyYW5jaCAndGVzdCcKOGY1NWM5MDJhZCBzY3JpcHRzL3FlbXUtZ2RiL3RpbWVycy5weTog
-bmV3IGhlbHBlciB0byBkdW1wIHRpbWVyIHN0YXRlCmE4Y2JhMWIyMTQgc2NyaXB0cy9yZXBsYXkt
-ZHVtcC5weTogcmVwbGF5IGxvZyBkdW1wZXIKMTVkY2RkNThhOSBzY3JpcHRzL2FuYWx5c2UtbG9j
-a3Mtc2ltcGxldHJhY2UucHk6IHNjcmlwdCB0byBhbmFseXNlIGxvY2sgdGltZXMKMmI3MTdjZTA4
-MCB1dGlsL3FlbXUtdGhyZWFkLSo6IGFkZCBxZW11X2xvY2ssIGxvY2tlZCBhbmQgdW5sb2NrIHRy
-YWNlIGV2ZW50cwpkY2UwNGZjZmQ5IHNjcmlwdHMvcWVtdS1nZGI6IGFkZCBzaW1wbGUgdGNnIGxv
-Y2sgc3RhdHVzIGhlbHBlcgphMTk3ZDk1NmM5IHJlcGxheTogY2hlY2sgcmV0dXJuIHZhbHVlcyBv
-ZiBmd3JpdGUKNmEzMWVkYTg4MyByZXBsYXk6IGRvbid0IGRlc3Ryb3kgbXV0ZXggYXQgZXhpdAoy
-MmQ4MTAzNTgzIGNwdS1leGVjOiByZXNldCBleGl0IGZsYWcgYmVmb3JlIGNhbGxpbmcgY3B1X2V4
-ZWNfbm9jYWNoZQpmZmQ1ZjgzODBhIGNwdS1leGVjOiBkb24ndCBvdmVyd3JpdGUgZXhjZXB0aW9u
-X2luZGV4CjM4M2IyYTMyM2QgcmVwbGF5OiBwdXNoIHJlcGxheV9tdXRleF9sb2NrIHVwIHRoZSBj
-YWxsIHRyZWUKOTE1YmZhMzU2MiByZXBsYXk6IG1ha2UgbG9ja2luZyB2aXNpYmxlIG91dHNpZGUg
-cmVwbGF5IGNvZGUKMmE0N2FjMWE5YiByZXBsYXkvcmVwbGF5LWludGVybmFsLmM6IHRyYWNrIGhv
-bGRpbmcgb2YgcmVwbGF5X2xvY2sKYmI4NzZiZTAyNyByZXBsYXkvcmVwbGF5LmM6IGJ1bXAgUkVQ
-TEFZX1ZFUlNJT04gYWdhaW4KNjE3ZTI0ODhmMSBjcHVzOiBvbmx5IHRha2UgQlFMIGZvciBzbGVl
-cGluZyB0aHJlYWRzCjcxNGZmMDhhMDYgY3B1czogcHVzaCBCUUwgbG9jayB0byBxZW11Xypfd2Fp
-dF9pb19ldmVudApmOTY1MjhkMDhhIHRhcmdldC9hcm0vYXJtLXBvd2VydGN0bDogZHJvcCBCUUwg
-YXNzZXJ0aW9ucwo5ZmVjZTI1YTE5IGljb3VudDogZml4ZWQgc2F2aW5nL3Jlc3RvcmluZyBvZiBp
-Y291bnQgd2FycCB0aW1lcnMKZjcxYzViODRlNyByZXBsYXk6IHNhdmUgcHJpb3IgdmFsdWUgb2Yg
-dGhlIGhvc3QgY2xvY2sKNjk1NDA1YjRjNiByZXBsYXk6IG1ha2Ugc2FmZSB2bXN0b3AgYXQgcmVj
-b3JkL3JlcGxheQo2NGUzYjZhYjNkIHJlcGxheTogYWRkZWQgcmVwbGF5IGxvZyBmb3JtYXQgZGVz
-Y3JpcHRpb24KZmMxOGFjZDVjMCByZXBsYXk6IGZpeCBzYXZlL2xvYWQgdm0gZm9yIG5vbi1lbXB0
-eSBxdWV1ZQowZjRkNTlhNzI2IHJlcGxheTogZml4ZWQgcmVwbGF5X2VuYWJsZV9ldmVudHMKN2I4
-ZTljMWU1MyByZXBsYXk6IGZpeCBwcm9jZXNzaW5nIGFzeW5jIGV2ZW50cwpiYmEyOWE0OWVkIHJl
-cGxheTogZGlzYWJsZSBkZWZhdWx0IHNuYXBzaG90IGZvciByZWNvcmQvcmVwbGF5Cjg1ZTRmMTg0
-YWMgYmxrcmVwbGF5OiBjcmVhdGUgdGVtcG9yYXJ5IG92ZXJsYXkgZm9yIHVuZGVybGF5aW5nIGRl
-dmljZXMKNDJiOGYzOGViMyBibG9jazogaW1wbGVtZW50IGJkcnZfc25hcHNob3RfZ290byBmb3Ig
-YmxrcmVwbGF5Cgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzI2OiBibG9j
-azogaW1wbGVtZW50IGJkcnZfc25hcHNob3RfZ290byBmb3IgYmxrcmVwbGF5Li4uCkNoZWNraW5n
-IFBBVENIIDIvMjY6IGJsa3JlcGxheTogY3JlYXRlIHRlbXBvcmFyeSBvdmVybGF5IGZvciB1bmRl
-cmxheWluZyBkZXZpY2VzLi4uCkNoZWNraW5nIFBBVENIIDMvMjY6IHJlcGxheTogZGlzYWJsZSBk
-ZWZhdWx0IHNuYXBzaG90IGZvciByZWNvcmQvcmVwbGF5Li4uCkNoZWNraW5nIFBBVENIIDQvMjY6
-IHJlcGxheTogZml4IHByb2Nlc3NpbmcgYXN5bmMgZXZlbnRzLi4uCkNoZWNraW5nIFBBVENIIDUv
-MjY6IHJlcGxheTogZml4ZWQgcmVwbGF5X2VuYWJsZV9ldmVudHMuLi4KQ2hlY2tpbmcgUEFUQ0gg
-Ni8yNjogcmVwbGF5OiBmaXggc2F2ZS9sb2FkIHZtIGZvciBub24tZW1wdHkgcXVldWUuLi4KRVJS
-T1I6IEVycm9yIG1lc3NhZ2VzIHNob3VsZCBub3QgY29udGFpbiBuZXdsaW5lcwojNjA6IEZJTEU6
-IG1pZ3JhdGlvbi9zYXZldm0uYzoyMzIyOgorICAgICAgICAgICAgICAgICAgICAgInJpZ2h0IG5v
-dy4gVHJ5IG9uY2UgbW9yZSBsYXRlci5cbiIpOwoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdz
-LCA0OCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNl
-IHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBv
-cnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMu
-CgpDaGVja2luZyBQQVRDSCA3LzI2OiByZXBsYXk6IGFkZGVkIHJlcGxheSBsb2cgZm9ybWF0IGRl
-c2NyaXB0aW9uLi4uCkNoZWNraW5nIFBBVENIIDgvMjY6IHJlcGxheTogbWFrZSBzYWZlIHZtc3Rv
-cCBhdCByZWNvcmQvcmVwbGF5Li4uCkVSUk9SOiBFcnJvciBtZXNzYWdlcyBzaG91bGQgbm90IGNv
-bnRhaW4gbmV3bGluZXMKIzQ1OiBGSUxFOiBtaWdyYXRpb24vc2F2ZXZtLmM6MjE0NzoKKyAgICAg
-ICAgICAgICAgICAgICAgICJyaWdodCBub3cuIFRyeSBvbmNlIG1vcmUgbGF0ZXIuXG4iKTsKCnRv
-dGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMjMgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBo
-YXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3Jz
-CmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpD
-SEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggOS8yNjogcmVwbGF5OiBz
-YXZlIHByaW9yIHZhbHVlIG9mIHRoZSBob3N0IGNsb2NrLi4uCkNoZWNraW5nIFBBVENIIDEwLzI2
-OiBpY291bnQ6IGZpeGVkIHNhdmluZy9yZXN0b3Jpbmcgb2YgaWNvdW50IHdhcnAgdGltZXJzLi4u
-CkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJyonIChjdHg6VnhWKQojMTcxOiBG
-SUxFOiBjcHVzLmM6Njg4OgorICAgIC5zdWJzZWN0aW9ucyA9IChjb25zdCBWTVN0YXRlRGVzY3Jp
-cHRpb24qW10pIHsKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-XgoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAxNzQgbGluZXMgY2hlY2tlZAoKWW91ciBw
-YXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2Ug
-ZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIs
-IHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMTEvMjY6IHRh
-cmdldC9hcm0vYXJtLXBvd2VydGN0bDogZHJvcCBCUUwgYXNzZXJ0aW9ucy4uLgpDaGVja2luZyBQ
-QVRDSCAxMi8yNjogY3B1czogcHVzaCBCUUwgbG9jayB0byBxZW11Xypfd2FpdF9pb19ldmVudC4u
-LgpDaGVja2luZyBQQVRDSCAxMy8yNjogY3B1czogb25seSB0YWtlIEJRTCBmb3Igc2xlZXBpbmcg
-dGhyZWFkcy4uLgpDaGVja2luZyBQQVRDSCAxNC8yNjogcmVwbGF5L3JlcGxheS5jOiBidW1wIFJF
-UExBWV9WRVJTSU9OIGFnYWluLi4uCkNoZWNraW5nIFBBVENIIDE1LzI2OiByZXBsYXkvcmVwbGF5
-LWludGVybmFsLmM6IHRyYWNrIGhvbGRpbmcgb2YgcmVwbGF5X2xvY2suLi4KQ2hlY2tpbmcgUEFU
-Q0ggMTYvMjY6IHJlcGxheTogbWFrZSBsb2NraW5nIHZpc2libGUgb3V0c2lkZSByZXBsYXkgY29k
-ZS4uLgpDaGVja2luZyBQQVRDSCAxNy8yNjogcmVwbGF5OiBwdXNoIHJlcGxheV9tdXRleF9sb2Nr
-IHVwIHRoZSBjYWxsIHRyZWUuLi4KQ2hlY2tpbmcgUEFUQ0ggMTgvMjY6IGNwdS1leGVjOiBkb24n
-dCBvdmVyd3JpdGUgZXhjZXB0aW9uX2luZGV4Li4uCkNoZWNraW5nIFBBVENIIDE5LzI2OiBjcHUt
-ZXhlYzogcmVzZXQgZXhpdCBmbGFnIGJlZm9yZSBjYWxsaW5nIGNwdV9leGVjX25vY2FjaGUuLi4K
-Q2hlY2tpbmcgUEFUQ0ggMjAvMjY6IHJlcGxheTogZG9uJ3QgZGVzdHJveSBtdXRleCBhdCBleGl0
-Li4uCkNoZWNraW5nIFBBVENIIDIxLzI2OiByZXBsYXk6IGNoZWNrIHJldHVybiB2YWx1ZXMgb2Yg
-ZndyaXRlLi4uCkNoZWNraW5nIFBBVENIIDIyLzI2OiBzY3JpcHRzL3FlbXUtZ2RiOiBhZGQgc2lt
-cGxlIHRjZyBsb2NrIHN0YXR1cyBoZWxwZXIuLi4KQ2hlY2tpbmcgUEFUQ0ggMjMvMjY6IHV0aWwv
-cWVtdS10aHJlYWQtKjogYWRkIHFlbXVfbG9jaywgbG9ja2VkIGFuZCB1bmxvY2sgdHJhY2UgZXZl
-bnRzLi4uCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMzMDogRklMRTogaW5jbHVk
-ZS9xZW11L3RocmVhZC5oOjMwOgorI2RlZmluZSBxZW11X211dGV4X3RyeWxvY2sobXV0ZXgpIHFl
-bXVfbXV0ZXhfdHJ5bG9ja19pbXBsKG11dGV4LCBfX0ZJTEVfXywgX19MSU5FX18pCgpXQVJOSU5H
-OiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMzE6IEZJTEU6IGluY2x1ZGUvcWVtdS90aHJlYWQu
-aDozMToKKyNkZWZpbmUgcWVtdV9tdXRleF91bmxvY2sobXV0ZXgpIHFlbXVfbXV0ZXhfdW5sb2Nr
-X2ltcGwobXV0ZXgsIF9fRklMRV9fLCBfX0xJTkVfXykKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hh
-cmFjdGVycwojNDA6IEZJTEU6IGluY2x1ZGUvcWVtdS90aHJlYWQuaDo0NjoKK3ZvaWQgcWVtdV9j
-b25kX3dhaXRfaW1wbChRZW11Q29uZCAqY29uZCwgUWVtdU11dGV4ICptdXRleCwgY29uc3QgY2hh
-ciAqZmlsZSwgY29uc3QgaW50IGxpbmUpOwoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3Rl
-cnMKIzQyOiBGSUxFOiBpbmNsdWRlL3FlbXUvdGhyZWFkLmg6NDg6CisjZGVmaW5lIHFlbXVfY29u
-ZF93YWl0KGNvbmQsIG11dGV4KSBxZW11X2NvbmRfd2FpdF9pbXBsKGNvbmQsIG11dGV4LCBfX0ZJ
-TEVfXywgX19MSU5FX18pCgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzEwNzogRklM
-RTogdXRpbC9xZW11LXRocmVhZC1wb3NpeC5jOjE1ODoKK3ZvaWQgcWVtdV9jb25kX3dhaXRfaW1w
-bChRZW11Q29uZCAqY29uZCwgUWVtdU11dGV4ICptdXRleCwgY29uc3QgY2hhciAqZmlsZSwgY29u
-c3QgaW50IGxpbmUpCgp0b3RhbDogMiBlcnJvcnMsIDMgd2FybmluZ3MsIDEwMyBsaW5lcyBjaGVj
-a2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFu
-eSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUg
-bWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRD
-SCAyNC8yNjogc2NyaXB0cy9hbmFseXNlLWxvY2tzLXNpbXBsZXRyYWNlLnB5OiBzY3JpcHQgdG8g
-YW5hbHlzZSBsb2NrIHRpbWVzLi4uCkNoZWNraW5nIFBBVENIIDI1LzI2OiBzY3JpcHRzL3JlcGxh
-eS1kdW1wLnB5OiByZXBsYXkgbG9nIGR1bXBlci4uLgpDaGVja2luZyBQQVRDSCAyNi8yNjogc2Ny
-aXB0cy9xZW11LWdkYi90aW1lcnMucHk6IG5ldyBoZWxwZXIgdG8gZHVtcCB0aW1lciBzdGF0ZS4u
-Lgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoK
-LS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRj
-aGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJl
-ZWxpc3RzLm9yZw==
+> From: Andrew Baumann
+> Sent: Tuesday, 31 October 2017 21:02
+[...]
+> +static uint8_t convert_stage2_attrs(CPUARMState *env, uint8_t s2attrs)
+> +{
+> +    uint8_t hiattr =3D extract32(s2attrs, 2, 2);
+> +    uint8_t loattr =3D extract32(s2attrs, 0, 2);
+> +    uint8_t hihint =3D 0, lohint =3D 0;
+> +
+> +    if (hiattr !=3D 0) { /* normal memory */
+> +        /* TODO: to faithfully emulate S2CacheDisabled() for the case
+> +         * when EL2 is aarch32, we should check HCR2 (not HCR_EL2), but
+> +         * qemu doesn't presently model this register.
+> +         */
+> +        if ((env->cp15.hcr_el2 & HCR_CD) !=3D 0) { /* cache disabled */
+> +            hiattr =3D loattr =3D 1; /* non-cacheable */
+> +        } else {
+> +            if (hiattr !=3D 1) { /* Write-through or write-back */
+> +                hihint =3D 3; /* RW allocate */
+> +            }
+> +            if (loattr !=3D 1) { /* Write-through or write-back */
+> +                lohint =3D 3; /* RW allocate */
+> +            }
+> +        }
+> +    }
+> +
+> +    return (hiattr << 6) | (hihint << 2) | (loattr << 2) | lohint;
+> +}
+
+Right after sending this, I noticed a dumb copy-paste bug: the above should=
+ be hihint << 4.
+I'm obviously going a bit too fast, sorry.
+
+Andrew
