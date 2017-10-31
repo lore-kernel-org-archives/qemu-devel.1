@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40591)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40751)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1e9UPc-0005Zk-Gg
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 07:08:53 -0400
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1e9UPn-0005jB-2e
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 07:09:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1e9UPb-0007u6-Bu
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 07:08:52 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:42472)
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1e9UPl-00084b-Sa
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 07:09:03 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:42500)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1e9UPa-0007tb-Ss
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 07:08:51 -0400
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1e9UPl-000846-Jt
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 07:09:01 -0400
 From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Date: Tue, 31 Oct 2017 14:08:51 +0300
-Message-ID: <20171031110851.5836.85776.stgit@pasha-VirtualBox>
+Date: Tue, 31 Oct 2017 14:09:01 +0300
+Message-ID: <20171031110901.5836.26880.stgit@pasha-VirtualBox>
 In-Reply-To: <20171031110641.5836.43266.stgit@pasha-VirtualBox>
 References: <20171031110641.5836.43266.stgit@pasha-VirtualBox>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [RFC PATCH 24/26]
- scripts/analyse-locks-simpletrace.py: script to analyse lock times
+Subject: [Qemu-devel] [RFC PATCH 26/26] scripts/qemu-gdb/timers.py: new
+ helper to dump timer state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,135 +32,97 @@ Cc: dovgaluk@ispras.ru
 
 From: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
-This script allows analysis of mutex acquisition and hold times based
-on a trace file. Given a trace control file of:
-
-  qemu_mutex_lock
-  qemu_mutex_locked
-  qemu_mutex_unlock
-
-And running with:
-
-  $QEMU $QEMU_ARGS -trace events=3D./lock-trace
-
-You can analyse the results with:
-
-  ./scripts/analyse-locks-simpletrace.py trace-events-all ./trace-21812
+This introduces the qemu-gdb command "qemu timers" which will dump the
+state of the main timers in the system.
 
 Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
 ---
- scripts/analyse-locks-simpletrace.py |   99 ++++++++++++++++++++++++++++=
+ scripts/qemu-gdb.py       |    3 ++-
+ scripts/qemugdb/timers.py |   54 +++++++++++++++++++++++++++++++++++++++=
 ++++++
- 1 file changed, 99 insertions(+)
- create mode 100755 scripts/analyse-locks-simpletrace.py
+ 2 files changed, 56 insertions(+), 1 deletion(-)
+ create mode 100644 scripts/qemugdb/timers.py
 
-diff --git a/scripts/analyse-locks-simpletrace.py b/scripts/analyse-locks=
--simpletrace.py
-new file mode 100755
-index 0000000..b72c951
+diff --git a/scripts/qemu-gdb.py b/scripts/qemu-gdb.py
+index d58213e..690827e 100644
+--- a/scripts/qemu-gdb.py
++++ b/scripts/qemu-gdb.py
+@@ -26,7 +26,7 @@ import os, sys
+=20
+ sys.path.append(os.path.dirname(__file__))
+=20
+-from qemugdb import aio, mtree, coroutine, tcg
++from qemugdb import aio, mtree, coroutine, tcg, timers
+=20
+ class QemuCommand(gdb.Command):
+     '''Prefix for QEMU debug support commands'''
+@@ -39,6 +39,7 @@ coroutine.CoroutineCommand()
+ mtree.MtreeCommand()
+ aio.HandlersCommand()
+ tcg.TCGLockStatusCommand()
++timers.TimersCommand()
+=20
+ coroutine.CoroutineSPFunction()
+ coroutine.CoroutinePCFunction()
+diff --git a/scripts/qemugdb/timers.py b/scripts/qemugdb/timers.py
+new file mode 100644
+index 0000000..be71a00
 --- /dev/null
-+++ b/scripts/analyse-locks-simpletrace.py
-@@ -0,0 +1,99 @@
-+#!/usr/bin/env python
-+# -*- coding: utf-8 -*-
++++ b/scripts/qemugdb/timers.py
+@@ -0,0 +1,54 @@
++#!/usr/bin/python
++# GDB debugging support
 +#
-+# Analyse lock events and
++# Copyright 2017 Linaro Ltd
 +#
 +# Author: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 +#
++# This work is licensed under the terms of the GNU GPL, version 2.  See
++# the COPYING file in the top-level directory.
 +
-+import os
-+import simpletrace
-+import argparse
-+import numpy as np
++# 'qemu timers' -- display the current timerlists
 +
-+class MutexAnalyser(simpletrace.Analyzer):
-+    "A simpletrace Analyser for checking locks."
++import gdb
++
++class TimersCommand(gdb.Command):
++    '''Display the current QEMU timers'''
 +
 +    def __init__(self):
-+        self.locks =3D 0
-+        self.locked =3D 0
-+        self.unlocks =3D 0
-+        self.mutex_records =3D {}
++        'Register the class as a gdb command'
++        gdb.Command.__init__(self, 'qemu timers', gdb.COMMAND_DATA,
++                             gdb.COMPLETE_NONE)
 +
-+    def _get_mutex(self, mutex):
-+        if not mutex in self.mutex_records:
-+            self.mutex_records[mutex] =3D {"locks": 0,
-+                                         "lock_time": 0,
-+                                         "acquire_times": [],
-+                                         "locked": 0,
-+                                         "locked_time": 0,
-+                                         "held_times": [],
-+                                         "unlocked": 0}
++    def dump_timers(self, timer):
++        "Follow a timer and recursively dump each one in the list."
++        # timer should be of type QemuTimer
++        gdb.write("    timer %s/%s (cb:%s,opq:%s)\n" % (
++            timer['expire_time'],
++            timer['scale'],
++            timer['cb'],
++            timer['opaque']))
 +
-+        return self.mutex_records[mutex]
-+
-+    def qemu_mutex_lock(self, timestamp, mutex, filename, line):
-+        self.locks +=3D 1
-+        rec =3D self._get_mutex(mutex)
-+        rec["locks"] +=3D 1
-+        rec["lock_time"] =3D timestamp[0]
-+        rec["lock_loc"] =3D (filename, line)
-+
-+    def qemu_mutex_locked(self, timestamp, mutex, filename, line):
-+        self.locked +=3D 1
-+        rec =3D self._get_mutex(mutex)
-+        rec["locked"] +=3D 1
-+        rec["locked_time"] =3D timestamp[0]
-+        acquire_time =3D rec["locked_time"] - rec["lock_time"]
-+        rec["locked_loc"] =3D (filename, line)
-+        rec["acquire_times"].append(acquire_time)
-+
-+    def qemu_mutex_unlock(self, timestamp, mutex, filename, line):
-+        self.unlocks +=3D 1
-+        rec =3D self._get_mutex(mutex)
-+        rec["unlocked"] +=3D 1
-+        held_time =3D timestamp[0] - rec["locked_time"]
-+        rec["held_times"].append(held_time)
-+        rec["unlock_loc"] =3D (filename, line)
++        if int(timer['next']) > 0:
++            self.dump_timers(timer['next'])
 +
 +
-+def get_args():
-+    "Grab options"
-+    parser =3D argparse.ArgumentParser()
-+    parser.add_argument("--output", "-o", type=3Dstr, help=3D"Render plo=
-t to file")
-+    parser.add_argument("events", type=3Dstr, help=3D'trace file read fr=
-om')
-+    parser.add_argument("tracefile", type=3Dstr, help=3D'trace file read=
- from')
-+    return parser.parse_args()
++    def process_timerlist(self, tlist, ttype):
++        gdb.write("Processing %s timers\n" % (ttype))
++        gdb.write("  clock %s is enabled:%s, last:%s\n" % (
++            tlist['clock']['type'],
++            tlist['clock']['enabled'],
++            tlist['clock']['last']))
++        if int(tlist['active_timers']) > 0:
++            self.dump_timers(tlist['active_timers'])
 +
-+if __name__ =3D=3D '__main__':
-+    args =3D get_args()
 +
-+    # Gather data from the trace
-+    analyser =3D MutexAnalyser()
-+    simpletrace.process(args.events, args.tracefile, analyser)
++    def invoke(self, arg, from_tty):
++        'Run the command'
++        main_timers =3D gdb.parse_and_eval("main_loop_tlg")
 +
-+    print ("Total locks: %d, locked: %d, unlocked: %d" %
-+           (analyser.locks, analyser.locked, analyser.unlocks))
-+
-+    # Now dump the individual lock stats
-+    for key, val in sorted(analyser.mutex_records.iteritems(),
-+                           key=3Dlambda (k,v): v["locks"]):
-+        print ("Lock: %#x locks: %d, locked: %d, unlocked: %d" %
-+               (key, val["locks"], val["locked"], val["unlocked"]))
-+
-+        acquire_times =3D np.array(val["acquire_times"])
-+        if len(acquire_times) > 0:
-+            print ("  Acquire Time: min:%d median:%d avg:%.2f max:%d" %
-+                   (acquire_times.min(), np.median(acquire_times),
-+                    acquire_times.mean(), acquire_times.max()))
-+
-+        held_times =3D np.array(val["held_times"])
-+        if len(held_times) > 0:
-+            print ("  Held Time: min:%d median:%d avg:%.2f max:%d" %
-+                   (held_times.min(), np.median(held_times),
-+                    held_times.mean(), held_times.max()))
-+
-+        # Check if any locks still held
-+        if val["locks"] > val["locked"]:
-+            print ("  LOCK HELD (%s:%s)" % (val["locked_loc"]))
-+            print ("  BLOCKED   (%s:%s)" % (val["lock_loc"]))
++        # This will break if QEMUClockType in timer.h is redfined
++        self.process_timerlist(main_timers['tl'][0], "Realtime")
++        self.process_timerlist(main_timers['tl'][1], "Virtual")
++        self.process_timerlist(main_timers['tl'][2], "Host")
++        self.process_timerlist(main_timers['tl'][3], "Virtual RT")
