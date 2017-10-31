@@ -1,35 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59216)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59239)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1e9dO3-0000xM-6X
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 16:43:52 -0400
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1e9dO4-0000yG-Aa
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 16:43:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1e9dO0-0004BA-2s
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 16:43:51 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:52590)
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1e9dO0-0004BS-Bq
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 16:43:52 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:48494
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
-	id 1e9dNz-0004Ak-QX
+	id 1e9dO0-0004B4-68
 	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 16:43:48 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v9VKeisl080699
-	for <qemu-devel@nongnu.org>; Tue, 31 Oct 2017 16:43:45 -0400
-Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2dxy79bsrp-1
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v9VKeLU1070345
+	for <qemu-devel@nongnu.org>; Tue, 31 Oct 2017 16:43:46 -0400
+Received: from e38.co.us.ibm.com (e38.co.us.ibm.com [32.97.110.159])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2dxva4vvn1-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 31 Oct 2017 16:43:44 -0400
+	for <qemu-devel@nongnu.org>; Tue, 31 Oct 2017 16:43:46 -0400
 Received: from localhost
-	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e38.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
-	Tue, 31 Oct 2017 14:43:44 -0600
+	Tue, 31 Oct 2017 14:43:45 -0600
 From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-Date: Tue, 31 Oct 2017 18:43:27 -0200
+Date: Tue, 31 Oct 2017 18:43:28 -0200
 In-Reply-To: <20171031204330.14803-1-danielhb@linux.vnet.ibm.com>
 References: <20171031204330.14803-1-danielhb@linux.vnet.ibm.com>
-Message-Id: <20171031204330.14803-2-danielhb@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v2 1/4] tests: adding 'check_exception' RTAS
- implementation
+Message-Id: <20171031204330.14803-3-danielhb@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v2 2/4] tests: adding 'set_indicator' RTAS call
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,77 +41,55 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, mdroth@linux.vnet.ibm.com, lvivier@redhat.com
 
-In the sPAPR guest, events such as device hotplug/unplug are
-retrieved by the check_exception RTAS call after the guest
-receives an IRQ pulse. For both hotplug and unplug operations,
-guest intervention is required to transit the DRC state of
-the attached device to the configured state.
+'set_indicator' is a RTAS hypercall that is used to change
+the state of both physical and logical devices DRCs by setting
+allocation-state, isolation-state and dr-indicator.
 
-Without guest intervention, we are still able of qtesting hotplug
-devices in the same manner that we support device hotplug in
-early (pre-CAS) stages.
-
-Unfortunately, hot unplugs qtests relies on callbacks that demands
-guest intervention to complete - otherwise we risk leaving the guest
-in an inconsistent state that might impact other hotplug/unplug
-operations later on. If we want to make hot unplug qtests we'll
-need to simulate the guest behavior in the scenario in which a
-hot unplug is received, allowing the hot unplug process to go
-as intended.
-
-This patch is the first step towards hot unplug qtests in sPAPR,
-implementing the check_exception RTAS hypercall in libqos. This
-hypercall is used to fetch events such as hotplug/hot unplug from
-the sPAPR machine after the guest receives an IRQ pulse (or,
-in the case of the test implemented here, we simply know when
-there is/isn't an event to be retrieved).
+This patch implements the set_indicator RTAS call in
+tests/libqos/rtas.c, adding its test in tests/rtas-test.c.
 
 Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
 ---
- tests/libqos/rtas.c | 37 +++++++++++++++++++++++++
+ tests/libqos/rtas.c | 33 ++++++++++++++++++++++++
  tests/libqos/rtas.h |  2 ++
- tests/rtas-test.c   | 77 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 116 insertions(+)
+ tests/rtas-test.c   | 73 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 108 insertions(+)
 
 diff --git a/tests/libqos/rtas.c b/tests/libqos/rtas.c
-index 0269803ce0..fdeab448f7 100644
+index fdeab448f7..ade572a84f 100644
 --- a/tests/libqos/rtas.c
 +++ b/tests/libqos/rtas.c
-@@ -114,3 +114,40 @@ int qrtas_ibm_write_pci_config(QGuestAllocator *alloc, uint64_t buid,
+@@ -151,3 +151,36 @@ int qrtas_check_exception(QGuestAllocator *alloc, uint32_t mask,
  
-     return 0;
+     return ret[0];
  }
 +
 +/*
-+ * check_exception as defined by PAPR 2.7+, 7.3.3.2
++ * set_indicator as defined by PAPR 2.7+, 7.3.5.4
 + *
-+ * nargs = 7 (with Extended Information)
++ * nargs = 3
 + * nrets = 1
 + *
-+ * arg[2] = mask of event classes to process
-+ * arg[4] = real address of error log
-+ * arg[5] = length of error log
++ * arg[0] = the type of the indicator
++ * arg[1] = index of the specific indicator
++ * arg[2] = desired new state
 + *
-+ * arg[0] (Vector Offset), arg[1] and arg[6] (Additional information)
-+ * and arg[3] (Critical) aren't used in the logic of check_exception
-+ * in hw/ppc/spapr_events.c and can be ignored.
-+ *
-+ * If there is an event that matches the given mask, check-exception writes
-+ * it in buf_addr up to a max of buf_len bytes.
-+ *
++ * Depending on the input, set_indicator will call set_isolation_state,
++ * set_allocation_state or set_dr_indicator in hw/ppc/spapr_drc.c.
++ * These functions allows the guest to control the state of hotplugged
++ * and hot unplugged devices.
 + */
-+int qrtas_check_exception(QGuestAllocator *alloc, uint32_t mask,
-+                          uint32_t buf_addr, uint32_t buf_len)
++int qrtas_set_indicator(QGuestAllocator *alloc, uint32_t type, uint32_t idx,
++                        uint32_t new_state)
 +{
-+    uint32_t args[7], ret[1];
++    uint32_t args[3], ret[1];
 +    int res;
 +
-+    args[0] = args[1] = args[3] = args[6] = 0;
-+    args[2] = mask;
-+    args[4] = buf_addr;
-+    args[5] = buf_len;
++    args[0] = type;
++    args[1] = idx;
++    args[2] = new_state;
 +
-+    res = qrtas_call(alloc, "check-exception", 7, args, 1, ret);
++    res = qrtas_call(alloc, "set-indicator", 3, args, 1, ret);
 +    if (res != 0) {
 +        return -1;
 +    }
@@ -119,100 +97,99 @@ index 0269803ce0..fdeab448f7 100644
 +    return ret[0];
 +}
 diff --git a/tests/libqos/rtas.h b/tests/libqos/rtas.h
-index 498eb19230..330ecfd397 100644
+index 330ecfd397..9dfa18f32b 100644
 --- a/tests/libqos/rtas.h
 +++ b/tests/libqos/rtas.h
-@@ -12,4 +12,6 @@ uint32_t qrtas_ibm_read_pci_config(QGuestAllocator *alloc, uint64_t buid,
-                                    uint32_t addr, uint32_t size);
- int qrtas_ibm_write_pci_config(QGuestAllocator *alloc, uint64_t buid,
+@@ -14,4 +14,6 @@ int qrtas_ibm_write_pci_config(QGuestAllocator *alloc, uint64_t buid,
                                 uint32_t addr, uint32_t size, uint32_t val);
-+int qrtas_check_exception(QGuestAllocator *alloc, uint32_t mask,
-+                          uint32_t buf_addr, uint32_t buf_len);
+ int qrtas_check_exception(QGuestAllocator *alloc, uint32_t mask,
+                           uint32_t buf_addr, uint32_t buf_len);
++int qrtas_set_indicator(QGuestAllocator *alloc, uint32_t type, uint32_t idx,
++                        uint32_t new_state);
  #endif /* LIBQOS_RTAS_H */
 diff --git a/tests/rtas-test.c b/tests/rtas-test.c
-index 276c87ef84..c5a6080043 100644
+index c5a6080043..2c34b6e83c 100644
 --- a/tests/rtas-test.c
 +++ b/tests/rtas-test.c
-@@ -5,6 +5,9 @@
- #include "libqos/libqos-spapr.h"
- #include "libqos/rtas.h"
+@@ -8,6 +8,13 @@
+ #define EVENT_MASK_EPOW (1 << 30)
+ #define EVENT_LOG_LEN 2048
  
-+#define EVENT_MASK_EPOW (1 << 30)
-+#define EVENT_LOG_LEN 2048
++#define RTAS_SENSOR_TYPE_ISOLATION_STATE 9001
++#define RTAS_SENSOR_TYPE_ALLOCATION_STATE 9003
++#define SPAPR_DR_ISOLATION_STATE_ISOLATED 0
++#define SPAPR_DR_ALLOCATION_STATE_UNUSABLE 0
++#define SPAPR_DR_ALLOCATION_STATE_USABLE  1
++#define SPAPR_DR_ISOLATION_STATE_UNISOLATED 1
 +
  static void test_rtas_get_time_of_day(void)
  {
      QOSState *qs;
-@@ -24,6 +27,76 @@ static void test_rtas_get_time_of_day(void)
+@@ -97,6 +104,71 @@ static void test_rtas_check_exception_hotplug_event(void)
      qtest_shutdown(qs);
  }
  
-+static void test_rtas_check_exception_no_events(void)
++/*
++ * To test the 'set-indicator' RTAS call we will hotplug a device
++ * (in this case a CPU) and then make its DRC state go from
++ * the starting state UNUSABLE(1) to UNISOLATE(3). These DRC
++ * states transitions are described in further detail in
++ * PAPR 2.7+ 13.4.
++ */
++static void test_rtas_set_indicator(void)
 +{
 +    QOSState *qs;
 +    uint64_t ret;
 +    uintptr_t guest_buf_addr;
++    uint32_t drc_index;
 +    uint8_t *buf = g_malloc0(EVENT_LOG_LEN);
-+
-+    qs = qtest_spapr_boot("-machine pseries");
-+    guest_buf_addr = guest_alloc(qs->alloc, EVENT_LOG_LEN * sizeof(uint8_t));
-+
-+    /*
-+     * mask = 0 should return no events, returning
-+     * RTAS_OUT_NO_ERRORS_FOUND (1).
-+     */
-+    ret = qrtas_check_exception(qs->alloc, 0, guest_buf_addr, EVENT_LOG_LEN);
-+    g_assert_cmpint(ret, ==, 1);
-+
-+    /*
-+     * Using a proper event mask should also return
-+     * no events since no hotplugs happened.
-+     */
-+    ret = qrtas_check_exception(qs->alloc, EVENT_MASK_EPOW, guest_buf_addr,
-+                                EVENT_LOG_LEN);
-+    g_assert_cmpint(ret, ==, 1);
-+
-+    guest_free(qs->alloc, guest_buf_addr);
-+    g_free(buf);
-+
-+    qtest_shutdown(qs);
-+}
-+
-+static void test_rtas_check_exception_hotplug_event(void)
-+{
-+    QOSState *qs;
-+    uint64_t ret;
-+    uintptr_t guest_buf_addr;
-+    uint8_t *buf = g_malloc0(EVENT_LOG_LEN);
-+    uint8_t *zero_buf = g_malloc0(EVENT_LOG_LEN);
 +
 +    qs = qtest_spapr_boot("-machine pseries -cpu POWER8_v2.0 "
 +                          "-smp 1,sockets=4,cores=1,threads=1,maxcpus=4");
 +
 +    guest_buf_addr = guest_alloc(qs->alloc, EVENT_LOG_LEN * sizeof(uint8_t));
-+
 +    qtest_qmp_device_add("power8_v2.0-spapr-cpu-core", "id-1",
 +                         "'core-id':'1'");
-+    /*
-+     * We use EPOW mask instead of HOTPLUG because the code defaults
-+     * the hotplug interrupt source to EPOW if the guest didn't change
-+     * OV5_HP_EVT during CAS.
-+     */
++
 +    ret = qrtas_check_exception(qs->alloc, EVENT_MASK_EPOW,
 +                                guest_buf_addr, EVENT_LOG_LEN);
 +
 +    memread(guest_buf_addr, buf, EVENT_LOG_LEN);
 +    guest_free(qs->alloc, guest_buf_addr);
 +
-+    /*
-+     * Calling check_exception after a hotplug needs to return
-+     * RTAS_OUT_SUCCESS (0) and a non-zero error_log.
-+     */
 +    g_assert_cmpint(ret, ==, 0);
-+    g_assert(memcmp(buf, zero_buf, EVENT_LOG_LEN) != 0);
 +
++    /*
++     * This time we can't ignore the event log written in the
++     * check_exception call - we need the DRC index of the
++     * recently added CPU to make the state changes using set_indicator.
++     *
++     * A bit of magic to go straight to the DRC index by checking the
++     * error log format in hw/ppc/spapr_events.c:
++     *
++     * - rtas_error_log size = 8 bytes
++     * - all other structures until the hotplug event log = 88 bytes
++     * - inside the hotplug event log, skip 8 + 4 bytes to get to
++     *   the drc_id union.
++     *
++     * This gives us a 108 bytes skip to get the drc info, which is
++     * written in be32.
++     */
++    drc_index = be32toh(*((uint32_t *)(buf + 108)));
 +    g_free(buf);
-+    g_free(zero_buf);
++
++    /*
++     * According to the DRC state diagram, the guest first sets a device
++     * to USABLE (2), then UNISOLATED (3). Both should return
++     * RTAS_OUT_SUCCESS(0).
++     */
++    ret = qrtas_set_indicator(qs->alloc, RTAS_SENSOR_TYPE_ALLOCATION_STATE,
++                              drc_index, SPAPR_DR_ALLOCATION_STATE_USABLE);
++    g_assert_cmpint(ret, ==, 0);
++
++    ret = qrtas_set_indicator(qs->alloc, RTAS_SENSOR_TYPE_ISOLATION_STATE,
++                              drc_index, SPAPR_DR_ISOLATION_STATE_UNISOLATED);
++    g_assert_cmpint(ret, ==, 0);
 +
 +    qtest_shutdown(qs);
 +}
@@ -220,14 +197,11 @@ index 276c87ef84..c5a6080043 100644
  int main(int argc, char *argv[])
  {
      const char *arch = qtest_get_arch();
-@@ -35,6 +108,10 @@ int main(int argc, char *argv[])
-         exit(EXIT_FAILURE);
-     }
-     qtest_add_func("rtas/get-time-of-day", test_rtas_get_time_of_day);
-+    qtest_add_func("rtas/rtas-check-exception-no-events",
-+                   test_rtas_check_exception_no_events);
-+    qtest_add_func("rtas/rtas-check-exception-hotplug-event",
-+                   test_rtas_check_exception_hotplug_event);
+@@ -112,6 +184,7 @@ int main(int argc, char *argv[])
+                    test_rtas_check_exception_no_events);
+     qtest_add_func("rtas/rtas-check-exception-hotplug-event",
+                    test_rtas_check_exception_hotplug_event);
++    qtest_add_func("rtas/test_rtas_set_indicator", test_rtas_set_indicator);
  
      return g_test_run();
  }
