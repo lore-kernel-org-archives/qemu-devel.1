@@ -1,34 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51245)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51291)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1e9UhF-0004K0-Tu
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 07:27:07 -0400
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1e9UhL-0004P1-7u
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 07:27:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1e9UhE-0000v5-TO
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 07:27:05 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:45454)
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1e9UhG-0000ww-R5
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 07:27:11 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:45468)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1e9UhE-0000ug-Li
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 07:27:04 -0400
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-References: <CAPnv1PJeMRPKv9UUSmSWxyn=GFOPaWY8eUgH8ZeL=ZBMDJpbdg@mail.gmail.com>
-	<CAJhHMCCZh7hvQT8x9Bks9k6=ka4G1Oybv1MrkKJ9_VZ_eRZBfQ@mail.gmail.com>
-	<CAPnv1PL7-BAt36BvTxP7G8J8990Ur9MJJbr-QPccWziD4sy28g@mail.gmail.com>
-	<87bmrj8eks.fsf@linaro.org>
-	<CAPnv1PKyak1G-uL=H=-Vh_9TH2dZKffYjDf_2Z+LWuqovMKCBQ@mail.gmail.com>
-	<CAKSfGUC_k6K=2Xy8pGcwuQ66DMPYCDvA47Ojgm7ntQfALGwDsQ@mail.gmail.com>
-	<CAKSfGUD-FEb+DGwtrVHm2_NR_WOes9_+WkPm3Z76OPNhc3vbGA@mail.gmail.com>
-	<000601d33128$2dd9d5e0$898d81a0$@ru> <87bmm7dohw.fsf@linaro.org>
-	<CAKSfGUCt7p95nDeW12Q_-BSTXVhRLPtL+=u_WLx5_BZEgAgeLw@mail.gmail.com>
-	<878thaepe2.fsf@linaro.org>
-In-Reply-To: <878thaepe2.fsf@linaro.org>
-Date: Tue, 31 Oct 2017 14:27:04 +0300
-Message-ID: <000d01d3523b$2e00f880$8a02e980$@ru>
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1e9UhG-0000wK-Ec
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 07:27:06 -0400
+From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+Date: Tue, 31 Oct 2017 14:27:06 +0300
+Message-ID: <20171031112706.10516.50173.stgit@pasha-VirtualBox>
+In-Reply-To: <20171031112457.10516.8971.stgit@pasha-VirtualBox>
+References: <20171031112457.10516.8971.stgit@pasha-VirtualBox>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Language: ru
-Subject: Re: [Qemu-devel] What is the best commit for record-replay?
+Subject: [Qemu-devel] [RFC PATCH 23/26] util/qemu-thread-*: add qemu_lock,
+ locked and unlock trace events
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,40 +27,161 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?'Alex_Benn=C3=A9e'?= <alex.bennee@linaro.org>, 'Aleksandr Bezzubikov' <zuban32s@gmail.com>
-Cc: 'QEMU Developers' <qemu-devel@nongnu.org>, 'Pranith Kumar' <bobby.prani+qemu@gmail.com>, pavel.dovgaluk@ispras.ru, 'Aleksandr Bezzubikov' <abezzubikov@ispras.ru>, 'Paolo Bonzini' <pbonzini@redhat.com>, 'Igor R' <boost.lists@gmail.com>
+To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, boost.lists@gmail.com, quintela@redhat.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, kraxel@redhat.com, pavel.dovgaluk@ispras.ru, pbonzini@redhat.com, alex.bennee@linaro.org
 
-> From: Alex Benn=C3=A9e [mailto:alex.bennee@linaro.org]
-> Aleksandr Bezzubikov <zuban32s@gmail.com> writes:
->=20
-> > 2017-09-19 12:30 GMT+03:00 Alex Benn=C3=A9e =
-<alex.bennee@linaro.org>:
-> >>
-> >>> As I know, RR is still broken in the current version.
-> >>> It was caused by the MTTCG implementation.
-> >>> Alex Bennee tried to fix RR back. Alex, have you found any =
-solution?
-> >>>
-> >>> We also trying to find a way to fix RR. It seems, that we will =
-reinvent BQL for RR.
-> >>
-> >> I think the method outlined in my RFC is the way to go, essentially =
-the
-> >> RR mutex taking over for the what the BQL did. The RFC patch hadn't
-> >> hoisted the mutex for the additional devices so I'm just re-basing =
-now
-> >> and I'll see if I can make the changes for Igor's test case.
-> >>
-> >> --
-> >> Alex Benn=C3=A9e
->=20
-> Could you try:
->=20
->   https://github.com/stsquad/qemu/tree/bql-and-replay-locks-v2
->=20
-> And report back?
+From: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
-Please check the new series of the patches.
-It includes patches from Alex and some fixes that made them working.
+Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
-Pavel Dovgalyuk
+---
+v1
+  - fix merge conflicts with existing tracing
+  - add trylock/cond_wait traces
+
+---
+ include/qemu/thread.h    |   14 ++++++++++----
+ util/qemu-thread-posix.c |   21 ++++++++++++---------
+ util/trace-events        |    7 ++++---
+ 3 files changed, 26 insertions(+), 16 deletions(-)
+
+diff --git a/include/qemu/thread.h b/include/qemu/thread.h
+index 9910f49..c51a7f1 100644
+--- a/include/qemu/thread.h
++++ b/include/qemu/thread.h
+@@ -22,9 +22,13 @@ typedef struct QemuThread QemuThread;
+=20
+ void qemu_mutex_init(QemuMutex *mutex);
+ void qemu_mutex_destroy(QemuMutex *mutex);
+-void qemu_mutex_lock(QemuMutex *mutex);
+-int qemu_mutex_trylock(QemuMutex *mutex);
+-void qemu_mutex_unlock(QemuMutex *mutex);
++int qemu_mutex_trylock_impl(QemuMutex *mutex, const char *file, const in=
+t line);
++void qemu_mutex_lock_impl(QemuMutex *mutex, const char *file, const int =
+line);
++void qemu_mutex_unlock_impl(QemuMutex *mutex, const char *file, const in=
+t line);
++
++#define qemu_mutex_lock(mutex) qemu_mutex_lock_impl(mutex, __FILE__, __L=
+INE__)
++#define qemu_mutex_trylock(mutex) qemu_mutex_trylock_impl(mutex, __FILE_=
+_, __LINE__)
++#define qemu_mutex_unlock(mutex) qemu_mutex_unlock_impl(mutex, __FILE__,=
+ __LINE__)
+=20
+ /* Prototypes for other functions are in thread-posix.h/thread-win32.h. =
+ */
+ void qemu_rec_mutex_init(QemuRecMutex *mutex);
+@@ -39,7 +43,9 @@ void qemu_cond_destroy(QemuCond *cond);
+  */
+ void qemu_cond_signal(QemuCond *cond);
+ void qemu_cond_broadcast(QemuCond *cond);
+-void qemu_cond_wait(QemuCond *cond, QemuMutex *mutex);
++void qemu_cond_wait_impl(QemuCond *cond, QemuMutex *mutex, const char *f=
+ile, const int line);
++
++#define qemu_cond_wait(cond, mutex) qemu_cond_wait_impl(cond, mutex, __F=
+ILE__, __LINE__)
+=20
+ void qemu_sem_init(QemuSemaphore *sem, int init);
+ void qemu_sem_post(QemuSemaphore *sem);
+diff --git a/util/qemu-thread-posix.c b/util/qemu-thread-posix.c
+index 7306475..1a838a9 100644
+--- a/util/qemu-thread-posix.c
++++ b/util/qemu-thread-posix.c
+@@ -57,26 +57,28 @@ void qemu_mutex_destroy(QemuMutex *mutex)
+         error_exit(err, __func__);
+ }
+=20
+-void qemu_mutex_lock(QemuMutex *mutex)
++void qemu_mutex_lock_impl(QemuMutex *mutex, const char *file, const int =
+line)
+ {
+     int err;
+=20
+     assert(mutex->initialized);
++    trace_qemu_mutex_lock(mutex, file, line);
++
+     err =3D pthread_mutex_lock(&mutex->lock);
+     if (err)
+         error_exit(err, __func__);
+=20
+-    trace_qemu_mutex_locked(mutex);
++    trace_qemu_mutex_locked(mutex, file, line);
+ }
+=20
+-int qemu_mutex_trylock(QemuMutex *mutex)
++int qemu_mutex_trylock_impl(QemuMutex *mutex, const char *file, const in=
+t line)
+ {
+     int err;
+=20
+     assert(mutex->initialized);
+     err =3D pthread_mutex_trylock(&mutex->lock);
+     if (err =3D=3D 0) {
+-        trace_qemu_mutex_locked(mutex);
++        trace_qemu_mutex_locked(mutex, file, line);
+         return 0;
+     }
+     if (err !=3D EBUSY) {
+@@ -85,15 +87,16 @@ int qemu_mutex_trylock(QemuMutex *mutex)
+     return -EBUSY;
+ }
+=20
+-void qemu_mutex_unlock(QemuMutex *mutex)
++void qemu_mutex_unlock_impl(QemuMutex *mutex, const char *file, const in=
+t line)
+ {
+     int err;
+=20
+     assert(mutex->initialized);
+-    trace_qemu_mutex_unlocked(mutex);
+     err =3D pthread_mutex_unlock(&mutex->lock);
+     if (err)
+         error_exit(err, __func__);
++
++    trace_qemu_mutex_unlock(mutex, file, line);
+ }
+=20
+ void qemu_rec_mutex_init(QemuRecMutex *mutex)
+@@ -152,14 +155,14 @@ void qemu_cond_broadcast(QemuCond *cond)
+         error_exit(err, __func__);
+ }
+=20
+-void qemu_cond_wait(QemuCond *cond, QemuMutex *mutex)
++void qemu_cond_wait_impl(QemuCond *cond, QemuMutex *mutex, const char *f=
+ile, const int line)
+ {
+     int err;
+=20
+     assert(cond->initialized);
+-    trace_qemu_mutex_unlocked(mutex);
++    trace_qemu_mutex_unlock(mutex, file, line);
+     err =3D pthread_cond_wait(&cond->cond, &mutex->lock);
+-    trace_qemu_mutex_locked(mutex);
++    trace_qemu_mutex_locked(mutex, file, line);
+     if (err)
+         error_exit(err, __func__);
+ }
+diff --git a/util/trace-events b/util/trace-events
+index 025499f..515e625 100644
+--- a/util/trace-events
++++ b/util/trace-events
+@@ -56,6 +56,7 @@ lockcnt_futex_wait(const void *lockcnt, int val) "lockc=
+nt %p waiting on %d"
+ lockcnt_futex_wait_resume(const void *lockcnt, int new) "lockcnt %p afte=
+r wait: %d"
+ lockcnt_futex_wake(const void *lockcnt) "lockcnt %p waking up one waiter=
+"
+=20
+-# util/qemu-thread-posix.c
+-qemu_mutex_locked(void *lock) "locked mutex %p"
+-qemu_mutex_unlocked(void *lock) "unlocked mutex %p"
++# util/qemu-thread.c
++qemu_mutex_lock(void *mutex, const char *file, const int line) "waiting =
+on mutex %p (%s:%d)"
++qemu_mutex_locked(void *mutex, const char *file, const int line) "taken =
+mutex %p (%s:%d)"
++qemu_mutex_unlock(void *mutex, const char *file, const int line) "releas=
+ed mutex %p (%s:%d)"
