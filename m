@@ -1,29 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43513)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48354)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mar.krzeminski@gmail.com>) id 1e9Tc5-0007vT-UA
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 06:17:43 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1e9Tkv-00017V-Sx
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 06:26:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mar.krzeminski@gmail.com>) id 1e9Tc2-00039q-F9
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 06:17:41 -0400
-Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:50621)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mar.krzeminski@gmail.com>)
-	id 1e9Tc2-00038O-0s
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 06:17:38 -0400
-Received: by mail-lf0-x243.google.com with SMTP id a132so18316795lfa.7
-	for <qemu-devel@nongnu.org>; Tue, 31 Oct 2017 03:17:37 -0700 (PDT)
-References: <20171029101343.15544-1-frasse.iglesias@gmail.com>
-	<20171029101343.15544-4-frasse.iglesias@gmail.com>
-From: "mar.krzeminski" <mar.krzeminski@gmail.com>
-Message-ID: <913e8005-bce7-fffc-04bd-c7cec30f039e@gmail.com>
-Date: Tue, 31 Oct 2017 11:17:29 +0100
+	(envelope-from <vsementsov@virtuozzo.com>) id 1e9Tkv-0001Bc-0B
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 06:26:49 -0400
+References: <20171012135313.227864-1-vsementsov@virtuozzo.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <7627142e-25be-4a7f-0f00-af5375ad9440@virtuozzo.com>
+Date: Tue, 31 Oct 2017 13:26:35 +0300
 MIME-Version: 1.0
-In-Reply-To: <20171029101343.15544-4-frasse.iglesias@gmail.com>
-Content-Language: pl
+In-Reply-To: <20171012135313.227864-1-vsementsov@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v5 03/13] m25p80: Add support for BRRD/BRWR
- and BULK_ERASE (0x60)
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: [Qemu-devel] ping Re: [PATCH v2 0/5] backup improvements part 1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,66 +23,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Francisco Iglesias <frasse.iglesias@gmail.com>, qemu-devel@nongnu.org
-Cc: edgari@xilinx.com, alistai@xilinx.com, francisco.iglesias@feimtech.se
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: jsnow@redhat.com, famz@redhat.com, mreitz@redhat.com, kwolf@redhat.com, jcody@redhat.com, stefanha@redhat.com, den@openvz.org
 
+Hey, what about this?
 
-
-W dniu 29.10.2017 o 11:13, Francisco Iglesias pisze:
-> Add support for the bank address register access commands (BRRD/BRWR) and
-> the BULK_ERASE (0x60) command.
+12.10.2017 16:53, Vladimir Sementsov-Ogievskiy wrote:
+> Hi all. Here is a continuation of my "new backup architecture" series,
+> The very first part, but it is meaningful itself.
 >
-> Signed-off-by: Francisco Iglesias <frasse.iglesias@gmail.com>
-Acked-by: Marcin Krzemiński <mar.krzeminski@gmail.com>
-> ---
->   hw/block/m25p80.c | 7 +++++++
->   1 file changed, 7 insertions(+)
+> v2: rebase on master
+> 01: add test and fix bug
+> 02: move commit about NONE mode to this patch, add John's r-b (hope,
+>       you are OK with this tiny change)
+> 03: tiny refactor (John)
+> 04: improve commit message, add John's r-b
+> 05: add John's r-b
 >
-> diff --git a/hw/block/m25p80.c b/hw/block/m25p80.c
-> index 7a5c137..cf39e36 100644
-> --- a/hw/block/m25p80.c
-> +++ b/hw/block/m25p80.c
-> @@ -331,7 +331,10 @@ typedef enum {
->       WRDI = 0x4,
->       RDSR = 0x5,
->       WREN = 0x6,
-> +    BRRD = 0x16,
-> +    BRWR = 0x17,
->       JEDEC_READ = 0x9f,
-> +    BULK_ERASE_60 = 0x60,
->       BULK_ERASE = 0xc7,
->       READ_FSR = 0x70,
->       RDCR = 0x15,
-> @@ -704,6 +707,7 @@ static void complete_collecting_data(Flash *s)
->               s->write_enable = false;
->           }
->           break;
-> +    case BRWR:
->       case EXTEND_ADDR_WRITE:
->           s->ear = s->data[0];
->           break;
-> @@ -1041,6 +1045,7 @@ static void decode_new_cmd(Flash *s, uint32_t value)
->           s->state = STATE_READING_DATA;
->           break;
->   
-> +    case BULK_ERASE_60:
->       case BULK_ERASE:
->           if (s->write_enable) {
->               DB_PRINT_L(0, "chip erase\n");
-> @@ -1058,12 +1063,14 @@ static void decode_new_cmd(Flash *s, uint32_t value)
->       case EX_4BYTE_ADDR:
->           s->four_bytes_address_mode = false;
->           break;
-> +    case BRRD:
->       case EXTEND_ADDR_READ:
->           s->data[0] = s->ear;
->           s->pos = 0;
->           s->len = 1;
->           s->state = STATE_READING_DATA;
->           break;
-> +    case BRWR:
->       case EXTEND_ADDR_WRITE:
->           if (s->write_enable) {
->               s->needed_bytes = 1;
-Regards,
-Marcin
+> Vladimir Sementsov-Ogievskiy (5):
+>    hbitmap: add next_zero function
+>    backup: move from done_bitmap to copy_bitmap
+>    backup: init copy_bitmap from sync_bitmap for incremental
+>    backup: simplify non-dirty bits progress processing
+>    backup: use copy_bitmap in incremental backup
+>
+>   include/block/dirty-bitmap.h |   1 +
+>   include/qemu/hbitmap.h       |   8 +++
+>   block/backup.c               | 118 ++++++++++++++++++++++++-------------------
+>   block/dirty-bitmap.c         |   5 ++
+>   tests/test-hbitmap.c         |  61 ++++++++++++++++++++++
+>   util/hbitmap.c               |  39 ++++++++++++++
+>   6 files changed, 180 insertions(+), 52 deletions(-)
+>
+
+
+-- 
+Best regards,
+Vladimir
