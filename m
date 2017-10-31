@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58329)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34217)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e9ZKY-0005F2-GN
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 12:23:59 -0400
+	(envelope-from <bounces@canonical.com>) id 1e9Zfi-0008Nx-13
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 12:45:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e9ZKS-0001e7-Q2
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 12:23:58 -0400
-Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:43639)
+	(envelope-from <bounces@canonical.com>) id 1e9Zfe-0004gb-Vf
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 12:45:50 -0400
+Received: from indium.canonical.com ([91.189.90.7]:52474)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1e9ZKS-0001ce-HG
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 12:23:52 -0400
-Received: by mail-wr0-x243.google.com with SMTP id w105so16496823wrc.0
-	for <qemu-devel@nongnu.org>; Tue, 31 Oct 2017 09:23:52 -0700 (PDT)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1e9Zfe-0004gT-Pa
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 12:45:46 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1e9Zfd-00054r-LP
+	for <qemu-devel@nongnu.org>; Tue, 31 Oct 2017 16:45:45 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id A0F252E80C3
+	for <qemu-devel@nongnu.org>; Tue, 31 Oct 2017 16:45:45 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20171005184309.14521-1-programmingkidx@gmail.com>
-References: <20171005184309.14521-1-programmingkidx@gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 31 Oct 2017 16:23:30 +0000
-Message-ID: <CAFEAcA9S-zyM8ndVfc6sreAZcEJLbAKULTDuepwtZVJ88si_rw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] Make scrolling work again
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 31 Oct 2017 16:28:17 -0000
+From: Barret <brho@cs.berkeley.edu>
+Reply-To: Bug 1318091 <1318091@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20140509224205.21323.62439.malonedeb@chaenomeles.canonical.com>
+Message-Id: <150946729805.20053.14453052346002235591.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1318091] Re: Perfctr MSRs not available to Guest
+ OS on AMD Phenom II
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,100 +37,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Arbuckle <programmingkidx@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
-On 5 October 2017 at 19:43, John Arbuckle <programmingkidx@gmail.com> wrote:
-> Make scrolling in the monitor work.
->
-> Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
+Hi -
 
-Sorry this took me a while to get to reviewing.
+I don't have the hardware readily available anymore, so I can't test it.
+Might as well close the bug.
 
-> ---
->  ui/cocoa.m | 88 +++++++++++++++++++++++++++++++++++++++-----------------------
->  1 file changed, 56 insertions(+), 32 deletions(-)
->
-> diff --git a/ui/cocoa.m b/ui/cocoa.m
-> index 93e56d0518..5545c42b9c 100644
-> --- a/ui/cocoa.m
-> +++ b/ui/cocoa.m
-> @@ -281,6 +281,7 @@ - (void) switchSurface:(DisplaySurface *)surface;
->  - (void) grabMouse;
->  - (void) ungrabMouse;
->  - (void) toggleFullScreen:(id)sender;
-> +- (void) handleMonitorInput:(NSEvent *)event;
->  - (void) handleEvent:(NSEvent *)event;
->  - (void) setAbsoluteEnabled:(BOOL)tIsAbsoluteEnabled;
->  /* The state surrounding mouse grabbing is potentially confusing.
-> @@ -554,6 +555,60 @@ - (void) toggleStatefulModifier: (int)keycode {
->      qemu_input_event_send_key_qcode(dcl->con, keycode, false);
->  }
->
-> +// Does the work of sending input to the monitor
-> +- (void) handleMonitorInput:(NSEvent *)event
-> +{
-> +    int keysym = 0;
-> +    int control_key = 0;
-> +
-> +    // if the control key is down
-> +    if ([event modifierFlags] & NSEventModifierFlagControl) {
-> +        control_key = 4; // shifts by one nibble (hex digit)
-> +    }
+Regarding Oliver's question, it doesn't sound like the same issue I had.
+I do recall that processor and qemu not supporting rdtscp (which is
+fine), so that problem might be some qemu startup script requesting
+features that aren't available.
 
-Rather than doing this, just have an array for "with control"
-and one for "without control".
+-- =
 
-> +
-> +    /* translates Macintosh keycodes to QEMU's keysym */
-> +    int translation_matrix[] = {
-> +        [0 ... 0xff] = 0,   // invalid key
-> +
-> +        [kVK_UpArrow]       = QEMU_KEY_UP,
-> +        [kVK_DownArrow]     = QEMU_KEY_DOWN,
-> +        [kVK_RightArrow]    = QEMU_KEY_RIGHT,
-> +        [kVK_LeftArrow]     = QEMU_KEY_LEFT,
-> +        [kVK_Home]          = QEMU_KEY_HOME,
-> +        [kVK_End]           = QEMU_KEY_END,
-> +        [kVK_PageUp]        = QEMU_KEY_PAGEUP,
-> +        [kVK_PageDown]      = QEMU_KEY_PAGEDOWN,
-> +        [kVK_ForwardDelete] = QEMU_KEY_DELETE,
-> +        [kVK_Delete]        = QEMU_KEY_BACKSPACE,
-> +
-> +        /*
-> +         * Shift value by one hex digit.
-> +         * Since no key has a 3 digit hex value there is no chance
-> +         * for overlap.
-> +         */
-> +        [kVK_UpArrow << 4]       = QEMU_KEY_CTRL_UP,
-> +        [kVK_DownArrow << 4]     = QEMU_KEY_CTRL_DOWN,
-> +        [kVK_RightArrow << 4]    = QEMU_KEY_CTRL_RIGHT,
-> +        [kVK_LeftArrow << 4]     = QEMU_KEY_CTRL_LEFT,
-> +        [kVK_Home << 4]          = QEMU_KEY_CTRL_HOME,
-> +        [kVK_End << 4]           = QEMU_KEY_CTRL_END,
-> +        [kVK_PageUp << 4]        = QEMU_KEY_CTRL_PAGEUP,
-> +        [kVK_PageDown << 4]      = QEMU_KEY_CTRL_PAGEDOWN,
-> +    };
-> +
-> +    keysym = translation_matrix[[event keyCode] << control_key];
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1318091
 
-You need to check whether your array index value is within
-bounds for the array before you use it as an array index.
+Title:
+  Perfctr MSRs not available to Guest OS on AMD Phenom II
 
-> +
-> +    // if not a key that needs translating
-> +    if (keysym == 0) {
-> +        NSString *ks = [event characters];
-> +        if ([ks length] > 0)
-> +            keysym = [ks characterAtIndex:0];
-> +    }
-> +
-> +    if(keysym)
-> +        kbd_put_keysym(keysym);
+Status in QEMU:
+  Incomplete
 
-Coding style requires braces for all if() statements. (I know
-you're just moving these lines; that's a good point to bring
-them into line with the style.)
+Bug description:
+  The  AMD Phenom(tm) II X4 965 Processor (family 16, model 4, stepping
+  3) has the 4 architecturally supported perf counters at MSRs.  The
+  selectors are c001000-c001003, and the counters are c001004-c001007.
+  I've verified that the MSRs are there and working by manually setting
+  the MSRs with msr-tools to count cycles.
 
-thanks
--- PMM
+  The processor does not support the extended perfctr or the perfctr_nb.
+  These are in cpuid leaf 8000_0001.  Qemu also sees that these cpuid
+  flags are not set, when I try launching with  -cpu
+  host,perfctr_core,check.  However, this flag is only for the extended
+  perfctr MSRs, which also happen to map the original four counters at
+  c0010200.
+
+  When I run a Guest OS, that OS is unable to use the perf counter
+  registers from c001000-7.  rdmsr and wrmsr complete, but the results
+  are always 0.  By contrast, a wrmsr to one of the c0010200 registers
+  causes a general protection fault (as it should, since those aren't
+  supported).
+
+  Kernel: 3.14.0-gentoo
+  Qemu: 2.0.0 (gentoo) and also with 2.0.50 (commit 06b4f00d5)
+  Qemu command: qemu-system-x86_64 -enable-kvm -cpu host -smp 8 -m 1024 -no=
+graphic -monitor /dev/pts/4 mnt/hdd.img
+  cat /proc/cpuinfo:
+  processor	: 3
+  vendor_id	: AuthenticAMD
+  cpu family	: 16
+  model		: 4
+  model name	: AMD Phenom(tm) II X4 965 Processor
+  stepping	: 3
+  cpu MHz		: 800.000
+  cache size	: 512 KB
+  physical id	: 0
+  siblings	: 4
+  core id		: 3
+  cpu cores	: 4
+  apicid		: 3
+  initial apicid	: 3
+  fpu		: yes
+  fpu_exception	: yes
+  cpuid level	: 5
+  wp		: yes
+  flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pa=
+t pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdt=
+scp lm 3dnowext 3dnow constant_tsc rep_good nopl nonstop_tsc extd_apicid pn=
+i monitor cx16 popcnt lahf_lm cmp_legacy svm extapic cr8_legacy abm sse4a m=
+isalignsse 3dnowprefetch osvw ibs skinit wdt hw_pstate npt lbrv svm_lock nr=
+ip_save
+  bogomips	: 6803.79
+  TLB size	: 1024 4K pages
+  clflush size	: 64
+  cache_alignment	: 64
+  address sizes	: 48 bits physical, 48 bits virtual
+  power management: ts ttp tm stc 100mhzsteps hwpstate
+
+  thanks.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1318091/+subscriptions
