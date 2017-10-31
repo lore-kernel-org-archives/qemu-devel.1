@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58059)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58794)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Andrew.Baumann@microsoft.com>) id 1e9WGq-00010C-F2
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 09:07:57 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1e9WK2-0001nh-3n
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 09:11:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Andrew.Baumann@microsoft.com>) id 1e9WGl-0003s1-FE
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 09:07:56 -0400
-From: Andrew Baumann <Andrew.Baumann@microsoft.com>
-Date: Tue, 31 Oct 2017 13:07:36 +0000
-Message-ID: <MWHPR21MB015998D56801F7253F33D1FB9E5E0@MWHPR21MB0159.namprd21.prod.outlook.com>
-References: <20171031130223.220-1-Andrew.Baumann@microsoft.com>
-In-Reply-To: <20171031130223.220-1-Andrew.Baumann@microsoft.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v3] arm: implement cache/shareability
- attribute bits for PAR registers
+	(envelope-from <pm215@archaic.org.uk>) id 1e9WK1-0006tP-4u
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 09:11:14 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:38084)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1e9WK0-0006em-TW
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 09:11:13 -0400
+Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
+	(envelope-from <pm215@archaic.org.uk>) id 1e9WJu-0007Ij-LS
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 13:11:06 +0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 31 Oct 2017 13:11:29 +0000
+Message-Id: <1509455489-14101-6-git-send-email-peter.maydell@linaro.org>
+In-Reply-To: <1509455489-14101-1-git-send-email-peter.maydell@linaro.org>
+References: <1509455489-14101-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PULL 5/5] hw/pci-host/gpex: Improve INTX to gsi
+ routing error checking
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,40 +28,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
-> From: Andrew Baumann
-> Sent: Tuesday, 31 October 2017 21:02
-[...]
-> +static uint8_t convert_stage2_attrs(CPUARMState *env, uint8_t s2attrs)
-> +{
-> +    uint8_t hiattr =3D extract32(s2attrs, 2, 2);
-> +    uint8_t loattr =3D extract32(s2attrs, 0, 2);
-> +    uint8_t hihint =3D 0, lohint =3D 0;
-> +
-> +    if (hiattr !=3D 0) { /* normal memory */
-> +        /* TODO: to faithfully emulate S2CacheDisabled() for the case
-> +         * when EL2 is aarch32, we should check HCR2 (not HCR_EL2), but
-> +         * qemu doesn't presently model this register.
-> +         */
-> +        if ((env->cp15.hcr_el2 & HCR_CD) !=3D 0) { /* cache disabled */
-> +            hiattr =3D loattr =3D 1; /* non-cacheable */
-> +        } else {
-> +            if (hiattr !=3D 1) { /* Write-through or write-back */
-> +                hihint =3D 3; /* RW allocate */
-> +            }
-> +            if (loattr !=3D 1) { /* Write-through or write-back */
-> +                lohint =3D 3; /* RW allocate */
-> +            }
-> +        }
-> +    }
-> +
-> +    return (hiattr << 6) | (hihint << 2) | (loattr << 2) | lohint;
-> +}
+From: Eric Auger <eric.auger@redhat.com>
 
-Right after sending this, I noticed a dumb copy-paste bug: the above should=
- be hihint << 4.
-I'm obviously going a bit too fast, sorry.
+We exposed gpex_set_irq_num() for machines to set the INTx to
+GSI routing. However if the machine forgets to call that
+function we currently do not check the association was properly
+done. Let's initialize gsi values to -1 and if this value is
+found in gpex_route_intx_pin_to_irq, set the routing mode as
+disabled.
 
-Andrew
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Message-id: 1508776211-22175-1-git-send-email-eric.auger@redhat.com
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ hw/pci-host/gpex.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/hw/pci-host/gpex.c b/hw/pci-host/gpex.c
+index 4090793..edf305b 100644
+--- a/hw/pci-host/gpex.c
++++ b/hw/pci-host/gpex.c
+@@ -57,9 +57,14 @@ static PCIINTxRoute gpex_route_intx_pin_to_irq(void *opaque, int pin)
+ {
+     PCIINTxRoute route;
+     GPEXHost *s = opaque;
++    int gsi = s->irq_num[pin];
+ 
+-    route.mode = PCI_INTX_ENABLED;
+-    route.irq = s->irq_num[pin];
++    route.irq = gsi;
++    if (gsi < 0) {
++        route.mode = PCI_INTX_DISABLED;
++    } else {
++        route.mode = PCI_INTX_ENABLED;
++    }
+ 
+     return route;
+ }
+@@ -81,6 +86,7 @@ static void gpex_host_realize(DeviceState *dev, Error **errp)
+     sysbus_init_mmio(sbd, &s->io_ioport);
+     for (i = 0; i < GPEX_NUM_IRQS; i++) {
+         sysbus_init_irq(sbd, &s->irq[i]);
++        s->irq_num[i] = -1;
+     }
+ 
+     pci->bus = pci_register_bus(dev, "pcie.0", gpex_set_irq,
+-- 
+2.7.4
