@@ -1,38 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50545)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52329)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dan.j.williams@intel.com>) id 1e9XPA-0000Rm-MA
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 10:20:37 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1e9XW3-0001sF-LC
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 10:27:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dan.j.williams@intel.com>) id 1e9XP9-0000jp-Ku
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 10:20:36 -0400
-Received: from mail-oi0-x234.google.com ([2607:f8b0:4003:c06::234]:48404)
+	(envelope-from <alex.bennee@linaro.org>) id 1e9XVy-0005pq-UM
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 10:27:43 -0400
+Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:43976)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <dan.j.williams@intel.com>)
-	id 1e9XP9-0000b9-DF
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 10:20:35 -0400
-Received: by mail-oi0-x234.google.com with SMTP id m198so26820562oig.5
-	for <qemu-devel@nongnu.org>; Tue, 31 Oct 2017 07:20:31 -0700 (PDT)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1e9XVy-0005pb-Ml
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 10:27:38 -0400
+Received: by mail-wm0-x233.google.com with SMTP id m72so14411604wmc.0
+	for <qemu-devel@nongnu.org>; Tue, 31 Oct 2017 07:27:38 -0700 (PDT)
+References: <CAPnv1PJeMRPKv9UUSmSWxyn=GFOPaWY8eUgH8ZeL=ZBMDJpbdg@mail.gmail.com>
+	<CAJhHMCCZh7hvQT8x9Bks9k6=ka4G1Oybv1MrkKJ9_VZ_eRZBfQ@mail.gmail.com>
+	<CAPnv1PL7-BAt36BvTxP7G8J8990Ur9MJJbr-QPccWziD4sy28g@mail.gmail.com>
+	<87bmrj8eks.fsf@linaro.org>
+	<CAPnv1PKyak1G-uL=H=-Vh_9TH2dZKffYjDf_2Z+LWuqovMKCBQ@mail.gmail.com>
+	<CAKSfGUC_k6K=2Xy8pGcwuQ66DMPYCDvA47Ojgm7ntQfALGwDsQ@mail.gmail.com>
+	<CAKSfGUD-FEb+DGwtrVHm2_NR_WOes9_+WkPm3Z76OPNhc3vbGA@mail.gmail.com>
+	<000601d33128$2dd9d5e0$898d81a0$@ru> <87bmm7dohw.fsf@linaro.org>
+	<CAKSfGUCt7p95nDeW12Q_-BSTXVhRLPtL+=u_WLx5_BZEgAgeLw@mail.gmail.com>
+	<878thaepe2.fsf@linaro.org> <000d01d3523b$2e00f880$8a02e980$@ru>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <000d01d3523b$2e00f880$8a02e980$@ru>
+Date: Tue, 31 Oct 2017 14:27:35 +0000
+Message-ID: <871sljie94.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <0a26793f-86f7-29e7-f61b-dc4c1ef08c8e@gmail.com>
-References: <1455443283.33337333.1500618150787.JavaMail.zimbra@redhat.com>
-	<CAPcyv4hpbk0jgp+mA=q05zVBV8ZSZvCvV68JJ4gjE3QhK70d1w@mail.gmail.com>
-	<20170724102330.GE652@quack2.suse.cz>
-	<1157879323.33809400.1500897967669.JavaMail.zimbra@redhat.com>
-	<20170724123752.GN652@quack2.suse.cz>
-	<1888117852.34216619.1500992835767.JavaMail.zimbra@redhat.com>
-	<CAPcyv4in28F3FOVKp9abvrggxPuXdbGynF5=ZvBXCrywoa06JA@mail.gmail.com>
-	<1501016375.26846.21.camel@redhat.com>
-	<1063764405.34607875.1501076841865.JavaMail.zimbra@redhat.com>
-	<1501104453.26846.45.camel@redhat.com>
-	<CAPcyv4hsqrqBxoipUHPAbSctuzbVWCRnT-gN08i9uhXTWY6iPQ@mail.gmail.com>
-	<1501112787.4073.49.camel@redhat.com>
-	<CAPcyv4gbC6Hx_4YsCfOd2t=fn=wPGp5h__1QH=-p40TPFNbFzA@mail.gmail.com>
-	<0a26793f-86f7-29e7-f61b-dc4c1ef08c8e@gmail.com>
-From: Dan Williams <dan.j.williams@intel.com>
-Date: Tue, 31 Oct 2017 07:20:29 -0700
-Message-ID: <CAPcyv4iw2cCpDmr+4kxsFvdy+iGZiz=ok-kLhsDKpqDy+szf-Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] KVM "fake DAX" flushing interface - discussion
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] What is the best commit for record-replay?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,40 +38,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Xiao Guangrong <xiaoguangrong.eric@gmail.com>
-Cc: Rik van Riel <riel@redhat.com>, Pankaj Gupta <pagupta@redhat.com>, Jan Kara <jack@suse.cz>, Stefan Hajnoczi <stefanha@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, kvm-devel <kvm@vger.kernel.org>, Qemu Developers <qemu-devel@nongnu.org>, "linux-nvdimm@lists.01.org" <linux-nvdimm@ml01.01.org>, ross zwisler <ross.zwisler@linux.intel.com>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Nitesh Narayan Lal <nilal@redhat.com>, Haozhong Zhang <haozhong.zhang@intel.com>, Ross Zwisler <ross.zwisler@intel.com>
+To: Pavel Dovgalyuk <dovgaluk@ispras.ru>
+Cc: 'Aleksandr Bezzubikov' <zuban32s@gmail.com>, 'QEMU Developers' <qemu-devel@nongnu.org>, 'Pranith Kumar' <bobby.prani+qemu@gmail.com>, pavel.dovgaluk@ispras.ru, 'Aleksandr Bezzubikov' <abezzubikov@ispras.ru>, 'Paolo Bonzini' <pbonzini@redhat.com>, 'Igor R' <boost.lists@gmail.com>
 
-On Tue, Oct 31, 2017 at 12:13 AM, Xiao Guangrong
-<xiaoguangrong.eric@gmail.com> wrote:
->
->
-> On 07/27/2017 08:54 AM, Dan Williams wrote:
->
->>> At that point, would it make sense to expose these special
->>> virtio-pmem areas to the guest in a slightly different way,
->>> so the regions that need virtio flushing are not bound by
->>> the regular driver, and the regular driver can continue to
->>> work for memory regions that are backed by actual pmem in
->>> the host?
+
+Pavel Dovgalyuk <dovgaluk@ispras.ru> writes:
+
+>> From: Alex Benn=C3=A9e [mailto:alex.bennee@linaro.org]
+>> Aleksandr Bezzubikov <zuban32s@gmail.com> writes:
 >>
+>> > 2017-09-19 12:30 GMT+03:00 Alex Benn=C3=A9e <alex.bennee@linaro.org>:
+>> >>
+>> >>> As I know, RR is still broken in the current version.
+>> >>> It was caused by the MTTCG implementation.
+>> >>> Alex Bennee tried to fix RR back. Alex, have you found any solution?
+>> >>>
+>> >>> We also trying to find a way to fix RR. It seems, that we will reinv=
+ent BQL for RR.
+>> >>
+>> >> I think the method outlined in my RFC is the way to go, essentially t=
+he
+>> >> RR mutex taking over for the what the BQL did. The RFC patch hadn't
+>> >> hoisted the mutex for the additional devices so I'm just re-basing now
+>> >> and I'll see if I can make the changes for Igor's test case.
+>> >>
+>> >> --
+>> >> Alex Benn=C3=A9e
 >>
->> Hmm, yes that could be feasible especially if it uses the ACPI NFIT
->> mechanism. It would basically involve defining a new SPA (System
->> Phyiscal Address) range GUID type, and then teaching libnvdimm to
->> treat that as a new pmem device type.
+>> Could you try:
+>>
+>>   https://github.com/stsquad/qemu/tree/bql-and-replay-locks-v2
+>>
+>> And report back?
 >
->
-> I would prefer a new flush mechanism to a new memory type introduced
-> to NFIT, e.g, in that mechanism we can define request queues and
-> completion queues and any other features to make virtualization
-> friendly. That would be much simpler.
->
+> Please check the new series of the patches.
+> It includes patches from Alex and some fixes that made them working.
 
-No that's more confusing because now we are overloading the definition
-of persistent memory. I want this memory type identified from the top
-of the stack so it can appear differently in /proc/iomem and also
-implement this alternate flush communication.
+For reference that is:
 
-In what way is this "more complicated"? It was trivial to add support
-for the "volatile" NFIT range, this will not be any more complicated
-than that.
+  Subject: [RFC PATCH 00/26] replay additions
+  From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+  Date: Tue, 31 Oct 2017 14:24:57 +0300
+  Message-ID: <20171031112457.10516.8971.stgit@pasha-VirtualBox>
+
+--
+Alex Benn=C3=A9e
