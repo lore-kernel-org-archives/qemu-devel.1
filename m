@@ -1,19 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38272)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39100)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1e9UMC-0002pE-5K
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 07:05:23 -0400
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1e9UNa-0003d1-PD
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 07:06:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1e9UM9-0004u6-0X
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 07:05:20 -0400
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <20170929165347.29658-11-mreitz@redhat.com>
-References: <20170929165347.29658-1-mreitz@redhat.com>
-	<20170929165347.29658-11-mreitz@redhat.com>
-Date: Tue, 31 Oct 2017 12:05:01 +0100
-Message-ID: <w51po93lgrm.fsf@maestria.local.igalia.com>
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1e9UNW-0005y2-Kr
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 07:06:46 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:42104)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1e9UNW-0005x5-7a
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 07:06:42 -0400
+From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+Date: Tue, 31 Oct 2017 14:06:41 +0300
+Message-ID: <20171031110641.5836.43266.stgit@pasha-VirtualBox>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v6 10/25] block: Add bdrv_dirname()
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [RFC PATCH 00/26] replay additions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,22 +24,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, John Snow <jsnow@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: dovgaluk@ispras.ru
 
-On Fri 29 Sep 2017 06:53:32 PM CEST, Max Reitz wrote:
-> This function may be implemented by block drivers to derive a directory
-> name from a BDS. Concatenating this g_free()-able string with a relative
-> filename must result in a valid (not necessarily existing) filename, so
-> this is a function that should generally be not implemented by format
-> drivers, because this is protocol-specific.
->
-> If a BDS's driver does not implement this function, bdrv_dirname() will
-> fall through to the BDS's file if it exists. If it does not, the
-> exact_filename field will be used to generate a directory name.
->
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
+This set of patches includex fixes from Alex Benn=C3=A9e for fixing
+BQL and replay locks after inventing the MTTCG. It also includes some
+additional replay patches that makes this set of fixes working.
+It is also fixes some vmstate creation (and loading) issues
+in record/replay modes:
+ - VM start/stop fixes in replay mode
+ - overlay creation for blkreplay filter
+ - fixes for vmstate save/load in record/replay mode
+ - fixes for host clock vmstate
+ - fixes for icount timers vmstate
 
-Reviewed-by: Alberto Garcia <berto@igalia.com>
+There is also a set of helper scripts written by Alex Benn=C3=A9e
+for debugging the record/replay code.
 
-Berto
+---
+
+Alex Benn=C3=A9e (12):
+      target/arm/arm-powertctl: drop BQL assertions
+      cpus: push BQL lock to qemu_*_wait_io_event
+      cpus: only take BQL for sleeping threads
+      replay/replay.c: bump REPLAY_VERSION again
+      replay/replay-internal.c: track holding of replay_lock
+      replay: make locking visible outside replay code
+      replay: push replay_mutex_lock up the call tree
+      scripts/qemu-gdb: add simple tcg lock status helper
+      util/qemu-thread-*: add qemu_lock, locked and unlock trace events
+      scripts/analyse-locks-simpletrace.py: script to analyse lock times
+      scripts/replay-dump.py: replay log dumper
+      scripts/qemu-gdb/timers.py: new helper to dump timer state
+
+Pavel Dovgalyuk (14):
+      block: implement bdrv_snapshot_goto for blkreplay
+      blkreplay: create temporary overlay for underlaying devices
+      replay: disable default snapshot for record/replay
+      replay: fix processing async events
+      replay: fixed replay_enable_events
+      replay: fix save/load vm for non-empty queue
+      replay: added replay log format description
+      replay: make safe vmstop at record/replay
+      replay: save prior value of the host clock
+      icount: fixed saving/restoring of icount warp timers
+      cpu-exec: don't overwrite exception_index
+      cpu-exec: reset exit flag before calling cpu_exec_nocache
+      replay: don't destroy mutex at exit
+      replay: check return values of fwrite
+
+
+ accel/kvm/kvm-all.c                  |    4=20
+ accel/tcg/cpu-exec.c                 |    5 -
+ block/blkreplay.c                    |   73 ++++++++
+ cpus-common.c                        |   13 +
+ cpus.c                               |  149 +++++++++++++---
+ docs/replay.txt                      |   88 ++++++++++
+ include/qemu/thread.h                |   14 +-
+ include/qemu/timer.h                 |   14 ++
+ include/sysemu/replay.h              |   19 ++
+ migration/savevm.c                   |   13 +
+ replay/replay-char.c                 |   21 +-
+ replay/replay-events.c               |   30 +--
+ replay/replay-internal.c             |   26 +++
+ replay/replay-internal.h             |    9 +
+ replay/replay-snapshot.c             |    9 +
+ replay/replay-time.c                 |   10 +
+ replay/replay.c                      |   43 ++---
+ scripts/analyse-locks-simpletrace.py |   99 +++++++++++
+ scripts/qemu-gdb.py                  |    4=20
+ scripts/qemugdb/tcg.py               |   46 +++++
+ scripts/qemugdb/timers.py            |   54 ++++++
+ scripts/replay-dump.py               |  308 ++++++++++++++++++++++++++++=
+++++++
+ stubs/replay.c                       |   16 ++
+ target/arm/arm-powerctl.c            |    8 -
+ target/i386/hax-all.c                |    3=20
+ util/main-loop.c                     |   23 ++-
+ util/qemu-thread-posix.c             |   21 +-
+ util/qemu-timer.c                    |   12 +
+ util/trace-events                    |    7 -
+ vl.c                                 |   12 +
+ 30 files changed, 1014 insertions(+), 139 deletions(-)
+ create mode 100755 scripts/analyse-locks-simpletrace.py
+ create mode 100644 scripts/qemugdb/tcg.py
+ create mode 100644 scripts/qemugdb/timers.py
+ create mode 100755 scripts/replay-dump.py
+
+--=20
+Pavel Dovgalyuk
