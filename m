@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57629)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57754)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1e9U5p-0005o2-Gr
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 06:48:26 -0400
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1e9U5y-0005w1-7P
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 06:48:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1e9U5o-0004B8-MZ
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 06:48:25 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:39892)
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1e9U5u-0004Ei-2b
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 06:48:34 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:39914)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1e9U5o-0004Ar-Ey
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 06:48:24 -0400
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1e9U5t-0004EY-RN
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 06:48:30 -0400
 From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Date: Tue, 31 Oct 2017 13:48:24 +0300
-Message-ID: <20171031104824.3079.91614.stgit@pasha-VirtualBox>
+Date: Tue, 31 Oct 2017 13:48:30 +0300
+Message-ID: <20171031104830.3079.58104.stgit@pasha-VirtualBox>
 In-Reply-To: <20171031104741.3079.26584.stgit@pasha-VirtualBox>
 References: <20171031104741.3079.26584.stgit@pasha-VirtualBox>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [RFCPATCH08/20] replay: make safe vmstop at
- record/replay
+Subject: [Qemu-devel] [RFCPATCH09/20] replay: save prior value of the host
+ clock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,50 +30,104 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dovgaluk@ispras.ru
 
-From: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
-
-This patch disables bdrv flush/drain in record/replay mode.
-When block request is in the replay queue it cannot be processed
-with drain/flush until it is found in the log.
-Therefore vm should just stop leaving unfinished operations
-in the queue.
+This patch adds saving/restoring of the host clock field 'last'.
+It is used in host clock calculation and therefore clock may
+become incorrect when using restored vmstate.
 
 Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
 ---
- cpus.c             |    7 ++++---
- migration/savevm.c |    4 ++--
- 2 files changed, 6 insertions(+), 5 deletions(-)
+ include/qemu/timer.h     |   14 ++++++++++++++
+ replay/replay-internal.h |    2 ++
+ replay/replay-snapshot.c |    3 +++
+ util/qemu-timer.c        |   12 ++++++++++++
+ 4 files changed, 31 insertions(+)
 
-diff --git a/cpus.c b/cpus.c
-index 114c29b..c728f3a 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -942,9 +942,10 @@ static int do_vm_stop(RunState state)
-         qapi_event_send_stop(&error_abort);
-     }
+diff --git a/include/qemu/timer.h b/include/qemu/timer.h
+index 1b518bc..a610a17 100644
+--- a/include/qemu/timer.h
++++ b/include/qemu/timer.h
+@@ -251,6 +251,20 @@ bool qemu_clock_run_timers(QEMUClockType type);
+  */
+ bool qemu_clock_run_all_timers(void);
  
--    bdrv_drain_all();
--    replay_disable_events();
--    ret = bdrv_flush_all();
-+    if (!replay_events_enabled()) {
-+        bdrv_drain_all();
-+        ret = bdrv_flush_all();
-+    }
++/**
++ * qemu_clock_get_last:
++ *
++ * Returns last clock query time.
++ */
++uint64_t qemu_clock_get_last(QEMUClockType type);
++/**
++ * qemu_clock_set_last:
++ *
++ * Sets last clock query time.
++ */
++void qemu_clock_set_last(QEMUClockType type, uint64_t last);
++
++
+ /*
+  * QEMUTimerList
+  */
+diff --git a/replay/replay-internal.h b/replay/replay-internal.h
+index 3ebb199..be96d7e 100644
+--- a/replay/replay-internal.h
++++ b/replay/replay-internal.h
+@@ -78,6 +78,8 @@ typedef struct ReplayState {
+         This counter is global, because requests from different
+         block devices should not get overlapping ids. */
+     uint64_t block_request_id;
++    /*! Prior value of the host clock */
++    uint64_t host_clock_last;
+ } ReplayState;
+ extern ReplayState replay_state;
  
-     return ret;
+diff --git a/replay/replay-snapshot.c b/replay/replay-snapshot.c
+index 7075986..e0b2204 100644
+--- a/replay/replay-snapshot.c
++++ b/replay/replay-snapshot.c
+@@ -25,6 +25,7 @@ static int replay_pre_save(void *opaque)
+ {
+     ReplayState *state = opaque;
+     state->file_offset = ftell(replay_file);
++    state->host_clock_last = qemu_clock_get_last(QEMU_CLOCK_HOST);
+ 
+     return 0;
  }
-diff --git a/migration/savevm.c b/migration/savevm.c
-index 20cebe1..41a13c0 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -2143,8 +2143,8 @@ int save_snapshot(const char *name, Error **errp)
-     AioContext *aio_context;
- 
-     if (!replay_can_snapshot()) {
--        monitor_printf(mon, "Record/replay does not allow making snapshot "
--                        "right now. Try once more later.\n");
-+        error_report("Record/replay does not allow making snapshot "
-+                     "right now. Try once more later.\n");
-         return ret;
+@@ -33,6 +34,7 @@ static int replay_post_load(void *opaque, int version_id)
+ {
+     ReplayState *state = opaque;
+     fseek(replay_file, state->file_offset, SEEK_SET);
++    qemu_clock_set_last(QEMU_CLOCK_HOST, state->host_clock_last);
+     /* If this was a vmstate, saved in recording mode,
+        we need to initialize replay data fields. */
+     replay_fetch_data_kind();
+@@ -54,6 +56,7 @@ static const VMStateDescription vmstate_replay = {
+         VMSTATE_UINT32(has_unread_data, ReplayState),
+         VMSTATE_UINT64(file_offset, ReplayState),
+         VMSTATE_UINT64(block_request_id, ReplayState),
++        VMSTATE_UINT64(host_clock_last, ReplayState),
+         VMSTATE_END_OF_LIST()
+     },
+ };
+diff --git a/util/qemu-timer.c b/util/qemu-timer.c
+index 82d5650..2ed1bf2 100644
+--- a/util/qemu-timer.c
++++ b/util/qemu-timer.c
+@@ -622,6 +622,18 @@ int64_t qemu_clock_get_ns(QEMUClockType type)
      }
+ }
  
++uint64_t qemu_clock_get_last(QEMUClockType type)
++{
++    QEMUClock *clock = qemu_clock_ptr(type);
++    return clock->last;
++}
++
++void qemu_clock_set_last(QEMUClockType type, uint64_t last)
++{
++    QEMUClock *clock = qemu_clock_ptr(type);
++    clock->last = last;
++}
++
+ void qemu_clock_register_reset_notifier(QEMUClockType type,
+                                         Notifier *notifier)
+ {
