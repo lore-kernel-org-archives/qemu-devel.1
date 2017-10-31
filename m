@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56548)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57410)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1e9ZCr-0003F3-6E
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 12:16:02 -0400
+	(envelope-from <jreiser@bitwagon.com>) id 1e9ZFX-00047V-3k
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 12:18:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1e9ZCn-0001JH-61
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 12:16:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46928)
+	(envelope-from <jreiser@bitwagon.com>) id 1e9ZFT-0004bk-4u
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 12:18:47 -0400
+Received: from bitwagon.com ([74.82.39.175]:50695)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1e9ZCm-0001Ih-Su
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 12:15:57 -0400
-Date: Tue, 31 Oct 2017 18:15:48 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20171031180315-mutt-send-email-mst@kernel.org>
-References: <cover.1505998455.git.tgolembi@redhat.com>
-	<b13f11c03ed394bd8ad367dc90996ed134ea98da.1505998455.git.tgolembi@redhat.com>
-	<20171019160405-mutt-send-email-mst@kernel.org>
-	<20171022200557.02558e37@fiorina> <20171031132019.76197945@fiorina>
+	(Exim 4.71) (envelope-from <jreiser@bitwagon.com>)
+	id 1e9ZFS-0004Zb-RZ
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 12:18:43 -0400
+Received: from f25e64.local ([71.36.99.203]) by bitwagon.com
+	for <qemu-devel@nongnu.org>; Tue, 31 Oct 2017 09:18:38 -0700
+From: John Reiser <jreiser@bitwagon.com>
+Message-ID: <92e2caac-31e2-d32f-1b71-810b8297736c@bitwagon.com>
+Date: Tue, 31 Oct 2017 09:18:37 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20171031132019.76197945@fiorina>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 1/1] virtio_balloon: include buffers and
- cached memory statistics
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] unfaithful emulation of system calls
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,148 +28,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?B?VG9tw6HFoSBHb2xlbWJpb3Zza8O9?= <tgolembi@redhat.com>
-Cc: linux-mm@kvack.org, virtualization@lists.linux-foundation.org, qemu-devel@nongnu.org, kvm@vger.kernel.org, virtio-dev@lists.oasis-open.org, Wei Wang <wei.w.wang@intel.com>, Shaohua Li <shli@fb.com>, Huang Ying <ying.huang@intel.com>, Jason Wang <jasowang@redhat.com>, Gal Hammer <ghammer@redhat.com>, Amnon Ilan <ailan@redhat.com>, riel@redhat.com
+To: qemu-devel@nongnu.org
 
-On Tue, Oct 31, 2017 at 01:20:19PM +0100, Tom=C3=A1=C5=A1 Golembiovsk=C3=BD=
- wrote:
-> ping
->=20
-> +Gil, +Amnon... could you maybe aid in reviewing the patch, please?
->=20
->=20
->     Tomas
->=20
-> On Sun, 22 Oct 2017 20:05:57 +0200
-> Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com> wrote:
->=20
-> > On Thu, 19 Oct 2017 16:12:20 +0300
-> > "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> >=20
-> > > On Thu, Sep 21, 2017 at 02:55:41PM +0200, Tom=C3=A1=C5=A1 Golembiov=
-sk=C3=BD wrote: =20
-> > > > Add a new fields, VIRTIO_BALLOON_S_BUFFERS and VIRTIO_BALLOON_S_C=
-ACHED,
-> > > > to virtio_balloon memory statistics protocol. The values correspo=
-nd to
-> > > > 'Buffers' and 'Cached' in /proc/meminfo.
-> > > >=20
-> > > > To be able to compute the value of 'Cached' memory it is necessar=
-y to
-> > > > export total_swapcache_pages() to modules.
-> > > >=20
-> > > > Signed-off-by: Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat=
-.com> =20
-> > >=20
-> > > Does 'Buffers' actually make sense? It's a temporary storage -
-> > > wouldn't it be significantly out of date by the time
-> > > host receives it? =20
-> >=20
-> > That would be best answered by somebody from kernel. But my personal
-> > opinion is that it would not be out of date. The amount of memory
-> > dedicated to Buffers does not seem to fluctuate too much.
-> >=20
-> >     Tomas
-> >=20
+I was surprised that my user-mode applications ran successfully under qemu-ppc64 2.10.1
+running on Linux on x86_64, but crashed when run directly under Linux on 64-bit PowerPC.
+Investigation showed that qemu-ppc64 does not emulate system calls faithfully.
 
-I would be inclined to say, just report
-global_node_page_state(NR_FILE_PAGES).
-Maybe subtract buffer ram.
+On real Linux on PowerPC64, a system call trashes registers {r0, r4-r12, ctr};
+qemu-ppc64 preserves them.  [Both preserve: r13-r31, r1 (sp), r2 (TOC), r3 (set to
+return value), lr (link register).]  Looking at the code in qemu/linux-user/syscall.c
+(tip commit 92c7ec5cd4d15c76218703f7bd3ca75bd46353b7), I do not see anything which
+"enforces the ABI", such as by setting all volatile registers to a random value,
+or a flag such as 0xA5A5A5...A5A5, or at least to 0.  qemu-user should.
 
-It's not clear host cares about the distinction,
-it's all memory that can shrink in response to
-memory pressure such as inflating the balloon.
+This raises the question, "What *is* the ABI for system calls?".
+The documentation  http://refspecs.linuxfoundation.org/ELF/ppc64/PPC-elf64abi.html#REG
+does not state explicitly that a system call is the same as a subroutine call.
+Indeed it isn't, because a system call preserves the link register lr,
+but a subroutine call need not.
 
-This statistic is portable as well I think, most guests have
-storage cache.
+So, how about qemu-user enforcing the ABI for system calls?
 
-
-> > > > ---
-> > > >  drivers/virtio/virtio_balloon.c     | 11 +++++++++++
-> > > >  include/uapi/linux/virtio_balloon.h |  4 +++-
-> > > >  mm/swap_state.c                     |  1 +
-> > > >  3 files changed, 15 insertions(+), 1 deletion(-)
-> > > >=20
-> > > > diff --git a/drivers/virtio/virtio_balloon.c b/drivers/virtio/vir=
-tio_balloon.c
-> > > > index f0b3a0b9d42f..c2558ec47a62 100644
-> > > > --- a/drivers/virtio/virtio_balloon.c
-> > > > +++ b/drivers/virtio/virtio_balloon.c
-> > > > @@ -244,12 +244,19 @@ static unsigned int update_balloon_stats(st=
-ruct virtio_balloon *vb)
-> > > >  	struct sysinfo i;
-> > > >  	unsigned int idx =3D 0;
-> > > >  	long available;
-> > > > +	long cached;
-> > > > =20
-> > > >  	all_vm_events(events);
-> > > >  	si_meminfo(&i);
-> > > > =20
-> > > >  	available =3D si_mem_available();
-> > > > =20
-> > > > +	cached =3D global_node_page_state(NR_FILE_PAGES) -
-> > > > +			total_swapcache_pages() - i.bufferram;
-> > > > +	if (cached < 0)
-> > > > +		cached =3D 0;
-> > > > +
-> > > > +
-> > > >  #ifdef CONFIG_VM_EVENT_COUNTERS
-> > > >  	update_stat(vb, idx++, VIRTIO_BALLOON_S_SWAP_IN,
-> > > >  				pages_to_bytes(events[PSWPIN]));
-> > > > @@ -264,6 +271,10 @@ static unsigned int update_balloon_stats(str=
-uct virtio_balloon *vb)
-> > > >  				pages_to_bytes(i.totalram));
-> > > >  	update_stat(vb, idx++, VIRTIO_BALLOON_S_AVAIL,
-> > > >  				pages_to_bytes(available));
-> > > > +	update_stat(vb, idx++, VIRTIO_BALLOON_S_BUFFERS,
-> > > > +				pages_to_bytes(i.bufferram));
-> > > > +	update_stat(vb, idx++, VIRTIO_BALLOON_S_CACHED,
-> > > > +				pages_to_bytes(cached));
-> > > > =20
-> > > >  	return idx;
-> > > >  }
-> > > > diff --git a/include/uapi/linux/virtio_balloon.h b/include/uapi/l=
-inux/virtio_balloon.h
-> > > > index 343d7ddefe04..d5dc8a56a497 100644
-> > > > --- a/include/uapi/linux/virtio_balloon.h
-> > > > +++ b/include/uapi/linux/virtio_balloon.h
-> > > > @@ -52,7 +52,9 @@ struct virtio_balloon_config {
-> > > >  #define VIRTIO_BALLOON_S_MEMFREE  4   /* Total amount of free me=
-mory */
-> > > >  #define VIRTIO_BALLOON_S_MEMTOT   5   /* Total amount of memory =
-*/
-> > > >  #define VIRTIO_BALLOON_S_AVAIL    6   /* Available memory as in =
-/proc */
-> > > > -#define VIRTIO_BALLOON_S_NR       7
-> > > > +#define VIRTIO_BALLOON_S_BUFFERS  7   /* Buffers memory as in /p=
-roc */
-> > > > +#define VIRTIO_BALLOON_S_CACHED   8   /* Cached memory as in /pr=
-oc */
-> > > > +#define VIRTIO_BALLOON_S_NR       9
-> > > > =20
-> > > >  /*
-> > > >   * Memory statistics structure.
-> > > > diff --git a/mm/swap_state.c b/mm/swap_state.c
-> > > > index 71ce2d1ccbf7..f3a4ff7d6c52 100644
-> > > > --- a/mm/swap_state.c
-> > > > +++ b/mm/swap_state.c
-> > > > @@ -95,6 +95,7 @@ unsigned long total_swapcache_pages(void)
-> > > >  	rcu_read_unlock();
-> > > >  	return ret;
-> > > >  }
-> > > > +EXPORT_SYMBOL_GPL(total_swapcache_pages);
-> > > > =20
-> > > >  static atomic_t swapin_readahead_hits =3D ATOMIC_INIT(4); =20
-> > >=20
-> > > Need an ack from MM crowd on that.
-> > >  =20
-> > > > --=20
-> > > > 2.14.1 =20
-> >=20
-> >=20
-> > --=20
-> > Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com>
->=20
->=20
-> --=20
-> Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com>
+-- 
