@@ -1,31 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42297)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48464)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e9c9T-0002vg-EB
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 15:24:44 -0400
+	(envelope-from <jsnow@redhat.com>) id 1e9ci7-0001ap-H6
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 16:00:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e9c9S-000341-H6
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 15:24:43 -0400
-Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:48411)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1e9c9S-00033d-AG
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 15:24:42 -0400
-Received: by mail-wm0-x233.google.com with SMTP id p75so934998wmg.3
-	for <qemu-devel@nongnu.org>; Tue, 31 Oct 2017 12:24:42 -0700 (PDT)
+	(envelope-from <jsnow@redhat.com>) id 1e9ci2-0002Lk-IY
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 16:00:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55642)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1e9ci2-0002KZ-A0
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 16:00:26 -0400
+References: <BC29A004BA570342A4CC0044A3845572CFCE5592@H3CMLB12-EX.srv.huawei-3com.com>
+	<20171025133115.GA23458@lemon>
+	<BC29A004BA570342A4CC0044A3845572CFCE5962@H3CMLB12-EX.srv.huawei-3com.com>
+	<f10f73b8-6b6b-a30e-a147-b7fcaa28b182@redhat.com>
+	<BC29A004BA570342A4CC0044A3845572CFCE5D44@H3CMLB12-EX.srv.huawei-3com.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <e88f74be-e219-bc1f-2f41-05ec29824897@redhat.com>
+Date: Tue, 31 Oct 2017 16:00:16 -0400
 MIME-Version: 1.0
-In-Reply-To: <alpine.DEB.2.10.1710311147570.13766@sstabellini-ThinkPad-X260>
-References: <alpine.DEB.2.10.1710171708130.27209@sstabellini-ThinkPad-X260>
-	<CAFEAcA9zXAmNPL8TsLKSPbm8Er_KLK8Ubwth6=nL6WD87OmBQw@mail.gmail.com>
-	<CAFEAcA8jwN81ZBCLA8HW=q5GAWKmZ=kAZAP9vGNN8RYkzYe=Pw@mail.gmail.com>
-	<alpine.DEB.2.10.1710310959490.13766@sstabellini-ThinkPad-X260>
-	<CAFEAcA_8cimWtic=2OdvCmAN-mJ5MGGnVzDGYA5VgXGJG-fKhw@mail.gmail.com>
-	<alpine.DEB.2.10.1710311147570.13766@sstabellini-ThinkPad-X260>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 31 Oct 2017 19:24:20 +0000
-Message-ID: <CAFEAcA_rOYq8NuhrbnJc4D7M+EenXPkPeqTBBJJzoBnAPxVLnw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] aarch64: advertise the GIC system register
- interface
+In-Reply-To: <BC29A004BA570342A4CC0044A3845572CFCE5D44@H3CMLB12-EX.srv.huawei-3com.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] Block format 'raw' does not support the option
+ 'locking' when disable image locking with option locking=off
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,47 +32,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Stabellini <sstabellini@kernel.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "xen-devel@lists.xen.org" <xen-devel@lists.xen.org>, julien.grall@arm.com, qemu-arm <qemu-arm@nongnu.org>
+To: Changlimin <changlimin@h3c.com>, Max Reitz <mreitz@redhat.com>, Fam Zheng <famz@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-On 31 October 2017 at 18:51, Stefano Stabellini <sstabellini@kernel.org> wrote:
-> On Tue, 31 Oct 2017, Peter Maydell wrote:
->> On 31 October 2017 at 17:01, Stefano Stabellini <sstabellini@kernel.org> wrote:
->> > Fixing QEMU is harder than I expected. Would it be possible to update
->> > id_aa64pfr0 at CPU reset time? Like cpu->id_aa64pfr0 |= 0x01000000; ?
->>
->> At that point we've already called register_cp_regs_for_features(),
->> which is where we read cpu->id_aa64pfr0 when we're creating the
->> cpreg. So if you change it after that it's too late. But that
->> function is called at CPU realize time, which is before we've
->> created the GIC object...
->
-> What about something along the lines of
->
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index 9e18b41..0851071 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -1401,6 +1400,10 @@ static void machvirt_init(MachineState *machine)
->              object_property_set_link(cpuobj, OBJECT(secure_sysmem),
->                                       "secure-memory", &error_abort);
->          }
-> +        if (vms->gic_version == 3) {
-> +            ARMCPU *cpu = ARM_CPU(cpuobj);
-> +            cpu->id_aa64pfr0 |= 0x01000000;
-> +        }
->
->          object_property_set_bool(cpuobj, true, "realized", NULL);
->          object_unref(cpuobj);
 
-Definitely not -- the virt board should not be poking about inside the
-internals of the CPU object.
 
-The slightly cleaned up version of this idea is that you give the
-CPU an object property for "claim the GICv3 registers exist in the
-ID registers" and have virt.c set it. That feels like an ugly
-workaround for something we really ought not to have to tell the
-board about at all, though.
+On 10/26/2017 03:18 AM, Changlimin wrote:
+> If the qcow2 file is created with preallocation=full, I think metadata will not corrupt when it is shared between two vms? Snapshot is not required. 
+> 
+> Is this right?
+> 
 
-thanks
--- PMM
+You can only share images read-only in this way. If you are asking to
+share one qcow2 as r/w across two VMs, that's not going to work
+regardless of how you allocate them, or the image format you are using.
+
+--js
+
+> BR
+> Chang limin
+> 
