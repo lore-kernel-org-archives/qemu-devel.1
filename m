@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42606)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46809)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e9YXh-0006Zi-U2
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 11:33:35 -0400
+	(envelope-from <Michael.Nawrocki@gtri.gatech.edu>)
+	id 1e9YjS-0001TB-LO
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 11:45:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e9YXd-0007rM-Cs
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 11:33:29 -0400
-Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:56004)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1e9YXd-0007r1-5K
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 11:33:25 -0400
-Received: by mail-wm0-x234.google.com with SMTP id y83so23949477wmc.4
-	for <qemu-devel@nongnu.org>; Tue, 31 Oct 2017 08:33:25 -0700 (PDT)
+	(envelope-from <Michael.Nawrocki@gtri.gatech.edu>)
+	id 1e9YjP-0007QU-J1
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 11:45:38 -0400
+Received: from relay2.gtri.gatech.edu ([130.207.199.168]:52289)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <Michael.Nawrocki@gtri.gatech.edu>)
+	id 1e9YjP-0007P6-Em
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 11:45:35 -0400
+From: Mike Nawrocki <michael.nawrocki@gtri.gatech.edu>
+Date: Tue, 31 Oct 2017 11:44:05 -0400
+Message-ID: <20171031154407.4184-1-michael.nawrocki@gtri.gatech.edu>
 MIME-Version: 1.0
-In-Reply-To: <1509455489-14101-1-git-send-email-peter.maydell@linaro.org>
-References: <1509455489-14101-1-git-send-email-peter.maydell@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 31 Oct 2017 15:33:03 +0000
-Message-ID: <CAFEAcA96o6S35SsC_FNjSwN84eMaEP+3U34+2b18bUdrSbyz1w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/5] target-arm queue
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH 0/2] Add 8-byte wide AMD flash support,
+ partial interleaving
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,41 +27,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, jan.kiszka@web.de, edgar.iglesias@gmail.com, alistair.francis@xilinx.com, michael@walle.cc, david@gibson.dropbear.id.au, magnus.damm@gmail.com, Mike Nawrocki <michael.nawrocki@gtri.gatech.edu>
 
-On 31 October 2017 at 13:11, Peter Maydell <peter.maydell@linaro.org> wrote:
-> Just small stuff. I expect/hope to get the "report attributes
-> in PAR register" fix from Andrew in, but will either send another
-> pull or just apply it as a single patch once it's been reviewed.
-> (I think we can call it a bugfix anyway, since it fixes booting
-> of Windows on ARM.)
->
-> thanks
-> -- PMM
->
->
-> The following changes since commit abf6e752e55b2f5afb48303429dea2db7c3a62de:
->
->   Merge remote-tracking branch 'remotes/borntraeger/tags/s390x-20171030' into staging (2017-10-30 13:02:45 +0000)
->
-> are available in the git repository at:
->
->   git://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20171031
->
-> for you to fetch changes up to 168df2dea701bbf3118bdfea7794369dfa694d3d:
->
->   hw/pci-host/gpex: Improve INTX to gsi routing error checking (2017-10-31 11:50:52 +0000)
->
-> ----------------------------------------------------------------
-> target-arm queue:
->  * fix instruction-length bit in syndrome for WFI/WFE traps
->  * xlnx-zcu102: Specify the max number of CPUs
->  * msf2: Remove dead code reported by Coverity
->  * msf2: Wire up SYSRESETREQ in SoC for system reset
->  * hw/pci-host/gpex: Improve INTX to gsi routing error checking
->
+This patch set does a few things. First, it switches the AMD CFI flash MMIO
+operations from the old MMIO API to the new one. Second, it enables 8-byte
+wide flash arrays. Finally, it supports rudimentary interleaving of notional
+flash "chips". It is expected that commands will be sent to all "chips"
+simultaneously. See the example in the second patch for more details. This
+behavior is used by drivers for the PPMC7400 PowerPC evaluation board.
 
+Mike Nawrocki (2):
+  Add 8-byte access to AMD CFI devices
+  Add support for flash interleaving of AMD chips
 
-Applied, thanks.
+ hw/arm/digic_boards.c    |   2 +-
+ hw/arm/musicpal.c        |   4 +-
+ hw/arm/xilinx_zynq.c     |   2 +-
+ hw/block/pflash_cfi02.c  | 210 ++++++++++++++++++++++++++---------------------
+ hw/lm32/lm32_boards.c    |   4 +-
+ hw/ppc/ppc405_boards.c   |  15 ++--
+ hw/sh4/r2d.c             |   2 +-
+ include/hw/block/flash.h |   1 +
+ 8 files changed, 132 insertions(+), 108 deletions(-)
 
--- PMM
+-- 
+2.14.2
