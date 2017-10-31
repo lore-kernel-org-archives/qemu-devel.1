@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57291)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57320)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1e9U5H-0005TG-Aq
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 06:47:52 -0400
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1e9U5J-0005Uc-E3
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 06:48:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1e9U5B-0003P1-Cw
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 06:47:51 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:39768)
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1e9U5I-0003bB-9M
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 06:47:53 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:39790)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1e9U5B-0003KE-5W
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 06:47:45 -0400
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1e9U5H-0003Zu-Tt
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 06:47:52 -0400
 From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Date: Tue, 31 Oct 2017 13:47:41 +0300
-Message-ID: <20171031104741.3079.26584.stgit@pasha-VirtualBox>
+Date: Tue, 31 Oct 2017 13:47:52 +0300
+Message-ID: <20171031104752.3079.69062.stgit@pasha-VirtualBox>
+In-Reply-To: <20171031104741.3079.26584.stgit@pasha-VirtualBox>
+References: <20171031104741.3079.26584.stgit@pasha-VirtualBox>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [RFCPATCH00/20] replay additions
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [RFCPATCH02/20] blkreplay: create temporary overlay
+ for underlaying devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,68 +30,134 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dovgaluk@ispras.ru
 
-This set of patches includex fixes from Alex Benn=C3=A9e for fixing
-BQL and replay locks after inventing the MTTCG. It also includes some
-additional replay patches that makes this set of fixes working.
-It is also fixes some vmstate creation (and loading) issues
-in record/replay modes:
- - VM start/stop fixes in replay mode
- - overlay creation for blkreplay filter
- - fixes for vmstate save/load in record/replay mode
- - fixes for host clock vmstate
- - fixes for icount timers vmstate
+From: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
 
+This patch allows using '-snapshot' behavior in record/replay mode.
+blkreplay layer creates temporary overlays on top of underlaying
+disk images. It is needed, because creating an overlay over blkreplay
+breaks the determinism.
+This patch creates similar temporary overlay (when it is needed)
+under the blkreplay driver. Therefore all block operations are controlled
+by blkreplay.
+
+Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
 ---
+ block/blkreplay.c |   65 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ stubs/replay.c    |    1 +
+ vl.c              |    2 +-
+ 3 files changed, 67 insertions(+), 1 deletion(-)
 
-Alex Benn=C3=A9e (7):
-      target/arm/arm-powertctl: drop BQL assertions
-      cpus: push BQL lock to qemu_*_wait_io_event
-      cpus: only take BQL for sleeping threads
-      replay/replay.c: bump REPLAY_VERSION again
-      replay/replay-internal.c: track holding of replay_lock
-      replay: make locking visible outside replay code
-      replay: push replay_mutex_lock up the call tree
-
-Pavel Dovgalyuk (13):
-      block: implement bdrv_snapshot_goto for blkreplay
-      blkreplay: create temporary overlay for underlaying devices
-      replay: disable default snapshot for record/replay
-      replay: fix processing async events
-      replay: fixed replay_enable_events
-      replay: fix save/load vm for non-empty queue
-      replay: added replay log format description
-      replay: make safe vmstop at record/replay
-      replay: save prior value of the host clock
-      icount: fixed saving/restoring of icount warp timers
-      cpu-exec: don't overwrite exception_index
-      cpu-exec: reset exit flag before calling cpu_exec_nocache
-      replay: don't destroy mutex at exit
-
-
- accel/kvm/kvm-all.c       |    4 -
- accel/tcg/cpu-exec.c      |    5 +-
- block/blkreplay.c         |   73 ++++++++++++++++++++++
- cpus-common.c             |   13 ++--
- cpus.c                    |  149 ++++++++++++++++++++++++++++++++++++---=
-------
- docs/replay.txt           |   88 +++++++++++++++++++++++++++
- include/qemu/timer.h      |   14 ++++
- include/sysemu/replay.h   |   19 ++++++
- migration/savevm.c        |   13 ++++
- replay/replay-char.c      |   21 ++----
- replay/replay-events.c    |   30 ++++-----
- replay/replay-internal.c  |   22 ++++++-
- replay/replay-internal.h  |    9 ++-
- replay/replay-snapshot.c  |    9 +++
- replay/replay-time.c      |   10 ++-
- replay/replay.c           |   43 ++++++-------
- stubs/replay.c            |   16 +++++
- target/arm/arm-powerctl.c |    8 --
- target/i386/hax-all.c     |    3 -
- util/main-loop.c          |   23 ++++++-
- util/qemu-timer.c         |   12 ++++
- vl.c                      |   12 +++-
- 22 files changed, 475 insertions(+), 121 deletions(-)
-
---=20
-Pavel Dovgalyuk
+diff --git a/block/blkreplay.c b/block/blkreplay.c
+index 82a88f8..c489d50 100755
+--- a/block/blkreplay.c
++++ b/block/blkreplay.c
+@@ -14,12 +14,69 @@
+ #include "block/block_int.h"
+ #include "sysemu/replay.h"
+ #include "qapi/error.h"
++#include "qapi/qmp/qstring.h"
+ 
+ typedef struct Request {
+     Coroutine *co;
+     QEMUBH *bh;
+ } Request;
+ 
++static BlockDriverState *blkreplay_append_snapshot(BlockDriverState *bs,
++                                                   Error **errp)
++{
++    int ret;
++    BlockDriverState *bs_snapshot;
++    int64_t total_size;
++    QemuOpts *opts = NULL;
++    char tmp_filename[PATH_MAX + 1];
++    QDict *snapshot_options = qdict_new();
++
++    /* Prepare options QDict for the overlay file */
++    qdict_put(snapshot_options, "file.driver", qstring_from_str("file"));
++    qdict_put(snapshot_options, "driver", qstring_from_str("qcow2"));
++
++    /* Create temporary file */
++    ret = get_tmp_filename(tmp_filename, PATH_MAX + 1);
++    if (ret < 0) {
++        error_setg_errno(errp, -ret, "Could not get temporary filename");
++        goto out;
++    }
++    qdict_put(snapshot_options, "file.filename",
++              qstring_from_str(tmp_filename));
++
++    /* Get the required size from the image */
++    total_size = bdrv_getlength(bs);
++    if (total_size < 0) {
++        error_setg_errno(errp, -total_size, "Could not get image size");
++        goto out;
++    }
++
++    opts = qemu_opts_create(bdrv_qcow2.create_opts, NULL, 0, &error_abort);
++    qemu_opt_set_number(opts, BLOCK_OPT_SIZE, total_size, &error_abort);
++    ret = bdrv_create(&bdrv_qcow2, tmp_filename, opts, errp);
++    qemu_opts_del(opts);
++    if (ret < 0) {
++        error_prepend(errp, "Could not create temporary overlay '%s': ",
++                      tmp_filename);
++        goto out;
++    }
++
++    bs_snapshot = bdrv_open(NULL, NULL, snapshot_options,
++                            BDRV_O_RDWR | BDRV_O_TEMPORARY, errp);
++    snapshot_options = NULL;
++    if (!bs_snapshot) {
++        goto out;
++    }
++
++    bdrv_append(bs_snapshot, bs, errp);
++
++    return bs_snapshot;
++
++out:
++    QDECREF(snapshot_options);
++    return NULL;
++}
++
+ static int blkreplay_open(BlockDriverState *bs, QDict *options, int flags,
+                           Error **errp)
+ {
+@@ -35,6 +92,14 @@ static int blkreplay_open(BlockDriverState *bs, QDict *options, int flags,
+         goto fail;
+     }
+ 
++    /* Add temporary snapshot to preserve the image */
++    if (!replay_snapshot
++        && !blkreplay_append_snapshot(bs->file->bs, &local_err)) {
++        ret = -EINVAL;
++        error_propagate(errp, local_err);
++        goto fail;
++    }
++
+     ret = 0;
+ fail:
+     return ret;
+diff --git a/stubs/replay.c b/stubs/replay.c
+index 9c8aa48..9991ee5 100644
+--- a/stubs/replay.c
++++ b/stubs/replay.c
+@@ -3,6 +3,7 @@
+ #include "sysemu/sysemu.h"
+ 
+ ReplayMode replay_mode;
++char *replay_snapshot;
+ 
+ int64_t replay_save_clock(unsigned int kind, int64_t clock)
+ {
+diff --git a/vl.c b/vl.c
+index ec29909..7aa59f0 100644
+--- a/vl.c
++++ b/vl.c
+@@ -4661,7 +4661,7 @@ int main(int argc, char **argv, char **envp)
+         qapi_free_BlockdevOptions(bdo->bdo);
+         g_free(bdo);
+     }
+-    if (snapshot || replay_mode != REPLAY_MODE_NONE) {
++    if (snapshot) {
+         qemu_opts_foreach(qemu_find_opts("drive"), drive_enable_snapshot,
+                           NULL, NULL);
+     }
