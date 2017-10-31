@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37961)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38071)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e9Zub-00038Y-Ju
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 13:01:14 -0400
+	(envelope-from <sstabellini@kernel.org>) id 1e9Zv0-0003MN-Vl
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 13:01:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e9ZuW-0004ZH-0d
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 13:01:13 -0400
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:44044)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1e9ZuV-0004Xn-PJ
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 13:01:07 -0400
-Received: by mail-wr0-x244.google.com with SMTP id z55so16613241wrz.1
-	for <qemu-devel@nongnu.org>; Tue, 31 Oct 2017 10:01:07 -0700 (PDT)
+	(envelope-from <sstabellini@kernel.org>) id 1e9Zus-0004ti-Hr
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 13:01:34 -0400
+Date: Tue, 31 Oct 2017 10:01:10 -0700 (PDT)
+From: Stefano Stabellini <sstabellini@kernel.org>
+In-Reply-To: <CAFEAcA8jwN81ZBCLA8HW=q5GAWKmZ=kAZAP9vGNN8RYkzYe=Pw@mail.gmail.com>
+Message-ID: <alpine.DEB.2.10.1710310959490.13766@sstabellini-ThinkPad-X260>
+References: <alpine.DEB.2.10.1710171708130.27209@sstabellini-ThinkPad-X260>
+	<CAFEAcA9zXAmNPL8TsLKSPbm8Er_KLK8Ubwth6=nL6WD87OmBQw@mail.gmail.com>
+	<CAFEAcA8jwN81ZBCLA8HW=q5GAWKmZ=kAZAP9vGNN8RYkzYe=Pw@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20171031154407.4184-1-michael.nawrocki@gtri.gatech.edu>
-References: <20171031154407.4184-1-michael.nawrocki@gtri.gatech.edu>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 31 Oct 2017 17:00:45 +0000
-Message-ID: <CAFEAcA8Cv1+E9v3dSqPkUDd7s9zp=V+UJ1V7oXJBWzwnQdzFSg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 0/2] Add 8-byte wide AMD flash support,
- partial interleaving
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: Re: [Qemu-devel] [PATCH] aarch64: advertise the GIC system register
+ interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,24 +24,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mike Nawrocki <michael.nawrocki@gtri.gatech.edu>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Magnus Damm <magnus.damm@gmail.com>, Alistair Francis <alistair.francis@xilinx.com>, Michael Walle <michael@walle.cc>, Jan Kiszka <jan.kiszka@web.de>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Max Reitz <mreitz@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Stefano Stabellini <sstabellini@kernel.org>, QEMU Developers <qemu-devel@nongnu.org>, "xen-devel@lists.xen.org" <xen-devel@lists.xen.org>, julien.grall@arm.com, qemu-arm <qemu-arm@nongnu.org>
 
-On 31 October 2017 at 15:44, Mike Nawrocki
-<michael.nawrocki@gtri.gatech.edu> wrote:
-> This patch set does a few things. First, it switches the AMD CFI flash MMIO
-> operations from the old MMIO API to the new one. Second, it enables 8-byte
-> wide flash arrays. Finally, it supports rudimentary interleaving of notional
-> flash "chips". It is expected that commands will be sent to all "chips"
-> simultaneously. See the example in the second patch for more details. This
-> behavior is used by drivers for the PPMC7400 PowerPC evaluation board.
+On Tue, 31 Oct 2017, Peter Maydell wrote:
+> On 19 October 2017 at 15:46, Peter Maydell <peter.maydell@linaro.org> wrote:
+> > On 18 October 2017 at 01:10, Stefano Stabellini <sstabellini@kernel.org> wrote:
+> >> Advertise the presence of the GIC system register interface (1<<24)
+> >> according to H9.248 of the ARM ARM.
+> >>
+> >> This patch allows Xen to boot on QEMU aarch64.
+> >>
+> >> Signed-off-by: Stefano Stabellini <sstabellini@kernel.org>
+> >>
+> >> diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
+> >> index 670c07a..a451763 100644
+> >> --- a/target/arm/cpu64.c
+> >> +++ b/target/arm/cpu64.c
+> >> @@ -136,7 +136,7 @@ static void aarch64_a57_initfn(Object *obj)
+> >>      cpu->id_isar3 = 0x01112131;
+> >>      cpu->id_isar4 = 0x00011142;
+> >>      cpu->id_isar5 = 0x00011121;
+> >> -    cpu->id_aa64pfr0 = 0x00002222;
+> >> +    cpu->id_aa64pfr0 = 0x01002222;
+> >>      cpu->id_aa64dfr0 = 0x10305106;
+> >>      cpu->pmceid0 = 0x00000000;
+> >>      cpu->pmceid1 = 0x00000000;
+> >> @@ -196,7 +196,7 @@ static void aarch64_a53_initfn(Object *obj)
+> >>      cpu->id_isar3 = 0x01112131;
+> >>      cpu->id_isar4 = 0x00011142;
+> >>      cpu->id_isar5 = 0x00011121;
+> >> -    cpu->id_aa64pfr0 = 0x00002222;
+> >> +    cpu->id_aa64pfr0 = 0x01002222;
+> >>      cpu->id_aa64dfr0 = 0x10305106;
+> >>      cpu->id_aa64isar0 = 0x00011120;
+> >>      cpu->id_aa64mmfr0 = 0x00001122; /* 40 bit physical addr */
+> >
+> > Whoops -- we missed this when we added the GICv3 support, because
+> > Linux doesn't check it.
+> >
+> > Applied to target-arm.next, thanks.
+> 
+> Unfortunately I've just noticed that this breaks booting Linux
+> in the "not using gicv3" case. This is because we don't actually
+> define the GICv3 cpu interface registers unless the board
+> instantiates a GICv3. We mustn't advertise the GICv3 sysregs
+> in the ID register unless we actually have them.
+> 
+> Not sure how best to fix this -- it's a consequence of the
+> design decision we made to have the sysregs implementation
+> be in the gicv3 code. There's no useful feature bit in the CPU
+> to hang this off either, it's an effect of whether the board
+> model happens to wire up a gicv3 or not. So we can only figure
+> this out fairly late on (probably at CPU reset time), which
+> is a bit tedious for getting ID reg values right.
+> 
+> In the meantime I've dropped this patch from target-arm.next.
 
-I'm confused by the interleaving part. Can you explain how this
-differs from the interleaving we already support in pflash_cfi01.c
-via setting width, device-width and max-device-width ? (see the comment
-in the pflash_cfi01_properties[] array about how those settings
-interact). If it is the same thing, we should really implement it
-in the same way for both kinds of flash device.
-
-thanks
--- PMM
+Fixing QEMU is harder than I expected. Would it be possible to update
+id_aa64pfr0 at CPU reset time? Like cpu->id_aa64pfr0 |= 0x01000000; ?
