@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55086)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56548)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=47063d443=ross.lagerwall@citrix.com>)
-	id 1e9Z7h-0002At-3B
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 12:10:42 -0400
+	(envelope-from <mst@redhat.com>) id 1e9ZCr-0003F3-6E
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 12:16:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=47063d443=ross.lagerwall@citrix.com>)
-	id 1e9Z7a-00067M-RE
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 12:10:39 -0400
-Received: from smtp02.citrix.com ([66.165.176.63]:26517)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=47063d443=ross.lagerwall@citrix.com>)
-	id 1e9Z7a-00066Q-Kr
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 12:10:34 -0400
-From: Ross Lagerwall <ross.lagerwall@citrix.com>
-Date: Tue, 31 Oct 2017 16:09:02 +0000
-Message-ID: <20171031160902.6874-1-ross.lagerwall@citrix.com>
+	(envelope-from <mst@redhat.com>) id 1e9ZCn-0001JH-61
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 12:16:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46928)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1e9ZCm-0001Ih-Su
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 12:15:57 -0400
+Date: Tue, 31 Oct 2017 18:15:48 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20171031180315-mutt-send-email-mst@kernel.org>
+References: <cover.1505998455.git.tgolembi@redhat.com>
+	<b13f11c03ed394bd8ad367dc90996ed134ea98da.1505998455.git.tgolembi@redhat.com>
+	<20171019160405-mutt-send-email-mst@kernel.org>
+	<20171022200557.02558e37@fiorina> <20171031132019.76197945@fiorina>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH] io: Fix QIOChannelFile when creating and
- opening read-write
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20171031132019.76197945@fiorina>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 1/1] virtio_balloon: include buffers and
+ cached memory statistics
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,101 +31,148 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, Ross Lagerwall <ross.lagerwall@citrix.com>
+To: =?utf-8?B?VG9tw6HFoSBHb2xlbWJpb3Zza8O9?= <tgolembi@redhat.com>
+Cc: linux-mm@kvack.org, virtualization@lists.linux-foundation.org, qemu-devel@nongnu.org, kvm@vger.kernel.org, virtio-dev@lists.oasis-open.org, Wei Wang <wei.w.wang@intel.com>, Shaohua Li <shli@fb.com>, Huang Ying <ying.huang@intel.com>, Jason Wang <jasowang@redhat.com>, Gal Hammer <ghammer@redhat.com>, Amnon Ilan <ailan@redhat.com>, riel@redhat.com
 
-The code wrongly passes the mode to open() only if O_WRONLY is set.
-Instead, the mode should be passed when O_CREAT is set (or O_TMPFILE on
-Linux). Fix this by always passing the mode since open() will correctly
-ignore the mode if it is not needed. Add a testcase which exercises this
-bug.
+On Tue, Oct 31, 2017 at 01:20:19PM +0100, Tom=C3=A1=C5=A1 Golembiovsk=C3=BD=
+ wrote:
+> ping
+>=20
+> +Gil, +Amnon... could you maybe aid in reviewing the patch, please?
+>=20
+>=20
+>     Tomas
+>=20
+> On Sun, 22 Oct 2017 20:05:57 +0200
+> Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com> wrote:
+>=20
+> > On Thu, 19 Oct 2017 16:12:20 +0300
+> > "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> >=20
+> > > On Thu, Sep 21, 2017 at 02:55:41PM +0200, Tom=C3=A1=C5=A1 Golembiov=
+sk=C3=BD wrote: =20
+> > > > Add a new fields, VIRTIO_BALLOON_S_BUFFERS and VIRTIO_BALLOON_S_C=
+ACHED,
+> > > > to virtio_balloon memory statistics protocol. The values correspo=
+nd to
+> > > > 'Buffers' and 'Cached' in /proc/meminfo.
+> > > >=20
+> > > > To be able to compute the value of 'Cached' memory it is necessar=
+y to
+> > > > export total_swapcache_pages() to modules.
+> > > >=20
+> > > > Signed-off-by: Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat=
+.com> =20
+> > >=20
+> > > Does 'Buffers' actually make sense? It's a temporary storage -
+> > > wouldn't it be significantly out of date by the time
+> > > host receives it? =20
+> >=20
+> > That would be best answered by somebody from kernel. But my personal
+> > opinion is that it would not be out of date. The amount of memory
+> > dedicated to Buffers does not seem to fluctuate too much.
+> >=20
+> >     Tomas
+> >=20
 
-While at it, add /dev/fdset/ support to QIOChannelFile by calling
-qemu_open() instead open(). There is a subtle semantic change since
-qemu_open() automatically sets O_CLOEXEC, but this doesn't affect any of
-the users of the function.
+I would be inclined to say, just report
+global_node_page_state(NR_FILE_PAGES).
+Maybe subtract buffer ram.
 
-Signed-off-by: Ross Lagerwall <ross.lagerwall@citrix.com>
----
- include/io/channel-file.h    |  2 +-
- io/channel-file.c            |  6 +-----
- tests/test-io-channel-file.c | 27 +++++++++++++++++++++++++++
- 3 files changed, 29 insertions(+), 6 deletions(-)
+It's not clear host cares about the distinction,
+it's all memory that can shrink in response to
+memory pressure such as inflating the balloon.
 
-diff --git a/include/io/channel-file.h b/include/io/channel-file.h
-index 79245f1..ebfe54e 100644
---- a/include/io/channel-file.h
-+++ b/include/io/channel-file.h
-@@ -73,7 +73,7 @@ qio_channel_file_new_fd(int fd);
-  * qio_channel_file_new_path:
-  * @path: the file path
-  * @flags: the open flags (O_RDONLY|O_WRONLY|O_RDWR, etc)
-- * @mode: the file creation mode if O_WRONLY is set in @flags
-+ * @mode: the file creation mode if O_CREAT is set in @flags
-  * @errp: pointer to initialized error object
-  *
-  * Create a new IO channel object for a file represented
-diff --git a/io/channel-file.c b/io/channel-file.c
-index b383273..ae8fb62 100644
---- a/io/channel-file.c
-+++ b/io/channel-file.c
-@@ -50,11 +50,7 @@ qio_channel_file_new_path(const char *path,
- 
-     ioc = QIO_CHANNEL_FILE(object_new(TYPE_QIO_CHANNEL_FILE));
- 
--    if (flags & O_WRONLY) {
--        ioc->fd = open(path, flags, mode);
--    } else {
--        ioc->fd = open(path, flags);
--    }
-+    ioc->fd = qemu_open(path, flags, mode);
-     if (ioc->fd < 0) {
-         object_unref(OBJECT(ioc));
-         error_setg_errno(errp, errno,
-diff --git a/tests/test-io-channel-file.c b/tests/test-io-channel-file.c
-index 6bfede6..0c7303d 100644
---- a/tests/test-io-channel-file.c
-+++ b/tests/test-io-channel-file.c
-@@ -50,6 +50,32 @@ static void test_io_channel_file(void)
-     object_unref(OBJECT(dst));
- }
- 
-+static void test_io_channel_file_rdwr(void)
-+{
-+    QIOChannel *src, *dst;
-+    QIOChannelTest *test;
-+
-+#define TEST_FILE "tests/test-io-channel-file.txt"
-+    unlink(TEST_FILE);
-+    src = QIO_CHANNEL(qio_channel_file_new_path(
-+                          TEST_FILE,
-+                          O_RDWR | O_CREAT | O_TRUNC | O_BINARY, 0600,
-+                          &error_abort));
-+    dst = QIO_CHANNEL(qio_channel_file_new_path(
-+                          TEST_FILE,
-+                          O_RDONLY | O_BINARY, 0,
-+                          &error_abort));
-+
-+    test = qio_channel_test_new();
-+    qio_channel_test_run_writer(test, src);
-+    qio_channel_test_run_reader(test, dst);
-+    qio_channel_test_validate(test);
-+
-+    unlink(TEST_FILE);
-+    object_unref(OBJECT(src));
-+    object_unref(OBJECT(dst));
-+}
-+
- 
- static void test_io_channel_fd(void)
- {
-@@ -114,6 +140,7 @@ int main(int argc, char **argv)
-     g_test_init(&argc, &argv, NULL);
- 
-     g_test_add_func("/io/channel/file", test_io_channel_file);
-+    g_test_add_func("/io/channel/file/rdwr", test_io_channel_file_rdwr);
-     g_test_add_func("/io/channel/file/fd", test_io_channel_fd);
- #ifndef _WIN32
-     g_test_add_func("/io/channel/pipe/sync", test_io_channel_pipe_sync);
--- 
-2.9.5
+This statistic is portable as well I think, most guests have
+storage cache.
+
+
+> > > > ---
+> > > >  drivers/virtio/virtio_balloon.c     | 11 +++++++++++
+> > > >  include/uapi/linux/virtio_balloon.h |  4 +++-
+> > > >  mm/swap_state.c                     |  1 +
+> > > >  3 files changed, 15 insertions(+), 1 deletion(-)
+> > > >=20
+> > > > diff --git a/drivers/virtio/virtio_balloon.c b/drivers/virtio/vir=
+tio_balloon.c
+> > > > index f0b3a0b9d42f..c2558ec47a62 100644
+> > > > --- a/drivers/virtio/virtio_balloon.c
+> > > > +++ b/drivers/virtio/virtio_balloon.c
+> > > > @@ -244,12 +244,19 @@ static unsigned int update_balloon_stats(st=
+ruct virtio_balloon *vb)
+> > > >  	struct sysinfo i;
+> > > >  	unsigned int idx =3D 0;
+> > > >  	long available;
+> > > > +	long cached;
+> > > > =20
+> > > >  	all_vm_events(events);
+> > > >  	si_meminfo(&i);
+> > > > =20
+> > > >  	available =3D si_mem_available();
+> > > > =20
+> > > > +	cached =3D global_node_page_state(NR_FILE_PAGES) -
+> > > > +			total_swapcache_pages() - i.bufferram;
+> > > > +	if (cached < 0)
+> > > > +		cached =3D 0;
+> > > > +
+> > > > +
+> > > >  #ifdef CONFIG_VM_EVENT_COUNTERS
+> > > >  	update_stat(vb, idx++, VIRTIO_BALLOON_S_SWAP_IN,
+> > > >  				pages_to_bytes(events[PSWPIN]));
+> > > > @@ -264,6 +271,10 @@ static unsigned int update_balloon_stats(str=
+uct virtio_balloon *vb)
+> > > >  				pages_to_bytes(i.totalram));
+> > > >  	update_stat(vb, idx++, VIRTIO_BALLOON_S_AVAIL,
+> > > >  				pages_to_bytes(available));
+> > > > +	update_stat(vb, idx++, VIRTIO_BALLOON_S_BUFFERS,
+> > > > +				pages_to_bytes(i.bufferram));
+> > > > +	update_stat(vb, idx++, VIRTIO_BALLOON_S_CACHED,
+> > > > +				pages_to_bytes(cached));
+> > > > =20
+> > > >  	return idx;
+> > > >  }
+> > > > diff --git a/include/uapi/linux/virtio_balloon.h b/include/uapi/l=
+inux/virtio_balloon.h
+> > > > index 343d7ddefe04..d5dc8a56a497 100644
+> > > > --- a/include/uapi/linux/virtio_balloon.h
+> > > > +++ b/include/uapi/linux/virtio_balloon.h
+> > > > @@ -52,7 +52,9 @@ struct virtio_balloon_config {
+> > > >  #define VIRTIO_BALLOON_S_MEMFREE  4   /* Total amount of free me=
+mory */
+> > > >  #define VIRTIO_BALLOON_S_MEMTOT   5   /* Total amount of memory =
+*/
+> > > >  #define VIRTIO_BALLOON_S_AVAIL    6   /* Available memory as in =
+/proc */
+> > > > -#define VIRTIO_BALLOON_S_NR       7
+> > > > +#define VIRTIO_BALLOON_S_BUFFERS  7   /* Buffers memory as in /p=
+roc */
+> > > > +#define VIRTIO_BALLOON_S_CACHED   8   /* Cached memory as in /pr=
+oc */
+> > > > +#define VIRTIO_BALLOON_S_NR       9
+> > > > =20
+> > > >  /*
+> > > >   * Memory statistics structure.
+> > > > diff --git a/mm/swap_state.c b/mm/swap_state.c
+> > > > index 71ce2d1ccbf7..f3a4ff7d6c52 100644
+> > > > --- a/mm/swap_state.c
+> > > > +++ b/mm/swap_state.c
+> > > > @@ -95,6 +95,7 @@ unsigned long total_swapcache_pages(void)
+> > > >  	rcu_read_unlock();
+> > > >  	return ret;
+> > > >  }
+> > > > +EXPORT_SYMBOL_GPL(total_swapcache_pages);
+> > > > =20
+> > > >  static atomic_t swapin_readahead_hits =3D ATOMIC_INIT(4); =20
+> > >=20
+> > > Need an ack from MM crowd on that.
+> > >  =20
+> > > > --=20
+> > > > 2.14.1 =20
+> >=20
+> >=20
+> > --=20
+> > Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com>
+>=20
+>=20
+> --=20
+> Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com>
