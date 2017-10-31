@@ -1,17 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56980)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57224)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Andrew.Baumann@microsoft.com>) id 1e9WCL-0007yc-Uw
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 09:03:25 -0400
+	(envelope-from <no-reply@patchew.org>) id 1e9WDM-0008Sp-K9
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 09:04:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Andrew.Baumann@microsoft.com>) id 1e9WCH-00011A-04
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 09:03:17 -0400
-From: Andrew Baumann <Andrew.Baumann@microsoft.com>
-Date: Tue, 31 Oct 2017 06:02:23 -0700
-Message-Id: <20171031130223.220-1-Andrew.Baumann@microsoft.com>
+	(envelope-from <no-reply@patchew.org>) id 1e9WDG-0001Nr-Gs
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 09:04:20 -0400
+Resent-Message-Id: <E1e9WDG-0001Nr-Gs@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21358)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1e9WDG-0001N1-7k
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 09:04:14 -0400
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <150945410417.171.566633983795592141@bafd83ae6430>
+In-Reply-To: <20171031110641.5836.43266.stgit@pasha-VirtualBox>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v3] arm: implement cache/shareability attribute
- bits for PAR registers
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 31 Oct 2017 05:48:24 -0700 (PDT)
+Subject: Re: [Qemu-devel] [RFC PATCH 00/26] replay additions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,353 +28,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, Andrew Baumann <Andrew.Baumann@microsoft.com>
+To: Pavel.Dovgaluk@ispras.ru
+Cc: famz@redhat.com, qemu-devel@nongnu.org, dovgaluk@ispras.ru
 
-On a successful address translation instruction, PAR is supposed to
-contain cacheability and shareability attributes determined by the
-translation. We previously returned 0 for these bits (in line with the
-general strategy of ignoring caches and memory attributes), but some
-guest OSes may depend on them.
-
-This patch collects the attribute bits in the page-table walk, and
-updates PAR with the correct attributes for all LPAE translations.
-Short descriptor formats still return 0 for these bits, as in the
-prior implementation.
-
-Signed-off-by: Andrew Baumann <Andrew.Baumann@microsoft.com>
----
-v2:
- * return attrs via out parameter from get_phys_addr, rather than MemTxAttrs
- * move MAIR lookup/index inline, since it turned out to be simple
- * implement attributes for stage 2 translations
- * combine attributes from stages 1 and 2 when required
-
-v3:
- * implement S2 allocation hints and check for cache-disabled
- * fix stage 2 shareability bits
- * fix combined allocation hints (always use stage 1 hints)
- * remove LOG_UNIMP message
-
-There's unfortunately one new wrinkle in this revision: the spec for
-S2ConvertAttrsHints() calls S2CacheDisabled() and returns non-cached if the
-cache is disabled. I assumed that we ought to emulate this. However, it wasn't
-clear to me what to make of the "if ELUsingAArch32(EL2)" branch -- we have a
-cp15.hcr_el2, but no HCR2 register. I just left a TODO comment, but it's quite
-likely I've missed something.
-
-Thanks,
-Andrew
-
- target/arm/helper.c | 180 ++++++++++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 166 insertions(+), 14 deletions(-)
-
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 96113fe989..81fe9283ea 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -19,17 +19,23 @@
- #define ARM_CPU_FREQ 1000000000 /* FIXME: 1 GHz, should be configurable */
- 
- #ifndef CONFIG_USER_ONLY
-+/* Cacheability and shareability attributes for a memory access */
-+typedef struct ARMCacheAttrs {
-+    unsigned int attrs:8; /* as in the MAIR register encoding */
-+    unsigned int shareability:2; /* as in the SH field of the VMSAv8-64 PTEs */
-+} ARMCacheAttrs;
-+
- static bool get_phys_addr(CPUARMState *env, target_ulong address,
-                           MMUAccessType access_type, ARMMMUIdx mmu_idx,
-                           hwaddr *phys_ptr, MemTxAttrs *attrs, int *prot,
-                           target_ulong *page_size, uint32_t *fsr,
--                          ARMMMUFaultInfo *fi);
-+                          ARMMMUFaultInfo *fi, ARMCacheAttrs *cacheattrs);
- 
- static bool get_phys_addr_lpae(CPUARMState *env, target_ulong address,
-                                MMUAccessType access_type, ARMMMUIdx mmu_idx,
-                                hwaddr *phys_ptr, MemTxAttrs *txattrs, int *prot,
-                                target_ulong *page_size_ptr, uint32_t *fsr,
--                               ARMMMUFaultInfo *fi);
-+                               ARMMMUFaultInfo *fi, ARMCacheAttrs *cacheattrs);
- 
- /* Security attributes for an address, as returned by v8m_security_lookup. */
- typedef struct V8M_SAttributes {
-@@ -2159,9 +2165,10 @@ static uint64_t do_ats_write(CPUARMState *env, uint64_t value,
-     uint64_t par64;
-     MemTxAttrs attrs = {};
-     ARMMMUFaultInfo fi = {};
-+    ARMCacheAttrs cacheattrs = {};
- 
--    ret = get_phys_addr(env, value, access_type, mmu_idx,
--                        &phys_addr, &attrs, &prot, &page_size, &fsr, &fi);
-+    ret = get_phys_addr(env, value, access_type, mmu_idx, &phys_addr, &attrs,
-+                        &prot, &page_size, &fsr, &fi, &cacheattrs);
-     if (extended_addresses_enabled(env)) {
-         /* fsr is a DFSR/IFSR value for the long descriptor
-          * translation table format, but with WnR always clear.
-@@ -2173,7 +2180,8 @@ static uint64_t do_ats_write(CPUARMState *env, uint64_t value,
-             if (!attrs.secure) {
-                 par64 |= (1 << 9); /* NS */
-             }
--            /* We don't set the ATTR or SH fields in the PAR. */
-+            par64 |= (uint64_t)cacheattrs.attrs << 56; /* ATTR */
-+            par64 |= cacheattrs.shareability << 7; /* SH */
-         } else {
-             par64 |= 1; /* F */
-             par64 |= (fsr & 0x3f) << 1; /* FS */
-@@ -6925,7 +6933,7 @@ static bool v7m_read_half_insn(ARMCPU *cpu, ARMMMUIdx mmu_idx,
-         return false;
-     }
-     if (get_phys_addr(env, addr, MMU_INST_FETCH, mmu_idx,
--                      &physaddr, &attrs, &prot, &page_size, &fsr, &fi)) {
-+                      &physaddr, &attrs, &prot, &page_size, &fsr, &fi, NULL)) {
-         /* the MPU lookup failed */
-         env->v7m.cfsr[env->v7m.secure] |= R_V7M_CFSR_IACCVIOL_MASK;
-         armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_MEM, env->v7m.secure);
-@@ -8207,7 +8215,7 @@ static hwaddr S1_ptw_translate(CPUARMState *env, ARMMMUIdx mmu_idx,
-         int ret;
- 
-         ret = get_phys_addr_lpae(env, addr, 0, ARMMMUIdx_S2NS, &s2pa,
--                                 &txattrs, &s2prot, &s2size, fsr, fi);
-+                                 &txattrs, &s2prot, &s2size, fsr, fi, NULL);
-         if (ret) {
-             fi->s2addr = addr;
-             fi->stage2 = true;
-@@ -8608,11 +8616,45 @@ static bool check_s2_mmu_setup(ARMCPU *cpu, bool is_aa64, int level,
-     return true;
- }
- 
-+/* Translate from the 4-bit stage 2 representation of
-+ * memory attributes (without cache-allocation hints) to
-+ * the 8-bit representation of the stage 1 MAIR registers
-+ * (which includes allocation hints).
-+ *
-+ * ref: shared/translation/attrs/S2AttrDecode()
-+ *      .../S2ConvertAttrsHints()
-+ */
-+static uint8_t convert_stage2_attrs(CPUARMState *env, uint8_t s2attrs)
-+{
-+    uint8_t hiattr = extract32(s2attrs, 2, 2);
-+    uint8_t loattr = extract32(s2attrs, 0, 2);
-+    uint8_t hihint = 0, lohint = 0;
-+
-+    if (hiattr != 0) { /* normal memory */
-+        /* TODO: to faithfully emulate S2CacheDisabled() for the case
-+         * when EL2 is aarch32, we should check HCR2 (not HCR_EL2), but
-+         * qemu doesn't presently model this register.
-+         */
-+        if ((env->cp15.hcr_el2 & HCR_CD) != 0) { /* cache disabled */
-+            hiattr = loattr = 1; /* non-cacheable */
-+        } else {
-+            if (hiattr != 1) { /* Write-through or write-back */
-+                hihint = 3; /* RW allocate */
-+            }
-+            if (loattr != 1) { /* Write-through or write-back */
-+                lohint = 3; /* RW allocate */
-+            }
-+        }
-+    }
-+
-+    return (hiattr << 6) | (hihint << 2) | (loattr << 2) | lohint;
-+}
-+
- static bool get_phys_addr_lpae(CPUARMState *env, target_ulong address,
-                                MMUAccessType access_type, ARMMMUIdx mmu_idx,
-                                hwaddr *phys_ptr, MemTxAttrs *txattrs, int *prot,
-                                target_ulong *page_size_ptr, uint32_t *fsr,
--                               ARMMMUFaultInfo *fi)
-+                               ARMMMUFaultInfo *fi, ARMCacheAttrs *cacheattrs)
- {
-     ARMCPU *cpu = arm_env_get_cpu(env);
-     CPUState *cs = CPU(cpu);
-@@ -8929,6 +8971,21 @@ static bool get_phys_addr_lpae(CPUARMState *env, target_ulong address,
-          */
-         txattrs->secure = false;
-     }
-+
-+    if (cacheattrs != NULL) {
-+        if (mmu_idx == ARMMMUIdx_S2NS) {
-+            cacheattrs->attrs = convert_stage2_attrs(env,
-+                                                     extract32(attrs, 0, 4));
-+        } else {
-+            /* Index into MAIR registers for cache attributes */
-+            uint8_t attrindx = extract32(attrs, 0, 3);
-+            uint64_t mair = env->cp15.mair_el[regime_el(env, mmu_idx)];
-+            assert(attrindx <= 7);
-+            cacheattrs->attrs = extract64(mair, attrindx * 8, 8);
-+        }
-+        cacheattrs->shareability = extract32(attrs, 6, 2);
-+    }
-+
-     *phys_ptr = descaddr;
-     *page_size_ptr = page_size;
-     return false;
-@@ -9490,6 +9547,91 @@ static bool get_phys_addr_pmsav5(CPUARMState *env, uint32_t address,
-     return false;
- }
- 
-+/* Combine either inner or outer cacheability attributes for normal
-+ * memory, according to table D4-42 of ARM DDI 0487B.b (the ARMv8 ARM).
-+ *
-+ * NB: only stage 1 includes allocation hints (RW bits), leading to
-+ * some asymmetry.
-+ */
-+static uint8_t combine_cacheattr_nibble(uint8_t s1, uint8_t s2)
-+{
-+    if (s1 == 4 || s2 == 4) {
-+        /* non-cacheable has precedence */
-+        return 4;
-+    } else if (extract32(s1, 2, 2) == 0 || extract32(s1, 2, 2) == 2) {
-+        /* stage 1 write-through takes precedence */
-+        return s1;
-+    } else if (extract32(s2, 2, 2) == 2) {
-+        /* stage 2 write-through takes precedence, but the allocation hint
-+         * is still taken from stage 1
-+         */
-+        return (2 << 2) | extract32(s1, 0, 2);
-+    } else { /* write-back */
-+        return s1;
-+    }
-+}
-+
-+/* Combine S1 and S2 cacheability/shareability attributes, per D4.5.4
-+ *
-+ * @s1:      Attributes from stage 1 walk
-+ * @s2:      Attributes from stage 2 walk
-+ */
-+static ARMCacheAttrs combine_cacheattrs(ARMCacheAttrs s1, ARMCacheAttrs s2)
-+{
-+    uint8_t s1lo = extract32(s1.attrs, 0, 4), s2lo = extract32(s2.attrs, 0, 4);
-+    uint8_t s1hi = extract32(s1.attrs, 4, 4), s2hi = extract32(s2.attrs, 4, 4);
-+    ARMCacheAttrs ret;
-+
-+    /* Combine shareability attributes (table D4-43) */
-+    if (s1.shareability == 2 || s2.shareability == 2) {
-+        /* if either are outer-shareable, the result is outer-shareable */
-+        ret.shareability = 2;
-+    } else if (s1.shareability == 3 || s2.shareability == 3) {
-+        /* if either are inner-shareable, the result is inner-shareable */
-+        ret.shareability = 3;
-+    } else {
-+        /* both non-shareable */
-+        ret.shareability = 0;
-+    }
-+
-+    /* Combine memory type and cacheability attributes */
-+    if (s1hi == 0 || s2hi == 0) {
-+        /* Device has precedence over normal */
-+        if (s1lo == 0 || s2lo == 0) {
-+            /* nGnRnE has precedence over anything */
-+            ret.attrs = 0;
-+        } else if (s1lo == 4 || s2lo == 4) {
-+            /* non-Reordering has precedence over Reordering */
-+            ret.attrs = 4;  /* nGnRE */
-+        } else if (s1lo == 8 || s2lo == 8) {
-+            /* non-Gathering has precedence over Gathering */
-+            ret.attrs = 8;  /* nGRE */
-+        } else {
-+            ret.attrs = 0xc; /* GRE */
-+        }
-+
-+        /* Any location for which the resultant memory type is any
-+         * type of Device memory is always treated as Outer Shareable.
-+         */
-+        ret.shareability = 2;
-+    } else { /* Normal memory */
-+        /* Outer/inner cacheability combine independently */
-+        ret.attrs = combine_cacheattr_nibble(s1hi, s2hi) << 4
-+                  | combine_cacheattr_nibble(s1lo, s2lo);
-+
-+        if (ret.attrs == 0x44) {
-+            /* Any location for which the resultant memory type is Normal
-+             * Inner Non-cacheable, Outer Non-cacheable is always treated
-+             * as Outer Shareable.
-+             */
-+            ret.shareability = 2;
-+        }
-+    }
-+
-+    return ret;
-+}
-+
-+
- /* get_phys_addr - get the physical address for this virtual address
-  *
-  * Find the physical address corresponding to the given virtual address,
-@@ -9514,12 +9656,14 @@ static bool get_phys_addr_pmsav5(CPUARMState *env, uint32_t address,
-  * @prot: set to the permissions for the page containing phys_ptr
-  * @page_size: set to the size of the page containing phys_ptr
-  * @fsr: set to the DFSR/IFSR value on failure
-+ * @fi: set to fault info if the translation fails
-+ * @cacheattrs: (if non-NULL) set to the cacheability/shareability attributes
-  */
- static bool get_phys_addr(CPUARMState *env, target_ulong address,
-                           MMUAccessType access_type, ARMMMUIdx mmu_idx,
-                           hwaddr *phys_ptr, MemTxAttrs *attrs, int *prot,
-                           target_ulong *page_size, uint32_t *fsr,
--                          ARMMMUFaultInfo *fi)
-+                          ARMMMUFaultInfo *fi, ARMCacheAttrs *cacheattrs)
- {
-     if (mmu_idx == ARMMMUIdx_S12NSE0 || mmu_idx == ARMMMUIdx_S12NSE1) {
-         /* Call ourselves recursively to do the stage 1 and then stage 2
-@@ -9529,10 +9673,11 @@ static bool get_phys_addr(CPUARMState *env, target_ulong address,
-             hwaddr ipa;
-             int s2_prot;
-             int ret;
-+            ARMCacheAttrs cacheattrs2 = {};
- 
-             ret = get_phys_addr(env, address, access_type,
-                                 stage_1_mmu_idx(mmu_idx), &ipa, attrs,
--                                prot, page_size, fsr, fi);
-+                                prot, page_size, fsr, fi, cacheattrs);
- 
-             /* If S1 fails or S2 is disabled, return early.  */
-             if (ret || regime_translation_disabled(env, ARMMMUIdx_S2NS)) {
-@@ -9543,10 +9688,17 @@ static bool get_phys_addr(CPUARMState *env, target_ulong address,
-             /* S1 is done. Now do S2 translation.  */
-             ret = get_phys_addr_lpae(env, ipa, access_type, ARMMMUIdx_S2NS,
-                                      phys_ptr, attrs, &s2_prot,
--                                     page_size, fsr, fi);
-+                                     page_size, fsr, fi,
-+                                     cacheattrs != NULL ? &cacheattrs2 : NULL);
-             fi->s2addr = ipa;
-             /* Combine the S1 and S2 perms.  */
-             *prot &= s2_prot;
-+
-+            /* Combine the S1 and S2 cache attributes, if needed */
-+            if (!ret && cacheattrs != NULL) {
-+                *cacheattrs = combine_cacheattrs(*cacheattrs, cacheattrs2);
-+            }
-+
-             return ret;
-         } else {
-             /*
-@@ -9617,7 +9769,7 @@ static bool get_phys_addr(CPUARMState *env, target_ulong address,
- 
-     if (regime_using_lpae_format(env, mmu_idx)) {
-         return get_phys_addr_lpae(env, address, access_type, mmu_idx, phys_ptr,
--                                  attrs, prot, page_size, fsr, fi);
-+                                  attrs, prot, page_size, fsr, fi, cacheattrs);
-     } else if (regime_sctlr(env, mmu_idx) & SCTLR_XP) {
-         return get_phys_addr_v6(env, address, access_type, mmu_idx, phys_ptr,
-                                 attrs, prot, page_size, fsr, fi);
-@@ -9645,7 +9797,7 @@ bool arm_tlb_fill(CPUState *cs, vaddr address,
- 
-     ret = get_phys_addr(env, address, access_type,
-                         core_to_arm_mmu_idx(env, mmu_idx), &phys_addr,
--                        &attrs, &prot, &page_size, fsr, fi);
-+                        &attrs, &prot, &page_size, fsr, fi, NULL);
-     if (!ret) {
-         /* Map a single [sub]page.  */
-         phys_addr &= TARGET_PAGE_MASK;
-@@ -9674,7 +9826,7 @@ hwaddr arm_cpu_get_phys_page_attrs_debug(CPUState *cs, vaddr addr,
-     *attrs = (MemTxAttrs) {};
- 
-     ret = get_phys_addr(env, addr, 0, mmu_idx, &phys_addr,
--                        attrs, &prot, &page_size, &fsr, &fi);
-+                        attrs, &prot, &page_size, &fsr, &fi, NULL);
- 
-     if (ret) {
-         return -1;
--- 
-2.14.2
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
+ZGV2ZWxdIFtSRkMgUEFUQ0ggMDAvMjZdIHJlcGxheSBhZGRpdGlvbnMKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTcxMDMxMTEwNjQxLjU4MzYuNDMyNjYuc3RnaXRAcGFzaGEtVmlydHVhbEJv
+eAoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0
+b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBj
+b25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYu
+cmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRC
+QVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRu
+LyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQg
+c2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJh
+Y2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgo
+bisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGlu
+ZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEg
+bmV3IGJyYW5jaCAndGVzdCcKOGY1NWM5MDJhZCBzY3JpcHRzL3FlbXUtZ2RiL3RpbWVycy5weTog
+bmV3IGhlbHBlciB0byBkdW1wIHRpbWVyIHN0YXRlCmE4Y2JhMWIyMTQgc2NyaXB0cy9yZXBsYXkt
+ZHVtcC5weTogcmVwbGF5IGxvZyBkdW1wZXIKMTVkY2RkNThhOSBzY3JpcHRzL2FuYWx5c2UtbG9j
+a3Mtc2ltcGxldHJhY2UucHk6IHNjcmlwdCB0byBhbmFseXNlIGxvY2sgdGltZXMKMmI3MTdjZTA4
+MCB1dGlsL3FlbXUtdGhyZWFkLSo6IGFkZCBxZW11X2xvY2ssIGxvY2tlZCBhbmQgdW5sb2NrIHRy
+YWNlIGV2ZW50cwpkY2UwNGZjZmQ5IHNjcmlwdHMvcWVtdS1nZGI6IGFkZCBzaW1wbGUgdGNnIGxv
+Y2sgc3RhdHVzIGhlbHBlcgphMTk3ZDk1NmM5IHJlcGxheTogY2hlY2sgcmV0dXJuIHZhbHVlcyBv
+ZiBmd3JpdGUKNmEzMWVkYTg4MyByZXBsYXk6IGRvbid0IGRlc3Ryb3kgbXV0ZXggYXQgZXhpdAoy
+MmQ4MTAzNTgzIGNwdS1leGVjOiByZXNldCBleGl0IGZsYWcgYmVmb3JlIGNhbGxpbmcgY3B1X2V4
+ZWNfbm9jYWNoZQpmZmQ1ZjgzODBhIGNwdS1leGVjOiBkb24ndCBvdmVyd3JpdGUgZXhjZXB0aW9u
+X2luZGV4CjM4M2IyYTMyM2QgcmVwbGF5OiBwdXNoIHJlcGxheV9tdXRleF9sb2NrIHVwIHRoZSBj
+YWxsIHRyZWUKOTE1YmZhMzU2MiByZXBsYXk6IG1ha2UgbG9ja2luZyB2aXNpYmxlIG91dHNpZGUg
+cmVwbGF5IGNvZGUKMmE0N2FjMWE5YiByZXBsYXkvcmVwbGF5LWludGVybmFsLmM6IHRyYWNrIGhv
+bGRpbmcgb2YgcmVwbGF5X2xvY2sKYmI4NzZiZTAyNyByZXBsYXkvcmVwbGF5LmM6IGJ1bXAgUkVQ
+TEFZX1ZFUlNJT04gYWdhaW4KNjE3ZTI0ODhmMSBjcHVzOiBvbmx5IHRha2UgQlFMIGZvciBzbGVl
+cGluZyB0aHJlYWRzCjcxNGZmMDhhMDYgY3B1czogcHVzaCBCUUwgbG9jayB0byBxZW11Xypfd2Fp
+dF9pb19ldmVudApmOTY1MjhkMDhhIHRhcmdldC9hcm0vYXJtLXBvd2VydGN0bDogZHJvcCBCUUwg
+YXNzZXJ0aW9ucwo5ZmVjZTI1YTE5IGljb3VudDogZml4ZWQgc2F2aW5nL3Jlc3RvcmluZyBvZiBp
+Y291bnQgd2FycCB0aW1lcnMKZjcxYzViODRlNyByZXBsYXk6IHNhdmUgcHJpb3IgdmFsdWUgb2Yg
+dGhlIGhvc3QgY2xvY2sKNjk1NDA1YjRjNiByZXBsYXk6IG1ha2Ugc2FmZSB2bXN0b3AgYXQgcmVj
+b3JkL3JlcGxheQo2NGUzYjZhYjNkIHJlcGxheTogYWRkZWQgcmVwbGF5IGxvZyBmb3JtYXQgZGVz
+Y3JpcHRpb24KZmMxOGFjZDVjMCByZXBsYXk6IGZpeCBzYXZlL2xvYWQgdm0gZm9yIG5vbi1lbXB0
+eSBxdWV1ZQowZjRkNTlhNzI2IHJlcGxheTogZml4ZWQgcmVwbGF5X2VuYWJsZV9ldmVudHMKN2I4
+ZTljMWU1MyByZXBsYXk6IGZpeCBwcm9jZXNzaW5nIGFzeW5jIGV2ZW50cwpiYmEyOWE0OWVkIHJl
+cGxheTogZGlzYWJsZSBkZWZhdWx0IHNuYXBzaG90IGZvciByZWNvcmQvcmVwbGF5Cjg1ZTRmMTg0
+YWMgYmxrcmVwbGF5OiBjcmVhdGUgdGVtcG9yYXJ5IG92ZXJsYXkgZm9yIHVuZGVybGF5aW5nIGRl
+dmljZXMKNDJiOGYzOGViMyBibG9jazogaW1wbGVtZW50IGJkcnZfc25hcHNob3RfZ290byBmb3Ig
+YmxrcmVwbGF5Cgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzI2OiBibG9j
+azogaW1wbGVtZW50IGJkcnZfc25hcHNob3RfZ290byBmb3IgYmxrcmVwbGF5Li4uCkNoZWNraW5n
+IFBBVENIIDIvMjY6IGJsa3JlcGxheTogY3JlYXRlIHRlbXBvcmFyeSBvdmVybGF5IGZvciB1bmRl
+cmxheWluZyBkZXZpY2VzLi4uCkNoZWNraW5nIFBBVENIIDMvMjY6IHJlcGxheTogZGlzYWJsZSBk
+ZWZhdWx0IHNuYXBzaG90IGZvciByZWNvcmQvcmVwbGF5Li4uCkNoZWNraW5nIFBBVENIIDQvMjY6
+IHJlcGxheTogZml4IHByb2Nlc3NpbmcgYXN5bmMgZXZlbnRzLi4uCkNoZWNraW5nIFBBVENIIDUv
+MjY6IHJlcGxheTogZml4ZWQgcmVwbGF5X2VuYWJsZV9ldmVudHMuLi4KQ2hlY2tpbmcgUEFUQ0gg
+Ni8yNjogcmVwbGF5OiBmaXggc2F2ZS9sb2FkIHZtIGZvciBub24tZW1wdHkgcXVldWUuLi4KRVJS
+T1I6IEVycm9yIG1lc3NhZ2VzIHNob3VsZCBub3QgY29udGFpbiBuZXdsaW5lcwojNjA6IEZJTEU6
+IG1pZ3JhdGlvbi9zYXZldm0uYzoyMzIyOgorICAgICAgICAgICAgICAgICAgICAgInJpZ2h0IG5v
+dy4gVHJ5IG9uY2UgbW9yZSBsYXRlci5cbiIpOwoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdz
+LCA0OCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNl
+IHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBv
+cnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMu
+CgpDaGVja2luZyBQQVRDSCA3LzI2OiByZXBsYXk6IGFkZGVkIHJlcGxheSBsb2cgZm9ybWF0IGRl
+c2NyaXB0aW9uLi4uCkNoZWNraW5nIFBBVENIIDgvMjY6IHJlcGxheTogbWFrZSBzYWZlIHZtc3Rv
+cCBhdCByZWNvcmQvcmVwbGF5Li4uCkVSUk9SOiBFcnJvciBtZXNzYWdlcyBzaG91bGQgbm90IGNv
+bnRhaW4gbmV3bGluZXMKIzQ1OiBGSUxFOiBtaWdyYXRpb24vc2F2ZXZtLmM6MjE0NzoKKyAgICAg
+ICAgICAgICAgICAgICAgICJyaWdodCBub3cuIFRyeSBvbmNlIG1vcmUgbGF0ZXIuXG4iKTsKCnRv
+dGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMjMgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBo
+YXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3Jz
+CmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpD
+SEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggOS8yNjogcmVwbGF5OiBz
+YXZlIHByaW9yIHZhbHVlIG9mIHRoZSBob3N0IGNsb2NrLi4uCkNoZWNraW5nIFBBVENIIDEwLzI2
+OiBpY291bnQ6IGZpeGVkIHNhdmluZy9yZXN0b3Jpbmcgb2YgaWNvdW50IHdhcnAgdGltZXJzLi4u
+CkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJyonIChjdHg6VnhWKQojMTcxOiBG
+SUxFOiBjcHVzLmM6Njg4OgorICAgIC5zdWJzZWN0aW9ucyA9IChjb25zdCBWTVN0YXRlRGVzY3Jp
+cHRpb24qW10pIHsKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+XgoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAxNzQgbGluZXMgY2hlY2tlZAoKWW91ciBw
+YXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2Ug
+ZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIs
+IHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMTEvMjY6IHRh
+cmdldC9hcm0vYXJtLXBvd2VydGN0bDogZHJvcCBCUUwgYXNzZXJ0aW9ucy4uLgpDaGVja2luZyBQ
+QVRDSCAxMi8yNjogY3B1czogcHVzaCBCUUwgbG9jayB0byBxZW11Xypfd2FpdF9pb19ldmVudC4u
+LgpDaGVja2luZyBQQVRDSCAxMy8yNjogY3B1czogb25seSB0YWtlIEJRTCBmb3Igc2xlZXBpbmcg
+dGhyZWFkcy4uLgpDaGVja2luZyBQQVRDSCAxNC8yNjogcmVwbGF5L3JlcGxheS5jOiBidW1wIFJF
+UExBWV9WRVJTSU9OIGFnYWluLi4uCkNoZWNraW5nIFBBVENIIDE1LzI2OiByZXBsYXkvcmVwbGF5
+LWludGVybmFsLmM6IHRyYWNrIGhvbGRpbmcgb2YgcmVwbGF5X2xvY2suLi4KQ2hlY2tpbmcgUEFU
+Q0ggMTYvMjY6IHJlcGxheTogbWFrZSBsb2NraW5nIHZpc2libGUgb3V0c2lkZSByZXBsYXkgY29k
+ZS4uLgpDaGVja2luZyBQQVRDSCAxNy8yNjogcmVwbGF5OiBwdXNoIHJlcGxheV9tdXRleF9sb2Nr
+IHVwIHRoZSBjYWxsIHRyZWUuLi4KQ2hlY2tpbmcgUEFUQ0ggMTgvMjY6IGNwdS1leGVjOiBkb24n
+dCBvdmVyd3JpdGUgZXhjZXB0aW9uX2luZGV4Li4uCkNoZWNraW5nIFBBVENIIDE5LzI2OiBjcHUt
+ZXhlYzogcmVzZXQgZXhpdCBmbGFnIGJlZm9yZSBjYWxsaW5nIGNwdV9leGVjX25vY2FjaGUuLi4K
+Q2hlY2tpbmcgUEFUQ0ggMjAvMjY6IHJlcGxheTogZG9uJ3QgZGVzdHJveSBtdXRleCBhdCBleGl0
+Li4uCkNoZWNraW5nIFBBVENIIDIxLzI2OiByZXBsYXk6IGNoZWNrIHJldHVybiB2YWx1ZXMgb2Yg
+ZndyaXRlLi4uCkNoZWNraW5nIFBBVENIIDIyLzI2OiBzY3JpcHRzL3FlbXUtZ2RiOiBhZGQgc2lt
+cGxlIHRjZyBsb2NrIHN0YXR1cyBoZWxwZXIuLi4KQ2hlY2tpbmcgUEFUQ0ggMjMvMjY6IHV0aWwv
+cWVtdS10aHJlYWQtKjogYWRkIHFlbXVfbG9jaywgbG9ja2VkIGFuZCB1bmxvY2sgdHJhY2UgZXZl
+bnRzLi4uCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMzMDogRklMRTogaW5jbHVk
+ZS9xZW11L3RocmVhZC5oOjMwOgorI2RlZmluZSBxZW11X211dGV4X3RyeWxvY2sobXV0ZXgpIHFl
+bXVfbXV0ZXhfdHJ5bG9ja19pbXBsKG11dGV4LCBfX0ZJTEVfXywgX19MSU5FX18pCgpXQVJOSU5H
+OiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMzE6IEZJTEU6IGluY2x1ZGUvcWVtdS90aHJlYWQu
+aDozMToKKyNkZWZpbmUgcWVtdV9tdXRleF91bmxvY2sobXV0ZXgpIHFlbXVfbXV0ZXhfdW5sb2Nr
+X2ltcGwobXV0ZXgsIF9fRklMRV9fLCBfX0xJTkVfXykKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hh
+cmFjdGVycwojNDA6IEZJTEU6IGluY2x1ZGUvcWVtdS90aHJlYWQuaDo0NjoKK3ZvaWQgcWVtdV9j
+b25kX3dhaXRfaW1wbChRZW11Q29uZCAqY29uZCwgUWVtdU11dGV4ICptdXRleCwgY29uc3QgY2hh
+ciAqZmlsZSwgY29uc3QgaW50IGxpbmUpOwoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3Rl
+cnMKIzQyOiBGSUxFOiBpbmNsdWRlL3FlbXUvdGhyZWFkLmg6NDg6CisjZGVmaW5lIHFlbXVfY29u
+ZF93YWl0KGNvbmQsIG11dGV4KSBxZW11X2NvbmRfd2FpdF9pbXBsKGNvbmQsIG11dGV4LCBfX0ZJ
+TEVfXywgX19MSU5FX18pCgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzEwNzogRklM
+RTogdXRpbC9xZW11LXRocmVhZC1wb3NpeC5jOjE1ODoKK3ZvaWQgcWVtdV9jb25kX3dhaXRfaW1w
+bChRZW11Q29uZCAqY29uZCwgUWVtdU11dGV4ICptdXRleCwgY29uc3QgY2hhciAqZmlsZSwgY29u
+c3QgaW50IGxpbmUpCgp0b3RhbDogMiBlcnJvcnMsIDMgd2FybmluZ3MsIDEwMyBsaW5lcyBjaGVj
+a2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFu
+eSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUg
+bWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRD
+SCAyNC8yNjogc2NyaXB0cy9hbmFseXNlLWxvY2tzLXNpbXBsZXRyYWNlLnB5OiBzY3JpcHQgdG8g
+YW5hbHlzZSBsb2NrIHRpbWVzLi4uCkNoZWNraW5nIFBBVENIIDI1LzI2OiBzY3JpcHRzL3JlcGxh
+eS1kdW1wLnB5OiByZXBsYXkgbG9nIGR1bXBlci4uLgpDaGVja2luZyBQQVRDSCAyNi8yNjogc2Ny
+aXB0cy9xZW11LWdkYi90aW1lcnMucHk6IG5ldyBoZWxwZXIgdG8gZHVtcCB0aW1lciBzdGF0ZS4u
+Lgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoK
+LS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRj
+aGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJl
+ZWxpc3RzLm9yZw==
