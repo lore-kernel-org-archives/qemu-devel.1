@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51178)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51213)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1e9UhB-0004F3-1h
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 07:27:02 -0400
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1e9UhC-0004GT-CZ
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 07:27:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1e9Uh5-0000k3-FX
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 07:27:01 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:45408)
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1e9UhB-0000pN-12
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 07:27:02 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:45432)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1e9Uh5-0000jp-7z
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 07:26:55 -0400
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1e9UhA-0000oc-Pj
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 07:27:00 -0400
 From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Date: Tue, 31 Oct 2017 14:26:55 +0300
-Message-ID: <20171031112655.10516.5241.stgit@pasha-VirtualBox>
+Date: Tue, 31 Oct 2017 14:27:00 +0300
+Message-ID: <20171031112700.10516.76192.stgit@pasha-VirtualBox>
 In-Reply-To: <20171031112457.10516.8971.stgit@pasha-VirtualBox>
 References: <20171031112457.10516.8971.stgit@pasha-VirtualBox>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [RFC PATCH 21/26] replay: check return values of fwrite
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [RFC PATCH 22/26] scripts/qemu-gdb: add simple tcg
+ lock status helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,27 +30,92 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, boost.lists@gmail.com, quintela@redhat.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, kraxel@redhat.com, pavel.dovgaluk@ispras.ru, pbonzini@redhat.com, alex.bennee@linaro.org
 
-This patch adds error reporting when fwrite cannot completely
-save the buffer to the file.
+From: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
-Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+Add a simple helper to dump lock state.
+
+Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
 ---
- replay/replay-internal.c |    4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ scripts/qemu-gdb.py    |    3 ++-
+ scripts/qemugdb/tcg.py |   46 ++++++++++++++++++++++++++++++++++++++++++=
+++++
+ 2 files changed, 48 insertions(+), 1 deletion(-)
+ create mode 100644 scripts/qemugdb/tcg.py
 
-diff --git a/replay/replay-internal.c b/replay/replay-internal.c
-index d036a02..0f73fdc 100644
---- a/replay/replay-internal.c
-+++ b/replay/replay-internal.c
-@@ -62,7 +62,9 @@ void replay_put_array(const uint8_t *buf, size_t size)
- {
-     if (replay_file) {
-         replay_put_dword(size);
--        fwrite(buf, 1, size, replay_file);
-+        if (fwrite(buf, 1, size, replay_file) != size) {
-+            error_report("replay write error");
-+        }
-     }
- }
- 
+diff --git a/scripts/qemu-gdb.py b/scripts/qemu-gdb.py
+index b3f8e04..d58213e 100644
+--- a/scripts/qemu-gdb.py
++++ b/scripts/qemu-gdb.py
+@@ -26,7 +26,7 @@ import os, sys
+=20
+ sys.path.append(os.path.dirname(__file__))
+=20
+-from qemugdb import aio, mtree, coroutine
++from qemugdb import aio, mtree, coroutine, tcg
+=20
+ class QemuCommand(gdb.Command):
+     '''Prefix for QEMU debug support commands'''
+@@ -38,6 +38,7 @@ QemuCommand()
+ coroutine.CoroutineCommand()
+ mtree.MtreeCommand()
+ aio.HandlersCommand()
++tcg.TCGLockStatusCommand()
+=20
+ coroutine.CoroutineSPFunction()
+ coroutine.CoroutinePCFunction()
+diff --git a/scripts/qemugdb/tcg.py b/scripts/qemugdb/tcg.py
+new file mode 100644
+index 0000000..8c7f1d7
+--- /dev/null
++++ b/scripts/qemugdb/tcg.py
+@@ -0,0 +1,46 @@
++#!/usr/bin/python
++# -*- coding: utf-8 -*-
++#
++# GDB debugging support, TCG status
++#
++# Copyright 2016 Linaro Ltd
++#
++# Authors:
++#  Alex Benn=C3=A9e <alex.bennee@linaro.org>
++#
++# This work is licensed under the terms of the GNU GPL, version 2.  See
++# the COPYING file in the top-level directory.
++#
++# Contributions after 2012-01-13 are licensed under the terms of the
++# GNU GPL, version 2 or (at your option) any later version.
++
++# 'qemu tcg-lock-status' -- display the TCG lock status across threads
++
++import gdb
++
++class TCGLockStatusCommand(gdb.Command):
++    '''Display TCG Execution Status'''
++    def __init__(self):
++        gdb.Command.__init__(self, 'qemu tcg-lock-status', gdb.COMMAND_D=
+ATA,
++                             gdb.COMPLETE_NONE)
++
++    def invoke(self, arg, from_tty):
++        gdb.write("Thread, BQL (iothread_mutex), Replay, Blocked?\n")
++        for thread in gdb.inferiors()[0].threads():
++            thread.switch()
++
++            iothread =3D gdb.parse_and_eval("iothread_locked")
++            replay =3D gdb.parse_and_eval("replay_locked")
++
++            frame =3D gdb.selected_frame()
++            if frame.name() =3D=3D "__lll_lock_wait":
++                frame.older().select()
++                mutex =3D gdb.parse_and_eval("mutex")
++                owner =3D gdb.parse_and_eval("mutex->__data.__owner")
++                blocked =3D ("__lll_lock_wait waiting on %s from %d" %
++                           (mutex, owner))
++            else:
++                blocked =3D "not blocked"
++
++            gdb.write("%d/%d, %s, %s, %s\n" % (thread.num, thread.ptid[1=
+],
++                                               iothread, replay, blocked=
+))
