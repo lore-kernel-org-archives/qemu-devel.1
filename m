@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37497)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37558)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yi.l.liu@linux.intel.com>) id 1e9P1W-00015o-Io
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 01:23:43 -0400
+	(envelope-from <yi.l.liu@linux.intel.com>) id 1e9P1b-0001Ae-MF
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 01:23:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yi.l.liu@linux.intel.com>) id 1e9P1V-0004nU-KD
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 01:23:38 -0400
+	(envelope-from <yi.l.liu@linux.intel.com>) id 1e9P1a-0004t2-OD
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 01:23:43 -0400
 Received: from mga07.intel.com ([134.134.136.100]:53480)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yi.l.liu@linux.intel.com>)
-	id 1e9P1V-0004cw-Bi
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 01:23:37 -0400
+	id 1e9P1a-0004cw-Fm
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 01:23:42 -0400
 From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
-Date: Tue, 31 Oct 2017 13:07:03 +0800
-Message-Id: <1509426425-23890-5-git-send-email-yi.l.liu@linux.intel.com>
+Date: Tue, 31 Oct 2017 13:07:05 +0800
+Message-Id: <1509426425-23890-7-git-send-email-yi.l.liu@linux.intel.com>
 In-Reply-To: <1509426425-23890-1-git-send-email-yi.l.liu@linux.intel.com>
 References: <1509426425-23890-1-git-send-email-yi.l.liu@linux.intel.com>
-Subject: [Qemu-devel] [PATCH 4/6] vfio: rename GuestIOMMU to be GuestIOMMUMR
+Subject: [Qemu-devel] [PATCH 6/6] vfio/pci: register
+ vfio_iommu_bind_pasidtbl_notify notifier
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,101 +28,55 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, mst@redhat.com, david@gibson.dropbear.id.au, pbonzini@redhat.com, alex.williamson@redhat.com
 Cc: tianyu.lan@intel.com, yi.l.liu@intel.com, peterx@redhat.com, kevin.tian@intel.com, jasowang@redhat.com, "Liu, Yi L" <yi.l.liu@linux.intel.com>
 
-Rename GuestIOMMU to GuestIOMMUMR as the existing GuestIOMMU is
-for MemoryRegion related notifiers.
+This is an example to show the usage of IOMMUObject based notifier.
+
+For passthru devices, if there is a vIOMMU exposed to guest, guest
+would issue iommu operation on the devices. And the iommu operations
+needs to be propagated to host iommu driver.
+
+In future, the IOMMUObject notifiers may include:
+* notifier for guest pasid table binding
+* notifier for guest iommu tlb invalidation
+Both of the two notifiers would be include in future virt-SVM patchset.
+
+In virt-SVM patchset, this notifier would be fulfilled.
 
 Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
 ---
- hw/vfio/common.c              | 15 ++++++++-------
- include/hw/vfio/vfio-common.h |  8 ++++----
- 2 files changed, 12 insertions(+), 11 deletions(-)
+ hw/vfio/pci.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index 1f7d516..3d40bec 100644
---- a/hw/vfio/common.c
-+++ b/hw/vfio/common.c
-@@ -348,7 +348,7 @@ static bool vfio_get_vaddr(IOMMUTLBEntry *iotlb, void **vaddr,
+diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+index 5b77c7e..3ed521e 100644
+--- a/hw/vfio/pci.c
++++ b/hw/vfio/pci.c
+@@ -2637,6 +2637,14 @@ static void vfio_unregister_req_notifier(VFIOPCIDevice *vdev)
+     vdev->req_enabled = false;
+ }
  
- static void vfio_iommu_map_notify(IOMMUMRNotifier *n, IOMMUTLBEntry *iotlb)
++static void vfio_iommu_bind_pasidtbl_notify(IOMMUNotifier *n,
++                                            IOMMUEventData *event_data)
++{
++/*  Sample code, would be detailed in coming virt-SVM patchset.
++    VFIOGuestIOMMUObject *giommu = container_of(n, VFIOGuestIOMMUObject, n);
++    VFIOContainer *container = giommu->container;
++*/
++}
+ static void vfio_realize(PCIDevice *pdev, Error **errp)
  {
--    VFIOGuestIOMMU *giommu = container_of(n, VFIOGuestIOMMU, n);
-+    VFIOGuestIOMMUMR *giommu = container_of(n, VFIOGuestIOMMUMR, n);
-     VFIOContainer *container = giommu->container;
-     hwaddr iova = iotlb->iova + giommu->iommu_offset;
-     bool read_only;
-@@ -478,7 +478,7 @@ static void vfio_listener_region_add(MemoryListener *listener,
-     memory_region_ref(section->mr);
- 
-     if (memory_region_is_iommu(section->mr)) {
--        VFIOGuestIOMMU *giommu;
-+        VFIOGuestIOMMUMR *giommu;
-         IOMMUMemoryRegion *iommu_mr = IOMMU_MEMORY_REGION(section->mr);
- 
-         trace_vfio_listener_region_add_iommu(iova, end);
-@@ -500,7 +500,7 @@ static void vfio_listener_region_add(MemoryListener *listener,
-                                IOMMU_MR_EVENT_ALL,
-                                section->offset_within_region,
-                                int128_get64(llend));
--        QLIST_INSERT_HEAD(&container->giommu_list, giommu, giommu_next);
-+        QLIST_INSERT_HEAD(&container->giommu_mr_list, giommu, giommu_next);
- 
-         memory_region_register_iommu_notifier(section->mr, &giommu->n);
-         memory_region_iommu_replay(giommu->iommu, &giommu->n);
-@@ -567,9 +567,9 @@ static void vfio_listener_region_del(MemoryListener *listener,
+     VFIOPCIDevice *vdev = DO_UPCAST(VFIOPCIDevice, pdev, pdev);
+@@ -2889,6 +2897,12 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
+         QLIST_INSERT_HEAD(&group->container->giommu_object_list,
+                           giommu,
+                           giommu_next);
++        /* Register vfio_iommu_bind_pasidtbl_notify with event flag
++           IOMMU_EVENT_BIND_PASIDT */
++        iommu_notifier_register(iommu,
++                                &giommu->n,
++                                vfio_iommu_bind_pasidtbl_notify,
++                                IOMMU_EVENT_BIND_PASIDT);
      }
  
-     if (memory_region_is_iommu(section->mr)) {
--        VFIOGuestIOMMU *giommu;
-+        VFIOGuestIOMMUMR *giommu;
- 
--        QLIST_FOREACH(giommu, &container->giommu_list, giommu_next) {
-+        QLIST_FOREACH(giommu, &container->giommu_mr_list, giommu_next) {
-             if (MEMORY_REGION(giommu->iommu) == section->mr &&
-                 giommu->n.start == section->offset_within_region) {
-                 memory_region_unregister_iommu_notifier(section->mr,
-@@ -1163,12 +1163,13 @@ static void vfio_disconnect_container(VFIOGroup *group)
- 
-     if (QLIST_EMPTY(&container->group_list)) {
-         VFIOAddressSpace *space = container->space;
--        VFIOGuestIOMMU *giommu, *tmp;
-+        VFIOGuestIOMMUMR *giommu, *tmp;
- 
-         vfio_listener_release(container);
-         QLIST_REMOVE(container, next);
- 
--        QLIST_FOREACH_SAFE(giommu, &container->giommu_list, giommu_next, tmp) {
-+        QLIST_FOREACH_SAFE(giommu, &container->giommu_mr_list,
-+                           giommu_next, tmp) {
-             memory_region_unregister_iommu_notifier(
-                     MEMORY_REGION(giommu->iommu), &giommu->n);
-             QLIST_REMOVE(giommu, giommu_next);
-diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-index 865e3e7..702a085 100644
---- a/include/hw/vfio/vfio-common.h
-+++ b/include/hw/vfio/vfio-common.h
-@@ -87,19 +87,19 @@ typedef struct VFIOContainer {
-      * contiguous IOVA window.  We may need to generalize that in
-      * future
-      */
--    QLIST_HEAD(, VFIOGuestIOMMU) giommu_list;
-+    QLIST_HEAD(, VFIOGuestIOMMUMR) giommu_mr_list;
-     QLIST_HEAD(, VFIOHostDMAWindow) hostwin_list;
-     QLIST_HEAD(, VFIOGroup) group_list;
-     QLIST_ENTRY(VFIOContainer) next;
- } VFIOContainer;
- 
--typedef struct VFIOGuestIOMMU {
-+typedef struct VFIOGuestIOMMUMR {
-     VFIOContainer *container;
-     IOMMUMemoryRegion *iommu;
-     hwaddr iommu_offset;
-     IOMMUMRNotifier n;
--    QLIST_ENTRY(VFIOGuestIOMMU) giommu_next;
--} VFIOGuestIOMMU;
-+    QLIST_ENTRY(VFIOGuestIOMMUMR) giommu_next;
-+} VFIOGuestIOMMUMR;
- 
- typedef struct VFIOHostDMAWindow {
-     hwaddr min_iova;
+     return;
 -- 
 1.9.1
