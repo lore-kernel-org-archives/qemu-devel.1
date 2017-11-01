@@ -1,25 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46604)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48897)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1e9mPw-0005Cl-QR
-	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 02:22:25 -0400
+	(envelope-from <lizhengui@huawei.com>) id 1e9mjx-00082K-Kt
+	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 02:43:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1e9mPs-0003x5-3t
-	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 02:22:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56562)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1e9mPr-0003vy-T0
-	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 02:22:20 -0400
-References: <CAFEAcA81ENKOYTCvhpBrXnreyy9zodk-EXqvwLZq=1w6UvkoAg@mail.gmail.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <832ea538-6347-9b00-6a44-48159f94748f@redhat.com>
-Date: Wed, 1 Nov 2017 07:22:16 +0100
+	(envelope-from <lizhengui@huawei.com>) id 1e9mjq-0008L6-8g
+	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 02:43:03 -0400
+From: lizhengui <lizhengui@huawei.com>
+Date: Wed, 1 Nov 2017 06:42:33 +0000
+Message-ID: <68B56AECEFB25A418ADB9417F6178A531091A91B@dggemi507-mbs.china.huawei.com>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="gb2312"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA81ENKOYTCvhpBrXnreyy9zodk-EXqvwLZq=1w6UvkoAg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] we allow passing -machine type=foo more than once
- but are confused about which to use...
+Subject: [Qemu-devel] =?gb2312?b?cXVlc3Rpb26juiBJIGZvdW5kIGEgcWVtdSBjcmFz?=
+ =?gb2312?b?aCB3aGVuIGF0dGFjaCB2aXJ0aW8tc2NzaSBkaXNr?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,27 +22,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
-Cc: Markus Armbruster <armbru@redhat.com>
+To: "kwolf@redhat.com" <kwolf@redhat.com>, "jcody@redhat.com" <jcody@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>
+Cc: lizhengui <lizhengui@huawei.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Fangyi (C)" <eric.fangyi@huawei.com>
 
-On 31.10.2017 19:33, Peter Maydell wrote:
-> (cc Markus because I know how much he likes weirdnesses in our
-> command line parsing :-))
-> 
-> https://stackoverflow.com/questions/46955244/qemu-run-arm-ubuntu-unsupported-machine-type/47042282
-> has a user who's run into a confusing error message, because
-> we allow the user to pass "-machine type=foo" more than once on
-> the command line. When we decide which one to use, we go with the
-> last one on the list. However if it's not valid, when we print the
-> "don't recognize that machine type" message, the name we use in
-> the message is the *first* one on the list :-)
-> 
-> Maybe we should just not allow users to pass the argument
-> more than once...?
-
-I think we at least need that in some of our qtests - to override the
-default "-M accel=qtest" with "-M accel=tcg". So if we disallow to use
-the option more than once, we've got to find a different solution for
-the qtests.
-
- Thomas
+SGksIHdoZW4gSSBhdHRhY2ggdmlydGlvLXNjc2kgZGlzayB0byBWTSwgdGhlIHFlbXUgY3Jhc2gg
+aGFwcGVuZWQgYXQgdmVyeSBsb3cgcHJvYmFiaWxpdHkuIA0KDQpUaGUgcWVtdSBjcmFzaCBidCBp
+cyBiZWxvdzoNCg0KIzAgIDB4MDAwMDdmMmJlM2FkYTFkNyBpbiByYWlzZSAoKSBmcm9tIC91c3Iv
+bGliNjQvbGliYy5zby42DQojMSAgMHgwMDAwN2YyYmUzYWRiOGM4IGluIGFib3J0ICgpIGZyb20g
+L3Vzci9saWI2NC9saWJjLnNvLjYNCiMyICAweDAwMDAwMDAwMDA4NGZlNDkgaW4gUEFUX2Fib3J0
+ICgpDQojMyAgMHgwMDAwMDAwMDAwODRjZThkIGluIHBhdGNoSWxsSW5zSGFuZGxlciAoKQ0KIzQg
+IDxzaWduYWwgaGFuZGxlciBjYWxsZWQ+DQojNSAgMHgwMDAwMDAwMDAwODIyOGJiIGluIHFlbXVf
+c3RybmxlbiAoKQ0KIzYgIDB4MDAwMDAwMDAwMDgyMjkzNCBpbiBzdHJwYWRjcHkgKCkNCiM3ICAw
+eDAwMDAwMDAwMDA2ODRhODggaW4gc2NzaV9kaXNrX2VtdWxhdGVfaW5xdWlyeSAoKQ0KIzggIDB4
+MDAwMDAwMDAwMDY4NzQ0YiBpbiBzY3NpX2Rpc2tfZW11bGF0ZV9jb21tYW5kICgpDQojOSAgMHgw
+MDAwMDAwMDAwNjhjNDgxIGluIHNjc2lfcmVxX2VucXVldWUgKCkNCiMxMCAweDAwMDAwMDAwMDA0
+YjFmMDAgaW4gdmlydGlvX3Njc2lfaGFuZGxlX2NtZF9yZXFfc3VibWl0ICgpDQojMTEgMHgwMDAw
+MDAwMDAwNGIyZTllIGluIHZpcnRpb19zY3NpX2hhbmRsZV9jbWRfdnEgKCkNCiMxMiAweDAwMDAw
+MDAwMDA3NmRiYTcgaW4gYWlvX2Rpc3BhdGNoICgpDQojMTMgMHgwMDAwMDAwMDAwNzZkZDk2IGlu
+IGFpb19wb2xsICgpDQojMTQgMHgwMDAwMDAwMDAwN2E4NjczIGluIGJsa19wcncgKCkNCiMxNSAw
+eDAwMDAwMDAwMDA3YTkyMmMgaW4gYmxrX3ByZWFkICgpDQojMTYgMHgwMDAwMDAwMDAwN2E5Y2Qw
+IGluIGJsa19wcmVhZF91bnRocm90dGxlZCAoKQ0KIzE3IDB4MDAwMDAwMDAwMDVjYjQwNCBpbiBn
+dWVzc19kaXNrX2xjaHMgKCkNCiMxOCAweDAwMDAwMDAwMDA1Y2I1YjQgaW4gaGRfZ2VvbWV0cnlf
+Z3Vlc3MgKCkNCiMxOSAweDAwMDAwMDAwMDA1Y2FkNTYgaW4gYmxrY29uZl9nZW9tZXRyeSAoKQ0K
+IzIwIDB4MDAwMDAwMDAwMDY4NTk1NiBpbiBzY3NpX3JlYWxpemUgKCkNCiMyMSAweDAwMDAwMDAw
+MDA2OGQzZTMgaW4gc2NzaV9xZGV2X3JlYWxpemUgKCkNCiMyMiAweDAwMDAwMDAwMDA1ZTM5Mzgg
+aW4gZGV2aWNlX3NldF9yZWFsaXplZCAoKQ0KIzIzIDB4MDAwMDAwMDAwMDc1YmNlZCBpbiBwcm9w
+ZXJ0eV9zZXRfYm9vbCAoKQ0KIzI0IDB4MDAwMDAwMDAwMDc2MDIwNSBpbiBvYmplY3RfcHJvcGVy
+dHlfc2V0X3FvYmplY3QgKCkNCiMyNSAweDAwMDAwMDAwMDA3NWRmNjQgaW4gb2JqZWN0X3Byb3Bl
+cnR5X3NldF9ib29sICgpDQojMjYgMHgwMDAwMDAwMDAwNTU4MGFkIGluIHFkZXZfZGV2aWNlX2Fk
+ZCAoKQ0KIzI3IDB4MDAwMDAwMDAwMDU1ODUwYiBpbiBxbXBfZGV2aWNlX2FkZCAoKQ0KIzI4IDB4
+MDAwMDAwMDAwMDgxOGIzNyBpbiBkb19xbXBfZGlzcGF0Y2guY29uc3Rwcm9wLjEgKCkNCiMyOSAw
+eDAwMDAwMDAwMDA4MThkOGIgaW4gcW1wX2Rpc3BhdGNoICgpDQojMzAgMHgwMDAwMDAwMDAwNDVk
+MjEyIGluIGhhbmRsZV9xbXBfY29tbWFuZCAoKQ0KIzMxIDB4MDAwMDAwMDAwMDgxZjgxOSBpbiBq
+c29uX21lc3NhZ2VfcHJvY2Vzc190b2tlbiAoKQ0KIzMyIDB4MDAwMDAwMDAwMDg0MzRkMCBpbiBq
+c29uX2xleGVyX2ZlZWRfY2hhciAoKQ0KIzMzIDB4MDAwMDAwMDAwMDg0MzVlNiBpbiBqc29uX2xl
+eGVyX2ZlZWQgKCkNCiMzNCAweDAwMDAwMDAwMDA0NWJkNzIgaW4gbW9uaXRvcl9xbXBfcmVhZCAo
+KQ0KIzM1IDB4MDAwMDAwMDAwMDU1ZWNmMyBpbiB0Y3BfY2hyX3JlYWQgKCkNCiMzNiAweDAwMDA3
+ZjJiZTRjZjg5OWEgaW4gZ19tYWluX2NvbnRleHRfZGlzcGF0Y2ggKCkgZnJvbSAvdXNyL2xpYjY0
+L2xpYmdsaWItMi4wLnNvLjANCiMzNyAweDAwMDAwMDAwMDA3NmI4NmIgaW4gb3NfaG9zdF9tYWlu
+X2xvb3Bfd2FpdCAoKQ0KIzM4IDB4MDAwMDAwMDAwMDc2Yjk5NSBpbiBtYWluX2xvb3Bfd2FpdCAo
+KQ0KIzM5IDB4MDAwMDAwMDAwMDU2OWM1MSBpbiBtYWluX2xvb3AgKCkNCiM0MCAweDAwMDAwMDAw
+MDA0MjA2NjUgaW4gbWFpbiAoKQ0KDQpGcm9tIHRoZSBxZW11IGNyYXNoIGJ0LCB3ZSBjYW4gc2Vl
+IHRoYXQgdGhlIHNjc2lfcmVhbGl6ZSBoYXMgbm90IGNvbXBsZXRlZCB5ZXQuIFNvbWUgZmllbGRz
+IHN1c2ggYXMgdmVuZG9yLCB2ZXJzaW9uIGluIFNDU0lEaXNrU3RhdGUgaXMgDQpOdWxsIGF0IHRo
+aXMgbW9tZW50LiBJZiBxZW11IGhhbmRsZXMgc2NzaSByZXF1ZXN0IGZyb20gdGhpcyBzY3NpIGRp
+c2sgYXQgdGhpcyBtb21lbnQsIHRoZSBxZW11IHdpbGwgYWNjZXNzIHNvbWUgbnVsbCBwb2ludGVy
+cyBhbmQgY2F1c2UgY3Jhc2guDQpIb3cgY2FuIEkgc29sdmUgdGhpcyBwcm9ibGVtPyBTaG91bGQg
+d2UgYWRkIGEgY2hlY2sgdGhhdCB3aGV0aGVyIHRoZSBzY3NpIGRpc2sgaGFzIHJlYWxpemVkIG9y
+IG5vdCBpbiBzY3NpX2Rpc2tfZW11bGF0ZV9jb21tYW5kIGJlZm9yZQ0KSGFuZGxpbmcgc2NzaSBy
+ZXF1ZXN0cz8gDQoNCg==
