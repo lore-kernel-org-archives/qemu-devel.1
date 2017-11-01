@@ -1,25 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58434)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52852)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1e9iTY-0007nZ-TT
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 22:09:53 -0400
+	(envelope-from <xiaoguangrong.eric@gmail.com>) id 1e9jw5-0002mn-Oz
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 23:43:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1e9iTX-0007EK-Pz
-	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 22:09:52 -0400
-Date: Tue, 31 Oct 2017 19:09:42 -0700 (PDT)
-From: Stefano Stabellini <sstabellini@kernel.org>
-In-Reply-To: <CAFEAcA_rOYq8NuhrbnJc4D7M+EenXPkPeqTBBJJzoBnAPxVLnw@mail.gmail.com>
-Message-ID: <alpine.DEB.2.10.1710311909010.1707@sstabellini-ThinkPad-X260>
-References: <alpine.DEB.2.10.1710171708130.27209@sstabellini-ThinkPad-X260>
-	<CAFEAcA9zXAmNPL8TsLKSPbm8Er_KLK8Ubwth6=nL6WD87OmBQw@mail.gmail.com>
-	<CAFEAcA8jwN81ZBCLA8HW=q5GAWKmZ=kAZAP9vGNN8RYkzYe=Pw@mail.gmail.com>
-	<alpine.DEB.2.10.1710310959490.13766@sstabellini-ThinkPad-X260>
-	<CAFEAcA_8cimWtic=2OdvCmAN-mJ5MGGnVzDGYA5VgXGJG-fKhw@mail.gmail.com>
-	<alpine.DEB.2.10.1710311147570.13766@sstabellini-ThinkPad-X260>
-	<CAFEAcA_rOYq8NuhrbnJc4D7M+EenXPkPeqTBBJJzoBnAPxVLnw@mail.gmail.com>
+	(envelope-from <xiaoguangrong.eric@gmail.com>) id 1e9jw2-00011i-LS
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 23:43:25 -0400
+Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:55720)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <xiaoguangrong.eric@gmail.com>)
+	id 1e9jw2-0000zN-EF
+	for qemu-devel@nongnu.org; Tue, 31 Oct 2017 23:43:22 -0400
+Received: by mail-pg0-x243.google.com with SMTP id 15so981394pgc.12
+	for <qemu-devel@nongnu.org>; Tue, 31 Oct 2017 20:43:22 -0700 (PDT)
+References: <1455443283.33337333.1500618150787.JavaMail.zimbra@redhat.com>
+	<CAPcyv4hpbk0jgp+mA=q05zVBV8ZSZvCvV68JJ4gjE3QhK70d1w@mail.gmail.com>
+	<20170724102330.GE652@quack2.suse.cz>
+	<1157879323.33809400.1500897967669.JavaMail.zimbra@redhat.com>
+	<20170724123752.GN652@quack2.suse.cz>
+	<1888117852.34216619.1500992835767.JavaMail.zimbra@redhat.com>
+	<CAPcyv4in28F3FOVKp9abvrggxPuXdbGynF5=ZvBXCrywoa06JA@mail.gmail.com>
+	<1501016375.26846.21.camel@redhat.com>
+	<1063764405.34607875.1501076841865.JavaMail.zimbra@redhat.com>
+	<1501104453.26846.45.camel@redhat.com>
+	<CAPcyv4hsqrqBxoipUHPAbSctuzbVWCRnT-gN08i9uhXTWY6iPQ@mail.gmail.com>
+	<1501112787.4073.49.camel@redhat.com>
+	<CAPcyv4gbC6Hx_4YsCfOd2t=fn=wPGp5h__1QH=-p40TPFNbFzA@mail.gmail.com>
+	<0a26793f-86f7-29e7-f61b-dc4c1ef08c8e@gmail.com>
+	<CAPcyv4iw2cCpDmr+4kxsFvdy+iGZiz=ok-kLhsDKpqDy+szf-Q@mail.gmail.com>
+From: Xiao Guangrong <xiaoguangrong.eric@gmail.com>
+Message-ID: <378b10f3-b32f-84f5-2bbc-50c2ec5bcdd4@gmail.com>
+Date: Wed, 1 Nov 2017 11:43:40 +0800
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: Re: [Qemu-devel] [PATCH] aarch64: advertise the GIC system register
- interface
+In-Reply-To: <CAPcyv4iw2cCpDmr+4kxsFvdy+iGZiz=ok-kLhsDKpqDy+szf-Q@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] KVM "fake DAX" flushing interface - discussion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,102 +44,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Stefano Stabellini <sstabellini@kernel.org>, QEMU Developers <qemu-devel@nongnu.org>, "xen-devel@lists.xen.org" <xen-devel@lists.xen.org>, julien.grall@arm.com, qemu-arm <qemu-arm@nongnu.org>
+To: Dan Williams <dan.j.williams@intel.com>
+Cc: Rik van Riel <riel@redhat.com>, Pankaj Gupta <pagupta@redhat.com>, Jan Kara <jack@suse.cz>, Stefan Hajnoczi <stefanha@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, kvm-devel <kvm@vger.kernel.org>, Qemu Developers <qemu-devel@nongnu.org>, "linux-nvdimm@lists.01.org" <linux-nvdimm@ml01.01.org>, ross zwisler <ross.zwisler@linux.intel.com>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Nitesh Narayan Lal <nilal@redhat.com>, Haozhong Zhang <haozhong.zhang@intel.com>, Ross Zwisler <ross.zwisler@intel.com>
 
-On Tue, 31 Oct 2017, Peter Maydell wrote:
-> On 31 October 2017 at 18:51, Stefano Stabellini <sstabellini@kernel.org> wrote:
-> > On Tue, 31 Oct 2017, Peter Maydell wrote:
-> >> On 31 October 2017 at 17:01, Stefano Stabellini <sstabellini@kernel.org> wrote:
-> >> > Fixing QEMU is harder than I expected. Would it be possible to update
-> >> > id_aa64pfr0 at CPU reset time? Like cpu->id_aa64pfr0 |= 0x01000000; ?
-> >>
-> >> At that point we've already called register_cp_regs_for_features(),
-> >> which is where we read cpu->id_aa64pfr0 when we're creating the
-> >> cpreg. So if you change it after that it's too late. But that
-> >> function is called at CPU realize time, which is before we've
-> >> created the GIC object...
-> >
-> > What about something along the lines of
-> >
-> > diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> > index 9e18b41..0851071 100644
-> > --- a/hw/arm/virt.c
-> > +++ b/hw/arm/virt.c
-> > @@ -1401,6 +1400,10 @@ static void machvirt_init(MachineState *machine)
-> >              object_property_set_link(cpuobj, OBJECT(secure_sysmem),
-> >                                       "secure-memory", &error_abort);
-> >          }
-> > +        if (vms->gic_version == 3) {
-> > +            ARMCPU *cpu = ARM_CPU(cpuobj);
-> > +            cpu->id_aa64pfr0 |= 0x01000000;
-> > +        }
-> >
-> >          object_property_set_bool(cpuobj, true, "realized", NULL);
-> >          object_unref(cpuobj);
+
+
+On 10/31/2017 10:20 PM, Dan Williams wrote:
+> On Tue, Oct 31, 2017 at 12:13 AM, Xiao Guangrong
+> <xiaoguangrong.eric@gmail.com> wrote:
+>>
+>>
+>> On 07/27/2017 08:54 AM, Dan Williams wrote:
+>>
+>>>> At that point, would it make sense to expose these special
+>>>> virtio-pmem areas to the guest in a slightly different way,
+>>>> so the regions that need virtio flushing are not bound by
+>>>> the regular driver, and the regular driver can continue to
+>>>> work for memory regions that are backed by actual pmem in
+>>>> the host?
+>>>
+>>>
+>>> Hmm, yes that could be feasible especially if it uses the ACPI NFIT
+>>> mechanism. It would basically involve defining a new SPA (System
+>>> Phyiscal Address) range GUID type, and then teaching libnvdimm to
+>>> treat that as a new pmem device type.
+>>
+>>
+>> I would prefer a new flush mechanism to a new memory type introduced
+>> to NFIT, e.g, in that mechanism we can define request queues and
+>> completion queues and any other features to make virtualization
+>> friendly. That would be much simpler.
+>>
 > 
-> Definitely not -- the virt board should not be poking about inside the
-> internals of the CPU object.
+> No that's more confusing because now we are overloading the definition
+> of persistent memory. I want this memory type identified from the top
+> of the stack so it can appear differently in /proc/iomem and also
+> implement this alternate flush communication.
 > 
-> The slightly cleaned up version of this idea is that you give the
-> CPU an object property for "claim the GICv3 registers exist in the
-> ID registers" and have virt.c set it. That feels like an ugly
-> workaround for something we really ought not to have to tell the
-> board about at all, though.
 
-Something like the following?
+For the characteristic of memory, I have no idea why VM should know this
+difference. It can be completely transparent to VM, that means, VM
+does not need to know where this virtual PMEM comes from (for a really
+nvdimm backend or a normal storage). The only discrepancy is the flush
+interface.
 
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 9e18b41..369d36b 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -1401,6 +1401,9 @@ static void machvirt_init(MachineState *machine)
-             object_property_set_link(cpuobj, OBJECT(secure_sysmem),
-                                      "secure-memory", &error_abort);
-         }
-+        if (vms->gic_version == 3) {
-+            object_property_set_bool(cpuobj, true, "gicv3-sysregs", NULL);
-+        }
- 
-         object_property_set_bool(cpuobj, true, "realized", NULL);
-         object_unref(cpuobj);
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index 88578f3..259cad1 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -1690,6 +1690,7 @@ static Property arm_cpu_properties[] = {
-     DEFINE_PROP_UINT64("mp-affinity", ARMCPU,
-                         mp_affinity, ARM64_AFFINITY_INVALID),
-     DEFINE_PROP_INT32("node-id", ARMCPU, node_id, CPU_UNSET_NUMA_NODE_ID),
-+    DEFINE_PROP_BOOL("gicv3-sysregs", ARMCPU, gicv3_sysregs, false),
-     DEFINE_PROP_END_OF_LIST()
- };
- 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 89d49cd..0015b37 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -657,6 +657,9 @@ struct ARMCPU {
-     /* Should CPU start in PSCI powered-off state? */
-     bool start_powered_off;
- 
-+    /* GICv3 sysregs present */
-+    bool gicv3_sysregs;
-+
-     /* Current power state, access guarded by BQL */
-     ARMPSCIState power_state;
- 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 37af750..6f21900 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -4687,7 +4687,8 @@ void register_cp_regs_for_features(ARMCPU *cpu)
-             { .name = "ID_AA64PFR0_EL1", .state = ARM_CP_STATE_AA64,
-               .opc0 = 3, .opc1 = 0, .crn = 0, .crm = 4, .opc2 = 0,
-               .access = PL1_R, .type = ARM_CP_CONST,
--              .resetvalue = cpu->id_aa64pfr0 },
-+              .resetvalue = cpu->gicv3_sysregs ? (cpu->id_aa64pfr0|0x01000000) :
-+                  cpu->id_aa64pfr0 },
-             { .name = "ID_AA64PFR1_EL1", .state = ARM_CP_STATE_AA64,
-               .opc0 = 3, .opc1 = 0, .crn = 0, .crm = 4, .opc2 = 1,
-               .access = PL1_R, .type = ARM_CP_CONST,
+> In what way is this "more complicated"? It was trivial to add support
+> for the "volatile" NFIT range, this will not be any more complicated
+> than that.
+> 
+
+Introducing memory type is easy indeed, however, a new flush interface
+definition is inevitable, i.e, we need a standard way to discover the
+MMIOs to communicate with host.
