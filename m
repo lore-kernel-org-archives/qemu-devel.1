@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35408)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35653)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1e9qQe-0000kI-5e
-	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 06:39:24 -0400
+	(envelope-from <kraxel@redhat.com>) id 1e9qRp-0001PM-9Y
+	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 06:40:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1e9qQa-00005y-6H
-	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 06:39:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48896)
+	(envelope-from <kraxel@redhat.com>) id 1e9qRl-00014k-9X
+	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 06:40:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46174)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1e9qQa-0008WU-06
-	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 06:39:20 -0400
-Message-ID: <1509532757.3856.6.camel@redhat.com>
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1e9qRl-00013s-3l
+	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 06:40:33 -0400
+Message-ID: <1509532830.3856.7.camel@redhat.com>
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Wed, 01 Nov 2017 11:39:17 +0100
-In-Reply-To: <20171023210803.20998-3-makovick@gmail.com>
+Date: Wed, 01 Nov 2017 11:40:30 +0100
+In-Reply-To: <20171023210803.20998-5-makovick@gmail.com>
 References: <20171023210803.20998-1-makovick@gmail.com>
-	<20171023210803.20998-3-makovick@gmail.com>
+	<20171023210803.20998-5-makovick@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 2/7] sdl2: Do not quit the emulator when an
- auxilliary window is closed
+Subject: Re: [Qemu-devel] [PATCH 4/7] sdl2: Only accept the hotkeys on the
+ main window
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,43 +30,27 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Jindrich Makovicka <makovick@gmail.com>, qemu-devel@nongnu.org
 
-On Mon, 2017-10-23 at 23:07 +0200, Jindrich Makovicka wrote:
+Why?
+
 > ---
-> =C2=A0ui/sdl2.c | 10 +++++++---
-> =C2=A01 file changed, 7 insertions(+), 3 deletions(-)
+> =C2=A0ui/sdl2.c | 2 +-
+> =C2=A01 file changed, 1 insertion(+), 1 deletion(-)
 >=20
 > diff --git a/ui/sdl2.c b/ui/sdl2.c
-> index 7f51933234..aa37b39547 100644
+> index 685e4fabec..fa54353430 100644
 > --- a/ui/sdl2.c
 > +++ b/ui/sdl2.c
-> @@ -566,9 +566,13 @@ static void handle_windowevent(SDL_Event *ev)
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0update_displaycha=
-ngelistener(&scon->dcl, 500);
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0break;
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0case SDL_WINDOWEVENT_CLOSE:
-> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (!no_quit) {
-> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-no_shutdown =3D 0;
-> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-qemu_system_shutdown_request(SHUTDOWN_CAUSE_HOST_UI);
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (qemu_console_is_gr=
-aphic(scon->dcl.con)) {
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-if (!no_quit) {
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0no_shutdown =3D 0;
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0qemu_system_shutdown_request(SHUTDOWN_CAUSE_HOST_=
-UI)
-> ;
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-}
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0} else {
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-SDL_HideWindow(scon->real_window);
-
-scon->hidden should be update here.
-
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0break;
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0case SDL_WINDOWEVENT_SHOWN:
+> @@ -349,7 +349,7 @@ static void handle_keydown(SDL_Event *ev)
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0gui_key_modifier_pressed =3D mod_state;
+> =C2=A0
+> -=C2=A0=C2=A0=C2=A0=C2=A0if (gui_key_modifier_pressed) {
+> +=C2=A0=C2=A0=C2=A0=C2=A0if (gui_key_modifier_pressed && !ev->key.repea=
+t &&
+> qemu_console_is_graphic(scon->dcl.con)) {
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0switch (ev->key.k=
+eysym.scancode) {
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0case SDL_SCANCODE=
+_2:
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0case SDL_SCANCODE=
+_3:
