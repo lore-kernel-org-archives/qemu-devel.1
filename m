@@ -1,39 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59205)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59358)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1e9yYk-0008VM-3B
-	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 15:20:18 -0400
+	(envelope-from <mar.krzeminski@gmail.com>) id 1e9yZE-0000Kt-3h
+	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 15:20:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1e9yYe-0003UB-SW
-	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 15:20:17 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:50654)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
-	id 1e9yYe-0003Td-Ix
-	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 15:20:12 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vA1JIQKQ097586
-	for <qemu-devel@nongnu.org>; Wed, 1 Nov 2017 15:20:09 -0400
-Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2dyh3h2nn6-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 01 Nov 2017 15:20:07 -0400
-Received: from localhost
-	by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
-	Wed, 1 Nov 2017 15:20:06 -0400
-From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-References: <20171101191030.16136-1-danielhb@linux.vnet.ibm.com>
-Date: Wed, 1 Nov 2017 17:20:00 -0200
+	(envelope-from <mar.krzeminski@gmail.com>) id 1e9yZ9-0003t4-9x
+	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 15:20:48 -0400
+Received: from mail-lf0-x242.google.com ([2a00:1450:4010:c07::242]:46282)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mar.krzeminski@gmail.com>)
+	id 1e9yZ9-0003re-1C
+	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 15:20:43 -0400
+Received: by mail-lf0-x242.google.com with SMTP id g70so3718608lfl.3
+	for <qemu-devel@nongnu.org>; Wed, 01 Nov 2017 12:20:42 -0700 (PDT)
+References: <20171101071652.19375-1-frasse.iglesias@gmail.com>
+	<20171101071652.19375-2-frasse.iglesias@gmail.com>
+From: "mar.krzeminski" <mar.krzeminski@gmail.com>
+Message-ID: <86790113-ff54-95e1-451f-0c3f27002910@gmail.com>
+Date: Wed, 1 Nov 2017 20:20:38 +0100
 MIME-Version: 1.0
-In-Reply-To: <20171101191030.16136-1-danielhb@linux.vnet.ibm.com>
+In-Reply-To: <20171101071652.19375-2-frasse.iglesias@gmail.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Message-Id: <e018cff0-933d-d9ef-83a1-ea2a81c459a2@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v2] configure: adding ppc64le to supported
- host CPUs
+Content-Transfer-Encoding: 8bit
+Content-Language: en-AU
+Subject: Re: [Qemu-devel] [PATCH v6 01/13] m25p80: Add support for
+ continuous read out of RDSR and READ_FSR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,75 +32,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, mdroth@linux.vnet.ibm.com
+To: Francisco Iglesias <frasse.iglesias@gmail.com>, qemu-devel@nongnu.org
+Cc: edgari@xilinx.com, alistai@xilinx.com, francisco.iglesias@feimtech.se, Peter Maydell <peter.maydell@linaro.org>
 
-Ops, sorry about that. Resending ....
+Hi Francisco,
 
-On 11/01/2017 05:10 PM, Daniel Henrique Barboza wrote:
-> When executing 'configure' in a fresh QEMU clone, in a fresh
-> OS install running in a ppc64le host, this is the error
-> shown:
+W dniu 01.11.2017 o 08:16, Francisco Iglesias pisze:
+> Add support for continuous read out of the RDSR and READ_FSR status
+> registers until the chip select is deasserted. This feature is supported
+> by amongst others 1 or more flashtypes manufactured by Numonyx (Micron),
+> Windbond, SST, Gigadevice, Eon and Macronix.
 >
-> -----
->
-> ../configure --enable-trace-backend=simple --enable-debug
->      --target-list=ppc64-softmmu
->
-> ERROR: Unsupported CPU = ppc64le, try --enable-tcg-interpreter
->
-> -----
->
-> This isn't true, ppc64le host CPU is supported. This happens because,
-> in a fresh install, we don't have a C compiler to autodetect
-> the $cpu variable to "ppc64".
->
-> Since we need a C compiler to properly get the value of $cpu
-> in this and other cases, this patch changes the location of the C
-> compiler check right after setting the preferred CC.
->
-> Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+> Signed-off-by: Francisco Iglesias <frasse.iglesias@gmail.com>
 > ---
->   configure | 22 +++++++++++-----------
->   1 file changed, 11 insertions(+), 11 deletions(-)
+>   hw/block/m25p80.c | 9 ++++++++-
+>   1 file changed, 8 insertions(+), 1 deletion(-)
 >
-> diff --git a/configure b/configure
-> index 285d123dbf..5a4e0f0468 100755
-> --- a/configure
-> +++ b/configure
-> @@ -467,6 +467,17 @@ else
->     cc="${CC-${cross_prefix}gcc}"
->   fi
->
-> +# check that the C compiler works.
-> +write_c_skeleton;
-> +if compile_object ; then
-> +  : C compiler works ok
-> +else
-> +    error_exit "\"$cc\" either does not exist or does not work"
-> +fi
-> +if ! compile_prog ; then
-> +    error_exit "\"$cc\" cannot build an executable (is your linker broken?)"
-> +fi
-> +
->   if test -z "${CXX}${cross_prefix}"; then
->     cxx="c++"
->   else
-> @@ -1593,17 +1604,6 @@ if test -z "$werror" ; then
->       fi
->   fi
->
-> -# check that the C compiler works.
-> -write_c_skeleton;
-> -if compile_object ; then
-> -  : C compiler works ok
-> -else
-> -    error_exit "\"$cc\" either does not exist or does not work"
-> -fi
-> -if ! compile_prog ; then
-> -    error_exit "\"$cc\" cannot build an executable (is your linker broken?)"
-> -fi
-> -
->   if test "$bogus_os" = "yes"; then
->       # Now that we know that we're not printing the help and that
->       # the compiler works (so the results of the check_defines we used
+> diff --git a/hw/block/m25p80.c b/hw/block/m25p80.c
+> index a2438b9..721ae1a 100644
+> --- a/hw/block/m25p80.c
+> +++ b/hw/block/m25p80.c
+> @@ -423,6 +423,7 @@ typedef struct Flash {
+>       uint8_t data[M25P80_INTERNAL_DATA_BUFFER_SZ];
+>       uint32_t len;
+>       uint32_t pos;
+> +    bool data_read_loop;
+>       uint8_t needed_bytes;
+>       uint8_t cmd_in_progress;
+>       uint32_t cur_addr;
+> @@ -983,6 +984,7 @@ static void decode_new_cmd(Flash *s, uint32_t value)
+>           }
+>           s->pos = 0;
+>           s->len = 1;
+> +        s->data_read_loop = true;
+>           s->state = STATE_READING_DATA;
+>           break;
+>   
+> @@ -993,6 +995,7 @@ static void decode_new_cmd(Flash *s, uint32_t value)
+>           }
+>           s->pos = 0;
+>           s->len = 1;
+> +        s->data_read_loop = true;
+>           s->state = STATE_READING_DATA;
+>           break;
+>   
+> @@ -1133,6 +1136,7 @@ static int m25p80_cs(SSISlave *ss, bool select)
+>           s->pos = 0;
+>           s->state = STATE_IDLE;
+>           flash_sync_dirty(s, -1);
+> +        s->data_read_loop = false;
+>       }
+>   
+>       DB_PRINT_L(0, "%sselect\n", select ? "de" : "");
+> @@ -1198,7 +1202,9 @@ static uint32_t m25p80_transfer8(SSISlave *ss, uint32_t tx)
+>           s->pos++;
+>           if (s->pos == s->len) {
+>               s->pos = 0;
+> -            s->state = STATE_IDLE;
+> +            if (!s->data_read_loop) {
+> +                s->state = STATE_IDLE;
+> +            }
+>           }
+>           break;
+>   
+> @@ -1279,6 +1285,7 @@ static const VMStateDescription vmstate_m25p80 = {
+>           VMSTATE_UINT8_ARRAY(data, Flash, M25P80_INTERNAL_DATA_BUFFER_SZ),
+>           VMSTATE_UINT32(len, Flash),
+>           VMSTATE_UINT32(pos, Flash),
+> +        VMSTATE_BOOL(data_read_loop, Flash),
+This is not so simple I am afraid. Sorry I have not mentioned that in 
+previous review.
+Beside adding the field, you need to take care of VMSTATE (migration).
+Documentation is here:
+https://github.com/qemu/qemu/blob/master/docs/devel/migration.txt
+
+My suggestion would be to bump version and just set false to 
+data_read_loopwhen importing
+older states - in fact it should be false by default, so do nothing?
+Since I am away from Qemu for a while, and there are some new features 
+(subsections),
+could be that different solution is preferred.
+Maybe Peter can help.
+
+Regards,
+Marcin
+>           VMSTATE_UINT8(needed_bytes, Flash),
+>           VMSTATE_UINT8(cmd_in_progress, Flash),
+>           VMSTATE_UINT32(cur_addr, Flash),
