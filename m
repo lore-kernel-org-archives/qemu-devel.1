@@ -1,35 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39629)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45448)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1e9lLx-00069Z-0o
-	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 01:14:14 -0400
+	(envelope-from <thuth@redhat.com>) id 1e9mHC-0003ho-5E
+	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 02:13:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1e9lLt-0003tz-Qq
-	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 01:14:12 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:40998)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1e9lLt-0003tG-Im
-	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 01:14:09 -0400
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-References: <CAPnv1PJeMRPKv9UUSmSWxyn=GFOPaWY8eUgH8ZeL=ZBMDJpbdg@mail.gmail.com>
-	<CAJhHMCCZh7hvQT8x9Bks9k6=ka4G1Oybv1MrkKJ9_VZ_eRZBfQ@mail.gmail.com>
-	<CAPnv1PL7-BAt36BvTxP7G8J8990Ur9MJJbr-QPccWziD4sy28g@mail.gmail.com>
-	<87bmrj8eks.fsf@linaro.org>
-	<CAPnv1PKyak1G-uL=H=-Vh_9TH2dZKffYjDf_2Z+LWuqovMKCBQ@mail.gmail.com>
-	<CAKSfGUC_k6K=2Xy8pGcwuQ66DMPYCDvA47Ojgm7ntQfALGwDsQ@mail.gmail.com>
-	<CAKSfGUD-FEb+DGwtrVHm2_NR_WOes9_+WkPm3Z76OPNhc3vbGA@mail.gmail.com>
-	<000601d33128$2dd9d5e0$898d81a0$@ru> <87bmm7dohw.fsf@linaro.org>
-	<CAKSfGUCt7p95nDeW12Q_-BSTXVhRLPtL+=u_WLx5_BZEgAgeLw@mail.gmail.com>
-	<878thaepe2.fsf@linaro.org> <000d01d3523b$2e00f880$8a02e980$@ru>
-	<871sljie94.fsf@linaro.org>
-In-Reply-To: <871sljie94.fsf@linaro.org>
-Date: Wed, 1 Nov 2017 08:14:06 +0300
-Message-ID: <000001d352d0$3e097a00$ba1c6e00$@ru>
+	(envelope-from <thuth@redhat.com>) id 1e9mHA-00082L-Ew
+	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 02:13:22 -0400
+References: <150937459938.20015.8535040492037652631.malonedeb@soybean.canonical.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <011ed9e7-3860-d3d8-ce22-51f81815d507@redhat.com>
+Date: Wed, 1 Nov 2017 07:13:08 +0100
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Content-Language: ru
-Subject: Re: [Qemu-devel] What is the best commit for record-replay?
+In-Reply-To: <150937459938.20015.8535040492037652631.malonedeb@soybean.canonical.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Bug 1728615] [NEW] qemu-io crashes with SIGABRT
+ and Assertion `c->entries[i].offset != 0' failed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,53 +24,174 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?'Alex_Benn=C3=A9e'?= <alex.bennee@linaro.org>
-Cc: 'Aleksandr Bezzubikov' <zuban32s@gmail.com>, 'QEMU Developers' <qemu-devel@nongnu.org>, 'Pranith Kumar' <bobby.prani+qemu@gmail.com>, pavel.dovgaluk@ispras.ru, 'Aleksandr Bezzubikov' <abezzubikov@ispras.ru>, 'Paolo Bonzini' <pbonzini@redhat.com>, 'Igor R' <boost.lists@gmail.com>
+To: Bug 1728615 <1728615@bugs.launchpad.net>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: Alberto Garcia <berto@igalia.com>, Kevin Wolf <kwolf@redhat.com>
 
-> From: Alex Benn=C3=A9e [mailto:alex.bennee@linaro.org]
-> Pavel Dovgalyuk <dovgaluk@ispras.ru> writes:
->=20
-> >> From: Alex Benn=C3=A9e [mailto:alex.bennee@linaro.org]
-> >> Aleksandr Bezzubikov <zuban32s@gmail.com> writes:
-> >>
-> >> > 2017-09-19 12:30 GMT+03:00 Alex Benn=C3=A9e =
-<alex.bennee@linaro.org>:
-> >> >>
-> >> >>> As I know, RR is still broken in the current version.
-> >> >>> It was caused by the MTTCG implementation.
-> >> >>> Alex Bennee tried to fix RR back. Alex, have you found any =
-solution?
-> >> >>>
-> >> >>> We also trying to find a way to fix RR. It seems, that we will =
-reinvent BQL for RR.
-> >> >>
-> >> >> I think the method outlined in my RFC is the way to go, =
-essentially the
-> >> >> RR mutex taking over for the what the BQL did. The RFC patch =
-hadn't
-> >> >> hoisted the mutex for the additional devices so I'm just =
-re-basing now
-> >> >> and I'll see if I can make the changes for Igor's test case.
-> >> >>
-> >> >> --
-> >> >> Alex Benn=C3=A9e
-> >>
-> >> Could you try:
-> >>
-> >>   https://github.com/stsquad/qemu/tree/bql-and-replay-locks-v2
-> >>
-> >> And report back?
-> >
-> > Please check the new series of the patches.
-> > It includes patches from Alex and some fixes that made them working.
->=20
-> For reference that is:
->=20
->   Subject: [RFC PATCH 00/26] replay additions
->   From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
->   Date: Tue, 31 Oct 2017 14:24:57 +0300
->   Message-ID: <20171031112457.10516.8971.stgit@pasha-VirtualBox>
+On 30.10.2017 15:43, R.Nageswara Sastry wrote:
+> Public bug reported:
+> 
+> git is at HEAD a93ece47fd9edbd4558db24300056c9a57d3bcd4
+> This is on ppc64le architecture.
+> 
+> Re-production steps:
+> 
+> 1. Copy the attached files named backing_img.file and test.img to a directory
+> 2. And customize the following command to point to the above directory and run the same.
+> /usr/bin/qemu-io <path to>/test.img -c "write 1352192 1707520"
+> 
+> 3.Output of the above command.
+> qemu-io: block/qcow2-cache.c:411: qcow2_cache_entry_mark_dirty: Assertion `c->entries[i].offset != 0' failed.
+> Aborted (core dumped)
+> 
+> from gdb:
+> (gdb) bt
+> #0  0x00003fff833eeff0 in raise () from /lib64/libc.so.6
+> #1  0x00003fff833f136c in abort () from /lib64/libc.so.6
+> #2  0x00003fff833e4c44 in __assert_fail_base () from /lib64/libc.so.6
+> #3  0x00003fff833e4d34 in __assert_fail () from /lib64/libc.so.6
+> #4  0x000000001006a594 in qcow2_cache_entry_mark_dirty (bs=0x2e886f60, c=0x2e879700, table=0x3fff81200000) at block/qcow2-cache.c:411
+> #5  0x0000000010056154 in alloc_refcount_block (bs=0x2e886f60, cluster_index=2, refcount_block=0x3fff80cff808) at block/qcow2-refcount.c:417
+> #6  0x0000000010057520 in update_refcount (bs=0x2e886f60, offset=1048576, length=524288, addend=1, decrease=false, type=QCOW2_DISCARD_NEVER)
+>     at block/qcow2-refcount.c:834
+> #7  0x0000000010057dc8 in qcow2_alloc_clusters_at (bs=0x2e886f60, offset=1048576, nb_clusters=1) at block/qcow2-refcount.c:1032
+> #8  0x00000000100636d8 in do_alloc_cluster_offset (bs=0x2e886f60, guest_offset=2097152, host_offset=0x3fff80cff9e0, nb_clusters=0x3fff80cff9d8)
+>     at block/qcow2-cluster.c:1221
+> #9  0x0000000010063afc in handle_alloc (bs=0x2e886f60, guest_offset=2097152, host_offset=0x3fff80cffab0, bytes=0x3fff80cffab8, m=0x3fff80cffb60)
+>     at block/qcow2-cluster.c:1324
+> #10 0x0000000010064178 in qcow2_alloc_cluster_offset (bs=0x2e886f60, offset=1572864, bytes=0x3fff80cffb4c, host_offset=0x3fff80cffb58, m=0x3fff80cffb60)
+>     at block/qcow2-cluster.c:1511
+> #11 0x000000001004d3f4 in qcow2_co_pwritev (bs=0x2e886f60, offset=1572864, bytes=1486848, qiov=0x3fffc85f0bf0, flags=0) at block/qcow2.c:1919
+> #12 0x00000000100a9648 in bdrv_driver_pwritev (bs=0x2e886f60, offset=1352192, bytes=1707520, qiov=0x3fffc85f0bf0, flags=16) at block/io.c:898
+> #13 0x00000000100ab630 in bdrv_aligned_pwritev (child=0x2e8927f0, req=0x3fff80cffdd8, offset=1352192, bytes=1707520, align=1, qiov=0x3fffc85f0bf0, flags=16)
+>     at block/io.c:1440
+> #14 0x00000000100ac4ac in bdrv_co_pwritev (child=0x2e8927f0, offset=1352192, bytes=1707520, qiov=0x3fffc85f0bf0, flags=BDRV_REQ_FUA) at block/io.c:1691
+> #15 0x000000001008da0c in blk_co_pwritev (blk=0x2e879410, offset=1352192, bytes=1707520, qiov=0x3fffc85f0bf0, flags=BDRV_REQ_FUA) at block/block-backend.c:1085
+> #16 0x000000001008db68 in blk_write_entry (opaque=0x3fffc85f0c08) at block/block-backend.c:1110
+> #17 0x00000000101aa444 in coroutine_trampoline (i0=780753552, i1=0) at util/coroutine-ucontext.c:79
+> #18 0x00003fff83402b9c in makecontext () from /lib64/libc.so.6
+> #19 0x0000000000000000 in ?? ()
+> (gdb) bt full
+> #0  0x00003fff833eeff0 in raise () from /lib64/libc.so.6
+> No symbol table info available.
+> #1  0x00003fff833f136c in abort () from /lib64/libc.so.6
+> No symbol table info available.
+> #2  0x00003fff833e4c44 in __assert_fail_base () from /lib64/libc.so.6
+> No symbol table info available.
+> #3  0x00003fff833e4d34 in __assert_fail () from /lib64/libc.so.6
+> No symbol table info available.
+> #4  0x000000001006a594 in qcow2_cache_entry_mark_dirty (bs=0x2e886f60, c=0x2e879700, table=0x3fff81200000) at block/qcow2-cache.c:411
+>         i = 0
+>         __PRETTY_FUNCTION__ = "qcow2_cache_entry_mark_dirty"
+> #5  0x0000000010056154 in alloc_refcount_block (bs=0x2e886f60, cluster_index=2, refcount_block=0x3fff80cff808) at block/qcow2-refcount.c:417
+>         s = 0x2e893210
+>         refcount_table_index = 0
+>         ret = 0
+>         new_block = 0
+>         blocks_used = 72057594818669408
+>         meta_offset = 1572863
+> #6  0x0000000010057520 in update_refcount (bs=0x2e886f60, offset=1048576, length=524288, addend=1, decrease=false, type=QCOW2_DISCARD_NEVER)
+>     at block/qcow2-refcount.c:834
+>         block_index = 268870408
+>         refcount = 780741808
+>         cluster_index = 2
+>         table_index = 0
+>         s = 0x2e893210
+>         start = 1048576
+>         last = 1048576
+>         cluster_offset = 1048576
+>         refcount_block = 0x3fff81200000
+>         old_table_index = -1
+>         ret = 16383
+> #7  0x0000000010057dc8 in qcow2_alloc_clusters_at (bs=0x2e886f60, offset=1048576, nb_clusters=1) at block/qcow2-refcount.c:1032
+>         s = 0x2e893210
+>         cluster_index = 3
+>         refcount = 0
+>         i = 1
+>         ret = 0
+>         __PRETTY_FUNCTION__ = "qcow2_alloc_clusters_at"
+> #8  0x00000000100636d8 in do_alloc_cluster_offset (bs=0x2e886f60, guest_offset=2097152, host_offset=0x3fff80cff9e0, nb_clusters=0x3fff80cff9d8)
+>     at block/qcow2-cluster.c:1221
+>         ret = 780743184
+>         s = 0x2e893210
+> #9  0x0000000010063afc in handle_alloc (bs=0x2e886f60, guest_offset=2097152, host_offset=0x3fff80cffab0, bytes=0x3fff80cffab8, m=0x3fff80cffb60)
+>     at block/qcow2-cluster.c:1324
+>         s = 0x2e893210
+>         l2_index = 4
+>         l2_table = 0x0
+>         entry = 0
+>         nb_clusters = 1
+>         ret = 0
+> ---Type <return> to continue, or q <return> to quit---
+>         keep_old_clusters = false
+>         alloc_cluster_offset = 1048576
+>         __PRETTY_FUNCTION__ = "handle_alloc"
+>         requested_bytes = 17960562528
+>         avail_bytes = -2133853344
+>         nb_bytes = 16383
+>         old_m = 0x100000000
+> #10 0x0000000010064178 in qcow2_alloc_cluster_offset (bs=0x2e886f60, offset=1572864, bytes=0x3fff80cffb4c, host_offset=0x3fff80cffb58, m=0x3fff80cffb60)
+>     at block/qcow2-cluster.c:1511
+>         s = 0x2e893210
+>         start = 2097152
+>         remaining = 962560
+>         cluster_offset = 1048576
+>         cur_bytes = 962560
+>         ret = 0
+>         __PRETTY_FUNCTION__ = "qcow2_alloc_cluster_offset"
+> #11 0x000000001004d3f4 in qcow2_co_pwritev (bs=0x2e886f60, offset=1572864, bytes=1486848, qiov=0x3fffc85f0bf0, flags=0) at block/qcow2.c:1919
+>         s = 0x2e893210
+>         offset_in_cluster = 0
+>         ret = 0
+>         cur_bytes = 1486848
+>         cluster_offset = 524288
+>         hd_qiov = {iov = 0x2e858660, niov = 1, nalloc = 1, size = 220672}
+>         bytes_done = 220672
+>         cluster_data = 0x0
+>         l2meta = 0x0
+>         __PRETTY_FUNCTION__ = "qcow2_co_pwritev"
+> #12 0x00000000100a9648 in bdrv_driver_pwritev (bs=0x2e886f60, offset=1352192, bytes=1707520, qiov=0x3fffc85f0bf0, flags=16) at block/io.c:898
+>         drv = 0x102036f0 <bdrv_qcow2>
+>         sector_num = 780706080
+>         nb_sectors = 3069122264
+>         ret = -203160320
+>         __PRETTY_FUNCTION__ = "bdrv_driver_pwritev"
+> #13 0x00000000100ab630 in bdrv_aligned_pwritev (child=0x2e8927f0, req=0x3fff80cffdd8, offset=1352192, bytes=1707520, align=1, qiov=0x3fffc85f0bf0, flags=16)
+>     at block/io.c:1440
+>         bs = 0x2e886f60
+>         drv = 0x102036f0 <bdrv_qcow2>
+>         waited = false
+>         ret = 0
+>         end_sector = 5976
+>         bytes_remaining = 1707520
+>         max_transfer = 2147483647
+>         __PRETTY_FUNCTION__ = "bdrv_aligned_pwritev"
+> #14 0x00000000100ac4ac in bdrv_co_pwritev (child=0x2e8927f0, offset=1352192, bytes=1707520, qiov=0x3fffc85f0bf0, flags=BDRV_REQ_FUA) at block/io.c:1691
+>         bs = 0x2e886f60
+>         req = {bs = 0x2e886f60, offset = 1352192, bytes = 1707520, type = BDRV_TRACKED_WRITE, serialising = false, overlap_offset = 1352192,
+>           overlap_bytes = 1707520, list = {le_next = 0x0, le_prev = 0x2e88a1d8}, co = 0x2e895a90, wait_queue = {entries = {sqh_first = 0x0,
+>               sqh_last = 0x3fff80cffe20}}, waiting_for = 0x0}
+>         align = 1
+>         head_buf = 0x0
+> ---Type <return> to continue, or q <return> to quit---
+>         tail_buf = 0x0
+>         local_qiov = {iov = 0x3fff80cffdb0, niov = -2133852688, nalloc = 16383, size = 1352192}
+>         use_local_qiov = false
+>         ret = 0
+>         __PRETTY_FUNCTION__ = "bdrv_co_pwritev"
+> #15 0x000000001008da0c in blk_co_pwritev (blk=0x2e879410, offset=1352192, bytes=1707520, qiov=0x3fffc85f0bf0, flags=BDRV_REQ_FUA) at block/block-backend.c:1085
+>         ret = 0
+>         bs = 0x2e886f60
+> #16 0x000000001008db68 in blk_write_entry (opaque=0x3fffc85f0c08) at block/block-backend.c:1110
+>         rwco = 0x3fffc85f0c08
+> #17 0x00000000101aa444 in coroutine_trampoline (i0=780753552, i1=0) at util/coroutine-ucontext.c:79
+>         arg = {p = 0x2e895a90, i = {780753552, 0}}
+>         self = 0x2e895a90
+>         co = 0x2e895a90
+> #18 0x00003fff83402b9c in makecontext () from /lib64/libc.so.6
+> No symbol table info available.
+> #19 0x0000000000000000 in ?? ()
+> No symbol table info available.
 
-That's right.
+Can you also reproduce this on x86, or is it specific to ppc64?
 
-Pavel Dovgalyuk
+ Thomas
