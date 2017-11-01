@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39773)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43178)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1e9xDU-00070q-NS
-	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 13:54:17 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1e9xTl-0001eu-8i
+	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 14:11:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1e9xDO-00078w-OD
-	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 13:54:14 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:50374
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
-	id 1e9xDO-00078h-IE
-	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 13:54:10 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vA1Hqsxx088851
-	for <qemu-devel@nongnu.org>; Wed, 1 Nov 2017 13:54:07 -0400
-Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2dyhepwfkh-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 01 Nov 2017 13:54:07 -0400
-Received: from localhost
-	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
-	Wed, 1 Nov 2017 11:54:06 -0600
-From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-Date: Wed,  1 Nov 2017 15:53:56 -0200
-Message-Id: <20171101175356.11771-1-danielhb@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH] configure: adding ppc64le to supported host
- CPUs
+	(envelope-from <marcandre.lureau@gmail.com>) id 1e9xTk-0001gp-Cz
+	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 14:11:05 -0400
+Received: from mail-ua0-x244.google.com ([2607:f8b0:400c:c08::244]:45675)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1e9xTk-0001fm-8d
+	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 14:11:04 -0400
+Received: by mail-ua0-x244.google.com with SMTP id l40so2158753uah.2
+	for <qemu-devel@nongnu.org>; Wed, 01 Nov 2017 11:11:02 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <20171101142526.1006-4-ross.lagerwall@citrix.com>
+References: <20171101142526.1006-1-ross.lagerwall@citrix.com>
+	<20171101142526.1006-4-ross.lagerwall@citrix.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Wed, 1 Nov 2017 19:11:01 +0100
+Message-ID: <CAJ+F1C+PzaA1wVkNbb0eV2wY-9M6f-s3MmxCP6i_kuvAemtwCQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 3/4] io: Don't call close multiple times
+ in QIOChannelFile
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,56 +31,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: mdroth@linux.vnet.ibm.com
+To: Ross Lagerwall <ross.lagerwall@citrix.com>
+Cc: QEMU <qemu-devel@nongnu.org>
 
-When executing 'configure' in a fresh QEMU clone, in a fresh
-OS install running in a ppc64le host, this is the error
-shown:
+On Wed, Nov 1, 2017 at 3:25 PM, Ross Lagerwall
+<ross.lagerwall@citrix.com> wrote:
+> If the file descriptor underlying QIOChannelFile is closed in the
+> io_close() method, don't close it again in the finalize() method since
+> the file descriptor number may have been reused in the meantime.
+>
+> Signed-off-by: Ross Lagerwall <ross.lagerwall@citrix.com>
 
------
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-../configure --enable-trace-backend=simple --enable-debug
-    --target-list=ppc64-softmmu
 
-ERROR: Unsupported CPU = ppc64le, try --enable-tcg-interpreter
+> ---
+> New in v2.
+>
+>  io/channel-file.c | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/io/channel-file.c b/io/channel-file.c
+> index 16bf7ed..1f2f710 100644
+> --- a/io/channel-file.c
+> +++ b/io/channel-file.c
+> @@ -178,6 +178,7 @@ static int qio_channel_file_close(QIOChannel *ioc,
+>                           "Unable to close file");
+>          return -1;
+>      }
+> +    fioc->fd =3D -1;
+>      return 0;
+>  }
+>
+> --
+> 2.9.5
+>
+>
 
------
 
-This isn't true, ppc64le host CPU is supported.
 
-This patch adds 'ppc64le' to the list of supported host CPUs. After
-this patch, the next error when executing configure in the
-scenario mentioned is:
-
------
-
-../configure --enable-trace-backend=simple --enable-debug
-    --target-list=ppc64-softmmu
-
-ERROR: "cc" either does not exist or does not work
-
------
-
-Indicating that now we need a valid compiler to proceed.
-
-Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
----
- configure | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/configure b/configure
-index 285d123dbf..38c1003fb3 100755
---- a/configure
-+++ b/configure
-@@ -637,7 +637,7 @@ ARCH=
- # Normalise host CPU name and set ARCH.
- # Note that this case should only have supported host CPUs, not guests.
- case "$cpu" in
--  ppc|ppc64|s390|s390x|sparc64|x32)
-+  ppc|ppc64|ppc64le|s390|s390x|sparc64|x32)
-     cpu="$cpu"
-     supported_cpu="yes"
-   ;;
--- 
-2.13.6
+--=20
+Marc-Andr=C3=A9 Lureau
