@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43346)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51835)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1e9oof-0005a7-DG
-	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 04:56:06 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1e9pap-0000zu-U5
+	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 05:45:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1e9ooa-0002MG-E9
-	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 04:56:05 -0400
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <011ed9e7-3860-d3d8-ce22-51f81815d507@redhat.com>
-References: <150937459938.20015.8535040492037652631.malonedeb@soybean.canonical.com>
-	<011ed9e7-3860-d3d8-ce22-51f81815d507@redhat.com>
-Date: Wed, 01 Nov 2017 09:55:21 +0100
-Message-ID: <w51r2ti4buu.fsf@maestria.local.igalia.com>
+	(envelope-from <dgilbert@redhat.com>) id 1e9pai-0007wy-04
+	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 05:45:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43738)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1e9pah-0007vU-LP
+	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 05:45:43 -0400
+Date: Wed, 1 Nov 2017 09:45:38 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20171101094537.GA2786@work-vm>
+References: <CADak6y5eSo9=C2FJx+cTdqxArWeQqNDAvVgY+vS7H-9yGeuZvw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [Bug 1728615] [NEW] qemu-io crashes with SIGABRT
- and Assertion `c->entries[i].offset != 0' failed
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CADak6y5eSo9=C2FJx+cTdqxArWeQqNDAvVgY+vS7H-9yGeuZvw@mail.gmail.com>
+Subject: Re: [Qemu-devel] qemu disk use writeback don't take effect in
+ centos 7.2 1511
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,177 +27,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Bug 1728615 <1728615@bugs.launchpad.net>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>
+To: Paul Schlacter <wlfightup@gmail.com>
+Cc: qemu-devel@nongnu.org
 
-On Wed 01 Nov 2017 07:13:08 AM CET, Thomas Huth wrote:
-> On 30.10.2017 15:43, R.Nageswara Sastry wrote:
->> Public bug reported:
->> 
->> git is at HEAD a93ece47fd9edbd4558db24300056c9a57d3bcd4
->> This is on ppc64le architecture.
->> 
->> Re-production steps:
->> 
->> 1. Copy the attached files named backing_img.file and test.img to a directory
->> 2. And customize the following command to point to the above directory and run the same.
->> /usr/bin/qemu-io <path to>/test.img -c "write 1352192 1707520"
->> 
->> 3.Output of the above command.
->> qemu-io: block/qcow2-cache.c:411: qcow2_cache_entry_mark_dirty: Assertion `c->entries[i].offset != 0' failed.
->> Aborted (core dumped)
->> 
->> from gdb:
->> (gdb) bt
->> #0  0x00003fff833eeff0 in raise () from /lib64/libc.so.6
->> #1  0x00003fff833f136c in abort () from /lib64/libc.so.6
->> #2  0x00003fff833e4c44 in __assert_fail_base () from /lib64/libc.so.6
->> #3  0x00003fff833e4d34 in __assert_fail () from /lib64/libc.so.6
->> #4  0x000000001006a594 in qcow2_cache_entry_mark_dirty (bs=0x2e886f60, c=0x2e879700, table=0x3fff81200000) at block/qcow2-cache.c:411
->> #5  0x0000000010056154 in alloc_refcount_block (bs=0x2e886f60, cluster_index=2, refcount_block=0x3fff80cff808) at block/qcow2-refcount.c:417
->> #6  0x0000000010057520 in update_refcount (bs=0x2e886f60, offset=1048576, length=524288, addend=1, decrease=false, type=QCOW2_DISCARD_NEVER)
->>     at block/qcow2-refcount.c:834
->> #7  0x0000000010057dc8 in qcow2_alloc_clusters_at (bs=0x2e886f60, offset=1048576, nb_clusters=1) at block/qcow2-refcount.c:1032
->> #8  0x00000000100636d8 in do_alloc_cluster_offset (bs=0x2e886f60, guest_offset=2097152, host_offset=0x3fff80cff9e0, nb_clusters=0x3fff80cff9d8)
->>     at block/qcow2-cluster.c:1221
->> #9  0x0000000010063afc in handle_alloc (bs=0x2e886f60, guest_offset=2097152, host_offset=0x3fff80cffab0, bytes=0x3fff80cffab8, m=0x3fff80cffb60)
->>     at block/qcow2-cluster.c:1324
->> #10 0x0000000010064178 in qcow2_alloc_cluster_offset (bs=0x2e886f60, offset=1572864, bytes=0x3fff80cffb4c, host_offset=0x3fff80cffb58, m=0x3fff80cffb60)
->>     at block/qcow2-cluster.c:1511
->> #11 0x000000001004d3f4 in qcow2_co_pwritev (bs=0x2e886f60, offset=1572864, bytes=1486848, qiov=0x3fffc85f0bf0, flags=0) at block/qcow2.c:1919
->> #12 0x00000000100a9648 in bdrv_driver_pwritev (bs=0x2e886f60, offset=1352192, bytes=1707520, qiov=0x3fffc85f0bf0, flags=16) at block/io.c:898
->> #13 0x00000000100ab630 in bdrv_aligned_pwritev (child=0x2e8927f0, req=0x3fff80cffdd8, offset=1352192, bytes=1707520, align=1, qiov=0x3fffc85f0bf0, flags=16)
->>     at block/io.c:1440
->> #14 0x00000000100ac4ac in bdrv_co_pwritev (child=0x2e8927f0, offset=1352192, bytes=1707520, qiov=0x3fffc85f0bf0, flags=BDRV_REQ_FUA) at block/io.c:1691
->> #15 0x000000001008da0c in blk_co_pwritev (blk=0x2e879410, offset=1352192, bytes=1707520, qiov=0x3fffc85f0bf0, flags=BDRV_REQ_FUA) at block/block-backend.c:1085
->> #16 0x000000001008db68 in blk_write_entry (opaque=0x3fffc85f0c08) at block/block-backend.c:1110
->> #17 0x00000000101aa444 in coroutine_trampoline (i0=780753552, i1=0) at util/coroutine-ucontext.c:79
->> #18 0x00003fff83402b9c in makecontext () from /lib64/libc.so.6
->> #19 0x0000000000000000 in ?? ()
->> (gdb) bt full
->> #0  0x00003fff833eeff0 in raise () from /lib64/libc.so.6
->> No symbol table info available.
->> #1  0x00003fff833f136c in abort () from /lib64/libc.so.6
->> No symbol table info available.
->> #2  0x00003fff833e4c44 in __assert_fail_base () from /lib64/libc.so.6
->> No symbol table info available.
->> #3  0x00003fff833e4d34 in __assert_fail () from /lib64/libc.so.6
->> No symbol table info available.
->> #4  0x000000001006a594 in qcow2_cache_entry_mark_dirty (bs=0x2e886f60, c=0x2e879700, table=0x3fff81200000) at block/qcow2-cache.c:411
->>         i = 0
->>         __PRETTY_FUNCTION__ = "qcow2_cache_entry_mark_dirty"
->> #5  0x0000000010056154 in alloc_refcount_block (bs=0x2e886f60, cluster_index=2, refcount_block=0x3fff80cff808) at block/qcow2-refcount.c:417
->>         s = 0x2e893210
->>         refcount_table_index = 0
->>         ret = 0
->>         new_block = 0
->>         blocks_used = 72057594818669408
->>         meta_offset = 1572863
->> #6  0x0000000010057520 in update_refcount (bs=0x2e886f60, offset=1048576, length=524288, addend=1, decrease=false, type=QCOW2_DISCARD_NEVER)
->>     at block/qcow2-refcount.c:834
->>         block_index = 268870408
->>         refcount = 780741808
->>         cluster_index = 2
->>         table_index = 0
->>         s = 0x2e893210
->>         start = 1048576
->>         last = 1048576
->>         cluster_offset = 1048576
->>         refcount_block = 0x3fff81200000
->>         old_table_index = -1
->>         ret = 16383
->> #7  0x0000000010057dc8 in qcow2_alloc_clusters_at (bs=0x2e886f60, offset=1048576, nb_clusters=1) at block/qcow2-refcount.c:1032
->>         s = 0x2e893210
->>         cluster_index = 3
->>         refcount = 0
->>         i = 1
->>         ret = 0
->>         __PRETTY_FUNCTION__ = "qcow2_alloc_clusters_at"
->> #8  0x00000000100636d8 in do_alloc_cluster_offset (bs=0x2e886f60, guest_offset=2097152, host_offset=0x3fff80cff9e0, nb_clusters=0x3fff80cff9d8)
->>     at block/qcow2-cluster.c:1221
->>         ret = 780743184
->>         s = 0x2e893210
->> #9  0x0000000010063afc in handle_alloc (bs=0x2e886f60, guest_offset=2097152, host_offset=0x3fff80cffab0, bytes=0x3fff80cffab8, m=0x3fff80cffb60)
->>     at block/qcow2-cluster.c:1324
->>         s = 0x2e893210
->>         l2_index = 4
->>         l2_table = 0x0
->>         entry = 0
->>         nb_clusters = 1
->>         ret = 0
->> ---Type <return> to continue, or q <return> to quit---
->>         keep_old_clusters = false
->>         alloc_cluster_offset = 1048576
->>         __PRETTY_FUNCTION__ = "handle_alloc"
->>         requested_bytes = 17960562528
->>         avail_bytes = -2133853344
->>         nb_bytes = 16383
->>         old_m = 0x100000000
->> #10 0x0000000010064178 in qcow2_alloc_cluster_offset (bs=0x2e886f60, offset=1572864, bytes=0x3fff80cffb4c, host_offset=0x3fff80cffb58, m=0x3fff80cffb60)
->>     at block/qcow2-cluster.c:1511
->>         s = 0x2e893210
->>         start = 2097152
->>         remaining = 962560
->>         cluster_offset = 1048576
->>         cur_bytes = 962560
->>         ret = 0
->>         __PRETTY_FUNCTION__ = "qcow2_alloc_cluster_offset"
->> #11 0x000000001004d3f4 in qcow2_co_pwritev (bs=0x2e886f60, offset=1572864, bytes=1486848, qiov=0x3fffc85f0bf0, flags=0) at block/qcow2.c:1919
->>         s = 0x2e893210
->>         offset_in_cluster = 0
->>         ret = 0
->>         cur_bytes = 1486848
->>         cluster_offset = 524288
->>         hd_qiov = {iov = 0x2e858660, niov = 1, nalloc = 1, size = 220672}
->>         bytes_done = 220672
->>         cluster_data = 0x0
->>         l2meta = 0x0
->>         __PRETTY_FUNCTION__ = "qcow2_co_pwritev"
->> #12 0x00000000100a9648 in bdrv_driver_pwritev (bs=0x2e886f60, offset=1352192, bytes=1707520, qiov=0x3fffc85f0bf0, flags=16) at block/io.c:898
->>         drv = 0x102036f0 <bdrv_qcow2>
->>         sector_num = 780706080
->>         nb_sectors = 3069122264
->>         ret = -203160320
->>         __PRETTY_FUNCTION__ = "bdrv_driver_pwritev"
->> #13 0x00000000100ab630 in bdrv_aligned_pwritev (child=0x2e8927f0, req=0x3fff80cffdd8, offset=1352192, bytes=1707520, align=1, qiov=0x3fffc85f0bf0, flags=16)
->>     at block/io.c:1440
->>         bs = 0x2e886f60
->>         drv = 0x102036f0 <bdrv_qcow2>
->>         waited = false
->>         ret = 0
->>         end_sector = 5976
->>         bytes_remaining = 1707520
->>         max_transfer = 2147483647
->>         __PRETTY_FUNCTION__ = "bdrv_aligned_pwritev"
->> #14 0x00000000100ac4ac in bdrv_co_pwritev (child=0x2e8927f0, offset=1352192, bytes=1707520, qiov=0x3fffc85f0bf0, flags=BDRV_REQ_FUA) at block/io.c:1691
->>         bs = 0x2e886f60
->>         req = {bs = 0x2e886f60, offset = 1352192, bytes = 1707520, type = BDRV_TRACKED_WRITE, serialising = false, overlap_offset = 1352192,
->>           overlap_bytes = 1707520, list = {le_next = 0x0, le_prev = 0x2e88a1d8}, co = 0x2e895a90, wait_queue = {entries = {sqh_first = 0x0,
->>               sqh_last = 0x3fff80cffe20}}, waiting_for = 0x0}
->>         align = 1
->>         head_buf = 0x0
->> ---Type <return> to continue, or q <return> to quit---
->>         tail_buf = 0x0
->>         local_qiov = {iov = 0x3fff80cffdb0, niov = -2133852688, nalloc = 16383, size = 1352192}
->>         use_local_qiov = false
->>         ret = 0
->>         __PRETTY_FUNCTION__ = "bdrv_co_pwritev"
->> #15 0x000000001008da0c in blk_co_pwritev (blk=0x2e879410, offset=1352192, bytes=1707520, qiov=0x3fffc85f0bf0, flags=BDRV_REQ_FUA) at block/block-backend.c:1085
->>         ret = 0
->>         bs = 0x2e886f60
->> #16 0x000000001008db68 in blk_write_entry (opaque=0x3fffc85f0c08) at block/block-backend.c:1110
->>         rwco = 0x3fffc85f0c08
->> #17 0x00000000101aa444 in coroutine_trampoline (i0=780753552, i1=0) at util/coroutine-ucontext.c:79
->>         arg = {p = 0x2e895a90, i = {780753552, 0}}
->>         self = 0x2e895a90
->>         co = 0x2e895a90
->> #18 0x00003fff83402b9c in makecontext () from /lib64/libc.so.6
->> No symbol table info available.
->> #19 0x0000000000000000 in ?? ()
->> No symbol table info available.
->
-> Can you also reproduce this on x86, or is it specific to ppc64?
+* Paul Schlacter (wlfightup@gmail.com) wrote:
+> qemu version:  2.9.0
+> image: centos 7.2 1511 raw
+> cache mode: writeback
+> 
+> 
+> In centos7.2 time, the use of writeback and none, the result of dd disk is
+> the same io, no change
+> 
+> But I replaced centos7.1 centos7.3 centos7.4 when writeback was
+> significantly faster than none
+> 
+> Would like to ask what is going on, how to solve ?
 
-I can actually reproduce it myself, I'll take a look.
+Hi Paul,
+  Can you just clarify your setup please;  do you mean that
+with the same qemu setup but a 7.2 guest rather than a 7.1/7.3 guest
+the behaviour changes?
 
-Berto
+Dave
+
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
