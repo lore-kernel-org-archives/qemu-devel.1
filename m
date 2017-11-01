@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54560)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60716)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <frasse.iglesias@gmail.com>) id 1e9nH2-0006IE-CA
-	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 03:17:19 -0400
+	(envelope-from <wlfightup@gmail.com>) id 1e9nhc-0001qL-Gb
+	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 03:44:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <frasse.iglesias@gmail.com>) id 1e9nH1-0001XN-DD
-	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 03:17:16 -0400
-Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:52020)
+	(envelope-from <wlfightup@gmail.com>) id 1e9nhb-0000c9-MJ
+	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 03:44:44 -0400
+Received: from mail-oi0-x231.google.com ([2607:f8b0:4003:c06::231]:49417)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <frasse.iglesias@gmail.com>)
-	id 1e9nH1-0001X3-1u
-	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 03:17:15 -0400
-Received: by mail-lf0-x244.google.com with SMTP id r129so1471137lff.8
-	for <qemu-devel@nongnu.org>; Wed, 01 Nov 2017 00:17:14 -0700 (PDT)
-From: Francisco Iglesias <frasse.iglesias@gmail.com>
-Date: Wed,  1 Nov 2017 08:16:52 +0100
-Message-Id: <20171101071652.19375-14-frasse.iglesias@gmail.com>
-In-Reply-To: <20171101071652.19375-1-frasse.iglesias@gmail.com>
-References: <20171101071652.19375-1-frasse.iglesias@gmail.com>
-Subject: [Qemu-devel] [PATCH v6 13/13] xlnx-zcu102: Add support for the
- ZynqMP QSPI
+	(Exim 4.71) (envelope-from <wlfightup@gmail.com>) id 1e9nhb-0000bs-HT
+	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 03:44:43 -0400
+Received: by mail-oi0-x231.google.com with SMTP id w197so2245698oif.6
+	for <qemu-devel@nongnu.org>; Wed, 01 Nov 2017 00:44:43 -0700 (PDT)
+MIME-Version: 1.0
+From: Paul Schlacter <wlfightup@gmail.com>
+Date: Wed, 1 Nov 2017 15:44:41 +0800
+Message-ID: <CADak6y5eSo9=C2FJx+cTdqxArWeQqNDAvVgY+vS7H-9yGeuZvw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: [Qemu-devel] qemu disk use writeback don't take effect in centos
+ 7.2 1511
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,126 +27,17 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: edgari@xilinx.com, alistai@xilinx.com, francisco.iglesias@feimtech.se, mar.krzeminski@gmail.com
 
-Add support for the ZynqMP QSPI (consisting of the Generic QSPI and Legacy
-QSPI) and connect Numonyx n25q512a11 flashes to it.
+qemu version:  2.9.0
+image: centos 7.2 1511 raw
+cache mode: writeback
 
-Signed-off-by: Francisco Iglesias <frasse.iglesias@gmail.com>
-Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
----
- hw/arm/xlnx-zcu102.c         | 23 +++++++++++++++++++++++
- hw/arm/xlnx-zynqmp.c         | 26 ++++++++++++++++++++++++++
- include/hw/arm/xlnx-zynqmp.h |  5 +++++
- 3 files changed, 54 insertions(+)
 
-diff --git a/hw/arm/xlnx-zcu102.c b/hw/arm/xlnx-zcu102.c
-index 519a16e..7d61972 100644
---- a/hw/arm/xlnx-zcu102.c
-+++ b/hw/arm/xlnx-zcu102.c
-@@ -150,6 +150,29 @@ static void xlnx_zynqmp_init(XlnxZCU102 *s, MachineState *machine)
-         sysbus_connect_irq(SYS_BUS_DEVICE(&s->soc.spi[i]), 1, cs_line);
-     }
- 
-+    for (i = 0; i < XLNX_ZYNQMP_NUM_QSPI_FLASH; i++) {
-+        SSIBus *spi_bus;
-+        DeviceState *flash_dev;
-+        qemu_irq cs_line;
-+        DriveInfo *dinfo = drive_get_next(IF_MTD);
-+        int bus = i / XLNX_ZYNQMP_NUM_QSPI_BUS_CS;
-+        gchar *bus_name = g_strdup_printf("qspi%d", bus);
-+
-+        spi_bus = (SSIBus *)qdev_get_child_bus(DEVICE(&s->soc), bus_name);
-+        g_free(bus_name);
-+
-+        flash_dev = ssi_create_slave_no_init(spi_bus, "n25q512a11");
-+        if (dinfo) {
-+            qdev_prop_set_drive(flash_dev, "drive", blk_by_legacy_dinfo(dinfo),
-+                                &error_fatal);
-+        }
-+        qdev_init_nofail(flash_dev);
-+
-+        cs_line = qdev_get_gpio_in_named(flash_dev, SSI_GPIO_CS, 0);
-+
-+        sysbus_connect_irq(SYS_BUS_DEVICE(&s->soc.qspi), i + 1, cs_line);
-+    }
-+
-     /* TODO create and connect IDE devices for ide_drive_get() */
- 
-     xlnx_zcu102_binfo.ram_size = ram_size;
-diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
-index d4b6560..46ac45d 100644
---- a/hw/arm/xlnx-zynqmp.c
-+++ b/hw/arm/xlnx-zynqmp.c
-@@ -40,6 +40,10 @@
- #define SATA_ADDR           0xFD0C0000
- #define SATA_NUM_PORTS      2
- 
-+#define QSPI_ADDR           0xff0f0000
-+#define LQSPI_ADDR          0xc0000000
-+#define QSPI_IRQ            15
-+
- #define DP_ADDR             0xfd4a0000
- #define DP_IRQ              113
- 
-@@ -169,6 +173,9 @@ static void xlnx_zynqmp_init(Object *obj)
-         qdev_set_parent_bus(DEVICE(&s->spi[i]), sysbus_get_default());
-     }
- 
-+    object_initialize(&s->qspi, sizeof(s->qspi), TYPE_XLNX_ZYNQMP_QSPIPS);
-+    qdev_set_parent_bus(DEVICE(&s->qspi), sysbus_get_default());
-+
-     object_initialize(&s->dp, sizeof(s->dp), TYPE_XLNX_DP);
-     qdev_set_parent_bus(DEVICE(&s->dp), sysbus_get_default());
- 
-@@ -405,6 +412,25 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
-         g_free(bus_name);
-     }
- 
-+    object_property_set_bool(OBJECT(&s->qspi), true, "realized", &err);
-+    sysbus_mmio_map(SYS_BUS_DEVICE(&s->qspi), 0, QSPI_ADDR);
-+    sysbus_mmio_map(SYS_BUS_DEVICE(&s->qspi), 1, LQSPI_ADDR);
-+    sysbus_connect_irq(SYS_BUS_DEVICE(&s->qspi), 0, gic_spi[QSPI_IRQ]);
-+
-+    for (i = 0; i < XLNX_ZYNQMP_NUM_QSPI_BUS; i++) {
-+        gchar *bus_name;
-+        gchar *target_bus;
-+
-+        /* Alias controller SPI bus to the SoC itself */
-+        bus_name = g_strdup_printf("qspi%d", i);
-+        target_bus = g_strdup_printf("spi%d", i);
-+        object_property_add_alias(OBJECT(s), bus_name,
-+                                  OBJECT(&s->qspi), target_bus,
-+                                  &error_abort);
-+        g_free(bus_name);
-+        g_free(target_bus);
-+    }
-+
-     object_property_set_bool(OBJECT(&s->dp), true, "realized", &err);
-     if (err) {
-         error_propagate(errp, err);
-diff --git a/include/hw/arm/xlnx-zynqmp.h b/include/hw/arm/xlnx-zynqmp.h
-index 6eff81a..3e6fb9b 100644
---- a/include/hw/arm/xlnx-zynqmp.h
-+++ b/include/hw/arm/xlnx-zynqmp.h
-@@ -40,6 +40,10 @@
- #define XLNX_ZYNQMP_NUM_SDHCI 2
- #define XLNX_ZYNQMP_NUM_SPIS 2
- 
-+#define XLNX_ZYNQMP_NUM_QSPI_BUS 2
-+#define XLNX_ZYNQMP_NUM_QSPI_BUS_CS 2
-+#define XLNX_ZYNQMP_NUM_QSPI_FLASH 4
-+
- #define XLNX_ZYNQMP_NUM_OCM_BANKS 4
- #define XLNX_ZYNQMP_OCM_RAM_0_ADDRESS 0xFFFC0000
- #define XLNX_ZYNQMP_OCM_RAM_SIZE 0x10000
-@@ -83,6 +87,7 @@ typedef struct XlnxZynqMPState {
-     SysbusAHCIState sata;
-     SDHCIState sdhci[XLNX_ZYNQMP_NUM_SDHCI];
-     XilinxSPIPS spi[XLNX_ZYNQMP_NUM_SPIS];
-+    XlnxZynqMPQSPIPS qspi;
-     XlnxDPState dp;
-     XlnxDPDMAState dpdma;
- 
--- 
-2.9.3
+In centos7.2 time, the use of writeback and none, the result of dd disk is
+the same io, no change
+
+But I replaced centos7.1 centos7.3 centos7.4 when writeback was
+significantly faster than none
+
+
+Would like to ask what is going on, how to solve ?
