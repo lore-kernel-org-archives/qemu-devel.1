@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59809)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33469)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1e9yaX-00017c-S0
-	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 15:22:10 -0400
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1e9yjo-0004L4-Eh
+	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 15:31:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1e9yaS-0004Vt-Qs
-	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 15:22:09 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:54936)
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1e9yjk-0001UH-AS
+	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 15:31:44 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:44312
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
-	id 1e9yaS-0004Vb-Hu
-	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 15:22:04 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	id 1e9yjk-0001TS-5Q
+	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 15:31:40 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vA1JIUlA012056
-	for <qemu-devel@nongnu.org>; Wed, 1 Nov 2017 15:22:01 -0400
-Received: from e15.ny.us.ibm.com (e15.ny.us.ibm.com [129.33.205.205])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2dyjxxck2p-1
+	vA1JTW7U121563
+	for <qemu-devel@nongnu.org>; Wed, 1 Nov 2017 15:31:36 -0400
+Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2dyj5dydgd-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 01 Nov 2017 15:22:00 -0400
+	for <qemu-devel@nongnu.org>; Wed, 01 Nov 2017 15:31:35 -0400
 Received: from localhost
-	by e15.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
-	Wed, 1 Nov 2017 15:21:59 -0400
+	Wed, 1 Nov 2017 15:31:35 -0400
 From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-Date: Wed,  1 Nov 2017 17:21:51 -0200
-Message-Id: <20171101192151.18972-1-danielhb@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v3] configure: adding ppc64le to supported host
- CPUs
+Date: Wed,  1 Nov 2017 17:31:26 -0200
+Message-Id: <20171101193126.19730-1-danielhb@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v4] configure: do CC check before verifying
+ host CPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
