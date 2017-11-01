@@ -1,19 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59834)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60387)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1e9vAt-000714-4T
-	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 11:43:33 -0400
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1e9vC5-00081M-En
+	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 11:44:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1e9vAo-0005b2-6e
-	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 11:43:27 -0400
-From: Alberto Garcia <berto@igalia.com>
-Date: Wed,  1 Nov 2017 17:42:22 +0200
-Message-Id: <49d365124cf0bffb3fe705678b50b86445d42605.1509550787.git.berto@igalia.com>
-In-Reply-To: <cover.1509550787.git.berto@igalia.com>
-References: <cover.1509550787.git.berto@igalia.com>
-In-Reply-To: <cover.1509550787.git.berto@igalia.com>
-References: <cover.1509550787.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH 1/4] qcow2: Prevent allocating refcount blocks
- at offset 0
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1e9vC0-0006a2-HQ
+	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 11:44:41 -0400
+From: Anton Nefedov <anton.nefedov@virtuozzo.com>
+Date: Wed,  1 Nov 2017 18:43:53 +0300
+Message-Id: <1509551048-129830-1-git-send-email-anton.nefedov@virtuozzo.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v5 00/15] qcow2: space preallocation and COW
+ improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,95 +21,102 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>, "R . Nageswara Sastry" <nasastry@in.ibm.com>
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, den@virtuozzo.com, berto@igalia.com, Anton Nefedov <anton.nefedov@virtuozzo.com>
 
-Each entry in the qcow2 cache contains an offset field indicating the
-location of the data in the qcow2 image. If the offset is 0 then it
-means that the entry contains no data and is available to be used when
-needed.
+v5: rebased, patches slightly reordered;
+    cluster allocation (to avoid writing zero-buffers)
+    now goes before an optional ahead preallocation
 
-Because of that it is not possible to store in the cache the first
-cluster of the qcow2 image (offset = 0). This is not a problem because
-that cluster always contains the qcow2 header and we're not using this
-cache for that.
+v4: http://lists.nongnu.org/archive/html/qemu-devel/2017-08/msg00109.html
 
-However, if the qcow2 image is corrupted it can happen that we try to
-allocate a new refcount block at offset 0, triggering this assertion
-and crashing QEMU:
+This pull request is to improve a few performance problems of qcow2 format:
 
-  qcow2_cache_entry_mark_dirty: Assertion `c->entries[i].offset != 0' failed
+  1. non cluster-aligned write requests (to unallocated clusters) explicitly
+     pad data with zeroes if there is no backing data.
+     Resulting increase in ops number and potential cluster fragmentation
+     (on the host file) is already solved by:
+       ee22a9d qcow2: Merge the writing of the COW regions with the guest data
+     However, in case of zero COW regions, that can be avoided at all
+     but the whole clusters are preallocated and zeroed in a single
+     efficient write_zeroes() operation
 
-This patch adds an explicit check for this scenario and a new test
-case.
+  2. moreover, efficient write_zeroes() operation can be used to preallocate
+     space megabytes (*configurable number) ahead which gives noticeable
+     improvement on some storage types (e.g. distributed storage)
+     where the space allocation operation might be expensive)
 
-This problem was originally reported here:
+  3. this will also allow to enable simultaneous writes to the same unallocated
+     cluster after the space has been allocated & zeroed but before
+     the first data is written and the cluster is linked to L2.
+     (Not included in this patchset).
 
-   https://bugs.launchpad.net/qemu/+bug/1728615
+Efficient write_zeroes usually implies that the blocks are not actually
+written to but only reserved and marked as zeroed by the storage.
+In this patchset, file-posix driver is marked as supporting this operation
+if it supports (/configured to support) fallocate() operation.
 
-Reported-by: R.Nageswara Sastry <nasastry@in.ibm.com>
-Signed-off-by: Alberto Garcia <berto@igalia.com>
----
- block/qcow2-refcount.c     |  7 +++++++
- tests/qemu-iotests/060     | 11 +++++++++++
- tests/qemu-iotests/060.out |  8 ++++++++
- 3 files changed, 26 insertions(+)
+Existing bdrv_write_zeroes() falls back to writing zero buffers if
+write_zeroes is not supported by the driver.
+A new flag (BDRV_REQ_ALLOCATE) is introduced to avoid that but return ENOTSUP.
+Such allocate requests are also implemented to possibly overlap with the
+other requests. No wait is performed but an error returned in such case as well.
+So the operation should be considered advisory and a fallback scenario still
+handled by the caller (in this case, qcow2 driver).
 
-diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
-index aa3fd6cf17..9059996c4b 100644
---- a/block/qcow2-refcount.c
-+++ b/block/qcow2-refcount.c
-@@ -367,6 +367,13 @@ static int alloc_refcount_block(BlockDriverState *bs,
-         return new_block;
-     }
- 
-+    /* If we're allocating the block at offset 0 then something is wrong */
-+    if (new_block == 0) {
-+        qcow2_signal_corruption(bs, true, -1, -1, "Preventing invalid "
-+                                "allocation of refcount block at offset 0");
-+        return -EIO;
-+    }
-+
- #ifdef DEBUG_ALLOC2
-     fprintf(stderr, "qcow2: Allocate refcount block %d for %" PRIx64
-         " at %" PRIx64 "\n",
-diff --git a/tests/qemu-iotests/060 b/tests/qemu-iotests/060
-index 8e95c450eb..dead26aeaf 100755
---- a/tests/qemu-iotests/060
-+++ b/tests/qemu-iotests/060
-@@ -242,6 +242,17 @@ poke_file "$TEST_IMG" "$(($l2_offset+8))" "\x80\x00\x00\x00\x00\x06\x2a\x00"
- # Should emit two error messages
- $QEMU_IO -c "discard 0 64k" -c "read 64k 64k" "$TEST_IMG" | _filter_qemu_io
- 
-+echo
-+echo "=== Testing empty refcount table with valid L1 and L2 tables ==="
-+echo
-+_make_test_img 64M
-+$QEMU_IO -c "write 0 64k" "$TEST_IMG" | _filter_qemu_io
-+poke_file "$TEST_IMG" "$rt_offset"        "\x00\x00\x00\x00\x00\x00\x00\x00"
-+# Since the first data cluster is already allocated this triggers an
-+# allocation with an explicit offset (using qcow2_alloc_clusters_at())
-+# causing a refcount block to be allocated at offset 0
-+$QEMU_IO -c "write 0 128k" "$TEST_IMG" | _filter_qemu_io
-+
- # success, all done
- echo "*** done"
- rm -f $seq.full
-diff --git a/tests/qemu-iotests/060.out b/tests/qemu-iotests/060.out
-index 5ca3af491f..872719009c 100644
---- a/tests/qemu-iotests/060.out
-+++ b/tests/qemu-iotests/060.out
-@@ -181,4 +181,12 @@ qcow2: Marking image as corrupt: Cluster allocation offset 0x62a00 unaligned (L2
- discard 65536/65536 bytes at offset 0
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- read failed: Input/output error
-+
-+=== Testing empty refcount table with valid L1 and L2 tables ===
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
-+wrote 65536/65536 bytes at offset 0
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+qcow2: Marking image as corrupt: Preventing invalid allocation of refcount block at offset 0; further corruption events will be suppressed
-+write failed: Input/output error
- *** done
+Anton Nefedov (12):
+  mirror: inherit supported write/zero flags
+  blkverify: set supported write/zero flags
+  block: introduce BDRV_REQ_ALLOCATE flag
+  block: treat BDRV_REQ_ALLOCATE as serialising
+  file-posix: support BDRV_REQ_ALLOCATE
+  block: support BDRV_REQ_ALLOCATE in passthrough drivers
+  qcow2: move is_zero() up
+  qcow2: skip writing zero buffers to empty COW areas
+  qcow2: set inactive flag
+  qcow2: do not zero out clusters if already preallocated
+  iotest 198: test BDRV_REQ_ALLOCATE
+  iotest 134: test cluster-misaligned encrypted write
+
+Denis V. Lunev (2):
+  qcow2: preallocation at image expand
+  qcow2: truncate preallocated space
+
+Pavel Butsykin (1):
+  qcow2: check space leak at the end of the image
+
+ block/qcow2.h                      |  18 ++++
+ include/block/block.h              |   6 +-
+ include/block/block_int.h          |   2 +-
+ block/blkdebug.c                   |   3 +-
+ block/blkverify.c                  |   9 ++
+ block/file-posix.c                 |   8 ++
+ block/io.c                         |  47 +++++++--
+ block/mirror.c                     |   5 +
+ block/qcow2-cluster.c              |  14 ++-
+ block/qcow2-refcount.c             |   7 ++
+ block/qcow2.c                      | 202 +++++++++++++++++++++++++++++++++----
+ block/raw-format.c                 |   3 +-
+ block/trace-events                 |   1 +
+ qemu-options.hx                    |   4 +
+ tests/qemu-iotests/026.out         |  94 +++++++++++++----
+ tests/qemu-iotests/026.out.nocache |  94 +++++++++++++----
+ tests/qemu-iotests/029.out         |   5 +-
+ tests/qemu-iotests/060             |   2 +-
+ tests/qemu-iotests/060.out         |  13 ++-
+ tests/qemu-iotests/061.out         |   5 +-
+ tests/qemu-iotests/066             |   2 +-
+ tests/qemu-iotests/066.out         |   9 +-
+ tests/qemu-iotests/098.out         |   7 +-
+ tests/qemu-iotests/108.out         |   5 +-
+ tests/qemu-iotests/112.out         |   5 +-
+ tests/qemu-iotests/134             |   9 ++
+ tests/qemu-iotests/134.out         |  10 ++
+ tests/qemu-iotests/198             | 146 +++++++++++++++++++++++++++
+ tests/qemu-iotests/198.out         |  50 +++++++++
+ tests/qemu-iotests/group           |   1 +
+ 30 files changed, 693 insertions(+), 93 deletions(-)
+ create mode 100755 tests/qemu-iotests/198
+ create mode 100644 tests/qemu-iotests/198.out
+
 -- 
-2.11.0
+2.7.4
