@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37734)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44848)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=47103a974=ross.lagerwall@citrix.com>)
-	id 1e9u1f-0005WT-Aj
-	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 10:29:53 -0400
+	(envelope-from <Michael.Nawrocki@gtri.gatech.edu>)
+	id 1e9uJb-0002MD-5V
+	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 10:48:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=47103a974=ross.lagerwall@citrix.com>)
-	id 1e9u1b-00084a-Nk
-	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 10:29:51 -0400
-Received: from smtp02.citrix.com ([66.165.176.63]:12847)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=47103a974=ross.lagerwall@citrix.com>)
-	id 1e9u1b-00081x-Gm
-	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 10:29:47 -0400
-From: Ross Lagerwall <ross.lagerwall@citrix.com>
-Date: Wed, 1 Nov 2017 14:25:26 +0000
-Message-ID: <20171101142526.1006-5-ross.lagerwall@citrix.com>
-In-Reply-To: <20171101142526.1006-1-ross.lagerwall@citrix.com>
-References: <20171101142526.1006-1-ross.lagerwall@citrix.com>
+	(envelope-from <Michael.Nawrocki@gtri.gatech.edu>)
+	id 1e9uJY-0004ZI-2U
+	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 10:48:23 -0400
+Received: from relay2.gtri.gatech.edu ([130.207.199.168]:54530)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <Michael.Nawrocki@gtri.gatech.edu>)
+	id 1e9uJX-0004Yv-RS
+	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 10:48:19 -0400
+From: "Nawrocki, Michael" <Michael.Nawrocki@gtri.gatech.edu>
+Date: Wed, 1 Nov 2017 14:48:17 +0000
+Message-ID: <565D1929-C201-4AAD-A07E-12382FD23D81@gtri.gatech.edu>
+References: <20171031155435.4618-1-michael.nawrocki@gtri.gatech.edu>
+	<20171031155435.4618-3-michael.nawrocki@gtri.gatech.edu>
+	<20171031175048.GI4526@work-vm>
+In-Reply-To: <20171031175048.GI4526@work-vm>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <CBF471B8F2A21647AD7E86DC16D6F098@gtri.org>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2 4/4] io: Add /dev/fdset/ support to
- QIOChannelFile
+Subject: Re: [Qemu-devel] [PATCH 2/2] Add i82559a eepro100 interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,52 +33,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Ross Lagerwall <ross.lagerwall@citrix.com>, "Daniel P. Berrange" <berrange@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "marcel@redhat.com" <marcel@redhat.com>, "jasowang@redhat.com" <jasowang@redhat.com>, "mst@redhat.com" <mst@redhat.com>
 
-Add /dev/fdset/ support to QIOChannelFile by calling qemu_open() instead
-of open() and qemu_close() instead of close(). There is a subtle
-semantic change since qemu_open() automatically sets O_CLOEXEC, but this
-doesn't affect any of the users of the function.
-
-Signed-off-by: Ross Lagerwall <ross.lagerwall@citrix.com>
----
-Changed in v2:
-* Split into separate patch.
-
- io/channel-file.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/io/channel-file.c b/io/channel-file.c
-index 1f2f710..db948ab 100644
---- a/io/channel-file.c
-+++ b/io/channel-file.c
-@@ -50,7 +50,7 @@ qio_channel_file_new_path(const char *path,
- 
-     ioc = QIO_CHANNEL_FILE(object_new(TYPE_QIO_CHANNEL_FILE));
- 
--    ioc->fd = open(path, flags, mode);
-+    ioc->fd = qemu_open(path, flags, mode);
-     if (ioc->fd < 0) {
-         object_unref(OBJECT(ioc));
-         error_setg_errno(errp, errno,
-@@ -74,7 +74,7 @@ static void qio_channel_file_finalize(Object *obj)
- {
-     QIOChannelFile *ioc = QIO_CHANNEL_FILE(obj);
-     if (ioc->fd != -1) {
--        close(ioc->fd);
-+        qemu_close(ioc->fd);
-         ioc->fd = -1;
-     }
- }
-@@ -173,7 +173,7 @@ static int qio_channel_file_close(QIOChannel *ioc,
- {
-     QIOChannelFile *fioc = QIO_CHANNEL_FILE(ioc);
- 
--    if (close(fioc->fd) < 0) {
-+    if (qemu_close(fioc->fd) < 0) {
-         error_setg_errno(errp, errno,
-                          "Unable to close file");
-         return -1;
--- 
-2.9.5
+T24gMTAvMzEvMTcsIDEzOjUwLCAiRHIuIERhdmlkIEFsYW4gR2lsYmVydCIgPGRnaWxiZXJ0QHJl
+ZGhhdC5jb20+IHdyb3RlOg0KDQogICAgKiBNaWtlIE5hd3JvY2tpIChtaWNoYWVsLm5hd3JvY2tp
+QGd0cmkuZ2F0ZWNoLmVkdSkgd3JvdGU6DQogICAgPiBTaWduZWQtb2ZmLWJ5OiBNaWtlIE5hd3Jv
+Y2tpIDxtaWNoYWVsLm5hd3JvY2tpQGd0cmkuZ2F0ZWNoLmVkdT4NCiAgICA+IC0tLQ0KICAgID4g
+IGh3L25ldC9lZXBybzEwMC5jICAgIHwgMiArLQ0KICAgID4gIGh3L3BjaS9wY2kuYyAgICAgICAg
+IHwgMiArKw0KICAgID4gIGluY2x1ZGUvaHcvcGNpL3BjaS5oIHwgMSArDQogICAgPiAgcWVtdS1v
+cHRpb25zLmh4ICAgICAgfCAyICstDQogICAgPiAgNCBmaWxlcyBjaGFuZ2VkLCA1IGluc2VydGlv
+bnMoKyksIDIgZGVsZXRpb25zKC0pDQogICAgPiANCiAgICA+IGRpZmYgLS1naXQgYS9ody9uZXQv
+ZWVwcm8xMDAuYyBiL2h3L25ldC9lZXBybzEwMC5jDQogICAgPiBpbmRleCA5MWRkMDU4MDEwLi4y
+YzdjNWNkZWI5IDEwMDY0NA0KICAgID4gLS0tIGEvaHcvbmV0L2VlcHJvMTAwLmMNCiAgICA+ICsr
+KyBiL2h3L25ldC9lZXBybzEwMC5jDQogICAgPiBAQCAtMTk3Myw3ICsxOTczLDcgQEAgc3RhdGlj
+IEUxMDBQQ0lEZXZpY2VJbmZvIGUxMDBfZGV2aWNlc1tdID0gew0KICAgID4gICAgICAgICAgLm5h
+bWUgPSAiaTgyNTU5YSIsDQogICAgPiAgICAgICAgICAuZGVzYyA9ICJJbnRlbCBpODI1NTlBIEV0
+aGVybmV0IiwNCiAgICA+ICAgICAgICAgIC5kZXZpY2UgPSBpODI1NTlBLA0KICAgID4gLSAgICAg
+ICAgLmRldmljZV9pZCA9IFBDSV9ERVZJQ0VfSURfSU5URUxfODI1NTcsDQogICAgPiArICAgICAg
+ICAuZGV2aWNlX2lkID0gUENJX0RFVklDRV9JRF9JTlRFTF84MjU1OSwNCiAgICANCiAgICBEb2Vz
+bid0IHRoYXQgYnJlYWsgbWlncmF0aW9uL2NvbXBhdGliaWxpdHkgLSBpZiBvbmUgc2lkZSBzdWRk
+ZW5seQ0KICAgIHNlZXMgYSBkaWZmZXJlbnQgZGV2aWNlX2lkID8NCiAgICANCiAgICBEYXZlDQoN
+CknigJltIG5vdCBzdXJlLiBJIHNlYXJjaGVkIGZvciBjb2RlIHJlZmVyZW5jZXMgdG8gdGhlIGk4
+MjU1OWEgaW50ZXJmYWNlIGFuZCBjb3VsZG7igJl0IGZpbmQgYW55IG91dHNpZGUgb2YgdGhlIGRy
+aXZlciBpdHNlbGY7IGl0IHdhc27igJl0IGV4cG9ydGVkIGFzIGEgcGNpX25pY19tb2RlbCBiZWZv
+cmUgbXkgcGF0Y2gsIHNvIEkgZG9u4oCZdCB0aGluayB0aGUgaTgyNTU5YSBkZXZpY2Ugd2FzIGJl
+aW5nIHVzZWQsIHByb2dyYW1tYXRpY2FsbHkgb3IgdmlhIHRoZSBjb21tYW5kIGxpbmUsIGJlZm9y
+ZSB0aGlzIHBvaW50LiBQZXJoYXBzIHRoZXJl4oCZcyBhIGRpZmZlcmVudCB3YXkgdG8gdXNlIHRo
+ZSBkZXZpY2UgdGhhdCBJ4oCZbSBub3QgYXdhcmUgb2Y/DQoNCkkgdGhpbmsgdGhlIElEIEnigJlt
+IHVzaW5nICgweDgwODYgMHgxMDMwIOKAkyBJbnRlbCBDb3Jwb3JhdGlvbiA4MjU1OSBJbkJ1c2lu
+ZXNzIDEwLzEwMCkgaXMgbW9yZSBhY2N1cmF0ZSB0byB0aGUgY2hpcHNldCwgYW5kIGEgZHJpdmVy
+IEnigJl2ZSBnb3QgZXhwbGljaXRseSBzZWFyY2hlcyBmb3IgdGhpcyBJRC4gTW9zdCBkcml2ZXJz
+IHNlZW0gdG8gc2VhcmNoIGZvciBhIG51bWJlciBvZiBQQ0kgSURzIGluIHRoZSBlZXBybzEwMCBm
+YW1pbHksIGF0IGFueSByYXRlLCBzbyBJIHRoaW5rIGl0IHNob3VsZCBiZSBva2F5LiBMZXQgbWUg
+a25vdyBpZiBhbm90aGVyIGFwcHJvYWNoIGlzIHByZWZlcmFibGUuDQoNClRoYW5rcywNCk1pa2UN
+CiAgICANCiAgICA+ICAgICAgICAgIC5yZXZpc2lvbiA9IDB4MDYsDQogICAgPiAgICAgICAgICAu
+c3RhdHNfc2l6ZSA9IDgwLA0KICAgID4gICAgICAgICAgLmhhc19leHRlbmRlZF90Y2Jfc3VwcG9y
+dCA9IHRydWUsDQogICAgPiBkaWZmIC0tZ2l0IGEvaHcvcGNpL3BjaS5jIGIvaHcvcGNpL3BjaS5j
+DQogICAgPiBpbmRleCA1ZWQzYzhkY2E0Li4xMTI2YWQxZWIzIDEwMDY0NA0KICAgID4gLS0tIGEv
+aHcvcGNpL3BjaS5jDQogICAgPiArKysgYi9ody9wY2kvcGNpLmMNCiAgICA+IEBAIC0xODI2LDYg
+KzE4MjYsNyBAQCBzdGF0aWMgY29uc3QgY2hhciAqIGNvbnN0IHBjaV9uaWNfbW9kZWxzW10gPSB7
+DQogICAgPiAgICAgICJuZTJrX3BjaSIsDQogICAgPiAgICAgICJpODI1NTEiLA0KICAgID4gICAg
+ICAiaTgyNTU3YiIsDQogICAgPiArICAgICJpODI1NTlhIiwNCiAgICA+ICAgICAgImk4MjU1OWVy
+IiwNCiAgICA+ICAgICAgInJ0bDgxMzkiLA0KICAgID4gICAgICAiZTEwMDAiLA0KICAgID4gQEAg
+LTE4MzksNiArMTg0MCw3IEBAIHN0YXRpYyBjb25zdCBjaGFyICogY29uc3QgcGNpX25pY19uYW1l
+c1tdID0gew0KICAgID4gICAgICAibmUya19wY2kiLA0KICAgID4gICAgICAiaTgyNTUxIiwNCiAg
+ICA+ICAgICAgImk4MjU1N2IiLA0KICAgID4gKyAgICAiaTgyNTU5YSIsDQogICAgPiAgICAgICJp
+ODI1NTllciIsDQogICAgPiAgICAgICJydGw4MTM5IiwNCiAgICA+ICAgICAgImUxMDAwIiwNCiAg
+ICA+IGRpZmYgLS1naXQgYS9pbmNsdWRlL2h3L3BjaS9wY2kuaCBiL2luY2x1ZGUvaHcvcGNpL3Bj
+aS5oDQogICAgPiBpbmRleCA4ZDAyYTBhMzgzLi5mMzBlMmNmYjcyIDEwMDY0NA0KICAgID4gLS0t
+IGEvaW5jbHVkZS9ody9wY2kvcGNpLmgNCiAgICA+ICsrKyBiL2luY2x1ZGUvaHcvcGNpL3BjaS5o
+DQogICAgPiBAQCAtNzAsNiArNzAsNyBAQCBleHRlcm4gYm9vbCBwY2lfYXZhaWxhYmxlOw0KICAg
+ID4gIC8qIEludGVsICgweDgwODYpICovDQogICAgPiAgI2RlZmluZSBQQ0lfREVWSUNFX0lEX0lO
+VEVMXzgyNTUxSVQgICAgICAweDEyMDkNCiAgICA+ICAjZGVmaW5lIFBDSV9ERVZJQ0VfSURfSU5U
+RUxfODI1NTcgICAgICAgIDB4MTIyOQ0KICAgID4gKyNkZWZpbmUgUENJX0RFVklDRV9JRF9JTlRF
+TF84MjU1OSAgICAgICAgMHgxMDMwDQogICAgPiAgI2RlZmluZSBQQ0lfREVWSUNFX0lEX0lOVEVM
+XzgyODAxSVIgICAgICAweDI5MjINCiAgICA+ICANCiAgICA+ICAvKiBSZWQgSGF0IC8gUXVtcmFu
+ZXQgKGZvciBRRU1VKSAtLSBzZWUgcGNpLWlkcy50eHQgKi8NCiAgICA+IGRpZmYgLS1naXQgYS9x
+ZW11LW9wdGlvbnMuaHggYi9xZW11LW9wdGlvbnMuaHgNCiAgICA+IGluZGV4IDM3MjhlOWI0ZGQu
+LmEzOWM3ZTQ0YjMgMTAwNjQ0DQogICAgPiAtLS0gYS9xZW11LW9wdGlvbnMuaHgNCiAgICA+ICsr
+KyBiL3FlbXUtb3B0aW9ucy5oeA0KICAgID4gQEAgLTIwNDcsNyArMjA0Nyw3IEBAIHRoYXQgdGhl
+IGNhcmQgc2hvdWxkIGhhdmU7IHRoaXMgb3B0aW9uIGN1cnJlbnRseSBvbmx5IGFmZmVjdHMgdmly
+dGlvIGNhcmRzOyBzZXQNCiAgICA+ICBAdmFye3Z9ID0gMCB0byBkaXNhYmxlIE1TSS1YLiBJZiBu
+byBAb3B0aW9uey1uZXR9IG9wdGlvbiBpcyBzcGVjaWZpZWQsIGEgc2luZ2xlDQogICAgPiAgTklD
+IGlzIGNyZWF0ZWQuICBRRU1VIGNhbiBlbXVsYXRlIHNldmVyYWwgZGlmZmVyZW50IG1vZGVscyBv
+ZiBuZXR3b3JrIGNhcmQuDQogICAgPiAgVmFsaWQgdmFsdWVzIGZvciBAdmFye3R5cGV9IGFyZQ0K
+ICAgID4gLUBjb2Rle3ZpcnRpb30sIEBjb2Rle2k4MjU1MX0sIEBjb2Rle2k4MjU1N2J9LCBAY29k
+ZXtpODI1NTllcn0sDQogICAgPiArQGNvZGV7dmlydGlvfSwgQGNvZGV7aTgyNTUxfSwgQGNvZGV7
+aTgyNTU3Yn0sIEBjb2Rle2k4MjU1OWF9LCBAY29kZXtpODI1NTllcn0sDQogICAgPiAgQGNvZGV7
+bmUya19wY2l9LCBAY29kZXtuZTJrX2lzYX0sIEBjb2Rle3BjbmV0fSwgQGNvZGV7cnRsODEzOX0s
+DQogICAgPiAgQGNvZGV7ZTEwMDB9LCBAY29kZXtzbWM5MWMxMTF9LCBAY29kZXtsYW5jZX0gYW5k
+IEBjb2Rle21jZl9mZWN9Lg0KICAgID4gIE5vdCBhbGwgZGV2aWNlcyBhcmUgc3VwcG9ydGVkIG9u
+IGFsbCB0YXJnZXRzLiAgVXNlIEBjb2Rley1uZXQgbmljLG1vZGVsPWhlbHB9DQogICAgPiAtLSAN
+CiAgICA+IDIuMTQuMg0KICAgID4gDQogICAgPiANCiAgICAtLQ0KICAgIERyLiBEYXZpZCBBbGFu
+IEdpbGJlcnQgLyBkZ2lsYmVydEByZWRoYXQuY29tIC8gTWFuY2hlc3RlciwgVUsNCiAgICANCg0K
