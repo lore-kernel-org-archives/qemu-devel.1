@@ -1,40 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36205)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37049)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1e9yrG-0007oD-0z
-	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 15:39:27 -0400
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1e9yt7-0000Gv-Sb
+	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 15:41:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1e9yrB-000884-SC
-	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 15:39:25 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:35350)
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1e9yt3-0001Ey-R1
+	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 15:41:21 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36910
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
-	id 1e9yrB-00087Q-JK
-	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 15:39:21 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	id 1e9yt3-0001EL-L9
+	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 15:41:17 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vA1JVPcq003994
-	for <qemu-devel@nongnu.org>; Wed, 1 Nov 2017 15:39:16 -0400
-Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2dyh353uxq-1
+	vA1JVVDU027180
+	for <qemu-devel@nongnu.org>; Wed, 1 Nov 2017 15:41:15 -0400
+Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2dykuytf1w-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 01 Nov 2017 15:39:16 -0400
+	for <qemu-devel@nongnu.org>; Wed, 01 Nov 2017 15:41:14 -0400
 Received: from localhost
-	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
-	Wed, 1 Nov 2017 15:39:15 -0400
-References: <20171101192151.18972-1-danielhb@linux.vnet.ibm.com>
-	<57a99d3c-5157-e3b9-9696-49bbd821422d@amsat.org>
+	Wed, 1 Nov 2017 15:41:14 -0400
+References: <20171101193126.19730-1-danielhb@linux.vnet.ibm.com>
+	<81734112-f8f6-bd49-f43d-77dbdfc34c46@amsat.org>
 From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-Date: Wed, 1 Nov 2017 17:39:09 -0200
+Date: Wed, 1 Nov 2017 17:41:09 -0200
 MIME-Version: 1.0
-In-Reply-To: <57a99d3c-5157-e3b9-9696-49bbd821422d@amsat.org>
+In-Reply-To: <81734112-f8f6-bd49-f43d-77dbdfc34c46@amsat.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Message-Id: <de8d0da3-2ec2-7149-1121-06df87a88228@linux.vnet.ibm.com>
+Message-Id: <b1249dd1-9efc-1502-09c5-af63c8b1f4e1@linux.vnet.ibm.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3] configure: adding ppc64le to supported
- host CPUs
+Subject: Re: [Qemu-devel] [PATCH v4] configure: do CC check before verifying
+ host CPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -48,10 +49,17 @@ Cc: peter.maydell@linaro.org, mdroth@linux.vnet.ibm.com
 
 
 
-On 11/01/2017 05:34 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> Hi Daniel,
+On 11/01/2017 05:36 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+> Maybe "configure: check $CC available before verifying host CPU" ?
+
+If the maintainer is willing to amend the patch before pushing, works=20
+for me!
+
+
+Daniel
+
 >
-> On 11/01/2017 04:21 PM, Daniel Henrique Barboza wrote:
+> On 11/01/2017 04:31 PM, Daniel Henrique Barboza wrote:
 >> When executing 'configure' in a fresh QEMU clone, in a fresh
 >> OS install running in a ppc64le host, this is the error
 >> shown:
@@ -72,31 +80,10 @@ On 11/01/2017 05:34 PM, Philippe Mathieu-Daud=C3=A9 wrote:
 >> Since we need a C compiler to properly get the value of $cpu
 >> in this and other cases, this patch changes the location of the C
 >> compiler check right after setting the preferred CC.
-> Can you add the output of the new behavior?
->
-> Also please update the subject, then:
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Hey!
-
-I've updated the subject in the v4 already.
-
-The output didn't change: in my test scenario (fresh OS with no
-CC installed in a ppc64le host), if I try to run configure I get:
-
-
-../configure --enable-trace-backend=3Dsimple --enable-debug=20
---target-list=3Dppc64-softmmu
-
-ERROR: "cc" either does not exist or does not work
-
-
-Instead of an error message saying that ppc64le isn't supported.
-
-
-
-Daniel
->
+>>
 >> Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>
 >> ---
 >>   configure | 34 +++++++++++++++++-----------------
 >>   1 file changed, 17 insertions(+), 17 deletions(-)
