@@ -1,18 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60534)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60545)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1e9vCB-00087t-KF
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1e9vCC-00088e-46
 	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 11:44:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1e9vC7-0006dm-Bv
-	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 11:44:47 -0400
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1e9vC7-0006eE-S8
+	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 11:44:48 -0400
 From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Date: Wed,  1 Nov 2017 18:43:58 +0300
-Message-Id: <1509551048-129830-6-git-send-email-anton.nefedov@virtuozzo.com>
+Date: Wed,  1 Nov 2017 18:43:59 +0300
+Message-Id: <1509551048-129830-7-git-send-email-anton.nefedov@virtuozzo.com>
 In-Reply-To: <1509551048-129830-1-git-send-email-anton.nefedov@virtuozzo.com>
 References: <1509551048-129830-1-git-send-email-anton.nefedov@virtuozzo.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v5 05/15] file-posix: support BDRV_REQ_ALLOCATE
+Subject: [Qemu-devel] [PATCH v5 06/15] block: support BDRV_REQ_ALLOCATE in
+ passthrough drivers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,47 +25,70 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, den@virtuozzo.com, berto@igalia.com, Anton Nefedov <anton.nefedov@virtuozzo.com>
 
-Current write_zeroes implementation is good enough to satisfy this flag too
+Support the flag if the underlying BDS supports it
 
 Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
 Reviewed-by: Alberto Garcia <berto@igalia.com>
 ---
- block/file-posix.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ block/blkdebug.c   | 3 ++-
+ block/blkverify.c  | 2 +-
+ block/mirror.c     | 2 +-
+ block/raw-format.c | 3 ++-
+ 4 files changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/block/file-posix.c b/block/file-posix.c
-index 36ee89e..c36e156 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -558,7 +558,10 @@ static int raw_open_common(BlockDriverState *bs, QDict *options,
-     }
-     if (S_ISREG(st.st_mode)) {
-         s->discard_zeroes = true;
-+#ifdef CONFIG_FALLOCATE
-         s->has_fallocate = true;
-+        bs->supported_zero_flags |= BDRV_REQ_ALLOCATE;
-+#endif
-     }
-     if (S_ISBLK(st.st_mode)) {
- #ifdef BLKDISCARDZEROES
-@@ -593,6 +596,7 @@ static int raw_open_common(BlockDriverState *bs, QDict *options,
- #ifdef CONFIG_XFS
-     if (platform_test_xfs_fd(s->fd)) {
-         s->is_xfs = true;
-+        bs->supported_zero_flags |= BDRV_REQ_ALLOCATE;
-     }
- #endif
+diff --git a/block/blkdebug.c b/block/blkdebug.c
+index e216699..7d5773d 100644
+--- a/block/blkdebug.c
++++ b/block/blkdebug.c
+@@ -400,7 +400,8 @@ static int blkdebug_open(BlockDriverState *bs, QDict *options, int flags,
  
-@@ -1413,6 +1417,10 @@ static ssize_t handle_aiocb_write_zeroes(RawPosixAIOData *aiocb)
-         }
-         s->has_fallocate = false;
-     }
-+
-+    if (!s->has_fallocate) {
-+        aiocb->bs->supported_zero_flags &= ~BDRV_REQ_ALLOCATE;
-+    }
- #endif
+     bs->supported_write_flags = BDRV_REQ_FUA &
+         bs->file->bs->supported_write_flags;
+-    bs->supported_zero_flags = (BDRV_REQ_FUA | BDRV_REQ_MAY_UNMAP) &
++    bs->supported_zero_flags =
++        (BDRV_REQ_FUA | BDRV_REQ_MAY_UNMAP | BDRV_REQ_ALLOCATE) &
+         bs->file->bs->supported_zero_flags;
+     ret = -EINVAL;
  
-     return -ENOTSUP;
+diff --git a/block/blkverify.c b/block/blkverify.c
+index 9ba65d0..b249636 100644
+--- a/block/blkverify.c
++++ b/block/blkverify.c
+@@ -145,7 +145,7 @@ static int blkverify_open(BlockDriverState *bs, QDict *options, int flags,
+         s->test_file->bs->supported_write_flags;
+ 
+     bs->supported_zero_flags =
+-        (BDRV_REQ_FUA | BDRV_REQ_MAY_UNMAP) &
++        (BDRV_REQ_FUA | BDRV_REQ_MAY_UNMAP | BDRV_REQ_ALLOCATE) &
+         bs->file->bs->supported_zero_flags &
+         s->test_file->bs->supported_zero_flags;
+ 
+diff --git a/block/mirror.c b/block/mirror.c
+index 19c8987..404c3e9 100644
+--- a/block/mirror.c
++++ b/block/mirror.c
+@@ -1067,7 +1067,7 @@ static void bdrv_mirror_top_refresh_filename(BlockDriverState *bs, QDict *opts)
+     bs->supported_write_flags = BDRV_REQ_FUA &
+         bs->backing->bs->supported_write_flags;
+     bs->supported_zero_flags =
+-        (BDRV_REQ_FUA | BDRV_REQ_MAY_UNMAP) &
++        (BDRV_REQ_FUA | BDRV_REQ_MAY_UNMAP | BDRV_REQ_ALLOCATE) &
+         bs->backing->bs->supported_zero_flags;
+ }
+ 
+diff --git a/block/raw-format.c b/block/raw-format.c
+index ab552c0..b1deb93 100644
+--- a/block/raw-format.c
++++ b/block/raw-format.c
+@@ -416,7 +416,8 @@ static int raw_open(BlockDriverState *bs, QDict *options, int flags,
+     bs->sg = bs->file->bs->sg;
+     bs->supported_write_flags = BDRV_REQ_FUA &
+         bs->file->bs->supported_write_flags;
+-    bs->supported_zero_flags = (BDRV_REQ_FUA | BDRV_REQ_MAY_UNMAP) &
++    bs->supported_zero_flags =
++        (BDRV_REQ_FUA | BDRV_REQ_MAY_UNMAP | BDRV_REQ_ALLOCATE) &
+         bs->file->bs->supported_zero_flags;
+ 
+     if (bs->probed && !bdrv_is_read_only(bs)) {
 -- 
 2.7.4
