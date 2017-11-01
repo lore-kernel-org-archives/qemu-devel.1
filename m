@@ -1,19 +1,43 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48897)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49169)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lizhengui@huawei.com>) id 1e9mjx-00082K-Kt
-	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 02:43:06 -0400
+	(envelope-from <xiaoguangrong.eric@gmail.com>) id 1e9mml-0000MJ-6H
+	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 02:46:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lizhengui@huawei.com>) id 1e9mjq-0008L6-8g
-	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 02:43:03 -0400
-From: lizhengui <lizhengui@huawei.com>
-Date: Wed, 1 Nov 2017 06:42:33 +0000
-Message-ID: <68B56AECEFB25A418ADB9417F6178A531091A91B@dggemi507-mbs.china.huawei.com>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="gb2312"
-Content-Transfer-Encoding: base64
+	(envelope-from <xiaoguangrong.eric@gmail.com>) id 1e9mmg-0000X5-Bd
+	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 02:45:59 -0400
+Received: from mail-io0-x244.google.com ([2607:f8b0:4001:c06::244]:52973)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <xiaoguangrong.eric@gmail.com>)
+	id 1e9mmg-0000Wx-44
+	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 02:45:54 -0400
+Received: by mail-io0-x244.google.com with SMTP id f20so3985254ioj.9
+	for <qemu-devel@nongnu.org>; Tue, 31 Oct 2017 23:45:53 -0700 (PDT)
+References: <1455443283.33337333.1500618150787.JavaMail.zimbra@redhat.com>
+	<CAPcyv4hpbk0jgp+mA=q05zVBV8ZSZvCvV68JJ4gjE3QhK70d1w@mail.gmail.com>
+	<20170724102330.GE652@quack2.suse.cz>
+	<1157879323.33809400.1500897967669.JavaMail.zimbra@redhat.com>
+	<20170724123752.GN652@quack2.suse.cz>
+	<1888117852.34216619.1500992835767.JavaMail.zimbra@redhat.com>
+	<CAPcyv4in28F3FOVKp9abvrggxPuXdbGynF5=ZvBXCrywoa06JA@mail.gmail.com>
+	<1501016375.26846.21.camel@redhat.com>
+	<1063764405.34607875.1501076841865.JavaMail.zimbra@redhat.com>
+	<1501104453.26846.45.camel@redhat.com>
+	<CAPcyv4hsqrqBxoipUHPAbSctuzbVWCRnT-gN08i9uhXTWY6iPQ@mail.gmail.com>
+	<1501112787.4073.49.camel@redhat.com>
+	<CAPcyv4gbC6Hx_4YsCfOd2t=fn=wPGp5h__1QH=-p40TPFNbFzA@mail.gmail.com>
+	<0a26793f-86f7-29e7-f61b-dc4c1ef08c8e@gmail.com>
+	<CAPcyv4iw2cCpDmr+4kxsFvdy+iGZiz=ok-kLhsDKpqDy+szf-Q@mail.gmail.com>
+	<378b10f3-b32f-84f5-2bbc-50c2ec5bcdd4@gmail.com>
+	<CAPcyv4jR_LdbsX-rAsHC7++C6d-WYC084uWXzr+08PSYwoXFMw@mail.gmail.com>
+From: Xiao Guangrong <xiaoguangrong.eric@gmail.com>
+Message-ID: <ca6aaa77-cca0-441e-be49-73133d8581cf@gmail.com>
+Date: Wed, 1 Nov 2017 14:46:11 +0800
 MIME-Version: 1.0
-Subject: [Qemu-devel] =?gb2312?b?cXVlc3Rpb26juiBJIGZvdW5kIGEgcWVtdSBjcmFz?=
- =?gb2312?b?aCB3aGVuIGF0dGFjaCB2aXJ0aW8tc2NzaSBkaXNr?=
+In-Reply-To: <CAPcyv4jR_LdbsX-rAsHC7++C6d-WYC084uWXzr+08PSYwoXFMw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] KVM "fake DAX" flushing interface - discussion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,52 +46,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "kwolf@redhat.com" <kwolf@redhat.com>, "jcody@redhat.com" <jcody@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>
-Cc: lizhengui <lizhengui@huawei.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Fangyi (C)" <eric.fangyi@huawei.com>
+To: Dan Williams <dan.j.williams@intel.com>
+Cc: Rik van Riel <riel@redhat.com>, Pankaj Gupta <pagupta@redhat.com>, Jan Kara <jack@suse.cz>, Stefan Hajnoczi <stefanha@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, kvm-devel <kvm@vger.kernel.org>, Qemu Developers <qemu-devel@nongnu.org>, "linux-nvdimm@lists.01.org" <linux-nvdimm@ml01.01.org>, ross zwisler <ross.zwisler@linux.intel.com>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Nitesh Narayan Lal <nilal@redhat.com>, Haozhong Zhang <haozhong.zhang@intel.com>, Ross Zwisler <ross.zwisler@intel.com>
 
-SGksIHdoZW4gSSBhdHRhY2ggdmlydGlvLXNjc2kgZGlzayB0byBWTSwgdGhlIHFlbXUgY3Jhc2gg
-aGFwcGVuZWQgYXQgdmVyeSBsb3cgcHJvYmFiaWxpdHkuIA0KDQpUaGUgcWVtdSBjcmFzaCBidCBp
-cyBiZWxvdzoNCg0KIzAgIDB4MDAwMDdmMmJlM2FkYTFkNyBpbiByYWlzZSAoKSBmcm9tIC91c3Iv
-bGliNjQvbGliYy5zby42DQojMSAgMHgwMDAwN2YyYmUzYWRiOGM4IGluIGFib3J0ICgpIGZyb20g
-L3Vzci9saWI2NC9saWJjLnNvLjYNCiMyICAweDAwMDAwMDAwMDA4NGZlNDkgaW4gUEFUX2Fib3J0
-ICgpDQojMyAgMHgwMDAwMDAwMDAwODRjZThkIGluIHBhdGNoSWxsSW5zSGFuZGxlciAoKQ0KIzQg
-IDxzaWduYWwgaGFuZGxlciBjYWxsZWQ+DQojNSAgMHgwMDAwMDAwMDAwODIyOGJiIGluIHFlbXVf
-c3RybmxlbiAoKQ0KIzYgIDB4MDAwMDAwMDAwMDgyMjkzNCBpbiBzdHJwYWRjcHkgKCkNCiM3ICAw
-eDAwMDAwMDAwMDA2ODRhODggaW4gc2NzaV9kaXNrX2VtdWxhdGVfaW5xdWlyeSAoKQ0KIzggIDB4
-MDAwMDAwMDAwMDY4NzQ0YiBpbiBzY3NpX2Rpc2tfZW11bGF0ZV9jb21tYW5kICgpDQojOSAgMHgw
-MDAwMDAwMDAwNjhjNDgxIGluIHNjc2lfcmVxX2VucXVldWUgKCkNCiMxMCAweDAwMDAwMDAwMDA0
-YjFmMDAgaW4gdmlydGlvX3Njc2lfaGFuZGxlX2NtZF9yZXFfc3VibWl0ICgpDQojMTEgMHgwMDAw
-MDAwMDAwNGIyZTllIGluIHZpcnRpb19zY3NpX2hhbmRsZV9jbWRfdnEgKCkNCiMxMiAweDAwMDAw
-MDAwMDA3NmRiYTcgaW4gYWlvX2Rpc3BhdGNoICgpDQojMTMgMHgwMDAwMDAwMDAwNzZkZDk2IGlu
-IGFpb19wb2xsICgpDQojMTQgMHgwMDAwMDAwMDAwN2E4NjczIGluIGJsa19wcncgKCkNCiMxNSAw
-eDAwMDAwMDAwMDA3YTkyMmMgaW4gYmxrX3ByZWFkICgpDQojMTYgMHgwMDAwMDAwMDAwN2E5Y2Qw
-IGluIGJsa19wcmVhZF91bnRocm90dGxlZCAoKQ0KIzE3IDB4MDAwMDAwMDAwMDVjYjQwNCBpbiBn
-dWVzc19kaXNrX2xjaHMgKCkNCiMxOCAweDAwMDAwMDAwMDA1Y2I1YjQgaW4gaGRfZ2VvbWV0cnlf
-Z3Vlc3MgKCkNCiMxOSAweDAwMDAwMDAwMDA1Y2FkNTYgaW4gYmxrY29uZl9nZW9tZXRyeSAoKQ0K
-IzIwIDB4MDAwMDAwMDAwMDY4NTk1NiBpbiBzY3NpX3JlYWxpemUgKCkNCiMyMSAweDAwMDAwMDAw
-MDA2OGQzZTMgaW4gc2NzaV9xZGV2X3JlYWxpemUgKCkNCiMyMiAweDAwMDAwMDAwMDA1ZTM5Mzgg
-aW4gZGV2aWNlX3NldF9yZWFsaXplZCAoKQ0KIzIzIDB4MDAwMDAwMDAwMDc1YmNlZCBpbiBwcm9w
-ZXJ0eV9zZXRfYm9vbCAoKQ0KIzI0IDB4MDAwMDAwMDAwMDc2MDIwNSBpbiBvYmplY3RfcHJvcGVy
-dHlfc2V0X3FvYmplY3QgKCkNCiMyNSAweDAwMDAwMDAwMDA3NWRmNjQgaW4gb2JqZWN0X3Byb3Bl
-cnR5X3NldF9ib29sICgpDQojMjYgMHgwMDAwMDAwMDAwNTU4MGFkIGluIHFkZXZfZGV2aWNlX2Fk
-ZCAoKQ0KIzI3IDB4MDAwMDAwMDAwMDU1ODUwYiBpbiBxbXBfZGV2aWNlX2FkZCAoKQ0KIzI4IDB4
-MDAwMDAwMDAwMDgxOGIzNyBpbiBkb19xbXBfZGlzcGF0Y2guY29uc3Rwcm9wLjEgKCkNCiMyOSAw
-eDAwMDAwMDAwMDA4MThkOGIgaW4gcW1wX2Rpc3BhdGNoICgpDQojMzAgMHgwMDAwMDAwMDAwNDVk
-MjEyIGluIGhhbmRsZV9xbXBfY29tbWFuZCAoKQ0KIzMxIDB4MDAwMDAwMDAwMDgxZjgxOSBpbiBq
-c29uX21lc3NhZ2VfcHJvY2Vzc190b2tlbiAoKQ0KIzMyIDB4MDAwMDAwMDAwMDg0MzRkMCBpbiBq
-c29uX2xleGVyX2ZlZWRfY2hhciAoKQ0KIzMzIDB4MDAwMDAwMDAwMDg0MzVlNiBpbiBqc29uX2xl
-eGVyX2ZlZWQgKCkNCiMzNCAweDAwMDAwMDAwMDA0NWJkNzIgaW4gbW9uaXRvcl9xbXBfcmVhZCAo
-KQ0KIzM1IDB4MDAwMDAwMDAwMDU1ZWNmMyBpbiB0Y3BfY2hyX3JlYWQgKCkNCiMzNiAweDAwMDA3
-ZjJiZTRjZjg5OWEgaW4gZ19tYWluX2NvbnRleHRfZGlzcGF0Y2ggKCkgZnJvbSAvdXNyL2xpYjY0
-L2xpYmdsaWItMi4wLnNvLjANCiMzNyAweDAwMDAwMDAwMDA3NmI4NmIgaW4gb3NfaG9zdF9tYWlu
-X2xvb3Bfd2FpdCAoKQ0KIzM4IDB4MDAwMDAwMDAwMDc2Yjk5NSBpbiBtYWluX2xvb3Bfd2FpdCAo
-KQ0KIzM5IDB4MDAwMDAwMDAwMDU2OWM1MSBpbiBtYWluX2xvb3AgKCkNCiM0MCAweDAwMDAwMDAw
-MDA0MjA2NjUgaW4gbWFpbiAoKQ0KDQpGcm9tIHRoZSBxZW11IGNyYXNoIGJ0LCB3ZSBjYW4gc2Vl
-IHRoYXQgdGhlIHNjc2lfcmVhbGl6ZSBoYXMgbm90IGNvbXBsZXRlZCB5ZXQuIFNvbWUgZmllbGRz
-IHN1c2ggYXMgdmVuZG9yLCB2ZXJzaW9uIGluIFNDU0lEaXNrU3RhdGUgaXMgDQpOdWxsIGF0IHRo
-aXMgbW9tZW50LiBJZiBxZW11IGhhbmRsZXMgc2NzaSByZXF1ZXN0IGZyb20gdGhpcyBzY3NpIGRp
-c2sgYXQgdGhpcyBtb21lbnQsIHRoZSBxZW11IHdpbGwgYWNjZXNzIHNvbWUgbnVsbCBwb2ludGVy
-cyBhbmQgY2F1c2UgY3Jhc2guDQpIb3cgY2FuIEkgc29sdmUgdGhpcyBwcm9ibGVtPyBTaG91bGQg
-d2UgYWRkIGEgY2hlY2sgdGhhdCB3aGV0aGVyIHRoZSBzY3NpIGRpc2sgaGFzIHJlYWxpemVkIG9y
-IG5vdCBpbiBzY3NpX2Rpc2tfZW11bGF0ZV9jb21tYW5kIGJlZm9yZQ0KSGFuZGxpbmcgc2NzaSBy
-ZXF1ZXN0cz8gDQoNCg==
+
+
+On 11/01/2017 12:25 PM, Dan Williams wrote:
+> On Tue, Oct 31, 2017 at 8:43 PM, Xiao Guangrong
+> <xiaoguangrong.eric@gmail.com> wrote:
+>>
+>>
+>> On 10/31/2017 10:20 PM, Dan Williams wrote:
+>>>
+>>> On Tue, Oct 31, 2017 at 12:13 AM, Xiao Guangrong
+>>> <xiaoguangrong.eric@gmail.com> wrote:
+>>>>
+>>>>
+>>>>
+>>>> On 07/27/2017 08:54 AM, Dan Williams wrote:
+>>>>
+>>>>>> At that point, would it make sense to expose these special
+>>>>>> virtio-pmem areas to the guest in a slightly different way,
+>>>>>> so the regions that need virtio flushing are not bound by
+>>>>>> the regular driver, and the regular driver can continue to
+>>>>>> work for memory regions that are backed by actual pmem in
+>>>>>> the host?
+>>>>>
+>>>>>
+>>>>>
+>>>>> Hmm, yes that could be feasible especially if it uses the ACPI NFIT
+>>>>> mechanism. It would basically involve defining a new SPA (System
+>>>>> Phyiscal Address) range GUID type, and then teaching libnvdimm to
+>>>>> treat that as a new pmem device type.
+>>>>
+>>>>
+>>>>
+>>>> I would prefer a new flush mechanism to a new memory type introduced
+>>>> to NFIT, e.g, in that mechanism we can define request queues and
+>>>> completion queues and any other features to make virtualization
+>>>> friendly. That would be much simpler.
+>>>>
+>>>
+>>> No that's more confusing because now we are overloading the definition
+>>> of persistent memory. I want this memory type identified from the top
+>>> of the stack so it can appear differently in /proc/iomem and also
+>>> implement this alternate flush communication.
+>>>
+>>
+>> For the characteristic of memory, I have no idea why VM should know this
+>> difference. It can be completely transparent to VM, that means, VM
+>> does not need to know where this virtual PMEM comes from (for a really
+>> nvdimm backend or a normal storage). The only discrepancy is the flush
+>> interface.
+> 
+> It's not persistent memory if it requires a hypercall to make it
+> persistent. Unless memory writes can be made durable purely with cpu
+> instructions it's dangerous for it to be treated as a PMEM range.
+> Consider a guest that tried to map it with device-dax which has no
+> facility to route requests to a special flushing interface.
+> 
+
+Can we separate the concept of flush interface from persistent memory?
+Say there are two APIs, one is used to indicate the memory type (i.e,
+/proc/iomem) and another one indicates the flush interface.
+
+So for existing nvdimm hardwares:
+1: Persist-memory + CLFLUSH
+2: Persiste-memory + flush-hint-table (I know Intel does not use it)
+
+and for the virtual nvdimm which backended on normal storage:
+Persist-memory + virtual flush interface
+
+>>
+>>> In what way is this "more complicated"? It was trivial to add support
+>>> for the "volatile" NFIT range, this will not be any more complicated
+>>> than that.
+>>>
+>>
+>> Introducing memory type is easy indeed, however, a new flush interface
+>> definition is inevitable, i.e, we need a standard way to discover the
+>> MMIOs to communicate with host.
+> 
+> Right, the proposed way to do that for x86 platforms is a new SPA
+> Range GUID type. in the NFIT.
+> 
+
+So this SPA is used for both persistent memory region and flush interface?
+Maybe i missed it in previous mails, could you please detail how to do
+it?
+
+BTW, please note hypercall is not acceptable for standard, MMIO/PIO regions
+are. (Oh, yes, it depends on Paolo. :))
