@@ -1,17 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50826)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54383)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1e9mzV-0001z3-Cd
-	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 02:59:13 -0400
+	(envelope-from <frasse.iglesias@gmail.com>) id 1e9nGn-00065m-Fi
+	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 03:17:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1e9mzU-00009d-Oc
-	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 02:59:09 -0400
-From: Thomas Huth <thuth@redhat.com>
-Date: Wed,  1 Nov 2017 07:58:55 +0100
-Message-Id: <1509519537-6964-2-git-send-email-thuth@redhat.com>
-In-Reply-To: <1509519537-6964-1-git-send-email-thuth@redhat.com>
-References: <1509519537-6964-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/3] hw/arm: Mark the "fsl,
- imx6" device with user_creatable = false
+	(envelope-from <frasse.iglesias@gmail.com>) id 1e9nGm-0001Nx-HD
+	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 03:17:01 -0400
+Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:54695)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <frasse.iglesias@gmail.com>)
+	id 1e9nGm-0001Ma-9B
+	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 03:17:00 -0400
+Received: by mail-lf0-x243.google.com with SMTP id a2so1459514lfh.11
+	for <qemu-devel@nongnu.org>; Wed, 01 Nov 2017 00:17:00 -0700 (PDT)
+From: Francisco Iglesias <frasse.iglesias@gmail.com>
+Date: Wed,  1 Nov 2017 08:16:41 +0100
+Message-Id: <20171101071652.19375-3-frasse.iglesias@gmail.com>
+In-Reply-To: <20171101071652.19375-1-frasse.iglesias@gmail.com>
+References: <20171101071652.19375-1-frasse.iglesias@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v6 02/13] m25p80: Add support for SST READ ID
+ 0x90/0xAB commands
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,38 +30,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: qemu-arm@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: edgari@xilinx.com, alistai@xilinx.com, francisco.iglesias@feimtech.se, mar.krzeminski@gmail.com
 
-This device causes QEMU to abort if the user tries to instantiate it:
+Add support for SST READ ID 0x90/0xAB commands for reading out the flash
+manufacuter ID and device ID.
 
-$ qemu-system-aarch64 -M sabrelite -smp 1,maxcpus=2 -device fsl,,imx6
-Unexpected error in qemu_chr_fe_init() at chardev/char-fe.c:222:
-qemu-system-aarch64: -device fsl,,imx6: Device 'serial0' is in use
-Aborted (core dumped)
-
-The device uses serial_hds[] directly in its realize function, so it
-can not be instantiated again by the user.
-
-Signed-off-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Francisco Iglesias <frasse.iglesias@gmail.com>
+Acked-by: Alistair Francis <alistair.francis@xilinx.com>
+Acked-by: Marcin Krzemiński <mar.krzeminski@gmail.com>
 ---
- hw/arm/fsl-imx6.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ hw/block/m25p80.c | 23 +++++++++++++++++++++++
+ 1 file changed, 23 insertions(+)
 
-diff --git a/hw/arm/fsl-imx6.c b/hw/arm/fsl-imx6.c
-index 26fd214..59ef33e 100644
---- a/hw/arm/fsl-imx6.c
-+++ b/hw/arm/fsl-imx6.c
-@@ -440,8 +440,9 @@ static void fsl_imx6_class_init(ObjectClass *oc, void *data)
-     DeviceClass *dc = DEVICE_CLASS(oc);
+diff --git a/hw/block/m25p80.c b/hw/block/m25p80.c
+index 721ae1a..12ff656 100644
+--- a/hw/block/m25p80.c
++++ b/hw/block/m25p80.c
+@@ -355,6 +355,8 @@ typedef enum {
+     DPP = 0xa2,
+     QPP = 0x32,
+     QPP_4 = 0x34,
++    RDID_90 = 0x90,
++    RDID_AB = 0xab,
  
-     dc->realize = fsl_imx6_realize;
--
-     dc->desc = "i.MX6 SOC";
-+    /* Reason: Uses serial_hds[] in the realize() function */
-+    dc->user_creatable = false;
- }
+     ERASE_4K = 0x20,
+     ERASE4_4K = 0x21,
+@@ -405,6 +407,7 @@ typedef enum {
+     MAN_MACRONIX,
+     MAN_NUMONYX,
+     MAN_WINBOND,
++    MAN_SST,
+     MAN_GENERIC,
+ } Manufacturer;
  
- static const TypeInfo fsl_imx6_type_info = {
+@@ -476,6 +479,8 @@ static inline Manufacturer get_man(Flash *s)
+         return MAN_SPANSION;
+     case 0xC2:
+         return MAN_MACRONIX;
++    case 0xBF:
++        return MAN_SST;
+     default:
+         return MAN_GENERIC;
+     }
+@@ -711,6 +716,22 @@ static void complete_collecting_data(Flash *s)
+     case WEVCR:
+         s->enh_volatile_cfg = s->data[0];
+         break;
++    case RDID_90:
++    case RDID_AB:
++        if (get_man(s) == MAN_SST && s->cur_addr <= 1) {
++            if (s->cur_addr) {
++                s->data[0] = s->pi->id[2];
++                s->data[1] = s->pi->id[0];
++            } else {
++                s->data[0] = s->pi->id[0];
++                s->data[1] = s->pi->id[2];
++            }
++            s->pos = 0;
++            s->len = 2;
++            s->data_read_loop = true;
++            s->state = STATE_READING_DATA;
++        }
++        break;
+     default:
+         break;
+     }
+@@ -926,6 +947,8 @@ static void decode_new_cmd(Flash *s, uint32_t value)
+     case PP4:
+     case PP4_4:
+     case DIE_ERASE:
++    case RDID_90:
++    case RDID_AB:
+         s->needed_bytes = get_addr_length(s);
+         s->pos = 0;
+         s->len = 0;
 -- 
-1.8.3.1
+2.9.3
