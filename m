@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54451)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54437)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <frasse.iglesias@gmail.com>) id 1e9nGu-0006BG-9l
+	(envelope-from <frasse.iglesias@gmail.com>) id 1e9nGt-00069U-2n
 	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 03:17:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <frasse.iglesias@gmail.com>) id 1e9nGn-0001Pr-Qy
-	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 03:17:08 -0400
-Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:55908)
+	(envelope-from <frasse.iglesias@gmail.com>) id 1e9nGs-0001TR-2W
+	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 03:17:07 -0400
+Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:53031)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <frasse.iglesias@gmail.com>)
-	id 1e9nGn-0001OS-JX
-	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 03:17:01 -0400
-Received: by mail-lf0-x243.google.com with SMTP id e143so1459096lfg.12
-	for <qemu-devel@nongnu.org>; Wed, 01 Nov 2017 00:17:01 -0700 (PDT)
+	id 1e9nGr-0001S0-Qr
+	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 03:17:05 -0400
+Received: by mail-lf0-x244.google.com with SMTP id b190so1468633lfg.9
+	for <qemu-devel@nongnu.org>; Wed, 01 Nov 2017 00:17:05 -0700 (PDT)
 From: Francisco Iglesias <frasse.iglesias@gmail.com>
-Date: Wed,  1 Nov 2017 08:16:42 +0100
-Message-Id: <20171101071652.19375-4-frasse.iglesias@gmail.com>
+Date: Wed,  1 Nov 2017 08:16:45 +0100
+Message-Id: <20171101071652.19375-7-frasse.iglesias@gmail.com>
 In-Reply-To: <20171101071652.19375-1-frasse.iglesias@gmail.com>
 References: <20171101071652.19375-1-frasse.iglesias@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v6 03/13] m25p80: Add support for BRRD/BRWR and
- BULK_ERASE (0x60)
+Subject: [Qemu-devel] [PATCH v6 06/13] xilinx_spips: Update striping to be
+ big-endian bit order
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,60 +30,69 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: edgari@xilinx.com, alistai@xilinx.com, francisco.iglesias@feimtech.se, mar.krzeminski@gmail.com
 
-Add support for the bank address register access commands (BRRD/BRWR) and
-the BULK_ERASE (0x60) command.
+Update striping functionality to be big-endian bit order (as according to
+the Zynq-7000 Technical Reference Manual). Output thereafter the even bits
+into the flash memory connected to the lower QSPI bus and the odd bits into
+the flash memory connected to the upper QSPI bus.
 
 Signed-off-by: Francisco Iglesias <frasse.iglesias@gmail.com>
-Acked-by: Marcin Krzemiński <mar.krzeminski@gmail.com>
 ---
- hw/block/m25p80.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ hw/ssi/xilinx_spips.c | 19 ++++++++++---------
+ 1 file changed, 10 insertions(+), 9 deletions(-)
 
-diff --git a/hw/block/m25p80.c b/hw/block/m25p80.c
-index 12ff656..3f8154b 100644
---- a/hw/block/m25p80.c
-+++ b/hw/block/m25p80.c
-@@ -331,7 +331,10 @@ typedef enum {
-     WRDI = 0x4,
-     RDSR = 0x5,
-     WREN = 0x6,
-+    BRRD = 0x16,
-+    BRWR = 0x17,
-     JEDEC_READ = 0x9f,
-+    BULK_ERASE_60 = 0x60,
-     BULK_ERASE = 0xc7,
-     READ_FSR = 0x70,
-     RDCR = 0x15,
-@@ -704,6 +707,7 @@ static void complete_collecting_data(Flash *s)
-             s->write_enable = false;
-         }
-         break;
-+    case BRWR:
-     case EXTEND_ADDR_WRITE:
-         s->ear = s->data[0];
-         break;
-@@ -1041,6 +1045,7 @@ static void decode_new_cmd(Flash *s, uint32_t value)
-         s->state = STATE_READING_DATA;
-         break;
+diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
+index 559fa79..7accf5d 100644
+--- a/hw/ssi/xilinx_spips.c
++++ b/hw/ssi/xilinx_spips.c
+@@ -208,14 +208,14 @@ static void xilinx_spips_reset(DeviceState *d)
+     xilinx_spips_update_cs_lines(s);
+ }
  
-+    case BULK_ERASE_60:
-     case BULK_ERASE:
-         if (s->write_enable) {
-             DB_PRINT_L(0, "chip erase\n");
-@@ -1058,12 +1063,14 @@ static void decode_new_cmd(Flash *s, uint32_t value)
-     case EX_4BYTE_ADDR:
-         s->four_bytes_address_mode = false;
-         break;
-+    case BRRD:
-     case EXTEND_ADDR_READ:
-         s->data[0] = s->ear;
-         s->pos = 0;
-         s->len = 1;
-         s->state = STATE_READING_DATA;
-         break;
-+    case BRWR:
-     case EXTEND_ADDR_WRITE:
-         if (s->write_enable) {
-             s->needed_bytes = 1;
+-/* N way (num) in place bit striper. Lay out row wise bits (LSB to MSB)
++/* N way (num) in place bit striper. Lay out row wise bits (MSB to LSB)
+  * column wise (from element 0 to N-1). num is the length of x, and dir
+  * reverses the direction of the transform. Best illustrated by example:
+  * Each digit in the below array is a single bit (num == 3):
+  *
+- * {{ 76543210, }  ----- stripe (dir == false) -----> {{ FCheb630, }
+- *  { hgfedcba, }                                      { GDAfc741, }
+- *  { HGFEDCBA, }} <---- upstripe (dir == true) -----  { HEBgda52, }}
++ * {{ 76543210, }  ----- stripe (dir == false) -----> {{ 741gdaFC, }
++ *  { hgfedcba, }                                      { 630fcHEB, }
++ *  { HGFEDCBA, }} <---- upstripe (dir == true) -----  { 52hebGDA, }}
+  */
+ 
+ static inline void stripe8(uint8_t *x, int num, bool dir)
+@@ -223,15 +223,15 @@ static inline void stripe8(uint8_t *x, int num, bool dir)
+     uint8_t r[num];
+     memset(r, 0, sizeof(uint8_t) * num);
+     int idx[2] = {0, 0};
+-    int bit[2] = {0, 0};
++    int bit[2] = {0, 7};
+     int d = dir;
+ 
+     for (idx[0] = 0; idx[0] < num; ++idx[0]) {
+-        for (bit[0] = 0; bit[0] < 8; ++bit[0]) {
+-            r[idx[d]] |= x[idx[!d]] & 1 << bit[!d] ? 1 << bit[d] : 0;
++        for (bit[0] = 7; bit[0] != -1; bit[0] += -1) {
++            r[idx[!d]] |= x[idx[d]] & 1 << bit[d] ? 1 << bit[!d] : 0;
+             idx[1] = (idx[1] + 1) % num;
+             if (!idx[1]) {
+-                bit[1]++;
++                bit[1] += -1;
+             }
+         }
+     }
+@@ -266,8 +266,9 @@ static void xilinx_spips_flush_txfifo(XilinxSPIPS *s)
+         }
+ 
+         for (i = 0; i < num_effective_busses(s); ++i) {
++            int bus = num_effective_busses(s) - 1 - i;
+             DB_PRINT_L(debug_level, "tx = %02x\n", tx_rx[i]);
+-            tx_rx[i] = ssi_transfer(s->spi[i], (uint32_t)tx_rx[i]);
++            tx_rx[i] = ssi_transfer(s->spi[bus], (uint32_t)tx_rx[i]);
+             DB_PRINT_L(debug_level, "rx = %02x\n", tx_rx[i]);
+         }
+ 
 -- 
 2.9.3
