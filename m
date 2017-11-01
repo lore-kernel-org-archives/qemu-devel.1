@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37507)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41115)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eA09D-00033u-8u
-	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 17:02:05 -0400
+	(envelope-from <jsnow@redhat.com>) id 1eA0HD-0005JY-Q3
+	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 17:10:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eA09A-0005W2-3p
-	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 17:02:03 -0400
-Resent-Message-Id: <E1eA09A-0005W2-3p@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21420)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1eA099-0005Uo-UU
-	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 17:02:00 -0400
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <150956377150.207.8927950603675918265@bafd83ae6430>
-In-Reply-To: <20171101191030.16136-1-danielhb@linux.vnet.ibm.com>
+	(envelope-from <jsnow@redhat.com>) id 1eA0HC-00045h-QJ
+	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 17:10:19 -0400
+References: <cover.1508390588.git.alistair.francis@xilinx.com>
+	<ce8c1a6e1ab21911798dba9915bab413dc9f3e38.1508390588.git.alistair.francis@xilinx.com>
+	<e0a073e4-a976-360e-3c55-6e2a221af519@amsat.org>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <ef1fc32a-c730-a2c2-4a06-189f84420b0e@redhat.com>
+Date: Wed, 1 Nov 2017 17:10:09 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 1 Nov 2017 12:16:11 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v2] configure: adding ppc64le to supported
- host CPUs
+In-Reply-To: <e0a073e4-a976-360e-3c55-6e2a221af519@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v3 16/46] hw/ide: Replace
+ fprintf(stderr, "*\n" with error_report()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,160 +26,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: danielhb@linux.vnet.ibm.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, mdroth@linux.vnet.ibm.com
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org
+Cc: alistair23@gmail.com, armbru@redhat.com, qemu-block@nongnu.org
 
-SGksCgpUaGlzIHNlcmllcyBmYWlsZWQgYXV0b21hdGljIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5k
-IHRoZSB0ZXN0aW5nIGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZl
-IGRvY2tlciBpbnN0YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHku
-CgpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHYyXSBjb25maWd1cmU6IGFkZGluZyBwcGM2
-NGxlIHRvIHN1cHBvcnRlZCBob3N0IENQVXMKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMTcx
-MTAxMTkxMDMwLjE2MTM2LTEtZGFuaWVsaGJAbGludXgudm5ldC5pYm0uY29tCgo9PT0gVEVTVCBT
-Q1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCnNldCAtZQpnaXQgc3VibW9kdWxlIHVwZGF0ZSAt
-LWluaXQgZHRjCiMgTGV0IGRvY2tlciB0ZXN0cyBkdW1wIGVudmlyb25tZW50IGluZm8KZXhwb3J0
-IFNIT1dfRU5WPTEKZXhwb3J0IEo9OAp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtcXVpY2tAY2VudG9z
-Ngp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtYnVpbGRAbWluLWdsaWIKdGltZSBtYWtlIGRvY2tlci10
-ZXN0LW1pbmd3QGZlZG9yYQp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtYmxvY2tAZmVkb3JhCj09PSBU
-RVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0
-NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKMzgwZmFhYjcxZCBj
-b25maWd1cmU6IGFkZGluZyBwcGM2NGxlIHRvIHN1cHBvcnRlZCBob3N0IENQVXMKCj09PSBPVVRQ
-VVQgQkVHSU4gPT09ClN1Ym1vZHVsZSAnZHRjJyAoZ2l0Oi8vZ2l0LnFlbXUtcHJvamVjdC5vcmcv
-ZHRjLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAnZHRjJwpDbG9uaW5nIGludG8gJy92YXIvdG1w
-L3BhdGNoZXctdGVzdGVyLXRtcC1iYWF0b19obS9zcmMvZHRjJy4uLgpTdWJtb2R1bGUgcGF0aCAn
-ZHRjJzogY2hlY2tlZCBvdXQgJzU1OGNkODFiZGQ0MzI3NjliNTliZmYwMTI0MGM0NGY4MmNmYjFh
-OWQnCiAgQlVJTEQgICBjZW50b3M2Cm1ha2VbMV06IEVudGVyaW5nIGRpcmVjdG9yeSAnL3Zhci90
-bXAvcGF0Y2hldy10ZXN0ZXItdG1wLWJhYXRvX2htL3NyYycKICBHRU4gICAgIC92YXIvdG1wL3Bh
-dGNoZXctdGVzdGVyLXRtcC1iYWF0b19obS9zcmMvZG9ja2VyLXNyYy4yMDE3LTExLTAxLTE1LjE1
-LjAxLjEwMDk1L3FlbXUudGFyCkNsb25pbmcgaW50byAnL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXIt
-dG1wLWJhYXRvX2htL3NyYy9kb2NrZXItc3JjLjIwMTctMTEtMDEtMTUuMTUuMDEuMTAwOTUvcWVt
-dS50YXIudnJvb3QnLi4uCmRvbmUuCkNoZWNraW5nIG91dCBmaWxlczogIDIyJSAoMTI4OC81NjU1
-KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICAyMyUgKDEzMDEvNTY1NSkgICAKQ2hlY2tpbmcgb3V0
-IGZpbGVzOiAgMjQlICgxMzU4LzU2NTUpICAgCkNoZWNraW5nIG91dCBmaWxlczogIDI1JSAoMTQx
-NC81NjU1KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICAyNiUgKDE0NzEvNTY1NSkgICAKQ2hlY2tp
-bmcgb3V0IGZpbGVzOiAgMjclICgxNTI3LzU2NTUpICAgCkNoZWNraW5nIG91dCBmaWxlczogIDI4
-JSAoMTU4NC81NjU1KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICAyOSUgKDE2NDAvNTY1NSkgICAK
-Q2hlY2tpbmcgb3V0IGZpbGVzOiAgMzAlICgxNjk3LzU2NTUpICAgCkNoZWNraW5nIG91dCBmaWxl
-czogIDMxJSAoMTc1NC81NjU1KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICAzMiUgKDE4MTAvNTY1
-NSkgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgMzMlICgxODY3LzU2NTUpICAgCkNoZWNraW5nIG91
-dCBmaWxlczogIDM0JSAoMTkyMy81NjU1KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICAzNSUgKDE5
-ODAvNTY1NSkgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgMzYlICgyMDM2LzU2NTUpICAgCkNoZWNr
-aW5nIG91dCBmaWxlczogIDM3JSAoMjA5My81NjU1KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICAz
-NyUgKDIxNDUvNTY1NSkgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgMzglICgyMTQ5LzU2NTUpICAg
-CkNoZWNraW5nIG91dCBmaWxlczogIDM5JSAoMjIwNi81NjU1KSAgIApDaGVja2luZyBvdXQgZmls
-ZXM6ICA0MCUgKDIyNjIvNTY1NSkgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgNDElICgyMzE5LzU2
-NTUpICAgCkNoZWNraW5nIG91dCBmaWxlczogIDQyJSAoMjM3Ni81NjU1KSAgIApDaGVja2luZyBv
-dXQgZmlsZXM6ICA0MyUgKDI0MzIvNTY1NSkgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgNDQlICgy
-NDg5LzU2NTUpICAgCkNoZWNraW5nIG91dCBmaWxlczogIDQ1JSAoMjU0NS81NjU1KSAgIApDaGVj
-a2luZyBvdXQgZmlsZXM6ICA0NSUgKDI1NTkvNTY1NSkgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAg
-NDYlICgyNjAyLzU2NTUpICAgCkNoZWNraW5nIG91dCBmaWxlczogIDQ3JSAoMjY1OC81NjU1KSAg
-IApDaGVja2luZyBvdXQgZmlsZXM6ICA0OCUgKDI3MTUvNTY1NSkgICAKQ2hlY2tpbmcgb3V0IGZp
-bGVzOiAgNDklICgyNzcxLzU2NTUpICAgCkNoZWNraW5nIG91dCBmaWxlczogIDUwJSAoMjgyOC81
-NjU1KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA1MSUgKDI4ODUvNTY1NSkgICAKQ2hlY2tpbmcg
-b3V0IGZpbGVzOiAgNTIlICgyOTQxLzU2NTUpICAgCkNoZWNraW5nIG91dCBmaWxlczogIDUzJSAo
-Mjk5OC81NjU1KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA1NCUgKDMwNTQvNTY1NSkgICAKQ2hl
-Y2tpbmcgb3V0IGZpbGVzOiAgNTUlICgzMTExLzU2NTUpICAgCkNoZWNraW5nIG91dCBmaWxlczog
-IDU2JSAoMzE2Ny81NjU1KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA1NyUgKDMyMjQvNTY1NSkg
-ICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgNTglICgzMjgwLzU2NTUpICAgCkNoZWNraW5nIG91dCBm
-aWxlczogIDU5JSAoMzMzNy81NjU1KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA1OSUgKDMzOTAv
-NTY1NSkgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgNjAlICgzMzkzLzU2NTUpICAgCkNoZWNraW5n
-IG91dCBmaWxlczogIDYxJSAoMzQ1MC81NjU1KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA2MiUg
-KDM1MDcvNTY1NSkgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgNjMlICgzNTYzLzU2NTUpICAgCkNo
-ZWNraW5nIG91dCBmaWxlczogIDY0JSAoMzYyMC81NjU1KSAgIApDaGVja2luZyBvdXQgZmlsZXM6
-ICA2NSUgKDM2NzYvNTY1NSkgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgNjYlICgzNzMzLzU2NTUp
-ICAgCkNoZWNraW5nIG91dCBmaWxlczogIDY3JSAoMzc4OS81NjU1KSAgIApDaGVja2luZyBvdXQg
-ZmlsZXM6ICA2OCUgKDM4NDYvNTY1NSkgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgNjklICgzOTAy
-LzU2NTUpICAgCkNoZWNraW5nIG91dCBmaWxlczogIDcwJSAoMzk1OS81NjU1KSAgIApDaGVja2lu
-ZyBvdXQgZmlsZXM6ICA3MSUgKDQwMTYvNTY1NSkgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgNzIl
-ICg0MDcyLzU2NTUpICAgCkNoZWNraW5nIG91dCBmaWxlczogIDczJSAoNDEyOS81NjU1KSAgIApD
-aGVja2luZyBvdXQgZmlsZXM6ICA3NCUgKDQxODUvNTY1NSkgICAKQ2hlY2tpbmcgb3V0IGZpbGVz
-OiAgNzUlICg0MjQyLzU2NTUpICAgCkNoZWNraW5nIG91dCBmaWxlczogIDc2JSAoNDI5OC81NjU1
-KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA3NyUgKDQzNTUvNTY1NSkgICAKQ2hlY2tpbmcgb3V0
-IGZpbGVzOiAgNzglICg0NDExLzU2NTUpICAgCkNoZWNraW5nIG91dCBmaWxlczogIDc5JSAoNDQ2
-OC81NjU1KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA4MCUgKDQ1MjQvNTY1NSkgICAKQ2hlY2tp
-bmcgb3V0IGZpbGVzOiAgODElICg0NTgxLzU2NTUpICAgCkNoZWNraW5nIG91dCBmaWxlczogIDgy
-JSAoNDYzOC81NjU1KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA4MyUgKDQ2OTQvNTY1NSkgICAK
-Q2hlY2tpbmcgb3V0IGZpbGVzOiAgODQlICg0NzUxLzU2NTUpICAgCkNoZWNraW5nIG91dCBmaWxl
-czogIDg1JSAoNDgwNy81NjU1KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA4NiUgKDQ4NjQvNTY1
-NSkgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgODclICg0OTIwLzU2NTUpICAgCkNoZWNraW5nIG91
-dCBmaWxlczogIDg4JSAoNDk3Ny81NjU1KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA4OSUgKDUw
-MzMvNTY1NSkgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgOTAlICg1MDkwLzU2NTUpICAgCkNoZWNr
-aW5nIG91dCBmaWxlczogIDkxJSAoNTE0Ny81NjU1KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA5
-MiUgKDUyMDMvNTY1NSkgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgOTMlICg1MjYwLzU2NTUpICAg
-CkNoZWNraW5nIG91dCBmaWxlczogIDk0JSAoNTMxNi81NjU1KSAgIApDaGVja2luZyBvdXQgZmls
-ZXM6ICA5NSUgKDUzNzMvNTY1NSkgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgOTYlICg1NDI5LzU2
-NTUpICAgCkNoZWNraW5nIG91dCBmaWxlczogIDk3JSAoNTQ4Ni81NjU1KSAgIApDaGVja2luZyBv
-dXQgZmlsZXM6ICA5OCUgKDU1NDIvNTY1NSkgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgOTklICg1
-NTk5LzU2NTUpICAgCkNoZWNraW5nIG91dCBmaWxlczogMTAwJSAoNTY1NS81NjU1KSAgIApDaGVj
-a2luZyBvdXQgZmlsZXM6IDEwMCUgKDU2NTUvNTY1NSksIGRvbmUuCllvdXIgYnJhbmNoIGlzIHVw
-LXRvLWRhdGUgd2l0aCAnb3JpZ2luL3Rlc3QnLgpTdWJtb2R1bGUgJ2R0YycgKGdpdDovL2dpdC5x
-ZW11LXByb2plY3Qub3JnL2R0Yy5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ2R0YycKQ2xvbmlu
-ZyBpbnRvICcvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtYmFhdG9faG0vc3JjL2RvY2tlci1z
-cmMuMjAxNy0xMS0wMS0xNS4xNS4wMS4xMDA5NS9xZW11LnRhci52cm9vdC9kdGMnLi4uClN1Ym1v
-ZHVsZSBwYXRoICdkdGMnOiBjaGVja2VkIG91dCAnNTU4Y2Q4MWJkZDQzMjc2OWI1OWJmZjAxMjQw
-YzQ0ZjgyY2ZiMWE5ZCcKU3VibW9kdWxlICd1aS9rZXljb2RlbWFwZGInIChnaXQ6Ly9naXQucWVt
-dS5vcmcva2V5Y29kZW1hcGRiLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAndWkva2V5Y29kZW1h
-cGRiJwpDbG9uaW5nIGludG8gJy92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC1iYWF0b19obS9z
-cmMvZG9ja2VyLXNyYy4yMDE3LTExLTAxLTE1LjE1LjAxLjEwMDk1L3FlbXUudGFyLnZyb290L3Vp
-L2tleWNvZGVtYXBkYicuLi4KU3VibW9kdWxlIHBhdGggJ3VpL2tleWNvZGVtYXBkYic6IGNoZWNr
-ZWQgb3V0ICcxMDczOWFhMjYwNTFhNWQ0OWQ4ODEzMjYwNDUzOWQzZWQwODVlNzJlJwogIENPUFkg
-ICAgUlVOTkVSCiAgICBSVU4gdGVzdC1xdWljayBpbiBxZW11OmNlbnRvczYgClBhY2thZ2VzIGlu
-c3RhbGxlZDoKU0RMLWRldmVsLTEuMi4xNC03LmVsNl83LjEueDg2XzY0CmJpc29uLTIuNC4xLTUu
-ZWw2Lng4Nl82NApiemlwMi1kZXZlbC0xLjAuNS03LmVsNl8wLng4Nl82NApjY2FjaGUtMy4xLjYt
-Mi5lbDYueDg2XzY0CmNzbmFwcHktZGV2ZWwtMC02LjIwMTUwNzI5Z2l0ZDdiYzY4My5lbDYueDg2
-XzY0CmZsZXgtMi41LjM1LTkuZWw2Lng4Nl82NApnY2MtNC40LjctMTguZWw2Lng4Nl82NApnZXR0
-ZXh0LTAuMTctMTguZWw2Lng4Nl82NApnaXQtMS43LjEtOS5lbDZfOS54ODZfNjQKZ2xpYjItZGV2
-ZWwtMi4yOC44LTkuZWw2Lng4Nl82NApsaWJlcG94eS1kZXZlbC0xLjItMy5lbDYueDg2XzY0Cmxp
-YmZkdC1kZXZlbC0xLjQuMC0xLmVsNi54ODZfNjQKbGlicmRtYWNtLWRldmVsLTEuMC4yMS0wLmVs
-Ni54ODZfNjQKbHpvLWRldmVsLTIuMDMtMy4xLmVsNl81LjEueDg2XzY0Cm1ha2UtMy44MS0yMy5l
-bDYueDg2XzY0Cm1lc2EtbGliRUdMLWRldmVsLTExLjAuNy00LmVsNi54ODZfNjQKbWVzYS1saWJn
-Ym0tZGV2ZWwtMTEuMC43LTQuZWw2Lng4Nl82NApwYWNrYWdlIGcrKyBpcyBub3QgaW5zdGFsbGVk
-CnBpeG1hbi1kZXZlbC0wLjMyLjgtMS5lbDYueDg2XzY0CnNwaWNlLWdsaWItZGV2ZWwtMC4yNi04
-LmVsNi54ODZfNjQKc3BpY2Utc2VydmVyLWRldmVsLTAuMTIuNC0xNi5lbDYueDg2XzY0CnRhci0x
-LjIzLTE1LmVsNl84Lng4Nl82NAp2dGUtZGV2ZWwtMC4yNS4xLTkuZWw2Lng4Nl82NAp4ZW4tZGV2
-ZWwtNC42LjYtMi5lbDYueDg2XzY0CnpsaWItZGV2ZWwtMS4yLjMtMjkuZWw2Lng4Nl82NAoKRW52
-aXJvbm1lbnQgdmFyaWFibGVzOgpQQUNLQUdFUz1iaXNvbiAgICAgYnppcDItZGV2ZWwgICAgIGNj
-YWNoZSAgICAgY3NuYXBweS1kZXZlbCAgICAgZmxleCAgICAgZysrICAgICBnY2MgICAgIGdldHRl
-eHQgICAgIGdpdCAgICAgZ2xpYjItZGV2ZWwgICAgIGxpYmVwb3h5LWRldmVsICAgICBsaWJmZHQt
-ZGV2ZWwgICAgIGxpYnJkbWFjbS1kZXZlbCAgICAgbHpvLWRldmVsICAgICBtYWtlICAgICBtZXNh
-LWxpYkVHTC1kZXZlbCAgICAgbWVzYS1saWJnYm0tZGV2ZWwgICAgIHBpeG1hbi1kZXZlbCAgICAg
-U0RMLWRldmVsICAgICBzcGljZS1nbGliLWRldmVsICAgICBzcGljZS1zZXJ2ZXItZGV2ZWwgICAg
-IHRhciAgICAgdnRlLWRldmVsICAgICB4ZW4tZGV2ZWwgICAgIHpsaWItZGV2ZWwKSE9TVE5BTUU9
-N2JiODM0ZDY5NDBiCk1BS0VGTEFHUz0gLWo4Cko9OApDQ0FDSEVfRElSPS92YXIvdG1wL2NjYWNo
-ZQpFWFRSQV9DT05GSUdVUkVfT1BUUz0KVj0KU0hPV19FTlY9MQpQQVRIPS91c3IvbGliL2NjYWNo
-ZTovdXNyL2xpYjY0L2NjYWNoZTovdXNyL2xvY2FsL3NiaW46L3Vzci9sb2NhbC9iaW46L3Vzci9z
-YmluOi91c3IvYmluOi9zYmluOi9iaW4KUFdEPS8KVEFSR0VUX0xJU1Q9ClNITFZMPTEKSE9NRT0v
-cm9vdApURVNUX0RJUj0vdG1wL3FlbXUtdGVzdApGRUFUVVJFUz0gZHRjCkRFQlVHPQpfPS91c3Iv
-YmluL2VudgoKQ29uZmlndXJlIG9wdGlvbnM6Ci0tZW5hYmxlLXdlcnJvciAtLXRhcmdldC1saXN0
-PXg4Nl82NC1zb2Z0bW11LGFhcmNoNjQtc29mdG1tdSAtLXByZWZpeD0vdG1wL3FlbXUtdGVzdC9p
-bnN0YWxsCi90bXAvcWVtdS10ZXN0L3NyYy9jb25maWd1cmU6IGxpbmUgNDcxOiB3cml0ZV9jX3Nr
-ZWxldG9uOiBjb21tYW5kIG5vdCBmb3VuZAoKRVJST1I6ICJjYyIgZWl0aGVyIGRvZXMgbm90IGV4
-aXN0IG9yIGRvZXMgbm90IHdvcmsKClRyYWNlYmFjayAobW9zdCByZWNlbnQgY2FsbCBsYXN0KToK
-ICBGaWxlICIuL3Rlc3RzL2RvY2tlci9kb2NrZXIucHkiLCBsaW5lIDM4NSwgaW4gPG1vZHVsZT4K
-ICAgIHN5cy5leGl0KG1haW4oKSkKICBGaWxlICIuL3Rlc3RzL2RvY2tlci9kb2NrZXIucHkiLCBs
-aW5lIDM4MiwgaW4gbWFpbgogICAgcmV0dXJuIGFyZ3MuY21kb2JqLnJ1bihhcmdzLCBhcmd2KQog
-IEZpbGUgIi4vdGVzdHMvZG9ja2VyL2RvY2tlci5weSIsIGxpbmUgMjM5LCBpbiBydW4KICAgIHJl
-dHVybiBEb2NrZXIoKS5ydW4oYXJndiwgYXJncy5rZWVwLCBxdWlldD1hcmdzLnF1aWV0KQogIEZp
-bGUgIi4vdGVzdHMvZG9ja2VyL2RvY2tlci5weSIsIGxpbmUgMjA3LCBpbiBydW4KICAgIHF1aWV0
-PXF1aWV0KQogIEZpbGUgIi4vdGVzdHMvZG9ja2VyL2RvY2tlci5weSIsIGxpbmUgMTI1LCBpbiBf
-ZG9fY2hlY2sKICAgIHJldHVybiBzdWJwcm9jZXNzLmNoZWNrX2NhbGwoc2VsZi5fY29tbWFuZCAr
-IGNtZCwgKiprd2FyZ3MpCiAgRmlsZSAiL3Vzci9saWI2NC9weXRob24yLjcvc3VicHJvY2Vzcy5w
-eSIsIGxpbmUgMTg2LCBpbiBjaGVja19jYWxsCiAgICByYWlzZSBDYWxsZWRQcm9jZXNzRXJyb3Io
-cmV0Y29kZSwgY21kKQpzdWJwcm9jZXNzLkNhbGxlZFByb2Nlc3NFcnJvcjogQ29tbWFuZCAnWydk
-b2NrZXInLCAncnVuJywgJy0tbGFiZWwnLCAnY29tLnFlbXUuaW5zdGFuY2UudXVpZD1mYzlkMDIz
-Y2JmMzgxMWU3ODliMTUyNTQwMDY5YzgzMCcsICctdScsICcwJywgJy0tc2VjdXJpdHktb3B0Jywg
-J3NlY2NvbXA9dW5jb25maW5lZCcsICctLXJtJywgJy0tbmV0PW5vbmUnLCAnLWUnLCAnVEFSR0VU
-X0xJU1Q9JywgJy1lJywgJ0VYVFJBX0NPTkZJR1VSRV9PUFRTPScsICctZScsICdWPScsICctZScs
-ICdKPTgnLCAnLWUnLCAnREVCVUc9JywgJy1lJywgJ1NIT1dfRU5WPTEnLCAnLWUnLCAnQ0NBQ0hF
-X0RJUj0vdmFyL3RtcC9jY2FjaGUnLCAnLXYnLCAnL3Jvb3QvLmNhY2hlL3FlbXUtZG9ja2VyLWNj
-YWNoZTovdmFyL3RtcC9jY2FjaGU6eicsICctdicsICcvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10
-bXAtYmFhdG9faG0vc3JjL2RvY2tlci1zcmMuMjAxNy0xMS0wMS0xNS4xNS4wMS4xMDA5NTovdmFy
-L3RtcC9xZW11Onoscm8nLCAncWVtdTpjZW50b3M2JywgJy92YXIvdG1wL3FlbXUvcnVuJywgJ3Rl
-c3QtcXVpY2snXScgcmV0dXJuZWQgbm9uLXplcm8gZXhpdCBzdGF0dXMgMQptYWtlWzFdOiAqKiog
-W3Rlc3RzL2RvY2tlci9NYWtlZmlsZS5pbmNsdWRlOjEyOTogZG9ja2VyLXJ1bl0gRXJyb3IgMQpt
-YWtlWzFdOiBMZWF2aW5nIGRpcmVjdG9yeSAnL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLWJh
-YXRvX2htL3NyYycKbWFrZTogKioqIFt0ZXN0cy9kb2NrZXIvTWFrZWZpbGUuaW5jbHVkZToxNjM6
-IGRvY2tlci1ydW4tdGVzdC1xdWlja0BjZW50b3M2XSBFcnJvciAyCgpyZWFsCTFtMTIuMDYzcwp1
-c2VyCTBtNC43NzRzCnN5cwkwbTQuOTEycwo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFu
-ZCBleGl0ZWQgd2l0aCBjb2RlOiAyCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5
-IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRi
-YWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
+
+
+On 10/24/2017 11:56 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+> Hi Alistair,
+>=20
+> On 10/19/2017 01:16 PM, Alistair Francis wrote:
+>> Replace a large number of the fprintf(stderr, "*\n" calls with
+>> error_report(). The functions were renamed with these commands and the=
+n
+>> compiler issues where manually fixed.
+>>
+>> find ./* -type f -exec sed -i \
+>>     'N;N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|e=
+rror_report("\1"\2);|Ig}' \
+>>     {} +
+>> find ./* -type f -exec sed -i \
+>>     'N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|err=
+or_report("\1"\2);|Ig}' \
+>>     {} +
+>> find ./* -type f -exec sed -i \
+>>     'N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_r=
+eport("\1"\2);|Ig}' \
+>>     {} +
+>> find ./* -type f -exec sed -i \
+>>     'N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_rep=
+ort("\1"\2);|Ig}' \
+>>     {} +
+>> find ./* -type f -exec sed -i \
+>>     'N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_repor=
+t("\1"\2);|Ig}' \
+>>     {} +
+>> find ./* -type f -exec sed -i \
+>>     'N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report(=
+"\1"\2);|Ig}' \
+>>     {} +
+>> find ./* -type f -exec sed -i \
+>>     'N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\=
+1"\2);|Ig}' \
+>>     {} +
+>> find ./* -type f -exec sed -i \
+>>     'N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"=
+\2);|Ig}' \
+>>     {} +
+>> find ./* -type f -exec sed -i \
+>>     'N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2=
+);|Ig}' \
+>>     {} +
+>> find ./* -type f -exec sed -i \
+>>     'N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);=
+|Ig}' \
+>>     {} +
+>> find ./* -type f -exec sed -i \
+>>     'N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|I=
+g}' \
+>>     {} +
+>>
+>> Some lines where then manually tweaked to pass checkpatch.
+>>
+>> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+>> Cc: qemu-block@nongnu.org
+>> ---
+>> V2:
+>>  - Split hw patch into individual directories
+>>
+>>  hw/ide/ahci.c | 6 +++---
+>>  hw/ide/core.c | 2 +-
+>>  2 files changed, 4 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/hw/ide/ahci.c b/hw/ide/ahci.c
+>> index c25e293d88..2ed015285a 100644
+>> --- a/hw/ide/ahci.c
+>> +++ b/hw/ide/ahci.c
+>> @@ -410,8 +410,8 @@ static void ahci_mem_write(void *opaque, hwaddr ad=
+dr,
+>> =20
+>>      /* Only aligned reads are allowed on AHCI */
+>>      if (addr & 3) {
+>> -        fprintf(stderr, "ahci: Mis-aligned write to addr 0x"
+>> -                TARGET_FMT_plx "\n", addr);
+>> +        error_report("ahci: Mis-aligned write to addr 0x"
+>> +                     TARGET_FMT_plx "", addr);
+>=20
+> removing this trailing "":
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>=20
+
+^ ACK
+
+Acked-by: John Snow <jsnow@redhat.com>
+
+>>          return;
+>>      }
+>> =20
+>> @@ -1053,7 +1053,7 @@ static void process_ncq_command(AHCIState *s, in=
+t port, uint8_t *cmd_fis,
+>>      g_assert(is_ncq(ncq_fis->command));
+>>      if (ncq_tfs->used) {
+>>          /* error - already in use */
+>> -        fprintf(stderr, "%s: tag %d already used\n", __func__, tag);
+>> +        error_report("%s: tag %d already used", __func__, tag);
+>>          return;
+>>      }
+>> =20
+>> diff --git a/hw/ide/core.c b/hw/ide/core.c
+>> index 5f1cd3b91f..0ea34f62ba 100644
+>> --- a/hw/ide/core.c
+>> +++ b/hw/ide/core.c
+>> @@ -2762,7 +2762,7 @@ static int ide_drive_pio_pre_save(void *opaque)
+>> =20
+>>      idx =3D transfer_end_table_idx(s->end_transfer_func);
+>>      if (idx =3D=3D -1) {
+>> -        fprintf(stderr, "%s: invalid end_transfer_func for DRQ_STAT\n=
+",
+>> +        error_report("%s: invalid end_transfer_func for DRQ_STAT",
+>>                          __func__);
+>=20
+> eventually indent this line?
+>=20
+>                         __func__);
+>=20
+>>          s->end_transfer_fn_idx =3D 2;
+>>      } else {
+>=20
+>=20
