@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54425)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54451)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <frasse.iglesias@gmail.com>) id 1e9nGr-000683-Jm
-	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 03:17:06 -0400
+	(envelope-from <frasse.iglesias@gmail.com>) id 1e9nGu-0006BG-9l
+	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 03:17:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <frasse.iglesias@gmail.com>) id 1e9nGq-0001Rr-Ck
-	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 03:17:05 -0400
-Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:44605)
+	(envelope-from <frasse.iglesias@gmail.com>) id 1e9nGn-0001Pr-Qy
+	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 03:17:08 -0400
+Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:55908)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <frasse.iglesias@gmail.com>)
-	id 1e9nGq-0001RR-59
-	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 03:17:04 -0400
-Received: by mail-lf0-x243.google.com with SMTP id 75so1491401lfx.1
-	for <qemu-devel@nongnu.org>; Wed, 01 Nov 2017 00:17:04 -0700 (PDT)
+	id 1e9nGn-0001OS-JX
+	for qemu-devel@nongnu.org; Wed, 01 Nov 2017 03:17:01 -0400
+Received: by mail-lf0-x243.google.com with SMTP id e143so1459096lfg.12
+	for <qemu-devel@nongnu.org>; Wed, 01 Nov 2017 00:17:01 -0700 (PDT)
 From: Francisco Iglesias <frasse.iglesias@gmail.com>
-Date: Wed,  1 Nov 2017 08:16:44 +0100
-Message-Id: <20171101071652.19375-6-frasse.iglesias@gmail.com>
+Date: Wed,  1 Nov 2017 08:16:42 +0100
+Message-Id: <20171101071652.19375-4-frasse.iglesias@gmail.com>
 In-Reply-To: <20171101071652.19375-1-frasse.iglesias@gmail.com>
 References: <20171101071652.19375-1-frasse.iglesias@gmail.com>
-Subject: [Qemu-devel] [PATCH v6 05/13] xilinx_spips: Move FlashCMD,
- XilinxQSPIPS and XilinxSPIPSClass
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v6 03/13] m25p80: Add support for BRRD/BRWR and
+ BULK_ERASE (0x60)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,126 +33,60 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: edgari@xilinx.com, alistai@xilinx.com, francisco.iglesias@feimtech.se, mar.krzeminski@gmail.com
 
-Move the FlashCMD enum, XilinxQSPIPS and XilinxSPIPSClass structures to the
-header for consistency (struct XilinxSPIPS is found there). Also move out
-a define and remove two dubbel included headers (while touching the code).
-Finally, add 4 byte address commands to the FlashCMD enum.
+Add support for the bank address register access commands (BRRD/BRWR) and
+the BULK_ERASE (0x60) command.
 
 Signed-off-by: Francisco Iglesias <frasse.iglesias@gmail.com>
+Acked-by: Marcin Krzemiński <mar.krzeminski@gmail.com>
 ---
- hw/ssi/xilinx_spips.c         | 35 -----------------------------------
- include/hw/ssi/xilinx_spips.h | 34 ++++++++++++++++++++++++++++++++++
- 2 files changed, 34 insertions(+), 35 deletions(-)
+ hw/block/m25p80.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
-index ef56d35..559fa79 100644
---- a/hw/ssi/xilinx_spips.c
-+++ b/hw/ssi/xilinx_spips.c
-@@ -27,8 +27,6 @@
- #include "sysemu/sysemu.h"
- #include "hw/ptimer.h"
- #include "qemu/log.h"
--#include "qemu/fifo8.h"
--#include "hw/ssi/ssi.h"
- #include "qemu/bitops.h"
- #include "hw/ssi/xilinx_spips.h"
- #include "qapi/error.h"
-@@ -116,44 +114,11 @@
+diff --git a/hw/block/m25p80.c b/hw/block/m25p80.c
+index 12ff656..3f8154b 100644
+--- a/hw/block/m25p80.c
++++ b/hw/block/m25p80.c
+@@ -331,7 +331,10 @@ typedef enum {
+     WRDI = 0x4,
+     RDSR = 0x5,
+     WREN = 0x6,
++    BRRD = 0x16,
++    BRWR = 0x17,
+     JEDEC_READ = 0x9f,
++    BULK_ERASE_60 = 0x60,
+     BULK_ERASE = 0xc7,
+     READ_FSR = 0x70,
+     RDCR = 0x15,
+@@ -704,6 +707,7 @@ static void complete_collecting_data(Flash *s)
+             s->write_enable = false;
+         }
+         break;
++    case BRWR:
+     case EXTEND_ADDR_WRITE:
+         s->ear = s->data[0];
+         break;
+@@ -1041,6 +1045,7 @@ static void decode_new_cmd(Flash *s, uint32_t value)
+         s->state = STATE_READING_DATA;
+         break;
  
- /* 16MB per linear region */
- #define LQSPI_ADDRESS_BITS 24
--/* Bite off 4k chunks at a time */
--#define LQSPI_CACHE_SIZE 1024
- 
- #define SNOOP_CHECKING 0xFF
- #define SNOOP_NONE 0xFE
- #define SNOOP_STRIPING 0
- 
--typedef enum {
--    READ = 0x3,
--    FAST_READ = 0xb,
--    DOR = 0x3b,
--    QOR = 0x6b,
--    DIOR = 0xbb,
--    QIOR = 0xeb,
--
--    PP = 0x2,
--    DPP = 0xa2,
--    QPP = 0x32,
--} FlashCMD;
--
--typedef struct {
--    XilinxSPIPS parent_obj;
--
--    uint8_t lqspi_buf[LQSPI_CACHE_SIZE];
--    hwaddr lqspi_cached_addr;
--    Error *migration_blocker;
--    bool mmio_execution_enabled;
--} XilinxQSPIPS;
--
--typedef struct XilinxSPIPSClass {
--    SysBusDeviceClass parent_class;
--
--    const MemoryRegionOps *reg_ops;
--
--    uint32_t rx_fifo_size;
--    uint32_t tx_fifo_size;
--} XilinxSPIPSClass;
--
- static inline int num_effective_busses(XilinxSPIPS *s)
- {
-     return (s->regs[R_LQSPI_CFG] & LQSPI_CFG_SEP_BUS &&
-diff --git a/include/hw/ssi/xilinx_spips.h b/include/hw/ssi/xilinx_spips.h
-index 06aa096..7f9e2fc 100644
---- a/include/hw/ssi/xilinx_spips.h
-+++ b/include/hw/ssi/xilinx_spips.h
-@@ -32,6 +32,22 @@ typedef struct XilinxSPIPS XilinxSPIPS;
- 
- #define XLNX_SPIPS_R_MAX        (0x100 / 4)
- 
-+/* Bite off 4k chunks at a time */
-+#define LQSPI_CACHE_SIZE 1024
-+
-+typedef enum {
-+    READ = 0x3,         READ_4 = 0x13,
-+    FAST_READ = 0xb,    FAST_READ_4 = 0x0c,
-+    DOR = 0x3b,         DOR_4 = 0x3c,
-+    QOR = 0x6b,         QOR_4 = 0x6c,
-+    DIOR = 0xbb,        DIOR_4 = 0xbc,
-+    QIOR = 0xeb,        QIOR_4 = 0xec,
-+
-+    PP = 0x2,           PP_4 = 0x12,
-+    DPP = 0xa2,
-+    QPP = 0x32,         QPP_4 = 0x34,
-+} FlashCMD;
-+
- struct XilinxSPIPS {
-     SysBusDevice parent_obj;
- 
-@@ -56,6 +72,24 @@ struct XilinxSPIPS {
-     uint32_t regs[XLNX_SPIPS_R_MAX];
- };
- 
-+typedef struct {
-+    XilinxSPIPS parent_obj;
-+
-+    uint8_t lqspi_buf[LQSPI_CACHE_SIZE];
-+    hwaddr lqspi_cached_addr;
-+    Error *migration_blocker;
-+    bool mmio_execution_enabled;
-+} XilinxQSPIPS;
-+
-+typedef struct XilinxSPIPSClass {
-+    SysBusDeviceClass parent_class;
-+
-+    const MemoryRegionOps *reg_ops;
-+
-+    uint32_t rx_fifo_size;
-+    uint32_t tx_fifo_size;
-+} XilinxSPIPSClass;
-+
- #define TYPE_XILINX_SPIPS "xlnx.ps7-spi"
- #define TYPE_XILINX_QSPIPS "xlnx.ps7-qspi"
- 
++    case BULK_ERASE_60:
+     case BULK_ERASE:
+         if (s->write_enable) {
+             DB_PRINT_L(0, "chip erase\n");
+@@ -1058,12 +1063,14 @@ static void decode_new_cmd(Flash *s, uint32_t value)
+     case EX_4BYTE_ADDR:
+         s->four_bytes_address_mode = false;
+         break;
++    case BRRD:
+     case EXTEND_ADDR_READ:
+         s->data[0] = s->ear;
+         s->pos = 0;
+         s->len = 1;
+         s->state = STATE_READING_DATA;
+         break;
++    case BRWR:
+     case EXTEND_ADDR_WRITE:
+         if (s->write_enable) {
+             s->needed_bytes = 1;
 -- 
 2.9.3
