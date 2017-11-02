@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50831)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52380)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eAHDA-0008Kk-Jy
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 11:15:22 -0400
+	(envelope-from <programmingkidx@gmail.com>) id 1eAHIW-0001uQ-BY
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 11:20:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eAHD9-0002Wg-Mc
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 11:15:16 -0400
-Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:54671)
+	(envelope-from <programmingkidx@gmail.com>) id 1eAHIT-0006aD-60
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 11:20:48 -0400
+Received: from mail-io0-x244.google.com ([2607:f8b0:4001:c06::244]:48106)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eAHD9-0002Vn-Gv
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 11:15:15 -0400
-Received: by mail-wr0-x241.google.com with SMTP id o44so5330471wrf.11
-	for <qemu-devel@nongnu.org>; Thu, 02 Nov 2017 08:15:15 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <d0aa7605-c262-273f-7fab-94e72f202aa7@gmx.com>
-References: <20170903164952.26760-1-n54@gmx.com>
-	<20170911171639.22005-1-n54@gmx.com>
-	<CAFEAcA-wNp2T7BGih1O3-Tq1+OrYNnM1VqAneM3QfXrd5u9ZPg@mail.gmail.com>
-	<d0aa7605-c262-273f-7fab-94e72f202aa7@gmx.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 2 Nov 2017 15:14:53 +0000
-Message-ID: <CAFEAcA-E9TEay9xbeE9tZCHFvSLrE8R4V2ZttzEwoQN8JQzX9Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2] Discover openpty(3) dynamically in
- configure
+	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+	id 1eAHIT-0006Yt-0l
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 11:20:45 -0400
+Received: by mail-io0-x244.google.com with SMTP id h70so14796337ioi.4
+	for <qemu-devel@nongnu.org>; Thu, 02 Nov 2017 08:20:44 -0700 (PDT)
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+From: Programmingkid <programmingkidx@gmail.com>
+In-Reply-To: <CAFEAcA83iZs0T-rM24QZn1ttAsXjuWfsehW86kJBt52Up1p1Hw@mail.gmail.com>
+Date: Thu, 2 Nov 2017 11:20:42 -0400
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <385E45E2-3BC6-4501-91B1-44CA43718947@gmail.com>
+References: <20171005145557.5746-1-programmingkidx@gmail.com>
+	<20171005145557.5746-2-programmingkidx@gmail.com>
+	<CAFEAcA83iZs0T-rM24QZn1ttAsXjuWfsehW86kJBt52Up1p1Hw@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] ui/cocoa.m: move ungrab to
+ ctrl-alt-g
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,30 +32,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kamil Rytarowski <n54@gmx.com>
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>, Jonathan Perkin <jperkin@joyent.com>, QEMU Developers <qemu-devel@nongnu.org>, Peter Tribble <peter.tribble@gmail.com>, =?UTF-8?Q?Antonio_Huete_Jim=C3=A9nez?= <tuxillo@quantumachine.net>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 28 October 2017 at 18:07, Kamil Rytarowski <n54@gmx.com> wrote:
-> I've naively expected that once a build on a certain OS will be fixed,
-> it will be functional for longer period (at least few weeks). In one
-> month qemu has been broken on DragonFly and SmartOS so they are not just
-> broken in tests, but also in the basic build.
 
-Yep; things do break if they're not tested, which is why I think
-we have to have a host system being in our regular build/test
-process in order to be able to call it supported.
+> On Nov 2, 2017, at 5:10 AM, Peter Maydell <peter.maydell@linaro.org> =
+wrote:
+>=20
+> On 5 October 2017 at 15:55, John Arbuckle <programmingkidx@gmail.com> =
+wrote:
+>> Currently the cocoa user interface relys on the user pushing =
+control-alt to ungrab the mouse. This is patch changes the key =
+combination to control-alt-g to be in line with the GTK user interface.
+>>=20
+>> signed-off-by: John Arbuckle <programmingkidx@gmail.com>
+>> ---
+>=20
+>> +
+>> +                    // release the mouse grab
+>> +                    case Q_KEY_CODE_G:
+>> +                        [self ungrabMouse];
+>> +                        break;
+>>                 }
+>=20
+> Testing this I have found that it makes the grab key be
+> "ctrl+alt+ the key labelled 'g'", even if in the
+> OSX host keyboard mapping that key doesn't produce the
+> letter 'g'. This is in contrast to for instance the menu
+> accelerators which honour the host keyboard layout, and
+> it's also not what the GTK UI does. So I think we need
+> to fix that.
 
-> Because there is need to fix the SmartOS build in order to improve this
-> openpty(3) patch, I'm resigning from it. I also resign from helping
-> DragonFly port.
->
-> I will focus entirely on the bits that I registered as a maintainer.
->
-> I leave the decisions and steps about support of these platforms to
-> other volunteers and qemu core maintainers.
-
-Thanks for your efforts with the BSD porting work; we appreciate
-it.
-
-thanks
--- PMM
+I just realized that the cocoa interface does not consider the keyboard =
+layout. Switching from QWERTY to DVORK I still see the same keys =
+outputting the same characters in OpenBIOS. This is a separate patch but =
+sometime to take note.=20
