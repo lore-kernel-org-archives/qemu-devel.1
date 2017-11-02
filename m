@@ -1,25 +1,43 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53091)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37366)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eAAib-0006iU-B6
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 04:19:22 -0400
+	(envelope-from <xiaoguangrong.eric@gmail.com>) id 1eABD0-0004GP-1L
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 04:50:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eAAiX-0008K2-9U
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 04:19:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59288)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1eAAiX-0008JR-0H
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 04:19:13 -0400
-References: <150960325077.8724.2785366469980820788.malonedeb@wampee.canonical.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <9f8b07e3-2595-b6fe-17c2-b2b76bc2e65e@redhat.com>
-Date: Thu, 2 Nov 2017 09:19:05 +0100
+	(envelope-from <xiaoguangrong.eric@gmail.com>) id 1eABCv-0008AQ-3T
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 04:50:42 -0400
+Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:51545)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <xiaoguangrong.eric@gmail.com>)
+	id 1eABCu-00087L-RG
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 04:50:37 -0400
+Received: by mail-pg0-x243.google.com with SMTP id p9so4469698pgc.8
+	for <qemu-devel@nongnu.org>; Thu, 02 Nov 2017 01:50:36 -0700 (PDT)
+References: <1455443283.33337333.1500618150787.JavaMail.zimbra@redhat.com>
+	<1157879323.33809400.1500897967669.JavaMail.zimbra@redhat.com>
+	<20170724123752.GN652@quack2.suse.cz>
+	<1888117852.34216619.1500992835767.JavaMail.zimbra@redhat.com>
+	<CAPcyv4in28F3FOVKp9abvrggxPuXdbGynF5=ZvBXCrywoa06JA@mail.gmail.com>
+	<1501016375.26846.21.camel@redhat.com>
+	<1063764405.34607875.1501076841865.JavaMail.zimbra@redhat.com>
+	<1501104453.26846.45.camel@redhat.com>
+	<CAPcyv4hsqrqBxoipUHPAbSctuzbVWCRnT-gN08i9uhXTWY6iPQ@mail.gmail.com>
+	<1501112787.4073.49.camel@redhat.com>
+	<CAPcyv4gbC6Hx_4YsCfOd2t=fn=wPGp5h__1QH=-p40TPFNbFzA@mail.gmail.com>
+	<0a26793f-86f7-29e7-f61b-dc4c1ef08c8e@gmail.com>
+	<CAPcyv4iw2cCpDmr+4kxsFvdy+iGZiz=ok-kLhsDKpqDy+szf-Q@mail.gmail.com>
+	<378b10f3-b32f-84f5-2bbc-50c2ec5bcdd4@gmail.com>
+	<CAPcyv4jR_LdbsX-rAsHC7++C6d-WYC084uWXzr+08PSYwoXFMw@mail.gmail.com>
+	<ca6aaa77-cca0-441e-be49-73133d8581cf@gmail.com>
+	<CAPcyv4gKzvd39WbnKjbs3Bn9+o1tt=vz90CYMFu0DF5PsfHUig@mail.gmail.com>
+From: Xiao Guangrong <xiaoguangrong.eric@gmail.com>
+Message-ID: <86754966-281f-c3ed-938c-f009440de563@gmail.com>
+Date: Thu, 2 Nov 2017 16:50:54 +0800
 MIME-Version: 1.0
-In-Reply-To: <150960325077.8724.2785366469980820788.malonedeb@wampee.canonical.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <CAPcyv4gKzvd39WbnKjbs3Bn9+o1tt=vz90CYMFu0DF5PsfHUig@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Bug 1729501] [NEW] qemu crashes with assertion
- error `off_cur_end >= off_cur' failed
+Subject: Re: [Qemu-devel] KVM "fake DAX" flushing interface - discussion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,80 +46,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bug 1729501 <1729501@bugs.launchpad.net>, qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+To: Dan Williams <dan.j.williams@intel.com>
+Cc: Rik van Riel <riel@redhat.com>, Pankaj Gupta <pagupta@redhat.com>, Jan Kara <jack@suse.cz>, Stefan Hajnoczi <stefanha@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, kvm-devel <kvm@vger.kernel.org>, Qemu Developers <qemu-devel@nongnu.org>, "linux-nvdimm@lists.01.org" <linux-nvdimm@ml01.01.org>, ross zwisler <ross.zwisler@linux.intel.com>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Nitesh Narayan Lal <nilal@redhat.com>, Haozhong Zhang <haozhong.zhang@intel.com>, Ross Zwisler <ross.zwisler@intel.com>
 
-On 02.11.2017 07:14, Liang Dai wrote:
-> Public bug reported:
-> 
-> My host environment: Xen + QEMU
-> 
-> git clones today's xen git and qemut git (2017-10-31)
-> 
-> xen  -- git://xenbits.xen.org/xen.git
-> commit 24fb44e971a62b345c7b6ca3c03b454a1e150abe
-> 	
-> qemu -- https://github.com/qemu/qemu 
-> commit 47ba789c97c8d201d01058b00a14d8a9a85fcfe9
-> 
-> QEMU was compiled using:
-> ./configure --prefix=/mnt/bin/ --enable-xen --target-list=i386-softmmu --extra-cflags="-I/mnt/xen/tools/include -I/mnt/xen/tools/libxc -I/mnt/xen/tools/xenstore"        --extra-ldflags="-L/mnt/xen/tools/libxc -L/mnt/xen/tools/xenstore" --enable-debug --enable-debug-stack-usage
-> 
-> Xen was configured with the above QEMU distribution:
-> ./configure --with-system-qemu=/mnt/bin/bin/qemu-system-i386
-> 
-> QEMU command line: 
-> /mnt/bin/bin/qemu-system-i386 -xen-domid 28 -chardev socket,id=libxl-cmd,path=/var/run/xen/qmp-libxl-28,server,nowait -no-shutdown -mon chardev=libxl-cmd,mode=control -chardev socket,id=libxenstat-cmd,path=/var/run/xen/qmp-libxenstat-28,server,nowait -mon chardev=libxenstat-cmd,mode=control -nodefaults -no-user-config -name ubu_hvm -vnc 0.0.0.0:1,to=99 -display none -serial pty -device cirrus-vga,vgamem_mb=8 -boot order=c -smp 2,maxcpus=2 -device rtl8139,id=nic0,netdev=net0,mac=00:16:3e:74:34:32 -netdev type=tap,id=net0,ifname=vif28.0-emu,script=no,downscript=no -device rtl8139,id=nic1,netdev=net1,mac=00:16:3e:5f:48:e4 -netdev type=tap,id=net1,ifname=vif28.1-emu,script=no,downscript=no -machine xenfv -m 1504 -drive file=/mnt/10G.hdd,if=ide,index=0,media=disk,format=raw,cache=writeback
-> 
-> Produce:
-> I run a fuzzer program in guest vm, it may set incorrect values for graphics registers, sequencer registers and other registers.
-> 
-> Seeing the following error from /var/log/xen/qemu-dm-<vm-name>.log:
-> qemu-system-i386: hw/display/cirrus_vga.c:712: cirrus_invalidate_region: Assertion `off_cur_end >= off_cur' failed.
-> 
-> I can reproduce it at anytime, if you need to gather more diagnostic
-> information or try test patches, I'm happy to help.
-> 
-> 
-> gdb bt:
-> #0  0x00007f81a64f8c37 in __GI_raise (sig=sig@entry=6) at ../nptl/sysdeps/unix/sysv/linux/raise.c:56
-> #1  0x00007f81a64fc028 in __GI_abort () at abort.c:89
-> #2  0x00007f81a64f1bf6 in __assert_fail_base (fmt=0x7f81a6646018 "%s%s%s:%u: %s%sAssertion `%s' failed.\n%n", 
->     assertion=assertion@entry=0x55d70cf8cdf2 "off_cur_end >= off_cur", file=file@entry=0x55d70cf8cda9 "hw/display/cirrus_vga.c", line=line@entry=712, 
->     function=function@entry=0x55d70cf8db60 <__PRETTY_FUNCTION__.40643> "cirrus_invalidate_region") at assert.c:92
-> #3  0x00007f81a64f1ca2 in __GI___assert_fail (assertion=0x55d70cf8cdf2 "off_cur_end >= off_cur", file=0x55d70cf8cda9 "hw/display/cirrus_vga.c", line=712, 
->     function=0x55d70cf8db60 <__PRETTY_FUNCTION__.40643> "cirrus_invalidate_region") at assert.c:101
-> #4  0x000055d70cb66445 in cirrus_invalidate_region (s=0x55d70ee3a4b0, off_begin=4190568, off_pitch=1842, bytesperline=5056, lines=2922) at hw/display/cirrus_vga.c:712
-> #5  0x000055d70cb6660c in cirrus_bitblt_common_patterncopy (s=0x55d70ee3a4b0) at hw/display/cirrus_vga.c:752
-> #6  0x000055d70cb6676d in cirrus_bitblt_videotovideo_patterncopy (s=0x55d70ee3a4b0) at hw/display/cirrus_vga.c:786
-> #7  0x000055d70cb670c5 in cirrus_bitblt_videotovideo (s=0x55d70ee3a4b0) at hw/display/cirrus_vga.c:986
-> #8  0x000055d70cb678bf in cirrus_bitblt_start (s=0x55d70ee3a4b0) at hw/display/cirrus_vga.c:1136
-> #9  0x000055d70cb6880b in cirrus_vga_write_gr (s=0x55d70ee3a4b0, reg_index=42, reg_value=228) at hw/display/cirrus_vga.c:1652
-> #10 0x000055d70cb6ab86 in cirrus_vga_ioport_write (opaque=0x55d70ee3a4b0, addr=975, val=228, size=1) at hw/display/cirrus_vga.c:2754
-> #11 0x000055d70c91d9c0 in memory_region_write_accessor (mr=0x55d70ee4af70, addr=31, value=0x7fffdaaeaf38, size=1, shift=8, mask=255, attrs=...)
->     at /mnt/qemu/memory.c:560
-> #12 0x000055d70c91dc3a in access_with_adjusted_size (addr=30, value=0x7fffdaaeaf38, size=2, access_size_min=1, access_size_max=1, 
->     access_fn=0x55d70c91d8c9 <memory_region_write_accessor>, mr=0x55d70ee4af70, attrs=...) at /mnt/qemu/memory.c:627
-> #13 0x000055d70c920f48 in memory_region_dispatch_write (mr=0x55d70ee4af70, addr=30, data=58410, size=2, attrs=...) at /mnt/qemu/memory.c:1503
-> #14 0x000055d70c8c51e0 in flatview_write_continue (fv=0x55d70ecb66d0, addr=974, attrs=..., buf=0x7fffdaaeb0f0 "*\344W\026\377\177", len=4, addr1=30, l=2, 
->     mr=0x55d70ee4af70) at /mnt/qemu/exec.c:2951
-> #15 0x000055d70c8c5390 in flatview_write (fv=0x55d70ecb66d0, addr=974, attrs=..., buf=0x7fffdaaeb0f0 "*\344W\026\377\177", len=4) at /mnt/qemu/exec.c:3002
-> #16 0x000055d70c8c5406 in address_space_write (as=0x55d70d70d5e0 <address_space_io>, addr=974, attrs=..., buf=0x7fffdaaeb0f0 "*\344W\026\377\177", len=4)
->     at /mnt/qemu/exec.c:3014
-> #17 0x000055d70c914fb3 in cpu_outl (addr=974, val=374858794) at /mnt/qemu/ioport.c:81
-> #18 0x000055d70ca0253f in do_outp (addr=974, size=4, val=374858794) at /mnt/qemu/hw/i386/xen/xen-hvm.c:782
-> #19 0x000055d70ca02888 in cpu_ioreq_pio (req=0x7fffdaaeb210) at /mnt/qemu/hw/i386/xen/xen-hvm.c:852
-> #20 0x000055d70ca02f2e in handle_ioreq (state=0x55d70e0cf3d0, req=0x7fffdaaeb210) at /mnt/qemu/hw/i386/xen/xen-hvm.c:961
-> #21 0x000055d70ca0343e in cpu_handle_ioreq (opaque=0x55d70e0cf3d0) at /mnt/qemu/hw/i386/xen/xen-hvm.c:1089
-> #22 0x000055d70ce75d69 in aio_dispatch_handlers (ctx=0x55d70e098550) at util/aio-posix.c:406
-> #23 0x000055d70ce75f0b in aio_dispatch (ctx=0x55d70e098550) at util/aio-posix.c:437
-> #24 0x000055d70ce70b46 in aio_ctx_dispatch (source=0x55d70e098550, callback=0x0, user_data=0x0) at util/async.c:261
-> #25 0x00007f81a7215e04 in g_main_context_dispatch () from /lib/x86_64-linux-gnu/libglib-2.0.so.0
-> #26 0x000055d70ce74455 in glib_pollfds_poll () at util/main-loop.c:214
-> #27 0x000055d70ce7456a in os_host_main_loop_wait (timeout=16061710) at util/main-loop.c:261
-> #28 0x000055d70ce7463f in main_loop_wait (nonblocking=0) at util/main-loop.c:515
-> #29 0x000055d70ca8e6a6 in main_loop () at vl.c:1995
-> #30 0x000055d70ca96815 in main (argc=42, argv=0x7fffdaaeb888, envp=0x7fffdaaeb9e0) at vl.c:4897
 
-Can you also reproduce this without Xen? And is the fuzzer available
-publicly somewhere?
+
+On 11/01/2017 11:20 PM, Dan Williams wrote:
+>> On 11/01/2017 12:25 PM, Dan Williams wrote:
+> [..]
+>>> It's not persistent memory if it requires a hypercall to make it
+>>> persistent. Unless memory writes can be made durable purely with cpu
+>>> instructions it's dangerous for it to be treated as a PMEM range.
+>>> Consider a guest that tried to map it with device-dax which has no
+>>> facility to route requests to a special flushing interface.
+>>>
+>>
+>> Can we separate the concept of flush interface from persistent memory?
+>> Say there are two APIs, one is used to indicate the memory type (i.e,
+>> /proc/iomem) and another one indicates the flush interface.
+>>
+>> So for existing nvdimm hardwares:
+>> 1: Persist-memory + CLFLUSH
+>> 2: Persiste-memory + flush-hint-table (I know Intel does not use it)
+>>
+>> and for the virtual nvdimm which backended on normal storage:
+>> Persist-memory + virtual flush interface
+> 
+> I see the flush interface as fundamental to identifying the media
+> properties. It's not byte-addressable persistent memory if the
+> application needs to call a sideband interface to manage writes. This
+> is why we have pushed for something like the MAP_SYNC interface to
+> make filesystem-dax actually behave in a way that applications can
+> safely treat it as persistent memory, and this is also the guarantee
+> that device-dax provides. Changing the flush interface makes it
+> distinct and unusable for applications that want to manage data
+> persistence in userspace.
+> 
+
+I was thinking that from the device's perspective, both of them are
+not persistent until a flush operation is issued (clflush or virtual
+flush-interface). But you are right, from the user/software's
+perspective, their fundamentals are different.
+
+So for the virtual nvdimm which is backended on normal storage, we
+should refuse MAP_SYNC and the only way to guarantee persistence
+is fsync/fdatasync.
+
+Actually, we can treat a SPA region which associates with specific
+flush interface as special GUID as your proposal, please see more
+in below comment...
+
+>>>>
+>>>>> In what way is this "more complicated"? It was trivial to add support
+>>>>> for the "volatile" NFIT range, this will not be any more complicated
+>>>>> than that.
+>>>>>
+>>>>
+>>>> Introducing memory type is easy indeed, however, a new flush interface
+>>>> definition is inevitable, i.e, we need a standard way to discover the
+>>>> MMIOs to communicate with host.
+>>>
+>>>
+>>> Right, the proposed way to do that for x86 platforms is a new SPA
+>>> Range GUID type. in the NFIT.
+>>>
+>>
+>> So this SPA is used for both persistent memory region and flush interface?
+>> Maybe i missed it in previous mails, could you please detail how to do
+>> it?
+> 
+> Yes, the GUID will specifically identify this range as "Virtio Shared
+> Memory" (or whatever name survives after a bikeshed debate). The
+> libnvdimm core then needs to grow a new region type that mostly
+> behaves the same as a "pmem" region, but drivers/nvdimm/pmem.c grows a
+> new flush interface to perform the host communication. Device-dax
+> would be disallowed from attaching to this region type, or we could
+> grow a new device-dax type that does not allow the raw device to be
+> mapped, but allows a filesystem mounted on top to manage the flush
+> interface.
+
+I am afraid it is not a good idea that a single SPA is used for multiple
+purposes. For the region used as "pmem" is directly mapped to the VM so
+that guest can freely access it without host's assistance, however, for
+the region used as "host communication" is not mapped to VM, so that
+it causes VM-exit and host gets the chance to do specific operations,
+e.g, flush cache. So we'd better distinctly define these two regions to
+avoid the unnecessary complexity in hypervisor.
