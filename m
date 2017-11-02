@@ -1,34 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46355)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46357)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eAMvI-0006ks-NC
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 17:21:14 -0400
+	(envelope-from <bounces@canonical.com>) id 1eAMvI-0006ku-NW
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 17:21:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eAMvE-0000IY-Ef
+	(envelope-from <bounces@canonical.com>) id 1eAMvD-0000I4-Nx
 	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 17:21:12 -0400
-Received: from indium.canonical.com ([91.189.90.7]:56536)
+Received: from indium.canonical.com ([91.189.90.7]:56498)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eAMvE-0000Hu-5T
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 17:21:08 -0400
+	id 1eAMvD-0000HM-Hz
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 17:21:07 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eAMvD-0006Ak-77
-	for <qemu-devel@nongnu.org>; Thu, 02 Nov 2017 21:21:07 +0000
+	id 1eAMvB-0006BA-TQ
+	for <qemu-devel@nongnu.org>; Thu, 02 Nov 2017 21:21:06 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 34AF02E8069
-	for <qemu-devel@nongnu.org>; Thu,  2 Nov 2017 21:21:07 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id DD7C92E8076
+	for <qemu-devel@nongnu.org>; Thu,  2 Nov 2017 21:21:05 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 02 Nov 2017 21:14:43 -0000
-From: Max Reitz <1728639@bugs.launchpad.net>
-Reply-To: Bug 1728639 <1728639@bugs.launchpad.net>
+Date: Thu, 02 Nov 2017 21:15:27 -0000
+From: Max Reitz <1728660@bugs.launchpad.net>
+Reply-To: Bug 1728660 <1728660@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <150937882540.4122.2407662790431063606.malonedeb@gac.canonical.com>
-Message-Id: <150965728318.5178.3990282102837730873.malone@chaenomeles.canonical.com>
+References: <150938299200.4586.118755256317964456.malonedeb@chaenomeles.canonical.com>
+Message-Id: <150965732760.20760.7275459565955170783.malone@soybean.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1728639] Re: qemu-io crashes with SIGSEGV when
- did -c truncate 320000 on a image_fuzzer image
+Subject: [Qemu-devel] [Bug 1728660] Re: qemu-io segfaults at block/io.c:2545
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,8 +40,8 @@ To: qemu-devel@nongnu.org
 
 Hi,
 
-Thanks a lot for reporting this bug!  I've found a fix and I'll send a
-patch once I've written a test case.
+And once again, thanks a lot for reporting this bug!  Here, too, I've
+found a fix and I'll send a patch once I've written a test case.
 
 Max
 
@@ -50,11 +49,10 @@ Max
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1728639
+https://bugs.launchpad.net/bugs/1728660
 
 Title:
-  qemu-io crashes with SIGSEGV when did  -c truncate 320000 on a
-  image_fuzzer image
+  qemu-io segfaults at block/io.c:2545
 
 Status in QEMU:
   New
@@ -65,17 +63,17 @@ Bug description:
 
   Re-production steps:
 
-  1. Copy the attached files named test.img to a directory
+  1. Copy the attached file named test.img to a directory
   2. And customize the following command to point to the above directory an=
 d run the same.
   # mv test.img copy.img
-  # qemu-io <path to>/copy.img -c "truncate 320000"
+  # qemu-io <path to>/copy.img -c "discard 108544 97792"
 
   from gdb:
   Program terminated with signal 11, Segmentation fault.
-  #0  0x000000001000e444 in refresh_total_sectors (bs=3D0x1fe86f60, hint=3D=
-11648) at block.c:723
-  723	    if (drv->bdrv_getlength) {
+  #0  0x00000000100af254 in bdrv_co_pdiscard (bs=3D0x3ee89ad0, offset=3D196=
+608, bytes=3D9728) at block/io.c:2545
+  2545	        if (bs->drv->bdrv_co_pdiscard) {
   Missing separate debuginfos, use: debuginfo-install cyrus-sasl-lib-2.1.26=
 -21.el7.ppc64le glib2-2.50.3-3.el7.ppc64le glibc-2.17-196.el7.ppc64le gmp-6=
 .0.0-15.el7.ppc64le gnutls-3.3.26-9.el7.ppc64le keyutils-libs-1.5.8-3.el7.p=
@@ -89,127 +87,48 @@ el7_4.1.ppc64le libtasn1-4.10-1.el7.ppc64le nettle-2.7.1-8.el7.ppc64le nspr=
 c64le openssl-libs-1.0.2k-8.el7.ppc64le p11-kit-0.23.5-3.el7.ppc64le pcre-8=
 .32-17.el7.ppc64le zlib-1.2.7-17.el7.ppc64le
   (gdb) bt
-  #0  0x000000001000e444 in refresh_total_sectors (bs=3D0x1fe86f60, hint=3D=
-11648) at block.c:723
-  #1  0x000000001000fa10 in bdrv_open_driver (bs=3D0x1fe86f60, drv=3D0x1020=
-36f0 <bdrv_qcow2>, node_name=3D0x0, options=3D0x1fe8c240, open_flags=3D2457=
-8,
-      errp=3D0x3fffea0fc920) at block.c:1153
-  #2  0x0000000010010480 in bdrv_open_common (bs=3D0x1fe86f60, file=3D0x1fe=
-92540, options=3D0x1fe8c240, errp=3D0x3fffea0fc920) at block.c:1395
-  #3  0x0000000010013ac8 in bdrv_open_inherit (filename=3D0x3fffea0ff661 "c=
-opy.img", reference=3D0x0, options=3D0x1fe8c240, flags=3D24578, parent=3D0x=
-0, child_role=3D0x0,
-      errp=3D0x3fffea0fcae0) at block.c:2616
-  #4  0x0000000010013e8c in bdrv_open (filename=3D0x3fffea0ff661 "copy.img"=
-, reference=3D0x0, options=3D0x0, flags=3D16386, errp=3D0x3fffea0fcae0) at =
-block.c:2698
-  #5  0x000000001008b6d4 in blk_new_open (filename=3D0x3fffea0ff661 "copy.i=
-mg", reference=3D0x0, options=3D0x0, flags=3D16386, errp=3D0x3fffea0fcae0)
-      at block/block-backend.c:321
-  #6  0x000000001000a6ec in openfile (name=3D0x3fffea0ff661 "copy.img", fla=
-gs=3D16386, writethrough=3Dtrue, force_share=3Dfalse, opts=3D0x0) at qemu-i=
-o.c:81
-  #7  0x000000001000c040 in main (argc=3D4, argv=3D0x3fffea0fd208) at qemu-=
-io.c:624
+  #0  0x00000000100af254 in bdrv_co_pdiscard (bs=3D0x3ee89ad0, offset=3D196=
+608, bytes=3D9728) at block/io.c:2545
+  #1  0x000000001008f260 in blk_co_pdiscard (blk=3D0x3ee79410, offset=3D108=
+544, bytes=3D97792) at block/block-backend.c:1447
+  #2  0x0000000010090884 in blk_pdiscard_entry (opaque=3D0x3fffd7402c58) at=
+ block/block-backend.c:1851
+  #3  0x00000000101aa444 in coroutine_trampoline (i0=3D1055521728, i1=3D0) =
+at util/coroutine-ucontext.c:79
+  #4  0x00003fff7a3d2b9c in makecontext () from /lib64/libc.so.6
+  #5  0x0000000000000000 in ?? ()
   (gdb) bt full
-  #0  0x000000001000e444 in refresh_total_sectors (bs=3D0x1fe86f60, hint=3D=
-11648) at block.c:723
-          drv =3D 0x0
-  #1  0x000000001000fa10 in bdrv_open_driver (bs=3D0x1fe86f60, drv=3D0x1020=
-36f0 <bdrv_qcow2>, node_name=3D0x0, options=3D0x1fe8c240, open_flags=3D2457=
-8,
-      errp=3D0x3fffea0fc920) at block.c:1153
-          local_err =3D 0x0
+  #0  0x00000000100af254 in bdrv_co_pdiscard (bs=3D0x3ee89ad0, offset=3D196=
+608, bytes=3D9728) at block/io.c:2545
+          num =3D 9728
+          req =3D {bs =3D 0x3ee89ad0, offset =3D 108544, bytes =3D 97792, t=
+ype =3D BDRV_TRACKED_DISCARD, serialising =3D false, overlap_offset =3D 108=
+544,
+            overlap_bytes =3D 97792, list =3D {le_next =3D 0x0, le_prev =3D=
+ 0x3ee8cd48}, co =3D 0x3ee9fbc0, wait_queue =3D {entries =3D {sqh_first =3D=
+ 0x0,
+                sqh_last =3D 0x3fff7823fe10}}, waiting_for =3D 0x0}
+          max_pdiscard =3D 2147467264
           ret =3D 0
-          __PRETTY_FUNCTION__ =3D "bdrv_open_driver"
-          __func__ =3D "bdrv_open_driver"
-  #2  0x0000000010010480 in bdrv_open_common (bs=3D0x1fe86f60, file=3D0x1fe=
-92540, options=3D0x1fe8c240, errp=3D0x3fffea0fc920) at block.c:1395
-          ret =3D 16383
-          open_flags =3D 24578
-          filename =3D 0x1fe8e2b1 "copy.img"
-          driver_name =3D 0x1fe54810 "qcow2"
-          node_name =3D 0x0
-          discard =3D 0x0
-          detect_zeroes =3D 0x0
-          opts =3D 0x1fe93100
-          drv =3D 0x102036f0 <bdrv_qcow2>
-          local_err =3D 0x0
-          __PRETTY_FUNCTION__ =3D "bdrv_open_common"
-          __func__ =3D "bdrv_open_common"
-  #3  0x0000000010013ac8 in bdrv_open_inherit (filename=3D0x3fffea0ff661 "c=
-opy.img", reference=3D0x0, options=3D0x1fe8c240, flags=3D24578, parent=3D0x=
-0, child_role=3D0x0,
-      errp=3D0x3fffea0fcae0) at block.c:2616
-          ret =3D 512
-          file =3D 0x1fe92540
-          bs =3D 0x1fe86f60
-          drv =3D 0x102036f0 <bdrv_qcow2>
-          drvname =3D 0x0
-          backing =3D 0x0
-          local_err =3D 0x0
-          snapshot_options =3D 0x0
-          snapshot_flags =3D 0
-          __PRETTY_FUNCTION__ =3D "bdrv_open_inherit"
-          __func__ =3D "bdrv_open_inherit"
-  #4  0x0000000010013e8c in bdrv_open (filename=3D0x3fffea0ff661 "copy.img"=
-, reference=3D0x0, options=3D0x0, flags=3D16386, errp=3D0x3fffea0fcae0) at =
-block.c:2698
-  No locals.
-  #5  0x000000001008b6d4 in blk_new_open (filename=3D0x3fffea0ff661 "copy.i=
-mg", reference=3D0x0, options=3D0x0, flags=3D16386, errp=3D0x3fffea0fcae0)
-      at block/block-backend.c:321
-          blk =3D 0x1fe79410
-          bs =3D 0x0
-          perm =3D 3
-  #6  0x000000001000a6ec in openfile (name=3D0x3fffea0ff661 "copy.img", fla=
-gs=3D16386, writethrough=3Dtrue, force_share=3Dfalse, opts=3D0x0) at qemu-i=
-o.c:81
-          local_err =3D 0x0
-  #7  0x000000001000c040 in main (argc=3D4, argv=3D0x3fffea0fd208) at qemu-=
-io.c:624
-          readonly =3D 0
-          sopt =3D 0x101b2608 "hVc:d:f:rsnCmkt:T:U"
-          lopt =3D {{name =3D 0x101b26d0 "driver", has_arg =3D 0, flag =3D =
-0x0, val =3D 104}, {name =3D 0x101b26d8 "help", has_arg =3D 0, flag =3D 0x0=
-, val =3D 86}, {
-              name =3D 0x101b26e0 "version", has_arg =3D 1, flag =3D 0x0, v=
-al =3D 99}, {name =3D 0x101b26e8 "cmd", has_arg =3D 1, flag =3D 0x0, val =
-=3D 102}, {
-              name =3D 0x101b26f0 "format", has_arg =3D 0, flag =3D 0x0, va=
-l =3D 114}, {name =3D 0x101b2700 "y", has_arg =3D 0, flag =3D 0x0, val =3D =
-115}, {
-              name =3D 0x101b2710 "", has_arg =3D 0, flag =3D 0x0, val =3D =
-110}, {name =3D 0x101b2718 "nocache", has_arg =3D 0, flag =3D 0x0, val =3D =
-67}, {
-  ---Type <return> to continue, or q <return> to quit---
-              name =3D 0x101b2728 "read", has_arg =3D 0, flag =3D 0x0, val =
-=3D 109}, {name =3D 0x101b2738 "", has_arg =3D 0, flag =3D 0x0, val =3D 107=
-}, {
-              name =3D 0x101b2748 "io", has_arg =3D 1, flag =3D 0x0, val =
-=3D 100}, {name =3D 0x101b2750 "discard", has_arg =3D 1, flag =3D 0x0, val =
-=3D 116}, {
-              name =3D 0x101b2758 "cache", has_arg =3D 1, flag =3D 0x0, val=
- =3D 84}, {name =3D 0x101b25e8 "object", has_arg =3D 1, flag =3D 0x0, val =
-=3D 256}, {
-              name =3D 0x101b2760 "trace", has_arg =3D 0, flag =3D 0x0, val=
- =3D 257}, {name =3D 0x101b1c48 "force-share", has_arg =3D 0, flag =3D 0x0,=
- val =3D 85}, {name =3D 0x0,
-              has_arg =3D 0, flag =3D 0x0, val =3D 0}}
-          c =3D -1
-          opt_index =3D 0
-          flags =3D 16386
-          writethrough =3D true
-          local_error =3D 0x0
-          opts =3D 0x0
-          format =3D 0x0
-          trace_file =3D 0x0
-          force_share =3D false
-  (gdb)
-  (gdb) quit
-
-  Will attach image_fuzzer image.
+          head =3D 0
+          tail =3D 9728
+          align =3D 16384
+          __PRETTY_FUNCTION__ =3D "bdrv_co_pdiscard"
+  #1  0x000000001008f260 in blk_co_pdiscard (blk=3D0x3ee79410, offset=3D108=
+544, bytes=3D97792) at block/block-backend.c:1447
+          ret =3D 0
+  #2  0x0000000010090884 in blk_pdiscard_entry (opaque=3D0x3fffd7402c58) at=
+ block/block-backend.c:1851
+          rwco =3D 0x3fffd7402c58
+  #3  0x00000000101aa444 in coroutine_trampoline (i0=3D1055521728, i1=3D0) =
+at util/coroutine-ucontext.c:79
+          arg =3D {p =3D 0x3ee9fbc0, i =3D {1055521728, 0}}
+          self =3D 0x3ee9fbc0
+          co =3D 0x3ee9fbc0
+  #4  0x00003fff7a3d2b9c in makecontext () from /lib64/libc.so.6
+  No symbol table info available.
+  #5  0x0000000000000000 in ?? ()
+  No symbol table info available.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1728639/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1728660/+subscriptions
