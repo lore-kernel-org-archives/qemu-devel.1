@@ -1,30 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43087)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44737)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eAGia-00062e-B4
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 10:43:41 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1eAGpU-0000Gi-T1
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 10:50:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eAGiX-0005yh-6K
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 10:43:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56226)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eAGiX-0005xY-0h
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 10:43:37 -0400
-References: <20171031112457.10516.8971.stgit@pasha-VirtualBox>
-	<20171031112644.10516.1734.stgit@pasha-VirtualBox>
-	<a8979594-78e4-13dc-2958-f7b4444a1bb0@redhat.com>
-	<001501d353cd$29099010$7b1cb030$@ru>
-	<18ddcf7c-0198-a0ce-c2cc-992131512897@redhat.com>
-	<001801d353d8$77016da0$650448e0$@ru>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <2f57db92-25e0-362a-6130-dfa116fd43a2@redhat.com>
-Date: Thu, 2 Nov 2017 15:43:26 +0100
-MIME-Version: 1.0
-In-Reply-To: <001801d353d8$77016da0$650448e0$@ru>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH 19/26] cpu-exec: reset exit flag before
- calling cpu_exec_nocache
+	(envelope-from <pm215@archaic.org.uk>) id 1eAGpU-0005Bg-0N
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 10:50:48 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:38120)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1eAGpT-0005BH-P2
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 10:50:47 -0400
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu,  2 Nov 2017 14:51:13 +0000
+Message-Id: <1509634273-29111-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH] cpu-exec: Exit exclusive region on longjmp
+ from step_atomic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,23 +23,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <dovgaluk@ispras.ru>, 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, boost.lists@gmail.com, quintela@redhat.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, maria.klimushenkova@ispras.ru, kraxel@redhat.com, alex.bennee@linaro.org
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>, "Emilio G . Cota" <cota@braap.org>
 
-On 02/11/2017 13:45, Pavel Dovgalyuk wrote:
->> But if u16.high is -1, shouldn't you return EXCP_INTERRUPT first (via
->> "Finally, check if we need to exit to the main loop" in
->> cpu_handle_interrupt)?  Then only cause the exception when that one is
->> processed.
-> The case is the following.
-> 1. There are no pending instructions to execute, cpu_loop_exec_tb finished.
-> 2. There are no interrupts and cpu_handle_interrupt sets cpu->exception_index = EXCP_INTERRUPT
-> 3. There are no pending exceptions and cpu_handle_exception goes to the last branch,
->    because there is an exception flag in the log.
-> 4. cpu_exec_nocache translates the block and tries to execute it, causing an exception
-> 
+Commit ac03ee5331612e44be narrowed the scope of the exclusive
+region so it only covers when we're executing the TB, not when
+we're generating it. However it missed that there is more than
+one execution path out of cpu_tb_exec -- if the atomic insn
+causes an exception then the code will longjmp out, skipping
+the code to end the exclusive region. This causes QEMU to hang
+the next time the CPU calls start_exclusive(), waiting for
+itself to exit the region.
 
-Then the fix is indeed to clear u16.high in cpu_handle_interrupt instead
-of cpu_loop_exec_tb---see my other reply.
+Move the "end the region" code out to the end of the
+function so that it is run for both normal exit and also
+for exit-via-longjmp.
 
-Paolo
+(For some reason this only reproduces for me with a clang
+optimized build, not a gcc debug build.)
+
+Fixes: ac03ee5331612e44beb393df2b578c951d27dc0d
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ accel/tcg/cpu-exec.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
+index 4318441..ac316bb 100644
+--- a/accel/tcg/cpu-exec.c
++++ b/accel/tcg/cpu-exec.c
+@@ -256,9 +256,6 @@ void cpu_exec_step_atomic(CPUState *cpu)
+         trace_exec_tb(tb, pc);
+         cpu_tb_exec(cpu, tb);
+         cc->cpu_exec_exit(cpu);
+-        parallel_cpus = true;
+-
+-        end_exclusive();
+     } else {
+         /* We may have exited due to another problem here, so we need
+          * to reset any tb_locks we may have taken but didn't release.
+@@ -270,6 +267,9 @@ void cpu_exec_step_atomic(CPUState *cpu)
+ #endif
+         tb_lock_reset();
+     }
++
++    parallel_cpus = true;
++    end_exclusive();
+ }
+ 
+ struct tb_desc {
+-- 
+2.7.4
