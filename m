@@ -1,32 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53198)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56501)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eALHf-0000Mg-Jj
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 15:36:12 -0400
+	(envelope-from <cota@braap.org>) id 1eALY7-0003IA-IE
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 15:53:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eALHe-00070D-UG
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 15:36:11 -0400
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:52726)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eALHe-0006zw-NL
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 15:36:10 -0400
-Received: by mail-wm0-x244.google.com with SMTP id t139so1121506wmt.1
-	for <qemu-devel@nongnu.org>; Thu, 02 Nov 2017 12:36:10 -0700 (PDT)
+	(envelope-from <cota@braap.org>) id 1eALY6-0001fU-Li
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 15:53:11 -0400
+Date: Thu, 2 Nov 2017 15:53:03 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20171102195303.GA25452@flamenco>
+References: <20171025093535.10175-1-richard.henderson@linaro.org>
+	<4ab3bd81-925c-a281-614c-2cd87fce38b5@redhat.com>
+	<20171101203620.GA17963@flamenco>
+	<CAFEAcA-CX90dLbR8ypEidniFmORRZ8u7Pzc3fcaKJSeF9zTK1A@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <2251f54e-4c55-7495-8f60-af40cdd80594@redhat.com>
-References: <20171024230758.31779-1-riggle@google.com>
-	<20171025033442.44872-1-zachriggle@gmail.com>
-	<CAMP9c5=whCgR4qkOPDRKZ+adpWEPiVM=BwZp_r7qCAR7UAsWAQ@mail.gmail.com>
-	<20171027093600.GA29513@kos.to>
-	<CAMP9c5mm7icy06goXr3iiOEgqPbzyaWDt775+9+L=oxnqwRhpA@mail.gmail.com>
-	<CAMP9c5kTQmKd7GVE8DZzvY8tTtWV=tLsgV1ptWPKhEAh=J-maQ@mail.gmail.com>
-	<2251f54e-4c55-7495-8f60-af40cdd80594@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 2 Nov 2017 19:35:48 +0000
-Message-ID: <CAFEAcA-r-KxNDkHFJEdQDVnNXf4N-8zptjQK9a-uPixnSMsg+w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2] linux-user: fix is_proc_myself to check
- the paths via realpath
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA-CX90dLbR8ypEidniFmORRZ8u7Pzc3fcaKJSeF9zTK1A@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PULL 00/51] tcg queued patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,14 +25,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Zach Riggle <zachriggle@gmail.com>, Riku Voipio <riku.voipio@iki.fi>, QEMU Trivial <qemu-trivial@nongnu.org>, Laurent Vivier <laurent@vivier.eu>, "open list:All patches CC here" <qemu-devel@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Thomas Huth <thuth@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-On 28 October 2017 at 06:14, Eric Blake <eblake@redhat.com> wrote:
-> By definition, in linux-user, we ARE using glibc; therefore, you are
-> free to use all GNU extensions.
+On Thu, Nov 02, 2017 at 13:38:07 +0000, Peter Maydell wrote:
+> Maybe we should allow machine models to specify:
+>  * max_cpus (the most they can support; 1 if not set by board,
+>    as in current code)
+>  * min_cpus (the least they can support; 1 if not set by board)
+>  * default_cpus (what you get if you don't ask for something else;
+>    1 if not set by board)
+> 
+> Then:
+>  * these boards which always create a fixed number of CPUs
+>    should set all three to the same thing
+>  * boards which only create the CPUs requested by the user
+>    can leave them unset (as today)
+>  * the generic command line parsing code should stop with an
+>    error message if the user sets max_cpus smaller than
+>    the board's min_cpus setting or greater than the board's
+>    max_cpus, or if they set -smp to less than the board's
+>    min_cpus
 
-Don't we also support musl libc? I forget...
+Shouldn't we just print a warning (like we've been doing in some
+boards, e.g. nuri) and upgrade smp_cpus/max_cpus to whatever value?
+Changing this now could qualify as a regression.
 
-thanks
--- PMM
+Also, just noticed 4bd2f93 ("exynos4_boards: Silence lack
+of -smp 2 warning for qtest", 2013-11-05); I don't really know how
+"-smp 1" is built in qtest code, but doing as above breaks
+check-qtest-aarch64.
+
+		E.
