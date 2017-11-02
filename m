@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59985)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35107)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1eADFG-0005lA-2e
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 07:01:15 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1eADMh-0007Y4-Ts
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 07:08:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1eADFA-0005vU-J7
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 07:01:10 -0400
-Received: from fanzine.igalia.com ([91.117.99.155]:37895)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <berto@igalia.com>) id 1eADFA-0005Tn-8F
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 07:01:04 -0400
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <fc73cb3e-cc3a-2673-d57d-b08f3b04e6aa@huawei.com>
-References: <1506954812-6552-1-git-send-email-pradeep.jagadeesh@huawei.com>
-	<1506954812-6552-4-git-send-email-pradeep.jagadeesh@huawei.com>
-	<w51d15rjf4b.fsf@maestria.local.igalia.com>
-	<fc73cb3e-cc3a-2673-d57d-b08f3b04e6aa@huawei.com>
-Date: Thu, 02 Nov 2017 12:00:10 +0100
-Message-ID: <w51vaitvtc5.fsf@maestria.local.igalia.com>
+	(envelope-from <pbonzini@redhat.com>) id 1eADMd-0003GJ-LX
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 07:08:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58622)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eADMd-0003Fm-D3
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 07:08:47 -0400
+References: <20171031112457.10516.8971.stgit@pasha-VirtualBox>
+	<20171031112610.10516.78685.stgit@pasha-VirtualBox>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <84c5cdaf-4ec6-f05c-e1a2-3228517d491a@redhat.com>
+Date: Thu, 2 Nov 2017 12:08:32 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v13 3/6] qmp: factor out throttle code to
- reuse code
+In-Reply-To: <20171031112610.10516.78685.stgit@pasha-VirtualBox>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH 13/26] cpus: only take BQL for sleeping
+ threads
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,34 +29,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>, Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, eric blake <eblake@redhat.com>, greg kurz <groug@kaod.org>
-Cc: Markus Armbruster <armbru@redhat.com>, jani kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org
+To: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, boost.lists@gmail.com, quintela@redhat.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, kraxel@redhat.com, alex.bennee@linaro.org, David Hildenbrand <david@redhat.com>
 
-On Thu 02 Nov 2017 11:55:26 AM CET, Pradeep Jagadeesh wrote:
+On 31/10/2017 12:26, Pavel Dovgalyuk wrote:
+> From: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>=20
+> Now the only real need to hold the BQL is for when we sleep on the
+> cpu->halt conditional. The lock is actually dropped while the thread
+> sleeps so the actual window for contention is pretty small. This also
+> means we can remove the special case hack for exclusive work and
+> simply declare that work no longer has an implicit BQL held. This
+> isn't a major problem async work is generally only changing things in
+> the context of its own vCPU. If it needs to work across vCPUs it
+> should be using the exclusive mechanism or possibly taking the lock
+> itself.
+>=20
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Tested-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
 
->>> -    if (arg->has_iops_rd_max_length) {
->>> -        cfg.buckets[THROTTLE_OPS_READ].burst_length = arg->iops_rd_max_length;
->>> -    }
->>> -    if (arg->has_iops_wr_max_length) {
->>> -        cfg.buckets[THROTTLE_OPS_WRITE].burst_length = arg->iops_wr_max_length;
->>> -    }
->>> -
->>> -    if (arg->has_iops_size) {
->>> -        cfg.op_size = arg->iops_size;
->>> -    }
->>
->> The old code takes an empty ThrottleConfig, and initializes it using the
->> values from a BlockIOThrottle structure...
->>
->>> +    tlimit = qapi_BlockIOThrottle_base(arg);
->>> +    throttle_config_to_limits(&cfg, tlimit);
->>
->> ...but the new code does the exact opposite (?).
->
-> Its a mistake of a call. It should be throttle_limits_to_config()
-> I will change it.
+At least cpu_throttle_thread would fail with this patch.
 
-Thanks! It would be nice if the series had a few tests to verify that
-this all is working as expected :-)
+Also I am not sure if the s390 SIGP handlers are ready for this.
 
-Berto
+Paolo
+
+>=20
+> ---
+>  cpus-common.c |   13 +++++--------
+>  cpus.c        |   10 ++++------
+>  2 files changed, 9 insertions(+), 14 deletions(-)
+>=20
+> diff --git a/cpus-common.c b/cpus-common.c
+> index 59f751e..64661c3 100644
+> --- a/cpus-common.c
+> +++ b/cpus-common.c
+> @@ -310,6 +310,11 @@ void async_safe_run_on_cpu(CPUState *cpu, run_on_c=
+pu_func func,
+>      queue_work_on_cpu(cpu, wi);
+>  }
+> =20
+> +/* Work items run outside of the BQL. This is essential for avoiding a
+> + * deadlock for exclusive work but also applies to non-exclusive work.
+> + * If the work requires cross-vCPU changes then it should use the
+> + * exclusive mechanism.
+> + */
+>  void process_queued_cpu_work(CPUState *cpu)
+>  {
+>      struct qemu_work_item *wi;
+> @@ -327,17 +332,9 @@ void process_queued_cpu_work(CPUState *cpu)
+>          }
+>          qemu_mutex_unlock(&cpu->work_mutex);
+>          if (wi->exclusive) {
+> -            /* Running work items outside the BQL avoids the following=
+ deadlock:
+> -             * 1) start_exclusive() is called with the BQL taken while=
+ another
+> -             * CPU is running; 2) cpu_exec in the other CPU tries to t=
+akes the
+> -             * BQL, so it goes to sleep; start_exclusive() is sleeping=
+ too, so
+> -             * neither CPU can proceed.
+> -             */
+> -            qemu_mutex_unlock_iothread();
+>              start_exclusive();
+>              wi->func(cpu, wi->data);
+>              end_exclusive();
+> -            qemu_mutex_lock_iothread();
+>          } else {
+>              wi->func(cpu, wi->data);
+>          }
+> diff --git a/cpus.c b/cpus.c
+> index efde5c1..de6dfce 100644
+> --- a/cpus.c
+> +++ b/cpus.c
+> @@ -1127,31 +1127,29 @@ static bool qemu_tcg_should_sleep(CPUState *cpu=
+)
+> =20
+>  static void qemu_tcg_wait_io_event(CPUState *cpu)
+>  {
+> -    qemu_mutex_lock_iothread();
+> =20
+>      while (qemu_tcg_should_sleep(cpu)) {
+> +        qemu_mutex_lock_iothread();
+>          stop_tcg_kick_timer();
+>          qemu_cond_wait(cpu->halt_cond, &qemu_global_mutex);
+> +        qemu_mutex_unlock_iothread();
+>      }
+> =20
+>      start_tcg_kick_timer();
+> =20
+>      qemu_wait_io_event_common(cpu);
+> -
+> -    qemu_mutex_unlock_iothread();
+>  }
+> =20
+>  static void qemu_kvm_wait_io_event(CPUState *cpu)
+>  {
+> -    qemu_mutex_lock_iothread();
+> =20
+>      while (cpu_thread_is_idle(cpu)) {
+> +        qemu_mutex_lock_iothread();
+>          qemu_cond_wait(cpu->halt_cond, &qemu_global_mutex);
+> +        qemu_mutex_unlock_iothread();
+>      }
+> =20
+>      qemu_wait_io_event_common(cpu);
+> -
+> -    qemu_mutex_unlock_iothread();
+>  }
+> =20
+>  static void *qemu_kvm_cpu_thread_fn(void *arg)
+>=20
