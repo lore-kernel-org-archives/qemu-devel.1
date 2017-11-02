@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43892)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48138)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eADkg-0007LP-Hx
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 07:33:39 -0400
+	(envelope-from <rth7680@gmail.com>) id 1eADu9-0000r9-6X
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 07:43:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eADkb-0008Aq-2O
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 07:33:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36550)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eADka-000885-Sa
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 07:33:33 -0400
-References: <20171031112457.10516.8971.stgit@pasha-VirtualBox>
-	<20171031112644.10516.1734.stgit@pasha-VirtualBox>
-	<a8979594-78e4-13dc-2958-f7b4444a1bb0@redhat.com>
-	<001501d353cd$29099010$7b1cb030$@ru>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <18ddcf7c-0198-a0ce-c2cc-992131512897@redhat.com>
-Date: Thu, 2 Nov 2017 12:33:22 +0100
+	(envelope-from <rth7680@gmail.com>) id 1eADu5-0003QL-8n
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 07:43:25 -0400
+Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:51942)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1eADu5-0003Oq-2I
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 07:43:21 -0400
+Received: by mail-wm0-x236.google.com with SMTP id b9so10763759wmh.0
+	for <qemu-devel@nongnu.org>; Thu, 02 Nov 2017 04:43:20 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <201711021923504024201@zte.com.cn>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <1e17a8cf-e81e-91ba-5656-e8e2dfa3baea@twiddle.net>
+Date: Thu, 2 Nov 2017 12:43:16 +0100
 MIME-Version: 1.0
-In-Reply-To: <001501d353cd$29099010$7b1cb030$@ru>
+In-Reply-To: <201711021923504024201@zte.com.cn>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH 19/26] cpu-exec: reset exit flag before
- calling cpu_exec_nocache
+Subject: Re: [Qemu-devel] [PATCH] tcg/mips: make some functions inline.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,27 +30,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <dovgaluk@ispras.ru>, 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, boost.lists@gmail.com, quintela@redhat.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, maria.klimushenkova@ispras.ru, kraxel@redhat.com, alex.bennee@linaro.org
+To: jiang.biao2@zte.com.cn
+Cc: aurelien@aurel32.net, qemu-devel@nongnu.org, zhong.weidong@zte.com.cn
 
-On 02/11/2017 12:24, Pavel Dovgalyuk wrote:
->> I am not sure about this.  I think if instead you should return false
->> from here and EXCP_INTERRUPT from cpu_exec.
-> The problem is inside the TB. It checks cpu->icount_decr.u16.high which is -1.
-> And we have to enter the TB to cause an exception (because it exists in replay log).
-> That is why we reset this flag and try to execute the TB.
+On 11/02/2017 12:23 PM, jiang.biao2@zte.com.cn wrote:
+> No, :) Just found some of these functions are inline and others are not when reading 
+> the code, the style looks inconsistent. 
 
-But if u16.high is -1, shouldn't you return EXCP_INTERRUPT first (via
-"Finally, check if we need to exit to the main loop" in
-cpu_handle_interrupt)?  Then only cause the exception when that one is
-processed.
+My preference would be to remove them all.
 
-Paolo
+> Besides, The compiler may make default inline choices for some functions, but may 
+> not for some cases(some longer ones). Adding inline manually can guarantee and 
+> not hurt. :)
 
->> More important: there is still a race, because high can be set to -1
->> right after your atomic_set.
-> I'm not sure about it. But even the race exists, exec_nocache attempt will be repeated
-> after failed try.
-> 
-> Returning true is ok here, because we know that exception will happen (because it is
-> recorded in the log).
+The longer ones in particular should *not* be inline, so that we don't expand
+the size of the code unnecessarily.  Which *can* hurt.
+
+
+r~
