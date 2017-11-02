@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34497)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34770)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eAHtp-0002Ve-L8
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 11:59:22 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1eAHuv-0003Fi-As
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 12:00:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eAHto-0007uz-RH
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 11:59:21 -0400
-From: Max Reitz <mreitz@redhat.com>
-References: <20170929165347.29658-1-mreitz@redhat.com>
-	<20170929165347.29658-10-mreitz@redhat.com>
-	<w51h8ugk7zx.fsf@maestria.local.igalia.com>
-	<332bd2e4-6c1a-8d41-e204-776b29d42cfb@redhat.com>
-Message-ID: <b50479a1-c590-f882-e01c-a0b378218911@redhat.com>
-Date: Thu, 2 Nov 2017 16:59:07 +0100
+	(envelope-from <alex.bennee@linaro.org>) id 1eAHur-0000RO-CK
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 12:00:29 -0400
+Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:45008)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1eAHur-0000Qy-6Y
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 12:00:25 -0400
+Received: by mail-wr0-x244.google.com with SMTP id z55so22319wrz.1
+	for <qemu-devel@nongnu.org>; Thu, 02 Nov 2017 09:00:24 -0700 (PDT)
+References: <1509634273-29111-1-git-send-email-peter.maydell@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <1509634273-29111-1-git-send-email-peter.maydell@linaro.org>
+Date: Thu, 02 Nov 2017 16:00:22 +0000
+Message-ID: <87wp38hdrd.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <332bd2e4-6c1a-8d41-e204-776b29d42cfb@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="pO6rq2Aum31EjU1HHQuxFLPWR9bJaiWwA"
-Subject: Re: [Qemu-devel] [PATCH v6 09/25] block: Fix
- bdrv_find_backing_image()
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] cpu-exec: Exit exclusive region on longjmp
+ from step_atomic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,124 +30,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, John Snow <jsnow@redhat.com>
-
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---pO6rq2Aum31EjU1HHQuxFLPWR9bJaiWwA
-From: Max Reitz <mreitz@redhat.com>
-To: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- Eric Blake <eblake@redhat.com>, John Snow <jsnow@redhat.com>
-Message-ID: <b50479a1-c590-f882-e01c-a0b378218911@redhat.com>
-Subject: Re: [PATCH v6 09/25] block: Fix bdrv_find_backing_image()
-References: <20170929165347.29658-1-mreitz@redhat.com>
- <20170929165347.29658-10-mreitz@redhat.com>
- <w51h8ugk7zx.fsf@maestria.local.igalia.com>
- <332bd2e4-6c1a-8d41-e204-776b29d42cfb@redhat.com>
-In-Reply-To: <332bd2e4-6c1a-8d41-e204-776b29d42cfb@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 2017-11-02 16:45, Max Reitz wrote:
-> On 2017-10-30 15:47, Alberto Garcia wrote:
->> On Fri 29 Sep 2017 06:53:31 PM CEST, Max Reitz wrote:
->>> @@ -4096,22 +4086,31 @@ BlockDriverState *bdrv_find_backing_image(Blo=
-ckDriverState *bs,
->>>          } else {
->>>              /* If not an absolute filename path, make it relative to=
- the current
->>>               * image's filename path */
->>> -            path_combine_deprecated(filename_tmp, PATH_MAX, curr_bs-=
->filename,
->>> -                                    backing_file);
->>> +            filename_tmp =3D bdrv_make_absolute_filename(curr_bs, ba=
-cking_file,
->>> +                                                       NULL);
->>> +            if (!filename_tmp) {
->>> +                continue;
->>> +            }
->>> =20
->>>              /* We are going to compare absolute pathnames */
->>>              if (!realpath(filename_tmp, filename_full)) {
->>> +                g_free(filename_tmp);
->>>                  continue;
->>>              }
->>> +            g_free(filename_tmp);
->>
->> This feels a bit too verbose, doesn't it? (especially because you're
->> doing the same thing twice, see below). It could be made a bit shorter=
-,
->> something like:
->>
->>     bool have_filename =3D filename_tmp && realpath(filename_tmp, file=
-name_full);
->>     g_free(filename_tmp);
->>     if (!have_filename) {
->>          continue;
->>     }
->=20
-> Well, but then again
->=20
-> if (filename_tmp && realpath(filename_tmp, filename_full)) {
-
-(err, I mean ||, of course.)
-
->     g_free(filename_tmp);
->     continue;
-> }
-> g_free(filename_tmp);
->=20
-> has the same length. :-)
->=20
-> (Actually, overall it'd be one line shorter because I'd have to use an
-> own line for the "bool have_filename" declaration (to put it at the
-> start of the block).)
->=20
-> So I'll do that, yes.
->=20
-> Thanks for reviewing (and this suggestion)!
->=20
-> Max
->=20
->>
->>> -            path_combine_deprecated(filename_tmp, PATH_MAX, curr_bs-=
->filename,
->>> -                                    curr_bs->backing_file);
->>> +            filename_tmp =3D bdrv_get_full_backing_filename(curr_bs,=
- NULL);
->>> +            if (!filename_tmp) {
->>> +                continue;
->>> +            }
->>> =20
->>>              if (!realpath(filename_tmp, backing_file_full)) {
->>> +                g_free(filename_tmp);
->>>                  continue;
->>>              }
->>> +            g_free(filename_tmp);
->>
->> Berto
->>
->=20
->=20
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, "Emilio G . Cota" <cota@braap.org>
 
 
+Peter Maydell <peter.maydell@linaro.org> writes:
 
---pO6rq2Aum31EjU1HHQuxFLPWR9bJaiWwA
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+> Commit ac03ee5331612e44be narrowed the scope of the exclusive
+> region so it only covers when we're executing the TB, not when
+> we're generating it. However it missed that there is more than
+> one execution path out of cpu_tb_exec -- if the atomic insn
+> causes an exception then the code will longjmp out, skipping
+> the code to end the exclusive region. This causes QEMU to hang
+> the next time the CPU calls start_exclusive(), waiting for
+> itself to exit the region.
+>
+> Move the "end the region" code out to the end of the
+> function so that it is run for both normal exit and also
+> for exit-via-longjmp.
+>
+> (For some reason this only reproduces for me with a clang
+> optimized build, not a gcc debug build.)
+>
+> Fixes: ac03ee5331612e44beb393df2b578c951d27dc0d
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  accel/tcg/cpu-exec.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+>
+> diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
+> index 4318441..ac316bb 100644
+> --- a/accel/tcg/cpu-exec.c
+> +++ b/accel/tcg/cpu-exec.c
+> @@ -256,9 +256,6 @@ void cpu_exec_step_atomic(CPUState *cpu)
+>          trace_exec_tb(tb, pc);
+>          cpu_tb_exec(cpu, tb);
+>          cc->cpu_exec_exit(cpu);
+> -        parallel_cpus =3D true;
+> -
+> -        end_exclusive();
+>      } else {
+>          /* We may have exited due to another problem here, so we need
+>           * to reset any tb_locks we may have taken but didn't release.
+> @@ -270,6 +267,9 @@ void cpu_exec_step_atomic(CPUState *cpu)
+>  #endif
+>          tb_lock_reset();
+>      }
+> +
+> +    parallel_cpus =3D true;
+> +    end_exclusive();
 
------BEGIN PGP SIGNATURE-----
+We assume sigsetjmp can never fail - we either set the jump or are
+returning from a longjmp back. So we can never be in the position of
+having not been through start_exclusive?
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAln7QMsSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AvLcH/R99VWS0F4Vykvdb4lCqgo2iv+u9u3R+
-E2BhHiwu3xEFrWKOR3wMaAjlWwAsySJtwbhkmpHkeEHHOziEBYiMrkeNSnW8RPZp
-NOEVsQqkSWyg/445YSlBsjXI//EYg9HyEcaTDd6gaNVyYUI7qc+4/BZ8t0kmqswu
-G7OBi4KU0by8H4gUtFV526odT2R2manm5l5EHA5GaKkVhZGnkPeZ5A53cpmie9zT
-uNH57RsVwbp0Pt2WCKzOVKqOojSn9YkAFvl9Dt4VlazRr0cRs8JUV1ErFHrF+n2o
-3GPKw9IjTyU7vvbogYgEIhUOiLR9NzqzeZzefyN9L24258ZcDAhMIaI=
-=rvJR
------END PGP SIGNATURE-----
+What happens for example if we fault during translation?
 
---pO6rq2Aum31EjU1HHQuxFLPWR9bJaiWwA--
+--
+Alex Benn=C3=A9e
