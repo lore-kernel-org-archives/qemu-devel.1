@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37359)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40052)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eAJwL-0008E1-NI
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 14:10:06 -0400
+	(envelope-from <zachriggle@gmail.com>) id 1eAKCZ-00031F-CN
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 14:26:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eAJwG-0004S1-Nz
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 14:10:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56948)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eAJwG-0004R6-Hb
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 14:10:00 -0400
-References: <20171031152443.3670-1-michael.nawrocki@gtri.gatech.edu>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <8dbe8e3a-f8d4-3fb0-2ac8-e200ebde3dcb@redhat.com>
-Date: Thu, 2 Nov 2017 19:09:54 +0100
+	(envelope-from <zachriggle@gmail.com>) id 1eAKCX-0006dd-SN
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 14:26:50 -0400
 MIME-Version: 1.0
-In-Reply-To: <20171031152443.3670-1-michael.nawrocki@gtri.gatech.edu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] Enable 8-byte wide MMIO for 16550 serial
- devices
+References: <20171024230758.31779-1-riggle@google.com>
+	<20171025033442.44872-1-zachriggle@gmail.com>
+	<CAMP9c5=whCgR4qkOPDRKZ+adpWEPiVM=BwZp_r7qCAR7UAsWAQ@mail.gmail.com>
+	<20171027093600.GA29513@kos.to>
+	<CAMP9c5mm7icy06goXr3iiOEgqPbzyaWDt775+9+L=oxnqwRhpA@mail.gmail.com>
+	<CAMP9c5kTQmKd7GVE8DZzvY8tTtWV=tLsgV1ptWPKhEAh=J-maQ@mail.gmail.com>
+	<2251f54e-4c55-7495-8f60-af40cdd80594@redhat.com>
+In-Reply-To: <2251f54e-4c55-7495-8f60-af40cdd80594@redhat.com>
+From: Zach Riggle <zachriggle@gmail.com>
+Date: Thu, 02 Nov 2017 18:26:35 +0000
+Message-ID: <CAMP9c5=3rpH_84w8sRNhdRufnu7sisiyu_U0Bz+cyqdpP=C2_A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2] linux-user: fix is_proc_myself to check
+ the paths via realpath
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,45 +28,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mike Nawrocki <michael.nawrocki@gtri.gatech.edu>, qemu-devel@nongnu.org
-Cc: mst@redhat.com
+To: Eric Blake <eblake@redhat.com>
+Cc: Riku Voipio <riku.voipio@iki.fi>, qemu-trivial@nongnu.org, Laurent Vivier <laurent@vivier.eu>, "open list:All patches CC here" <qemu-devel@nongnu.org>
 
-On 31/10/2017 16:24, Mike Nawrocki wrote:
-> 
-> diff --git a/hw/char/serial.c b/hw/char/serial.c
-> index 376bd2f240..c16c19a406 100644
-> --- a/hw/char/serial.c
-> +++ b/hw/char/serial.c
-> @@ -1005,7 +1005,7 @@ static void serial_mm_write(void *opaque, hwaddr addr,
->                              uint64_t value, unsigned size)
->  {
->      SerialState *s = opaque;
-> -    value &= ~0u >> (32 - (size * 8));
-> +    value &= ~((uint64_t)0) >> (64 - (size * 8));
->      serial_ioport_write(s, addr >> s->it_shift, value, 1);
->  }
+Ping. What changes do I need to make to land this?
+On Sat, Oct 28, 2017 at 12:49 AM Eric Blake <eblake@redhat.com> wrote:
 
-Couldn't this be simply "value &= 255"?  Otherwise looks good.
-
-Paolo
-
-> @@ -1014,16 +1014,22 @@ static const MemoryRegionOps serial_mm_ops[3] = {
->          .read = serial_mm_read,
->          .write = serial_mm_write,
->          .endianness = DEVICE_NATIVE_ENDIAN,
-> +        .valid.max_access_size = 8,
-> +        .impl.max_access_size = 8,
->      },
->      [DEVICE_LITTLE_ENDIAN] = {
->          .read = serial_mm_read,
->          .write = serial_mm_write,
->          .endianness = DEVICE_LITTLE_ENDIAN,
-> +        .valid.max_access_size = 8,
-> +        .impl.max_access_size = 8,
->      },
->      [DEVICE_BIG_ENDIAN] = {
->          .read = serial_mm_read,
->          .write = serial_mm_write,
->          .endianness = DEVICE_BIG_ENDIAN,
-> +        .valid.max_access_size = 8,
-> +        .impl.max_access_size = 8,
+> On 10/27/2017 09:07 PM, Zach Riggle wrote:
+> > Another case that may be more relevant for general QEMU use, is that the
+> > current code fails if the software under test has poor path-handling
+> code.
+> > For example, any of
+> >
+> > - //proc/self/maps
+> > - /proc//self/maps
+> > - /proc/self//maps
+> >
+> > Will all return the non-emulated results.  Those examples are just path
+> > canonicalization issues and could be resolved with e.g.
+> > canonicalize_file_name, but I'm not sure if QEMU allows GNU extensions --
+> > and realpath() is portable.
+>
+> By definition, in linux-user, we ARE using glibc; therefore, you are
+> free to use all GNU extensions.
+>
+> And you'd be surprised at how many non-glibc implementations of
+> realpath() are not POSIX-compliant, even though that is not relevant here.
+>
+> --
+> Eric Blake, Principal Software Engineer
+> Red Hat, Inc.           +1-919-301-3266
+> Virtualization:  qemu.org | libvirt.org
+>
+>
