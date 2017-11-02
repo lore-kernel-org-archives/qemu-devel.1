@@ -1,31 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50223)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53678)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1eANGC-0004bo-Nv
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 17:42:49 -0400
+	(envelope-from <eblake@redhat.com>) id 1eANdK-0008Rp-JJ
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 18:06:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1eANG9-0003Fv-Kn
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 17:42:48 -0400
-Received: from mail-io0-x242.google.com ([2607:f8b0:4001:c06::242]:50211)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
-	id 1eANG9-0003FF-FB
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 17:42:45 -0400
-Received: by mail-io0-x242.google.com with SMTP id 97so2152781iok.7
-	for <qemu-devel@nongnu.org>; Thu, 02 Nov 2017 14:42:45 -0700 (PDT)
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-From: Programmingkid <programmingkidx@gmail.com>
-In-Reply-To: <alpine.BSF.2.21.1711021700510.67752@zero.eik.bme.hu>
-Date: Thu, 2 Nov 2017 17:42:43 -0400
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <B1C61B38-D39D-4849-83AE-FA56D5F5B172@gmail.com>
-References: <20171005145557.5746-1-programmingkidx@gmail.com>
-	<20171005145557.5746-2-programmingkidx@gmail.com>
-	<CAFEAcA83iZs0T-rM24QZn1ttAsXjuWfsehW86kJBt52Up1p1Hw@mail.gmail.com>
-	<385E45E2-3BC6-4501-91B1-44CA43718947@gmail.com>
-	<alpine.BSF.2.21.1711021700510.67752@zero.eik.bme.hu>
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] ui/cocoa.m: move ungrab to
- ctrl-alt-g
+	(envelope-from <eblake@redhat.com>) id 1eANdJ-0004Ms-EJ
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 18:06:42 -0400
+References: <20170929165347.29658-1-mreitz@redhat.com>
+	<20170929165347.29658-17-mreitz@redhat.com>
+	<w51shdwwxpn.fsf@maestria.local.igalia.com>
+	<b28222f7-e360-a31b-dc24-798e2db7d089@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <c12f0934-d3a6-10e2-918f-7602518789ad@redhat.com>
+Date: Thu, 2 Nov 2017 17:06:28 -0500
+MIME-Version: 1.0
+In-Reply-To: <b28222f7-e360-a31b-dc24-798e2db7d089@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="s3uMNrn6isTcp76Gtlrr6nkmB9GgfR3pP"
+Subject: Re: [Qemu-devel] [PATCH v6 16/25] block: Add 'base-directory' BDS
+ option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,55 +27,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Max Reitz <mreitz@redhat.com>, Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--s3uMNrn6isTcp76Gtlrr6nkmB9GgfR3pP
+From: Eric Blake <eblake@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, Alberto Garcia <berto@igalia.com>,
+ qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ John Snow <jsnow@redhat.com>
+Message-ID: <c12f0934-d3a6-10e2-918f-7602518789ad@redhat.com>
+Subject: Re: [PATCH v6 16/25] block: Add 'base-directory' BDS option
+References: <20170929165347.29658-1-mreitz@redhat.com>
+ <20170929165347.29658-17-mreitz@redhat.com>
+ <w51shdwwxpn.fsf@maestria.local.igalia.com>
+ <b28222f7-e360-a31b-dc24-798e2db7d089@redhat.com>
+In-Reply-To: <b28222f7-e360-a31b-dc24-798e2db7d089@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> On Nov 2, 2017, at 12:06 PM, BALATON Zoltan <balaton@eik.bme.hu> =
-wrote:
+On 11/02/2017 11:07 AM, Max Reitz wrote:
+> On 2017-11-02 15:40, Alberto Garcia wrote:
+>> On Fri 29 Sep 2017 06:53:38 PM CEST, Max Reitz wrote:
+>>> Using this option, one can directly override what bdrv_dirname() will=
+
+>>> return. This is useful if one uses e.g. qcow2 on top of quorum (with
+>>> only protocol BDSs under the quorum BDS) and wants to be able to use
+>>> relative backing filenames.
+>>>
+>>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>>
+>> Who would be using this option in practice? I understand that manageme=
+nt
+>> tools should be using always absolute filenames, and this API doesn't
+>> seem so convenient for humans.
 >=20
-> On Thu, 2 Nov 2017, Programmingkid wrote:
->>> On Nov 2, 2017, at 5:10 AM, Peter Maydell <peter.maydell@linaro.org> =
-wrote:
->>>=20
->>> On 5 October 2017 at 15:55, John Arbuckle =
-<programmingkidx@gmail.com> wrote:
->>>> Currently the cocoa user interface relys on the user pushing =
-control-alt to ungrab the mouse. This is patch changes the key =
-combination to control-alt-g to be in line with the GTK user interface.
->>>>=20
->>>> signed-off-by: John Arbuckle <programmingkidx@gmail.com>
->>>> ---
->>>=20
->>>> +
->>>> +                    // release the mouse grab
->>>> +                    case Q_KEY_CODE_G:
->>>> +                        [self ungrabMouse];
->>>> +                        break;
->>>>                }
->>>=20
->>> Testing this I have found that it makes the grab key be
->>> "ctrl+alt+ the key labelled 'g'", even if in the
->>> OSX host keyboard mapping that key doesn't produce the
->>> letter 'g'. This is in contrast to for instance the menu
->>> accelerators which honour the host keyboard layout, and
->>> it's also not what the GTK UI does. So I think we need
->>> to fix that.
->>=20
->> I just realized that the cocoa interface does not consider the =
-keyboard layout. Switching from QWERTY to DVORK I still see the same =
-keys outputting the same characters in OpenBIOS. This is a separate =
-patch but sometime to take note.
->=20
-> Is it the cocoa interface or OpenBIOS?
+> Hmmm.  I seem to recall Eric liked it a couple of years ago when he was=
 
-It was with the cocoa interface.
+> still more on the libvirt side of things. :-)
 
-> In case you are using an emulated USB keyboard, the very simple driver =
-in OpenBIOS only has a US layout so this may be the reason (see =
-openbios/drivers/usbhid.c). I'm not sure about ADB keyboards but you may =
-want to try a few combinations to identify where the problem is before =
-looking for it in QEMU's cocoa interface.
+Ideally, libvirt should be using node names rather than filenames
+(whether absolute or relative); but I still think it could be something
+that turns out to be useful.
 
-It looks like there is no problem with sending keys to the guest. The =
-cocoa interface behaves as it should.=
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--s3uMNrn6isTcp76Gtlrr6nkmB9GgfR3pP
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAln7luQACgkQp6FrSiUn
+Q2rxzwf/QsNtOMJeoajFn/CyVDVDDLy8x35tyVzF8WR9omlwgWOVGCyuHEXLr866
+3uznHpMz6K009sxuDy2uOdsi8lzlWXta6WEfitqUFi90Aj7pV2fdHP27JeOmJdDH
+XaDmFtIRkplP4fpbsItII2pOBcclddhf0tAXBerV4ekuMWBQHNT2QFEoaREhGuAQ
+ZsRujsjg6ytD167GCy8KNY9pFCCN4amX8j1Pyp2kw+39uxq98GLYIvuVWgs6EmHc
+Rr/ztr7FqYsQtwSNHjeP45hssu5h7wZSRCyAXkRyzUoZnLDIWB9CJQiBqXhG0eXo
+pW2Wx5tX+XHlj+7C44x9HHzGgiomRg==
+=haoF
+-----END PGP SIGNATURE-----
+
+--s3uMNrn6isTcp76Gtlrr6nkmB9GgfR3pP--
