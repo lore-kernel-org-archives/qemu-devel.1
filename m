@@ -1,24 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53891)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54622)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1eAJ5k-0006wU-PJ
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 13:15:45 -0400
+	(envelope-from <lyan@suse.com>) id 1eAJ90-00080B-2S
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 13:19:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1eAJ5g-0002d9-1A
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 13:15:44 -0400
-Received: from out4-smtp.messagingengine.com ([66.111.4.28]:35375)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1eAJ5f-0002cm-RA
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 13:15:39 -0400
-Date: Thu, 2 Nov 2017 13:15:38 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20171102171538.GA9433@flamenco>
-References: <1509640536-32160-1-git-send-email-peter.maydell@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1509640536-32160-1-git-send-email-peter.maydell@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH v2] cpu-exec: Exit exclusive region on
- longjmp from step_atomic
+	(envelope-from <lyan@suse.com>) id 1eAJ8v-0006ib-Ok
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 13:19:05 -0400
+From: Liang Yan <lyan@suse.com>
+Date: Thu,  2 Nov 2017 13:18:46 -0400
+Message-Id: <20171102171846.21445-1-lyan@suse.com>
+Subject: [Qemu-devel] [PATCH v2] hw/display/xenfb: Simulate auto-repeat key
+ events
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,33 +18,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>
+To: sstabellini@kernel.org, anthony.perard@citrix.com, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org
 
-On Thu, Nov 02, 2017 at 16:35:36 +0000, Peter Maydell wrote:
-> Commit ac03ee5331612e44be narrowed the scope of the exclusive
-> region so it only covers when we're executing the TB, not when
-> we're generating it. However it missed that there is more than
-> one execution path out of cpu_tb_exec -- if the atomic insn
-> causes an exception then the code will longjmp out, skipping
-> the code to end the exclusive region. This causes QEMU to hang
-> the next time the CPU calls start_exclusive(), waiting for
-> itself to exit the region.
-> 
-> Move the "end the region" code out to the end of the
-> function so that it is run for both normal exit and also
-> for exit-via-longjmp. We have to use a volatile bool flag
-> to decide whether we need to end the region, because we
-> can longjump out of the codegen as well as the execution.
-> 
-> (For some reason this only reproduces for me with a clang
-> optimized build, not a gcc debug build.)
-> 
-> Fixes: ac03ee5331612e44beb393df2b578c951d27dc0d
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+New tigervnc changes the way to send long pressed key,
+from "down up down up ..." to "down down ... up", it only
+affects xen pv console mode. I send a patch to latest
+kernel side, but it may have a fix in qemu backend for
+back compatible becase guest VMs may use very old kernel.
+This patch inserts an up event after each regular key down
+event to simulate an auto-repeat key event for xen keyboard
+frontend driver.
 
-Reviewed-by: Emilio G. Cota <cota@braap.org>
+Signed-off-by: Liang Yan <lyan@suse.com>
+---
+v2:
+- exclude extended key
+- change log comment
 
-Good catch, thanks for the fix!
+ hw/display/xenfb.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-		E.
+diff --git a/hw/display/xenfb.c b/hw/display/xenfb.c
+index 8e2547ac05..1bc5b41ab7 100644
+--- a/hw/display/xenfb.c
++++ b/hw/display/xenfb.c
+@@ -292,6 +292,11 @@ static void xenfb_key_event(void *opaque, int scancode)
+     }
+     trace_xenfb_key_event(opaque, scancode2linux[scancode], down);
+     xenfb_send_key(xenfb, down, scancode2linux[scancode]);
++
++    /* insert an up event for regular down key event */
++    if (down && !xenfb->extended) {
++        xenfb_send_key(xenfb, 0, scancode2linux[scancode]);
++    }
+ }
+ 
+ /*
+-- 
+2.14.2
