@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48856)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50492)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tuxillo@quantumachine.net>) id 1eAInF-0008U6-Cb
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 12:56:38 -0400
+	(envelope-from <berrange@redhat.com>) id 1eAIvP-0001zv-FW
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 13:05:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tuxillo@quantumachine.net>) id 1eAInC-0000dX-BM
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 12:56:37 -0400
-Received: from mailrelay.quantumachine.net ([37.59.103.225]:47276)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tuxillo@quantumachine.net>) id 1eAInC-0000c3-1s
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 12:56:34 -0400
-Received: from mail.quantumachine.net (unknown [185.48.86.222])
-	by mailrelay.quantumachine.net (Postfix) with ESMTP id 726215D
-	for <qemu-devel@nongnu.org>; Thu,  2 Nov 2017 17:56:31 +0100 (CET)
-Date: Thu, 02 Nov 2017 16:56:29 +0000
-Message-ID: <20171102165629.Horde.3vL2RJXzulVHv5PiXG00Bz4@www.quantumachine.net>
-From: Antonio Huete =?utf-8?b?Smltw6luZXo=?= <tuxillo@quantumachine.net>
-Content-Type: text/plain; charset=utf-8; format=flowed; DelSp=Yes
+	(envelope-from <berrange@redhat.com>) id 1eAIvN-0005fE-IQ
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 13:05:03 -0400
+Date: Thu, 2 Nov 2017 17:04:48 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20171102170448.GX32533@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20171102120223.GI32533@redhat.com>
+	<20171102164028.lkl3cv52stkdiywj@eukaryote>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Subject: [Qemu-devel] [PATCH] sockets: Normalize test for addrinfo flag
- AI_V4MAPPED
+In-Reply-To: <20171102164028.lkl3cv52stkdiywj@eukaryote>
+Subject: Re: [Qemu-devel] [Qemu-block] RFC: use case for adding QMP,
+ block jobs & multiple exports to qemu-nbd ?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,126 +25,204 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Kashyap Chamarthy <kchamart@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, mbooth@redhat.com
 
- From 2b4d9d8cb617445af8f3b062f917dfea42dbdc27 Mon Sep 17 00:00:00 2001
-From: Antonio Huete Jimenez <tuxillo@quantumachine.net>
-Date: Thu, 2 Nov 2017 17:46:24 +0100
-Subject: [PATCH] sockets: Normalize test for addrinfo flag AI_V4MAPPED
+On Thu, Nov 02, 2017 at 05:40:28PM +0100, Kashyap Chamarthy wrote:
+> [Cc: Matt Booth from Nova upstream; so not snipping the email to retain
+> context for Matt.]
+> 
+> On Thu, Nov 02, 2017 at 12:02:23PM +0000, Daniel P. Berrange wrote:
+> > I've been thinking about a potential design/impl improvement for the way
+> > that OpenStack Nova handles disk images when booting virtual machines, and
+> > thinking if some enhancements to qemu-nbd could be beneficial...
+> 
+> Just read-through, very intereesting idea.  A couple of things inline.
+> 
+> > At a high level, OpenStack has a repository of disk images (Glance), and
+> > when we go to boot a VM, Nova copies the disk image out of the repository
+> > onto the local host's image cache. We doing this, Nova may also enlarge
+> > disk image (eg if the original image has 10GB size, it may do a qemu-img
+> > resize to 40GB). Nova then creates a qcow2 overlay with backing file
+> > pointing to its local cache. Multiple VMs can be booted in parallel each
+> > with their own overlay pointing to the same backing file
+> > 
+> > The problem with this approach is that VM startup is delayed while we copy
+> > the disk image from the glance repository to the local cache, and again
+> > while we do the image resize (though the latter is pretty quick really
+> > since its just changing metadata in the image and/or host filesystem)
+> > 
+> > One might suggest that we avoid the local disk copy and just point the
+> > VM directly at an NBD server running in the remote image repository, but
+> > this introduces a centralized point of failure. With the local disk copy
+> > VMs can safely continue running even if the image repository dies. Running
+> > from the local image cache can offer better performance too, particularly
+> > if having SSD storage. 
+> > 
+> > Conceptually what I want to start with is a 3 layer chain
+> > 
+> >    master-disk1.qcow2  (qemu-nbd)
+> >           |
+> >           |  (format=raw, proto=nbd)
+> > 	  |
+> >    cache-disk1.qcow2   (qemu-system-XXX)
+> >           |
+> >           |  (format=qcow2, proto=file)
+> > 	  |
+> >           +-  vm-a-disk1.qcow2   (qemu-system-XXX)
+> > 
+> > NB vm-?-disk.qcow2 sizes may different than the backing file.
+> > Sometimes OS disk images are built with a fairly small root filesystem
+> > size, and the guest OS will grow its root FS to fill the actual disk
+> > size allowed to the specific VM instance.
+> > 
+> > The cache-disk1.qcow2 is on each local virt host that needs disk1, and
+> > created when the first VM is launched. Further launched VMs can all use
+> > this same cached disk.  Now the cache-disk1.qcow2 is not useful as is,
+> > because it has no allocated clusters, so after its created we need to
+> > be able to stream content into it from master-disk1.qcow2, in parallel
+> > with the VM A booting off vm-a-disk1.qcow2
+> > 
+> > If there was only a single VM, this would be easy enough, because we
+> > can use drive-mirror monitor command to pull master-disk1.qcow2 data
+> > into cache-disk1.qcow2 and then remove the backing chain leaving just
+> > 
+> >    cache-disk1.qcow2   (qemu-system-XXX)
+> >           |
+> 
+> Just for my own understanding: in this hypothetical single VM diagram,
+> you denote a QEMU binary ("qemu-system-XXX") for 'cache-disk1.qcow2'
+> because it will be issuing 'drive-mirror' / 'blockdev-mirror' to the
+> 'qemu-nbd' that exported 'master-disk1.qcow2', and "un-chain"
+> post completion of 'mirror' job.  Yes?
 
-Signed-off-by: Antonio Huete Jimenez <tuxillo@quantumachine.net>
----
-  util/qemu-sockets.c | 54  
-+++++++++++++++++++++++++++++++++--------------------
-  1 file changed, 34 insertions(+), 20 deletions(-)
+In this diagram the same QEMU process has both cache-disk1.qcow2 and
+vm-a-disk1.qcow2 open - its just a regular backing file setup.
 
-diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
-index b47fb45885..ce35b6a998 100644
---- a/util/qemu-sockets.c
-+++ b/util/qemu-sockets.c
-@@ -44,7 +44,6 @@
-  # define AI_NUMERICSERV 0
-  #endif
+> 
+> > 	    |  (format=qcow2, proto=file)
+> >           |
+> >           +-  vm-a-disk1.qcow2  (qemu-system-XXX)
+> > 
+> > The problem is that many VMs are wanting to use cache-disk1.qcow2 as
+> > their disk's backing file, and only one process is permitted to be
+> > writing to disk backing file at any time.
+> 
+> Can you explain a bit more about how many VMs are trying to write to
+> write to the same backing file 'cache-disk1.qcow2'?  I'd assume it's
+> just the "immutable" local backing store (once the previous 'mirror' job
+> is completed), based on which Nova creates a qcow2 overlay for each
+> instance it boots.
 
--
-  static int inet_getport(struct addrinfo *e)
-  {
-      struct sockaddr_in *i4;
-@@ -149,6 +148,31 @@ int inet_ai_family_from_address(InetSocketAddress *addr,
-      return PF_UNSPEC;
-  }
+An arbitrary number of  vm-*-disk1.qcow2 files could exist all using
+the same cache-disk1.qcow2 image. Its only limited by how many VMs
+you can fit on the host. By definition you can only ever have a single
+process writing to a qcow2 file though, otherwise corruption will quickly
+follow.
 
-+static int
-+check_ai_v4mapped(const char *host, const char *port, struct addrinfo *ai,
-+               struct addrinfo *res)
-+{
-+    static int useV4Mapped = -1;
-+    int rc;
-+
-+    /* At least FreeBSD and OS-X 10.6 declare AI_V4MAPPED but
-+     * then don't implement it in their getaddrinfo().
-+     * Unconditionally deselect AI_V4MAPPED option upon
-+     * getaddrinfo() failure, the next call to it will have to
-+     * do the error handling.
-+     */
-+    if (atomic_read(&useV4Mapped) == -1) {
-+        rc = getaddrinfo(host, port, ai, &res);
-+        if (rc == 0 && (ai->ai_flags & AI_V4MAPPED)) {
-+            atomic_set(&useV4Mapped, 1);
-+        } else {
-+            atomic_set(&useV4Mapped, 0);
-+        }
-+    }
-+
-+    return useV4Mapped;
-+}
-+
-  static int create_fast_reuse_socket(struct addrinfo *e)
-  {
-      int slisten = qemu_socket(e->ai_family, e->ai_socktype, e->ai_protocol);
-@@ -378,14 +402,10 @@ static struct addrinfo  
-*inet_parse_connect_saddr(InetSocketAddress *saddr,
-      struct addrinfo ai, *res;
-      int rc;
-      Error *err = NULL;
--    static int useV4Mapped = 1;
+> When I pointed this e-mail of yours to Matt Booth on Freenode Nova IRC
+> channel, he said the intermediate image (cache-disk1.qcow2) is a COR
+> Copy-On-Read).  I realize what COR is -- everytime you read a cluster
+> from the backing file, you write that locally, to avoid reading it
+> again.
 
-      memset(&ai, 0, sizeof(ai));
+qcow2 doesn't give you COR, only COW. So every read request would have a miss
+in cache-disk1.qcow2 and thus have to be fetched from master-disk1.qcow2. The
+use of drive-mirror to pull master-disk1.qcow2 contents into cache-disk1.qcow
+makes up for the lack of COR by populating cache-disk1.qcow2 in the background.
 
--    ai.ai_flags = AI_CANONNAME | AI_ADDRCONFIG;
--    if (atomic_read(&useV4Mapped)) {
--        ai.ai_flags |= AI_V4MAPPED;
--    }
-+    ai.ai_flags = AI_CANONNAME | AI_ADDRCONFIG | AI_V4MAPPED;
-      ai.ai_family = inet_ai_family_from_address(saddr, &err);
-      ai.ai_socktype = SOCK_STREAM;
+> > So I can't use the drive-mirror
+> > in the QEMU processes to deal with this; all QEMU's must see their
+> > backing file in a consistent read-only state
+> > 
+> > I've been wondering if it is possible to add an extra layer of NBD to
+> > deal with this scenario. i.e. start off with:
+> > 
+> >    master-disk1.qcow2  (qemu-nbd)
+> >           |
+> >           |  (format=raw, proto=nbd)
+> > 	  |
+> >    cache-disk1.qcow2  (qemu-nbd)
+> >           |
+> >           |  (format=raw, proto=nbd)
+> > 	  |
+> >           +-  vm-a-disk1.qcow2  (qemu-system-XXX)
+> >           +-  vm-b-disk1.qcow2  (qemu-system-XXX)
+> >           +-  vm-c-disk1.qcow2  (qemu-system-XXX)
+> > 
+> > 
+> > In this model 'cache-disk1.qcow2' would be opened read-write by a
+> > qemu-nbd server process, but exported read-only to QEMU. qemu-nbd
+> > would then do a drive mirror to stream the contents of
+> > master-disk1.qcow2 into its cache-disk1.qcow2, concurrently with
+> > servicing read requests from many QEMU's vm-*-disk1.qcow2 files
+> > over NBD. When the drive mirror is complete we would again cut
+> > the backing file to give
+> > 
+> >    cache-disk1.qcow2  (qemu-nbd)
+> >           |
+> >           |  (format=raw, proto=nbd)
+> > 	  |
+> >           +-  vm-a-disk1.qcow2  (qemu-system-XXX)
+> >           +-  vm-b-disk1.qcow2  (qemu-system-XXX)
+> >           +-  vm-c-disk1.qcow2  (qemu-system-XXX)
+> > 
+> > Since qemu-nbd no longer needs write to cache-disk1.qcow2 at this point,
+> > we can further pivot all the QEMU servers to make vm-*-disk1.qcow2 use
+> > format=qcow2,proto=file, allowing the local qemu-nbd to close the disk
+> > image, and potentially exit (assuming it doesn't have other disks to
+> > service). This would leave
+> > 
+> >    cache-disk1.qcow2  (qemu-system-XXX)
+> >           |
+> >           |  (format=qcow2, proto=file)
+> > 	  |
+> >           +-  vm-a-disk1.qcow2  (qemu-system-XXX)
+> >           +-  vm-b-disk1.qcow2  (qemu-system-XXX)
+> >           +-  vm-c-disk1.qcow2  (qemu-system-XXX)
+> > 
+> > Conceptually QEMU has all the pieces neccessary to support this kind of
+> > approach to disk images, but they're not exposed by qemu-nbd as it has
+> > no QMP interface of its own.
+> > 
+> > Another more minor issue is that the disk image repository may have
+> > 1000's of images in it, and I don't want to be running 1000's of
+> > qemu-nbd instances. I'd like 1 server to export many disks. I could
+> > use iscsi in the disk image repository instead to deal with that, 
+> > only having the qemu-nbd processes running on the local virt host
+> > for the duration of populating cache-disks1.qcow2 from master-disk1.qcow2
+> > The iscsi server admin commands are pretty unplesant to use compared
+> > to QMP though, so its appealing to use NBD for everything.
+> > 
+> > After all that long background explanation, what I'm wondering is whether
+> > there is any interest / desire to extend qemu-nbd to have more advanced
+> > featureset than simply exporting a single disk image which must be listed
+> > at startup time.
+> > 
+> >  - Ability to start qemu-nbd up with no initial disk image connected
+> >  - Option to have a QMP interface to control qemu-nbd
+> >  - Commands to add / remove individual disk image exports
+> >  - Commands for doing the drive-mirror / backing file pivot
+> > 
+> > It feels like this wouldn't require significant new functionality in either
+> > QMP or block layer. It ought to be mostly a cache of taking existing QMP
+> > code and wiring it up in qemu-nbd, and only exposing a whitelisted subset
+> > of existing QMP commands related to block backends. 
+> > 
+> > One alternative approach to doing this would be to suggest that we should
+> > instead just spawn qemu-system-x86_64 with '--machine none' and use that
+> > as a replacement for qemu-nbd, since it already has a built-in NBD server
+> > which can do many exports at once and arbitrary block jobs.
+> > 
+> > I'm concerned that this could end up being a be a game of whack-a-mole
+> > though, constantly trying to cut out/down all the bits of system emulation
+> > in the machine emulators to get its resource overhead to match the low
+> > overhead of standalone qemu-nbd.
+> > 
 
-@@ -399,21 +419,11 @@ static struct addrinfo  
-*inet_parse_connect_saddr(InetSocketAddress *saddr,
-          return NULL;
-      }
-
--    /* lookup */
--    rc = getaddrinfo(saddr->host, saddr->port, &ai, &res);
--
--    /* At least FreeBSD and OS-X 10.6 declare AI_V4MAPPED but
--     * then don't implement it in their getaddrinfo(). Detect
--     * this and retry without the flag since that's preferrable
--     * to a fatal error
--     */
--    if (rc == EAI_BADFLAGS &&
--        (ai.ai_flags & AI_V4MAPPED)) {
--        atomic_set(&useV4Mapped, 0);
-+    if ((check_ai_v4mapped(saddr->host, saddr->port, &ai, res)) == 0) {
-          ai.ai_flags &= ~AI_V4MAPPED;
--        rc = getaddrinfo(saddr->host, saddr->port, &ai, &res);
-      }
--    if (rc != 0) {
-+
-+    if ((rc = getaddrinfo(saddr->host, saddr->port, &ai, &res)) != 0) {
-          error_setg(errp, "address resolution failed for %s:%s: %s",
-                     saddr->host, saddr->port, gai_strerror(rc));
-          return NULL;
-@@ -469,7 +479,7 @@ static int inet_dgram_saddr(InetSocketAddress *sraddr,
-
-      /* lookup peer addr */
-      memset(&ai,0, sizeof(ai));
--    ai.ai_flags = AI_CANONNAME | AI_V4MAPPED | AI_ADDRCONFIG;
-+    ai.ai_flags = AI_CANONNAME | AI_ADDRCONFIG | AI_V4MAPPED;
-      ai.ai_family = inet_ai_family_from_address(sraddr, &err);
-      ai.ai_socktype = SOCK_DGRAM;
-
-@@ -488,6 +498,10 @@ static int inet_dgram_saddr(InetSocketAddress *sraddr,
-          goto err;
-      }
-
-+    if ((check_ai_v4mapped(addr, port, &ai, &peer)) == 0) {
-+        ai.ai_flags &= ~AI_V4MAPPED;
-+    }
-+
-      if ((rc = getaddrinfo(addr, port, &ai, &peer)) != 0) {
-          error_setg(errp, "address resolution failed for %s:%s: %s",  
-addr, port,
-                     gai_strerror(rc));
+Regards,
+Daniel
 -- 
-2.14.1
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
