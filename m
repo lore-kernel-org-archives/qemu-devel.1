@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49416)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49415)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1eANCq-0002pa-Bt
+	(envelope-from <programmingkidx@gmail.com>) id 1eANCq-0002pZ-BW
 	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 17:39:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1eANCn-0008Vl-9M
+	(envelope-from <programmingkidx@gmail.com>) id 1eANCo-0008Vy-0L
 	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 17:39:20 -0400
-Received: from mail-io0-x241.google.com ([2607:f8b0:4001:c06::241]:53398)
+Received: from mail-io0-x241.google.com ([2607:f8b0:4001:c06::241]:53239)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
-	id 1eANCn-0008Vb-3p
+	id 1eANCn-0008Vq-S0
 	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 17:39:17 -0400
-Received: by mail-io0-x241.google.com with SMTP id 189so2106536iow.10
+Received: by mail-io0-x241.google.com with SMTP id f20so2124721ioj.9
 	for <qemu-devel@nongnu.org>; Thu, 02 Nov 2017 14:39:17 -0700 (PDT)
 From: John Arbuckle <programmingkidx@gmail.com>
-Date: Thu,  2 Nov 2017 17:39:06 -0400
-Message-Id: <20171102213907.11443-1-programmingkidx@gmail.com>
-Subject: [Qemu-devel] [PATCH v3 1/2] ui/cocoa.m: move ungrab to ctrl-alt-g
+Date: Thu,  2 Nov 2017 17:39:07 -0400
+Message-Id: <20171102213907.11443-2-programmingkidx@gmail.com>
+In-Reply-To: <20171102213907.11443-1-programmingkidx@gmail.com>
+References: <20171102213907.11443-1-programmingkidx@gmail.com>
+Subject: [Qemu-devel] [PATCH v3 2/2] ui/cocoa.m: send ctrl-alt key
+ combinations to guest if not used by QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,73 +30,72 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org, qemu-devel@nongnu.org
 Cc: John Arbuckle <programmingkidx@gmail.com>
 
-Currently the cocoa user interface relys on the user pushing control-alt to ungrab the mouse. This is patch changes the key combination to control-alt-g to be in line with the GTK user interface. 
+Send control-alt key combinations to the guest if not used by the user interface.
 
 Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
 ---
-v3 changes
-- Code is now keyboard layout aware.
+v3 changes:
+- Code is now keyboard layout aware
 
- ui/cocoa.m | 31 ++++++++++++++++++-------------
- 1 file changed, 18 insertions(+), 13 deletions(-)
+v2 changes:
+- changed logic to use existing if case
+
+ ui/cocoa.m | 41 ++++++++++++++++++++---------------------
+ 1 file changed, 20 insertions(+), 21 deletions(-)
 
 diff --git a/ui/cocoa.m b/ui/cocoa.m
-index 2794f60b27..e06aa9c65f 100644
+index e06aa9c65f..030479f4cd 100644
 --- a/ui/cocoa.m
 +++ b/ui/cocoa.m
-@@ -609,10 +609,6 @@ - (void) handleEvent:(NSEvent *)event
-                 }
+@@ -619,29 +619,28 @@ - (void) handleEvent:(NSEvent *)event
+                 return;
              }
  
--            // release Mouse grab when pressing ctrl+alt
--            if (([event modifierFlags] & NSEventModifierFlagControl) && ([event modifierFlags] & NSEventModifierFlagOption)) {
--                [self ungrabMouse];
--            }
-             break;
-         case NSEventTypeKeyDown:
-             keycode = cocoa_keycode_to_qemu([event keyCode]);
-@@ -625,14 +621,23 @@ - (void) handleEvent:(NSEvent *)event
- 
-             // default
- 
--            // handle control + alt Key Combos (ctrl+alt is reserved for QEMU)
-+            // handle control + alt Key Combos (ctrl+alt+[1..9,g] is reserved for QEMU)
-             if (([event modifierFlags] & NSEventModifierFlagControl) && ([event modifierFlags] & NSEventModifierFlagOption)) {
--                switch (keycode) {
+-            // default
 -
--                    // enable graphic console
--                    case Q_KEY_CODE_1 ... Q_KEY_CODE_9: // '1' to '9' keys
--                        console_select(keycode - Q_KEY_CODE_1);
--                        break;
-+                NSString *keychar = [event charactersIgnoringModifiers];
-+                if ([keychar length] == 1) {
-+                    char key = [keychar characterAtIndex:0];
-+                    switch (key) {
+-            // handle control + alt Key Combos (ctrl+alt+[1..9,g] is reserved for QEMU)
+-            if (([event modifierFlags] & NSEventModifierFlagControl) && ([event modifierFlags] & NSEventModifierFlagOption)) {
++            // console selection
++            if (([event modifierFlags] & NSEventModifierFlagControl) &&
++                ([event modifierFlags] & NSEventModifierFlagOption) &&
++                ([[event charactersIgnoringModifiers] length] == 1) &&
++                (isdigit([[event charactersIgnoringModifiers] characterAtIndex: 0]))) {
+                 NSString *keychar = [event charactersIgnoringModifiers];
+-                if ([keychar length] == 1) {
+-                    char key = [keychar characterAtIndex:0];
+-                    switch (key) {
+-
+-                        // enable graphic console
+-                        case '1' ... '9':
+-                            console_select(key - '0' - 1); /* ascii math */
+-                            return;
+-
+-                        // release the mouse grab
+-                        case 'g':
+-                            [self ungrabMouse];
+-                            return;
+-                    }
+-                }
++                char key = [keychar characterAtIndex:0];
++                console_select(key - '0' - 1); /* ascii math */
++                return;
++            }
 +
-+                        // enable graphic console
-+                        case '1' ... '9':
-+                            console_select(key - '0' - 1); /* ascii math */
-+                            return;
-+
-+                        // release the mouse grab
-+                        case 'g':
-+                            [self ungrabMouse];
-+                            return;
-+                    }
-                 }
++            // mouse ungrab
++            else if (([event modifierFlags] & NSEventModifierFlagControl) &&
++                     ([event modifierFlags] & NSEventModifierFlagOption) &&
++                     ([[event charactersIgnoringModifiers] length] == 1) &&
++                     ([[event charactersIgnoringModifiers] characterAtIndex: 0] == 'g')) {
++                [self ungrabMouse];
++                return;
++            }
  
-             // handle keys for graphic console
-@@ -806,9 +811,9 @@ - (void) grabMouse
+-            // handle keys for graphic console
+-            } else if (qemu_console_is_graphic(NULL)) {
++            // send to guest
++            else if (qemu_console_is_graphic(NULL)) {
+                 qemu_input_event_send_key_qcode(dcl->con, keycode, true);
  
-     if (!isFullscreen) {
-         if (qemu_name)
--            [normalWindow setTitle:[NSString stringWithFormat:@"QEMU %s - (Press ctrl + alt to release Mouse)", qemu_name]];
-+            [normalWindow setTitle:[NSString stringWithFormat:@"QEMU %s - (Press ctrl + alt + g to release Mouse)", qemu_name]];
-         else
--            [normalWindow setTitle:@"QEMU - (Press ctrl + alt to release Mouse)"];
-+            [normalWindow setTitle:@"QEMU - (Press ctrl + alt + g to release Mouse)"];
-     }
-     [self hideCursor];
-     if (!isAbsoluteEnabled) {
+             // handlekeys for Monitor
 -- 
 2.13.5 (Apple Git-94)
