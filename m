@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52673)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52773)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eAJ2D-0005Tb-Gn
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 13:12:06 -0400
+	(envelope-from <makovick@gmail.com>) id 1eAJ2V-0005dm-1V
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 13:12:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eAJ28-0004Nq-Fx
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 13:12:05 -0400
-Received: from indium.canonical.com ([91.189.90.7]:40814)
+	(envelope-from <makovick@gmail.com>) id 1eAJ2U-00051A-4q
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 13:12:23 -0400
+Received: from mail-qt0-x232.google.com ([2607:f8b0:400d:c0d::232]:46186)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eAJ28-0004Eu-AJ
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 13:12:00 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eAJ24-0001pr-LU
-	for <qemu-devel@nongnu.org>; Thu, 02 Nov 2017 17:11:56 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id B78672E81D5
-	for <qemu-devel@nongnu.org>; Thu,  2 Nov 2017 17:11:51 +0000 (UTC)
+	(Exim 4.71) (envelope-from <makovick@gmail.com>) id 1eAJ2U-000503-0t
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 13:12:22 -0400
+Received: by mail-qt0-x232.google.com with SMTP id 1so283726qtn.3
+	for <qemu-devel@nongnu.org>; Thu, 02 Nov 2017 10:12:22 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+References: <20171023210803.20998-1-makovick@gmail.com>
+	<20171023210803.20998-5-makovick@gmail.com>
+	<1509532830.3856.7.camel@redhat.com>
+In-Reply-To: <1509532830.3856.7.camel@redhat.com>
+From: =?UTF-8?B?SmluZMWZaWNoIE1ha292acSNa2E=?= <makovick@gmail.com>
+Date: Thu, 02 Nov 2017 17:12:11 +0000
+Message-ID: <CAHmvugcYmaujAYGwpb+ObistFr522W1XsuV-6jUgi543VgfvTA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 02 Nov 2017 16:56:27 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1725267 <1725267@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150850189101.17148.14929440782690831821.malonedeb@wampee.canonical.com>
-Message-Id: <150964178737.20484.1385855904492714103.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1725267] Re: armeb regression since qemu version
- 2.8
+Subject: Re: [Qemu-devel] [PATCH 4/7] sdl2: Only accept the hotkeys on the
+ main window
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,65 +31,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-https://lists.gnu.org/archive/html/qemu-devel/2017-11/msg00155.html
-should fix this bug.
+This fixes the following case:
+
+1) Ctrl-Alt-2 for console is pressed
+2) console pops up and gets focus
+3) console receives the Ctrl-Alt-2 keypress event
+4) console closes
+5) focus returns to the main window
+6) main window gets the keypress event
+7) goto 2 until the key is released, with 50% chance that the console
+window is shown at the end
 
 
-** Changed in: qemu
-       Status: New =3D> Incomplete
+On Wed, Nov 1, 2017 at 11:40 AM Gerd Hoffmann <kraxel@redhat.com> wrote:
 
-** Changed in: qemu
-       Status: Incomplete =3D> In Progress
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1725267
-
-Title:
-  armeb regression since qemu version 2.8
-
-Status in QEMU:
-  In Progress
-
-Bug description:
-  Hi,
-
-  I have noticed a regression when I upgraded from qemu-armeb 2.7 to
-  2.8, and the problem is still present with version 2.10.1.
-
-  I am using qemu for GCC validation, noticed problems with testcases
-  involving atomics, I'm attaching here atomic-exchange-4.exe.
-
-  # with 2.7:
-  $ qemu-armeb -cpu any -R 0 -L $PWD -E LD_LIBRARY_PATH=3D$PWD/lib $PWD/ato=
-mic-exchange-4.exe
-  $ echo $?
-  0
-  # with 2.8, 2.10.1:
-  $ qemu-armeb -cpu any -R 0 -L $PWD -E LD_LIBRARY_PATH=3D$PWD/lib $PWD/ato=
-mic-exchange-4.exe
-  qemu: uncaught target signal 6 (Aborted) - core dumped
-  Aborted (core dumped)
-  $ echo $?
-  134
-
-  The source code is gcc/testsuite/gcc.dg/atomic-exchange-4.c
-
-  Running with -d in_asm shows a difference early in the startup code:
-  IN: _dl_sysdep_start
-  [...]
-  0x40a17790:  908ff103      addls	pc, pc, r3, lsl #2
-
-  and then the next address is not the same with qemu 2.7 and 2.10.1
-
-  I hope you have enough data/information to reproduce and confirm/fix
-  the problem.
-
-  Thanks
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1725267/+subscriptions
+> Why?
+>
+> > ---
+> >  ui/sdl2.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/ui/sdl2.c b/ui/sdl2.c
+> > index 685e4fabec..fa54353430 100644
+> > --- a/ui/sdl2.c
+> > +++ b/ui/sdl2.c
+> > @@ -349,7 +349,7 @@ static void handle_keydown(SDL_Event *ev)
+> >      }
+> >      gui_key_modifier_pressed =3D mod_state;
+> >
+> > -    if (gui_key_modifier_pressed) {
+> > +    if (gui_key_modifier_pressed && !ev->key.repeat &&
+> > qemu_console_is_graphic(scon->dcl.con)) {
+> >          switch (ev->key.keysym.scancode) {
+> >          case SDL_SCANCODE_2:
+> >          case SDL_SCANCODE_3:
+>
+--=20
+Jind=C5=99ich Makovi=C4=8Dka
