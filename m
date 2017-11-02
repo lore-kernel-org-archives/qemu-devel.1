@@ -1,28 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48290)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49347)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eADud-00018c-4n
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 07:43:56 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1eADxK-0002EW-EK
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 07:46:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eADuZ-00049q-73
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 07:43:55 -0400
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:54486)
+	(envelope-from <pbonzini@redhat.com>) id 1eADxH-0007Sm-Ac
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 07:46:42 -0400
+Received: from mail-wr0-f196.google.com ([209.85.128.196]:51361)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1eADuZ-00048X-10
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 07:43:51 -0400
-Received: by mail-wm0-x243.google.com with SMTP id r68so10732153wmr.3
-	for <qemu-devel@nongnu.org>; Thu, 02 Nov 2017 04:43:50 -0700 (PDT)
-References: <1509622400-13351-1-git-send-email-peter.maydell@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <aa20fe35-6c76-3194-d633-cae8d2a6116f@linaro.org>
-Date: Thu, 2 Nov 2017 12:43:46 +0100
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eADxH-0007QM-3Y
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 07:46:39 -0400
+Received: by mail-wr0-f196.google.com with SMTP id j15so4718730wre.8
+	for <qemu-devel@nongnu.org>; Thu, 02 Nov 2017 04:46:38 -0700 (PDT)
+From: Paolo Bonzini <pbonzini@redhat.com>
+References: <20171031112457.10516.8971.stgit@pasha-VirtualBox>
+	<20171031112644.10516.1734.stgit@pasha-VirtualBox>
+	<a8979594-78e4-13dc-2958-f7b4444a1bb0@redhat.com>
+	<001501d353cd$29099010$7b1cb030$@ru>
+	<18ddcf7c-0198-a0ce-c2cc-992131512897@redhat.com>
+Message-ID: <fbda6d5e-aee1-ec74-faf4-e2dde0003588@redhat.com>
+Date: Thu, 2 Nov 2017 12:46:35 +0100
 MIME-Version: 1.0
-In-Reply-To: <1509622400-13351-1-git-send-email-peter.maydell@linaro.org>
+In-Reply-To: <18ddcf7c-0198-a0ce-c2cc-992131512897@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] translate.c: Fix usermode big-endian
- AArch32 LDREXD and STREXD
+Subject: Re: [Qemu-devel] [RFC PATCH 19/26] cpu-exec: reset exit flag before
+ calling cpu_exec_nocache
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,35 +34,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org, christophe.lyon@linaro.org
+To: Pavel Dovgalyuk <dovgaluk@ispras.ru>, 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, mst@redhat.com, jasowang@redhat.com, quintela@redhat.com, zuban32s@gmail.com, maria.klimushenkova@ispras.ru, kraxel@redhat.com, boost.lists@gmail.com, alex.bennee@linaro.org
 
-On 11/02/2017 12:33 PM, Peter Maydell wrote:
-> For AArch32 LDREXD and STREXD, architecturally the 32-bit word at the
-> lowest address is always Rt and the one at addr+4 is Rt2, even if the
-> CPU is big-endian. Our implementation does these with a single
-> 64-bit store, so if we're big-endian then we need to put the two
-> 32-bit halves together in the opposite order to little-endian,
-> so that they end up in the right places. We were trying to do
-> this with the gen_aa32_frob64() function, but that is not correct
-> for the usermode emulator, because there there is a distinction
-> between "load a 64 bit value" (which does a BE 64-bit access
-> and doesn't need swapping) and "load two 32 bit values as one
-> 64 bit access" (where we still need to do the swapping, like
-> system mode BE32).
+On 02/11/2017 12:33, Paolo Bonzini wrote:
+> On 02/11/2017 12:24, Pavel Dovgalyuk wrote:
+>>> I am not sure about this.  I think if instead you should return false
+>>> from here and EXCP_INTERRUPT from cpu_exec.
+>> The problem is inside the TB. It checks cpu->icount_decr.u16.high which is -1.
+>> And we have to enter the TB to cause an exception (because it exists in replay log).
+>> That is why we reset this flag and try to execute the TB.
 > 
-> Fixes: https://bugs.launchpad.net/qemu/+bug/1725267
-> Cc: qemu-stable@nongnu.org
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
-> Changes v1->v2:
->  * use correct "s->be_data == MO_BE" check for bigendian
->  * don't mangle the data from the atomic-cmpxchg before
->    comparing against expected value
->  * tcg_temp_free() the TCGv from gen_aa32_addr()
->  * name that TCGv "taddr" rather than "a"...
+> But if u16.high is -1, shouldn't you return EXCP_INTERRUPT first (via
+> "Finally, check if we need to exit to the main loop" in
+> cpu_handle_interrupt)?  Then only cause the exception when that one is
+> processed.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+... indeed, you probably need something like:
 
+    /* Clear the interrupt flag now since we're processing
+     * cpu->interrupt_request and cpu->exit_request.
+     */
+    insns_left = atomic_read(&cpu->icount_decr.u32);
+    atomic_set(&cpu->icount_decr.u16.high, 0);
+    if (unlikely(insns_left < 0) {
+        /* Ensure the zeroing of icount_decr comes before the next read
+         * of cpu->exit_request or cpu->interrupt_request.
+         */
+        smb_mb();
+    }
 
-r~
+at the top of cpu_handle_interrupt.  Then you can remove the same
+atomic_set+smp_mb in cpu_loop_exec_tb, like
+
+    *last_tb = NULL;
+    insns_left = atomic_read(&cpu->icount_decr.u32);
+    if (insns_left < 0) {
+        /* Something asked us to stop executing chained TBs; just
+         * continue round the main loop. Whatever requested the exit
+         * will also have set something else (eg exit_request or
+         * interrupt_request) which will be handled by
+         * cpu_handle_interrupt.  cpu_handle_interrupt will also
+         * clear cpu->icount_decr.u16.high.
+         */
+        return;
+    }
+
+Thanks,
+
+Paolo
