@@ -1,43 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37366)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47907)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <xiaoguangrong.eric@gmail.com>) id 1eABD0-0004GP-1L
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 04:50:43 -0400
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1eABWB-0007rx-Af
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 05:10:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <xiaoguangrong.eric@gmail.com>) id 1eABCv-0008AQ-3T
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 04:50:42 -0400
-Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:51545)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <xiaoguangrong.eric@gmail.com>)
-	id 1eABCu-00087L-RG
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 04:50:37 -0400
-Received: by mail-pg0-x243.google.com with SMTP id p9so4469698pgc.8
-	for <qemu-devel@nongnu.org>; Thu, 02 Nov 2017 01:50:36 -0700 (PDT)
-References: <1455443283.33337333.1500618150787.JavaMail.zimbra@redhat.com>
-	<1157879323.33809400.1500897967669.JavaMail.zimbra@redhat.com>
-	<20170724123752.GN652@quack2.suse.cz>
-	<1888117852.34216619.1500992835767.JavaMail.zimbra@redhat.com>
-	<CAPcyv4in28F3FOVKp9abvrggxPuXdbGynF5=ZvBXCrywoa06JA@mail.gmail.com>
-	<1501016375.26846.21.camel@redhat.com>
-	<1063764405.34607875.1501076841865.JavaMail.zimbra@redhat.com>
-	<1501104453.26846.45.camel@redhat.com>
-	<CAPcyv4hsqrqBxoipUHPAbSctuzbVWCRnT-gN08i9uhXTWY6iPQ@mail.gmail.com>
-	<1501112787.4073.49.camel@redhat.com>
-	<CAPcyv4gbC6Hx_4YsCfOd2t=fn=wPGp5h__1QH=-p40TPFNbFzA@mail.gmail.com>
-	<0a26793f-86f7-29e7-f61b-dc4c1ef08c8e@gmail.com>
-	<CAPcyv4iw2cCpDmr+4kxsFvdy+iGZiz=ok-kLhsDKpqDy+szf-Q@mail.gmail.com>
-	<378b10f3-b32f-84f5-2bbc-50c2ec5bcdd4@gmail.com>
-	<CAPcyv4jR_LdbsX-rAsHC7++C6d-WYC084uWXzr+08PSYwoXFMw@mail.gmail.com>
-	<ca6aaa77-cca0-441e-be49-73133d8581cf@gmail.com>
-	<CAPcyv4gKzvd39WbnKjbs3Bn9+o1tt=vz90CYMFu0DF5PsfHUig@mail.gmail.com>
-From: Xiao Guangrong <xiaoguangrong.eric@gmail.com>
-Message-ID: <86754966-281f-c3ed-938c-f009440de563@gmail.com>
-Date: Thu, 2 Nov 2017 16:50:54 +0800
-MIME-Version: 1.0
-In-Reply-To: <CAPcyv4gKzvd39WbnKjbs3Bn9+o1tt=vz90CYMFu0DF5PsfHUig@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] KVM "fake DAX" flushing interface - discussion
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1eABW6-0000Gn-Rj
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 05:10:31 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:56196
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
+	id 1eABW6-0007bv-LV
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 05:10:26 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	vA294AMQ093152
+	for <qemu-devel@nongnu.org>; Thu, 2 Nov 2017 05:09:20 -0400
+Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2dywm30wdg-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 02 Nov 2017 05:09:20 -0400
+Received: from localhost
+	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
+	Thu, 2 Nov 2017 03:09:19 -0600
+From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Date: Thu,  2 Nov 2017 07:09:06 -0200
+Message-Id: <20171102090906.30391-1-danielhb@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v5] configure: check $CC available before
+ verifying host CPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,89 +37,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dan Williams <dan.j.williams@intel.com>
-Cc: Rik van Riel <riel@redhat.com>, Pankaj Gupta <pagupta@redhat.com>, Jan Kara <jack@suse.cz>, Stefan Hajnoczi <stefanha@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, kvm-devel <kvm@vger.kernel.org>, Qemu Developers <qemu-devel@nongnu.org>, "linux-nvdimm@lists.01.org" <linux-nvdimm@ml01.01.org>, ross zwisler <ross.zwisler@linux.intel.com>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Nitesh Narayan Lal <nilal@redhat.com>, Haozhong Zhang <haozhong.zhang@intel.com>, Ross Zwisler <ross.zwisler@intel.com>
+To: qemu-devel@nongnu.org
+Cc: mdroth@linux.vnet.ibm.com, peter.maydell@linaro.org, f4bug@amsat.org
 
+When executing 'configure' in a fresh QEMU clone, in a fresh
+OS install running in a ppc64le host, this is the error
+shown:
 
+-----
 
-On 11/01/2017 11:20 PM, Dan Williams wrote:
->> On 11/01/2017 12:25 PM, Dan Williams wrote:
-> [..]
->>> It's not persistent memory if it requires a hypercall to make it
->>> persistent. Unless memory writes can be made durable purely with cpu
->>> instructions it's dangerous for it to be treated as a PMEM range.
->>> Consider a guest that tried to map it with device-dax which has no
->>> facility to route requests to a special flushing interface.
->>>
->>
->> Can we separate the concept of flush interface from persistent memory?
->> Say there are two APIs, one is used to indicate the memory type (i.e,
->> /proc/iomem) and another one indicates the flush interface.
->>
->> So for existing nvdimm hardwares:
->> 1: Persist-memory + CLFLUSH
->> 2: Persiste-memory + flush-hint-table (I know Intel does not use it)
->>
->> and for the virtual nvdimm which backended on normal storage:
->> Persist-memory + virtual flush interface
-> 
-> I see the flush interface as fundamental to identifying the media
-> properties. It's not byte-addressable persistent memory if the
-> application needs to call a sideband interface to manage writes. This
-> is why we have pushed for something like the MAP_SYNC interface to
-> make filesystem-dax actually behave in a way that applications can
-> safely treat it as persistent memory, and this is also the guarantee
-> that device-dax provides. Changing the flush interface makes it
-> distinct and unusable for applications that want to manage data
-> persistence in userspace.
-> 
+../configure --enable-trace-backend=simple --enable-debug
+    --target-list=ppc64-softmmu
 
-I was thinking that from the device's perspective, both of them are
-not persistent until a flush operation is issued (clflush or virtual
-flush-interface). But you are right, from the user/software's
-perspective, their fundamentals are different.
+ERROR: Unsupported CPU = ppc64le, try --enable-tcg-interpreter
 
-So for the virtual nvdimm which is backended on normal storage, we
-should refuse MAP_SYNC and the only way to guarantee persistence
-is fsync/fdatasync.
+-----
 
-Actually, we can treat a SPA region which associates with specific
-flush interface as special GUID as your proposal, please see more
-in below comment...
+This isn't true, ppc64le host CPU is supported. This happens because,
+in a fresh install, we don't have a C compiler to autodetect
+the $cpu variable to "ppc64".
 
->>>>
->>>>> In what way is this "more complicated"? It was trivial to add support
->>>>> for the "volatile" NFIT range, this will not be any more complicated
->>>>> than that.
->>>>>
->>>>
->>>> Introducing memory type is easy indeed, however, a new flush interface
->>>> definition is inevitable, i.e, we need a standard way to discover the
->>>> MMIOs to communicate with host.
->>>
->>>
->>> Right, the proposed way to do that for x86 platforms is a new SPA
->>> Range GUID type. in the NFIT.
->>>
->>
->> So this SPA is used for both persistent memory region and flush interface?
->> Maybe i missed it in previous mails, could you please detail how to do
->> it?
-> 
-> Yes, the GUID will specifically identify this range as "Virtio Shared
-> Memory" (or whatever name survives after a bikeshed debate). The
-> libnvdimm core then needs to grow a new region type that mostly
-> behaves the same as a "pmem" region, but drivers/nvdimm/pmem.c grows a
-> new flush interface to perform the host communication. Device-dax
-> would be disallowed from attaching to this region type, or we could
-> grow a new device-dax type that does not allow the raw device to be
-> mapped, but allows a filesystem mounted on top to manage the flush
-> interface.
+This patch moves the CC available check up a bit, just before verifying
+the host CPU. This ensures that we bail out with a $CC not available
+error instead of unsupported CPU (the host CPU detection without
+the compiler wouldn't work properly anyway). It also allows --help to
+keep working without a C compiler. With this patch, in the same ppc64le
+host without gcc:
 
-I am afraid it is not a good idea that a single SPA is used for multiple
-purposes. For the region used as "pmem" is directly mapped to the VM so
-that guest can freely access it without host's assistance, however, for
-the region used as "host communication" is not mapped to VM, so that
-it causes VM-exit and host gets the chance to do specific operations,
-e.g, flush cache. So we'd better distinctly define these two regions to
-avoid the unnecessary complexity in hypervisor.
+$ ../configure --enable-trace-backend=simple --enable-debug
+    --target-list=ppc64-softmmu
+
+ERROR: "cc" either does not exist or does not work
+
+$ ../configure --help
+
+Usage: configure [options]
+Options: [defaults in brackets after descriptions]
+
+Standard options:
+  --help                   print this message
+  --prefix=PREFIX          install in PREFIX [/usr/local]
+  --interp-prefix=PREFIX   where to find shared libraries, etc.
+(...)
+
+Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+---
+ configure | 25 ++++++++++++++-----------
+ 1 file changed, 14 insertions(+), 11 deletions(-)
+
+diff --git a/configure b/configure
+index 285d123dbf..e78f07d5d9 100755
+--- a/configure
++++ b/configure
+@@ -1572,6 +1572,20 @@ fi
+ # Suppress writing compiled files
+ python="$python -B"
+ 
++# Check that the C compiler works. Doing this here before testing
++# the host CPU ensures that we had a valid CC to autodetect the
++# $cpu var (and we should bail right here if that's not the case).
++# It also allows the help message to be printed without a CC.
++write_c_skeleton;
++if compile_object ; then
++  : C compiler works ok
++else
++    error_exit "\"$cc\" either does not exist or does not work"
++fi
++if ! compile_prog ; then
++    error_exit "\"$cc\" cannot build an executable (is your linker broken?)"
++fi
++
+ # Now we have handled --enable-tcg-interpreter and know we're not just
+ # printing the help message, bail out if the host CPU isn't supported.
+ if test "$ARCH" = "unknown"; then
+@@ -1593,17 +1607,6 @@ if test -z "$werror" ; then
+     fi
+ fi
+ 
+-# check that the C compiler works.
+-write_c_skeleton;
+-if compile_object ; then
+-  : C compiler works ok
+-else
+-    error_exit "\"$cc\" either does not exist or does not work"
+-fi
+-if ! compile_prog ; then
+-    error_exit "\"$cc\" cannot build an executable (is your linker broken?)"
+-fi
+-
+ if test "$bogus_os" = "yes"; then
+     # Now that we know that we're not printing the help and that
+     # the compiler works (so the results of the check_defines we used
+-- 
+2.13.6
