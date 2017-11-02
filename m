@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35107)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38362)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eADMh-0007Y4-Ts
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 07:08:56 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1eADVo-0001Mg-Vk
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 07:18:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eADMd-0003GJ-LX
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 07:08:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58622)
+	(envelope-from <pbonzini@redhat.com>) id 1eADVk-00032d-2l
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 07:18:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57904)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eADMd-0003Fm-D3
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 07:08:47 -0400
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eADVj-000325-SS
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 07:18:11 -0400
 References: <20171031112457.10516.8971.stgit@pasha-VirtualBox>
-	<20171031112610.10516.78685.stgit@pasha-VirtualBox>
+	<20171031112644.10516.1734.stgit@pasha-VirtualBox>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <84c5cdaf-4ec6-f05c-e1a2-3228517d491a@redhat.com>
-Date: Thu, 2 Nov 2017 12:08:32 +0100
+Message-ID: <a8979594-78e4-13dc-2958-f7b4444a1bb0@redhat.com>
+Date: Thu, 2 Nov 2017 12:17:51 +0100
 MIME-Version: 1.0
-In-Reply-To: <20171031112610.10516.78685.stgit@pasha-VirtualBox>
+In-Reply-To: <20171031112644.10516.1734.stgit@pasha-VirtualBox>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 13/26] cpus: only take BQL for sleeping
- threads
+Subject: Re: [Qemu-devel] [RFC PATCH 19/26] cpu-exec: reset exit flag before
+ calling cpu_exec_nocache
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,114 +30,64 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, boost.lists@gmail.com, quintela@redhat.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, kraxel@redhat.com, alex.bennee@linaro.org, David Hildenbrand <david@redhat.com>
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, boost.lists@gmail.com, quintela@redhat.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, kraxel@redhat.com, alex.bennee@linaro.org
 
 On 31/10/2017 12:26, Pavel Dovgalyuk wrote:
-> From: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> This patch resets icount_decr.u32.high before calling cpu_exec_nocache
+> when exception is pending. Exception is caused by the first instruction
+> in the block and it cannot be executed without resetting the flag.
 >=20
-> Now the only real need to hold the BQL is for when we sleep on the
-> cpu->halt conditional. The lock is actually dropped while the thread
-> sleeps so the actual window for contention is pretty small. This also
-> means we can remove the special case hack for exclusive work and
-> simply declare that work no longer has an implicit BQL held. This
-> isn't a major problem async work is generally only changing things in
-> the context of its own vCPU. If it needs to work across vCPUs it
-> should be using the exclusive mechanism or possibly taking the lock
-> itself.
->=20
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> Tested-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
-
-At least cpu_throttle_thread would fail with this patch.
-
-Also I am not sure if the s390 SIGP handlers are ready for this.
-
-Paolo
-
+> Signed-off-by: Maria Klimushenkova <maria.klimushenkova@ispras.ru>
+> Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
 >=20
 > ---
->  cpus-common.c |   13 +++++--------
->  cpus.c        |   10 ++++------
->  2 files changed, 9 insertions(+), 14 deletions(-)
+>  accel/tcg/cpu-exec.c |    1 +
+>  1 file changed, 1 insertion(+)
 >=20
-> diff --git a/cpus-common.c b/cpus-common.c
-> index 59f751e..64661c3 100644
-> --- a/cpus-common.c
-> +++ b/cpus-common.c
-> @@ -310,6 +310,11 @@ void async_safe_run_on_cpu(CPUState *cpu, run_on_c=
-pu_func func,
->      queue_work_on_cpu(cpu, wi);
->  }
-> =20
-> +/* Work items run outside of the BQL. This is essential for avoiding a
-> + * deadlock for exclusive work but also applies to non-exclusive work.
-> + * If the work requires cross-vCPU changes then it should use the
-> + * exclusive mechanism.
-> + */
->  void process_queued_cpu_work(CPUState *cpu)
->  {
->      struct qemu_work_item *wi;
-> @@ -327,17 +332,9 @@ void process_queued_cpu_work(CPUState *cpu)
->          }
->          qemu_mutex_unlock(&cpu->work_mutex);
->          if (wi->exclusive) {
-> -            /* Running work items outside the BQL avoids the following=
- deadlock:
-> -             * 1) start_exclusive() is called with the BQL taken while=
- another
-> -             * CPU is running; 2) cpu_exec in the other CPU tries to t=
-akes the
-> -             * BQL, so it goes to sleep; start_exclusive() is sleeping=
- too, so
-> -             * neither CPU can proceed.
-> -             */
-> -            qemu_mutex_unlock_iothread();
->              start_exclusive();
->              wi->func(cpu, wi->data);
->              end_exclusive();
-> -            qemu_mutex_lock_iothread();
->          } else {
->              wi->func(cpu, wi->data);
->          }
-> diff --git a/cpus.c b/cpus.c
-> index efde5c1..de6dfce 100644
-> --- a/cpus.c
-> +++ b/cpus.c
-> @@ -1127,31 +1127,29 @@ static bool qemu_tcg_should_sleep(CPUState *cpu=
-)
-> =20
->  static void qemu_tcg_wait_io_event(CPUState *cpu)
->  {
-> -    qemu_mutex_lock_iothread();
-> =20
->      while (qemu_tcg_should_sleep(cpu)) {
-> +        qemu_mutex_lock_iothread();
->          stop_tcg_kick_timer();
->          qemu_cond_wait(cpu->halt_cond, &qemu_global_mutex);
-> +        qemu_mutex_unlock_iothread();
->      }
-> =20
->      start_tcg_kick_timer();
-> =20
->      qemu_wait_io_event_common(cpu);
-> -
-> -    qemu_mutex_unlock_iothread();
->  }
-> =20
->  static void qemu_kvm_wait_io_event(CPUState *cpu)
->  {
-> -    qemu_mutex_lock_iothread();
-> =20
->      while (cpu_thread_is_idle(cpu)) {
-> +        qemu_mutex_lock_iothread();
->          qemu_cond_wait(cpu->halt_cond, &qemu_global_mutex);
-> +        qemu_mutex_unlock_iothread();
->      }
-> =20
->      qemu_wait_io_event_common(cpu);
-> -
-> -    qemu_mutex_unlock_iothread();
->  }
-> =20
->  static void *qemu_kvm_cpu_thread_fn(void *arg)
+> diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
+> index 35d0240..aaa9c2d 100644
+> --- a/accel/tcg/cpu-exec.c
+> +++ b/accel/tcg/cpu-exec.c
+> @@ -500,6 +500,7 @@ static inline bool cpu_handle_exception(CPUState *c=
+pu, int *ret)
+>      } else if (replay_has_exception()
+>                 && cpu->icount_decr.u16.low + cpu->icount_extra =3D=3D =
+0) {
+>          /* try to cause an exception pending in the log */
+> +        atomic_set(&cpu->icount_decr.u16.high, 0);
+>          cpu_exec_nocache(cpu, 1, tb_find(cpu, NULL, 0, curr_cflags()),=
+ true);
+>          *ret =3D -1;
+>          return true;
 >=20
+
+I am not sure about this.  I think if instead you should return false=20
+from here and EXCP_INTERRUPT from cpu_exec.
+
+More important: there is still a race, because high can be set to -1=20
+right after your atomic_set.  Maybe:
+
+1) you should only return true if cpu->exception_index was set by=20
+cpu_exec_nocache?
+
+2) you should not do
+
+    *ret =3D -1;
+    return true;
+
+and instead do
+
+    if (cpu->exception_index < 0 &&
+        replay_has_exception() &&
+        cpu->icount_decr.u16.low + cpu->icount_extra =3D=3D 0) {
+           /* try to cause an exception pending in the log */
+           cpu_exec_nocache(cpu, 1, tb_find(cpu, NULL, 0, curr_cflags()),=
+ true);
+        }
+    }
+    if (cpu->exception_index >=3D 0) {
+        ...
+    }
+    return false;
+
+Paolo
