@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49761)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52868)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eADyX-0002wZ-Es
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 07:47:58 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1eAE77-0004rO-3w
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 07:56:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eADyW-00008t-HG
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 07:47:57 -0400
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:53684)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eADyW-00007H-9C
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 07:47:56 -0400
-Received: by mail-wm0-x242.google.com with SMTP id r196so10757197wmf.2
-	for <qemu-devel@nongnu.org>; Thu, 02 Nov 2017 04:47:55 -0700 (PDT)
+	(envelope-from <pbonzini@redhat.com>) id 1eAE74-0006m0-0w
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 07:56:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39238)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eAE73-0006ha-S5
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 07:56:45 -0400
+References: <20171031112457.10516.8971.stgit@pasha-VirtualBox>
+	<20171031112633.10516.44062.stgit@pasha-VirtualBox>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <b413bf64-d0ff-b99b-28c5-fc39d0e2b327@redhat.com>
+Date: Thu, 2 Nov 2017 12:56:36 +0100
 MIME-Version: 1.0
-In-Reply-To: <20171031230206.32731-1-jsnow@redhat.com>
-References: <20171031230206.32731-1-jsnow@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 2 Nov 2017 11:47:34 +0000
-Message-ID: <CAFEAcA-s2NwFi-SyJCAeSwy51HNX3EhqNX+2gy98stPZXYHy+g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/2] Ide patches
+In-Reply-To: <20171031112633.10516.44062.stgit@pasha-VirtualBox>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH 17/26] replay: push replay_mutex_lock
+ up the call tree
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,40 +29,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, boost.lists@gmail.com, quintela@redhat.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, kraxel@redhat.com, alex.bennee@linaro.org
 
-On 31 October 2017 at 23:02, John Snow <jsnow@redhat.com> wrote:
-> The following changes since commit 7fa00e204902cee0b33a0c60de87e87319d1809f:
->
->   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20171031' into staging (2017-10-31 14:28:25 +0000)
->
-> are available in the git repository at:
->
->   https://github.com/jnsnow/qemu.git tags/ide-pull-request
->
-> for you to fetch changes up to 96f43c2b0a663f4789b51ed97297163321e7ba5e:
->
->   ide: avoid referencing NULL dev in rotational rate setting (2017-10-31 18:00:03 -0400)
->
-> ----------------------------------------------------------------
->
-> ----------------------------------------------------------------
->
-> Daniel P. Berrange (1):
->   ide: avoid referencing NULL dev in rotational rate setting
->
-> Thomas Huth (1):
->   hw/ide/ahci: Move allwinner code into a separate file
->
->  hw/ide/Makefile.objs    |   1 +
->  hw/ide/ahci-allwinner.c | 127 ++++++++++++++++++++++++++++++++++++++++++++++++
->  hw/ide/ahci.c           |  95 ------------------------------------
->  hw/ide/core.c           |   4 +-
->  4 files changed, 131 insertions(+), 96 deletions(-)
->  create mode 100644 hw/ide/ahci-allwinner.c
->
+On 31/10/2017 12:26, Pavel Dovgalyuk wrote:
+>=20
+> +
+>      if (timeout) {
+>          spin_counter =3D 0;
+> -        qemu_mutex_unlock_iothread();
 
-Applied, thanks.
+This was done on purpose because it improved performance.  It's probably
+pointless now that TCG runs outside the iothread, but it should be a
+separate patch.
 
--- PMM
+>      } else {
+>          spin_counter++;
+>      }
+> +    qemu_mutex_unlock_iothread();
+> +
+> +    if (replay_mode !=3D REPLAY_MODE_NONE) {
+> +        replay_mutex_unlock();
+> +    }
+
+This is quite ugly.  Perhaps you can push the "if" down inside the
+functions?
+
+Paolo
+
+>      ret =3D qemu_poll_ns((GPollFD *)gpollfds->data, gpollfds->len, tim=
+eout);
+> =20
+> -    if (timeout) {
+> -        qemu_mutex_lock_iothread();
+> +    if (replay_mode !=3D REPLAY_MODE_NONE) {
+> +        replay_mutex_lock();
+>      }
+> =20
+> +    qemu_mutex_lock_iothread();
+> +
