@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56373)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58462)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eAHVr-0005mS-V7
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 11:34:37 -0400
+	(envelope-from <mreitz@redhat.com>) id 1eAHh4-0007w8-3n
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 11:46:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eAHVn-0002FZ-UO
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 11:34:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34596)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eAHVn-0002DI-OX
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 11:34:31 -0400
-Date: Thu, 2 Nov 2017 15:34:24 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20171102153424.GP32533@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <CAATJJ0KveNV1tHT-w5TCL9_TrCdMzp34=fGfhMm7NzZux=7K+Q@mail.gmail.com>
-	<CAATJJ0L6Xs6vbauBeznVuf+e_GjRLbU2Kz8MWSrBHzD_+wLhhQ@mail.gmail.com>
+	(envelope-from <mreitz@redhat.com>) id 1eAHgz-0002Ff-SW
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 11:46:10 -0400
+References: <20170929165347.29658-1-mreitz@redhat.com>
+	<20170929165347.29658-10-mreitz@redhat.com>
+	<w51h8ugk7zx.fsf@maestria.local.igalia.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <332bd2e4-6c1a-8d41-e204-776b29d42cfb@redhat.com>
+Date: Thu, 2 Nov 2017 16:45:50 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAATJJ0L6Xs6vbauBeznVuf+e_GjRLbU2Kz8MWSrBHzD_+wLhhQ@mail.gmail.com>
-Subject: Re: [Qemu-devel] [libvirt] How to best handle the reoccurring of
- rom changes breaking cross version migrations?
+In-Reply-To: <w51h8ugk7zx.fsf@maestria.local.igalia.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="eD9852R9X4JoVeLsj5hRM5WXDRaEV43M0"
+Subject: Re: [Qemu-devel] [PATCH v6 09/25] block: Fix
+ bdrv_find_backing_image()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,43 +26,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Ehrhardt <christian.ehrhardt@canonical.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Libvirt Devel <libvir-list@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, John Snow <jsnow@redhat.com>
 
-On Thu, Nov 02, 2017 at 04:14:06PM +0100, Christian Ehrhardt wrote:
-> Ping - since there wasn't any reply so far - any best practices one could
-> share?
-> 
-> Let me add a TL;DR:
-> - bump of ipxe rom versions change the size of virtio-net-pci.rom
-> - that breaks on migration "Length mismatch"
-> 
-> I'd guess the size of that rom has to be fixed up on the fly, but if that
-> is really ok and how/where is the question.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--eD9852R9X4JoVeLsj5hRM5WXDRaEV43M0
+From: Max Reitz <mreitz@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ Eric Blake <eblake@redhat.com>, John Snow <jsnow@redhat.com>
+Message-ID: <332bd2e4-6c1a-8d41-e204-776b29d42cfb@redhat.com>
+Subject: Re: [PATCH v6 09/25] block: Fix bdrv_find_backing_image()
+References: <20170929165347.29658-1-mreitz@redhat.com>
+ <20170929165347.29658-10-mreitz@redhat.com>
+ <w51h8ugk7zx.fsf@maestria.local.igalia.com>
+In-Reply-To: <w51h8ugk7zx.fsf@maestria.local.igalia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-The actual ROM contents will be transferred in the migration stream, so
-the fact that the target host has ROMs with different content is not
-important. The key thing that matters is that QEMU the target host loads
-the ROMs at the same location, so that when the ROM contents is overwritten
-with data from the incoming migration scheme, it all ends up at the same
-place as it was on the source.
+On 2017-10-30 15:47, Alberto Garcia wrote:
+> On Fri 29 Sep 2017 06:53:31 PM CEST, Max Reitz wrote:
+>> @@ -4096,22 +4086,31 @@ BlockDriverState *bdrv_find_backing_image(Bloc=
+kDriverState *bs,
+>>          } else {
+>>              /* If not an absolute filename path, make it relative to =
+the current
+>>               * image's filename path */
+>> -            path_combine_deprecated(filename_tmp, PATH_MAX, curr_bs->=
+filename,
+>> -                                    backing_file);
+>> +            filename_tmp =3D bdrv_make_absolute_filename(curr_bs, bac=
+king_file,
+>> +                                                       NULL);
+>> +            if (!filename_tmp) {
+>> +                continue;
+>> +            }
+>> =20
+>>              /* We are going to compare absolute pathnames */
+>>              if (!realpath(filename_tmp, filename_full)) {
+>> +                g_free(filename_tmp);
+>>                  continue;
+>>              }
+>> +            g_free(filename_tmp);
+>=20
+> This feels a bit too verbose, doesn't it? (especially because you're
+> doing the same thing twice, see below). It could be made a bit shorter,=
 
-Getting this to happen requires pre-planning when building the ROMs. By
-the time you hit the size change during migration it is too late and your
-VM is basically doomed. When building you need to add padding. IIUC for
-RHEL we artificially increased the size of the seabios and ipxe ROMs to
-256k. So when later RHEL updates ship new seabios/ipxe they still fit in
-the 256k region previously allowed for.
+> something like:
+>=20
+>     bool have_filename =3D filename_tmp && realpath(filename_tmp, filen=
+ame_full);
+>     g_free(filename_tmp);
+>     if (!have_filename) {
+>          continue;
+>     }
 
-<tangent>
-... QEMU could really benefit from more formal docs around migration to
-describe how users / vendors can protect themselves from the many pitfalls
-like this...
-</tangent>
+Well, but then again
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+if (filename_tmp && realpath(filename_tmp, filename_full)) {
+    g_free(filename_tmp);
+    continue;
+}
+g_free(filename_tmp);
+
+has the same length. :-)
+
+(Actually, overall it'd be one line shorter because I'd have to use an
+own line for the "bool have_filename" declaration (to put it at the
+start of the block).)
+
+So I'll do that, yes.
+
+Thanks for reviewing (and this suggestion)!
+
+Max
+
+>=20
+>> -            path_combine_deprecated(filename_tmp, PATH_MAX, curr_bs->=
+filename,
+>> -                                    curr_bs->backing_file);
+>> +            filename_tmp =3D bdrv_get_full_backing_filename(curr_bs, =
+NULL);
+>> +            if (!filename_tmp) {
+>> +                continue;
+>> +            }
+>> =20
+>>              if (!realpath(filename_tmp, backing_file_full)) {
+>> +                g_free(filename_tmp);
+>>                  continue;
+>>              }
+>> +            g_free(filename_tmp);
+>=20
+> Berto
+>=20
+
+
+
+--eD9852R9X4JoVeLsj5hRM5WXDRaEV43M0
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAln7Pa4SHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AD00H/ir4mAXL2Jv6gt8D0C+F5Ywr/vVFKx6q
+WokBguXRr4Lg/XUCiF0p425bpf5xByr4VHhErqlyJNENvipavbHL2A+4Y1Hym1M0
+q5SotRSkWrNMsostE7ZXqGh/A080gLI+0FHjDepW1fMv9ngEQ+Pj84JQasDl1D0r
+M2CLNzGpHT/+E957RsBPGas3iz5Pboce4/oer+PVb8IQ9TiGu9IYJxqw3rt+Rk2d
+qZc/D84OIXHJ9oUbJFzktn7SF9kSMHSm4E9IC8R4imNhNomdVo1way3QYXZ76WMz
+Ro05eW4PG1Dckviajgxa5Ja3iI9A+VWfOKK1DryK2yXHkyNOM/wMAuc=
+=K1b5
+-----END PGP SIGNATURE-----
+
+--eD9852R9X4JoVeLsj5hRM5WXDRaEV43M0--
