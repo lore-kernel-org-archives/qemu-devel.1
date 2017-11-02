@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33537)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35535)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eAEQ8-0003Ez-II
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 08:16:29 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1eAEUy-0004fH-Go
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 08:21:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eAEQ7-0007sQ-Jz
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 08:16:28 -0400
-Received: from mail-io0-x241.google.com ([2607:f8b0:4001:c06::241]:45334)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eAEQ7-0007rj-FP
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 08:16:27 -0400
-Received: by mail-io0-x241.google.com with SMTP id i38so13466699iod.2
-	for <qemu-devel@nongnu.org>; Thu, 02 Nov 2017 05:16:27 -0700 (PDT)
+	(envelope-from <pbonzini@redhat.com>) id 1eAEUt-00033h-J6
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 08:21:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46950)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eAEUt-00032c-CI
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 08:21:23 -0400
+References: <20171031112457.10516.8971.stgit@pasha-VirtualBox>
+	<20171031112542.10516.61105.stgit@pasha-VirtualBox>
+	<7f87350f-2a29-ae49-c86a-63bc8c425937@redhat.com>
+	<001601d353d1$b839eab0$28adc010$@ru>
+	<2c37b9dc-3b17-8848-f9c1-cd6cf7b4c609@redhat.com>
+	<001701d353d2$af3cc7b0$0db65710$@ru>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <918bb472-84fe-9061-0914-d3ee997488c9@redhat.com>
+Date: Thu, 2 Nov 2017 13:21:09 +0100
 MIME-Version: 1.0
-Sender: philippe.mathieu.daude@gmail.com
-In-Reply-To: <1e17a8cf-e81e-91ba-5656-e8e2dfa3baea@twiddle.net>
-References: <201711021923504024201@zte.com.cn>
-	<1e17a8cf-e81e-91ba-5656-e8e2dfa3baea@twiddle.net>
-From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philippe@mathieu-daude.net>
-Date: Thu, 2 Nov 2017 09:16:26 -0300
-Message-ID: <CAAdtpL7f7BW4Ta357GT_3nMhFSjrh0eFZpn+OvC8XOrw710dXg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] tcg/mips: make some functions inline.
+In-Reply-To: <001701d353d2$af3cc7b0$0db65710$@ru>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH 08/26] replay: make safe vmstop at
+ record/replay
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,15 +33,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>, Eric Blake <eblake@redhat.com>
-Cc: Jiang Biao <jiang.biao2@zte.com.cn>, zhong.weidong@zte.com.cn, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>
+To: Pavel Dovgalyuk <dovgaluk@ispras.ru>, 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, boost.lists@gmail.com, quintela@redhat.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, maria.klimushenkova@ispras.ru, kraxel@redhat.com, alex.bennee@linaro.org
 
-On Thu, Nov 2, 2017 at 8:43 AM, Richard Henderson <rth@twiddle.net> wrote:
-> On 11/02/2017 12:23 PM, jiang.biao2@zte.com.cn wrote:
->> No, :) Just found some of these functions are inline and others are not when reading
->> the code, the style looks inconsistent.
->
-> My preference would be to remove them all.
+On 02/11/2017 13:04, Pavel Dovgalyuk wrote:
+>> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
+>>>>> diff --git a/migration/savevm.c b/migration/savevm.c
+>>>>> index 20cebe1..41a13c0 100644
+>>>>> --- a/migration/savevm.c
+>>>>> +++ b/migration/savevm.c
+>>>>> @@ -2143,8 +2143,8 @@ int save_snapshot(const char *name, Error **errp)
+>>>>>      AioContext *aio_context;
+>>>>>
+>>>>>      if (!replay_can_snapshot()) {
+>>>>> -        monitor_printf(mon, "Record/replay does not allow making snapshot "
+>>>>> -                        "right now. Try once more later.\n");
+>>>>> +        error_report("Record/replay does not allow making snapshot "
+>>>>> +                     "right now. Try once more later.\n");
+>>>>
+>>>> Why this change?
+>>>
+>>> Kind of a mess in changes.
+>>> It should be in patch 06 which introduce these lines.
+>>> I'll fix it in the next version.
+>>
+>> No problem.  Remember to delete the \n too since otherwise patchew
+>> complains.
+> 
+> Is this ok for the line over 80 symbols here?
 
-If more people agree to this we should add an entry in HACKING coding
-guidelines (not sure about checkpatch).
+Patchew (and checkpatch) are complaining about the \n in the string,
+i.e. "later.\n" -> "later.".
+
+Thanks,
+
+Paolo
