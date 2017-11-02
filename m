@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52441)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56373)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eAHIj-00020s-ON
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 11:21:06 -0400
+	(envelope-from <berrange@redhat.com>) id 1eAHVr-0005mS-V7
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 11:34:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eAHIb-0006gk-Kd
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 11:21:01 -0400
-Received: from indium.canonical.com ([91.189.90.7]:46136)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eAHIb-0006fa-CE
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 11:20:53 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eAHIY-00056v-E9
-	for <qemu-devel@nongnu.org>; Thu, 02 Nov 2017 15:20:50 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 6968C2E8082
-	for <qemu-devel@nongnu.org>; Thu,  2 Nov 2017 15:20:50 +0000 (UTC)
+	(envelope-from <berrange@redhat.com>) id 1eAHVn-0002FZ-UO
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 11:34:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34596)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eAHVn-0002DI-OX
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 11:34:31 -0400
+Date: Thu, 2 Nov 2017 15:34:24 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20171102153424.GP32533@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <CAATJJ0KveNV1tHT-w5TCL9_TrCdMzp34=fGfhMm7NzZux=7K+Q@mail.gmail.com>
+	<CAATJJ0L6Xs6vbauBeznVuf+e_GjRLbU2Kz8MWSrBHzD_+wLhhQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 02 Nov 2017 15:11:30 -0000
-From: "R.Nageswara Sastry" <nasastry@in.ibm.com>
-Reply-To: Bug 1729623 <1729623@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <150963549061.4171.11895725981979057755.malonedeb@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1729623] [NEW] test-aio-multithread fails with
- 'Co-routine re-entered recursively'
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAATJJ0L6Xs6vbauBeznVuf+e_GjRLbU2Kz8MWSrBHzD_+wLhhQ@mail.gmail.com>
+Subject: Re: [Qemu-devel] [libvirt] How to best handle the reoccurring of
+ rom changes breaking cross version migrations?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,130 +29,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Christian Ehrhardt <christian.ehrhardt@canonical.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Libvirt Devel <libvir-list@redhat.com>
 
-Public bug reported:
+On Thu, Nov 02, 2017 at 04:14:06PM +0100, Christian Ehrhardt wrote:
+> Ping - since there wasn't any reply so far - any best practices one could
+> share?
+> 
+> Let me add a TL;DR:
+> - bump of ipxe rom versions change the size of virtio-net-pci.rom
+> - that breaks on migration "Length mismatch"
+> 
+> I'd guess the size of that rom has to be fixed up on the fly, but if that
+> is really ok and how/where is the question.
 
-git head is at fa73e146250181852c0915aa65df8d54d35485fa
+The actual ROM contents will be transferred in the migration stream, so
+the fact that the target host has ROMs with different content is not
+important. The key thing that matters is that QEMU the target host loads
+the ROMs at the same location, so that when the ROM contents is overwritten
+with data from the incoming migration scheme, it all ends up at the same
+place as it was on the source.
 
-configure with the following
+Getting this to happen requires pre-planning when building the ROMs. By
+the time you hit the size change during migration it is too late and your
+VM is basically doomed. When building you need to add padding. IIUC for
+RHEL we artificially increased the size of the seabios and ipxe ROMs to
+256k. So when later RHEL updates ship new seabios/ipxe they still fit in
+the 256k region previously allowed for.
 
-./configure --enable-attr --enable-bsd-user --enable-cap-ng\
- --enable-coroutine-pool  --enable-crypto-afalg --enable-curl\
- --enable-curses --enable-debug --enable-debug-info\
- --enable-debug-tcg      --enable-fdt      --enable-gcrypt \
- --enable-gnutls      --enable-gprof      --enable-gtk  \
- --enable-guest-agent      --enable-kvm      --enable-libiscsi \
- --enable-libssh2      --enable-linux-aio      --enable-linux-user \
- --enable-live-block-migration      --enable-modules   \
- --enable-numa      --enable-pie      --enable-profiler \
- --enable-qom-cast-debug      --enable-rbd      --enable-replication  \
- --enable-seccomp      --enable-smartcard      --enable-stack-protector \
- --enable-system      --enable-tcg      --enable-tcg-interpreter  \
- --enable-tools      --enable-tpm      --enable-trace-backend=3Dftrace \
- --enable-user      --enable-vhost-net      --enable-vhost-scsi  \
- --enable-vhost-user      --enable-vhost-vsock      --enable-virtfs  \ =
+<tangent>
+... QEMU could really benefit from more formal docs around migration to
+describe how users / vendors can protect themselves from the many pitfalls
+like this...
+</tangent>
 
- --enable-vnc      --enable-tpm      --enable-vnc-png   \
- --enable-vnc-sasl      --enable-werror      --enable-xfsctl \
- --enable-gcov --enable-debug-stack-usage
-
-make -j 32
-
-make test-aio-multithread V=3D1
-
-...
-File '/home/nasastry/qemu/include/qapi/qmp/qobject.h'
-No executable lines
-
-MALLOC_PERTURB_=3D${MALLOC_PERTURB_:-$(( ${RANDOM:-0} % 255 + 1))} gtester =
--k --verbose -m=3Dquick tests/test-aio-multithread
-TEST: tests/test-aio-multithread... (pid=3D86877)
-  /aio/multi/lifecycle:                                                OK
-  /aio/multi/schedule:                                                 Co-r=
-outine re-entered recursively
-FAIL
-GTester: last random seed: R02S681209ce87fc22715b41223212d9f6f0
-(pid=3D86891)
-  /aio/multi/mutex/contended:                                          OK
-  /aio/multi/mutex/handoff:                                            OK
-  /aio/multi/mutex/mcs:                                                OK
-  /aio/multi/mutex/pthread:                                            OK
-FAIL: tests/test-aio-multithread
-make: *** [check-tests/test-aio-multithread] Error 1
-
-Full log will be attached.
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
-** Attachment added: "full run log configure, make, make check"
-   https://bugs.launchpad.net/bugs/1729623/+attachment/5002488/+files/confi=
-gure_most_run_tests.txt
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1729623
-
-Title:
-  test-aio-multithread fails with 'Co-routine re-entered recursively'
-
-Status in QEMU:
-  New
-
-Bug description:
-  git head is at fa73e146250181852c0915aa65df8d54d35485fa
-
-  configure with the following
-
-  ./configure --enable-attr --enable-bsd-user --enable-cap-ng\
-   --enable-coroutine-pool  --enable-crypto-afalg --enable-curl\
-   --enable-curses --enable-debug --enable-debug-info\
-   --enable-debug-tcg      --enable-fdt      --enable-gcrypt \
-   --enable-gnutls      --enable-gprof      --enable-gtk  \
-   --enable-guest-agent      --enable-kvm      --enable-libiscsi \
-   --enable-libssh2      --enable-linux-aio      --enable-linux-user \
-   --enable-live-block-migration      --enable-modules   \
-   --enable-numa      --enable-pie      --enable-profiler \
-   --enable-qom-cast-debug      --enable-rbd      --enable-replication  \
-   --enable-seccomp      --enable-smartcard      --enable-stack-protector \
-   --enable-system      --enable-tcg      --enable-tcg-interpreter  \
-   --enable-tools      --enable-tpm      --enable-trace-backend=3Dftrace \
-   --enable-user      --enable-vhost-net      --enable-vhost-scsi  \
-   --enable-vhost-user      --enable-vhost-vsock      --enable-virtfs  \ =
-
-   --enable-vnc      --enable-tpm      --enable-vnc-png   \
-   --enable-vnc-sasl      --enable-werror      --enable-xfsctl \
-   --enable-gcov --enable-debug-stack-usage
-
-  make -j 32
-
-  make test-aio-multithread V=3D1
-
-  ...
-  File '/home/nasastry/qemu/include/qapi/qmp/qobject.h'
-  No executable lines
-
-  MALLOC_PERTURB_=3D${MALLOC_PERTURB_:-$(( ${RANDOM:-0} % 255 + 1))} gteste=
-r -k --verbose -m=3Dquick tests/test-aio-multithread
-  TEST: tests/test-aio-multithread... (pid=3D86877)
-    /aio/multi/lifecycle:                                                OK
-    /aio/multi/schedule:                                                 Co=
--routine re-entered recursively
-  FAIL
-  GTester: last random seed: R02S681209ce87fc22715b41223212d9f6f0
-  (pid=3D86891)
-    /aio/multi/mutex/contended:                                          OK
-    /aio/multi/mutex/handoff:                                            OK
-    /aio/multi/mutex/mcs:                                                OK
-    /aio/multi/mutex/pthread:                                            OK
-  FAIL: tests/test-aio-multithread
-  make: *** [check-tests/test-aio-multithread] Error 1
-
-  Full log will be attached.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1729623/+subscriptions
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
