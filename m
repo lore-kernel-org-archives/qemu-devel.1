@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42146)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42668)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1eAGfg-0004F6-EV
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 10:40:42 -0400
+	(envelope-from <marcel@redhat.com>) id 1eAGhX-0005MY-B8
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 10:42:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1eAGfd-0003PB-Qu
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 10:40:40 -0400
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:56484)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1eAGfd-0003N6-K2
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 10:40:37 -0400
-Received: by mail-wm0-x241.google.com with SMTP id z3so11895132wme.5
-	for <qemu-devel@nongnu.org>; Thu, 02 Nov 2017 07:40:37 -0700 (PDT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Thu,  2 Nov 2017 14:40:34 +0000
-Message-Id: <20171102144034.888-2-alex.bennee@linaro.org>
-In-Reply-To: <20171102144034.888-1-alex.bennee@linaro.org>
-References: <20171102144034.888-1-alex.bennee@linaro.org>
+	(envelope-from <marcel@redhat.com>) id 1eAGhS-0004jR-Ul
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 10:42:34 -0400
+References: <a0750de5-d3ce-3f15-ba12-ce383ded143d@redhat.com>
+From: Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <1e04415c-83d5-a6ac-f83f-d7a57b9b9868@redhat.com>
+Date: Thu, 2 Nov 2017 16:42:27 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 1/1] docker: add python stdlib dependency
- (required by keycodemapdb)
+In-Reply-To: <a0750de5-d3ce-3f15-ba12-ce383ded143d@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] Crash with pcie-pci-bridge on qemu-system-s390x
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,45 +23,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-s390x@nongnu.org
+Cc: Aleksandr Bezzubikov <zuban32s@gmail.com>
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+On 02/11/2017 16:19, Thomas Huth wrote:
+>   Hi,
+> 
 
-Since 927128222b0a QEMU depends of keycodemapdb, which uses the python 'csv'
-module from stdlib to parse keymaps.csv.
+Hi Thomas,
 
-Without this package the build fails:
+> seems like there's a new way to crash QEMU with the pcie-pci-bridge
+> device (using QEMU master branch of today):
+>  > $ s390x-softmmu/qemu-system-s390x -nographic -S
+> QEMU 2.10.50 monitor - type 'help' for more information
+> (qemu) device_add pcie-pci-bridge,id=x
+> Segmentation fault (core dumped)
+> 
 
-    GEN     ui/input-keymap-linux-to-qcode.c
-  Traceback (most recent call last):
-    File "ui/keycodemapdb/tools/keymap-gen", line 15, in <module>
-      import csv
-  ImportError: No module named csv
-    GEN     ui/input-keymap-qcode-to-qnum.c
-  Traceback (most recent call last):
-    File "ui/keycodemapdb/tools/keymap-gen", line 15, in <module>
-      import csv
-  ImportError: No module named csv
-  [...]
-    CC      ui/input-keymap.o
-  ui/input-keymap.c:8:44: fatal error: ui/input-keymap-linux-to-qcode.c: No such file or directory
-  make: *** [ui/input-keymap.o] Error 1
+Thanks for noticing it.
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> Does anybody have a clue what might be wrong here?
+> 
 
-diff --git a/tests/docker/dockerfiles/debian8-mxe.docker b/tests/docker/dockerfiles/debian8-mxe.docker
-index 7bf1b59e54..9b8e577b03 100644
---- a/tests/docker/dockerfiles/debian8-mxe.docker
-+++ b/tests/docker/dockerfiles/debian8-mxe.docker
-@@ -13,6 +13,7 @@ RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys D43A795B73B16ABE964
- RUN apt-get update
- RUN DEBIAN_FRONTEND=noninteractive eatmydata \
-     apt-get install -y --no-install-recommends \
-+        libpython2.7-stdlib \
-         $(apt-get -s install -y --no-install-recommends gw32.shared-mingw-w64 gw32.shared-mingw-w64 | egrep "^Inst mxe-x86-64-unknown-" | cut -d\  -f2)
- 
- ENV PATH $PATH:/usr/lib/mxe/usr/bin/ 
--- 
-2.14.2
+It was tested with X86 and I think aarch64.
+I am not sure how it would work with or if we
+really need it for s390.
+
+We need the device to start a PCI hierarchy by plugging
+it to PCIe Root Port. If I understand correctly s390
+does not use PCIe Root Ports and may not need it.
+
+If the assumption is correct I suppose we should only
+be compiled into the above archs.
+If you agree, I can post a patch for this.
+
+Thanks,
+Marcel
+
+> Backtrace looks like this:
+> 
+> #0  0x000055555577064b in pci_default_write_config (d=d@entry=0x0,
+> addr=addr@entry=26, val_in=1, l=l@entry=1) at
+> /home/thuth/devel/qemu/hw/pci/pci.c:1367
+> #1  0x00005555556c885f in s390_pcihost_hot_plug (hotplug_dev=<optimized
+> out>, dev=0x55555639b160, errp=0x7fffffffc5a0) at
+> /home/thuth/devel/qemu/hw/s390x/s390-pci-bus.c:684
+> #2  0x000055555575afeb in device_set_realized (obj=<optimized out>,
+> value=<optimized out>, errp=0x7fffffffc6d8) at
+> /home/thuth/devel/qemu/hw/core/qdev.c:936
+> #3  0x00005555557ee48e in property_set_bool (obj=0x55555639b160,
+> v=<optimized out>, name=<optimized out>, opaque=0x555556399fe0,
+> errp=0x7fffffffc6d8)
+>      at /home/thuth/devel/qemu/qom/object.c:1906
+> #4  0x00005555557f25ff in object_property_set_qobject
+> (obj=obj@entry=0x55555639b160, value=value@entry=0x55555639d170,
+> name=name@entry=0x5555559a4157 "realized",
+> errp=errp@entry=0x7fffffffc6d8) at
+> /home/thuth/devel/qemu/qom/qom-qobject.c:27
+> #5  0x00005555557f0270 in object_property_set_bool (obj=0x55555639b160,
+> value=<optimized out>, name=0x5555559a4157 "realized", errp=0x7fffffffc6d8)
+>      at /home/thuth/devel/qemu/qom/object.c:1171
+> #6  0x000055555570b549 in qdev_device_add
+> (opts=opts@entry=0x55555640cb50, errp=errp@entry=0x7fffffffc7b0) at
+> /home/thuth/devel/qemu/qdev-monitor.c:632
+> ...
+> 
+>   Thomas
+> 
