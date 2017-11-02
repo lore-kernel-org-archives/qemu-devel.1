@@ -1,27 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48136)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57185)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eABWS-0007zY-Gz
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 05:10:51 -0400
+	(envelope-from <ppandit@redhat.com>) id 1eABvS-0007Nx-PR
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 05:36:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eABWM-0000a6-Jq
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 05:10:48 -0400
-Received: from mail-wr0-x230.google.com ([2a00:1450:400c:c0c::230]:43145)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eABWM-0000ZS-Cl
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 05:10:42 -0400
-Received: by mail-wr0-x230.google.com with SMTP id w105so4301698wrc.0
-	for <qemu-devel@nongnu.org>; Thu, 02 Nov 2017 02:10:42 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20171005145557.5746-2-programmingkidx@gmail.com>
-References: <20171005145557.5746-1-programmingkidx@gmail.com>
-	<20171005145557.5746-2-programmingkidx@gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 2 Nov 2017 09:10:20 +0000
-Message-ID: <CAFEAcA83iZs0T-rM24QZn1ttAsXjuWfsehW86kJBt52Up1p1Hw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] ui/cocoa.m: move ungrab to
- ctrl-alt-g
+	(envelope-from <ppandit@redhat.com>) id 1eABvP-000490-M7
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 05:36:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33892)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1eABvP-00047K-FU
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 05:36:35 -0400
+From: P J P <ppandit@redhat.com>
+Date: Thu,  2 Nov 2017 15:06:25 +0530
+Message-Id: <20171102093625.32342-1-ppandit@redhat.com>
+Subject: [Qemu-devel] [PATCH] pc: restrict port92 register value to 2 bits
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,29 +21,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Arbuckle <programmingkidx@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Qemu Developers <qemu-devel@nongnu.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Niu Guoxiang <niuguoxiang@huawei.com>, Prasad J Pandit <pjp@fedoraproject.org>
 
-On 5 October 2017 at 15:55, John Arbuckle <programmingkidx@gmail.com> wrote:
-> Currently the cocoa user interface relys on the user pushing control-alt to ungrab the mouse. This is patch changes the key combination to control-alt-g to be in line with the GTK user interface.
->
-> signed-off-by: John Arbuckle <programmingkidx@gmail.com>
-> ---
+From: Prasad J Pandit <pjp@fedoraproject.org>
 
-> +
-> +                    // release the mouse grab
-> +                    case Q_KEY_CODE_G:
-> +                        [self ungrabMouse];
-> +                        break;
->                  }
+Port 92 configuration register holds an 8-bit value. Of 8-bits,
+bits 0-1 are used and 2-7 are reserved. Restrict the supplied
+value to 2 bits.
 
-Testing this I have found that it makes the grab key be
-"ctrl+alt+ the key labelled 'g'", even if in the
-OSX host keyboard mapping that key doesn't produce the
-letter 'g'. This is in contrast to for instance the menu
-accelerators which honour the host keyboard layout, and
-it's also not what the GTK UI does. So I think we need
-to fix that.
+Reported-by: Niu Guoxiang <niuguoxiang@huawei.com>
+Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+---
+ hw/i386/pc.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-thanks
--- PMM
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 05985d4927..883384a599 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -515,6 +515,7 @@ static void port92_write(void *opaque, hwaddr addr, uint64_t val,
+     Port92State *s = opaque;
+     int oldval = s->outport;
+ 
++    val &= 0x03;
+     DPRINTF("port92: write 0x%02" PRIx64 "\n", val);
+     s->outport = val;
+     qemu_set_irq(s->a20_out, (val >> 1) & 1);
+-- 
+2.13.6
