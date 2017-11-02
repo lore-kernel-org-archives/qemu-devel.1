@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42105)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42145)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1eAGfU-00049T-G7
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 10:40:31 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1eAGfg-0004F5-E4
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 10:40:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1eAGfT-0003Ex-Ny
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 10:40:28 -0400
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <20170929165347.29658-17-mreitz@redhat.com>
-References: <20170929165347.29658-1-mreitz@redhat.com>
-	<20170929165347.29658-17-mreitz@redhat.com>
-Date: Thu, 02 Nov 2017 15:40:20 +0100
-Message-ID: <w51shdwwxpn.fsf@maestria.local.igalia.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1eAGfd-0003OK-Bc
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 10:40:40 -0400
+Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:54688)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1eAGfd-0003LQ-5T
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 10:40:37 -0400
+Received: by mail-wm0-x234.google.com with SMTP id r68so11917311wmr.3
+	for <qemu-devel@nongnu.org>; Thu, 02 Nov 2017 07:40:36 -0700 (PDT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Thu,  2 Nov 2017 14:40:33 +0000
+Message-Id: <20171102144034.888-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v6 16/25] block: Add 'base-directory' BDS
- option
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 0/1] cross-compiler build fixes for softfreeze
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,19 +27,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, John Snow <jsnow@redhat.com>
+To: peter.maydell@linaro.org
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-On Fri 29 Sep 2017 06:53:38 PM CEST, Max Reitz wrote:
-> Using this option, one can directly override what bdrv_dirname() will
-> return. This is useful if one uses e.g. qcow2 on top of quorum (with
-> only protocol BDSs under the quorum BDS) and wants to be able to use
-> relative backing filenames.
->
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
+The following changes since commit d2b9d71432687eef947f243a57409381151701d5:
 
-Who would be using this option in practice? I understand that management
-tools should be using always absolute filenames, and this API doesn't
-seem so convenient for humans.
+  Merge remote-tracking branch 'remotes/dgilbert/tags/pull-hmp-20171030' into staging (2017-10-31 11:18:00 +0000)
 
-Berto
+are available in the git repository at:
+
+  https://github.com/stsquad/qemu.git tags/pull-ci-updates-for-softfreeze-021117-2
+
+for you to fetch changes up to e58c1f9b35e81dec90c3d483b57351256cecfc41:
+
+  docker: add python stdlib dependency (required by keycodemapdb) (2017-11-02 11:46:41 +0000)
+
+----------------------------------------------------------------
+One fix for win32/64 cross compiles.
+
+----------------------------------------------------------------
+Philippe Mathieu-Daudé (1):
+      docker: add python stdlib dependency (required by keycodemapdb)
+
+ tests/docker/dockerfiles/debian8-mxe.docker | 1 +
+ 1 file changed, 1 insertion(+)
+
+--
+2.14.2
