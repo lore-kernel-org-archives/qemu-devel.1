@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59878)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eAJXE-0007ok-97
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 13:44:11 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60693)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <n54@gmx.com>)
+	id 1eAJcb-0000fS-9R
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 13:49:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eAJX8-0000U0-G3
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 13:44:08 -0400
-References: <cover.1509550787.git.berto@igalia.com>
-	<c7e98781b46f3bbda37cffe526d5082f3e68a425.1509550787.git.berto@igalia.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <bdb44140-d0fa-f84e-4622-21c50e4be8b7@redhat.com>
-Date: Thu, 2 Nov 2017 18:43:53 +0100
+	(envelope-from <n54@gmx.com>) id 1eAJcY-0002wS-7H
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 13:49:41 -0400
+Received: from mout.gmx.net ([212.227.17.21]:56349)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <n54@gmx.com>) id 1eAJcX-0002v4-R1
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 13:49:38 -0400
+References: <20171028194833.23858-1-n54@gmx.com>
+	<CAFEAcA8Rw99f6aB-=4bahwyxpPMYiyG0aCCAyqBmva3vMYrJDA@mail.gmail.com>
+	<891b1cf9-6d6f-ace6-c6af-ec9ef4e83139@gmx.com>
+	<CAFEAcA-d3z-968piK2X0-8GBdGVqZjqrCnoKkvrjOxOu8PULXQ@mail.gmail.com>
+From: Kamil Rytarowski <n54@gmx.com>
+Message-ID: <bab3e4fa-5485-8c8b-dccd-c87256106d58@gmx.com>
+Date: Thu, 2 Nov 2017 18:52:04 +0100
 MIME-Version: 1.0
-In-Reply-To: <c7e98781b46f3bbda37cffe526d5082f3e68a425.1509550787.git.berto@igalia.com>
+In-Reply-To: <CAFEAcA-d3z-968piK2X0-8GBdGVqZjqrCnoKkvrjOxOu8PULXQ@mail.gmail.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="7gHCinIDDP7rU33gckxeUU9A9IDG1jnaR"
-Subject: Re: [Qemu-devel] [PATCH 4/4] qcow2: Add iotest for an empty
- refcount table
+	boundary="acCoXuWD8RVtTfoKimJcm3EkoW6hDVujr"
+Subject: Re: [Qemu-devel] [PATCH] oslib-posix: Use sysctl(2) call to resolve
+ exec_dir on NetBSD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,54 +31,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>, "R . Nageswara Sastry" <nasastry@in.ibm.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Antonio_Huete_Jim=c3=a9nez?= <tuxillo@quantumachine.net>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---7gHCinIDDP7rU33gckxeUU9A9IDG1jnaR
-From: Max Reitz <mreitz@redhat.com>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- Thomas Huth <thuth@redhat.com>, "R . Nageswara Sastry" <nasastry@in.ibm.com>
-Message-ID: <bdb44140-d0fa-f84e-4622-21c50e4be8b7@redhat.com>
-Subject: Re: [PATCH 4/4] qcow2: Add iotest for an empty refcount table
-References: <cover.1509550787.git.berto@igalia.com>
- <c7e98781b46f3bbda37cffe526d5082f3e68a425.1509550787.git.berto@igalia.com>
-In-Reply-To: <c7e98781b46f3bbda37cffe526d5082f3e68a425.1509550787.git.berto@igalia.com>
+--acCoXuWD8RVtTfoKimJcm3EkoW6hDVujr
+From: Kamil Rytarowski <n54@gmx.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>,
+ =?UTF-8?Q?Antonio_Huete_Jim=c3=a9nez?= <tuxillo@quantumachine.net>
+Message-ID: <bab3e4fa-5485-8c8b-dccd-c87256106d58@gmx.com>
+Subject: Re: [Qemu-devel] [PATCH] oslib-posix: Use sysctl(2) call to resolve
+ exec_dir on NetBSD
+References: <20171028194833.23858-1-n54@gmx.com>
+ <CAFEAcA8Rw99f6aB-=4bahwyxpPMYiyG0aCCAyqBmva3vMYrJDA@mail.gmail.com>
+ <891b1cf9-6d6f-ace6-c6af-ec9ef4e83139@gmx.com>
+ <CAFEAcA-d3z-968piK2X0-8GBdGVqZjqrCnoKkvrjOxOu8PULXQ@mail.gmail.com>
+In-Reply-To: <CAFEAcA-d3z-968piK2X0-8GBdGVqZjqrCnoKkvrjOxOu8PULXQ@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 2017-11-01 16:42, Alberto Garcia wrote:
-> This patch adds a simple iotests in which we try to write to an image
-> with an empty refcount table (i.e. with all entries set to 0).
+On 02.11.2017 18:29, Peter Maydell wrote:
+> On 2 November 2017 at 17:27, Kamil Rytarowski <n54@gmx.com> wrote:
+>> On 02.11.2017 17:55, Peter Maydell wrote:
+>>> It's a shame the BSDs can't agree on a single way to implement this :=
+-(
 >=20
-> This scenario was already handled by the existing consistency checks,
-> but we add an explicit test case for completeness.
+>> It's better to assume that there is no such entity as a shared BSD cod=
+e
+>> in modern BSD Operating Systems. My opinion is to drop CONFIG_BSD
+>> entirely from qemu and treat __NetBSD__, __FreeBSD__ and __OpenBSD__ a=
+s
+>> diverse targets.
 >=20
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
-> ---
->  tests/qemu-iotests/060     | 7 +++++++
->  tests/qemu-iotests/060.out | 6 ++++++
->  2 files changed, 13 insertions(+)
+> Mmm, that's probably the best way to do it. (Better still,
+> wherever possible check features rather than OS type).
+>=20
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+Correct.
+
+We already end up with check for CONFIG_BSD and specific BSD variation.
+
+chardev/char-parallel.c:#ifdef CONFIG_BSD
+chardev/char-parallel.c-#if defined(__FreeBSD__) ||
+defined(__FreeBSD_kernel__)
+
+util/qemu-openpty.c:#elif defined CONFIG_BSD
+util/qemu-openpty.c-# include <termios.h>
+util/qemu-openpty.c-# if defined(__FreeBSD__) ||
+defined(__FreeBSD_kernel__) || defined(__DragonFly__)
+
+block.c:#ifdef CONFIG_BSD
+block.c-#include <sys/ioctl.h>
+block.c-#include <sys/queue.h>
+block.c-#ifndef __DragonFly__
+
+Sometimes automatic detection whether a struct or function exists can
+lead to problems as they might have different purpose. This is common
+especially for sysctl(2) calls.
+
+> It does mean that more minor BSD variants like DragonFly are
+> in a worse place, because nobody much is going to care about
+> supporting them, and they can't get automatic support by
+> being "like all of the others".
+>=20
+
+Fixing and maintaining DragonFly requires non-trivial (at lest in terms
+of dedicated time) effort. I wouldn't be surprised that part of qemu
+problems originates from the base-system bugs (this happens in every BSD
+and OS).
+
+CC: Antonio who expressed interest in the DFLY port.
+
+> thanks
+> -- PMM
+>=20
 
 
---7gHCinIDDP7rU33gckxeUU9A9IDG1jnaR
+
+--acCoXuWD8RVtTfoKimJcm3EkoW6hDVujr
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAln7WVkSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AddQIAJent9mOWF7bHba71uJlS+8lDdFPhfD7
-IOwlpnERK2GQCID3dNewgC1Q1tISh+oEZKE0drhNP2I+6DJCQPm+XuSY62pH1MuS
-D8Q9Fig6zKTP5sHwzUUyaRRBiR0Fk3lPilZwgXthmNqMdSc2jhojxzCJj8Dgk0Ve
-3/LSKlt0hF03qqS7TvrGAEYwo6MLMV3VCgQ3YQWBpczBe5SULswBuzOfYdaC4QIS
-rbqtpSsWe+i5Xhasi9JT+Um11rSpncujnurWqFRahMQSKNYRTkVAioRfAVNL83/L
-3L+TgH105R7PIO3LTwnhc1aD6bm5OVEJq/6tfxeDtibvIHVREpnRKp8=
-=sMG/
+iQIcBAEBCAAGBQJZ+1tKAAoJEEuzCOmwLnZs/RMP/2a7wCLxXrwuiVpKHyRA4GSp
+OAv03ZXbhTs7Ekf68dQ7YwBjEsjxM2GLHM0uIzDPCH0mIO1NI0Caz5GRBf3WYVTl
++7sIZJDTDAOLWihacJ/l0+aM2l8Jhq2SqTIp7C1DBgSmDYgTX8TSPnL2OF/rsYrb
+vmLccqbALCzDahaGKFwUkvIco6CuAXMFmruLUuMb696B1bGjH1NQLuAS5IJg4bmj
+9j67O1Zwu93Mop76sFTZCWmMTDKHZHignCyq235KQ5yyg/nP87WS3ieAISrJ0ibx
+PCbLWf66zP5r5DwfaWx5SsZ+FP9h5ALVQTBdc1vUPvy6q31Xa4Ysf2o9rG2sOoJv
+u1x0tQYDD0DsgdI85oMg8WWmvsZ2Um9UlMVVP559OGk++vBxG+0yIndiY//JLqxk
+xtZCUrENe3lXNarBbz+gjlR8OTBrY8WaCq8U829M8RrYBospGFDxUW1UGrQE3pOI
+nupjDvGG1BNQfP8jE1YQGOYUgL18lQXCt8t6NqbTk1FccKeMXInwWvFtOnDhmtBj
+qaU2LwrA2pYyT5NieDv/DqQYDxyu+FxxC2bmGpHH4rgaXORDAwGj8GOv10KX3SC0
+pOD2+9Yqj4P1g6pH2NqOzTEng/OM02jlX3L+WcwJjHvWsIdVP6B6fnjx9ZxVHYXg
+JIuvVRb21DMYTUbK7sr6
+=TSK9
 -----END PGP SIGNATURE-----
 
---7gHCinIDDP7rU33gckxeUU9A9IDG1jnaR--
+--acCoXuWD8RVtTfoKimJcm3EkoW6hDVujr--
