@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48172)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48890)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eAH3c-0004OS-Bq
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 11:05:30 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1eAH5t-0005eZ-LD
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 11:07:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eAH3V-0002og-Vc
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 11:05:23 -0400
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:47064)
+	(envelope-from <peter.maydell@linaro.org>) id 1eAH5s-0005lo-Rb
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 11:07:45 -0400
+Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:44996)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eAH3V-0002me-OU
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 11:05:17 -0400
-Received: by mail-wm0-x242.google.com with SMTP id m72so11801529wmc.1
-	for <qemu-devel@nongnu.org>; Thu, 02 Nov 2017 08:05:17 -0700 (PDT)
+	id 1eAH5s-0005jX-Lk
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 11:07:44 -0400
+Received: by mail-wr0-x244.google.com with SMTP id z55so5339830wrz.1
+	for <qemu-devel@nongnu.org>; Thu, 02 Nov 2017 08:07:44 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20171031223830.4608-1-Andrew.Baumann@microsoft.com>
-References: <20171031223830.4608-1-Andrew.Baumann@microsoft.com>
+In-Reply-To: <1509519537-6964-1-git-send-email-thuth@redhat.com>
+References: <1509519537-6964-1-git-send-email-thuth@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 2 Nov 2017 15:04:55 +0000
-Message-ID: <CAFEAcA9rbXTwts2bfWmbT8sL91zCgL6u6D8xxdWgAh+06eef6Q@mail.gmail.com>
+Date: Thu, 2 Nov 2017 15:07:23 +0000
+Message-ID: <CAFEAcA9e7GAMmHjp9-nOy5AAiZL+CnW_OUbg89LpaT=3AoDnoA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v4] arm: implement cache/shareability
- attribute bits for PAR registers
+Subject: Re: [Qemu-devel] [PATCH 0/3] hw/arm: Mark the "fsl,
+ imx" devices with user_creatable = false
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,41 +29,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Baumann <Andrew.Baumann@microsoft.com>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Thomas Huth <thuth@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-On 31 October 2017 at 22:38, Andrew Baumann
-<Andrew.Baumann@microsoft.com> wrote:
-> On a successful address translation instruction, PAR is supposed to
-> contain cacheability and shareability attributes determined by the
-> translation. We previously returned 0 for these bits (in line with the
-> general strategy of ignoring caches and memory attributes), but some
-> guest OSes may depend on them.
+On 1 November 2017 at 06:58, Thomas Huth <thuth@redhat.com> wrote:
+> These devices can not be used by the user directly and cause QEMU
+> to abort() if the user tried it anyway. So simply mark the devices
+> with user_creatable = false to avoid that the users can run into
+> this unpleasant situation.
 >
-> This patch collects the attribute bits in the page-table walk, and
-> updates PAR with the correct attributes for all LPAE translations.
-> Short descriptor formats still return 0 for these bits, as in the
-> prior implementation.
+> Thomas Huth (3):
+>   hw/arm: Mark the "fsl,imx6" device with user_creatable = false
+>   hw/arm: Mark the "fsl,imx25" device with user_creatable = false
+>   hw/arm: Mark the "fsl,imx31" device with user_creatable = false
 >
-> Signed-off-by: Andrew Baumann <Andrew.Baumann@microsoft.com>
-> ---
-> v2:
->  * return attrs via out parameter from get_phys_addr, rather than MemTxAttrs
->  * move MAIR lookup/index inline, since it turned out to be simple
->  * implement attributes for stage 2 translations
->  * combine attributes from stages 1 and 2 when required
->
-> v3:
->  * implement S2 allocation hints and check for cache-disabled
->  * fix stage 2 shareability bits
->  * fix combined allocation hints (always use stage 1 hints)
->  * remove LOG_UNIMP message
->
-> v4:
->  * fix hihint shift buglet in convert_stage2_attrs
->  * remove TODO comment (what was there is complete)
->  * mention relevant pseudocode procedures in comments
->
+>  hw/arm/fsl-imx25.c | 6 +++++-
+>  hw/arm/fsl-imx31.c | 6 +++++-
+>  hw/arm/fsl-imx6.c  | 3 ++-
+>  3 files changed, 12 insertions(+), 3 deletions(-)
 
 
 
