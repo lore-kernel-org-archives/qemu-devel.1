@@ -1,34 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60251)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60259)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eAO1L-0003mD-RW
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 18:31:33 -0400
+	(envelope-from <bounces@canonical.com>) id 1eAO1M-0003mF-Mx
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 18:31:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eAO1H-0004UB-PO
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 18:31:31 -0400
-Received: from indium.canonical.com ([91.189.90.7]:48020)
+	(envelope-from <bounces@canonical.com>) id 1eAO1K-0004Xy-PA
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 18:31:32 -0400
+Received: from indium.canonical.com ([91.189.90.7]:48176)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eAO1H-0004TG-Fp
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 18:31:27 -0400
+	id 1eAO1K-0004Wi-Ex
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 18:31:30 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eAO1F-0004Pa-4q
-	for <qemu-devel@nongnu.org>; Thu, 02 Nov 2017 22:31:25 +0000
+	id 1eAO1I-0004UF-Ns
+	for <qemu-devel@nongnu.org>; Thu, 02 Nov 2017 22:31:28 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 16F4B2E80AD
-	for <qemu-devel@nongnu.org>; Thu,  2 Nov 2017 22:31:25 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id AE2AB2E807E
+	for <qemu-devel@nongnu.org>; Thu,  2 Nov 2017 22:31:28 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 02 Nov 2017 22:16:32 -0000
-From: Launchpad Bug Tracker <1719196@bugs.launchpad.net>
+Date: Thu, 02 Nov 2017 22:16:40 -0000
+From: Brian Murray <brian@ubuntu.com>
 Reply-To: Bug 1719196 <1719196@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <150626680089.6094.17724106932405637799.malonedeb@soybean.canonical.com>
-Message-Id: <150966099591.14704.15579565353459258178.malone@ackee.canonical.com>
+Message-Id: <150966100032.4354.14188248625392424512.malone@chaenomeles.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1719196] Re: [arm64 ocata] newly created
- instances are unable to raise network interfaces
+Subject: [Qemu-devel] [Bug 1719196] Update Released
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,20 +38,13 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-This bug was fixed in the package qemu - 1:2.8+dfsg-3ubuntu2.7
-
----------------
-qemu (1:2.8+dfsg-3ubuntu2.7) zesty; urgency=3Dmedium
-
-  * d/p/ubuntu/virtio-Fix-no-interrupt-when-not-creating-msi-contro.patch:
-    on Arm fix no interrupt when not creating msi controller. That fixes
-    broken networking if running with virtio-mmio only (LP: #1719196).
-
- -- Christian Ehrhardt <christian.ehrhardt@canonical.com>  Wed, 18 Oct
-2017 16:17:34 +0200
-
-** Changed in: qemu (Ubuntu Zesty)
-       Status: Fix Committed =3D> Fix Released
+The verification of the Stable Release Update for qemu has completed
+successfully and the package has now been released to -updates.
+Subsequently, the Ubuntu Stable Release Updates Team is being
+unsubscribed and will not receive messages about this bug report.  In
+the event that you encounter a regression using the package from
+-updates please report a new bug using ubuntu-bug and tag the bug report
+regression-update so we can easily find any regressions.
 
 -- =
 
