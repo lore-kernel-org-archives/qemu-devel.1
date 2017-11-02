@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54109)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54137)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eACwP-0000v7-JY
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 06:41:42 -0400
+	(envelope-from <bounces@canonical.com>) id 1eACwR-0000vU-PV
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 06:41:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eACwO-0006ZE-Fm
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 06:41:41 -0400
-Received: from indium.canonical.com ([91.189.90.7]:56900)
+	(envelope-from <bounces@canonical.com>) id 1eACwL-0006Xy-M5
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 06:41:43 -0400
+Received: from indium.canonical.com ([91.189.90.7]:56758)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eACwO-0006Ys-AO
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 06:41:40 -0400
+	id 1eACwL-0006Wb-Fj
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 06:41:37 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eACwM-0000Jf-Gb
-	for <qemu-devel@nongnu.org>; Thu, 02 Nov 2017 10:41:38 +0000
+	id 1eACwJ-0000Ac-9n
+	for <qemu-devel@nongnu.org>; Thu, 02 Nov 2017 10:41:35 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 608562E80D6
-	for <qemu-devel@nongnu.org>; Thu,  2 Nov 2017 10:41:38 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 468252E80D0
+	for <qemu-devel@nongnu.org>; Thu,  2 Nov 2017 10:41:35 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 02 Nov 2017 10:28:35 -0000
-From: ChristianEhrhardt <921208@bugs.launchpad.net>
-Reply-To: Bug 921208 <921208@bugs.launchpad.net>
+Date: Thu, 02 Nov 2017 10:29:42 -0000
+From: ChristianEhrhardt <1246990@bugs.launchpad.net>
+Reply-To: Bug 1246990 <1246990@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20120124212047.2129.40489.malonedeb@wampee.canonical.com>
-Message-Id: <150961851610.8833.10129405249307870518.malone@wampee.canonical.com>
+References: <20131101065844.10659.568.malonedeb@soybean.canonical.com>
+Message-Id: <150961858373.4653.2731846523519347484.launchpad@chaenomeles.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 921208] Re: win7/x64 installer hangs on startup
- with 0x0000005d.
+Subject: [Qemu-devel] [Bug 1246990] Re: [qemu-x86-64-linux-user 1.6.1] qemu:
+ uncaught target signal 11 (Segmentation fault) - core dumped
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,78 +39,80 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Yeah, Assuming the commit was the fix that is released since Xenial.
-
 ** Changed in: qemu (Ubuntu)
-       Status: Triaged =3D> Fix Released
+       Status: Confirmed =3D> Incomplete
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/921208
+https://bugs.launchpad.net/bugs/1246990
 
 Title:
-  win7/x64 installer hangs on startup with 0x0000005d.
+  [qemu-x86-64-linux-user 1.6.1] qemu: uncaught target signal 11
+  (Segmentation fault) - core dumped
 
 Status in QEMU:
-  Fix Released
+  Incomplete
 Status in qemu package in Ubuntu:
-  Fix Released
+  Incomplete
 
 Bug description:
-  hi,
+  Rjsupplicant is an authentication client of Campus Network in most
+  universities in China. Its Linux version has only x86 and amd64
+  version.
 
-  during booting win7/x64 installer i'm observing a bsod with 0x0000005d
-  ( msdn: unsupported_processor ).
+  On linux:
 
-  used command line: qemu-system-x86_64 -m 2048 -hda w7-system.img
-  -cdrom win7_x64.iso -boot d
+  ./qemu-x86_64 is compiled from latest qemu 1.6.1, with ./configure
+  options: --enable-debug --target-list=3Dx86_64-linux-user . Compiler is
+  gcc version 4.7.3 (Debian 4.7.3-4)
 
-  adding '-machine accel=3Dkvm' instead of default tcg accel helps to
-  boot.
+  $ sudo ./qemu-x86_64  ./rjsupplicant -n eth0 -u USER -p PASS -d 1 -s inte=
+rnet =
+
+  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+
+  $ sudo gdb ./qemu-x86_64
+  (gdb) r ./rjsupplicant -n eth0 -u USER -p PASS -d 1 -s internet
+  (gdb) where
+  #0  0x00005555559c21bd in static_code_gen_buffer ()
+  #1  0x00005555555b74d5 in cpu_tb_exec (cpu=3D0x555557972580, tb_ptr=3D0x5=
+555559c2190 <static_code_gen_buffer+819792> "A\213n\250\205\355\017\205\257=
+")
+      at /home/USER/x/rjsupplicant/x64/qemu-1.6.1/cpu-exec.c:56
+  #2  0x00005555555b817d in cpu_x86_exec (env=3D0x5555579726b0) at /home/US=
+ER/x/rjsupplicant/x64/qemu-1.6.1/cpu-exec.c:631
+  #3  0x00005555555d997a in cpu_loop (env=3D0x5555579726b0) at /home/USER/x=
+/rjsupplicant/x64/qemu-1.6.1/linux-user/main.c:283
+  #4  0x00005555555eca6b in clone_func (arg=3D0x7fffffffc1d0) at /home/USER=
+/x/rjsupplicant/x64/qemu-1.6.1/linux-user/syscall.c:4266
+  #5  0x00007ffff71bfe0e in start_thread (arg=3D0x7ffff7f04700) at pthread_=
+create.c:311
+  #6  0x00007ffff6ef493d in clone () at ../sysdeps/unix/sysv/linux/x86_64/c=
+lone.S:113
+
+  $ file rjsupplicant =
+
+  rjsupplicant: ELF 64-bit LSB  executable, x86-64, version 1 (SYSV), dynam=
+ically linked (uses shared libs), for GNU/Linux 2.6.9, not stripped
+
+  $ uname -r
+  3.10-2-amd64
 
   =
 
-  installed software:
+  And it can be run on Linux amd64 successfully.
 
-  qemu-1.0
-  linux-3.2.1
-  glibc-2.14.1
-  gcc-4.6.2
+  Though I don't have the source code of rjsupplicant, so I don't have
+  further information.
 
-  hw cpu:
+  `qemu-x86_64 -strace ./rjsupplicant -n eth0 -u USER -p PASS -d 1 -s
+  internet` is attached as strace_qemu.log
 
-  processor       : 0..7
-  vendor_id       : GenuineIntel
-  cpu family      : 6
-  model           : 42
-  model name      : Intel(R) Core(TM) i7-2630QM CPU @ 2.00GHz
-  stepping        : 7
-  microcode       : 0x14
-  cpu MHz         : 1995.739
-  cache size      : 6144 KB
-  physical id     : 0
-  siblings        : 8
-  core id         : 3
-  cpu cores       : 4
-  apicid          : 7
-  initial apicid  : 7
-  fpu             : yes
-  fpu_exception   : yes
-  cpuid level     : 13
-  wp              : yes
-  flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mc=
-a cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx=
- rdtscp lm constant_tsc arch_perfmon pebs bts rep_good nopl xtopology nonst=
-op_tsc aperfmperf pni pclmulqdq dtes64 monitor ds_cpl vmx est tm2 ssse3 cx1=
-6 xtpr pdcm pcid sse4_1 sse4_2 x2apic popcnt tsc_deadline_timer xsave avx l=
-ahf_lm ida arat epb xsaveopt pln pts dts tpr_shadow vnmi flexpriority ept v=
-pid
-  bogomips        : 3992.23
-  clflush size    : 64
-  cache_alignment : 64
-  address sizes   : 36 bits physical, 48 bits virtual
+  =
+
+  The binary is available to download at http://ge.tt/6pgG1tw/v/0
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/921208/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1246990/+subscriptions
