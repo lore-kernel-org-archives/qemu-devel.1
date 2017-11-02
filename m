@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48741)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49142)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eAN9U-0001dW-Ez
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 17:35:53 -0400
+	(envelope-from <mreitz@redhat.com>) id 1eANCC-0002SG-34
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 17:38:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eAN9R-0004fe-9a
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 17:35:52 -0400
-Received: from indium.canonical.com ([91.189.90.7]:47854)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eAN9R-0004dr-0f
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 17:35:49 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eAN9N-0006YZ-Vs
-	for <qemu-devel@nongnu.org>; Thu, 02 Nov 2017 21:35:46 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id AF3C92E8079
-	for <qemu-devel@nongnu.org>; Thu,  2 Nov 2017 21:35:45 +0000 (UTC)
+	(envelope-from <mreitz@redhat.com>) id 1eANCB-0008Do-9H
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 17:38:40 -0400
+References: <20171102120223.GI32533@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <50b7935f-c02f-7d7d-4e8e-fc8967e85d2e@redhat.com>
+Date: Thu, 2 Nov 2017 22:38:16 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 02 Nov 2017 21:16:06 -0000
-From: Max Reitz <1728661@bugs.launchpad.net>
-Reply-To: Bug 1728661 <1728661@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150938328262.20448.12104835174396986902.malonedeb@soybean.canonical.com>
-Message-Id: <150965736704.4887.3386127867826433935.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1728661] Re: qemu-io segfaults at
- block/qcow2.h:533
+In-Reply-To: <20171102120223.GI32533@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="M8IkkgB4AaaHtf58FHJm97niU7bflfRox"
+Subject: Re: [Qemu-devel] [Qemu-block] RFC: use case for adding QMP,
+ block jobs & multiple exports to qemu-nbd ?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,183 +24,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-Hi,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--M8IkkgB4AaaHtf58FHJm97niU7bflfRox
+From: Max Reitz <mreitz@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org,
+ qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+Message-ID: <50b7935f-c02f-7d7d-4e8e-fc8967e85d2e@redhat.com>
+Subject: Re: [Qemu-block] RFC: use case for adding QMP, block jobs & multiple
+ exports to qemu-nbd ?
+References: <20171102120223.GI32533@redhat.com>
+In-Reply-To: <20171102120223.GI32533@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-And finally, also here, thanks a lot for reporting this bug!  I've found
-a fix; sending a patch might take a little longer, though...
+On 2017-11-02 13:02, Daniel P. Berrange wrote:
+[...]
+> One alternative approach to doing this would be to suggest that we shou=
+ld
+> instead just spawn qemu-system-x86_64 with '--machine none' and use tha=
+t
+> as a replacement for qemu-nbd, since it already has a built-in NBD serv=
+er
+> which can do many exports at once and arbitrary block jobs.
+
+As far as I know, we had wanted to add QMP support to qemu-nbd maybe one
+or two years ago, but nobody ever did it.
+
+I've had some discussions about this with Markus and Kevin at KVM Forum.
+ They appeared to strongly prefer this approach.  I agree with them that
+design-wise, a qemu with no machine at all (and not even -M none) and
+early QMP is the way we want to go anyway, and then this would be the
+correct tool to use.
+
+> I'm concerned that this could end up being a be a game of whack-a-mole
+> though, constantly trying to cut out/down all the bits of system emulat=
+ion
+> in the machine emulators to get its resource overhead to match the low
+> overhead of standalone qemu-nbd.
+
+However, I personally share your concern.  Especially, I think that
+getting to a point where we can have no machine at all and early QMP
+will take much longer than just adding QMP to qemu-nbd -- or adding a
+qmp command to qemu-img (because you can add NBD exports through QMP, so
+qemu-nbd's hardcoded focus on NBD exports seems kind of weird then)[1].
+
+I'm very much torn here.  There are two approaches: Stripping fat qemu
+down, or fattening lean qemu-img (?) up.  The latter is very simple.
+The former is what we want anyway.
+
+Markus says it's not too hard to strip down qemu.  If that is true,
+there is no point in fattening qemu-img now.  I personally am not
+convinced at all, but he knows the state of that project much better
+than me, so I cannot reasonably disagree.
+
+So my mail is more of a CC to Markus and Kevin -- but I think both are
+on PTO right now.
+
+I guess the main question is: If someone were to introduce a qemu-img
+QMP subcommand -- would it be accepted? :-)
 
 Max
 
--- =
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1728661
+[1] Also, adding QMP should trivially add block jobs and multiple
+exports to whatever tool we are talking about (in fact, qemu-img already
+does perform the mirror block job for committing).
 
-Title:
-  qemu-io segfaults at block/qcow2.h:533
 
-Status in QEMU:
-  New
+--M8IkkgB4AaaHtf58FHJm97niU7bflfRox
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Bug description:
-  git is at HEAD a93ece47fd9edbd4558db24300056c9a57d3bcd4
-  This is on ppc64le architecture.
+-----BEGIN PGP SIGNATURE-----
 
-  Re-production steps:
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAln7kEgSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9A7B8H/3Orabqp0dR88JIZp3piI4Nr2s9mgdy2
+IjZI0JqodA9Uzm9Gw1fc/eQajG2ou7rZaaeKfJ6cmsw7lY/dCE/h3ux1uckrRvH3
+B3cGB2RfaloipOu0Txrr+LXqY5AIRd7k5RUlZ8hYP4zdBTG7wZYb0pMYV/lNx5W6
+73aTtXAELexYbfkqJEKjgjqSmGOXvXRMEPKbTuGO9OucE0i6IqwtpUmWWCxuinEB
+dTueQbT80Fr7N6834His5NqOoy+AyepxexYmjQ7XiboRh6HIkKTrvj9ZPYxnlR/C
+uEELXlZOs3XyDjpERtuGOwwu8MHlJR3fmdheDTh6tOYToqI3mmFWrbg=
+=hskL
+-----END PGP SIGNATURE-----
 
-  1. Copy the attached file named test.img to a directory
-  2. And customize the following command to point to the above directory an=
-d run the same.
-  # mv test.img copy.img
-  # qemu-io <path to>/copy.img -c "truncate 66560"
-
-  from gdb:
-  Program terminated with signal 11, Segmentation fault.
-  #0  0x0000000010054cec in get_refblock_offset (s=3D0x32ca3210, offset=3D9=
-223372036854775296) at ./block/qcow2.h:533
-  533	    return s->refcount_table[index] & REFT_OFFSET_MASK;
-  Missing separate debuginfos, use: debuginfo-install cyrus-sasl-lib-2.1.26=
--21.el7.ppc64le glib2-2.50.3-3.el7.ppc64le glibc-2.17-196.el7.ppc64le gmp-6=
-.0.0-15.el7.ppc64le gnutls-3.3.26-9.el7.ppc64le keyutils-libs-1.5.8-3.el7.p=
-pc64le krb5-libs-1.15.1-8.el7.ppc64le libaio-0.3.109-13.el7.ppc64le libcom_=
-err-1.42.9-10.el7.ppc64le libcurl-7.29.0-42.el7.ppc64le libffi-3.0.13-18.el=
-7.ppc64le libgcc-4.8.5-16.el7_4.1.ppc64le libidn-1.28-4.el7.ppc64le libseli=
-nux-2.5-11.el7.ppc64le libssh2-1.4.3-10.el7_2.1.ppc64le libstdc++-4.8.5-16.=
-el7_4.1.ppc64le libtasn1-4.10-1.el7.ppc64le nettle-2.7.1-8.el7.ppc64le nspr=
--4.13.1-1.0.el7_3.ppc64le nss-3.28.4-15.el7_4.ppc64le nss-softokn-freebl-3.=
-28.3-8.el7_4.ppc64le nss-util-3.28.4-3.el7.ppc64le openldap-2.4.44-5.el7.pp=
-c64le openssl-libs-1.0.2k-8.el7.ppc64le p11-kit-0.23.5-3.el7.ppc64le pcre-8=
-.32-17.el7.ppc64le zlib-1.2.7-17.el7.ppc64le
-  (gdb) bt
-  #0  0x0000000010054cec in get_refblock_offset (s=3D0x32ca3210, offset=3D9=
-223372036854775296) at ./block/qcow2.h:533
-  #1  0x000000001005df4c in qcow2_discard_refcount_block (bs=3D0x32c96f60, =
-discard_block_offs=3D9223372036854775296) at block/qcow2-refcount.c:3070
-  #2  0x000000001005e5c4 in qcow2_shrink_reftable (bs=3D0x32c96f60) at bloc=
-k/qcow2-refcount.c:3169
-  #3  0x0000000010051184 in qcow2_truncate (bs=3D0x32c96f60, offset=3D66560=
-, prealloc=3DPREALLOC_MODE_OFF, errp=3D0x3fffc051ecd8) at block/qcow2.c:3155
-  #4  0x0000000010016480 in bdrv_truncate (child=3D0x32ca6270, offset=3D665=
-60, prealloc=3DPREALLOC_MODE_OFF, errp=3D0x3fffc051ecd8) at block.c:3585
-  #5  0x0000000010090800 in blk_truncate (blk=3D0x32c89410, offset=3D66560,=
- prealloc=3DPREALLOC_MODE_OFF, errp=3D0x3fffc051ecd8) at block/block-backen=
-d.c:1845
-  #6  0x0000000010023028 in truncate_f (blk=3D0x32c89410, argc=3D2, argv=3D=
-0x32c685a0) at qemu-io-cmds.c:1580
-  #7  0x000000001001e648 in command (blk=3D0x32c89410, ct=3D0x32c96e30, arg=
-c=3D2, argv=3D0x32c685a0) at qemu-io-cmds.c:117
-  #8  0x0000000010024d64 in qemuio_command (blk=3D0x32c89410, cmd=3D0x3fffc=
-052f66e "truncate 66560") at qemu-io-cmds.c:2291
-  #9  0x000000001000b540 in command_loop () at qemu-io.c:374
-  #10 0x000000001000c05c in main (argc=3D4, argv=3D0x3fffc051f618) at qemu-=
-io.c:630
-  (gdb) bt full
-  #0  0x0000000010054cec in get_refblock_offset (s=3D0x32ca3210, offset=3D9=
-223372036854775296) at ./block/qcow2.h:533
-          index =3D 4294967295
-  #1  0x000000001005df4c in qcow2_discard_refcount_block (bs=3D0x32c96f60, =
-discard_block_offs=3D9223372036854775296) at block/qcow2-refcount.c:3070
-          s =3D 0x32ca3210
-          refblock_offs =3D 852111520
-          cluster_index =3D 16384
-          block_index =3D 3226593616
-          refblock =3D 0x32cb9570
-          ret =3D 16384
-          __PRETTY_FUNCTION__ =3D "qcow2_discard_refcount_block"
-  #2  0x000000001005e5c4 in qcow2_shrink_reftable (bs=3D0x32c96f60) at bloc=
-k/qcow2-refcount.c:3169
-          s =3D 0x32ca3210
-          reftable_tmp =3D 0x32cb9570
-          i =3D 0
-          ret =3D 0
-  #3  0x0000000010051184 in qcow2_truncate (bs=3D0x32c96f60, offset=3D66560=
-, prealloc=3DPREALLOC_MODE_OFF, errp=3D0x3fffc051ecd8) at block/qcow2.c:3155
-          last_cluster =3D 70367675804416
-          old_file_size =3D 70367675804416
-          s =3D 0x32ca3210
-          old_length =3D 1048576
-          new_l1_size =3D 1
-          ret =3D 0
-          __func__ =3D "qcow2_truncate"
-          __PRETTY_FUNCTION__ =3D "qcow2_truncate"
-          __FUNCTION__ =3D "qcow2_truncate"
-  #4  0x0000000010016480 in bdrv_truncate (child=3D0x32ca6270, offset=3D665=
-60, prealloc=3DPREALLOC_MODE_OFF, errp=3D0x3fffc051ecd8) at block.c:3585
-          bs =3D 0x32c96f60
-          drv =3D 0x102036f0 <bdrv_qcow2>
-          ret =3D 16383
-          __PRETTY_FUNCTION__ =3D "bdrv_truncate"
-          __func__ =3D "bdrv_truncate"
-  #5  0x0000000010090800 in blk_truncate (blk=3D0x32c89410, offset=3D66560,=
- prealloc=3DPREALLOC_MODE_OFF, errp=3D0x3fffc051ecd8) at block/block-backen=
-d.c:1845
-          __func__ =3D "blk_truncate"
-  #6  0x0000000010023028 in truncate_f (blk=3D0x32c89410, argc=3D2, argv=3D=
-0x32c685a0) at qemu-io-cmds.c:1580
-          local_err =3D 0x0
-          offset =3D 66560
-          ret =3D 0
-  #7  0x000000001001e648 in command (blk=3D0x32c89410, ct=3D0x32c96e30, arg=
-c=3D2, argv=3D0x32c685a0) at qemu-io-cmds.c:117
-          cmd =3D 0x32c684c0 "truncate"
-  #8  0x0000000010024d64 in qemuio_command (blk=3D0x32c89410, cmd=3D0x3fffc=
-052f66e "truncate 66560") at qemu-io-cmds.c:2291
-          ctx =3D 0x32c924d0
-          input =3D 0x32c684c0 "truncate"
-          ct =3D 0x32c96e30
-          v =3D 0x32c685a0
-          c =3D 2
-          done =3D false
-  #9  0x000000001000b540 in command_loop () at qemu-io.c:374
-          i =3D 0
-          done =3D 0
-          fetchable =3D 0
-  ---Type <return> to continue, or q <return> to quit---
-          prompted =3D 0
-          input =3D 0x0
-  #10 0x000000001000c05c in main (argc=3D4, argv=3D0x3fffc051f618) at qemu-=
-io.c:630
-          readonly =3D 0
-          sopt =3D 0x101b2608 "hVc:d:f:rsnCmkt:T:U"
-          lopt =3D {{name =3D 0x101b26d0 "driver", has_arg =3D 0, flag =3D =
-0x0, val =3D 104}, {name =3D 0x101b26d8 "help", has_arg =3D 0, flag =3D 0x0=
-, val =3D 86}, {
-              name =3D 0x101b26e0 "version", has_arg =3D 1, flag =3D 0x0, v=
-al =3D 99}, {name =3D 0x101b26e8 "cmd", has_arg =3D 1, flag =3D 0x0, val =
-=3D 102}, {
-              name =3D 0x101b26f0 "format", has_arg =3D 0, flag =3D 0x0, va=
-l =3D 114}, {name =3D 0x101b2700 "y", has_arg =3D 0, flag =3D 0x0, val =3D =
-115}, {
-              name =3D 0x101b2710 "", has_arg =3D 0, flag =3D 0x0, val =3D =
-110}, {name =3D 0x101b2718 "nocache", has_arg =3D 0, flag =3D 0x0, val =3D =
-67}, {
-              name =3D 0x101b2728 "read", has_arg =3D 0, flag =3D 0x0, val =
-=3D 109}, {name =3D 0x101b2738 "", has_arg =3D 0, flag =3D 0x0, val =3D 107=
-}, {
-              name =3D 0x101b2748 "io", has_arg =3D 1, flag =3D 0x0, val =
-=3D 100}, {name =3D 0x101b2750 "discard", has_arg =3D 1, flag =3D 0x0, val =
-=3D 116}, {
-              name =3D 0x101b2758 "cache", has_arg =3D 1, flag =3D 0x0, val=
- =3D 84}, {name =3D 0x101b25e8 "object", has_arg =3D 1, flag =3D 0x0, val =
-=3D 256}, {
-              name =3D 0x101b2760 "trace", has_arg =3D 0, flag =3D 0x0, val=
- =3D 257}, {name =3D 0x101b1c48 "force-share", has_arg =3D 0, flag =3D 0x0,=
- val =3D 85}, {name =3D 0x0,
-              has_arg =3D 0, flag =3D 0x0, val =3D 0}}
-          c =3D -1
-          opt_index =3D 0
-          flags =3D 16386
-          writethrough =3D true
-          local_error =3D 0x0
-          opts =3D 0x0
-          format =3D 0x0
-          trace_file =3D 0x0
-          force_share =3D false
-
-  image_fuzzer image will be attached.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1728661/+subscriptions
+--M8IkkgB4AaaHtf58FHJm97niU7bflfRox--
