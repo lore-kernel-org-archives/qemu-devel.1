@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49142)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49416)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eANCC-0002SG-34
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 17:38:41 -0400
+	(envelope-from <programmingkidx@gmail.com>) id 1eANCq-0002pa-Bt
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 17:39:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eANCB-0008Do-9H
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 17:38:40 -0400
-References: <20171102120223.GI32533@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <50b7935f-c02f-7d7d-4e8e-fc8967e85d2e@redhat.com>
-Date: Thu, 2 Nov 2017 22:38:16 +0100
-MIME-Version: 1.0
-In-Reply-To: <20171102120223.GI32533@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="M8IkkgB4AaaHtf58FHJm97niU7bflfRox"
-Subject: Re: [Qemu-devel] [Qemu-block] RFC: use case for adding QMP,
- block jobs & multiple exports to qemu-nbd ?
+	(envelope-from <programmingkidx@gmail.com>) id 1eANCn-0008Vl-9M
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 17:39:20 -0400
+Received: from mail-io0-x241.google.com ([2607:f8b0:4001:c06::241]:53398)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+	id 1eANCn-0008Vb-3p
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 17:39:17 -0400
+Received: by mail-io0-x241.google.com with SMTP id 189so2106536iow.10
+	for <qemu-devel@nongnu.org>; Thu, 02 Nov 2017 14:39:17 -0700 (PDT)
+From: John Arbuckle <programmingkidx@gmail.com>
+Date: Thu,  2 Nov 2017 17:39:06 -0400
+Message-Id: <20171102213907.11443-1-programmingkidx@gmail.com>
+Subject: [Qemu-devel] [PATCH v3 1/2] ui/cocoa.m: move ungrab to ctrl-alt-g
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,91 +24,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+To: peter.maydell@linaro.org, qemu-devel@nongnu.org
+Cc: John Arbuckle <programmingkidx@gmail.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---M8IkkgB4AaaHtf58FHJm97niU7bflfRox
-From: Max Reitz <mreitz@redhat.com>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org,
- qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <50b7935f-c02f-7d7d-4e8e-fc8967e85d2e@redhat.com>
-Subject: Re: [Qemu-block] RFC: use case for adding QMP, block jobs & multiple
- exports to qemu-nbd ?
-References: <20171102120223.GI32533@redhat.com>
-In-Reply-To: <20171102120223.GI32533@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Currently the cocoa user interface relys on the user pushing control-alt to ungrab the mouse. This is patch changes the key combination to control-alt-g to be in line with the GTK user interface. 
 
-On 2017-11-02 13:02, Daniel P. Berrange wrote:
-[...]
-> One alternative approach to doing this would be to suggest that we shou=
-ld
-> instead just spawn qemu-system-x86_64 with '--machine none' and use tha=
-t
-> as a replacement for qemu-nbd, since it already has a built-in NBD serv=
-er
-> which can do many exports at once and arbitrary block jobs.
+Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
+---
+v3 changes
+- Code is now keyboard layout aware.
 
-As far as I know, we had wanted to add QMP support to qemu-nbd maybe one
-or two years ago, but nobody ever did it.
+ ui/cocoa.m | 31 ++++++++++++++++++-------------
+ 1 file changed, 18 insertions(+), 13 deletions(-)
 
-I've had some discussions about this with Markus and Kevin at KVM Forum.
- They appeared to strongly prefer this approach.  I agree with them that
-design-wise, a qemu with no machine at all (and not even -M none) and
-early QMP is the way we want to go anyway, and then this would be the
-correct tool to use.
-
-> I'm concerned that this could end up being a be a game of whack-a-mole
-> though, constantly trying to cut out/down all the bits of system emulat=
-ion
-> in the machine emulators to get its resource overhead to match the low
-> overhead of standalone qemu-nbd.
-
-However, I personally share your concern.  Especially, I think that
-getting to a point where we can have no machine at all and early QMP
-will take much longer than just adding QMP to qemu-nbd -- or adding a
-qmp command to qemu-img (because you can add NBD exports through QMP, so
-qemu-nbd's hardcoded focus on NBD exports seems kind of weird then)[1].
-
-I'm very much torn here.  There are two approaches: Stripping fat qemu
-down, or fattening lean qemu-img (?) up.  The latter is very simple.
-The former is what we want anyway.
-
-Markus says it's not too hard to strip down qemu.  If that is true,
-there is no point in fattening qemu-img now.  I personally am not
-convinced at all, but he knows the state of that project much better
-than me, so I cannot reasonably disagree.
-
-So my mail is more of a CC to Markus and Kevin -- but I think both are
-on PTO right now.
-
-I guess the main question is: If someone were to introduce a qemu-img
-QMP subcommand -- would it be accepted? :-)
-
-Max
-
-
-[1] Also, adding QMP should trivially add block jobs and multiple
-exports to whatever tool we are talking about (in fact, qemu-img already
-does perform the mirror block job for committing).
-
-
---M8IkkgB4AaaHtf58FHJm97niU7bflfRox
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAln7kEgSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9A7B8H/3Orabqp0dR88JIZp3piI4Nr2s9mgdy2
-IjZI0JqodA9Uzm9Gw1fc/eQajG2ou7rZaaeKfJ6cmsw7lY/dCE/h3ux1uckrRvH3
-B3cGB2RfaloipOu0Txrr+LXqY5AIRd7k5RUlZ8hYP4zdBTG7wZYb0pMYV/lNx5W6
-73aTtXAELexYbfkqJEKjgjqSmGOXvXRMEPKbTuGO9OucE0i6IqwtpUmWWCxuinEB
-dTueQbT80Fr7N6834His5NqOoy+AyepxexYmjQ7XiboRh6HIkKTrvj9ZPYxnlR/C
-uEELXlZOs3XyDjpERtuGOwwu8MHlJR3fmdheDTh6tOYToqI3mmFWrbg=
-=hskL
------END PGP SIGNATURE-----
-
---M8IkkgB4AaaHtf58FHJm97niU7bflfRox--
+diff --git a/ui/cocoa.m b/ui/cocoa.m
+index 2794f60b27..e06aa9c65f 100644
+--- a/ui/cocoa.m
++++ b/ui/cocoa.m
+@@ -609,10 +609,6 @@ - (void) handleEvent:(NSEvent *)event
+                 }
+             }
+ 
+-            // release Mouse grab when pressing ctrl+alt
+-            if (([event modifierFlags] & NSEventModifierFlagControl) && ([event modifierFlags] & NSEventModifierFlagOption)) {
+-                [self ungrabMouse];
+-            }
+             break;
+         case NSEventTypeKeyDown:
+             keycode = cocoa_keycode_to_qemu([event keyCode]);
+@@ -625,14 +621,23 @@ - (void) handleEvent:(NSEvent *)event
+ 
+             // default
+ 
+-            // handle control + alt Key Combos (ctrl+alt is reserved for QEMU)
++            // handle control + alt Key Combos (ctrl+alt+[1..9,g] is reserved for QEMU)
+             if (([event modifierFlags] & NSEventModifierFlagControl) && ([event modifierFlags] & NSEventModifierFlagOption)) {
+-                switch (keycode) {
+-
+-                    // enable graphic console
+-                    case Q_KEY_CODE_1 ... Q_KEY_CODE_9: // '1' to '9' keys
+-                        console_select(keycode - Q_KEY_CODE_1);
+-                        break;
++                NSString *keychar = [event charactersIgnoringModifiers];
++                if ([keychar length] == 1) {
++                    char key = [keychar characterAtIndex:0];
++                    switch (key) {
++
++                        // enable graphic console
++                        case '1' ... '9':
++                            console_select(key - '0' - 1); /* ascii math */
++                            return;
++
++                        // release the mouse grab
++                        case 'g':
++                            [self ungrabMouse];
++                            return;
++                    }
+                 }
+ 
+             // handle keys for graphic console
+@@ -806,9 +811,9 @@ - (void) grabMouse
+ 
+     if (!isFullscreen) {
+         if (qemu_name)
+-            [normalWindow setTitle:[NSString stringWithFormat:@"QEMU %s - (Press ctrl + alt to release Mouse)", qemu_name]];
++            [normalWindow setTitle:[NSString stringWithFormat:@"QEMU %s - (Press ctrl + alt + g to release Mouse)", qemu_name]];
+         else
+-            [normalWindow setTitle:@"QEMU - (Press ctrl + alt to release Mouse)"];
++            [normalWindow setTitle:@"QEMU - (Press ctrl + alt + g to release Mouse)"];
+     }
+     [self hideCursor];
+     if (!isAbsoluteEnabled) {
+-- 
+2.13.5 (Apple Git-94)
