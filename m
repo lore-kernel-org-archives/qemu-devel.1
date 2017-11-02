@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59146)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59473)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eAJTs-00069y-RQ
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 13:40:42 -0400
+	(envelope-from <mreitz@redhat.com>) id 1eAJV6-0006rt-OP
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 13:41:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eAJTl-0006bR-35
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 13:40:36 -0400
-Date: Thu, 2 Nov 2017 17:40:22 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20171102174022.GA32533@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20171102171846.21445-1-lyan@suse.com>
-	<CAFEAcA8JDVKBE1pFssTwFTybT=Kamc+_ra8qRF-DGSpb7=7QZA@mail.gmail.com>
+	(envelope-from <mreitz@redhat.com>) id 1eAJV3-0007wy-07
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 13:41:56 -0400
+References: <cover.1509550787.git.berto@igalia.com>
+	<33492fad2f21dff38a33a96decb38983aee7e405.1509550787.git.berto@igalia.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <6e9b5351-b1b4-4df4-c267-a8b4e8061864@redhat.com>
+Date: Thu, 2 Nov 2017 18:41:44 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA8JDVKBE1pFssTwFTybT=Kamc+_ra8qRF-DGSpb7=7QZA@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v2] hw/display/xenfb: Simulate auto-repeat
- key events
+In-Reply-To: <33492fad2f21dff38a33a96decb38983aee7e405.1509550787.git.berto@igalia.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="jbjPWLlibj0bPQx5t5PtwJE6vvjhhSVQg"
+Subject: Re: [Qemu-devel] [PATCH 3/4] qcow2: Don't open images with
+ header.refcount_table_clusters == 0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,79 +25,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Liang Yan <lyan@suse.com>, Anthony PERARD <anthony.perard@citrix.com>, "open list:X86" <xen-devel@lists.xenproject.org>, Stefano Stabellini <sstabellini@kernel.org>, QEMU Trivial <qemu-trivial@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>, "R . Nageswara Sastry" <nasastry@in.ibm.com>
 
-On Thu, Nov 02, 2017 at 05:26:50PM +0000, Peter Maydell wrote:
-> On 2 November 2017 at 17:18, Liang Yan <lyan@suse.com> wrote:
-> > New tigervnc changes the way to send long pressed key,
-> > from "down up down up ..." to "down down ... up", it only
-> > affects xen pv console mode. I send a patch to latest
-> > kernel side, but it may have a fix in qemu backend for
-> > back compatible becase guest VMs may use very old kernel.
-> > This patch inserts an up event after each regular key down
-> > event to simulate an auto-repeat key event for xen keyboard
-> > frontend driver.
-> >
-> > Signed-off-by: Liang Yan <lyan@suse.com>
-> > ---
-> > v2:
-> > - exclude extended key
-> > - change log comment
-> >
-> >  hw/display/xenfb.c | 5 +++++
-> >  1 file changed, 5 insertions(+)
-> >
-> > diff --git a/hw/display/xenfb.c b/hw/display/xenfb.c
-> > index 8e2547ac05..1bc5b41ab7 100644
-> > --- a/hw/display/xenfb.c
-> > +++ b/hw/display/xenfb.c
-> > @@ -292,6 +292,11 @@ static void xenfb_key_event(void *opaque, int scancode)
-> >      }
-> >      trace_xenfb_key_event(opaque, scancode2linux[scancode], down);
-> >      xenfb_send_key(xenfb, down, scancode2linux[scancode]);
-> > +
-> > +    /* insert an up event for regular down key event */
-> > +    if (down && !xenfb->extended) {
-> > +        xenfb_send_key(xenfb, 0, scancode2linux[scancode]);
-> > +    }
-> >  }
-> 
-> This doesn't look to me like the right place to fix this bug.
-> The xenfb key event handler is just one QEMU keyboard backend
-> (in a setup where there are many possible sources of keyboard
-> events: vnc, gtk, SDL, cocoa UI frontends; and many possible
-> sinks: xenfb's key handling, ps2 keyboard emulator, etc etc).
-> 
-> We need to be clear in our definition of generic QEMU key
-> events how key repeat is supposed to be handled, and then
-> every consumer and every producer needs to follow that.
-> In the specific case of the vnc UI frontend, we need to
-> also look at what the VNC protocol specifies for key repeat.
-> That then tells us whether the bug to be fixed is in QEMU,
-> or in a particular VNC client.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--jbjPWLlibj0bPQx5t5PtwJE6vvjhhSVQg
+From: Max Reitz <mreitz@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, "R . Nageswara Sastry" <nasastry@in.ibm.com>
+Message-ID: <6e9b5351-b1b4-4df4-c267-a8b4e8061864@redhat.com>
+Subject: Re: [PATCH 3/4] qcow2: Don't open images with
+ header.refcount_table_clusters == 0
+References: <cover.1509550787.git.berto@igalia.com>
+ <33492fad2f21dff38a33a96decb38983aee7e405.1509550787.git.berto@igalia.com>
+In-Reply-To: <33492fad2f21dff38a33a96decb38983aee7e405.1509550787.git.berto@igalia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-I'm somewhat inclined to say this is a Tigervnc bug. We fixed this
-same issue in GTK-VNC ~10 years ago. While X11 would send a sequence
-of press,release,press,release,  GTK would turn this into
-press,press,press,press,release which broke some VNC servers.
-So GTK-VNC undoes this optimization from GTK to ensure a full set
-of press,release,press,release pairs is always sent.
+On 2017-11-01 16:42, Alberto Garcia wrote:
+> qcow2_do_open() is checking that header.refcount_table_clusters is not
+> too large, but it doesn't check that it's greater than zero. Apart
+> from the fact that an image like that is obviously corrupted, trying
+> to use it crashes QEMU since we end up with a null s->refcount_table
+> after qcow2_refcount_init().
+>=20
+> These images can however be repaired, so allow opening them if the
+> BDRV_O_CHECK flag is set.
+>=20
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> ---
+>  block/qcow2.c              | 6 ++++++
+>  tests/qemu-iotests/060     | 7 +++++++
+>  tests/qemu-iotests/060.out | 5 +++++
+>  3 files changed, 18 insertions(+)
 
-The official RFC for VNC does not specify any auto-repeat behaviour
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
-  https://tools.ietf.org/html/rfc6143#section-7.5.4
 
-The unofficial community authored extension to the RFC suggests
-taking the press,press,press,release approach to allow servers to
-distinguish auto-repeat from manual repeat, but I'm not really
-convinced by that justification really
+--jbjPWLlibj0bPQx5t5PtwJE6vvjhhSVQg
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-  http://vncdotool.readthedocs.io/en/latest/rfbproto.html#keyevent
+-----BEGIN PGP SIGNATURE-----
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAln7WNkSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9Ad3QH/Rh5tYYUe4XT7HB0zvznS/qv+k3t9M9Z
+T+/RLYfKXU4CcF0kPDp0npSpb+gs1MqvbfkYSrS4XheowGlWesCY+kj9fM/M/w2C
+aqSeoH3toDuzXzbFJaWS04isiPZW5tRceoVxQKUUwniGO4HKNOaNch3Q5DkFSxNb
+rV+Y641cLyBwYoqNUCurTPgyDnjbj0zMhLSeTR9uVXE55dfGGDQaTEwA+2OaQ/kH
+gQ8BPylz7jlTZUMrXEMdmN1JIipwPNtf93SBMcqEgvSCnR9n9cqeaPtq3peuWII/
+zvzXdGhC23oR0tmc71Ih2DeFjYWWLH0KZwcEumJ+TS09gxHo7M3ogFs=
+=R8FS
+-----END PGP SIGNATURE-----
+
+--jbjPWLlibj0bPQx5t5PtwJE6vvjhhSVQg--
