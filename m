@@ -1,20 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42668)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43087)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1eAGhX-0005MY-B8
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 10:42:36 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1eAGia-00062e-B4
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 10:43:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1eAGhS-0004jR-Ul
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 10:42:34 -0400
-References: <a0750de5-d3ce-3f15-ba12-ce383ded143d@redhat.com>
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <1e04415c-83d5-a6ac-f83f-d7a57b9b9868@redhat.com>
-Date: Thu, 2 Nov 2017 16:42:27 +0200
+	(envelope-from <pbonzini@redhat.com>) id 1eAGiX-0005yh-6K
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 10:43:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56226)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eAGiX-0005xY-0h
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 10:43:37 -0400
+References: <20171031112457.10516.8971.stgit@pasha-VirtualBox>
+	<20171031112644.10516.1734.stgit@pasha-VirtualBox>
+	<a8979594-78e4-13dc-2958-f7b4444a1bb0@redhat.com>
+	<001501d353cd$29099010$7b1cb030$@ru>
+	<18ddcf7c-0198-a0ce-c2cc-992131512897@redhat.com>
+	<001801d353d8$77016da0$650448e0$@ru>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <2f57db92-25e0-362a-6130-dfa116fd43a2@redhat.com>
+Date: Thu, 2 Nov 2017 15:43:26 +0100
 MIME-Version: 1.0
-In-Reply-To: <a0750de5-d3ce-3f15-ba12-ce383ded143d@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <001801d353d8$77016da0$650448e0$@ru>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] Crash with pcie-pci-bridge on qemu-system-s390x
+Subject: Re: [Qemu-devel] [RFC PATCH 19/26] cpu-exec: reset exit flag before
+ calling cpu_exec_nocache
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,70 +33,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-s390x@nongnu.org
-Cc: Aleksandr Bezzubikov <zuban32s@gmail.com>
+To: Pavel Dovgalyuk <dovgaluk@ispras.ru>, 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, boost.lists@gmail.com, quintela@redhat.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, maria.klimushenkova@ispras.ru, kraxel@redhat.com, alex.bennee@linaro.org
 
-On 02/11/2017 16:19, Thomas Huth wrote:
->   Hi,
+On 02/11/2017 13:45, Pavel Dovgalyuk wrote:
+>> But if u16.high is -1, shouldn't you return EXCP_INTERRUPT first (via
+>> "Finally, check if we need to exit to the main loop" in
+>> cpu_handle_interrupt)?  Then only cause the exception when that one is
+>> processed.
+> The case is the following.
+> 1. There are no pending instructions to execute, cpu_loop_exec_tb finished.
+> 2. There are no interrupts and cpu_handle_interrupt sets cpu->exception_index = EXCP_INTERRUPT
+> 3. There are no pending exceptions and cpu_handle_exception goes to the last branch,
+>    because there is an exception flag in the log.
+> 4. cpu_exec_nocache translates the block and tries to execute it, causing an exception
 > 
 
-Hi Thomas,
+Then the fix is indeed to clear u16.high in cpu_handle_interrupt instead
+of cpu_loop_exec_tb---see my other reply.
 
-> seems like there's a new way to crash QEMU with the pcie-pci-bridge
-> device (using QEMU master branch of today):
->  > $ s390x-softmmu/qemu-system-s390x -nographic -S
-> QEMU 2.10.50 monitor - type 'help' for more information
-> (qemu) device_add pcie-pci-bridge,id=x
-> Segmentation fault (core dumped)
-> 
-
-Thanks for noticing it.
-
-> Does anybody have a clue what might be wrong here?
-> 
-
-It was tested with X86 and I think aarch64.
-I am not sure how it would work with or if we
-really need it for s390.
-
-We need the device to start a PCI hierarchy by plugging
-it to PCIe Root Port. If I understand correctly s390
-does not use PCIe Root Ports and may not need it.
-
-If the assumption is correct I suppose we should only
-be compiled into the above archs.
-If you agree, I can post a patch for this.
-
-Thanks,
-Marcel
-
-> Backtrace looks like this:
-> 
-> #0  0x000055555577064b in pci_default_write_config (d=d@entry=0x0,
-> addr=addr@entry=26, val_in=1, l=l@entry=1) at
-> /home/thuth/devel/qemu/hw/pci/pci.c:1367
-> #1  0x00005555556c885f in s390_pcihost_hot_plug (hotplug_dev=<optimized
-> out>, dev=0x55555639b160, errp=0x7fffffffc5a0) at
-> /home/thuth/devel/qemu/hw/s390x/s390-pci-bus.c:684
-> #2  0x000055555575afeb in device_set_realized (obj=<optimized out>,
-> value=<optimized out>, errp=0x7fffffffc6d8) at
-> /home/thuth/devel/qemu/hw/core/qdev.c:936
-> #3  0x00005555557ee48e in property_set_bool (obj=0x55555639b160,
-> v=<optimized out>, name=<optimized out>, opaque=0x555556399fe0,
-> errp=0x7fffffffc6d8)
->      at /home/thuth/devel/qemu/qom/object.c:1906
-> #4  0x00005555557f25ff in object_property_set_qobject
-> (obj=obj@entry=0x55555639b160, value=value@entry=0x55555639d170,
-> name=name@entry=0x5555559a4157 "realized",
-> errp=errp@entry=0x7fffffffc6d8) at
-> /home/thuth/devel/qemu/qom/qom-qobject.c:27
-> #5  0x00005555557f0270 in object_property_set_bool (obj=0x55555639b160,
-> value=<optimized out>, name=0x5555559a4157 "realized", errp=0x7fffffffc6d8)
->      at /home/thuth/devel/qemu/qom/object.c:1171
-> #6  0x000055555570b549 in qdev_device_add
-> (opts=opts@entry=0x55555640cb50, errp=errp@entry=0x7fffffffc7b0) at
-> /home/thuth/devel/qemu/qdev-monitor.c:632
-> ...
-> 
->   Thomas
-> 
+Paolo
