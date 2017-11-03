@@ -1,18 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38589)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39319)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1eAalG-0004wq-OS
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 08:07:47 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1eAaoU-00062v-Q8
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 08:11:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1eAalC-0004fs-QE
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 08:07:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33032)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1eAalC-0004f1-Iu
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 08:07:42 -0400
-Message-ID: <1509710857.31823.22.camel@redhat.com>
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Fri, 03 Nov 2017 13:07:37 +0100
-In-Reply-To: <CAFEAcA9kLX19tWACRLEGSd6iuRahTkBrORJqt1GSBSAA4bwr6g@mail.gmail.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1eAaoU-00074m-1w
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 08:11:06 -0400
+Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:47581)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eAaoT-00073K-R5
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 08:11:05 -0400
+Received: by mail-wm0-x231.google.com with SMTP id r196so1078555wmf.2
+	for <qemu-devel@nongnu.org>; Fri, 03 Nov 2017 05:11:05 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <1509710857.31823.22.camel@redhat.com>
 References: <20171023210803.20998-1-makovick@gmail.com>
 	<20171023210803.20998-5-makovick@gmail.com>
 	<1509532830.3856.7.camel@redhat.com>
@@ -23,9 +24,11 @@ References: <20171023210803.20998-1-makovick@gmail.com>
 	<CAFEAcA_DbZ_1WxjtN5NiY3drFgqmJpZwxcrKSeYtqqkjkq0hUA@mail.gmail.com>
 	<1509706872.31823.20.camel@redhat.com>
 	<CAFEAcA9kLX19tWACRLEGSd6iuRahTkBrORJqt1GSBSAA4bwr6g@mail.gmail.com>
+	<1509710857.31823.22.camel@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 3 Nov 2017 12:10:43 +0000
+Message-ID: <CAFEAcA9J+uQ4xRSddJJPFC_Dk_j9+ESG1NY4B7qxkzasN86qFw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] [PATCH 4/7] sdl2: Only accept the hotkeys on the
  main window
 List-Id: <qemu-devel.nongnu.org>
@@ -36,25 +39,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: =?UTF-8?Q?Jind=C5=99ich_Makovi=C4=8Dka?= <makovick@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: =?UTF-8?B?SmluZMWZaWNoIE1ha292acSNa2E=?= <makovick@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-  Hi,
+On 3 November 2017 at 12:07, Gerd Hoffmann <kraxel@redhat.com> wrote:
+>   Hi,
+>
+>> I don't think we have the same grab semantics exactly on all
+>> UI frontends either, so I dunno that that "doesn't grab on tablet"
+>> is true either.
+>
+> Well, there are pointer grabs and keyboard grabs.
+>
+> Pointer grabs happen in relative mouse mode only, and I'm pretty sure
+> we are consistent here.
 
-> I don't think we have the same grab semantics exactly on all
-> UI frontends either, so I dunno that that "doesn't grab on tablet"
-> is true either.
+Looking at the cocoa code, we grab the mouse even for absolute.
+Commit f61c387ea627079b3 says we did that to align with SDL.
 
-Well, there are pointer grabs and keyboard grabs.
+There's also the question of how grabs interact with fullscreen.
 
-Pointer grabs happen in relative mouse mode only, and I'm pretty sure
-we are consistent here.
-
-Keyboard grabs typically happen if the mouse is within the qemu window,
-so keys usually captured by the window manager go to the guest instead.
-  Allows to alt-tab cycle through the guest windows instead of the host
-windows.  gtk has a menu option for that to enable/disable, for sdl it
-is always on.  Dunno about cocoa.
-
-cheers,
-  Gerd
+thanks
+-- PMM
