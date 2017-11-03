@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54062)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54228)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eAbhj-00088g-Av
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 09:08:12 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1eAbiF-0008Qa-OQ
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 09:08:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eAbhg-0007v8-1h
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 09:08:11 -0400
-Date: Fri, 3 Nov 2017 13:08:03 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20171103130803.GI20155@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <1509710092-31645-1-git-send-email-thuth@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1eAbiE-00089I-S7
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 09:08:43 -0400
+Received: from mail-wr0-x22f.google.com ([2a00:1450:400c:c0c::22f]:57159)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eAbiE-00088x-M8
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 09:08:42 -0400
+Received: by mail-wr0-x22f.google.com with SMTP id r79so2442798wrb.13
+	for <qemu-devel@nongnu.org>; Fri, 03 Nov 2017 06:08:42 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1509710092-31645-1-git-send-email-thuth@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2] tests: Run the luks tests in
- test-crypto-block only if encryption is available
+In-Reply-To: <1509697171.31823.9.camel@redhat.com>
+References: <1509697171.31823.9.camel@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 3 Nov 2017 13:08:20 +0000
+Message-ID: <CAFEAcA8LWHP-yWZxSQmnL_U2f_RAk-_ZfSERF8U48zqRE+bq0Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] capstone broke mingw cross build
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,48 +28,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-On Fri, Nov 03, 2017 at 12:54:52PM +0100, Thomas Huth wrote:
-> The test-crypto-block currently fails if encryption has not been
-> compiled into QEMU:
-> 
-> TEST: tests/test-crypto-block... (pid=22231)
->   /crypto/block/qcow:                                                  OK
->   /crypto/block/luks/default:
->   Unexpected error in qcrypto_pbkdf2() at qemu/crypto/pbkdf-stub.c:41:
-> FAIL
-> GTester: last random seed: R02Sbbb5b6f299c6727f41bb50ba4aa6ef5c
-> (pid=22237)
->   /crypto/block/luks/aes-256-cbc-plain64:
->   Unexpected error in qcrypto_pbkdf2() at qemu/crypto/pbkdf-stub.c:41:
-> FAIL
-> GTester: last random seed: R02S3e27992a5ab4cc95e141c4ed3c7f0d2e
-> (pid=22239)
->   /crypto/block/luks/aes-256-cbc-essiv:
->   Unexpected error in qcrypto_pbkdf2() at qemu/crypto/pbkdf-stub.c:41:
-> FAIL
-> GTester: last random seed: R02S51b52bb02a66c42d8b331fd305384f53
-> (pid=22241)
-> FAIL: tests/test-crypto-block
-> 
-> So run the luks test only if the required encryption support is available.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  v2: Added the check to TEST_LUKS in the .c file instead of disabling
->      test-crypto-block completely in the Makefile.include.
-> 
->  tests/test-crypto-block.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+On 3 November 2017 at 08:19, Gerd Hoffmann <kraxel@redhat.com> wrote:
+>   Hi,
+>
+> see $subject
+>
+> make: Entering directory `/home/kraxel/projects/qemu/build-win64'
+> mkdir -p dtc/libfdt
+> mkdir -p dtc/tests
+> make[1]: `/home/kraxel/projects/qemu/build-win64/capstone/capstone.lib'
+> is up to date.
+>   LINK    qemu-ga.exe
+>   LINK    qemu-img.exe
+> /home/kraxel/projects/qemu/build-win64/capstone/capstone.lib: error
+> adding symbols: Archive has no index; run ranlib to add one
+> collect2: error: ld returned 1 exit status
+>   LINK    qemu-io.exe
+> make: *** [qemu-img.exe] Error 1
+> make: *** Waiting for unfinished jobs....
+> /home/kraxel/projects/qemu/build-win64/capstone/capstone.lib: error
+> adding symbols: Archive has no index; run ranlib to add one
+> collect2: error: ld returned 1 exit status
+> make: *** [qemu-io.exe] Error 1
+> make: Leaving directory `/home/kraxel/projects/qemu/build-win64'
 
-Acked-by: Daniel P. Berrange <berrange@redhat.com>
+Works for me for the crossbuild I do with mingw64, so I wonder
+what's different about your setup?
 
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+thanks
+-- PMM
