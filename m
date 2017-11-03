@@ -1,34 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56958)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57223)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eAgyn-00071T-VT
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 14:46:11 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1eAgzw-0007jo-OM
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 14:47:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eAgyk-0004B4-TL
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 14:46:10 -0400
-Received: from indium.canonical.com ([91.189.90.7]:36056)
+	(envelope-from <peter.maydell@linaro.org>) id 1eAgzv-0005bx-RT
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 14:47:20 -0400
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:45815)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eAgyk-0004Al-NQ
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 14:46:06 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eAgyi-0000K7-Dc
-	for <qemu-devel@nongnu.org>; Fri, 03 Nov 2017 18:46:04 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 391AB2E822E
-	for <qemu-devel@nongnu.org>; Fri,  3 Nov 2017 18:45:59 +0000 (UTC)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eAgzv-0005Zi-Jk
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 14:47:19 -0400
+Received: by mail-wr0-x242.google.com with SMTP id y9so3313350wrb.2
+	for <qemu-devel@nongnu.org>; Fri, 03 Nov 2017 11:47:19 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 03 Nov 2017 18:35:35 -0000
-From: pgnet <1689367@bugs.launchpad.net>
-Reply-To: Bug 1689367 <1689367@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170508175438.13498.58008.malonedeb@chaenomeles.canonical.com>
-Message-Id: <150973413579.20841.4819343689338931367.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1689367] Re: In qemu chroot,
- repeating "qemu: Unsupported syscall: 384" messages. sys_getrandom ?
+In-Reply-To: <20170808203900.7661-3-jfreimann@redhat.com>
+References: <20170808203900.7661-1-jfreimann@redhat.com>
+	<20170808203900.7661-3-jfreimann@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 3 Nov 2017 18:46:57 +0000
+Message-ID: <CAFEAcA96q_ebN06WE5mgOqiPprufR3aVOgkFBhgKKyjFr=aiCA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2 2/5] net: fix -netdev socket,
+ fd= for UDP sockets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,71 +30,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Jens Freimann <jfreimann@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Victor Kaplansky <victork@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Maxime Coquelin <maxime.coquelin@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
 
-> Can you just run  /usr/bin/qemu-arm-static --version  in the chroot,
-please ? (or whatever suse calls its statically linked binary).
+On 8 August 2017 at 21:38, Jens Freimann <jfreimann@redhat.com> wrote:
+> This patch fixes -netdev socket,fd= for UDP sockets
+> Currently -netdev socket,fd=<...> results in
+>
+>   qemu: error: specified mcastaddr "127.0.0.1" (0x7f000001) does not
+>     contain a multicast address
+>   qemu-system-x86_64: -netdev
+>     socket,id=n1,fd=3: Device 'socket' could not be initialized
+>
+> To fix these we need to allow specifying multicast and fd arguments
+> for the same netdev. With this the user can specify "-netdev
+> fd=3,mcast=<IP:port>"
+>
+> Cc: Jason Wang <jasowang@redhat.com>
+> Fixes: 3d830459b1eccdb61b75e2712fd364012ce5a115
+> Signed-off-by: Jens Freimann <jfreimann@redhat.com>
+> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 
-Yep, as soon as I'm sitting back in front of the machine with the chroot
-on it.  Bit later ...
+Hi. It looks like this patch (commit 0f8c289ad539 in master)
+introduced a coverity issue (CID1005339):
 
-> The other interesting question is what version of the (host) kernel
-headers the QEMU binary was built against -- if that's earlier than 3.17
-then the headers won't define __NR_getrandom for the host system and we
-won't implement the syscall.
+> @@ -333,8 +333,13 @@ static NetSocketState *net_socket_fd_init_dgram(NetClientState *peer,
+>       * by ONLY ONE process: we must "clone" this dgram socket --jjo
+>       */
+>
+> -    if (is_connected) {
+> -        if (getsockname(fd, (struct sockaddr *) &saddr, &saddr_len) == 0) {
+> +    if (is_connected && mcast != NULL) {
 
-The qemu build uses headers from a repo which tracks Kernel/Stable's
-regular releases.  It _currently_ holds kernel 4.13.10.
+This changes the condition() under which we fill in the struct sockaddr_in saddr
+from "if (is_connected)" to "if (is_connected && mcast != NULL)"...
 
--- =
+> +            if (parse_host_port(&saddr, mcast) < 0) {
+> +                fprintf(stderr,
+> +                        "qemu: error: init_dgram: fd=%d failed parse_host_port()\n",
+> +                        fd);
+> +                goto err;
+> +            }
+>              /* must be bound */
+>              if (saddr.sin_addr.s_addr == 0) {
+>                  fprintf(stderr, "qemu: error: init_dgram: fd=%d unbound, "
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1689367
+...but later in the function we do:
 
-Title:
-  In qemu chroot, repeating "qemu: Unsupported syscall: 384" messages.
-  sys_getrandom ?
+    /* mcast: save bound address as dst */
+    if (is_connected) {
+        s->dgram_dst = saddr;
+        snprintf(nc->info_str, sizeof(nc->info_str),
+                 "socket: fd=%d (cloned mcast=%s:%d)",
+                 fd, inet_ntoa(saddr.sin_addr), ntohs(saddr.sin_port));
+    } else {
+        snprintf(nc->info_str, sizeof(nc->info_str),
+                 "socket: fd=%d", fd);
+    }
 
-Status in QEMU:
-  Incomplete
+and coverity correctly points out that if is_connected is true
+but mcast is NULL then we use 'saddr' without having initialized
+it properly.
 
-Bug description:
-  On exec of an armv7 qemu chroot on my local x86_64 desktop, launched
-  via
+Any suggestions for the correct fix for this?
 
-          /usr/sbin/qemu-binfmt-conf.sh
-
-  from
-
-          qemu-linux-user-2.9.0-374.1.x86_64
-
-  on the host, inside the chroot any compile activity is laced with
-  repetitions of
-
-          qemu: Unsupported syscall: 384
-
-  messages.
-
-  This wasn't always the case -- but, TBH, it's been ~ 6 months since I
-  used this env, and there have been scads of usual pkg updates in the
-  interim.  These messages appear to be non-fatal, with no particular
-  effect at all; at least not so far ...
-
-  From a chat in #IRC,
-
-  	[10:05] davidgiluk clever/pgnd: I see it as getrandom
-  	[10:05] davidgiluk pgnd: https://fedora.juszkiewicz.com.pl/syscalls.html=
-   sort it on the ARM table and you can easily see it
-  	[10:05] clever arch/arm/tools/syscall.tbl:384  common  getrandom        =
-       sys_getrandom
-  	[10:06] davidgiluk pgnd: my *guess* is that something is calling getrand=
-om, getting told it's not implemented and then falling back to using /dev/u=
-random
-  	[10:10] pgnd davidgiluk: If that *is* the case, is it to be considered a=
- problem, or just informational?
-  	[10:12] davidgiluk pgnd: As long as it's falling back probably informati=
-onal; but someone should probably go and wire up sys_getrandom at some point
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1689367/+subscriptions
+thanks
+-- PMM
