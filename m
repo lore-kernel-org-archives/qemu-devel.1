@@ -1,20 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57904)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58550)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1eAPxN-0004FO-KF
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 20:35:34 -0400
+	(envelope-from <jiang.biao2@zte.com.cn>) id 1eAPzI-00054D-OK
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 20:37:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1eAPxK-0001os-HO
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 20:35:33 -0400
-Date: Fri, 3 Nov 2017 01:35:20 +0100
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20171103003520.GF3111@localhost.localdomain>
-References: <20171030181459.1951-1-f4bug@amsat.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20171030181459.1951-1-f4bug@amsat.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH] vl: only display available accelerators
+	(envelope-from <jiang.biao2@zte.com.cn>) id 1eAPzF-0003PA-Ln
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 20:37:32 -0400
+Received: from out1.zte.com.cn ([202.103.147.172]:39218 helo=mxct.zte.com.cn)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jiang.biao2@zte.com.cn>)
+	id 1eAPzF-0003Oc-Ad
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 20:37:29 -0400
+Date: Fri, 3 Nov 2017 08:37:14 +0800 (CST)
+Message-ID: <201711030837145949795@zte.com.cn>
+In-Reply-To: <1e17a8cf-e81e-91ba-5656-e8e2dfa3baea@twiddle.net>
+References: 201711021923504024201@zte.com.cn,
+	1e17a8cf-e81e-91ba-5656-e8e2dfa3baea@twiddle.net
+Mime-Version: 1.0
+From: <jiang.biao2@zte.com.cn>
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: base64 
+Subject: Re: [Qemu-devel]
+ =?utf-8?q?=5BPATCH=5D_tcg/mips=3A_make_some_functio?=
+ =?utf-8?q?ns_inline=2E?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,117 +31,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, Peter Xu <peterx@redhat.com>, Markus Armbruster <armbru@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, "Emilio G . Cota" <cota@braap.org>, Eric Blake <eblake@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: rth@twiddle.net
+Cc: aurelien@aurel32.net, qemu-devel@nongnu.org, zhong.weidong@zte.com.cn
 
-On Mon, Oct 30, 2017 at 03:14:59PM -0300, Philippe Mathieu-Daud=E9 wrote:
-> examples configuring with '--enable-kvm --disable-tcg'
->=20
-> - before
->=20
->   $ qemu-system-x86_64 -accel help
->   Possible accelerators: kvm, xen, hax, tcg
->=20
->   $ qemu-system-x86_64 -accel tcg
->   qemu-system-x86_64: -machine accel=3Dtcg: No accelerator found
->=20
->   # qemu-system-x86_64 -accel hax
->   qemu-system-x86_64: -machine accel=3Dhax: No accelerator found
->=20
-> - after
->=20
->   $ qemu-system-x86_64 -accel help
->   Possible accelerators:
->     xen
->     kvm
->=20
-> Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
-> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
-> ---
-> since RFC:
->   - use much cleaner object_class_get_list(TYPE_ACCEL, false)
->=20
->  vl.c | 39 ++++++++++++++++++++++++++++++++++-----
->  1 file changed, 34 insertions(+), 5 deletions(-)
->=20
-> diff --git a/vl.c b/vl.c
-> index ec299099ff..0f13641715 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -2764,6 +2764,39 @@ static gint machine_class_cmp(gconstpointer a, g=
-constpointer b)
->      exit(!name || !is_help_option(name));
->  }
-> =20
-> +static void accel_list_entry(gpointer data, gpointer user_data)
-> +{
-> +    ObjectClass *oc =3D data;
-> +    const char *typename =3D object_class_get_name(oc);
-> +    int len;
-> +
-> +    if (!qtest_driver() && !g_strcmp0(typename, ACCEL_CLASS_NAME("qtes=
-t"))) {
-> +        return; /* used by test cases */
-> +    }
-
-I would prefer to not hardcode the accel name here.  If you want
-qtest to have special behavior, you can add a new field to
-AccelClass to implement that.
-
-However, I don't think I agree we should hide qtest from the
-user: it is accepted on the command-line, so why should we lie?
-Why not add a description field and indicate that qtest is useful
-only for testing?
-
-> +
-> +    len =3D strlen(typename) - strlen("-" TYPE_ACCEL);
-
-You can use AccelClass::name here.
-
-> +    if (len > 0) {
-> +        error_printf("  %.*s\n", len, typename);
-> +    }
-> +}
-> +
-> +static void accel_parse(const char *name, QemuOpts *accel_opts)
-> +{
-> +    const char *optarg =3D qemu_opt_get(accel_opts, "accel");
-> +    GSList *list;
-> +
-> +    if (!is_help_option(optarg)) {
-> +        return;
-> +    }
-> +
-> +    list =3D object_class_get_list(TYPE_ACCEL, false);
-> +    error_printf("Possible accelerators:\n");
-> +    g_slist_foreach(list, accel_list_entry, NULL);
-> +    g_slist_free(list);
-> +
-> +    exit(0);
-> +}
-> +
->  void qemu_add_exit_notifier(Notifier *notify)
->  {
->      notifier_list_add(&exit_notifiers, notify);
-> @@ -3881,11 +3914,7 @@ int main(int argc, char **argv, char **envp)
->              case QEMU_OPTION_accel:
->                  accel_opts =3D qemu_opts_parse_noisily(qemu_find_opts(=
-"accel"),
->                                                       optarg, true);
-> -                optarg =3D qemu_opt_get(accel_opts, "accel");
-> -                if (!optarg || is_help_option(optarg)) {
-> -                    error_printf("Possible accelerators: kvm, xen, hax=
-, tcg\n");
-> -                    exit(0);
-> -                }
-> +                accel_parse(optarg, accel_opts);
->                  opts =3D qemu_opts_create(qemu_find_opts("machine"), N=
-ULL,
->                                          false, &error_abort);
->                  qemu_opt_set(opts, "accel", optarg, &error_abort);
-> --=20
-> 2.15.0.rc2
->=20
-
---=20
-Eduardo
+PiBPbiAxMS8wMi8yMDE3IDEyOjIzIFBNLCBqaWFuZy5iaWFvMkB6dGUuY29tLmNuIHdyb3RlOgo+
+ID4gTm8sIDopIEp1c3QgZm91bmQgc29tZSBvZiB0aGVzZSBmdW5jdGlvbnMgYXJlIGlubGluZSBh
+bmQgb3RoZXJzIGFyZSBub3Qgd2hlbiByZWFkaW5nCj4gPiB0aGUgY29kZSwgdGhlIHN0eWxlIGxv
+b2tzIGluY29uc2lzdGVudC4KPiA+Cj4gTXkgcHJlZmVyZW5jZSB3b3VsZCBiZSB0byByZW1vdmUg
+dGhlbSBhbGwuClNob3VsZCBJIGNvbW1pdCBhbm90aGVyIHBhdGNoIHRvIGRvIHRoYXQ/IDopIAoK
+PiA+IEJlc2lkZXMsIFRoZSBjb21waWxlciBtYXkgbWFrZSBkZWZhdWx0IGlubGluZSBjaG9pY2Vz
+IGZvciBzb21lIGZ1bmN0aW9ucywgYnV0IG1heQo+ID4gbm90IGZvciBzb21lIGNhc2VzKHNvbWUg
+bG9uZ2VyIG9uZXMpLiBBZGRpbmcgaW5saW5lIG1hbnVhbGx5IGNhbiBndWFyYW50ZWUgYW5kCj4g
+PiBub3QgaHVydC4gOikKPiBUaGUgbG9uZ2VyIG9uZXMgaW4gcGFydGljdWxhciBzaG91bGQgKm5v
+dCogYmUgaW5saW5lLCBzbyB0aGF0IHdlIGRvbid0IGV4cGFuZAo+IHRoZSBzaXplIG9mIHRoZSBj
+b2RlIHVubmVjZXNzYXJpbHkuICBXaGljaCAqY2FuKiBodXJ0LgpHb3QgdGhhdCwgdGhhbmtzIGZv
+ciB0aGUgcmVwbHkuCgpSZWdhcmRzLA==
