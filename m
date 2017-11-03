@@ -1,34 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60784)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33962)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eAdcl-0008J0-1W
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 11:11:12 -0400
+	(envelope-from <stefanha@gmail.com>) id 1eAdhm-0002X3-Lq
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 11:16:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eAdch-0000MN-Qh
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 11:11:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33612)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eAdch-0000K3-KF
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 11:11:07 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8D1D820262
-	for <qemu-devel@nongnu.org>; Fri,  3 Nov 2017 15:11:06 +0000 (UTC)
-Date: Fri, 3 Nov 2017 17:11:01 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20171103170426-mutt-send-email-mst@kernel.org>
-References: <20171102133115.19195-1-lprosek@redhat.com>
-	<20171102163348-mutt-send-email-mst@kernel.org>
-	<CABdb734XVCNxyyRUfFtU5cm=34K28zsuRgyuj6F2SEBjPUu27w@mail.gmail.com>
-	<1509693637.31823.7.camel@redhat.com>
-	<CABdb734MR3vMCSBH-JhD8vWYKLBx6QOxrVZFYUyDbuQJg8mZ6Q@mail.gmail.com>
+	(envelope-from <stefanha@gmail.com>) id 1eAdhh-0003Yh-37
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 11:16:22 -0400
+Date: Fri, 3 Nov 2017 15:16:13 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20171103151613.GB10959@stefanha-x1.localdomain>
+References: <20170126153837.25597-1-stefanha@redhat.com>
+	<3ca6376a-ae3e-1e5c-503f-239e4e62799c@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="p4qYPpj5QlsIQJ0K"
 Content-Disposition: inline
-In-Reply-To: <CABdb734MR3vMCSBH-JhD8vWYKLBx6QOxrVZFYUyDbuQJg8mZ6Q@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH] virtio-pci: Don't force Subsystem Vendor
- ID = Vendor ID
+In-Reply-To: <3ca6376a-ae3e-1e5c-503f-239e4e62799c@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] aio-posix: drop QEMU_AIO_POLL_MAX_NS env
+ var
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,57 +25,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ladi Prosek <lprosek@redhat.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Yan Vugenfirer <yvugenfi@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Vadim Rozenfeld <vrozenfe@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org, QEMU Trivial <qemu-trivial@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Fri, Nov 03, 2017 at 09:23:07AM +0100, Ladi Prosek wrote:
-> On Fri, Nov 3, 2017 at 8:20 AM, Gerd Hoffmann <kraxel@redhat.com> wrote:
-> >
-> >> > > Signed-off-by: Ladi Prosek <lprosek@redhat.com>
-> >> >
-> >> > I wonder whether it's a problem that legacy devices ignore
-> >> > the subsystem ID (that's part of spec).
-> >>
-> >> I don't understand this comment. I don't see anything in the spec
-> >> related to ignoring the subsystem ID.
-> >
-> > Well, the subsystem *device* id is defined to be the virtio device id,
-> > so it is certainly not ignored.  The subsystem *vendor* id is not used
-> > as far I know (or ignored in the sense that it doesn't change driver
-> > behavior), allowing to set that makes sense to me.
-> 
-> Yes, thanks, I'm assuming that Michael meant the subsystem device ID.
-> The PCI spec seems to be using "subsystem ID" for the name of this
-> field.
 
-Exactly.
+--p4qYPpj5QlsIQJ0K
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> I understand that this ID must not change in legacy devices.
+On Thu, Nov 02, 2017 at 07:31:13AM +0100, Thomas Huth wrote:
+> On 26.01.2017 16:38, Stefan Hajnoczi wrote:
+> > This hunk should not have been merged but I forgot to remove it.  Let's
+> > remove it before it slips into a QEMU release.
+>=20
+> Too late - looks like this patch has never been committed :-(
+>=20
+> >=20
+> > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> > ---
+> >  aio-posix.c | 7 -------
+> >  1 file changed, 7 deletions(-)
+> >=20
+> > diff --git a/aio-posix.c b/aio-posix.c
+> > index 9453d83..9a6348b 100644
+> > --- a/aio-posix.c
+> > +++ b/aio-posix.c
+> > @@ -723,13 +723,6 @@ bool aio_poll(AioContext *ctx, bool blocking)
+> > =20
+> >  void aio_context_setup(AioContext *ctx)
+> >  {
+> > -    /* TODO remove this in final patch submission */
+> > -    if (getenv("QEMU_AIO_POLL_MAX_NS")) {
+> > -        fprintf(stderr, "The QEMU_AIO_POLL_MAX_NS environment variable=
+ has "
+> > -                "been replaced with -object iothread,poll-max-ns=3DNUM=
+\n");
+> > -        exit(1);
+> > -    }
+> > -
+> >  #ifdef CONFIG_EPOLL_CREATE1
+> >      assert(!ctx->epollfd);
+> >      ctx->epollfd =3D epoll_create1(EPOLL_CLOEXEC);
+> >=20
+>=20
+> Could we get this at least added for QEMU 2.11 ?
+>=20
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
 
-Interestingly the device ID is ignored except it must be within
-a specific range of values.
+I am sending a new version of this patch (it needs to be rebased).
 
-> Interestingly, Windows appears to allow matching drivers only on the
-> full subsystem device ID + subsystem vendor ID 32-bit value, not on
-> only one of the two.
-> 
-> PCI\VEN_v(4)&DEV_d(4)&SUBSYS_s(4)n(4)&REV_r(2)
-> 
-> This might be a potential problem for a legacy driver that wants to
-> stay vendor-agnostic but I'm pretty sure there would be a reasonable
-> way of working around it. Actually, the device must use a designated
-> device ID (like 0x1000) in addition to the subsystem device ID so this
-> should be a non-issue altogether.
+Stefan
 
-The original virtio spec wasn't really workable for windows. It requires
-ignoring everything except the vendor ID, *range* of device IDs
-(specific ID is ignored) and subsystem ID.
+--p4qYPpj5QlsIQJ0K
+Content-Type: application/pgp-signature; name="signature.asc"
 
-So in my humble opinion the right thing for people to do is simply to
-avoid legacy devices. Is something preventing that?
+-----BEGIN PGP SIGNATURE-----
 
-> > Possibly not only for virtio devices, most pci devices have 1af4:1100
-> > as subsystem id, other vendors might want set it too for consistency.
-> >
-> > cheers,
-> >   Gerd
+iQEcBAEBAgAGBQJZ/Ig9AAoJEJykq7OBq3PIKZQIAJz+Wifjl5lIIVVZkd5vY9DG
+J0af5Z9gXYj/MHSA/MuiMYRsxX9xkcuUgbGxxON/Gg6JzimHeK7B7oyUJ20wRLJ9
+U8ylpjHCdfR3EFygdoeju796hQPORc04fjI1dHDpwZJViP+D0ojLNstyFGbJkUnR
+/FAT2AVB7T0af2Rbusk+pGTIq5lm6PSXsr135kJ579WB8DqksXA2NVElkLu0arU6
+WLGKI3LyzCCXG2t+Cnj1TxLyYVEVMR3/ZUIULZ0vPO+3OgqXkJG7iuCZgjbuRGAV
+U4me9yUrfc3fmSd02MJKclVZI1wwMTuOCfuPiAgJH0noRhgEvhwpH6nS2WJA/bw=
+=bLgj
+-----END PGP SIGNATURE-----
+
+--p4qYPpj5QlsIQJ0K--
