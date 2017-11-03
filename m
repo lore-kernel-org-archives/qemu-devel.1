@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56842)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57547)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eAa5s-0006k1-CT
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 07:25:01 -0400
+	(envelope-from <penguin-kernel@I-love.SAKURA.ne.jp>)
+	id 1eAa7G-0007js-Vv
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 07:26:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eAa5p-0007FA-7y
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 07:25:00 -0400
-Received: from indium.canonical.com ([91.189.90.7]:44924)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eAa5p-0007DZ-21
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 07:24:57 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eAa5m-00082D-SC
-	for <qemu-devel@nongnu.org>; Fri, 03 Nov 2017 11:24:54 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id D3DA02E80CB
-	for <qemu-devel@nongnu.org>; Fri,  3 Nov 2017 11:24:54 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 03 Nov 2017 11:09:02 -0000
-From: Thomas Huth <1087411@bugs.launchpad.net>
-Reply-To: Bug 1087411 <1087411@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20121206195502.27824.72446.malonedeb@gac.canonical.com>
-Message-Id: <150970734255.4240.4529401623812986316.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1087411] Re: pseries machine breaks in
- instalation of SLES11_SP2
+	(envelope-from <penguin-kernel@I-love.SAKURA.ne.jp>)
+	id 1eAa7D-00085J-SS
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 07:26:26 -0400
+Received: from www262.sakura.ne.jp ([2001:e42:101:1:202:181:97:72]:58635)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <penguin-kernel@I-love.SAKURA.ne.jp>)
+	id 1eAa7D-00080f-FP
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 07:26:23 -0400
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+References: <1509696786-1597-1-git-send-email-wei.w.wang@intel.com>
+	<1509696786-1597-5-git-send-email-wei.w.wang@intel.com>
+In-Reply-To: <1509696786-1597-5-git-send-email-wei.w.wang@intel.com>
+Message-Id: <201711032025.HJC78622.SFFOMLOtFQHVJO@I-love.SAKURA.ne.jp>
+Date: Fri, 3 Nov 2017 20:25:32 +0900
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: Re: [Qemu-devel] [PATCH v17 4/6] virtio-balloon: VIRTIO_BALLOON_F_SG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,49 +29,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: wei.w.wang@intel.com, virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mst@redhat.com, mhocko@kernel.org, akpm@linux-foundation.org, mawilcox@microsoft.com
+Cc: david@redhat.com, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, willy@infradead.org, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu@aliyun.com
 
-Triaging old bug tickets... can you still reproduce this issue with the
-latest version of QEMU? Or could we close this ticket nowadays?
+Wei Wang wrote:
+> @@ -164,6 +284,8 @@ static unsigned fill_balloon(struct virtio_balloon *vb, size_t num)
+>  			break;
+>  		}
+>  
+> +		if (use_sg && xb_set_page(vb, page, &pfn_min, &pfn_max) < 0)
 
-** Changed in: qemu
-       Status: New =3D> Incomplete
+Isn't this leaking "page" ?
 
--- =
+> +			break;
+>  		balloon_page_push(&pages, page);
+>  	}
+>  
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1087411
 
-Title:
-  pseries machine breaks in instalation of SLES11_SP2
 
-Status in QEMU:
-  Incomplete
+> @@ -184,8 +307,12 @@ static unsigned fill_balloon(struct virtio_balloon *vb, size_t num)
+>  
+>  	num_allocated_pages = vb->num_pfns;
+>  	/* Did we get any? */
+> -	if (vb->num_pfns != 0)
+> -		tell_host(vb, vb->inflate_vq);
+> +	if (vb->num_pfns) {
+> +		if (use_sg)
+> +			tell_host_sgs(vb, vb->inflate_vq, pfn_min, pfn_max);
 
-Bug description:
-  QEMU version: 1.0, 1.1, and 1.2
+Please describe why tell_host_sgs() can work without __GFP_DIRECT_RECLAIM allocation,
+for tell_host_sgs() is called with vb->balloon_lock mutex held.
 
-  Host OS:
-  Intel(R) Core(TM) i5-2520M CPU @ 2.50GH
-   Linux tpad 3.2.0-23-generic #36-Ubuntu SMP Tue Apr 10 20:39:51 UTC 2012 =
-x86_64 x86_64 x86_64 GNU/Linux
+> +		else
+> +			tell_host(vb, vb->inflate_vq);
+> +	}
+>  	mutex_unlock(&vb->balloon_lock);
+>  
+>  	return num_allocated_pages;
 
-  SLES Media:
-  SLES-11-SP2-DVD-ppc64-GM-DVD1.iso: sha256 -> 2247dd6bb495eb50860668e46f7d=
-6ba004eece9909f347c8ce487fd6a5f65ee1
 
-  Command line:
-  ./ppc64-softmmu/qemu-system-ppc64 -machine type=3Dpseries,usb=3Doff -m 51=
-2 -net nic,vlan=3D0 -net tap -nographic -cdrom =
 
-  /exports/isos/SLES-11-SP2-DVD-ppc64-GM-DVD1.iso -hda /exports/sles11_sp2.=
-qcow2 -monitor unix:/dev/tty1,nowait,server
+> @@ -223,7 +353,13 @@ static unsigned leak_balloon(struct virtio_balloon *vb, size_t num)
+>  		page = balloon_page_dequeue(vb_dev_info);
+>  		if (!page)
+>  			break;
+> -		set_page_pfns(vb, vb->pfns + vb->num_pfns, page);
+> +		if (use_sg) {
+> +			if (xb_set_page(vb, page, &pfn_min, &pfn_max) < 0)
 
-  Error message (after starting instalation ~23%):
-  Installation of package ./suse/ppc64/vim-base-7.2-8.15.2.ppc64.rpm failed.
-  Subprocess failed. Error: RPM failed: error: %post(vim-base-7.2-8.15.2.pp=
-c64.rpm)
+Isn't this leaking "page" ?
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1087411/+subscriptions
+If this is inside vb->balloon_lock mutex (isn't this?), xb_set_page() must not
+use __GFP_DIRECT_RECLAIM allocation, for leak_balloon_sg_oom() will be blocked
+on vb->balloon_lock mutex.
+
+> +				break;
+> +		} else {
+> +			set_page_pfns(vb, vb->pfns + vb->num_pfns, page);
+> +		}
+> +
+>  		list_add(&page->lru, &pages);
+>  		vb->num_pages -= VIRTIO_BALLOON_PAGES_PER_PAGE;
+>  	}
