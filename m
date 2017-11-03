@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47531)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47958)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1eAgFK-0001ET-Bk
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 13:59:11 -0400
+	(envelope-from <eblake@redhat.com>) id 1eAgGi-0001vQ-Fc
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 14:00:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1eAgFG-0006qi-6b
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 13:59:10 -0400
-Received: from mail-wr0-x235.google.com ([2a00:1450:400c:c0c::235]:46922)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1eAgFF-0006qL-U9
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 13:59:06 -0400
-Received: by mail-wr0-x235.google.com with SMTP id l1so3218192wrc.3
-	for <qemu-devel@nongnu.org>; Fri, 03 Nov 2017 10:59:05 -0700 (PDT)
-References: <20171103131229.4737-1-famz@redhat.com>
-	<a860d2a7-ef85-71ec-3967-b36bdf649c30@amsat.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <a860d2a7-ef85-71ec-3967-b36bdf649c30@amsat.org>
-Date: Fri, 03 Nov 2017 17:59:02 +0000
-Message-ID: <87shdvgs61.fsf@linaro.org>
+	(envelope-from <eblake@redhat.com>) id 1eAgGe-0007eq-MP
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 14:00:36 -0400
+References: <20171103144113.7188-1-berrange@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <4296ded2-9c4e-4c21-202e-b28984e48566@redhat.com>
+Date: Fri, 3 Nov 2017 13:00:22 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] docker: Improved image checksum
+In-Reply-To: <20171103144113.7188-1-berrange@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="eCFlBawEi5qxIrnCGdQq5GqKClJWQsNk0"
+Subject: Re: [Qemu-devel] [PATCH] qcow2: fix image corruption after
+ committing qcow2 image into base
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,104 +24,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Cc: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--eCFlBawEi5qxIrnCGdQq5GqKClJWQsNk0
+From: Eric Blake <eblake@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
+Message-ID: <4296ded2-9c4e-4c21-202e-b28984e48566@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] qcow2: fix image corruption after committing
+ qcow2 image into base
+References: <20171103144113.7188-1-berrange@redhat.com>
+In-Reply-To: <20171103144113.7188-1-berrange@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 11/03/2017 09:41 AM, Daniel P. Berrange wrote:
+> After committing the qcow2 image contents into the base image, qemu-img=
+
+> will call bdrv_make_empty to drop the payload in the layered image.
+>=20
+> When this is done for qcow2 images, it blows away the LUKS encryption
+> header, making the resulting image unusable. There are two codepaths
+> for emptying a qcow2 image, and the second (slower) codepaths leaves
+
+s/codepaths/codepath/
+
+> the LUKS header intact, so force use of that codepath.
+>=20
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> ---
+>=20
+> NB, ideally we would fix the faster codepath in make_completely_empty, =
+but
+> having looked at the code, I've really no idea how to even start on fix=
+ing that
+> to not kill the LUKS header clusters.
+>=20
+
+> +++ b/block/qcow2.c
+> @@ -3594,7 +3594,8 @@ static int qcow2_make_empty(BlockDriverState *bs)=
+
+>      l1_clusters =3D DIV_ROUND_UP(s->l1_size, s->cluster_size / sizeof(=
+uint64_t));
+> =20
+>      if (s->qcow_version >=3D 3 && !s->snapshots &&
+> -        3 + l1_clusters <=3D s->refcount_block_size) {
+> +        3 + l1_clusters <=3D s->refcount_block_size &&
+> +        s->crypt_method_header !=3D QCOW_CRYPT_LUKS) {
+>          /* The following function only works for qcow2 v3 images (it r=
+equires
+>           * the dirty flag) and only as long as there are no snapshots =
+(because
+>           * it completely empties the image). Furthermore, the L1 table=
+ and three
+
+Worth updating the comment to explain why we can't use the fast path
+with LUKS encryption?
+
+But that's minor enough that with or without a comment tweak, I'm fine wi=
+th:
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
-Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
+--eCFlBawEi5qxIrnCGdQq5GqKClJWQsNk0
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-> Thanks Fam, this fixes Shippable builds :)
->
-> On 11/03/2017 10:12 AM, Fam Zheng wrote:
->> When a base image locally defined by QEMU, such as in the debian images,
->> is updated, the dockerfile checksum mechanism in docker.py still skips
->> updating the derived image, because it only looks at the literal content
->> of the dockerfile, without considering changes to the base image.
->>
->> For example we have a recent fix e58c1f9b35e81 that fixed
->> debian-win64-cross by updating its base image, debian8-mxe, but due to
->> above "feature" of docker.py the image in question is automatically NOT
->> rebuilt unless you add NOCACHE=3D1. It is noticed on Shippable:
->>
->> https://app.shippable.com/github/qemu/qemu/runs/541/2/console
->>
->> because after the fix is merged, the error still occurs, and the log
->> shows the container image is, as explained above, not updated.
->>
->> This is because at the time docker.py was written, there wasn't any
->> dependencies between QEMU's docker images.
->>
->> Now improve this to preprocess any "FROM qemu:*" directives in the
->> dockerfiles while doing checksum, and inline the base image's dockerfile
->> content, recursively. This ensures any changes on the depended _QEMU_
->> images are taken into account.
->>
->> This means for external images that we expect to retrieve from docker
->> registries, we still do it as before. It is not perfect, because
->> registry images can get updated too. Technically we could substitute the
->> image name with its hex ID as obtained with $(docker images $IMAGE
->> --format=3D"{{.Id}}"), but --format is not supported by RHEL 7, so leave
->> it for now.
->>
->> Reported-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->> Signed-off-by: Fam Zheng <famz@redhat.com>
->
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> Tested-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAln8rrYACgkQp6FrSiUn
+Q2prGgf/f3xOoJO+xag8MM0xHWcUtg3HredCTac8OLeHYgZjJVYwZpaWZvPtmDVm
+YGeXblbnhsGEDSi/qNIoXtlQUfmxpRr8HoH/G3Hyudl79KDicannJigkAX3aw7ee
+zVZwpRsjbxZzvxfK7Ltf0VC96ARoJ9bAS7knyW/AV38gv5tTnx7YEVUutIbjK9PR
+OcezotONHl1qwMqjQrh3hQgKyzvs/DIlbnJlr/m9Lrw02g6YTnz7UIaBEm5cfBgb
+Wb6ApXj8NY0fYKLbQ10VqBpbx359cFPuXTrGFENCeTGMYyTUOcrOtmWcX/5Oc6+n
+Pd9dGCVeweVRgg4ErW8/PbycZDgMBA==
+=z+PZ
+-----END PGP SIGNATURE-----
 
->
->> ---
->>  tests/docker/docker.py | 24 +++++++++++++++++++++++-
->>  1 file changed, 23 insertions(+), 1 deletion(-)
->>
->> diff --git a/tests/docker/docker.py b/tests/docker/docker.py
->> index 08122ca17d..1246ba9578 100755
->> --- a/tests/docker/docker.py
->> +++ b/tests/docker/docker.py
->> @@ -105,6 +105,28 @@ def _copy_binary_with_libs(src, dest_dir):
->>              so_path =3D os.path.dirname(l)
->>              _copy_with_mkdir(l , dest_dir, so_path)
->>
->> +def _read_qemu_dockerfile(img_name):
->> +    df =3D os.path.join(os.path.dirname(__file__), "dockerfiles",
->> +                      img_name + ".docker")
->> +    return open(df, "r").read()
->> +
->> +def _dockerfile_preprocess(df):
->> +    out =3D ""
->> +    for l in df.splitlines():
->> +        if len(l.strip()) =3D=3D 0 or l.startswith("#"):
->> +            continue
->> +        from_pref =3D "FROM qemu:"
->> +        if l.startswith(from_pref):
->> +            # TODO: Alternatively we could replace this line with "FROM=
- $ID"
->> +            # where $ID is the image's hex id obtained with
->> +            #    $ docker images $IMAGE --format=3D"{{.Id}}"
->> +            # but unfortunately that's not supported by RHEL 7.
->> +            inlining =3D _read_qemu_dockerfile(l[len(from_pref):])
->> +            out +=3D _dockerfile_preprocess(inlining)
->> +            continue
->> +        out +=3D l + "\n"
->> +    return out
->> +
->>  class Docker(object):
->>      """ Running Docker commands """
->>      def __init__(self):
->> @@ -196,7 +218,7 @@ class Docker(object):
->>              checksum =3D self.get_image_dockerfile_checksum(tag)
->>          except Exception:
->>              return False
->> -        return checksum =3D=3D _text_checksum(dockerfile)
->> +        return checksum =3D=3D _text_checksum(_dockerfile_preprocess(do=
-ckerfile))
->>
->>      def run(self, cmd, keep, quiet):
->>          label =3D uuid.uuid1().hex
->>
-
-
---
-Alex Benn=C3=A9e
+--eCFlBawEi5qxIrnCGdQq5GqKClJWQsNk0--
