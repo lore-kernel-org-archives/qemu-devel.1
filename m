@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56766)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56843)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eAa5h-0006ey-AF
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 07:24:50 -0400
+	(envelope-from <bounces@canonical.com>) id 1eAa5s-0006k2-CV
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 07:25:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eAa5e-00074n-5p
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 07:24:49 -0400
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:51026)
+	(envelope-from <bounces@canonical.com>) id 1eAa5p-0007FF-8a
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 07:25:00 -0400
+Received: from indium.canonical.com ([91.189.90.7]:44922)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1eAa5d-000748-V7
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 07:24:46 -0400
-Received: by mail-wm0-x243.google.com with SMTP id s66so780556wmf.5
-	for <qemu-devel@nongnu.org>; Fri, 03 Nov 2017 04:24:45 -0700 (PDT)
-Date: Fri, 3 Nov 2017 11:24:42 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20171103112442.GN5078@stefanha-x1.localdomain>
-References: <1509020054-25434-1-git-send-email-nanjekyejoannah@gmail.com>
-	<e4b4b545-919f-f043-6a6e-70e563fa75ff@amsat.org>
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eAa5p-0007DX-22
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 07:24:57 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eAa5n-000829-7z
+	for <qemu-devel@nongnu.org>; Fri, 03 Nov 2017 11:24:55 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 31DAB2E80CC
+	for <qemu-devel@nongnu.org>; Fri,  3 Nov 2017 11:24:55 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="7fwXp2o0gOrkU5lS"
-Content-Disposition: inline
-In-Reply-To: <e4b4b545-919f-f043-6a6e-70e563fa75ff@amsat.org>
-Subject: Re: [Qemu-devel] [PATCH WIP] replace numpy with struct
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 03 Nov 2017 11:11:03 -0000
+From: Thomas Huth <1086782@bugs.launchpad.net>
+Reply-To: Bug 1086782 <1086782@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20121205125603.6348.62070.malonedeb@gac.canonical.com>
+Message-Id: <150970746321.4047.11021785829317668336.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1086782] Re: HPET time drift windows 7 64bits
+ guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,58 +37,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Joannah Nanjekye <nanjekyejoannah@gmail.com>
-Cc: stefanha@redhat.com, qemu-devel@nongnu.org, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
 
+Triaging old bug tickets... can you still reproduce this issue with the
+latest version of QEMU? Or could we close this ticket nowadays?
 
---7fwXp2o0gOrkU5lS
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+** Changed in: qemu
+       Status: New =3D> Incomplete
 
-On Thu, Oct 26, 2017 at 10:50:26AM -0300, Philippe Mathieu-Daud=E9 wrote:
-> Hi Joannah,
->=20
-> The common subject to use is [RFC PATCH] instead of [PATCH WIP]
->=20
-> On 10/26/2017 09:14 AM, Joannah Nanjekye wrote:
-> > This patch replaces the use of numpy with the standard Library struct m=
-odule where possible.
->=20
-> This seems a good idea but why?
+-- =
 
-I suggest adding this to the commit description:
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1086782
 
-Users tend to hit an ImportError when running analyze-migration.py due
-to the numpy dependency.  numpy functionality isn't actually used, just
-binary serialization that the standard library 'struct' module already
-provides.  Removing the dependency allows the script to run
-out-of-the-box.
+Title:
+  HPET time drift windows 7 64bits guest
 
-> Do you have any performance improvements results to share?
->
-> > Signed-off-by: Joannah Nanjekye <nanjekyejoannah@gmail.com>
-> > ---
-> > =20
-> >  scripts/analyze-migration.py | 19 ++++++++++++-------
-> >  1 file changed, 12 insertions(+), 7 deletions(-)
+Status in QEMU:
+  Incomplete
 
-I don't see a removal of "import numpy as np" so this script still
-depends on numpy.  Did you forget to sent further patches that you have
-to remove the numpy dependency?
+Bug description:
+  Using latest qemu-kvm (1.2.0), time drift (clock slow in guest) in Window=
+s 7 64 bits guest when HPET is enabled (default).
+  Disabling HPET (-no-hpet) solves the time drift.
 
---7fwXp2o0gOrkU5lS
-Content-Type: application/pgp-signature; name="signature.asc"
+  UsePlatformClock enable/disable doesn't make a difference in the guest.
+  bcdedit /set useplatformclock true
 
------BEGIN PGP SIGNATURE-----
+  Using driftfix slew doesn't make a difference too.
 
-iQEcBAEBAgAGBQJZ/FH6AAoJEJykq7OBq3PIbtwH/0AzMyWfMeRet4kwv6FMdC/G
-iy0jChwkaV1wcL6PNWtG0dMLNxUU/lNXDsfRB4rF1t+SCNlOaYzBolC5V2/FfBCK
-4CoZOFngeiUJHSid/fhuty/1DZ5dc/3lHKG87C824me9gWzeVf29GdsG5HtO2Mmn
-ISqvv8WHxsk/9QGKt6ttjPQMnw/q0LDVaSrx2Ku0ufN9q/pyc+Kn3vy7GTPrfbqE
-BhjrJKYwf4Udcd0JDxYnt0lP+w74sMy6ZXsDlZMP1epUWu21YjIn9kJnF6zG2lWV
-gog8Fv74BXEdOkZ9OR31D1ixNwtSetE1ZTZFqg/I8xN1kpZ5S8iZ8xpBONnyTk8=
-=uzzu
------END PGP SIGNATURE-----
+  =
 
---7fwXp2o0gOrkU5lS--
+  # qemu-system-x86_64 --version
+  QEMU emulator version 1.2.0 (qemu-kvm-1.2.0), Copyright (c) 2003-2008 Fab=
+rice Bellard
+
+  Kernel is 3.6.8:
+  # uname -a
+  Linux pulsar 3.6.8 #1 SMP Sat Dec 1 16:26:10 CET 2012 x86_64 x86_64 x86_6=
+4 GNU/Linux
+
+  TSC is stable in the host:
+  =3D=3D=3D
+  # cat /sys/devices/system/clocksource/clocksource0/current_clocksource
+  tsc
+
+  Dmesg:
+  [    0.000000] hpet clockevent registered
+  [    0.000000] tsc: Fast TSC calibration using PIT
+  [    0.000000] tsc: Detected 2660.096 MHz processor
+  [    0.001002] Calibrating delay loop (skipped), value calculated using t=
+imer frequency.. 5320.19 BogoMIPS (lpj=3D2660096)
+  [    0.001138] pid_max: default: 32768 minimum: 301
+  ...
+  [    1.492019] tsc: Refined TSC clocksource calibration: 2659.973 MHz
+  [    1.492093] Switching to clocksource tsc
+
+  =
+
+  CPUinfo, constant_tsc:
+  vendor_id       : GenuineIntel
+  cpu family      : 6
+  model           : 23
+  model name      : Intel(R) Core(TM)2 Quad CPU    Q8400  @ 2.66GHz
+  stepping        : 10
+  microcode       : 0xa0b
+  cpu MHz         : 2667.000
+  cache size      : 2048 KB
+  flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mc=
+a cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx=
+ lm constant_tsc arch_perfmon pebs bts rep_good nopl aperfmperf pni dtes64 =
+monitor ds_cpl vmx est tm2 ssse3 cx16 xtpr pdcm sse4_1 xsave lahf_lm dtherm=
+ tpr_shadow vnmi flexpriority
+  bogomips        : 5320.19
+
+  # grep -i hpet .config
+  CONFIG_HPET_TIMER=3Dy
+  CONFIG_HPET_EMULATE_RTC=3Dy
+  CONFIG_HPET=3Dy
+  # CONFIG_HPET_MMAP is not set
+  =3D=3D=3D
+
+  Qemu command line:
+  /usr/bin/qemu-system-x86_64 -drive file=3D/dev/vol0/KVMORION01,cache=3Dno=
+ne,aio=3Dnative,if=3Dvirtio \
+    -drive file=3D/dev/vol0/KVMORION02,cache=3Dnone,aio=3Dnative,if=3Dvirti=
+o \
+    -cpu host \
+    -m 2048 \
+    -smp 4,maxcpus=3D4,cores=3D4,threads=3D1,sockets=3D1 \
+    -rtc base=3Dlocaltime,driftfix=3Dslew \
+    -vnc 10.124.241.211:0,password -k es \
+    -monitor telnet:localhost:37200,server,nowait \
+    -netdev tap,id=3Dkvmorion,ifname=3Dkvmorion,script=3D/etc/qemu-ifup-br0=
+,downscript=3D/etc/qemu-ifdown-br0 \
+    -device virtio-net-pci,netdev=3Dkvmorion,id=3Dvirtio-nic0,mac=3D02:85:6=
+4:02:c2:aa \
+    -device virtio-balloon-pci,id=3Dballoon0 \
+    -boot menu=3Don \
+    -pidfile /var/run/kvmorion.pid \
+    -daemonize
+
+  Using 1 CPU doesn't make a difference.
+  Only workaround is disabling hpet (-no-hpet)
+
+  Sample time drift in guest:
+  >ntpdate -q 10.124.241.211
+   5 Dec 13:36:06 ntpdate[3464]: Raised to realtime priority class
+  server 10.124.241.211, stratum 2, offset 3.694184, delay 0.02551
+   5 Dec 13:36:12 ntpdate[3464]: step time server 10.124.241.211 offset 3.6=
+94184 s
+  ec
+
+  >ntpdate -q 10.124.241.211
+   5 Dec 13:52:02 ntpdate[1964]: Raised to realtime priority class
+  server 10.124.241.211, stratum 2, offset 4.719968, delay 0.02554
+   5 Dec 13:52:08 ntpdate[1964]: step time server 10.124.241.211 offset 4.7=
+19968 s
+  ec
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1086782/+subscriptions
