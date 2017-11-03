@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49956)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49993)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eAcyt-0001dC-6J
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 10:29:59 -0400
+	(envelope-from <laurent@vivier.eu>) id 1eAcyz-0001hy-14
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 10:30:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eAcys-0005sa-E9
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 10:29:59 -0400
-Date: Fri, 3 Nov 2017 14:29:49 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20171103142949.GP5078@stefanha-x1.localdomain>
-References: <CAPuOgO3vuhZ8Dgk5GZrDFCrCV-a-1-Jq+eERma_vysh1PQohSg@mail.gmail.com>
-	<20171024120602.GC18756@stefanha-x1.localdomain>
-	<CAPuOgO2UT2G4YOOp_yT6esN-yA6hiyv=JA=wBqiC+poMOG-C3w@mail.gmail.com>
+	(envelope-from <laurent@vivier.eu>) id 1eAcyv-0005ts-1y
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 10:30:05 -0400
+Received: from mout.kundenserver.de ([212.227.126.130]:62407)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eAcyu-0005sk-P9
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 10:30:00 -0400
+References: <20171103120703.15749-1-james.cowgill@mips.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <755effd6-c595-9487-75a6-073ade6be4bc@vivier.eu>
+Date: Fri, 3 Nov 2017 15:29:42 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="Bd2KlmcTHfsQFEJ+"
-Content-Disposition: inline
-In-Reply-To: <CAPuOgO2UT2G4YOOp_yT6esN-yA6hiyv=JA=wBqiC+poMOG-C3w@mail.gmail.com>
-Subject: Re: [Qemu-devel] [Qemu-block] Question regarding qemuimg check
+In-Reply-To: <20171103120703.15749-1-james.cowgill@mips.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] linux-user: return EINVAL from
+ prctl(PR_*_SECCOMP)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,36 +28,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ala Hino <ahino@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, qemu-discuss@nongnu.org, Nir Soffer <nsoffer@redhat.com>
+To: James Cowgill <james.cowgill@mips.com>, Riku Voipio <riku.voipio@iki.fi>
+Cc: qemu-devel@nongnu.org
 
+Le 03/11/2017 à 13:07, James Cowgill a écrit :
+> If an application tries to install a seccomp filter using
+> prctl(PR_SET_SECCOMP), the filter is likely for the target instead of the host
+> architecture. This will probably cause qemu to be immediately killed when it
+> executes another syscall.
+> 
+> Prevent this from happening by returning EINVAL from both seccomp prctl
+> calls. This is the error returned by the kernel when seccomp support is
+> disabled.
+> 
+> Fixes: https://bugs.launchpad.net/qemu/+bug/1726394
+> Signed-off-by: James Cowgill <james.cowgill@mips.com>
+> ---
+>  linux-user/syscall.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+> 
+> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+> index d4497dec5d..43cd5fb2bb 100644
+> --- a/linux-user/syscall.c
+> +++ b/linux-user/syscall.c
+> @@ -10482,6 +10482,10 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+>              break;
+>          }
+>  #endif
+> +        case PR_GET_SECCOMP:
+> +        case PR_SET_SECCOMP:
+> +            ret = -TARGET_EINVAL;
+> +            break;
+>          default:
+>              /* Most prctl options have no pointer arguments */
+>              ret = get_errno(prctl(arg1, arg2, arg3, arg4, arg5));
+> 
 
---Bd2KlmcTHfsQFEJ+
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+I think we should allow PR_GET_SECCOMP, and at least all the modes
+except SECCOMP_MODE_FILTER for PR_SET_SECCOMP.
 
-On Tue, Oct 24, 2017 at 03:31:30PM +0300, Ala Hino wrote:
-> Can we always run qemu-img check with -r leaks option, even if there are no
-> leaks?
-
-Running "qemu-img check -r leaks" opens the file in read/write mode.  It
-must only be used when the disk image is writable and the VM is not
-accessing it.  If thoses conditions are met then you can use it.
-
-Stefan
-
---Bd2KlmcTHfsQFEJ+
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZ/H1dAAoJEJykq7OBq3PIlSIH/1MUiM3kydr/HAVcEBc1R1oD
-T0OJzbkgrH08TEEk5/92M1dV7ON0GQF+PY2YeSX1VsJeit5oNN7kwy/L6QWkpqzs
-wY0dt+zoHDc/cYbjYY3lG/EJV1tmXBtUmczwIAeEPb5gqVFIzwVwMHnKTyh5xEqA
-2R1p+S5akezTuzkYWRAviAJtqFFL9BuIySdHP0TLjaw18ukBqv634B/O77qRs5xW
-sdPxmlypQX2Uyh+amaZkbwPmMFP2LH1upf7J6/3WqLbN90Gmy9FMAhhSr9eUWPd8
-hyf347ytwoKw2LxTlKZdZKrHbth4uxsdNhh/5DssMm52NPZtYg/BVADKp0Ukpac=
-=1uJl
------END PGP SIGNATURE-----
-
---Bd2KlmcTHfsQFEJ+--
+Thanks,
+Laurent
