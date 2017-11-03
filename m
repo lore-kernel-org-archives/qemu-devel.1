@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48426)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48750)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eAXX6-00029r-3W
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 04:40:57 -0400
+	(envelope-from <rth7680@gmail.com>) id 1eAXYJ-000347-Pw
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 04:42:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eAXX1-0002PJ-Rw
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 04:40:56 -0400
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:50496)
+	(envelope-from <rth7680@gmail.com>) id 1eAXYE-0003G8-TZ
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 04:42:11 -0400
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:51984)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1eAXX1-0002P8-Kr
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 04:40:51 -0400
-Received: by mail-wm0-x243.google.com with SMTP id s66so3380448wmf.5
-	for <qemu-devel@nongnu.org>; Fri, 03 Nov 2017 01:40:51 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-Date: Fri,  3 Nov 2017 09:40:43 +0100
-Message-Id: <20171103084046.12821-1-richard.henderson@linaro.org>
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1eAXYE-0003EY-Ms
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 04:42:06 -0400
+Received: by mail-wm0-x241.google.com with SMTP id b9so3537377wmh.0
+	for <qemu-devel@nongnu.org>; Fri, 03 Nov 2017 01:42:06 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <201711030837145949795@zte.com.cn>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <811e6387-83c3-0d30-89a0-22c6cc847178@twiddle.net>
+Date: Fri, 3 Nov 2017 09:42:01 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 0/3] TCG queued patches
+In-Reply-To: <201711030837145949795@zte.com.cn>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] tcg/mips: make some functions inline.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,39 +30,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org
+To: jiang.biao2@zte.com.cn
+Cc: aurelien@aurel32.net, qemu-devel@nongnu.org, zhong.weidong@zte.com.cn
 
-Two bug fixes this time.
+On 11/03/2017 01:37 AM, jiang.biao2@zte.com.cn wrote:
+>> On 11/02/2017 12:23 PM, jiang.biao2@zte.com.cn wrote:
+>>> No, :) Just found some of these functions are inline and others are not when reading
+>>> the code, the style looks inconsistent.
+>>>
+>> My preference would be to remove them all.
+> Should I commit another patch to do that? :) 
+
+If you find the inconsistency distracting, yes.
 
 
 r~
-
-
-The following changes since commit 094611b426b3b532a3ec72256cb4e958149269d3:
-
-  oslib-posix: Use sysctl(2) call to resolve exec_dir on NetBSD (2017-11-02 16:19:34 +0000)
-
-are available in the git repository at:
-
-  git://github.com/rth7680/qemu.git tags/pull-tcg-20171103
-
-for you to fetch changes up to 426eeecdf5d9cf1695a53c08f46394f8e5351750:
-
-  cpu-exec: Exit exclusive region on longjmp from step_atomic (2017-11-03 09:34:21 +0100)
-
-----------------------------------------------------------------
-Queued tcg patches
-
-----------------------------------------------------------------
-Peter Maydell (1):
-      cpu-exec: Exit exclusive region on longjmp from step_atomic
-
-Richard Henderson (2):
-      tcg: Allow constant pool entries in the prologue
-      tcg/s390x: Use constant pool for prologue
-
- accel/tcg/cpu-exec.c      | 15 ++++++++++++---
- tcg/s390/tcg-target.inc.c | 44 ++++++++++++------------------------------
- tcg/tcg.c                 | 49 ++++++++++++++++++++++++++++++++++++++++-------
- 3 files changed, 66 insertions(+), 42 deletions(-)
