@@ -1,29 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60608)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60784)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eAdc5-0007ou-2o
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 11:10:32 -0400
+	(envelope-from <mst@redhat.com>) id 1eAdcl-0008J0-1W
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 11:11:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eAdc1-00088f-UO
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 11:10:29 -0400
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:47933)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1eAdc1-00087d-MO
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 11:10:25 -0400
-Received: by mail-wm0-x242.google.com with SMTP id r196so2159095wmf.2
-	for <qemu-devel@nongnu.org>; Fri, 03 Nov 2017 08:10:25 -0700 (PDT)
-Date: Fri, 3 Nov 2017 15:10:21 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20171103151021.GA10959@stefanha-x1.localdomain>
-References: <2896466deb1ff8d832e39ce389ce268ee38e4e4f.1504935362.git.maozy.fnst@cn.fujitsu.com>
-	<20170912101629.GE6123@stefanha-x1.localdomain>
-	<b3ee14cb-9d20-156b-2f68-f069ccd89f1d@cn.fujitsu.com>
+	(envelope-from <mst@redhat.com>) id 1eAdch-0000MN-Qh
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 11:11:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33612)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eAdch-0000K3-KF
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 11:11:07 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8D1D820262
+	for <qemu-devel@nongnu.org>; Fri,  3 Nov 2017 15:11:06 +0000 (UTC)
+Date: Fri, 3 Nov 2017 17:11:01 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20171103170426-mutt-send-email-mst@kernel.org>
+References: <20171102133115.19195-1-lprosek@redhat.com>
+	<20171102163348-mutt-send-email-mst@kernel.org>
+	<CABdb734XVCNxyyRUfFtU5cm=34K28zsuRgyuj6F2SEBjPUu27w@mail.gmail.com>
+	<1509693637.31823.7.camel@redhat.com>
+	<CABdb734MR3vMCSBH-JhD8vWYKLBx6QOxrVZFYUyDbuQJg8mZ6Q@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="zYM0uCDKw75PZbzx"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <b3ee14cb-9d20-156b-2f68-f069ccd89f1d@cn.fujitsu.com>
-Subject: Re: [Qemu-devel] [PATCH v4] pci: Set err to errp directly rather
- than through error_propagate()
+In-Reply-To: <CABdb734MR3vMCSBH-JhD8vWYKLBx6QOxrVZFYUyDbuQJg8mZ6Q@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH] virtio-pci: Don't force Subsystem Vendor
+ ID = Vendor ID
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,59 +37,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Marcel Apfelbaum <marcel@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+To: Ladi Prosek <lprosek@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Yan Vugenfirer <yvugenfi@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Vadim Rozenfeld <vrozenfe@redhat.com>
 
+On Fri, Nov 03, 2017 at 09:23:07AM +0100, Ladi Prosek wrote:
+> On Fri, Nov 3, 2017 at 8:20 AM, Gerd Hoffmann <kraxel@redhat.com> wrote:
+> >
+> >> > > Signed-off-by: Ladi Prosek <lprosek@redhat.com>
+> >> >
+> >> > I wonder whether it's a problem that legacy devices ignore
+> >> > the subsystem ID (that's part of spec).
+> >>
+> >> I don't understand this comment. I don't see anything in the spec
+> >> related to ignoring the subsystem ID.
+> >
+> > Well, the subsystem *device* id is defined to be the virtio device id,
+> > so it is certainly not ignored.  The subsystem *vendor* id is not used
+> > as far I know (or ignored in the sense that it doesn't change driver
+> > behavior), allowing to set that makes sense to me.
+> 
+> Yes, thanks, I'm assuming that Michael meant the subsystem device ID.
+> The PCI spec seems to be using "subsystem ID" for the name of this
+> field.
 
---zYM0uCDKw75PZbzx
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Exactly.
 
-On Thu, Oct 12, 2017 at 10:44:26AM +0800, Mao Zhongyi wrote:
-> On 09/12/2017 06:16 PM, Stefan Hajnoczi wrote:
-> > On Sat, Sep 09, 2017 at 02:22:26PM +0800, Mao Zhongyi wrote:
-> > > ioh3420_interrupts_init() pass error message to local_err, then
-> > > propagate it to errp by error_propagate(), which is not necessary.
-> > > So eliminate it and pass errp directly instead of local_err.
-> > >=20
-> > > Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> > > Cc: Marcel Apfelbaum <marcel@redhat.com>
-> > > Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-> > > Reviewed-by: Eric Blake <eblake@redhat.com>
-> > > Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
-> > > Reviewed-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
-> > > ---
-> > > v4:
-> > > it not apply clearly on HEAD, so rebase it and modify the commit
-> > > message.
-> > > ---
-> > >=20
-> > >  hw/pci-bridge/ioh3420.c | 4 +---
-> > >  1 file changed, 1 insertion(+), 3 deletions(-)
-> >=20
-> > Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
->=20
-> Hi,
->=20
-> Long time no news. Ping...
+> I understand that this ID must not change in legacy devices.
 
-This patch should go through Michael Tsirkin's tree.
+Interestingly the device ID is ignored except it must be within
+a specific range of values.
 
-Stefan
+> Interestingly, Windows appears to allow matching drivers only on the
+> full subsystem device ID + subsystem vendor ID 32-bit value, not on
+> only one of the two.
+> 
+> PCI\VEN_v(4)&DEV_d(4)&SUBSYS_s(4)n(4)&REV_r(2)
+> 
+> This might be a potential problem for a legacy driver that wants to
+> stay vendor-agnostic but I'm pretty sure there would be a reasonable
+> way of working around it. Actually, the device must use a designated
+> device ID (like 0x1000) in addition to the subsystem device ID so this
+> should be a non-issue altogether.
 
---zYM0uCDKw75PZbzx
-Content-Type: application/pgp-signature; name="signature.asc"
+The original virtio spec wasn't really workable for windows. It requires
+ignoring everything except the vendor ID, *range* of device IDs
+(specific ID is ignored) and subsystem ID.
 
------BEGIN PGP SIGNATURE-----
+So in my humble opinion the right thing for people to do is simply to
+avoid legacy devices. Is something preventing that?
 
-iQEcBAEBAgAGBQJZ/IbdAAoJEJykq7OBq3PIWYkH/1l6jOpCmrGJFwX132CvLLCq
-BzN6nASBS/G05Hl+72jLluOklNuRc0bzYhBGn2d4yTrEzgWW4wn06EsIOUjrKUdZ
-SiRT+ifoRXydtrXIBPi/zQxPxA56V18L3XMMjAQEpOOUWi3SISun/fB9RoTq1EjW
-FXp1VU3yc7Z0nq27JXTI94rQpxzK6FR1+UgwOGKpPXTSv/ImrCgxRUdxWfl5kb7y
-8LBYgmCKoo6cIYkYjvFjk06heeCCpL4DEZp+CPEgdGwrZqaNn0sxeyQLjCRH1OGz
-Ou9NjkaaAYabJPzyqTR2pZRONBASm9wtMikLKnJ0kdxcVu2PrUWjxt1q3cvhWLM=
-=B6gi
------END PGP SIGNATURE-----
-
---zYM0uCDKw75PZbzx--
+> > Possibly not only for virtio devices, most pci devices have 1af4:1100
+> > as subsystem id, other vendors might want set it too for consistency.
+> >
+> > cheers,
+> >   Gerd
