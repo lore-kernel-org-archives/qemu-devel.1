@@ -1,34 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57719)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58009)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eAVl8-0004JY-KZ
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 02:47:19 -0400
+	(envelope-from <kraxel@redhat.com>) id 1eAVmv-00054G-Il
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 02:49:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eAVl5-0004cP-H3
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 02:47:18 -0400
-Received: from indium.canonical.com ([91.189.90.7]:47862)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eAVl5-0004bG-Aw
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 02:47:15 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eAVl2-0000de-6V
-	for <qemu-devel@nongnu.org>; Fri, 03 Nov 2017 06:47:12 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 10E632E80CC
-	for <qemu-devel@nongnu.org>; Fri,  3 Nov 2017 06:47:12 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+	(envelope-from <kraxel@redhat.com>) id 1eAVms-0005vG-Em
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 02:49:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50792)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1eAVms-0005uu-89
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 02:49:06 -0400
+Message-ID: <1509691743.31823.1.camel@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Fri, 03 Nov 2017 07:49:03 +0100
+In-Reply-To: <20171102161103.GU32533@redhat.com>
+References: <1509638660.11873.13.camel@redhat.com>
+	<20171102161103.GU32533@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 03 Nov 2017 06:32:34 -0000
-From: Thomas Huth <1188018@bugs.launchpad.net>
-Reply-To: Bug 1188018 <1188018@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20130606060816.21214.71277.malonedeb@chaenomeles.canonical.com>
-Message-Id: <150969075415.4519.15415324252587277298.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1188018] Re: qemu monitor does not suppot rbd
- "savevm" command
+Subject: Re: [Qemu-devel] seabios serial console vs. sgabios
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,36 +27,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: seabios <seabios@seabios.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-Triaging old bug tickets... has this ever been fixed? Can you still
-reproduce this issue with the latest version of QEMU? Or could we close
-this ticket nowadays?
+On Thu, 2017-11-02 at 16:11 +0000, Daniel P. Berrange wrote:
+> On Thu, Nov 02, 2017 at 05:04:20PM +0100, Gerd Hoffmann wrote:
+> > =C2=A0 Hi,
+> >=20
+> > One problem we have with the serial console support in seabios and
+> > sgabios:=C2=A0=C2=A0It can happen that both are activated.=C2=A0=C2=A0=
+We'll go fix that
+> > in
+> > qemu, but that'll work for new qemu versions only, not for the old
+> > already released ones.
+> >=20
+> > So I think it would be useful if seabios makes sure sgabios and
+> > serial
+> > console are not both active at the same time, i.e. in case we find
+> > "vgaroms/sgabios.bin" being present either turn off builtin serial
+> > console, or don't load sgabios (and possibly also enable builtin
+> > serial
+> > console).
+>=20
+> Historically libvirt will always use '-device sgabios' if the user
+> has
+> requested <bios useserial=3D'yes'/>.=C2=A0=C2=A0So if that -device arg =
+is given,
+> I
+> think QEMU must honour it, which implies QEMU must disable Seabios'
+> own built-in serial console impl in that scenario.
 
-** Changed in: qemu
-       Status: New =3D> Incomplete
+Hmm, why?  The user asked for a serial console.  Whenever that is
+provided by seabios builtin support or the sgabios rom doesn't really
+matter, no?
 
--- =
+Also, the question is what seabios should do in case both are active.=20
+Which I think can happen today with libvirt if you configure a virtual
+machine without vga (libvirt passes -machine graphics=3Doff which
+activates builtin serial console) and with "<bios useserial=3D'yes'/>"
+(enables sgabios rom).
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1188018
-
-Title:
-  qemu monitor does not suppot rbd "savevm" command
-
-Status in QEMU:
-  Incomplete
-
-Bug description:
-  1. I used ceph rbd as my block device, /usr/local/bin/qemu-system-
-  x86_64 -drive
-  format=3Drbd,file=3Drbd:rbd/sles.img:rbd_cache=3Dtrue,cache=3Dwriteback -=
-boot
-  c  -m 1024 -enable-kvm -vnc 0.0.0.0:0 -monitor stdio
-
-  2. when in monitor command line "savevm", it reports "Error -95 while
-  writing VM" in the monitor
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1188018/+subscriptions
+cheers,
+  Gerd
