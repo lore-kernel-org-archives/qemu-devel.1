@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55098)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57904)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eAPpW-0002nc-0u
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 20:27:27 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1eAPxN-0004FO-KF
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 20:35:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eAPpS-0005sZ-TZ
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 20:27:26 -0400
-Resent-Message-Id: <E1eAPpS-0005sZ-TZ@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21446)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1eAPpS-0005lW-Lf
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 20:27:22 -0400
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <150964073694.216.3626923485460882393@bafd83ae6430>
-In-Reply-To: <1509640536-32160-1-git-send-email-peter.maydell@linaro.org>
+	(envelope-from <ehabkost@redhat.com>) id 1eAPxK-0001os-HO
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 20:35:33 -0400
+Date: Fri, 3 Nov 2017 01:35:20 +0100
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20171103003520.GF3111@localhost.localdomain>
+References: <20171030181459.1951-1-f4bug@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 2 Nov 2017 09:38:57 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v2] cpu-exec: Exit exclusive region on
- longjmp from step_atomic
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20171030181459.1951-1-f4bug@amsat.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH] vl: only display available accelerators
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,38 +23,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org, cota@braap.org, alex.bennee@linaro.org, rth@twiddle.net
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, Peter Xu <peterx@redhat.com>, Markus Armbruster <armbru@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, "Emilio G . Cota" <cota@braap.org>, Eric Blake <eblake@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtQQVRDSCB2Ml0gY3B1LWV4ZWM6IEV4aXQgZXhjbHVzaXZlIHJlZ2lvbiBvbiBsb25n
-am1wIGZyb20gc3RlcF9hdG9taWMKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDE1MDk2NDA1MzYt
-MzIxNjAtMS1naXQtc2VuZC1lbWFpbC1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcKCj09PSBURVNU
-IFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQg
-bG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9j
-YWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1
-ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9y
-IGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQo
-Z2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1m
-b3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4K
-ICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUK
-CmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTlj
-MjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9w
-YXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3LzE1
-MDk2NDA1MzYtMzIxNjAtMS1naXQtc2VuZC1lbWFpbC1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcg
-LT4gcGF0Y2hldy8xNTA5NjQwNTM2LTMyMTYwLTEtZ2l0LXNlbmQtZW1haWwtcGV0ZXIubWF5ZGVs
-bEBsaW5hcm8ub3JnClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKYmYyNDVjYjNkYiBj
-cHUtZXhlYzogRXhpdCBleGNsdXNpdmUgcmVnaW9uIG9uIGxvbmdqbXAgZnJvbSBzdGVwX2F0b21p
-YwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8xOiBjcHUtZXhlYzogRXhp
-dCBleGNsdXNpdmUgcmVnaW9uIG9uIGxvbmdqbXAgZnJvbSBzdGVwX2F0b21pYy4uLgpFUlJPUjog
-VXNlIG9mIHZvbGF0aWxlIGlzIHVzdWFsbHkgd3Jvbmc6IHNlZSBEb2N1bWVudGF0aW9uL3ZvbGF0
-aWxlLWNvbnNpZGVyZWQtaGFybWZ1bC50eHQKIzM3OiBGSUxFOiBhY2NlbC90Y2cvY3B1LWV4ZWMu
-YzoyMzc6CisgICAgdm9sYXRpbGUgYm9vbCBpbl9leGNsdXNpdmVfcmVnaW9uID0gZmFsc2U7Cgp0
-b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDM4IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2gg
-aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
-cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
-Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21t
-YW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2Fs
-bHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVl
-ZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
+On Mon, Oct 30, 2017 at 03:14:59PM -0300, Philippe Mathieu-Daud=E9 wrote:
+> examples configuring with '--enable-kvm --disable-tcg'
+>=20
+> - before
+>=20
+>   $ qemu-system-x86_64 -accel help
+>   Possible accelerators: kvm, xen, hax, tcg
+>=20
+>   $ qemu-system-x86_64 -accel tcg
+>   qemu-system-x86_64: -machine accel=3Dtcg: No accelerator found
+>=20
+>   # qemu-system-x86_64 -accel hax
+>   qemu-system-x86_64: -machine accel=3Dhax: No accelerator found
+>=20
+> - after
+>=20
+>   $ qemu-system-x86_64 -accel help
+>   Possible accelerators:
+>     xen
+>     kvm
+>=20
+> Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
+> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+> ---
+> since RFC:
+>   - use much cleaner object_class_get_list(TYPE_ACCEL, false)
+>=20
+>  vl.c | 39 ++++++++++++++++++++++++++++++++++-----
+>  1 file changed, 34 insertions(+), 5 deletions(-)
+>=20
+> diff --git a/vl.c b/vl.c
+> index ec299099ff..0f13641715 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -2764,6 +2764,39 @@ static gint machine_class_cmp(gconstpointer a, g=
+constpointer b)
+>      exit(!name || !is_help_option(name));
+>  }
+> =20
+> +static void accel_list_entry(gpointer data, gpointer user_data)
+> +{
+> +    ObjectClass *oc =3D data;
+> +    const char *typename =3D object_class_get_name(oc);
+> +    int len;
+> +
+> +    if (!qtest_driver() && !g_strcmp0(typename, ACCEL_CLASS_NAME("qtes=
+t"))) {
+> +        return; /* used by test cases */
+> +    }
+
+I would prefer to not hardcode the accel name here.  If you want
+qtest to have special behavior, you can add a new field to
+AccelClass to implement that.
+
+However, I don't think I agree we should hide qtest from the
+user: it is accepted on the command-line, so why should we lie?
+Why not add a description field and indicate that qtest is useful
+only for testing?
+
+> +
+> +    len =3D strlen(typename) - strlen("-" TYPE_ACCEL);
+
+You can use AccelClass::name here.
+
+> +    if (len > 0) {
+> +        error_printf("  %.*s\n", len, typename);
+> +    }
+> +}
+> +
+> +static void accel_parse(const char *name, QemuOpts *accel_opts)
+> +{
+> +    const char *optarg =3D qemu_opt_get(accel_opts, "accel");
+> +    GSList *list;
+> +
+> +    if (!is_help_option(optarg)) {
+> +        return;
+> +    }
+> +
+> +    list =3D object_class_get_list(TYPE_ACCEL, false);
+> +    error_printf("Possible accelerators:\n");
+> +    g_slist_foreach(list, accel_list_entry, NULL);
+> +    g_slist_free(list);
+> +
+> +    exit(0);
+> +}
+> +
+>  void qemu_add_exit_notifier(Notifier *notify)
+>  {
+>      notifier_list_add(&exit_notifiers, notify);
+> @@ -3881,11 +3914,7 @@ int main(int argc, char **argv, char **envp)
+>              case QEMU_OPTION_accel:
+>                  accel_opts =3D qemu_opts_parse_noisily(qemu_find_opts(=
+"accel"),
+>                                                       optarg, true);
+> -                optarg =3D qemu_opt_get(accel_opts, "accel");
+> -                if (!optarg || is_help_option(optarg)) {
+> -                    error_printf("Possible accelerators: kvm, xen, hax=
+, tcg\n");
+> -                    exit(0);
+> -                }
+> +                accel_parse(optarg, accel_opts);
+>                  opts =3D qemu_opts_create(qemu_find_opts("machine"), N=
+ULL,
+>                                          false, &error_abort);
+>                  qemu_opt_set(opts, "accel", optarg, &error_abort);
+> --=20
+> 2.15.0.rc2
+>=20
+
+--=20
+Eduardo
