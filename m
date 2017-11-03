@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35306)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35309)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1eAach-0007pL-Ep
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 07:58:56 -0400
+	(envelope-from <kraxel@redhat.com>) id 1eAach-0007pN-FP
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 07:58:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1eAacd-00068U-AU
+	(envelope-from <kraxel@redhat.com>) id 1eAacc-000671-Ht
 	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 07:58:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48978)
+Received: from mx1.redhat.com ([209.132.183.28]:34438)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1eAacd-00066h-1M
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 07:58:51 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1eAacc-00065Y-9M
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 07:58:50 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 048414E4C3
-	for <qemu-devel@nongnu.org>; Fri,  3 Nov 2017 11:58:50 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 146396A7C6
+	for <qemu-devel@nongnu.org>; Fri,  3 Nov 2017 11:58:49 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Fri,  3 Nov 2017 12:58:42 +0100
-Message-Id: <20171103115842.1534-4-kraxel@redhat.com>
+Date: Fri,  3 Nov 2017 12:58:40 +0100
+Message-Id: <20171103115842.1534-2-kraxel@redhat.com>
 In-Reply-To: <20171103115842.1534-1-kraxel@redhat.com>
 References: <20171103115842.1534-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH 3/3] sdl: use ctrl-alt-g as grab hotkey
+Subject: [Qemu-devel] [PATCH 1/3] sdl: remove -no-frame support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,113 +30,167 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-Be consistent with gtk and cocoa.
+SDL2 doesn't support this any more, the SDL_NOFRAME window flag is gone.
+Drop the code, print a notice when the option is still used.
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- ui/sdl.c  | 26 +++++++++++---------------
- ui/sdl2.c | 22 +++++++++-------------
- 2 files changed, 20 insertions(+), 28 deletions(-)
+ include/ui/console.h |  5 ++---
+ ui/sdl.c             |  8 +-------
+ ui/sdl2.c            |  7 +------
+ vl.c                 | 15 ++++-----------
+ 4 files changed, 8 insertions(+), 27 deletions(-)
 
+diff --git a/include/ui/console.h b/include/ui/console.h
+index 580dfc57ee..7b35778444 100644
+--- a/include/ui/console.h
++++ b/include/ui/console.h
+@@ -436,7 +436,7 @@ void surface_gl_setup_viewport(QemuGLShader *gls,
+ /* sdl.c */
+ #ifdef CONFIG_SDL
+ void sdl_display_early_init(int opengl);
+-void sdl_display_init(DisplayState *ds, int full_screen, int no_frame);
++void sdl_display_init(DisplayState *ds, int full_screen);
+ #else
+ static inline void sdl_display_early_init(int opengl)
+ {
+@@ -444,8 +444,7 @@ static inline void sdl_display_early_init(int opengl)
+     error_report("SDL support is disabled");
+     abort();
+ }
+-static inline void sdl_display_init(DisplayState *ds, int full_screen,
+-                                    int no_frame)
++static inline void sdl_display_init(DisplayState *ds, int full_screen)
+ {
+     /* This must never be called if CONFIG_SDL is disabled */
+     error_report("SDL support is disabled");
 diff --git a/ui/sdl.c b/ui/sdl.c
-index 2c85482b5e..6ce67eeb5a 100644
+index 7b71a9ac58..f3adbb7a64 100644
 --- a/ui/sdl.c
 +++ b/ui/sdl.c
-@@ -364,7 +364,7 @@ static void sdl_update_caption(void)
-     if (!runstate_is_running())
-         status = " [Stopped]";
-     else if (gui_grab) {
--        status = " - Press Ctrl-Alt to exit mouse grab";
-+        status = " - Press Ctrl-Alt-G to exit mouse grab";
+@@ -48,7 +48,6 @@ static int gui_saved_width;
+ static int gui_saved_height;
+ static int gui_saved_grab;
+ static int gui_fullscreen;
+-static int gui_noframe;
+ static int gui_key_modifier_pressed;
+ static int gui_keysym;
+ static int gui_grab_code = KMOD_LALT | KMOD_LCTRL;
+@@ -114,8 +113,6 @@ static void do_sdl_resize(int width, int height, int bpp)
+     } else {
+         flags |= SDL_RESIZABLE;
+     }
+-    if (gui_noframe)
+-        flags |= SDL_NOFRAME;
+ 
+     tmp_screen = SDL_SetVideoMode(width, height, bpp, flags);
+     if (!real_screen) {
+@@ -944,7 +941,7 @@ void sdl_display_early_init(int opengl)
+     }
+ }
+ 
+-void sdl_display_init(DisplayState *ds, int full_screen, int no_frame)
++void sdl_display_init(DisplayState *ds, int full_screen)
+ {
+     int flags;
+     uint8_t data = 0;
+@@ -963,9 +960,6 @@ void sdl_display_init(DisplayState *ds, int full_screen, int no_frame)
+             exit(1);
      }
  
-     if (qemu_name) {
-@@ -561,6 +561,16 @@ static void handle_keydown(SDL_Event *ev)
-             toggle_full_screen();
-             gui_keysym = 1;
-             break;
-+        case 0x22: /* 'g' key */
-+            if (!gui_grab) {
-+                if (qemu_console_is_graphic(NULL)) {
-+                    sdl_grab_start();
-+                }
-+            } else if (!gui_fullscreen) {
-+                sdl_grab_end();
-+            }
-+            gui_keysym = 1;
-+            break;
-         case 0x16: /* 'u' key on US keyboard */
-             if (scaling_active) {
-                 scaling_active = 0;
-@@ -692,20 +702,6 @@ static void handle_keyup(SDL_Event *ev)
-     mod_state = (ev->key.keysym.mod & gui_grab_code);
-     if (!mod_state && gui_key_modifier_pressed) {
-         gui_key_modifier_pressed = 0;
--        if (gui_keysym == 0) {
--            /* exit/enter grab if pressing Ctrl-Alt */
--            if (!gui_grab) {
--                if (qemu_console_is_graphic(NULL)) {
--                    sdl_grab_start();
--                }
--            } else if (!gui_fullscreen) {
--                sdl_grab_end();
--            }
--            /* SDL does not send back all the modifiers key, so we must
--             * correct it. */
--            reset_keys();
--            return;
--        }
-         gui_keysym = 0;
+-    if (no_frame)
+-        gui_noframe = 1;
+-
+     if (!full_screen) {
+         setenv("SDL_VIDEO_ALLOW_SCREENSAVER", "1", 0);
      }
-     if (qemu_console_is_graphic(NULL) && !gui_keysym) {
 diff --git a/ui/sdl2.c b/ui/sdl2.c
-index e15566877b..105c461b21 100644
+index 53dd447fd2..3802a9b477 100644
 --- a/ui/sdl2.c
 +++ b/ui/sdl2.c
-@@ -139,7 +139,7 @@ static void sdl_update_caption(struct sdl2_console *scon)
-     if (!runstate_is_running()) {
-         status = " [Stopped]";
-     } else if (gui_grab) {
--        status = " - Press Ctrl-Alt to exit grab";
-+        status = " - Press Ctrl-Alt-G to exit grab";
+@@ -38,7 +38,6 @@ static int gui_grab; /* if true, all keyboard/mouse events are grabbed */
+ 
+ static int gui_saved_grab;
+ static int gui_fullscreen;
+-static int gui_noframe;
+ static int gui_key_modifier_pressed;
+ static int gui_keysym;
+ static int gui_grab_code = KMOD_LALT | KMOD_LCTRL;
+@@ -756,7 +755,7 @@ void sdl_display_early_init(int opengl)
+     }
+ }
+ 
+-void sdl_display_init(DisplayState *ds, int full_screen, int no_frame)
++void sdl_display_init(DisplayState *ds, int full_screen)
+ {
+     int flags;
+     uint8_t data = 0;
+@@ -764,10 +763,6 @@ void sdl_display_init(DisplayState *ds, int full_screen, int no_frame)
+     int i;
+     SDL_SysWMinfo info;
+ 
+-    if (no_frame) {
+-        gui_noframe = 1;
+-    }
+-
+ #ifdef __linux__
+     /* on Linux, SDL may use fbcon|directfb|svgalib when run without
+      * accessible $DISPLAY to open X11 window.  This is often the case
+diff --git a/vl.c b/vl.c
+index ec299099ff..0065161240 100644
+--- a/vl.c
++++ b/vl.c
+@@ -151,7 +151,6 @@ static int rtc_date_offset = -1; /* -1 means no change */
+ QEMUClockType rtc_clock;
+ int vga_interface_type = VGA_NONE;
+ static int full_screen = 0;
+-static int no_frame = 0;
+ int no_quit = 0;
+ static bool grab_on_hover;
+ Chardev *serial_hds[MAX_SERIAL_PORTS];
+@@ -2165,13 +2164,7 @@ static DisplayType select_display(const char *p)
+ 
+             if (strstart(opts, ",frame=", &nextopt)) {
+                 opts = nextopt;
+-                if (strstart(opts, "on", &nextopt)) {
+-                    no_frame = 0;
+-                } else if (strstart(opts, "off", &nextopt)) {
+-                    no_frame = 1;
+-                } else {
+-                    goto invalid_sdl_args;
+-                }
++                warn_report("frame sdl option is unsupported, ignoring");
+             } else if (strstart(opts, ",alt_grab=", &nextopt)) {
+                 opts = nextopt;
+                 if (strstart(opts, "on", &nextopt)) {
+@@ -3784,7 +3777,7 @@ int main(int argc, char **argv, char **envp)
+                 full_screen = 1;
+                 break;
+             case QEMU_OPTION_no_frame:
+-                no_frame = 1;
++                warn_report("-no-frame switch is unsupported, ignoring");
+                 break;
+             case QEMU_OPTION_alt_grab:
+                 alt_grab = 1;
+@@ -4458,7 +4451,7 @@ int main(int argc, char **argv, char **envp)
+ #endif
      }
  
-     if (qemu_name) {
-@@ -364,6 +364,14 @@ static void handle_keydown(SDL_Event *ev)
-             toggle_full_screen(scon);
-             gui_keysym = 1;
-             break;
-+        case SDL_SCANCODE_G:
-+            gui_keysym = 1;
-+            if (!gui_grab) {
-+                sdl_grab_start(scon);
-+            } else if (!gui_fullscreen) {
-+                sdl_grab_end(scon);
-+            }
-+            break;
-         case SDL_SCANCODE_U:
-             sdl2_window_destroy(scon);
-             sdl2_window_create(scon);
-@@ -410,18 +418,6 @@ static void handle_keyup(SDL_Event *ev)
-     mod_state = (ev->key.keysym.mod & gui_grab_code);
-     if (!mod_state && gui_key_modifier_pressed) {
-         gui_key_modifier_pressed = 0;
--        if (gui_keysym == 0) {
--            /* exit/enter grab if pressing Ctrl-Alt */
--            if (!gui_grab) {
--                sdl_grab_start(scon);
--            } else if (!gui_fullscreen) {
--                sdl_grab_end(scon);
--            }
--            /* SDL does not send back all the modifiers key, so we must
--             * correct it. */
--            sdl2_reset_keys(scon);
--            return;
--        }
-         gui_keysym = 0;
+-    if ((no_frame || alt_grab || ctrl_grab) && display_type != DT_SDL) {
++    if ((alt_grab || ctrl_grab) && display_type != DT_SDL) {
+         error_report("-no-frame, -alt-grab and -ctrl-grab are only valid "
+                      "for SDL, ignoring option");
      }
-     if (!gui_keysym) {
+@@ -4809,7 +4802,7 @@ int main(int argc, char **argv, char **envp)
+         curses_display_init(ds, full_screen);
+         break;
+     case DT_SDL:
+-        sdl_display_init(ds, full_screen, no_frame);
++        sdl_display_init(ds, full_screen);
+         break;
+     case DT_COCOA:
+         cocoa_display_init(ds, full_screen);
 -- 
 2.9.3
