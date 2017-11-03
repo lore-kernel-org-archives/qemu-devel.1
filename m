@@ -1,14 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46068)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46067)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1eAcon-0002Kr-2I
+	(envelope-from <berto@igalia.com>) id 1eAcon-0002Kq-1Q
 	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 10:19:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1eAcoi-0007v0-1X
+	(envelope-from <berto@igalia.com>) id 1eAcoi-0007vC-2C
 	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 10:19:32 -0400
 From: Alberto Garcia <berto@igalia.com>
-Date: Fri,  3 Nov 2017 16:18:49 +0200
-Message-Id: <cover.1509718618.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH v2 0/7] Misc qcow2 corruption checks
+Date: Fri,  3 Nov 2017 16:18:52 +0200
+Message-Id: <fb53467cf48e95ff3330def1cf1003a5b862b7d9.1509718618.git.berto@igalia.com>
+In-Reply-To: <cover.1509718618.git.berto@igalia.com>
+References: <cover.1509718618.git.berto@igalia.com>
+In-Reply-To: <cover.1509718618.git.berto@igalia.com>
+References: <cover.1509718618.git.berto@igalia.com>
+Subject: [Qemu-devel] [PATCH v2 3/7] qcow2: Prevent allocating compressed
+ clusters at offset 0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,60 +24,85 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Thomas Huth <thuth@redhat.com>, "R . Nageswara Sastry" <nasastry@in.ibm.com>
 
-This series contains a few checks that prevent QEMU from crashing
-under some scenarios with corrupted qcow2 images.
+If the refcount data is corrupted then we can end up trying to
+allocate a new compressed cluster at offset 0 in the image, triggering
+an assertion in qcow2_alloc_bytes() that would crash QEMU:
 
-The first patch solves the crash reported here:
+  qcow2_alloc_bytes: Assertion `offset' failed.
 
-  https://bugs.launchpad.net/qemu/+bug/1728615
+This patch adds an explicit check for this scenario and a new test
+case.
 
-And the others solve similar crashes that I detected in the process of
-fixing this one.
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+---
+ block/qcow2-refcount.c     |  8 +++++++-
+ tests/qemu-iotests/060     | 10 ++++++++++
+ tests/qemu-iotests/060.out |  8 ++++++++
+ 3 files changed, 25 insertions(+), 1 deletion(-)
 
-Regards,
-
-Berto
-
-v2:
-- Use goto fail in the l2_allocate() check [Max]
-- Add check and test case for allocation of compressed clusters [Max]
-- Add test case for header.refcount_table_offset == 0
-- Add overlap checks to qcow2_crypto_hdr_init_func() [Max]
-
-v1: https://lists.gnu.org/archive/html/qemu-block/2017-11/msg00010.html
-- Initial version
-
-Output of backport-diff against v1:
-
-Key:
-[----] : patches are identical
-[####] : number of functional differences between upstream/downstream patch
-[down] : patch is downstream-only
-The flags [FC] indicate (F)unctional and (C)ontextual differences, respectively
-
-001/7:[----] [--] 'qcow2: Prevent allocating refcount blocks at offset 0'
-002/7:[0003] [FC] 'qcow2: Prevent allocating L2 tables at offset 0'
-003/7:[down] 'qcow2: Prevent allocating compressed clusters at offset 0'
-004/7:[----] [-C] 'qcow2: Don't open images with header.refcount_table_clusters == 0'
-005/7:[down] 'qcow2: Add iotest for an image with header.refcount_table_offset == 0'
-006/7:[----] [--] 'qcow2: Add iotest for an empty refcount table'
-007/7:[down] 'qcow2: Assert that the crypto header does not overlap other metadata'
-
-Alberto Garcia (7):
-  qcow2: Prevent allocating refcount blocks at offset 0
-  qcow2: Prevent allocating L2 tables at offset 0
-  qcow2: Prevent allocating compressed clusters at offset 0
-  qcow2: Don't open images with header.refcount_table_clusters == 0
-  qcow2: Add iotest for an image with header.refcount_table_offset == 0
-  qcow2: Add iotest for an empty refcount table
-  qcow2: Assert that the crypto header does not overlap other metadata
-
- block/qcow2-cluster.c      |  8 ++++++++
- block/qcow2-refcount.c     | 15 +++++++++++++-
- block/qcow2.c              |  7 +++++++
- tests/qemu-iotests/060     | 49 ++++++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/060.out | 39 ++++++++++++++++++++++++++++++++++++
- 5 files changed, 117 insertions(+), 1 deletion(-)
-
+diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
+index 9059996c4b..7eaac11429 100644
+--- a/block/qcow2-refcount.c
++++ b/block/qcow2-refcount.c
+@@ -1082,6 +1082,13 @@ int64_t qcow2_alloc_bytes(BlockDriverState *bs, int size)
+                 return new_cluster;
+             }
+ 
++            if (new_cluster == 0) {
++                qcow2_signal_corruption(bs, true, -1, -1, "Preventing invalid "
++                                        "allocation of compressed cluster "
++                                        "at offset 0");
++                return -EIO;
++            }
++
+             if (!offset || ROUND_UP(offset, s->cluster_size) != new_cluster) {
+                 offset = new_cluster;
+                 free_in_cluster = s->cluster_size;
+@@ -1090,7 +1097,6 @@ int64_t qcow2_alloc_bytes(BlockDriverState *bs, int size)
+             }
+         }
+ 
+-        assert(offset);
+         ret = update_refcount(bs, offset, size, 1, false, QCOW2_DISCARD_NEVER);
+         if (ret < 0) {
+             offset = 0;
+diff --git a/tests/qemu-iotests/060 b/tests/qemu-iotests/060
+index 40f85cc216..c3bce27b33 100755
+--- a/tests/qemu-iotests/060
++++ b/tests/qemu-iotests/060
+@@ -260,6 +260,16 @@ _make_test_img 64M
+ poke_file "$TEST_IMG" "$rb_offset"        "\x00\x00\x00\x00\x00\x00\x00\x00"
+ $QEMU_IO -c "write 0 64k" "$TEST_IMG" | _filter_qemu_io
+ 
++echo
++echo "=== Testing empty refcount block with compressed write ==="
++echo
++_make_test_img 64M
++$QEMU_IO -c "write 64k 64k" "$TEST_IMG" | _filter_qemu_io
++poke_file "$TEST_IMG" "$rb_offset"        "\x00\x00\x00\x00\x00\x00\x00\x00"
++# The previous write already allocated an L2 table, so now this new
++# write will try to allocate a compressed data cluster at offset 0.
++$QEMU_IO -c "write -c 0k 64k" "$TEST_IMG" | _filter_qemu_io
++
+ # success, all done
+ echo "*** done"
+ rm -f $seq.full
+diff --git a/tests/qemu-iotests/060.out b/tests/qemu-iotests/060.out
+index 5b8b518486..cf8790ff57 100644
+--- a/tests/qemu-iotests/060.out
++++ b/tests/qemu-iotests/060.out
+@@ -195,4 +195,12 @@ write failed: Input/output error
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
+ qcow2: Marking image as corrupt: Preventing invalid allocation of L2 table at offset 0; further corruption events will be suppressed
+ write failed: Input/output error
++
++=== Testing empty refcount block with compressed write ===
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
++wrote 65536/65536 bytes at offset 65536
++64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++qcow2: Marking image as corrupt: Preventing invalid allocation of compressed cluster at offset 0; further corruption events will be suppressed
++write failed: Input/output error
+ *** done
 -- 
 2.11.0
