@@ -1,21 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37306)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38543)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eAYmk-0002h9-23
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 06:01:11 -0400
+	(envelope-from <thuth@redhat.com>) id 1eAYpf-0003sr-Cr
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 06:04:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eAYmg-0001XC-6k
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 06:01:10 -0400
-Date: Fri, 3 Nov 2017 10:01:02 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20171103100102.GE5078@stefanha-x1.localdomain>
-References: <20171102120223.GI32533@redhat.com> <20171103060046.GB18539@lemon>
+	(envelope-from <thuth@redhat.com>) id 1eAYpb-0004lw-FK
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 06:04:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49908)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1eAYpb-0004lb-87
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 06:04:07 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 31C7313A74
+	for <qemu-devel@nongnu.org>; Fri,  3 Nov 2017 10:04:06 +0000 (UTC)
+References: <150970267983.273.1055338257816616711@bafd83ae6430>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <9066062f-b01e-0e37-8d0d-0982429d546a@redhat.com>
+Date: Fri, 3 Nov 2017 11:03:58 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="tMbDGjvJuJijemkf"
-Content-Disposition: inline
-In-Reply-To: <20171103060046.GB18539@lemon>
-Subject: Re: [Qemu-devel] [Qemu-block]  RFC: use case for adding QMP,
- block jobs & multiple exports to qemu-nbd ?
+In-Reply-To: <150970267983.273.1055338257816616711@bafd83ae6430>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] tests: Run the test-crypto-block only if
+ encryption is available
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,78 +34,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, stefanha@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: famz@redhat.com, berrange@redhat.com, Paolo Bonzini <pbonzini@redhat.com>
 
-
---tMbDGjvJuJijemkf
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Fri, Nov 03, 2017 at 02:00:46PM +0800, Fam Zheng wrote:
-> On Thu, 11/02 12:02, Daniel P. Berrange wrote:
-> > One alternative approach to doing this would be to suggest that we shou=
-ld
-> > instead just spawn qemu-system-x86_64 with '--machine none' and use that
-> > as a replacement for qemu-nbd, since it already has a built-in NBD serv=
-er
-> > which can do many exports at once and arbitrary block jobs.
+On 03.11.2017 10:51, no-reply@patchew.org wrote:
+> Hi,
 >=20
-> Here is a crazy idea from KVM Forum discussions that may relate, so menti=
-on it
-> here: we could move the QEMU block layer to a separate program and guest =
-can use
-> vhost-user-{blk,scsi} for I/O. It is something like this:
->=20
->=20
->    master-disk1.qcow2  (qemu-nbd)
->           ^
->           |  backing
->           |
->    cache-disk1.qcow2   (qemu-vhost)     <-------------.
->           ^                                           |
->           |  backing                                  |  backing
->           |                                           |
->           +-  vm-a-disk1.qcow2   (qemu-vhost)         +-  vm-a-disk2.qcow=
-2   (qemu-vhost)
->                     ^                                             ^
->                     |  vhost-user-blk                             |  vhos=
-t-user-blk
->                     |                                             |
->                     +- VM-1 (qemu-system-XXX)                     +- VM-2=
- (qemu-system-XXX)
->=20
->=20
-> So on the compute node, there will be N qemu-system-XXX processes (where =
-N is
-> the number of VMs) and 1 qemu-vhost process.
->=20
-> The hypothetical qemu-vhost program needs to support QMP as well and it r=
-uns the
-> COR/mirroring jobs from master disk to cache disk, just like what you pro=
-pose to
-> do with the extended qemu-nbd. The only difference is replacing the local=
- NBD
-> with vhost-user, which is more efficient.
+> This series failed automatic build test. Please find the testing comman=
+ds and
+> their output below. If you have docker installed, you can probably repr=
+oduce it
+> locally.
+[...]
+>   GTESTER tests/test-coroutine
+>   GTESTER tests/test-visitor-serialization
+>   GTESTER tests/test-aio
+>   GTESTER tests/test-iov
+>   GTESTER tests/test-aio-multithread
+>   GTESTER tests/test-throttle
+>   GTESTER tests/test-thread-pool
+>   GTESTER tests/test-hbitmap
+>   GTESTER tests/test-blockjob-txn
+>   GTESTER tests/test-blockjob
+>   GTESTER tests/test-x86-cpuid
+>   GTESTER tests/test-xbzrle
+>   GTESTER tests/test-vmstate
+> Failed to load simple/primitive:b_1
+> Failed to load simple/primitive:i64_2
+> Failed to load simple/primitive:i32_1
+> Failed to load simple/primitive:i32_1
+> Failed to load test/with_tmp:a
+> Failed to load test/tmp_child_parent:f
+> Failed to load test/tmp_child:parent
+> Failed to load test/with_tmp:tmp
+> Failed to load test/tmp_child:diff
+> Failed to load test/with_tmp:tmp
+> Failed to load test/tmp_child:diff
+> Failed to load test/with_tmp:tmp
+>   GTESTER tests/test-cutils
+>   GTESTER tests/test-shift128
+>   GTESTER tests/test-mul64
+>   GTESTER tests/test-int128
+>   GTESTER tests/rcutorture
+>   GTESTER tests/test-rcu-list
+>   GTESTER tests/test-qdist
+>   GTESTER tests/test-qht
+> GTester: last random seed: R02S7edfc183e8c228b3f1f73d7b19921a84
+>   LINK    tests/test-qht-par
+>   GTESTER tests/test-bitops
+>   GTESTER tests/test-bitcnt
+>   GTESTER tests/check-qom-interface
+>   GTESTER tests/check-qom-proplist
+>   GTESTER tests/test-qemu-opts
+>   GTESTER tests/test-keyval
+>   GTESTER tests/test-write-threshold
+>   GTESTER tests/test-crypto-hash
+>   GTESTER tests/test-crypto-hmac
+>   GTESTER tests/test-crypto-cipher
+>   GTESTER tests/test-crypto-secret
+>   GTESTER tests/test-qga
+>   GTESTER tests/test-timed-average
+>   GTESTER tests/test-io-task
+>   GTESTER tests/test-io-channel-socket
+>   GTESTER tests/test-io-channel-file
+>   GTESTER tests/test-io-channel-command
+>   GTESTER tests/test-io-channel-buffer
+>   GTESTER tests/test-base64
+>   GTESTER tests/test-crypto-ivgen
+>   GTESTER tests/test-crypto-afsplit
+>   GTESTER tests/test-crypto-xts
 
-The vhost-user part can be added later.  I think the first step is
-whether to add a QMP interface to qemu-nbd or use -machine none.
+Mhh, this looks somewhat strange - apparently the test-crypto-block has
+now been skipped - but then I wonder why this was working before here if
+the crypto libraries were not available? ... maybe there's still
+something wrong with my patch?
 
-Stefan
+>   GTESTER tests/test-logging
+>   GTESTER tests/test-replication
+>   GTESTER tests/test-bufferiszero
+>   GTESTER tests/test-uuid
+>   GTESTER tests/ptimer-test
+>   GTESTER tests/test-qapi-util
+>   GTESTER check-qtest-x86_64
+>   GTESTER check-qtest-aarch64
+>   GTESTER tests/test-qobject-output-visitor
+>   GTESTER tests/test-clone-visitor
+>   GTESTER tests/test-qobject-input-visitor
+>   GTESTER tests/test-qmp-commands
+>   GTESTER tests/test-string-input-visitor
+>   GTESTER tests/test-string-output-visitor
+>   GTESTER tests/test-qmp-event
+>   GTESTER tests/test-opts-visitor
+>   GTESTER tests/test-qht-par
+> make: *** [check-tests/test-aio-multithread] Error 1
+> make: *** Waiting for unfinished jobs....
+> Could not access KVM kernel module: No such file or directory
+> qemu-system-x86_64: failed to initialize KVM: No such file or directory
+> qemu-system-x86_64: Back to tcg accelerator
 
---tMbDGjvJuJijemkf
-Content-Type: application/pgp-signature; name="signature.asc"
+... but this test-aio-multithread error is certainly not related to my
+patch, I think. Is this already a known issue?
 
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZ/D5eAAoJEJykq7OBq3PIJAIIAKlLmp4giV506YgnqfcrbZxR
-tuDrlmQtQH4zGjiCWzhw2xRpiGTqqOrXA0+ZJLchXCeB6/RXW3iYopS9GhHIA/Py
-Zjtr+0vz8VqhomKvuAWcLBhvpAwh5cU2Ph7Be/aH6n/n9W4fg17ix9LocPEQCFzJ
-7ZPSt+rrLV0gM4rwyNHkfunLWIDrI08p8Na54xSSdEVpoQpzg8NujWGZ0EDtUZGp
-hJ43QmeXAu043iGCVU5RH9l6A6V4ETs/PdrCES2xt1+dHSoCDY4Mxi/ARP+Cj2z8
-/aq8x+O3i3SbvvHoPb2+D+/zqCWMuBC/6nV12pup+QVam0S15HUsxx38J0WZZ6c=
-=LbUP
------END PGP SIGNATURE-----
-
---tMbDGjvJuJijemkf--
+ Thomas
