@@ -1,32 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39874)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40269)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eAYue-0006Xx-RT
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 06:09:21 -0400
+	(envelope-from <berrange@redhat.com>) id 1eAYwO-0007hW-QX
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 06:11:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eAYuZ-0008Sh-Tj
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 06:09:20 -0400
-Received: from mail-wr0-x22f.google.com ([2a00:1450:400c:c0c::22f]:48169)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1eAYuZ-0008SB-Kd
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 06:09:15 -0400
-Received: by mail-wr0-x22f.google.com with SMTP id 15so2035699wrb.5
-	for <qemu-devel@nongnu.org>; Fri, 03 Nov 2017 03:09:15 -0700 (PDT)
-Date: Fri, 3 Nov 2017 10:09:12 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20171103100912.GG5078@stefanha-x1.localdomain>
-References: <CADak6y5eSo9=C2FJx+cTdqxArWeQqNDAvVgY+vS7H-9yGeuZvw@mail.gmail.com>
-	<20171101094537.GA2786@work-vm>
-	<CADak6y485_OSHrzji4Wq7_3vOrK+ch6Vm1FW1RMidSzoO3U-kQ@mail.gmail.com>
-	<CADak6y5mfPnDfQbQSBjY-iGXsFEAmRX6cd=Cv-z-kD5VArKA9Q@mail.gmail.com>
-	<CADak6y5zT2qxHe8-iCQhpgxdAyHcerMMbcDNvRig8i2PvopHBg@mail.gmail.com>
-	<20171103091045.GA2616@work-vm>
+	(envelope-from <berrange@redhat.com>) id 1eAYwK-00014G-Ql
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 06:11:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59358)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eAYwK-00013F-KV
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 06:11:04 -0400
+Date: Fri, 3 Nov 2017 10:10:55 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20171103101055.GD20155@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <1509638660.11873.13.camel@redhat.com>
+	<20171102161103.GU32533@redhat.com>
+	<1509691743.31823.1.camel@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="xs+9IvWevLaxKUtW"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20171103091045.GA2616@work-vm>
-Subject: Re: [Qemu-devel] qemu disk use writeback don't take effect in
- centos 7.2 1511
+In-Reply-To: <1509691743.31823.1.camel@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] seabios serial console vs. sgabios
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,59 +30,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paul Schlacter <wlfightup@gmail.com>
-Cc: stefanha@redhat.com, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: seabios <seabios@seabios.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-
---xs+9IvWevLaxKUtW
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Fri, Nov 03, 2017 at 09:10:45AM +0000, Dr. David Alan Gilbert wrote:
-> * Paul Schlacter (wlfightup@gmail.com) wrote:
-> > latest progress=EF=BC=9A
-> > use centos 7.2   https://cloud.centos.org/centos/7/images/
-> > test version: 1511  1601  1604 1606 1608
+On Fri, Nov 03, 2017 at 07:49:03AM +0100, Gerd Hoffmann wrote:
+> On Thu, 2017-11-02 at 16:11 +0000, Daniel P. Berrange wrote:
+> > On Thu, Nov 02, 2017 at 05:04:20PM +0100, Gerd Hoffmann wrote:
+> > > =C2=A0 Hi,
+> > >=20
+> > > One problem we have with the serial console support in seabios and
+> > > sgabios:=C2=A0=C2=A0It can happen that both are activated.=C2=A0=C2=
+=A0We'll go fix that
+> > > in
+> > > qemu, but that'll work for new qemu versions only, not for the old
+> > > already released ones.
+> > >=20
+> > > So I think it would be useful if seabios makes sure sgabios and
+> > > serial
+> > > console are not both active at the same time, i.e. in case we find
+> > > "vgaroms/sgabios.bin" being present either turn off builtin serial
+> > > console, or don't load sgabios (and possibly also enable builtin
+> > > serial
+> > > console).
 > >=20
-> > From the above version in turn test, found the previous version 1511 16=
-01
-> > 1603 have the problem,
-> > The latter two versions 1606 1608 are normal, dont't have the prblem,
-> > Normal is cache =3D writeback io significantly higher than none mode
-> >=20
-> > why?
+> > Historically libvirt will always use '-device sgabios' if the user
+> > has
+> > requested <bios useserial=3D'yes'/>.=C2=A0=C2=A0So if that -device ar=
+g is given,
+> > I
+> > think QEMU must honour it, which implies QEMU must disable Seabios'
+> > own built-in serial console impl in that scenario.
 >=20
-> It's a fun bug, but I don't know the cause - the fact it's dependent
-> on guest version but fixed, suggests something changed in the guest
-> kernel.  If you really wanted to figure out why I guess the only way
-> would be to walk through the CentOS guest kernel versions and find the
-> exact kernel that fixed it; then we could hunt down which change fixed
-> it.
->=20
-> (I've cc'd in Stefan for block stuff, but this is sounding more guest
-> than qemu)
+> Hmm, why?  The user asked for a serial console.  Whenever that is
+> provided by seabios builtin support or the sgabios rom doesn't really
+> matter, no?
 
-Please provide full details of the problem you are observing:
+Surely it has ABI implications for the guest if we stop putting the
+sgabios option ROM into memory - changing layout of ROMS
 
-1. qemu command-line on the host (ps aux | grep qemu)
-2. dd command-line inside the guest
-3. "Good" output and "bad" output
+> Also, the question is what seabios should do in case both are active.=20
+> Which I think can happen today with libvirt if you configure a virtual
+> machine without vga (libvirt passes -machine graphics=3Doff which
+> activates builtin serial console) and with "<bios useserial=3D'yes'/>"
+> (enables sgabios rom).
 
-Stefan
+Libvirt doesn't use  '-machine graphics=3Doff' AFAIK, only '-nographic'.=20
 
---xs+9IvWevLaxKUtW
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZ/EBIAAoJEJykq7OBq3PI/cAH/RMzhO2Qc+BkijiC8SYIsLZh
-2hZlSAB5Vnt1g0b1jRhRnUwgVyuJZQ29J06dKV5wQBz4EO6M9C29gL51IbVKM9wI
-EIMpaXk5FPtfS+6lk05p3rJdnszbfMD2FL+l3T8ZcBa5Ijadu6k2S/2BFcc4iEbS
-7azGbGIDsG5z9hOyslyiTn4/ixxD4rAye0RIVOyBW2Af5AI9ETU9+mdD0cfEQDaQ
-Wqd14y+6trQZP9TdZNQFbysxB8vx7Twvv//Zo6X+hKLreuwknuA+NO6t8oHihOcU
-Lb3112BHy3ezKBYxgcA1tnc/EsBPmKQfzzU/TcJb/JGNGLNa8ESAfwezNhpei2w=
-=8ot9
------END PGP SIGNATURE-----
-
---xs+9IvWevLaxKUtW--
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
