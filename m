@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48413)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48432)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <frasse.iglesias@gmail.com>) id 1eAPQI-0008Iy-DD
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 20:01:23 -0400
+	(envelope-from <frasse.iglesias@gmail.com>) id 1eAPQJ-0008K5-FI
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 20:01:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <frasse.iglesias@gmail.com>) id 1eAPQH-0000qW-FC
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 20:01:22 -0400
-Received: from mail-lf0-x242.google.com ([2a00:1450:4010:c07::242]:44553)
+	(envelope-from <frasse.iglesias@gmail.com>) id 1eAPQI-0000r7-KY
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 20:01:23 -0400
+Received: from mail-lf0-x242.google.com ([2a00:1450:4010:c07::242]:47373)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <frasse.iglesias@gmail.com>)
-	id 1eAPQH-0000q5-72
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 20:01:21 -0400
-Received: by mail-lf0-x242.google.com with SMTP id 75so1316143lfx.1
-	for <qemu-devel@nongnu.org>; Thu, 02 Nov 2017 17:01:20 -0700 (PDT)
+	id 1eAPQI-0000qa-D9
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 20:01:22 -0400
+Received: by mail-lf0-x242.google.com with SMTP id k40so1308880lfi.4
+	for <qemu-devel@nongnu.org>; Thu, 02 Nov 2017 17:01:22 -0700 (PDT)
 From: Francisco Iglesias <frasse.iglesias@gmail.com>
-Date: Fri,  3 Nov 2017 01:01:01 +0100
-Message-Id: <20171103000109.28244-6-frasse.iglesias@gmail.com>
+Date: Fri,  3 Nov 2017 01:01:02 +0100
+Message-Id: <20171103000109.28244-7-frasse.iglesias@gmail.com>
 In-Reply-To: <20171103000109.28244-1-frasse.iglesias@gmail.com>
 References: <20171103000109.28244-1-frasse.iglesias@gmail.com>
-Subject: [Qemu-devel] [PATCH v7 05/13] xilinx_spips: Move FlashCMD,
- XilinxQSPIPS and XilinxSPIPSClass
+Subject: [Qemu-devel] [PATCH v7 06/13] xilinx_spips: Update striping to be
+ big-endian bit order
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,126 +30,69 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: edgari@xilinx.com, alistai@xilinx.com, francisco.iglesias@feimtech.se, mar.krzeminski@gmail.com, peter.maydell@linaro.org
 
-Move the FlashCMD enum, XilinxQSPIPS and XilinxSPIPSClass structures to the
-header for consistency (struct XilinxSPIPS is found there). Also move out
-a define and remove two dubbel included headers (while touching the code).
-Finally, add 4 byte address commands to the FlashCMD enum.
+Update striping functionality to be big-endian bit order (as according to
+the Zynq-7000 Technical Reference Manual). Output thereafter the even bits
+into the flash memory connected to the lower QSPI bus and the odd bits into
+the flash memory connected to the upper QSPI bus.
 
 Signed-off-by: Francisco Iglesias <frasse.iglesias@gmail.com>
 ---
- hw/ssi/xilinx_spips.c         | 35 -----------------------------------
- include/hw/ssi/xilinx_spips.h | 34 ++++++++++++++++++++++++++++++++++
- 2 files changed, 34 insertions(+), 35 deletions(-)
+ hw/ssi/xilinx_spips.c | 19 ++++++++++---------
+ 1 file changed, 10 insertions(+), 9 deletions(-)
 
 diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
-index ef56d35..559fa79 100644
+index 559fa79..7accf5d 100644
 --- a/hw/ssi/xilinx_spips.c
 +++ b/hw/ssi/xilinx_spips.c
-@@ -27,8 +27,6 @@
- #include "sysemu/sysemu.h"
- #include "hw/ptimer.h"
- #include "qemu/log.h"
--#include "qemu/fifo8.h"
--#include "hw/ssi/ssi.h"
- #include "qemu/bitops.h"
- #include "hw/ssi/xilinx_spips.h"
- #include "qapi/error.h"
-@@ -116,44 +114,11 @@
+@@ -208,14 +208,14 @@ static void xilinx_spips_reset(DeviceState *d)
+     xilinx_spips_update_cs_lines(s);
+ }
  
- /* 16MB per linear region */
- #define LQSPI_ADDRESS_BITS 24
--/* Bite off 4k chunks at a time */
--#define LQSPI_CACHE_SIZE 1024
+-/* N way (num) in place bit striper. Lay out row wise bits (LSB to MSB)
++/* N way (num) in place bit striper. Lay out row wise bits (MSB to LSB)
+  * column wise (from element 0 to N-1). num is the length of x, and dir
+  * reverses the direction of the transform. Best illustrated by example:
+  * Each digit in the below array is a single bit (num == 3):
+  *
+- * {{ 76543210, }  ----- stripe (dir == false) -----> {{ FCheb630, }
+- *  { hgfedcba, }                                      { GDAfc741, }
+- *  { HGFEDCBA, }} <---- upstripe (dir == true) -----  { HEBgda52, }}
++ * {{ 76543210, }  ----- stripe (dir == false) -----> {{ 741gdaFC, }
++ *  { hgfedcba, }                                      { 630fcHEB, }
++ *  { HGFEDCBA, }} <---- upstripe (dir == true) -----  { 52hebGDA, }}
+  */
  
- #define SNOOP_CHECKING 0xFF
- #define SNOOP_NONE 0xFE
- #define SNOOP_STRIPING 0
+ static inline void stripe8(uint8_t *x, int num, bool dir)
+@@ -223,15 +223,15 @@ static inline void stripe8(uint8_t *x, int num, bool dir)
+     uint8_t r[num];
+     memset(r, 0, sizeof(uint8_t) * num);
+     int idx[2] = {0, 0};
+-    int bit[2] = {0, 0};
++    int bit[2] = {0, 7};
+     int d = dir;
  
--typedef enum {
--    READ = 0x3,
--    FAST_READ = 0xb,
--    DOR = 0x3b,
--    QOR = 0x6b,
--    DIOR = 0xbb,
--    QIOR = 0xeb,
--
--    PP = 0x2,
--    DPP = 0xa2,
--    QPP = 0x32,
--} FlashCMD;
--
--typedef struct {
--    XilinxSPIPS parent_obj;
--
--    uint8_t lqspi_buf[LQSPI_CACHE_SIZE];
--    hwaddr lqspi_cached_addr;
--    Error *migration_blocker;
--    bool mmio_execution_enabled;
--} XilinxQSPIPS;
--
--typedef struct XilinxSPIPSClass {
--    SysBusDeviceClass parent_class;
--
--    const MemoryRegionOps *reg_ops;
--
--    uint32_t rx_fifo_size;
--    uint32_t tx_fifo_size;
--} XilinxSPIPSClass;
--
- static inline int num_effective_busses(XilinxSPIPS *s)
- {
-     return (s->regs[R_LQSPI_CFG] & LQSPI_CFG_SEP_BUS &&
-diff --git a/include/hw/ssi/xilinx_spips.h b/include/hw/ssi/xilinx_spips.h
-index 06aa096..7f9e2fc 100644
---- a/include/hw/ssi/xilinx_spips.h
-+++ b/include/hw/ssi/xilinx_spips.h
-@@ -32,6 +32,22 @@ typedef struct XilinxSPIPS XilinxSPIPS;
+     for (idx[0] = 0; idx[0] < num; ++idx[0]) {
+-        for (bit[0] = 0; bit[0] < 8; ++bit[0]) {
+-            r[idx[d]] |= x[idx[!d]] & 1 << bit[!d] ? 1 << bit[d] : 0;
++        for (bit[0] = 7; bit[0] != -1; bit[0] += -1) {
++            r[idx[!d]] |= x[idx[d]] & 1 << bit[d] ? 1 << bit[!d] : 0;
+             idx[1] = (idx[1] + 1) % num;
+             if (!idx[1]) {
+-                bit[1]++;
++                bit[1] += -1;
+             }
+         }
+     }
+@@ -266,8 +266,9 @@ static void xilinx_spips_flush_txfifo(XilinxSPIPS *s)
+         }
  
- #define XLNX_SPIPS_R_MAX        (0x100 / 4)
- 
-+/* Bite off 4k chunks at a time */
-+#define LQSPI_CACHE_SIZE 1024
-+
-+typedef enum {
-+    READ = 0x3,         READ_4 = 0x13,
-+    FAST_READ = 0xb,    FAST_READ_4 = 0x0c,
-+    DOR = 0x3b,         DOR_4 = 0x3c,
-+    QOR = 0x6b,         QOR_4 = 0x6c,
-+    DIOR = 0xbb,        DIOR_4 = 0xbc,
-+    QIOR = 0xeb,        QIOR_4 = 0xec,
-+
-+    PP = 0x2,           PP_4 = 0x12,
-+    DPP = 0xa2,
-+    QPP = 0x32,         QPP_4 = 0x34,
-+} FlashCMD;
-+
- struct XilinxSPIPS {
-     SysBusDevice parent_obj;
- 
-@@ -56,6 +72,24 @@ struct XilinxSPIPS {
-     uint32_t regs[XLNX_SPIPS_R_MAX];
- };
- 
-+typedef struct {
-+    XilinxSPIPS parent_obj;
-+
-+    uint8_t lqspi_buf[LQSPI_CACHE_SIZE];
-+    hwaddr lqspi_cached_addr;
-+    Error *migration_blocker;
-+    bool mmio_execution_enabled;
-+} XilinxQSPIPS;
-+
-+typedef struct XilinxSPIPSClass {
-+    SysBusDeviceClass parent_class;
-+
-+    const MemoryRegionOps *reg_ops;
-+
-+    uint32_t rx_fifo_size;
-+    uint32_t tx_fifo_size;
-+} XilinxSPIPSClass;
-+
- #define TYPE_XILINX_SPIPS "xlnx.ps7-spi"
- #define TYPE_XILINX_QSPIPS "xlnx.ps7-qspi"
+         for (i = 0; i < num_effective_busses(s); ++i) {
++            int bus = num_effective_busses(s) - 1 - i;
+             DB_PRINT_L(debug_level, "tx = %02x\n", tx_rx[i]);
+-            tx_rx[i] = ssi_transfer(s->spi[i], (uint32_t)tx_rx[i]);
++            tx_rx[i] = ssi_transfer(s->spi[bus], (uint32_t)tx_rx[i]);
+             DB_PRINT_L(debug_level, "rx = %02x\n", tx_rx[i]);
+         }
  
 -- 
 2.9.3
