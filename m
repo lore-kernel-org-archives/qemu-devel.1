@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59348)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60619)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eAf7L-0002s3-L8
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 12:46:52 -0400
+	(envelope-from <bounces@canonical.com>) id 1eAfBf-0004jE-TF
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 12:51:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eAf7G-0000pn-OK
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 12:46:51 -0400
-Received: from indium.canonical.com ([91.189.90.7]:59568)
+	(envelope-from <bounces@canonical.com>) id 1eAfBb-0003hg-4u
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 12:51:19 -0400
+Received: from indium.canonical.com ([91.189.90.7]:34382)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eAf7G-0000p6-IT
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 12:46:46 -0400
+	id 1eAfBa-0003hK-UB
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 12:51:15 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eAf7D-0004tr-Il
-	for <qemu-devel@nongnu.org>; Fri, 03 Nov 2017 16:46:43 +0000
+	id 1eAfBZ-0008HK-Jf
+	for <qemu-devel@nongnu.org>; Fri, 03 Nov 2017 16:51:13 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 782592E8241
-	for <qemu-devel@nongnu.org>; Fri,  3 Nov 2017 16:46:28 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 562AA2E80D5
+	for <qemu-devel@nongnu.org>; Fri,  3 Nov 2017 16:51:13 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 03 Nov 2017 16:34:14 -0000
+Date: Fri, 03 Nov 2017 16:32:51 -0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1673976 <1673976@bugs.launchpad.net>
+Reply-To: Bug 1594069 <1594069@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20170318142657.21676.52259.malonedeb@chaenomeles.canonical.com>
-Message-Id: <150972685457.9364.12622324922354786252.launchpad@wampee.canonical.com>
+References: <20160619053325.24903.2985.malonedeb@gac.canonical.com>
+Message-Id: <150972677166.9241.10734596886329541281.malone@wampee.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1673976] Re: locale-gen dumps core run under
- arm-linux-user on x86-64 host
+Subject: [Qemu-devel] [Bug 1594069] Re: SIMD instructions translated to
+ scalar host instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,40 +39,40 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-** Summary changed:
+Closing this because it isn't a bug. (It looks like some of the vector
+TCG improvements are now in progress and might hit master for 2.12; but
+in any case having an open bug in the system about this serves no useful
+purpose.)
 
-- core dump
-+ locale-gen dumps core run under arm-linux-user on x86-64 host
+
+** Changed in: qemu
+       Status: Confirmed =3D> Invalid
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1673976
+https://bugs.launchpad.net/bugs/1594069
 
 Title:
-  locale-gen dumps core run under arm-linux-user on x86-64 host
+  SIMD instructions translated to scalar host instructions
 
 Status in QEMU:
-  New
+  Invalid
 
 Bug description:
-  I'm running a command (locale-gen) inside of an armv7h chroot mounted
-  on my x86_64 desktop by putting qemu-arm-static into /usr/bin/ of the
-  chroot file system and I get a core dump.
+  SIMD instructions inside the guest (NEON, MMX, SSE, SSE2, AVX) are
+  translated to scalar instructions on the host instead of SIMD
+  instructions.  It appears that there have been a few efforts to
+  rectify this [1], and even a submitted patch series, but all
+  discussion has effectively died out [2].
 
-  locale-gen
-  Generating locales...
-  =C2=A0=C2=A0en_US.UTF-8...localedef: ../sysdeps/unix/sysv/linux/spawni.c:=
-360: __spawnix: Assertion `ec >=3D 0' failed.
-  qemu: uncaught target signal 6 (Aborted) - core dumped
-  /usr/bin/locale-gen: line 41:    34 Aborted                 (core dumped)=
- localedef -i $input -c -f $charset -A /usr/share/locale/locale.alias $loca=
-le
+  I would like to see better SIMD performance on qemu, especially as
+  non-x86 architectures are becoming widely used (e.g. ARM).
 
-  I've done this same thing successfully for years, but this breakage
-  has appeared some time in the last 3 or so months. Possibly with the
-  update to qemu version 2.8.
+  [1] http://dl.acm.org/citation.cfm?id=3D2757098&dl=3DACM&coll=3DDL&CFID=
+=3D633095244&CFTOKEN=3D12352103
+  [2] https://lists.nongnu.org/archive/html/qemu-devel/2014-10/msg01720.html
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1673976/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1594069/+subscriptions
