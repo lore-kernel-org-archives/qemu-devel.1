@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42955)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39552)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1eAcbg-0005yg-Iw
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 10:06:01 -0400
+	(envelope-from <James.Cowgill@mips.com>) id 1eAapH-0006gR-MV
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 08:11:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1eAcba-0006JC-Kd
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 10:06:00 -0400
-Received: from mail-ua0-x242.google.com ([2607:f8b0:400c:c08::242]:46722)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1eAcba-0006J0-Fx
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 10:05:54 -0400
-Received: by mail-ua0-x242.google.com with SMTP id w45so1999619uac.3
-	for <qemu-devel@nongnu.org>; Fri, 03 Nov 2017 07:05:54 -0700 (PDT)
+	(envelope-from <James.Cowgill@mips.com>) id 1eAapD-0007bE-Ma
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 08:11:55 -0400
+Received: from 19pmail.ess.barracuda.com ([64.235.154.231]:40400)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <James.Cowgill@mips.com>)
+	id 1eAapD-0007Vd-E9
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 08:11:51 -0400
+From: James Cowgill <james.cowgill@mips.com>
+Date: Fri, 3 Nov 2017 12:07:03 +0000
+Message-ID: <20171103120703.15749-1-james.cowgill@mips.com>
 MIME-Version: 1.0
-In-Reply-To: <20171103131959.73560-1-kirill.shutemov@linux.intel.com>
-References: <20171103131959.73560-1-kirill.shutemov@linux.intel.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Fri, 3 Nov 2017 15:05:53 +0100
-Message-ID: <CAJ+F1CKEVXzR6nA3V1RUx+BhE-UU7Du9dGmR0mN9KpsAQKOrSA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] chardev: don't forget to set backend for
- mux
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH] linux-user: return EINVAL from
+ prctl(PR_*_SECCOMP)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,61 +25,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kirill@shutemov.name, QEMU <qemu-devel@nongnu.org>
+To: Riku Voipio <riku.voipio@iki.fi>
+Cc: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org, James Cowgill <james.cowgill@mips.com>
 
-Hi
+If an application tries to install a seccomp filter using
+prctl(PR_SET_SECCOMP), the filter is likely for the target instead of the host
+architecture. This will probably cause qemu to be immediately killed when it
+executes another syscall.
 
-On Fri, Nov 3, 2017 at 2:19 PM, Kirill A. Shutemov
-<kirill.shutemov@linux.intel.com> wrote:
-> I noticied that on recent versions on QEMU I was not able to trigger
-> SysRq to invoke debug capabilites of Linux Kernel.
->
-> I've tracked it down to qemu_chr_be_event() ignoring CHR_EVENT_BREAK due
-> s->be being NULL.
->
-> Looks like the bug was introduced in a4afa548fc6d ("char: move front end
-> handlers in CharBackend"). Since the commit the qemu_chr_be_event()
-> failed to deliver CHR_EVENT_BREAK due to qemu_chr_fe_init() forgot to
-> get s->be initialized in case of mux.
->
-> Let's fix this.
->
-> Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
-> Fixes: a4afa548fc6d ("char: move front end handlers in CharBackend")
-> ---
->  chardev/char-fe.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
->
-> diff --git a/chardev/char-fe.c b/chardev/char-fe.c
-> index ee6d59610031..d4a54947a567 100644
-> --- a/chardev/char-fe.c
-> +++ b/chardev/char-fe.c
-> @@ -209,9 +209,8 @@ bool qemu_chr_fe_init(CharBackend *b, Chardev *s, Err=
-or **errp)
->          tag =3D d->mux_cnt++;
->      } else if (s->be) {
->          goto unavailable;
-> -    } else {
-> -        s->be =3D b;
->      }
-> +    s->be =3D b;
+Prevent this from happening by returning EINVAL from both seccomp prctl
+calls. This is the error returned by the kernel when seccomp support is
+disabled.
 
-This will send the event to the last frontend that called
-chr_fe_init(). Instead, it should probably send it to the one with
-focus. I am sending an alternative patch.
+Fixes: https://bugs.launchpad.net/qemu/+bug/1726394
+Signed-off-by: James Cowgill <james.cowgill@mips.com>
+---
+ linux-user/syscall.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-thanks
-
->
->      b->fe_open =3D false;
->      b->tag =3D tag;
-> --
-> 2.14.2
->
->
-
-
-
---=20
-Marc-Andr=C3=A9 Lureau
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index d4497dec5d..43cd5fb2bb 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -10482,6 +10482,10 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+             break;
+         }
+ #endif
++        case PR_GET_SECCOMP:
++        case PR_SET_SECCOMP:
++            ret = -TARGET_EINVAL;
++            break;
+         default:
+             /* Most prctl options have no pointer arguments */
+             ret = get_errno(prctl(arg1, arg2, arg3, arg4, arg5));
+-- 
+2.15.0
