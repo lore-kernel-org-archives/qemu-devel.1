@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48480)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48514)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <frasse.iglesias@gmail.com>) id 1eAPQQ-0008Qm-GO
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 20:01:31 -0400
+	(envelope-from <frasse.iglesias@gmail.com>) id 1eAPQT-0008TQ-E3
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 20:01:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <frasse.iglesias@gmail.com>) id 1eAPQM-0000sx-QW
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 20:01:30 -0400
-Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:52215)
+	(envelope-from <frasse.iglesias@gmail.com>) id 1eAPQS-0000wc-FP
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 20:01:33 -0400
+Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:44554)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <frasse.iglesias@gmail.com>)
-	id 1eAPQM-0000sT-Jb
-	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 20:01:26 -0400
-Received: by mail-lf0-x244.google.com with SMTP id r129so1292118lff.8
-	for <qemu-devel@nongnu.org>; Thu, 02 Nov 2017 17:01:26 -0700 (PDT)
+	id 1eAPQS-0000v7-3k
+	for qemu-devel@nongnu.org; Thu, 02 Nov 2017 20:01:32 -0400
+Received: by mail-lf0-x243.google.com with SMTP id 75so1316528lfx.1
+	for <qemu-devel@nongnu.org>; Thu, 02 Nov 2017 17:01:31 -0700 (PDT)
 From: Francisco Iglesias <frasse.iglesias@gmail.com>
-Date: Fri,  3 Nov 2017 01:01:05 +0100
-Message-Id: <20171103000109.28244-10-frasse.iglesias@gmail.com>
+Date: Fri,  3 Nov 2017 01:01:09 +0100
+Message-Id: <20171103000109.28244-14-frasse.iglesias@gmail.com>
 In-Reply-To: <20171103000109.28244-1-frasse.iglesias@gmail.com>
 References: <20171103000109.28244-1-frasse.iglesias@gmail.com>
-Subject: [Qemu-devel] [PATCH v7 09/13] xilinx_spips: Add support for zero
- pumping
+Subject: [Qemu-devel] [PATCH v7 13/13] xlnx-zcu102: Add support for the
+ ZynqMP QSPI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,119 +30,124 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: edgari@xilinx.com, alistai@xilinx.com, francisco.iglesias@feimtech.se, mar.krzeminski@gmail.com, peter.maydell@linaro.org
 
-Add support for zero pumping according to the transfer size register.
+Add support for the ZynqMP QSPI (consisting of the Generic QSPI and Legacy
+QSPI) and connect Numonyx n25q512a11 flashes to it.
 
 Signed-off-by: Francisco Iglesias <frasse.iglesias@gmail.com>
+Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
 ---
- hw/ssi/xilinx_spips.c         | 47 ++++++++++++++++++++++++++++++++++++-------
- include/hw/ssi/xilinx_spips.h |  2 ++
- 2 files changed, 42 insertions(+), 7 deletions(-)
+ hw/arm/xlnx-zcu102.c         | 23 +++++++++++++++++++++++
+ hw/arm/xlnx-zynqmp.c         | 26 ++++++++++++++++++++++++++
+ include/hw/arm/xlnx-zynqmp.h |  5 +++++
+ 3 files changed, 54 insertions(+)
 
-diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
-index e37d005..3a98799 100644
---- a/hw/ssi/xilinx_spips.c
-+++ b/hw/ssi/xilinx_spips.c
-@@ -109,6 +109,7 @@
-     FIELD(CMND, DUMMY_CYCLES, 2, 6)
- #define R_CMND_DMA_EN         (1 << 1)
- #define R_CMND_PUSH_WAIT      (1 << 0)
-+#define R_TRANSFER_SIZE     (0xc4 / 4)
- #define R_LQSPI_STS         (0xA4 / 4)
- #define LQSPI_STS_WR_RECVD      (1 << 1)
- 
-@@ -227,6 +228,7 @@ static void xilinx_spips_reset(DeviceState *d)
-     s->link_state_next_when = 0;
-     s->snoop_state = SNOOP_CHECKING;
-     s->cmd_dummies = 0;
-+    s->man_start_com = false;
-     xilinx_spips_update_ixr(s);
-     xilinx_spips_update_cs_lines(s);
- }
-@@ -464,6 +466,41 @@ static inline void tx_data_bytes(Fifo8 *fifo, uint32_t value, int num, bool be)
+diff --git a/hw/arm/xlnx-zcu102.c b/hw/arm/xlnx-zcu102.c
+index 519a16e..7d61972 100644
+--- a/hw/arm/xlnx-zcu102.c
++++ b/hw/arm/xlnx-zcu102.c
+@@ -150,6 +150,29 @@ static void xlnx_zynqmp_init(XlnxZCU102 *s, MachineState *machine)
+         sysbus_connect_irq(SYS_BUS_DEVICE(&s->soc.spi[i]), 1, cs_line);
      }
- }
  
-+static void xilinx_spips_check_zero_pump(XilinxSPIPS *s)
-+{
-+    if (!s->regs[R_TRANSFER_SIZE]) {
-+        return;
-+    }
-+    if (!fifo8_is_empty(&s->tx_fifo) && s->regs[R_CMND] & R_CMND_PUSH_WAIT) {
-+        return;
-+    }
-+    /*
-+     * The zero pump must never fill tx fifo such that rx overflow is
-+     * possible
-+     */
-+    while (s->regs[R_TRANSFER_SIZE] &&
-+           s->rx_fifo.num + s->tx_fifo.num < RXFF_A_Q - 3) {
-+        /* endianess just doesn't matter when zero pumping */
-+        tx_data_bytes(&s->tx_fifo, 0, 4, false);
-+        s->regs[R_TRANSFER_SIZE] &= ~0x03ull;
-+        s->regs[R_TRANSFER_SIZE] -= 4;
-+    }
-+}
++    for (i = 0; i < XLNX_ZYNQMP_NUM_QSPI_FLASH; i++) {
++        SSIBus *spi_bus;
++        DeviceState *flash_dev;
++        qemu_irq cs_line;
++        DriveInfo *dinfo = drive_get_next(IF_MTD);
++        int bus = i / XLNX_ZYNQMP_NUM_QSPI_BUS_CS;
++        gchar *bus_name = g_strdup_printf("qspi%d", bus);
 +
-+static void xilinx_spips_check_flush(XilinxSPIPS *s)
-+{
-+    if (s->man_start_com ||
-+        (!fifo8_is_empty(&s->tx_fifo) &&
-+         !(s->regs[R_CONFIG] & MAN_START_EN))) {
-+        xilinx_spips_check_zero_pump(s);
-+        xilinx_spips_flush_txfifo(s);
-+    }
-+    if (fifo8_is_empty(&s->tx_fifo) && !s->regs[R_TRANSFER_SIZE]) {
-+        s->man_start_com = false;
-+    }
-+    xilinx_spips_update_ixr(s);
-+}
++        spi_bus = (SSIBus *)qdev_get_child_bus(DEVICE(&s->soc), bus_name);
++        g_free(bus_name);
 +
- static inline int rx_data_bytes(Fifo8 *fifo, uint8_t *value, int max)
- {
-     int i;
-@@ -533,7 +570,6 @@ static void xilinx_spips_write(void *opaque, hwaddr addr,
-                                         uint64_t value, unsigned size)
- {
-     int mask = ~0;
--    int man_start_com = 0;
-     XilinxSPIPS *s = opaque;
- 
-     DB_PRINT_L(0, "addr=" TARGET_FMT_plx " = %x\n", addr, (unsigned)value);
-@@ -541,8 +577,8 @@ static void xilinx_spips_write(void *opaque, hwaddr addr,
-     switch (addr) {
-     case R_CONFIG:
-         mask = ~(R_CONFIG_RSVD | MAN_START_COM);
--        if (value & MAN_START_COM) {
--            man_start_com = 1;
-+        if ((value & MAN_START_COM) && (s->regs[R_CONFIG] & MAN_START_EN)) {
-+            s->man_start_com = true;
-         }
-         break;
-     case R_INTR_STATUS:
-@@ -588,10 +624,7 @@ static void xilinx_spips_write(void *opaque, hwaddr addr,
-     s->regs[addr] = (s->regs[addr] & ~mask) | (value & mask);
- no_reg_update:
-     xilinx_spips_update_cs_lines(s);
--    if ((man_start_com && s->regs[R_CONFIG] & MAN_START_EN) ||
--            (fifo8_is_empty(&s->tx_fifo) && s->regs[R_CONFIG] & MAN_START_EN)) {
--        xilinx_spips_flush_txfifo(s);
--    }
-+    xilinx_spips_check_flush(s);
-     xilinx_spips_update_cs_lines(s);
-     xilinx_spips_update_ixr(s);
- }
-diff --git a/include/hw/ssi/xilinx_spips.h b/include/hw/ssi/xilinx_spips.h
-index bac90a5..ad2175a 100644
---- a/include/hw/ssi/xilinx_spips.h
-+++ b/include/hw/ssi/xilinx_spips.h
-@@ -76,6 +76,8 @@ struct XilinxSPIPS {
-     uint32_t rx_discard;
- 
-     uint32_t regs[XLNX_SPIPS_R_MAX];
++        flash_dev = ssi_create_slave_no_init(spi_bus, "n25q512a11");
++        if (dinfo) {
++            qdev_prop_set_drive(flash_dev, "drive", blk_by_legacy_dinfo(dinfo),
++                                &error_fatal);
++        }
++        qdev_init_nofail(flash_dev);
 +
-+    bool man_start_com;
- };
++        cs_line = qdev_get_gpio_in_named(flash_dev, SSI_GPIO_CS, 0);
++
++        sysbus_connect_irq(SYS_BUS_DEVICE(&s->soc.qspi), i + 1, cs_line);
++    }
++
+     /* TODO create and connect IDE devices for ide_drive_get() */
  
- typedef struct {
+     xlnx_zcu102_binfo.ram_size = ram_size;
+diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
+index d4b6560..46ac45d 100644
+--- a/hw/arm/xlnx-zynqmp.c
++++ b/hw/arm/xlnx-zynqmp.c
+@@ -40,6 +40,10 @@
+ #define SATA_ADDR           0xFD0C0000
+ #define SATA_NUM_PORTS      2
+ 
++#define QSPI_ADDR           0xff0f0000
++#define LQSPI_ADDR          0xc0000000
++#define QSPI_IRQ            15
++
+ #define DP_ADDR             0xfd4a0000
+ #define DP_IRQ              113
+ 
+@@ -169,6 +173,9 @@ static void xlnx_zynqmp_init(Object *obj)
+         qdev_set_parent_bus(DEVICE(&s->spi[i]), sysbus_get_default());
+     }
+ 
++    object_initialize(&s->qspi, sizeof(s->qspi), TYPE_XLNX_ZYNQMP_QSPIPS);
++    qdev_set_parent_bus(DEVICE(&s->qspi), sysbus_get_default());
++
+     object_initialize(&s->dp, sizeof(s->dp), TYPE_XLNX_DP);
+     qdev_set_parent_bus(DEVICE(&s->dp), sysbus_get_default());
+ 
+@@ -405,6 +412,25 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
+         g_free(bus_name);
+     }
+ 
++    object_property_set_bool(OBJECT(&s->qspi), true, "realized", &err);
++    sysbus_mmio_map(SYS_BUS_DEVICE(&s->qspi), 0, QSPI_ADDR);
++    sysbus_mmio_map(SYS_BUS_DEVICE(&s->qspi), 1, LQSPI_ADDR);
++    sysbus_connect_irq(SYS_BUS_DEVICE(&s->qspi), 0, gic_spi[QSPI_IRQ]);
++
++    for (i = 0; i < XLNX_ZYNQMP_NUM_QSPI_BUS; i++) {
++        gchar *bus_name;
++        gchar *target_bus;
++
++        /* Alias controller SPI bus to the SoC itself */
++        bus_name = g_strdup_printf("qspi%d", i);
++        target_bus = g_strdup_printf("spi%d", i);
++        object_property_add_alias(OBJECT(s), bus_name,
++                                  OBJECT(&s->qspi), target_bus,
++                                  &error_abort);
++        g_free(bus_name);
++        g_free(target_bus);
++    }
++
+     object_property_set_bool(OBJECT(&s->dp), true, "realized", &err);
+     if (err) {
+         error_propagate(errp, err);
+diff --git a/include/hw/arm/xlnx-zynqmp.h b/include/hw/arm/xlnx-zynqmp.h
+index 6eff81a..3e6fb9b 100644
+--- a/include/hw/arm/xlnx-zynqmp.h
++++ b/include/hw/arm/xlnx-zynqmp.h
+@@ -40,6 +40,10 @@
+ #define XLNX_ZYNQMP_NUM_SDHCI 2
+ #define XLNX_ZYNQMP_NUM_SPIS 2
+ 
++#define XLNX_ZYNQMP_NUM_QSPI_BUS 2
++#define XLNX_ZYNQMP_NUM_QSPI_BUS_CS 2
++#define XLNX_ZYNQMP_NUM_QSPI_FLASH 4
++
+ #define XLNX_ZYNQMP_NUM_OCM_BANKS 4
+ #define XLNX_ZYNQMP_OCM_RAM_0_ADDRESS 0xFFFC0000
+ #define XLNX_ZYNQMP_OCM_RAM_SIZE 0x10000
+@@ -83,6 +87,7 @@ typedef struct XlnxZynqMPState {
+     SysbusAHCIState sata;
+     SDHCIState sdhci[XLNX_ZYNQMP_NUM_SDHCI];
+     XilinxSPIPS spi[XLNX_ZYNQMP_NUM_SPIS];
++    XlnxZynqMPQSPIPS qspi;
+     XlnxDPState dp;
+     XlnxDPDMAState dpdma;
+ 
 -- 
 2.9.3
