@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52431)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52560)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <penguin-kernel@I-love.SAKURA.ne.jp>)
-	id 1eAZiL-0007iy-7g
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 07:00:42 -0400
+	(envelope-from <kraxel@redhat.com>) id 1eAZj0-00085P-OH
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 07:01:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <penguin-kernel@I-love.SAKURA.ne.jp>)
-	id 1eAZiF-0005I9-Pr
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 07:00:41 -0400
-Received: from www262.sakura.ne.jp ([2001:e42:101:1:202:181:97:72]:11385)
+	(envelope-from <kraxel@redhat.com>) id 1eAZiv-00063O-76
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 07:01:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45374)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <penguin-kernel@I-love.SAKURA.ne.jp>)
-	id 1eAZiF-0005Hk-BZ
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 07:00:35 -0400
-From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-References: <1509696786-1597-1-git-send-email-wei.w.wang@intel.com>
-	<1509696786-1597-4-git-send-email-wei.w.wang@intel.com>
-In-Reply-To: <1509696786-1597-4-git-send-email-wei.w.wang@intel.com>
-Message-Id: <201711031959.CCC21876.tQFLHOOFVMJSFO@I-love.SAKURA.ne.jp>
-Date: Fri, 3 Nov 2017 19:59:38 +0900
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1eAZiv-00062c-0t
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 07:01:17 -0400
+Message-ID: <1509706872.31823.20.camel@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Fri, 03 Nov 2017 12:01:12 +0100
+In-Reply-To: <CAFEAcA_DbZ_1WxjtN5NiY3drFgqmJpZwxcrKSeYtqqkjkq0hUA@mail.gmail.com>
+References: <20171023210803.20998-1-makovick@gmail.com>
+	<20171023210803.20998-5-makovick@gmail.com>
+	<1509532830.3856.7.camel@redhat.com>
+	<CAHmvugcYmaujAYGwpb+ObistFr522W1XsuV-6jUgi543VgfvTA@mail.gmail.com>
+	<1509701213.31823.11.camel@redhat.com>
+	<CAFEAcA8RbiuAwwW4oqD_i2NGMeAao8KU=pWP7faM0QbajHgMYw@mail.gmail.com>
+	<1509705342.31823.16.camel@redhat.com>
+	<CAFEAcA_DbZ_1WxjtN5NiY3drFgqmJpZwxcrKSeYtqqkjkq0hUA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: Re: [Qemu-devel] [PATCH v17 3/6] mm/balloon_compaction.c: split
- balloon page allocation and enqueue
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 4/7] sdl2: Only accept the hotkeys on the
+ main window
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,41 +34,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: wei.w.wang@intel.com, virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mst@redhat.com, mhocko@kernel.org, akpm@linux-foundation.org, mawilcox@microsoft.com
-Cc: david@redhat.com, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, willy@infradead.org, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu@aliyun.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: =?UTF-8?Q?Jind=C5=99ich_Makovi=C4=8Dka?= <makovick@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-Wei Wang wrote:
-> Here's a detailed analysis of the deadlock by Tetsuo Handa:
-> 
-> In leak_balloon(), mutex_lock(&vb->balloon_lock) is called in order to
-> serialize against fill_balloon(). But in fill_balloon(),
-> alloc_page(GFP_HIGHUSER[_MOVABLE] | __GFP_NOMEMALLOC | __GFP_NORETRY) is
-> called with vb->balloon_lock mutex held. Since GFP_HIGHUSER[_MOVABLE]
-> implies __GFP_DIRECT_RECLAIM | __GFP_IO | __GFP_FS, despite __GFP_NORETRY
-> is specified, this allocation attempt might indirectly depend on somebody
-> else's __GFP_DIRECT_RECLAIM memory allocation. And such indirect
-> __GFP_DIRECT_RECLAIM memory allocation might call leak_balloon() via
-> virtballoon_oom_notify() via blocking_notifier_call_chain() callback via
-> out_of_memory() when it reached __alloc_pages_may_oom() and held oom_lock
-> mutex. Since vb->balloon_lock mutex is already held by fill_balloon(), it
-> will cause OOM lockup. Thus, do not wait for vb->balloon_lock mutex if
-> leak_balloon() is called from out_of_memory().
+  Hi,
 
-Please drop "Thus, do not wait for vb->balloon_lock mutex if leak_balloon()
-is called from out_of_memory()." part. This is not what this patch will do.
+> There's a patch in-flight to switch cocoa to ctrl-alt-g.
+> (If you think that's a bad idea it would be useful to reply
+> to that patch.)
 
-> 
-> Thread1                                Thread2
-> fill_balloon()
->  takes a balloon_lock
->   balloon_page_enqueue()
->    alloc_page(GFP_HIGHUSER_MOVABLE)
->     direct reclaim (__GFP_FS context)  takes a fs lock
->      waits for that fs lock             alloc_page(GFP_NOFS)
->                                          __alloc_pages_may_oom()
->                                           takes the oom_lock
->                                            out_of_memory()
->                                             blocking_notifier_call_chain()
->                                              leak_balloon()
->                                                tries to take that
-> 					       balloon_lock and deadlocks
+I personally don't mind much.  I rarely use it.  With a tablet added to
+the guest (which I expect most people do these days) mouse grabs don't
+happen anyway.
+
+But when switching cocoa it makes sense to switch sdl too for
+consistency.
+
+> Using plain ctrl-alt for ungrab has the disadvantage that you
+> then can't send the guest any ctrl-alt-anything combos at all,
+> I think.
+
+I think it works, because SDL does the ungrab on ctrl-alt key
+*release*.
+
+cheers,
+  Gerd
