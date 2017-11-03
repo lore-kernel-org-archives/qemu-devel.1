@@ -1,32 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39931)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43985)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eAhnt-0004nR-Fm
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 15:38:58 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1eAiAx-0001uD-6L
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 16:02:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eAhnq-0001qS-D4
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 15:38:57 -0400
-Received: from mail-qt0-x231.google.com ([2607:f8b0:400d:c0d::231]:49428)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eAhnq-0001pL-6w
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 15:38:54 -0400
-Received: by mail-qt0-x231.google.com with SMTP id k31so4560772qta.6
-	for <qemu-devel@nongnu.org>; Fri, 03 Nov 2017 12:38:54 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20171103153333.6416-1-berrange@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <8293752e-fd11-f550-cd88-2c1a85192e9b@amsat.org>
-Date: Fri, 3 Nov 2017 16:38:49 -0300
+	(envelope-from <ehabkost@redhat.com>) id 1eAiAw-00058A-CJ
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 16:02:47 -0400
+Date: Fri, 3 Nov 2017 21:02:33 +0100
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20171103200233.GI3111@localhost.localdomain>
+References: <1509734853-3014-1-git-send-email-cota@braap.org>
+	<20171103185610.GA3907@flamenco>
 MIME-Version: 1.0
-In-Reply-To: <20171103153333.6416-1-berrange@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 0/5] Various improvements/bugfixes to
- submodule handling
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171103185610.GA3907@flamenco>
+Subject: Re: [Qemu-devel] [PATCH] hw: add .min_cpus and .default_cpus fields
+ to machine_class
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,27 +24,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Eric Blake <eblake@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>, Peter Maydell <peter.maydell@linaro.org>
+To: "Emilio G. Cota" <cota@braap.org>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Thomas Huth <thuth@redhat.com>, qemu-arm@nongnu.org, Igor Mitsyanko <i.mitsyanko@gmail.com>, Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@gmail.com>, Marcel Apfelbaum <marcel@redhat.com>
 
-On 11/03/2017 12:33 PM, Daniel P. Berrange wrote:
-> This short series of patches improves the reliability of the submodule
-> handling to cope with various dev env scenarios that have since emerged
+On Fri, Nov 03, 2017 at 02:56:10PM -0400, Emilio G. Cota wrote:
+> On Fri, Nov 03, 2017 at 14:47:33 -0400, Emilio G. Cota wrote:
+> > diff --git a/hw/arm/xlnx-zcu102.c b/hw/arm/xlnx-zcu102.c
+> > index e2d15a1..395d1b5 100644
+> > --- a/hw/arm/xlnx-zcu102.c
+> > +++ b/hw/arm/xlnx-zcu102.c
+> > @@ -185,6 +185,9 @@ static void xlnx_ep108_machine_class_init(ObjectClass *oc, void *data)
+> >      mc->block_default_type = IF_IDE;
+> >      mc->units_per_default_bus = 1;
+> >      mc->ignore_memory_transaction_failures = true;
+> > +    mc->max_cpus = XLNX_ZYNQMP_NUM_APU_CPUS + XLNX_ZYNQMP_NUM_RPU_CPUS;
+> > +    mc->min_cpus = XLNX_ZYNQMP_NUM_APU_CPUS;
+> > +    mc->default_cpus = XLNX_ZYNQMP_NUM_APU_CPUS;
+> >  }
+> >  
+> >  static const TypeInfo xlnx_ep108_machine_init_typeinfo = {
+> > @@ -241,6 +244,8 @@ static void xlnx_zcu102_machine_class_init(ObjectClass *oc, void *data)
+> >      mc->units_per_default_bus = 1;
+> >      mc->ignore_memory_transaction_failures = true;
+> >      mc->max_cpus = XLNX_ZYNQMP_NUM_APU_CPUS + XLNX_ZYNQMP_NUM_RPU_CPUS;
+> > +    mc->min_cpus = XLNX_ZYNQMP_NUM_APU_CPUS;
+> > +    mc->default_cpus = XLNX_ZYNQMP_NUM_APU_CPUS;
+> >  }
 > 
->   v2: https://lists.gnu.org/archive/html/qemu-devel/2017-10/msg06272.html
+> Should we update max_cpus to just NUM_APU_CPUS as well for these boards?
+> -smp 5 or 6 (NUM_APU + NUM_RPU) still gets us 4 vCPUs.
 > 
-> Changed in v3:
-> 
->  - Avoid use of mktemp
->  - Use '=' instead of '==' (bashism) in conditional tests
->  - Fix problem with short-circuiting for empty submodule list
->  - Ensure help message is displayed on all errors
-> 
-> Daniel P. Berrange (5):
->   build: allow setting a custom GIT binary for transparent proxying
->   build: don't create temporary files in source dir
->   build: allow automatic git submodule updates to be disabled
->   build: don't fail if given a git submodule which does not exist
->   build: delay check for empty git submodule list
+> I see there's code for RPU cpus but it seems disabled at compile-time
+> at xlnx-zynqmp.c:431:
+>    DEFINE_PROP_BOOL("has_rpu", XlnxZynqMPState, has_rpu, false)
+> Or is there a run-time way to override this?
 
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Device properties can be overridden using -global, e.g.:
+
+  -global driver=xlnx,,zynqmp,property=has_rpu,value=on
+
+(",," is how commas are escaped in QEMU options)
+
+-- 
+Eduardo
