@@ -1,23 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50098)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51562)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eAUse-0003Bx-52
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 01:51:01 -0400
+	(envelope-from <famz@redhat.com>) id 1eAV2H-0004sL-Nh
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 02:00:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eAUsa-00064N-QU
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 01:51:00 -0400
-References: <20171101154204.27146-1-vsementsov@virtuozzo.com>
-	<20171101154204.27146-2-vsementsov@virtuozzo.com>
-	<0f8feedf-9650-f004-dae0-c658759588d9@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <e78e2506-a9e3-f4a4-f752-75089e247a71@virtuozzo.com>
-Date: Fri, 3 Nov 2017 08:50:49 +0300
+	(envelope-from <famz@redhat.com>) id 1eAV2G-0006Gn-Up
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 02:00:57 -0400
+Date: Fri, 3 Nov 2017 14:00:46 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20171103060046.GB18539@lemon>
+References: <20171102120223.GI32533@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <0f8feedf-9650-f004-dae0-c658759588d9@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH 2/2] nbd/server: add assert to
- nbd_negotiate_handle_info
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171102120223.GI32533@redhat.com>
+Subject: Re: [Qemu-devel] RFC: use case for adding QMP,
+ block jobs & multiple exports to qemu-nbd ?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,47 +23,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: den@openvz.org
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, pbonzini@redhat.com, stefanha@redhat.com
 
-02.11.2017 21:06, Eric Blake wrote:
-> On 11/01/2017 10:42 AM, Vladimir Sementsov-Ogievskiy wrote:
->> Add an assert here to make last length assignment meaningful and
->> following return without tail dropping obvious.
-> Not quite sure I followed your explanation, which means it's difficult
-> for me to propose an alternative wording.  Maybe:
->
-> Add an assert here to make it obvious that the prior loop consumed the
-> rest of the input, and that all further code in the function is focused
-> on output.
->
-> On the other hand, if you are okay with it, I wouldn't mind squashing
-> the first and second patches into one (as the first patch is then easier
-> to read when it is obvious that we used the wrong length variable).  But
-> until I get your feedback (on either squashing the two patches or
-> tweaking the wording), I'm just placing your patches as-is on my NBD
-> queue for inclusion prior to rc0.
+On Thu, 11/02 12:02, Daniel P. Berrange wrote:
+> One alternative approach to doing this would be to suggest that we should
+> instead just spawn qemu-system-x86_64 with '--machine none' and use that
+> as a replacement for qemu-nbd, since it already has a built-in NBD server
+> which can do many exports at once and arbitrary block jobs.
+
+Here is a crazy idea from KVM Forum discussions that may relate, so mention it
+here: we could move the QEMU block layer to a separate program and guest can use
+vhost-user-{blk,scsi} for I/O. It is something like this:
 
 
-in commit message I mean two things:
-1. assignment to length in the previous loop is useless without an assert
-2. firstly I thought that the following return statement is a bug as it 
-doesn't
-drop payload tail. And only then I noticed previous "if (requests != 
-length / sizeof(request))".
-With an assert the correctness of the code is more evident.
-
-However you may reword or squash it as you want, all is good.
-
->
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> ---
->>   nbd/server.c | 1 +
->>   1 file changed, 1 insertion(+)
-> Reviewed-by: Eric Blake <eblake@redhat.com>
->
+   master-disk1.qcow2  (qemu-nbd)
+          ^
+          |  backing
+          |
+   cache-disk1.qcow2   (qemu-vhost)     <-------------.
+          ^                                           |
+          |  backing                                  |  backing
+          |                                           |
+          +-  vm-a-disk1.qcow2   (qemu-vhost)         +-  vm-a-disk2.qcow2   (qemu-vhost)
+                    ^                                             ^
+                    |  vhost-user-blk                             |  vhost-user-blk
+                    |                                             |
+                    +- VM-1 (qemu-system-XXX)                     +- VM-2 (qemu-system-XXX)
 
 
--- 
-Best regards,
-Vladimir
+So on the compute node, there will be N qemu-system-XXX processes (where N is
+the number of VMs) and 1 qemu-vhost process.
+
+The hypothetical qemu-vhost program needs to support QMP as well and it runs the
+COR/mirroring jobs from master disk to cache disk, just like what you propose to
+do with the extended qemu-nbd. The only difference is replacing the local NBD
+with vhost-user, which is more efficient.
+
+Fam
