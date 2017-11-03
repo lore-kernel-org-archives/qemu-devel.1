@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39515)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39548)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eAYtJ-0005Zz-L1
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 06:08:03 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1eAYtV-0005eG-SR
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 06:08:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eAYtF-0007py-LH
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 06:07:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:25784)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eAYtF-0007pi-FW
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 06:07:53 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8FB06AC2C8
-	for <qemu-devel@nongnu.org>; Fri,  3 Nov 2017 10:07:52 +0000 (UTC)
-Date: Fri, 3 Nov 2017 10:07:46 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20171103100746.GC20155@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20171030112112.6952-1-quintela@redhat.com>
-	<20171030112112.6952-6-quintela@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1eAYtV-0007uw-2p
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 06:08:09 -0400
+Received: from mail-wm0-x22d.google.com ([2a00:1450:400c:c09::22d]:53017)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eAYtU-0007ub-S4
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 06:08:09 -0400
+Received: by mail-wm0-x22d.google.com with SMTP id t139so400920wmt.1
+	for <qemu-devel@nongnu.org>; Fri, 03 Nov 2017 03:08:08 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20171030112112.6952-6-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 5/6] migration: Now set the migration uri
+In-Reply-To: <20171103084046.12821-1-richard.henderson@linaro.org>
+References: <20171103084046.12821-1-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 3 Nov 2017 10:07:47 +0000
+Message-ID: <CAFEAcA81u=fYXZFWRzAmcB5a4RX2Y5+ZD3LMwcAcHsH-g2dxNQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/3] TCG queued patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,41 +28,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Mon, Oct 30, 2017 at 12:21:11PM +0100, Juan Quintela wrote:
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> ---
->  migration/migration.c | 25 ++++++++++++++++++-------
->  migration/migration.h |  2 ++
->  migration/socket.c    |  7 +++++++
->  3 files changed, 27 insertions(+), 7 deletions(-)
+On 3 November 2017 at 08:40, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> Two bug fixes this time.
+>
+>
+> r~
+>
+>
+> The following changes since commit 094611b426b3b532a3ec72256cb4e958149269d3:
+>
+>   oslib-posix: Use sysctl(2) call to resolve exec_dir on NetBSD (2017-11-02 16:19:34 +0000)
+>
+> are available in the git repository at:
+>
+>   git://github.com/rth7680/qemu.git tags/pull-tcg-20171103
+>
+> for you to fetch changes up to 426eeecdf5d9cf1695a53c08f46394f8e5351750:
+>
+>   cpu-exec: Exit exclusive region on longjmp from step_atomic (2017-11-03 09:34:21 +0100)
+>
+> ----------------------------------------------------------------
+> Queued tcg patches
+>
+> ----------------------------------------------------------------
+> Peter Maydell (1):
+>       cpu-exec: Exit exclusive region on longjmp from step_atomic
+>
+> Richard Henderson (2):
+>       tcg: Allow constant pool entries in the prologue
+>       tcg/s390x: Use constant pool for prologue
 
+Applied, thanks.
 
-> diff --git a/migration/socket.c b/migration/socket.c
-> index 3a8232dd2d..c3ab81d1fb 100644
-> --- a/migration/socket.c
-> +++ b/migration/socket.c
-> @@ -187,7 +187,14 @@ void tcp_start_incoming_migration(const char *host_port, Error **errp)
->      Error *err = NULL;
->      SocketAddress *saddr = tcp_build_address(host_port, &err);
->      if (!err) {
-> +        char *new_uri;
->          socket_start_incoming_migration(saddr, &err);
-> +        if (!err) {
-> +            new_uri = g_strdup_printf("tcp:%s:%s", saddr->u.inet.host,
-> +                                      saddr->u.inet.port);
-
-This is bad as it is throwing away data that the original URI had. In particular
-you loose the 'ipv4=on|off' and 'ipv6=on|off' flags. If you need to keep the
-original URI for later, then why not just keep the 'host_port' parameter that
-was passed into this function instead of trying to reverse engineeer the URI ?
-
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+-- PMM
