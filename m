@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39552)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45762)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <James.Cowgill@mips.com>) id 1eAapH-0006gR-MV
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 08:11:57 -0400
+	(envelope-from <lu.zhipeng@zte.com.cn>) id 1eAcnk-0001jM-7P
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 10:18:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <James.Cowgill@mips.com>) id 1eAapD-0007bE-Ma
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 08:11:55 -0400
-Received: from 19pmail.ess.barracuda.com ([64.235.154.231]:40400)
+	(envelope-from <lu.zhipeng@zte.com.cn>) id 1eAcnf-0006Wx-VG
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 10:18:28 -0400
+Received: from out1.zte.com.cn ([202.103.147.172]:57670 helo=mxct.zte.com.cn)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <James.Cowgill@mips.com>)
-	id 1eAapD-0007Vd-E9
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 08:11:51 -0400
-From: James Cowgill <james.cowgill@mips.com>
-Date: Fri, 3 Nov 2017 12:07:03 +0000
-Message-ID: <20171103120703.15749-1-james.cowgill@mips.com>
+	(Exim 4.71) (envelope-from <lu.zhipeng@zte.com.cn>)
+	id 1eAcnf-0006N5-K3
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 10:18:23 -0400
+From: ZhiPeng Lu <lu.zhipeng@zte.com.cn>
+Date: Fri, 3 Nov 2017 22:18:05 +0800
+Message-Id: <1509718685-7993-1-git-send-email-lu.zhipeng@zte.com.cn>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH] linux-user: return EINVAL from
- prctl(PR_*_SECCOMP)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2] net: add print link status of nic in
+ print_net_client function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,38 +26,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Riku Voipio <riku.voipio@iki.fi>
-Cc: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org, James Cowgill <james.cowgill@mips.com>
+To: jasowang@redhat.com
+Cc: qemu-devel@nongnu.org, ZhiPeng Lu <lu.zhipeng@zte.com.cn>
 
-If an application tries to install a seccomp filter using
-prctl(PR_SET_SECCOMP), the filter is likely for the target instead of the host
-architecture. This will probably cause qemu to be immediately killed when it
-executes another syscall.
+We can directly know the information of vm by executing "info network" comm=
+and,
+ including the link state of nics, without executing other commands again.
 
-Prevent this from happening by returning EINVAL from both seccomp prctl
-calls. This is the error returned by the kernel when seccomp support is
-disabled.
-
-Fixes: https://bugs.launchpad.net/qemu/+bug/1726394
-Signed-off-by: James Cowgill <james.cowgill@mips.com>
+Signed-off-by: ZhiPeng Lu <lu.zhipeng@zte.com.cn>
+Reviewed-by: Jiyun Fan <fan.jiyun@zte.com.cn>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 ---
- linux-user/syscall.c | 4 ++++
- 1 file changed, 4 insertions(+)
+v2: correct commit messages
+---
+ net/net.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index d4497dec5d..43cd5fb2bb 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -10482,6 +10482,10 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
-             break;
-         }
- #endif
-+        case PR_GET_SECCOMP:
-+        case PR_SET_SECCOMP:
-+            ret = -TARGET_EINVAL;
-+            break;
-         default:
-             /* Most prctl options have no pointer arguments */
-             ret = get_errno(prctl(arg1, arg2, arg3, arg4, arg5));
--- 
-2.15.0
+diff --git a/net/net.c b/net/net.c
+index 39ef546..9e349cb 100644
+--- a/net/net.c
++++ b/net/net.c
+@@ -1298,10 +1298,14 @@ void print=5Fnet=5Fclient(Monitor *mon, NetClientSt=
+ate *nc)
+ {
+     NetFilterState *nf;
+=20
+-    monitor=5Fprintf(mon, "%s: index=3D%d,type=3D%s,%s\n", nc->name,
++    monitor=5Fprintf(mon, "%s: index=3D%d,type=3D%s,%s", nc->name,
+                    nc->queue=5Findex,
+                    NetClientDriver=5Fstr(nc->info->type),
+                    nc->info=5Fstr);
++    if (nc->info->type =3D=3D NET=5FCLIENT=5FDRIVER=5FNIC) {
++        monitor=5Fprintf(mon, ",link status:%s", nc->link=5Fdown ? "down" =
+: "up");
++    }
++    monitor=5Fprintf(mon, "\n");
+     if (!QTAILQ=5FEMPTY(&nc->filters)) {
+         monitor=5Fprintf(mon, "filters:\n");
+     }
+--=20
+1.8.3.1
