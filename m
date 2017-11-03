@@ -1,28 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46723)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48063)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nanjekyejoannah@gmail.com>) id 1eAbBS-0007S9-7R
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 08:34:51 -0400
+	(envelope-from <shankerd@codeaurora.org>) id 1eAbEo-0000my-3p
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 08:38:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nanjekyejoannah@gmail.com>) id 1eAbBR-0000S1-BR
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 08:34:50 -0400
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:46208)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <nanjekyejoannah@gmail.com>)
-	id 1eAbBR-0000Rd-4s
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 08:34:49 -0400
-Received: by mail-wm0-x242.google.com with SMTP id r68so1226494wmr.1
-	for <qemu-devel@nongnu.org>; Fri, 03 Nov 2017 05:34:48 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20171103112442.GN5078@stefanha-x1.localdomain>
-References: <1509020054-25434-1-git-send-email-nanjekyejoannah@gmail.com>
-	<e4b4b545-919f-f043-6a6e-70e563fa75ff@amsat.org>
-	<20171103112442.GN5078@stefanha-x1.localdomain>
-From: joannah nanjekye <nanjekyejoannah@gmail.com>
-Date: Fri, 3 Nov 2017 15:34:46 +0300
-Message-ID: <CANFMCgQf4gE4Tsm0uPfq4ADD2TrinjpazTzp4Yh3+4d2wwr3vw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH WIP] replace numpy with struct
+	(envelope-from <shankerd@codeaurora.org>) id 1eAbEn-0002Xr-7I
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 08:38:18 -0400
+From: Shanker Donthineni <shankerd@codeaurora.org>
+Date: Fri,  3 Nov 2017 07:37:51 -0500
+Message-Id: <1509712671-16299-1-git-send-email-shankerd@codeaurora.org>
+Subject: [Qemu-devel] [PATCH] hw/intc/arm_gicv3_its: Fix the VM termination
+ in vm_change_state_handler()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,44 +18,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+To: Eric Auger <eric.auger@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>, Shanker Donthineni <shankerd@codeaurora.org>
 
-I will send an update tomorrow as am travelling rite now.
+The commit cddafd8f353d ("hw/intc/arm_gicv3_its: Implement state save
+/restore") breaks the backward compatibility with the older kernels
+where vITS save/restore support is not available. The vmstate function
+vm_change_state_handler() should not be registered if the running kernel
+doesn't support ITS save/restore feature. Otherwise VM instance will be
+killed whenever vmstate callback function is invoked.
 
-Thanks for the reminder.
+Observed a virtual machine shutdown with QEMU-2.10+linux-4.11 when testing
+the reboot command "virsh reboot <domain> --mode acpi" instead of reboot.
 
-On Nov 3, 2017 2:24 PM, "Stefan Hajnoczi" <stefanha@gmail.com> wrote:
+KVM Error: 'KVM_SET_DEVICE_ATTR failed: Group 4 attr 0x00000000000001'
 
-> On Thu, Oct 26, 2017 at 10:50:26AM -0300, Philippe Mathieu-Daud=C3=A9 wro=
-te:
-> > Hi Joannah,
-> >
-> > The common subject to use is [RFC PATCH] instead of [PATCH WIP]
-> >
-> > On 10/26/2017 09:14 AM, Joannah Nanjekye wrote:
-> > > This patch replaces the use of numpy with the standard Library struct
-> module where possible.
-> >
-> > This seems a good idea but why?
->
-> I suggest adding this to the commit description:
->
-> Users tend to hit an ImportError when running analyze-migration.py due
-> to the numpy dependency.  numpy functionality isn't actually used, just
-> binary serialization that the standard library 'struct' module already
-> provides.  Removing the dependency allows the script to run
-> out-of-the-box.
->
-> > Do you have any performance improvements results to share?
-> >
-> > > Signed-off-by: Joannah Nanjekye <nanjekyejoannah@gmail.com>
-> > > ---
-> > >
-> > >  scripts/analyze-migration.py | 19 ++++++++++++-------
-> > >  1 file changed, 12 insertions(+), 7 deletions(-)
->
-> I don't see a removal of "import numpy as np" so this script still
-> depends on numpy.  Did you forget to sent further patches that you have
-> to remove the numpy dependency?
->
+Signed-off-by: Shanker Donthineni <shankerd@codeaurora.org>
+---
+ hw/intc/arm_gicv3_its_kvm.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/hw/intc/arm_gicv3_its_kvm.c b/hw/intc/arm_gicv3_its_kvm.c
+index 39903d5..9b00ce5 100644
+--- a/hw/intc/arm_gicv3_its_kvm.c
++++ b/hw/intc/arm_gicv3_its_kvm.c
+@@ -111,13 +111,13 @@ static void kvm_arm_its_realize(DeviceState *dev, Error **errp)
+             error_free(s->migration_blocker);
+             return;
+         }
++    } else {
++        qemu_add_vm_change_state_handler(vm_change_state_handler, s);
+     }
+ 
+     kvm_msi_use_devid = true;
+     kvm_gsi_direct_mapping = false;
+     kvm_msi_via_irqfd_allowed = kvm_irqfds_enabled();
+-
+-    qemu_add_vm_change_state_handler(vm_change_state_handler, s);
+ }
+ 
+ /**
+-- 
+Qualcomm Datacenter Technologies, Inc. on behalf of the Qualcomm Technologies, Inc.
+Qualcomm Technologies, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project.
