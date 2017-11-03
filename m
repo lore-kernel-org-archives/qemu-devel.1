@@ -1,30 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59888)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60104)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eAYQU-0001Lw-10
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 05:38:10 -0400
+	(envelope-from <thuth@redhat.com>) id 1eAYRc-0001xy-Nw
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 05:39:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eAYQQ-0002yv-7P
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 05:38:10 -0400
-Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:50474)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eAYQP-0002yd-VL
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 05:38:06 -0400
-Received: by mail-wm0-x235.google.com with SMTP id s66so171063wmf.5
-	for <qemu-devel@nongnu.org>; Fri, 03 Nov 2017 02:38:05 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <1509701213.31823.11.camel@redhat.com>
-References: <20171023210803.20998-1-makovick@gmail.com>
-	<20171023210803.20998-5-makovick@gmail.com>
-	<1509532830.3856.7.camel@redhat.com>
-	<CAHmvugcYmaujAYGwpb+ObistFr522W1XsuV-6jUgi543VgfvTA@mail.gmail.com>
-	<1509701213.31823.11.camel@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 3 Nov 2017 09:37:44 +0000
-Message-ID: <CAFEAcA8RbiuAwwW4oqD_i2NGMeAao8KU=pWP7faM0QbajHgMYw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 4/7] sdl2: Only accept the hotkeys on the
- main window
+	(envelope-from <thuth@redhat.com>) id 1eAYRZ-0003Sa-KH
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 05:39:20 -0400
+From: Thomas Huth <thuth@redhat.com>
+Date: Fri,  3 Nov 2017 10:39:13 +0100
+Message-Id: <1509701953-8995-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH] tests: Run the test-crypto-block only if
+ encryption is available
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,25 +18,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: =?UTF-8?B?SmluZMWZaWNoIE1ha292acSNa2E=?= <makovick@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org
 
-On 3 November 2017 at 09:26, Gerd Hoffmann <kraxel@redhat.com> wrote:
-> Ignoring autorepeat events (as the patch does, but which the commit
-> message doesn't mention) makes sense.  But I still fail to see why we
-> should limit hotkeys to the main window.
+The test-crypto-block currently fails if encryption has not been
+compiled into QEMU:
 
-Is there documentation about how the input subsystem wants to
-handle autorepeat? (ie how UI frontends should present repeating
-keys to it, and how keyboard backends should expect to see
-repeating keys delivered from it). There's been discussion on
-this in another thread about xenfb and vnc...
+TEST: tests/test-crypto-block... (pid=22231)
+  /crypto/block/qcow:                                                  OK
+  /crypto/block/luks/default:
+  Unexpected error in qcrypto_pbkdf2() at qemu/crypto/pbkdf-stub.c:41:
+FAIL
+GTester: last random seed: R02Sbbb5b6f299c6727f41bb50ba4aa6ef5c
+(pid=22237)
+  /crypto/block/luks/aes-256-cbc-plain64:
+  Unexpected error in qcrypto_pbkdf2() at qemu/crypto/pbkdf-stub.c:41:
+FAIL
+GTester: last random seed: R02S3e27992a5ab4cc95e141c4ed3c7f0d2e
+(pid=22239)
+  /crypto/block/luks/aes-256-cbc-essiv:
+  Unexpected error in qcrypto_pbkdf2() at qemu/crypto/pbkdf-stub.c:41:
+FAIL
+GTester: last random seed: R02S51b52bb02a66c42d8b331fd305384f53
+(pid=22241)
+FAIL: tests/test-crypto-block
 
-Also I think it would be nice to have written up what the
-"expected" set of hotkeys for UI frontends are, so we can
-be consistent. I think SDL and gtk are different about what
-their ungrab keycombo is, for instance. (I've been assuming
-gtk is the "this is the right behaviour" exemplar to follow.)
+So run this test only if the required encryption support is available.
 
-thanks
--- PMM
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ tests/Makefile.include | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 434a2ce..ac46aea 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -145,7 +145,7 @@ check-unit-$(if $(CONFIG_NETTLE_KDF),y,$(CONFIG_GCRYPT_KDF)) += tests/test-crypt
+ check-unit-y += tests/test-crypto-ivgen$(EXESUF)
+ check-unit-y += tests/test-crypto-afsplit$(EXESUF)
+ check-unit-y += tests/test-crypto-xts$(EXESUF)
+-check-unit-y += tests/test-crypto-block$(EXESUF)
++check-unit-$(call lor,$(CONFIG_NETTLE_KDF),$(CONFIG_GCRYPT_KDF)) += tests/test-crypto-block$(EXESUF)
+ check-unit-y += tests/test-logging$(EXESUF)
+ gcov-files-test-logging-y = util/log.c
+ check-unit-$(CONFIG_REPLICATION) += tests/test-replication$(EXESUF)
+-- 
+1.8.3.1
