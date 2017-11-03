@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60583)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33261)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eAYTs-0002ly-Fv
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 05:41:41 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1eAYa6-00049Y-1J
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 05:48:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eAYTp-0005RJ-AR
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 05:41:40 -0400
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:54837)
+	(envelope-from <alex.bennee@linaro.org>) id 1eAYa2-0002eh-U9
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 05:48:06 -0400
+Received: from mail-wr0-x229.google.com ([2a00:1450:400c:c0c::229]:56175)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1eAYTp-0005R3-4I
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 05:41:37 -0400
-Received: by mail-wr0-x242.google.com with SMTP id o44so1941281wrf.11
-	for <qemu-devel@nongnu.org>; Fri, 03 Nov 2017 02:41:36 -0700 (PDT)
-Date: Fri, 3 Nov 2017 09:41:33 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20171103094133.GB5078@stefanha-x1.localdomain>
-References: <20171102180310.24760-1-dgilbert@redhat.com>
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1eAYa2-0002eL-N0
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 05:48:02 -0400
+Received: by mail-wr0-x229.google.com with SMTP id l8so1956612wre.12
+	for <qemu-devel@nongnu.org>; Fri, 03 Nov 2017 02:48:02 -0700 (PDT)
+References: <20171031112457.10516.8971.stgit@pasha-VirtualBox>
+	<20171031112633.10516.44062.stgit@pasha-VirtualBox>
+	<92aa3279-66b5-b765-b36b-2acb6413bd47@redhat.com>
+	<001301d35484$75071110$5f153330$@ru>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <001301d35484$75071110$5f153330$@ru>
+Date: Fri, 03 Nov 2017 09:47:56 +0000
+Message-ID: <87tvybhewj.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="H+4ONPRPur6+Ovig"
-Content-Disposition: inline
-In-Reply-To: <20171102180310.24760-1-dgilbert@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] ioapic/tracing: Remove last DPRINTFs
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH 17/26] replay: push replay_mutex_lock
+ up the call tree
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,43 +33,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, mst@redhat.com, pbonzini@redhat.com, peterx@redhat.com
+To: Pavel Dovgalyuk <dovgaluk@ispras.ru>
+Cc: 'Paolo Bonzini' <pbonzini@redhat.com>, 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org, kwolf@redhat.com, peter.maydell@linaro.org, boost.lists@gmail.com, quintela@redhat.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, maria.klimushenkova@ispras.ru, kraxel@redhat.com
 
 
---H+4ONPRPur6+Ovig
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Pavel Dovgalyuk <dovgaluk@ispras.ru> writes:
 
-On Thu, Nov 02, 2017 at 06:03:10PM +0000, Dr. David Alan Gilbert (git) wrot=
-e:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->=20
-> Remove the last few DPRINTFs from hw/intc/ioapic.c and turn
-> them into tracing.  In one case it's a new trace, in the others
-> it's just adding a parameter to the existing traces.
->=20
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> ---
->  hw/intc/ioapic.c     | 17 +++--------------
->  hw/intc/trace-events |  5 +++--
->  2 files changed, 6 insertions(+), 16 deletions(-)
+>> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
+>> On 31/10/2017 12:26, Pavel Dovgalyuk wrote:
+>> > +    /* We need to drop the replay_lock so any vCPU threads woken up
+>> > +     * can finish their replay tasks
+>> > +     */
+>> > +    if (replay_mode !=3D REPLAY_MODE_NONE) {
+>> > +        g_assert(replay_mutex_locked());
+>> > +        qemu_mutex_unlock_iothread();
+>> > +        replay_mutex_unlock();
+>> > +        qemu_mutex_lock_iothread();
+>> > +    }
+>>
+>> The assert+unlock+lock here is unnecessary; just do
+>>
+>>     if (replay_mode !=3D REPLAY_MODE_NONE) {
+>>         replay_mutex_unlock();
+>>     }
+>>
+>> which according to a previous suggestion can become just
+>>
+>>     replay_mutex_unlock();
+>
+> We can't remove qemu_mutex_unlock_iothread(), because there is an assert
+> inside replay_mutex_unlock(), which checks that iothread is unlocked.
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+I'm certainly open to reviewing the locking order rules if it is easier
+another way around. I'm just conscious that it's easy to deadlock if we
+don't pay attention. This is what I wrote in replay.txt:
 
---H+4ONPRPur6+Ovig
-Content-Type: application/pgp-signature; name="signature.asc"
+  Locking and thread synchronisation
+  ----------------------------------
 
------BEGIN PGP SIGNATURE-----
+  Previously the synchronisation of the main thread and the vCPU thread
+  was ensured by the holding of the BQL. However the trend has been to
+  reduce the time the BQL was held across the system including under TCG
+  system emulation. As it is important that batches of events are kept
+  in sequence (e.g. expiring timers and checkpoints in the main thread
+  while instruction checkpoints are written by the vCPU thread) we need
+  another lock to keep things in lock-step. This role is now handled by
+  the replay_mutex_lock. It used to be held only for each event being
+  written but now it is held for a whole execution period. This results
+  in a deterministic ping-pong between the two main threads.
 
-iQEcBAEBAgAGBQJZ/DnNAAoJEJykq7OBq3PIR6QIALEg9YaNXy/c4R3lkVmUUivX
-yRTwC/6hG4N5niYtvX9+fnm028D9ngLWTu4IAFr3zc8KIVb4R1eXTkxoC/tbUfoc
-oXYX6GW/EnUi+igARbDTbISKEexn0DR2qxrpZMpgCnPbGH1KQFlS1zMYsD4iTSpi
-9sr3y3+Gk2v26KIczGNLn6chP4vD1Ojq3OPdy4KAnJCyGk25ZGU3RAybgmr6HbZ8
-Mr2CwsFcH/GiAGTyFZ5SFwtN6pwihzGBngCli9dMIVPE7bxObSA4SoKPlHsF4yZe
-11wnUpyDRP8HgdH18YQ1FwxKY/RNrC/oj8arvAMtwE7rcdEzT0aNyH3Bl/2+qEw=
-=TREk
------END PGP SIGNATURE-----
+  As deadlocks are easy to introduce a new rule is introduced that the
+  replay_mutex_lock is taken before any BQL locks. Conversely you cannot
+  release the replay_lock while the BQL is still held.
 
---H+4ONPRPur6+Ovig--
+>
+>>
+>> >      while (!all_vcpus_paused()) {
+>> >          qemu_cond_wait(&qemu_pause_cond, &qemu_global_mutex);
+>> >          CPU_FOREACH(cpu) {
+>> >              qemu_cpu_kick(cpu);
+>> >          }
+>> >      }
+>> > +
+>> > +    if (replay_mode !=3D REPLAY_MODE_NONE) {
+>> > +        qemu_mutex_unlock_iothread();
+>> > +        replay_mutex_lock();
+>> > +        qemu_mutex_lock_iothread();
+>> > +    }
+>>
+>
+> Pavel Dovgalyuk
+
+
+--
+Alex Benn=C3=A9e
