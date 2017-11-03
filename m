@@ -1,21 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38191)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40384)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eAdyh-000854-Kw
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 11:33:52 -0400
+	(envelope-from <stefanha@redhat.com>) id 1eAe5X-0004qk-2w
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 11:40:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eAdye-0001Ee-Hm
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 11:33:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:11550)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eAdye-0001E2-BK
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 11:33:48 -0400
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Fri,  3 Nov 2017 15:33:32 +0000
-Message-Id: <20171103153333.6416-5-berrange@redhat.com>
-In-Reply-To: <20171103153333.6416-1-berrange@redhat.com>
-References: <20171103153333.6416-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 4/5] build: don't fail if given a git
- submodule which does not exist
+	(envelope-from <stefanha@redhat.com>) id 1eAe5W-0005oN-2G
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 11:40:55 -0400
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Date: Fri,  3 Nov 2017 15:40:41 +0000
+Message-Id: <20171103154041.12617-1-stefanha@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] aio-posix: drop QEMU_AIO_POLL_MAX_NS env var
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,63 +21,38 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Eric Blake <eblake@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-block@nongnu.org, thuth@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>
 
-If going back in time in git history, across a commit that introduces a new
-submodule, the 'git-submodule.sh' script will fail, causing rebuild to fail.
+This hunk should not have been merged but I forgot to remove it.  Let's
+remove it before it slips into a QEMU release.
 
-This is because config-host.mak contains a GIT_SUBMODULES variable that lists
-a submodule that only exists in the later commit. config-host.mak won't get
-repopulated until config.status is invoked, but make won't get this far due to
-the submodule error.
+=C2=AF\_(=E3=83=84)_/=C2=AF
 
-This change makes 'git-submodule.sh' check whether each module is known to git
-and drops any which are not present. A warning message will be printed when any
-submodule is dropped in this manner.
-
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- scripts/git-submodule.sh | 16 ++++++++++++++--
- 1 file changed, 14 insertions(+), 2 deletions(-)
+ util/aio-posix.c | 7 -------
+ 1 file changed, 7 deletions(-)
 
-diff --git a/scripts/git-submodule.sh b/scripts/git-submodule.sh
-index 63ace6fc55..2857fc57c4 100755
---- a/scripts/git-submodule.sh
-+++ b/scripts/git-submodule.sh
-@@ -7,7 +7,7 @@ substat=".git-submodule-status"
- 
- command=$1
- shift
--modules="$@"
-+maybe_modules="$@"
- 
- test -z "$GIT" && GIT=git
- 
-@@ -33,12 +33,24 @@ error() {
-     exit 1
- }
- 
--if test -z "$modules"
-+if test -z "$maybe_modules"
- then
-     test -e $substat || touch $substat
-     exit 0
- fi
- 
-+modules=""
-+for m in $maybe_modules
-+do
-+    $GIT submodule status $m 1> /dev/null 2>&1
-+    if test $? = 0
-+    then
-+        modules="$modules $m"
-+    else
-+        echo "warn: ignoring non-existant submodule $m"
-+    fi
-+done
-+
- if ! test -e ".git"
- then
-     echo "$0: unexpectedly called with submodules but no git checkout exists"
--- 
+diff --git a/util/aio-posix.c b/util/aio-posix.c
+index 5946ac09f0..1427f49b4a 100644
+--- a/util/aio-posix.c
++++ b/util/aio-posix.c
+@@ -701,13 +701,6 @@ bool aio_poll(AioContext *ctx, bool blocking)
+=20
+ void aio_context_setup(AioContext *ctx)
+ {
+-    /* TODO remove this in final patch submission */
+-    if (getenv("QEMU_AIO_POLL_MAX_NS")) {
+-        fprintf(stderr, "The QEMU_AIO_POLL_MAX_NS environment variable h=
+as "
+-                "been replaced with -object iothread,poll-max-ns=3DNUM\n=
+");
+-        exit(1);
+-    }
+-
+ #ifdef CONFIG_EPOLL_CREATE1
+     assert(!ctx->epollfd);
+     ctx->epollfd =3D epoll_create1(EPOLL_CLOEXEC);
+--=20
 2.13.6
