@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45645)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45728)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1eAXKt-0004dc-Dc
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 04:28:21 -0400
+	(envelope-from <wei.w.wang@intel.com>) id 1eAXL9-0004qq-Lm
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 04:28:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1eAXKq-0001tB-UG
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 04:28:19 -0400
-Received: from mga14.intel.com ([192.55.52.115]:18865)
+	(envelope-from <wei.w.wang@intel.com>) id 1eAXL6-0001zd-U1
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 04:28:35 -0400
+Received: from mga14.intel.com ([192.55.52.115]:64782)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1eAXKq-0001rJ-Hw
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 04:28:16 -0400
+	id 1eAXL6-0001yr-Lw
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 04:28:32 -0400
 From: Wei Wang <wei.w.wang@intel.com>
-Date: Fri,  3 Nov 2017 16:13:01 +0800
-Message-Id: <1509696786-1597-2-git-send-email-wei.w.wang@intel.com>
+Date: Fri,  3 Nov 2017 16:13:03 +0800
+Message-Id: <1509696786-1597-4-git-send-email-wei.w.wang@intel.com>
 In-Reply-To: <1509696786-1597-1-git-send-email-wei.w.wang@intel.com>
 References: <1509696786-1597-1-git-send-email-wei.w.wang@intel.com>
-Subject: [Qemu-devel] [PATCH v17 1/6] lib/xbitmap: Introduce xbitmap
+Subject: [Qemu-devel] [PATCH v17 3/6] mm/balloon_compaction.c: split balloon
+ page allocation and enqueue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,522 +28,210 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mst@redhat.com, mhocko@kernel.org, akpm@linux-foundation.org, mawilcox@microsoft.com
 Cc: david@redhat.com, penguin-kernel@I-love.SAKURA.ne.jp, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, willy@infradead.org, wei.w.wang@intel.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu@aliyun.com
 
-From: Matthew Wilcox <mawilcox@microsoft.com>
+From: "Michael S. Tsirkin" <mst.redhat.com>
 
-The eXtensible Bitmap is a sparse bitmap representation which is
-efficient for set bits which tend to cluster.  It supports up to
-'unsigned long' worth of bits, and this commit adds the bare bones --
-xb_set_bit(), xb_clear_bit(), xb_clear_bit_range(), xb_test_bit(),
-xb_find_next_set_bit(), xb_find_next_zero_bit().
+fill_balloon doing memory allocations under balloon_lock
+can cause a deadlock when leak_balloon is called from
+virtballoon_oom_notify and tries to take same lock.
 
-More possible optimizations to add in the future:
-1) xb_set_bit_range: set a range of bits.
-2) when searching a bit, if the bit is not found in the slot, move on to
-the next slot directly.
-3) add Tags to help searching.
+To fix, split page allocation and enqueue and do allocations outside
+the lock.
 
-Signed-off-by: Wei Wang <wei.w.wang@intel.com>
-Cc: Matthew Wilcox <mawilcox@microsoft.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>
-Cc: Michal Hocko <mhocko@kernel.org>
-Cc: Michael S. Tsirkin <mst@redhat.com>
-Cc: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Here's a detailed analysis of the deadlock by Tetsuo Handa:
 
-v16->v17 ChangeLog:
-1) xb_preload: allocate ida bitmap before __radix_tree_preload() to avoid
-kmalloc with preemption disabled. Also change this function to return with
-preemption not disabled on error.
-2) xb_preload_and_set_bit: a wrapper of xb_preload and xb_set_bit, for
-the convenience of usage.
+In leak_balloon(), mutex_lock(&vb->balloon_lock) is called in order to
+serialize against fill_balloon(). But in fill_balloon(),
+alloc_page(GFP_HIGHUSER[_MOVABLE] | __GFP_NOMEMALLOC | __GFP_NORETRY) is
+called with vb->balloon_lock mutex held. Since GFP_HIGHUSER[_MOVABLE]
+implies __GFP_DIRECT_RECLAIM | __GFP_IO | __GFP_FS, despite __GFP_NORETRY
+is specified, this allocation attempt might indirectly depend on somebody
+else's __GFP_DIRECT_RECLAIM memory allocation. And such indirect
+__GFP_DIRECT_RECLAIM memory allocation might call leak_balloon() via
+virtballoon_oom_notify() via blocking_notifier_call_chain() callback via
+out_of_memory() when it reached __alloc_pages_may_oom() and held oom_lock
+mutex. Since vb->balloon_lock mutex is already held by fill_balloon(), it
+will cause OOM lockup. Thus, do not wait for vb->balloon_lock mutex if
+leak_balloon() is called from out_of_memory().
 
-v15->v16 ChangeLog:
-1) coding style - separate small functions for bit set/clear/test;
-2) Clear a range of bits in a more efficient way:
-   A) clear a range of bits from the same ida bitmap directly rather than
-      search the bitmap again for each bit;
-   B) when the range of bits to clear covers the whole ida bitmap,
-      directly free the bitmap - no need to zero the bitmap first.
-3) more efficient bit searching, like 2.A.
+Thread1                                Thread2
+fill_balloon()
+ takes a balloon_lock
+  balloon_page_enqueue()
+   alloc_page(GFP_HIGHUSER_MOVABLE)
+    direct reclaim (__GFP_FS context)  takes a fs lock
+     waits for that fs lock             alloc_page(GFP_NOFS)
+                                         __alloc_pages_may_oom()
+                                          takes the oom_lock
+                                           out_of_memory()
+                                            blocking_notifier_call_chain()
+                                             leak_balloon()
+                                               tries to take that
+					       balloon_lock and deadlocks
+
+Reported-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Cc: Michal Hocko <mhocko@suse.com>
+Cc: Wei Wang <wei.w.wang@intel.com>
+Reviewed-by: Wei Wang <wei.w.wang@intel.com>
+
 ---
- include/linux/radix-tree.h |   2 +
- include/linux/xbitmap.h    |  67 +++++++++++
- lib/Makefile               |   2 +-
- lib/radix-tree.c           |  51 +++++++-
- lib/xbitmap.c              | 283 +++++++++++++++++++++++++++++++++++++++++++++
- 5 files changed, 402 insertions(+), 3 deletions(-)
- create mode 100644 include/linux/xbitmap.h
- create mode 100644 lib/xbitmap.c
+ drivers/virtio/virtio_balloon.c    | 23 ++++++++++++++++++-----
+ include/linux/balloon_compaction.h | 34 +++++++++++++++++++++++++++++++++-
+ mm/balloon_compaction.c            | 28 +++++++++++++++++++++-------
+ 3 files changed, 72 insertions(+), 13 deletions(-)
 
-diff --git a/include/linux/radix-tree.h b/include/linux/radix-tree.h
-index 567ebb5..1d6d6f6 100644
---- a/include/linux/radix-tree.h
-+++ b/include/linux/radix-tree.h
-@@ -309,6 +309,8 @@ void radix_tree_iter_replace(struct radix_tree_root *,
- 		const struct radix_tree_iter *, void __rcu **slot, void *entry);
- void radix_tree_replace_slot(struct radix_tree_root *,
- 			     void __rcu **slot, void *entry);
-+bool __radix_tree_delete(struct radix_tree_root *root,
-+			 struct radix_tree_node *node, void __rcu **slot);
- void __radix_tree_delete_node(struct radix_tree_root *,
- 			      struct radix_tree_node *,
- 			      radix_tree_update_node_t update_node,
-diff --git a/include/linux/xbitmap.h b/include/linux/xbitmap.h
-new file mode 100644
-index 0000000..00b59c3
---- /dev/null
-+++ b/include/linux/xbitmap.h
-@@ -0,0 +1,67 @@
-+/*
-+ * eXtensible Bitmaps
-+ * Copyright (c) 2017 Microsoft Corporation <mawilcox@microsoft.com>
-+ *
-+ * This program is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU General Public License as
-+ * published by the Free Software Foundation; either version 2 of the
-+ * License, or (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * eXtensible Bitmaps provide an unlimited-size sparse bitmap facility.
-+ * All bits are initially zero.
-+ */
-+
-+#ifndef __XBITMAP_H__
-+#define __XBITMAP_H__
-+
-+#include <linux/idr.h>
-+
-+struct xb {
-+	struct radix_tree_root xbrt;
-+};
-+
-+#define XB_INIT {							\
-+	.xbrt = RADIX_TREE_INIT(IDR_RT_MARKER | GFP_NOWAIT),		\
-+}
-+#define DEFINE_XB(name)		struct xb name = XB_INIT
-+
-+static inline void xb_init(struct xb *xb)
-+{
-+	INIT_RADIX_TREE(&xb->xbrt, IDR_RT_MARKER | GFP_NOWAIT);
-+}
-+
-+int xb_set_bit(struct xb *xb, unsigned long bit);
-+int xb_preload_and_set_bit(struct xb *xb, unsigned long bit, gfp_t gfp);
-+bool xb_test_bit(struct xb *xb, unsigned long bit);
-+void xb_clear_bit(struct xb *xb, unsigned long bit);
-+unsigned long xb_find_next_set_bit(struct xb *xb, unsigned long start,
-+				   unsigned long end);
-+unsigned long xb_find_next_zero_bit(struct xb *xb, unsigned long start,
-+				    unsigned long end);
-+void xb_clear_bit_range(struct xb *xb, unsigned long start, unsigned long end);
-+
-+/* Check if the xb tree is empty */
-+static inline bool xb_is_empty(const struct xb *xb)
-+{
-+	return radix_tree_empty(&xb->xbrt);
-+}
-+
-+bool xb_preload(gfp_t gfp);
-+
-+/**
-+ * xb_preload_end - end preload section started with xb_preload()
-+ *
-+ * Each xb_preload() should be matched with an invocation of this
-+ * function. See xb_preload() for details.
-+ */
-+static inline void xb_preload_end(void)
-+{
-+	preempt_enable();
-+}
-+
-+#endif
-diff --git a/lib/Makefile b/lib/Makefile
-index dafa796..082361b 100644
---- a/lib/Makefile
-+++ b/lib/Makefile
-@@ -18,7 +18,7 @@ KCOV_INSTRUMENT_dynamic_debug.o := n
+diff --git a/drivers/virtio/virtio_balloon.c b/drivers/virtio/virtio_balloon.c
+index f0b3a0b..45fe6a8 100644
+--- a/drivers/virtio/virtio_balloon.c
++++ b/drivers/virtio/virtio_balloon.c
+@@ -143,16 +143,17 @@ static void set_page_pfns(struct virtio_balloon *vb,
  
- lib-y := ctype.o string.o vsprintf.o cmdline.o \
- 	 rbtree.o radix-tree.o dump_stack.o timerqueue.o\
--	 idr.o int_sqrt.o extable.o \
-+	 idr.o xbitmap.o int_sqrt.o extable.o \
- 	 sha1.o chacha20.o irq_regs.o argv_split.o \
- 	 flex_proportions.o ratelimit.o show_mem.o \
- 	 is_single_threaded.o plist.o decompress.o kobject_uevent.o \
-diff --git a/lib/radix-tree.c b/lib/radix-tree.c
-index 8b1feca..269a5cc 100644
---- a/lib/radix-tree.c
-+++ b/lib/radix-tree.c
-@@ -78,6 +78,19 @@ static struct kmem_cache *radix_tree_node_cachep;
- #define IDA_PRELOAD_SIZE	(IDA_MAX_PATH * 2 - 1)
+ static unsigned fill_balloon(struct virtio_balloon *vb, size_t num)
+ {
+-	struct balloon_dev_info *vb_dev_info = &vb->vb_dev_info;
+ 	unsigned num_allocated_pages;
++	unsigned int num_pfns;
++	struct page *page;
++	LIST_HEAD(pages);
+ 
+ 	/* We can only do one array worth at a time. */
+ 	num = min(num, ARRAY_SIZE(vb->pfns));
+ 
+-	mutex_lock(&vb->balloon_lock);
+-	for (vb->num_pfns = 0; vb->num_pfns < num;
+-	     vb->num_pfns += VIRTIO_BALLOON_PAGES_PER_PAGE) {
+-		struct page *page = balloon_page_enqueue(vb_dev_info);
++	for (num_pfns = 0; num_pfns < num;
++	     num_pfns += VIRTIO_BALLOON_PAGES_PER_PAGE) {
++		struct page *page = balloon_page_alloc();
+ 
+ 		if (!page) {
+ 			dev_info_ratelimited(&vb->vdev->dev,
+@@ -162,6 +163,18 @@ static unsigned fill_balloon(struct virtio_balloon *vb, size_t num)
+ 			msleep(200);
+ 			break;
+ 		}
++
++		balloon_page_push(&pages, page);
++	}
++
++	mutex_lock(&vb->balloon_lock);
++
++	vb->num_pfns = 0;
++	while ((page = balloon_page_pop(&pages))) {
++		balloon_page_enqueue(&vb->vb_dev_info, page);
++
++		vb->num_pfns += VIRTIO_BALLOON_PAGES_PER_PAGE;
++
+ 		set_page_pfns(vb, vb->pfns + vb->num_pfns, page);
+ 		vb->num_pages += VIRTIO_BALLOON_PAGES_PER_PAGE;
+ 		if (!virtio_has_feature(vb->vdev,
+diff --git a/include/linux/balloon_compaction.h b/include/linux/balloon_compaction.h
+index 79542b2..bdc055a 100644
+--- a/include/linux/balloon_compaction.h
++++ b/include/linux/balloon_compaction.h
+@@ -49,6 +49,7 @@
+ #include <linux/gfp.h>
+ #include <linux/err.h>
+ #include <linux/fs.h>
++#include <linux/list.h>
  
  /*
-+ * The xbitmap implementation supports up to ULONG_MAX bits, and it is
-+ * implemented based on ida bitmaps. So, given an unsigned long index,
-+ * the high order XB_INDEX_BITS bits of the index is used to find the
-+ * corresponding item (i.e. ida bitmap) from the radix tree, and the low
-+ * order (i.e. ilog2(IDA_BITMAP_BITS)) bits of the index are indexed into
-+ * the ida bitmap to find the bit.
+  * Balloon device information descriptor.
+@@ -66,7 +67,9 @@ struct balloon_dev_info {
+ 	struct inode *inode;
+ };
+ 
+-extern struct page *balloon_page_enqueue(struct balloon_dev_info *b_dev_info);
++extern struct page *balloon_page_alloc(void);
++extern void balloon_page_enqueue(struct balloon_dev_info *b_dev_info,
++				 struct page *page);
+ extern struct page *balloon_page_dequeue(struct balloon_dev_info *b_dev_info);
+ 
+ static inline void balloon_devinfo_init(struct balloon_dev_info *balloon)
+@@ -86,6 +89,35 @@ extern void balloon_page_putback(struct page *page);
+ extern int balloon_page_migrate(struct address_space *mapping,
+ 				struct page *newpage,
+ 				struct page *page, enum migrate_mode mode);
++/*
++ * balloon_page_push - insert a page into a page list.
++ * @head : pointer to list
++ * @page : page to be added
++ *
++ * Caller must ensure the page is private and protect the list.
 + */
-+#define XB_INDEX_BITS		(BITS_PER_LONG - ilog2(IDA_BITMAP_BITS))
-+#define XB_MAX_PATH		(DIV_ROUND_UP(XB_INDEX_BITS, \
-+					      RADIX_TREE_MAP_SHIFT))
-+#define XB_PRELOAD_SIZE		(XB_MAX_PATH * 2 - 1)
++static inline void balloon_page_push(struct list_head *pages, struct page *page)
++{
++	list_add(&page->lru, pages);
++}
 +
 +/*
-  * Per-cpu pool of preloaded nodes
++ * balloon_page_pop - remove a page from a page list.
++ * @head : pointer to list
++ * @page : page to be added
++ *
++ * Caller must ensure the page is private and protect the list.
++ */
++static inline struct page *balloon_page_pop(struct list_head *pages)
++{
++	struct page *page = list_first_entry_or_null(pages, struct page, lru);
++
++	if (!page)
++		return NULL;
++
++	list_del(&page->lru);
++	return page;
++}
+ 
+ /*
+  * balloon_page_insert - insert a page into the balloon's page list and make
+diff --git a/mm/balloon_compaction.c b/mm/balloon_compaction.c
+index 68d2892..16212c7 100644
+--- a/mm/balloon_compaction.c
++++ b/mm/balloon_compaction.c
+@@ -11,22 +11,36 @@
+ #include <linux/balloon_compaction.h>
+ 
+ /*
+- * balloon_page_enqueue - allocates a new page and inserts it into the balloon
++ * balloon_page_alloc - allocates a new page for insertion into the balloon
+  *			  page list.
++ *
++ * Driver must call it to properly allocate a new enlisted balloon page.
++ * Driver must call balloon_page_enqueue before definitively removing it from
++ * the guest system.  This function returns the page address for the recently
++ * allocated page or NULL in the case we fail to allocate a new page this turn.
++ */
++struct page *balloon_page_alloc(void)
++{
++	struct page *page = alloc_page(balloon_mapping_gfp_mask() |
++				       __GFP_NOMEMALLOC | __GFP_NORETRY);
++	return page;
++}
++EXPORT_SYMBOL_GPL(balloon_page_alloc);
++
++/*
++ * balloon_page_enqueue - inserts a new page into the balloon page list.
+  * @b_dev_info: balloon device descriptor where we will insert a new page to
++ * @page: new page to enqueue - allocated using balloon_page_alloc.
+  *
+- * Driver must call it to properly allocate a new enlisted balloon page
++ * Driver must call it to properly enqueue a new enlisted balloon page
+  * before definitively removing it from the guest system.
+  * This function returns the page address for the recently enqueued page or
+  * NULL in the case we fail to allocate a new page this turn.
   */
- struct radix_tree_preload {
-@@ -840,6 +853,8 @@ int __radix_tree_create(struct radix_tree_root *root, unsigned long index,
- 							offset, 0, 0);
- 			if (!child)
- 				return -ENOMEM;
-+			if (is_idr(root))
-+				all_tag_set(child, IDR_FREE);
- 			rcu_assign_pointer(*slot, node_to_entry(child));
- 			if (node)
- 				node->count++;
-@@ -1986,8 +2001,8 @@ void __radix_tree_delete_node(struct radix_tree_root *root,
- 	delete_node(root, node, update_node, private);
- }
- 
--static bool __radix_tree_delete(struct radix_tree_root *root,
--				struct radix_tree_node *node, void __rcu **slot)
-+bool __radix_tree_delete(struct radix_tree_root *root,
-+			 struct radix_tree_node *node, void __rcu **slot)
+-struct page *balloon_page_enqueue(struct balloon_dev_info *b_dev_info)
++void balloon_page_enqueue(struct balloon_dev_info *b_dev_info,
++			  struct page *page)
  {
- 	void *old = rcu_dereference_raw(*slot);
- 	int exceptional = radix_tree_exceptional_entry(old) ? -1 : 0;
-@@ -2005,6 +2020,38 @@ static bool __radix_tree_delete(struct radix_tree_root *root,
- }
+ 	unsigned long flags;
+-	struct page *page = alloc_page(balloon_mapping_gfp_mask() |
+-				       __GFP_NOMEMALLOC | __GFP_NORETRY);
+-	if (!page)
+-		return NULL;
  
- /**
-+ *  xb_preload - preload for xb_set_bit()
-+ *  @gfp_mask: allocation mask to use for preloading
-+ *
-+ * Preallocate memory to use for the next call to xb_set_bit(). On success,
-+ * return true, with preemption disabled. On error, return false with
-+ * preemption not disabled.
-+ */
-+bool xb_preload(gfp_t gfp)
-+{
-+	if (!this_cpu_read(ida_bitmap)) {
-+		struct ida_bitmap *bitmap = kmalloc(sizeof(*bitmap), gfp);
-+
-+		if (!bitmap)
-+			return false;
-+		/*
-+		 * The per-CPU variable is updated with preemption enabled.
-+		 * If the calling task is unlucky to be scheduled to another
-+		 * CPU which has no ida_bitmap allocation, it will be detected
-+		 * when setting a bit (i.e. __xb_set_bit()).
-+		 */
-+		bitmap = this_cpu_cmpxchg(ida_bitmap, NULL, bitmap);
-+		kfree(bitmap);
-+	}
-+
-+	if (__radix_tree_preload(gfp, XB_PRELOAD_SIZE) < 0)
-+		return false;
-+
-+	return true;
-+}
-+EXPORT_SYMBOL(xb_preload);
-+
-+/**
-  * radix_tree_iter_delete - delete the entry at this iterator position
-  * @root: radix tree root
-  * @iter: iterator state
-diff --git a/lib/xbitmap.c b/lib/xbitmap.c
-new file mode 100644
-index 0000000..3e891d6
---- /dev/null
-+++ b/lib/xbitmap.c
-@@ -0,0 +1,283 @@
-+#include <linux/slab.h>
-+#include <linux/xbitmap.h>
-+
-+/**
-+ *  xb_set_bit - set a bit in the xbitmap
-+ *  @xb: the xbitmap tree used to record the bit
-+ *  @bit: index of the bit to set
-+ *
-+ * Returns: 0 on success; -EAGAIN on error, and the caller is expected to
-+ * restart from xb_preload.
-+ */
-+int xb_set_bit(struct xb *xb, unsigned long bit)
-+{
-+	int err;
-+	unsigned long index = bit / IDA_BITMAP_BITS;
-+	struct radix_tree_root *root = &xb->xbrt;
-+	struct radix_tree_node *node;
-+	void **slot;
-+	struct ida_bitmap *bitmap;
-+	unsigned long ebit;
-+
-+	bit %= IDA_BITMAP_BITS;
-+	ebit = bit + 2;
-+
-+	err = __radix_tree_create(root, index, 0, &node, &slot);
-+	if (err)
-+		return err;
-+	bitmap = rcu_dereference_raw(*slot);
-+	if (radix_tree_exception(bitmap)) {
-+		unsigned long tmp = (unsigned long)bitmap;
-+
-+		if (ebit < BITS_PER_LONG) {
-+			tmp |= 1UL << ebit;
-+			rcu_assign_pointer(*slot, (void *)tmp);
-+			return 0;
-+		}
-+		bitmap = this_cpu_xchg(ida_bitmap, NULL);
-+		if (!bitmap)
-+			return -EAGAIN;
-+		memset(bitmap, 0, sizeof(*bitmap));
-+		bitmap->bitmap[0] = tmp >> RADIX_TREE_EXCEPTIONAL_SHIFT;
-+		rcu_assign_pointer(*slot, bitmap);
-+	}
-+
-+	if (!bitmap) {
-+		if (ebit < BITS_PER_LONG) {
-+			bitmap = (void *)((1UL << ebit) |
-+					RADIX_TREE_EXCEPTIONAL_ENTRY);
-+			__radix_tree_replace(root, node, slot, bitmap, NULL,
-+						NULL);
-+			return 0;
-+		}
-+		bitmap = this_cpu_xchg(ida_bitmap, NULL);
-+		if (!bitmap)
-+			return -EAGAIN;
-+		memset(bitmap, 0, sizeof(*bitmap));
-+		__radix_tree_replace(root, node, slot, bitmap, NULL, NULL);
-+	}
-+
-+	__set_bit(bit, bitmap->bitmap);
-+	return 0;
-+}
-+EXPORT_SYMBOL(xb_set_bit);
-+
-+/**
-+ *  xb_preload_and_set_bit - preload the memory and set a bit in the xbitmap
-+ *  @xb: the xbitmap tree used to record the bit
-+ *  @bit: index of the bit to set
-+ *
-+ * A wrapper of the xb_preload() and xb_set_bit().
-+ * Returns: 0 on success; -EAGAIN or -ENOMEM on error.
-+ */
-+int xb_preload_and_set_bit(struct xb *xb, unsigned long bit, gfp_t gfp)
-+{
-+	int ret = 0;
-+
-+	if (!xb_preload(gfp))
-+		return -ENOMEM;
-+
-+	ret = xb_set_bit(xb, bit);
-+	xb_preload_end();
-+
-+	return ret;
-+}
-+EXPORT_SYMBOL(xb_preload_and_set_bit);
-+
-+/**
-+ * xb_clear_bit - clear a bit in the xbitmap
-+ * @xb: the xbitmap tree used to record the bit
-+ * @bit: index of the bit to clear
-+ *
-+ * This function is used to clear a bit in the xbitmap. If all the bits of the
-+ * bitmap are 0, the bitmap will be freed.
-+ */
-+void xb_clear_bit(struct xb *xb, unsigned long bit)
-+{
-+	unsigned long index = bit / IDA_BITMAP_BITS;
-+	struct radix_tree_root *root = &xb->xbrt;
-+	struct radix_tree_node *node;
-+	void **slot;
-+	struct ida_bitmap *bitmap;
-+	unsigned long ebit;
-+
-+	bit %= IDA_BITMAP_BITS;
-+	ebit = bit + 2;
-+
-+	bitmap = __radix_tree_lookup(root, index, &node, &slot);
-+	if (radix_tree_exception(bitmap)) {
-+		unsigned long tmp = (unsigned long)bitmap;
-+
-+		if (ebit >= BITS_PER_LONG)
-+			return;
-+		tmp &= ~(1UL << ebit);
-+		if (tmp == RADIX_TREE_EXCEPTIONAL_ENTRY)
-+			__radix_tree_delete(root, node, slot);
-+		else
-+			rcu_assign_pointer(*slot, (void *)tmp);
-+		return;
-+	}
-+
-+	if (!bitmap)
-+		return;
-+
-+	__clear_bit(bit, bitmap->bitmap);
-+	if (bitmap_empty(bitmap->bitmap, IDA_BITMAP_BITS)) {
-+		kfree(bitmap);
-+		__radix_tree_delete(root, node, slot);
-+	}
-+}
-+EXPORT_SYMBOL(xb_clear_bit);
-+
-+/**
-+ * xb_clear_bit - clear a range of bits in the xbitmap
-+ * @start: the start of the bit range, inclusive
-+ * @end: the end of the bit range, inclusive
-+ *
-+ * This function is used to clear a bit in the xbitmap. If all the bits of the
-+ * bitmap are 0, the bitmap will be freed.
-+ */
-+void xb_clear_bit_range(struct xb *xb, unsigned long start, unsigned long end)
-+{
-+	struct radix_tree_root *root = &xb->xbrt;
-+	struct radix_tree_node *node;
-+	void **slot;
-+	struct ida_bitmap *bitmap;
-+	unsigned int nbits;
-+
-+	for (; start < end; start = (start | (IDA_BITMAP_BITS - 1)) + 1) {
-+		unsigned long index = start / IDA_BITMAP_BITS;
-+		unsigned long bit = start % IDA_BITMAP_BITS;
-+
-+		bitmap = __radix_tree_lookup(root, index, &node, &slot);
-+		if (radix_tree_exception(bitmap)) {
-+			unsigned long ebit = bit + 2;
-+			unsigned long tmp = (unsigned long)bitmap;
-+
-+			nbits = min(end - start + 1, BITS_PER_LONG - ebit);
-+
-+			if (ebit >= BITS_PER_LONG)
-+				continue;
-+			bitmap_clear(&tmp, ebit, nbits);
-+			if (tmp == RADIX_TREE_EXCEPTIONAL_ENTRY)
-+				__radix_tree_delete(root, node, slot);
-+			else
-+				rcu_assign_pointer(*slot, (void *)tmp);
-+		} else if (bitmap) {
-+			nbits = min(end - start + 1, IDA_BITMAP_BITS - bit);
-+
-+			if (nbits != IDA_BITMAP_BITS)
-+				bitmap_clear(bitmap->bitmap, bit, nbits);
-+
-+			if (nbits == IDA_BITMAP_BITS ||
-+				bitmap_empty(bitmap->bitmap, IDA_BITMAP_BITS)) {
-+				kfree(bitmap);
-+				__radix_tree_delete(root, node, slot);
-+			}
-+		}
-+	}
-+}
-+EXPORT_SYMBOL(xb_clear_bit_range);
-+
-+/**
-+ * xb_test_bit - test a bit in the xbitmap
-+ * @xb: the xbitmap tree used to record the bit
-+ * @bit: index of the bit to test
-+ *
-+ * This function is used to test a bit in the xbitmap.
-+ * Returns: 1 if the bit is set, or 0 otherwise.
-+ */
-+bool xb_test_bit(struct xb *xb, unsigned long bit)
-+{
-+	unsigned long index = bit / IDA_BITMAP_BITS;
-+	const struct radix_tree_root *root = &xb->xbrt;
-+	struct ida_bitmap *bitmap = radix_tree_lookup(root, index);
-+
-+	bit %= IDA_BITMAP_BITS;
-+
-+	if (!bitmap)
-+		return false;
-+	if (radix_tree_exception(bitmap)) {
-+		bit += RADIX_TREE_EXCEPTIONAL_SHIFT;
-+		if (bit > BITS_PER_LONG)
-+			return false;
-+		return (unsigned long)bitmap & (1UL << bit);
-+	}
-+
-+	return test_bit(bit, bitmap->bitmap);
-+}
-+EXPORT_SYMBOL(xb_test_bit);
-+
-+static unsigned long xb_find_next_bit(struct xb *xb, unsigned long start,
-+				      unsigned long end, bool set)
-+{
-+	struct radix_tree_root *root = &xb->xbrt;
-+	struct radix_tree_node *node;
-+	void **slot;
-+	struct ida_bitmap *bmap;
-+	unsigned long ret = end + 1;
-+
-+	for (; start < end; start = (start | (IDA_BITMAP_BITS - 1)) + 1) {
-+		unsigned long index = start / IDA_BITMAP_BITS;
-+		unsigned long bit = start % IDA_BITMAP_BITS;
-+
-+		bmap = __radix_tree_lookup(root, index, &node, &slot);
-+		if (radix_tree_exception(bmap)) {
-+			unsigned long tmp = (unsigned long)bmap;
-+			unsigned long ebit = bit + 2;
-+
-+			if (ebit >= BITS_PER_LONG)
-+				continue;
-+			if (set)
-+				ret = find_next_bit(&tmp, BITS_PER_LONG, ebit);
-+			else
-+				ret = find_next_zero_bit(&tmp, BITS_PER_LONG,
-+							 ebit);
-+			if (ret < BITS_PER_LONG)
-+				return ret - 2 + IDA_BITMAP_BITS * index;
-+		} else if (bmap) {
-+			if (set)
-+				ret = find_next_bit(bmap->bitmap,
-+						    IDA_BITMAP_BITS, bit);
-+			else
-+				ret = find_next_zero_bit(bmap->bitmap,
-+							 IDA_BITMAP_BITS, bit);
-+			if (ret < IDA_BITMAP_BITS)
-+				return ret + index * IDA_BITMAP_BITS;
-+		} else if (!bmap && !set) {
-+			return start;
-+		}
-+	}
-+
-+	return ret;
-+}
-+
-+/**
-+ * xb_find_next_set_bit - find the next set bit in a range
-+ * @xb: the xbitmap to search
-+ * @start: the start of the range, inclusive
-+ * @end: the end of the range, inclusive
-+ *
-+ * Returns: the index of the found bit, or @end + 1 if no such bit is found.
-+ */
-+unsigned long xb_find_next_set_bit(struct xb *xb, unsigned long start,
-+				   unsigned long end)
-+{
-+	return xb_find_next_bit(xb, start, end, 1);
-+}
-+EXPORT_SYMBOL(xb_find_next_set_bit);
-+
-+/**
-+ * xb_find_next_zero_bit - find the next zero bit in a range
-+ * @xb: the xbitmap to search
-+ * @start: the start of the range, inclusive
-+ * @end: the end of the range, inclusive
-+ *
-+ * Returns: the index of the found bit, or @end + 1 if no such bit is found.
-+ */
-+unsigned long xb_find_next_zero_bit(struct xb *xb, unsigned long start,
-+				    unsigned long end)
-+{
-+	return xb_find_next_bit(xb, start, end, 0);
-+}
-+EXPORT_SYMBOL(xb_find_next_zero_bit);
+ 	/*
+ 	 * Block others from accessing the 'page' when we get around to
 -- 
 2.7.4
