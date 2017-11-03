@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52463)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52669)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eAgfM-0007LX-U6
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 14:26:05 -0400
+	(envelope-from <eblake@redhat.com>) id 1eAggX-00085M-4h
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 14:27:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eAgfJ-0006xQ-N8
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 14:26:04 -0400
-Received: from indium.canonical.com ([91.189.90.7]:60600)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eAgfJ-0006w8-Gh
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 14:26:01 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eAgfH-0005jm-D2
-	for <qemu-devel@nongnu.org>; Fri, 03 Nov 2017 18:25:59 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 2F7962E80D6
-	for <qemu-devel@nongnu.org>; Fri,  3 Nov 2017 18:25:58 +0000 (UTC)
+	(envelope-from <eblake@redhat.com>) id 1eAggT-0007wQ-VH
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 14:27:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52986)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eAggT-0007w7-MK
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 14:27:13 -0400
+References: <20171103153333.6416-1-berrange@redhat.com>
+	<20171103153333.6416-2-berrange@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <af7e8423-bde8-b2f8-1c7d-fe32fdfb7e8e@redhat.com>
+Date: Fri, 3 Nov 2017 13:27:10 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 03 Nov 2017 18:19:17 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1689367 <1689367@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170508175438.13498.58008.malonedeb@chaenomeles.canonical.com>
-Message-Id: <150973315760.20130.2764770403417409737.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1689367] Re: In qemu chroot,
- repeating "qemu: Unsupported syscall: 384" messages. sys_getrandom ?
+In-Reply-To: <20171103153333.6416-2-berrange@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="nqx9UXhN1tH6m5Mrhm6HIeqF7RauURQ7e"
+Subject: Re: [Qemu-devel] [PATCH v3 1/5] build: allow setting a custom GIT
+ binary for transparent proxying
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,62 +29,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 
-The other interesting question is what version of the (host) kernel
-headers the QEMU binary was built against -- if that's earlier than 3.17
-then the headers won't define __NR_getrandom for the host system and we
-won't implement the syscall.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--nqx9UXhN1tH6m5Mrhm6HIeqF7RauURQ7e
+From: Eric Blake <eblake@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>,
+ Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <af7e8423-bde8-b2f8-1c7d-fe32fdfb7e8e@redhat.com>
+Subject: Re: [PATCH v3 1/5] build: allow setting a custom GIT binary for
+ transparent proxying
+References: <20171103153333.6416-1-berrange@redhat.com>
+ <20171103153333.6416-2-berrange@redhat.com>
+In-Reply-To: <20171103153333.6416-2-berrange@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
--- =
+On 11/03/2017 10:33 AM, Daniel P. Berrange wrote:
+> Some users can't run a bare 'git' command, due to need for a transparen=
+t
+> proxying solution such as 'tsocks'. This adds an argument to configure =
+to
+> let users specify such a thing:
+>=20
+>   ./configure --with-git=3D"tsocks git"
+>=20
+> The submodule script is also updated to give the user a hint about usin=
+g this
+> flag, if we fail to checkout modules.
+>=20
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> ---
+>  Makefile                 |  4 ++--
+>  configure                |  5 +++++
+>  scripts/git-submodule.sh | 29 ++++++++++++++++++++++++-----
+>  3 files changed, 31 insertions(+), 7 deletions(-)
+>=20
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1689367
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-Title:
-  In qemu chroot, repeating "qemu: Unsupported syscall: 384" messages.
-  sys_getrandom ?
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-Status in QEMU:
-  Incomplete
 
-Bug description:
-  On exec of an armv7 qemu chroot on my local x86_64 desktop, launched
-  via
+--nqx9UXhN1tH6m5Mrhm6HIeqF7RauURQ7e
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-          /usr/sbin/qemu-binfmt-conf.sh
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-  from
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAln8tP8ACgkQp6FrSiUn
+Q2oKSgf9HakbRk1wvzkMvYCTY0XvXRsgSlfcdbFrA+j2e29/ro11YMV22eGEuwq3
+UnaSC/8mvagcMzprpD7lNKu2bm2PpIrVBf6d8Yu95dhGcIC0uJsB0eaM4mT0XWC1
+OpUA0l7aEYQQF944UFNSZM90xpOS2xXWPbKll38RiEFIB913s69tyeVVXRm3dxHj
+VQgZp8PBoBdxlq6ZkCCgimigDnuzC2NBuHJaacra+n6w37JRRTgnlYcbZDcuatUC
+Jv5J4YTg62JC4cnvgEpet9W/sVJnmsykmkfxtnoGOcSXhE5q2jaWZWAk9Zh2tnm8
+IL2uVEc9Y0zQdMeWawjlMUb52eKTTg==
+=/DZi
+-----END PGP SIGNATURE-----
 
-          qemu-linux-user-2.9.0-374.1.x86_64
-
-  on the host, inside the chroot any compile activity is laced with
-  repetitions of
-
-          qemu: Unsupported syscall: 384
-
-  messages.
-
-  This wasn't always the case -- but, TBH, it's been ~ 6 months since I
-  used this env, and there have been scads of usual pkg updates in the
-  interim.  These messages appear to be non-fatal, with no particular
-  effect at all; at least not so far ...
-
-  From a chat in #IRC,
-
-  	[10:05] davidgiluk clever/pgnd: I see it as getrandom
-  	[10:05] davidgiluk pgnd: https://fedora.juszkiewicz.com.pl/syscalls.html=
-   sort it on the ARM table and you can easily see it
-  	[10:05] clever arch/arm/tools/syscall.tbl:384  common  getrandom        =
-       sys_getrandom
-  	[10:06] davidgiluk pgnd: my *guess* is that something is calling getrand=
-om, getting told it's not implemented and then falling back to using /dev/u=
-random
-  	[10:10] pgnd davidgiluk: If that *is* the case, is it to be considered a=
- problem, or just informational?
-  	[10:12] davidgiluk pgnd: As long as it's falling back probably informati=
-onal; but someone should probably go and wire up sys_getrandom at some point
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1689367/+subscriptions
+--nqx9UXhN1tH6m5Mrhm6HIeqF7RauURQ7e--
