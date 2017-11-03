@@ -1,25 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59844)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60674)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eAjVD-00012i-RI
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 17:27:48 -0400
+	id 1eAjb6-0002R1-Sw
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 17:33:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eAjVC-0002Cc-TZ
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 17:27:47 -0400
+	id 1eAjb3-0001rz-O8
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 17:33:52 -0400
+Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:46371)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eAjb3-0001rc-IJ
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 17:33:49 -0400
+Received: by mail-qt0-x241.google.com with SMTP id 1so4900550qtn.3
+	for <qemu-devel@nongnu.org>; Fri, 03 Nov 2017 14:33:49 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-References: <20171103202624.5956-1-laurent@vivier.eu>
+References: <20170920131823.16347-1-laurent@vivier.eu>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <db255c93-a4c6-216d-8ea3-10f340a916f6@amsat.org>
-Date: Fri, 3 Nov 2017 18:27:36 -0300
+Message-ID: <858581a0-880f-794c-7d36-de7ba668462f@amsat.org>
+Date: Fri, 3 Nov 2017 18:33:44 -0300
 MIME-Version: 1.0
-In-Reply-To: <20171103202624.5956-1-laurent@vivier.eu>
+In-Reply-To: <20170920131823.16347-1-laurent@vivier.eu>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 0/4] softfloat: fix some helper
- definitions
+Subject: Re: [Qemu-devel] [PATCH v3] softfloat: rename
+ make_float[x80|128]_init to const_float[x80|128]
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,51 +36,130 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, qemu-arm@nongnu.org, Stafford Horne <shorne@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: Eric Blake <eblake@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, Peter Maydell <peter.maydell@linaro.org>
 
-Hi Laurent,
-
-On 11/03/2017 05:26 PM, Laurent Vivier wrote:
-> This series fixes some errors found by
-> enabling USE_SOFTFLOAT_STRUCT_TYPES.
+On 09/20/2017 10:18 AM, Laurent Vivier wrote:
+> We already have const_float16(), const_float32() and const_float64(),
+> so rename make_floatx80_init() and make_float128_init() to now be
+> const_floatx80() and const_float128(), for consistency.
 > 
-> Most of them are helpers using int types
-> instead of float types.
-> This also requires the use of floatXX_val()
-> and make_floatXX().
+> Redefine make_float16(), make_float32() and make_float64() to be like
+> make_floatx80() and make_float128(), by using a compound literal.
 > 
-> Laurent Vivier (4):
->   arm: fix float64 helper definitions
->   openrisc: fix float32 and float64 helper definitions
->   tricore: use make_float32() and float32_val()
->   softfloat: use floatXX_val() in XX_minmax()
+> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
+> ---
+> v3: update patch description
+> v2: change float16(), make_float32() and make_float64()
+>     instead of make_floatx80() and make_float128()
 > 
->  fpu/softfloat.c              |  8 +++----
->  target/arm/helper-a64.h      |  6 ++---
->  target/openrisc/fpu_helper.c | 52 ++++++++++++++++++++++----------------------
->  target/openrisc/helper.h     | 20 ++++++++---------
->  target/tricore/fpu_helper.c  | 34 ++++++++++++++---------------
->  5 files changed, 60 insertions(+), 60 deletions(-)
+>  include/fpu/softfloat.h  | 10 +++++-----
+>  target/m68k/fpu_helper.c | 44 ++++++++++++++++++++++----------------------
+>  2 files changed, 27 insertions(+), 27 deletions(-)
 > 
-
-I'm getting those errors:
-
-$ make subdir-arm-softmmu -j2
-
-/source/qemu/migration/vmstate-types.c:430:5: error: conversion to
-non-scalar type requested
-     qemu_put_be64(f, float64_val(*v));
-     ^~~~~~~~~~~~~
-make: *** [migration/vmstate-types.o] Error 1
-
-In file included from /source/qemu/fpu/softfloat.c:87:0:
-/source/qemu/fpu/softfloat-specialize.h: In function ‘float16_default_nan’:
-/source/qemu/include/fpu/softfloat.h:117:26: error: expected expression
-before ‘{’ token
- #define const_float16(x) { x }
-                          ^
-/source/qemu/fpu/softfloat-specialize.h:95:12: note: in expansion of
-macro ‘const_float16’
-     return const_float16(0x7E00);
-            ^~~~~~~~~~~~~
-make: *** [fpu/softfloat.o] Error 1
+> diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
+> index 0f96a0edd1..cda6421b23 100644
+> --- a/include/fpu/softfloat.h
+> +++ b/include/fpu/softfloat.h
+> @@ -113,20 +113,20 @@ typedef struct {
+>      uint16_t v;
+>  } float16;
+>  #define float16_val(x) (((float16)(x)).v)
+> -#define make_float16(x) __extension__ ({ float16 f16_val = {x}; f16_val; })
+> +#define make_float16(x) ((float16) { x })
+>  #define const_float16(x) { x }
+>  typedef struct {
+>      uint32_t v;
+>  } float32;
+>  /* The cast ensures an error if the wrong type is passed.  */
+>  #define float32_val(x) (((float32)(x)).v)
+> -#define make_float32(x) __extension__ ({ float32 f32_val = {x}; f32_val; })
+> +#define make_float32(x) ((float32) { x })
+>  #define const_float32(x) { x }
+>  typedef struct {
+>      uint64_t v;
+>  } float64;
+>  #define float64_val(x) (((float64)(x)).v)
+> -#define make_float64(x) __extension__ ({ float64 f64_val = {x}; f64_val; })
+> +#define make_float64(x) ((float64) { x })
+>  #define const_float64(x) { x }
+>  #else
+>  typedef uint16_t float16;
+> @@ -147,7 +147,7 @@ typedef struct {
+>      uint16_t high;
+>  } floatx80;
+>  #define make_floatx80(exp, mant) ((floatx80) { mant, exp })
+> -#define make_floatx80_init(exp, mant) { .low = mant, .high = exp }
+> +#define const_floatx80(exp, mant) { .low = mant, .high = exp }
+>  typedef struct {
+>  #ifdef HOST_WORDS_BIGENDIAN
+>      uint64_t high, low;
+> @@ -156,7 +156,7 @@ typedef struct {
+>  #endif
+>  } float128;
+>  #define make_float128(high_, low_) ((float128) { .high = high_, .low = low_ })
+> -#define make_float128_init(high_, low_) { .high = high_, .low = low_ }
+> +#define const_float128(high_, low_) { .high = high_, .low = low_ }
+>  
+>  /*----------------------------------------------------------------------------
+>  | Software IEC/IEEE floating-point underflow tininess-detection mode.
+> diff --git a/target/m68k/fpu_helper.c b/target/m68k/fpu_helper.c
+> index 665e7609af..bf62cf8003 100644
+> --- a/target/m68k/fpu_helper.c
+> +++ b/target/m68k/fpu_helper.c
+> @@ -29,28 +29,28 @@
+>   */
+>  
+>  static const floatx80 fpu_rom[128] = {
+> -    [0x00] = make_floatx80_init(0x4000, 0xc90fdaa22168c235ULL),  /* Pi       */
+> -    [0x0b] = make_floatx80_init(0x3ffd, 0x9a209a84fbcff798ULL),  /* Log10(2) */
+> -    [0x0c] = make_floatx80_init(0x4000, 0xadf85458a2bb4a9aULL),  /* e        */
+> -    [0x0d] = make_floatx80_init(0x3fff, 0xb8aa3b295c17f0bcULL),  /* Log2(e)  */
+> -    [0x0e] = make_floatx80_init(0x3ffd, 0xde5bd8a937287195ULL),  /* Log10(e) */
+> -    [0x0f] = make_floatx80_init(0x0000, 0x0000000000000000ULL),  /* Zero     */
+> -    [0x30] = make_floatx80_init(0x3ffe, 0xb17217f7d1cf79acULL),  /* ln(2)    */
+> -    [0x31] = make_floatx80_init(0x4000, 0x935d8dddaaa8ac17ULL),  /* ln(10)   */
+> -    [0x32] = make_floatx80_init(0x3fff, 0x8000000000000000ULL),  /* 10^0     */
+> -    [0x33] = make_floatx80_init(0x4002, 0xa000000000000000ULL),  /* 10^1     */
+> -    [0x34] = make_floatx80_init(0x4005, 0xc800000000000000ULL),  /* 10^2     */
+> -    [0x35] = make_floatx80_init(0x400c, 0x9c40000000000000ULL),  /* 10^4     */
+> -    [0x36] = make_floatx80_init(0x4019, 0xbebc200000000000ULL),  /* 10^8     */
+> -    [0x37] = make_floatx80_init(0x4034, 0x8e1bc9bf04000000ULL),  /* 10^16    */
+> -    [0x38] = make_floatx80_init(0x4069, 0x9dc5ada82b70b59eULL),  /* 10^32    */
+> -    [0x39] = make_floatx80_init(0x40d3, 0xc2781f49ffcfa6d5ULL),  /* 10^64    */
+> -    [0x3a] = make_floatx80_init(0x41a8, 0x93ba47c980e98ce0ULL),  /* 10^128   */
+> -    [0x3b] = make_floatx80_init(0x4351, 0xaa7eebfb9df9de8eULL),  /* 10^256   */
+> -    [0x3c] = make_floatx80_init(0x46a3, 0xe319a0aea60e91c7ULL),  /* 10^512   */
+> -    [0x3d] = make_floatx80_init(0x4d48, 0xc976758681750c17ULL),  /* 10^1024  */
+> -    [0x3e] = make_floatx80_init(0x5a92, 0x9e8b3b5dc53d5de5ULL),  /* 10^2048  */
+> -    [0x3f] = make_floatx80_init(0x7525, 0xc46052028a20979bULL),  /* 10^4096  */
+> +    [0x00] = const_floatx80(0x4000, 0xc90fdaa22168c235ULL),  /* Pi       */
+> +    [0x0b] = const_floatx80(0x3ffd, 0x9a209a84fbcff798ULL),  /* Log10(2) */
+> +    [0x0c] = const_floatx80(0x4000, 0xadf85458a2bb4a9aULL),  /* e        */
+> +    [0x0d] = const_floatx80(0x3fff, 0xb8aa3b295c17f0bcULL),  /* Log2(e)  */
+> +    [0x0e] = const_floatx80(0x3ffd, 0xde5bd8a937287195ULL),  /* Log10(e) */
+> +    [0x0f] = const_floatx80(0x0000, 0x0000000000000000ULL),  /* Zero     */
+> +    [0x30] = const_floatx80(0x3ffe, 0xb17217f7d1cf79acULL),  /* ln(2)    */
+> +    [0x31] = const_floatx80(0x4000, 0x935d8dddaaa8ac17ULL),  /* ln(10)   */
+> +    [0x32] = const_floatx80(0x3fff, 0x8000000000000000ULL),  /* 10^0     */
+> +    [0x33] = const_floatx80(0x4002, 0xa000000000000000ULL),  /* 10^1     */
+> +    [0x34] = const_floatx80(0x4005, 0xc800000000000000ULL),  /* 10^2     */
+> +    [0x35] = const_floatx80(0x400c, 0x9c40000000000000ULL),  /* 10^4     */
+> +    [0x36] = const_floatx80(0x4019, 0xbebc200000000000ULL),  /* 10^8     */
+> +    [0x37] = const_floatx80(0x4034, 0x8e1bc9bf04000000ULL),  /* 10^16    */
+> +    [0x38] = const_floatx80(0x4069, 0x9dc5ada82b70b59eULL),  /* 10^32    */
+> +    [0x39] = const_floatx80(0x40d3, 0xc2781f49ffcfa6d5ULL),  /* 10^64    */
+> +    [0x3a] = const_floatx80(0x41a8, 0x93ba47c980e98ce0ULL),  /* 10^128   */
+> +    [0x3b] = const_floatx80(0x4351, 0xaa7eebfb9df9de8eULL),  /* 10^256   */
+> +    [0x3c] = const_floatx80(0x46a3, 0xe319a0aea60e91c7ULL),  /* 10^512   */
+> +    [0x3d] = const_floatx80(0x4d48, 0xc976758681750c17ULL),  /* 10^1024  */
+> +    [0x3e] = const_floatx80(0x5a92, 0x9e8b3b5dc53d5de5ULL),  /* 10^2048  */
+> +    [0x3f] = const_floatx80(0x7525, 0xc46052028a20979bULL),  /* 10^4096  */
+>  };
+>  
+>  int32_t HELPER(reds32)(CPUM68KState *env, FPReg *val)
+> 
