@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35309)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36442)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1eAach-0007pN-FP
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 07:58:57 -0400
+	(envelope-from <thuth@redhat.com>) id 1eAafc-0001pS-KK
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 08:01:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1eAacc-000671-Ht
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 07:58:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34438)
+	(envelope-from <thuth@redhat.com>) id 1eAafX-0000TB-1B
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 08:01:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54512)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1eAacc-00065Y-9M
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 07:58:50 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 146396A7C6
-	for <qemu-devel@nongnu.org>; Fri,  3 Nov 2017 11:58:49 +0000 (UTC)
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Fri,  3 Nov 2017 12:58:40 +0100
-Message-Id: <20171103115842.1534-2-kraxel@redhat.com>
-In-Reply-To: <20171103115842.1534-1-kraxel@redhat.com>
-References: <20171103115842.1534-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/3] sdl: remove -no-frame support
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1eAafW-0000SF-PU
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 08:01:50 -0400
+References: <20171027181740.32165-1-danielhb@linux.vnet.ibm.com>
+	<CAJ+F1CJs7WtU+xYfMViYer9vfRAq3SAMQiEjPRRCGnTUBbsgGQ@mail.gmail.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <f2457db3-b654-4956-165c-ef0962d9e923@redhat.com>
+Date: Fri, 3 Nov 2017 13:01:21 +0100
+MIME-Version: 1.0
+In-Reply-To: <CAJ+F1CJs7WtU+xYfMViYer9vfRAq3SAMQiEjPRRCGnTUBbsgGQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] scripts/device-crash-test: vmcoreinfo in
+ error_whitelist for ppc64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,168 +29,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Cc: QEMU <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-SDL2 doesn't support this any more, the SDL_NOFRAME window flag is gone.
-Drop the code, print a notice when the option is still used.
+On 03.11.2017 12:49, Marc-Andr=C3=A9 Lureau wrote:
+> Hi Daniel
+>=20
+> On Fri, Oct 27, 2017 at 8:17 PM, Daniel Henrique Barboza
+> <danielhb@linux.vnet.ibm.com> wrote:
+>> The device vmcoreinfo depends on the fw_cfg device to work, a device
+>> that isn't available in most ppc64 machines. This makes device-crash-t=
+est
+>> spams the following error when running with qemu-system-ppc64:
+>>
+>> "INFO: log: qemu-system-ppc64: -device vmcoreinfo: vmcoreinfo device
+>> requires fw_cfg with DMA"
+>>
+>> To fix it, this patch adds the following ppc64 machines into the
+>> error_whitelist for the vmcoreinfo device:
+>>
+>> - pseries.*
+>> - 40p
+>> - bamboo
+>> - g3beige
+>> - mac99
+>> - mpc8544ds
+>> - powernv
+>> - ppce500
+>> - prep
+>> - virtex-ml507
+>>
+>> After this patch, the only ppc64 machine that reports error on the
+>> vmcoreinfo device is the 'none' type.
+>>
+>> Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+>> ---
+>>  scripts/device-crash-test | 12 ++++++++++++
+>>  1 file changed, 12 insertions(+)
+>>
+>> diff --git a/scripts/device-crash-test b/scripts/device-crash-test
+>> index 043b24a4aa..fb8a43d679 100755
+>> --- a/scripts/device-crash-test
+>> +++ b/scripts/device-crash-test
+>> @@ -163,6 +163,18 @@ ERROR_WHITELIST =3D [
+>>      # "spapr-cpu-core needs a pseries machine"
+>>      {'machine':'(?!pseries).*', 'device':'.*-spapr-cpu-core', 'expect=
+ed':True},
+>>
+>> +    # vmcoreinfo requires a fw_cfg device and will fail in these ppc6=
+4 machines
+>> +    {'machine':'pseries.*', 'device':'vmcoreinfo', 'expected':True},
+>> +    {'machine':'40p', 'device':'vmcoreinfo', 'expected':True},
+>> +    {'machine':'bamboo', 'device':'vmcoreinfo', 'expected':True},
+>> +    {'machine':'g3beige', 'device':'vmcoreinfo', 'expected':True},
+>> +    {'machine':'mac99', 'device':'vmcoreinfo', 'expected':True},
+>> +    {'machine':'mpc8544ds', 'device':'vmcoreinfo', 'expected':True},
+>> +    {'machine':'powernv', 'device':'vmcoreinfo', 'expected':True},
+>> +    {'machine':'ppce500', 'device':'vmcoreinfo', 'expected':True},
+>> +    {'machine':'prep', 'device':'vmcoreinfo', 'expected':True},
+>> +    {'machine':'virtex-ml507', 'device':'vmcoreinfo', 'expected':True=
+},
+>=20
+> You could try to make it fit on one line with
+> r"(pseries.*|40p|bamboo|...)". Declaring a ppc64_machines before would
+> probably help too.
+>=20
+> Any idea for an alternative vmcoreinfo device approach on ppc64?
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- include/ui/console.h |  5 ++---
- ui/sdl.c             |  8 +-------
- ui/sdl2.c            |  7 +------
- vl.c                 | 15 ++++-----------
- 4 files changed, 8 insertions(+), 27 deletions(-)
+It's not only about ppc64 - this problem exists also on most other
+targets, e.g.:
 
-diff --git a/include/ui/console.h b/include/ui/console.h
-index 580dfc57ee..7b35778444 100644
---- a/include/ui/console.h
-+++ b/include/ui/console.h
-@@ -436,7 +436,7 @@ void surface_gl_setup_viewport(QemuGLShader *gls,
- /* sdl.c */
- #ifdef CONFIG_SDL
- void sdl_display_early_init(int opengl);
--void sdl_display_init(DisplayState *ds, int full_screen, int no_frame);
-+void sdl_display_init(DisplayState *ds, int full_screen);
- #else
- static inline void sdl_display_early_init(int opengl)
- {
-@@ -444,8 +444,7 @@ static inline void sdl_display_early_init(int opengl)
-     error_report("SDL support is disabled");
-     abort();
- }
--static inline void sdl_display_init(DisplayState *ds, int full_screen,
--                                    int no_frame)
-+static inline void sdl_display_init(DisplayState *ds, int full_screen)
- {
-     /* This must never be called if CONFIG_SDL is disabled */
-     error_report("SDL support is disabled");
-diff --git a/ui/sdl.c b/ui/sdl.c
-index 7b71a9ac58..f3adbb7a64 100644
---- a/ui/sdl.c
-+++ b/ui/sdl.c
-@@ -48,7 +48,6 @@ static int gui_saved_width;
- static int gui_saved_height;
- static int gui_saved_grab;
- static int gui_fullscreen;
--static int gui_noframe;
- static int gui_key_modifier_pressed;
- static int gui_keysym;
- static int gui_grab_code = KMOD_LALT | KMOD_LCTRL;
-@@ -114,8 +113,6 @@ static void do_sdl_resize(int width, int height, int bpp)
-     } else {
-         flags |= SDL_RESIZABLE;
-     }
--    if (gui_noframe)
--        flags |= SDL_NOFRAME;
- 
-     tmp_screen = SDL_SetVideoMode(width, height, bpp, flags);
-     if (!real_screen) {
-@@ -944,7 +941,7 @@ void sdl_display_early_init(int opengl)
-     }
- }
- 
--void sdl_display_init(DisplayState *ds, int full_screen, int no_frame)
-+void sdl_display_init(DisplayState *ds, int full_screen)
- {
-     int flags;
-     uint8_t data = 0;
-@@ -963,9 +960,6 @@ void sdl_display_init(DisplayState *ds, int full_screen, int no_frame)
-             exit(1);
-     }
- 
--    if (no_frame)
--        gui_noframe = 1;
--
-     if (!full_screen) {
-         setenv("SDL_VIDEO_ALLOW_SCREENSAVER", "1", 0);
-     }
-diff --git a/ui/sdl2.c b/ui/sdl2.c
-index 53dd447fd2..3802a9b477 100644
---- a/ui/sdl2.c
-+++ b/ui/sdl2.c
-@@ -38,7 +38,6 @@ static int gui_grab; /* if true, all keyboard/mouse events are grabbed */
- 
- static int gui_saved_grab;
- static int gui_fullscreen;
--static int gui_noframe;
- static int gui_key_modifier_pressed;
- static int gui_keysym;
- static int gui_grab_code = KMOD_LALT | KMOD_LCTRL;
-@@ -756,7 +755,7 @@ void sdl_display_early_init(int opengl)
-     }
- }
- 
--void sdl_display_init(DisplayState *ds, int full_screen, int no_frame)
-+void sdl_display_init(DisplayState *ds, int full_screen)
- {
-     int flags;
-     uint8_t data = 0;
-@@ -764,10 +763,6 @@ void sdl_display_init(DisplayState *ds, int full_screen, int no_frame)
-     int i;
-     SDL_SysWMinfo info;
- 
--    if (no_frame) {
--        gui_noframe = 1;
--    }
--
- #ifdef __linux__
-     /* on Linux, SDL may use fbcon|directfb|svgalib when run without
-      * accessible $DISPLAY to open X11 window.  This is often the case
-diff --git a/vl.c b/vl.c
-index ec299099ff..0065161240 100644
---- a/vl.c
-+++ b/vl.c
-@@ -151,7 +151,6 @@ static int rtc_date_offset = -1; /* -1 means no change */
- QEMUClockType rtc_clock;
- int vga_interface_type = VGA_NONE;
- static int full_screen = 0;
--static int no_frame = 0;
- int no_quit = 0;
- static bool grab_on_hover;
- Chardev *serial_hds[MAX_SERIAL_PORTS];
-@@ -2165,13 +2164,7 @@ static DisplayType select_display(const char *p)
- 
-             if (strstart(opts, ",frame=", &nextopt)) {
-                 opts = nextopt;
--                if (strstart(opts, "on", &nextopt)) {
--                    no_frame = 0;
--                } else if (strstart(opts, "off", &nextopt)) {
--                    no_frame = 1;
--                } else {
--                    goto invalid_sdl_args;
--                }
-+                warn_report("frame sdl option is unsupported, ignoring");
-             } else if (strstart(opts, ",alt_grab=", &nextopt)) {
-                 opts = nextopt;
-                 if (strstart(opts, "on", &nextopt)) {
-@@ -3784,7 +3777,7 @@ int main(int argc, char **argv, char **envp)
-                 full_screen = 1;
-                 break;
-             case QEMU_OPTION_no_frame:
--                no_frame = 1;
-+                warn_report("-no-frame switch is unsupported, ignoring");
-                 break;
-             case QEMU_OPTION_alt_grab:
-                 alt_grab = 1;
-@@ -4458,7 +4451,7 @@ int main(int argc, char **argv, char **envp)
- #endif
-     }
- 
--    if ((no_frame || alt_grab || ctrl_grab) && display_type != DT_SDL) {
-+    if ((alt_grab || ctrl_grab) && display_type != DT_SDL) {
-         error_report("-no-frame, -alt-grab and -ctrl-grab are only valid "
-                      "for SDL, ignoring option");
-     }
-@@ -4809,7 +4802,7 @@ int main(int argc, char **argv, char **envp)
-         curses_display_init(ds, full_screen);
-         break;
-     case DT_SDL:
--        sdl_display_init(ds, full_screen, no_frame);
-+        sdl_display_init(ds, full_screen);
-         break;
-     case DT_COCOA:
-         cocoa_display_init(ds, full_screen);
--- 
-2.9.3
+$ m68k-softmmu/qemu-system-m68k -M none -device vmcoreinfo
+qemu-system-m68k: -device vmcoreinfo: vmcoreinfo device requires fw_cfg
+with DMA
+
+So for the device-crash-test script, I think it would make more sense to
+add a generic, machine-independent entry for this.
+
+Additionally, I think it's also a bad idea to blindly add this
+vmcoreinfo device to all targets! We should only add it to the targets
+that actually feature the fw_cfg device with DMA, so we need a proper
+CONFIG_xxx switch for this. Marc-Andr=C3=A9 or Daniel, do you have time t=
+o
+work on such a patch? Otherwise, I can have a look at this, too.
+
+ Thomas
