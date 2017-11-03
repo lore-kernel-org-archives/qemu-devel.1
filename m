@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60619)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60657)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eAfBf-0004jE-TF
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 12:51:22 -0400
+	(envelope-from <bounces@canonical.com>) id 1eAfBm-0004kp-1r
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 12:51:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eAfBb-0003hg-4u
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 12:51:19 -0400
-Received: from indium.canonical.com ([91.189.90.7]:34382)
+	(envelope-from <bounces@canonical.com>) id 1eAfBl-0003o0-1t
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 12:51:26 -0400
+Received: from indium.canonical.com ([91.189.90.7]:34920)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eAfBa-0003hK-UB
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 12:51:15 -0400
+	id 1eAfBk-0003nI-S3
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 12:51:24 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eAfBZ-0008HK-Jf
-	for <qemu-devel@nongnu.org>; Fri, 03 Nov 2017 16:51:13 +0000
+	id 1eAfBh-0008AV-Dw
+	for <qemu-devel@nongnu.org>; Fri, 03 Nov 2017 16:51:21 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 562AA2E80D5
-	for <qemu-devel@nongnu.org>; Fri,  3 Nov 2017 16:51:13 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 32B822E80D9
+	for <qemu-devel@nongnu.org>; Fri,  3 Nov 2017 16:51:21 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 03 Nov 2017 16:32:51 -0000
+Date: Fri, 03 Nov 2017 16:31:09 -0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1594069 <1594069@bugs.launchpad.net>
+Reply-To: Bug 1568107 <1568107@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20160619053325.24903.2985.malonedeb@gac.canonical.com>
-Message-Id: <150972677166.9241.10734596886329541281.malone@wampee.canonical.com>
+References: <20160408193555.1623.91065.malonedeb@wampee.canonical.com>
+Message-Id: <150972666929.4653.3307619958130646464.malone@chaenomeles.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1594069] Re: SIMD instructions translated to
- scalar host instructions
+Subject: [Qemu-devel] [Bug 1568107] Re: x86_64 linux-user: setup_rt_frame:
+ not implemented
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,40 +39,36 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Closing this because it isn't a bug. (It looks like some of the vector
-TCG improvements are now in progress and might hit master for 2.12; but
-in any case having an open bug in the system about this serves no useful
-purpose.)
+This bug was fixed in 2.9 (we added x86-64 linux-user signal handling
+support.)
 
 
 ** Changed in: qemu
-       Status: Confirmed =3D> Invalid
+       Status: New =3D> Fix Released
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1594069
+https://bugs.launchpad.net/bugs/1568107
 
 Title:
-  SIMD instructions translated to scalar host instructions
+  x86_64 linux-user: setup_rt_frame: not implemented
 
 Status in QEMU:
-  Invalid
+  Fix Released
 
 Bug description:
-  SIMD instructions inside the guest (NEON, MMX, SSE, SSE2, AVX) are
-  translated to scalar instructions on the host instead of SIMD
-  instructions.  It appears that there have been a few efforts to
-  rectify this [1], and even a submitted patch series, but all
-  discussion has effectively died out [2].
+  Trying to run this binary
+  (https://github.com/ethcore/parity/releases/download/v1.0.1/parity_linux_=
+1.0.1-0_amd64.deb)
+  under qemu-x86_64 on ARM, ends like this:
 
-  I would like to see better SIMD performance on qemu, especially as
-  non-x86 architectures are becoming widely used (e.g. ARM).
+  $ qemu-x86_64 parity --pruning fast
 
-  [1] http://dl.acm.org/citation.cfm?id=3D2757098&dl=3DACM&coll=3DDL&CFID=
-=3D633095244&CFTOKEN=3D12352103
-  [2] https://lists.nongnu.org/archive/html/qemu-devel/2014-10/msg01720.html
+  setup_rt_frame: not implemented
+  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+  Segmentation fault
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1594069/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1568107/+subscriptions
