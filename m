@@ -1,19 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46066)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47030)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1eAcon-0002Km-0z
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 10:19:37 -0400
+	(envelope-from <berrange@redhat.com>) id 1eAcr6-0004Vz-ED
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 10:21:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1eAcoi-0007vP-3a
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 10:19:32 -0400
-From: Alberto Garcia <berto@igalia.com>
-Date: Fri,  3 Nov 2017 16:18:53 +0200
-Message-Id: <f9750f50c80359babba11062e88f5075a47e8e16.1509718618.git.berto@igalia.com>
-In-Reply-To: <cover.1509718618.git.berto@igalia.com>
+	(envelope-from <berrange@redhat.com>) id 1eAcr5-00018W-A6
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 10:21:56 -0400
+Date: Fri, 3 Nov 2017 14:21:44 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20171103142144.GJ20155@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
 References: <cover.1509718618.git.berto@igalia.com>
-In-Reply-To: <cover.1509718618.git.berto@igalia.com>
-References: <cover.1509718618.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH v2 4/7] qcow2: Don't open images with
- header.refcount_table_clusters == 0
+	<ae3d77f312fc0c5e0ac2bbd71676c0112eebe2e5.1509718618.git.berto@igalia.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <ae3d77f312fc0c5e0ac2bbd71676c0112eebe2e5.1509718618.git.berto@igalia.com>
+Subject: Re: [Qemu-devel] [PATCH v2 7/7] qcow2: Assert that the crypto
+ header does not overlap other metadata
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,73 +25,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Thomas Huth <thuth@redhat.com>, "R . Nageswara Sastry" <nasastry@in.ibm.com>
+To: Alberto Garcia <berto@igalia.com>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, "R . Nageswara Sastry" <nasastry@in.ibm.com>
 
-qcow2_do_open() is checking that header.refcount_table_clusters is not
-too large, but it doesn't check that it's greater than zero. Apart
-from the fact that an image like that is obviously corrupted, trying
-to use it crashes QEMU since we end up with a null s->refcount_table
-after qcow2_refcount_init().
+On Fri, Nov 03, 2017 at 04:18:56PM +0200, Alberto Garcia wrote:
+> The crypto header is initialized only when QEMU is creating a new
+> image, so there's no chance of this happening on a corrupted image.
+> 
+> If QEMU is really trying to allocate the header overlapping other
+> existing metadata sections then this is a serious bug in QEMU itself
+> so let's add an assertion.
+> 
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> ---
+>  block/qcow2.c | 1 +
+>  1 file changed, 1 insertion(+)
 
-These images can however be repaired, so allow opening them if the
-BDRV_O_CHECK flag is set.
+Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
 
-Signed-off-by: Alberto Garcia <berto@igalia.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
----
- block/qcow2.c              | 6 ++++++
- tests/qemu-iotests/060     | 7 +++++++
- tests/qemu-iotests/060.out | 5 +++++
- 3 files changed, 18 insertions(+)
 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 92cb9f9bfa..defc1fe49f 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -1280,6 +1280,12 @@ static int qcow2_do_open(BlockDriverState *bs, QDict *options, int flags,
-         goto fail;
-     }
- 
-+    if (header.refcount_table_clusters == 0 && !(flags & BDRV_O_CHECK)) {
-+        error_setg(errp, "Image does not contain a reference count table");
-+        ret = -EINVAL;
-+        goto fail;
-+    }
-+
-     ret = validate_table_offset(bs, s->refcount_table_offset,
-                                 s->refcount_table_size, sizeof(uint64_t));
-     if (ret < 0) {
-diff --git a/tests/qemu-iotests/060 b/tests/qemu-iotests/060
-index c3bce27b33..656af50883 100755
---- a/tests/qemu-iotests/060
-+++ b/tests/qemu-iotests/060
-@@ -270,6 +270,13 @@ poke_file "$TEST_IMG" "$rb_offset"        "\x00\x00\x00\x00\x00\x00\x00\x00"
- # write will try to allocate a compressed data cluster at offset 0.
- $QEMU_IO -c "write -c 0k 64k" "$TEST_IMG" | _filter_qemu_io
- 
-+echo
-+echo "=== Testing zero refcount table size ==="
-+echo
-+_make_test_img 64M
-+poke_file "$TEST_IMG" "56"                "\x00\x00\x00\x00"
-+$QEMU_IO -c "write 0 64k" "$TEST_IMG" 2>&1 | _filter_testdir | _filter_imgfmt
-+
- # success, all done
- echo "*** done"
- rm -f $seq.full
-diff --git a/tests/qemu-iotests/060.out b/tests/qemu-iotests/060.out
-index cf8790ff57..58456e8487 100644
---- a/tests/qemu-iotests/060.out
-+++ b/tests/qemu-iotests/060.out
-@@ -203,4 +203,9 @@ wrote 65536/65536 bytes at offset 65536
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- qcow2: Marking image as corrupt: Preventing invalid allocation of compressed cluster at offset 0; further corruption events will be suppressed
- write failed: Input/output error
-+
-+=== Testing zero refcount table size ===
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
-+can't open device TEST_DIR/t.IMGFMT: Image does not contain a reference count table
- *** done
+Regards,
+Daniel
 -- 
-2.11.0
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
