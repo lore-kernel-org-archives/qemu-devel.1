@@ -1,32 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60674)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34460)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eAjb6-0002R1-Sw
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 17:33:54 -0400
+	(envelope-from <eblake@redhat.com>) id 1eAjqD-0004bj-5A
+	for Qemu-devel@nongnu.org; Fri, 03 Nov 2017 17:49:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eAjb3-0001rz-O8
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 17:33:52 -0400
-Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:46371)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eAjb3-0001rc-IJ
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 17:33:49 -0400
-Received: by mail-qt0-x241.google.com with SMTP id 1so4900550qtn.3
-	for <qemu-devel@nongnu.org>; Fri, 03 Nov 2017 14:33:49 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170920131823.16347-1-laurent@vivier.eu>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <858581a0-880f-794c-7d36-de7ba668462f@amsat.org>
-Date: Fri, 3 Nov 2017 18:33:44 -0300
+	(envelope-from <eblake@redhat.com>) id 1eAjq8-00059X-OR
+	for Qemu-devel@nongnu.org; Fri, 03 Nov 2017 17:49:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51396)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eAjq8-00058s-Fk
+	for Qemu-devel@nongnu.org; Fri, 03 Nov 2017 17:49:24 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 39CE4BDFD
+	for <Qemu-devel@nongnu.org>; Fri,  3 Nov 2017 21:49:23 +0000 (UTC)
+References: <f88b9c1e-6331-8c7f-b748-62dc11a50c1e@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <19b8b458-3964-3d98-5459-30c5bf19d708@redhat.com>
+Date: Fri, 3 Nov 2017 16:49:21 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170920131823.16347-1-laurent@vivier.eu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3] softfloat: rename
- make_float[x80|128]_init to const_float[x80|128]
+In-Reply-To: <f88b9c1e-6331-8c7f-b748-62dc11a50c1e@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="KNBFgxTtwAk2s3LP3r0rB037S2b4r0ibH"
+Subject: Re: [Qemu-devel] coroutine question, for NBD debugging
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,131 +33,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
-Cc: Eric Blake <eblake@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, Peter Maydell <peter.maydell@linaro.org>
+To: "Qemu-devel@nongnu.org" <Qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 09/20/2017 10:18 AM, Laurent Vivier wrote:
-> We already have const_float16(), const_float32() and const_float64(),
-> so rename make_floatx80_init() and make_float128_init() to now be
-> const_floatx80() and const_float128(), for consistency.
-> 
-> Redefine make_float16(), make_float32() and make_float64() to be like
-> make_floatx80() and make_float128(), by using a compound literal.
-> 
-> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--KNBFgxTtwAk2s3LP3r0rB037S2b4r0ibH
+From: Eric Blake <eblake@redhat.com>
+To: "Qemu-devel@nongnu.org" <Qemu-devel@nongnu.org>,
+ Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <19b8b458-3964-3d98-5459-30c5bf19d708@redhat.com>
+Subject: Re: [Qemu-devel] coroutine question, for NBD debugging
+References: <f88b9c1e-6331-8c7f-b748-62dc11a50c1e@redhat.com>
+In-Reply-To: <f88b9c1e-6331-8c7f-b748-62dc11a50c1e@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+On 11/03/2017 03:03 PM, Eric Blake wrote:
+> In include/qemu/coroutine.h, we have:
+>=20
+> /**
+>  * Yield the coroutine for a given duration
+>  *
+>  * Behaves similarly to co_sleep_ns(), but the sleeping coroutine will =
+be
+>  * resumed when using aio_poll().
+>  */
+> void coroutine_fn co_aio_sleep_ns(AioContext *ctx, QEMUClockType type,
+>=20
+> but there is no co_sleep_ns() anywhere.  What should the documentation
+> actually state?
 
-> ---
-> v3: update patch description
-> v2: change float16(), make_float32() and make_float64()
->     instead of make_floatx80() and make_float128()
-> 
->  include/fpu/softfloat.h  | 10 +++++-----
->  target/m68k/fpu_helper.c | 44 ++++++++++++++++++++++----------------------
->  2 files changed, 27 insertions(+), 27 deletions(-)
-> 
-> diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
-> index 0f96a0edd1..cda6421b23 100644
-> --- a/include/fpu/softfloat.h
-> +++ b/include/fpu/softfloat.h
-> @@ -113,20 +113,20 @@ typedef struct {
->      uint16_t v;
->  } float16;
->  #define float16_val(x) (((float16)(x)).v)
-> -#define make_float16(x) __extension__ ({ float16 f16_val = {x}; f16_val; })
-> +#define make_float16(x) ((float16) { x })
->  #define const_float16(x) { x }
->  typedef struct {
->      uint32_t v;
->  } float32;
->  /* The cast ensures an error if the wrong type is passed.  */
->  #define float32_val(x) (((float32)(x)).v)
-> -#define make_float32(x) __extension__ ({ float32 f32_val = {x}; f32_val; })
-> +#define make_float32(x) ((float32) { x })
->  #define const_float32(x) { x }
->  typedef struct {
->      uint64_t v;
->  } float64;
->  #define float64_val(x) (((float64)(x)).v)
-> -#define make_float64(x) __extension__ ({ float64 f64_val = {x}; f64_val; })
-> +#define make_float64(x) ((float64) { x })
->  #define const_float64(x) { x }
->  #else
->  typedef uint16_t float16;
-> @@ -147,7 +147,7 @@ typedef struct {
->      uint16_t high;
->  } floatx80;
->  #define make_floatx80(exp, mant) ((floatx80) { mant, exp })
-> -#define make_floatx80_init(exp, mant) { .low = mant, .high = exp }
-> +#define const_floatx80(exp, mant) { .low = mant, .high = exp }
->  typedef struct {
->  #ifdef HOST_WORDS_BIGENDIAN
->      uint64_t high, low;
-> @@ -156,7 +156,7 @@ typedef struct {
->  #endif
->  } float128;
->  #define make_float128(high_, low_) ((float128) { .high = high_, .low = low_ })
-> -#define make_float128_init(high_, low_) { .high = high_, .low = low_ }
-> +#define const_float128(high_, low_) { .high = high_, .low = low_ }
->  
->  /*----------------------------------------------------------------------------
->  | Software IEC/IEEE floating-point underflow tininess-detection mode.
-> diff --git a/target/m68k/fpu_helper.c b/target/m68k/fpu_helper.c
-> index 665e7609af..bf62cf8003 100644
-> --- a/target/m68k/fpu_helper.c
-> +++ b/target/m68k/fpu_helper.c
-> @@ -29,28 +29,28 @@
->   */
->  
->  static const floatx80 fpu_rom[128] = {
-> -    [0x00] = make_floatx80_init(0x4000, 0xc90fdaa22168c235ULL),  /* Pi       */
-> -    [0x0b] = make_floatx80_init(0x3ffd, 0x9a209a84fbcff798ULL),  /* Log10(2) */
-> -    [0x0c] = make_floatx80_init(0x4000, 0xadf85458a2bb4a9aULL),  /* e        */
-> -    [0x0d] = make_floatx80_init(0x3fff, 0xb8aa3b295c17f0bcULL),  /* Log2(e)  */
-> -    [0x0e] = make_floatx80_init(0x3ffd, 0xde5bd8a937287195ULL),  /* Log10(e) */
-> -    [0x0f] = make_floatx80_init(0x0000, 0x0000000000000000ULL),  /* Zero     */
-> -    [0x30] = make_floatx80_init(0x3ffe, 0xb17217f7d1cf79acULL),  /* ln(2)    */
-> -    [0x31] = make_floatx80_init(0x4000, 0x935d8dddaaa8ac17ULL),  /* ln(10)   */
-> -    [0x32] = make_floatx80_init(0x3fff, 0x8000000000000000ULL),  /* 10^0     */
-> -    [0x33] = make_floatx80_init(0x4002, 0xa000000000000000ULL),  /* 10^1     */
-> -    [0x34] = make_floatx80_init(0x4005, 0xc800000000000000ULL),  /* 10^2     */
-> -    [0x35] = make_floatx80_init(0x400c, 0x9c40000000000000ULL),  /* 10^4     */
-> -    [0x36] = make_floatx80_init(0x4019, 0xbebc200000000000ULL),  /* 10^8     */
-> -    [0x37] = make_floatx80_init(0x4034, 0x8e1bc9bf04000000ULL),  /* 10^16    */
-> -    [0x38] = make_floatx80_init(0x4069, 0x9dc5ada82b70b59eULL),  /* 10^32    */
-> -    [0x39] = make_floatx80_init(0x40d3, 0xc2781f49ffcfa6d5ULL),  /* 10^64    */
-> -    [0x3a] = make_floatx80_init(0x41a8, 0x93ba47c980e98ce0ULL),  /* 10^128   */
-> -    [0x3b] = make_floatx80_init(0x4351, 0xaa7eebfb9df9de8eULL),  /* 10^256   */
-> -    [0x3c] = make_floatx80_init(0x46a3, 0xe319a0aea60e91c7ULL),  /* 10^512   */
-> -    [0x3d] = make_floatx80_init(0x4d48, 0xc976758681750c17ULL),  /* 10^1024  */
-> -    [0x3e] = make_floatx80_init(0x5a92, 0x9e8b3b5dc53d5de5ULL),  /* 10^2048  */
-> -    [0x3f] = make_floatx80_init(0x7525, 0xc46052028a20979bULL),  /* 10^4096  */
-> +    [0x00] = const_floatx80(0x4000, 0xc90fdaa22168c235ULL),  /* Pi       */
-> +    [0x0b] = const_floatx80(0x3ffd, 0x9a209a84fbcff798ULL),  /* Log10(2) */
-> +    [0x0c] = const_floatx80(0x4000, 0xadf85458a2bb4a9aULL),  /* e        */
-> +    [0x0d] = const_floatx80(0x3fff, 0xb8aa3b295c17f0bcULL),  /* Log2(e)  */
-> +    [0x0e] = const_floatx80(0x3ffd, 0xde5bd8a937287195ULL),  /* Log10(e) */
-> +    [0x0f] = const_floatx80(0x0000, 0x0000000000000000ULL),  /* Zero     */
-> +    [0x30] = const_floatx80(0x3ffe, 0xb17217f7d1cf79acULL),  /* ln(2)    */
-> +    [0x31] = const_floatx80(0x4000, 0x935d8dddaaa8ac17ULL),  /* ln(10)   */
-> +    [0x32] = const_floatx80(0x3fff, 0x8000000000000000ULL),  /* 10^0     */
-> +    [0x33] = const_floatx80(0x4002, 0xa000000000000000ULL),  /* 10^1     */
-> +    [0x34] = const_floatx80(0x4005, 0xc800000000000000ULL),  /* 10^2     */
-> +    [0x35] = const_floatx80(0x400c, 0x9c40000000000000ULL),  /* 10^4     */
-> +    [0x36] = const_floatx80(0x4019, 0xbebc200000000000ULL),  /* 10^8     */
-> +    [0x37] = const_floatx80(0x4034, 0x8e1bc9bf04000000ULL),  /* 10^16    */
-> +    [0x38] = const_floatx80(0x4069, 0x9dc5ada82b70b59eULL),  /* 10^32    */
-> +    [0x39] = const_floatx80(0x40d3, 0xc2781f49ffcfa6d5ULL),  /* 10^64    */
-> +    [0x3a] = const_floatx80(0x41a8, 0x93ba47c980e98ce0ULL),  /* 10^128   */
-> +    [0x3b] = const_floatx80(0x4351, 0xaa7eebfb9df9de8eULL),  /* 10^256   */
-> +    [0x3c] = const_floatx80(0x46a3, 0xe319a0aea60e91c7ULL),  /* 10^512   */
-> +    [0x3d] = const_floatx80(0x4d48, 0xc976758681750c17ULL),  /* 10^1024  */
-> +    [0x3e] = const_floatx80(0x5a92, 0x9e8b3b5dc53d5de5ULL),  /* 10^2048  */
-> +    [0x3f] = const_floatx80(0x7525, 0xc46052028a20979bULL),  /* 10^4096  */
->  };
->  
->  int32_t HELPER(reds32)(CPUM68KState *env, FPReg *val)
-> 
+This part still needs fixing; but partially answering myself:
+
+>=20
+> Meanwhile, I'm trying to figure out if there is an easy way to hack
+> qemu-nbd to send two structured replies interleaved (as in A.1, B.1,
+> A.2, B.2) to ensure the NBD client coroutines properly handle
+> interleaved responses, but adding a plain sleep() between A.1 and A.2
+> does not work, and I'm not sure whether co_aio_sleep_ns() would work fo=
+r
+> the hack instead.
+>=20
+> The hack I'm currently playing with splits reads and structured errors
+> into two parts, attempting to use sleeps to force the server to send
+> replies out of order:
+>=20
+
+> +    sleep(2);
+
+Using this instead of sleep():
+
++    co_aio_sleep_ns(client->exp->ctx, QEMU_CLOCK_REALTIME, 2000000000);
+
+> coupled with a client that does:
+>=20
+> $ ./qemu-io -f raw nbd://localhost:10809/foo --trace=3D'nbd_*' -c
+> 'aio_write -P 3 1 1' -c 'aio_read -P 1 1 1'
+>=20
+
+produced the trace I was looking for:
+
+2837@1509745520.815687:nbd_send_request Sending request to server: {
+=2Efrom =3D 1, .len =3D 1, .handle =3D 93924431318768, .flags =3D 0x1, .t=
+ype =3D 1
+(write) }
+2837@1509745520.815764:nbd_send_request Sending request to server: {
+=2Efrom =3D 1, .len =3D 1, .handle =3D 93924431318769, .flags =3D 0x0, .t=
+ype =3D 0
+(read) }
+2837@1509745520.815913:nbd_receive_structured_reply_chunk Got structured
+reply chunk: { flags =3D 0x0, type =3D 32769, handle =3D 93924431318768,
+length =3D 25 }
+2837@1509745520.856401:nbd_receive_structured_reply_chunk Got structured
+reply chunk: { flags =3D 0x0, type =3D 1, handle =3D 93924431318769, leng=
+th =3D 9 }
+2837@1509745521.817279:nbd_receive_structured_reply_chunk Got structured
+reply chunk: { flags =3D 0x1, type =3D 0, handle =3D 93924431318768, leng=
+th =3D 0 }
+aio_write failed: Operation not permitted
+2837@1509745522.817474:nbd_receive_structured_reply_chunk Got structured
+reply chunk: { flags =3D 0x1, type =3D 0, handle =3D 93924431318769, leng=
+th =3D 0 }
+read 1/1 bytes at offset 1
+1 bytes, 1 ops; 0:00:02.00 (0.499560 bytes/sec and 0.4996 ops/sec)
+
+which means I'm fairly confident that our client implementation is doing
+the right thing with regards to complex out-of-order/interleaved
+structured replies!  Always a nice thing to demonstrate.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--KNBFgxTtwAk2s3LP3r0rB037S2b4r0ibH
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAln85GEACgkQp6FrSiUn
+Q2qi9wf/b5xKruF2relAoCSC+9laNWuhwzTyfGdKMv6VdDrb/6Dd0ms/mKvpGp29
+jPD5OmvaxvwIl/LucpmvdvJnbEqO7KHCnVGT61fuyZQ3lPgB5UgPmXs8KT2rkWTj
+e4qTn3SXW2eNYJ3cgt0TEct3GvvJdqahaoCklZkUP+xIBWQW3ekHbyXkBbR0vFZV
+yE4hdGRIdj71HpMTFdtb+W8dy9M2Q9qdgYOReks9vp4E59IEvcEvJZzHnGqGSPkV
+HWuiLLmP6R/Y0AL3zgK1MVd/m7YqQOsPWK41jCZ+A0//X3cGmM5iEiGcbNz1f7tl
+qOHB8z13ThBTgJ78J0cVWUF7RujFJA==
+=wqXa
+-----END PGP SIGNATURE-----
+
+--KNBFgxTtwAk2s3LP3r0rB037S2b4r0ibH--
