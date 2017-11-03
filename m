@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46768)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46829)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eAgCw-0007wu-Dw
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 13:56:43 -0400
+	(envelope-from <eblake@redhat.com>) id 1eAgDD-0008Oy-Dd
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 13:57:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eAgCo-0005gJ-6Y
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 13:56:39 -0400
-Received: from indium.canonical.com ([91.189.90.7]:52814)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eAgCn-0005ev-Vm
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 13:56:34 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eAgCl-0008Iq-KB
-	for <qemu-devel@nongnu.org>; Fri, 03 Nov 2017 17:56:31 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 7EB622E80CC
-	for <qemu-devel@nongnu.org>; Fri,  3 Nov 2017 17:56:31 +0000 (UTC)
+	(envelope-from <eblake@redhat.com>) id 1eAgDC-00062M-PR
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 13:56:59 -0400
+References: <20171103143902.18039-1-berrange@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <77890479-0388-7990-d542-f50dbbe9a9f2@redhat.com>
+Date: Fri, 3 Nov 2017 12:56:47 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 03 Nov 2017 17:46:25 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1689367 <1689367@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170508175438.13498.58008.malonedeb@chaenomeles.canonical.com>
-Message-Id: <150973118602.5178.9154984262407414686.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1689367] Re: In qemu chroot,
- repeating "qemu: Unsupported syscall: 384" messages. sys_getrandom ?
+In-Reply-To: <20171103143902.18039-1-berrange@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="Ibthir2MMrNl362hge8eVR0SVjbeVr3Uw"
+Subject: Re: [Qemu-devel] [PATCH] qcow2: don't permit changing encryption
+ parameters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,60 +24,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-Can you just run  /usr/bin/qemu-arm-static --version  in the chroot,
-please ? (or whatever suse calls its statically linked binary).
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Ibthir2MMrNl362hge8eVR0SVjbeVr3Uw
+From: Eric Blake <eblake@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
+Message-ID: <77890479-0388-7990-d542-f50dbbe9a9f2@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] qcow2: don't permit changing encryption
+ parameters
+References: <20171103143902.18039-1-berrange@redhat.com>
+In-Reply-To: <20171103143902.18039-1-berrange@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
--- =
+On 11/03/2017 09:39 AM, Daniel P. Berrange wrote:
+> Currently if trying to change encryption parameters on a qcow2 image, q=
+emu-img
+> will abort. We already explicitly check for attempt to change encrypt.f=
+ormat
+> but missed other parameters like encrypt.key-secret. Rather than list e=
+ach
+> parameter, just blacklist changing of all parameters with a 'encrypt.' =
+prefix.
+>=20
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> ---
+>  block/qcow2.c | 3 +++
+>  1 file changed, 3 insertions(+)
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1689367
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-Title:
-  In qemu chroot, repeating "qemu: Unsupported syscall: 384" messages.
-  sys_getrandom ?
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-Status in QEMU:
-  Incomplete
 
-Bug description:
-  On exec of an armv7 qemu chroot on my local x86_64 desktop, launched
-  via
+--Ibthir2MMrNl362hge8eVR0SVjbeVr3Uw
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-          /usr/sbin/qemu-binfmt-conf.sh
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-  from
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAln8rd8ACgkQp6FrSiUn
+Q2rx1Qf/Wi0jVZi63LbTXU7vnTC43rWiw9IYlWEsaT3jGSnK2lWBXJYtNpz3yora
+56zDsO70SfGt+HEtU0bApA6LaAx9lidOadyDZSnRF1yQvrHWTjUCTJs2BQ3Erefx
+6wUubCuxb3CIsi05kdyxGWiJsNEaP5f1In3kzkERT389tfGpjDgwYj0Mos4Egb7E
+tYN5noR50prrx5ElxAcwXbq6nbkNB3t+ho4c4gACHfDj8ohPXqmEzFuqDRtWrhOp
+jlTRMnlEKpJbOrIYi6xdADi7/W1P6lSqUwklkARHa1lklb6jmFVJl6cRUCFijdb6
+aswJ/fjdeHsAw39u2Z8KWGXLFb3yFg==
+=+QOE
+-----END PGP SIGNATURE-----
 
-          qemu-linux-user-2.9.0-374.1.x86_64
-
-  on the host, inside the chroot any compile activity is laced with
-  repetitions of
-
-          qemu: Unsupported syscall: 384
-
-  messages.
-
-  This wasn't always the case -- but, TBH, it's been ~ 6 months since I
-  used this env, and there have been scads of usual pkg updates in the
-  interim.  These messages appear to be non-fatal, with no particular
-  effect at all; at least not so far ...
-
-  From a chat in #IRC,
-
-  	[10:05] davidgiluk clever/pgnd: I see it as getrandom
-  	[10:05] davidgiluk pgnd: https://fedora.juszkiewicz.com.pl/syscalls.html=
-   sort it on the ARM table and you can easily see it
-  	[10:05] clever arch/arm/tools/syscall.tbl:384  common  getrandom        =
-       sys_getrandom
-  	[10:06] davidgiluk pgnd: my *guess* is that something is calling getrand=
-om, getting told it's not implemented and then falling back to using /dev/u=
-random
-  	[10:10] pgnd davidgiluk: If that *is* the case, is it to be considered a=
- problem, or just informational?
-  	[10:12] davidgiluk pgnd: As long as it's falling back probably informati=
-onal; but someone should probably go and wire up sys_getrandom at some point
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1689367/+subscriptions
+--Ibthir2MMrNl362hge8eVR0SVjbeVr3Uw--
