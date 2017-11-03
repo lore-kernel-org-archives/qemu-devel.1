@@ -1,20 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59856)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35703)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1eAh8c-0003s7-GS
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 14:56:19 -0400
+	(envelope-from <bounces@canonical.com>) id 1eAhRr-0008Df-8f
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 15:16:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1eAh8b-0005dm-MI
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 14:56:18 -0400
-Date: Fri, 3 Nov 2017 14:56:10 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20171103185610.GA3907@flamenco>
-References: <1509734853-3014-1-git-send-email-cota@braap.org>
+	(envelope-from <bounces@canonical.com>) id 1eAhRo-0005Sc-3B
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 15:16:11 -0400
+Received: from indium.canonical.com ([91.189.90.7]:48676)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eAhRn-0005R1-TT
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 15:16:08 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eAhRm-0000rC-8I
+	for <qemu-devel@nongnu.org>; Fri, 03 Nov 2017 19:16:06 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id EE6022E80D9
+	for <qemu-devel@nongnu.org>; Fri,  3 Nov 2017 19:16:02 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1509734853-3014-1-git-send-email-cota@braap.org>
-Subject: Re: [Qemu-devel] [PATCH] hw: add .min_cpus and .default_cpus fields
- to machine_class
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 03 Nov 2017 19:07:31 -0000
+From: pgnet <1689367@bugs.launchpad.net>
+Reply-To: Bug 1689367 <1689367@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170508175438.13498.58008.malonedeb@chaenomeles.canonical.com>
+Message-Id: <150973605108.20350.7424257143115749019.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1689367] Re: In qemu chroot,
+ repeating "qemu: Unsupported syscall: 384" messages. sys_getrandom ?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,39 +38,62 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Thomas Huth <thuth@redhat.com>, qemu-arm@nongnu.org, Igor Mitsyanko <i.mitsyanko@gmail.com>, Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
 
-On Fri, Nov 03, 2017 at 14:47:33 -0400, Emilio G. Cota wrote:
-> diff --git a/hw/arm/xlnx-zcu102.c b/hw/arm/xlnx-zcu102.c
-> index e2d15a1..395d1b5 100644
-> --- a/hw/arm/xlnx-zcu102.c
-> +++ b/hw/arm/xlnx-zcu102.c
-> @@ -185,6 +185,9 @@ static void xlnx_ep108_machine_class_init(ObjectClass *oc, void *data)
->      mc->block_default_type = IF_IDE;
->      mc->units_per_default_bus = 1;
->      mc->ignore_memory_transaction_failures = true;
-> +    mc->max_cpus = XLNX_ZYNQMP_NUM_APU_CPUS + XLNX_ZYNQMP_NUM_RPU_CPUS;
-> +    mc->min_cpus = XLNX_ZYNQMP_NUM_APU_CPUS;
-> +    mc->default_cpus = XLNX_ZYNQMP_NUM_APU_CPUS;
->  }
->  
->  static const TypeInfo xlnx_ep108_machine_init_typeinfo = {
-> @@ -241,6 +244,8 @@ static void xlnx_zcu102_machine_class_init(ObjectClass *oc, void *data)
->      mc->units_per_default_bus = 1;
->      mc->ignore_memory_transaction_failures = true;
->      mc->max_cpus = XLNX_ZYNQMP_NUM_APU_CPUS + XLNX_ZYNQMP_NUM_RPU_CPUS;
-> +    mc->min_cpus = XLNX_ZYNQMP_NUM_APU_CPUS;
-> +    mc->default_cpus = XLNX_ZYNQMP_NUM_APU_CPUS;
->  }
+> run /usr/bin/qemu-arm-static --version in the chroot
 
-Should we update max_cpus to just NUM_APU_CPUS as well for these boards?
--smp 5 or 6 (NUM_APU + NUM_RPU) still gets us 4 vCPUs.
+:/# /usr/bin/qemu-arm --version
+	qemu-arm version 2.10.1
+	Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
 
-I see there's code for RPU cpus but it seems disabled at compile-time
-at xlnx-zynqmp.c:431:
-   DEFINE_PROP_BOOL("has_rpu", XlnxZynqMPState, has_rpu, false)
-Or is there a run-time way to override this?
+-- =
 
-Thanks,
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1689367
 
-		Emilio
+Title:
+  In qemu chroot, repeating "qemu: Unsupported syscall: 384" messages.
+  sys_getrandom ?
+
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  On exec of an armv7 qemu chroot on my local x86_64 desktop, launched
+  via
+
+          /usr/sbin/qemu-binfmt-conf.sh
+
+  from
+
+          qemu-linux-user-2.9.0-374.1.x86_64
+
+  on the host, inside the chroot any compile activity is laced with
+  repetitions of
+
+          qemu: Unsupported syscall: 384
+
+  messages.
+
+  This wasn't always the case -- but, TBH, it's been ~ 6 months since I
+  used this env, and there have been scads of usual pkg updates in the
+  interim.  These messages appear to be non-fatal, with no particular
+  effect at all; at least not so far ...
+
+  From a chat in #IRC,
+
+  	[10:05] davidgiluk clever/pgnd: I see it as getrandom
+  	[10:05] davidgiluk pgnd: https://fedora.juszkiewicz.com.pl/syscalls.html=
+   sort it on the ARM table and you can easily see it
+  	[10:05] clever arch/arm/tools/syscall.tbl:384  common  getrandom        =
+       sys_getrandom
+  	[10:06] davidgiluk pgnd: my *guess* is that something is calling getrand=
+om, getting told it's not implemented and then falling back to using /dev/u=
+random
+  	[10:10] pgnd davidgiluk: If that *is* the case, is it to be considered a=
+ problem, or just informational?
+  	[10:12] davidgiluk pgnd: As long as it's falling back probably informati=
+onal; but someone should probably go and wire up sys_getrandom at some point
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1689367/+subscriptions
