@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55179)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55987)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eAY0B-0003ag-27
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 05:11:00 -0400
+	(envelope-from <dovgaluk@ispras.ru>) id 1eAY5i-0004jV-Dq
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 05:16:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eAY05-0004j8-5a
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 05:10:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34044)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eAY04-0004iw-TM
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 05:10:53 -0400
-Date: Fri, 3 Nov 2017 09:10:45 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20171103091045.GA2616@work-vm>
-References: <CADak6y5eSo9=C2FJx+cTdqxArWeQqNDAvVgY+vS7H-9yGeuZvw@mail.gmail.com>
-	<20171101094537.GA2786@work-vm>
-	<CADak6y485_OSHrzji4Wq7_3vOrK+ch6Vm1FW1RMidSzoO3U-kQ@mail.gmail.com>
-	<CADak6y5mfPnDfQbQSBjY-iGXsFEAmRX6cd=Cv-z-kD5VArKA9Q@mail.gmail.com>
-	<CADak6y5zT2qxHe8-iCQhpgxdAyHcerMMbcDNvRig8i2PvopHBg@mail.gmail.com>
+	(envelope-from <dovgaluk@ispras.ru>) id 1eAY5d-0000Cp-FI
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 05:16:42 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:40490)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <dovgaluk@ispras.ru>) id 1eAY5d-0000CN-8R
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 05:16:37 -0400
+From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
+References: <20171031112457.10516.8971.stgit@pasha-VirtualBox>
+	<20171031112633.10516.44062.stgit@pasha-VirtualBox>
+	<92aa3279-66b5-b765-b36b-2acb6413bd47@redhat.com>
+In-Reply-To: <92aa3279-66b5-b765-b36b-2acb6413bd47@redhat.com>
+Date: Fri, 3 Nov 2017 12:16:39 +0300
+Message-ID: <001301d35484$75071110$5f153330$@ru>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CADak6y5zT2qxHe8-iCQhpgxdAyHcerMMbcDNvRig8i2PvopHBg@mail.gmail.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] qemu disk use writeback don't take effect in
- centos 7.2 1511
+Content-Type: text/plain;
+	charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Content-Language: ru
+Subject: Re: [Qemu-devel] [RFC PATCH 17/26] replay: push replay_mutex_lock
+ up the call tree
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,88 +31,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paul Schlacter <wlfightup@gmail.com>, stefanha@redhat.com
-Cc: qemu-devel@nongnu.org
+To: 'Paolo Bonzini' <pbonzini@redhat.com>, 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, boost.lists@gmail.com, quintela@redhat.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, maria.klimushenkova@ispras.ru, kraxel@redhat.com, alex.bennee@linaro.org
 
-* Paul Schlacter (wlfightup@gmail.com) wrote:
-> latest progress=EF=BC=9A
-> use centos 7.2   https://cloud.centos.org/centos/7/images/
-> test version: 1511  1601  1604 1606 1608
->=20
-> From the above version in turn test, found the previous version 1511 16=
-01
-> 1603 have the problem,
-> The latter two versions 1606 1608 are normal, dont't have the prblem,
-> Normal is cache =3D writeback io significantly higher than none mode
->=20
-> why?
+> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
+> On 31/10/2017 12:26, Pavel Dovgalyuk wrote:
+> > +    /* We need to drop the replay_lock so any vCPU threads woken up
+> > +     * can finish their replay tasks
+> > +     */
+> > +    if (replay_mode != REPLAY_MODE_NONE) {
+> > +        g_assert(replay_mutex_locked());
+> > +        qemu_mutex_unlock_iothread();
+> > +        replay_mutex_unlock();
+> > +        qemu_mutex_lock_iothread();
+> > +    }
+> 
+> The assert+unlock+lock here is unnecessary; just do
+> 
+>     if (replay_mode != REPLAY_MODE_NONE) {
+>         replay_mutex_unlock();
+>     }
+> 
+> which according to a previous suggestion can become just
+> 
+>     replay_mutex_unlock();
 
-It's a fun bug, but I don't know the cause - the fact it's dependent
-on guest version but fixed, suggests something changed in the guest
-kernel.  If you really wanted to figure out why I guess the only way
-would be to walk through the CentOS guest kernel versions and find the
-exact kernel that fixed it; then we could hunt down which change fixed
-it.
+We can't remove qemu_mutex_unlock_iothread(), because there is an assert
+inside replay_mutex_unlock(), which checks that iothread is unlocked.
 
-(I've cc'd in Stefan for block stuff, but this is sounding more guest
-than qemu)
+> 
+> >      while (!all_vcpus_paused()) {
+> >          qemu_cond_wait(&qemu_pause_cond, &qemu_global_mutex);
+> >          CPU_FOREACH(cpu) {
+> >              qemu_cpu_kick(cpu);
+> >          }
+> >      }
+> > +
+> > +    if (replay_mode != REPLAY_MODE_NONE) {
+> > +        qemu_mutex_unlock_iothread();
+> > +        replay_mutex_lock();
+> > +        qemu_mutex_lock_iothread();
+> > +    }
+> 
 
-Dave
-
-> On Wed, Nov 1, 2017 at 8:03 PM, Paul Schlacter <wlfightup@gmail.com> wr=
-ote:
->=20
-> > Hi David:
-> >      yes, with the same qemu,  centos 7.2 guest cache is writeback an=
-d
-> > none, the disk io almost, writeback feeling no effect.
-> >       but 7.1/7.3/7.4  cache is writeback was significantly faster th=
-an
-> > none model
-> >
-> > On Wed, Nov 1, 2017 at 8:02 PM, Paul Schlacter <wlfightup@gmail.com>
-> > wrote:
-> >
-> >> Hi David:
-> >>      yes, with the same qemu,  centos 7.2 guest cache is writeback a=
-nd
-> >> none, the disk io almost, writeback feeling no effect.
-> >>       but 7.1/7.3/7.4  cache is writeback was significantly faster t=
-han
-> >> none model
-> >>
-> >> On Wed, Nov 1, 2017 at 5:45 PM, Dr. David Alan Gilbert <
-> >> dgilbert@redhat.com> wrote:
-> >>
-> >>> * Paul Schlacter (wlfightup@gmail.com) wrote:
-> >>> > qemu version:  2.9.0
-> >>> > image: centos 7.2 1511 raw
-> >>> > cache mode: writeback
-> >>> >
-> >>> >
-> >>> > In centos7.2 time, the use of writeback and none, the result of d=
-d
-> >>> disk is
-> >>> > the same io, no change
-> >>> >
-> >>> > But I replaced centos7.1 centos7.3 centos7.4 when writeback was
-> >>> > significantly faster than none
-> >>> >
-> >>> > Would like to ask what is going on, how to solve ?
-> >>>
-> >>> Hi Paul,
-> >>>   Can you just clarify your setup please;  do you mean that
-> >>> with the same qemu setup but a 7.2 guest rather than a 7.1/7.3 gues=
-t
-> >>> the behaviour changes?
-> >>>
-> >>> Dave
-> >>>
-> >>> --
-> >>> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> >>>
-> >>
-> >>
-> >
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Pavel Dovgalyuk
