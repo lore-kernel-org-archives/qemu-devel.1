@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37609)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39617)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1eAWaV-0004St-Td
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 03:40:29 -0400
+	(envelope-from <bounces@canonical.com>) id 1eAWpz-0007HE-0Z
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 03:56:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1eAWaS-0002cE-OV
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 03:40:23 -0400
-Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:46694)
+	(envelope-from <bounces@canonical.com>) id 1eAWpu-0003iJ-IJ
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 03:56:23 -0400
+Received: from indium.canonical.com ([91.189.90.7]:36534)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1eAWaS-0002bm-G3
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 03:40:20 -0400
-Received: by mail-wr0-x241.google.com with SMTP id l1so1705486wrc.3
-	for <qemu-devel@nongnu.org>; Fri, 03 Nov 2017 00:40:20 -0700 (PDT)
-References: <1509640536-32160-1-git-send-email-peter.maydell@linaro.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <1509640536-32160-1-git-send-email-peter.maydell@linaro.org>
-Date: Fri, 03 Nov 2017 07:40:17 +0000
-Message-ID: <87vairhkta.fsf@linaro.org>
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eAWpu-0003hu-Cw
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 03:56:18 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eAWpt-0004eB-8i
+	for <qemu-devel@nongnu.org>; Fri, 03 Nov 2017 07:56:17 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 02BA62E80CC
+	for <qemu-devel@nongnu.org>; Fri,  3 Nov 2017 07:56:17 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] cpu-exec: Exit exclusive region on
- longjmp from step_atomic
+Date: Fri, 03 Nov 2017 07:35:47 -0000
+From: Thomas Huth <1013691@bugs.launchpad.net>
+Reply-To: Bug 1013691 <1013691@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20120615142445.16648.90728.malonedeb@wampee.canonical.com>
+Message-Id: <150969454749.8905.9169019339497009092.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1013691] Re: ppc64 + virtio-scsi: only first scsi
+ disk shows up in the guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,34 +37,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, "Emilio G . Cota" <cota@braap.org>
+To: qemu-devel@nongnu.org
 
+Triaging old bug tickets... can you still reproduce this issue with the
+latest version of QEMU and guest kernel? Or could we close this ticket
+nowadays?
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+** Changed in: qemu
+       Status: New =3D> Incomplete
 
-> Commit ac03ee5331612e44be narrowed the scope of the exclusive
-> region so it only covers when we're executing the TB, not when
-> we're generating it. However it missed that there is more than
-> one execution path out of cpu_tb_exec -- if the atomic insn
-> causes an exception then the code will longjmp out, skipping
-> the code to end the exclusive region. This causes QEMU to hang
-> the next time the CPU calls start_exclusive(), waiting for
-> itself to exit the region.
->
-> Move the "end the region" code out to the end of the
-> function so that it is run for both normal exit and also
-> for exit-via-longjmp. We have to use a volatile bool flag
-> to decide whether we need to end the region, because we
-> can longjump out of the codegen as well as the execution.
->
-> (For some reason this only reproduces for me with a clang
-> optimized build, not a gcc debug build.)
->
-> Fixes: ac03ee5331612e44beb393df2b578c951d27dc0d
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+-- =
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1013691
 
---
-Alex Benn=C3=A9e
+Title:
+  ppc64 + virtio-scsi: only first scsi disk shows up in the guest
+
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  When adding two virtio-scsi targets to a single guest, only the first
+  disk is seen inside the guest.  For some unknown reason the guest
+  doesn't enumerate the second disk.
+
+  For full qemu-system-ppc64 command line and 'dmesg' output, see:
+
+  http://lists.nongnu.org/archive/html/qemu-devel/2012-06/msg02430.html
+
+  I have also tried this with Linus's git tree (3.5.0-rc2+ at time of writi=
+ng),
+  same thing.
+
+  In both cases I'm using qemu from git.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1013691/+subscriptions
