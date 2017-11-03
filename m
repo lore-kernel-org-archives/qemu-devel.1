@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46829)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47531)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eAgDD-0008Oy-Dd
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 13:57:00 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1eAgFK-0001ET-Bk
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 13:59:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eAgDC-00062M-PR
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 13:56:59 -0400
-References: <20171103143902.18039-1-berrange@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <77890479-0388-7990-d542-f50dbbe9a9f2@redhat.com>
-Date: Fri, 3 Nov 2017 12:56:47 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1eAgFG-0006qi-6b
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 13:59:10 -0400
+Received: from mail-wr0-x235.google.com ([2a00:1450:400c:c0c::235]:46922)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1eAgFF-0006qL-U9
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 13:59:06 -0400
+Received: by mail-wr0-x235.google.com with SMTP id l1so3218192wrc.3
+	for <qemu-devel@nongnu.org>; Fri, 03 Nov 2017 10:59:05 -0700 (PDT)
+References: <20171103131229.4737-1-famz@redhat.com>
+	<a860d2a7-ef85-71ec-3967-b36bdf649c30@amsat.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <a860d2a7-ef85-71ec-3967-b36bdf649c30@amsat.org>
+Date: Fri, 03 Nov 2017 17:59:02 +0000
+Message-ID: <87shdvgs61.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20171103143902.18039-1-berrange@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="Ibthir2MMrNl362hge8eVR0SVjbeVr3Uw"
-Subject: Re: [Qemu-devel] [PATCH] qcow2: don't permit changing encryption
- parameters
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] docker: Improved image checksum
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,63 +30,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
-
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Ibthir2MMrNl362hge8eVR0SVjbeVr3Uw
-From: Eric Blake <eblake@redhat.com>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
- Max Reitz <mreitz@redhat.com>
-Message-ID: <77890479-0388-7990-d542-f50dbbe9a9f2@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] qcow2: don't permit changing encryption
- parameters
-References: <20171103143902.18039-1-berrange@redhat.com>
-In-Reply-To: <20171103143902.18039-1-berrange@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 11/03/2017 09:39 AM, Daniel P. Berrange wrote:
-> Currently if trying to change encryption parameters on a qcow2 image, q=
-emu-img
-> will abort. We already explicitly check for attempt to change encrypt.f=
-ormat
-> but missed other parameters like encrypt.key-secret. Rather than list e=
-ach
-> parameter, just blacklist changing of all parameters with a 'encrypt.' =
-prefix.
->=20
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> ---
->  block/qcow2.c | 3 +++
->  1 file changed, 3 insertions(+)
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
 
 
---Ibthir2MMrNl362hge8eVR0SVjbeVr3Uw
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+> Thanks Fam, this fixes Shippable builds :)
+>
+> On 11/03/2017 10:12 AM, Fam Zheng wrote:
+>> When a base image locally defined by QEMU, such as in the debian images,
+>> is updated, the dockerfile checksum mechanism in docker.py still skips
+>> updating the derived image, because it only looks at the literal content
+>> of the dockerfile, without considering changes to the base image.
+>>
+>> For example we have a recent fix e58c1f9b35e81 that fixed
+>> debian-win64-cross by updating its base image, debian8-mxe, but due to
+>> above "feature" of docker.py the image in question is automatically NOT
+>> rebuilt unless you add NOCACHE=3D1. It is noticed on Shippable:
+>>
+>> https://app.shippable.com/github/qemu/qemu/runs/541/2/console
+>>
+>> because after the fix is merged, the error still occurs, and the log
+>> shows the container image is, as explained above, not updated.
+>>
+>> This is because at the time docker.py was written, there wasn't any
+>> dependencies between QEMU's docker images.
+>>
+>> Now improve this to preprocess any "FROM qemu:*" directives in the
+>> dockerfiles while doing checksum, and inline the base image's dockerfile
+>> content, recursively. This ensures any changes on the depended _QEMU_
+>> images are taken into account.
+>>
+>> This means for external images that we expect to retrieve from docker
+>> registries, we still do it as before. It is not perfect, because
+>> registry images can get updated too. Technically we could substitute the
+>> image name with its hex ID as obtained with $(docker images $IMAGE
+>> --format=3D"{{.Id}}"), but --format is not supported by RHEL 7, so leave
+>> it for now.
+>>
+>> Reported-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>> Signed-off-by: Fam Zheng <famz@redhat.com>
+>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> Tested-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAln8rd8ACgkQp6FrSiUn
-Q2rx1Qf/Wi0jVZi63LbTXU7vnTC43rWiw9IYlWEsaT3jGSnK2lWBXJYtNpz3yora
-56zDsO70SfGt+HEtU0bApA6LaAx9lidOadyDZSnRF1yQvrHWTjUCTJs2BQ3Erefx
-6wUubCuxb3CIsi05kdyxGWiJsNEaP5f1In3kzkERT389tfGpjDgwYj0Mos4Egb7E
-tYN5noR50prrx5ElxAcwXbq6nbkNB3t+ho4c4gACHfDj8ohPXqmEzFuqDRtWrhOp
-jlTRMnlEKpJbOrIYi6xdADi7/W1P6lSqUwklkARHa1lklb6jmFVJl6cRUCFijdb6
-aswJ/fjdeHsAw39u2Z8KWGXLFb3yFg==
-=+QOE
------END PGP SIGNATURE-----
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
---Ibthir2MMrNl362hge8eVR0SVjbeVr3Uw--
+>
+>> ---
+>>  tests/docker/docker.py | 24 +++++++++++++++++++++++-
+>>  1 file changed, 23 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/tests/docker/docker.py b/tests/docker/docker.py
+>> index 08122ca17d..1246ba9578 100755
+>> --- a/tests/docker/docker.py
+>> +++ b/tests/docker/docker.py
+>> @@ -105,6 +105,28 @@ def _copy_binary_with_libs(src, dest_dir):
+>>              so_path =3D os.path.dirname(l)
+>>              _copy_with_mkdir(l , dest_dir, so_path)
+>>
+>> +def _read_qemu_dockerfile(img_name):
+>> +    df =3D os.path.join(os.path.dirname(__file__), "dockerfiles",
+>> +                      img_name + ".docker")
+>> +    return open(df, "r").read()
+>> +
+>> +def _dockerfile_preprocess(df):
+>> +    out =3D ""
+>> +    for l in df.splitlines():
+>> +        if len(l.strip()) =3D=3D 0 or l.startswith("#"):
+>> +            continue
+>> +        from_pref =3D "FROM qemu:"
+>> +        if l.startswith(from_pref):
+>> +            # TODO: Alternatively we could replace this line with "FROM=
+ $ID"
+>> +            # where $ID is the image's hex id obtained with
+>> +            #    $ docker images $IMAGE --format=3D"{{.Id}}"
+>> +            # but unfortunately that's not supported by RHEL 7.
+>> +            inlining =3D _read_qemu_dockerfile(l[len(from_pref):])
+>> +            out +=3D _dockerfile_preprocess(inlining)
+>> +            continue
+>> +        out +=3D l + "\n"
+>> +    return out
+>> +
+>>  class Docker(object):
+>>      """ Running Docker commands """
+>>      def __init__(self):
+>> @@ -196,7 +218,7 @@ class Docker(object):
+>>              checksum =3D self.get_image_dockerfile_checksum(tag)
+>>          except Exception:
+>>              return False
+>> -        return checksum =3D=3D _text_checksum(dockerfile)
+>> +        return checksum =3D=3D _text_checksum(_dockerfile_preprocess(do=
+ckerfile))
+>>
+>>      def run(self, cmd, keep, quiet):
+>>          label =3D uuid.uuid1().hex
+>>
+
+
+--
+Alex Benn=C3=A9e
