@@ -1,36 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55489)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56079)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eAdIy-0001Cf-Gh
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 10:50:45 -0400
+	(envelope-from <berrange@redhat.com>) id 1eAdL4-0001va-87
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 10:52:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eAdIv-0004h9-3d
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 10:50:44 -0400
-Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:49855)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1eAdIu-0004fp-NZ
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 10:50:41 -0400
-Received: by mail-wr0-x231.google.com with SMTP id g90so2733818wrd.6
-	for <qemu-devel@nongnu.org>; Fri, 03 Nov 2017 07:50:40 -0700 (PDT)
-Date: Fri, 3 Nov 2017 14:50:37 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20171103145037.GQ5078@stefanha-x1.localdomain>
-References: <1508390650-19115-1-git-send-email-changpeng.liu@intel.com>
-	<1508390650-19115-3-git-send-email-changpeng.liu@intel.com>
-	<20171019151745.GH6205@stefanha-x1.localdomain>
-	<FF7FC980937D6342B9D289F5F3C7C2625B5D8682@SHSMSX103.ccr.corp.intel.com>
-	<20171020095435.GD21393@stefanha-x1.localdomain>
-	<FF7FC980937D6342B9D289F5F3C7C2625B5D8EB6@SHSMSX103.ccr.corp.intel.com>
-	<20171023171146.GB15029@stefanha-x1.localdomain>
-	<FF7FC980937D6342B9D289F5F3C7C2625B5D9206@SHSMSX103.ccr.corp.intel.com>
-	<20171024125323.GH18756@stefanha-x1.localdomain>
-	<FF7FC980937D6342B9D289F5F3C7C2625B5D97A2@SHSMSX103.ccr.corp.intel.com>
+	(envelope-from <berrange@redhat.com>) id 1eAdL1-00074P-0n
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 10:52:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50972)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eAdL0-000742-Ns
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 10:52:50 -0400
+Date: Fri, 3 Nov 2017 14:52:46 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20171103145246.GK20155@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20171102165629.Horde.3vL2RJXzulVHv5PiXG00Bz4@www.quantumachine.net>
+	<20171102170903.GY32533@redhat.com>
+	<20171102224710.Horde.un6xiancuv3-V_s6uvEtdpP@www.quantumachine.net>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="8HhMLSHvAouSipEr"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <FF7FC980937D6342B9D289F5F3C7C2625B5D97A2@SHSMSX103.ccr.corp.intel.com>
-Subject: Re: [Qemu-devel] [PATCH v4 2/4] vhost-user-blk: introduce a new
- vhost-user-blk host device
+In-Reply-To: <20171102224710.Horde.un6xiancuv3-V_s6uvEtdpP@www.quantumachine.net>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] sockets: Normalize test for addrinfo flag
+ AI_V4MAPPED
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,239 +31,180 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Liu, Changpeng" <changpeng.liu@intel.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>, "felipe@nutanix.com" <felipe@nutanix.com>, "Harris, James R" <james.r.harris@intel.com>
+To: Antonio Huete =?utf-8?Q?Jim=C3=A9nez?= <tuxillo@quantumachine.net>
+Cc: qemu-devel@nongnu.org
 
-
---8HhMLSHvAouSipEr
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, Oct 25, 2017 at 01:34:39AM +0000, Liu, Changpeng wrote:
+On Thu, Nov 02, 2017 at 10:47:10PM +0000, Antonio Huete Jim=C3=A9nez wrot=
+e:
 >=20
+> "Daniel P. Berrange" <berrange@redhat.com> escribi=C3=B3:
 >=20
-> > -----Original Message-----
-> > From: Stefan Hajnoczi [mailto:stefanha@gmail.com]
-> > Sent: Tuesday, October 24, 2017 8:53 PM
-> > To: Liu, Changpeng <changpeng.liu@intel.com>
-> > Cc: qemu-devel@nongnu.org; pbonzini@redhat.com; mst@redhat.com;
-> > marcandre.lureau@redhat.com; felipe@nutanix.com; Harris, James R
-> > <james.r.harris@intel.com>
-> > Subject: Re: [PATCH v4 2/4] vhost-user-blk: introduce a new vhost-user-=
-blk host
-> > device
+> > On Thu, Nov 02, 2017 at 04:56:29PM +0000, Antonio Huete Jim=C3=A9nez =
+wrote:
+> > > From 2b4d9d8cb617445af8f3b062f917dfea42dbdc27 Mon Sep 17 00:00:00 2=
+001
+> > > From: Antonio Huete Jimenez <tuxillo@quantumachine.net>
+> > > Date: Thu, 2 Nov 2017 17:46:24 +0100
+> > > Subject: [PATCH] sockets: Normalize test for addrinfo flag AI_V4MAP=
+PED
 > >=20
-> > On Tue, Oct 24, 2017 at 12:44:30AM +0000, Liu, Changpeng wrote:
-> > >
-> > >
-> > > > -----Original Message-----
-> > > > From: Stefan Hajnoczi [mailto:stefanha@gmail.com]
-> > > > Sent: Tuesday, October 24, 2017 1:12 AM
-> > > > To: Liu, Changpeng <changpeng.liu@intel.com>
-> > > > Cc: qemu-devel@nongnu.org; pbonzini@redhat.com; mst@redhat.com;
-> > > > marcandre.lureau@redhat.com; felipe@nutanix.com; Harris, James R
-> > > > <james.r.harris@intel.com>
-> > > > Subject: Re: [PATCH v4 2/4] vhost-user-blk: introduce a new vhost-u=
-ser-blk
-> > host
-> > > > device
-> > > >
-> > > > On Mon, Oct 23, 2017 at 04:26:36AM +0000, Liu, Changpeng wrote:
-> > > > >
-> > > > >
-> > > > > > -----Original Message-----
-> > > > > > From: Stefan Hajnoczi [mailto:stefanha@gmail.com]
-> > > > > > Sent: Friday, October 20, 2017 5:55 PM
-> > > > > > To: Liu, Changpeng <changpeng.liu@intel.com>
-> > > > > > Cc: qemu-devel@nongnu.org; pbonzini@redhat.com; mst@redhat.com;
-> > > > > > marcandre.lureau@redhat.com; felipe@nutanix.com; Harris, James R
-> > > > > > <james.r.harris@intel.com>
-> > > > > > Subject: Re: [PATCH v4 2/4] vhost-user-blk: introduce a new vho=
-st-user-blk
-> > > > host
-> > > > > > device
-> > > > > >
-> > > > > > On Fri, Oct 20, 2017 at 01:47:58AM +0000, Liu, Changpeng wrote:
-> > > > > > > > > +static Property vhost_user_blk_properties[] =3D {
-> > > > > > > > > +    DEFINE_PROP_CHR("chardev", VHostUserBlk, chardev),
-> > > > > > > > > +    DEFINE_PROP_UINT16("num_queues", VHostUserBlk,
-> > num_queues,
-> > > > 1),
-> > > > > > > > > +    DEFINE_PROP_UINT32("queue_size", VHostUserBlk, queue=
-_size,
-> > 128),
-> > > > > > > > > +    DEFINE_PROP_BIT64("f_size_max", VHostUserBlk, host_f=
-eatures,
-> > > > > > > > > +                      VIRTIO_BLK_F_SIZE_MAX, true),
-> > > > > > > > > +    DEFINE_PROP_BIT64("f_sizemax", VHostUserBlk, host_fe=
-atures,
-> > > > > > > > > +                      VIRTIO_BLK_F_SIZE_MAX, true),
-> > > > > > > > > +    DEFINE_PROP_BIT64("f_segmax", VHostUserBlk, host_fea=
-tures,
-> > > > > > > > > +                      VIRTIO_BLK_F_SEG_MAX, true),
-> > > > > > > > > +    DEFINE_PROP_BIT64("f_geometry", VHostUserBlk, host_f=
-eatures,
-> > > > > > > > > +                      VIRTIO_BLK_F_GEOMETRY, true),
-> > > > > > > > > +    DEFINE_PROP_BIT64("f_readonly", VHostUserBlk, host_f=
-eatures,
-> > > > > > > > > +                      VIRTIO_BLK_F_RO, false),
-> > > > > > > > > +    DEFINE_PROP_BIT64("f_blocksize", VHostUserBlk, host_=
-features,
-> > > > > > > > > +                      VIRTIO_BLK_F_BLK_SIZE, true),
-> > > > > > > > > +    DEFINE_PROP_BIT64("f_topology", VHostUserBlk, host_f=
-eatures,
-> > > > > > > > > +                      VIRTIO_BLK_F_TOPOLOGY, true),
-> > > > > > > > > +    DEFINE_PROP_BIT64("f_multiqueue", VHostUserBlk,
-> > host_features,
-> > > > > > > > > +                      VIRTIO_BLK_F_MQ, true),
-> > > > > > > > > +    DEFINE_PROP_BIT64("f_flush", VHostUserBlk, host_feat=
-ures,
-> > > > > > > > > +                      VIRTIO_BLK_F_FLUSH, true),
-> > > > > > > > > +    DEFINE_PROP_BIT64("f_barrier", VHostUserBlk, host_fe=
-atures,
-> > > > > > > > > +                      VIRTIO_BLK_F_BARRIER, false),
-> > > > > > > > > +    DEFINE_PROP_BIT64("f_scsi", VHostUserBlk, host_featu=
-res,
-> > > > > > > > > +                      VIRTIO_BLK_F_SCSI, false),
-> > > > > > > > > +    DEFINE_PROP_BIT64("f_wce", VHostUserBlk, host_featur=
-es,
-> > > > > > > > > +                      VIRTIO_BLK_F_WCE, false),
-> > > > > > > >
-> > > > > > > > Please explain how feature negotation works.  The vhost-use=
-r slave
-> > > > > > > > advertises support features in the return value from
-> > > > > > > > VHOST_USER_GET_FEATURES.  How does this additional feature =
-mask
-> > > > work
-> > > > > > and
-> > > > > > > > why is it useful?
-> > > > > > > According to Paolo's previous comments, VIRTIO_BLK_F_WCE/
-> > > > > > VIRTIO_BLK_F_SCSI/ VIRTIO_BLK_F_BARRIER
-> > > > > > > should be removed. Here I added all the feature flags just wa=
-nt to avoid
-> > > > the
-> > > > > > case that vhost-user slave target
-> > > > > > > can support but Qemu vhost block driver cannot support it.
-> > > > > >
-> > > > > > Please explain a bit more how these options can be used.
-> > > > > >
-> > > > > > When I looked at the vhost code it seemed like the vhost slave =
-can
-> > > > > > report any feature bits it wishes (even things QEMU doesn't kno=
-w about).
-> > > > > > What is the purpose of override some of the feature bits on the=
- QEMU
-> > > > > > command-line?
-> > > > > Hi Stefan,
-> > > > > Here I added a switch which can override vhost-slave's feature bi=
-ts, for
-> > > > example, vhost-slave reported `VIRTIO_BLK_F_RO`,
-> > > > > but Qemu vhost-master can disable it through command line when st=
-arted
-> > the
-> > > > Qemu. Users don't need to change any
-> > > > > vhost-slave's code to disable this feature, and this is also alig=
-ned with
-> > vhost-
-> > > > scsi and vhost-net's implementation.
-> > > >
-> > > > You said vhost-master can disable features but the code doesn't see=
-m to
-> > > > work that way:
-> > > >
-> > > > +    /* Turn on pre-defined features */
-> > > > +    features |=3D s->host_features;
-> > > User can append parameter when started Qemu: e.g: f_readonly=3Dfalse =
-to
-> > disable it.
+> > Can you explain why you're making this change....
+>=20
+> Hi Daniel,
+>=20
+> Thanks for reviewing the patch. I am trying to fix 'make check' for
+> DragonFly BSD and this is the first issue I encountered.
+
+Ok, it would be helpful if the commit msg could mention which test fails
+without this fix, ideally with the actual error message (if one is given,
+as opposed to an abort()).
+
+
+> > > Signed-off-by: Antonio Huete Jimenez <tuxillo@quantumachine.net>
+> > > ---
+> > >  util/qemu-sockets.c | 54
+> > > +++++++++++++++++++++++++++++++++--------------------
+> > >  1 file changed, 34 insertions(+), 20 deletions(-)
+> > >=20
+> > > diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
+> > > index b47fb45885..ce35b6a998 100644
+> > > --- a/util/qemu-sockets.c
+> > > +++ b/util/qemu-sockets.c
+> > > @@ -44,7 +44,6 @@
+> > >  # define AI_NUMERICSERV 0
+> > >  #endif
+> > >=20
+> > > -
+> > >  static int inet_getport(struct addrinfo *e)
+> > >  {
+> > >      struct sockaddr_in *i4;
+> > > @@ -149,6 +148,31 @@ int
+> > > inet_ai_family_from_address(InetSocketAddress *addr,
+> > >      return PF_UNSPEC;
+> > >  }
+> > >=20
+> > > +static int
+> > > +check_ai_v4mapped(const char *host, const char *port, struct addri=
+nfo *ai,
+> > > +               struct addrinfo *res)
+> > > +{
+> > > +    static int useV4Mapped =3D -1;
+> > > +    int rc;
+> > > +
+> > > +    /* At least FreeBSD and OS-X 10.6 declare AI_V4MAPPED but
+> > > +     * then don't implement it in their getaddrinfo().
+> > > +     * Unconditionally deselect AI_V4MAPPED option upon
+> > > +     * getaddrinfo() failure, the next call to it will have to
+> > > +     * do the error handling.
+> > > +     */
+> > > +    if (atomic_read(&useV4Mapped) =3D=3D -1) {
+> > > +        rc =3D getaddrinfo(host, port, ai, &res);
+> > > +        if (rc =3D=3D 0 && (ai->ai_flags & AI_V4MAPPED)) {
+> > > +            atomic_set(&useV4Mapped, 1);
+> > > +        } else {
+> > > +            atomic_set(&useV4Mapped, 0);
+
+This is treating every single failure of getaddrinfo as a sign to turn
+off AI_V4MAPPED, which is really bad. I'm not a huge fan of doing the
+extra getaddrinfo() call, even though it is protected behind the atomic
+var. I'd prefer to just keep current style of checking the result after
+the main call to getaddrinfo() - just extend that to the dgram case too.
+A single 'static int useV4Mapped =3D 1' could still be used in the global
+namespace though.
+
+> > > +        }
+> > > +    }
+> > > +
+> > > +    return useV4Mapped;
+> > > +}
+> > > +
+> > >  static int create_fast_reuse_socket(struct addrinfo *e)
+> > >  {
+> > >      int slisten =3D qemu_socket(e->ai_family, e->ai_socktype,
+> > > e->ai_protocol);
+> > > @@ -378,14 +402,10 @@ static struct addrinfo
+> > > *inet_parse_connect_saddr(InetSocketAddress *saddr,
+> > >      struct addrinfo ai, *res;
+> > >      int rc;
+> > >      Error *err =3D NULL;
+> > > -    static int useV4Mapped =3D 1;
+> > >=20
+> > >      memset(&ai, 0, sizeof(ai));
+> > >=20
+> > > -    ai.ai_flags =3D AI_CANONNAME | AI_ADDRCONFIG;
+> > > -    if (atomic_read(&useV4Mapped)) {
+> > > -        ai.ai_flags |=3D AI_V4MAPPED;
+> > > -    }
+> > > +    ai.ai_flags =3D AI_CANONNAME | AI_ADDRCONFIG | AI_V4MAPPED;
+> > >      ai.ai_family =3D inet_ai_family_from_address(saddr, &err);
+> > >      ai.ai_socktype =3D SOCK_STREAM;
+> > >=20
+> > > @@ -399,21 +419,11 @@ static struct addrinfo
+> > > *inet_parse_connect_saddr(InetSocketAddress *saddr,
+> > >          return NULL;
+> > >      }
+> > >=20
+> > > -    /* lookup */
+> > > -    rc =3D getaddrinfo(saddr->host, saddr->port, &ai, &res);
+> > > -
+> > > -    /* At least FreeBSD and OS-X 10.6 declare AI_V4MAPPED but
+> > > -     * then don't implement it in their getaddrinfo(). Detect
+> > > -     * this and retry without the flag since that's preferrable
+> > > -     * to a fatal error
+> > > -     */
+> > > -    if (rc =3D=3D EAI_BADFLAGS &&
+> > > -        (ai.ai_flags & AI_V4MAPPED)) {
+> > > -        atomic_set(&useV4Mapped, 0);
+> > > +    if ((check_ai_v4mapped(saddr->host, saddr->port, &ai, res)) =3D=
+=3D 0) {
+> > >          ai.ai_flags &=3D ~AI_V4MAPPED;
+> > > -        rc =3D getaddrinfo(saddr->host, saddr->port, &ai, &res);
+> > >      }
+> > > -    if (rc !=3D 0) {
+> > > +
+> > > +    if ((rc =3D getaddrinfo(saddr->host, saddr->port, &ai, &res)) =
+!=3D 0) {
+> > >          error_setg(errp, "address resolution failed for %s:%s: %s"=
+,
+> > >                     saddr->host, saddr->port, gai_strerror(rc));
+> > >          return NULL;
+> > > @@ -469,7 +479,7 @@ static int inet_dgram_saddr(InetSocketAddress *=
+sraddr,
+> > >=20
+> > >      /* lookup peer addr */
+> > >      memset(&ai,0, sizeof(ai));
+> > > -    ai.ai_flags =3D AI_CANONNAME | AI_V4MAPPED | AI_ADDRCONFIG;
+> > > +    ai.ai_flags =3D AI_CANONNAME | AI_ADDRCONFIG | AI_V4MAPPED;
 > >=20
-> > No, f_readonly=3Dfalse has no effect if the vhost slave replies with f_=
-readonly
-> > to the VHOST_USER_GET_FEATURES message.
+> > Gratuitous re-ordering of code with no functional change.
+>=20
+> Agree, can change it.
+>=20
 > >=20
-> > Take a look at the hw/virtio/vhost.c code:
-> >=20
-> >   uint64_t vhost_get_features(struct vhost_dev *hdev, const int *featur=
-e_bits,
-> >                               uint64_t features)
-> >   {
-> >       const int *bit =3D feature_bits;
-> >       while (*bit !=3D VHOST_INVALID_FEATURE_BIT) {
-> >           uint64_t bit_mask =3D (1ULL << *bit);
-> >           if (!(hdev->features & bit_mask)) {
-> >               features &=3D ~bit_mask;
-> >           }
-> >           bit++;
-> >       }
-> >       return features;
-> >   }
-> >=20
-> > If f_readonly=3Dfalse then features |=3D s->host_features will not cont=
-ain
-> > f_readonly but it doesn't matter because if hdev->features (this value
-> > comes from the vhost slave) has f_readonly we will not clear the bit!
-> >=20
-> > So again, what is the purpose of the f_* properties?  I don't understand
-> > the semantics, it seems useless.
-> Hi Stefan,
-> I hate this piece of code too, :). There are several feature definitions =
-in VirtIODevice and vhost_dev,
-> I printed the features in the function: vhost_user_blk_get_features, my t=
-est vhost-slave also provides RO feature, and
-> I started Qemu with f_readonly=3Dfalse:
->=20
-> static uint64_t vhost_user_blk_get_features(VirtIODevice *vdev,
->                                             uint64_t features,
->                                             Error **errp)
-> {
->     VHostUserBlk *s =3D VHOST_USER_BLK(vdev);
->     uint64_t get_features;
->=20
->     /* Turn on pre-defined host features */
->     fprintf(stdout, "Features %"PRIx64"\n", features);
->     features |=3D s->host_features;
->     fprintf(stdout, "Turn On Predefined Features %"PRIx64"\n", features);
->     fprintf(stdout, "VHOST Features %"PRIx64"\n", s->dev.features);
->=20
->     get_features =3D vhost_get_features(&s->dev, user_feature_bits, featu=
-res);
->     fprintf(stdout, "Get Features %"PRIx64"\n", get_features);
->=20
->     return get_features;
-> }
->=20
-> Here is the result, RO feature is bit5:
-> Features 179000000, This is VirtIODevice->host_features.
-> Turn On Predefined Features 179001ed7, RO bit is masked here.
-> VHOST Features 141001466, vhost_dev-> features, you can see that RO bit i=
-s set here.
-> Get Features 149001446, this is the final result, RO bit is masked finall=
-y.
->=20
-> Similar with vhost-scsi and vhost-net, I think this part of logic is corr=
-ect.
+> > >      ai.ai_family =3D inet_ai_family_from_address(sraddr, &err);
+> > >      ai.ai_socktype =3D SOCK_DGRAM;
+> > >=20
+> > > @@ -488,6 +498,10 @@ static int inet_dgram_saddr(InetSocketAddress =
+*sraddr,
+> > >          goto err;
+> > >      }
+> > >=20
+> > > +    if ((check_ai_v4mapped(addr, port, &ai, &peer)) =3D=3D 0) {
+> > > +        ai.ai_flags &=3D ~AI_V4MAPPED;
+> > > +    }
+> > > +
+> > >      if ((rc =3D getaddrinfo(addr, port, &ai, &peer)) !=3D 0) {
+> > >          error_setg(errp, "address resolution failed for %s:%s: %s"=
+, addr,
+> > > port,
+> > >                     gai_strerror(rc));
 
-I see.  I incorrectly thought vhost_dev->features is ORed at some stage.
-
-This means that vhost slaves can only influence the feature bits in one
-way: they can disable feature bits that QEMU knows about.  Basically the
-feature bits are controlled by QEMU, not the slave.
-
-Stefan
-
---8HhMLSHvAouSipEr
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZ/II9AAoJEJykq7OBq3PIjIsH/1v9k6W+4XvcYl0FTQQpI3Zx
-rZSjI4ZS6L1aTU2XU3jWKvDlLlLATIuNxLU5cbnXlaOHS0EPhcuEiZuwKb0d37j5
-dQuU0z5ZVxkm55yMM8xe41VWXJM4Z/X2TEdNEFIieSUexX0sutZBE4R7gDr1K6RZ
-tZ6oq9Vghcl0b0XAzBl7E1U8/u155k4kUtjHFSX+eBSswgNYghMD2k+P6IS+XQXx
-PJkoQHDdsIhyQIOW97vQv4wMYBwpScOHcxx/VY2f7q8U7PvEI/1a9naRQv+voUVE
-a+tLV+/ML+dfhBXXNNg4uKsEz2ktdl6YV7DXQMxTZSVRipoO7E6HVz/OYgVBTl8=
-=vp9T
------END PGP SIGNATURE-----
-
---8HhMLSHvAouSipEr--
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
