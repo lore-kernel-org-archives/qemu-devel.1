@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38190)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38191)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eAdyh-000852-Ko
+	(envelope-from <berrange@redhat.com>) id 1eAdyh-000854-Kw
 	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 11:33:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eAdyg-0001HA-NS
+	(envelope-from <berrange@redhat.com>) id 1eAdye-0001Ee-Hm
 	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 11:33:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52230)
+Received: from mx1.redhat.com ([209.132.183.28]:11550)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eAdyg-0001Fy-Hr
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 11:33:50 -0400
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eAdye-0001E2-BK
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 11:33:48 -0400
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Fri,  3 Nov 2017 15:33:33 +0000
-Message-Id: <20171103153333.6416-6-berrange@redhat.com>
+Date: Fri,  3 Nov 2017 15:33:32 +0000
+Message-Id: <20171103153333.6416-5-berrange@redhat.com>
 In-Reply-To: <20171103153333.6416-1-berrange@redhat.com>
 References: <20171103153333.6416-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 5/5] build: delay check for empty git
- submodule list
+Subject: [Qemu-devel] [PATCH v3 4/5] build: don't fail if given a git
+ submodule which does not exist
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,66 +27,61 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Eric Blake <eblake@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, "Daniel P. Berrange" <berrange@redhat.com>
 
-We short circuit the git submodule update when passed an empty module list.
-This accidentally causes the 'status' command to write to the status file. The
-test needs to be delayed into the individual commands to avoid this premature
-writing of the status file.
+If going back in time in git history, across a commit that introduces a new
+submodule, the 'git-submodule.sh' script will fail, causing rebuild to fail.
+
+This is because config-host.mak contains a GIT_SUBMODULES variable that lists
+a submodule that only exists in the later commit. config-host.mak won't get
+repopulated until config.status is invoked, but make won't get this far due to
+the submodule error.
+
+This change makes 'git-submodule.sh' check whether each module is known to git
+and drops any which are not present. A warning message will be printed when any
+submodule is dropped in this manner.
 
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- scripts/git-submodule.sh | 19 ++++++++++++-------
- 1 file changed, 12 insertions(+), 7 deletions(-)
+ scripts/git-submodule.sh | 16 ++++++++++++++--
+ 1 file changed, 14 insertions(+), 2 deletions(-)
 
 diff --git a/scripts/git-submodule.sh b/scripts/git-submodule.sh
-index 2857fc57c4..90376a7dae 100755
+index 63ace6fc55..2857fc57c4 100755
 --- a/scripts/git-submodule.sh
 +++ b/scripts/git-submodule.sh
-@@ -33,12 +33,6 @@ error() {
+@@ -7,7 +7,7 @@ substat=".git-submodule-status"
+ 
+ command=$1
+ shift
+-modules="$@"
++maybe_modules="$@"
+ 
+ test -z "$GIT" && GIT=git
+ 
+@@ -33,12 +33,24 @@ error() {
      exit 1
  }
  
--if test -z "$maybe_modules"
--then
--    test -e $substat || touch $substat
--    exit 0
--fi
--
- modules=""
- for m in $maybe_modules
- do
-@@ -51,7 +45,7 @@ do
-     fi
- done
+-if test -z "$modules"
++if test -z "$maybe_modules"
+ then
+     test -e $substat || touch $substat
+     exit 0
+ fi
  
--if ! test -e ".git"
-+if test -n "$maybe_modules" && ! test -e ".git"
++modules=""
++for m in $maybe_modules
++do
++    $GIT submodule status $m 1> /dev/null 2>&1
++    if test $? = 0
++    then
++        modules="$modules $m"
++    else
++        echo "warn: ignoring non-existant submodule $m"
++    fi
++done
++
+ if ! test -e ".git"
  then
      echo "$0: unexpectedly called with submodules but no git checkout exists"
-     exit 1
-@@ -59,6 +53,11 @@ fi
- 
- case "$command" in
- status)
-+    if test -z "$maybe_modules"
-+    then
-+         test -s ${substat} && exit 1 || exit 0
-+    fi
-+
-     test -f "$substat" || exit 1
-     CURSTATUS=`$GIT submodule status $modules`
-     OLDSTATUS=`cat $substat`
-@@ -66,6 +65,12 @@ status)
-     exit $?
-     ;;
- update)
-+    if test -z "$maybe_modules"
-+    then
-+        test -e $substat || touch $substat
-+        exit 0
-+    fi
-+
-     $GIT submodule update --init $modules 1>/dev/null
-     test $? -ne 0 && error "failed to update modules"
- 
 -- 
 2.13.6
