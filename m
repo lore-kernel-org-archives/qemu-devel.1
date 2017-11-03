@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60010)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60021)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1eAdZs-0005lG-26
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 11:08:13 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1eAdZu-0005mn-5S
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 11:08:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1eAdZq-0006sy-Qv
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 11:08:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57190)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1eAdZt-0006uF-5P
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 11:08:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50290)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1eAdZq-0006sO-IO
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 11:08:10 -0400
+	id 1eAdZs-0006tq-Vi
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 11:08:13 -0400
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Fri,  3 Nov 2017 16:07:57 +0100
-Message-Id: <20171103150758.15005-2-marcandre.lureau@redhat.com>
+Date: Fri,  3 Nov 2017 16:07:58 +0100
+Message-Id: <20171103150758.15005-3-marcandre.lureau@redhat.com>
 In-Reply-To: <20171103150758.15005-1-marcandre.lureau@redhat.com>
 References: <20171103150758.15005-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 1/2] chardev: fix backend events regression
- with mux chardev
+Subject: [Qemu-devel] [PATCH 2/2] test: add some chardev mux event tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,110 +30,63 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: pbonzini@redhat.com, kirill.shutemov@linux.intel.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-Kirill noticied that on recent versions on QEMU he was not able to
-trigger SysRq to invoke debug capabilites of Linux Kernel.  He tracked
-it down to qemu_chr_be_event() ignoring CHR_EVENT_BREAK due s->be
-being NULL. The bug was introduced in 2.8, commit a4afa548fc6d ("char:
-move front end handlers in CharBackend"). Since the commit, the
-qemu_chr_be_event() failed to deliver CHR_EVENT_BREAK due to
-qemu_chr_fe_init() does not set s->be in case of mux.
+Check the expected behaviour of qemu_chr_be_event() on a mux chardev.
 
-Let's fix this by teaching mux to send an event to the frontend with
-the focus.
+For some reason, sending the event on the base chardev broadcast to
+all frontends, while sending it on the mux chardev itself should
+trigger the event on the currently focused chardev frontend.
 
-Reported-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Fixes: a4afa548fc6d ("char: move front end handlers in CharBackend")
 ---
- include/chardev/char.h |  1 +
- chardev/char-mux.c     |  6 ++++++
- chardev/char.c         | 18 ++++++++++++------
- 3 files changed, 19 insertions(+), 6 deletions(-)
+ tests/test-char.c | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
-diff --git a/include/chardev/char.h b/include/chardev/char.h
-index 43aabccef5..778d610295 100644
---- a/include/chardev/char.h
-+++ b/include/chardev/char.h
-@@ -248,6 +248,7 @@ typedef struct ChardevClass {
-     void (*chr_accept_input)(Chardev *chr);
-     void (*chr_set_echo)(Chardev *chr, bool echo);
-     void (*chr_set_fe_open)(Chardev *chr, int fe_open);
-+    void (*chr_be_event)(Chardev *s, int event);
- } ChardevClass;
+diff --git a/tests/test-char.c b/tests/test-char.c
+index 7ac25ff73f..911e3f6e8d 100644
+--- a/tests/test-char.c
++++ b/tests/test-char.c
+@@ -5,6 +5,7 @@
+ #include "qemu/config-file.h"
+ #include "qemu/sockets.h"
+ #include "chardev/char-fe.h"
++#include "chardev/char-mux.h"
+ #include "sysemu/sysemu.h"
+ #include "qapi/error.h"
+ #include "qom/qom-qobject.h"
+@@ -164,6 +165,7 @@ static void char_mux_test(void)
+     FeHandler h1 =3D { 0, }, h2 =3D { 0, };
+     CharBackend chr_be1, chr_be2;
 =20
- Chardev *qemu_chardev_new(const char *id, const char *typename,
-diff --git a/chardev/char-mux.c b/chardev/char-mux.c
-index 4cda5e7458..2281f07cb5 100644
---- a/chardev/char-mux.c
-+++ b/chardev/char-mux.c
-@@ -123,6 +123,11 @@ static void mux_chr_send_event(MuxChardev *d, int mu=
-x_nr, int event)
-     }
- }
++    muxes_realized =3D true; /* done after machine init */
+     opts =3D qemu_opts_create(qemu_find_opts("chardev"), "mux-label",
+                             1, &error_abort);
+     qemu_opt_set(opts, "backend", "ringbuf", &error_abort);
+@@ -201,8 +203,23 @@ static void char_mux_test(void)
+     g_assert_cmpstr(h2.read_buf, =3D=3D, "hello");
+     h2.read_count =3D 0;
 =20
-+static void mux_chr_be_event(MuxChardev *d, int event)
-+{
-+    mux_chr_send_event(d, d->focus, event);
-+}
++    g_assert_cmpint(h1.last_event, !=3D, 42); /* should be MUX_OUT or OP=
+ENED */
++    g_assert_cmpint(h2.last_event, !=3D, 42); /* should be MUX_IN or OPE=
+NED */
++    /* sending event on the base broadcast to all fe, historical reasons=
+? */
++    qemu_chr_be_event(base, 42);
++    g_assert_cmpint(h1.last_event, =3D=3D, 42);
++    g_assert_cmpint(h2.last_event, =3D=3D, 42);
++    qemu_chr_be_event(chr, -1);
++    g_assert_cmpint(h1.last_event, =3D=3D, 42);
++    g_assert_cmpint(h2.last_event, =3D=3D, -1);
 +
- static int mux_proc_byte(Chardev *chr, MuxChardev *d, int ch)
- {
-     if (d->term_got_escape) {
-@@ -346,6 +351,7 @@ static void char_mux_class_init(ObjectClass *oc, void=
- *data)
-     cc->chr_write =3D mux_chr_write;
-     cc->chr_accept_input =3D mux_chr_accept_input;
-     cc->chr_add_watch =3D mux_chr_add_watch;
-+    cc->chr_be_event =3D mux_chr_be_event;
- }
+     /* switch focus */
+     qemu_chr_be_write(base, (void *)"\1c", 2);
++    g_assert_cmpint(h1.last_event, =3D=3D, CHR_EVENT_MUX_IN);
++    g_assert_cmpint(h2.last_event, =3D=3D, CHR_EVENT_MUX_OUT);
++    qemu_chr_be_event(chr, -1);
++    g_assert_cmpint(h1.last_event, =3D=3D, -1);
++    g_assert_cmpint(h2.last_event, =3D=3D, CHR_EVENT_MUX_OUT);
 =20
- static const TypeInfo char_mux_type_info =3D {
-diff --git a/chardev/char.c b/chardev/char.c
-index 2ae4f465ec..8c3765ee99 100644
---- a/chardev/char.c
-+++ b/chardev/char.c
-@@ -43,10 +43,19 @@ static Object *get_chardevs_root(void)
-     return container_get(object_get_root(), "/chardevs");
- }
-=20
--void qemu_chr_be_event(Chardev *s, int event)
-+static void chr_be_event(Chardev *s, int event)
- {
-     CharBackend *be =3D s->be;
-=20
-+    if (!be || !be->chr_event) {
-+        return;
-+    }
-+
-+    be->chr_event(be->opaque, event);
-+}
-+
-+void qemu_chr_be_event(Chardev *s, int event)
-+{
-     /* Keep track if the char device is open */
-     switch (event) {
-         case CHR_EVENT_OPENED:
-@@ -57,11 +66,7 @@ void qemu_chr_be_event(Chardev *s, int event)
-             break;
-     }
-=20
--    if (!be || !be->chr_event) {
--        return;
--    }
--
--    be->chr_event(be->opaque, event);
-+    CHARDEV_GET_CLASS(s)->chr_be_event(s, event);
- }
-=20
- /* Not reporting errors from writing to logfile, as logs are
-@@ -244,6 +249,7 @@ static void char_class_init(ObjectClass *oc, void *da=
-ta)
-     ChardevClass *cc =3D CHARDEV_CLASS(oc);
-=20
-     cc->chr_write =3D null_chr_write;
-+    cc->chr_be_event =3D chr_be_event;
- }
-=20
- static void char_finalize(Object *obj)
+     qemu_chr_be_write(base, (void *)"hello", 6);
+     g_assert_cmpint(h2.read_count, =3D=3D, 0);
 --=20
 2.15.0.rc0.40.gaefcc5f6f
