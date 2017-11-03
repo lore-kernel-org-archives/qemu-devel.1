@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41293)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41314)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yi.l.liu@linux.intel.com>) id 1eAavY-0007lv-Co
+	(envelope-from <yi.l.liu@linux.intel.com>) id 1eAava-0007ml-LM
 	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 08:18:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yi.l.liu@linux.intel.com>) id 1eAavW-0004PE-Fd
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 08:18:24 -0400
+	(envelope-from <yi.l.liu@linux.intel.com>) id 1eAavZ-0004RT-N9
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 08:18:26 -0400
 Received: from mga11.intel.com ([192.55.52.93]:37808)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yi.l.liu@linux.intel.com>)
-	id 1eAavW-0004Mu-5E
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 08:18:22 -0400
+	id 1eAavZ-0004Mu-Dm
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 08:18:25 -0400
 From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
-Date: Fri,  3 Nov 2017 20:01:52 +0800
-Message-Id: <1509710516-21084-3-git-send-email-yi.l.liu@linux.intel.com>
+Date: Fri,  3 Nov 2017 20:01:53 +0800
+Message-Id: <1509710516-21084-4-git-send-email-yi.l.liu@linux.intel.com>
 In-Reply-To: <1509710516-21084-1-git-send-email-yi.l.liu@linux.intel.com>
 References: <1509710516-21084-1-git-send-email-yi.l.liu@linux.intel.com>
-Subject: [Qemu-devel] [RESEND PATCH 2/6] memory: introduce AddressSpaceOps
- and IOMMUObject
+Subject: [Qemu-devel] [RESEND PATCH 3/6] intel_iommu: provide
+ AddressSpaceOps.iommu_get instance
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,274 +30,59 @@ Cc: tianyu.lan@intel.com, yi.l.liu@intel.com, peterx@redhat.com, kevin.tian@inte
 
 From: Peter Xu <peterx@redhat.com>
 
-AddressSpaceOps is similar to MemoryRegionOps, it's just for address
-spaces to store arch-specific hooks.
-
-The first hook I would like to introduce is iommu_get(). Return an
-IOMMUObject behind the AddressSpace.
-
-For systems that have IOMMUs, we will create a special address
-space per device which is different from system default address
-space for it (please refer to pci_device_iommu_address_space()).
-Normally when that happens, there will be one specific IOMMU (or
-say, translation unit) stands right behind that new address space.
-
-This iommu_get() fetches that guy behind the address space. Here,
-the guy is defined as IOMMUObject, which includes a notifier_list
-so far, may extend in future. Along with IOMMUObject, a new iommu
-notifier mechanism is introduced. It would be used for virt-svm.
-Also IOMMUObject can further have a IOMMUObjectOps which is similar
-to MemoryRegionOps. The difference is IOMMUObjectOps is not relied
-on MemoryRegion.
+Provide AddressSpaceOps.iommu_get() in Intel IOMMU emulator.
 
 Signed-off-by: Peter Xu <peterx@redhat.com>
 Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
 ---
- hw/core/Makefile.objs   |  1 +
- hw/core/iommu.c         | 58 +++++++++++++++++++++++++++++++++++++++
- include/exec/memory.h   | 22 +++++++++++++++
- include/hw/core/iommu.h | 73 +++++++++++++++++++++++++++++++++++++++++++++++++
- memory.c                | 10 +++++--
- 5 files changed, 162 insertions(+), 2 deletions(-)
- create mode 100644 hw/core/iommu.c
- create mode 100644 include/hw/core/iommu.h
+ hw/i386/intel_iommu.c         | 7 +++++++
+ include/hw/i386/intel_iommu.h | 2 ++
+ 2 files changed, 9 insertions(+)
 
-diff --git a/hw/core/Makefile.objs b/hw/core/Makefile.objs
-index f8d7a4a..d688412 100644
---- a/hw/core/Makefile.objs
-+++ b/hw/core/Makefile.objs
-@@ -5,6 +5,7 @@ common-obj-y += fw-path-provider.o
- # irq.o needed for qdev GPIO handling:
- common-obj-y += irq.o
- common-obj-y += hotplug.o
-+common-obj-y += iommu.o
- common-obj-y += nmi.o
- 
- common-obj-$(CONFIG_EMPTY_SLOT) += empty_slot.o
-diff --git a/hw/core/iommu.c b/hw/core/iommu.c
-new file mode 100644
-index 0000000..7c4fcfe
---- /dev/null
-+++ b/hw/core/iommu.c
-@@ -0,0 +1,58 @@
-+/*
-+ * QEMU emulation of IOMMU logic
-+ *
-+ * Copyright (C) 2017 Red Hat Inc.
-+ *
-+ * Authors: Peter Xu <peterx@redhat.com>,
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
-+
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+
-+ * You should have received a copy of the GNU General Public License along
-+ * with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "hw/core/iommu.h"
-+
-+void iommu_notifier_register(IOMMUObject *iommu,
-+                             IOMMUNotifier *n,
-+                             IOMMUNotifyFn fn,
-+                             IOMMUEvent event)
-+{
-+    n->event = event;
-+    n->iommu_notify = fn;
-+    QLIST_INSERT_HEAD(&iommu->iommu_notifiers, n, node);
-+    return;
-+}
-+
-+void iommu_notifier_unregister(IOMMUObject *iommu,
-+                               IOMMUNotifier *notifier)
-+{
-+    IOMMUNotifier *cur, *next;
-+
-+    QLIST_FOREACH_SAFE(cur, &iommu->iommu_notifiers, node, next) {
-+        if (cur == notifier) {
-+            QLIST_REMOVE(cur, node);
-+            break;
-+        }
-+    }
-+}
-+
-+void iommu_notify(IOMMUObject *iommu, IOMMUEventData *event_data)
-+{
-+    IOMMUNotifier *cur;
-+
-+    QLIST_FOREACH(cur, &iommu->iommu_notifiers, node) {
-+        if ((cur->event == event_data->event) && cur->iommu_notify) {
-+            cur->iommu_notify(cur, event_data);
-+        }
-+    }
-+}
-diff --git a/include/exec/memory.h b/include/exec/memory.h
-index 03595e3..8350973 100644
---- a/include/exec/memory.h
-+++ b/include/exec/memory.h
-@@ -26,6 +26,7 @@
- #include "qom/object.h"
- #include "qemu/rcu.h"
- #include "hw/qdev-core.h"
-+#include "hw/core/iommu.h"
- 
- #define RAM_ADDR_INVALID (~(ram_addr_t)0)
- 
-@@ -301,6 +302,19 @@ struct MemoryListener {
+diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+index e81c706..54343e5 100644
+--- a/hw/i386/intel_iommu.c
++++ b/hw/i386/intel_iommu.c
+@@ -2687,6 +2687,12 @@ static const MemoryRegionOps vtd_mem_ir_ops = {
+     },
  };
  
- /**
-+ * AddressSpaceOps: callbacks structure for address space specific operations
-+ *
-+ * @iommu_get: returns an IOMMU object that backs the address space.
-+ *             Normally this should be NULL for generic address
-+ *             spaces, and it's only used when there is one
-+ *             translation unit behind this address space.
-+ */
-+struct AddressSpaceOps {
-+    IOMMUObject *(*iommu_get)(AddressSpace *as);
-+};
-+typedef struct AddressSpaceOps AddressSpaceOps;
-+
-+/**
-  * AddressSpace: describes a mapping of addresses to #MemoryRegion objects
-  */
- struct AddressSpace {
-@@ -316,6 +330,7 @@ struct AddressSpace {
-     struct MemoryRegionIoeventfd *ioeventfds;
-     QTAILQ_HEAD(memory_listeners_as, MemoryListener) listeners;
-     QTAILQ_ENTRY(AddressSpace) address_spaces_link;
-+    AddressSpaceOps as_ops;
- };
- 
- FlatView *address_space_to_flatview(AddressSpace *as);
-@@ -1988,6 +2003,13 @@ address_space_write_cached(MemoryRegionCache *cache, hwaddr addr,
-     address_space_write(cache->as, cache->xlat + addr, MEMTXATTRS_UNSPECIFIED, buf, len);
- }
- 
-+/**
-+ * address_space_iommu_get: Get the backend IOMMU for the address space
-+ *
-+ * @as: the address space to fetch IOMMU from
-+ */
-+IOMMUObject *address_space_iommu_get(AddressSpace *as);
-+
- #endif
- 
- #endif
-diff --git a/include/hw/core/iommu.h b/include/hw/core/iommu.h
-new file mode 100644
-index 0000000..34387c0
---- /dev/null
-+++ b/include/hw/core/iommu.h
-@@ -0,0 +1,73 @@
-+/*
-+ * QEMU emulation of IOMMU logic
-+ *
-+ * Copyright (C) 2017 Red Hat Inc.
-+ *
-+ * Authors: Peter Xu <peterx@redhat.com>,
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
-+
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+
-+ * You should have received a copy of the GNU General Public License along
-+ * with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#ifndef HW_CORE_IOMMU_H
-+#define HW_CORE_IOMMU_H
-+
-+#include "qemu/queue.h"
-+
-+enum IOMMUEvent {
-+    IOMMU_EVENT_BIND_PASIDT,
-+};
-+typedef enum IOMMUEvent IOMMUEvent;
-+
-+struct IOMMUEventData {
-+    IOMMUEvent event;
-+    uint64_t length;
-+    void *data;
-+};
-+typedef struct IOMMUEventData IOMMUEventData;
-+
-+typedef struct IOMMUNotifier IOMMUNotifier;
-+
-+typedef void (*IOMMUNotifyFn)(IOMMUNotifier *notifier,
-+                              IOMMUEventData *event_data);
-+
-+struct IOMMUNotifier {
-+    IOMMUNotifyFn iommu_notify;
-+    /*
-+     * What events we are listening to. Let's allow multiple event
-+     * registrations from beginning.
-+     */
-+    IOMMUEvent event;
-+    QLIST_ENTRY(IOMMUNotifier) node;
-+};
-+
-+typedef struct IOMMUObject IOMMUObject;
-+
-+/*
-+ * This stands for an IOMMU unit. Any translation device should have
-+ * this struct inside its own structure to make sure it can leverage
-+ * common IOMMU functionalities.
-+ */
-+struct IOMMUObject {
-+    QLIST_HEAD(, IOMMUNotifier) iommu_notifiers;
-+};
-+
-+void iommu_notifier_register(IOMMUObject *iommu,
-+                             IOMMUNotifier *n,
-+                             IOMMUNotifyFn fn,
-+                             IOMMUEvent event);
-+void iommu_notifier_unregister(IOMMUObject *iommu,
-+                               IOMMUNotifier *notifier);
-+void iommu_notify(IOMMUObject *iommu, IOMMUEventData *event_data);
-+
-+#endif
-diff --git a/memory.c b/memory.c
-index 77fb3ef..307f665 100644
---- a/memory.c
-+++ b/memory.c
-@@ -235,8 +235,6 @@ struct FlatView {
-     MemoryRegion *root;
- };
- 
--typedef struct AddressSpaceOps AddressSpaceOps;
--
- #define FOR_EACH_FLAT_RANGE(var, view)          \
-     for (var = (view)->ranges; var < (view)->ranges + (view)->nr; ++var)
- 
-@@ -2793,6 +2791,14 @@ static void do_address_space_destroy(AddressSpace *as)
-     memory_region_unref(as->root);
- }
- 
-+IOMMUObject *address_space_iommu_get(AddressSpace *as)
++static IOMMUObject *vtd_as_iommu_get(AddressSpace *as)
 +{
-+    if (!as->as_ops.iommu_get) {
-+        return NULL;
-+    }
-+    return as->as_ops.iommu_get(as);
++    VTDAddressSpace *vtd_dev_as = container_of(as, VTDAddressSpace, as);
++    return &vtd_dev_as->iommu_object;
 +}
 +
- void address_space_destroy(AddressSpace *as)
+ VTDAddressSpace *vtd_find_add_as(IntelIOMMUState *s, PCIBus *bus, int devfn)
  {
-     MemoryRegion *root = as->root;
+     uintptr_t key = (uintptr_t)bus;
+@@ -2748,6 +2754,7 @@ VTDAddressSpace *vtd_find_add_as(IntelIOMMUState *s, PCIBus *bus, int devfn)
+                                             VTD_INTERRUPT_ADDR_FIRST,
+                                             &vtd_dev_as->iommu_ir, 64);
+         address_space_init(&vtd_dev_as->as, &vtd_dev_as->root, name);
++        vtd_dev_as->as.as_ops.iommu_get = vtd_as_iommu_get;
+         memory_region_add_subregion_overlap(&vtd_dev_as->root, 0,
+                                             &vtd_dev_as->sys_alias, 1);
+         memory_region_add_subregion_overlap(&vtd_dev_as->root, 0,
+diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.h
+index c85f9ff..a3c6d45 100644
+--- a/include/hw/i386/intel_iommu.h
++++ b/include/hw/i386/intel_iommu.h
+@@ -27,6 +27,7 @@
+ #include "hw/i386/ioapic.h"
+ #include "hw/pci/msi.h"
+ #include "hw/sysbus.h"
++#include "hw/core/iommu.h"
+ 
+ #define TYPE_INTEL_IOMMU_DEVICE "intel-iommu"
+ #define INTEL_IOMMU_DEVICE(obj) \
+@@ -90,6 +91,7 @@ struct VTDAddressSpace {
+     MemoryRegion sys_alias;
+     MemoryRegion iommu_ir;      /* Interrupt region: 0xfeeXXXXX */
+     IntelIOMMUState *iommu_state;
++    IOMMUObject iommu_object;
+     VTDContextCacheEntry context_cache_entry;
+ };
+ 
 -- 
 1.9.1
