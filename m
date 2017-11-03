@@ -1,15 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48063)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48210)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <shankerd@codeaurora.org>) id 1eAbEo-0000my-3p
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 08:38:18 -0400
+	(envelope-from <jcody@redhat.com>) id 1eAbFJ-00015B-6o
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 08:38:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <shankerd@codeaurora.org>) id 1eAbEn-0002Xr-7I
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 08:38:18 -0400
-From: Shanker Donthineni <shankerd@codeaurora.org>
-Date: Fri,  3 Nov 2017 07:37:51 -0500
-Message-Id: <1509712671-16299-1-git-send-email-shankerd@codeaurora.org>
-Subject: [Qemu-devel] [PATCH] hw/intc/arm_gicv3_its: Fix the VM termination
- in vm_change_state_handler()
+	(envelope-from <jcody@redhat.com>) id 1eAbFE-00030k-3k
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 08:38:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38232)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jcody@redhat.com>) id 1eAbFD-0002zD-Tw
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 08:38:44 -0400
+Date: Fri, 3 Nov 2017 08:38:40 -0400
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20171103123840.GA5399@localhost.localdomain>
+References: <f512ef4b-11ac-0cd2-0037-4608f2059669@ozlabs.ru>
+	<d80a7e33-f055-d59e-8aff-2ed1f9a79c83@ozlabs.ru>
+	<20171027071241.GA30326@localhost.localdomain>
+	<12b21c38-3d03-929b-aea0-7de5efe55d56@ozlabs.ru>
+	<9ac46d04-9a6a-67a5-73b3-fa2208c03e35@redhat.com>
+	<0c64b45d-3f42-7866-ffa8-b2d0a32dddb0@ozlabs.ru>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0c64b45d-3f42-7866-ffa8-b2d0a32dddb0@ozlabs.ru>
+Subject: Re: [Qemu-devel] iotest 194 fails on vhdx
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,46 +31,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Auger <eric.auger@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>, Shanker Donthineni <shankerd@codeaurora.org>
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>
 
-The commit cddafd8f353d ("hw/intc/arm_gicv3_its: Implement state save
-/restore") breaks the backward compatibility with the older kernels
-where vITS save/restore support is not available. The vmstate function
-vm_change_state_handler() should not be registered if the running kernel
-doesn't support ITS save/restore feature. Otherwise VM instance will be
-killed whenever vmstate callback function is invoked.
+On Thu, Nov 02, 2017 at 12:19:00PM +1100, Alexey Kardashevskiy wrote:
+> On 28/10/17 19:25, Paolo Bonzini wrote:
+> > On 28/10/2017 08:57, Alexey Kardashevskiy wrote:
+> >> On 27/10/17 18:12, Jeff Cody wrote:
+> >>> VHDX does not support migration (VMDK fails the same way). 
+> >>
+> >> Probably a very ignorant question but how can an image format not support
+> >> migration at all? Is not it simple writing blocks, one-by-one? Thanks.
+> > 
+> > VHDX does not implement bdrv_invalidate_cache.  If you add that
+> > callback, it can support migration.
+> 
+> 
+> I could give it a try but is there a demand for it really?
+> 
 
-Observed a virtual machine shutdown with QEMU-2.10+linux-4.11 when testing
-the reboot command "virsh reboot <domain> --mode acpi" instead of reboot.
-
-KVM Error: 'KVM_SET_DEVICE_ATTR failed: Group 4 attr 0x00000000000001'
-
-Signed-off-by: Shanker Donthineni <shankerd@codeaurora.org>
----
- hw/intc/arm_gicv3_its_kvm.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/hw/intc/arm_gicv3_its_kvm.c b/hw/intc/arm_gicv3_its_kvm.c
-index 39903d5..9b00ce5 100644
---- a/hw/intc/arm_gicv3_its_kvm.c
-+++ b/hw/intc/arm_gicv3_its_kvm.c
-@@ -111,13 +111,13 @@ static void kvm_arm_its_realize(DeviceState *dev, Error **errp)
-             error_free(s->migration_blocker);
-             return;
-         }
-+    } else {
-+        qemu_add_vm_change_state_handler(vm_change_state_handler, s);
-     }
- 
-     kvm_msi_use_devid = true;
-     kvm_gsi_direct_mapping = false;
-     kvm_msi_via_irqfd_allowed = kvm_irqfds_enabled();
--
--    qemu_add_vm_change_state_handler(vm_change_state_handler, s);
- }
- 
- /**
--- 
-Qualcomm Datacenter Technologies, Inc. on behalf of the Qualcomm Technologies, Inc.
-Qualcomm Technologies, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project.
+I don't think there is much demand for it, which is why we use the
+migration-blocker for it still.  VHDX is a compatibility format, and as such
+I don't imagine many people using it as a primary format during runtime.
