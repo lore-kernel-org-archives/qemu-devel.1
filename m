@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54083)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54247)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eAgoI-0001zY-9L
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 14:35:19 -0400
+	(envelope-from <bounces@canonical.com>) id 1eAgou-0002Rh-2F
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 14:35:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eAgoF-0004VY-0Y
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 14:35:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40332)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eAgoE-0004UT-NX
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 14:35:14 -0400
-References: <20171103153333.6416-1-berrange@redhat.com>
-	<20171103153333.6416-4-berrange@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <10360380-eb0c-104e-da9b-b6d8b5f26718@redhat.com>
-Date: Fri, 3 Nov 2017 13:35:11 -0500
+	(envelope-from <bounces@canonical.com>) id 1eAgoq-0004zV-Tw
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 14:35:56 -0400
+Received: from indium.canonical.com ([91.189.90.7]:33506)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eAgoq-0004z2-NI
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 14:35:52 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eAgon-0006Jj-Og
+	for <qemu-devel@nongnu.org>; Fri, 03 Nov 2017 18:35:49 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 87ACC2E80D8
+	for <qemu-devel@nongnu.org>; Fri,  3 Nov 2017 18:35:48 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20171103153333.6416-4-berrange@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="3sO9ldh6NmNh7GB4ccEjRKWGkfdpDOuuJ"
-Subject: Re: [Qemu-devel] [PATCH v3 3/5] build: allow automatic git
- submodule updates to be disabled
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 03 Nov 2017 18:28:21 -0000
+From: Kevin <1728448@bugs.launchpad.net>
+Reply-To: Bug 1728448 <1728448@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150930506825.20259.326196094575831329.malonedeb@soybean.canonical.com>
+Message-Id: <150973370140.4312.7524581396586106645.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1728448] Re: qemu-system-arm segmentation fault
+ with cpu cortex-m*
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,102 +37,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---3sO9ldh6NmNh7GB4ccEjRKWGkfdpDOuuJ
-From: Eric Blake <eblake@redhat.com>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>,
- Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <10360380-eb0c-104e-da9b-b6d8b5f26718@redhat.com>
-Subject: Re: [PATCH v3 3/5] build: allow automatic git submodule updates to be
- disabled
-References: <20171103153333.6416-1-berrange@redhat.com>
- <20171103153333.6416-4-berrange@redhat.com>
-In-Reply-To: <20171103153333.6416-4-berrange@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Thank you for you answer.
 
-On 11/03/2017 10:33 AM, Daniel P. Berrange wrote:
-> Some people building QEMU use VPATH builds where the source directory i=
-s on a
-> read-only volume. In such a case 'scripts/git-submodules.sh update' wil=
-l always
-> fail and users are required to run it manually themselves on their orig=
-inal
-> writable source directory.
->=20
-> While this is already supported, it is nice to give users a command lin=
-e flag
-> to configure to permanently disable automatic submodule updates, as it =
-means
-> they won't get hard to diagnose failures from git-submodules.sh at an a=
-rbitrary
-> later date.
->=20
-> This patch thus introduces a flag '--disable-git-update' which will pre=
-vent
-> 'make' from ever running 'scripts/git-submodules.sh update'. It will st=
-ill run
-> the 'status' command to determine if a submodule update is needed, but =
-when it
-> does this it'll simply stop and print a message instructing the develop=
-er what
-> todo. eg
->=20
-> $ ./configure  --target-list=3Dx86_64-softmmu --disable-git-update
-> ...snip...
->=20
-> $ make
->   GEN     config-host.h
->   GEN     trace/generated-tcg-tracers.h
->   GEN     trace/generated-helpers-wrappers.h
->   GEN     trace/generated-helpers.h
->   GEN     trace/generated-helpers.c
->   GEN     module_block.h
->=20
-> GIT submodule checkout is out of date. Please run
->   scripts/git-submodule.sh update ui/keycodemapdb
-> from the source directory checkout /home/berrange/src/virt/qemu
->=20
-> make: *** [Makefile:31: git-submodule-update] Error 1
->=20
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> ---
->  Makefile                 | 11 +++++++++++
->  configure                |  7 +++++++
->  scripts/git-submodule.sh |  9 +++++++++
->  3 files changed, 27 insertions(+)
->=20
+I wanted to emulate under cortex-M3 because I need to ex=C3=A9utute an
+executable who will install a kernel but only runs under cortex-M3, for
+then realized fuzzing on this kernel.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+But, I will try with freeRTOS.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+-- =
 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1728448
 
---3sO9ldh6NmNh7GB4ccEjRKWGkfdpDOuuJ
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Title:
+  qemu-system-arm segmentation fault with cpu cortex-m*
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+Status in QEMU:
+  New
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAln8tt8ACgkQp6FrSiUn
-Q2pSXQf/VngluuFO7gdkVAfV+ic0Q7ao0MRRFukw7OzJatPuisQNVoJrHqD9MlU3
-m2GdJPQmvdPldpbtXHQ4Msc13t1bwatTfGc+Bfp6gyp984jA/KxbLRR7YSMHQglW
-mIsLsi+qs6/KXWV5FFtVIqaZZEgBbo3bRSt8kzKbThnV9jJgCPC1aedxTfCYL0zj
-rdktlU5zeDYjgxIEP6e4PCqbIFxFCG9QX3RvXogFjGe1W0nFoEW7ZCw1BYdG04KP
-h3CJQrKMTMHimY9RpkyD29bMaHbK/uW+8j5w8h94otV6YITPzHzYIFZ21MRvQl3/
-vVw8WyOnBXdGiqQZFLekZEOWUB22BQ==
-=ghdM
------END PGP SIGNATURE-----
+Bug description:
+  I try to run an emulation with qemu-system-arm under a cpu cortex-m3
+  but any execution under the processor result by a segmentation fault.
 
---3sO9ldh6NmNh7GB4ccEjRKWGkfdpDOuuJ--
+  My command is : qemu-system-arm -m 256 -M versatilepb -cpu cortex-m3
+  -kernel ~/qemu/wheezy/vmlinuz-3.2.0-4-versatile -initrd
+  ~/qemu/wheezy/initrd.img-3.2.0-4-versatile -hda ~/qemu/wheezy/hda.img
+  -append 'root=3D/dev/sda1'
+
+  If a lauch the emulation without specifying a cpu equivalent to
+  cortex-m*, the vm opens up well and works but I absolutely need to run
+  it under cortex-m3.
+
+  =
+
+  Do you have any idea why I have this problem only with this type of proce=
+ssor ?
+
+  I also try with other boards different from versatilepb but I have the
+  same result.
+
+  I am under ubuntu 17 64bits during my test.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1728448/+subscriptions
