@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33261)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33365)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1eAYa6-00049Y-1J
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 05:48:07 -0400
+	(envelope-from <stefanha@gmail.com>) id 1eAYan-0004XV-Vo
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 05:48:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1eAYa2-0002eh-U9
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 05:48:06 -0400
-Received: from mail-wr0-x229.google.com ([2a00:1450:400c:c0c::229]:56175)
+	(envelope-from <stefanha@gmail.com>) id 1eAYak-000315-Sb
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 05:48:50 -0400
+Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:44367)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1eAYa2-0002eL-N0
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 05:48:02 -0400
-Received: by mail-wr0-x229.google.com with SMTP id l8so1956612wre.12
-	for <qemu-devel@nongnu.org>; Fri, 03 Nov 2017 02:48:02 -0700 (PDT)
-References: <20171031112457.10516.8971.stgit@pasha-VirtualBox>
-	<20171031112633.10516.44062.stgit@pasha-VirtualBox>
-	<92aa3279-66b5-b765-b36b-2acb6413bd47@redhat.com>
-	<001301d35484$75071110$5f153330$@ru>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <001301d35484$75071110$5f153330$@ru>
-Date: Fri, 03 Nov 2017 09:47:56 +0000
-Message-ID: <87tvybhewj.fsf@linaro.org>
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1eAYak-00030j-LC
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 05:48:46 -0400
+Received: by mail-wm0-x236.google.com with SMTP id n74so2262596wmi.1
+	for <qemu-devel@nongnu.org>; Fri, 03 Nov 2017 02:48:46 -0700 (PDT)
+Date: Fri, 3 Nov 2017 09:48:43 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20171103094843.GC5078@stefanha-x1.localdomain>
+References: <150963549061.4171.11895725981979057755.malonedeb@gac.canonical.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 17/26] replay: push replay_mutex_lock
- up the call tree
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="f+W+jCU1fRNres8c"
+Content-Disposition: inline
+In-Reply-To: <150963549061.4171.11895725981979057755.malonedeb@gac.canonical.com>
+Subject: Re: [Qemu-devel] [Bug 1729623] [NEW] test-aio-multithread fails
+ with 'Co-routine re-entered recursively'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,77 +30,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <dovgaluk@ispras.ru>
-Cc: 'Paolo Bonzini' <pbonzini@redhat.com>, 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org, kwolf@redhat.com, peter.maydell@linaro.org, boost.lists@gmail.com, quintela@redhat.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, maria.klimushenkova@ispras.ru, kraxel@redhat.com
+To: Bug 1729623 <1729623@bugs.launchpad.net>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 
 
-Pavel Dovgalyuk <dovgaluk@ispras.ru> writes:
+--f+W+jCU1fRNres8c
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
->> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
->> On 31/10/2017 12:26, Pavel Dovgalyuk wrote:
->> > +    /* We need to drop the replay_lock so any vCPU threads woken up
->> > +     * can finish their replay tasks
->> > +     */
->> > +    if (replay_mode !=3D REPLAY_MODE_NONE) {
->> > +        g_assert(replay_mutex_locked());
->> > +        qemu_mutex_unlock_iothread();
->> > +        replay_mutex_unlock();
->> > +        qemu_mutex_lock_iothread();
->> > +    }
->>
->> The assert+unlock+lock here is unnecessary; just do
->>
->>     if (replay_mode !=3D REPLAY_MODE_NONE) {
->>         replay_mutex_unlock();
->>     }
->>
->> which according to a previous suggestion can become just
->>
->>     replay_mutex_unlock();
->
-> We can't remove qemu_mutex_unlock_iothread(), because there is an assert
-> inside replay_mutex_unlock(), which checks that iothread is unlocked.
+On Thu, Nov 02, 2017 at 03:11:30PM -0000, R.Nageswara Sastry wrote:
+> Public bug reported:
+>=20
+> git head is at fa73e146250181852c0915aa65df8d54d35485fa
+>=20
+> configure with the following
+>=20
+> ./configure --enable-attr --enable-bsd-user --enable-cap-ng\
+>  --enable-coroutine-pool  --enable-crypto-afalg --enable-curl\
+>  --enable-curses --enable-debug --enable-debug-info\
+>  --enable-debug-tcg      --enable-fdt      --enable-gcrypt \
+>  --enable-gnutls      --enable-gprof      --enable-gtk  \
+>  --enable-guest-agent      --enable-kvm      --enable-libiscsi \
+>  --enable-libssh2      --enable-linux-aio      --enable-linux-user \
+>  --enable-live-block-migration      --enable-modules   \
+>  --enable-numa      --enable-pie      --enable-profiler \
+>  --enable-qom-cast-debug      --enable-rbd      --enable-replication  \
+>  --enable-seccomp      --enable-smartcard      --enable-stack-protector \
+>  --enable-system      --enable-tcg      --enable-tcg-interpreter  \
+>  --enable-tools      --enable-tpm      --enable-trace-backend=3Dftrace \
+>  --enable-user      --enable-vhost-net      --enable-vhost-scsi  \
+>  --enable-vhost-user      --enable-vhost-vsock      --enable-virtfs  \=20
+>  --enable-vnc      --enable-tpm      --enable-vnc-png   \
+>  --enable-vnc-sasl      --enable-werror      --enable-xfsctl \
+>  --enable-gcov --enable-debug-stack-usage
+>=20
+> make -j 32
+>=20
+> make test-aio-multithread V=3D1
+>=20
+> ...
+> File '/home/nasastry/qemu/include/qapi/qmp/qobject.h'
+> No executable lines
+>=20
+> MALLOC_PERTURB_=3D${MALLOC_PERTURB_:-$(( ${RANDOM:-0} % 255 + 1))} gteste=
+r -k --verbose -m=3Dquick tests/test-aio-multithread
+> TEST: tests/test-aio-multithread... (pid=3D86877)
+>   /aio/multi/lifecycle:                                                OK
+>   /aio/multi/schedule:                                                 Co=
+-routine re-entered recursively
+> FAIL
 
-I'm certainly open to reviewing the locking order rules if it is easier
-another way around. I'm just conscious that it's easy to deadlock if we
-don't pay attention. This is what I wrote in replay.txt:
+I cannot reproduce it locally.
 
-  Locking and thread synchronisation
-  ----------------------------------
+Please run with gdb tests/test-aio-multithread and post the backtrace
+when the "Co-routine re-entered recursively" message is printed using
+the "thread apply all bt" gdb command.
 
-  Previously the synchronisation of the main thread and the vCPU thread
-  was ensured by the holding of the BQL. However the trend has been to
-  reduce the time the BQL was held across the system including under TCG
-  system emulation. As it is important that batches of events are kept
-  in sequence (e.g. expiring timers and checkpoints in the main thread
-  while instruction checkpoints are written by the vCPU thread) we need
-  another lock to keep things in lock-step. This role is now handled by
-  the replay_mutex_lock. It used to be held only for each event being
-  written but now it is held for a whole execution period. This results
-  in a deterministic ping-pong between the two main threads.
+Stefan
 
-  As deadlocks are easy to introduce a new rule is introduced that the
-  replay_mutex_lock is taken before any BQL locks. Conversely you cannot
-  release the replay_lock while the BQL is still held.
+--f+W+jCU1fRNres8c
+Content-Type: application/pgp-signature; name="signature.asc"
 
->
->>
->> >      while (!all_vcpus_paused()) {
->> >          qemu_cond_wait(&qemu_pause_cond, &qemu_global_mutex);
->> >          CPU_FOREACH(cpu) {
->> >              qemu_cpu_kick(cpu);
->> >          }
->> >      }
->> > +
->> > +    if (replay_mode !=3D REPLAY_MODE_NONE) {
->> > +        qemu_mutex_unlock_iothread();
->> > +        replay_mutex_lock();
->> > +        qemu_mutex_lock_iothread();
->> > +    }
->>
->
-> Pavel Dovgalyuk
+-----BEGIN PGP SIGNATURE-----
 
+iQEcBAEBAgAGBQJZ/Dt7AAoJEJykq7OBq3PIW0wH/jY+WTgP0qQHUVxgP55FyOVG
+FgXYPDHBsGt1fFsHdNk7gmMLF1qalyyHWhBensVTeu9hgY0C+wrQb57yqGaIpeIF
+pBOJXfekxtEZemKBLpGUwwMgXfCLCPOpkqvy3/T1EqyZ51HAp5IX3Ps797EMprlB
+vToJPmtr7HHUHIZil5bguWJ+gE2MQD1/2IlE7uhzjjPfJ71KC/9ofGXtZZnZRrUZ
+8MtXzhf5+gcX/DiybHdZckSDaEBQEMON+GrINLu5mIZwayp5PGVQNsmy2XppUugo
+xWmcW9oCxFMD0ZpADscZ08T2mi16rU0FdpajVlESPr3q07ZaTrr++2WdAqsIA9A=
+=Rd0O
+-----END PGP SIGNATURE-----
 
---
-Alex Benn=C3=A9e
+--f+W+jCU1fRNres8c--
