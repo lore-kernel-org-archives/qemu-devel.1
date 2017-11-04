@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44880)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44886)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1eApPL-0005zq-1t
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 23:46:14 -0400
+	(envelope-from <jcmvbkbc@gmail.com>) id 1eApPM-00060l-ED
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 23:46:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1eApPC-0000Xc-Tv
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 23:46:07 -0400
-Received: from mail-lf0-x22e.google.com ([2a00:1450:4010:c07::22e]:53315)
+	(envelope-from <jcmvbkbc@gmail.com>) id 1eApPE-0000YU-6j
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 23:46:08 -0400
+Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:50915)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1eApPC-0000Ww-6y
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 23:45:58 -0400
-Received: by mail-lf0-x22e.google.com with SMTP id l23so5144792lfk.10
-	for <qemu-devel@nongnu.org>; Fri, 03 Nov 2017 20:45:58 -0700 (PDT)
+	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1eApPD-0000XU-G0
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 23:46:00 -0400
+Received: by mail-lf0-x243.google.com with SMTP id a132so5153634lfa.7
+	for <qemu-devel@nongnu.org>; Fri, 03 Nov 2017 20:45:59 -0700 (PDT)
 From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Fri,  3 Nov 2017 20:45:07 -0700
-Message-Id: <1509767121-26925-3-git-send-email-jcmvbkbc@gmail.com>
+Date: Fri,  3 Nov 2017 20:45:08 -0700
+Message-Id: <1509767121-26925-4-git-send-email-jcmvbkbc@gmail.com>
 In-Reply-To: <1509767121-26925-1-git-send-email-jcmvbkbc@gmail.com>
 References: <1509767121-26925-1-git-send-email-jcmvbkbc@gmail.com>
-Subject: [Qemu-devel] [PATCH 02/16] target/xtensa: import libisa source
+Subject: [Qemu-devel] [PATCH 03/16] target/xtensa: extract core opcode
+ translators
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,2876 +29,3214 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <rth@twiddle.net>, Max Filippov <jcmvbkbc@gmail.com>
 
-The canonical way of dealing with Xtensa instructions decoding and
-encoding is through the libisa. Libisa is a configuration-independent
-library with a stable interface plus generated configuration-specific
-xtensa-modules.c file with implementations of decoding and encoding
-functions. Libisa is MIT-licensed and originally disributed
-xtensa-modules.c files are also MIT-licensed and are available as a
-part of xtensa configuration overlay.
+Move implementations of core opcodes into separate translation
+functions. Introduce data structures for mapping opcode name to
+translator function. Make an array of core opcode/translator structures.
 
 Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
 ---
- include/hw/xtensa/xtensa-isa.h      |  838 +++++++++++++++++
- target/xtensa/Makefile.objs         |    1 +
- target/xtensa/xtensa-isa-internal.h |  231 +++++
- target/xtensa/xtensa-isa.c          | 1745 +++++++++++++++++++++++++++++++++++
- target/xtensa/xtensa-isa.h          |    1 +
- 5 files changed, 2816 insertions(+)
- create mode 100644 include/hw/xtensa/xtensa-isa.h
- create mode 100644 target/xtensa/xtensa-isa-internal.h
- create mode 100644 target/xtensa/xtensa-isa.c
- create mode 100644 target/xtensa/xtensa-isa.h
+ target/xtensa/cpu.h       |   24 +
+ target/xtensa/translate.c | 3121 +++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 3145 insertions(+)
 
-diff --git a/include/hw/xtensa/xtensa-isa.h b/include/hw/xtensa/xtensa-isa.h
-new file mode 100644
-index 000000000000..353f82ba251e
---- /dev/null
-+++ b/include/hw/xtensa/xtensa-isa.h
-@@ -0,0 +1,838 @@
-+/* Interface definition for configurable Xtensa ISA support.
-+ *
-+ * Copyright (c) 2001-2013 Tensilica Inc.
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining
-+ * a copy of this software and associated documentation files (the
-+ * "Software"), to deal in the Software without restriction, including
-+ * without limitation the rights to use, copy, modify, merge, publish,
-+ * distribute, sublicense, and/or sell copies of the Software, and to
-+ * permit persons to whom the Software is furnished to do so, subject to
-+ * the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included
-+ * in all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
-+ * CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-+ * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-+ * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-+ */
-+
-+#ifndef XTENSA_LIBISA_H
-+#define XTENSA_LIBISA_H
-+
-+#include <stdint.h>
-+
-+#ifdef __cplusplus
-+extern "C" {
-+#endif
-+
-+/*
-+ * Version number: This is intended to help support code that works with
-+ * versions of this library from multiple Xtensa releases.
-+ */
-+
-+#define XTENSA_ISA_VERSION 7000
-+
-+/*
-+ * This file defines the interface to the Xtensa ISA library. This
-+ * library contains most of the ISA-specific information for a
-+ * particular Xtensa processor. For example, the set of valid
-+ * instructions, their opcode encodings and operand fields are all
-+ * included here.
-+ *
-+ * This interface basically defines a number of abstract data types.
-+ *
-+ * . an instruction buffer - for holding the raw instruction bits
-+ * . ISA info - information about the ISA as a whole
-+ * . instruction formats - instruction size and slot structure
-+ * . opcodes - information about individual instructions
-+ * . operands - information about register and immediate instruction operands
-+ * . stateOperands - information about processor state instruction operands
-+ * . interfaceOperands - information about interface instruction operands
-+ * . register files - register file information
-+ * . processor states - internal processor state information
-+ * . system registers - "special registers" and "user registers"
-+ * . interfaces - TIE interfaces that are external to the processor
-+ * . functional units - TIE shared functions
-+ *
-+ * The interface defines a set of functions to access each data type.
-+ * With the exception of the instruction buffer, the internal
-+ * representations of the data structures are hidden. All accesses must
-+ * be made through the functions defined here.
-+ */
-+
-+typedef struct xtensa_isa_opaque { int unused; } *xtensa_isa;
-+
-+
-+/*
-+ * Most of the Xtensa ISA entities (e.g., opcodes, regfiles, etc.) are
-+ * represented here using sequential integers beginning with 0. The
-+ * specific values are only fixed for a particular instantiation of an
-+ * xtensa_isa structure, so these values should only be used
-+ * internally.
-+ */
-+
-+typedef int xtensa_opcode;
-+typedef int xtensa_format;
-+typedef int xtensa_regfile;
-+typedef int xtensa_state;
-+typedef int xtensa_sysreg;
-+typedef int xtensa_interface;
-+typedef int xtensa_funcUnit;
-+
-+
-+/* Define a unique value for undefined items. */
-+
-+#define XTENSA_UNDEFINED -1
-+
-+
-+/*
-+ * Overview of using this interface to decode/encode instructions:
-+ *
-+ * Each Xtensa instruction is associated with a particular instruction
-+ * format, where the format defines a fixed number of slots for
-+ * operations. The formats for the core Xtensa ISA have only one slot,
-+ * but FLIX instructions may have multiple slots. Within each slot,
-+ * there is a single opcode and some number of associated operands.
-+ *
-+ * The encoding and decoding functions operate on instruction buffers,
-+ * not on the raw bytes of the instructions. The same instruction
-+ * buffer data structure is used for both entire instructions and
-+ * individual slots in those instructions -- the contents of a slot need
-+ * to be extracted from or inserted into the buffer for the instruction
-+ * as a whole.
-+ *
-+ * Decoding an instruction involves first finding the format, which
-+ * identifies the number of slots, and then decoding each slot
-+ * separately. A slot is decoded by finding the opcode and then using
-+ * the opcode to determine how many operands there are. For example:
-+ *
-+ * xtensa_insnbuf_from_chars
-+ * xtensa_format_decode
-+ * for each slot {
-+ *   xtensa_format_get_slot
-+ *   xtensa_opcode_decode
-+ *   for each operand {
-+ *     xtensa_operand_get_field
-+ *     xtensa_operand_decode
-+ *   }
-+ * }
-+ *
-+ * Encoding an instruction is roughly the same procedure in reverse:
-+ *
-+ * xtensa_format_encode
-+ * for each slot {
-+ *   xtensa_opcode_encode
-+ *   for each operand {
-+ *     xtensa_operand_encode
-+ *     xtensa_operand_set_field
-+ *   }
-+ *   xtensa_format_set_slot
-+ * }
-+ * xtensa_insnbuf_to_chars
-+ */
-+
-+
-+/* Error handling. */
-+
-+/*
-+ * Error codes. The code for the most recent error condition can be
-+ * retrieved with the "errno" function. For any result other than
-+ * xtensa_isa_ok, an error message containing additional information
-+ * about the problem can be retrieved using the "error_msg" function.
-+ * The error messages are stored in an internal buffer, which should
-+ * not be freed and may be overwritten by subsequent operations.
-+ */
-+
-+typedef enum xtensa_isa_status_enum {
-+    xtensa_isa_ok = 0,
-+    xtensa_isa_bad_format,
-+    xtensa_isa_bad_slot,
-+    xtensa_isa_bad_opcode,
-+    xtensa_isa_bad_operand,
-+    xtensa_isa_bad_field,
-+    xtensa_isa_bad_iclass,
-+    xtensa_isa_bad_regfile,
-+    xtensa_isa_bad_sysreg,
-+    xtensa_isa_bad_state,
-+    xtensa_isa_bad_interface,
-+    xtensa_isa_bad_funcUnit,
-+    xtensa_isa_wrong_slot,
-+    xtensa_isa_no_field,
-+    xtensa_isa_out_of_memory,
-+    xtensa_isa_buffer_overflow,
-+    xtensa_isa_internal_error,
-+    xtensa_isa_bad_value
-+} xtensa_isa_status;
-+
-+xtensa_isa_status xtensa_isa_errno(xtensa_isa isa);
-+
-+char *xtensa_isa_error_msg(xtensa_isa isa);
-+
-+
-+
-+/* Instruction buffers. */
-+
-+typedef uint32_t xtensa_insnbuf_word;
-+typedef xtensa_insnbuf_word *xtensa_insnbuf;
-+
-+
-+/* Get the size in "insnbuf_words" of the xtensa_insnbuf array. */
-+
-+int xtensa_insnbuf_size(xtensa_isa isa);
-+
-+
-+/* Allocate an xtensa_insnbuf of the right size. */
-+
-+xtensa_insnbuf xtensa_insnbuf_alloc(xtensa_isa isa);
-+
-+
-+/* Release an xtensa_insnbuf. */
-+
-+void xtensa_insnbuf_free(xtensa_isa isa, xtensa_insnbuf buf);
-+
-+
-+/*
-+ * Conversion between raw memory (char arrays) and our internal
-+ * instruction representation. This is complicated by the Xtensa ISA's
-+ * variable instruction lengths. When converting to chars, the buffer
-+ * must contain a valid instruction so we know how many bytes to copy;
-+ * thus, the "to_chars" function returns the number of bytes copied or
-+ * XTENSA_UNDEFINED on error. The "from_chars" function first reads the
-+ * minimal number of bytes required to decode the instruction length and
-+ * then proceeds to copy the entire instruction into the buffer; if the
-+ * memory does not contain a valid instruction, it copies the maximum
-+ * number of bytes required for the longest Xtensa instruction. The
-+ * "num_chars" argument may be used to limit the number of bytes that
-+ * can be read or written. Otherwise, if "num_chars" is zero, the
-+ * functions may read or write past the end of the code.
-+ */
-+
-+int xtensa_insnbuf_to_chars(xtensa_isa isa, const xtensa_insnbuf insn,
-+                            unsigned char *cp, int num_chars);
-+
-+void xtensa_insnbuf_from_chars(xtensa_isa isa, xtensa_insnbuf insn,
-+                               const unsigned char *cp, int num_chars);
-+
-+
-+
-+/* ISA information. */
-+
-+/* Initialize the ISA information. */
-+
-+xtensa_isa xtensa_isa_init(void *xtensa_modules, xtensa_isa_status *errno_p,
-+                           char **error_msg_p);
-+
-+
-+/* Deallocate an xtensa_isa structure. */
-+
-+void xtensa_isa_free(xtensa_isa isa);
-+
-+
-+/* Get the maximum instruction size in bytes. */
-+
-+int xtensa_isa_maxlength(xtensa_isa isa);
-+
-+
-+/*
-+ * Decode the length in bytes of an instruction in raw memory (not an
-+ * insnbuf). This function reads only the minimal number of bytes
-+ * required to decode the instruction length. Returns
-+ * XTENSA_UNDEFINED on error.
-+ */
-+
-+int xtensa_isa_length_from_chars(xtensa_isa isa, const unsigned char *cp);
-+
-+
-+/*
-+ * Get the number of stages in the processor's pipeline. The pipeline
-+ * stage values returned by other functions in this library will range
-+ * from 0 to N-1, where N is the value returned by this function.
-+ * Note that the stage numbers used here may not correspond to the
-+ * actual processor hardware, e.g., the hardware may have additional
-+ * stages before stage 0. Returns XTENSA_UNDEFINED on error.
-+ */
-+
-+int xtensa_isa_num_pipe_stages(xtensa_isa isa);
-+
-+
-+/* Get the number of various entities that are defined for this processor. */
-+
-+int xtensa_isa_num_formats(xtensa_isa isa);
-+
-+int xtensa_isa_num_opcodes(xtensa_isa isa);
-+
-+int xtensa_isa_num_regfiles(xtensa_isa isa);
-+
-+int xtensa_isa_num_states(xtensa_isa isa);
-+
-+int xtensa_isa_num_sysregs(xtensa_isa isa);
-+
-+int xtensa_isa_num_interfaces(xtensa_isa isa);
-+
-+int xtensa_isa_num_funcUnits(xtensa_isa isa);
-+
-+
-+
-+/* Instruction formats. */
-+
-+/* Get the name of a format. Returns null on error. */
-+
-+const char *xtensa_format_name(xtensa_isa isa, xtensa_format fmt);
-+
-+
-+/*
-+ * Given a format name, return the format number. Returns
-+ * XTENSA_UNDEFINED if the name is not a valid format.
-+ */
-+
-+xtensa_format xtensa_format_lookup(xtensa_isa isa, const char *fmtname);
-+
-+
-+/*
-+ * Decode the instruction format from a binary instruction buffer.
-+ * Returns XTENSA_UNDEFINED if the format is not recognized.
-+ */
-+
-+xtensa_format xtensa_format_decode(xtensa_isa isa, const xtensa_insnbuf insn);
-+
-+
-+/*
-+ * Set the instruction format field(s) in a binary instruction buffer.
-+ * All the other fields are set to zero. Returns non-zero on error.
-+ */
-+
-+int xtensa_format_encode(xtensa_isa isa, xtensa_format fmt,
-+                         xtensa_insnbuf insn);
-+
-+
-+/*
-+ * Find the length (in bytes) of an instruction. Returns
-+ * XTENSA_UNDEFINED on error.
-+ */
-+
-+int xtensa_format_length(xtensa_isa isa, xtensa_format fmt);
-+
-+
-+/*
-+ * Get the number of slots in an instruction. Returns XTENSA_UNDEFINED
-+ * on error.
-+ */
-+
-+int xtensa_format_num_slots(xtensa_isa isa, xtensa_format fmt);
-+
-+
-+/*
-+ * Get the opcode for a no-op in a particular slot.
-+ * Returns XTENSA_UNDEFINED on error.
-+ */
-+
-+xtensa_opcode xtensa_format_slot_nop_opcode(xtensa_isa isa, xtensa_format fmt,
-+                                            int slot);
-+
-+
-+/*
-+ * Get the bits for a specified slot out of an insnbuf for the
-+ * instruction as a whole and put them into an insnbuf for that one
-+ * slot, and do the opposite to set a slot. Return non-zero on error.
-+ */
-+
-+int xtensa_format_get_slot(xtensa_isa isa, xtensa_format fmt, int slot,
-+                           const xtensa_insnbuf insn, xtensa_insnbuf slotbuf);
-+
-+int xtensa_format_set_slot(xtensa_isa isa, xtensa_format fmt, int slot,
-+                           xtensa_insnbuf insn, const xtensa_insnbuf slotbuf);
-+
-+
-+
-+/* Opcode information. */
-+
-+/*
-+ * Translate a mnemonic name to an opcode. Returns XTENSA_UNDEFINED if
-+ * the name is not a valid opcode mnemonic.
-+ */
-+
-+xtensa_opcode xtensa_opcode_lookup(xtensa_isa isa, const char *opname);
-+
-+
-+/*
-+ * Decode the opcode for one instruction slot from a binary instruction
-+ * buffer. Returns the opcode or XTENSA_UNDEFINED if the opcode is
-+ * illegal.
-+ */
-+
-+xtensa_opcode xtensa_opcode_decode(xtensa_isa isa, xtensa_format fmt, int slot,
-+                                   const xtensa_insnbuf slotbuf);
-+
-+
-+/*
-+ * Set the opcode field(s) for an instruction slot. All other fields
-+ * in the slot are set to zero. Returns non-zero if the opcode cannot
-+ * be encoded.
-+ */
-+
-+int xtensa_opcode_encode(xtensa_isa isa, xtensa_format fmt, int slot,
-+                         xtensa_insnbuf slotbuf, xtensa_opcode opc);
-+
-+
-+/* Get the mnemonic name for an opcode. Returns null on error. */
-+
-+const char *xtensa_opcode_name(xtensa_isa isa, xtensa_opcode opc);
-+
-+
-+/* Check various properties of opcodes. These functions return 0 if
-+ * the condition is false, 1 if the condition is true, and
-+ * XTENSA_UNDEFINED on error. The instructions are classified as
-+ * follows:
-+ *
-+ * branch: conditional branch; may fall through to next instruction (B*)
-+ * jump: unconditional branch (J, JX, RET*, RF*)
-+ * loop: zero-overhead loop (LOOP*)
-+ * call: unconditional call; control returns to next instruction (CALL*)
-+ *
-+ * For the opcodes that affect control flow in some way, the branch
-+ * target may be specified by an immediate operand or it may be an
-+ * address stored in a register. You can distinguish these by
-+ * checking if the instruction has a PC-relative immediate
-+ * operand.
-+ */
-+
-+int xtensa_opcode_is_branch(xtensa_isa isa, xtensa_opcode opc);
-+
-+int xtensa_opcode_is_jump(xtensa_isa isa, xtensa_opcode opc);
-+
-+int xtensa_opcode_is_loop(xtensa_isa isa, xtensa_opcode opc);
-+
-+int xtensa_opcode_is_call(xtensa_isa isa, xtensa_opcode opc);
-+
-+
-+/*
-+ * Find the number of ordinary operands, state operands, and interface
-+ * operands for an instruction. These return XTENSA_UNDEFINED on
-+ * error.
-+ */
-+
-+int xtensa_opcode_num_operands(xtensa_isa isa, xtensa_opcode opc);
-+
-+int xtensa_opcode_num_stateOperands(xtensa_isa isa, xtensa_opcode opc);
-+
-+int xtensa_opcode_num_interfaceOperands(xtensa_isa isa, xtensa_opcode opc);
-+
-+
-+/*
-+ * Get functional unit usage requirements for an opcode. Each "use"
-+ * is identified by a <functional unit, pipeline stage> pair. The
-+ * "num_funcUnit_uses" function returns the number of these "uses" or
-+ * XTENSA_UNDEFINED on error. The "funcUnit_use" function returns
-+ * a pointer to a "use" pair or null on error.
-+ */
-+
-+typedef struct xtensa_funcUnit_use_struct {
-+    xtensa_funcUnit unit;
-+    int stage;
-+} xtensa_funcUnit_use;
-+
-+int xtensa_opcode_num_funcUnit_uses(xtensa_isa isa, xtensa_opcode opc);
-+
-+xtensa_funcUnit_use *xtensa_opcode_funcUnit_use(xtensa_isa isa,
-+                                                xtensa_opcode opc, int u);
-+
-+
-+
-+/* Operand information. */
-+
-+/* Get the name of an operand. Returns null on error. */
-+
-+const char *xtensa_operand_name(xtensa_isa isa, xtensa_opcode opc, int opnd);
-+
-+
-+/*
-+ * Some operands are "invisible", i.e., not explicitly specified in
-+ * assembly language. When assembling an instruction, you need not set
-+ * the values of invisible operands, since they are either hardwired or
-+ * derived from other field values. The values of invisible operands
-+ * can be examined in the same way as other operands, but remember that
-+ * an invisible operand may get its value from another visible one, so
-+ * the entire instruction must be available before examining the
-+ * invisible operand values. This function returns 1 if an operand is
-+ * visible, 0 if it is invisible, or XTENSA_UNDEFINED on error. Note
-+ * that whether an operand is visible is orthogonal to whether it is
-+ * "implicit", i.e., whether it is encoded in a field in the
-+ * instruction.
-+ */
-+
-+int xtensa_operand_is_visible(xtensa_isa isa, xtensa_opcode opc, int opnd);
-+
-+
-+/*
-+ * Check if an operand is an input ('i'), output ('o'), or inout ('m')
-+ * operand. Note: The output operand of a conditional assignment
-+ * (e.g., movnez) appears here as an inout ('m') even if it is declared
-+ * in the TIE code as an output ('o'); this allows the compiler to
-+ * properly handle register allocation for conditional assignments.
-+ * Returns 0 on error.
-+ */
-+
-+char xtensa_operand_inout(xtensa_isa isa, xtensa_opcode opc, int opnd);
-+
-+
-+/*
-+ * Get and set the raw (encoded) value of the field for the specified
-+ * operand. The "set" function does not check if the value fits in the
-+ * field; that is done by the "encode" function below. Both of these
-+ * functions return non-zero on error, e.g., if the field is not defined
-+ * for the specified slot.
-+ */
-+
-+int xtensa_operand_get_field(xtensa_isa isa, xtensa_opcode opc, int opnd,
-+                             xtensa_format fmt, int slot,
-+                             const xtensa_insnbuf slotbuf, uint32_t *valp);
-+
-+int xtensa_operand_set_field(xtensa_isa isa, xtensa_opcode opc, int opnd,
-+                             xtensa_format fmt, int slot,
-+                             xtensa_insnbuf slotbuf, uint32_t val);
-+
-+
-+/*
-+ * Encode and decode operands. The raw bits in the operand field may
-+ * be encoded in a variety of different ways. These functions hide
-+ * the details of that encoding. The result values are returned through
-+ * the argument pointer. The return value is non-zero on error.
-+ */
-+
-+int xtensa_operand_encode(xtensa_isa isa, xtensa_opcode opc, int opnd,
-+                          uint32_t *valp);
-+
-+int xtensa_operand_decode(xtensa_isa isa, xtensa_opcode opc, int opnd,
-+                          uint32_t *valp);
-+
-+
-+/*
-+ * An operand may be either a register operand or an immediate of some
-+ * sort (e.g., PC-relative or not). The "is_register" function returns
-+ * 0 if the operand is an immediate, 1 if it is a register, and
-+ * XTENSA_UNDEFINED on error. The "regfile" function returns the
-+ * regfile for a register operand, or XTENSA_UNDEFINED on error.
-+ */
-+
-+int xtensa_operand_is_register(xtensa_isa isa, xtensa_opcode opc, int opnd);
-+
-+xtensa_regfile xtensa_operand_regfile(xtensa_isa isa, xtensa_opcode opc,
-+                                      int opnd);
-+
-+
-+/*
-+ * Register operands may span multiple consecutive registers, e.g., a
-+ * 64-bit data type may occupy two 32-bit registers. Only the first
-+ * register is encoded in the operand field. This function specifies
-+ * the number of consecutive registers occupied by this operand. For
-+ * non-register operands, the return value is undefined. Returns
-+ * XTENSA_UNDEFINED on error.
-+ */
-+
-+int xtensa_operand_num_regs(xtensa_isa isa, xtensa_opcode opc, int opnd);
-+
-+
-+/*
-+ * Some register operands do not completely identify the register being
-+ * accessed. For example, the operand value may be added to an internal
-+ * state value. By definition, this implies that the corresponding
-+ * regfile is not allocatable. Unknown registers should generally be
-+ * treated with worst-case assumptions. The function returns 0 if the
-+ * register value is unknown, 1 if known, and XTENSA_UNDEFINED on
-+ * error.
-+ */
-+
-+int xtensa_operand_is_known_reg(xtensa_isa isa, xtensa_opcode opc, int opnd);
-+
-+
-+/*
-+ * Check if an immediate operand is PC-relative. Returns 0 for register
-+ * operands and non-PC-relative immediates, 1 for PC-relative
-+ * immediates, and XTENSA_UNDEFINED on error.
-+ */
-+
-+int xtensa_operand_is_PCrelative(xtensa_isa isa, xtensa_opcode opc, int opnd);
-+
-+
-+/*
-+ * For PC-relative offset operands, the interpretation of the offset may
-+ * vary between opcodes, e.g., is it relative to the current PC or that
-+ * of the next instruction?  The following functions are defined to
-+ * perform PC-relative relocations and to undo them (as in the
-+ * disassembler). The "do_reloc" function takes the desired address
-+ * value and the PC of the current instruction and sets the value to the
-+ * corresponding PC-relative offset (which can then be encoded and
-+ * stored into the operand field). The "undo_reloc" function takes the
-+ * unencoded offset value and the current PC and sets the value to the
-+ * appropriate address. The return values are non-zero on error. Note
-+ * that these functions do not replace the encode/decode functions; the
-+ * operands must be encoded/decoded separately and the encode functions
-+ * are responsible for detecting invalid operand values.
-+ */
-+
-+int xtensa_operand_do_reloc(xtensa_isa isa, xtensa_opcode opc, int opnd,
-+                            uint32_t *valp, uint32_t pc);
-+
-+int xtensa_operand_undo_reloc(xtensa_isa isa, xtensa_opcode opc, int opnd,
-+                              uint32_t *valp, uint32_t pc);
-+
-+
-+
-+/* State Operands. */
-+
-+/*
-+ * Get the state accessed by a state operand. Returns XTENSA_UNDEFINED
-+ * on error.
-+ */
-+
-+xtensa_state xtensa_stateOperand_state(xtensa_isa isa, xtensa_opcode opc,
-+                                       int stOp);
-+
-+
-+/*
-+ * Check if a state operand is an input ('i'), output ('o'), or inout
-+ * ('m') operand. Returns 0 on error.
-+ */
-+
-+char xtensa_stateOperand_inout(xtensa_isa isa, xtensa_opcode opc, int stOp);
-+
-+
-+
-+/* Interface Operands. */
-+
-+/*
-+ * Get the external interface accessed by an interface operand.
-+ * Returns XTENSA_UNDEFINED on error.
-+ */
-+
-+xtensa_interface xtensa_interfaceOperand_interface(xtensa_isa isa,
-+                                                   xtensa_opcode opc,
-+                                                   int ifOp);
-+
-+
-+
-+/* Register Files. */
-+
-+/*
-+ * Regfiles include both "real" regfiles and "views", where a view
-+ * allows a group of adjacent registers in a real "parent" regfile to be
-+ * viewed as a single register. A regfile view has all the same
-+ * properties as its parent except for its (long) name, bit width, number
-+ * of entries, and default ctype. You can use the parent function to
-+ * distinguish these two classes.
-+ */
-+
-+/*
-+ * Look up a regfile by either its name or its abbreviated "short name".
-+ * Returns XTENSA_UNDEFINED on error. The "lookup_shortname" function
-+ * ignores "view" regfiles since they always have the same shortname as
-+ * their parents.
-+ */
-+
-+xtensa_regfile xtensa_regfile_lookup(xtensa_isa isa, const char *name);
-+
-+xtensa_regfile xtensa_regfile_lookup_shortname(xtensa_isa isa,
-+                                               const char *shortname);
-+
-+
-+/*
-+ * Get the name or abbreviated "short name" of a regfile.
-+ * Returns null on error.
-+ */
-+
-+const char *xtensa_regfile_name(xtensa_isa isa, xtensa_regfile rf);
-+
-+const char *xtensa_regfile_shortname(xtensa_isa isa, xtensa_regfile rf);
-+
-+
-+/*
-+ * Get the parent regfile of a "view" regfile. If the regfile is not a
-+ * view, the result is the same as the input parameter. Returns
-+ * XTENSA_UNDEFINED on error.
-+ */
-+
-+xtensa_regfile xtensa_regfile_view_parent(xtensa_isa isa, xtensa_regfile rf);
-+
-+
-+/*
-+ * Get the bit width of a regfile or regfile view.
-+ * Returns XTENSA_UNDEFINED on error.
-+ */
-+
-+int xtensa_regfile_num_bits(xtensa_isa isa, xtensa_regfile rf);
-+
-+
-+/*
-+ * Get the number of regfile entries. Returns XTENSA_UNDEFINED on
-+ * error.
-+ */
-+
-+int xtensa_regfile_num_entries(xtensa_isa isa, xtensa_regfile rf);
-+
-+
-+
-+/* Processor States. */
-+
-+/* Look up a state by name. Returns XTENSA_UNDEFINED on error. */
-+
-+xtensa_state xtensa_state_lookup(xtensa_isa isa, const char *name);
-+
-+
-+/* Get the name for a processor state. Returns null on error. */
-+
-+const char *xtensa_state_name(xtensa_isa isa, xtensa_state st);
-+
-+
-+/*
-+ * Get the bit width for a processor state.
-+ * Returns XTENSA_UNDEFINED on error.
-+ */
-+
-+int xtensa_state_num_bits(xtensa_isa isa, xtensa_state st);
-+
-+
-+/*
-+ * Check if a state is exported from the processor core. Returns 0 if
-+ * the condition is false, 1 if the condition is true, and
-+ * XTENSA_UNDEFINED on error.
-+ */
-+
-+int xtensa_state_is_exported(xtensa_isa isa, xtensa_state st);
-+
-+
-+/*
-+ * Check for a "shared_or" state. Returns 0 if the condition is false,
-+ * 1 if the condition is true, and XTENSA_UNDEFINED on error.
-+ */
-+
-+int xtensa_state_is_shared_or(xtensa_isa isa, xtensa_state st);
-+
-+
-+
-+/* Sysregs ("special registers" and "user registers"). */
-+
-+/*
-+ * Look up a register by its number and whether it is a "user register"
-+ * or a "special register". Returns XTENSA_UNDEFINED if the sysreg does
-+ * not exist.
-+ */
-+
-+xtensa_sysreg xtensa_sysreg_lookup(xtensa_isa isa, int num, int is_user);
-+
-+
-+/*
-+ * Check if there exists a sysreg with a given name.
-+ * If not, this function returns XTENSA_UNDEFINED.
-+ */
-+
-+xtensa_sysreg xtensa_sysreg_lookup_name(xtensa_isa isa, const char *name);
-+
-+
-+/* Get the name of a sysreg. Returns null on error. */
-+
-+const char *xtensa_sysreg_name(xtensa_isa isa, xtensa_sysreg sysreg);
-+
-+
-+/* Get the register number. Returns XTENSA_UNDEFINED on error. */
-+
-+int xtensa_sysreg_number(xtensa_isa isa, xtensa_sysreg sysreg);
-+
-+
-+/*
-+ * Check if a sysreg is a "special register" or a "user register".
-+ * Returns 0 for special registers, 1 for user registers and
-+ * XTENSA_UNDEFINED on error.
-+ */
-+
-+int xtensa_sysreg_is_user(xtensa_isa isa, xtensa_sysreg sysreg);
-+
-+
-+
-+/* Interfaces. */
-+
-+/*
-+ * Find an interface by name. The return value is XTENSA_UNDEFINED if
-+ * the specified interface is not found.
-+ */
-+
-+xtensa_interface xtensa_interface_lookup(xtensa_isa isa, const char *ifname);
-+
-+
-+/* Get the name of an interface. Returns null on error. */
-+
-+const char *xtensa_interface_name(xtensa_isa isa, xtensa_interface intf);
-+
-+
-+/*
-+ * Get the bit width for an interface.
-+ * Returns XTENSA_UNDEFINED on error.
-+ */
-+
-+int xtensa_interface_num_bits(xtensa_isa isa, xtensa_interface intf);
-+
-+
-+/*
-+ * Check if an interface is an input ('i') or output ('o') with respect
-+ * to the Xtensa processor core. Returns 0 on error.
-+ */
-+
-+char xtensa_interface_inout(xtensa_isa isa, xtensa_interface intf);
-+
-+
-+/*
-+ * Check if accessing an interface has potential side effects.
-+ * Currently "data" interfaces have side effects and "control"
-+ * interfaces do not. Returns 1 if there are side effects, 0 if not,
-+ * and XTENSA_UNDEFINED on error.
-+ */
-+
-+int xtensa_interface_has_side_effect(xtensa_isa isa, xtensa_interface intf);
-+
-+
-+/*
-+ * Some interfaces may be related such that accessing one interface
-+ * has side effects on a set of related interfaces. The interfaces
-+ * are partitioned into equivalence classes of related interfaces, and
-+ * each class is assigned a unique identifier number. This function
-+ * returns the class identifier for an interface, or XTENSA_UNDEFINED
-+ * on error. These identifiers can be compared to determine if two
-+ * interfaces are related; the specific values of the identifiers have
-+ * no particular meaning otherwise.
-+ */
-+
-+int xtensa_interface_class_id(xtensa_isa isa, xtensa_interface intf);
-+
-+
-+/* Functional Units. */
-+
-+/*
-+ * Find a functional unit by name. The return value is XTENSA_UNDEFINED if
-+ * the specified unit is not found.
-+ */
-+
-+xtensa_funcUnit xtensa_funcUnit_lookup(xtensa_isa isa, const char *fname);
-+
-+
-+/* Get the name of a functional unit. Returns null on error. */
-+
-+const char *xtensa_funcUnit_name(xtensa_isa isa, xtensa_funcUnit fun);
-+
-+
-+/*
-+ * Functional units may be replicated. See how many instances of a
-+ * particular function unit exist. Returns XTENSA_UNDEFINED on error.
-+ */
-+
-+int xtensa_funcUnit_num_copies(xtensa_isa isa, xtensa_funcUnit fun);
-+
-+
-+#ifdef __cplusplus
-+}
-+#endif
-+#endif /* XTENSA_LIBISA_H */
-diff --git a/target/xtensa/Makefile.objs b/target/xtensa/Makefile.objs
-index 481de9197385..042970668023 100644
---- a/target/xtensa/Makefile.objs
-+++ b/target/xtensa/Makefile.objs
-@@ -3,5 +3,6 @@ obj-y += core-dc232b.o
- obj-y += core-dc233c.o
- obj-y += core-fsf.o
- obj-$(CONFIG_SOFTMMU) += monitor.o
-+obj-y += xtensa-isa.o
- obj-y += translate.o op_helper.o helper.o cpu.o
- obj-y += gdbstub.o
-diff --git a/target/xtensa/xtensa-isa-internal.h b/target/xtensa/xtensa-isa-internal.h
-new file mode 100644
-index 000000000000..c29295ff9687
---- /dev/null
-+++ b/target/xtensa/xtensa-isa-internal.h
-@@ -0,0 +1,231 @@
-+/* Internal definitions for the Xtensa ISA library.
-+ *
-+ * Copyright (c) 2004-2011 Tensilica Inc.
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining
-+ * a copy of this software and associated documentation files (the
-+ * "Software"), to deal in the Software without restriction, including
-+ * without limitation the rights to use, copy, modify, merge, publish,
-+ * distribute, sublicense, and/or sell copies of the Software, and to
-+ * permit persons to whom the Software is furnished to do so, subject to
-+ * the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included
-+ * in all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
-+ * CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-+ * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-+ * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-+ */
-+
-+#ifndef XTENSA_ISA_INTERNAL_H
-+#define XTENSA_ISA_INTERNAL_H
-+
-+#ifndef uint32
-+#define uint32 uint32_t
-+#endif
-+
-+/* Flags. */
-+
-+#define XTENSA_OPERAND_IS_REGISTER      0x00000001
-+#define XTENSA_OPERAND_IS_PCRELATIVE    0x00000002
-+#define XTENSA_OPERAND_IS_INVISIBLE     0x00000004
-+#define XTENSA_OPERAND_IS_UNKNOWN       0x00000008
-+
-+#define XTENSA_OPCODE_IS_BRANCH         0x00000001
-+#define XTENSA_OPCODE_IS_JUMP           0x00000002
-+#define XTENSA_OPCODE_IS_LOOP           0x00000004
-+#define XTENSA_OPCODE_IS_CALL           0x00000008
-+
-+#define XTENSA_STATE_IS_EXPORTED        0x00000001
-+#define XTENSA_STATE_IS_SHARED_OR       0x00000002
-+
-+#define XTENSA_INTERFACE_HAS_SIDE_EFFECT 0x00000001
-+
-+/* Function pointer typedefs */
-+typedef void (*xtensa_format_encode_fn)(xtensa_insnbuf);
-+typedef void (*xtensa_get_slot_fn)(const xtensa_insnbuf, xtensa_insnbuf);
-+typedef void (*xtensa_set_slot_fn)(xtensa_insnbuf, const xtensa_insnbuf);
-+typedef int (*xtensa_opcode_decode_fn)(const xtensa_insnbuf);
-+typedef uint32_t (*xtensa_get_field_fn)(const xtensa_insnbuf);
-+typedef void (*xtensa_set_field_fn)(xtensa_insnbuf, uint32_t);
-+typedef int (*xtensa_immed_decode_fn)(uint32_t *);
-+typedef int (*xtensa_immed_encode_fn)(uint32_t *);
-+typedef int (*xtensa_do_reloc_fn)(uint32_t *, uint32_t);
-+typedef int (*xtensa_undo_reloc_fn)(uint32_t *, uint32_t);
-+typedef void (*xtensa_opcode_encode_fn)(xtensa_insnbuf);
-+typedef int (*xtensa_format_decode_fn)(const xtensa_insnbuf);
-+typedef int (*xtensa_length_decode_fn)(const unsigned char *);
-+
-+typedef struct xtensa_format_internal_struct {
-+    const char *name;           /* Instruction format name. */
-+    int length;                 /* Instruction length in bytes. */
-+    xtensa_format_encode_fn encode_fn;
-+    int num_slots;
-+    int *slot_id;               /* Array[num_slots] of slot IDs. */
-+} xtensa_format_internal;
-+
-+typedef struct xtensa_slot_internal_struct {
-+    const char *name;                   /* Not necessarily unique. */
-+    const char *format;
-+    int position;
-+    xtensa_get_slot_fn get_fn;
-+    xtensa_set_slot_fn set_fn;
-+    xtensa_get_field_fn *get_field_fns; /* Array[field_id]. */
-+    xtensa_set_field_fn *set_field_fns; /* Array[field_id]. */
-+    xtensa_opcode_decode_fn opcode_decode_fn;
-+    const char *nop_name;
-+} xtensa_slot_internal;
-+
-+typedef struct xtensa_operand_internal_struct {
-+    const char *name;
-+    int field_id;
-+    xtensa_regfile regfile;             /* Register file. */
-+    int num_regs;                       /* Usually 1; 2 for reg pairs, etc. */
-+    uint32_t flags;                     /* See XTENSA_OPERAND_* flags. */
-+    xtensa_immed_encode_fn encode;      /* Encode the operand value. */
-+    xtensa_immed_decode_fn decode;      /* Decode the value from the field. */
-+    xtensa_do_reloc_fn do_reloc;        /* Perform a PC-relative reloc. */
-+    xtensa_undo_reloc_fn undo_reloc;    /* Undo a PC-relative relocation. */
-+} xtensa_operand_internal;
-+
-+typedef struct xtensa_arg_internal_struct {
-+    union {
-+        int operand_id;         /* For normal operands. */
-+        xtensa_state state;     /* For stateOperands. */
-+    } u;
-+    char inout;                 /* Direction: 'i', 'o', or 'm'. */
-+} xtensa_arg_internal;
-+
-+typedef struct xtensa_iclass_internal_struct {
-+    int num_operands;           /* Size of "operands" array. */
-+    xtensa_arg_internal *operands;          /* Array[num_operands]. */
-+
-+    int num_stateOperands;      /* Size of "stateOperands" array. */
-+    xtensa_arg_internal *stateOperands;     /* Array[num_stateOperands]. */
-+
-+    int num_interfaceOperands;  /* Size of "interfaceOperands". */
-+    xtensa_interface *interfaceOperands;    /* Array[num_interfaceOperands]. */
-+} xtensa_iclass_internal;
-+
-+typedef struct xtensa_opcode_internal_struct {
-+    const char *name;           /* Opcode mnemonic. */
-+    int iclass_id;              /* Iclass for this opcode. */
-+    uint32_t flags;             /* See XTENSA_OPCODE_* flags. */
-+    xtensa_opcode_encode_fn *encode_fns;    /* Array[slot_id]. */
-+    int num_funcUnit_uses;      /* Number of funcUnit_use entries. */
-+    xtensa_funcUnit_use *funcUnit_uses;     /* Array[num_funcUnit_uses]. */
-+} xtensa_opcode_internal;
-+
-+typedef struct xtensa_regfile_internal_struct {
-+    const char *name;           /* Full name of the regfile. */
-+    const char *shortname;      /* Abbreviated name. */
-+    xtensa_regfile parent;      /* View parent (or identity). */
-+    int num_bits;               /* Width of the registers. */
-+    int num_entries;            /* Number of registers. */
-+} xtensa_regfile_internal;
-+
-+typedef struct xtensa_interface_internal_struct {
-+    const char *name;           /* Interface name. */
-+    int num_bits;               /* Width of the interface. */
-+    uint32_t flags;             /* See XTENSA_INTERFACE_* flags. */
-+    int class_id;               /* Class of related interfaces. */
-+    char inout;                 /* "i" or "o". */
-+} xtensa_interface_internal;
-+
-+typedef struct xtensa_funcUnit_internal_struct {
-+    const char *name;           /* Functional unit name. */
-+    int num_copies;             /* Number of instances. */
-+} xtensa_funcUnit_internal;
-+
-+typedef struct xtensa_state_internal_struct {
-+    const char *name;           /* State name. */
-+    int num_bits;               /* Number of state bits. */
-+    uint32_t flags;             /* See XTENSA_STATE_* flags. */
-+} xtensa_state_internal;
-+
-+typedef struct xtensa_sysreg_internal_struct {
-+    const char *name;           /* Register name. */
-+    int number;                 /* Register number. */
-+    int is_user;                /* Non-zero if a "user register". */
-+} xtensa_sysreg_internal;
-+
-+typedef struct xtensa_lookup_entry_struct {
-+    const char *key;
-+    union {
-+        xtensa_opcode opcode;   /* Internal opcode number. */
-+        xtensa_sysreg sysreg;   /* Internal sysreg number. */
-+        xtensa_state state;     /* Internal state number. */
-+        xtensa_interface intf;  /* Internal interface number. */
-+        xtensa_funcUnit fun;    /* Internal funcUnit number. */
-+    } u;
-+} xtensa_lookup_entry;
-+
-+typedef struct xtensa_isa_internal_struct {
-+    int is_big_endian;          /* Endianness. */
-+    int insn_size;              /* Maximum length in bytes. */
-+    int insnbuf_size;           /* Number of insnbuf_words. */
-+
-+    int num_formats;
-+    xtensa_format_internal *formats;
-+    xtensa_format_decode_fn format_decode_fn;
-+    xtensa_length_decode_fn length_decode_fn;
-+
-+    int num_slots;
-+    xtensa_slot_internal *slots;
-+
-+    int num_fields;
-+
-+    int num_operands;
-+    xtensa_operand_internal *operands;
-+
-+    int num_iclasses;
-+    xtensa_iclass_internal *iclasses;
-+
-+    int num_opcodes;
-+    xtensa_opcode_internal *opcodes;
-+    xtensa_lookup_entry *opname_lookup_table;
-+
-+    int num_regfiles;
-+    xtensa_regfile_internal *regfiles;
-+
-+    int num_states;
-+    xtensa_state_internal *states;
-+    xtensa_lookup_entry *state_lookup_table;
-+
-+    int num_sysregs;
-+    xtensa_sysreg_internal *sysregs;
-+    xtensa_lookup_entry *sysreg_lookup_table;
-+
-+    /*
-+     * The current Xtensa ISA only supports 256 of each kind of sysreg so
-+     * we can get away with implementing lookups with tables indexed by
-+     * the register numbers. If we ever allow larger sysreg numbers, this
-+     * may have to be reimplemented. The first entry in the following
-+     * arrays corresponds to "special" registers and the second to "user"
-+     * registers.
-+     */
-+    int max_sysreg_num[2];
-+    xtensa_sysreg *sysreg_table[2];
-+
-+    int num_interfaces;
-+    xtensa_interface_internal *interfaces;
-+    xtensa_lookup_entry *interface_lookup_table;
-+
-+    int num_funcUnits;
-+    xtensa_funcUnit_internal *funcUnits;
-+    xtensa_lookup_entry *funcUnit_lookup_table;
-+
-+    int num_stages;             /* Number of pipe stages. */
-+} xtensa_isa_internal;
-+
-+int xtensa_isa_name_compare(const void *, const void *);
-+
-+extern xtensa_isa_status xtisa_errno;
-+extern char xtisa_error_msg[];
-+
-+#endif /* !XTENSA_ISA_INTERNAL_H */
-diff --git a/target/xtensa/xtensa-isa.c b/target/xtensa/xtensa-isa.c
-new file mode 100644
-index 000000000000..e0076a694fe9
---- /dev/null
-+++ b/target/xtensa/xtensa-isa.c
-@@ -0,0 +1,1745 @@
-+/* Configurable Xtensa ISA support.
-+ *
-+ * Copyright (c) 2001-2011 Tensilica Inc.
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining
-+ * a copy of this software and associated documentation files (the
-+ * "Software"), to deal in the Software without restriction, including
-+ * without limitation the rights to use, copy, modify, merge, publish,
-+ * distribute, sublicense, and/or sell copies of the Software, and to
-+ * permit persons to whom the Software is furnished to do so, subject to
-+ * the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included
-+ * in all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
-+ * CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-+ * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-+ * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-+ */
-+
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <string.h>
+diff --git a/target/xtensa/cpu.h b/target/xtensa/cpu.h
+index 48033313c534..8b6fd1ff9695 100644
+--- a/target/xtensa/cpu.h
++++ b/target/xtensa/cpu.h
+@@ -37,6 +37,7 @@
+ #include "cpu-qom.h"
+ #include "exec/cpu-defs.h"
+ #include "fpu/softfloat.h"
 +#include "xtensa-isa.h"
-+#include "xtensa-isa-internal.h"
+ 
+ #define NB_MMU_MODES 4
+ 
+@@ -205,6 +206,8 @@ enum {
+ #define MEMCTL_DSNP 0x2
+ #define MEMCTL_IL0EN 0x1
+ 
++#define MAX_INSN_LENGTH 64
++#define MAX_OPCODE_ARGS 16
+ #define MAX_NAREG 64
+ #define MAX_NINTERRUPT 32
+ #define MAX_NLEVEL 6
+@@ -330,6 +333,23 @@ typedef struct XtensaMemory {
+     } location[MAX_NMEMORY];
+ } XtensaMemory;
+ 
++typedef struct DisasContext DisasContext;
++typedef void (*XtensaOpcodeOp)(DisasContext *dc, const uint32_t arg[],
++                               const uint32_t par[]);
 +
-+xtensa_isa_status xtisa_errno;
-+char xtisa_error_msg[1024];
++typedef struct XtensaOpcodeOps {
++    const char *name;
++    XtensaOpcodeOp translate;
++    const uint32_t *par;
++} XtensaOpcodeOps;
 +
++typedef struct XtensaOpcodeTranslators {
++    unsigned num_opcodes;
++    const XtensaOpcodeOps *opcode;
++} XtensaOpcodeTranslators;
 +
-+xtensa_isa_status xtensa_isa_errno(xtensa_isa isa __attribute__ ((unused)))
++extern const XtensaOpcodeTranslators xtensa_core_opcodes;
++
+ struct XtensaConfig {
+     const char *name;
+     uint64_t options;
+@@ -370,6 +390,8 @@ struct XtensaConfig {
+ 
+     uint32_t configid[2];
+ 
++    void *isa_internal;
++
+     uint32_t clock_freq_khz;
+ 
+     xtensa_tlb itlb;
+@@ -518,6 +540,8 @@ static inline void xtensa_select_static_vectors(CPUXtensaState *env,
+     env->static_vectors = n;
+ }
+ void xtensa_runstall(CPUXtensaState *env, bool runstall);
++XtensaOpcodeOps *xtensa_find_opcode_ops(const XtensaOpcodeTranslators *t,
++                                        const char *opcode);
+ 
+ #define XTENSA_OPTION_BIT(opt) (((uint64_t)1) << (opt))
+ #define XTENSA_OPTION_ALL (~(uint64_t)0)
+diff --git a/target/xtensa/translate.c b/target/xtensa/translate.c
+index 225e4a5fe870..1c227380a64d 100644
+--- a/target/xtensa/translate.c
++++ b/target/xtensa/translate.c
+@@ -75,6 +75,8 @@ typedef struct DisasContext {
+     TCGv_i32 next_icount;
+ 
+     unsigned cpenable;
++
++    uint32_t *raw_arg;
+ } DisasContext;
+ 
+ static TCGv_i32 cpu_pc;
+@@ -3312,3 +3314,3122 @@ void restore_state_to_opc(CPUXtensaState *env, TranslationBlock *tb,
+ {
+     env->pc = data[0];
+ }
++
++static int compare_opcode_ops(const void *a, const void *b)
 +{
-+    return xtisa_errno;
++    return strcmp((const char *)a,
++                  ((const XtensaOpcodeOps *)b)->name);
 +}
 +
-+
-+char *xtensa_isa_error_msg(xtensa_isa isa __attribute__ ((unused)))
++XtensaOpcodeOps *
++xtensa_find_opcode_ops(const XtensaOpcodeTranslators *t,
++                       const char *name)
 +{
-+    return xtisa_error_msg;
++    XtensaOpcodeOps *ops;
++
++    ops = bsearch(name, t->opcode, t->num_opcodes,
++                  sizeof(XtensaOpcodeOps), compare_opcode_ops);
++    return ops;
 +}
 +
-+
-+#define CHECK_ALLOC(MEM, ERRVAL) \
-+    do { \
-+        if ((MEM) == 0) { \
-+            xtisa_errno = xtensa_isa_out_of_memory; \
-+            strcpy(xtisa_error_msg, "out of memory"); \
-+            return ERRVAL; \
-+        } \
-+    } while (0)
-+
-+#define CHECK_ALLOC_FOR_INIT(MEM, ERRVAL, ERRNO_P, ERROR_MSG_P) \
-+    do { \
-+        if ((MEM) == 0) { \
-+            xtisa_errno = xtensa_isa_out_of_memory; \
-+            strcpy(xtisa_error_msg, "out of memory"); \
-+            if (ERRNO_P) { \
-+                *(ERRNO_P) = xtisa_errno; \
-+            } \
-+            if (ERROR_MSG_P) { \
-+                *(ERROR_MSG_P) = xtisa_error_msg; \
-+            } \
-+            return ERRVAL; \
-+        } \
-+    } while (0)
-+
-+
-+/* Instruction buffers. */
-+
-+int xtensa_insnbuf_size(xtensa_isa isa)
++static void translate_abs(DisasContext *dc, const uint32_t arg[],
++                          const uint32_t par[])
 +{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+    return intisa->insnbuf_size;
-+}
++    if (gen_window_check2(dc, arg[0], arg[1])) {
++        TCGv_i32 zero = tcg_const_i32(0);
++        TCGv_i32 neg = tcg_temp_new_i32();
 +
-+
-+xtensa_insnbuf xtensa_insnbuf_alloc(xtensa_isa isa)
-+{
-+    xtensa_insnbuf result = (xtensa_insnbuf)
-+        malloc(xtensa_insnbuf_size(isa) * sizeof(xtensa_insnbuf_word));
-+
-+    CHECK_ALLOC(result, 0);
-+    return result;
-+}
-+
-+
-+void xtensa_insnbuf_free(xtensa_isa isa __attribute__ ((unused)),
-+                         xtensa_insnbuf buf)
-+{
-+    free(buf);
-+}
-+
-+
-+/*
-+ * Given <byte_index>, the index of a byte in a xtensa_insnbuf, our
-+ * internal representation of a xtensa instruction word, return the index of
-+ * its word and the bit index of its low order byte in the xtensa_insnbuf.
-+ */
-+
-+static inline int byte_to_word_index(int byte_index)
-+{
-+    return byte_index / sizeof(xtensa_insnbuf_word);
-+}
-+
-+
-+static inline int byte_to_bit_index(int byte_index)
-+{
-+    return (byte_index & 0x3) * 8;
-+}
-+
-+
-+/*
-+ * Copy an instruction in the 32-bit words pointed at by "insn" to
-+ * characters pointed at by "cp". This is more complicated than you
-+ * might think because we want 16-bit instructions in bytes 2 & 3 for
-+ * big-endian configurations. This function allows us to specify
-+ * which byte in "insn" to start with and which way to increment,
-+ * allowing trivial implementation for both big- and little-endian
-+ * configurations....and it seems to make pretty good code for
-+ * both.
-+ */
-+
-+int xtensa_insnbuf_to_chars(xtensa_isa isa,
-+                            const xtensa_insnbuf insn,
-+                            unsigned char *cp,
-+                            int num_chars)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+    int insn_size = xtensa_isa_maxlength(isa);
-+    int fence_post, start, increment, i, byte_count;
-+    xtensa_format fmt;
-+
-+    if (num_chars == 0) {
-+        num_chars = insn_size;
++        tcg_gen_neg_i32(neg, cpu_R[arg[1]]);
++        tcg_gen_movcond_i32(TCG_COND_GE, cpu_R[arg[0]],
++                            cpu_R[arg[1]], zero, cpu_R[arg[1]], neg);
++        tcg_temp_free(neg);
++        tcg_temp_free(zero);
 +    }
++}
 +
-+    if (intisa->is_big_endian) {
-+        start = insn_size - 1;
-+        increment = -1;
++static void translate_add(DisasContext *dc, const uint32_t arg[],
++                          const uint32_t par[])
++{
++    if (gen_window_check3(dc, arg[0], arg[1], arg[2])) {
++        tcg_gen_add_i32(cpu_R[arg[0]], cpu_R[arg[1]], cpu_R[arg[2]]);
++    }
++}
++
++static void translate_addi(DisasContext *dc, const uint32_t arg[],
++                           const uint32_t par[])
++{
++    if (gen_window_check2(dc, arg[0], arg[1])) {
++        tcg_gen_addi_i32(cpu_R[arg[0]], cpu_R[arg[1]], arg[2]);
++    }
++}
++
++static void translate_addx(DisasContext *dc, const uint32_t arg[],
++                           const uint32_t par[])
++{
++    if (gen_window_check3(dc, arg[0], arg[1], arg[2])) {
++        TCGv_i32 tmp = tcg_temp_new_i32();
++        tcg_gen_shli_i32(tmp, cpu_R[arg[1]], par[0]);
++        tcg_gen_add_i32(cpu_R[arg[0]], tmp, cpu_R[arg[2]]);
++        tcg_temp_free(tmp);
++    }
++}
++
++static void translate_all(DisasContext *dc, const uint32_t arg[],
++                          const uint32_t par[])
++{
++    uint32_t shift = par[1];
++    TCGv_i32 mask = tcg_const_i32(((1 << shift) - 1) << arg[1]);
++    TCGv_i32 tmp = tcg_temp_new_i32();
++
++    tcg_gen_and_i32(tmp, cpu_SR[BR], mask);
++    if (par[0]) {
++        tcg_gen_addi_i32(tmp, tmp, 1 << arg[1]);
 +    } else {
-+        start = 0;
-+        increment = 1;
++        tcg_gen_add_i32(tmp, tmp, mask);
 +    }
-+
-+    /*
-+     * Find the instruction format. Do nothing if the buffer does not contain
-+     * a valid instruction since we need to know how many bytes to copy.
-+     */
-+    fmt = xtensa_format_decode(isa, insn);
-+    if (fmt == XTENSA_UNDEFINED) {
-+        return XTENSA_UNDEFINED;
-+    }
-+
-+    byte_count = xtensa_format_length(isa, fmt);
-+    if (byte_count == XTENSA_UNDEFINED) {
-+        return XTENSA_UNDEFINED;
-+    }
-+
-+    if (byte_count > num_chars) {
-+        xtisa_errno = xtensa_isa_buffer_overflow;
-+        strcpy(xtisa_error_msg, "output buffer too small for instruction");
-+        return XTENSA_UNDEFINED;
-+    }
-+
-+    fence_post = start + (byte_count * increment);
-+
-+    for (i = start; i != fence_post; i += increment, ++cp) {
-+        int word_inx = byte_to_word_index(i);
-+        int bit_inx = byte_to_bit_index(i);
-+
-+        *cp = (insn[word_inx] >> bit_inx) & 0xff;
-+    }
-+
-+    return byte_count;
++    tcg_gen_shri_i32(tmp, tmp, arg[1] + shift);
++    tcg_gen_deposit_i32(cpu_SR[BR], cpu_SR[BR],
++                        tmp, arg[0], 1);
++    tcg_temp_free(mask);
++    tcg_temp_free(tmp);
 +}
 +
++static void translate_and(DisasContext *dc, const uint32_t arg[],
++                          const uint32_t par[])
++{
++    if (gen_window_check3(dc, arg[0], arg[1], arg[2])) {
++        tcg_gen_and_i32(cpu_R[arg[0]], cpu_R[arg[1]], cpu_R[arg[2]]);
++    }
++}
++
++static void translate_ball(DisasContext *dc, const uint32_t arg[],
++                           const uint32_t par[])
++{
++    if (gen_window_check2(dc, arg[0], arg[1])) {
++        TCGv_i32 tmp = tcg_temp_new_i32();
++        tcg_gen_and_i32(tmp, cpu_R[arg[0]], cpu_R[arg[1]]);
++        gen_brcond(dc, par[0], tmp, cpu_R[arg[1]], arg[2]);
++        tcg_temp_free(tmp);
++    }
++}
++
++static void translate_bany(DisasContext *dc, const uint32_t arg[],
++                           const uint32_t par[])
++{
++    if (gen_window_check2(dc, arg[0], arg[1])) {
++        TCGv_i32 tmp = tcg_temp_new_i32();
++        tcg_gen_and_i32(tmp, cpu_R[arg[0]], cpu_R[arg[1]]);
++        gen_brcondi(dc, par[0], tmp, 0, arg[2]);
++        tcg_temp_free(tmp);
++    }
++}
++
++static void translate_b(DisasContext *dc, const uint32_t arg[],
++                        const uint32_t par[])
++{
++    if (gen_window_check2(dc, arg[0], arg[1])) {
++        gen_brcond(dc, par[0], cpu_R[arg[0]], cpu_R[arg[1]], arg[2]);
++    }
++}
++
++static void translate_bb(DisasContext *dc, const uint32_t arg[],
++                         const uint32_t par[])
++{
++    if (gen_window_check2(dc, arg[0], arg[1])) {
++#ifdef TARGET_WORDS_BIGENDIAN
++        TCGv_i32 bit = tcg_const_i32(0x80000000u);
++#else
++        TCGv_i32 bit = tcg_const_i32(0x00000001u);
++#endif
++        TCGv_i32 tmp = tcg_temp_new_i32();
++        tcg_gen_andi_i32(tmp, cpu_R[arg[1]], 0x1f);
++#ifdef TARGET_WORDS_BIGENDIAN
++        tcg_gen_shr_i32(bit, bit, tmp);
++#else
++        tcg_gen_shl_i32(bit, bit, tmp);
++#endif
++        tcg_gen_and_i32(tmp, cpu_R[arg[0]], bit);
++        gen_brcondi(dc, par[0], tmp, 0, arg[2]);
++        tcg_temp_free(tmp);
++        tcg_temp_free(bit);
++    }
++}
++
++static void translate_bbi(DisasContext *dc, const uint32_t arg[],
++                          const uint32_t par[])
++{
++    if (gen_window_check1(dc, arg[0])) {
++        TCGv_i32 tmp = tcg_temp_new_i32();
++#ifdef TARGET_WORDS_BIGENDIAN
++        tcg_gen_andi_i32(tmp, cpu_R[arg[0]], 0x80000000u >> arg[1]);
++#else
++        tcg_gen_andi_i32(tmp, cpu_R[arg[0]], 0x00000001u << arg[1]);
++#endif
++        gen_brcondi(dc, par[0], tmp, 0, arg[2]);
++        tcg_temp_free(tmp);
++    }
++}
++
++static void translate_bi(DisasContext *dc, const uint32_t arg[],
++                         const uint32_t par[])
++{
++    if (gen_window_check1(dc, arg[0])) {
++        gen_brcondi(dc, par[0], cpu_R[arg[0]], arg[1], arg[2]);
++    }
++}
++
++static void translate_bz(DisasContext *dc, const uint32_t arg[],
++                         const uint32_t par[])
++{
++    if (gen_window_check1(dc, arg[0])) {
++        gen_brcondi(dc, par[0], cpu_R[arg[0]], 0, arg[1]);
++    }
++}
++
++enum {
++    BOOLEAN_AND,
++    BOOLEAN_ANDC,
++    BOOLEAN_OR,
++    BOOLEAN_ORC,
++    BOOLEAN_XOR,
++};
++
++static void translate_boolean(DisasContext *dc, const uint32_t arg[],
++                              const uint32_t par[])
++{
++    static void (* const op[])(TCGv_i32, TCGv_i32, TCGv_i32) = {
++        [BOOLEAN_AND] = tcg_gen_and_i32,
++        [BOOLEAN_ANDC] = tcg_gen_andc_i32,
++        [BOOLEAN_OR] = tcg_gen_or_i32,
++        [BOOLEAN_ORC] = tcg_gen_orc_i32,
++        [BOOLEAN_XOR] = tcg_gen_xor_i32,
++    };
++
++    TCGv_i32 tmp1 = tcg_temp_new_i32();
++    TCGv_i32 tmp2 = tcg_temp_new_i32();
++
++    tcg_gen_shri_i32(tmp1, cpu_SR[BR], arg[1]);
++    tcg_gen_shri_i32(tmp2, cpu_SR[BR], arg[2]);
++    op[par[0]](tmp1, tmp1, tmp2);
++    tcg_gen_deposit_i32(cpu_SR[BR], cpu_SR[BR], tmp1, arg[0], 1);
++    tcg_temp_free(tmp1);
++    tcg_temp_free(tmp2);
++}
++
++static void translate_bp(DisasContext *dc, const uint32_t arg[],
++                         const uint32_t par[])
++{
++    TCGv_i32 tmp = tcg_temp_new_i32();
++
++    tcg_gen_andi_i32(tmp, cpu_SR[BR], 1 << arg[0]);
++    gen_brcondi(dc, par[0], tmp, 0, arg[1]);
++    tcg_temp_free(tmp);
++}
++
++static void translate_break(DisasContext *dc, const uint32_t arg[],
++                            const uint32_t par[])
++{
++    if (dc->debug) {
++        gen_debug_exception(dc, par[0]);
++    }
++}
++
++static void translate_call0(DisasContext *dc, const uint32_t arg[],
++                            const uint32_t par[])
++{
++    tcg_gen_movi_i32(cpu_R[0], dc->next_pc);
++    gen_jumpi(dc, arg[0], 0);
++}
++
++static void translate_callw(DisasContext *dc, const uint32_t arg[],
++                            const uint32_t par[])
++{
++    if (gen_window_check1(dc, par[0] << 2)) {
++        gen_callwi(dc, par[0], arg[0], 0);
++    }
++}
++
++static void translate_callx0(DisasContext *dc, const uint32_t arg[],
++                             const uint32_t par[])
++{
++    if (gen_window_check1(dc, arg[0])) {
++        TCGv_i32 tmp = tcg_temp_new_i32();
++        tcg_gen_mov_i32(tmp, cpu_R[arg[0]]);
++        tcg_gen_movi_i32(cpu_R[0], dc->next_pc);
++        gen_jump(dc, tmp);
++        tcg_temp_free(tmp);
++    }
++}
++
++static void translate_callxw(DisasContext *dc, const uint32_t arg[],
++                             const uint32_t par[])
++{
++    if (gen_window_check2(dc, arg[0], par[0] << 2)) {
++        TCGv_i32 tmp = tcg_temp_new_i32();
++
++        tcg_gen_mov_i32(tmp, cpu_R[arg[0]]);
++        gen_callw(dc, par[0], tmp);
++        tcg_temp_free(tmp);
++    }
++}
++
++static void translate_clamps(DisasContext *dc, const uint32_t arg[],
++                             const uint32_t par[])
++{
++    if (gen_window_check2(dc, arg[0], arg[1])) {
++        TCGv_i32 tmp1 = tcg_const_i32(-1u << arg[2]);
++        TCGv_i32 tmp2 = tcg_const_i32((1 << arg[2]) - 1);
++
++        tcg_gen_movcond_i32(TCG_COND_GT, tmp1,
++                            cpu_R[arg[1]], tmp1, cpu_R[arg[1]], tmp1);
++        tcg_gen_movcond_i32(TCG_COND_LT, cpu_R[arg[0]],
++                            tmp1, tmp2, tmp1, tmp2);
++        tcg_temp_free(tmp1);
++        tcg_temp_free(tmp2);
++    }
++}
++
++/* par[0]: privileged, par[1]: check memory access */
++static void translate_dcache(DisasContext *dc, const uint32_t arg[],
++                             const uint32_t par[])
++{
++    if ((!par[0] || gen_check_privilege(dc)) &&
++        gen_window_check1(dc, arg[0]) && par[1]) {
++        TCGv_i32 addr = tcg_temp_new_i32();
++        TCGv_i32 res = tcg_temp_new_i32();
++
++        tcg_gen_addi_i32(addr, cpu_R[arg[0]], arg[1]);
++        tcg_gen_qemu_ld8u(res, addr, dc->cring);
++        tcg_temp_free(addr);
++        tcg_temp_free(res);
++    }
++}
++
++static void translate_depbits(DisasContext *dc, const uint32_t arg[],
++                              const uint32_t par[])
++{
++    if (gen_window_check2(dc, arg[0], arg[1])) {
++        tcg_gen_deposit_i32(cpu_R[arg[1]], cpu_R[arg[1]], cpu_R[arg[0]],
++                            arg[2], arg[3]);
++    }
++}
++
++static void translate_entry(DisasContext *dc, const uint32_t arg[],
++                            const uint32_t par[])
++{
++    TCGv_i32 pc = tcg_const_i32(dc->pc);
++    TCGv_i32 s = tcg_const_i32(arg[0]);
++    TCGv_i32 imm = tcg_const_i32(arg[1]);
++    gen_helper_entry(cpu_env, pc, s, imm);
++    tcg_temp_free(imm);
++    tcg_temp_free(s);
++    tcg_temp_free(pc);
++    /* This can change tb->flags, so exit tb */
++    gen_jumpi_check_loop_end(dc, -1);
++}
++
++static void translate_extui(DisasContext *dc, const uint32_t arg[],
++                            const uint32_t par[])
++{
++    if (gen_window_check2(dc, arg[0], arg[1])) {
++        int maskimm = (1 << arg[3]) - 1;
++
++        TCGv_i32 tmp = tcg_temp_new_i32();
++        tcg_gen_shri_i32(tmp, cpu_R[arg[1]], arg[2]);
++        tcg_gen_andi_i32(cpu_R[arg[0]], tmp, maskimm);
++        tcg_temp_free(tmp);
++    }
++}
++
++/* par[0]: privileged, par[1]: check memory access */
++static void translate_icache(DisasContext *dc, const uint32_t arg[],
++                             const uint32_t par[])
++{
++    if ((!par[0] || gen_check_privilege(dc)) &&
++        gen_window_check1(dc, arg[0]) && par[1]) {
++        TCGv_i32 addr = tcg_temp_new_i32();
++
++        tcg_gen_movi_i32(cpu_pc, dc->pc);
++        tcg_gen_addi_i32(addr, cpu_R[arg[0]], arg[1]);
++        gen_helper_itlb_hit_test(cpu_env, addr);
++        tcg_temp_free(addr);
++    }
++}
++
++static void translate_itlb(DisasContext *dc, const uint32_t arg[],
++                           const uint32_t par[])
++{
++    if (gen_check_privilege(dc) &&
++        gen_window_check1(dc, arg[0])) {
++        TCGv_i32 dtlb = tcg_const_i32(par[0]);
++
++        gen_helper_itlb(cpu_env, cpu_R[arg[0]], dtlb);
++        /* This could change memory mapping, so exit tb */
++        gen_jumpi_check_loop_end(dc, -1);
++        tcg_temp_free(dtlb);
++    }
++}
++
++static void translate_ill(DisasContext *dc, const uint32_t arg[],
++                          const uint32_t par[])
++{
++    gen_exception_cause(dc, ILLEGAL_INSTRUCTION_CAUSE);
++}
++
++static void translate_j(DisasContext *dc, const uint32_t arg[],
++                        const uint32_t par[])
++{
++    gen_jumpi(dc, arg[0], 0);
++}
++
++static void translate_jx(DisasContext *dc, const uint32_t arg[],
++                         const uint32_t par[])
++{
++    if (gen_window_check1(dc, arg[0])) {
++        gen_jump(dc, cpu_R[arg[0]]);
++    }
++}
++
++static void translate_l32e(DisasContext *dc, const uint32_t arg[],
++                           const uint32_t par[])
++{
++    if (gen_check_privilege(dc) &&
++        gen_window_check2(dc, arg[0], arg[1])) {
++        TCGv_i32 addr = tcg_temp_new_i32();
++
++        tcg_gen_addi_i32(addr, cpu_R[arg[1]], arg[2]);
++        gen_load_store_alignment(dc, 2, addr, false);
++        tcg_gen_qemu_ld_tl(cpu_R[arg[0]], addr, dc->ring, MO_TEUL);
++        tcg_temp_free(addr);
++    }
++}
++
++static void translate_ldst(DisasContext *dc, const uint32_t arg[],
++                           const uint32_t par[])
++{
++    if (gen_window_check2(dc, arg[0], arg[1])) {
++        TCGv_i32 addr = tcg_temp_new_i32();
++
++        tcg_gen_addi_i32(addr, cpu_R[arg[1]], arg[2]);
++        if (par[0] & MO_SIZE) {
++            gen_load_store_alignment(dc, par[0] & MO_SIZE, addr, par[1]);
++        }
++        if (par[2]) {
++            tcg_gen_qemu_st_tl(cpu_R[arg[0]], addr, dc->cring, par[0]);
++        } else {
++            tcg_gen_qemu_ld_tl(cpu_R[arg[0]], addr, dc->cring, par[0]);
++        }
++        tcg_temp_free(addr);
++    }
++}
++
++static void translate_l32r(DisasContext *dc, const uint32_t arg[],
++                           const uint32_t par[])
++{
++    if (gen_window_check1(dc, arg[0])) {
++        TCGv_i32 tmp = (dc->tb->flags & XTENSA_TBFLAG_LITBASE) ?
++                       tcg_const_i32(dc->raw_arg[1] - 1) :
++                       tcg_const_i32(arg[1]);
++
++        if (dc->tb->flags & XTENSA_TBFLAG_LITBASE) {
++            tcg_gen_add_i32(tmp, tmp, dc->litbase);
++        }
++        tcg_gen_qemu_ld32u(cpu_R[arg[0]], tmp, dc->cring);
++        tcg_temp_free(tmp);
++    }
++}
++
++static void translate_loop(DisasContext *dc, const uint32_t arg[],
++                           const uint32_t par[])
++{
++    if (gen_window_check1(dc, arg[0])) {
++        uint32_t lend = arg[1];
++        TCGv_i32 tmp = tcg_const_i32(lend);
++
++        tcg_gen_subi_i32(cpu_SR[LCOUNT], cpu_R[arg[0]], 1);
++        tcg_gen_movi_i32(cpu_SR[LBEG], dc->next_pc);
++        gen_helper_wsr_lend(cpu_env, tmp);
++        tcg_temp_free(tmp);
++
++        if (par[0] != TCG_COND_NEVER) {
++            TCGLabel *label = gen_new_label();
++            tcg_gen_brcondi_i32(par[0], cpu_R[arg[0]], 0, label);
++            gen_jumpi(dc, lend, 1);
++            gen_set_label(label);
++        }
++
++        gen_jumpi(dc, dc->next_pc, 0);
++    }
++}
++
++enum {
++    MAC16_UMUL,
++    MAC16_MUL,
++    MAC16_MULA,
++    MAC16_MULS,
++    MAC16_NONE,
++};
++
++enum {
++    MAC16_LL,
++    MAC16_HL,
++    MAC16_LH,
++    MAC16_HH,
++
++    MAC16_HX = 0x1,
++    MAC16_XH = 0x2,
++};
++
++enum {
++    MAC16_AA,
++    MAC16_AD,
++    MAC16_DA,
++    MAC16_DD,
++
++    MAC16_XD = 0x1,
++    MAC16_DX = 0x2,
++};
++
++static void translate_mac16(DisasContext *dc, const uint32_t arg[],
++                            const uint32_t par[])
++{
++    int op = par[0];
++    bool is_m1_sr = par[1] & MAC16_DX;
++    bool is_m2_sr = par[1] & MAC16_XD;
++    unsigned half = par[2];
++    uint32_t ld_offset = par[3];
++    unsigned off = ld_offset ? 2 : 0;
++    uint32_t ar[3] = {0};
++    unsigned n_ar = 0;
++
++    if (op != MAC16_NONE) {
++        if (!is_m1_sr) {
++            ar[n_ar++] = arg[off];
++        }
++        if (!is_m2_sr) {
++            ar[n_ar++] = arg[off + 1];
++        }
++    }
++
++    if (ld_offset) {
++        ar[n_ar++] = arg[1];
++    }
++
++    if (gen_window_check3(dc, ar[0], ar[1], ar[2])) {
++        TCGv_i32 vaddr = tcg_temp_new_i32();
++        TCGv_i32 mem32 = tcg_temp_new_i32();
++
++        if (ld_offset) {
++            tcg_gen_addi_i32(vaddr, cpu_R[arg[1]], ld_offset);
++            gen_load_store_alignment(dc, 2, vaddr, false);
++            tcg_gen_qemu_ld32u(mem32, vaddr, dc->cring);
++        }
++        if (op != MAC16_NONE) {
++            TCGv_i32 m1 = gen_mac16_m(is_m1_sr ?
++                                      cpu_SR[MR + arg[off]] :
++                                      cpu_R[arg[off]],
++                                      half & MAC16_HX, op == MAC16_UMUL);
++            TCGv_i32 m2 = gen_mac16_m(is_m2_sr ?
++                                      cpu_SR[MR + arg[off + 1]] :
++                                      cpu_R[arg[off + 1]],
++                                      half & MAC16_XH, op == MAC16_UMUL);
++
++            if (op == MAC16_MUL || op == MAC16_UMUL) {
++                tcg_gen_mul_i32(cpu_SR[ACCLO], m1, m2);
++                if (op == MAC16_UMUL) {
++                    tcg_gen_movi_i32(cpu_SR[ACCHI], 0);
++                } else {
++                    tcg_gen_sari_i32(cpu_SR[ACCHI], cpu_SR[ACCLO], 31);
++                }
++            } else {
++                TCGv_i32 lo = tcg_temp_new_i32();
++                TCGv_i32 hi = tcg_temp_new_i32();
++
++                tcg_gen_mul_i32(lo, m1, m2);
++                tcg_gen_sari_i32(hi, lo, 31);
++                if (op == MAC16_MULA) {
++                    tcg_gen_add2_i32(cpu_SR[ACCLO], cpu_SR[ACCHI],
++                                     cpu_SR[ACCLO], cpu_SR[ACCHI],
++                                     lo, hi);
++                } else {
++                    tcg_gen_sub2_i32(cpu_SR[ACCLO], cpu_SR[ACCHI],
++                                     cpu_SR[ACCLO], cpu_SR[ACCHI],
++                                     lo, hi);
++                }
++                tcg_gen_ext8s_i32(cpu_SR[ACCHI], cpu_SR[ACCHI]);
++
++                tcg_temp_free_i32(lo);
++                tcg_temp_free_i32(hi);
++            }
++            tcg_temp_free(m1);
++            tcg_temp_free(m2);
++        }
++        if (ld_offset) {
++            tcg_gen_mov_i32(cpu_R[arg[1]], vaddr);
++            tcg_gen_mov_i32(cpu_SR[MR + arg[0]], mem32);
++        }
++        tcg_temp_free(vaddr);
++        tcg_temp_free(mem32);
++    }
++}
++
++static void translate_minmax(DisasContext *dc, const uint32_t arg[],
++                             const uint32_t par[])
++{
++    if (gen_window_check3(dc, arg[0], arg[1], arg[2])) {
++        tcg_gen_movcond_i32(par[0], cpu_R[arg[0]],
++                            cpu_R[arg[1]], cpu_R[arg[2]],
++                            cpu_R[arg[1]], cpu_R[arg[2]]);
++    }
++}
++
++static void translate_mov(DisasContext *dc, const uint32_t arg[],
++                          const uint32_t par[])
++{
++    if (gen_window_check2(dc, arg[0], arg[1])) {
++        tcg_gen_mov_i32(cpu_R[arg[0]], cpu_R[arg[1]]);
++    }
++}
++
++static void translate_movcond(DisasContext *dc, const uint32_t arg[],
++                              const uint32_t par[])
++{
++    if (gen_window_check3(dc, arg[0], arg[1], arg[2])) {
++        TCGv_i32 zero = tcg_const_i32(0);
++
++        tcg_gen_movcond_i32(par[0], cpu_R[arg[0]],
++                            cpu_R[arg[2]], zero, cpu_R[arg[1]], cpu_R[arg[0]]);
++        tcg_temp_free(zero);
++    }
++}
++
++static void translate_movi(DisasContext *dc, const uint32_t arg[],
++                           const uint32_t par[])
++{
++    if (gen_window_check1(dc, arg[0])) {
++        tcg_gen_movi_i32(cpu_R[arg[0]], arg[1]);
++    }
++}
++
++static void translate_movp(DisasContext *dc, const uint32_t arg[],
++                           const uint32_t par[])
++{
++    if (gen_window_check2(dc, arg[0], arg[1])) {
++        TCGv_i32 zero = tcg_const_i32(0);
++        TCGv_i32 tmp = tcg_temp_new_i32();
++
++        tcg_gen_andi_i32(tmp, cpu_SR[BR], 1 << arg[2]);
++        tcg_gen_movcond_i32(par[0],
++                            cpu_R[arg[0]], tmp, zero,
++                            cpu_R[arg[1]], cpu_R[arg[0]]);
++        tcg_temp_free(tmp);
++        tcg_temp_free(zero);
++    }
++}
++
++static void translate_movsp(DisasContext *dc, const uint32_t arg[],
++                            const uint32_t par[])
++{
++    if (gen_window_check2(dc, arg[0], arg[1])) {
++        TCGv_i32 pc = tcg_const_i32(dc->pc);
++        gen_helper_movsp(cpu_env, pc);
++        tcg_gen_mov_i32(cpu_R[arg[0]], cpu_R[arg[1]]);
++        tcg_temp_free(pc);
++    }
++}
++
++static void translate_mul16(DisasContext *dc, const uint32_t arg[],
++                            const uint32_t par[])
++{
++    if (gen_window_check3(dc, arg[0], arg[1], arg[2])) {
++        TCGv_i32 v1 = tcg_temp_new_i32();
++        TCGv_i32 v2 = tcg_temp_new_i32();
++
++        if (par[0]) {
++            tcg_gen_ext16s_i32(v1, cpu_R[arg[1]]);
++            tcg_gen_ext16s_i32(v2, cpu_R[arg[2]]);
++        } else {
++            tcg_gen_ext16u_i32(v1, cpu_R[arg[1]]);
++            tcg_gen_ext16u_i32(v2, cpu_R[arg[2]]);
++        }
++        tcg_gen_mul_i32(cpu_R[arg[0]], v1, v2);
++        tcg_temp_free(v2);
++        tcg_temp_free(v1);
++    }
++}
++
++static void translate_mull(DisasContext *dc, const uint32_t arg[],
++                           const uint32_t par[])
++{
++    if (gen_window_check3(dc, arg[0], arg[1], arg[2])) {
++        tcg_gen_mul_i32(cpu_R[arg[0]], cpu_R[arg[1]], cpu_R[arg[2]]);
++    }
++}
++
++static void translate_mulh(DisasContext *dc, const uint32_t arg[],
++                           const uint32_t par[])
++{
++    if (gen_window_check3(dc, arg[0], arg[1], arg[2])) {
++        TCGv_i32 lo = tcg_temp_new();
++
++        if (par[0]) {
++            tcg_gen_muls2_i32(lo, cpu_R[arg[0]], cpu_R[arg[1]], cpu_R[arg[2]]);
++        } else {
++            tcg_gen_mulu2_i32(lo, cpu_R[arg[0]], cpu_R[arg[1]], cpu_R[arg[2]]);
++        }
++        tcg_temp_free(lo);
++    }
++}
++
++static void translate_neg(DisasContext *dc, const uint32_t arg[],
++                          const uint32_t par[])
++{
++    if (gen_window_check2(dc, arg[0], arg[1])) {
++        tcg_gen_neg_i32(cpu_R[arg[0]], cpu_R[arg[1]]);
++    }
++}
++
++static void translate_nop(DisasContext *dc, const uint32_t arg[],
++                          const uint32_t par[])
++{
++}
++
++static void translate_nsa(DisasContext *dc, const uint32_t arg[],
++                          const uint32_t par[])
++{
++    if (gen_window_check2(dc, arg[0], arg[1])) {
++        tcg_gen_clrsb_i32(cpu_R[arg[0]], cpu_R[arg[1]]);
++    }
++}
++
++static void translate_nsau(DisasContext *dc, const uint32_t arg[],
++                           const uint32_t par[])
++{
++    if (gen_window_check2(dc, arg[0], arg[1])) {
++        tcg_gen_clzi_i32(cpu_R[arg[0]], cpu_R[arg[1]], 32);
++    }
++}
++
++static void translate_or(DisasContext *dc, const uint32_t arg[],
++                         const uint32_t par[])
++{
++    if (gen_window_check3(dc, arg[0], arg[1], arg[2])) {
++        tcg_gen_or_i32(cpu_R[arg[0]], cpu_R[arg[1]], cpu_R[arg[2]]);
++    }
++}
++
++static void translate_ptlb(DisasContext *dc, const uint32_t arg[],
++                           const uint32_t par[])
++{
++    if (gen_check_privilege(dc) &&
++        gen_window_check2(dc, arg[0], arg[1])) {
++        TCGv_i32 dtlb = tcg_const_i32(par[0]);
++
++        tcg_gen_movi_i32(cpu_pc, dc->pc);
++        gen_helper_ptlb(cpu_R[arg[0]], cpu_env, cpu_R[arg[1]], dtlb);
++        tcg_temp_free(dtlb);
++    }
++}
++
++static void gen_zero_check(DisasContext *dc, const uint32_t arg[])
++{
++    TCGLabel *label = gen_new_label();
++
++    tcg_gen_brcondi_i32(TCG_COND_NE, cpu_R[arg[2]], 0, label);
++    gen_exception_cause(dc, INTEGER_DIVIDE_BY_ZERO_CAUSE);
++    gen_set_label(label);
++}
++
++static void translate_quos(DisasContext *dc, const uint32_t arg[],
++                           const uint32_t par[])
++{
++    if (gen_window_check3(dc, arg[0], arg[1], arg[2])) {
++        TCGLabel *label1 = gen_new_label();
++        TCGLabel *label2 = gen_new_label();
++
++        gen_zero_check(dc, arg);
++
++        tcg_gen_brcondi_i32(TCG_COND_NE, cpu_R[arg[1]], 0x80000000,
++                            label1);
++        tcg_gen_brcondi_i32(TCG_COND_NE, cpu_R[arg[2]], 0xffffffff,
++                            label1);
++        tcg_gen_movi_i32(cpu_R[arg[0]],
++                         par[0] ? 0x80000000 : 0);
++        tcg_gen_br(label2);
++        gen_set_label(label1);
++        if (par[0]) {
++            tcg_gen_div_i32(cpu_R[arg[0]],
++                            cpu_R[arg[1]], cpu_R[arg[2]]);
++        } else {
++            tcg_gen_rem_i32(cpu_R[arg[0]],
++                            cpu_R[arg[1]], cpu_R[arg[2]]);
++        }
++        gen_set_label(label2);
++    }
++}
++
++static void translate_quou(DisasContext *dc, const uint32_t arg[],
++                           const uint32_t par[])
++{
++    if (gen_window_check3(dc, arg[0], arg[1], arg[2])) {
++        gen_zero_check(dc, arg);
++        if (par[0]) {
++            tcg_gen_divu_i32(cpu_R[arg[0]],
++                             cpu_R[arg[1]], cpu_R[arg[2]]);
++        } else {
++            tcg_gen_remu_i32(cpu_R[arg[0]],
++                             cpu_R[arg[1]], cpu_R[arg[2]]);
++        }
++    }
++}
++
++static void translate_rer(DisasContext *dc, const uint32_t arg[],
++                          const uint32_t par[])
++{
++    if (gen_check_privilege(dc) &&
++        gen_window_check2(dc, arg[0], arg[1])) {
++        gen_helper_rer(cpu_R[arg[0]], cpu_env, cpu_R[arg[1]]);
++    }
++}
++
++static void translate_ret(DisasContext *dc, const uint32_t arg[],
++                          const uint32_t par[])
++{
++    gen_jump(dc, cpu_R[0]);
++}
++
++static void translate_retw(DisasContext *dc, const uint32_t arg[],
++                           const uint32_t par[])
++{
++    TCGv_i32 tmp = tcg_const_i32(dc->pc);
++    gen_helper_retw(tmp, cpu_env, tmp);
++    gen_jump(dc, tmp);
++    tcg_temp_free(tmp);
++}
++
++static void translate_rfde(DisasContext *dc, const uint32_t arg[],
++                           const uint32_t par[])
++{
++    if (gen_check_privilege(dc)) {
++        gen_jump(dc, cpu_SR[dc->config->ndepc ? DEPC : EPC1]);
++    }
++}
++
++static void translate_rfe(DisasContext *dc, const uint32_t arg[],
++                          const uint32_t par[])
++{
++    if (gen_check_privilege(dc)) {
++        tcg_gen_andi_i32(cpu_SR[PS], cpu_SR[PS], ~PS_EXCM);
++        gen_check_interrupts(dc);
++        gen_jump(dc, cpu_SR[EPC1]);
++    }
++}
++
++static void translate_rfi(DisasContext *dc, const uint32_t arg[],
++                          const uint32_t par[])
++{
++    if (gen_check_privilege(dc)) {
++        tcg_gen_mov_i32(cpu_SR[PS], cpu_SR[EPS2 + arg[0] - 2]);
++        gen_check_interrupts(dc);
++        gen_jump(dc, cpu_SR[EPC1 + arg[0] - 1]);
++    }
++}
++
++static void translate_rfw(DisasContext *dc, const uint32_t arg[],
++                          const uint32_t par[])
++{
++    if (gen_check_privilege(dc)) {
++        TCGv_i32 tmp = tcg_const_i32(1);
++
++        tcg_gen_andi_i32(cpu_SR[PS], cpu_SR[PS], ~PS_EXCM);
++        tcg_gen_shl_i32(tmp, tmp, cpu_SR[WINDOW_BASE]);
++
++        if (par[0]) {
++            tcg_gen_andc_i32(cpu_SR[WINDOW_START],
++                             cpu_SR[WINDOW_START], tmp);
++        } else {
++            tcg_gen_or_i32(cpu_SR[WINDOW_START],
++                           cpu_SR[WINDOW_START], tmp);
++        }
++
++        gen_helper_restore_owb(cpu_env);
++        gen_check_interrupts(dc);
++        gen_jump(dc, cpu_SR[EPC1]);
++
++        tcg_temp_free(tmp);
++    }
++}
++
++static void translate_rotw(DisasContext *dc, const uint32_t arg[],
++                           const uint32_t par[])
++{
++    if (gen_check_privilege(dc)) {
++        TCGv_i32 tmp = tcg_const_i32(arg[0]);
++        gen_helper_rotw(cpu_env, tmp);
++        tcg_temp_free(tmp);
++        /* This can change tb->flags, so exit tb */
++        gen_jumpi_check_loop_end(dc, -1);
++    }
++}
++
++static void translate_rsil(DisasContext *dc, const uint32_t arg[],
++                           const uint32_t par[])
++{
++    if (gen_check_privilege(dc) &&
++        gen_window_check1(dc, arg[0])) {
++        tcg_gen_mov_i32(cpu_R[arg[0]], cpu_SR[PS]);
++        tcg_gen_andi_i32(cpu_SR[PS], cpu_SR[PS], ~PS_INTLEVEL);
++        tcg_gen_ori_i32(cpu_SR[PS], cpu_SR[PS], arg[1]);
++        gen_check_interrupts(dc);
++        gen_jumpi_check_loop_end(dc, 0);
++    }
++}
++
++static void translate_rsr(DisasContext *dc, const uint32_t arg[],
++                          const uint32_t par[])
++{
++    if (gen_check_sr(dc, par[0], SR_R) &&
++        (par[0] < 64 || gen_check_privilege(dc)) &&
++        gen_window_check1(dc, arg[0])) {
++        if (gen_rsr(dc, cpu_R[arg[0]], par[0])) {
++            gen_jumpi_check_loop_end(dc, 0);
++        }
++    }
++}
++
++static void translate_rtlb(DisasContext *dc, const uint32_t arg[],
++                           const uint32_t par[])
++{
++    static void (* const helper[])(TCGv_i32 r, TCGv_env env, TCGv_i32 a1,
++                                   TCGv_i32 a2) = {
++        gen_helper_rtlb0,
++        gen_helper_rtlb1,
++    };
++
++    if (gen_check_privilege(dc) &&
++        gen_window_check2(dc, arg[0], arg[1])) {
++        TCGv_i32 dtlb = tcg_const_i32(par[0]);
++
++        helper[par[1]](cpu_R[arg[0]], cpu_env, cpu_R[arg[1]], dtlb);
++        tcg_temp_free(dtlb);
++    }
++}
++
++static void translate_rur(DisasContext *dc, const uint32_t arg[],
++                          const uint32_t par[])
++{
++    if (gen_window_check1(dc, arg[0])) {
++        if (uregnames[par[0]].name) {
++            tcg_gen_mov_i32(cpu_R[arg[0]], cpu_UR[par[0]]);
++        } else {
++            qemu_log_mask(LOG_UNIMP, "RUR %d not implemented, ", par[0]);
++        }
++    }
++}
++
++static void translate_s32c1i(DisasContext *dc, const uint32_t arg[],
++                             const uint32_t par[])
++{
++    if (gen_window_check2(dc, arg[0], arg[1])) {
++        TCGLabel *label = gen_new_label();
++        TCGv_i32 tmp = tcg_temp_local_new_i32();
++        TCGv_i32 addr = tcg_temp_local_new_i32();
++        TCGv_i32 tpc;
++
++        tcg_gen_mov_i32(tmp, cpu_R[arg[0]]);
++        tcg_gen_addi_i32(addr, cpu_R[arg[1]], arg[2]);
++        gen_load_store_alignment(dc, 2, addr, true);
++
++        tpc = tcg_const_i32(dc->pc);
++        gen_helper_check_atomctl(cpu_env, tpc, addr);
++        tcg_gen_qemu_ld32u(cpu_R[arg[0]], addr, dc->cring);
++        tcg_gen_brcond_i32(TCG_COND_NE, cpu_R[arg[0]],
++                           cpu_SR[SCOMPARE1], label);
++
++        tcg_gen_qemu_st32(tmp, addr, dc->cring);
++
++        gen_set_label(label);
++        tcg_temp_free(tpc);
++        tcg_temp_free(addr);
++        tcg_temp_free(tmp);
++    }
++}
++
++static void translate_s32e(DisasContext *dc, const uint32_t arg[],
++                           const uint32_t par[])
++{
++    if (gen_check_privilege(dc) &&
++        gen_window_check2(dc, arg[0], arg[1])) {
++        TCGv_i32 addr = tcg_temp_new_i32();
++
++        tcg_gen_addi_i32(addr, cpu_R[arg[1]], arg[2]);
++        gen_load_store_alignment(dc, 2, addr, false);
++        tcg_gen_qemu_st_tl(cpu_R[arg[0]], addr, dc->ring, MO_TEUL);
++        tcg_temp_free(addr);
++    }
++}
++
++static void translate_sext(DisasContext *dc, const uint32_t arg[],
++                           const uint32_t par[])
++{
++    if (gen_window_check2(dc, arg[0], arg[1])) {
++        int shift = 31 - arg[2];
++
++        if (shift == 24) {
++            tcg_gen_ext8s_i32(cpu_R[arg[0]], cpu_R[arg[1]]);
++        } else if (shift == 16) {
++            tcg_gen_ext16s_i32(cpu_R[arg[0]], cpu_R[arg[1]]);
++        } else {
++            TCGv_i32 tmp = tcg_temp_new_i32();
++            tcg_gen_shli_i32(tmp, cpu_R[arg[1]], shift);
++            tcg_gen_sari_i32(cpu_R[arg[0]], tmp, shift);
++            tcg_temp_free(tmp);
++        }
++    }
++}
++
++static void translate_simcall(DisasContext *dc, const uint32_t arg[],
++                              const uint32_t par[])
++{
++    if (semihosting_enabled()) {
++        if (gen_check_privilege(dc)) {
++            gen_helper_simcall(cpu_env);
++        }
++    } else {
++        qemu_log_mask(LOG_GUEST_ERROR, "SIMCALL but semihosting is disabled\n");
++        gen_exception_cause(dc, ILLEGAL_INSTRUCTION_CAUSE);
++    }
++}
 +
 +/*
-+ * Inward conversion from byte stream to xtensa_insnbuf. See
-+ * xtensa_insnbuf_to_chars for a discussion of why this is complicated
-+ * by endianness.
++ * Note: 64 bit ops are used here solely because SAR values
++ * have range 0..63
 + */
++#define gen_shift_reg(cmd, reg) do { \
++                    TCGv_i64 tmp = tcg_temp_new_i64(); \
++                    tcg_gen_extu_i32_i64(tmp, reg); \
++                    tcg_gen_##cmd##_i64(v, v, tmp); \
++                    tcg_gen_extrl_i64_i32(cpu_R[arg[0]], v); \
++                    tcg_temp_free_i64(v); \
++                    tcg_temp_free_i64(tmp); \
++                } while (0)
 +
-+void xtensa_insnbuf_from_chars(xtensa_isa isa,
-+                               xtensa_insnbuf insn,
-+                               const unsigned char *cp,
-+                               int num_chars)
++#define gen_shift(cmd) gen_shift_reg(cmd, cpu_SR[SAR])
++
++static void translate_sll(DisasContext *dc, const uint32_t arg[],
++                          const uint32_t par[])
 +{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+    int max_size, insn_size, fence_post, start, increment, i;
-+
-+    max_size = xtensa_isa_maxlength(isa);
-+
-+    /* Decode the instruction length so we know how many bytes to read. */
-+    insn_size = (intisa->length_decode_fn)(cp);
-+    if (insn_size == XTENSA_UNDEFINED) {
-+        /*
-+         * This should never happen when the byte stream contains a
-+         * valid instruction. Just read the maximum number of bytes....
-+         */
-+        insn_size = max_size;
-+    }
-+
-+    if (num_chars == 0 || num_chars > insn_size) {
-+        num_chars = insn_size;
-+    }
-+
-+    if (intisa->is_big_endian) {
-+        start = max_size - 1;
-+        increment = -1;
-+    } else {
-+        start = 0;
-+        increment = 1;
-+    }
-+
-+    fence_post = start + (num_chars * increment);
-+    memset(insn, 0, xtensa_insnbuf_size(isa) * sizeof(xtensa_insnbuf_word));
-+
-+    for (i = start; i != fence_post; i += increment, ++cp) {
-+        int word_inx = byte_to_word_index(i);
-+        int bit_inx = byte_to_bit_index(i);
-+
-+        insn[word_inx] |= (*cp & 0xff) << bit_inx;
-+    }
-+}
-+
-+
-+/* ISA information. */
-+
-+xtensa_isa xtensa_isa_init(void *xtensa_modules, xtensa_isa_status *errno_p,
-+                           char **error_msg_p)
-+{
-+    xtensa_isa_internal *isa = xtensa_modules;
-+    int n, is_user;
-+
-+    /* Set up the opcode name lookup table. */
-+    isa->opname_lookup_table =
-+        malloc(isa->num_opcodes * sizeof(xtensa_lookup_entry));
-+    CHECK_ALLOC_FOR_INIT(isa->opname_lookup_table, NULL, errno_p, error_msg_p);
-+    for (n = 0; n < isa->num_opcodes; n++) {
-+        isa->opname_lookup_table[n].key = isa->opcodes[n].name;
-+        isa->opname_lookup_table[n].u.opcode = n;
-+    }
-+    qsort(isa->opname_lookup_table, isa->num_opcodes,
-+          sizeof(xtensa_lookup_entry), xtensa_isa_name_compare);
-+
-+    /* Set up the state name lookup table. */
-+    isa->state_lookup_table =
-+        malloc(isa->num_states * sizeof(xtensa_lookup_entry));
-+    CHECK_ALLOC_FOR_INIT(isa->state_lookup_table, NULL, errno_p, error_msg_p);
-+    for (n = 0; n < isa->num_states; n++) {
-+        isa->state_lookup_table[n].key = isa->states[n].name;
-+        isa->state_lookup_table[n].u.state = n;
-+    }
-+    qsort(isa->state_lookup_table, isa->num_states,
-+          sizeof(xtensa_lookup_entry), xtensa_isa_name_compare);
-+
-+    /* Set up the sysreg name lookup table. */
-+    isa->sysreg_lookup_table =
-+        malloc(isa->num_sysregs * sizeof(xtensa_lookup_entry));
-+    CHECK_ALLOC_FOR_INIT(isa->sysreg_lookup_table, NULL, errno_p, error_msg_p);
-+    for (n = 0; n < isa->num_sysregs; n++) {
-+        isa->sysreg_lookup_table[n].key = isa->sysregs[n].name;
-+        isa->sysreg_lookup_table[n].u.sysreg = n;
-+    }
-+    qsort(isa->sysreg_lookup_table, isa->num_sysregs,
-+          sizeof(xtensa_lookup_entry), xtensa_isa_name_compare);
-+
-+    /* Set up the user & system sysreg number tables. */
-+    for (is_user = 0; is_user < 2; is_user++) {
-+        isa->sysreg_table[is_user] =
-+            malloc((isa->max_sysreg_num[is_user] + 1) * sizeof(xtensa_sysreg));
-+        CHECK_ALLOC_FOR_INIT(isa->sysreg_table[is_user], NULL,
-+                             errno_p, error_msg_p);
-+
-+        for (n = 0; n <= isa->max_sysreg_num[is_user]; n++) {
-+            isa->sysreg_table[is_user][n] = XTENSA_UNDEFINED;
++    if (gen_window_check2(dc, arg[0], arg[1])) {
++        if (dc->sar_m32_5bit) {
++            tcg_gen_shl_i32(cpu_R[arg[0]], cpu_R[arg[1]], dc->sar_m32);
++        } else {
++            TCGv_i64 v = tcg_temp_new_i64();
++            TCGv_i32 s = tcg_const_i32(32);
++            tcg_gen_sub_i32(s, s, cpu_SR[SAR]);
++            tcg_gen_andi_i32(s, s, 0x3f);
++            tcg_gen_extu_i32_i64(v, cpu_R[arg[1]]);
++            gen_shift_reg(shl, s);
++            tcg_temp_free(s);
 +        }
 +    }
-+    for (n = 0; n < isa->num_sysregs; n++) {
-+        xtensa_sysreg_internal *sreg = &isa->sysregs[n];
-+        is_user = sreg->is_user;
++}
 +
-+        if (sreg->number >= 0) {
-+            isa->sysreg_table[is_user][sreg->number] = n;
++static void translate_slli(DisasContext *dc, const uint32_t arg[],
++                           const uint32_t par[])
++{
++    if (gen_window_check2(dc, arg[0], arg[1])) {
++        if (arg[2] == 32) {
++            qemu_log_mask(LOG_GUEST_ERROR, "slli a%d, a%d, 32 is undefined",
++                          arg[0], arg[1]);
++        }
++        tcg_gen_shli_i32(cpu_R[arg[0]], cpu_R[arg[1]], arg[2] & 0x1f);
++    }
++}
++
++static void translate_sra(DisasContext *dc, const uint32_t arg[],
++                          const uint32_t par[])
++{
++    if (gen_window_check2(dc, arg[0], arg[1])) {
++        if (dc->sar_m32_5bit) {
++            tcg_gen_sar_i32(cpu_R[arg[0]], cpu_R[arg[1]], cpu_SR[SAR]);
++        } else {
++            TCGv_i64 v = tcg_temp_new_i64();
++            tcg_gen_ext_i32_i64(v, cpu_R[arg[1]]);
++            gen_shift(sar);
 +        }
 +    }
-+
-+    /* Set up the interface lookup table. */
-+    isa->interface_lookup_table =
-+        malloc(isa->num_interfaces * sizeof(xtensa_lookup_entry));
-+    CHECK_ALLOC_FOR_INIT(isa->interface_lookup_table, NULL, errno_p,
-+                         error_msg_p);
-+    for (n = 0; n < isa->num_interfaces; n++) {
-+        isa->interface_lookup_table[n].key = isa->interfaces[n].name;
-+        isa->interface_lookup_table[n].u.intf = n;
-+    }
-+    qsort(isa->interface_lookup_table, isa->num_interfaces,
-+          sizeof(xtensa_lookup_entry), xtensa_isa_name_compare);
-+
-+    /* Set up the funcUnit lookup table. */
-+    isa->funcUnit_lookup_table =
-+        malloc(isa->num_funcUnits * sizeof(xtensa_lookup_entry));
-+    CHECK_ALLOC_FOR_INIT(isa->funcUnit_lookup_table, NULL, errno_p,
-+                         error_msg_p);
-+    for (n = 0; n < isa->num_funcUnits; n++) {
-+        isa->funcUnit_lookup_table[n].key = isa->funcUnits[n].name;
-+        isa->funcUnit_lookup_table[n].u.fun = n;
-+    }
-+    qsort(isa->funcUnit_lookup_table, isa->num_funcUnits,
-+          sizeof(xtensa_lookup_entry), xtensa_isa_name_compare);
-+
-+    isa->insnbuf_size = ((isa->insn_size + sizeof(xtensa_insnbuf_word) - 1) /
-+                         sizeof(xtensa_insnbuf_word));
-+    isa->num_stages = XTENSA_UNDEFINED;
-+
-+    return (xtensa_isa)isa;
 +}
 +
-+
-+void xtensa_isa_free(xtensa_isa isa)
++static void translate_srai(DisasContext *dc, const uint32_t arg[],
++                           const uint32_t par[])
 +{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+    int n;
-+
-+    /*
-+     * With this version of the code, the xtensa_isa structure is not
-+     * dynamically allocated, so this function is not essential. Free
-+     * the memory allocated by xtensa_isa_init and restore the xtensa_isa
-+     * structure to its initial state.
-+     */
-+
-+    if (intisa->opname_lookup_table) {
-+        free(intisa->opname_lookup_table);
-+        intisa->opname_lookup_table = 0;
++    if (gen_window_check2(dc, arg[0], arg[1])) {
++        tcg_gen_sari_i32(cpu_R[arg[0]], cpu_R[arg[1]], arg[2]);
 +    }
++}
 +
-+    if (intisa->state_lookup_table) {
-+        free(intisa->state_lookup_table);
-+        intisa->state_lookup_table = 0;
++static void translate_src(DisasContext *dc, const uint32_t arg[],
++                          const uint32_t par[])
++{
++    if (gen_window_check3(dc, arg[0], arg[1], arg[2])) {
++        TCGv_i64 v = tcg_temp_new_i64();
++        tcg_gen_concat_i32_i64(v, cpu_R[arg[2]], cpu_R[arg[1]]);
++        gen_shift(shr);
 +    }
++}
 +
-+    if (intisa->sysreg_lookup_table) {
-+        free(intisa->sysreg_lookup_table);
-+        intisa->sysreg_lookup_table = 0;
-+    }
-+    for (n = 0; n < 2; n++) {
-+        if (intisa->sysreg_table[n]) {
-+            free(intisa->sysreg_table[n]);
-+            intisa->sysreg_table[n] = 0;
++static void translate_srl(DisasContext *dc, const uint32_t arg[],
++                          const uint32_t par[])
++{
++    if (gen_window_check2(dc, arg[0], arg[1])) {
++        if (dc->sar_m32_5bit) {
++            tcg_gen_shr_i32(cpu_R[arg[0]], cpu_R[arg[1]], cpu_SR[SAR]);
++        } else {
++            TCGv_i64 v = tcg_temp_new_i64();
++            tcg_gen_extu_i32_i64(v, cpu_R[arg[1]]);
++            gen_shift(shr);
 +        }
 +    }
++}
 +
-+    if (intisa->interface_lookup_table) {
-+        free(intisa->interface_lookup_table);
-+        intisa->interface_lookup_table = 0;
++#undef gen_shift
++#undef gen_shift_reg
++
++static void translate_srli(DisasContext *dc, const uint32_t arg[],
++                           const uint32_t par[])
++{
++    if (gen_window_check2(dc, arg[0], arg[1])) {
++        tcg_gen_shri_i32(cpu_R[arg[0]], cpu_R[arg[1]], arg[2]);
 +    }
++}
 +
-+    if (intisa->funcUnit_lookup_table) {
-+        free(intisa->funcUnit_lookup_table);
-+        intisa->funcUnit_lookup_table = 0;
++static void translate_ssa8b(DisasContext *dc, const uint32_t arg[],
++                            const uint32_t par[])
++{
++    if (gen_window_check1(dc, arg[0])) {
++        TCGv_i32 tmp = tcg_temp_new_i32();
++        tcg_gen_shli_i32(tmp, cpu_R[arg[0]], 3);
++        gen_left_shift_sar(dc, tmp);
++        tcg_temp_free(tmp);
 +    }
 +}
 +
-+
-+int xtensa_isa_name_compare(const void *v1, const void *v2)
++static void translate_ssa8l(DisasContext *dc, const uint32_t arg[],
++                            const uint32_t par[])
 +{
-+    xtensa_lookup_entry *e1 = (xtensa_lookup_entry *)v1;
-+    xtensa_lookup_entry *e2 = (xtensa_lookup_entry *)v2;
-+
-+    return strcasecmp(e1->key, e2->key);
-+}
-+
-+
-+int xtensa_isa_maxlength(xtensa_isa isa)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+    return intisa->insn_size;
-+}
-+
-+
-+int xtensa_isa_length_from_chars(xtensa_isa isa, const unsigned char *cp)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+    return (intisa->length_decode_fn)(cp);
-+}
-+
-+
-+int xtensa_isa_num_pipe_stages(xtensa_isa isa)
-+{
-+    xtensa_opcode opcode;
-+    xtensa_funcUnit_use *use;
-+    int num_opcodes, num_uses;
-+    int i, stage, max_stage;
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+
-+    /* Only compute the value once. */
-+    if (intisa->num_stages != XTENSA_UNDEFINED) {
-+        return intisa->num_stages;
++    if (gen_window_check1(dc, arg[0])) {
++        TCGv_i32 tmp = tcg_temp_new_i32();
++        tcg_gen_shli_i32(tmp, cpu_R[arg[0]], 3);
++        gen_right_shift_sar(dc, tmp);
++        tcg_temp_free(tmp);
 +    }
++}
 +
-+    max_stage = -1;
++static void translate_ssai(DisasContext *dc, const uint32_t arg[],
++                           const uint32_t par[])
++{
++    TCGv_i32 tmp = tcg_const_i32(arg[0]);
++    gen_right_shift_sar(dc, tmp);
++    tcg_temp_free(tmp);
++}
 +
-+    num_opcodes = xtensa_isa_num_opcodes(isa);
-+    for (opcode = 0; opcode < num_opcodes; opcode++) {
-+        num_uses = xtensa_opcode_num_funcUnit_uses(isa, opcode);
-+        for (i = 0; i < num_uses; i++) {
-+            use = xtensa_opcode_funcUnit_use(isa, opcode, i);
-+            stage = use->stage;
-+            if (stage > max_stage) {
-+                max_stage = stage;
-+            }
++static void translate_ssl(DisasContext *dc, const uint32_t arg[],
++                          const uint32_t par[])
++{
++    if (gen_window_check1(dc, arg[0])) {
++        gen_left_shift_sar(dc, cpu_R[arg[0]]);
++    }
++}
++
++static void translate_ssr(DisasContext *dc, const uint32_t arg[],
++                          const uint32_t par[])
++{
++    if (gen_window_check1(dc, arg[0])) {
++        gen_right_shift_sar(dc, cpu_R[arg[0]]);
++    }
++}
++
++static void translate_sub(DisasContext *dc, const uint32_t arg[],
++                          const uint32_t par[])
++{
++    if (gen_window_check3(dc, arg[0], arg[1], arg[2])) {
++        tcg_gen_sub_i32(cpu_R[arg[0]], cpu_R[arg[1]], cpu_R[arg[2]]);
++    }
++}
++
++static void translate_subx(DisasContext *dc, const uint32_t arg[],
++                           const uint32_t par[])
++{
++    if (gen_window_check3(dc, arg[0], arg[1], arg[2])) {
++        TCGv_i32 tmp = tcg_temp_new_i32();
++        tcg_gen_shli_i32(tmp, cpu_R[arg[1]], par[0]);
++        tcg_gen_sub_i32(cpu_R[arg[0]], tmp, cpu_R[arg[2]]);
++        tcg_temp_free(tmp);
++    }
++}
++
++static void translate_syscall(DisasContext *dc, const uint32_t arg[],
++                              const uint32_t par[])
++{
++    gen_exception_cause(dc, SYSCALL_CAUSE);
++}
++
++static void translate_waiti(DisasContext *dc, const uint32_t arg[],
++                            const uint32_t par[])
++{
++    if (gen_check_privilege(dc)) {
++        gen_waiti(dc, arg[0]);
++    }
++}
++
++static void translate_wtlb(DisasContext *dc, const uint32_t arg[],
++                           const uint32_t par[])
++{
++    if (gen_check_privilege(dc) &&
++        gen_window_check2(dc, arg[0], arg[1])) {
++        TCGv_i32 dtlb = tcg_const_i32(par[0]);
++
++        gen_helper_wtlb(cpu_env, cpu_R[arg[0]], cpu_R[arg[1]], dtlb);
++        /* This could change memory mapping, so exit tb */
++        gen_jumpi_check_loop_end(dc, -1);
++        tcg_temp_free(dtlb);
++    }
++}
++
++static void translate_wer(DisasContext *dc, const uint32_t arg[],
++                          const uint32_t par[])
++{
++    if (gen_check_privilege(dc) &&
++        gen_window_check2(dc, arg[0], arg[1])) {
++        gen_helper_wer(cpu_env, cpu_R[arg[0]], cpu_R[arg[1]]);
++    }
++}
++
++static void translate_wsr(DisasContext *dc, const uint32_t arg[],
++                          const uint32_t par[])
++{
++    if (gen_check_sr(dc, par[0], SR_W) &&
++        (par[0] < 64 || gen_check_privilege(dc)) &&
++        gen_window_check1(dc, arg[0])) {
++        gen_wsr(dc, par[0], cpu_R[arg[0]]);
++    }
++}
++
++static void translate_wur(DisasContext *dc, const uint32_t arg[],
++                          const uint32_t par[])
++{
++    if (gen_window_check1(dc, arg[0])) {
++        if (uregnames[par[0]].name) {
++            gen_wur(par[0], cpu_R[arg[0]]);
++        } else {
++            qemu_log_mask(LOG_UNIMP, "WUR %d not implemented, ", par[0]);
 +        }
 +    }
-+
-+    intisa->num_stages = max_stage + 1;
-+    return intisa->num_states;
 +}
 +
-+
-+int xtensa_isa_num_formats(xtensa_isa isa)
++static void translate_xor(DisasContext *dc, const uint32_t arg[],
++                          const uint32_t par[])
 +{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+    return intisa->num_formats;
-+}
-+
-+
-+int xtensa_isa_num_opcodes(xtensa_isa isa)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+    return intisa->num_opcodes;
-+}
-+
-+
-+int xtensa_isa_num_regfiles(xtensa_isa isa)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+    return intisa->num_regfiles;
-+}
-+
-+
-+int xtensa_isa_num_states(xtensa_isa isa)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+    return intisa->num_states;
-+}
-+
-+
-+int xtensa_isa_num_sysregs(xtensa_isa isa)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+    return intisa->num_sysregs;
-+}
-+
-+
-+int xtensa_isa_num_interfaces(xtensa_isa isa)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+    return intisa->num_interfaces;
-+}
-+
-+
-+int xtensa_isa_num_funcUnits(xtensa_isa isa)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+    return intisa->num_funcUnits;
-+}
-+
-+
-+/* Instruction formats. */
-+
-+
-+#define CHECK_FORMAT(INTISA, FMT, ERRVAL) \
-+    do { \
-+        if ((FMT) < 0 || (FMT) >= (INTISA)->num_formats) { \
-+            xtisa_errno = xtensa_isa_bad_format; \
-+            strcpy(xtisa_error_msg, "invalid format specifier"); \
-+            return ERRVAL; \
-+        } \
-+    } while (0)
-+
-+
-+#define CHECK_SLOT(INTISA, FMT, SLOT, ERRVAL) \
-+    do { \
-+        if ((SLOT) < 0 || (SLOT) >= (INTISA)->formats[FMT].num_slots) { \
-+            xtisa_errno = xtensa_isa_bad_slot; \
-+            strcpy(xtisa_error_msg, "invalid slot specifier"); \
-+            return ERRVAL; \
-+        } \
-+    } while (0)
-+
-+
-+const char *xtensa_format_name(xtensa_isa isa, xtensa_format fmt)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+
-+    CHECK_FORMAT(intisa, fmt, NULL);
-+    return intisa->formats[fmt].name;
-+}
-+
-+
-+xtensa_format xtensa_format_lookup(xtensa_isa isa, const char *fmtname)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+    int fmt;
-+
-+    if (!fmtname || !*fmtname) {
-+        xtisa_errno = xtensa_isa_bad_format;
-+        strcpy(xtisa_error_msg, "invalid format name");
-+        return XTENSA_UNDEFINED;
++    if (gen_window_check3(dc, arg[0], arg[1], arg[2])) {
++        tcg_gen_xor_i32(cpu_R[arg[0]], cpu_R[arg[1]], cpu_R[arg[2]]);
 +    }
++}
 +
-+    for (fmt = 0; fmt < intisa->num_formats; fmt++) {
-+        if (strcasecmp(fmtname, intisa->formats[fmt].name) == 0) {
-+            return fmt;
++static void translate_xsr(DisasContext *dc, const uint32_t arg[],
++                          const uint32_t par[])
++{
++    if (gen_check_sr(dc, par[0], SR_X) &&
++        (par[0] < 64 || gen_check_privilege(dc)) &&
++        gen_window_check1(dc, arg[0])) {
++        TCGv_i32 tmp = tcg_temp_new_i32();
++        bool rsr_end, wsr_end;
++
++        tcg_gen_mov_i32(tmp, cpu_R[arg[0]]);
++        rsr_end = gen_rsr(dc, cpu_R[arg[0]], par[0]);
++        wsr_end = gen_wsr(dc, par[0], tmp);
++        tcg_temp_free(tmp);
++        if (rsr_end && !wsr_end) {
++            gen_jumpi_check_loop_end(dc, 0);
 +        }
 +    }
-+
-+    xtisa_errno = xtensa_isa_bad_format;
-+    sprintf(xtisa_error_msg, "format \"%s\" not recognized", fmtname);
-+    return XTENSA_UNDEFINED;
-+}
-+
-+
-+xtensa_format xtensa_format_decode(xtensa_isa isa, const xtensa_insnbuf insn)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+    xtensa_format fmt;
-+
-+    fmt = (intisa->format_decode_fn)(insn);
-+    if (fmt != XTENSA_UNDEFINED) {
-+        return fmt;
-+    }
-+
-+    xtisa_errno = xtensa_isa_bad_format;
-+    strcpy(xtisa_error_msg, "cannot decode instruction format");
-+    return XTENSA_UNDEFINED;
-+}
-+
-+
-+int xtensa_format_encode(xtensa_isa isa, xtensa_format fmt,
-+                         xtensa_insnbuf insn)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+
-+    CHECK_FORMAT(intisa, fmt, -1);
-+    (*intisa->formats[fmt].encode_fn)(insn);
-+    return 0;
-+}
-+
-+
-+int xtensa_format_length(xtensa_isa isa, xtensa_format fmt)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+
-+    CHECK_FORMAT(intisa, fmt, XTENSA_UNDEFINED);
-+    return intisa->formats[fmt].length;
-+}
-+
-+
-+int xtensa_format_num_slots(xtensa_isa isa, xtensa_format fmt)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+
-+    CHECK_FORMAT(intisa, fmt, XTENSA_UNDEFINED);
-+    return intisa->formats[fmt].num_slots;
-+}
-+
-+
-+xtensa_opcode xtensa_format_slot_nop_opcode(xtensa_isa isa, xtensa_format fmt,
-+                                            int slot)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+    int slot_id;
-+
-+    CHECK_FORMAT(intisa, fmt, XTENSA_UNDEFINED);
-+    CHECK_SLOT(intisa, fmt, slot, XTENSA_UNDEFINED);
-+
-+    slot_id = intisa->formats[fmt].slot_id[slot];
-+    return xtensa_opcode_lookup(isa, intisa->slots[slot_id].nop_name);
-+}
-+
-+
-+int xtensa_format_get_slot(xtensa_isa isa, xtensa_format fmt, int slot,
-+                           const xtensa_insnbuf insn, xtensa_insnbuf slotbuf)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+    int slot_id;
-+
-+    CHECK_FORMAT(intisa, fmt, -1);
-+    CHECK_SLOT(intisa, fmt, slot, -1);
-+
-+    slot_id = intisa->formats[fmt].slot_id[slot];
-+    (*intisa->slots[slot_id].get_fn)(insn, slotbuf);
-+    return 0;
-+}
-+
-+
-+int xtensa_format_set_slot(xtensa_isa isa, xtensa_format fmt, int slot,
-+                           xtensa_insnbuf insn, const xtensa_insnbuf slotbuf)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+    int slot_id;
-+
-+    CHECK_FORMAT(intisa, fmt, -1);
-+    CHECK_SLOT(intisa, fmt, slot, -1);
-+
-+    slot_id = intisa->formats[fmt].slot_id[slot];
-+    (*intisa->slots[slot_id].set_fn)(insn, slotbuf);
-+    return 0;
-+}
-+
-+
-+/* Opcode information. */
-+
-+
-+#define CHECK_OPCODE(INTISA, OPC, ERRVAL) \
-+    do { \
-+        if ((OPC) < 0 || (OPC) >= (INTISA)->num_opcodes) { \
-+            xtisa_errno = xtensa_isa_bad_opcode; \
-+            strcpy(xtisa_error_msg, "invalid opcode specifier"); \
-+            return ERRVAL; \
-+        } \
-+    } while (0)
-+
-+
-+xtensa_opcode xtensa_opcode_lookup(xtensa_isa isa, const char *opname)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+    xtensa_lookup_entry entry, *result = 0;
-+
-+    if (!opname || !*opname) {
-+        xtisa_errno = xtensa_isa_bad_opcode;
-+        strcpy(xtisa_error_msg, "invalid opcode name");
-+        return XTENSA_UNDEFINED;
-+    }
-+
-+    if (intisa->num_opcodes != 0) {
-+        entry.key = opname;
-+        result = bsearch(&entry, intisa->opname_lookup_table,
-+                         intisa->num_opcodes, sizeof(xtensa_lookup_entry),
-+                         xtensa_isa_name_compare);
-+    }
-+
-+    if (!result) {
-+        xtisa_errno = xtensa_isa_bad_opcode;
-+        sprintf(xtisa_error_msg, "opcode \"%s\" not recognized", opname);
-+        return XTENSA_UNDEFINED;
-+    }
-+
-+    return result->u.opcode;
-+}
-+
-+
-+xtensa_opcode xtensa_opcode_decode(xtensa_isa isa, xtensa_format fmt, int slot,
-+                                   const xtensa_insnbuf slotbuf)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+    int slot_id;
-+    xtensa_opcode opc;
-+
-+    CHECK_FORMAT(intisa, fmt, XTENSA_UNDEFINED);
-+    CHECK_SLOT(intisa, fmt, slot, XTENSA_UNDEFINED);
-+
-+    slot_id = intisa->formats[fmt].slot_id[slot];
-+
-+    opc = (intisa->slots[slot_id].opcode_decode_fn) (slotbuf);
-+    if (opc != XTENSA_UNDEFINED) {
-+        return opc;
-+    }
-+
-+    xtisa_errno = xtensa_isa_bad_opcode;
-+    strcpy(xtisa_error_msg, "cannot decode opcode");
-+    return XTENSA_UNDEFINED;
-+}
-+
-+
-+int xtensa_opcode_encode(xtensa_isa isa, xtensa_format fmt, int slot,
-+                         xtensa_insnbuf slotbuf, xtensa_opcode opc)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+    int slot_id;
-+    xtensa_opcode_encode_fn encode_fn;
-+
-+    CHECK_FORMAT(intisa, fmt, -1);
-+    CHECK_SLOT(intisa, fmt, slot, -1);
-+    CHECK_OPCODE(intisa, opc, -1);
-+
-+    slot_id = intisa->formats[fmt].slot_id[slot];
-+    encode_fn = intisa->opcodes[opc].encode_fns[slot_id];
-+    if (!encode_fn) {
-+        xtisa_errno = xtensa_isa_wrong_slot;
-+        sprintf(xtisa_error_msg,
-+                "opcode \"%s\" is not allowed in slot %d of format \"%s\"",
-+                intisa->opcodes[opc].name, slot, intisa->formats[fmt].name);
-+        return -1;
-+    }
-+    (*encode_fn)(slotbuf);
-+    return 0;
-+}
-+
-+
-+const char *xtensa_opcode_name(xtensa_isa isa, xtensa_opcode opc)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+
-+    CHECK_OPCODE(intisa, opc, NULL);
-+    return intisa->opcodes[opc].name;
-+}
-+
-+
-+int xtensa_opcode_is_branch(xtensa_isa isa, xtensa_opcode opc)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+
-+    CHECK_OPCODE(intisa, opc, XTENSA_UNDEFINED);
-+    if ((intisa->opcodes[opc].flags & XTENSA_OPCODE_IS_BRANCH) != 0) {
-+        return 1;
-+    }
-+    return 0;
-+}
-+
-+
-+int xtensa_opcode_is_jump(xtensa_isa isa, xtensa_opcode opc)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+
-+    CHECK_OPCODE(intisa, opc, XTENSA_UNDEFINED);
-+    if ((intisa->opcodes[opc].flags & XTENSA_OPCODE_IS_JUMP) != 0) {
-+        return 1;
-+    }
-+    return 0;
-+}
-+
-+
-+int xtensa_opcode_is_loop(xtensa_isa isa, xtensa_opcode opc)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+
-+    CHECK_OPCODE(intisa, opc, XTENSA_UNDEFINED);
-+    if ((intisa->opcodes[opc].flags & XTENSA_OPCODE_IS_LOOP) != 0) {
-+        return 1;
-+    }
-+    return 0;
-+}
-+
-+
-+int xtensa_opcode_is_call(xtensa_isa isa, xtensa_opcode opc)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+
-+    CHECK_OPCODE(intisa, opc, XTENSA_UNDEFINED);
-+    if ((intisa->opcodes[opc].flags & XTENSA_OPCODE_IS_CALL) != 0) {
-+        return 1;
-+    }
-+    return 0;
-+}
-+
-+
-+int xtensa_opcode_num_operands(xtensa_isa isa, xtensa_opcode opc)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+    int iclass_id;
-+
-+    CHECK_OPCODE(intisa, opc, XTENSA_UNDEFINED);
-+    iclass_id = intisa->opcodes[opc].iclass_id;
-+    return intisa->iclasses[iclass_id].num_operands;
-+}
-+
-+
-+int xtensa_opcode_num_stateOperands(xtensa_isa isa, xtensa_opcode opc)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+    int iclass_id;
-+
-+    CHECK_OPCODE(intisa, opc, XTENSA_UNDEFINED);
-+    iclass_id = intisa->opcodes[opc].iclass_id;
-+    return intisa->iclasses[iclass_id].num_stateOperands;
-+}
-+
-+
-+int xtensa_opcode_num_interfaceOperands(xtensa_isa isa, xtensa_opcode opc)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+    int iclass_id;
-+
-+    CHECK_OPCODE(intisa, opc, XTENSA_UNDEFINED);
-+    iclass_id = intisa->opcodes[opc].iclass_id;
-+    return intisa->iclasses[iclass_id].num_interfaceOperands;
-+}
-+
-+
-+int xtensa_opcode_num_funcUnit_uses(xtensa_isa isa, xtensa_opcode opc)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+
-+    CHECK_OPCODE(intisa, opc, XTENSA_UNDEFINED);
-+    return intisa->opcodes[opc].num_funcUnit_uses;
-+}
-+
-+
-+xtensa_funcUnit_use *xtensa_opcode_funcUnit_use(xtensa_isa isa,
-+                                                xtensa_opcode opc, int u)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+
-+    CHECK_OPCODE(intisa, opc, NULL);
-+    if (u < 0 || u >= intisa->opcodes[opc].num_funcUnit_uses) {
-+        xtisa_errno = xtensa_isa_bad_funcUnit;
-+        sprintf(xtisa_error_msg, "invalid functional unit use number (%d); "
-+                "opcode \"%s\" has %d", u, intisa->opcodes[opc].name,
-+                intisa->opcodes[opc].num_funcUnit_uses);
-+        return NULL;
-+    }
-+    return &intisa->opcodes[opc].funcUnit_uses[u];
-+}
-+
-+
-+/* Operand information. */
-+
-+
-+#define CHECK_OPERAND(INTISA, OPC, ICLASS, OPND, ERRVAL) \
-+    do { \
-+        if ((OPND) < 0 || (OPND) >= (ICLASS)->num_operands) { \
-+            xtisa_errno = xtensa_isa_bad_operand; \
-+            sprintf(xtisa_error_msg, "invalid operand number (%d); " \
-+                    "opcode \"%s\" has %d operands", (OPND), \
-+                    (INTISA)->opcodes[(OPC)].name, (ICLASS)->num_operands); \
-+            return ERRVAL; \
-+        } \
-+    } while (0)
-+
-+
-+static xtensa_operand_internal *get_operand(xtensa_isa_internal *intisa,
-+                                            xtensa_opcode opc, int opnd)
-+{
-+    xtensa_iclass_internal *iclass;
-+    int iclass_id, operand_id;
-+
-+    CHECK_OPCODE(intisa, opc, NULL);
-+    iclass_id = intisa->opcodes[opc].iclass_id;
-+    iclass = &intisa->iclasses[iclass_id];
-+    CHECK_OPERAND(intisa, opc, iclass, opnd, NULL);
-+    operand_id = iclass->operands[opnd].u.operand_id;
-+    return &intisa->operands[operand_id];
-+}
-+
-+
-+const char *xtensa_operand_name(xtensa_isa isa, xtensa_opcode opc, int opnd)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+    xtensa_operand_internal *intop;
-+
-+    intop = get_operand(intisa, opc, opnd);
-+    if (!intop) {
-+        return NULL;
-+    }
-+    return intop->name;
-+}
-+
-+
-+int xtensa_operand_is_visible(xtensa_isa isa, xtensa_opcode opc, int opnd)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+    xtensa_iclass_internal *iclass;
-+    int iclass_id, operand_id;
-+    xtensa_operand_internal *intop;
-+
-+    CHECK_OPCODE(intisa, opc, XTENSA_UNDEFINED);
-+    iclass_id = intisa->opcodes[opc].iclass_id;
-+    iclass = &intisa->iclasses[iclass_id];
-+    CHECK_OPERAND(intisa, opc, iclass, opnd, XTENSA_UNDEFINED);
-+
-+    /* Special case for "sout" operands. */
-+    if (iclass->operands[opnd].inout == 's') {
-+        return 0;
-+    }
-+
-+    operand_id = iclass->operands[opnd].u.operand_id;
-+    intop = &intisa->operands[operand_id];
-+
-+    if ((intop->flags & XTENSA_OPERAND_IS_INVISIBLE) == 0) {
-+        return 1;
-+    }
-+    return 0;
-+}
-+
-+
-+char xtensa_operand_inout(xtensa_isa isa, xtensa_opcode opc, int opnd)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+    xtensa_iclass_internal *iclass;
-+    int iclass_id;
-+    char inout;
-+
-+    CHECK_OPCODE(intisa, opc, 0);
-+    iclass_id = intisa->opcodes[opc].iclass_id;
-+    iclass = &intisa->iclasses[iclass_id];
-+    CHECK_OPERAND(intisa, opc, iclass, opnd, 0);
-+    inout = iclass->operands[opnd].inout;
-+
-+    /* Special case for "sout" and "_sin" operands. */
-+    if (inout == 's') {
-+        return 'o';
-+    }
-+    if (inout == 't') {
-+        return 'i';
-+    }
-+    return inout;
-+}
-+
-+
-+int xtensa_operand_get_field(xtensa_isa isa, xtensa_opcode opc, int opnd,
-+                             xtensa_format fmt, int slot,
-+                             const xtensa_insnbuf slotbuf, uint32_t *valp)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+    xtensa_operand_internal *intop;
-+    int slot_id;
-+    xtensa_get_field_fn get_fn;
-+
-+    intop = get_operand(intisa, opc, opnd);
-+    if (!intop) {
-+        return -1;
-+    }
-+
-+    CHECK_FORMAT(intisa, fmt, -1);
-+    CHECK_SLOT(intisa, fmt, slot, -1);
-+
-+    slot_id = intisa->formats[fmt].slot_id[slot];
-+    if (intop->field_id == XTENSA_UNDEFINED) {
-+        xtisa_errno = xtensa_isa_no_field;
-+        strcpy(xtisa_error_msg, "implicit operand has no field");
-+        return -1;
-+    }
-+    get_fn = intisa->slots[slot_id].get_field_fns[intop->field_id];
-+    if (!get_fn) {
-+        xtisa_errno = xtensa_isa_wrong_slot;
-+        sprintf(xtisa_error_msg,
-+                "operand \"%s\" does not exist in slot %d of format \"%s\"",
-+                intop->name, slot, intisa->formats[fmt].name);
-+        return -1;
-+    }
-+    *valp = (*get_fn)(slotbuf);
-+    return 0;
-+}
-+
-+
-+int xtensa_operand_set_field(xtensa_isa isa, xtensa_opcode opc, int opnd,
-+                             xtensa_format fmt, int slot,
-+                             xtensa_insnbuf slotbuf, uint32_t val)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+    xtensa_operand_internal *intop;
-+    int slot_id;
-+    xtensa_set_field_fn set_fn;
-+
-+    intop = get_operand(intisa, opc, opnd);
-+    if (!intop) {
-+        return -1;
-+    }
-+
-+    CHECK_FORMAT(intisa, fmt, -1);
-+    CHECK_SLOT(intisa, fmt, slot, -1);
-+
-+    slot_id = intisa->formats[fmt].slot_id[slot];
-+    if (intop->field_id == XTENSA_UNDEFINED) {
-+        xtisa_errno = xtensa_isa_no_field;
-+        strcpy(xtisa_error_msg, "implicit operand has no field");
-+        return -1;
-+    }
-+    set_fn = intisa->slots[slot_id].set_field_fns[intop->field_id];
-+    if (!set_fn) {
-+        xtisa_errno = xtensa_isa_wrong_slot;
-+        sprintf(xtisa_error_msg,
-+                "operand \"%s\" does not exist in slot %d of format \"%s\"",
-+                intop->name, slot, intisa->formats[fmt].name);
-+        return -1;
-+    }
-+    (*set_fn)(slotbuf, val);
-+    return 0;
-+}
-+
-+
-+int xtensa_operand_encode(xtensa_isa isa, xtensa_opcode opc, int opnd,
-+                          uint32_t *valp)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+    xtensa_operand_internal *intop;
-+    uint32_t test_val, orig_val;
-+
-+    intop = get_operand(intisa, opc, opnd);
-+    if (!intop) {
-+        return -1;
-+    }
-+
-+    if (!intop->encode) {
-+        /*
-+         * This is a default operand for a field. How can we tell if the
-+         * value fits in the field?  Write the value into the field,
-+         * read it back, and then make sure we get the same value.
-+         */
-+        static xtensa_insnbuf tmpbuf;
-+        int slot_id;
-+
-+        if (!tmpbuf) {
-+            tmpbuf = xtensa_insnbuf_alloc(isa);
-+            CHECK_ALLOC(tmpbuf, -1);
-+        }
-+
-+        /*
-+         * A default operand is always associated with a field,
-+         * but check just to be sure....
-+         */
-+        if (intop->field_id == XTENSA_UNDEFINED) {
-+            xtisa_errno = xtensa_isa_internal_error;
-+            strcpy(xtisa_error_msg, "operand has no field");
-+            return -1;
-+        }
-+
-+        /* Find some slot that includes the field. */
-+        for (slot_id = 0; slot_id < intisa->num_slots; slot_id++) {
-+            xtensa_get_field_fn get_fn =
-+                intisa->slots[slot_id].get_field_fns[intop->field_id];
-+            xtensa_set_field_fn set_fn =
-+                intisa->slots[slot_id].set_field_fns[intop->field_id];
-+
-+            if (get_fn && set_fn) {
-+                (*set_fn)(tmpbuf, *valp);
-+                return (*get_fn)(tmpbuf) != *valp;
-+            }
-+        }
-+
-+        /* Couldn't find any slot containing the field.... */
-+        xtisa_errno = xtensa_isa_no_field;
-+        strcpy(xtisa_error_msg, "field does not exist in any slot");
-+        return -1;
-+    }
-+
-+    /*
-+     * Encode the value. In some cases, the encoding function may detect
-+     * errors, but most of the time the only way to determine if the value
-+     * was successfully encoded is to decode it and check if it matches
-+     * the original value.
-+     */
-+    orig_val = *valp;
-+    if ((*intop->encode)(valp) ||
-+        (test_val = *valp, (*intop->decode)(&test_val)) ||
-+        test_val != orig_val) {
-+        xtisa_errno = xtensa_isa_bad_value;
-+        sprintf(xtisa_error_msg, "cannot encode operand value 0x%08x", *valp);
-+        return -1;
-+    }
-+
-+    return 0;
-+}
-+
-+
-+int xtensa_operand_decode(xtensa_isa isa, xtensa_opcode opc, int opnd,
-+                          uint32_t *valp)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+    xtensa_operand_internal *intop;
-+
-+    intop = get_operand(intisa, opc, opnd);
-+    if (!intop) {
-+        return -1;
-+    }
-+
-+    /* Use identity function for "default" operands. */
-+    if (!intop->decode) {
-+        return 0;
-+    }
-+
-+    if ((*intop->decode)(valp)) {
-+        xtisa_errno = xtensa_isa_bad_value;
-+        sprintf(xtisa_error_msg, "cannot decode operand value 0x%08x", *valp);
-+        return -1;
-+    }
-+    return 0;
-+}
-+
-+
-+int xtensa_operand_is_register(xtensa_isa isa, xtensa_opcode opc, int opnd)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+    xtensa_operand_internal *intop;
-+
-+    intop = get_operand(intisa, opc, opnd);
-+    if (!intop) {
-+        return XTENSA_UNDEFINED;
-+    }
-+
-+    if ((intop->flags & XTENSA_OPERAND_IS_REGISTER) != 0) {
-+        return 1;
-+    }
-+    return 0;
-+}
-+
-+
-+xtensa_regfile xtensa_operand_regfile(xtensa_isa isa, xtensa_opcode opc,
-+                                      int opnd)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+    xtensa_operand_internal *intop;
-+
-+    intop = get_operand(intisa, opc, opnd);
-+    if (!intop) {
-+        return XTENSA_UNDEFINED;
-+    }
-+
-+    return intop->regfile;
-+}
-+
-+
-+int xtensa_operand_num_regs(xtensa_isa isa, xtensa_opcode opc, int opnd)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+    xtensa_operand_internal *intop;
-+
-+    intop = get_operand(intisa, opc, opnd);
-+    if (!intop) {
-+        return XTENSA_UNDEFINED;
-+    }
-+
-+    return intop->num_regs;
-+}
-+
-+
-+int xtensa_operand_is_known_reg(xtensa_isa isa, xtensa_opcode opc, int opnd)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+    xtensa_operand_internal *intop;
-+
-+    intop = get_operand(intisa, opc, opnd);
-+    if (!intop) {
-+        return XTENSA_UNDEFINED;
-+    }
-+
-+    if ((intop->flags & XTENSA_OPERAND_IS_UNKNOWN) == 0) {
-+        return 1;
-+    }
-+    return 0;
-+}
-+
-+
-+int xtensa_operand_is_PCrelative(xtensa_isa isa, xtensa_opcode opc, int opnd)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+    xtensa_operand_internal *intop;
-+
-+    intop = get_operand(intisa, opc, opnd);
-+    if (!intop) {
-+        return XTENSA_UNDEFINED;
-+    }
-+
-+    if ((intop->flags & XTENSA_OPERAND_IS_PCRELATIVE) != 0) {
-+        return 1;
-+    }
-+    return 0;
-+}
-+
-+
-+int xtensa_operand_do_reloc(xtensa_isa isa, xtensa_opcode opc, int opnd,
-+                            uint32_t *valp, uint32_t pc)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+    xtensa_operand_internal *intop;
-+
-+    intop = get_operand(intisa, opc, opnd);
-+    if (!intop) {
-+        return -1;
-+    }
-+
-+    if ((intop->flags & XTENSA_OPERAND_IS_PCRELATIVE) == 0) {
-+        return 0;
-+    }
-+
-+    if (!intop->do_reloc) {
-+        xtisa_errno = xtensa_isa_internal_error;
-+        strcpy(xtisa_error_msg, "operand missing do_reloc function");
-+        return -1;
-+    }
-+
-+    if ((*intop->do_reloc)(valp, pc)) {
-+        xtisa_errno = xtensa_isa_bad_value;
-+        sprintf(xtisa_error_msg,
-+                "do_reloc failed for value 0x%08x at PC 0x%08x", *valp, pc);
-+        return -1;
-+    }
-+
-+    return 0;
-+}
-+
-+
-+int xtensa_operand_undo_reloc(xtensa_isa isa, xtensa_opcode opc, int opnd,
-+                              uint32_t *valp, uint32_t pc)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+    xtensa_operand_internal *intop;
-+
-+    intop = get_operand(intisa, opc, opnd);
-+    if (!intop) {
-+        return -1;
-+    }
-+
-+    if ((intop->flags & XTENSA_OPERAND_IS_PCRELATIVE) == 0) {
-+        return 0;
-+    }
-+
-+    if (!intop->undo_reloc) {
-+        xtisa_errno = xtensa_isa_internal_error;
-+        strcpy(xtisa_error_msg, "operand missing undo_reloc function");
-+        return -1;
-+    }
-+
-+    if ((*intop->undo_reloc)(valp, pc)) {
-+        xtisa_errno = xtensa_isa_bad_value;
-+        sprintf(xtisa_error_msg,
-+                "undo_reloc failed for value 0x%08x at PC 0x%08x", *valp, pc);
-+        return -1;
-+    }
-+
-+    return 0;
-+}
-+
-+
-+/* State Operands. */
-+
-+
-+#define CHECK_STATE_OPERAND(INTISA, OPC, ICLASS, STOP, ERRVAL) \
-+    do { \
-+        if ((STOP) < 0 || (STOP) >= (ICLASS)->num_stateOperands) { \
-+            xtisa_errno = xtensa_isa_bad_operand; \
-+            sprintf(xtisa_error_msg, "invalid state operand number (%d); " \
-+                    "opcode \"%s\" has %d state operands", (STOP), \
-+                    (INTISA)->opcodes[(OPC)].name, \
-+                    (ICLASS)->num_stateOperands); \
-+            return ERRVAL; \
-+        } \
-+    } while (0)
-+
-+
-+xtensa_state xtensa_stateOperand_state(xtensa_isa isa, xtensa_opcode opc,
-+                                       int stOp)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+    xtensa_iclass_internal *iclass;
-+    int iclass_id;
-+
-+    CHECK_OPCODE(intisa, opc, XTENSA_UNDEFINED);
-+    iclass_id = intisa->opcodes[opc].iclass_id;
-+    iclass = &intisa->iclasses[iclass_id];
-+    CHECK_STATE_OPERAND(intisa, opc, iclass, stOp, XTENSA_UNDEFINED);
-+    return iclass->stateOperands[stOp].u.state;
-+}
-+
-+
-+char xtensa_stateOperand_inout(xtensa_isa isa, xtensa_opcode opc, int stOp)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+    xtensa_iclass_internal *iclass;
-+    int iclass_id;
-+
-+    CHECK_OPCODE(intisa, opc, 0);
-+    iclass_id = intisa->opcodes[opc].iclass_id;
-+    iclass = &intisa->iclasses[iclass_id];
-+    CHECK_STATE_OPERAND(intisa, opc, iclass, stOp, 0);
-+    return iclass->stateOperands[stOp].inout;
-+}
-+
-+
-+/* Interface Operands. */
-+
-+
-+#define CHECK_INTERFACE_OPERAND(INTISA, OPC, ICLASS, IFOP, ERRVAL) \
-+    do { \
-+        if ((IFOP) < 0 || (IFOP) >= (ICLASS)->num_interfaceOperands) { \
-+            xtisa_errno = xtensa_isa_bad_operand; \
-+            sprintf(xtisa_error_msg, \
-+                    "invalid interface operand number (%d); " \
-+                    "opcode \"%s\" has %d interface operands", (IFOP), \
-+                    (INTISA)->opcodes[(OPC)].name, \
-+                    (ICLASS)->num_interfaceOperands); \
-+            return ERRVAL; \
-+        } \
-+    } while (0)
-+
-+
-+xtensa_interface xtensa_interfaceOperand_interface(xtensa_isa isa,
-+                                                   xtensa_opcode opc,
-+                                                   int ifOp)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+    xtensa_iclass_internal *iclass;
-+    int iclass_id;
-+
-+    CHECK_OPCODE(intisa, opc, XTENSA_UNDEFINED);
-+    iclass_id = intisa->opcodes[opc].iclass_id;
-+    iclass = &intisa->iclasses[iclass_id];
-+    CHECK_INTERFACE_OPERAND(intisa, opc, iclass, ifOp, XTENSA_UNDEFINED);
-+    return iclass->interfaceOperands[ifOp];
-+}
-+
-+
-+/* Register Files. */
-+
-+
-+#define CHECK_REGFILE(INTISA, RF, ERRVAL) \
-+    do { \
-+        if ((RF) < 0 || (RF) >= (INTISA)->num_regfiles) { \
-+            xtisa_errno = xtensa_isa_bad_regfile; \
-+            strcpy(xtisa_error_msg, "invalid regfile specifier"); \
-+            return ERRVAL; \
-+        } \
-+    } while (0)
-+
-+
-+xtensa_regfile xtensa_regfile_lookup(xtensa_isa isa, const char *name)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+    int n;
-+
-+    if (!name || !*name) {
-+        xtisa_errno = xtensa_isa_bad_regfile;
-+        strcpy(xtisa_error_msg, "invalid regfile name");
-+        return XTENSA_UNDEFINED;
-+    }
-+
-+    /* The expected number of regfiles is small; use a linear search. */
-+    for (n = 0; n < intisa->num_regfiles; n++) {
-+        if (!strcmp(intisa->regfiles[n].name, name)) {
-+            return n;
-+        }
-+    }
-+
-+    xtisa_errno = xtensa_isa_bad_regfile;
-+    sprintf(xtisa_error_msg, "regfile \"%s\" not recognized", name);
-+    return XTENSA_UNDEFINED;
-+}
-+
-+
-+xtensa_regfile xtensa_regfile_lookup_shortname(xtensa_isa isa,
-+                                               const char *shortname)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+    int n;
-+
-+    if (!shortname || !*shortname) {
-+        xtisa_errno = xtensa_isa_bad_regfile;
-+        strcpy(xtisa_error_msg, "invalid regfile shortname");
-+        return XTENSA_UNDEFINED;
-+    }
-+
-+    /* The expected number of regfiles is small; use a linear search. */
-+    for (n = 0; n < intisa->num_regfiles; n++) {
-+        /*
-+         * Ignore regfile views since they always have the same shortnames
-+         * as their parents.
-+         */
-+        if (intisa->regfiles[n].parent != n) {
-+            continue;
-+        }
-+        if (!strcmp(intisa->regfiles[n].shortname, shortname)) {
-+            return n;
-+        }
-+    }
-+
-+    xtisa_errno = xtensa_isa_bad_regfile;
-+    sprintf(xtisa_error_msg, "regfile shortname \"%s\" not recognized",
-+            shortname);
-+    return XTENSA_UNDEFINED;
-+}
-+
-+
-+const char *xtensa_regfile_name(xtensa_isa isa, xtensa_regfile rf)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+
-+    CHECK_REGFILE(intisa, rf, NULL);
-+    return intisa->regfiles[rf].name;
-+}
-+
-+
-+const char *xtensa_regfile_shortname(xtensa_isa isa, xtensa_regfile rf)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+
-+    CHECK_REGFILE(intisa, rf, NULL);
-+    return intisa->regfiles[rf].shortname;
-+}
-+
-+
-+xtensa_regfile xtensa_regfile_view_parent(xtensa_isa isa, xtensa_regfile rf)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+
-+    CHECK_REGFILE(intisa, rf, XTENSA_UNDEFINED);
-+    return intisa->regfiles[rf].parent;
-+}
-+
-+
-+int xtensa_regfile_num_bits(xtensa_isa isa, xtensa_regfile rf)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+
-+    CHECK_REGFILE(intisa, rf, XTENSA_UNDEFINED);
-+    return intisa->regfiles[rf].num_bits;
-+}
-+
-+
-+int xtensa_regfile_num_entries(xtensa_isa isa, xtensa_regfile rf)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+
-+    CHECK_REGFILE(intisa, rf, XTENSA_UNDEFINED);
-+    return intisa->regfiles[rf].num_entries;
-+}
-+
-+
-+/* Processor States. */
-+
-+
-+#define CHECK_STATE(INTISA, ST, ERRVAL) \
-+    do { \
-+        if ((ST) < 0 || (ST) >= (INTISA)->num_states) { \
-+            xtisa_errno = xtensa_isa_bad_state; \
-+            strcpy(xtisa_error_msg, "invalid state specifier"); \
-+            return ERRVAL; \
-+        } \
-+    } while (0)
-+
-+
-+xtensa_state xtensa_state_lookup(xtensa_isa isa, const char *name)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+    xtensa_lookup_entry entry, *result = 0;
-+
-+    if (!name || !*name) {
-+        xtisa_errno = xtensa_isa_bad_state;
-+        strcpy(xtisa_error_msg, "invalid state name");
-+        return XTENSA_UNDEFINED;
-+    }
-+
-+    if (intisa->num_states != 0) {
-+        entry.key = name;
-+        result = bsearch(&entry, intisa->state_lookup_table,
-+                         intisa->num_states, sizeof(xtensa_lookup_entry),
-+                         xtensa_isa_name_compare);
-+    }
-+
-+    if (!result) {
-+        xtisa_errno = xtensa_isa_bad_state;
-+        sprintf(xtisa_error_msg, "state \"%s\" not recognized", name);
-+        return XTENSA_UNDEFINED;
-+    }
-+
-+    return result->u.state;
-+}
-+
-+
-+const char *xtensa_state_name(xtensa_isa isa, xtensa_state st)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+
-+    CHECK_STATE(intisa, st, NULL);
-+    return intisa->states[st].name;
-+}
-+
-+
-+int xtensa_state_num_bits(xtensa_isa isa, xtensa_state st)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+
-+    CHECK_STATE(intisa, st, XTENSA_UNDEFINED);
-+    return intisa->states[st].num_bits;
-+}
-+
-+
-+int xtensa_state_is_exported(xtensa_isa isa, xtensa_state st)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+
-+    CHECK_STATE(intisa, st, XTENSA_UNDEFINED);
-+    if ((intisa->states[st].flags & XTENSA_STATE_IS_EXPORTED) != 0) {
-+        return 1;
-+    }
-+    return 0;
-+}
-+
-+
-+int xtensa_state_is_shared_or(xtensa_isa isa, xtensa_state st)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+
-+    CHECK_STATE(intisa, st, XTENSA_UNDEFINED);
-+    if ((intisa->states[st].flags & XTENSA_STATE_IS_SHARED_OR) != 0) {
-+        return 1;
-+    }
-+    return 0;
-+}
-+
-+
-+/* Sysregs. */
-+
-+
-+#define CHECK_SYSREG(INTISA, SYSREG, ERRVAL) \
-+    do { \
-+        if ((SYSREG) < 0 || (SYSREG) >= (INTISA)->num_sysregs) { \
-+            xtisa_errno = xtensa_isa_bad_sysreg; \
-+            strcpy(xtisa_error_msg, "invalid sysreg specifier"); \
-+            return ERRVAL; \
-+        } \
-+    } while (0)
-+
-+
-+xtensa_sysreg xtensa_sysreg_lookup(xtensa_isa isa, int num, int is_user)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+
-+    if (is_user != 0) {
-+        is_user = 1;
-+    }
-+
-+    if (num < 0 || num > intisa->max_sysreg_num[is_user] ||
-+        intisa->sysreg_table[is_user][num] == XTENSA_UNDEFINED) {
-+        xtisa_errno = xtensa_isa_bad_sysreg;
-+        strcpy(xtisa_error_msg, "sysreg not recognized");
-+        return XTENSA_UNDEFINED;
-+    }
-+
-+    return intisa->sysreg_table[is_user][num];
-+}
-+
-+
-+xtensa_sysreg xtensa_sysreg_lookup_name(xtensa_isa isa, const char *name)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+    xtensa_lookup_entry entry, *result = 0;
-+
-+    if (!name || !*name) {
-+        xtisa_errno = xtensa_isa_bad_sysreg;
-+        strcpy(xtisa_error_msg, "invalid sysreg name");
-+        return XTENSA_UNDEFINED;
-+    }
-+
-+    if (intisa->num_sysregs != 0) {
-+        entry.key = name;
-+        result = bsearch(&entry, intisa->sysreg_lookup_table,
-+                         intisa->num_sysregs, sizeof(xtensa_lookup_entry),
-+                         xtensa_isa_name_compare);
-+    }
-+
-+    if (!result) {
-+        xtisa_errno = xtensa_isa_bad_sysreg;
-+        sprintf(xtisa_error_msg, "sysreg \"%s\" not recognized", name);
-+        return XTENSA_UNDEFINED;
-+    }
-+
-+    return result->u.sysreg;
-+}
-+
-+
-+const char *xtensa_sysreg_name(xtensa_isa isa, xtensa_sysreg sysreg)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+
-+    CHECK_SYSREG(intisa, sysreg, NULL);
-+    return intisa->sysregs[sysreg].name;
-+}
-+
-+
-+int xtensa_sysreg_number(xtensa_isa isa, xtensa_sysreg sysreg)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+
-+    CHECK_SYSREG(intisa, sysreg, XTENSA_UNDEFINED);
-+    return intisa->sysregs[sysreg].number;
-+}
-+
-+
-+int xtensa_sysreg_is_user(xtensa_isa isa, xtensa_sysreg sysreg)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+
-+    CHECK_SYSREG(intisa, sysreg, XTENSA_UNDEFINED);
-+    if (intisa->sysregs[sysreg].is_user) {
-+        return 1;
-+    }
-+    return 0;
-+}
-+
-+
-+/* Interfaces. */
-+
-+
-+#define CHECK_INTERFACE(INTISA, INTF, ERRVAL) \
-+    do { \
-+        if ((INTF) < 0 || (INTF) >= (INTISA)->num_interfaces) { \
-+            xtisa_errno = xtensa_isa_bad_interface; \
-+            strcpy(xtisa_error_msg, "invalid interface specifier"); \
-+            return ERRVAL; \
-+        } \
-+    } while (0)
-+
-+
-+xtensa_interface xtensa_interface_lookup(xtensa_isa isa, const char *ifname)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+    xtensa_lookup_entry entry, *result = 0;
-+
-+    if (!ifname || !*ifname) {
-+        xtisa_errno = xtensa_isa_bad_interface;
-+        strcpy(xtisa_error_msg, "invalid interface name");
-+        return XTENSA_UNDEFINED;
-+    }
-+
-+    if (intisa->num_interfaces != 0) {
-+        entry.key = ifname;
-+        result = bsearch(&entry, intisa->interface_lookup_table,
-+                         intisa->num_interfaces, sizeof(xtensa_lookup_entry),
-+                         xtensa_isa_name_compare);
-+    }
-+
-+    if (!result) {
-+        xtisa_errno = xtensa_isa_bad_interface;
-+        sprintf(xtisa_error_msg, "interface \"%s\" not recognized", ifname);
-+        return XTENSA_UNDEFINED;
-+    }
-+
-+    return result->u.intf;
-+}
-+
-+
-+const char *xtensa_interface_name(xtensa_isa isa, xtensa_interface intf)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+
-+    CHECK_INTERFACE(intisa, intf, NULL);
-+    return intisa->interfaces[intf].name;
-+}
-+
-+
-+int xtensa_interface_num_bits(xtensa_isa isa, xtensa_interface intf)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+
-+    CHECK_INTERFACE(intisa, intf, XTENSA_UNDEFINED);
-+    return intisa->interfaces[intf].num_bits;
-+}
-+
-+
-+char xtensa_interface_inout(xtensa_isa isa, xtensa_interface intf)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+
-+    CHECK_INTERFACE(intisa, intf, 0);
-+    return intisa->interfaces[intf].inout;
-+}
-+
-+
-+int xtensa_interface_has_side_effect(xtensa_isa isa, xtensa_interface intf)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+
-+    CHECK_INTERFACE(intisa, intf, XTENSA_UNDEFINED);
-+    if ((intisa->interfaces[intf].flags &
-+         XTENSA_INTERFACE_HAS_SIDE_EFFECT) != 0) {
-+        return 1;
-+    }
-+    return 0;
 +}
 +
-+
-+int xtensa_interface_class_id(xtensa_isa isa, xtensa_interface intf)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+
-+    CHECK_INTERFACE(intisa, intf, XTENSA_UNDEFINED);
-+    return intisa->interfaces[intf].class_id;
-+}
-+
-+
-+/* Functional Units. */
-+
-+
-+#define CHECK_FUNCUNIT(INTISA, FUN, ERRVAL) \
-+    do { \
-+        if ((FUN) < 0 || (FUN) >= (INTISA)->num_funcUnits) { \
-+            xtisa_errno = xtensa_isa_bad_funcUnit; \
-+            strcpy(xtisa_error_msg, "invalid functional unit specifier"); \
-+            return ERRVAL; \
-+        } \
-+    } while (0)
-+
-+
-+xtensa_funcUnit xtensa_funcUnit_lookup(xtensa_isa isa, const char *fname)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+    xtensa_lookup_entry entry, *result = 0;
-+
-+    if (!fname || !*fname) {
-+        xtisa_errno = xtensa_isa_bad_funcUnit;
-+        strcpy(xtisa_error_msg, "invalid functional unit name");
-+        return XTENSA_UNDEFINED;
-+    }
-+
-+    if (intisa->num_funcUnits != 0) {
-+        entry.key = fname;
-+        result = bsearch(&entry, intisa->funcUnit_lookup_table,
-+                         intisa->num_funcUnits, sizeof(xtensa_lookup_entry),
-+                         xtensa_isa_name_compare);
-+    }
-+
-+    if (!result) {
-+        xtisa_errno = xtensa_isa_bad_funcUnit;
-+        sprintf(xtisa_error_msg,
-+                "functional unit \"%s\" not recognized", fname);
-+        return XTENSA_UNDEFINED;
-+    }
-+
-+    return result->u.fun;
-+}
-+
-+
-+const char *xtensa_funcUnit_name(xtensa_isa isa, xtensa_funcUnit fun)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+
-+    CHECK_FUNCUNIT(intisa, fun, NULL);
-+    return intisa->funcUnits[fun].name;
-+}
-+
-+
-+int xtensa_funcUnit_num_copies(xtensa_isa isa, xtensa_funcUnit fun)
-+{
-+    xtensa_isa_internal *intisa = (xtensa_isa_internal *)isa;
-+
-+    CHECK_FUNCUNIT(intisa, fun, XTENSA_UNDEFINED);
-+    return intisa->funcUnits[fun].num_copies;
-+}
-diff --git a/target/xtensa/xtensa-isa.h b/target/xtensa/xtensa-isa.h
-new file mode 100644
-index 000000000000..d06614c187c1
---- /dev/null
-+++ b/target/xtensa/xtensa-isa.h
-@@ -0,0 +1 @@
-+#include <hw/xtensa/xtensa-isa.h>
++static const XtensaOpcodeOps core_ops[] = {
++    {
++        .name = "abs",
++        .translate = translate_abs,
++    }, {
++        .name = "add",
++        .translate = translate_add,
++    }, {
++        .name = "add.n",
++        .translate = translate_add,
++    }, {
++        .name = "addi",
++        .translate = translate_addi,
++    }, {
++        .name = "addi.n",
++        .translate = translate_addi,
++    }, {
++        .name = "addmi",
++        .translate = translate_addi,
++    }, {
++        .name = "addx2",
++        .translate = translate_addx,
++        .par = (const uint32_t[]){1},
++    }, {
++        .name = "addx4",
++        .translate = translate_addx,
++        .par = (const uint32_t[]){2},
++    }, {
++        .name = "addx8",
++        .translate = translate_addx,
++        .par = (const uint32_t[]){3},
++    }, {
++        .name = "all4",
++        .translate = translate_all,
++        .par = (const uint32_t[]){true, 4},
++    }, {
++        .name = "all8",
++        .translate = translate_all,
++        .par = (const uint32_t[]){true, 8},
++    }, {
++        .name = "and",
++        .translate = translate_and,
++    }, {
++        .name = "andb",
++        .translate = translate_boolean,
++        .par = (const uint32_t[]){BOOLEAN_AND},
++    }, {
++        .name = "andbc",
++        .translate = translate_boolean,
++        .par = (const uint32_t[]){BOOLEAN_ANDC},
++    }, {
++        .name = "any4",
++        .translate = translate_all,
++        .par = (const uint32_t[]){false, 4},
++    }, {
++        .name = "any8",
++        .translate = translate_all,
++        .par = (const uint32_t[]){false, 8},
++    }, {
++        .name = "ball",
++        .translate = translate_ball,
++        .par = (const uint32_t[]){TCG_COND_EQ},
++    }, {
++        .name = "bany",
++        .translate = translate_bany,
++        .par = (const uint32_t[]){TCG_COND_NE},
++    }, {
++        .name = "bbc",
++        .translate = translate_bb,
++        .par = (const uint32_t[]){TCG_COND_EQ},
++    }, {
++        .name = "bbci",
++        .translate = translate_bbi,
++        .par = (const uint32_t[]){TCG_COND_EQ},
++    }, {
++        .name = "bbs",
++        .translate = translate_bb,
++        .par = (const uint32_t[]){TCG_COND_NE},
++    }, {
++        .name = "bbsi",
++        .translate = translate_bbi,
++        .par = (const uint32_t[]){TCG_COND_NE},
++    }, {
++        .name = "beq",
++        .translate = translate_b,
++        .par = (const uint32_t[]){TCG_COND_EQ},
++    }, {
++        .name = "beqi",
++        .translate = translate_bi,
++        .par = (const uint32_t[]){TCG_COND_EQ},
++    }, {
++        .name = "beqz",
++        .translate = translate_bz,
++        .par = (const uint32_t[]){TCG_COND_EQ},
++    }, {
++        .name = "beqz.n",
++        .translate = translate_bz,
++        .par = (const uint32_t[]){TCG_COND_EQ},
++    }, {
++        .name = "bf",
++        .translate = translate_bp,
++        .par = (const uint32_t[]){TCG_COND_EQ},
++    }, {
++        .name = "bge",
++        .translate = translate_b,
++        .par = (const uint32_t[]){TCG_COND_GE},
++    }, {
++        .name = "bgei",
++        .translate = translate_bi,
++        .par = (const uint32_t[]){TCG_COND_GE},
++    }, {
++        .name = "bgeu",
++        .translate = translate_b,
++        .par = (const uint32_t[]){TCG_COND_GEU},
++    }, {
++        .name = "bgeui",
++        .translate = translate_bi,
++        .par = (const uint32_t[]){TCG_COND_GEU},
++    }, {
++        .name = "bgez",
++        .translate = translate_bz,
++        .par = (const uint32_t[]){TCG_COND_GE},
++    }, {
++        .name = "blt",
++        .translate = translate_b,
++        .par = (const uint32_t[]){TCG_COND_LT},
++    }, {
++        .name = "blti",
++        .translate = translate_bi,
++        .par = (const uint32_t[]){TCG_COND_LT},
++    }, {
++        .name = "bltu",
++        .translate = translate_b,
++        .par = (const uint32_t[]){TCG_COND_LTU},
++    }, {
++        .name = "bltui",
++        .translate = translate_bi,
++        .par = (const uint32_t[]){TCG_COND_LTU},
++    }, {
++        .name = "bltz",
++        .translate = translate_bz,
++        .par = (const uint32_t[]){TCG_COND_LT},
++    }, {
++        .name = "bnall",
++        .translate = translate_ball,
++        .par = (const uint32_t[]){TCG_COND_NE},
++    }, {
++        .name = "bne",
++        .translate = translate_b,
++        .par = (const uint32_t[]){TCG_COND_NE},
++    }, {
++        .name = "bnei",
++        .translate = translate_bi,
++        .par = (const uint32_t[]){TCG_COND_NE},
++    }, {
++        .name = "bnez",
++        .translate = translate_bz,
++        .par = (const uint32_t[]){TCG_COND_NE},
++    }, {
++        .name = "bnez.n",
++        .translate = translate_bz,
++        .par = (const uint32_t[]){TCG_COND_NE},
++    }, {
++        .name = "bnone",
++        .translate = translate_bany,
++        .par = (const uint32_t[]){TCG_COND_EQ},
++    }, {
++        .name = "break",
++        .translate = translate_break,
++        .par = (const uint32_t[]){DEBUGCAUSE_BI},
++    }, {
++        .name = "break.n",
++        .translate = translate_break,
++        .par = (const uint32_t[]){DEBUGCAUSE_BN},
++    }, {
++        .name = "bt",
++        .translate = translate_bp,
++        .par = (const uint32_t[]){TCG_COND_NE},
++    }, {
++        .name = "call0",
++        .translate = translate_call0,
++    }, {
++        .name = "call12",
++        .translate = translate_callw,
++        .par = (const uint32_t[]){3},
++    }, {
++        .name = "call4",
++        .translate = translate_callw,
++        .par = (const uint32_t[]){1},
++    }, {
++        .name = "call8",
++        .translate = translate_callw,
++        .par = (const uint32_t[]){2},
++    }, {
++        .name = "callx0",
++        .translate = translate_callx0,
++    }, {
++        .name = "callx12",
++        .translate = translate_callxw,
++        .par = (const uint32_t[]){3},
++    }, {
++        .name = "callx4",
++        .translate = translate_callxw,
++        .par = (const uint32_t[]){1},
++    }, {
++        .name = "callx8",
++        .translate = translate_callxw,
++        .par = (const uint32_t[]){2},
++    }, {
++        .name = "clamps",
++        .translate = translate_clamps,
++    }, {
++        .name = "depbits",
++        .translate = translate_depbits,
++    }, {
++        .name = "dhi",
++        .translate = translate_dcache,
++        .par = (const uint32_t[]){true, true},
++    }, {
++        .name = "dhu",
++        .translate = translate_dcache,
++        .par = (const uint32_t[]){true, true},
++    }, {
++        .name = "dhwb",
++        .translate = translate_dcache,
++        .par = (const uint32_t[]){false, true},
++    }, {
++        .name = "dhwbi",
++        .translate = translate_dcache,
++        .par = (const uint32_t[]){false, true},
++    }, {
++        .name = "dii",
++        .translate = translate_dcache,
++        .par = (const uint32_t[]){true, false},
++    }, {
++        .name = "diu",
++        .translate = translate_dcache,
++        .par = (const uint32_t[]){true, false},
++    }, {
++        .name = "diwb",
++        .translate = translate_dcache,
++        .par = (const uint32_t[]){true, false},
++    }, {
++        .name = "diwbi",
++        .translate = translate_dcache,
++        .par = (const uint32_t[]){true, false},
++    }, {
++        .name = "dpfl",
++        .translate = translate_dcache,
++        .par = (const uint32_t[]){true, true},
++    }, {
++        .name = "dpfr",
++        .translate = translate_dcache,
++        .par = (const uint32_t[]){false, false},
++    }, {
++        .name = "dpfro",
++        .translate = translate_dcache,
++        .par = (const uint32_t[]){false, false},
++    }, {
++        .name = "dpfw",
++        .translate = translate_dcache,
++        .par = (const uint32_t[]){false, false},
++    }, {
++        .name = "dpfwo",
++        .translate = translate_dcache,
++        .par = (const uint32_t[]){false, false},
++    }, {
++        .name = "dsync",
++        .translate = translate_nop,
++    }, {
++        .name = "entry",
++        .translate = translate_entry,
++    }, {
++        .name = "esync",
++        .translate = translate_nop,
++    }, {
++        .name = "excw",
++        .translate = translate_nop,
++    }, {
++        .name = "extui",
++        .translate = translate_extui,
++    }, {
++        .name = "extw",
++        .translate = translate_nop,
++    }, {
++        .name = "idtlb",
++        .translate = translate_itlb,
++        .par = (const uint32_t[]){true},
++    }, {
++        .name = "ihi",
++        .translate = translate_icache,
++        .par = (const uint32_t[]){false, true},
++    }, {
++        .name = "ihu",
++        .translate = translate_icache,
++        .par = (const uint32_t[]){true, true},
++    }, {
++        .name = "iii",
++        .translate = translate_icache,
++        .par = (const uint32_t[]){true, false},
++    }, {
++        .name = "iitlb",
++        .translate = translate_itlb,
++        .par = (const uint32_t[]){false},
++    }, {
++        .name = "iiu",
++        .translate = translate_icache,
++        .par = (const uint32_t[]){true, false},
++    }, {
++        .name = "ill",
++        .translate = translate_ill,
++    }, {
++        .name = "ill.n",
++        .translate = translate_ill,
++    }, {
++        .name = "ipf",
++        .translate = translate_icache,
++        .par = (const uint32_t[]){false, false},
++    }, {
++        .name = "ipfl",
++        .translate = translate_icache,
++        .par = (const uint32_t[]){true, true},
++    }, {
++        .name = "isync",
++        .translate = translate_nop,
++    }, {
++        .name = "j",
++        .translate = translate_j,
++    }, {
++        .name = "jx",
++        .translate = translate_jx,
++    }, {
++        .name = "l16si",
++        .translate = translate_ldst,
++        .par = (const uint32_t[]){MO_TESW, false, false},
++    }, {
++        .name = "l16ui",
++        .translate = translate_ldst,
++        .par = (const uint32_t[]){MO_TEUW, false, false},
++    }, {
++        .name = "l32ai",
++        .translate = translate_ldst,
++        .par = (const uint32_t[]){MO_TEUL, true, false},
++    }, {
++        .name = "l32e",
++        .translate = translate_l32e,
++    }, {
++        .name = "l32i",
++        .translate = translate_ldst,
++        .par = (const uint32_t[]){MO_TEUL, false, false},
++    }, {
++        .name = "l32i.n",
++        .translate = translate_ldst,
++        .par = (const uint32_t[]){MO_TEUL, false, false},
++    }, {
++        .name = "l32r",
++        .translate = translate_l32r,
++    }, {
++        .name = "l8ui",
++        .translate = translate_ldst,
++        .par = (const uint32_t[]){MO_UB, false, false},
++    }, {
++        .name = "lddec",
++        .translate = translate_mac16,
++        .par = (const uint32_t[]){MAC16_NONE, 0, 0, -4},
++    }, {
++        .name = "ldinc",
++        .translate = translate_mac16,
++        .par = (const uint32_t[]){MAC16_NONE, 0, 0, 4},
++    }, {
++        .name = "loop",
++        .translate = translate_loop,
++        .par = (const uint32_t[]){TCG_COND_NEVER},
++    }, {
++        .name = "loopgtz",
++        .translate = translate_loop,
++        .par = (const uint32_t[]){TCG_COND_GT},
++    }, {
++        .name = "loopnez",
++        .translate = translate_loop,
++        .par = (const uint32_t[]){TCG_COND_NE},
++    }, {
++        .name = "max",
++        .translate = translate_minmax,
++        .par = (const uint32_t[]){TCG_COND_GE},
++    }, {
++        .name = "maxu",
++        .translate = translate_minmax,
++        .par = (const uint32_t[]){TCG_COND_GEU},
++    }, {
++        .name = "memw",
++        .translate = translate_nop,
++    }, {
++        .name = "min",
++        .translate = translate_minmax,
++        .par = (const uint32_t[]){TCG_COND_LT},
++    }, {
++        .name = "minu",
++        .translate = translate_minmax,
++        .par = (const uint32_t[]){TCG_COND_LTU},
++    }, {
++        .name = "mov",
++        .translate = translate_mov,
++    }, {
++        .name = "mov.n",
++        .translate = translate_mov,
++    }, {
++        .name = "moveqz",
++        .translate = translate_movcond,
++        .par = (const uint32_t[]){TCG_COND_EQ},
++    }, {
++        .name = "movf",
++        .translate = translate_movp,
++        .par = (const uint32_t[]){TCG_COND_EQ},
++    }, {
++        .name = "movgez",
++        .translate = translate_movcond,
++        .par = (const uint32_t[]){TCG_COND_GE},
++    }, {
++        .name = "movi",
++        .translate = translate_movi,
++    }, {
++        .name = "movi.n",
++        .translate = translate_movi,
++    }, {
++        .name = "movltz",
++        .translate = translate_movcond,
++        .par = (const uint32_t[]){TCG_COND_LT},
++    }, {
++        .name = "movnez",
++        .translate = translate_movcond,
++        .par = (const uint32_t[]){TCG_COND_NE},
++    }, {
++        .name = "movsp",
++        .translate = translate_movsp,
++    }, {
++        .name = "movt",
++        .translate = translate_movp,
++        .par = (const uint32_t[]){TCG_COND_NE},
++    }, {
++        .name = "mul.aa.hh",
++        .translate = translate_mac16,
++        .par = (const uint32_t[]){MAC16_MUL, MAC16_AA, MAC16_HH, 0},
++    }, {
++        .name = "mul.aa.hl",
++        .translate = translate_mac16,
++        .par = (const uint32_t[]){MAC16_MUL, MAC16_AA, MAC16_HL, 0},
++    }, {
++        .name = "mul.aa.lh",
++        .translate = translate_mac16,
++        .par = (const uint32_t[]){MAC16_MUL, MAC16_AA, MAC16_LH, 0},
++    }, {
++        .name = "mul.aa.ll",
++        .translate = translate_mac16,
++        .par = (const uint32_t[]){MAC16_MUL, MAC16_AA, MAC16_LL, 0},
++    }, {
++        .name = "mul.ad.hh",
++        .translate = translate_mac16,
++        .par = (const uint32_t[]){MAC16_MUL, MAC16_AD, MAC16_HH, 0},
++    }, {
++        .name = "mul.ad.hl",
++        .translate = translate_mac16,
++        .par = (const uint32_t[]){MAC16_MUL, MAC16_AD, MAC16_HL, 0},
++    }, {
++        .name = "mul.ad.lh",
++        .translate = translate_mac16,
++        .par = (const uint32_t[]){MAC16_MUL, MAC16_AD, MAC16_LH, 0},
++    }, {
++        .name = "mul.ad.ll",
++        .translate = translate_mac16,
++        .par = (const uint32_t[]){MAC16_MUL, MAC16_AD, MAC16_LL, 0},
++    }, {
++        .name = "mul.da.hh",
++        .translate = translate_mac16,
++        .par = (const uint32_t[]){MAC16_MUL, MAC16_DA, MAC16_HH, 0},
++    }, {
++        .name = "mul.da.hl",
++        .translate = translate_mac16,
++        .par = (const uint32_t[]){MAC16_MUL, MAC16_DA, MAC16_HL, 0},
++    }, {
++        .name = "mul.da.lh",
++        .translate = translate_mac16,
++        .par = (const uint32_t[]){MAC16_MUL, MAC16_DA, MAC16_LH, 0},
++    }, {
++        .name = "mul.da.ll",
++        .translate = translate_mac16,
++        .par = (const uint32_t[]){MAC16_MUL, MAC16_DA, MAC16_LL, 0},
++    }, {
++        .name = "mul.dd.hh",
++        .translate = translate_mac16,
++        .par = (const uint32_t[]){MAC16_MUL, MAC16_DD, MAC16_HH, 0},
++    }, {
++        .name = "mul.dd.hl",
++        .translate = translate_mac16,
++        .par = (const uint32_t[]){MAC16_MUL, MAC16_DD, MAC16_HL, 0},
++    }, {
++        .name = "mul.dd.lh",
++        .translate = translate_mac16,
++        .par = (const uint32_t[]){MAC16_MUL, MAC16_DD, MAC16_LH, 0},
++    }, {
++        .name = "mul.dd.ll",
++        .translate = translate_mac16,
++        .par = (const uint32_t[]){MAC16_MUL, MAC16_DD, MAC16_LL, 0},
++    }, {
++        .name = "mul16s",
++        .translate = translate_mul16,
++        .par = (const uint32_t[]){true},
++    }, {
++        .name = "mul16u",
++        .translate = translate_mul16,
++        .par = (const uint32_t[]){false},
++    }, {
++        .name = "mula.aa.hh",
++        .translate = translate_mac16,
++        .par = (const uint32_t[]){MAC16_MULA, MAC16_AA, MAC16_HH, 0},
++    }, {
++        .name = "mula.aa.hl",
++        .translate = translate_mac16,
++        .par = (const uint32_t[]){MAC16_MULA, MAC16_AA, MAC16_HL, 0},
++    }, {
++        .name = "mula.aa.lh",
++        .translate = translate_mac16,
++        .par = (const uint32_t[]){MAC16_MULA, MAC16_AA, MAC16_LH, 0},
++    }, {
++        .name = "mula.aa.ll",
++        .translate = translate_mac16,
++        .par = (const uint32_t[]){MAC16_MULA, MAC16_AA, MAC16_LL, 0},
++    }, {
++        .name = "mula.ad.hh",
++        .translate = translate_mac16,
++        .par = (const uint32_t[]){MAC16_MULA, MAC16_AD, MAC16_HH, 0},
++    }, {
++        .name = "mula.ad.hl",
++        .translate = translate_mac16,
++        .par = (const uint32_t[]){MAC16_MULA, MAC16_AD, MAC16_HL, 0},
++    }, {
++        .name = "mula.ad.lh",
++        .translate = translate_mac16,
++        .par = (const uint32_t[]){MAC16_MULA, MAC16_AD, MAC16_LH, 0},
++    }, {
++        .name = "mula.ad.ll",
++        .translate = translate_mac16,
++        .par = (const uint32_t[]){MAC16_MULA, MAC16_AD, MAC16_LL, 0},
++    }, {
++        .name = "mula.da.hh",
++        .translate = translate_mac16,
++        .par = (const uint32_t[]){MAC16_MULA, MAC16_DA, MAC16_HH, 0},
++    }, {
++        .name = "mula.da.hh.lddec",
++        .translate = translate_mac16,
++        .par = (const uint32_t[]){MAC16_MULA, MAC16_DA, MAC16_HH, -4},
++    }, {
++        .name = "mula.da.hh.ldinc",
++        .translate = translate_mac16,
++        .par = (const uint32_t[]){MAC16_MULA, MAC16_DA, MAC16_HH, 4},
++    }, {
++        .name = "mula.da.hl",
++        .translate = translate_mac16,
++        .par = (const uint32_t[]){MAC16_MULA, MAC16_DA, MAC16_HL, 0},
++    }, {
++        .name = "mula.da.hl.lddec",
++        .translate = translate_mac16,
++        .par = (const uint32_t[]){MAC16_MULA, MAC16_DA, MAC16_HL, -4},
++    }, {
++        .name = "mula.da.hl.ldinc",
++        .translate = translate_mac16,
++        .par = (const uint32_t[]){MAC16_MULA, MAC16_DA, MAC16_HL, 4},
++    }, {
++        .name = "mula.da.lh",
++        .translate = translate_mac16,
++        .par = (const uint32_t[]){MAC16_MULA, MAC16_DA, MAC16_LH, 0},
++    }, {
++        .name = "mula.da.lh.lddec",
++        .translate = translate_mac16,
++        .par = (const uint32_t[]){MAC16_MULA, MAC16_DA, MAC16_LH, -4},
++    }, {
++        .name = "mula.da.lh.ldinc",
++        .translate = translate_mac16,
++        .par = (const uint32_t[]){MAC16_MULA, MAC16_DA, MAC16_LH, 4},
++    }, {
++        .name = "mula.da.ll",
++        .translate = translate_mac16,
++        .par = (const uint32_t[]){MAC16_MULA, MAC16_DA, MAC16_LL, 0},
++    }, {
++        .name = "mula.da.ll.lddec",
++        .translate = translate_mac16,
++        .par = (const uint32_t[]){MAC16_MULA, MAC16_DA, MAC16_LL, -4},
++    }, {
++        .name = "mula.da.ll.ldinc",
++        .translate = translate_mac16,
++        .par = (const uint32_t[]){MAC16_MULA, MAC16_DA, MAC16_LL, 4},
++    }, {
++        .name = "mula.dd.hh",
++        .translate = translate_mac16,
++        .par = (const uint32_t[]){MAC16_MULA, MAC16_DD, MAC16_HH, 0},
++    }, {
++        .name = "mula.dd.hh.lddec",
++        .translate = translate_mac16,
++        .par = (const uint32_t[]){MAC16_MULA, MAC16_DD, MAC16_HH, -4},
++    }, {
++        .name = "mula.dd.hh.ldinc",
++        .translate = translate_mac16,
++        .par = (const uint32_t[]){MAC16_MULA, MAC16_DD, MAC16_HH, 4},
++    }, {
++        .name = "mula.dd.hl",
++        .translate = translate_mac16,
++        .par = (const uint32_t[]){MAC16_MULA, MAC16_DD, MAC16_HL, 0},
++    }, {
++        .name = "mula.dd.hl.lddec",
++        .translate = translate_mac16,
++        .par = (const uint32_t[]){MAC16_MULA, MAC16_DD, MAC16_HL, -4},
++    }, {
++        .name = "mula.dd.hl.ldinc",
++        .translate = translate_mac16,
++        .par = (const uint32_t[]){MAC16_MULA, MAC16_DD, MAC16_HL, 4},
++    }, {
++        .name = "mula.dd.lh",
++        .translate = translate_mac16,
++        .par = (const uint32_t[]){MAC16_MULA, MAC16_DD, MAC16_LH, 0},
++    }, {
++        .name = "mula.dd.lh.lddec",
++        .translate = translate_mac16,
++        .par = (const uint32_t[]){MAC16_MULA, MAC16_DD, MAC16_LH, -4},
++    }, {
++        .name = "mula.dd.lh.ldinc",
++        .translate = translate_mac16,
++        .par = (const uint32_t[]){MAC16_MULA, MAC16_DD, MAC16_LH, 4},
++    }, {
++        .name = "mula.dd.ll",
++        .translate = translate_mac16,
++        .par = (const uint32_t[]){MAC16_MULA, MAC16_DD, MAC16_LL, 0},
++    }, {
++        .name = "mula.dd.ll.lddec",
++        .translate = translate_mac16,
++        .par = (const uint32_t[]){MAC16_MULA, MAC16_DD, MAC16_LL, -4},
++    }, {
++        .name = "mula.dd.ll.ldinc",
++        .translate = translate_mac16,
++        .par = (const uint32_t[]){MAC16_MULA, MAC16_DD, MAC16_LL, 4},
++    }, {
++        .name = "mull",
++        .translate = translate_mull,
++    }, {
++        .name = "muls.aa.hh",
++        .translate = translate_mac16,
++        .par = (const uint32_t[]){MAC16_MULS, MAC16_AA, MAC16_HH, 0},
++    }, {
++        .name = "muls.aa.hl",
++        .translate = translate_mac16,
++        .par = (const uint32_t[]){MAC16_MULS, MAC16_AA, MAC16_HL, 0},
++    }, {
++        .name = "muls.aa.lh",
++        .translate = translate_mac16,
++        .par = (const uint32_t[]){MAC16_MULS, MAC16_AA, MAC16_LH, 0},
++    }, {
++        .name = "muls.aa.ll",
++        .translate = translate_mac16,
++        .par = (const uint32_t[]){MAC16_MULS, MAC16_AA, MAC16_LL, 0},
++    }, {
++        .name = "muls.ad.hh",
++        .translate = translate_mac16,
++        .par = (const uint32_t[]){MAC16_MULS, MAC16_AD, MAC16_HH, 0},
++    }, {
++        .name = "muls.ad.hl",
++        .translate = translate_mac16,
++        .par = (const uint32_t[]){MAC16_MULS, MAC16_AD, MAC16_HL, 0},
++    }, {
++        .name = "muls.ad.lh",
++        .translate = translate_mac16,
++        .par = (const uint32_t[]){MAC16_MULS, MAC16_AD, MAC16_LH, 0},
++    }, {
++        .name = "muls.ad.ll",
++        .translate = translate_mac16,
++        .par = (const uint32_t[]){MAC16_MULS, MAC16_AD, MAC16_LL, 0},
++    }, {
++        .name = "muls.da.hh",
++        .translate = translate_mac16,
++        .par = (const uint32_t[]){MAC16_MULS, MAC16_DA, MAC16_HH, 0},
++    }, {
++        .name = "muls.da.hl",
++        .translate = translate_mac16,
++        .par = (const uint32_t[]){MAC16_MULS, MAC16_DA, MAC16_HL, 0},
++    }, {
++        .name = "muls.da.lh",
++        .translate = translate_mac16,
++        .par = (const uint32_t[]){MAC16_MULS, MAC16_DA, MAC16_LH, 0},
++    }, {
++        .name = "muls.da.ll",
++        .translate = translate_mac16,
++        .par = (const uint32_t[]){MAC16_MULS, MAC16_DA, MAC16_LL, 0},
++    }, {
++        .name = "muls.dd.hh",
++        .translate = translate_mac16,
++        .par = (const uint32_t[]){MAC16_MULS, MAC16_DD, MAC16_HH, 0},
++    }, {
++        .name = "muls.dd.hl",
++        .translate = translate_mac16,
++        .par = (const uint32_t[]){MAC16_MULS, MAC16_DD, MAC16_HL, 0},
++    }, {
++        .name = "muls.dd.lh",
++        .translate = translate_mac16,
++        .par = (const uint32_t[]){MAC16_MULS, MAC16_DD, MAC16_LH, 0},
++    }, {
++        .name = "muls.dd.ll",
++        .translate = translate_mac16,
++        .par = (const uint32_t[]){MAC16_MULS, MAC16_DD, MAC16_LL, 0},
++    }, {
++        .name = "mulsh",
++        .translate = translate_mulh,
++        .par = (const uint32_t[]){true},
++    }, {
++        .name = "muluh",
++        .translate = translate_mulh,
++        .par = (const uint32_t[]){false},
++    }, {
++        .name = "neg",
++        .translate = translate_neg,
++    }, {
++        .name = "nop",
++        .translate = translate_nop,
++    }, {
++        .name = "nop.n",
++        .translate = translate_nop,
++    }, {
++        .name = "nsa",
++        .translate = translate_nsa,
++    }, {
++        .name = "nsau",
++        .translate = translate_nsau,
++    }, {
++        .name = "or",
++        .translate = translate_or,
++    }, {
++        .name = "orb",
++        .translate = translate_boolean,
++        .par = (const uint32_t[]){BOOLEAN_OR},
++    }, {
++        .name = "orbc",
++        .translate = translate_boolean,
++        .par = (const uint32_t[]){BOOLEAN_ORC},
++    }, {
++        .name = "pdtlb",
++        .translate = translate_ptlb,
++        .par = (const uint32_t[]){true},
++    }, {
++        .name = "pitlb",
++        .translate = translate_ptlb,
++        .par = (const uint32_t[]){false},
++    }, {
++        .name = "quos",
++        .translate = translate_quos,
++        .par = (const uint32_t[]){true},
++    }, {
++        .name = "quou",
++        .translate = translate_quou,
++        .par = (const uint32_t[]){true},
++    }, {
++        .name = "rdtlb0",
++        .translate = translate_rtlb,
++        .par = (const uint32_t[]){true, 0},
++    }, {
++        .name = "rdtlb1",
++        .translate = translate_rtlb,
++        .par = (const uint32_t[]){true, 1},
++    }, {
++        .name = "rems",
++        .translate = translate_quos,
++        .par = (const uint32_t[]){false},
++    }, {
++        .name = "remu",
++        .translate = translate_quou,
++        .par = (const uint32_t[]){false},
++    }, {
++        .name = "rer",
++        .translate = translate_rer,
++    }, {
++        .name = "ret",
++        .translate = translate_ret,
++    }, {
++        .name = "ret.n",
++        .translate = translate_ret,
++    }, {
++        .name = "retw",
++        .translate = translate_retw,
++    }, {
++        .name = "retw.n",
++        .translate = translate_retw,
++    }, {
++        .name = "rfde",
++        .translate = translate_rfde,
++    }, {
++        .name = "rfe",
++        .translate = translate_rfe,
++    }, {
++        .name = "rfi",
++        .translate = translate_rfi,
++    }, {
++        .name = "rfwo",
++        .translate = translate_rfw,
++        .par = (const uint32_t[]){true},
++    }, {
++        .name = "rfwu",
++        .translate = translate_rfw,
++        .par = (const uint32_t[]){false},
++    }, {
++        .name = "ritlb0",
++        .translate = translate_rtlb,
++        .par = (const uint32_t[]){false, 0},
++    }, {
++        .name = "ritlb1",
++        .translate = translate_rtlb,
++        .par = (const uint32_t[]){false, 1},
++    }, {
++        .name = "rotw",
++        .translate = translate_rotw,
++    }, {
++        .name = "rsil",
++        .translate = translate_rsil,
++    }, {
++        .name = "rsr.176",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){176},
++    }, {
++        .name = "rsr.208",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){208},
++    }, {
++        .name = "rsr.acchi",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){ACCHI},
++    }, {
++        .name = "rsr.acclo",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){ACCLO},
++    }, {
++        .name = "rsr.atomctl",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){ATOMCTL},
++    }, {
++        .name = "rsr.br",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){BR},
++    }, {
++        .name = "rsr.cacheattr",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){CACHEATTR},
++    }, {
++        .name = "rsr.ccompare0",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){CCOMPARE},
++    }, {
++        .name = "rsr.ccompare1",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){CCOMPARE + 1},
++    }, {
++        .name = "rsr.ccompare2",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){CCOMPARE + 2},
++    }, {
++        .name = "rsr.ccount",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){CCOUNT},
++    }, {
++        .name = "rsr.configid0",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){CONFIGID0},
++    }, {
++        .name = "rsr.configid1",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){CONFIGID1},
++    }, {
++        .name = "rsr.cpenable",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){CPENABLE},
++    }, {
++        .name = "rsr.dbreaka0",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){DBREAKA},
++    }, {
++        .name = "rsr.dbreaka1",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){DBREAKA + 1},
++    }, {
++        .name = "rsr.dbreakc0",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){DBREAKC},
++    }, {
++        .name = "rsr.dbreakc1",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){DBREAKC + 1},
++    }, {
++        .name = "rsr.debugcause",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){DEBUGCAUSE},
++    }, {
++        .name = "rsr.depc",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){DEPC},
++    }, {
++        .name = "rsr.dtlbcfg",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){DTLBCFG},
++    }, {
++        .name = "rsr.epc1",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){EPC1},
++    }, {
++        .name = "rsr.epc2",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){EPC1 + 1},
++    }, {
++        .name = "rsr.epc3",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){EPC1 + 2},
++    }, {
++        .name = "rsr.epc4",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){EPC1 + 3},
++    }, {
++        .name = "rsr.epc5",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){EPC1 + 4},
++    }, {
++        .name = "rsr.epc6",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){EPC1 + 5},
++    }, {
++        .name = "rsr.epc7",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){EPC1 + 6},
++    }, {
++        .name = "rsr.eps2",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){EPS2},
++    }, {
++        .name = "rsr.eps3",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){EPS2 + 1},
++    }, {
++        .name = "rsr.eps4",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){EPS2 + 2},
++    }, {
++        .name = "rsr.eps5",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){EPS2 + 3},
++    }, {
++        .name = "rsr.eps6",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){EPS2 + 4},
++    }, {
++        .name = "rsr.eps7",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){EPS2 + 5},
++    }, {
++        .name = "rsr.exccause",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){EXCCAUSE},
++    }, {
++        .name = "rsr.excsave1",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){EXCSAVE1},
++    }, {
++        .name = "rsr.excsave2",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){EXCSAVE1 + 1},
++    }, {
++        .name = "rsr.excsave3",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){EXCSAVE1 + 2},
++    }, {
++        .name = "rsr.excsave4",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){EXCSAVE1 + 3},
++    }, {
++        .name = "rsr.excsave5",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){EXCSAVE1 + 4},
++    }, {
++        .name = "rsr.excsave6",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){EXCSAVE1 + 5},
++    }, {
++        .name = "rsr.excsave7",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){EXCSAVE1 + 6},
++    }, {
++        .name = "rsr.excvaddr",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){EXCVADDR},
++    }, {
++        .name = "rsr.ibreaka0",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){IBREAKA},
++    }, {
++        .name = "rsr.ibreaka1",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){IBREAKA + 1},
++    }, {
++        .name = "rsr.ibreakenable",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){IBREAKENABLE},
++    }, {
++        .name = "rsr.icount",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){ICOUNT},
++    }, {
++        .name = "rsr.icountlevel",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){ICOUNTLEVEL},
++    }, {
++        .name = "rsr.intclear",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){INTCLEAR},
++    }, {
++        .name = "rsr.intenable",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){INTENABLE},
++    }, {
++        .name = "rsr.interrupt",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){INTSET},
++    }, {
++        .name = "rsr.intset",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){INTSET},
++    }, {
++        .name = "rsr.itlbcfg",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){ITLBCFG},
++    }, {
++        .name = "rsr.lbeg",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){LBEG},
++    }, {
++        .name = "rsr.lcount",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){LCOUNT},
++    }, {
++        .name = "rsr.lend",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){LEND},
++    }, {
++        .name = "rsr.litbase",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){LITBASE},
++    }, {
++        .name = "rsr.m0",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){MR},
++    }, {
++        .name = "rsr.m1",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){MR + 1},
++    }, {
++        .name = "rsr.m2",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){MR + 2},
++    }, {
++        .name = "rsr.m3",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){MR + 3},
++    }, {
++        .name = "rsr.memctl",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){MEMCTL},
++    }, {
++        .name = "rsr.misc0",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){MISC},
++    }, {
++        .name = "rsr.misc1",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){MISC + 1},
++    }, {
++        .name = "rsr.misc2",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){MISC + 2},
++    }, {
++        .name = "rsr.misc3",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){MISC + 3},
++    }, {
++        .name = "rsr.prid",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){PRID},
++    }, {
++        .name = "rsr.ps",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){PS},
++    }, {
++        .name = "rsr.ptevaddr",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){PTEVADDR},
++    }, {
++        .name = "rsr.rasid",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){RASID},
++    }, {
++        .name = "rsr.sar",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){SAR},
++    }, {
++        .name = "rsr.scompare1",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){SCOMPARE1},
++    }, {
++        .name = "rsr.vecbase",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){VECBASE},
++    }, {
++        .name = "rsr.windowbase",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){WINDOW_BASE},
++    }, {
++        .name = "rsr.windowstart",
++        .translate = translate_rsr,
++        .par = (const uint32_t[]){WINDOW_START},
++    }, {
++        .name = "rsync",
++        .translate = translate_nop,
++    }, {
++        .name = "rur.fcr",
++        .translate = translate_rur,
++        .par = (const uint32_t[]){FCR},
++    }, {
++        .name = "rur.fsr",
++        .translate = translate_rur,
++        .par = (const uint32_t[]){FSR},
++    }, {
++        .name = "rur.threadptr",
++        .translate = translate_rur,
++        .par = (const uint32_t[]){THREADPTR},
++    }, {
++        .name = "s16i",
++        .translate = translate_ldst,
++        .par = (const uint32_t[]){MO_TEUW, false, true},
++    }, {
++        .name = "s32c1i",
++        .translate = translate_s32c1i,
++    }, {
++        .name = "s32e",
++        .translate = translate_s32e,
++    }, {
++        .name = "s32i",
++        .translate = translate_ldst,
++        .par = (const uint32_t[]){MO_TEUL, false, true},
++    }, {
++        .name = "s32i.n",
++        .translate = translate_ldst,
++        .par = (const uint32_t[]){MO_TEUL, false, true},
++    }, {
++        .name = "s32nb",
++        .translate = translate_ldst,
++        .par = (const uint32_t[]){MO_TEUL, false, true},
++    }, {
++        .name = "s32ri",
++        .translate = translate_ldst,
++        .par = (const uint32_t[]){MO_TEUL, true, true},
++    }, {
++        .name = "s8i",
++        .translate = translate_ldst,
++        .par = (const uint32_t[]){MO_UB, false, true},
++    }, {
++        .name = "sext",
++        .translate = translate_sext,
++    }, {
++        .name = "simcall",
++        .translate = translate_simcall,
++    }, {
++        .name = "sll",
++        .translate = translate_sll,
++    }, {
++        .name = "slli",
++        .translate = translate_slli,
++    }, {
++        .name = "sra",
++        .translate = translate_sra,
++    }, {
++        .name = "srai",
++        .translate = translate_srai,
++    }, {
++        .name = "src",
++        .translate = translate_src,
++    }, {
++        .name = "srl",
++        .translate = translate_srl,
++    }, {
++        .name = "srli",
++        .translate = translate_srli,
++    }, {
++        .name = "ssa8b",
++        .translate = translate_ssa8b,
++    }, {
++        .name = "ssa8l",
++        .translate = translate_ssa8l,
++    }, {
++        .name = "ssai",
++        .translate = translate_ssai,
++    }, {
++        .name = "ssl",
++        .translate = translate_ssl,
++    }, {
++        .name = "ssr",
++        .translate = translate_ssr,
++    }, {
++        .name = "sub",
++        .translate = translate_sub,
++    }, {
++        .name = "subx2",
++        .translate = translate_subx,
++        .par = (const uint32_t[]){1},
++    }, {
++        .name = "subx4",
++        .translate = translate_subx,
++        .par = (const uint32_t[]){2},
++    }, {
++        .name = "subx8",
++        .translate = translate_subx,
++        .par = (const uint32_t[]){3},
++    }, {
++        .name = "syscall",
++        .translate = translate_syscall,
++    }, {
++        .name = "umul.aa.hh",
++        .translate = translate_mac16,
++        .par = (const uint32_t[]){MAC16_UMUL, MAC16_AA, MAC16_HH, 0},
++    }, {
++        .name = "umul.aa.hl",
++        .translate = translate_mac16,
++        .par = (const uint32_t[]){MAC16_UMUL, MAC16_AA, MAC16_HL, 0},
++    }, {
++        .name = "umul.aa.lh",
++        .translate = translate_mac16,
++        .par = (const uint32_t[]){MAC16_UMUL, MAC16_AA, MAC16_LH, 0},
++    }, {
++        .name = "umul.aa.ll",
++        .translate = translate_mac16,
++        .par = (const uint32_t[]){MAC16_UMUL, MAC16_AA, MAC16_LL, 0},
++    }, {
++        .name = "waiti",
++        .translate = translate_waiti,
++    }, {
++        .name = "wdtlb",
++        .translate = translate_wtlb,
++        .par = (const uint32_t[]){true},
++    }, {
++        .name = "wer",
++        .translate = translate_wer,
++    }, {
++        .name = "witlb",
++        .translate = translate_wtlb,
++        .par = (const uint32_t[]){false},
++    }, {
++        .name = "wsr.176",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){176},
++    }, {
++        .name = "wsr.208",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){208},
++    }, {
++        .name = "wsr.acchi",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){ACCHI},
++    }, {
++        .name = "wsr.acclo",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){ACCLO},
++    }, {
++        .name = "wsr.atomctl",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){ATOMCTL},
++    }, {
++        .name = "wsr.br",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){BR},
++    }, {
++        .name = "wsr.cacheattr",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){CACHEATTR},
++    }, {
++        .name = "wsr.ccompare0",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){CCOMPARE},
++    }, {
++        .name = "wsr.ccompare1",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){CCOMPARE + 1},
++    }, {
++        .name = "wsr.ccompare2",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){CCOMPARE + 2},
++    }, {
++        .name = "wsr.ccount",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){CCOUNT},
++    }, {
++        .name = "wsr.configid0",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){CONFIGID0},
++    }, {
++        .name = "wsr.configid1",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){CONFIGID1},
++    }, {
++        .name = "wsr.cpenable",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){CPENABLE},
++    }, {
++        .name = "wsr.dbreaka0",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){DBREAKA},
++    }, {
++        .name = "wsr.dbreaka1",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){DBREAKA + 1},
++    }, {
++        .name = "wsr.dbreakc0",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){DBREAKC},
++    }, {
++        .name = "wsr.dbreakc1",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){DBREAKC + 1},
++    }, {
++        .name = "wsr.debugcause",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){DEBUGCAUSE},
++    }, {
++        .name = "wsr.depc",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){DEPC},
++    }, {
++        .name = "wsr.dtlbcfg",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){DTLBCFG},
++    }, {
++        .name = "wsr.epc1",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){EPC1},
++    }, {
++        .name = "wsr.epc2",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){EPC1 + 1},
++    }, {
++        .name = "wsr.epc3",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){EPC1 + 2},
++    }, {
++        .name = "wsr.epc4",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){EPC1 + 3},
++    }, {
++        .name = "wsr.epc5",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){EPC1 + 4},
++    }, {
++        .name = "wsr.epc6",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){EPC1 + 5},
++    }, {
++        .name = "wsr.epc7",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){EPC1 + 6},
++    }, {
++        .name = "wsr.eps2",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){EPS2},
++    }, {
++        .name = "wsr.eps3",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){EPS2 + 1},
++    }, {
++        .name = "wsr.eps4",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){EPS2 + 2},
++    }, {
++        .name = "wsr.eps5",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){EPS2 + 3},
++    }, {
++        .name = "wsr.eps6",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){EPS2 + 4},
++    }, {
++        .name = "wsr.eps7",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){EPS2 + 5},
++    }, {
++        .name = "wsr.exccause",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){EXCCAUSE},
++    }, {
++        .name = "wsr.excsave1",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){EXCSAVE1},
++    }, {
++        .name = "wsr.excsave2",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){EXCSAVE1 + 1},
++    }, {
++        .name = "wsr.excsave3",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){EXCSAVE1 + 2},
++    }, {
++        .name = "wsr.excsave4",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){EXCSAVE1 + 3},
++    }, {
++        .name = "wsr.excsave5",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){EXCSAVE1 + 4},
++    }, {
++        .name = "wsr.excsave6",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){EXCSAVE1 + 5},
++    }, {
++        .name = "wsr.excsave7",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){EXCSAVE1 + 6},
++    }, {
++        .name = "wsr.excvaddr",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){EXCVADDR},
++    }, {
++        .name = "wsr.ibreaka0",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){IBREAKA},
++    }, {
++        .name = "wsr.ibreaka1",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){IBREAKA + 1},
++    }, {
++        .name = "wsr.ibreakenable",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){IBREAKENABLE},
++    }, {
++        .name = "wsr.icount",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){ICOUNT},
++    }, {
++        .name = "wsr.icountlevel",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){ICOUNTLEVEL},
++    }, {
++        .name = "wsr.intclear",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){INTCLEAR},
++    }, {
++        .name = "wsr.intenable",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){INTENABLE},
++    }, {
++        .name = "wsr.interrupt",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){INTSET},
++    }, {
++        .name = "wsr.intset",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){INTSET},
++    }, {
++        .name = "wsr.itlbcfg",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){ITLBCFG},
++    }, {
++        .name = "wsr.lbeg",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){LBEG},
++    }, {
++        .name = "wsr.lcount",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){LCOUNT},
++    }, {
++        .name = "wsr.lend",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){LEND},
++    }, {
++        .name = "wsr.litbase",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){LITBASE},
++    }, {
++        .name = "wsr.m0",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){MR},
++    }, {
++        .name = "wsr.m1",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){MR + 1},
++    }, {
++        .name = "wsr.m2",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){MR + 2},
++    }, {
++        .name = "wsr.m3",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){MR + 3},
++    }, {
++        .name = "wsr.memctl",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){MEMCTL},
++    }, {
++        .name = "wsr.misc0",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){MISC},
++    }, {
++        .name = "wsr.misc1",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){MISC + 1},
++    }, {
++        .name = "wsr.misc2",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){MISC + 2},
++    }, {
++        .name = "wsr.misc3",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){MISC + 3},
++    }, {
++        .name = "wsr.prid",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){PRID},
++    }, {
++        .name = "wsr.ps",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){PS},
++    }, {
++        .name = "wsr.ptevaddr",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){PTEVADDR},
++    }, {
++        .name = "wsr.rasid",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){RASID},
++    }, {
++        .name = "wsr.sar",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){SAR},
++    }, {
++        .name = "wsr.scompare1",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){SCOMPARE1},
++    }, {
++        .name = "wsr.vecbase",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){VECBASE},
++    }, {
++        .name = "wsr.windowbase",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){WINDOW_BASE},
++    }, {
++        .name = "wsr.windowstart",
++        .translate = translate_wsr,
++        .par = (const uint32_t[]){WINDOW_START},
++    }, {
++        .name = "wur.fcr",
++        .translate = translate_wur,
++        .par = (const uint32_t[]){FCR},
++    }, {
++        .name = "wur.fsr",
++        .translate = translate_wur,
++        .par = (const uint32_t[]){FSR},
++    }, {
++        .name = "wur.threadptr",
++        .translate = translate_wur,
++        .par = (const uint32_t[]){THREADPTR},
++    }, {
++        .name = "xor",
++        .translate = translate_xor,
++    }, {
++        .name = "xorb",
++        .translate = translate_boolean,
++        .par = (const uint32_t[]){BOOLEAN_XOR},
++    }, {
++        .name = "xsr.176",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){176},
++    }, {
++        .name = "xsr.208",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){208},
++    }, {
++        .name = "xsr.acchi",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){ACCHI},
++    }, {
++        .name = "xsr.acclo",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){ACCLO},
++    }, {
++        .name = "xsr.atomctl",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){ATOMCTL},
++    }, {
++        .name = "xsr.br",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){BR},
++    }, {
++        .name = "xsr.cacheattr",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){CACHEATTR},
++    }, {
++        .name = "xsr.ccompare0",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){CCOMPARE},
++    }, {
++        .name = "xsr.ccompare1",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){CCOMPARE + 1},
++    }, {
++        .name = "xsr.ccompare2",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){CCOMPARE + 2},
++    }, {
++        .name = "xsr.ccount",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){CCOUNT},
++    }, {
++        .name = "xsr.configid0",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){CONFIGID0},
++    }, {
++        .name = "xsr.configid1",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){CONFIGID1},
++    }, {
++        .name = "xsr.cpenable",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){CPENABLE},
++    }, {
++        .name = "xsr.dbreaka0",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){DBREAKA},
++    }, {
++        .name = "xsr.dbreaka1",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){DBREAKA + 1},
++    }, {
++        .name = "xsr.dbreakc0",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){DBREAKC},
++    }, {
++        .name = "xsr.dbreakc1",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){DBREAKC + 1},
++    }, {
++        .name = "xsr.debugcause",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){DEBUGCAUSE},
++    }, {
++        .name = "xsr.depc",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){DEPC},
++    }, {
++        .name = "xsr.dtlbcfg",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){DTLBCFG},
++    }, {
++        .name = "xsr.epc1",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){EPC1},
++    }, {
++        .name = "xsr.epc2",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){EPC1 + 1},
++    }, {
++        .name = "xsr.epc3",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){EPC1 + 2},
++    }, {
++        .name = "xsr.epc4",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){EPC1 + 3},
++    }, {
++        .name = "xsr.epc5",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){EPC1 + 4},
++    }, {
++        .name = "xsr.epc6",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){EPC1 + 5},
++    }, {
++        .name = "xsr.epc7",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){EPC1 + 6},
++    }, {
++        .name = "xsr.eps2",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){EPS2},
++    }, {
++        .name = "xsr.eps3",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){EPS2 + 1},
++    }, {
++        .name = "xsr.eps4",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){EPS2 + 2},
++    }, {
++        .name = "xsr.eps5",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){EPS2 + 3},
++    }, {
++        .name = "xsr.eps6",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){EPS2 + 4},
++    }, {
++        .name = "xsr.eps7",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){EPS2 + 5},
++    }, {
++        .name = "xsr.exccause",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){EXCCAUSE},
++    }, {
++        .name = "xsr.excsave1",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){EXCSAVE1},
++    }, {
++        .name = "xsr.excsave2",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){EXCSAVE1 + 1},
++    }, {
++        .name = "xsr.excsave3",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){EXCSAVE1 + 2},
++    }, {
++        .name = "xsr.excsave4",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){EXCSAVE1 + 3},
++    }, {
++        .name = "xsr.excsave5",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){EXCSAVE1 + 4},
++    }, {
++        .name = "xsr.excsave6",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){EXCSAVE1 + 5},
++    }, {
++        .name = "xsr.excsave7",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){EXCSAVE1 + 6},
++    }, {
++        .name = "xsr.excvaddr",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){EXCVADDR},
++    }, {
++        .name = "xsr.ibreaka0",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){IBREAKA},
++    }, {
++        .name = "xsr.ibreaka1",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){IBREAKA + 1},
++    }, {
++        .name = "xsr.ibreakenable",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){IBREAKENABLE},
++    }, {
++        .name = "xsr.icount",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){ICOUNT},
++    }, {
++        .name = "xsr.icountlevel",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){ICOUNTLEVEL},
++    }, {
++        .name = "xsr.intclear",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){INTCLEAR},
++    }, {
++        .name = "xsr.intenable",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){INTENABLE},
++    }, {
++        .name = "xsr.interrupt",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){INTSET},
++    }, {
++        .name = "xsr.intset",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){INTSET},
++    }, {
++        .name = "xsr.itlbcfg",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){ITLBCFG},
++    }, {
++        .name = "xsr.lbeg",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){LBEG},
++    }, {
++        .name = "xsr.lcount",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){LCOUNT},
++    }, {
++        .name = "xsr.lend",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){LEND},
++    }, {
++        .name = "xsr.litbase",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){LITBASE},
++    }, {
++        .name = "xsr.m0",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){MR},
++    }, {
++        .name = "xsr.m1",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){MR + 1},
++    }, {
++        .name = "xsr.m2",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){MR + 2},
++    }, {
++        .name = "xsr.m3",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){MR + 3},
++    }, {
++        .name = "xsr.memctl",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){MEMCTL},
++    }, {
++        .name = "xsr.misc0",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){MISC},
++    }, {
++        .name = "xsr.misc1",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){MISC + 1},
++    }, {
++        .name = "xsr.misc2",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){MISC + 2},
++    }, {
++        .name = "xsr.misc3",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){MISC + 3},
++    }, {
++        .name = "xsr.prid",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){PRID},
++    }, {
++        .name = "xsr.ps",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){PS},
++    }, {
++        .name = "xsr.ptevaddr",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){PTEVADDR},
++    }, {
++        .name = "xsr.rasid",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){RASID},
++    }, {
++        .name = "xsr.sar",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){SAR},
++    }, {
++        .name = "xsr.scompare1",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){SCOMPARE1},
++    }, {
++        .name = "xsr.vecbase",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){VECBASE},
++    }, {
++        .name = "xsr.windowbase",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){WINDOW_BASE},
++    }, {
++        .name = "xsr.windowstart",
++        .translate = translate_xsr,
++        .par = (const uint32_t[]){WINDOW_START},
++    },
++};
++
++const XtensaOpcodeTranslators xtensa_core_opcodes = {
++    .num_opcodes = ARRAY_SIZE(core_ops),
++    .opcode = core_ops,
++};
 -- 
 2.1.4
