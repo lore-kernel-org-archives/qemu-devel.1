@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57166)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44822)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eAmP0-0008Hw-7K
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 20:33:35 -0400
+	(envelope-from <jcmvbkbc@gmail.com>) id 1eApP5-0005r9-KV
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 23:45:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eAmOv-00033c-Tm
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 20:33:34 -0400
-Resent-Message-Id: <E1eAmOv-00033c-Tm@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21304)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1eAmOv-00032Q-Mz
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 20:33:29 -0400
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <150969877331.231.8454865359591179675@bafd83ae6430>
-In-Reply-To: <20171103084046.12821-1-richard.henderson@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 3 Nov 2017 01:46:14 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PULL 0/3] TCG queued patches
+	(envelope-from <jcmvbkbc@gmail.com>) id 1eApP4-0000RR-Mx
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 23:45:51 -0400
+Received: from mail-lf0-x230.google.com ([2a00:1450:4010:c07::230]:49274)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1eApP4-0000QE-Dk
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 23:45:50 -0400
+Received: by mail-lf0-x230.google.com with SMTP id w21so5156609lfc.6
+	for <qemu-devel@nongnu.org>; Fri, 03 Nov 2017 20:45:49 -0700 (PDT)
+From: Max Filippov <jcmvbkbc@gmail.com>
+Date: Fri,  3 Nov 2017 20:45:05 -0700
+Message-Id: <1509767121-26925-1-git-send-email-jcmvbkbc@gmail.com>
+Subject: [Qemu-devel] [PATCH 00/16] target/xtensa: switch to libisa
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,47 +23,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: richard.henderson@linaro.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: qemu-devel@nongnu.org
+Cc: Richard Henderson <rth@twiddle.net>, Max Filippov <jcmvbkbc@gmail.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtQVUxMIDAvM10gVENHIHF1ZXVlZCBwYXRjaGVzClR5cGU6IHNlcmllcwpNZXNzYWdl
-LWlkOiAyMDE3MTEwMzA4NDA0Ni4xMjgyMS0xLXJpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmcK
-Cj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90
-YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29u
-ZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJl
-bmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFT
-RS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8k
-dG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNo
-b3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNr
-IC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4r
-MSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcg
-M2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0
-aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAgICBw
-YXRjaGV3LzE1MDk2NDA1MzYtMzIxNjAtMS1naXQtc2VuZC1lbWFpbC1wZXRlci5tYXlkZWxsQGxp
-bmFyby5vcmcgLT4gcGF0Y2hldy8xNTA5NjQwNTM2LTMyMTYwLTEtZ2l0LXNlbmQtZW1haWwtcGV0
-ZXIubWF5ZGVsbEBsaW5hcm8ub3JnCiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcv
-MjAxNzExMDIxODAzMTAuMjQ3NjAtMS1kZ2lsYmVydEByZWRoYXQuY29tIC0+IHBhdGNoZXcvMjAx
-NzExMDIxODAzMTAuMjQ3NjAtMS1kZ2lsYmVydEByZWRoYXQuY29tCiAqIFtuZXcgdGFnXSAgICAg
-ICAgICAgICAgIHBhdGNoZXcvMjAxNzExMDMwODQwNDYuMTI4MjEtMS1yaWNoYXJkLmhlbmRlcnNv
-bkBsaW5hcm8ub3JnIC0+IHBhdGNoZXcvMjAxNzExMDMwODQwNDYuMTI4MjEtMS1yaWNoYXJkLmhl
-bmRlcnNvbkBsaW5hcm8ub3JnClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKMjg5MDI2
-ZjFkYSBjcHUtZXhlYzogRXhpdCBleGNsdXNpdmUgcmVnaW9uIG9uIGxvbmdqbXAgZnJvbSBzdGVw
-X2F0b21pYwpiMGRhZmNhNjRmIHRjZy9zMzkweDogVXNlIGNvbnN0YW50IHBvb2wgZm9yIHByb2xv
-Z3VlCjliZWI0YjkzZjEgdGNnOiBBbGxvdyBjb25zdGFudCBwb29sIGVudHJpZXMgaW4gdGhlIHBy
-b2xvZ3VlCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzM6IHRjZzogQWxs
-b3cgY29uc3RhbnQgcG9vbCBlbnRyaWVzIGluIHRoZSBwcm9sb2d1ZS4uLgpDaGVja2luZyBQQVRD
-SCAyLzM6IHRjZy9zMzkweDogVXNlIGNvbnN0YW50IHBvb2wgZm9yIHByb2xvZ3VlLi4uCkNoZWNr
-aW5nIFBBVENIIDMvMzogY3B1LWV4ZWM6IEV4aXQgZXhjbHVzaXZlIHJlZ2lvbiBvbiBsb25nam1w
-IGZyb20gc3RlcF9hdG9taWMuLi4KRVJST1I6IFVzZSBvZiB2b2xhdGlsZSBpcyB1c3VhbGx5IHdy
-b25nOiBzZWUgRG9jdW1lbnRhdGlvbi92b2xhdGlsZS1jb25zaWRlcmVkLWhhcm1mdWwudHh0CiM0
-NTogRklMRTogYWNjZWwvdGNnL2NwdS1leGVjLmM6MjM3OgorICAgIHZvbGF0aWxlIGJvb2wgaW5f
-ZXhjbHVzaXZlX3JlZ2lvbiA9IGZhbHNlOwoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAz
-OCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJl
-dmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQg
-dGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9
-PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0t
-CkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3
-Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxp
-c3RzLm9yZw==
+Hello,
+
+this series adds libisa to the Xtensa target, changes decoder and
+instruction translators to use it, switches existing xtensa cores
+to use it, adds support for a number of new instructions and adds
+disassembler for Xtensa.
+
+Libisa is the canonical way of dealing with Xtensa instructions
+decoding and encoding. Libisa is a configuration-independent library
+with a stable interface plus generated configuration-specific
+xtensa-modules.c file with implementations of decoding and encoding
+functions. Libisa is MIT-licensed and originally distributed
+xtensa-modules.c files are also MIT-licensed and are available as a
+part of the xtensa configuration overlay.
+
+This transition makes it possible to support variable-encoding
+instructions of the core ISA, like const16, and will allow to support
+advanced Xtensa features, like FLIX and TIE.
+
+Development branch is available at:
+
+   git://github.com/OSLL/qemu-xtensa.git xtensa-libisa
+
+Max Filippov (16):
+  target/xtensa: pass actual frame size to the entry helper
+  target/xtensa: import libisa source
+  target/xtensa: extract core opcode translators
+  target/xtensa: extract FPU2000 opcode translators
+  target/xtensa: update import_core.sh script for libisa
+  target/xtensa: switch dc232b to libisa
+  target/xtensa: switch dc233c to libisa
+  target/xtensa: switch fsf to libisa
+  target/xtensa: use libisa for instruction decoding
+  target/xtensa: tests: fix memctl SR test
+  target/xtensa: drop DisasContext::litbase
+  target/xtensa: add internal/noop SRs and opcodes
+  target/xtensa: implement salt/saltu
+  target/xtensa: implement GPIO32
+  target/xtensa: implement const16
+  target/xtensa: implement disassembler
+
+ MAINTAINERS                                |     1 +
+ disas/Makefile.objs                        |     1 +
+ disas/xtensa.c                             |   133 +
+ include/disas/bfd.h                        |     1 +
+ include/hw/xtensa/xtensa-isa.h             |   838 ++
+ target/xtensa/Makefile.objs                |     1 +
+ target/xtensa/core-dc232b.c                |     4 +
+ target/xtensa/core-dc232b/xtensa-modules.c | 14106 +++++++++++++++++++++++++
+ target/xtensa/core-dc233c.c                |     4 +
+ target/xtensa/core-dc233c/xtensa-modules.c | 15233 +++++++++++++++++++++++++++
+ target/xtensa/core-fsf.c                   |     5 +
+ target/xtensa/core-fsf/xtensa-modules.c    |  9842 +++++++++++++++++
+ target/xtensa/cpu.c                        |     9 +
+ target/xtensa/cpu.h                        |    31 +
+ target/xtensa/helper.c                     |    37 +
+ target/xtensa/import_core.sh               |    14 +
+ target/xtensa/op_helper.c                  |     2 +-
+ target/xtensa/translate.c                  |  5883 +++++++----
+ target/xtensa/xtensa-isa-internal.h        |   231 +
+ target/xtensa/xtensa-isa.c                 |  1745 +++
+ target/xtensa/xtensa-isa.h                 |     1 +
+ tests/tcg/xtensa/test_sr.S                 |     2 +-
+ 22 files changed, 45951 insertions(+), 2173 deletions(-)
+ create mode 100644 disas/xtensa.c
+ create mode 100644 include/hw/xtensa/xtensa-isa.h
+ create mode 100644 target/xtensa/core-dc232b/xtensa-modules.c
+ create mode 100644 target/xtensa/core-dc233c/xtensa-modules.c
+ create mode 100644 target/xtensa/core-fsf/xtensa-modules.c
+ create mode 100644 target/xtensa/xtensa-isa-internal.h
+ create mode 100644 target/xtensa/xtensa-isa.c
+ create mode 100644 target/xtensa/xtensa-isa.h
+
+-- 
+2.1.4
