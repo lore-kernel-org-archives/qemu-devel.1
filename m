@@ -1,20 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44822)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44835)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1eApP5-0005r9-KV
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 23:45:52 -0400
+	(envelope-from <jcmvbkbc@gmail.com>) id 1eApP7-0005rG-DW
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 23:45:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1eApP4-0000RR-Mx
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 23:45:51 -0400
-Received: from mail-lf0-x230.google.com ([2a00:1450:4010:c07::230]:49274)
+	(envelope-from <jcmvbkbc@gmail.com>) id 1eApP6-0000TX-L4
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 23:45:53 -0400
+Received: from mail-lf0-x242.google.com ([2a00:1450:4010:c07::242]:49622)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1eApP4-0000QE-Dk
-	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 23:45:50 -0400
-Received: by mail-lf0-x230.google.com with SMTP id w21so5156609lfc.6
-	for <qemu-devel@nongnu.org>; Fri, 03 Nov 2017 20:45:49 -0700 (PDT)
+	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1eApP6-0000SF-Dk
+	for qemu-devel@nongnu.org; Fri, 03 Nov 2017 23:45:52 -0400
+Received: by mail-lf0-x242.google.com with SMTP id w21so5156653lfc.6
+	for <qemu-devel@nongnu.org>; Fri, 03 Nov 2017 20:45:52 -0700 (PDT)
 From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Fri,  3 Nov 2017 20:45:05 -0700
-Message-Id: <1509767121-26925-1-git-send-email-jcmvbkbc@gmail.com>
-Subject: [Qemu-devel] [PATCH 00/16] target/xtensa: switch to libisa
+Date: Fri,  3 Nov 2017 20:45:06 -0700
+Message-Id: <1509767121-26925-2-git-send-email-jcmvbkbc@gmail.com>
+In-Reply-To: <1509767121-26925-1-git-send-email-jcmvbkbc@gmail.com>
+References: <1509767121-26925-1-git-send-email-jcmvbkbc@gmail.com>
+Subject: [Qemu-devel] [PATCH 01/16] target/xtensa: pass actual frame size to
+ the entry helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,78 +29,41 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <rth@twiddle.net>, Max Filippov <jcmvbkbc@gmail.com>
 
-Hello,
+Currently 'entry' opcode helper accepts frame size divided by 8, as it
+is encoded in the opcode. Make it more natural and accept actual frame
+size instead.
 
-this series adds libisa to the Xtensa target, changes decoder and
-instruction translators to use it, switches existing xtensa cores
-to use it, adds support for a number of new instructions and adds
-disassembler for Xtensa.
+Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
+---
+ target/xtensa/op_helper.c | 2 +-
+ target/xtensa/translate.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-Libisa is the canonical way of dealing with Xtensa instructions
-decoding and encoding. Libisa is a configuration-independent library
-with a stable interface plus generated configuration-specific
-xtensa-modules.c file with implementations of decoding and encoding
-functions. Libisa is MIT-licensed and originally distributed
-xtensa-modules.c files are also MIT-licensed and are available as a
-part of the xtensa configuration overlay.
-
-This transition makes it possible to support variable-encoding
-instructions of the core ISA, like const16, and will allow to support
-advanced Xtensa features, like FLIX and TIE.
-
-Development branch is available at:
-
-   git://github.com/OSLL/qemu-xtensa.git xtensa-libisa
-
-Max Filippov (16):
-  target/xtensa: pass actual frame size to the entry helper
-  target/xtensa: import libisa source
-  target/xtensa: extract core opcode translators
-  target/xtensa: extract FPU2000 opcode translators
-  target/xtensa: update import_core.sh script for libisa
-  target/xtensa: switch dc232b to libisa
-  target/xtensa: switch dc233c to libisa
-  target/xtensa: switch fsf to libisa
-  target/xtensa: use libisa for instruction decoding
-  target/xtensa: tests: fix memctl SR test
-  target/xtensa: drop DisasContext::litbase
-  target/xtensa: add internal/noop SRs and opcodes
-  target/xtensa: implement salt/saltu
-  target/xtensa: implement GPIO32
-  target/xtensa: implement const16
-  target/xtensa: implement disassembler
-
- MAINTAINERS                                |     1 +
- disas/Makefile.objs                        |     1 +
- disas/xtensa.c                             |   133 +
- include/disas/bfd.h                        |     1 +
- include/hw/xtensa/xtensa-isa.h             |   838 ++
- target/xtensa/Makefile.objs                |     1 +
- target/xtensa/core-dc232b.c                |     4 +
- target/xtensa/core-dc232b/xtensa-modules.c | 14106 +++++++++++++++++++++++++
- target/xtensa/core-dc233c.c                |     4 +
- target/xtensa/core-dc233c/xtensa-modules.c | 15233 +++++++++++++++++++++++++++
- target/xtensa/core-fsf.c                   |     5 +
- target/xtensa/core-fsf/xtensa-modules.c    |  9842 +++++++++++++++++
- target/xtensa/cpu.c                        |     9 +
- target/xtensa/cpu.h                        |    31 +
- target/xtensa/helper.c                     |    37 +
- target/xtensa/import_core.sh               |    14 +
- target/xtensa/op_helper.c                  |     2 +-
- target/xtensa/translate.c                  |  5883 +++++++----
- target/xtensa/xtensa-isa-internal.h        |   231 +
- target/xtensa/xtensa-isa.c                 |  1745 +++
- target/xtensa/xtensa-isa.h                 |     1 +
- tests/tcg/xtensa/test_sr.S                 |     2 +-
- 22 files changed, 45951 insertions(+), 2173 deletions(-)
- create mode 100644 disas/xtensa.c
- create mode 100644 include/hw/xtensa/xtensa-isa.h
- create mode 100644 target/xtensa/core-dc232b/xtensa-modules.c
- create mode 100644 target/xtensa/core-dc233c/xtensa-modules.c
- create mode 100644 target/xtensa/core-fsf/xtensa-modules.c
- create mode 100644 target/xtensa/xtensa-isa-internal.h
- create mode 100644 target/xtensa/xtensa-isa.c
- create mode 100644 target/xtensa/xtensa-isa.h
-
+diff --git a/target/xtensa/op_helper.c b/target/xtensa/op_helper.c
+index 3d990c0caa44..012552817f74 100644
+--- a/target/xtensa/op_helper.c
++++ b/target/xtensa/op_helper.c
+@@ -249,7 +249,7 @@ void HELPER(entry)(CPUXtensaState *env, uint32_t pc, uint32_t s, uint32_t imm)
+         if (windowstart & ((1 << callinc) - 1)) {
+             HELPER(window_check)(env, pc, callinc);
+         }
+-        env->regs[(callinc << 2) | (s & 3)] = env->regs[s] - (imm << 3);
++        env->regs[(callinc << 2) | (s & 3)] = env->regs[s] - imm;
+         rotate_window(env, callinc);
+         env->sregs[WINDOW_START] |=
+             windowstart_bit(env->sregs[WINDOW_BASE], env);
+diff --git a/target/xtensa/translate.c b/target/xtensa/translate.c
+index 20f7ddf042f8..225e4a5fe870 100644
+--- a/target/xtensa/translate.c
++++ b/target/xtensa/translate.c
+@@ -2830,7 +2830,7 @@ static void disas_xtensa_insn(CPUXtensaState *env, DisasContext *dc)
+                 {
+                     TCGv_i32 pc = tcg_const_i32(dc->pc);
+                     TCGv_i32 s = tcg_const_i32(BRI12_S);
+-                    TCGv_i32 imm = tcg_const_i32(BRI12_IMM12);
++                    TCGv_i32 imm = tcg_const_i32(BRI12_IMM12 << 3);
+                     gen_helper_entry(cpu_env, pc, s, imm);
+                     tcg_temp_free(imm);
+                     tcg_temp_free(s);
 -- 
 2.1.4
