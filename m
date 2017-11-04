@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40862)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50953)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <glaubitz@physik.fu-berlin.de>) id 1eAsv3-0001df-N9
-	for qemu-devel@nongnu.org; Sat, 04 Nov 2017 03:31:07 -0400
+	(envelope-from <laurent@vivier.eu>) id 1eAuEw-0004Ec-86
+	for qemu-devel@nongnu.org; Sat, 04 Nov 2017 04:55:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <glaubitz@physik.fu-berlin.de>) id 1eAsuz-00024a-NO
-	for qemu-devel@nongnu.org; Sat, 04 Nov 2017 03:31:05 -0400
-Received: from outpost1.zedat.fu-berlin.de ([130.133.4.66]:36297)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <glaubitz@physik.fu-berlin.de>)
-	id 1eAsuz-0001zt-FZ
-	for qemu-devel@nongnu.org; Sat, 04 Nov 2017 03:31:01 -0400
-From: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
-References: <20170915065821.16600-1-jrtc27@jrtc27.com>
-	<20170915193313.86362-1-jrtc27@jrtc27.com>
-	<f22e881a-466a-945b-2979-8c0851790854@physik.fu-berlin.de>
-Message-ID: <aaa0c5b1-81a9-08f5-c945-f00da2d13682@physik.fu-berlin.de>
-Date: Sat, 4 Nov 2017 08:30:54 +0100
+	(envelope-from <laurent@vivier.eu>) id 1eAuEr-0000X1-Ce
+	for qemu-devel@nongnu.org; Sat, 04 Nov 2017 04:55:42 -0400
+References: <20171103202624.5956-1-laurent@vivier.eu>
+	<db255c93-a4c6-216d-8ea3-10f340a916f6@amsat.org>
+	<257f2a30-6607-cb14-3bbf-27b95d962cf4@amsat.org>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <89487dfd-f941-871f-e822-68a6fbace6fe@vivier.eu>
+Date: Sat, 4 Nov 2017 09:55:17 +0100
 MIME-Version: 1.0
-In-Reply-To: <f22e881a-466a-945b-2979-8c0851790854@physik.fu-berlin.de>
+In-Reply-To: <257f2a30-6607-cb14-3bbf-27b95d962cf4@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] PING: Re: [PATCH v3] linux-user/syscall.c: Handle
- SH4's exceptional alignment for p{read, write}64
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 0/4] softfloat: fix some helper
+ definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,152 +26,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: James Clarke <jrtc27@jrtc27.com>, QEMU Developers <qemu-devel@nongnu.org>
-Cc: Laurent Vivier <laurent@vivier.eu>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, qemu-arm@nongnu.org, Stafford Horne <shorne@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>
 
-Ping.
+Le 03/11/2017 à 22:51, Philippe Mathieu-Daudé a écrit :
+>> On 11/03/2017 05:26 PM, Laurent Vivier wrote:
+>>> This series fixes some errors found by
+>>> enabling USE_SOFTFLOAT_STRUCT_TYPES.
+> [...]
+>>
+>> I'm getting those errors:
+>>
+>> $ make subdir-arm-softmmu -j2
+>>
+>> /source/qemu/migration/vmstate-types.c:430:5: error: conversion to
+>> non-scalar type requested
+>>      qemu_put_be64(f, float64_val(*v));
+>>      ^~~~~~~~~~~~~
+>> make: *** [migration/vmstate-types.o] Error 1
+>>
+>> In file included from /source/qemu/fpu/softfloat.c:87:0:
+>> /source/qemu/fpu/softfloat-specialize.h: In function ‘float16_default_nan’:
+>> /source/qemu/include/fpu/softfloat.h:117:26: error: expected expression
+>> before ‘{’ token
+>>  #define const_float16(x) { x }
+>>                           ^
+>> /source/qemu/fpu/softfloat-specialize.h:95:12: note: in expansion of
+>> macro ‘const_float16’
+>>      return const_float16(0x7E00);
+>>             ^~~~~~~~~~~~~
+>> make: *** [fpu/softfloat.o] Error 1
+>>
+> 
+> Also:
+> 
+> $ make subdir-armeb-linux-user -j2
+> 
+>   CC      linux-user/signal.o
+> In file included from /source/qemu/linux-user/signal.c:24:0:
+> /source/qemu/linux-user/signal.c: In function ‘restore_sigframe_v2_vfp’:
+> /source/qemu/linux-user/qemu.h:472:8: error: lvalue required as left
+> operand of assignment
+>    ((x) = (typeof(*hptr))(                                             \
+>         ^
+> /source/qemu/linux-user/qemu.h:481:31: note: in expansion of macro
+> ‘__get_user_e’
+>  # define __get_user(x, hptr)  __get_user_e(x, hptr, be)
+>                                ^~~~~~~~~~~~
+> /source/qemu/linux-user/signal.c:2209:9: note: in expansion of macro
+> ‘__get_user’
+>          __get_user(float64_val(env->vfp.regs[i]),
+> &vfpframe->ufp.fpregs[i]);
+>          ^~~~~~~~~~
+> /source/qemu/linux-user/qemu.h:477:13: error: left-hand operand of comma
+> expression has no effect [-Werror=unused-value]
+>       (hptr)), (void)0)
+>              ^
+> /source/qemu/linux-user/qemu.h:481:31: note: in expansion of macro
+> ‘__get_user_e’
+>  # define __get_user(x, hptr)  __get_user_e(x, hptr, be)
+>                                ^~~~~~~~~~~~
+> /source/qemu/linux-user/signal.c:2209:9: note: in expansion of macro
+> ‘__get_user’
+>          __get_user(float64_val(env->vfp.regs[i]),
+> &vfpframe->ufp.fpregs[i]);
+>          ^~~~~~~~~~
+> cc1: all warnings being treated as errors
+> /source/qemu/rules.mak:66: recipe for target 'linux-user/signal.o' failed
+> 
+>   CC      linux-user/arm/nwfpe/fpa11_cpdt.o
+> ...
+> /source/qemu/linux-user/arm/nwfpe/fpa11_cpdt.c:37:4: note: in expansion
+> of macro ‘get_user_u32’
+>     get_user_u32(float32_val(fpa11->fpreg[Fn].fSingle), addr);
+>     ^~~~~~~~~~~~
+> /source/qemu/linux-user/qemu.h:515:13: error: lvalue required as left
+> operand of assignment
+>          (x) = 0;       \
+>              ^
+> /source/qemu/linux-user/qemu.h:536:32: note: in expansion of macro
+> ‘get_user’
+>  #define get_user_u32(x, gaddr) get_user((x), (gaddr), uint32_t)
+>                                 ^~~~~~~~
+> /source/qemu/linux-user/arm/nwfpe/fpa11_cpdt.c:37:4: note: in expansion
+> of macro ‘get_user_u32’
+>     get_user_u32(float32_val(fpa11->fpreg[Fn].fSingle), addr);
+>     ^~~~~~~~~~~~
+> 
 
-Please don't let this patch fall of the table. It's actually fixing a bug.
+These series doesn't fix all the problems, only the easiest to fix...
+
+for this one, you need:
+
+diff --git a/migration/vmstate-types.c b/migration/vmstate-types.c
+index 48184c380d..0c273d616a 100644
+--- a/migration/vmstate-types.c
++++ b/migration/vmstate-types.c
+@@ -425,7 +425,7 @@ static int get_float64(QEMUFile *f, void *pv, size_t
+size,
+ static int put_float64(QEMUFile *f, void *pv, size_t size, VMStateField
+*field,
+                        QJSON *vmdesc)
+ {
+-    uint64_t *v = pv;
++    float64 *v = pv;
+
+     qemu_put_be64(f, float64_val(*v));
+     return 0;
 
 Thanks,
-Adrian
-
-On 10/04/2017 10:38 AM, John Paul Adrian Glaubitz wrote:
-> Hi!
-> 
-> Any chance that this patch gets merged soon?
-> 
-> Looks like it has been reviewed by at least Richard and Philippe.
-> 
-> Adrian
-> 
-> On 09/15/2017 09:33 PM, James Clarke wrote:
->> Fixes: https://bugs.launchpad.net/qemu/+bug/1716767
->> Signed-off-by: James Clarke <jrtc27@jrtc27.com>
->> ---
->>
->> Changes since v2:
->>   * Fixed opening curly brace formatting, both for my new SH4-specific
->>     regpairs_aligned function, as well as the Arm one I touched, to appease
->>     checkpatch.pl
->>
->> Changes since v1:
->>   * Removed all changes in v1 :)
->>   * Added syscall num argument to regpairs_aligned
->>   * Added SH4-specific implementation of regpairs_aligned to return 1 for
->>     p{read,write}64
->>
->>   linux-user/syscall.c | 36 +++++++++++++++++++++++++-----------
->>   1 file changed, 25 insertions(+), 11 deletions(-)
->>
->> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
->> index 9b6364a266..0c1bd80bed 100644
->> --- a/linux-user/syscall.c
->> +++ b/linux-user/syscall.c
->> @@ -667,18 +667,32 @@ static inline int next_free_host_timer(void)
->>     /* ARM EABI and MIPS expect 64bit types aligned even on pairs or registers */
->>   #ifdef TARGET_ARM
->> -static inline int regpairs_aligned(void *cpu_env) {
->> +static inline int regpairs_aligned(void *cpu_env, int num)
->> +{
->>       return ((((CPUARMState *)cpu_env)->eabi) == 1) ;
->>   }
->>   #elif defined(TARGET_MIPS) && (TARGET_ABI_BITS == 32)
->> -static inline int regpairs_aligned(void *cpu_env) { return 1; }
->> +static inline int regpairs_aligned(void *cpu_env, int num) { return 1; }
->>   #elif defined(TARGET_PPC) && !defined(TARGET_PPC64)
->>   /* SysV AVI for PPC32 expects 64bit parameters to be passed on odd/even pairs
->>    * of registers which translates to the same as ARM/MIPS, because we start with
->>    * r3 as arg1 */
->> -static inline int regpairs_aligned(void *cpu_env) { return 1; }
->> +static inline int regpairs_aligned(void *cpu_env, int num) { return 1; }
->> +#elif defined(TARGET_SH4)
->> +/* SH4 doesn't align register pairs, except for p{read,write}64 */
->> +static inline int regpairs_aligned(void *cpu_env, int num)
->> +{
->> +    switch (num) {
->> +    case TARGET_NR_pread64:
->> +    case TARGET_NR_pwrite64:
->> +        return 1;
->> +
->> +    default:
->> +        return 0;
->> +    }
->> +}
->>   #else
->> -static inline int regpairs_aligned(void *cpu_env) { return 0; }
->> +static inline int regpairs_aligned(void *cpu_env, int num) { return 0; }
->>   #endif
->>     #define ERRNO_TABLE_SIZE 1200
->> @@ -6857,7 +6871,7 @@ static inline abi_long target_truncate64(void *cpu_env, const char *arg1,
->>                                            abi_long arg3,
->>                                            abi_long arg4)
->>   {
->> -    if (regpairs_aligned(cpu_env)) {
->> +    if (regpairs_aligned(cpu_env, TARGET_NR_truncate64)) {
->>           arg2 = arg3;
->>           arg3 = arg4;
->>       }
->> @@ -6871,7 +6885,7 @@ static inline abi_long target_ftruncate64(void *cpu_env, abi_long arg1,
->>                                             abi_long arg3,
->>                                             abi_long arg4)
->>   {
->> -    if (regpairs_aligned(cpu_env)) {
->> +    if (regpairs_aligned(cpu_env, TARGET_NR_ftruncate64)) {
->>           arg2 = arg3;
->>           arg3 = arg4;
->>       }
->> @@ -10495,7 +10509,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
->>   #endif
->>   #ifdef TARGET_NR_pread64
->>       case TARGET_NR_pread64:
->> -        if (regpairs_aligned(cpu_env)) {
->> +        if (regpairs_aligned(cpu_env, num)) {
->>               arg4 = arg5;
->>               arg5 = arg6;
->>           }
->> @@ -10505,7 +10519,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
->>           unlock_user(p, arg2, ret);
->>           break;
->>       case TARGET_NR_pwrite64:
->> -        if (regpairs_aligned(cpu_env)) {
->> +        if (regpairs_aligned(cpu_env, num)) {
->>               arg4 = arg5;
->>               arg5 = arg6;
->>           }
->> @@ -11275,7 +11289,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
->>           arg6 = ret;
->>   #else
->>           /* 6 args: fd, offset (high, low), len (high, low), advice */
->> -        if (regpairs_aligned(cpu_env)) {
->> +        if (regpairs_aligned(cpu_env, num)) {
->>               /* offset is in (3,4), len in (5,6) and advice in 7 */
->>               arg2 = arg3;
->>               arg3 = arg4;
->> @@ -11294,7 +11308,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
->>   #ifdef TARGET_NR_fadvise64
->>       case TARGET_NR_fadvise64:
->>           /* 5 args: fd, offset (high, low), len, advice */
->> -        if (regpairs_aligned(cpu_env)) {
->> +        if (regpairs_aligned(cpu_env, num)) {
->>               /* offset is in (3,4), len in 5 and advice in 6 */
->>               arg2 = arg3;
->>               arg3 = arg4;
->> @@ -11407,7 +11421,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
->>   #ifdef TARGET_NR_readahead
->>       case TARGET_NR_readahead:
->>   #if TARGET_ABI_BITS == 32
->> -        if (regpairs_aligned(cpu_env)) {
->> +        if (regpairs_aligned(cpu_env, num)) {
->>               arg2 = arg3;
->>               arg3 = arg4;
->>               arg4 = arg5;
->>
-> 
-
-
--- 
- .''`.  John Paul Adrian Glaubitz
-: :' :  Debian Developer - glaubitz@debian.org
-`. `'   Freie Universitaet Berlin - glaubitz@physik.fu-berlin.de
-  `-    GPG: 62FF 8A75 84E0 2956 9546  0006 7426 3B37 F5B5 F913
+Laurent
