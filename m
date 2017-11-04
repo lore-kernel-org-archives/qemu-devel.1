@@ -1,33 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60279)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33430)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eB3lR-0006r5-AI
-	for qemu-devel@nongnu.org; Sat, 04 Nov 2017 15:05:54 -0400
+	(envelope-from <bounces@canonical.com>) id 1eB3v1-0000JU-4i
+	for qemu-devel@nongnu.org; Sat, 04 Nov 2017 15:15:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eB3lO-0004NE-5p
-	for qemu-devel@nongnu.org; Sat, 04 Nov 2017 15:05:53 -0400
-Received: from indium.canonical.com ([91.189.90.7]:58542)
+	(envelope-from <bounces@canonical.com>) id 1eB3uy-0001S0-0C
+	for qemu-devel@nongnu.org; Sat, 04 Nov 2017 15:15:47 -0400
+Received: from indium.canonical.com ([91.189.90.7]:58926)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eB3lN-0004LS-W3
-	for qemu-devel@nongnu.org; Sat, 04 Nov 2017 15:05:50 -0400
+	id 1eB3ux-0001RK-Q3
+	for qemu-devel@nongnu.org; Sat, 04 Nov 2017 15:15:43 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eB3lK-0004Ue-O3
-	for <qemu-devel@nongnu.org>; Sat, 04 Nov 2017 19:05:46 +0000
+	id 1eB3uv-0006PH-Va
+	for <qemu-devel@nongnu.org>; Sat, 04 Nov 2017 19:15:41 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id B04DC2E8033
-	for <qemu-devel@nongnu.org>; Sat,  4 Nov 2017 19:05:46 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id EC0F72E80C3
+	for <qemu-devel@nongnu.org>; Sat,  4 Nov 2017 19:15:41 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 04 Nov 2017 18:58:06 -0000
-From: Michal Rus <1730099@bugs.launchpad.net>
-Reply-To: Bug 1730099 <1730099@bugs.launchpad.net>
+Date: Sat, 04 Nov 2017 19:03:01 -0000
+From: Michal Rus <1730101@bugs.launchpad.net>
+Reply-To: Bug 1730101 <1730101@bugs.launchpad.net>
 Sender: bounces@canonical.com
-Message-Id: <150982188718.19907.10916894947386280270.malonedeb@soybean.canonical.com>
+Message-Id: <150982218219.20484.11681642745420352739.malonedeb@soybean.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1730099] [NEW] Sometimes,
- when not touching the SDL window, the guest freezes
+Subject: [Qemu-devel] [Bug 1730101] [NEW] The guest is only starting after
+ its SDL window gets focus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,16 +40,14 @@ To: qemu-devel@nongnu.org
 
 Public bug reported:
 
-I often just run some development guest machine, and leave its SDL
-window on a workspace I don=E2=80=99t touch, and only interact with it via =
-TCP.
+I=E2=80=99m using i3wm and have workspace assigning rules that make QEMU=E2=
+=80=99s SDL
+window be assigned to a workspace I don=E2=80=99t really switch to.
 
-And sometimes, the guest just freezes.
-
-After it gets the focus back, it comes back to life (starts responding
-via network).
-
-QEMU release version: 2.8.1.1
+When I run start a guest machine, its SDL window is moved to that
+workspace (I never see it); but the machine freezes after displaying
+that black window. It only starts booting after I switch to the
+workspace and view the window.
 
 ** Affects: qemu
      Importance: Undecided
@@ -59,25 +57,23 @@ QEMU release version: 2.8.1.1
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1730099
+https://bugs.launchpad.net/bugs/1730101
 
 Title:
-  Sometimes, when not touching the SDL window, the guest freezes
+  The guest is only starting after its SDL window gets focus
 
 Status in QEMU:
   New
 
 Bug description:
-  I often just run some development guest machine, and leave its SDL
-  window on a workspace I don=E2=80=99t touch, and only interact with it via
-  TCP.
+  I=E2=80=99m using i3wm and have workspace assigning rules that make QEMU=
+=E2=80=99s SDL
+  window be assigned to a workspace I don=E2=80=99t really switch to.
 
-  And sometimes, the guest just freezes.
-
-  After it gets the focus back, it comes back to life (starts responding
-  via network).
-
-  QEMU release version: 2.8.1.1
+  When I run start a guest machine, its SDL window is moved to that
+  workspace (I never see it); but the machine freezes after displaying
+  that black window. It only starts booting after I switch to the
+  workspace and view the window.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1730099/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1730101/+subscriptions
