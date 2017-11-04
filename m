@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57236)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33497)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eB1A4-00008C-OF
-	for qemu-devel@nongnu.org; Sat, 04 Nov 2017 12:19:09 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1eB1j9-00056H-Tg
+	for qemu-devel@nongnu.org; Sat, 04 Nov 2017 12:55:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eB1A3-0006YL-Qt
-	for qemu-devel@nongnu.org; Sat, 04 Nov 2017 12:19:08 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20171103202624.5956-1-laurent@vivier.eu>
-	<db255c93-a4c6-216d-8ea3-10f340a916f6@amsat.org>
-	<257f2a30-6607-cb14-3bbf-27b95d962cf4@amsat.org>
-	<89487dfd-f941-871f-e822-68a6fbace6fe@vivier.eu>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <23b10dc0-2bb6-b53d-dfaa-a641630f8aaf@amsat.org>
-Date: Sat, 4 Nov 2017 13:18:59 -0300
+	(envelope-from <paolo.bonzini@gmail.com>) id 1eB1j5-0000yq-2a
+	for qemu-devel@nongnu.org; Sat, 04 Nov 2017 12:55:23 -0400
+Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:47177)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1eB1j4-0000yT-Rh
+	for qemu-devel@nongnu.org; Sat, 04 Nov 2017 12:55:18 -0400
+Received: by mail-wm0-x234.google.com with SMTP id r196so6678494wmf.2
+	for <qemu-devel@nongnu.org>; Sat, 04 Nov 2017 09:55:18 -0700 (PDT)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+References: <20171103075753.23217-1-kraxel@redhat.com>
+	<20171104100908.GS4167@stuge.se>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <ac142da5-657a-72dc-ec72-17bd3050d39b@redhat.com>
+Date: Sat, 4 Nov 2017 17:55:13 +0100
 MIME-Version: 1.0
-In-Reply-To: <89487dfd-f941-871f-e822-68a6fbace6fe@vivier.eu>
+In-Reply-To: <20171104100908.GS4167@stuge.se>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 0/4] softfloat: fix some helper
- definitions
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [SeaBIOS] [PATCH] Ignore sgabios rom in case
+ sercon is enabled.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,68 +33,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, qemu-arm@nongnu.org, Stafford Horne <shorne@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>
+To: Peter Stuge <peter@stuge.se>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: seabios@seabios.org, "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
 
-On 11/04/2017 05:55 AM, Laurent Vivier wrote:
-> Le 03/11/2017 à 22:51, Philippe Mathieu-Daudé a écrit :
->>> On 11/03/2017 05:26 PM, Laurent Vivier wrote:
->>>> This series fixes some errors found by
->>>> enabling USE_SOFTFLOAT_STRUCT_TYPES.
->> [...]
->>>
->>> I'm getting those errors:
->>>
->>> $ make subdir-arm-softmmu -j2
->>>
->>> /source/qemu/migration/vmstate-types.c:430:5: error: conversion to
->>> non-scalar type requested
->>>      qemu_put_be64(f, float64_val(*v));
->>>      ^~~~~~~~~~~~~
->>> make: *** [migration/vmstate-types.o] Error 1
-[...]
-> 
-> These series doesn't fix all the problems, only the easiest to fix...
-> 
-> for this one, you need:
-> 
-> diff --git a/migration/vmstate-types.c b/migration/vmstate-types.c
-> index 48184c380d..0c273d616a 100644
-> --- a/migration/vmstate-types.c
-> +++ b/migration/vmstate-types.c
-> @@ -425,7 +425,7 @@ static int get_float64(QEMUFile *f, void *pv, size_t
-> size,
->  static int put_float64(QEMUFile *f, void *pv, size_t size, VMStateField
-> *field,
->                         QJSON *vmdesc)
->  {
-> -    uint64_t *v = pv;
-> +    float64 *v = pv;
-> 
->      qemu_put_be64(f, float64_val(*v));
->      return 0;
+On 04/11/2017 11:09, Peter Stuge wrote:
+>> +        if (strcmp(file->name, "vgaroms/sgabios.bin") == 0 &&
+>> +            CONFIG_SERCON && romfile_loadint("etc/sercon-port", 0)) {
+>> +            dprintf(1, "sercon: is enabled, not loading sgabios rom.\n");
+>> +            continue;
+>> +        }
+> This heuristic isn't very reliable. Is there nothing in the sgabios.bin
+> option ROM itself that can be used instead?
 
-If you respin with this one you can add my Reviewed-by + Tested-by.
+In what sense it is not very reliable?
 
-Another error:
-
-$ make subdir-aarch64-softmmu
-[...]
-  CC      target/arm/helper-a64.o
-/source/qemu/target/arm/helper-a64.c: In function ‘helper_simd_tbl’:
-/source/qemu/target/arm/helper-a64.c:162:38: error: incompatible type
-for argument 1 of ‘extract64’
-             uint64_t val = extract64(env->vfp.regs[elt], bitidx, 8);
-                                      ^~~
-In file included from /source/qemu/include/qemu/bitmap.h:16:0,
-                 from /source/qemu/include/hw/qdev-core.h:6,
-                 from /source/qemu/include/qom/cpu.h:23,
-                 from /source/qemu/target/arm/cpu-qom.h:23,
-                 from /source/qemu/target/arm/cpu.h:39,
-                 from /source/qemu/target/arm/helper-a64.c:21:
-/source/qemu/include/qemu/bitops.h:316:24: note: expected ‘uint64_t {aka
-long unsigned int}’ but argument is of type ‘float64 {aka struct
-<anonymous>}’
- static inline uint64_t extract64(uint64_t value, int start, int length)
-                        ^~~~~~~~~
-make: *** [target/arm/helper-a64.o] Error 1
+Paolo
