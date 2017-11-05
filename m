@@ -1,21 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45489)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47002)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eBMGF-0000ht-IE
-	for qemu-devel@nongnu.org; Sun, 05 Nov 2017 09:50:56 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1eBMLi-0002iu-6E
+	for qemu-devel@nongnu.org; Sun, 05 Nov 2017 09:56:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eBMGA-0003L8-N8
-	for qemu-devel@nongnu.org; Sun, 05 Nov 2017 09:50:55 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53780)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eBMGA-0003KW-He
-	for qemu-devel@nongnu.org; Sun, 05 Nov 2017 09:50:50 -0500
-Date: Sun, 5 Nov 2017 09:50:48 -0500 (EST)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1eBMLe-0007Ec-A1
+	for qemu-devel@nongnu.org; Sun, 05 Nov 2017 09:56:34 -0500
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:55524)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1eBMLe-0007DA-3k
+	for qemu-devel@nongnu.org; Sun, 05 Nov 2017 09:56:30 -0500
+Received: by mail-wm0-x243.google.com with SMTP id y83so9520325wmc.4
+	for <qemu-devel@nongnu.org>; Sun, 05 Nov 2017 06:56:29 -0800 (PST)
+Received: from donizetti.lan (94-39-170-107.adsl-ull.clienti.tiscali.it.
+	[94.39.170.107]) by smtp.gmail.com with ESMTPSA id
+	b15sm13030903wrh.35.2017.11.05.06.56.25 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Sun, 05 Nov 2017 06:56:26 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <933836135.17566227.1509893448345.JavaMail.zimbra@redhat.com>
+Date: Sun,  5 Nov 2017 15:56:23 +0100
+Message-Id: <20171105145625.7817-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] broken --enable-crypto-afalg?
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 0/2] Changes for 2017-11-05
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,29 +33,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: berrange@redhat.com, arei.gonglei@huawei.com
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-Seen on both RHEL7 and Ubuntu:
+The following changes since commit b33afc415622e5eb26e0f14fd27eb86e32a5472e:
 
-$ gtester -k --verbose -m=quick tests/test-crypto-hash
-TEST: tests/test-crypto-hash... (pid=96313)
-  /crypto/hash/iov:                                                    FAIL
-GTester: last random seed: R02S1fb9dd7b21cb29ff371b0d53bccdf6e4
-(pid=96315)
-  /crypto/hash/alloc:                                                  FAIL
-GTester: last random seed: R02S7d4a497cd03a646b3fcef4a56de90b00
-(pid=96316)
-  /crypto/hash/prealloc:                                               FAIL
-GTester: last random seed: R02S72a273f4764f8b080364ddeb83b7f889
-(pid=96317)
-  /crypto/hash/digest:                                                 FAIL
-GTester: last random seed: R02S6ae0ac44ab193219f9934878cccc7dae
-(pid=96318)
-  /crypto/hash/base64:                                                 FAIL
-GTester: last random seed: R02S425dc43b4dd05127b42896bb02fce05b
-(pid=96319)
-FAIL: tests/test-crypto-hash
-make: *** [check-tests/test-crypto-hash] Error 1
+  Merge remote-tracking branch 'remotes/stsquad/tags/pull-ci-updates-for-softfreeze-021117-2' into staging (2017-11-03 10:08:34 +0000)
 
-Paolo
+are available in the Git repository at:
+
+  git://github.com/bonzini/qemu.git tags/for-upstream
+
+for you to fetch changes up to 20bc94a2b8449b7700b6bfa25a87ce2320a1c649:
+
+  build: disable -Wmissing-braces on older compilers (2017-11-05 14:52:10 +0100)
+
+(I see some brokenness in check-qtest-sparc, but not caused by
+my two patches of course).
+
+----------------------------------------------------------------
+* Remove legacy KVM PCI device assignment
+* Fix qemu-pr-helper.c compilation on older compilers
+
+----------------------------------------------------------------
+Paolo Bonzini (2):
+      pci-assign: Remove
+      build: disable -Wmissing-braces on older compilers
+
+ configure                                          |   13 +
+ docs/qdev-device-use.txt                           |   12 +-
+ hw/i386/Makefile.objs                              |    1 -
+ hw/i386/kvm/Makefile.objs                          |    2 +-
+ hw/i386/kvm/pci-assign.c                           | 1887 --------------------
+ hw/xen/Makefile.objs                               |    1 +
+ .../xen_pt_load_rom.c}                             |    4 +-
+ include/hw/pci/pci-assign.h                        |   27 -
+ qdev-monitor.c                                     |    1 -
+ scripts/device-crash-test                          |    2 -
+ 10 files changed, 19 insertions(+), 1931 deletions(-)
+ delete mode 100644 hw/i386/kvm/pci-assign.c
+ rename hw/{i386/pci-assign-load-rom.c => xen/xen_pt_load_rom.c} (96%)
+ delete mode 100644 include/hw/pci/pci-assign.h
+-- 
+2.14.3
