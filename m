@@ -1,34 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43856)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46567)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1eBnf9-0006cN-OS
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 15:06:31 -0500
+	(envelope-from <cota@braap.org>) id 1eBnmA-000202-8T
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 15:13:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1eBnf5-0001vb-P7
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 15:06:27 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:46500)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1eBnf5-0001vK-Fu
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 15:06:23 -0500
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vA6K5P23091731
-	for <qemu-devel@nongnu.org>; Mon, 6 Nov 2017 15:06:15 -0500
-Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2e2wmjjm52-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 06 Nov 2017 15:06:14 -0500
-Received: from localhost
-	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
-	Mon, 6 Nov 2017 20:06:11 -0000
-From: Greg Kurz <groug@kaod.org>
-Date: Mon,  6 Nov 2017 21:05:54 +0100
-In-Reply-To: <20171106200554.5894-1-groug@kaod.org>
-References: <20171106200554.5894-1-groug@kaod.org>
-Message-Id: <20171106200554.5894-3-groug@kaod.org>
-Subject: [Qemu-devel] [PULL 2/2] 9pfs: fix v9fs_mark_fids_unreclaim() return
- value
+	(envelope-from <cota@braap.org>) id 1eBnm9-00053x-38
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 15:13:42 -0500
+Date: Mon, 6 Nov 2017 15:13:32 -0500
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20171106201332.GA2152@flamenco>
+References: <1509734853-3014-1-git-send-email-cota@braap.org>
+	<20171103185610.GA3907@flamenco>
+	<20171103200233.GI3111@localhost.localdomain>
+	<20171103222407.GA22411@flamenco>
+	<20171106141022.GO3111@localhost.localdomain>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171106141022.GO3111@localhost.localdomain>
+Subject: Re: [Qemu-devel] [PATCH] hw: add .min_cpus and .default_cpus fields
+ to machine_class
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,30 +27,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Greg Kurz <groug@kaod.org>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Thomas Huth <thuth@redhat.com>, qemu-arm@nongnu.org, Igor Mitsyanko <i.mitsyanko@gmail.com>, Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@gmail.com>, Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
-The return value of v9fs_mark_fids_unreclaim() is then propagated to
-pdu_complete(). It should be a negative errno, not -1.
+On Mon, Nov 06, 2017 at 12:10:22 -0200, Eduardo Habkost wrote:
+> IMO, initialization state doesn't belong to CPUClass.  We already
+> have a single accelerator object in MachineState::accelerator,
+> and tcg_initialized could be moved to a AccelState::initialized
+> field.
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
-Reviewed-by: Eric Blake <eblake@redhat.com>
+I don't know how to cleanly get AccelState from a CPUClass pointer
+(as I said I'm not familiar with object code / qom) -- suggestions
+welcome! The best I could come up in the limited time I have for
+this is to use a static bool, as shown below.
+
+
+---8<---
+
+Subject: [PATCH] qom: move CPUClass.tcg_initialize to a global
+
+55c3cee ("qom: Introduce CPUClass.tcg_initialize", 2017-10-24)
+introduces a per-CPUClass bool that we check so that the target CPU
+is initialized for TCG only once. This works well except when
+we end up creating more than one CPUClass, in which case we end
+up incorrectly initializing TCG more than once, i.e. once for
+each CPUClass.
+
+This can be replicated with:
+  $ aarch64-softmmu/qemu-system-aarch64 -machine xlnx-zcu102 -smp 6 \
+      -global driver=xlnx,,zynqmp,property=has_rpu,value=on
+In this case the class name of the "RPUs" is prefixed by "cortex-r5-",
+whereas the "regular" CPUs are prefixed by "cortex-a53-". This
+results in two CPUClass instances being created.
+
+Fix it by introducing a static variable, so that only the first
+target CPU being initialized will initialize the target-dependent
+part of TCG, regardless of CPUClass instances.
+
+Fixes: 55c3ceef61fcf06fc98ddc752b7cce788ce7680b
+Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- hw/9pfs/9p.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ exec.c            | 5 +++--
+ include/qom/cpu.h | 1 -
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
-index f8bbac251dc9..52d46632fe15 100644
---- a/hw/9pfs/9p.c
-+++ b/hw/9pfs/9p.c
-@@ -512,7 +512,7 @@ static int coroutine_fn v9fs_mark_fids_unreclaim(V9fsPDU *pdu, V9fsPath *path)
-             /* reopen the file/dir if already closed */
-             err = v9fs_reopen_fid(pdu, fidp);
-             if (err < 0) {
--                return -1;
-+                return err;
-             }
-             /*
-              * Go back to head of fid list because
+diff --git a/exec.c b/exec.c
+index 97a24a8..8b579c0 100644
+--- a/exec.c
++++ b/exec.c
+@@ -792,11 +792,12 @@ void cpu_exec_initfn(CPUState *cpu)
+ void cpu_exec_realizefn(CPUState *cpu, Error **errp)
+ {
+     CPUClass *cc = CPU_GET_CLASS(cpu);
++    static bool tcg_target_initialized;
+ 
+     cpu_list_add(cpu);
+ 
+-    if (tcg_enabled() && !cc->tcg_initialized) {
+-        cc->tcg_initialized = true;
++    if (tcg_enabled() && !tcg_target_initialized) {
++        tcg_target_initialized = true;
+         cc->tcg_initialize();
+     }
+ 
+diff --git a/include/qom/cpu.h b/include/qom/cpu.h
+index fa4b0c9..c2fa151 100644
+--- a/include/qom/cpu.h
++++ b/include/qom/cpu.h
+@@ -209,7 +209,6 @@ typedef struct CPUClass {
+     /* Keep non-pointer data at the end to minimize holes.  */
+     int gdb_num_core_regs;
+     bool gdb_stop_before_watchpoint;
+-    bool tcg_initialized;
+ } CPUClass;
+ 
+ #ifdef HOST_WORDS_BIGENDIAN
 -- 
-2.13.6
+2.7.4
