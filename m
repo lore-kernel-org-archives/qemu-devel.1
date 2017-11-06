@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41276)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42109)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jim.quigley@oracle.com>) id 1eD69b-0002no-Dl
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 05:03:17 -0500
+	(envelope-from <no-reply@patchew.org>) id 1eD6C4-0004ZG-G5
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 05:05:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jim.quigley@oracle.com>) id 1eD69X-0000RK-D8
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 05:03:15 -0500
-References: <1507630928-28307-1-git-send-email-Jim.Quigley@oracle.com>
-	<78aed453-49b8-a9e4-ae7c-39c731158eaa@msgid.tls.msk.ru>
-From: Jim Quigley <jim.quigley@oracle.com>
-Message-ID: <1c3087f3-9019-26b3-b4be-df71da2033fc@oracle.com>
-Date: Fri, 10 Nov 2017 10:03:07 +0000
+	(envelope-from <no-reply@patchew.org>) id 1eD6C0-0003Xm-GI
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 05:05:48 -0500
+Resent-Message-Id: <E1eD6C0-0003Xm-GI@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21498)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1eD6C0-0003Wg-8Q
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 05:05:44 -0500
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <150996313592.327.4353631543325177108@bafd83ae6430>
+In-Reply-To: <20171106094643.14881-1-peterx@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <78aed453-49b8-a9e4-ae7c-39c731158eaa@msgid.tls.msk.ru>
-Content-Language: en-US
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] hw/vfio: improve error message when cannot
- init vfio event notifiers
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 6 Nov 2017 02:12:17 -0800 (PST)
+Subject: Re: [Qemu-devel] [RFC v3 00/27] QMP: out-of-band (OOB) execution
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,82 +29,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Tokarev <mjt@tls.msk.ru>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, alex.williamson@redhat.com, laurent@vivier.eu, Jim Quigley <jim.quigley@oracle.com>
+To: peterx@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, lvivier@redhat.comfamz@redhat.com, quintela@redhat.com, mdroth@linux.vnet.ibm.com, armbru@redhat.com, marcandre.lureau@redhat.com, shajnocz@redhat.com, pbonzini@redhat.com, jdenemar@redhat.com, dgilbert@redhat.com
 
-
-
-On 16/10/2017 19:07, Michael Tokarev wrote:
-> 10.10.2017 13:22, Jim Quigley wrote:
->> More information is required to assist trouble-shooting when
->> QEMU fails to initialise the event notifications for devices
->> assigned with VFIO-PCI. Instead of supplying the user with a cryptic
->> error number only, print out a proper error message with strerror()
->> so that the user has a better way to figure out what the problem is.
->>
->> Reviewed-by: Liam Merwick <liam.merwick@oracle.com>
->> Signed-off-by: Jim Quigley <Jim.Quigley@oracle.com>
->> ---
->> Cc: qemu-trivial@nongnu.org
->> Cc: mjt@tls.msk.ru
->> Cc: laurent@vivier.eu
->> Cc: alex.williamson@redhat.com
->> ---
->>   hw/vfio/pci.c | 35 ++++++++++++++++++++++++-----------
->>   1 file changed, 24 insertions(+), 11 deletions(-)
->>
->> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
->> index 31e1edf..3bffb93 100644
->> --- a/hw/vfio/pci.c
->> +++ b/hw/vfio/pci.c
->> @@ -430,13 +430,16 @@ static int vfio_enable_vectors(VFIOPCIDevice *vd=
-ev, bool msix)
->>   static void vfio_add_kvm_msi_virq(VFIOPCIDevice *vdev, VFIOMSIVector=
- *vector,
->>                                     int vector_n, bool msix)
->>   {
->> -    int virq;
->> +    int virq, ret;
->>  =20
->>       if ((msix && vdev->no_kvm_msix) || (!msix && vdev->no_kvm_msi)) =
-{
->>           return;
->>       }
->>  =20
->> -    if (event_notifier_init(&vector->kvm_interrupt, 0)) {
->> +    ret =3D event_notifier_init(&vector->kvm_interrupt, 0);
->> +    if (ret) {
->> +        error_report("vfio (%s): Error: unable to init event notifier=
-: %s (%d)",
->> +                     __func__, strerror(-ret), -ret);
-> Since this pattern gets repeated again and again, maybe we can either
-> use a common wrapper or move that eror reporting into event_notifier_in=
-it()?
-> Note there are other users of this function, besides hw/vfio, and maybe
-> these, too, can benefit from better error reporting?
-
- =C2=A0=C2=A0=C2=A0 Ideally the strerror() would be included in the error=
-_report()=20
-function,
- =C2=A0=C2=A0=C2=A0 (as per the error_setg() function), which obviously w=
-ould involve a=20
-more
- =C2=A0=C2=A0=C2=A0 extensive change to the code base. Would that be an a=
-cceptable=20
-solution ?
- =C2=A0=C2=A0=C2=A0 Or I can move the reporting into theevent_notifier_in=
-it() function=20
-if that is
- =C2=A0=C2=A0=C2=A0 the preferred approach ?
-
- =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 thanks
-
- =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 regards
-
- =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 Jim Q.
->
-> Thanks,
->
-> /mjt
->
->
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
+ZGV2ZWxdIFtSRkMgdjMgMDAvMjddIFFNUDogb3V0LW9mLWJhbmQgKE9PQikgZXhlY3V0aW9uIHN1
+cHBvcnQKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMTcxMTA2MDk0NjQzLjE0ODgxLTEtcGV0
+ZXJ4QHJlZGhhdC5jb20KCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJB
+U0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZh
+aWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcg
+LS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVI
+IC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVj
+a2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIK
+ICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRj
+aC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAg
+IGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5E
+ID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApG
+cm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10g
+ICAgICAgICAgICAgICBwYXRjaGV3LzIwMTcxMTA2MDk0NjQzLjE0ODgxLTEtcGV0ZXJ4QHJlZGhh
+dC5jb20gLT4gcGF0Y2hldy8yMDE3MTEwNjA5NDY0My4xNDg4MS0xLXBldGVyeEByZWRoYXQuY29t
+ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKNTUyNWM0ZTc5MSB0ZXN0czogcW1wLXRl
+c3Q6IGFkZCBvb2IgdGVzdApjY2M5ZTRjMzk5IHRlc3RzOiBxbXAtdGVzdDogdmVyaWZ5IGNvbW1h
+bmQgYmF0Y2hpbmcKN2Y0NWI0YzZjMCBkb2NzOiB1cGRhdGUgUU1QIGRvY3VtZW50cyBmb3IgT09C
+IGNvbW1hbmRzCjU4Y2ZlODc3ZDIgbW9uaXRvcjogZW5hYmxlIElPIHRocmVhZCBmb3IgKHFtcCAm
+ICFtdXgpIHR5cGVkCjVlMWQ1NmNlNzQgcW1wOiBpc29sYXRlIHJlc3BvbnNlcyBpbnRvIGlvIHRo
+cmVhZAphZWY0Mjc1NTM2IHFtcDogbGV0IG1pZ3JhdGUtaW5jb21pbmcgYWxsb3cgb3V0LW9mLWJh
+bmQKNWU2OGJlYWNmMyBxbXA6IHN1cHBvcnQgb3V0LW9mLWJhbmQgKG9vYikgZXhlY3V0aW9uCjQz
+YzcyMTVhMzAgcWFwaTogaW50cm9kdWNlIG5ldyBjbWQgb3B0aW9uICJhbGxvdy1vb2IiCmUxMTEy
+N2JhNGIgbW9uaXRvcjogc2VuZCBldmVudCB3aGVuIHJlcXVlc3QgcXVldWUgZnVsbAo0NWNlZjRm
+N2U0IHFtcDogYWRkIG5ldyBldmVudCAicmVxdWVzdC1kcm9wcGVkIgo0ODVkYTI4YmUxIG1vbml0
+b3I6IHNlcGFyYXRlIFFNUCBwYXJzZXIgYW5kIGRpc3BhdGNoZXIKNDg5MmZlOWNhMiBtb25pdG9y
+OiBsZXQgbW9uaXRvcl97c3VzcGVuZHxyZXN1bWV9IHRocmVhZCBzYWZlCjFiODYxNjZkOWMgbW9u
+aXRvcjogaW50cm9kdWNlIG1vbml0b3JfcW1wX3Jlc3BvbmQoKQowZjQ4MDkzYWRkIHFtcDogaW50
+cm9kdWNlIHNvbWUgY2FwYWJpbGl0eSBoZWxwZXJzCjhkM2YzMzA0M2QgcW1wOiBuZWdvY2lhdGUg
+UU1QIGNhcGFiaWxpdGllcwowMjNiMzg2ZDBlIHFtcDogaW50cm9kdWNlIFFNUENhcGFiaWxpdHkK
+MmJkZTVjYThjZSBtb25pdG9yOiBhbGxvdyB0byB1c2UgSU8gdGhyZWFkIGZvciBwYXJzaW5nCmY0
+Y2MxMTJmODAgbW9uaXRvcjogY3JlYXRlIG1vbml0b3IgZGVkaWNhdGUgaW90aHJlYWQKMzU5MGZk
+YzFkNCBtb25pdG9yOiBsZXQgbW9uX2xpc3QgYmUgdGFpbCBxdWV1ZQoxMWM4MThhOWFjIG1vbml0
+b3I6IHVuaWZ5IGdsb2JhbCBpbml0CjM2ZDNlZmI4N2QgbW9uaXRvcjogbW92ZSB0aGUgY3VyX21v
+biBoYWNrIGRlZXBlciBmb3IgUU1QCmJmM2U0OTNhODYgcWpzb246IGFkZCAib3BhcXVlIiBmaWVs
+ZCB0byBKU09OTWVzc2FnZVBhcnNlcgoxNzM2N2ZlN2ExIG1vbml0b3I6IG1vdmUgc2tpcF9mbHVz
+aCBpbnRvIG1vbml0b3JfZGF0YV9pbml0CjBjOThkNGJhYTQgcW9iamVjdDogbGV0IG9iamVjdF9w
+cm9wZXJ0eV9nZXRfc3RyKCkgdXNlIG5ldyBBUEkKYWE0Yjk3M2RkNSBxb2JqZWN0OiBpbnRyb2R1
+Y2UgcW9iamVjdF9nZXRfdHJ5X3N0cigpCjk4MWNjZWJjMWUgcW9iamVjdDogaW50cm9kdWNlIHFz
+dHJpbmdfZ2V0X3RyeV9zdHIoKQpkNDBiYTM4MDg1IGNoYXItaW86IGZpeCBwb3NzaWJsZSByYWNl
+IG9uIElPV2F0Y2hQb2xsCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzI3
+OiBjaGFyLWlvOiBmaXggcG9zc2libGUgcmFjZSBvbiBJT1dhdGNoUG9sbC4uLgpDaGVja2luZyBQ
+QVRDSCAyLzI3OiBxb2JqZWN0OiBpbnRyb2R1Y2UgcXN0cmluZ19nZXRfdHJ5X3N0cigpLi4uCkNo
+ZWNraW5nIFBBVENIIDMvMjc6IHFvYmplY3Q6IGludHJvZHVjZSBxb2JqZWN0X2dldF90cnlfc3Ry
+KCkuLi4KQ2hlY2tpbmcgUEFUQ0ggNC8yNzogcW9iamVjdDogbGV0IG9iamVjdF9wcm9wZXJ0eV9n
+ZXRfc3RyKCkgdXNlIG5ldyBBUEkuLi4KQ2hlY2tpbmcgUEFUQ0ggNS8yNzogbW9uaXRvcjogbW92
+ZSBza2lwX2ZsdXNoIGludG8gbW9uaXRvcl9kYXRhX2luaXQuLi4KQ2hlY2tpbmcgUEFUQ0ggNi8y
+NzogcWpzb246IGFkZCAib3BhcXVlIiBmaWVsZCB0byBKU09OTWVzc2FnZVBhcnNlci4uLgpDaGVj
+a2luZyBQQVRDSCA3LzI3OiBtb25pdG9yOiBtb3ZlIHRoZSBjdXJfbW9uIGhhY2sgZGVlcGVyIGZv
+ciBRTVAuLi4KQ2hlY2tpbmcgUEFUQ0ggOC8yNzogbW9uaXRvcjogdW5pZnkgZ2xvYmFsIGluaXQu
+Li4KQ2hlY2tpbmcgUEFUQ0ggOS8yNzogbW9uaXRvcjogbGV0IG1vbl9saXN0IGJlIHRhaWwgcXVl
+dWUuLi4KQ2hlY2tpbmcgUEFUQ0ggMTAvMjc6IG1vbml0b3I6IGNyZWF0ZSBtb25pdG9yIGRlZGlj
+YXRlIGlvdGhyZWFkLi4uCkNoZWNraW5nIFBBVENIIDExLzI3OiBtb25pdG9yOiBhbGxvdyB0byB1
+c2UgSU8gdGhyZWFkIGZvciBwYXJzaW5nLi4uCkNoZWNraW5nIFBBVENIIDEyLzI3OiBxbXA6IGlu
+dHJvZHVjZSBRTVBDYXBhYmlsaXR5Li4uCkNoZWNraW5nIFBBVENIIDEzLzI3OiBxbXA6IG5lZ29j
+aWF0ZSBRTVAgY2FwYWJpbGl0aWVzLi4uCkNoZWNraW5nIFBBVENIIDE0LzI3OiBxbXA6IGludHJv
+ZHVjZSBzb21lIGNhcGFiaWxpdHkgaGVscGVycy4uLgpDaGVja2luZyBQQVRDSCAxNS8yNzogbW9u
+aXRvcjogaW50cm9kdWNlIG1vbml0b3JfcW1wX3Jlc3BvbmQoKS4uLgpDaGVja2luZyBQQVRDSCAx
+Ni8yNzogbW9uaXRvcjogbGV0IG1vbml0b3Jfe3N1c3BlbmR8cmVzdW1lfSB0aHJlYWQgc2FmZS4u
+LgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3Rh
+dGVtZW50CiMyODogRklMRTogbW9uaXRvci5jOjQwMTQ6CisgICAgaWYgKGF0b21pY19kZWNfZmV0
+Y2goJm1vbi0+c3VzcGVuZF9jbnQpID09IDApClsuLi5dCgpFUlJPUjogTWlzc2luZyBTaWduZWQt
+b2ZmLWJ5OiBsaW5lKHMpCgp0b3RhbDogMiBlcnJvcnMsIDAgd2FybmluZ3MsIDE2IGxpbmVzIGNo
+ZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYg
+YW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRo
+ZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBB
+VENIIDE3LzI3OiBtb25pdG9yOiBzZXBhcmF0ZSBRTVAgcGFyc2VyIGFuZCBkaXNwYXRjaGVyLi4u
+CkNoZWNraW5nIFBBVENIIDE4LzI3OiBxbXA6IGFkZCBuZXcgZXZlbnQgInJlcXVlc3QtZHJvcHBl
+ZCIuLi4KQ2hlY2tpbmcgUEFUQ0ggMTkvMjc6IG1vbml0b3I6IHNlbmQgZXZlbnQgd2hlbiByZXF1
+ZXN0IHF1ZXVlIGZ1bGwuLi4KQ2hlY2tpbmcgUEFUQ0ggMjAvMjc6IHFhcGk6IGludHJvZHVjZSBu
+ZXcgY21kIG9wdGlvbiAiYWxsb3ctb29iIi4uLgpDaGVja2luZyBQQVRDSCAyMS8yNzogcW1wOiBz
+dXBwb3J0IG91dC1vZi1iYW5kIChvb2IpIGV4ZWN1dGlvbi4uLgpDaGVja2luZyBQQVRDSCAyMi8y
+NzogcW1wOiBsZXQgbWlncmF0ZS1pbmNvbWluZyBhbGxvdyBvdXQtb2YtYmFuZC4uLgpDaGVja2lu
+ZyBQQVRDSCAyMy8yNzogcW1wOiBpc29sYXRlIHJlc3BvbnNlcyBpbnRvIGlvIHRocmVhZC4uLgpD
+aGVja2luZyBQQVRDSCAyNC8yNzogbW9uaXRvcjogZW5hYmxlIElPIHRocmVhZCBmb3IgKHFtcCAm
+ICFtdXgpIHR5cGVkLi4uCkNoZWNraW5nIFBBVENIIDI1LzI3OiBkb2NzOiB1cGRhdGUgUU1QIGRv
+Y3VtZW50cyBmb3IgT09CIGNvbW1hbmRzLi4uCkNoZWNraW5nIFBBVENIIDI2LzI3OiB0ZXN0czog
+cW1wLXRlc3Q6IHZlcmlmeSBjb21tYW5kIGJhdGNoaW5nLi4uCkNoZWNraW5nIFBBVENIIDI3LzI3
+OiB0ZXN0czogcW1wLXRlc3Q6IGFkZCBvb2IgdGVzdC4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRl
+c3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRv
+bWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5
+b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
