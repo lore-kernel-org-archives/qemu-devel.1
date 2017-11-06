@@ -1,34 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42249)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42383)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eBmP4-0003Qz-Rt
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 13:45:48 -0500
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1eBmPI-0003eA-OR
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 13:46:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eBmOz-0000Mu-W2
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 13:45:46 -0500
-Received: from indium.canonical.com ([91.189.90.7]:34246)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eBmOz-0000KK-Qi
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 13:45:41 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eBmOy-00073L-4r
-	for <qemu-devel@nongnu.org>; Mon, 06 Nov 2017 18:45:40 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 1E1392E80CD
-	for <qemu-devel@nongnu.org>; Mon,  6 Nov 2017 18:45:40 +0000 (UTC)
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1eBmPD-0000bk-Px
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 13:46:00 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:44454
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
+	id 1eBmPD-0000b9-JL
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 13:45:55 -0500
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	vA6Ijdg0070950
+	for <qemu-devel@nongnu.org>; Mon, 6 Nov 2017 13:45:49 -0500
+Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2e2v44bpr0-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 06 Nov 2017 13:45:48 -0500
+Received: from localhost
+	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
+	Mon, 6 Nov 2017 11:45:48 -0700
+References: <1507222047-20115-1-git-send-email-stefanb@linux.vnet.ibm.com>
+	<CAJ+F1CLo46LvnfH_EBT9CRzuyKojKz3G-NMfJ7poyXZy5QxPJg@mail.gmail.com>
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Date: Mon, 6 Nov 2017 13:45:44 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <CAJ+F1CLo46LvnfH_EBT9CRzuyKojKz3G-NMfJ7poyXZy5QxPJg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Message-Id: <7825177e-8347-1340-4fb7-bd1805c8a044@linux.vnet.ibm.com>
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 06 Nov 2017 18:35:03 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1077116 <1077116@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20121109183454.27088.83319.malonedeb@gac.canonical.com>
-Message-Id: <150999330382.4653.18389384542431290090.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1077116] Re: automoc4 segfaults when building in
- an armhf pbuilder on an amd64 host
+Subject: Re: [Qemu-devel] [PATCH] specs: Extend TPM spec with TPM emulator
+ description
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,94 +43,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>
+Cc: QEMU <qemu-devel@nongnu.org>, Amarnath Valluri <amarnath.valluri@intel.com>
 
-I was able to reproduce this failure with QEMU 2.5, and the code runs OK
-under QEMU current master, so I think this is fixed by the
-threading/signal handling bugfixes we've done between then and now. I'm
-going to close this as will-be-fixed-in-2.11 (though it's quite possible
-it's already fixed in 2.10).
+On 10/06/2017 12:03 PM, Marc-Andr=C3=A9 Lureau wrote:
+> Hi
+>
+> On Thu, Oct 5, 2017 at 6:47 PM, Stefan Berger
+> <stefanb@linux.vnet.ibm.com> wrote:
+>> Following the recent extension of QEMU with a TPM emulator device,
+>> update the specs describing for how to interact with the device.
+>>
+>> The results of commands run inside a Linux VM are expected to be
+>> similar to those when the TPM passthrough device is used, so we
+>> just reuse that.
+>>
+>> Fix a typo on the way.
+>>
+>> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+> Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>
+>
+>> ---
+>>   docs/specs/tpm.txt | 79 ++++++++++++++++++++++++++++++++++++++++++++=
+++++++++++
+>>   1 file changed, 79 insertions(+)
+>>
+>> diff --git a/docs/specs/tpm.txt b/docs/specs/tpm.txt
+>> index 914daac..9bef8b3 100644
+>> --- a/docs/specs/tpm.txt
+>> +++ b/docs/specs/tpm.txt
+>> @@ -121,3 +121,82 @@ crw-------. 1 root root 10, 224 Jul 11 10:11 /dev=
+/tpm0
+>>   PCR-00: 35 4E 3B CE 23 9F 38 59 ...
+>>   ...
+>>   PCR-23: 00 00 00 00 00 00 00 00 ...
+>> +
+>> +
+>> +=3D=3D The QEMU TPM emulator device =3D=3D
+>> +
+>> +The TPM emulator device uses an external TPM emulator called 'swtpm' =
+for
+>> +sending TPM commands to and receiving responses from. The swtpm progr=
+am
+>> +must have been started before trying to access it through the TPM emu=
+lator
+>> +with QEMU.
+>> +
+>> +The TPM emulator implements a command channel for transferring TPM co=
+mmands
+>> +and responses as well as a control channel over which control command=
+s can
+>> +be sent. The specification for the control channel can be found here:
+>> +
+>> +https://github.com/stefanberger/swtpm/blob/master/man/man3/swtpm_ioct=
+ls.pod
+>> +
+>> +
+>> +The control channel serves the purpose of resetting, initializing, an=
+d
+>> +migrating the TPM state, among other things.
+>> +
+>> +The swtpm program behaves like a hardware TPM and therefore needs to =
+be
+>> +initialized by the firmware running inside the QEMU virtual machine.
+>> +One necessary step for initializing the device is to send the TPM_Sta=
+rtup
+>> +command to it. SeaBIOS, for example, has been instrumented to initial=
+ize
+>> +a TPM 1.2 or TPM 2 device using this command.
+>> +
+>> +
+>> +QEMU files related to the TPM emulator device:
+>> + - hw/tpm/tpm_emulator.c
+>> + - hw/tpm/tpm_util.c
+>> + - hw/tpm/tpm_util.h
+>> +
+>> +
+>> +The following commands start the swtpm with a UnixIO control channel =
+over
+>> +a socket interface. They do not need to be run as root.
+>> +
+>> +mkdir /tmp/mytpm1
+> You no longer need swtpm_setup? nice
+
+swtpm_setup is only needed if the TPM 1.2 is supposed to have an=20
+endorsement key (EK) and possibly an EK certificate when it starts up.=20
+In the simplest case it is not necessary to use swtpm_setup.
+
+     Stefan
 
 
-** Changed in: qemu
-       Status: New =3D> Fix Committed
+>
+>> +swtpm socket --tpmstate dir=3D/tmp/mytpm1 \
+>> +  --ctrl type=3Dunixio,path=3D/tmp/mytpm1/swtpm-sock \
+>> +  --log level=3D20
+>> +
+>> +Command line to start QEMU with the TPM emulator device using the hos=
+t's
+>> +hardware TPM /dev/tpm0:
 
--- =
+I fixed this to:
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1077116
-
-Title:
-  automoc4 segfaults when building in an armhf pbuilder on an amd64 host
-
-Status in QEMU:
-  Fix Committed
-Status in qemu package in Ubuntu:
-  Confirmed
-
-Bug description:
-  When trying to build kde4libs in an armhf pbuilder created with the
-  pbuilder-scripts running on an amd64 host automoc4 recieves a
-  segmentation fault and I can't get any useful information out of it:
-
-  root@yofel-thinkpad:/tmp/kde4libs-4.9.3/build/kdeui# /usr/bin/automoc4 kd=
-eui_automoc.cpp ../../kdeui/ . moc-qt4 cmake
-  unable to dump 00102c00
-  Segmentation fault (core dumped)
-  root@yofel-thinkpad:/tmp/kde4libs-4.9.3/build/kdeui# gdb /usr/bin/automoc=
-4 qemu_automoc4_20121108-211818_15839.core  =
-
-  GNU gdb (GDB) 7.5-ubuntu
-  Copyright (C) 2012 Free Software Foundation, Inc.
-  License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.h=
-tml>
-  This is free software: you are free to change and redistribute it.
-  There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
-  and "show warranty" for details.
-  This GDB was configured as "arm-linux-gnueabihf".
-  For bug reporting instructions, please see:
-  <http://www.gnu.org/software/gdb/bugs/>...
-  Reading symbols from /usr/bin/automoc4...done.
-  BFD: Warning: /tmp/kde4libs-4.9.3/build/kdeui/qemu_automoc4_20121108-2118=
-18_15839.core is truncated: expected core file size >=3D 5150720, found: 97=
-4848.
-  [New LWP 15839]
-  [New LWP 15866]
-  Cannot access memory at address 0xf67fe954
-  Cannot access memory at address 0xf67fe950
-  (gdb) bt
-  #0  0xf6630306 in ?? ()
-  #1  0xf6415ff8 in ?? ()
-  #2  0xf6415ff8 in ?? ()
-  Backtrace stopped: previous frame identical to this frame (corrupt stack?)
-  (gdb) =
+Command line to start QEMU with the TPM emulator device communicating
+with the swtpm:
 
 
-  automoc4 runs fine when building on a nexus7 so this sounds like an issue=
- in qemu.
-  Tested in quantal and raring.
+    Stefan
 
-  ProblemType: Bug
-  DistroRelease: Ubuntu 13.04
-  Package: qemu-user-static 1.2.0-2012.09-0ubuntu1
-  Uname: Linux 3.6.2-030602-generic x86_64
-  NonfreeKernelModules: nvidia
-  ApportVersion: 2.6.2-0ubuntu3
-  Architecture: amd64
-  Date: Fri Nov  9 19:29:28 2012
-  EcryptfsInUse: Yes
-  InstallationDate: Installed on 2011-10-08 (398 days ago)
-  InstallationMedia: Kubuntu 11.10 "Oneiric Ocelot" - Beta amd64 (20111007)
-  MarkForUpload: True
-  ProcEnviron:
-   SHELL=3D/bin/bash
-   TERM=3Dxterm
-   PATH=3D(custom, user)
-   LANG=3Den_US.UTF-8
-   LANGUAGE=3Den_US.UTF-8
-  SourcePackage: qemu-linaro
-  UpgradeStatus: No upgrade log present (probably fresh install)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1077116/+subscriptions
+>> +
+>> +qemu-system-x86_64 -display sdl -enable-kvm \
+>> +  -m 1024 -boot d -bios bios-256k.bin -boot menu=3Don \
+>> +  -chardev socket,id=3Dchrtpm,path=3D/tmp/mytpm1/swtpm-sock \
+>> +  -tpmdev emulator,id=3Dtpm0,chardev=3Dchrtpm \
+>> +  -device tpm-tis,tpmdev=3Dtpm0 test.img
+>> +
+>> +
+>> +In case SeaBIOS is used as firmware, it should show the TPM menu item
+>> +after entering the menu with 'ESC'.
+>> +
+>> +Select boot device:
+>> +1. DVD/CD [ata1-0: QEMU DVD-ROM ATAPI-4 DVD/CD]
+>> +[...]
+>> +5. Legacy option rom
+>> +
+>> +t. TPM Configuration
+>> +
+>> +
+>> +The following commands should result in similar output inside the VM =
+with a
+>> +Linux kernel that either has the TPM TIS driver built-in or available=
+ as a
+>> +module:
+>> +
+>> +#> dmesg | grep -i tpm
+>> +[    0.711310] tpm_tis 00:06: 1.2 TPM (device=3Did 0x1, rev-id 1)
+>> +
+>> +#> dmesg | grep TCPA
+>> +[    0.000000] ACPI: TCPA 0x0000000003FFD191C 000032 (v02 BOCHS  \
+>> +    BXPCTCPA 0000001 BXPC 00000001)
+>> +
+>> +#> ls -l /dev/tpm*
+>> +crw-------. 1 root root 10, 224 Jul 11 10:11 /dev/tpm0
+>> +
+>> +#> find /sys/devices/ | grep pcrs$ | xargs cat
+>> +PCR-00: 35 4E 3B CE 23 9F 38 59 ...
+>> +...
+>> +PCR-23: 00 00 00 00 00 00 00 00 ...
+>> --
+>> 2.5.5
+>>
+>
+>
