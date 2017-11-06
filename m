@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38595)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39996)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eBkws-0004gy-Gp
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 12:12:35 -0500
+	(envelope-from <bounces@canonical.com>) id 1eBl0t-0006aa-6G
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 12:16:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eBkwr-00022n-Li
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 12:12:34 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49440)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eBkwr-00022V-DW
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 12:12:33 -0500
-References: <20171106114134.10125-1-berrange@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <e34755df-ce62-ad41-7974-7bce9bdc6621@redhat.com>
-Date: Mon, 6 Nov 2017 11:12:30 -0600
+	(envelope-from <bounces@canonical.com>) id 1eBl0p-0003m6-QU
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 12:16:43 -0500
+Received: from indium.canonical.com ([91.189.90.7]:58240)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eBl0p-0003ka-Kb
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 12:16:39 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eBl0o-0005Sz-IA
+	for <qemu-devel@nongnu.org>; Mon, 06 Nov 2017 17:16:38 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 838C02E8058
+	for <qemu-devel@nongnu.org>; Mon,  6 Nov 2017 17:16:38 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20171106114134.10125-1-berrange@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="8gNGUtNJR0sB8ORbRc0oDmDdUE998HlTu"
-Subject: Re: [Qemu-devel] [PATCH] build: remove use of MAKELEVEL
- optimization in submodule handling
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 06 Nov 2017 17:03:16 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Reply-To: Bug 1617929 <1617929@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20160829083959.18113.76446.malonedeb@chaenomeles.canonical.com>
+Message-Id: <150998779660.5027.2420958186220572702.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1617929] Re: qemu hangs in pselect syscall
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,85 +36,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Greg Kurz <groug@kaod.org>
+To: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---8gNGUtNJR0sB8ORbRc0oDmDdUE998HlTu
-From: Eric Blake <eblake@redhat.com>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Greg Kurz <groug@kaod.org>
-Message-ID: <e34755df-ce62-ad41-7974-7bce9bdc6621@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] build: remove use of MAKELEVEL optimization
- in submodule handling
-References: <20171106114134.10125-1-berrange@redhat.com>
-In-Reply-To: <20171106114134.10125-1-berrange@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 11/06/2017 05:41 AM, Daniel P. Berrange wrote:
-> The Makefile attempts to optimize the handling of submodules by using M=
-AKELEVEL
-> to only check the submodule status when running from the top level make=
-
-> invokation. This causes problems for people who are using a makefile of=
- their
-
-s/invokation/invocation/
-
-> own to in turn invoke QEMU's makefile, as MAKELEVEL is already set to 1=
- (or
-> more) when QEMU's makefile runs.
->=20
-> This optimization should not really be needed, since the git-submodule.=
-sh
-> script is already used to detect if a submodule update is required. Thi=
-s by
-
-s/This/Thus/
-
-> removing the MAKELEVEL check, we at most add an extra 'git-submodule.sh=
- status'
-> call to each make level, the overhead of which is lost in noise of buil=
-ding
-> QEMU.
->=20
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> ---
->=20
-> NB this is on top of https://lists.gnu.org/archive/html/qemu-devel/2017=
--11/msg00449.html
-
-Or in wording understood by patchew:
-
-Based-on:
-https://lists.gnu.org/archive/html/qemu-devel/2017-11/msg00449.html
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+I can't reproduce this with current git master, and I know we fixed a
+lot of race conditions in linux-user. So I'm going to close this bug --
+if it's still a problem for you with new QEMU, please reopen, preferably
+with a repro case that's more frequent than 1-in-50-or-less.
 
 
---8gNGUtNJR0sB8ORbRc0oDmDdUE998HlTu
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+** Changed in: qemu
+       Status: New =3D> Fix Committed
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+-- =
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloAl/4ACgkQp6FrSiUn
-Q2rTjgf/dM6QKFMJesYRwrAEdufzLR6vOaWRY92snRcxqKubwj1B4GvYn8j1o++A
-rsuIl3Vaeodq8E05mHfmOFLU8n4nEW3lVBb+C2ORTtjMq/y1UGa7167Y6+y4DMhH
-EvATLWjGzVv0BhWT3tK8H5fc7DvuZF5veQSdoKUFFC222MVKUvHQDZgxgJ9aj40u
-efPx65FEkAfwtmnpsIB1pp6ddGnngfLiFAN/OVLjfZJVCI7In7+mT5R1ueyIXUbL
-n/t29f137J29Uhiq4W8TQESDNHVo+8+lMU+unnmT4yHmuaaWrx8D0WfoOtmy9ZLm
-LdZj/s5Lt7wzLBAWQ6zXRaKFY+zk8A==
-=vLiu
------END PGP SIGNATURE-----
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1617929
 
---8gNGUtNJR0sB8ORbRc0oDmDdUE998HlTu--
+Title:
+  qemu hangs in pselect syscall
+
+Status in QEMU:
+  Fix Committed
+
+Bug description:
+  I'm using git commit d75aa4372f0414c9960534026a562b0302fcff29 (v2.7.0-rc4=
+) configured with;
+      --enable-linux-user \
+      --disable-system \
+      --disable-tools \
+      --disable-guest-agent \
+      --static --disable-linux-aio \
+      --disable-fdt \
+      --without-pixman \
+      --disable-blobs \
+  Stable version (v2.6.0) also have the same problem.
+
+  In a chroot environment I ran below command-line to compile some things, =
+different sources each time.
+      /usr/bin/qemu-arm -0 /usr/bin/edje_cc /usr/bin/edje_cc -id /home/abui=
+ld/rpmbuild/BUILD/org.tizen.browser-1.6.2/services/SimpleUI/images_mob/ -DB=
+ROWSER_RESOLUTION_720x1280=3D1 -DPROFILE_MOBILE=3D1 /home/abuild/rpmbuild/B=
+UILD/org.tizen.browser-1.6.2/services/SimpleUI/edc/TextPopup_mob.edc /home/=
+abuild/rpmbuild/BUILD/org.tizen.browser-1.6.2/build-tizen/services/SimpleUI=
+/720x1280_TextPopup.edj
+
+  Here is back trace with gdb;
+  #0  safe_syscall_end () at /usr/src/debug/qemu-2.6.94/linux-user/host/i38=
+6/safe-syscall.inc.S:78
+  #1  0x60049370 in safe_pselect6 (nfds=3D10, readfds=3D0xffa31b5c, writefd=
+s=3D0xffa31bdc, exceptfds=3D0xffa31c5c, timeout=3D0x0, sig=3D0x0)
+      at /usr/src/debug/qemu-2.6.94/linux-user/syscall.c:855
+  #2  0x6004b2fe in do_select (n=3D10, rfd_addr=3D1082122232, wfd_addr=3D10=
+82122360, efd_addr=3D1082122488, target_tv_addr=3D0)
+      at /usr/src/debug/qemu-2.6.94/linux-user/syscall.c:1386
+  #3  0x6005e5ba in do_syscall (cpu_env=3D0x640d0454, num=3D142, arg1=3D10,=
+ arg2=3D1082122232, arg3=3D1082122360, arg4=3D1082122488, arg5=3D0, arg6=3D=
+1087473216, arg7=3D0, =
+
+      arg8=3D0) at /usr/src/debug/qemu-2.6.94/linux-user/syscall.c:9690
+  #4  0x60045def in cpu_loop (env=3D0x640d0454) at /usr/src/debug/qemu-2.6.=
+94/linux-user/main.c:876
+  #5  0x60047640 in main (argc=3D10, argv=3D0xffa33c84, envp=3D0xffa33cb0) =
+at /usr/src/debug/qemu-2.6.94/linux-user/main.c:4817
+
+  Attached core file taken from gdb. To see the stack frame, you could try; =
+
+  $ tar -xf reproduced_118_04.tar.bz2; gdb --core core.1823 qemu-arm
+
+  And recent strace log for PID 1823(stucked one);
+  79965 [  313s] 1823 :0x8e _newselect(10,[9,3,],[],[],NULL)
+  79966 [  313s]  =3D=3D>[pselect6(0xa)=3D]
+  79967 [  313s]  [pselect6=3D0x1]<=3D=3D
+  79968 [  313s] 1823 :0x8e _newselect(10,[9,],[],[],NULL)
+  79969 [  313s] 1823 :0x8e =3D>  =3D 0x00000001 ([9,],[],[],NULL)
+  79970 [  313s] 1823 :0xfc epoll_wait(3,1082121456,32,0,1082121456,3)
+  79971 [  313s] 1823 :0xfc epoll_wait(3,1082121456,32,0,1082121456,3)
+  79972 [  313s] 1823 :0xfc =3D>  =3D 0
+  79973 [  313s] 1823 :0x3 read(9,0x407fdeec,16)
+  79974 [  313s] 1823 :0x3 read(9,0x407fdeec,16)
+  79975 [  313s] 1823 :0x3 =3D>  =3D 8
+  79976 [  313s] 1823 :0x107 clock_gettime(1,1082122120,0,1082829144,108282=
+7588,0)
+  79977 [  313s] 1823 :0x107 clock_gettime(1,1082122120,0,1082829144,108282=
+7588,0)
+  79978 [  313s] 1823 :0x107 =3D>  =3D 0
+  79979 [  313s] 1823 :0x8e _newselect(10,[9,3,],[],[],NULL)
+  79980 [  313s]  =3D=3D>[pselect6(0xa)=3D]
+
+  I'm using 64-bit Ubuntu with kernel release Linux 3.19.0-25-generic #26~1=
+4.04.1-Ubuntu.
+  Reproducibility is low. One occurrence out of 50+ trials.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1617929/+subscriptions
