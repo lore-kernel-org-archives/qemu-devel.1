@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36796)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38991)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eBmDo-0002vB-R4
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 13:34:09 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1eBmJ4-000676-5n
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 13:39:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eBmDl-0001Sl-Nm
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 13:34:08 -0500
-Resent-Message-Id: <E1eBmDl-0001Sl-Nm@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21344)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1eBmDl-0001Rl-H4
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 13:34:05 -0500
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <150998686565.330.2680373983803398451@bafd83ae6430>
-In-Reply-To: <1509986155-4735-1-git-send-email-nanjekyejoannah@gmail.com>
+	(envelope-from <marcandre.lureau@redhat.com>) id 1eBmJ1-00046H-3N
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 13:39:34 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35252)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1eBmJ0-000461-Qv
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 13:39:31 -0500
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Mon,  6 Nov 2017 19:38:57 +0100
+Message-Id: <20171106183925.16747-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 6 Nov 2017 08:47:46 -0800 (PST)
-Subject: Re: [Qemu-devel] [RFC PATCH] remove numpy dependency
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2 00/28] TPM: code cleanup (not 2.11)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,38 +25,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: nanjekyejoannah@gmail.com
-Cc: famz@redhat.com, stefanha@redhat.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: amarnath.valluri@intel.com, stefanb@linux.vnet.ibm.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtSRkMgUEFUQ0hdIHJlbW92ZSBudW1weSBkZXBlbmRlbmN5ClR5cGU6IHNlcmllcwpN
-ZXNzYWdlLWlkOiAxNTA5OTg2MTU1LTQ3MzUtMS1naXQtc2VuZC1lbWFpbC1uYW5qZWt5ZWpvYW5u
-YWhAZ21haWwuY29tCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNF
-PWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWls
-ZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0t
-bG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAt
-LXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tp
-bmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAg
-ICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gu
-cGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBm
-aQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9
-PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dp
-dGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwpkMGM2Y2IxY2QwIHJlbW92ZSBudW1weSBkZXBl
-bmRlbmN5Cgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzE6IHJlbW92ZSBu
-dW1weSBkZXBlbmRlbmN5Li4uCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM1ODog
-RklMRTogc2NyaXB0cy9hbmFseXplLW1pZ3JhdGlvbi5weTo2MDoKKyAgICAgICAgcmV0dXJuIHN0
-cnVjdC51bnBhY2socmVhZF9mb3JtYXQsIGJ1ZmZlclswOigwICsgc3RydWN0LmNhbGNzaXplKHJl
-YWRfZm9ybWF0KSldKQoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM3MDogRklMRTog
-c2NyaXB0cy9hbmFseXplLW1pZ3JhdGlvbi5weTozMTM6CisgICAgICAgIHNlbGYuc2RhdGEgPSBz
-dHJ1Y3QudW5wYWNrKHNlbGYuc2R0eXBlLCBidWZmZXJbMDooMCArIHN0cnVjdC5jYWxjc2l6ZShz
-ZWxmLnNkdHlwZSkpXSkKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojNzE6IEZJTEU6
-IHNjcmlwdHMvYW5hbHl6ZS1taWdyYXRpb24ucHk6MzE0OgorICAgICAgICBzZWxmLnNkYXRhID0g
-c3RydWN0LnVucGFjayhzZWxmLnVkdHlwZSwgYnVmZmVyWzA6KDAgKyBzdHJ1Y3QuY2FsY3NpemUo
-c2VsZi51ZHR5cGUpKV0pCgp0b3RhbDogMiBlcnJvcnMsIDEgd2FybmluZ3MsIDUzIGxpbmVzIGNo
-ZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYg
-YW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRo
-ZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQg
-RU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2Vu
-ZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBs
-ZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
+Hi,
+
+Various code cleanups accumulated while doing reviews and implementing
+a CRB device (postponed for later), aiming at a tpm-next development
+branch for after qemu 2.11.
+
+v2: after Stefan review
+- rebased (half of v1 is merged upstream)
+- add & use a DEFINE_PROP_TPMBE()
+- remove tpm_register_model()
+- fix wrong locty_number usage & regression
+- tpm-tis: check that at most one TPM device exists
+- I changed "tpm-passthrough: remove error cleanup from
+  handle_device_opts" to "tpm-passthrough: simplify create()", it is
+  mostly the same patch that Stefan didn't like much but with a
+  different rationale to have code closer to tpm-emulator create().
+- added some signed-offs
+
+Marc-Andr=C3=A9 Lureau (28):
+  tpm-tis: remove unused locty_number
+  tpm: move TpmIf in include/sysemu/tpm.h
+  tpm-backend: store TPMIf interface, improve backend_init()
+  tpm-tis: no longer expose TPMState
+  tpm-be: call request_completed() out of thread
+  tpm-be: report error instead of front-end
+  tpm-be: ask model to the TPM interface
+  tpm: remove unused opened code
+  tpm-passthrough: don't save guessed cancel_path in options
+  tpm-be: update optional function pointers
+  tpm-passthrough: pass TPMPassthruState to handle_device_opts
+  tpm-backend: move set 'id' to common code
+  tpm-passthrough: make it safer to destroy after creation
+  tpm-passthrough: simplify create()
+  tpm-passthrough: workaround a possible race
+  tpm-tis: simplify header inclusion
+  tpm: rename qemu_find_tpm() -> qemu_find_tpm_be()
+  tpm: lookup the the TPM interface instead of TIS device
+  tpm: add TPM interface to lookup TPM version
+  tpm: add tpm_cmd_get_size() to tpm_util
+  acpi: change TPM TIS data conditions
+  tpm-emulator: add a FIXME comment about blocking cancel
+  tpm-tis: remove redundant 'tpm_tis:' in error messages
+  tpm-tis: check that at most one TPM device exists
+  tpm-emulator: protect concurrent ctrl_chr access
+  qdev: add DEFINE_PROP_TPMBE
+  tpm-tis: use DEFINE_PROP_TPMBE
+  tpm: remove tpm_register_model()
+
+ hw/tpm/tpm_int.h                 | 22 +----------
+ hw/tpm/tpm_util.h                |  8 +++-
+ include/hw/qdev-properties.h     |  3 ++
+ include/sysemu/tpm.h             | 48 +++++++++++++++++------
+ include/sysemu/tpm_backend.h     | 32 ++++++----------
+ backends/tpm.c                   | 83 +++++++++++++---------------------=
+------
+ hw/core/qdev-properties-system.c | 64 +++++++++++++++++++++++++++++++
+ hw/i386/acpi-build.c             | 14 ++++---
+ hw/tpm/tpm_emulator.c            | 59 +++++++++++++++-------------
+ hw/tpm/tpm_passthrough.c         | 66 +++++++++++---------------------
+ hw/tpm/tpm_tis.c                 | 83 +++++++++++++++-------------------=
+------
+ tpm.c                            | 34 ++++++----------
+ 12 files changed, 255 insertions(+), 261 deletions(-)
+
+--=20
+2.15.0.rc0.40.gaefcc5f6f
