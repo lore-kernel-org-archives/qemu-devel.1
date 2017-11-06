@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60105)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34397)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1eBeLW-0006kW-Tw
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 05:09:35 -0500
+	(envelope-from <laurent@vivier.eu>) id 1eBeRW-000269-CL
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 05:15:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1eBeLW-0007Z1-1t
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 05:09:34 -0500
-References: <1508772937-21054-1-git-send-email-eric.auger@redhat.com>
-	<1508772937-21054-2-git-send-email-eric.auger@redhat.com>
-	<CAFEAcA81ogq6py71ejK7JD52A8LrQz1v92M1HZPCfPVBZy1vww@mail.gmail.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <0686ba45-7a77-f5b0-537d-07e2c3438e5e@redhat.com>
-Date: Mon, 6 Nov 2017 11:09:18 +0100
+	(envelope-from <laurent@vivier.eu>) id 1eBeRS-0001sh-H9
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 05:15:46 -0500
+Received: from mout.kundenserver.de ([217.72.192.73]:53314)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eBeRS-0001rj-76
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 05:15:42 -0500
+References: <20171103193802.11876-1-laurent@vivier.eu>
+	<20076e3b-883a-b669-8453-f870eda6e31a@ozlabs.ru>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <425ee57b-641a-b8d3-7700-1ddcbc243ec3@vivier.eu>
+Date: Mon, 6 Nov 2017 11:15:34 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA81ogq6py71ejK7JD52A8LrQz1v92M1HZPCfPVBZy1vww@mail.gmail.com>
+In-Reply-To: <20076e3b-883a-b669-8453-f870eda6e31a@ozlabs.ru>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v2 1/4] hw/intc/arm_gicv3_its: Don't abort on
- table save failure
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] linux-user: remove nmi.c and
+ fw-path-provider.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,46 +29,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: eric.auger.pro@gmail.com, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, wanghaibin.wang@huawei.com, Vijay Kilari <vijay.kilari@gmail.com>, Andrew Jones <drjones@redhat.com>, Wei Huang <wei@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>, wu.wubin@huawei.com
+To: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Riku Voipio <riku.voipio@linaro.org>
 
-Hi Peter,
-
-On 02/11/2017 13:53, Peter Maydell wrote:
-> On 23 October 2017 at 16:35, Eric Auger <eric.auger@redhat.com> wrote:
->> The ITS is not fully properly reset at the moment. Caches are
->> not emptied.
->>
->> After a reset, in case we attempt to save the state before
->> the bound devices have registered their MSIs and after the
->> 1st level table has been allocated by the ITS driver
->> (device BASER is valid), the first level entries are still
->> invalid. If the device cache is not empty (devices registered
->> before the reset), vgic_its_save_device_tables fails with -EINVAL.
->> This causes a QEMU abort().
->>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->> Reported-by: wanghaibin <wanghaibin.wang@huawei.com>
->>
->> ---
->>
->> this patch would deserve being cc'ed stable (2.10)
->> This goes along with patches 1-5 of
->> [PATCH v5 00/10] vITS Migration fixes and reset, candidate
->> for being cc'ed stable
->> ---
+Le 06/11/2017 à 01:44, Alexey Kardashevskiy a écrit :
+> On 04/11/17 06:38, Laurent Vivier wrote:
+>> linux-user binaries don't need firmware and NMI,
+>> so don't add them in this case, move QDEV
+>> firmware functions to qdev-fw.c
 > 
-> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 > 
-> We could/should put this patch into qemu now, right (it's
-> the rest of the series that's RFC) ?
+> When configured with --target-list=ppc64-linux-user , config-host.mak gets
+> TARGET_DIRS=ppc64-linux-user  and I would expect CONFIG_SOFTMMU to be
+> disabled in Makefile#27 and qdev.c not to be compiled at all but this is
+> not happening, I wonder why...
 
-Yes that's correct.
+this is driven by config-target.mak and config-target.h which are target
+specific.
 
-Thanks
+for ppc64-linux-user, you have ppc64-linux-user/config-target.mak:
+...
+CONFIG_LINUX_USER=y
+...
 
-Eric
-> 
-> thanks
-> -- PMM
-> 
+for ppc64-softmmu/config-target.mak:
+...
+CONFIG_SOFTMMU=y
+...
+
+Thanks,
+Laurent
