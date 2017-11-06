@@ -1,34 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48346)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49038)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eBgKd-00053Y-Q3
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 07:16:49 -0500
+	(envelope-from <kernellwp@gmail.com>) id 1eBgMw-00068r-BK
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 07:19:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eBgKb-0003qF-Tu
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 07:16:47 -0500
-Received: from indium.canonical.com ([91.189.90.7]:43590)
+	(envelope-from <kernellwp@gmail.com>) id 1eBgMn-0004uw-2g
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 07:19:10 -0500
+Received: from mail-oi0-x22a.google.com ([2607:f8b0:4003:c06::22a]:48823)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eBgKb-0003pv-Ni
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 07:16:45 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eBgKa-0004cY-S9
-	for <qemu-devel@nongnu.org>; Mon, 06 Nov 2017 12:16:44 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id D41852E8058
-	for <qemu-devel@nongnu.org>; Mon,  6 Nov 2017 12:16:44 +0000 (UTC)
+	(Exim 4.71) (envelope-from <kernellwp@gmail.com>) id 1eBgMm-0004un-Ub
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 07:19:01 -0500
+Received: by mail-oi0-x22a.google.com with SMTP id m198so6895876oig.5
+	for <qemu-devel@nongnu.org>; Mon, 06 Nov 2017 04:19:00 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 06 Nov 2017 11:58:53 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1098729 <1098729@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20130111214005.8995.51690.malonedeb@wampee.canonical.com>
-Message-Id: <150996953327.5103.4419738112862755827.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1098729] Re: qemu-user-static for armhf: segfault
- in threaded code
+In-Reply-To: <fb7c5778-238d-ac99-26d6-8a6d9c80a0f4@redhat.com>
+References: <CANRm+CxGAiDBDYrtvxXwsPwt2WjiY_biMCVkvQOyAaQtv5v-UQ@mail.gmail.com>
+	<80415da5-4eef-bf85-b617-fadc3dae4475@redhat.com>
+	<CANRm+CwexgKHUVK3b3QYw8ksyaSgZRDiWztOsOvPpMugTQj16w@mail.gmail.com>
+	<e23177c9-36cb-2ad7-18c0-ebf3caaebb52@redhat.com>
+	<20171106115931.GB3898@lemon>
+	<fb7c5778-238d-ac99-26d6-8a6d9c80a0f4@redhat.com>
+From: Wanpeng Li <kernellwp@gmail.com>
+Date: Mon, 6 Nov 2017 20:18:59 +0800
+Message-ID: <CANRm+Cw=F244w=6YMutjcvWin9_xiRt0Z1MvT=oi+7CXjU+DXw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] qemu core file size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,92 +32,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Fam Zheng <famz@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 
-We think we've fixed the multithreading issues in QEMU linux-user (in
-particular the test case that started this bug report works). If there
-are still problems with a QEMU version later than 2.10, please open
-fresh bug reports for specific guest programs that fail, giving detailed
-how-to-reproduce instructions.
+2017-11-06 20:02 GMT+08:00 Paolo Bonzini <pbonzini@redhat.com>:
+> On 06/11/2017 12:59, Fam Zheng wrote:
+>>>> Could you point out the patchset for the fix?
+>>> Between 447b0d0b9ee8a0ac216c3186e0f3c427a1001f0c and
+>>> 092aa2fc65b7a35121616aad8f39d47b8f921618.
+>> Not sure how these relate to the core size, but I've tested upstream
+>> (ec7a8bf0b8f7dc7288fe8745464ee8217528cc6c) and with dump-guest-core=off the core
+>> file is 363M, still significantly larger than rss (~73M).
+>>
+>> What is bloating the core file?
+>
+> My guess would have been fragmented heap.  The core file, unlike the
+> RSS, includes all the mmaped memory (e.g. from shared libraries) that
+> has never been used.
+>
+> For example, all the Ceph/Gluster/PulseAudio/SPICE/whatever libraries
+> are included in the core file but likely are not in the RSS.
 
+Do you mean not use Memory API will avoid the fragmented heap?
 
-** Tags added: arm linux-user
-
-** Changed in: qemu
-       Status: Confirmed =3D> Fix Released
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1098729
-
-Title:
-  qemu-user-static for armhf: segfault in threaded code
-
-Status in QEMU:
-  Fix Released
-
-Bug description:
-  =
-
-  Currently running QEMU from git (fedf2de31023) and running the armhf vers=
-ion of qemu-user-static which I have renamed qemu-armhf-static to follow th=
-e naming convention used in Debian.
-
-  The host systems is a Debian testing x86_64-linux and I have an Debian
-  testing armhf chroot which I invoke using schroot.
-
-  Majority of program in the armhf chroot run fine, but I'm getting qemu
-  segfaults in multi-threaded programs.
-
-  As an example, I've grabbed the threads demo program here:
-
-  https://computing.llnl.gov/tutorials/pthreads/samples/dotprod_mutex.c
-
-  and changed NUMTHRDS from 4 to 10. I compile it as (same compile
-  command on both x86_64 host and armhf guest):
-
-      gcc -Wall -lpthread dotprod_mutex.c -o dotprod_mutex
-
-  When compiled for x86_64 host it runs perfectly and even under
-  Valgrind displays no errors whatsoever.
-
-  However, when I compile the program in my armhs chroot and run it it
-  usually (but not always) segaults or hangs or crashes. Example output:
-
-  =
-
-      (armhf) $ ./dotprod_mutex
-      Thread 1 did 100000 to 200000:  mysum=3D100000.000000 global sum=3D10=
-0000.000000
-      Thread 0 did 0 to 100000:  mysum=3D100000.000000 global sum=3D200000.=
-000000
-      TCG temporary leak before f6731ca0
-      qemu-arm-static: /home/erikd/Git/qemu-posix-timer-hacking/Upstream/tc=
-g/tcg-op.h:2371:
-      tcg_gen_goto_tb: Assertion `(tcg_ctx.goto_tb_issue_mask & (1 << idx))=
- =3D=3D 0' failed.
-
-  =
-
-      (armhf) $ ./dotprod_mutex
-      qemu: uncaught target signal 11 (Segmentation fault) - core dumped
-      Segmentation fault
-
-      (armhf) $ ./dotprod_mutex
-      qemu-arm-static: /home/erikd/Git/qemu-posix-timer-hacking/Upstream/tc=
-g/tcg.c:519:
-      tcg_temp_free_internal: Assertion `idx >=3D s->nb_globals && idx < s-=
->nb_temps' failed.
-
-  =
-
-      (armhf) $ ./dotprod_mutex
-      Thread 1 did 100000 to 200000:  mysum=3D100000.000000 global sum=3D10=
-0000.000000
-      qemu: uncaught target signal 11 (Segmentation fault) - core dumped
-      Segmentation fault
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1098729/+subscriptions
+Regards,
+Wanpeng Li
