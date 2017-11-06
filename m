@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48345)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48346)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eBgKd-00053X-Q3
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 07:16:48 -0500
+	(envelope-from <bounces@canonical.com>) id 1eBgKd-00053Y-Q3
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 07:16:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eBgKa-0003pi-LR
+	(envelope-from <bounces@canonical.com>) id 1eBgKb-0003qF-Tu
 	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 07:16:47 -0500
-Received: from indium.canonical.com ([91.189.90.7]:43534)
+Received: from indium.canonical.com ([91.189.90.7]:43590)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eBgKa-0003pK-FD
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 07:16:44 -0500
+	id 1eBgKb-0003pv-Ni
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 07:16:45 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eBgKZ-0004cU-CO
-	for <qemu-devel@nongnu.org>; Mon, 06 Nov 2017 12:16:43 +0000
+	id 1eBgKa-0004cY-S9
+	for <qemu-devel@nongnu.org>; Mon, 06 Nov 2017 12:16:44 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 59D672E8058
-	for <qemu-devel@nongnu.org>; Mon,  6 Nov 2017 12:16:43 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id D41852E8058
+	for <qemu-devel@nongnu.org>; Mon,  6 Nov 2017 12:16:44 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 06 Nov 2017 12:02:38 -0000
+Date: Mon, 06 Nov 2017 11:58:53 -0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1188991 <1188991@bugs.launchpad.net>
+Reply-To: Bug 1098729 <1098729@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20130608182041.13525.18729.malonedeb@soybean.canonical.com>
-Message-Id: <150996975848.8971.5132208450709596358.malone@wampee.canonical.com>
+References: <20130111214005.8995.51690.malonedeb@wampee.canonical.com>
+Message-Id: <150996953327.5103.4419738112862755827.malone@chaenomeles.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1188991] Re: Unable to do serial communication
- using -chardev tty
+Subject: [Qemu-devel] [Bug 1098729] Re: qemu-user-static for armhf: segfault
+ in threaded code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,114 +39,90 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Hi. The beaglexm model isn't part of upstream QEMU (it was in a set of
-downstream patches for OMAP3 which were never merged upstream and which
-are now essentially abandoned.) The root cause of this bug is that
-support for pass-through of a host serial port requires specific support
-in the device model for the UART to pass through the serial parameters
-(baud rate etc); this is implemented in some UART models but not all and
-apparently not in the OMAP3 UART code.
+We think we've fixed the multithreading issues in QEMU linux-user (in
+particular the test case that started this bug report works). If there
+are still problems with a QEMU version later than 2.10, please open
+fresh bug reports for specific guest programs that fail, giving detailed
+how-to-reproduce instructions.
 
-Since this isn't a bug in upstream QEMU, I'm going to close this (now
-four year old) bug report; sorry we can't be more helpful here :-(
 
+** Tags added: arm linux-user
 
 ** Changed in: qemu
-       Status: New =3D> Invalid
+       Status: Confirmed =3D> Fix Released
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1188991
+https://bugs.launchpad.net/bugs/1098729
 
 Title:
-  Unable to do serial communication using -chardev tty
+  qemu-user-static for armhf: segfault in threaded code
 
 Status in QEMU:
-  Invalid
+  Fix Released
 
 Bug description:
+  =
 
-  Im running an Linux Image (kernel 3.2.8) for beagleboard-xm on QEMU's
-  1.4.0 emulator.
+  Currently running QEMU from git (fedf2de31023) and running the armhf vers=
+ion of qemu-user-static which I have renamed qemu-armhf-static to follow th=
+e naming convention used in Debian.
+
+  The host systems is a Debian testing x86_64-linux and I have an Debian
+  testing armhf chroot which I invoke using schroot.
+
+  Majority of program in the armhf chroot run fine, but I'm getting qemu
+  segfaults in multi-threaded programs.
+
+  As an example, I've grabbed the threads demo program here:
+
+  https://computing.llnl.gov/tutorials/pthreads/samples/dotprod_mutex.c
+
+  and changed NUMTHRDS from 4 to 10. I compile it as (same compile
+  command on both x86_64 host and armhf guest):
+
+      gcc -Wall -lpthread dotprod_mutex.c -o dotprod_mutex
+
+  When compiled for x86_64 host it runs perfectly and even under
+  Valgrind displays no errors whatsoever.
+
+  However, when I compile the program in my armhs chroot and run it it
+  usually (but not always) segaults or hangs or crashes. Example output:
 
   =
 
-  What I want to do is to have a communication between guest and host acros=
-s serial the 4 differents ttyO present on the guest. QEMU offer facilities =
-to redirect the trafic to some device in the host side.
+      (armhf) $ ./dotprod_mutex
+      Thread 1 did 100000 to 200000:  mysum=3D100000.000000 global sum=3D10=
+0000.000000
+      Thread 0 did 0 to 100000:  mysum=3D100000.000000 global sum=3D200000.=
+000000
+      TCG temporary leak before f6731ca0
+      qemu-arm-static: /home/erikd/Git/qemu-posix-timer-hacking/Upstream/tc=
+g/tcg-op.h:2371:
+      tcg_gen_goto_tb: Assertion `(tcg_ctx.goto_tb_issue_mask & (1 << idx))=
+ =3D=3D 0' failed.
 
-  The command that I use to lauch QEMU is :
+  =
 
-      sudo qemu-system-arm -M beaglexm -m 1024 -sd ./test.img -clock
-  unix -see -device usb-kbd -chardev tty,id=3Dmytty,path=3D/dev/ttyS0
+      (armhf) $ ./dotprod_mutex
+      qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+      Segmentation fault
 
-  As it says in the QEMU's manual -chardev is suppose to connect to a
-  local tty device at the path given
+      (armhf) $ ./dotprod_mutex
+      qemu-arm-static: /home/erikd/Git/qemu-posix-timer-hacking/Upstream/tc=
+g/tcg.c:519:
+      tcg_temp_free_internal: Assertion `idx >=3D s->nb_globals && idx < s-=
+>nb_temps' failed.
 
-  My problem goes like this:
+  =
 
-  At the guest kernel boot I'm able to see that my UART where enabled
-
-      [    2.682040] Serial: 8250/16550 driver, 4 ports, IRQ sharing enabled
-      [    2.777947] omap_uart.0: ttyO0 at MMIO 0x4806a000 (irq =3D 72) is =
-a OMAP UART0
-      [    2.794967] omap_uart.1: ttyO1 at MMIO 0x4806c000 (irq =3D 73) is =
-a OMAP UART1
-      [    2.814942] omap_uart.2: ttyO2 at MMIO 0x49020000 (irq =3D 74) is =
-a OMAP UART2
-      [    2.966825] console [ttyO2] enabled
-      [    2.984777] omap_uart.3: ttyO3 at MMIO 0x49042000 (irq =3D 80) is =
-a OMAP UART3
-
-  In fact, when I go see in to /proc/tty/driver and I do a cat on OMAP-
-  SERIAL Im able to see this serinfo:1.0 driver revision:
-
-      0: uart:OMAP UART0 mmio:0x4806A000 irq:72 tx:0 rx:0 CTS|DSR|CD
-      1: uart:OMAP UART1 mmio:0x4806C000 irq:73 tx:0 rx:0 CTS|DSR|CD
-      2: uart:OMAP UART2 mmio:0x49020000 irq:74 tx:268 rx:37 RTS|CTS|DTR|DS=
-R|CD
-      3: uart:OMAP UART3 mmio:0x49042000 irq:80 tx:0 rx:0 CTS|DSR|CD
-
-  I know that ttyO2 is working because my console is been redirected to
-  it. The thing is that doing a set serial on any of the ttyO I get the
-  following message:
-
-       [root@enu driver]# setserial -a /dev/ttyO0
-      /dev/ttyO0, Line 0, UART: undefined, Port: 0x0000, IRQ: 72
-          Baud_base: 3000000, close_delay: 50, divisor: 0
-          closing_wait: 3000
-          Flags: spd_normal
-
-  The same goes with ttyO2. I tryed to set some sethings to any of the
-  ttyO with setserial but I always get the same message:
-
-      [root@enu ~]# setserial /dev/ttyO0 uart 8250                         =
-     =
-
-      setserial: can't set serial info: Invalid argument
-      [root@enu ~]# setserial /dev/ttyO0 port 0x4806a000
-      setserial: can't set serial info: Invalid argument
-
-  basicly I want to establish a serial communication between a guest and
-  a host, but the serial ports on the guest side aren't well configured.
-
-  When I open ttyS0 with minicom on the host side and do on the guest
-  side
-
-      echo "test" > /dev/ttyO0
-
-  The host recives nothing.
-
-  Anyone can tell me how I could remove tty modules on the guest side
-  and try to insert it again to see if the setup resets properly or give
-  me any advice on how to solve this problem. Plus if anyone has already
-  tryed doing this kind on serial communication I would like to here
-  from you.
-
-  Thank,
-  Francisco
+      (armhf) $ ./dotprod_mutex
+      Thread 1 did 100000 to 200000:  mysum=3D100000.000000 global sum=3D10=
+0000.000000
+      qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+      Segmentation fault
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1188991/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1098729/+subscriptions
