@@ -1,36 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58296)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49980)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sam.bobroff@au1.ibm.com>) id 1eBXsD-0000sd-KL
-	for qemu-devel@nongnu.org; Sun, 05 Nov 2017 22:14:54 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1eBZHU-000488-10
+	for qemu-devel@nongnu.org; Sun, 05 Nov 2017 23:45:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sam.bobroff@au1.ibm.com>) id 1eBXsA-0006p9-Et
-	for qemu-devel@nongnu.org; Sun, 05 Nov 2017 22:14:53 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:46896)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sam.bobroff@au1.ibm.com>)
-	id 1eBXsA-0006oi-6O
-	for qemu-devel@nongnu.org; Sun, 05 Nov 2017 22:14:50 -0500
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vA63DhRZ058793
-	for <qemu-devel@nongnu.org>; Sun, 5 Nov 2017 22:14:44 -0500
-Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2e220pjj38-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Sun, 05 Nov 2017 22:14:44 -0500
-Received: from localhost
-	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <sam.bobroff@au1.ibm.com>;
-	Mon, 6 Nov 2017 03:14:42 -0000
-Date: Mon, 6 Nov 2017 14:14:35 +1100
-From: Sam Bobroff <sam.bobroff@au1.ibm.com>
+	(envelope-from <aik@ozlabs.ru>) id 1eBZHQ-0003TW-UN
+	for qemu-devel@nongnu.org; Sun, 05 Nov 2017 23:45:04 -0500
+Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:46921)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1eBZHQ-0003TM-La
+	for qemu-devel@nongnu.org; Sun, 05 Nov 2017 23:45:00 -0500
+Received: by mail-pf0-x241.google.com with SMTP id p87so6859126pfj.3
+	for <qemu-devel@nongnu.org>; Sun, 05 Nov 2017 20:45:00 -0800 (PST)
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+References: <20171103153333.6416-1-berrange@redhat.com>
+	<c20a8639-8288-3525-2ebf-76681e2e9243@ozlabs.ru>
+Message-ID: <56688e01-9671-70aa-d10b-21c438222017@ozlabs.ru>
+Date: Mon, 6 Nov 2017 15:44:54 +1100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Message-Id: <4d05be59374384a32c09437f5d0308bfafaf0128.1509937620.git.sam.bobroff@au1.ibm.com>
-Subject: [Qemu-devel] [PATCH 1/1] target/ppc: correct htab shift for hash on
- radix
+In-Reply-To: <c20a8639-8288-3525-2ebf-76681e2e9243@ozlabs.ru>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-AU
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 0/5] Various improvements/bugfixes to
+ submodule handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,65 +31,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
-Cc: david@gibson.dropbear.id.au
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Eric Blake <eblake@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 
-KVM HV will soon support running a guest in hash mode on a POWER9 host
-running in radix mode (see [1]), however the guest currently fails to
-boot.
+On 06/11/17 11:22, Alexey Kardashevskiy wrote:
+> On 04/11/17 02:33, Daniel P. Berrange wrote:
+>> This short series of patches improves the reliability of the submodule
+>> handling to cope with various dev env scenarios that have since emerged
+>>
+>>   v2: https://lists.gnu.org/archive/html/qemu-devel/2017-10/msg06272.html
+>>
+>> Changed in v3:
+>>
+>>  - Avoid use of mktemp
+>>  - Use '=' instead of '==' (bashism) in conditional tests
+>>  - Fix problem with short-circuiting for empty submodule list
+>>  - Ensure help message is displayed on all errors
+>>
+>> Daniel P. Berrange (5):
+>>   build: allow setting a custom GIT binary for transparent proxying
+>>   build: don't create temporary files in source dir
+>>   build: allow automatic git submodule updates to be disabled
+>>   build: don't fail if given a git submodule which does not exist
+>>   build: delay check for empty git submodule list
+>>
+>>  Makefile                 | 15 ++++++++--
+>>  configure                | 12 ++++++++
+>>  scripts/git-submodule.sh | 72 ++++++++++++++++++++++++++++++++++++++----------
+>>  3 files changed, 83 insertions(+), 16 deletions(-)
+> 
+> 
+> It is getting more complicated.
+> 
+> So, same setup,
+> git checkout v2.10.0
+> ./configure --target-list=ppc64-softmmu
+> make
+> 
+> All good.
+> Then:
+> 
+> git checkout git-submodule (upstream + this patchset)
+> ./configure --target-list=ppc64-softmmu
+> 
+> I see an error and educational page about --disable-git-update, good.
+> ./configure --target-list=ppc64-softmmu --disable-git-update
+> make
+> 
+> Now I get:
+> 
+> GIT submodule checkout is out of date. Please run
+>   scripts/git-submodule.sh update ui/keycodemapdb dtc capstone
+> from the source directory checkout /home/aik/p/qemu
+> 
+> Good, as I wanted.
+> I do this on the server:
+> scripts/git-submodule.sh update ui/keycodemapdb dtc capstone
+> 
+> and repeat "make" on the build machine but get the very same error. Then I
+> add "set -x" to scripts/git-submodule.sh and see:
+> 
+> + substat=.git-submodule-status
+> + command=status
+> + shift
+> + maybe_modules=ui/keycodemapdb dtc capstone
+> + test -z git
+> + modules=
+> + git submodule status ui/keycodemapdb
+> + test 0 = 0
+> + modules= ui/keycodemapdb
+> + git submodule status dtc
+> + test 0 = 0
+> + modules= ui/keycodemapdb dtc
+> + git submodule status capstone
+> + test 0 = 0
+> + modules= ui/keycodemapdb dtc capstone
+> + test -n ui/keycodemapdb dtc capstone
+> + test -e .git
+> + test -z ui/keycodemapdb dtc capstone
+> + test -f .git-submodule-status
+> + git submodule status ui/keycodemapdb dtc capstone
+> + CURSTATUS=-22ead3e0bfdb87516656453336160e0a37b066bf capstone
+>  558cd81bdd432769b59bff01240c44f82cfb1a9d dtc (v1.4.4)
+>  10739aa26051a5d49d88132604539d3ed085e72e ui/keycodemapdb (heads/master)
+> 
+> + cat .git-submodule-status
+> + OLDSTATUS= 558cd81bdd432769b59bff01240c44f82cfb1a9d dtc (v1.4.4)
+>  10739aa26051a5d49d88132604539d3ed085e72e ui/keycodemapdb (heads/master)
+> 
+> + test -22ead3e0bfdb87516656453336160e0a37b066bf capstone
+>  558cd81bdd432769b59bff01240c44f82cfb1a9d dtc (v1.4.4)
+>  10739aa26051a5d49d88132604539d3ed085e72e ui/keycodemapdb (heads/master) =
+> 558cd81bdd432769b59bff01240c44f82cfb1a9d dtc (v1.4.4)
+>  10739aa26051a5d49d88132604539d3ed085e72e ui/keycodemapdb (heads/master)
+> 
+> + exit 1
+> 
+> 
+> What is that new module - capstone - about? It is not in the status file:
+> 
+> [vpl1 qemu]$ cat .git-submodule-status
+>  558cd81bdd432769b59bff01240c44f82cfb1a9d dtc (v1.4.4)
+>  10739aa26051a5d49d88132604539d3ed085e72e ui/keycodemapdb (heads/master)
 
-This is because the "htab_shift" value (the size of the MMU's hash
-table) is added to the device tree before KVM has had a chance to
-change it. If the host is in hash mode, KVM does not need to change it
-and so the problem is not seen, but when the host is in radix mode a
-change is required and we see a problem.
+Ufff, that was inaccurate me, sorry for the noise. This is a real thing:
 
-To fix this, move the call spapr_setup_hpt_and_vrma() (where
-htab_shift could be changed) up a little so that it's called before
-spapr_h_cas_compose_response() (where htab_shift is added to the
-device tree).
 
-Signed-off-by: Sam Bobroff <sam.bobroff@au1.ibm.com>
+[vpl1 qemu]$ git submodule status capstone
+ 22ead3e0bfdb87516656453336160e0a37b066bf capstone (3.0.5-rc3-14-g22ead3e0)
+[vpl1 qemu]$ ssh garrison2 git -C p/qemu submodule status capstone
+ 22ead3e0bfdb87516656453336160e0a37b066bf capstone (3.0.5-rc3-14-g22ead3e)
 
-[1] See http://www.spinics.net/lists/kvm-ppc/msg13057.html
----
-I tested this patch using a kernel based on Paul's kvm-ppc-next branch from his
-powerpc tree:
-https://git.kernel.org/pub/scm/linux/kernel/git/paulus/powerpc.git/
 
- hw/ppc/spapr_hcall.c | 13 ++++++-------
- 1 file changed, 6 insertions(+), 7 deletions(-)
+So now I have to add this to .gitconfig on all build machines:
 
-diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-index 0d59d1534d..be22a6b289 100644
---- a/hw/ppc/spapr_hcall.c
-+++ b/hw/ppc/spapr_hcall.c
-@@ -1636,6 +1636,12 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
-     spapr->cas_legacy_guest_workaround = !spapr_ovec_test(ov1_guest,
-                                                           OV1_PPC_3_00);
-     if (!spapr->cas_reboot) {
-+        /* If ppc_spapr_reset() did not set up a HPT but one is necessary
-+         * (because the guest isn't going to use radix) then set it up here. */
-+        if ((spapr->patb_entry & PATBE1_GR) && !guest_radix) {
-+            /* legacy hash or new hash: */
-+            spapr_setup_hpt_and_vrma(spapr);
-+        }
-         spapr->cas_reboot =
-             (spapr_h_cas_compose_response(spapr, args[1], args[2],
-                                           ov5_updates) != 0);
-@@ -1644,13 +1650,6 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
- 
-     if (spapr->cas_reboot) {
-         qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
--    } else {
--        /* If ppc_spapr_reset() did not set up a HPT but one is necessary
--         * (because the guest isn't going to use radix) then set it up here. */
--        if ((spapr->patb_entry & PATBE1_GR) && !guest_radix) {
--            /* legacy hash or new hash: */
--            spapr_setup_hpt_and_vrma(spapr);
--        }
-     }
- 
-     return H_SUCCESS;
+[core]
+        abbrev=10
+
+as "git submodule status" simply calls "git describe" which does not take
+"--abbrev". Well, ok :(
+
+
+
 -- 
-2.14.1.4.g334a7be4f
+Alexey
