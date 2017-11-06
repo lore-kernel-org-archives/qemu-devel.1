@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34187)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34998)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eBiNY-0000Xa-VM
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 09:27:57 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eBiPR-0001xu-VB
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 09:29:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eBiNV-0001kR-SZ
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 09:27:56 -0500
-Received: from mail-wr0-f195.google.com ([209.85.128.195]:43795)
+	(envelope-from <pbonzini@redhat.com>) id 1eBiPO-0002tY-RL
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 09:29:53 -0500
+Received: from mail-wr0-f195.google.com ([209.85.128.195]:51812)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eBiNV-0001kF-MG
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 09:27:53 -0500
-Received: by mail-wr0-f195.google.com with SMTP id 4so4535422wrt.0
-	for <qemu-devel@nongnu.org>; Mon, 06 Nov 2017 06:27:53 -0800 (PST)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eBiPO-0002sB-KV
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 09:29:50 -0500
+Received: by mail-wr0-f195.google.com with SMTP id j15so8768223wre.8
+	for <qemu-devel@nongnu.org>; Mon, 06 Nov 2017 06:29:50 -0800 (PST)
 References: <20170929111323.6308-1-michael@fritscher.net>
-	<20170929111323.6308-3-michael@fritscher.net>
+	<20170929111323.6308-8-michael@fritscher.net>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <9e45e60c-c279-f243-2441-2a5c6d65b533@redhat.com>
-Date: Mon, 6 Nov 2017 15:27:50 +0100
+Message-ID: <7eb00f04-101d-96af-08ca-28f892e2ca1c@redhat.com>
+Date: Mon, 6 Nov 2017 15:29:47 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170929111323.6308-3-michael@fritscher.net>
+In-Reply-To: <20170929111323.6308-8-michael@fritscher.net>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 02/18] #include <sys/vfs.h> is not
- available under Windows.
+Subject: Re: [Qemu-devel] [PATCH 07/18] Fix unused variable error and
+ unsuded function if FS_IOC_GETVERSION is not defined.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,27 +36,47 @@ To: Michael Fritscher <michael@fritscher.net>, gkurz@linux.vnet.ibm.com, sw@weil
 On 29/09/2017 13:13, Michael Fritscher wrote:
 > Signed-off-by: Michael Fritscher <michael@fritscher.net>
 > ---
->  fsdev/file-op-9p.h | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
+>  hw/9pfs/9p-local.c | 9 ++++-----
+>  1 file changed, 4 insertions(+), 5 deletions(-)
 > 
-> diff --git a/fsdev/file-op-9p.h b/fsdev/file-op-9p.h
-> index 474c79d003..3fc7b0532f 100644
-> --- a/fsdev/file-op-9p.h
-> +++ b/fsdev/file-op-9p.h
-> @@ -16,7 +16,9 @@
+> diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
+> index e51af87309..4c8e0f3296 100644
+> --- a/hw/9pfs/9p-local.c
+> +++ b/hw/9pfs/9p-local.c
+> @@ -1372,10 +1372,10 @@ static int local_unlinkat(FsContext *ctx, V9fsPath *dir,
+>      return ret;
+>  }
 >  
->  #include <dirent.h>
->  #include <utime.h>
-> -#include <sys/vfs.h>
-> +#ifndef _WIN32
-> +# include <sys/vfs.h>
+> +#ifdef FS_IOC_GETVERSION
+>  static int local_ioc_getversion(FsContext *ctx, V9fsPath *path,
+>                                  mode_t st_mode, uint64_t *st_gen)
+>  {
+> -#ifdef FS_IOC_GETVERSION
+>      int err;
+>      V9fsFidOpenState fid_open;
+>  
+> @@ -1394,15 +1394,14 @@ static int local_ioc_getversion(FsContext *ctx, V9fsPath *path,
+>      err = ioctl(fid_open.fd, FS_IOC_GETVERSION, st_gen);
+>      local_close(ctx, &fid_open);
+>      return err;
+> -#else
+> -    errno = ENOTTY;
+> -    return -1;
+> -#endif
+>  }
 > +#endif
->  #include "qemu-fsdev-throttle.h"
 >  
->  #define SM_LOCAL_MODE_BITS    0600
+>  static int local_init(FsContext *ctx)
+>  {
+> +#ifdef FS_IOC_GETVERSION
+>      struct statfs stbuf;
+> +#endif
+>      LocalData *data = g_malloc(sizeof(*data));
+>  
+>      data->mountfd = open(ctx->fs_root, O_DIRECTORY | O_RDONLY);
 > 
 
-Like patch 4, this only makes sense in the same patch that stops using
-function from /usr/include/sys/vfs.h.
+This is probably the change in which patch 2 should be merged.  With the
+#include added here, the patch is fine.
 
 Paolo
