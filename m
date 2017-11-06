@@ -1,23 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38313)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38564)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <patrick.ohly@intel.com>) id 1eBkwG-0004Kg-U3
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 12:11:58 -0500
+	(envelope-from <stefanha@redhat.com>) id 1eBkwp-0004em-0m
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 12:12:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <patrick.ohly@intel.com>) id 1eBkwD-0001Rn-Fm
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 12:11:56 -0500
-Received: from mail-wr0-x236.google.com ([2a00:1450:400c:c0c::236]:51093)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <patrick.ohly@intel.com>)
-	id 1eBkwD-0001Pc-0v
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 12:11:53 -0500
-Received: by mail-wr0-x236.google.com with SMTP id p96so9285640wrb.7
-	for <qemu-devel@nongnu.org>; Mon, 06 Nov 2017 09:11:46 -0800 (PST)
-Message-ID: <1509988303.22094.8.camel@intel.com>
-From: Patrick Ohly <patrick.ohly@intel.com>
-Date: Mon, 06 Nov 2017 18:11:43 +0100
-Content-Type: multipart/mixed; boundary="=-S5k91e+3AOv8jKGBPDEL"
-Mime-Version: 1.0
-Subject: [Qemu-devel] RFC: connecting chardev to a command forked by qemu
+	(envelope-from <stefanha@redhat.com>) id 1eBkwl-00020X-6a
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 12:12:31 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35438)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eBkwk-0001zW-Tx
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 12:12:27 -0500
+Date: Mon, 6 Nov 2017 17:12:24 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20171106171224.GH4557@stefanha-x1.localdomain>
+References: <1476435656-3100-1-git-send-email-stefanha@redhat.com>
+	<1476435656-3100-4-git-send-email-stefanha@redhat.com>
+	<f142a70a-dd03-76e3-52a7-79277c51928a@redhat.com>
+	<20161016133526.GA13844@stefanha-x1.localdomain>
+	<bb54ed67-1839-4527-13e1-45009b6d4adf@redhat.com>
+	<20161018102123.GF19457@stefanha-x1.localdomain>
+	<20171105185959.fi5xvniqicg7rtiq@eukaryote>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="ISKrrfpKsPiF35CV"
+Content-Disposition: inline
+In-Reply-To: <20171105185959.fi5xvniqicg7rtiq@eukaryote>
+Subject: Re: [Qemu-devel] [PATCH v2 3/4] sockets: add AF_VSOCK support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,219 +33,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Amarnath Valluri <amarnath.valluri@intel.com>
+To: Kashyap Chamarthy <kchamart@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
 
 
---=-S5k91e+3AOv8jKGBPDEL
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
+--ISKrrfpKsPiF35CV
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Hello!
+On Sun, Nov 05, 2017 at 07:59:59PM +0100, Kashyap Chamarthy wrote:
+> [Reviving a more than 1-year old thread.  I randomly noticed this (refer
+> below) while browsing through AF_VSOCK changes in my 'qemu-devel'
+> maildir.]
+>=20
+> On Tue, Oct 18, 2016 at 11:21:23AM +0100, Stefan Hajnoczi wrote:
+> > On Mon, Oct 17, 2016 at 09:25:46AM -0500, Eric Blake wrote:
+> > > On 10/16/2016 08:35 AM, Stefan Hajnoczi wrote:
+> > >=20
+> > > >>> +
+> > > >>> +    if (sscanf(str, "%32[^:]:%32[^,]%n", cid, port, &n) !=3D 2) {
+> > > >>
+> > > >> This says stop at the first comma after the colon...
+> > > >>
+> > > >>> +        error_setg(errp, "error parsing address '%s'", str);
+> > > >>> +        return NULL;
+> > > >>> +    }
+> > > >>> +    if (str[n] !=3D '\0') {
+> > > >>> +        error_setg(errp, "trailing characters in address '%s'", =
+str);
+> > > >>
+> > > >> ...but this rejects a trailing comma.  Is a trailing comma possibl=
+e base
+> > > >> on how QemuOpts work? If so, do you need to handle it here?
+> > > >=20
+> > > > Actually I just wanted to grab characters up until the end of strin=
+g.
+> > > > It wasn't clear from the sscanf(3) man page what the best way to do=
+ that
+> > > > was, so I kept the comma which is also used in tcp addresses (becau=
+se
+> > > > they support additional comma-separated options).
+> > >=20
+> > > %32s instead of %32[^,] should grab up to all 32 remaining characters=
+ in
+> > > the string; your %n trick then ensures there is no garbage.  I guess
+> > > it's still a question of whether we want to always treat a comma as
+> > > trailing garbage.
+> >=20
+> > No comma options are currently accepted.  Treating comma as garbage
+> > seems okay.
+> >=20
+> > Mike: Please change %32[^,] to %32s when merging.  Thanks!
+>=20
+> The above change didn't take place while merging at that time as part of
+> v2.7.0-1720-g6a02c80.
+>=20
+> I still see %32[^,] in all the sscanf(3) calls in
+> util/util/qemu-sockets.c
+>=20
+> Is it still important to change?
 
-When Amarnath proposed the initial patch set for interacting with swtpm
-without relying on CUSE, letting QEMU invoke swtpm was part of the
-patch series. When using some virtual machine management framework like
- virt-manager that might not be necessary. But our goal was to use
-QEMU+swtpm to test TPM support in Yocto, and there QEMU is started by a
-simple wrapper script where handling additional processes would be
-awkward.
+Thanks for noticing.  I don't think it's necessary to make this change
+now.
 
-To achieve that goal without having to make that script more complex,
-I'd like to propose that with some minor (?) changes, a chardev could
-also be configured to use an external command. As a proof of concept
-I'm attaching a patch which modifies char-socket.c accordingly.
+Stefan
 
-Because it's now implemented using the chardev concept, this feature
-could also be useful for other purposes besides connecting to swtpm.
-For example, it could also be used to connect a serial port to anything
-that socat supports, which is more than the builtin code can handle.
+--ISKrrfpKsPiF35CV
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Is that something that has a chance of getting merged?
+-----BEGIN PGP SIGNATURE-----
 
-The specific implementation may need more work. I'm not entirely happy
-about adding the "cmd" option to the existing char-socket.c. It might
-be cleaner to have a separate char-cmd.c. I'm just not sure how the
-common code (for example, everything related to read/write, like
-tcp_chr_read) then could be shared.
+iQEcBAEBAgAGBQJaAJf3AAoJEJykq7OBq3PIV80IAIp0IOI8KaPDPtm3FAuiz/+a
+UdpAMy4aNRHCOXQ86e/NuEVUcUHiMXOc3QGxY14fFi78sexCeNR8DRbKh6lniRM2
+VyUYduNq2wsJuX6Rz77hp7jxeuzL3ccTa+0Fs4xDn9qrBfOKDhXbjnDYcKggTc5N
+7SdxvNnblo7A8iNZsS6GJXNzrJdPMtcGM1iQkbf1WKvzoQVJDoqGuPAlPLEw3qjf
+VK18VYy96PbA3lhEX/ms3Q/EQWXUnxyqeQqfeGTa7W/hInmWvRHXSe4sIvrKUeXj
+/+3H1K0YJvwI3VQVQHhE9Vw/ETbX7ZH7cW0wBpcdAsekTTvEHZS03ZA0cLXBPIw=
+=Ix+z
+-----END PGP SIGNATURE-----
 
-Or perhaps it shouldn't be shared? Introducing yet another base class
-for SocketChardev and a future SocketCmd looks like overkill to me.
-
-Regarding SocketChardev, for what are the "addr" and "connected"
-properties used? Would it be useful to also have something like that in
-a hypothetical char-cmd.c?
-
-When SocketChardev is configured to establish a connection as client,
-does it do that only on demand? I haven't checked what triggers that
-code. It might be useful to only spawn the command when actually needed
-by some frontend. Perhaps then the command can also be spawned multiple
-times. Right now it gets spawned exactly once when creating thechardev. 
-
--- 
-Best Regards, Patrick Ohly
-
-The content of this message is my personal opinion only and although
-I am an employee of Intel, the statements I make here in no way
-represent Intel's position on the issue, nor am I authorized to speak
-on behalf of Intel on this matter.
-
-
---=-S5k91e+3AOv8jKGBPDEL
-Content-Disposition: attachment;
-	filename="0001-chardev-connect-socket-to-a-spawned-command.patch"
-Content-Type: text/x-patch;
-	name="0001-chardev-connect-socket-to-a-spawned-command.patch";
-	charset="UTF-8"
-Content-Transfer-Encoding: base64
-
-RnJvbSA4NWUyNDU2OTgzZThjMjg0ZDMwNGI4ZmNkN2U5YWY4ZDM3ODIwY2ZmIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBQYXRyaWNrIE9obHkgPHBhdHJpY2sub2hseUBpbnRlbC5jb20+
-CkRhdGU6IEZyaSwgMjcgT2N0IDIwMTcgMTU6MjM6MzUgKzAyMDAKU3ViamVjdDogW1BBVENIIDEv
-MV0gY2hhcmRldjogY29ubmVjdCBzb2NrZXQgdG8gYSBzcGF3bmVkIGNvbW1hbmQKClRoZSBjb21t
-YW5kIGlzIHN0YXJ0ZWQgaW4gYSBzaGVsbCAoc2ggLWMpIHdpdGggc3RkaW4gY29ubmVjdCB0byBx
-ZW11CnZpYSBhIFVuaXggZG9tYWluIHN0cmVhbSBzb2NrZXQuIFFlbXUgdGhlbiBleGNoYW5nZXMg
-ZGF0YSB2aWEgaXRzIG93bgplbmQgb2YgdGhlIHNvY2tldCwganVzdCBsaWtlIGl0IG5vcm1hbGx5
-IGRvZXMuCgoiLWNoYXJkZXYgc29ja2V0IiBzdXBwb3J0cyBzb21lIHdheXMgb2YgY29ubmVjdGlu
-ZyB2aWEgcHJvdG9jb2xzIGxpa2UKdGVsbmV0LCBidXQgdGhhdCBpcyBvbmx5IGEgc3Vic2V0IG9m
-IHRoZSBmdW5jdGlvbmFsaXR5IHN1cHBvcnRlZCBieQp0b29scyBzb2NhdC4gVG8gdXNlIHNvY2F0
-IGluc3RlYWQsIGZvciBleGFtcGxlIHRvIGNvbm5lY3QgdmlhIGEgc29ja3MKcHJveHksIHVzZToK
-CiAgLWNoYXJkZXYgJ3NvY2tldCxjbWQ9ZXhlYyBzb2NhdCBGRDowIFNPQ0tTNEE6c29ja3MtcHJv
-eHkubG9jYWxkb21haW46ZXhhbXBsZS5jb206OTk5OSwsc29ja3N1c2VyPW5vYm9keScKCkJld2Fy
-ZSB0aGF0IGNvbW1hcyBpbiB0aGUgY29tbWFuZCBtdXN0IGJlIGVzY2FwZWQgYXMgZG91YmxlIGNv
-bW1hcy4KCkFub3RoZXIgdXNhZ2UgaXMgc3RhcnRpbmcgc3d0cG0gZnJvbSBpbnNpZGUgcWVtdS4g
-c3d0cG0gd2lsbAphdXRvbWF0aWNhbGx5IHNodXQgZG93biBvbmNlIGl0IGxvb3NlcyB0aGUgY29u
-bmVjdGlvbiB0byB0aGUgcGFyZW50CnFlbXUsIHNvIHRoZXJlIGlzIG5vIHJpc2sgb2YgbGluZ2Vy
-aW5nIHByb2Nlc3NlczoKCiAgLWNoYXJkZXYgJ3NvY2tldCxpZD1jaHJ0cG0wLGNtZD1leGVjIHN3
-dHBtIHNvY2tldCAtLXRlcm1pbmF0ZSAtLWN0cmwgdHlwZT11bml4aW8sLGNsaWVudGZkPTAgLS10
-cG1zdGF0ZSBkaXI9Li4uIC0tbG9nIGZpbGU9c3d0cG0ubG9nJyBcCiAgLXRwbWRldiBlbXVsYXRv
-cixpZD10cG0wLGNoYXJkZXY9Y2hydHBtMCBcCiAgLWRldmljZSB0cG0tdGlzLHRwbWRldj10cG0w
-CgpTaWduZWQtb2ZmLWJ5OiBQYXRyaWNrIE9obHkgPHBhdHJpY2sub2hseUBpbnRlbC5jb20+Cgol
-JSBvcmlnaW5hbCBwYXRjaDogY2hhcmRldi1jb25uZWN0LXNvY2tldC10by1hLXNwYXduZWQtY29t
-bWFuZC5wYXRjaAotLS0KIGNoYXJkZXYvY2hhci1zb2NrZXQuYyB8IDg4ICsrKysrKysrKysrKysr
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrLS0tLS0tLQogY2hhcmRldi9jaGFyLmMgICAg
-ICAgIHwgIDMgKysKIHFhcGktc2NoZW1hLmpzb24gICAgICB8ICA1ICsrKwogMyBmaWxlcyBjaGFu
-Z2VkLCA4NCBpbnNlcnRpb25zKCspLCAxMiBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9jaGFy
-ZGV2L2NoYXItc29ja2V0LmMgYi9jaGFyZGV2L2NoYXItc29ja2V0LmMKaW5kZXggMWFlNzMwYTQu
-LjQyYTY3Zjg4IDEwMDY0NAotLS0gYS9jaGFyZGV2L2NoYXItc29ja2V0LmMKKysrIGIvY2hhcmRl
-di9jaGFyLXNvY2tldC5jCkBAIC04NTQsNiArODU0LDU4IEBAIHN0YXRpYyBnYm9vbGVhbiBzb2Nr
-ZXRfcmVjb25uZWN0X3RpbWVvdXQoZ3BvaW50ZXIgb3BhcXVlKQogICAgIHJldHVybiBmYWxzZTsK
-IH0KIAorc3RhdGljIHZvaWQgY2hhcmRldl9vcGVuX3NvY2tldF9jbWQoQ2hhcmRldiAqY2hyLAor
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgY29uc3QgY2hhciAqY21kLAorICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgRXJyb3IgKiplcnJwKQoreworICAgIGlu
-dCBmZHNbMl0gPSB7IC0xLCAtMSB9OworICAgIFFJT0NoYW5uZWxTb2NrZXQgKnNpb2MgPSBOVUxM
-OworICAgIHBpZF90IHBpZCA9IC0xOworICAgIGNvbnN0IGNoYXIgKmFyZ3ZbXSA9IHsgIi9iaW4v
-c2giLCAiLWMiLCBjbWQsIE5VTEwgfTsKKworICAgIGlmIChzb2NrZXRwYWlyKEFGX1VOSVgsIFNP
-Q0tfU1RSRUFNfFNPQ0tfQ0xPRVhFQywgMCwgZmRzKSkgeworICAgICAgICBlcnJvcl9zZXRnX2Vy
-cm5vKGVycnAsIGVycm5vLCAiRXJyb3IgY3JlYXRpbmcgc29ja2V0cGFpcihBRl9VTklYLCBTT0NL
-X1NUUkVBTXxTT0NLX0NMT0VYRUMpIik7CisgICAgICAgIGdvdG8gZXJyb3I7CisgICAgfQorCisg
-ICAgcGlkID0gcWVtdV9mb3JrKGVycnApOworICAgIGlmIChwaWQgPCAwKSB7CisgICAgICAgIGdv
-dG8gZXJyb3I7CisgICAgfQorCisgICAgaWYgKCFwaWQpIHsKKyAgICAgICAgLyogY2hpbGQgKi8K
-KyAgICAgICAgZHVwMihmZHNbMV0sIFNURElOX0ZJTEVOTyk7CisgICAgICAgIGV4ZWN2KGFyZ3Zb
-MF0sIChjaGFyICogY29uc3QgKilhcmd2KTsKKyAgICAgICAgX2V4aXQoMSk7CisgICAgfQorCisg
-ICAgLyoKKyAgICAgKiBIYW5kIG92ZXIgb3VyIGVuZCBvZiB0aGUgc29ja2V0IHBhaXIgdG8gdGhl
-IHFpbyBjaGFubmVsLgorICAgICAqIFRPRE86IFdlIGRvbid0IHJlYXAgdGhlIGNoaWxkIGF0IHRo
-ZSBtb21lbnQuCisgICAgICovCisgICAgc2lvYyA9IHFpb19jaGFubmVsX3NvY2tldF9uZXdfZmQo
-ZmRzWzBdLCBlcnJwKTsKKyAgICBpZiAoIXNpb2MpIHsKKyAgICAgICAgZ290byBlcnJvcjsKKyAg
-ICB9CisgICAgZmRzWzBdID0gLTE7CisKKyAgICBnX2ZyZWUoY2hyLT5maWxlbmFtZSk7CisgICAg
-Y2hyLT5maWxlbmFtZSA9IGdfc3RyZHVwX3ByaW50ZigiY21kOiVzIiwgY21kKTsKKyAgICB0Y3Bf
-Y2hyX25ld19jbGllbnQoY2hyLCBzaW9jKTsKKworIGVycm9yOgorICAgIGlmIChmZHNbMF0gPj0g
-MCkgeworICAgICAgICBjbG9zZShmZHNbMF0pOworICAgIH0KKyAgICBpZiAoZmRzWzFdID49IDAp
-IHsKKyAgICAgICAgY2xvc2UoZmRzWzFdKTsKKyAgICB9CisgICAgaWYgKHNpb2MpIHsKKyAgICAg
-ICAgb2JqZWN0X3VucmVmKE9CSkVDVChzaW9jKSk7CisgICAgfQorfQorCiBzdGF0aWMgdm9pZCBx
-bXBfY2hhcmRldl9vcGVuX3NvY2tldChDaGFyZGV2ICpjaHIsCiAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICBDaGFyZGV2QmFja2VuZCAqYmFja2VuZCwKICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgIGJvb2wgKmJlX29wZW5lZCwKQEAgLTg2MSwxMiArOTEzLDEz
-IEBAIHN0YXRpYyB2b2lkIHFtcF9jaGFyZGV2X29wZW5fc29ja2V0KENoYXJkZXYgKmNociwKIHsK
-ICAgICBTb2NrZXRDaGFyZGV2ICpzID0gU09DS0VUX0NIQVJERVYoY2hyKTsKICAgICBDaGFyZGV2
-U29ja2V0ICpzb2NrID0gYmFja2VuZC0+dS5zb2NrZXQuZGF0YTsKLSAgICBib29sIGRvX25vZGVs
-YXkgICAgID0gc29jay0+aGFzX25vZGVsYXkgPyBzb2NrLT5ub2RlbGF5IDogZmFsc2U7Ci0gICAg
-Ym9vbCBpc19saXN0ZW4gICAgICA9IHNvY2stPmhhc19zZXJ2ZXIgID8gc29jay0+c2VydmVyICA6
-IHRydWU7Ci0gICAgYm9vbCBpc190ZWxuZXQgICAgICA9IHNvY2stPmhhc190ZWxuZXQgID8gc29j
-ay0+dGVsbmV0ICA6IGZhbHNlOwotICAgIGJvb2wgaXNfdG4zMjcwICAgICAgPSBzb2NrLT5oYXNf
-dG4zMjcwICA/IHNvY2stPnRuMzI3MCAgOiBmYWxzZTsKLSAgICBib29sIGlzX3dhaXRjb25uZWN0
-ID0gc29jay0+aGFzX3dhaXQgICAgPyBzb2NrLT53YWl0ICAgIDogZmFsc2U7Ci0gICAgaW50NjRf
-dCByZWNvbm5lY3QgICA9IHNvY2stPmhhc19yZWNvbm5lY3QgPyBzb2NrLT5yZWNvbm5lY3QgOiAw
-OworICAgIGNvbnN0IGNoYXIgKmNtZCAgICAgPSBzb2NrLT5jbWQ7CisgICAgYm9vbCBkb19ub2Rl
-bGF5ICAgICA9IGNtZCA/IGZhbHNlIDogc29jay0+aGFzX25vZGVsYXkgPyBzb2NrLT5ub2RlbGF5
-IDogZmFsc2U7CisgICAgYm9vbCBpc19saXN0ZW4gICAgICA9IGNtZCA/IGZhbHNlIDogc29jay0+
-aGFzX3NlcnZlciAgPyBzb2NrLT5zZXJ2ZXIgIDogdHJ1ZTsKKyAgICBib29sIGlzX3RlbG5ldCAg
-ICAgID0gY21kID8gZmFsc2UgOiBzb2NrLT5oYXNfdGVsbmV0ICA/IHNvY2stPnRlbG5ldCAgOiBm
-YWxzZTsKKyAgICBib29sIGlzX3RuMzI3MCAgICAgID0gY21kID8gZmFsc2UgOiBzb2NrLT5oYXNf
-dG4zMjcwICA/IHNvY2stPnRuMzI3MCAgOiBmYWxzZTsKKyAgICBib29sIGlzX3dhaXRjb25uZWN0
-ID0gY21kID8gZmFsc2UgOiBzb2NrLT5oYXNfd2FpdCAgICA/IHNvY2stPndhaXQgICAgOiBmYWxz
-ZTsKKyAgICBpbnQ2NF90IHJlY29ubmVjdCAgID0gY21kID8gMCA6IHNvY2stPmhhc19yZWNvbm5l
-Y3QgPyBzb2NrLT5yZWNvbm5lY3QgOiAwOwogICAgIFFJT0NoYW5uZWxTb2NrZXQgKnNpb2MgPSBO
-VUxMOwogICAgIFNvY2tldEFkZHJlc3MgKmFkZHI7CiAKQEAgLTkxMSwxMSArOTY0LDExIEBAIHN0
-YXRpYyB2b2lkIHFtcF9jaGFyZGV2X29wZW5fc29ja2V0KENoYXJkZXYgKmNociwKIAogICAgIHFl
-bXVfY2hyX3NldF9mZWF0dXJlKGNociwgUUVNVV9DSEFSX0ZFQVRVUkVfUkVDT05ORUNUQUJMRSk7
-CiAgICAgLyogVE9ETyBTT0NLRVRfQUREUkVTU19GRCB3aGVyZSBmZCBoYXMgQUZfVU5JWCAqLwot
-ICAgIGlmIChhZGRyLT50eXBlID09IFNPQ0tFVF9BRERSRVNTX1RZUEVfVU5JWCkgeworICAgIGlm
-IChjbWQgfHwgYWRkci0+dHlwZSA9PSBTT0NLRVRfQUREUkVTU19UWVBFX1VOSVgpIHsKICAgICAg
-ICAgcWVtdV9jaHJfc2V0X2ZlYXR1cmUoY2hyLCBRRU1VX0NIQVJfRkVBVFVSRV9GRF9QQVNTKTsK
-ICAgICB9CiAKLSAgICAvKiBiZSBpc24ndCBvcGVuZWQgdW50aWwgd2UgZ2V0IGEgY29ubmVjdGlv
-biAqLworICAgIC8qIGJlIGlzbid0IG9wZW5lZCB1bnRpbCB3ZSBnZXQgYSBjb25uZWN0aW9uIG9y
-IGZvcmsgYSBjb21tYW5kICovCiAgICAgKmJlX29wZW5lZCA9IGZhbHNlOwogCiAgICAgdXBkYXRl
-X2Rpc2Nvbm5lY3RlZF9maWxlbmFtZShzKTsKQEAgLTkyOCw3ICs5ODEsMTIgQEAgc3RhdGljIHZv
-aWQgcW1wX2NoYXJkZXZfb3Blbl9zb2NrZXQoQ2hhcmRldiAqY2hyLAogICAgICAgICBzLT5yZWNv
-bm5lY3RfdGltZSA9IHJlY29ubmVjdDsKICAgICB9CiAKLSAgICBpZiAocy0+cmVjb25uZWN0X3Rp
-bWUpIHsKKyAgICBpZiAoY21kKSB7CisgICAgICAgIGNoYXJkZXZfb3Blbl9zb2NrZXRfY21kKGNo
-ciwgY21kLCBlcnJwKTsKKworICAgICAgICAvKiBldmVyeXRoaW5nIHJlYWR5IChvciBmYWlsZWQg
-cGVybWFuZW50bHkpIGJlZm9yZSB3ZSByZXR1cm4gKi8KKyAgICAgICAgKmJlX29wZW5lZCA9IHRy
-dWU7CisgICAgfSBlbHNlIGlmIChzLT5yZWNvbm5lY3RfdGltZSkgewogICAgICAgICBzaW9jID0g
-cWlvX2NoYW5uZWxfc29ja2V0X25ldygpOwogICAgICAgICB0Y3BfY2hyX3NldF9jbGllbnRfaW9j
-X25hbWUoY2hyLCBzaW9jKTsKICAgICAgICAgcWlvX2NoYW5uZWxfc29ja2V0X2Nvbm5lY3RfYXN5
-bmMoc2lvYywgcy0+YWRkciwKQEAgLTk4NywxMSArMTA0NSwxNiBAQCBzdGF0aWMgdm9pZCBxZW11
-X2Nocl9wYXJzZV9zb2NrZXQoUWVtdU9wdHMgKm9wdHMsIENoYXJkZXZCYWNrZW5kICpiYWNrZW5k
-LAogICAgIGNvbnN0IGNoYXIgKmhvc3QgPSBxZW11X29wdF9nZXQob3B0cywgImhvc3QiKTsKICAg
-ICBjb25zdCBjaGFyICpwb3J0ID0gcWVtdV9vcHRfZ2V0KG9wdHMsICJwb3J0Iik7CiAgICAgY29u
-c3QgY2hhciAqdGxzX2NyZWRzID0gcWVtdV9vcHRfZ2V0KG9wdHMsICJ0bHMtY3JlZHMiKTsKKyAg
-ICBjb25zdCBjaGFyICpjbWQgPSBxZW11X29wdF9nZXQob3B0cywgImNtZCIpOwogICAgIFNvY2tl
-dEFkZHJlc3NMZWdhY3kgKmFkZHI7CiAgICAgQ2hhcmRldlNvY2tldCAqc29jazsKIAogICAgIGJh
-Y2tlbmQtPnR5cGUgPSBDSEFSREVWX0JBQ0tFTkRfS0lORF9TT0NLRVQ7Ci0gICAgaWYgKCFwYXRo
-KSB7CisgICAgaWYgKGNtZCAmJiBwYXRoKSB7CisgICAgICAgIGVycm9yX3NldGcoZXJycCwgImNo
-YXJkZXY6IHNvY2tldDogY21kIGFuZCBwYXRoIGFyZSBtdXR1YWxseSBleGNsdXNpdmUiKTsKKyAg
-ICAgICAgcmV0dXJuOworICAgIH0KKyAgICBpZiAoIXBhdGggJiYgIWNtZCkgewogICAgICAgICBp
-ZiAoIWhvc3QpIHsKICAgICAgICAgICAgIGVycm9yX3NldGcoZXJycCwgImNoYXJkZXY6IHNvY2tl
-dDogbm8gaG9zdCBnaXZlbiIpOwogICAgICAgICAgICAgcmV0dXJuOwpAQCAtMTAyMywxMyArMTA4
-NiwxNCBAQCBzdGF0aWMgdm9pZCBxZW11X2Nocl9wYXJzZV9zb2NrZXQoUWVtdU9wdHMgKm9wdHMs
-IENoYXJkZXZCYWNrZW5kICpiYWNrZW5kLAogICAgIHNvY2stPmhhc19yZWNvbm5lY3QgPSB0cnVl
-OwogICAgIHNvY2stPnJlY29ubmVjdCA9IHJlY29ubmVjdDsKICAgICBzb2NrLT50bHNfY3JlZHMg
-PSBnX3N0cmR1cCh0bHNfY3JlZHMpOworICAgIHNvY2stPmNtZCA9IGdfc3RyZHVwKGNtZCk7CiAK
-ICAgICBhZGRyID0gZ19uZXcwKFNvY2tldEFkZHJlc3NMZWdhY3ksIDEpOwotICAgIGlmIChwYXRo
-KSB7CisgICAgaWYgKHBhdGggfHwgY21kKSB7CiAgICAgICAgIFVuaXhTb2NrZXRBZGRyZXNzICpx
-X3VuaXg7CiAgICAgICAgIGFkZHItPnR5cGUgPSBTT0NLRVRfQUREUkVTU19MRUdBQ1lfS0lORF9V
-TklYOwogICAgICAgICBxX3VuaXggPSBhZGRyLT51LnFfdW5peC5kYXRhID0gZ19uZXcwKFVuaXhT
-b2NrZXRBZGRyZXNzLCAxKTsKLSAgICAgICAgcV91bml4LT5wYXRoID0gZ19zdHJkdXAocGF0aCk7
-CisgICAgICAgIHFfdW5peC0+cGF0aCA9IGNtZCA/IGdfc3RyZHVwX3ByaW50ZigiY21kOiVzIiwg
-Y21kKSA6IGdfc3RyZHVwKHBhdGgpOwogICAgIH0gZWxzZSB7CiAgICAgICAgIGFkZHItPnR5cGUg
-PSBTT0NLRVRfQUREUkVTU19MRUdBQ1lfS0lORF9JTkVUOwogICAgICAgICBhZGRyLT51LmluZXQu
-ZGF0YSA9IGdfbmV3KEluZXRTb2NrZXRBZGRyZXNzLCAxKTsKZGlmZiAtLWdpdCBhL2NoYXJkZXYv
-Y2hhci5jIGIvY2hhcmRldi9jaGFyLmMKaW5kZXggNWQyODNiOTAuLmNjYjMyOWQ0IDEwMDY0NAot
-LS0gYS9jaGFyZGV2L2NoYXIuYworKysgYi9jaGFyZGV2L2NoYXIuYwpAQCAtNzgyLDYgKzc4Miw5
-IEBAIFFlbXVPcHRzTGlzdCBxZW11X2NoYXJkZXZfb3B0cyA9IHsKICAgICAgICAgICAgIC5uYW1l
-ID0gInBhdGgiLAogICAgICAgICAgICAgLnR5cGUgPSBRRU1VX09QVF9TVFJJTkcsCiAgICAgICAg
-IH0seworICAgICAgICAgICAgLm5hbWUgPSAiY21kIiwKKyAgICAgICAgICAgIC50eXBlID0gUUVN
-VV9PUFRfU1RSSU5HLAorICAgICAgICB9LHsKICAgICAgICAgICAgIC5uYW1lID0gImhvc3QiLAog
-ICAgICAgICAgICAgLnR5cGUgPSBRRU1VX09QVF9TVFJJTkcsCiAgICAgICAgIH0sewpkaWZmIC0t
-Z2l0IGEvcWFwaS1zY2hlbWEuanNvbiBiL3FhcGktc2NoZW1hLmpzb24KaW5kZXggNzhhMDBiYzgu
-Ljc5MGIwMjZkIDEwMDY0NAotLS0gYS9xYXBpLXNjaGVtYS5qc29uCisrKyBiL3FhcGktc2NoZW1h
-Lmpzb24KQEAgLTUwMDQsNiArNTAwNCwxMCBAQAogIwogIyBAYWRkcjogc29ja2V0IGFkZHJlc3Mg
-dG8gbGlzdGVuIG9uIChzZXJ2ZXI9dHJ1ZSkKICMgICAgICAgIG9yIGNvbm5lY3QgdG8gKHNlcnZl
-cj1mYWxzZSkKKyMgQGNtZDogY29tbWFuZCB0byBydW4gdmlhICJzaCAtYyIgd2l0aCBzdGRpbiBh
-cyBvbmUgZW5kIG9mCisjICAgICAgIGEgQUZfVU5JWCBTT0NLX0RTVFJFQU0gc29ja2V0IHBhaXIu
-IFRoZSBvdGhlciBlbmQKKyMgICAgICAgaXMgdXNlZCBieSB0aGUgY2hhcmRldi4gRWl0aGVyIGFu
-IGFkZHIgb3IgYSBjbWQgY2FuCisjICAgICAgIGJlIHNwZWNpZmllZCwgYnV0IG5vdCBib3RoLgog
-IyBAdGxzLWNyZWRzOiB0aGUgSUQgb2YgdGhlIFRMUyBjcmVkZW50aWFscyBvYmplY3QgKHNpbmNl
-IDIuNikKICMgQHNlcnZlcjogY3JlYXRlIHNlcnZlciBzb2NrZXQgKGRlZmF1bHQ6IHRydWUpCiAj
-IEB3YWl0OiB3YWl0IGZvciBpbmNvbWluZyBjb25uZWN0aW9uIG9uIHNlcnZlcgpAQCAtNTAyMSw2
-ICs1MDI1LDcgQEAKICMgU2luY2U6IDEuNAogIyMKIHsgJ3N0cnVjdCc6ICdDaGFyZGV2U29ja2V0
-JywgJ2RhdGEnOiB7ICdhZGRyJyAgICAgICA6ICdTb2NrZXRBZGRyZXNzTGVnYWN5JywKKyAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAnKmNtZCcgICAgICAgOiAnc3RyJywKICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAnKnRscy1jcmVkcycgIDogJ3N0cics
-CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgJypzZXJ2ZXInICAgIDogJ2Jv
-b2wnLAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICcqd2FpdCcgICAgICA6
-ICdib29sJywKLS0gCjIuMTEuMAoK
-
-
---=-S5k91e+3AOv8jKGBPDEL--
+--ISKrrfpKsPiF35CV--
