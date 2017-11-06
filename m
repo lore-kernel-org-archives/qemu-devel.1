@@ -1,34 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57510)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57512)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eBmxj-00051G-B5
+	(envelope-from <eblake@redhat.com>) id 1eBmxj-00051H-Dr
 	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 14:21:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eBmxg-0000be-5Q
+	(envelope-from <eblake@redhat.com>) id 1eBmxg-0000bk-7v
 	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 14:21:35 -0500
-Received: from indium.canonical.com ([91.189.90.7]:44300)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eBmxf-0000bN-VE
+Received: from mx1.redhat.com ([209.132.183.28]:46428)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eBmxf-0000bL-Uz
 	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 14:21:32 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eBmxe-0005ka-6x
-	for <qemu-devel@nongnu.org>; Mon, 06 Nov 2017 19:21:30 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 92C8F2E81A1
-	for <qemu-devel@nongnu.org>; Mon,  6 Nov 2017 19:21:26 +0000 (UTC)
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C842C5F152
+	for <qemu-devel@nongnu.org>; Mon,  6 Nov 2017 19:21:30 +0000 (UTC)
+References: <20171106185411.19551-1-marcandre.lureau@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <ae73f31f-749a-e02e-d04b-1090e350619e@redhat.com>
+Date: Mon, 6 Nov 2017 13:21:27 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 06 Nov 2017 19:14:46 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1673976 <1673976@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170318142657.21676.52259.malonedeb@chaenomeles.canonical.com>
-Message-Id: <150999568789.20805.16293748337074744799.launchpad@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1673976] Re: locale-gen dumps core run under
- arm-linux-user on x86-64 host
+In-Reply-To: <20171106185411.19551-1-marcandre.lureau@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="BWpN00LnDIURmO3sesA06hb3FfA4QFQxc"
+Subject: Re: [Qemu-devel] [PATCH] .gitignore: remove vscclient
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,39 +33,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
 
-** Tags added: linux-user
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--BWpN00LnDIURmO3sesA06hb3FfA4QFQxc
+From: Eric Blake <eblake@redhat.com>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ qemu-devel@nongnu.org
+Message-ID: <ae73f31f-749a-e02e-d04b-1090e350619e@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] .gitignore: remove vscclient
+References: <20171106185411.19551-1-marcandre.lureau@redhat.com>
+In-Reply-To: <20171106185411.19551-1-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
--- =
+On 11/06/2017 12:54 PM, Marc-Andr=C3=A9 Lureau wrote:
+> It was removed with libcacard.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1673976
+which was back in which commit?  I'm trying to get an idea of how long
+this entry has been stale.
 
-Title:
-  locale-gen dumps core run under arm-linux-user on x86-64 host
+I'm not opposed to this patch, but I personally like to leave .gitignore
+entries in place for several releases after they are last useful, to
+make incremental builds easier when jumping around between old and new
+branches across the point where the file was removed (as long as the new
+branch still ignores the file, then building the file in the old branch
+doesn't hurt the new branch).  Of course, if I'm that involved in
+backporting madness across branches, I'm also fine updating my own
+=2Egit/info/exclude for cruft that is built in only one of two branches,
+rather than relying on per-branch .gitignore to do it for me.
 
-Status in QEMU:
-  New
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-Bug description:
-  I'm running a command (locale-gen) inside of an armv7h chroot mounted
-  on my x86_64 desktop by putting qemu-arm-static into /usr/bin/ of the
-  chroot file system and I get a core dump.
 
-  locale-gen
-  Generating locales...
-  =C2=A0=C2=A0en_US.UTF-8...localedef: ../sysdeps/unix/sysv/linux/spawni.c:=
-360: __spawnix: Assertion `ec >=3D 0' failed.
-  qemu: uncaught target signal 6 (Aborted) - core dumped
-  /usr/bin/locale-gen: line 41:    34 Aborted                 (core dumped)=
- localedef -i $input -c -f $charset -A /usr/share/locale/locale.alias $loca=
-le
+--BWpN00LnDIURmO3sesA06hb3FfA4QFQxc
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-  I've done this same thing successfully for years, but this breakage
-  has appeared some time in the last 3 or so months. Possibly with the
-  update to qemu version 2.8.
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1673976/+subscriptions
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloAtjcACgkQp6FrSiUn
+Q2pJqwgAlQHwC9qyCWRKyRhZYeQizAByGndtoHQ8PbV8In5Ptfgwc9a9Kz+ZjGoI
+wFGF7HwwxJxIZqryVkCX19AjYXSVw9NY9X/xcJCFxqBokzDRTIBycXfcB9j1vXIw
+97hPeMjJ/au7ET9hh/XTcWO9MuMeqPN4i+f/t5xW60OFFsARzUMQRgG1HW1HDgJL
+YMYW6sS8G4bICXenkvhzdm/LbUcc/wtcejeQwi5v0TC2G3ZFFim+Wt4zMqhuEgGC
+ElTSeXXAAvMCF9np28xVIdco64oSbstyow4+qkX1JgCn9XrjLajhKjEiX6+ics6D
+G7JyjQWJLY4UyPIG/FAO8Aax9Pn9ag==
+=nRC9
+-----END PGP SIGNATURE-----
+
+--BWpN00LnDIURmO3sesA06hb3FfA4QFQxc--
