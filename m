@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41336)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41819)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eBakX-0008C9-8r
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 01:19:10 -0500
+	(envelope-from <longpeng2@huawei.com>) id 1eBams-0000bu-Cx
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 01:21:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eBakT-00060p-FD
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 01:19:09 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49950)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eBakT-0005wY-9S
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 01:19:05 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <1507696406-11168-1-git-send-email-jiang.biao2@zte.com.cn>
-	<CAFEAcA_EefcYLjt5aG1D+rcQes9vig6OFZGJrxNhgp5q2vfqbw@mail.gmail.com>
-Date: Mon, 06 Nov 2017 07:19:01 +0100
-In-Reply-To: <CAFEAcA_EefcYLjt5aG1D+rcQes9vig6OFZGJrxNhgp5q2vfqbw@mail.gmail.com>
-	(Peter Maydell's message of "Wed, 11 Oct 2017 13:03:15 +0100")
-Message-ID: <87h8u8gca2.fsf@dusky.pond.sub.org>
+	(envelope-from <longpeng2@huawei.com>) id 1eBamn-0002uF-LZ
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 01:21:34 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:2275)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <longpeng2@huawei.com>) id 1eBamn-0002fk-8t
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 01:21:29 -0500
+From: "Longpeng(Mike)" <longpeng2@huawei.com>
+Date: Mon, 6 Nov 2017 14:21:11 +0800
+Message-ID: <1509949271-36280-1-git-send-email-longpeng2@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] checkpatch: replace ERROR with WARN for
- extern checking.
+Subject: [Qemu-devel] [PATCH] crypto: afalg: fix a NULL pointer dereference
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,29 +23,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Jiang Biao <jiang.biao2@zte.com.cn>, zhong.weidong@zte.com.cn, QEMU Developers <qemu-devel@nongnu.org>
+To: berrange@redhat.com, pbonzini@redhat.com, arei.gonglei@huawei.com
+Cc: longpeng2@huawei.com, qemu-devel@nongnu.org
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+Test-crypto-hash calls qcrypto_hash_bytesv/digest/base64 with
+errp=NULL, this will cause a NULL poniter deference if afalg_driver
+doesn't support requested algos:
+    ret = qcrypto_hash_afalg_driver.hash_bytesv(alg, iov, niov,
+                                                result, resultlen,
+                                                errp);
+    if (ret == 0) {
+        return ret;
+    }
 
-> On 11 October 2017 at 05:33, Jiang Biao <jiang.biao2@zte.com.cn> wrote:
->> There are some rare cases which need external declarations in .c
->> files. patchew.org and checkpatch.pl will complain errors on
->> patches for these declarations.
->>
->> Degrade ERROR to WARN to erase the error complaints taking
->> checkpatch.pl in kernel as reference.
->>
->> Signed-off-by: Jiang Biao <jiang.biao2@zte.com.cn>
->> ---
->>  scripts/checkpatch.pl | 4 ++--
->>  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> I'd rather not drop this to a warning for the sake of a single
-> use case that's already in the tree (and which if you really
+    error_free(*errp);  // <--- here
 
-Concur.  Rare false positives from checkpatch are tolerable.
+So we must check 'errp & *errp' before dereference.
 
-> cared about you could work around by putting the link_error()
-> declaration in a header file I suppose, though I wouldn't
-> bother personally.)
+Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
+---
+ crypto/hash.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/crypto/hash.c b/crypto/hash.c
+index ac59c63..c464c78 100644
+--- a/crypto/hash.c
++++ b/crypto/hash.c
+@@ -60,7 +60,9 @@ int qcrypto_hash_bytesv(QCryptoHashAlgorithm alg,
+      * TODO:
+      * Maybe we should treat some afalg errors as fatal
+      */
+-    error_free(*errp);
++    if (errp && *errp) {
++        error_free(*errp);
++    }
+ #endif
+ 
+     return qcrypto_hash_lib_driver.hash_bytesv(alg, iov, niov,
+-- 
+1.8.3.1
