@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50773)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51194)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eBmhq-0003HQ-3I
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 14:05:14 -0500
+	(envelope-from <stefanha@gmail.com>) id 1eBmir-0004Cb-RT
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 14:06:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eBmhj-0001ZL-UN
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 14:05:10 -0500
-Date: Tue, 7 Nov 2017 06:04:55 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20171106190455.GA12514@umbus.fritz.box>
-References: <150789430473.4410.10317971414202753256.stgit@bahia.lan>
-	<20171014093337.GG28032@umbus.fritz.box>
-	<20171016102638.6977381f@nial.brq.redhat.com>
-	<20171017061609.GL2776@umbus.fritz.box>
-	<20171106160307.215d3cbd@bahia>
+	(envelope-from <stefanha@gmail.com>) id 1eBmin-0002FF-RF
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 14:06:13 -0500
+Date: Mon, 6 Nov 2017 19:06:06 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20171106190606.GK4557@stefanha-x1.localdomain>
+References: <68B56AECEFB25A418ADB9417F6178A531091A91B@dggemi507-mbs.china.huawei.com>
+	<20171103102626.GH5078@stefanha-x1.localdomain>
+	<68B56AECEFB25A418ADB9417F6178A531091E80A@dggemi507-mbx.china.huawei.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="pf9I7BMVVzbSWLtt"
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="9a9Vq1BJdYBEXpLG"
 Content-Disposition: inline
-In-Reply-To: <20171106160307.215d3cbd@bahia>
-Subject: Re: [Qemu-devel] [PATCH] spapr_cpu_core: instantiate CPUs separately
+In-Reply-To: <68B56AECEFB25A418ADB9417F6178A531091E80A@dggemi507-mbx.china.huawei.com>
+Subject: Re: [Qemu-devel]
+ =?utf-8?q?=5BQemu-block=5D_question=EF=BC=9A_I_foun?=
+ =?utf-8?q?d_a_qemu_crash_when_attach_virtio-scsi_disk?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,101 +27,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: lizhengui <lizhengui@huawei.com>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "jcody@redhat.com" <jcody@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "Fangyi (C)" <eric.fangyi@huawei.com>
 
 
---pf9I7BMVVzbSWLtt
-Content-Type: text/plain; charset=us-ascii
+--9a9Vq1BJdYBEXpLG
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Nov 06, 2017 at 04:03:07PM +0100, Greg Kurz wrote:
-> On Tue, 17 Oct 2017 17:16:09 +1100
-> David Gibson <david@gibson.dropbear.id.au> wrote:
->=20
-> > On Mon, Oct 16, 2017 at 10:26:38AM +0200, Igor Mammedov wrote:
-> > > On Sat, 14 Oct 2017 20:33:37 +1100
-> > > David Gibson <david@gibson.dropbear.id.au> wrote:
-> > >  =20
-> > > > On Fri, Oct 13, 2017 at 01:31:44PM +0200, Greg Kurz wrote: =20
-> > > > > The current code assumes that only the CPU core object holds a
-> > > > > reference on each individual CPU object, and happily frees their
-> > > > > allocated memory when the core is unrealized. This is dangerous
-> > > > > as some other code can legitimely keep a pointer to a CPU if it
-> > > > > calls object_ref(), but it would end up with a dangling pointer.
-> > > > >=20
-> > > > > Let's allocate all CPUs with object_new() and let QOM frees them
-> > > > > when their reference count reaches zero. This greatly simplify the
-> > > > > code as we don't have to fiddle with the instance size anymore.
-> > > > >=20
-> > > > > Signed-off-by: Greg Kurz <groug@kaod.org>   =20
-> > > >=20
-> > > > So, I'm pretty sure my first drafts of the core stuff did things th=
-is
-> > > > waym and it got nacked, for QOM lifetime reasons that I never really
-> > > > understood. =20
-> > > From what I remember, Andreas would like to see composite CPU object
-> > > allocated in one go and then its children initialized with object_ini=
-tialize()
-> > > so that no more allocation were needed. =20
-> >=20
-> > Ah, ok.
-> >=20
-> > > That potentially would benefit hotplug, since we could gracefully
-> > > fail object creation early if there is not enough memory. =20
-> >=20
-> > Yeah, it sounds nice, but I don't see how we can do it.  In order to
-> > do that the core object has to have enough space for all the threads,
-> > which means we need both the size of each thread object and the number
-> > of them.  The size we have (and will be easier to handle after Igor's
-> > cleanups).  The number, we don't.
-> >=20
-> > > But the way it's implemented currently doesn't really match that init=
-ial
-> > > goal as array for threads is dynamically allocated later
-> > > and then we need to dance around it with pointer arithmetic.
-> > >=20
-> > > BTW: almost any allocation failure in qemu currently
-> > > is fatal so whether we fail on array alloc or on individual
-> > > object_new() won't make any difference.
-> > >=20
-> > > I'd rather see this clean up merged as it simplifies code
-> > > in these case. =20
-> >=20
-> > Ok, works for me.
-> >=20
->=20
-> Since we're in soft freeze already, I guess this won't go to 2.11. Maybe =
-it's
-> time to create ppc-for-2.12 and apply it there ?
+On Sun, Nov 05, 2017 at 02:51:40PM +0000, lizhengui wrote:
+> Ok=EF=BC=8C thanks for your reply so mush..
 
-Yeah, sounds like a plan.
+Did the patch solve the problem?
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+If it works for you I will send a proper patch to the mailing list.
 
---pf9I7BMVVzbSWLtt
+Thanks,
+Stefan
+
+--9a9Vq1BJdYBEXpLG
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAloAslUACgkQbDjKyiDZ
-s5LVAg//RYPiiYmnMvbyddM/vixa5mR2kh7G/qZt7kQFjAZ4+/Kachh035ugTLRM
-DRbjyBwWOhAy87srMpkaYbIzOmTotfoTMzu69mvCnI9tSFu/dLjCi+IABiLsc3yX
-5HS5pQS6EI6txZ6W5Fb4Ycl2iEeybqX60F7VtM4GNtTzTAF7OmNLKORFIdr2Y9Fu
-7y9vemLitkFTzoU7XL2hpn9/JTzBdDlDLXrasDzhNxrjDXae88rrJAC2L9mx5Dzb
-mVXk4zd1pOwBrGV/atcd0aQiUKbXYVHhqKKpkRb6md/GxID0mMLJe1Oy46U1c3Ct
-KkF5THs/TNxRukX84SVVYWVsIAnZSvHNNJN6ujEW43/DXGGGLCZALfahk2UloTgV
-HjT3bG73dgOrMh8fXvv8EriW+eHrEM0MGY59p/NmIb0cot+OiT0OvXbjhP/J/nXU
-MFblyeZQ5sTS3U9EdyL7frHKOmiUtQBXZca9M9ech9j01KfNS0BzKxq3EblXUUxU
-I8Lpfwqus5dwg5Tp3iT4G1loNrOERtjqqe9uLspKkWFXRZngnLvHqN81eNjdvdfD
-WIXdN7rFpnfla1LIHywz8Vye0eXpCTYkUOWT5bUhObhLQOd8yQOWC1Rq6ghswafn
-HNedtZwc+uBbKnbp0BjS9QmM4mAfFA8R9xNzXJ8451bB5Zj0AJM=
-=E0pl
+iQEcBAEBAgAGBQJaALKeAAoJEJykq7OBq3PIdE4H/2mb3jgc6or8a4HGuxBQEixs
+tn2LKqwK/oxEhLAvwcV3rCizaIyxFQtwUERgJpTceVHEGr9xHNIZmLhCt+aOWCLn
+vJz2t084l+h+4O8eamLDekFCecanGwAuocl1Hrh1P4nDD/ZvNxSzcDwInc3cEFTO
+Ge7TFacNGaW5wym8sacxKscx4jycA5jcF6IPeVAlIEThCbzxcUtJA0LKFPT96rRp
+RI3rNl+Tw63RPPQ9nO8lIcR1q8mlmsRM8e4caZd1LqxauflCRizAwSo2Aki2Zbds
+ZDSUUVcmERUKVWD6ROz4qI7rQYvqFePxGm/Pq0cP6Onfo9nZ7g1XQ9//Xq+0p6Q=
+=NZkc
 -----END PGP SIGNATURE-----
 
---pf9I7BMVVzbSWLtt--
+--9a9Vq1BJdYBEXpLG--
