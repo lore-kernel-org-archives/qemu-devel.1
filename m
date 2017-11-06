@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40657)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eBl2w-0007NI-PI
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 12:18:51 -0500
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40896)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <n54@gmx.com>)
+	id 1eBl3X-0007h7-8E
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 12:19:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eBl2t-0004bA-FC
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 12:18:50 -0500
-Received: from mail-wm0-x22d.google.com ([2a00:1450:400c:c09::22d]:48262)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1eBl2t-0004ap-6z
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 12:18:47 -0500
-Received: by mail-wm0-x22d.google.com with SMTP id p75so15328692wmg.3
-	for <qemu-devel@nongnu.org>; Mon, 06 Nov 2017 09:18:46 -0800 (PST)
-Date: Mon, 6 Nov 2017 17:18:44 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20171106171844.GI4557@stefanha-x1.localdomain>
-References: <1509949271-36280-1-git-send-email-longpeng2@huawei.com>
+	(envelope-from <n54@gmx.com>) id 1eBl3T-0004qN-Tb
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 12:19:27 -0500
+Received: from mout.gmx.net ([212.227.17.21]:58687)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <n54@gmx.com>) id 1eBl3T-0004pn-JA
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 12:19:23 -0500
+References: <20171106005656.GC84093@humpty.home.comstyle.com>
+	<CAFEAcA_2i0p9C3amtoB0o9Y4K83aCP7Gkw1cDqmLjrkLwJTZxg@mail.gmail.com>
+From: Kamil Rytarowski <n54@gmx.com>
+Message-ID: <5ed0a508-e22a-5d59-c826-54fa17afcf20@gmx.com>
+Date: Mon, 6 Nov 2017 18:21:45 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="zqjkMoGlbUJ91oFe"
-Content-Disposition: inline
-In-Reply-To: <1509949271-36280-1-git-send-email-longpeng2@huawei.com>
-Subject: Re: [Qemu-devel] [PATCH] crypto: afalg: fix a NULL pointer
- dereference
+In-Reply-To: <CAFEAcA_2i0p9C3amtoB0o9Y4K83aCP7Gkw1cDqmLjrkLwJTZxg@mail.gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="f66bIae8xG55N6311ACtsgXxwNVE5sqrV"
+Subject: Re: [Qemu-devel] [PATCH] osdep: Deal with TIME_MAX and OpenBSD
+ 64-bit time_t
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,48 +29,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Longpeng(Mike)" <longpeng2@huawei.com>
-Cc: berrange@redhat.com, pbonzini@redhat.com, arei.gonglei@huawei.com, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>, Brad Smith <brad@comstyle.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-
---zqjkMoGlbUJ91oFe
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--f66bIae8xG55N6311ACtsgXxwNVE5sqrV
+From: Kamil Rytarowski <n54@gmx.com>
+To: Peter Maydell <peter.maydell@linaro.org>, Brad Smith <brad@comstyle.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
+Message-ID: <5ed0a508-e22a-5d59-c826-54fa17afcf20@gmx.com>
+Subject: Re: [Qemu-devel] [PATCH] osdep: Deal with TIME_MAX and OpenBSD 64-bit
+ time_t
+References: <20171106005656.GC84093@humpty.home.comstyle.com>
+ <CAFEAcA_2i0p9C3amtoB0o9Y4K83aCP7Gkw1cDqmLjrkLwJTZxg@mail.gmail.com>
+In-Reply-To: <CAFEAcA_2i0p9C3amtoB0o9Y4K83aCP7Gkw1cDqmLjrkLwJTZxg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Nov 06, 2017 at 02:21:11PM +0800, Longpeng(Mike) wrote:
-> Test-crypto-hash calls qcrypto_hash_bytesv/digest/base64 with
-> errp=3DNULL, this will cause a NULL poniter deference if afalg_driver
-> doesn't support requested algos:
->     ret =3D qcrypto_hash_afalg_driver.hash_bytesv(alg, iov, niov,
->                                                 result, resultlen,
->                                                 errp);
->     if (ret =3D=3D 0) {
->         return ret;
->     }
+On 06.11.2017 11:51, Peter Maydell wrote:
+> On 6 November 2017 at 00:56, Brad Smith <brad@comstyle.com> wrote:
+>> Define TIME_MAX to LLONG_MAX for OpenBSD since OpenBSD uses 64-bit tim=
+e_t.
+>>
+>> Signed-off-by: Brad Smith <brad@comstyle.com>
+>>
+>>
+>> diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
+>> index 6855b94bbf..824714049b 100644
+>> --- a/include/qemu/osdep.h
+>> +++ b/include/qemu/osdep.h
+>> @@ -132,8 +132,12 @@ extern int daemon(int, int);
+>>  #define ESHUTDOWN 4099
+>>  #endif
+>>  #ifndef TIME_MAX
+>> +#ifdef __OpenBSD__
+>> +#define TIME_MAX LLONG_MAX
+>> +#else
+>>  #define TIME_MAX LONG_MAX
+>>  #endif
+>> +#endif
 >=20
->     error_free(*errp);  // <--- here
+> I'm not really a fan of adding new OS-specific #ifdefs --
+> what if one of the other BSDs uses or switches to 64-bit
+> time_t for 32-bit platforms? Is there some way we can detect
+> this generically at compile time (possibly in configure) ?
 >=20
-> So we must check 'errp & *errp' before dereference.
 
-Only errp needs to be checked.  It's okay to invoke error_free(NULL):
+NetBSD 32-bit ports switched to 64-bit in 2009. There are no longer
+supported releases with 32-bit time_t.
 
-  void error_free(Error *err)
-  {
-      if (err) {
+> thanks
+> -- PMM
+>=20
 
---zqjkMoGlbUJ91oFe
+
+
+--f66bIae8xG55N6311ACtsgXxwNVE5sqrV
 Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
 
-iQEcBAEBAgAGBQJaAJl0AAoJEJykq7OBq3PIR/4IAJ7dgPR0SR8pai0fyLWfnssC
-okuGa2FDvXJypxiTBPIjGcmd/vJTPRRyT10xIlEcIooVxEHsafyJ7q8CBFHF37Y+
-i8kcfOmu7kfWL1QrOBoLEe78LBZvr92ljIqnB6cSRVJi696Vqh9mK4wD5o7L0NGN
-m2eMi+fTb4DaXyAaEuuwpqb65uPyQJFSocZMEhFbUH/bnzS5DrtomhY2GwdUEpSy
-oaOwGlFJxmuVai3H6ccL0aBqVLVn8ER2nHtO0siLmR4X9EhtFVlHnXHnIh7JVCgH
-yZH4oW5KWIeh80tQ9pfqYtknZp10dobK5ycPlZgc7iQWlaHsRlSVuhkimRO7v6Y=
-=CpLr
+iQIcBAEBCAAGBQJaAJovAAoJEEuzCOmwLnZsxQYQAKaQNqy1t6O0hRYrdpYV4xKl
+I65Ko4dYtUae5upUdVM62O7r1WNf/3s6+vPjpw0CVB5HYARizgYrh9SJX9p+mKxF
+P2+IFtGQSTJ1CbwCWp5Drjm+nnKF2sRjKoU0laAJuRslYpsWpaCjwgC4KLv+H7vj
+HYvYag5ZcaqhYicavKvYfBiJPqYYSJtiMDT+6r+G3hU0GI9SqYaOoxaly2GQ452h
+oDx31BQdmRXhIcPXytSz7wguIKOEbYguHwTgysvkabiBg8BN7ZIZz5oub4R7RxET
+1Fdl4+T8HZM0F0ApgTBRY4cVMfS1HeucZZNIy9d7EkrbAYHNCFWPPZzwBaJSZacT
+NpeVcY0yPD9VLXUfZZFzn376DvU57q/Ak6zs2Jkd0rr3ef9w/+enp4nv7oR/S7sT
+AqCHevOub3Q4DsfAgwvfp9HPNrri+8arcowUgF1jhH20lCebqFIR85zrwr/3wCnx
+yF7GtHOB9Qc7EHKgKbMZIF84spfuIo4B1MTR3vxZDzYL7A7XCV+r6s1XDPw1fn9S
+6IxvkWO41XWJ9fW2fdvMT5AVapnjlCPupkaRAL1zVvRKLTSBt4/22/ipYtQilC/0
+qznV85VKDAkyAbcaH3LeDT4nbK/AIsjSRfJVkYPKkwyS8JJ4iOlLizb5A8mzWDAH
+b7b+5lUDMPE9z8+A72EF
+=JIID
 -----END PGP SIGNATURE-----
 
---zqjkMoGlbUJ91oFe--
+--f66bIae8xG55N6311ACtsgXxwNVE5sqrV--
