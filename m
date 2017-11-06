@@ -1,26 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36160)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37634)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eBfjE-0001Lw-3k
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 06:38:08 -0500
+	(envelope-from <berrange@redhat.com>) id 1eBfmm-0002dZ-5v
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 06:41:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eBfjD-0000xW-BW
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 06:38:08 -0500
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:55733)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eBfjD-0000xA-51
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 06:38:07 -0500
-Received: by mail-wm0-x241.google.com with SMTP id y83so13451474wmc.4
-	for <qemu-devel@nongnu.org>; Mon, 06 Nov 2017 03:38:06 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <20171106005328.GB84093@humpty.home.comstyle.com>
-References: <20171106005328.GB84093@humpty.home.comstyle.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 6 Nov 2017 11:37:45 +0000
-Message-ID: <CAFEAcA_3ZeQnsin-_ycGaRyxmqTxSFyyeGVrQYmQt2myxPemBQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] configure: Deal with OpenBSD/i386
- emulation linker
+	(envelope-from <berrange@redhat.com>) id 1eBfmh-0003MU-Ly
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 06:41:48 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42708)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eBfmh-0003LN-Fh
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 06:41:43 -0500
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Date: Mon,  6 Nov 2017 11:41:34 +0000
+Message-Id: <20171106114134.10125-1-berrange@redhat.com>
+Subject: [Qemu-devel] [PATCH] build: remove use of MAKELEVEL optimization in
+ submodule handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,38 +22,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Brad Smith <brad@comstyle.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Greg Kurz <groug@kaod.org>, Peter Maydell <peter.maydell@linaro.org>, "Daniel P. Berrange" <berrange@redhat.com>
 
-On 6 November 2017 at 00:53, Brad Smith <brad@comstyle.com> wrote:
-> OpenBSD/i386 uses elf_i386_obsd for the emulation linker.
->
-> Signed-off-by: Brad Smith <brad@comstyle.com>
->
->
-> diff --git a/configure b/configure
-> index dd73cce62f..02799d38ac 100755
-> --- a/configure
-> +++ b/configure
-> @@ -5159,9 +5159,9 @@ if test \( "$cpu" = "i386" -o "$cpu" = "x86_64" \) -a \
->          "$targetos" != "Darwin" -a "$targetos" != "SunOS" -a \
->          "$softmmu" = yes ; then
->      # Different host OS linkers have different ideas about the name of the ELF
-> -    # emulation. Linux and OpenBSD use 'elf_i386'; FreeBSD uses the _fbsd
-> -    # variant; and Windows uses i386pe.
-> -    for emu in elf_i386 elf_i386_fbsd i386pe; do
-> +    # emulation. Linux uses 'elf_i386'; FreeBSD uses the _fbsd variant;
-> +    # OpenBSD uses the _obsd variant; and Windows uses i386pe.
-> +    for emu in elf_i386 elf_i386_fbsd elf_i386_obsd i386pe; do
->          if "$ld" -verbose 2>&1 | grep -q "^[[:space:]]*$emu[[:space:]]*$"; then
->              ld_i386_emulation="$emu"
->              roms="optionrom"
+The Makefile attempts to optimize the handling of submodules by using MAKELEVEL
+to only check the submodule status when running from the top level make
+invokation. This causes problems for people who are using a makefile of their
+own to in turn invoke QEMU's makefile, as MAKELEVEL is already set to 1 (or
+more) when QEMU's makefile runs.
 
-My OpenBSD/x86-64's ld supports both "elf_i386" and "elf_i386_obsd" --
-which should we be using in this case? With your change we'll
-still prefer elf_i386 if the linker handles both.
+This optimization should not really be needed, since the git-submodule.sh
+script is already used to detect if a submodule update is required. This by
+removing the MAKELEVEL check, we at most add an extra 'git-submodule.sh status'
+call to each make level, the overhead of which is lost in noise of building
+QEMU.
 
-Do you know what the difference between the two is?
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+---
 
-thanks
--- PMM
+NB this is on top of https://lists.gnu.org/archive/html/qemu-devel/2017-11/msg00449.html
+
+ Makefile | 12 +++++-------
+ 1 file changed, 5 insertions(+), 7 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index a92d7b8e14..0496c5057a 100644
+--- a/Makefile
++++ b/Makefile
+@@ -18,12 +18,11 @@ git-submodule-update:
+ 
+ .PHONY: git-submodule-update
+ 
+-ifeq (0,$(MAKELEVEL))
+-  git_module_status := $(shell \
+-    cd '$(SRC_PATH)' && \
+-    GIT="$(GIT)" ./scripts/git-submodule.sh status $(GIT_SUBMODULES); \
+-    echo $$?; \
+-  )
++git_module_status := $(shell \
++  cd '$(SRC_PATH)' && \
++  GIT="$(GIT)" ./scripts/git-submodule.sh status $(GIT_SUBMODULES); \
++  echo $$?; \
++)
+ 
+ ifeq (1,$(git_module_status))
+ ifeq (no,$(GIT_UPDATE))
+@@ -42,7 +41,6 @@ git-submodule-update:
+           "GIT","$(GIT_SUBMODULES)")
+ endif
+ endif
+-endif
+ 
+ .git-submodule-status: git-submodule-update config-host.mak
+ 
+-- 
+2.13.6
