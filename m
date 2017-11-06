@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60956)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36160)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eBfYa-0006oK-Hy
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 06:27:09 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eBfjE-0001Lw-3k
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 06:38:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eBfYX-0005Vp-C8
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 06:27:08 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38562)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eBfYX-0005UD-3Z
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 06:27:05 -0500
-References: <1b862cf2-2fee-3243-cb54-2780ace6f25b@profihost.ag>
-	<971cc10f-7930-9830-0528-27e8faac7282@redhat.com>
-	<748c4d0d-f84b-303d-f9a6-bafa6037d669@profihost.ag>
-	<f4b0cb70-7f86-f7cf-bb89-3a9f7ae15dc2@redhat.com>
-	<4c2913e2-5946-47db-cced-a5702538bc3b@profihost.ag>
-	<dc3bf74f-fbd6-573d-0d7c-d456469fcf1d@profihost.ag>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <9c8673a5-faf7-ca9c-27d3-398df4223d6a@redhat.com>
-Date: Mon, 6 Nov 2017 12:27:01 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1eBfjD-0000xW-BW
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 06:38:08 -0500
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:55733)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eBfjD-0000xA-51
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 06:38:07 -0500
+Received: by mail-wm0-x241.google.com with SMTP id y83so13451474wmc.4
+	for <qemu-devel@nongnu.org>; Mon, 06 Nov 2017 03:38:06 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <dc3bf74f-fbd6-573d-0d7c-d456469fcf1d@profihost.ag>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] kvm: virtio-net: saved image requires TUN_F_UFO
- support
+In-Reply-To: <20171106005328.GB84093@humpty.home.comstyle.com>
+References: <20171106005328.GB84093@humpty.home.comstyle.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 6 Nov 2017 11:37:45 +0000
+Message-ID: <CAFEAcA_3ZeQnsin-_ycGaRyxmqTxSFyyeGVrQYmQt2myxPemBQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] configure: Deal with OpenBSD/i386
+ emulation linker
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,80 +29,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Priebe - Profihost AG <s.priebe@profihost.ag>, qemu-devel <qemu-devel@nongnu.org>, "Jason Wang (jasowang@redhat.com)" <jasowang@redhat.com>
+To: Brad Smith <brad@comstyle.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 06/11/2017 12:09, Stefan Priebe - Profihost AG wrote:
-> HI Paolo,
-> 
-> could this patchset be related?
+On 6 November 2017 at 00:53, Brad Smith <brad@comstyle.com> wrote:
+> OpenBSD/i386 uses elf_i386_obsd for the emulation linker.
+>
+> Signed-off-by: Brad Smith <brad@comstyle.com>
+>
+>
+> diff --git a/configure b/configure
+> index dd73cce62f..02799d38ac 100755
+> --- a/configure
+> +++ b/configure
+> @@ -5159,9 +5159,9 @@ if test \( "$cpu" = "i386" -o "$cpu" = "x86_64" \) -a \
+>          "$targetos" != "Darwin" -a "$targetos" != "SunOS" -a \
+>          "$softmmu" = yes ; then
+>      # Different host OS linkers have different ideas about the name of the ELF
+> -    # emulation. Linux and OpenBSD use 'elf_i386'; FreeBSD uses the _fbsd
+> -    # variant; and Windows uses i386pe.
+> -    for emu in elf_i386 elf_i386_fbsd i386pe; do
+> +    # emulation. Linux uses 'elf_i386'; FreeBSD uses the _fbsd variant;
+> +    # OpenBSD uses the _obsd variant; and Windows uses i386pe.
+> +    for emu in elf_i386 elf_i386_fbsd elf_i386_obsd i386pe; do
+>          if "$ld" -verbose 2>&1 | grep -q "^[[:space:]]*$emu[[:space:]]*$"; then
+>              ld_i386_emulation="$emu"
+>              roms="optionrom"
 
-Uh oh, yes it should.  Jason, any ways to fix it?  I suppose we need to
-disable UFO in the newest machine types, but do we also have to do
-(software) UFO in vhost-net and QEMU for migration compatibility?
+My OpenBSD/x86-64's ld supports both "elf_i386" and "elf_i386_obsd" --
+which should we be using in this case? With your change we'll
+still prefer elf_i386 if the linker handles both.
 
-Thanks,
+Do you know what the difference between the two is?
 
-Paolo
-
-> Greets,
-> Stefan
-> 
-> Am 06.11.2017 um 10:52 schrieb Stefan Priebe - Profihost AG:
->> Hi Paolo,
->>
->> Am 06.11.2017 um 10:49 schrieb Paolo Bonzini:
->>> On 06/11/2017 10:48, Stefan Priebe - Profihost AG wrote:
->>>> Hi Paolo,
->>>>
->>>> Am 06.11.2017 um 10:40 schrieb Paolo Bonzini:
->>>>> On 06/11/2017 10:38, Stefan Priebe - Profihost AG wrote:
->>>>>> Hello,
->>>>>>
->>>>>> i've upgraded some servers from kernel 4.4 to 4.12 - both running Qemu
->>>>>> 2.9.1.
->>>>>>
->>>>>> If i migrate a VM from a host running kernel 4.4 to a host running 4.12
->>>>>> i get:
->>>>>>
->>>>>> kvm: virtio-net: saved image requires TUN_F_UFO support
->>>>>> kvm: Failed to load virtio-net-device:tmp
->>>>>> kvm: Failed to load virtio-net:virtio
->>>>>> kvm: error while loading state for instance 0x0 of device
->>>>>> '0000:00:12.0/virtio-net'
->>>>>> kvm: load of migration failed: Invalid argument
->>>>>>
->>>>>>
->>>>>> while migrating from 4.12 to 4.4 works fine.
->>>>>>
->>>>>> Can anybody help? Is this expected?
->>>>>
->>>>> Can you check why peer_has_ufo failed (in hw/net/virtio-net.c)?
->>>>
->>>> May be - how can i archieve this? Patching the code is not a problem if
->>>> you can give me a hint.
->>>>
->>>>> Also, did this ioctl fail when the tap device was set up on the 4.12 destination?
->>>>> int tap_probe_has_ufo(int fd)
->>>>> {
->>>>>     unsigned offload;
->>>>>
->>>>>     offload = TUN_F_CSUM | TUN_F_UFO;
->>>>>
->>>>>     if (ioctl(fd, TUNSETOFFLOAD, offload) < 0)
->>>>>         return 0;
->>>>>
->>>>>     return 1;
->>>>> }
->>>>
->>>> Should there be any kernel output or how can i detect / check it?
->>>
->>> For both, the simplest answer is probably just using printf.
->>
->> arg i missed an important part. The kernel is an opensuse SLE15 one.
->>
->> I've seen it contains the following patchset:
->> https://www.spinics.net/lists/netdev/msg443821.html
->>
->> Greets,
->> Stefan
->>
+thanks
+-- PMM
