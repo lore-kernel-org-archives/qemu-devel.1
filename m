@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52129)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53922)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eBgWr-0000Wc-KG
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 07:29:26 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eBgdS-0001i6-G6
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 07:36:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eBgWm-00019Z-RU
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 07:29:25 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41086)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eBgWm-00019A-Ih
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 07:29:20 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <1507314444-30835-1-git-send-email-ian.jackson@eu.citrix.com>
-	<1507314444-30835-8-git-send-email-ian.jackson@eu.citrix.com>
-Date: Mon, 06 Nov 2017 13:29:17 +0100
-In-Reply-To: <1507314444-30835-8-git-send-email-ian.jackson@eu.citrix.com>
-	(Ian Jackson's message of "Fri, 6 Oct 2017 19:27:23 +0100")
-Message-ID: <87inenfv4y.fsf@dusky.pond.sub.org>
+	(envelope-from <mreitz@redhat.com>) id 1eBgdR-0003l2-LP
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 07:36:14 -0500
+References: <cover.1509718618.git.berto@igalia.com>
+	<fb53467cf48e95ff3330def1cf1003a5b862b7d9.1509718618.git.berto@igalia.com>
+	<ad3990d7-4356-4764-4da2-01cc59a63075@redhat.com>
+	<w518tfnglio.fsf@maestria.local.igalia.com>
+	<w5160argl1p.fsf@maestria.local.igalia.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <ec0fbf5f-0c42-1787-c6ea-4a64dbc58295@redhat.com>
+Date: Mon, 6 Nov 2017 13:36:01 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 7/8] os-posix: Provide new -runasid option
+In-Reply-To: <w5160argl1p.fsf@maestria.local.igalia.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="WgT959NfSKA5fOBUi1JuBf4C3R4ctGl7n"
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 3/7] qcow2: Prevent
+ allocating compressed clusters at offset 0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,151 +28,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ian Jackson <ian.jackson@eu.citrix.com>
-Cc: qemu-devel@nongnu.org, Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, Ross Lagerwall <ross.lagerwall@citrix.com>, Anthony PERARD <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org
+To: Alberto Garcia <berto@igalia.com>
+Cc: Thomas Huth <thuth@redhat.com>, "R . Nageswara Sastry" <nasastry@in.ibm.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-Sorry for the slooooow response.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--WgT959NfSKA5fOBUi1JuBf4C3R4ctGl7n
+From: Max Reitz <mreitz@redhat.com>
+To: Alberto Garcia <berto@igalia.com>
+Cc: Thomas Huth <thuth@redhat.com>, "R . Nageswara Sastry"
+ <nasastry@in.ibm.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Message-ID: <ec0fbf5f-0c42-1787-c6ea-4a64dbc58295@redhat.com>
+Subject: Re: [Qemu-block] [PATCH v2 3/7] qcow2: Prevent allocating compressed
+ clusters at offset 0
+References: <cover.1509718618.git.berto@igalia.com>
+ <fb53467cf48e95ff3330def1cf1003a5b862b7d9.1509718618.git.berto@igalia.com>
+ <ad3990d7-4356-4764-4da2-01cc59a63075@redhat.com>
+ <w518tfnglio.fsf@maestria.local.igalia.com>
+ <w5160argl1p.fsf@maestria.local.igalia.com>
+In-Reply-To: <w5160argl1p.fsf@maestria.local.igalia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Ian Jackson <ian.jackson@eu.citrix.com> writes:
+On 2017-11-03 21:32, Alberto Garcia wrote:
+> On Fri 03 Nov 2017 09:22:39 PM CET, Alberto Garcia wrote:
+>>>> -        assert(offset);
+>>>
+>>> I don't think this assert() was meant as a protection against offset
+>>> being 0. :-)
+>>
+>> After the new check offset is now guaranteed to be 0, so what's the
+>> point of keeping the assert() ?
+>=20
+> I meant "guaranteed _not_ to be 0" :-)
 
-> This allows the caller to specify a uid and gid to use, even if there
-> is no corresponding password entry.  This will be useful in certain
-> Xen configurations.
->
-> Signed-off-by: Ian Jackson <Ian.Jackson@eu.citrix.com>
-> ---
-> v3: Error messages fixed.  Thanks to Peter Maydell and Ross Lagerwall.
-> v2: Coding style fixes.
-> ---
->  os-posix.c      | 49 ++++++++++++++++++++++++++++++++++++++++---------
->  qemu-options.hx | 12 ++++++++++++
->  2 files changed, 52 insertions(+), 9 deletions(-)
->
-> diff --git a/os-posix.c b/os-posix.c
-> index 92e9d85..6cc5868 100644
-> --- a/os-posix.c
-> +++ b/os-posix.c
-> @@ -43,6 +43,8 @@
->  #endif
->  
->  static struct passwd *user_pwd;
-> +static uid_t user_uid = (uid_t)-1;
-> +static gid_t user_gid = (gid_t)-1;
->  static const char *chroot_dir;
->  static int daemonize;
->  static int daemon_pipe;
-> @@ -134,6 +136,9 @@ void os_set_proc_name(const char *s)
->   */
->  void os_parse_cmd_args(int index, const char *optarg)
->  {
-> +    unsigned long lv;
-> +    char *ep;
-> +    int rc;
->      switch (index) {
->  #ifdef CONFIG_SLIRP
->      case QEMU_OPTION_smb:
-> @@ -150,6 +155,22 @@ void os_parse_cmd_args(int index, const char *optarg)
->              exit(1);
->          }
->          break;
-> +    case QEMU_OPTION_runasid:
-> +        errno = 0;
-> +        lv = strtoul(optarg, &ep, 0); /* can't qemu_strtoul, want *ep=='.' */
+That is the point of an assert.
 
-I'm afraid I can't see why qemu_strtoul() wouldn't work here.  Can you
-enlighten me?
+An assert should not guard against something that can occur.  It should
+express that something will always be true (in this case that the offset
+is guaranteed not to be 0).  Then, someone who reads the code does not
+have to read all code paths to check whether that condition is true.
 
-> +        user_uid = lv; /* overflow here is ID in C99 */
+If an assert checks a condition that can be true, it's wrong.  Then
+either the code is buggy (like it was before this patch) or the error
+should be handled gracefully instead of aborting the program.
 
-I don't get the comment.  You check for overflow the obvious way below.
-Sure you need a comment?
+In a perfect world, all assert()s would be checked at compile time.
 
-> +        if (errno || *ep != '.' || user_uid != lv || user_uid == (uid_t)-1) {
-> +            fprintf(stderr, "Could not obtain uid from \"%s\"", optarg);
-> +            exit(1);
-> +        }
-> +        lv = 0;
-> +        rc = qemu_strtoul(ep + 1, 0, 0, &lv);
-> +        user_gid = lv; /* overflow here is ID in C99 */
+Max
 
-Likewise.
 
-> +        if (rc || user_gid != lv || user_gid == (gid_t)-1) {
-> +            fprintf(stderr, "Could not obtain gid from \"%s\"", optarg);
-> +            exit(1);
-> +        }
-> +        break;
->      case QEMU_OPTION_chroot:
->          chroot_dir = optarg;
->          break;
-> @@ -166,18 +187,28 @@ void os_parse_cmd_args(int index, const char *optarg)
->  
->  static void change_process_uid(void)
->  {
-> -    if (user_pwd) {
-> -        if (setgid(user_pwd->pw_gid) < 0) {
-> -            fprintf(stderr, "Failed to setgid(%d)\n", user_pwd->pw_gid);
-> +    if (user_pwd || user_uid != (uid_t)-1) {
-> +        gid_t intended_gid = user_pwd ? user_pwd->pw_gid : user_gid;
-> +        uid_t intended_uid = user_pwd ? user_pwd->pw_uid : user_uid;
-> +        if (setgid(intended_gid) < 0) {
-> +            fprintf(stderr, "Failed to setgid(%d)\n", intended_gid);
->              exit(1);
->          }
-> -        if (initgroups(user_pwd->pw_name, user_pwd->pw_gid) < 0) {
-> -            fprintf(stderr, "Failed to initgroups(\"%s\", %d)\n",
-> -                    user_pwd->pw_name, user_pwd->pw_gid);
-> -            exit(1);
-> +        if (user_pwd) {
-> +            if (initgroups(user_pwd->pw_name, user_pwd->pw_gid) < 0) {
-> +                fprintf(stderr, "Failed to initgroups(\"%s\", %d)\n",
-> +                        user_pwd->pw_name, user_pwd->pw_gid);
-> +                exit(1);
-> +            }
-> +        } else {
-> +            if (setgroups(1, &user_gid) < 0) {
-> +                fprintf(stderr, "Failed to setgroups(1, [%d])",
-> +                        user_gid);
-> +                exit(1);
-> +            }
->          }
-> -        if (setuid(user_pwd->pw_uid) < 0) {
-> -            fprintf(stderr, "Failed to setuid(%d)\n", user_pwd->pw_uid);
-> +        if (setuid(intended_uid) < 0) {
-> +            fprintf(stderr, "Failed to setuid(%d)\n", intended_uid);
->              exit(1);
->          }
->          if (setuid(0) != -1) {
-> diff --git a/qemu-options.hx b/qemu-options.hx
-> index 9f6e2ad..34a5329 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -3968,6 +3968,18 @@ Immediately before starting guest execution, drop root privileges, switching
->  to the specified user.
->  ETEXI
->  
-> +#ifndef _WIN32
-> +DEF("runasid", HAS_ARG, QEMU_OPTION_runasid, \
-> +    "-runasid uid.gid     change to numeric uid and gid just before starting the VM\n",
-> +    QEMU_ARCH_ALL)
-> +#endif
-> +STEXI
-> +@item -runasid @var{uid}.@var{gid}
+--WgT959NfSKA5fOBUi1JuBf4C3R4ctGl7n
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Didn't we agree on using ':' instead of '.' as separator?
+-----BEGIN PGP SIGNATURE-----
 
-Sure we need yet another option?  Why can't we compatibly extend -runas?
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAloAVzESHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9ArIgH/R59x9iWOqUDyDYm52+8QC9K/9BjaCKL
+rUdlvvQHigDEJiXxxwzrJuigYm/D1qOKq9xo86yv5bEFiEGanA8jNzD5wAOJil1y
+NcooWLMZe4wtqmOfuyOqgUTqrqCoCTDQccYI+11AzZegCib1jgo/wur1srnlwINO
+/9QbmAZxWFHgHmn7BrFgtc4Z1h669GzWYSmqtVciZNoZP9t/XxN4sB5rQ69rBGsA
+PibV4nANx2PNSFuiKkI1VW4+aWrEU5BNA6Ix/svjpEB/qrD7ex3RJIB3CoSdAIR/
+9VwWrdembGhZideaINsJ6sPLqRpEOmfCgtdIMPj728Q9Wx9r1rZROJ4=
+=E6aQ
+-----END PGP SIGNATURE-----
 
-If we truly need both, the rationale belongs into the commit message,
-and we need to consider how they interact.  I'd recommend left-to-right
-semantics, i.e. if you specify both, the last one wins.  Not what your
-current code does, if I read it correctly.
-
-> +@findex -runasid
-> +Immediately before starting guest execution, drop root privileges, switching
-> +to the specified uid and gid.
-> +ETEXI
-> +
->  DEF("prom-env", HAS_ARG, QEMU_OPTION_prom_env,
->      "-prom-env variable=value\n"
->      "                set OpenBIOS nvram variables\n",
+--WgT959NfSKA5fOBUi1JuBf4C3R4ctGl7n--
