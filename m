@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57240)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57802)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1eBpcN-0002NL-LP
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 17:11:45 -0500
+	(envelope-from <hpoussin@reactos.org>) id 1eBpds-00032q-6C
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 17:13:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1eBpcK-0007pf-9p
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 17:11:43 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59688)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1eBpcK-0007op-1A
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 17:11:40 -0500
-Date: Mon, 6 Nov 2017 17:11:38 -0500 (EST)
-From: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Message-ID: <67468788.36927096.1510006298683.JavaMail.zimbra@redhat.com>
-In-Reply-To: <79f747d6-d739-d213-34db-17d304491e05@linux.vnet.ibm.com>
-References: <20171106183925.16747-1-marcandre.lureau@redhat.com>
-	<20171106183925.16747-26-marcandre.lureau@redhat.com>
-	<79f747d6-d739-d213-34db-17d304491e05@linux.vnet.ibm.com>
+	(envelope-from <hpoussin@reactos.org>) id 1eBpdr-0000Cn-CS
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 17:13:16 -0500
+References: <20171017164426.25277-1-f4bug@amsat.org>
+	<20171017164426.25277-5-f4bug@amsat.org>
+From: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
+Message-ID: <132ef0a6-0c45-461d-5e13-001877c90746@reactos.org>
+Date: Mon, 6 Nov 2017 23:12:45 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 25/28] tpm-emulator: protect concurrent
- ctrl_chr access
+In-Reply-To: <20171017164426.25277-5-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v3 04/42] MAINTAINERS: add an entry for the
+ i82378 (superio)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,220 +25,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, amarnath valluri <amarnath.valluri@intel.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Michael Tokarev <mjt@tls.msk.ru>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, qemu-trivial@nongnu.org
 
-Hi
+Le 17/10/2017 à 18:43, Philippe Mathieu-Daudé a écrit :
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> Reviewed-by: Hervé Poussineau <hpoussin@reactos.org>
+> ---
+>   MAINTAINERS | 1 +
+>   1 file changed, 1 insertion(+)
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 0706b474e7..510505b2f3 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -712,6 +712,7 @@ F: hw/ppc/prep.c
+>   F: hw/ppc/prep_systemio.c
+>   F: hw/ppc/rs6000_mc.c
+>   F: hw/pci-host/prep.[hc]
+> +F: hw/isa/i82378.c
+>   F: hw/isa/pc87312.[hc]
+>   F: hw/dma/i82374.c
+>   F: pc-bios/ppc_rom.bin
+> 
 
------ Original Message -----
-> On 11/06/2017 01:39 PM, Marc-Andr=C3=A9 Lureau wrote:
-> > The control chardev is being used from the data thread to set the
-> > locality of the next request. Altough the chr has a write mutex, we
-> > may potentially read the reply from another thread request.
->=20
-> Right, so there may be concurrency with the CMD_RESET/GET_TPMESTABLISHED
-> commands. All the other ones shouldn't be affected. It sound like a bug
-> in existing code.
->=20
-
-I think so too, I'll rebase on master for 2.11, unless you can trivially ch=
-erry-pick it.
-
-> > Add a mutex to protect from concurrent control commands.
-> >
-> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->=20
-> Reviewed-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
->=20
->=20
-
-thanks
-
-> > ---
-> >   hw/tpm/tpm_emulator.c | 44 ++++++++++++++++++++++++++++--------------=
---
-> >   1 file changed, 28 insertions(+), 16 deletions(-)
-> >
-> > diff --git a/hw/tpm/tpm_emulator.c b/hw/tpm/tpm_emulator.c
-> > index b77c0238c7..24cb61162f 100644
-> > --- a/hw/tpm/tpm_emulator.c
-> > +++ b/hw/tpm/tpm_emulator.c
-> > @@ -71,15 +71,21 @@ typedef struct TPMEmulator {
-> >       ptm_cap caps; /* capabilities of the TPM */
-> >       uint8_t cur_locty_number; /* last set locality */
-> >       Error *migration_blocker;
-> > +
-> > +    QemuMutex mutex;
-> >   } TPMEmulator;
-> >
-> >
-> > -static int tpm_emulator_ctrlcmd(CharBackend *dev, unsigned long cmd, v=
-oid
-> > *msg,
-> > +static int tpm_emulator_ctrlcmd(TPMEmulator *tpm, unsigned long cmd, v=
-oid
-> > *msg,
-> >                                   size_t msg_len_in, size_t msg_len_out=
-)
-> >   {
-> > +    CharBackend *dev =3D &tpm->ctrl_chr;
-> >       uint32_t cmd_no =3D cpu_to_be32(cmd);
-> >       ssize_t n =3D sizeof(uint32_t) + msg_len_in;
-> >       uint8_t *buf =3D NULL;
-> > +    int ret =3D -1;
-> > +
-> > +    qemu_mutex_lock(&tpm->mutex);
-> >
-> >       buf =3D g_alloca(n);
-> >       memcpy(buf, &cmd_no, sizeof(cmd_no));
-> > @@ -87,17 +93,21 @@ static int tpm_emulator_ctrlcmd(CharBackend *dev,
-> > unsigned long cmd, void *msg,
-> >
-> >       n =3D qemu_chr_fe_write_all(dev, buf, n);
-> >       if (n <=3D 0) {
-> > -        return -1;
-> > +        goto end;
-> >       }
-> >
-> >       if (msg_len_out !=3D 0) {
-> >           n =3D qemu_chr_fe_read_all(dev, msg, msg_len_out);
-> >           if (n <=3D 0) {
-> > -            return -1;
-> > +            goto end;
-> >           }
-> >       }
-> >
-> > -    return 0;
-> > +    ret =3D 0;
-> > +
-> > +end:
-> > +    qemu_mutex_unlock(&tpm->mutex);
-> > +    return ret;
-> >   }
-> >
-> >   static int tpm_emulator_unix_tx_bufs(TPMEmulator *tpm_emu,
-> > @@ -154,7 +164,7 @@ static int tpm_emulator_set_locality(TPMEmulator
-> > *tpm_emu, uint8_t locty_number,
-> >
-> >       DPRINTF("setting locality : 0x%x", locty_number);
-> >       loc.u.req.loc =3D locty_number;
-> > -    if (tpm_emulator_ctrlcmd(&tpm_emu->ctrl_chr, CMD_SET_LOCALITY, &lo=
-c,
-> > +    if (tpm_emulator_ctrlcmd(tpm_emu, CMD_SET_LOCALITY, &loc,
-> >                                sizeof(loc), sizeof(loc)) < 0) {
-> >           error_setg(errp, "tpm-emulator: could not set locality : %s",
-> >                      strerror(errno));
-> > @@ -200,8 +210,8 @@ error:
-> >   static int tpm_emulator_probe_caps(TPMEmulator *tpm_emu)
-> >   {
-> >       DPRINTF("%s", __func__);
-> > -    if (tpm_emulator_ctrlcmd(&tpm_emu->ctrl_chr, CMD_GET_CAPABILITY,
-> > -                         &tpm_emu->caps, 0, sizeof(tpm_emu->caps)) < 0=
-) {
-> > +    if (tpm_emulator_ctrlcmd(tpm_emu, CMD_GET_CAPABILITY,
-> > +                             &tpm_emu->caps, 0, sizeof(tpm_emu->caps))=
- <
-> > 0) {
-> >           error_report("tpm-emulator: probing failed : %s",
-> >           strerror(errno));
-> >           return -1;
-> >       }
-> > @@ -252,8 +262,8 @@ static int tpm_emulator_startup_tpm(TPMBackend *tb)
-> >       ptm_res res;
-> >
-> >       DPRINTF("%s", __func__);
-> > -    if (tpm_emulator_ctrlcmd(&tpm_emu->ctrl_chr, CMD_INIT, &init,
-> > sizeof(init),
-> > -                         sizeof(init)) < 0) {
-> > +    if (tpm_emulator_ctrlcmd(tpm_emu, CMD_INIT, &init, sizeof(init),
-> > +                             sizeof(init)) < 0) {
-> >           error_report("tpm-emulator: could not send INIT: %s",
-> >                        strerror(errno));
-> >           goto err_exit;
-> > @@ -276,7 +286,7 @@ static bool
-> > tpm_emulator_get_tpm_established_flag(TPMBackend *tb)
-> >       ptm_est est;
-> >
-> >       DPRINTF("%s", __func__);
-> > -    if (tpm_emulator_ctrlcmd(&tpm_emu->ctrl_chr, CMD_GET_TPMESTABLISHE=
-D,
-> > &est,
-> > +    if (tpm_emulator_ctrlcmd(tpm_emu, CMD_GET_TPMESTABLISHED, &est,
-> >                                0, sizeof(est)) < 0) {
-> >           error_report("tpm-emulator: Could not get the TPM established
-> >           flag: %s",
-> >                        strerror(errno));
-> > @@ -300,7 +310,7 @@ static int
-> > tpm_emulator_reset_tpm_established_flag(TPMBackend *tb,
-> >       }
-> >
-> >       reset_est.u.req.loc =3D tpm_emu->cur_locty_number;
-> > -    if (tpm_emulator_ctrlcmd(&tpm_emu->ctrl_chr, CMD_RESET_TPMESTABLIS=
-HED,
-> > +    if (tpm_emulator_ctrlcmd(tpm_emu, CMD_RESET_TPMESTABLISHED,
-> >                                &reset_est, sizeof(reset_est),
-> >                                sizeof(reset_est)) < 0) {
-> >           error_report("tpm-emulator: Could not reset the establishment
-> >           bit: %s",
-> > @@ -329,7 +339,7 @@ static void tpm_emulator_cancel_cmd(TPMBackend *tb)
-> >       }
-> >
-> >       /* FIXME: make the function non-blocking, or it may block a VCPU =
-*/
-> > -    if (tpm_emulator_ctrlcmd(&tpm_emu->ctrl_chr, CMD_CANCEL_TPM_CMD, &=
-res,
-> > 0,
-> > +    if (tpm_emulator_ctrlcmd(tpm_emu, CMD_CANCEL_TPM_CMD, &res, 0,
-> >                                sizeof(res)) < 0) {
-> >           error_report("tpm-emulator: Could not cancel command: %s",
-> >                        strerror(errno));
-> > @@ -377,8 +387,8 @@ static int tpm_emulator_prepare_data_fd(TPMEmulator
-> > *tpm_emu)
-> >
-> >       qemu_chr_fe_set_msgfds(&tpm_emu->ctrl_chr, fds + 1, 1);
-> >
-> > -    if (tpm_emulator_ctrlcmd(&tpm_emu->ctrl_chr, CMD_SET_DATAFD, &res,=
- 0,
-> > -                    sizeof(res)) || res !=3D 0) {
-> > +    if (tpm_emulator_ctrlcmd(tpm_emu, CMD_SET_DATAFD, &res, 0,
-> > +                             sizeof(res)) < 0 || res !=3D 0) {
-> >           error_report("tpm-emulator: Failed to send CMD_SET_DATAFD: %s=
-",
-> >                        strerror(errno));
-> >           goto err_exit;
-> > @@ -494,6 +504,7 @@ static void tpm_emulator_inst_init(Object *obj)
-> >       DPRINTF("%s", __func__);
-> >       tpm_emu->options =3D g_new0(TPMEmulatorOptions, 1);
-> >       tpm_emu->cur_locty_number =3D ~0;
-> > +    qemu_mutex_init(&tpm_emu->mutex);
-> >   }
-> >
-> >   /*
-> > @@ -503,8 +514,7 @@ static void tpm_emulator_shutdown(TPMEmulator *tpm_=
-emu)
-> >   {
-> >       ptm_res res;
-> >
-> > -    if (tpm_emulator_ctrlcmd(&tpm_emu->ctrl_chr, CMD_SHUTDOWN, &res, 0=
-,
-> > -                             sizeof(res)) < 0) {
-> > +    if (tpm_emulator_ctrlcmd(tpm_emu, CMD_SHUTDOWN, &res, 0, sizeof(re=
-s))
-> > < 0) {
-> >           error_report("tpm-emulator: Could not cleanly shutdown the TP=
-M:
-> >           %s",
-> >                        strerror(errno));
-> >       } else if (res !=3D 0) {
-> > @@ -529,6 +539,8 @@ static void tpm_emulator_inst_finalize(Object *obj)
-> >           migrate_del_blocker(tpm_emu->migration_blocker);
-> >           error_free(tpm_emu->migration_blocker);
-> >       }
-> > +
-> > +    qemu_mutex_destroy(&tpm_emu->mutex);
-> >   }
-> >
-> >   static void tpm_emulator_class_init(ObjectClass *klass, void *data)
->=20
->=20
->=20
+Reviewed-by: Hervé Poussineau <hpoussin@reactos.org>
