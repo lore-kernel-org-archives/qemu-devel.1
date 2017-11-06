@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45344)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47298)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eBk58-0006PE-MG
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 11:17:03 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1eBk91-00019t-NS
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 11:21:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eBk54-0007qS-KP
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 11:17:02 -0500
-Resent-Message-Id: <E1eBk54-0007qS-KP@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21399)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1eBk54-0007pq-DI
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 11:16:58 -0500
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <150971193429.273.7261549386095293429@bafd83ae6430>
-In-Reply-To: <20171103115842.1534-1-kraxel@redhat.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1eBk8x-0001Ry-Lv
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 11:21:03 -0500
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:54224)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1eBk8x-0001QN-EL
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 11:20:59 -0500
+Received: by mail-wr0-x242.google.com with SMTP id u40so9109463wrf.10
+	for <qemu-devel@nongnu.org>; Mon, 06 Nov 2017 08:20:59 -0800 (PST)
+References: <1509732813-22957-1-git-send-email-peter.maydell@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <1509732813-22957-1-git-send-email-peter.maydell@linaro.org>
+Date: Mon, 06 Nov 2017 16:20:56 +0000
+Message-ID: <871slbs7iv.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 3 Nov 2017 05:25:35 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH 0/3] sdl: hotkey updates and cleanups
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH] nvic: Fix ARMv7M MPU_RBAR reads
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,45 +29,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kraxel@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, patches@linaro.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtQQVRDSCAwLzNdIHNkbDogaG90a2V5IHVwZGF0ZXMgYW5kIGNsZWFudXBzClR5cGU6
-IHNlcmllcwpNZXNzYWdlLWlkOiAyMDE3MTEwMzExNTg0Mi4xNTM0LTEta3JheGVsQHJlZGhhdC5j
-b20KCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEK
-dG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQg
-Y29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZm
-LnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAk
-QkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAk
-bi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0
-IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxi
-YWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQo
-KG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRp
-bmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8v
-Z2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICAgICAg
-ICBwYXRjaGV3LzIwMTcxMTAzMTE1NjMxLjE1MTc1LTEtb3dlbi5zbWl0aEBjaXRyaXguY29tIC0+
-IHBhdGNoZXcvMjAxNzExMDMxMTU2MzEuMTUxNzUtMS1vd2VuLnNtaXRoQGNpdHJpeC5jb20KICog
-W25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE3MTEwMzExNTg0Mi4xNTM0LTEta3Jh
-eGVsQHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE3MTEwMzExNTg0Mi4xNTM0LTEta3JheGVsQHJl
-ZGhhdC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo2YTEwN2E0ZGI4IHNkbDog
-dXNlIGN0cmwtYWx0LWcgYXMgZ3JhYiBob3RrZXkKOGQ3OTg2MDBmMyBzZGw6IHJlbW92ZSAtYWx0
-LWdyYWIgYW5kIC1jdHJsLWdyYWIgc3VwcG9ydAoyYWMyYjJmNmI4IHNkbDogcmVtb3ZlIC1uby1m
-cmFtZSBzdXBwb3J0Cgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzM6IHNk
-bDogcmVtb3ZlIC1uby1mcmFtZSBzdXBwb3J0Li4uCkNoZWNraW5nIFBBVENIIDIvMzogc2RsOiBy
-ZW1vdmUgLWFsdC1ncmFiIGFuZCAtY3RybC1ncmFiIHN1cHBvcnQuLi4KRVJST1I6IHNwYWNlIHBy
-b2hpYml0ZWQgYWZ0ZXIgdGhhdCAnJicgKGN0eDpXeFcpCiM0ODogRklMRTogdWkvc2RsLmM6NTU0
-OgorICAgIG1vZF9zdGF0ZSA9IChTRExfR2V0TW9kU3RhdGUoKSAmIGd1aV9ncmFiX2NvZGUpID09
-IGd1aV9ncmFiX2NvZGU7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCkVS
-Uk9SOiBzcGFjZSBwcm9oaWJpdGVkIGFmdGVyIHRoYXQgJyYnIChjdHg6V3hXKQojOTY6IEZJTEU6
-IHVpL3NkbDIuYzozMzM6CisgICAgbW9kX3N0YXRlID0gKFNETF9HZXRNb2RTdGF0ZSgpICYgZ3Vp
-X2dyYWJfY29kZSkgPT0gZ3VpX2dyYWJfY29kZTsKICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgXgoKdG90YWw6IDIgZXJyb3JzLCAwIHdhcm5pbmdzLCAxMzUgbGluZXMgY2hlY2tl
-ZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkg
-b2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1h
-aW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0gg
-My8zOiBzZGw6IHVzZSBjdHJsLWFsdC1nIGFzIGdyYWIgaG90a2V5Li4uCj09PSBPVVRQVVQgRU5E
-ID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJh
-dGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFz
-ZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
+
+Peter Maydell <peter.maydell@linaro.org> writes:
+
+> Fix an incorrect mask expression in the handling of v7M MPU_RBAR
+> reads that meant that we would always report the ADDR field as zero.
+
+nit: you could extend that to: "..as zero because we mask it when
+written".
+
+As I see you do:
+  cpu->env.pmsav7.drbar[region] =3D value & ~0x1f;
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+> Doesn't affect v8M, which is a different codepath.
+>
+>  hw/intc/armv7m_nvic.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
+> index be46639..5d9c883 100644
+> --- a/hw/intc/armv7m_nvic.c
+> +++ b/hw/intc/armv7m_nvic.c
+> @@ -977,7 +977,7 @@ static uint32_t nvic_readl(NVICState *s, uint32_t off=
+set, MemTxAttrs attrs)
+>          if (region >=3D cpu->pmsav7_dregion) {
+>              return 0;
+>          }
+> -        return (cpu->env.pmsav7.drbar[region] & 0x1f) | (region & 0xf);
+> +        return (cpu->env.pmsav7.drbar[region] & ~0x1f) | (region & 0xf);
+>      }
+>      case 0xda0: /* MPU_RASR (v7M), MPU_RLAR (v8M) */
+>      case 0xda8: /* MPU_RASR_A1 (v7M), MPU_RLAR_A1 (v8M) */
+
+
+--
+Alex Benn=C3=A9e
