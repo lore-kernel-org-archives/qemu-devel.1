@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33725)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33786)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1eBjds-0007K8-Cx
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 10:48:53 -0500
+	(envelope-from <andrew.smirnov@gmail.com>) id 1eBjdv-0007Mz-2T
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 10:48:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1eBjdr-0000bW-9u
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 10:48:52 -0500
+	(envelope-from <andrew.smirnov@gmail.com>) id 1eBjdu-0000dg-01
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 10:48:55 -0500
 From: Andrey Smirnov <andrew.smirnov@gmail.com>
-Date: Mon,  6 Nov 2017 07:47:58 -0800
-Message-Id: <20171106154813.19936-16-andrew.smirnov@gmail.com>
+Date: Mon,  6 Nov 2017 07:48:02 -0800
+Message-Id: <20171106154813.19936-20-andrew.smirnov@gmail.com>
 In-Reply-To: <20171106154813.19936-1-andrew.smirnov@gmail.com>
 References: <20171106154813.19936-1-andrew.smirnov@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 15/30] i.MX: Add code to emulate i.MX7 SNVS
- IP-block
+Subject: [Qemu-devel] [PATCH v3 19/30] i.MX: Add code to emulate SDMA IP
+ block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,8 +26,7 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org
 Cc: Andrey Smirnov <andrew.smirnov@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, yurovsky@gmail.com
 
-Add code to emulate SNVS IP-block. Currently only the bits needed to
-be able to emulate machine shutdown are implemented.
+Add minimal code needed to allow upstream Linux guest to boot.
 
 Cc: Peter Maydell <peter.maydell@linaro.org>
 Cc: Jason Wang <jasowang@redhat.com>
@@ -37,69 +36,67 @@ Cc: qemu-arm@nongnu.org
 Cc: yurovsky@gmail.com
 Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
 ---
- hw/misc/Makefile.objs       |  1 +
- hw/misc/imx7_snvs.c         | 83 +++++++++++++++++++++++++++++++++++++++++++++
- include/hw/misc/imx7_snvs.h | 35 +++++++++++++++++++
- 3 files changed, 119 insertions(+)
- create mode 100644 hw/misc/imx7_snvs.c
- create mode 100644 include/hw/misc/imx7_snvs.h
+ hw/dma/Makefile.objs      |  1 +
+ hw/dma/imx_sdma.c         | 99 +++++++++++++++++++++++++++++++++++++++++++++++
+ include/hw/dma/imx_sdma.h | 22 +++++++++++
+ 3 files changed, 122 insertions(+)
+ create mode 100644 hw/dma/imx_sdma.c
+ create mode 100644 include/hw/dma/imx_sdma.h
 
-diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-index c393a93456..16cee88e0f 100644
---- a/hw/misc/Makefile.objs
-+++ b/hw/misc/Makefile.objs
-@@ -36,6 +36,7 @@ obj-$(CONFIG_IMX) += imx6_ccm.o
- obj-$(CONFIG_IMX) += imx6_src.o
- obj-$(CONFIG_IMX) += imx7_ccm.o
- obj-$(CONFIG_IMX) += imx2_wdt.o
-+obj-$(CONFIG_IMX) += imx7_snvs.o
- obj-$(CONFIG_MILKYMIST) += milkymist-hpdmc.o
- obj-$(CONFIG_MILKYMIST) += milkymist-pfpu.o
- obj-$(CONFIG_MAINSTONE) += mst_fpga.o
-diff --git a/hw/misc/imx7_snvs.c b/hw/misc/imx7_snvs.c
+diff --git a/hw/dma/Makefile.objs b/hw/dma/Makefile.objs
+index 087c8e6855..3cee0b1047 100644
+--- a/hw/dma/Makefile.objs
++++ b/hw/dma/Makefile.objs
+@@ -14,3 +14,4 @@ obj-$(CONFIG_XLNX_ZYNQMP) += xlnx_dpdma.o
+ obj-$(CONFIG_OMAP) += omap_dma.o soc_dma.o
+ obj-$(CONFIG_PXA2XX) += pxa2xx_dma.o
+ obj-$(CONFIG_RASPI) += bcm2835_dma.o
++obj-$(CONFIG_IMX) += imx_sdma.o
+diff --git a/hw/dma/imx_sdma.c b/hw/dma/imx_sdma.c
 new file mode 100644
-index 0000000000..670b9f4639
+index 0000000000..0776e41b9a
 --- /dev/null
-+++ b/hw/misc/imx7_snvs.c
-@@ -0,0 +1,83 @@
++++ b/hw/dma/imx_sdma.c
+@@ -0,0 +1,99 @@
 +/*
-+ * IMX7 Secure Non-Volatile Storage
-+ *
 + * Copyright (c) 2017, Impinj, Inc.
++ *
++ * i.MX7 IOMUXC block emulation code
 + *
 + * Author: Andrey Smirnov <andrew.smirnov@gmail.com>
 + *
 + * This work is licensed under the terms of the GNU GPL, version 2 or later.
 + * See the COPYING file in the top-level directory.
-+ *
-+ * Bare minimum emulation code needed to support being able to shut
-+ * down linux guest gracefully.
 + */
 +
 +#include "qemu/osdep.h"
-+#include "hw/misc/imx7_snvs.h"
++#include "hw/dma/imx_sdma.h"
 +#include "qemu/log.h"
-+#include "sysemu/sysemu.h"
 +
-+static uint64_t imx7_snvs_read(void *opaque, hwaddr offset, unsigned size)
++static void imx_sdma_reset(DeviceState *dev)
 +{
-+    return 0;
++    IMXSDMAState *s = IMX_SDMA(dev);
++
++    memset(s->regs, 0, sizeof(s->regs));
 +}
 +
-+static void imx7_snvs_write(void *opaque, hwaddr offset,
-+                            uint64_t v, unsigned size)
++static uint64_t imx_sdma_read(void *opaque, hwaddr offset,
++                               unsigned size)
 +{
-+    const uint32_t value = v;
-+    const uint32_t mask  = SNVS_LPCR_TOP | SNVS_LPCR_DP_EN;
-+
-+    if (offset == SNVS_LPCR && ((value & mask) == mask)) {
-+        qemu_system_shutdown_request(SHUTDOWN_CAUSE_GUEST_SHUTDOWN);
-+    }
++    IMXSDMAState *s = opaque;
++    return s->regs[offset / sizeof(uint32_t)];
 +}
 +
-+static const struct MemoryRegionOps imx7_snvs_ops = {
-+    .read = imx7_snvs_read,
-+    .write = imx7_snvs_write,
++static void imx_sdma_write(void *opaque, hwaddr offset,
++                            uint64_t value, unsigned size)
++{
++    IMXSDMAState *s = opaque;
++    s->regs[offset / sizeof(uint32_t)] = value;
++}
++
++static const struct MemoryRegionOps imx_sdma_ops = {
++    .read = imx_sdma_read,
++    .write = imx_sdma_write,
 +    .endianness = DEVICE_NATIVE_ENDIAN,
 +    .impl = {
 +        /*
@@ -114,77 +111,79 @@ index 0000000000..670b9f4639
 +    },
 +};
 +
-+static void imx7_snvs_init(Object *obj)
++static void imx_sdma_init(Object *obj)
 +{
 +    SysBusDevice *sd = SYS_BUS_DEVICE(obj);
-+    IMX7SNVSState *s = IMX7_SNVS(obj);
++    IMXSDMAState *s = IMX_SDMA(obj);
 +
-+    memory_region_init_io(&s->mmio, obj, &imx7_snvs_ops, s,
-+                          TYPE_IMX7_SNVS, 0x1000);
-+
-+    sysbus_init_mmio(sd, &s->mmio);
++    memory_region_init_io(&s->iomem,
++                          obj,
++                          &imx_sdma_ops,
++                          s,
++                          TYPE_IMX_SDMA ".iomem",
++                          sizeof(s->regs));
++    sysbus_init_mmio(sd, &s->iomem);
 +}
 +
-+static void imx7_snvs_class_init(ObjectClass *klass, void *data)
++static const VMStateDescription vmstate_imx_sdma = {
++    .name = TYPE_IMX_SDMA,
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT32_ARRAY(regs, IMXSDMAState, SDMA_NUM),
++        VMSTATE_END_OF_LIST()
++    },
++};
++
++static void imx_sdma_class_init(ObjectClass *klass, void *data)
 +{
 +    DeviceClass *dc = DEVICE_CLASS(klass);
 +
-+    dc->desc  = "i.MX7 Secure Non-Volatile Storage Module";
++    dc->reset = imx_sdma_reset;
++    dc->vmsd  = &vmstate_imx_sdma;
++    dc->desc  = "i.MX IOMUXC Module";
 +}
 +
-+static const TypeInfo imx7_snvs_info = {
-+    .name          = TYPE_IMX7_SNVS,
++static const TypeInfo imx_sdma_info = {
++    .name          = TYPE_IMX_SDMA,
 +    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(IMX7SNVSState),
-+    .instance_init = imx7_snvs_init,
-+    .class_init    = imx7_snvs_class_init,
++    .instance_size = sizeof(IMXSDMAState),
++    .instance_init = imx_sdma_init,
++    .class_init    = imx_sdma_class_init,
 +};
 +
-+static void imx7_snvs_register_type(void)
++static void imx_sdma_register_type(void)
 +{
-+    type_register_static(&imx7_snvs_info);
++    type_register_static(&imx_sdma_info);
 +}
-+type_init(imx7_snvs_register_type)
-diff --git a/include/hw/misc/imx7_snvs.h b/include/hw/misc/imx7_snvs.h
++type_init(imx_sdma_register_type)
+diff --git a/include/hw/dma/imx_sdma.h b/include/hw/dma/imx_sdma.h
 new file mode 100644
-index 0000000000..255f8f26f9
+index 0000000000..13c5be7a00
 --- /dev/null
-+++ b/include/hw/misc/imx7_snvs.h
-@@ -0,0 +1,35 @@
-+/*
-+ * Copyright (c) 2017, Impinj, Inc.
-+ *
-+ * i.MX7 SNVS block emulation code
-+ *
-+ * Author: Andrey Smirnov <andrew.smirnov@gmail.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
++++ b/include/hw/dma/imx_sdma.h
+@@ -0,0 +1,22 @@
++#ifndef IMX_SDMA_H
++#define IMX_SDMA_H
 +
-+#ifndef IMX7_SNVS_H
-+#define IMX7_SNVS_H
-+
-+#include "qemu/bitops.h"
 +#include "hw/sysbus.h"
 +
-+
-+enum IMX7SNVSRegisters {
-+    SNVS_LPCR = 0x38,
-+    SNVS_LPCR_TOP   = BIT(6),
-+    SNVS_LPCR_DP_EN = BIT(5)
++enum IMXSDMARegisters {
++    SDMA_NUM = 0x300 / sizeof(uint32_t) + 1,
 +};
 +
-+#define TYPE_IMX7_SNVS "imx7.snvs"
-+#define IMX7_SNVS(obj) OBJECT_CHECK(IMX7SNVSState, (obj), TYPE_IMX7_SNVS)
-+
-+typedef struct IMX7SNVSState {
-+    /* <private> */
++typedef struct IMXSDMAState {
++    /*< private >*/
 +    SysBusDevice parent_obj;
 +
-+    MemoryRegion mmio;
-+} IMX7SNVSState;
++    /*< public >*/
++    MemoryRegion iomem;
++    uint32_t     regs[SDMA_NUM];
++} IMXSDMAState;
 +
-+#endif /* IMX7_SNVS_H */
++#define TYPE_IMX_SDMA "imx-sdma"
++#define IMX_SDMA(obj) OBJECT_CHECK(IMXSDMAState, (obj), TYPE_IMX_SDMA)
++
++#endif /* IMX_SDMA_H */
 -- 
 2.13.6
