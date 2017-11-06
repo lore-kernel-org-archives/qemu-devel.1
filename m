@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40338)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40305)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Andrew.Baumann@microsoft.com>) id 1eBmL3-00080Y-Gv
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 13:41:38 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Andrew.Baumann@microsoft.com>) id 1eBmKy-0005eP-Jz
+	(envelope-from <marcandre.lureau@redhat.com>) id 1eBmL2-0007zJ-3o
 	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 13:41:37 -0500
-Received: from mail-dm3nam03on0097.outbound.protection.outlook.com
-	([104.47.41.97]:30605
-	helo=NAM03-DM3-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Andrew.Baumann@microsoft.com>)
-	id 1eBmKy-0005dR-7B
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 13:41:32 -0500
-From: Andrew Baumann <Andrew.Baumann@microsoft.com>
-Date: Mon, 6 Nov 2017 18:41:29 +0000
-Message-ID: <MWHPR21MB0159B2CB632AE8DE6B8DB6F99E500@MWHPR21MB0159.namprd21.prod.outlook.com>
-References: <150824572545.6816.5099701189660002212.stgit@Misha-PC.lan02.inno>
-	<CABdb736bkcafKPCHsQGEmB6wYOGB4s4S4+sVkuygDe7SjqZDYA@mail.gmail.com>
-	<CABdb736w49GjXwNOsj4o8RHQKAfmWnu+jJQgAZjzHwwzOW-+gA@mail.gmail.com>
-In-Reply-To: <CABdb736w49GjXwNOsj4o8RHQKAfmWnu+jJQgAZjzHwwzOW-+gA@mail.gmail.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1eBmL0-0005jR-Qo
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 13:41:36 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55894)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1eBmL0-0005h7-Il
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 13:41:34 -0500
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Mon,  6 Nov 2017 19:39:23 +0100
+Message-Id: <20171106183925.16747-27-marcandre.lureau@redhat.com>
+In-Reply-To: <20171106183925.16747-1-marcandre.lureau@redhat.com>
+References: <20171106183925.16747-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2 00/43] Windbg supporting
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2 26/28] qdev: add DEFINE_PROP_TPMBE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,38 +27,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ladi Prosek <lprosek@redhat.com>, Mihail Abakumov <mikhail.abakumov@ispras.ru>
-Cc: "sw@weilnetz.de" <sw@weilnetz.de>, qemu-devel <qemu-devel@nongnu.org>, Pavel Dovgalyuk <dovgaluk@ispras.ru>, Roman Kagan <rkagan@virtuozzo.com>, Paolo Bonzini <pbonzini@redhat.com>, "Denis V. Lunev" <den@openvz.org>
+To: qemu-devel@nongnu.org
+Cc: amarnath.valluri@intel.com, stefanb@linux.vnet.ibm.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-SGksDQoNCkkganVzdCBub3RpY2VkIHRoaXMgdGhyZWFkLCBhbmQgdGhlIHByb2JsZW0gc291bmRl
-ZCB2ZXJ5IGZhbWlsaWFyLi4uDQoNCj4gRnJvbTogTGFkaSBQcm9zZWsNCj4gU2VudDogTW9uZGF5
-LCA2IE5vdmVtYmVyIDIwMTcgMDc6MTYNClsuLi5dDQo+IEZTIGJhc2UgcGFzc2VzIGFsbCB0aGUg
-Y2hlY2tzIGluIHdpbmRiZ19vbl9sb2FkKCkgYXMgdGhlIGd1ZXN0IGtlcm5lbA0KPiBsb2FkcyBh
-bmQgaXQgcmV0dXJucyB0cnVlLiBRRU1VIHRoZW4gc2VuZHMgc29tZSBkYXRhIG92ZXIgdGhlIHBp
-cGUuDQo+IFdpbmRiZyBkb2Vzbid0IHByaW50IGFueXRoaW5nLCBpdCdzIHN0aWxsIHNob3dpbmc6
-DQo+IA0KPiAgIE9wZW5lZCBcXC5ccGlwZVx3aW43X2RiZw0KPiAgIFdhaXRpbmcgdG8gcmVjb25u
-ZWN0Li4uDQo+IA0KPiBJcyB0aGlzIGV4cGVjdGVkPyBJbiByZWd1bGFyIHJlbW90ZSBrZXJuZWwg
-ZGVidWdnaW5nLCB3aW5kYmcgcHJvZHVjZXMNCj4gYSBidW5jaCBvZiBvdXRwdXQgYWJvdXQgdGhl
-IHRhcmdldCBzdGF0ZSB3aGVuIGl0IGF0dGFjaGVzLg0KDQpKdXN0IGEgZ3Vlc3MsIGJ1dCBJIHN1
-c3BlY3QgdGhlIHByb2JsZW0geW91J3JlIHNlZWluZyBtYXkgYmUgZHVlIHRvIHRoZSBjb21iaW5h
-dGlvbiBvZiB3aW5kYmcncyB0aWdodCB0aW1pbmcgcmVxdWlyZW1lbnRzIGZvciB0aGUgc2VyaWFs
-IGRlYnVnIHByb3RvY29sIGFuZCBxZW11J3MgcG9sbGluZy1iYXNlZCBpbXBsZW1lbnRhdGlvbiBv
-ZiBuYW1lZCBwaXBlIElPLiBJIHJhbiBpbnRvIHRoaXMgYSB5ZWFyIG9yIHR3byBhZ28gd2hlbiBi
-cmluZ2luZyB1cCByYXNwYmVycnkgcGkuLi4gSSBjb3VsZCBuZXZlciByZWxpYWJseSBjb25uZWN0
-IHdpbmRiZyB0byB0aGUgZW11bGF0ZWQgc2VyaWFsIHBvcnQgdXNpbmcgYSBuYW1lZCBwaXBlLiBJ
-IGJlbGlldmUgdGhlIHByb2JsZW0gaXMgdGhhdCB0aGUgbmFtZWQgcGlwZSBkcml2ZXIgcmVsaWVz
-IG9uIHJlY2VpdmluZyBpbnB1dCB0aHJvdWdoIHdpbl9jaHJfcGlwZV9wb2xsKCksIHdoaWNoIGlz
-IGNhbGxlZCB0b28gaW5mcmVxdWVudGx5IHRvIHNhdGlzZnkgd2luZGJnJ3MgbmVlZHMgKGl0IGhh
-cyBhIHJhdGhlciBzaG9ydCB0aW1lb3V0IGJlZm9yZSBpdCBnaXZlcyB1cCBhbmQgcmV0cmFuc21p
-dHMpLiBUaGUgY29ycmVjdCBmaXggaXMgdG8gdXNlIGJsb2NraW5nIElPIGZvciB0aGUgbmFtZWQg
-cGlwZXMgaW5zaWRlIHFlbXUsIGJ1dCBJIGtub3cgZnJvbSBleHBlcmllbmNlIHRoYXQgd2luMzIg
-aXMgYXdmdWwgaW4gdGhpcyByZXNwZWN0IC0tIHFlbXUgd2FudHMgYSBzaW5nbGUgdW5pZmllZCBi
-bG9ja2luZyBjYWxsIHRvIHdhaXQgZm9yIElPIG9uIGFueSBjb21iaW5hdGlvbiBvZiBuYW1lZCBw
-aXBlcywgc29ja2V0cywgZXZlbnRzLCBldGMuIGFuZCBXaW5kb3dzIGFwcGVhcnMgdG8gbGFjayB0
-aGlzLCBhdCBsZWFzdCBhdCB0aGUgbGV2ZWwgb2YgcG9sbC9zZWxlY3QuDQoNCk15IHdvcmthcm91
-bmQgYXQgdGhlIHRpbWUgd2FzIHRvIGtsdWRnZSB1cCBhIHByb3h5IGJldHdlZW4gc29ja2V0cyBh
-bmQgbmFtZWQgcGlwZXMsIHNvIHRoZSBjb25uZWN0aW9uIHdhczoNCnFlbXUgPC1zb2NrZXQtPiBw
-cm94eSA8LW5hbWVkIHBpcGUtPiB3aW5kYmcNCg0KKFRoZSBwcm94eSB3YXMgYSBmYWlybHkgZmxh
-a3kgcHl0aG9uIHNjcmlwdCwgYnV0IGl0IHdhcyBnb29kIGVub3VnaCB0byB0aWRlIG1lIG92ZXIg
-dW50aWwgSSBjb3VsZCBnZXQga2RuZXQgd29ya2luZy4gSSBjYW4gcHJvYmFibHkgZGlnIGl0IG91
-dCBpZiB5b3UncmUgaW50ZXJlc3RlZC4pDQoNCkNoZWVycywNCkFuZHJldw0K
+A property to lookup a tpm backend.
+
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ include/hw/qdev-properties.h     |  3 ++
+ hw/core/qdev-properties-system.c | 64 ++++++++++++++++++++++++++++++++++=
+++++++
+ 2 files changed, 67 insertions(+)
+
+diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
+index e2321f1cc1..4d24cdf8d6 100644
+--- a/include/hw/qdev-properties.h
++++ b/include/hw/qdev-properties.h
+@@ -17,6 +17,7 @@ extern const PropertyInfo qdev_prop_int64;
+ extern const PropertyInfo qdev_prop_size;
+ extern const PropertyInfo qdev_prop_string;
+ extern const PropertyInfo qdev_prop_chr;
++extern const PropertyInfo qdev_prop_tpm;
+ extern const PropertyInfo qdev_prop_ptr;
+ extern const PropertyInfo qdev_prop_macaddr;
+ extern const PropertyInfo qdev_prop_on_off_auto;
+@@ -186,6 +187,8 @@ extern const PropertyInfo qdev_prop_link;
+=20
+ #define DEFINE_PROP_CHR(_n, _s, _f)             \
+     DEFINE_PROP(_n, _s, _f, qdev_prop_chr, CharBackend)
++#define DEFINE_PROP_TPMBE(_n, _s, _f)                     \
++    DEFINE_PROP(_n, _s, _f, qdev_prop_tpm, TPMBackend *)
+ #define DEFINE_PROP_STRING(_n, _s, _f)             \
+     DEFINE_PROP(_n, _s, _f, qdev_prop_string, char*)
+ #define DEFINE_PROP_NETDEV(_n, _s, _f)             \
+diff --git a/hw/core/qdev-properties-system.c b/hw/core/qdev-properties-s=
+ystem.c
+index ec10da7424..c17364655c 100644
+--- a/hw/core/qdev-properties-system.c
++++ b/hw/core/qdev-properties-system.c
+@@ -21,6 +21,7 @@
+ #include "net/hub.h"
+ #include "qapi/visitor.h"
+ #include "chardev/char-fe.h"
++#include "sysemu/tpm_backend.h"
+ #include "sysemu/iothread.h"
+=20
+ static void get_pointer(Object *obj, Visitor *v, Property *prop,
+@@ -236,6 +237,69 @@ const PropertyInfo qdev_prop_chr =3D {
+     .release =3D release_chr,
+ };
+=20
++/* --- character device --- */
++
++static void get_tpm(Object *obj, Visitor *v, const char *name, void *opa=
+que,
++                    Error **errp)
++{
++    DeviceState *dev =3D DEVICE(obj);
++    TPMBackend **be =3D qdev_get_prop_ptr(dev, opaque);
++    char *p;
++
++    p =3D g_strdup(*be ? (*be)->id : "");
++    visit_type_str(v, name, &p, errp);
++    g_free(p);
++}
++
++static void set_tpm(Object *obj, Visitor *v, const char *name, void *opa=
+que,
++                    Error **errp)
++{
++    DeviceState *dev =3D DEVICE(obj);
++    Error *local_err =3D NULL;
++    Property *prop =3D opaque;
++    TPMBackend *s, **be =3D qdev_get_prop_ptr(dev, prop);
++    char *str;
++
++    if (dev->realized) {
++        qdev_prop_set_after_realize(dev, name, errp);
++        return;
++    }
++
++    visit_type_str(v, name, &str, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        return;
++    }
++
++    s =3D qemu_find_tpm_be(str);
++    if (s =3D=3D NULL) {
++        error_setg(errp, "Property '%s.%s' can't find value '%s'",
++                   object_get_typename(obj), prop->name, str);
++    } else if (tpm_backend_init(s, TPM_IF(obj), errp) =3D=3D 0) {
++        *be =3D s; /* weak reference, avoid cyclic ref */
++    }
++    g_free(str);
++}
++
++static void release_tpm(Object *obj, const char *name, void *opaque)
++{
++    DeviceState *dev =3D DEVICE(obj);
++    Property *prop =3D opaque;
++    TPMBackend **be =3D qdev_get_prop_ptr(dev, prop);
++
++    if (*be) {
++        tpm_backend_reset(*be);
++    }
++}
++
++const PropertyInfo qdev_prop_tpm =3D {
++    .name  =3D "str",
++    .description =3D "ID of a tpm to use as a backend",
++    .get   =3D get_tpm,
++    .set   =3D set_tpm,
++    .release =3D release_tpm,
++};
++
+ /* --- netdev device --- */
+ static void get_netdev(Object *obj, Visitor *v, const char *name,
+                        void *opaque, Error **errp)
+--=20
+2.15.0.rc0.40.gaefcc5f6f
