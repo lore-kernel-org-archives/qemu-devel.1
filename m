@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48266)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48327)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eBe1C-0004Xl-38
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 04:48:35 -0500
+	(envelope-from <s.priebe@profihost.ag>) id 1eBe1G-0004c0-GR
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 04:48:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eBe1B-0004ET-4d
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 04:48:34 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57244)
+	(envelope-from <s.priebe@profihost.ag>) id 1eBe1B-0004Ei-IS
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 04:48:38 -0500
+Received: from cloud1-vm154.de-nserver.de ([178.250.10.56]:51061)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eBe1A-0004E7-Rt
+	(Exim 4.71) (envelope-from <s.priebe@profihost.ag>)
+	id 1eBe1B-0004Dv-7k
 	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 04:48:33 -0500
-From: Peter Xu <peterx@redhat.com>
-Date: Mon,  6 Nov 2017 17:46:23 +0800
-Message-Id: <20171106094643.14881-8-peterx@redhat.com>
-In-Reply-To: <20171106094643.14881-1-peterx@redhat.com>
-References: <20171106094643.14881-1-peterx@redhat.com>
-Subject: [Qemu-devel] [RFC v3 07/27] monitor: move the cur_mon hack deeper
- for QMP
+References: <1b862cf2-2fee-3243-cb54-2780ace6f25b@profihost.ag>
+	<971cc10f-7930-9830-0528-27e8faac7282@redhat.com>
+From: Stefan Priebe - Profihost AG <s.priebe@profihost.ag>
+Message-ID: <748c4d0d-f84b-303d-f9a6-bafa6037d669@profihost.ag>
+Date: Mon, 6 Nov 2017 10:48:31 +0100
+MIME-Version: 1.0
+In-Reply-To: <971cc10f-7930-9830-0528-27e8faac7282@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: de-DE
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] kvm: virtio-net: saved image requires TUN_F_UFO
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,84 +30,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Jiri Denemark <jdenemar@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, peterx@redhat.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, marcandre.lureau@redhat.com, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
 
-In monitor_qmp_read(), we have the hack to temporarily replace the
-cur_mon pointer.  Now we move this hack deeper inside the QMP dispatcher
-routine since the Monitor pointer can be passed in to that using the new
-JSON Parser opaque field now.
+Hi Paolo,
 
-This does not make much sense as a single patch.  However, this will be
-a big step for the next patch, when the QMP dispatcher routine will be
-split from the QMP parser.
+Am 06.11.2017 um 10:40 schrieb Paolo Bonzini:
+> On 06/11/2017 10:38, Stefan Priebe - Profihost AG wrote:
+>> Hello,
+>>
+>> i've upgraded some servers from kernel 4.4 to 4.12 - both running Qemu
+>> 2.9.1.
+>>
+>> If i migrate a VM from a host running kernel 4.4 to a host running 4.12
+>> i get:
+>>
+>> kvm: virtio-net: saved image requires TUN_F_UFO support
+>> kvm: Failed to load virtio-net-device:tmp
+>> kvm: Failed to load virtio-net:virtio
+>> kvm: error while loading state for instance 0x0 of device
+>> '0000:00:12.0/virtio-net'
+>> kvm: load of migration failed: Invalid argument
+>>
+>>
+>> while migrating from 4.12 to 4.4 works fine.
+>>
+>> Can anybody help? Is this expected?
+> 
+> Can you check why peer_has_ufo failed (in hw/net/virtio-net.c)?
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- monitor.c | 19 ++++++++++---------
- 1 file changed, 10 insertions(+), 9 deletions(-)
+May be - how can i archieve this? Patching the code is not a problem if
+you can give me a hint.
 
-diff --git a/monitor.c b/monitor.c
-index ab80d32c70..322dfb5f31 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -3813,7 +3813,7 @@ static void handle_qmp_command(JSONMessageParser *parser, GQueue *tokens,
- {
-     QObject *req, *rsp = NULL, *id = NULL;
-     QDict *qdict = NULL;
--    Monitor *mon = cur_mon;
-+    Monitor *mon = opaque, *old_mon;
-     Error *err = NULL;
- 
-     req = json_parser_parse_err(tokens, NULL, &err);
-@@ -3838,8 +3838,13 @@ static void handle_qmp_command(JSONMessageParser *parser, GQueue *tokens,
-         QDECREF(req_json);
-     }
- 
-+    old_mon = cur_mon;
-+    cur_mon = mon;
-+
-     rsp = qmp_dispatch(cur_mon->qmp.commands, req);
- 
-+    cur_mon = old_mon;
-+
-     if (mon->qmp.commands == &qmp_cap_negotiation_commands) {
-         qdict = qdict_get_qdict(qobject_to_qdict(rsp), "error");
-         if (qdict
-@@ -3876,13 +3881,9 @@ err_out:
- 
- static void monitor_qmp_read(void *opaque, const uint8_t *buf, int size)
- {
--    Monitor *old_mon = cur_mon;
--
--    cur_mon = opaque;
--
--    json_message_parser_feed(&cur_mon->qmp.parser, (const char *) buf, size);
-+    Monitor *mon = opaque;
- 
--    cur_mon = old_mon;
-+    json_message_parser_feed(&mon->qmp.parser, (const char *) buf, size);
- }
- 
- static void monitor_read(void *opaque, const uint8_t *buf, int size)
-@@ -3956,7 +3957,7 @@ static void monitor_qmp_event(void *opaque, int event)
-         break;
-     case CHR_EVENT_CLOSED:
-         json_message_parser_destroy(&mon->qmp.parser);
--        json_message_parser_init(&mon->qmp.parser, handle_qmp_command, NULL);
-+        json_message_parser_init(&mon->qmp.parser, handle_qmp_command, mon);
-         mon_refcount--;
-         monitor_fdsets_cleanup();
-         break;
-@@ -4106,7 +4107,7 @@ void monitor_init(Chardev *chr, int flags)
-         qemu_chr_fe_set_handlers(&mon->chr, monitor_can_read, monitor_qmp_read,
-                                  monitor_qmp_event, NULL, mon, NULL, true);
-         qemu_chr_fe_set_echo(&mon->chr, true);
--        json_message_parser_init(&mon->qmp.parser, handle_qmp_command, NULL);
-+        json_message_parser_init(&mon->qmp.parser, handle_qmp_command, mon);
-     } else {
-         qemu_chr_fe_set_handlers(&mon->chr, monitor_can_read, monitor_read,
-                                  monitor_event, NULL, mon, NULL, true);
--- 
-2.13.5
+> Also, did this ioctl fail when the tap device was set up on the 4.12 destination?
+> int tap_probe_has_ufo(int fd)
+> {
+>     unsigned offload;
+> 
+>     offload = TUN_F_CSUM | TUN_F_UFO;
+> 
+>     if (ioctl(fd, TUNSETOFFLOAD, offload) < 0)
+>         return 0;
+> 
+>     return 1;
+> }
+
+Should there be any kernel output or how can i detect / check it?
+
+Greets,
+Stefan
+
+> Thanks,
+> 
+> Paolo
+> 
