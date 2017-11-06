@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39143)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39175)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eBnQJ-0000Bq-MP
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 14:51:08 -0500
+	(envelope-from <bounces@canonical.com>) id 1eBnQP-0000Dr-CF
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 14:51:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eBnQE-0004sb-S4
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 14:51:07 -0500
-Received: from indium.canonical.com ([91.189.90.7]:50674)
+	(envelope-from <bounces@canonical.com>) id 1eBnQN-0004xd-QA
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 14:51:13 -0500
+Received: from indium.canonical.com ([91.189.90.7]:51294)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eBnQE-0004rW-Lm
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 14:51:02 -0500
+	id 1eBnQN-0004wp-GN
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 14:51:11 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eBnQB-0002OV-GF
-	for <qemu-devel@nongnu.org>; Mon, 06 Nov 2017 19:50:59 +0000
+	id 1eBnQL-0002OB-2E
+	for <qemu-devel@nongnu.org>; Mon, 06 Nov 2017 19:51:09 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id D901D2E80CF
-	for <qemu-devel@nongnu.org>; Mon,  6 Nov 2017 19:50:56 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 4A46F2E80CB
+	for <qemu-devel@nongnu.org>; Mon,  6 Nov 2017 19:51:07 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 06 Nov 2017 19:36:47 -0000
-From: =?utf-8?q?W=C3=BCstengecko?= <1728256@bugs.launchpad.net>
-Reply-To: Bug 1728256 <1728256@bugs.launchpad.net>
+Date: Mon, 06 Nov 2017 19:38:20 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Reply-To: Bug 1701798 <1701798@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <150920686502.20214.12572544661418580428.malonedeb@soybean.canonical.com>
-Message-Id: <150999700784.4047.12878586140882436918.malone@gac.canonical.com>
+References: <149890819992.24827.8096984642709091835.malonedeb@soybean.canonical.com>
+Message-Id: <150999710051.3913.13682648299408628801.launchpad@gac.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1728256] Re: (Regression) Memory corruption in
- Windows 10 guest / amd64
+Subject: [Qemu-devel] [Bug 1701798] Re: dynamically linked binaries crash
+ for big-endian targets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,64 +39,216 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Unfortunately I have bad news, but I also have (kind of) good news.
-Bad news is, 2.9 is NOT stable, contrary to what I believed earlier.
-Good news is, I found a correlation between the crashes and converting larg=
-e video files on an SMB share with ffmpeg, so effectively copying slowly wi=
-th simultaneously high CPU load. In that constellation it crashed a few tim=
-es after just hours (instead of days sometimes). I suspect it might be a ne=
-twork related issue. I am now testing the different virtual network hardwar=
-e that qemu supports (which proved to be difficult due to lack of driver su=
-pport in Windows).
-
-On that note, I remember right after setting up the VM I had some
-strange networking related hangup issues with the rtl8139 virtual
-adapter - the default -, where the VM would slowly grind to a complete
-halt over a few seconds when I started a very network-heavy task (like
-copying something from the host via SMB into the VM). I could prevent
-the hang when I paused the copying for a few seconds. At that time I
-assumed it was the hardware registering as 100Mbps adapter, but the
-actual load being about 4 times that on average (during copying of
-course), with peaks significantly higher (about 15-20 times). That issue
-completely went away after switching the virtual network hardware to
-virtio (which registers as 10Gbps adapter), and I considered that case
-closed.
+** Tags added: linux-user
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1728256
+https://bugs.launchpad.net/bugs/1701798
 
 Title:
-  (Regression) Memory corruption in Windows 10 guest / amd64
+  dynamically linked binaries crash for big-endian targets
 
 Status in QEMU:
   New
 
 Bug description:
-  I have a Win 10 Pro x64 guest inside a qemu/kvm running on an Arch x86_64=
- host. The VM has a physical GPU passed through, as well as the physical US=
-B controllers, as well as a dedicated SSD attached via SATA; you can find t=
-he complete libvirt xml here: https://pastebin.com/U1ZAXBNg
-  I built qemu from source using the qemu-minimal-git AUR package; you can =
-find the build script here: https://aur.archlinux.org/cgit/aur.git/tree/PKG=
-BUILD?h=3Dqemu-minimal-git (if you aren't familiar with Arch, this is essen=
-tially a bash script where build() and package() are run to build the files=
-, and then install them into the $pkgdir to later tar them up.)
+  On the targets
+    hppa
+    m68k
+    mips
+    mips64
+    powerpc
+    powerpc64
+    s390x
+    sparc64
+  dynamically linked binaries crash, but statically linked binaries work.
+  On the targets
+    aarch64
+    alpha
+    armhf
+    powerpc64le
+    sh4
+  both dynamically linked and statically linked binaries work.
 
-  Starting with qemu v2.10.0, Windows crashes randomly with a bluescreen
-  about CRITICAL_STRUCTURE_CORRUPTION. I also tested the git heads
-  f90ea7ba7c, 861cd431c9 and e822e81e35, before I went back to v2.9.0,
-  which is running stable for over 50 hours right now.
+  How to reproduce:
 
-  During my tests I found that locking the memory pages alleviates the
-  problem somewhat, but never completely avoids it. However, with the
-  crashes occuring randomly, that could as well be false conclusions; I
-  had crashes within minutes after boot with that too.
+  1) On Ubuntu 16.04, install the packages
+  g++-5-aarch64-linux-gnu
+  g++-5-alpha-linux-gnu
+  g++-5-arm-linux-gnueabihf
+  g++-5-hppa-linux-gnu
+  g++-5-m68k-linux-gnu
+  g++-5-mips-linux-gnu
+  g++-5-mips64-linux-gnuabi64
+  g++-5-powerpc-linux-gnu
+  g++-5-powerpc64-linux-gnu
+  g++-5-powerpc64le-linux-gnu
+  g++-5-s390x-linux-gnu
+  g++-5-sh4-linux-gnu
+  g++-5-sparc64-linux-gnu
 
-  I will now start `git bisect`ing; if you have any other suggestions on
-  what I could try or possible patches feel free to leave them with me.
+  2) Install qemu 2.9.0 from source (for m68k, use the 2.7.0-m68k
+  code from https://github.com/vivier/qemu-m68k.git):
+  $ ../configure --prefix=3D/home/bruno/inst-qemu/2.9.0 --target-list=3Daar=
+ch64-softmmu,alpha-softmmu,arm-softmmu,i386-softmmu,m68k-softmmu,mips-softm=
+mu,mipsel-softmmu,mips64-softmmu,mips64el-softmmu,ppc-softmmu,ppc64-softmmu=
+,s390x-softmmu,sh4-softmmu,sparc-softmmu,sparc64-softmmu,x86_64-softmmu,aar=
+ch64-linux-user,alpha-linux-user,arm-linux-user,hppa-linux-user,m68k-linux-=
+user,mips-linux-user,mipsel-linux-user,mips64-linux-user,mips64el-linux-use=
+r,ppc-linux-user,ppc64-linux-user,ppc64le-linux-user,s390x-linux-user,sh4-l=
+inux-user,sparc-linux-user,sparc64-linux-user --disable-strip --disable-wer=
+ror --enable-gtk --enable-vnc
+  $ make
+  $ make install
+
+  3) Cross-compile the programs:
+
+  $ aarch64-linux-gnu-gcc-5 -O hello.c -o hello.aarch64
+  $ alpha-linux-gnu-gcc-5 -O hello.c -o hello.alpha
+  $ arm-linux-gnueabihf-gcc-5 -O hello.c -o hello.armhf
+  $ hppa-linux-gnu-gcc-5 -O hello.c -o hello.hppa
+  $ m68k-linux-gnu-gcc-5 -O hello.c -o hello.m68k
+  $ mips-linux-gnu-gcc-5 -O hello.c -o hello.mips
+  $ mips64-linux-gnuabi64-gcc-5 -O hello.c -o hello.mips64
+  $ powerpc-linux-gnu-gcc-5 -O hello.c -o hello.powerpc
+  $ powerpc64-linux-gnu-gcc-5 -O hello.c -o hello.powerpc64
+  $ powerpc64le-linux-gnu-gcc-5 -O hello.c -o hello.powerpc64le
+  $ s390x-linux-gnu-gcc-5 -O hello.c -o hello.s390x
+  $ sh4-linux-gnu-gcc-5 -O hello.c -o hello.sh4
+  $ sparc64-linux-gnu-gcc-5 -O hello.c -o hello.sparc64
+
+  4) Run the programs:
+
+  * aarch64 works:
+  $ QEMU_LD_PREFIX=3D/usr/aarch64-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-aarc=
+h64 hello.aarch64
+  Hello world
+
+  * alpha works:
+  $ QEMU_LD_PREFIX=3D/usr/alpha-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-alpha =
+hello.alpha =
+
+  Hello world
+
+  * armhf works:
+  $ QEMU_LD_PREFIX=3D/usr/arm-linux-gnueabihf ~/inst-qemu/2.9.0/bin/qemu-ar=
+m hello.armhf
+  Hello world
+
+  * powerpc64le works:
+  $ QEMU_LD_PREFIX=3D/usr/powerpc64le-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-=
+ppc64le hello.powerpc64le
+  Hello world
+
+  * sh4 works:
+  $ QEMU_LD_PREFIX=3D/usr/sh4-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-sh4 hell=
+o.sh4
+  Hello world
+
+  * =3D=3D=3D=3D=3D sparc64 does not work:
+  $ QEMU_LD_PREFIX=3D/usr/sparc64-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-spar=
+c64 hello.sparc64
+  Segmentation fault (core dumped)
+
+  When I copy the file to a machine with `uname -srm` =3D "Linux 4.5.0-2-sp=
+arc64 sparc64",
+  it works:
+  $ ./hello.sparc64
+  Hello world
+
+  When I copy the file and its execution environment /usr/sparc64-linux-gnu=
+ to the
+  same machine and run the binary in a chroot environment:
+  # /bin/hello.sparc64 =
+
+  Hello world
+
+  * =3D=3D=3D=3D=3D mips does not work:
+  $ QEMU_LD_PREFIX=3D/usr/mips-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-mips he=
+llo.mips
+  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+
+  When I copy the file to a machine with `uname -srm` =3D "Linux 3.16.0-4-4=
+kc-malta mips",
+  it works:
+  $ ./hello.mips
+  Hello world
+
+  When I copy the file and its execution environment /usr/mips-linux-gnu to=
+ the
+  same machine and run the binary in a chroot environment:
+  # /bin/hello.mips =
+
+  Hello world
+
+  * =3D=3D=3D=3D=3D mips64 does not work:
+  $ QEMU_LD_PREFIX=3D/usr/mips64-linux-gnuabi64 ~/inst-qemu/2.9.0/bin/qemu-=
+mips64 hello.mips64
+  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+
+  When I copy the file to a machine with `uname -srm` =3D "Linux 3.16.0-4-5=
+kc-malta mips64",
+  it works:
+  $ ./hello.mips64
+  Hello world
+
+  * =3D=3D=3D=3D=3D powerpc does not work:
+  $ QEMU_LD_PREFIX=3D/usr/powerpc-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-ppc =
+hello.powerpc
+  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+
+  When I copy the file to a machine with `uname -srm` =3D "Linux 3.17.2-200=
+.fc20.ppc64p7 ppc64",
+  it works:
+  $ ./hello.powerpc
+  Hello world
+
+  * =3D=3D=3D=3D=3D powerpc64 does not work:
+  $ QEMU_LD_PREFIX=3D/usr/powerpc64-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-pp=
+c64 hello.powerpc64
+  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+
+  When I copy the file to a machine with `uname -srm` =3D "Linux 3.17.2-200=
+.fc20.ppc64p7 ppc64",
+  it works:
+  $ ./hello.powerpc64
+  Hello world
+
+  * =3D=3D=3D=3D=3D s390x does not work:
+  $ QEMU_LD_PREFIX=3D/usr/s390x-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-s390x =
+hello.s390x
+  <hangs>
+  $ QEMU_LD_PREFIX=3D/usr/s390x-linux-gnu ~/inst-qemu/2.8.1/bin/qemu-s390x =
+hello.s390x
+  qemu-s390x: /media/develdata/devel/build/qemu-2.8.1/translate-all.c:175: =
+tb_lock: Assertion `!have_tb_lock' failed.
+  Segmentation fault (core dumped)
+
+  When I copy the file to a machine with `uname -srm` =3D "Linux 3.16.0-4-s=
+390x s390x",
+  it works:
+  $ ./hello.s390x
+  Hello world
+
+  * =3D=3D=3D=3D=3D hppa does not work:
+  $ QEMU_LD_PREFIX=3D/usr/hppa-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-hppa he=
+llo.hppa
+  Segmentation fault (core dumped)
+
+  * =3D=3D=3D=3D=3D m68k does not work:
+  $ QEMU_LD_PREFIX=3D/usr/m68k-linux-gnu QEMU_CPU=3Dm68020 ~/inst-qemu/2.9.=
+0/bin/qemu-m68k hello.m68k
+  qemu: uncaught target signal 4 (Illegal instruction) - core dumped
+  $ QEMU_LD_PREFIX=3D/usr/m68k-linux-gnu QEMU_CPU=3Dm68020 ~/inst-qemu/2.7.=
+0-m68k/bin/qemu-m68k hello.m68k
+  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+
+  =
+
+  The set of targets where it does not work is exactly the big-endian targe=
+ts.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1728256/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1701798/+subscriptions
