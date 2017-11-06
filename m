@@ -1,37 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60153)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60675)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eBkeX-0002vA-6A
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 11:53:37 -0500
+	(envelope-from <lvivier@redhat.com>) id 1eBkfs-0003Zw-On
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 11:55:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eBkeU-0001OJ-Eg
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 11:53:37 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42280)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eBkeU-0001O9-8I
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 11:53:34 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 349537853F
-	for <qemu-devel@nongnu.org>; Mon,  6 Nov 2017 16:53:33 +0000 (UTC)
-Date: Mon, 6 Nov 2017 18:53:27 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20171106185150-mutt-send-email-mst@kernel.org>
-References: <20171102133115.19195-1-lprosek@redhat.com>
-	<20171102163348-mutt-send-email-mst@kernel.org>
-	<CABdb734XVCNxyyRUfFtU5cm=34K28zsuRgyuj6F2SEBjPUu27w@mail.gmail.com>
-	<1509693637.31823.7.camel@redhat.com>
-	<CABdb734MR3vMCSBH-JhD8vWYKLBx6QOxrVZFYUyDbuQJg8mZ6Q@mail.gmail.com>
-	<20171103170426-mutt-send-email-mst@kernel.org>
-	<CABdb734DG_itxuUjCiANz_ps+j5EdJj287HXrd8Xa_akyGAsaA@mail.gmail.com>
-	<1509959887.30277.8.camel@redhat.com>
+	(envelope-from <lvivier@redhat.com>) id 1eBkfo-0001qG-LH
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 11:55:00 -0500
+References: <20171031204330.14803-1-danielhb@linux.vnet.ibm.com>
+	<20171031204330.14803-3-danielhb@linux.vnet.ibm.com>
+From: Laurent Vivier <lvivier@redhat.com>
+Message-ID: <51f58725-912c-9f63-1205-74e3095210a8@redhat.com>
+Date: Mon, 6 Nov 2017 17:54:52 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1509959887.30277.8.camel@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] virtio-pci: Don't force Subsystem Vendor
- ID = Vendor ID
+In-Reply-To: <20171031204330.14803-3-danielhb@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 2/4] tests: adding 'set_indicator' RTAS
+ call
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,42 +25,188 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Ladi Prosek <lprosek@redhat.com>, Yan Vugenfirer <yvugenfi@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Vadim Rozenfeld <vrozenfe@redhat.com>
+To: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, mdroth@linux.vnet.ibm.com
 
-On Mon, Nov 06, 2017 at 10:18:07AM +0100, Gerd Hoffmann wrote:
->   Hi,
+On 31/10/2017 21:43, Daniel Henrique Barboza wrote:
+> 'set_indicator' is a RTAS hypercall that is used to change
+> the state of both physical and logical devices DRCs by setting
+> allocation-state, isolation-state and dr-indicator.
 > 
-> > > So in my humble opinion the right thing for people to do is simply
-> > > to
-> > > avoid legacy devices. Is something preventing that?
-> > 
-> > The same reasons why the concept of transitional devices exists at
-> > all?
+> This patch implements the set_indicator RTAS call in
+> tests/libqos/rtas.c, adding its test in tests/rtas-test.c.
 > 
-> We discussing future driver versions running on future qemu versions,
-> so we should have virtio 1.0 support on both ends.  So IMO the question
->  isn't that silly ...
+> Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+> ---
+>  tests/libqos/rtas.c | 33 ++++++++++++++++++++++++
+>  tests/libqos/rtas.h |  2 ++
+>  tests/rtas-test.c   | 73 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 108 insertions(+)
 > 
-> But by default qemu uses transitional by default for non-express
-> devices, i.e. for all i440fx machines types.  Which implies virtio-
-> legacy compatible pci ids.
-> 
-> If we want change this we need a transitional/modern virtio config
-> switch.  Not only in qemu, but for the whole management stack too.
-> I don't think it is a good idea to go that route.
-> 
-> cheers,
->   Gerd
+> diff --git a/tests/libqos/rtas.c b/tests/libqos/rtas.c
+> index fdeab448f7..ade572a84f 100644
+> --- a/tests/libqos/rtas.c
+> +++ b/tests/libqos/rtas.c
+> @@ -151,3 +151,36 @@ int qrtas_check_exception(QGuestAllocator *alloc, uint32_t mask,
+>  
+>      return ret[0];
+>  }
+> +
+> +/*
+> + * set_indicator as defined by PAPR 2.7+, 7.3.5.4
+> + *
+> + * nargs = 3
+> + * nrets = 1
+> + *
+> + * arg[0] = the type of the indicator
+> + * arg[1] = index of the specific indicator
+> + * arg[2] = desired new state
+> + *
+> + * Depending on the input, set_indicator will call set_isolation_state,
+> + * set_allocation_state or set_dr_indicator in hw/ppc/spapr_drc.c.
+> + * These functions allows the guest to control the state of hotplugged
+> + * and hot unplugged devices.
+> + */
+> +int qrtas_set_indicator(QGuestAllocator *alloc, uint32_t type, uint32_t idx,
+> +                        uint32_t new_state)
+> +{
+> +    uint32_t args[3], ret[1];
+> +    int res;
+> +
+> +    args[0] = type;
+> +    args[1] = idx;
+> +    args[2] = new_state;
+> +
+> +    res = qrtas_call(alloc, "set-indicator", 3, args, 1, ret);
+> +    if (res != 0) {
+> +        return -1;
+> +    }
+> +
+> +    return ret[0];
+> +}
+> diff --git a/tests/libqos/rtas.h b/tests/libqos/rtas.h
+> index 330ecfd397..9dfa18f32b 100644
+> --- a/tests/libqos/rtas.h
+> +++ b/tests/libqos/rtas.h
+> @@ -14,4 +14,6 @@ int qrtas_ibm_write_pci_config(QGuestAllocator *alloc, uint64_t buid,
+>                                 uint32_t addr, uint32_t size, uint32_t val);
+>  int qrtas_check_exception(QGuestAllocator *alloc, uint32_t mask,
+>                            uint32_t buf_addr, uint32_t buf_len);
+> +int qrtas_set_indicator(QGuestAllocator *alloc, uint32_t type, uint32_t idx,
+> +                        uint32_t new_state);
+>  #endif /* LIBQOS_RTAS_H */
+> diff --git a/tests/rtas-test.c b/tests/rtas-test.c
+> index c5a6080043..2c34b6e83c 100644
+> --- a/tests/rtas-test.c
+> +++ b/tests/rtas-test.c
+> @@ -8,6 +8,13 @@
+>  #define EVENT_MASK_EPOW (1 << 30)
+>  #define EVENT_LOG_LEN 2048
+>  
+> +#define RTAS_SENSOR_TYPE_ISOLATION_STATE 9001
+> +#define RTAS_SENSOR_TYPE_ALLOCATION_STATE 9003
+> +#define SPAPR_DR_ISOLATION_STATE_ISOLATED 0
+> +#define SPAPR_DR_ALLOCATION_STATE_UNUSABLE 0
+> +#define SPAPR_DR_ALLOCATION_STATE_USABLE  1
+> +#define SPAPR_DR_ISOLATION_STATE_UNISOLATED 1
+> +
+>  static void test_rtas_get_time_of_day(void)
+>  {
+>      QOSState *qs;
+> @@ -97,6 +104,71 @@ static void test_rtas_check_exception_hotplug_event(void)
+>      qtest_shutdown(qs);
+>  }
+>  
+> +/*
+> + * To test the 'set-indicator' RTAS call we will hotplug a device
+> + * (in this case a CPU) and then make its DRC state go from
+> + * the starting state UNUSABLE(1) to UNISOLATE(3). These DRC
+> + * states transitions are described in further detail in
+> + * PAPR 2.7+ 13.4.
+> + */
+> +static void test_rtas_set_indicator(void)
+> +{
+> +    QOSState *qs;
+> +    uint64_t ret;
+> +    uintptr_t guest_buf_addr;
+> +    uint32_t drc_index;
+> +    uint8_t *buf = g_malloc0(EVENT_LOG_LEN);
+> +
+> +    qs = qtest_spapr_boot("-machine pseries -cpu POWER8_v2.0 "
+> +                          "-smp 1,sockets=4,cores=1,threads=1,maxcpus=4");
+> +
+> +    guest_buf_addr = guest_alloc(qs->alloc, EVENT_LOG_LEN * sizeof(uint8_t));
+> +    qtest_qmp_device_add("power8_v2.0-spapr-cpu-core", "id-1",
+> +                         "'core-id':'1'");
+> +
+> +    ret = qrtas_check_exception(qs->alloc, EVENT_MASK_EPOW,
+> +                                guest_buf_addr, EVENT_LOG_LEN);
+> +
+> +    memread(guest_buf_addr, buf, EVENT_LOG_LEN);
+> +    guest_free(qs->alloc, guest_buf_addr);
+> +
+> +    g_assert_cmpint(ret, ==, 0);
+> +
+> +    /*
+> +     * This time we can't ignore the event log written in the
+> +     * check_exception call - we need the DRC index of the
+> +     * recently added CPU to make the state changes using set_indicator.
+> +     *
+> +     * A bit of magic to go straight to the DRC index by checking the
+> +     * error log format in hw/ppc/spapr_events.c:
+> +     *
+> +     * - rtas_error_log size = 8 bytes
+> +     * - all other structures until the hotplug event log = 88 bytes
+> +     * - inside the hotplug event log, skip 8 + 4 bytes to get to
+> +     *   the drc_id union.
+> +     *
+> +     * This gives us a 108 bytes skip to get the drc info, which is
+> +     * written in be32.
+> +     */
+> +    drc_index = be32toh(*((uint32_t *)(buf + 108)));
+> +    g_free(buf);
 
-I think we already have that in libvirt.
+It's test program, so I think you should really check the content of
+rtas_error_log (initiator field), the content of the extended (check Log
+Valid, Log Format identifier, Company identifier, ...) and the content
+of the Platform Event Log (Logical Resource Identitifcation: Section Id,
+Resource Type). Then you can get Logical CPU Id. You should also check
+you can hotplug memory (perhaps in the previous patch too).
+> +
+> +    /*
+> +     * According to the DRC state diagram, the guest first sets a device
+> +     * to USABLE (2), then UNISOLATED (3). Both should return
+> +     * RTAS_OUT_SUCCESS(0).
+> +     */
+> +    ret = qrtas_set_indicator(qs->alloc, RTAS_SENSOR_TYPE_ALLOCATION_STATE,
+> +                              drc_index, SPAPR_DR_ALLOCATION_STATE_USABLE);
+> +    g_assert_cmpint(ret, ==, 0);
 
-Right now we just ignore the subsystem IDs if supplied but
-maybe the right thing to do is to just disable legacy
-mode if they are supplied.
+According to the diagram, you need get-sensor-state to check the initial
+state (UNUSABLE).
 
-Seems cleaner than ignoring the subsystem id but using the
-subsystem vendor id.
+> +    ret = qrtas_set_indicator(qs->alloc, RTAS_SENSOR_TYPE_ISOLATION_STATE,
+> +                              drc_index, SPAPR_DR_ISOLATION_STATE_UNISOLATED);
+> +    g_assert_cmpint(ret, ==, 0);
+> +
 
--- 
-MST
+And the you can also check it has moved to UNISOLATE.
+
+> +    qtest_shutdown(qs);
+> +}
+> +
+>  int main(int argc, char *argv[])
+>  {
+>      const char *arch = qtest_get_arch();
+> @@ -112,6 +184,7 @@ int main(int argc, char *argv[])
+>                     test_rtas_check_exception_no_events);
+>      qtest_add_func("rtas/rtas-check-exception-hotplug-event",
+>                     test_rtas_check_exception_hotplug_event);
+> +    qtest_add_func("rtas/test_rtas_set_indicator", test_rtas_set_indicator);
+>  
+>      return g_test_run();
+>  }
+> 
+
+Thanks,
+Laurent
