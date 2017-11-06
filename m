@@ -1,23 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41464)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41983)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1eBfyi-000573-5Z
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 06:54:09 -0500
+	(envelope-from <bounces@canonical.com>) id 1eBg06-0005to-68
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 06:55:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1eBfyd-00018y-6o
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 06:54:08 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58904)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1eBfyd-00017Q-0Q
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 06:54:03 -0500
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Mon,  6 Nov 2017 12:53:47 +0100
-Message-Id: <20171106115347.19873-1-marcandre.lureau@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1eBg02-0001kd-6d
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 06:55:34 -0500
+Received: from indium.canonical.com ([91.189.90.7]:38420)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eBg02-0001kA-0g
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 06:55:30 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eBg01-0000el-2W
+	for <qemu-devel@nongnu.org>; Mon, 06 Nov 2017 11:55:29 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 122162E80C8
+	for <qemu-devel@nongnu.org>; Mon,  6 Nov 2017 11:55:29 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] build-sys: restrict vmcoreinfo to fw_cfg+dma
- capable targets
+Date: Mon, 06 Nov 2017 11:39:59 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Reply-To: Bug 657006 <657006@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20101008180054.4876.62094.malonedeb@palladium.canonical.com>
+Message-Id: <150996840025.4488.12001196691197991679.launchpad@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 657006] Re: arm v7M - svc insn doesn't trigger
+ PendSV handler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,64 +38,79 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: mst@redhat.com, thuth@redhat.com, danielhb@linux.vnet.ibm.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-vmcoreinfo is built for all targets. However, it requires fw_cfg with
-DMA operations support (write operation). Restrict vmcoreinfo exposure
-to architectures that are supporting FW_CFG_DMA, that is arm-virt and
-x86 only atm.
+** Tags added: arm
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- default-configs/arm-softmmu.mak    | 2 ++
- default-configs/i386-softmmu.mak   | 1 +
- default-configs/x86_64-softmmu.mak | 1 +
- hw/misc/Makefile.objs              | 2 +-
- 4 files changed, 5 insertions(+), 1 deletion(-)
+-- =
 
-diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmm=
-u.mak
-index 5059d134c8..d37edc4312 100644
---- a/default-configs/arm-softmmu.mak
-+++ b/default-configs/arm-softmmu.mak
-@@ -130,3 +130,5 @@ CONFIG_SMBIOS=3Dy
- CONFIG_ASPEED_SOC=3Dy
- CONFIG_GPIO_KEY=3Dy
- CONFIG_MSF2=3Dy
-+
-+CONFIG_FW_CFG_DMA=3Dy
-diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-soft=
-mmu.mak
-index a685c439e7..95ac4b464a 100644
---- a/default-configs/i386-softmmu.mak
-+++ b/default-configs/i386-softmmu.mak
-@@ -60,3 +60,4 @@ CONFIG_SMBIOS=3Dy
- CONFIG_HYPERV_TESTDEV=3D$(CONFIG_KVM)
- CONFIG_PXB=3Dy
- CONFIG_ACPI_VMGENID=3Dy
-+CONFIG_FW_CFG_DMA=3Dy
-diff --git a/default-configs/x86_64-softmmu.mak b/default-configs/x86_64-=
-softmmu.mak
-index ea69e8289e..0221236825 100644
---- a/default-configs/x86_64-softmmu.mak
-+++ b/default-configs/x86_64-softmmu.mak
-@@ -60,3 +60,4 @@ CONFIG_SMBIOS=3Dy
- CONFIG_HYPERV_TESTDEV=3D$(CONFIG_KVM)
- CONFIG_PXB=3Dy
- CONFIG_ACPI_VMGENID=3Dy
-+CONFIG_FW_CFG_DMA=3Dy
-diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-index 19202d90cf..10c88a84b4 100644
---- a/hw/misc/Makefile.objs
-+++ b/hw/misc/Makefile.objs
-@@ -9,7 +9,7 @@ common-obj-$(CONFIG_PCI_TESTDEV) +=3D pci-testdev.o
- common-obj-$(CONFIG_EDU) +=3D edu.o
-=20
- common-obj-y +=3D unimp.o
--common-obj-y +=3D vmcoreinfo.o
-+common-obj-$(CONFIG_FW_CFG_DMA) +=3D vmcoreinfo.o
-=20
- obj-$(CONFIG_VMPORT) +=3D vmport.o
-=20
---=20
-2.15.0.rc0.40.gaefcc5f6f
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/657006
+
+Title:
+  arm v7M - svc insn doesn't trigger PendSV handler
+
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  The svc instruction doesn't work as expected.
+
+  -> qemu 0.13.0 rc1 (git)
+
+  Test : demo with freeRTOS (for example
+  FreeRTOS-6.0.5/Demo/CORTEX_LM3S811_GCC) with the card lm3s811evb.
+
+  If we start the scheduler, it will call that function (__attribute__
+  (( naked ))) :
+
+  void vPortStartFirstTask( void )
+
+  {
+
+          __asm volatile(
+
+                                          " ldr r0, =3D0xE000ED08   \n" /*
+  Use the NVIC offset register to locate the stack. */
+
+                                          " ldr r0, [r0]
+  \n"
+
+                                          " ldr r0, [r0]
+  \n"
+
+                                          " msr msp, r0
+  \n" /* Set the msp back to the start of the stack. */
+
+                                          " svc 0
+  \n" /* System call to start first task. */
+
+                                  );
+
+  }
+
+  The 4 first lines in asm work fine. The scv 0 call will rise the right in=
+terrupt in qemu (line 151, in arm_gic.c, best_irq =3D 15). However, it will=
+ never call the PendSV Handler (xPortPendSVHandler here). This function is =
+recorded in the nvic vector.
+  Next, (after the svc), the processor will execute the line after in code =
+(this is a naked function) so the next function written after vPortStartFir=
+stTask in the code.
+
+  =
+
+  command line :
+  console 1 : qemu-system-arm -M lm3s6965evb -kernel gcc/RTOSDemo.axf -s -S
+  console 2 : arm-none-eabi-gdb -ex "target remote localhost:1234" gcc/RTOS=
+Demo.axf
+
+  arm-none-eabi from http://www.codesourcery.com/sgpp/lite/arm/portal/relea=
+se1294
+  Same error with another project with arm-elf
+
+  processor : arm cortex m3
+
+  host : gentoo (2.6.35-r9) (without kqemu)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/657006/+subscriptions
