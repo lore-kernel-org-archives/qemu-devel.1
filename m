@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40896)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <n54@gmx.com>)
-	id 1eBl3X-0007h7-8E
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 12:19:28 -0500
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43550)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <berrange@redhat.com>) id 1eBlAk-0001ay-8q
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 12:26:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <n54@gmx.com>) id 1eBl3T-0004qN-Tb
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 12:19:27 -0500
-Received: from mout.gmx.net ([212.227.17.21]:58687)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <n54@gmx.com>) id 1eBl3T-0004pn-JA
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 12:19:23 -0500
-References: <20171106005656.GC84093@humpty.home.comstyle.com>
-	<CAFEAcA_2i0p9C3amtoB0o9Y4K83aCP7Gkw1cDqmLjrkLwJTZxg@mail.gmail.com>
-From: Kamil Rytarowski <n54@gmx.com>
-Message-ID: <5ed0a508-e22a-5d59-c826-54fa17afcf20@gmx.com>
-Date: Mon, 6 Nov 2017 18:21:45 +0100
+	(envelope-from <berrange@redhat.com>) id 1eBlAh-0000nO-IO
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 12:26:54 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57660)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eBlAh-0000mU-9Z
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 12:26:51 -0500
+Date: Mon, 6 Nov 2017 17:26:46 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20171106172646.GO23361@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <1509988303.22094.8.camel@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_2i0p9C3amtoB0o9Y4K83aCP7Gkw1cDqmLjrkLwJTZxg@mail.gmail.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="f66bIae8xG55N6311ACtsgXxwNVE5sqrV"
-Subject: Re: [Qemu-devel] [PATCH] osdep: Deal with TIME_MAX and OpenBSD
- 64-bit time_t
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1509988303.22094.8.camel@intel.com>
+Subject: Re: [Qemu-devel] RFC: connecting chardev to a command forked by qemu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,82 +27,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Brad Smith <brad@comstyle.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Patrick Ohly <patrick.ohly@intel.com>
+Cc: qemu-devel@nongnu.org, Amarnath Valluri <amarnath.valluri@intel.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---f66bIae8xG55N6311ACtsgXxwNVE5sqrV
-From: Kamil Rytarowski <n54@gmx.com>
-To: Peter Maydell <peter.maydell@linaro.org>, Brad Smith <brad@comstyle.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
-Message-ID: <5ed0a508-e22a-5d59-c826-54fa17afcf20@gmx.com>
-Subject: Re: [Qemu-devel] [PATCH] osdep: Deal with TIME_MAX and OpenBSD 64-bit
- time_t
-References: <20171106005656.GC84093@humpty.home.comstyle.com>
- <CAFEAcA_2i0p9C3amtoB0o9Y4K83aCP7Gkw1cDqmLjrkLwJTZxg@mail.gmail.com>
-In-Reply-To: <CAFEAcA_2i0p9C3amtoB0o9Y4K83aCP7Gkw1cDqmLjrkLwJTZxg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Mon, Nov 06, 2017 at 06:11:43PM +0100, Patrick Ohly wrote:
+> Hello!
+> 
+> When Amarnath proposed the initial patch set for interacting with swtpm
+> without relying on CUSE, letting QEMU invoke swtpm was part of the
+> patch series. When using some virtual machine management framework like
+>  virt-manager that might not be necessary. But our goal was to use
+> QEMU+swtpm to test TPM support in Yocto, and there QEMU is started by a
+> simple wrapper script where handling additional processes would be
+> awkward.
+> 
+> To achieve that goal without having to make that script more complex,
+> I'd like to propose that with some minor (?) changes, a chardev could
+> also be configured to use an external command. As a proof of concept
+> I'm attaching a patch which modifies char-socket.c accordingly.
 
-On 06.11.2017 11:51, Peter Maydell wrote:
-> On 6 November 2017 at 00:56, Brad Smith <brad@comstyle.com> wrote:
->> Define TIME_MAX to LLONG_MAX for OpenBSD since OpenBSD uses 64-bit tim=
-e_t.
->>
->> Signed-off-by: Brad Smith <brad@comstyle.com>
->>
->>
->> diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
->> index 6855b94bbf..824714049b 100644
->> --- a/include/qemu/osdep.h
->> +++ b/include/qemu/osdep.h
->> @@ -132,8 +132,12 @@ extern int daemon(int, int);
->>  #define ESHUTDOWN 4099
->>  #endif
->>  #ifndef TIME_MAX
->> +#ifdef __OpenBSD__
->> +#define TIME_MAX LLONG_MAX
->> +#else
->>  #define TIME_MAX LONG_MAX
->>  #endif
->> +#endif
->=20
-> I'm not really a fan of adding new OS-specific #ifdefs --
-> what if one of the other BSDs uses or switches to 64-bit
-> time_t for 32-bit platforms? Is there some way we can detect
-> this generically at compile time (possibly in configure) ?
->=20
+Personally I'm not a huge fan of adding more ways for QEMU to spawn
+external commands. QEMU is already a very large & complex beast which
+is hard to confine, and when QEMU spawns a command it is hard to lock
+it down to any useful extent without us adding alot of extra features
+to QEMU. Most stuff we've been doing in QEMU has tended to go in the
+opposite direction of facilitating integration with helpers spawned
+by a 3rd party, whether it be the mgmt app that launches QEMU or
+something else. cf vhost-user where we just expose a normal chardev
+unix socket and assume someone/thing else spawned the service on
+the other end, or the new approach to host FS passthrough where we
+expose vsock and run NFS server externally.
 
-NetBSD 32-bit ports switched to 64-bit in 2009. There are no longer
-supported releases with 32-bit time_t.
-
-> thanks
-> -- PMM
->=20
+I can see the argument about it making QEMU easier to use, and those
+who care about security aren't forced to use this new feature. It
+none the less has a cost on maintainers and existance of these features
+does reflect on QEMU's security reputation even if many don't use it.
 
 
+> +static void chardev_open_socket_cmd(Chardev *chr,
+> +                                    const char *cmd,
+> +                                    Error **errp)
+> +{
+> +    int fds[2] = { -1, -1 };
+> +    QIOChannelSocket *sioc = NULL;
+> +    pid_t pid = -1;
+> +    const char *argv[] = { "/bin/sh", "-c", cmd, NULL };
+> +
+> +    if (socketpair(AF_UNIX, SOCK_STREAM|SOCK_CLOEXEC, 0, fds)) {
+> +        error_setg_errno(errp, errno, "Error creating socketpair(AF_UNIX, SOCK_STREAM|SOCK_CLOEXEC)");
+> +        goto error;
+> +    }
+> +
+> +    pid = qemu_fork(errp);
+> +    if (pid < 0) {
+> +        goto error;
+> +    }
+> +
+> +    if (!pid) {
+> +        /* child */
+> +        dup2(fds[1], STDIN_FILENO);
+> +        execv(argv[0], (char * const *)argv);
+> +        _exit(1);
+> +    }
+> +
+> +    /*
+> +     * Hand over our end of the socket pair to the qio channel.
+> +     * TODO: We don't reap the child at the moment.
+> +     */
+> +    sioc = qio_channel_socket_new_fd(fds[0], errp);
 
---f66bIae8xG55N6311ACtsgXxwNVE5sqrV
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+NB, you've mostly re-invented qio_channel_command_new_spawn() here,
+though you're using a socketpair instead of pipe, which has the
+slight benefit of meaning we can do FD passing across the external
+command. If the latter is why you chose socketpair, then it would
+be nice to improve QIOChannelCommand 
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
 
-iQIcBAEBCAAGBQJaAJovAAoJEEuzCOmwLnZsxQYQAKaQNqy1t6O0hRYrdpYV4xKl
-I65Ko4dYtUae5upUdVM62O7r1WNf/3s6+vPjpw0CVB5HYARizgYrh9SJX9p+mKxF
-P2+IFtGQSTJ1CbwCWp5Drjm+nnKF2sRjKoU0laAJuRslYpsWpaCjwgC4KLv+H7vj
-HYvYag5ZcaqhYicavKvYfBiJPqYYSJtiMDT+6r+G3hU0GI9SqYaOoxaly2GQ452h
-oDx31BQdmRXhIcPXytSz7wguIKOEbYguHwTgysvkabiBg8BN7ZIZz5oub4R7RxET
-1Fdl4+T8HZM0F0ApgTBRY4cVMfS1HeucZZNIy9d7EkrbAYHNCFWPPZzwBaJSZacT
-NpeVcY0yPD9VLXUfZZFzn376DvU57q/Ak6zs2Jkd0rr3ef9w/+enp4nv7oR/S7sT
-AqCHevOub3Q4DsfAgwvfp9HPNrri+8arcowUgF1jhH20lCebqFIR85zrwr/3wCnx
-yF7GtHOB9Qc7EHKgKbMZIF84spfuIo4B1MTR3vxZDzYL7A7XCV+r6s1XDPw1fn9S
-6IxvkWO41XWJ9fW2fdvMT5AVapnjlCPupkaRAL1zVvRKLTSBt4/22/ipYtQilC/0
-qznV85VKDAkyAbcaH3LeDT4nbK/AIsjSRfJVkYPKkwyS8JJ4iOlLizb5A8mzWDAH
-b7b+5lUDMPE9z8+A72EF
-=JIID
------END PGP SIGNATURE-----
-
---f66bIae8xG55N6311ACtsgXxwNVE5sqrV--
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
