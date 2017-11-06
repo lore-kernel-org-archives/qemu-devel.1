@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49781)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49783)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1eBbLa-0006Gk-Dy
+	(envelope-from <longpeng2@huawei.com>) id 1eBbLa-0006Gl-FL
 	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 01:57:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1eBbLV-0008Fb-Te
+	(envelope-from <longpeng2@huawei.com>) id 1eBbLX-0008Hz-Qz
 	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 01:57:26 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:2329)
+Received: from szxga04-in.huawei.com ([45.249.212.190]:2331)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1eBbLV-00088u-AS
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 01:57:21 -0500
+	(envelope-from <longpeng2@huawei.com>) id 1eBbLW-0008Aw-Tf
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 01:57:23 -0500
 From: "Longpeng(Mike)" <longpeng2@huawei.com>
-Date: Mon, 6 Nov 2017 14:56:58 +0800
-Message-ID: <1509951422-20060-7-git-send-email-longpeng2@huawei.com>
+Date: Mon, 6 Nov 2017 14:57:00 +0800
+Message-ID: <1509951422-20060-9-git-send-email-longpeng2@huawei.com>
 In-Reply-To: <1509951422-20060-1-git-send-email-longpeng2@huawei.com>
 References: <1509951422-20060-1-git-send-email-longpeng2@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [RFC 06/10] cryptodev: add stateless mode cipher
- support
+Subject: [Qemu-devel] [RFC 08/10] cryptodev: extract one util function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,108 +28,159 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: arei.gonglei@huawei.com, pasic@linux.vnet.ibm.com
 Cc: weidong.huang@huawei.com, wangxinxin.wang@huawei.com, jianjay.zhou@huawei.com, qemu-devel@nongnu.org, "Longpeng(Mike)" <longpeng2@huawei.com>
 
-Adds stateless mode cipher support.
+From: Gonglei <arei.gonglei@huawei.com>
 
+So that the new function can be used by both seesion creation
+and the following stateless crypto operation.
+
+Signed-off-by: Gonglei <arei.gonglei@huawei.com>
 Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
 ---
- backends/cryptodev.c              | 21 +++++++++++++++++++++
- include/hw/virtio/virtio-crypto.h |  1 +
- include/sysemu/cryptodev.h        | 18 ++++++++++++++++++
- 3 files changed, 40 insertions(+)
+ backends/cryptodev-builtin.c | 100 +++++++++++++++++++++++++------------------
+ 1 file changed, 58 insertions(+), 42 deletions(-)
 
-diff --git a/backends/cryptodev.c b/backends/cryptodev.c
-index 67edfa5..e06ab12 100644
---- a/backends/cryptodev.c
-+++ b/backends/cryptodev.c
-@@ -120,6 +120,21 @@ static int cryptodev_backend_sym_operation(
-     return -VIRTIO_CRYPTO_ERR;
+diff --git a/backends/cryptodev-builtin.c b/backends/cryptodev-builtin.c
+index 6df23b9..ba6d15c 100644
+--- a/backends/cryptodev-builtin.c
++++ b/backends/cryptodev-builtin.c
+@@ -152,73 +152,56 @@ err:
+    return -1;
  }
  
-+static int cryptodev_backend_sym_stateless_operation(
-+                 CryptoDevBackend *backend,
-+                 CryptoDevBackendSymStatelessInfo *op_info,
-+                 uint32_t queue_index, Error **errp)
-+{
-+    CryptoDevBackendClass *bc =
-+                      CRYPTODEV_BACKEND_GET_CLASS(backend);
-+
-+    if (bc->do_sym_stateless_op) {
-+        return bc->do_sym_stateless_op(backend, op_info, queue_index, errp);
-+    }
-+
-+    return -VIRTIO_CRYPTO_ERR;
+-static int cryptodev_builtin_create_cipher_session(
+-                    CryptoDevBackendBuiltin *builtin,
++static int
++cryptodev_builtin_get_cipher_alg_mode(
+                     CryptoDevBackendSymSessionInfo *sess_info,
++                    int *algo, int *mode,
+                     Error **errp)
+ {
+-    int algo;
+-    int mode;
+-    QCryptoCipher *cipher;
+-    int index;
+-    CryptoDevBackendBuiltinSession *sess;
+-
+-    if (sess_info->op_type != VIRTIO_CRYPTO_SYM_OP_CIPHER) {
+-        error_setg(errp, "Unsupported optype :%u", sess_info->op_type);
+-        return -1;
+-    }
+-
+-    index = cryptodev_builtin_get_unused_session_index(builtin);
+-    if (index < 0) {
+-        error_setg(errp, "Total number of sessions created exceeds %u",
+-                  MAX_NUM_SESSIONS);
+-        return -1;
+-    }
+-
+     switch (sess_info->cipher_alg) {
+     case VIRTIO_CRYPTO_CIPHER_AES_ECB:
+-        mode = QCRYPTO_CIPHER_MODE_ECB;
+-        algo = cryptodev_builtin_get_aes_algo(sess_info->key_len,
+-                                                    mode, errp);
+-        if (algo < 0)  {
++        *mode = QCRYPTO_CIPHER_MODE_ECB;
++        *algo = cryptodev_builtin_get_aes_algo(sess_info->key_len,
++                                               *mode, errp);
++        if (*algo < 0)  {
+             return -1;
+         }
+         break;
+     case VIRTIO_CRYPTO_CIPHER_AES_CBC:
+-        mode = QCRYPTO_CIPHER_MODE_CBC;
+-        algo = cryptodev_builtin_get_aes_algo(sess_info->key_len,
+-                                                    mode, errp);
+-        if (algo < 0)  {
++        *mode = QCRYPTO_CIPHER_MODE_CBC;
++        *algo = cryptodev_builtin_get_aes_algo(sess_info->key_len,
++                                               *mode, errp);
++        if (*algo < 0)  {
+             return -1;
+         }
+         break;
+     case VIRTIO_CRYPTO_CIPHER_AES_CTR:
+-        mode = QCRYPTO_CIPHER_MODE_CTR;
+-        algo = cryptodev_builtin_get_aes_algo(sess_info->key_len,
+-                                                    mode, errp);
+-        if (algo < 0)  {
++        *mode = QCRYPTO_CIPHER_MODE_CTR;
++        *algo = cryptodev_builtin_get_aes_algo(sess_info->key_len,
++                                              *mode, errp);
++        if (*algo < 0)  {
+             return -1;
+         }
+         break;
+     case VIRTIO_CRYPTO_CIPHER_AES_XTS:
+-        mode = QCRYPTO_CIPHER_MODE_XTS;
+-        algo = cryptodev_builtin_get_aes_algo(sess_info->key_len,
+-                                                    mode, errp);
+-        if (algo < 0)  {
++        *mode = QCRYPTO_CIPHER_MODE_XTS;
++        *algo = cryptodev_builtin_get_aes_algo(sess_info->key_len,
++                                               *mode, errp);
++        if (*algo < 0)  {
+             return -1;
+         }
+         break;
+     case VIRTIO_CRYPTO_CIPHER_3DES_ECB:
+-        mode = QCRYPTO_CIPHER_MODE_ECB;
+-        algo = QCRYPTO_CIPHER_ALG_3DES;
++        *mode = QCRYPTO_CIPHER_MODE_ECB;
++        *algo = QCRYPTO_CIPHER_ALG_3DES;
+         break;
+     case VIRTIO_CRYPTO_CIPHER_3DES_CBC:
+-        mode = QCRYPTO_CIPHER_MODE_CBC;
+-        algo = QCRYPTO_CIPHER_ALG_3DES;
++        *mode = QCRYPTO_CIPHER_MODE_CBC;
++        *algo = QCRYPTO_CIPHER_ALG_3DES;
+         break;
+     case VIRTIO_CRYPTO_CIPHER_3DES_CTR:
+-        mode = QCRYPTO_CIPHER_MODE_CTR;
+-        algo = QCRYPTO_CIPHER_ALG_3DES;
++        *mode = QCRYPTO_CIPHER_MODE_CTR;
++        *algo = QCRYPTO_CIPHER_ALG_3DES;
+         break;
+     default:
+         error_setg(errp, "Unsupported cipher alg :%u",
+@@ -226,6 +209,39 @@ static int cryptodev_builtin_create_cipher_session(
+         return -1;
+     }
+ 
++    return 0;
 +}
 +
- int cryptodev_backend_crypto_operation(
-                  CryptoDevBackend *backend,
-                  void *opaque,
-@@ -133,6 +148,12 @@ int cryptodev_backend_crypto_operation(
- 
-         return cryptodev_backend_sym_operation(backend,
-                          op_info, queue_index, errp);
-+    } else if (req->flags == CRYPTODEV_BACKEND_ALG_SYM_STATELESS) {
-+        CryptoDevBackendSymStatelessInfo *op_info;
-+        op_info = req->u.sym_stateless_info;
++static int cryptodev_builtin_create_cipher_session(
++                    CryptoDevBackendBuiltin *builtin,
++                    CryptoDevBackendSymSessionInfo *sess_info,
++                    Error **errp)
++{
++    int algo;
++    int mode;
++    QCryptoCipher *cipher;
++    int index;
++    CryptoDevBackendBuiltinSession *sess;
++    int ret;
 +
-+        return cryptodev_backend_sym_stateless_operation(backend,
-+                         op_info, queue_index, errp);
-     } else {
-         error_setg(errp, "Unsupported cryptodev alg type: %" PRIu32 "",
-                    req->flags);
-diff --git a/include/hw/virtio/virtio-crypto.h b/include/hw/virtio/virtio-crypto.h
-index a00a0bf..465ad20 100644
---- a/include/hw/virtio/virtio-crypto.h
-+++ b/include/hw/virtio/virtio-crypto.h
-@@ -73,6 +73,7 @@ typedef struct VirtIOCryptoReq {
-     struct VirtIOCrypto *vcrypto;
-     union {
-         CryptoDevBackendSymOpInfo *sym_op_info;
-+        CryptoDevBackendSymStatelessInfo *sym_stateless_info;
-     } u;
- } VirtIOCryptoReq;
- 
-diff --git a/include/sysemu/cryptodev.h b/include/sysemu/cryptodev.h
-index a9d0d1e..aa2fcd8 100644
---- a/include/sysemu/cryptodev.h
-+++ b/include/sysemu/cryptodev.h
-@@ -58,6 +58,7 @@ typedef struct CryptoDevBackend CryptoDevBackend;
- 
- enum CryptoDevBackendAlgType {
-     CRYPTODEV_BACKEND_ALG_SYM,
-+    CRYPTODEV_BACKEND_ALG_SYM_STATELESS,
-     CRYPTODEV_BACKEND_ALG__MAX,
- };
- 
-@@ -146,6 +147,20 @@ typedef struct CryptoDevBackendSymOpInfo {
-     uint8_t data[0];
- } CryptoDevBackendSymOpInfo;
- 
-+/**
-+ * CryptoDevBackendSymStatelessInfo:
-+ *
-+ * @session_info: session information, see above
-+ *  CryptoDevBackendSymSessionInfo
-+ * @op_info: crypto operation information, see above
-+ *  CryptoDevBackendSymOpInfo, @session_id is ignored
-+ *
-+ **/
-+typedef struct CryptoDevBackendSymStatelessInfo {
-+    CryptoDevBackendSymSessionInfo session_info;
-+    CryptoDevBackendSymOpInfo op_info;
-+} CryptoDevBackendSymStatelessInfo;
++    if (sess_info->op_type != VIRTIO_CRYPTO_SYM_OP_CIPHER) {
++        error_setg(errp, "Unsupported optype :%u", sess_info->op_type);
++        return -1;
++    }
 +
- typedef struct CryptoDevBackendClass {
-     ObjectClass parent_class;
- 
-@@ -161,6 +176,9 @@ typedef struct CryptoDevBackendClass {
-     int (*do_sym_op)(CryptoDevBackend *backend,
-                      CryptoDevBackendSymOpInfo *op_info,
-                      uint32_t queue_index, Error **errp);
-+    int (*do_sym_stateless_op)(CryptoDevBackend *backend,
-+                     CryptoDevBackendSymStatelessInfo *op_info,
-+                     uint32_t queue_index, Error **errp);
- } CryptoDevBackendClass;
- 
- 
++    index = cryptodev_builtin_get_unused_session_index(builtin);
++    if (index < 0) {
++        error_setg(errp, "Total number of sessions created exceeds %u",
++                  MAX_NUM_SESSIONS);
++        return -1;
++    }
++
++    ret = cryptodev_builtin_get_cipher_alg_mode(sess_info,
++                                                &algo, &mode, errp);
++    if (ret < 0) {
++        return -1;
++    }
++
+     cipher = qcrypto_cipher_new(algo, mode,
+                                sess_info->cipher_key,
+                                sess_info->key_len,
 -- 
 1.8.3.1
