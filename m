@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53634)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57510)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eBmo5-0000OX-Cw
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 14:11:41 -0500
+	(envelope-from <bounces@canonical.com>) id 1eBmxj-00051G-B5
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 14:21:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eBmo1-0004mH-Lu
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 14:11:37 -0500
-Received: from indium.canonical.com ([91.189.90.7]:41076)
+	(envelope-from <bounces@canonical.com>) id 1eBmxg-0000be-5Q
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 14:21:35 -0500
+Received: from indium.canonical.com ([91.189.90.7]:44300)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eBmo1-0004le-G1
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 14:11:33 -0500
+	id 1eBmxf-0000bN-VE
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 14:21:32 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eBmnz-0004pv-RX
-	for <qemu-devel@nongnu.org>; Mon, 06 Nov 2017 19:11:31 +0000
+	id 1eBmxe-0005ka-6x
+	for <qemu-devel@nongnu.org>; Mon, 06 Nov 2017 19:21:30 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 4BE832E80EA
-	for <qemu-devel@nongnu.org>; Mon,  6 Nov 2017 19:11:30 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 92C8F2E81A1
+	for <qemu-devel@nongnu.org>; Mon,  6 Nov 2017 19:21:26 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 06 Nov 2017 19:01:43 -0000
+Date: Mon, 06 Nov 2017 19:14:46 -0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1705118 <1705118@bugs.launchpad.net>
+Reply-To: Bug 1673976 <1673976@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <150041005567.6544.17518405784140614257.malonedeb@gac.canonical.com>
-Message-Id: <150999490367.4957.6740671140211512470.malone@chaenomeles.canonical.com>
+References: <20170318142657.21676.52259.malonedeb@chaenomeles.canonical.com>
+Message-Id: <150999568789.20805.16293748337074744799.launchpad@soybean.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1705118] Re: qemu user mode does not support
- catching SIGSEGV on some architectures
+Subject: [Qemu-devel] [Bug 1673976] Re: locale-gen dumps core run under
+ arm-linux-user on x86-64 host
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,83 +39,37 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Patchset that fixes all the minor parts of this, leaving (probably) just sp=
-arc setup_rt_frame/rt_sigreturn:
-https://lists.gnu.org/archive/html/qemu-devel/2017-11/msg00833.html
+** Tags added: linux-user
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1705118
+https://bugs.launchpad.net/bugs/1673976
 
 Title:
-  qemu user mode does not support catching SIGSEGV on some architectures
+  locale-gen dumps core run under arm-linux-user on x86-64 host
 
 Status in QEMU:
-  Confirmed
+  New
 
 Bug description:
-  The documentation
-  <https://qemu.weilnetz.de/doc/qemu-doc.html#Features> says that
-  qemu in user mode supports POSIX signal handling.
+  I'm running a command (locale-gen) inside of an armv7h chroot mounted
+  on my x86_64 desktop by putting qemu-arm-static into /usr/bin/ of the
+  chroot file system and I get a core dump.
 
-  Catching SIGSEGV according to POSIX, however, does not work on
-    ppc, ppc64, ppc64le, s390x, sparc64.
-  It does work, however, on
-    aarch64, alpha, arm, hppa, m68k, mips, mips64, sh4.
+  locale-gen
+  Generating locales...
+  =C2=A0=C2=A0en_US.UTF-8...localedef: ../sysdeps/unix/sysv/linux/spawni.c:=
+360: __spawnix: Assertion `ec >=3D 0' failed.
+  qemu: uncaught target signal 6 (Aborted) - core dumped
+  /usr/bin/locale-gen: line 41:    34 Aborted                 (core dumped)=
+ localedef -i $input -c -f $charset -A /usr/share/locale/locale.alias $loca=
+le
 
-  How to reproduce:
-  The attached program runs fine (exits with code 0) on
-    - real hardware Linux/PowerPC64 (in 32-bit and 64-bit mode),
-    - real hardware Linux/PowerPC64LE,
-    - qemu-system-s390x emulated Linux/s390x,
-    - real hardware Linux/SPARC64.
-  $ gcc -O -Wall testsigsegv.c; ./a.out; echo $?
-  0
-
-  For ppc:
-  $ powerpc-linux-gnu-gcc-5 -O -Wall -static testsigsegv.c -o testsigsegv-p=
-pc
-  $ ~/inst-qemu/2.9.0/bin/qemu-ppc testsigsegv-ppc
-  $ echo $?
-  3
-
-  For ppc64:
-  $ powerpc64-linux-gnu-gcc-5 -O -Wall -static testsigsegv.c -o testsigsegv=
--ppc64
-  $ ~/inst-qemu/2.9.0/bin/qemu-ppc64 testsigsegv-ppc64
-  $ echo $?
-  3
-
-  For ppc64le:
-  $ powerpc64le-linux-gnu-gcc-5 -O -Wall -static testsigsegv.c -o testsigse=
-gv-ppc64le
-  $ ~/inst-qemu/2.9.0/bin/qemu-ppc64le testsigsegv-ppc64le
-  $ echo $?
-  3
-
-  For s390x:
-  $ s390x-linux-gnu-gcc-5 -O -Wall -static testsigsegv.c -o testsigsegv-s39=
-0x
-  $ ~/inst-qemu/2.9.0/bin/qemu-s390x testsigsegv-s390x
-  $ echo $?
-  3
-  $ s390x-linux-gnu-gcc-5 -O -Wall -static testsigsegv.c -DAVOID_LINUX_S390=
-X_COMPAT -o testsigsegv-s390x-a
-  $ ~/inst-qemu/2.9.0/bin/qemu-s390x testsigsegv-s390x-a
-  $ echo $?
-  0
-  So, the test fails here because the Linux/s390x kernel omits the least
-  significant 12 bits of the fault address in the 'si_addr' field. But
-  qemu-s390x is not compatible with the Linux/s390x behaviour: it puts
-  the complete fault address in the 'si_addr' field.
-
-  For sparc64:
-  $ sparc64-linux-gnu-gcc-5 -O -Wall -static testsigsegv.c -o testsigsegv-s=
-parc64
-  $ ~/inst-qemu/2.9.0/bin/qemu-sparc64 testsigsegv-sparc64
-  Segmentation fault (core dumped)
+  I've done this same thing successfully for years, but this breakage
+  has appeared some time in the last 3 or so months. Possibly with the
+  update to qemu version 2.8.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1705118/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1673976/+subscriptions
