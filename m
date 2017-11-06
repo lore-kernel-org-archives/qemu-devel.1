@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32879)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33103)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1eBn6s-0000pQ-FG
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 14:31:03 -0500
+	(envelope-from <bounces@canonical.com>) id 1eBn7Q-000174-5r
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 14:31:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1eBn6p-0004bM-Bw
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 14:31:02 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48084)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1eBn6p-0004ai-5j
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 14:30:59 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4690861D0E
-	for <qemu-devel@nongnu.org>; Mon,  6 Nov 2017 19:30:57 +0000 (UTC)
-Received: from colo-mx.corp.redhat.com
-	(colo-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.21])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 3EF5D5EDE0
-	for <qemu-devel@nongnu.org>; Mon,  6 Nov 2017 19:30:57 +0000 (UTC)
-Date: Mon, 6 Nov 2017 14:30:56 -0500 (EST)
-From: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Message-ID: <1152775610.36873329.1509996656951.JavaMail.zimbra@redhat.com>
-In-Reply-To: <ae73f31f-749a-e02e-d04b-1090e350619e@redhat.com>
-References: <20171106185411.19551-1-marcandre.lureau@redhat.com>
-	<ae73f31f-749a-e02e-d04b-1090e350619e@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1eBn7N-0004v1-7W
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 14:31:36 -0500
+Received: from indium.canonical.com ([91.189.90.7]:47002)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eBn7N-0004uW-1T
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 14:31:33 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eBn7J-0007TC-3V
+	for <qemu-devel@nongnu.org>; Mon, 06 Nov 2017 19:31:29 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id C56A52E81B8
+	for <qemu-devel@nongnu.org>; Mon,  6 Nov 2017 19:31:25 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] .gitignore: remove vscclient
+Date: Mon, 06 Nov 2017 19:25:12 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Reply-To: Bug 1696353 <1696353@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <149682692221.8383.2186201709283317126.malonedeb@gac.canonical.com>
+Message-Id: <150999631231.3874.3767631805193375598.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1696353] Re: golang binaries fail to start under
+ linux-user
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,40 +37,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+
+Since this has been fixed/worked around on the go side (thanks for
+following up with that!) I'm going to close this as "wontfix" on QEMU's
+side. It would be nice to support clone() with non-standard flags but
+since we can't do that while we still link with libc there's no way we
+can do this without a massive (and massively painful!) redesign to
+remove our libc dependency so that all of QEMU's linux-user code runs
+bare on the kernel.
 
 
+** Changed in: qemu
+       Status: New =3D> Won't Fix
 
------ Original Message -----
-> On 11/06/2017 12:54 PM, Marc-Andr=C3=A9 Lureau wrote:
-> > It was removed with libcacard.
->=20
-> which was back in which commit?  I'm trying to get an idea of how long
-> this entry has been stale.
+-- =
 
-Since:
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1696353
 
-commit 7b02f5447c64d1854468f758398c9f6fe9e5721f
-Author: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Date:   Sun Aug 30 11:48:40 2015 +0200
+Title:
+  golang binaries fail to start under linux-user
 
-    libcacard: use the standalone project
+Status in QEMU:
+  Won't Fix
 
->=20
-> I'm not opposed to this patch, but I personally like to leave .gitignore
-> entries in place for several releases after they are last useful, to
-> make incremental builds easier when jumping around between old and new
-> branches across the point where the file was removed (as long as the new
-> branch still ignores the file, then building the file in the old branch
-> doesn't hurt the new branch).  Of course, if I'm that involved in
-> backporting madness across branches, I'm also fine updating my own
-> .git/info/exclude for cruft that is built in only one of two branches,
-> rather than relying on per-branch .gitignore to do it for me.
->=20
-> --
-> Eric Blake, Principal Software Engineer
-> Red Hat, Inc.           +1-919-301-3266
-> Virtualization:  qemu.org | libvirt.org
->=20
->=20
+Bug description:
+  With current master golang binaries fail when run under linux-user,
+  for example:
+
+  [will@localhost qemu]$ ./arm-linux-user/qemu-arm glide =
+
+  runtime: failed to create new OS thread (have 2 already; errno=3D22)
+  fatal error: newosproc
+
+  runtime stack:
+  runtime.throw(0x45f879, 0x9)
+  	/usr/lib/golang/src/runtime/panic.go:566 +0x78
+  runtime.newosproc(0x1092c000, 0x1093bfe0)
+  	/usr/lib/golang/src/runtime/os_linux.go:160 +0x1b0
+  runtime.newm(0x4ae1e8, 0x0)
+  	/usr/lib/golang/src/runtime/proc.go:1572 +0x12c
+  runtime.main.func1()
+  	/usr/lib/golang/src/runtime/proc.go:126 +0x24
+  runtime.systemstack(0x5ef900)
+  	/usr/lib/golang/src/runtime/asm_arm.s:247 +0x80
+  runtime.mstart()
+  	/usr/lib/golang/src/runtime/proc.go:1079
+
+  goroutine 1 [running]:
+  runtime.systemstack_switch()
+  	/usr/lib/golang/src/runtime/asm_arm.s:192 +0x4 fp=3D0x109287ac sp=3D0x10=
+9287a8
+  runtime.main()
+  	/usr/lib/golang/src/runtime/proc.go:127 +0x5c fp=3D0x109287d4 sp=3D0x109=
+287ac
+  runtime.goexit()
+  	/usr/lib/golang/src/runtime/asm_arm.s:998 +0x4 fp=3D0x109287d4 sp=3D0x10=
+9287d4
+
+  The reason for this is that the golang runtime does not pass the
+  CLONE_SYSVMEM flag to clone so the clone flags checks fail:
+
+  https://github.com/golang/go/blob/master/src/runtime/os_linux.go#L155
+
+  The attached patch allows golang binaries to start under linux-user.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1696353/+subscriptions
