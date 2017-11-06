@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47792)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48901)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jfreimann@redhat.com>) id 1eBeyF-0004py-ND
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 05:49:36 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eBf0I-0005hs-4i
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 05:51:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jfreimann@redhat.com>) id 1eBeyC-0002Qk-L0
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 05:49:35 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37042)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jfreimann@redhat.com>)
-	id 1eBeyC-0002Oh-Dk
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 05:49:32 -0500
-Date: Mon, 6 Nov 2017 11:49:14 +0100
-From: Jens Freimann <jfreimann@redhat.com>
-Message-ID: <20171106104914.w2tcqgog2e7jfi2e@localhost.localdomain>
-References: <20170808203900.7661-1-jfreimann@redhat.com>
-	<20170808203900.7661-3-jfreimann@redhat.com>
-	<CAFEAcA96q_ebN06WE5mgOqiPprufR3aVOgkFBhgKKyjFr=aiCA@mail.gmail.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1eBf0E-0004Lz-Et
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 05:51:42 -0500
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:44437)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eBf0E-0004LZ-6v
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 05:51:38 -0500
+Received: by mail-wr0-x242.google.com with SMTP id u97so669847wrc.1
+	for <qemu-devel@nongnu.org>; Mon, 06 Nov 2017 02:51:38 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA96q_ebN06WE5mgOqiPprufR3aVOgkFBhgKKyjFr=aiCA@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v2 2/5] net: fix -netdev socket,
- fd= for UDP sockets
+In-Reply-To: <20171106005656.GC84093@humpty.home.comstyle.com>
+References: <20171106005656.GC84093@humpty.home.comstyle.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 6 Nov 2017 10:51:16 +0000
+Message-ID: <CAFEAcA_2i0p9C3amtoB0o9Y4K83aCP7Gkw1cDqmLjrkLwJTZxg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] osdep: Deal with TIME_MAX and OpenBSD
+ 64-bit time_t
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,59 +29,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Victor Kaplansky <victork@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Maxime Coquelin <maxime.coquelin@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Marc-Andr?? Lureau <marcandre.lureau@redhat.com>
+To: Brad Smith <brad@comstyle.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Fri, Nov 03, 2017 at 06:46:57PM +0000, Peter Maydell wrote:
->On 8 August 2017 at 21:38, Jens Freimann <jfreimann@redhat.com> wrote:
->> @@ -333,8 +333,13 @@ static NetSocketState *net_socket_fd_init_dgram(NetClientState *peer,
->>       * by ONLY ONE process: we must "clone" this dgram socket --jjo
->>       */
->>
->> -    if (is_connected) {
->> -        if (getsockname(fd, (struct sockaddr *) &saddr, &saddr_len) == 0) {
->> +    if (is_connected && mcast != NULL) {
+On 6 November 2017 at 00:56, Brad Smith <brad@comstyle.com> wrote:
+> Define TIME_MAX to LLONG_MAX for OpenBSD since OpenBSD uses 64-bit time_t.
 >
->This changes the condition() under which we fill in the struct sockaddr_in saddr
->from "if (is_connected)" to "if (is_connected && mcast != NULL)"...
+> Signed-off-by: Brad Smith <brad@comstyle.com>
 >
->> +            if (parse_host_port(&saddr, mcast) < 0) {
->> +                fprintf(stderr,
->> +                        "qemu: error: init_dgram: fd=%d failed parse_host_port()\n",
->> +                        fd);
->> +                goto err;
->> +            }
->>              /* must be bound */
->>              if (saddr.sin_addr.s_addr == 0) {
->>                  fprintf(stderr, "qemu: error: init_dgram: fd=%d unbound, "
 >
->...but later in the function we do:
->
->    /* mcast: save bound address as dst */
->    if (is_connected) {
+> diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
+> index 6855b94bbf..824714049b 100644
+> --- a/include/qemu/osdep.h
+> +++ b/include/qemu/osdep.h
+> @@ -132,8 +132,12 @@ extern int daemon(int, int);
+>  #define ESHUTDOWN 4099
+>  #endif
+>  #ifndef TIME_MAX
+> +#ifdef __OpenBSD__
+> +#define TIME_MAX LLONG_MAX
+> +#else
+>  #define TIME_MAX LONG_MAX
+>  #endif
+> +#endif
 
-This should be changed to "if (is_connected && mcast != NULL)" because
-it is only necessary to do this if there is a multicast address specified. 
+I'm not really a fan of adding new OS-specific #ifdefs --
+what if one of the other BSDs uses or switches to 64-bit
+time_t for 32-bit platforms? Is there some way we can detect
+this generically at compile time (possibly in configure) ?
 
->        s->dgram_dst = saddr;
->        snprintf(nc->info_str, sizeof(nc->info_str),
->                 "socket: fd=%d (cloned mcast=%s:%d)",
->                 fd, inet_ntoa(saddr.sin_addr), ntohs(saddr.sin_port));
->    } else {
->        snprintf(nc->info_str, sizeof(nc->info_str),
->                 "socket: fd=%d", fd);
->    }
->
->and coverity correctly points out that if is_connected is true
->but mcast is NULL then we use 'saddr' without having initialized
->it properly.
->
->Any suggestions for the correct fix for this?
-
-I think we should initialize saddr to 0 and do the above change. I'll send a
-patch.
-
-Thanks!
-
-regards,
-Jens 
+thanks
+-- PMM
