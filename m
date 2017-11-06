@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49685)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49745)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1eBbLD-00064S-6u
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 01:57:04 -0500
+	(envelope-from <longpeng2@huawei.com>) id 1eBbLW-0006FG-Fz
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 01:57:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1eBbL9-0007RT-7m
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 01:57:03 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:2327)
+	(envelope-from <longpeng2@huawei.com>) id 1eBbLR-00084d-Pj
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 01:57:22 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:2276)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1eBbL8-0007Jf-L2
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 01:56:59 -0500
+	(envelope-from <longpeng2@huawei.com>) id 1eBbLR-00080O-6W
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 01:57:17 -0500
 From: "Longpeng(Mike)" <longpeng2@huawei.com>
-Date: Mon, 6 Nov 2017 14:53:11 +0800
-Message-ID: <1509951193-25256-1-git-send-email-longpeng2@huawei.com>
+Date: Mon, 6 Nov 2017 14:56:55 +0800
+Message-ID: <1509951422-20060-4-git-send-email-longpeng2@huawei.com>
+In-Reply-To: <1509951422-20060-1-git-send-email-longpeng2@huawei.com>
+References: <1509951422-20060-1-git-send-email-longpeng2@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [v21 0/2] virtio-crypto: virtio crypto device
- specification
+Subject: [Qemu-devel] [RFC 03/10] virtio-crypto: remove queue_id field in
+ ctrl header
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,88 +26,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org
-Cc: luonengjun@huawei.com, mst@redhat.com, cornelia.huck@de.ibm.com, stefanha@redhat.com, denglingli@chinamobile.com, Jani.Kokkonen@huawei.com, Ola.Liljedahl@arm.com, Varun.Sethi@freescale.com, xin.zeng@intel.com, brian.a.keating@intel.com, liang.j.ma@intel.com, john.griffin@intel.com, weidong.huang@huawei.com, agraf@suse.de, jasowang@redhat.com, vincent.jardin@6wind.com, arei.gonglei@hotmail.com, pasic@linux.vnet.ibm.com, wangxinxin.wang@huawei.com, jianjay.zhou@huawei.com, "Longpeng(Mike)" <longpeng2@huawei.com>
+To: arei.gonglei@huawei.com, pasic@linux.vnet.ibm.com
+Cc: weidong.huang@huawei.com, wangxinxin.wang@huawei.com, jianjay.zhou@huawei.com, qemu-devel@nongnu.org, "Longpeng(Mike)" <longpeng2@huawei.com>
 
-This is the specification about the new virtio crypto device.
+The queue_id is needless bacause we can get the info from
+VirtQueue->queue_index.
 
+For existing frontend driver, this field is always zero,
+so we can just mark this field as reserved and ingore its
+value.
+
+Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
 ---
-v21 -> v20
- - rename 'queue_id' to 'reserved' [Halil]
- - redescribe the format of the structures which using 'union'
-   in the previous version [Halil]
+ hw/virtio/virtio-crypto.c                      | 8 +++-----
+ include/standard-headers/linux/virtio_crypto.h | 3 +--
+ 2 files changed, 4 insertions(+), 7 deletions(-)
 
-v20 -> v19
- - fix some typos and grammar fixes [Halil]
- - make queue_id reserved [Halil]
- - remove 'Steps of Operation'
-
-v19 -> v18:
- - fix some typos and grammar fixes [Stefan, Halil]
- - rename VIRTIO_CRYPTO_F_STATELESS_MODE to VIRTIO_CRYPTO_F_MUX_MODE
- - describe the VIRTIO_CRYPTO_STATUS in detial. [Halil]
- - refactor and redescribe the controlq/dataq request's format
-   of mux mode. [Halil]
- - other small fixes. [Halil]
-
-v18 -> v17:
- - fix many English grammar problems suggested by Stefan, Thanks a lot!
-
-v17 -> v16:
- - Some grammar fixes [Stefan, Halil, Michael]
- - add a section named "Supported crypto services" in order to explain bit
-   numbers and valuse clearly. [Halil, Cornelia]
- - avoid word reptition [Halil]
- - rename non-session mode to stateless mode [Halil]
- - change descriptions for all elements in struct virtio_crypto_config [Halil]
- - add Halil as a reviewer in the ackonwledgement part, thanks for his work.
- - other fixes here and there.
-
-Changes since v15:
- - use feature bits for non-session mode in order to keep compatibility with
-   pre-existing code. [Halil & Michael]
- - introduce VIRTIO_CRYPTO_F_ NON_SESSION_MODE feature bit to control all other
-   non-session mode feature bits.
- - fix some typos. [Stefan]
- - introduce struct virtio_crypto_op_data_req_mux to support both session
-   and non-session based crypto operations and keep compatibility with
-   pre-existing code.
-
-Changes since v14:
- - drop VIRTIO_CRYPTO_S_STARTED status [Halil & Cornelia]
- - correct a sentence about dataqueue and controlq in the first paragraph. 
-[Halil]
- - change a MAY to MUST about max_dataqueues. [Halil]
- - add non-session mode support
-   a) add four features for different crypto services to identify wheather 
-support session mode.
-   b) rewrite some
-
-For pervious versions of virtio crypto spec, Pls see:
-
-[v18]:
-https://www.mail-archive.com/qemu-devel@nongnu.org/msg444897.html
-
-[v14]:
-https://lists.gnu.org/archive/html/qemu-devel/2016-11/msg02212.html
-
-[v13]:
-https://lists.gnu.org/archive/html/qemu-devel/2016-10/msg07348.html
-
-For more information, please see:
- http://qemu-project.org/Features/VirtioCrypto
-
----
-Gonglei (2):
-  virtio-crypto: Add virtio crypto device specification
-  virtio-crypto: Add conformance clauses
-
- acknowledgements.tex |    3 +
- conformance.tex      |   29 +
- content.tex          |    2 +
- virtio-crypto.tex    | 1426 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 1460 insertions(+)
- create mode 100644 virtio-crypto.tex
-
+diff --git a/hw/virtio/virtio-crypto.c b/hw/virtio/virtio-crypto.c
+index 04c34d8..9ffe26d 100644
+--- a/hw/virtio/virtio-crypto.c
++++ b/hw/virtio/virtio-crypto.c
+@@ -221,7 +221,6 @@ static void virtio_crypto_handle_ctrl(VirtIODevice *vdev, VirtQueue *vq)
+     struct iovec *out_iov;
+     unsigned in_num;
+     unsigned out_num;
+-    uint32_t queue_id;
+     uint32_t opcode;
+     struct virtio_crypto_session_input input;
+     int64_t session_id;
+@@ -258,7 +257,6 @@ static void virtio_crypto_handle_ctrl(VirtIODevice *vdev, VirtQueue *vq)
+         iov_discard_front(&out_iov, &out_num, s);
+ 
+         opcode = ldl_le_p(&hdr.opcode);
+-        queue_id = ldl_le_p(&hdr.queue_id);
+ 
+         switch (opcode) {
+         case VIRTIO_CRYPTO_CIPHER_CREATE_SESSION:
+@@ -277,8 +275,8 @@ static void virtio_crypto_handle_ctrl(VirtIODevice *vdev, VirtQueue *vq)
+ 
+             memset(&input, 0, sizeof(input));
+             session_id = virtio_crypto_create_sym_session(vcrypto,
+-                                            &req, queue_id, opcode,
+-                                            out_iov, out_num);
++                                            &req, virtio_get_queue_index(vq),
++                                            opcode, out_iov, out_num);
+             /* Serious errors, need to reset virtio crypto device */
+             if (session_id == -EFAULT) {
+                 virtqueue_detach_element(vq, elem, 0);
+@@ -321,7 +319,7 @@ static void virtio_crypto_handle_ctrl(VirtIODevice *vdev, VirtQueue *vq)
+             }
+ 
+             status = virtio_crypto_handle_close_session(vcrypto,
+-                                                &req, queue_id);
++                                         &req, virtio_get_queue_index(vq));
+             /* The status only occupy one byte, we can directly use it */
+             s = iov_from_buf(in_iov, in_num, 0, &status, sizeof(status));
+             if (unlikely(s != sizeof(status))) {
+diff --git a/include/standard-headers/linux/virtio_crypto.h b/include/standard-headers/linux/virtio_crypto.h
+index 8793be6..5e586e5 100644
+--- a/include/standard-headers/linux/virtio_crypto.h
++++ b/include/standard-headers/linux/virtio_crypto.h
+@@ -67,8 +67,7 @@ struct virtio_crypto_ctrl_header {
+ 	uint32_t opcode;
+ 	uint32_t algo;
+ 	uint32_t flag;
+-	/* data virtqueue id */
+-	uint32_t queue_id;
++	uint32_t reserved;
+ };
+ 
+ struct virtio_crypto_cipher_session_para {
 -- 
 1.8.3.1
