@@ -1,32 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33756)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33889)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eBiMY-0008Cx-9m
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 09:26:55 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eBiMp-0008Qg-Ft
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 09:27:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eBiMU-0001MA-BS
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 09:26:54 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50856)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eBiMU-0001KN-3J
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 09:26:50 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0768CC04B928
-	for <qemu-devel@nongnu.org>; Mon,  6 Nov 2017 14:26:49 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20171010181542.24168-1-quintela@redhat.com>
-	<20171010181542.24168-11-quintela@redhat.com>
-	<20171011092815.GE20372@redhat.com> <87376q10oh.fsf@secure.laptop>
-Date: Mon, 06 Nov 2017 15:26:45 +0100
-In-Reply-To: <87376q10oh.fsf@secure.laptop> (Juan Quintela's message of "Wed,
-	11 Oct 2017 11:41:34 +0200")
-Message-ID: <87o9ofeb4q.fsf@dusky.pond.sub.org>
+	(envelope-from <pbonzini@redhat.com>) id 1eBiMm-0001W2-Bv
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 09:27:11 -0500
+Received: from mail-wm0-f66.google.com ([74.125.82.66]:45982)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eBiMm-0001Vi-4h
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 09:27:08 -0500
+Received: by mail-wm0-f66.google.com with SMTP id y80so14119858wmd.0
+	for <qemu-devel@nongnu.org>; Mon, 06 Nov 2017 06:27:08 -0800 (PST)
+References: <20170929111323.6308-1-michael@fritscher.net>
+	<20170929111323.6308-5-michael@fritscher.net>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <84fb3ddb-f2e1-abb1-2d2a-40d25abcf2b0@redhat.com>
+Date: Mon, 6 Nov 2017 15:27:04 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 10/10] migration: [RFC] Use proper types in
- json
+In-Reply-To: <20170929111323.6308-5-michael@fritscher.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 04/18] Don't include sys/resource.h on
+ Windows.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,100 +31,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, lvivier@redhat.com, peterx@redhat.com, dgilbert@redhat.com, qemu-devel@nongnu.org
+To: Michael Fritscher <michael@fritscher.net>, gkurz@linux.vnet.ibm.com, sw@weilnetz.de, aneesh.kumar@linux.vnet.ibm.com, mst@redhat.com, qemu-devel@nongnu.org
 
-Juan Quintela <quintela@redhat.com> writes:
+On 29/09/2017 13:13, Michael Fritscher wrote:
+> Signed-off-by: Michael Fritscher <michael@fritscher.net>
+> ---
+>  hw/9pfs/9p.h | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/9pfs/9p.h b/hw/9pfs/9p.h
+> index d1cfeaf10e..c2dd782620 100644
+> --- a/hw/9pfs/9p.h
+> +++ b/hw/9pfs/9p.h
+> @@ -3,7 +3,9 @@
+>  
+>  #include <dirent.h>
+>  #include <utime.h>
+> -#include <sys/resource.h>
+> +#ifndef _WIN32
+> +# include <sys/resource.h>
+> +#endif
+>  #include "fsdev/file-op-9p.h"
+>  #include "fsdev/9p-iov-marshal.h"
+>  #include "qemu/thread.h"
+> 
 
-> "Daniel P. Berrange" <berrange@redhat.com> wrote:
->> On Tue, Oct 10, 2017 at 08:15:42PM +0200, Juan Quintela wrote:
->>> We use int for everything (int64_t), and then we check that value is
->>> between 0 and 255.  Change it to the valid types.
->>> 
->>> For qmp, the only real change is that now max_bandwidth allows to use
->>> the k/M/G suffixes.
+This is probably related to patch 14, and should be included in there.
 
-Are you sure?
-
-QAPI type 'size' is integer in JSON.  No suffixes.  The QObject input
-visitor does suffixes only when visiting v->keyval is true.
-
->> So on input apps previous would use:
->>
->>     "max-bandwidth":  1024
->>
->> ie json numeric field, and would expect to see the same when reading
->> data back from QEMU.
->>
->> With this change they could use a string field
->>
->>     "max-bandwidth":  "1k"
->
-> Actually it is worse than that
->
->
-> if you set:
->
->      "max-bandwidth":  1024
->
-> it understand 1024M, and it outputs that big number
->
->       "max-bandwidth":  $((1024*1024*1024))
->
-> (no, I don't know the value from memory)
->
-> And yes, for migrate_set_parameter, we introduced it on 2.10.  We should
-> have done the right thing, but  I didn't catch the error (Markus did,
-> but too late, release were already done)
-
-I suspect you're talking about *HMP*.  hmp_migrate_set_parameter(), to
-be precise:
-
-    case MIGRATION_PARAMETER_MAX_BANDWIDTH:
-        p->has_max_bandwidth = true;
-        /*
-         * Can't use visit_type_size() here, because it
-         * defaults to Bytes rather than Mebibytes.
-         */
-        ret = qemu_strtosz_MiB(valuestr, NULL, &valuebw);
-        if (ret < 0 || valuebw > INT64_MAX
-            || (size_t)valuebw != valuebw) {
-            error_setg(&err, "Invalid size %s", valuestr);
-            break;
-        }
-        p->max_bandwidth = valuebw;
-        break;
-
->> As long as QEMU's JSON parser accepts both number & string values
->> for the 'size' type it is still backwards compatible if an app
->> continues to use 1024 instead of "1k"
->>
->> On *output* though (ie 'info migrate-parameters') this is not
->> compatible for applications, unless QEMU *always* uses the
->> numeric format when generating values. ie it must always
->> report 1024, and never "1k", as apps won't be expecting a string
->> with suffix.  I can't 100% tell whether this is the case or not,
->> so CC'ing Markus to confirm if changing "int" to "size" is
->> guaranteed back-compat in both directions
->
-> This is why I asked.  My *understanding* was that my changes are NOP
-> if you use the old interface, but I don't claim to be an expert on QAPI.
->
-> (qemu) migrate_set_parameter 100
-> (qemu) info migrate_parameters 
-> ...
-> max-bandwidth: 104857600 bytes/second
-> ...
-> (qemu) migrate_set_parameter max-bandwidth 1M
-> (qemu) info migrate_parameters 
-> ...
-> max-bandwidth: 1048576 bytes/second
-> ...
-> (qemu) 
->
-> This is the output with my changes applied, so I think that it works
-> correctly on your example.
-
-This is HMP.  Not a stable interface.  QMP is a stable interface, but it
-should not be affected by this patch.  Is your commit message
-misleading?
+Paolo
