@@ -1,34 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42059)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42758)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eBikK-0001b4-Ph
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 09:51:30 -0500
+	(envelope-from <berto@igalia.com>) id 1eBin6-0002Yz-03
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 09:54:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eBikF-0005Qg-Sz
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 09:51:28 -0500
-Received: from indium.canonical.com ([91.189.90.7]:50956)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eBikF-0005ON-Lx
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 09:51:23 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eBikD-0001av-BV
-	for <qemu-devel@nongnu.org>; Mon, 06 Nov 2017 14:51:21 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 02BF52E81C7
-	for <qemu-devel@nongnu.org>; Mon,  6 Nov 2017 14:51:16 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 06 Nov 2017 14:41:36 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1641861 <1641861@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20161115075112.3631.29997.malonedeb@soybean.canonical.com>
-Message-Id: <150997929659.4205.987813852033178873.launchpad@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1641861] Re: ARM QEMU doesn't enforce that RES0
- bits in FPSCR are non-writeable
+	(envelope-from <berto@igalia.com>) id 1eBin1-0000vk-3S
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 09:54:20 -0500
+From: Alberto Garcia <berto@igalia.com>
+Date: Mon,  6 Nov 2017 16:53:45 +0200
+Message-Id: <20171106145345.12038-1-berto@igalia.com>
+Subject: [Qemu-devel] [PATCH] block: Close a BlockDriverState completely
+ even when bs->drv is NULL
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,75 +19,161 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-** Summary changed:
+bdrv_close() skips much of its logic when bs->drv is NULL. This is
+fine when we're closing a BlockDriverState that has just been created
+(because e.g the initialization process failed), but it's not enough
+in other cases.
 
-- fail to correctly emulate FPSCR register on arm
-+ ARM QEMU doesn't enforce that RES0 bits in FPSCR are non-writeable
+For example, when a valid qcow2 image is found to be corrupted then
+QEMU marks it as such in the file header and then sets bs->drv to
+NULL in order to make the BlockDriverState unusable. When that BDS is
+later closed then many of its data structures are not freed (leaking
+their memory) and none of its children are detached. This results in
+bdrv_close_all() failing to close all BDSs and making this assertion
+fail when QEMU is being shut down:
 
-** Changed in: qemu
-       Status: New =3D> Confirmed
+   bdrv_close_all: Assertion `QTAILQ_EMPTY(&all_bdrv_states)' failed.
 
-** Tags added: arm
+This patch makes bdrv_close() do the full uninitialization process
+in all cases. This fixes the problem with corrupted images and still
+works fine with freshly created BDSs.
 
--- =
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+---
+ block.c                    | 57 +++++++++++++++++++++++-----------------------
+ tests/qemu-iotests/060     | 13 +++++++++++
+ tests/qemu-iotests/060.out | 12 ++++++++++
+ 3 files changed, 53 insertions(+), 29 deletions(-)
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1641861
-
-Title:
-  ARM QEMU doesn't enforce that RES0 bits in FPSCR are non-writeable
-
-Status in QEMU:
-  Confirmed
-
-Bug description:
-  Hi all, we systematically tested the QEMU implementation for emulating
-  arm user mode programs. We found that QEMU incorrectly emulate the
-  FPSCR register. The following the proof of code:
-
-  /*********** Beginning of the bug: arm.c **********/
-
-  int printf(const char *format, ...);
-  unsigned char i0[0x10];
-  unsigned char o[0x10];
-  int main() {
-  =C2=A0=C2=A0=C2=A0=C2=A0int k =3D 0;
-  =C2=A0=C2=A0=C2=A0=C2=A0asm("mov r2, %0\n"
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0"ldr r0, [r2]\n"::"r"((ch=
-ar *)(i0)));;
-  =C2=A0=C2=A0=C2=A0=C2=A0asm("vmsr fpscr, r0");
-  =C2=A0=C2=A0=C2=A0=C2=A0asm("mov r2, %0\n"
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0"vmrs r4, fpscr\n"
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0"str r4, [r2]\n"::"r"((ch=
-ar *)(o)));;
-  =C2=A0=C2=A0=C2=A0=C2=A0for (k =3D 0; k < 0x10; k++)
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0printf("%02x", o[0x10 - 1=
- - k]);
-  =C2=A0=C2=A0=C2=A0=C2=A0printf("\n");
-  }
-  unsigned char i0[0x10] =3D {0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x0=
-0, 0x28, 0x1c, 0xc7, 0x01, 0x00, 0x00, 0x00, 0x00};
-
-  /*********** End fo the bug **********/
-
-  When the program is compiled into arm binary code and running on a
-  real arm machine, and running in qemu, we have the following result
-
-  $ arm-linux-gnueabihf-gcc arm.c -o arm -static
-  $ ./arm
-  000000000000000000000000fff7009f
-  $ qemu-arm arm
-  000000000000000000000000ffffffff
-
-  According to the ARM manual, bits[19, 14:13, 6:5] of FPSCR should be
-  reserved as zero. However, arm qemu fails to keep these bits to be
-  zero: these bits can be actually modified in QEMU.
-
-  QEMU version is 2.7.0. The operating system is Linux 3.13.0. x86_64.
-
-  Thanks!
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1641861/+subscriptions
+diff --git a/block.c b/block.c
+index 684cb018da..389a6edad2 100644
+--- a/block.c
++++ b/block.c
+@@ -3179,6 +3179,7 @@ void bdrv_reopen_abort(BDRVReopenState *reopen_state)
+ static void bdrv_close(BlockDriverState *bs)
+ {
+     BdrvAioNotifier *ban, *ban_next;
++    BdrvChild *child, *next;
+ 
+     assert(!bs->job);
+     assert(!bs->refcnt);
+@@ -3188,43 +3189,41 @@ static void bdrv_close(BlockDriverState *bs)
+     bdrv_drain(bs); /* in case flush left pending I/O */
+ 
+     if (bs->drv) {
+-        BdrvChild *child, *next;
+-
+         bs->drv->bdrv_close(bs);
+         bs->drv = NULL;
++    }
+ 
+-        bdrv_set_backing_hd(bs, NULL, &error_abort);
++    bdrv_set_backing_hd(bs, NULL, &error_abort);
+ 
+-        if (bs->file != NULL) {
+-            bdrv_unref_child(bs, bs->file);
+-            bs->file = NULL;
+-        }
++    if (bs->file != NULL) {
++        bdrv_unref_child(bs, bs->file);
++        bs->file = NULL;
++    }
+ 
+-        QLIST_FOREACH_SAFE(child, &bs->children, next, next) {
+-            /* TODO Remove bdrv_unref() from drivers' close function and use
+-             * bdrv_unref_child() here */
+-            if (child->bs->inherits_from == bs) {
+-                child->bs->inherits_from = NULL;
+-            }
+-            bdrv_detach_child(child);
++    QLIST_FOREACH_SAFE(child, &bs->children, next, next) {
++        /* TODO Remove bdrv_unref() from drivers' close function and use
++         * bdrv_unref_child() here */
++        if (child->bs->inherits_from == bs) {
++            child->bs->inherits_from = NULL;
+         }
+-
+-        g_free(bs->opaque);
+-        bs->opaque = NULL;
+-        atomic_set(&bs->copy_on_read, 0);
+-        bs->backing_file[0] = '\0';
+-        bs->backing_format[0] = '\0';
+-        bs->total_sectors = 0;
+-        bs->encrypted = false;
+-        bs->sg = false;
+-        QDECREF(bs->options);
+-        QDECREF(bs->explicit_options);
+-        bs->options = NULL;
+-        bs->explicit_options = NULL;
+-        QDECREF(bs->full_open_options);
+-        bs->full_open_options = NULL;
++        bdrv_detach_child(child);
+     }
+ 
++    g_free(bs->opaque);
++    bs->opaque = NULL;
++    atomic_set(&bs->copy_on_read, 0);
++    bs->backing_file[0] = '\0';
++    bs->backing_format[0] = '\0';
++    bs->total_sectors = 0;
++    bs->encrypted = false;
++    bs->sg = false;
++    QDECREF(bs->options);
++    QDECREF(bs->explicit_options);
++    bs->options = NULL;
++    bs->explicit_options = NULL;
++    QDECREF(bs->full_open_options);
++    bs->full_open_options = NULL;
++
+     bdrv_release_named_dirty_bitmaps(bs);
+     assert(QLIST_EMPTY(&bs->dirty_bitmaps));
+ 
+diff --git a/tests/qemu-iotests/060 b/tests/qemu-iotests/060
+index 66a8fa4aea..1cebe4c775 100755
+--- a/tests/qemu-iotests/060
++++ b/tests/qemu-iotests/060
+@@ -291,6 +291,19 @@ _make_test_img 64M
+ poke_file "$TEST_IMG" "48"                "\x00\x00\x00\x00\x00\x00\x00\x00"
+ $QEMU_IO -c "write 0 64k" "$TEST_IMG" | _filter_qemu_io
+ 
++echo
++echo "=== Testing the QEMU shutdown with a corrupted image ==="
++echo
++_make_test_img 64M
++poke_file "$TEST_IMG" "$rt_offset"        "\x00\x00\x00\x00\x00\x00\x00\x00"
++echo "{'execute': 'qmp_capabilities'}
++      {'execute': 'human-monitor-command',
++       'arguments': {'command-line': 'qemu-io drive \"write 0 512\"'}}
++      {'execute': 'quit'}" \
++    | $QEMU -qmp stdio -nographic -nodefaults \
++            -drive if=none,node-name=drive,file="$TEST_IMG",driver=qcow2 \
++    | _filter_qmp | _filter_qemu_io
++
+ # success, all done
+ echo "*** done"
+ rm -f $seq.full
+diff --git a/tests/qemu-iotests/060.out b/tests/qemu-iotests/060.out
+index cfd78f87a9..a5093fab8e 100644
+--- a/tests/qemu-iotests/060.out
++++ b/tests/qemu-iotests/060.out
+@@ -220,4 +220,16 @@ can't open device TEST_DIR/t.IMGFMT: Image does not contain a reference count ta
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
+ qcow2: Marking image as corrupt: Preventing invalid allocation of L2 table at offset 0; further corruption events will be suppressed
+ write failed: Input/output error
++
++=== Testing the QEMU shutdown with a corrupted image ===
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
++qcow2: Marking image as corrupt: Preventing invalid write on metadata (overlaps with refcount table); further corruption events will be suppressed
++QMP_VERSION
++{"return": {}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_IMAGE_CORRUPTED", "data": {"device": "none0", "msg": "Preventing invalid write on metadata (overlaps with refcount table)", "offset": 65536, "node-name": "drive", "fatal": true, "size": 65536}}
++write failed: Input/output error
++{"return": ""}
++{"return": {}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
+ *** done
+-- 
+2.11.0
