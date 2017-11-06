@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34147)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37319)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1eBbs5-00008W-F0
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 02:31:02 -0500
+	(envelope-from <longpeng2@huawei.com>) id 1eBc20-0001oO-6t
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 02:41:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1eBbs4-0002Qr-KX
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 02:31:01 -0500
-References: <1509712671-16299-1-git-send-email-shankerd@codeaurora.org>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <a381c1f7-b695-8126-982f-610f60a1b992@redhat.com>
-Date: Mon, 6 Nov 2017 08:30:51 +0100
+	(envelope-from <longpeng2@huawei.com>) id 1eBc1v-0002aM-Hd
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 02:41:16 -0500
+Received: from [45.249.212.32] (port=41078 helo=huawei.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <longpeng2@huawei.com>) id 1eBc1v-0002Z6-62
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 02:41:11 -0500
+From: "Longpeng(Mike)" <longpeng2@huawei.com>
+Date: Mon, 6 Nov 2017 14:53:13 +0800
+Message-ID: <1509951193-25256-3-git-send-email-longpeng2@huawei.com>
+In-Reply-To: <1509951193-25256-1-git-send-email-longpeng2@huawei.com>
+References: <1509951193-25256-1-git-send-email-longpeng2@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <1509712671-16299-1-git-send-email-shankerd@codeaurora.org>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] hw/intc/arm_gicv3_its: Fix the VM
- termination in vm_change_state_handler()
+Content-Type: text/plain
+Subject: [Qemu-devel] [v21 2/2] virtio-crypto: Add conformance clauses
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,54 +25,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Shanker Donthineni <shankerd@codeaurora.org>, Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org
+Cc: luonengjun@huawei.com, mst@redhat.com, cornelia.huck@de.ibm.com, stefanha@redhat.com, denglingli@chinamobile.com, Jani.Kokkonen@huawei.com, Ola.Liljedahl@arm.com, Varun.Sethi@freescale.com, xin.zeng@intel.com, brian.a.keating@intel.com, liang.j.ma@intel.com, john.griffin@intel.com, weidong.huang@huawei.com, agraf@suse.de, jasowang@redhat.com, vincent.jardin@6wind.com, arei.gonglei@hotmail.com, pasic@linux.vnet.ibm.com, wangxinxin.wang@huawei.com, jianjay.zhou@huawei.com, Gonglei <arei.gonglei@huawei.com>, "Longpeng(Mike)" <longpeng2@huawei.com>
 
-Hi Shanker,
+From: Gonglei <arei.gonglei@huawei.com>
 
-On 03/11/2017 13:37, Shanker Donthineni wrote:
-> The commit cddafd8f353d ("hw/intc/arm_gicv3_its: Implement state save
-> /restore") breaks the backward compatibility with the older kernels
-> where vITS save/restore support is not available. The vmstate function
-> vm_change_state_handler() should not be registered if the running kernel
-> doesn't support ITS save/restore feature. Otherwise VM instance will be
-> killed whenever vmstate callback function is invoked.
-> 
-> Observed a virtual machine shutdown with QEMU-2.10+linux-4.11 when testing
-> the reboot command "virsh reboot <domain> --mode acpi" instead of reboot.
-> 
-> KVM Error: 'KVM_SET_DEVICE_ATTR failed: Group 4 attr 0x00000000000001'
-> 
-> Signed-off-by: Shanker Donthineni <shankerd@codeaurora.org>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Add the conformance targets and clauses for
+virtio-crypto device.
 
-Thanks for the fix.
+Signed-off-by: Gonglei <arei.gonglei@huawei.com>
+Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
+---
+ conformance.tex | 29 +++++++++++++++++++++++++++++
+ 1 file changed, 29 insertions(+)
 
-Best Regards
-
-Eric
-> ---
->  hw/intc/arm_gicv3_its_kvm.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/intc/arm_gicv3_its_kvm.c b/hw/intc/arm_gicv3_its_kvm.c
-> index 39903d5..9b00ce5 100644
-> --- a/hw/intc/arm_gicv3_its_kvm.c
-> +++ b/hw/intc/arm_gicv3_its_kvm.c
-> @@ -111,13 +111,13 @@ static void kvm_arm_its_realize(DeviceState *dev, Error **errp)
->              error_free(s->migration_blocker);
->              return;
->          }
-> +    } else {
-> +        qemu_add_vm_change_state_handler(vm_change_state_handler, s);
->      }
->  
->      kvm_msi_use_devid = true;
->      kvm_gsi_direct_mapping = false;
->      kvm_msi_via_irqfd_allowed = kvm_irqfds_enabled();
-> -
-> -    qemu_add_vm_change_state_handler(vm_change_state_handler, s);
->  }
->  
->  /**
-> 
+diff --git a/conformance.tex b/conformance.tex
+index 7b7df32..266a22f 100644
+--- a/conformance.tex
++++ b/conformance.tex
+@@ -145,6 +145,21 @@ An SCSI host driver MUST conform to the following normative statements:
+ \item \ref{drivernormative:Device Types / SCSI Host Device / Device Operation / Device Operation: eventq}
+ \end{itemize}
+ 
++\subsection{Crypto Driver Conformance}\label{sec:Conformance / Driver Conformance / Crypto Driver Conformance}
++
++A Crypto driver MUST conform to the following normative statements:
++
++\begin{itemize}
++\item \ref{drivernormative:Device Types / Crypto Device / Device configuration layout}
++\item \ref{drivernormative:Device Types / Crypto Device / Device Initialization}
++\item \ref{drivernormative:Device Types / Crypto Device / Device Operation / Control Virtqueue / Session operation / Session operation: create session}
++\item \ref{drivernormative:Device Types / Crypto Device / Device Operation / Control Virtqueue / Session operation / Session operation: destroy session}
++\item \ref{drivernormative:Device Types / Crypto Device / Device Operation / HASH Service operation}
++\item \ref{drivernormative:Device Types / Crypto Device / Device Operation / MAC Service operation}
++\item \ref{drivernormative:Device Types / Crypto Device / Device Operation / Symmetric algorithms Operation}
++\item \ref{drivernormative:Device Types / Crypto Device / Device Operation / AEAD Service operation}
++\end{itemize}
++
+ \section{Device Conformance}\label{sec:Conformance / Device Conformance}
+ 
+ A device MUST conform to the following normative statements:
+@@ -265,6 +280,20 @@ An SCSI host device MUST conform to the following normative statements:
+ \item \ref{devicenormative:Device Types / SCSI Host Device / Device Operation / Device Operation: eventq}
+ \end{itemize}
+ 
++\subsection{Crypto Device Conformance}\label{sec:Conformance / Device Conformance / Crypto Device Conformance}
++
++A Crypto device MUST conform to the following normative statements:
++
++\begin{itemize}
++\item \ref{devicenormative:Device Types / Crypto Device / Device configuration layout}
++\item \ref{devicenormative:Device Types / Crypto Device / Device Operation / Control Virtqueue / Session operation / Session operation: create session}
++\item \ref{devicenormative:Device Types / Crypto Device / Device Operation / Control Virtqueue / Session operation / Session operation: destroy session}
++\item \ref{devicenormative:Device Types / Crypto Device / Device Operation / HASH Service operation}
++\item \ref{devicenormative:Device Types / Crypto Device / Device Operation / MAC Service operation}
++\item \ref{devicenormative:Device Types / Crypto Device / Device Operation / Symmetric algorithms Operation}
++\item \ref{devicenormative:Device Types / Crypto Device / Device Operation / AEAD Service operation}
++\end{itemize}
++
+ \section{Legacy Interface: Transitional Device and
+ Transitional Driver Conformance}\label{sec:Conformance / Legacy
+ Interface: Transitional Device and 
+-- 
+1.8.3.1
