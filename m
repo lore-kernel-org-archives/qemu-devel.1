@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33529)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47494)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <patrick.ohly@intel.com>) id 1eBoX6-000793-9a
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 16:02:13 -0500
+	(envelope-from <hpoussin@reactos.org>) id 1eBp9W-0004jn-3D
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 16:41:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <patrick.ohly@intel.com>) id 1eBoX3-0004fn-3n
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 16:02:12 -0500
-Received: from mail-wm0-x22e.google.com ([2a00:1450:400c:c09::22e]:48183)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <patrick.ohly@intel.com>)
-	id 1eBoX2-0004e3-Py
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 16:02:09 -0500
-Received: by mail-wm0-x22e.google.com with SMTP id p75so16427600wmg.3
-	for <qemu-devel@nongnu.org>; Mon, 06 Nov 2017 13:02:08 -0800 (PST)
-Message-ID: <1510002125.22094.10.camel@intel.com>
-From: Patrick Ohly <patrick.ohly@intel.com>
-Date: Mon, 06 Nov 2017 22:02:05 +0100
-In-Reply-To: <20171106172646.GO23361@redhat.com>
-References: <1509988303.22094.8.camel@intel.com>
-	<20171106172646.GO23361@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+	(envelope-from <hpoussin@reactos.org>) id 1eBp9V-0003yp-AW
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 16:41:54 -0500
+References: <20171017164426.25277-1-f4bug@amsat.org>
+	<20171017164426.25277-3-f4bug@amsat.org>
+From: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
+Message-ID: <62624405-626a-bcbb-d164-e34ef06c8a81@reactos.org>
+Date: Mon, 6 Nov 2017 22:41:03 +0100
+MIME-Version: 1.0
+In-Reply-To: <20171017164426.25277-3-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] RFC: connecting chardev to a command forked by qemu
+Subject: Re: [Qemu-devel] [PATCH v3 02/42] MAINTAINERS: add an entry for the
+ i82374 (southbridge)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,83 +25,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Amarnath Valluri <amarnath.valluri@intel.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Thomas Huth <thuth@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>, Eduardo Otubo <otubo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, qemu-trivial@nongnu.org
 
-On Mon, 2017-11-06 at 17:26 +0000, Daniel P. Berrange wrote:
-> I can see the argument about it making QEMU easier to use, and those
-> who care about security aren't forced to use this new feature. It
-> none the less has a cost on maintainers and existance of these
-> features does reflect on QEMU's security reputation even if many
-> don't use it.
-
-With Yocto we really don't have much choice: we need a patch like this
-because the alternative (introducing support for spawning and stopping
-swtpm and then passing the right parameters to QEMU) is way more
-complex. So if this patch isn't acceptable to QEMU upstream, then I
-will keep it as simple as possible and propose it as a local patch in
-Yocto.
-
-But that then won't help others who might be using QEMU in a similar
-situation.
-
-> > +static void chardev_open_socket_cmd(Chardev *chr,
-> > +                                    const char *cmd,
-> > +                                    Error **errp)
-> > +{
-> > +    int fds[2] = { -1, -1 };
-> > +    QIOChannelSocket *sioc = NULL;
-> > +    pid_t pid = -1;
-> > +    const char *argv[] = { "/bin/sh", "-c", cmd, NULL };
-> > +
-> > +    if (socketpair(AF_UNIX, SOCK_STREAM|SOCK_CLOEXEC, 0, fds)) {
-> > +        error_setg_errno(errp, errno, "Error creating
-> > socketpair(AF_UNIX, SOCK_STREAM|SOCK_CLOEXEC)");
-> > +        goto error;
-> > +    }
-> > +
-> > +    pid = qemu_fork(errp);
-> > +    if (pid < 0) {
-> > +        goto error;
-> > +    }
-> > +
-> > +    if (!pid) {
-> > +        /* child */
-> > +        dup2(fds[1], STDIN_FILENO);
-> > +        execv(argv[0], (char * const *)argv);
-> > +        _exit(1);
-> > +    }
-> > +
-> > +    /*
-> > +     * Hand over our end of the socket pair to the qio channel.
-> > +     * TODO: We don't reap the child at the moment.
-> > +     */
-> > +    sioc = qio_channel_socket_new_fd(fds[0], errp);
+Le 17/10/2017 à 18:43, Philippe Mathieu-Daudé a écrit :
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> ---
+>   MAINTAINERS | 1 +
+>   1 file changed, 1 insertion(+)
 > 
-> NB, you've mostly re-invented qio_channel_command_new_spawn() here,
-> though you're using a socketpair instead of pipe, which has the
-> slight benefit of meaning we can do FD passing across the external
-> command.
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 6f56c1349b..331f7391c1 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -713,6 +713,7 @@ F: hw/ppc/prep_systemio.c
+>   F: hw/ppc/rs6000_mc.c
+>   F: hw/pci-host/prep.[hc]
+>   F: hw/isa/pc87312.[hc]
+> +F: hw/dma/i82374.c
+>   F: pc-bios/ppc_rom.bin
+>   
+>   sPAPR
+> 
 
-Yes, that's exactly the reason. swtpm depends on a bidirectional stream
-with support for FD passing. I should have added that an option for a
-new "-charset cmd" might be to choose two uni-direction pipes connected
-to stdin/stdout of the command. That would be useful for some other
-commands.
-
-> If the latter is why you chose socketpair, then it would
-> be nice to improve QIOChannelCommand 
-
-Yes, that would be better. But before touching too many different files
-and thus increasing the risk of merge conflicts (which is an issue when
-maintaining the patch downstream) I'd like to get a feeling for whether
-it's worth enhancing the patch to make it suitable for upstream or
-whether there are strong reasons to never include anything like it.
-
--- 
-Best Regards, Patrick Ohly
-
-The content of this message is my personal opinion only and although
-I am an employee of Intel, the statements I make here in no way
-represent Intel's position on the issue, nor am I authorized to speak
-on behalf of Intel on this matter.
+Reviewed-by: Hervé Poussineau <hpoussin@reactos.org>
