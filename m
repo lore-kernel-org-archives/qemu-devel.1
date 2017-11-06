@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34799)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36140)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eBnAr-0003gl-8z
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 14:35:13 -0500
+	(envelope-from <bounces@canonical.com>) id 1eBnFY-0005Vr-D4
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 14:40:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eBnAn-0006yF-87
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 14:35:09 -0500
-Received: from indium.canonical.com ([91.189.90.7]:47124)
+	(envelope-from <bounces@canonical.com>) id 1eBnFS-0000cN-Jh
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 14:40:00 -0500
+Received: from indium.canonical.com ([91.189.90.7]:48328)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eBnAn-0006xh-1t
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 14:35:05 -0500
+	id 1eBnFS-0000bv-Dg
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 14:39:54 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eBnAm-000868-7p
-	for <qemu-devel@nongnu.org>; Mon, 06 Nov 2017 19:35:04 +0000
+	id 1eBnFR-0001JD-DD
+	for <qemu-devel@nongnu.org>; Mon, 06 Nov 2017 19:39:53 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 2EB902E80C3
-	for <qemu-devel@nongnu.org>; Mon,  6 Nov 2017 19:35:04 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 5FDA52E8058
+	for <qemu-devel@nongnu.org>; Mon,  6 Nov 2017 19:39:53 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 06 Nov 2017 19:17:46 -0000
+Date: Mon, 06 Nov 2017 19:29:27 -0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1605443 <1605443@bugs.launchpad.net>
+Reply-To: Bug 1581695 <1581695@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20160722020729.820.92357.malonedeb@gac.canonical.com>
-Message-Id: <150999586645.20015.5570109793222116224.malone@soybean.canonical.com>
+References: <20160513232712.9526.48086.malonedeb@soybean.canonical.com>
+Message-Id: <150999656716.19979.4241868822535384353.malone@soybean.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1605443] Re: QEMU epoll for i386-linux-user on
- arm host is broken in 2.6
+Subject: [Qemu-devel] [Bug 1581695] Re: getifaddrs: Address family not
+ supported by protocol
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,36 +39,50 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-This was fixed by commit d9fe91d8689b078ac, which went into the 2.7
-release.
+We got netlink sockets working for linux-user over the course of 2016,
+and "ip addr" now works for me with a 32-bit arm chroot. This should be
+fixed in QEMU 2.10.
 
 
 ** Changed in: qemu
-       Status: Confirmed =3D> Fix Released
+       Status: New =3D> Fix Released
+
+** Tags added: linux-user
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1605443
+https://bugs.launchpad.net/bugs/1581695
 
 Title:
-  QEMU epoll for i386-linux-user on arm host is broken in 2.6
+  getifaddrs: Address family not supported by protocol
 
 Status in QEMU:
   Fix Released
 
 Bug description:
-  I'm trying to get wine running on qemu-i386 on arm.
+  Calling ip addr fails with the following error message:
+  Cannot open netlink socket: Address family not supported by protocol
 
-  I found that 2.5.1 is OK, but 2.6 is not.
+  =
 
-  By bisecting, I found commit 928bed6a057cedd6110e634865e021a24029785a
-  is the problem.
+  My use case is running a docker raspberry pi arm container on Ubuntu 14.0=
+4 x64 with qemu-static.
 
-  I reverted this commit, and then epoll is OK now.
+  My steps to reproduce are the following:
 
-  It seems that the commit broke epoll of qemu-i386 on arm.
+  # docker pull philipz/rpi-raspbian:latest
+  # docker run -it --rm -v /usr/bin/qemu-arm-static:/usr/bin/qemu-arm-stati=
+c philipz/rpi-raspbian bash
+  root@3b4ddc174279:/# ip addr
+  Cannot open netlink socket: Address family not supported by protocol
+
+  A fix or an workaround would be awesome.
+
+  note: we are also working with a embedded arm distro which has no
+  package manager available, would be nice if the workaround would not
+  depend on apt-get
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1605443/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1581695/+subscriptions
