@@ -1,40 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42383)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43948)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1eBmPI-0003eA-OR
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 13:46:02 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eBmSf-0006fc-9Q
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 13:49:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1eBmPD-0000bk-Px
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 13:46:00 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:44454
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1eBmPD-0000b9-JL
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 13:45:55 -0500
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vA6Ijdg0070950
-	for <qemu-devel@nongnu.org>; Mon, 6 Nov 2017 13:45:49 -0500
-Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2e2v44bpr0-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 06 Nov 2017 13:45:48 -0500
-Received: from localhost
-	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Mon, 6 Nov 2017 11:45:48 -0700
-References: <1507222047-20115-1-git-send-email-stefanb@linux.vnet.ibm.com>
-	<CAJ+F1CLo46LvnfH_EBT9CRzuyKojKz3G-NMfJ7poyXZy5QxPJg@mail.gmail.com>
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Mon, 6 Nov 2017 13:45:44 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eBmSe-0002rJ-8z
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 13:49:29 -0500
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <8a184b91-49ef-bb52-d190-053c4c0861a1@redhat.com>
+Date: Mon, 6 Nov 2017 19:49:17 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAJ+F1CLo46LvnfH_EBT9CRzuyKojKz3G-NMfJ7poyXZy5QxPJg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Message-Id: <7825177e-8347-1340-4fb7-bd1805c8a044@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] specs: Extend TPM spec with TPM emulator
- description
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="hx3o9kB8a2wVplRAPXbkTBnUoqoDNGGDN"
+Subject: [Qemu-devel] Drainage in bdrv_replace_child_noperm()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,155 +21,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>
-Cc: QEMU <qemu-devel@nongnu.org>, Amarnath Valluri <amarnath.valluri@intel.com>
+To: Qemu-block <qemu-block@nongnu.org>, Qemu-devel <qemu-devel@nongnu.org>
 
-On 10/06/2017 12:03 PM, Marc-Andr=C3=A9 Lureau wrote:
-> Hi
->
-> On Thu, Oct 5, 2017 at 6:47 PM, Stefan Berger
-> <stefanb@linux.vnet.ibm.com> wrote:
->> Following the recent extension of QEMU with a TPM emulator device,
->> update the specs describing for how to interact with the device.
->>
->> The results of commands run inside a Linux VM are expected to be
->> similar to those when the TPM passthrough device is used, so we
->> just reuse that.
->>
->> Fix a typo on the way.
->>
->> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
-> Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->
->
->> ---
->>   docs/specs/tpm.txt | 79 ++++++++++++++++++++++++++++++++++++++++++++=
-++++++++++
->>   1 file changed, 79 insertions(+)
->>
->> diff --git a/docs/specs/tpm.txt b/docs/specs/tpm.txt
->> index 914daac..9bef8b3 100644
->> --- a/docs/specs/tpm.txt
->> +++ b/docs/specs/tpm.txt
->> @@ -121,3 +121,82 @@ crw-------. 1 root root 10, 224 Jul 11 10:11 /dev=
-/tpm0
->>   PCR-00: 35 4E 3B CE 23 9F 38 59 ...
->>   ...
->>   PCR-23: 00 00 00 00 00 00 00 00 ...
->> +
->> +
->> +=3D=3D The QEMU TPM emulator device =3D=3D
->> +
->> +The TPM emulator device uses an external TPM emulator called 'swtpm' =
-for
->> +sending TPM commands to and receiving responses from. The swtpm progr=
-am
->> +must have been started before trying to access it through the TPM emu=
-lator
->> +with QEMU.
->> +
->> +The TPM emulator implements a command channel for transferring TPM co=
-mmands
->> +and responses as well as a control channel over which control command=
-s can
->> +be sent. The specification for the control channel can be found here:
->> +
->> +https://github.com/stefanberger/swtpm/blob/master/man/man3/swtpm_ioct=
-ls.pod
->> +
->> +
->> +The control channel serves the purpose of resetting, initializing, an=
-d
->> +migrating the TPM state, among other things.
->> +
->> +The swtpm program behaves like a hardware TPM and therefore needs to =
-be
->> +initialized by the firmware running inside the QEMU virtual machine.
->> +One necessary step for initializing the device is to send the TPM_Sta=
-rtup
->> +command to it. SeaBIOS, for example, has been instrumented to initial=
-ize
->> +a TPM 1.2 or TPM 2 device using this command.
->> +
->> +
->> +QEMU files related to the TPM emulator device:
->> + - hw/tpm/tpm_emulator.c
->> + - hw/tpm/tpm_util.c
->> + - hw/tpm/tpm_util.h
->> +
->> +
->> +The following commands start the swtpm with a UnixIO control channel =
-over
->> +a socket interface. They do not need to be run as root.
->> +
->> +mkdir /tmp/mytpm1
-> You no longer need swtpm_setup? nice
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--hx3o9kB8a2wVplRAPXbkTBnUoqoDNGGDN
+From: Max Reitz <mreitz@redhat.com>
+To: Qemu-block <qemu-block@nongnu.org>, Qemu-devel <qemu-devel@nongnu.org>
+Message-ID: <8a184b91-49ef-bb52-d190-053c4c0861a1@redhat.com>
+Subject: Drainage in bdrv_replace_child_noperm()
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-swtpm_setup is only needed if the TPM 1.2 is supposed to have an=20
-endorsement key (EK) and possibly an EK certificate when it starts up.=20
-In the simplest case it is not necessary to use swtpm_setup.
+Hi everyone,
 
-     Stefan
+On my quest to fix some flaky iotests, I came to a bit of a halt on 129.
+ (Details: Its issue is that block jobs now generally ignore throttling
+in a BB (because they use their own), so we have to add a throttle node
+instead.  However, when I added it, I got an abort.)
+
+My issue can be reproduced as follows:
+
+$ x86_64-softmmu/qemu-system-x86_64 \
+    -qmp stdio \
+    -object throttle-group,id=3Dtg0 \
+    -blockdev "{'driver':'throttle','node-name':'drive0',
+                'throttle-group':'tg0','file':{'driver':'null-co'}}" \
+    -blockdev node-name=3Dtarget,driver=3Dnull-co
+{"QMP": {"version": {"qemu": {"micro": 50, "minor": 10, "major": 2},
+"package": " (v2.9.0-632-g4a52d43-dirty)"}, "capabilities": []}}
+{'execute':'qmp_capabilities'}
+{"return": {}}
+{'execute':'blockdev-mirror','arguments':{
+    'device':'drive0','job-id':'job0','target':'target','sync':'full',
+    'filter-node-name':'mirror-node' }}
+qemu-system-x86_64: block/throttle.c:213: throttle_co_drain_end:
+Assertion `tgm->io_limits_disabled' failed.
+[1]    3524 abort (core dumped)  x86_64-softmmu/qemu-system-x86_64 -qmp
+stdio -object throttle-group,id=3Dtg0
+
+Here's what happens:
+
+(1) bdrv_drained_begin(bs) in mirror_start_job() starts draining drive0.
+
+(2) bdrv_append(...) puts mirror-node above drive0.  Through
+bdrv_replace_child_noperm(), this will invoke
+bdrv_child_cb_drained_begin() on mirror-node.  This is necessary because
+drive0 is drained, so the new parent needs to be drained as well.
+However, note that drive0 is not yet attached to mirror-node.
+Therefore, mirror-node cannot drain drive0 recursively.
+
+This is seemingly fine because drive0 is drained anyway.  However, this
+is different from what would happen if we would have drained drive0 with
+mirror-node already attached to it as its parent: Then, we would have
+drained drive0 twice; once by itself, and another time recursively
+through mirror-node.
+
+This will be important in a second...
+
+(3) ...and this second is now: We invoke bdrv_drained_end() on drive0.
+Now, through bdrv_parent_drained_end() and bdrv_child_cb_drained_end()
+that goes up to mirror-node which recursively un-drains drive0.  Fine so
+far.  But once that parent un-drain is done, we un-drain drive0 by
+itself: And this fails the assertion in the throttle driver because we
+attempt to un-drain it twice, although we've drained it only once.
 
 
->
->> +swtpm socket --tpmstate dir=3D/tmp/mytpm1 \
->> +  --ctrl type=3Dunixio,path=3D/tmp/mytpm1/swtpm-sock \
->> +  --log level=3D20
->> +
->> +Command line to start QEMU with the TPM emulator device using the hos=
-t's
->> +hardware TPM /dev/tpm0:
+So the issue has two parts:
 
-I fixed this to:
+(A) (Un-)Draining a parent from a child will always (?[1]) (un-)drain
+that child, too.  This seems a bit superfluous to me and I would guess
+that it results in worst-case O(n^2) function calls to drain a block
+graph consisting of n nodes.
 
-Command line to start QEMU with the TPM emulator device communicating
-with the swtpm:
+(B) In bdrv_replace_child_noperm() we try to drain the parent if the new
+child is drained; specifically, we want it to be in a state as if it had
+been a parent when the child was originally drained.  However, we fail
+at this because we drain the parent without the child attached, so we
+don't drain the child twice.  This bites us when we undrain everything.
+
+(Most importantly, ideally we'd want to attach the new child to the
+parent and then drain the parent: This would give us exactly the state
+we want.  However, attaching the child first and then draining the
+parent is unsafe, so we cannot do it...)
+
+[1] Whether the parent (un-)drains the child depends on the
+BdrvChildRole.drained_{begin,end}() implementation, strictly speaking.
+We cannot say it generally.
+
+OK, so how to fix it?  I don't know, so I'm asking you. :-)
+
+I have two ideas:
+
+One is to assume that (un-)draining a parent will always (un-)drain all
+children, including the one the (un-)drain comes from.  This assumption
+seems wrong, see [1], but maybe it isn't.  Anyway, if so, we could just
+explicitly drain the new child in bdrv_replace_child_noperm() after
+having drained the parent and thus get a consistent state again.
+
+The other is to declare (A) wrong.  Maybe when
+BdrvChildRole.drained_{begin,end}() is invoked, we should not drain that
+child because we can declare it the caller's responsibility to make sure
+it's drained.  This seems logical to me because usually those methods
+are invoked when the child is drained anyway.  But maybe I'm wrong. :-)
 
 
-    Stefan
+So, any ideas?
 
->> +
->> +qemu-system-x86_64 -display sdl -enable-kvm \
->> +  -m 1024 -boot d -bios bios-256k.bin -boot menu=3Don \
->> +  -chardev socket,id=3Dchrtpm,path=3D/tmp/mytpm1/swtpm-sock \
->> +  -tpmdev emulator,id=3Dtpm0,chardev=3Dchrtpm \
->> +  -device tpm-tis,tpmdev=3Dtpm0 test.img
->> +
->> +
->> +In case SeaBIOS is used as firmware, it should show the TPM menu item
->> +after entering the menu with 'ESC'.
->> +
->> +Select boot device:
->> +1. DVD/CD [ata1-0: QEMU DVD-ROM ATAPI-4 DVD/CD]
->> +[...]
->> +5. Legacy option rom
->> +
->> +t. TPM Configuration
->> +
->> +
->> +The following commands should result in similar output inside the VM =
-with a
->> +Linux kernel that either has the TPM TIS driver built-in or available=
- as a
->> +module:
->> +
->> +#> dmesg | grep -i tpm
->> +[    0.711310] tpm_tis 00:06: 1.2 TPM (device=3Did 0x1, rev-id 1)
->> +
->> +#> dmesg | grep TCPA
->> +[    0.000000] ACPI: TCPA 0x0000000003FFD191C 000032 (v02 BOCHS  \
->> +    BXPCTCPA 0000001 BXPC 00000001)
->> +
->> +#> ls -l /dev/tpm*
->> +crw-------. 1 root root 10, 224 Jul 11 10:11 /dev/tpm0
->> +
->> +#> find /sys/devices/ | grep pcrs$ | xargs cat
->> +PCR-00: 35 4E 3B CE 23 9F 38 59 ...
->> +...
->> +PCR-23: 00 00 00 00 00 00 00 00 ...
->> --
->> 2.5.5
->>
->
->
+Max
+
+
+--hx3o9kB8a2wVplRAPXbkTBnUoqoDNGGDN
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAloArq0SHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AsXUH/2dAPARGLmdtPyhy7sP4SW9gqTxUckKT
+NGml9QEbZmyesp9xixOAsciCNuNFWz/VC6DcNZsglgC5VLjUgUPTVUwEdluNzyci
+e4iuGkyWNKYIDenrwVpfSOnZgKLbij7v03s5RpRC4uGPz8/ulWxXAgx2asY7Jyrd
+m9KT3O+IGHuJm+CjmYpWj4dVdJN/jw4Epgmno7voPYBWKYYvTAjFUAPhaS8wToXu
+GSj5S/E70RtJNHT99VITQQ4D05mN+EP82tiVpV820EIsutjfqoxBVf1PiX1+dl5U
+DT0tp+LUknTmOdN9OC18b9sbM0oUwsTERgFjiJTHk6RwSxnwQiTEIr8=
+=9kaR
+-----END PGP SIGNATURE-----
+
+--hx3o9kB8a2wVplRAPXbkTBnUoqoDNGGDN--
