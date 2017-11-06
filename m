@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40268)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40338)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1eBmL0-0007xt-Gu
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 13:41:35 -0500
+	(envelope-from <Andrew.Baumann@microsoft.com>) id 1eBmL3-00080Y-Gv
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 13:41:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1eBmKv-0005c7-Qr
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 13:41:34 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46708)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1eBmKv-0005bI-Hm
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 13:41:29 -0500
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Mon,  6 Nov 2017 19:39:22 +0100
-Message-Id: <20171106183925.16747-26-marcandre.lureau@redhat.com>
-In-Reply-To: <20171106183925.16747-1-marcandre.lureau@redhat.com>
-References: <20171106183925.16747-1-marcandre.lureau@redhat.com>
+	(envelope-from <Andrew.Baumann@microsoft.com>) id 1eBmKy-0005eP-Jz
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 13:41:37 -0500
+Received: from mail-dm3nam03on0097.outbound.protection.outlook.com
+	([104.47.41.97]:30605
+	helo=NAM03-DM3-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <Andrew.Baumann@microsoft.com>)
+	id 1eBmKy-0005dR-7B
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 13:41:32 -0500
+From: Andrew Baumann <Andrew.Baumann@microsoft.com>
+Date: Mon, 6 Nov 2017 18:41:29 +0000
+Message-ID: <MWHPR21MB0159B2CB632AE8DE6B8DB6F99E500@MWHPR21MB0159.namprd21.prod.outlook.com>
+References: <150824572545.6816.5099701189660002212.stgit@Misha-PC.lan02.inno>
+	<CABdb736bkcafKPCHsQGEmB6wYOGB4s4S4+sVkuygDe7SjqZDYA@mail.gmail.com>
+	<CABdb736w49GjXwNOsj4o8RHQKAfmWnu+jJQgAZjzHwwzOW-+gA@mail.gmail.com>
+In-Reply-To: <CABdb736w49GjXwNOsj4o8RHQKAfmWnu+jJQgAZjzHwwzOW-+gA@mail.gmail.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 25/28] tpm-emulator: protect concurrent
- ctrl_chr access
+Subject: Re: [Qemu-devel] [PATCH v2 00/43] Windbg supporting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,187 +32,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: amarnath.valluri@intel.com, stefanb@linux.vnet.ibm.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: Ladi Prosek <lprosek@redhat.com>, Mihail Abakumov <mikhail.abakumov@ispras.ru>
+Cc: "sw@weilnetz.de" <sw@weilnetz.de>, qemu-devel <qemu-devel@nongnu.org>, Pavel Dovgalyuk <dovgaluk@ispras.ru>, Roman Kagan <rkagan@virtuozzo.com>, Paolo Bonzini <pbonzini@redhat.com>, "Denis V. Lunev" <den@openvz.org>
 
-The control chardev is being used from the data thread to set the
-locality of the next request. Altough the chr has a write mutex, we
-may potentially read the reply from another thread request.
-
-Add a mutex to protect from concurrent control commands.
-
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- hw/tpm/tpm_emulator.c | 44 ++++++++++++++++++++++++++++----------------
- 1 file changed, 28 insertions(+), 16 deletions(-)
-
-diff --git a/hw/tpm/tpm_emulator.c b/hw/tpm/tpm_emulator.c
-index b77c0238c7..24cb61162f 100644
---- a/hw/tpm/tpm_emulator.c
-+++ b/hw/tpm/tpm_emulator.c
-@@ -71,15 +71,21 @@ typedef struct TPMEmulator {
-     ptm_cap caps; /* capabilities of the TPM */
-     uint8_t cur_locty_number; /* last set locality */
-     Error *migration_blocker;
-+
-+    QemuMutex mutex;
- } TPMEmulator;
-=20
-=20
--static int tpm_emulator_ctrlcmd(CharBackend *dev, unsigned long cmd, voi=
-d *msg,
-+static int tpm_emulator_ctrlcmd(TPMEmulator *tpm, unsigned long cmd, voi=
-d *msg,
-                                 size_t msg_len_in, size_t msg_len_out)
- {
-+    CharBackend *dev =3D &tpm->ctrl_chr;
-     uint32_t cmd_no =3D cpu_to_be32(cmd);
-     ssize_t n =3D sizeof(uint32_t) + msg_len_in;
-     uint8_t *buf =3D NULL;
-+    int ret =3D -1;
-+
-+    qemu_mutex_lock(&tpm->mutex);
-=20
-     buf =3D g_alloca(n);
-     memcpy(buf, &cmd_no, sizeof(cmd_no));
-@@ -87,17 +93,21 @@ static int tpm_emulator_ctrlcmd(CharBackend *dev, uns=
-igned long cmd, void *msg,
-=20
-     n =3D qemu_chr_fe_write_all(dev, buf, n);
-     if (n <=3D 0) {
--        return -1;
-+        goto end;
-     }
-=20
-     if (msg_len_out !=3D 0) {
-         n =3D qemu_chr_fe_read_all(dev, msg, msg_len_out);
-         if (n <=3D 0) {
--            return -1;
-+            goto end;
-         }
-     }
-=20
--    return 0;
-+    ret =3D 0;
-+
-+end:
-+    qemu_mutex_unlock(&tpm->mutex);
-+    return ret;
- }
-=20
- static int tpm_emulator_unix_tx_bufs(TPMEmulator *tpm_emu,
-@@ -154,7 +164,7 @@ static int tpm_emulator_set_locality(TPMEmulator *tpm=
-_emu, uint8_t locty_number,
-=20
-     DPRINTF("setting locality : 0x%x", locty_number);
-     loc.u.req.loc =3D locty_number;
--    if (tpm_emulator_ctrlcmd(&tpm_emu->ctrl_chr, CMD_SET_LOCALITY, &loc,
-+    if (tpm_emulator_ctrlcmd(tpm_emu, CMD_SET_LOCALITY, &loc,
-                              sizeof(loc), sizeof(loc)) < 0) {
-         error_setg(errp, "tpm-emulator: could not set locality : %s",
-                    strerror(errno));
-@@ -200,8 +210,8 @@ error:
- static int tpm_emulator_probe_caps(TPMEmulator *tpm_emu)
- {
-     DPRINTF("%s", __func__);
--    if (tpm_emulator_ctrlcmd(&tpm_emu->ctrl_chr, CMD_GET_CAPABILITY,
--                         &tpm_emu->caps, 0, sizeof(tpm_emu->caps)) < 0) =
-{
-+    if (tpm_emulator_ctrlcmd(tpm_emu, CMD_GET_CAPABILITY,
-+                             &tpm_emu->caps, 0, sizeof(tpm_emu->caps)) <=
- 0) {
-         error_report("tpm-emulator: probing failed : %s", strerror(errno=
-));
-         return -1;
-     }
-@@ -252,8 +262,8 @@ static int tpm_emulator_startup_tpm(TPMBackend *tb)
-     ptm_res res;
-=20
-     DPRINTF("%s", __func__);
--    if (tpm_emulator_ctrlcmd(&tpm_emu->ctrl_chr, CMD_INIT, &init, sizeof=
-(init),
--                         sizeof(init)) < 0) {
-+    if (tpm_emulator_ctrlcmd(tpm_emu, CMD_INIT, &init, sizeof(init),
-+                             sizeof(init)) < 0) {
-         error_report("tpm-emulator: could not send INIT: %s",
-                      strerror(errno));
-         goto err_exit;
-@@ -276,7 +286,7 @@ static bool tpm_emulator_get_tpm_established_flag(TPM=
-Backend *tb)
-     ptm_est est;
-=20
-     DPRINTF("%s", __func__);
--    if (tpm_emulator_ctrlcmd(&tpm_emu->ctrl_chr, CMD_GET_TPMESTABLISHED,=
- &est,
-+    if (tpm_emulator_ctrlcmd(tpm_emu, CMD_GET_TPMESTABLISHED, &est,
-                              0, sizeof(est)) < 0) {
-         error_report("tpm-emulator: Could not get the TPM established fl=
-ag: %s",
-                      strerror(errno));
-@@ -300,7 +310,7 @@ static int tpm_emulator_reset_tpm_established_flag(TP=
-MBackend *tb,
-     }
-=20
-     reset_est.u.req.loc =3D tpm_emu->cur_locty_number;
--    if (tpm_emulator_ctrlcmd(&tpm_emu->ctrl_chr, CMD_RESET_TPMESTABLISHE=
-D,
-+    if (tpm_emulator_ctrlcmd(tpm_emu, CMD_RESET_TPMESTABLISHED,
-                              &reset_est, sizeof(reset_est),
-                              sizeof(reset_est)) < 0) {
-         error_report("tpm-emulator: Could not reset the establishment bi=
-t: %s",
-@@ -329,7 +339,7 @@ static void tpm_emulator_cancel_cmd(TPMBackend *tb)
-     }
-=20
-     /* FIXME: make the function non-blocking, or it may block a VCPU */
--    if (tpm_emulator_ctrlcmd(&tpm_emu->ctrl_chr, CMD_CANCEL_TPM_CMD, &re=
-s, 0,
-+    if (tpm_emulator_ctrlcmd(tpm_emu, CMD_CANCEL_TPM_CMD, &res, 0,
-                              sizeof(res)) < 0) {
-         error_report("tpm-emulator: Could not cancel command: %s",
-                      strerror(errno));
-@@ -377,8 +387,8 @@ static int tpm_emulator_prepare_data_fd(TPMEmulator *=
-tpm_emu)
-=20
-     qemu_chr_fe_set_msgfds(&tpm_emu->ctrl_chr, fds + 1, 1);
-=20
--    if (tpm_emulator_ctrlcmd(&tpm_emu->ctrl_chr, CMD_SET_DATAFD, &res, 0=
-,
--                    sizeof(res)) || res !=3D 0) {
-+    if (tpm_emulator_ctrlcmd(tpm_emu, CMD_SET_DATAFD, &res, 0,
-+                             sizeof(res)) < 0 || res !=3D 0) {
-         error_report("tpm-emulator: Failed to send CMD_SET_DATAFD: %s",
-                      strerror(errno));
-         goto err_exit;
-@@ -494,6 +504,7 @@ static void tpm_emulator_inst_init(Object *obj)
-     DPRINTF("%s", __func__);
-     tpm_emu->options =3D g_new0(TPMEmulatorOptions, 1);
-     tpm_emu->cur_locty_number =3D ~0;
-+    qemu_mutex_init(&tpm_emu->mutex);
- }
-=20
- /*
-@@ -503,8 +514,7 @@ static void tpm_emulator_shutdown(TPMEmulator *tpm_em=
-u)
- {
-     ptm_res res;
-=20
--    if (tpm_emulator_ctrlcmd(&tpm_emu->ctrl_chr, CMD_SHUTDOWN, &res, 0,
--                             sizeof(res)) < 0) {
-+    if (tpm_emulator_ctrlcmd(tpm_emu, CMD_SHUTDOWN, &res, 0, sizeof(res)=
-) < 0) {
-         error_report("tpm-emulator: Could not cleanly shutdown the TPM: =
-%s",
-                      strerror(errno));
-     } else if (res !=3D 0) {
-@@ -529,6 +539,8 @@ static void tpm_emulator_inst_finalize(Object *obj)
-         migrate_del_blocker(tpm_emu->migration_blocker);
-         error_free(tpm_emu->migration_blocker);
-     }
-+
-+    qemu_mutex_destroy(&tpm_emu->mutex);
- }
-=20
- static void tpm_emulator_class_init(ObjectClass *klass, void *data)
---=20
-2.15.0.rc0.40.gaefcc5f6f
+SGksDQoNCkkganVzdCBub3RpY2VkIHRoaXMgdGhyZWFkLCBhbmQgdGhlIHByb2JsZW0gc291bmRl
+ZCB2ZXJ5IGZhbWlsaWFyLi4uDQoNCj4gRnJvbTogTGFkaSBQcm9zZWsNCj4gU2VudDogTW9uZGF5
+LCA2IE5vdmVtYmVyIDIwMTcgMDc6MTYNClsuLi5dDQo+IEZTIGJhc2UgcGFzc2VzIGFsbCB0aGUg
+Y2hlY2tzIGluIHdpbmRiZ19vbl9sb2FkKCkgYXMgdGhlIGd1ZXN0IGtlcm5lbA0KPiBsb2FkcyBh
+bmQgaXQgcmV0dXJucyB0cnVlLiBRRU1VIHRoZW4gc2VuZHMgc29tZSBkYXRhIG92ZXIgdGhlIHBp
+cGUuDQo+IFdpbmRiZyBkb2Vzbid0IHByaW50IGFueXRoaW5nLCBpdCdzIHN0aWxsIHNob3dpbmc6
+DQo+IA0KPiAgIE9wZW5lZCBcXC5ccGlwZVx3aW43X2RiZw0KPiAgIFdhaXRpbmcgdG8gcmVjb25u
+ZWN0Li4uDQo+IA0KPiBJcyB0aGlzIGV4cGVjdGVkPyBJbiByZWd1bGFyIHJlbW90ZSBrZXJuZWwg
+ZGVidWdnaW5nLCB3aW5kYmcgcHJvZHVjZXMNCj4gYSBidW5jaCBvZiBvdXRwdXQgYWJvdXQgdGhl
+IHRhcmdldCBzdGF0ZSB3aGVuIGl0IGF0dGFjaGVzLg0KDQpKdXN0IGEgZ3Vlc3MsIGJ1dCBJIHN1
+c3BlY3QgdGhlIHByb2JsZW0geW91J3JlIHNlZWluZyBtYXkgYmUgZHVlIHRvIHRoZSBjb21iaW5h
+dGlvbiBvZiB3aW5kYmcncyB0aWdodCB0aW1pbmcgcmVxdWlyZW1lbnRzIGZvciB0aGUgc2VyaWFs
+IGRlYnVnIHByb3RvY29sIGFuZCBxZW11J3MgcG9sbGluZy1iYXNlZCBpbXBsZW1lbnRhdGlvbiBv
+ZiBuYW1lZCBwaXBlIElPLiBJIHJhbiBpbnRvIHRoaXMgYSB5ZWFyIG9yIHR3byBhZ28gd2hlbiBi
+cmluZ2luZyB1cCByYXNwYmVycnkgcGkuLi4gSSBjb3VsZCBuZXZlciByZWxpYWJseSBjb25uZWN0
+IHdpbmRiZyB0byB0aGUgZW11bGF0ZWQgc2VyaWFsIHBvcnQgdXNpbmcgYSBuYW1lZCBwaXBlLiBJ
+IGJlbGlldmUgdGhlIHByb2JsZW0gaXMgdGhhdCB0aGUgbmFtZWQgcGlwZSBkcml2ZXIgcmVsaWVz
+IG9uIHJlY2VpdmluZyBpbnB1dCB0aHJvdWdoIHdpbl9jaHJfcGlwZV9wb2xsKCksIHdoaWNoIGlz
+IGNhbGxlZCB0b28gaW5mcmVxdWVudGx5IHRvIHNhdGlzZnkgd2luZGJnJ3MgbmVlZHMgKGl0IGhh
+cyBhIHJhdGhlciBzaG9ydCB0aW1lb3V0IGJlZm9yZSBpdCBnaXZlcyB1cCBhbmQgcmV0cmFuc21p
+dHMpLiBUaGUgY29ycmVjdCBmaXggaXMgdG8gdXNlIGJsb2NraW5nIElPIGZvciB0aGUgbmFtZWQg
+cGlwZXMgaW5zaWRlIHFlbXUsIGJ1dCBJIGtub3cgZnJvbSBleHBlcmllbmNlIHRoYXQgd2luMzIg
+aXMgYXdmdWwgaW4gdGhpcyByZXNwZWN0IC0tIHFlbXUgd2FudHMgYSBzaW5nbGUgdW5pZmllZCBi
+bG9ja2luZyBjYWxsIHRvIHdhaXQgZm9yIElPIG9uIGFueSBjb21iaW5hdGlvbiBvZiBuYW1lZCBw
+aXBlcywgc29ja2V0cywgZXZlbnRzLCBldGMuIGFuZCBXaW5kb3dzIGFwcGVhcnMgdG8gbGFjayB0
+aGlzLCBhdCBsZWFzdCBhdCB0aGUgbGV2ZWwgb2YgcG9sbC9zZWxlY3QuDQoNCk15IHdvcmthcm91
+bmQgYXQgdGhlIHRpbWUgd2FzIHRvIGtsdWRnZSB1cCBhIHByb3h5IGJldHdlZW4gc29ja2V0cyBh
+bmQgbmFtZWQgcGlwZXMsIHNvIHRoZSBjb25uZWN0aW9uIHdhczoNCnFlbXUgPC1zb2NrZXQtPiBw
+cm94eSA8LW5hbWVkIHBpcGUtPiB3aW5kYmcNCg0KKFRoZSBwcm94eSB3YXMgYSBmYWlybHkgZmxh
+a3kgcHl0aG9uIHNjcmlwdCwgYnV0IGl0IHdhcyBnb29kIGVub3VnaCB0byB0aWRlIG1lIG92ZXIg
+dW50aWwgSSBjb3VsZCBnZXQga2RuZXQgd29ya2luZy4gSSBjYW4gcHJvYmFibHkgZGlnIGl0IG91
+dCBpZiB5b3UncmUgaW50ZXJlc3RlZC4pDQoNCkNoZWVycywNCkFuZHJldw0K
