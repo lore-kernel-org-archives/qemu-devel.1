@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51312)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53634)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eBmj4-0004NN-2J
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 14:06:27 -0500
+	(envelope-from <bounces@canonical.com>) id 1eBmo5-0000OX-Cw
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 14:11:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eBmj3-0002Nx-95
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 14:06:26 -0500
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20171006235023.11952-1-f4bug@amsat.org>
-	<20171006235023.11952-64-f4bug@amsat.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <d09209e7-5221-5b1e-dc17-1db05b84c614@amsat.org>
-Date: Mon, 6 Nov 2017 16:06:14 -0300
+	(envelope-from <bounces@canonical.com>) id 1eBmo1-0004mH-Lu
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 14:11:37 -0500
+Received: from indium.canonical.com ([91.189.90.7]:41076)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eBmo1-0004le-G1
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 14:11:33 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eBmnz-0004pv-RX
+	for <qemu-devel@nongnu.org>; Mon, 06 Nov 2017 19:11:31 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 4BE832E80EA
+	for <qemu-devel@nongnu.org>; Mon,  6 Nov 2017 19:11:30 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20171006235023.11952-64-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 63/88] bsd-user/syscall: fix a memory leak
- on EFAULT, use g_new()
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 06 Nov 2017 19:01:43 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Reply-To: Bug 1705118 <1705118@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150041005567.6544.17518405784140614257.malonedeb@gac.canonical.com>
+Message-Id: <150999490367.4957.6740671140211512470.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1705118] Re: qemu user mode does not support
+ catching SIGSEGV on some architectures
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,45 +37,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, Kamil Rytarowski <kamil@netbsd.org>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu trival <qemu-trivial@nongnu.org>
+To: qemu-devel@nongnu.org
 
-Hi Michael,
+Patchset that fixes all the minor parts of this, leaving (probably) just sp=
+arc setup_rt_frame/rt_sigreturn:
+https://lists.gnu.org/archive/html/qemu-devel/2017-11/msg00833.html
 
-Since there is no bsd-user maintainers, can you take this single patch
-for 2.11? It fixes a memory leak.
+-- =
 
-Regards,
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1705118
 
-Phil.
+Title:
+  qemu user mode does not support catching SIGSEGV on some architectures
 
-On 10/06/2017 08:49 PM, Philippe Mathieu-Daudé wrote:
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> ---
-> Kamil are you interested in maintaining bsd-user? :)
->  
->  bsd-user/syscall.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/bsd-user/syscall.c b/bsd-user/syscall.c
-> index 66492aaf5d..9120cea61e 100644
-> --- a/bsd-user/syscall.c
-> +++ b/bsd-user/syscall.c
-> @@ -227,7 +227,7 @@ static abi_long do_freebsd_sysctl(abi_ulong namep, int32_t namelen, abi_ulong ol
->      void *hnamep, *holdp, *hnewp = NULL;
->      size_t holdlen;
->      abi_ulong oldlen = 0;
-> -    int32_t *snamep = g_malloc(sizeof(int32_t) * namelen), *p, *q, i;
-> +    int32_t *snamep, *p, *q, i;
->      uint32_t kind = 0;
->  
->      if (oldlenp)
-> @@ -239,6 +239,7 @@ static abi_long do_freebsd_sysctl(abi_ulong namep, int32_t namelen, abi_ulong ol
->      if (!(holdp = lock_user(VERIFY_WRITE, oldp, oldlen, 0)))
->          return -TARGET_EFAULT;
->      holdlen = oldlen;
-> +    snamep = g_new(int32_t, namelen);
->      for (p = hnamep, q = snamep, i = 0; i < namelen; p++, i++)
->         *q++ = tswap32(*p);
->      oidfmt(snamep, namelen, NULL, &kind);
-> 
+Status in QEMU:
+  Confirmed
+
+Bug description:
+  The documentation
+  <https://qemu.weilnetz.de/doc/qemu-doc.html#Features> says that
+  qemu in user mode supports POSIX signal handling.
+
+  Catching SIGSEGV according to POSIX, however, does not work on
+    ppc, ppc64, ppc64le, s390x, sparc64.
+  It does work, however, on
+    aarch64, alpha, arm, hppa, m68k, mips, mips64, sh4.
+
+  How to reproduce:
+  The attached program runs fine (exits with code 0) on
+    - real hardware Linux/PowerPC64 (in 32-bit and 64-bit mode),
+    - real hardware Linux/PowerPC64LE,
+    - qemu-system-s390x emulated Linux/s390x,
+    - real hardware Linux/SPARC64.
+  $ gcc -O -Wall testsigsegv.c; ./a.out; echo $?
+  0
+
+  For ppc:
+  $ powerpc-linux-gnu-gcc-5 -O -Wall -static testsigsegv.c -o testsigsegv-p=
+pc
+  $ ~/inst-qemu/2.9.0/bin/qemu-ppc testsigsegv-ppc
+  $ echo $?
+  3
+
+  For ppc64:
+  $ powerpc64-linux-gnu-gcc-5 -O -Wall -static testsigsegv.c -o testsigsegv=
+-ppc64
+  $ ~/inst-qemu/2.9.0/bin/qemu-ppc64 testsigsegv-ppc64
+  $ echo $?
+  3
+
+  For ppc64le:
+  $ powerpc64le-linux-gnu-gcc-5 -O -Wall -static testsigsegv.c -o testsigse=
+gv-ppc64le
+  $ ~/inst-qemu/2.9.0/bin/qemu-ppc64le testsigsegv-ppc64le
+  $ echo $?
+  3
+
+  For s390x:
+  $ s390x-linux-gnu-gcc-5 -O -Wall -static testsigsegv.c -o testsigsegv-s39=
+0x
+  $ ~/inst-qemu/2.9.0/bin/qemu-s390x testsigsegv-s390x
+  $ echo $?
+  3
+  $ s390x-linux-gnu-gcc-5 -O -Wall -static testsigsegv.c -DAVOID_LINUX_S390=
+X_COMPAT -o testsigsegv-s390x-a
+  $ ~/inst-qemu/2.9.0/bin/qemu-s390x testsigsegv-s390x-a
+  $ echo $?
+  0
+  So, the test fails here because the Linux/s390x kernel omits the least
+  significant 12 bits of the fault address in the 'si_addr' field. But
+  qemu-s390x is not compatible with the Linux/s390x behaviour: it puts
+  the complete fault address in the 'si_addr' field.
+
+  For sparc64:
+  $ sparc64-linux-gnu-gcc-5 -O -Wall -static testsigsegv.c -o testsigsegv-s=
+parc64
+  $ ~/inst-qemu/2.9.0/bin/qemu-sparc64 testsigsegv-sparc64
+  Segmentation fault (core dumped)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1705118/+subscriptions
