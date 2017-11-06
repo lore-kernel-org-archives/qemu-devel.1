@@ -1,24 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40434)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42249)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1eBmLB-0008Gm-WC
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 13:41:46 -0500
+	(envelope-from <bounces@canonical.com>) id 1eBmP4-0003Qz-Rt
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 13:45:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1eBmLB-0005wk-6N
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 13:41:46 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42278)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1eBmLB-0005wD-0H
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 13:41:45 -0500
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Mon,  6 Nov 2017 19:39:25 +0100
-Message-Id: <20171106183925.16747-29-marcandre.lureau@redhat.com>
-In-Reply-To: <20171106183925.16747-1-marcandre.lureau@redhat.com>
-References: <20171106183925.16747-1-marcandre.lureau@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1eBmOz-0000Mu-W2
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 13:45:46 -0500
+Received: from indium.canonical.com ([91.189.90.7]:34246)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eBmOz-0000KK-Qi
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 13:45:41 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eBmOy-00073L-4r
+	for <qemu-devel@nongnu.org>; Mon, 06 Nov 2017 18:45:40 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 1E1392E80CD
+	for <qemu-devel@nongnu.org>; Mon,  6 Nov 2017 18:45:40 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 28/28] tpm: remove tpm_register_model()
+Date: Mon, 06 Nov 2017 18:35:03 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Reply-To: Bug 1077116 <1077116@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20121109183454.27088.83319.malonedeb@gac.canonical.com>
+Message-Id: <150999330382.4653.18389384542431290090.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1077116] Re: automoc4 segfaults when building in
+ an armhf pbuilder on an amd64 host
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,89 +38,93 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: amarnath.valluri@intel.com, stefanb@linux.vnet.ibm.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-Query object classes that implements TPMIf instead.
+I was able to reproduce this failure with QEMU 2.5, and the code runs OK
+under QEMU current master, so I think this is fixed by the
+threading/signal handling bugfixes we've done between then and now. I'm
+going to close this as will-be-fixed-in-2.11 (though it's quite possible
+it's already fixed in 2.10).
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- include/sysemu/tpm_backend.h |  2 --
- hw/tpm/tpm_tis.c             |  1 -
- tpm.c                        | 20 ++++++--------------
- 3 files changed, 6 insertions(+), 17 deletions(-)
 
-diff --git a/include/sysemu/tpm_backend.h b/include/sysemu/tpm_backend.h
-index c42d83aaef..590e8b42de 100644
---- a/include/sysemu/tpm_backend.h
-+++ b/include/sysemu/tpm_backend.h
-@@ -194,6 +194,4 @@ TPMInfo *tpm_backend_query_tpm(TPMBackend *s);
-=20
- TPMBackend *qemu_find_tpm_be(const char *id);
-=20
--void tpm_register_model(enum TpmModel model);
--
- #endif
-diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
-index a00779f3aa..cc32fcde36 100644
---- a/hw/tpm/tpm_tis.c
-+++ b/hw/tpm/tpm_tis.c
-@@ -1115,7 +1115,6 @@ static const TypeInfo tpm_tis_info =3D {
- static void tpm_tis_register(void)
- {
-     type_register_static(&tpm_tis_info);
--    tpm_register_model(TPM_MODEL_TPM_TIS);
- }
-=20
- type_init(tpm_tis_register)
-diff --git a/tpm.c b/tpm.c
-index 4661dfc46e..61a434185a 100644
---- a/tpm.c
-+++ b/tpm.c
-@@ -23,13 +23,6 @@
- static QLIST_HEAD(, TPMBackend) tpm_backends =3D
-     QLIST_HEAD_INITIALIZER(tpm_backends);
-=20
--static bool tpm_models[TPM_MODEL__MAX];
--
--void tpm_register_model(enum TpmModel model)
--{
--    tpm_models[model] =3D true;
--}
--
- static const TPMBackendClass *
- tpm_be_find_by_type(enum TpmType type)
- {
-@@ -236,18 +229,16 @@ TpmTypeList *qmp_query_tpm_types(Error **errp)
-=20
-     return head;
- }
--
- TpmModelList *qmp_query_tpm_models(Error **errp)
- {
--    unsigned int i =3D 0;
-     TpmModelList *head =3D NULL, *prev =3D NULL, *cur_item;
-+    GSList *e, *l =3D object_class_get_list(TYPE_TPM_IF, false);
-+
-+    for (e =3D l; e; e =3D e->next) {
-+        TPMIfClass *c =3D TPM_IF_CLASS(e->data);
-=20
--    for (i =3D 0; i < TPM_MODEL__MAX; i++) {
--        if (!tpm_models[i]) {
--            continue;
--        }
-         cur_item =3D g_new0(TpmModelList, 1);
--        cur_item->value =3D i;
-+        cur_item->value =3D c->model;
-=20
-         if (prev) {
-             prev->next =3D cur_item;
-@@ -257,6 +248,7 @@ TpmModelList *qmp_query_tpm_models(Error **errp)
-         }
-         prev =3D cur_item;
-     }
-+    g_slist_free(l);
-=20
-     return head;
- }
---=20
-2.15.0.rc0.40.gaefcc5f6f
+** Changed in: qemu
+       Status: New =3D> Fix Committed
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1077116
+
+Title:
+  automoc4 segfaults when building in an armhf pbuilder on an amd64 host
+
+Status in QEMU:
+  Fix Committed
+Status in qemu package in Ubuntu:
+  Confirmed
+
+Bug description:
+  When trying to build kde4libs in an armhf pbuilder created with the
+  pbuilder-scripts running on an amd64 host automoc4 recieves a
+  segmentation fault and I can't get any useful information out of it:
+
+  root@yofel-thinkpad:/tmp/kde4libs-4.9.3/build/kdeui# /usr/bin/automoc4 kd=
+eui_automoc.cpp ../../kdeui/ . moc-qt4 cmake
+  unable to dump 00102c00
+  Segmentation fault (core dumped)
+  root@yofel-thinkpad:/tmp/kde4libs-4.9.3/build/kdeui# gdb /usr/bin/automoc=
+4 qemu_automoc4_20121108-211818_15839.core  =
+
+  GNU gdb (GDB) 7.5-ubuntu
+  Copyright (C) 2012 Free Software Foundation, Inc.
+  License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.h=
+tml>
+  This is free software: you are free to change and redistribute it.
+  There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+  and "show warranty" for details.
+  This GDB was configured as "arm-linux-gnueabihf".
+  For bug reporting instructions, please see:
+  <http://www.gnu.org/software/gdb/bugs/>...
+  Reading symbols from /usr/bin/automoc4...done.
+  BFD: Warning: /tmp/kde4libs-4.9.3/build/kdeui/qemu_automoc4_20121108-2118=
+18_15839.core is truncated: expected core file size >=3D 5150720, found: 97=
+4848.
+  [New LWP 15839]
+  [New LWP 15866]
+  Cannot access memory at address 0xf67fe954
+  Cannot access memory at address 0xf67fe950
+  (gdb) bt
+  #0  0xf6630306 in ?? ()
+  #1  0xf6415ff8 in ?? ()
+  #2  0xf6415ff8 in ?? ()
+  Backtrace stopped: previous frame identical to this frame (corrupt stack?)
+  (gdb) =
+
+
+  automoc4 runs fine when building on a nexus7 so this sounds like an issue=
+ in qemu.
+  Tested in quantal and raring.
+
+  ProblemType: Bug
+  DistroRelease: Ubuntu 13.04
+  Package: qemu-user-static 1.2.0-2012.09-0ubuntu1
+  Uname: Linux 3.6.2-030602-generic x86_64
+  NonfreeKernelModules: nvidia
+  ApportVersion: 2.6.2-0ubuntu3
+  Architecture: amd64
+  Date: Fri Nov  9 19:29:28 2012
+  EcryptfsInUse: Yes
+  InstallationDate: Installed on 2011-10-08 (398 days ago)
+  InstallationMedia: Kubuntu 11.10 "Oneiric Ocelot" - Beta amd64 (20111007)
+  MarkForUpload: True
+  ProcEnviron:
+   SHELL=3D/bin/bash
+   TERM=3Dxterm
+   PATH=3D(custom, user)
+   LANG=3Den_US.UTF-8
+   LANGUAGE=3Den_US.UTF-8
+  SourcePackage: qemu-linaro
+  UpgradeStatus: No upgrade log present (probably fresh install)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1077116/+subscriptions
