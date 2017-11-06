@@ -1,21 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43161)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43784)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <voipio@kos.to>) id 1eBndA-0005Xl-0b
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 15:04:24 -0500
+	(envelope-from <groug@kaod.org>) id 1eBnf3-0006TA-In
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 15:06:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <voipio@kos.to>) id 1eBnd6-0001H9-2W
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 15:04:24 -0500
-Date: Mon, 6 Nov 2017 20:04:17 +0000
-From: Riku Voipio <riku.voipio@iki.fi>
-Message-ID: <20171106200417.GC19281@kos.to>
-References: <1508364103-16131-1-git-send-email-cota@braap.org>
-	<1508364103-16131-3-git-send-email-cota@braap.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1508364103-16131-3-git-send-email-cota@braap.org>
-Subject: Re: [Qemu-devel] [PATCH 2/4] linux-user: fix 'finshed' typo in
- comment
+	(envelope-from <groug@kaod.org>) id 1eBnez-0001tG-HR
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 15:06:21 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:51298)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1eBnez-0001sy-8K
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 15:06:17 -0500
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	vA6K5W2V002243
+	for <qemu-devel@nongnu.org>; Mon, 6 Nov 2017 15:06:12 -0500
+Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2e2ue9280m-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 06 Nov 2017 15:06:11 -0500
+Received: from localhost
+	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
+	Mon, 6 Nov 2017 20:06:09 -0000
+From: Greg Kurz <groug@kaod.org>
+Date: Mon,  6 Nov 2017 21:05:53 +0100
+In-Reply-To: <20171106200554.5894-1-groug@kaod.org>
+References: <20171106200554.5894-1-groug@kaod.org>
+Message-Id: <20171106200554.5894-2-groug@kaod.org>
+Subject: [Qemu-devel] [PULL 1/2] 9pfs: drop one user of struct V9fsFidState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,33 +36,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Greg Kurz <groug@kaod.org>
 
-Applied to linux-user, thanks
+To comply with QEMU coding style.
 
-Riku
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
+ hw/9pfs/9p.h | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-On Wed, Oct 18, 2017 at 06:01:41PM -0400, Emilio G. Cota wrote:
-> Signed-off-by: Emilio G. Cota <cota@braap.org>
-> ---
->  linux-user/syscall.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> index 9d4cc4c..47b4a79 100644
-> --- a/linux-user/syscall.c
-> +++ b/linux-user/syscall.c
-> @@ -6231,7 +6231,7 @@ static void *clone_func(void *arg)
->      pthread_mutex_lock(&info->mutex);
->      pthread_cond_broadcast(&info->cond);
->      pthread_mutex_unlock(&info->mutex);
-> -    /* Wait until the parent has finshed initializing the tls state.  */
-> +    /* Wait until the parent has finished initializing the tls state.  */
->      pthread_mutex_lock(&clone_lock);
->      pthread_mutex_unlock(&clone_lock);
->      cpu_loop(env);
-> -- 
-> 2.7.4
-> 
-> 
+diff --git a/hw/9pfs/9p.h b/hw/9pfs/9p.h
+index d1cfeaf10e4f..cdfc4f4ce787 100644
+--- a/hw/9pfs/9p.h
++++ b/hw/9pfs/9p.h
+@@ -117,7 +117,7 @@ static inline char *rpath(FsContext *ctx, const char *path)
+ #define P9_IOHDRSZ 24
+ 
+ typedef struct V9fsPDU V9fsPDU;
+-struct V9fsState;
++typedef struct V9fsState V9fsState;
+ 
+ typedef struct {
+     uint32_t size_le;
+@@ -137,7 +137,7 @@ struct V9fsPDU
+     uint8_t id;
+     uint8_t cancelled;
+     CoQueue complete;
+-    struct V9fsState *s;
++    V9fsState *s;
+     QLIST_ENTRY(V9fsPDU) next;
+     uint32_t idx;
+ };
+@@ -230,7 +230,7 @@ struct V9fsFidState
+     V9fsFidState *rclm_lst;
+ };
+ 
+-typedef struct V9fsState
++struct V9fsState
+ {
+     QLIST_HEAD(, V9fsPDU) free_list;
+     QLIST_HEAD(, V9fsPDU) active_list;
+@@ -251,7 +251,7 @@ typedef struct V9fsState
+     Error *migration_blocker;
+     V9fsConf fsconf;
+     V9fsQID root_qid;
+-} V9fsState;
++};
+ 
+ /* 9p2000.L open flags */
+ #define P9_DOTL_RDONLY        00000000
+-- 
+2.13.6
