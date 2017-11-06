@@ -1,40 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51687)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53411)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1eBlZq-00017Y-V6
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 12:52:51 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eBlfs-0003Cm-VG
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 12:59:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1eBlZm-0005hN-RU
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 12:52:51 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59784
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1eBlZm-0005gi-Ls
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 12:52:46 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vA6Hjvgu139302
-	for <qemu-devel@nongnu.org>; Mon, 6 Nov 2017 12:52:42 -0500
-Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2e2u51mtx8-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 06 Nov 2017 12:52:41 -0500
-Received: from localhost
-	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Mon, 6 Nov 2017 10:52:41 -0700
-References: <20171019075031.25507-1-rjones@redhat.com>
-	<5888e39b-8f55-2d6b-afbe-da4727f23c2d@msgid.tls.msk.ru>
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Mon, 6 Nov 2017 12:52:35 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eBlfr-00009n-NU
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 12:59:05 -0500
+Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:56486)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eBlfr-00009M-Cl
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 12:59:03 -0500
+Received: by mail-wr0-x241.google.com with SMTP id q66so5831314wrb.13
+	for <qemu-devel@nongnu.org>; Mon, 06 Nov 2017 09:59:03 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <5888e39b-8f55-2d6b-afbe-da4727f23c2d@msgid.tls.msk.ru>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Message-Id: <90c15906-724b-fd8a-89eb-e012ea910623@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH] tpm: Don't call tpm_cleanup unless
- CONFIG_TPM.
+In-Reply-To: <20171106174338.GP23361@redhat.com>
+References: <20171106153342.24147-1-berrange@redhat.com>
+	<CAFEAcA_jweuOwrNf93o=2uMzXQVUHcJ6cNsQd++sRt_D04j1nA@mail.gmail.com>
+	<20171106174338.GP23361@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 6 Nov 2017 17:58:41 +0000
+Message-ID: <CAFEAcA_2o4R0eMGBz=P-5+_G+ax0UPWtytMC4XrKYHT3jZg=3g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL v1 0/2] Merge IO 2017/11/06
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,37 +30,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Tokarev <mjt@tls.msk.ru>, "Richard W.M. Jones" <rjones@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, pbonzini@redhat.com, amarnath.valluri@intel.com, marcandre.lureau@gmail.com
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 11/06/2017 12:49 PM, Michael Tokarev wrote:
-> 19.10.2017 10:50, Richard W.M. Jones wrote:
->> When compiling with --disable-tpm:
+On 6 November 2017 at 17:43, Daniel P. Berrange <berrange@redhat.com> wrote:
+> On Mon, Nov 06, 2017 at 04:11:56PM +0000, Peter Maydell wrote:
+>> On 6 November 2017 at 15:33, Daniel P. Berrange <berrange@redhat.com> wrote:
+>> > The following changes since commit ec7a8bf0b8f7dc7288fe8745464ee8217528cc6c:
+>> >
+>> >   Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into staging (2017-11-06 10:04:16 +0000)
+>> >
+>> > are available in the git repository at:
+>> >
+>> >   git://github.com/berrange/qemu tags/pull-qio-2017-11-06-1
+>> >
+>> > for you to fetch changes up to 74c0035408d5b327eac5985d976bca3009e0c5d6:
+>> >
+>> >   tests: Add test-listen - a stress test for QEMU socket listen (2017-11-06 11:49:15 +0000)
+>> >
+>> > ----------------------------------------------------------------
+>> > Merge qio 2017-11-06 v1
+>> >
+>> > ----------------------------------------------------------------
 >>
->>    ../vl.o: In function `main':
->>    /home/rjones/d/qemu/vl.c:4908: undefined reference to `tpm_cleanup'
->>
->> This appears to have been introduced in commit c37cacabf228
->> ("tpm: Move tpm_cleanup() to right place").
->>
->> index 0723835bbf..dbfd06d4bc 100644
->> --- a/vl.c
->> +++ b/vl.c
->> @@ -4905,7 +4905,9 @@ int main(int argc, char **argv, char **envp)
->>       res_free();
->>   
->>       /* vhost-user must be cleaned up before chardevs.  */
->> +#ifdef CONFIG_TPM
->>       tpm_cleanup();
->> +#endif
-> Maybe we can define it to an empty macro (or inline function) in
-> the header file instead?
-
-It's solved with a stub in stubs/tpm.c.
-
-   Stefan
-
-
+>> Hi. I'm afraid this fails on various hosts.
 >
-> /mjt
+> Sigh, anything network related in unit tests is soo hard to get right :-(
+> I was hoping the previous fail you saw with this test was all due to the
+> file descriptor leak the first patch fixed, but I guess not....
 >
+>>
+>> arm 32 bit (in a chroot on a 64 bit box):
+>> TEST: tests/test-listen... (pid=319)
+>>   /socket/listen-serial/ipv4:                                          OK
+>>   /socket/listen-serial/ipv6:
+>> ** Failed to assign a port to
+>> thread 0 (errno = 98)
+>> ** Failed to assign a port to thread 1 (errno = 98)
+>> ** Failed to assign a port to thread 2 (errno = 98)
+>> ** Failed to assign a port to thread 3 (errno = 98)
+>> ** Failed to assign a port to thread 4 (errno = 98)
+>> [...repeats all the way up to...]
+>> ** Failed to assign a port to thread 197 (errno = 98)
+>> ** Failed to assign a port to thread 198 (errno = 98)
+>> ** Failed to assign a port to thread 199 (errno = 98)
+>> **
+>> ERROR:/home/peter.maydell/qemu/tests/test-listen.c:195:listen_compete_nthr:
+>> assertion failed (failed_listens == 0): (200 == 0)
+>
+> Hmm, every single thread failed, which suggests some fundamental config in
+> this environment that prevents any use of networking at all from tests.
+>
+> Anything interesting about this build env related to network availability
+> that would prevent use of even localhost ?
+
+You'll notice that the IPV4 test worked fine. I assume this is an
+IPV6 specific problem.
+
+>> Test failure on OpenBSD:
+>>
+>> TEST: tests/test-listen... (pid=9208)
+>>   /socket/listen-serial/ipv4:
+>> ** Failed to assign a port to
+>> thread 124 (errno = 48)
+>> ** Failed to assign a port to thread 125 (errno = 48)
+>> ** Failed to assign a port to thread 126 (errno = 48)
+>> ** Failed to assign a port to thread 127 (errno = 48)
+>> [repeats up to]
+>> ** Failed to assign a port to thread 197 (errno = 48)
+>> ** Failed to assign a port to thread 198 (errno = 48)
+>> ** Failed to assign a port to thread 199 (errno = 48)
+>> **
+>> ERROR:/home/qemu/tests/test-listen.c:195:listen_compete_nthr:
+>> assertion failed (failed_listens == 0): (76 == 0)
+>> FAIL
+>> GTester: last random seed: R02S17d50ab00329e514ffbe630191e76e83
+>> (pid=80652)
+>
+> Only a subset failed, which is more interesting - this is definitely
+> more like the problem seen when FD leaks. Could you mention what the
+> ulimits are for your OpenBSD host - I wondering if it hits max FDs
+> due to having a parallel builds / test run.
+
+# ulimit -a
+time(cpu-seconds)    unlimited
+file(blocks)         unlimited
+coredump(blocks)     unlimited
+data(kbytes)         33554432
+stack(kbytes)        8192
+lockedmem(kbytes)    670784
+memory(kbytes)       2010588
+nofiles(descriptors) 128
+processes            1310
+
+That nofiles limit looks quite close to the number where we
+start failing...
+
+>> Linux x86-64:
+>>
+>> make: Entering directory '/home/petmay01/linaro/qemu-for-merges/build/all'
+>>   GTESTER tests/test-listen
+>> ** Failed to assign a port to thread 0 (errno = 98)
+>> ** Failed to assign a port to thread 1 (errno = 98)
+>> ** Failed to assign a port to thread 2 (errno = 98)
+>> ** Failed to assign a port to thread 3 (errno = 98)
+>> ** Failed to assign a port to thread 4 (errno = 98)
+>> ** Failed to assign a port to thread 5 (errno = 98)
+>> ** Failed to assign a port to thread 6 (errno = 98)
+>> [up to]
+>> ** Failed to assign a port to thread 199 (errno = 98)
+>> **
+>> ERROR:/home/petmay01/linaro/qemu-for-merges/tests/test-listen.c:195:listen_compete_nthr:
+>> assertion failed (failed_listens == 0): (200 == 0)
+>> GTester: last random seed: R02S041a056d256c9ae190cf026f5adfd979
+>> /home/petmay01/linaro/qemu-for-merges/tests/Makefile.include:863:
+>> recipe for target 'check-tests/test-listen' failed
+>
+> Looks same as your arm env, which suggests no network access at all.
+
+This is running native on my primary development machine, so its
+network access is fine :-)
+
+thanks
+-- PMM
