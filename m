@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43241)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44285)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eBg43-00080j-7T
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 06:59:40 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eBg7P-0000kg-Am
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 07:03:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eBg3z-0003Uw-AH
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 06:59:39 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58800)
+	(envelope-from <pbonzini@redhat.com>) id 1eBg7J-0005aB-JW
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 07:03:07 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56940)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1eBg3z-0003U9-4D
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 06:59:35 -0500
-Date: Mon, 6 Nov 2017 19:59:31 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20171106115931.GB3898@lemon>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eBg7J-0005Zt-DS
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 07:03:01 -0500
 References: <CANRm+CxGAiDBDYrtvxXwsPwt2WjiY_biMCVkvQOyAaQtv5v-UQ@mail.gmail.com>
 	<80415da5-4eef-bf85-b617-fadc3dae4475@redhat.com>
 	<CANRm+CwexgKHUVK3b3QYw8ksyaSgZRDiWztOsOvPpMugTQj16w@mail.gmail.com>
 	<e23177c9-36cb-2ad7-18c0-ebf3caaebb52@redhat.com>
+	<20171106115931.GB3898@lemon>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <fb7c5778-238d-ac99-26d6-8a6d9c80a0f4@redhat.com>
+Date: Mon, 6 Nov 2017 13:02:50 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e23177c9-36cb-2ad7-18c0-ebf3caaebb52@redhat.com>
+In-Reply-To: <20171106115931.GB3898@lemon>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] qemu core file size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -29,32 +31,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
+To: Fam Zheng <famz@redhat.com>
 Cc: Wanpeng Li <kernellwp@gmail.com>, Alexey Kardashevskiy <aik@ozlabs.ru>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 
-On Mon, 11/06 11:26, Paolo Bonzini wrote:
-> On 06/11/2017 11:01, Wanpeng Li wrote:
-> > 2017-11-06 17:41 GMT+08:00 Paolo Bonzini <pbonzini@redhat.com>:
-> >> On 06/11/2017 10:11, Wanpeng Li wrote:
-> >>> Hi all,
-> >>>
-> >>> qemu core dump, max_core="unlimited", dump_guest_core=0, kill -11 pid
-> >>> to generate a qemu core file, the Rss of qemu itself is ~40MB, the
-> >>> core file is almost ~40MB in centos 6.x, but ~400MB in cents 7.x, any
-> >>> idea?
-> >>
-> >> My suspicion is the memory API, which isn't used in CentOS 6.x.  QEMU
-> >> 2.11 should fix that.
-> > 
-> > Could you point out the patchset for the fix?
+On 06/11/2017 12:59, Fam Zheng wrote:
+>>> Could you point out the patchset for the fix?
+>> Between 447b0d0b9ee8a0ac216c3186e0f3c427a1001f0c and
+>> 092aa2fc65b7a35121616aad8f39d47b8f921618.
+> Not sure how these relate to the core size, but I've tested upstream
+> (ec7a8bf0b8f7dc7288fe8745464ee8217528cc6c) and with dump-guest-core=off the core
+> file is 363M, still significantly larger than rss (~73M).
 > 
-> Between 447b0d0b9ee8a0ac216c3186e0f3c427a1001f0c and
-> 092aa2fc65b7a35121616aad8f39d47b8f921618.
+> What is bloating the core file?
 
-Not sure how these relate to the core size, but I've tested upstream
-(ec7a8bf0b8f7dc7288fe8745464ee8217528cc6c) and with dump-guest-core=off the core
-file is 363M, still significantly larger than rss (~73M).
+My guess would have been fragmented heap.  The core file, unlike the
+RSS, includes all the mmaped memory (e.g. from shared libraries) that
+has never been used.
 
-What is bloating the core file?
+For example, all the Ceph/Gluster/PulseAudio/SPICE/whatever libraries
+are included in the core file but likely are not in the RSS.
 
-Fam
+Paolo
