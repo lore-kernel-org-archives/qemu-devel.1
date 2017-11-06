@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42229)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42343)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1eBjyd-0000Mu-Pq
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 11:10:25 -0500
+	(envelope-from <Yongbok.Kim@mips.com>) id 1eBjz0-0000e0-Lq
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 11:10:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1eBjyX-0003XJ-As
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 11:10:19 -0500
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:49219)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1eBjyW-0003WD-PW
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 11:10:13 -0500
-Received: by mail-wr0-x242.google.com with SMTP id g90so9093112wrd.6
-	for <qemu-devel@nongnu.org>; Mon, 06 Nov 2017 08:10:12 -0800 (PST)
-References: <1509719814-6191-1-git-send-email-peter.maydell@linaro.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <1509719814-6191-1-git-send-email-peter.maydell@linaro.org>
-Date: Mon, 06 Nov 2017 16:10:10 +0000
-Message-ID: <87375rs80t.fsf@linaro.org>
+	(envelope-from <Yongbok.Kim@mips.com>) id 1eBjyw-0003oz-IU
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 11:10:42 -0500
+Received: from 19pmail.ess.barracuda.com ([64.235.150.244]:37538)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <Yongbok.Kim@mips.com>)
+	id 1eBjyw-0003oe-DI
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 11:10:38 -0500
+From: Yongbok Kim <yongbok.kim@mips.com>
+Date: Mon, 6 Nov 2017 16:07:41 +0000
+Message-ID: <20171106160744.14399-1-yongbok.kim@mips.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH] arm: check regime,
- not current state, for ATS write PAR format
+Subject: [Qemu-devel] [PULL v2 0/3] target-mips queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,59 +25,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, Julien Grall <julien.grall@linaro.org>, Stefano Stabellini <sstabellini@kernel.org>, patches@linaro.org
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>
 
+The following changes since commit d24aaf2a2915424962fb101142f28fa4307f4740=
+:
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+  Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request' i=
+nto staging (2017-11-06 11:24:14 +0000)
 
-> In do_ats_write(), rather than using extended_addresses_enabled() to
-> decide whether the value we get back from get_phys_addr() is a 64-bit
-> format PAR or a 32-bit one, use arm_s1_regime_using_lpae_format().
->
-> This is not really the correct answer, because the PAR format
-> depends on the AT instruction being used, not just on the
-> translation regime. However getting this correct requires a
-> significant refactoring, so that get_phys_addr() returns raw
-> information about the fault which the caller can then assemble
-> into a suitable FSR/PAR/syndrome for its purposes, rather than
-> get_phys_addr() returning a pre-formatted FSR.
->
-> However this change at least improves the situation by making
-> the PAR work correctly for address translation operations done
-> at AArch64 EL2 on the EL2 translation regime. In particular,
-> this is necessary for Xen to be able to run in our emulation,
-> so this seems like a safer interim fix given that we are in freeze.
->
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+are available in the git repository at:
 
-As far as it goes it seems reasonable:
+  git://github.com/yongbok/upstream-qemu.git tags/mips-20171106
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+for you to fetch changes up to 94d973bdaacb69b034f675fc0fd3f285fea17f94:
 
-> ---
-> I guess I should have a go at the "correct answer" I sketch
-> above, but no promises about when I'll get time for that :-(
->
->  target/arm/helper.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index 96113fe..37af750 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -2162,7 +2162,7 @@ static uint64_t do_ats_write(CPUARMState *env, uint=
-64_t value,
->
->      ret =3D get_phys_addr(env, value, access_type, mmu_idx,
->                          &phys_addr, &attrs, &prot, &page_size, &fsr, &fi=
-);
-> -    if (extended_addresses_enabled(env)) {
-> +    if (arm_s1_regime_using_lpae_format(env, mmu_idx)) {
->          /* fsr is a DFSR/IFSR value for the long descriptor
->           * translation table format, but with WnR always clear.
->           * Convert it to a 64-bit PAR.
+  MAINTAINERS: Update Paul Burton's email address (2017-11-06 07:36:43 -080=
+0)
 
+----------------------------------------------------------------
+MIPS patches 2017-11-06
 
---
-Alex Benn=C3=A9e
+Changes:
+Update email addresses of Yongbok Kim, James Hogan and Paul Burton.
+
+----------------------------------------------------------------
+
+James Hogan (1):
+  MAINTAINERS: Update James Hogan's email address
+
+Paul Burton (1):
+  MAINTAINERS: Update Paul Burton's email address
+
+Yongbok Kim (1):
+  MAINTAINERS: Update Yongbok Kim's email address
+
+ .mailmap    |  3 +++
+ MAINTAINERS | 10 +++++-----
+ 2 files changed, 8 insertions(+), 5 deletions(-)
+
+--=20
+2.4.5
