@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33531)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33464)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1eBjdk-0007B3-Dw
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 10:48:45 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1eBjdj-0000Vp-MD
+	(envelope-from <andrew.smirnov@gmail.com>) id 1eBjdi-00078u-Jm
 	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 10:48:44 -0500
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <andrew.smirnov@gmail.com>) id 1eBjdg-0000TP-GS
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 10:48:42 -0500
 From: Andrey Smirnov <andrew.smirnov@gmail.com>
-Date: Mon,  6 Nov 2017 07:47:53 -0800
-Message-Id: <20171106154813.19936-11-andrew.smirnov@gmail.com>
+Date: Mon,  6 Nov 2017 07:47:50 -0800
+Message-Id: <20171106154813.19936-8-andrew.smirnov@gmail.com>
 In-Reply-To: <20171106154813.19936-1-andrew.smirnov@gmail.com>
 References: <20171106154813.19936-1-andrew.smirnov@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 10/30] imx_fec: Reserve full 4K page for the
- register file
+Subject: [Qemu-devel] [PATCH v3 07/30] imx_fec: Add support for multiple Tx
+ DMA rings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,9 +26,8 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org
 Cc: Andrey Smirnov <andrew.smirnov@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, yurovsky@gmail.com
 
-Some i.MX SoCs (e.g. i.MX7) have FEC registers going as far as offset
-0x614, so to avoid getting aborts when accessing those on QEMU, extend
-the register file to cover 4KB of address space instead of just 1K.
+More recent version of the IP block support more than one Tx DMA ring,
+so add the code implementing that feature.
 
 Cc: Peter Maydell <peter.maydell@linaro.org>
 Cc: Jason Wang <jasowang@redhat.com>
@@ -38,21 +37,285 @@ Cc: qemu-arm@nongnu.org
 Cc: yurovsky@gmail.com
 Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
 ---
- hw/net/imx_fec.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/net/imx_fec.c         | 106 ++++++++++++++++++++++++++++++++++++++---------
+ include/hw/net/imx_fec.h |  18 +++++++-
+ 2 files changed, 102 insertions(+), 22 deletions(-)
 
 diff --git a/hw/net/imx_fec.c b/hw/net/imx_fec.c
-index 48d012cad6..e236bc933c 100644
+index 131e7fd734..38d8c27dcd 100644
 --- a/hw/net/imx_fec.c
 +++ b/hw/net/imx_fec.c
-@@ -1252,7 +1252,7 @@ static void imx_eth_realize(DeviceState *dev, Error **errp)
-     SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
+@@ -198,13 +198,13 @@ static const char *imx_eth_reg_name(IMXFECState *s, uint32_t index)
  
-     memory_region_init_io(&s->iomem, OBJECT(dev), &imx_eth_ops, s,
--                          TYPE_IMX_FEC, 0x400);
-+                          TYPE_IMX_FEC, 0x1000);
-     sysbus_init_mmio(sbd, &s->iomem);
-     sysbus_init_irq(sbd, &s->irq[0]);
-     sysbus_init_irq(sbd, &s->irq[1]);
+ static const VMStateDescription vmstate_imx_eth = {
+     .name = TYPE_IMX_FEC,
+-    .version_id = 2,
+-    .minimum_version_id = 2,
++    .version_id = 3,
++    .minimum_version_id = 3,
+     .fields = (VMStateField[]) {
+         VMSTATE_UINT32_ARRAY(regs, IMXFECState, ENET_MAX),
+         VMSTATE_UINT32(rx_descriptor, IMXFECState),
+-        VMSTATE_UINT32(tx_descriptor, IMXFECState),
+-
++        VMSTATE_UINT32_ARRAY(tx_descriptor, IMXFECState, ENET_TX_RING_NUM),
++        VMSTATE_UINT32(tx_ring_num, IMXFECState),
+         VMSTATE_UINT32(phy_status, IMXFECState),
+         VMSTATE_UINT32(phy_control, IMXFECState),
+         VMSTATE_UINT32(phy_advertise, IMXFECState),
+@@ -407,7 +407,7 @@ static void imx_fec_do_tx(IMXFECState *s)
+     int frame_size = 0, descnt = 0;
+     uint8_t frame[ENET_MAX_FRAME_SIZE];
+     uint8_t *ptr = frame;
+-    uint32_t addr = s->tx_descriptor;
++    uint32_t addr = s->tx_descriptor[0];
+ 
+     while (descnt++ < IMX_MAX_DESC) {
+         IMXFECBufDesc bd;
+@@ -448,17 +448,47 @@ static void imx_fec_do_tx(IMXFECState *s)
+         }
+     }
+ 
+-    s->tx_descriptor = addr;
++    s->tx_descriptor[0] = addr;
+ 
+     imx_eth_update(s);
+ }
+ 
+-static void imx_enet_do_tx(IMXFECState *s)
++static void imx_enet_do_tx(IMXFECState *s, uint32_t index)
+ {
+     int frame_size = 0, descnt = 0;
+     uint8_t frame[ENET_MAX_FRAME_SIZE];
+     uint8_t *ptr = frame;
+-    uint32_t addr = s->tx_descriptor;
++    uint32_t addr, int_txb, int_txf, tdsr;
++    size_t ring;
++
++    switch (index) {
++    case ENET_TDAR:
++        ring    = 0;
++        int_txb = ENET_INT_TXB;
++        int_txf = ENET_INT_TXF;
++        tdsr    = ENET_TDSR;
++        break;
++    case ENET_TDAR1:
++        ring    = 1;
++        int_txb = ENET_INT_TXB1;
++        int_txf = ENET_INT_TXF1;
++        tdsr    = ENET_TDSR1;
++        break;
++    case ENET_TDAR2:
++        ring    = 2;
++        int_txb = ENET_INT_TXB2;
++        int_txf = ENET_INT_TXF2;
++        tdsr    = ENET_TDSR2;
++        break;
++    default:
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "%s: bogus value for index %x\n",
++                      __func__, index);
++        abort();
++        break;
++    }
++
++    addr = s->tx_descriptor[ring];
+ 
+     while (descnt++ < IMX_MAX_DESC) {
+         IMXENETBufDesc bd;
+@@ -502,32 +532,32 @@ static void imx_enet_do_tx(IMXFECState *s)
+             ptr = frame;
+             frame_size = 0;
+             if (bd.option & ENET_BD_TX_INT) {
+-                s->regs[ENET_EIR] |= ENET_INT_TXF;
++                s->regs[ENET_EIR] |= int_txf;
+             }
+         }
+         if (bd.option & ENET_BD_TX_INT) {
+-            s->regs[ENET_EIR] |= ENET_INT_TXB;
++            s->regs[ENET_EIR] |= int_txb;
+         }
+         bd.flags &= ~ENET_BD_R;
+         /* Write back the modified descriptor.  */
+         imx_enet_write_bd(&bd, addr);
+         /* Advance to the next descriptor.  */
+         if ((bd.flags & ENET_BD_W) != 0) {
+-            addr = s->regs[ENET_TDSR];
++            addr = s->regs[tdsr];
+         } else {
+             addr += sizeof(bd);
+         }
+     }
+ 
+-    s->tx_descriptor = addr;
++    s->tx_descriptor[ring] = addr;
+ 
+     imx_eth_update(s);
+ }
+ 
+-static void imx_eth_do_tx(IMXFECState *s)
++static void imx_eth_do_tx(IMXFECState *s, uint32_t index)
+ {
+     if (!s->is_fec && (s->regs[ENET_ECR] & ENET_ECR_EN1588)) {
+-        imx_enet_do_tx(s);
++        imx_enet_do_tx(s, index);
+     } else {
+         imx_fec_do_tx(s);
+     }
+@@ -585,7 +615,7 @@ static void imx_eth_reset(DeviceState *d)
+     }
+ 
+     s->rx_descriptor = 0;
+-    s->tx_descriptor = 0;
++    memset(s->tx_descriptor, 0, sizeof(s->tx_descriptor));
+ 
+     /* We also reset the PHY */
+     phy_reset(s);
+@@ -791,6 +821,7 @@ static void imx_eth_write(void *opaque, hwaddr offset, uint64_t value,
+                            unsigned size)
+ {
+     IMXFECState *s = IMX_FEC(opaque);
++    const bool single_tx_ring = s->tx_ring_num != 3;
+     uint32_t index = offset >> 2;
+ 
+     FEC_PRINTF("reg[%s] <= 0x%" PRIx32 "\n", imx_eth_reg_name(s, index),
+@@ -813,10 +844,18 @@ static void imx_eth_write(void *opaque, hwaddr offset, uint64_t value,
+             s->regs[index] = 0;
+         }
+         break;
+-    case ENET_TDAR:
++    case ENET_TDAR1:    /* FALLTHROUGH */
++    case ENET_TDAR2:    /* FALLTHROUGH */
++        if (unlikely(single_tx_ring)) {
++            qemu_log_mask(LOG_GUEST_ERROR,
++                          "[%s]%s: trying to access TDAR2 or TDAR1\n",
++                          TYPE_IMX_FEC, __func__);
++            return;
++        }
++    case ENET_TDAR:     /* FALLTHROUGH */
+         if (s->regs[ENET_ECR] & ENET_ECR_ETHEREN) {
+             s->regs[index] = ENET_TDAR_TDAR;
+-            imx_eth_do_tx(s);
++            imx_eth_do_tx(s, index);
+         }
+         s->regs[index] = 0;
+         break;
+@@ -828,8 +867,12 @@ static void imx_eth_write(void *opaque, hwaddr offset, uint64_t value,
+         if ((s->regs[index] & ENET_ECR_ETHEREN) == 0) {
+             s->regs[ENET_RDAR] = 0;
+             s->rx_descriptor = s->regs[ENET_RDSR];
+-            s->regs[ENET_TDAR] = 0;
+-            s->tx_descriptor = s->regs[ENET_TDSR];
++            s->regs[ENET_TDAR]  = 0;
++            s->regs[ENET_TDAR1] = 0;
++            s->regs[ENET_TDAR2] = 0;
++            s->tx_descriptor[0] = s->regs[ENET_TDSR];
++            s->tx_descriptor[1] = s->regs[ENET_TDSR1];
++            s->tx_descriptor[2] = s->regs[ENET_TDSR2];
+         }
+         break;
+     case ENET_MMFR:
+@@ -907,7 +950,29 @@ static void imx_eth_write(void *opaque, hwaddr offset, uint64_t value,
+         } else {
+             s->regs[index] = value & ~7;
+         }
+-        s->tx_descriptor = s->regs[index];
++        s->tx_descriptor[0] = s->regs[index];
++        break;
++    case ENET_TDSR1:
++        if (unlikely(single_tx_ring)) {
++            qemu_log_mask(LOG_GUEST_ERROR,
++                          "[%s]%s: trying to access TDSR1\n",
++                          TYPE_IMX_FEC, __func__);
++            return;
++        }
++
++        s->regs[index] = value & ~7;
++        s->tx_descriptor[1] = s->regs[index];
++        break;
++    case ENET_TDSR2:
++        if (unlikely(single_tx_ring)) {
++            qemu_log_mask(LOG_GUEST_ERROR,
++                          "[%s]%s: trying to access TDSR2\n",
++                          TYPE_IMX_FEC, __func__);
++            return;
++        }
++
++        s->regs[index] = value & ~7;
++        s->tx_descriptor[2] = s->regs[index];
+         break;
+     case ENET_MRBR:
+         s->regs[index] = value & 0x00003ff0;
+@@ -1203,6 +1268,7 @@ static void imx_eth_realize(DeviceState *dev, Error **errp)
+ 
+ static Property imx_eth_properties[] = {
+     DEFINE_NIC_PROPERTIES(IMXFECState, conf),
++    DEFINE_PROP_UINT32("tx-ring-num", IMXFECState, tx_ring_num, 1),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
+diff --git a/include/hw/net/imx_fec.h b/include/hw/net/imx_fec.h
+index e482d1c13b..3a438127f9 100644
+--- a/include/hw/net/imx_fec.h
++++ b/include/hw/net/imx_fec.h
+@@ -52,6 +52,8 @@
+ #define ENET_TFWR              81
+ #define ENET_FRBR              83
+ #define ENET_FRSR              84
++#define ENET_TDSR1             89
++#define ENET_TDSR2             92
+ #define ENET_RDSR              96
+ #define ENET_TDSR              97
+ #define ENET_MRBR              98
+@@ -66,6 +68,8 @@
+ #define ENET_FTRL              108
+ #define ENET_TACC              112
+ #define ENET_RACC              113
++#define ENET_TDAR1             121
++#define ENET_TDAR2             123
+ #define ENET_MIIGSK_CFGR       192
+ #define ENET_MIIGSK_ENR        194
+ #define ENET_ATCR              256
+@@ -105,13 +109,18 @@
+ #define ENET_INT_WAKEUP        (1 << 17)
+ #define ENET_INT_TS_AVAIL      (1 << 16)
+ #define ENET_INT_TS_TIMER      (1 << 15)
++#define ENET_INT_TXF2          (1 <<  7)
++#define ENET_INT_TXB2          (1 <<  6)
++#define ENET_INT_TXF1          (1 <<  3)
++#define ENET_INT_TXB1          (1 <<  2)
+ 
+ #define ENET_INT_MAC           (ENET_INT_HB | ENET_INT_BABR | ENET_INT_BABT | \
+                                 ENET_INT_GRA | ENET_INT_TXF | ENET_INT_TXB | \
+                                 ENET_INT_RXF | ENET_INT_RXB | ENET_INT_MII | \
+                                 ENET_INT_EBERR | ENET_INT_LC | ENET_INT_RL | \
+                                 ENET_INT_UN | ENET_INT_PLR | ENET_INT_WAKEUP | \
+-                                ENET_INT_TS_AVAIL)
++                                ENET_INT_TS_AVAIL | ENET_INT_TXF1 | \
++                                ENET_INT_TXB1 | ENET_INT_TXF2 | ENET_INT_TXB2)
+ 
+ /* RDAR */
+ #define ENET_RDAR_RDAR         (1 << 24)
+@@ -234,6 +243,9 @@ typedef struct {
+ 
+ #define ENET_BD_BDU            (1 << 31)
+ 
++#define ENET_TX_RING_NUM       3
++
++
+ typedef struct IMXFECState {
+     /*< private >*/
+     SysBusDevice parent_obj;
+@@ -246,7 +258,9 @@ typedef struct IMXFECState {
+ 
+     uint32_t regs[ENET_MAX];
+     uint32_t rx_descriptor;
+-    uint32_t tx_descriptor;
++
++    uint32_t tx_descriptor[ENET_TX_RING_NUM];
++    uint32_t tx_ring_num;
+ 
+     uint32_t phy_status;
+     uint32_t phy_control;
 -- 
 2.13.6
