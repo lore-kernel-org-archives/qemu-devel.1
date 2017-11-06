@@ -1,28 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49980)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54816)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1eBZHU-000488-10
-	for qemu-devel@nongnu.org; Sun, 05 Nov 2017 23:45:05 -0500
+	(envelope-from <bounces@canonical.com>) id 1eBZgY-0007TD-HT
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 00:11:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1eBZHQ-0003TW-UN
-	for qemu-devel@nongnu.org; Sun, 05 Nov 2017 23:45:04 -0500
-Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:46921)
+	(envelope-from <bounces@canonical.com>) id 1eBZgU-0006Fy-Fs
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 00:10:58 -0500
+Received: from indium.canonical.com ([91.189.90.7]:51888)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1eBZHQ-0003TM-La
-	for qemu-devel@nongnu.org; Sun, 05 Nov 2017 23:45:00 -0500
-Received: by mail-pf0-x241.google.com with SMTP id p87so6859126pfj.3
-	for <qemu-devel@nongnu.org>; Sun, 05 Nov 2017 20:45:00 -0800 (PST)
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-References: <20171103153333.6416-1-berrange@redhat.com>
-	<c20a8639-8288-3525-2ebf-76681e2e9243@ozlabs.ru>
-Message-ID: <56688e01-9671-70aa-d10b-21c438222017@ozlabs.ru>
-Date: Mon, 6 Nov 2017 15:44:54 +1100
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eBZgU-0006Fi-5d
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 00:10:54 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eBZgT-0000hA-7e
+	for <qemu-devel@nongnu.org>; Mon, 06 Nov 2017 05:10:53 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 2F8E52E80C7
+	for <qemu-devel@nongnu.org>; Mon,  6 Nov 2017 05:10:53 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <c20a8639-8288-3525-2ebf-76681e2e9243@ozlabs.ru>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-AU
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 0/5] Various improvements/bugfixes to
- submodule handling
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 06 Nov 2017 04:57:13 -0000
+From: "R.Nageswara Sastry" <nasastry@in.ibm.com>
+Reply-To: Bug 1729623 <1729623@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150963549061.4171.11895725981979057755.malonedeb@gac.canonical.com>
+Message-Id: <150994423312.8654.11697877487416250001.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1729623] Re: test-aio-multithread fails with
+ 'Co-routine re-entered recursively'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,127 +37,304 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Eric Blake <eblake@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
 
-On 06/11/17 11:22, Alexey Kardashevskiy wrote:
-> On 04/11/17 02:33, Daniel P. Berrange wrote:
->> This short series of patches improves the reliability of the submodule
->> handling to cope with various dev env scenarios that have since emerged
->>
->>   v2: https://lists.gnu.org/archive/html/qemu-devel/2017-10/msg06272.html
->>
->> Changed in v3:
->>
->>  - Avoid use of mktemp
->>  - Use '=' instead of '==' (bashism) in conditional tests
->>  - Fix problem with short-circuiting for empty submodule list
->>  - Ensure help message is displayed on all errors
->>
->> Daniel P. Berrange (5):
->>   build: allow setting a custom GIT binary for transparent proxying
->>   build: don't create temporary files in source dir
->>   build: allow automatic git submodule updates to be disabled
->>   build: don't fail if given a git submodule which does not exist
->>   build: delay check for empty git submodule list
->>
->>  Makefile                 | 15 ++++++++--
->>  configure                | 12 ++++++++
->>  scripts/git-submodule.sh | 72 ++++++++++++++++++++++++++++++++++++++----------
->>  3 files changed, 83 insertions(+), 16 deletions(-)
-> 
-> 
-> It is getting more complicated.
-> 
-> So, same setup,
-> git checkout v2.10.0
-> ./configure --target-list=ppc64-softmmu
-> make
-> 
-> All good.
-> Then:
-> 
-> git checkout git-submodule (upstream + this patchset)
-> ./configure --target-list=ppc64-softmmu
-> 
-> I see an error and educational page about --disable-git-update, good.
-> ./configure --target-list=ppc64-softmmu --disable-git-update
-> make
-> 
-> Now I get:
-> 
-> GIT submodule checkout is out of date. Please run
->   scripts/git-submodule.sh update ui/keycodemapdb dtc capstone
-> from the source directory checkout /home/aik/p/qemu
-> 
-> Good, as I wanted.
-> I do this on the server:
-> scripts/git-submodule.sh update ui/keycodemapdb dtc capstone
-> 
-> and repeat "make" on the build machine but get the very same error. Then I
-> add "set -x" to scripts/git-submodule.sh and see:
-> 
-> + substat=.git-submodule-status
-> + command=status
-> + shift
-> + maybe_modules=ui/keycodemapdb dtc capstone
-> + test -z git
-> + modules=
-> + git submodule status ui/keycodemapdb
-> + test 0 = 0
-> + modules= ui/keycodemapdb
-> + git submodule status dtc
-> + test 0 = 0
-> + modules= ui/keycodemapdb dtc
-> + git submodule status capstone
-> + test 0 = 0
-> + modules= ui/keycodemapdb dtc capstone
-> + test -n ui/keycodemapdb dtc capstone
-> + test -e .git
-> + test -z ui/keycodemapdb dtc capstone
-> + test -f .git-submodule-status
-> + git submodule status ui/keycodemapdb dtc capstone
-> + CURSTATUS=-22ead3e0bfdb87516656453336160e0a37b066bf capstone
->  558cd81bdd432769b59bff01240c44f82cfb1a9d dtc (v1.4.4)
->  10739aa26051a5d49d88132604539d3ed085e72e ui/keycodemapdb (heads/master)
-> 
-> + cat .git-submodule-status
-> + OLDSTATUS= 558cd81bdd432769b59bff01240c44f82cfb1a9d dtc (v1.4.4)
->  10739aa26051a5d49d88132604539d3ed085e72e ui/keycodemapdb (heads/master)
-> 
-> + test -22ead3e0bfdb87516656453336160e0a37b066bf capstone
->  558cd81bdd432769b59bff01240c44f82cfb1a9d dtc (v1.4.4)
->  10739aa26051a5d49d88132604539d3ed085e72e ui/keycodemapdb (heads/master) =
-> 558cd81bdd432769b59bff01240c44f82cfb1a9d dtc (v1.4.4)
->  10739aa26051a5d49d88132604539d3ed085e72e ui/keycodemapdb (heads/master)
-> 
-> + exit 1
-> 
-> 
-> What is that new module - capstone - about? It is not in the status file:
-> 
-> [vpl1 qemu]$ cat .git-submodule-status
->  558cd81bdd432769b59bff01240c44f82cfb1a9d dtc (v1.4.4)
->  10739aa26051a5d49d88132604539d3ed085e72e ui/keycodemapdb (heads/master)
+I could re-produce using the following command,
 
-Ufff, that was inaccurate me, sorry for the noise. This is a real thing:
+# MALLOC_PERTURB_=3D${MALLOC_PERTURB_:-$(( ${RANDOM:-0} % 255 + 1))} gteste=
+r -k --verbose -m=3Dquick tests/test-aio-multithread
+TEST: tests/test-aio-multithread... (pid=3D116074)
+  /aio/multi/lifecycle:                                                OK
+  /aio/multi/schedule:                                                 Co-r=
+outine re-entered recursively
+FAIL
+GTester: last random seed: R02Seb8ebc3a9c10406e7725cdff556c14e4
+(pid=3D116088)
+  /aio/multi/mutex/contended:                                          OK
+  /aio/multi/mutex/handoff:                                            OK
+  /aio/multi/mutex/mcs:                                                OK
+  /aio/multi/mutex/pthread:                                            OK
+FAIL: tests/test-aio-multithread
+[root@zzfp365-lp1 qemu]# echo $?
+1
+
+No important dmesg messages.
+
+Trying with gdb
+
+When I ran only the test case seeing a segfault.
+[root@zzfp365-lp1 qemu]# tests/test-aio-multithread
+/aio/multi/lifecycle: OK
+/aio/multi/schedule: Segmentation fault
+
+from dmesg:
+test-aio-multit[117118]: unhandled signal 11 at 00007fff88a2fe88 nip 00007f=
+ff8c08ed24 lr 00007fff8c08ebb0 code 30001
+
+from gdb:
+# gdb tests/test-aio-multithread core.117109
+GNU gdb (GDB) Red Hat Enterprise Linux 7.6.1-100.el7
+Copyright (C) 2013 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.htm=
+l>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "ppc64le-redhat-linux-gnu".
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>...
+Reading symbols from /home/nasastry/qemu/tests/test-aio-multithread...done.
+
+warning: core file may not match specified executable file.
+[New LWP 117118]
+[New LWP 117116]
+[New LWP 117109]
+[New LWP 117120]
+[New LWP 117119]
+[New LWP 117117]
+[New LWP 117110]
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib64/libthread_db.so.1".
+Core was generated by `tests/test-aio-multithread '.
+Program terminated with signal 11, Segmentation fault.
+#0  0x00007fff8c08ed24 in __vmx__longjmp () from /lib64/libc.so.6
+warning: File "/home/nasastry/qemu/.gdbinit" auto-loading has been declined=
+ by your `auto-load safe-path' set to "$debugdir:$datadir/auto-load:/usr/bi=
+n/mono-gdb.py:/usr/lib/golang/src/pkg/runtime/runtime-gdb.py".
+To enable execution of this file add
+	add-auto-load-safe-path /home/nasastry/qemu/.gdbinit
+line to your configuration file "/root/.gdbinit".
+To completely disable this security protection add
+	set auto-load safe-path /
+line to your configuration file "/root/.gdbinit".
+For more information about this security protection see the
+"Auto-loading safe path" section in the GDB manual.  E.g., run from the she=
+ll:
+	info "(gdb)Auto-loading safe path"
+Missing separate debuginfos, use: debuginfo-install glib2-2.50.3-3.el7.ppc6=
+4le glibc-2.17-196.el7.ppc64le gmp-6.0.0-15.el7.ppc64le gnutls-3.3.26-9.el7=
+.ppc64le libaio-0.3.109-13.el7.ppc64le libcap-ng-0.7.5-4.el7.ppc64le libffi=
+-3.0.13-18.el7.ppc64le libgcrypt-1.5.3-14.el7.ppc64le libgpg-error-1.12-3.e=
+l7.ppc64le libtasn1-4.10-1.el7.ppc64le nettle-2.7.1-8.el7.ppc64le p11-kit-0=
+.23.5-3.el7.ppc64le pcre-8.32-17.el7.ppc64le zlib-1.2.7-17.el7.ppc64le
+(gdb) bt
+#0  0x00007fff8c08ed24 in __vmx__longjmp () from /lib64/libc.so.6
+#1  0x00007fff8c08ebb0 in siglongjmp@@GLIBC_2.17 () from /lib64/libc.so.6
+Cannot access memory at address 0x7fff88a2feb0
+(gdb) bt full
+#0  0x00007fff8c08ed24 in __vmx__longjmp () from /lib64/libc.so.6
+No symbol table info available.
+#1  0x00007fff8c08ebb0 in siglongjmp@@GLIBC_2.17 () from /lib64/libc.so.6
+No symbol table info available.
+(gdb) thread apply all bt
+
+Thread 7 (Thread 0x7fff8bc4edc0 (LWP 117110)):
+#0  0x00007fff8c16cdd4 in syscall () from /lib64/libc.so.6
+#1  0x00000001121f2868 in qemu_futex_wait (f=3D0x11273d74c <rcu_call_ready_=
+event>, val=3D4294967295) at /home/nasastry/qemu/include/qemu/futex.h:29
+#2  0x00000001121f2e60 in qemu_event_wait (ev=3D0x11273d74c <rcu_call_ready=
+_event>) at util/qemu-thread-posix.c:442
+#3  0x0000000112229a98 in call_rcu_thread (opaque=3D0x0) at util/rcu.c:249
+#4  0x00007fff8c248af4 in start_thread () from /lib64/libpthread.so.0
+#5  0x00007fff8c174ef4 in clone () from /lib64/libc.so.6
+
+Thread 6 (Thread 0x7fff89c4edc0 (LWP 117117)):
+#0  0x00007fff8c1644b0 in ppoll () from /lib64/libc.so.6
+#1  0x00000001121e3414 in qemu_poll_ns (fds=3D0x7fff7400a850, nfds=3D1, tim=
+eout=3D-1) at util/qemu-timer.c:322
+#2  0x00000001121eb5f8 in aio_poll (ctx=3D0x7fff740008c0, blocking=3Dtrue) =
+at util/aio-posix.c:629
+#3  0x000000011210efa0 in iothread_run (opaque=3D0x125335600) at tests/ioth=
+read.c:51
+#4  0x00007fff8c248af4 in start_thread () from /lib64/libpthread.so.0
+#5  0x00007fff8c174ef4 in clone () from /lib64/libc.so.6
+
+Thread 5 (Thread 0x7fff8ac4edc0 (LWP 117119)):
+#0  0x00000001121f01a0 in qemu_free_stack (stack=3D0x7fff88810000, sz=3D111=
+4112) at util/oslib-posix.c:574
+#1  0x000000011222f738 in qemu_coroutine_delete (co_=3D0x125336e30) at util=
+/coroutine-ucontext.c:153
+#2  0x000000011222b04c in coroutine_delete (co=3D0x125336e30) at util/qemu-=
+coroutine.c:102
+#3  0x000000011222b310 in qemu_aio_coroutine_enter (ctx=3D0x7fff7c0008c0, c=
+o=3D0x125336e30) at util/qemu-coroutine.c:140
+#4  0x000000011222b3ec in qemu_coroutine_enter (co=3D0x125336e30) at util/q=
+emu-coroutine.c:149
+#5  0x00000001121df09c in co_schedule_bh_cb (opaque=3D0x7fff7c0008c0) at ut=
+il/async.c:391
+#6  0x00000001121dd7c8 in aio_bh_call (bh=3D0x7fff7c008400) at util/async.c=
+:90
+#7  0x00000001121dd990 in aio_bh_poll (ctx=3D0x7fff7c0008c0) at util/async.=
+c:118
+#8  0x00000001121eba60 in aio_poll (ctx=3D0x7fff7c0008c0, blocking=3Dtrue) =
+at util/aio-posix.c:689
+#9  0x000000011210efa0 in iothread_run (opaque=3D0x125335c00) at tests/ioth=
+read.c:51
+#10 0x00007fff8c248af4 in start_thread () from /lib64/libpthread.so.0
+#11 0x00007fff8c174ef4 in clone () from /lib64/libc.so.6
+
+Thread 4 (Thread 0x7fff8b44edc0 (LWP 117120)):
+#0  0x00000001121f01e0 in qemu_free_stack (stack=3D0x7fff88700000, sz=3D111=
+4112) at util/oslib-posix.c:573
+#1  0x000000011222f738 in qemu_coroutine_delete (co_=3D0x125337130) at util=
+/coroutine-ucontext.c:153
+#2  0x000000011222b04c in coroutine_delete (co=3D0x125337130) at util/qemu-=
+coroutine.c:102
+#3  0x000000011222b310 in qemu_aio_coroutine_enter (ctx=3D0x7fff840008c0, c=
+o=3D0x125337130) at util/qemu-coroutine.c:140
+#4  0x000000011222b3ec in qemu_coroutine_enter (co=3D0x125337130) at util/q=
+emu-coroutine.c:149
+#5  0x00000001121df09c in co_schedule_bh_cb (opaque=3D0x7fff840008c0) at ut=
+il/async.c:391
+#6  0x00000001121dd7c8 in aio_bh_call (bh=3D0x7fff84008400) at util/async.c=
+:90
+#7  0x00000001121dd990 in aio_bh_poll (ctx=3D0x7fff840008c0) at util/async.=
+c:118
+#8  0x00000001121eba60 in aio_poll (ctx=3D0x7fff840008c0, blocking=3Dtrue) =
+at util/aio-posix.c:689
+#9  0x000000011210efa0 in iothread_run (opaque=3D0x125335f00) at tests/ioth=
+read.c:51
+#10 0x00007fff8c248af4 in start_thread () from /lib64/libpthread.so.0
+#11 0x00007fff8c174ef4 in clone () from /lib64/libc.so.6
+
+Thread 3 (Thread 0x7fff8cb4b8b0 (LWP 117109)):
+#0  0x00007fff8c24a074 in pthread_join () from /lib64/libpthread.so.0
+#1  0x00000001121f3898 in qemu_thread_join (thread=3D0x125336208) at util/q=
+emu-thread-posix.c:547
+#2  0x000000011210f0ac in iothread_join (iothread=3D0x125336200) at tests/i=
+othread.c:62
+#3  0x0000000111f5a408 in join_aio_contexts () at tests/test-aio-multithrea=
+d.c:93
+#4  0x0000000111f5adc0 in test_multi_co_schedule (seconds=3D1) at tests/tes=
+t-aio-multithread.c:183
+#5  0x0000000111f5aee8 in test_multi_co_schedule_1 () at tests/test-aio-mul=
+tithread.c:191
+#6  0x00007fff8c94a3d4 in g_test_run_suite_internal () from /lib64/libglib-=
+2.0.so.0
+#7  0x00007fff8c94a1a8 in g_test_run_suite_internal () from /lib64/libglib-=
+2.0.so.0
+#8  0x00007fff8c94a1a8 in g_test_run_suite_internal () from /lib64/libglib-=
+2.0.so.0
+#9  0x00007fff8c94a788 in g_test_run_suite () from /lib64/libglib-2.0.so.0
+#10 0x00007fff8c94a7c0 in g_test_run () from /lib64/libglib-2.0.so.0
+#11 0x0000000111f5ceb0 in main (argc=3D1, argv=3D0x7ffff82b45a8) at tests/t=
+est-aio-multithread.c:462
+
+Thread 2 (Thread 0x7fff8944edc0 (LWP 117116)):
+#0  0x00007fff8c977bb8 in g_mutex_lock () from /lib64/libglib-2.0.so.0
+#1  0x00007fff8c93c090 in private_thread_memory_cleanup () from /lib64/libg=
+lib-2.0.so.0
+#2  0x00007fff8c248924 in __nptl_deallocate_tsd () from /lib64/libpthread.s=
+o.0
+#3  0x00007fff8c248b00 in start_thread () from /lib64/libpthread.so.0
+#4  0x00007fff8c174ef4 in clone () from /lib64/libc.so.6
+
+Thread 1 (Thread 0x7fff8a44edc0 (LWP 117118)):
+#0  0x00007fff8c08ed24 in __vmx__longjmp () from /lib64/libc.so.6
+---Type <return> to continue, or q <return> to quit---
+#1  0x00007fff8c08ebb0 in siglongjmp@@GLIBC_2.17 () from /lib64/libc.so.6
+Cannot access memory at address 0x7fff88a2feb0
 
 
-[vpl1 qemu]$ git submodule status capstone
- 22ead3e0bfdb87516656453336160e0a37b066bf capstone (3.0.5-rc3-14-g22ead3e0)
-[vpl1 qemu]$ ssh garrison2 git -C p/qemu submodule status capstone
- 22ead3e0bfdb87516656453336160e0a37b066bf capstone (3.0.5-rc3-14-g22ead3e)
+So the following thread crashed with segfault: As the core file extension m=
+atching with this thread  -- core.117109
+
+Thread 3 (Thread 0x7fff8cb4b8b0 (LWP 117109)):
+#0  0x00007fff8c24a074 in pthread_join () from /lib64/libpthread.so.0
+#1  0x00000001121f3898 in qemu_thread_join (thread=3D0x125336208) at util/q=
+emu-thread-posix.c:547
+#2  0x000000011210f0ac in iothread_join (iothread=3D0x125336200) at tests/i=
+othread.c:62
+#3  0x0000000111f5a408 in join_aio_contexts () at tests/test-aio-multithrea=
+d.c:93
+#4  0x0000000111f5adc0 in test_multi_co_schedule (seconds=3D1) at tests/tes=
+t-aio-multithread.c:183
+#5  0x0000000111f5aee8 in test_multi_co_schedule_1 () at tests/test-aio-mul=
+tithread.c:191
+#6  0x00007fff8c94a3d4 in g_test_run_suite_internal () from /lib64/libglib-=
+2.0.so.0
+#7  0x00007fff8c94a1a8 in g_test_run_suite_internal () from /lib64/libglib-=
+2.0.so.0
+#8  0x00007fff8c94a1a8 in g_test_run_suite_internal () from /lib64/libglib-=
+2.0.so.0
+#9  0x00007fff8c94a788 in g_test_run_suite () from /lib64/libglib-2.0.so.0
+#10 0x00007fff8c94a7c0 in g_test_run () from /lib64/libglib-2.0.so.0
+#11 0x0000000111f5ceb0 in main (argc=3D1, argv=3D0x7ffff82b45a8) at tests/t=
+est-aio-multithread.c:462
 
 
-So now I have to add this to .gitconfig on all build machines:
+But can't run:
+gdb --args MALLOC_PERTURB_=3D${MALLOC_PERTURB_:-$(( ${RANDOM:-0} % 255 + 1)=
+)} gtester -k --verbose -m=3Dquick tests/test-aio-multithread
+...
+gdb) r
+Starting program:  gtester -k --verbose -m=3Dquick tests/test-aio-multithre=
+ad
+No executable file specified.
+Use the "file" or "exec-file" command.
 
-[core]
-        abbrev=10
+-- =
 
-as "git submodule status" simply calls "git describe" which does not take
-"--abbrev". Well, ok :(
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1729623
 
+Title:
+  test-aio-multithread fails with 'Co-routine re-entered recursively'
 
+Status in QEMU:
+  New
 
--- 
-Alexey
+Bug description:
+  git head is at fa73e146250181852c0915aa65df8d54d35485fa
+
+  configure with the following
+
+  ./configure --enable-attr --enable-bsd-user --enable-cap-ng\
+   --enable-coroutine-pool  --enable-crypto-afalg --enable-curl\
+   --enable-curses --enable-debug --enable-debug-info\
+   --enable-debug-tcg      --enable-fdt      --enable-gcrypt \
+   --enable-gnutls      --enable-gprof      --enable-gtk  \
+   --enable-guest-agent      --enable-kvm      --enable-libiscsi \
+   --enable-libssh2      --enable-linux-aio      --enable-linux-user \
+   --enable-live-block-migration      --enable-modules   \
+   --enable-numa      --enable-pie      --enable-profiler \
+   --enable-qom-cast-debug      --enable-rbd      --enable-replication  \
+   --enable-seccomp      --enable-smartcard      --enable-stack-protector \
+   --enable-system      --enable-tcg      --enable-tcg-interpreter  \
+   --enable-tools      --enable-tpm      --enable-trace-backend=3Dftrace \
+   --enable-user      --enable-vhost-net      --enable-vhost-scsi  \
+   --enable-vhost-user      --enable-vhost-vsock      --enable-virtfs  \ =
+
+   --enable-vnc      --enable-tpm      --enable-vnc-png   \
+   --enable-vnc-sasl      --enable-werror      --enable-xfsctl \
+   --enable-gcov --enable-debug-stack-usage
+
+  make -j 32
+
+  make test-aio-multithread V=3D1
+
+  ...
+  File '/home/nasastry/qemu/include/qapi/qmp/qobject.h'
+  No executable lines
+
+  MALLOC_PERTURB_=3D${MALLOC_PERTURB_:-$(( ${RANDOM:-0} % 255 + 1))} gteste=
+r -k --verbose -m=3Dquick tests/test-aio-multithread
+  TEST: tests/test-aio-multithread... (pid=3D86877)
+    /aio/multi/lifecycle:                                                OK
+    /aio/multi/schedule:                                                 Co=
+-routine re-entered recursively
+  FAIL
+  GTester: last random seed: R02S681209ce87fc22715b41223212d9f6f0
+  (pid=3D86891)
+    /aio/multi/mutex/contended:                                          OK
+    /aio/multi/mutex/handoff:                                            OK
+    /aio/multi/mutex/mcs:                                                OK
+    /aio/multi/mutex/pthread:                                            OK
+  FAIL: tests/test-aio-multithread
+  make: *** [check-tests/test-aio-multithread] Error 1
+
+  Full log will be attached.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1729623/+subscriptions
