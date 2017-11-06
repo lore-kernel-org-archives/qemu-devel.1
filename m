@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43611)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44124)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <darren.kenny@oracle.com>) id 1eBhXN-000804-EO
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 08:34:02 -0500
+	(envelope-from <groug@kaod.org>) id 1eBhYW-0008Uv-97
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 08:35:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <darren.kenny@oracle.com>) id 1eBhXK-0007TK-4Y
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 08:34:01 -0500
-Received: from aserp1040.oracle.com ([141.146.126.69]:29033)
+	(envelope-from <groug@kaod.org>) id 1eBhYT-0008Oz-6c
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 08:35:12 -0500
+Received: from 6.mo179.mail-out.ovh.net ([46.105.56.76]:46063)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <darren.kenny@oracle.com>)
-	id 1eBhXJ-0007Rq-Te
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 08:33:58 -0500
-Date: Mon, 6 Nov 2017 13:33:49 +0000
-From: Darren Kenny <darren.kenny@oracle.com>
-Message-ID: <20171106133349.3ddquhwe72axdtjl@starbug-vm.ie.oracle.com>
-References: <20171106132805.19986-1-jfreimann@redhat.com>
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1eBhYT-0008OB-0a
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 08:35:09 -0500
+Received: from player690.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo179.mail-out.ovh.net (Postfix) with ESMTP id 028126195E
+	for <qemu-devel@nongnu.org>; Mon,  6 Nov 2017 14:35:03 +0100 (CET)
+Date: Mon, 6 Nov 2017 14:34:57 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20171106143457.63bf47f2@bahia>
+In-Reply-To: <20170929111323.6308-2-michael@fritscher.net>
+References: <20170929111323.6308-1-michael@fritscher.net>
+	<20170929111323.6308-2-michael@fritscher.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20171106132805.19986-1-jfreimann@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] net/socket: fix coverity issue
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 01/18] Add definitions needed by
+ file-op-9p.h for Windows
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,59 +31,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jens Freimann <jfreimann@redhat.com>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, jasowang@redhat.com
+To: Michael Fritscher <michael@fritscher.net>
+Cc: sw@weilnetz.de, aneesh.kumar@linux.vnet.ibm.com, mst@redhat.com, qemu-devel@nongnu.org, Greg Kurz <gkurz@linux.vnet.ibm.com>
 
-Hi Jan,
+On Fri, 29 Sep 2017 13:13:06 +0200
+Michael Fritscher <michael@fritscher.net> wrote:
 
-On Mon, Nov 06, 2017 at 02:28:05PM +0100, Jens Freimann wrote:
->This fixes coverity issue CID1005339.
->
->Make sure that saddr is not used uninitialized if the
->mcast parameter is NULL.
->
->Cc: qemu-stable@nongnu.org
->Reported-by: Peter Maydell <peter.maydell@linaro.org>
->Signed-off-by: Jens Freimann <jfreimann@redhat.com>
->---
-> net/socket.c | 4 ++--
-> 1 file changed, 2 insertions(+), 2 deletions(-)
->
->diff --git a/net/socket.c b/net/socket.c
->index e6b471c63d..51eaea67a0 100644
->--- a/net/socket.c
->+++ b/net/socket.c
->@@ -332,7 +332,7 @@ static NetSocketState *net_socket_fd_init_dgram(NetClientState *peer,
->                                                 const char *mcast,
->                                                 Error **errp)
-> {
->-    struct sockaddr_in saddr;
->+    struct sockaddr_in saddr = { 0 };
+> Signed-off-by: Michael Fritscher <michael@fritscher.net>
+> ---
+>  include/sysemu/os-win32.h | 26 ++++++++++++++++++++++++++
+>  1 file changed, 26 insertions(+)
+> 
+> diff --git a/include/sysemu/os-win32.h b/include/sysemu/os-win32.h
+> index ff18b23db1..15cc94513b 100644
+> --- a/include/sysemu/os-win32.h
+> +++ b/include/sysemu/os-win32.h
+> @@ -196,4 +196,30 @@ ssize_t qemu_recv_wrap(int sockfd, void *buf, size_t len, int flags);
+>  ssize_t qemu_recvfrom_wrap(int sockfd, void *buf, size_t len, int flags,
+>                             struct sockaddr *addr, socklen_t *addrlen);
+> 
+> +typedef uint32_t uid_t;
+> +typedef uint32_t gid_t;
+> +
+> +/* from http://man7.org/linux/man-pages/man2/statfs.2.html */
+> +typedef uint32_t __fsword_t;
+> +typedef uint32_t fsblkcnt_t;
+> +typedef uint32_t fsfilcnt_t;
+> +
+> +/* from linux/include/uapi/asm-generic/posix_types.h */
+> +typedef struct {
+> +    long __val[2];
+> +} fsid_t;
+> +
+> +struct statfs {
+> +    __fsword_t f_type;
+> +    __fsword_t f_bsize;
+> +    fsblkcnt_t f_blocks;
+> +    fsblkcnt_t f_bfree;
+> +    fsblkcnt_t f_bavail;
+> +    fsfilcnt_t f_files;
+> +    fsfilcnt_t f_ffree;
+> +    fsid_t f_fsid;
+> +    __fsword_t f_namelen;
+> +    __fsword_t f_frsize;
+> +    __fsword_t f_flags;
+> +};
+>  #endif
 
-Based on:
-
-   https://lists.gnu.org/archive/html/qemu-devel/2017-10/msg04946.html
-
-It would appear that the use of {} to initialize the struct is
-preferred over {0}.
-
-Thanks,
-
-Darren.
-
->     int newfd;
->     NetClientState *nc;
->     NetSocketState *s;
->@@ -373,7 +373,7 @@ static NetSocketState *net_socket_fd_init_dgram(NetClientState *peer,
->     net_socket_read_poll(s, true);
->
->     /* mcast: save bound address as dst */
->-    if (is_connected) {
->+    if (is_connected && mcast != NULL) {
->         s->dgram_dst = saddr;
->         snprintf(nc->info_str, sizeof(nc->info_str),
->                  "socket: fd=%d (cloned mcast=%s:%d)",
->-- 
->2.13.6
->
->
+Since this statfs definition is likely to be only ever used by fsdev, I'm
+wondering if all the related typedefs would better sit in fsdev/file-op-9p.h
+directly (ie, move the lines to a #else block in the next patch).
