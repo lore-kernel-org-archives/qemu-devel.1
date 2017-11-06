@@ -1,39 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47746)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49292)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1eBmbM-0006Iy-J8
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 13:58:29 -0500
+	(envelope-from <stefanha@redhat.com>) id 1eBmfS-0001Ii-Pc
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 14:02:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1eBmbI-00070a-MK
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 13:58:28 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:59482)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1eBmbI-0006zo-DL
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 13:58:24 -0500
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vA6Ivd7E090490
-	for <qemu-devel@nongnu.org>; Mon, 6 Nov 2017 13:58:16 -0500
-Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2e2ue8y454-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 06 Nov 2017 13:58:15 -0500
-Received: from localhost
-	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Mon, 6 Nov 2017 13:58:14 -0500
-References: <20171106183925.16747-1-marcandre.lureau@redhat.com>
-	<20171106183925.16747-3-marcandre.lureau@redhat.com>
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Mon, 6 Nov 2017 13:58:12 -0500
-MIME-Version: 1.0
-In-Reply-To: <20171106183925.16747-3-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Message-Id: <fe8b09e1-eb10-c151-f951-4e030998d5cc@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 02/28] tpm: move TpmIf in
- include/sysemu/tpm.h
+	(envelope-from <stefanha@redhat.com>) id 1eBmfO-0000BW-Sm
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 14:02:42 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48624)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eBmfO-0000Au-Mp
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 14:02:38 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7D2637F7A2
+	for <qemu-devel@nongnu.org>; Mon,  6 Nov 2017 19:02:37 +0000 (UTC)
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Date: Mon,  6 Nov 2017 19:02:33 +0000
+Message-Id: <20171106190233.1175-1-stefanha@redhat.com>
+Subject: [Qemu-devel] [PATCH for-2.11] tests-aio-multithread: fix
+ /aio/multi/schedule race condition
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,97 +28,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: amarnath.valluri@intel.com
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On 11/06/2017 01:38 PM, Marc-Andr=C3=A9 Lureau wrote:
-> This is a better location than hw/tpm, since we are going to use the
-> interface from outside hw/tpm.
->
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+test_multi_co_schedule_entry() set to_schedule[id] in the final loop
+iteration before terminating the coroutine.  There is a race condition
+where the main thread attempts to enter the terminating or terminated
+coroutine when signalling coroutines to stop:
 
-Reviewed-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+  atomic_mb_set(&now_stopping, true);
+  for (i = 0; i < NUM_CONTEXTS; i++) {
+      ctx_run(i, finish_cb, NULL);  <--- enters dead coroutine!
+      to_schedule[i] = NULL;
+  }
 
-> ---
->   hw/tpm/tpm_int.h     | 22 +---------------------
->   include/sysemu/tpm.h | 19 +++++++++++++++++++
->   backends/tpm.c       |  1 -
->   3 files changed, 20 insertions(+), 22 deletions(-)
->
-> diff --git a/hw/tpm/tpm_int.h b/hw/tpm/tpm_int.h
-> index 9c045b6691..1df5883f3c 100644
-> --- a/hw/tpm/tpm_int.h
-> +++ b/hw/tpm/tpm_int.h
-> @@ -13,28 +13,8 @@
->   #define TPM_TPM_INT_H
->
->   #include "qemu/osdep.h"
-> -#include "qom/object.h"
->
-> -#define TYPE_TPM_IF "tpm-if"
-> -#define TPM_IF_CLASS(klass) \
-> -    OBJECT_CLASS_CHECK(TPMIfClass, (klass), TYPE_TPM_IF)
-> -#define TPM_IF_GET_CLASS(obj) \
-> -    OBJECT_GET_CLASS(TPMIfClass, (obj), TYPE_TPM_IF)
-> -#define TPM_IF(obj) \
-> -    INTERFACE_CHECK(TPMIf, (obj), TYPE_TPM_IF)
-> -
-> -typedef struct TPMIf {
-> -    Object parent_obj;
-> -} TPMIf;
-> -
-> -typedef struct TPMIfClass {
-> -    InterfaceClass parent_class;
-> -
-> -    /* run in thread pool by backend */
-> -    void (*request_completed)(TPMIf *obj);
-> -} TPMIfClass;
-> -
-> -#define TPM_STANDARD_CMDLINE_OPTS               \
-> +#define TPM_STANDARD_CMDLINE_OPTS \
->       { \
->           .name =3D "type", \
->           .type =3D QEMU_OPT_STRING, \
-> diff --git a/include/sysemu/tpm.h b/include/sysemu/tpm.h
-> index d7a2bd8556..452cdb9cb7 100644
-> --- a/include/sysemu/tpm.h
-> +++ b/include/sysemu/tpm.h
-> @@ -27,6 +27,25 @@ typedef enum  TPMVersion {
->       TPM_VERSION_2_0 =3D 2,
->   } TPMVersion;
->
-> +#define TYPE_TPM_IF "tpm-if"
-> +#define TPM_IF_CLASS(klass)                                 \
-> +    OBJECT_CLASS_CHECK(TPMIfClass, (klass), TYPE_TPM_IF)
-> +#define TPM_IF_GET_CLASS(obj)                           \
-> +    OBJECT_GET_CLASS(TPMIfClass, (obj), TYPE_TPM_IF)
-> +#define TPM_IF(obj)                             \
-> +    INTERFACE_CHECK(TPMIf, (obj), TYPE_TPM_IF)
-> +
-> +typedef struct TPMIf {
-> +    Object parent_obj;
-> +} TPMIf;
-> +
-> +typedef struct TPMIfClass {
-> +    InterfaceClass parent_class;
-> +
-> +    /* run in thread pool by backend */
-> +    void (*request_completed)(TPMIf *obj);
-> +} TPMIfClass;
-> +
->   TPMVersion tpm_tis_get_tpm_version(Object *obj);
->
->   #define TYPE_TPM_TIS                "tpm-tis"
-> diff --git a/backends/tpm.c b/backends/tpm.c
-> index 5763f6f369..1e416d7f90 100644
-> --- a/backends/tpm.c
-> +++ b/backends/tpm.c
-> @@ -17,7 +17,6 @@
->   #include "qapi/error.h"
->   #include "qapi/qmp/qerror.h"
->   #include "sysemu/tpm.h"
-> -#include "hw/tpm/tpm_int.h"
->   #include "qemu/thread.h"
->
->   static void tpm_backend_worker_thread(gpointer data, gpointer user_da=
-ta)
+Make sure only to set to_schedule[id] if this coroutine really needs to
+be scheduled!
+
+Reported-by: "R.Nageswara Sastry" <nasastry@in.ibm.com>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+This patch is appropriate for the QEMU 2.11 release to eliminate
+spurious test failures.
+
+ tests/test-aio-multithread.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/tests/test-aio-multithread.c b/tests/test-aio-multithread.c
+index 549d784915..d396185972 100644
+--- a/tests/test-aio-multithread.c
++++ b/tests/test-aio-multithread.c
+@@ -144,17 +144,16 @@ static void finish_cb(void *opaque)
+ static coroutine_fn void test_multi_co_schedule_entry(void *opaque)
+ {
+     g_assert(to_schedule[id] == NULL);
+-    atomic_mb_set(&to_schedule[id], qemu_coroutine_self());
+ 
+     while (!atomic_mb_read(&now_stopping)) {
+         int n;
+ 
+         n = g_test_rand_int_range(0, NUM_CONTEXTS);
+         schedule_next(n);
++
++        atomic_mb_set(&to_schedule[id], qemu_coroutine_self());
+         qemu_coroutine_yield();
+-
+         g_assert(to_schedule[id] == NULL);
+-        atomic_mb_set(&to_schedule[id], qemu_coroutine_self());
+     }
+ }
+ 
+-- 
+2.13.6
