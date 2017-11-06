@@ -1,28 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37148)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40753)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eBiVs-0004ii-1A
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 09:36:33 -0500
+	(envelope-from <bounces@canonical.com>) id 1eBifY-00008w-08
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 09:46:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eBiVm-0006BY-EJ
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 09:36:32 -0500
-Received: from mail-wr0-f196.google.com ([209.85.128.196]:48544)
+	(envelope-from <bounces@canonical.com>) id 1eBifT-0002f3-3Q
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 09:46:32 -0500
+Received: from indium.canonical.com ([91.189.90.7]:47984)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eBiVm-0006B9-8S
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 09:36:26 -0500
-Received: by mail-wr0-f196.google.com with SMTP id 15so8799777wrb.5
-	for <qemu-devel@nongnu.org>; Mon, 06 Nov 2017 06:36:26 -0800 (PST)
-References: <20170929111323.6308-1-michael@fritscher.net>
-	<20170929111323.6308-16-michael@fritscher.net>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <d86b8115-9512-d487-a508-906c5f259764@redhat.com>
-Date: Mon, 6 Nov 2017 15:36:22 +0100
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eBifS-0002eK-TU
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 09:46:27 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eBifQ-0000WM-72
+	for <qemu-devel@nongnu.org>; Mon, 06 Nov 2017 14:46:24 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 1D0102E80DB
+	for <qemu-devel@nongnu.org>; Mon,  6 Nov 2017 14:46:20 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20170929111323.6308-16-michael@fritscher.net>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 15/18] Fix unavailable fields in stbuf
- under Windows.
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 06 Nov 2017 14:35:25 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Reply-To: Bug 1216845 <1216845@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20130826101205.25802.19011.malonedeb@soybean.canonical.com>
+Message-Id: <150997892555.20053.10758617713462098853.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1216845] Re: qemu-system-arm semihosting always
+ calls exit(0)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,48 +37,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Fritscher <michael@fritscher.net>, gkurz@linux.vnet.ibm.com, sw@weilnetz.de, aneesh.kumar@linux.vnet.ibm.com, mst@redhat.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-On 29/09/2017 13:13, Michael Fritscher wrote:
-> @@ -886,14 +886,34 @@ static void stat_to_v9stat_dotl(V9fsState *s, const struct stat *stbuf,
->      v9lstat->st_gid = stbuf->st_gid;
->      v9lstat->st_rdev = stbuf->st_rdev;
->      v9lstat->st_size = stbuf->st_size;
-> +#ifdef _WIN32
-> +    /* Blksize is the optimal EA-block,
-> +       while blocks always refers to 512 byte blocks
-> +    */
-> +    v9lstat->st_blksize = 4096;
-> +    v9lstat->st_blocks = ((stbuf->st_size + 1) / 512) + 1;
-> +#else
->      v9lstat->st_blksize = stbuf->st_blksize;
->      v9lstat->st_blocks = stbuf->st_blocks;
-> +#endif
->      v9lstat->st_atime_sec = stbuf->st_atime;
-> +#ifdef _WIN32
-> +    v9lstat->st_atime_nsec = 0;
-> +#else
->      v9lstat->st_atime_nsec = stbuf->st_atim.tv_nsec;
-> +#endif
->      v9lstat->st_mtime_sec = stbuf->st_mtime;
-> +#ifdef _WIN32
-> +    v9lstat->st_mtime_nsec = 0;
-> +#else
->      v9lstat->st_mtime_nsec = stbuf->st_mtim.tv_nsec;
-> +#endif
->      v9lstat->st_ctime_sec = stbuf->st_ctime;
-> +#ifdef _WIN32
-> +    v9lstat->st_ctime_nsec = 0;
-> +#else
->      v9lstat->st_ctime_nsec = stbuf->st_ctim.tv_nsec;
-> +#endif
->      /* Currently we only support BASIC fields in stat */
->      v9lstat->st_result_mask = P9_STATS_BASIC;
->  
+With the new 2.0 ARM semihosting ABI, there is an optional extension
+SYS_EXIT_EXTENDED which can be used to implement returning a non-zero
+exit code for 32-bit ARM programs:
 
-Likewise, I think it should be struct FileOperations's lstat member that
-uses struct V9fsStatDotl instead of struct stat.  Then
-stat_to_v9stat_dotl would be hidden inside 9p-local.c (and 9p-local.c
-isn't going to be used by Windows at all, so this patch disappears).
+https://developer.arm.com/docs/100863/latest/semihosting-operations
+/sys_exit_extended-0x20#sh-ext-exit-extended
 
-Paolo
+QEMU should implement this.
+
+
+** Changed in: qemu
+       Status: New =3D> Confirmed
+
+** Tags added: arm
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1216845
+
+Title:
+  qemu-system-arm semihosting always calls exit(0)
+
+Status in QEMU:
+  Confirmed
+
+Bug description:
+  In my embedded ARM project I have a bunch of unit tests that I run in
+  a POSIX synthetic environment, and, as usual for POSIX processes,
+  these tests return 0 for success and !=3D0 for error.
+
+  Now I expanded the testing environment to run some of these tests
+  compiled for ARM, under QEMU, with the tracing messages forwarded via
+  the semihosting API.
+
+  Up to now everything is fine with the emulation.
+
+  However I have a problem with passing the failure code back to the
+  operating system, to drive the continuous integration framework.
+
+  I checked the arm-semi.c code and for SYS_EXIT and I discovered that
+  the parameter passed is ignored and it always calls exit(0):
+
+      case SYS_EXIT:
+          gdb_exit(env, 0);
+          exit(0);
+
+  To solve my problem I temporarily made a patch, and for cases that
+  should return non zero codes, I call an unsupported BKPT instruction,
+  which makes QEMU abort, and pass an non zero code (1) back to the
+  operating system.
+
+      qemu: Unsupported SemiHosting SWI 0xf1
+
+  This kludge is more or less functional, but is quite inconvenient.
+
+  After checking the ARM manuals, I discovered that SYS_EXIT is not
+  standard, and the 0x18 code used for it originally was used for
+  angel_SWIreason_ReportException, which has a slightly different
+  purpose.
+
+  Now the question:
+
+  Would it be possible to no longer ignore the code passed to 0x18, and
+  if it is non zero, to call exit() with a different value?
+
+  The suggested rule would be:
+
+  if (code =3D=3D0 || code =3D=3D 0x20026)
+    exit(0);
+  elif (code < 256)
+    exit(code);
+  else
+    exit(1);
+
+  The value 0x20026 means ADP_Stopped_ApplicationExit, and, if I
+  understood it right, it means that the program terminated
+  successfully. If this is not true, it can be removed from the first
+  conditional statement.
+
+  What do you think? Can this be added to arm-semi.c?
+
+  =
+
+  Regards,
+
+  Liviu
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1216845/+subscriptions
