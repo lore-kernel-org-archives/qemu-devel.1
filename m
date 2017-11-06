@@ -1,22 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57802)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58847)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hpoussin@reactos.org>) id 1eBpds-00032q-6C
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 17:13:17 -0500
+	(envelope-from <sstabellini@kernel.org>) id 1eBpgg-0003vl-Ez
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 17:16:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hpoussin@reactos.org>) id 1eBpdr-0000Cn-CS
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 17:13:16 -0500
-References: <20171017164426.25277-1-f4bug@amsat.org>
-	<20171017164426.25277-5-f4bug@amsat.org>
-From: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
-Message-ID: <132ef0a6-0c45-461d-5e13-001877c90746@reactos.org>
-Date: Mon, 6 Nov 2017 23:12:45 +0100
+	(envelope-from <sstabellini@kernel.org>) id 1eBpgf-0001NX-Gl
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 17:16:10 -0500
+Date: Mon, 6 Nov 2017 14:16:02 -0800 (PST)
+From: Stefano Stabellini <sstabellini@kernel.org>
+Message-ID: <alpine.DEB.2.10.1711061412330.30448@sstabellini-ThinkPad-X260>
 MIME-Version: 1.0
-In-Reply-To: <20171017164426.25277-5-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 04/42] MAINTAINERS: add an entry for the
- i82378 (superio)
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: [Qemu-devel] [PATCH v2] aarch64: advertise the GIC system register
+ interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,28 +20,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Michael Tokarev <mjt@tls.msk.ru>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, qemu-trivial@nongnu.org
+To: peter.maydell@linaro.org
+Cc: sstabellini@kernel.org, qemu-devel@nongnu.org, xen-devel@lists.xen.org, qemu-arm@nongnu.org, julien.grall@arm.com
 
-Le 17/10/2017 à 18:43, Philippe Mathieu-Daudé a écrit :
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> Reviewed-by: Hervé Poussineau <hpoussin@reactos.org>
-> ---
->   MAINTAINERS | 1 +
->   1 file changed, 1 insertion(+)
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 0706b474e7..510505b2f3 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -712,6 +712,7 @@ F: hw/ppc/prep.c
->   F: hw/ppc/prep_systemio.c
->   F: hw/ppc/rs6000_mc.c
->   F: hw/pci-host/prep.[hc]
-> +F: hw/isa/i82378.c
->   F: hw/isa/pc87312.[hc]
->   F: hw/dma/i82374.c
->   F: pc-bios/ppc_rom.bin
-> 
+When QEMU emulates a GICv3, it needs to advertise the presence of the
+system register interface, which is done via id_aa64pfr0.
 
-Reviewed-by: Hervé Poussineau <hpoussin@reactos.org>
+To do that, and at the same time to avoid advertising the presence of
+the system register interface when it is actually not available, set a
+boolean property in machvirt_init. Check on the boolean property from
+register_cp_regs_for_features and set id_aa64pfr0 accordingly.
+
+Signed-off-by: Stefano Stabellini <sstabellini@kernel.org>
+
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index 9e18b41..369d36b 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -1401,6 +1401,9 @@ static void machvirt_init(MachineState *machine)
+             object_property_set_link(cpuobj, OBJECT(secure_sysmem),
+                                      "secure-memory", &error_abort);
+         }
++        if (vms->gic_version == 3) {
++            object_property_set_bool(cpuobj, true, "gicv3-sysregs", NULL);
++        }
+ 
+         object_property_set_bool(cpuobj, true, "realized", NULL);
+         object_unref(cpuobj);
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index 88578f3..259cad1 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -1690,6 +1690,7 @@ static Property arm_cpu_properties[] = {
+     DEFINE_PROP_UINT64("mp-affinity", ARMCPU,
+                         mp_affinity, ARM64_AFFINITY_INVALID),
+     DEFINE_PROP_INT32("node-id", ARMCPU, node_id, CPU_UNSET_NUMA_NODE_ID),
++    DEFINE_PROP_BOOL("gicv3-sysregs", ARMCPU, gicv3_sysregs, false),
+     DEFINE_PROP_END_OF_LIST()
+ };
+ 
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 89d49cd..0015b37 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -657,6 +657,9 @@ struct ARMCPU {
+     /* Should CPU start in PSCI powered-off state? */
+     bool start_powered_off;
+ 
++    /* GICv3 sysregs present */
++    bool gicv3_sysregs;
++
+     /* Current power state, access guarded by BQL */
+     ARMPSCIState power_state;
+ 
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 37af750..6f21900 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -4687,7 +4687,8 @@ void register_cp_regs_for_features(ARMCPU *cpu)
+             { .name = "ID_AA64PFR0_EL1", .state = ARM_CP_STATE_AA64,
+               .opc0 = 3, .opc1 = 0, .crn = 0, .crm = 4, .opc2 = 0,
+               .access = PL1_R, .type = ARM_CP_CONST,
+-              .resetvalue = cpu->id_aa64pfr0 },
++              .resetvalue = cpu->gicv3_sysregs ? (cpu->id_aa64pfr0|0x01000000) :
++                  cpu->id_aa64pfr0 },
+             { .name = "ID_AA64PFR1_EL1", .state = ARM_CP_STATE_AA64,
+               .opc0 = 3, .opc1 = 0, .crn = 0, .crm = 4, .opc2 = 1,
+               .access = PL1_R, .type = ARM_CP_CONST,
