@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49886)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53901)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eBf2x-0006UE-Oa
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 05:54:28 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eBfFh-0000fb-R0
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 06:07:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eBf2s-0005Yx-SB
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 05:54:27 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33534)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eBf2s-0005YE-Ll
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 05:54:22 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20171026080041.8280-1-aik@ozlabs.ru>
-Date: Mon, 06 Nov 2017 11:54:19 +0100
-In-Reply-To: <20171026080041.8280-1-aik@ozlabs.ru> (Alexey Kardashevskiy's
-	message of "Thu, 26 Oct 2017 19:00:41 +1100")
-Message-ID: <878tfjhe3o.fsf@dusky.pond.sub.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1eBfFb-0005iG-V1
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 06:07:37 -0500
+Received: from mail-wr0-x233.google.com ([2a00:1450:400c:c0c::233]:47283)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eBfFb-0005i2-Np
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 06:07:31 -0500
+Received: by mail-wr0-x233.google.com with SMTP id k61so2360492wrc.4
+	for <qemu-devel@nongnu.org>; Mon, 06 Nov 2017 03:07:31 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20171026080041.8280-1-aik@ozlabs.ru>
+References: <20171026080041.8280-1-aik@ozlabs.ru>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 6 Nov 2017 11:07:09 +0000
+Message-ID: <CAFEAcA8SjKZxLKu3LcWjdbAuFrDduQqY6inwigwZ76T-3XuFHA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Subject: Re: [Qemu-devel] [PATCH qemu] isa-bus: Replace assert() about DMA
  with error report
 List-Id: <qemu-devel.nongnu.org>
@@ -28,10 +30,9 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: qemu-devel@nongnu.org
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Alexey Kardashevskiy <aik@ozlabs.ru> writes:
-
+On 26 October 2017 at 09:00, Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
 > Running "qemu-system-ppc64 -machine prep -device i82374" creates an ISA
 > bus with two i82374 DMA controllers - one is implicit from ppc_prep_init(),
 > the other one is from "-device i82374". QEMU asserts but it is not
@@ -40,34 +41,14 @@ Alexey Kardashevskiy <aik@ozlabs.ru> writes:
 > This adds an error message to explain the failure.
 >
 > Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-> ---
->
->
-> Better phase suggestions are welcome. Thanks!
->
->
-> ---
->  hw/isa/isa-bus.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
->
-> diff --git a/hw/isa/isa-bus.c b/hw/isa/isa-bus.c
-> index 348e0eab9d..553707b18d 100644
-> --- a/hw/isa/isa-bus.c
-> +++ b/hw/isa/isa-bus.c
-> @@ -107,7 +107,10 @@ void isa_connect_gpio_out(ISADevice *isadev, int gpioirq, int isairq)
->  void isa_bus_dma(ISABus *bus, IsaDma *dma8, IsaDma *dma16)
->  {
->      assert(bus && dma8 && dma16);
-> -    assert(!bus->dma[0] && !bus->dma[1]);
-> +    if (bus->dma[0] || bus->dma[1]) {
-> +        error_setg(&error_fatal,
-> +                   "DMA is already set to ISA bus, duplicated DMA controller?");
-> +    }
->      bus->dma[0] = dma8;
->      bus->dma[1] = dma16;
->  }
 
-Quote include/qapi/error.h:
+Does it ever make sense for the user to try to create this
+device on the command line? If not, maybe we should set
+it to dc->user_creatable = false; ?
 
- * Please don't error_setg(&error_fatal, ...), use error_report() and
- * exit(), because that's more obvious.
+If it can be usefully user-created, then rather than being
+a fatal error in this function the error should be passed
+back up so that we can fail the 'realize' method of the device.
+
+thanks
+-- PMM
