@@ -1,34 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39852)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43330)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eBdfQ-0004Yh-8O
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 04:26:05 -0500
+	(envelope-from <el13635@mail.ntua.gr>) id 1eBdpg-0007ts-Nb
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 04:36:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eBdfN-0001oE-29
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 04:26:04 -0500
-Received: from indium.canonical.com ([91.189.90.7]:52446)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eBdfM-0001nf-SE
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 04:26:00 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eBdfK-0006Uu-2a
-	for <qemu-devel@nongnu.org>; Mon, 06 Nov 2017 09:25:58 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 0B1AF2E804E
-	for <qemu-devel@nongnu.org>; Mon,  6 Nov 2017 09:25:58 +0000 (UTC)
+	(envelope-from <el13635@mail.ntua.gr>) id 1eBdpc-0006wY-Lv
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 04:36:40 -0500
+Date: Mon, 6 Nov 2017 11:35:28 +0200
+From: Manos Pitsidianakis <el13635@mail.ntua.gr>
+Message-ID: <20171106093528.7wwyxff5psaabc4a@postretch>
+References: <1506954812-6552-1-git-send-email-pradeep.jagadeesh@huawei.com>
+	<1506954812-6552-3-git-send-email-pradeep.jagadeesh@huawei.com>
+	<w51fuanjfop.fsf@maestria.local.igalia.com>
+	<515d6e61-2e1f-0661-e04a-526844deb9ce@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 06 Nov 2017 09:07:04 -0000
-From: Carlos-velasco <1086782@bugs.launchpad.net>
-Reply-To: Bug 1086782 <1086782@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20121205125603.6348.62070.malonedeb@gac.canonical.com>
-Message-Id: <150995922460.4240.16421235421863407799.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1086782] Re: HPET time drift windows 7 64bits
- guest
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="447segmtxkt4plwn"
+Content-Disposition: inline
+In-Reply-To: <515d6e61-2e1f-0661-e04a-526844deb9ce@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v13 2/6] qmp: Use ThrottleLimits structure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,122 +26,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>
+Cc: Alberto Garcia <berto@igalia.com>, Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, greg kurz <groug@kaod.org>, Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>, jani kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, qemu block <qemu-block@nongnu.org>
 
-Testing now with qemu 2.10.1
-Will need 1 day to see drift or not
 
--- =
+--447segmtxkt4plwn
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1086782
+On Fri, Oct 13, 2017 at 09:26:17AM -0500, Eric Blake wrote:
+>[adding Markus, and block list]
+>
+>On 10/13/2017 09:16 AM, Alberto Garcia wrote:
+>> On Mon 02 Oct 2017 04:33:28 PM CEST, Pradeep Jagadeesh wrote:
+>>> This patch factors out code to use the ThrottleLimits
+>>> structure.
+>>
+>>>  { 'struct': 'BlockIOThrottle',
+>>> -  'data': { '*device': 'str', '*id': 'str', 'bps': 'int', 'bps_rd': 'i=
+nt',
+>>> -            'bps_wr': 'int', 'iops': 'int', 'iops_rd': 'int', 'iops_wr=
+': 'int',
+>>> -            '*bps_max': 'int', '*bps_rd_max': 'int',
+>>> -            '*bps_wr_max': 'int', '*iops_max': 'int',
+>>> -            '*iops_rd_max': 'int', '*iops_wr_max': 'int',
+>>> -            '*bps_max_length': 'int', '*bps_rd_max_length': 'int',
+>>> -            '*bps_wr_max_length': 'int', '*iops_max_length': 'int',
+>>> -            '*iops_rd_max_length': 'int', '*iops_wr_max_length': 'int',
+>>> -            '*iops_size': 'int', '*group': 'str' } }
+>>> +  'base': 'ThrottleLimits',
+>>> +  'data': { '*device': 'str', '*id': 'str', '*group': 'str' } }
+>>
+>> So BlockIOThrottle used to have parameters named bps_rd and iops_wr, and
+>> after this patch they become bps-read and iops-write. This breaks the
+>> API completely, as you can see if you run e.g. iotest 129:
+>>
+>> AssertionError: failed path traversal for "return" in "{u'error': {u'cla=
+ss': u'GenericError', u'desc': u"Parameter 'iops_rd' is unexpected"}}"
+>>
+>> I just checked previous versions of the series and I see that Manos
+>> already warned you of this in v11:
+>>
+>>    https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg04698.html
+>
+>On the bright side, ThrottleLimits is marked 'since 2.11' (added in
+>commit 432d889e), meaning it has not yet been released, so we CAN fix
+>the naming in ThrottleLimits to be compatible with BlockIOThrottle if we
+>want to share the type, as long as we get it done before the 2.11
+>release.
 
-Title:
-  HPET time drift windows 7 64bits guest
+We decided to keep BlockIOThrottle separate from ThrottleLimits because=20
+that would break the old I/O throttling API, just like is done in this=20
+patch series.  BlockIOThrottle is the one using old naming conventions=20
+so I think it should be the one to go, if that has to be done.
 
-Status in QEMU:
-  Incomplete
+But this all boils down to whether the legacy throttling API has to=20
+break in 2.11 or not, which probably is the maintainer's decision.
 
-Bug description:
-  Using latest qemu-kvm (1.2.0), time drift (clock slow in guest) in Window=
-s 7 64 bits guest when HPET is enabled (default).
-  Disabling HPET (-no-hpet) solves the time drift.
 
-  UsePlatformClock enable/disable doesn't make a difference in the guest.
-  bcdedit /set useplatformclock true
+>It does mean tweaking Manos' code to use compatible names
+>everywhere, but that may be a wise course of action (we tend to favor
+>'-' in new API names unless there is a strong reason to use '_'; but
+>sharing code for maximum back-compat would be a reason to use '_').
+>
+>--=20
+>Eric Blake, Principal Software Engineer
+>Red Hat, Inc.           +1-919-301-3266
+>Virtualization:  qemu.org | libvirt.org
+>
 
-  Using driftfix slew doesn't make a difference too.
 
-  =
 
-  # qemu-system-x86_64 --version
-  QEMU emulator version 1.2.0 (qemu-kvm-1.2.0), Copyright (c) 2003-2008 Fab=
-rice Bellard
 
-  Kernel is 3.6.8:
-  # uname -a
-  Linux pulsar 3.6.8 #1 SMP Sat Dec 1 16:26:10 CET 2012 x86_64 x86_64 x86_6=
-4 GNU/Linux
+--447segmtxkt4plwn
+Content-Type: application/pgp-signature; name="signature.asc"
 
-  TSC is stable in the host:
-  =3D=3D=3D
-  # cat /sys/devices/system/clocksource/clocksource0/current_clocksource
-  tsc
+-----BEGIN PGP SIGNATURE-----
 
-  Dmesg:
-  [    0.000000] hpet clockevent registered
-  [    0.000000] tsc: Fast TSC calibration using PIT
-  [    0.000000] tsc: Detected 2660.096 MHz processor
-  [    0.001002] Calibrating delay loop (skipped), value calculated using t=
-imer frequency.. 5320.19 BogoMIPS (lpj=3D2660096)
-  [    0.001138] pid_max: default: 32768 minimum: 301
-  ...
-  [    1.492019] tsc: Refined TSC clocksource calibration: 2659.973 MHz
-  [    1.492093] Switching to clocksource tsc
+iQIzBAEBCgAdFiEEvy2VxhCrsoeMN1aIc2J8L2kN9xAFAloALOAACgkQc2J8L2kN
+9xB11hAAnnaSjeCG3pc+JW3QsIiPFQB02l9AfJlCyazY7rNKRQJMzV55DGxoYOUL
+IozOBGRzWPgTJfenYr7oojmgyporxKAEeFJQgGiK8Od+d+3uPmdvjXlZAj5sH5co
+TMtYrFBmNdahsIWw9f4hAC6AnQIbx87M1nztR5NhrHWzfHHcAzD9Sbp10FTDqPLX
+NxmDd2y0k/8TgLmZccMGNEC2zav2Kx1IS5WIcwgZIYRb2jmQ8hxwYSrWbLL7VT2M
+EeLcgamI3X3Nt8jVGfWlRMj3OWBAJrnF54Da7a2uis4zfiyOT7YGa62EXp3OWoKj
+giNup121es7CJMh8ACIvdBQB3bjRZj0YqQvEPqofTpFGmhHK0+O6TobAtBDpu7mM
+G2tEAjX8KDsGIY1eRuF0kCvJ8Cnzs0Yy+QjxVwZW7ju4loD/eEdxu5BcKc23uEpY
+nVnGxhWOA8BJCL4kONy9rkvdznmRPnPAg/rNH6f/8/Sg9fHQ4zxyRxDGHVLWe17L
+E91KTZ+d3VzHeBT5V+FylxhxG0xXSzprCYTTwSF6OxwfzPIQkcfweYyKBq50R9BJ
+qsFYZ5qGtI1SGKXbyxkBdgtC2410kMbHXnJdovWMX0p/0wOyCmthbZ8DWkIfD6jk
+H425yKI0Ob92oP6J4RYQWLZkNiZDN0b1w4Q6zqqLz6oJf2qrZL8=
+=WwyQ
+-----END PGP SIGNATURE-----
 
-  =
-
-  CPUinfo, constant_tsc:
-  vendor_id       : GenuineIntel
-  cpu family      : 6
-  model           : 23
-  model name      : Intel(R) Core(TM)2 Quad CPU    Q8400  @ 2.66GHz
-  stepping        : 10
-  microcode       : 0xa0b
-  cpu MHz         : 2667.000
-  cache size      : 2048 KB
-  flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mc=
-a cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx=
- lm constant_tsc arch_perfmon pebs bts rep_good nopl aperfmperf pni dtes64 =
-monitor ds_cpl vmx est tm2 ssse3 cx16 xtpr pdcm sse4_1 xsave lahf_lm dtherm=
- tpr_shadow vnmi flexpriority
-  bogomips        : 5320.19
-
-  # grep -i hpet .config
-  CONFIG_HPET_TIMER=3Dy
-  CONFIG_HPET_EMULATE_RTC=3Dy
-  CONFIG_HPET=3Dy
-  # CONFIG_HPET_MMAP is not set
-  =3D=3D=3D
-
-  Qemu command line:
-  /usr/bin/qemu-system-x86_64 -drive file=3D/dev/vol0/KVMORION01,cache=3Dno=
-ne,aio=3Dnative,if=3Dvirtio \
-    -drive file=3D/dev/vol0/KVMORION02,cache=3Dnone,aio=3Dnative,if=3Dvirti=
-o \
-    -cpu host \
-    -m 2048 \
-    -smp 4,maxcpus=3D4,cores=3D4,threads=3D1,sockets=3D1 \
-    -rtc base=3Dlocaltime,driftfix=3Dslew \
-    -vnc 10.124.241.211:0,password -k es \
-    -monitor telnet:localhost:37200,server,nowait \
-    -netdev tap,id=3Dkvmorion,ifname=3Dkvmorion,script=3D/etc/qemu-ifup-br0=
-,downscript=3D/etc/qemu-ifdown-br0 \
-    -device virtio-net-pci,netdev=3Dkvmorion,id=3Dvirtio-nic0,mac=3D02:85:6=
-4:02:c2:aa \
-    -device virtio-balloon-pci,id=3Dballoon0 \
-    -boot menu=3Don \
-    -pidfile /var/run/kvmorion.pid \
-    -daemonize
-
-  Using 1 CPU doesn't make a difference.
-  Only workaround is disabling hpet (-no-hpet)
-
-  Sample time drift in guest:
-  >ntpdate -q 10.124.241.211
-   5 Dec 13:36:06 ntpdate[3464]: Raised to realtime priority class
-  server 10.124.241.211, stratum 2, offset 3.694184, delay 0.02551
-   5 Dec 13:36:12 ntpdate[3464]: step time server 10.124.241.211 offset 3.6=
-94184 s
-  ec
-
-  >ntpdate -q 10.124.241.211
-   5 Dec 13:52:02 ntpdate[1964]: Raised to realtime priority class
-  server 10.124.241.211, stratum 2, offset 4.719968, delay 0.02554
-   5 Dec 13:52:08 ntpdate[1964]: step time server 10.124.241.211 offset 4.7=
-19968 s
-  ec
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1086782/+subscriptions
+--447segmtxkt4plwn--
