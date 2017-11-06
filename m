@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58722)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60030)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1eBVX6-0000Xj-RI
-	for qemu-devel@nongnu.org; Sun, 05 Nov 2017 19:44:57 -0500
+	(envelope-from <brad@comstyle.com>) id 1eBVfo-0001zm-P4
+	for qemu-devel@nongnu.org; Sun, 05 Nov 2017 19:53:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1eBVX3-0004ny-GK
-	for qemu-devel@nongnu.org; Sun, 05 Nov 2017 19:44:56 -0500
-Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:53064)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1eBVX3-0004nc-8Y
-	for qemu-devel@nongnu.org; Sun, 05 Nov 2017 19:44:53 -0500
-Received: by mail-pg0-x243.google.com with SMTP id a192so6887716pge.9
-	for <qemu-devel@nongnu.org>; Sun, 05 Nov 2017 16:44:52 -0800 (PST)
-References: <20171103193802.11876-1-laurent@vivier.eu>
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Message-ID: <20076e3b-883a-b669-8453-f870eda6e31a@ozlabs.ru>
-Date: Mon, 6 Nov 2017 11:44:46 +1100
+	(envelope-from <brad@comstyle.com>) id 1eBVfl-00086x-NX
+	for qemu-devel@nongnu.org; Sun, 05 Nov 2017 19:53:56 -0500
+Received: from speedy.comstyle.com ([206.51.28.2]:25607 helo=mail.comstyle.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <brad@comstyle.com>) id 1eBVfl-00084t-Hv
+	for qemu-devel@nongnu.org; Sun, 05 Nov 2017 19:53:53 -0500
+Received: from mail.comstyle.com (localhost [127.0.0.1])
+	by mail.comstyle.com (Postfix) with ESMTP id A6F6C9843A
+	for <qemu-devel@nongnu.org>; Sun,  5 Nov 2017 19:53:38 -0500 (EST)
+Received: from humpty.home.comstyle.com (unknown
+	[IPv6:2607:fea8:12c0:f00:3c40:9470:82cf:3fa8])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested) (Authenticated sender: brad)
+	by mail.comstyle.com (Postfix) with ESMTPSA id 79EC098439
+	for <qemu-devel@nongnu.org>; Sun,  5 Nov 2017 19:53:38 -0500 (EST)
+Date: Sun, 5 Nov 2017 19:53:30 -0500
+From: Brad Smith <brad@comstyle.com>
+Message-ID: <20171106005328.GB84093@humpty.home.comstyle.com>
 MIME-Version: 1.0
-In-Reply-To: <20171103193802.11876-1-laurent@vivier.eu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-AU
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] linux-user: remove nmi.c and
- fw-path-provider.c
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Subject: [Qemu-devel] [PATCH] configure: Deal with OpenBSD/i386 emulation
+ linker
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,51 +34,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Riku Voipio <riku.voipio@linaro.org>
+To: qemu-devel@nongnu.org
 
-On 04/11/17 06:38, Laurent Vivier wrote:
-> linux-user binaries don't need firmware and NMI,
-> so don't add them in this case, move QDEV
-> firmware functions to qdev-fw.c
+OpenBSD/i386 uses elf_i386_obsd for the emulation linker.
+
+Signed-off-by: Brad Smith <brad@comstyle.com>
 
 
-When configured with --target-list=ppc64-linux-user , config-host.mak gets
-TARGET_DIRS=ppc64-linux-user  and I would expect CONFIG_SOFTMMU to be
-disabled in Makefile#27 and qdev.c not to be compiled at all but this is
-not happening, I wonder why...
-
-
-> 
-> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-> ---
->  hw/core/Makefile.objs |  5 +--
->  hw/core/qdev-fw.c     | 96 +++++++++++++++++++++++++++++++++++++++++++++++++++
->  hw/core/qdev.c        | 77 -----------------------------------------
->  3 files changed, 99 insertions(+), 79 deletions(-)
->  create mode 100644 hw/core/qdev-fw.c
-> 
-> diff --git a/hw/core/Makefile.objs b/hw/core/Makefile.objs
-> index f8d7a4aaed..1240728c87 100644
-> --- a/hw/core/Makefile.objs
-> +++ b/hw/core/Makefile.objs
-> @@ -1,11 +1,12 @@
->  # core qdev-related obj files, also used by *-user:
->  common-obj-y += qdev.o qdev-properties.o
->  common-obj-y += bus.o reset.o
-> -common-obj-y += fw-path-provider.o
-> +common-obj-$(CONFIG_SOFTMMU) += qdev-fw.o
-> +common-obj-$(CONFIG_SOFTMMU) += fw-path-provider.o
->  # irq.o needed for qdev GPIO handling:
->  common-obj-y += irq.o
->  common-obj-y += hotplug.o
-> -common-obj-y += nmi.o
-> +common-obj-$(CONFIG_SOFTMMU) += nmi.o
->  
->  common-obj-$(CONFIG_EMPTY_SLOT) += empty_slot.o
->  common-obj-$(CONFIG_XILINX_AXI) += stream.o
-
-
-
--- 
-Alexey
+diff --git a/configure b/configure
+index dd73cce62f..02799d38ac 100755
+--- a/configure
++++ b/configure
+@@ -5159,9 +5159,9 @@ if test \( "$cpu" = "i386" -o "$cpu" = "x86_64" \) -a \
+         "$targetos" != "Darwin" -a "$targetos" != "SunOS" -a \
+         "$softmmu" = yes ; then
+     # Different host OS linkers have different ideas about the name of the ELF
+-    # emulation. Linux and OpenBSD use 'elf_i386'; FreeBSD uses the _fbsd
+-    # variant; and Windows uses i386pe.
+-    for emu in elf_i386 elf_i386_fbsd i386pe; do
++    # emulation. Linux uses 'elf_i386'; FreeBSD uses the _fbsd variant;
++    # OpenBSD uses the _obsd variant; and Windows uses i386pe.
++    for emu in elf_i386 elf_i386_fbsd elf_i386_obsd i386pe; do
+         if "$ld" -verbose 2>&1 | grep -q "^[[:space:]]*$emu[[:space:]]*$"; then
+             ld_i386_emulation="$emu"
+             roms="optionrom"
