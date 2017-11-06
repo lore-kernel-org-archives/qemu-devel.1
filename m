@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40753)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42059)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eBifY-00008w-08
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 09:46:41 -0500
+	(envelope-from <bounces@canonical.com>) id 1eBikK-0001b4-Ph
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 09:51:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eBifT-0002f3-3Q
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 09:46:32 -0500
-Received: from indium.canonical.com ([91.189.90.7]:47984)
+	(envelope-from <bounces@canonical.com>) id 1eBikF-0005Qg-Sz
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 09:51:28 -0500
+Received: from indium.canonical.com ([91.189.90.7]:50956)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eBifS-0002eK-TU
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 09:46:27 -0500
+	id 1eBikF-0005ON-Lx
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 09:51:23 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eBifQ-0000WM-72
-	for <qemu-devel@nongnu.org>; Mon, 06 Nov 2017 14:46:24 +0000
+	id 1eBikD-0001av-BV
+	for <qemu-devel@nongnu.org>; Mon, 06 Nov 2017 14:51:21 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 1D0102E80DB
-	for <qemu-devel@nongnu.org>; Mon,  6 Nov 2017 14:46:20 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 02BF52E81C7
+	for <qemu-devel@nongnu.org>; Mon,  6 Nov 2017 14:51:16 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 06 Nov 2017 14:35:25 -0000
+Date: Mon, 06 Nov 2017 14:41:36 -0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1216845 <1216845@bugs.launchpad.net>
+Reply-To: Bug 1641861 <1641861@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20130826101205.25802.19011.malonedeb@soybean.canonical.com>
-Message-Id: <150997892555.20053.10758617713462098853.malone@soybean.canonical.com>
+References: <20161115075112.3631.29997.malonedeb@soybean.canonical.com>
+Message-Id: <150997929659.4205.987813852033178873.launchpad@gac.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1216845] Re: qemu-system-arm semihosting always
- calls exit(0)
+Subject: [Qemu-devel] [Bug 1641861] Re: ARM QEMU doesn't enforce that RES0
+ bits in FPSCR are non-writeable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,15 +39,10 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-With the new 2.0 ARM semihosting ABI, there is an optional extension
-SYS_EXIT_EXTENDED which can be used to implement returning a non-zero
-exit code for 32-bit ARM programs:
+** Summary changed:
 
-https://developer.arm.com/docs/100863/latest/semihosting-operations
-/sys_exit_extended-0x20#sh-ext-exit-extended
-
-QEMU should implement this.
-
+- fail to correctly emulate FPSCR register on arm
++ ARM QEMU doesn't enforce that RES0 bits in FPSCR are non-writeable
 
 ** Changed in: qemu
        Status: New =3D> Confirmed
@@ -58,75 +53,60 @@ QEMU should implement this.
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1216845
+https://bugs.launchpad.net/bugs/1641861
 
 Title:
-  qemu-system-arm semihosting always calls exit(0)
+  ARM QEMU doesn't enforce that RES0 bits in FPSCR are non-writeable
 
 Status in QEMU:
   Confirmed
 
 Bug description:
-  In my embedded ARM project I have a bunch of unit tests that I run in
-  a POSIX synthetic environment, and, as usual for POSIX processes,
-  these tests return 0 for success and !=3D0 for error.
+  Hi all, we systematically tested the QEMU implementation for emulating
+  arm user mode programs. We found that QEMU incorrectly emulate the
+  FPSCR register. The following the proof of code:
 
-  Now I expanded the testing environment to run some of these tests
-  compiled for ARM, under QEMU, with the tracing messages forwarded via
-  the semihosting API.
+  /*********** Beginning of the bug: arm.c **********/
 
-  Up to now everything is fine with the emulation.
+  int printf(const char *format, ...);
+  unsigned char i0[0x10];
+  unsigned char o[0x10];
+  int main() {
+  =C2=A0=C2=A0=C2=A0=C2=A0int k =3D 0;
+  =C2=A0=C2=A0=C2=A0=C2=A0asm("mov r2, %0\n"
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0"ldr r0, [r2]\n"::"r"((ch=
+ar *)(i0)));;
+  =C2=A0=C2=A0=C2=A0=C2=A0asm("vmsr fpscr, r0");
+  =C2=A0=C2=A0=C2=A0=C2=A0asm("mov r2, %0\n"
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0"vmrs r4, fpscr\n"
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0"str r4, [r2]\n"::"r"((ch=
+ar *)(o)));;
+  =C2=A0=C2=A0=C2=A0=C2=A0for (k =3D 0; k < 0x10; k++)
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0printf("%02x", o[0x10 - 1=
+ - k]);
+  =C2=A0=C2=A0=C2=A0=C2=A0printf("\n");
+  }
+  unsigned char i0[0x10] =3D {0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x0=
+0, 0x28, 0x1c, 0xc7, 0x01, 0x00, 0x00, 0x00, 0x00};
 
-  However I have a problem with passing the failure code back to the
-  operating system, to drive the continuous integration framework.
+  /*********** End fo the bug **********/
 
-  I checked the arm-semi.c code and for SYS_EXIT and I discovered that
-  the parameter passed is ignored and it always calls exit(0):
+  When the program is compiled into arm binary code and running on a
+  real arm machine, and running in qemu, we have the following result
 
-      case SYS_EXIT:
-          gdb_exit(env, 0);
-          exit(0);
+  $ arm-linux-gnueabihf-gcc arm.c -o arm -static
+  $ ./arm
+  000000000000000000000000fff7009f
+  $ qemu-arm arm
+  000000000000000000000000ffffffff
 
-  To solve my problem I temporarily made a patch, and for cases that
-  should return non zero codes, I call an unsupported BKPT instruction,
-  which makes QEMU abort, and pass an non zero code (1) back to the
-  operating system.
+  According to the ARM manual, bits[19, 14:13, 6:5] of FPSCR should be
+  reserved as zero. However, arm qemu fails to keep these bits to be
+  zero: these bits can be actually modified in QEMU.
 
-      qemu: Unsupported SemiHosting SWI 0xf1
+  QEMU version is 2.7.0. The operating system is Linux 3.13.0. x86_64.
 
-  This kludge is more or less functional, but is quite inconvenient.
-
-  After checking the ARM manuals, I discovered that SYS_EXIT is not
-  standard, and the 0x18 code used for it originally was used for
-  angel_SWIreason_ReportException, which has a slightly different
-  purpose.
-
-  Now the question:
-
-  Would it be possible to no longer ignore the code passed to 0x18, and
-  if it is non zero, to call exit() with a different value?
-
-  The suggested rule would be:
-
-  if (code =3D=3D0 || code =3D=3D 0x20026)
-    exit(0);
-  elif (code < 256)
-    exit(code);
-  else
-    exit(1);
-
-  The value 0x20026 means ADP_Stopped_ApplicationExit, and, if I
-  understood it right, it means that the program terminated
-  successfully. If this is not true, it can be removed from the first
-  conditional statement.
-
-  What do you think? Can this be added to arm-semi.c?
-
-  =
-
-  Regards,
-
-  Liviu
+  Thanks!
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1216845/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1641861/+subscriptions
