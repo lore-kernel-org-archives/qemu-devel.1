@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60789)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60956)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eBfYE-0006Qu-M0
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 06:26:47 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eBfYa-0006oK-Hy
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 06:27:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eBfYB-0005KW-FN
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 06:26:46 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53277)
+	(envelope-from <pbonzini@redhat.com>) id 1eBfYX-0005Vp-C8
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 06:27:08 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38562)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eBfYB-0005KJ-8k
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 06:26:43 -0500
-Date: Mon, 6 Nov 2017 11:26:38 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20171106112638.GF23361@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20171106005656.GC84093@humpty.home.comstyle.com>
-	<CAFEAcA_2i0p9C3amtoB0o9Y4K83aCP7Gkw1cDqmLjrkLwJTZxg@mail.gmail.com>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eBfYX-0005UD-3Z
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 06:27:05 -0500
+References: <1b862cf2-2fee-3243-cb54-2780ace6f25b@profihost.ag>
+	<971cc10f-7930-9830-0528-27e8faac7282@redhat.com>
+	<748c4d0d-f84b-303d-f9a6-bafa6037d669@profihost.ag>
+	<f4b0cb70-7f86-f7cf-bb89-3a9f7ae15dc2@redhat.com>
+	<4c2913e2-5946-47db-cced-a5702538bc3b@profihost.ag>
+	<dc3bf74f-fbd6-573d-0d7c-d456469fcf1d@profihost.ag>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <9c8673a5-faf7-ca9c-27d3-398df4223d6a@redhat.com>
+Date: Mon, 6 Nov 2017 12:27:01 +0100
 MIME-Version: 1.0
+In-Reply-To: <dc3bf74f-fbd6-573d-0d7c-d456469fcf1d@profihost.ag>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA_2i0p9C3amtoB0o9Y4K83aCP7Gkw1cDqmLjrkLwJTZxg@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH] osdep: Deal with TIME_MAX and OpenBSD
- 64-bit time_t
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] kvm: virtio-net: saved image requires TUN_F_UFO
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,56 +33,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Brad Smith <brad@comstyle.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Stefan Priebe - Profihost AG <s.priebe@profihost.ag>, qemu-devel <qemu-devel@nongnu.org>, "Jason Wang (jasowang@redhat.com)" <jasowang@redhat.com>
 
-On Mon, Nov 06, 2017 at 10:51:16AM +0000, Peter Maydell wrote:
-> On 6 November 2017 at 00:56, Brad Smith <brad@comstyle.com> wrote:
-> > Define TIME_MAX to LLONG_MAX for OpenBSD since OpenBSD uses 64-bit time_t.
-> >
-> > Signed-off-by: Brad Smith <brad@comstyle.com>
-> >
-> >
-> > diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
-> > index 6855b94bbf..824714049b 100644
-> > --- a/include/qemu/osdep.h
-> > +++ b/include/qemu/osdep.h
-> > @@ -132,8 +132,12 @@ extern int daemon(int, int);
-> >  #define ESHUTDOWN 4099
-> >  #endif
-> >  #ifndef TIME_MAX
-> > +#ifdef __OpenBSD__
-> > +#define TIME_MAX LLONG_MAX
-> > +#else
-> >  #define TIME_MAX LONG_MAX
-> >  #endif
-> > +#endif
+On 06/11/2017 12:09, Stefan Priebe - Profihost AG wrote:
+> HI Paolo,
 > 
-> I'm not really a fan of adding new OS-specific #ifdefs --
-> what if one of the other BSDs uses or switches to 64-bit
-> time_t for 32-bit platforms? Is there some way we can detect
-> this generically at compile time (possibly in configure) ?
+> could this patchset be related?
 
-You could use a pair of compile time asserts to figure it out.
+Uh oh, yes it should.  Jason, any ways to fix it?  I suppose we need to
+disable UFO in the newest machine types, but do we also have to do
+(software) UFO in vhost-net and QEMU for migration compatibility?
 
-Would need one compile test to check 32 vs 64 bit:
+Thanks,
 
-  #include <time.h>
-  char time_t_64bit[sizeof(time_t) == 8 ? 1 : -1];
+Paolo
 
-and a second to check signed vs unsigned:
-
-  #include <time.h>
-  char time_t_signed[(time_t) -1 < 0 ? 1 : -1];
-
-
-Save each of these programs to the file $TMPC, and then run 'compile_object'
-from configure. You then have a decision matrix for 4 different TIME_MAX
-values to write into config-host.h.
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+> Greets,
+> Stefan
+> 
+> Am 06.11.2017 um 10:52 schrieb Stefan Priebe - Profihost AG:
+>> Hi Paolo,
+>>
+>> Am 06.11.2017 um 10:49 schrieb Paolo Bonzini:
+>>> On 06/11/2017 10:48, Stefan Priebe - Profihost AG wrote:
+>>>> Hi Paolo,
+>>>>
+>>>> Am 06.11.2017 um 10:40 schrieb Paolo Bonzini:
+>>>>> On 06/11/2017 10:38, Stefan Priebe - Profihost AG wrote:
+>>>>>> Hello,
+>>>>>>
+>>>>>> i've upgraded some servers from kernel 4.4 to 4.12 - both running Qemu
+>>>>>> 2.9.1.
+>>>>>>
+>>>>>> If i migrate a VM from a host running kernel 4.4 to a host running 4.12
+>>>>>> i get:
+>>>>>>
+>>>>>> kvm: virtio-net: saved image requires TUN_F_UFO support
+>>>>>> kvm: Failed to load virtio-net-device:tmp
+>>>>>> kvm: Failed to load virtio-net:virtio
+>>>>>> kvm: error while loading state for instance 0x0 of device
+>>>>>> '0000:00:12.0/virtio-net'
+>>>>>> kvm: load of migration failed: Invalid argument
+>>>>>>
+>>>>>>
+>>>>>> while migrating from 4.12 to 4.4 works fine.
+>>>>>>
+>>>>>> Can anybody help? Is this expected?
+>>>>>
+>>>>> Can you check why peer_has_ufo failed (in hw/net/virtio-net.c)?
+>>>>
+>>>> May be - how can i archieve this? Patching the code is not a problem if
+>>>> you can give me a hint.
+>>>>
+>>>>> Also, did this ioctl fail when the tap device was set up on the 4.12 destination?
+>>>>> int tap_probe_has_ufo(int fd)
+>>>>> {
+>>>>>     unsigned offload;
+>>>>>
+>>>>>     offload = TUN_F_CSUM | TUN_F_UFO;
+>>>>>
+>>>>>     if (ioctl(fd, TUNSETOFFLOAD, offload) < 0)
+>>>>>         return 0;
+>>>>>
+>>>>>     return 1;
+>>>>> }
+>>>>
+>>>> Should there be any kernel output or how can i detect / check it?
+>>>
+>>> For both, the simplest answer is probably just using printf.
+>>
+>> arg i missed an important part. The kernel is an opensuse SLE15 one.
+>>
+>> I've seen it contains the following patchset:
+>> https://www.spinics.net/lists/netdev/msg443821.html
+>>
+>> Greets,
+>> Stefan
+>>
