@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49764)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49781)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1eBbLY-0006FV-5Z
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 01:57:25 -0500
+	(envelope-from <longpeng2@huawei.com>) id 1eBbLa-0006Gk-Dy
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 01:57:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1eBbLW-0008Gw-VL
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 01:57:24 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:2277)
+	(envelope-from <longpeng2@huawei.com>) id 1eBbLV-0008Fb-Te
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 01:57:26 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:2329)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1eBbLW-0008AE-5w
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 01:57:22 -0500
+	(envelope-from <longpeng2@huawei.com>) id 1eBbLV-00088u-AS
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 01:57:21 -0500
 From: "Longpeng(Mike)" <longpeng2@huawei.com>
-Date: Mon, 6 Nov 2017 14:56:53 +0800
-Message-ID: <1509951422-20060-2-git-send-email-longpeng2@huawei.com>
+Date: Mon, 6 Nov 2017 14:56:58 +0800
+Message-ID: <1509951422-20060-7-git-send-email-longpeng2@huawei.com>
 In-Reply-To: <1509951422-20060-1-git-send-email-longpeng2@huawei.com>
 References: <1509951422-20060-1-git-send-email-longpeng2@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [RFC 01/10] virtio-crypto: remove
- virtio_crypto_op_ctrl_req structure
+Subject: [Qemu-devel] [RFC 06/10] cryptodev: add stateless mode cipher
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,142 +29,108 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: arei.gonglei@huawei.com, pasic@linux.vnet.ibm.com
 Cc: weidong.huang@huawei.com, wangxinxin.wang@huawei.com, jianjay.zhou@huawei.com, qemu-devel@nongnu.org, "Longpeng(Mike)" <longpeng2@huawei.com>
 
-The struct virtio_crypto_op_ctrl_req is not needed, we can
-use 'header + payload' instead as suggested by Halil. This
-can makes the code simpler to add MUX-mode support in the
-next patch.
+Adds stateless mode cipher support.
 
 Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
 ---
- hw/virtio/virtio-crypto.c                      | 48 ++++++++++++++++++++------
- include/standard-headers/linux/virtio_crypto.h | 19 +---------
- 2 files changed, 39 insertions(+), 28 deletions(-)
+ backends/cryptodev.c              | 21 +++++++++++++++++++++
+ include/hw/virtio/virtio-crypto.h |  1 +
+ include/sysemu/cryptodev.h        | 18 ++++++++++++++++++
+ 3 files changed, 40 insertions(+)
 
-diff --git a/hw/virtio/virtio-crypto.c b/hw/virtio/virtio-crypto.c
-index 19c82e0..c7f6cc4 100644
---- a/hw/virtio/virtio-crypto.c
-+++ b/hw/virtio/virtio-crypto.c
-@@ -210,7 +210,7 @@ virtio_crypto_handle_close_session(VirtIOCrypto *vcrypto,
- static void virtio_crypto_handle_ctrl(VirtIODevice *vdev, VirtQueue *vq)
- {
-     VirtIOCrypto *vcrypto = VIRTIO_CRYPTO(vdev);
--    struct virtio_crypto_op_ctrl_req ctrl;
-+    struct virtio_crypto_ctrl_header hdr;
-     VirtQueueElement *elem;
-     struct iovec *in_iov;
-     struct iovec *out_iov;
-@@ -239,25 +239,38 @@ static void virtio_crypto_handle_ctrl(VirtIODevice *vdev, VirtQueue *vq)
-         out_iov = elem->out_sg;
-         in_num = elem->in_num;
-         in_iov = elem->in_sg;
--        if (unlikely(iov_to_buf(out_iov, out_num, 0, &ctrl, sizeof(ctrl))
--                    != sizeof(ctrl))) {
-+
-+        s = sizeof(hdr);
-+        if (unlikely(s != iov_to_buf(out_iov, out_num, 0, &hdr, s))) {
-             virtio_error(vdev, "virtio-crypto request ctrl_hdr too short");
-             virtqueue_detach_element(vq, elem, 0);
-             g_free(elem);
-             break;
-         }
--        iov_discard_front(&out_iov, &out_num, sizeof(ctrl));
-+        iov_discard_front(&out_iov, &out_num, s);
+diff --git a/backends/cryptodev.c b/backends/cryptodev.c
+index 67edfa5..e06ab12 100644
+--- a/backends/cryptodev.c
++++ b/backends/cryptodev.c
+@@ -120,6 +120,21 @@ static int cryptodev_backend_sym_operation(
+     return -VIRTIO_CRYPTO_ERR;
+ }
  
--        opcode = ldl_le_p(&ctrl.header.opcode);
--        queue_id = ldl_le_p(&ctrl.header.queue_id);
-+        opcode = ldl_le_p(&hdr.opcode);
-+        queue_id = ldl_le_p(&hdr.queue_id);
++static int cryptodev_backend_sym_stateless_operation(
++                 CryptoDevBackend *backend,
++                 CryptoDevBackendSymStatelessInfo *op_info,
++                 uint32_t queue_index, Error **errp)
++{
++    CryptoDevBackendClass *bc =
++                      CRYPTODEV_BACKEND_GET_CLASS(backend);
++
++    if (bc->do_sym_stateless_op) {
++        return bc->do_sym_stateless_op(backend, op_info, queue_index, errp);
++    }
++
++    return -VIRTIO_CRYPTO_ERR;
++}
++
+ int cryptodev_backend_crypto_operation(
+                  CryptoDevBackend *backend,
+                  void *opaque,
+@@ -133,6 +148,12 @@ int cryptodev_backend_crypto_operation(
  
-         switch (opcode) {
-         case VIRTIO_CRYPTO_CIPHER_CREATE_SESSION:
-+        {
-+            struct virtio_crypto_sym_create_session_req req;
+         return cryptodev_backend_sym_operation(backend,
+                          op_info, queue_index, errp);
++    } else if (req->flags == CRYPTODEV_BACKEND_ALG_SYM_STATELESS) {
++        CryptoDevBackendSymStatelessInfo *op_info;
++        op_info = req->u.sym_stateless_info;
 +
-+            iov_to_buf(out_iov, out_num, 0, &req, sizeof(req));
-+            /* The unused part of the req will be ingored */
-+            s = VIRTIO_CRYPTO_CTRL_REQ_PAYLOAD_SIZE_NONMUX;
-+            if (unlikely(s != iov_discard_front(&out_iov, &out_num, s))) {
-+                virtio_error(vdev, "virtio-crypto request additional "
-+                             "parameters too short");
-+                virtqueue_detach_element(vq, elem, 0);
-+                break;
-+            }
-+
-             memset(&input, 0, sizeof(input));
-             session_id = virtio_crypto_create_sym_session(vcrypto,
--                             &ctrl.u.sym_create_session,
--                             queue_id, opcode,
--                             out_iov, out_num);
-+                                            &req, queue_id, opcode,
-+                                            out_iov, out_num);
-             /* Serious errors, need to reset virtio crypto device */
-             if (session_id == -EFAULT) {
-                 virtqueue_detach_element(vq, elem, 0);
-@@ -281,12 +294,26 @@ static void virtio_crypto_handle_ctrl(VirtIODevice *vdev, VirtQueue *vq)
-             virtqueue_push(vq, elem, sizeof(input));
-             virtio_notify(vdev, vq);
-             break;
-+        }
-         case VIRTIO_CRYPTO_CIPHER_DESTROY_SESSION:
-         case VIRTIO_CRYPTO_HASH_DESTROY_SESSION:
-         case VIRTIO_CRYPTO_MAC_DESTROY_SESSION:
-         case VIRTIO_CRYPTO_AEAD_DESTROY_SESSION:
-+        {
-+            struct virtio_crypto_destroy_session_req req;
-+
-+            iov_to_buf(out_iov, out_num, 0, &req, sizeof(req));
-+            /* The unused part of the req will be ingored */
-+            s = VIRTIO_CRYPTO_CTRL_REQ_PAYLOAD_SIZE_NONMUX;
-+            if (unlikely(s != iov_discard_front(&out_iov, &out_num, s))) {
-+                virtio_error(vdev, "virtio-crypto request additional "
-+                             "parameters too short");
-+                virtqueue_detach_element(vq, elem, 0);
-+                break;
-+            }
-+
-             status = virtio_crypto_handle_close_session(vcrypto,
--                   &ctrl.u.destroy_session, queue_id);
-+                                                &req, queue_id);
-             /* The status only occupy one byte, we can directly use it */
-             s = iov_from_buf(in_iov, in_num, 0, &status, sizeof(status));
-             if (unlikely(s != sizeof(status))) {
-@@ -297,6 +324,7 @@ static void virtio_crypto_handle_ctrl(VirtIODevice *vdev, VirtQueue *vq)
-             virtqueue_push(vq, elem, sizeof(status));
-             virtio_notify(vdev, vq);
-             break;
-+        }
-         case VIRTIO_CRYPTO_HASH_CREATE_SESSION:
-         case VIRTIO_CRYPTO_MAC_CREATE_SESSION:
-         case VIRTIO_CRYPTO_AEAD_CREATE_SESSION:
-diff --git a/include/standard-headers/linux/virtio_crypto.h b/include/standard-headers/linux/virtio_crypto.h
-index 5ff0b4e..6677c82 100644
---- a/include/standard-headers/linux/virtio_crypto.h
-+++ b/include/standard-headers/linux/virtio_crypto.h
-@@ -234,24 +234,7 @@ struct virtio_crypto_destroy_session_req {
- 	uint8_t padding[48];
++        return cryptodev_backend_sym_stateless_operation(backend,
++                         op_info, queue_index, errp);
+     } else {
+         error_setg(errp, "Unsupported cryptodev alg type: %" PRIu32 "",
+                    req->flags);
+diff --git a/include/hw/virtio/virtio-crypto.h b/include/hw/virtio/virtio-crypto.h
+index a00a0bf..465ad20 100644
+--- a/include/hw/virtio/virtio-crypto.h
++++ b/include/hw/virtio/virtio-crypto.h
+@@ -73,6 +73,7 @@ typedef struct VirtIOCryptoReq {
+     struct VirtIOCrypto *vcrypto;
+     union {
+         CryptoDevBackendSymOpInfo *sym_op_info;
++        CryptoDevBackendSymStatelessInfo *sym_stateless_info;
+     } u;
+ } VirtIOCryptoReq;
+ 
+diff --git a/include/sysemu/cryptodev.h b/include/sysemu/cryptodev.h
+index a9d0d1e..aa2fcd8 100644
+--- a/include/sysemu/cryptodev.h
++++ b/include/sysemu/cryptodev.h
+@@ -58,6 +58,7 @@ typedef struct CryptoDevBackend CryptoDevBackend;
+ 
+ enum CryptoDevBackendAlgType {
+     CRYPTODEV_BACKEND_ALG_SYM,
++    CRYPTODEV_BACKEND_ALG_SYM_STATELESS,
+     CRYPTODEV_BACKEND_ALG__MAX,
  };
  
--/* The request of the control virtqueue's packet */
--struct virtio_crypto_op_ctrl_req {
--	struct virtio_crypto_ctrl_header header;
--
--	union {
--		struct virtio_crypto_sym_create_session_req
--			sym_create_session;
--		struct virtio_crypto_hash_create_session_req
--			hash_create_session;
--		struct virtio_crypto_mac_create_session_req
--			mac_create_session;
--		struct virtio_crypto_aead_create_session_req
--			aead_create_session;
--		struct virtio_crypto_destroy_session_req
--			destroy_session;
--		uint8_t padding[56];
--	} u;
--};
-+#define VIRTIO_CRYPTO_CTRL_REQ_PAYLOAD_SIZE_NONMUX 56
+@@ -146,6 +147,20 @@ typedef struct CryptoDevBackendSymOpInfo {
+     uint8_t data[0];
+ } CryptoDevBackendSymOpInfo;
  
- struct virtio_crypto_op_header {
- #define VIRTIO_CRYPTO_CIPHER_ENCRYPT \
++/**
++ * CryptoDevBackendSymStatelessInfo:
++ *
++ * @session_info: session information, see above
++ *  CryptoDevBackendSymSessionInfo
++ * @op_info: crypto operation information, see above
++ *  CryptoDevBackendSymOpInfo, @session_id is ignored
++ *
++ **/
++typedef struct CryptoDevBackendSymStatelessInfo {
++    CryptoDevBackendSymSessionInfo session_info;
++    CryptoDevBackendSymOpInfo op_info;
++} CryptoDevBackendSymStatelessInfo;
++
+ typedef struct CryptoDevBackendClass {
+     ObjectClass parent_class;
+ 
+@@ -161,6 +176,9 @@ typedef struct CryptoDevBackendClass {
+     int (*do_sym_op)(CryptoDevBackend *backend,
+                      CryptoDevBackendSymOpInfo *op_info,
+                      uint32_t queue_index, Error **errp);
++    int (*do_sym_stateless_op)(CryptoDevBackend *backend,
++                     CryptoDevBackendSymStatelessInfo *op_info,
++                     uint32_t queue_index, Error **errp);
+ } CryptoDevBackendClass;
+ 
+ 
 -- 
 1.8.3.1
