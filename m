@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41983)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41984)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eBg06-0005to-68
+	(envelope-from <bounces@canonical.com>) id 1eBg06-0005tp-6C
 	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 06:55:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eBg02-0001kd-6d
+	(envelope-from <bounces@canonical.com>) id 1eBg02-0001ka-6U
 	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 06:55:34 -0500
-Received: from indium.canonical.com ([91.189.90.7]:38420)
+Received: from indium.canonical.com ([91.189.90.7]:38400)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eBg02-0001kA-0g
+	id 1eBg01-0001k3-Vw
 	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 06:55:30 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eBg01-0000el-2W
-	for <qemu-devel@nongnu.org>; Mon, 06 Nov 2017 11:55:29 +0000
+	id 1eBfzz-0000fY-R6
+	for <qemu-devel@nongnu.org>; Mon, 06 Nov 2017 11:55:27 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 122162E80C8
-	for <qemu-devel@nongnu.org>; Mon,  6 Nov 2017 11:55:29 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id CC0CE2E80C3
+	for <qemu-devel@nongnu.org>; Mon,  6 Nov 2017 11:55:27 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 06 Nov 2017 11:39:59 -0000
+Date: Mon, 06 Nov 2017 11:40:28 -0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 657006 <657006@bugs.launchpad.net>
+Reply-To: Bug 696094 <696094@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20101008180054.4876.62094.malonedeb@palladium.canonical.com>
-Message-Id: <150996840025.4488.12001196691197991679.launchpad@gac.canonical.com>
+References: <20101231203043.711.86363.malonedeb@potassium.ubuntu.com>
+Message-Id: <150996842889.4347.104938770780402945.launchpad@gac.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 657006] Re: arm v7M - svc insn doesn't trigger
- PendSV handler
+Subject: [Qemu-devel] [Bug 696094] Re: TI Stellaris lm3s811evb (ARM
+ Cortex-M3) : Systick interrupt not working
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,72 +45,70 @@ To: qemu-devel@nongnu.org
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/657006
+https://bugs.launchpad.net/bugs/696094
 
 Title:
-  arm v7M - svc insn doesn't trigger PendSV handler
+  TI Stellaris lm3s811evb (ARM Cortex-M3) : Systick interrupt not
+  working
 
 Status in QEMU:
-  Incomplete
+  New
 
 Bug description:
-  The svc instruction doesn't work as expected.
+  I've tried to create a small project that uses the CMSIS as base library.
+  The problem is that the SysTick_interrupt_handler() doesn't get executed =
+when the systick event is detected in QEMU. Furthermore, it seems asif QEMU=
+ gets stuck in an endless loop. QEMU doesn't respond to Ctrl-C on the comma=
+nd line and the GDB session also stalls. 'kill -9' is the only way to stop =
+QEMU.
 
-  -> qemu 0.13.0 rc1 (git)
+  It seems asif the initialisation of the NVIC works fine. I've traced the =
+function calls in QEMU as follows:
+  stellaris.c: stellaris_init() - Perform generic armv7 init: armv7m_init()
+     armv7m.c: armv7m_init() - Create and init the nvic:
+                                 nvic =3D qdev_create(NULL, "armv7m_nvic");
+                                 env->nvic =3D nvic;
+                                 qdev_init_nofail(nvic);
+                             - Configure the programmable interrupt control=
+ler:
+                                 Call: arm_pic_init_cpu() =
 
-  Test : demo with freeRTOS (for example
-  FreeRTOS-6.0.5/Demo/CORTEX_LM3S811_GCC) with the card lm3s811evb.
+                                          qemu_allocate_irqs(arm_pic_cpu_ha=
+ndler)
+                             - Initialise 64 interrupt structures.
 
-  If we start the scheduler, it will call that function (__attribute__
-  (( naked ))) :
+  The following call sequence is observed when the systick event occur:
+  armv7m_nvic.c: systick_timer_tick(): set pending interrupt
+  armv7m_nvic.c: armv7m_nvic_set_pending() for irq:15
+    arm_gic.c: gic_set_pending_private(): GIC_SET_PENDING(15,)
+      arm_gic.c: gic_update() - Raise IRQ with qemu_set_irq()
+         irq.c: eqmu_set_irq() - Call the irq->handler =
 
-  void vPortStartFirstTask( void )
+                                 -- I assume the irq handler is 'arm_pic_cp=
+u_handler()',
+                                    since that was passed as the parameter =
+when
+                                    qemu_allocate_irqs() was called in ...
+            arm_pic.c: arm_pic_cpu_handler() - After evaluation, call cpu_i=
+nterrupt()
+               exec.c: cpu_interrupt() is called.     =
 
-  {
 
-          __asm volatile(
+  The tools that were used during the testing of this project:
+    GCC: Codesourcery ARM eabi 2010q3
+    QEMU: Checked out on 31/12/2010 - Last commit: 0fcec41eec0432c77645b4a4=
+07d3a3e030c4abc4
+  The project files are attached, for reproducing of the errors.
+     Note: The CMSIS wants to perform byte accesses to the NVIC. For the Co=
+rtex-M3, unaligned 8 bit and 16 bit accesses are allowed. The current QEMU =
+implementation doesn't yet cater for it. As a work around, updated versions=
+ of
+  arm_gic.c armv7m_nvic.h armv7m_nvic.c is also included.
 
-                                          " ldr r0, =3D0xE000ED08   \n" /*
-  Use the NVIC offset register to locate the stack. */
-
-                                          " ldr r0, [r0]
-  \n"
-
-                                          " ldr r0, [r0]
-  \n"
-
-                                          " msr msp, r0
-  \n" /* Set the msp back to the start of the stack. */
-
-                                          " svc 0
-  \n" /* System call to start first task. */
-
-                                  );
-
-  }
-
-  The 4 first lines in asm work fine. The scv 0 call will rise the right in=
-terrupt in qemu (line 151, in arm_gic.c, best_irq =3D 15). However, it will=
- never call the PendSV Handler (xPortPendSVHandler here). This function is =
-recorded in the nvic vector.
-  Next, (after the svc), the processor will execute the line after in code =
-(this is a naked function) so the next function written after vPortStartFir=
-stTask in the code.
-
-  =
-
-  command line :
-  console 1 : qemu-system-arm -M lm3s6965evb -kernel gcc/RTOSDemo.axf -s -S
-  console 2 : arm-none-eabi-gdb -ex "target remote localhost:1234" gcc/RTOS=
-Demo.axf
-
-  arm-none-eabi from http://www.codesourcery.com/sgpp/lite/arm/portal/relea=
-se1294
-  Same error with another project with arm-elf
-
-  processor : arm cortex m3
-
-  host : gentoo (2.6.35-r9) (without kqemu)
+  Launch project with: go_gdb.sh
+  Attach debugger with: arm-none-eabi-gdbtui --command=3DgdbCommands_tui
+  (s =3D step, n =3D next, c =3D continue, Ctrl-C =3D stop, print <variable=
+> to look at variable contents)
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/657006/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/696094/+subscriptions
