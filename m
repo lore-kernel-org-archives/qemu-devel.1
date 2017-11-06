@@ -1,34 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54242)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54354)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eBlij-0004BG-Pv
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 13:02:06 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1eBljC-0004NU-07
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 13:02:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eBlig-0001ZQ-BC
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 13:02:01 -0500
-Received: from indium.canonical.com ([91.189.90.7]:47950)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eBlig-0001Yv-5a
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 13:01:58 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eBlid-0006ba-Om
-	for <qemu-devel@nongnu.org>; Mon, 06 Nov 2017 18:01:55 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id A84F42E80CD
-	for <qemu-devel@nongnu.org>; Mon,  6 Nov 2017 18:01:54 +0000 (UTC)
+	(envelope-from <ehabkost@redhat.com>) id 1eBlj6-0001rp-5a
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 13:02:30 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:63518)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1eBlj5-0001rS-Su
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 13:02:24 -0500
+Date: Mon, 6 Nov 2017 16:02:16 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20171106180216.GT3111@localhost.localdomain>
+References: <1508170976-96869-4-git-send-email-imammedo@redhat.com>
+	<1508325132-70513-1-git-send-email-imammedo@redhat.com>
+	<20171019063151.GA13245@umbus>
+	<20171031150114.60e0958e@nial.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 06 Nov 2017 17:53:12 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1705118 <1705118@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150041005567.6544.17518405784140614257.malonedeb@gac.canonical.com>
-Message-Id: <150999079285.3780.13297437492261904934.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1705118] Re: qemu user mode does not support
- catching SIGSEGV on some architectures
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171031150114.60e0958e@nial.brq.redhat.com>
+Subject: Re: [Qemu-devel] [RFC v2 3/6] possible_cpus: add CPUArchId::type
+ field
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,86 +30,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org, peter.maydell@linaro.org, pkrempa@redhat.com, pbonzini@redhat.com, drjones@redhat.com, cohuck@redhat.com
 
-...and also
- * SPARC doesn't implement setup_rt_frame(), so it can't deliver RT signals=
- at all.
-That's a bigger missing feature than the rest.
+On Tue, Oct 31, 2017 at 03:01:14PM +0100, Igor Mammedov wrote:
+> On Thu, 19 Oct 2017 17:31:51 +1100
+> David Gibson <david@gibson.dropbear.id.au> wrote:
+> 
+> > On Wed, Oct 18, 2017 at 01:12:12PM +0200, Igor Mammedov wrote:
+> > > For enabling early cpu to numa node configuration at runtime
+> > > qmp_query_hotpluggable_cpus() should provide a list of available
+> > > cpu slots at early stage, before machine_init() is called and
+> > > the 1st cpu is created, so that mgmt might be able to call it
+> > > and use output to set numa mapping.
+> > > Use MachineClass::possible_cpu_arch_ids() callback to set
+> > > cpu type info, along with the rest of possible cpu properties,
+> > > to let machine define which cpu type* will be used.
+> > > 
+> > > * for SPAPR it will be a spapr core type and for ARM/s390x/x86
+> > >   a respective descendant of CPUClass.
+> > > 
+> > > Move parse_numa_opts() in vl.c after cpu_model is parsed into
+> > > cpu_type so that possible_cpu_arch_ids() would know which
+> > > cpu_type to use during layout initialization.
+> > > 
+> > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>  
+> > 
+> > Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+> > 
+> > > ---
+> > >   v2:
+> > >      - fix NULL dereference caused by not initialized
+> > >        MachineState::cpu_type at the time parse_numa_opts()
+> > >        were called
+> > > ---
+> > >  include/hw/boards.h        |  2 ++
+> > >  hw/arm/virt.c              |  3 ++-
+> > >  hw/core/machine.c          | 12 ++++++------
+> > >  hw/i386/pc.c               |  4 +++-
+> > >  hw/ppc/spapr.c             | 13 ++++++++-----
+> > >  hw/s390x/s390-virtio-ccw.c |  1 +
+> > >  vl.c                       |  3 +--
+> > >  7 files changed, 23 insertions(+), 15 deletions(-)
+> > > 
+> > > diff --git a/include/hw/boards.h b/include/hw/boards.h
+> > > index 191a5b3..fa21758 100644
+> > > --- a/include/hw/boards.h
+> > > +++ b/include/hw/boards.h
+> > > @@ -80,6 +80,7 @@ void machine_set_cpu_numa_node(MachineState *machine,
+> > >   * CPUArchId:
+> > >   * @arch_id - architecture-dependent CPU ID of present or possible CPU  
+> > 
+> > I know this isn't really in scope for this patch, but is @arch_id here
+> > supposed to have meaning defined by the target, or by the machine?
+> > 
+> > If it's the machime, it could do with a rename - "arch" means target
+> > to most people (thanks to Linux).
+> > 
+> > If it's the target, it's kind of bogus, because it doesn't necessarily
+> > have a clear meaning per target - get_arch_id in CPUClass has the same
+> > problem, which is probably one reason it's basically only used by the
+> > x86 code at present.
+> > 
+> > e.g. for target/ppc, what do we use?  There's the PIR, which is in the
+> > CPU.. but only on some cpu models, not all.  There will generally be
+> > some kind of master PIC id, but there are different PIC models on
+> > different boards.  What goes in the devicetree?  Well only some
+> > machines use devicetree, and they might define the cpu reg 
+> > differently.
+> > 
+> > Board designs will generally try to make some if not all of those
+> > possible values equal for simplicity, but there's still no real way of
+> > defining a sensible arch_id independent of machine / board.
+> I'd say arch_id is machine specific so far, it was introduced when we
+> didn't have CpuInstanceProperties and at that time we considered only
+> vcpus (threads) and doesn't really apply to spapr cores.
+> 
+> In general we could do away with arch_id and use CpuInstanceProperties
+> instead, but arch_id also serves aux purpose, it allows machine to
+> pre-calculate(cache) apic-id/mpidr values in one place and then they
+> are/(could be) used by arch in-depended code to build acpi tables.
+> So if we drop arch_id we would need to introduce a machine hook,
+> which would translate CpuInstanceProperties into current arch_id.
 
--- =
+I think we need to do a better to job documenting where exactly
+we expect arch_id to be used and how, so people know what it's
+supposed to return.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1705118
+If the only place where it's useful now is ACPI code (is it?),
+should we rename it to something like get_acpi_id()?
 
-Title:
-  qemu user mode does not support catching SIGSEGV on some architectures
-
-Status in QEMU:
-  Confirmed
-
-Bug description:
-  The documentation
-  <https://qemu.weilnetz.de/doc/qemu-doc.html#Features> says that
-  qemu in user mode supports POSIX signal handling.
-
-  Catching SIGSEGV according to POSIX, however, does not work on
-    ppc, ppc64, ppc64le, s390x, sparc64.
-  It does work, however, on
-    aarch64, alpha, arm, hppa, m68k, mips, mips64, sh4.
-
-  How to reproduce:
-  The attached program runs fine (exits with code 0) on
-    - real hardware Linux/PowerPC64 (in 32-bit and 64-bit mode),
-    - real hardware Linux/PowerPC64LE,
-    - qemu-system-s390x emulated Linux/s390x,
-    - real hardware Linux/SPARC64.
-  $ gcc -O -Wall testsigsegv.c; ./a.out; echo $?
-  0
-
-  For ppc:
-  $ powerpc-linux-gnu-gcc-5 -O -Wall -static testsigsegv.c -o testsigsegv-p=
-pc
-  $ ~/inst-qemu/2.9.0/bin/qemu-ppc testsigsegv-ppc
-  $ echo $?
-  3
-
-  For ppc64:
-  $ powerpc64-linux-gnu-gcc-5 -O -Wall -static testsigsegv.c -o testsigsegv=
--ppc64
-  $ ~/inst-qemu/2.9.0/bin/qemu-ppc64 testsigsegv-ppc64
-  $ echo $?
-  3
-
-  For ppc64le:
-  $ powerpc64le-linux-gnu-gcc-5 -O -Wall -static testsigsegv.c -o testsigse=
-gv-ppc64le
-  $ ~/inst-qemu/2.9.0/bin/qemu-ppc64le testsigsegv-ppc64le
-  $ echo $?
-  3
-
-  For s390x:
-  $ s390x-linux-gnu-gcc-5 -O -Wall -static testsigsegv.c -o testsigsegv-s39=
-0x
-  $ ~/inst-qemu/2.9.0/bin/qemu-s390x testsigsegv-s390x
-  $ echo $?
-  3
-  $ s390x-linux-gnu-gcc-5 -O -Wall -static testsigsegv.c -DAVOID_LINUX_S390=
-X_COMPAT -o testsigsegv-s390x-a
-  $ ~/inst-qemu/2.9.0/bin/qemu-s390x testsigsegv-s390x-a
-  $ echo $?
-  0
-  So, the test fails here because the Linux/s390x kernel omits the least
-  significant 12 bits of the fault address in the 'si_addr' field. But
-  qemu-s390x is not compatible with the Linux/s390x behaviour: it puts
-  the complete fault address in the 'si_addr' field.
-
-  For sparc64:
-  $ sparc64-linux-gnu-gcc-5 -O -Wall -static testsigsegv.c -o testsigsegv-s=
-parc64
-  $ ~/inst-qemu/2.9.0/bin/qemu-sparc64 testsigsegv-sparc64
-  Segmentation fault (core dumped)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1705118/+subscriptions
+-- 
+Eduardo
