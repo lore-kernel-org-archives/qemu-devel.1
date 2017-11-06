@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41819)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46685)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1eBams-0000bu-Cx
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 01:21:35 -0500
+	(envelope-from <aurelien@aurel32.net>) id 1eBb90-00044H-Tt
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 01:44:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1eBamn-0002uF-LZ
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 01:21:34 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:2275)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1eBamn-0002fk-8t
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 01:21:29 -0500
-From: "Longpeng(Mike)" <longpeng2@huawei.com>
-Date: Mon, 6 Nov 2017 14:21:11 +0800
-Message-ID: <1509949271-36280-1-git-send-email-longpeng2@huawei.com>
+	(envelope-from <aurelien@aurel32.net>) id 1eBb8z-000789-QY
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 01:44:26 -0500
+Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:49248)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <aurelien@aurel32.net>)
+	id 1eBb8z-0006rR-KR
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 01:44:25 -0500
+Date: Mon, 6 Nov 2017 07:44:09 +0100
+From: Aurelien Jarno <aurelien@aurel32.net>
+Message-ID: <20171106064409.u46jexf5cafghlmw@aurel32.net>
+References: <1509929837-178178-1-git-send-email-jiang.biao2@zte.com.cn>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH] crypto: afalg: fix a NULL pointer dereference
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1509929837-178178-1-git-send-email-jiang.biao2@zte.com.cn>
+Sender: Aurelien Jarno <aurelien@aurel32.net>
+Subject: Re: [Qemu-devel] [PATCH] tcg/mips: remove inline keywords.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,42 +28,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: berrange@redhat.com, pbonzini@redhat.com, arei.gonglei@huawei.com
-Cc: longpeng2@huawei.com, qemu-devel@nongnu.org
+To: Jiang Biao <jiang.biao2@zte.com.cn>
+Cc: rth@twiddle.net, qemu-devel@nongnu.org, zhong.weidong@zte.com.cn
 
-Test-crypto-hash calls qcrypto_hash_bytesv/digest/base64 with
-errp=NULL, this will cause a NULL poniter deference if afalg_driver
-doesn't support requested algos:
-    ret = qcrypto_hash_afalg_driver.hash_bytesv(alg, iov, niov,
-                                                result, resultlen,
-                                                errp);
-    if (ret == 0) {
-        return ret;
-    }
+On 2017-11-06 08:57, Jiang Biao wrote:
+> The compiler will make reasonable default choies for inline
+> functions, so the inline keywords are redundant. Remove them to
+> retain consistant code style.
+> 
+> Signed-off-by: Jiang Biao <jiang.biao2@zte.com.cn>
+> Suggested-by: Richard Henderson <rth@twiddle.net>
+> ---
+>  tcg/mips/tcg-target.inc.c | 52 +++++++++++++++++++++++------------------------
+>  1 file changed, 26 insertions(+), 26 deletions(-)
 
-    error_free(*errp);  // <--- here
+Looks good to me.
 
-So we must check 'errp & *errp' before dereference.
+Acked-by: Aurelien Jarno <aurelien@aurel32.net>
 
-Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
----
- crypto/hash.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/crypto/hash.c b/crypto/hash.c
-index ac59c63..c464c78 100644
---- a/crypto/hash.c
-+++ b/crypto/hash.c
-@@ -60,7 +60,9 @@ int qcrypto_hash_bytesv(QCryptoHashAlgorithm alg,
-      * TODO:
-      * Maybe we should treat some afalg errors as fatal
-      */
--    error_free(*errp);
-+    if (errp && *errp) {
-+        error_free(*errp);
-+    }
- #endif
- 
-     return qcrypto_hash_lib_driver.hash_bytesv(alg, iov, niov,
 -- 
-1.8.3.1
+Aurelien Jarno                          GPG: 4096R/1DDD8C9B
+aurelien@aurel32.net                 http://www.aurel32.net
