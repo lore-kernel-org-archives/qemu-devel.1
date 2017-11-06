@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37917)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38513)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1eBc3u-0003Cy-01
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 02:43:15 -0500
+	(envelope-from <longpeng2@huawei.com>) id 1eBc5q-0004FM-0g
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 02:45:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1eBc3p-0003oZ-Ar
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 02:43:14 -0500
-Received: from [45.249.212.32] (port=41892 helo=huawei.com)
+	(envelope-from <longpeng2@huawei.com>) id 1eBc5l-0004oU-5G
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 02:45:14 -0500
+Received: from [45.249.212.32] (port=42641 helo=huawei.com)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1eBc3o-0003oF-Ur
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 02:43:09 -0500
+	(envelope-from <longpeng2@huawei.com>) id 1eBc5k-0004o3-Qw
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 02:45:09 -0500
 From: "Longpeng(Mike)" <longpeng2@huawei.com>
-Date: Mon, 6 Nov 2017 14:56:57 +0800
-Message-ID: <1509951422-20060-6-git-send-email-longpeng2@huawei.com>
-In-Reply-To: <1509951422-20060-1-git-send-email-longpeng2@huawei.com>
-References: <1509951422-20060-1-git-send-email-longpeng2@huawei.com>
+Date: Mon, 6 Nov 2017 14:56:52 +0800
+Message-ID: <1509951422-20060-1-git-send-email-longpeng2@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [RFC 05/10] virtio-crypto: add dataq operation logic
- for mux mode
+Subject: [Qemu-devel] [RFC 00/10] virtio-crypto: add multiplexing mode
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,43 +27,42 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: arei.gonglei@huawei.com, pasic@linux.vnet.ibm.com
 Cc: weidong.huang@huawei.com, wangxinxin.wang@huawei.com, jianjay.zhou@huawei.com, qemu-devel@nongnu.org, "Longpeng(Mike)" <longpeng2@huawei.com>
 
-Adds dataq operation support for MUX mode.
+*NOTE*
+The code realization is based on the latest virtio crypto spec:
+ [PATCH v21 0/2] virtio-crypto: virtio crypto device specification
 
-Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
+In session mode, the process of create/close a session
+makes we have a least one full round-trip cost from guest to host to guest
+to be able to send any data for symmetric algorithms. It gets ourself into
+synchronization troubles in some scenarios like a web server handling lots
+of small requests whose algorithms and keys are different.
+
+We can support one-blob request (no sessions) as well for symmetric
+algorithms, including HASH, MAC services. The benefit is obvious for
+HASH service because it's usually a one-blob operation.
+
 ---
- hw/virtio/virtio-crypto.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+Gonglei (2):
+  cryptodev: extract one util function
+  virtio-crypto: add host feature bits support
 
-diff --git a/hw/virtio/virtio-crypto.c b/hw/virtio/virtio-crypto.c
-index 828d7ef..10a0c35 100644
---- a/hw/virtio/virtio-crypto.c
-+++ b/hw/virtio/virtio-crypto.c
-@@ -663,6 +663,9 @@ virtio_crypto_handle_request(VirtIOCryptoReq *request)
-     opcode = ldl_le_p(&hdr.opcode);
-     session_id = ldq_le_p(&hdr.session_id);
- 
-+#define data_req_payload_size(vdev, req)                        \
-+        (virtio_crypto_in_mux_mode((vdev)) ? sizeof((req)) :    \
-+        VIRTIO_CRYPTO_DATA_REQ_PAYLOAD_SIZE_NONMUX)
-     switch (opcode) {
-     case VIRTIO_CRYPTO_CIPHER_ENCRYPT:
-     case VIRTIO_CRYPTO_CIPHER_DECRYPT:
-@@ -671,7 +674,7 @@ virtio_crypto_handle_request(VirtIOCryptoReq *request)
- 
-         iov_to_buf(out_iov, out_num, 0, &req, sizeof(req));
-         /* The unused part of the req will be ingored */
--        s = VIRTIO_CRYPTO_DATA_REQ_PAYLOAD_SIZE_NONMUX;
-+        s = data_req_payload_size(vdev, req);
-         if (unlikely(s != iov_discard_front(&out_iov, &out_num, s))) {
-             virtio_error(vdev, "virtio-crypto request additional "
-                          "parameters too short");
-@@ -718,6 +721,7 @@ virtio_crypto_handle_request(VirtIOCryptoReq *request)
-         virtio_crypto_req_complete(request, VIRTIO_CRYPTO_NOTSUPP);
-         virtio_crypto_free_request(request);
-     }
-+#undef data_req_payload_size
- 
-     return 0;
- }
+Longpeng(Mike) (8):
+  virtio-crypto: remove virtio_crypto_op_ctrl_req structure
+  virtio-crypto: add session creation logic for mux mode
+  virtio-crypto: remove queue_id field in ctrl header
+  virtio-crypto: remove virtio_crypto_op_data_req structure
+  virtio-crypto: add dataq operation logic for mux mode
+  cryptodev: add stateless mode cipher support
+  virtio-crypto: add stateless crypto request handler
+  cryptodev-builtin: add stateless cipher support
+
+ backends/cryptodev-builtin.c                   | 189 +++++++++---
+ backends/cryptodev.c                           |  21 ++
+ hw/virtio/virtio-crypto.c                      | 403 +++++++++++++++++++++++--
+ include/hw/virtio/virtio-crypto.h              |   2 +
+ include/standard-headers/linux/virtio_crypto.h | 199 ++++++++++--
+ include/sysemu/cryptodev.h                     |  21 ++
+ 6 files changed, 735 insertions(+), 100 deletions(-)
+
 -- 
 1.8.3.1
