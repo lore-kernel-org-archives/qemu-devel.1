@@ -1,19 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42664)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42775)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Yongbok.Kim@mips.com>) id 1eBjzg-0001D0-JB
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 11:11:28 -0500
+	(envelope-from <eblake@redhat.com>) id 1eBjzt-0001MD-Jp
+	for Qemu-devel@nongnu.org; Mon, 06 Nov 2017 11:11:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Yongbok.Kim@mips.com>) id 1eBjza-0004FI-H3
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 11:11:24 -0500
-From: Yongbok Kim <yongbok.kim@mips.com>
-Date: Mon, 6 Nov 2017 16:07:43 +0000
-Message-ID: <20171106160744.14399-3-yongbok.kim@mips.com>
-In-Reply-To: <20171106160744.14399-1-yongbok.kim@mips.com>
-References: <20171106160744.14399-1-yongbok.kim@mips.com>
+	(envelope-from <eblake@redhat.com>) id 1eBjzp-0004Oo-HA
+	for Qemu-devel@nongnu.org; Mon, 06 Nov 2017 11:11:37 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47973)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eBjzp-0004Mv-96
+	for Qemu-devel@nongnu.org; Mon, 06 Nov 2017 11:11:33 -0500
+References: <d0e4e71e-981e-eec1-c996-74655079a860@redhat.com>
+	<20171105195753.4td423texl32uo4z@grep.be>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <6b0d5400-5668-11e8-0cd3-789494e6a95b@redhat.com>
+Date: Mon, 6 Nov 2017 10:11:29 -0600
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PULL v2 2/3] MAINTAINERS: Update James Hogan's email
- address
+In-Reply-To: <20171105195753.4td423texl32uo4z@grep.be>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="I4t6uAfof9THp3AbONFRp9lieXn6fbxXe"
+Subject: Re: [Qemu-devel] structured reply behavior for read of 0 bytes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,53 +28,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, James Hogan <james.hogan@imgtec.com>, Michael Tokarev <mjt@tls.msk.ru>, Laurent Vivier <laurent@vivier.eu>, qemu-trivial@nongnu.org, Yongbok Kim <yongbok.kim@imgtec.com>
+To: Wouter Verhelst <w@uter.be>
+Cc: "Qemu-devel@nongnu.org" <Qemu-devel@nongnu.org>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, nbd list <nbd@other.debian.org>
 
-From: James Hogan <james.hogan@imgtec.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--I4t6uAfof9THp3AbONFRp9lieXn6fbxXe
+From: Eric Blake <eblake@redhat.com>
+To: Wouter Verhelst <w@uter.be>
+Cc: "Qemu-devel@nongnu.org" <Qemu-devel@nongnu.org>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ nbd list <nbd@other.debian.org>
+Message-ID: <6b0d5400-5668-11e8-0cd3-789494e6a95b@redhat.com>
+Subject: Re: structured reply behavior for read of 0 bytes
+References: <d0e4e71e-981e-eec1-c996-74655079a860@redhat.com>
+ <20171105195753.4td423texl32uo4z@grep.be>
+In-Reply-To: <20171105195753.4td423texl32uo4z@grep.be>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Update my imgtec.com email address to my kernel.org one in MAINTAINERS
-as MIPS will soon no longer be part of Imagination Technologies, and add
-a mapping in .mailcap so get_maintainer.pl reports the right address.
+On 11/05/2017 01:57 PM, Wouter Verhelst wrote:
+>=20
+> I'd like to take a step back first and wonder what a zero-sized read
+> would actually mean. "Please read no data at this offset". What good
+> does that do? I can't see anything useful coming out of that.
 
-Signed-off-by: James Hogan <james.hogan@imgtec.com>
-Cc: Michael Tokarev <mjt@tls.msk.ru>
-Cc: Laurent Vivier <laurent@vivier.eu>
-Cc: qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-[Yongbok Kim:
-  Updated message subject]
-Signed-off-by: Yongbok Kim <yongbok.kim@imgtec.com>
----
- .mailmap    | 1 +
- MAINTAINERS | 2 +-
- 2 files changed, 2 insertions(+), 1 deletion(-)
+If the export is some sort of memory-mapped device, where a read of 0
+has a different action than a read of 1, then maybe it has use - but
+that gets into the dirty details of a client and server that know what
+to expect. I agree that in the generic case it's probably easiest to
+just leave things as unspecified behavior results.
 
-diff --git a/.mailmap b/.mailmap
-index 28defa1..5aec1bd 100644
---- a/.mailmap
-+++ b/.mailmap
-@@ -8,6 +8,7 @@ Aurelien Jarno <aurelien@aurel32.net> aurel32 <aurel32@c046a42c-6fe2-441c-8c8c-7
- Blue Swirl <blauwirbel@gmail.com> blueswir1 <blueswir1@c046a42c-6fe2-441c-8c8c-71466251a162>
- Edgar E. Iglesias <edgar.iglesias@gmail.com> edgar_igl <edgar_igl@c046a42c-6fe2-441c-8c8c-71466251a162>
- Fabrice Bellard <fabrice@bellard.org> bellard <bellard@c046a42c-6fe2-441c-8c8c-71466251a162>
-+James Hogan <jhogan@kernel.org> <james.hogan@imgtec.com>
- Jocelyn Mayer <l_indien@magic.fr> j_mayer <j_mayer@c046a42c-6fe2-441c-8c8c-71466251a162>
- Paul Brook <paul@codesourcery.com> pbrook <pbrook@c046a42c-6fe2-441c-8c8c-71466251a162>
- Thiemo Seufer <ths@networkno.de> ths <ths@c046a42c-6fe2-441c-8c8c-71466251a162>
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 44aa71e..abbf2b4 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -285,7 +285,7 @@ S: Maintained
- F: target/arm/kvm.c
- 
- MIPS
--M: James Hogan <james.hogan@imgtec.com>
-+M: James Hogan <jhogan@kernel.org>
- S: Maintained
- F: target/mips/kvm.c
- 
--- 
-2.4.5
+I know that a 0-byte write is an interesting probe - does that succeed
+on a read-only export, even when a write of one byte fails?  But that
+just strengthens the argument that normal clients won't be doing 0-byte
+transactions.  It is also feasible that some client/server pair may want
+to special-case a length of 0 as meaning 4G.
+
+>=20
+> If we can come up with some useful semantics that we could apply to a
+> zero-sized read, then I guess it makes sense to worry about handling it=
+=2E
+> In the absense of that though, I think it is more appropriate to just
+> document that a client should not send it, but that a server's behaviou=
+r
+> upon such a command is not defined (other than that it should not cause=
+
+> the server to quit, through a crash or otherwise).
+
+I'll propose wording along those lines.
+
+>=20
+> In fact, the current spec, as you point out, already implicitly forbids=
+
+> (with MUST) nonzero writes by requiring a data chunk to have nonzero
+> payload (and that can't happen when you have a zero-sized read). It
+> might make sense to make that explicit.
+>=20
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--I4t6uAfof9THp3AbONFRp9lieXn6fbxXe
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloAibEACgkQp6FrSiUn
+Q2q82wf9HYaNKebOT79vZTlSN5fAmNHaKmtzIxObEnoOkxNiEgave9JtTZmLTjJ2
+P/1daHgdHtcKSc9o3ubqokvuaDvZxJCkhDLAno1pCNSlZVmjsVswSDQE0VA3tPHc
+V0Clk/E10cu6/ydXXxuT/GCL7fGsoiIJgr9dvx989kCKQno12EIP57EJnsf9DDVX
+rVVh+cRsFvkBh9vlTWpnvlGhlxhUTik8rgWAByH4SP//FcbhgCjlVJnwNts1cSzt
+xFGwPERuKzZ16sQ5T78sdnEzgRijA/RfWeJGcfYmu5R5zMYG5Kd1BLrlMpa5jGXC
+zopyh2z9biGimIS/I6Wiv1V9SzYEPw==
+=zId3
+-----END PGP SIGNATURE-----
+
+--I4t6uAfof9THp3AbONFRp9lieXn6fbxXe--
