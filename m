@@ -1,40 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49319)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49436)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1eBmfW-0001LW-4u
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 14:02:47 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eBmfh-0001Xe-OA
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 14:02:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1eBmfS-0000EV-76
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 14:02:46 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:54222
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1eBmfS-0000E9-0l
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 14:02:42 -0500
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vA6IxIjW186354
-	for <qemu-devel@nongnu.org>; Mon, 6 Nov 2017 14:02:37 -0500
-Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2e2u0m0q3m-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 06 Nov 2017 14:02:36 -0500
-Received: from localhost
-	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Mon, 6 Nov 2017 12:02:36 -0700
-References: <20171106183925.16747-1-marcandre.lureau@redhat.com>
-	<20171106183925.16747-4-marcandre.lureau@redhat.com>
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Mon, 6 Nov 2017 14:02:31 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eBmfg-0000QU-G0
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 14:02:57 -0500
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20171017164426.25277-1-f4bug@amsat.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <68421658-f4db-a74f-f577-85d6b6e2ccd9@amsat.org>
+Date: Mon, 6 Nov 2017 16:02:42 -0300
 MIME-Version: 1.0
-In-Reply-To: <20171106183925.16747-4-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Message-Id: <982c744d-01d6-7ac4-fb15-ef3e24a47fc4@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 03/28] tpm-backend: store TPMIf
- interface, improve backend_init()
+In-Reply-To: <20171017164426.25277-1-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v3 00/42] remove i386/pc dependency from
+ non-PC world (part 1)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,165 +28,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: amarnath.valluri@intel.com
+To: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@imgtec.com>, Richard Henderson <rth@twiddle.net>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Gerd Hoffmann <kraxel@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>, Michael Tokarev <mjt@tls.msk.ru>, Eduardo Otubo <otubo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
 
-On 11/06/2017 01:39 PM, Marc-Andr=C3=A9 Lureau wrote:
-> Store the TPM interface, the actual object may be different from
-> TPMState. Keep a reference on the interface, and check the backend
-> wasn't already initialized.
->
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Hi Michael,
 
-Reviewed-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Since we are now in Soft Freeze, I'll respin this series rebased once
+the next merge window opens.
 
+On 10/17/2017 01:43 PM, Philippe Mathieu-Daudé wrote:
+> Hi,
+> 
+> quite a bunch of patches and files modified, but the diffstat is not that big.
+> 
+> patches missing review: 2 3 16 20 21 33-37 39-41
 
-> ---
->   include/sysemu/tpm.h         |  2 +-
->   include/sysemu/tpm_backend.h |  6 +++---
->   backends/tpm.c               | 11 +++++++++--
->   hw/tpm/tpm_emulator.c        |  4 ++--
->   hw/tpm/tpm_passthrough.c     |  4 ++--
->   hw/tpm/tpm_tis.c             |  2 +-
->   6 files changed, 18 insertions(+), 11 deletions(-)
->
-> diff --git a/include/sysemu/tpm.h b/include/sysemu/tpm.h
-> index 452cdb9cb7..fb1719e5e4 100644
-> --- a/include/sysemu/tpm.h
-> +++ b/include/sysemu/tpm.h
-> @@ -12,8 +12,8 @@
->   #ifndef QEMU_TPM_H
->   #define QEMU_TPM_H
->
-> -#include "qemu/option.h"
->   #include "qom/object.h"
-> +#include "qapi-types.h"
->
->   typedef struct TPMState TPMState;
->
-> diff --git a/include/sysemu/tpm_backend.h b/include/sysemu/tpm_backend.=
-h
-> index 03ea5a3400..b5f21ed8f1 100644
-> --- a/include/sysemu/tpm_backend.h
-> +++ b/include/sysemu/tpm_backend.h
-> @@ -43,8 +43,8 @@ struct TPMBackend {
->       Object parent;
->
->       /*< protected >*/
-> +    TPMIf *tpmif;
->       bool opened;
-> -    TPMState *tpm_state;
->       GThreadPool *thread_pool;
->       bool had_startup_error;
->
-> @@ -96,14 +96,14 @@ enum TpmType tpm_backend_get_type(TPMBackend *s);
->   /**
->    * tpm_backend_init:
->    * @s: the backend to initialized
-> - * @state: TPMState
-> + * @tpmif: TPM interface
->    * @datacb: callback for sending data to frontend
->    *
->    * Initialize the backend with the given variables.
->    *
->    * Returns 0 on success.
->    */
-> -int tpm_backend_init(TPMBackend *s, TPMState *state);
-> +int tpm_backend_init(TPMBackend *s, TPMIf *tpmif);
->
->   /**
->    * tpm_backend_startup_tpm:
-> diff --git a/backends/tpm.c b/backends/tpm.c
-> index 1e416d7f90..86f0e7e915 100644
-> --- a/backends/tpm.c
-> +++ b/backends/tpm.c
-> @@ -43,9 +43,15 @@ enum TpmType tpm_backend_get_type(TPMBackend *s)
->       return k->type;
->   }
->
-> -int tpm_backend_init(TPMBackend *s, TPMState *state)
-> +int tpm_backend_init(TPMBackend *s, TPMIf *tpmif)
->   {
-> -    s->tpm_state =3D state;
-> +    if (s->tpmif) {
-> +        return -1;
-> +    }
-> +
-> +    s->tpmif =3D tpmif;
-> +    object_ref(OBJECT(tpmif));
-> +
->       s->had_startup_error =3D false;
->
->       return 0;
-> @@ -193,6 +199,7 @@ static void tpm_backend_instance_finalize(Object *o=
-bj)
->   {
->       TPMBackend *s =3D TPM_BACKEND(obj);
->
-> +    object_unref(OBJECT(s->tpmif));
->       g_free(s->id);
->       tpm_backend_thread_end(s);
->   }
-> diff --git a/hw/tpm/tpm_emulator.c b/hw/tpm/tpm_emulator.c
-> index 9aaec8e3ef..6bf025c7e2 100644
-> --- a/hw/tpm/tpm_emulator.c
-> +++ b/hw/tpm/tpm_emulator.c
-> @@ -176,7 +176,7 @@ static int tpm_emulator_set_locality(TPMEmulator *t=
-pm_emu, uint8_t locty_number,
->   static void tpm_emulator_handle_request(TPMBackend *tb, TPMBackendCmd=
- *cmd)
->   {
->       TPMEmulator *tpm_emu =3D TPM_EMULATOR(tb);
-> -    TPMIfClass *tic =3D TPM_IF_GET_CLASS(tb->tpm_state);
-> +    TPMIfClass *tic =3D TPM_IF_GET_CLASS(tb->tpmif);
->       Error *err =3D NULL;
->
->       DPRINTF("processing TPM command");
-> @@ -191,7 +191,7 @@ static void tpm_emulator_handle_request(TPMBackend =
-*tb, TPMBackendCmd *cmd)
->           goto error;
->       }
->
-> -    tic->request_completed(TPM_IF(tb->tpm_state));
-> +    tic->request_completed(tb->tpmif);
->       return;
->
->   error:
-> diff --git a/hw/tpm/tpm_passthrough.c b/hw/tpm/tpm_passthrough.c
-> index c440aff4b2..2ad74badca 100644
-> --- a/hw/tpm/tpm_passthrough.c
-> +++ b/hw/tpm/tpm_passthrough.c
-> @@ -139,14 +139,14 @@ err_exit:
->   static void tpm_passthrough_handle_request(TPMBackend *tb, TPMBackend=
-Cmd *cmd)
->   {
->       TPMPassthruState *tpm_pt =3D TPM_PASSTHROUGH(tb);
-> -    TPMIfClass *tic =3D TPM_IF_GET_CLASS(tb->tpm_state);
-> +    TPMIfClass *tic =3D TPM_IF_GET_CLASS(tb->tpmif);
->
->       DPRINTF("tpm_passthrough: processing command %p\n", cmd);
->
->       tpm_passthrough_unix_tx_bufs(tpm_pt, cmd->in, cmd->in_len,
->                                    cmd->out, cmd->out_len, &cmd->selfte=
-st_done);
->
-> -    tic->request_completed(TPM_IF(tb->tpm_state));
-> +    tic->request_completed(tb->tpmif);
->   }
->
->   static void tpm_passthrough_reset(TPMBackend *tb)
-> diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
-> index c5c534d7f2..34ceec91c3 100644
-> --- a/hw/tpm/tpm_tis.c
-> +++ b/hw/tpm/tpm_tis.c
-> @@ -1078,7 +1078,7 @@ static void tpm_tis_realizefn(DeviceState *dev, E=
-rror **errp)
->
->       s->be_driver->fe_model =3D TPM_MODEL_TPM_TIS;
->
-> -    if (tpm_backend_init(s->be_driver, s)) {
-> +    if (tpm_backend_init(s->be_driver, TPM_IF(s))) {
->           error_setg(errp, "tpm_tis: backend driver with id %s could no=
-t be "
->                      "initialized", s->backend);
->           return;
+In the meaning time patches 3 16 20 21 39 can still get some R|A-b :)
+
+Regards,
+
+Phil.
+
+> since v3:
+> 
+> - addressed Thomas & Paolo comments (thanks for your reviews!)
+> - split/fixed MAINTAINERS entries
+> - dropped port92 patch
+> - dropped i8237* patches
+> 
+> I couldn't test the KVM/XEN/HAX part (thanks Corey Minyard for v1 testing!).
+> 
+> since v2:
+> - added R-b, A-b
+> - added missing MAINTAINERS entries (as separate patches)
+> - dma/i82374: avoid multiple creations on the same ISA bus
+> - i386/pc: extract port92 from pc.c
+> - i386/pc: move vmport.c/pvpanic.c from hw/misc/ to hw/i386/
+> 
+> v1:
+> 
+> - clean includes (mostly from script)
+> - code movement (about no logical changes)
+> 
+> Regards,
+> 
+> Phil.
+> 
+> [----] : patches are identical
+> [####] : number of functional differences between upstream/downstream patch
+> [down] : patch is downstream-only
+> The flags [FC] indicate (F)unctional and (C)ontextual differences, respectively
+> 
+> 001/42:[----] [--] 'MAINTAINERS: add entries for i2c/ppc4xx'
+> 002/42:[down] 'MAINTAINERS: add an entry for the i82374 (southbridge)'
+> 003/42:[down] 'MAINTAINERS: add an entry for the i8257 (DMA controller)'
+> 004/42:[----] [--] 'MAINTAINERS: add an entry for the i82378 (superio)'
+> 005/42:[----] [-C] 'MAINTAINERS: add an entry for watchdog/wdt_ib700'
+> 006/42:[----] [--] 'MAINTAINERS: add an entry for input/pckbd.c'
+> 007/42:[----] [--] 'MAINTAINERS: add entries for timer/m48t59'
+> 008/42:[----] [--] 'MAINTAINERS: add missing entry for include/hw/net/'
+> 009/42:[----] [--] 'hw: use "qemu/osdep.h" as first #include in source files'
+> 010/42:[----] [--] 'hw: remove "qemu/osdep.h" from header files'
+> 011/42:[----] [--] 'block: remove "qemu/osdep.h" from header file'
+> 012/42:[----] [--] 'misc: remove headers implicitly included'
+> 013/42:[----] [--] 'misc: remove duplicated includes'
+> 014/42:[----] [--] 'ppc: remove duplicated includes'
+> 015/42:[----] [--] 'i386/hax: remove duplicated includes'
+> 016/42:[0013] [FC] 'i386/hax: remove duplicated include'
+> 017/42:[----] [--] 'nios2: remove duplicated includes (in code commented out)'
+> 018/42:[----] [--] 'misc: avoid "include/" in include path'
+> 019/42:[----] [--] 'numa: remove unused #include'
+> 020/42:[down] 'hw/input/vmmouse: remove unused #include'
+> 021/42:[down] 'hw/misc/pvpanic: remove unused #include'
+> 022/42:[----] [--] 'hw/ssi/aspeed_smc: remove unused #include'
+> 023/42:[----] [--] 'amd_iommu: avoid needless includes in header file'
+> 024/42:[0001] [FC] 'misc: remove old i386 dependency'
+> 025/42:[----] [--] 'hw/ide: remove old i386 dependency'
+> 026/42:[----] [--] 'hw/ipmi: remove old i386 dependency'
+> 027/42:[----] [--] 'hw/i2c: remove old i386 dependency'
+> 028/42:[----] [--] 'hw/tpm: remove old i386 dependency'
+> 029/42:[----] [--] 'hw/virtio-balloon: remove old i386 dependency'
+> 030/42:[0001] [FC] 'hw/unicore32: restrict hw addr defines to source file'
+> 031/42:[----] [--] 'hw/timer/i8254: rename pit_init() -> i8254_pit_init()'
+> 032/42:[----] [-C] 'hw/timer/mc146818: rename rtc_init() -> mc146818_rtc_init()'
+> 033/42:[0003] [FC] 'hw/acpi: ACPI_PM_* defines are not restricted to i386 arch'
+> 034/42:[down] 'hw/acpi/ich9: extract ACPI_PM_PROP_TCO_ENABLED from i386/pc'
+> 035/42:[down] 'hw/display/vga: "vga.h" only contains registers defs, rename it "vga_regs.h"'
+> 036/42:[down] 'hw/display/vga: "vga_int.h" requires "ui/console.h"'
+> 037/42:[down] 'hw/display/vga: extract public API from i386/pc to "hw/display/vga.h"'
+> 038/42:[----] [-C] 'hw/net/ne2000: extract ne2k-isa code from i386/pc to ne2000-isa.c'
+> 039/42:[down] 'hw/misc/pvpanic: extract public API from i386/pc to "hw/misc/pvpanic.h"'
+> 040/42:[down] 'i386/pc: move vmport.c to hw/i386/'
+> 041/42:[down] 'i386/pc: move vmmouse.c to hw/i386/'
+> 042/42:[----] [--] 'misc: drop old i386 dependency'
+[...]
