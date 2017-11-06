@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53960)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59881)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eD1mh-00043C-Eb
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 00:23:20 -0500
+	(envelope-from <no-reply@patchew.org>) id 1eD2Z2-0001Co-CH
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 01:13:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eD1mf-00037y-Rv
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 00:23:19 -0500
-Date: Fri, 10 Nov 2017 14:18:18 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20171110031818.GH7732@umbus.fritz.box>
-References: <1467696699-8941-9-git-send-email-david@gibson.dropbear.id.au>
-	<52275d2d-0a93-fe92-56ed-7841fa5a79dc@redhat.com>
-	<518a60a2-9c65-9eda-471c-83596e746bfb@ozlabs.ru>
+	(envelope-from <no-reply@patchew.org>) id 1eD2Yz-0003ZJ-8A
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 01:13:16 -0500
+Resent-Message-Id: <E1eD2Yz-0003ZJ-8A@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21355)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1eD2Yy-0003Tv-V5
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 01:13:13 -0500
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <151000683988.336.12701448268483176497@bafd83ae6430>
+In-Reply-To: <alpine.DEB.2.10.1711061412330.30448@sstabellini-ThinkPad-X260>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="Hlh2aiwFLCZwGcpw"
-Content-Disposition: inline
-In-Reply-To: <518a60a2-9c65-9eda-471c-83596e746bfb@ozlabs.ru>
-Subject: Re: [Qemu-devel] [PULL,
- 08/14] spapr_pci/spapr_pci_vfio: Support Dynamic DMA Windows (DDW)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 6 Nov 2017 14:20:41 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v2] aarch64: advertise the GIC system
+ register interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,97 +29,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: Laurent Vivier <lvivier@redhat.com>, peter.maydell@linaro.org, agraf@suse.de, qemu-devel@nongnu.org, alex.williamson@redhat.com, qemu-ppc@nongnu.org
+To: sstabellini@kernel.org
+Cc: famz@redhat.com, peter.maydell@linaro.org, julien.grall@arm.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, xen-devel@lists.xen.org
 
-
---Hlh2aiwFLCZwGcpw
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, Nov 08, 2017 at 09:52:12AM +1100, Alexey Kardashevskiy wrote:
-> On 07/11/17 19:42, Laurent Vivier wrote:
-> > On 05/07/2016 07:31, David Gibson wrote:
-> >> From: Alexey Kardashevskiy <aik@ozlabs.ru>
-> >>
-> >> This adds support for Dynamic DMA Windows (DDW) option defined by
-> >> the SPAPR specification which allows to have additional DMA window(s)
-> >>
-> >> The "ddw" property is enabled by default on a PHB but for compatibility
-> >> the pseries-2.6 machine and older disable it.
-> >> This also creates a single DMA window for the older machines to
-> >> maintain backward migration.
-> >>
-> >> This implements DDW for PHB with emulated and VFIO devices. The host
-> >> kernel support is required. The advertised IOMMU page sizes are 4K and
-> >> 64K; 16M pages are supported but not advertised by default, in order to
-> >> enable them, the user has to specify "pgsz" property for PHB and
-> >> enable huge pages for RAM.
-> >=20
-> > Why is it not advirtised by default?
->=20
-> I do not remember clearly but this kind of automation is usually less
-> manageable. What if we do not want huge IOMMU pages for some reason?
-
-The reason is basically for migration.  Because of the compatibility
-requirements for that, we generally try to avoid making any guest
-visible changes to the virtual machine based on host capabilities or
-configuration because it makes migration a total nightmare.
-
-
-That said, in this case the difference which we'd need here -
-availability of hugepages in the guest, is *already* guest visible for
-the normal (non IOMMU) page mapping.  So maybe automatically changing
-the IOMMU mask as well would be ok.  Or at least no worse than we have
-already.
-
-> > When we start qemu with hugepage memory ("mount -t hugetlbfs none
-> > /mnt/kvm_hugepage" and ".. -mem-path /mnt/kvm_hugepage .."), we have an
-> > ugly message:
-> >=20
-> > "qemu-kvm: System page size 0x1000000 is not enabled in page_size_mask
-> > (0x11000). Performance may be slow"
-> >=20
-> > I understand if we want to use this with VFIO, we need something like
-> > "-global spapr-pci-host-bridge.pgsz=3D0x1011000".
-> >=20
-> > But is it needed if we don't use VFIO?
->=20
-> Yes, TCE tables are still created in KVM so the size matters.
->=20
-> > Is it a way QEMU adds automatically the 0x1000000 mask to page_size_mas=
-k?
->=20
-> No. That thing which decides about -mem-path should also add the pgsz mas=
-k.
->=20
->=20
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---Hlh2aiwFLCZwGcpw
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAloFGncACgkQbDjKyiDZ
-s5I02xAAq3ud5ee1homd04tLNmGCKMVfzkV4puVyrpPbvmS3p2XBoexjP8psSDWe
-IECwGxHavUAMFk8IEc02WmVxWQX5wr4JIi5a+p+KoRHV2JYkxA4++mNZbY9Ns9Tw
-2Fs7tlFuDwl1/Mirj5zVqbWMVCB/jrkiuxPvkwY4pgAU+Po5fda7Ty32BNmLZc0R
-bhwLsnrfafJkc0j/ymRBo6Qx6GwNR4BeCkNseA9rhY35rB7HHRnMSFB6/HEPqbQJ
-R6PRzOsUXS1cEQQ9iXmvjNk+fZHBQ6UbKsFOo2AsoFMI/VxWHO35HN97wHmX+g5s
-xPC/j05r7gFjJlpxum+JB3AkERjbmVEBNNWiRbIGwxHHOSuDRHimyuQ1GrmMWvhx
-PP5ff6HDr0ktIuP19/cgf6AuMZHV5JTt6BMsS5U0O7FEUscsQlsk/EZWvZ0f6VWW
-YJd8+DbCOnMhxADTzn871NVcSmcrbAR9WjwC+HYlOw3M+aMbuxm8JrueSCX1m6lh
-D3agcrsNZypcQHQW/RhH8xd60BTBZEwIyUtBDAfkHtmt3XJhISEY2yD1XEX9GAd2
-HTZ8/3voGkNFWTqPAE3Biefn45judf4BBvSSV0WifUXQ7wKnzxddkCPn80GHG3QK
-ZQReNktNeJJfWIwZKccZEviVJzUuLFkgPHVYWy43BzBMM+yzlNE=
-=aGb0
------END PGP SIGNATURE-----
-
---Hlh2aiwFLCZwGcpw--
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
+ZGV2ZWxdIFtQQVRDSCB2Ml0gYWFyY2g2NDogYWR2ZXJ0aXNlIHRoZSBHSUMgc3lzdGVtIHJlZ2lz
+dGVyIGludGVyZmFjZQpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogYWxwaW5lLkRFQi4yLjEwLjE3
+MTEwNjE0MTIzMzAuMzA0NDhAc3N0YWJlbGxpbmktVGhpbmtQYWQtWDI2MAoKPT09IFRFU1QgU0NS
+SVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cg
+LS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBk
+aWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpj
+b21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBp
+biAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQg
+bG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1h
+dD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAg
+ICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhp
+dCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZm
+ODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNo
+ZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgICAgICAgIHBhdGNoZXcvYWxwaW5l
+LkRFQi4yLjEwLjE3MTEwNjE0MTIzMzAuMzA0NDhAc3N0YWJlbGxpbmktVGhpbmtQYWQtWDI2MCAt
+PiBwYXRjaGV3L2FscGluZS5ERUIuMi4xMC4xNzExMDYxNDEyMzMwLjMwNDQ4QHNzdGFiZWxsaW5p
+LVRoaW5rUGFkLVgyNjAKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwpkM2UxY2VjNTQ5
+IGFhcmNoNjQ6IGFkdmVydGlzZSB0aGUgR0lDIHN5c3RlbSByZWdpc3RlciBpbnRlcmZhY2UKCj09
+PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMTogYWFyY2g2NDogYWR2ZXJ0aXNl
+IHRoZSBHSUMgc3lzdGVtIHJlZ2lzdGVyIGludGVyZmFjZS4uLgpFUlJPUjogc3BhY2VzIHJlcXVp
+cmVkIGFyb3VuZCB0aGF0ICd8JyAoY3R4OlZ4VikKIzY3OiBGSUxFOiB0YXJnZXQvYXJtL2hlbHBl
+ci5jOjQ2OTA6CisgICAgICAgICAgICAgIC5yZXNldHZhbHVlID0gY3B1LT5naWN2M19zeXNyZWdz
+ID8gKGNwdS0+aWRfYWE2NHBmcjB8MHgwMTAwMDAwMCkgOgogICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKdG90YWw6IDEg
+ZXJyb3JzLCAwIHdhcm5pbmdzLCAzNCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHls
+ZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZh
+bHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFU
+Q0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0
+ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBh
+dGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRv
+IHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
