@@ -1,23 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44849)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45538)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eC9l6-0002vl-VQ
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 14:42:06 -0500
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1eC9ma-0003pP-Tz
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 14:43:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eC9l6-0000Eg-41
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 14:42:05 -0500
-References: <cover.1508390588.git.alistair.francis@xilinx.com>
-	<ad7c1de551fbc497743e4dd60335a75cb5365a15.1508390588.git.alistair.francis@xilinx.com>
-	<87efpmccvu.fsf@secure.laptop> <87bmke4cu9.fsf@dusky.pond.sub.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <51d103e9-8d6b-8c83-dd69-effe997d4813@redhat.com>
-Date: Tue, 7 Nov 2017 13:41:49 -0600
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1eC9mX-0001FN-N1
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 14:43:36 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:46076
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
+	id 1eC9mX-0001F2-H1
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 14:43:33 -0500
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	vA7JfrOQ101738
+	for <qemu-devel@nongnu.org>; Tue, 7 Nov 2017 14:43:28 -0500
+Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2e3gec80gn-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 07 Nov 2017 14:43:27 -0500
+Received: from localhost
+	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
+	Tue, 7 Nov 2017 12:43:26 -0700
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <87bmke4cu9.fsf@dusky.pond.sub.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="uwwnaKEfqEtGFaKvKrIFwaQN0bnBoTLvE"
-Subject: Re: [Qemu-devel] [PATCH v3 01/46] Replace all occurances of
- __FUNCTION__ with __func__
+Content-Transfer-Encoding: quoted-printable
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+In-Reply-To: <151007441527.31225.4851895159440081867@sif>
+References: <20171107113716.14244-1-chen_han_xiao@126.com>
+	<151007441527.31225.4851895159440081867@sif>
+Date: Tue, 07 Nov 2017 13:43:20 -0600
+Message-Id: <151008380060.31225.11831036511036878637@sif>
+Subject: Re: [Qemu-devel] [Resend][PATCH] qapi-docs: fix a comment typo
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,88 +42,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, Juan Quintela <quintela@redhat.com>
-Cc: Stefano Stabellini <sstabellini@kernel.org>, Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Alistair Francis <alistair.francis@xilinx.com>, Anthony Perard <anthony.perard@citrix.com>, qemu-arm@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, alistair23@gmail.com, Yongbok Kim <yongbok.kim@imgtec.com>, xen-devel@lists.xenproject.org, John Snow <jsnow@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+To: Chen Hanxiao <chen_han_xiao@126.com>, armbru@redhat.com
+Cc: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---uwwnaKEfqEtGFaKvKrIFwaQN0bnBoTLvE
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, Juan Quintela <quintela@redhat.com>
-Cc: Stefano Stabellini <sstabellini@kernel.org>, Fam Zheng <famz@redhat.com>,
- qemu-block@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>,
- qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Alistair Francis <alistair.francis@xilinx.com>,
- Anthony Perard <anthony.perard@citrix.com>, qemu-arm@nongnu.org,
- Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- alistair23@gmail.com, Yongbok Kim <yongbok.kim@imgtec.com>,
- xen-devel@lists.xenproject.org, John Snow <jsnow@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>
-Message-ID: <51d103e9-8d6b-8c83-dd69-effe997d4813@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 01/46] Replace all occurances of
- __FUNCTION__ with __func__
-References: <cover.1508390588.git.alistair.francis@xilinx.com>
- <ad7c1de551fbc497743e4dd60335a75cb5365a15.1508390588.git.alistair.francis@xilinx.com>
- <87efpmccvu.fsf@secure.laptop> <87bmke4cu9.fsf@dusky.pond.sub.org>
-In-Reply-To: <87bmke4cu9.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Quoting Michael Roth (2017-11-07 11:06:55)
+> Quoting Chen Hanxiao (2017-11-07 05:37:16)
+> > From: Chen Hanxiao <chenhanxiao@gmail.com>
+> > =
 
-On 11/07/2017 04:12 AM, Markus Armbruster wrote:
-> Juan Quintela <quintela@redhat.com> writes:
+> >   s/Subection/Subsection
+> > =
+
+> > Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> > Signed-off-by: Chen Hanxiao <chenhanxiao@gmail.com>
+> =
+
+> Thanks, applied to qga tree:
+>   https://github.com/mdroth/qemu/commits/qga
+
+Actually looks like Markus picked this up yesterday, and I plucked it
+into the wrong tree anyway =3D\
+
+> =
+
+> > ---
+> >  docs/devel/qapi-code-gen.txt | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > =
+
+> > diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
+> > index f04c63fe82..06ab699066 100644
+> > --- a/docs/devel/qapi-code-gen.txt
+> > +++ b/docs/devel/qapi-code-gen.txt
+> > @@ -63,7 +63,7 @@ Comment text starting with '=3D' is a section title:
+> > =
+
+> >  Double the '=3D' for a subsection title:
+> > =
+
+> > -    # =3D=3D Subection title
+> > +    # =3D=3D Subsection title
+> > =
+
+> >  '|' denotes examples:
+> > =
+
+> > -- =
+
+> > 2.13.5
+> > =
+
+> =
+
 >=20
->> Alistair Francis <alistair.francis@xilinx.com> wrote:
->>> Replace all occurs of __FUNCTION__ except for the check in checkpatch=
-
->>> with the non GCC specific __func__.
->>>
-
->>> +++ b/audio/audio_int.h
->>> @@ -253,7 +253,7 @@ static inline int audio_ring_dist (int dst, int s=
-rc, int len)
->>>  #define AUDIO_STRINGIFY(n) AUDIO_STRINGIFY_(n)
->>> =20
->>>  #if defined _MSC_VER || defined __GNUC__
->>> -#define AUDIO_FUNC __FUNCTION__
->>> +#define AUDIO_FUNC __func__
->>>  #else
->>>  #define AUDIO_FUNC __FILE__ ":" AUDIO_STRINGIFY (__LINE__)
->>>  #endif
->>
->> Unrelated to this patch ....
->> Do we really support other compilers than msc and gcc?
->=20
-> Let me rephrase the question: do we really support compilers that don't=
-
-> understand __func__?  The presence of numerous unconditional uses of
-> __func__ in the tree means the answer is no.  Let's replace AUDIO_FUNC
-> by plain __func__.
-
-Answered elsewhere in patch 3/46 (where we DO replace AUDIO_FUNC by
-__func__).
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---uwwnaKEfqEtGFaKvKrIFwaQN0bnBoTLvE
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloCDH0ACgkQp6FrSiUn
-Q2pS9wf9GG4eL9iiIJxwjd5vCijsO1/RHRiPat6+DtxuejIILHJbB6EY4hHBalDI
-xcshnT6eisNHvHvfWotdTn6oymhEBN7eVYGJqXucv3qXcBKsiQJZDnVqn/opnBVE
-FGpvAybwkFLOzUbQyRuoehW0qAbYmuFPVlOtMgepuzbpXZ2sv7DdCueIuBGj+6PQ
-eMVGSzQtgfVbxS8jYvv8l34aOaZHNrWjqwPNiYTaqo83/56On8sSghw8qrAT3xHT
-RfbwM4Hh2NI6xFR8VlaZcBEWStWT2nKH3Bzj6s/PCjPLk+GhAn8UolaLxPK9XKMa
-oHpLZWepo/fzcXHMglQxA3JeT0PMVA==
-=3gMk
------END PGP SIGNATURE-----
-
---uwwnaKEfqEtGFaKvKrIFwaQN0bnBoTLvE--
