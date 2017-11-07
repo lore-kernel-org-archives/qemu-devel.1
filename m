@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43485)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48107)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1eCCp3-0005xg-11
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 17:58:22 -0500
+	(envelope-from <alistair23@gmail.com>) id 1eCDBr-00028w-NB
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 18:21:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1eCCoz-0005FR-TE
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 17:58:21 -0500
-Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:45061)
+	(envelope-from <alistair23@gmail.com>) id 1eCDBq-0000oz-PO
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 18:21:55 -0500
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:48487)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1eCCoz-0005FG-Mb
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 17:58:17 -0500
-Received: by mail-pf0-x244.google.com with SMTP id d28so606204pfe.2
-	for <qemu-devel@nongnu.org>; Tue, 07 Nov 2017 14:58:17 -0800 (PST)
-References: <20171103153333.6416-1-berrange@redhat.com>
-	<20171103153333.6416-6-berrange@redhat.com>
-	<d1704cf4-d3d4-cc69-df96-1298c11e1295@ozlabs.ru>
-	<1dee5931-84f6-89e5-54e0-5a61cda23ccf@ozlabs.ru>
-	<20171107101254.GA3213@redhat.com>
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Message-ID: <d4dff69f-ce98-1309-990d-62425ab636b1@ozlabs.ru>
-Date: Wed, 8 Nov 2017 09:58:11 +1100
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1eCDBq-0000o4-Iu
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 18:21:54 -0500
+Received: by mail-wm0-x244.google.com with SMTP id p75so7016384wmg.3
+	for <qemu-devel@nongnu.org>; Tue, 07 Nov 2017 15:21:54 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20171107101254.GA3213@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-AU
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 5/5] build: delay check for empty git
- submodule list
+In-Reply-To: <CAFEAcA_4NfAHSM+qZ7qAys=wTPGJRJfta-H_LvyVp4rYfP49mg@mail.gmail.com>
+References: <1509697171.31823.9.camel@redhat.com>
+	<CAFEAcA8LWHP-yWZxSQmnL_U2f_RAk-_ZfSERF8U48zqRE+bq0Q@mail.gmail.com>
+	<1509715357.5662.1.camel@redhat.com>
+	<CAFEAcA-0d1hEz-O1Q9cCGYAJfcc-rFAg2hNA3Wwq5LzBx1PD9Q@mail.gmail.com>
+	<1509716406.5662.3.camel@redhat.com>
+	<CAKmqyKOG5kASrXuKKm9aLXSRo=jmF3a_LEbBkq4y_LvKGFhbBw@mail.gmail.com>
+	<CAFEAcA_4NfAHSM+qZ7qAys=wTPGJRJfta-H_LvyVp4rYfP49mg@mail.gmail.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Tue, 7 Nov 2017 15:21:22 -0800
+Message-ID: <CAKmqyKMUuEqMB+1HuBMEn4kr33FwDCcK1ydwLhOc9pyqu0YQvg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] capstone broke mingw cross build
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,74 +34,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-On 07/11/17 21:12, Daniel P. Berrange wrote:
-> On Tue, Nov 07, 2017 at 04:13:27PM +1100, Alexey Kardashevskiy wrote:
->> On 07/11/17 15:12, Alexey Kardashevskiy wrote:
->>> On 04/11/17 02:33, Daniel P. Berrange wrote:
->>>> We short circuit the git submodule update when passed an empty module list.
->>>> This accidentally causes the 'status' command to write to the status file. The
->>>> test needs to be delayed into the individual commands to avoid this premature
->>>> writing of the status file.
+On Tue, Nov 7, 2017 at 9:53 AM, Peter Maydell <peter.maydell@linaro.org> wrote:
+> On 7 November 2017 at 17:52, Alistair Francis <alistair23@gmail.com> wrote:
+>> On Fri, Nov 3, 2017 at 6:40 AM, Gerd Hoffmann <kraxel@redhat.com> wrote:
+>>>   Hi,
+>>>
+>>>> > "x86_64-w64-mingw32-ar --version" says "GNU ar (GNU Binutils) 2.25"
 >>>>
->>>> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
->>>> ---
->>>>  scripts/git-submodule.sh | 19 ++++++++++++-------
->>>>  1 file changed, 12 insertions(+), 7 deletions(-)
->>>>
->>>> diff --git a/scripts/git-submodule.sh b/scripts/git-submodule.sh
->>>> index 2857fc57c4..90376a7dae 100755
->>>> --- a/scripts/git-submodule.sh
->>>> +++ b/scripts/git-submodule.sh
->>>> @@ -33,12 +33,6 @@ error() {
->>>>      exit 1
->>>>  }
->>>>  
->>>> -if test -z "$maybe_modules"
->>>> -then
->>>> -    test -e $substat || touch $substat
->>>> -    exit 0
->>>> -fi
->>>> -
->>>>  modules=""
->>>>  for m in $maybe_modules
->>>>  do
->>>> @@ -51,7 +45,7 @@ do
->>>>      fi
->>>>  done
->>>>  
->>>> -if ! test -e ".git"
->>>> +if test -n "$maybe_modules" && ! test -e ".git"
+>>>> Hmm, I guess this 'ar' isn't capable of avoiding the requirement for
+>>>> ranlib. The capstone makefiles look like they have support for
+>>>> running ranlib, though...
 >>>
->>>
->>> $GIT_DIR should be checked too imho:
->>>
->>> if test -n "$maybe_modules" && ! test -e ".git" && test "$GIT_DIR" = ""
+>>> Ah, the recursive call in the qemu Makefile doesn't set RANLIB.
+>>> So it probably works if that happens to be set correctly in the
+>>> environment.  I'm using 'configure --cross-prefix=x86_64-w64-mingw32-'
+>>> for cross builds though.
 >>
->> Uff. Just this won't help, it is assumed everywhere that the ".git" folder
->> exists :(
->>
->> I was hoping to use "git --work-dir=" for the source tree to have a full
->> complete source tree to compile on a build machine but
->> "./scripts/git-submodule.sh status" is always called, no matter what.
-> 
-> If you need to pass extra args to 'git' this is supported already by
-> this changeset. Just create a wrapper script containing whatever args
-> you need to give git, and use "./configure --with-git=your-wrapper"
-> 
->> I'd really love to have some way to disable git activities in Makefile...
-> 
-> I don't want to add that. We don't want to ever build if we detect that
-> the submodules are at a different version to what we expect as it would
-> cause obscure hard to diagnose build problems
-> 
+>> I'm seeing the same problem on RHEL7.2 as well. Did you find a nicer
+>> solution then manually running runlib?
+>
+> Does adding RANLIB to the Makefile rune that calls the capstone
+> makefile work? (I guess we might need to set it up in configure too.)
 
-I gave you an example with one build machine having dtc and another not
-having it - your system breaks. What is the proper solution to this?
+It does, I'll send a patch out.
 
+Thanks for the help Peter
 
+Alistair
 
--- 
-Alexey
+>
+> thanks
+> -- PMM
