@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37849)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39677)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eC1V2-0005M1-9B
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 05:53:02 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1eC1a6-0006Pb-3d
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 05:58:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eC1Ux-0000mo-W0
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 05:52:56 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54434)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eC1Ux-0000lK-Ln
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 05:52:51 -0500
-Date: Tue, 7 Nov 2017 10:52:44 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20171107105244.GD6809@stefanha-x1.localdomain>
-References: <1509986155-4735-1-git-send-email-nanjekyejoannah@gmail.com>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1eC1a4-0003Fs-TQ
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 05:58:10 -0500
+Received: from mail-ua0-x232.google.com ([2607:f8b0:400c:c08::232]:54554)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1eC1a4-0003Fh-Nf
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 05:58:08 -0500
+Received: by mail-ua0-x232.google.com with SMTP id j14so488352uag.11
+	for <qemu-devel@nongnu.org>; Tue, 07 Nov 2017 02:58:08 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="mJm6k4Vb/yFcL9ZU"
-Content-Disposition: inline
-In-Reply-To: <1509986155-4735-1-git-send-email-nanjekyejoannah@gmail.com>
-Subject: Re: [Qemu-devel] [RFC PATCH] remove numpy dependency
+In-Reply-To: <4501d863-bd2d-a62b-b3b8-47c986bdc497@linux.vnet.ibm.com>
+References: <20171106183925.16747-1-marcandre.lureau@redhat.com>
+	<20171106183925.16747-27-marcandre.lureau@redhat.com>
+	<4501d863-bd2d-a62b-b3b8-47c986bdc497@linux.vnet.ibm.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 7 Nov 2017 11:58:07 +0100
+Message-ID: <CAJ+F1C+ngYmGAxi1j4GN2DpQD3Kg+XK41zm754F9w-9pPqKfmA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 26/28] qdev: add DEFINE_PROP_TPMBE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,184 +31,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Joannah Nanjekye <nanjekyejoannah@gmail.com>
-Cc: qemu-devel@nongnu.org
+To: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Cc: QEMU <qemu-devel@nongnu.org>, Amarnath Valluri <amarnath.valluri@intel.com>
+
+On Mon, Nov 6, 2017 at 9:31 PM, Stefan Berger
+<stefanb@linux.vnet.ibm.com> wrote:
+> On 11/06/2017 01:39 PM, Marc-Andr=C3=A9 Lureau wrote:
+>>
+>> A property to lookup a tpm backend.
+>>
+>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>> ---
+>>   include/hw/qdev-properties.h     |  3 ++
+>>   hw/core/qdev-properties-system.c | 64
+>> ++++++++++++++++++++++++++++++++++++++++
+>>   2 files changed, 67 insertions(+)
+>>
+>> diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
+>> index e2321f1cc1..4d24cdf8d6 100644
+>> --- a/include/hw/qdev-properties.h
+>> +++ b/include/hw/qdev-properties.h
+>> @@ -17,6 +17,7 @@ extern const PropertyInfo qdev_prop_int64;
+>>   extern const PropertyInfo qdev_prop_size;
+>>   extern const PropertyInfo qdev_prop_string;
+>>   extern const PropertyInfo qdev_prop_chr;
+>> +extern const PropertyInfo qdev_prop_tpm;
+>>   extern const PropertyInfo qdev_prop_ptr;
+>>   extern const PropertyInfo qdev_prop_macaddr;
+>>   extern const PropertyInfo qdev_prop_on_off_auto;
+>> @@ -186,6 +187,8 @@ extern const PropertyInfo qdev_prop_link;
+>>
+>>   #define DEFINE_PROP_CHR(_n, _s, _f)             \
+>>       DEFINE_PROP(_n, _s, _f, qdev_prop_chr, CharBackend)
+>> +#define DEFINE_PROP_TPMBE(_n, _s, _f)                     \
+>> +    DEFINE_PROP(_n, _s, _f, qdev_prop_tpm, TPMBackend *)
+>>   #define DEFINE_PROP_STRING(_n, _s, _f)             \
+>>       DEFINE_PROP(_n, _s, _f, qdev_prop_string, char*)
+>>   #define DEFINE_PROP_NETDEV(_n, _s, _f)             \
+>> diff --git a/hw/core/qdev-properties-system.c
+>> b/hw/core/qdev-properties-system.c
+>> index ec10da7424..c17364655c 100644
+>> --- a/hw/core/qdev-properties-system.c
+>> +++ b/hw/core/qdev-properties-system.c
+>> @@ -21,6 +21,7 @@
+>>   #include "net/hub.h"
+>>   #include "qapi/visitor.h"
+>>   #include "chardev/char-fe.h"
+>> +#include "sysemu/tpm_backend.h"
+>>   #include "sysemu/iothread.h"
+>>
+>>   static void get_pointer(Object *obj, Visitor *v, Property *prop,
+>> @@ -236,6 +237,69 @@ const PropertyInfo qdev_prop_chr =3D {
+>>       .release =3D release_chr,
+>>   };
+>>
+>> +/* --- character device --- */
+>> +
+>> +static void get_tpm(Object *obj, Visitor *v, const char *name, void
+>> *opaque,
+>> +                    Error **errp)
+>> +{
+>> +    DeviceState *dev =3D DEVICE(obj);
+>> +    TPMBackend **be =3D qdev_get_prop_ptr(dev, opaque);
+>> +    char *p;
+>> +
+>> +    p =3D g_strdup(*be ? (*be)->id : "");
+>> +    visit_type_str(v, name, &p, errp);
+>> +    g_free(p);
+>> +}
+>> +
+>> +static void set_tpm(Object *obj, Visitor *v, const char *name, void
+>> *opaque,
+>> +                    Error **errp)
+>> +{
+>> +    DeviceState *dev =3D DEVICE(obj);
+>> +    Error *local_err =3D NULL;
+>> +    Property *prop =3D opaque;
+>> +    TPMBackend *s, **be =3D qdev_get_prop_ptr(dev, prop);
+>> +    char *str;
+>> +
+>> +    if (dev->realized) {
+>> +        qdev_prop_set_after_realize(dev, name, errp);
+>> +        return;
+>> +    }
+>> +
+>> +    visit_type_str(v, name, &str, &local_err);
+>> +    if (local_err) {
+>> +        error_propagate(errp, local_err);
+>> +        return;
+>> +    }
+>> +
+>> +    s =3D qemu_find_tpm_be(str);
+>> +    if (s =3D=3D NULL) {
+>> +        error_setg(errp, "Property '%s.%s' can't find value '%s'",
+>> +                   object_get_typename(obj), prop->name, str);
+>> +    } else if (tpm_backend_init(s, TPM_IF(obj), errp) =3D=3D 0) {
+>> +        *be =3D s; /* weak reference, avoid cyclic ref */
+>
+>
+> I suppose this is the reason why you need **be rather than *be, but why d=
+o
+> you need this here?
+>
+
+**be is because we have a pointer to the pointer property. This is
+similar to PROP_PTR for example.
+
+tpm_backend_init() takes a refrence to the TpmIf, so we only take a
+weak reference to the backend. Otherwise we would need extra calls to
+break the reference loop. (I am not convinced this is the best design,
+we would need to think about destruction order if there is an issue
+left)
+
+thanks
+
+> Reviewed-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+>
+>     Stefan
+>
+>
+>> +    }
+>> +    g_free(str);
+>> +}
+>> +
+>> +static void release_tpm(Object *obj, const char *name, void *opaque)
+>> +{
+>> +    DeviceState *dev =3D DEVICE(obj);
+>> +    Property *prop =3D opaque;
+>> +    TPMBackend **be =3D qdev_get_prop_ptr(dev, prop);
+>> +
+>> +    if (*be) {
+>> +        tpm_backend_reset(*be);
+>> +    }
+>> +}
+>> +
+>> +const PropertyInfo qdev_prop_tpm =3D {
+>> +    .name  =3D "str",
+>> +    .description =3D "ID of a tpm to use as a backend",
+>> +    .get   =3D get_tpm,
+>> +    .set   =3D set_tpm,
+>> +    .release =3D release_tpm,
+>> +};
+>> +
+>>   /* --- netdev device --- */
+>>   static void get_netdev(Object *obj, Visitor *v, const char *name,
+>>                          void *opaque, Error **errp)
+>
+>
+>
+>
 
 
---mJm6k4Vb/yFcL9ZU
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Mon, Nov 06, 2017 at 07:35:55PM +0300, Joannah Nanjekye wrote:
-> Users tend to hit an ImportError when running analyze-migration.py due
-> to the numpy dependency.  numpy functionality isn't actually used, just
-> binary serialization that the standard library 'struct' module already
-> provides.  Removing the dependency allows the script to run
-> out-of-the-box.
->=20
-> Signed-off-by: Joannah Nanjekye <nanjekyejoannah@gmail.com>
-> ---
->  scripts/analyze-migration.py | 23 +++++++++++++++--------
->  1 file changed, 15 insertions(+), 8 deletions(-)
->=20
-> diff --git a/scripts/analyze-migration.py b/scripts/analyze-migration.py
-> index 1455387..6175c99 100755
-> --- a/scripts/analyze-migration.py
-> +++ b/scripts/analyze-migration.py
-> @@ -17,7 +17,6 @@
->  # You should have received a copy of the GNU Lesser General Public
->  # License along with this library; if not, see <http://www.gnu.org/licen=
-ses/>.
-> =20
-> -import numpy as np
->  import json
->  import os
->  import argparse
-> @@ -36,23 +35,29 @@ class MigrationFile(object):
->          self.file =3D open(self.filename, "rb")
-> =20
->      def read64(self):
-> -        return np.asscalar(np.fromfile(self.file, count=3D1, dtype=3D'>i=
-8')[0])
-
-dtype=3D'>i8' is a 64-bit (8 bytes) big-endian signed integer according to
-https://docs.scipy.org/doc/numpy-1.13.0/reference/arrays.dtypes.html#arrays=
--dtypes-constructing.
-
-> +        buffer =3D file.read(64)
-
-This reads 64 bytes (not bits!).  It should read 8 bytes.
-
-> +        return struct.unpack('>i16', buffer)[0]
-
-This should be '>q' according to
-https://docs.python.org/2.7/library/struct.html#format-strings.
-
-> =20
->      def read32(self):
-> -        return np.asscalar(np.fromfile(self.file, count=3D1, dtype=3D'>i=
-4')[0])
-> +        buffer =3D file.read(32)
-
-read(4)
-
-> +        return struct.unpack('>i8', buffer)[0]
-
-'>i'
-
-> =20
->      def read16(self):
-> -        return np.asscalar(np.fromfile(self.file, count=3D1, dtype=3D'>i=
-2')[0])
-> +        buffer =3D file.read(16)
-
-read(2)
-
-> +        return struct.unpack('>i4', buffer)[0]
-
-'>h'
-
-> =20
->      def read8(self):
-> -        return np.asscalar(np.fromfile(self.file, count=3D1, dtype=3D'>i=
-1')[0])
-> +        buffer =3D file.read(8)
-
-read(1)
-
-> +        return struct.unpack('>i2', buffer)[0]
-
-'b'
-
-> =20
->      def readstr(self, len =3D None):
-> +        read_format =3D str(len) + 'd'
->          if len is None:
->              len =3D self.read8()
->          if len =3D=3D 0:
->              return ""
-> -        return np.fromfile(self.file, count=3D1, dtype=3D('S%d' % len))[=
-0]
-> +        buffer =3D file.read(8)
-> +        return struct.unpack(read_format, buffer[0:(0 + struct.calcsize(=
-read_format))])
-
-According to the numpy documentation 'S' produces raw bytes (not a
-unicode string).  To get the raw bytes we just need file.read(len).  The
-struct module isn't needed.
-
-Something like this should work:
-
-  if len is None:
-      len =3D self.read8()
-  if len =3D=3D 0:
-      return ""
-  return file.read(len).split(b'\0')[0]
-
-> =20
->      def readvar(self, size =3D None):
->          if size is None:
-> @@ -303,8 +308,10 @@ class VMSDFieldInt(VMSDFieldGeneric):
-> =20
->      def read(self):
->          super(VMSDFieldInt, self).read()
-> -        self.sdata =3D np.fromstring(self.data, count=3D1, dtype=3D(self=
-=2Esdtype))[0]
-> -        self.udata =3D np.fromstring(self.data, count=3D1, dtype=3D(self=
-=2Eudtype))[0]
-> +        buffer =3D file.read(self.data)
-
-This statement doesn't make sense.  According to the Python
-documentation:
-
-  read([size]) -> read at most size bytes, returned as a string.
-
-self.data *is* the buffer.  There's no need to call file.read().
-
-> +        read_format =3D self.sdtype
-
-Unused.
-
-> +        self.sdata =3D struct.unpack(self.sdtype, buffer[0:(0 + struct.c=
-alcsize(self.sdtype))])
-
-struct.calcsize() is unnecessary since self.size already contains the
-size in bytes.
-
-struct.unpack returns a tuple and we need the first element, so it
-should be:
-
-  self.sdata =3D struct.unpack(...)[0]
-
-> +        self.sdata =3D struct.unpack(self.udtype, buffer[0:(0 + struct.c=
-alcsize(self.udtype))])
-
-The data type specifiers are incorrect because the struct module uses
-different syntax than numpy:
-
-  self.sdtype =3D '>i%d' % self.size
-  self.udtype =3D '>u%d' % self.size
-
-The struct data type specifiers can be looked up like this:
-
-  sdtypes =3D {1: 'b', 2: '>h', 4: '>i', 8: '>q'}
-  udtypes =3D {1: 'B', 2: '>H', 4: '>I', 8: '>Q'}
-  self.sdtype =3D sdtypes[self.size]
-  self.udtype =3D udtypes[self.size]
-
---mJm6k4Vb/yFcL9ZU
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJaAZB8AAoJEJykq7OBq3PIBSgIAKcwLO9GoIfNybXcdYNGlmLM
-ORjOeMFTKJm5jTprEh0TXLGLkLt9oL0YjKgw6INkbldq0qq9qpuAJXVduPmiE7gD
-7KT6HUTunK12pdkW6fKjlvl9QYq+NZFlWnl3v5SzKWFowHy06A/fVjs+UuKePCS4
-p/vNruacwtKQow2GayVcHvC6baxw7iVmDgyw1z+H4RkyzHTZbAhpJ4eTyv5nSnGU
-ZXS0jrwfQ+V2+4BURNv7NV3mvyZHjD4ZMQTVC1sFgMemIIE13uaNA4CUGrnyM71Y
-x8I7jVeywEuQBbB6CdJn8cVepqO58OhxAjsg58o55lZ7RC2JQ4tV6RPWG8aQljw=
-=HluM
------END PGP SIGNATURE-----
-
---mJm6k4Vb/yFcL9ZU--
+--=20
+Marc-Andr=C3=A9 Lureau
