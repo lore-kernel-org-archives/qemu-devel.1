@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56875)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56948)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1eC3ei-0008Gn-JS
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 08:11:12 -0500
+	(envelope-from <jcody@redhat.com>) id 1eC3ep-0008Jw-P6
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 08:11:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1eC3eY-0003bg-Of
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 08:11:04 -0500
+	(envelope-from <jcody@redhat.com>) id 1eC3el-0003nU-JX
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 08:11:11 -0500
 From: Jeff Cody <jcody@redhat.com>
-Date: Tue,  7 Nov 2017 08:10:34 -0500
-Message-Id: <3996c930fa8cde8570b7a63032720d76a28fd78b.1510059970.git.jcody@redhat.com>
+Date: Tue,  7 Nov 2017 08:10:36 -0500
+Message-Id: <23ca18c7f843c86a28b1529ca9ac6db4b35ca0e4.1510059970.git.jcody@redhat.com>
 In-Reply-To: <cover.1510059970.git.jcody@redhat.com>
 References: <cover.1510059970.git.jcody@redhat.com>
 In-Reply-To: <cover.1510059970.git.jcody@redhat.com>
 References: <cover.1510059970.git.jcody@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 2/4] block/parallels: Do not update header
- or truncate image when INMIGRATE
+Subject: [Qemu-devel] [PATCH v4 4/4] qemu-iotests: update unsupported image
+ formats in 194
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,43 +25,30 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, kwolf@redhat.com, aik@ozlabs.ru, mreitz@redhat.com, den@openvz.org, stefanha@redhat.com
 
-If we write or modify the image file while the QEMU run state is
-INMIGRATE, then the BDRV_O_INACTIVE BDS flag is set.  This will cause
-an assert, since the image is marked inactive.  Make sure we obey this
-flag.
+Test 194 checks for 'luks' to exclude as an unsupported format,
+However, most formats are unsupported, due to migration blockers.
+
+Rather than specifying a blacklist of unsupported formats, whitelist
+supported formats (specifically, qcow2, qed, raw, dmg).
 
 Tested-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 Signed-off-by: Jeff Cody <jcody@redhat.com>
 ---
- block/parallels.c | 7 ++-----
- 1 file changed, 2 insertions(+), 5 deletions(-)
+ tests/qemu-iotests/194 | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/block/parallels.c b/block/parallels.c
-index 2b6c6e5..7b7a3ef 100644
---- a/block/parallels.c
-+++ b/block/parallels.c
-@@ -708,7 +708,7 @@ static int parallels_open(BlockDriverState *bs, QDict *options, int flags,
-         s->prealloc_mode = PRL_PREALLOC_MODE_FALLOCATE;
-     }
+diff --git a/tests/qemu-iotests/194 b/tests/qemu-iotests/194
+index 8d973b4..1d4214a 100755
+--- a/tests/qemu-iotests/194
++++ b/tests/qemu-iotests/194
+@@ -21,7 +21,7 @@
  
--    if (flags & BDRV_O_RDWR) {
-+    if ((flags & BDRV_O_RDWR) && !(flags & BDRV_O_INACTIVE)) {
-         s->header->inuse = cpu_to_le32(HEADER_INUSE_MAGIC);
-         ret = parallels_update_header(bs);
-         if (ret < 0) {
-@@ -741,12 +741,9 @@ static void parallels_close(BlockDriverState *bs)
- {
-     BDRVParallelsState *s = bs->opaque;
+ import iotests
  
--    if (bs->open_flags & BDRV_O_RDWR) {
-+    if ((bs->open_flags & BDRV_O_RDWR) && !(bs->open_flags & BDRV_O_INACTIVE)) {
-         s->header->inuse = 0;
-         parallels_update_header(bs);
--    }
--
--    if (bs->open_flags & BDRV_O_RDWR) {
-         bdrv_truncate(bs->file, s->data_end << BDRV_SECTOR_BITS,
-                       PREALLOC_MODE_OFF, NULL);
-     }
+-iotests.verify_image_format(unsupported_fmts=['luks'])
++iotests.verify_image_format(supported_fmts=['qcow2', 'qed', 'raw', 'dmg'])
+ iotests.verify_platform(['linux'])
+ 
+ with iotests.FilePath('source.img') as source_img_path, \
 -- 
 2.9.5
