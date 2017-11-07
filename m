@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37552)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37595)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eBuA1-0007TL-4B
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 22:02:45 -0500
+	(envelope-from <eblake@redhat.com>) id 1eBuA3-0007Va-CH
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 22:02:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eBuA0-0003Pl-7n
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 22:02:45 -0500
+	(envelope-from <eblake@redhat.com>) id 1eBuA2-0003R3-Ji
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 22:02:47 -0500
 From: Eric Blake <eblake@redhat.com>
-Date: Mon,  6 Nov 2017 21:02:29 -0600
-Message-Id: <20171107030236.23633-2-eblake@redhat.com>
+Date: Mon,  6 Nov 2017 21:02:31 -0600
+Message-Id: <20171107030236.23633-4-eblake@redhat.com>
 In-Reply-To: <20171107030236.23633-1-eblake@redhat.com>
 References: <20171107030236.23633-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/8] nbd-client: Fix error message typos
+Subject: [Qemu-devel] [PATCH 3/8] raw: Reflect read-only protocol layer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,46 +20,36 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, pbonzini@redhat.com, vsementsov@virtuozzo.com, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: qemu-block@nongnu.org, pbonzini@redhat.com, vsementsov@virtuozzo.com, kwolf@redhat.com, Max Reitz <mreitz@redhat.com>
 
-Provide missing spaces that are required when using string
-concatenation to break error messages across source lines.
+We forbid operations like a zero-length write zero or a discard
+at the protocol layer when it is marked read-only, but those
+same operations were succeeding at the format layer because the
+raw format was not reflecting the underlying read-only status
+to the block layer, which then took short circuit paths on
+zero-length operations.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- block/nbd-client.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ block/raw-format.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/block/nbd-client.c b/block/nbd-client.c
-index b44d4d4a01..de6c153328 100644
---- a/block/nbd-client.c
-+++ b/block/nbd-client.c
-@@ -248,7 +248,7 @@ static int nbd_parse_error_payload(NBDStructuredReplyChunk *chunk,
+diff --git a/block/raw-format.c b/block/raw-format.c
+index 830243a8e4..717b8eff65 100644
+--- a/block/raw-format.c
++++ b/block/raw-format.c
+@@ -418,6 +418,12 @@ static int raw_open(BlockDriverState *bs, QDict *options, int flags,
+         bs->file->bs->supported_write_flags;
+     bs->supported_zero_flags = (BDRV_REQ_FUA | BDRV_REQ_MAY_UNMAP) &
+         bs->file->bs->supported_zero_flags;
++    if (bdrv_is_read_only(bs->file->bs)) {
++        ret = bdrv_set_read_only(bs, true, errp);
++        if (ret < 0) {
++            return ret;
++        }
++    }
 
-     error = nbd_errno_to_system_errno(payload_advance32(&payload));
-     if (error == 0) {
--        error_setg(errp, "Protocol error: server sent structured error chunk"
-+        error_setg(errp, "Protocol error: server sent structured error chunk "
-                          "with error = 0");
-         return -EINVAL;
-     }
-@@ -257,7 +257,7 @@ static int nbd_parse_error_payload(NBDStructuredReplyChunk *chunk,
-     message_size = payload_advance16(&payload);
-
-     if (message_size > chunk->length - sizeof(error) - sizeof(message_size)) {
--        error_setg(errp, "Protocol error: server sent structured error chunk"
-+        error_setg(errp, "Protocol error: server sent structured error chunk "
-                          "with incorrect message size");
-         return -EINVAL;
-     }
-@@ -408,7 +408,7 @@ static coroutine_fn int nbd_co_do_receive_one_chunk(
-     if (chunk->type == NBD_REPLY_TYPE_NONE) {
-         if (!(chunk->flags & NBD_REPLY_FLAG_DONE)) {
-             error_setg(errp, "Protocol error: NBD_REPLY_TYPE_NONE chunk without"
--                             "NBD_REPLY_FLAG_DONE flag set");
-+                       " NBD_REPLY_FLAG_DONE flag set");
-             return -EINVAL;
-         }
-         return 0;
+     if (bs->probed && !bdrv_is_read_only(bs)) {
+         fprintf(stderr,
 -- 
 2.13.6
