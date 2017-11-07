@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45098)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45100)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eC8Gk-0001Fu-Qo
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 13:06:40 -0500
+	(envelope-from <bounces@canonical.com>) id 1eC8Gl-0001Fx-2K
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 13:06:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eC8Gh-00053c-IO
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 13:06:38 -0500
-Received: from indium.canonical.com ([91.189.90.7]:55580)
+	(envelope-from <bounces@canonical.com>) id 1eC8Gj-00056d-IE
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 13:06:39 -0500
+Received: from indium.canonical.com ([91.189.90.7]:55674)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eC8Gh-00052j-Bs
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 13:06:35 -0500
+	id 1eC8Gj-00056C-BS
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 13:06:37 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eC8Gf-0007Wh-Hn
-	for <qemu-devel@nongnu.org>; Tue, 07 Nov 2017 18:06:33 +0000
+	id 1eC8Gi-0007V8-Ey
+	for <qemu-devel@nongnu.org>; Tue, 07 Nov 2017 18:06:36 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 84CA42E80C7
-	for <qemu-devel@nongnu.org>; Tue,  7 Nov 2017 18:06:33 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 701522E8050
+	for <qemu-devel@nongnu.org>; Tue,  7 Nov 2017 18:06:36 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 07 Nov 2017 18:00:05 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1728116 <1728116@bugs.launchpad.net>
+Date: Tue, 07 Nov 2017 17:59:47 -0000
+From: "R.Nageswara Sastry" <nasastry@in.ibm.com>
+Reply-To: Bug 1713434 <1713434@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <150912776103.20350.959452179379767829.malonedeb@soybean.canonical.com>
-Message-Id: <151007760547.8623.7527254333300984782.malone@wampee.canonical.com>
+References: <150391152035.18876.7874968547091336063.malonedeb@chaenomeles.canonical.com>
+Message-Id: <151007758775.4887.11261439580182847392.malone@chaenomeles.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1728116] Re: Empty /proc/self/auxv (linux-user)
+Subject: [Qemu-devel] [Bug 1713434] Re: prom-env-test test aborted and core
+ dumped
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,80 +39,117 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Oops, yes, commit 7c4ee5bcc82e643 broke this -- it switched the order in
-which we fill in the AUXV info, but forgot to adjust the calculation of
-the length, which as you've guessed we now get backwards.
+The above problem is getting re-producible only with configure option
+"--enable-crypto-afalg" This got introduced in between 2.9.1 and 2.10.0.
+I will bisect it and update.
 
+When I tried earlier with 2.9.1 it complained saying "--enable-crypto-afalg=
+" option is not available so I did with out it and continued that's the rea=
+son why it worked with 2.10.0 and till rc4. =
 
-** Changed in: qemu
-       Status: New =3D> Confirmed
+Tested 2.10.1 with configure option "--enable-crypto-afalg" so it failed.
+
+So this information made me to say it broke in 2.10.1.
+
+When I disable this option "crypto-afalg" in 2.10.1 it's working fine
+and same with latest qemu (git head is at
+a4f0537db0cd68fa2da097995f6ec00747ca453c)
+
+# ./sparc64-softmmu/qemu-system-sparc64 -nographic -M sun4u -prom-env 'use-=
+nvramrc?=3Dtrue' -prom-env 'nvramrc=3D." Hello World!" cr'
+OpenBIOS for Sparc64
+Configuration device id QEMU version 1 machine id 0
+kernel cmdline
+CPUs: 1 x SUNW,UltraSPARC-IIi
+UUID: 00000000-0000-0000-0000-000000000000
+Hello World!
+Welcome to OpenBIOS v1.1 built on Oct 19 2017 06:59
+  Type 'help' for detailed information
+Trying disk:a...
+No valid state has been set by load or init-program
+
+0 > QEMU 2.10.50 monitor - type 'help' for more information
+(qemu) quit
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1728116
+https://bugs.launchpad.net/bugs/1713434
 
 Title:
-  Empty /proc/self/auxv (linux-user)
+  prom-env-test test aborted and core dumped
 
 Status in QEMU:
-  Confirmed
+  In Progress
 
 Bug description:
-  The userspace Linux API virtualization used to fake access to
-  /proc/self/auxv, to provide meaningful data for the guest process.
+  On ppc64le architecture machine the following test case Aborted and
+  Core dumped.
 
-  For newer qemu versions, this fails: The openat() is intercepted, but
-  there's no content: /proc/self/auxv has length zero (i.e. reading from
-  it returns 0 bytes).
+  # tests/prom-env-test --quiet --keep-going -m=3Dquick --GTestLogFD=3D6
+  **
+  ERROR:tests/libqtest.c:628:qtest_get_arch: assertion failed: (qemu !=3D N=
+ULL)
+  Aborted (core dumped)
 
-  Good:
+  Steps to re-produce:
+  clone from the git
+  configure & compile =
 
-  $ x86_64-linux-user/qemu-x86_64 /usr/bin/cat /proc/self/auxv | wc -c
-  256 /proc/self/auxv
+  run the unit tests by 'make check'
 
-  Bad:
-
-  $ x86_64-linux-user/qemu-x86_64 /usr/bin/cat /proc/self/auxv | wc -c
-  0 /proc/self/auxv
-
-  This worked in 2.7.1, and fails in 2.10.1.
-
-  This causes e.g. any procps-ng-based tool to segfault while reading
-  from /proc/self/auxv in an endless loop (probably worth another bug
-  report...)
-
-  Doing a "git bisect" shows that this commit:
-  https://github.com/qemu/qemu/commit/7c4ee5bcc introduced the problem.
-
-  It might be a simple logic (subtraction in the wrong direction?) or
-  sign-ness error: Adding some logging (to v2.10.1)
-
-  diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-  index 9b6364a..49285f9 100644
-  --- a/linux-user/syscall.c
-  +++ b/linux-user/syscall.c
-  @@ -7469,6 +7469,9 @@ static int open_self_auxv(void *cpu_env, int fd)
-       abi_ulong len =3D ts->info->auxv_len;
-       char *ptr;
-   =
-
-  +    gemu_log(TARGET_ABI_FMT_lu"\n", len);
-  +    gemu_log(TARGET_ABI_FMT_ld"\n", len);
-  +
-       /*
-        * Auxiliary vector is stored in target process stack.
-        * read in whole auxv vector and copy it to file
-
-  shows this output:
-
-  $  x86_64-linux-user/qemu-x86_64 /usr/bin/cat /proc/self/auxv | wc -c
-  18446744073709551264
-  -352
-  0
-
-  And 352 could be the expected length.
+  (gdb) bt
+  #0  0x00003fff9d60eff0 in raise () from /lib64/libc.so.6
+  #1  0x00003fff9d61136c in abort () from /lib64/libc.so.6
+  #2  0x00003fff9de1aa04 in g_assertion_message () from /lib64/libglib-2.0.=
+so.0
+  #3  0x00003fff9de1ab0c in g_assertion_message_expr () from /lib64/libglib=
+-2.0.so.0
+  #4  0x000000001000cc30 in qtest_get_arch () at tests/libqtest.c:628
+  #5  0x00000000100048f0 in main (argc=3D5, argv=3D0x3ffff2145538) at tests=
+/prom-env-test.c:82
+  (gdb) i r
+  r0             0xfa	250
+  r1             0x3ffff2144d30	70368510627120
+  r2             0x3fff9d7b9900	70367091333376
+  r3             0x0	0
+  r4             0x12a7	4775
+  r5             0x6	6
+  r6             0x8	8
+  r7             0x1	1
+  r8             0x0	0
+  r9             0x0	0
+  r10            0x0	0
+  r11            0x0	0
+  r12            0x0	0
+  r13            0x3fff9dfa1950	70367099623760
+  r14            0x0	0
+  r15            0x0	0
+  r16            0x0	0
+  r17            0x0	0
+  r18            0x0	0
+  r19            0x0	0
+  r20            0x0	0
+  r21            0x0	0
+  r22            0x0	0
+  r23            0x0	0
+  r24            0x0	0
+  r25            0x0	0
+  r26            0x0	0
+  r27            0x100287f8	268601336
+  r28            0x16841b40	377756480
+  r29            0x4c	76
+  r30            0x3ffff2144de8	70368510627304
+  r31            0x6	6
+  pc             0x3fff9d60eff0	0x3fff9d60eff0 <raise+96>
+  msr            0x900000000280f033	10376293541503627315
+  cr             0x42000842	1107298370
+  lr             0x3fff9d61136c	0x3fff9d61136c <abort+396>
+  ctr            0x0	0
+  xer            0x0	0
+  orig_r3        0x12a7	4775
+  trap           0xc00	3072
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1728116/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1713434/+subscriptions
