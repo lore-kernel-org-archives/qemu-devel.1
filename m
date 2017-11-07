@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48107)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49582)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1eCDBr-00028w-NB
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 18:21:56 -0500
+	(envelope-from <alistair23@gmail.com>) id 1eCDKF-0003Ky-Ik
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 18:30:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1eCDBq-0000oz-PO
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 18:21:55 -0500
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:48487)
+	(envelope-from <alistair23@gmail.com>) id 1eCDKE-0005UJ-GQ
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 18:30:35 -0500
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:53234)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1eCDBq-0000o4-Iu
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 18:21:54 -0500
-Received: by mail-wm0-x244.google.com with SMTP id p75so7016384wmg.3
-	for <qemu-devel@nongnu.org>; Tue, 07 Nov 2017 15:21:54 -0800 (PST)
+	id 1eCDKE-0005Tq-81
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 18:30:34 -0500
+Received: by mail-wm0-x241.google.com with SMTP id t139so7285983wmt.1
+	for <qemu-devel@nongnu.org>; Tue, 07 Nov 2017 15:30:34 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_4NfAHSM+qZ7qAys=wTPGJRJfta-H_LvyVp4rYfP49mg@mail.gmail.com>
-References: <1509697171.31823.9.camel@redhat.com>
-	<CAFEAcA8LWHP-yWZxSQmnL_U2f_RAk-_ZfSERF8U48zqRE+bq0Q@mail.gmail.com>
-	<1509715357.5662.1.camel@redhat.com>
-	<CAFEAcA-0d1hEz-O1Q9cCGYAJfcc-rFAg2hNA3Wwq5LzBx1PD9Q@mail.gmail.com>
-	<1509716406.5662.3.camel@redhat.com>
-	<CAKmqyKOG5kASrXuKKm9aLXSRo=jmF3a_LEbBkq4y_LvKGFhbBw@mail.gmail.com>
-	<CAFEAcA_4NfAHSM+qZ7qAys=wTPGJRJfta-H_LvyVp4rYfP49mg@mail.gmail.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Tue, 7 Nov 2017 15:21:22 -0800
-Message-ID: <CAKmqyKMUuEqMB+1HuBMEn4kr33FwDCcK1ydwLhOc9pyqu0YQvg@mail.gmail.com>
+Sender: alistair23@gmail.com
+In-Reply-To: <CAKmqyKM4CsbVvfT5roqQOi+oVLCV=kN7mFxKeTSkiD_tBNA5Ng@mail.gmail.com>
+References: <cover.1508279421.git.alistair.francis@xilinx.com>
+	<CAKmqyKM4CsbVvfT5roqQOi+oVLCV=kN7mFxKeTSkiD_tBNA5Ng@mail.gmail.com>
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Tue, 7 Nov 2017 15:30:02 -0800
+Message-ID: <CAKmqyKMettqnEmxr2w5Z6o0Dn3gU5Pun8CbQm4VPj_0qXeO33w@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] capstone broke mingw cross build
+Subject: Re: [Qemu-devel] [PATCH v3 0/5] Add a valid_cpu_types property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,37 +30,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 
-On Tue, Nov 7, 2017 at 9:53 AM, Peter Maydell <peter.maydell@linaro.org> wrote:
-> On 7 November 2017 at 17:52, Alistair Francis <alistair23@gmail.com> wrote:
->> On Fri, Nov 3, 2017 at 6:40 AM, Gerd Hoffmann <kraxel@redhat.com> wrote:
->>>   Hi,
->>>
->>>> > "x86_64-w64-mingw32-ar --version" says "GNU ar (GNU Binutils) 2.25"
->>>>
->>>> Hmm, I guess this 'ar' isn't capable of avoiding the requirement for
->>>> ranlib. The capstone makefiles look like they have support for
->>>> running ranlib, though...
->>>
->>> Ah, the recursive call in the qemu Makefile doesn't set RANLIB.
->>> So it probably works if that happens to be set correctly in the
->>> environment.  I'm using 'configure --cross-prefix=x86_64-w64-mingw32-'
->>> for cross builds though.
+On Mon, Oct 23, 2017 at 12:26 AM, Alistair Francis <alistair23@gmail.com> wrote:
+> On Wed, Oct 18, 2017 at 12:31 AM, Alistair Francis
+> <alistair.francis@xilinx.com> wrote:
+>> There are numorous QEMU machines that only have a single or a handful of
+>> valid CPU options. To simplyfy the management of specificying which CPU
+>> is/isn't valid let's create a property that can be set in the machine
+>> init. We can then check to see if the user supplied CPU is in that list
+>> or not.
 >>
->> I'm seeing the same problem on RHEL7.2 as well. Did you find a nicer
->> solution then manually running runlib?
+>> I have added the valid_cpu_types for some ARM machines only at the
+>> moment.
+>>
+>> Here is what specifying the CPUs looks like now:
+>>
+>> $ aarch64-softmmu/qemu-system-aarch64 -M netduino2 -kernel ./u-boot.elf -nographic -cpu "cortex-m3" -S
+>> QEMU 2.10.50 monitor - type 'help' for more information
+>> (qemu) info cpus
+>> * CPU #0: thread_id=24175
+>> (qemu) q
+>>
+>> $ aarch64-softmmu/qemu-system-aarch64 -M netduino2 -kernel ./u-boot.elf -nographic -cpu "cortex-m4" -S
+>> QEMU 2.10.50 monitor - type 'help' for more information
+>> (qemu) q
+>>
+>> $ aarch64-softmmu/qemu-system-aarch64 -M netduino2 -kernel ./u-boot.elf -nographic -cpu "cortex-m5" -S
+>> qemu-system-aarch64: unable to find CPU model 'cortex-m5'
+>>
+>> $ aarch64-softmmu/qemu-system-aarch64 -M netduino2 -kernel ./u-boot.elf -nographic -cpu "cortex-a9" -S
+>> qemu-system-aarch64: Invalid CPU type: cortex-a9-arm-cpu
+>> The valid types are: cortex-m3-arm-cpu, cortex-m4-arm-cpu
 >
-> Does adding RANLIB to the Makefile rune that calls the capstone
-> makefile work? (I guess we might need to set it up in configure too.)
+> It looks like all the patches have been reviewed now. Can this go
+> through your tree Peter?
 
-It does, I'll send a patch out.
+Ping!
 
-Thanks for the help Peter
+I'm happy to send a pull request if that helps. I have a slick signed key now :)
 
 Alistair
 
 >
-> thanks
-> -- PMM
+> Thanks,
+> Alistair
+>
+>>
+>> V3:
+>>  - Make the varialbes static
+>> V2:
+>>  - Rebase
+>>  - Reorder patches
+>>  - Add a Raspberry Pi 2 CPU fix
+>> V1:
+>>  - Small fixes to prepare a series instead of RFC
+>>  - Add commit messages for the commits
+>>  - Expand the machine support to ARM machines
+>> RFC v2:
+>>  - Rebase on Igor's work
+>>  - Use more QEMUisms inside the code
+>>  - List the supported machines in a NULL terminated array
+>>
+>> Alistair Francis (5):
+>>   netduino2: Specify the valid CPUs
+>>   bcm2836: Use the Cortex-A7 instead of Cortex-A15
+>>   raspi: Specify the valid CPUs
+>>   xlnx-zcu102: Specify the valid CPUs
+>>   xilinx_zynq: Specify the valid CPUs
+>>
+>>  hw/arm/bcm2836.c     |  2 +-
+>>  hw/arm/netduino2.c   | 10 +++++++++-
+>>  hw/arm/raspi.c       |  7 +++++++
+>>  hw/arm/xilinx_zynq.c |  6 ++++++
+>>  hw/arm/xlnx-zcu102.c | 17 +++++++++++++++++
+>>  5 files changed, 40 insertions(+), 2 deletions(-)
+>>
+>> --
+>> 2.11.0
+>>
