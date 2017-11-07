@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54422)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42331)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1eBqte-0008VW-J2
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 18:33:39 -0500
+	(envelope-from <jsnow@redhat.com>) id 1eBrht-0006Lp-IF
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 19:25:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1eBqtd-0002Vl-Kn
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 18:33:38 -0500
+	(envelope-from <jsnow@redhat.com>) id 1eBrhs-0001MM-HD
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 19:25:33 -0500
+References: <20171002143919.207741-1-vsementsov@virtuozzo.com>
+	<20171002143919.207741-4-vsementsov@virtuozzo.com>
+	<9e5c8b0a-d2f9-e051-f8fb-b9618982e6ea@redhat.com>
+	<b3c404ca-54bd-7385-32eb-58addcf52714@virtuozzo.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <104807ac-bde9-fdba-85cc-e380bed820d0@redhat.com>
+Date: Mon, 6 Nov 2017 19:25:10 -0500
 MIME-Version: 1.0
-Sender: alistair23@gmail.com
-In-Reply-To: <20171106232145.GA25246@flamenco>
-References: <1509734853-3014-1-git-send-email-cota@braap.org>
-	<20171103185610.GA3907@flamenco>
-	<20171103200233.GI3111@localhost.localdomain>
-	<20171103222407.GA22411@flamenco>
-	<20171106141022.GO3111@localhost.localdomain>
-	<20171106215454.GB2152@flamenco>
-	<CAKmqyKOSOHdpzfu_WMPWo6Mh_kfmYhem0nR=BD3_hUws0tGEww@mail.gmail.com>
-	<20171106232145.GA25246@flamenco>
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Mon, 6 Nov 2017 15:33:05 -0800
-Message-ID: <CAKmqyKM20ibTxSFQ5FE_fzgOkcHfjXmrK36mpKswz=ZPwfMshA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] hw: add .min_cpus and .default_cpus fields
- to machine_class
+In-Reply-To: <b3c404ca-54bd-7385-32eb-58addcf52714@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 3/5] backup: init copy_bitmap from
+ sync_bitmap for incremental
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,78 +27,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Richard Henderson <richard.henderson@linaro.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, "Edgar E . Iglesias" <edgar.iglesias@gmail.com>, Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, jcody@redhat.com, mreitz@redhat.com, stefanha@redhat.com, den@openvz.org
 
-On Mon, Nov 6, 2017 at 3:21 PM, Emilio G. Cota <cota@braap.org> wrote:
-> On Mon, Nov 06, 2017 at 14:32:35 -0800, Alistair Francis wrote:
->> Sorry for the silence here, I noticed these were broken just before I
->> went on holidays but didn't get a chance to fix anything.
+
+
+On 10/12/2017 07:23 AM, Vladimir Sementsov-Ogievskiy wrote:
+> 10.10.2017 01:56, John Snow wrote:
 >>
->> For the Xilinx case I was thinking of patching the machine code to
->> sanely follow the -smp option.
+>> On 10/02/2017 10:39 AM, Vladimir Sementsov-Ogievskiy wrote:
+>>> We should not copy non-dirty clusters in write notifiers. So,
+>>> initialize copy_bitmap from sync_bitmap.
+>>>
+>> ...! Duh, good find!!
 >>
->> -smp 1 -> Only create 1 A53
->> -smp 4 -> Create 4 A53s
->> -smp 6 -> Create all the CPUs
+>> So, previously we'd copy extra sectors if they just so happened to be
+>> written to during the backup process. These would be totally redundant
+>> compared to the previous backups in the chain, by definition.
 >>
->> I see a lot of advantages in not forcing the smallest number of CPUs
->> to be 4 unless we really have to.
+>> Now, we allow the write to go through to the source image and let it
+>> dirty the bdrv dirty bitmap we have on standby.
 >>
->> I do see a nice advantage in being able to set the default smp option
->> to something not 1 so the default closely matches hardware, but users
->> can override that if they want to.
+>> Good fix.
 >>
->> So for the patch below I like the default_cpus option, but for Xilinx
->> at least I would like to patch the logic to follow the -smp option
->> instead of force a minimum.
+>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com=
 >
-> Agreed, honouring -smp would be the right fix.
-> Just note that since this is a regression we need the fix to
-> be in for 2.11.
+>>> ---
+>>> =C2=A0 block/backup.c | 45 ++++++++++++++++++++++++++++++++++++++++++=
+++-
+>>> =C2=A0 1 file changed, 44 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/block/backup.c b/block/backup.c
+>>> index 08efec639f..07f4ae846b 100644
+>>> --- a/block/backup.c
+>>> +++ b/block/backup.c
+>>> @@ -422,6 +422,43 @@ out:
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return ret;
+>>> =C2=A0 }
+>>> =C2=A0 +/* init copy_bitmap from sync_bitmap */
+>>> +static void backup_incremental_init_copy_bitmap(BackupBlockJob *job)
+>>> +{
+>>> +=C2=A0=C2=A0=C2=A0 BdrvDirtyBitmapIter *dbi;
+>>> +=C2=A0=C2=A0=C2=A0 int64_t offset;
+>>> +=C2=A0=C2=A0=C2=A0 int64_t end =3D
+>>> DIV_ROUND_UP(bdrv_dirty_bitmap_size(job->sync_bitmap),
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 job->cluster_size);
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 dbi =3D bdrv_dirty_iter_new(job->sync_bitmap);
+>>> +=C2=A0=C2=A0=C2=A0 while ((offset =3D bdrv_dirty_iter_next(dbi)) !=3D=
+ -1) {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int64_t cluster =3D offse=
+t / job->cluster_size;
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int64_t next_cluster;
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 offset +=3D bdrv_dirty_bi=
+tmap_granularity(job->sync_bitmap);
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (offset >=3D bdrv_dirt=
+y_bitmap_size(job->sync_bitmap)) {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 h=
+bitmap_set(job->copy_bitmap, cluster, end - cluster);
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 b=
+reak;
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 offset =3D bdrv_dirty_bit=
+map_next_zero(job->sync_bitmap, offset);
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (offset =3D=3D -1) {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 h=
+bitmap_set(job->copy_bitmap, cluster, end - cluster);
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 b=
+reak;
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 next_cluster =3D DIV_ROUN=
+D_UP(offset, job->cluster_size);
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 hbitmap_set(job->copy_bit=
+map, cluster, next_cluster - cluster);
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (next_cluster >=3D end=
+) {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 b=
+reak;
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>>> +
+>> Did you look into initializing this from a lower layer, e.g. a call to
+>> initialize-an-hbitmap-from-another-hbitmap?
+>>
+>> The loop might look a little cleaner that way and we might possibly ge=
+t
+>> more utility out of it than a custom coded loop here in the backup cod=
+e.
+>=20
+> No, to be honest, I don't want to do it now, there are some difficultie=
+s:
+>=20
+> 1. we init from bdrv bitmap, so we'll have to add a bit strange common
+> interface init-hbitmap-from-bdrv-bitmap
+> 2 (more hard). here copy_bitmap have other size: it's granularity is
+> zero, it corresponds to clusters, not to bytes, and I don't want to
+> change this.
+> so, it's not a common case..
+>=20
 
-Ok, I can spin up a patch for the Xilinx boards in the next day (maybe 2)
+Fair enough, it just struck me as a slightly odd thing to code here in
+the backup file, but it's true that nobody else needs this yet (or
+perhaps ever.)
 
->
-> I just took a look at the non-Xilinx boards. It seems simple enough to
-> substitute the hard-coded value for smp_cpus, but yet again
-> I see "Property" structs that I'm not sure what to do with.
-> For instance, bcm2836.c:152:
->
-> static Property bcm2836_props[] = {
->     DEFINE_PROP_UINT32("enabled-cpus", BCM2836State, enabled_cpus, BCM2836_NCPUS),
->     DEFINE_PROP_END_OF_LIST()
-> };
->
-> What is the purpose here? To enable/disable CPUs with -global args,
-> just like it's done for the Xilinx boards? Shouldn't we just use
-> -smp for that?
+No problem. We'll figure it out when we get there. Thank you!
 
-Hmm...
-
->
-> Also, note that I don't have a way to test these boards, which
-> explains why I'm reluctant to change board code. But of
-> course if board maintainers step in, I'm all for it :-)
-
-Yeah, I see.
-
-What about if we set default_cpus to the -smp option that is expected.
-Then on some of the older boards (like the bcm2836) we print a warning
-in the machine init() if the -smp option doesn't match that?
-
-That way the default args work, we allow users to specify a overwrite
-but we warn them that it might not work and it ensures all boards
-follow a similar flow.
-
-Then if we can test the boards and know that -smp 1 works we can
-remove the warning.
-
-Thanks,
-Alistair
-
->
-> Thanks,
->
->                 Emilio
->
+--js
