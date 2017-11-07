@@ -1,25 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52504)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53918)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1eBtbv-0008Pa-PK
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 21:27:32 -0500
+	(envelope-from <jcody@redhat.com>) id 1eBtfn-0000sn-3k
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 21:31:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1eBtbs-0005xo-H4
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 21:27:31 -0500
-Received: from [45.249.212.32] (port=42057 helo=huawei.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1eBtbs-0005xC-5G
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 21:27:28 -0500
-Message-ID: <5A0119FE.6060709@huawei.com>
-Date: Tue, 7 Nov 2017 10:27:10 +0800
-From: "Longpeng (Mike)" <longpeng2@huawei.com>
-MIME-Version: 1.0
-References: <1509949271-36280-1-git-send-email-longpeng2@huawei.com>
-	<d465b265-2f07-34df-4474-d5dd57ec7443@redhat.com>
-In-Reply-To: <d465b265-2f07-34df-4474-d5dd57ec7443@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] crypto: afalg: fix a NULL pointer
- dereference
+	(envelope-from <jcody@redhat.com>) id 1eBtfm-00080m-BJ
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 21:31:31 -0500
+From: Jeff Cody <jcody@redhat.com>
+Date: Mon,  6 Nov 2017 21:31:18 -0500
+Message-Id: <cover.1510021573.git.jcody@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 0/4] Don't write headers if BDS is INACTIVE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,97 +17,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: berrange@redhat.com, pbonzini@redhat.com, arei.gonglei@huawei.com, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Stefan
-	Hajnoczi <stefanha@gmail.com>
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, aik@ozlabs.ru, mreitz@redhat.com, den@openvz.org, stefanha@redhat.com
+
+Changes from v2->v3:
+
+Patch 2: Uh... fix that misspelling.  Thanks Stefan :)
+Patch 3: New patch to block migration in parallels
+
+git-backport-diff -r qemu/master.. -u 6dc6acb
+
+001/4:[----] [--] 'block/vhdx.c: Don't blindly update the header'
+002/4:[----] [--] 'block/parallels: Do not update header or truncate image when INMIGRATE'
+003/4:[down] 'block/parallels: add migration blocker'
+004/4:[----] [--] 'qemu-iotests: update unsupported image formats in 194'
 
 
+Changes from v1->v2:
 
-On 2017/11/7 1:00, Eric Blake wrote:
+* Drop previous parallels patches, just check BDRV_O_INACTIVE now
+  (Kevin)
 
-> On 11/06/2017 12:21 AM, Longpeng(Mike) wrote:
->> Test-crypto-hash calls qcrypto_hash_bytesv/digest/base64 with
->> errp=NULL, this will cause a NULL poniter deference if afalg_driver
-> 
-> s/poniter deference/pointer dereference/
-> 
+git-backport-diff -r qemu/master.. -u github/master
+Key:
+[----] : patches are identical
+[####] : number of functional differences between upstream/downstream patch
+[down] : patch is downstream-only
+The flags [FC] indicate (F)unctional and (C)ontextual differences, respectively
 
-OK.
+001/3:[----] [--] 'block/vhdx.c: Don't blindly update the header'
+002/3:[down] 'block/parallals: Do not update header or truncate image when INMIGRATE'
+003/3:[----] [--] 'qemu-iotests: update unsupported image formats in 194'
 
->> doesn't support requested algos:
->>     ret = qcrypto_hash_afalg_driver.hash_bytesv(alg, iov, niov,
->>                                                 result, resultlen,
->>                                                 errp);
->>     if (ret == 0) {
->>         return ret;
->>     }
->>
->>     error_free(*errp);  // <--- here
->>
->> So we must check 'errp & *errp' before dereference.
-> 
-> No, if we are going to blindly ignore the error from the hash_bytesv()
-> call, then we should pass NULL rather than errp.
-> 
 
-The 'errp' in this palce is convenient for debug, it can tell us the reason for
-failure without stepping into afalg_driver's hash_bytesv().
+v1:
 
->>
->> Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
->> ---
->>  crypto/hash.c | 4 +++-
->>  1 file changed, 3 insertions(+), 1 deletion(-)
->>
->> diff --git a/crypto/hash.c b/crypto/hash.c
->> index ac59c63..c464c78 100644
->> --- a/crypto/hash.c
->> +++ b/crypto/hash.c
->> @@ -60,7 +60,9 @@ int qcrypto_hash_bytesv(QCryptoHashAlgorithm alg,
->>       * TODO:
->>       * Maybe we should treat some afalg errors as fatal
->>       */
->> -    error_free(*errp);
->> +    if (errp && *errp) {
->> +        error_free(*errp);
->> +    }
-> 
-> Any code that uses 'if (errp && *errp)' is suspicious; I think you need
+VHDX and Parallels both blindly write headers to the image file
+if the images are opened R/W.  This causes an assert if the QEMU run
+state is INMIGRATE.
 
-I see, thanks a lot.
+Jeff Cody (4):
+  block/vhdx.c: Don't blindly update the header
+  block/parallels: Do not update header or truncate image when INMIGRATE
+  block/parallels: add migration blocker
+  qemu-iotests: update unsupported image formats in 194
 
-> a v2 that doesn't try to set errp in the first place, rather than
-> cleaning it up to ignore it after the fact.
-> 
-
-I answered above.
-
-How about the following approach?
-
-int qcrypto_hash_bytesv(...Error **errp)
-{
-#ifdef CONFIG_AF_ALG
-    int ret;
-    Error *err2 = NULL;
-
-    ret = qcrypto_hash_afalg_driver.hash_bytesv(alg, iov, niov,
-                                                result, resultlen,
-                                                &err2);
-    if (ret == 0) {
-        return ret;
-    }
-
-    error_free(*err2);
-#endif
-
-    return qcrypto_hash_lib_driver.hash_bytesv(alg, iov, niov,
-                                               result, resultlen,
-                                               errp);
-}
-
-I'll send a V2 if there's no objection, otherwise I'll pick your suggested
-approach. :)
+ block/parallels.c      | 19 ++++++++++++++-----
+ block/vhdx.c           |  7 -------
+ tests/qemu-iotests/194 |  2 +-
+ 3 files changed, 15 insertions(+), 13 deletions(-)
 
 -- 
-Regards,
-Longpeng(Mike)
+2.9.5
