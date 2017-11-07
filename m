@@ -1,19 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54069)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37554)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1eBtfz-00014f-SW
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 21:31:47 -0500
+	(envelope-from <eblake@redhat.com>) id 1eBuA1-0007TO-6P
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 22:02:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1eBtfz-00087i-5s
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 21:31:43 -0500
-From: Jeff Cody <jcody@redhat.com>
-Date: Mon,  6 Nov 2017 21:31:22 -0500
-Message-Id: <ba11b692f7e46cd4f1a581288e145686e2e35362.1510021573.git.jcody@redhat.com>
-In-Reply-To: <cover.1510021573.git.jcody@redhat.com>
-References: <cover.1510021573.git.jcody@redhat.com>
-In-Reply-To: <cover.1510021573.git.jcody@redhat.com>
-References: <cover.1510021573.git.jcody@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 4/4] qemu-iotests: update unsupported image
- formats in 194
+	(envelope-from <eblake@redhat.com>) id 1eBuA0-0003Pt-Dq
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 22:02:45 -0500
+From: Eric Blake <eblake@redhat.com>
+Date: Mon,  6 Nov 2017 21:02:28 -0600
+Message-Id: <20171107030236.23633-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH 0/8] various NBD fixes for 2.11
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,33 +17,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, aik@ozlabs.ru, mreitz@redhat.com, den@openvz.org, stefanha@redhat.com
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, pbonzini@redhat.com, vsementsov@virtuozzo.com
 
-Test 194 checks for 'luks' to exclude as an unsupported format,
-However, most formats are unsupported, due to migration blockers.
+Sparked by my question on whether we were handling zero-length
+reads correctly according to the NBD spec, but grew to fix
+other things as well such as some typos, tracing weaknesses,
+and better handling of read-only exports.
 
-Rather than specifying a blacklist of unsupported formats, whitelist
-supported formats (specifically, qcow2, qed, raw, dmg).
+The order these patches are listed here is bisection-friendly,
+but applying the patches out of order (for example, applying
+7/8 before any short-circuiting patches stop the client from
+sending 0-length requests, and before the server is fixed to
+stop botching replies to 0-length requests) proved important
+to my ability to test that the patches are needed.
 
-Tested-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-Signed-off-by: Jeff Cody <jcody@redhat.com>
----
- tests/qemu-iotests/194 | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+One of the patches is not strictly NBD, and begs the question
+of whether other filter drivers (mirror, throttle, etc) should
+also be reflecting the read-only status of their underlying
+BDS.  Some of my testing included setting up a read-only NBD
+server and a read-write qemu-io session, then attempting
+'w 0 0', 'w -z 0 0', and 'd 0 0'; these should not succeed if
+the corresponding 'w 0 1' fails, but the end goal is that the
+server shouldn't even need to be involved in these corner cases.
 
-diff --git a/tests/qemu-iotests/194 b/tests/qemu-iotests/194
-index 8d973b4..1d4214a 100755
---- a/tests/qemu-iotests/194
-+++ b/tests/qemu-iotests/194
-@@ -21,7 +21,7 @@
- 
- import iotests
- 
--iotests.verify_image_format(unsupported_fmts=['luks'])
-+iotests.verify_image_format(supported_fmts=['qcow2', 'qed', 'raw', 'dmg'])
- iotests.verify_platform(['linux'])
- 
- with iotests.FilePath('source.img') as source_img_path, \
+Eric Blake (8):
+  nbd-client: Fix error message typos
+  nbd/client: Nicer trace of structured reply
+  raw: Reflect read-only protocol layer
+  nbd-client: Honor server read-only advertisement
+  nbd: Fix struct name for structured reads
+  nbd-client: Short-circuit 0-length operations
+  nbd-client: Stricter enforcing of structured reply spec
+  nbd/server: Fix structured read of length 0
+
+ include/block/nbd.h | 18 +++++++++++++-----
+ block/nbd-client.c  | 38 +++++++++++++++++++++++++++++++-------
+ block/raw-format.c  |  6 ++++++
+ nbd/client.c        |  4 +++-
+ nbd/server.c        | 23 +++++++++++++++++++++--
+ nbd/trace-events    |  3 ++-
+ 6 files changed, 76 insertions(+), 16 deletions(-)
+
 -- 
-2.9.5
+2.13.6
