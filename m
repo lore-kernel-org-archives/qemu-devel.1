@@ -1,34 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57749)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58467)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eC6YU-0003us-9U
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 11:16:51 -0500
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1eC6bV-00057P-Md
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 11:20:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eC6YO-0008WO-8L
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 11:16:50 -0500
-Received: from indium.canonical.com ([91.189.90.7]:44512)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eC6YO-0008Ui-1Q
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 11:16:44 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eC6YM-0008WQ-67
-	for <qemu-devel@nongnu.org>; Tue, 07 Nov 2017 16:16:42 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 22BEB2E8059
-	for <qemu-devel@nongnu.org>; Tue,  7 Nov 2017 16:16:42 +0000 (UTC)
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1eC6bU-0001eV-F3
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 11:19:57 -0500
+From: Anton Nefedov <anton.nefedov@virtuozzo.com>
+Message-ID: <dd350838-9132-e787-10b1-4cb200076ec9@virtuozzo.com>
+Date: Tue, 7 Nov 2017 19:19:41 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 07 Nov 2017 16:01:45 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1585840 <1585840@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20160526014921.26209.46866.malonedeb@chaenomeles.canonical.com>
-Message-Id: <151007050525.3780.2685166142478625298.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1585840] Re: multiprocess program gets incorrect
- results with qemu arm-linux-user
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] segfault in parallel blockjobs (iotest 30)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,61 +22,95 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com
 
-Thanks for the updated test program. I've now run it and can confirm it
-still fails in 'process' mode with current head of git:
+Hi,
 
-$ ~/linaro/qemu-from-laptop/qemu/build/all-linux-static/arm-linux-user/qemu=
--arm /tmp/shmipc-armhf process
-multiprocess test
-starting is_primary=3D0
-starting is_primary=3D1
-at end, *mem =3D 1013192
-at end, *mem =3D 1013192
-should be 2000000
-should be 2000000
+One more drainage-related thing.
+We have recently encountered an issue with parallel block jobs and it's
+not quite clear how to fix it properly, so would appreciate your ideas.
+
+The small attached tweak makes iotest 30 (-qcow2 -nocache) fail 10/10
+times on my machine.
+
+And while most of the errors are just a desync between qemu and the
+test, TestParallelOps is more worrying: qemu segfaults while draining
+before reopening the image for the new block-stream job:
+
+> Program received signal SIGSEGV, Segmentation fault.
+> bdrv_next (it=it@entry=0x7fffcea39330) at /mnt/code/us-qemu/block/block-backend.c:453
+> 453                 bs = it->blk ? blk_bs(it->blk) : NULL;
+> (gdb) bt
+> #0  bdrv_next (it=it@entry=0x7fffcea39330) at /mnt/code/us-qemu/block/block-backend.c:453
+> #1  0x00007f2797ca1bd7 in bdrv_drain_all_begin () at /mnt/code/us-qemu/block/io.c:347
+> #2  0x00007f2797c5470e in bdrv_reopen_multiple (ctx=0x7f279904bd40, bs_queue=0x7f2799b9d8d0, 
+>     errp=errp@entry=0x7fffcea393e0) at /mnt/code/us-qemu/block.c:2871
+> #3  0x00007f2797c548d4 in bdrv_reopen (bs=bs@entry=0x7f27990a0250, bdrv_flags=bdrv_flags@entry=8226, 
+>     errp=errp@entry=0x7fffcea394e8) at /mnt/code/us-qemu/block.c:2916
+> #4  0x00007f2797ab49bb in stream_start (job_id=job_id@entry=0x7f2799c2bc10 "stream-node6", 
+>     bs=bs@entry=0x7f27990a0250, base=base@entry=0x7f27990de250, 
+>     backing_file_str=backing_file_str@entry=0x7f2799a0a350 "/vz/anefedov/qemu-build/us/tests/qemu-iotests/scratch/img-4.img", speed=speed@entry=524288, on_error=on_error@entry=BLOCKDEV_ON_ERROR_REPORT, 
+>     errp=errp@entry=0x7fffcea394e8) at /mnt/code/us-qemu/block/stream.c:239
+> #5  0x00007f2797a86c96 in qmp_block_stream (has_job_id=<optimized out>, 
+> [...]
+> (gdb) p it->blk
+> $1 = (BlockBackend *) 0x9797979797979797
 
 
-** Changed in: qemu
-       Status: Incomplete =3D> Confirmed
+BlockBackend gets deleted by another job's stream_complete(),
+deferred to the main loop, so the fact that the job is put to sleep by
+bdrv_drain_all_begin() doesn't really stop it from execution.
 
--- =
+Looks like the problem is a bit wider though: if I (just for a test)
+keep the BlockBackends referenced while iterating in drain_all_begin(),
+qemu fails a bit further, when accessing the deleted BlockDriverState
+from the apparently obsolete BlockReopenQueue in bdrv_reopen_prepare().
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1585840
 
-Title:
-  multiprocess program gets incorrect results with qemu arm-linux-user
+> Program received signal SIGSEGV, Segmentation fault.
+> 0x00007f4c66a04420 in find_parent_in_reopen_queue (q=<optimized out>, c=0x7f4c68b365e0)
+>     at /mnt/code/us-qemu/block.c:2932
+> 2932            QLIST_FOREACH(child, &bs->children, next) {
+> (gdb) bt
+> #0  0x00007f4c66a04420 in find_parent_in_reopen_queue (q=<optimized out>, c=0x7f4c68b365e0)
+>     at /mnt/code/us-qemu/block.c:2932
+> #1  bdrv_reopen_perm (shared=0x7f4c69596440, perm=0x7f4c69596438, bs=0x7f4c68abc250, q=0x7f4c696238d0)
+>     at /mnt/code/us-qemu/block.c:2951
+> #2  bdrv_reopen_prepare (reopen_state=reopen_state@entry=0x7f4c69596428, queue=queue@entry=0x7f4c696238d0, 
+>     errp=errp@entry=0x7ffe09fc28d0) at /mnt/code/us-qemu/block.c:3035
+> #3  0x00007f4c66a0474f in bdrv_reopen_multiple (ctx=<optimized out>, bs_queue=0x7f4c696238d0, 
+>     errp=errp@entry=0x7ffe09fc2920) at /mnt/code/us-qemu/block.c:2875
+> #4  0x00007f4c66a048d4 in bdrv_reopen (bs=bs@entry=0x7f4c68abc250, bdrv_flags=bdrv_flags@entry=8226, 
+>     errp=errp@entry=0x7ffe09fc2a28) at /mnt/code/us-qemu/block.c:2916
+> #5  0x00007f4c668649bb in stream_start (job_id=job_id@entry=0x7f4c68f95fc0 "stream-node6", 
+> [...]
+> (gdb) p bs
+> $1 = (BlockDriverState *) 0x7f4c68b57250
+> (gdb) p bs->children
+> $2 = {lh_first = 0x6060606060606060}
 
-Status in QEMU:
-  Confirmed
 
-Bug description:
-  The attached program can run either in a threaded mode or a
-  multiprocess mode.  It defaults to threaded mode, and switches to
-  multiprocess mode if the first positional argument is "process".
-  "success" of the test is defined as the final count being seen as
-  2000000 by both tasks.
+Does this mean that bdrv_reopen_queue() has to be moved after
+bdrv_drain_all_begin() which also has to be taught to suspend the main
+loop BHs somehow?
 
-  In standard linux x86_64 userspace (i7, 4 cores) and in standard armhf
-  userspace (4 cores), the test program consistently completes
-  successfully in both modes.  But with qemu arm-linux-user, the test
-  consistently succeeds in threaded mode and generally fails in
-  multiprocess mode.
 
-  The test reflects an essential aspect of how the Free and Open Source
-  project linuxcnc's IPC system works: shared memory regions (created by
-  shmat, but mmap would probably behave the same) contain data and
-  mutexes.  I observed that our testsuite encounters numerous deadlocks
-  and failures when running in an schroot with qemu-user (x86_64 host),
-  and I believe the underlying cause is improper support for atomic
-  operations in a multiprocess model. (the testsuite consistently passes
-  on real hardware)
+thank you
+/Anton
 
-  I observed the same failure at v1.6.0 and master
-  (v2.6.0-424-g287db79), as well as in the outdated Debian version
-  1:2.1+dfsg-12+deb8u5a.
+------
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1585840/+subscriptions
+diff --git a/block/stream.c b/block/stream.c
+index 52d329f..74e980c 100644
+--- a/block/stream.c
++++ b/block/stream.c
+@@ -26,7 +26,7 @@ enum {
+       * enough to process multiple clusters in a single call, so that 
+populating
+       * contiguous regions of the image is efficient.
+       */
+-    STREAM_BUFFER_SIZE = 512 * 1024, /* in bytes */
++    STREAM_BUFFER_SIZE = 8 * 1024 * 1024, /* in bytes */
+  };
+
+  #define SLICE_TIME 100000000ULL /* ns */
