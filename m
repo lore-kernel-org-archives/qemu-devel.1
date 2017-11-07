@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44684)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45200)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eC5tU-0008Rp-H8
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 10:34:34 -0500
+	(envelope-from <bounces@canonical.com>) id 1eC5un-00015c-4q
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 10:35:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eC5tO-00081c-W1
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 10:34:28 -0500
-Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:51516)
+	(envelope-from <bounces@canonical.com>) id 1eC5uh-0008WI-HF
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 10:35:49 -0500
+Received: from indium.canonical.com ([91.189.90.7]:60600)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eC5tO-00081R-S0
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 10:34:22 -0500
-Received: by mail-qt0-x241.google.com with SMTP id h4so15662371qtk.8
-	for <qemu-devel@nongnu.org>; Tue, 07 Nov 2017 07:34:22 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1509993206-26637-1-git-send-email-peter.maydell@linaro.org>
-	<1509993206-26637-2-git-send-email-peter.maydell@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <e66c9e23-3938-0786-8880-3895f88827c5@amsat.org>
-Date: Tue, 7 Nov 2017 12:34:13 -0300
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eC5uh-0008VH-BU
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 10:35:43 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eC5ug-00080p-Ei
+	for <qemu-devel@nongnu.org>; Tue, 07 Nov 2017 15:35:42 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 6C6D92E8058
+	for <qemu-devel@nongnu.org>; Tue,  7 Nov 2017 15:35:42 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <1509993206-26637-2-git-send-email-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 1/4] linux-user/s390x: Mask si_addr for
- SIGSEGV
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 07 Nov 2017 15:18:27 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Reply-To: Bug 1614348 <1614348@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20160818033638.22562.88196.malonedeb@soybean.canonical.com>
+Message-Id: <151006790764.20130.13067138357150511535.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1614348] Re: qemu-arm core dumped for no entry
+ symbol programe
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,48 +37,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, patches@linaro.org
+To: qemu-devel@nongnu.org
 
-On 11/06/2017 03:33 PM, Peter Maydell wrote:
-> For s390x, the address passed to a signal handler in the
-> siginfo_t si_addr field is masked (in the kernel this is done in
-> do_sigbus() and do_sigsegv() in arch/s390/mm/fault.c). Implement
-> this architecture-specific oddity in linux-user.
-> 
-> This is one of the issues described in
-> https://bugs.launchpad.net/qemu/+bug/1705118
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Why do you think this is a bug in QEMU? This program crashes on exit if
+you run it on real arm hardware. This is unsurprising as you have told
+the compiler to build it with no C runtime. The program thus starts at
+the beginning of 'main', and when it hits the return at the end there is
+nowhere for it to return to and it crashes. If you link the program with
+the C runtime the way you are expected to, then the runtime gets control
+at the start of execution and provides a place for main() to return to.
+If you choose not to link against the C runtime then it is your
+responsibility to provide an alternate runtime (including defining an
+entry point) which implements the semantics that the main() function
+expects.
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-> ---
->  linux-user/main.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
-> 
-> diff --git a/linux-user/main.c b/linux-user/main.c
-> index aa02f25..b6dd9ef 100644
-> --- a/linux-user/main.c
-> +++ b/linux-user/main.c
-> @@ -3238,6 +3238,10 @@ void cpu_loop(CPUAlphaState *env)
->  #endif /* TARGET_ALPHA */
->  
->  #ifdef TARGET_S390X
-> +
-> +/* s390x masks the fault address it reports in si_addr for SIGSEGV and SIGBUS */
-> +#define S390X_FAIL_ADDR_MASK -4096LL
-> +
->  void cpu_loop(CPUS390XState *env)
->  {
->      CPUState *cs = CPU(s390_env_get_cpu(env));
-> @@ -3294,7 +3298,7 @@ void cpu_loop(CPUS390XState *env)
->                  sig = TARGET_SIGSEGV;
->                  /* XXX: check env->error_code */
->                  n = TARGET_SEGV_MAPERR;
-> -                addr = env->__excp_addr;
-> +                addr = env->__excp_addr & S390X_FAIL_ADDR_MASK;
->                  goto do_signal;
->              case PGM_EXECUTE:
->              case PGM_SPECIFICATION:
-> 
+** Changed in: qemu
+       Status: New =3D> Invalid
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1614348
+
+Title:
+  qemu-arm core dumped for no entry symbol programe
+
+Status in QEMU:
+  Invalid
+
+Bug description:
+  Hi qemu developers,
+
+  Environment:
+  * Fedora 24 x86_64
+  * qemu-arm version 2.6.92, Copyright (c) 2003-2008 Fabrice Bellard
+  * arm-linux-gnu-gcc 6.1.1 20160621 (Red Hat Cross 6.1.1-2) (GCC) target: =
+arm-linux-gnueabi
+  * glibc-arm-linux-gnu-devel-2.23
+
+  very simple hello.c:
+
+  #include <stdio.h>
+
+  int main(int argc, char *argv[]) =
+
+  {
+      printf("Hello World\n");
+
+      return 0;
+  }
+
+  arm-linux-gnu-gcc hello.c -I/usr/arm-linux-gnu/include -L/usr/arm-
+  linux-gnu/lib -nostdlib -lc
+
+  /usr/bin/arm-linux-gnu-ld: Warning: Cannot find entry symbol _start;
+  defaulting to 00000000000101fc
+
+  qemu-arm -L /usr/arm-linux-gnu ./a.out
+
+  Hello World
+  qemu: uncaught target signal 4 (Illegal instruction) - core dumped
+  Illegal instruction
+
+  But provided entry symbol:
+
+  arm-linux-gnu-gcc hello.c -I/usr/arm-linux-gnu/include -L/usr/arm-
+  linux-gnu/lib -nostdlib /usr/arm-linux-gnu/lib/crt1.o /usr/arm-linux-
+  gnu/lib/crti.o /usr/arm-linux-gnu/lib/crtn.o -lc
+
+  qemu-arm -L /usr/arm-linux-gnu ./a.out is able to work happily!
+
+  Regards,
+  Leslie Zhai
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1614348/+subscriptions
