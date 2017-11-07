@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38907)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39004)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <asierra@xes-inc.com>) id 1eC5g7-0007hM-Ra
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 10:20:45 -0500
+	(envelope-from <bounces@canonical.com>) id 1eC5gZ-0007tY-5Z
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 10:21:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <asierra@xes-inc.com>) id 1eC5g2-00068T-0w
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 10:20:39 -0500
-Received: from xes-mad.com ([216.165.139.220]:14437 helo=mail.xes-mad.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <asierra@xes-inc.com>) id 1eC5g1-00068D-Sq
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 10:20:33 -0500
-Date: Tue, 7 Nov 2017 09:20:32 -0600 (CST)
-From: Aaron Sierra <asierra@xes-inc.com>
-Message-ID: <1997067362.187762.1510068032954.JavaMail.zimbra@xes-inc.com>
-In-Reply-To: <c97adeea-32ee-269c-2a88-b011e8a294fa@vivier.eu>
-References: <492245211.936616.1510023015797.JavaMail.zimbra@xes-inc.com>
-	<c97adeea-32ee-269c-2a88-b011e8a294fa@vivier.eu>
+	(envelope-from <bounces@canonical.com>) id 1eC5gT-0006MN-09
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 10:21:07 -0500
+Received: from indium.canonical.com ([91.189.90.7]:47294)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eC5gS-0006Kl-Q1
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 10:21:00 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eC5gP-0003A1-5g
+	for <qemu-devel@nongnu.org>; Tue, 07 Nov 2017 15:20:57 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id AC9B42E80CE
+	for <qemu-devel@nongnu.org>; Tue,  7 Nov 2017 15:20:56 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] linux-user: Support explicit targets for
- PowerPC
+Date: Tue, 07 Nov 2017 15:07:55 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Reply-To: Bug 1680991 <1680991@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170408001403.30529.99444.malonedeb@soybean.canonical.com>
+Message-Id: <151006727536.20448.7158140977229998826.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1680991] Re: raspi2: system timer not device
+ implemented
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,81 +37,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: Riku Voipio <riku.voipio@iki.fi>, qemu-devel <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
------ Original Message -----
-> From: "Laurent Vivier" <laurent@vivier.eu>
-> Sent: Tuesday, November 7, 2017 3:24:52 AM
+The raspi2 board model is only partial, and is missing various devices that=
+ weren't used by the test images that it was tested with (mostly Windows-fo=
+r-Arm, I think). The "system timer" is one of the devices that hasn't been =
+implemented, which is why the memory locations where it should be just read=
+-as-zero.
+ =
 
-> Le 07/11/2017 =E0 03:50, Aaron Sierra a =E9crit :
->> Enable building PowerPC targets supporting a specific CPU, without
->> having to set QEMU_CPU via the environment. For example these build
->> targets (and many more) become available:
->>=20
->> qemu-ppc.e500mc qemu-ppc.e500v2 qemu-ppc.e5500 qemu-ppc.e600
->> qemu-ppc.e6500
->>=20
->> These (statically compiled) binaries have proven useful for
->> emulating PowerPC CPUs within Docker containers, where it's hard to
->> reliably define environment variables that are available for every
->> process.
->>=20
->=20
-> An other idea would be to extract the default cpu from argv[0].
->
-> We don't change the default CPU at compile time, but we check the binary
-> name:
-> - if it's qemu-ppc, let's use the default cpu for qemu-ppc
-> - if it's not qemu-ppc, but something like qemu-ppc.XXX, let's set the
-> CPU to XXX. For instance "qemu-ppc.e600" will be a shortcut for
-> "qemu-ppc -cpu e600". [1]
->=20
-> I think it's easy to implement and don't change the default behavior of
-> qemu. And you can use hardlink to define several binaries with different
-> defaults (like busybox)
 
-Laurent,
+** Summary changed:
 
-I had that thought, too, as being the cleanest and simplest to implement,
-but it didn't work out as a practical solution. Having execution depend
-on the name of the file would require a lot of tuning of magics, masks,
-and interpreters in /proc/sys/fs/binfmt_misc to get the behavior that I
-depend on. It would require one entry per binary.
+- System Timer returning 0 tick count for raspi2 emulation
++ raspi2: system timer not device implemented
 
-With the implementation that I've proposed, I only need two fairly generic
-entries (ppc and ppc64) stock from Ubuntu's qemu-user-static package.
-With Docker it's trivial to bind <any_path>/qemu-ppc.e500mc to
-/usr/bin/qemu-ppc-static within the container. Which gives me complete
-control over how the container is emulated.
+** Changed in: qemu
+       Status: New =3D> Confirmed
 
--Aaron S.
+** Tags added: arm
 
->=20
-> Thanks,
-> Laurent
->=20
-> [1] something like:
->=20
-> -- a/linux-user/main.c
-> +++ b/linux-user/main.c
-> @@ -4165,6 +4165,7 @@ static void usage(int exitcode)
-> static int parse_args(int argc, char **argv)
-> {
->     const char *r;
-> +    const char *cpuname;
->     int optind;
->     const struct qemu_argument *arginfo;
->=20
-> @@ -4179,6 +4180,11 @@ static int parse_args(int argc, char **argv)
->         }
->     }
->=20
-> +    cpuname =3D strrchr(argv[0], '.');
-> +    if (cpuname && cpuname[1] !=3D 0) {
-> +        cpu_model =3D strdup(cpuname + 1);
-> +    }
-> +
->     optind =3D 1;
->     for (;;) {
->          if (optind >=3D argc) {
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1680991
+
+Title:
+  raspi2: system timer not device implemented
+
+Status in QEMU:
+  Confirmed
+
+Bug description:
+  In a small hobby kernel for Raspberry Pi 2B, I am using the system
+  timer to control wait durations.  This timer is located at 0x3f003000
+  and the timer counts are located at 0x3f003004 (CLO) and 0x3f004008
+  (CHI).  Reading these memory locations returns 0 for both.
+
+  The basic code for this function is:
+  @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@=
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+  @@ uint64_t ReadSysTimerCount() -- read the system time running count
+  @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@=
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+  ReadSysTimerCount:
+  	ldr	r0,=3DST_CLO                  @ load the base address of the system =
+timer
+  	ldrd	r0,r1,[r0]                  @ Get the 64-bit timer "count" into r1:=
+r0
+  	mov	pc,lr			    @ return
+
+  Tracing back the definition of ST_CLO in my code:
+  #define ST_CLO              (ST_BASE+4)                 // Counter Lower =
+32 bits
+  #define ST_BASE             (HW_BASE+0x3000)            // System Timer b=
+ase address
+  #define HW_BASE             (0x3f000000)                // this is the ba=
+se address for all hardware I/O addresses
+
+  I have tested a similar program that I know to work on real hardware
+  with qemu-system-arm reading the same mmio register and have the same
+  issue, so I'm pretty sure the issue is not with my code.
+
+  My Host PC is a VM on vmWare esxi running FC25 (8 cores, 8GB RAM): =
+
+  [adam@os-dev ~]$ uname -a
+  Linux os-dev.jammin 4.10.8-200.fc25.x86_64 #1 SMP Fri Mar 31 13:20:22 UTC=
+ 2017 x86_64 x86_64 x86_64 GNU/Linux
+
+  I have confirmed this issue on QEMU 2.7.1 (fc25 Distro) and 2.9.0-rc3
+  (git).
+
+  adam@os-dev ~]$ qemu-system-arm --version
+  QEMU emulator version 2.7.1(qemu-2.7.1-4.fc25), Copyright (c) 2003-2016 F=
+abrice Bellard and the QEMU Project developers
+
+  [adam@os-dev ~]$ ./workspace/qemu/bin/debug/native/arm-softmmu/qemu-syste=
+m-arm --version
+  QEMU emulator version 2.8.93 (v2.9.0-rc3-15-g5daf9b3)
+  Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
+
+  A remote debugger for my kernel shows the following:
+  (gdb) info reg
+  r0             0x0	0
+  r1             0x0	0
+  r2             0x96	150
+  r3             0x0	0
+  r4             0xa000	40960
+  r5             0x0	0
+  r6             0x0	0
+  r7             0x0	0
+  r8             0x0	0
+  r9             0xa000	40960
+  r10            0x0	0
+  r11            0x7fdc	32732
+  r12            0x0	0
+  sp             0x7fc8	0x7fc8
+  lr             0x8194	33172
+  pc             0x80a4	0x80a4
+  cpsr           0x800001d3	-2147483181
+  (gdb) stepi
+  0x000080a8 in ?? ()
+  (gdb) info reg
+  r0             0x3f003004	1056976900
+  r1             0x0	0
+  r2             0x96	150
+  r3             0x0	0
+  r4             0xa000	40960
+  r5             0x0	0
+  r6             0x0	0
+  r7             0x0	0
+  r8             0x0	0
+  r9             0xa000	40960
+  r10            0x0	0
+  r11            0x7fdc	32732
+  r12            0x0	0
+  sp             0x7fc8	0x7fc8
+  lr             0x8194	33172
+  pc             0x80a8	0x80a8
+  cpsr           0x800001d3	-2147483181
+  (gdb) stepi
+  0x000080ac in ?? ()
+  (gdb) info reg
+  r0             0x0	0
+  r1             0x0	0
+  r2             0x96	150
+  r3             0x0	0
+  r4             0xa000	40960
+  r5             0x0	0
+  r6             0x0	0
+  r7             0x0	0
+  r8             0x0	0
+  r9             0xa000	40960
+  r10            0x0	0
+  r11            0x7fdc	32732
+  r12            0x0	0
+  sp             0x7fc8	0x7fc8
+  lr             0x8194	33172
+  pc             0x80ac	0x80ac
+  cpsr           0x800001d3	-2147483181
+
+  Notice r0 is loaded with the address for CLO and then cleared with 0
+  when read.
+
+  I am writing my code against the documented specifications in "BCM2835
+  ARM Peripherals" (attached for convenience), section "12 System
+  Timer".
+
+  =
+
+  Please let me know if you need anything else from me.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1680991/+subscriptions
