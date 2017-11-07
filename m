@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59748)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59805)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1eC5I5-0001St-5c
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 09:55:50 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1eC5IA-0001We-As
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 09:55:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1eC5Hz-0002QO-Lc
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 09:55:49 -0500
-Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:52709)
+	(envelope-from <richard.henderson@linaro.org>) id 1eC5I6-0002VL-9p
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 09:55:54 -0500
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:45406)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1eC5Hz-0002Py-EP
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 09:55:43 -0500
-Received: by mail-wm0-x236.google.com with SMTP id t139so4503946wmt.1
-	for <qemu-devel@nongnu.org>; Tue, 07 Nov 2017 06:55:43 -0800 (PST)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <CAFEAcA_krUaWG_EyyRM84znrYEFOhj2xtNgNpnxaUxMU4-EUCQ@mail.gmail.com>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <f3de1ae1-6dda-9bd1-d880-2b5d65285b2e@twiddle.net>
-Date: Tue, 7 Nov 2017 13:59:54 +0100
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_krUaWG_EyyRM84znrYEFOhj2xtNgNpnxaUxMU4-EUCQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] target-s390x: assertion failure in op_risbg
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1eC5I6-0002UV-4I
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 09:55:50 -0500
+Received: by mail-wm0-x243.google.com with SMTP id y80so4311185wmd.0
+	for <qemu-devel@nongnu.org>; Tue, 07 Nov 2017 06:55:49 -0800 (PST)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Tue,  7 Nov 2017 15:55:46 +0100
+Message-Id: <20171107145546.767-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH] target/s390x: Finish implementing RISBGN
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,51 +24,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
-Cc: Alexander Graf <agraf@suse.de>
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, qemu-s390x@nongnu.org
 
-On 11/07/2017 12:41 PM, Peter Maydell wrote:
-> This is from https://bugs.launchpad.net/qemu/+bug/1701798, but
-> that's quite a large thing, so here's the s390 specific part.
-> 
-> On an ubuntu xenial install:
-> 
-> $ apt install g++-5-s390x-linux-gnu
-> $ cat hello.c
-> #include <stdio.h>
-> int main(void) {
->     printf("hello world\n");
->     return 0;
-> }
-> $ s390x-linux-gnu-gcc-5 -O hello.c -o hello.s390x
-> $ QEMU_LD_PREFIX=/usr/s390x-linux-gnu/ gdb --args
-> ~/linaro/qemu-from-laptop/qemu/build/all-linux-static/s390x-linux-user/qemu-s390x
-> ./hello.s390x
-> [...]
-> (gdb) r
-> [...]
-> Thread 1 "qemu-s390x" received signal SIGABRT, Aborted.
-> 0x0000000060215018 in raise ()
-> (gdb) bt
-> #0  0x0000000060215018 in raise ()
-> #1  0x000000006021573a in abort ()
-> #2  0x0000000060079a96 in op_risbg (s=0x7fffffffda10, o=0x7fffffffd950)
->     at /home/petmay01/linaro/qemu-from-laptop/qemu/target/s390x/translate.c:3450
-> #3  0x0000000060082c8b in translate_one (env=0x627f0350, s=0x7fffffffda10)
->     at /home/petmay01/linaro/qemu-from-laptop/qemu/target/s390x/translate.c:5824
-> #4  0x0000000060082f3f in gen_intermediate_code (cs=0x627e80b0,
->     tb=0x60794d40 <static_code_gen_buffer+56064>)
->     at /home/petmay01/linaro/qemu-from-laptop/qemu/target/s390x/translate.c:5925
-> #5  0x00000000600369aa in tb_gen_code (cpu=0x627e80b0, pc=274886359240,
->     cs_base=0, flags=3, cflags=0)
-> 
-> This is because in op_risbg() we abort() if s->fields->op2 is not
-> one of 0x55, 0x5d, 0x51. In this case it is 0x59. I don't know enough
-> s390 to know what this might be, but we shouldn't really abort()
-> inside QEMU for unimplemented guest insns.
+We added the entry to insn-data.def, but failed to update op_risbg
+to match.  No need to special-case the imask inversion, since that
+is already ~0 for RISBG (and now RISBGN).
 
-Patch sent.  Since you have a testcase created, can you smoke test it?
-I decline to download the necessaries while riding on this bus.  ;-)
+Fixes: 375ee58bedcda359011fe7fa99e0647f66f9ffa0
+Fixes: https://bugs.launchpad.net/qemu/+bug/1701798 (s390x part)
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/s390x/translate.c | 9 +++------
+ 1 file changed, 3 insertions(+), 6 deletions(-)
 
-
-r~
+diff --git a/target/s390x/translate.c b/target/s390x/translate.c
+index dee72a787d..85d0a6c3af 100644
+--- a/target/s390x/translate.c
++++ b/target/s390x/translate.c
+@@ -3432,6 +3432,7 @@ static ExitStatus op_risbg(DisasContext *s, DisasOps *o)
+     /* Adjust the arguments for the specific insn.  */
+     switch (s->fields->op2) {
+     case 0x55: /* risbg */
++    case 0x59: /* risbgn */
+         i3 &= 63;
+         i4 &= 63;
+         pmask = ~0;
+@@ -3447,7 +3448,7 @@ static ExitStatus op_risbg(DisasContext *s, DisasOps *o)
+         pmask = 0x00000000ffffffffull;
+         break;
+     default:
+-        abort();
++        g_assert_not_reached();
+     }
+ 
+     /* MASK is the set of bits to be inserted from R2.
+@@ -3464,11 +3465,7 @@ static ExitStatus op_risbg(DisasContext *s, DisasOps *o)
+        insns, we need to keep the other half of the register.  */
+     imask = ~mask | ~pmask;
+     if (do_zero) {
+-        if (s->fields->op2 == 0x55) {
+-            imask = 0;
+-        } else {
+-            imask = ~pmask;
+-        }
++        imask = ~pmask;
+     }
+ 
+     len = i4 - i3 + 1;
+-- 
+2.13.6
