@@ -1,18 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56829)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56875)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1eC3eb-0008ER-Qx
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 08:11:01 -0500
+	(envelope-from <jcody@redhat.com>) id 1eC3ei-0008Gn-JS
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 08:11:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1eC3ea-0003d1-PL
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 08:10:57 -0500
+	(envelope-from <jcody@redhat.com>) id 1eC3eY-0003bg-Of
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 08:11:04 -0500
 From: Jeff Cody <jcody@redhat.com>
-Date: Tue,  7 Nov 2017 08:10:35 -0500
-Message-Id: <5e04a7c8a3089913fa58d484af42dab7993984ad.1510059970.git.jcody@redhat.com>
+Date: Tue,  7 Nov 2017 08:10:34 -0500
+Message-Id: <3996c930fa8cde8570b7a63032720d76a28fd78b.1510059970.git.jcody@redhat.com>
 In-Reply-To: <cover.1510059970.git.jcody@redhat.com>
 References: <cover.1510059970.git.jcody@redhat.com>
 In-Reply-To: <cover.1510059970.git.jcody@redhat.com>
 References: <cover.1510059970.git.jcody@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 3/4] block/parallels: add migration blocker
+Subject: [Qemu-devel] [PATCH v4 2/4] block/parallels: Do not update header
+ or truncate image when INMIGRATE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,63 +25,43 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, kwolf@redhat.com, aik@ozlabs.ru, mreitz@redhat.com, den@openvz.org, stefanha@redhat.com
 
-Migration does not work for parallels, and has been broken for a while
-(see patch 'block/parallels: Do not update header or truncate image when
- INMIGRATE').  The bdrv_invalidate_cache() method needs to be added for
-migration to be supported.  Until this is done, prohibit migration.
+If we write or modify the image file while the QEMU run state is
+INMIGRATE, then the BDRV_O_INACTIVE BDS flag is set.  This will cause
+an assert, since the image is marked inactive.  Make sure we obey this
+flag.
 
+Tested-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 Signed-off-by: Jeff Cody <jcody@redhat.com>
-Reviewed-by: Fam Zheng <famz@redhat.com>
 ---
- block/parallels.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+ block/parallels.c | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
 
 diff --git a/block/parallels.c b/block/parallels.c
-index 7b7a3ef..9545761 100644
+index 2b6c6e5..7b7a3ef 100644
 --- a/block/parallels.c
 +++ b/block/parallels.c
-@@ -35,6 +35,7 @@
- #include "qemu/module.h"
- #include "qemu/bswap.h"
- #include "qemu/bitmap.h"
-+#include "migration/blocker.h"
+@@ -708,7 +708,7 @@ static int parallels_open(BlockDriverState *bs, QDict *options, int flags,
+         s->prealloc_mode = PRL_PREALLOC_MODE_FALLOCATE;
+     }
  
- /**************************************************************/
+-    if (flags & BDRV_O_RDWR) {
++    if ((flags & BDRV_O_RDWR) && !(flags & BDRV_O_INACTIVE)) {
+         s->header->inuse = cpu_to_le32(HEADER_INUSE_MAGIC);
+         ret = parallels_update_header(bs);
+         if (ret < 0) {
+@@ -741,12 +741,9 @@ static void parallels_close(BlockDriverState *bs)
+ {
+     BDRVParallelsState *s = bs->opaque;
  
-@@ -100,6 +101,7 @@ typedef struct BDRVParallelsState {
-     unsigned int tracks;
- 
-     unsigned int off_multiplier;
-+    Error *migration_blocker;
- } BDRVParallelsState;
- 
- 
-@@ -720,6 +722,16 @@ static int parallels_open(BlockDriverState *bs, QDict *options, int flags,
-     s->bat_dirty_bmap =
-         bitmap_new(DIV_ROUND_UP(s->header_size, s->bat_dirty_block));
- 
-+    /* Disable migration until bdrv_invalidate_cache method is added */
-+    error_setg(&s->migration_blocker, "The Parallels format used by node '%s' "
-+               "does not support live migration",
-+               bdrv_get_device_or_node_name(bs));
-+    ret = migrate_add_blocker(s->migration_blocker, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        error_free(s->migration_blocker);
-+        goto fail;
-+    }
-     qemu_co_mutex_init(&s->lock);
-     return 0;
- 
-@@ -750,6 +762,9 @@ static void parallels_close(BlockDriverState *bs)
- 
-     g_free(s->bat_dirty_bmap);
-     qemu_vfree(s->header);
-+
-+    migrate_del_blocker(s->migration_blocker);
-+    error_free(s->migration_blocker);
- }
- 
- static QemuOptsList parallels_create_opts = {
+-    if (bs->open_flags & BDRV_O_RDWR) {
++    if ((bs->open_flags & BDRV_O_RDWR) && !(bs->open_flags & BDRV_O_INACTIVE)) {
+         s->header->inuse = 0;
+         parallels_update_header(bs);
+-    }
+-
+-    if (bs->open_flags & BDRV_O_RDWR) {
+         bdrv_truncate(bs->file, s->data_end << BDRV_SECTOR_BITS,
+                       PREALLOC_MODE_OFF, NULL);
+     }
 -- 
 2.9.5
