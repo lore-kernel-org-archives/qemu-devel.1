@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40616)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41047)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eC5l8-0001kO-H5
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 10:25:56 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eC5m8-0002Vv-4X
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 10:26:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eC5l5-0002GS-5E
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 10:25:50 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:62484)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eC5l4-0002Er-Ue
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 10:25:47 -0500
-Date: Tue, 7 Nov 2017 15:25:42 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20171107152542.GH3213@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20171107143652.15375-1-berrange@redhat.com>
-	<CAFEAcA9e1dc01TVQQ2TxK9wNRejUA3pqBz1WdwMPvnxHXvB3Bw@mail.gmail.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eC5m4-0003BJ-Vn
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 10:26:52 -0500
+Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:48270)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eC5m4-0003Ax-RC
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 10:26:48 -0500
+Received: by mail-qk0-x241.google.com with SMTP id a142so6912494qkb.5
+	for <qemu-devel@nongnu.org>; Tue, 07 Nov 2017 07:26:48 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1509993206-26637-1-git-send-email-peter.maydell@linaro.org>
+	<1509993206-26637-4-git-send-email-peter.maydell@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <915815fa-b28d-62e7-e39f-01aa55ebc388@amsat.org>
+Date: Tue, 7 Nov 2017 12:26:44 -0300
 MIME-Version: 1.0
+In-Reply-To: <1509993206-26637-4-git-send-email-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA9e1dc01TVQQ2TxK9wNRejUA3pqBz1WdwMPvnxHXvB3Bw@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PULL v2 0/1] Merge IO 2017/11/06
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 3/4] linux-user/sparc: Put address for data
+ faults where linux-user expects it
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,44 +36,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, patches@linaro.org
 
-On Tue, Nov 07, 2017 at 03:22:02PM +0000, Peter Maydell wrote:
-> On 7 November 2017 at 14:36, Daniel P. Berrange <berrange@redhat.com> wrote:
-> > The following changes since commit 5853e92207193e967abf5e4c25b4a551c7604725:
-> >
-> >   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-cocoa-20171107' into staging (2017-11-07 12:19:48 +0000)
-> >
-> > are available in the git repository at:
-> >
-> >   git://github.com/berrange/qemu pull-2017-11-06-2
-> >
-> > for you to fetch changes up to 10a7b7e6fd9f250f0506568345d7b4d2ab52889d:
-> >
-> >   sockets: avoid leak of listen file descriptor (2017-11-07 14:10:20 +0000)
-> >
-> > ----------------------------------------------------------------
-> > Pull IO 2017/11/06 v2
-> >
-> > ----------------------------------------------------------------
-> > Daniel P. Berrange (1):
-> >   sockets: avoid leak of listen file descriptor
-> >
-> >  util/qemu-sockets.c | 52 +++++++++++++++++++++++++++++-----------------------
-> >  1 file changed, 29 insertions(+), 23 deletions(-)
+On 11/06/2017 03:33 PM, Peter Maydell wrote:
+> In the user-mode-only version of sparc_cpu_handle_mmu_fault(),
+> we must save the fault address for a data fault into the CPU
+> state's mmu registers, because the code in linux-user/main.c
+> expects to find it there in order to populate the si_addr
+> field of the guest siginfo.
 > 
-> Applied, thanks. (My test script expected your pullreq to
-> say "git://github.com/berrange/qemu tags/pull-2017-11-06-2"
-> but that might be the script not being as smart as it could be.)
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-Oh my bad. I forgot to actually push the tag to github before generating
-the cover letter text, and I guess that caused git to leave off the 'tags/'
-bit
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+> ---
+>  target/sparc/mmu_helper.c | 8 ++++++++
+>  1 file changed, 8 insertions(+)
+> 
+> diff --git a/target/sparc/mmu_helper.c b/target/sparc/mmu_helper.c
+> index 126ea5e..d5b6c1e 100644
+> --- a/target/sparc/mmu_helper.c
+> +++ b/target/sparc/mmu_helper.c
+> @@ -30,10 +30,18 @@
+>  int sparc_cpu_handle_mmu_fault(CPUState *cs, vaddr address, int rw,
+>                                 int mmu_idx)
+>  {
+> +    SPARCCPU *cpu = SPARC_CPU(cs);
+> +    CPUSPARCState *env = &cpu->env;
+> +
+>      if (rw & 2) {
+>          cs->exception_index = TT_TFAULT;
+>      } else {
+>          cs->exception_index = TT_DFAULT;
+> +#ifdef TARGET_SPARC64
+> +        env->dmmu.mmuregs[4] = address;
+> +#else
+> +        env->mmuregs[4] = address;
+> +#endif
+>      }
+>      return 1;
+>  }
+> 
