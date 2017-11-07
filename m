@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49417)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58939)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1eBzSk-00017j-Ef
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 03:42:27 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eBzye-00075F-VM
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 04:15:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1eBzSh-0003Fx-9h
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 03:42:26 -0500
-References: <1467696699-8941-9-git-send-email-david@gibson.dropbear.id.au>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <52275d2d-0a93-fe92-56ed-7841fa5a79dc@redhat.com>
-Date: Tue, 7 Nov 2017 09:42:15 +0100
+	(envelope-from <kwolf@redhat.com>) id 1eBzya-0000wl-8q
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 04:15:24 -0500
+Date: Tue, 7 Nov 2017 10:15:06 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20171107091506.GA4706@localhost.localdomain>
+References: <201711071518033155528@zte.com.cn>
 MIME-Version: 1.0
-In-Reply-To: <1467696699-8941-9-git-send-email-david@gibson.dropbear.id.au>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL,
- 08/14] spapr_pci/spapr_pci_vfio: Support Dynamic DMA Windows (DDW)
+Content-Disposition: inline
+In-Reply-To: <201711071518033155528@zte.com.cn>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] about qemu-img info on block dev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,40 +23,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: aik@ozlabs.ru
-Cc: David Gibson <david@gibson.dropbear.id.au>, peter.maydell@linaro.org, agraf@suse.de, qemu-devel@nongnu.org, alex.williamson@redhat.com, qemu-ppc@nongnu.org
+To: wang.guang55@zte.com.cn
+Cc: mreitz@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, wang.yong155@zte.com.cn
 
-On 05/07/2016 07:31, David Gibson wrote:
-> From: Alexey Kardashevskiy <aik@ozlabs.ru>
-> 
-> This adds support for Dynamic DMA Windows (DDW) option defined by
-> the SPAPR specification which allows to have additional DMA window(s)
-> 
-> The "ddw" property is enabled by default on a PHB but for compatibility
-> the pseries-2.6 machine and older disable it.
-> This also creates a single DMA window for the older machines to
-> maintain backward migration.
-> 
-> This implements DDW for PHB with emulated and VFIO devices. The host
-> kernel support is required. The advertised IOMMU page sizes are 4K and
-> 64K; 16M pages are supported but not advertised by default, in order to
-> enable them, the user has to specify "pgsz" property for PHB and
-> enable huge pages for RAM.
+Am 07.11.2017 um 08:18 hat wang.guang55@zte.com.cn geschrieben:
+> hello
+>=20
+>=20
+> if we create a qcow2 file on a block dev.
+>=20
+>=20
+> we can,t get the right disk size by qemu-img info=E3=80=82
+>=20
+>=20
+>=20
+>=20
+>=20
+>=20
+> [root@host-120-79 qemu]# ./qemu-img create -f qcow2 /dev/zs/lvol0 1G
+>=20
+> Formatting '/dev/zs/lvol0', fmt=3Dqcow2 size=3D1073741824 cluster_size=3D=
+65536 lazy_refcounts=3Doff refcount_bits=3D16
+>=20
+> [root@host-120-79 qemu]# ./qemu-img info /dev/zs/lvol0=20
+>=20
+> image: /dev/zs/lvol0
+>=20
+> file format: qcow2
+>=20
+> virtual size: 1.0G (1073741824 bytes)
+>=20
+> disk size: 0
+>=20
+> cluster_size: 65536
+>=20
+> Format specific information:
+>=20
+>     compat: 1.1
+>=20
+>     lazy refcounts: false
+>=20
+>     refcount bits: 16
+>=20
+>     corrupt: false
+>=20
+>=20
+>=20
+>=20
+>=20
+>=20
+> Then we get disk size from L1 table and L2 table in qcow2_get_allocated=
+_file_size.
+>=20
+>=20
+> May be we can submit the patch to qemu master??
 
-Why is it not advirtised by default?
+No, qcow2 is the wrong layer to do this. If anything,
+raw_get_allocated_file_size() could be changed to return the full file
+size for block devices. However, even this is not necessarily the right
+number, the block device could actually be thin provisioned and the
+kernel doesn't tell us how many blocks are actually allocated. So I
+think 0 for "we don't know" is in fact the right answer.
 
-When we start qemu with hugepage memory ("mount -t hugetlbfs none
-/mnt/kvm_hugepage" and ".. -mem-path /mnt/kvm_hugepage .."), we have an
-ugly message:
-
-"qemu-kvm: System page size 0x1000000 is not enabled in page_size_mask
-(0x11000). Performance may be slow"
-
-I understand if we want to use this with VFIO, we need something like
-"-global spapr-pci-host-bridge.pgsz=0x1011000".
-
-But is it needed if we don't use VFIO?
-Is it a way QEMU adds automatically the 0x1000000 mask to page_size_mask?
-
-Thanks,
-Laurent
+Kevin
