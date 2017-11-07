@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44691)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49951)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1eC334-0000l9-Fj
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 07:32:13 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eC3JJ-0003Lv-GV
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 07:48:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1eC32y-0000Xy-D4
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 07:32:10 -0500
-Date: Tue, 7 Nov 2017 10:31:49 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20171107123149.GZ3111@localhost.localdomain>
-References: <1509734853-3014-1-git-send-email-cota@braap.org>
-	<20171103185610.GA3907@flamenco>
-	<20171103200233.GI3111@localhost.localdomain>
-	<20171103222407.GA22411@flamenco>
-	<20171106141022.GO3111@localhost.localdomain>
-	<20171106201332.GA2152@flamenco>
-	<CAKmqyKO41gHX1Y0+rq8wMygf+ZoZLvOJPzqhfviPsgbDGHecsQ@mail.gmail.com>
+	(envelope-from <pbonzini@redhat.com>) id 1eC3JE-0000GS-HA
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 07:48:57 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57280)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eC3JE-0000FS-8j
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 07:48:52 -0500
+References: <20171103193802.11876-1-laurent@vivier.eu>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <8ec7f5f2-6f39-cff9-aedb-696a8b318cab@redhat.com>
+Date: Tue, 7 Nov 2017 13:48:47 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAKmqyKO41gHX1Y0+rq8wMygf+ZoZLvOJPzqhfviPsgbDGHecsQ@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH] hw: add .min_cpus and .default_cpus fields
- to machine_class
+In-Reply-To: <20171103193802.11876-1-laurent@vivier.eu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] linux-user: remove nmi.c and
+ fw-path-provider.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,106 +28,246 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>
-Cc: "Emilio G. Cota" <cota@braap.org>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Richard Henderson <richard.henderson@linaro.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, "Edgar E . Iglesias" <edgar.iglesias@gmail.com>
+To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, Riku Voipio <riku.voipio@linaro.org>
 
-On Mon, Nov 06, 2017 at 04:43:34PM -0800, Alistair Francis wrote:
-> On Mon, Nov 6, 2017 at 12:13 PM, Emilio G. Cota <cota@braap.org> wrote:
-> > On Mon, Nov 06, 2017 at 12:10:22 -0200, Eduardo Habkost wrote:
-> >> IMO, initialization state doesn't belong to CPUClass.  We already
-> >> have a single accelerator object in MachineState::accelerator,
-> >> and tcg_initialized could be moved to a AccelState::initialized
-> >> field.
-> >
-> > I don't know how to cleanly get AccelState from a CPUClass pointer
-> > (as I said I'm not familiar with object code / qom) -- suggestions
-> > welcome! The best I could come up in the limited time I have for
-> > this is to use a static bool, as shown below.
-
-I don't believe a TYPE_ACCEL object is created in *-user.  We can
-consider changing that, but not during 2.11 freeze.
-
-> >
-> >
-> > ---8<---
-> >
-> > Subject: [PATCH] qom: move CPUClass.tcg_initialize to a global
-> >
-> > 55c3cee ("qom: Introduce CPUClass.tcg_initialize", 2017-10-24)
-> > introduces a per-CPUClass bool that we check so that the target CPU
-> > is initialized for TCG only once. This works well except when
-> > we end up creating more than one CPUClass, in which case we end
-> > up incorrectly initializing TCG more than once, i.e. once for
-> > each CPUClass.
-> >
-> > This can be replicated with:
-> >   $ aarch64-softmmu/qemu-system-aarch64 -machine xlnx-zcu102 -smp 6 \
-> >       -global driver=xlnx,,zynqmp,property=has_rpu,value=on
-> > In this case the class name of the "RPUs" is prefixed by "cortex-r5-",
-> > whereas the "regular" CPUs are prefixed by "cortex-a53-". This
-> > results in two CPUClass instances being created.
-> >
-> > Fix it by introducing a static variable, so that only the first
-> > target CPU being initialized will initialize the target-dependent
-> > part of TCG, regardless of CPUClass instances.
-> >
-> > Fixes: 55c3ceef61fcf06fc98ddc752b7cce788ce7680b
-> > Signed-off-by: Emilio G. Cota <cota@braap.org>
+On 03/11/2017 20:38, Laurent Vivier wrote:
+> linux-user binaries don't need firmware and NMI,
+> so don't add them in this case, move QDEV
+> firmware functions to qdev-fw.c
 > 
-> This works great for me, is this ok to be applied?
+> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 
-It depends if we are already relying on initialization of CPUs of
-different types to be calling two different ->tcg_initialize()
-functions.  I think that's the case today, so this looks
-reasonable as a quick fix for 2.11.
+Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 
-I would wait for an Acked-by from Richard Henderson before
-applying it, though.  Richard, what do you think?
-
+> ---
+>  hw/core/Makefile.objs |  5 +--
+>  hw/core/qdev-fw.c     | 96 +++++++++++++++++++++++++++++++++++++++++++++++++++
+>  hw/core/qdev.c        | 77 -----------------------------------------
+>  3 files changed, 99 insertions(+), 79 deletions(-)
+>  create mode 100644 hw/core/qdev-fw.c
 > 
-> Thanks,
-> Alistair
+> diff --git a/hw/core/Makefile.objs b/hw/core/Makefile.objs
+> index f8d7a4aaed..1240728c87 100644
+> --- a/hw/core/Makefile.objs
+> +++ b/hw/core/Makefile.objs
+> @@ -1,11 +1,12 @@
+>  # core qdev-related obj files, also used by *-user:
+>  common-obj-y += qdev.o qdev-properties.o
+>  common-obj-y += bus.o reset.o
+> -common-obj-y += fw-path-provider.o
+> +common-obj-$(CONFIG_SOFTMMU) += qdev-fw.o
+> +common-obj-$(CONFIG_SOFTMMU) += fw-path-provider.o
+>  # irq.o needed for qdev GPIO handling:
+>  common-obj-y += irq.o
+>  common-obj-y += hotplug.o
+> -common-obj-y += nmi.o
+> +common-obj-$(CONFIG_SOFTMMU) += nmi.o
+>  
+>  common-obj-$(CONFIG_EMPTY_SLOT) += empty_slot.o
+>  common-obj-$(CONFIG_XILINX_AXI) += stream.o
+> diff --git a/hw/core/qdev-fw.c b/hw/core/qdev-fw.c
+> new file mode 100644
+> index 0000000000..aa35e9d0ac
+> --- /dev/null
+> +++ b/hw/core/qdev-fw.c
+> @@ -0,0 +1,96 @@
+> +/*
+> + *  qdev fw helpers
+> + *
+> + *  This program is free software; you can redistribute it and/or modify
+> + *  it under the terms of the GNU General Public License as published by
+> + *  the Free Software Foundation; either version 2 of the License,
+> + *  or (at your option) any later version.
+> + *
+> + *  This program is distributed in the hope that it will be useful,
+> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + *  GNU General Public License for more details.
+> + *
+> + *  You should have received a copy of the GNU General Public License
+> + *  along with this program; if not, see <http://www.gnu.org/licenses/>.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "hw/qdev.h"
+> +#include "hw/fw-path-provider.h"
+> +
+> +const char *qdev_fw_name(DeviceState *dev)
+> +{
+> +    DeviceClass *dc = DEVICE_GET_CLASS(dev);
+> +
+> +    if (dc->fw_name) {
+> +        return dc->fw_name;
+> +    }
+> +
+> +    return object_get_typename(OBJECT(dev));
+> +}
+> +
+> +static char *bus_get_fw_dev_path(BusState *bus, DeviceState *dev)
+> +{
+> +    BusClass *bc = BUS_GET_CLASS(bus);
+> +
+> +    if (bc->get_fw_dev_path) {
+> +        return bc->get_fw_dev_path(dev);
+> +    }
+> +
+> +    return NULL;
+> +}
+> +
+> +static char *qdev_get_fw_dev_path_from_handler(BusState *bus, DeviceState *dev)
+> +{
+> +    Object *obj = OBJECT(dev);
+> +    char *d = NULL;
+> +
+> +    while (!d && obj->parent) {
+> +        obj = obj->parent;
+> +        d = fw_path_provider_try_get_dev_path(obj, bus, dev);
+> +    }
+> +    return d;
+> +}
+> +
+> +char *qdev_get_own_fw_dev_path_from_handler(BusState *bus, DeviceState *dev)
+> +{
+> +    Object *obj = OBJECT(dev);
+> +
+> +    return fw_path_provider_try_get_dev_path(obj, bus, dev);
+> +}
+> +
+> +static int qdev_get_fw_dev_path_helper(DeviceState *dev, char *p, int size)
+> +{
+> +    int l = 0;
+> +
+> +    if (dev && dev->parent_bus) {
+> +        char *d;
+> +        l = qdev_get_fw_dev_path_helper(dev->parent_bus->parent, p, size);
+> +        d = qdev_get_fw_dev_path_from_handler(dev->parent_bus, dev);
+> +        if (!d) {
+> +            d = bus_get_fw_dev_path(dev->parent_bus, dev);
+> +        }
+> +        if (d) {
+> +            l += snprintf(p + l, size - l, "%s", d);
+> +            g_free(d);
+> +        } else {
+> +            return l;
+> +        }
+> +    }
+> +    l += snprintf(p + l , size - l, "/");
+> +
+> +    return l;
+> +}
+> +
+> +char *qdev_get_fw_dev_path(DeviceState *dev)
+> +{
+> +    char path[128];
+> +    int l;
+> +
+> +    l = qdev_get_fw_dev_path_helper(dev, path, 128);
+> +
+> +    path[l - 1] = '\0';
+> +
+> +    return g_strdup(path);
+> +}
+> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+> index 11112951a5..49df62ba8c 100644
+> --- a/hw/core/qdev.c
+> +++ b/hw/core/qdev.c
+> @@ -27,7 +27,6 @@
+>  
+>  #include "qemu/osdep.h"
+>  #include "hw/qdev.h"
+> -#include "hw/fw-path-provider.h"
+>  #include "sysemu/sysemu.h"
+>  #include "qapi/qmp/qerror.h"
+>  #include "qapi/visitor.h"
+> @@ -48,17 +47,6 @@ const VMStateDescription *qdev_get_vmsd(DeviceState *dev)
+>      return dc->vmsd;
+>  }
+>  
+> -const char *qdev_fw_name(DeviceState *dev)
+> -{
+> -    DeviceClass *dc = DEVICE_GET_CLASS(dev);
+> -
+> -    if (dc->fw_name) {
+> -        return dc->fw_name;
+> -    }
+> -
+> -    return object_get_typename(OBJECT(dev));
+> -}
+> -
+>  static void bus_remove_child(BusState *bus, DeviceState *child)
+>  {
+>      BusChild *kid;
+> @@ -619,71 +607,6 @@ DeviceState *qdev_find_recursive(BusState *bus, const char *id)
+>      return NULL;
+>  }
+>  
+> -static char *bus_get_fw_dev_path(BusState *bus, DeviceState *dev)
+> -{
+> -    BusClass *bc = BUS_GET_CLASS(bus);
+> -
+> -    if (bc->get_fw_dev_path) {
+> -        return bc->get_fw_dev_path(dev);
+> -    }
+> -
+> -    return NULL;
+> -}
+> -
+> -static char *qdev_get_fw_dev_path_from_handler(BusState *bus, DeviceState *dev)
+> -{
+> -    Object *obj = OBJECT(dev);
+> -    char *d = NULL;
+> -
+> -    while (!d && obj->parent) {
+> -        obj = obj->parent;
+> -        d = fw_path_provider_try_get_dev_path(obj, bus, dev);
+> -    }
+> -    return d;
+> -}
+> -
+> -char *qdev_get_own_fw_dev_path_from_handler(BusState *bus, DeviceState *dev)
+> -{
+> -    Object *obj = OBJECT(dev);
+> -
+> -    return fw_path_provider_try_get_dev_path(obj, bus, dev);
+> -}
+> -
+> -static int qdev_get_fw_dev_path_helper(DeviceState *dev, char *p, int size)
+> -{
+> -    int l = 0;
+> -
+> -    if (dev && dev->parent_bus) {
+> -        char *d;
+> -        l = qdev_get_fw_dev_path_helper(dev->parent_bus->parent, p, size);
+> -        d = qdev_get_fw_dev_path_from_handler(dev->parent_bus, dev);
+> -        if (!d) {
+> -            d = bus_get_fw_dev_path(dev->parent_bus, dev);
+> -        }
+> -        if (d) {
+> -            l += snprintf(p + l, size - l, "%s", d);
+> -            g_free(d);
+> -        } else {
+> -            return l;
+> -        }
+> -    }
+> -    l += snprintf(p + l , size - l, "/");
+> -
+> -    return l;
+> -}
+> -
+> -char* qdev_get_fw_dev_path(DeviceState *dev)
+> -{
+> -    char path[128];
+> -    int l;
+> -
+> -    l = qdev_get_fw_dev_path_helper(dev, path, 128);
+> -
+> -    path[l-1] = '\0';
+> -
+> -    return g_strdup(path);
+> -}
+> -
+>  char *qdev_get_dev_path(DeviceState *dev)
+>  {
+>      BusClass *bc;
 > 
-> > ---
-> >  exec.c            | 5 +++--
-> >  include/qom/cpu.h | 1 -
-> >  2 files changed, 3 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/exec.c b/exec.c
-> > index 97a24a8..8b579c0 100644
-> > --- a/exec.c
-> > +++ b/exec.c
-> > @@ -792,11 +792,12 @@ void cpu_exec_initfn(CPUState *cpu)
-> >  void cpu_exec_realizefn(CPUState *cpu, Error **errp)
-> >  {
-> >      CPUClass *cc = CPU_GET_CLASS(cpu);
-> > +    static bool tcg_target_initialized;
-> >
-> >      cpu_list_add(cpu);
-> >
-> > -    if (tcg_enabled() && !cc->tcg_initialized) {
-> > -        cc->tcg_initialized = true;
-> > +    if (tcg_enabled() && !tcg_target_initialized) {
-> > +        tcg_target_initialized = true;
-> >          cc->tcg_initialize();
-> >      }
-> >
-> > diff --git a/include/qom/cpu.h b/include/qom/cpu.h
-> > index fa4b0c9..c2fa151 100644
-> > --- a/include/qom/cpu.h
-> > +++ b/include/qom/cpu.h
-> > @@ -209,7 +209,6 @@ typedef struct CPUClass {
-> >      /* Keep non-pointer data at the end to minimize holes.  */
-> >      int gdb_num_core_regs;
-> >      bool gdb_stop_before_watchpoint;
-> > -    bool tcg_initialized;
-> >  } CPUClass;
-> >
-> >  #ifdef HOST_WORDS_BIGENDIAN
-> > --
-> > 2.7.4
-> >
-> >
-
--- 
-Eduardo
