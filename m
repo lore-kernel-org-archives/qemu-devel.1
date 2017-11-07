@@ -1,34 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55434)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55424)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1eBsEU-0005JP-Kd
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1eBsEU-0005J5-2k
 	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 19:59:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1eBsER-0003me-EU
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1eBsEQ-0003mB-SP
 	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 19:59:14 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:40984
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:37212
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1eBsER-0003mL-9o
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 19:59:11 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	id 1eBsEQ-0003m0-NS
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 19:59:10 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
 	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vA70sZOf065914
-	for <qemu-devel@nongnu.org>; Mon, 6 Nov 2017 19:59:04 -0500
-Received: from e18.ny.us.ibm.com (e18.ny.us.ibm.com [129.33.205.208])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2e31y4t6th-1
+	vA70sDAk063540
+	for <qemu-devel@nongnu.org>; Mon, 6 Nov 2017 19:59:08 -0500
+Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2e31k7k53s-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 06 Nov 2017 19:59:04 -0500
+	for <qemu-devel@nongnu.org>; Mon, 06 Nov 2017 19:59:08 -0500
 Received: from localhost
-	by e18.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Mon, 6 Nov 2017 19:59:03 -0500
+	Mon, 6 Nov 2017 19:59:07 -0500
 From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Mon,  6 Nov 2017 19:58:51 -0500
-Message-Id: <1510016336-4086-1-git-send-email-stefanb@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 0/5] tpm: Match frontend and backend buffer
- sizes (not 2.11)
+Date: Mon,  6 Nov 2017 19:58:54 -0500
+In-Reply-To: <1510016336-4086-1-git-send-email-stefanb@linux.vnet.ibm.com>
+References: <1510016336-4086-1-git-send-email-stefanb@linux.vnet.ibm.com>
+Message-Id: <1510016336-4086-4-git-send-email-stefanb@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 3/5] tpm: tpm_passthrough: Read the buffer size
+ from the host device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,33 +42,217 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, marcandre.lureau@redhat.com
 Cc: amarnath.valluri@intel.com, Stefan Berger <stefanb@linux.vnet.ibm.com>
 
-This patch series does away with the hard coded buffer size in the TIS
-frontend and instead retrieves the buffer size from the device that's
-being used. So it gets it from the host device or the external emulator.
-In case the frontend (CRB) cannot support the backend's current buffer size
-(typically 4k) it can adjust the buffer size the emulator is working with
-so that we will not run into the problem that the backend produces packets
-that the frontend cannot deliver to due mismatching buffer sizes.
+Rather than hard coding the buffer size in the tpm_passthrough
+backend read the TPM I/O buffer size from the host device.
 
-   Stefan
+Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+---
+ hw/tpm/tpm_int.h         |   9 ++++
+ hw/tpm/tpm_passthrough.c |  11 ++++-
+ hw/tpm/tpm_util.c        | 116 +++++++++++++++++++++++++++++++++++++++++++++++
+ hw/tpm/tpm_util.h        |   3 ++
+ 4 files changed, 138 insertions(+), 1 deletion(-)
 
-Stefan Berger (5):
-  tpm: Move getting TPM buffer size to backends
-  tpm: pull tpm_util_send() out of tpm_util_test()
-  tpm: tpm_passthrough: Read the buffer size from the host device
-  tpm: tpm_emulator: get and set buffer size of device
-  tpm: tpm_passthrough: Fail startup if FE buffer size < BE buffer size
-
- backends/tpm.c               |  13 +++-
- hw/tpm/tpm_emulator.c        |  83 +++++++++++++++++++++++-
- hw/tpm/tpm_int.h             |   9 +++
- hw/tpm/tpm_ioctl.h           |  28 +++++++-
- hw/tpm/tpm_passthrough.c     |  30 +++++++++
- hw/tpm/tpm_tis.c             |  18 +++---
- hw/tpm/tpm_util.c            | 149 +++++++++++++++++++++++++++++++++++++++++--
- hw/tpm/tpm_util.h            |   3 +
- include/sysemu/tpm_backend.h |  17 ++++-
- 9 files changed, 327 insertions(+), 23 deletions(-)
-
+diff --git a/hw/tpm/tpm_int.h b/hw/tpm/tpm_int.h
+index 1df5883..f838535 100644
+--- a/hw/tpm/tpm_int.h
++++ b/hw/tpm/tpm_int.h
+@@ -45,11 +45,20 @@ struct tpm_resp_hdr {
+ 
+ #define TPM_ORD_ContinueSelfTest  0x53
+ #define TPM_ORD_GetTicks          0xf1
++#define TPM_ORD_GetCapability     0x65
+ 
++#define TPM_CAP_PROPERTY          0x05
++
++#define TPM_CAP_PROP_INPUT_BUFFER 0x124
+ 
+ /* TPM2 defines */
+ #define TPM2_ST_NO_SESSIONS       0x8001
+ 
+ #define TPM2_CC_ReadClock         0x00000181
++#define TPM2_CC_GetCapability     0x0000017a
++
++#define TPM2_CAP_TPM_PROPERTIES   0x6
++
++#define TPM2_PT_INPUT_BUFFER      0x10d
+ 
+ #endif /* TPM_TPM_INT_H */
+diff --git a/hw/tpm/tpm_passthrough.c b/hw/tpm/tpm_passthrough.c
+index 7ff9249..ec755fe 100644
+--- a/hw/tpm/tpm_passthrough.c
++++ b/hw/tpm/tpm_passthrough.c
+@@ -57,6 +57,7 @@ struct TPMPassthruState {
+     int cancel_fd;
+ 
+     TPMVersion tpm_version;
++    uint32_t tpm_buffersize;
+ };
+ 
+ typedef struct TPMPassthruState TPMPassthruState;
+@@ -201,7 +202,15 @@ static TPMVersion tpm_passthrough_get_tpm_version(TPMBackend *tb)
+ 
+ static uint32_t tpm_passthrough_get_buffer_size(TPMBackend *tb)
+ {
+-    return 4096;
++    TPMPassthruState *tpm_pt = TPM_PASSTHROUGH(tb);
++    int ret;
++
++    ret = tpm_util_get_buffer_size(tpm_pt->tpm_fd, tpm_pt->tpm_version,
++                                   &tpm_pt->tpm_buffersize);
++    if (ret < 0) {
++        tpm_pt->tpm_buffersize = 4096;
++    }
++    return tpm_pt->tpm_buffersize;
+ }
+ 
+ /*
+diff --git a/hw/tpm/tpm_util.c b/hw/tpm/tpm_util.c
+index 396e793..3c861ab 100644
+--- a/hw/tpm/tpm_util.c
++++ b/hw/tpm/tpm_util.c
+@@ -20,10 +20,19 @@
+  */
+ 
+ #include "qemu/osdep.h"
++#include "qemu/error-report.h"
+ #include "tpm_util.h"
+ #include "tpm_int.h"
+ #include "exec/memory.h"
+ 
++#define DEBUG_TPM 0
++
++#define DPRINTF(fmt, ...) do { \
++    if (DEBUG_TPM) { \
++        fprintf(stderr, "tpm-util:"fmt"\n", ## __VA_ARGS__); \
++    } \
++} while (0)
++
+ /*
+  * Write an error message in the given output buffer.
+  */
+@@ -170,3 +179,110 @@ int tpm_util_test_tpmdev(int tpm_fd, TPMVersion *tpm_version)
+ 
+     return 1;
+ }
++
++int tpm_util_get_buffer_size(int tpm_fd, TPMVersion tpm_version,
++                             uint32_t *buffersize)
++{
++    unsigned char buf[1024];
++    const struct tpm_req_get_buffer_size {
++        struct tpm_req_hdr hdr;
++        uint32_t capability;
++        uint32_t len;
++        uint32_t subcap;
++    } QEMU_PACKED tpm_get_buffer_size = {
++        .hdr = {
++            .tag = cpu_to_be16(TPM_TAG_RQU_COMMAND),
++            .len = cpu_to_be32(sizeof(tpm_get_buffer_size)),
++            .ordinal = cpu_to_be32(TPM_ORD_GetCapability),
++        },
++        .capability = cpu_to_be32(TPM_CAP_PROPERTY),
++        .len = cpu_to_be32(sizeof(uint32_t)),
++        .subcap = cpu_to_be32(TPM_CAP_PROP_INPUT_BUFFER),
++    };
++    const struct tpm2_req_get_buffer_size {
++        struct tpm_req_hdr hdr;
++        uint32_t capability;
++        uint32_t property;
++        uint32_t count;
++    } QEMU_PACKED tpm2_get_buffer_size = {
++        .hdr = {
++            .tag = cpu_to_be16(TPM2_ST_NO_SESSIONS),
++            .len = cpu_to_be32(sizeof(tpm2_get_buffer_size)),
++            .ordinal = cpu_to_be32(TPM2_CC_GetCapability),
++        },
++        .capability = cpu_to_be32(TPM2_CAP_TPM_PROPERTIES),
++        .property = cpu_to_be32(TPM2_PT_INPUT_BUFFER),
++        .count = cpu_to_be32(1),
++    };
++    struct tpm_resp_get_buffer_size {
++        struct tpm_resp_hdr hdr;
++        uint32_t len;
++        uint32_t buffersize;
++    } QEMU_PACKED *tpm_resp = (struct tpm_resp_get_buffer_size *)buf;
++    struct tpm2_resp_get_buffer_size {
++        struct tpm_resp_hdr hdr;
++        uint8_t more;
++        uint32_t capability;
++        uint32_t count;
++        uint32_t property;
++        uint32_t value;
++    } QEMU_PACKED *tpm2_resp = (struct tpm2_resp_get_buffer_size *)buf;
++    unsigned char *request = NULL;
++    size_t requestlen;
++    int ret;
++
++    switch (tpm_version) {
++    case TPM_VERSION_1_2:
++        request = (unsigned char *)&tpm_get_buffer_size;
++        requestlen = sizeof(tpm_get_buffer_size);
++        break;
++    case TPM_VERSION_2_0:
++        request = (unsigned char *)&tpm2_get_buffer_size;
++        requestlen = sizeof(tpm2_get_buffer_size);
++        break;
++    case TPM_VERSION_UNSPEC:
++        return -EFAULT;
++    }
++
++    ret = tpm_util_tx(tpm_fd, request, requestlen, buf, sizeof(buf));
++    if (ret < 0) {
++        return ret;
++    }
++
++    switch (tpm_version) {
++    case TPM_VERSION_1_2:
++        if (be32_to_cpu(tpm_resp->hdr.len) != sizeof(*tpm_resp) ||
++            be32_to_cpu(tpm_resp->len) != sizeof(uint32_t)) {
++            DPRINTF("tpm_resp->hdr.len = %u, expected = %zu\n",
++                    be32_to_cpu(tpm_resp->hdr.len), sizeof(*tpm_resp));
++            DPRINTF("tpm_resp->len = %u, expected = %zu\n",
++                    be32_to_cpu(tpm_resp->len), sizeof(uint32_t));
++            error_report("tpm_util: Got malformed response to "
++                         "TPM_GetCapability; errcode: 0x%x",
++                         be32_to_cpu(tpm_resp->hdr.errcode));
++            return -EFAULT;
++        }
++        *buffersize = be32_to_cpu(tpm_resp->buffersize);
++        break;
++    case TPM_VERSION_2_0:
++        if (be32_to_cpu(tpm2_resp->hdr.len) != sizeof(*tpm2_resp) ||
++            be32_to_cpu(tpm2_resp->count) != 1) {
++            DPRINTF("tpm2_resp->hdr.len = %u, expected = %zu\n",
++                    be32_to_cpu(tpm2_resp->hdr.len), sizeof(*tpm2_resp));
++            DPRINTF("tpm2_resp->len = %u, expected = %u\n",
++                    be32_to_cpu(tpm2_resp->count), 1);
++            error_report("tpm_util: Got malformed response to "
++                         "TPM2_GetCapability; errcode: 0x%x",
++                         be32_to_cpu(tpm2_resp->hdr.errcode));
++            return -EFAULT;
++        }
++        *buffersize = be32_to_cpu(tpm2_resp->value);
++        break;
++    case TPM_VERSION_UNSPEC:
++        break;
++    }
++
++    DPRINTF("buffersize of device: %u\n", *buffersize);
++
++    return 0;
++}
+diff --git a/hw/tpm/tpm_util.h b/hw/tpm/tpm_util.h
+index aca10c9..e4fba32 100644
+--- a/hw/tpm/tpm_util.h
++++ b/hw/tpm/tpm_util.h
+@@ -36,4 +36,7 @@ static inline uint32_t tpm_cmd_get_size(const void *b)
+     return be32_to_cpu(*(const uint32_t *)(b + 2));
+ }
+ 
++int tpm_util_get_buffer_size(int tpm_fd, TPMVersion tpm_version,
++                             uint32_t *buffersize);
++
+ #endif /* TPM_TPM_UTIL_H */
 -- 
 2.5.5
