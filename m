@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37511)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38227)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eC7tW-0006Ln-5f
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 12:42:39 -0500
+	(envelope-from <bounces@canonical.com>) id 1eC7vz-0007iT-TK
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 12:45:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eC7tV-0007X5-8Q
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 12:42:38 -0500
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:45881)
+	(envelope-from <bounces@canonical.com>) id 1eC7vv-0008Li-Tg
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 12:45:11 -0500
+Received: from indium.canonical.com ([91.189.90.7]:48184)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eC7tV-0007WW-26
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 12:42:37 -0500
-Received: by mail-wm0-x243.google.com with SMTP id y80so5435067wmd.0
-	for <qemu-devel@nongnu.org>; Tue, 07 Nov 2017 09:42:36 -0800 (PST)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eC7vv-0008LK-Mk
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 12:45:07 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eC7vu-0002ta-QA
+	for <qemu-devel@nongnu.org>; Tue, 07 Nov 2017 17:45:06 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id C16EC2E802D
+	for <qemu-devel@nongnu.org>; Tue,  7 Nov 2017 17:45:06 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <94be963c-ec25-b798-2a8f-c05fbd2d6626@redhat.com>
-References: <20171107145546.767-1-richard.henderson@linaro.org>
-	<94be963c-ec25-b798-2a8f-c05fbd2d6626@redhat.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 07 Nov 2017 17:35:38 -0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 7 Nov 2017 17:42:15 +0000
-Message-ID: <CAFEAcA8sLn7JK+LN=Zg_DLG14sHXq+HsBMgUtVF0P4sv2KMWCw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH] target/s390x: Finish
- implementing RISBGN
+Reply-To: Bug 1400768 <1400768@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20141209153744.25096.3299.malonedeb@wampee.canonical.com>
+Message-Id: <151007613825.8833.15926547568424182180.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1400768] Re: Fatal error when running with
+ '-machine isapc' on 2.1.2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,64 +37,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Richard Henderson <richard.henderson@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-s390x@nongnu.org
+To: qemu-devel@nongnu.org
 
-On 7 November 2017 at 16:00, Thomas Huth <thuth@redhat.com> wrote:
-> On 07.11.2017 15:55, Richard Henderson wrote:
->> We added the entry to insn-data.def, but failed to update op_risbg
->> to match.  No need to special-case the imask inversion, since that
->> is already ~0 for RISBG (and now RISBGN).
->>
->> Fixes: 375ee58bedcda359011fe7fa99e0647f66f9ffa0
->> Fixes: https://bugs.launchpad.net/qemu/+bug/1701798 (s390x part)
->> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
->> ---
->>  target/s390x/translate.c | 9 +++------
->>  1 file changed, 3 insertions(+), 6 deletions(-)
->>
->> diff --git a/target/s390x/translate.c b/target/s390x/translate.c
->> index dee72a787d..85d0a6c3af 100644
->> --- a/target/s390x/translate.c
->> +++ b/target/s390x/translate.c
->> @@ -3432,6 +3432,7 @@ static ExitStatus op_risbg(DisasContext *s, DisasOps *o)
->>      /* Adjust the arguments for the specific insn.  */
->>      switch (s->fields->op2) {
->>      case 0x55: /* risbg */
->> +    case 0x59: /* risbgn */
->>          i3 &= 63;
->>          i4 &= 63;
->>          pmask = ~0;
->> @@ -3447,7 +3448,7 @@ static ExitStatus op_risbg(DisasContext *s, DisasOps *o)
->>          pmask = 0x00000000ffffffffull;
->>          break;
->>      default:
->> -        abort();
->> +        g_assert_not_reached();
->>      }
->>
->>      /* MASK is the set of bits to be inserted from R2.
->> @@ -3464,11 +3465,7 @@ static ExitStatus op_risbg(DisasContext *s, DisasOps *o)
->>         insns, we need to keep the other half of the register.  */
->>      imask = ~mask | ~pmask;
->>      if (do_zero) {
->> -        if (s->fields->op2 == 0x55) {
->> -            imask = 0;
->> -        } else {
->> -            imask = ~pmask;
->> -        }
->> +        imask = ~pmask;
->>      }
->>
->>      len = i4 - i3 + 1;
->>
->
-> Looks good.
->
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
+Testing this with QEMU 2.5 (and also with today's head-of-git) "qemu-
+system_x86-64 -machine isapc" works for me (it boots the guest bios). So
+I'm going to close this bug as fixed; please open a fresh bug if you
+still have problems with a more recent QEMU version.
 
-Tested-by: Peter Maydell <peter.maydell@linaro.org>
 
-...at least it fixes the simple test case from the bug report.
+** Changed in: qemu
+       Status: New =3D> Fix Released
 
--- PMM
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1400768
+
+Title:
+  Fatal error when running with '-machine isapc' on 2.1.2
+
+Status in QEMU:
+  Fix Released
+
+Bug description:
+  all I have are the traces, should hopefully be easy to reproduce.
+
+  # qemu-system-i386 -machine isapc
+  VNC server running on `::1:5900'
+  qemu: fatal: Trying to execute code outside RAM or ROM at 0x1a0dff44
+
+  EAX=3D000f0f88 EBX=3D00100000 ECX=3D07fc0000 EDX=3D0000002c
+  ESI=3D00006f5c EDI=3D08000000 EBP=3D07fc0000 ESP=3Dfffe0014
+  EIP=3D1a0dff44 EFL=3D00000046 [---Z-P-] CPL=3D0 II=3D0 A20=3D1 SMM=3D0 HL=
+T=3D0
+  ES =3D0010 00000000 ffffffff 00cf9300 DPL=3D0 DS   [-WA]
+  CS =3D0008 00000000 ffffffff 00cf9b00 DPL=3D0 CS32 [-RA]
+  SS =3D0010 00000000 ffffffff 00cf9300 DPL=3D0 DS   [-WA]
+  DS =3D0010 00000000 ffffffff 00cf9300 DPL=3D0 DS   [-WA]
+  FS =3D0010 00000000 ffffffff 00cf9300 DPL=3D0 DS   [-WA]
+  GS =3D0010 00000000 ffffffff 00cf9300 DPL=3D0 DS   [-WA]
+  LDT=3D0000 00000000 0000ffff 00008200 DPL=3D0 LDT
+  TR =3D0000 00000000 0000ffff 00008b00 DPL=3D0 TSS32-busy
+  GDT=3D     000f6be8 00000037
+  IDT=3D     000f6c26 00000000
+  CR0=3D60000011 CR2=3D00000000 CR3=3D00000000 CR4=3D00000000
+  DR0=3D00000000 DR1=3D00000000 DR2=3D00000000 DR3=3D00000000 =
+
+  DR6=3Dffff0ff0 DR7=3D00000400
+  CCS=3D00000000 CCD=3D00000000 CCO=3DADDB    =
+
+  EFER=3D0000000000000000
+  FCW=3D037f FSW=3D0000 [ST=3D0] FTW=3D00 MXCSR=3D00001f80
+  FPR0=3D0000000000000000 0000 FPR1=3D0000000000000000 0000
+  FPR2=3D0000000000000000 0000 FPR3=3D0000000000000000 0000
+  FPR4=3D0000000000000000 0000 FPR5=3D0000000000000000 0000
+  FPR6=3D0000000000000000 0000 FPR7=3D0000000000000000 0000
+  XMM00=3D00000000000000000000000000000000 XMM01=3D000000000000000000000000=
+00000000
+  XMM02=3D00000000000000000000000000000000 XMM03=3D000000000000000000000000=
+00000000
+  XMM04=3D00000000000000000000000000000000 XMM05=3D000000000000000000000000=
+00000000
+  XMM06=3D00000000000000000000000000000000 XMM07=3D000000000000000000000000=
+00000000
+  Aborted
+
+  =
+
+  # qemu-system-x86_64 -machine isapc
+  VNC server running on `::1:5900'
+  qemu: fatal: Trying to execute code outside RAM or ROM at 0x000000001a0df=
+f44
+
+  EAX=3D000f0f88 EBX=3D00100000 ECX=3D07fc0000 EDX=3D0000002c
+  ESI=3D00006f5c EDI=3D08000000 EBP=3D07fc0000 ESP=3Dfffe0014
+  EIP=3D1a0dff44 EFL=3D00000046 [---Z-P-] CPL=3D0 II=3D0 A20=3D1 SMM=3D0 HL=
+T=3D0
+  ES =3D0010 00000000 ffffffff 00cf9300 DPL=3D0 DS   [-WA]
+  CS =3D0008 00000000 ffffffff 00cf9b00 DPL=3D0 CS32 [-RA]
+  SS =3D0010 00000000 ffffffff 00cf9300 DPL=3D0 DS   [-WA]
+  DS =3D0010 00000000 ffffffff 00cf9300 DPL=3D0 DS   [-WA]
+  FS =3D0010 00000000 ffffffff 00cf9300 DPL=3D0 DS   [-WA]
+  GS =3D0010 00000000 ffffffff 00cf9300 DPL=3D0 DS   [-WA]
+  LDT=3D0000 00000000 0000ffff 00008200 DPL=3D0 LDT
+  TR =3D0000 00000000 0000ffff 00008b00 DPL=3D0 TSS32-busy
+  GDT=3D     000f6be8 00000037
+  IDT=3D     000f6c26 00000000
+  CR0=3D60000011 CR2=3D00000000 CR3=3D00000000 CR4=3D00000000
+  DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000 DR3=
+=3D0000000000000000 =
+
+  DR6=3D00000000ffff0ff0 DR7=3D0000000000000400
+  CCS=3D00000000 CCD=3D00000000 CCO=3DADDB    =
+
+  EFER=3D0000000000000000
+  FCW=3D037f FSW=3D0000 [ST=3D0] FTW=3D00 MXCSR=3D00001f80
+  FPR0=3D0000000000000000 0000 FPR1=3D0000000000000000 0000
+  FPR2=3D0000000000000000 0000 FPR3=3D0000000000000000 0000
+  FPR4=3D0000000000000000 0000 FPR5=3D0000000000000000 0000
+  FPR6=3D0000000000000000 0000 FPR7=3D0000000000000000 0000
+  XMM00=3D00000000000000000000000000000000 XMM01=3D000000000000000000000000=
+00000000
+  XMM02=3D00000000000000000000000000000000 XMM03=3D000000000000000000000000=
+00000000
+  XMM04=3D00000000000000000000000000000000 XMM05=3D000000000000000000000000=
+00000000
+  XMM06=3D00000000000000000000000000000000 XMM07=3D000000000000000000000000=
+00000000
+  Aborted
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1400768/+subscriptions
