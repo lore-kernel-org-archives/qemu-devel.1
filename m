@@ -1,14 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33519)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33527)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1eCCLL-00007m-W7
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 17:27:40 -0500
+	(envelope-from <jcody@redhat.com>) id 1eCCLM-00007x-6O
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 17:27:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1eCCLL-0004bp-0W
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 17:27:39 -0500
+	(envelope-from <jcody@redhat.com>) id 1eCCLL-0004bj-18
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 17:27:40 -0500
 From: Jeff Cody <jcody@redhat.com>
-Date: Tue,  7 Nov 2017 17:27:17 -0500
-Message-Id: <cover.1510093478.git.jcody@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 0/7] Code cleanup and minor fixes (for 2.11)
+Date: Tue,  7 Nov 2017 17:27:19 -0500
+Message-Id: <d02d1a7eca3797d6fb1b7395b74a5ae757e53e64.1510093478.git.jcody@redhat.com>
+In-Reply-To: <cover.1510093478.git.jcody@redhat.com>
+References: <cover.1510093478.git.jcody@redhat.com>
+In-Reply-To: <cover.1510093478.git.jcody@redhat.com>
+References: <cover.1510093478.git.jcody@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 2/7] block/ssh: make compliant with coding
+ guidelines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,36 +25,124 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, rjones@redhat.com, kwolf@redhat.com, eblake@redhat.com
 
-Changes from v2 -> v3:
+Signed-off-by: Jeff Cody <jcody@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+---
+ block/ssh.c | 32 ++++++++++++++++++--------------
+ 1 file changed, 18 insertions(+), 14 deletions(-)
 
-Patch 1: Return -EIO for ssh_state_init() (Thanks Eric)
-Patch 4: fixed missed line (Thanks Eric)
-Patch 7: fixed opaque pointer assignment (Thanks Eric)
-
-git-backport-diff -r master.. -u 81fb084
-
-001/7:[0007] [FC] 'block/ssh: don't call libssh2_init() in block_init()'
-002/7:[----] [--] 'block/ssh: make compliant with coding guidelines'
-003/7:[----] [--] 'block/sheepdog: remove spurious NULL check'
-004/7:[0010] [FC] 'block/sheepdog: code beautification'
-005/7:[----] [--] 'block/curl: check error return of curl_global_init()'
-006/7:[----] [--] 'block/curl: fix minor memory leaks'
-007/7:[0002] [FC] 'block/curl: code cleanup to comply with coding style'
-
-
-Jeff Cody (7):
-  block/ssh: don't call libssh2_init() in block_init()
-  block/ssh: make compliant with coding guidelines
-  block/sheepdog: remove spurious NULL check
-  block/sheepdog: code beautification
-  block/curl: check error return of curl_global_init()
-  block/curl: fix minor memory leaks
-  block/curl: code cleanup to comply with coding style
-
- block/curl.c     | 124 +++++++++++++++++++++++------------------
- block/sheepdog.c | 166 +++++++++++++++++++++++++++----------------------------
- block/ssh.c      |  69 ++++++++++++++---------
- 3 files changed, 197 insertions(+), 162 deletions(-)
-
+diff --git a/block/ssh.c b/block/ssh.c
+index de81ec8..39cacc1 100644
+--- a/block/ssh.c
++++ b/block/ssh.c
+@@ -241,7 +241,7 @@ static int parse_uri(const char *filename, QDict *options, Error **errp)
+         goto err;
+     }
+ 
+-    if(uri->user && strcmp(uri->user, "") != 0) {
++    if (uri->user && strcmp(uri->user, "") != 0) {
+         qdict_put_str(options, "user", uri->user);
+     }
+ 
+@@ -268,7 +268,7 @@ static int parse_uri(const char *filename, QDict *options, Error **errp)
+ 
+  err:
+     if (uri) {
+-      uri_free(uri);
++        uri_free(uri);
+     }
+     return -EINVAL;
+ }
+@@ -342,7 +342,7 @@ static int check_host_key_knownhosts(BDRVSSHState *s,
+     libssh2_knownhost_readfile(knh, knh_file, LIBSSH2_KNOWNHOST_FILE_OPENSSH);
+ 
+     r = libssh2_knownhost_checkp(knh, host, port, hostkey, len,
+-                                 LIBSSH2_KNOWNHOST_TYPE_PLAIN|
++                                 LIBSSH2_KNOWNHOST_TYPE_PLAIN |
+                                  LIBSSH2_KNOWNHOST_KEYENC_RAW,
+                                  &found);
+     switch (r) {
+@@ -405,15 +405,18 @@ static int compare_fingerprint(const unsigned char *fingerprint, size_t len,
+     unsigned c;
+ 
+     while (len > 0) {
+-        while (*host_key_check == ':')
++        while (*host_key_check == ':') {
+             host_key_check++;
++        }
+         if (!qemu_isxdigit(host_key_check[0]) ||
+-            !qemu_isxdigit(host_key_check[1]))
++            !qemu_isxdigit(host_key_check[1])) {
+             return 1;
++        }
+         c = hex2decimal(host_key_check[0]) * 16 +
+             hex2decimal(host_key_check[1]);
+-        if (c - *fingerprint != 0)
++        if (c - *fingerprint != 0) {
+             return c - *fingerprint;
++        }
+         fingerprint++;
+         len--;
+         host_key_check += 2;
+@@ -433,8 +436,8 @@ check_host_key_hash(BDRVSSHState *s, const char *hash,
+         return -EINVAL;
+     }
+ 
+-    if(compare_fingerprint((unsigned char *) fingerprint, fingerprint_len,
+-                           hash) != 0) {
++    if (compare_fingerprint((unsigned char *) fingerprint, fingerprint_len,
++                            hash) != 0) {
+         error_setg(errp, "remote host key does not match host_key_check '%s'",
+                    hash);
+         return -EPERM;
+@@ -507,7 +510,7 @@ static int authenticate(BDRVSSHState *s, const char *user, Error **errp)
+         goto out;
+     }
+ 
+-    for(;;) {
++    for (;;) {
+         r = libssh2_agent_get_identity(agent, &identity, prev_identity);
+         if (r == 1) {           /* end of list */
+             break;
+@@ -860,8 +863,8 @@ static int ssh_create(const char *filename, QemuOpts *opts, Error **errp)
+     }
+ 
+     r = connect_to_ssh(&s, uri_options,
+-                       LIBSSH2_FXF_READ|LIBSSH2_FXF_WRITE|
+-                       LIBSSH2_FXF_CREAT|LIBSSH2_FXF_TRUNC,
++                       LIBSSH2_FXF_READ  | LIBSSH2_FXF_WRITE |
++                       LIBSSH2_FXF_CREAT | LIBSSH2_FXF_TRUNC,
+                        0644, errp);
+     if (r < 0) {
+         ret = r;
+@@ -869,7 +872,7 @@ static int ssh_create(const char *filename, QemuOpts *opts, Error **errp)
+     }
+ 
+     if (total_size > 0) {
+-        libssh2_sftp_seek64(s.sftp_handle, total_size-1);
++        libssh2_sftp_seek64(s.sftp_handle, total_size - 1);
+         r2 = libssh2_sftp_write(s.sftp_handle, c, 1);
+         if (r2 < 0) {
+             sftp_error_setg(errp, &s, "truncate failed");
+@@ -1108,7 +1111,7 @@ static int ssh_write(BDRVSSHState *s, BlockDriverState *bs,
+          * works for me.
+          */
+         if (r == 0) {
+-            ssh_seek(s, offset + written, SSH_SEEK_WRITE|SSH_SEEK_FORCE);
++            ssh_seek(s, offset + written, SSH_SEEK_WRITE | SSH_SEEK_FORCE);
+             co_yield(s, bs);
+             goto again;
+         }
+@@ -1122,8 +1125,9 @@ static int ssh_write(BDRVSSHState *s, BlockDriverState *bs,
+             end_of_vec = i->iov_base + i->iov_len;
+         }
+ 
+-        if (offset + written > s->attrs.filesize)
++        if (offset + written > s->attrs.filesize) {
+             s->attrs.filesize = offset + written;
++        }
+     }
+ 
+     return 0;
 -- 
 2.9.5
