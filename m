@@ -1,19 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33526)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33519)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1eCCLM-00007v-6L
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 17:27:41 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1eCCLL-0004bv-1J
+	(envelope-from <jcody@redhat.com>) id 1eCCLL-00007m-W7
 	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 17:27:40 -0500
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <jcody@redhat.com>) id 1eCCLL-0004bp-0W
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 17:27:39 -0500
 From: Jeff Cody <jcody@redhat.com>
-Date: Tue,  7 Nov 2017 17:27:18 -0500
-Message-Id: <27e0bf9dfb1370e8beb08c7b5ad6894540fff13a.1510093478.git.jcody@redhat.com>
-In-Reply-To: <cover.1510093478.git.jcody@redhat.com>
-References: <cover.1510093478.git.jcody@redhat.com>
-In-Reply-To: <cover.1510093478.git.jcody@redhat.com>
-References: <cover.1510093478.git.jcody@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 1/7] block/ssh: don't call libssh2_init() in
- block_init()
+Date: Tue,  7 Nov 2017 17:27:17 -0500
+Message-Id: <cover.1510093478.git.jcody@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 0/7] Code cleanup and minor fixes (for 2.11)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,90 +20,36 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, rjones@redhat.com, kwolf@redhat.com, eblake@redhat.com
 
-We don't need libssh2 failure to be fatal (we could just opt to not
-register the driver on failure). But, it is probably a good idea to
-avoid external library calls during the block_init(), and call the
-libssh2 global init function on the first usage, returning any errors.
+Changes from v2 -> v3:
 
-Signed-off-by: Jeff Cody <jcody@redhat.com>
----
- block/ssh.c | 37 ++++++++++++++++++++++++++-----------
- 1 file changed, 26 insertions(+), 11 deletions(-)
+Patch 1: Return -EIO for ssh_state_init() (Thanks Eric)
+Patch 4: fixed missed line (Thanks Eric)
+Patch 7: fixed opaque pointer assignment (Thanks Eric)
 
-diff --git a/block/ssh.c b/block/ssh.c
-index b049a16..de81ec8 100644
---- a/block/ssh.c
-+++ b/block/ssh.c
-@@ -83,12 +83,28 @@ typedef struct BDRVSSHState {
-     bool unsafe_flush_warning;
- } BDRVSSHState;
- 
--static void ssh_state_init(BDRVSSHState *s)
-+static bool ssh_libinit_called;
-+
-+static int ssh_state_init(BDRVSSHState *s, Error **errp)
- {
-+    int ret;
-+
-+    if (!ssh_libinit_called) {
-+        ret = libssh2_init(0);
-+        if (ret) {
-+            error_setg(errp, "libssh2 initialization failed with %d", ret);
-+            return ret;
-+        }
-+        ssh_libinit_called = true;
-+    }
-+
-+
-     memset(s, 0, sizeof *s);
-     s->sock = -1;
-     s->offset = -1;
-     qemu_co_mutex_init(&s->lock);
-+
-+    return 0;
- }
- 
- static void ssh_state_free(BDRVSSHState *s)
-@@ -773,7 +789,9 @@ static int ssh_file_open(BlockDriverState *bs, QDict *options, int bdrv_flags,
-     int ret;
-     int ssh_flags;
- 
--    ssh_state_init(s);
-+    if (ssh_state_init(s, errp)) {
-+        return -EIO;
-+    }
- 
-     ssh_flags = LIBSSH2_FXF_READ;
-     if (bdrv_flags & BDRV_O_RDWR) {
-@@ -821,8 +839,13 @@ static int ssh_create(const char *filename, QemuOpts *opts, Error **errp)
-     BDRVSSHState s;
-     ssize_t r2;
-     char c[1] = { '\0' };
-+    Error *local_err = NULL;
- 
--    ssh_state_init(&s);
-+    ret = ssh_state_init(&s, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        return ret;
-+    }
- 
-     /* Get desired file size. */
-     total_size = ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0),
-@@ -1213,14 +1236,6 @@ static BlockDriver bdrv_ssh = {
- 
- static void bdrv_ssh_init(void)
- {
--    int r;
--
--    r = libssh2_init(0);
--    if (r != 0) {
--        fprintf(stderr, "libssh2 initialization failed, %d\n", r);
--        exit(EXIT_FAILURE);
--    }
--
-     bdrv_register(&bdrv_ssh);
- }
- 
+git-backport-diff -r master.. -u 81fb084
+
+001/7:[0007] [FC] 'block/ssh: don't call libssh2_init() in block_init()'
+002/7:[----] [--] 'block/ssh: make compliant with coding guidelines'
+003/7:[----] [--] 'block/sheepdog: remove spurious NULL check'
+004/7:[0010] [FC] 'block/sheepdog: code beautification'
+005/7:[----] [--] 'block/curl: check error return of curl_global_init()'
+006/7:[----] [--] 'block/curl: fix minor memory leaks'
+007/7:[0002] [FC] 'block/curl: code cleanup to comply with coding style'
+
+
+Jeff Cody (7):
+  block/ssh: don't call libssh2_init() in block_init()
+  block/ssh: make compliant with coding guidelines
+  block/sheepdog: remove spurious NULL check
+  block/sheepdog: code beautification
+  block/curl: check error return of curl_global_init()
+  block/curl: fix minor memory leaks
+  block/curl: code cleanup to comply with coding style
+
+ block/curl.c     | 124 +++++++++++++++++++++++------------------
+ block/sheepdog.c | 166 +++++++++++++++++++++++++++----------------------------
+ block/ssh.c      |  69 ++++++++++++++---------
+ 3 files changed, 197 insertions(+), 162 deletions(-)
+
 -- 
 2.9.5
