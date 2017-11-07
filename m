@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53917)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55142)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eBsAJ-0003wb-Fe
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 19:54:56 -0500
+	(envelope-from <jsnow@redhat.com>) id 1eBsDo-0004wv-Kv
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 19:58:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eBsAI-0001KB-GO
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 19:54:55 -0500
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1509734853-3014-1-git-send-email-cota@braap.org>
-	<20171103185610.GA3907@flamenco>
-	<20171103200233.GI3111@localhost.localdomain>
-	<20171103222407.GA22411@flamenco>
-	<20171106141022.GO3111@localhost.localdomain>
-	<20171106215454.GB2152@flamenco>
-	<CAKmqyKOSOHdpzfu_WMPWo6Mh_kfmYhem0nR=BD3_hUws0tGEww@mail.gmail.com>
-	<20171106232145.GA25246@flamenco>
-	<CAKmqyKM20ibTxSFQ5FE_fzgOkcHfjXmrK36mpKswz=ZPwfMshA@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <3ff3c20e-fba9-2f77-5f4c-8ffe6ca0b669@amsat.org>
-Date: Mon, 6 Nov 2017 21:54:41 -0300
+	(envelope-from <jsnow@redhat.com>) id 1eBsDl-0003Pf-En
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 19:58:32 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56066)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1eBsDl-0003PF-7c
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 19:58:29 -0500
+References: <20171026064635.7179-1-aik@ozlabs.ru>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <13277057-669f-cd77-95f1-f0e54f7ae222@redhat.com>
+Date: Mon, 6 Nov 2017 19:58:26 -0500
 MIME-Version: 1.0
-In-Reply-To: <CAKmqyKM20ibTxSFQ5FE_fzgOkcHfjXmrK36mpKswz=ZPwfMshA@mail.gmail.com>
+In-Reply-To: <20171026064635.7179-1-aik@ozlabs.ru>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH] hw: add .min_cpus and
- .default_cpus fields to machine_class
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH qemu] fdc: Exit if ISA controller does not
+ support DMA
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,109 +28,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>, "Emilio G. Cota" <cota@braap.org>, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Richard Henderson <richard.henderson@linaro.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Marcel Apfelbaum <marcel@redhat.com>
+To: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org
+Cc: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-On 11/06/2017 08:33 PM, Alistair Francis wrote:
-> On Mon, Nov 6, 2017 at 3:21 PM, Emilio G. Cota <cota@braap.org> wrote:
->> On Mon, Nov 06, 2017 at 14:32:35 -0800, Alistair Francis wrote:
->>> Sorry for the silence here, I noticed these were broken just before I
->>> went on holidays but didn't get a chance to fix anything.
->>>
->>> For the Xilinx case I was thinking of patching the machine code to
->>> sanely follow the -smp option.
->>>
->>> -smp 1 -> Only create 1 A53
->>> -smp 4 -> Create 4 A53s
->>> -smp 6 -> Create all the CPUs
->>>
->>> I see a lot of advantages in not forcing the smallest number of CPUs
->>> to be 4 unless we really have to.
->>>
->>> I do see a nice advantage in being able to set the default smp option
->>> to something not 1 so the default closely matches hardware, but users
->>> can override that if they want to.
->>>
->>> So for the patch below I like the default_cpus option, but for Xilinx
->>> at least I would like to patch the logic to follow the -smp option
->>> instead of force a minimum.
->>
->> Agreed, honouring -smp would be the right fix.
->> Just note that since this is a regression we need the fix to
->> be in for 2.11.
 
-Can we revert some patches to avoid the 2.11 regression and take time to
-see how to fix this correctly instead?
 
-The -smp help is:
-
--smp
-[cpus=]n[,maxcpus=cpus][,cores=cores][,threads=threads][,sockets=sockets]
-
-How would we start a Cortex-R52?
-
-default would be: -smp cores=4,lockstep
-so we can disable DCLS with: -smp cores=8
-
-having Lockstep not being 2N cores but aliased as N, the only interest
-being injecting fault (or actually 2 cores, but 1 stopped, the guest not
-aware of that).
-
-The ZynqMP indeed has 6 CPUs, why not add apu/rpu options for ARM?
-
-4+2=6 cores:
--smp apus=4,rpus=2
-
-4+1=5 cores
--smp apus=4,rpus=2:lockstep
-
-There will always be 6 cores to this ZynqMP, why want to have less than
-4 APUs? I'd rather have 4 APUs, all of them can be offlined /
-hotplugged, but they need to be instantiated and machine-initialized.
-
-> Ok, I can spin up a patch for the Xilinx boards in the next day (maybe 2)
+On 10/26/2017 02:46 AM, Alexey Kardashevskiy wrote:
+> A "powernv" machine type defines an ISA bus but it does not add any DMA
+> controller to it so it is possible to hit assert(fdctrl->dma) by
+> adding "-machine powernv -device isa-fdc".
 > 
->>
->> I just took a look at the non-Xilinx boards. It seems simple enough to
->> substitute the hard-coded value for smp_cpus, but yet again
->> I see "Property" structs that I'm not sure what to do with.
->> For instance, bcm2836.c:152:
->>
->> static Property bcm2836_props[] = {
->>     DEFINE_PROP_UINT32("enabled-cpus", BCM2836State, enabled_cpus, BCM2836_NCPUS),
->>     DEFINE_PROP_END_OF_LIST()
->> };
->>
->> What is the purpose here? To enable/disable CPUs with -global args,
->> just like it's done for the Xilinx boards? Shouldn't we just use
->> -smp for that?
+> This replaces assert() with an error message.
 > 
-> Hmm...
+> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> ---
 > 
->>
->> Also, note that I don't have a way to test these boards, which
->> explains why I'm reluctant to change board code. But of
->> course if board maintainers step in, I'm all for it :-)
+> Is it a must for ISA to have DMA controllers?
 > 
-> Yeah, I see.
 > 
-> What about if we set default_cpus to the -smp option that is expected.
-> Then on some of the older boards (like the bcm2836) we print a warning
-> in the machine init() if the -smp option doesn't match that?
+> ---
+>  hw/block/fdc.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
 > 
-> That way the default args work, we allow users to specify a overwrite
-> but we warn them that it might not work and it ensures all boards
-> follow a similar flow.
+> diff --git a/hw/block/fdc.c b/hw/block/fdc.c
+> index 67f78ac702..ed8b367572 100644
+> --- a/hw/block/fdc.c
+> +++ b/hw/block/fdc.c
+> @@ -2700,7 +2700,10 @@ static void isabus_fdc_realize(DeviceState *dev, Error **errp)
+>      fdctrl->dma_chann = isa->dma;
+>      if (fdctrl->dma_chann != -1) {
+>          fdctrl->dma = isa_get_dma(isa_bus_from_device(isadev), isa->dma);
+> -        assert(fdctrl->dma);
+> +        if (!fdctrl->dma) {
+> +            error_setg(errp, "ISA controller does not support DMA, exiting");
+> +            return;
+> +        }
+>      }
+>  
+>      qdev_set_legacy_instance_id(dev, isa->iobase, 2);
 > 
-> Then if we can test the boards and know that -smp 1 works we can
-> remove the warning.
-> 
-> Thanks,
-> Alistair
-> 
->>
->> Thanks,
->>
->>                 Emilio
->>
-> 
+
+I've been MIA for a little while, so I'm out of the loop -- but I am not
+sure this is entirely the right way to fix this problem. I think it is
+more the case that certain boards should not be able to ask for certain
+types of devices, and we should prohibit e.g. powernv from being able to
+ask for an ISA floppy disk controller.
+
+(It doesn't seem to have an ISA DMA controller by default, but I have no
+idea if that means it can't EVER have one...)
+
+Papering over this by making it a soft error when we fail to execute
+isa_get_dma and then assuming in retrospect it's because the machine
+type we're on cannot have an ISA DMA controller seems a little
+wrong-headed. It also leaves side-effects from isa_register_portio_list
+and isa_init_irq, so we can't just bail here -- it's only marginally
+better than the assert() it's doing.
+
+That said, I am not really sure what the right thing to do is ... I
+suspect the "right thing" is to express the dependency that isa-fdc
+requires an ISA DMA controller -- and maybe that check happens here when
+isa_get_dma fails and we have to unwind the realize function, but we
+need to do it gracefully.
+
+Give me a day to think about it, but I do want to make sure this is in
+the next release.
+
+--John
