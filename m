@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45758)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46204)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eC7JG-0000s9-NN
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 12:05:15 -0500
+	(envelope-from <bounces@canonical.com>) id 1eC7K7-0001Xt-V5
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 12:06:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eC7JB-0003Ki-3H
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 12:05:10 -0500
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:52454)
+	(envelope-from <bounces@canonical.com>) id 1eC7K3-0003mL-V9
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 12:06:03 -0500
+Received: from indium.canonical.com ([91.189.90.7]:33978)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eC7JA-0003K5-SK
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 12:05:05 -0500
-Received: by mail-wm0-x242.google.com with SMTP id t139so5415038wmt.1
-	for <qemu-devel@nongnu.org>; Tue, 07 Nov 2017 09:05:04 -0800 (PST)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eC7K3-0003ls-Oe
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 12:05:59 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eC7K1-0001U2-NU
+	for <qemu-devel@nongnu.org>; Tue, 07 Nov 2017 17:05:57 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id B026B2E80CE
+	for <qemu-devel@nongnu.org>; Tue,  7 Nov 2017 17:05:57 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20171107165226.22546-1-alex.bennee@linaro.org>
-References: <20171107165226.22546-1-alex.bennee@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 7 Nov 2017 17:04:43 +0000
-Message-ID: <CAFEAcA-E4Tq0gi3q5z+_5JOy0-j0=59p5WiKNFP9qmKG8=r4bg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] accel/tcg/translate-all: expand
- cpu_restore_state retaddr check
+Date: Tue, 07 Nov 2017 16:53:55 -0000
+From: Christophe Lyon <christophe.lyon+launchpad@gmail.com>
+Reply-To: Bug 1727737 <1727737@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150902607840.5143.15937446061017284272.malonedeb@chaenomeles.canonical.com>
+Message-Id: <151007363587.5103.13678613495226955612.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1727737] Re: qemu-arm stalls on a GCC sanitizer
+ test since qemu-2.7
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,66 +37,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
+To: qemu-devel@nongnu.org
 
-On 7 November 2017 at 16:52, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrot=
-e:
-> We are still seeing signals during translation time when we walk over
-> a page protection boundary. This expands the check to ensure the
-> retaddr is inside the code generation buffer. The original suggestion
-> was to check versus tcg_ctx.code_gen_ptr but as we now segment the
-> translation buffer we have to settle for just a general check for
-> being inside.
->
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> Reported-by: Peter Maydell <peter.maydell@linaro.org>
-> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Richard Henderson <rth@twiddle.net>
-> ---
->  accel/tcg/translate-all.c | 20 ++++++++++++--------
->  1 file changed, 12 insertions(+), 8 deletions(-)
->
-> diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-> index 34c5e28d07..eb255af402 100644
-> --- a/accel/tcg/translate-all.c
-> +++ b/accel/tcg/translate-all.c
-> @@ -357,16 +357,20 @@ bool cpu_restore_state(CPUState *cpu, uintptr_t ret=
-addr)
->      TranslationBlock *tb;
->      bool r =3D false;
->
-> -    /* A retaddr of zero is invalid so we really shouldn't have ended
-> -     * up here. The target code has likely forgotten to check retaddr
-> -     * !=3D 0 before attempting to restore state. We return early to
-> -     * avoid blowing up on a recursive tb_lock(). The target must have
-> -     * previously survived a failed cpu_restore_state because
-> -     * tb_find_pc(0) would have failed anyway. It still should be
-> -     * fixed though.
-> +    /* The retaddr has to be in the region of current code buffer. If
-> +     * it's not we will not be able to resolve it here. If it is zero
-> +     * the calling code has likely forgotten to check retaddr before
-> +     * calling here.
+I suspect this happens when the sanitizer library calls StopTheWorld()
+(in
+libsanitizer/sanitizer_common/sanitizer_stoptheworld_linux_libcdep.cc in
+GCC sources).
 
-This part of the comment isn't correct -- it's entirely expected
-that we will get here with a zero retaddr, because that is
-how the rest of the code tells this function "no state restoration
-required".
+It does:
+  uptr tracer_pid =3D internal_clone(
+      TracerThread, tracer_stack.Bottom(),
+      CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_UNTRACED,
+      &tracer_thread_argument, nullptr /* parent_tidptr */,
+      nullptr /* newtls */, nullptr /* child_tidptr */);
 
-> If it is not in the translated code we could be
-> +     * faulting during translation itself.
-> +     *
-> +     * Either way we need return early to avoid blowing up on a
-> +     * recursive tb_lock() as we can't resolve it here.
->       */
->
-> -    if (!retaddr) {
-> +    if (!retaddr ||
-> +        (retaddr < (uintptr_t) tcg_init_ctx.code_gen_buffer) ||
-> +        (retaddr > (uintptr_t) (tcg_init_ctx.code_gen_buffer +
-> +                                tcg_init_ctx.code_gen_buffer_size))) {
->          return r;
->      }
+See:
+https://gcc.gnu.org/viewcvs/gcc/trunk/libsanitizer/sanitizer_common/sanitiz=
+er_stoptheworld_linux_libcdep.cc?revision=3D253887&view=3Dmarkup#l383
 
-thanks
--- PMM
+The recent merge with the upstream libsanitizer means that stoptheworld
+is now enabled on arm as well, leading to this call to internal_clone().
+
+This matches the comment I received on the gcc-patches list: https://gcc.gn=
+u.org/ml/gcc-patches/2017-10/msg02215.html
+"LSan sets atexit handler that calls internal_clone function that's not sup=
+ported in QEMU"
+
+I'm wondering why this works on aarch64? (I am also using QEMU for
+validations of aarch64 gcc). I mean the validations do not timeout. That
+being said, on aarch64 the test exits with 4 as return-code (like it did
+on arm with qemu-2.7)
+
+It also seems to me that the sanitizer lib is trying to handle the error
+(see if (internal_iserror(tracer_pid, &local_errno)) line 427).
+
+As a side note, doing
+$ qemu-arm -E ASAN_OPTIONS=3Ddetect_leaks=3D0 blah
+does not affect the execution, while
+$ env ASAN_OPTIONS=3Ddetect_leaks=3D0 qemu-arm blah
+does
+(my question here being: why doesn't -E do what I want?)
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1727737
+
+Title:
+  qemu-arm stalls on a GCC sanitizer test since qemu-2.7
+
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  Hi,
+
+  I have noticed that several GCC/sanitizer tests fail with timeout when
+  executed under QEMU.
+
+  After a bit of investigation, I have noticed that this worked with
+  qemu-2.7, and started failing with qemu-2.8, and still fails with
+  qemu-2.10.1
+
+  I'm attaching a tarball containing:
+  alloca_instruments_all_paddings.exe : the testcase, and the needed libs:
+  lib/librt.so.1
+  lib/libdl.so.2
+  lib/ld-linux-armhf.so.3
+  lib/libasan.so.5
+  lib/libc.so.6
+  lib/libgcc_s.so.1
+  lib/libpthread.so.0
+  lib/libm.so.6
+
+  To reproduce the problem:
+  $ qemu-arm -cpu any -R 0 -L $PWD $PWD/alloca_instruments_all_paddings.exe
+  returns in less than a second with qemu-2.7, and never with qemu-2.8
+
+  Using -d in_asm suggests that the program "almost" completes and qemu see=
+ms to stall on:
+  0x40b6eb44: e08f4004 add r4, pc, r4
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1727737/+subscriptions
