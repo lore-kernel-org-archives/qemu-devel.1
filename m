@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49951)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51336)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eC3JJ-0003Lv-GV
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 07:48:58 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eC3OD-0004P9-EO
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 07:54:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eC3JE-0000GS-HA
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 07:48:57 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57280)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eC3JE-0000FS-8j
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 07:48:52 -0500
-References: <20171103193802.11876-1-laurent@vivier.eu>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <8ec7f5f2-6f39-cff9-aedb-696a8b318cab@redhat.com>
-Date: Tue, 7 Nov 2017 13:48:47 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1eC3OC-0003Ca-8X
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 07:54:01 -0500
+Received: from mail-wm0-x230.google.com ([2a00:1450:400c:c09::230]:43587)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eC3OC-0003Bm-1x
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 07:54:00 -0500
+Received: by mail-wm0-x230.google.com with SMTP id r68so12889045wmr.0
+	for <qemu-devel@nongnu.org>; Tue, 07 Nov 2017 04:53:59 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20171103193802.11876-1-laurent@vivier.eu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] linux-user: remove nmi.c and
- fw-path-provider.c
+In-Reply-To: <1510049762-4609-1-git-send-email-peter.maydell@linaro.org>
+References: <1510049762-4609-1-git-send-email-peter.maydell@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 7 Nov 2017 12:53:37 +0000
+Message-ID: <CAFEAcA-6nEHiXvxXDPym1oguvXEHBUyVNnL23mssNvT-qCaAYA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/3] cocoa queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,246 +28,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, Riku Voipio <riku.voipio@linaro.org>
+To: QEMU Developers <qemu-devel@nongnu.org>
+Cc: G 3 <programmingkidx@gmail.com>
 
-On 03/11/2017 20:38, Laurent Vivier wrote:
-> linux-user binaries don't need firmware and NMI,
-> so don't add them in this case, move QDEV
-> firmware functions to qdev-fw.c
-> 
-> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+On 7 November 2017 at 10:15, Peter Maydell <peter.maydell@linaro.org> wrote:
+> Cocoa patches for rc0.
+>
+> The following changes since commit 299d1ea9bb56bd9f45f905125489bdd7d543a1aa:
+>
+>   Merge remote-tracking branch 'remotes/yongbok/tags/mips-20171106' into staging (2017-11-06 16:13:10 +0000)
+>
+> are available in the git repository at:
+>
+>   git://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-cocoa-20171107
+>
+> for you to fetch changes up to ef2088f9af16d3a19f5f094da160dd8ba52231a9:
+>
+>   ui/cocoa.m: Send ctrl-alt key combos to guest if QEMU isn't using them (2017-11-07 10:14:14 +0000)
+>
+> ----------------------------------------------------------------
+> cocoa queue:
+>  * make scrolling work in GUI monitor windows
+>  * change ungrab to ctrl-alt-g (matching gtk)
+>  * pass unused ctrl-alt combos to guest
+>
+> ----------------------------------------------------------------
+> John Arbuckle (2):
+>       ui/cocoa.m: Make scrolling work again in GUI monitor windows
+>       ui/cocoa.m: move ungrab to ctrl-alt-g
+>
+> Peter Maydell (1):
+>       ui/cocoa.m: Send ctrl-alt key combos to guest if QEMU isn't using them
+>
+>  ui/cocoa.m | 135 +++++++++++++++++++++++++++++++++++++++----------------------
+>  1 file changed, 86 insertions(+), 49 deletions(-)
 
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+Applied, thanks.
 
-> ---
->  hw/core/Makefile.objs |  5 +--
->  hw/core/qdev-fw.c     | 96 +++++++++++++++++++++++++++++++++++++++++++++++++++
->  hw/core/qdev.c        | 77 -----------------------------------------
->  3 files changed, 99 insertions(+), 79 deletions(-)
->  create mode 100644 hw/core/qdev-fw.c
-> 
-> diff --git a/hw/core/Makefile.objs b/hw/core/Makefile.objs
-> index f8d7a4aaed..1240728c87 100644
-> --- a/hw/core/Makefile.objs
-> +++ b/hw/core/Makefile.objs
-> @@ -1,11 +1,12 @@
->  # core qdev-related obj files, also used by *-user:
->  common-obj-y += qdev.o qdev-properties.o
->  common-obj-y += bus.o reset.o
-> -common-obj-y += fw-path-provider.o
-> +common-obj-$(CONFIG_SOFTMMU) += qdev-fw.o
-> +common-obj-$(CONFIG_SOFTMMU) += fw-path-provider.o
->  # irq.o needed for qdev GPIO handling:
->  common-obj-y += irq.o
->  common-obj-y += hotplug.o
-> -common-obj-y += nmi.o
-> +common-obj-$(CONFIG_SOFTMMU) += nmi.o
->  
->  common-obj-$(CONFIG_EMPTY_SLOT) += empty_slot.o
->  common-obj-$(CONFIG_XILINX_AXI) += stream.o
-> diff --git a/hw/core/qdev-fw.c b/hw/core/qdev-fw.c
-> new file mode 100644
-> index 0000000000..aa35e9d0ac
-> --- /dev/null
-> +++ b/hw/core/qdev-fw.c
-> @@ -0,0 +1,96 @@
-> +/*
-> + *  qdev fw helpers
-> + *
-> + *  This program is free software; you can redistribute it and/or modify
-> + *  it under the terms of the GNU General Public License as published by
-> + *  the Free Software Foundation; either version 2 of the License,
-> + *  or (at your option) any later version.
-> + *
-> + *  This program is distributed in the hope that it will be useful,
-> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> + *  GNU General Public License for more details.
-> + *
-> + *  You should have received a copy of the GNU General Public License
-> + *  along with this program; if not, see <http://www.gnu.org/licenses/>.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "hw/qdev.h"
-> +#include "hw/fw-path-provider.h"
-> +
-> +const char *qdev_fw_name(DeviceState *dev)
-> +{
-> +    DeviceClass *dc = DEVICE_GET_CLASS(dev);
-> +
-> +    if (dc->fw_name) {
-> +        return dc->fw_name;
-> +    }
-> +
-> +    return object_get_typename(OBJECT(dev));
-> +}
-> +
-> +static char *bus_get_fw_dev_path(BusState *bus, DeviceState *dev)
-> +{
-> +    BusClass *bc = BUS_GET_CLASS(bus);
-> +
-> +    if (bc->get_fw_dev_path) {
-> +        return bc->get_fw_dev_path(dev);
-> +    }
-> +
-> +    return NULL;
-> +}
-> +
-> +static char *qdev_get_fw_dev_path_from_handler(BusState *bus, DeviceState *dev)
-> +{
-> +    Object *obj = OBJECT(dev);
-> +    char *d = NULL;
-> +
-> +    while (!d && obj->parent) {
-> +        obj = obj->parent;
-> +        d = fw_path_provider_try_get_dev_path(obj, bus, dev);
-> +    }
-> +    return d;
-> +}
-> +
-> +char *qdev_get_own_fw_dev_path_from_handler(BusState *bus, DeviceState *dev)
-> +{
-> +    Object *obj = OBJECT(dev);
-> +
-> +    return fw_path_provider_try_get_dev_path(obj, bus, dev);
-> +}
-> +
-> +static int qdev_get_fw_dev_path_helper(DeviceState *dev, char *p, int size)
-> +{
-> +    int l = 0;
-> +
-> +    if (dev && dev->parent_bus) {
-> +        char *d;
-> +        l = qdev_get_fw_dev_path_helper(dev->parent_bus->parent, p, size);
-> +        d = qdev_get_fw_dev_path_from_handler(dev->parent_bus, dev);
-> +        if (!d) {
-> +            d = bus_get_fw_dev_path(dev->parent_bus, dev);
-> +        }
-> +        if (d) {
-> +            l += snprintf(p + l, size - l, "%s", d);
-> +            g_free(d);
-> +        } else {
-> +            return l;
-> +        }
-> +    }
-> +    l += snprintf(p + l , size - l, "/");
-> +
-> +    return l;
-> +}
-> +
-> +char *qdev_get_fw_dev_path(DeviceState *dev)
-> +{
-> +    char path[128];
-> +    int l;
-> +
-> +    l = qdev_get_fw_dev_path_helper(dev, path, 128);
-> +
-> +    path[l - 1] = '\0';
-> +
-> +    return g_strdup(path);
-> +}
-> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-> index 11112951a5..49df62ba8c 100644
-> --- a/hw/core/qdev.c
-> +++ b/hw/core/qdev.c
-> @@ -27,7 +27,6 @@
->  
->  #include "qemu/osdep.h"
->  #include "hw/qdev.h"
-> -#include "hw/fw-path-provider.h"
->  #include "sysemu/sysemu.h"
->  #include "qapi/qmp/qerror.h"
->  #include "qapi/visitor.h"
-> @@ -48,17 +47,6 @@ const VMStateDescription *qdev_get_vmsd(DeviceState *dev)
->      return dc->vmsd;
->  }
->  
-> -const char *qdev_fw_name(DeviceState *dev)
-> -{
-> -    DeviceClass *dc = DEVICE_GET_CLASS(dev);
-> -
-> -    if (dc->fw_name) {
-> -        return dc->fw_name;
-> -    }
-> -
-> -    return object_get_typename(OBJECT(dev));
-> -}
-> -
->  static void bus_remove_child(BusState *bus, DeviceState *child)
->  {
->      BusChild *kid;
-> @@ -619,71 +607,6 @@ DeviceState *qdev_find_recursive(BusState *bus, const char *id)
->      return NULL;
->  }
->  
-> -static char *bus_get_fw_dev_path(BusState *bus, DeviceState *dev)
-> -{
-> -    BusClass *bc = BUS_GET_CLASS(bus);
-> -
-> -    if (bc->get_fw_dev_path) {
-> -        return bc->get_fw_dev_path(dev);
-> -    }
-> -
-> -    return NULL;
-> -}
-> -
-> -static char *qdev_get_fw_dev_path_from_handler(BusState *bus, DeviceState *dev)
-> -{
-> -    Object *obj = OBJECT(dev);
-> -    char *d = NULL;
-> -
-> -    while (!d && obj->parent) {
-> -        obj = obj->parent;
-> -        d = fw_path_provider_try_get_dev_path(obj, bus, dev);
-> -    }
-> -    return d;
-> -}
-> -
-> -char *qdev_get_own_fw_dev_path_from_handler(BusState *bus, DeviceState *dev)
-> -{
-> -    Object *obj = OBJECT(dev);
-> -
-> -    return fw_path_provider_try_get_dev_path(obj, bus, dev);
-> -}
-> -
-> -static int qdev_get_fw_dev_path_helper(DeviceState *dev, char *p, int size)
-> -{
-> -    int l = 0;
-> -
-> -    if (dev && dev->parent_bus) {
-> -        char *d;
-> -        l = qdev_get_fw_dev_path_helper(dev->parent_bus->parent, p, size);
-> -        d = qdev_get_fw_dev_path_from_handler(dev->parent_bus, dev);
-> -        if (!d) {
-> -            d = bus_get_fw_dev_path(dev->parent_bus, dev);
-> -        }
-> -        if (d) {
-> -            l += snprintf(p + l, size - l, "%s", d);
-> -            g_free(d);
-> -        } else {
-> -            return l;
-> -        }
-> -    }
-> -    l += snprintf(p + l , size - l, "/");
-> -
-> -    return l;
-> -}
-> -
-> -char* qdev_get_fw_dev_path(DeviceState *dev)
-> -{
-> -    char path[128];
-> -    int l;
-> -
-> -    l = qdev_get_fw_dev_path_helper(dev, path, 128);
-> -
-> -    path[l-1] = '\0';
-> -
-> -    return g_strdup(path);
-> -}
-> -
->  char *qdev_get_dev_path(DeviceState *dev)
->  {
->      BusClass *bc;
-> 
+-- PMM
