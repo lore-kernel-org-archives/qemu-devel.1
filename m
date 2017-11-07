@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59494)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36788)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eC3oU-00041n-3S
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 08:21:14 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1eC41l-0006Vr-Qz
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 08:34:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eC3oO-0003nW-9L
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 08:21:10 -0500
-Received: from indium.canonical.com ([91.189.90.7]:42866)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eC3oO-0003l5-34
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 08:21:04 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eC3oL-0008R9-3r
-	for <qemu-devel@nongnu.org>; Tue, 07 Nov 2017 13:21:01 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 692242E80E9
-	for <qemu-devel@nongnu.org>; Tue,  7 Nov 2017 13:20:59 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 07 Nov 2017 13:06:07 -0000
-From: "R.Nageswara Sastry" <nasastry@in.ibm.com>
-Reply-To: Bug 1713434 <1713434@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150391152035.18876.7874968547091336063.malonedeb@chaenomeles.canonical.com>
-Message-Id: <151005996720.19907.17408369624848984429.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1713434] Re: prom-env-test test aborted and core
- dumped
+	(envelope-from <pm215@archaic.org.uk>) id 1eC41k-0005wZ-N7
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 08:34:53 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:38240)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1eC41k-0005vT-FF
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 08:34:52 -0500
+Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
+	(envelope-from <pm215@archaic.org.uk>) id 1eC41j-0004UP-F3
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 13:34:51 +0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue,  7 Nov 2017 13:35:20 +0000
+Message-Id: <1510061722-14092-6-git-send-email-peter.maydell@linaro.org>
+In-Reply-To: <1510061722-14092-1-git-send-email-peter.maydell@linaro.org>
+References: <1510061722-14092-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PULL 5/7] translate.c: Fix usermode big-endian
+ AArch32 LDREXD and STREXD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,102 +30,91 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Here is the md5sum of openbios-sparc64
+For AArch32 LDREXD and STREXD, architecturally the 32-bit word at the
+lowest address is always Rt and the one at addr+4 is Rt2, even if the
+CPU is big-endian. Our implementation does these with a single
+64-bit store, so if we're big-endian then we need to put the two
+32-bit halves together in the opposite order to little-endian,
+so that they end up in the right places. We were trying to do
+this with the gen_aa32_frob64() function, but that is not correct
+for the usermode emulator, because there there is a distinction
+between "load a 64 bit value" (which does a BE 64-bit access
+and doesn't need swapping) and "load two 32 bit values as one
+64 bit access" (where we still need to do the swapping, like
+system mode BE32).
 
-# md5sum ./pc-bios/openbios-sparc64
-15418a4c9429d9ee9c637701b94c7ffb  ./pc-bios/openbios-sparc64
+Fixes: https://bugs.launchpad.net/qemu/+bug/1725267
+Cc: qemu-stable@nongnu.org
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 1509622400-13351-1-git-send-email-peter.maydell@linaro.org
+---
+ target/arm/translate.c | 39 ++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 34 insertions(+), 5 deletions(-)
 
-> Could you please check with the QEMU 2.10 release to see whether this is =
-a regression or whether it was already failing there? =
-
-Sure, I will update here. Most probably tomorrow.
-
-> I don't have access to POWER9 anymore, so I can't check this right now
-No issues, I can check.
-
-> To quit QEMU, you've got to press "CTRL-a c" and then type "quit" at the =
-monitor prompt.
-Thank you. I am learning new things along with raising bugs :-)
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1713434
-
-Title:
-  prom-env-test test aborted and core dumped
-
-Status in QEMU:
-  In Progress
-
-Bug description:
-  On ppc64le architecture machine the following test case Aborted and
-  Core dumped.
-
-  # tests/prom-env-test --quiet --keep-going -m=3Dquick --GTestLogFD=3D6
-  **
-  ERROR:tests/libqtest.c:628:qtest_get_arch: assertion failed: (qemu !=3D N=
-ULL)
-  Aborted (core dumped)
-
-  Steps to re-produce:
-  clone from the git
-  configure & compile =
-
-  run the unit tests by 'make check'
-
-  (gdb) bt
-  #0  0x00003fff9d60eff0 in raise () from /lib64/libc.so.6
-  #1  0x00003fff9d61136c in abort () from /lib64/libc.so.6
-  #2  0x00003fff9de1aa04 in g_assertion_message () from /lib64/libglib-2.0.=
-so.0
-  #3  0x00003fff9de1ab0c in g_assertion_message_expr () from /lib64/libglib=
--2.0.so.0
-  #4  0x000000001000cc30 in qtest_get_arch () at tests/libqtest.c:628
-  #5  0x00000000100048f0 in main (argc=3D5, argv=3D0x3ffff2145538) at tests=
-/prom-env-test.c:82
-  (gdb) i r
-  r0             0xfa	250
-  r1             0x3ffff2144d30	70368510627120
-  r2             0x3fff9d7b9900	70367091333376
-  r3             0x0	0
-  r4             0x12a7	4775
-  r5             0x6	6
-  r6             0x8	8
-  r7             0x1	1
-  r8             0x0	0
-  r9             0x0	0
-  r10            0x0	0
-  r11            0x0	0
-  r12            0x0	0
-  r13            0x3fff9dfa1950	70367099623760
-  r14            0x0	0
-  r15            0x0	0
-  r16            0x0	0
-  r17            0x0	0
-  r18            0x0	0
-  r19            0x0	0
-  r20            0x0	0
-  r21            0x0	0
-  r22            0x0	0
-  r23            0x0	0
-  r24            0x0	0
-  r25            0x0	0
-  r26            0x0	0
-  r27            0x100287f8	268601336
-  r28            0x16841b40	377756480
-  r29            0x4c	76
-  r30            0x3ffff2144de8	70368510627304
-  r31            0x6	6
-  pc             0x3fff9d60eff0	0x3fff9d60eff0 <raise+96>
-  msr            0x900000000280f033	10376293541503627315
-  cr             0x42000842	1107298370
-  lr             0x3fff9d61136c	0x3fff9d61136c <abort+396>
-  ctr            0x0	0
-  xer            0x0	0
-  orig_r3        0x12a7	4775
-  trap           0xc00	3072
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1713434/+subscriptions
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index df57dbb..4afb0c8 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -7903,9 +7903,27 @@ static void gen_load_exclusive(DisasContext *s, int rt, int rt2,
+         TCGv_i32 tmp2 = tcg_temp_new_i32();
+         TCGv_i64 t64 = tcg_temp_new_i64();
+ 
+-        gen_aa32_ld_i64(s, t64, addr, get_mem_index(s), opc);
++        /* For AArch32, architecturally the 32-bit word at the lowest
++         * address is always Rt and the one at addr+4 is Rt2, even if
++         * the CPU is big-endian. That means we don't want to do a
++         * gen_aa32_ld_i64(), which invokes gen_aa32_frob64() as if
++         * for an architecturally 64-bit access, but instead do a
++         * 64-bit access using MO_BE if appropriate and then split
++         * the two halves.
++         * This only makes a difference for BE32 user-mode, where
++         * frob64() must not flip the two halves of the 64-bit data
++         * but this code must treat BE32 user-mode like BE32 system.
++         */
++        TCGv taddr = gen_aa32_addr(s, addr, opc);
++
++        tcg_gen_qemu_ld_i64(t64, taddr, get_mem_index(s), opc);
++        tcg_temp_free(taddr);
+         tcg_gen_mov_i64(cpu_exclusive_val, t64);
+-        tcg_gen_extr_i64_i32(tmp, tmp2, t64);
++        if (s->be_data == MO_BE) {
++            tcg_gen_extr_i64_i32(tmp2, tmp, t64);
++        } else {
++            tcg_gen_extr_i64_i32(tmp, tmp2, t64);
++        }
+         tcg_temp_free_i64(t64);
+ 
+         store_reg(s, rt2, tmp2);
+@@ -7954,15 +7972,26 @@ static void gen_store_exclusive(DisasContext *s, int rd, int rt, int rt2,
+         TCGv_i64 n64 = tcg_temp_new_i64();
+ 
+         t2 = load_reg(s, rt2);
+-        tcg_gen_concat_i32_i64(n64, t1, t2);
++        /* For AArch32, architecturally the 32-bit word at the lowest
++         * address is always Rt and the one at addr+4 is Rt2, even if
++         * the CPU is big-endian. Since we're going to treat this as a
++         * single 64-bit BE store, we need to put the two halves in the
++         * opposite order for BE to LE, so that they end up in the right
++         * places.
++         * We don't want gen_aa32_frob64() because that does the wrong
++         * thing for BE32 usermode.
++         */
++        if (s->be_data == MO_BE) {
++            tcg_gen_concat_i32_i64(n64, t2, t1);
++        } else {
++            tcg_gen_concat_i32_i64(n64, t1, t2);
++        }
+         tcg_temp_free_i32(t2);
+-        gen_aa32_frob64(s, n64);
+ 
+         tcg_gen_atomic_cmpxchg_i64(o64, taddr, cpu_exclusive_val, n64,
+                                    get_mem_index(s), opc);
+         tcg_temp_free_i64(n64);
+ 
+-        gen_aa32_frob64(s, o64);
+         tcg_gen_setcond_i64(TCG_COND_NE, o64, o64, cpu_exclusive_val);
+         tcg_gen_extrl_i64_i32(t0, o64);
+ 
+-- 
+2.7.4
