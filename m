@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60915)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33692)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eC03j-0001KO-IR
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 04:20:40 -0500
+	(envelope-from <berrange@redhat.com>) id 1eC06V-0002ts-7r
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 04:23:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eC03f-0003KC-8V
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 04:20:39 -0500
-Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:55568)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eC03f-0003Je-0g
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 04:20:35 -0500
-Received: by mail-wr0-x241.google.com with SMTP id l8so11150311wre.12
-	for <qemu-devel@nongnu.org>; Tue, 07 Nov 2017 01:20:34 -0800 (PST)
+	(envelope-from <berrange@redhat.com>) id 1eC06R-0004dV-9S
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 04:23:31 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57460)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eC06R-0004dG-4C
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 04:23:27 -0500
+Date: Tue, 7 Nov 2017 09:23:22 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20171107092322.GE14232@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <1509988303.22094.8.camel@intel.com>
+	<20171106172646.GO23361@redhat.com>
+	<1510002125.22094.10.camel@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <4fcd39ca-7e73-01b2-e9bc-1c690c9d5dec@vivier.eu>
-References: <1509993206-26637-1-git-send-email-peter.maydell@linaro.org>
-	<1509993206-26637-4-git-send-email-peter.maydell@linaro.org>
-	<4fcd39ca-7e73-01b2-e9bc-1c690c9d5dec@vivier.eu>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 7 Nov 2017 09:20:13 +0000
-Message-ID: <CAFEAcA_ATV-L=HUDwDt0AUqdpFvDiH1emzs7k7+YfmR1YC1K-g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1510002125.22094.10.camel@intel.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 3/4] linux-user/sparc: Put address for data
- faults where linux-user expects it
+Subject: Re: [Qemu-devel] RFC: connecting chardev to a command forked by qemu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,51 +30,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, Riku Voipio <riku.voipio@iki.fi>
+To: Patrick Ohly <patrick.ohly@intel.com>
+Cc: qemu-devel@nongnu.org, Amarnath Valluri <amarnath.valluri@intel.com>
 
-On 7 November 2017 at 08:28, Laurent Vivier <laurent@vivier.eu> wrote:
-> Le 06/11/2017 =C3=A0 19:33, Peter Maydell a =C3=A9crit :
->> In the user-mode-only version of sparc_cpu_handle_mmu_fault(),
->> we must save the fault address for a data fault into the CPU
->> state's mmu registers, because the code in linux-user/main.c
->> expects to find it there in order to populate the si_addr
->> field of the guest siginfo.
->>
->> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
->> ---
->>  target/sparc/mmu_helper.c | 8 ++++++++
->>  1 file changed, 8 insertions(+)
->>
->> diff --git a/target/sparc/mmu_helper.c b/target/sparc/mmu_helper.c
->> index 126ea5e..d5b6c1e 100644
->> --- a/target/sparc/mmu_helper.c
->> +++ b/target/sparc/mmu_helper.c
->> @@ -30,10 +30,18 @@
->>  int sparc_cpu_handle_mmu_fault(CPUState *cs, vaddr address, int rw,
->>                                 int mmu_idx)
->>  {
->> +    SPARCCPU *cpu =3D SPARC_CPU(cs);
->> +    CPUSPARCState *env =3D &cpu->env;
->> +
->>      if (rw & 2) {
->>          cs->exception_index =3D TT_TFAULT;
->>      } else {
->>          cs->exception_index =3D TT_DFAULT;
->> +#ifdef TARGET_SPARC64
->> +        env->dmmu.mmuregs[4] =3D address;
->> +#else
->> +        env->mmuregs[4] =3D address;
->> +#endif
->>      }
->>      return 1;
->>  }
->>
->
-> The softmmu version of sparc_cpu_handle_mmu_fault() also updates
-> mmuregs[3]. Is it needed for this one (for ucontext)?
+On Mon, Nov 06, 2017 at 10:02:05PM +0100, Patrick Ohly wrote:
+> On Mon, 2017-11-06 at 17:26 +0000, Daniel P. Berrange wrote:
+> > I can see the argument about it making QEMU easier to use, and those
+> > who care about security aren't forced to use this new feature. It
+> > none the less has a cost on maintainers and existance of these
+> > features does reflect on QEMU's security reputation even if many
+> > don't use it.
+>=20
+> With Yocto we really don't have much choice: we need a patch like this
+> because the alternative (introducing support for spawning and stopping
+> swtpm and then passing the right parameters to QEMU) is way more
+> complex.=C2=A0So if this patch isn't acceptable to QEMU upstream, then =
+I
+> will keep it as simple as possible and propose it as a local patch in
+> Yocto.
 
-Nothing in linux-user/ reads mmuregs[3], so I assume not.
+I don't really buy this argument. Any distro's core job is the ability
+to start/stop/manage processes. Saying yocto is unable to manage
+runing of swtpm is really dubious - it is simply a choice to declare
+that it is QEMU's job.=20
 
-thanks
--- PMM
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
