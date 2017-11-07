@@ -1,17 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37748)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40607)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eBuAE-0007fR-AL
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 22:02:59 -0500
+	(envelope-from <eblake@redhat.com>) id 1eBuGO-0003wl-Cy
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 22:09:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eBuAA-0003X2-FN
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 22:02:58 -0500
+	(envelope-from <eblake@redhat.com>) id 1eBuGN-00071B-LB
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 22:09:20 -0500
 From: Eric Blake <eblake@redhat.com>
-Date: Mon,  6 Nov 2017 21:02:35 -0600
-Message-Id: <20171107030236.23633-8-eblake@redhat.com>
-In-Reply-To: <20171107030236.23633-1-eblake@redhat.com>
-References: <20171107030236.23633-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH 7/8] nbd-client: Stricter enforcing of
- structured reply spec
+Date: Mon,  6 Nov 2017 21:09:10 -0600
+Message-Id: <20171107030912.23930-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH 0/2] Optimize sparse reads over NBD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,62 +18,32 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, pbonzini@redhat.com, vsementsov@virtuozzo.com, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: qemu-block@nongnu.org, pbonzini@redhat.com, vsementsov@virtuozzo.com
 
-Ensure that the server is not sending unexpected chunk lengths
-for either the NONE or the OFFSET_DATA chunk, nor unexpected
-hole length for OFFSET_HOLE.  This will flag any server that
-responds to a zero-length read with an OFFSET_DATA as broken, but
-we just fixed things to never send that request.
+When I first proposed the NBD extension of structured reads,
+it was in order to more efficiently read sparse files without
+sending lots of zeroes over the wire.  These two patches feel
+like a feature addition, and missed soft freeze, so I'm
+reluctant to include them in a 2.11 pull request; on the other
+hand, implementing structured replies without sparse reads is
+a rather incomplete feature addition even if it complies with
+the NBD spec.  Since structured replies is a new 2.11 feature,
+I could argue that it is a bug if the new feature does not go
+all the way to sparse reads.
 
-Signed-off-by: Eric Blake <eblake@redhat.com>
----
- block/nbd-client.c | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
+I've posted this as two patches, but welcome opinions on whether
+it should be squashed into one.
 
-diff --git a/block/nbd-client.c b/block/nbd-client.c
-index d8ad2ba57c..992c6e1493 100644
---- a/block/nbd-client.c
-+++ b/block/nbd-client.c
-@@ -216,7 +216,7 @@ static int nbd_parse_offset_hole_payload(NBDStructuredReplyChunk *chunk,
-     offset = payload_advance64(&payload);
-     hole_size = payload_advance32(&payload);
+Based-on: 20171107030236.23633-1-eblake@redhat.com
+([PATCH 0/8] various NBD fixes for 2.11)
 
--    if (offset < orig_offset || hole_size > qiov->size ||
-+    if (!hole_size || offset < orig_offset || hole_size > qiov->size ||
-         offset > orig_offset + qiov->size - hole_size) {
-         error_setg(errp, "Protocol error: server sent chunk exceeding requested"
-                          " region");
-@@ -281,7 +281,8 @@ static int nbd_co_receive_offset_data_payload(NBDClientSession *s,
+Eric Blake (2):
+  nbd/server: Implement sparse reads atop structured reply
+  nbd/server: Optimize final chunk of sparse read
 
-     assert(nbd_reply_is_structured(&s->reply));
-
--    if (chunk->length < sizeof(offset)) {
-+    /* The NBD spec requires at least one byte of payload */
-+    if (chunk->length <= sizeof(offset)) {
-         error_setg(errp, "Protocol error: invalid payload for "
-                          "NBD_REPLY_TYPE_OFFSET_DATA");
-         return -EINVAL;
-@@ -293,7 +294,7 @@ static int nbd_co_receive_offset_data_payload(NBDClientSession *s,
-     be64_to_cpus(&offset);
-
-     data_size = chunk->length - sizeof(offset);
--    if (offset < orig_offset || data_size > qiov->size ||
-+    if (!data_size || offset < orig_offset || data_size > qiov->size ||
-         offset > orig_offset + qiov->size - data_size) {
-         error_setg(errp, "Protocol error: server sent chunk exceeding requested"
-                          " region");
-@@ -411,6 +412,11 @@ static coroutine_fn int nbd_co_do_receive_one_chunk(
-                        " NBD_REPLY_FLAG_DONE flag set");
-             return -EINVAL;
-         }
-+        if (chunk->length) {
-+            error_setg(errp, "Protocol error: NBD_REPLY_TYPE_NONE chunk with"
-+                       " nonzero length");
-+            return -EINVAL;
-+        }
-         return 0;
-     }
+ nbd/server.c     | 79 +++++++++++++++++++++++++++++++++++++++++++++++++++++---
+ nbd/trace-events |  1 +
+ 2 files changed, 77 insertions(+), 3 deletions(-)
 
 -- 
 2.13.6
