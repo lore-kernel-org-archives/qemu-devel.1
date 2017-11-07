@@ -1,28 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41915)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42540)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1eCCjJ-00035X-3P
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 17:52:26 -0500
+	(envelope-from <slp@redhat.com>) id 1eCClt-0004UF-Ro
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 17:55:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1eCCjE-0001ks-Vq
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 17:52:25 -0500
-Received: from mail-pl0-x244.google.com ([2607:f8b0:400e:c01::244]:43406)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1eCCjE-0001kB-LQ
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 17:52:20 -0500
-Received: by mail-pl0-x244.google.com with SMTP id t7so1264plm.0
-	for <qemu-devel@nongnu.org>; Tue, 07 Nov 2017 14:52:20 -0800 (PST)
-References: <1467696699-8941-9-git-send-email-david@gibson.dropbear.id.au>
-	<52275d2d-0a93-fe92-56ed-7841fa5a79dc@redhat.com>
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Message-ID: <518a60a2-9c65-9eda-471c-83596e746bfb@ozlabs.ru>
-Date: Wed, 8 Nov 2017 09:52:12 +1100
-MIME-Version: 1.0
-In-Reply-To: <52275d2d-0a93-fe92-56ed-7841fa5a79dc@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-AU
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL,
- 08/14] spapr_pci/spapr_pci_vfio: Support Dynamic DMA Windows (DDW)
+	(envelope-from <slp@redhat.com>) id 1eCCls-0003YQ-UO
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 17:55:05 -0500
+From: Sergio Lopez <slp@redhat.com>
+Date: Tue,  7 Nov 2017 23:54:26 +0100
+Message-Id: <20171107225426.3822-1-slp@redhat.com>
+Subject: [Qemu-devel] [PATCH v2] util/async: use atomic_mb_set in
+ qemu_bh_cancel
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,51 +18,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>, peter.maydell@linaro.org, agraf@suse.de, qemu-devel@nongnu.org, alex.williamson@redhat.com, qemu-ppc@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, famz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, Sergio Lopez <slp@redhat.com>
 
-On 07/11/17 19:42, Laurent Vivier wrote:
-> On 05/07/2016 07:31, David Gibson wrote:
->> From: Alexey Kardashevskiy <aik@ozlabs.ru>
->>
->> This adds support for Dynamic DMA Windows (DDW) option defined by
->> the SPAPR specification which allows to have additional DMA window(s)
->>
->> The "ddw" property is enabled by default on a PHB but for compatibility
->> the pseries-2.6 machine and older disable it.
->> This also creates a single DMA window for the older machines to
->> maintain backward migration.
->>
->> This implements DDW for PHB with emulated and VFIO devices. The host
->> kernel support is required. The advertised IOMMU page sizes are 4K and
->> 64K; 16M pages are supported but not advertised by default, in order to
->> enable them, the user has to specify "pgsz" property for PHB and
->> enable huge pages for RAM.
-> 
-> Why is it not advirtised by default?
+Commit b7a745d added a qemu_bh_cancel call to the completion function
+as an optimization to prevent it from unnecessarily rescheduling itself.
 
-I do not remember clearly but this kind of automation is usually less
-manageable. What if we do not want huge IOMMU pages for some reason?
+This completion function is scheduled from worker_thread, after setting
+the state of a ThreadPoolElement to THREAD_DONE.
 
+This was considered to be safe, as the completion function restarts the
+loop just after the call to qemu_bh_cancel. But, under certain access
+patterns and scheduling conditions, the loop may wrongly use a
+pre-fetched elem->state value, reading it as THREAD_QUEUED, and ending
+the completion function without having processed a pending TPE linked at
+pool->head:
 
-> When we start qemu with hugepage memory ("mount -t hugetlbfs none
-> /mnt/kvm_hugepage" and ".. -mem-path /mnt/kvm_hugepage .."), we have an
-> ugly message:
-> 
-> "qemu-kvm: System page size 0x1000000 is not enabled in page_size_mask
-> (0x11000). Performance may be slow"
-> 
-> I understand if we want to use this with VFIO, we need something like
-> "-global spapr-pci-host-bridge.pgsz=0x1011000".
-> 
-> But is it needed if we don't use VFIO?
+       I/O thread                  |          worker thread
+------------------------------------------------------------------------
+                                   | speculatively read req->state
+req->state = THREAD_DONE;          |
+qemu_bh_schedule(p->completion_bh) |
+ bh->scheduled = 1;                |
+                                   | qemu_bh_cancel(p->completion_bh)
+                                   |   bh->scheduled = 0;
+                                   | if (req->state == THREAD_DONE)
+                                   |   // sees THREAD_QUEUED
 
-Yes, TCE tables are still created in KVM so the size matters.
+The source of the misunderstanding was that qemu_bh_cancel is now being
+used by the _consumer_ rather than the producer, and therefore now needs
+to have acquire semantics just like e.g. aio_bh_poll.
 
-> Is it a way QEMU adds automatically the 0x1000000 mask to page_size_mask?
+In some situations, if there are no other independent requests in the
+same aio context that could eventually trigger the scheduling of the
+completion function, the omitted TPE and all operations pending on it
+will get stuck forever.
 
-No. That thing which decides about -mem-path should also add the pgsz mask.
+Signed-off-by: Sergio Lopez <slp@redhat.com>
+---
+ util/async.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-
+diff --git a/util/async.c b/util/async.c
+index 355af73ee7..0e1bd8780a 100644
+--- a/util/async.c
++++ b/util/async.c
+@@ -174,7 +174,7 @@ void qemu_bh_schedule(QEMUBH *bh)
+  */
+ void qemu_bh_cancel(QEMUBH *bh)
+ {
+-    bh->scheduled = 0;
++    atomic_mb_set(&bh->scheduled, 0);
+ }
+ 
+ /* This func is async.The bottom half will do the delete action at the finial
 -- 
-Alexey
+2.13.6
