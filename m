@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40849)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46860)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eC0OV-00082T-EL
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 04:42:08 -0500
+	(envelope-from <bounces@canonical.com>) id 1eC0hA-00039P-3t
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 05:01:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eC0OR-0005JJ-8S
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 04:42:07 -0500
-Received: from mout.kundenserver.de ([212.227.17.13]:53398)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eC0OQ-0005IZ-Tb
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 04:42:03 -0500
-References: <492245211.936616.1510023015797.JavaMail.zimbra@xes-inc.com>
-	<03986f7a-f1f8-751a-4967-ab7d1a5093fd@vivier.eu>
-	<CAFEAcA8kXjH5dSM6KCGX5gfgJWJMAymz=D3BTMxjLwZQ7_s5hg@mail.gmail.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <4cf591cc-f35c-890a-dc33-3d1148026112@vivier.eu>
-Date: Tue, 7 Nov 2017 10:41:51 +0100
+	(envelope-from <bounces@canonical.com>) id 1eC0go-0005rP-Pr
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 05:01:24 -0500
+Received: from indium.canonical.com ([91.189.90.7]:44948)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eC0go-0005pe-H5
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 05:01:02 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eC0gm-0005K3-JJ
+	for <qemu-devel@nongnu.org>; Tue, 07 Nov 2017 10:01:00 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 90BC72E80CB
+	for <qemu-devel@nongnu.org>; Tue,  7 Nov 2017 10:01:00 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8kXjH5dSM6KCGX5gfgJWJMAymz=D3BTMxjLwZQ7_s5hg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] linux-user: Support explicit targets for
- PowerPC
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 07 Nov 2017 09:47:35 -0000
+From: "R.Nageswara Sastry" <nasastry@in.ibm.com>
+Reply-To: Bug 1713434 <1713434@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150391152035.18876.7874968547091336063.malonedeb@chaenomeles.canonical.com>
+Message-Id: <151004805599.4519.13564216444967898463.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1713434] Re: prom-env-test test aborted and core
+ dumped
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,64 +37,201 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Aaron Sierra <asierra@xes-inc.com>, Riku Voipio <riku.voipio@iki.fi>, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
-Le 07/11/2017 à 10:29, Peter Maydell a écrit :
-> On 7 November 2017 at 06:57, Laurent Vivier <laurent@vivier.eu> wrote:
->> Le 07/11/2017 à 03:50, Aaron Sierra a écrit :
->>> Enable building PowerPC targets supporting a specific CPU, without
->>> having to set QEMU_CPU via the environment. For example these build
->>> targets (and many more) become available:
->>>
->>>     qemu-ppc.e500mc
->>>     qemu-ppc.e500v2
->>>     qemu-ppc.e5500
->>>     qemu-ppc.e600
->>>     qemu-ppc.e6500
->>>
->>> These (statically compiled) binaries have proven useful for emulating
->>> PowerPC CPUs within Docker containers, where it's hard to reliably
->>> define environment variables that are available for every process.
->>
->> I agree with you.
->>
->> I have patches to do that for years, perhaps we can merge our both
->> solutions to have something working:
->>
->> linux-user: define default cpu model in configure instead of
->> linux-user/main.c
->> https://github.com/vivier/qemu-m68k/commit/1488df8c9fa3a5b099bbc4f41c077a6c69305cc2
->>
->> linux-user: specify the cpu model during configure
->> https://github.com/vivier/qemu-m68k/commit/496f804fd97d5f0ef26da1090e1d95ad15bcc50e
->>
->> The part missing in my series is to rename the qemu binaries with the
->> suffix of the default CPU.
-> 
-> I don't really like this -- it means we'll end up with a huge
-> extra range of executables, and every time a new CPU type is
-> added a new binary has to be plumbed in to our own 'make
-> install' machinery and into every distro's packaging.
+Similar failure seen with the following test too.
 
-I understand, so I don't push the idea more than that...
+# make check-qtest-sparc64 V=3D1
+(cd /home/nasastry/qemu; printf '#define QEMU_PKGVERSION '; if test -n ""; =
+then printf '""\n'; else if test -d .git; then printf '" ('; git describe -=
+-match 'v*' 2>/dev/null | tr -d '\n'; if ! git diff-index --quiet HEAD &>/d=
+ev/null; then printf -- '-dirty'; fi; printf ')"\n'; else printf '""\n'; fi=
+; fi) > qemu-version.h.tmp
+if ! cmp -s qemu-version.h qemu-version.h.tmp; then mv qemu-version.h.tmp q=
+emu-version.h; else rm qemu-version.h.tmp; fi
+make -C /home/nasastry/qemu/capstone CAPSTONE_SHARED=3Dno BUILDDIR=3D"/home=
+/nasastry/qemu/capstone" CC=3D"cc" AR=3D"ar" LD=3D"ld" CFLAGS=3D"-fprofile-=
+arcs -ftest-coverage -g -g -I/usr/include/pixman-1 -DHAS_LIBSSH2_SFTP_FSYNC=
+ -pthread -I/usr/include/glib-2.0 -I/usr/lib64/glib-2.0/include -pthread -I=
+/usr/include/glib-2.0 -I/usr/lib64/glib-2.0/include -DNCURSES_WIDECHAR -fPI=
+E -DPIE -m64 -D_GNU_SOURCE -D_FILE_OFFSET_BITS=3D64 -D_LARGEFILE_SOURCE -fn=
+o-strict-aliasing -fno-common -fwrapv -fstack-protector-strong -I/usr/inclu=
+de/p11-kit-1 -I/usr/include/libpng15 -I/home/nasastry/qemu/capstone/include=
+ -I/home/nasastry/qemu/tests -DCAPSTONE_USE_SYS_DYN_MEM -DCAPSTONE_HAS_ARM =
+-DCAPSTONE_HAS_ARM64 -DCAPSTONE_HAS_POWERPC -DCAPSTONE_HAS_X86"  BUILD_DIR=
+=3D/home/nasastry/qemu /home/nasastry/qemu/capstone/libcapstone.a
+make[1]: Entering directory `/home/nasastry/qemu/capstone'
+make[1]: `/home/nasastry/qemu/capstone/libcapstone.a' is up to date.
+make[1]: Leaving directory `/home/nasastry/qemu/capstone'
+make  BUILD_DIR=3D/home/nasastry/qemu -C sparc64-softmmu V=3D"1" TARGET_DIR=
+=3D"sparc64-softmmu/" all
+make[1]: Entering directory `/home/nasastry/qemu/sparc64-softmmu'
+make[1]: Leaving directory `/home/nasastry/qemu/sparc64-softmmu'
+QTEST_QEMU_BINARY=3Dsparc64-softmmu/qemu-system-sparc64 QTEST_QEMU_IMG=3Dqe=
+mu-img MALLOC_PERTURB_=3D${MALLOC_PERTURB_:-$(( ${RANDOM:-0} % 255 + 1))} g=
+tester -k --verbose -m=3Dquick tests/endianness-test tests/prom-env-test te=
+sts/qmp-test tests/device-introspect-test tests/qom-test tests/test-hmp
+TEST: tests/endianness-test... (pid=3D72117)
+  /sparc64/endianness/sun4u:                                           OK
+  /sparc64/endianness/split/sun4u:                                     OK
+  /sparc64/endianness/combine/sun4u:                                   OK
+PASS: tests/endianness-test
+TEST: tests/prom-env-test... (pid=3D72128)
+  /sparc64/prom-env/sun4u:                                             **
+ERROR:tests/prom-env-test.c:42:check_guest_memory: assertion failed (signat=
+ure =3D=3D MAGIC): (0x00000000 =3D=3D 0xcafec0de)
+FAIL
+GTester: last random seed: R02S54a8565ad2895d49d8d1b0dc99da7044
+(pid=3D74068)
+FAIL: tests/prom-env-test
+TEST: tests/qmp-test... (pid=3D74069)
+  /sparc64/qmp/protocol:                                               OK
+  /sparc64/qmp/qom-list-types:                                         OK
+  /sparc64/qmp/query-acpi-ospm-status:                                 OK
+  /sparc64/qmp/query-balloon:                                          OK
+  /sparc64/qmp/query-block:                                            OK
+  /sparc64/qmp/query-block-jobs:                                       OK
+  /sparc64/qmp/query-blockstats:                                       OK
+  /sparc64/qmp/query-chardev:                                          OK
+  /sparc64/qmp/query-chardev-backends:                                 OK
+  /sparc64/qmp/query-command-line-options:                             OK
+  /sparc64/qmp/query-commands:                                         OK
+  /sparc64/qmp/query-cpus:                                             OK
+  /sparc64/qmp/query-dump:                                             OK
+  /sparc64/qmp/query-dump-guest-memory-capability:                     OK
+  /sparc64/qmp/query-events:                                           OK
+  /sparc64/qmp/query-fdsets:                                           OK
+  /sparc64/qmp/query-hotpluggable-cpus:                                OK
+  /sparc64/qmp/query-iothreads:                                        OK
+  /sparc64/qmp/query-kvm:                                              OK
+  /sparc64/qmp/query-machines:                                         OK
+  /sparc64/qmp/query-memdev:                                           OK
+  /sparc64/qmp/query-memory-devices:                                   OK
+  /sparc64/qmp/query-memory-size-summary:                              OK
+  /sparc64/qmp/query-mice:                                             OK
+  /sparc64/qmp/query-migrate:                                          OK
+  /sparc64/qmp/query-migrate-cache-size:                               OK
+  /sparc64/qmp/query-migrate-capabilities:                             OK
+  /sparc64/qmp/query-migrate-parameters:                               OK
+  /sparc64/qmp/query-name:                                             OK
+  /sparc64/qmp/query-named-block-nodes:                                OK
+  /sparc64/qmp/query-qmp-schema:                                       OK
+  /sparc64/qmp/query-rx-filter:                                        OK
+  /sparc64/qmp/query-spice:                                            OK
+  /sparc64/qmp/query-status:                                           OK
+  /sparc64/qmp/query-target:                                           OK
+  /sparc64/qmp/query-tpm:                                              OK
+  /sparc64/qmp/query-tpm-models:                                       OK
+  /sparc64/qmp/query-tpm-types:                                        OK
+  /sparc64/qmp/query-uuid:                                             OK
+  /sparc64/qmp/query-version:                                          OK
+  /sparc64/qmp/query-vm-generation-id:                                 OK
+  /sparc64/qmp/query-vnc:                                              OK
+  /sparc64/qmp/query-vnc-servers:                                      OK
+  /sparc64/qmp/query-xen-replication-status:                           OK
+PASS: tests/qmp-test
+TEST: tests/device-introspect-test... (pid=3D74165)
+  /sparc64/device/introspect/list:                                     OK
+  /sparc64/device/introspect/list-fields:                              OK
+  /sparc64/device/introspect/none:                                     OK
+  /sparc64/device/introspect/abstract:                                 OK
+  /sparc64/device/introspect/concrete:                                 OK
+  /sparc64/device/introspect/abstract-interfaces:                      OK
+PASS: tests/device-introspect-test
+TEST: tests/qom-test... (pid=3D74181)
+  /sparc64/qom/sun4v:                                                  OK
+  /sparc64/qom/none:                                                   OK
+  /sparc64/qom/sun4u:                                                  OK
+  /sparc64/qom/niagara:                                                OK
+PASS: tests/qom-test
+TEST: tests/test-hmp... (pid=3D74199)
+  /sparc64/hmp/sun4v:                                                  OK
+  /sparc64/hmp/none:                                                   OK
+  /sparc64/hmp/sun4u:                                                  OK
+  /sparc64/hmp/niagara:                                                OK
+  /sparc64/hmp/none+2MB:                                               OK
+PASS: tests/test-hmp
+make: *** [check-qtest-sparc64] Error 1
 
-> The 'look at argv[0]' approach is perhaps a bit more
-> palatable. Or you could just write and use wrapper
-> scripts.
+-- =
 
-It's a personal opinion: I don't like the wrapper idea.
-If we could go with the 'look at argv[0]' approach, I'd be happy.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1713434
 
-> I take it there's no good "-cpu any" option for PPC that
-> would run all these binaries?
+Title:
+  prom-env-test test aborted and core dumped
 
-Yes, there are the embedded version and the server version, that are
-described in different books (books and booke). I didn't check, but I
-think some instructions differ.
+Status in QEMU:
+  In Progress
 
-But I have the same problem with m68k between coldfire and 680x0, and I
-know we can't use the "-cpu any" in this case.
+Bug description:
+  On ppc64le architecture machine the following test case Aborted and
+  Core dumped.
 
-Thanks,
-Laurent
+  # tests/prom-env-test --quiet --keep-going -m=3Dquick --GTestLogFD=3D6
+  **
+  ERROR:tests/libqtest.c:628:qtest_get_arch: assertion failed: (qemu !=3D N=
+ULL)
+  Aborted (core dumped)
+
+  Steps to re-produce:
+  clone from the git
+  configure & compile =
+
+  run the unit tests by 'make check'
+
+  (gdb) bt
+  #0  0x00003fff9d60eff0 in raise () from /lib64/libc.so.6
+  #1  0x00003fff9d61136c in abort () from /lib64/libc.so.6
+  #2  0x00003fff9de1aa04 in g_assertion_message () from /lib64/libglib-2.0.=
+so.0
+  #3  0x00003fff9de1ab0c in g_assertion_message_expr () from /lib64/libglib=
+-2.0.so.0
+  #4  0x000000001000cc30 in qtest_get_arch () at tests/libqtest.c:628
+  #5  0x00000000100048f0 in main (argc=3D5, argv=3D0x3ffff2145538) at tests=
+/prom-env-test.c:82
+  (gdb) i r
+  r0             0xfa	250
+  r1             0x3ffff2144d30	70368510627120
+  r2             0x3fff9d7b9900	70367091333376
+  r3             0x0	0
+  r4             0x12a7	4775
+  r5             0x6	6
+  r6             0x8	8
+  r7             0x1	1
+  r8             0x0	0
+  r9             0x0	0
+  r10            0x0	0
+  r11            0x0	0
+  r12            0x0	0
+  r13            0x3fff9dfa1950	70367099623760
+  r14            0x0	0
+  r15            0x0	0
+  r16            0x0	0
+  r17            0x0	0
+  r18            0x0	0
+  r19            0x0	0
+  r20            0x0	0
+  r21            0x0	0
+  r22            0x0	0
+  r23            0x0	0
+  r24            0x0	0
+  r25            0x0	0
+  r26            0x0	0
+  r27            0x100287f8	268601336
+  r28            0x16841b40	377756480
+  r29            0x4c	76
+  r30            0x3ffff2144de8	70368510627304
+  r31            0x6	6
+  pc             0x3fff9d60eff0	0x3fff9d60eff0 <raise+96>
+  msr            0x900000000280f033	10376293541503627315
+  cr             0x42000842	1107298370
+  lr             0x3fff9d61136c	0x3fff9d61136c <abort+396>
+  ctr            0x0	0
+  xer            0x0	0
+  orig_r3        0x12a7	4775
+  trap           0xc00	3072
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1713434/+subscriptions
