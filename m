@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56233)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57007)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1eCASK-0001fC-EA
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 15:26:45 -0500
+	(envelope-from <eblake@redhat.com>) id 1eCAUp-00039x-Qb
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 15:29:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1eCASI-0002EV-Pu
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 15:26:44 -0500
-Date: Tue, 7 Nov 2017 18:26:30 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20171107202630.GG3111@localhost.localdomain>
-References: <cover.1510080103.git.alistair.francis@xilinx.com>
-	<949865c4381080ce685097390f69115d7f6ef111.1510080103.git.alistair.francis@xilinx.com>
-	<20171107200026.GF3111@localhost.localdomain>
-	<CAKmqyKPtzhQk+=vW=fmOxWrWiDhBZJ9FCPcKroeW7756Fd-R4Q@mail.gmail.com>
+	(envelope-from <eblake@redhat.com>) id 1eCAUo-0003eE-Tz
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 15:29:19 -0500
+References: <20171107172638.29942-1-kwolf@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <9306085c-07c4-b6f7-5222-2b73ee706dac@redhat.com>
+Date: Tue, 7 Nov 2017 14:29:12 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAKmqyKPtzhQk+=vW=fmOxWrWiDhBZJ9FCPcKroeW7756Fd-R4Q@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v1 1/2] xlnx-zynqmp: Properly support the
- smp command line option
+In-Reply-To: <20171107172638.29942-1-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="55QInNlGBoB56Jo62mWOXBgLWDhapm723"
+Subject: Re: [Qemu-devel] [PATCH] block: Deprecate bdrv_set_read_only() and
+ users
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,197 +24,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Edgar Iglesias <edgar.iglesias@xilinx.com>, Edgar Iglesias <edgar.iglesias@gmail.com>, "Emilio G. Cota" <cota@braap.org>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Richard Henderson <richard.henderson@linaro.org>, Thomas Huth <thuth@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org
 
-On Tue, Nov 07, 2017 at 12:04:18PM -0800, Alistair Francis wrote:
-> On Tue, Nov 7, 2017 at 12:00 PM, Eduardo Habkost <ehabkost@redhat.com> wrote:
-> > On Tue, Nov 07, 2017 at 10:59:39AM -0800, Alistair Francis wrote:
-> >> Allow the -smp command line option to control the number of CPUs we
-> >> create.
-> >>
-> >> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-> >> ---
-> >>
-> >>  hw/arm/xlnx-zcu102.c |  3 ++-
-> >>  hw/arm/xlnx-zynqmp.c | 26 ++++++++++++++++----------
-> >>  2 files changed, 18 insertions(+), 11 deletions(-)
-> >>
-> >> diff --git a/hw/arm/xlnx-zcu102.c b/hw/arm/xlnx-zcu102.c
-> >> index e2d15a1c9d..7ec03dad42 100644
-> >> --- a/hw/arm/xlnx-zcu102.c
-> >> +++ b/hw/arm/xlnx-zcu102.c
-> >> @@ -235,7 +235,8 @@ static void xlnx_zcu102_machine_class_init(ObjectClass *oc, void *data)
-> >>  {
-> >>      MachineClass *mc = MACHINE_CLASS(oc);
-> >>
-> >> -    mc->desc = "Xilinx ZynqMP ZCU102 board";
-> >> +    mc->desc = "Xilinx ZynqMP ZCU102 board with 4xA53s and 2xR5s based on " \
-> >> +               "the value of smp";
-> >>      mc->init = xlnx_zcu102_init;
-> >>      mc->block_default_type = IF_IDE;
-> >>      mc->units_per_default_bus = 1;
-> >> diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
-> >> index d4b6560194..c707c66322 100644
-> >> --- a/hw/arm/xlnx-zynqmp.c
-> >> +++ b/hw/arm/xlnx-zynqmp.c
-> >> @@ -98,8 +98,9 @@ static void xlnx_zynqmp_create_rpu(XlnxZynqMPState *s, const char *boot_cpu,
-> >>  {
-> >>      Error *err = NULL;
-> >>      int i;
-> >> +    int num_rpus = MIN(smp_cpus - XLNX_ZYNQMP_NUM_APU_CPUS, XLNX_ZYNQMP_NUM_RPU_CPUS);
-> >>
-> >> -    for (i = 0; i < XLNX_ZYNQMP_NUM_RPU_CPUS; i++) {
-> >> +    for (i = 0; i < num_rpus; i++) {
-> >>          char *name;
-> >>
-> >>          object_initialize(&s->rpu_cpu[i], sizeof(s->rpu_cpu[i]),
-> >> @@ -132,8 +133,9 @@ static void xlnx_zynqmp_init(Object *obj)
-> >>  {
-> >>      XlnxZynqMPState *s = XLNX_ZYNQMP(obj);
-> >>      int i;
-> >> +    int num_apus = MIN(smp_cpus, XLNX_ZYNQMP_NUM_APU_CPUS);
-> >>
-> >> -    for (i = 0; i < XLNX_ZYNQMP_NUM_APU_CPUS; i++) {
-> >> +    for (i = 0; i < num_apus; i++) {
-> >>          object_initialize(&s->apu_cpu[i], sizeof(s->apu_cpu[i]),
-> >>                            "cortex-a53-" TYPE_ARM_CPU);
-> >>          object_property_add_child(obj, "apu-cpu[*]", OBJECT(&s->apu_cpu[i]),
-> >> @@ -182,6 +184,7 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
-> >>      MemoryRegion *system_memory = get_system_memory();
-> >>      uint8_t i;
-> >>      uint64_t ram_size;
-> >> +    int num_apus = MIN(smp_cpus, XLNX_ZYNQMP_NUM_APU_CPUS);
-> >>      const char *boot_cpu = s->boot_cpu ? s->boot_cpu : "apu-cpu[0]";
-> >>      ram_addr_t ddr_low_size, ddr_high_size;
-> >>      qemu_irq gic_spi[GIC_NUM_SPI_INTR];
-> >> @@ -233,10 +236,10 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
-> >>
-> >>      qdev_prop_set_uint32(DEVICE(&s->gic), "num-irq", GIC_NUM_SPI_INTR + 32);
-> >>      qdev_prop_set_uint32(DEVICE(&s->gic), "revision", 2);
-> >> -    qdev_prop_set_uint32(DEVICE(&s->gic), "num-cpu", XLNX_ZYNQMP_NUM_APU_CPUS);
-> >> +    qdev_prop_set_uint32(DEVICE(&s->gic), "num-cpu", num_apus);
-> >>
-> >>      /* Realize APUs before realizing the GIC. KVM requires this.  */
-> >> -    for (i = 0; i < XLNX_ZYNQMP_NUM_APU_CPUS; i++) {
-> >> +    for (i = 0; i < num_apus; i++) {
-> >>          char *name;
-> >>
-> >>          object_property_set_int(OBJECT(&s->apu_cpu[i]), QEMU_PSCI_CONDUIT_SMC,
-> >> @@ -292,7 +295,7 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
-> >>          }
-> >>      }
-> >>
-> >> -    for (i = 0; i < XLNX_ZYNQMP_NUM_APU_CPUS; i++) {
-> >> +    for (i = 0; i < num_apus; i++) {
-> >>          qemu_irq irq;
-> >>
-> >>          sysbus_connect_irq(SYS_BUS_DEVICE(&s->gic), i,
-> >> @@ -307,11 +310,14 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
-> >>      }
-> >>
-> >>      if (s->has_rpu) {
-> >> -        xlnx_zynqmp_create_rpu(s, boot_cpu, &err);
-> >> -        if (err) {
-> >> -            error_propagate(errp, err);
-> >> -            return;
-> >> -        }
-> >> +        info_report("The 'has_rpu' property is no longer required, to use the "
-> >> +                    "RPUs just use -smp 6.");
-> >> +    }
-> >
-> > Is "-global driver=xlnx,,zynqmp,property=has_rpu,value=on"
-> > without an explicit -smp option supposed to be a supported
-> > configuration?
-> >
-> > 0) On current master, we have this:
-> >
-> >   $ ./aarch64-softmmu/qemu-system-aarch64 -machine xlnx-zcu102 -global driver=xlnx,,zynqmp,property=has_rpu,value=on
-> >   **
-> >   ERROR:/home/ehabkost/rh/proj/virt/qemu/tcg/tcg.c:538:tcg_register_thread: assertion failed: (n < max_cpus)
-> >   Aborted (core dumped)
-> >
-> > 1) With your patch we have this:
-> >
-> >   $ ./aarch64-softmmu/qemu-system-aarch64 -machine xlnx-zcu102 -global driver=xlnx,,zynqmp,property=has_rpu,value=on -monitor stdio
-> >   QEMU 2.10.50 monitor - type 'help' for more information
-> >   (qemu) qemu-system-aarch64: info: The 'has_rpu' property is no longer required, to use the RPUs just use -smp 6.
-> >   (qemu) info cpus
-> >   * CPU #0: thread_id=1662
-> >   (qemu)
-> >
-> > 2) With your patch plus Emilio's original min_cpus/default_cpus
-> > proposal[1], we have this:
-> >
-> >   $ ./aarch64-softmmu/qemu-system-aarch64 -machine xlnx-zcu102 -global driver=xlnx,,zynqmp,property=has_rpu,value=on -monitor stdio
-> >   QEMU 2.10.50 monitor - type 'help' for more information
-> >   (qemu) qemu-system-aarch64: info: The 'has_rpu' property is no longer required, to use the RPUs just use -smp 6.
-> >   (qemu) info cpus
-> >   * CPU #0: thread_id=7112
-> >     CPU #1: (halted) thread_id=7113
-> >     CPU #2: (halted) thread_id=7114
-> >     CPU #3: (halted) thread_id=7115
-> >   (qemu)
-> >
-> > 3) With Emilio's max_additional_cpus proposal[2], we have this:
-> >
-> >   $ ./aarch64-softmmu/qemu-system-aarch64 -machine xlnx-zcu102 -global driver=xlnx,,zynqmp,property=has_rpu,value=on -monitor stdio
-> >   QEMU 2.10.50 monitor - type 'help' for more information
-> >   (qemu) info cpus
-> >   * CPU #0: thread_id=4045
-> >     CPU #1: (halted) thread_id=4046
-> >     CPU #2: (halted) thread_id=4047
-> >     CPU #3: (halted) thread_id=4048
-> >     CPU #4: (halted) thread_id=4049
-> >     CPU #5: (halted) thread_id=4050
-> >   (qemu)
-> >
-> >
-> > Which option is preferred?  I like option #2 because it's
-> > simpler, but I would like to confirm this is really the intended
-> > behavior.
-> 
-> After this patch (and the fix to TCG otherwise it seg faults) no one
-> should use the has_rpu property. It is ignored and will print a
-> message saying that it is ignored.
-> 
-> Users should only use the -smp option now. So option 2 is the way to go.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--55QInNlGBoB56Jo62mWOXBgLWDhapm723
+From: Eric Blake <eblake@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org
+Message-ID: <9306085c-07c4-b6f7-5222-2b73ee706dac@redhat.com>
+Subject: Re: [PATCH] block: Deprecate bdrv_set_read_only() and users
+References: <20171107172638.29942-1-kwolf@redhat.com>
+In-Reply-To: <20171107172638.29942-1-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Sounds reasonable to me.
+On 11/07/2017 11:26 AM, Kevin Wolf wrote:
+> bdrv_set_read_only() is used by some block drivers to override the
+> read-only option given by the user. This is not how read-only images
+> generally work in QEMU: Instead of second guessing what the user really=
 
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+> meant (which currently includes making an image read-only even if the
+> user didn't only use the default, but explicitly said read-only=3Doff),=
+ we
+> should error out if we can't provide what the user requested.
+>=20
+> This adds deprecation warnings to all callers of bdrv_set_read_only() s=
+o
+> that the behaviour can be corrected after the usual deprecation period.=
 
-I just sent one small comment to the min_cpus/default_cpus patch
-at [1], and I'm waiting for Richard's input on Emilio's TCG
-fix[3].
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  block.c       |  5 +++++
+>  block/bochs.c | 13 ++++++++++---
+>  block/cloop.c | 13 ++++++++++---
+>  block/dmg.c   | 12 +++++++++---
+>  block/rbd.c   | 14 ++++++++++----
+>  block/vvfat.c |  6 +++++-
+>  6 files changed, 49 insertions(+), 14 deletions(-)
 
-[3] https://mid.mail-archive.com/20171106201332.GA2152@flamenco
+Dan pointed out the missing documentation, but for the code itself, the
+approach looks sane (especially since it was my attempt to make it worse
+by extending the idiom to NBD that triggered you to write this patch).
+
+Other documentation: In qapi/block-core.json, @BlockdevOptions, we
+probably ought to mention under @read-only that some block drivers
+require the use of an explicit read-only.
+
+> +++ b/block/vvfat.c
+> @@ -1259,7 +1259,11 @@ static int vvfat_open(BlockDriverState *bs, QDic=
+t *options, int flags,
+>                         "Unable to set VVFAT to 'rw' when drive is read=
+-only");
+>              goto fail;
+>          }
+> -    } else  {
+> +    } else  if (!bdrv_is_read_only(bs)) {
+> +        error_report("Opening non-rw vvfat images without an explicit =
+"
+> +                     "read-only=3Don option is deprecated. Future vers=
+ions "
+> +                     "will refuse to open the image instead of "
+> +                     "automatically marking the image read-only.");
+>          /* read only is the default for safety */
+>          ret =3D bdrv_set_read_only(bs, true, &local_err);
+
+Is this also a good time to deprecate vvfat's duplication of rw vs.
+read-only, and consolidate that into a single option?  No other device
+defaults to read-only, so the deprecation period is a good point to warn
+that a future version may default to read-write without an explicit
+read-only.  I guess vvfat is the only driver with a device-specific QAPI
+change (for 'rw') that might be impacted if you make that additional chan=
+ge.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
-> 
-> Thanks,
-> Alistair
-> 
-> >
-> >
-> > [1] https://mid.mail-archive.com/1509734853-3014-1-git-send-email-cota@braap.org
-> > [2] https://mid.mail-archive.com/20171106215454.GB2152@flamenco
-> >
-> >
-> >> +
-> >> +    xlnx_zynqmp_create_rpu(s, boot_cpu, &err);
-> >> +    if (err) {
-> >> +        error_propagate(errp, err);
-> >> +        return;
-> >>      }
-> >>
-> >>      if (!s->boot_cpu_ptr) {
-> >> --
-> >> 2.11.0
-> >>
-> >
-> > --
-> > Eduardo
+--55QInNlGBoB56Jo62mWOXBgLWDhapm723
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
--- 
-Eduardo
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloCF5gACgkQp6FrSiUn
+Q2r0PAf+N91woYokAWR4UL98dcDYYkMjSYjVdnZL5FLbynexOPinVoSdrYKieSS6
+3xzlkT4qS6IFtCEzG+5AaE/UoqZwZPg36gwXy8z1RXadpqtvOKXldFTbiYtemCBY
+VxLqy8biVzMMi0lE7AfdyPjFW+XstWTXCc3TajfQ9yhQiXQZZB93fTiwzJPJD/nb
+83F7C1zEvwpUz9gT13+5xv1dFYuqrwcrlpC4iUV2W3bno8YEjtLCsbP6DgsTDOmD
+HMHD3MkwKKCucuASpTttIxBCnJqOncdofdG+HZfUUO/x+v1GRz+irc7bjeek7Hna
+eWG3gElJkata3X4q0jamo98qYYeCXQ==
+=naW3
+-----END PGP SIGNATURE-----
+
+--55QInNlGBoB56Jo62mWOXBgLWDhapm723--
