@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43029)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43492)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eC8BJ-00074O-JU
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 13:01:04 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eC8C7-0007ZG-7n
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 13:01:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eC8B8-00080t-Ep
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 13:00:56 -0500
-Received: from indium.canonical.com ([91.189.90.7]:52326)
+	(envelope-from <peter.maydell@linaro.org>) id 1eC8C1-0000fk-JV
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 13:01:51 -0500
+Received: from mail-wr0-x22c.google.com ([2a00:1450:400c:c0c::22c]:54199)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eC8B8-0007zy-8H
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 13:00:50 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eC8B7-0005Lf-A2
-	for <qemu-devel@nongnu.org>; Tue, 07 Nov 2017 18:00:49 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 491C72E8058
-	for <qemu-devel@nongnu.org>; Tue,  7 Nov 2017 18:00:49 +0000 (UTC)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eC8C1-0000dM-E8
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 13:01:45 -0500
+Received: by mail-wr0-x22c.google.com with SMTP id u40so47015wrf.10
+	for <qemu-devel@nongnu.org>; Tue, 07 Nov 2017 10:01:45 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 07 Nov 2017 17:46:53 -0000
+In-Reply-To: <alpine.DEB.2.10.1711070957150.30448@sstabellini-ThinkPad-X260>
+References: <alpine.DEB.2.10.1711061412330.30448@sstabellini-ThinkPad-X260>
+	<CAFEAcA9txp80bxgV5dYCPx7xoxqgutpbLyZ7PDkkL_OfVjSxYA@mail.gmail.com>
+	<alpine.DEB.2.10.1711070957150.30448@sstabellini-ThinkPad-X260>
 From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1431084 <1431084@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20150312002554.14936.93110.malonedeb@wampee.canonical.com>
-Message-Id: <151007681359.4416.16161740712839944009.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1431084] Re: improve configure error message
- "ERROR: User requested feature nptl"
+Date: Tue, 7 Nov 2017 18:01:23 +0000
+Message-ID: <CAFEAcA8=Yrn53odaaSp+fvZ96sdLX4B5ZGZqf8FgYNjpCwYE+w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2] aarch64: advertise the GIC system
+ register interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,46 +31,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Stefano Stabellini <sstabellini@kernel.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "xen-devel@lists.xen.org" <xen-devel@lists.xen.org>, qemu-arm <qemu-arm@nongnu.org>, julien.grall@arm.com
 
-You say "Both linux kernel headers and `libglib2.0-dev` are installed",
-but the error message says "Install glibc and linux kernel headers".
-"glibc" is not "libglib". I suspect you didn't have what on Ubuntu is
-the "libc6-dev" package. Unfortunately it's difficult to be specific in
-these error messages, because different distros call their dev packages
-by different names.
+On 7 November 2017 at 17:57, Stefano Stabellini <sstabellini@kernel.org> wrote:
+> On Tue, 7 Nov 2017, Peter Maydell wrote:
+>> I thought about this on the cycle into work this morning, and I
+>> think that rather than require every board that uses gicv3
+>> to set a property on the CPU, we should change the definition
+>> of the id_aa64pfr0 register so that rather than being ARM_CP_CONST
+>> it has a readfn, and then at runtime we can get that readfn to
+>> add in the right bit if env->gicv3state is non-null.
+>>
+>> I'll put together a patch this afternoon.
+>
+> Great, please CC me when you do, I'll help you test the patch.
 
+http://patchwork.ozlabs.org/patch/835300/ -- should already be
+in your inbox somewhere...
 
-** Changed in: qemu
-       Status: New =3D> Invalid
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1431084
-
-Title:
-  improve configure error message "ERROR: User requested feature nptl"
-
-Status in QEMU:
-  Invalid
-
-Bug description:
-  Running `./configure` on Ubuntu 14.10 amd64 with Linux 3.19.1 causes
-  the error
-
-      ERROR: User requested feature nptl
-             configure was not able to find it.
-             Install glibc and linux kernel headers.
-
-  Both linux kernel headers and `libglib2.0-dev` are installed in my
-  case, so the error message definitely misses a point and is at least
-  confusing and should either omit the hint if the recommended
-  dependencies are already installed or - better - give one that fixes
-  the issue.
-
-  experienced with git commit d598911b6f5e7bf7bafb63b8e1d074729e94aca7
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1431084/+subscriptions
+thanks
+-- PMM
