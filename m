@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41139)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41915)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eCCg4-0001d6-FP
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 17:49:05 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1eCCjJ-00035X-3P
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 17:52:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eCCg3-0008Ht-JD
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 17:49:04 -0500
-References: <cover.1510093478.git.jcody@redhat.com>
-	<27e0bf9dfb1370e8beb08c7b5ad6894540fff13a.1510093478.git.jcody@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <41cfae9c-b487-89c1-47fd-778dd98968a0@redhat.com>
-Date: Tue, 7 Nov 2017 16:48:54 -0600
+	(envelope-from <aik@ozlabs.ru>) id 1eCCjE-0001ks-Vq
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 17:52:25 -0500
+Received: from mail-pl0-x244.google.com ([2607:f8b0:400e:c01::244]:43406)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1eCCjE-0001kB-LQ
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 17:52:20 -0500
+Received: by mail-pl0-x244.google.com with SMTP id t7so1264plm.0
+	for <qemu-devel@nongnu.org>; Tue, 07 Nov 2017 14:52:20 -0800 (PST)
+References: <1467696699-8941-9-git-send-email-david@gibson.dropbear.id.au>
+	<52275d2d-0a93-fe92-56ed-7841fa5a79dc@redhat.com>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <518a60a2-9c65-9eda-471c-83596e746bfb@ozlabs.ru>
+Date: Wed, 8 Nov 2017 09:52:12 +1100
 MIME-Version: 1.0
-In-Reply-To: <27e0bf9dfb1370e8beb08c7b5ad6894540fff13a.1510093478.git.jcody@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="fTnr9HEiJcpDxKnew0FvJXa14jtxePFos"
-Subject: Re: [Qemu-devel] [PATCH v3 1/7] block/ssh: don't call
- libssh2_init() in block_init()
+In-Reply-To: <52275d2d-0a93-fe92-56ed-7841fa5a79dc@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-AU
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL,
+ 08/14] spapr_pci/spapr_pci_vfio: Support Dynamic DMA Windows (DDW)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,98 +31,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, rjones@redhat.com, kwolf@redhat.com
+To: Laurent Vivier <lvivier@redhat.com>
+Cc: David Gibson <david@gibson.dropbear.id.au>, peter.maydell@linaro.org, agraf@suse.de, qemu-devel@nongnu.org, alex.williamson@redhat.com, qemu-ppc@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---fTnr9HEiJcpDxKnew0FvJXa14jtxePFos
-From: Eric Blake <eblake@redhat.com>
-To: Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp,
- namei.unix@gmail.com, rjones@redhat.com, kwolf@redhat.com
-Message-ID: <41cfae9c-b487-89c1-47fd-778dd98968a0@redhat.com>
-Subject: Re: [PATCH v3 1/7] block/ssh: don't call libssh2_init() in
- block_init()
-References: <cover.1510093478.git.jcody@redhat.com>
- <27e0bf9dfb1370e8beb08c7b5ad6894540fff13a.1510093478.git.jcody@redhat.com>
-In-Reply-To: <27e0bf9dfb1370e8beb08c7b5ad6894540fff13a.1510093478.git.jcody@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 07/11/17 19:42, Laurent Vivier wrote:
+> On 05/07/2016 07:31, David Gibson wrote:
+>> From: Alexey Kardashevskiy <aik@ozlabs.ru>
+>>
+>> This adds support for Dynamic DMA Windows (DDW) option defined by
+>> the SPAPR specification which allows to have additional DMA window(s)
+>>
+>> The "ddw" property is enabled by default on a PHB but for compatibility
+>> the pseries-2.6 machine and older disable it.
+>> This also creates a single DMA window for the older machines to
+>> maintain backward migration.
+>>
+>> This implements DDW for PHB with emulated and VFIO devices. The host
+>> kernel support is required. The advertised IOMMU page sizes are 4K and
+>> 64K; 16M pages are supported but not advertised by default, in order to
+>> enable them, the user has to specify "pgsz" property for PHB and
+>> enable huge pages for RAM.
+> 
+> Why is it not advirtised by default?
 
-On 11/07/2017 04:27 PM, Jeff Cody wrote:
-> We don't need libssh2 failure to be fatal (we could just opt to not
-> register the driver on failure). But, it is probably a good idea to
-> avoid external library calls during the block_init(), and call the
-> libssh2 global init function on the first usage, returning any errors.
->=20
-> Signed-off-by: Jeff Cody <jcody@redhat.com>
-> ---
->  block/ssh.c | 37 ++++++++++++++++++++++++++-----------
->  1 file changed, 26 insertions(+), 11 deletions(-)
->=20
-> +static int ssh_state_init(BDRVSSHState *s, Error **errp)
->  {
-> +    int ret;
-> +
-> +    if (!ssh_libinit_called) {
-> +        ret =3D libssh2_init(0);
-> +        if (ret) {
-> +            error_setg(errp, "libssh2 initialization failed with %d", =
-ret);
-
-Maybe s/with %d/with status %d/
-
-> +            return ret;
-
-This is returning a non-zero value, but not necessarily a negative errno.=
-=2E.
-
-> @@ -821,8 +839,13 @@ static int ssh_create(const char *filename, QemuOp=
-ts *opts, Error **errp)
->      BDRVSSHState s;
->      ssize_t r2;
->      char c[1] =3D { '\0' };
-> +    Error *local_err =3D NULL;
-> =20
-> -    ssh_state_init(&s);
-> +    ret =3D ssh_state_init(&s, &local_err);
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
-> +        return ret;
-
-=2E..but this function wants to return a negative errno.  I think you can=
-
-rewrite this to:
-
-if (ssh_state_init(&s, errp)) {
-    return -EIO;
-}
-
-and skip out on local_err.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+I do not remember clearly but this kind of automation is usually less
+manageable. What if we do not want huge IOMMU pages for some reason?
 
 
---fTnr9HEiJcpDxKnew0FvJXa14jtxePFos
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+> When we start qemu with hugepage memory ("mount -t hugetlbfs none
+> /mnt/kvm_hugepage" and ".. -mem-path /mnt/kvm_hugepage .."), we have an
+> ugly message:
+> 
+> "qemu-kvm: System page size 0x1000000 is not enabled in page_size_mask
+> (0x11000). Performance may be slow"
+> 
+> I understand if we want to use this with VFIO, we need something like
+> "-global spapr-pci-host-bridge.pgsz=0x1011000".
+> 
+> But is it needed if we don't use VFIO?
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+Yes, TCE tables are still created in KVM so the size matters.
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloCOFYACgkQp6FrSiUn
-Q2r3PQf/U3f+1mXre+DpMBOqAAFUBgfZQQ9z7GD7G4p8gUEbWQodMXb1akmUBysI
-jRKPpTTX4VoUlVK1753AVHWB8T2qndaswy4YZzkv5yqO5RsdeJccgDK97muEddKk
-uCK4JAacxJjXvA/DjLv0r93bfi9cEK3GR7xDK2rjPc5eNKAnBHksHIukqWyM5pFC
-NqZTwD4//cAOJcYE9hT+4GzhhS/dpa/ZG/+JGATTYVXsC2+iDIusCBXDZdgA3v2b
-jUw+b3DXAxC4/SZz4RkkMaKI82+pxVg0atWrVQOXunQ9OFFrieq2ruUQGZT3vHLu
-9E/9YE3zLqZQ2ZpOysuqTLNInjgCcA==
-=yb3r
------END PGP SIGNATURE-----
+> Is it a way QEMU adds automatically the 0x1000000 mask to page_size_mask?
 
---fTnr9HEiJcpDxKnew0FvJXa14jtxePFos--
+No. That thing which decides about -mem-path should also add the pgsz mask.
+
+
+-- 
+Alexey
