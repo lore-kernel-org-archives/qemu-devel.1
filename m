@@ -1,34 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46204)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46501)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eC7K7-0001Xt-V5
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 12:06:05 -0500
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1eC7Kl-000236-JB
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 12:06:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eC7K3-0003mL-V9
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 12:06:03 -0500
-Received: from indium.canonical.com ([91.189.90.7]:33978)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eC7K3-0003ls-Oe
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 12:05:59 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eC7K1-0001U2-NU
-	for <qemu-devel@nongnu.org>; Tue, 07 Nov 2017 17:05:57 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id B026B2E80CE
-	for <qemu-devel@nongnu.org>; Tue,  7 Nov 2017 17:05:57 +0000 (UTC)
-MIME-Version: 1.0
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1eC7Kg-0004G8-PK
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 12:06:43 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:32884)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
+	id 1eC7Kg-0004Du-GB
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 12:06:38 -0500
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	vA7H5F55020165
+	for <qemu-devel@nongnu.org>; Tue, 7 Nov 2017 12:06:33 -0500
+Received: from e37.co.us.ibm.com (e37.co.us.ibm.com [32.97.110.158])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2e3e62tccn-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 07 Nov 2017 12:06:32 -0500
+Received: from localhost
+	by e37.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
+	Tue, 7 Nov 2017 10:06:31 -0700
 Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 07 Nov 2017 16:53:55 -0000
-From: Christophe Lyon <christophe.lyon+launchpad@gmail.com>
-Reply-To: Bug 1727737 <1727737@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150902607840.5143.15937446061017284272.malonedeb@chaenomeles.canonical.com>
-Message-Id: <151007363587.5103.13678613495226955612.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1727737] Re: qemu-arm stalls on a GCC sanitizer
- test since qemu-2.7
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+In-Reply-To: <1509720860-10065-1-git-send-email-lu.zhipeng@zte.com.cn>
+References: <1509720860-10065-1-git-send-email-lu.zhipeng@zte.com.cn>
+Date: Tue, 07 Nov 2017 11:06:15 -0600
+Message-Id: <151007437551.31225.7183381961531333303@sif>
+Subject: Re: [Qemu-devel] [PATCH v2] qga: replace GetIfEntry
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,87 +40,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: ZhiPeng Lu <lu.zhipeng@zte.com.cn>
+Cc: qemu-devel@nongnu.org
 
-I suspect this happens when the sanitizer library calls StopTheWorld()
-(in
-libsanitizer/sanitizer_common/sanitizer_stoptheworld_linux_libcdep.cc in
-GCC sources).
+Quoting ZhiPeng Lu (2017-11-03 09:54:20)
+> The data obtained by GetIfEntry is 32 bits, and it may overflow. Thus usi=
+ng GetIfEntry2 instead of GetIfEntry.
+> =
 
-It does:
-  uptr tracer_pid =3D internal_clone(
-      TracerThread, tracer_stack.Bottom(),
-      CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_UNTRACED,
-      &tracer_thread_argument, nullptr /* parent_tidptr */,
-      nullptr /* newtls */, nullptr /* child_tidptr */);
+> Signed-off-by: ZhiPeng Lu <lu.zhipeng@zte.com.cn>
+> ---
+>  qga/commands-win32.c | 31 ++++++++++++++++++-------------
+>  1 file changed, 18 insertions(+), 13 deletions(-)
+> =
 
-See:
-https://gcc.gnu.org/viewcvs/gcc/trunk/libsanitizer/sanitizer_common/sanitiz=
-er_stoptheworld_linux_libcdep.cc?revision=3D253887&view=3Dmarkup#l383
+> diff --git a/qga/commands-win32.c b/qga/commands-win32.c
+> index 0322188..d096dc2 100644
+> --- a/qga/commands-win32.c
+> +++ b/qga/commands-win32.c
+> @@ -1173,20 +1173,25 @@ static int guest_get_network_stats(const char *na=
+me,
+>                         GuestNetworkInterfaceStat *stats)
+>  {
+>      DWORD if_index =3D 0;
+> -    MIB_IFROW a_mid_ifrow;
+> -    memset(&a_mid_ifrow, 0, sizeof(a_mid_ifrow));
+> +    OSVERSIONINFO OSver;
+>      if_index =3D get_interface_index(name);
+> -    a_mid_ifrow.dwIndex =3D if_index;
+> -    if (NO_ERROR =3D=3D GetIfEntry(&a_mid_ifrow)) {
+> -        stats->rx_bytes =3D a_mid_ifrow.dwInOctets;
+> -        stats->rx_packets =3D a_mid_ifrow.dwInUcastPkts;
+> -        stats->rx_errs =3D a_mid_ifrow.dwInErrors;
+> -        stats->rx_dropped =3D a_mid_ifrow.dwInDiscards;
+> -        stats->tx_bytes =3D a_mid_ifrow.dwOutOctets;
+> -        stats->tx_packets =3D a_mid_ifrow.dwOutUcastPkts;
+> -        stats->tx_errs =3D a_mid_ifrow.dwOutErrors;
+> -        stats->tx_dropped =3D a_mid_ifrow.dwOutDiscards;
+> -        return 0;
+> +    OSver.dwOSVersionInfoSize =3D sizeof(OSVERSIONINFO);
+> +    GetVersionEx(&OSver);
+> +    if (OSver.dwMajorVersion >=3D 6) {
+> +        MIB_IF_ROW2 a_mid_ifrow;
+> +        memset(&a_mid_ifrow, 0, sizeof(a_mid_ifrow));
+> +        a_mid_ifrow.dwIndex =3D if_index;
+> +        if (NO_ERROR =3D=3D GetIfEntry2(&a_mid_ifrow)) {
+> +            stats->rx_bytes =3D a_mid_ifrow.dwInOctets;
+> +            stats->rx_packets =3D a_mid_ifrow.dwInUcastPkts;
+> +            stats->rx_errs =3D a_mid_ifrow.dwInErrors;
+> +            stats->rx_dropped =3D a_mid_ifrow.dwInDiscards;
+> +            stats->tx_bytes =3D a_mid_ifrow.dwOutOctets;
+> +            stats->tx_packets =3D a_mid_ifrow.dwOutUcastPkts;
+> +            stats->tx_errs =3D a_mid_ifrow.dwOutErrors;
+> +            stats->tx_dropped =3D a_mid_ifrow.dwOutDiscards;
+> +            return 0;
 
-The recent merge with the upstream libsanitizer means that stoptheworld
-is now enabled on arm as well, leading to this call to internal_clone().
+This fails to build in my fc20 mingw64 environment:
 
-This matches the comment I received on the gcc-patches list: https://gcc.gn=
-u.org/ml/gcc-patches/2017-10/msg02215.html
-"LSan sets atexit handler that calls internal_clone function that's not sup=
-ported in QEMU"
+/home/mdroth/w/qemu4.git/qga/commands-win32.c:1184:20: error: 'MIB_IF_ROW2'=
+ has no member named 'dwIndex'
+         a_mid_ifrow.dwIndex =3D if_index;
+                    ^
+/home/mdroth/w/qemu4.git/qga/commands-win32.c:1186:42: error: 'MIB_IF_ROW2'=
+ has no member named 'dwInOctets'
+             stats->rx_bytes =3D a_mid_ifrow.dwInOctets;
+                                          ^
+/home/mdroth/w/qemu4.git/qga/commands-win32.c:1187:44: error: 'MIB_IF_ROW2'=
+ has no member named 'dwInUcastPkts'
+             stats->rx_packets =3D a_mid_ifrow.dwInUcastPkts;
 
-I'm wondering why this works on aarch64? (I am also using QEMU for
-validations of aarch64 gcc). I mean the validations do not timeout. That
-being said, on aarch64 the test exits with 4 as return-code (like it did
-on arm with qemu-2.7)
+etc ...
 
-It also seems to me that the sanitizer lib is trying to handle the error
-(see if (internal_iserror(tracer_pid, &local_errno)) line 427).
+The patch seems to assume MIB_IFROW and MIB_IF_ROW2 have the same field nam=
+es
+for the stats, but according to this they're slightly different:
 
-As a side note, doing
-$ qemu-arm -E ASAN_OPTIONS=3Ddetect_leaks=3D0 blah
-does not affect the execution, while
-$ env ASAN_OPTIONS=3Ddetect_leaks=3D0 qemu-arm blah
-does
-(my question here being: why doesn't -E do what I want?)
+  https://msdn.microsoft.com/en-us/library/windows/desktop/aa814491(v=3Dvs.=
+85).aspx
 
--- =
+This change on top of your patch seems to work:
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1727737
+diff --git a/qga/commands-win32.c b/qga/commands-win32.c
+index e17fc3c284..58e470877f 100644
+--- a/qga/commands-win32.c
++++ b/qga/commands-win32.c
+@@ -1181,16 +1181,16 @@ static int guest_get_network_stats(const char *name,
+     if (os_ver.dwMajorVersion >=3D 6) {
+         MIB_IF_ROW2 a_mid_ifrow;
+         memset(&a_mid_ifrow, 0, sizeof(a_mid_ifrow));
+-        a_mid_ifrow.dwIndex =3D if_index;
++        a_mid_ifrow.InterfaceIndex =3D if_index;
+         if (NO_ERROR =3D=3D GetIfEntry2(&a_mid_ifrow)) {
+-            stats->rx_bytes =3D a_mid_ifrow.dwInOctets;
+-            stats->rx_packets =3D a_mid_ifrow.dwInUcastPkts;
+-            stats->rx_errs =3D a_mid_ifrow.dwInErrors;
+-            stats->rx_dropped =3D a_mid_ifrow.dwInDiscards;
+-            stats->tx_bytes =3D a_mid_ifrow.dwOutOctets;
+-            stats->tx_packets =3D a_mid_ifrow.dwOutUcastPkts;
+-            stats->tx_errs =3D a_mid_ifrow.dwOutErrors;
+-            stats->tx_dropped =3D a_mid_ifrow.dwOutDiscards;
++            stats->rx_bytes =3D a_mid_ifrow.InOctets;
++            stats->rx_packets =3D a_mid_ifrow.InUcastPkts;
++            stats->rx_errs =3D a_mid_ifrow.InErrors;
++            stats->rx_dropped =3D a_mid_ifrow.InDiscards;
++            stats->tx_bytes =3D a_mid_ifrow.OutOctets;
++            stats->tx_packets =3D a_mid_ifrow.OutUcastPkts;
++            stats->tx_errs =3D a_mid_ifrow.OutErrors;
++            stats->tx_dropped =3D a_mid_ifrow.OutDiscards;
+             return 0;
+         }
+     }
 
-Title:
-  qemu-arm stalls on a GCC sanitizer test since qemu-2.7
+I have the modified patch staged here:
 
-Status in QEMU:
-  Incomplete
+  https://github.com/mdroth/qemu/commit/de597a8b27722ce4f9cc660f930f7dccc71=
+2712d
 
-Bug description:
-  Hi,
+Let me know if it looks okay and I'll send a pull request for rc1
 
-  I have noticed that several GCC/sanitizer tests fail with timeout when
-  executed under QEMU.
+> +        }
+>      }
+>      return -1;
+>  }
+> -- =
 
-  After a bit of investigation, I have noticed that this worked with
-  qemu-2.7, and started failing with qemu-2.8, and still fails with
-  qemu-2.10.1
-
-  I'm attaching a tarball containing:
-  alloca_instruments_all_paddings.exe : the testcase, and the needed libs:
-  lib/librt.so.1
-  lib/libdl.so.2
-  lib/ld-linux-armhf.so.3
-  lib/libasan.so.5
-  lib/libc.so.6
-  lib/libgcc_s.so.1
-  lib/libpthread.so.0
-  lib/libm.so.6
-
-  To reproduce the problem:
-  $ qemu-arm -cpu any -R 0 -L $PWD $PWD/alloca_instruments_all_paddings.exe
-  returns in less than a second with qemu-2.7, and never with qemu-2.8
-
-  Using -d in_asm suggests that the program "almost" completes and qemu see=
-ms to stall on:
-  0x40b6eb44: e08f4004 add r4, pc, r4
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1727737/+subscriptions
+> 1.8.3.1
+>=20
