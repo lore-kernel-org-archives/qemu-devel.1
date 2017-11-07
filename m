@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59611)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59748)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eC5HU-0001AO-Qd
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 09:55:18 -0500
+	(envelope-from <rth7680@gmail.com>) id 1eC5I5-0001St-5c
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 09:55:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eC5HR-0002CT-1d
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 09:55:12 -0500
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20171103202624.5956-1-laurent@vivier.eu>
-	<20171103202624.5956-2-laurent@vivier.eu>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <68dc78bb-3a86-b200-1c45-b60d0a2a2578@amsat.org>
-Date: Tue, 7 Nov 2017 11:54:57 -0300
+	(envelope-from <rth7680@gmail.com>) id 1eC5Hz-0002QO-Lc
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 09:55:49 -0500
+Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:52709)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1eC5Hz-0002Py-EP
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 09:55:43 -0500
+Received: by mail-wm0-x236.google.com with SMTP id t139so4503946wmt.1
+	for <qemu-devel@nongnu.org>; Tue, 07 Nov 2017 06:55:43 -0800 (PST)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <CAFEAcA_krUaWG_EyyRM84znrYEFOhj2xtNgNpnxaUxMU4-EUCQ@mail.gmail.com>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <f3de1ae1-6dda-9bd1-d880-2b5d65285b2e@twiddle.net>
+Date: Tue, 7 Nov 2017 13:59:54 +0100
 MIME-Version: 1.0
-In-Reply-To: <20171103202624.5956-2-laurent@vivier.eu>
+In-Reply-To: <CAFEAcA_krUaWG_EyyRM84znrYEFOhj2xtNgNpnxaUxMU4-EUCQ@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 1/4] arm: fix float64 helper
- definitions
+Subject: Re: [Qemu-devel] target-s390x: assertion failure in op_risbg
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,55 +30,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, qemu-arm@nongnu.org, Stafford Horne <shorne@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>
+To: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: Alexander Graf <agraf@suse.de>
 
-Hi Laurent,
-
-On 11/03/2017 05:26 PM, Laurent Vivier wrote:
-> neon_ceq_f64(), neon_cge_f64() and neon_cgt_f64()
-> take float64 as parameter, fix the definition in
-> helper-a64.h
+On 11/07/2017 12:41 PM, Peter Maydell wrote:
+> This is from https://bugs.launchpad.net/qemu/+bug/1701798, but
+> that's quite a large thing, so here's the s390 specific part.
 > 
-> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-> ---
->  target/arm/helper-a64.h | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+> On an ubuntu xenial install:
 > 
-> diff --git a/target/arm/helper-a64.h b/target/arm/helper-a64.h
-> index 85d86741db..b5e9ba03c0 100644
-> --- a/target/arm/helper-a64.h
-> +++ b/target/arm/helper-a64.h
-> @@ -26,9 +26,9 @@ DEF_HELPER_3(vfp_cmped_a64, i64, f64, f64, ptr)
->  DEF_HELPER_FLAGS_5(simd_tbl, TCG_CALL_NO_RWG_SE, i64, env, i64, i64, i32, i32)
->  DEF_HELPER_FLAGS_3(vfp_mulxs, TCG_CALL_NO_RWG, f32, f32, f32, ptr)
->  DEF_HELPER_FLAGS_3(vfp_mulxd, TCG_CALL_NO_RWG, f64, f64, f64, ptr)
-> -DEF_HELPER_FLAGS_3(neon_ceq_f64, TCG_CALL_NO_RWG, i64, i64, i64, ptr)
-> -DEF_HELPER_FLAGS_3(neon_cge_f64, TCG_CALL_NO_RWG, i64, i64, i64, ptr)
-> -DEF_HELPER_FLAGS_3(neon_cgt_f64, TCG_CALL_NO_RWG, i64, i64, i64, ptr)
-> +DEF_HELPER_FLAGS_3(neon_ceq_f64, TCG_CALL_NO_RWG, i64, f64, f64, ptr)
-> +DEF_HELPER_FLAGS_3(neon_cge_f64, TCG_CALL_NO_RWG, i64, f64, f64, ptr)
-> +DEF_HELPER_FLAGS_3(neon_cgt_f64, TCG_CALL_NO_RWG, i64, f64, f64, ptr)
->  DEF_HELPER_FLAGS_3(recpsf_f32, TCG_CALL_NO_RWG, f32, f32, f32, ptr)
->  DEF_HELPER_FLAGS_3(recpsf_f64, TCG_CALL_NO_RWG, f64, f64, f64, ptr)
->  DEF_HELPER_FLAGS_3(rsqrtsf_f32, TCG_CALL_NO_RWG, f32, f32, f32, ptr)
+> $ apt install g++-5-s390x-linux-gnu
+> $ cat hello.c
+> #include <stdio.h>
+> int main(void) {
+>     printf("hello world\n");
+>     return 0;
+> }
+> $ s390x-linux-gnu-gcc-5 -O hello.c -o hello.s390x
+> $ QEMU_LD_PREFIX=/usr/s390x-linux-gnu/ gdb --args
+> ~/linaro/qemu-from-laptop/qemu/build/all-linux-static/s390x-linux-user/qemu-s390x
+> ./hello.s390x
+> [...]
+> (gdb) r
+> [...]
+> Thread 1 "qemu-s390x" received signal SIGABRT, Aborted.
+> 0x0000000060215018 in raise ()
+> (gdb) bt
+> #0  0x0000000060215018 in raise ()
+> #1  0x000000006021573a in abort ()
+> #2  0x0000000060079a96 in op_risbg (s=0x7fffffffda10, o=0x7fffffffd950)
+>     at /home/petmay01/linaro/qemu-from-laptop/qemu/target/s390x/translate.c:3450
+> #3  0x0000000060082c8b in translate_one (env=0x627f0350, s=0x7fffffffda10)
+>     at /home/petmay01/linaro/qemu-from-laptop/qemu/target/s390x/translate.c:5824
+> #4  0x0000000060082f3f in gen_intermediate_code (cs=0x627e80b0,
+>     tb=0x60794d40 <static_code_gen_buffer+56064>)
+>     at /home/petmay01/linaro/qemu-from-laptop/qemu/target/s390x/translate.c:5925
+> #5  0x00000000600369aa in tb_gen_code (cpu=0x627e80b0, pc=274886359240,
+>     cs_base=0, flags=3, cflags=0)
+> 
+> This is because in op_risbg() we abort() if s->fields->op2 is not
+> one of 0x55, 0x5d, 0x51. In this case it is 0x59. I don't know enough
+> s390 to know what this might be, but we shouldn't really abort()
+> inside QEMU for unimplemented guest insns.
 
-As commented replying to your series cover, this patch seems missing:
+Patch sent.  Since you have a testcase created, can you smoke test it?
+I decline to download the necessaries while riding on this bus.  ;-)
 
-diff --git a/target/arm/helper-a64.c b/target/arm/helper-a64.c
-@@ -159,8 +159,8 @@ uint64_t HELPER(simd_tbl)(CPUARMState *env, uint64_t
-result, uint64_t indices,
-              */
-             int elt = (rn * 2 + (index >> 3)) % 64;
-             int bitidx = (index & 7) * 8;
--            uint64_t val = extract64(env->vfp.regs[elt], bitidx, 8);
--
-+            uint64_t val = extract64(float64_val(env->vfp.regs[elt]),
-+                                     bitidx, 8);
-             result = deposit64(result, shift, 8, val);
-         }
-     }
 
-Regards,
-
-Phil.
+r~
