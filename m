@@ -1,20 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51142)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51304)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1eC8YK-0005V2-NM
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 13:24:49 -0500
+	(envelope-from <Michael.Nawrocki@gtri.gatech.edu>)
+	id 1eC8Z3-00061N-3d
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 13:25:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1eC8YJ-0004mu-Gv
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 13:24:48 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:38250)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1eC8YJ-0004mF-9R
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 13:24:47 -0500
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue,  7 Nov 2017 18:25:18 +0000
-Message-Id: <1510079118-3923-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH for-2.11] linux-user: Fix calculation of auxv
- length
+	(envelope-from <Michael.Nawrocki@gtri.gatech.edu>)
+	id 1eC8Yz-0005Fu-Qr
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 13:25:33 -0500
+Received: from relay2.gtri.gatech.edu ([130.207.199.168]:41068)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <Michael.Nawrocki@gtri.gatech.edu>)
+	id 1eC8Yz-0005F1-J2
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 13:25:29 -0500
+References: <20171106203520.7880-1-michael.nawrocki@gtri.gatech.edu>
+	<20171106203520.7880-3-michael.nawrocki@gtri.gatech.edu>
+	<20171107181002-mutt-send-email-mst@kernel.org>
+From: Michael Nawrocki <michael.nawrocki@gtri.gatech.edu>
+Message-ID: <321f3307-1cd1-82d7-4bb3-ed0f52193e85@gtri.gatech.edu>
+Date: Tue, 7 Nov 2017 13:25:26 -0500
+MIME-Version: 1.0
+In-Reply-To: <20171107181002-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] Add new PCI ID for i82559a
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,70 +32,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: patches@linaro.org, Richard Henderson <rth@twiddle.net>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, jasowang@redhat.com, marcel@redhat.com
 
-In commit 7c4ee5bcc82e643 we changed the order in which we construct
-the AUXV, but forgot to adjust the calculation of the length. The
-result is that we set info->auxv_len to a bogus and negative value,
-and then later on the code in open_self_auxv() gets confused and
-ends up presenting the guest with an empty file.
 
-Since we now have to calculate the auxv length up-front as part
-of figuring out how much we're going to put on the stack, set
-info->auxv_len then; this allows us to assert that we put the
-same number of entries into auxv as we pre-calculated, rather
-than merely having a comment saying we need to do that.
 
-Fixes: https://bugs.launchpad.net/qemu/+bug/1728116
+On 11/07/2017 11:12 AM, Michael S. Tsirkin wrote:
+> On Mon, Nov 06, 2017 at 03:35:20PM -0500, Mike Nawrocki wrote:
+>> Adds a new PCI ID for the i82559a (0x8086 0x1030) interface. Enables
+>> this ID with a new property "use-alt-device-id" to preserve
+>> compatibility.
+>>
+>> Signed-off-by: Mike Nawrocki <michael.nawrocki@gtri.gatech.edu>
+>> ---
+>>   hw/net/eepro100.c    | 12 ++++++++++++
+>>   include/hw/pci/pci.h |  1 +
+>>   qemu-options.hx      |  2 +-
+>>   3 files changed, 14 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/hw/net/eepro100.c b/hw/net/eepro100.c
+>> index 91dd058010..66f2d2b9e7 100644
+>> --- a/hw/net/eepro100.c
+>> +++ b/hw/net/eepro100.c
+>> @@ -132,6 +132,7 @@ typedef struct {
+>>       const char *name;
+>>       const char *desc;
+>>       uint16_t device_id;
+>> +    uint16_t alt_device_id;
+>>       uint8_t revision;
+>>       uint16_t subsystem_vendor_id;
+>>       uint16_t subsystem_id;
+>> @@ -276,6 +277,7 @@ typedef struct {
+>>       /* Quasi static device properties (no need to save them). */
+>>       uint16_t stats_size;
+>>       bool has_extended_tcb_support;
+>> +    bool use_alt_device_id;
+>>   } EEPRO100State;
+>>   
+>>   /* Word indices in EEPROM. */
+>> @@ -1855,6 +1857,14 @@ static void e100_nic_realize(PCIDevice *pci_dev, Error **errp)
+>>   
+>>       TRACE(OTHER, logout("\n"));
+>>   
+>> +    /* By default, the i82559a adapter uses the legacy PCI ID (for the
+>> +     * i82557). This allows the PCI ID to be changed to the alternate
+>> +     * i82559 ID if needed.
+>> +     */
+>> +    if (s->use_alt_device_id) {
+>> +        pci_config_set_device_id(s->dev.config, info->alt_device_id);
+>> +    }
+>> +
+>>       s->device = info->device;
+>>   
+>>       e100_pci_reset(s, &local_err);
+>> @@ -1974,6 +1984,7 @@ static E100PCIDeviceInfo e100_devices[] = {
+>>           .desc = "Intel i82559A Ethernet",
+>>           .device = i82559A,
+>>           .device_id = PCI_DEVICE_ID_INTEL_82557,
+>> +        .alt_device_id = PCI_DEVICE_ID_INTEL_82559,
+>>           .revision = 0x06,
+>>           .stats_size = 80,
+>>           .has_extended_tcb_support = true,
+>> @@ -2067,6 +2078,7 @@ static E100PCIDeviceInfo *eepro100_get_class(EEPRO100State *s)
+>>   
+>>   static Property e100_properties[] = {
+>>       DEFINE_NIC_PROPERTIES(EEPRO100State, conf),
+>> +    DEFINE_PROP_BOOL("use-alt-device-id", EEPRO100State, use_alt_device_id, 0),
+> 
+> 0 -> false
+> 
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- linux-user/elfload.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+Gotcha.
 
-diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-index 3b857fb..20f3d8c 100644
---- a/linux-user/elfload.c
-+++ b/linux-user/elfload.c
-@@ -1732,6 +1732,8 @@ static abi_ulong create_elf_tables(abi_ulong p, int argc, int envc,
- #ifdef ELF_HWCAP2
-     size += 2;
- #endif
-+    info->auxv_len = size * n;
-+
-     size += envc + argc + 2;
-     size += 1;  /* argc itself */
-     size *= n;
-@@ -1760,7 +1762,6 @@ static abi_ulong create_elf_tables(abi_ulong p, int argc, int envc,
-         put_user_ual(val, u_auxv); u_auxv += n; \
-     } while(0)
- 
--    /* There must be exactly DLINFO_ITEMS entries here.  */
- #ifdef ARCH_DLINFO
-     /*
-      * ARCH_DLINFO must come first so platform specific code can enforce
-@@ -1768,6 +1769,9 @@ static abi_ulong create_elf_tables(abi_ulong p, int argc, int envc,
-      */
-     ARCH_DLINFO;
- #endif
-+    /* There must be exactly DLINFO_ITEMS entries here, or the assert
-+     * on info->auxv_len will trigger.
-+     */
-     NEW_AUX_ENT(AT_PHDR, (abi_ulong)(info->load_addr + exec->e_phoff));
-     NEW_AUX_ENT(AT_PHENT, (abi_ulong)(sizeof (struct elf_phdr)));
-     NEW_AUX_ENT(AT_PHNUM, (abi_ulong)(exec->e_phnum));
-@@ -1793,7 +1797,10 @@ static abi_ulong create_elf_tables(abi_ulong p, int argc, int envc,
-     NEW_AUX_ENT (AT_NULL, 0);
- #undef NEW_AUX_ENT
- 
--    info->auxv_len = u_argv - info->saved_auxv;
-+    /* Check that our initial calculation of the auxv length matches how much
-+     * we actually put into it.
-+     */
-+    assert(info->auxv_len == u_auxv - info->saved_auxv);
- 
-     put_user_ual(argc, u_argc);
- 
--- 
-2.7.4
+>>       DEFINE_PROP_END_OF_LIST(),
+>>   };
+>>   
+> 
+> Do I understand it correctly that the only reason we really
+> want it enabled by default, you only set it to 0 for
+> compatibility?
+> If yes there's a way to keep it enabled by default:
+> - add x- in front of the property, set to true by default,
+>    then tweak it to false in include/hw/compat.h
+> 
+> 
+
+I think it ought to be enabled by default, and did set it to 0 for 
+compatibility.
+
+I went ahead and added "x-" to the front of the property, set it to true 
+by default, and added the compat tweak. I put it in HW_COMPAT_2_10, 
+which I think is the right place; let me know if anything else needs to 
+be done. I'll go ahead and push out the fixes.
+
+Thanks,
+Mike
+
+>> diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
+>> index 8d02a0a383..f30e2cfb72 100644
+>> --- a/include/hw/pci/pci.h
+>> +++ b/include/hw/pci/pci.h
+>> @@ -70,6 +70,7 @@ extern bool pci_available;
+>>   /* Intel (0x8086) */
+>>   #define PCI_DEVICE_ID_INTEL_82551IT      0x1209
+>>   #define PCI_DEVICE_ID_INTEL_82557        0x1229
+>> +#define PCI_DEVICE_ID_INTEL_82559        0x1030
+>>   #define PCI_DEVICE_ID_INTEL_82801IR      0x2922
+>>   
+>>   /* Red Hat / Qumranet (for QEMU) -- see pci-ids.txt */
+>> diff --git a/qemu-options.hx b/qemu-options.hx
+>> index 3728e9b4dd..a39c7e44b3 100644
+>> --- a/qemu-options.hx
+>> +++ b/qemu-options.hx
+>> @@ -2047,7 +2047,7 @@ that the card should have; this option currently only affects virtio cards; set
+>>   @var{v} = 0 to disable MSI-X. If no @option{-net} option is specified, a single
+>>   NIC is created.  QEMU can emulate several different models of network card.
+>>   Valid values for @var{type} are
+>> -@code{virtio}, @code{i82551}, @code{i82557b}, @code{i82559er},
+>> +@code{virtio}, @code{i82551}, @code{i82557b}, @code{i82559a}, @code{i82559er},
+>>   @code{ne2k_pci}, @code{ne2k_isa}, @code{pcnet}, @code{rtl8139},
+>>   @code{e1000}, @code{smc91c111}, @code{lance} and @code{mcf_fec}.
+>>   Not all devices are supported on all targets.  Use @code{-net nic,model=help}
+>> -- 
+>> 2.14.2
