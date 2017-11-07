@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45200)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47008)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eC5un-00015c-4q
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 10:35:50 -0500
+	(envelope-from <bounces@canonical.com>) id 1eC604-0005I0-5m
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 10:41:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eC5uh-0008WI-HF
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 10:35:49 -0500
-Received: from indium.canonical.com ([91.189.90.7]:60600)
+	(envelope-from <bounces@canonical.com>) id 1eC5zz-0003aU-5l
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 10:41:16 -0500
+Received: from indium.canonical.com ([91.189.90.7]:33424)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eC5uh-0008VH-BU
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 10:35:43 -0500
+	id 1eC5zy-0003ZS-VH
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 10:41:11 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eC5ug-00080p-Ei
-	for <qemu-devel@nongnu.org>; Tue, 07 Nov 2017 15:35:42 +0000
+	id 1eC5zx-00009g-I3
+	for <qemu-devel@nongnu.org>; Tue, 07 Nov 2017 15:41:09 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 6C6D92E8058
-	for <qemu-devel@nongnu.org>; Tue,  7 Nov 2017 15:35:42 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 7334F2E80CD
+	for <qemu-devel@nongnu.org>; Tue,  7 Nov 2017 15:41:09 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 07 Nov 2017 15:18:27 -0000
+Date: Tue, 07 Nov 2017 15:30:52 -0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1614348 <1614348@bugs.launchpad.net>
+Reply-To: Bug 1673976 <1673976@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20160818033638.22562.88196.malonedeb@soybean.canonical.com>
-Message-Id: <151006790764.20130.13067138357150511535.malone@soybean.canonical.com>
+References: <20170318142657.21676.52259.malonedeb@chaenomeles.canonical.com>
+Message-Id: <151006865268.9047.4727090632573580550.malone@wampee.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1614348] Re: qemu-arm core dumped for no entry
- symbol programe
+Subject: [Qemu-devel] [Bug 1673976] Re: locale-gen dumps core run under
+ arm-linux-user on x86-64 host
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,78 +39,56 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Why do you think this is a bug in QEMU? This program crashes on exit if
-you run it on real arm hardware. This is unsurprising as you have told
-the compiler to build it with no C runtime. The program thus starts at
-the beginning of 'main', and when it hits the return at the end there is
-nowhere for it to return to and it crashes. If you link the program with
-the C runtime the way you are expected to, then the runtime gets control
-at the start of execution and provides a place for main() to return to.
-If you choose not to link against the C runtime then it is your
-responsibility to provide an alternate runtime (including defining an
-entry point) which implements the semantics that the main() function
-expects.
+This happens because QEMU is now stricter about its checking of the
+flags passed to clone() -- previously we would silently allow flags we
+couldn't support and create new threads with the wrong behaviour. Now we
+check and fail the clone() syscall if the requested behaviour is
+something we can't implement. Unfortunately we don't have any way to
+distinguish "guest program is asking for something odd that it doesn't
+really need" from "guest program is asking for something odd that it
+does need". So we err on the safe side and tell the guest we can't do
+it.
+
+It's particularly unfortunate that the glibc implementation of
+posix_spawn() runs into this, though.
 
 
-** Changed in: qemu
-       Status: New =3D> Invalid
+** Summary changed:
+
+- locale-gen dumps core run under arm-linux-user on x86-64 host
++ linux-user clone() can't handle glibc posix_spawn() (causes locale-gen to=
+ assert)
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1614348
+https://bugs.launchpad.net/bugs/1673976
 
 Title:
-  qemu-arm core dumped for no entry symbol programe
+  linux-user clone() can't handle glibc posix_spawn() (causes locale-gen
+  to assert)
 
 Status in QEMU:
-  Invalid
+  New
 
 Bug description:
-  Hi qemu developers,
+  I'm running a command (locale-gen) inside of an armv7h chroot mounted
+  on my x86_64 desktop by putting qemu-arm-static into /usr/bin/ of the
+  chroot file system and I get a core dump.
 
-  Environment:
-  * Fedora 24 x86_64
-  * qemu-arm version 2.6.92, Copyright (c) 2003-2008 Fabrice Bellard
-  * arm-linux-gnu-gcc 6.1.1 20160621 (Red Hat Cross 6.1.1-2) (GCC) target: =
-arm-linux-gnueabi
-  * glibc-arm-linux-gnu-devel-2.23
+  locale-gen
+  Generating locales...
+  =C2=A0=C2=A0en_US.UTF-8...localedef: ../sysdeps/unix/sysv/linux/spawni.c:=
+360: __spawnix: Assertion `ec >=3D 0' failed.
+  qemu: uncaught target signal 6 (Aborted) - core dumped
+  /usr/bin/locale-gen: line 41:    34 Aborted                 (core dumped)=
+ localedef -i $input -c -f $charset -A /usr/share/locale/locale.alias $loca=
+le
 
-  very simple hello.c:
-
-  #include <stdio.h>
-
-  int main(int argc, char *argv[]) =
-
-  {
-      printf("Hello World\n");
-
-      return 0;
-  }
-
-  arm-linux-gnu-gcc hello.c -I/usr/arm-linux-gnu/include -L/usr/arm-
-  linux-gnu/lib -nostdlib -lc
-
-  /usr/bin/arm-linux-gnu-ld: Warning: Cannot find entry symbol _start;
-  defaulting to 00000000000101fc
-
-  qemu-arm -L /usr/arm-linux-gnu ./a.out
-
-  Hello World
-  qemu: uncaught target signal 4 (Illegal instruction) - core dumped
-  Illegal instruction
-
-  But provided entry symbol:
-
-  arm-linux-gnu-gcc hello.c -I/usr/arm-linux-gnu/include -L/usr/arm-
-  linux-gnu/lib -nostdlib /usr/arm-linux-gnu/lib/crt1.o /usr/arm-linux-
-  gnu/lib/crti.o /usr/arm-linux-gnu/lib/crtn.o -lc
-
-  qemu-arm -L /usr/arm-linux-gnu ./a.out is able to work happily!
-
-  Regards,
-  Leslie Zhai
+  I've done this same thing successfully for years, but this breakage
+  has appeared some time in the last 3 or so months. Possibly with the
+  update to qemu version 2.8.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1614348/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1673976/+subscriptions
