@@ -1,34 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39392)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41139)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eCCYr-00009g-0D
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 17:41:38 -0500
+	(envelope-from <eblake@redhat.com>) id 1eCCg4-0001d6-FP
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 17:49:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eCCYm-0005HQ-5J
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 17:41:37 -0500
-Received: from indium.canonical.com ([91.189.90.7]:47804)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eCCYl-0005HA-Sr
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 17:41:32 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eCCYj-0008S5-Ce
-	for <qemu-devel@nongnu.org>; Tue, 07 Nov 2017 22:41:29 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 5F4CF2E80E7
-	for <qemu-devel@nongnu.org>; Tue,  7 Nov 2017 22:41:26 +0000 (UTC)
+	(envelope-from <eblake@redhat.com>) id 1eCCg3-0008Ht-JD
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 17:49:04 -0500
+References: <cover.1510093478.git.jcody@redhat.com>
+	<27e0bf9dfb1370e8beb08c7b5ad6894540fff13a.1510093478.git.jcody@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <41cfae9c-b487-89c1-47fd-778dd98968a0@redhat.com>
+Date: Tue, 7 Nov 2017 16:48:54 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 07 Nov 2017 22:30:09 -0000
-From: Bruno Haible <bruno@clisp.org>
-Reply-To: Bug 1701798 <1701798@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <149890819992.24827.8096984642709091835.malonedeb@soybean.canonical.com>
-Message-Id: <151009380964.3780.14212440777183093756.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1701798] Re: dynamically linked binaries crash
- for big-endian targets
+In-Reply-To: <27e0bf9dfb1370e8beb08c7b5ad6894540fff13a.1510093478.git.jcody@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="fTnr9HEiJcpDxKnew0FvJXa14jtxePFos"
+Subject: Re: [Qemu-devel] [PATCH v3 1/7] block/ssh: don't call
+ libssh2_init() in block_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,229 +25,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, rjones@redhat.com, kwolf@redhat.com
 
-> That patch would prevent us from picking up a legitimate ld.so.cache for =
-the guest (in a chroot, for instance), so I don't think we should take it.
-But in a chroot, QEMU_LD_PREFIX is most likely NOT set. So how about this p=
-seudocode?
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--fTnr9HEiJcpDxKnew0FvJXa14jtxePFos
+From: Eric Blake <eblake@redhat.com>
+To: Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp,
+ namei.unix@gmail.com, rjones@redhat.com, kwolf@redhat.com
+Message-ID: <41cfae9c-b487-89c1-47fd-778dd98968a0@redhat.com>
+Subject: Re: [PATCH v3 1/7] block/ssh: don't call libssh2_init() in
+ block_init()
+References: <cover.1510093478.git.jcody@redhat.com>
+ <27e0bf9dfb1370e8beb08c7b5ad6894540fff13a.1510093478.git.jcody@redhat.com>
+In-Reply-To: <27e0bf9dfb1370e8beb08c7b5ad6894540fff13a.1510093478.git.jcody@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-  if (strcmp (pathname, "/etc/ld.so.cache") =3D=3D 0 && getenv ("QEMU_LD_PR=
-EFIX") !=3D NULL) {
-    pathname =3D concat (getenv ("QEMU_LD_PREFIX"), pathname);
-  }
+On 11/07/2017 04:27 PM, Jeff Cody wrote:
+> We don't need libssh2 failure to be fatal (we could just opt to not
+> register the driver on failure). But, it is probably a good idea to
+> avoid external library calls during the block_init(), and call the
+> libssh2 global init function on the first usage, returning any errors.
+>=20
+> Signed-off-by: Jeff Cody <jcody@redhat.com>
+> ---
+>  block/ssh.c | 37 ++++++++++++++++++++++++++-----------
+>  1 file changed, 26 insertions(+), 11 deletions(-)
+>=20
+> +static int ssh_state_init(BDRVSSHState *s, Error **errp)
+>  {
+> +    int ret;
+> +
+> +    if (!ssh_libinit_called) {
+> +        ret =3D libssh2_init(0);
+> +        if (ret) {
+> +            error_setg(errp, "libssh2 initialization failed with %d", =
+ret);
 
-That is, redirect /etc/ld.so.cache to $QEMU_LD_PREFIX/etc/ld.so.cache if
-and only if $QEMU_LD_PREFIX is set.
+Maybe s/with %d/with status %d/
 
--- =
+> +            return ret;
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1701798
+This is returning a non-zero value, but not necessarily a negative errno.=
+=2E.
 
-Title:
-  dynamically linked binaries crash for big-endian targets
+> @@ -821,8 +839,13 @@ static int ssh_create(const char *filename, QemuOp=
+ts *opts, Error **errp)
+>      BDRVSSHState s;
+>      ssize_t r2;
+>      char c[1] =3D { '\0' };
+> +    Error *local_err =3D NULL;
+> =20
+> -    ssh_state_init(&s);
+> +    ret =3D ssh_state_init(&s, &local_err);
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        return ret;
 
-Status in QEMU:
-  New
+=2E..but this function wants to return a negative errno.  I think you can=
 
-Bug description:
-  On the targets
-    hppa
-    m68k
-    mips
-    mips64
-    powerpc
-    powerpc64
-    s390x
-    sparc64
-  dynamically linked binaries crash, but statically linked binaries work.
-  On the targets
-    aarch64
-    alpha
-    armhf
-    powerpc64le
-    sh4
-  both dynamically linked and statically linked binaries work.
+rewrite this to:
 
-  How to reproduce:
+if (ssh_state_init(&s, errp)) {
+    return -EIO;
+}
 
-  1) On Ubuntu 16.04, install the packages
-  g++-5-aarch64-linux-gnu
-  g++-5-alpha-linux-gnu
-  g++-5-arm-linux-gnueabihf
-  g++-5-hppa-linux-gnu
-  g++-5-m68k-linux-gnu
-  g++-5-mips-linux-gnu
-  g++-5-mips64-linux-gnuabi64
-  g++-5-powerpc-linux-gnu
-  g++-5-powerpc64-linux-gnu
-  g++-5-powerpc64le-linux-gnu
-  g++-5-s390x-linux-gnu
-  g++-5-sh4-linux-gnu
-  g++-5-sparc64-linux-gnu
+and skip out on local_err.
 
-  2) Install qemu 2.9.0 from source (for m68k, use the 2.7.0-m68k
-  code from https://github.com/vivier/qemu-m68k.git):
-  $ ../configure --prefix=3D/home/bruno/inst-qemu/2.9.0 --target-list=3Daar=
-ch64-softmmu,alpha-softmmu,arm-softmmu,i386-softmmu,m68k-softmmu,mips-softm=
-mu,mipsel-softmmu,mips64-softmmu,mips64el-softmmu,ppc-softmmu,ppc64-softmmu=
-,s390x-softmmu,sh4-softmmu,sparc-softmmu,sparc64-softmmu,x86_64-softmmu,aar=
-ch64-linux-user,alpha-linux-user,arm-linux-user,hppa-linux-user,m68k-linux-=
-user,mips-linux-user,mipsel-linux-user,mips64-linux-user,mips64el-linux-use=
-r,ppc-linux-user,ppc64-linux-user,ppc64le-linux-user,s390x-linux-user,sh4-l=
-inux-user,sparc-linux-user,sparc64-linux-user --disable-strip --disable-wer=
-ror --enable-gtk --enable-vnc
-  $ make
-  $ make install
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-  3) Cross-compile the programs:
 
-  $ aarch64-linux-gnu-gcc-5 -O hello.c -o hello.aarch64
-  $ alpha-linux-gnu-gcc-5 -O hello.c -o hello.alpha
-  $ arm-linux-gnueabihf-gcc-5 -O hello.c -o hello.armhf
-  $ hppa-linux-gnu-gcc-5 -O hello.c -o hello.hppa
-  $ m68k-linux-gnu-gcc-5 -O hello.c -o hello.m68k
-  $ mips-linux-gnu-gcc-5 -O hello.c -o hello.mips
-  $ mips64-linux-gnuabi64-gcc-5 -O hello.c -o hello.mips64
-  $ powerpc-linux-gnu-gcc-5 -O hello.c -o hello.powerpc
-  $ powerpc64-linux-gnu-gcc-5 -O hello.c -o hello.powerpc64
-  $ powerpc64le-linux-gnu-gcc-5 -O hello.c -o hello.powerpc64le
-  $ s390x-linux-gnu-gcc-5 -O hello.c -o hello.s390x
-  $ sh4-linux-gnu-gcc-5 -O hello.c -o hello.sh4
-  $ sparc64-linux-gnu-gcc-5 -O hello.c -o hello.sparc64
+--fTnr9HEiJcpDxKnew0FvJXa14jtxePFos
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-  4) Run the programs:
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-  * aarch64 works:
-  $ QEMU_LD_PREFIX=3D/usr/aarch64-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-aarc=
-h64 hello.aarch64
-  Hello world
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloCOFYACgkQp6FrSiUn
+Q2r3PQf/U3f+1mXre+DpMBOqAAFUBgfZQQ9z7GD7G4p8gUEbWQodMXb1akmUBysI
+jRKPpTTX4VoUlVK1753AVHWB8T2qndaswy4YZzkv5yqO5RsdeJccgDK97muEddKk
+uCK4JAacxJjXvA/DjLv0r93bfi9cEK3GR7xDK2rjPc5eNKAnBHksHIukqWyM5pFC
+NqZTwD4//cAOJcYE9hT+4GzhhS/dpa/ZG/+JGATTYVXsC2+iDIusCBXDZdgA3v2b
+jUw+b3DXAxC4/SZz4RkkMaKI82+pxVg0atWrVQOXunQ9OFFrieq2ruUQGZT3vHLu
+9E/9YE3zLqZQ2ZpOysuqTLNInjgCcA==
+=yb3r
+-----END PGP SIGNATURE-----
 
-  * alpha works:
-  $ QEMU_LD_PREFIX=3D/usr/alpha-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-alpha =
-hello.alpha =
-
-  Hello world
-
-  * armhf works:
-  $ QEMU_LD_PREFIX=3D/usr/arm-linux-gnueabihf ~/inst-qemu/2.9.0/bin/qemu-ar=
-m hello.armhf
-  Hello world
-
-  * powerpc64le works:
-  $ QEMU_LD_PREFIX=3D/usr/powerpc64le-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-=
-ppc64le hello.powerpc64le
-  Hello world
-
-  * sh4 works:
-  $ QEMU_LD_PREFIX=3D/usr/sh4-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-sh4 hell=
-o.sh4
-  Hello world
-
-  * =3D=3D=3D=3D=3D sparc64 does not work:
-  $ QEMU_LD_PREFIX=3D/usr/sparc64-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-spar=
-c64 hello.sparc64
-  Segmentation fault (core dumped)
-
-  When I copy the file to a machine with `uname -srm` =3D "Linux 4.5.0-2-sp=
-arc64 sparc64",
-  it works:
-  $ ./hello.sparc64
-  Hello world
-
-  When I copy the file and its execution environment /usr/sparc64-linux-gnu=
- to the
-  same machine and run the binary in a chroot environment:
-  # /bin/hello.sparc64 =
-
-  Hello world
-
-  * =3D=3D=3D=3D=3D mips does not work:
-  $ QEMU_LD_PREFIX=3D/usr/mips-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-mips he=
-llo.mips
-  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
-
-  When I copy the file to a machine with `uname -srm` =3D "Linux 3.16.0-4-4=
-kc-malta mips",
-  it works:
-  $ ./hello.mips
-  Hello world
-
-  When I copy the file and its execution environment /usr/mips-linux-gnu to=
- the
-  same machine and run the binary in a chroot environment:
-  # /bin/hello.mips =
-
-  Hello world
-
-  * =3D=3D=3D=3D=3D mips64 does not work:
-  $ QEMU_LD_PREFIX=3D/usr/mips64-linux-gnuabi64 ~/inst-qemu/2.9.0/bin/qemu-=
-mips64 hello.mips64
-  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
-
-  When I copy the file to a machine with `uname -srm` =3D "Linux 3.16.0-4-5=
-kc-malta mips64",
-  it works:
-  $ ./hello.mips64
-  Hello world
-
-  * =3D=3D=3D=3D=3D powerpc does not work:
-  $ QEMU_LD_PREFIX=3D/usr/powerpc-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-ppc =
-hello.powerpc
-  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
-
-  When I copy the file to a machine with `uname -srm` =3D "Linux 3.17.2-200=
-.fc20.ppc64p7 ppc64",
-  it works:
-  $ ./hello.powerpc
-  Hello world
-
-  * =3D=3D=3D=3D=3D powerpc64 does not work:
-  $ QEMU_LD_PREFIX=3D/usr/powerpc64-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-pp=
-c64 hello.powerpc64
-  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
-
-  When I copy the file to a machine with `uname -srm` =3D "Linux 3.17.2-200=
-.fc20.ppc64p7 ppc64",
-  it works:
-  $ ./hello.powerpc64
-  Hello world
-
-  * =3D=3D=3D=3D=3D s390x does not work:
-  $ QEMU_LD_PREFIX=3D/usr/s390x-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-s390x =
-hello.s390x
-  <hangs>
-  $ QEMU_LD_PREFIX=3D/usr/s390x-linux-gnu ~/inst-qemu/2.8.1/bin/qemu-s390x =
-hello.s390x
-  qemu-s390x: /media/develdata/devel/build/qemu-2.8.1/translate-all.c:175: =
-tb_lock: Assertion `!have_tb_lock' failed.
-  Segmentation fault (core dumped)
-
-  When I copy the file to a machine with `uname -srm` =3D "Linux 3.16.0-4-s=
-390x s390x",
-  it works:
-  $ ./hello.s390x
-  Hello world
-
-  * =3D=3D=3D=3D=3D hppa does not work:
-  $ QEMU_LD_PREFIX=3D/usr/hppa-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-hppa he=
-llo.hppa
-  Segmentation fault (core dumped)
-
-  * =3D=3D=3D=3D=3D m68k does not work:
-  $ QEMU_LD_PREFIX=3D/usr/m68k-linux-gnu QEMU_CPU=3Dm68020 ~/inst-qemu/2.9.=
-0/bin/qemu-m68k hello.m68k
-  qemu: uncaught target signal 4 (Illegal instruction) - core dumped
-  $ QEMU_LD_PREFIX=3D/usr/m68k-linux-gnu QEMU_CPU=3Dm68020 ~/inst-qemu/2.7.=
-0-m68k/bin/qemu-m68k hello.m68k
-  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
-
-  =
-
-  The set of targets where it does not work is exactly the big-endian targe=
-ts.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1701798/+subscriptions
+--fTnr9HEiJcpDxKnew0FvJXa14jtxePFos--
