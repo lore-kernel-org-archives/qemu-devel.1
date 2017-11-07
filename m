@@ -1,14 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53918)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53955)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1eBtfn-0000sn-3k
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 21:31:32 -0500
+	(envelope-from <jcody@redhat.com>) id 1eBtfq-0000vO-Aj
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 21:31:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1eBtfm-00080m-BJ
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 21:31:31 -0500
+	(envelope-from <jcody@redhat.com>) id 1eBtfp-00082W-FA
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 21:31:34 -0500
 From: Jeff Cody <jcody@redhat.com>
-Date: Mon,  6 Nov 2017 21:31:18 -0500
-Message-Id: <cover.1510021573.git.jcody@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 0/4] Don't write headers if BDS is INACTIVE
+Date: Mon,  6 Nov 2017 21:31:20 -0500
+Message-Id: <3996c930fa8cde8570b7a63032720d76a28fd78b.1510021573.git.jcody@redhat.com>
+In-Reply-To: <cover.1510021573.git.jcody@redhat.com>
+References: <cover.1510021573.git.jcody@redhat.com>
+In-Reply-To: <cover.1510021573.git.jcody@redhat.com>
+References: <cover.1510021573.git.jcody@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 2/4] block/parallels: Do not update header
+ or truncate image when INMIGRATE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,52 +25,43 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, kwolf@redhat.com, aik@ozlabs.ru, mreitz@redhat.com, den@openvz.org, stefanha@redhat.com
 
-Changes from v2->v3:
+If we write or modify the image file while the QEMU run state is
+INMIGRATE, then the BDRV_O_INACTIVE BDS flag is set.  This will cause
+an assert, since the image is marked inactive.  Make sure we obey this
+flag.
 
-Patch 2: Uh... fix that misspelling.  Thanks Stefan :)
-Patch 3: New patch to block migration in parallels
+Tested-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+Signed-off-by: Jeff Cody <jcody@redhat.com>
+---
+ block/parallels.c | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
 
-git-backport-diff -r qemu/master.. -u 6dc6acb
-
-001/4:[----] [--] 'block/vhdx.c: Don't blindly update the header'
-002/4:[----] [--] 'block/parallels: Do not update header or truncate image when INMIGRATE'
-003/4:[down] 'block/parallels: add migration blocker'
-004/4:[----] [--] 'qemu-iotests: update unsupported image formats in 194'
-
-
-Changes from v1->v2:
-
-* Drop previous parallels patches, just check BDRV_O_INACTIVE now
-  (Kevin)
-
-git-backport-diff -r qemu/master.. -u github/master
-Key:
-[----] : patches are identical
-[####] : number of functional differences between upstream/downstream patch
-[down] : patch is downstream-only
-The flags [FC] indicate (F)unctional and (C)ontextual differences, respectively
-
-001/3:[----] [--] 'block/vhdx.c: Don't blindly update the header'
-002/3:[down] 'block/parallals: Do not update header or truncate image when INMIGRATE'
-003/3:[----] [--] 'qemu-iotests: update unsupported image formats in 194'
-
-
-v1:
-
-VHDX and Parallels both blindly write headers to the image file
-if the images are opened R/W.  This causes an assert if the QEMU run
-state is INMIGRATE.
-
-Jeff Cody (4):
-  block/vhdx.c: Don't blindly update the header
-  block/parallels: Do not update header or truncate image when INMIGRATE
-  block/parallels: add migration blocker
-  qemu-iotests: update unsupported image formats in 194
-
- block/parallels.c      | 19 ++++++++++++++-----
- block/vhdx.c           |  7 -------
- tests/qemu-iotests/194 |  2 +-
- 3 files changed, 15 insertions(+), 13 deletions(-)
-
+diff --git a/block/parallels.c b/block/parallels.c
+index 2b6c6e5..7b7a3ef 100644
+--- a/block/parallels.c
++++ b/block/parallels.c
+@@ -708,7 +708,7 @@ static int parallels_open(BlockDriverState *bs, QDict *options, int flags,
+         s->prealloc_mode = PRL_PREALLOC_MODE_FALLOCATE;
+     }
+ 
+-    if (flags & BDRV_O_RDWR) {
++    if ((flags & BDRV_O_RDWR) && !(flags & BDRV_O_INACTIVE)) {
+         s->header->inuse = cpu_to_le32(HEADER_INUSE_MAGIC);
+         ret = parallels_update_header(bs);
+         if (ret < 0) {
+@@ -741,12 +741,9 @@ static void parallels_close(BlockDriverState *bs)
+ {
+     BDRVParallelsState *s = bs->opaque;
+ 
+-    if (bs->open_flags & BDRV_O_RDWR) {
++    if ((bs->open_flags & BDRV_O_RDWR) && !(bs->open_flags & BDRV_O_INACTIVE)) {
+         s->header->inuse = 0;
+         parallels_update_header(bs);
+-    }
+-
+-    if (bs->open_flags & BDRV_O_RDWR) {
+         bdrv_truncate(bs->file, s->data_end << BDRV_SECTOR_BITS,
+                       PREALLOC_MODE_OFF, NULL);
+     }
 -- 
 2.9.5
