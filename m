@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46704)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51132)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eC8Lk-0003fE-Rg
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 13:11:50 -0500
+	(envelope-from <bounces@canonical.com>) id 1eC8YJ-0005V1-UC
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 13:24:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eC8Lh-0001GF-GN
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 13:11:48 -0500
-Received: from indium.canonical.com ([91.189.90.7]:56788)
+	(envelope-from <bounces@canonical.com>) id 1eC8YG-0004lh-Oh
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 13:24:47 -0500
+Received: from indium.canonical.com ([91.189.90.7]:60202)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eC8Lh-0001FK-AG
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 13:11:45 -0500
+	id 1eC8YG-0004lK-I2
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 13:24:44 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eC8Lg-0008LW-Bq
-	for <qemu-devel@nongnu.org>; Tue, 07 Nov 2017 18:11:44 +0000
+	id 1eC8YE-0002OJ-JM
+	for <qemu-devel@nongnu.org>; Tue, 07 Nov 2017 18:24:42 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 4C3B92E80CB
-	for <qemu-devel@nongnu.org>; Tue,  7 Nov 2017 18:11:44 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 8FACF2E80CC
+	for <qemu-devel@nongnu.org>; Tue,  7 Nov 2017 18:24:42 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 07 Nov 2017 18:00:24 -0000
-From: Richard Jones <rjones@redhat.com>
+Date: Tue, 07 Nov 2017 18:14:18 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
 Reply-To: Bug 1383857 <1383857@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <20141021190701.7654.78957.malonedeb@chaenomeles.canonical.com>
-Message-Id: <151007762408.3843.4428318808160097059.malone@gac.canonical.com>
+Message-Id: <151007845941.9399.16423784959284577894.launchpad@wampee.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1383857] Re: aarch64: virtio disks don't show up
  in guest (neither blk nor scsi)
@@ -39,7 +39,11 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Oh yes, long fixed.
+** Changed in: qemu
+       Status: Incomplete =3D> Fix Committed
+
+** Changed in: qemu
+       Status: Fix Committed =3D> Fix Released
 
 -- =
 
@@ -51,7 +55,7 @@ Title:
   aarch64: virtio disks don't show up in guest (neither blk nor scsi)
 
 Status in QEMU:
-  Incomplete
+  Fix Released
 
 Bug description:
   kernel-3.18.0-0.rc1.git0.1.rwmj5.fc22.aarch64 (3.18 rc1 + some hardware e=
