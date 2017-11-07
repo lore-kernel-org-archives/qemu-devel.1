@@ -1,34 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52733)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53431)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eC7ZD-0008SZ-Ao
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 12:21:43 -0500
+	(envelope-from <Andrew.Baumann@microsoft.com>) id 1eC7at-00013H-4Q
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 12:23:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eC7ZA-0003nd-7R
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 12:21:39 -0500
-Received: from indium.canonical.com ([91.189.90.7]:41778)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eC7Z9-0003mp-U6
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 12:21:36 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eC7Z7-0006Yl-Ey
-	for <qemu-devel@nongnu.org>; Tue, 07 Nov 2017 17:21:33 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 700DF2E80CF
-	for <qemu-devel@nongnu.org>; Tue,  7 Nov 2017 17:21:33 +0000 (UTC)
-MIME-Version: 1.0
+	(envelope-from <Andrew.Baumann@microsoft.com>) id 1eC7ap-0004fn-MY
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 12:23:23 -0500
+Received: from mail-bn3nam01on0120.outbound.protection.outlook.com
+	([104.47.33.120]:42589
+	helo=NAM01-BN3-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <Andrew.Baumann@microsoft.com>)
+	id 1eC7ap-0004eW-Ak
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 12:23:19 -0500
+From: Andrew Baumann <Andrew.Baumann@microsoft.com>
+Date: Tue, 7 Nov 2017 17:23:15 +0000
+Message-ID: <MWHPR21MB015986C9CA4F4EC74FBFFB249E510@MWHPR21MB0159.namprd21.prod.outlook.com>
+References: <150824572545.6816.5099701189660002212.stgit@Misha-PC.lan02.inno>
+	<CABdb736bkcafKPCHsQGEmB6wYOGB4s4S4+sVkuygDe7SjqZDYA@mail.gmail.com>
+	<CABdb736w49GjXwNOsj4o8RHQKAfmWnu+jJQgAZjzHwwzOW-+gA@mail.gmail.com>
+	<MWHPR21MB0159B2CB632AE8DE6B8DB6F99E500@MWHPR21MB0159.namprd21.prod.outlook.com>
+	<CABdb737aU7U1CsQ0hOVB+6=Nk=Se5EfWrEoUgHQhkKRZbjPheA@mail.gmail.com>
+In-Reply-To: <CABdb737aU7U1CsQ0hOVB+6=Nk=Se5EfWrEoUgHQhkKRZbjPheA@mail.gmail.com>
+Content-Language: en-US
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 07 Nov 2017 17:02:58 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 696094 <696094@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20101231203043.711.86363.malonedeb@potassium.ubuntu.com>
-Message-Id: <151007417858.4382.4382228456928214334.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 696094] Re: TI Stellaris lm3s811evb (ARM
- Cortex-M3) : Systick interrupt not working
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v2 00/43] Windbg supporting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,96 +34,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Ladi Prosek <lprosek@redhat.com>
+Cc: Mihail Abakumov <mikhail.abakumov@ispras.ru>, "sw@weilnetz.de" <sw@weilnetz.de>, qemu-devel <qemu-devel@nongnu.org>, Pavel Dovgalyuk <dovgaluk@ispras.ru>, Roman Kagan <rkagan@virtuozzo.com>, Paolo Bonzini <pbonzini@redhat.com>, "Denis V. Lunev" <den@openvz.org>
 
-I've just retested with the project attached to the bug (had to hack it
-a little bit to build with a recent gcc, but nothing affecting the timer
-code), and with current head-of-git QEMU we execute it OK and putting a
-breakpoint on the SysTick_Handler function shows that it is being
-invoked once a second, as expected.
-
->From my comment #6, we've fixed SHPR byte/halfword accessibility, and
-rewritten the NVIC handling so it gets priority masking, BASEPRI, etc
-right. The stellaris boards having not much RAM is unavoidable, but we
-do now have the mps2 boards if you need a basic M profile system with
-more memory.
-
-So I'm going to close this bug as fix-committed, as it should be fixed
-in 2.11. (It might have been fixed already in 2.10, but 2.11 will
-definitely be OK.)
-
-
-** Changed in: qemu
-       Status: New =3D> Fix Committed
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/696094
-
-Title:
-  TI Stellaris lm3s811evb (ARM Cortex-M3) : Systick interrupt not
-  working
-
-Status in QEMU:
-  Fix Committed
-
-Bug description:
-  I've tried to create a small project that uses the CMSIS as base library.
-  The problem is that the SysTick_interrupt_handler() doesn't get executed =
-when the systick event is detected in QEMU. Furthermore, it seems asif QEMU=
- gets stuck in an endless loop. QEMU doesn't respond to Ctrl-C on the comma=
-nd line and the GDB session also stalls. 'kill -9' is the only way to stop =
-QEMU.
-
-  It seems asif the initialisation of the NVIC works fine. I've traced the =
-function calls in QEMU as follows:
-  stellaris.c: stellaris_init() - Perform generic armv7 init: armv7m_init()
-     armv7m.c: armv7m_init() - Create and init the nvic:
-                                 nvic =3D qdev_create(NULL, "armv7m_nvic");
-                                 env->nvic =3D nvic;
-                                 qdev_init_nofail(nvic);
-                             - Configure the programmable interrupt control=
-ler:
-                                 Call: arm_pic_init_cpu() =
-
-                                          qemu_allocate_irqs(arm_pic_cpu_ha=
-ndler)
-                             - Initialise 64 interrupt structures.
-
-  The following call sequence is observed when the systick event occur:
-  armv7m_nvic.c: systick_timer_tick(): set pending interrupt
-  armv7m_nvic.c: armv7m_nvic_set_pending() for irq:15
-    arm_gic.c: gic_set_pending_private(): GIC_SET_PENDING(15,)
-      arm_gic.c: gic_update() - Raise IRQ with qemu_set_irq()
-         irq.c: eqmu_set_irq() - Call the irq->handler =
-
-                                 -- I assume the irq handler is 'arm_pic_cp=
-u_handler()',
-                                    since that was passed as the parameter =
-when
-                                    qemu_allocate_irqs() was called in ...
-            arm_pic.c: arm_pic_cpu_handler() - After evaluation, call cpu_i=
-nterrupt()
-               exec.c: cpu_interrupt() is called.     =
-
-
-  The tools that were used during the testing of this project:
-    GCC: Codesourcery ARM eabi 2010q3
-    QEMU: Checked out on 31/12/2010 - Last commit: 0fcec41eec0432c77645b4a4=
-07d3a3e030c4abc4
-  The project files are attached, for reproducing of the errors.
-     Note: The CMSIS wants to perform byte accesses to the NVIC. For the Co=
-rtex-M3, unaligned 8 bit and 16 bit accesses are allowed. The current QEMU =
-implementation doesn't yet cater for it. As a work around, updated versions=
- of
-  arm_gic.c armv7m_nvic.h armv7m_nvic.c is also included.
-
-  Launch project with: go_gdb.sh
-  Attach debugger with: arm-none-eabi-gdbtui --command=3DgdbCommands_tui
-  (s =3D step, n =3D next, c =3D continue, Ctrl-C =3D stop, print <variable=
-> to look at variable contents)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/696094/+subscriptions
+PiBGcm9tOiBMYWRpIFByb3NlayBbbWFpbHRvOmxwcm9zZWtAcmVkaGF0LmNvbV0NCj4gU2VudDog
+VHVlc2RheSwgNyBOb3ZlbWJlciAyMDE3IDAwOjExDQo+IA0KPiBPbiBNb24sIE5vdiA2LCAyMDE3
+IGF0IDc6NDEgUE0sIEFuZHJldyBCYXVtYW5uDQo+IDxBbmRyZXcuQmF1bWFubkBtaWNyb3NvZnQu
+Y29tPiB3cm90ZToNCj4gPiBIaSwNCj4gPg0KPiA+IEkganVzdCBub3RpY2VkIHRoaXMgdGhyZWFk
+LCBhbmQgdGhlIHByb2JsZW0gc291bmRlZCB2ZXJ5IGZhbWlsaWFyLi4uDQo+ID4NCj4gPj4gRnJv
+bTogTGFkaSBQcm9zZWsNCj4gPj4gU2VudDogTW9uZGF5LCA2IE5vdmVtYmVyIDIwMTcgMDc6MTYN
+Cj4gPiBbLi4uXQ0KPiA+PiBGUyBiYXNlIHBhc3NlcyBhbGwgdGhlIGNoZWNrcyBpbiB3aW5kYmdf
+b25fbG9hZCgpIGFzIHRoZSBndWVzdCBrZXJuZWwNCj4gPj4gbG9hZHMgYW5kIGl0IHJldHVybnMg
+dHJ1ZS4gUUVNVSB0aGVuIHNlbmRzIHNvbWUgZGF0YSBvdmVyIHRoZSBwaXBlLg0KPiA+PiBXaW5k
+YmcgZG9lc24ndCBwcmludCBhbnl0aGluZywgaXQncyBzdGlsbCBzaG93aW5nOg0KPiA+Pg0KPiA+
+PiAgIE9wZW5lZCBcXC5ccGlwZVx3aW43X2RiZw0KPiA+PiAgIFdhaXRpbmcgdG8gcmVjb25uZWN0
+Li4uDQo+ID4+DQo+ID4+IElzIHRoaXMgZXhwZWN0ZWQ/IEluIHJlZ3VsYXIgcmVtb3RlIGtlcm5l
+bCBkZWJ1Z2dpbmcsIHdpbmRiZyBwcm9kdWNlcw0KPiA+PiBhIGJ1bmNoIG9mIG91dHB1dCBhYm91
+dCB0aGUgdGFyZ2V0IHN0YXRlIHdoZW4gaXQgYXR0YWNoZXMuDQo+ID4NCj4gPiBKdXN0IGEgZ3Vl
+c3MsIGJ1dCBJIHN1c3BlY3QgdGhlIHByb2JsZW0geW91J3JlIHNlZWluZyBtYXkgYmUgZHVlIHRv
+IHRoZQ0KPiBjb21iaW5hdGlvbiBvZiB3aW5kYmcncyB0aWdodCB0aW1pbmcgcmVxdWlyZW1lbnRz
+IGZvciB0aGUgc2VyaWFsIGRlYnVnDQo+IHByb3RvY29sIGFuZCBxZW11J3MgcG9sbGluZy1iYXNl
+ZCBpbXBsZW1lbnRhdGlvbiBvZiBuYW1lZCBwaXBlIElPLiBJIHJhbg0KPiBpbnRvIHRoaXMgYSB5
+ZWFyIG9yIHR3byBhZ28gd2hlbiBicmluZ2luZyB1cCByYXNwYmVycnkgcGkuLi4gSSBjb3VsZCBu
+ZXZlcg0KPiByZWxpYWJseSBjb25uZWN0IHdpbmRiZyB0byB0aGUgZW11bGF0ZWQgc2VyaWFsIHBv
+cnQgdXNpbmcgYSBuYW1lZCBwaXBlLiBJDQo+IGJlbGlldmUgdGhlIHByb2JsZW0gaXMgdGhhdCB0
+aGUgbmFtZWQgcGlwZSBkcml2ZXIgcmVsaWVzIG9uIHJlY2VpdmluZyBpbnB1dA0KPiB0aHJvdWdo
+IHdpbl9jaHJfcGlwZV9wb2xsKCksIHdoaWNoIGlzIGNhbGxlZCB0b28gaW5mcmVxdWVudGx5IHRv
+IHNhdGlzZnkNCj4gd2luZGJnJ3MgbmVlZHMgKGl0IGhhcyBhIHJhdGhlciBzaG9ydCB0aW1lb3V0
+IGJlZm9yZSBpdCBnaXZlcyB1cCBhbmQNCj4gcmV0cmFuc21pdHMpLiBUaGUgY29ycmVjdCBmaXgg
+aXMgdG8gdXNlIGJsb2NraW5nIElPIGZvciB0aGUgbmFtZWQgcGlwZXMgaW5zaWRlDQo+IHFlbXUs
+IGJ1dCBJIGtub3cgZnJvbSBleHBlcmllbmNlIHRoYXQgd2luMzIgaXMgYXdmdWwgaW4gdGhpcyBy
+ZXNwZWN0IC0tIHFlbXUNCj4gd2FudHMgYSBzaW5nbGUgdW5pZmllZCBibG9ja2luZyBjYWxsIHRv
+IHdhaXQgZm9yIElPIG9uIGFueSBjb21iaW5hdGlvbiBvZg0KPiBuYW1lZCBwaXBlcywgc29ja2V0
+cywgZXZlbnRzLCBldGMuIGFuZCBXaW5kb3dzIGFwcGVhcnMgdG8gbGFjayB0aGlzLCBhdCBsZWFz
+dA0KPiBhdCB0aGUgbGV2ZWwgb2YgcG9sbC9zZWxlY3QuDQo+IA0KPiBUaGFua3MsIEkgZG9uJ3Qg
+dXN1YWxseSBzZXQgdXAgd2luZGJnIHJlbW90ZSBkZWJ1Z2dpbmcgb3ZlciBuYW1lZA0KPiBwaXBl
+cyBzbyB0aGlzIGluZGVlZCBzb3VuZGVkIHBsYXVzaWJsZS4NCj4gDQo+IE15IFdpbmRvd3MgcnVu
+cyBpbiBhIFFFTVUvS1ZNIFZNIHNvIHRvIGVsaW1pbmF0ZSB0aGUgcGlwZSBJIGhhdmUgc2V0DQo+
+IHVwIGEgdmlydHVhbCBDT00gcG9ydCBsaWtlIHNvOg0KPiANCj4gLXNlcmlhbCB0Y3A6MTI3LjAu
+MC4xOjg4ODksc2VydmVyLG5vd2FpdA0KPiANCj4gYW5kIHRoZSBuZXN0ZWQgUUVNVSByYW4gd2l0
+aDoNCj4gDQo+IC13aW5kYmcgdGNwOjEwLjAuMi4yOjg4ODkNCj4gDQo+IHdoZXJlIDEwLjAuMi4y
+IGlzIHRoZSBhZGRyZXNzIGFzc2lnbmVkIHRvIHRoZSBob3N0IHdpdGggdXNlcg0KPiBuZXR3b3Jr
+aW5nLiBXaW5kYmcgdGhlbiB1c2VkIHRoZSBkZWZhdWx0IENPTTEgdG8gY29ubmVjdCB0byB0aGUN
+Cj4gdGFyZ2V0LiBJIHJvdXRpbmVseSB1c2UgQ09NeCBmb3IgcmVtb3RlIGRlYnVnZ2luZyBiZXR3
+ZWVuIFZNcyB3aXRoIGENCj4gVENQIGNvbm5lY3Rpb24gb24gdGhlIGhvc3Qgc2lkZSBhY3Rpbmcg
+YXMgYSBudWxsLW1vZGVtIGNhYmxlIGFuZCBuZXZlcg0KPiBoYWQgYW55IHRpbWluZyByZWxhdGVk
+IGlzc3Vlcy4NCj4gDQo+IEhvd2V2ZXIsIHRoZSBzeW1wdG9tcyB3ZXJlIGV4YWN0bHkgdGhlIHNh
+bWUgd2l0aCB0aGlzIHNldCB1cC4NCg0KT2ssIHRoZW4gSSBhZ3JlZSB0aGlzIGlzIHByb2JhYmx5
+IG5vdCB0aGUgc2FtZSBpc3N1ZS4NCg0KQW5kcmV3DQo=
