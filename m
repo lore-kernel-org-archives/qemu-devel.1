@@ -1,20 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59536)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33927)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eC2YL-0000vz-HJ
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 07:00:30 -0500
+	(envelope-from <berto@igalia.com>) id 1eC2fe-0003HD-5Q
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 07:07:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eC2YH-0001b6-DL
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 07:00:25 -0500
-References: <CAFEAcA_krUaWG_EyyRM84znrYEFOhj2xtNgNpnxaUxMU4-EUCQ@mail.gmail.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <1a04d2a2-98cc-5ef7-ace4-6836a1c9ec94@redhat.com>
-Date: Tue, 7 Nov 2017 13:00:14 +0100
+	(envelope-from <berto@igalia.com>) id 1eC2fa-000572-1A
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 07:07:58 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <c12f0934-d3a6-10e2-918f-7602518789ad@redhat.com>
+References: <20170929165347.29658-1-mreitz@redhat.com>
+	<20170929165347.29658-17-mreitz@redhat.com>
+	<w51shdwwxpn.fsf@maestria.local.igalia.com>
+	<b28222f7-e360-a31b-dc24-798e2db7d089@redhat.com>
+	<c12f0934-d3a6-10e2-918f-7602518789ad@redhat.com>
+Date: Tue, 07 Nov 2017 13:07:40 +0100
+Message-ID: <w51lgji2sxf.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_krUaWG_EyyRM84znrYEFOhj2xtNgNpnxaUxMU4-EUCQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] target-s390x: assertion failure in op_risbg
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v6 16/25] block: Add 'base-directory' BDS
+ option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,62 +26,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
-Cc: Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, qemu-s390x@nongnu.org
+To: Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>
 
-On 07.11.2017 12:41, Peter Maydell wrote:
-> This is from https://bugs.launchpad.net/qemu/+bug/1701798, but
-> that's quite a large thing, so here's the s390 specific part.
->=20
-> On an ubuntu xenial install:
->=20
-> $ apt install g++-5-s390x-linux-gnu
-> $ cat hello.c
-> #include <stdio.h>
-> int main(void) {
->     printf("hello world\n");
->     return 0;
-> }
-> $ s390x-linux-gnu-gcc-5 -O hello.c -o hello.s390x
-> $ QEMU_LD_PREFIX=3D/usr/s390x-linux-gnu/ gdb --args
-> ~/linaro/qemu-from-laptop/qemu/build/all-linux-static/s390x-linux-user/=
-qemu-s390x
-> ./hello.s390x
-> [...]
-> (gdb) r
-> [...]
-> Thread 1 "qemu-s390x" received signal SIGABRT, Aborted.
-> 0x0000000060215018 in raise ()
-> (gdb) bt
-> #0  0x0000000060215018 in raise ()
-> #1  0x000000006021573a in abort ()
-> #2  0x0000000060079a96 in op_risbg (s=3D0x7fffffffda10, o=3D0x7fffffffd=
-950)
->     at /home/petmay01/linaro/qemu-from-laptop/qemu/target/s390x/transla=
-te.c:3450
-> #3  0x0000000060082c8b in translate_one (env=3D0x627f0350, s=3D0x7fffff=
-ffda10)
->     at /home/petmay01/linaro/qemu-from-laptop/qemu/target/s390x/transla=
-te.c:5824
-> #4  0x0000000060082f3f in gen_intermediate_code (cs=3D0x627e80b0,
->     tb=3D0x60794d40 <static_code_gen_buffer+56064>)
->     at /home/petmay01/linaro/qemu-from-laptop/qemu/target/s390x/transla=
-te.c:5925
-> #5  0x00000000600369aa in tb_gen_code (cpu=3D0x627e80b0, pc=3D274886359=
-240,
->     cs_base=3D0, flags=3D3, cflags=3D0)
->=20
-> This is because in op_risbg() we abort() if s->fields->op2 is not
-> one of 0x55, 0x5d, 0x51. In this case it is 0x59. I don't know enough
-> s390 to know what this might be, but we shouldn't really abort()
-> inside QEMU for unimplemented guest insns.
+On Thu 02 Nov 2017 11:06:28 PM CET, Eric Blake wrote:
 
-If I've got the spec right, the 0x59 here means that it is a "new"
-instruction called RISBGN which we do not support in QEMU yet. Instead
-of calling abort(), the correct behavior for unsupported instructions
-here is to generate a "operation" exception. Or even better: Implement
-the instruction. If I've got the spec right, it's doing the same as
-RISBG (with subcode 0x55), but just does not set the condition code at
-the end, so this should be quite easy to implement?
+>>>> Using this option, one can directly override what bdrv_dirname()
+>>>> will return. This is useful if one uses e.g. qcow2 on top of quorum
+>>>> (with only protocol BDSs under the quorum BDS) and wants to be able
+>>>> to use relative backing filenames.
+>>>>
+>>>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>>>
+>>> Who would be using this option in practice? I understand that
+>>>management tools should be using always absolute filenames, and this
+>>>API doesn't seem so convenient for humans.
+>> 
+>> Hmmm.  I seem to recall Eric liked it a couple of years ago when he
+>> was still more on the libvirt side of things. :-)
+>
+> Ideally, libvirt should be using node names rather than filenames
+> (whether absolute or relative); but I still think it could be
+> something that turns out to be useful.
 
- Thomas
+But what would be the use case? For a management tool it's not more
+convenient to use relative file names, or is it?
+
+Berto
