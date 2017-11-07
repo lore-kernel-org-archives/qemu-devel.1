@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40515)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40616)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <asierra@xes-inc.com>) id 1eC5kk-0001SY-Ff
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 10:25:29 -0500
+	(envelope-from <berrange@redhat.com>) id 1eC5l8-0001kO-H5
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 10:25:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <asierra@xes-inc.com>) id 1eC5ka-0001w9-V2
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 10:25:26 -0500
-Received: from xes-mad.com ([216.165.139.220]:51198 helo=mail.xes-mad.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <asierra@xes-inc.com>) id 1eC5ka-0001uu-Iz
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 10:25:16 -0500
-Date: Tue, 7 Nov 2017 09:25:16 -0600 (CST)
-From: Aaron Sierra <asierra@xes-inc.com>
-Message-ID: <1590616620.194475.1510068316265.JavaMail.zimbra@xes-inc.com>
-In-Reply-To: <CAFEAcA8kXjH5dSM6KCGX5gfgJWJMAymz=D3BTMxjLwZQ7_s5hg@mail.gmail.com>
-References: <492245211.936616.1510023015797.JavaMail.zimbra@xes-inc.com>
-	<03986f7a-f1f8-751a-4967-ab7d1a5093fd@vivier.eu>
-	<CAFEAcA8kXjH5dSM6KCGX5gfgJWJMAymz=D3BTMxjLwZQ7_s5hg@mail.gmail.com>
+	(envelope-from <berrange@redhat.com>) id 1eC5l5-0002GS-5E
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 10:25:50 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:62484)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eC5l4-0002Er-Ue
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 10:25:47 -0500
+Date: Tue, 7 Nov 2017 15:25:42 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20171107152542.GH3213@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20171107143652.15375-1-berrange@redhat.com>
+	<CAFEAcA9e1dc01TVQQ2TxK9wNRejUA3pqBz1WdwMPvnxHXvB3Bw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] linux-user: Support explicit targets for
- PowerPC
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA9e1dc01TVQQ2TxK9wNRejUA3pqBz1WdwMPvnxHXvB3Bw@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PULL v2 0/1] Merge IO 2017/11/06
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,66 +29,43 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Laurent Vivier <laurent@vivier.eu>, Riku Voipio <riku.voipio@iki.fi>, qemu-devel <qemu-devel@nongnu.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
------ Original Message -----
-> From: "Peter Maydell" <peter.maydell@linaro.org>
-> Sent: Tuesday, November 7, 2017 3:29:21 AM
+On Tue, Nov 07, 2017 at 03:22:02PM +0000, Peter Maydell wrote:
+> On 7 November 2017 at 14:36, Daniel P. Berrange <berrange@redhat.com> wrote:
+> > The following changes since commit 5853e92207193e967abf5e4c25b4a551c7604725:
+> >
+> >   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-cocoa-20171107' into staging (2017-11-07 12:19:48 +0000)
+> >
+> > are available in the git repository at:
+> >
+> >   git://github.com/berrange/qemu pull-2017-11-06-2
+> >
+> > for you to fetch changes up to 10a7b7e6fd9f250f0506568345d7b4d2ab52889d:
+> >
+> >   sockets: avoid leak of listen file descriptor (2017-11-07 14:10:20 +0000)
+> >
+> > ----------------------------------------------------------------
+> > Pull IO 2017/11/06 v2
+> >
+> > ----------------------------------------------------------------
+> > Daniel P. Berrange (1):
+> >   sockets: avoid leak of listen file descriptor
+> >
+> >  util/qemu-sockets.c | 52 +++++++++++++++++++++++++++++-----------------------
+> >  1 file changed, 29 insertions(+), 23 deletions(-)
+> 
+> Applied, thanks. (My test script expected your pullreq to
+> say "git://github.com/berrange/qemu tags/pull-2017-11-06-2"
+> but that might be the script not being as smart as it could be.)
 
-> On 7 November 2017 at 06:57, Laurent Vivier <laurent@vivier.eu> wrote:
->> Le 07/11/2017 =E0 03:50, Aaron Sierra a =E9crit :
->>> Enable building PowerPC targets supporting a specific CPU, without
->>> having to set QEMU_CPU via the environment. For example these build
->>> targets (and many more) become available:
->>>
->>>     qemu-ppc.e500mc
->>>     qemu-ppc.e500v2
->>>     qemu-ppc.e5500
->>>     qemu-ppc.e600
->>>     qemu-ppc.e6500
->>>
->>> These (statically compiled) binaries have proven useful for emulating
->>> PowerPC CPUs within Docker containers, where it's hard to reliably
->>> define environment variables that are available for every process.
->>
->> I agree with you.
->>
->> I have patches to do that for years, perhaps we can merge our both
->> solutions to have something working:
->>
->> linux-user: define default cpu model in configure instead of
->> linux-user/main.c
->> https://github.com/vivier/qemu-m68k/commit/1488df8c9fa3a5b099bbc4f41c077=
-a6c69305cc2
->>
->> linux-user: specify the cpu model during configure
->> https://github.com/vivier/qemu-m68k/commit/496f804fd97d5f0ef26da1090e1d9=
-5ad15bcc50e
->>
->> The part missing in my series is to rename the qemu binaries with the
->> suffix of the default CPU.
->=20
-> I don't really like this -- it means we'll end up with a huge
-> extra range of executables, and every time a new CPU type is
-> added a new binary has to be plumbed in to our own 'make
-> install' machinery and into every distro's packaging.
+Oh my bad. I forgot to actually push the tag to github before generating
+the cover letter text, and I guess that caused git to leave off the 'tags/'
+bit
 
-Peter,
-
-Yes, there is a huge new range of binaries (there's actually no practical
-upper bound), but I don't really anticipate this feature being used en mass=
-e
-by distributions. I do see it as a very useful tool for developers to be
-able to leverage when the situation arises.
-
--Aaron S.
-
-> The 'look at argv[0]' approach is perhaps a bit more
-> palatable. Or you could just write and use wrapper
-> scripts.
->=20
-> I take it there's no good "-cpu any" option for PPC that
-> would run all these binaries?
->=20
-> thanks
-> -- PMM
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
