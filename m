@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43358)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44849)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eC9f6-00012L-2B
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 14:35:53 -0500
+	(envelope-from <eblake@redhat.com>) id 1eC9l6-0002vl-VQ
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 14:42:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eC9f2-0005UQ-33
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 14:35:52 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37858)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eC9f1-0005Tj-Pk
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 14:35:48 -0500
-References: <20170919074314.10350-1-borntraeger@de.ibm.com>
-	<a6b1668e-b646-186b-8036-193100f15d54@redhat.com>
-	<7c5f5d15-2275-7493-d311-73c21e1e1924@linux.vnet.ibm.com>
+	(envelope-from <eblake@redhat.com>) id 1eC9l6-0000Eg-41
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 14:42:05 -0500
+References: <cover.1508390588.git.alistair.francis@xilinx.com>
+	<ad7c1de551fbc497743e4dd60335a75cb5365a15.1508390588.git.alistair.francis@xilinx.com>
+	<87efpmccvu.fsf@secure.laptop> <87bmke4cu9.fsf@dusky.pond.sub.org>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <16218abe-3484-333e-e3b7-3f35d0b3f57b@redhat.com>
-Date: Tue, 7 Nov 2017 13:35:44 -0600
+Message-ID: <51d103e9-8d6b-8c83-dd69-effe997d4813@redhat.com>
+Date: Tue, 7 Nov 2017 13:41:49 -0600
 MIME-Version: 1.0
-In-Reply-To: <7c5f5d15-2275-7493-d311-73c21e1e1924@linux.vnet.ibm.com>
+In-Reply-To: <87bmke4cu9.fsf@dusky.pond.sub.org>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="DPEOHsngnSP5bHtnHv6bvgUbJAsAGHuaJ"
-Subject: Re: [Qemu-devel] [PATCH v2] s390x/cpu: expose the guest crash
- information
+	boundary="uwwnaKEfqEtGFaKvKrIFwaQN0bnBoTLvE"
+Subject: Re: [Qemu-devel] [PATCH v3 01/46] Replace all occurances of
+ __FUNCTION__ with __func__
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,67 +26,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QingFeng Hao <haoqf@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Jing Liu <liujbjl@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, qemu-devel <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
+To: Markus Armbruster <armbru@redhat.com>, Juan Quintela <quintela@redhat.com>
+Cc: Stefano Stabellini <sstabellini@kernel.org>, Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Alistair Francis <alistair.francis@xilinx.com>, Anthony Perard <anthony.perard@citrix.com>, qemu-arm@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, alistair23@gmail.com, Yongbok Kim <yongbok.kim@imgtec.com>, xen-devel@lists.xenproject.org, John Snow <jsnow@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---DPEOHsngnSP5bHtnHv6bvgUbJAsAGHuaJ
+--uwwnaKEfqEtGFaKvKrIFwaQN0bnBoTLvE
 From: Eric Blake <eblake@redhat.com>
-To: QingFeng Hao <haoqf@linux.vnet.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Cornelia Huck <cohuck@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>,
- Jing Liu <liujbjl@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>,
- qemu-devel <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
-Message-ID: <16218abe-3484-333e-e3b7-3f35d0b3f57b@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2] s390x/cpu: expose the guest crash
- information
-References: <20170919074314.10350-1-borntraeger@de.ibm.com>
- <a6b1668e-b646-186b-8036-193100f15d54@redhat.com>
- <7c5f5d15-2275-7493-d311-73c21e1e1924@linux.vnet.ibm.com>
-In-Reply-To: <7c5f5d15-2275-7493-d311-73c21e1e1924@linux.vnet.ibm.com>
+To: Markus Armbruster <armbru@redhat.com>, Juan Quintela <quintela@redhat.com>
+Cc: Stefano Stabellini <sstabellini@kernel.org>, Fam Zheng <famz@redhat.com>,
+ qemu-block@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>,
+ qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Alistair Francis <alistair.francis@xilinx.com>,
+ Anthony Perard <anthony.perard@citrix.com>, qemu-arm@nongnu.org,
+ Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ alistair23@gmail.com, Yongbok Kim <yongbok.kim@imgtec.com>,
+ xen-devel@lists.xenproject.org, John Snow <jsnow@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
+Message-ID: <51d103e9-8d6b-8c83-dd69-effe997d4813@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 01/46] Replace all occurances of
+ __FUNCTION__ with __func__
+References: <cover.1508390588.git.alistair.francis@xilinx.com>
+ <ad7c1de551fbc497743e4dd60335a75cb5365a15.1508390588.git.alistair.francis@xilinx.com>
+ <87efpmccvu.fsf@secure.laptop> <87bmke4cu9.fsf@dusky.pond.sub.org>
+In-Reply-To: <87bmke4cu9.fsf@dusky.pond.sub.org>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 11/07/2017 05:00 AM, QingFeng Hao wrote:
+On 11/07/2017 04:12 AM, Markus Armbruster wrote:
+> Juan Quintela <quintela@redhat.com> writes:
+>=20
+>> Alistair Francis <alistair.francis@xilinx.com> wrote:
+>>> Replace all occurs of __FUNCTION__ except for the check in checkpatch=
 
->>> +
->>> +##
->>> +# @GuestPanicInformationS390:
->>> +#
->>> +# S390 specific guest panic information (PSW)
->>> +#
->>> +# Since: 2.11
->>> +##
->>> +{'struct': 'GuestPanicInformationS390',
->>> + 'data': { 'psw-mask': 'uint64',
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'psw-ad=
-dr': 'uint64',
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'reason=
-': 'str' } }
->> Missing documentation of the three fields; in particular, whether
-> I didn't get your point, do you mean we need to add comments
-> for the three fields? But I don't see the comments for Hyper-V either.
+>>> with the non GCC specific __func__.
+>>>
 
-Your mailer is eating blank lines, which makes it harder to visually
-distinguish where quoting ends and where new content begins (I had a
-blank line between your "'reason': 'str' } }" content and my "Missing
-documentation..." comment).
+>>> +++ b/audio/audio_int.h
+>>> @@ -253,7 +253,7 @@ static inline int audio_ring_dist (int dst, int s=
+rc, int len)
+>>>  #define AUDIO_STRINGIFY(n) AUDIO_STRINGIFY_(n)
+>>> =20
+>>>  #if defined _MSC_VER || defined __GNUC__
+>>> -#define AUDIO_FUNC __FUNCTION__
+>>> +#define AUDIO_FUNC __func__
+>>>  #else
+>>>  #define AUDIO_FUNC __FILE__ ":" AUDIO_STRINGIFY (__LINE__)
+>>>  #endif
+>>
+>> Unrelated to this patch ....
+>> Do we really support other compilers than msc and gcc?
+>=20
+> Let me rephrase the question: do we really support compilers that don't=
 
-I mean something like:
+> understand __func__?  The presence of numerous unconditional uses of
+> __func__ in the tree means the answer is no.  Let's replace AUDIO_FUNC
+> by plain __func__.
 
-##
-# @GuestPanicInformationS390:
-#
-# S390 specific guest panic information (PSW)
-#
-# @psw-mask: <description of what this mask represents>
-# @psw-addr: Address that was accessed to cause the panic
-# @reason: Human-readable explanation of the panic (should not be parsed
-#          by a machine)
-#
-# Since: 2.11
-##
+Answered elsewhere in patch 3/46 (where we DO replace AUDIO_FUNC by
+__func__).
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -98,7 +91,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---DPEOHsngnSP5bHtnHv6bvgUbJAsAGHuaJ
+--uwwnaKEfqEtGFaKvKrIFwaQN0bnBoTLvE
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -107,14 +100,14 @@ Content-Disposition: attachment; filename="signature.asc"
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloCCxAACgkQp6FrSiUn
-Q2roxAgArJBoQ3JkBhAQHPvhBm3umdgEideizlGF8WitDS/EldYuC9JUuRzIu20z
-fJVmH0YkZlGKhEUDasloQOIdxxMxLUdbPN+vW6TAWRh3oev10oRp5pk/8lHGfQbM
-yYLCsxI9l4m1pEq1LNtFCr+Kcm5mpAb2dI8ZvMd0H055/u0McEaERftEByugiRw9
-YZE11xOuDze+w0PsexiKrJ4nDdyfwk8D/GgzCH8JHAsrSUmnk3MWHBW3D8BvPx3u
-gvMmBUSYgQBrPGQ+4JuSyhMy1dBZ+xoPNBE6wBw/asAtcO6/979UOh67HZX67aBL
-IszLuHQpvkM8ftF+EVXKu6Fe3XX+Yw==
-=7M4l
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloCDH0ACgkQp6FrSiUn
+Q2pS9wf9GG4eL9iiIJxwjd5vCijsO1/RHRiPat6+DtxuejIILHJbB6EY4hHBalDI
+xcshnT6eisNHvHvfWotdTn6oymhEBN7eVYGJqXucv3qXcBKsiQJZDnVqn/opnBVE
+FGpvAybwkFLOzUbQyRuoehW0qAbYmuFPVlOtMgepuzbpXZ2sv7DdCueIuBGj+6PQ
+eMVGSzQtgfVbxS8jYvv8l34aOaZHNrWjqwPNiYTaqo83/56On8sSghw8qrAT3xHT
+RfbwM4Hh2NI6xFR8VlaZcBEWStWT2nKH3Bzj6s/PCjPLk+GhAn8UolaLxPK9XKMa
+oHpLZWepo/fzcXHMglQxA3JeT0PMVA==
+=3gMk
 -----END PGP SIGNATURE-----
 
---DPEOHsngnSP5bHtnHv6bvgUbJAsAGHuaJ--
+--uwwnaKEfqEtGFaKvKrIFwaQN0bnBoTLvE--
