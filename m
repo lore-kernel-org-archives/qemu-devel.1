@@ -1,34 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46506)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47724)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eC1sk-00078f-6P
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 06:17:27 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1eC1wc-00080y-P6
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 06:21:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eC1se-0005ee-7q
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 06:17:26 -0500
-Received: from indium.canonical.com ([91.189.90.7]:34598)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1eC1wY-0008Pw-Mv
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 06:21:26 -0500
+Received: from mail-lf0-x235.google.com ([2a00:1450:4010:c07::235]:47268)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eC1se-0005eN-0r
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 06:17:20 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eC1sd-0002VQ-89
-	for <qemu-devel@nongnu.org>; Tue, 07 Nov 2017 11:17:19 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 369862E8059
-	for <qemu-devel@nongnu.org>; Tue,  7 Nov 2017 11:17:19 +0000 (UTC)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1eC1wY-0008P4-Ei
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 06:21:22 -0500
+Received: by mail-lf0-x235.google.com with SMTP id k40so14029247lfi.4
+	for <qemu-devel@nongnu.org>; Tue, 07 Nov 2017 03:21:22 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+References: <20171006215244.27104-1-ehabkost@redhat.com>
+	<765f7133-0ccc-2239-d49b-55d8b2a24cc7@redhat.com>
+	<fddffbab-7aab-72b4-f42f-d18e94517350@redhat.com>
+	<17ed046b-2c29-340b-9802-f43a709715e2@redhat.com>
+	<20171010155003.GD3246@localhost.localdomain>
+	<4b9e65ed-3636-bff4-3cca-52f6b80bca3b@redhat.com>
+	<20171010194117.GK3246@localhost.localdomain>
+	<cdd2b3da-b243-0d17-c3b7-305532b3bc43@redhat.com>
+	<20171013190138.GB3246@localhost.localdomain>
+	<c0614596-8157-0d91-77a7-e28946b8b13f@redhat.com>
+	<20171013235644.GE3246@localhost.localdomain>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <eea713f7-2b5e-0233-ebd2-6610d344d2d0@redhat.com>
+Date: Tue, 7 Nov 2017 12:21:16 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 07 Nov 2017 11:05:41 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1585840 <1585840@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20160526014921.26209.46866.malonedeb@chaenomeles.canonical.com>
-Message-Id: <151005274150.8938.6238655546970537319.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1585840] Re: multiprocess program gets incorrect
- results with qemu arm-linux-user
+In-Reply-To: <20171013235644.GE3246@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [libvirt] [PATCH 0/7] x86: Rework KVM-defaults
+ compat code, enable kvm_pv_unhalt by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,65 +42,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Eduardo Habkost <ehabkost@redhat.com>, Waiman Long <longman@redhat.com>
+Cc: Davidlohr Bueso <dave@stgolabs.net>, "Michael S. Tsirkin" <mst@redhat.com>, libvir-list@redhat.com, qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>
 
-Hi. Your test program doesn't work for me running natively (x86-64):
-$ gcc -O -pthread -o /tmp/shmipc-native -static /tmp/shmipc.c
-$ time /tmp/shmipc-native =
+On 14/10/2017 01:56, Eduardo Habkost wrote:
+> Now, I don't know yet what's the best default for a guest that
+> has CONFIG_PARAVIRT_SPINLOCK when it sees a host that supports
+> kvm_pv_unhalt.  But I'm arguing that it's the guest
+> responsibility to choose what to do when it detects such a host,
+> instead of expecting the host to hide features from the guest.
+> The guest and the guest administrator have more information to
+> choose what's best.
+> 
+> In other words, if exposing kvm_pv_unhalt on CPUID really makes
+> some guests behave poorly, can we fix the guests instead?
 
-threaded test
-^C
+Waiman just did it. :)
 
-real    929m16.382s
-user    1858m14.140s
-sys     0m2.924s
+https://marc.info/?l=linux-kernel&m=150972337909996
 
-...I left it running overnight and it still hadn't finished when I got
-in in the morning, so I killed it.
-
-Do you have a repro case that completes in a more reasonable timescale?
-
-
-** Changed in: qemu
-       Status: New =3D> Incomplete
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1585840
-
-Title:
-  multiprocess program gets incorrect results with qemu arm-linux-user
-
-Status in QEMU:
-  Incomplete
-
-Bug description:
-  The attached program can run either in a threaded mode or a
-  multiprocess mode.  It defaults to threaded mode, and switches to
-  multiprocess mode if the first positional argument is "process".
-  "success" of the test is defined as the final count being seen as
-  2000000 by both tasks.
-
-  In standard linux x86_64 userspace (i7, 4 cores) and in standard armhf
-  userspace (4 cores), the test program consistently completes
-  successfully in both modes.  But with qemu arm-linux-user, the test
-  consistently succeeds in threaded mode and generally fails in
-  multiprocess mode.
-
-  The test reflects an essential aspect of how the Free and Open Source
-  project linuxcnc's IPC system works: shared memory regions (created by
-  shmat, but mmap would probably behave the same) contain data and
-  mutexes.  I observed that our testsuite encounters numerous deadlocks
-  and failures when running in an schroot with qemu-user (x86_64 host),
-  and I believe the underlying cause is improper support for atomic
-  operations in a multiprocess model. (the testsuite consistently passes
-  on real hardware)
-
-  I observed the same failure at v1.6.0 and master
-  (v2.6.0-424-g287db79), as well as in the outdated Debian version
-  1:2.1+dfsg-12+deb8u5a.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1585840/+subscriptions
+Paolo
