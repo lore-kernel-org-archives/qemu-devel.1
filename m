@@ -1,35 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54085)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54088)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1eC7cS-0001yk-Vf
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 12:25:01 -0500
+	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1eC7cT-0001yp-3s
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 12:25:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1eC7cP-0005KJ-OJ
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 12:25:00 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:33490)
+	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1eC7cP-0005KO-OY
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 12:25:01 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:33492)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pmorel@linux.vnet.ibm.com>)
-	id 1eC7cP-0005Jl-Fr
+	id 1eC7cP-0005Jn-Fv
 	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 12:24:57 -0500
 Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vA7HODoI079034
-	for <qemu-devel@nongnu.org>; Tue, 7 Nov 2017 12:24:53 -0500
-Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2e3e62u7ac-1
+	vA7HODoH079034
+	for <qemu-devel@nongnu.org>; Tue, 7 Nov 2017 12:24:52 -0500
+Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2e3e62u7a5-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 07 Nov 2017 12:24:52 -0500
+	for <qemu-devel@nongnu.org>; Tue, 07 Nov 2017 12:24:50 -0500
 Received: from localhost
-	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <pmorel@linux.vnet.ibm.com>;
-	Tue, 7 Nov 2017 17:24:47 -0000
+	Tue, 7 Nov 2017 17:24:48 -0000
 From: Pierre Morel <pmorel@linux.vnet.ibm.com>
-Date: Tue,  7 Nov 2017 18:24:37 +0100
+Date: Tue,  7 Nov 2017 18:24:36 +0100
 In-Reply-To: <1510075479-17224-1-git-send-email-pmorel@linux.vnet.ibm.com>
 References: <1510075479-17224-1-git-send-email-pmorel@linux.vnet.ibm.com>
-Message-Id: <1510075479-17224-6-git-send-email-pmorel@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 5/7] s390x/pci: move the memory region read
- from pcilg
+Message-Id: <1510075479-17224-5-git-send-email-pmorel@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 4/7] s390x/pci: rework PCI STORE BLOCK
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,53 +40,164 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: cohuck@redhat.com, agraf@suse.de, borntraeger@de.ibm.com, zyimin@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com
 
-Let's move the memory region read from pcilg into a dedicated function.
-This allows us to prepare a later patch.
+Enhance the fault detection.
+
+Add the maxstbl entry to both the Query PCI Function Group
+response and the PCIBusDevice structure.
+
+Initialize the maxstbl to 128 per default until we get
+the actual data from the hardware.
 
 Signed-off-by: Pierre Morel <pmorel@linux.vnet.ibm.com>
 Reviewed-by: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
 ---
- hw/s390x/s390-pci-inst.c | 15 +++++++++++----
- 1 file changed, 11 insertions(+), 4 deletions(-)
+ hw/s390x/s390-pci-bus.h  |  1 +
+ hw/s390x/s390-pci-inst.c | 62 +++++++++++++++++++++++++++++-------------------
+ hw/s390x/s390-pci-inst.h |  2 +-
+ 3 files changed, 40 insertions(+), 25 deletions(-)
 
+diff --git a/hw/s390x/s390-pci-bus.h b/hw/s390x/s390-pci-bus.h
+index 560bd82..2993f0d 100644
+--- a/hw/s390x/s390-pci-bus.h
++++ b/hw/s390x/s390-pci-bus.h
+@@ -284,6 +284,7 @@ struct S390PCIBusDevice {
+     uint64_t fmb_addr;
+     uint8_t isc;
+     uint16_t noi;
++    uint16_t maxstbl;
+     uint8_t sum;
+     S390MsixInfo msix;
+     AdapterRoutes routes;
 diff --git a/hw/s390x/s390-pci-inst.c b/hw/s390x/s390-pci-inst.c
-index 646137e..50135a0 100644
+index 62ebaa0..646137e 100644
 --- a/hw/s390x/s390-pci-inst.c
 +++ b/hw/s390x/s390-pci-inst.c
-@@ -344,13 +344,22 @@ static int zpci_endian_swap(uint64_t *ptr, uint8_t len)
+@@ -294,6 +294,7 @@ int clp_service_call(S390CPU *cpu, uint8_t r2)
+         stq_p(&resgrp->msia, ZPCI_MSI_ADDR);
+         stw_p(&resgrp->mui, 0);
+         stw_p(&resgrp->i, 128);
++        stw_p(&resgrp->maxstbl, 128);
+         resgrp->version = 0;
+ 
+         stw_p(&resgrp->hdr.rsp, CLP_RC_OK);
+@@ -648,6 +649,7 @@ int pcistb_service_call(S390CPU *cpu, uint8_t r1, uint8_t r3, uint64_t gaddr,
+     S390PCIBusDevice *pbdev;
+     MemoryRegion *mr;
+     MemTxResult result;
++    uint64_t offset;
+     int i;
+     uint32_t fh;
+     uint8_t pcias;
+@@ -662,22 +664,10 @@ int pcistb_service_call(S390CPU *cpu, uint8_t r1, uint8_t r3, uint64_t gaddr,
+     fh = env->regs[r1] >> 32;
+     pcias = (env->regs[r1] >> 16) & 0xf;
+     len = env->regs[r1] & 0xff;
++    offset = env->regs[r3];
+ 
+-    if (pcias > 5) {
+-        DPRINTF("pcistb invalid space\n");
+-        setcc(cpu, ZPCI_PCI_LS_ERR);
+-        s390_set_status_code(env, r1, ZPCI_PCI_ST_INVAL_AS);
+-        return 0;
+-    }
+-
+-    switch (len) {
+-    case 16:
+-    case 32:
+-    case 64:
+-    case 128:
+-        break;
+-    default:
+-        program_interrupt(env, PGM_SPECIFICATION, 6);
++    if (!(fh & FH_MASK_ENABLE)) {
++        setcc(cpu, ZPCI_PCI_LS_INVAL_HANDLE);
+         return 0;
+     }
+ 
+@@ -689,12 +679,7 @@ int pcistb_service_call(S390CPU *cpu, uint8_t r1, uint8_t r3, uint64_t gaddr,
+     }
+ 
+     switch (pbdev->state) {
+-    case ZPCI_FS_RESERVED:
+-    case ZPCI_FS_STANDBY:
+-    case ZPCI_FS_DISABLED:
+     case ZPCI_FS_PERMANENT_ERROR:
+-        setcc(cpu, ZPCI_PCI_LS_INVAL_HANDLE);
+-        return 0;
+     case ZPCI_FS_ERROR:
+         setcc(cpu, ZPCI_PCI_LS_ERR);
+         s390_set_status_code(env, r1, ZPCI_PCI_ST_BLOCKED);
+@@ -703,8 +688,33 @@ int pcistb_service_call(S390CPU *cpu, uint8_t r1, uint8_t r3, uint64_t gaddr,
+         break;
+     }
+ 
++    if (pcias > 5) {
++        DPRINTF("pcistb invalid space\n");
++        setcc(cpu, ZPCI_PCI_LS_ERR);
++        s390_set_status_code(env, r1, ZPCI_PCI_ST_INVAL_AS);
++        return 0;
++    }
++
++    /* Verify the address, offset and length */
++    /* offset must be a multiple of 8 */
++    if (offset % 8) {
++        goto addressing_error;
++    }
++    /* Length must be greater than 8, a multiple of 8, lower than maxstbl */
++    if ((len <= 8) || (len % 8) || (len > pbdev->maxstbl)) {
++        goto addressing_error;
++    }
++    /* Do not cross a 4K-byte boundary */
++    if (((offset & 0xfff) + len) > 0x1000) {
++        goto addressing_error;
++    }
++    /* Guest address must be double word aligned */
++    if (gaddr & 0x07UL) {
++        goto addressing_error;
++    }
++
+     mr = pbdev->pdev->io_regions[pcias].memory;
+-    if (!memory_region_access_valid(mr, env->regs[r3], len, true)) {
++    if (!memory_region_access_valid(mr, offset, len, true)) {
+         program_interrupt(env, PGM_OPERAND, 6);
+         return 0;
+     }
+@@ -714,9 +724,9 @@ int pcistb_service_call(S390CPU *cpu, uint8_t r1, uint8_t r3, uint64_t gaddr,
+     }
+ 
+     for (i = 0; i < len / 8; i++) {
+-        result = memory_region_dispatch_write(mr, env->regs[r3] + i * 8,
+-                                     ldq_p(buffer + i * 8), 8,
+-                                     MEMTXATTRS_UNSPECIFIED);
++        result = memory_region_dispatch_write(mr, offset + i * 8,
++                                              ldq_p(buffer + i * 8), 8,
++                                              MEMTXATTRS_UNSPECIFIED);
+         if (result != MEMTX_OK) {
+             program_interrupt(env, PGM_OPERAND, 6);
+             return 0;
+@@ -725,6 +735,10 @@ int pcistb_service_call(S390CPU *cpu, uint8_t r1, uint8_t r3, uint64_t gaddr,
+ 
+     setcc(cpu, ZPCI_PCI_LS_OK);
      return 0;
++
++addressing_error:
++    program_interrupt(env, PGM_SPECIFICATION, 6);
++    return 0;
  }
  
-+static MemTxResult zpci_read_bar(S390PCIBusDevice *pbdev, uint8_t pcias,
-+                                 uint64_t offset, uint64_t *data, uint8_t len)
-+{
-+    MemoryRegion *mr;
-+
-+    mr = pbdev->pdev->io_regions[pcias].memory;
-+    return memory_region_dispatch_read(mr, offset, data, len,
-+                                       MEMTXATTRS_UNSPECIFIED);
-+}
-+
- int pcilg_service_call(S390CPU *cpu, uint8_t r1, uint8_t r2)
- {
-     CPUS390XState *env = &cpu->env;
-     S390PCIBusDevice *pbdev;
-     uint64_t offset;
-     uint64_t data;
--    MemoryRegion *mr;
-     MemTxResult result;
-     uint8_t len;
-     uint32_t fh;
-@@ -401,9 +410,7 @@ int pcilg_service_call(S390CPU *cpu, uint8_t r1, uint8_t r2)
-             program_interrupt(env, PGM_OPERAND, 4);
-             return 0;
-         }
--        mr = pbdev->pdev->io_regions[pcias].memory;
--        result = memory_region_dispatch_read(mr, offset, &data, len,
--                                             MEMTXATTRS_UNSPECIFIED);
-+        result = zpci_read_bar(pbdev, pcias, offset, &data, len);
-         if (result != MEMTX_OK) {
-             program_interrupt(env, PGM_OPERAND, 4);
-             return 0;
+ static int reg_irqs(CPUS390XState *env, S390PCIBusDevice *pbdev, ZpciFib fib)
+diff --git a/hw/s390x/s390-pci-inst.h b/hw/s390x/s390-pci-inst.h
+index 94a959f..d6aeadd 100644
+--- a/hw/s390x/s390-pci-inst.h
++++ b/hw/s390x/s390-pci-inst.h
+@@ -162,7 +162,7 @@ typedef struct ClpRspQueryPciGrp {
+ #define CLP_RSP_QPCIG_MASK_FRAME   0x2
+ #define CLP_RSP_QPCIG_MASK_REFRESH 0x1
+     uint8_t fr;
+-    uint16_t reserved2;
++    uint16_t maxstbl;
+     uint16_t mui;
+     uint64_t reserved3;
+     uint64_t dasm; /* dma address space mask */
 -- 
 2.7.4
