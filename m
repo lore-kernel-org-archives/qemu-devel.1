@@ -1,34 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44544)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46116)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eC1n3-00054L-8v
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 06:11:39 -0500
+	(envelope-from <prvs=477d28a75=Paul.Durrant@citrix.com>)
+	id 1eC1rk-0006VN-Gj
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 06:16:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eC1mx-0001x7-Ch
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 06:11:33 -0500
-Received: from indium.canonical.com ([91.189.90.7]:34278)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eC1mx-0001wP-5x
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 06:11:27 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eC1mv-00025P-BO
-	for <qemu-devel@nongnu.org>; Tue, 07 Nov 2017 11:11:25 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 5336F2E80C8
-	for <qemu-devel@nongnu.org>; Tue,  7 Nov 2017 11:11:25 +0000 (UTC)
+	(envelope-from <prvs=477d28a75=Paul.Durrant@citrix.com>)
+	id 1eC1rg-0004Ub-BX
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 06:16:24 -0500
+Received: from smtp02.citrix.com ([66.165.176.63]:6410)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=477d28a75=Paul.Durrant@citrix.com>)
+	id 1eC1rg-0004TJ-2U
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 06:16:20 -0500
+From: Paul Durrant <paul.durrant@citrix.com>
+Date: Tue, 7 Nov 2017 05:46:53 -0500
+Message-ID: <20171107104653.8913-1-paul.durrant@citrix.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 07 Nov 2017 10:58:52 -0000
-From: "R.Nageswara Sastry" <nasastry@in.ibm.com>
-Reply-To: Bug 1713434 <1713434@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150391152035.18876.7874968547091336063.malonedeb@chaenomeles.canonical.com>
-Message-Id: <151005233294.4565.312386986743168705.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1713434] Re: prom-env-test test aborted and core
- dumped
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v3] xen-disk: use an IOThread per instance
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,102 +26,221 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org
+Cc: Paul Durrant <paul.durrant@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-Git head is at 299d1ea9bb56bd9f45f905125489bdd7d543a1aa
-latest today
+This patch allocates an IOThread object for each xen_disk instance and
+sets the AIO context appropriately on connect. This allows processing
+of I/O to proceed in parallel.
 
-100% re-producible. This is different & working Power9 machine than the
-other day.
+The patch also adds tracepoints into xen_disk to make it possible to
+follow the state transtions of an instance in the log.
 
-# ./sparc64-softmmu/qemu-system-sparc64 -nographic -M sun4u -prom-env 'use-=
-nvramrc?=3Dtrue' -prom-env 'nvramrc=3D." Hello World!" cr'
-OpenBIOS for Sparc64
-Unhandled Exception 0x0000000000000034
-PC =3D 0x00000000ffd0f704 NPC =3D 0x00000000ffd0f708
-Stopping execution
+Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+---
+Cc: Stefano Stabellini <sstabellini@kernel.org>
+Cc: Anthony Perard <anthony.perard@citrix.com>
+Cc: Kevin Wolf <kwolf@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>
 
-and hung here. Not responding to ctrl+c or ctrl+z.
+v3:
+ - Use new iothread_create/destroy() functions
 
--- =
+v2:
+ - explicitly acquire and release AIO context in qemu_aio_complete() and
+   blk_bh()
+---
+ hw/block/trace-events |  7 +++++++
+ hw/block/xen_disk.c   | 53 ++++++++++++++++++++++++++++++++++++++++++++-------
+ 2 files changed, 53 insertions(+), 7 deletions(-)
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1713434
-
-Title:
-  prom-env-test test aborted and core dumped
-
-Status in QEMU:
-  In Progress
-
-Bug description:
-  On ppc64le architecture machine the following test case Aborted and
-  Core dumped.
-
-  # tests/prom-env-test --quiet --keep-going -m=3Dquick --GTestLogFD=3D6
-  **
-  ERROR:tests/libqtest.c:628:qtest_get_arch: assertion failed: (qemu !=3D N=
-ULL)
-  Aborted (core dumped)
-
-  Steps to re-produce:
-  clone from the git
-  configure & compile =
-
-  run the unit tests by 'make check'
-
-  (gdb) bt
-  #0  0x00003fff9d60eff0 in raise () from /lib64/libc.so.6
-  #1  0x00003fff9d61136c in abort () from /lib64/libc.so.6
-  #2  0x00003fff9de1aa04 in g_assertion_message () from /lib64/libglib-2.0.=
-so.0
-  #3  0x00003fff9de1ab0c in g_assertion_message_expr () from /lib64/libglib=
--2.0.so.0
-  #4  0x000000001000cc30 in qtest_get_arch () at tests/libqtest.c:628
-  #5  0x00000000100048f0 in main (argc=3D5, argv=3D0x3ffff2145538) at tests=
-/prom-env-test.c:82
-  (gdb) i r
-  r0             0xfa	250
-  r1             0x3ffff2144d30	70368510627120
-  r2             0x3fff9d7b9900	70367091333376
-  r3             0x0	0
-  r4             0x12a7	4775
-  r5             0x6	6
-  r6             0x8	8
-  r7             0x1	1
-  r8             0x0	0
-  r9             0x0	0
-  r10            0x0	0
-  r11            0x0	0
-  r12            0x0	0
-  r13            0x3fff9dfa1950	70367099623760
-  r14            0x0	0
-  r15            0x0	0
-  r16            0x0	0
-  r17            0x0	0
-  r18            0x0	0
-  r19            0x0	0
-  r20            0x0	0
-  r21            0x0	0
-  r22            0x0	0
-  r23            0x0	0
-  r24            0x0	0
-  r25            0x0	0
-  r26            0x0	0
-  r27            0x100287f8	268601336
-  r28            0x16841b40	377756480
-  r29            0x4c	76
-  r30            0x3ffff2144de8	70368510627304
-  r31            0x6	6
-  pc             0x3fff9d60eff0	0x3fff9d60eff0 <raise+96>
-  msr            0x900000000280f033	10376293541503627315
-  cr             0x42000842	1107298370
-  lr             0x3fff9d61136c	0x3fff9d61136c <abort+396>
-  ctr            0x0	0
-  xer            0x0	0
-  orig_r3        0x12a7	4775
-  trap           0xc00	3072
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1713434/+subscriptions
+diff --git a/hw/block/trace-events b/hw/block/trace-events
+index cb6767b3ee..962a3bfa24 100644
+--- a/hw/block/trace-events
++++ b/hw/block/trace-events
+@@ -10,3 +10,10 @@ virtio_blk_submit_multireq(void *vdev, void *mrb, int start, int num_reqs, uint6
+ # hw/block/hd-geometry.c
+ hd_geometry_lchs_guess(void *blk, int cyls, int heads, int secs) "blk %p LCHS %d %d %d"
+ hd_geometry_guess(void *blk, uint32_t cyls, uint32_t heads, uint32_t secs, int trans) "blk %p CHS %u %u %u trans %d"
++
++# hw/block/xen_disk.c
++xen_disk_alloc(char *name) "%s"
++xen_disk_init(char *name) "%s"
++xen_disk_connect(char *name) "%s"
++xen_disk_disconnect(char *name) "%s"
++xen_disk_free(char *name) "%s"
+diff --git a/hw/block/xen_disk.c b/hw/block/xen_disk.c
+index e431bd89e8..f74fcd42d1 100644
+--- a/hw/block/xen_disk.c
++++ b/hw/block/xen_disk.c
+@@ -27,10 +27,12 @@
+ #include "hw/xen/xen_backend.h"
+ #include "xen_blkif.h"
+ #include "sysemu/blockdev.h"
++#include "sysemu/iothread.h"
+ #include "sysemu/block-backend.h"
+ #include "qapi/error.h"
+ #include "qapi/qmp/qdict.h"
+ #include "qapi/qmp/qstring.h"
++#include "trace.h"
+ 
+ /* ------------------------------------------------------------- */
+ 
+@@ -125,6 +127,9 @@ struct XenBlkDev {
+     DriveInfo           *dinfo;
+     BlockBackend        *blk;
+     QEMUBH              *bh;
++
++    IOThread            *iothread;
++    AioContext          *ctx;
+ };
+ 
+ /* ------------------------------------------------------------- */
+@@ -596,9 +601,12 @@ static int ioreq_runio_qemu_aio(struct ioreq *ioreq);
+ static void qemu_aio_complete(void *opaque, int ret)
+ {
+     struct ioreq *ioreq = opaque;
++    struct XenBlkDev *blkdev = ioreq->blkdev;
++
++    aio_context_acquire(blkdev->ctx);
+ 
+     if (ret != 0) {
+-        xen_pv_printf(&ioreq->blkdev->xendev, 0, "%s I/O error\n",
++        xen_pv_printf(&blkdev->xendev, 0, "%s I/O error\n",
+                       ioreq->req.operation == BLKIF_OP_READ ? "read" : "write");
+         ioreq->aio_errors++;
+     }
+@@ -607,10 +615,10 @@ static void qemu_aio_complete(void *opaque, int ret)
+     if (ioreq->presync) {
+         ioreq->presync = 0;
+         ioreq_runio_qemu_aio(ioreq);
+-        return;
++        goto done;
+     }
+     if (ioreq->aio_inflight > 0) {
+-        return;
++        goto done;
+     }
+ 
+     if (xen_feature_grant_copy) {
+@@ -647,16 +655,19 @@ static void qemu_aio_complete(void *opaque, int ret)
+         }
+     case BLKIF_OP_READ:
+         if (ioreq->status == BLKIF_RSP_OKAY) {
+-            block_acct_done(blk_get_stats(ioreq->blkdev->blk), &ioreq->acct);
++            block_acct_done(blk_get_stats(blkdev->blk), &ioreq->acct);
+         } else {
+-            block_acct_failed(blk_get_stats(ioreq->blkdev->blk), &ioreq->acct);
++            block_acct_failed(blk_get_stats(blkdev->blk), &ioreq->acct);
+         }
+         break;
+     case BLKIF_OP_DISCARD:
+     default:
+         break;
+     }
+-    qemu_bh_schedule(ioreq->blkdev->bh);
++    qemu_bh_schedule(blkdev->bh);
++
++done:
++    aio_context_release(blkdev->ctx);
+ }
+ 
+ static bool blk_split_discard(struct ioreq *ioreq, blkif_sector_t sector_number,
+@@ -913,17 +924,29 @@ static void blk_handle_requests(struct XenBlkDev *blkdev)
+ static void blk_bh(void *opaque)
+ {
+     struct XenBlkDev *blkdev = opaque;
++
++    aio_context_acquire(blkdev->ctx);
+     blk_handle_requests(blkdev);
++    aio_context_release(blkdev->ctx);
+ }
+ 
+ static void blk_alloc(struct XenDevice *xendev)
+ {
+     struct XenBlkDev *blkdev = container_of(xendev, struct XenBlkDev, xendev);
++    Error *err = NULL;
++
++    trace_xen_disk_alloc(xendev->name);
+ 
+     QLIST_INIT(&blkdev->inflight);
+     QLIST_INIT(&blkdev->finished);
+     QLIST_INIT(&blkdev->freelist);
+-    blkdev->bh = qemu_bh_new(blk_bh, blkdev);
++
++    blkdev->iothread = iothread_create(xendev->name, &err);
++    assert(!err);
++
++    blkdev->ctx = iothread_get_aio_context(blkdev->iothread);
++    blkdev->bh = aio_bh_new(blkdev->ctx, blk_bh, blkdev);
++
+     if (xen_mode != XEN_EMULATE) {
+         batch_maps = 1;
+     }
+@@ -950,6 +973,8 @@ static int blk_init(struct XenDevice *xendev)
+     int info = 0;
+     char *directiosafe = NULL;
+ 
++    trace_xen_disk_init(xendev->name);
++
+     /* read xenstore entries */
+     if (blkdev->params == NULL) {
+         char *h = NULL;
+@@ -1062,6 +1087,8 @@ static int blk_connect(struct XenDevice *xendev)
+     unsigned int i;
+     uint32_t *domids;
+ 
++    trace_xen_disk_connect(xendev->name);
++
+     /* read-only ? */
+     if (blkdev->directiosafe) {
+         qflags = BDRV_O_NOCACHE | BDRV_O_NATIVE_AIO;
+@@ -1287,6 +1314,8 @@ static int blk_connect(struct XenDevice *xendev)
+         blkdev->persistent_gnt_count = 0;
+     }
+ 
++    blk_set_aio_context(blkdev->blk, blkdev->ctx);
++
+     xen_be_bind_evtchn(&blkdev->xendev);
+ 
+     xen_pv_printf(&blkdev->xendev, 1, "ok: proto %s, nr-ring-ref %u, "
+@@ -1300,13 +1329,20 @@ static void blk_disconnect(struct XenDevice *xendev)
+ {
+     struct XenBlkDev *blkdev = container_of(xendev, struct XenBlkDev, xendev);
+ 
++    trace_xen_disk_disconnect(xendev->name);
++
++    aio_context_acquire(blkdev->ctx);
++
+     if (blkdev->blk) {
++        blk_set_aio_context(blkdev->blk, qemu_get_aio_context());
+         blk_detach_dev(blkdev->blk, blkdev);
+         blk_unref(blkdev->blk);
+         blkdev->blk = NULL;
+     }
+     xen_pv_unbind_evtchn(&blkdev->xendev);
+ 
++    aio_context_release(blkdev->ctx);
++
+     if (blkdev->sring) {
+         xengnttab_unmap(blkdev->xendev.gnttabdev, blkdev->sring,
+                         blkdev->nr_ring_ref);
+@@ -1345,6 +1381,8 @@ static int blk_free(struct XenDevice *xendev)
+     struct XenBlkDev *blkdev = container_of(xendev, struct XenBlkDev, xendev);
+     struct ioreq *ioreq;
+ 
++    trace_xen_disk_free(xendev->name);
++
+     blk_disconnect(xendev);
+ 
+     while (!QLIST_EMPTY(&blkdev->freelist)) {
+@@ -1360,6 +1398,7 @@ static int blk_free(struct XenDevice *xendev)
+     g_free(blkdev->dev);
+     g_free(blkdev->devtype);
+     qemu_bh_delete(blkdev->bh);
++    iothread_destroy(blkdev->iothread);
+     return 0;
+ }
+ 
+-- 
+2.11.0
