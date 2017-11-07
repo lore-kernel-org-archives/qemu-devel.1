@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33381)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34127)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1eC9AC-0008Lv-Cs
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 14:03:57 -0500
+	(envelope-from <bounces@canonical.com>) id 1eC9C9-00017C-CK
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 14:05:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1eC9A9-0006gM-8Y
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 14:03:56 -0500
-Received: from mail-co1nam03on0084.outbound.protection.outlook.com
-	([104.47.40.84]:2622
-	helo=NAM03-CO1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1eC9A8-0006fl-Vj
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 14:03:53 -0500
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Tue, 7 Nov 2017 10:59:41 -0800
-Message-ID: <bc63082170a982b0a45447134dcbd86b8df80386.1510080103.git.alistair.francis@xilinx.com>
-In-Reply-To: <cover.1510080103.git.alistair.francis@xilinx.com>
-References: <cover.1510080103.git.alistair.francis@xilinx.com>
+	(envelope-from <bounces@canonical.com>) id 1eC9C6-0007hN-6W
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 14:05:57 -0500
+Received: from indium.canonical.com ([91.189.90.7]:41470)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eC9C6-0007hC-0V
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 14:05:54 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eC9C5-0000Fm-4e
+	for <qemu-devel@nongnu.org>; Tue, 07 Nov 2017 19:05:53 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 1D0D52E80C7
+	for <qemu-devel@nongnu.org>; Tue,  7 Nov 2017 19:05:53 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v1 2/2] xlnx-zcu102: Add an info message
- deprecating the EP108
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 07 Nov 2017 18:47:19 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Reply-To: Bug 1426593 <1426593@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20150228000102.17292.81743.malonedeb@gac.canonical.com>
+Message-Id: <151008043941.8833.1062868786666794646.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1426593] Re: linux-user: doesn't handle guest
+ setting its memory ulimit very small
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,32 +37,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, peter.maydell@linaro.org
-Cc: alistair.francis@xilinx.com, alistair23@gmail.com, edgar.iglesias@xilinx.com, edgar.iglesias@gmail.com, ehabkost@redhat.com, cota@braap.org, f4bug@amsat.org
+To: qemu-devel@nongnu.org
 
-The EP108 was an early access development board that is no longer used.
-Add an info message to convert any users to the ZCU102 instead. On QEMU
-they are both identical.
+*** This bug is a duplicate of bug 1163034 ***
+    https://bugs.launchpad.net/bugs/1163034
 
-Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
----
+I've just noticed that this is a duplicate of bug 1163034 (gnutls uses a
+very similar configure test), so I'm going to mark this one as a dup of
+that one, since it's older.
 
- hw/arm/xlnx-zcu102.c | 3 +++
- 1 file changed, 3 insertions(+)
 
-diff --git a/hw/arm/xlnx-zcu102.c b/hw/arm/xlnx-zcu102.c
-index 7ec03dad42..adddd234a1 100644
---- a/hw/arm/xlnx-zcu102.c
-+++ b/hw/arm/xlnx-zcu102.c
-@@ -164,6 +164,9 @@ static void xlnx_ep108_init(MachineState *machine)
- {
-     XlnxZCU102 *s = EP108_MACHINE(machine);
- 
-+    info_report("The Xilinx EP108 machine is deprecated, please use the "
-+                "ZCU102 machine instead. It has the same features supported.");
-+
-     xlnx_zynqmp_init(s, machine);
- }
- 
--- 
-2.11.0
+** This bug has been marked a duplicate of bug 1163034
+   linux-user mode can't handle guest setting RLIMIT_AS (hangs running gnut=
+ls28 configure check code)
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1426593
+
+Title:
+  linux-user: doesn't handle guest setting its memory ulimit very small
+
+Status in QEMU:
+  Confirmed
+
+Bug description:
+  using the latest build from git (hash 041ccc922ee474693a2869d4e3b59e920c7=
+39bc0 ) and all older versions i have tested.
+  i am using an amd64 host with an arm chroot using "qemu-user arm cortex-a=
+8" cpu emulation to run it
+
+  building coreutils hangs on "checking whether printf survives out-of-
+  memory conditions"
+
+  i have not had time to dig into the build system to isolate the test
+  yet, there were old reports of this bug but i can no longer find them
+  on google.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1426593/+subscriptions
