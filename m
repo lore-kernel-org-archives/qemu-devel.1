@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59055)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59611)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eC5FE-0000QO-17
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 09:52:53 -0500
+	id 1eC5HU-0001AO-Qd
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 09:55:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eC5F9-0001OD-61
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 09:52:52 -0500
+	id 1eC5HR-0002CT-1d
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 09:55:12 -0500
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 References: <20171103202624.5956-1-laurent@vivier.eu>
-	<db255c93-a4c6-216d-8ea3-10f340a916f6@amsat.org>
-	<257f2a30-6607-cb14-3bbf-27b95d962cf4@amsat.org>
-	<89487dfd-f941-871f-e822-68a6fbace6fe@vivier.eu>
-	<23b10dc0-2bb6-b53d-dfaa-a641630f8aaf@amsat.org>
-Message-ID: <8fdc98d4-edea-4239-a32f-23882fbff9d2@amsat.org>
-Date: Tue, 7 Nov 2017 11:52:27 -0300
+	<20171103202624.5956-2-laurent@vivier.eu>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <68dc78bb-3a86-b200-1c45-b60d0a2a2578@amsat.org>
+Date: Tue, 7 Nov 2017 11:54:57 -0300
 MIME-Version: 1.0
-In-Reply-To: <23b10dc0-2bb6-b53d-dfaa-a641630f8aaf@amsat.org>
+In-Reply-To: <20171103202624.5956-2-laurent@vivier.eu>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 0/4] softfloat: fix some helper
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 1/4] arm: fix float64 helper
  definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -35,71 +32,52 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, qemu-arm@nongnu.org, Stafford Horne <shorne@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>
 
-On 11/04/2017 01:18 PM, Philippe Mathieu-Daudé wrote:
-> On 11/04/2017 05:55 AM, Laurent Vivier wrote:
->> Le 03/11/2017 à 22:51, Philippe Mathieu-Daudé a écrit :
->>>> On 11/03/2017 05:26 PM, Laurent Vivier wrote:
->>>>> This series fixes some errors found by
->>>>> enabling USE_SOFTFLOAT_STRUCT_TYPES.
->>> [...]
->>>>
->>>> I'm getting those errors:
->>>>
->>>> $ make subdir-arm-softmmu -j2
->>>>
->>>> /source/qemu/migration/vmstate-types.c:430:5: error: conversion to
->>>> non-scalar type requested
->>>>      qemu_put_be64(f, float64_val(*v));
->>>>      ^~~~~~~~~~~~~
->>>> make: *** [migration/vmstate-types.o] Error 1
-> [...]
->>
->> These series doesn't fix all the problems, only the easiest to fix...
->>
->> for this one, you need:
->>
->> diff --git a/migration/vmstate-types.c b/migration/vmstate-types.c
->> index 48184c380d..0c273d616a 100644
->> --- a/migration/vmstate-types.c
->> +++ b/migration/vmstate-types.c
->> @@ -425,7 +425,7 @@ static int get_float64(QEMUFile *f, void *pv, size_t
->> size,
->>  static int put_float64(QEMUFile *f, void *pv, size_t size, VMStateField
->> *field,
->>                         QJSON *vmdesc)
->>  {
->> -    uint64_t *v = pv;
->> +    float64 *v = pv;
->>
->>      qemu_put_be64(f, float64_val(*v));
->>      return 0;
-> 
-> If you respin with this one you can add my Reviewed-by + Tested-by.
-> 
-> Another error:
-> 
-> $ make subdir-aarch64-softmmu
-> [...]
->   CC      target/arm/helper-a64.o
-> /source/qemu/target/arm/helper-a64.c: In function ‘helper_simd_tbl’:
-> /source/qemu/target/arm/helper-a64.c:162:38: error: incompatible type
-> for argument 1 of ‘extract64’
->              uint64_t val = extract64(env->vfp.regs[elt], bitidx, 8);
->                                       ^~~
-> In file included from /source/qemu/include/qemu/bitmap.h:16:0,
->                  from /source/qemu/include/hw/qdev-core.h:6,
->                  from /source/qemu/include/qom/cpu.h:23,
->                  from /source/qemu/target/arm/cpu-qom.h:23,
->                  from /source/qemu/target/arm/cpu.h:39,
->                  from /source/qemu/target/arm/helper-a64.c:21:
-> /source/qemu/include/qemu/bitops.h:316:24: note: expected ‘uint64_t {aka
-> long unsigned int}’ but argument is of type ‘float64 {aka struct
-> <anonymous>}’
->  static inline uint64_t extract64(uint64_t value, int start, int length)
->                         ^~~~~~~~~
-> make: *** [target/arm/helper-a64.o] Error 1
+Hi Laurent,
 
-OK with:
+On 11/03/2017 05:26 PM, Laurent Vivier wrote:
+> neon_ceq_f64(), neon_cge_f64() and neon_cgt_f64()
+> take float64 as parameter, fix the definition in
+> helper-a64.h
+> 
+> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+> ---
+>  target/arm/helper-a64.h | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/target/arm/helper-a64.h b/target/arm/helper-a64.h
+> index 85d86741db..b5e9ba03c0 100644
+> --- a/target/arm/helper-a64.h
+> +++ b/target/arm/helper-a64.h
+> @@ -26,9 +26,9 @@ DEF_HELPER_3(vfp_cmped_a64, i64, f64, f64, ptr)
+>  DEF_HELPER_FLAGS_5(simd_tbl, TCG_CALL_NO_RWG_SE, i64, env, i64, i64, i32, i32)
+>  DEF_HELPER_FLAGS_3(vfp_mulxs, TCG_CALL_NO_RWG, f32, f32, f32, ptr)
+>  DEF_HELPER_FLAGS_3(vfp_mulxd, TCG_CALL_NO_RWG, f64, f64, f64, ptr)
+> -DEF_HELPER_FLAGS_3(neon_ceq_f64, TCG_CALL_NO_RWG, i64, i64, i64, ptr)
+> -DEF_HELPER_FLAGS_3(neon_cge_f64, TCG_CALL_NO_RWG, i64, i64, i64, ptr)
+> -DEF_HELPER_FLAGS_3(neon_cgt_f64, TCG_CALL_NO_RWG, i64, i64, i64, ptr)
+> +DEF_HELPER_FLAGS_3(neon_ceq_f64, TCG_CALL_NO_RWG, i64, f64, f64, ptr)
+> +DEF_HELPER_FLAGS_3(neon_cge_f64, TCG_CALL_NO_RWG, i64, f64, f64, ptr)
+> +DEF_HELPER_FLAGS_3(neon_cgt_f64, TCG_CALL_NO_RWG, i64, f64, f64, ptr)
+>  DEF_HELPER_FLAGS_3(recpsf_f32, TCG_CALL_NO_RWG, f32, f32, f32, ptr)
+>  DEF_HELPER_FLAGS_3(recpsf_f64, TCG_CALL_NO_RWG, f64, f64, f64, ptr)
+>  DEF_HELPER_FLAGS_3(rsqrtsf_f32, TCG_CALL_NO_RWG, f32, f32, f32, ptr)
 
-- uint64_t val = extract64(env->vfp.regs[elt], bitidx, 8);
-+ uint64_t val = extract64(float64_val(env->vfp.regs[elt]), bitidx, 8);
+As commented replying to your series cover, this patch seems missing:
+
+diff --git a/target/arm/helper-a64.c b/target/arm/helper-a64.c
+@@ -159,8 +159,8 @@ uint64_t HELPER(simd_tbl)(CPUARMState *env, uint64_t
+result, uint64_t indices,
+              */
+             int elt = (rn * 2 + (index >> 3)) % 64;
+             int bitidx = (index & 7) * 8;
+-            uint64_t val = extract64(env->vfp.regs[elt], bitidx, 8);
+-
++            uint64_t val = extract64(float64_val(env->vfp.regs[elt]),
++                                     bitidx, 8);
+             result = deposit64(result, shift, 8, val);
+         }
+     }
+
+Regards,
+
+Phil.
