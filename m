@@ -1,19 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44382)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45098)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1eC8F2-0000RC-1y
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 13:04:56 -0500
+	(envelope-from <bounces@canonical.com>) id 1eC8Gk-0001Fu-Qo
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 13:06:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1eC8F0-00032Q-TK
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 13:04:52 -0500
-Date: Tue, 7 Nov 2017 10:04:41 -0800 (PST)
-From: Stefano Stabellini <sstabellini@kernel.org>
-In-Reply-To: <1510066898-3725-1-git-send-email-peter.maydell@linaro.org>
-Message-ID: <alpine.DEB.2.10.1711071004190.30448@sstabellini-ThinkPad-X260>
-References: <1510066898-3725-1-git-send-email-peter.maydell@linaro.org>
+	(envelope-from <bounces@canonical.com>) id 1eC8Gh-00053c-IO
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 13:06:38 -0500
+Received: from indium.canonical.com ([91.189.90.7]:55580)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eC8Gh-00052j-Bs
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 13:06:35 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eC8Gf-0007Wh-Hn
+	for <qemu-devel@nongnu.org>; Tue, 07 Nov 2017 18:06:33 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 84CA42E80C7
+	for <qemu-devel@nongnu.org>; Tue,  7 Nov 2017 18:06:33 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: Re: [Qemu-devel] [PATCH for-2.11] target/arm: Report GICv3 sysregs
- present in ID registers if needed
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 07 Nov 2017 18:00:05 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Reply-To: Bug 1728116 <1728116@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150912776103.20350.959452179379767829.malonedeb@soybean.canonical.com>
+Message-Id: <151007760547.8623.7527254333300984782.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1728116] Re: Empty /proc/self/auxv (linux-user)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,114 +36,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, patches@linaro.org, Stefano Stabellini <sstabellini@kernel.org>
+To: qemu-devel@nongnu.org
 
-On Tue, 7 Nov 2017, Peter Maydell wrote:
-> The CPU ID registers ID_AA64PFR0_EL1, ID_PFR1_EL1 and ID_PFR1
-> have a field for reporting presence of GICv3 system registers.
-> We need to report this field correctly in order for Xen to
-> work as a guest inside QEMU emulation. We mustn't incorrectly
-> claim the sysregs exist when they don't, though, or Linux will
-> crash.
-> 
-> Unfortunately the way we've designed the GICv3 emulation in QEMU
-> puts the system registers as part of the GICv3 device, which
-> may be created after the CPU proper has been realized. This
-> means that we don't know at the point when we define the ID
-> registers what the correct value is. Handle this by switching
-> them to calling a function at runtime to read the value, where
-> we can fill in the GIC field appropriately.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Oops, yes, commit 7c4ee5bcc82e643 broke this -- it switched the order in
+which we fill in the AUXV info, but forgot to adjust the calculation of
+the length, which as you've guessed we now get backwards.
 
-Tested-by: Stefano Stabellini <sstabellini@kernel.org>
 
-> ---
-> In retrospect I think having the sysregs emulation in the
-> GIC device was a bit of a design error -- we should have
-> split it like the hardware does, with a defined protocol
-> between the GIC and the CPU interface. (In real hardware the
-> CPU can have the GIC system registers even though it's not
-> connected to an actual GICv3, and we don't/can't emulate
-> that with our current design.)
-> ---
->  target/arm/helper.c | 44 ++++++++++++++++++++++++++++++++++++++++----
->  1 file changed, 40 insertions(+), 4 deletions(-)
-> 
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index f61fb3e..35c5bd6 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -4549,6 +4549,33 @@ static void define_debug_regs(ARMCPU *cpu)
->      }
->  }
->  
-> +/* We don't know until after realize whether there's a GICv3
-> + * attached, and that is what registers the gicv3 sysregs.
-> + * So we have to fill in the GIC fields in ID_PFR/ID_PFR1_EL1/ID_AA64PFR0_EL1
-> + * at runtime.
-> + */
-> +static uint64_t id_pfr1_read(CPUARMState *env, const ARMCPRegInfo *ri)
-> +{
-> +    ARMCPU *cpu = arm_env_get_cpu(env);
-> +    uint64_t pfr1 = cpu->id_pfr1;
-> +
-> +    if (env->gicv3state) {
-> +        pfr1 |= 1 << 28;
-> +    }
-> +    return pfr1;
-> +}
-> +
-> +static uint64_t id_aa64pfr0_read(CPUARMState *env, const ARMCPRegInfo *ri)
-> +{
-> +    ARMCPU *cpu = arm_env_get_cpu(env);
-> +    uint64_t pfr0 = cpu->id_aa64pfr0;
-> +
-> +    if (env->gicv3state) {
-> +        pfr0 |= 1 << 24;
-> +    }
-> +    return pfr0;
-> +}
-> +
->  void register_cp_regs_for_features(ARMCPU *cpu)
->  {
->      /* Register all the coprocessor registers based on feature bits */
-> @@ -4573,10 +4600,14 @@ void register_cp_regs_for_features(ARMCPU *cpu)
->                .opc0 = 3, .opc1 = 0, .crn = 0, .crm = 1, .opc2 = 0,
->                .access = PL1_R, .type = ARM_CP_CONST,
->                .resetvalue = cpu->id_pfr0 },
-> +            /* ID_PFR1 is not a plain ARM_CP_CONST because we don't know
-> +             * the value of the GIC field until after we define these regs.
-> +             */
->              { .name = "ID_PFR1", .state = ARM_CP_STATE_BOTH,
->                .opc0 = 3, .opc1 = 0, .crn = 0, .crm = 1, .opc2 = 1,
-> -              .access = PL1_R, .type = ARM_CP_CONST,
-> -              .resetvalue = cpu->id_pfr1 },
-> +              .access = PL1_R, .type = ARM_CP_NO_RAW,
-> +              .readfn = id_pfr1_read,
-> +              .writefn = arm_cp_write_ignore },
->              { .name = "ID_DFR0", .state = ARM_CP_STATE_BOTH,
->                .opc0 = 3, .opc1 = 0, .crn = 0, .crm = 1, .opc2 = 2,
->                .access = PL1_R, .type = ARM_CP_CONST,
-> @@ -4692,10 +4723,15 @@ void register_cp_regs_for_features(ARMCPU *cpu)
->           * define new registers here.
->           */
->          ARMCPRegInfo v8_idregs[] = {
-> +            /* ID_AA64PFR0_EL1 is not a plain ARM_CP_CONST because we don't
-> +             * know the right value for the GIC field until after we
-> +             * define these regs.
-> +             */
->              { .name = "ID_AA64PFR0_EL1", .state = ARM_CP_STATE_AA64,
->                .opc0 = 3, .opc1 = 0, .crn = 0, .crm = 4, .opc2 = 0,
-> -              .access = PL1_R, .type = ARM_CP_CONST,
-> -              .resetvalue = cpu->id_aa64pfr0 },
-> +              .access = PL1_R, .type = ARM_CP_NO_RAW,
-> +              .readfn = id_aa64pfr0_read,
-> +              .writefn = arm_cp_write_ignore },
->              { .name = "ID_AA64PFR1_EL1", .state = ARM_CP_STATE_AA64,
->                .opc0 = 3, .opc1 = 0, .crn = 0, .crm = 4, .opc2 = 1,
->                .access = PL1_R, .type = ARM_CP_CONST,
-> -- 
-> 2.7.4
-> 
+** Changed in: qemu
+       Status: New =3D> Confirmed
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1728116
+
+Title:
+  Empty /proc/self/auxv (linux-user)
+
+Status in QEMU:
+  Confirmed
+
+Bug description:
+  The userspace Linux API virtualization used to fake access to
+  /proc/self/auxv, to provide meaningful data for the guest process.
+
+  For newer qemu versions, this fails: The openat() is intercepted, but
+  there's no content: /proc/self/auxv has length zero (i.e. reading from
+  it returns 0 bytes).
+
+  Good:
+
+  $ x86_64-linux-user/qemu-x86_64 /usr/bin/cat /proc/self/auxv | wc -c
+  256 /proc/self/auxv
+
+  Bad:
+
+  $ x86_64-linux-user/qemu-x86_64 /usr/bin/cat /proc/self/auxv | wc -c
+  0 /proc/self/auxv
+
+  This worked in 2.7.1, and fails in 2.10.1.
+
+  This causes e.g. any procps-ng-based tool to segfault while reading
+  from /proc/self/auxv in an endless loop (probably worth another bug
+  report...)
+
+  Doing a "git bisect" shows that this commit:
+  https://github.com/qemu/qemu/commit/7c4ee5bcc introduced the problem.
+
+  It might be a simple logic (subtraction in the wrong direction?) or
+  sign-ness error: Adding some logging (to v2.10.1)
+
+  diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+  index 9b6364a..49285f9 100644
+  --- a/linux-user/syscall.c
+  +++ b/linux-user/syscall.c
+  @@ -7469,6 +7469,9 @@ static int open_self_auxv(void *cpu_env, int fd)
+       abi_ulong len =3D ts->info->auxv_len;
+       char *ptr;
+   =
+
+  +    gemu_log(TARGET_ABI_FMT_lu"\n", len);
+  +    gemu_log(TARGET_ABI_FMT_ld"\n", len);
+  +
+       /*
+        * Auxiliary vector is stored in target process stack.
+        * read in whole auxv vector and copy it to file
+
+  shows this output:
+
+  $  x86_64-linux-user/qemu-x86_64 /usr/bin/cat /proc/self/auxv | wc -c
+  18446744073709551264
+  -352
+  0
+
+  And 352 could be the expected length.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1728116/+subscriptions
