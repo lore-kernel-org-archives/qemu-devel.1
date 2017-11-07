@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41041)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41453)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1eC77A-0001yR-0Y
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 11:52:41 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1eC78I-0002Zb-RQ
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 11:53:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1eC775-0005az-C2
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 11:52:40 -0500
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:44059)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1eC775-0005Z3-49
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 11:52:35 -0500
-Received: by mail-wm0-x242.google.com with SMTP id n74so15071207wmi.1
-	for <qemu-devel@nongnu.org>; Tue, 07 Nov 2017 08:52:34 -0800 (PST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Tue,  7 Nov 2017 16:52:26 +0000
-Message-Id: <20171107165226.22546-1-alex.bennee@linaro.org>
+	(envelope-from <ehabkost@redhat.com>) id 1eC78E-00066l-Mt
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 11:53:50 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34194)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1eC78E-00066L-Gc
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 11:53:46 -0500
+Date: Tue, 7 Nov 2017 14:53:39 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20171107165339.GB3111@localhost.localdomain>
+References: <CAJ+F1CKWdxAwuZ-QAvT=AhGMrXd+7c8=eBCMMuKPdbK75NDtiQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH] accel/tcg/translate-all: expand
- cpu_restore_state retaddr check
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <CAJ+F1CKWdxAwuZ-QAvT=AhGMrXd+7c8=eBCMMuKPdbK75NDtiQ@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] i440/piix and dynamic sysbus check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,56 +27,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
+To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>
+Cc: QEMU <qemu-devel@nongnu.org>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <agraf@suse.de>, Stefan Berger <stefanb@linux.vnet.ibm.com>
 
-We are still seeing signals during translation time when we walk over
-a page protection boundary. This expands the check to ensure the
-retaddr is inside the code generation buffer. The original suggestion
-was to check versus tcg_ctx.code_gen_ptr but as we now segment the
-translation buffer we have to settle for just a general check for
-being inside.
+On Tue, Nov 07, 2017 at 05:40:17PM +0100, Marc-Andr=E9 Lureau wrote:
+> Hi,
+>=20
+> I am working on a TPM CRB device (last sent version:
+> https://lists.gnu.org/archive/html/qemu-devel/2017-10/msg02014.html).
+> It's a sysbus device, and when starting qemu with i440, I get "Option
+> '-device tpm-crb' cannot be handled by this machine".
+>=20
+> The check comes from machine_init_notify(), checking that the machine
+> has_dynamic_sysbus.
+>=20
+>  Apparently, q35 supports it. But not i440. If I declare
+> has_dynamic_sysbus in piix, the device works fine.
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reported-by: Peter Maydell <peter.maydell@linaro.org>
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Richard Henderson <rth@twiddle.net>
----
- accel/tcg/translate-all.c | 20 ++++++++++++--------
- 1 file changed, 12 insertions(+), 8 deletions(-)
+Before doing that, I would like to replace has_dynamic_sysbus
+with a whitelist, so we don't need to make the machine accept all
+other sysbus devices too.
 
-diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index 34c5e28d07..eb255af402 100644
---- a/accel/tcg/translate-all.c
-+++ b/accel/tcg/translate-all.c
-@@ -357,16 +357,20 @@ bool cpu_restore_state(CPUState *cpu, uintptr_t retaddr)
-     TranslationBlock *tb;
-     bool r = false;
- 
--    /* A retaddr of zero is invalid so we really shouldn't have ended
--     * up here. The target code has likely forgotten to check retaddr
--     * != 0 before attempting to restore state. We return early to
--     * avoid blowing up on a recursive tb_lock(). The target must have
--     * previously survived a failed cpu_restore_state because
--     * tb_find_pc(0) would have failed anyway. It still should be
--     * fixed though.
-+    /* The retaddr has to be in the region of current code buffer. If
-+     * it's not we will not be able to resolve it here. If it is zero
-+     * the calling code has likely forgotten to check retaddr before
-+     * calling here. If it is not in the translated code we could be
-+     * faulting during translation itself.
-+     *
-+     * Either way we need return early to avoid blowing up on a
-+     * recursive tb_lock() as we can't resolve it here.
-      */
- 
--    if (!retaddr) {
-+    if (!retaddr ||
-+        (retaddr < (uintptr_t) tcg_init_ctx.code_gen_buffer) ||
-+        (retaddr > (uintptr_t) (tcg_init_ctx.code_gen_buffer +
-+                                tcg_init_ctx.code_gen_buffer_size))) {
-         return r;
-     }
- 
--- 
-2.14.2
+I probably should rebase and resubmit this RFC:
+http://mid.mail-archive.com/20170323212848.8492-1-ehabkost@redhat.com
+Subject: [Qemu-devel] [RFC 0/4] Replace has_dynamic_sysbus with device ty=
+pe  whitelist
+
+
+>=20
+> Marcel, could we do something similar to piix to what you did for q35?:
+>=20
+> commit bf8d492405feaee2c1685b3b9d5e03228ed3e47f
+> Author: Marcel Apfelbaum <marcel@redhat.com>
+> Date:   Mon Jun 27 18:38:33 2016 +0300
+>=20
+>     q35: allow dynamic sysbus
+>=20
+> thanks
+>=20
+> --=20
+> Marc-Andr=E9 Lureau
+
+--=20
+Eduardo
