@@ -1,37 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47665)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48692)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1eBxrv-0000ql-NG
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 02:00:25 -0500
+	(envelope-from <famz@redhat.com>) id 1eBxvU-0001qz-US
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 02:04:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1eBxrp-0000QJ-HX
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 02:00:19 -0500
-Received: from mail-it0-x234.google.com ([2607:f8b0:4001:c0b::234]:50416)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1eBxrp-0000Pe-80
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 02:00:13 -0500
-Received: by mail-it0-x234.google.com with SMTP id 72so1178055itl.5
-	for <qemu-devel@nongnu.org>; Mon, 06 Nov 2017 23:00:13 -0800 (PST)
-References: <CANRm+CxGAiDBDYrtvxXwsPwt2WjiY_biMCVkvQOyAaQtv5v-UQ@mail.gmail.com>
-	<80415da5-4eef-bf85-b617-fadc3dae4475@redhat.com>
-	<CANRm+CwexgKHUVK3b3QYw8ksyaSgZRDiWztOsOvPpMugTQj16w@mail.gmail.com>
-	<e23177c9-36cb-2ad7-18c0-ebf3caaebb52@redhat.com>
-	<20171106115931.GB3898@lemon>
-	<fb7c5778-238d-ac99-26d6-8a6d9c80a0f4@redhat.com>
-	<CANRm+Cw=F244w=6YMutjcvWin9_xiRt0Z1MvT=oi+7CXjU+DXw@mail.gmail.com>
-	<78a404c5-fb2f-6fdf-c307-107ff1af4342@redhat.com>
-	<5e0576f6-bb91-7e6e-7a1d-391d18717c0d@ozlabs.ru>
-	<CANRm+CwnZCpEZ9qN9dB808Y-znyn_vcwtAWKfjxCrpo4Qv=U_Q@mail.gmail.com>
-	<f2d1d51e-16d4-ed20-cda2-fad6c7394cc0@ozlabs.ru>
-	<CANRm+CzH82=t-5YZySHtX9_Dc88nv-4L38+2tHOqc1v6WzPS2w@mail.gmail.com>
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Message-ID: <780134b8-16d8-b295-5ff9-c495f660dad7@ozlabs.ru>
-Date: Tue, 7 Nov 2017 18:00:07 +1100
+	(envelope-from <famz@redhat.com>) id 1eBxvR-0002cL-O0
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 02:04:00 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44458)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1eBxvR-0002bw-H1
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 02:03:57 -0500
+Date: Tue, 7 Nov 2017 15:03:49 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20171107070349.GL16355@lemon>
+References: <20171106094643.14881-1-peterx@redhat.com>
+	<20171106094643.14881-9-peterx@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CANRm+CzH82=t-5YZySHtX9_Dc88nv-4L38+2tHOqc1v6WzPS2w@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-AU
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] qemu core file size
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171106094643.14881-9-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [RFC v3 08/27] monitor: unify global init
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,64 +27,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wanpeng Li <kernellwp@gmail.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Jiri Denemark <jdenemar@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, marcandre.lureau@redhat.com, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-On 07/11/17 17:16, Wanpeng Li wrote:
-> 2017-11-07 14:12 GMT+08:00 Alexey Kardashevskiy <aik@ozlabs.ru>:
->> On 07/11/17 17:02, Wanpeng Li wrote:
->>> Hi Alexey,
->>> 2017-11-07 13:46 GMT+08:00 Alexey Kardashevskiy <aik@ozlabs.ru>:
->>>> On 07/11/17 01:08, Paolo Bonzini wrote:
->>>>> On 06/11/2017 13:18, Wanpeng Li wrote:
->>>>>> 2017-11-06 20:02 GMT+08:00 Paolo Bonzini <pbonzini@redhat.com>:
->>>>>>> On 06/11/2017 12:59, Fam Zheng wrote:
->>>>>>>>>> Could you point out the patchset for the fix?
->>>>>>>>> Between 447b0d0b9ee8a0ac216c3186e0f3c427a1001f0c and
->>>>>>>>> 092aa2fc65b7a35121616aad8f39d47b8f921618.
->>>>>>>> Not sure how these relate to the core size, but I've tested upstream
->>>>>>>> (ec7a8bf0b8f7dc7288fe8745464ee8217528cc6c) and with dump-guest-core=off the core
->>>>>>>> file is 363M, still significantly larger than rss (~73M).
->>>>>>>>
->>>>>>>> What is bloating the core file?
->>>>>>>
->>>>>>> My guess would have been fragmented heap.  The core file, unlike the
->>>>>>> RSS, includes all the mmaped memory (e.g. from shared libraries) that
->>>>>>> has never been used.
->>>>>>>
->>>>>>> For example, all the Ceph/Gluster/PulseAudio/SPICE/whatever libraries
->>>>>>> are included in the core file but likely are not in the RSS.
->>>>>>
->>>>>> Do you mean not use Memory API will avoid the fragmented heap?
->>>>>
->>>>> The high memory usage from the memory API causes excessive
->>>>> fragmentation.  Alexey's work should help reducing memory usage and thus
->>>>> the fragmentation.
->>>>
->>>> Since centos6 does not have this issue and centos7 does, I'd suggest
->>>> MALLOC_ARENA_MAX&co
->>>> https://www.gnu.org/software/libc/manual/html_node/Memory-Allocation-Tunables.html
->>>
->>> Thanks for the inputs. What's the recommend glibc.malloc.arena_max
->>> value from you? :)
->>
->> I have no idea, you have to try different values as you are the one who is
->> unhappy about the sizes :) I do not normally mess with this as things
->> should just work with the defaults whatever they are.
+On Mon, 11/06 17:46, Peter Xu wrote:
+> There are many places for monitor init its globals, at least:
+> 
+> - monitor_init_qmp_commands() at the very beginning
+> - single function to init monitor_lock
+> - in the first entry of monitor_init() using "is_first_init"
+> 
+> Unify them a bit.
+> 
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 
-
-So I tried:
-- QEMU with "-smp 8" and "(gdb) generate-core-file 1"  creates 820MB file;
-- QEMU with "-smp 256" creates 11GB file,
-- QEMU with "-smp 256" with MALLOC_ARENA_MAX=1 creates 2.5GB file,
-- QEMU with "-smp 128" with MALLOC_ARENA_MAX=1 creates 1.3GB file;
-- QEMU with "-smp 1" creates 290MB file;
-- QEMU with "-smp 1" with MALLOC_ARENA_MAX=1 creates 222MB file.
-
-
-It is "qemu-system-ppc64 -nodefaults -m 2G -enable-kvm -S" (i.e. stopped)
-pretty much.
-
-
--- 
-Alexey
+Reviewed-by: Fam Zheng <famz@redhat.com>
