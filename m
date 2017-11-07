@@ -1,34 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36320)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34286)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eBvX3-0005c0-U5
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 23:30:39 -0500
+	(envelope-from <asierra@xes-inc.com>) id 1eBty3-00069G-RD
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 21:50:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eBvX1-0005xV-U6
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 23:30:37 -0500
-Received: from indium.canonical.com ([91.189.90.7]:52362)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eBvX1-0005vw-Of
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 23:30:35 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eBvX0-0000ND-TQ
-	for <qemu-devel@nongnu.org>; Tue, 07 Nov 2017 04:30:34 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id DCE202E80C3
-	for <qemu-devel@nongnu.org>; Tue,  7 Nov 2017 04:30:34 +0000 (UTC)
+	(envelope-from <asierra@xes-inc.com>) id 1eBtxz-0002Ex-BL
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 21:50:23 -0500
+Received: from xes-mad.com ([216.165.139.220]:19886 helo=mail.xes-mad.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <asierra@xes-inc.com>) id 1eBtxz-0002Dq-4A
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 21:50:19 -0500
+Date: Mon, 6 Nov 2017 20:50:15 -0600 (CST)
+From: Aaron Sierra <asierra@xes-inc.com>
+Message-ID: <492245211.936616.1510023015797.JavaMail.zimbra@xes-inc.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 07 Nov 2017 04:17:32 -0000
-From: Launchpad Bug Tracker <1326986@bugs.launchpad.net>
-Reply-To: Bug 1326986 <1326986@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20140605222643.4583.85001.malonedeb@soybean.canonical.com>
-Message-Id: <151002825308.21207.2692112706867902819.malone@loganberry.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1326986] Re: e1000 - no link detected by VXWorks
- based guest
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PATCH] linux-user: Support explicit targets for
+ PowerPC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,51 +25,200 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
+Cc: qemu-devel@nongnu.org
 
-[Expired for QEMU because there has been no activity for 60 days.]
+Enable building PowerPC targets supporting a specific CPU, without
+having to set QEMU_CPU via the environment. For example these build
+targets (and many more) become available:
 
-** Changed in: qemu
-       Status: Incomplete =3D> Expired
+    qemu-ppc.e500mc
+    qemu-ppc.e500v2
+    qemu-ppc.e5500
+    qemu-ppc.e600
+    qemu-ppc.e6500
 
--- =
+These (statically compiled) binaries have proven useful for emulating
+PowerPC CPUs within Docker containers, where it's hard to reliably
+define environment variables that are available for every process.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1326986
+Additional Makefile rules are all that should be needed to support
+other architectures.
 
-Title:
-  e1000 - no link detected by VXWorks based guest
+Signed-off-by: Aaron Sierra <asierra@xes-inc.com>
+---
+ Makefile              |  4 ++++
+ configure             | 40 ++++++++++++++++++++++++++--------------
+ linux-user/main.c     |  4 +++-
+ scripts/create_config |  3 +++
+ 4 files changed, 36 insertions(+), 15 deletions(-)
 
-Status in QEMU:
-  Expired
-
-Bug description:
-  I'm trying to get a VXWorks image running inside a qemu guest.  I have
-  the machine running, however, the vxworks image only has support for
-  the 82544EI device so I had to change the device ID in e1000.c to get
-  the device even recognized so I'm not sure if this is a bug or an
-  issue for the development list.
-
-  =
-
-  After changing e1000.c, the device is now seen by the guest OS, however, =
-it never gets a link.  I've attached the e1000 debug logs in the hopes that=
- someone can help me understand where to start looking into why this guest =
-won't get a link.
-
-  I tested the updated e1000 driver with a debian live CD and the card
-  works under it, so it doesn't appear that the issue is with the driver
-  string change but rather something in the e1000 driver itself.
-
-  Here is the command I'm using to start QEMU:
-
-  /opt/qemu/bin/qemu-system-i386  -cpu coreduo -hda /root/vxworks_test
-  -m 2048 -netdev tap,ifname=3Dtap0,id=3Dnet0 -netdev
-  tap,ifname=3Dtap1,id=3Dnet1 -device
-  e1000,netdev=3Dnet0,mac=3D00:00:e8:01:02:03 -device
-  e1000,netdev=3Dnet1,mac=3D00:00:e8:01:02:04 -boot c -curses -no-kvm -D
-  /tmp/qemu.log 2>/tmp/e1000.log
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1326986/+subscriptions
+diff --git a/Makefile b/Makefile
+index ec73acf..7de6d88 100644
+--- a/Makefile
++++ b/Makefile
+@@ -281,6 +281,10 @@ endif
+ 
+ -include $(SUBDIR_DEVICES_MAK_DEP)
+ 
++# Support PowerPC targets with explicit CPU defined
++default-configs/ppc-linux-user.%.mak: default-configs/ppc-linux-user.mak
++	cp $< $@
++
+ %/config-devices.mak: default-configs/%.mak $(SRC_PATH)/scripts/make_device_config.sh
+ 	$(call quiet-command, \
+             $(SHELL) $(SRC_PATH)/scripts/make_device_config.sh $< $*-config-devices.mak.d $@ > $@.tmp,"GEN","$@.tmp")
+diff --git a/configure b/configure
+index e31d6a7..49aed47 100755
+--- a/configure
++++ b/configure
+@@ -240,6 +240,13 @@ supported_target() {
+     return 1
+ }
+ 
++set_target_variables() {
++    alias_name=$(echo $target | cut -d '-' -f 1)
++    alias_base=$(echo $target | cut -d '.' -f 1)
++    target_cpu=$(echo $target | cut -d '.' -f 2)
++    target_name=${alias_name}.${target_cpu}
++    target_suffix=$(echo $alias_base | sed s/${alias_name}//)
++}
+ 
+ ld_has() {
+     $ld --help 2>/dev/null | grep ".$1" >/dev/null 2>&1
+@@ -1828,14 +1835,15 @@ else
+     for target in $target_list; do
+         # Check that we recognised the target name; this allows a more
+         # friendly error message than if we let it fall through.
++        set_target_variables $target
+         case " $default_target_list " in
+-            *" $target "*)
++            *" $alias_base "*)
+                 ;;
+             *)
+                 error_exit "Unknown target name '$target'"
+                 ;;
+         esac
+-        supported_target $target || exit 1
++        supported_target $alias_base || exit 1
+     done
+ fi
+ 
+@@ -6348,10 +6356,10 @@ fi
+ for target in $target_list; do
+ target_dir="$target"
+ config_target_mak=$target_dir/config-target.mak
+-target_name=$(echo $target | cut -d '-' -f 1)
++set_target_variables $target
+ target_bigendian="no"
+ 
+-case "$target_name" in
++case "$alias_name" in
+   armeb|hppa|lm32|m68k|microblaze|mips|mipsn32|mips64|moxie|or1k|ppc|ppcemb|ppc64|ppc64abi32|s390x|sh4eb|sparc|sparc64|sparc32plus|xtensaeb)
+   target_bigendian=yes
+   ;;
+@@ -6360,15 +6368,15 @@ target_softmmu="no"
+ target_user_only="no"
+ target_linux_user="no"
+ target_bsd_user="no"
+-case "$target" in
+-  ${target_name}-softmmu)
++case "$target_suffix" in
++  -softmmu)
+     target_softmmu="yes"
+     ;;
+-  ${target_name}-linux-user)
++  -linux-user)
+     target_user_only="yes"
+     target_linux_user="yes"
+     ;;
+-  ${target_name}-bsd-user)
++  -bsd-user)
+     target_user_only="yes"
+     target_bsd_user="yes"
+     ;;
+@@ -6383,14 +6391,14 @@ echo "# Automatically generated by configure - do not modify" > $config_target_m
+ 
+ bflt="no"
+ mttcg="no"
+-interp_prefix1=$(echo "$interp_prefix" | sed "s/%M/$target_name/g")
++interp_prefix1=$(echo "$interp_prefix" | sed "s/%M/$alias_name/g")
+ gdb_xml_files=""
+ 
+-TARGET_ARCH="$target_name"
++TARGET_ARCH="$alias_name"
+ TARGET_BASE_ARCH=""
+ TARGET_ABI_DIR=""
+ 
+-case "$target_name" in
++case "$alias_name" in
+   i386)
+     gdb_xml_files="i386-32bit.xml i386-32bit-core.xml i386-32bit-sse.xml"
+   ;;
+@@ -6514,6 +6522,10 @@ if [ "$TARGET_BASE_ARCH" = "" ]; then
+   TARGET_BASE_ARCH=$TARGET_ARCH
+ fi
+ 
++if [ "$alias_name" != "$target_cpu" ]; then
++  echo "TARGET_EXPLICIT_CPU=$target_cpu" >> $config_target_mak
++fi
++
+ symlink "$source_path/Makefile.target" "$target_dir/Makefile"
+ 
+ upper() {
+@@ -6532,13 +6544,13 @@ if [ "$HOST_VARIANT_DIR" != "" ]; then
+     echo "HOST_VARIANT_DIR=$HOST_VARIANT_DIR" >> $config_target_mak
+ fi
+ 
+-if supported_xen_target $target; then
++if supported_xen_target $alias_base; then
+     echo "CONFIG_XEN=y" >> $config_target_mak
+     if test "$xen_pci_passthrough" = yes; then
+         echo "CONFIG_XEN_PCI_PASSTHROUGH=y" >> "$config_target_mak"
+     fi
+ fi
+-if supported_kvm_target $target; then
++if supported_kvm_target $alias_base; then
+     echo "CONFIG_KVM=y" >> $config_target_mak
+     if test "$vhost_net" = "yes" ; then
+         echo "CONFIG_VHOST_NET=y" >> $config_target_mak
+@@ -6547,7 +6559,7 @@ if supported_kvm_target $target; then
+         fi
+     fi
+ fi
+-if supported_hax_target $target; then
++if supported_hax_target $alias_base; then
+     echo "CONFIG_HAX=y" >> $config_target_mak
+ fi
+ if test "$target_bigendian" = "yes" ; then
+diff --git a/linux-user/main.c b/linux-user/main.c
+index aa02f25..9d0c4b6 100644
+--- a/linux-user/main.c
++++ b/linux-user/main.c
+@@ -4298,7 +4298,9 @@ int main(int argc, char **argv, char **envp)
+     init_qemu_uname_release();
+ 
+     if (cpu_model == NULL) {
+-#if defined(TARGET_I386)
++#if defined(TARGET_EXPLICIT_CPU)
++        cpu_model = TARGET_EXPLICIT_CPU;
++#elif defined(TARGET_I386)
+ #ifdef TARGET_X86_64
+         cpu_model = "qemu64";
+ #else
+diff --git a/scripts/create_config b/scripts/create_config
+index 603b826..8aa4a9f 100755
+--- a/scripts/create_config
++++ b/scripts/create_config
+@@ -107,6 +107,9 @@ case $line in
+     target_name=${line#*=}
+     echo "#define TARGET_NAME \"$target_name\""
+     ;;
++ TARGET_EXPLICIT_CPU=*)
++    echo "#define TARGET_EXPLICIT_CPU \"${line#*=}\""
++    ;;
+  TARGET_DIRS=*)
+     # do nothing
+     ;;
+-- 
+2.7.4
