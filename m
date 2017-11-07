@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36830)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36800)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1eC41n-0006XL-Dq
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 08:34:56 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1eC41m-0006Wh-9r
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 08:34:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1eC41m-0005zR-8r
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 08:34:55 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:38238)
+	(envelope-from <pm215@archaic.org.uk>) id 1eC41l-0005y7-Iz
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 08:34:54 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:38240)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1eC41m-0005rx-1n
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 08:34:54 -0500
+	id 1eC41l-0005vT-D6
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 08:34:53 -0500
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1eC41g-0004SG-Am
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 13:34:48 +0000
+	(envelope-from <pm215@archaic.org.uk>) id 1eC41h-0004Sg-J6
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 13:34:49 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue,  7 Nov 2017 13:35:15 +0000
-Message-Id: <1510061722-14092-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 0/7] target-arm queue
+Date: Tue,  7 Nov 2017 13:35:17 +0000
+Message-Id: <1510061722-14092-3-git-send-email-peter.maydell@linaro.org>
+In-Reply-To: <1510061722-14092-1-git-send-email-peter.maydell@linaro.org>
+References: <1510061722-14092-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PULL 2/7] hw/arm: Mark the "fsl,
+ imx6" device with user_creatable = false
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,52 +30,40 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-A small set of arm bugfixes for rc0.
+From: Thomas Huth <thuth@redhat.com>
 
+This device causes QEMU to abort if the user tries to instantiate it:
 
+$ qemu-system-aarch64 -M sabrelite -smp 1,maxcpus=2 -device fsl,,imx6
+Unexpected error in qemu_chr_fe_init() at chardev/char-fe.c:222:
+qemu-system-aarch64: -device fsl,,imx6: Device 'serial0' is in use
+Aborted (core dumped)
 
-The following changes since commit 5853e92207193e967abf5e4c25b4a551c7604725:
+The device uses serial_hds[] directly in its realize function, so it
+can not be instantiated again by the user.
 
-  Merge remote-tracking branch 'remotes/pmaydell/tags/pull-cocoa-20171107' into staging (2017-11-07 12:19:48 +0000)
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+Message-id: 1509519537-6964-2-git-send-email-thuth@redhat.com
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ hw/arm/fsl-imx6.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-are available in the git repository at:
-
-  git://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20171107
-
-for you to fetch changes up to 8a7348b5d62d7ea16807e6bea54b448a0184bb0f:
-
-  hw/intc/arm_gicv3_its: Don't abort on table save failure (2017-11-07 13:03:52 +0000)
-
-----------------------------------------------------------------
-target-arm queue:
- * arm_gicv3_its: Don't abort on table save failure
- * arm_gicv3_its: Fix the VM termination in vm_change_state_handler()
- * translate.c: Fix usermode big-endian AArch32 LDREXD and STREXD
- * hw/arm: Mark the "fsl,imx31/25/6" devices with user_creatable = false
- * arm: implement cache/shareability attribute bits for PAR registers
-
-----------------------------------------------------------------
-Andrew Baumann (1):
-      arm: implement cache/shareability attribute bits for PAR registers
-
-Eric Auger (1):
-      hw/intc/arm_gicv3_its: Don't abort on table save failure
-
-Peter Maydell (1):
-      translate.c: Fix usermode big-endian AArch32 LDREXD and STREXD
-
-Shanker Donthineni (1):
-      hw/intc/arm_gicv3_its: Fix the VM termination in vm_change_state_handler()
-
-Thomas Huth (3):
-      hw/arm: Mark the "fsl,imx6" device with user_creatable = false
-      hw/arm: Mark the "fsl,imx25" device with user_creatable = false
-      hw/arm: Mark the "fsl,imx31" device with user_creatable = false
-
- hw/arm/fsl-imx25.c          |   6 +-
- hw/arm/fsl-imx31.c          |   6 +-
- hw/arm/fsl-imx6.c           |   3 +-
- hw/intc/arm_gicv3_its_kvm.c |  12 +--
- target/arm/helper.c         | 178 ++++++++++++++++++++++++++++++++++++++++----
- target/arm/translate.c      |  39 ++++++++--
- 6 files changed, 214 insertions(+), 30 deletions(-)
+diff --git a/hw/arm/fsl-imx6.c b/hw/arm/fsl-imx6.c
+index 26fd214..59ef33e 100644
+--- a/hw/arm/fsl-imx6.c
++++ b/hw/arm/fsl-imx6.c
+@@ -440,8 +440,9 @@ static void fsl_imx6_class_init(ObjectClass *oc, void *data)
+     DeviceClass *dc = DEVICE_CLASS(oc);
+ 
+     dc->realize = fsl_imx6_realize;
+-
+     dc->desc = "i.MX6 SOC";
++    /* Reason: Uses serial_hds[] in the realize() function */
++    dc->user_creatable = false;
+ }
+ 
+ static const TypeInfo fsl_imx6_type_info = {
+-- 
+2.7.4
