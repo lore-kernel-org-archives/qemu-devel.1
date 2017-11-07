@@ -1,28 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56934)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36319)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1eBvFk-0003TW-Ej
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 23:12:48 -0500
+	(envelope-from <bounces@canonical.com>) id 1eBvX3-0005bz-Tt
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 23:30:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1eBvFf-00081J-Eg
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 23:12:44 -0500
-Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:49915)
+	(envelope-from <bounces@canonical.com>) id 1eBvX0-0005vA-Lg
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 23:30:37 -0500
+Received: from indium.canonical.com ([91.189.90.7]:52310)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1eBvFf-00080S-6r
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 23:12:39 -0500
-Received: by mail-pf0-x241.google.com with SMTP id i5so9378591pfe.6
-	for <qemu-devel@nongnu.org>; Mon, 06 Nov 2017 20:12:38 -0800 (PST)
-References: <20171103153333.6416-1-berrange@redhat.com>
-	<20171103153333.6416-6-berrange@redhat.com>
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Message-ID: <d1704cf4-d3d4-cc69-df96-1298c11e1295@ozlabs.ru>
-Date: Tue, 7 Nov 2017 15:12:32 +1100
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eBvX0-0005u2-FN
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 23:30:34 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eBvWz-0000LB-K7
+	for <qemu-devel@nongnu.org>; Tue, 07 Nov 2017 04:30:33 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 954FA2E80C3
+	for <qemu-devel@nongnu.org>; Tue,  7 Nov 2017 04:30:33 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20171103153333.6416-6-berrange@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-AU
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 5/5] build: delay check for empty git
- submodule list
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 07 Nov 2017 04:17:32 -0000
+From: Launchpad Bug Tracker <1355644@bugs.launchpad.net>
+Reply-To: Bug 1355644 <1355644@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20140812073520.4928.24191.malonedeb@gac.canonical.com>
+Message-Id: <151002825241.21207.15891612641998670189.malone@loganberry.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1355644] Re: windows7 reboot bluesreen 0x0000005c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,82 +36,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Eric Blake <eblake@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
 
-On 04/11/17 02:33, Daniel P. Berrange wrote:
-> We short circuit the git submodule update when passed an empty module list.
-> This accidentally causes the 'status' command to write to the status file. The
-> test needs to be delayed into the individual commands to avoid this premature
-> writing of the status file.
-> 
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> ---
->  scripts/git-submodule.sh | 19 ++++++++++++-------
->  1 file changed, 12 insertions(+), 7 deletions(-)
-> 
-> diff --git a/scripts/git-submodule.sh b/scripts/git-submodule.sh
-> index 2857fc57c4..90376a7dae 100755
-> --- a/scripts/git-submodule.sh
-> +++ b/scripts/git-submodule.sh
-> @@ -33,12 +33,6 @@ error() {
->      exit 1
->  }
->  
-> -if test -z "$maybe_modules"
-> -then
-> -    test -e $substat || touch $substat
-> -    exit 0
-> -fi
-> -
->  modules=""
->  for m in $maybe_modules
->  do
-> @@ -51,7 +45,7 @@ do
->      fi
->  done
->  
-> -if ! test -e ".git"
-> +if test -n "$maybe_modules" && ! test -e ".git"
+[Expired for QEMU because there has been no activity for 60 days.]
 
+** Changed in: qemu
+       Status: Incomplete =3D> Expired
 
-$GIT_DIR should be checked too imho:
+-- =
 
-if test -n "$maybe_modules" && ! test -e ".git" && test "$GIT_DIR" = ""
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1355644
 
+Title:
+  windows7 reboot bluesreen 0x0000005c
 
+Status in QEMU:
+  Expired
 
+Bug description:
+  I have met sevaral blue screen with 0x0000005c(0x0000010b,0x00000003,0x00=
+000000,0x00000000) after windows7 reboot.
+  It always happens just before the windows iron animation appears.
 
->  then
->      echo "$0: unexpectedly called with submodules but no git checkout exists"
->      exit 1
-> @@ -59,6 +53,11 @@ fi
->  
->  case "$command" in
->  status)
-> +    if test -z "$maybe_modules"
-> +    then
-> +         test -s ${substat} && exit 1 || exit 0
-> +    fi
-> +
->      test -f "$substat" || exit 1
->      CURSTATUS=`$GIT submodule status $modules`
->      OLDSTATUS=`cat $substat`
-> @@ -66,6 +65,12 @@ status)
->      exit $?
->      ;;
->  update)
-> +    if test -z "$maybe_modules"
-> +    then
-> +        test -e $substat || touch $substat
-> +        exit 0
-> +    fi
-> +
->      $GIT submodule update --init $modules 1>/dev/null
->      test $? -ne 0 && error "failed to update modules"
->  
-> 
+  my qemu version is qemu-2.1.0
+  my guest os is windows7 32bits sp1
 
+  my qemu commandline is =
 
--- 
-Alexey
+  ./x86_64-softmmu/qemu-system-x86_64 -m 2048 -hda system.inst -spice port=
+=3D5940,disable-ticketing -monitor stdio --enable-kvm
+
+  This bug  doesn't happen always=EF=BC=8Cand i don=E2=80=98t know how to r=
+eproduce it.
+
+  But i have a special way to produce such a bluescreen.
+  I set nmi dump on and set windows to collect dump file and set auto reboo=
+t after system fail on. =
+
+  Then i send a nmi to guest, and then after collecting dump file , windows=
+ will auto reboot and then such a blue screen happens.
+  And this can be  reproduced always.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1355644/+subscriptions
