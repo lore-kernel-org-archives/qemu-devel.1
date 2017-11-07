@@ -1,14 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40607)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40615)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eBuGO-0003wl-Cy
+	(envelope-from <eblake@redhat.com>) id 1eBuGO-0003x6-UL
 	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 22:09:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eBuGN-00071B-LB
+	(envelope-from <eblake@redhat.com>) id 1eBuGO-00071P-1H
 	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 22:09:20 -0500
 From: Eric Blake <eblake@redhat.com>
-Date: Mon,  6 Nov 2017 21:09:10 -0600
-Message-Id: <20171107030912.23930-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH 0/2] Optimize sparse reads over NBD
+Date: Mon,  6 Nov 2017 21:09:12 -0600
+Message-Id: <20171107030912.23930-3-eblake@redhat.com>
+In-Reply-To: <20171107030912.23930-1-eblake@redhat.com>
+References: <20171107030912.23930-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH 2/2] nbd/server: Optimize final chunk of sparse
+ read
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,30 +23,73 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, pbonzini@redhat.com, vsementsov@virtuozzo.com
 
-When I first proposed the NBD extension of structured reads,
-it was in order to more efficiently read sparse files without
-sending lots of zeroes over the wire.  These two patches feel
-like a feature addition, and missed soft freeze, so I'm
-reluctant to include them in a 2.11 pull request; on the other
-hand, implementing structured replies without sparse reads is
-a rather incomplete feature addition even if it complies with
-the NBD spec.  Since structured replies is a new 2.11 feature,
-I could argue that it is a bug if the new feature does not go
-all the way to sparse reads.
+If we are careful to handle 0-length read requests correctly,
+we can optimize our sparse read to send the NBD_REPLY_FLAG_DONE
+bit on our last OFFSET_DATA or OFFSET_HOLE chunk rather than
+needing a separate chunk.
 
-I've posted this as two patches, but welcome opinions on whether
-it should be squashed into one.
+Signed-off-by: Eric Blake <eblake@redhat.com>
+---
+ nbd/server.c | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
 
-Based-on: 20171107030236.23633-1-eblake@redhat.com
-([PATCH 0/8] various NBD fixes for 2.11)
+diff --git a/nbd/server.c b/nbd/server.c
+index 3c5e3005a6..cde61d2461 100644
+--- a/nbd/server.c
++++ b/nbd/server.c
+@@ -1329,12 +1329,14 @@ static int coroutine_fn nbd_co_send_sparse_read(NBDClient *client,
+                                              offset + progress,
+                                              size - progress, &pnum, NULL,
+                                              NULL);
++        bool final;
 
-Eric Blake (2):
-  nbd/server: Implement sparse reads atop structured reply
-  nbd/server: Optimize final chunk of sparse read
+         if (status < 0) {
+             error_setg_errno(errp, -status, "unable to check for holes");
+             return status;
+         }
+         assert(pnum && pnum <= size - progress);
++        final = progress + pnum == size;
+         if (status & BDRV_BLOCK_ZERO) {
+             NBDStructuredReadHole chunk;
+             struct iovec iov[] = {
+@@ -1343,7 +1345,8 @@ static int coroutine_fn nbd_co_send_sparse_read(NBDClient *client,
 
- nbd/server.c     | 79 +++++++++++++++++++++++++++++++++++++++++++++++++++++---
- nbd/trace-events |  1 +
- 2 files changed, 77 insertions(+), 3 deletions(-)
+             trace_nbd_co_send_structured_read_hole(handle, offset + progress,
+                                                    pnum);
+-            set_be_chunk(&chunk.h, 0, NBD_REPLY_TYPE_OFFSET_HOLE,
++            set_be_chunk(&chunk.h, final ? NBD_REPLY_FLAG_DONE : 0,
++                         NBD_REPLY_TYPE_OFFSET_HOLE,
+                          handle, sizeof(chunk) - sizeof(chunk.h));
+             stq_be_p(&chunk.offset, offset + progress);
+             stl_be_p(&chunk.length, pnum);
+@@ -1356,7 +1359,7 @@ static int coroutine_fn nbd_co_send_sparse_read(NBDClient *client,
+                 break;
+             }
+             ret = nbd_co_send_structured_read(client, handle, offset + progress,
+-                                              data + progress, pnum, false,
++                                              data + progress, pnum, final,
+                                               errp);
+         }
 
+@@ -1365,9 +1368,6 @@ static int coroutine_fn nbd_co_send_sparse_read(NBDClient *client,
+         }
+         progress += pnum;
+     }
+-    if (!ret) {
+-        ret = nbd_co_send_structured_done(client, handle, errp);
+-    }
+     return ret;
+ }
+
+@@ -1532,7 +1532,8 @@ static coroutine_fn void nbd_trip(void *opaque)
+             }
+         }
+
+-        if (client->structured_reply && !(request.flags & NBD_CMD_FLAG_DF)) {
++        if (client->structured_reply && !(request.flags & NBD_CMD_FLAG_DF) &&
++            request.len) {
+             ret = nbd_co_send_sparse_read(req->client, request.handle,
+                                           request.from, req->data, request.len,
+                                           &local_err);
 -- 
 2.13.6
