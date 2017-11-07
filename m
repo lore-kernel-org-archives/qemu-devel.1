@@ -1,18 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33564)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33587)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1eCCLN-00009G-89
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 17:27:42 -0500
+	(envelope-from <jcody@redhat.com>) id 1eCCLO-0000Al-Ai
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 17:27:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1eCCLL-0004cO-NG
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 17:27:41 -0500
+	(envelope-from <jcody@redhat.com>) id 1eCCLM-0004f3-NG
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 17:27:42 -0500
 From: Jeff Cody <jcody@redhat.com>
-Date: Tue,  7 Nov 2017 17:27:21 -0500
-Message-Id: <8a612e6e2f30e4c3fb367270f78d359e881ac1e6.1510093478.git.jcody@redhat.com>
+Date: Tue,  7 Nov 2017 17:27:24 -0500
+Message-Id: <41ed8543e005205118438328c7e162532729d9c7.1510093478.git.jcody@redhat.com>
 In-Reply-To: <cover.1510093478.git.jcody@redhat.com>
 References: <cover.1510093478.git.jcody@redhat.com>
 In-Reply-To: <cover.1510093478.git.jcody@redhat.com>
 References: <cover.1510093478.git.jcody@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 4/7] block/sheepdog: code beautification
+Subject: [Qemu-devel] [PATCH v3 7/7] block/curl: code cleanup to comply with
+ coding style
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,219 +25,240 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, rjones@redhat.com, kwolf@redhat.com, eblake@redhat.com
 
-No functional changes, just whitespace manipulation.
+This addresses non-functional changes to help curl.c better comply
+with the coding styles (comments, indentation, brackets, etc.).
+
+One minor code change is the combination of two if statements into
+a single if statement.
 
 Signed-off-by: Jeff Cody <jcody@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- block/sheepdog.c | 164 +++++++++++++++++++++++++++----------------------------
- 1 file changed, 82 insertions(+), 82 deletions(-)
+ block/curl.c | 100 +++++++++++++++++++++++++++++++----------------------------
+ 1 file changed, 52 insertions(+), 48 deletions(-)
 
-diff --git a/block/sheepdog.c b/block/sheepdog.c
-index 459d93a..488bad3 100644
---- a/block/sheepdog.c
-+++ b/block/sheepdog.c
-@@ -400,7 +400,7 @@ typedef struct BDRVSheepdogReopenState {
-     int cache_flags;
- } BDRVSheepdogReopenState;
+diff --git a/block/curl.c b/block/curl.c
+index 35cf417..7a6dd44 100644
+--- a/block/curl.c
++++ b/block/curl.c
+@@ -32,8 +32,10 @@
+ #include <curl/curl.h>
+ #include "qemu/cutils.h"
  
--static const char * sd_strerror(int err)
-+static const char *sd_strerror(int err)
+-// #define DEBUG_CURL
+-// #define DEBUG_VERBOSE
++/*
++ #define DEBUG_CURL
++ #define DEBUG_VERBOSE
++*/
+ 
+ #ifdef DEBUG_CURL
+ #define DEBUG_CURL_PRINT 1
+@@ -76,15 +78,15 @@ static CURLMcode __curl_multi_socket_action(CURLM *multi_handle,
+ #define CURL_TIMEOUT_DEFAULT 5
+ #define CURL_TIMEOUT_MAX 10000
+ 
+-#define CURL_BLOCK_OPT_URL       "url"
+-#define CURL_BLOCK_OPT_READAHEAD "readahead"
+-#define CURL_BLOCK_OPT_SSLVERIFY "sslverify"
+-#define CURL_BLOCK_OPT_TIMEOUT "timeout"
+-#define CURL_BLOCK_OPT_COOKIE    "cookie"
+-#define CURL_BLOCK_OPT_COOKIE_SECRET "cookie-secret"
+-#define CURL_BLOCK_OPT_USERNAME "username"
+-#define CURL_BLOCK_OPT_PASSWORD_SECRET "password-secret"
+-#define CURL_BLOCK_OPT_PROXY_USERNAME "proxy-username"
++#define CURL_BLOCK_OPT_URL                   "url"
++#define CURL_BLOCK_OPT_READAHEAD             "readahead"
++#define CURL_BLOCK_OPT_SSLVERIFY             "sslverify"
++#define CURL_BLOCK_OPT_TIMEOUT               "timeout"
++#define CURL_BLOCK_OPT_COOKIE                "cookie"
++#define CURL_BLOCK_OPT_COOKIE_SECRET         "cookie-secret"
++#define CURL_BLOCK_OPT_USERNAME              "username"
++#define CURL_BLOCK_OPT_PASSWORD_SECRET       "password-secret"
++#define CURL_BLOCK_OPT_PROXY_USERNAME        "proxy-username"
+ #define CURL_BLOCK_OPT_PROXY_PASSWORD_SECRET "proxy-password-secret"
+ 
+ struct BDRVCURLState;
+@@ -110,8 +112,7 @@ typedef struct CURLSocket {
+     QLIST_ENTRY(CURLSocket) next;
+ } CURLSocket;
+ 
+-typedef struct CURLState
+-{
++typedef struct CURLState {
+     struct BDRVCURLState *s;
+     CURLAIOCB *acb[CURL_NUM_ACB];
+     CURL *curl;
+@@ -196,22 +197,22 @@ static int curl_sock_cb(CURL *curl, curl_socket_t fd, int action,
+ 
+     DPRINTF("CURL (AIO): Sock action %d on fd %d\n", action, (int)fd);
+     switch (action) {
+-        case CURL_POLL_IN:
+-            aio_set_fd_handler(s->aio_context, fd, false,
+-                               curl_multi_read, NULL, NULL, state);
+-            break;
+-        case CURL_POLL_OUT:
+-            aio_set_fd_handler(s->aio_context, fd, false,
+-                               NULL, curl_multi_do, NULL, state);
+-            break;
+-        case CURL_POLL_INOUT:
+-            aio_set_fd_handler(s->aio_context, fd, false,
+-                               curl_multi_read, curl_multi_do, NULL, state);
+-            break;
+-        case CURL_POLL_REMOVE:
+-            aio_set_fd_handler(s->aio_context, fd, false,
+-                               NULL, NULL, NULL, NULL);
+-            break;
++    case CURL_POLL_IN:
++        aio_set_fd_handler(s->aio_context, fd, false,
++                           curl_multi_read, NULL, NULL, state);
++        break;
++    case CURL_POLL_OUT:
++        aio_set_fd_handler(s->aio_context, fd, false,
++                           NULL, curl_multi_do, NULL, state);
++        break;
++    case CURL_POLL_INOUT:
++        aio_set_fd_handler(s->aio_context, fd, false,
++                           curl_multi_read, curl_multi_do, NULL, state);
++        break;
++    case CURL_POLL_REMOVE:
++        aio_set_fd_handler(s->aio_context, fd, false,
++                           NULL, NULL, NULL, NULL);
++        break;
+     }
+ 
+     return 0;
+@@ -235,7 +236,7 @@ static size_t curl_header_cb(void *ptr, size_t size, size_t nmemb, void *opaque)
+ /* Called from curl_multi_do_locked, with s->mutex held.  */
+ static size_t curl_read_cb(void *ptr, size_t size, size_t nmemb, void *opaque)
  {
+-    CURLState *s = ((CURLState*)opaque);
++    CURLState *s = opaque;
+     size_t realsize = size * nmemb;
      int i;
  
-@@ -3078,111 +3078,111 @@ static QemuOptsList sd_create_opts = {
- };
+@@ -253,11 +254,12 @@ static size_t curl_read_cb(void *ptr, size_t size, size_t nmemb, void *opaque)
+     memcpy(s->orig_buf + s->buf_off, ptr, realsize);
+     s->buf_off += realsize;
  
- static BlockDriver bdrv_sheepdog = {
--    .format_name    = "sheepdog",
--    .protocol_name  = "sheepdog",
--    .instance_size  = sizeof(BDRVSheepdogState),
--    .bdrv_parse_filename    = sd_parse_filename,
--    .bdrv_file_open = sd_open,
--    .bdrv_reopen_prepare    = sd_reopen_prepare,
--    .bdrv_reopen_commit     = sd_reopen_commit,
--    .bdrv_reopen_abort      = sd_reopen_abort,
--    .bdrv_close     = sd_close,
--    .bdrv_create    = sd_create,
--    .bdrv_has_zero_init = bdrv_has_zero_init_1,
--    .bdrv_getlength = sd_getlength,
-+    .format_name                  = "sheepdog",
-+    .protocol_name                = "sheepdog",
-+    .instance_size                = sizeof(BDRVSheepdogState),
-+    .bdrv_parse_filename          = sd_parse_filename,
-+    .bdrv_file_open               = sd_open,
-+    .bdrv_reopen_prepare          = sd_reopen_prepare,
-+    .bdrv_reopen_commit           = sd_reopen_commit,
-+    .bdrv_reopen_abort            = sd_reopen_abort,
-+    .bdrv_close                   = sd_close,
-+    .bdrv_create                  = sd_create,
-+    .bdrv_has_zero_init           = bdrv_has_zero_init_1,
-+    .bdrv_getlength               = sd_getlength,
-     .bdrv_get_allocated_file_size = sd_get_allocated_file_size,
--    .bdrv_truncate  = sd_truncate,
-+    .bdrv_truncate                = sd_truncate,
+-    for(i=0; i<CURL_NUM_ACB; i++) {
++    for (i = 0; i < CURL_NUM_ACB; i++) {
+         CURLAIOCB *acb = s->acb[i];
  
--    .bdrv_co_readv  = sd_co_readv,
--    .bdrv_co_writev = sd_co_writev,
--    .bdrv_co_flush_to_disk  = sd_co_flush_to_disk,
--    .bdrv_co_pdiscard = sd_co_pdiscard,
--    .bdrv_co_get_block_status = sd_co_get_block_status,
-+    .bdrv_co_readv                = sd_co_readv,
-+    .bdrv_co_writev               = sd_co_writev,
-+    .bdrv_co_flush_to_disk        = sd_co_flush_to_disk,
-+    .bdrv_co_pdiscard             = sd_co_pdiscard,
-+    .bdrv_co_get_block_status     = sd_co_get_block_status,
+-        if (!acb)
++        if (!acb) {
+             continue;
++        }
  
--    .bdrv_snapshot_create   = sd_snapshot_create,
--    .bdrv_snapshot_goto     = sd_snapshot_goto,
--    .bdrv_snapshot_delete   = sd_snapshot_delete,
--    .bdrv_snapshot_list     = sd_snapshot_list,
-+    .bdrv_snapshot_create         = sd_snapshot_create,
-+    .bdrv_snapshot_goto           = sd_snapshot_goto,
-+    .bdrv_snapshot_delete         = sd_snapshot_delete,
-+    .bdrv_snapshot_list           = sd_snapshot_list,
+         if ((s->buf_off >= acb->end)) {
+             size_t request_length = acb->bytes;
+@@ -293,17 +295,16 @@ static bool curl_find_buf(BDRVCURLState *s, uint64_t start, uint64_t len,
+     uint64_t clamped_end = MIN(end, s->len);
+     uint64_t clamped_len = clamped_end - start;
  
--    .bdrv_save_vmstate  = sd_save_vmstate,
--    .bdrv_load_vmstate  = sd_load_vmstate,
-+    .bdrv_save_vmstate            = sd_save_vmstate,
-+    .bdrv_load_vmstate            = sd_load_vmstate,
+-    for (i=0; i<CURL_NUM_STATES; i++) {
++    for (i = 0; i < CURL_NUM_STATES; i++) {
+         CURLState *state = &s->states[i];
+         uint64_t buf_end = (state->buf_start + state->buf_off);
+         uint64_t buf_fend = (state->buf_start + state->buf_len);
  
--    .bdrv_detach_aio_context = sd_detach_aio_context,
--    .bdrv_attach_aio_context = sd_attach_aio_context,
-+    .bdrv_detach_aio_context      = sd_detach_aio_context,
-+    .bdrv_attach_aio_context      = sd_attach_aio_context,
+-        if (!state->orig_buf)
+-            continue;
+-        if (!state->buf_off)
++        if (!state->orig_buf || !state->buf_off) {
+             continue;
++        }
  
--    .create_opts    = &sd_create_opts,
-+    .create_opts                  = &sd_create_opts,
- };
+-        // Does the existing buffer cover our section?
++        /* Does the existing buffer cover our section? */
+         if ((start >= state->buf_start) &&
+             (start <= buf_end) &&
+             (clamped_end >= state->buf_start) &&
+@@ -319,7 +320,7 @@ static bool curl_find_buf(BDRVCURLState *s, uint64_t start, uint64_t len,
+             return true;
+         }
  
- static BlockDriver bdrv_sheepdog_tcp = {
--    .format_name    = "sheepdog",
--    .protocol_name  = "sheepdog+tcp",
--    .instance_size  = sizeof(BDRVSheepdogState),
--    .bdrv_parse_filename    = sd_parse_filename,
--    .bdrv_file_open = sd_open,
--    .bdrv_reopen_prepare    = sd_reopen_prepare,
--    .bdrv_reopen_commit     = sd_reopen_commit,
--    .bdrv_reopen_abort      = sd_reopen_abort,
--    .bdrv_close     = sd_close,
--    .bdrv_create    = sd_create,
--    .bdrv_has_zero_init = bdrv_has_zero_init_1,
--    .bdrv_getlength = sd_getlength,
-+    .format_name                  = "sheepdog",
-+    .protocol_name                = "sheepdog+tcp",
-+    .instance_size                = sizeof(BDRVSheepdogState),
-+    .bdrv_parse_filename          = sd_parse_filename,
-+    .bdrv_file_open               = sd_open,
-+    .bdrv_reopen_prepare          = sd_reopen_prepare,
-+    .bdrv_reopen_commit           = sd_reopen_commit,
-+    .bdrv_reopen_abort            = sd_reopen_abort,
-+    .bdrv_close                   = sd_close,
-+    .bdrv_create                  = sd_create,
-+    .bdrv_has_zero_init           = bdrv_has_zero_init_1,
-+    .bdrv_getlength               = sd_getlength,
-     .bdrv_get_allocated_file_size = sd_get_allocated_file_size,
--    .bdrv_truncate  = sd_truncate,
-+    .bdrv_truncate                = sd_truncate,
+-        // Wait for unfinished chunks
++        /* Wait for unfinished chunks */
+         if (state->in_use &&
+             (start >= state->buf_start) &&
+             (start <= buf_fend) &&
+@@ -331,7 +332,7 @@ static bool curl_find_buf(BDRVCURLState *s, uint64_t start, uint64_t len,
+             acb->start = start - state->buf_start;
+             acb->end = acb->start + clamped_len;
  
--    .bdrv_co_readv  = sd_co_readv,
--    .bdrv_co_writev = sd_co_writev,
--    .bdrv_co_flush_to_disk  = sd_co_flush_to_disk,
--    .bdrv_co_pdiscard = sd_co_pdiscard,
--    .bdrv_co_get_block_status = sd_co_get_block_status,
-+    .bdrv_co_readv                = sd_co_readv,
-+    .bdrv_co_writev               = sd_co_writev,
-+    .bdrv_co_flush_to_disk        = sd_co_flush_to_disk,
-+    .bdrv_co_pdiscard             = sd_co_pdiscard,
-+    .bdrv_co_get_block_status     = sd_co_get_block_status,
+-            for (j=0; j<CURL_NUM_ACB; j++) {
++            for (j = 0; j < CURL_NUM_ACB; j++) {
+                 if (!state->acb[j]) {
+                     state->acb[j] = acb;
+                     return true;
+@@ -355,8 +356,9 @@ static void curl_multi_check_completion(BDRVCURLState *s)
+         msg = curl_multi_info_read(s->multi, &msgs_in_queue);
  
--    .bdrv_snapshot_create   = sd_snapshot_create,
--    .bdrv_snapshot_goto     = sd_snapshot_goto,
--    .bdrv_snapshot_delete   = sd_snapshot_delete,
--    .bdrv_snapshot_list     = sd_snapshot_list,
-+    .bdrv_snapshot_create         = sd_snapshot_create,
-+    .bdrv_snapshot_goto           = sd_snapshot_goto,
-+    .bdrv_snapshot_delete         = sd_snapshot_delete,
-+    .bdrv_snapshot_list           = sd_snapshot_list,
+         /* Quit when there are no more completions */
+-        if (!msg)
++        if (!msg) {
+             break;
++        }
  
--    .bdrv_save_vmstate  = sd_save_vmstate,
--    .bdrv_load_vmstate  = sd_load_vmstate,
-+    .bdrv_save_vmstate            = sd_save_vmstate,
-+    .bdrv_load_vmstate            = sd_load_vmstate,
+         if (msg->msg == CURLMSG_DONE) {
+             CURLState *state = NULL;
+@@ -540,12 +542,14 @@ static void curl_clean_state(CURLState *s)
+ {
+     CURLAIOCB *next;
+     int j;
++
+     for (j = 0; j < CURL_NUM_ACB; j++) {
+         assert(!s->acb[j]);
+     }
  
--    .bdrv_detach_aio_context = sd_detach_aio_context,
--    .bdrv_attach_aio_context = sd_attach_aio_context,
-+    .bdrv_detach_aio_context      = sd_detach_aio_context,
-+    .bdrv_attach_aio_context      = sd_attach_aio_context,
+-    if (s->s->multi)
++    if (s->s->multi) {
+         curl_multi_remove_handle(s->s->multi, s->curl);
++    }
  
--    .create_opts    = &sd_create_opts,
-+    .create_opts                  = &sd_create_opts,
- };
+     while (!QLIST_EMPTY(&s->sockets)) {
+         CURLSocket *socket = QLIST_FIRST(&s->sockets);
+@@ -794,7 +798,7 @@ static int curl_open(BlockDriverState *bs, QDict *options, int flags,
+         goto out_noclean;
+     }
  
- static BlockDriver bdrv_sheepdog_unix = {
--    .format_name    = "sheepdog",
--    .protocol_name  = "sheepdog+unix",
--    .instance_size  = sizeof(BDRVSheepdogState),
--    .bdrv_parse_filename    = sd_parse_filename,
--    .bdrv_file_open = sd_open,
--    .bdrv_reopen_prepare    = sd_reopen_prepare,
--    .bdrv_reopen_commit     = sd_reopen_commit,
--    .bdrv_reopen_abort      = sd_reopen_abort,
--    .bdrv_close     = sd_close,
--    .bdrv_create    = sd_create,
--    .bdrv_has_zero_init = bdrv_has_zero_init_1,
--    .bdrv_getlength = sd_getlength,
-+    .format_name                  = "sheepdog",
-+    .protocol_name                = "sheepdog+unix",
-+    .instance_size                = sizeof(BDRVSheepdogState),
-+    .bdrv_parse_filename          = sd_parse_filename,
-+    .bdrv_file_open               = sd_open,
-+    .bdrv_reopen_prepare          = sd_reopen_prepare,
-+    .bdrv_reopen_commit           = sd_reopen_commit,
-+    .bdrv_reopen_abort            = sd_reopen_abort,
-+    .bdrv_close                   = sd_close,
-+    .bdrv_create                  = sd_create,
-+    .bdrv_has_zero_init           = bdrv_has_zero_init_1,
-+    .bdrv_getlength               = sd_getlength,
-     .bdrv_get_allocated_file_size = sd_get_allocated_file_size,
--    .bdrv_truncate  = sd_truncate,
-+    .bdrv_truncate                = sd_truncate,
+-    // Get file size
++    /* Get file size */
  
--    .bdrv_co_readv  = sd_co_readv,
--    .bdrv_co_writev = sd_co_writev,
--    .bdrv_co_flush_to_disk  = sd_co_flush_to_disk,
--    .bdrv_co_pdiscard = sd_co_pdiscard,
--    .bdrv_co_get_block_status = sd_co_get_block_status,
-+    .bdrv_co_readv                = sd_co_readv,
-+    .bdrv_co_writev               = sd_co_writev,
-+    .bdrv_co_flush_to_disk        = sd_co_flush_to_disk,
-+    .bdrv_co_pdiscard             = sd_co_pdiscard,
-+    .bdrv_co_get_block_status     = sd_co_get_block_status,
+     if (curl_init_state(s, state) < 0) {
+         goto out;
+@@ -802,11 +806,11 @@ static int curl_open(BlockDriverState *bs, QDict *options, int flags,
  
--    .bdrv_snapshot_create   = sd_snapshot_create,
--    .bdrv_snapshot_goto     = sd_snapshot_goto,
--    .bdrv_snapshot_delete   = sd_snapshot_delete,
--    .bdrv_snapshot_list     = sd_snapshot_list,
-+    .bdrv_snapshot_create         = sd_snapshot_create,
-+    .bdrv_snapshot_goto           = sd_snapshot_goto,
-+    .bdrv_snapshot_delete         = sd_snapshot_delete,
-+    .bdrv_snapshot_list           = sd_snapshot_list,
+     s->accept_range = false;
+     curl_easy_setopt(state->curl, CURLOPT_NOBODY, 1);
+-    curl_easy_setopt(state->curl, CURLOPT_HEADERFUNCTION,
+-                     curl_header_cb);
++    curl_easy_setopt(state->curl, CURLOPT_HEADERFUNCTION, curl_header_cb);
+     curl_easy_setopt(state->curl, CURLOPT_HEADERDATA, s);
+-    if (curl_easy_perform(state->curl))
++    if (curl_easy_perform(state->curl)) {
+         goto out;
++    }
+     if (curl_easy_getinfo(state->curl, CURLINFO_CONTENT_LENGTH_DOWNLOAD, &d)) {
+         goto out;
+     }
+@@ -876,13 +880,13 @@ static void curl_setup_preadv(BlockDriverState *bs, CURLAIOCB *acb)
  
--    .bdrv_save_vmstate  = sd_save_vmstate,
--    .bdrv_load_vmstate  = sd_load_vmstate,
-+    .bdrv_save_vmstate            = sd_save_vmstate,
-+    .bdrv_load_vmstate            = sd_load_vmstate,
+     qemu_mutex_lock(&s->mutex);
  
--    .bdrv_detach_aio_context = sd_detach_aio_context,
--    .bdrv_attach_aio_context = sd_attach_aio_context,
-+    .bdrv_detach_aio_context      = sd_detach_aio_context,
-+    .bdrv_attach_aio_context      = sd_attach_aio_context,
+-    // In case we have the requested data already (e.g. read-ahead),
+-    // we can just call the callback and be done.
++    /* In case we have the requested data already (e.g. read-ahead),
++       we can just call the callback and be done. */
+     if (curl_find_buf(s, start, acb->bytes, acb)) {
+         goto out;
+     }
  
--    .create_opts    = &sd_create_opts,
-+    .create_opts                  = &sd_create_opts,
- };
- 
- static void bdrv_sheepdog_init(void)
+-    // No cache found, so let's start a new request
++    /* No cache found, so let's start a new request */
+     for (;;) {
+         state = curl_find_state(s);
+         if (state) {
 -- 
 2.9.5
