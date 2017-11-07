@@ -1,21 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59805)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33338)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eC5IA-0001We-As
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 09:55:59 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1eC5NS-0004Qx-LN
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 10:01:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eC5I6-0002VL-9p
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 09:55:54 -0500
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:45406)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1eC5I6-0002UV-4I
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 09:55:50 -0500
-Received: by mail-wm0-x243.google.com with SMTP id y80so4311185wmd.0
-	for <qemu-devel@nongnu.org>; Tue, 07 Nov 2017 06:55:49 -0800 (PST)
-From: Richard Henderson <richard.henderson@linaro.org>
-Date: Tue,  7 Nov 2017 15:55:46 +0100
-Message-Id: <20171107145546.767-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH] target/s390x: Finish implementing RISBGN
+	(envelope-from <pm215@archaic.org.uk>) id 1eC5NM-0005LG-I0
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 10:01:22 -0500
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue,  7 Nov 2017 15:01:38 +0000
+Message-Id: <1510066898-3725-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH for-2.11] target/arm: Report GICv3 sysregs
+ present in ID registers if needed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,53 +18,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, qemu-s390x@nongnu.org
+To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org, Stefano Stabellini <sstabellini@kernel.org>
 
-We added the entry to insn-data.def, but failed to update op_risbg
-to match.  No need to special-case the imask inversion, since that
-is already ~0 for RISBG (and now RISBGN).
+The CPU ID registers ID_AA64PFR0_EL1, ID_PFR1_EL1 and ID_PFR1
+have a field for reporting presence of GICv3 system registers.
+We need to report this field correctly in order for Xen to
+work as a guest inside QEMU emulation. We mustn't incorrectly
+claim the sysregs exist when they don't, though, or Linux will
+crash.
 
-Fixes: 375ee58bedcda359011fe7fa99e0647f66f9ffa0
-Fixes: https://bugs.launchpad.net/qemu/+bug/1701798 (s390x part)
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Unfortunately the way we've designed the GICv3 emulation in QEMU
+puts the system registers as part of the GICv3 device, which
+may be created after the CPU proper has been realized. This
+means that we don't know at the point when we define the ID
+registers what the correct value is. Handle this by switching
+them to calling a function at runtime to read the value, where
+we can fill in the GIC field appropriately.
+
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/s390x/translate.c | 9 +++------
- 1 file changed, 3 insertions(+), 6 deletions(-)
+In retrospect I think having the sysregs emulation in the
+GIC device was a bit of a design error -- we should have
+split it like the hardware does, with a defined protocol
+between the GIC and the CPU interface. (In real hardware the
+CPU can have the GIC system registers even though it's not
+connected to an actual GICv3, and we don't/can't emulate
+that with our current design.)
+---
+ target/arm/helper.c | 44 ++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 40 insertions(+), 4 deletions(-)
 
-diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index dee72a787d..85d0a6c3af 100644
---- a/target/s390x/translate.c
-+++ b/target/s390x/translate.c
-@@ -3432,6 +3432,7 @@ static ExitStatus op_risbg(DisasContext *s, DisasOps *o)
-     /* Adjust the arguments for the specific insn.  */
-     switch (s->fields->op2) {
-     case 0x55: /* risbg */
-+    case 0x59: /* risbgn */
-         i3 &= 63;
-         i4 &= 63;
-         pmask = ~0;
-@@ -3447,7 +3448,7 @@ static ExitStatus op_risbg(DisasContext *s, DisasOps *o)
-         pmask = 0x00000000ffffffffull;
-         break;
-     default:
--        abort();
-+        g_assert_not_reached();
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index f61fb3e..35c5bd6 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -4549,6 +4549,33 @@ static void define_debug_regs(ARMCPU *cpu)
      }
+ }
  
-     /* MASK is the set of bits to be inserted from R2.
-@@ -3464,11 +3465,7 @@ static ExitStatus op_risbg(DisasContext *s, DisasOps *o)
-        insns, we need to keep the other half of the register.  */
-     imask = ~mask | ~pmask;
-     if (do_zero) {
--        if (s->fields->op2 == 0x55) {
--            imask = 0;
--        } else {
--            imask = ~pmask;
--        }
-+        imask = ~pmask;
-     }
- 
-     len = i4 - i3 + 1;
++/* We don't know until after realize whether there's a GICv3
++ * attached, and that is what registers the gicv3 sysregs.
++ * So we have to fill in the GIC fields in ID_PFR/ID_PFR1_EL1/ID_AA64PFR0_EL1
++ * at runtime.
++ */
++static uint64_t id_pfr1_read(CPUARMState *env, const ARMCPRegInfo *ri)
++{
++    ARMCPU *cpu = arm_env_get_cpu(env);
++    uint64_t pfr1 = cpu->id_pfr1;
++
++    if (env->gicv3state) {
++        pfr1 |= 1 << 28;
++    }
++    return pfr1;
++}
++
++static uint64_t id_aa64pfr0_read(CPUARMState *env, const ARMCPRegInfo *ri)
++{
++    ARMCPU *cpu = arm_env_get_cpu(env);
++    uint64_t pfr0 = cpu->id_aa64pfr0;
++
++    if (env->gicv3state) {
++        pfr0 |= 1 << 24;
++    }
++    return pfr0;
++}
++
+ void register_cp_regs_for_features(ARMCPU *cpu)
+ {
+     /* Register all the coprocessor registers based on feature bits */
+@@ -4573,10 +4600,14 @@ void register_cp_regs_for_features(ARMCPU *cpu)
+               .opc0 = 3, .opc1 = 0, .crn = 0, .crm = 1, .opc2 = 0,
+               .access = PL1_R, .type = ARM_CP_CONST,
+               .resetvalue = cpu->id_pfr0 },
++            /* ID_PFR1 is not a plain ARM_CP_CONST because we don't know
++             * the value of the GIC field until after we define these regs.
++             */
+             { .name = "ID_PFR1", .state = ARM_CP_STATE_BOTH,
+               .opc0 = 3, .opc1 = 0, .crn = 0, .crm = 1, .opc2 = 1,
+-              .access = PL1_R, .type = ARM_CP_CONST,
+-              .resetvalue = cpu->id_pfr1 },
++              .access = PL1_R, .type = ARM_CP_NO_RAW,
++              .readfn = id_pfr1_read,
++              .writefn = arm_cp_write_ignore },
+             { .name = "ID_DFR0", .state = ARM_CP_STATE_BOTH,
+               .opc0 = 3, .opc1 = 0, .crn = 0, .crm = 1, .opc2 = 2,
+               .access = PL1_R, .type = ARM_CP_CONST,
+@@ -4692,10 +4723,15 @@ void register_cp_regs_for_features(ARMCPU *cpu)
+          * define new registers here.
+          */
+         ARMCPRegInfo v8_idregs[] = {
++            /* ID_AA64PFR0_EL1 is not a plain ARM_CP_CONST because we don't
++             * know the right value for the GIC field until after we
++             * define these regs.
++             */
+             { .name = "ID_AA64PFR0_EL1", .state = ARM_CP_STATE_AA64,
+               .opc0 = 3, .opc1 = 0, .crn = 0, .crm = 4, .opc2 = 0,
+-              .access = PL1_R, .type = ARM_CP_CONST,
+-              .resetvalue = cpu->id_aa64pfr0 },
++              .access = PL1_R, .type = ARM_CP_NO_RAW,
++              .readfn = id_aa64pfr0_read,
++              .writefn = arm_cp_write_ignore },
+             { .name = "ID_AA64PFR1_EL1", .state = ARM_CP_STATE_AA64,
+               .opc0 = 3, .opc1 = 0, .crn = 0, .crm = 4, .opc2 = 1,
+               .access = PL1_R, .type = ARM_CP_CONST,
 -- 
-2.13.6
+2.7.4
