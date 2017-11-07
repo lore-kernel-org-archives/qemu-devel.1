@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54743)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55119)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eC526-0003eb-Jl
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 09:39:20 -0500
+	(envelope-from <berrange@redhat.com>) id 1eC53T-0004V7-Py
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 09:40:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eC523-0002pj-G0
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 09:39:18 -0500
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20171103202624.5956-1-laurent@vivier.eu>
-	<20171103202624.5956-3-laurent@vivier.eu>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <05e0db35-da92-cdea-0fd3-131fb989ea6c@amsat.org>
-Date: Tue, 7 Nov 2017 11:38:50 -0300
+	(envelope-from <berrange@redhat.com>) id 1eC53N-0003YN-ME
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 09:40:43 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35552)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eC53N-0003Xl-DE
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 09:40:37 -0500
+Date: Tue, 7 Nov 2017 14:40:33 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20171107144033.GG3213@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20171106153342.24147-1-berrange@redhat.com>
+	<CAFEAcA_jweuOwrNf93o=2uMzXQVUHcJ6cNsQd++sRt_D04j1nA@mail.gmail.com>
+	<20171106174338.GP23361@redhat.com>
+	<CAFEAcA_2o4R0eMGBz=P-5+_G+ax0UPWtytMC4XrKYHT3jZg=3g@mail.gmail.com>
+	<20171107091945.GD14232@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20171103202624.5956-3-laurent@vivier.eu>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 2/4] openrisc: fix float32 and
- float64 helper definitions
+Content-Disposition: inline
+In-Reply-To: <20171107091945.GD14232@redhat.com>
+Subject: Re: [Qemu-devel] [PULL v1 0/2] Merge IO 2017/11/06
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,235 +31,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, qemu-arm@nongnu.org, Stafford Horne <shorne@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 11/03/2017 05:26 PM, Laurent Vivier wrote:
-> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-
-Acked-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
-> ---
->  target/openrisc/fpu_helper.c | 52 ++++++++++++++++++++++----------------------
->  target/openrisc/helper.h     | 20 ++++++++---------
->  2 files changed, 36 insertions(+), 36 deletions(-)
+On Tue, Nov 07, 2017 at 09:19:45AM +0000, Daniel P. Berrange wrote:
+> On Mon, Nov 06, 2017 at 05:58:41PM +0000, Peter Maydell wrote:
+> > On 6 November 2017 at 17:43, Daniel P. Berrange <berrange@redhat.com> wrote:
+> > > On Mon, Nov 06, 2017 at 04:11:56PM +0000, Peter Maydell wrote:
+> > >> On 6 November 2017 at 15:33, Daniel P. Berrange <berrange@redhat.com> wrote:
+> > >> > The following changes since commit ec7a8bf0b8f7dc7288fe8745464ee8217528cc6c:
+> > >> >
+> > >> >   Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into staging (2017-11-06 10:04:16 +0000)
+> > >> >
+> > >> > are available in the git repository at:
+> > >> >
+> > >> >   git://github.com/berrange/qemu tags/pull-qio-2017-11-06-1
+> > >> >
+> > >> > for you to fetch changes up to 74c0035408d5b327eac5985d976bca3009e0c5d6:
+> > >> >
+> > >> >   tests: Add test-listen - a stress test for QEMU socket listen (2017-11-06 11:49:15 +0000)
+> > >> >
+> > >> > ----------------------------------------------------------------
+> > >> > Merge qio 2017-11-06 v1
+> > >> >
+> > >> > ----------------------------------------------------------------
+> > >>
+> > >> Hi. I'm afraid this fails on various hosts.
+> > >
+> > > Sigh, anything network related in unit tests is soo hard to get right :-(
+> > > I was hoping the previous fail you saw with this test was all due to the
+> > > file descriptor leak the first patch fixed, but I guess not....
+> > >
+> > >>
+> > >> arm 32 bit (in a chroot on a 64 bit box):
+> > >> TEST: tests/test-listen... (pid=319)
+> > >>   /socket/listen-serial/ipv4:                                          OK
+> > >>   /socket/listen-serial/ipv6:
+> > >> ** Failed to assign a port to
+> > >> thread 0 (errno = 98)
+> > >> ** Failed to assign a port to thread 1 (errno = 98)
+> > >> ** Failed to assign a port to thread 2 (errno = 98)
+> > >> ** Failed to assign a port to thread 3 (errno = 98)
+> > >> ** Failed to assign a port to thread 4 (errno = 98)
+> > >> [...repeats all the way up to...]
+> > >> ** Failed to assign a port to thread 197 (errno = 98)
+> > >> ** Failed to assign a port to thread 198 (errno = 98)
+> > >> ** Failed to assign a port to thread 199 (errno = 98)
+> > >> **
+> > >> ERROR:/home/peter.maydell/qemu/tests/test-listen.c:195:listen_compete_nthr:
+> > >> assertion failed (failed_listens == 0): (200 == 0)
+> > >
+> > > Hmm, every single thread failed, which suggests some fundamental config in
+> > > this environment that prevents any use of networking at all from tests.
+> > >
+> > > Anything interesting about this build env related to network availability
+> > > that would prevent use of even localhost ?
+> > 
+> > You'll notice that the IPV4 test worked fine. I assume this is an
+> > IPV6 specific problem.
 > 
-> diff --git a/target/openrisc/fpu_helper.c b/target/openrisc/fpu_helper.c
-> index 1375cea948..f84f8bf26a 100644
-> --- a/target/openrisc/fpu_helper.c
-> +++ b/target/openrisc/fpu_helper.c
-> @@ -66,9 +66,9 @@ static inline void update_fpcsr(OpenRISCCPU *cpu)
->      }
->  }
->  
-> -uint64_t HELPER(itofd)(CPUOpenRISCState *env, uint64_t val)
-> +float64 HELPER(itofd)(CPUOpenRISCState *env, uint64_t val)
->  {
-> -    uint64_t itofd;
-> +    float64 itofd;
->      OpenRISCCPU *cpu = openrisc_env_get_cpu(env);
->  
->      set_float_exception_flags(0, &cpu->env.fp_status);
-> @@ -78,9 +78,9 @@ uint64_t HELPER(itofd)(CPUOpenRISCState *env, uint64_t val)
->      return itofd;
->  }
->  
-> -uint32_t HELPER(itofs)(CPUOpenRISCState *env, uint32_t val)
-> +float32 HELPER(itofs)(CPUOpenRISCState *env, uint32_t val)
->  {
-> -    uint32_t itofs;
-> +    float32 itofs;
->      OpenRISCCPU *cpu = openrisc_env_get_cpu(env);
->  
->      set_float_exception_flags(0, &cpu->env.fp_status);
-> @@ -90,7 +90,7 @@ uint32_t HELPER(itofs)(CPUOpenRISCState *env, uint32_t val)
->      return itofs;
->  }
->  
-> -uint64_t HELPER(ftoid)(CPUOpenRISCState *env, uint64_t val)
-> +uint64_t HELPER(ftoid)(CPUOpenRISCState *env, float32 val)
->  {
->      uint64_t ftoid;
->      OpenRISCCPU *cpu = openrisc_env_get_cpu(env);
-> @@ -102,7 +102,7 @@ uint64_t HELPER(ftoid)(CPUOpenRISCState *env, uint64_t val)
->      return ftoid;
->  }
->  
-> -uint32_t HELPER(ftois)(CPUOpenRISCState *env, uint32_t val)
-> +uint32_t HELPER(ftois)(CPUOpenRISCState *env, float32 val)
->  {
->      uint32_t ftois;
->      OpenRISCCPU *cpu = openrisc_env_get_cpu(env);
-> @@ -117,10 +117,10 @@ uint32_t HELPER(ftois)(CPUOpenRISCState *env, uint32_t val)
->  #define FLOAT_OP(name, p) void helper_float_##_##p(void)
->  
->  #define FLOAT_CALC(name)                                                  \
-> -uint64_t helper_float_ ## name ## _d(CPUOpenRISCState *env,               \
-> -                                     uint64_t fdt0, uint64_t fdt1)        \
-> +float64 helper_float_ ## name ## _d(CPUOpenRISCState *env,                \
-> +                                    float64 fdt0, float64 fdt1)          \
->  {                                                                         \
-> -    uint64_t result;                                                      \
-> +    float64 result;                                                       \
->      OpenRISCCPU *cpu = openrisc_env_get_cpu(env);                         \
->      set_float_exception_flags(0, &cpu->env.fp_status);                    \
->      result = float64_ ## name(fdt0, fdt1, &cpu->env.fp_status);           \
-> @@ -128,10 +128,10 @@ uint64_t helper_float_ ## name ## _d(CPUOpenRISCState *env,               \
->      return result;                                                        \
->  }                                                                         \
->                                                                            \
-> -uint32_t helper_float_ ## name ## _s(CPUOpenRISCState *env,               \
-> -                                     uint32_t fdt0, uint32_t fdt1)        \
-> +float32 helper_float_ ## name ## _s(CPUOpenRISCState *env,                \
-> +                                    float32 fdt0, float32 fdt1)           \
->  {                                                                         \
-> -    uint32_t result;                                                      \
-> +    float32 result;                                                       \
->      OpenRISCCPU *cpu = openrisc_env_get_cpu(env);                         \
->      set_float_exception_flags(0, &cpu->env.fp_status);                    \
->      result = float32_ ## name(fdt0, fdt1, &cpu->env.fp_status);           \
-> @@ -147,11 +147,11 @@ FLOAT_CALC(rem)
->  #undef FLOAT_CALC
->  
->  
-> -uint64_t helper_float_madd_d(CPUOpenRISCState *env, uint64_t a,
-> -                             uint64_t b, uint64_t c)
-> +float64 helper_float_madd_d(CPUOpenRISCState *env, float64 a,
-> +                             float64 b, float64 c)
->  {
->      OpenRISCCPU *cpu = openrisc_env_get_cpu(env);
-> -    uint64_t result;
-> +    float64 result;
->      set_float_exception_flags(0, &cpu->env.fp_status);
->      /* Note that or1ksim doesn't use merged operation.  */
->      result = float64_mul(b, c, &cpu->env.fp_status);
-> @@ -160,11 +160,11 @@ uint64_t helper_float_madd_d(CPUOpenRISCState *env, uint64_t a,
->      return result;
->  }
->  
-> -uint32_t helper_float_madd_s(CPUOpenRISCState *env, uint32_t a,
-> -                             uint32_t b, uint32_t c)
-> +float32 helper_float_madd_s(CPUOpenRISCState *env, float32 a,
-> +                             float32 b, float32 c)
->  {
->      OpenRISCCPU *cpu = openrisc_env_get_cpu(env);
-> -    uint32_t result;
-> +    float32 result;
->      set_float_exception_flags(0, &cpu->env.fp_status);
->      /* Note that or1ksim doesn't use merged operation.  */
->      result = float32_mul(b, c, &cpu->env.fp_status);
-> @@ -176,7 +176,7 @@ uint32_t helper_float_madd_s(CPUOpenRISCState *env, uint32_t a,
->  
->  #define FLOAT_CMP(name)                                                   \
->  uint64_t helper_float_ ## name ## _d(CPUOpenRISCState *env,               \
-> -                                     uint64_t fdt0, uint64_t fdt1)        \
-> +                                    float64 fdt0, float64 fdt1)           \
->  {                                                                         \
->      int res;                                                              \
->      OpenRISCCPU *cpu = openrisc_env_get_cpu(env);                         \
-> @@ -187,7 +187,7 @@ uint64_t helper_float_ ## name ## _d(CPUOpenRISCState *env,               \
->  }                                                                         \
->                                                                            \
->  uint32_t helper_float_ ## name ## _s(CPUOpenRISCState *env,               \
-> -                                             uint32_t fdt0, uint32_t fdt1)\
-> +                                    float32 fdt0, float32 fdt1)           \
->  {                                                                         \
->      int res;                                                              \
->      OpenRISCCPU *cpu = openrisc_env_get_cpu(env);                         \
-> @@ -205,7 +205,7 @@ FLOAT_CMP(lt)
->  
->  #define FLOAT_CMPNE(name)                                                 \
->  uint64_t helper_float_ ## name ## _d(CPUOpenRISCState *env,               \
-> -                                     uint64_t fdt0, uint64_t fdt1)        \
-> +                                     float64 fdt0, float64 fdt1)          \
->  {                                                                         \
->      int res;                                                              \
->      OpenRISCCPU *cpu = openrisc_env_get_cpu(env);                         \
-> @@ -216,7 +216,7 @@ uint64_t helper_float_ ## name ## _d(CPUOpenRISCState *env,               \
->  }                                                                         \
->                                                                            \
->  uint32_t helper_float_ ## name ## _s(CPUOpenRISCState *env,               \
-> -                                     uint32_t fdt0, uint32_t fdt1)        \
-> +                                     float32 fdt0, float32 fdt1)          \
->  {                                                                         \
->      int res;                                                              \
->      OpenRISCCPU *cpu = openrisc_env_get_cpu(env);                         \
-> @@ -231,7 +231,7 @@ FLOAT_CMPNE(ne)
->  
->  #define FLOAT_CMPGT(name)                                                 \
->  uint64_t helper_float_ ## name ## _d(CPUOpenRISCState *env,               \
-> -                                     uint64_t fdt0, uint64_t fdt1)        \
-> +                                     float64 fdt0, float64 fdt1)          \
->  {                                                                         \
->      int res;                                                              \
->      OpenRISCCPU *cpu = openrisc_env_get_cpu(env);                         \
-> @@ -242,7 +242,7 @@ uint64_t helper_float_ ## name ## _d(CPUOpenRISCState *env,               \
->  }                                                                         \
->                                                                            \
->  uint32_t helper_float_ ## name ## _s(CPUOpenRISCState *env,               \
-> -                                     uint32_t fdt0, uint32_t fdt1)        \
-> +                                     float32 fdt0, float32 fdt1)          \
->  {                                                                         \
->      int res;                                                              \
->      OpenRISCCPU *cpu = openrisc_env_get_cpu(env);                         \
-> @@ -256,7 +256,7 @@ FLOAT_CMPGT(gt)
->  
->  #define FLOAT_CMPGE(name)                                                 \
->  uint64_t helper_float_ ## name ## _d(CPUOpenRISCState *env,               \
-> -                                     uint64_t fdt0, uint64_t fdt1)        \
-> +                                     float64 fdt0, float64 fdt1)          \
->  {                                                                         \
->      int res;                                                              \
->      OpenRISCCPU *cpu = openrisc_env_get_cpu(env);                         \
-> @@ -267,7 +267,7 @@ uint64_t helper_float_ ## name ## _d(CPUOpenRISCState *env,               \
->  }                                                                         \
->                                                                            \
->  uint32_t helper_float_ ## name ## _s(CPUOpenRISCState *env,               \
-> -                                     uint32_t fdt0, uint32_t fdt1)        \
-> +                                     float32 fdt0, float32 fdt1)          \
->  {                                                                         \
->      int res;                                                              \
->      OpenRISCCPU *cpu = openrisc_env_get_cpu(env);                         \
-> diff --git a/target/openrisc/helper.h b/target/openrisc/helper.h
-> index 4fd1a6bb8e..081606527b 100644
-> --- a/target/openrisc/helper.h
-> +++ b/target/openrisc/helper.h
-> @@ -24,17 +24,17 @@ DEF_HELPER_FLAGS_1(ove_ov, TCG_CALL_NO_WG, void, env)
->  DEF_HELPER_FLAGS_1(ove_cyov, TCG_CALL_NO_WG, void, env)
->  
->  /* float */
-> -DEF_HELPER_FLAGS_2(itofd, TCG_CALL_NO_WG, i64, env, i64)
-> -DEF_HELPER_FLAGS_2(itofs, TCG_CALL_NO_WG, i32, env, i32)
-> -DEF_HELPER_FLAGS_2(ftoid, TCG_CALL_NO_WG, i64, env, i64)
-> -DEF_HELPER_FLAGS_2(ftois, TCG_CALL_NO_WG, i32, env, i32)
-> +DEF_HELPER_FLAGS_2(itofd, TCG_CALL_NO_WG, f64, env, i64)
-> +DEF_HELPER_FLAGS_2(itofs, TCG_CALL_NO_WG, f32, env, i32)
-> +DEF_HELPER_FLAGS_2(ftoid, TCG_CALL_NO_WG, i64, env, f32)
-> +DEF_HELPER_FLAGS_2(ftois, TCG_CALL_NO_WG, i32, env, f32)
->  
-> -DEF_HELPER_FLAGS_4(float_madd_s, TCG_CALL_NO_WG, i32, env, i32, i32, i32)
-> -DEF_HELPER_FLAGS_4(float_madd_d, TCG_CALL_NO_WG, i64, env, i64, i64, i64)
-> +DEF_HELPER_FLAGS_4(float_madd_s, TCG_CALL_NO_WG, f32, env, f32, f32, f32)
-> +DEF_HELPER_FLAGS_4(float_madd_d, TCG_CALL_NO_WG, f64, env, f64, f64, f64)
->  
->  #define FOP_CALC(op)                                            \
-> -DEF_HELPER_FLAGS_3(float_ ## op ## _s, TCG_CALL_NO_WG, i32, env, i32, i32) \
-> -DEF_HELPER_FLAGS_3(float_ ## op ## _d, TCG_CALL_NO_WG, i64, env, i64, i64)
-> +DEF_HELPER_FLAGS_3(float_ ## op ## _s, TCG_CALL_NO_WG, f32, env, f32, f32) \
-> +DEF_HELPER_FLAGS_3(float_ ## op ## _d, TCG_CALL_NO_WG, f64, env, f64, f64)
->  FOP_CALC(add)
->  FOP_CALC(sub)
->  FOP_CALC(mul)
-> @@ -43,8 +43,8 @@ FOP_CALC(rem)
->  #undef FOP_CALC
->  
->  #define FOP_CMP(op)                                              \
-> -DEF_HELPER_FLAGS_3(float_ ## op ## _s, TCG_CALL_NO_WG, i32, env, i32, i32) \
-> -DEF_HELPER_FLAGS_3(float_ ## op ## _d, TCG_CALL_NO_WG, i64, env, i64, i64)
-> +DEF_HELPER_FLAGS_3(float_ ## op ## _s, TCG_CALL_NO_WG, i32, env, f32, f32) \
-> +DEF_HELPER_FLAGS_3(float_ ## op ## _d, TCG_CALL_NO_WG, i64, env, f64, f64)
->  FOP_CMP(eq)
->  FOP_CMP(lt)
->  FOP_CMP(le)
+> Oh yes, so it is.  The strange thing is that the test does check if we have
+> a protocol available by doing a test bind() at start.
 > 
+> > >> Test failure on OpenBSD:
+> > >>
+> > >> TEST: tests/test-listen... (pid=9208)
+> > >>   /socket/listen-serial/ipv4:
+> > >> ** Failed to assign a port to
+> > >> thread 124 (errno = 48)
+> > >> ** Failed to assign a port to thread 125 (errno = 48)
+> > >> ** Failed to assign a port to thread 126 (errno = 48)
+> > >> ** Failed to assign a port to thread 127 (errno = 48)
+> > >> [repeats up to]
+> > >> ** Failed to assign a port to thread 197 (errno = 48)
+> > >> ** Failed to assign a port to thread 198 (errno = 48)
+> > >> ** Failed to assign a port to thread 199 (errno = 48)
+> > >> **
+> > >> ERROR:/home/qemu/tests/test-listen.c:195:listen_compete_nthr:
+> > >> assertion failed (failed_listens == 0): (76 == 0)
+> > >> FAIL
+> > >> GTester: last random seed: R02S17d50ab00329e514ffbe630191e76e83
+> > >> (pid=80652)
+> > >
+> > > Only a subset failed, which is more interesting - this is definitely
+> > > more like the problem seen when FD leaks. Could you mention what the
+> > > ulimits are for your OpenBSD host - I wondering if it hits max FDs
+> > > due to having a parallel builds / test run.
+> > 
+> > # ulimit -a
+> > time(cpu-seconds)    unlimited
+> > file(blocks)         unlimited
+> > coredump(blocks)     unlimited
+> > data(kbytes)         33554432
+> > stack(kbytes)        8192
+> > lockedmem(kbytes)    670784
+> > memory(kbytes)       2010588
+> > nofiles(descriptors) 128
+> > processes            1310
+> > 
+> > That nofiles limit looks quite close to the number where we
+> > start failing...
+> 
+> Ok, I think I'll just make the test skip unless nofiles >= 1024
+> so we have a good margin of safety when things run very parallel
+
+FYI, I've dropped the test suite addition in my 2nd PULL request, as I'm
+not confident I can solve all the portability problems quickly, and don't
+want to waste your time going back + forth testing new versions during
+freeze.
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
