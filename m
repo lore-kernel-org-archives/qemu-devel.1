@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59395)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60580)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eBzzj-0007e0-AS
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 04:16:33 -0500
+	(envelope-from <berrange@redhat.com>) id 1eC031-0000vE-Hh
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 04:19:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eBzzd-0001ac-HF
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 04:16:31 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47612)
+	(envelope-from <berrange@redhat.com>) id 1eC02v-00030W-Fj
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 04:19:55 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52870)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eBzzd-0001aM-AR
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 04:16:25 -0500
-Date: Tue, 7 Nov 2017 09:16:17 +0000
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eC02v-00030N-5y
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 04:19:49 -0500
+Date: Tue, 7 Nov 2017 09:19:45 +0000
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20171107091617.GC14232@redhat.com>
+Message-ID: <20171107091945.GD14232@redhat.com>
 Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <1509949271-36280-1-git-send-email-longpeng2@huawei.com>
-	<d465b265-2f07-34df-4474-d5dd57ec7443@redhat.com>
-	<5A0119FE.6060709@huawei.com>
+References: <20171106153342.24147-1-berrange@redhat.com>
+	<CAFEAcA_jweuOwrNf93o=2uMzXQVUHcJ6cNsQd++sRt_D04j1nA@mail.gmail.com>
+	<20171106174338.GP23361@redhat.com>
+	<CAFEAcA_2o4R0eMGBz=P-5+_G+ax0UPWtytMC4XrKYHT3jZg=3g@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <5A0119FE.6060709@huawei.com>
-Subject: Re: [Qemu-devel] [PATCH] crypto: afalg: fix a NULL pointer
- dereference
+In-Reply-To: <CAFEAcA_2o4R0eMGBz=P-5+_G+ax0UPWtytMC4XrKYHT3jZg=3g@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PULL v1 0/2] Merge IO 2017/11/06
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,45 +30,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Longpeng (Mike)" <longpeng2@huawei.com>
-Cc: Eric Blake <eblake@redhat.com>, pbonzini@redhat.com, arei.gonglei@huawei.com, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Tue, Nov 07, 2017 at 10:27:10AM +0800, Longpeng (Mike) wrote:
-> 
-> 
-> On 2017/11/7 1:00, Eric Blake wrote:
-> 
-> > On 11/06/2017 12:21 AM, Longpeng(Mike) wrote:
-> >> Test-crypto-hash calls qcrypto_hash_bytesv/digest/base64 with
-> >> errp=NULL, this will cause a NULL poniter deference if afalg_driver
-> > 
-> > s/poniter deference/pointer dereference/
-> > 
-> 
-> OK.
-> 
-> >> doesn't support requested algos:
-> >>     ret = qcrypto_hash_afalg_driver.hash_bytesv(alg, iov, niov,
-> >>                                                 result, resultlen,
-> >>                                                 errp);
-> >>     if (ret == 0) {
-> >>         return ret;
-> >>     }
+On Mon, Nov 06, 2017 at 05:58:41PM +0000, Peter Maydell wrote:
+> On 6 November 2017 at 17:43, Daniel P. Berrange <berrange@redhat.com> wrote:
+> > On Mon, Nov 06, 2017 at 04:11:56PM +0000, Peter Maydell wrote:
+> >> On 6 November 2017 at 15:33, Daniel P. Berrange <berrange@redhat.com> wrote:
+> >> > The following changes since commit ec7a8bf0b8f7dc7288fe8745464ee8217528cc6c:
+> >> >
+> >> >   Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into staging (2017-11-06 10:04:16 +0000)
+> >> >
+> >> > are available in the git repository at:
+> >> >
+> >> >   git://github.com/berrange/qemu tags/pull-qio-2017-11-06-1
+> >> >
+> >> > for you to fetch changes up to 74c0035408d5b327eac5985d976bca3009e0c5d6:
+> >> >
+> >> >   tests: Add test-listen - a stress test for QEMU socket listen (2017-11-06 11:49:15 +0000)
+> >> >
+> >> > ----------------------------------------------------------------
+> >> > Merge qio 2017-11-06 v1
+> >> >
+> >> > ----------------------------------------------------------------
 > >>
-> >>     error_free(*errp);  // <--- here
+> >> Hi. I'm afraid this fails on various hosts.
+> >
+> > Sigh, anything network related in unit tests is soo hard to get right :-(
+> > I was hoping the previous fail you saw with this test was all due to the
+> > file descriptor leak the first patch fixed, but I guess not....
+> >
 > >>
-> >> So we must check 'errp & *errp' before dereference.
-> > 
-> > No, if we are going to blindly ignore the error from the hash_bytesv()
-> > call, then we should pass NULL rather than errp.
-> > 
+> >> arm 32 bit (in a chroot on a 64 bit box):
+> >> TEST: tests/test-listen... (pid=319)
+> >>   /socket/listen-serial/ipv4:                                          OK
+> >>   /socket/listen-serial/ipv6:
+> >> ** Failed to assign a port to
+> >> thread 0 (errno = 98)
+> >> ** Failed to assign a port to thread 1 (errno = 98)
+> >> ** Failed to assign a port to thread 2 (errno = 98)
+> >> ** Failed to assign a port to thread 3 (errno = 98)
+> >> ** Failed to assign a port to thread 4 (errno = 98)
+> >> [...repeats all the way up to...]
+> >> ** Failed to assign a port to thread 197 (errno = 98)
+> >> ** Failed to assign a port to thread 198 (errno = 98)
+> >> ** Failed to assign a port to thread 199 (errno = 98)
+> >> **
+> >> ERROR:/home/peter.maydell/qemu/tests/test-listen.c:195:listen_compete_nthr:
+> >> assertion failed (failed_listens == 0): (200 == 0)
+> >
+> > Hmm, every single thread failed, which suggests some fundamental config in
+> > this environment that prevents any use of networking at all from tests.
+> >
+> > Anything interesting about this build env related to network availability
+> > that would prevent use of even localhost ?
 > 
-> The 'errp' in this palce is convenient for debug, it can tell us the reason for
-> failure without stepping into afalg_driver's hash_bytesv().
+> You'll notice that the IPV4 test worked fine. I assume this is an
+> IPV6 specific problem.
 
-It doesn't do anything useful for debug, because we are just immediately
-throwing away the error without printing it anywhere. Just pass NULL into
-the hash_bytesv call above.
+Oh yes, so it is.  The strange thing is that the test does check if we have
+a protocol available by doing a test bind() at start.
+
+> >> Test failure on OpenBSD:
+> >>
+> >> TEST: tests/test-listen... (pid=9208)
+> >>   /socket/listen-serial/ipv4:
+> >> ** Failed to assign a port to
+> >> thread 124 (errno = 48)
+> >> ** Failed to assign a port to thread 125 (errno = 48)
+> >> ** Failed to assign a port to thread 126 (errno = 48)
+> >> ** Failed to assign a port to thread 127 (errno = 48)
+> >> [repeats up to]
+> >> ** Failed to assign a port to thread 197 (errno = 48)
+> >> ** Failed to assign a port to thread 198 (errno = 48)
+> >> ** Failed to assign a port to thread 199 (errno = 48)
+> >> **
+> >> ERROR:/home/qemu/tests/test-listen.c:195:listen_compete_nthr:
+> >> assertion failed (failed_listens == 0): (76 == 0)
+> >> FAIL
+> >> GTester: last random seed: R02S17d50ab00329e514ffbe630191e76e83
+> >> (pid=80652)
+> >
+> > Only a subset failed, which is more interesting - this is definitely
+> > more like the problem seen when FD leaks. Could you mention what the
+> > ulimits are for your OpenBSD host - I wondering if it hits max FDs
+> > due to having a parallel builds / test run.
+> 
+> # ulimit -a
+> time(cpu-seconds)    unlimited
+> file(blocks)         unlimited
+> coredump(blocks)     unlimited
+> data(kbytes)         33554432
+> stack(kbytes)        8192
+> lockedmem(kbytes)    670784
+> memory(kbytes)       2010588
+> nofiles(descriptors) 128
+> processes            1310
+> 
+> That nofiles limit looks quite close to the number where we
+> start failing...
+
+Ok, I think I'll just make the test skip unless nofiles >= 1024
+so we have a good margin of safety when things run very parallel
+
 
 Regards,
 Daniel
