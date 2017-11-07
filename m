@@ -1,33 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39351)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39625)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eC80a-0001CR-DR
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 12:49:57 -0500
+	(envelope-from <borntraeger@de.ibm.com>) id 1eC81c-0001oZ-6G
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 12:51:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eC80W-0001Xa-Dz
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 12:49:56 -0500
-Received: from indium.canonical.com ([91.189.90.7]:48998)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eC80W-0001X5-91
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 12:49:52 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eC80V-0003Ne-4e
-	for <qemu-devel@nongnu.org>; Tue, 07 Nov 2017 17:49:51 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 201A52E80C7
-	for <qemu-devel@nongnu.org>; Tue,  7 Nov 2017 17:49:51 +0000 (UTC)
+	(envelope-from <borntraeger@de.ibm.com>) id 1eC81Y-0001zp-6N
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 12:51:00 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53066
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1eC81Y-0001zP-1Z
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 12:50:56 -0500
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	vA7Hog6B055307
+	for <qemu-devel@nongnu.org>; Tue, 7 Nov 2017 12:50:51 -0500
+Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2e3gec3f3d-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 07 Nov 2017 12:50:48 -0500
+Received: from localhost
+	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Tue, 7 Nov 2017 17:50:13 -0000
+References: <1510075479-17224-1-git-send-email-pmorel@linux.vnet.ibm.com>
+	<20171107183125.10ab7032.cohuck@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Tue, 7 Nov 2017 18:50:10 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 07 Nov 2017 17:37:31 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1408152 <1408152@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20150106232208.16446.55378.malonedeb@soybean.canonical.com>
-Message-Id: <151007625206.4922.392128525630540308.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1408152] Re: latest qemu git doesn't load
+In-Reply-To: <20171107183125.10ab7032.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <209811bf-8fef-6b02-455d-11e29daeb9ab@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 0/7] s390x/pci: Improve zPCI to cover more
+ cases
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,38 +44,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-
-Hi; we fixed this with commit 446f16a6906e9d0 in March 2015, so I'm
-going to mark this as fixed.
+To: Cornelia Huck <cohuck@redhat.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, agraf@suse.de, zyimin@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, qemu-s390x@nongnu.org
 
 
-** Changed in: qemu
-       Status: New =3D> Fix Released
 
--- =
+On 11/07/2017 06:31 PM, Cornelia Huck wrote:
+> On Tue,  7 Nov 2017 18:24:32 +0100
+> Pierre Morel <pmorel@linux.vnet.ibm.com> wrote:
+> 
+>> Right now the PCI support is very limited (e.g. pass through of a
+>> host vfio device)
+>> To enable features like virtio-pci several modifications needs to be
+>> done.
+>>
+>> Virtio-PCI uses subregions, which may eventually be discontinuous
+>> inside bars instead of a single flat region.
+>> The address offset being formerly calculated from the BAR base address
+>> must be adapted to the subregions instead of to the single region.
+>>
+>> This patch provides the new calculation for the three kind of BAR
+>> access, zPCI STORE, zPCI LOAD and zPCI STORE BLOCK.
+>>
+>> We use the opportunity to
+>>  - enhance the fault detection for zPCI STORE and LOAD,
+>>  - enhance the fault detection and to provide the maximum STORE BLOCK
+>>    block size, maxstbl, for zPCI STORE BLOCK
+>>  - factor out part of the code used to calculate the offset and
+>>    access the BARs,
+>>  - factor out the code for endianess conversion.
+> 
+> Will look at this later. Just a quick question: What kind of further
+> functionality is enabled by this? E.g., I can attach a virtio-net-pci
+> device right now, does this enable more virtio devices?
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1408152
+You can attach a virtio-net-pci today, with these patches it now starts to work ;-)
+In essence to me this all looks like a bugfix (a big one though)
 
-Title:
-  latest qemu git doesn't load
-
-Status in QEMU:
-  Fix Released
-
-Bug description:
-  commit ab0302ee764fd702465aef6d88612cdff4302809This is with
-
-  qemu-system-x86_64: util/qemu-option.c:387: qemu_opt_get_bool_helper: Ass=
-ertion `opt->desc && opt->desc->type =3D=3D QEMU_OPT_BOOL' failed.
-  /home/njh/bin/kfreebsd-amd64: line 7: 32549 Aborted                 (core=
- dumped) qemu-system-x86_64 -drive file=3Dkfreebsd-amd64,index=3D0,media=3D=
-disk,cache=3Dwriteback,aio=3Dnative -drive file=3D/dev/sr0,index=3D1,media=
-=3Dcdrom -boot c -redir tcp:2232::22 -m 1024 -machine accel=3Dkvm,kernel_ir=
-qchip=3Don -cpu host -net user,hostname=3Dqemu.bandsman.co.uk -net nic,mode=
-l=3De1000 -k en-us
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1408152/+subscriptions
+> 
+>>
+>>
+>> Pierre Morel (7):
+>>   s390x/pci: factor out endianess conversion
+>>   s390x/pci: rework PCI STORE
+>>   s390x/pci: rework PCI LOAD
+>>   s390x/pci: rework PCI STORE BLOCK
+>>   s390x/pci: move the memory region read from pcilg
+>>   s390x/pci: move the memory region write from pcistg
+>>   s390x/pci: search for subregion inside the BARs
+>>
+>>  hw/s390x/s390-pci-bus.h  |   1 +
+>>  hw/s390x/s390-pci-inst.c | 250 ++++++++++++++++++++++++++++-------------------
+>>  hw/s390x/s390-pci-inst.h |   2 +-
+>>  3 files changed, 153 insertions(+), 100 deletions(-)
+>>
+> 
