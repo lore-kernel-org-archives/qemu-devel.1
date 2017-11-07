@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36684)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43208)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kernellwp@gmail.com>) id 1eBxBG-0000TF-DE
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 01:16:15 -0500
+	(envelope-from <famz@redhat.com>) id 1eBxbt-0003ej-7R
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 01:43:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kernellwp@gmail.com>) id 1eBxBF-0005B1-9v
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 01:16:14 -0500
-Received: from mail-oi0-x230.google.com ([2607:f8b0:4003:c06::230]:55678)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <kernellwp@gmail.com>) id 1eBxBF-0005Ak-4F
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 01:16:13 -0500
-Received: by mail-oi0-x230.google.com with SMTP id g125so9358565oib.12
-	for <qemu-devel@nongnu.org>; Mon, 06 Nov 2017 22:16:13 -0800 (PST)
+	(envelope-from <famz@redhat.com>) id 1eBxbq-0000jf-23
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 01:43:45 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40130)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1eBxbp-0000iS-Ru
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 01:43:41 -0500
+Date: Tue, 7 Nov 2017 14:43:28 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20171107064328.GE16355@lemon>
+References: <20171106094643.14881-1-peterx@redhat.com>
+	<20171106094643.14881-2-peterx@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <f2d1d51e-16d4-ed20-cda2-fad6c7394cc0@ozlabs.ru>
-References: <CANRm+CxGAiDBDYrtvxXwsPwt2WjiY_biMCVkvQOyAaQtv5v-UQ@mail.gmail.com>
-	<80415da5-4eef-bf85-b617-fadc3dae4475@redhat.com>
-	<CANRm+CwexgKHUVK3b3QYw8ksyaSgZRDiWztOsOvPpMugTQj16w@mail.gmail.com>
-	<e23177c9-36cb-2ad7-18c0-ebf3caaebb52@redhat.com>
-	<20171106115931.GB3898@lemon>
-	<fb7c5778-238d-ac99-26d6-8a6d9c80a0f4@redhat.com>
-	<CANRm+Cw=F244w=6YMutjcvWin9_xiRt0Z1MvT=oi+7CXjU+DXw@mail.gmail.com>
-	<78a404c5-fb2f-6fdf-c307-107ff1af4342@redhat.com>
-	<5e0576f6-bb91-7e6e-7a1d-391d18717c0d@ozlabs.ru>
-	<CANRm+CwnZCpEZ9qN9dB808Y-znyn_vcwtAWKfjxCrpo4Qv=U_Q@mail.gmail.com>
-	<f2d1d51e-16d4-ed20-cda2-fad6c7394cc0@ozlabs.ru>
-From: Wanpeng Li <kernellwp@gmail.com>
-Date: Tue, 7 Nov 2017 14:16:11 +0800
-Message-ID: <CANRm+CzH82=t-5YZySHtX9_Dc88nv-4L38+2tHOqc1v6WzPS2w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] qemu core file size
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171106094643.14881-2-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [RFC v3 01/27] char-io: fix possible race on
+ IOWatchPoll
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,69 +28,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Jiri Denemark <jdenemar@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, marcandre.lureau@redhat.com, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-2017-11-07 14:12 GMT+08:00 Alexey Kardashevskiy <aik@ozlabs.ru>:
-> On 07/11/17 17:02, Wanpeng Li wrote:
->> Hi Alexey,
->> 2017-11-07 13:46 GMT+08:00 Alexey Kardashevskiy <aik@ozlabs.ru>:
->>> On 07/11/17 01:08, Paolo Bonzini wrote:
->>>> On 06/11/2017 13:18, Wanpeng Li wrote:
->>>>> 2017-11-06 20:02 GMT+08:00 Paolo Bonzini <pbonzini@redhat.com>:
->>>>>> On 06/11/2017 12:59, Fam Zheng wrote:
->>>>>>>>> Could you point out the patchset for the fix?
->>>>>>>> Between 447b0d0b9ee8a0ac216c3186e0f3c427a1001f0c and
->>>>>>>> 092aa2fc65b7a35121616aad8f39d47b8f921618.
->>>>>>> Not sure how these relate to the core size, but I've tested upstream
->>>>>>> (ec7a8bf0b8f7dc7288fe8745464ee8217528cc6c) and with dump-guest-core=off the core
->>>>>>> file is 363M, still significantly larger than rss (~73M).
->>>>>>>
->>>>>>> What is bloating the core file?
->>>>>>
->>>>>> My guess would have been fragmented heap.  The core file, unlike the
->>>>>> RSS, includes all the mmaped memory (e.g. from shared libraries) that
->>>>>> has never been used.
->>>>>>
->>>>>> For example, all the Ceph/Gluster/PulseAudio/SPICE/whatever libraries
->>>>>> are included in the core file but likely are not in the RSS.
->>>>>
->>>>> Do you mean not use Memory API will avoid the fragmented heap?
->>>>
->>>> The high memory usage from the memory API causes excessive
->>>> fragmentation.  Alexey's work should help reducing memory usage and thus
->>>> the fragmentation.
->>>
->>> Since centos6 does not have this issue and centos7 does, I'd suggest
->>> MALLOC_ARENA_MAX&co
->>> https://www.gnu.org/software/libc/manual/html_node/Memory-Allocation-Tunables.html
->>
->> Thanks for the inputs. What's the recommend glibc.malloc.arena_max
->> value from you? :)
->
-> I have no idea, you have to try different values as you are the one who is
-> unhappy about the sizes :) I do not normally mess with this as things
-> should just work with the defaults whatever they are.
->
->
->>
->>>
->>> glibc changed some defaults between rhel/centos 6 and 7 if I recall
->>> correctly, and these arenas now create big anon mappings per thread, these
->>> are not really touched (so they do not use resident memory) but may appear
->>> in these dumps, dunno.
->>>
->>> btw do you configure the machine to make "kill -11" produce qemu core dumps?
->>
->> Yeah, some tuning in /etc/libvirt/qemu.conf, max_core="unlimited",
->> dump_guest_core=0
->
-> dump_guest_core=0 should mean "no dumps", no?
-> Do you know how to enable this without libvirt?
+On Mon, 11/06 17:46, Peter Xu wrote:
+> This is not a problem if we are only having one single loop thread like
+> before.  However, after per-monitor thread is introduced, this is not
+> true any more, and the race can happen.
+> 
+> The race can be triggered with "make check -j8" sometimes:
+> 
+>   qemu-system-x86_64: /root/git/qemu/chardev/char-io.c:91:
+>   io_watch_poll_finalize: Assertion `iwp->src == NULL' failed.
+> 
+> This patch keeps the reference for the watch object when creating in
+> io_add_watch_poll(), so that the object will never be released in the
+> context main loop, especially when the context loop is running in
+> another standalone thread.  Meanwhile, when we want to remove the watch
+> object, we always first detach the watch object from its owner context,
+> then we continue with the cleanup.
+> 
+> Without this patch, calling io_remove_watch_poll() in main loop thread
+> is not thread-safe, since the other per-monitor thread may be modifying
+> the watch object at the same time.
 
-Please add dump_guest_core=off in your qemu command-line,
-"dump_guest_core" mean not dump guest memory and just dump qemu
-itself.
+Looks sane,
 
-Regards,
-Wanpeng Li
+Reviewed-by: Fam Zheng <famz@redhat.com>
