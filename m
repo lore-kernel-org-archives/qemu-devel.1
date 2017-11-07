@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37669)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37672)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eBuA8-0007Zw-WA
+	(envelope-from <eblake@redhat.com>) id 1eBuA9-0007a3-1i
 	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 22:02:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eBuA5-0003TF-MA
+	(envelope-from <eblake@redhat.com>) id 1eBuA4-0003SG-Dn
 	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 22:02:53 -0500
 From: Eric Blake <eblake@redhat.com>
-Date: Mon,  6 Nov 2017 21:02:33 -0600
-Message-Id: <20171107030236.23633-6-eblake@redhat.com>
+Date: Mon,  6 Nov 2017 21:02:32 -0600
+Message-Id: <20171107030236.23633-5-eblake@redhat.com>
 In-Reply-To: <20171107030236.23633-1-eblake@redhat.com>
 References: <20171107030236.23633-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH 5/8] nbd: Fix struct name for structured reads
+Subject: [Qemu-devel] [PATCH 4/8] nbd-client: Honor server read-only
+ advertisement
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,64 +23,63 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, pbonzini@redhat.com, vsementsov@virtuozzo.com, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-A closer read of the NBD spec shows that a structured reply chunk
-for a hole is not quite identical to the prefix of a data chunk,
-because the hole has to also send a 32-bit size field.  Although
-we do not yet send holes, we should fix the misleading information
-in our header and make it easier for a future patch to support
-sparse reads.
+The NBD spec says that clients should not try to write/trim to
+an export advertised as read-only by the server.  But we failed
+to inform the block layer of what we learned from the server,
+meaning that we were depending on the server sending a proper
+EPERM failure for various commands.  In fact, this was noticeable
+in the case of a 0-length write: we had a difference in behavior
+depending on whether we were writing zero (silent success
+locally, because the driver is not invoked from the block layer)
+or normal writes (noisy failure, because we sent a 0-length
+request across the wire and the server flagged it as invalid);
+now we always fail locally without sending anything over the wire.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- include/block/nbd.h | 18 +++++++++++++-----
- nbd/server.c        |  2 +-
- 2 files changed, 14 insertions(+), 6 deletions(-)
+ block/nbd-client.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/include/block/nbd.h b/include/block/nbd.h
-index 92d1723d7c..113c707a5e 100644
---- a/include/block/nbd.h
-+++ b/include/block/nbd.h
-@@ -86,15 +86,23 @@ typedef union NBDReply {
-     } QEMU_PACKED;
- } NBDReply;
+diff --git a/block/nbd-client.c b/block/nbd-client.c
+index de6c153328..c35aad59b0 100644
+--- a/block/nbd-client.c
++++ b/block/nbd-client.c
+@@ -697,6 +697,7 @@ int nbd_client_co_pwritev(BlockDriverState *bs, uint64_t offset,
+         .len = bytes,
+     };
 
--/* Header of NBD_REPLY_TYPE_OFFSET_DATA, complete NBD_REPLY_TYPE_OFFSET_HOLE */
--typedef struct NBDStructuredRead {
--    NBDStructuredReplyChunk h;
-+/* Header of chunk for NBD_REPLY_TYPE_OFFSET_DATA */
-+typedef struct NBDStructuredReadData {
-+    NBDStructuredReplyChunk h; /* h.length >= 9 */
-     uint64_t offset;
--} QEMU_PACKED NBDStructuredRead;
-+    /* At least one byte of data payload follows, calculated from h.length */
-+} QEMU_PACKED NBDStructuredReadData;
-+
-+/* Complete chunk for NBD_REPLY_TYPE_OFFSET_HOLE */
-+typedef struct NBDStructuredReadHole {
-+    NBDStructuredReplyChunk h; /* h.length == 12 */
-+    uint64_t offset;
-+    uint32_t length;
-+} QEMU_PACKED NBDStructuredReadHole;
++    assert(!(client->info.flags & NBD_FLAG_READ_ONLY));
+     if (flags & BDRV_REQ_FUA) {
+         assert(client->info.flags & NBD_FLAG_SEND_FUA);
+         request.flags |= NBD_CMD_FLAG_FUA;
+@@ -717,6 +718,7 @@ int nbd_client_co_pwrite_zeroes(BlockDriverState *bs, int64_t offset,
+         .len = bytes,
+     };
 
- /* Header of all NBD_REPLY_TYPE_ERROR* errors */
- typedef struct NBDStructuredError {
--    NBDStructuredReplyChunk h;
-+    NBDStructuredReplyChunk h; /* h.length >= 6 */
-     uint32_t error;
-     uint16_t message_length;
- } QEMU_PACKED NBDStructuredError;
-diff --git a/nbd/server.c b/nbd/server.c
-index bcf0cdb47c..6ebb7d9c2e 100644
---- a/nbd/server.c
-+++ b/nbd/server.c
-@@ -1280,7 +1280,7 @@ static int coroutine_fn nbd_co_send_structured_read(NBDClient *client,
-                                                     size_t size,
-                                                     Error **errp)
- {
--    NBDStructuredRead chunk;
-+    NBDStructuredReadData chunk;
-     struct iovec iov[] = {
-         {.iov_base = &chunk, .iov_len = sizeof(chunk)},
-         {.iov_base = data, .iov_len = size}
++    assert(!(client->info.flags & NBD_FLAG_READ_ONLY));
+     if (!(client->info.flags & NBD_FLAG_SEND_WRITE_ZEROES)) {
+         return -ENOTSUP;
+     }
+@@ -756,6 +758,7 @@ int nbd_client_co_pdiscard(BlockDriverState *bs, int64_t offset, int bytes)
+         .len = bytes,
+     };
+
++    assert(!(client->info.flags & NBD_FLAG_READ_ONLY));
+     if (!(client->info.flags & NBD_FLAG_SEND_TRIM)) {
+         return 0;
+     }
+@@ -814,6 +817,12 @@ int nbd_client_init(BlockDriverState *bs,
+         logout("Failed to negotiate with the NBD server\n");
+         return ret;
+     }
++    if (client->info.flags & NBD_FLAG_READ_ONLY) {
++        ret = bdrv_set_read_only(bs, true, errp);
++        if (ret < 0) {
++            return ret;
++        }
++    }
+     if (client->info.flags & NBD_FLAG_SEND_FUA) {
+         bs->supported_write_flags = BDRV_REQ_FUA;
+         bs->supported_zero_flags |= BDRV_REQ_FUA;
 -- 
 2.13.6
