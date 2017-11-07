@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52734)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52733)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eC7ZD-0008Sa-BL
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 12:21:40 -0500
+	(envelope-from <bounces@canonical.com>) id 1eC7ZD-0008SZ-Ao
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 12:21:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eC7ZA-0003nV-3v
+	(envelope-from <bounces@canonical.com>) id 1eC7ZA-0003nd-7R
 	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 12:21:39 -0500
-Received: from indium.canonical.com ([91.189.90.7]:41776)
+Received: from indium.canonical.com ([91.189.90.7]:41778)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eC7Z9-0003mq-Rw
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 12:21:35 -0500
+	id 1eC7Z9-0003mp-U6
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 12:21:36 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eC7Z6-0006ZY-VE
+	id 1eC7Z7-0006Yl-Ey
 	for <qemu-devel@nongnu.org>; Tue, 07 Nov 2017 17:21:33 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id EB49A2E80D4
-	for <qemu-devel@nongnu.org>; Tue,  7 Nov 2017 17:21:32 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 700DF2E80CF
+	for <qemu-devel@nongnu.org>; Tue,  7 Nov 2017 17:21:33 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 07 Nov 2017 17:09:21 -0000
+Date: Tue, 07 Nov 2017 17:02:58 -0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1054812 <1054812@bugs.launchpad.net>
+Reply-To: Bug 696094 <696094@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20120923004004.13209.62505.malonedeb@gac.canonical.com>
-Message-Id: <151007456130.4416.258102951369995372.malone@chaenomeles.canonical.com>
+References: <20101231203043.711.86363.malonedeb@potassium.ubuntu.com>
+Message-Id: <151007417858.4382.4382228456928214334.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1054812] Re: Configure uses wrong libtool on
- Darwin
+Subject: [Qemu-devel] [Bug 696094] Re: TI Stellaris lm3s811evb (ARM
+ Cortex-M3) : Systick interrupt not working
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,38 +39,94 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Yes, libtool handling was removed entirely in commit e999ee443496b, so
-this bug is no longer present.
+I've just retested with the project attached to the bug (had to hack it
+a little bit to build with a recent gcc, but nothing affecting the timer
+code), and with current head-of-git QEMU we execute it OK and putting a
+breakpoint on the SysTick_Handler function shows that it is being
+invoked once a second, as expected.
+
+>From my comment #6, we've fixed SHPR byte/halfword accessibility, and
+rewritten the NVIC handling so it gets priority masking, BASEPRI, etc
+right. The stellaris boards having not much RAM is unavoidable, but we
+do now have the mps2 boards if you need a basic M profile system with
+more memory.
+
+So I'm going to close this bug as fix-committed, as it should be fixed
+in 2.11. (It might have been fixed already in 2.10, but 2.11 will
+definitely be OK.)
 
 
 ** Changed in: qemu
-       Status: Incomplete =3D> Fix Released
+       Status: New =3D> Fix Committed
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1054812
+https://bugs.launchpad.net/bugs/696094
 
 Title:
-  Configure uses wrong libtool on Darwin
+  TI Stellaris lm3s811evb (ARM Cortex-M3) : Systick interrupt not
+  working
 
 Status in QEMU:
-  Fix Released
+  Fix Committed
 
 Bug description:
-  On Darwin/OS X, there are two versions of libtool: the GNU libtool,
-  and Apple's libtool. Both are installed, but Apple's libtool (libtool)
-  won't build libcacard that Qemu uses, but Gnu's libtool (glibtool)
-  does. I get around using Apple's libtool by passing LIBTOOL=3Dglibtool
-  when configuring; unfortunately this variable isn't preserved so when
-  Qemu's configure changes it's not passed. A simple switch in the
-  configure script could check for Darwin, then if present, use
-  glibtool. Or configure could check the features of libtool, see if
-  they can build libcacard, then look for alternatives like glibtool.
+  I've tried to create a small project that uses the CMSIS as base library.
+  The problem is that the SysTick_interrupt_handler() doesn't get executed =
+when the systick event is detected in QEMU. Furthermore, it seems asif QEMU=
+ gets stuck in an endless loop. QEMU doesn't respond to Ctrl-C on the comma=
+nd line and the GDB session also stalls. 'kill -9' is the only way to stop =
+QEMU.
 
-  This bug was probably introduced when libcacard was added to Qemu, and
-  is present in commit 93b6599734f81328ee3d608f57667742cafeea72.
+  It seems asif the initialisation of the NVIC works fine. I've traced the =
+function calls in QEMU as follows:
+  stellaris.c: stellaris_init() - Perform generic armv7 init: armv7m_init()
+     armv7m.c: armv7m_init() - Create and init the nvic:
+                                 nvic =3D qdev_create(NULL, "armv7m_nvic");
+                                 env->nvic =3D nvic;
+                                 qdev_init_nofail(nvic);
+                             - Configure the programmable interrupt control=
+ler:
+                                 Call: arm_pic_init_cpu() =
+
+                                          qemu_allocate_irqs(arm_pic_cpu_ha=
+ndler)
+                             - Initialise 64 interrupt structures.
+
+  The following call sequence is observed when the systick event occur:
+  armv7m_nvic.c: systick_timer_tick(): set pending interrupt
+  armv7m_nvic.c: armv7m_nvic_set_pending() for irq:15
+    arm_gic.c: gic_set_pending_private(): GIC_SET_PENDING(15,)
+      arm_gic.c: gic_update() - Raise IRQ with qemu_set_irq()
+         irq.c: eqmu_set_irq() - Call the irq->handler =
+
+                                 -- I assume the irq handler is 'arm_pic_cp=
+u_handler()',
+                                    since that was passed as the parameter =
+when
+                                    qemu_allocate_irqs() was called in ...
+            arm_pic.c: arm_pic_cpu_handler() - After evaluation, call cpu_i=
+nterrupt()
+               exec.c: cpu_interrupt() is called.     =
+
+
+  The tools that were used during the testing of this project:
+    GCC: Codesourcery ARM eabi 2010q3
+    QEMU: Checked out on 31/12/2010 - Last commit: 0fcec41eec0432c77645b4a4=
+07d3a3e030c4abc4
+  The project files are attached, for reproducing of the errors.
+     Note: The CMSIS wants to perform byte accesses to the NVIC. For the Co=
+rtex-M3, unaligned 8 bit and 16 bit accesses are allowed. The current QEMU =
+implementation doesn't yet cater for it. As a work around, updated versions=
+ of
+  arm_gic.c armv7m_nvic.h armv7m_nvic.c is also included.
+
+  Launch project with: go_gdb.sh
+  Attach debugger with: arm-none-eabi-gdbtui --command=3DgdbCommands_tui
+  (s =3D step, n =3D next, c =3D continue, Ctrl-C =3D stop, print <variable=
+> to look at variable contents)
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1054812/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/696094/+subscriptions
