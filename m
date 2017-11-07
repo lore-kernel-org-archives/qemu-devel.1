@@ -1,35 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54105)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54906)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1eC7cV-000217-Nc
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 12:25:09 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eC7eN-0003lg-Ud
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 12:27:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1eC7cS-0005Lw-HL
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 12:25:03 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:51086)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pmorel@linux.vnet.ibm.com>)
-	id 1eC7cS-0005LU-8v
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 12:25:00 -0500
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vA7HNkoJ140429
-	for <qemu-devel@nongnu.org>; Tue, 7 Nov 2017 12:24:54 -0500
-Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2e3h130n7k-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 07 Nov 2017 12:24:52 -0500
-Received: from localhost
-	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pmorel@linux.vnet.ibm.com>;
-	Tue, 7 Nov 2017 17:24:49 -0000
-From: Pierre Morel <pmorel@linux.vnet.ibm.com>
-Date: Tue,  7 Nov 2017 18:24:38 +0100
-In-Reply-To: <1510075479-17224-1-git-send-email-pmorel@linux.vnet.ibm.com>
-References: <1510075479-17224-1-git-send-email-pmorel@linux.vnet.ibm.com>
-Message-Id: <1510075479-17224-7-git-send-email-pmorel@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 6/7] s390x/pci: move the memory region write
- from pcistg
+	(envelope-from <kwolf@redhat.com>) id 1eC7eM-0006Qh-OF
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 12:26:59 -0500
+From: Kevin Wolf <kwolf@redhat.com>
+Date: Tue,  7 Nov 2017 18:26:38 +0100
+Message-Id: <20171107172638.29942-1-kwolf@redhat.com>
+Subject: [Qemu-devel] [PATCH] block: Deprecate bdrv_set_read_only() and users
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,69 +17,171 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: cohuck@redhat.com, agraf@suse.de, borntraeger@de.ibm.com, zyimin@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com
+To: qemu-block@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org
 
-Let's move the memory region write from pcistg into a dedicated
-function.
-This allows us to prepare a later patch searching for subregions
-inside of the memory region.
+bdrv_set_read_only() is used by some block drivers to override the
+read-only option given by the user. This is not how read-only images
+generally work in QEMU: Instead of second guessing what the user really
+meant (which currently includes making an image read-only even if the
+user didn't only use the default, but explicitly said read-only=off), we
+should error out if we can't provide what the user requested.
 
-Signed-off-by: Pierre Morel <pmorel@linux.vnet.ibm.com>
-Reviewed-by: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
+This adds deprecation warnings to all callers of bdrv_set_read_only() so
+that the behaviour can be corrected after the usual deprecation period.
+
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- hw/s390x/s390-pci-inst.c | 27 +++++++++++++++++----------
- 1 file changed, 17 insertions(+), 10 deletions(-)
+ block.c       |  5 +++++
+ block/bochs.c | 13 ++++++++++---
+ block/cloop.c | 13 ++++++++++---
+ block/dmg.c   | 12 +++++++++---
+ block/rbd.c   | 14 ++++++++++----
+ block/vvfat.c |  6 +++++-
+ 6 files changed, 49 insertions(+), 14 deletions(-)
 
-diff --git a/hw/s390x/s390-pci-inst.c b/hw/s390x/s390-pci-inst.c
-index 50135a0..97f62b5 100644
---- a/hw/s390x/s390-pci-inst.c
-+++ b/hw/s390x/s390-pci-inst.c
-@@ -455,12 +455,27 @@ static int trap_msix(S390PCIBusDevice *pbdev, uint64_t offset, uint8_t pcias)
-     }
+diff --git a/block.c b/block.c
+index f6415547fe..0ed0c27140 100644
+--- a/block.c
++++ b/block.c
+@@ -261,6 +261,11 @@ int bdrv_can_set_read_only(BlockDriverState *bs, bool read_only,
+     return 0;
  }
  
-+static MemTxResult zpci_write_bar(S390PCIBusDevice *pbdev, uint8_t pcias,
-+                                  uint64_t offset, uint64_t data, uint8_t len)
-+{
-+    MemoryRegion *mr;
-+
-+    if (trap_msix(pbdev, offset, pcias)) {
-+        offset = offset - pbdev->msix.table_offset;
-+        mr = &pbdev->pdev->msix_table_mmio;
-+    } else {
-+        mr = pbdev->pdev->io_regions[pcias].memory;
-+    }
-+
-+    return memory_region_dispatch_write(mr, offset, data, len,
-+                                        MEMTXATTRS_UNSPECIFIED);
-+}
-+
- int pcistg_service_call(S390CPU *cpu, uint8_t r1, uint8_t r2)
++/* TODO Remove (deprecated since 2.11)
++ * Block drivers are not supposed to automatically change bs->read_only.
++ * Instead, they should just check whether they can provide what the user
++ * explicitly requested and error out if read-write is requested, but they can
++ * only provide read-only access. */
+ int bdrv_set_read_only(BlockDriverState *bs, bool read_only, Error **errp)
  {
-     CPUS390XState *env = &cpu->env;
-     uint64_t offset, data;
-     S390PCIBusDevice *pbdev;
--    MemoryRegion *mr;
-     MemTxResult result;
-     uint8_t len;
-     uint32_t fh;
-@@ -517,15 +532,7 @@ int pcistg_service_call(S390CPU *cpu, uint8_t r1, uint8_t r2)
-             return 0;
-         }
+     int ret = 0;
+diff --git a/block/bochs.c b/block/bochs.c
+index a759b6eff0..50c630047b 100644
+--- a/block/bochs.c
++++ b/block/bochs.c
+@@ -28,6 +28,7 @@
+ #include "block/block_int.h"
+ #include "qemu/module.h"
+ #include "qemu/bswap.h"
++#include "qemu/error-report.h"
  
--        if (trap_msix(pbdev, offset, pcias)) {
--            offset = offset - pbdev->msix.table_offset;
--            mr = &pbdev->pdev->msix_table_mmio;
--        } else {
--            mr = pbdev->pdev->io_regions[pcias].memory;
--        }
--
--        result = memory_region_dispatch_write(mr, offset, data, len,
--                                     MEMTXATTRS_UNSPECIFIED);
-+        result = zpci_write_bar(pbdev, pcias, offset, data, len);
-         if (result != MEMTX_OK) {
-             program_interrupt(env, PGM_OPERAND, 4);
-             return 0;
+ /**************************************************************/
+ 
+@@ -110,9 +111,15 @@ static int bochs_open(BlockDriverState *bs, QDict *options, int flags,
+         return -EINVAL;
+     }
+ 
+-    ret = bdrv_set_read_only(bs, true, errp); /* no write support yet */
+-    if (ret < 0) {
+-        return ret;
++    if (!bdrv_is_read_only(bs)) {
++        error_report("Opening bochs images without an explicit read-only=on "
++                     "option is deprecated. Future versions will refuse to "
++                     "open the image instead of automatically marking the "
++                     "image read-only.");
++        ret = bdrv_set_read_only(bs, true, errp); /* no write support yet */
++        if (ret < 0) {
++            return ret;
++        }
+     }
+ 
+     ret = bdrv_pread(bs->file, 0, &bochs, sizeof(bochs));
+diff --git a/block/cloop.c b/block/cloop.c
+index d6597fcf78..2be68987bd 100644
+--- a/block/cloop.c
++++ b/block/cloop.c
+@@ -23,6 +23,7 @@
+  */
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
++#include "qemu/error-report.h"
+ #include "qemu-common.h"
+ #include "block/block_int.h"
+ #include "qemu/module.h"
+@@ -72,9 +73,15 @@ static int cloop_open(BlockDriverState *bs, QDict *options, int flags,
+         return -EINVAL;
+     }
+ 
+-    ret = bdrv_set_read_only(bs, true, errp);
+-    if (ret < 0) {
+-        return ret;
++    if (!bdrv_is_read_only(bs)) {
++        error_report("Opening cloop images without an explicit read-only=on "
++                     "option is deprecated. Future versions will refuse to "
++                     "open the image instead of automatically marking the "
++                     "image read-only.");
++        ret = bdrv_set_read_only(bs, true, errp);
++        if (ret < 0) {
++            return ret;
++        }
+     }
+ 
+     /* read header */
+diff --git a/block/dmg.c b/block/dmg.c
+index 6c0711f563..c9b3c519c4 100644
+--- a/block/dmg.c
++++ b/block/dmg.c
+@@ -419,9 +419,15 @@ static int dmg_open(BlockDriverState *bs, QDict *options, int flags,
+         return -EINVAL;
+     }
+ 
+-    ret = bdrv_set_read_only(bs, true, errp);
+-    if (ret < 0) {
+-        return ret;
++    if (!bdrv_is_read_only(bs)) {
++        error_report("Opening dmg images without an explicit read-only=on "
++                     "option is deprecated. Future versions will refuse to "
++                     "open the image instead of automatically marking the "
++                     "image read-only.");
++        ret = bdrv_set_read_only(bs, true, errp);
++        if (ret < 0) {
++            return ret;
++        }
+     }
+ 
+     block_module_load_one("dmg-bz2");
+diff --git a/block/rbd.c b/block/rbd.c
+index 144f350e1f..a76a5e8755 100644
+--- a/block/rbd.c
++++ b/block/rbd.c
+@@ -665,10 +665,16 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
+     /* If we are using an rbd snapshot, we must be r/o, otherwise
+      * leave as-is */
+     if (s->snap != NULL) {
+-        r = bdrv_set_read_only(bs, true, &local_err);
+-        if (r < 0) {
+-            error_propagate(errp, local_err);
+-            goto failed_open;
++        if (!bdrv_is_read_only(bs)) {
++            error_report("Opening rbd snapshots without an explicit "
++                         "read-only=on option is deprecated. Future versions "
++                         "will refuse to open the image instead of "
++                         "automatically marking the image read-only.");
++            r = bdrv_set_read_only(bs, true, &local_err);
++            if (r < 0) {
++                error_propagate(errp, local_err);
++                goto failed_open;
++            }
+         }
+     }
+ 
+diff --git a/block/vvfat.c b/block/vvfat.c
+index a0f2335894..0841cc42fc 100644
+--- a/block/vvfat.c
++++ b/block/vvfat.c
+@@ -1259,7 +1259,11 @@ static int vvfat_open(BlockDriverState *bs, QDict *options, int flags,
+                        "Unable to set VVFAT to 'rw' when drive is read-only");
+             goto fail;
+         }
+-    } else  {
++    } else  if (!bdrv_is_read_only(bs)) {
++        error_report("Opening non-rw vvfat images without an explicit "
++                     "read-only=on option is deprecated. Future versions "
++                     "will refuse to open the image instead of "
++                     "automatically marking the image read-only.");
+         /* read only is the default for safety */
+         ret = bdrv_set_read_only(bs, true, &local_err);
+         if (ret < 0) {
 -- 
-2.7.4
+2.13.6
