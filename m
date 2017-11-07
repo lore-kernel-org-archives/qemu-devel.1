@@ -1,34 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47008)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47185)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eC604-0005I0-5m
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 10:41:20 -0500
+	(envelope-from <stefanha@gmail.com>) id 1eC60k-0005gK-VH
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 10:42:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eC5zz-0003aU-5l
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 10:41:16 -0500
-Received: from indium.canonical.com ([91.189.90.7]:33424)
+	(envelope-from <stefanha@gmail.com>) id 1eC60g-0004Er-8O
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 10:41:58 -0500
+Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:49990)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eC5zy-0003ZS-VH
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 10:41:11 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eC5zx-00009g-I3
-	for <qemu-devel@nongnu.org>; Tue, 07 Nov 2017 15:41:09 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 7334F2E80CD
-	for <qemu-devel@nongnu.org>; Tue,  7 Nov 2017 15:41:09 +0000 (UTC)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1eC60g-0004EV-0p
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 10:41:54 -0500
+Received: by mail-wr0-x231.google.com with SMTP id o88so1411095wrb.6
+	for <qemu-devel@nongnu.org>; Tue, 07 Nov 2017 07:41:53 -0800 (PST)
+Date: Tue, 7 Nov 2017 15:41:44 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20171107154144.GA23535@stefanha-x1.localdomain>
+References: <20171106190233.1175-1-stefanha@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 07 Nov 2017 15:30:52 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1673976 <1673976@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170318142657.21676.52259.malonedeb@chaenomeles.canonical.com>
-Message-Id: <151006865268.9047.4727090632573580550.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1673976] Re: locale-gen dumps core run under
- arm-linux-user on x86-64 host
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="rwEMma7ioTxnRzrJ"
+Content-Disposition: inline
+In-Reply-To: <20171106190233.1175-1-stefanha@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.11] tests-aio-multithread: fix
+ /aio/multi/schedule race condition
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,58 +30,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-
-This happens because QEMU is now stricter about its checking of the
-flags passed to clone() -- previously we would silently allow flags we
-couldn't support and create new threads with the wrong behaviour. Now we
-check and fail the clone() syscall if the requested behaviour is
-something we can't implement. Unfortunately we don't have any way to
-distinguish "guest program is asking for something odd that it doesn't
-really need" from "guest program is asking for something odd that it
-does need". So we err on the safe side and tell the guest we can't do
-it.
-
-It's particularly unfortunate that the glibc implementation of
-posix_spawn() runs into this, though.
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 
 
-** Summary changed:
+--rwEMma7ioTxnRzrJ
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-- locale-gen dumps core run under arm-linux-user on x86-64 host
-+ linux-user clone() can't handle glibc posix_spawn() (causes locale-gen to=
- assert)
+On Mon, Nov 06, 2017 at 07:02:33PM +0000, Stefan Hajnoczi wrote:
+> test_multi_co_schedule_entry() set to_schedule[id] in the final loop
+> iteration before terminating the coroutine.  There is a race condition
+> where the main thread attempts to enter the terminating or terminated
+> coroutine when signalling coroutines to stop:
+>=20
+>   atomic_mb_set(&now_stopping, true);
+>   for (i =3D 0; i < NUM_CONTEXTS; i++) {
+>       ctx_run(i, finish_cb, NULL);  <--- enters dead coroutine!
+>       to_schedule[i] =3D NULL;
+>   }
+>=20
+> Make sure only to set to_schedule[id] if this coroutine really needs to
+> be scheduled!
+>=20
+> Reported-by: "R.Nageswara Sastry" <nasastry@in.ibm.com>
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+> This patch is appropriate for the QEMU 2.11 release to eliminate
+> spurious test failures.
+>=20
+>  tests/test-aio-multithread.c | 5 ++---
+>  1 file changed, 2 insertions(+), 3 deletions(-)
 
--- =
+Thanks, applied to my block tree:
+https://github.com/stefanha/qemu/commits/block
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1673976
+Stefan
 
-Title:
-  linux-user clone() can't handle glibc posix_spawn() (causes locale-gen
-  to assert)
+--rwEMma7ioTxnRzrJ
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Status in QEMU:
-  New
+-----BEGIN PGP SIGNATURE-----
 
-Bug description:
-  I'm running a command (locale-gen) inside of an armv7h chroot mounted
-  on my x86_64 desktop by putting qemu-arm-static into /usr/bin/ of the
-  chroot file system and I get a core dump.
+iQEcBAEBAgAGBQJaAdQ4AAoJEJykq7OBq3PIuEUH/j7D3Cp6O5aNi30+Vt7BS9fH
+fwwO4eIQSXO3t180Iem4GFdSHHZ/Q5UZlf13sc+Aunq7et+anPV/QYHGWM13r8Px
+CKdNPUTKIkrXhZ9OMR94JlZog25Np5c3MvMrsTtjxIavzYTF9q8rk0P97VgvghSI
+UcB6WyElnUfzz+LsLe4Ax/friQ8B+egcp5gziHNhSqRCtG1JfCN7eIUXXMyvpsAq
+mrkPUHzrnbn4XZJlwGDcZhD7UVlY1TUEtJhjElFwMSw0thvw85WJ9k05quI0xACv
+V+/UK8u0PyQ9Ziw1s1r0N/1sSqyGbRCGx2TJE3+H7/yU8B/JK4Bfcw+qsRV/jEE=
+=Sdzk
+-----END PGP SIGNATURE-----
 
-  locale-gen
-  Generating locales...
-  =C2=A0=C2=A0en_US.UTF-8...localedef: ../sysdeps/unix/sysv/linux/spawni.c:=
-360: __spawnix: Assertion `ec >=3D 0' failed.
-  qemu: uncaught target signal 6 (Aborted) - core dumped
-  /usr/bin/locale-gen: line 41:    34 Aborted                 (core dumped)=
- localedef -i $input -c -f $charset -A /usr/share/locale/locale.alias $loca=
-le
-
-  I've done this same thing successfully for years, but this breakage
-  has appeared some time in the last 3 or so months. Possibly with the
-  update to qemu version 2.8.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1673976/+subscriptions
+--rwEMma7ioTxnRzrJ--
