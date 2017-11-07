@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37672)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37702)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eBuA9-0007a3-1i
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 22:02:53 -0500
+	(envelope-from <eblake@redhat.com>) id 1eBuA9-0007c3-SE
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 22:02:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eBuA4-0003SG-Dn
+	(envelope-from <eblake@redhat.com>) id 1eBuA9-0003WE-59
 	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 22:02:53 -0500
 From: Eric Blake <eblake@redhat.com>
-Date: Mon,  6 Nov 2017 21:02:32 -0600
-Message-Id: <20171107030236.23633-5-eblake@redhat.com>
+Date: Mon,  6 Nov 2017 21:02:34 -0600
+Message-Id: <20171107030236.23633-7-eblake@redhat.com>
 In-Reply-To: <20171107030236.23633-1-eblake@redhat.com>
 References: <20171107030236.23633-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH 4/8] nbd-client: Honor server read-only
- advertisement
+Subject: [Qemu-devel] [PATCH 6/8] nbd-client: Short-circuit 0-length
+ operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,63 +23,62 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, pbonzini@redhat.com, vsementsov@virtuozzo.com, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-The NBD spec says that clients should not try to write/trim to
-an export advertised as read-only by the server.  But we failed
-to inform the block layer of what we learned from the server,
-meaning that we were depending on the server sending a proper
-EPERM failure for various commands.  In fact, this was noticeable
-in the case of a 0-length write: we had a difference in behavior
-depending on whether we were writing zero (silent success
-locally, because the driver is not invoked from the block layer)
-or normal writes (noisy failure, because we sent a 0-length
-request across the wire and the server flagged it as invalid);
-now we always fail locally without sending anything over the wire.
+The NBD spec is being clarified to state that clients should
+not send 0-length requests to the server, as the server behavior
+is undefined.  While such requests are unlikely to occur from
+real guest behavior, qemu-io can force the driver to perform them;
+avoid any questionable server implementations by short-circuiting
+such operations as a no-op success (we are relying on the block
+layer for already filtering out things like invalid offset, write
+to a read-only volume, and so forth).
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- block/nbd-client.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ block/nbd-client.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
 diff --git a/block/nbd-client.c b/block/nbd-client.c
-index de6c153328..c35aad59b0 100644
+index c35aad59b0..d8ad2ba57c 100644
 --- a/block/nbd-client.c
 +++ b/block/nbd-client.c
-@@ -697,6 +697,7 @@ int nbd_client_co_pwritev(BlockDriverState *bs, uint64_t offset,
-         .len = bytes,
-     };
+@@ -673,6 +673,9 @@ int nbd_client_co_preadv(BlockDriverState *bs, uint64_t offset,
 
-+    assert(!(client->info.flags & NBD_FLAG_READ_ONLY));
-     if (flags & BDRV_REQ_FUA) {
-         assert(client->info.flags & NBD_FLAG_SEND_FUA);
-         request.flags |= NBD_CMD_FLAG_FUA;
-@@ -717,6 +718,7 @@ int nbd_client_co_pwrite_zeroes(BlockDriverState *bs, int64_t offset,
-         .len = bytes,
-     };
+     assert(bytes <= NBD_MAX_BUFFER_SIZE);
+     assert(!flags);
++    if (!bytes) {
++        return 0;
++    }
 
-+    assert(!(client->info.flags & NBD_FLAG_READ_ONLY));
-     if (!(client->info.flags & NBD_FLAG_SEND_WRITE_ZEROES)) {
-         return -ENOTSUP;
+     ret = nbd_co_send_request(bs, &request, NULL);
+     if (ret < 0) {
+@@ -705,6 +708,9 @@ int nbd_client_co_pwritev(BlockDriverState *bs, uint64_t offset,
+
+     assert(bytes <= NBD_MAX_BUFFER_SIZE);
+
++    if (!bytes) {
++        return 0;
++    }
+     return nbd_co_request(bs, &request, qiov);
+ }
+
+@@ -731,6 +737,9 @@ int nbd_client_co_pwrite_zeroes(BlockDriverState *bs, int64_t offset,
+         request.flags |= NBD_CMD_FLAG_NO_HOLE;
      }
-@@ -756,6 +758,7 @@ int nbd_client_co_pdiscard(BlockDriverState *bs, int64_t offset, int bytes)
-         .len = bytes,
+
++    if (!bytes) {
++        return 0;
++    }
+     return nbd_co_request(bs, &request, NULL);
+ }
+
+@@ -759,7 +768,7 @@ int nbd_client_co_pdiscard(BlockDriverState *bs, int64_t offset, int bytes)
      };
 
-+    assert(!(client->info.flags & NBD_FLAG_READ_ONLY));
-     if (!(client->info.flags & NBD_FLAG_SEND_TRIM)) {
+     assert(!(client->info.flags & NBD_FLAG_READ_ONLY));
+-    if (!(client->info.flags & NBD_FLAG_SEND_TRIM)) {
++    if (!(client->info.flags & NBD_FLAG_SEND_TRIM) || !bytes) {
          return 0;
      }
-@@ -814,6 +817,12 @@ int nbd_client_init(BlockDriverState *bs,
-         logout("Failed to negotiate with the NBD server\n");
-         return ret;
-     }
-+    if (client->info.flags & NBD_FLAG_READ_ONLY) {
-+        ret = bdrv_set_read_only(bs, true, errp);
-+        if (ret < 0) {
-+            return ret;
-+        }
-+    }
-     if (client->info.flags & NBD_FLAG_SEND_FUA) {
-         bs->supported_write_flags = BDRV_REQ_FUA;
-         bs->supported_zero_flags |= BDRV_REQ_FUA;
+
 -- 
 2.13.6
