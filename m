@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35988)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38106)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eC0CY-00056k-4A
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 04:29:47 -0500
+	(envelope-from <longpeng2@huawei.com>) id 1eC0GC-00068C-1M
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 04:33:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eC0CW-00083I-Ey
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 04:29:46 -0500
-Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:45503)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eC0CW-00081d-6B
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 04:29:44 -0500
-Received: by mail-wr0-x241.google.com with SMTP id y9so11201231wrb.2
-	for <qemu-devel@nongnu.org>; Tue, 07 Nov 2017 01:29:43 -0800 (PST)
+	(envelope-from <longpeng2@huawei.com>) id 1eC0G5-0001jn-Dr
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 04:33:32 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:2280)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <longpeng2@huawei.com>) id 1eC0G4-0001i0-R1
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 04:33:25 -0500
+Message-ID: <5A017DC4.6000706@huawei.com>
+Date: Tue, 7 Nov 2017 17:32:52 +0800
+From: "Longpeng (Mike)" <longpeng2@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <03986f7a-f1f8-751a-4967-ab7d1a5093fd@vivier.eu>
-References: <492245211.936616.1510023015797.JavaMail.zimbra@xes-inc.com>
-	<03986f7a-f1f8-751a-4967-ab7d1a5093fd@vivier.eu>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 7 Nov 2017 09:29:21 +0000
-Message-ID: <CAFEAcA8kXjH5dSM6KCGX5gfgJWJMAymz=D3BTMxjLwZQ7_s5hg@mail.gmail.com>
+References: <1509949271-36280-1-git-send-email-longpeng2@huawei.com>
+	<d465b265-2f07-34df-4474-d5dd57ec7443@redhat.com>
+	<5A0119FE.6060709@huawei.com> <20171107091617.GC14232@redhat.com>
+In-Reply-To: <20171107091617.GC14232@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] linux-user: Support explicit targets for
- PowerPC
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] crypto: afalg: fix a NULL pointer
+ dereference
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,53 +29,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: Aaron Sierra <asierra@xes-inc.com>, Riku Voipio <riku.voipio@iki.fi>, QEMU Developers <qemu-devel@nongnu.org>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, pbonzini@redhat.com, arei.gonglei@huawei.com, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>
 
-On 7 November 2017 at 06:57, Laurent Vivier <laurent@vivier.eu> wrote:
-> Le 07/11/2017 =C3=A0 03:50, Aaron Sierra a =C3=A9crit :
->> Enable building PowerPC targets supporting a specific CPU, without
->> having to set QEMU_CPU via the environment. For example these build
->> targets (and many more) become available:
+
+
+On 2017/11/7 17:16, Daniel P. Berrange wrote:
+
+> On Tue, Nov 07, 2017 at 10:27:10AM +0800, Longpeng (Mike) wrote:
 >>
->>     qemu-ppc.e500mc
->>     qemu-ppc.e500v2
->>     qemu-ppc.e5500
->>     qemu-ppc.e600
->>     qemu-ppc.e6500
 >>
->> These (statically compiled) binaries have proven useful for emulating
->> PowerPC CPUs within Docker containers, where it's hard to reliably
->> define environment variables that are available for every process.
->
-> I agree with you.
->
-> I have patches to do that for years, perhaps we can merge our both
-> solutions to have something working:
->
-> linux-user: define default cpu model in configure instead of
-> linux-user/main.c
-> https://github.com/vivier/qemu-m68k/commit/1488df8c9fa3a5b099bbc4f41c077a=
-6c69305cc2
->
-> linux-user: specify the cpu model during configure
-> https://github.com/vivier/qemu-m68k/commit/496f804fd97d5f0ef26da1090e1d95=
-ad15bcc50e
->
-> The part missing in my series is to rename the qemu binaries with the
-> suffix of the default CPU.
+>> On 2017/11/7 1:00, Eric Blake wrote:
+>>
+>>> On 11/06/2017 12:21 AM, Longpeng(Mike) wrote:
+>>>> Test-crypto-hash calls qcrypto_hash_bytesv/digest/base64 with
+>>>> errp=NULL, this will cause a NULL poniter deference if afalg_driver
+>>>
+>>> s/poniter deference/pointer dereference/
+>>>
+>>
+>> OK.
+>>
+>>>> doesn't support requested algos:
+>>>>     ret = qcrypto_hash_afalg_driver.hash_bytesv(alg, iov, niov,
+>>>>                                                 result, resultlen,
+>>>>                                                 errp);
+>>>>     if (ret == 0) {
+>>>>         return ret;
+>>>>     }
+>>>>
+>>>>     error_free(*errp);  // <--- here
+>>>>
+>>>> So we must check 'errp & *errp' before dereference.
+>>>
+>>> No, if we are going to blindly ignore the error from the hash_bytesv()
+>>> call, then we should pass NULL rather than errp.
+>>>
+>>
+>> The 'errp' in this palce is convenient for debug, it can tell us the reason for
+>> failure without stepping into afalg_driver's hash_bytesv().
+> 
+> It doesn't do anything useful for debug, because we are just immediately
+> throwing away the error without printing it anywhere. Just pass NULL into
+> the hash_bytesv call above.
+> 
 
-I don't really like this -- it means we'll end up with a huge
-extra range of executables, and every time a new CPU type is
-added a new binary has to be plumbed in to our own 'make
-install' machinery and into every distro's packaging.
+OK..
 
-The 'look at argv[0]' approach is perhaps a bit more
-palatable. Or you could just write and use wrapper
-scripts.
+Afalg-backend cipher/hmac has the same usage, so maybe I need to correct all of
+them.
 
-I take it there's no good "-cpu any" option for PPC that
-would run all these binaries?
+> Regards,
+> Daniel
 
-thanks
--- PMM
+
+-- 
+Regards,
+Longpeng(Mike)
