@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36751)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47080)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eCAze-00020t-QR
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 16:01:14 -0500
+	(envelope-from <bounces@canonical.com>) id 1eCBSt-0000c9-91
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 16:31:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eCAzY-0005fp-EQ
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 16:01:10 -0500
-Received: from indium.canonical.com ([91.189.90.7]:51468)
+	(envelope-from <bounces@canonical.com>) id 1eCBSq-0001Lk-4w
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 16:31:23 -0500
+Received: from indium.canonical.com ([91.189.90.7]:57442)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eCAzY-0005fB-4Y
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 16:01:04 -0500
+	id 1eCBSp-0001LP-RH
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 16:31:20 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eCAzX-0007hA-2G
-	for <qemu-devel@nongnu.org>; Tue, 07 Nov 2017 21:01:03 +0000
+	id 1eCBSo-0003FX-3M
+	for <qemu-devel@nongnu.org>; Tue, 07 Nov 2017 21:31:18 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 0E7582E80C0
-	for <qemu-devel@nongnu.org>; Tue,  7 Nov 2017 21:01:03 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 26F7A2E81E1
+	for <qemu-devel@nongnu.org>; Tue,  7 Nov 2017 21:31:13 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 07 Nov 2017 20:52:16 -0000
+Date: Tue, 07 Nov 2017 21:22:33 -0000
 From: Bruno Haible <bruno@clisp.org>
 Reply-To: Bug 1701798 <1701798@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <149890819992.24827.8096984642709091835.malonedeb@soybean.canonical.com>
-Message-Id: <151008793700.9436.1932745383861095758.malone@wampee.canonical.com>
+Message-Id: <151008975326.4047.12175507305537933970.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1701798] Re: dynamically linked binaries crash
  for big-endian targets
@@ -39,77 +39,67 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-> can you still reproduce any of the other problems with a new QEMU?
+Re #4:
+>  2) files like /etc/ld.so.cache (and other things the dynamic linker uses=
+) are not in the -L directory but are in the host
+>  3) the ld.so.cache format is not endian-agnostic
+>  4) glibc's dynamic linker code does not ignore a wrong-endian ld.so.cach=
+e but crashes instead
 
-On the same system (Ubuntu 16.04 x86_64, not a chroot environment), I
-still observe the same symptoms with QEMU as of today than with 2.9.0 or
-2.10.0:
+Indeed the problem is with /etc/ld.so.cache, and ONLY /etc/ld.so.cache.
+When I hack the do_openat function in linux-user/syscall.c, to pretend
+that no /etc/ld.so.cache exists, - see attached hide-ld.so.cache.diff -
+the dynamically-linked binaries work (except the s390x case, which you
+identified as a different issue):
 
-$ QEMU_LD_PREFIX=3D/usr/sparc64-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-sparc6=
-4 hello.sparc64
-Segmentation fault (core dumped)
 $ QEMU_LD_PREFIX=3D/usr/sparc64-linux-gnu ~/inst-qemu/2.10+-20171107/bin/qe=
 mu-sparc64 hello.sparc64
-Segmentation fault (core dumped)
-
-$ QEMU_LD_PREFIX=3D/usr/mips-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-mips hell=
-o.mips
-qemu: uncaught target signal 11 (Segmentation fault) - core dumped
-Segmentation fault (core dumped)
+Hello world
 $ QEMU_LD_PREFIX=3D/usr/mips-linux-gnu ~/inst-qemu/2.10+-20171107/bin/qemu-=
 mips hello.mips
-qemu: uncaught target signal 11 (Segmentation fault) - core dumped
-Segmentation fault (core dumped)
-
-$ QEMU_LD_PREFIX=3D/usr/mips64-linux-gnuabi64 ~/inst-qemu/2.9.0/bin/qemu-mi=
-ps64 hello.mips64
-qemu: uncaught target signal 11 (Segmentation fault) - core dumped
-Segmentation fault (core dumped)
+Hello world
 $ QEMU_LD_PREFIX=3D/usr/mips64-linux-gnuabi64 ~/inst-qemu/2.10+-20171107/bi=
 n/qemu-mips64 hello.mips64
-qemu: uncaught target signal 11 (Segmentation fault) - core dumped
-Segmentation fault (core dumped)
-
-$ QEMU_LD_PREFIX=3D/usr/powerpc-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-ppc he=
-llo.powerpc
-qemu: uncaught target signal 11 (Segmentation fault) - core dumped
-Segmentation fault (core dumped)
+Hello world
 $ QEMU_LD_PREFIX=3D/usr/powerpc-linux-gnu ~/inst-qemu/2.10+-20171107/bin/qe=
 mu-ppc hello.powerpc
-qemu: uncaught target signal 11 (Segmentation fault) - core dumped
-Segmentation fault (core dumped)
-
-$ QEMU_LD_PREFIX=3D/usr/powerpc64-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-ppc6=
-4 hello.powerpc64
-qemu: uncaught target signal 11 (Segmentation fault) - core dumped
-Segmentation fault (core dumped)
+Hello world
 $ QEMU_LD_PREFIX=3D/usr/powerpc64-linux-gnu ~/inst-qemu/2.10+-20171107/bin/=
 qemu-ppc64 hello.powerpc64
-qemu: uncaught target signal 11 (Segmentation fault) - core dumped
-Segmentation fault (core dumped)
-
-$ QEMU_LD_PREFIX=3D/usr/s390x-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-s390x he=
-llo.s390x
-Killed
+Hello world
 $ QEMU_LD_PREFIX=3D/usr/s390x-linux-gnu ~/inst-qemu/2.10+-20171107/bin/qemu=
 -s390x hello.s390x
 Killed
-
-$ QEMU_LD_PREFIX=3D/usr/hppa-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-hppa hell=
-o.hppa
-Segmentation fault (core dumped)
 $ QEMU_LD_PREFIX=3D/usr/hppa-linux-gnu ~/inst-qemu/2.10+-20171107/bin/qemu-=
 hppa hello.hppa
-Segmentation fault (core dumped)
-
-$ QEMU_LD_PREFIX=3D/usr/m68k-linux-gnu QEMU_CPU=3Dm68020 ~/inst-qemu/2.10.0=
-/bin/qemu-m68k hello.m68k
-qemu: uncaught target signal 11 (Segmentation fault) - core dumped
-Segmentation fault (core dumped)
+Hello world
 $ QEMU_LD_PREFIX=3D/usr/m68k-linux-gnu QEMU_CPU=3Dm68020 ~/inst-qemu/2.10+-=
 20171107/bin/qemu-m68k hello.m68k
-qemu: uncaught target signal 11 (Segmentation fault) - core dumped
-Segmentation fault (core dumped)
+Hello world
+
+Hurray! This bug that has seriously limited the value of linux-user
+emulation is now gone for me!
+
+> Can you check whether these work if you copy the QEMU and the
+dynamically linked target binary into a chroot
+
+This is way too cumbersome for me:
+  - Need to copy my workspaces into specific file locations on the disk,
+  - Need to use 'chroot' command before anything else,
+  - Need to use a statically-linked qemu.
+
+> Personally I think that (4) is a glibc bug...
+
+Maybe, but if you can fix it in 5 to 10 lines code in qemu, I doubt it's
+worth reporting it to the glibc people.
+
+Small improvement: In my hack, I just pretended /etc/ld.so.cache is
+absent. Possibly it's better to map it to
+$QEMU_LD_PREFIX/etc/ld.so.cache .
+
+** Patch added: "hide-ld.so.cache.diff"
+   https://bugs.launchpad.net/qemu/+bug/1701798/+attachment/5005583/+files/=
+hide-ld.so.cache.diff
 
 -- =
 
