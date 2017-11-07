@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58953)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59494)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <s1seetee@linux.vnet.ibm.com>) id 1eC3md-0003Fq-TX
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 08:19:16 -0500
+	(envelope-from <bounces@canonical.com>) id 1eC3oU-00041n-3S
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 08:21:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <s1seetee@linux.vnet.ibm.com>) id 1eC3md-0008O6-1I
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 08:19:15 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57054)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <s1seetee@linux.vnet.ibm.com>)
-	id 1eC3mc-0008Ll-PJ
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 08:19:14 -0500
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vA7DIm1i110472
-	for <qemu-devel@nongnu.org>; Tue, 7 Nov 2017 08:19:08 -0500
-Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2e3b239ed5-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 07 Nov 2017 08:19:08 -0500
-Received: from localhost
-	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <s1seetee@linux.vnet.ibm.com>;
-	Tue, 7 Nov 2017 13:19:05 -0000
-From: Seeteena Thoufeek <s1seetee@linux.vnet.ibm.com>
-Date: Tue,  7 Nov 2017 18:48:58 +0530
-Message-Id: <1510060738-25975-1-git-send-email-s1seetee@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v1] spapr_pci: fix the path while fetching
- loc-code from host DT
+	(envelope-from <bounces@canonical.com>) id 1eC3oO-0003nW-9L
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 08:21:10 -0500
+Received: from indium.canonical.com ([91.189.90.7]:42866)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eC3oO-0003l5-34
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 08:21:04 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eC3oL-0008R9-3r
+	for <qemu-devel@nongnu.org>; Tue, 07 Nov 2017 13:21:01 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 692242E80E9
+	for <qemu-devel@nongnu.org>; Tue,  7 Nov 2017 13:20:59 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 07 Nov 2017 13:06:07 -0000
+From: "R.Nageswara Sastry" <nasastry@in.ibm.com>
+Reply-To: Bug 1713434 <1713434@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150391152035.18876.7874968547091336063.malonedeb@chaenomeles.canonical.com>
+Message-Id: <151005996720.19907.17408369624848984429.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1713434] Re: prom-env-test test aborted and core
+ dumped
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,33 +37,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: david@gibson.dropbear.id.au, agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
-Cc: s1seetee@linux.vnet.ibm.com
+To: qemu-devel@nongnu.org
 
-The function spapr_phb_vfio_get_loc_code uses wrong path for
-fetching loc-code from host DT
+Here is the md5sum of openbios-sparc64
 
-this is the call that needs to be fixed:
-/* Construct and read from host device tree the loc-code */
-path = g_strdup_printf("/proc/device-tree%s/ibm,loc-code", buf);
+# md5sum ./pc-bios/openbios-sparc64
+15418a4c9429d9ee9c637701b94c7ffb  ./pc-bios/openbios-sparc64
 
-Signed-off-by: Seeteena Thoufeek <s1seetee@linux.vnet.ibm.com>
----
- hw/ppc/spapr_pci.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> Could you please check with the QEMU 2.10 release to see whether this is =
+a regression or whether it was already failing there? =
 
-diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-index 5a3122a..ae86322 100644
---- a/hw/ppc/spapr_pci.c
-+++ b/hw/ppc/spapr_pci.c
-@@ -762,7 +762,7 @@ static char *spapr_phb_vfio_get_loc_code(sPAPRPHBState *sphb,  PCIDevice *pdev)
-     g_free(path);
- 
-     /* Construct and read from host device tree the loc-code */
--    path = g_strdup_printf("/proc/device-tree%s/ibm,loc-code", buf);
-+    path = g_strdup_printf("/proc/device-tree/%s/ibm,loc-code", buf);
-     g_free(buf);
-     if (!g_file_get_contents(path, &buf, NULL, NULL)) {
-         goto err_out;
--- 
-1.8.3.1
+Sure, I will update here. Most probably tomorrow.
+
+> I don't have access to POWER9 anymore, so I can't check this right now
+No issues, I can check.
+
+> To quit QEMU, you've got to press "CTRL-a c" and then type "quit" at the =
+monitor prompt.
+Thank you. I am learning new things along with raising bugs :-)
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1713434
+
+Title:
+  prom-env-test test aborted and core dumped
+
+Status in QEMU:
+  In Progress
+
+Bug description:
+  On ppc64le architecture machine the following test case Aborted and
+  Core dumped.
+
+  # tests/prom-env-test --quiet --keep-going -m=3Dquick --GTestLogFD=3D6
+  **
+  ERROR:tests/libqtest.c:628:qtest_get_arch: assertion failed: (qemu !=3D N=
+ULL)
+  Aborted (core dumped)
+
+  Steps to re-produce:
+  clone from the git
+  configure & compile =
+
+  run the unit tests by 'make check'
+
+  (gdb) bt
+  #0  0x00003fff9d60eff0 in raise () from /lib64/libc.so.6
+  #1  0x00003fff9d61136c in abort () from /lib64/libc.so.6
+  #2  0x00003fff9de1aa04 in g_assertion_message () from /lib64/libglib-2.0.=
+so.0
+  #3  0x00003fff9de1ab0c in g_assertion_message_expr () from /lib64/libglib=
+-2.0.so.0
+  #4  0x000000001000cc30 in qtest_get_arch () at tests/libqtest.c:628
+  #5  0x00000000100048f0 in main (argc=3D5, argv=3D0x3ffff2145538) at tests=
+/prom-env-test.c:82
+  (gdb) i r
+  r0             0xfa	250
+  r1             0x3ffff2144d30	70368510627120
+  r2             0x3fff9d7b9900	70367091333376
+  r3             0x0	0
+  r4             0x12a7	4775
+  r5             0x6	6
+  r6             0x8	8
+  r7             0x1	1
+  r8             0x0	0
+  r9             0x0	0
+  r10            0x0	0
+  r11            0x0	0
+  r12            0x0	0
+  r13            0x3fff9dfa1950	70367099623760
+  r14            0x0	0
+  r15            0x0	0
+  r16            0x0	0
+  r17            0x0	0
+  r18            0x0	0
+  r19            0x0	0
+  r20            0x0	0
+  r21            0x0	0
+  r22            0x0	0
+  r23            0x0	0
+  r24            0x0	0
+  r25            0x0	0
+  r26            0x0	0
+  r27            0x100287f8	268601336
+  r28            0x16841b40	377756480
+  r29            0x4c	76
+  r30            0x3ffff2144de8	70368510627304
+  r31            0x6	6
+  pc             0x3fff9d60eff0	0x3fff9d60eff0 <raise+96>
+  msr            0x900000000280f033	10376293541503627315
+  cr             0x42000842	1107298370
+  lr             0x3fff9d61136c	0x3fff9d61136c <abort+396>
+  ctr            0x0	0
+  xer            0x0	0
+  orig_r3        0x12a7	4775
+  trap           0xc00	3072
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1713434/+subscriptions
