@@ -1,33 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57460)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32790)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1eBwie-0003J5-25
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 00:46:41 -0500
+	(envelope-from <famz@redhat.com>) id 1eBwwP-00059m-4i
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 01:00:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1eBwia-0002Tr-VS
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 00:46:40 -0500
-Received: from mail-io0-x22e.google.com ([2607:f8b0:4001:c06::22e]:49520)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1eBwia-0002TR-Q1
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 00:46:36 -0500
-Received: by mail-io0-x22e.google.com with SMTP id n137so887042iod.6
-	for <qemu-devel@nongnu.org>; Mon, 06 Nov 2017 21:46:36 -0800 (PST)
-References: <CANRm+CxGAiDBDYrtvxXwsPwt2WjiY_biMCVkvQOyAaQtv5v-UQ@mail.gmail.com>
-	<80415da5-4eef-bf85-b617-fadc3dae4475@redhat.com>
-	<CANRm+CwexgKHUVK3b3QYw8ksyaSgZRDiWztOsOvPpMugTQj16w@mail.gmail.com>
-	<e23177c9-36cb-2ad7-18c0-ebf3caaebb52@redhat.com>
-	<20171106115931.GB3898@lemon>
-	<fb7c5778-238d-ac99-26d6-8a6d9c80a0f4@redhat.com>
-	<CANRm+Cw=F244w=6YMutjcvWin9_xiRt0Z1MvT=oi+7CXjU+DXw@mail.gmail.com>
-	<78a404c5-fb2f-6fdf-c307-107ff1af4342@redhat.com>
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Message-ID: <5e0576f6-bb91-7e6e-7a1d-391d18717c0d@ozlabs.ru>
-Date: Tue, 7 Nov 2017 16:46:31 +1100
+	(envelope-from <famz@redhat.com>) id 1eBwwM-0007Tr-4U
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 01:00:53 -0500
+Date: Tue, 7 Nov 2017 14:00:33 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20171107060033.GD16355@lemon>
+References: <cover.1510021573.git.jcody@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <78a404c5-fb2f-6fdf-c307-107ff1af4342@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-AU
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] qemu core file size
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <cover.1510021573.git.jcody@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 0/4] Don't write headers if BDS is
+ INACTIVE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,46 +23,13 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wanpeng Li <kernellwp@gmail.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+To: Jeff Cody <jcody@redhat.com>
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, aik@ozlabs.ru, qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com, den@openvz.org
 
-On 07/11/17 01:08, Paolo Bonzini wrote:
-> On 06/11/2017 13:18, Wanpeng Li wrote:
->> 2017-11-06 20:02 GMT+08:00 Paolo Bonzini <pbonzini@redhat.com>:
->>> On 06/11/2017 12:59, Fam Zheng wrote:
->>>>>> Could you point out the patchset for the fix?
->>>>> Between 447b0d0b9ee8a0ac216c3186e0f3c427a1001f0c and
->>>>> 092aa2fc65b7a35121616aad8f39d47b8f921618.
->>>> Not sure how these relate to the core size, but I've tested upstream
->>>> (ec7a8bf0b8f7dc7288fe8745464ee8217528cc6c) and with dump-guest-core=off the core
->>>> file is 363M, still significantly larger than rss (~73M).
->>>>
->>>> What is bloating the core file?
->>>
->>> My guess would have been fragmented heap.  The core file, unlike the
->>> RSS, includes all the mmaped memory (e.g. from shared libraries) that
->>> has never been used.
->>>
->>> For example, all the Ceph/Gluster/PulseAudio/SPICE/whatever libraries
->>> are included in the core file but likely are not in the RSS.
->>
->> Do you mean not use Memory API will avoid the fragmented heap?
+On Mon, 11/06 21:31, Jeff Cody wrote:
+> Changes from v2->v3:
 > 
-> The high memory usage from the memory API causes excessive
-> fragmentation.  Alexey's work should help reducing memory usage and thus
-> the fragmentation.
+> Patch 2: Uh... fix that misspelling.  Thanks Stefan :)
+> Patch 3: New patch to block migration in parallels
 
-Since centos6 does not have this issue and centos7 does, I'd suggest
-MALLOC_ARENA_MAX&co
-https://www.gnu.org/software/libc/manual/html_node/Memory-Allocation-Tunables.html
-
-glibc changed some defaults between rhel/centos 6 and 7 if I recall
-correctly, and these arenas now create big anon mappings per thread, these
-are not really touched (so they do not use resident memory) but may appear
-in these dumps, dunno.
-
-btw do you configure the machine to make "kill -11" produce qemu core dumps?
-
-
--- 
-Alexey
+Reviewed-by: Fam Zheng <famz@redhat.com>
