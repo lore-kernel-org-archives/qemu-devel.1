@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45618)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46754)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eBtB0-0003QZ-8r
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 20:59:43 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1eBtFL-0004TA-GP
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 21:04:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eBtAz-0007Ey-7o
-	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 20:59:42 -0500
-Date: Tue, 7 Nov 2017 09:59:30 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20171107015930.GA16355@lemon>
-References: <68B56AECEFB25A418ADB9417F6178A531091A91B@dggemi507-mbs.china.huawei.com>
-	<20171103102626.GH5078@stefanha-x1.localdomain>
-	<20171106161159.GC5116@localhost.localdomain>
-	<22b48478-8c86-f378-f770-095e3c297725@redhat.com>
+	(envelope-from <aik@ozlabs.ru>) id 1eBtFI-0000zC-7T
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 21:04:11 -0500
+Received: from mail-pf0-x230.google.com ([2607:f8b0:400e:c00::230]:48255)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1eBtFH-0000yp-Vo
+	for qemu-devel@nongnu.org; Mon, 06 Nov 2017 21:04:08 -0500
+Received: by mail-pf0-x230.google.com with SMTP id b79so9158065pfk.5
+	for <qemu-devel@nongnu.org>; Mon, 06 Nov 2017 18:04:07 -0800 (PST)
+References: <20171103153333.6416-1-berrange@redhat.com>
+	<CAFEAcA-n7jLjBcCAG6r30F=UUZy8vAKfMK8oC3oM+K1QTsH0zA@mail.gmail.com>
+	<20171106104401.GE23361@redhat.com> <20171106143010.GI23361@redhat.com>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <4474fa50-c6e4-973e-90e9-2756dcd3d3b1@ozlabs.ru>
+Date: Tue, 7 Nov 2017 13:04:02 +1100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <22b48478-8c86-f378-f770-095e3c297725@redhat.com>
-Subject: Re: [Qemu-devel]
- =?utf-8?q?=5BQemu-block=5D_question=EF=BC=9A_I_foun?=
- =?utf-8?q?d_a_qemu_crash_when_attach_virtio-scsi_disk?=
+In-Reply-To: <20171106143010.GI23361@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-AU
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 0/5] Various improvements/bugfixes to
+ submodule handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,106 +32,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, lizhengui <lizhengui@huawei.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "Fangyi (C)" <eric.fangyi@huawei.com>, "jcody@redhat.com" <jcody@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mreitz@redhat.com" <mreitz@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 
-On Mon, 11/06 17:33, Paolo Bonzini wrote:
-> On 06/11/2017 17:11, Kevin Wolf wrote:
-> > Am 03.11.2017 um 11:26 hat Stefan Hajnoczi geschrieben:
-> >> On Wed, Nov 01, 2017 at 06:42:33AM +0000, lizhengui wrote:
-> >>> Hi, when I attach virtio-scsi disk to VM, the qemu crash happened at very low probability. 
-> >>>
-> >>> The qemu crash bt is below:
-> >>>
-> >>> #0  0x00007f2be3ada1d7 in raise () from /usr/lib64/libc.so.6
-> >>> #1  0x00007f2be3adb8c8 in abort () from /usr/lib64/libc.so.6
-> >>> #2  0x000000000084fe49 in PAT_abort ()
-> >>> #3  0x000000000084ce8d in patchIllInsHandler ()
-> >>> #4  <signal handler called>
-> >>> #5  0x00000000008228bb in qemu_strnlen ()
-> >>> #6  0x0000000000822934 in strpadcpy ()
-> >>> #7  0x0000000000684a88 in scsi_disk_emulate_inquiry ()
-> >>> #8  0x000000000068744b in scsi_disk_emulate_command ()
-> >>> #9  0x000000000068c481 in scsi_req_enqueue ()
-> >>> #10 0x00000000004b1f00 in virtio_scsi_handle_cmd_req_submit ()
-> >>> #11 0x00000000004b2e9e in virtio_scsi_handle_cmd_vq ()
-> >>> #12 0x000000000076dba7 in aio_dispatch ()
-> >>> #13 0x000000000076dd96 in aio_poll ()
-> >>> #14 0x00000000007a8673 in blk_prw ()
-> >>> #15 0x00000000007a922c in blk_pread ()
-> >>> #16 0x00000000007a9cd0 in blk_pread_unthrottled ()
-> >>> #17 0x00000000005cb404 in guess_disk_lchs ()
-> >>> #18 0x00000000005cb5b4 in hd_geometry_guess ()
-> >>> #19 0x00000000005cad56 in blkconf_geometry ()
-> >>> #20 0x0000000000685956 in scsi_realize ()
-> >>> #21 0x000000000068d3e3 in scsi_qdev_realize ()
-> >>> #22 0x00000000005e3938 in device_set_realized ()
-> >>> #23 0x000000000075bced in property_set_bool ()
-> >>> #24 0x0000000000760205 in object_property_set_qobject ()
-> >>> #25 0x000000000075df64 in object_property_set_bool ()
-> >>> #26 0x00000000005580ad in qdev_device_add ()
-> >>> #27 0x000000000055850b in qmp_device_add ()
-> >>> #28 0x0000000000818b37 in do_qmp_dispatch.constprop.1 ()
-> >>> #29 0x0000000000818d8b in qmp_dispatch ()
-> >>> #30 0x000000000045d212 in handle_qmp_command ()
-> >>> #31 0x000000000081f819 in json_message_process_token ()
-> >>> #32 0x00000000008434d0 in json_lexer_feed_char ()
-> >>> #33 0x00000000008435e6 in json_lexer_feed ()
-> >>> #34 0x000000000045bd72 in monitor_qmp_read ()
-> >>> #35 0x000000000055ecf3 in tcp_chr_read ()
-> >>> #36 0x00007f2be4cf899a in g_main_context_dispatch () from /usr/lib64/libglib-2.0.so.0
-> >>> #37 0x000000000076b86b in os_host_main_loop_wait ()
-> >>> #38 0x000000000076b995 in main_loop_wait ()
-> >>> #39 0x0000000000569c51 in main_loop ()
-> >>> #40 0x0000000000420665 in main ()
-> >>>
-> >>> From the qemu crash bt, we can see that the scsi_realize has not completed yet. Some fields sush as vendor, version in SCSIDiskState is 
-> >>> Null at this moment. If qemu handles scsi request from this scsi disk at this moment, the qemu will access some null pointers and cause crash.
-> >>> How can I solve this problem? Should we add a check that whether the scsi disk has realized or not in scsi_disk_emulate_command before
-> >>> Handling scsi requests? 
-> >>
-> >> Please try this patch:
-> >>
-> >> diff --git a/hw/block/block.c b/hw/block/block.c
-> >> index 27878d0087..df99ddb899 100644
-> >> --- a/hw/block/block.c
-> >> +++ b/hw/block/block.c
-> >> @@ -120,9 +120,16 @@ void blkconf_geometry(BlockConf *conf, int *ptrans,
-> >>          }
-> >>      }
-> >>      if (!conf->cyls && !conf->heads && !conf->secs) {
-> >> +        AioContext *ctx = blk_get_aio_context(conf->blk);
-> >> +
-> >> +        /* Callers may not expect this function to dispatch aio handlers, so
-> >> +         * disable external aio such as guest device emulation.
-> >> +         */
-> >> +        aio_disable_external(ctx);
-> >>          hd_geometry_guess(conf->blk,
-> >>                            &conf->cyls, &conf->heads, &conf->secs,
-> >>                            ptrans);
-> >> +        aio_enable_external(ctx);
-> >>      } else if (ptrans && *ptrans == BIOS_ATA_TRANSLATION_AUTO) {
-> >>          *ptrans = hd_bios_chs_auto_trans(conf->cyls, conf->heads, conf->secs);
-> >>      }
-> > 
-> > But why is the new disk even attached to the controller and visible to
-> > the guest at this point when it hasn't completed its initialisation yet?
-> > Isn't the root problem that we're initialising things in the wrong
-> > order?
+On 07/11/17 01:30, Daniel P. Berrange wrote:
+> On Mon, Nov 06, 2017 at 10:44:01AM +0000, Daniel P. Berrange wrote:
+>> On Fri, Nov 03, 2017 at 06:03:55PM +0000, Peter Maydell wrote:
+>>> On 3 November 2017 at 15:33, Daniel P. Berrange <berrange@redhat.com> wrote:
+>>>> This short series of patches improves the reliability of the submodule
+>>>> handling to cope with various dev env scenarios that have since emerged
+>>>
+>>> Can I ask you to write up a bit for the release notes at
+>>> https://wiki.qemu.org/ChangeLog/2.11#Build_Information
+>>> covering what users need to know about the new submodule
+>>> handling, please?
+>>
+>> Certainly, will do that.
+>>
+>> Perhaps have something in the general wiki pages about building QEMU, and
+>> link to it from the changelog.
 > 
-> Well, the root cause then is that scsi_device_find is just reusing the
-> list of devices on the SCSI bus.  Devices are added to that list very
-> early by qdev_set_parent_bus.
+> I've created this now:
 > 
-> Stefan's patch could make the issue even harder to hit, but I think that
-> with iothreads you could hit it anyway.
+> https://wiki.qemu.org/Documentation/GitSubmodules
+
+This could probably also mention something like this workaround if things
+do not work as expected:
+
+git config --global --replace-all core.abbrev 8
+
+Thanks.
+
+
 > 
-> The solution is probably to add an "online" flag to the device, and set
-> it in scsi_device_realize.  But even that has the issue that access to
-> the list is not protected with a lock.  What do you think?
+> and linked it from here:
+> 
+> https://wiki.qemu.org/ChangeLog/2.11#Build_Information
+> 
+> and a couple of other places in the wiki.
+> 
+> Regards,
+> Daniel
 > 
 
-Can main thread somehow call aio_context_acquire(vs->ctx) (and release) around
-qdev_set_parent_bus()? virtio_scsi_device_find() takes the lock.
 
-Fam
+-- 
+Alexey
