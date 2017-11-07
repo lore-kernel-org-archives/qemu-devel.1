@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34919)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34905)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eC5SZ-00063p-11
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 10:06:45 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eC5SP-0000CH-C9
+	(envelope-from <bounces@canonical.com>) id 1eC5ST-0005z9-Ba
 	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 10:06:39 -0500
-Received: from indium.canonical.com ([91.189.90.7]:41802)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <bounces@canonical.com>) id 1eC5SP-0000Cn-WD
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 10:06:33 -0500
+Received: from indium.canonical.com ([91.189.90.7]:41826)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eC5SP-0000Bq-5A
+	id 1eC5SP-0000CD-QZ
 	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 10:06:29 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eC5SO-0007uv-5R
-	for <qemu-devel@nongnu.org>; Tue, 07 Nov 2017 15:06:28 +0000
+	id 1eC5SP-0007uy-32
+	for <qemu-devel@nongnu.org>; Tue, 07 Nov 2017 15:06:29 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 144F52E802D
-	for <qemu-devel@nongnu.org>; Tue,  7 Nov 2017 15:06:28 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 119A42E80C7
+	for <qemu-devel@nongnu.org>; Tue,  7 Nov 2017 15:06:29 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 07 Nov 2017 14:45:05 -0000
+Date: Tue, 07 Nov 2017 14:46:39 -0000
 From: jepler <jepler@unpythonic.net>
 Reply-To: Bug 1585840 <1585840@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <20160526014921.26209.46866.malonedeb@chaenomeles.canonical.com>
-Message-Id: <151006590603.4122.9423726872402533995.malone@gac.canonical.com>
+Message-Id: <151006599964.4385.12677723625569649319.malone@chaenomeles.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1585840] Re: multiprocess program gets incorrect
  results with qemu arm-linux-user
@@ -39,59 +39,17 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-I agree.  The test program I originally attached works (completes in way un=
-der 1 second) on
- debian wheezy
- x86_64
- i7-4930K
-
-and doesn't work on
- debian stretch
- x86_64
- i7-4790K
-
-The test program should run in well under 1s, even under qemu-user-arm.
-
-The problem with my test program seems to be in the initial
-synchronization, which is janky because my standalone test program isn't
-using a proper synchronization primitive to make sure the two threads
-start incrementing the shared counter at around the same time.  I've
-attached an updated version which works for me on wheezy x86_64, stretch
-x86_64, trusty armhf, but not on stretch x86-64 + qemu-user.
-
-
-Typical output:
- $ ./a.out process
- multiprocess test
- starting is_primary=3D0
- starting is_primary=3D1
- at end, *mem =3D 2000000
- at end, *mem =3D 2000000
- should be 2000000
- should be 2000000
-
-Typical failing output under qemu-arm-static:
-
- $ qemu-arm-static ./a.arm process
- multiprocess test
- starting is_primary=3D0
- starting is_primary=3D1
- at end, *mem =3D 1010975
- at end, *mem =3D 1010975
- should be 2000000
- should be 2000000
-
-Note that when qemu-arm-static is restricted to 1 CPU via `tasket`, the
-frequency of the failure changes from "almost every time" to "one in
-ten".
-
-Thank you for taking the time to look at my test program.  I apologize
-that I caused you to waste a day of (CPU) time waiting for the test
-program to complete.
-
-** Attachment added: "Updated test program"
-   https://bugs.launchpad.net/qemu/+bug/1585840/+attachment/5005420/+files/=
-shmipc.c
+Latest tests of qemu-arm-static performed with
+$ apt policy qemu-user-static
+qemu-user-static:
+  Installed: 1:2.8+dfsg-6+deb9u3
+  Candidate: 1:2.8+dfsg-6+deb9u3
+  Version table:
+ *** 1:2.8+dfsg-6+deb9u3 500
+        500 http://security.debian.org stretch/updates/main amd64 Packages
+        100 /var/lib/dpkg/status
+     1:2.8+dfsg-6+deb9u2 500
+        500 http://ftp.us.debian.org/debian stretch/main amd64 Packages
 
 -- =
 
