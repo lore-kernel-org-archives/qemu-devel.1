@@ -1,25 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49358)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50561)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <slopezpa@redhat.com>) id 1eCJrT-0003LY-Jq
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 01:29:20 -0500
+	(envelope-from <slp@redhat.com>) id 1eCJx1-0004m4-6G
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 01:35:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <slopezpa@redhat.com>) id 1eCJrQ-00029F-Eq
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 01:29:19 -0500
-Received: from mail-vk0-f46.google.com ([209.85.213.46]:56156)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <slopezpa@redhat.com>) id 1eCJrQ-00028X-Al
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 01:29:16 -0500
-Received: by mail-vk0-f46.google.com with SMTP id b7so1041679vkh.12
-	for <qemu-devel@nongnu.org>; Tue, 07 Nov 2017 22:29:15 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <20171108012907.GA2834@lemon>
-References: <20171107225426.3822-1-slp@redhat.com>
-	<20171108012907.GA2834@lemon>
-From: Sergio Lopez Pascual <slp@redhat.com>
-Date: Wed, 8 Nov 2017 07:29:14 +0100
-Message-ID: <CAAiTLFVCiTQHxUATRd6shBePPNxq+fFVpBhQsuu-LF_4HvKDvA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2] util/async: use atomic_mb_set in
+	(envelope-from <slp@redhat.com>) id 1eCJx0-0003wN-BH
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 01:35:03 -0500
+From: Sergio Lopez <slp@redhat.com>
+Date: Wed,  8 Nov 2017 07:34:47 +0100
+Message-Id: <20171108063447.2842-1-slp@redhat.com>
+Subject: [Qemu-devel] [PATCH v3] util/async: use atomic_mb_set in
  qemu_bh_cancel
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -29,18 +18,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, stefanha@redhat.com, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, famz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, Sergio Lopez <slp@redhat.com>
 
-Hi Fam,
+Commit b7a745d added a qemu_bh_cancel call to the completion function
+as an optimization to prevent it from unnecessarily rescheduling itself.
 
-On Wed, Nov 8, 2017 at 2:29 AM, Fam Zheng <famz@redhat.com> wrote:
->>        I/O thread                  |          worker thread
->
-> Isn't the left column "workder thread" and the right one "I/O thread"?
->
+This completion function is scheduled from worker_thread, after setting
+the state of a ThreadPoolElement to THREAD_DONE.
 
-Yes, you're right. I'm going to switch them back.
+This was considered to be safe, as the completion function restarts the
+loop just after the call to qemu_bh_cancel. But, under certain access
+patterns and scheduling conditions, the loop may wrongly use a
+pre-fetched elem->state value, reading it as THREAD_QUEUED, and ending
+the completion function without having processed a pending TPE linked at
+pool->head:
 
-Thanks,
-Sergio.
+         worker thread             |            I/O thread
+------------------------------------------------------------------------
+                                   | speculatively read req->state
+req->state = THREAD_DONE;          |
+qemu_bh_schedule(p->completion_bh) |
+  bh->scheduled = 1;               |
+                                   | qemu_bh_cancel(p->completion_bh)
+                                   |   bh->scheduled = 0;
+                                   | if (req->state == THREAD_DONE)
+                                   |   // sees THREAD_QUEUED
+
+The source of the misunderstanding was that qemu_bh_cancel is now being
+used by the _consumer_ rather than the producer, and therefore now needs
+to have acquire semantics just like e.g. aio_bh_poll.
+
+In some situations, if there are no other independent requests in the
+same aio context that could eventually trigger the scheduling of the
+completion function, the omitted TPE and all operations pending on it
+will get stuck forever.
+
+Signed-off-by: Sergio Lopez <slp@redhat.com>
+---
+ util/async.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/util/async.c b/util/async.c
+index 355af73ee7..0e1bd8780a 100644
+--- a/util/async.c
++++ b/util/async.c
+@@ -174,7 +174,7 @@ void qemu_bh_schedule(QEMUBH *bh)
+  */
+ void qemu_bh_cancel(QEMUBH *bh)
+ {
+-    bh->scheduled = 0;
++    atomic_mb_set(&bh->scheduled, 0);
+ }
+ 
+ /* This func is async.The bottom half will do the delete action at the finial
+-- 
+2.13.6
