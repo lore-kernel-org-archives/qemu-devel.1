@@ -1,17 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45964)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48868)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eCYLd-00059k-N8
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 16:57:26 -0500
+	(envelope-from <eblake@redhat.com>) id 1eCYVT-0002nS-51
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 17:07:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eCYLc-0000Y1-Gp
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 16:57:25 -0500
-From: Eric Blake <eblake@redhat.com>
-Date: Wed,  8 Nov 2017 15:57:03 -0600
-Message-Id: <20171108215703.9295-8-eblake@redhat.com>
-In-Reply-To: <20171108215703.9295-1-eblake@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1eCYVS-00059f-4z
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 17:07:35 -0500
 References: <20171108215703.9295-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 7/7] nbd/server: Fix structured read of
- length 0
+	<20171108215703.9295-3-eblake@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <e409a506-3861-3a65-7cdb-5f5b6f3a3365@redhat.com>
+Date: Wed, 8 Nov 2017 16:07:26 -0600
+MIME-Version: 1.0
+In-Reply-To: <20171108215703.9295-3-eblake@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="sognxK9vPoJ0nfQWaihx2xXTm7Xw8uPFQ"
+Subject: Re: [Qemu-devel] [PATCH v2 2/7] nbd-client: Refuse read-only client
+ with BDRV_O_RDWR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,92 +26,56 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, vsementsov@virtuozzo.com, pbonzini@redhat.com, kwolf@redhat.com
+Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org, qemu-stable@nongnu.org, Max Reitz <mreitz@redhat.com>, pbonzini@redhat.com
 
-The NBD spec was recently clarified to state that a read of length 0
-should not be attempted by a compliant client; but that a server must
-still handle it correctly in an unspecified manner (that is, either
-a successful no-op or an error reply, but not a crash) [1].  However,
-it also implies that NBD_REPLY_TYPE_OFFSET_DATA must have a non-zero
-payload length, but our existing code was replying with a chunk
-that a picky client could reject as invalid because it was missing
-a payload.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--sognxK9vPoJ0nfQWaihx2xXTm7Xw8uPFQ
+From: Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org,
+ qemu-stable@nongnu.org, Max Reitz <mreitz@redhat.com>, pbonzini@redhat.com
+Message-ID: <e409a506-3861-3a65-7cdb-5f5b6f3a3365@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 2/7] nbd-client: Refuse read-only client
+ with BDRV_O_RDWR
+References: <20171108215703.9295-1-eblake@redhat.com>
+ <20171108215703.9295-3-eblake@redhat.com>
+In-Reply-To: <20171108215703.9295-3-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-We are already doing successful no-ops for 0-length writes and for
-non-structured reads; so for consistency, we want structured reply
-reads to also be a no-op.  The easiest way to do this is to return
-a NBD_REPLY_TYPE_NONE chunk; this is best done via a new helper
-function (especially since future patches for other structured
-replies may benefit from using the same helper).
+On 11/08/2017 03:56 PM, Eric Blake wrote:
 
-[1] https://github.com/NetworkBlockDevice/nbd/commit/ee926037
+> Fix iotest 147 to comply with the new behavior (since nbd-server-add
+> defaults to a read-only export, we must tell blockdev-add to set up a
+> read-only client).
 
-Signed-off-by: Eric Blake <eblake@redhat.com>
----
- nbd/server.c     | 21 ++++++++++++++++++++-
- nbd/trace-events |  1 +
- 2 files changed, 21 insertions(+), 1 deletion(-)
+My bad for testing only './check -nbd' and not also './check -qcow2';
+iotest 58 and 140 also need fixing. I'll post the patch for squashing
+while awaiting review; I'd like for this to make it into -rc1.
 
-diff --git a/nbd/server.c b/nbd/server.c
-index 6ebb7d9c2e..df771fd42f 100644
---- a/nbd/server.c
-+++ b/nbd/server.c
-@@ -1273,6 +1273,21 @@ static inline void set_be_chunk(NBDStructuredReplyChunk *chunk, uint16_t flags,
-     stl_be_p(&chunk->length, length);
- }
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-+static int coroutine_fn nbd_co_send_structured_done(NBDClient *client,
-+                                                    uint64_t handle,
-+                                                    Error **errp)
-+{
-+    NBDStructuredReplyChunk chunk;
-+    struct iovec iov[] = {
-+        {.iov_base = &chunk, .iov_len = sizeof(chunk)},
-+    };
-+
-+    trace_nbd_co_send_structured_done(handle);
-+    set_be_chunk(&chunk, NBD_REPLY_FLAG_DONE, NBD_REPLY_TYPE_NONE, handle, 0);
-+
-+    return nbd_co_send_iov(client, iov, 1, errp);
-+}
-+
- static int coroutine_fn nbd_co_send_structured_read(NBDClient *client,
-                                                     uint64_t handle,
-                                                     uint64_t offset,
-@@ -1286,6 +1301,7 @@ static int coroutine_fn nbd_co_send_structured_read(NBDClient *client,
-         {.iov_base = data, .iov_len = size}
-     };
 
-+    assert(size);
-     trace_nbd_co_send_structured_read(handle, offset, data, size);
-     set_be_chunk(&chunk.h, NBD_REPLY_FLAG_DONE, NBD_REPLY_TYPE_OFFSET_DATA,
-                  handle, sizeof(chunk) - sizeof(chunk.h) + size);
-@@ -1544,10 +1560,13 @@ reply:
-         if (ret < 0) {
-             ret = nbd_co_send_structured_error(req->client, request.handle,
-                                                -ret, msg, &local_err);
--        } else {
-+        } else if (reply_data_len) {
-             ret = nbd_co_send_structured_read(req->client, request.handle,
-                                               request.from, req->data,
-                                               reply_data_len, &local_err);
-+        } else {
-+            ret = nbd_co_send_structured_done(req->client, request.handle,
-+                                              &local_err);
-         }
-     } else {
-         ret = nbd_co_send_simple_reply(req->client, request.handle,
-diff --git a/nbd/trace-events b/nbd/trace-events
-index bbc75f6414..92568edce5 100644
---- a/nbd/trace-events
-+++ b/nbd/trace-events
-@@ -55,6 +55,7 @@ nbd_receive_request(uint32_t magic, uint16_t flags, uint16_t type, uint64_t from
- nbd_blk_aio_attached(const char *name, void *ctx) "Export %s: Attaching clients to AIO context %p\n"
- nbd_blk_aio_detach(const char *name, void *ctx) "Export %s: Detaching clients from AIO context %p\n"
- nbd_co_send_simple_reply(uint64_t handle, uint32_t error, const char *errname, int len) "Send simple reply: handle = %" PRIu64 ", error = %" PRIu32 " (%s), len = %d"
-+nbd_co_send_structured_done(uint64_t handle) "Send structured reply done: handle = %" PRIu64
- nbd_co_send_structured_read(uint64_t handle, uint64_t offset, void *data, size_t size) "Send structured read data reply: handle = %" PRIu64 ", offset = %" PRIu64 ", data = %p, len = %zu"
- nbd_co_send_structured_error(uint64_t handle, int err, const char *errname, const char *msg) "Send structured error reply: handle = %" PRIu64 ", error = %d (%s), msg = '%s'"
- nbd_co_receive_request_decode_type(uint64_t handle, uint16_t type, const char *name) "Decoding type: handle = %" PRIu64 ", type = %" PRIu16 " (%s)"
--- 
-2.13.6
+--sognxK9vPoJ0nfQWaihx2xXTm7Xw8uPFQ
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloDgB8ACgkQp6FrSiUn
+Q2pOFgf+LwMZxhzFH3bQssl2ooXIkgwJg9ryVtGNL2UmJjW+Gme+XneNjhS39SZf
+CHA6wwq8cVHjW16LZ7EdjdPbTImeLgwIRJRSPxJ8qpMpr9tz8K+vkXZceRzzhdBf
+k6RvNKeOzDY6imnNcq0p2+CCL95jKQYJfKrp4AoJ1OLCC8vo+kcKtQb7e1Tfy7R7
+DSkJYJ0rRfFVe3N18SrdQL7dJmm0OcgDDF3xyAbWPOByOY2sQAd6roddkM9yKzvy
+3L9IwBA2nIjzh8VBM5Acegw09rl7TgGPexAtAK6aCKZDieAQul9rMK6NE/hIjCyy
+BaUsPB9yAFaf9w5heEnvD6Enw68dEw==
+=xzev
+-----END PGP SIGNATURE-----
+
+--sognxK9vPoJ0nfQWaihx2xXTm7Xw8uPFQ--
