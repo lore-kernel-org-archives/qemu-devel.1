@@ -1,21 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37860)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38919)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eCGvL-00040D-7X
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 22:21:08 -0500
+	(envelope-from <joel.stan@gmail.com>) id 1eCGz5-0004sj-BD
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 22:25:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eCGvG-00076B-9Q
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 22:21:07 -0500
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Wed,  8 Nov 2017 00:20:52 -0300
-Message-Id: <20171108032052.20029-1-f4bug@amsat.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH] Makefile: simpler/faster "make help"
+	(envelope-from <joel.stan@gmail.com>) id 1eCGz4-00008R-Ac
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 22:24:59 -0500
+Sender: "joel.stan@gmail.com" <joel.stan@gmail.com>
+From: Joel Stanley <joel@jms.id.au>
+Date: Wed,  8 Nov 2017 13:54:27 +1030
+Message-Id: <20171108032427.11163-1-joel@jms.id.au>
+Subject: [Qemu-devel] [PATCH] hw/arm/aspeed: Unlock SCU when running kernel
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,111 +18,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, "Daniel P . Berrange" <berrange@redhat.com>, Fam Zheng <famz@redhat.com>, Eric Blake <eblake@redhat.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, Andrew Jeffery <andrew@aj.id.au>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-Using obscure black magic introduced in eaa2ddbb767 :)
+The ASPEED hardware contains a lock register for the SCU that disables
+any writes to the SCU when it is locked. The machine comes up with the
+lock enabled, but on all known hardware u-boot will unlock it and leave
+it unlocked when loading the kernel.
 
-In an out-of-tree directory, running "../configure && make help" will generate
-some required files (.mak), then clone some submodules, compile at least
-the capstone submodule, generate QMP and Trace files, and finally display
-the help.
+This means the kernel expects the SCU to be unlocked. When booting from
+an emulated ROM the normal u-boot unlock path is executed. Things don't
+go well when booting using the -kernel command line, as u-boot does not
+run first.
 
-On an outdated computer (Sun Blade workstation), running "make help" took
-more than 5h :) With this patch it took roughly 37min.
+Change behaviour so that when a kernel is passed to the machine, set the
+reset value of the SCU to be unlocked.
 
-Suggested-by: Daniel P. Berrange <berrange@redhat.com>
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Signed-off-by: Joel Stanley <joel@jms.id.au>
 ---
+ hw/arm/aspeed.c               | 10 ++++++++++
+ hw/arm/aspeed_soc.c           |  2 ++
+ hw/misc/aspeed_scu.c          |  2 ++
+ hw/misc/aspeed_sdmc.c         |  1 -
+ include/hw/misc/aspeed_scu.h  |  1 +
+ include/hw/misc/aspeed_sdmc.h |  2 ++
+ 6 files changed, 17 insertions(+), 1 deletion(-)
 
-before:
-
-$ make help
-  GEN     config-host.h
-  CC      cs.o
-  CC      utils.o
-  CC      SStream.o
-  CC      MCInstrDesc.o
-  CC      MCRegisterInfo.o
-  CC      arch/ARM/ARMDisassembler.o
-  CC      arch/ARM/ARMInstPrinter.o
-  CC      arch/ARM/ARMMapping.o
-  CC      arch/ARM/ARMModule.o
-  CC      arch/AArch64/AArch64BaseInfo.o
-  CC      arch/AArch64/AArch64Disassembler.o
-  CC      arch/AArch64/AArch64InstPrinter.o
-  CC      arch/AArch64/AArch64Mapping.o
-  CC      arch/AArch64/AArch64Module.o
-  CC      arch/Mips/MipsDisassembler.o
-  CC      arch/Mips/MipsInstPrinter.o
-  CC      arch/Mips/MipsMapping.o
-  CC      arch/Mips/MipsModule.o
-  CC      arch/PowerPC/PPCDisassembler.o
-  CC      arch/PowerPC/PPCInstPrinter.o
-  CC      arch/PowerPC/PPCMapping.o
-  CC      arch/PowerPC/PPCModule.o
-  CC      arch/Sparc/SparcDisassembler.o
-  CC      arch/Sparc/SparcInstPrinter.o
-  CC      arch/Sparc/SparcMapping.o
-  CC      arch/Sparc/SparcModule.o
-  CC      arch/SystemZ/SystemZDisassembler.o
-  CC      arch/SystemZ/SystemZInstPrinter.o
-  CC      arch/SystemZ/SystemZMapping.o
-  CC      arch/SystemZ/SystemZModule.o
-  CC      arch/SystemZ/SystemZMCTargetDesc.o
-  CC      arch/X86/X86DisassemblerDecoder.o
-  CC      arch/X86/X86Disassembler.o
-  CC      arch/X86/X86IntelInstPrinter.o
-  CC      arch/X86/X86ATTInstPrinter.o
-  CC      arch/X86/X86Mapping.o
-  CC      arch/X86/X86Module.o
-  CC      arch/XCore/XCoreDisassembler.o
-  CC      arch/XCore/XCoreInstPrinter.o
-  CC      arch/XCore/XCoreMapping.o
-  CC      arch/XCore/XCoreModule.o
-  CC      MCInst.o
-  AR      libcapstone.a
-ar: creating capstone/libcapstone.a
-  GEN     trace/generated-tcg-tracers.h
-  GEN     trace/generated-helpers-wrappers.h
-  GEN     trace/generated-helpers.h
-  GEN     trace/generated-helpers.c
-  GEN     module_block.h
-make[1]: 'capstone/libcapstone.a' is up to date.
-Generic targets:
-  all             - Build all
-  dir/file.o      - Build specified target only
-  install         - Install QEMU, documentation and tools
-  ctags/TAGS      - Generate tags file for editors
-  cscope          - Generate cscope index
-[...]
-
-after:
-
-$ make help
-Generic targets:
-  all             - Build all
-  dir/file.o      - Build specified target only
-  install         - Install QEMU, documentation and tools
-  ctags/TAGS      - Generate tags file for editors
-  cscope          - Generate cscope index
-[...]
-
- Makefile | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/Makefile b/Makefile
-index 0496c5057a..7850ca5928 100644
---- a/Makefile
-+++ b/Makefile
-@@ -6,7 +6,7 @@ BUILD_DIR=$(CURDIR)
- # Before including a proper config-host.mak, assume we are in the source tree
- SRC_PATH=.
+diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
+index ab895ad490af..179ee66624b9 100644
+--- a/hw/arm/aspeed.c
++++ b/hw/arm/aspeed.c
+@@ -36,6 +36,7 @@ typedef struct AspeedBoardState {
+ typedef struct AspeedBoardConfig {
+     const char *soc_name;
+     uint32_t hw_strap1;
++    uint32_t hw_prot_key;
+     const char *fmc_model;
+     const char *spi_model;
+     uint32_t num_cs;
+@@ -186,6 +187,15 @@ static void aspeed_board_init(MachineState *machine,
+                             &error_abort);
+     object_property_set_int(OBJECT(&bmc->soc), cfg->num_cs, "num-cs",
+                             &error_abort);
++    if (machine->kernel_filename) {
++        /*
++         * When booting with a -kernel command line there is no u-boot
++         * that runs to unlock the SCU. In this case set the default to
++         * be unlocked as the kernel expects
++         */
++        object_property_set_int(OBJECT(&bmc->soc), PROT_KEY_UNLOCK,
++                                "hw-prot-key", &error_abort);
++    }
+     object_property_set_bool(OBJECT(&bmc->soc), true, "realized",
+                              &error_abort);
  
--UNCHECKED_GOALS := %clean TAGS cscope ctags docker docker-%
-+UNCHECKED_GOALS := %clean TAGS cscope ctags docker docker-% help
+diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
+index 5aa3d2ddd9cd..c83b7e207b86 100644
+--- a/hw/arm/aspeed_soc.c
++++ b/hw/arm/aspeed_soc.c
+@@ -154,6 +154,8 @@ static void aspeed_soc_init(Object *obj)
+                               "hw-strap1", &error_abort);
+     object_property_add_alias(obj, "hw-strap2", OBJECT(&s->scu),
+                               "hw-strap2", &error_abort);
++    object_property_add_alias(obj, "hw-prot-key", OBJECT(&s->scu),
++                              "hw-prot-key", &error_abort);
  
- # All following code might depend on configuration variables
- ifneq ($(wildcard config-host.mak),)
+     object_initialize(&s->fmc, sizeof(s->fmc), sc->info->fmc_typename);
+     object_property_add_child(obj, "fmc", OBJECT(&s->fmc), NULL);
+diff --git a/hw/misc/aspeed_scu.c b/hw/misc/aspeed_scu.c
+index 95022d3607ad..c71e77729581 100644
+--- a/hw/misc/aspeed_scu.c
++++ b/hw/misc/aspeed_scu.c
+@@ -246,6 +246,7 @@ static void aspeed_scu_reset(DeviceState *dev)
+     s->regs[SILICON_REV] = s->silicon_rev;
+     s->regs[HW_STRAP1] = s->hw_strap1;
+     s->regs[HW_STRAP2] = s->hw_strap2;
++    s->regs[PROT_KEY] = s->hw_prot_key;
+ }
+ 
+ static uint32_t aspeed_silicon_revs[] = {
+@@ -299,6 +300,7 @@ static Property aspeed_scu_properties[] = {
+     DEFINE_PROP_UINT32("silicon-rev", AspeedSCUState, silicon_rev, 0),
+     DEFINE_PROP_UINT32("hw-strap1", AspeedSCUState, hw_strap1, 0),
+     DEFINE_PROP_UINT32("hw-strap2", AspeedSCUState, hw_strap2, 0),
++    DEFINE_PROP_UINT32("hw-prot-key", AspeedSCUState, hw_prot_key, 0),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
+diff --git a/hw/misc/aspeed_sdmc.c b/hw/misc/aspeed_sdmc.c
+index f0b3053fae36..35dc803604f8 100644
+--- a/hw/misc/aspeed_sdmc.c
++++ b/hw/misc/aspeed_sdmc.c
+@@ -18,7 +18,6 @@
+ 
+ /* Protection Key Register */
+ #define R_PROT            (0x00 / 4)
+-#define   PROT_KEY_UNLOCK     0xFC600309
+ 
+ /* Configuration Register */
+ #define R_CONF            (0x04 / 4)
+diff --git a/include/hw/misc/aspeed_scu.h b/include/hw/misc/aspeed_scu.h
+index bd4ac013f997..f5da54e27105 100644
+--- a/include/hw/misc/aspeed_scu.h
++++ b/include/hw/misc/aspeed_scu.h
+@@ -29,6 +29,7 @@ typedef struct AspeedSCUState {
+     uint32_t silicon_rev;
+     uint32_t hw_strap1;
+     uint32_t hw_strap2;
++    uint32_t hw_prot_key;
+ } AspeedSCUState;
+ 
+ #define AST2400_A0_SILICON_REV   0x02000303U
+diff --git a/include/hw/misc/aspeed_sdmc.h b/include/hw/misc/aspeed_sdmc.h
+index 551c8afdf4be..a1b3232c5ef3 100644
+--- a/include/hw/misc/aspeed_sdmc.h
++++ b/include/hw/misc/aspeed_sdmc.h
+@@ -16,6 +16,8 @@
+ 
+ #define ASPEED_SDMC_NR_REGS (0x8 >> 2)
+ 
++#define PROT_KEY_UNLOCK 0xFC600309
++
+ typedef struct AspeedSDMCState {
+     /*< private >*/
+     SysBusDevice parent_obj;
 -- 
-2.15.0
+2.14.1
