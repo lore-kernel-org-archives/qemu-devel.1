@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35187)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36015)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1eCZNP-0001Fa-ML
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 18:03:21 -0500
+	(envelope-from <eblake@redhat.com>) id 1eCZPn-0003F5-1r
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 18:05:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1eCZNM-0003sW-HN
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 18:03:19 -0500
-Received: from mail-sn1nam01on0048.outbound.protection.outlook.com
-	([104.47.32.48]:16414
-	helo=NAM01-SN1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1eCZNM-0003s8-8V
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 18:03:16 -0500
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Wed, 8 Nov 2017 14:59:03 -0800
-Message-ID: <d6f714bbdec34720c64e6b2391df440c5d0466f7.1510181732.git.alistair.francis@xilinx.com>
-In-Reply-To: <cover.1510181732.git.alistair.francis@xilinx.com>
-References: <cover.1510181732.git.alistair.francis@xilinx.com>
+	(envelope-from <eblake@redhat.com>) id 1eCZPl-0004a8-Sv
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 18:05:47 -0500
+References: <151017987286.354.17484911984782218867@bafd83ae6430>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <7741570f-5544-be75-840e-99aa44f19e9f@redhat.com>
+Date: Wed, 8 Nov 2017 17:05:34 -0600
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v4 44/45] tcg: Replace fprintf(stderr,
- "*\n" with error_report()
+In-Reply-To: <151017987286.354.17484911984782218867@bafd83ae6430>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="fXnlkqpQOffOmL31A8D8WVGLWJFQTHQlC"
+Subject: Re: [Qemu-devel] [PATCH v2 0/7] various NBD fixes for 2.11
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,264 +24,78 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: alistair.francis@xilinx.com, alistair23@gmail.com, armbru@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Stefan Weil <sw@weilnetz.de>
+Cc: famz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org
 
-Replace a large number of the fprintf(stderr, "*\n" calls with
-error_report(). The functions were renamed with these commands and then
-compiler issues where manually fixed.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--fXnlkqpQOffOmL31A8D8WVGLWJFQTHQlC
+From: Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: famz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com,
+ vsementsov@virtuozzo.com, qemu-block@nongnu.org
+Message-ID: <7741570f-5544-be75-840e-99aa44f19e9f@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 0/7] various NBD fixes for 2.11
+References: <151017987286.354.17484911984782218867@bafd83ae6430>
+In-Reply-To: <151017987286.354.17484911984782218867@bafd83ae6430>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-find ./* -type f -exec sed -i \
-    'N;N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
-    {} +
-find ./* -type f -exec sed -i \
-    'N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
-    {} +
-find ./* -type f -exec sed -i \
-    'N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
-    {} +
-find ./* -type f -exec sed -i \
-    'N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
-    {} +
-find ./* -type f -exec sed -i \
-    'N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
-    {} +
-find ./* -type f -exec sed -i \
-    'N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
-    {} +
-find ./* -type f -exec sed -i \
-    'N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
-    {} +
-find ./* -type f -exec sed -i \
-    'N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
-    {} +
-find ./* -type f -exec sed -i \
-    'N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
-    {} +
-find ./* -type f -exec sed -i \
-    'N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
-    {} +
-find ./* -type f -exec sed -i \
-    'N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
-    {} +
+On 11/08/2017 04:24 PM, no-reply@patchew.org wrote:
+> Hi,
+>=20
+> This series failed automatic build test. Please find the testing comman=
+ds and
+> their output below. If you have docker installed, you can probably repr=
+oduce it
+> locally.
+>=20
 
-Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Peter Crosthwaite <crosthwaite.peter@gmail.com>
-Cc: Richard Henderson <rth@twiddle.net>
-Cc: Stefan Weil <sw@weilnetz.de>
-Acked-by: Richard Henderson <richard.henderson@linaro.org>
----
+> 140         - output mismatch (see 140.out.bad)
+> --- /tmp/qemu-test/src/tests/qemu-iotests/140.out	2017-11-08 22:20:18.0=
+00000000 +0000
+> +++ /tmp/qemu-test/build/tests/qemu-iotests/140.out.bad	2017-11-08 22:2=
+2:51.888146974 +0000
+> @@ -5,11 +5,11 @@
+>  {"return": {}}
+>  {"return": {}}
+>  {"return": {}}
+> -read 65536/65536 bytes at offset 0
+> -64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+> +can't open device nbd+unix:///drv?socket=3DTEST_DIR/nbd: request for w=
+rite access conflicts with read-only export
+>  {"return": {}}
 
- cpus.c                   |  8 ++++----
- exec.c                   | 14 +++++++-------
- tcg/optimize.c           |  8 ++++----
- tcg/tcg.c                |  2 +-
- tcg/tcg.h                |  3 ++-
- tcg/tci.c                |  2 +-
- tcg/tci/tcg-target.inc.c |  4 ++--
- vl.c                     |  2 +-
- 8 files changed, 22 insertions(+), 21 deletions(-)
+Fixup in the form of 2.5/7 already sent.
 
-diff --git a/cpus.c b/cpus.c
-index 114c29b6a0..d73df01659 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -258,7 +258,7 @@ int64_t cpu_get_icount_raw(void)
- 
-     if (cpu && cpu->running) {
-         if (!cpu->can_do_io) {
--            fprintf(stderr, "Bad icount read\n");
-+            error_report("Bad icount read");
-             exit(1);
-         }
-         /* Take into account what has run */
-@@ -1113,7 +1113,7 @@ static void *qemu_kvm_cpu_thread_fn(void *arg)
- 
-     r = kvm_init_vcpu(cpu);
-     if (r < 0) {
--        fprintf(stderr, "kvm_init_vcpu failed: %s\n", strerror(-r));
-+        error_report("kvm_init_vcpu failed: %s", strerror(-r));
-         exit(1);
-     }
- 
-@@ -1143,7 +1143,7 @@ static void *qemu_kvm_cpu_thread_fn(void *arg)
- static void *qemu_dummy_cpu_thread_fn(void *arg)
- {
- #ifdef _WIN32
--    fprintf(stderr, "qtest is not supported under Windows\n");
-+    error_report("qtest is not supported under Windows");
-     exit(1);
- #else
-     CPUState *cpu = arg;
-@@ -1527,7 +1527,7 @@ static void qemu_cpu_kick_thread(CPUState *cpu)
- #else /* _WIN32 */
-     if (!qemu_cpu_is_self(cpu)) {
-         if (!QueueUserAPC(dummy_apc_func, cpu->hThread, 0)) {
--            fprintf(stderr, "%s: QueueUserAPC failed with error %lu\n",
-+            error_report("%s: QueueUserAPC failed with error %lu",
-                     __func__, GetLastError());
-             exit(1);
-         }
-diff --git a/exec.c b/exec.c
-index 97a24a875e..59e0411d0e 100644
---- a/exec.c
-+++ b/exec.c
-@@ -1076,7 +1076,7 @@ static RAMBlock *qemu_get_ram_block(ram_addr_t addr)
-         }
-     }
- 
--    fprintf(stderr, "Bad ram offset %" PRIx64 "\n", (uint64_t)addr);
-+    error_report("Bad ram offset %" PRIx64 "", (uint64_t)addr);
-     abort();
- 
- found:
-@@ -1689,7 +1689,7 @@ static ram_addr_t find_ram_offset(ram_addr_t size)
-     }
- 
-     if (offset == RAM_ADDR_MAX) {
--        fprintf(stderr, "Failed to find gap of requested size: %" PRIu64 "\n",
-+        error_report("Failed to find gap of requested size: %" PRIu64 "",
-                 (uint64_t)size);
-         abort();
-     }
-@@ -1719,8 +1719,8 @@ static void qemu_ram_setup_dump(void *addr, ram_addr_t size)
-         ret = qemu_madvise(addr, size, QEMU_MADV_DONTDUMP);
-         if (ret) {
-             perror("qemu_madvise");
--            fprintf(stderr, "madvise doesn't support MADV_DONTDUMP, "
--                            "but dump_guest_core=off specified\n");
-+            error_report("madvise doesn't support MADV_DONTDUMP, "
-+                            "but dump_guest_core=off specified");
-         }
-     }
- }
-@@ -1756,7 +1756,7 @@ void qemu_ram_set_idstr(RAMBlock *new_block, const char *name, DeviceState *dev)
-     RAMBLOCK_FOREACH(block) {
-         if (block != new_block &&
-             !strcmp(block->idstr, new_block->idstr)) {
--            fprintf(stderr, "RAMBlock \"%s\" already registered, abort!\n",
-+            error_report("RAMBlock \"%s\" already registered, abort!",
-                     new_block->idstr);
-             abort();
-         }
-@@ -2184,8 +2184,8 @@ void qemu_ram_remap(ram_addr_t addr, ram_addr_t length)
-                                 flags, -1, 0);
-                 }
-                 if (area != vaddr) {
--                    fprintf(stderr, "Could not remap addr: "
--                            RAM_ADDR_FMT "@" RAM_ADDR_FMT "\n",
-+                    error_report("Could not remap addr: "
-+                            RAM_ADDR_FMT "@" RAM_ADDR_FMT "",
-                             length, addr);
-                     exit(1);
-                 }
-diff --git a/tcg/optimize.c b/tcg/optimize.c
-index 438321c6cc..93bfaad556 100644
---- a/tcg/optimize.c
-+++ b/tcg/optimize.c
-@@ -122,8 +122,8 @@ static TCGOpcode op_to_mov(TCGOpcode op)
-     case 64:
-         return INDEX_op_mov_i64;
-     default:
--        fprintf(stderr, "op_to_mov: unexpected return value of "
--                "function op_bits.\n");
-+        error_report("op_to_mov: unexpected return value of "
-+                "function op_bits.");
-         tcg_abort();
-     }
- }
-@@ -136,8 +136,8 @@ static TCGOpcode op_to_movi(TCGOpcode op)
-     case 64:
-         return INDEX_op_movi_i64;
-     default:
--        fprintf(stderr, "op_to_movi: unexpected return value of "
--                "function op_bits.\n");
-+        error_report("op_to_movi: unexpected return value of "
-+                "function op_bits.");
-         tcg_abort();
-     }
- }
-diff --git a/tcg/tcg.c b/tcg/tcg.c
-index c22f1c4441..ca5d841c23 100644
---- a/tcg/tcg.c
-+++ b/tcg/tcg.c
-@@ -1035,7 +1035,7 @@ static void tcg_temp_free_internal(TCGTemp *ts)
- #if defined(CONFIG_DEBUG_TCG)
-     s->temps_in_use--;
-     if (s->temps_in_use < 0) {
--        fprintf(stderr, "More temporaries freed than allocated!\n");
-+        error_report("More temporaries freed than allocated!");
-     }
- #endif
- 
-diff --git a/tcg/tcg.h b/tcg/tcg.h
-index cb7b329876..eadad66f7d 100644
---- a/tcg/tcg.h
-+++ b/tcg/tcg.h
-@@ -29,6 +29,7 @@
- #include "cpu.h"
- #include "exec/tb-context.h"
- #include "qemu/bitops.h"
-+#include "qemu/error-report.h"
- #include "tcg-mo.h"
- #include "tcg-target.h"
- 
-@@ -948,7 +949,7 @@ typedef struct TCGTargetOpDef {
- 
- #define tcg_abort() \
- do {\
--    fprintf(stderr, "%s:%d: tcg fatal error\n", __FILE__, __LINE__);\
-+    error_report("%s:%d: tcg fatal error", __FILE__, __LINE__);\
-     abort();\
- } while (0)
- 
-diff --git a/tcg/tci.c b/tcg/tci.c
-index 63f2cd54ab..6c851d3450 100644
---- a/tcg/tci.c
-+++ b/tcg/tci.c
-@@ -35,7 +35,7 @@
- /* Marker for missing code. */
- #define TODO() \
-     do { \
--        fprintf(stderr, "TODO %s:%u: %s()\n", \
-+        error_report("TODO %s:%u: %s()", \
-                 __FILE__, __LINE__, __func__); \
-         tcg_abort(); \
-     } while (0)
-diff --git a/tcg/tci/tcg-target.inc.c b/tcg/tci/tcg-target.inc.c
-index 913c3802a3..2f4b56d3ba 100644
---- a/tcg/tci/tcg-target.inc.c
-+++ b/tcg/tci/tcg-target.inc.c
-@@ -29,7 +29,7 @@
- /* Marker for missing code. */
- #define TODO() \
-     do { \
--        fprintf(stderr, "TODO %s:%u: %s()\n", \
-+        error_report("TODO %s:%u: %s()", \
-                 __FILE__, __LINE__, __func__); \
-         tcg_abort(); \
-     } while (0)
-@@ -403,7 +403,7 @@ static const char *target_parse_constraint(TCGArgConstraint *ct,
- void tci_disas(uint8_t opc)
- {
-     const TCGOpDef *def = &tcg_op_defs[opc];
--    fprintf(stderr, "TCG %s %u, %u, %u\n",
-+    error_report("TCG %s %u, %u, %u",
-             def->name, def->nb_oargs, def->nb_iargs, def->nb_cargs);
- }
- #endif
-diff --git a/vl.c b/vl.c
-index ec299099ff..985760b76b 100644
---- a/vl.c
-+++ b/vl.c
-@@ -2232,7 +2232,7 @@ static DisplayType select_display(const char *p)
-         display_opengl = 1;
-         display = DT_EGL;
- #else
--        fprintf(stderr, "egl support is disabled\n");
-+        error_report("egl support is disabled");
-         exit(1);
- #endif
-     } else if (strstart(p, "curses", &opts)) {
--- 
-2.14.1
+> ---
+> Email generated automatically by Patchew [http://patchew.org/].
+> Please send your feedback to patchew-devel@freelists.org
+
+But I'm not sure if there is an easy way to tell patchew to include a
+fixup patch and re-test the series, short of sending a v3.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--fXnlkqpQOffOmL31A8D8WVGLWJFQTHQlC
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloDjb4ACgkQp6FrSiUn
+Q2orAAf+NNthZL+ATyd+hTEzv2vENDLMw/Ud4xFzd7Zt2eSGNA0PLr+kPyGbck47
+JhNHryOLjUTKPGWIPsaCQmp0aDYXusBVqm47QwUtry77kDtcj8iNTIQKu4GrXf1r
+R/yG6gUgPMh0W8UgumQM1yK1RPCakUdqgP5gagrJ4nrRH72yyo+m0t2Hka4cwywu
+9aKNw06wdCyGJZPdEgBXpx8/H1b/RApiO/9+P3wCEwfm7IlIFlzQ02doNcPRYp+E
+/ISxbKBgag5PNHQxjlY732hH7fgmTFg6aLg6FoAc2kfLfI33Wk1xbkWUxNiNLrYs
+xFQRXxiKzauwk3t6OVgRkW+tvNUGdg==
+=+RD2
+-----END PGP SIGNATURE-----
+
+--fXnlkqpQOffOmL31A8D8WVGLWJFQTHQlC--
