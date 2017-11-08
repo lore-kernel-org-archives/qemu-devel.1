@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34186)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34553)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eCOe4-0005qm-GA
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 06:35:49 -0500
+	(envelope-from <thuth@redhat.com>) id 1eCOfF-0006ko-E6
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 06:37:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eCOdz-0003l4-Gq
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 06:35:48 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51600)
+	(envelope-from <thuth@redhat.com>) id 1eCOfA-0004oh-Ef
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 06:37:01 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53806)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eCOdz-0003jn-AT
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 06:35:43 -0500
-Date: Wed, 8 Nov 2017 19:35:32 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20171108113532.GA4105@xz-mi>
-References: <20171106094643.14881-1-peterx@redhat.com>
-	<20171106094643.14881-11-peterx@redhat.com>
-	<20171107071131.GN16355@lemon> <20171108072542.GA2992@xz-mi>
-	<20171108111844.GD2834@lemon>
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1eCOfA-0004nv-9C
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 06:36:56 -0500
+References: <20171108022828.7242-1-f4bug@amsat.org>
+	<20171108022828.7242-6-f4bug@amsat.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <4a07565a-235c-48cc-b0aa-3bd9938a4154@redhat.com>
+Date: Wed, 8 Nov 2017 12:36:46 +0100
 MIME-Version: 1.0
+In-Reply-To: <20171108022828.7242-6-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20171108111844.GD2834@lemon>
-Subject: Re: [Qemu-devel] [RFC v3 10/27] monitor: create monitor dedicate
- iothread
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH 5/6] hw/i386: deprecate the pc-0.10 and
+ pc-0.11 machines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,39 +29,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: Laurent Vivier <lvivier@redhat.com>, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, Stefan Hajnoczi <shajnocz@redhat.com>, marcandre.lureau@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, Jiri Denemark <jdenemar@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org
 
-On Wed, Nov 08, 2017 at 07:18:44PM +0800, Fam Zheng wrote:
-> On Wed, 11/08 15:25, Peter Xu wrote:
-> > On Tue, Nov 07, 2017 at 03:11:31PM +0800, Fam Zheng wrote:
-> > > On Mon, 11/06 17:46, Peter Xu wrote:
-> > > > +static GMainContext *monitor_io_context_get(void)
-> > > > +{
-> > > > +    return iothread_get_g_main_context(mon_global.mon_iothread);
-> > > > +}
-> > > > +
-> > > > +static void monitor_iothread_init(void)
-> > > > +{
-> > > > +    mon_global.mon_iothread = iothread_create("monitor_iothread",
-> > > > +                                              &error_abort);
-> > > > +    /*
-> > > > +     * GContext in iothread is using lazy init - the first time we
-> > > > +     * fetch the context we'll have that initialized.
-> > > > +     */
-> > > > +    monitor_io_context_get();
-> > > 
-> > > Why do you need an eager init here?
-> > 
-> > I thought putting this line with IOThread creation will make it more
-> > clear that the IOThread is using GMainContext polling.  I am not that
-> > strong to keep it, but I would prefer.
-> 
-> The "iothread only starts using GMainContext polling after the lazy init
-> happens" is completely opaque to its user, so I don't think there is anything
-> but confusion to have this.
+On 08.11.2017 03:28, Philippe Mathieu-Daud=C3=A9 wrote:
+> Both are deprecated since 2.9.0
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+>  hw/i386/pc_piix.c | 2 ++
+>  1 file changed, 2 insertions(+)
+>=20
+> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+> index f79d5cb694..c462b702ff 100644
+> --- a/hw/i386/pc_piix.c
+> +++ b/hw/i386/pc_piix.c
+> @@ -941,6 +941,7 @@ static void pc_i440fx_0_11_machine_options(MachineC=
+lass *m)
+>      pc_i440fx_0_12_machine_options(m);
+>      m->hw_version =3D "0.11";
+>      SET_MACHINE_COMPAT(m, PC_COMPAT_0_11);
+> +    m->deprecated_reason =3D "Too old";
 
-Makes sense.  Let me remove it.
+As Daniel already mentioned it, I'd also suggest to use a more helpful
+message instead (e.g. "Use a newer version of pc-i440fx instead" ?).
 
--- 
-Peter Xu
+>  }
+> =20
+>  DEFINE_I440FX_MACHINE(v0_11, "pc-0.11", pc_compat_0_13,
+> @@ -976,6 +977,7 @@ static void pc_i440fx_0_10_machine_options(MachineC=
+lass *m)
+>      pc_i440fx_0_11_machine_options(m);
+>      m->hw_version =3D "0.10";
+>      SET_MACHINE_COMPAT(m, PC_COMPAT_0_10);
+> +    m->deprecated_reason =3D "Too old";
+
+I think you don't need the second hunk here since the function is
+calling pc_i440fx_0_11_machine_options(), too.
+
+ Thomas
