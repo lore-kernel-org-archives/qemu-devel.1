@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50631)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51443)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1eCNq9-0007Bh-U8
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 05:44:16 -0500
+	(envelope-from <darren.kenny@oracle.com>) id 1eCNtq-0008HV-48
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 05:48:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1eCNq8-0002W0-JX
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 05:44:13 -0500
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <20171107172638.29942-1-kwolf@redhat.com>
-	<20171107173920.GK3213@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <357d61df-9bad-dc5a-1878-2fce4b2a93cc@redhat.com>
-Date: Wed, 8 Nov 2017 11:44:01 +0100
+	(envelope-from <darren.kenny@oracle.com>) id 1eCNto-0004Wp-GN
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 05:48:02 -0500
+Date: Wed, 8 Nov 2017 10:47:37 +0000
+From: Darren Kenny <darren.kenny@oracle.com>
+Message-ID: <20171108104737.xtxfex7leabfbqyc@starbug-vm.ie.oracle.com>
+References: <cover.1510093478.git.jcody@redhat.com>
+	<41ed8543e005205118438328c7e162532729d9c7.1510093478.git.jcody@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20171107173920.GK3213@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] block: Deprecate bdrv_set_read_only() and
- users
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+In-Reply-To: <41ed8543e005205118438328c7e162532729d9c7.1510093478.git.jcody@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v3 7/7] block/curl: code
+ cleanup to comply with coding style
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,193 +24,268 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, Kevin Wolf <kwolf@redhat.com>
-Cc: mreitz@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, armbru@redhat.com
+To: Jeff Cody <jcody@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp, rjones@redhat.com, namei.unix@gmail.com
 
-On 07/11/2017 18:39, Daniel P. Berrange wrote:
-> On Tue, Nov 07, 2017 at 06:26:38PM +0100, Kevin Wolf wrote:
->> bdrv_set_read_only() is used by some block drivers to override the
->> read-only option given by the user. This is not how read-only images
->> generally work in QEMU: Instead of second guessing what the user really
->> meant (which currently includes making an image read-only even if the
->> user didn't only use the default, but explicitly said read-only=off), we
->> should error out if we can't provide what the user requested.
->>
->> This adds deprecation warnings to all callers of bdrv_set_read_only() so
->> that the behaviour can be corrected after the usual deprecation period.
-> 
-> All deprecations should be listed in "Deprecated features" appendix
-> in qemu-doc.texi. This probably fits in the 'system emulator command
-> line arguments' section, even though its talking about the need for
-> the user to add something extra, rather than deleting something they
-> currently use.
+Hi Jeff,
 
-I am not sure this counts as deprecation, but it should go in the
-release notes as "future incompatible changes", and that section
-probably should go in qemu-doc.texi itself.
+While I'm relatively new to this community, I do have some comments
+about the styling in this file.
 
-Paolo
+I don't see anything in the CODING_STYLE file that tells me I'm
+wrong here, but it's certainly possible...
 
-> 
->>
->> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
->> ---
->>  block.c       |  5 +++++
->>  block/bochs.c | 13 ++++++++++---
->>  block/cloop.c | 13 ++++++++++---
->>  block/dmg.c   | 12 +++++++++---
->>  block/rbd.c   | 14 ++++++++++----
->>  block/vvfat.c |  6 +++++-
->>  6 files changed, 49 insertions(+), 14 deletions(-)
->>
->> diff --git a/block.c b/block.c
->> index f6415547fe..0ed0c27140 100644
->> --- a/block.c
->> +++ b/block.c
->> @@ -261,6 +261,11 @@ int bdrv_can_set_read_only(BlockDriverState *bs, bool read_only,
->>      return 0;
->>  }
->>  
->> +/* TODO Remove (deprecated since 2.11)
->> + * Block drivers are not supposed to automatically change bs->read_only.
->> + * Instead, they should just check whether they can provide what the user
->> + * explicitly requested and error out if read-write is requested, but they can
->> + * only provide read-only access. */
->>  int bdrv_set_read_only(BlockDriverState *bs, bool read_only, Error **errp)
->>  {
->>      int ret = 0;
->> diff --git a/block/bochs.c b/block/bochs.c
->> index a759b6eff0..50c630047b 100644
->> --- a/block/bochs.c
->> +++ b/block/bochs.c
->> @@ -28,6 +28,7 @@
->>  #include "block/block_int.h"
->>  #include "qemu/module.h"
->>  #include "qemu/bswap.h"
->> +#include "qemu/error-report.h"
->>  
->>  /**************************************************************/
->>  
->> @@ -110,9 +111,15 @@ static int bochs_open(BlockDriverState *bs, QDict *options, int flags,
->>          return -EINVAL;
->>      }
->>  
->> -    ret = bdrv_set_read_only(bs, true, errp); /* no write support yet */
->> -    if (ret < 0) {
->> -        return ret;
->> +    if (!bdrv_is_read_only(bs)) {
->> +        error_report("Opening bochs images without an explicit read-only=on "
->> +                     "option is deprecated. Future versions will refuse to "
->> +                     "open the image instead of automatically marking the "
->> +                     "image read-only.");
->> +        ret = bdrv_set_read_only(bs, true, errp); /* no write support yet */
->> +        if (ret < 0) {
->> +            return ret;
->> +        }
->>      }
->>  
->>      ret = bdrv_pread(bs->file, 0, &bochs, sizeof(bochs));
->> diff --git a/block/cloop.c b/block/cloop.c
->> index d6597fcf78..2be68987bd 100644
->> --- a/block/cloop.c
->> +++ b/block/cloop.c
->> @@ -23,6 +23,7 @@
->>   */
->>  #include "qemu/osdep.h"
->>  #include "qapi/error.h"
->> +#include "qemu/error-report.h"
->>  #include "qemu-common.h"
->>  #include "block/block_int.h"
->>  #include "qemu/module.h"
->> @@ -72,9 +73,15 @@ static int cloop_open(BlockDriverState *bs, QDict *options, int flags,
->>          return -EINVAL;
->>      }
->>  
->> -    ret = bdrv_set_read_only(bs, true, errp);
->> -    if (ret < 0) {
->> -        return ret;
->> +    if (!bdrv_is_read_only(bs)) {
->> +        error_report("Opening cloop images without an explicit read-only=on "
->> +                     "option is deprecated. Future versions will refuse to "
->> +                     "open the image instead of automatically marking the "
->> +                     "image read-only.");
->> +        ret = bdrv_set_read_only(bs, true, errp);
->> +        if (ret < 0) {
->> +            return ret;
->> +        }
->>      }
->>  
->>      /* read header */
->> diff --git a/block/dmg.c b/block/dmg.c
->> index 6c0711f563..c9b3c519c4 100644
->> --- a/block/dmg.c
->> +++ b/block/dmg.c
->> @@ -419,9 +419,15 @@ static int dmg_open(BlockDriverState *bs, QDict *options, int flags,
->>          return -EINVAL;
->>      }
->>  
->> -    ret = bdrv_set_read_only(bs, true, errp);
->> -    if (ret < 0) {
->> -        return ret;
->> +    if (!bdrv_is_read_only(bs)) {
->> +        error_report("Opening dmg images without an explicit read-only=on "
->> +                     "option is deprecated. Future versions will refuse to "
->> +                     "open the image instead of automatically marking the "
->> +                     "image read-only.");
->> +        ret = bdrv_set_read_only(bs, true, errp);
->> +        if (ret < 0) {
->> +            return ret;
->> +        }
->>      }
->>  
->>      block_module_load_one("dmg-bz2");
->> diff --git a/block/rbd.c b/block/rbd.c
->> index 144f350e1f..a76a5e8755 100644
->> --- a/block/rbd.c
->> +++ b/block/rbd.c
->> @@ -665,10 +665,16 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
->>      /* If we are using an rbd snapshot, we must be r/o, otherwise
->>       * leave as-is */
->>      if (s->snap != NULL) {
->> -        r = bdrv_set_read_only(bs, true, &local_err);
->> -        if (r < 0) {
->> -            error_propagate(errp, local_err);
->> -            goto failed_open;
->> +        if (!bdrv_is_read_only(bs)) {
->> +            error_report("Opening rbd snapshots without an explicit "
->> +                         "read-only=on option is deprecated. Future versions "
->> +                         "will refuse to open the image instead of "
->> +                         "automatically marking the image read-only.");
->> +            r = bdrv_set_read_only(bs, true, &local_err);
->> +            if (r < 0) {
->> +                error_propagate(errp, local_err);
->> +                goto failed_open;
->> +            }
->>          }
->>      }
->>  
->> diff --git a/block/vvfat.c b/block/vvfat.c
->> index a0f2335894..0841cc42fc 100644
->> --- a/block/vvfat.c
->> +++ b/block/vvfat.c
->> @@ -1259,7 +1259,11 @@ static int vvfat_open(BlockDriverState *bs, QDict *options, int flags,
->>                         "Unable to set VVFAT to 'rw' when drive is read-only");
->>              goto fail;
->>          }
->> -    } else  {
->> +    } else  if (!bdrv_is_read_only(bs)) {
->> +        error_report("Opening non-rw vvfat images without an explicit "
->> +                     "read-only=on option is deprecated. Future versions "
->> +                     "will refuse to open the image instead of "
->> +                     "automatically marking the image read-only.");
->>          /* read only is the default for safety */
->>          ret = bdrv_set_read_only(bs, true, &local_err);
->>          if (ret < 0) {
->> -- 
->> 2.13.6
->>
->>
-> 
-> Regards,
-> Daniel
-> 
+More inline.
+
+On Tue, Nov 07, 2017 at 05:27:24PM -0500, Jeff Cody wrote:
+>This addresses non-functional changes to help curl.c better comply
+>with the coding styles (comments, indentation, brackets, etc.).
+>
+>One minor code change is the combination of two if statements into
+>a single if statement.
+>
+>Signed-off-by: Jeff Cody <jcody@redhat.com>
+>Reviewed-by: Eric Blake <eblake@redhat.com>
+>---
+> block/curl.c | 100 +++++++++++++++++++++++++++++++----------------------------
+> 1 file changed, 52 insertions(+), 48 deletions(-)
+>
+>diff --git a/block/curl.c b/block/curl.c
+>index 35cf417..7a6dd44 100644
+>--- a/block/curl.c
+>+++ b/block/curl.c
+>@@ -32,8 +32,10 @@
+> #include <curl/curl.h>
+> #include "qemu/cutils.h"
+>
+>-// #define DEBUG_CURL
+>-// #define DEBUG_VERBOSE
+>+/*
+>+ #define DEBUG_CURL
+>+ #define DEBUG_VERBOSE
+>+*/
+
+Is it not more common to use the style:
+
+    /*
+     * text
+     */
+
+This is visible in almost every file at the top, where the Copyright
+and License is.
+
+>
+> #ifdef DEBUG_CURL
+> #define DEBUG_CURL_PRINT 1
+>@@ -76,15 +78,15 @@ static CURLMcode __curl_multi_socket_action(CURLM *multi_handle,
+> #define CURL_TIMEOUT_DEFAULT 5
+> #define CURL_TIMEOUT_MAX 10000
+>
+>-#define CURL_BLOCK_OPT_URL       "url"
+>-#define CURL_BLOCK_OPT_READAHEAD "readahead"
+>-#define CURL_BLOCK_OPT_SSLVERIFY "sslverify"
+>-#define CURL_BLOCK_OPT_TIMEOUT "timeout"
+>-#define CURL_BLOCK_OPT_COOKIE    "cookie"
+>-#define CURL_BLOCK_OPT_COOKIE_SECRET "cookie-secret"
+>-#define CURL_BLOCK_OPT_USERNAME "username"
+>-#define CURL_BLOCK_OPT_PASSWORD_SECRET "password-secret"
+>-#define CURL_BLOCK_OPT_PROXY_USERNAME "proxy-username"
+>+#define CURL_BLOCK_OPT_URL                   "url"
+>+#define CURL_BLOCK_OPT_READAHEAD             "readahead"
+>+#define CURL_BLOCK_OPT_SSLVERIFY             "sslverify"
+>+#define CURL_BLOCK_OPT_TIMEOUT               "timeout"
+>+#define CURL_BLOCK_OPT_COOKIE                "cookie"
+>+#define CURL_BLOCK_OPT_COOKIE_SECRET         "cookie-secret"
+>+#define CURL_BLOCK_OPT_USERNAME              "username"
+>+#define CURL_BLOCK_OPT_PASSWORD_SECRET       "password-secret"
+>+#define CURL_BLOCK_OPT_PROXY_USERNAME        "proxy-username"
+> #define CURL_BLOCK_OPT_PROXY_PASSWORD_SECRET "proxy-password-secret"
+>
+> struct BDRVCURLState;
+>@@ -110,8 +112,7 @@ typedef struct CURLSocket {
+>     QLIST_ENTRY(CURLSocket) next;
+> } CURLSocket;
+>
+>-typedef struct CURLState
+>-{
+>+typedef struct CURLState {
+>     struct BDRVCURLState *s;
+>     CURLAIOCB *acb[CURL_NUM_ACB];
+>     CURL *curl;
+>@@ -196,22 +197,22 @@ static int curl_sock_cb(CURL *curl, curl_socket_t fd, int action,
+>
+>     DPRINTF("CURL (AIO): Sock action %d on fd %d\n", action, (int)fd);
+>     switch (action) {
+>-        case CURL_POLL_IN:
+>-            aio_set_fd_handler(s->aio_context, fd, false,
+>-                               curl_multi_read, NULL, NULL, state);
+>-            break;
+>-        case CURL_POLL_OUT:
+>-            aio_set_fd_handler(s->aio_context, fd, false,
+>-                               NULL, curl_multi_do, NULL, state);
+>-            break;
+>-        case CURL_POLL_INOUT:
+>-            aio_set_fd_handler(s->aio_context, fd, false,
+>-                               curl_multi_read, curl_multi_do, NULL, state);
+>-            break;
+>-        case CURL_POLL_REMOVE:
+>-            aio_set_fd_handler(s->aio_context, fd, false,
+>-                               NULL, NULL, NULL, NULL);
+>-            break;
+>+    case CURL_POLL_IN:
+>+        aio_set_fd_handler(s->aio_context, fd, false,
+>+                           curl_multi_read, NULL, NULL, state);
+>+        break;
+>+    case CURL_POLL_OUT:
+>+        aio_set_fd_handler(s->aio_context, fd, false,
+>+                           NULL, curl_multi_do, NULL, state);
+>+        break;
+>+    case CURL_POLL_INOUT:
+>+        aio_set_fd_handler(s->aio_context, fd, false,
+>+                           curl_multi_read, curl_multi_do, NULL, state);
+>+        break;
+>+    case CURL_POLL_REMOVE:
+>+        aio_set_fd_handler(s->aio_context, fd, false,
+>+                           NULL, NULL, NULL, NULL);
+>+        break;
+>     }
+>
+>     return 0;
+>@@ -235,7 +236,7 @@ static size_t curl_header_cb(void *ptr, size_t size, size_t nmemb, void *opaque)
+> /* Called from curl_multi_do_locked, with s->mutex held.  */
+> static size_t curl_read_cb(void *ptr, size_t size, size_t nmemb, void *opaque)
+> {
+>-    CURLState *s = ((CURLState*)opaque);
+>+    CURLState *s = opaque;
+
+Not sure about this one - while it may not be strictly necessary to
+do the casting, from a readability point of view it is helpful to
+see the cast - possibly with the outer brackets removed:
+
+      CURLState *s = (CURLState*)opaque;
+
+>     size_t realsize = size * nmemb;
+>     int i;
+>
+>@@ -253,11 +254,12 @@ static size_t curl_read_cb(void *ptr, size_t size, size_t nmemb, void *opaque)
+>     memcpy(s->orig_buf + s->buf_off, ptr, realsize);
+>     s->buf_off += realsize;
+>
+>-    for(i=0; i<CURL_NUM_ACB; i++) {
+>+    for (i = 0; i < CURL_NUM_ACB; i++) {
+>         CURLAIOCB *acb = s->acb[i];
+>
+>-        if (!acb)
+>+        if (!acb) {
+>             continue;
+>+        }
+>
+>         if ((s->buf_off >= acb->end)) {
+>             size_t request_length = acb->bytes;
+>@@ -293,17 +295,16 @@ static bool curl_find_buf(BDRVCURLState *s, uint64_t start, uint64_t len,
+>     uint64_t clamped_end = MIN(end, s->len);
+>     uint64_t clamped_len = clamped_end - start;
+>
+>-    for (i=0; i<CURL_NUM_STATES; i++) {
+>+    for (i = 0; i < CURL_NUM_STATES; i++) {
+>         CURLState *state = &s->states[i];
+>         uint64_t buf_end = (state->buf_start + state->buf_off);
+>         uint64_t buf_fend = (state->buf_start + state->buf_len);
+>
+>-        if (!state->orig_buf)
+>-            continue;
+>-        if (!state->buf_off)
+>+        if (!state->orig_buf || !state->buf_off) {
+>             continue;
+>+        }
+>
+>-        // Does the existing buffer cover our section?
+>+        /* Does the existing buffer cover our section? */
+>         if ((start >= state->buf_start) &&
+>             (start <= buf_end) &&
+>             (clamped_end >= state->buf_start) &&
+>@@ -319,7 +320,7 @@ static bool curl_find_buf(BDRVCURLState *s, uint64_t start, uint64_t len,
+>             return true;
+>         }
+>
+>-        // Wait for unfinished chunks
+>+        /* Wait for unfinished chunks */
+>         if (state->in_use &&
+>             (start >= state->buf_start) &&
+>             (start <= buf_fend) &&
+>@@ -331,7 +332,7 @@ static bool curl_find_buf(BDRVCURLState *s, uint64_t start, uint64_t len,
+>             acb->start = start - state->buf_start;
+>             acb->end = acb->start + clamped_len;
+>
+>-            for (j=0; j<CURL_NUM_ACB; j++) {
+>+            for (j = 0; j < CURL_NUM_ACB; j++) {
+>                 if (!state->acb[j]) {
+>                     state->acb[j] = acb;
+>                     return true;
+>@@ -355,8 +356,9 @@ static void curl_multi_check_completion(BDRVCURLState *s)
+>         msg = curl_multi_info_read(s->multi, &msgs_in_queue);
+>
+>         /* Quit when there are no more completions */
+>-        if (!msg)
+>+        if (!msg) {
+>             break;
+>+        }
+>
+>         if (msg->msg == CURLMSG_DONE) {
+>             CURLState *state = NULL;
+>@@ -540,12 +542,14 @@ static void curl_clean_state(CURLState *s)
+> {
+>     CURLAIOCB *next;
+>     int j;
+>+
+>     for (j = 0; j < CURL_NUM_ACB; j++) {
+>         assert(!s->acb[j]);
+>     }
+>
+>-    if (s->s->multi)
+>+    if (s->s->multi) {
+>         curl_multi_remove_handle(s->s->multi, s->curl);
+>+    }
+>
+>     while (!QLIST_EMPTY(&s->sockets)) {
+>         CURLSocket *socket = QLIST_FIRST(&s->sockets);
+>@@ -794,7 +798,7 @@ static int curl_open(BlockDriverState *bs, QDict *options, int flags,
+>         goto out_noclean;
+>     }
+>
+>-    // Get file size
+>+    /* Get file size */
+>
+>     if (curl_init_state(s, state) < 0) {
+>         goto out;
+>@@ -802,11 +806,11 @@ static int curl_open(BlockDriverState *bs, QDict *options, int flags,
+>
+>     s->accept_range = false;
+>     curl_easy_setopt(state->curl, CURLOPT_NOBODY, 1);
+>-    curl_easy_setopt(state->curl, CURLOPT_HEADERFUNCTION,
+>-                     curl_header_cb);
+>+    curl_easy_setopt(state->curl, CURLOPT_HEADERFUNCTION, curl_header_cb);
+>     curl_easy_setopt(state->curl, CURLOPT_HEADERDATA, s);
+>-    if (curl_easy_perform(state->curl))
+>+    if (curl_easy_perform(state->curl)) {
+>         goto out;
+>+    }
+>     if (curl_easy_getinfo(state->curl, CURLINFO_CONTENT_LENGTH_DOWNLOAD, &d)) {
+>         goto out;
+>     }
+>@@ -876,13 +880,13 @@ static void curl_setup_preadv(BlockDriverState *bs, CURLAIOCB *acb)
+>
+>     qemu_mutex_lock(&s->mutex);
+>
+>-    // In case we have the requested data already (e.g. read-ahead),
+>-    // we can just call the callback and be done.
+>+    /* In case we have the requested data already (e.g. read-ahead),
+>+       we can just call the callback and be done. */
+
+Please don't do a multi-line comment like this, it is much more
+obvious that the second line is a comment if you use the more normal
+format of as outlined earlier by me.
+
+Thanks,
+
+Darren.
