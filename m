@@ -1,24 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35119)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35145)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1eCZNE-000146-B5
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 18:03:11 -0500
+	(envelope-from <alistai@xilinx.com>) id 1eCZNI-000188-7v
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 18:03:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1eCZNB-0003qC-3y
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 18:03:08 -0500
-Received: from mail-cys01nam02on0067.outbound.protection.outlook.com
-	([104.47.37.67]:6176
-	helo=NAM02-CY1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1eCZNA-0003po-OW
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 18:03:05 -0500
+	(envelope-from <alistai@xilinx.com>) id 1eCZNG-0003r4-0s
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 18:03:12 -0500
 From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Wed, 8 Nov 2017 14:58:59 -0800
-Message-ID: <3c6c24cb01f7d4812addd84bd170337459c9e95b.1510181732.git.alistair.francis@xilinx.com>
+Date: Wed, 8 Nov 2017 14:58:56 -0800
+Message-ID: <f71203227749e2afb8564b3388b2b34f6652b009.1510181732.git.alistair.francis@xilinx.com>
 In-Reply-To: <cover.1510181732.git.alistair.francis@xilinx.com>
 References: <cover.1510181732.git.alistair.francis@xilinx.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v4 43/45] ui: Replace fprintf(stderr,
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v4 42/45] util: Replace fprintf(stderr,
  "*\n" with error_report()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -29,519 +24,409 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: alistair.francis@xilinx.com, alistair23@gmail.com, armbru@redhat.com, Peter Maydell <peter.maydell@linaro.org>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: alistair.francis@xilinx.com, alistair23@gmail.com, armbru@redhat.com, Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Weil <sw@weilnetz.de>, qemu-block@nongnu.org
 
 Replace a large number of the fprintf(stderr, "*\n" calls with
 error_report(). The functions were renamed with these commands and then
 compiler issues where manually fixed.
 
 find ./* -type f -exec sed -i \
-    'N;N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+    'N;N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_=
+report("\1"\2);|Ig}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+    'N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_re=
+port("\1"\2);|Ig}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+    'N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report=
+("\1"\2);|Ig}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+    'N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("=
+\1"\2);|Ig}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+    'N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1=
+"\2);|Ig}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+    'N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\=
+2);|Ig}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+    'N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2)=
+;|Ig}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+    'N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|=
+Ig}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+    'N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig=
+}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+    'N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}'=
+ \
     {} +
 find ./* -type f -exec sed -i \
     'N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
     {} +
 
+The error in aio_poll() was removed manually.
+
 Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Stefan Weil <sw@weilnetz.de>
+Cc: qemu-block@nongnu.org
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 ---
+V4:
+ - Remove the error in aio_poll()
 
- ui/cocoa.m         |  6 +++---
- ui/console.c       |  2 +-
- ui/curses.c        |  2 +-
- ui/cursor.c        | 10 +++++-----
- ui/gtk.c           | 10 +++++-----
- ui/input-linux.c   |  3 ++-
- ui/keymaps.c       |  4 ++--
- ui/sdl.c           | 14 +++++++-------
- ui/sdl2.c          |  8 ++++----
- ui/sdl_zoom.c      |  3 ++-
- ui/shader.c        |  9 +++++----
- ui/spice-display.c | 10 +++++-----
- ui/vnc-enc-tight.c |  4 ++--
- ui/vnc-enc-zlib.c  |  4 ++--
- ui/vnc-enc-zrle.c  |  4 ++--
- ui/vnc.c           |  2 +-
- 16 files changed, 49 insertions(+), 46 deletions(-)
+ util/aio-posix.c             | 1 +
+ util/coroutine-sigaltstack.c | 2 +-
+ util/error.c                 | 4 ++--
+ util/main-loop.c             | 2 +-
+ util/mmap-alloc.c            | 3 ++-
+ util/module.c                | 6 +++---
+ util/osdep.c                 | 4 ++--
+ util/oslib-posix.c           | 3 ++-
+ util/oslib-win32.c           | 3 ++-
+ util/qemu-coroutine.c        | 5 +++--
+ util/qemu-progress.c         | 3 ++-
+ util/qemu-thread-posix.c     | 5 +++--
+ util/qemu-thread-win32.c     | 5 +++--
+ util/qemu-timer-common.c     | 3 ++-
+ util/qht.c                   | 2 +-
+ 15 files changed, 30 insertions(+), 21 deletions(-)
 
-diff --git a/ui/cocoa.m b/ui/cocoa.m
-index 330ccebf90..fd3686bfd1 100644
---- a/ui/cocoa.m
-+++ b/ui/cocoa.m
-@@ -235,7 +235,7 @@ const int mac_to_qkeycode_map[] = {
- static int cocoa_keycode_to_qemu(int keycode)
- {
-     if (ARRAY_SIZE(mac_to_qkeycode_map) <= keycode) {
--        fprintf(stderr, "(cocoa) warning unknown keycode 0x%x\n", keycode);
-+        error_report("(cocoa) warning unknown keycode 0x%x", keycode);
-         return 0;
-     }
-     return mac_to_qkeycode_map[keycode];
-@@ -945,7 +945,7 @@ QemuCocoaView *cocoaView;
-         // create a view and add it to the window
-         cocoaView = [[QemuCocoaView alloc] initWithFrame:NSMakeRect(0.0, 0.0, 640.0, 480.0)];
-         if(!cocoaView) {
--            fprintf(stderr, "(cocoa) can't create a view\n");
-+            error_report("(cocoa) can't create a view");
-             exit(1);
-         }
- 
-@@ -954,7 +954,7 @@ QemuCocoaView *cocoaView;
-             styleMask:NSWindowStyleMaskTitled|NSWindowStyleMaskMiniaturizable|NSWindowStyleMaskClosable
-             backing:NSBackingStoreBuffered defer:NO];
-         if(!normalWindow) {
--            fprintf(stderr, "(cocoa) can't create window\n");
-+            error_report("(cocoa) can't create window");
-             exit(1);
-         }
-         [normalWindow setAcceptsMouseMovedEvents:YES];
-diff --git a/ui/console.c b/ui/console.c
-index eca854cbd5..b58336c7b2 100644
---- a/ui/console.c
-+++ b/ui/console.c
-@@ -1422,7 +1422,7 @@ void register_displaychangelistener(DisplayChangeListener *dcl)
-         /* display has opengl support */
-         assert(dcl->con);
-         if (dcl->con->gl) {
--            fprintf(stderr, "can't register two opengl displays (%s, %s)\n",
-+            error_report("can't register two opengl displays (%s, %s)",
-                     dcl->ops->dpy_name, dcl->con->gl->ops->dpy_name);
-             exit(1);
-         }
-diff --git a/ui/curses.c b/ui/curses.c
-index 85503876c0..11c862520f 100644
---- a/ui/curses.c
-+++ b/ui/curses.c
-@@ -438,7 +438,7 @@ void curses_display_init(DisplayState *ds, int full_screen)
- {
- #ifndef _WIN32
-     if (!isatty(1)) {
--        fprintf(stderr, "We need a terminal output\n");
-+        error_report("We need a terminal output");
-         exit(1);
-     }
- #endif
-diff --git a/ui/cursor.c b/ui/cursor.c
-index f3da0cee79..9d847031ec 100644
---- a/ui/cursor.c
-+++ b/ui/cursor.c
-@@ -18,12 +18,12 @@ static QEMUCursor *cursor_parse_xpm(const char *xpm[])
-     /* parse header line: width, height, #colors, #chars */
-     if (sscanf(xpm[line], "%u %u %u %u",
-                &width, &height, &colors, &chars) != 4) {
--        fprintf(stderr, "%s: header parse error: \"%s\"\n",
--                __func__, xpm[line]);
-+        error_report("%s: header parse error: \"%s\"",
-+                     __func__, xpm[line]);
-         return NULL;
-     }
-     if (chars != 1) {
--        fprintf(stderr, "%s: chars != 1 not supported\n", __func__);
-+        error_report("%s: chars != 1 not supported", __func__);
-         return NULL;
-     }
-     line++;
-@@ -40,7 +40,7 @@ static QEMUCursor *cursor_parse_xpm(const char *xpm[])
-                 continue;
-             }
-         }
--        fprintf(stderr, "%s: color parse error: \"%s\"\n",
-+        error_report("%s: color parse error: \"%s\"",
-                 __func__, xpm[line]);
-         return NULL;
-     }
-@@ -75,7 +75,7 @@ void cursor_print_ascii_art(QEMUCursor *c, const char *prefix)
-                 fprintf(stderr, "o"); /* other */
-             }
-         }
--        fprintf(stderr, "|\n");
-+        error_report("|");
+diff --git a/util/aio-posix.c b/util/aio-posix.c
+index 1427f49b4a..8eeba93da6 100644
+--- a/util/aio-posix.c
++++ b/util/aio-posix.c
+@@ -15,6 +15,7 @@
+=20
+ #include "qemu/osdep.h"
+ #include "qemu-common.h"
++#include "qemu/error-report.h"
+ #include "block/block.h"
+ #include "qemu/rcu_queue.h"
+ #include "qemu/sockets.h"
+diff --git a/util/coroutine-sigaltstack.c b/util/coroutine-sigaltstack.c
+index f6fc49a0e5..96a01c2c88 100644
+--- a/util/coroutine-sigaltstack.c
++++ b/util/coroutine-sigaltstack.c
+@@ -80,7 +80,7 @@ static void __attribute__((constructor)) coroutine_init(v=
+oid)
+=20
+     ret =3D pthread_key_create(&thread_state_key, qemu_coroutine_thread_cl=
+eanup);
+     if (ret !=3D 0) {
+-        fprintf(stderr, "unable to create leader key: %s\n", strerror(errn=
+o));
++        error_report("unable to create leader key: %s", strerror(errno));
+         abort();
      }
  }
- 
-diff --git a/ui/gtk.c b/ui/gtk.c
-index 342e96fbe9..91b269d9d0 100644
---- a/ui/gtk.c
-+++ b/ui/gtk.c
-@@ -1254,7 +1254,7 @@ static gboolean gd_win_grab(void *opaque)
+diff --git a/util/error.c b/util/error.c
+index 3efdd69162..f524e138ec 100644
+--- a/util/error.c
++++ b/util/error.c
+@@ -32,8 +32,8 @@ Error *error_fatal;
+ static void error_handle_fatal(Error **errp, Error *err)
  {
-     VirtualConsole *vc = opaque;
- 
--    fprintf(stderr, "%s: %s\n", __func__, vc->label);
-+    error_report("%s: %s", __func__, vc->label);
-     if (vc->s->ptr_owner) {
-         gd_ungrab_pointer(vc->s);
-     } else {
-@@ -2215,12 +2215,12 @@ static void gd_set_keycode_type(GtkDisplayState *s)
-             keycodes = XGetAtomName(x11_display, desc->names->keycodes);
-         }
-         if (keycodes == NULL) {
--            fprintf(stderr, "could not lookup keycode name\n");
-+            error_report("could not lookup keycode name");
-         } else if (strstart(keycodes, "evdev", NULL)) {
-             s->has_evdev = true;
-         } else if (!strstart(keycodes, "xfree86", NULL)) {
--            fprintf(stderr, "unknown keycodes `%s', please report to "
--                    "qemu-devel@nongnu.org\n", keycodes);
-+            error_report("unknown keycodes `%s', please report to "
-+                    "qemu-devel@nongnu.org", keycodes);
-         }
- 
-         if (desc) {
-@@ -2244,7 +2244,7 @@ void gtk_display_init(DisplayState *ds, bool full_screen, bool grab_on_hover)
-     GdkDisplay *window_display;
- 
-     if (!gtkinit) {
--        fprintf(stderr, "gtk initialization failed\n");
-+        error_report("gtk initialization failed");
-         exit(1);
+     if (errp =3D=3D &error_abort) {
+-        fprintf(stderr, "Unexpected error in %s() at %s:%d:\n",
+-                err->func, err->src, err->line);
++        error_report("Unexpected error in %s() at %s:%d:",
++                     err->func, err->src, err->line);
+         error_report_err(err);
+         abort();
      }
- 
-diff --git a/ui/input-linux.c b/ui/input-linux.c
-index 9720333b2c..edc5273476 100644
---- a/ui/input-linux.c
-+++ b/ui/input-linux.c
-@@ -5,6 +5,7 @@
+diff --git a/util/main-loop.c b/util/main-loop.c
+index 7558eb5f53..d8369716b2 100644
+--- a/util/main-loop.c
++++ b/util/main-loop.c
+@@ -95,7 +95,7 @@ static int qemu_signal_init(void)
+     sigdelset(&set, SIG_IPI);
+     sigfd =3D qemu_signalfd(&set);
+     if (sigfd =3D=3D -1) {
+-        fprintf(stderr, "failed to create signalfd\n");
++        error_report("failed to create signalfd");
+         return -errno;
+     }
+=20
+diff --git a/util/mmap-alloc.c b/util/mmap-alloc.c
+index 3ec029a9ea..11887aac69 100644
+--- a/util/mmap-alloc.c
++++ b/util/mmap-alloc.c
+@@ -11,6 +11,7 @@
   */
- 
+=20
  #include "qemu/osdep.h"
 +#include "qemu/error-report.h"
- #include "qapi/error.h"
- #include "qemu-common.h"
- #include "qemu/config-file.h"
-@@ -241,7 +242,7 @@ static void input_linux_event(void *opaque)
-         rc = read(il->fd, &p[il->read_offset], read_size);
-         if (rc != read_size) {
-             if (rc < 0 && errno != EAGAIN) {
--                fprintf(stderr, "%s: read: %s\n", __func__, strerror(errno));
-+                error_report("%s: read: %s", __func__, strerror(errno));
-                 qemu_set_fd_handler(il->fd, NULL, NULL, NULL);
-                 close(il->fd);
-             } else if (rc > 0) {
-diff --git a/ui/keymaps.c b/ui/keymaps.c
-index f9762d1497..41c5e42553 100644
---- a/ui/keymaps.c
-+++ b/ui/keymaps.c
-@@ -105,7 +105,7 @@ static kbd_layout_t *parse_keyboard_layout(const name2keysym_t *table,
-     f = filename ? fopen(filename, "r") : NULL;
-     g_free(filename);
-     if (!f) {
--        fprintf(stderr, "Could not read keymap file: '%s'\n", language);
-+        error_report("Could not read keymap file: '%s'", language);
-         return NULL;
-     }
- 
-@@ -150,7 +150,7 @@ static kbd_layout_t *parse_keyboard_layout(const name2keysym_t *table,
-                     if (strstr(rest, "numlock")) {
-                         add_to_key_range(&k->keypad_range, keycode);
-                         add_to_key_range(&k->numlock_range, keysym);
--                        /* fprintf(stderr, "keypad keysym %04x keycode %d\n",
-+                        /* error_report("keypad keysym %04x keycode %d",
-                                    keysym, keycode); */
-                     }
- 
-diff --git a/ui/sdl.c b/ui/sdl.c
-index 7b71a9ac58..29db4c68ad 100644
---- a/ui/sdl.c
-+++ b/ui/sdl.c
-@@ -91,7 +91,7 @@ static void sdl_update(DisplayChangeListener *dcl,
-             SDL_BlitSurface(guest_screen, &rec, real_screen, &rec);
-         } else {
-             if (sdl_zoom_blit(guest_screen, real_screen, SMOOTHING_ON, &rec) < 0) {
--                fprintf(stderr, "Zoom blit failed\n");
-+                error_report("Zoom blit failed");
-                 exit(1);
-             }
-         }
-@@ -120,7 +120,7 @@ static void do_sdl_resize(int width, int height, int bpp)
-     tmp_screen = SDL_SetVideoMode(width, height, bpp, flags);
-     if (!real_screen) {
-         if (!tmp_screen) {
--            fprintf(stderr, "Could not open SDL display (%dx%dx%d): %s\n",
-+            error_report("Could not open SDL display (%dx%dx%d): %s",
-                     width, height, bpp, SDL_GetError());
-             exit(1);
-         }
-@@ -130,7 +130,7 @@ static void do_sdl_resize(int width, int height, int bpp)
-          * resolution failed.
-          */
-         if (!tmp_screen) {
--            fprintf(stderr, "Failed to set SDL display (%dx%dx%d): %s\n",
-+            error_report("Failed to set SDL display (%dx%dx%d): %s",
-                     width, height, bpp, SDL_GetError());
-             return;
-         }
-@@ -241,12 +241,12 @@ static int check_for_evdev(void)
-                      XkbKeycodesNameMask, desc) == Success)) {
-         keycodes = XGetAtomName(info.info.x11.display, desc->names->keycodes);
-         if (keycodes == NULL) {
--            fprintf(stderr, "could not lookup keycode name\n");
-+            error_report("could not lookup keycode name");
-         } else if (strstart(keycodes, "evdev", NULL)) {
-             has_evdev = 1;
-         } else if (!strstart(keycodes, "xfree86", NULL)) {
--            fprintf(stderr, "unknown keycodes `%s', please report to "
--                    "qemu-devel@nongnu.org\n", keycodes);
-+            error_report("unknown keycodes `%s', please report to "
-+                    "qemu-devel@nongnu.org", keycodes);
-         }
-     }
- 
-@@ -988,7 +988,7 @@ void sdl_display_init(DisplayState *ds, int full_screen, int no_frame)
- 
-     flags = SDL_INIT_VIDEO | SDL_INIT_NOPARACHUTE;
-     if (SDL_Init (flags)) {
--        fprintf(stderr, "Could not initialize SDL(%s) - exiting\n",
-+        error_report("Could not initialize SDL(%s) - exiting",
-                 SDL_GetError());
+ #include "qemu/mmap-alloc.h"
+ #include "qemu/host-utils.h"
+=20
+@@ -51,7 +52,7 @@ size_t qemu_mempath_getpagesize(const char *mem_path)
+     } while (ret !=3D 0 && errno =3D=3D EINTR);
+=20
+     if (ret !=3D 0) {
+-        fprintf(stderr, "Couldn't statfs() memory path: %s\n",
++        error_report("Couldn't statfs() memory path: %s",
+                 strerror(errno));
          exit(1);
      }
-diff --git a/ui/sdl2.c b/ui/sdl2.c
-index 53dd447fd2..f6700e70f5 100644
---- a/ui/sdl2.c
-+++ b/ui/sdl2.c
-@@ -400,7 +400,7 @@ static void handle_keydown(SDL_Event *ev)
-                             160);
-                 height = (surface_height(scon->surface) * width) /
-                     surface_width(scon->surface);
--                fprintf(stderr, "%s: scale to %dx%d\n",
-+                error_report("%s: scale to %dx%d",
-                         __func__, width, height);
-                 sdl_scale(scon, width, height);
-                 sdl2_redraw(scon);
-@@ -686,13 +686,13 @@ static void sdl_mouse_define(DisplayChangeListener *dcl,
-                                  0xff0000, 0x00ff00, 0xff, 0xff000000);
- 
-     if (!guest_sprite_surface) {
--        fprintf(stderr, "Failed to make rgb surface from %p\n", c);
-+        error_report("Failed to make rgb surface from %p", c);
+diff --git a/util/module.c b/util/module.c
+index c90973721f..1153e3ebb0 100644
+--- a/util/module.c
++++ b/util/module.c
+@@ -124,13 +124,13 @@ static int module_load_file(const char *fname)
+=20
+     g_module =3D g_module_open(fname, G_MODULE_BIND_LAZY | G_MODULE_BIND_L=
+OCAL);
+     if (!g_module) {
+-        fprintf(stderr, "Failed to open module: %s\n",
++        error_report("Failed to open module: %s",
+                 g_module_error());
+         ret =3D -EINVAL;
+         goto out;
+     }
+     if (!g_module_symbol(g_module, DSO_STAMP_FUN_STR, (gpointer *)&sym)) {
+-        fprintf(stderr, "Failed to initialize module: %s\n",
++        error_report("Failed to initialize module: %s",
+                 fname);
+         /* Print some info if this is a QEMU module (but from different bu=
+ild),
+          * this will make debugging user problems easier. */
+@@ -169,7 +169,7 @@ void module_load_one(const char *prefix, const char *li=
+b_name)
+     static GHashTable *loaded_modules;
+=20
+     if (!g_module_supported()) {
+-        fprintf(stderr, "Module is not supported by system.\n");
++        error_report("Module is not supported by system.");
          return;
      }
-     guest_sprite = SDL_CreateColorCursor(guest_sprite_surface,
-                                          c->hot_x, c->hot_y);
-     if (!guest_sprite) {
--        fprintf(stderr, "Failed to make color cursor from %p\n", c);
-+        error_report("Failed to make color cursor from %p", c);
-         return;
-     }
-     if (guest_cursor &&
-@@ -783,7 +783,7 @@ void sdl_display_init(DisplayState *ds, int full_screen, int no_frame)
- 
-     flags = SDL_INIT_VIDEO | SDL_INIT_NOPARACHUTE;
-     if (SDL_Init(flags)) {
--        fprintf(stderr, "Could not initialize SDL(%s) - exiting\n",
-+        error_report("Could not initialize SDL(%s) - exiting",
-                 SDL_GetError());
-         exit(1);
-     }
-diff --git a/ui/sdl_zoom.c b/ui/sdl_zoom.c
-index b96196bac5..bf73d1f1f9 100644
---- a/ui/sdl_zoom.c
-+++ b/ui/sdl_zoom.c
-@@ -12,6 +12,7 @@
-  */
- 
- #include "qemu/osdep.h"
-+#include "qemu/error-report.h"
- #include "sdl_zoom.h"
- 
- static void sdl_zoom_rgb16(SDL_Surface *src, SDL_Surface *dst, int smooth,
-@@ -81,7 +82,7 @@ int sdl_zoom_blit(SDL_Surface *src_sfc, SDL_Surface *dst_sfc, int smooth,
-     else if (src_sfc->format->BitsPerPixel == 16)
-         sdl_zoom_rgb16(src_sfc, dst_sfc, smooth, &zoom);
-     else {
--        fprintf(stderr, "pixel format not supported\n");
-+        error_report("pixel format not supported");
+=20
+diff --git a/util/osdep.c b/util/osdep.c
+index 1231f9f876..ec0ec7ed2c 100644
+--- a/util/osdep.c
++++ b/util/osdep.c
+@@ -466,7 +466,7 @@ void fips_set_state(bool requested)
+ #endif /* __linux__ */
+=20
+ #ifdef _FIPS_DEBUG
+-    fprintf(stderr, "FIPS mode %s (requested %s)\n",
++    error_report("FIPS mode %s (requested %s)",
+ 	    (fips_enabled ? "enabled" : "disabled"),
+ 	    (requested ? "enabled" : "disabled"));
+ #endif
+@@ -493,7 +493,7 @@ int socket_init(void)
+     ret =3D WSAStartup(MAKEWORD(2, 2), &Data);
+     if (ret !=3D 0) {
+         err =3D WSAGetLastError();
+-        fprintf(stderr, "WSAStartup: %d\n", err);
++        error_report("WSAStartup: %d", err);
          return -1;
      }
- 
-diff --git a/ui/shader.c b/ui/shader.c
-index 008458bf94..54afd3fbb6 100644
---- a/ui/shader.c
-+++ b/ui/shader.c
-@@ -25,6 +25,7 @@
+     atexit(socket_cleanup);
+diff --git a/util/oslib-posix.c b/util/oslib-posix.c
+index 77369c92ce..e34ebf094f 100644
+--- a/util/oslib-posix.c
++++ b/util/oslib-posix.c
+@@ -34,6 +34,7 @@
+ #include "sysemu/sysemu.h"
+ #include "trace.h"
+ #include "qapi/error.h"
++#include "qemu/error-report.h"
+ #include "qemu/sockets.h"
+ #include <libgen.h>
+ #include <sys/signal.h>
+@@ -91,7 +92,7 @@ int qemu_daemon(int nochdir, int noclose)
+ void *qemu_oom_check(void *ptr)
+ {
+     if (ptr =3D=3D NULL) {
+-        fprintf(stderr, "Failed to allocate memory: %s\n", strerror(errno)=
+);
++        error_report("Failed to allocate memory: %s", strerror(errno));
+         abort();
+     }
+     return ptr;
+diff --git a/util/oslib-win32.c b/util/oslib-win32.c
+index 69a6286d50..2197a6a4fc 100644
+--- a/util/oslib-win32.c
++++ b/util/oslib-win32.c
+@@ -30,6 +30,7 @@
+  * see the license comment there.
+  */
+ #include "qemu/osdep.h"
++#include "qemu/error-report.h"
+ #include <windows.h>
+ #include "qapi/error.h"
+ #include "sysemu/sysemu.h"
+@@ -44,7 +45,7 @@
+ void *qemu_oom_check(void *ptr)
+ {
+     if (ptr =3D=3D NULL) {
+-        fprintf(stderr, "Failed to allocate memory: %lu\n", GetLastError()=
+);
++        error_report("Failed to allocate memory: %lu", GetLastError());
+         abort();
+     }
+     return ptr;
+diff --git a/util/qemu-coroutine.c b/util/qemu-coroutine.c
+index d6095c1d5a..1f7cce6706 100644
+--- a/util/qemu-coroutine.c
++++ b/util/qemu-coroutine.c
+@@ -13,6 +13,7 @@
+  */
+=20
+ #include "qemu/osdep.h"
++#include "qemu/error-report.h"
+ #include "trace.h"
+ #include "qemu-common.h"
+ #include "qemu/thread.h"
+@@ -110,7 +111,7 @@ void qemu_aio_coroutine_enter(AioContext *ctx, Coroutin=
+e *co)
+     trace_qemu_aio_coroutine_enter(ctx, self, co, co->entry_arg);
+=20
+     if (co->caller) {
+-        fprintf(stderr, "Co-routine re-entered recursively\n");
++        error_report("Co-routine re-entered recursively");
+         abort();
+     }
+=20
+@@ -164,7 +165,7 @@ void coroutine_fn qemu_coroutine_yield(void)
+     trace_qemu_coroutine_yield(self, to);
+=20
+     if (!to) {
+-        fprintf(stderr, "Co-routine is yielding to no one\n");
++        error_report("Co-routine is yielding to no one");
+         abort();
+     }
+=20
+diff --git a/util/qemu-progress.c b/util/qemu-progress.c
+index 3c2223c1a2..84598f0fbb 100644
+--- a/util/qemu-progress.c
++++ b/util/qemu-progress.c
+@@ -23,6 +23,7 @@
+  */
+=20
+ #include "qemu/osdep.h"
++#include "qemu/error-report.h"
+ #include "qemu-common.h"
+=20
+ struct progress_state {
+@@ -68,7 +69,7 @@ static void sigusr_print(int signal)
+ static void progress_dummy_print(void)
+ {
+     if (print_pending) {
+-        fprintf(stderr, "    (%3.2f/100%%)\n", state.current);
++        error_report("    (%3.2f/100%%)", state.current);
+         print_pending =3D 0;
+     }
+ }
+diff --git a/util/qemu-thread-posix.c b/util/qemu-thread-posix.c
+index 7306475899..1207ef71d6 100644
+--- a/util/qemu-thread-posix.c
++++ b/util/qemu-thread-posix.c
+@@ -11,6 +11,7 @@
+  *
+  */
+ #include "qemu/osdep.h"
++#include "qemu/error-report.h"
+ #include "qemu/thread.h"
+ #include "qemu/atomic.h"
+ #include "qemu/notify.h"
+@@ -25,14 +26,14 @@ void qemu_thread_naming(bool enable)
+ #ifndef CONFIG_THREAD_SETNAME_BYTHREAD
+     /* This is a debugging option, not fatal */
+     if (enable) {
+-        fprintf(stderr, "qemu: thread naming not supported on this host\n"=
+);
++        error_report("thread naming not supported on this host");
+     }
+ #endif
+ }
+=20
+ static void error_exit(int err, const char *msg)
+ {
+-    fprintf(stderr, "qemu: %s: %s\n", msg, strerror(err));
++    error_report("%s: %s", msg, strerror(err));
+     abort();
+ }
+=20
+diff --git a/util/qemu-thread-win32.c b/util/qemu-thread-win32.c
+index 94f3491a87..02b94e22da 100644
+--- a/util/qemu-thread-win32.c
++++ b/util/qemu-thread-win32.c
+@@ -16,6 +16,7 @@
+ #endif
+=20
+ #include "qemu/osdep.h"
++#include "qemu/error-report.h"
+ #include "qemu-common.h"
+ #include "qemu/thread.h"
+ #include "qemu/notify.h"
+@@ -29,7 +30,7 @@ void qemu_thread_naming(bool enable)
+     /* But note we don't actually name them on Windows yet */
+     name_threads =3D enable;
+=20
+-    fprintf(stderr, "qemu: thread naming not supported on this host\n");
++    error_report("thread naming not supported on this host");
+ }
+=20
+ static void error_exit(int err, const char *msg)
+@@ -38,7 +39,7 @@ static void error_exit(int err, const char *msg)
+=20
+     FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUF=
+FER,
+                   NULL, err, 0, (LPTSTR)&pstr, 2, NULL);
+-    fprintf(stderr, "qemu: %s: %s\n", msg, pstr);
++    error_report("%s: %s", msg, pstr);
+     LocalFree(pstr);
+     abort();
+ }
+diff --git a/util/qemu-timer-common.c b/util/qemu-timer-common.c
+index 06d084d364..ab7b702c4f 100644
+--- a/util/qemu-timer-common.c
++++ b/util/qemu-timer-common.c
+@@ -22,6 +22,7 @@
   * THE SOFTWARE.
   */
  #include "qemu/osdep.h"
 +#include "qemu/error-report.h"
- #include "qemu-common.h"
- #include "ui/shader.h"
- 
-@@ -96,9 +97,9 @@ static GLuint qemu_gl_create_compile_shader(GLenum type, const GLchar *src)
-         glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &length);
-         errmsg = g_malloc(length);
-         glGetShaderInfoLog(shader, length, &length, errmsg);
--        fprintf(stderr, "%s: compile %s error\n%s\n", __func__,
--                (type == GL_VERTEX_SHADER) ? "vertex" : "fragment",
--                errmsg);
-+        error_report("%s: compile %s error: %s", __func__,
-+                     (type == GL_VERTEX_SHADER) ? "vertex" : "fragment",
-+                     errmsg);
-         g_free(errmsg);
-         return 0;
+ #include "qemu/timer.h"
+=20
+ /***********************************************************/
+@@ -37,7 +38,7 @@ static void __attribute__((constructor)) init_get_clock(v=
+oid)
+     int ret;
+     ret =3D QueryPerformanceFrequency(&freq);
+     if (ret =3D=3D 0) {
+-        fprintf(stderr, "Could not calibrate ticks\n");
++        error_report("Could not calibrate ticks");
+         exit(1);
      }
-@@ -121,7 +122,7 @@ static GLuint qemu_gl_create_link_program(GLuint vert, GLuint frag)
-         glGetProgramiv(program, GL_INFO_LOG_LENGTH, &length);
-         errmsg = g_malloc(length);
-         glGetProgramInfoLog(program, length, &length, errmsg);
--        fprintf(stderr, "%s: link program: %s\n", __func__, errmsg);
-+        error_report("%s: link program: %s", __func__, errmsg);
-         g_free(errmsg);
-         return 0;
-     }
-diff --git a/ui/spice-display.c b/ui/spice-display.c
-index 586f058f1b..bb6a1af68e 100644
---- a/ui/spice-display.c
-+++ b/ui/spice-display.c
-@@ -630,13 +630,13 @@ static int interface_req_cursor_notification(QXLInstance *sin)
- 
- static void interface_notify_update(QXLInstance *sin, uint32_t update_id)
- {
--    fprintf(stderr, "%s: abort()\n", __func__);
-+    error_report("%s: abort()", __func__);
-     abort();
- }
- 
- static int interface_flush_resources(QXLInstance *sin)
- {
--    fprintf(stderr, "%s: abort()\n", __func__);
-+    error_report("%s: abort()", __func__);
-     abort();
-     return 0;
- }
-@@ -646,7 +646,7 @@ static void interface_update_area_complete(QXLInstance *sin,
-         QXLRect *dirty, uint32_t num_updated_rects)
- {
-     /* should never be called, used in qxl native mode only */
--    fprintf(stderr, "%s: abort()\n", __func__);
-+    error_report("%s: abort()", __func__);
-     abort();
- }
- 
-@@ -671,7 +671,7 @@ static void interface_async_complete(QXLInstance *sin, uint64_t cookie_token)
- #endif
-     default:
-         /* should never be called, used in qxl native mode only */
--        fprintf(stderr, "%s: abort()\n", __func__);
-+        error_report("%s: abort()", __func__);
-         abort();
-     }
-     g_free(cookie);
-@@ -955,7 +955,7 @@ static void qemu_spice_gl_scanout_texture(DisplayChangeListener *dcl,
-     assert(tex_id);
-     fd = egl_get_fd_for_texture(tex_id, &stride, &fourcc);
-     if (fd < 0) {
--        fprintf(stderr, "%s: failed to get fd for texture\n", __func__);
-+        error_report("%s: failed to get fd for texture", __func__);
-         return;
-     }
-     dprint(1, "%s: %dx%d (stride %d, fourcc 0x%x)\n", __func__,
-diff --git a/ui/vnc-enc-tight.c b/ui/vnc-enc-tight.c
-index f38aceb4da..7ac957057d 100644
---- a/ui/vnc-enc-tight.c
-+++ b/ui/vnc-enc-tight.c
-@@ -800,7 +800,7 @@ static int tight_init_stream(VncState *vs, int stream_id,
-                            MAX_MEM_LEVEL, strategy);
- 
-         if (err != Z_OK) {
--            fprintf(stderr, "VNC: error initializing zlib\n");
-+            error_report("VNC: error initializing zlib");
-             return -1;
-         }
- 
-@@ -865,7 +865,7 @@ static int tight_compress_data(VncState *vs, int stream_id, size_t bytes,
- 
-     /* start encoding */
-     if (deflate(zstream, Z_SYNC_FLUSH) != Z_OK) {
--        fprintf(stderr, "VNC: error during tight compression\n");
-+        error_report("VNC: error during tight compression");
-         return -1;
-     }
- 
-diff --git a/ui/vnc-enc-zlib.c b/ui/vnc-enc-zlib.c
-index 33e9df2f6a..437cfb1307 100644
---- a/ui/vnc-enc-zlib.c
-+++ b/ui/vnc-enc-zlib.c
-@@ -80,7 +80,7 @@ static int vnc_zlib_stop(VncState *vs)
-                            MAX_MEM_LEVEL, Z_DEFAULT_STRATEGY);
- 
-         if (err != Z_OK) {
--            fprintf(stderr, "VNC: error initializing zlib\n");
-+            error_report("VNC: error initializing zlib");
-             return -1;
-         }
- 
-@@ -109,7 +109,7 @@ static int vnc_zlib_stop(VncState *vs)
- 
-     // start encoding
-     if (deflate(zstream, Z_SYNC_FLUSH) != Z_OK) {
--        fprintf(stderr, "VNC: error during zlib compression\n");
-+        error_report("VNC: error during zlib compression");
-         return -1;
-     }
- 
-diff --git a/ui/vnc-enc-zrle.c b/ui/vnc-enc-zrle.c
-index fd63d4f688..a3af8a1c5d 100644
---- a/ui/vnc-enc-zrle.c
-+++ b/ui/vnc-enc-zrle.c
-@@ -85,7 +85,7 @@ static int zrle_compress_data(VncState *vs, int level)
-                            MAX_MEM_LEVEL, Z_DEFAULT_STRATEGY);
- 
-         if (err != Z_OK) {
--            fprintf(stderr, "VNC: error initializing zlib\n");
-+            error_report("VNC: error initializing zlib");
-             return -1;
-         }
- 
-@@ -104,7 +104,7 @@ static int zrle_compress_data(VncState *vs, int level)
- 
-     /* start encoding */
-     if (deflate(zstream, Z_SYNC_FLUSH) != Z_OK) {
--        fprintf(stderr, "VNC: error during zrle compression\n");
-+        error_report("VNC: error during zrle compression");
-         return -1;
-     }
- 
-diff --git a/ui/vnc.c b/ui/vnc.c
-index 9f8d5a1b1f..05fd3922a5 100644
---- a/ui/vnc.c
-+++ b/ui/vnc.c
-@@ -71,7 +71,7 @@ static void vnc_set_share_mode(VncState *vs, VncShareMode mode)
-         [VNC_SHARE_MODE_EXCLUSIVE]    = "exclusive",
-         [VNC_SHARE_MODE_DISCONNECTED] = "disconnected",
-     };
--    fprintf(stderr, "%s/%p: %s -> %s\n", __func__,
-+    error_report("%s/%p: %s -> %s", __func__,
-             vs->ioc, mn[vs->share_mode], mn[mode]);
- #endif
- 
--- 
+     clock_freq =3D freq.QuadPart;
+diff --git a/util/qht.c b/util/qht.c
+index ff4d2e6974..bfab5c7e5e 100644
+--- a/util/qht.c
++++ b/util/qht.c
+@@ -154,7 +154,7 @@ static void qht_bucket_debug__locked(struct qht_bucket =
+*b)
+                 continue;
+             }
+             if (seen_empty) {
+-                fprintf(stderr, "%s: b: %p, pos: %i, hash: 0x%x, p: %p\n",
++                error_report("%s: b: %p, pos: %i, hash: 0x%x, p: %p",
+                         __func__, b, i, b->hashes[i], b->pointers[i]);
+                 corrupt =3D true;
+             }
+--=20
 2.14.1
