@@ -1,30 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55927)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56023)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1eCTeQ-0004mO-Nw
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 11:56:32 -0500
+	(envelope-from <mst@redhat.com>) id 1eCTes-0005BZ-Ll
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 11:57:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1eCTeL-0001G4-RP
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 11:56:30 -0500
-Received: from 8.mo179.mail-out.ovh.net ([46.105.75.26]:52260)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1eCTeL-0001Ey-Gh
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 11:56:25 -0500
-Received: from player168.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo179.mail-out.ovh.net (Postfix) with ESMTP id 0BA907633B
-	for <qemu-devel@nongnu.org>; Wed,  8 Nov 2017 17:56:23 +0100 (CET)
-References: <20171029181217.9927-1-clg@kaod.org>
-	<20171029181217.9927-2-clg@kaod.org>
-	<20171108105404.4edc12d4@bahia.lan>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <c144c7bc-2a76-2baa-7504-dee5afc0038e@kaod.org>
-Date: Wed, 8 Nov 2017 16:56:17 +0000
+	(envelope-from <mst@redhat.com>) id 1eCTem-0001gm-6E
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 11:56:58 -0500
+Date: Wed, 8 Nov 2017 18:56:37 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20171108185443-mutt-send-email-mst@kernel.org>
+References: <20171017164426.25277-1-f4bug@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <20171108105404.4edc12d4@bahia.lan>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20171017164426.25277-1-f4bug@amsat.org>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/8] spapr: introduce an IRQ allocator at
- the machine level
+Subject: Re: [Qemu-devel] [PATCH v3 00/42] remove i386/pc dependency from
+ non-PC world (part 1)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,401 +24,288 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@imgtec.com>, Richard Henderson <rth@twiddle.net>, =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Gerd Hoffmann <kraxel@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>, Michael Tokarev <mjt@tls.msk.ru>, Eduardo Otubo <otubo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
 
-On 11/08/2017 09:54 AM, Greg Kurz wrote:
-> On Sun, 29 Oct 2017 19:12:10 +0100
-> C=C3=A9dric Le Goater <clg@kaod.org> wrote:
->=20
->> Currently, the ICSState 'ics' object of the sPAPR machine acts as the
->> global interrupt source handler and also as the IRQ number allocator
->> for the machine. Some IRQ numbers are allocated very early in the
->> machine initialization sequence to populate the device tree, and this
->> is a problem to introduce the new POWER XIVE interrupt model, as it
->> needs to share the IRQ numbers with the older model.
->>
->> To prepare ground for XIVE, here is a proposal adding a set of new
->> XICSFabric operations to let the machine handle directly the IRQ
->> number allocation and to decorrelate the allocation from the interrupt
->> source object :
->>
->>     bool (*irq_test)(XICSFabric *xi, int irq);
->>     int (*irq_alloc_block)(XICSFabric *xi, int count, int align);
->>     void (*irq_free_block)(XICSFabric *xi, int irq, int num);
->>
->> In these prototypes, the 'irq' parameter refers to a number in the
->> global IRQ number space. Indexes for arrays storing different state
->> informations on the interrupts, like the ICSIRQState, are named
->> 'srcno'.
->>
->> On the sPAPR platform, these IRQ operations are simply backed by a
->> bitmap 'irq_map' in the machine.
->>
->> 'irq_base' is a base number in sync with the ICSState 'offset'. It
->> lets us allocate only the subset of the IRQ numbers used on the sPAPR
->> platform but we could also choose to waste some extra bytes (512) and
->> allocate the whole number space. 'nr_irqs' is the total number of
->> IRQs, required to manipulate the bitmap.
->>
->> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
->> ---
->=20
+On Tue, Oct 17, 2017 at 01:43:44PM -0300, Philippe Mathieu-Daud=E9 wrote:
 > Hi,
 >=20
-> The idea makes sense but this patch brings too many changes IMHO.
-
-yes. I agree. The next version splits a bit more the changes and=20
-introduces the XICSFabric ops before the bitmap.=20
- =20
->>  hw/intc/xics.c         |  3 ++-
->>  hw/intc/xics_spapr.c   | 57 ++++++++++++-----------------------------=
------
->>  hw/ppc/spapr.c         | 62 +++++++++++++++++++++++++++++++++++++++++=
-++++++++-
->>  include/hw/ppc/spapr.h |  4 ++++
->>  include/hw/ppc/xics.h  |  4 ++++
->>  5 files changed, 85 insertions(+), 45 deletions(-)
->>
->> diff --git a/hw/intc/xics.c b/hw/intc/xics.c
->> index cc9816e7f204..2c4899f278e2 100644
->> --- a/hw/intc/xics.c
->> +++ b/hw/intc/xics.c
->> @@ -53,6 +53,7 @@ void icp_pic_print_info(ICPState *icp, Monitor *mon)
->>  void ics_pic_print_info(ICSState *ics, Monitor *mon)
->>  {
->>      uint32_t i;
->> +    XICSFabricClass *xic =3D XICS_FABRIC_GET_CLASS(ics->xics);
->> =20
->>      monitor_printf(mon, "ICS %4x..%4x %p\n",
->>                     ics->offset, ics->offset + ics->nr_irqs - 1, ics);
->> @@ -64,7 +65,7 @@ void ics_pic_print_info(ICSState *ics, Monitor *mon)
->>      for (i =3D 0; i < ics->nr_irqs; i++) {
->>          ICSIRQState *irq =3D ics->irqs + i;
->> =20
->> -        if (!(irq->flags & XICS_FLAGS_IRQ_MASK)) {
->> +        if (!xic->irq_test(ics->xics, i + ics->offset)) {
->>              continue;
->>          }
->>          monitor_printf(mon, "  %4x %s %02x %02x\n",
->> diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
->> index d98ea8b13068..f2e20bca5b2e 100644
->> --- a/hw/intc/xics_spapr.c
->> +++ b/hw/intc/xics_spapr.c
->> @@ -245,50 +245,23 @@ void xics_spapr_init(sPAPRMachineState *spapr)
->>      spapr_register_hypercall(H_IPOLL, h_ipoll);
->>  }
->> =20
->> -#define ICS_IRQ_FREE(ics, srcno)   \
->> -    (!((ics)->irqs[(srcno)].flags & (XICS_FLAGS_IRQ_MASK)))
->> -
->> -static int ics_find_free_block(ICSState *ics, int num, int alignnum)
->> -{
->> -    int first, i;
->> -
->> -    for (first =3D 0; first < ics->nr_irqs; first +=3D alignnum) {
->> -        if (num > (ics->nr_irqs - first)) {
->> -            return -1;
->> -        }
->> -        for (i =3D first; i < first + num; ++i) {
->> -            if (!ICS_IRQ_FREE(ics, i)) {
->> -                break;
->> -            }
->> -        }
->> -        if (i =3D=3D (first + num)) {
->> -            return first;
->> -        }
->> -    }
->> -
->> -    return -1;
->> -}
->> -
->>  int spapr_ics_alloc(ICSState *ics, int irq_hint, bool lsi, Error **er=
-rp)
->>  {
->>      int irq;
->> +    XICSFabricClass *xic =3D XICS_FABRIC_GET_CLASS(ics->xics);
->> =20
->> -    if (!ics) {
->> -        return -1;
->> -    }
+> quite a bunch of patches and files modified, but the diffstat is not th=
+at big.
 >=20
-> If spapr_ics_alloc() is never called with ics =3D=3D NULL, then you
-> should assert. Also, this looks like this deserves a separate
-> patch.
+> patches missing review: 2 3 16 20 21 33-37 39-41
 
-yes.
-=20
->>      if (irq_hint) {
->> -        if (!ICS_IRQ_FREE(ics, irq_hint - ics->offset)) {
->> +        if (xic->irq_test(ics->xics, irq_hint)) {
->>              error_setg(errp, "can't allocate IRQ %d: already in use",=
- irq_hint);
->>              return -1;
->>          }
->>          irq =3D irq_hint;
->>      } else {
->> -        irq =3D ics_find_free_block(ics, 1, 1);
->> +        irq =3D xic->irq_alloc_block(ics->xics, 1, 0);
->>          if (irq < 0) {
->>              error_setg(errp, "can't allocate IRQ: no IRQ left");
->>              return -1;
->>          }
->> -        irq +=3D ics->offset;
->>      }
->> =20
->>      ics_set_irq_type(ics, irq - ics->offset, lsi);
->> @@ -305,10 +278,8 @@ int spapr_ics_alloc_block(ICSState *ics, int num,=
- bool lsi,
->>                            bool align, Error **errp)
->>  {
->>      int i, first =3D -1;
->> +    XICSFabricClass *xic =3D XICS_FABRIC_GET_CLASS(ics->xics);
->> =20
->> -    if (!ics) {
->> -        return -1;
->> -    }
->> =20
+All my stuff looks good.  Series
+
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+
+If you like, and no one wants to, I can merge after the release.
+
+
+> since v3:
 >=20
-> Ditto.
+> - addressed Thomas & Paolo comments (thanks for your reviews!)
+> - split/fixed MAINTAINERS entries
+> - dropped port92 patch
+> - dropped i8237* patches
 >=20
->>      /*
->>       * MSIMesage::data is used for storing VIRQ so
->> @@ -320,9 +291,9 @@ int spapr_ics_alloc_block(ICSState *ics, int num, =
-bool lsi,
->>      if (align) {
->>          assert((num =3D=3D 1) || (num =3D=3D 2) || (num =3D=3D 4) ||
->>                 (num =3D=3D 8) || (num =3D=3D 16) || (num =3D=3D 32));
->> -        first =3D ics_find_free_block(ics, num, num);
->> +        first =3D xic->irq_alloc_block(ics->xics, num, num);
->>      } else {
->> -        first =3D ics_find_free_block(ics, num, 1);
->> +        first =3D xic->irq_alloc_block(ics->xics, num, 0);
->>      }
->>      if (first < 0) {
->>          error_setg(errp, "can't find a free %d-IRQ block", num);
->> @@ -331,25 +302,25 @@ int spapr_ics_alloc_block(ICSState *ics, int num=
-, bool lsi,
->> =20
->>      if (first >=3D 0) {
+> I couldn't test the KVM/XEN/HAX part (thanks Corey Minyard for v1 testi=
+ng!).
 >=20
-> It looks like this check isn't needed since we return in the first < 0 =
-case.
-> Maybe you can fix this in a preliminary patch ?
-
-done.
-
->>          for (i =3D first; i < first + num; ++i) {
->> -            ics_set_irq_type(ics, i, lsi);
->> +            ics_set_irq_type(ics, i - ics->offset, lsi);
->>          }
->>      }
->> -    first +=3D ics->offset;
->> =20
->>      trace_xics_alloc_block(first, num, lsi, align);
->> =20
->>      return first;
->>  }
->> =20
->> -static void ics_free(ICSState *ics, int srcno, int num)
->> +static void ics_free(ICSState *ics, int irq, int num)
->>  {
->>      int i;
->> +    XICSFabricClass *xic =3D XICS_FABRIC_GET_CLASS(ics->xics);
->> =20
->> -    for (i =3D srcno; i < srcno + num; ++i) {
->> -        if (ICS_IRQ_FREE(ics, i)) {
->> -            trace_xics_ics_free_warn(0, i + ics->offset);
->> +    for (i =3D irq; i < irq + num; ++i) {
->> +        if (xic->irq_test(ics->xics, i)) {
->> +            trace_xics_ics_free_warn(0, i);
->>          }
->> -        memset(&ics->irqs[i], 0, sizeof(ICSIRQState));
->> +        xic->irq_free_block(ics->xics, i, 1);
->>      }
->>  }
->> =20
->> @@ -357,7 +328,7 @@ void spapr_ics_free(ICSState *ics, int irq, int nu=
-m)
->>  {
->>      if (ics_valid_irq(ics, irq)) {
->>          trace_xics_ics_free(0, irq, num);
->> -        ics_free(ics, irq - ics->offset, num);
->> +        ics_free(ics, irq, num);
->>      }
->>  }
->> =20
->> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
->> index d682f013d422..88da4bad2328 100644
->> --- a/hw/ppc/spapr.c
->> +++ b/hw/ppc/spapr.c
->> @@ -1681,6 +1681,24 @@ static const VMStateDescription vmstate_spapr_p=
-atb_entry =3D {
->>      },
->>  };
->> =20
->> +static bool spapr_irq_map_needed(void *opaque)
->> +{
->> +    sPAPRMachineState *spapr =3D opaque;
->> +
->> +    return find_first_bit(spapr->irq_map, spapr->nr_irqs) < spapr->nr=
-_irqs;
->> +}
+> since v2:
+> - added R-b, A-b
+> - added missing MAINTAINERS entries (as separate patches)
+> - dma/i82374: avoid multiple creations on the same ISA bus
+> - i386/pc: extract port92 from pc.c
+> - i386/pc: move vmport.c/pvpanic.c from hw/misc/ to hw/i386/
 >=20
-> This will allow migration from older QEMU. Maybe you can add a machine =
-property
-> so that the subsection is only generated for newer pseries, and you'll =
-support
-> migration to older QEMU (see details at the end of =3D=3D=3D Subsection=
-s =3D=3D=3D in
-> docs/devel/migration.txt).
-
-I have found a better way to save state. We will discuss it in the next r=
-ound.
-
->> +
->> +static const VMStateDescription vmstate_spapr_irq_map =3D {
->> +    .name =3D "spapr_irq_map",
->> +    .version_id =3D 0,
->> +    .minimum_version_id =3D 0,
->> +    .needed =3D spapr_irq_map_needed,
->> +    .fields =3D (VMStateField[]) {
->> +        VMSTATE_BITMAP(irq_map, sPAPRMachineState, 0, nr_irqs),
->> +        VMSTATE_END_OF_LIST()
->> +    },
->> +};
->> +
->>  static const VMStateDescription vmstate_spapr =3D {
->>      .name =3D "spapr",
->>      .version_id =3D 3,
->> @@ -1700,6 +1718,7 @@ static const VMStateDescription vmstate_spapr =3D=
- {
->>          &vmstate_spapr_ov5_cas,
->>          &vmstate_spapr_patb_entry,
->>          &vmstate_spapr_pending_events,
->> +        &vmstate_spapr_irq_map,
->>          NULL
->>      }
->>  };
->> @@ -2337,8 +2356,13 @@ static void ppc_spapr_init(MachineState *machin=
-e)
->>      /* Setup a load limit for the ramdisk leaving room for SLOF and F=
-DT */
->>      load_limit =3D MIN(spapr->rma_size, RTAS_MAX_ADDR) - FW_OVERHEAD;
->> =20
->> +    /* Initialize the IRQ allocator */
->> +    spapr->nr_irqs  =3D XICS_IRQS_SPAPR;
->> +    spapr->irq_map  =3D bitmap_new(spapr->nr_irqs);
->> +    spapr->irq_base =3D XICS_IRQ_BASE;
->> +
->>      /* Set up Interrupt Controller before we create the VCPUs */
->> -    xics_system_init(machine, XICS_IRQS_SPAPR, &error_fatal);
->> +    xics_system_init(machine, spapr->nr_irqs, &error_fatal);
->> =20
->>      /* Set up containers for ibm,client-architecture-support negotiat=
-ed options
->>       */
->> @@ -3536,6 +3560,38 @@ static ICPState *spapr_icp_get(XICSFabric *xi, =
-int vcpu_id)
->>      return cpu ? ICP(cpu->intc) : NULL;
->>  }
->> =20
->> +static bool spapr_irq_test(XICSFabric *xi, int irq)
->> +{
->> +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
->> +    int srcno =3D irq - spapr->irq_base;
->> +
->> +    return test_bit(srcno, spapr->irq_map);
->> +}
->> +
->> +static int spapr_irq_alloc_block(XICSFabric *xi, int count, int align=
-)
->> +{
->> +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
->> +    int start =3D 0;
->> +    int srcno;
->> +
->> +    srcno =3D bitmap_find_next_zero_area(spapr->irq_map, spapr->nr_ir=
-qs, start,
->> +                                       count, align);
->> +    if (srcno =3D=3D spapr->nr_irqs) {
->> +        return -1;
->> +    }
->> +
->> +    bitmap_set(spapr->irq_map, srcno, count);
->> +    return srcno + spapr->irq_base;
->> +}
->> +
->> +static void spapr_irq_free_block(XICSFabric *xi, int irq, int num)
->> +{
->> +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
->> +    int srcno =3D irq - spapr->irq_base;
->> +
->> +    bitmap_clear(spapr->irq_map, srcno, num);
->> +}
->> +
->>  static void spapr_pic_print_info(InterruptStatsProvider *obj,
->>                                   Monitor *mon)
->>  {
->> @@ -3630,6 +3686,10 @@ static void spapr_machine_class_init(ObjectClas=
-s *oc, void *data)
->>      xic->ics_get =3D spapr_ics_get;
->>      xic->ics_resend =3D spapr_ics_resend;
->>      xic->icp_get =3D spapr_icp_get;
->> +    xic->irq_test =3D spapr_irq_test;
->> +    xic->irq_alloc_block =3D spapr_irq_alloc_block;
->> +    xic->irq_free_block =3D spapr_irq_free_block;
->> +
->>      ispc->print_info =3D spapr_pic_print_info;
->>      /* Force NUMA node memory size to be a multiple of
->>       * SPAPR_MEMORY_BLOCK_SIZE (256M) since that's the granularity
->> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
->> index 9d21ca9bde3a..b962bfe09bb5 100644
->> --- a/include/hw/ppc/spapr.h
->> +++ b/include/hw/ppc/spapr.h
->> @@ -7,6 +7,7 @@
->>  #include "hw/ppc/spapr_drc.h"
->>  #include "hw/mem/pc-dimm.h"
->>  #include "hw/ppc/spapr_ovec.h"
->> +#include "qemu/bitmap.h"
->> =20
->>  struct VIOsPAPRBus;
->>  struct sPAPRPHBState;
->> @@ -78,6 +79,9 @@ struct sPAPRMachineState {
->>      struct VIOsPAPRBus *vio_bus;
->>      QLIST_HEAD(, sPAPRPHBState) phbs;
->>      struct sPAPRNVRAM *nvram;
->> +    int32_t nr_irqs;
->> +    unsigned long *irq_map;
->> +    uint32_t irq_base;
->>      ICSState *ics;
->>      sPAPRRTCState rtc;
->> =20
->> diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
->> index 28d248abad61..30e7f2e0a7dd 100644
->> --- a/include/hw/ppc/xics.h
->> +++ b/include/hw/ppc/xics.h
->> @@ -175,6 +175,10 @@ typedef struct XICSFabricClass {
->>      ICSState *(*ics_get)(XICSFabric *xi, int irq);
->>      void (*ics_resend)(XICSFabric *xi);
->>      ICPState *(*icp_get)(XICSFabric *xi, int server);
->> +    /* IRQ allocator helpers */
->> +    bool (*irq_test)(XICSFabric *xi, int irq);
->> +    int (*irq_alloc_block)(XICSFabric *xi, int count, int align);
->> +    void (*irq_free_block)(XICSFabric *xi, int irq, int num);
+> v1:
 >=20
-> API looks good to me. I suggest you introduce it in a dedicated patch, =
-and
-> change the allocator implementation in another patch.
-
-yep.=20
-
-Thanks
-
-C.=20
-
-
->>  } XICSFabricClass;
->> =20
->>  #define XICS_IRQS_SPAPR               1024
+> - clean includes (mostly from script)
+> - code movement (about no logical changes)
 >=20
+> Regards,
+>=20
+> Phil.
+>=20
+> [----] : patches are identical
+> [####] : number of functional differences between upstream/downstream p=
+atch
+> [down] : patch is downstream-only
+> The flags [FC] indicate (F)unctional and (C)ontextual differences, resp=
+ectively
+>=20
+> 001/42:[----] [--] 'MAINTAINERS: add entries for i2c/ppc4xx'
+> 002/42:[down] 'MAINTAINERS: add an entry for the i82374 (southbridge)'
+> 003/42:[down] 'MAINTAINERS: add an entry for the i8257 (DMA controller)=
+'
+> 004/42:[----] [--] 'MAINTAINERS: add an entry for the i82378 (superio)'
+> 005/42:[----] [-C] 'MAINTAINERS: add an entry for watchdog/wdt_ib700'
+> 006/42:[----] [--] 'MAINTAINERS: add an entry for input/pckbd.c'
+> 007/42:[----] [--] 'MAINTAINERS: add entries for timer/m48t59'
+> 008/42:[----] [--] 'MAINTAINERS: add missing entry for include/hw/net/'
+> 009/42:[----] [--] 'hw: use "qemu/osdep.h" as first #include in source =
+files'
+> 010/42:[----] [--] 'hw: remove "qemu/osdep.h" from header files'
+> 011/42:[----] [--] 'block: remove "qemu/osdep.h" from header file'
+> 012/42:[----] [--] 'misc: remove headers implicitly included'
+> 013/42:[----] [--] 'misc: remove duplicated includes'
+> 014/42:[----] [--] 'ppc: remove duplicated includes'
+> 015/42:[----] [--] 'i386/hax: remove duplicated includes'
+> 016/42:[0013] [FC] 'i386/hax: remove duplicated include'
+> 017/42:[----] [--] 'nios2: remove duplicated includes (in code commente=
+d out)'
+> 018/42:[----] [--] 'misc: avoid "include/" in include path'
+> 019/42:[----] [--] 'numa: remove unused #include'
+> 020/42:[down] 'hw/input/vmmouse: remove unused #include'
+> 021/42:[down] 'hw/misc/pvpanic: remove unused #include'
+> 022/42:[----] [--] 'hw/ssi/aspeed_smc: remove unused #include'
+> 023/42:[----] [--] 'amd_iommu: avoid needless includes in header file'
+> 024/42:[0001] [FC] 'misc: remove old i386 dependency'
+> 025/42:[----] [--] 'hw/ide: remove old i386 dependency'
+> 026/42:[----] [--] 'hw/ipmi: remove old i386 dependency'
+> 027/42:[----] [--] 'hw/i2c: remove old i386 dependency'
+> 028/42:[----] [--] 'hw/tpm: remove old i386 dependency'
+> 029/42:[----] [--] 'hw/virtio-balloon: remove old i386 dependency'
+> 030/42:[0001] [FC] 'hw/unicore32: restrict hw addr defines to source fi=
+le'
+> 031/42:[----] [--] 'hw/timer/i8254: rename pit_init() -> i8254_pit_init=
+()'
+> 032/42:[----] [-C] 'hw/timer/mc146818: rename rtc_init() -> mc146818_rt=
+c_init()'
+> 033/42:[0003] [FC] 'hw/acpi: ACPI_PM_* defines are not restricted to i3=
+86 arch'
+> 034/42:[down] 'hw/acpi/ich9: extract ACPI_PM_PROP_TCO_ENABLED from i386=
+/pc'
+> 035/42:[down] 'hw/display/vga: "vga.h" only contains registers defs, re=
+name it "vga_regs.h"'
+> 036/42:[down] 'hw/display/vga: "vga_int.h" requires "ui/console.h"'
+> 037/42:[down] 'hw/display/vga: extract public API from i386/pc to "hw/d=
+isplay/vga.h"'
+> 038/42:[----] [-C] 'hw/net/ne2000: extract ne2k-isa code from i386/pc t=
+o ne2000-isa.c'
+> 039/42:[down] 'hw/misc/pvpanic: extract public API from i386/pc to "hw/=
+misc/pvpanic.h"'
+> 040/42:[down] 'i386/pc: move vmport.c to hw/i386/'
+> 041/42:[down] 'i386/pc: move vmmouse.c to hw/i386/'
+> 042/42:[----] [--] 'misc: drop old i386 dependency'
+>=20
+> Philippe Mathieu-Daud=E9 (42):
+>   MAINTAINERS: add entries for i2c/ppc4xx
+>   MAINTAINERS: add an entry for the i82374 (southbridge)
+>   MAINTAINERS: add an entry for the i8257 (DMA controller)
+>   MAINTAINERS: add an entry for the i82378 (superio)
+>   MAINTAINERS: add an entry for watchdog/wdt_ib700
+>   MAINTAINERS: add an entry for input/pckbd.c
+>   MAINTAINERS: add entries for timer/m48t59
+>   MAINTAINERS: add missing entry for include/hw/net/
+>   hw: use "qemu/osdep.h" as first #include in source files
+>   hw: remove "qemu/osdep.h" from header files
+>   block: remove "qemu/osdep.h" from header file
+>   misc: remove headers implicitly included
+>   misc: remove duplicated includes
+>   ppc: remove duplicated includes
+>   i386/hax: remove duplicated includes
+>   i386/hax: remove duplicated include
+>   nios2: remove duplicated includes (in code commented out)
+>   misc: avoid "include/" in include path
+>   numa: remove unused #include
+>   hw/input/vmmouse: remove unused #include
+>   hw/misc/pvpanic: remove unused #include
+>   hw/ssi/aspeed_smc: remove unused #include
+>   amd_iommu: avoid needless includes in header file
+>   misc: remove old i386 dependency
+>   hw/ide: remove old i386 dependency
+>   hw/ipmi: remove old i386 dependency
+>   hw/i2c: remove old i386 dependency
+>   hw/tpm: remove old i386 dependency
+>   hw/virtio-balloon: remove old i386 dependency
+>   hw/unicore32: restrict hw addr defines to source file
+>   hw/timer/i8254: rename pit_init() -> i8254_pit_init()
+>   hw/timer/mc146818: rename rtc_init() -> mc146818_rtc_init()
+>   hw/acpi: ACPI_PM_* defines are not restricted to i386 arch
+>   hw/acpi/ich9: extract ACPI_PM_PROP_TCO_ENABLED from i386/pc
+>   hw/display/vga: "vga.h" only contains registers defs, rename it
+>     "vga_regs.h"
+>   hw/display/vga: "vga_int.h" requires "ui/console.h"
+>   hw/display/vga: extract public API from i386/pc to "hw/display/vga.h"
+>   hw/net/ne2000: extract ne2k-isa code from i386/pc to ne2000-isa.c
+>   hw/misc/pvpanic: extract public API from i386/pc to
+>     "hw/misc/pvpanic.h"
+>   i386/pc: move vmport.c to hw/i386/
+>   i386/pc: move vmmouse.c to hw/i386/
+>   misc: drop old i386 dependency
+>=20
+>  block/dmg.h                         |  1 -
+>  hw/audio/fmopl.h                    |  1 -
+>  hw/display/qxl.h                    |  1 -
+>  hw/display/vga_int.h                |  3 ++-
+>  hw/display/{vga.h =3D> vga_regs.h}    |  0
+>  hw/i386/amd_iommu.h                 |  5 ----
+>  hw/net/ne2000.h                     |  3 +++
+>  include/hw/acpi/acpi.h              | 11 +++++++++
+>  include/hw/acpi/ich9.h              |  2 ++
+>  include/hw/acpi/ipmi.h              |  1 -
+>  include/hw/cpu/core.h               |  1 -
+>  include/hw/display/vga.h            | 25 +++++++++++++++++++
+>  include/hw/i2c/ppc4xx_i2c.h         |  1 -
+>  include/hw/i386/pc.h                | 48 -----------------------------=
+--------
+>  include/hw/misc/pvpanic.h           | 21 ++++++++++++++++
+>  include/hw/net/ne2000-isa.h         | 33 +++++++++++++++++++++++++
+>  include/hw/timer/i8254.h            |  5 ++--
+>  include/hw/timer/i8254_internal.h   |  2 +-
+>  include/hw/timer/mc146818rtc.h      |  3 ++-
+>  include/hw/unicore32/puv3.h         | 10 --------
+>  include/sysemu/hax.h                |  1 -
+>  target/i386/hax-darwin.h            |  3 ---
+>  target/i386/hax-windows.h           |  3 ---
+>  target/nios2/cpu.h                  |  1 -
+>  accel/tcg/translate-all.c           |  1 -
+>  bsd-user/main.c                     |  1 -
+>  chardev/wctablet.c                  |  4 ----
+>  disas/nios2.c                       |  3 ---
+>  exec.c                              |  3 ---
+>  hw/acpi/core.c                      |  1 -
+>  hw/acpi/ipmi-stub.c                 |  1 +
+>  hw/alpha/dp264.c                    |  4 ++--
+>  hw/arm/spitz.c                      |  1 -
+>  hw/audio/fmopl.c                    |  1 -
+>  hw/audio/pcspk.c                    |  1 -
+>  hw/char/debugcon.c                  |  1 -
+>  hw/char/xen_console.c               |  1 -
+>  hw/core/machine.c                   |  1 -
+>  hw/cpu/core.c                       |  1 +
+>  hw/display/cirrus_vga.c             |  1 -
+>  hw/display/vga-isa-mm.c             |  4 +---
+>  hw/display/vga-isa.c                |  3 +--
+>  hw/display/vga-pci.c                |  1 -
+>  hw/display/vga.c                    |  5 ++--
+>  hw/display/virtio-vga.c             |  1 -
+>  hw/display/vmware_vga.c             |  1 -
+>  hw/i2c/pm_smbus.c                   |  1 -
+>  hw/i2c/smbus_ich9.c                 |  1 -
+>  hw/i386/acpi-build.c                |  2 +-
+>  hw/i386/amd_iommu.c                 |  5 +++-
+>  hw/i386/kvm/pci-assign.c            |  1 -
+>  hw/i386/pc.c                        |  5 ++--
+>  hw/i386/pci-assign-load-rom.c       |  2 --
+>  hw/{input =3D> i386}/vmmouse.c        |  1 -
+>  hw/{misc =3D> i386}/vmport.c          |  0
+>  hw/i386/xen/xen_platform.c          |  1 -
+>  hw/ide/ahci.c                       |  1 -
+>  hw/ide/cmd646.c                     |  1 -
+>  hw/ide/core.c                       |  3 +--
+>  hw/ide/ich.c                        |  1 -
+>  hw/ide/isa.c                        |  1 -
+>  hw/ide/microdrive.c                 |  1 -
+>  hw/ide/pci.c                        |  1 -
+>  hw/ide/piix.c                       |  2 +-
+>  hw/ide/via.c                        |  1 -
+>  hw/input/adb.c                      |  2 +-
+>  hw/intc/lm32_pic.c                  |  1 -
+>  hw/ipmi/isa_ipmi_bt.c               |  1 -
+>  hw/ipmi/isa_ipmi_kcs.c              |  1 -
+>  hw/isa/i82378.c                     |  5 ++--
+>  hw/isa/vt82c686.c                   |  1 -
+>  hw/mips/mips_fulong2e.c             |  4 ++--
+>  hw/mips/mips_jazz.c                 |  5 ++--
+>  hw/mips/mips_malta.c                |  4 ++--
+>  hw/mips/mips_r4k.c                  |  5 ++--
+>  hw/misc/ivshmem.c                   |  1 -
+>  hw/misc/pvpanic.c                   | 12 ++++------
+>  hw/misc/sga.c                       |  1 -
+>  hw/moxie/moxiesim.c                 |  1 -
+>  hw/net/ne2000-isa.c                 |  6 ++---
+>  hw/net/ne2000.c                     |  2 --
+>  hw/nios2/boot.c                     |  1 -
+>  hw/pci-bridge/pci_expander_bridge.c |  1 -
+>  hw/ppc/pnv.c                        |  2 +-
+>  hw/ppc/prep.c                       |  1 +
+>  hw/ppc/spapr_cpu_core.c             |  1 +
+>  hw/ppc/spapr_hcall.c                |  1 -
+>  hw/s390x/css.c                      |  1 -
+>  hw/scsi/vhost-user-scsi.c           |  1 -
+>  hw/smbios/smbios_type_38-stub.c     |  1 +
+>  hw/sparc/sun4m.c                    |  1 -
+>  hw/ssi/aspeed_smc.c                 |  3 +--
+>  hw/timer/i8254.c                    |  1 -
+>  hw/timer/i8254_common.c             |  1 -
+>  hw/timer/mc146818rtc.c              |  2 +-
+>  hw/tpm/tpm_passthrough.c            |  1 -
+>  hw/tpm/tpm_tis.c                    |  1 -
+>  hw/unicore32/puv3.c                 | 15 ++++++++----
+>  hw/vfio/ccw.c                       |  2 +-
+>  hw/virtio/vhost-vsock.c             |  2 +-
+>  hw/virtio/virtio-balloon.c          |  2 +-
+>  hw/watchdog/wdt_ib700.c             |  1 -
+>  linux-user/main.c                   |  1 -
+>  monitor.c                           |  1 -
+>  net/colo-compare.c                  |  1 -
+>  numa.c                              |  1 -
+>  target/i386/hax-darwin.c            |  6 +----
+>  target/nios2/helper.c               |  5 +---
+>  target/nios2/op_helper.c            |  1 +
+>  target/nios2/translate.c            |  1 +
+>  target/openrisc/exception_helper.c  |  1 -
+>  target/ppc/kvm.c                    |  3 ---
+>  tests/test-aio-multithread.c        |  1 -
+>  tests/test-clone-visitor.c          |  1 -
+>  tests/vhost-user-test.c             |  1 -
+>  tests/vmgenid-test.c                |  3 ---
+>  util/qemu-sockets.c                 |  1 -
+>  vl.c                                |  3 +--
+>  MAINTAINERS                         | 13 +++++++++-
+>  hw/i386/Makefile.objs               |  2 ++
+>  hw/input/Makefile.objs              |  1 -
+>  hw/misc/Makefile.objs               |  2 --
+>  122 files changed, 179 insertions(+), 221 deletions(-)
+>  rename hw/display/{vga.h =3D> vga_regs.h} (100%)
+>  create mode 100644 include/hw/display/vga.h
+>  create mode 100644 include/hw/misc/pvpanic.h
+>  create mode 100644 include/hw/net/ne2000-isa.h
+>  rename hw/{input =3D> i386}/vmmouse.c (99%)
+>  rename hw/{misc =3D> i386}/vmport.c (100%)
+>=20
+> --=20
+> 2.15.0.rc0
