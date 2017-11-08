@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34138)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34162)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1eCZLW-0007vf-L2
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 18:01:25 -0500
+	(envelope-from <alistai@xilinx.com>) id 1eCZLZ-0007yL-Pq
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 18:01:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1eCZLS-0003DI-P5
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 18:01:22 -0500
-Received: from mail-sn1nam02on0068.outbound.protection.outlook.com
-	([104.47.36.68]:59191
-	helo=NAM02-SN1-obe.outbound.protection.outlook.com)
+	(envelope-from <alistai@xilinx.com>) id 1eCZLV-0003EE-P2
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 18:01:25 -0500
+Received: from mail-by2nam01on0056.outbound.protection.outlook.com
+	([104.47.34.56]:53861
+	helo=NAM01-BY2-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1eCZLS-0003Cp-Gq
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 18:01:18 -0500
+	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1eCZLV-0003Dd-Fe
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 18:01:21 -0500
 From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Wed, 8 Nov 2017 14:57:10 -0800
-Message-ID: <720acbeb99526cf48d07f29594c1964e97c6387a.1510181732.git.alistair.francis@xilinx.com>
+Date: Wed, 8 Nov 2017 14:57:05 -0800
+Message-ID: <1a4b0d078ceeaa56e3a8450e4015a0c6457b62dd.1510181732.git.alistair.francis@xilinx.com>
 In-Reply-To: <cover.1510181732.git.alistair.francis@xilinx.com>
 References: <cover.1510181732.git.alistair.francis@xilinx.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 14/45] hw/i2c: Replace fprintf(stderr,
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v4 13/45] hw/gpio: Replace fprintf(stderr,
  "*\n" with error_report()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -37,44 +36,34 @@ error_report(). The functions were renamed with these commands and then
 compiler issues where manually fixed.
 
 find ./* -type f -exec sed -i \
-    'N;N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_=
-report("\1"\2);|Ig}' \
+    'N;N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_re=
-port("\1"\2);|Ig}' \
+    'N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report=
-("\1"\2);|Ig}' \
+    'N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("=
-\1"\2);|Ig}' \
+    'N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1=
-"\2);|Ig}' \
+    'N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\=
-2);|Ig}' \
+    'N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2)=
-;|Ig}' \
+    'N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|=
-Ig}' \
+    'N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig=
-}' \
+    'N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}'=
- \
+    'N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
     {} +
 find ./* -type f -exec sed -i \
     'N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
@@ -82,49 +71,26 @@ find ./* -type f -exec sed -i \
 
 Some lines where then manually tweaked to pass checkpatch.
 
-A "I^2C" was manually replaced with "i2c" in hw/i2c/omap_i2c.c.
-
 Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 ---
-V3:
- - Replace "I&2C"
 V2:
  - Split hw patch into individual directories
 
- hw/i2c/omap_i2c.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ hw/gpio/omap_gpio.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/i2c/omap_i2c.c b/hw/i2c/omap_i2c.c
-index 26e3e5ebf6..e9da7f9f51 100644
---- a/hw/i2c/omap_i2c.c
-+++ b/hw/i2c/omap_i2c.c
-@@ -340,13 +340,13 @@ static void omap_i2c_write(void *opaque, hwaddr addr,
-             break;
-         }
-         if ((value & (1 << 15)) && !(value & (1 << 10))) {	/* MST */
--            fprintf(stderr, "%s: I^2C slave mode not supported\n",
--                            __func__);
-+            error_report("%s: i2c slave mode not supported",
-+                         __func__);
-             break;
-         }
-         if ((value & (1 << 15)) && value & (1 << 8)) {		/* XA */
--            fprintf(stderr, "%s: 10-bit addressing mode not supported\n",
--                            __func__);
-+            error_report("%s: 10-bit addressing mode not supported",
-+                         __func__);
-             break;
-         }
-         if ((value & (1 << 15)) && value & (1 << 0)) {		/* STT */
-@@ -393,7 +393,7 @@ static void omap_i2c_write(void *opaque, hwaddr addr,
-                 omap_i2c_interrupts_update(s);
-             }
-         if (value & (1 << 15))					/* ST_EN */
--            fprintf(stderr, "%s: System Test not supported\n", __func__);
-+            error_report("%s: System Test not supported", __func__);
-         break;
-=20
-     default:
---=20
+diff --git a/hw/gpio/omap_gpio.c b/hw/gpio/omap_gpio.c
+index 08472193b5..57aa2e54f5 100644
+--- a/hw/gpio/omap_gpio.c
++++ b/hw/gpio/omap_gpio.c
+@@ -399,7 +399,7 @@ static void omap2_gpio_module_write(void *opaque, hwaddr addr,
+ 
+     case 0x10:	/* GPIO_SYSCONFIG */
+         if (((value >> 3) & 3) == 3)
+-            fprintf(stderr, "%s: bad IDLEMODE value\n", __func__);
++            error_report("%s: bad IDLEMODE value", __func__);
+         if (value & 2)
+             omap2_gpio_module_reset(s);
+         s->config[0] = value & 0x1d;
+-- 
 2.14.1
