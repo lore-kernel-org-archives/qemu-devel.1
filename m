@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36434)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38261)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eCJSl-0000vW-Rx
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 01:03:48 -0500
+	(envelope-from <peterx@redhat.com>) id 1eCJZk-0006wn-1L
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 01:11:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eCJSg-0007GO-WC
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 01:03:47 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42534)
+	(envelope-from <peterx@redhat.com>) id 1eCJZj-00016K-3K
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 01:10:59 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49236)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eCJSg-0007GC-Qj
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 01:03:42 -0500
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eCJZi-00014u-Sn
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 01:10:59 -0500
 From: Peter Xu <peterx@redhat.com>
-Date: Wed,  8 Nov 2017 14:01:30 +0800
-Message-Id: <20171108060130.3772-33-peterx@redhat.com>
+Date: Wed,  8 Nov 2017 14:01:29 +0800
+Message-Id: <20171108060130.3772-32-peterx@redhat.com>
 In-Reply-To: <20171108060130.3772-1-peterx@redhat.com>
 References: <20171108060130.3772-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 32/32] migration,
- hmp: new command "migrate_pause"
+Subject: [Qemu-devel] [PATCH v4 31/32] migration,
+ qmp: new command "migrate-pause"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,71 +27,77 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alexey Perevalov <a.perevalov@samsung.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
 
-HMP version of QMP "migrate-pause".
+It is used to manually trigger the postcopy pause state.  It works just
+like when we found the migration stream failed during postcopy, but
+provide an explicit way for user in case of misterious socket hangs.
 
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- hmp-commands.hx | 14 ++++++++++++++
- hmp.c           |  9 +++++++++
- hmp.h           |  1 +
- 3 files changed, 24 insertions(+)
+ migration/migration.c | 18 ++++++++++++++++++
+ qapi/migration.json   | 22 ++++++++++++++++++++++
+ 2 files changed, 40 insertions(+)
 
-diff --git a/hmp-commands.hx b/hmp-commands.hx
-index ffcdc34652..0c9f0cc4f2 100644
---- a/hmp-commands.hx
-+++ b/hmp-commands.hx
-@@ -992,6 +992,20 @@ as the -incoming option).
- ETEXI
- 
-     {
-+        .name       = "migrate_pause",
-+        .args_type  = "",
-+        .params     = "",
-+        .help       = "Pause a migration stream (only supported by postcopy)",
-+        .cmd        = hmp_migrate_pause,
-+    },
-+
-+STEXI
-+@item migrate_pause
-+@findex migrate_pause
-+Pause an existing migration manually.  Currently it only support postcopy.
-+ETEXI
-+
-+    {
-         .name       = "migrate_set_cache_size",
-         .args_type  = "value:o",
-         .params     = "value",
-diff --git a/hmp.c b/hmp.c
-index c7e1022283..c1abba037f 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -1519,6 +1519,15 @@ void hmp_migrate_incoming(Monitor *mon, const QDict *qdict)
-     hmp_handle_error(mon, &err);
+diff --git a/migration/migration.c b/migration/migration.c
+index 536a771803..30348a5e27 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -1485,6 +1485,24 @@ void qmp_migrate_incoming(const char *uri, Error **errp)
+     once = false;
  }
  
-+void hmp_migrate_pause(Monitor *mon, const QDict *qdict)
++void qmp_migrate_pause(Error **errp)
 +{
-+    Error *err = NULL;
++    int ret;
++    MigrationState *ms = migrate_get_current();
 +
-+    qmp_migrate_pause(&err);
++    if (ms->state != MIGRATION_STATUS_POSTCOPY_ACTIVE) {
++        error_setg(errp, "Migration pause is currently only allowed during"
++                   " an active postcopy phase.");
++        return;
++    }
 +
-+    hmp_handle_error(mon, &err);
++    ret = qemu_file_shutdown(ms->to_dst_file);
++
++    if (ret) {
++        error_setg(errp, "Failed to pause migration stream.");
++    }
 +}
 +
- /* Kept for backwards compatibility */
- void hmp_migrate_set_downtime(Monitor *mon, const QDict *qdict)
+ bool migration_is_blocked(Error **errp)
  {
-diff --git a/hmp.h b/hmp.h
-index a6f56b1f29..87d7c117eb 100644
---- a/hmp.h
-+++ b/hmp.h
-@@ -70,6 +70,7 @@ void hmp_info_snapshots(Monitor *mon, const QDict *qdict);
- void hmp_migrate_cancel(Monitor *mon, const QDict *qdict);
- void hmp_migrate_continue(Monitor *mon, const QDict *qdict);
- void hmp_migrate_incoming(Monitor *mon, const QDict *qdict);
-+void hmp_migrate_pause(Monitor *mon, const QDict *qdict);
- void hmp_migrate_set_downtime(Monitor *mon, const QDict *qdict);
- void hmp_migrate_set_speed(Monitor *mon, const QDict *qdict);
- void hmp_migrate_set_capability(Monitor *mon, const QDict *qdict);
+     if (qemu_savevm_state_blocked(errp)) {
+diff --git a/qapi/migration.json b/qapi/migration.json
+index 4a3eff62f1..52901f7e2e 100644
+--- a/qapi/migration.json
++++ b/qapi/migration.json
+@@ -1074,6 +1074,28 @@
+ { 'command': 'migrate-incoming', 'data': {'uri': 'str' } }
+ 
+ ##
++# @migrate-pause:
++#
++# Pause an migration.  Currently it can only pause a postcopy
++# migration.  Pausing a precopy migration is not supported yet.
++#
++# It is mostly used as a manual way to trigger the postcopy paused
++# state when the network sockets hang due to some reason, so that we
++# can try a recovery afterward.
++#
++# Returns: nothing on success
++#
++# Since: 2.12
++#
++# Example:
++#
++# -> { "execute": "migrate-pause" }
++# <- { "return": {} }
++#
++##
++{ 'command': 'migrate-pause' }
++
++##
+ # @xen-save-devices-state:
+ #
+ # Save the state of all devices to file. The RAM and the block devices
 -- 
 2.13.6
