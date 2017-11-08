@@ -1,31 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40024)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40935)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <makovick@gmail.com>) id 1eCVoy-0005vD-RY
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 14:15:34 -0500
+	(envelope-from <stefanha@redhat.com>) id 1eCVu8-0007jQ-Ty
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 14:20:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <makovick@gmail.com>) id 1eCVox-00078a-Ne
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 14:15:32 -0500
-Received: from mail-qk0-x234.google.com ([2607:f8b0:400d:c09::234]:54384)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <makovick@gmail.com>) id 1eCVox-00078G-Im
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 14:15:31 -0500
-Received: by mail-qk0-x234.google.com with SMTP id n5so4707418qke.11
-	for <qemu-devel@nongnu.org>; Wed, 08 Nov 2017 11:15:31 -0800 (PST)
-MIME-Version: 1.0
-References: <20171023210803.20998-1-makovick@gmail.com>
-	<20171023210803.20998-5-makovick@gmail.com>
-	<1509532830.3856.7.camel@redhat.com>
-	<CAHmvugcYmaujAYGwpb+ObistFr522W1XsuV-6jUgi543VgfvTA@mail.gmail.com>
-	<27e88186-fa91-fac3-1564-9c81a55fecd4@redhat.com>
-	<20171108101031.6z3yqsjw6n5saxcr@sirius.home.kraxel.org>
-In-Reply-To: <20171108101031.6z3yqsjw6n5saxcr@sirius.home.kraxel.org>
-From: =?UTF-8?B?SmluZMWZaWNoIE1ha292acSNa2E=?= <makovick@gmail.com>
-Date: Wed, 08 Nov 2017 19:15:19 +0000
-Message-ID: <CAHmvugecVHRkEkHukkMxT5R8OujJ8YnYS7Q_AM-P9UzHo-0M9Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 4/7] sdl2: Only accept the hotkeys on the
- main window
+	(envelope-from <stefanha@redhat.com>) id 1eCVu4-00015v-BH
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 14:20:52 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36016)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eCVu4-00014Z-5C
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 14:20:48 -0500
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Date: Wed,  8 Nov 2017 19:20:41 +0000
+Message-Id: <20171108192043.10682-1-stefanha@redhat.com>
+Subject: [Qemu-devel] [PULL for-2.11-rc1 v2 0/2] Block patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,44 +21,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Cole Robinson <crobinso@redhat.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-Hi Gerd,
+The following changes since commit b0fbe46ad82982b289a44ee2495b59b0bad8a842:
 
-I will try to respin the patch set during the weekend.
+  Update version for v2.11.0-rc0 release (2017-11-07 16:05:28 +0000)
 
-Regards, Jindrich
+are available in the git repository at:
 
-On Wed, Nov 8, 2017 at 11:10 AM Gerd Hoffmann <kraxel@redhat.com> wrote:
+  git://github.com/stefanha/qemu.git tags/block-pull-request
 
-> On Sun, Nov 05, 2017 at 09:10:45AM -0500, Cole Robinson wrote:
-> > On 11/02/2017 01:12 PM, Jind=C5=99ich Makovi=C4=8Dka wrote:
-> > > This fixes the following case:
-> > >
-> > > 1) Ctrl-Alt-2 for console is pressed
-> > > 2) console pops up and gets focus
-> > > 3) console receives the Ctrl-Alt-2 keypress event
-> > > 4) console closes
-> > > 5) focus returns to the main window
-> > > 6) main window gets the keypress event
-> > > 7) goto 2 until the key is released, with 50% chance that the console
-> > > window is shown at the end
-> >
-> > Sounds similar to what I reported in my comment here a while back:
-> > https://bugzilla.libsdl.org/show_bug.cgi?id=3D3287
->
-> Hmm, so it seems to be a SDL bug.  I'm running SDL 2.0.3 here, which
-> explains why I can't reproduce it.  According to the bug it seem to be
-> *repeat* keydown events, so is simply ignoring repeat events enough to
-> avoid this issue?
->
-> Also: Jind=C5=99ich, do you plan to send a new of the patch series with t=
-he
-> issues discussed fixed?
->
-> cheers,
->   Gerd
->
-> --
-Jind=C5=99ich Makovi=C4=8Dka
+for you to fetch changes up to ef6dada8b44e1e7c4bec5c1115903af9af415b50:
+
+  util/async: use atomic_mb_set in qemu_bh_cancel (2017-11-08 19:09:15 +0000)
+
+----------------------------------------------------------------
+Pull request
+
+v2:
+ * v1 emails 2/3 and 3/3 weren't sent due to an email failure
+ * Included Sergio's updated wording in the commit description
+
+----------------------------------------------------------------
+
+Sergio Lopez (1):
+  util/async: use atomic_mb_set in qemu_bh_cancel
+
+Stefan Hajnoczi (1):
+  tests-aio-multithread: fix /aio/multi/schedule race condition
+
+ tests/test-aio-multithread.c | 5 ++---
+ util/async.c                 | 2 +-
+ 2 files changed, 3 insertions(+), 4 deletions(-)
+
+-- 
+2.13.6
