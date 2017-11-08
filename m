@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47188)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47564)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eCNWe-0002Oh-Oq
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 05:24:05 -0500
+	(envelope-from <berrange@redhat.com>) id 1eCNYA-0003Bf-Vm
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 05:25:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eCNWa-0001Au-Uf
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 05:24:04 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36926)
+	(envelope-from <berrange@redhat.com>) id 1eCNY7-0001ls-RR
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 05:25:38 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33418)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1eCNWa-0001AU-OP
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 05:24:00 -0500
-References: <20171108022828.7242-1-f4bug@amsat.org>
-	<20171108022828.7242-2-f4bug@amsat.org>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <0f594637-3668-91b1-76e4-5964dcdae84b@redhat.com>
-Date: Wed, 8 Nov 2017 11:23:53 +0100
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eCNY7-0001lM-Kw
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 05:25:35 -0500
+Date: Wed, 8 Nov 2017 10:25:29 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20171108102529.GL12670@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <7967e55c-de72-6ef2-eb92-a85af8fc2552@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20171108022828.7242-2-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 1/6] machine: add a deprecated_reason
- property
+Content-Disposition: inline
+In-Reply-To: <7967e55c-de72-6ef2-eb92-a85af8fc2552@redhat.com>
+Subject: Re: [Qemu-devel] Yet another git submodule rant
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,67 +27,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
-On 08.11.2017 03:28, Philippe Mathieu-Daud=C3=A9 wrote:
-> If a machine has the deprecated_reason property set:
-> - it won't get listed anymore by the "-M help" command,
-> - a warning will be displayed if the machine is used.
->=20
-> Example:
->   $ ppc-softmmu/qemu-system-ppc -M prep
->   qemu-system-ppc: -M prep: warning: The PowerPC PREP platform machine =
-is deprecated (Obsoleted by the "40p" machine)
->   [machine starting ...]
->=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
->  include/hw/boards.h | 1 +
->  vl.c                | 7 +++++++
->  2 files changed, 8 insertions(+)
->=20
-> diff --git a/include/hw/boards.h b/include/hw/boards.h
-> index 191a5b3cd8..4d5c180968 100644
-> --- a/include/hw/boards.h
-> +++ b/include/hw/boards.h
-> @@ -182,6 +182,7 @@ struct MachineClass {
->      const char *default_boot_order;
->      const char *default_display;
->      GArray *compat_props;
-> +    const char *deprecated_reason;
->      const char *hw_version;
->      ram_addr_t default_ram_size;
->      const char *default_cpu_type;
-> diff --git a/vl.c b/vl.c
-> index ec299099ff..9ed4648af2 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -2742,6 +2742,10 @@ static gint machine_class_cmp(gconstpointer a, g=
-constpointer b)
->      }
->      if (mc) {
->          g_slist_free(machines);
-> +        if (mc->deprecated_reason) {
-> +            warn_report("The %s machine is deprecated (%s)",
-> +                        mc->desc, mc->deprecated_reason);
-> +        }
+On Wed, Nov 08, 2017 at 10:57:21AM +0100, Thomas Huth wrote:
+> 
+> That automatic git submodule stuff now broke my workflow again. I
+> usually keep the git repository on my laptop and then simply rsync the
+> sources (without .git directories) to my target machine to compile it
+> there. Used to work great for years. Now it's broken, the build process
+> complains:
 
-Just cosmetic, but maybe rather put that into select_machine() instead?
+Excluding the .git dir will be a problem - that needs to exist, unless
+you are building from tar.xz (where we will bundled all the submodule
+sources together in the tar.xz).
 
->          return mc;
->      }
->      if (name && !is_help_option(name)) {
-> @@ -2752,6 +2756,9 @@ static gint machine_class_cmp(gconstpointer a, gc=
-onstpointer b)
->          machines =3D g_slist_sort(machines, machine_class_cmp);
->          for (el =3D machines; el; el =3D el->next) {
->              MachineClass *mc =3D el->data;
-> +            if (mc->deprecated_reason) {
-> +                continue;
-> +            }
+If you really want to exclude the .git directories, then instead of
+doing an rsync, then use the scripts/archive-source.sh tool to create
+an archive of all the sources (which bundles required submodules)
+and unpack that on your target machine. Then all submodule handling
+on the target will be skipped.
 
-Not sure, but maybe it would be more user-friendly to still list the
-machine, but add a "(deprecated)" string at the end?
+> 
+> GIT submodule checkout is out of date. Please run
+>   scripts/git-submodule.sh update
+> from the source directory checkout /home/thuth/devel/qemu
+> 
+> Running "scripts/git-submodule.sh update" did not fix the issue at all -
+> I first had to tinker with it for a while to find out that I simply have
+> to delete ".git-submodule-status" in my git tree to fix the issue.
 
- Thomas
+I think it got confused from you deleting the .git directory
+
+> I've got the feeling that all this submodule crap is constantly causing
+> pain ... do we really need this? Can't we find another solution instead?
+> Or at least stop modifying files automatically in the $SRC_PATH ?
+
+We *have* to modify SRC_PATH, as that's where git submodule checkouts
+live. If we didn't do that, then people would end up having failed
+build due to submodules not existing, or even worse, having a silently
+incorrect build due to using the wrong checked out version.
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
