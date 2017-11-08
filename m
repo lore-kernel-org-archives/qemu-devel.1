@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51076)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51719)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eCPpa-0001FP-My
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 07:51:50 -0500
+	(envelope-from <berrange@redhat.com>) id 1eCPtS-00020E-Rb
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 07:55:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eCPpU-0002xd-Va
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 07:51:46 -0500
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170926210723.38042-1-carenas@gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <cab436f4-5d5c-485e-a7da-0d844429c5a4@amsat.org>
-Date: Wed, 8 Nov 2017 09:51:31 -0300
+	(envelope-from <berrange@redhat.com>) id 1eCPtP-0005Jl-IZ
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 07:55:46 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36080)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eCPtP-0005IX-A0
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 07:55:43 -0500
+Date: Wed, 8 Nov 2017 12:55:36 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20171108125536.GR12670@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <7967e55c-de72-6ef2-eb92-a85af8fc2552@redhat.com>
+	<20171108102529.GL12670@redhat.com>
+	<20171108130527.0afeb899@kitsune.suse.cz>
+	<20171108123417.GQ12670@redhat.com>
+	<20171108134315.0b4d9aad@kitsune.suse.cz>
 MIME-Version: 1.0
-In-Reply-To: <20170926210723.38042-1-carenas@gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2] gitignore: ignore check-qlit test
+Content-Disposition: inline
+In-Reply-To: <20171108134315.0b4d9aad@kitsune.suse.cz>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Yet another git submodule rant
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,31 +32,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Carlo_Marcelo_Arenas_Bel=c3=b3n?= <carenas@gmail.com>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, marcandre.lureau@redhat.com
+To: Michal =?utf-8?B?U3VjaMOhbmVr?= <msuchanek@suse.de>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
 
-On 09/26/2017 06:07 PM, Carlo Marcelo Arenas Belón wrote:
-> test introduced in 382176b4d78e070d119af8e0dcd00884c11bbec2
-> 
-> Signed-off-by: Carlo Marcelo Arenas Belón <carenas@gmail.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
+On Wed, Nov 08, 2017 at 01:43:15PM +0100, Michal Such=C3=A1nek wrote:
+> On Wed, 8 Nov 2017 12:34:17 +0000
+> "Daniel P. Berrange" <berrange@redhat.com> wrote:
+>=20
+> > On Wed, Nov 08, 2017 at 01:05:27PM +0100, Michal Such=C3=A1nek wrote:
+> > > On Wed, 8 Nov 2017 10:25:29 +0000
+> > > "Daniel P. Berrange" <berrange@redhat.com> wrote:
+> > >  =20
+> > > > On Wed, Nov 08, 2017 at 10:57:21AM +0100, Thomas Huth wrote: =20
+> > > > >=20
+> > > > > That automatic git submodule stuff now broke my workflow again.
+> > > > > I usually keep the git repository on my laptop and then simply
+> > > > > rsync the sources (without .git directories) to my target
+> > > > > machine to compile it there. Used to work great for years. Now
+> > > > > it's broken, the build process complains:   =20
+> > > >=20
+> > > > Excluding the .git dir will be a problem - that needs to exist,
+> > > > unless you are building from tar.xz (where we will bundled all
+> > > > the submodule sources together in the tar.xz).
+> > > >=20
+> > > > If you really want to exclude the .git directories, then instead
+> > > > of doing an rsync, then use the scripts/archive-source.sh tool to
+> > > > create an archive of all the sources (which bundles required
+> > > > submodules) and unpack that on your target machine. Then all
+> > > > submodule handling on the target will be skipped. =20
+> > >=20
+> > > This probably does not work because it archives committed sources
+> > > and not actual sources. =20
+> >=20
+> > Actually that's not quite correct - if it sees you have non-comitted
+> > changes, and will use 'git stash create' to capture them in the
+> > archive it creates.  So it would only miss brand new files which have
+> > not yet been 'git add'ed
+>=20
+> So there really isn't a good solution.
+>=20
+> >=20
+> > > > > I've got the feeling that all this submodule crap is constantly
+> > > > > causing pain ... do we really need this? Can't we find another
+> > > > > solution instead? Or at least stop modifying files
+> > > > > automatically in the $SRC_PATH ?   =20
+> > > >=20
+> > > > We *have* to modify SRC_PATH, as that's where git submodule
+> > > > checkouts live. If we didn't do that, then people would end up
+> > > > having failed build due to submodules not existing, or even
+> > > > worse, having a silently incorrect build due to using the wrong
+> > > > checked out version. =20
+> > >=20
+> > > And that's another reason why submodules are bad thing.
+> > >=20
+> > > So again, can this be done without submodules?
+> > >=20
+> > > Let somebody else do the testing and polishing of this pre-alpha gi=
+t
+> > > feature. =20
+> >=20
+> > Honestly I think the submodule stuff is working pretty well - a
+> > handful of people have mentioned problems and we've addressed most of
+> > them or illustrated alternative approaches to deal with it. For most
+> > developers it has been pretty much transparent and just works, or we
+> > would have seen alot more noise.
+>=20
+> > On 11/08/2017 06:57 AM, Thomas Huth wrote:
+>=20
+> >=20
+> > Also yesterday on IRC:
+> >=20
+> > <RaV3N> [...] I downloaded the qemu source from git and tried to
+> > compile it. I am getting this:
+> >=20
+> > ./configure --static && make && sudo make install
+> >  CC      ui/input-keymap.o
+> > ui/input-keymap.c:8:10: fatal error: ui/input-keymap-linux-to-qcode.c=
+:
+> > No such file or directory
+> >=20
+> > <cota> [...] you might want to do "git submodule init && git submodul=
+e
+> > update"
+> >=20
+>=20
+>  .. you call that transparent.
+>=20
+> Yeah, right.
+>=20
+> Please don't pretend that something is working when it clearly isn't.
+>=20
+> Repositories using submodules are far from first class citizens as far
+> as support from git is concerned.
+>=20
+> Therefore projects that don't have git development at least as
+> secondary focus should not use them until that changes.
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+That's really overstating the problem. There are some caveats with use of
+submodules, but they are hardly showstoppers that prevent their usage
+entirely. There are plenty of projects using GIT with submodules for
+*years* (libvirt has used them for 8 years).
 
-> ---
->  tests/.gitignore | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/tests/.gitignore b/tests/.gitignore
-> index cf6d99c91e..53cb2efaee 100644
-> --- a/tests/.gitignore
-> +++ b/tests/.gitignore
-> @@ -6,6 +6,7 @@ check-qdict
->  check-qnum
->  check-qjson
->  check-qlist
-> +check-qlit
->  check-qnull
->  check-qstring
->  check-qom-interface
-> 
+Some of the problems pointed out have been clear bugs in the way we've
+integrated into QEMU's build system, which I've been addressing. Others
+have been due to usage scenarios I didn't anticipate, which I've attempte=
+d
+to provide solutions for, either by improving the build system, or sugges=
+ting
+alternative approaches. We'll continue to try to improve this, as we woul=
+d
+for any other major change to the buildsystem we've been through, which
+caused problems for some workflows. I none the less believe this is worki=
+ng
+for the vast majority of developers of QEMU, given the size of our commun=
+ity
+vs the number of problems reported.
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
