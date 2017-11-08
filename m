@@ -1,36 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46906)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47188)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1eCNVd-0001rx-T2
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 05:23:02 -0500
+	(envelope-from <thuth@redhat.com>) id 1eCNWe-0002Oh-Oq
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 05:24:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1eCNVa-0000l3-NM
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 05:23:01 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34420)
+	(envelope-from <thuth@redhat.com>) id 1eCNWa-0001Au-Uf
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 05:24:04 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36926)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1eCNVa-0000kh-Hf
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 05:22:58 -0500
-References: <1b862cf2-2fee-3243-cb54-2780ace6f25b@profihost.ag>
-	<971cc10f-7930-9830-0528-27e8faac7282@redhat.com>
-	<748c4d0d-f84b-303d-f9a6-bafa6037d669@profihost.ag>
-	<f4b0cb70-7f86-f7cf-bb89-3a9f7ae15dc2@redhat.com>
-	<4c2913e2-5946-47db-cced-a5702538bc3b@profihost.ag>
-	<dc3bf74f-fbd6-573d-0d7c-d456469fcf1d@profihost.ag>
-	<9c8673a5-faf7-ca9c-27d3-398df4223d6a@redhat.com>
-	<f362d043-7293-65b7-734b-c8372a5f16c3@profihost.ag>
-	<54326bae-831d-dfb8-151e-534d3a100c2c@redhat.com>
-	<ab53e4ae-4c38-9520-b076-96318b6c09b5@profihost.ag>
-	<61b97624-bd55-655f-f8e2-ea1699c25d51@redhat.com>
-	<b110639a-3752-56b5-fe50-741c53048c15@redhat.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <34a1bec2-403e-8de1-d3dd-661865c6dceb@redhat.com>
-Date: Wed, 8 Nov 2017 19:22:48 +0900
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1eCNWa-0001AU-OP
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 05:24:00 -0500
+References: <20171108022828.7242-1-f4bug@amsat.org>
+	<20171108022828.7242-2-f4bug@amsat.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <0f594637-3668-91b1-76e4-5964dcdae84b@redhat.com>
+Date: Wed, 8 Nov 2017 11:23:53 +0100
 MIME-Version: 1.0
-In-Reply-To: <b110639a-3752-56b5-fe50-741c53048c15@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20171108022828.7242-2-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] kvm: virtio-net: saved image requires TUN_F_UFO
- support
+Subject: Re: [Qemu-devel] [RFC PATCH 1/6] machine: add a deprecated_reason
+ property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,52 +29,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Stefan Priebe - Profihost AG <s.priebe@profihost.ag>, qemu-devel <qemu-devel@nongnu.org>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org
 
+On 08.11.2017 03:28, Philippe Mathieu-Daud=C3=A9 wrote:
+> If a machine has the deprecated_reason property set:
+> - it won't get listed anymore by the "-M help" command,
+> - a warning will be displayed if the machine is used.
+>=20
+> Example:
+>   $ ppc-softmmu/qemu-system-ppc -M prep
+>   qemu-system-ppc: -M prep: warning: The PowerPC PREP platform machine =
+is deprecated (Obsoleted by the "40p" machine)
+>   [machine starting ...]
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+>  include/hw/boards.h | 1 +
+>  vl.c                | 7 +++++++
+>  2 files changed, 8 insertions(+)
+>=20
+> diff --git a/include/hw/boards.h b/include/hw/boards.h
+> index 191a5b3cd8..4d5c180968 100644
+> --- a/include/hw/boards.h
+> +++ b/include/hw/boards.h
+> @@ -182,6 +182,7 @@ struct MachineClass {
+>      const char *default_boot_order;
+>      const char *default_display;
+>      GArray *compat_props;
+> +    const char *deprecated_reason;
+>      const char *hw_version;
+>      ram_addr_t default_ram_size;
+>      const char *default_cpu_type;
+> diff --git a/vl.c b/vl.c
+> index ec299099ff..9ed4648af2 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -2742,6 +2742,10 @@ static gint machine_class_cmp(gconstpointer a, g=
+constpointer b)
+>      }
+>      if (mc) {
+>          g_slist_free(machines);
+> +        if (mc->deprecated_reason) {
+> +            warn_report("The %s machine is deprecated (%s)",
+> +                        mc->desc, mc->deprecated_reason);
+> +        }
 
+Just cosmetic, but maybe rather put that into select_machine() instead?
 
-On 2017=E5=B9=B411=E6=9C=8808=E6=97=A5 18:46, Paolo Bonzini wrote:
-> On 08/11/2017 09:21, Jason Wang wrote:
->>
->> On 2017=E5=B9=B411=E6=9C=8808=E6=97=A5 17:05, Stefan Priebe - Profihos=
-t AG wrote:
->>> Am 08.11.2017 um 08:54 schrieb Jason Wang:
->>>> On 2017=E5=B9=B411=E6=9C=8808=E6=97=A5 15:41, Stefan Priebe - Profih=
-ost AG wrote:
->>>>> Hi Paolo,
->>>>>
->>>>> Am 06.11.2017 um 12:27 schrieb Paolo Bonzini:
->>>>>> On 06/11/2017 12:09, Stefan Priebe - Profihost AG wrote:
->>>>>>> HI Paolo,
->>>>>>>
->>>>>>> could this patchset be related?
->>>>>> Uh oh, yes it should.=C2=A0 Jason, any ways to fix it?=C2=A0 I sup=
-pose we
->>>>>> need to
->>>>>> disable UFO in the newest machine types, but do we also have to do
->>>>>> (software) UFO in vhost-net and QEMU for migration compatibility?
->>>>> Any news on this?
->>>>>
->>>>> Greets,
->>>> Since we probe UFO support, it will be disabled automatically on dev=
-ice
->>>> startup.
->>>>
->>>> For the issue of migration, I think the only way is trying to fix it=
- in
->>>> kernel.
->>> But 4.14 is around the corner and the patchset is already included.
->>> Shouldn't this get fixed before 4.14 is released?
->> We will try to seek a solution as soon as possible. If we can't catch
->> 4.14, we will do it for stable for sure.
-> Jason, can you write to netdev and Cc Linus and me?
->
-> Thanks,
->
-> Paolo
+>          return mc;
+>      }
+>      if (name && !is_help_option(name)) {
+> @@ -2752,6 +2756,9 @@ static gint machine_class_cmp(gconstpointer a, gc=
+onstpointer b)
+>          machines =3D g_slist_sort(machines, machine_class_cmp);
+>          for (el =3D machines; el; el =3D el->next) {
+>              MachineClass *mc =3D el->data;
+> +            if (mc->deprecated_reason) {
+> +                continue;
+> +            }
 
-Paolo, see this https://www.spinics.net/lists/netdev/msg465454.html
+Not sure, but maybe it would be more user-friendly to still list the
+machine, but add a "(deprecated)" string at the end?
 
-Just notice this today since I'm not on the cc list.
-
-Thanks
+ Thomas
