@@ -1,23 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39003)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42195)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1eCExI-0008Oq-V5
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 20:15:02 -0500
+	(envelope-from <famz@redhat.com>) id 1eCFBD-0002FG-Nq
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 20:29:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1eCExD-0004co-WC
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 20:15:00 -0500
-Received: from mail-by2nam01on0089.outbound.protection.outlook.com
-	([104.47.34.89]:39809
-	helo=NAM01-BY2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1eCExD-0004cM-IX
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 20:14:55 -0500
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Tue, 7 Nov 2017 17:10:46 -0800
-Message-ID: <e457d4e906dceea4de6c3431813a06b137c1ab9c.1510103351.git.alistair.francis@xilinx.com>
+	(envelope-from <famz@redhat.com>) id 1eCFBC-0001Hm-OR
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 20:29:23 -0500
+Date: Wed, 8 Nov 2017 09:29:07 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20171108012907.GA2834@lemon>
+References: <20171107225426.3822-1-slp@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v1 1/1] Makefile: Capstone: Add support for
- cross compile ranlib
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171107225426.3822-1-slp@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2] util/async: use atomic_mb_set in
+ qemu_bh_cancel
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,62 +23,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, peter.maydell@linaro.org
-Cc: alistair.francis@xilinx.com, alistair23@gmail.com, kraxel@redhat.com, dgilbert@redhat.com
+To: Sergio Lopez <slp@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, stefanha@redhat.com, pbonzini@redhat.com
 
-When cross compiling QEMU for Windows we need to specify the cross
-version of ranlib to avoid build errors when buildling capstone. This
-patch ensures we use the same cross prefix on ranlib as other toolchain
-components.
+Hi Sergio,
 
-Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-Suggested-by: Peter Maydell <peter.maydell@linaro.org>
----
+On Tue, 11/07 23:54, Sergio Lopez wrote:
+> Commit b7a745d added a qemu_bh_cancel call to the completion function
+> as an optimization to prevent it from unnecessarily rescheduling itself.
+> 
+> This completion function is scheduled from worker_thread, after setting
+> the state of a ThreadPoolElement to THREAD_DONE.
+> 
+> This was considered to be safe, as the completion function restarts the
+> loop just after the call to qemu_bh_cancel. But, under certain access
+> patterns and scheduling conditions, the loop may wrongly use a
+> pre-fetched elem->state value, reading it as THREAD_QUEUED, and ending
+> the completion function without having processed a pending TPE linked at
+> pool->head:
+> 
+>        I/O thread                  |          worker thread
 
- Makefile  | 2 +-
- configure | 3 +++
- 2 files changed, 4 insertions(+), 1 deletion(-)
+Isn't the left column "workder thread" and the right one "I/O thread"?
 
-diff --git a/Makefile b/Makefile
-index 0496c5057a..814f6820d9 100644
---- a/Makefile
-+++ b/Makefile
-@@ -405,7 +405,7 @@ CAP_CFLAGS += -DCAPSTONE_HAS_POWERPC
- CAP_CFLAGS += -DCAPSTONE_HAS_X86
- 
- subdir-capstone: .git-submodule-status
--	$(call quiet-command,$(MAKE) -C $(SRC_PATH)/capstone CAPSTONE_SHARED=no BUILDDIR="$(BUILD_DIR)/capstone" CC="$(CC)" AR="$(AR)" LD="$(LD)" CFLAGS="$(CAP_CFLAGS)" $(SUBDIR_MAKEFLAGS) $(BUILD_DIR)/capstone/$(LIBCAPSTONE))
-+	$(call quiet-command,$(MAKE) -C $(SRC_PATH)/capstone CAPSTONE_SHARED=no BUILDDIR="$(BUILD_DIR)/capstone" CC="$(CC)" AR="$(AR)" LD="$(LD)" RANLIB="$(RANLIB)" CFLAGS="$(CAP_CFLAGS)" $(SUBDIR_MAKEFLAGS) $(BUILD_DIR)/capstone/$(LIBCAPSTONE))
- 
- $(SUBDIR_RULES): libqemuutil.a $(common-obj-y) $(chardev-obj-y) \
- 	$(qom-obj-y) $(crypto-aes-obj-$(CONFIG_USER_ONLY))
-diff --git a/configure b/configure
-index a6055c0710..0e856bbc04 100755
---- a/configure
-+++ b/configure
-@@ -482,6 +482,7 @@ ccas="${CCAS-$cc}"
- cpp="${CPP-$cc -E}"
- objcopy="${OBJCOPY-${cross_prefix}objcopy}"
- ld="${LD-${cross_prefix}ld}"
-+ranlib="${RANLIB-${cross_prefix}ranlib}"
- nm="${NM-${cross_prefix}nm}"
- strip="${STRIP-${cross_prefix}strip}"
- windres="${WINDRES-${cross_prefix}windres}"
-@@ -6288,6 +6289,7 @@ echo "CCAS=$ccas" >> $config_host_mak
- echo "CPP=$cpp" >> $config_host_mak
- echo "OBJCOPY=$objcopy" >> $config_host_mak
- echo "LD=$ld" >> $config_host_mak
-+echo "RANLIB=$ranlib" >> $config_host_mak
- echo "NM=$nm" >> $config_host_mak
- echo "WINDRES=$windres" >> $config_host_mak
- echo "CFLAGS=$CFLAGS" >> $config_host_mak
-@@ -6782,6 +6784,7 @@ for rom in seabios vgabios ; do
-     echo "OBJCOPY=objcopy" >> $config_mak
-     echo "IASL=$iasl" >> $config_mak
-     echo "LD=$ld" >> $config_mak
-+    echo "RANLIB=$ranlib" >> $config_mak
- done
- 
- # set up tests data directory
--- 
-2.11.0
+Fam
+
+> ------------------------------------------------------------------------
+>                                    | speculatively read req->state
+> req->state = THREAD_DONE;          |
+> qemu_bh_schedule(p->completion_bh) |
+>  bh->scheduled = 1;                |
+>                                    | qemu_bh_cancel(p->completion_bh)
+>                                    |   bh->scheduled = 0;
+>                                    | if (req->state == THREAD_DONE)
+>                                    |   // sees THREAD_QUEUED
+> 
+> The source of the misunderstanding was that qemu_bh_cancel is now being
+> used by the _consumer_ rather than the producer, and therefore now needs
+> to have acquire semantics just like e.g. aio_bh_poll.
+> 
+> In some situations, if there are no other independent requests in the
+> same aio context that could eventually trigger the scheduling of the
+> completion function, the omitted TPE and all operations pending on it
+> will get stuck forever.
+> 
+> Signed-off-by: Sergio Lopez <slp@redhat.com>
+> ---
+>  util/async.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/util/async.c b/util/async.c
+> index 355af73ee7..0e1bd8780a 100644
+> --- a/util/async.c
+> +++ b/util/async.c
+> @@ -174,7 +174,7 @@ void qemu_bh_schedule(QEMUBH *bh)
+>   */
+>  void qemu_bh_cancel(QEMUBH *bh)
+>  {
+> -    bh->scheduled = 0;
+> +    atomic_mb_set(&bh->scheduled, 0);
+>  }
+>  
+>  /* This func is async.The bottom half will do the delete action at the finial
+> -- 
+> 2.13.6
+> 
