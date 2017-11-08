@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35495)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36042)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1eCOi3-0000T7-LL
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 06:39:56 -0500
+	(envelope-from <rjones@redhat.com>) id 1eCOjW-0001R0-IN
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 06:41:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1eCOi2-0006JC-Jk
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 06:39:55 -0500
-Date: Wed, 8 Nov 2017 11:39:46 +0000
+	(envelope-from <rjones@redhat.com>) id 1eCOjR-0007J4-Vg
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 06:41:26 -0500
+Date: Wed, 8 Nov 2017 11:41:13 +0000
 From: "Richard W.M. Jones" <rjones@redhat.com>
-Message-ID: <20171108113946.GO2787@redhat.com>
+Message-ID: <20171108114113.GP2787@redhat.com>
 References: <cover.1510093478.git.jcody@redhat.com>
-	<27e0bf9dfb1370e8beb08c7b5ad6894540fff13a.1510093478.git.jcody@redhat.com>
+	<bc6988fb22c5a5c67300ab99fa2e955df10aae61.1510093478.git.jcody@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <27e0bf9dfb1370e8beb08c7b5ad6894540fff13a.1510093478.git.jcody@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 1/7] block/ssh: don't call
- libssh2_init() in block_init()
+In-Reply-To: <bc6988fb22c5a5c67300ab99fa2e955df10aae61.1510093478.git.jcody@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 5/7] block/curl: check error return of
+ curl_global_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,106 +27,84 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Jeff Cody <jcody@redhat.com>
 Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, kwolf@redhat.com, eblake@redhat.com
 
-On Tue, Nov 07, 2017 at 05:27:18PM -0500, Jeff Cody wrote:
-> We don't need libssh2 failure to be fatal (we could just opt to not
-> register the driver on failure). But, it is probably a good idea to
-> avoid external library calls during the block_init(), and call the
-> libssh2 global init function on the first usage, returning any errors.
+On Tue, Nov 07, 2017 at 05:27:22PM -0500, Jeff Cody wrote:
+> If curl_global_init() fails, per the documentation no other curl
+> functions may be called, so make sure to check the return value.
+> 
+> Also, some minor changes to the initialization latch variable 'inited':
+> 
+> - Make it static in the file, for clarity
+> - Change the name for clarity
+> - Make it a bool
 > 
 > Signed-off-by: Jeff Cody <jcody@redhat.com>
-> ---
->  block/ssh.c | 37 ++++++++++++++++++++++++++-----------
->  1 file changed, 26 insertions(+), 11 deletions(-)
-> 
-> diff --git a/block/ssh.c b/block/ssh.c
-> index b049a16..de81ec8 100644
-> --- a/block/ssh.c
-> +++ b/block/ssh.c
-> @@ -83,12 +83,28 @@ typedef struct BDRVSSHState {
->      bool unsafe_flush_warning;
->  } BDRVSSHState;
->  
-> -static void ssh_state_init(BDRVSSHState *s)
-> +static bool ssh_libinit_called;
-> +
-> +static int ssh_state_init(BDRVSSHState *s, Error **errp)
->  {
-> +    int ret;
-> +
-> +    if (!ssh_libinit_called) {
-> +        ret = libssh2_init(0);
-> +        if (ret) {
-> +            error_setg(errp, "libssh2 initialization failed with %d", ret);
-> +            return ret;
-> +        }
-> +        ssh_libinit_called = true;
-> +    }
-> +
-> +
->      memset(s, 0, sizeof *s);
->      s->sock = -1;
->      s->offset = -1;
->      qemu_co_mutex_init(&s->lock);
-> +
-> +    return 0;
+> Reviewed-by: Eric Blake <eblake@redhat.com>
 
-Is this thread safe?  Is there a case where multiple ssh URL opens
-could race off against each other and we could end up calling
-libssh2_init in parallel?  (According to the libssh2_init
-documentation, the function is not thread-safe so should not be called
-in parallel on multiple threads)
+This is just a simple evolution of the previous code, so:
+
+Reviewed-by: Richard W.M. Jones <rjones@redhat.com>
 
 Rich.
 
->  }
+>  block/curl.c | 18 ++++++++++++------
+>  1 file changed, 12 insertions(+), 6 deletions(-)
+> 
+> diff --git a/block/curl.c b/block/curl.c
+> index 2a244e2..00a9879 100644
+> --- a/block/curl.c
+> +++ b/block/curl.c
+> @@ -89,6 +89,8 @@ static CURLMcode __curl_multi_socket_action(CURLM *multi_handle,
 >  
->  static void ssh_state_free(BDRVSSHState *s)
-> @@ -773,7 +789,9 @@ static int ssh_file_open(BlockDriverState *bs, QDict *options, int bdrv_flags,
->      int ret;
->      int ssh_flags;
+>  struct BDRVCURLState;
 >  
-> -    ssh_state_init(s);
-> +    if (ssh_state_init(s, errp)) {
-> +        return -EIO;
+> +static bool libcurl_initialized;
+> +
+>  typedef struct CURLAIOCB {
+>      Coroutine *co;
+>      QEMUIOVector *qiov;
+> @@ -686,14 +688,23 @@ static int curl_open(BlockDriverState *bs, QDict *options, int flags,
+>      double d;
+>      const char *secretid;
+>      const char *protocol_delimiter;
+> +    int ret;
+>  
+> -    static int inited = 0;
+>  
+>      if (flags & BDRV_O_RDWR) {
+>          error_setg(errp, "curl block device does not support writes");
+>          return -EROFS;
+>      }
+>  
+> +    if (!libcurl_initialized) {
+> +        ret = curl_global_init(CURL_GLOBAL_ALL);
+> +        if (ret) {
+> +            error_setg(errp, "libcurl initialization failed with %d", ret);
+> +            return -EIO;
+> +        }
+> +        libcurl_initialized = true;
 > +    }
+> +
+>      qemu_mutex_init(&s->mutex);
+>      opts = qemu_opts_create(&runtime_opts, NULL, 0, &error_abort);
+>      qemu_opts_absorb_qdict(opts, options, &local_err);
+> @@ -772,11 +783,6 @@ static int curl_open(BlockDriverState *bs, QDict *options, int flags,
+>          }
+>      }
 >  
->      ssh_flags = LIBSSH2_FXF_READ;
->      if (bdrv_flags & BDRV_O_RDWR) {
-> @@ -821,8 +839,13 @@ static int ssh_create(const char *filename, QemuOpts *opts, Error **errp)
->      BDRVSSHState s;
->      ssize_t r2;
->      char c[1] = { '\0' };
-> +    Error *local_err = NULL;
->  
-> -    ssh_state_init(&s);
-> +    ret = ssh_state_init(&s, &local_err);
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
-> +        return ret;
-> +    }
->  
->      /* Get desired file size. */
->      total_size = ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0),
-> @@ -1213,14 +1236,6 @@ static BlockDriver bdrv_ssh = {
->  
->  static void bdrv_ssh_init(void)
->  {
-> -    int r;
-> -
-> -    r = libssh2_init(0);
-> -    if (r != 0) {
-> -        fprintf(stderr, "libssh2 initialization failed, %d\n", r);
-> -        exit(EXIT_FAILURE);
+> -    if (!inited) {
+> -        curl_global_init(CURL_GLOBAL_ALL);
+> -        inited = 1;
 > -    }
 > -
->      bdrv_register(&bdrv_ssh);
->  }
->  
+>      DPRINTF("CURL: Opening %s\n", file);
+>      QSIMPLEQ_INIT(&s->free_state_waitq);
+>      s->aio_context = bdrv_get_aio_context(bs);
 > -- 
 > 2.9.5
 
 -- 
 Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
 Read my programming and virtualization blog: http://rwmj.wordpress.com
-virt-builder quickly builds VMs from scratch
-http://libguestfs.org/virt-builder.1.html
+Fedora Windows cross-compiler. Compile Windows programs, test, and
+build Windows installers. Over 100 libraries supported.
+http://fedoraproject.org/wiki/MinGW
