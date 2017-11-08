@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44933)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45078)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eCRJu-0004zl-FV
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 09:27:16 -0500
+	(envelope-from <eblake@redhat.com>) id 1eCRKc-0005HZ-GP
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 09:27:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eCRJq-00082a-Ah
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 09:27:10 -0500
-References: <cover.1510093478.git.jcody@redhat.com>
-	<41ed8543e005205118438328c7e162532729d9c7.1510093478.git.jcody@redhat.com>
-	<20171108104737.xtxfex7leabfbqyc@starbug-vm.ie.oracle.com>
+	(envelope-from <eblake@redhat.com>) id 1eCRKZ-0008Tz-Cd
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 09:27:54 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53646)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eCRKZ-0008TF-3U
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 09:27:51 -0500
+References: <1510049762-4609-1-git-send-email-peter.maydell@linaro.org>
+	<1510049762-4609-3-git-send-email-peter.maydell@linaro.org>
+	<CD2DCF39-4633-4F81-8B5E-75B49DB93D12@gmail.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <a888b534-f285-6d02-fdb6-9faae79879fb@redhat.com>
-Date: Wed, 8 Nov 2017 08:26:57 -0600
+Message-ID: <5909acc5-056c-3f37-f683-e826f98a287f@redhat.com>
+Date: Wed, 8 Nov 2017 08:27:49 -0600
 MIME-Version: 1.0
-In-Reply-To: <20171108104737.xtxfex7leabfbqyc@starbug-vm.ie.oracle.com>
+In-Reply-To: <CD2DCF39-4633-4F81-8B5E-75B49DB93D12@gmail.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="bCfJBd8vmrTE3vEGMR4fBFpd3K5D2RehV"
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v3 7/7] block/curl: code
- cleanup to comply with coding style
+	boundary="w6cocsIEMSxdpKPAp7W6ktmMW3uDCkSap"
+Subject: Re: [Qemu-devel] [PULL 2/3] ui/cocoa.m: move ungrab to ctrl-alt-g
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,100 +29,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp, rjones@redhat.com, namei.unix@gmail.com
+To: Programmingkid <programmingkidx@gmail.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---bCfJBd8vmrTE3vEGMR4fBFpd3K5D2RehV
+--w6cocsIEMSxdpKPAp7W6ktmMW3uDCkSap
 From: Eric Blake <eblake@redhat.com>
-To: Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org, kwolf@redhat.com,
- qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp, rjones@redhat.com,
- namei.unix@gmail.com
-Message-ID: <a888b534-f285-6d02-fdb6-9faae79879fb@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v3 7/7] block/curl: code cleanup
- to comply with coding style
-References: <cover.1510093478.git.jcody@redhat.com>
- <41ed8543e005205118438328c7e162532729d9c7.1510093478.git.jcody@redhat.com>
- <20171108104737.xtxfex7leabfbqyc@starbug-vm.ie.oracle.com>
-In-Reply-To: <20171108104737.xtxfex7leabfbqyc@starbug-vm.ie.oracle.com>
+To: Programmingkid <programmingkidx@gmail.com>,
+ Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org
+Message-ID: <5909acc5-056c-3f37-f683-e826f98a287f@redhat.com>
+Subject: Re: [Qemu-devel] [PULL 2/3] ui/cocoa.m: move ungrab to ctrl-alt-g
+References: <1510049762-4609-1-git-send-email-peter.maydell@linaro.org>
+ <1510049762-4609-3-git-send-email-peter.maydell@linaro.org>
+ <CD2DCF39-4633-4F81-8B5E-75B49DB93D12@gmail.com>
+In-Reply-To: <CD2DCF39-4633-4F81-8B5E-75B49DB93D12@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 11/08/2017 04:47 AM, Darren Kenny wrote:
-> Hi Jeff,
+On 11/08/2017 06:04 AM, Programmingkid wrote:
 >=20
-> While I'm relatively new to this community, I do have some comments
-> about the styling in this file.
->=20
-> I don't see anything in the CODING_STYLE file that tells me I'm
-> wrong here, but it's certainly possible...
->=20
-> More inline.
->=20
-
->> -// #define DEBUG_CURL
->> -// #define DEBUG_VERBOSE
-
-This is definitely against style (checkpatch.pl flags it),
-
->> +/*
->> + #define DEBUG_CURL
->> + #define DEBUG_VERBOSE
->> +*/
->=20
-
-while you are correct that this is not quite usual style.
-
-> Is it not more common to use the style:
->=20
-> =C2=A0=C2=A0 /*
-> =C2=A0=C2=A0=C2=A0 * text
-> =C2=A0=C2=A0=C2=A0 */
-
-But, since checkpatch.pl doesn't flag it, and since it is easier to
-remove the leading and trailing /* and */ to enable the debug #defines
-(compared to editing every single line of the comment), I don't see a
-problem with the style chosen here.
-
-
->> @@ -235,7 +236,7 @@ static size_t curl_header_cb(void *ptr, size_t
->> size, size_t nmemb, void *opaque)
->> /* Called from curl_multi_do_locked, with s->mutex held.=C2=A0 */
->> static size_t curl_read_cb(void *ptr, size_t size, size_t nmemb, void
->> *opaque)
->> {
->> -=C2=A0=C2=A0=C2=A0 CURLState *s =3D ((CURLState*)opaque);
->> +=C2=A0=C2=A0=C2=A0 CURLState *s =3D opaque;
->=20
-> Not sure about this one - while it may not be strictly necessary to
-> do the casting, from a readability point of view it is helpful to
-> see the cast - possibly with the outer brackets removed:
->=20
-> =C2=A0=C2=A0=C2=A0=C2=A0 CURLState *s =3D (CURLState*)opaque;
-
-I _am_ sure about it. The cast from void* is pointless (this is C, not
-C++), and this is one of the changes that Jeff specifically made in v3
-that was not present in v2, because I requested that we lose the cast
-(in general, we try to avoid as many casts as possible).
-
->> @@ -876,13 +880,13 @@ static void curl_setup_preadv(BlockDriverState
->> *bs, CURLAIOCB *acb)
+>> On Nov 7, 2017, at 5:16 AM, Peter Maydell <peter.maydell@linaro.org> w=
+rote:
 >>
->> =C2=A0=C2=A0=C2=A0 qemu_mutex_lock(&s->mutex);
+>> From: John Arbuckle <programmingkidx@gmail.com>
 >>
->> -=C2=A0=C2=A0=C2=A0 // In case we have the requested data already (e.g=
-=2E read-ahead),
->> -=C2=A0=C2=A0=C2=A0 // we can just call the callback and be done.
->> +=C2=A0=C2=A0=C2=A0 /* In case we have the requested data already (e.g=
-=2E read-ahead),
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 we can just call the callback an=
-d be done. */
+>> Currently the cocoa user interface relis on the user pushing
 >=20
-> Please don't do a multi-line comment like this, it is much more
-> obvious that the second line is a comment if you use the more normal
-> format of as outlined earlier by me.
+> I would change "relis" to "relies" here.
 
-Indeed, while I don't mind the style used on the #define DEBUG_*, this
-one could be touched up to be more idiomatic.
+Too late; it's already commit 5929e36c
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -127,7 +66,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---bCfJBd8vmrTE3vEGMR4fBFpd3K5D2RehV
+--w6cocsIEMSxdpKPAp7W6ktmMW3uDCkSap
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -136,14 +75,14 @@ Content-Disposition: attachment; filename="signature.asc"
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloDFDEACgkQp6FrSiUn
-Q2ocVwf/agnbpoUny+k5eYmnHbcr0PXCyh5BZijxA1xj7Dlvluo7NmJQZ8l1URBT
-CwyPSin2KE9YkdubtR1J20KBRAaadEjKKLda8EzEqylEkv8Crnu6uI618qf1o9m6
-47lINIl3uN9jSh33z42jHXWhhKT4LPkHLOm0gqBryYaXbzZ0Eo/zWwUYnkwh5QXR
-yUNqvKSTSrgoFx9DskEisYfnw9B/ztlNZgJY6PhnyK8CAi2ez0t4PlRAxPN+5Cd4
-jg05z4dLBhpHlyFiiuQ8B6l2Ndiot44r6ZB7bC/T2B5PAu1kJ6PX0lOIbsXLtvEK
-hKfsKtYDHWm6zMwD7PSPavE1yti3kw==
-=BB8c
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloDFGUACgkQp6FrSiUn
+Q2rj7gf/THI9a4UDi9xcs7MwzFtXLdwwUempW6shWs5MQFwxCriCjkoUhbAwlXoA
+vOEzoI8JGIrEcSibqBMNwZH6a3N/u0zTlZ/it/mdaBmpiOCY3ZsKuWNjZqADurGV
+u7MMbq+v2WiJ3zAsvxx0jBgp5K6vII2Rm4/b1mPpkdvEPNm3Jn+R7nf7q/1Dk7Mu
+r/HLnxNGFshr1r1icXyUQRjoH1ti3n4PrqfeHT0yskMAHj1HMGj1VQPM1eRdOyeB
+ox6VNI3qWYBKzAoFThU533aFfJaUujgy+1mxGWOIXxpZm9KsK7OFoJjVT2wzxUK2
+JFAYIkG5k3+n7paaE/LRkN9IHx/1hA==
+=KTTz
 -----END PGP SIGNATURE-----
 
---bCfJBd8vmrTE3vEGMR4fBFpd3K5D2RehV--
+--w6cocsIEMSxdpKPAp7W6ktmMW3uDCkSap--
