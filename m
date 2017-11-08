@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58585)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58785)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1eCTnm-0004Gs-3i
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 12:06:14 -0500
+	(envelope-from <berrange@redhat.com>) id 1eCToJ-0004hp-LS
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 12:06:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1eCTng-0005LU-BA
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 12:06:10 -0500
-Date: Wed, 8 Nov 2017 18:05:45 +0100
-From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Message-ID: <20171108170545.GF5553@toto>
-References: <1509719814-6191-1-git-send-email-peter.maydell@linaro.org>
-	<alpine.DEB.2.10.1711031035500.8975@sstabellini-ThinkPad-X260>
+	(envelope-from <berrange@redhat.com>) id 1eCToD-0005kE-Fj
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 12:06:43 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39916)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eCToD-0005jU-6m
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 12:06:37 -0500
+Date: Wed, 8 Nov 2017 17:06:29 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20171108170629.GD12670@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20171030040056.11780-1-f4bug@amsat.org>
+	<20171030082029.GY2993@localhost.localdomain>
+	<20171108132857.GT12670@redhat.com>
+	<1ecb6a4b-465f-0949-e039-441038f1adf8@amsat.org>
+	<20171108165905.GN3111@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <alpine.DEB.2.10.1711031035500.8975@sstabellini-ThinkPad-X260>
-Subject: Re: [Qemu-devel] [PATCH] arm: check regime, not current state,
- for ATS write PAR format
+In-Reply-To: <20171108165905.GN3111@localhost.localdomain>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH] vl: only display available accelerators
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,64 +32,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Stabellini <sstabellini@kernel.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org, Julien Grall <julien.grall@linaro.org>, patches@linaro.org
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Thomas Huth <thuth@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Markus Armbruster <armbru@redhat.com>, Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org, "Emilio G . Cota" <cota@braap.org>, Anthony Perard <anthony.perard@citrix.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On Fri, Nov 03, 2017 at 10:36:37AM -0700, Stefano Stabellini wrote:
-> On Fri, 3 Nov 2017, Peter Maydell wrote:
-> > In do_ats_write(), rather than using extended_addresses_enabled() to
-> > decide whether the value we get back from get_phys_addr() is a 64-bit
-> > format PAR or a 32-bit one, use arm_s1_regime_using_lpae_format().
-> > 
-> > This is not really the correct answer, because the PAR format
-> > depends on the AT instruction being used, not just on the
-> > translation regime. However getting this correct requires a
-> > significant refactoring, so that get_phys_addr() returns raw
-> > information about the fault which the caller can then assemble
-> > into a suitable FSR/PAR/syndrome for its purposes, rather than
-> > get_phys_addr() returning a pre-formatted FSR.
-> > 
-> > However this change at least improves the situation by making
-> > the PAR work correctly for address translation operations done
-> > at AArch64 EL2 on the EL2 translation regime. In particular,
-> > this is necessary for Xen to be able to run in our emulation,
-> > so this seems like a safer interim fix given that we are in freeze.
-> > 
-> > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> 
-> Tested-by: Stefano Stabellini <sstabellini@kernel.org>
+On Wed, Nov 08, 2017 at 02:59:05PM -0200, Eduardo Habkost wrote:
+> On Wed, Nov 08, 2017 at 01:21:33PM -0300, Philippe Mathieu-Daud=C3=A9 w=
+rote:
+> > On 11/08/2017 10:28 AM, Daniel P. Berrange wrote:
+> > > On Mon, Oct 30, 2017 at 09:20:29AM +0100, Eduardo Habkost wrote:
+> > >> On Mon, Oct 30, 2017 at 01:00:56AM -0300, Philippe Mathieu-Daud=C3=
+=A9 wrote:
+> > >>> examples configuring with '--enable-kvm --disable-tcg'
+> > >>>
+> > >>> - before
+> > >>>
+> > >>>   $ qemu-system-x86_64 -accel help
+> > >>>   Possible accelerators: kvm, xen, hax, tcg
+> > >>>
+> > >>>   $ qemu-system-x86_64 -accel tcg
+> > >>>   qemu-system-x86_64: -machine accel=3Dtcg: No accelerator found
+> > >>>
+> > >>>   # qemu-system-x86_64 -accel hax
+> > >>>   qemu-system-x86_64: -machine accel=3Dhax: No accelerator found
+> > >>>
+> > >>>   # qemu-system-x86_64 -accel xen
+> > >>>   xencall: error: Could not obtain handle on privileged command i=
+nterface: No such file or directory
+> > >>>   xen be core: xen be core: can't open xen interface
+> > >>>   can't open xen interface
+> > >>>   qemu-system-x86_64: failed to initialize Xen: Operation not per=
+mitted
+> > >>>
+> > >>> - after
+> > >>>
+> > >>>   $ qemu-system-x86_64 -accel help
+> > >>>   Possible accelerators: kvm
+> > >>>
+> > >>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> > >>> ---
+> > >>> RFC because:
+> > >>>     - I don't think this is the nicest way, too much #ifdef'fery =
+in main()
+> > >>
+> > >> I suggest using object_class_get_list(TYPE_ACCEL, false).
+> > >=20
+> > > And check the result of the available() method on the returned clas=
+ses
+> > > too, to filter the results.
+> >=20
+> > Good idea! I'll use that.
+>=20
+> It looks like QTest is the only accelerator that implements
+> ->available(), and its return value is a build-time constant that
+> depends only on CONFIG_POSIX.
+>=20
+> I wonder why we don't simply avoid compiling the qtest class if
+> CONFIG_POSIX is unset, making the ->available() method
+> unnecessary.
 
-Hi,
+Yeah that does seem simpler, though I'm surprised that Xen does not
+implement the available method. Xen is an accel I'd expect to see
+compiled into an x86 build, but is only available if the host is
+actually booted under a Xen hypervisor.  Likewise shouldn't kvm
+only report itself as available if the /dev/kvm actually exists.
+But maybe that's not the kind of semantics code using available()
+expects ?
 
-This looks like an OK workaround for the moment:
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 
-Cheers,
-Edgar
-
-> 
-> 
-> > ---
-> > I guess I should have a go at the "correct answer" I sketch
-> > above, but no promises about when I'll get time for that :-(
-> > 
-> >  target/arm/helper.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > 
-> > diff --git a/target/arm/helper.c b/target/arm/helper.c
-> > index 96113fe..37af750 100644
-> > --- a/target/arm/helper.c
-> > +++ b/target/arm/helper.c
-> > @@ -2162,7 +2162,7 @@ static uint64_t do_ats_write(CPUARMState *env, uint64_t value,
-> >  
-> >      ret = get_phys_addr(env, value, access_type, mmu_idx,
-> >                          &phys_addr, &attrs, &prot, &page_size, &fsr, &fi);
-> > -    if (extended_addresses_enabled(env)) {
-> > +    if (arm_s1_regime_using_lpae_format(env, mmu_idx)) {
-> >          /* fsr is a DFSR/IFSR value for the long descriptor
-> >           * translation table format, but with WnR always clear.
-> >           * Convert it to a 64-bit PAR.
-> > -- 
-> > 2.7.4
-> > 
-> > 
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
