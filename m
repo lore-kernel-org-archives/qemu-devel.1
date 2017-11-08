@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55467)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60067)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eCIb4-0002Gx-81
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 00:08:19 -0500
+	(envelope-from <thuth@redhat.com>) id 1eCIx4-00059O-Jt
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 00:31:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eCIb3-00038I-ER
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 00:08:18 -0500
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <cover.1510093478.git.jcody@redhat.com>
-	<facec289ff8a7ea66e420585ac87baf65b3f4cd5.1510093478.git.jcody@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <ecd8c311-ee18-a556-2dca-3410d60834c6@amsat.org>
-Date: Wed, 8 Nov 2017 02:08:08 -0300
+	(envelope-from <thuth@redhat.com>) id 1eCIx0-0004OA-Gv
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 00:31:02 -0500
+References: <20171107205201.10207-1-mdroth@linux.vnet.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <2c8f9ccb-31d3-d06d-e02a-8790fd78c2ef@redhat.com>
+Date: Wed, 8 Nov 2017 06:30:53 +0100
 MIME-Version: 1.0
-In-Reply-To: <facec289ff8a7ea66e420585ac87baf65b3f4cd5.1510093478.git.jcody@redhat.com>
+In-Reply-To: <20171107205201.10207-1-mdroth@linux.vnet.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 6/7] block/curl: fix minor memory leaks
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-2.11] scripts/make-release: ship u-boot
+ source as a tarball
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,45 +24,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp, rjones@redhat.com, namei.unix@gmail.com
+To: Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, qemu-stable@nongnu.org, Alexander Graf <agraf@suse.de>
 
-Hi Jeff,
-
-On 11/07/2017 07:27 PM, Jeff Cody wrote:
-
-"Missed in 1bff9606429."
-
-> Signed-off-by: Jeff Cody <jcody@redhat.com>
-
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
+On 07.11.2017 21:52, Michael Roth wrote:
+> The u-boot sources we ship currently cause problems with unpacking on
+> a case-insensitive filesystem due to path conflicts. This has been
+> fixed in upstream u-boot via commit 610eec7f, but since it is not
+> yet included in an official release we implement this approach as a
+> temporary workaround.
+> 
+> Once we move to a u-boot containing commit 610eec7f we should revert
+> this patch.
+> 
+> Cc: qemu-stable@nongnu.org
+> Cc: Alexander Graf <agraf@suse.de>
+> Cc: Richard Henderson <richard.henderson@linaro.org>
+> Cc: Thomas Huth <thuth@redhat.com>
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Suggested-by: Richard Henderson <richard.henderson@linaro.org>
+> Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 > ---
->  block/curl.c | 6 ++++++
->  1 file changed, 6 insertions(+)
+>  scripts/make-release | 4 ++++
+>  1 file changed, 4 insertions(+)
 > 
-> diff --git a/block/curl.c b/block/curl.c
-> index 00a9879..35cf417 100644
-> --- a/block/curl.c
-> +++ b/block/curl.c
-> @@ -857,6 +857,9 @@ out_noclean:
->      qemu_mutex_destroy(&s->mutex);
->      g_free(s->cookie);
->      g_free(s->url);
-> +    g_free(s->username);
-> +    g_free(s->proxyusername);
-> +    g_free(s->proxypassword);
->      qemu_opts_del(opts);
->      return -EINVAL;
->  }
-> @@ -955,6 +958,9 @@ static void curl_close(BlockDriverState *bs)
->  
->      g_free(s->cookie);
->      g_free(s->url);
-> +    g_free(s->username);
-> +    g_free(s->proxyusername);
-> +    g_free(s->proxypassword);
->  }
->  
->  static int64_t curl_getlength(BlockDriverState *bs)
+> diff --git a/scripts/make-release b/scripts/make-release
+> index fa6323fda8..3917df7142 100755
+> --- a/scripts/make-release
+> +++ b/scripts/make-release
+> @@ -20,6 +20,10 @@ git checkout "v${version}"
+>  git submodule update --init
+>  (cd roms/seabios && git describe --tags --long --dirty > .version)
+>  rm -rf .git roms/*/.git dtc/.git pixman/.git
+> +# FIXME: The following line is a workaround for avoiding filename collisions
+> +# when unpacking u-boot sources on case-insensitive filesystems. Once we
+> +# update to something with u-boot commit 610eec7f0 we can drop this line.
+> +tar cfj roms/u-boot.tar.bz2 -C roms u-boot && rm -rf roms/u-boot
+>  popd
+>  tar cfj ${destination}.tar.bz2 ${destination}
+>  rm -rf ${destination}
 > 
+
+Reviewed-by: Thomas Huth <thuth@redhat.com>
