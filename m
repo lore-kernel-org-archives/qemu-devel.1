@@ -1,28 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41948)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42143)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eCNEj-0003wk-Ma
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 05:05:34 -0500
+	(envelope-from <bounces@canonical.com>) id 1eCNFQ-0004J2-Kj
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 05:06:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eCNEg-0007cc-H9
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 05:05:33 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57388)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1eCNEg-0007cH-Ag
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 05:05:30 -0500
-References: <20171108022828.7242-1-f4bug@amsat.org>
-	<20171108022828.7242-7-f4bug@amsat.org>
-	<20171108090900.GF12670@redhat.com>
-	<20171108094421.ta2wumq36gux3m5s@sirius.home.kraxel.org>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <470e67ec-fe1e-2692-c14c-5c843a9d3053@redhat.com>
-Date: Wed, 8 Nov 2017 11:05:15 +0100
+	(envelope-from <bounces@canonical.com>) id 1eCNFK-0008Dd-0y
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 05:06:16 -0500
+Received: from indium.canonical.com ([91.189.90.7]:60628)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eCNFJ-0008DA-OJ
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 05:06:09 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eCNFI-0005xj-Q0
+	for <qemu-devel@nongnu.org>; Wed, 08 Nov 2017 10:06:08 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id C29C52E80C7
+	for <qemu-devel@nongnu.org>; Wed,  8 Nov 2017 10:06:08 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20171108094421.ta2wumq36gux3m5s@sirius.home.kraxel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 6/6] hw/i386: deprecate the "isapc"
- machine
+Date: Wed, 08 Nov 2017 09:57:45 -0000
+From: "R.Nageswara Sastry" <nasastry@in.ibm.com>
+Reply-To: Bug 1713434 <1713434@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150391152035.18876.7874968547091336063.malonedeb@chaenomeles.canonical.com>
+Message-Id: <151013506512.4619.10811835164590695010.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1713434] Re: prom-env-test test aborted and core
+ dumped
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,42 +37,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Alistair Francis <alistair.francis@xilinx.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
 
-On 08.11.2017 10:44, Gerd Hoffmann wrote:
-> On Wed, Nov 08, 2017 at 09:09:00AM +0000, Daniel P. Berrange wrote:
->> On Tue, Nov 07, 2017 at 11:28:28PM -0300, Philippe Mathieu-Daud=C3=A9 =
-wrote:
->>> Deprecated since 2.9.0, guests should be able to use "pc" instead.
->>
->> Isn't isapc important to allow QEMU to old operating systems that
->> predate the PCI era.
->=20
-> They should work fine.  The early pci chipsets like the piix4 have
-> built-in backward compatibility.  The IDE controller can be driven by
-> simply accessing the isa ide ports.  Likewise vga.  You can plug in ne2=
-k
-> (we have both isa and pci variants) for ethernet and sb16 (isa too) for
-> sound.
->=20
-> That should make guests which don't know anything about pci happy.
->=20
->> I do recall seeing some messages about specific
->> cases where you cannot use the 'pc' machine type and we suggested
->> used of 'isapc' instead, but can't remember the exact details..
->=20
-> I'd like to see such use cases where isapc is actually required.
+Thomas thanks for your hint about the configuration option named
+"--enable-tcg-interpreter". By removing it the test case started working
+fine.
 
-Just my 0.02 =E2=82=AC: I like the idea of keeping isapc. It's a way to r=
-emind
-the x86 folks that there are also architectures without PCI / APIC /
-ACPI. And this helped to spot some bugs in some HMP commands in the past
-already.
+[root@zzfp365-lp1 qemu]# ./sparc64-softmmu/qemu-system-sparc64 -nographic -=
+M sun4u -prom-env 'use-nvramrc?=3Dtrue' -prom-env 'nvramrc=3D." Hello World=
+!" cr'
+OpenBIOS for Sparc64
+Configuration device id QEMU version 1 machine id 0
+kernel cmdline
+CPUs: 1 x SUNW,UltraSPARC-IIi
+UUID: 00000000-0000-0000-0000-000000000000
+Hello World!
+Welcome to OpenBIOS v1.1 built on Oct 19 2017 06:59
+  Type 'help' for detailed information
+Trying disk:a...
+No valid state has been set by load or init-program
 
-> Well, nobody maintains it.  Nobody tests it.
+0 > QEMU 2.10.90 monitor - type 'help' for more information
+(qemu) quit
 
-At least we've got the automatic boot-serial-test now that checks that
-the machine is not completely broken.
+-- =
 
- Thomas
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1713434
+
+Title:
+  prom-env-test test aborted and core dumped
+
+Status in QEMU:
+  In Progress
+
+Bug description:
+  On ppc64le architecture machine the following test case Aborted and
+  Core dumped.
+
+  # tests/prom-env-test --quiet --keep-going -m=3Dquick --GTestLogFD=3D6
+  **
+  ERROR:tests/libqtest.c:628:qtest_get_arch: assertion failed: (qemu !=3D N=
+ULL)
+  Aborted (core dumped)
+
+  Steps to re-produce:
+  clone from the git
+  configure & compile =
+
+  run the unit tests by 'make check'
+
+  (gdb) bt
+  #0  0x00003fff9d60eff0 in raise () from /lib64/libc.so.6
+  #1  0x00003fff9d61136c in abort () from /lib64/libc.so.6
+  #2  0x00003fff9de1aa04 in g_assertion_message () from /lib64/libglib-2.0.=
+so.0
+  #3  0x00003fff9de1ab0c in g_assertion_message_expr () from /lib64/libglib=
+-2.0.so.0
+  #4  0x000000001000cc30 in qtest_get_arch () at tests/libqtest.c:628
+  #5  0x00000000100048f0 in main (argc=3D5, argv=3D0x3ffff2145538) at tests=
+/prom-env-test.c:82
+  (gdb) i r
+  r0             0xfa	250
+  r1             0x3ffff2144d30	70368510627120
+  r2             0x3fff9d7b9900	70367091333376
+  r3             0x0	0
+  r4             0x12a7	4775
+  r5             0x6	6
+  r6             0x8	8
+  r7             0x1	1
+  r8             0x0	0
+  r9             0x0	0
+  r10            0x0	0
+  r11            0x0	0
+  r12            0x0	0
+  r13            0x3fff9dfa1950	70367099623760
+  r14            0x0	0
+  r15            0x0	0
+  r16            0x0	0
+  r17            0x0	0
+  r18            0x0	0
+  r19            0x0	0
+  r20            0x0	0
+  r21            0x0	0
+  r22            0x0	0
+  r23            0x0	0
+  r24            0x0	0
+  r25            0x0	0
+  r26            0x0	0
+  r27            0x100287f8	268601336
+  r28            0x16841b40	377756480
+  r29            0x4c	76
+  r30            0x3ffff2144de8	70368510627304
+  r31            0x6	6
+  pc             0x3fff9d60eff0	0x3fff9d60eff0 <raise+96>
+  msr            0x900000000280f033	10376293541503627315
+  cr             0x42000842	1107298370
+  lr             0x3fff9d61136c	0x3fff9d61136c <abort+396>
+  ctr            0x0	0
+  xer            0x0	0
+  orig_r3        0x12a7	4775
+  trap           0xc00	3072
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1713434/+subscriptions
