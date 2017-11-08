@@ -1,32 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54356)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55467)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eCIU6-0001Ev-Pu
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 00:01:07 -0500
+	id 1eCIb4-0002Gx-81
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 00:08:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eCIU2-0000LJ-Ph
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 00:01:06 -0500
-Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:45657)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eCIU2-0000L2-KA
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 00:01:02 -0500
-Received: by mail-qt0-x241.google.com with SMTP id p1so1917845qtg.2
-	for <qemu-devel@nongnu.org>; Tue, 07 Nov 2017 21:01:02 -0800 (PST)
+	id 1eCIb3-00038I-ER
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 00:08:18 -0500
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-References: <e457d4e906dceea4de6c3431813a06b137c1ab9c.1510103351.git.alistair.francis@xilinx.com>
+References: <cover.1510093478.git.jcody@redhat.com>
+	<facec289ff8a7ea66e420585ac87baf65b3f4cd5.1510093478.git.jcody@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <67091b7c-7518-e9af-5171-1232e7c09bdf@amsat.org>
-Date: Wed, 8 Nov 2017 02:00:56 -0300
+Message-ID: <ecd8c311-ee18-a556-2dca-3410d60834c6@amsat.org>
+Date: Wed, 8 Nov 2017 02:08:08 -0300
 MIME-Version: 1.0
-In-Reply-To: <e457d4e906dceea4de6c3431813a06b137c1ab9c.1510103351.git.alistair.francis@xilinx.com>
+In-Reply-To: <facec289ff8a7ea66e420585ac87baf65b3f4cd5.1510093478.git.jcody@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v1 1/1] Makefile: Capstone: Add support for
- cross compile ranlib
+Subject: Re: [Qemu-devel] [PATCH v3 6/7] block/curl: fix minor memory leaks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,76 +28,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org, peter.maydell@linaro.org
-Cc: alistair23@gmail.com, kraxel@redhat.com, dgilbert@redhat.com
+To: Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp, rjones@redhat.com, namei.unix@gmail.com
 
-Hi Alistair,
+Hi Jeff,
 
-On 11/07/2017 10:10 PM, Alistair Francis wrote:
-> When cross compiling QEMU for Windows we need to specify the cross
+On 11/07/2017 07:27 PM, Jeff Cody wrote:
 
-What toolchain do you use?
+"Missed in 1bff9606429."
 
-> version of ranlib to avoid build errors when buildling capstone. This
-
-"building"
-
-> patch ensures we use the same cross prefix on ranlib as other toolchain
-> components.
-> 
-> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-> Suggested-by: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Jeff Cody <jcody@redhat.com>
 
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-MXE:
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
 > ---
+>  block/curl.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
 > 
->  Makefile  | 2 +-
->  configure | 3 +++
->  2 files changed, 4 insertions(+), 1 deletion(-)
-> 
-> diff --git a/Makefile b/Makefile
-> index 0496c5057a..814f6820d9 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -405,7 +405,7 @@ CAP_CFLAGS += -DCAPSTONE_HAS_POWERPC
->  CAP_CFLAGS += -DCAPSTONE_HAS_X86
+> diff --git a/block/curl.c b/block/curl.c
+> index 00a9879..35cf417 100644
+> --- a/block/curl.c
+> +++ b/block/curl.c
+> @@ -857,6 +857,9 @@ out_noclean:
+>      qemu_mutex_destroy(&s->mutex);
+>      g_free(s->cookie);
+>      g_free(s->url);
+> +    g_free(s->username);
+> +    g_free(s->proxyusername);
+> +    g_free(s->proxypassword);
+>      qemu_opts_del(opts);
+>      return -EINVAL;
+>  }
+> @@ -955,6 +958,9 @@ static void curl_close(BlockDriverState *bs)
 >  
->  subdir-capstone: .git-submodule-status
-> -	$(call quiet-command,$(MAKE) -C $(SRC_PATH)/capstone CAPSTONE_SHARED=no BUILDDIR="$(BUILD_DIR)/capstone" CC="$(CC)" AR="$(AR)" LD="$(LD)" CFLAGS="$(CAP_CFLAGS)" $(SUBDIR_MAKEFLAGS) $(BUILD_DIR)/capstone/$(LIBCAPSTONE))
-> +	$(call quiet-command,$(MAKE) -C $(SRC_PATH)/capstone CAPSTONE_SHARED=no BUILDDIR="$(BUILD_DIR)/capstone" CC="$(CC)" AR="$(AR)" LD="$(LD)" RANLIB="$(RANLIB)" CFLAGS="$(CAP_CFLAGS)" $(SUBDIR_MAKEFLAGS) $(BUILD_DIR)/capstone/$(LIBCAPSTONE))
+>      g_free(s->cookie);
+>      g_free(s->url);
+> +    g_free(s->username);
+> +    g_free(s->proxyusername);
+> +    g_free(s->proxypassword);
+>  }
 >  
->  $(SUBDIR_RULES): libqemuutil.a $(common-obj-y) $(chardev-obj-y) \
->  	$(qom-obj-y) $(crypto-aes-obj-$(CONFIG_USER_ONLY))
-> diff --git a/configure b/configure
-> index a6055c0710..0e856bbc04 100755
-> --- a/configure
-> +++ b/configure
-> @@ -482,6 +482,7 @@ ccas="${CCAS-$cc}"
->  cpp="${CPP-$cc -E}"
->  objcopy="${OBJCOPY-${cross_prefix}objcopy}"
->  ld="${LD-${cross_prefix}ld}"
-> +ranlib="${RANLIB-${cross_prefix}ranlib}"
->  nm="${NM-${cross_prefix}nm}"
->  strip="${STRIP-${cross_prefix}strip}"
->  windres="${WINDRES-${cross_prefix}windres}"
-> @@ -6288,6 +6289,7 @@ echo "CCAS=$ccas" >> $config_host_mak
->  echo "CPP=$cpp" >> $config_host_mak
->  echo "OBJCOPY=$objcopy" >> $config_host_mak
->  echo "LD=$ld" >> $config_host_mak
-> +echo "RANLIB=$ranlib" >> $config_host_mak
->  echo "NM=$nm" >> $config_host_mak
->  echo "WINDRES=$windres" >> $config_host_mak
->  echo "CFLAGS=$CFLAGS" >> $config_host_mak
-> @@ -6782,6 +6784,7 @@ for rom in seabios vgabios ; do
->      echo "OBJCOPY=objcopy" >> $config_mak
->      echo "IASL=$iasl" >> $config_mak
->      echo "LD=$ld" >> $config_mak
-> +    echo "RANLIB=$ranlib" >> $config_mak
->  done
->  
->  # set up tests data directory
+>  static int64_t curl_getlength(BlockDriverState *bs)
 > 
