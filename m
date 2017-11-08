@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38252)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38921)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eCOqr-0006gn-BB
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 06:49:02 -0500
+	(envelope-from <cohuck@redhat.com>) id 1eCOsr-0007S7-8b
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 06:51:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eCOqn-0002ij-9e
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 06:49:01 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34020)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1eCOqn-0002iS-2n
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 06:48:57 -0500
-References: <7967e55c-de72-6ef2-eb92-a85af8fc2552@redhat.com>
-	<20171108105332.etwcm4nyb6rqmprn@sirius.home.kraxel.org>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <54cb9ffb-fa92-f07c-f0df-af589cf17b3a@redhat.com>
-Date: Wed, 8 Nov 2017 12:48:50 +0100
+	(envelope-from <cohuck@redhat.com>) id 1eCOsn-0003s9-6s
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 06:51:05 -0500
+Date: Wed, 8 Nov 2017 12:50:56 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20171108125056.159597fd.cohuck@redhat.com>
+In-Reply-To: <20171107145546.767-1-richard.henderson@linaro.org>
+References: <20171107145546.767-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20171108105332.etwcm4nyb6rqmprn@sirius.home.kraxel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] Yet another git submodule rant
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH] target/s390x: Finish
+ implementing RISBGN
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,27 +23,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "Daniel P. Berrange" <berrange@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, qemu-s390x@nongnu.org
 
-On 08.11.2017 11:53, Gerd Hoffmann wrote:
-> On Wed, Nov 08, 2017 at 10:57:21AM +0100, Thomas Huth wrote:
->>
->> That automatic git submodule stuff now broke my workflow again. I
->> usually keep the git repository on my laptop and then simply rsync the
->> sources (without .git directories) to my target machine to compile it
->> there.
+On Tue,  7 Nov 2017 15:55:46 +0100
+Richard Henderson <richard.henderson@linaro.org> wrote:
+
+> We added the entry to insn-data.def, but failed to update op_risbg
+> to match.  No need to special-case the imask inversion, since that
+> is already ~0 for RISBG (and now RISBGN).
 > 
-> How about excluding all files listed in .gitignore from rsync?  Which I
-> guess would be a good idea anyway because you don't want sync over the
-> build artifacts to the target machine if you want compile there.  Might
-> be as simple as "rsync --exclude-from .gitignore" (didn't test though).
+> Fixes: 375ee58bedcda359011fe7fa99e0647f66f9ffa0
+> Fixes: https://bugs.launchpad.net/qemu/+bug/1701798 (s390x part)
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/s390x/translate.c | 9 +++------
+>  1 file changed, 3 insertions(+), 6 deletions(-)
+> 
+> diff --git a/target/s390x/translate.c b/target/s390x/translate.c
+> index dee72a787d..85d0a6c3af 100644
+> --- a/target/s390x/translate.c
+> +++ b/target/s390x/translate.c
+> @@ -3432,6 +3432,7 @@ static ExitStatus op_risbg(DisasContext *s, DisasOps *o)
+>      /* Adjust the arguments for the specific insn.  */
+>      switch (s->fields->op2) {
+>      case 0x55: /* risbg */
+> +    case 0x59: /* risbgn */
+>          i3 &= 63;
+>          i4 &= 63;
+>          pmask = ~0;
+> @@ -3447,7 +3448,7 @@ static ExitStatus op_risbg(DisasContext *s, DisasOps *o)
+>          pmask = 0x00000000ffffffffull;
+>          break;
+>      default:
+> -        abort();
+> +        g_assert_not_reached();
+>      }
+>  
+>      /* MASK is the set of bits to be inserted from R2.
+> @@ -3464,11 +3465,7 @@ static ExitStatus op_risbg(DisasContext *s, DisasOps *o)
+>         insns, we need to keep the other half of the register.  */
+>      imask = ~mask | ~pmask;
+>      if (do_zero) {
+> -        if (s->fields->op2 == 0x55) {
+> -            imask = 0;
+> -        } else {
+> -            imask = ~pmask;
+> -        }
+> +        imask = ~pmask;
+>      }
+>  
+>      len = i4 - i3 + 1;
 
-That's a neat idea, thanks, I'll give it a try!
-
-> Or syncronize using git instead of rsync.  This is what I am doing.
-
-Tried that in the past already, but it didn't really feel right (I don't
-want to check in each time before syncing my files)...
-
- Thomas
+I can queue this to s390-fixes (unless there are other takers).
