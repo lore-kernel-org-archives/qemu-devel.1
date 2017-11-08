@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39192)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40987)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1eCScP-00086f-ML
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 10:50:28 -0500
+	(envelope-from <eblake@redhat.com>) id 1eCSjl-0001To-0s
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 10:57:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1eCScO-0003Gu-R2
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 10:50:21 -0500
-References: <dd350838-9132-e787-10b1-4cb200076ec9@virtuozzo.com>
-	<w51inekzv59.fsf@maestria.local.igalia.com>
-From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Message-ID: <84b1b069-642e-2b33-7723-70edce3aea43@virtuozzo.com>
-Date: Wed, 8 Nov 2017 18:50:05 +0300
+	(envelope-from <eblake@redhat.com>) id 1eCSjg-0006Ex-Gt
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 10:57:57 -0500
+References: <20171107223708.17935-1-eblake@redhat.com>
+	<20171108154226.GC6118@stefanha-x1.localdomain>
+	<462c8b69-9665-1342-fd01-5ba57049a39c@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <061e94f4-602e-3ff3-0f20-d3915e7a5550@redhat.com>
+Date: Wed, 8 Nov 2017 09:57:47 -0600
 MIME-Version: 1.0
-In-Reply-To: <w51inekzv59.fsf@maestria.local.igalia.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-block] segfault in parallel blockjobs
- (iotest 30)
+In-Reply-To: <462c8b69-9665-1342-fd01-5ba57049a39c@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="XWhurDJJjVkBGJtQIwdd5SAEiDpL1DFGm"
+Subject: Re: [Qemu-devel] [PATCH] coroutine: Fix documentation of
+ co_aio_sleep_ns()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,46 +26,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--XWhurDJJjVkBGJtQIwdd5SAEiDpL1DFGm
+From: Eric Blake <eblake@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org,
+ Kevin Wolf <kwolf@redhat.com>
+Message-ID: <061e94f4-602e-3ff3-0f20-d3915e7a5550@redhat.com>
+Subject: Re: [PATCH] coroutine: Fix documentation of co_aio_sleep_ns()
+References: <20171107223708.17935-1-eblake@redhat.com>
+ <20171108154226.GC6118@stefanha-x1.localdomain>
+ <462c8b69-9665-1342-fd01-5ba57049a39c@redhat.com>
+In-Reply-To: <462c8b69-9665-1342-fd01-5ba57049a39c@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 11/08/2017 09:47 AM, Paolo Bonzini wrote:
+> On 08/11/2017 16:42, Stefan Hajnoczi wrote:
+>>> In any case, co_aio_sleep_ns()
+>>> + * does not affect the #AioContext where the current coroutine is ru=
+nning,
+>>> + * as the coroutine will restart on the same #AioContext that it is
+>>> + * running on.
+>> I cannot parse the second sentence.  What does "affecting" an AioConte=
+xt
+>> mean?  Does "where the current coroutine is running" simply mean "the
+>> caller"?
+>>
+>> What is it trying to say?  My guess is: the caller will be resumed in
+>> the current AioContext, not the timer's AioContext.
+>=20
+> Yes, that is the intended meaning.  Perhaps just s/current//.
+
+How about:
+
+This function uses timers and hence needs to know the event loop
+(#AioContext) to place the timer on.  After the time elapses, the
+current coroutine will restart with the same #AioContext it is currently
+running in, even if that is different than the timer context passed to
+co_aio_sleep_ns().
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
+--XWhurDJJjVkBGJtQIwdd5SAEiDpL1DFGm
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-On 8/11/2017 5:45 PM, Alberto Garcia wrote:
-> On Tue 07 Nov 2017 05:19:41 PM CET, Anton Nefedov wrote:
->> BlockBackend gets deleted by another job's stream_complete(), deferred
->> to the main loop, so the fact that the job is put to sleep by
->> bdrv_drain_all_begin() doesn't really stop it from execution.
-> 
-> I was debugging this a bit, and the block_job_defer_to_main_loop() call
-> happens _after_ all jobs have been paused, so I think that when the BDS
-> is drained then stream_run() finishes the last iteration without
-> checking if it's paused.
-> 
-> Without your patch (i.e. with a smaller STREAM_BUFFER_SIZE) then I
-> assume that the function would have to continue looping and
-> block_job_sleep_ns() would make the job coroutine yield, effectively
-> pausing the job and preventing the crash.
-> 
-> I can fix the crash by adding block_job_pause_point(&s->common) at the
-> end of stream_run() (where the 'out' label is).
-> 
-> I'm thinking that perhaps we should add the pause point directly to
-> block_job_defer_to_main_loop(), to prevent any block job from running
-> the exit function when it's paused.
-> 
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-Is it possible that the exit function is already deferred when the jobs
-are being paused? (even though it's at least less likely to happen)
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloDKXsACgkQp6FrSiUn
+Q2pnagf/e+5853+j30Q9nocVlNGa9KU+ODUdaSeNrj2YZRDRUURM8oEn+TrYroF9
+zesAUzPB5FS7C3bryJLdehpLtaQcjTWQrG40dDMeSILhpvIVkXqazrjHdA7tBabw
+HyS+7JzQ0U5t+8qGsaRtLirKFn1jGwUGvQb/ZA7F2LBMmavK/5sn0Vx0SIvERwTe
+t2vmfHW/nyYyzCxh0B0fDJlUyRwJx48OWULAHNuQxlnL9Ydjrj6cfdGb0ylZJFPY
+nYsH883TB+/UrgKOgomLWi8jwW+BPmFYD0W4xC3iLpi6sZUyXjPEsMskNRgYKsjw
+Da4yDU2+gftW5aUPLQ7Z7WklGdylsA==
+=QJvt
+-----END PGP SIGNATURE-----
 
-Then should we flush the bottom halves somehow in addition to putting
-the jobs to sleep? And also then it all probably has to happen before
-bdrv_reopen_queue()
-
-/Anton
-
-> Somehow I had the impression that we discussed this already in the past
-> (?) because I remember thinking about this very scenario.
-> 
-> Berto
-> 
+--XWhurDJJjVkBGJtQIwdd5SAEiDpL1DFGm--
