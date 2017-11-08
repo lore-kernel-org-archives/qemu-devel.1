@@ -1,21 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56281)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57561)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eCOBO-0007ME-5y
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 06:06:11 -0500
+	(envelope-from <bounces@canonical.com>) id 1eCOGO-0008HN-KF
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 06:11:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eCOBK-0005Cc-6o
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 06:06:10 -0500
-Date: Wed, 8 Nov 2017 12:05:57 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20171108120557.42e07dd3.cohuck@redhat.com>
-In-Reply-To: <20171107175455.73793-2-borntraeger@de.ibm.com>
-References: <20171107175455.73793-1-borntraeger@de.ibm.com>
-	<20171107175455.73793-2-borntraeger@de.ibm.com>
+	(envelope-from <bounces@canonical.com>) id 1eCOGK-0007X7-Kh
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 06:11:20 -0500
+Received: from indium.canonical.com ([91.189.90.7]:48350)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eCOGK-0007Wg-EW
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 06:11:16 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eCOGJ-0000L0-GC
+	for <qemu-devel@nongnu.org>; Wed, 08 Nov 2017 11:11:15 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 740D62E80C7
+	for <qemu-devel@nongnu.org>; Wed,  8 Nov 2017 11:11:15 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/1] s390x/pci: let pci devices start in
- configured mode
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 08 Nov 2017 11:00:31 -0000
+From: Thomas Huth <1713434@bugs.launchpad.net>
+Reply-To: Bug 1713434 <1713434@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150391152035.18876.7874968547091336063.malonedeb@chaenomeles.canonical.com>
+Message-Id: <151013883177.4992.190779185585065978.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1713434] Re: prom-env-test test aborted and core
+ dumped
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,38 +37,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Halil Pasic <pasic@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Yi Min Zhao <zyimin@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org
 
-On Tue,  7 Nov 2017 18:54:55 +0100
-Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+OK, so this was "only" the TCG-interpreter that was causing the sparc64
+problem here. Since there are known issues with the TCG-interpreter on
+certain architectures, this is not really related to the prom-env-test.
+And since the fix for the original
+"ERROR:tests/libqtest.c:628:qtest_get_arch: assertion failed" problem
+has been committed already ("commit db221e66d8117f8"), I'm marking the
+status of this bug now accordingly.
 
-> Currently, to enable a pci device in the guest, the user has to issue
-> echo 1 > /sys/bus/pci/slots/00000000/power. This is not what people
-> expect. On an LPAR, the user can put a PCI device in configured or
-> deconfigured state via IOCDS. The "start in deconfigured state" can be
-> used for "sharing" a pci function across LPARs. This is not what we are
-> going to use in KVM, so always start configured.
-> 
-> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> Acked-by: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
-> Reviewed-by: Pierre Morel <pmorel@linux.vnet.ibm.com>
-> ---
->  hw/s390x/s390-pci-bus.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-> index e7a58e8..2b1e140 100644
-> --- a/hw/s390x/s390-pci-bus.c
-> +++ b/hw/s390x/s390-pci-bus.c
-> @@ -715,7 +715,7 @@ static void s390_pcihost_hot_plug(HotplugHandler *hotplug_dev,
->          pbdev->pdev = pdev;
->          pbdev->iommu = s390_pci_get_iommu(s, pdev->bus, pdev->devfn);
->          pbdev->iommu->pbdev = pbdev;
-> -        pbdev->state = ZPCI_FS_STANDBY;
-> +        pbdev->state = ZPCI_FS_DISABLED;
->  
->          if (s390_pci_msix_init(pbdev)) {
->              error_setg(errp, "MSI-X support is mandatory "
+** Changed in: qemu
+       Status: In Progress =3D> Fix Committed
 
-Thanks, queued to s390-fixes.
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1713434
+
+Title:
+  prom-env-test test aborted and core dumped
+
+Status in QEMU:
+  Fix Committed
+
+Bug description:
+  On ppc64le architecture machine the following test case Aborted and
+  Core dumped.
+
+  # tests/prom-env-test --quiet --keep-going -m=3Dquick --GTestLogFD=3D6
+  **
+  ERROR:tests/libqtest.c:628:qtest_get_arch: assertion failed: (qemu !=3D N=
+ULL)
+  Aborted (core dumped)
+
+  Steps to re-produce:
+  clone from the git
+  configure & compile =
+
+  run the unit tests by 'make check'
+
+  (gdb) bt
+  #0  0x00003fff9d60eff0 in raise () from /lib64/libc.so.6
+  #1  0x00003fff9d61136c in abort () from /lib64/libc.so.6
+  #2  0x00003fff9de1aa04 in g_assertion_message () from /lib64/libglib-2.0.=
+so.0
+  #3  0x00003fff9de1ab0c in g_assertion_message_expr () from /lib64/libglib=
+-2.0.so.0
+  #4  0x000000001000cc30 in qtest_get_arch () at tests/libqtest.c:628
+  #5  0x00000000100048f0 in main (argc=3D5, argv=3D0x3ffff2145538) at tests=
+/prom-env-test.c:82
+  (gdb) i r
+  r0             0xfa	250
+  r1             0x3ffff2144d30	70368510627120
+  r2             0x3fff9d7b9900	70367091333376
+  r3             0x0	0
+  r4             0x12a7	4775
+  r5             0x6	6
+  r6             0x8	8
+  r7             0x1	1
+  r8             0x0	0
+  r9             0x0	0
+  r10            0x0	0
+  r11            0x0	0
+  r12            0x0	0
+  r13            0x3fff9dfa1950	70367099623760
+  r14            0x0	0
+  r15            0x0	0
+  r16            0x0	0
+  r17            0x0	0
+  r18            0x0	0
+  r19            0x0	0
+  r20            0x0	0
+  r21            0x0	0
+  r22            0x0	0
+  r23            0x0	0
+  r24            0x0	0
+  r25            0x0	0
+  r26            0x0	0
+  r27            0x100287f8	268601336
+  r28            0x16841b40	377756480
+  r29            0x4c	76
+  r30            0x3ffff2144de8	70368510627304
+  r31            0x6	6
+  pc             0x3fff9d60eff0	0x3fff9d60eff0 <raise+96>
+  msr            0x900000000280f033	10376293541503627315
+  cr             0x42000842	1107298370
+  lr             0x3fff9d61136c	0x3fff9d61136c <abort+396>
+  ctr            0x0	0
+  xer            0x0	0
+  orig_r3        0x12a7	4775
+  trap           0xc00	3072
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1713434/+subscriptions
