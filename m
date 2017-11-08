@@ -1,20 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38921)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39098)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eCOsr-0007S7-8b
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 06:51:06 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eCOtO-0007iD-9g
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 06:51:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eCOsn-0003s9-6s
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 06:51:05 -0500
-Date: Wed, 8 Nov 2017 12:50:56 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20171108125056.159597fd.cohuck@redhat.com>
-In-Reply-To: <20171107145546.767-1-richard.henderson@linaro.org>
-References: <20171107145546.767-1-richard.henderson@linaro.org>
+	(envelope-from <kwolf@redhat.com>) id 1eCOtN-0004Ee-Ie
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 06:51:38 -0500
+Date: Wed, 8 Nov 2017 12:51:27 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20171108115127.GC30890@localhost.localdomain>
+References: <20171107172638.29942-1-kwolf@redhat.com>
+	<20171107173920.GK3213@redhat.com>
+	<357d61df-9bad-dc5a-1878-2fce4b2a93cc@redhat.com>
+	<20171108104907.GN12670@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH] target/s390x: Finish
- implementing RISBGN
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171108104907.GN12670@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] block: Deprecate bdrv_set_read_only() and
+ users
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,56 +26,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, qemu-s390x@nongnu.org
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, mreitz@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, armbru@redhat.com
 
-On Tue,  7 Nov 2017 15:55:46 +0100
-Richard Henderson <richard.henderson@linaro.org> wrote:
-
-> We added the entry to insn-data.def, but failed to update op_risbg
-> to match.  No need to special-case the imask inversion, since that
-> is already ~0 for RISBG (and now RISBGN).
+Am 08.11.2017 um 11:49 hat Daniel P. Berrange geschrieben:
+> On Wed, Nov 08, 2017 at 11:44:01AM +0100, Paolo Bonzini wrote:
+> > On 07/11/2017 18:39, Daniel P. Berrange wrote:
+> > > On Tue, Nov 07, 2017 at 06:26:38PM +0100, Kevin Wolf wrote:
+> > >> bdrv_set_read_only() is used by some block drivers to override the
+> > >> read-only option given by the user. This is not how read-only images
+> > >> generally work in QEMU: Instead of second guessing what the user really
+> > >> meant (which currently includes making an image read-only even if the
+> > >> user didn't only use the default, but explicitly said read-only=off), we
+> > >> should error out if we can't provide what the user requested.
+> > >>
+> > >> This adds deprecation warnings to all callers of bdrv_set_read_only() so
+> > >> that the behaviour can be corrected after the usual deprecation period.
+> > > 
+> > > All deprecations should be listed in "Deprecated features" appendix
+> > > in qemu-doc.texi. This probably fits in the 'system emulator command
+> > > line arguments' section, even though its talking about the need for
+> > > the user to add something extra, rather than deleting something they
+> > > currently use.
+> > 
+> > I am not sure this counts as deprecation, but it should go in the
+> > release notes as "future incompatible changes", and that section
+> > probably should go in qemu-doc.texi itself.
 > 
-> Fixes: 375ee58bedcda359011fe7fa99e0647f66f9ffa0
-> Fixes: https://bugs.launchpad.net/qemu/+bug/1701798 (s390x part)
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/s390x/translate.c | 9 +++------
->  1 file changed, 3 insertions(+), 6 deletions(-)
-> 
-> diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-> index dee72a787d..85d0a6c3af 100644
-> --- a/target/s390x/translate.c
-> +++ b/target/s390x/translate.c
-> @@ -3432,6 +3432,7 @@ static ExitStatus op_risbg(DisasContext *s, DisasOps *o)
->      /* Adjust the arguments for the specific insn.  */
->      switch (s->fields->op2) {
->      case 0x55: /* risbg */
-> +    case 0x59: /* risbgn */
->          i3 &= 63;
->          i4 &= 63;
->          pmask = ~0;
-> @@ -3447,7 +3448,7 @@ static ExitStatus op_risbg(DisasContext *s, DisasOps *o)
->          pmask = 0x00000000ffffffffull;
->          break;
->      default:
-> -        abort();
-> +        g_assert_not_reached();
->      }
->  
->      /* MASK is the set of bits to be inserted from R2.
-> @@ -3464,11 +3465,7 @@ static ExitStatus op_risbg(DisasContext *s, DisasOps *o)
->         insns, we need to keep the other half of the register.  */
->      imask = ~mask | ~pmask;
->      if (do_zero) {
-> -        if (s->fields->op2 == 0x55) {
-> -            imask = 0;
-> -        } else {
-> -            imask = ~pmask;
-> -        }
-> +        imask = ~pmask;
->      }
->  
->      len = i4 - i3 + 1;
+> Yeah, adding a "Incompatible changes" appendix to the qemu-doc.texi
+> would be useful, listing the planned change, and when it is actually
+> made. That way apps adding support for a feature have an indication
+> of any incompatiblities they might need to care about.
 
-I can queue this to s390-fixes (unless there are other takers).
+You mean a section containing future incompatible changes as well as
+already implemented incompatible changes?
+
+What would we do with the existing "Deprecated features" section? Would
+it become a subsection of "Incompatible changes"? Or would we just
+rename it and the subsections would stay on the same level and get
+"deprecated" added to their title? Or a completely different structure?
+
+I'm okay with adding a little documentation in this patch if I know what
+it should look like, but if it turns into a major overhaul of the
+documentation on incompatible changes, it's probably out of scope for
+this patch.
+
+Kevin
