@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51773)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55573)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1eCG86-0000n0-4R
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 21:30:15 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eCGOn-0006bM-60
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 21:47:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1eCG82-0005eh-Vw
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 21:30:14 -0500
-Received: from mail-pl0-x241.google.com ([2607:f8b0:400e:c01::241]:45993)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1eCG82-0005eB-RC
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 21:30:10 -0500
-Received: by mail-pl0-x241.google.com with SMTP id 30so320485pla.2
-	for <qemu-devel@nongnu.org>; Tue, 07 Nov 2017 18:30:10 -0800 (PST)
-References: <1510060738-25975-1-git-send-email-s1seetee@linux.vnet.ibm.com>
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Message-ID: <7426dac9-67bf-a70a-bb5b-307de4602263@ozlabs.ru>
-Date: Wed, 8 Nov 2017 13:30:04 +1100
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eCGOk-0003rl-3a
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 21:47:29 -0500
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Date: Tue,  7 Nov 2017 23:47:19 -0300
+Message-Id: <20171108024719.8389-1-f4bug@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <1510060738-25975-1-git-send-email-s1seetee@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-AU
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v1] spapr_pci: fix the path
- while fetching loc-code from host DT
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH] docker: correctly escape $BACKEND in the help
+ output
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,48 +25,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Seeteena Thoufeek <s1seetee@linux.vnet.ibm.com>, david@gibson.dropbear.id.au, agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, "Daniel P . Berrange" <berrange@redhat.com>, Fam Zheng <famz@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
 
-On 08/11/17 00:18, Seeteena Thoufeek wrote:
-> The function spapr_phb_vfio_get_loc_code uses wrong path for
-> fetching loc-code from host DT
-> 
-> this is the call that needs to be fixed:
-> /* Construct and read from host device tree the loc-code */
-> path = g_strdup_printf("/proc/device-tree%s/ibm,loc-code", buf);
+In Makefiles the $ must be escaped as $$ in shell uses.
 
+Since 8a2390a4f47:
 
-I do not see why would extra '/' hurt but where does it really fail?
+ $ make docker
+     [...]
+     NETWORK=1            Enable virtual network interface with default backend.
+     NETWORK=ACKEND     Enable virtual network interface with ACKEND.
 
-My machines have leading '/' in devspec, do not yours?
+Once escaped:
 
-aik@garrison2:~$ cat /sys/bus/pci/devices/0009:03:00.0/devspec && echo -e '\n'
-/pciex@3fffe40500000/pci@0/pci@0/pci@1/usb-xhci@0
+ $ make docker
+     [...]
+     NETWORK=1            Enable virtual network interface with default backend.
+     NETWORK=$BACKEND     Enable virtual network interface with $BACKEND.
 
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ tests/docker/Makefile.include | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-
-
-> 
-> Signed-off-by: Seeteena Thoufeek <s1seetee@linux.vnet.ibm.com>
-> ---
->  hw/ppc/spapr_pci.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-> index 5a3122a..ae86322 100644
-> --- a/hw/ppc/spapr_pci.c
-> +++ b/hw/ppc/spapr_pci.c
-> @@ -762,7 +762,7 @@ static char *spapr_phb_vfio_get_loc_code(sPAPRPHBState *sphb,  PCIDevice *pdev)
->      g_free(path);
->  
->      /* Construct and read from host device tree the loc-code */
-> -    path = g_strdup_printf("/proc/device-tree%s/ibm,loc-code", buf);
-> +    path = g_strdup_printf("/proc/device-tree/%s/ibm,loc-code", buf);
->      g_free(buf);
->      if (!g_file_get_contents(path, &buf, NULL, NULL)) {
->          goto err_out;
-> 
-
-
+diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
+index f1a398e9fa..de87341528 100644
+--- a/tests/docker/Makefile.include
++++ b/tests/docker/Makefile.include
+@@ -109,7 +109,7 @@ docker:
+ 	@echo '    DEBUG=1              Stop and drop to shell in the created container'
+ 	@echo '                         before running the command.'
+ 	@echo '    NETWORK=1            Enable virtual network interface with default backend.'
+-	@echo '    NETWORK=$BACKEND     Enable virtual network interface with $BACKEND.'
++	@echo '    NETWORK=$$BACKEND     Enable virtual network interface with $$BACKEND.'
+ 	@echo '    NOUSER               Define to disable adding current user to containers passwd.'
+ 	@echo '    NOCACHE=1            Ignore cache when build images.'
+ 	@echo '    EXECUTABLE=<path>    Include executable in image.'
 -- 
-Alexey
+2.15.0
