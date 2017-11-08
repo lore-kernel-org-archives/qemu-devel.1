@@ -1,40 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56672)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59581)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1eCUyW-0006T1-Rj
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 13:21:21 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1eCVC2-0001T5-VQ
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 13:35:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1eCUyT-0000gy-N1
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 13:21:20 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:45432)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1eCUyT-0000gU-EA
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 13:21:17 -0500
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vA8IJfOC089597
-	for <qemu-devel@nongnu.org>; Wed, 8 Nov 2017 13:21:15 -0500
-Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2e44gvst78-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 08 Nov 2017 13:21:02 -0500
-Received: from localhost
-	by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Wed, 8 Nov 2017 13:20:29 -0500
-References: <1510016336-4086-1-git-send-email-stefanb@linux.vnet.ibm.com>
-	<1510016336-4086-6-git-send-email-stefanb@linux.vnet.ibm.com>
-	<20171108162256.GF13150@boraha>
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Wed, 8 Nov 2017 13:20:27 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1eCVBz-0006Y0-Qt
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 13:35:19 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33362)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1eCVBz-0006WP-F2
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 13:35:15 -0500
+Date: Wed, 8 Nov 2017 16:35:09 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20171108183509.GS3111@localhost.localdomain>
+References: <20171030040056.11780-1-f4bug@amsat.org>
+	<20171030082029.GY2993@localhost.localdomain>
+	<20171108132857.GT12670@redhat.com>
+	<1ecb6a4b-465f-0949-e039-441038f1adf8@amsat.org>
+	<20171108165905.GN3111@localhost.localdomain>
+	<20171108170629.GD12670@redhat.com>
+	<20171108172547.GP3111@localhost.localdomain>
+	<e2ae58f9-4f19-ad9f-c287-2bc282a6de2f@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <20171108162256.GF13150@boraha>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Message-Id: <d049e7e6-690f-ebc7-b27b-85033371b0eb@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <e2ae58f9-4f19-ad9f-c287-2bc282a6de2f@amsat.org>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 5/5] tpm: tpm_passthrough: Fail startup if
- FE buffer size < BE buffer size
+Subject: Re: [Qemu-devel] [RFC PATCH] vl: only display available accelerators
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,78 +34,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, amarnath.valluri@intel.com
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, Thomas Huth <thuth@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Markus Armbruster <armbru@redhat.com>, Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org, "Emilio G . Cota" <cota@braap.org>, Anthony Perard <anthony.perard@citrix.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Christoffer Dall <cdall@linaro.org>, Vincent Palatin <vpalatin@chromium.org>
 
-On 11/08/2017 11:22 AM, Marc-Andr=E9 Lureau wrote:
-> Hi Stefan,
->
-> On Mon, Nov 06, 2017 at 07:58:56PM -0500, Stefan Berger wrote:
->> If the requested buffer size of the frontend is smaller than the fixed
->> buffer size of the host's TPM, fail the startup_tpm() interface functi=
-on,
->> which will make the device unusable. We fail it because the backend TP=
-M
->> could produce larger packets than what the frontend could pass to the =
-OS.
->>
->> The current combination of TIS frontend and either passthrough or emul=
-ator
->> backend will not lead to this case since the TIS can support any size =
-of
->> buffer.
->>
->> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
->> ---
->>   hw/tpm/tpm_passthrough.c | 15 +++++++++++++++
->>   1 file changed, 15 insertions(+)
->>
->> diff --git a/hw/tpm/tpm_passthrough.c b/hw/tpm/tpm_passthrough.c
->> index ec755fe..66d5098 100644
->> --- a/hw/tpm/tpm_passthrough.c
->> +++ b/hw/tpm/tpm_passthrough.c
->> @@ -304,6 +304,20 @@ static TPMBackend *tpm_passthrough_create(QemuOpt=
-s *opts)
->>       return TPM_BACKEND(obj);
->>   }
->>  =20
->> +static int tpm_passthrough_startup_tpm(TPMBackend *tb, uint32_t buffe=
-rsize)
->> +{
->> +    TPMPassthruState *tpm_pt =3D TPM_PASSTHROUGH(tb);
->> +
->> +    if (buffersize && buffersize < tpm_pt->tpm_buffersize) {
->> +        error_report("Requested buffer size of %u is smaller than hos=
-t TPM's "
->> +                     "fixed buffer size of %u",
->> +                     buffersize, tpm_pt->tpm_buffersize);
-> Looks ok
->
->> +        return -1;
->> +    }
->> +
->> +    return 0;
->> +}
->> +
->>   static TpmTypeOptions *tpm_passthrough_get_tpm_options(TPMBackend *t=
-b)
->>   {
->>       TpmTypeOptions *options =3D g_new0(TpmTypeOptions, 1);
->> @@ -362,6 +376,7 @@ static void tpm_passthrough_class_init(ObjectClass=
- *klass, void *data)
->>       tbc->opts =3D tpm_passthrough_cmdline_opts;
->>       tbc->desc =3D "Passthrough TPM backend driver";
->>       tbc->create =3D tpm_passthrough_create;
->> +    tbc->startup_tpm =3D tpm_passthrough_startup_tpm;
->>       tbc->reset =3D tpm_passthrough_reset;
->>       tbc->cancel_cmd =3D tpm_passthrough_cancel_cmd;
->>       tbc->get_tpm_established_flag =3D tpm_passthrough_get_tpm_establ=
-ished_flag;
->> --=20
->> 2.5.5
-> Reviewed-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
->
+On Wed, Nov 08, 2017 at 03:03:34PM -0300, Philippe Mathieu-Daud=E9 wrote:
+> On 11/08/2017 02:25 PM, Eduardo Habkost wrote:
+> > On Wed, Nov 08, 2017 at 05:06:29PM +0000, Daniel P. Berrange wrote:
+> >> On Wed, Nov 08, 2017 at 02:59:05PM -0200, Eduardo Habkost wrote:
+> >>> On Wed, Nov 08, 2017 at 01:21:33PM -0300, Philippe Mathieu-Daud=E9 =
+wrote:
+> >>>> On 11/08/2017 10:28 AM, Daniel P. Berrange wrote:
+> >>>>> On Mon, Oct 30, 2017 at 09:20:29AM +0100, Eduardo Habkost wrote:
+> >>>>>> On Mon, Oct 30, 2017 at 01:00:56AM -0300, Philippe Mathieu-Daud=E9=
+ wrote:
+> >>>>>>> examples configuring with '--enable-kvm --disable-tcg'
+> >>>>>>>
+> >>>>>>> - before
+> >>>>>>>
+> >>>>>>>   $ qemu-system-x86_64 -accel help
+> >>>>>>>   Possible accelerators: kvm, xen, hax, tcg
+> >>>>>>>
+> >>>>>>>   $ qemu-system-x86_64 -accel tcg
+> >>>>>>>   qemu-system-x86_64: -machine accel=3Dtcg: No accelerator foun=
+d
+> >>>>>>>
+> >>>>>>>   # qemu-system-x86_64 -accel hax
+> >>>>>>>   qemu-system-x86_64: -machine accel=3Dhax: No accelerator foun=
+d
+> >>>>>>>
+> >>>>>>>   # qemu-system-x86_64 -accel xen
+> >>>>>>>   xencall: error: Could not obtain handle on privileged command=
+ interface: No such file or directory
+> >>>>>>>   xen be core: xen be core: can't open xen interface
+> >>>>>>>   can't open xen interface
+> >>>>>>>   qemu-system-x86_64: failed to initialize Xen: Operation not p=
+ermitted
+> >>>>>>>
+> >>>>>>> - after
+> >>>>>>>
+> >>>>>>>   $ qemu-system-x86_64 -accel help
+> >>>>>>>   Possible accelerators: kvm
+> >>>>>>>
+> >>>>>>> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+> >>>>>>> ---
+> >>>>>>> RFC because:
+> >>>>>>>     - I don't think this is the nicest way, too much #ifdef'fer=
+y in main()
+> >>>>>>
+> >>>>>> I suggest using object_class_get_list(TYPE_ACCEL, false).
+> >>>>>
+> >>>>> And check the result of the available() method on the returned cl=
+asses
+> >>>>> too, to filter the results.
+> >>>>
+> >>>> Good idea! I'll use that.
+> >>>
+> >>> It looks like QTest is the only accelerator that implements
+> >>> ->available(), and its return value is a build-time constant that
+> >>> depends only on CONFIG_POSIX.
+> >>>
+> >>> I wonder why we don't simply avoid compiling the qtest class if
+> >>> CONFIG_POSIX is unset, making the ->available() method
+> >>> unnecessary.
+> >>
+> >> Yeah that does seem simpler, though I'm surprised that Xen does not
+> >> implement the available method. Xen is an accel I'd expect to see
+> >> compiled into an x86 build, but is only available if the host is
+> >> actually booted under a Xen hypervisor.  Likewise shouldn't kvm
+> >> only report itself as available if the /dev/kvm actually exists.
+> >> But maybe that's not the kind of semantics code using available()
+> >> expects ?
+> >=20
+> > Currently the only caller of ->available() calls ->init_machine()
+> > immediately afterwards, so for the current code it doesn't matter
+> > if the check is inside ->available() or ->init_machine().
+> >=20
+> > That said, I'm not sure we should look for /dev/kvm or check for
+> > the Xen hypervisor when handling "-accel help".  I expect help
+> > text to tell the user what the QEMU binary supports, not what the
+> > current host supports.
+>=20
+> Yes I prefer that too, I'll write something up such:
+>=20
+> static bool kvm_available(void)
+> {
+>     return access("/dev/kvm", R_OK|W_OK) =3D=3D 0;
+> }
+>=20
+> However I wonder, if an user is not in the kvm group but is in sudoers
+> and run "qemu-system-aarch64 -accel help" he won't see KVM as
+> available... (I tend to not use sudo when looking for -help output).
 
-Thanks for the review. I'll post v2 shortly.
+If we do that, I think we should include kvm in the list anyway,
+but just add a column indicating that it doesn't seem to be
+available on the host.
 
-     Stefan
+In either case, I suggest implementing it as a separate patch,
+and just ignore ->available() in the first version.
+
+>=20
+> same with:
+>=20
+> static bool hax_available(void)
+> {
+>     return access("/dev/HAX", R_OK|W_OK) =3D=3D 0;
+> }
+>=20
+> ok for:
+>=20
+> static bool xen_available(void)
+> {
+>     return access("/sys/hypervisor/properties/features", F_OK) =3D=3D 0=
+;
+> }
+>=20
+> On POWER7 we have:
+>=20
+> /* On ppc64, the test only works with kvm-hv, but not with kvm-pr */
+> accel =3D access("/sys/module/kvm_hv", F_OK) ? "tcg" : "kvm:tcg";
+>=20
+> Isn't it cleaner to register 2 accelerators, KVM-PR and KVM-HV and have
+> KVM being an alias?
+
+I believe "-accel kvm,kvm-type=3DHV" and "-accel kvm,kvm-type=3DPR"
+would be cleaner ways to represent the two modes, instead of
+having two different accelerator classes.  This is not supported
+by the current "<accel1>:<accel2>" syntax, but I think we should
+replace that syntax with something better anyway.
+
+--=20
+Eduardo
