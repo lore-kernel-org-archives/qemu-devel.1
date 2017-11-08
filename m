@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40728)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41750)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eCP2a-0001YT-Od
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 07:01:14 -0500
+	(envelope-from <programmingkidx@gmail.com>) id 1eCP6Q-0002WT-EA
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 07:05:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eCP2R-0000V0-77
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 07:01:08 -0500
-References: <20171107172638.29942-1-kwolf@redhat.com>
-	<20171107173920.GK3213@redhat.com>
-	<357d61df-9bad-dc5a-1878-2fce4b2a93cc@redhat.com>
-	<20171108104907.GN12670@redhat.com>
-	<20171108115127.GC30890@localhost.localdomain>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f5dc8522-86cd-c8fa-2dd7-d9e36c5c8245@redhat.com>
-Date: Wed, 8 Nov 2017 13:00:38 +0100
-MIME-Version: 1.0
-In-Reply-To: <20171108115127.GC30890@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] block: Deprecate bdrv_set_read_only() and
- users
+	(envelope-from <programmingkidx@gmail.com>) id 1eCP6M-0002Q5-81
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 07:05:06 -0500
+Received: from mail-io0-x243.google.com ([2607:f8b0:4001:c06::243]:43599)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+	id 1eCP6M-0002PL-4J
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 07:05:02 -0500
+Received: by mail-io0-x243.google.com with SMTP id 134so5685088ioo.0
+	for <qemu-devel@nongnu.org>; Wed, 08 Nov 2017 04:05:01 -0800 (PST)
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+From: Programmingkid <programmingkidx@gmail.com>
+In-Reply-To: <1510049762-4609-3-git-send-email-peter.maydell@linaro.org>
+Date: Wed, 8 Nov 2017 07:04:58 -0500
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <CD2DCF39-4633-4F81-8B5E-75B49DB93D12@gmail.com>
+References: <1510049762-4609-1-git-send-email-peter.maydell@linaro.org>
+	<1510049762-4609-3-git-send-email-peter.maydell@linaro.org>
+Subject: Re: [Qemu-devel] [PULL 2/3] ui/cocoa.m: move ungrab to ctrl-alt-g
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,35 +30,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
-Cc: mreitz@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, armbru@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org
 
-On 08/11/2017 12:51, Kevin Wolf wrote:
-> Am 08.11.2017 um 11:49 hat Daniel P. Berrange geschrieben:
->> On Wed, Nov 08, 2017 at 11:44:01AM +0100, Paolo Bonzini wrote:
->>> I am not sure this counts as deprecation, but it should go in the
->>> release notes as "future incompatible changes", and that section
->>> probably should go in qemu-doc.texi itself.
->>
->> Yeah, adding a "Incompatible changes" appendix to the qemu-doc.texi
->> would be useful, listing the planned change, and when it is actually
->> made. That way apps adding support for a feature have an indication
->> of any incompatiblities they might need to care about.
-> 
-> You mean a section containing future incompatible changes as well as
-> already implemented incompatible changes?
-> 
-> What would we do with the existing "Deprecated features" section? Would
-> it become a subsection of "Incompatible changes"? Or would we just
-> rename it and the subsections would stay on the same level and get
-> "deprecated" added to their title? Or a completely different structure?
-> 
-> I'm okay with adding a little documentation in this patch if I know what
-> it should look like, but if it turns into a major overhaul of the
-> documentation on incompatible changes, it's probably out of scope for
-> this patch.
 
-For now I would just add a section to the changelog.  That ensures that
-we don't forget and end up doing nothing.
+> On Nov 7, 2017, at 5:16 AM, Peter Maydell <peter.maydell@linaro.org> =
+wrote:
+>=20
+> From: John Arbuckle <programmingkidx@gmail.com>
+>=20
+> Currently the cocoa user interface relis on the user pushing
 
-Paolo
+I would change "relis" to "relies" here.
+
+> control-alt to ungrab the mouse.  This is patch changes the key
+> combination to control-alt-g to be in line with the GTK user
+> interface.
+>=20
+> Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
+> Message-id: 20171102213907.11443-1-programmingkidx@gmail.com
+> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+> ui/cocoa.m | 31 ++++++++++++++++++-------------
+> 1 file changed, 18 insertions(+), 13 deletions(-)
+>=20
+> diff --git a/ui/cocoa.m b/ui/cocoa.m
+> index 2f76dac..f39c792 100644
+> --- a/ui/cocoa.m
+> +++ b/ui/cocoa.m
+> @@ -674,10 +674,6 @@ QemuCocoaView *cocoaView;
+>                 }
+>             }
+>=20
+> -            // release Mouse grab when pressing ctrl+alt
+> -            if (([event modifierFlags] & NSEventModifierFlagControl) =
+&& ([event modifierFlags] & NSEventModifierFlagOption)) {
+> -                [self ungrabMouse];
+> -            }
+>             break;
+>         case NSEventTypeKeyDown:
+>             keycode =3D cocoa_keycode_to_qemu([event keyCode]);
+> @@ -690,14 +686,23 @@ QemuCocoaView *cocoaView;
+>=20
+>             // default
+>=20
+> -            // handle control + alt Key Combos (ctrl+alt is reserved =
+for QEMU)
+> +            // handle control + alt Key Combos (ctrl+alt+[1..9,g] is =
+reserved for QEMU)
+>             if (([event modifierFlags] & NSEventModifierFlagControl) =
+&& ([event modifierFlags] & NSEventModifierFlagOption)) {
+> -                switch (keycode) {
+> -
+> -                    // enable graphic console
+> -                    case Q_KEY_CODE_1 ... Q_KEY_CODE_9: // '1' to '9' =
+keys
+> -                        console_select(keycode - Q_KEY_CODE_1);
+> -                        break;
+> +                NSString *keychar =3D [event =
+charactersIgnoringModifiers];
+> +                if ([keychar length] =3D=3D 1) {
+> +                    char key =3D [keychar characterAtIndex:0];
+> +                    switch (key) {
+> +
+> +                        // enable graphic console
+> +                        case '1' ... '9':
+> +                            console_select(key - '0' - 1); /* ascii =
+math */
+> +                            return;
+> +
+> +                        // release the mouse grab
+> +                        case 'g':
+> +                            [self ungrabMouse];
+> +                            return;
+> +                    }
+>                 }
+>=20
+>             // handle keys for graphic console
+> @@ -840,9 +845,9 @@ QemuCocoaView *cocoaView;
+>=20
+>     if (!isFullscreen) {
+>         if (qemu_name)
+> -            [normalWindow setTitle:[NSString stringWithFormat:@"QEMU =
+%s - (Press ctrl + alt to release Mouse)", qemu_name]];
+> +            [normalWindow setTitle:[NSString stringWithFormat:@"QEMU =
+%s - (Press ctrl + alt + g to release Mouse)", qemu_name]];
+>         else
+> -            [normalWindow setTitle:@"QEMU - (Press ctrl + alt to =
+release Mouse)"];
+> +            [normalWindow setTitle:@"QEMU - (Press ctrl + alt + g to =
+release Mouse)"];
+>     }
+>     [self hideCursor];
+>     if (!isAbsoluteEnabled) {
+> --=20
+> 2.7.4
+>=20
