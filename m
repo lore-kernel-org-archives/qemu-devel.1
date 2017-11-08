@@ -1,15 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38919)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39375)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <joel.stan@gmail.com>) id 1eCGz5-0004sj-BD
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 22:25:00 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eCH2A-0005ja-EX
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 22:28:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <joel.stan@gmail.com>) id 1eCGz4-00008R-Ac
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 22:24:59 -0500
-Sender: "joel.stan@gmail.com" <joel.stan@gmail.com>
-From: Joel Stanley <joel@jms.id.au>
-Date: Wed,  8 Nov 2017 13:54:27 +1030
-Message-Id: <20171108032427.11163-1-joel@jms.id.au>
-Subject: [Qemu-devel] [PATCH] hw/arm/aspeed: Unlock SCU when running kernel
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eCH25-0000u9-JW
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 22:28:10 -0500
+Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:48857)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eCH25-0000u0-En
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 22:28:05 -0500
+Received: by mail-qt0-x244.google.com with SMTP id f8so1740418qta.5
+	for <qemu-devel@nongnu.org>; Tue, 07 Nov 2017 19:28:05 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20171108022828.7242-1-f4bug@amsat.org>
+	<20171108022828.7242-6-f4bug@amsat.org>
+	<b49e3557-7593-44ac-3337-41ee95451457@ozlabs.ru>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <17a9e801-0f13-a438-e57d-f511c5ed92ee@amsat.org>
+Date: Wed, 8 Nov 2017 00:28:00 -0300
+MIME-Version: 1.0
+In-Reply-To: <b49e3557-7593-44ac-3337-41ee95451457@ozlabs.ru>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [RFC PATCH 5/6] hw/i386: deprecate the pc-0.10 and
+ pc-0.11 machines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,129 +37,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, Andrew Jeffery <andrew@aj.id.au>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: Alexey Kardashevskiy <aik@ozlabs.ru>, Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org
 
-The ASPEED hardware contains a lock register for the SCU that disables
-any writes to the SCU when it is locked. The machine comes up with the
-lock enabled, but on all known hardware u-boot will unlock it and leave
-it unlocked when loading the kernel.
+Hi Alexey,
 
-This means the kernel expects the SCU to be unlocked. When booting from
-an emulated ROM the normal u-boot unlock path is executed. Things don't
-go well when booting using the -kernel command line, as u-boot does not
-run first.
+On 11/07/2017 11:48 PM, Alexey Kardashevskiy wrote:
+> On 08/11/17 13:28, Philippe Mathieu-Daudé wrote:
+>> Both are deprecated since 2.9.0
+> 
+> May be so but I could not find where this happened in git history:
+> 
+> [vpl1 qemu]$ git log -n1 --grep 'pc-0.10'
+> f6d5a0bad2 2 years, 5 months ago Eduardo Habkost piix: Define PC_COMPAT_0_10
+> 
+> Having some pointers in the commit log would be helpful imho, like [2/6].
 
-Change behaviour so that when a kernel is passed to the machine, set the
-reset value of the SCU to be unlocked.
+Ok! If there is positive feedback on this series I'll respin trying to
+be more verbose.
 
-Signed-off-by: Joel Stanley <joel@jms.id.au>
----
- hw/arm/aspeed.c               | 10 ++++++++++
- hw/arm/aspeed_soc.c           |  2 ++
- hw/misc/aspeed_scu.c          |  2 ++
- hw/misc/aspeed_sdmc.c         |  1 -
- include/hw/misc/aspeed_scu.h  |  1 +
- include/hw/misc/aspeed_sdmc.h |  2 ++
- 6 files changed, 17 insertions(+), 1 deletion(-)
+I took "2.9.0" from the wiki history [1], which is the formal way to go
+as I understand:
 
-diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
-index ab895ad490af..179ee66624b9 100644
---- a/hw/arm/aspeed.c
-+++ b/hw/arm/aspeed.c
-@@ -36,6 +36,7 @@ typedef struct AspeedBoardState {
- typedef struct AspeedBoardConfig {
-     const char *soc_name;
-     uint32_t hw_strap1;
-+    uint32_t hw_prot_key;
-     const char *fmc_model;
-     const char *spi_model;
-     uint32_t num_cs;
-@@ -186,6 +187,15 @@ static void aspeed_board_init(MachineState *machine,
-                             &error_abort);
-     object_property_set_int(OBJECT(&bmc->soc), cfg->num_cs, "num-cs",
-                             &error_abort);
-+    if (machine->kernel_filename) {
-+        /*
-+         * When booting with a -kernel command line there is no u-boot
-+         * that runs to unlock the SCU. In this case set the default to
-+         * be unlocked as the kernel expects
-+         */
-+        object_property_set_int(OBJECT(&bmc->soc), PROT_KEY_UNLOCK,
-+                                "hw-prot-key", &error_abort);
-+    }
-     object_property_set_bool(OBJECT(&bmc->soc), true, "realized",
-                              &error_abort);
- 
-diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
-index 5aa3d2ddd9cd..c83b7e207b86 100644
---- a/hw/arm/aspeed_soc.c
-+++ b/hw/arm/aspeed_soc.c
-@@ -154,6 +154,8 @@ static void aspeed_soc_init(Object *obj)
-                               "hw-strap1", &error_abort);
-     object_property_add_alias(obj, "hw-strap2", OBJECT(&s->scu),
-                               "hw-strap2", &error_abort);
-+    object_property_add_alias(obj, "hw-prot-key", OBJECT(&s->scu),
-+                              "hw-prot-key", &error_abort);
- 
-     object_initialize(&s->fmc, sizeof(s->fmc), sc->info->fmc_typename);
-     object_property_add_child(obj, "fmc", OBJECT(&s->fmc), NULL);
-diff --git a/hw/misc/aspeed_scu.c b/hw/misc/aspeed_scu.c
-index 95022d3607ad..c71e77729581 100644
---- a/hw/misc/aspeed_scu.c
-+++ b/hw/misc/aspeed_scu.c
-@@ -246,6 +246,7 @@ static void aspeed_scu_reset(DeviceState *dev)
-     s->regs[SILICON_REV] = s->silicon_rev;
-     s->regs[HW_STRAP1] = s->hw_strap1;
-     s->regs[HW_STRAP2] = s->hw_strap2;
-+    s->regs[PROT_KEY] = s->hw_prot_key;
- }
- 
- static uint32_t aspeed_silicon_revs[] = {
-@@ -299,6 +300,7 @@ static Property aspeed_scu_properties[] = {
-     DEFINE_PROP_UINT32("silicon-rev", AspeedSCUState, silicon_rev, 0),
-     DEFINE_PROP_UINT32("hw-strap1", AspeedSCUState, hw_strap1, 0),
-     DEFINE_PROP_UINT32("hw-strap2", AspeedSCUState, hw_strap2, 0),
-+    DEFINE_PROP_UINT32("hw-prot-key", AspeedSCUState, hw_prot_key, 0),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
-diff --git a/hw/misc/aspeed_sdmc.c b/hw/misc/aspeed_sdmc.c
-index f0b3053fae36..35dc803604f8 100644
---- a/hw/misc/aspeed_sdmc.c
-+++ b/hw/misc/aspeed_sdmc.c
-@@ -18,7 +18,6 @@
- 
- /* Protection Key Register */
- #define R_PROT            (0x00 / 4)
--#define   PROT_KEY_UNLOCK     0xFC600309
- 
- /* Configuration Register */
- #define R_CONF            (0x04 / 4)
-diff --git a/include/hw/misc/aspeed_scu.h b/include/hw/misc/aspeed_scu.h
-index bd4ac013f997..f5da54e27105 100644
---- a/include/hw/misc/aspeed_scu.h
-+++ b/include/hw/misc/aspeed_scu.h
-@@ -29,6 +29,7 @@ typedef struct AspeedSCUState {
-     uint32_t silicon_rev;
-     uint32_t hw_strap1;
-     uint32_t hw_strap2;
-+    uint32_t hw_prot_key;
- } AspeedSCUState;
- 
- #define AST2400_A0_SILICON_REV   0x02000303U
-diff --git a/include/hw/misc/aspeed_sdmc.h b/include/hw/misc/aspeed_sdmc.h
-index 551c8afdf4be..a1b3232c5ef3 100644
---- a/include/hw/misc/aspeed_sdmc.h
-+++ b/include/hw/misc/aspeed_sdmc.h
-@@ -16,6 +16,8 @@
- 
- #define ASPEED_SDMC_NR_REGS (0x8 >> 2)
- 
-+#define PROT_KEY_UNLOCK 0xFC600309
-+
- typedef struct AspeedSDMCState {
-     /*< private >*/
-     SysBusDevice parent_obj;
--- 
-2.14.1
+Before an "interface" can be removed, there needs to be a clear
+transition plan for doing so. This means it should be added to this wiki
+page, and that there have to be at least two public releases of QEMU
+where the interface still works, but issues a warning when used. Two
+public releases are required so that the users have at least one
+development cycle to complain if they think that there is a good reason
+that the interface should not be removed. The warning should say that
+the interface is deprecated / going away soon, with a pointer to
+documentation or similar information about its replacement syntax.
+
+[1]
+https://wiki.qemu.org/index.php?title=Features/LegacyRemoval&action=history
+
+>>
+>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>> ---
+>>  hw/i386/pc_piix.c | 2 ++
+>>  1 file changed, 2 insertions(+)
+>>
+>> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+>> index f79d5cb694..c462b702ff 100644
+>> --- a/hw/i386/pc_piix.c
+>> +++ b/hw/i386/pc_piix.c
+>> @@ -941,6 +941,7 @@ static void pc_i440fx_0_11_machine_options(MachineClass *m)
+>>      pc_i440fx_0_12_machine_options(m);
+>>      m->hw_version = "0.11";
+>>      SET_MACHINE_COMPAT(m, PC_COMPAT_0_11);
+>> +    m->deprecated_reason = "Too old";
+>>  }
+>>  
+>>  DEFINE_I440FX_MACHINE(v0_11, "pc-0.11", pc_compat_0_13,
+>> @@ -976,6 +977,7 @@ static void pc_i440fx_0_10_machine_options(MachineClass *m)
+>>      pc_i440fx_0_11_machine_options(m);
+>>      m->hw_version = "0.10";
+>>      SET_MACHINE_COMPAT(m, PC_COMPAT_0_10);
+>> +    m->deprecated_reason = "Too old";
+>>  }
+>>  
+>>  DEFINE_I440FX_MACHINE(v0_10, "pc-0.10", pc_compat_0_13,
+>>
