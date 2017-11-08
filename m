@@ -1,33 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46640)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46807)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eCT6m-0007fh-G0
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 11:21:50 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1eCT7F-00087i-Ao
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 11:22:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eCT6h-0000j0-IV
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 11:21:44 -0500
-Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:54190)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eCT6h-0000iq-Do
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 11:21:39 -0500
-Received: by mail-qt0-x242.google.com with SMTP id n61so3985290qte.10
-	for <qemu-devel@nongnu.org>; Wed, 08 Nov 2017 08:21:39 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20171030040056.11780-1-f4bug@amsat.org>
-	<20171030082029.GY2993@localhost.localdomain>
-	<20171108132857.GT12670@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <1ecb6a4b-465f-0949-e039-441038f1adf8@amsat.org>
-Date: Wed, 8 Nov 2017 13:21:33 -0300
+	(envelope-from <marcandre.lureau@redhat.com>) id 1eCT79-0000xC-MB
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 11:22:13 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55780)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1eCT79-0000wg-Fz
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 11:22:07 -0500
+Date: Wed, 8 Nov 2017 17:22:05 +0100
+From: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
+Message-ID: <20171108162205.GD13150@boraha>
+References: <1510016336-4086-1-git-send-email-stefanb@linux.vnet.ibm.com>
+	<1510016336-4086-3-git-send-email-stefanb@linux.vnet.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20171108132857.GT12670@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RFC PATCH] vl: only display available accelerators
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <1510016336-4086-3-git-send-email-stefanb@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 2/5] tpm: pull tpm_util_send() out of
+ tpm_util_test()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,44 +30,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Markus Armbruster <armbru@redhat.com>, Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org, "Emilio G . Cota" <cota@braap.org>, Anthony Perard <anthony.perard@citrix.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, amarnath.valluri@intel.com
 
-On 11/08/2017 10:28 AM, Daniel P. Berrange wrote:
-> On Mon, Oct 30, 2017 at 09:20:29AM +0100, Eduardo Habkost wrote:
->> On Mon, Oct 30, 2017 at 01:00:56AM -0300, Philippe Mathieu-Daudé wrote:
->>> examples configuring with '--enable-kvm --disable-tcg'
->>>
->>> - before
->>>
->>>   $ qemu-system-x86_64 -accel help
->>>   Possible accelerators: kvm, xen, hax, tcg
->>>
->>>   $ qemu-system-x86_64 -accel tcg
->>>   qemu-system-x86_64: -machine accel=tcg: No accelerator found
->>>
->>>   # qemu-system-x86_64 -accel hax
->>>   qemu-system-x86_64: -machine accel=hax: No accelerator found
->>>
->>>   # qemu-system-x86_64 -accel xen
->>>   xencall: error: Could not obtain handle on privileged command interface: No such file or directory
->>>   xen be core: xen be core: can't open xen interface
->>>   can't open xen interface
->>>   qemu-system-x86_64: failed to initialize Xen: Operation not permitted
->>>
->>> - after
->>>
->>>   $ qemu-system-x86_64 -accel help
->>>   Possible accelerators: kvm
->>>
->>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->>> ---
->>> RFC because:
->>>     - I don't think this is the nicest way, too much #ifdef'fery in main()
->>
->> I suggest using object_class_get_list(TYPE_ACCEL, false).
-> 
-> And check the result of the available() method on the returned classes
-> too, to filter the results.
+Hi Stefan,
 
-Good idea! I'll use that.
+On Mon, Nov 06, 2017 at 07:58:53PM -0500, Stefan Berger wrote:
+> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+> ---
+>  hw/tpm/tpm_util.c | 33 ++++++++++++++++++++++++++-------
+>  1 file changed, 26 insertions(+), 7 deletions(-)
+>=20
+> diff --git a/hw/tpm/tpm_util.c b/hw/tpm/tpm_util.c
+> index daf1faa..396e793 100644
+> --- a/hw/tpm/tpm_util.c
+> +++ b/hw/tpm/tpm_util.c
+> @@ -53,10 +53,11 @@ bool tpm_util_is_selftest(const uint8_t *in, uint32=
+_t in_len)
+>   * A basic test of a TPM device. We expect a well formatted response h=
+eader
+>   * (error response is fine) within one second.
+>   */
+> -static int tpm_util_test(int fd,
+> -                         unsigned char *request,
+> -                         size_t requestlen,
+> -                         uint16_t *return_tag)
+> +static int tpm_util_tx(int fd,
+
+The function is not just tx, but write & read. Call it
+tpm_util_request() instead?
+
+> +                       unsigned char *request,
+> +                       size_t requestlen,
+> +                       unsigned char *response,
+> +                       size_t responselen)
+>  {
+>      struct tpm_resp_hdr *resp;
+>      fd_set readfds;
+> @@ -65,7 +66,6 @@ static int tpm_util_test(int fd,
+>          .tv_sec =3D 1,
+>          .tv_usec =3D 0,
+>      };
+> -    unsigned char buf[1024];
+> =20
+>      n =3D write(fd, request, requestlen);
+>      if (n < 0) {
+> @@ -84,17 +84,36 @@ static int tpm_util_test(int fd,
+>          return -errno;
+>      }
+> =20
+> -    n =3D read(fd, &buf, sizeof(buf));
+> +    n =3D read(fd, response, responselen);
+>      if (n < sizeof(struct tpm_resp_hdr)) {
+>          return -EFAULT;
+>      }
+> =20
+> -    resp =3D (struct tpm_resp_hdr *)buf;
+> +    resp =3D (struct tpm_resp_hdr *)response;
+>      /* check the header */
+>      if (be32_to_cpu(resp->len) !=3D n) {
+>          return -EMSGSIZE;
+>      }
+> =20
+> +    return 0;
+> +}
+> +
+> +static int tpm_util_test(int fd,
+> +                         unsigned char *request,
+> +                         size_t requestlen,
+> +                         uint16_t *return_tag)
+> +{
+> +    struct tpm_resp_hdr *resp;
+> +    unsigned char buf[1024];
+> +    ssize_t ret;
+> +
+> +    ret =3D tpm_util_tx(fd, request, requestlen,
+> +                      buf, sizeof(buf));
+> +    if (ret < 0) {
+> +        return ret;
+> +    }
+> +
+> +    resp =3D (struct tpm_resp_hdr *)buf;
+>      *return_tag =3D be16_to_cpu(resp->tag);
+> =20
+>      return 0;
+> --=20
+> 2.5.5
+>=20
+>=20
+
+Looks fine otherwise,
+
+Reviewed-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
