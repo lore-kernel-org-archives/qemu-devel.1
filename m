@@ -1,42 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51151)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51731)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <haoqf@linux.vnet.ibm.com>) id 1eCJyn-0005VX-8v
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 01:36:54 -0500
+	(envelope-from <s.priebe@profihost.ag>) id 1eCK3e-0006XW-HE
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 01:41:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <haoqf@linux.vnet.ibm.com>) id 1eCJyk-0004qs-3e
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 01:36:53 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:40092
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <haoqf@linux.vnet.ibm.com>)
-	id 1eCJyj-0004qi-Up
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 01:36:50 -0500
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vA86YQ9v092717
-	for <qemu-devel@nongnu.org>; Wed, 8 Nov 2017 01:36:44 -0500
-Received: from e18.ny.us.ibm.com (e18.ny.us.ibm.com [129.33.205.208])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2e3q8f7sxs-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 08 Nov 2017 01:36:44 -0500
-Received: from localhost
-	by e18.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <haoqf@linux.vnet.ibm.com>;
-	Wed, 8 Nov 2017 01:36:43 -0500
-References: <20170919074314.10350-1-borntraeger@de.ibm.com>
-	<a6b1668e-b646-186b-8036-193100f15d54@redhat.com>
-	<7c5f5d15-2275-7493-d311-73c21e1e1924@linux.vnet.ibm.com>
-	<16218abe-3484-333e-e3b7-3f35d0b3f57b@redhat.com>
-From: QingFeng Hao <haoqf@linux.vnet.ibm.com>
-Date: Wed, 8 Nov 2017 14:36:31 +0800
+	(envelope-from <s.priebe@profihost.ag>) id 1eCK3b-0005pA-Cd
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 01:41:54 -0500
+Received: from cloud1-vm154.de-nserver.de ([178.250.10.56]:45866)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <s.priebe@profihost.ag>)
+	id 1eCK3b-0005oj-2A
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 01:41:51 -0500
+References: <1b862cf2-2fee-3243-cb54-2780ace6f25b@profihost.ag>
+	<971cc10f-7930-9830-0528-27e8faac7282@redhat.com>
+	<748c4d0d-f84b-303d-f9a6-bafa6037d669@profihost.ag>
+	<f4b0cb70-7f86-f7cf-bb89-3a9f7ae15dc2@redhat.com>
+	<4c2913e2-5946-47db-cced-a5702538bc3b@profihost.ag>
+	<dc3bf74f-fbd6-573d-0d7c-d456469fcf1d@profihost.ag>
+	<9c8673a5-faf7-ca9c-27d3-398df4223d6a@redhat.com>
+From: Stefan Priebe - Profihost AG <s.priebe@profihost.ag>
+Message-ID: <f362d043-7293-65b7-734b-c8372a5f16c3@profihost.ag>
+Date: Wed, 8 Nov 2017 07:41:46 +0100
 MIME-Version: 1.0
-In-Reply-To: <16218abe-3484-333e-e3b7-3f35d0b3f57b@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Message-Id: <423d0de8-f7e2-c6a5-7bfd-31aa4d7ecc31@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] s390x/cpu: expose the guest crash
- information
+In-Reply-To: <9c8673a5-faf7-ca9c-27d3-398df4223d6a@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: de-DE
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] kvm: virtio-net: saved image requires TUN_F_UFO
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,56 +35,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Jing Liu <liujbjl@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, qemu-devel <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, "Jason Wang (jasowang@redhat.com)" <jasowang@redhat.com>
+
+Hi Paolo,
+
+Am 06.11.2017 um 12:27 schrieb Paolo Bonzini:
+> On 06/11/2017 12:09, Stefan Priebe - Profihost AG wrote:
+>> HI Paolo,
+>>
+>> could this patchset be related?
+> 
+> Uh oh, yes it should.  Jason, any ways to fix it?  I suppose we need to
+> disable UFO in the newest machine types, but do we also have to do
+> (software) UFO in vhost-net and QEMU for migration compatibility?
+
+Any news on this?
+
+Greets,
+Stefan
 
 
-
-=E5=9C=A8 2017/11/8 3:35, Eric Blake =E5=86=99=E9=81=93:
-> On 11/07/2017 05:00 AM, QingFeng Hao wrote:
->
->>>> +
->>>> +##
->>>> +# @GuestPanicInformationS390:
->>>> +#
->>>> +# S390 specific guest panic information (PSW)
->>>> +#
->>>> +# Since: 2.11
->>>> +##
->>>> +{'struct': 'GuestPanicInformationS390',
->>>> + 'data': { 'psw-mask': 'uint64',
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'psw-a=
-ddr': 'uint64',
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'reaso=
-n': 'str' } }
->>> Missing documentation of the three fields; in particular, whether
->> I didn't get your point, do you mean we need to add comments
->> for the three fields? But I don't see the comments for Hyper-V either.
-> Your mailer is eating blank lines, which makes it harder to visually
-> distinguish where quoting ends and where new content begins (I had a
-> blank line between your "'reason': 'str' } }" content and my "Missing
-> documentation..." comment).
-Sorry about that I am using thunderbird and I had set some related=20
-configurations
-but not sure what's going on. I can read it normally.
->
-> I mean something like:
->
-> ##
-> # @GuestPanicInformationS390:
-> #
-> # S390 specific guest panic information (PSW)
-> #
-> # @psw-mask: <description of what this mask represents>
-> # @psw-addr: Address that was accessed to cause the panic
-> # @reason: Human-readable explanation of the panic (should not be parse=
-d
-> #          by a machine)
-> #
-> # Since: 2.11
-> ##
-Thanks and our new patch will contain this change.
-
---=20
-Regards
-QingFeng Hao
+> Thanks,
+> 
+> Paolo
+> 
+>> Greets,
+>> Stefan
+>>
+>> Am 06.11.2017 um 10:52 schrieb Stefan Priebe - Profihost AG:
+>>> Hi Paolo,
+>>>
+>>> Am 06.11.2017 um 10:49 schrieb Paolo Bonzini:
+>>>> On 06/11/2017 10:48, Stefan Priebe - Profihost AG wrote:
+>>>>> Hi Paolo,
+>>>>>
+>>>>> Am 06.11.2017 um 10:40 schrieb Paolo Bonzini:
+>>>>>> On 06/11/2017 10:38, Stefan Priebe - Profihost AG wrote:
+>>>>>>> Hello,
+>>>>>>>
+>>>>>>> i've upgraded some servers from kernel 4.4 to 4.12 - both running Qemu
+>>>>>>> 2.9.1.
+>>>>>>>
+>>>>>>> If i migrate a VM from a host running kernel 4.4 to a host running 4.12
+>>>>>>> i get:
+>>>>>>>
+>>>>>>> kvm: virtio-net: saved image requires TUN_F_UFO support
+>>>>>>> kvm: Failed to load virtio-net-device:tmp
+>>>>>>> kvm: Failed to load virtio-net:virtio
+>>>>>>> kvm: error while loading state for instance 0x0 of device
+>>>>>>> '0000:00:12.0/virtio-net'
+>>>>>>> kvm: load of migration failed: Invalid argument
+>>>>>>>
+>>>>>>>
+>>>>>>> while migrating from 4.12 to 4.4 works fine.
+>>>>>>>
+>>>>>>> Can anybody help? Is this expected?
+>>>>>>
+>>>>>> Can you check why peer_has_ufo failed (in hw/net/virtio-net.c)?
+>>>>>
+>>>>> May be - how can i archieve this? Patching the code is not a problem if
+>>>>> you can give me a hint.
+>>>>>
+>>>>>> Also, did this ioctl fail when the tap device was set up on the 4.12 destination?
+>>>>>> int tap_probe_has_ufo(int fd)
+>>>>>> {
+>>>>>>     unsigned offload;
+>>>>>>
+>>>>>>     offload = TUN_F_CSUM | TUN_F_UFO;
+>>>>>>
+>>>>>>     if (ioctl(fd, TUNSETOFFLOAD, offload) < 0)
+>>>>>>         return 0;
+>>>>>>
+>>>>>>     return 1;
+>>>>>> }
+>>>>>
+>>>>> Should there be any kernel output or how can i detect / check it?
+>>>>
+>>>> For both, the simplest answer is probably just using printf.
+>>>
+>>> arg i missed an important part. The kernel is an opensuse SLE15 one.
+>>>
+>>> I've seen it contains the following patchset:
+>>> https://www.spinics.net/lists/netdev/msg443821.html
+>>>
+>>> Greets,
+>>> Stefan
+>>>
+> 
