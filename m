@@ -1,34 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39713)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40908)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eCQuu-0005Hz-TL
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 09:01:25 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eCR2B-0007PP-2b
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 09:08:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eCQuk-0001UZ-Ri
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 09:01:18 -0500
-Received: from indium.canonical.com ([91.189.90.7]:46180)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eCR24-0006Ej-Mi
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 09:08:50 -0500
+Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:47460)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eCQuk-0001TZ-M4
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 09:01:10 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eCQui-0006sv-3e
-	for <qemu-devel@nongnu.org>; Wed, 08 Nov 2017 14:01:08 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id ACAC32E80D0
-	for <qemu-devel@nongnu.org>; Wed,  8 Nov 2017 14:01:07 +0000 (UTC)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eCR24-0006EJ-I6
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 09:08:44 -0500
+Received: by mail-qt0-x242.google.com with SMTP id z50so3419550qtj.4
+	for <qemu-devel@nongnu.org>; Wed, 08 Nov 2017 06:08:44 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+References: <e457d4e906dceea4de6c3431813a06b137c1ab9c.1510103351.git.alistair.francis@xilinx.com>
+	<67091b7c-7518-e9af-5171-1232e7c09bdf@amsat.org>
+Message-ID: <49816f25-a810-286e-4520-55b6c78f1750@amsat.org>
+Date: Wed, 8 Nov 2017 11:08:39 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 08 Nov 2017 13:55:17 -0000
-From: Christophe Lyon <christophe.lyon+launchpad@gmail.com>
-Reply-To: Bug 1727737 <1727737@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150902607840.5143.15937446061017284272.malonedeb@chaenomeles.canonical.com>
-Message-Id: <151014931791.26524.10562265465591163296.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1727737] Re: qemu-arm stalls on a GCC sanitizer
- test since qemu-2.7
+In-Reply-To: <67091b7c-7518-e9af-5171-1232e7c09bdf@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v1 1/1] Makefile: Capstone: Add support for
+ cross compile ranlib
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,55 +36,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org, peter.maydell@linaro.org
+Cc: alistair23@gmail.com, kraxel@redhat.com, dgilbert@redhat.com
 
-My bad: on aarch64 it does not "work", the test actually exits with a
-LeakSanitizer error message ("fatal error").
+On 11/08/2017 02:00 AM, Philippe Mathieu-Daudé wrote:
+> Hi Alistair,
+> 
+> On 11/07/2017 10:10 PM, Alistair Francis wrote:
+>> When cross compiling QEMU for Windows we need to specify the cross
+> 
+> What toolchain do you use?
+> 
+>> version of ranlib to avoid build errors when buildling capstone. This
+> 
+> "building"
+> 
+>> patch ensures we use the same cross prefix on ranlib as other toolchain
+>> components.
 
-Using QEMU_STRACE=3D1 shows that clone() fails in the same way as for arm
-(which is expected), but apparently this error is handled better on
-aarch64, maybe because the internal_clone implementation is different.
+Please add this extra info in the commit (take from the mail thread)
+which may be useful if we add a continuous integration test for these
+toolchains/distribs.
 
--- =
+- Fedora23 mingw
+- RHEL-7 with mingw packages from epel:
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1727737
+   LINK    qemu-img.exe
+ build-win64/capstone/capstone.lib: error adding symbols: Archive has no
+index; run ranlib to add one
+ collect2: error: ld returned 1 exit status
 
-Title:
-  qemu-arm stalls on a GCC sanitizer test since qemu-2.7
+$ x86_64-w64-mingw32-ar --version
+GNU ar (GNU Binutils) 2.25
 
-Status in QEMU:
-  Incomplete
+- RHEL7.2
 
-Bug description:
-  Hi,
-
-  I have noticed that several GCC/sanitizer tests fail with timeout when
-  executed under QEMU.
-
-  After a bit of investigation, I have noticed that this worked with
-  qemu-2.7, and started failing with qemu-2.8, and still fails with
-  qemu-2.10.1
-
-  I'm attaching a tarball containing:
-  alloca_instruments_all_paddings.exe : the testcase, and the needed libs:
-  lib/librt.so.1
-  lib/libdl.so.2
-  lib/ld-linux-armhf.so.3
-  lib/libasan.so.5
-  lib/libc.so.6
-  lib/libgcc_s.so.1
-  lib/libpthread.so.0
-  lib/libm.so.6
-
-  To reproduce the problem:
-  $ qemu-arm -cpu any -R 0 -L $PWD $PWD/alloca_instruments_all_paddings.exe
-  returns in less than a second with qemu-2.7, and never with qemu-2.8
-
-  Using -d in_asm suggests that the program "almost" completes and qemu see=
-ms to stall on:
-  0x40b6eb44: e08f4004 add r4, pc, r4
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1727737/+subscriptions
+>>
+>> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+>> Suggested-by: Peter Maydell <peter.maydell@linaro.org>
+> 
+> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> 
+> MXE:
+> Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> 
+>> ---
+>>
+>>  Makefile  | 2 +-
+>>  configure | 3 +++
+>>  2 files changed, 4 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/Makefile b/Makefile
+>> index 0496c5057a..814f6820d9 100644
+>> --- a/Makefile
+>> +++ b/Makefile
+>> @@ -405,7 +405,7 @@ CAP_CFLAGS += -DCAPSTONE_HAS_POWERPC
+>>  CAP_CFLAGS += -DCAPSTONE_HAS_X86
+>>  
+>>  subdir-capstone: .git-submodule-status
+>> -	$(call quiet-command,$(MAKE) -C $(SRC_PATH)/capstone CAPSTONE_SHARED=no BUILDDIR="$(BUILD_DIR)/capstone" CC="$(CC)" AR="$(AR)" LD="$(LD)" CFLAGS="$(CAP_CFLAGS)" $(SUBDIR_MAKEFLAGS) $(BUILD_DIR)/capstone/$(LIBCAPSTONE))
+>> +	$(call quiet-command,$(MAKE) -C $(SRC_PATH)/capstone CAPSTONE_SHARED=no BUILDDIR="$(BUILD_DIR)/capstone" CC="$(CC)" AR="$(AR)" LD="$(LD)" RANLIB="$(RANLIB)" CFLAGS="$(CAP_CFLAGS)" $(SUBDIR_MAKEFLAGS) $(BUILD_DIR)/capstone/$(LIBCAPSTONE))
+>>  
+>>  $(SUBDIR_RULES): libqemuutil.a $(common-obj-y) $(chardev-obj-y) \
+>>  	$(qom-obj-y) $(crypto-aes-obj-$(CONFIG_USER_ONLY))
+>> diff --git a/configure b/configure
+>> index a6055c0710..0e856bbc04 100755
+>> --- a/configure
+>> +++ b/configure
+>> @@ -482,6 +482,7 @@ ccas="${CCAS-$cc}"
+>>  cpp="${CPP-$cc -E}"
+>>  objcopy="${OBJCOPY-${cross_prefix}objcopy}"
+>>  ld="${LD-${cross_prefix}ld}"
+>> +ranlib="${RANLIB-${cross_prefix}ranlib}"
+>>  nm="${NM-${cross_prefix}nm}"
+>>  strip="${STRIP-${cross_prefix}strip}"
+>>  windres="${WINDRES-${cross_prefix}windres}"
+>> @@ -6288,6 +6289,7 @@ echo "CCAS=$ccas" >> $config_host_mak
+>>  echo "CPP=$cpp" >> $config_host_mak
+>>  echo "OBJCOPY=$objcopy" >> $config_host_mak
+>>  echo "LD=$ld" >> $config_host_mak
+>> +echo "RANLIB=$ranlib" >> $config_host_mak
+>>  echo "NM=$nm" >> $config_host_mak
+>>  echo "WINDRES=$windres" >> $config_host_mak
+>>  echo "CFLAGS=$CFLAGS" >> $config_host_mak
+>> @@ -6782,6 +6784,7 @@ for rom in seabios vgabios ; do
+>>      echo "OBJCOPY=objcopy" >> $config_mak
+>>      echo "IASL=$iasl" >> $config_mak
+>>      echo "LD=$ld" >> $config_mak
+>> +    echo "RANLIB=$ranlib" >> $config_mak
+>>  done
+>>  
+>>  # set up tests data directory
+>>
