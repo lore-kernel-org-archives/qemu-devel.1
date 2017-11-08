@@ -1,20 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59581)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59757)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1eCQQk-0003nR-2D
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 08:30:11 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eCQRH-0004CO-4f
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 08:30:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1eCQQf-0006As-2g
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 08:30:10 -0500
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <20170929165347.29658-20-mreitz@redhat.com>
-References: <20170929165347.29658-1-mreitz@redhat.com>
-	<20170929165347.29658-20-mreitz@redhat.com>
-Date: Wed, 08 Nov 2017 14:29:52 +0100
-Message-ID: <w51o9oczynj.fsf@maestria.local.igalia.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eCQRE-0006Yd-1W
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 08:30:43 -0500
+Received: from mail-qt0-x235.google.com ([2607:f8b0:400d:c0d::235]:50264)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eCQRD-0006YH-Su
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 08:30:39 -0500
+Received: by mail-qt0-x235.google.com with SMTP id d9so3255169qtd.7
+	for <qemu-devel@nongnu.org>; Wed, 08 Nov 2017 05:30:39 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <7967e55c-de72-6ef2-eb92-a85af8fc2552@redhat.com>
+	<20171108105332.etwcm4nyb6rqmprn@sirius.home.kraxel.org>
+	<54cb9ffb-fa92-f07c-f0df-af589cf17b3a@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <999fe337-ef3b-243e-65e7-ca4ecacb709e@amsat.org>
+Date: Wed, 8 Nov 2017 10:30:35 -0300
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v6 19/25] block: Add
- BlockDriver.bdrv_gather_child_options
+In-Reply-To: <54cb9ffb-fa92-f07c-f0df-af589cf17b3a@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] Yet another git submodule rant
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,31 +36,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, John Snow <jsnow@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Fri 29 Sep 2017 06:53:41 PM CEST, Max Reitz wrote:
-> Some follow-up patches will rework the way bs->full_open_options is
-> refreshed in bdrv_refresh_filename(). The new implementation will remove
-> the need for the block drivers' bdrv_refresh_filename() implementations
-> to set bs->full_open_options; instead, it will be generic and use static
-> information from each block driver.
->
-> However, by implementing bdrv_gather_child_options(), block drivers will
-> still be able to override the way the full_open_options of their
-> children are incorporated into their own.
->
-> We need to implement this function for VMDK because we have to prevent
-> the generic implementation from gathering the options of all children:
-> It is not possible to specify options for the extents through the
-> runtime options.
->
-> For quorum, the child names that would be used by the generic
-> implementation and the ones that we actually want to use differ. See
-> quorum_gather_child_options() for more information.
->
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
+On 11/08/2017 08:48 AM, Thomas Huth wrote:
+> On 08.11.2017 11:53, Gerd Hoffmann wrote:
+>> On Wed, Nov 08, 2017 at 10:57:21AM +0100, Thomas Huth wrote:
+>>>
+>>> That automatic git submodule stuff now broke my workflow again. I
+>>> usually keep the git repository on my laptop and then simply rsync the
+>>> sources (without .git directories) to my target machine to compile it
+>>> there.
+>>
+>> How about excluding all files listed in .gitignore from rsync?  Which I
+>> guess would be a good idea anyway because you don't want sync over the
+>> build artifacts to the target machine if you want compile there.  Might
+>> be as simple as "rsync --exclude-from .gitignore" (didn't test though).
+> 
+> That's a neat idea, thanks, I'll give it a try!
+> 
+>> Or syncronize using git instead of rsync.  This is what I am doing.
+> 
+> Tried that in the past already, but it didn't really feel right (I don't
+> want to check in each time before syncing my files)...
 
-Reviewed-by: Alberto Garcia <berto@igalia.com>
+TIL: git push --recurse-submodules=on-demand
 
-Berto
+GIT-PUSH(1)
+
+       --recurse-submodules=check|on-demand|only|no
+
+           [...] If check is used Git will verify that all submodule
+           commits that changed in the revisions to be pushed are
+           available on at least one remote of the submodule. If any
+           commits are missing the push will be aborted and exit with
+           non-zero status. If on-demand is used all submodules that
+           changed in the revisions to be pushed will be pushed. If
+           on-demand was not able to push all necessary revisions it
+           will also be aborted and exit with non-zero status. [...]
+
+GIT-CONFIG(1)
+
+       push.recurseSubmodules
+           Make sure all submodule commits used by the revisions to be
+           pushed are available on a remote-tracking branch. If the
+           value is check then Git will verify that all submodule
+           commits that changed in the revisions to be pushed are
+           available on at least one remote of the submodule. If any
+           commits are missing, the push will be aborted and exit with
+           non-zero status. If the value is on-demand then all
+           submodules that changed in the revisions to be pushed will
+           be pushed. If on-demand was not able to push all necessary
+           revisions it will also be aborted and exit with non-zero
+           status. [...]
