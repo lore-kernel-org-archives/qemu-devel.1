@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56863)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57240)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eCMMG-0005Gk-R4
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 04:09:23 -0500
+	(envelope-from <berrange@redhat.com>) id 1eCMNn-0005wQ-Vf
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 04:10:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eCMMD-0000pU-KT
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 04:09:16 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56432)
+	(envelope-from <berrange@redhat.com>) id 1eCMNm-0001l3-SG
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 04:10:51 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59578)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eCMMD-0000pE-EC
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 04:09:13 -0500
-Date: Wed, 8 Nov 2017 09:09:00 +0000
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eCMNm-0001kB-M3
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 04:10:50 -0500
+Date: Wed, 8 Nov 2017 09:10:37 +0000
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20171108090900.GF12670@redhat.com>
+Message-ID: <20171108091037.GG12670@redhat.com>
 Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
 References: <20171108022828.7242-1-f4bug@amsat.org>
-	<20171108022828.7242-7-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20171108022828.7242-7-f4bug@amsat.org>
+In-Reply-To: <20171108022828.7242-1-f4bug@amsat.org>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 6/6] hw/i386: deprecate the "isapc"
- machine
+Subject: Re: [Qemu-devel] [RFC PATCH 0/6] generic way to deprecate machines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,40 +29,45 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Richard Henderson <rth@twiddle.net>, =?utf-8?B?SGVydsOp?= Poussineau <hpoussin@reactos.org>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
-On Tue, Nov 07, 2017 at 11:28:28PM -0300, Philippe Mathieu-Daud=C3=A9 wro=
+On Tue, Nov 07, 2017 at 11:28:22PM -0300, Philippe Mathieu-Daud=C3=A9 wro=
 te:
-> Deprecated since 2.9.0, guests should be able to use "pc" instead.
-
-Isn't isapc important to allow QEMU to old operating systems that
-predate the PCI era. I do recall seeing some messages about specific
-cases where you cannot use the 'pc' machine type and we suggested
-used of 'isapc' instead, but can't remember the exact details..
-
-I know that's not a typical usecase for modern cloud / data center
-virt, but it is interesting for usage of QEMU as a archeology tool,
-so I'm loathe to see this removed unless it is demonstrably causing
-an unacceptable maint burden to keep it.
-
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
->  hw/i386/pc_piix.c | 1 +
->  1 file changed, 1 insertion(+)
+> Hi,
 >=20
-> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-> index c462b702ff..df4669c6d3 100644
-> --- a/hw/i386/pc_piix.c
-> +++ b/hw/i386/pc_piix.c
-> @@ -1114,6 +1114,7 @@ static void isapc_machine_options(MachineClass *m=
-)
->      pcmc->smbios_legacy_mode =3D true;
->      pcmc->has_reserved_memory =3D false;
->      m->default_cpu_type =3D X86_CPU_TYPE_NAME("486");
-> +    m->deprecated_reason =3D "Use the \"pc\" machine instead";
->  }
-> =20
->  DEFINE_PC_MACHINE(isapc, "isapc", pc_init_isa,
+> This series intends to provide a simple and common way to deprecate
+> machines between releases. It may be extended to deprecate devices.
+>=20
+> I started with the machines list from:
+>=20
+>   https://wiki.qemu.org/Features/LegacyRemoval#Deprecated_machines
+>=20
+> Comment welcomed :)
+>=20
+> Regards,
+>=20
+> Phil.
+>=20
+> Alistair Francis (1):
+>   hw/arm: deprecate the EP108 board
+>=20
+> Philippe Mathieu-Daud=C3=A9 (5):
+>   machine: add a deprecated_reason property
+>   hw/arm: deprecate the Gumstix boards
+>   hw/ppc: deprecate the PReP machine
+>   hw/i386: deprecate the pc-0.10 and pc-0.11 machines
+>   hw/i386: deprecate the "isapc" machine
+>=20
+>  include/hw/boards.h  | 1 +
+>  hw/arm/gumstix.c     | 2 ++
+>  hw/arm/xlnx-zcu102.c | 6 +++++-
+>  hw/i386/pc_piix.c    | 3 +++
+>  hw/ppc/prep.c        | 1 +
+>  vl.c                 | 7 +++++++
+>  6 files changed, 19 insertions(+), 1 deletion(-)
+
+Unless listed in the qemu-doc.texi "Deprecated features" appendix,
+things are not considered deprecated...
 
 Regards,
 Daniel
