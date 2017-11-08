@@ -1,18 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60511)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33360)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1eCS9Y-0006QY-GC
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 10:20:33 -0500
+	(envelope-from <alistair23@gmail.com>) id 1eCSGH-0007f4-Im
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 10:27:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1eCS9V-0005F0-B3
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 10:20:32 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48522)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1eCS9V-0005Ek-4Q
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 10:20:29 -0500
-From: Marcel Apfelbaum <marcel@redhat.com>
-Date: Wed,  8 Nov 2017 17:20:23 +0200
-Message-Id: <20171108152023.80780-1-marcel@redhat.com>
-Subject: [Qemu-devel]  [PATCH] hw/pcie-pci-bridge: restrict to X86 and ARM
+	(envelope-from <alistair23@gmail.com>) id 1eCSGG-0007p5-GE
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 10:27:29 -0500
+MIME-Version: 1.0
+In-Reply-To: <308c6070-e9b8-f40d-2389-96497dbe238d@redhat.com>
+References: <cover.1508390588.git.alistair.francis@xilinx.com>
+	<ad7c1de551fbc497743e4dd60335a75cb5365a15.1508390588.git.alistair.francis@xilinx.com>
+	<87efpmccvu.fsf@secure.laptop> <87bmke4cu9.fsf@dusky.pond.sub.org>
+	<51d103e9-8d6b-8c83-dd69-effe997d4813@redhat.com>
+	<87shdptdf0.fsf@dusky.pond.sub.org>
+	<CAKmqyKOhnGrbZ6tnaXgBNzdJ=LdnD9NWuWVV-LHmM3zea8OBvA@mail.gmail.com>
+	<308c6070-e9b8-f40d-2389-96497dbe238d@redhat.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Wed, 8 Nov 2017 07:26:54 -0800
+Message-ID: <CAKmqyKNEA41=HaDJ5A8X=UXBvWzzviG7Mv63fa2Zr0tPcxrqkQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v3 01/46] Replace all occurances of
+ __FUNCTION__ with __func__
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,66 +28,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: marcel@redhat.com, mst@redhat.com, thuth@redhat.com, zuban32s@gmail.com, cohuck@redhat.com
+To: Eric Blake <eblake@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, Juan Quintela <quintela@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Fam Zheng <famz@redhat.com>, Qemu-block <qemu-block@nongnu.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Yongbok Kim <yongbok.kim@imgtec.com>, qemu-arm <qemu-arm@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "open list:X86" <xen-devel@lists.xenproject.org>, Anthony Perard <anthony.perard@citrix.com>, Alistair Francis <alistair.francis@xilinx.com>, John Snow <jsnow@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 
-The PCIE-PCI bridge is specific to "pure" PCI systems
-(on QEMU we have X86 and ARM), it does not make sense to
-have if in other archs.
+On Wed, Nov 8, 2017 at 7:00 AM, Eric Blake <eblake@redhat.com> wrote:
+> On 11/08/2017 08:51 AM, Alistair Francis wrote:
+>
+>>>>> Let me rephrase the question: do we really support compilers that don't
+>>>>> understand __func__?  The presence of numerous unconditional uses of
+>>>>> __func__ in the tree means the answer is no.  Let's replace AUDIO_FUNC
+>>>>> by plain __func__.
+>>>>
+>>>> Answered elsewhere in patch 3/46 (where we DO replace AUDIO_FUNC by
+>>>> __func__).
+>>>
+>>> I see.
+>>>
+>>> Put 03/46 first, so we don't have to mess with AUDIO_FUNC twice?
+>>
+>> I would really like to avoid that, as the conflicts will be a bit of a
+>> mess. The way I see it there will be a lot of churn no matter what,
+>> so we don't gain much by swapping the order around.
+>>
+>> I have a new series ready to send today, so I'm going to send that
+>> through as I would like at least some of these patches to make it in
+>> 2.11. After that if you think strongly the order should be changed I
+>> can change it in the next version.
+>
+> I think the reorder is not that hard.  Put 3/46 first (changing
+> AUDIO_FUNC to __func__), and then 1/46 doesn't have to touch any of the
+> files that used to use AUDIO_FUNC, because there is no intermediate
+> state using __FUNCTION__.
+>
+> If I'm reading it correctly, the rebase conflict is limited to a slight
+> rewording of the commit message for 3/46, and one line in 1/46 to the
+> definition of AUDIO_FUNC (that will no longer be present).
 
-Reported-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
----
- default-configs/arm-softmmu.mak    | 1 +
- default-configs/i386-softmmu.mak   | 1 +
- default-configs/x86_64-softmmu.mak | 1 +
- hw/pci-bridge/Makefile.objs        | 3 ++-
- 4 files changed, 5 insertions(+), 1 deletion(-)
+That's true, it didn't end up being that hard. I'm launching my tests
+now, so I should be able to send the series out later today.
 
-diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
-index 5059d134c8..33934b1dc4 100644
---- a/default-configs/arm-softmmu.mak
-+++ b/default-configs/arm-softmmu.mak
-@@ -122,6 +122,7 @@ CONFIG_FSL_IMX25=y
- CONFIG_IMX_I2C=y
- 
- CONFIG_PCIE_PORT=y
-+CONFIG_PCIE_PCI_BRIDGE=y
- CONFIG_XIO3130=y
- CONFIG_IOH3420=y
- CONFIG_I82801B11=y
-diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-softmmu.mak
-index a685c439e7..0d2ce8bcc9 100644
---- a/default-configs/i386-softmmu.mak
-+++ b/default-configs/i386-softmmu.mak
-@@ -59,4 +59,5 @@ CONFIG_I82801B11=y
- CONFIG_SMBIOS=y
- CONFIG_HYPERV_TESTDEV=$(CONFIG_KVM)
- CONFIG_PXB=y
-+CONFIG_PCIE_PCI_BRIDGE=y
- CONFIG_ACPI_VMGENID=y
-diff --git a/default-configs/x86_64-softmmu.mak b/default-configs/x86_64-softmmu.mak
-index ea69e8289e..846a72b930 100644
---- a/default-configs/x86_64-softmmu.mak
-+++ b/default-configs/x86_64-softmmu.mak
-@@ -59,4 +59,5 @@ CONFIG_I82801B11=y
- CONFIG_SMBIOS=y
- CONFIG_HYPERV_TESTDEV=$(CONFIG_KVM)
- CONFIG_PXB=y
-+CONFIG_PCIE_PCI_BRIDGE=y
- CONFIG_ACPI_VMGENID=y
-diff --git a/hw/pci-bridge/Makefile.objs b/hw/pci-bridge/Makefile.objs
-index 666db37da2..9d23a7038a 100644
---- a/hw/pci-bridge/Makefile.objs
-+++ b/hw/pci-bridge/Makefile.objs
-@@ -1,6 +1,7 @@
--common-obj-y += pci_bridge_dev.o pcie_pci_bridge.o
-+common-obj-y += pci_bridge_dev.o
- common-obj-$(CONFIG_PCIE_PORT) += pcie_root_port.o gen_pcie_root_port.o
- common-obj-$(CONFIG_PXB) += pci_expander_bridge.o
-+common-obj-$(CONFIG_PCIE_PCI_BRIDGE) += pcie_pci_bridge.o
- common-obj-$(CONFIG_XIO3130) += xio3130_upstream.o xio3130_downstream.o
- common-obj-$(CONFIG_IOH3420) += ioh3420.o
- common-obj-$(CONFIG_I82801B11) += i82801b11.o
--- 
-2.13.5
+Hopefully some of this can make it in 2.11 :)
+
+Thanks,
+Alistair
+
+>
+> --
+> Eric Blake, Principal Software Engineer
+> Red Hat, Inc.           +1-919-301-3266
+> Virtualization:  qemu.org | libvirt.org
+>
