@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49223)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51473)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1eCYWy-0003hV-Cv
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 17:09:09 -0500
+	(envelope-from <lepton@google.com>) id 1eCUkH-0002LO-4c
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 13:06:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1eCYWx-0005mx-F3
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 17:09:08 -0500
-MIME-Version: 1.0
-Sender: alistair23@gmail.com
-In-Reply-To: <20171108215212.GW3111@localhost.localdomain>
-References: <1509734853-3014-1-git-send-email-cota@braap.org>
-	<20171103185610.GA3907@flamenco>
-	<20171103200233.GI3111@localhost.localdomain>
-	<20171103222407.GA22411@flamenco>
-	<20171106141022.GO3111@localhost.localdomain>
-	<20171106201332.GA2152@flamenco>
-	<73e9c472-82da-b293-27cd-ca9e0ff93179@linaro.org>
-	<20171108215212.GW3111@localhost.localdomain>
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Wed, 8 Nov 2017 14:08:35 -0800
-Message-ID: <CAKmqyKNOSdKjxJUVq0dtu7h4ELLqnvT27HDbe_FpVn+tyy7agw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] hw: add .min_cpus and .default_cpus fields
- to machine_class
+	(envelope-from <lepton@google.com>) id 1eCUjU-0000UK-7Y
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 13:06:37 -0500
+Received: from mail-io0-x244.google.com ([2607:f8b0:4001:c06::244]:51471)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <lepton@google.com>) id 1eCUjT-0000TH-Ua
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 13:05:48 -0500
+Received: by mail-io0-x244.google.com with SMTP id b186so6893033iof.8
+	for <qemu-devel@nongnu.org>; Wed, 08 Nov 2017 10:05:47 -0800 (PST)
+From: Tao Wu <lepton@google.com>
+Date: Wed,  8 Nov 2017 10:05:36 -0800
+Message-Id: <20171108180536.38781-1-lepton@google.com>
+Subject: [Qemu-devel] [PATCH] virtio-gpu: fix bug in host memory calculation.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,54 +23,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Richard Henderson <richard.henderson@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Igor Mitsyanko <i.mitsyanko@gmail.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, "Emilio G. Cota" <cota@braap.org>, qemu-arm <qemu-arm@nongnu.org>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, "Edgar E . Iglesias" <edgar.iglesias@gmail.com>
+To: qemu-devel@nongnu.org, kraxel@redhat.com
+Cc: marcandre.lureau@redhat.com, airlied@redhat.com, liqiang6-s@360.cn, Tao Wu <lepton@google.com>
 
-On Wed, Nov 8, 2017 at 1:52 PM, Eduardo Habkost <ehabkost@redhat.com> wrote:
-> On Wed, Nov 08, 2017 at 10:29:43PM +0100, Richard Henderson wrote:
->> On 11/06/2017 09:13 PM, Emilio G. Cota wrote:
->> > Subject: [PATCH] qom: move CPUClass.tcg_initialize to a global
->> >
->> > 55c3cee ("qom: Introduce CPUClass.tcg_initialize", 2017-10-24)
->> > introduces a per-CPUClass bool that we check so that the target CPU
->> > is initialized for TCG only once. This works well except when
->> > we end up creating more than one CPUClass, in which case we end
->> > up incorrectly initializing TCG more than once, i.e. once for
->> > each CPUClass.
->> >
->> > This can be replicated with:
->> >   $ aarch64-softmmu/qemu-system-aarch64 -machine xlnx-zcu102 -smp 6 \
->> >       -global driver=xlnx,,zynqmp,property=has_rpu,value=on
->> > In this case the class name of the "RPUs" is prefixed by "cortex-r5-",
->> > whereas the "regular" CPUs are prefixed by "cortex-a53-". This
->> > results in two CPUClass instances being created.
->> >
->> > Fix it by introducing a static variable, so that only the first
->> > target CPU being initialized will initialize the target-dependent
->> > part of TCG, regardless of CPUClass instances.
->>
->> Hah!
->>
->> So, I had been thinking of the xylinx ARM + Microblaze case, where we really do
->> need two different initializations.  I never imagined that two different ARM
->> parts had different CPUClasses.
->
-> Is xylinx ARM + Microblaze something that already works (and
-> would be broken by this patch), or something planned for the
-> future?
+The old code treats bits as bytes when calculating host memory usage.
+Change it to be consistent with allocation logic in pixman library.
 
-Something planned for the future, it has never worked.
+Signed-off-by: Tao Wu <lepton@google.com>
+---
+ hw/display/virtio-gpu.c | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
 
-Alistair
-
->
->>
->> So I guess it's my initial patch that unified this that's more buggy than not.
->
-> We still have the option of reverting the original patch, but (if
-> it doesn't break anything) this patch looks like a simpler fix
-> for 2.11 than a full revert.
->
-> --
-> Eduardo
->
+diff --git a/hw/display/virtio-gpu.c b/hw/display/virtio-gpu.c
+index 43bbe09ea0..428786f291 100644
+--- a/hw/display/virtio-gpu.c
++++ b/hw/display/virtio-gpu.c
+@@ -322,6 +322,15 @@ static pixman_format_code_t get_pixman_format(uint32_t virtio_gpu_format)
+     }
+ }
+ 
++static uint32_t calc_image_hostmem(pixman_format_code_t pformat,
++                                   uint32_t width, uint32_t height)
++{
++    /* copied from pixman/pixman-bits-image.c, skip integer overflow check. */
++    int bpp = PIXMAN_FORMAT_BPP(pformat);
++    int stride = ((width * bpp + 0x1f) >> 5) * sizeof(uint32_t);
++    return height * stride;
++}
++
+ static void virtio_gpu_resource_create_2d(VirtIOGPU *g,
+                                           struct virtio_gpu_ctrl_command *cmd)
+ {
+@@ -366,7 +375,7 @@ static void virtio_gpu_resource_create_2d(VirtIOGPU *g,
+         return;
+     }
+ 
+-    res->hostmem = PIXMAN_FORMAT_BPP(pformat) * c2d.width * c2d.height;
++    res->hostmem = calc_image_hostmem(pformat, c2d.width, c2d.height);
+     if (res->hostmem + g->hostmem < g->conf.max_hostmem) {
+         res->image = pixman_image_create_bits(pformat,
+                                               c2d.width,
+@@ -1087,7 +1096,7 @@ static int virtio_gpu_load(QEMUFile *f, void *opaque, size_t size,
+             return -EINVAL;
+         }
+ 
+-        res->hostmem = PIXMAN_FORMAT_BPP(pformat) * res->width * res->height;
++        res->hostmem = calc_image_hostmem(pformat, res->width, res->height);
+ 
+         res->addrs = g_new(uint64_t, res->iov_cnt);
+         res->iov = g_new(struct iovec, res->iov_cnt);
+-- 
+2.15.0.403.gc27cc4dac6-goog
