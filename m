@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46138)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46536)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1eCT5P-0006gB-Sb
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 11:20:24 -0500
+	(envelope-from <bounces@canonical.com>) id 1eCT6J-0007C4-11
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 11:21:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1eCT5K-0008JV-03
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 11:20:19 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44436)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1eCT5J-0008Ip-B6
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 11:20:13 -0500
-Date: Wed, 8 Nov 2017 17:20:11 +0100
-From: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
-Message-ID: <20171108162011.GB13150@boraha>
-References: <1510016336-4086-1-git-send-email-stefanb@linux.vnet.ibm.com>
+	(envelope-from <bounces@canonical.com>) id 1eCT6C-0000QP-IL
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 11:21:14 -0500
+Received: from indium.canonical.com ([91.189.90.7]:43042)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eCT6C-0000Pr-B1
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 11:21:08 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eCT6B-0005Ed-2V
+	for <qemu-devel@nongnu.org>; Wed, 08 Nov 2017 16:21:07 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 0BDF12E80C9
+	for <qemu-devel@nongnu.org>; Wed,  8 Nov 2017 16:21:07 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1510016336-4086-1-git-send-email-stefanb@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 0/5] tpm: Match frontend and backend buffer
- sizes (not 2.11)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 08 Nov 2017 16:10:24 -0000
+From: ChristianEhrhardt <1716028@bugs.launchpad.net>
+Reply-To: Bug 1716028 <1716028@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150489404292.23034.16812601554685741285.malonedeb@wampee.canonical.com>
+Message-Id: <151015742406.3019.333660367492678765.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1716028] Re: qemu 2.10 locks images with no
+ feature flag
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,49 +37,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, amarnath.valluri@intel.com
+To: qemu-devel@nongnu.org
 
-On Mon, Nov 06, 2017 at 07:58:51PM -0500, Stefan Berger wrote:
-> This patch series does away with the hard coded buffer size in the TIS
-> frontend and instead retrieves the buffer size from the device that's
-> being used. So it gets it from the host device or the external emulator.
-> In case the frontend (CRB) cannot support the backend's current buffer size
-> (typically 4k) it can adjust the buffer size the emulator is working with
-> so that we will not run into the problem that the backend produces packets
-> that the frontend cannot deliver to due mismatching buffer sizes.
-> 
+We had a discussion today on how to workaround if you drive qmeu via libvir=
+t.
+While discussions often and up at the correctness of such setups they exist=
+s, I think it is worth to document until libvirt supports that officially.
 
-The approach looks ok to me. I don't have enough TPM/backend knowledge
-to say how relevant that is in the long run. Modifying the CRB device
-to set the buffer size to qemu CRB_CTRL_CMD_SIZE works. Windows 10 seems
-happy at least.
+TL:DR:
+- no native libvirt feature yet
+- discussions if <shareable/> should set it
+- workaround available via cmdline
 
-Just a few remarks, I suppose you'll send a v2 soon,
+Details on the workaround:
+- To use the workaround you have to check your log usually in /var/log/libv=
+irt/qemu/<guestname>.log
+- Get the id of the device that matters to you
+- then use [1] to tweak qemu cmdline
+- example is from [2] to [3]
 
-thanks
+[1]: http://blog.vmsplice.net/2011/04/how-to-pass-qemu-command-line-options=
+.html
+[2]: https://gist.github.com/anonymous/a2ce3cbf7878995537212f0dafd06d99
+[3]: https://gist.github.com/anonymous/07a357af9e34172b60c83d410fe63fdd
 
->    Stefan
-> 
-> Stefan Berger (5):
->   tpm: Move getting TPM buffer size to backends
->   tpm: pull tpm_util_send() out of tpm_util_test()
->   tpm: tpm_passthrough: Read the buffer size from the host device
->   tpm: tpm_emulator: get and set buffer size of device
->   tpm: tpm_passthrough: Fail startup if FE buffer size < BE buffer size
-> 
->  backends/tpm.c               |  13 +++-
->  hw/tpm/tpm_emulator.c        |  83 +++++++++++++++++++++++-
->  hw/tpm/tpm_int.h             |   9 +++
->  hw/tpm/tpm_ioctl.h           |  28 +++++++-
->  hw/tpm/tpm_passthrough.c     |  30 +++++++++
->  hw/tpm/tpm_tis.c             |  18 +++---
->  hw/tpm/tpm_util.c            | 149 +++++++++++++++++++++++++++++++++++++++++--
->  hw/tpm/tpm_util.h            |   3 +
->  include/sysemu/tpm_backend.h |  17 ++++-
->  9 files changed, 327 insertions(+), 23 deletions(-)
-> 
-> -- 
-> 2.5.5
-> 
-> 
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1716028
+
+Title:
+  qemu 2.10 locks images with no feature flag
+
+Status in QEMU:
+  New
+Status in qemu package in Ubuntu:
+  New
+
+Bug description:
+  1) % lsb_release -rd
+  Description:	Ubuntu Artful Aardvark (development branch)
+  Release:	17.10
+
+  2) % apt-cache policy qemu-system-x86
+  qemu-system-x86:
+    Installed: 1:2.10~rc3+dfsg-0ubuntu1
+    Candidate: 1:2.10+dfsg-0ubuntu1
+    Version table:
+       1:2.10+dfsg-0ubuntu1 500
+          500 http://archive.ubuntu.com//ubuntu devel/main amd64 Packages
+   *** 1:2.10~rc3+dfsg-0ubuntu1 100
+          100 /var/lib/dpkg/status
+
+  3) qemu locks image files with no way to discover this feature nor how
+  to disable it
+
+  4) qemu provides a way to query if it supports image locking, and what
+  the default value is, and how to disable the locking via cli
+
+  qemu 2.10 now will lock image files and warn if an image is currently
+  locked.  This prevent qemu from running (and possibly corrupting said
+  image).
+
+  However, qemu does not provide any way to determine if a qemu binary
+  actually has this capability.  Normally behavior changing features are
+  exposed via some change to the qemu help menu or QMP/QAPI output of
+  capabilities.
+
+  I believe this slipped through since libvirt already does image
+  locking, but direct cli users will be caught by this change.
+
+  In particular, we have a use-case where we simulate multipath disks by
+  creating to disks which point to the same file which now breaks
+  without adding the 'file.locking=3Doff' to the -drive parameters;  which
+  is also completely undocumented and unexposed.
+
+  Some parts of the cli like -device allow querying of settable options
+  (qemu-system-x86 -device scsi_hd,?)  but nothing equivalent exists for
+  -drive parameters.
+
+  ProblemType: Bug
+  DistroRelease: Ubuntu 17.10
+  Package: qemu-system-x86 1:2.10~rc3+dfsg-0ubuntu1
+  ProcVersionSignature: Ubuntu 4.12.0-11.12-generic 4.12.5
+  Uname: Linux 4.12.0-11-generic x86_64
+  NonfreeKernelModules: zfs zunicode zavl zcommon znvpair
+  ApportVersion: 2.20.6-0ubuntu7
+  Architecture: amd64
+  Date: Fri Sep  8 12:56:53 2017
+  JournalErrors:
+   Hint: You are currently not seeing messages from other users and the sys=
+tem.
+         Users in groups 'adm', 'systemd-journal' can see all messages.
+         Pass -q to turn off this notice.
+   -- Logs begin at Mon 2017-01-30 11:56:02 CST, end at Fri 2017-09-08 12:5=
+6:46 CDT. --
+   -- No entries --
+  KvmCmdLine: COMMAND         STAT  EUID  RUID   PID  PPID %CPU COMMAND
+  MachineType: HP ProLiant DL360 Gen9
+  ProcEnviron:
+   TERM=3Dxterm
+   PATH=3D(custom, no user)
+   XDG_RUNTIME_DIR=3D<set>
+   LANG=3Den_US.UTF-8
+   SHELL=3D/bin/bash
+  ProcKernelCmdLine: BOOT_IMAGE=3D/vmlinuz-4.12.0-11-generic root=3DUUID=3D=
+45354276-e0c0-4bf6-9083-f130b89411cc ro --- console=3DttyS1,115200
+  SourcePackage: qemu
+  UpgradeStatus: No upgrade log present (probably fresh install)
+  dmi.bios.date: 03/05/2015
+  dmi.bios.vendor: HP
+  dmi.bios.version: P89
+  dmi.chassis.type: 23
+  dmi.chassis.vendor: HP
+  dmi.modalias: dmi:bvnHP:bvrP89:bd03/05/2015:svnHP:pnProLiantDL360Gen9:pvr=
+:cvnHP:ct23:cvr:
+  dmi.product.family: ProLiant
+  dmi.product.name: ProLiant DL360 Gen9
+  dmi.sys.vendor: HP
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1716028/+subscriptions
