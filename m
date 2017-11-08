@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45201)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45902)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eCRKx-0005UX-9P
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 09:28:17 -0500
+	(envelope-from <eblake@redhat.com>) id 1eCRNQ-0006to-14
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 09:30:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eCRKq-0000Ee-KA
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 09:28:15 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:55512)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eCRKq-0000EH-7l
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 09:28:08 -0500
+	(envelope-from <eblake@redhat.com>) id 1eCRNK-0001ik-9e
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 09:30:48 -0500
+References: <cover.1510143008.git.berto@igalia.com>
+	<0b1b95340ecdfbc6927e36adf2fd42ae6198747a.1510143008.git.berto@igalia.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <c90f13d4-a6fe-02cb-b054-27f96f4b0b46@redhat.com>
+Date: Wed, 8 Nov 2017 08:30:30 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Date: Wed, 08 Nov 2017 17:28:06 +0300
-From: Mihail Abakumov <mikhail.abakumov@ispras.ru>
-In-Reply-To: <CABdb735OHqGVf_0D=zDy9D4HzG4s+w8OjUX5MG2pWrqOrQc=pg@mail.gmail.com>
-References: <150824572545.6816.5099701189660002212.stgit@Misha-PC.lan02.inno>
-	<CABdb736bkcafKPCHsQGEmB6wYOGB4s4S4+sVkuygDe7SjqZDYA@mail.gmail.com>
-	<CABdb736w49GjXwNOsj4o8RHQKAfmWnu+jJQgAZjzHwwzOW-+gA@mail.gmail.com>
-	<1b94bfaac633fc76c8633bbcec9ff4a9@ispras.ru>
-	<CABdb735OHqGVf_0D=zDy9D4HzG4s+w8OjUX5MG2pWrqOrQc=pg@mail.gmail.com>
-Message-ID: <3205f50a0ec9089fcaf452911e60637b@ispras.ru>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 00/43] Windbg supporting
+In-Reply-To: <0b1b95340ecdfbc6927e36adf2fd42ae6198747a.1510143008.git.berto@igalia.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="juigUppbjFmjXWeaWHhhlLBQuvDd3DDPr"
+Subject: Re: [Qemu-devel] [PATCH 1/1] qcow2: Check that corrupted images can
+ be repaired in iotest 060
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,187 +25,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ladi Prosek <lprosek@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, sw@weilnetz.de, Pavel Dovgalyuk <dovgaluk@ispras.ru>, Roman Kagan <rkagan@virtuozzo.com>, Paolo Bonzini <pbonzini@redhat.com>, "Denis V. Lunev" <den@openvz.org>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-Ladi Prosek =D0=BF=D0=B8=D1=81=D0=B0=D0=BB 2017-11-08 16:43:
-> On Wed, Nov 8, 2017 at 12:54 PM, Mihail Abakumov
-> <mikhail.abakumov@ispras.ru> wrote:
->> Ladi Prosek =D0=BF=D0=B8=D1=81=D0=B0=D0=BB 2017-11-06 18:15:
->>=20
->>> On Mon, Oct 23, 2017 at 10:31 AM, Ladi Prosek <lprosek@redhat.com>=20
->>> wrote:
->>>>=20
->>>> On Tue, Oct 17, 2017 at 3:08 PM, Mihail Abakumov
->>>> <mikhail.abakumov@ispras.ru> wrote:
->>>>>=20
->>>>> An update of:
->>>>>=20
->>>>>         v1:
->>>>> https://lists.nongnu.org/archive/html/qemu-devel/2017-09/msg07092.h=
-tml
->>>>>=20
->>>>> We made the debugger module WinDbg (like GDB) for QEMU. This is the
->>>>> replacement of the remote stub in Windows kernel. Used for remote=20
->>>>> Windows
->>>>> kernel debugging without debugging mode.
->>>>>=20
->>>>> WinDbg is a multipurpose debugger for the Microsoft Windows=20
->>>>> computer
->>>>> operating system, distributed by Microsoft. Recent versions of=20
->>>>> WinDbg have
->>>>> been and are being distributed as part of the free Debugging Tools=20
->>>>> for
->>>>> Windows suite.
->>>>>=20
->>>>> How to start debugging QEMU using WinDbg:
->>>>>   Run QEMU with next option:
->>>>>     -windbg pipe:<name>
->>>>>   QEMU will start and pause for waiting WinDbg connection.
->>>>>   Run WinDbg with next options:
->>>>>     -b -k com:pipe,baud=3D115200,port=3D\\.\pipe\<name>,resets=3D0
->>>>>   Wait for debugger connect to kernel.
->>>>>=20
->>>>> Note: You can add Symbol Search Path in WinDbg such as
->>>>> srv*c:\tmp*http://msdl.microsoft.com/download/symbols.
->>>>>=20
->>>>> How it works:
->>>>> The WinDbg debugger has the possibility of connecting to a remote=20
->>>>> debug
->>>>> service (Kdsrv.exe) in the Windows kernel. Therefore, it is=20
->>>>> possible to
->>>>> connect to the guest system running in the QEMU emulator. Kernel=20
->>>>> debugging
->>>>> is possible only with the enabled debugging mode, may change at the=
-=20
->>>>> same
->>>>> time. Our module of WinDbg debugger for QEMU is an alternative of=20
->>>>> the remote
->>>>> debugging service in the kernel. Thus, the debugger connects to the
->>>>> debugging module, not to the kernel of the operating system. The=20
->>>>> module
->>>>> obtains all the necessary information answering debugger requests=20
->>>>> from the
->>>>> QEMU emulator. At the same time for debugging there is no need to=20
->>>>> enable
->>>>> debugging mode in the kernel. This leads to hidden debugging. Our=20
->>>>> module
->>>>> supports all features of WinDbg regarding remote debugging, besides
->>>>> interception of events and exceptions. Only i386 is supported now.
->>>>>=20
->>>>> Changed in v2:
->>>>>=20
->>>>>  - Move target specific code in the 'target/' directory. (Alistair
->>>>> Francis)
->>>>>  - Change 'kd_api_fill_memory'. Made a fill of memory by line=20
->>>>> segments.
->>>>> Before that, a full array was immediately collected and written in=20
->>>>> RAM.
->>>>> (Ladi Prosek)
->>>>>  - Change 'kd_api_search_memory'. Made a search for memory by line
->>>>> segments. (Ladi Prosek)
->>>>>  - Change ld* to st* where it needs. (Ladi Prosek)
->>>>>  - Add a additional check of input arguments in=20
->>>>> 'windbg_read_context'
->>>>> and 'windbg_read_ks_regs'. (Ladi Prosek)
->>>>>  - Fix typos. (Ladi Prosek)
->>>>>  - Add a fliping back 'windbg_state->is_loaded' after reset VM.
->>>>>  - Add a check to disabled kvm. It is supported yet. (Ladi Prosek)
->>>>>  - Add a check to device in windbg option. Only pipe is supporting=20
->>>>> now.
->>>>> (Alistair Francis)
->>>>>  - Add a check to 'ifdef' WINDBG_DEBUG_ON before define it.=20
->>>>> (Alistair
->>>>> Francis)
->>>>>  - Replace printf to qemu_log. (Alistair Francis)
->>>>>  - Fix build on s390x host. (patchew)
->>>>>  - Fix code style error. (patchew)
->>>>=20
->>>>=20
->>>> Thank you, I am planning to take a closer look and test the changes=20
->>>> in
->>>> a week or two.
->>>>=20
->>>> Still wondering if it is limited to Windows hosts or if it can be=20
->>>> used
->>>> on Linux as well, preferably with KVM.
->>>=20
->>>=20
->>> I haven't been able to make this work.
->>>=20
->>> I've built a 32-bit QEMU for Windows with these patches and used the
->>> command line parameters given above:
->>>=20
->>>   qemu-system-i386.exe run with -windbg pipe:win7_dbg
->>>   windbg -b -k com:pipe,baud=3D115200,port=3D\\.\pipe\win7_dbg,resets=
-=3D0
->>>=20
->>> The guest is a fresh install of Win7 32-bit.
->>>=20
->>> FS base passes all the checks in windbg_on_load() as the guest kernel
->>> loads and it returns true. QEMU then sends some data over the pipe.
->>> Windbg doesn't print anything, it's still showing:
->>>=20
->>>   Opened \\.\pipe\win7_dbg
->>>   Waiting to reconnect...
->>>=20
->>> Is this expected? In regular remote kernel debugging, windbg produces
->>> a bunch of output about the target state when it attaches.
->>>=20
->>> The only thing I can reasonably do at this point is Ctrl+Break. This
->>> results in some data exchange between QEMU and windbg but nothing
->>> really changes -- windbg still says "Waiting to reconnect...".=20
->>> Hitting
->>> Ctrl+Break for the second time kills windbg. I tried running windbg
->>> under windbg and was able to capture this output:
->>>=20
->>>   Debug target initialization failed, 0x8000FFFF
->>>=20
->>> Once I managed to make windbg actually attach (i.e. it generated the
->>> target state output) but the QEMU process died shortly after that. I
->>> don't know why because I haven't been able to reproduce it.
->>>=20
->>> So, what am I doing wrong? Can you post your detailed steps please?
->>>=20
->>> I'm pasting a dump of the pipe traffic as captured with IO Ninja. "<"
->>> is windbg to QEMU, ">" is QEMU to windbg. QEMU initialized the stub=20
->>> at
->>> 14:57:48, the first Ctrl+Break was issued at 15:00:32 and the second
->>> one at 15:01:10.
->>>=20
->>=20
->> This is very strange.
->> After reading the desired addresses (windbg_on_load()), the=20
->> interaction
->> between the stub and windbg begins. A lot of packets are being sent.
->> This happens about 10 seconds. All this time "Waiting to reconnect=20
->> ..."
->> Then the windbg connects.
->> In your case windbg does not send packets, more specifically, does not
->> continue to do it. What is your version of windbg. Also, windbg stub=20
->> has
->> been supported only for windbg x64, yet.
->=20
-> Ah, so that's a pretty important piece of information and not very
-> intuitive given the "Only i386 is supported now." sentence in the
-> cover email.
->=20
-> Microsoft (R) Windows Debugger Version 10.0.15063.468 X86
-> Microsoft (R) Windows Debugger Version 10.0.15063.468 AMD64
-> Microsoft (R) Windows Debugger Version 10.0.16299.15 X86
-> Microsoft (R) Windows Debugger Version 10.0.16299.15 AMD64
->=20
-> are the versions I have tried. I don't see any difference between x86
-> and amd64, all versions never connect and crash after the second
-> break.
->=20
-> What guest OS are you running? Can you maybe zip up your QEMU binaries
-> and share them with me?
->=20
-> Thanks,
-> Ladi
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--juigUppbjFmjXWeaWHhhlLBQuvDd3DDPr
+From: Eric Blake <eblake@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
+Message-ID: <c90f13d4-a6fe-02cb-b054-27f96f4b0b46@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/1] qcow2: Check that corrupted images can
+ be repaired in iotest 060
+References: <cover.1510143008.git.berto@igalia.com>
+ <0b1b95340ecdfbc6927e36adf2fd42ae6198747a.1510143008.git.berto@igalia.com>
+In-Reply-To: <0b1b95340ecdfbc6927e36adf2fd42ae6198747a.1510143008.git.berto@igalia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Oh, it looks like a problem in the versions. I use the Windbg from=20
-Windows 7.
-Windbg version: 6.12.0002.633 AMD64. I will try to test with your=20
-version.
+On 11/08/2017 06:13 AM, Alberto Garcia wrote:
+> We just fixed a few bugs that caused QEMU to crash when trying to
+> write to corrupted qcow2 images, and iotest 060 was expanded to test
+> all those scenarios.
+>=20
+> In almost all cases the corrupted images can be repaired using
+> qemu-img, so this patch verifies that.
+>=20
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> ---
+>  tests/qemu-iotests/060     | 10 ++++++++
+>  tests/qemu-iotests/060.out | 64 ++++++++++++++++++++++++++++++++++++++=
+++++++++
+>  2 files changed, 74 insertions(+)
+
+Just in case it matters to patchew:
+Based-on: <cover.1509718618.git.berto@igalia.com>
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--juigUppbjFmjXWeaWHhhlLBQuvDd3DDPr
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloDFQYACgkQp6FrSiUn
+Q2qeMQf/c2+hJItUS1tudvU/1v5CRPoNXdpkSZvDE7iRJiIIqW98czvvvYPNQFwy
+/JG5EdKgoUqw1VDGsU8O82bdgVKn4sTjGuvhkTGUfrG0iMfZUqGDDIn/gGoW7pmG
+5mL4Ojr/xWm28EBSZBOA4cWulcpX7mV/9x1wn7PbUs1CPZIhsjqY/uOYKzTSqYWx
+PRIXz8LF6u51VMq/XO9KO/teI25JJ2DogquEHT4IIh/Jxb6pmZCKU0TWqyzbJjKx
+a2hQnIa8MQsb/EhrPlIR64z0CLqxQhw8DWjZIkf+aAm0VwDwkcoW0YHI8xKQFTc5
+EdoMq5b7M86QegNyHmNu36Mx1PJ7qw==
+=8BLK
+-----END PGP SIGNATURE-----
+
+--juigUppbjFmjXWeaWHhhlLBQuvDd3DDPr--
