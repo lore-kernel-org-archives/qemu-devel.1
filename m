@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55926)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56065)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eCRqn-0000sz-I5
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 10:01:17 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eCRrc-0001M9-Jk
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 10:02:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eCRqh-0003X7-NY
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 10:01:09 -0500
-References: <cover.1508390588.git.alistair.francis@xilinx.com>
-	<ad7c1de551fbc497743e4dd60335a75cb5365a15.1508390588.git.alistair.francis@xilinx.com>
-	<87efpmccvu.fsf@secure.laptop> <87bmke4cu9.fsf@dusky.pond.sub.org>
-	<51d103e9-8d6b-8c83-dd69-effe997d4813@redhat.com>
-	<87shdptdf0.fsf@dusky.pond.sub.org>
-	<CAKmqyKOhnGrbZ6tnaXgBNzdJ=LdnD9NWuWVV-LHmM3zea8OBvA@mail.gmail.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <308c6070-e9b8-f40d-2389-96497dbe238d@redhat.com>
-Date: Wed, 8 Nov 2017 09:00:23 -0600
+	(envelope-from <pbonzini@redhat.com>) id 1eCRrZ-000429-FP
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 10:02:00 -0500
+Received: from mail-wr0-f177.google.com ([209.85.128.177]:48359)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eCRrZ-00041b-9N
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 10:01:57 -0500
+Received: by mail-wr0-f177.google.com with SMTP id 15so2693156wrb.5
+	for <qemu-devel@nongnu.org>; Wed, 08 Nov 2017 07:01:57 -0800 (PST)
+References: <cover.1510093478.git.jcody@redhat.com>
+	<41ed8543e005205118438328c7e162532729d9c7.1510093478.git.jcody@redhat.com>
+	<20171108104737.xtxfex7leabfbqyc@starbug-vm.ie.oracle.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <1465eafb-d4c4-4628-cffd-1b4ea47f2e8a@redhat.com>
+Date: Wed, 8 Nov 2017 16:01:51 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAKmqyKOhnGrbZ6tnaXgBNzdJ=LdnD9NWuWVV-LHmM3zea8OBvA@mail.gmail.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="kF2Ne2kcFoSMjrqnDiSc2XfQb1w9bXXj2"
-Subject: Re: [Qemu-devel] [PATCH v3 01/46] Replace all occurances of
- __FUNCTION__ with __func__
+In-Reply-To: <20171108104737.xtxfex7leabfbqyc@starbug-vm.ie.oracle.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v3 7/7] block/curl: code
+ cleanup to comply with coding style
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,97 +32,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair23@gmail.com>, Markus Armbruster <armbru@redhat.com>
-Cc: Juan Quintela <quintela@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Fam Zheng <famz@redhat.com>, Qemu-block <qemu-block@nongnu.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Yongbok Kim <yongbok.kim@imgtec.com>, qemu-arm <qemu-arm@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "open list:X86" <xen-devel@lists.xenproject.org>, Anthony Perard <anthony.perard@citrix.com>, Alistair Francis <alistair.francis@xilinx.com>, John Snow <jsnow@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+To: Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp, rjones@redhat.com, namei.unix@gmail.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---kF2Ne2kcFoSMjrqnDiSc2XfQb1w9bXXj2
-From: Eric Blake <eblake@redhat.com>
-To: Alistair Francis <alistair23@gmail.com>,
- Markus Armbruster <armbru@redhat.com>
-Cc: Juan Quintela <quintela@redhat.com>,
- Stefano Stabellini <sstabellini@kernel.org>, Fam Zheng <famz@redhat.com>,
- Qemu-block <qemu-block@nongnu.org>,
- Peter Crosthwaite <crosthwaite.peter@gmail.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Yongbok Kim <yongbok.kim@imgtec.com>, qemu-arm <qemu-arm@nongnu.org>,
- Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- "open list:X86" <xen-devel@lists.xenproject.org>,
- Anthony Perard <anthony.perard@citrix.com>,
- Alistair Francis <alistair.francis@xilinx.com>, John Snow
- <jsnow@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
-Message-ID: <308c6070-e9b8-f40d-2389-96497dbe238d@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 01/46] Replace all occurances of
- __FUNCTION__ with __func__
-References: <cover.1508390588.git.alistair.francis@xilinx.com>
- <ad7c1de551fbc497743e4dd60335a75cb5365a15.1508390588.git.alistair.francis@xilinx.com>
- <87efpmccvu.fsf@secure.laptop> <87bmke4cu9.fsf@dusky.pond.sub.org>
- <51d103e9-8d6b-8c83-dd69-effe997d4813@redhat.com>
- <87shdptdf0.fsf@dusky.pond.sub.org>
- <CAKmqyKOhnGrbZ6tnaXgBNzdJ=LdnD9NWuWVV-LHmM3zea8OBvA@mail.gmail.com>
-In-Reply-To: <CAKmqyKOhnGrbZ6tnaXgBNzdJ=LdnD9NWuWVV-LHmM3zea8OBvA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 11/08/2017 08:51 AM, Alistair Francis wrote:
-
->>>> Let me rephrase the question: do we really support compilers that do=
-n't
->>>> understand __func__?  The presence of numerous unconditional uses of=
-
->>>> __func__ in the tree means the answer is no.  Let's replace AUDIO_FU=
-NC
->>>> by plain __func__.
->>>
->>> Answered elsewhere in patch 3/46 (where we DO replace AUDIO_FUNC by
->>> __func__).
+On 08/11/2017 11:47, Darren Kenny wrote:
 >>
->> I see.
 >>
->> Put 03/46 first, so we don't have to mess with AUDIO_FUNC twice?
->=20
-> I would really like to avoid that, as the conflicts will be a bit of a
-> mess. The way I see it there will be a lot of churn no matter what,
-> so we don't gain much by swapping the order around.
->=20
-> I have a new series ready to send today, so I'm going to send that
-> through as I would like at least some of these patches to make it in
-> 2.11. After that if you think strongly the order should be changed I
-> can change it in the next version.
+>> -// #define DEBUG_CURL
+>> -// #define DEBUG_VERBOSE
+>> +/*
+>> + #define DEBUG_CURL
+>> + #define DEBUG_VERBOSE
+>> +*/
+> 
+> Is it not more common to use the style:
+> 
+>    /*
+>     * text
+>     */
+> 
+> This is visible in almost every file at the top, where the Copyright
+> and License is.
 
-I think the reorder is not that hard.  Put 3/46 first (changing
-AUDIO_FUNC to __func__), and then 1/46 doesn't have to touch any of the
-files that used to use AUDIO_FUNC, because there is no intermediate
-state using __FUNCTION__.
+The most common style in QEMU is probably
 
-If I'm reading it correctly, the rebase conflict is limited to a slight
-rewording of the commit message for 3/46, and one line in 1/46 to the
-definition of AUDIO_FUNC (that will no longer be present).
+   /* text
+    * more text
+    */
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+But for DEBUG_* macros I think // are appropriate.  checkpatch should
+still warn about them because DEBUG_* macros should be replaced by
+tracepoints; but unless we do that we should keep line comments.
 
+>>
+>> -    CURLState *s = ((CURLState*)opaque);
+>> +    CURLState *s = opaque;
+> 
+> Not sure about this one - while it may not be strictly necessary to
+> do the casting, from a readability point of view it is helpful to
+> see the cast - possibly with the outer brackets removed:
+> 
+>      CURLState *s = (CURLState*)opaque;
 
---kF2Ne2kcFoSMjrqnDiSc2XfQb1w9bXXj2
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+I think the most common idiom here is to omit the cast.
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+>> -    // In case we have the requested data already (e.g. read-ahead),
+>> -    // we can just call the callback and be done.
+>> +    /* In case we have the requested data already (e.g. read-ahead),
+>> +       we can just call the callback and be done. */
+> 
+> Please don't do a multi-line comment like this, it is much more
+> obvious that the second line is a comment if you use the more normal
+> format of as outlined earlier by me. 
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloDHAcACgkQp6FrSiUn
-Q2r23Qf+KWVL6ncuGiLwyij++5Xtg++Irybomd+ICJpYrF5KdV2xX2jl5EZW800/
-aeseimOISxuXGTt14SnjzWC2FinRpD/X6ABjyp49CpjlT6ueglDRSXcHPS1CbJ2y
-RFjZIN1TFAAk9vI1nafOKYKQhHxiKQ/qFYCF2XNuJmDEZwE2Bf+V5qp20MqejKIQ
-0GM/PY3tAX1l921g+L+HrFUVTceyOXdCJCiy4zgzvc3nXfFv2EH2MvLuGj+XfffI
-9vcTohI0eyocQb1zbcnpF6oU7kJPEcWV9B5xwhqkb53rjv7Isb9TKf4972doSDdM
-vkCJbjm3IMRf5E7B3WwRSStCs8r26g==
-=KiGA
------END PGP SIGNATURE-----
+Agreed.
 
---kF2Ne2kcFoSMjrqnDiSc2XfQb1w9bXXj2--
+Paolo
