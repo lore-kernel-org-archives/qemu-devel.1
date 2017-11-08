@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53621)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55008)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1eCWyb-0007Lt-Bl
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 15:29:34 -0500
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1eCX69-0000R4-7M
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 15:37:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1eCWyY-0008DX-7c
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 15:29:33 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50854)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1eCWyX-0008Cz-Uz
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 15:29:30 -0500
-Date: Wed, 8 Nov 2017 18:29:24 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20171108202924.GV3111@localhost.localdomain>
-References: <20171108022828.7242-1-f4bug@amsat.org>
-	<20171108022828.7242-2-f4bug@amsat.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20171108022828.7242-2-f4bug@amsat.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 1/6] machine: add a deprecated_reason
- property
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1eCX64-0004uI-Ay
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 15:37:21 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:40544)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
+	id 1eCX64-0004tc-2P
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 15:37:16 -0500
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	vA8Ka2wJ107046
+	for <qemu-devel@nongnu.org>; Wed, 8 Nov 2017 15:37:09 -0500
+Received: from e37.co.us.ibm.com (e37.co.us.ibm.com [32.97.110.158])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2e48abtf33-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 08 Nov 2017 15:37:09 -0500
+Received: from localhost
+	by e37.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
+	Wed, 8 Nov 2017 13:37:08 -0700
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Date: Wed,  8 Nov 2017 15:37:01 -0500
+Message-Id: <1510173421-19895-1-git-send-email-stefanb@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v2] tpm_emulator: Add a caching layer for the
+ TPM Established flag
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,104 +36,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, marcandre.lureau@redhat.com
+Cc: amarnath.valluri@intel.com, Stefan Berger <stefanb@linux.vnet.ibm.com>
 
-On Tue, Nov 07, 2017 at 11:28:23PM -0300, Philippe Mathieu-Daud=E9 wrote:
-> If a machine has the deprecated_reason property set:
-> - it won't get listed anymore by the "-M help" command,
-> - a warning will be displayed if the machine is used.
->=20
-> Example:
->   $ ppc-softmmu/qemu-system-ppc -M prep
->   qemu-system-ppc: -M prep: warning: The PowerPC PREP platform machine =
-is deprecated (Obsoleted by the "40p" machine)
->   [machine starting ...]
->=20
-> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
-> ---
->  include/hw/boards.h | 1 +
->  vl.c                | 7 +++++++
->  2 files changed, 8 insertions(+)
->=20
-> diff --git a/include/hw/boards.h b/include/hw/boards.h
-> index 191a5b3cd8..4d5c180968 100644
-> --- a/include/hw/boards.h
-> +++ b/include/hw/boards.h
-> @@ -182,6 +182,7 @@ struct MachineClass {
->      const char *default_boot_order;
->      const char *default_display;
->      GArray *compat_props;
-> +    const char *deprecated_reason;
+Add a caching layer for the TPM established flag so that we don't
+need to go to the emulator every time the flag is read by accessing
+the REG_ACCESS register.
 
-This series introduces 5 different flavors of deprecation
-messages:
+Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
 
-* "Too old"
-* "Unmaintained"
-* "The ZCU102 machine has the same features supported"
-* "Use the \"pc\" machine instead"
-* "Obsoleted by the \"40p\" machine"
+v1->v2:
+ - move the caching to the backend layer since detecting the
+   TPM 1.2 TSC_ResetEstablishmentBit() command is easier to do
+   here.
+---
+ hw/tpm/tpm_emulator.c | 17 ++++++++++++++---
+ 1 file changed, 14 insertions(+), 3 deletions(-)
 
-Can we clearly document guidelines and examples for values of
-this field, to help ensure consistency?
-
-Examples of questions that could be answered in the field
-documentation:
-
-* Should the message start with an uppercase letter?
-* Should it really explain _why_ it was deprecated, or is a
-  simple "please use xlnx-zcu102 instead" good enough?
-* Which of the following is preferred:
-  * "obsoleted by the \"pc\" machine"
-  * "obsoleted by \"pc\""
-  * "use \"pc\" instead"
-  * "too old, use \"pc\" instead"
-  * "too old; use \"pc\" instead"
-  * <something else?>
-
-
-Minor suggestion: name the field 'deprecation_reason' instead of
-'deprecated_reason'.
-
->      const char *hw_version;
->      ram_addr_t default_ram_size;
->      const char *default_cpu_type;
-> diff --git a/vl.c b/vl.c
-> index ec299099ff..9ed4648af2 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -2742,6 +2742,10 @@ static gint machine_class_cmp(gconstpointer a, g=
-constpointer b)
->      }
->      if (mc) {
->          g_slist_free(machines);
-> +        if (mc->deprecated_reason) {
-> +            warn_report("The %s machine is deprecated (%s)",
-> +                        mc->desc, mc->deprecated_reason);
-
-I would use mc->name instead of mc->desc.
-
-
-> +        }
->          return mc;
->      }
->      if (name && !is_help_option(name)) {
-> @@ -2752,6 +2756,9 @@ static gint machine_class_cmp(gconstpointer a, gc=
-onstpointer b)
->          machines =3D g_slist_sort(machines, machine_class_cmp);
->          for (el =3D machines; el; el =3D el->next) {
->              MachineClass *mc =3D el->data;
-> +            if (mc->deprecated_reason) {
-> +                continue;
-> +            }
->              if (mc->alias) {
->                  printf("%-20s %s (alias of %s)\n", mc->alias, mc->desc=
-, mc->name);
->              }
-> --=20
-> 2.15.0
->=20
-
---=20
-Eduardo
+diff --git a/hw/tpm/tpm_emulator.c b/hw/tpm/tpm_emulator.c
+index 9aaec8e..507e2cb 100644
+--- a/hw/tpm/tpm_emulator.c
++++ b/hw/tpm/tpm_emulator.c
+@@ -71,6 +71,9 @@ typedef struct TPMEmulator {
+     ptm_cap caps; /* capabilities of the TPM */
+     uint8_t cur_locty_number; /* last set locality */
+     Error *migration_blocker;
++
++    unsigned int established_flag:1;
++    unsigned int established_flag_cached:1;
+ } TPMEmulator;
+ 
+ 
+@@ -277,16 +280,22 @@ static bool tpm_emulator_get_tpm_established_flag(TPMBackend *tb)
+     TPMEmulator *tpm_emu = TPM_EMULATOR(tb);
+     ptm_est est;
+ 
+-    DPRINTF("%s", __func__);
++    if (tpm_emu->established_flag_cached) {
++        return tpm_emu->established_flag;
++    }
++
+     if (tpm_emulator_ctrlcmd(&tpm_emu->ctrl_chr, CMD_GET_TPMESTABLISHED, &est,
+                              0, sizeof(est)) < 0) {
+         error_report("tpm-emulator: Could not get the TPM established flag: %s",
+                      strerror(errno));
+         return false;
+     }
+-    DPRINTF("established flag: %0x", est.u.resp.bit);
++    DPRINTF("got established flag: %0x", est.u.resp.bit);
++
++    tpm_emu->established_flag_cached = 1;
++    tpm_emu->established_flag = (est.u.resp.bit != 0);
+ 
+-    return (est.u.resp.bit != 0);
++    return tpm_emu->established_flag;
+ }
+ 
+ static int tpm_emulator_reset_tpm_established_flag(TPMBackend *tb,
+@@ -317,6 +326,8 @@ static int tpm_emulator_reset_tpm_established_flag(TPMBackend *tb,
+         return -1;
+     }
+ 
++    tpm_emu->established_flag_cached = 0;
++
+     return 0;
+ }
+ 
+-- 
+2.5.5
