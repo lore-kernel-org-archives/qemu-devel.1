@@ -1,33 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55008)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55221)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1eCX69-0000R4-7M
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 15:37:22 -0500
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1eCX7T-00014z-GS
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 15:38:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1eCX64-0004uI-Ay
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 15:37:21 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:40544)
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1eCX7O-0005VK-K6
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 15:38:43 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:58420
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1eCX64-0004tc-2P
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 15:37:16 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vA8Ka2wJ107046
-	for <qemu-devel@nongnu.org>; Wed, 8 Nov 2017 15:37:09 -0500
-Received: from e37.co.us.ibm.com (e37.co.us.ibm.com [32.97.110.158])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2e48abtf33-1
+	id 1eCX7O-0005V3-Db
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 15:38:38 -0500
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	vA8KbSXD069984
+	for <qemu-devel@nongnu.org>; Wed, 8 Nov 2017 15:38:29 -0500
+Received: from e15.ny.us.ibm.com (e15.ny.us.ibm.com [129.33.205.205])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2e45u62a86-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 08 Nov 2017 15:37:09 -0500
+	for <qemu-devel@nongnu.org>; Wed, 08 Nov 2017 15:38:29 -0500
 Received: from localhost
-	by e37.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e15.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Wed, 8 Nov 2017 13:37:08 -0700
+	Wed, 8 Nov 2017 15:38:28 -0500
+References: <1510170356-16953-1-git-send-email-stefanb@linux.vnet.ibm.com>
 From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Wed,  8 Nov 2017 15:37:01 -0500
-Message-Id: <1510173421-19895-1-git-send-email-stefanb@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v2] tpm_emulator: Add a caching layer for the
- TPM Established flag
+Date: Wed, 8 Nov 2017 15:38:24 -0500
+MIME-Version: 1.0
+In-Reply-To: <1510170356-16953-1-git-send-email-stefanb@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Message-Id: <9dcf6e2e-3f31-c4a4-a5da-50892a777f10@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH] tpm: Add a caching layer for the TPM
+ Established flag
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,70 +43,79 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, marcandre.lureau@redhat.com
-Cc: amarnath.valluri@intel.com, Stefan Berger <stefanb@linux.vnet.ibm.com>
+Cc: amarnath.valluri@intel.com
 
-Add a caching layer for the TPM established flag so that we don't
-need to go to the emulator every time the flag is read by accessing
-the REG_ACCESS register.
+On 11/08/2017 02:45 PM, Stefan Berger wrote:
+> Add a caching layer for the TPM established flag so that we don't
+> need to go to the backend every time the flag is read by accessing
+> the REG_ACCESS register.
 
-Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+The v2 I just sent moves this to the tpm_emulator.
 
-v1->v2:
- - move the caching to the backend layer since detecting the
-   TPM 1.2 TSC_ResetEstablishmentBit() command is easier to do
-   here.
----
- hw/tpm/tpm_emulator.c | 17 ++++++++++++++---
- 1 file changed, 14 insertions(+), 3 deletions(-)
+     Stefan
 
-diff --git a/hw/tpm/tpm_emulator.c b/hw/tpm/tpm_emulator.c
-index 9aaec8e..507e2cb 100644
---- a/hw/tpm/tpm_emulator.c
-+++ b/hw/tpm/tpm_emulator.c
-@@ -71,6 +71,9 @@ typedef struct TPMEmulator {
-     ptm_cap caps; /* capabilities of the TPM */
-     uint8_t cur_locty_number; /* last set locality */
-     Error *migration_blocker;
-+
-+    unsigned int established_flag:1;
-+    unsigned int established_flag_cached:1;
- } TPMEmulator;
- 
- 
-@@ -277,16 +280,22 @@ static bool tpm_emulator_get_tpm_established_flag(TPMBackend *tb)
-     TPMEmulator *tpm_emu = TPM_EMULATOR(tb);
-     ptm_est est;
- 
--    DPRINTF("%s", __func__);
-+    if (tpm_emu->established_flag_cached) {
-+        return tpm_emu->established_flag;
-+    }
-+
-     if (tpm_emulator_ctrlcmd(&tpm_emu->ctrl_chr, CMD_GET_TPMESTABLISHED, &est,
-                              0, sizeof(est)) < 0) {
-         error_report("tpm-emulator: Could not get the TPM established flag: %s",
-                      strerror(errno));
-         return false;
-     }
--    DPRINTF("established flag: %0x", est.u.resp.bit);
-+    DPRINTF("got established flag: %0x", est.u.resp.bit);
-+
-+    tpm_emu->established_flag_cached = 1;
-+    tpm_emu->established_flag = (est.u.resp.bit != 0);
- 
--    return (est.u.resp.bit != 0);
-+    return tpm_emu->established_flag;
- }
- 
- static int tpm_emulator_reset_tpm_established_flag(TPMBackend *tb,
-@@ -317,6 +326,8 @@ static int tpm_emulator_reset_tpm_established_flag(TPMBackend *tb,
-         return -1;
-     }
- 
-+    tpm_emu->established_flag_cached = 0;
-+
-     return 0;
- }
- 
--- 
-2.5.5
+>
+> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+> ---
+>   hw/tpm/tpm_tis.c | 27 +++++++++++++++++++++++++--
+>   1 file changed, 25 insertions(+), 2 deletions(-)
+>
+> diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
+> index 7402528..6b81bbf 100644
+> --- a/hw/tpm/tpm_tis.c
+> +++ b/hw/tpm/tpm_tis.c
+> @@ -95,6 +95,9 @@ struct TPMState {
+>       char *backend;
+>       TPMBackend *be_driver;
+>       TPMVersion be_tpm_version;
+> +
+> +    unsigned int established_flag:1;
+> +    unsigned int established_flag_cached:1;
+>   };
+>
+>   #define TPM(obj) OBJECT_CHECK(TPMState, (obj), TYPE_TPM_TIS)
+> @@ -529,6 +532,26 @@ static void tpm_tis_dump_state(void *opaque, hwaddr addr)
+>   }
+>   #endif
+>
+> +static void tpm_tis_reset_tpm_established_flag(TPMState *s,
+> +                                               uint8_t locty)
+> +{
+> +    s->established_flag_cached = 0;
+> +
+> +    tpm_backend_reset_tpm_established_flag(s->be_driver, locty);
+> +}
+> +
+> +static unsigned int tpm_tis_get_tpm_established_flag(TPMState *s)
+> +{
+> +    if (s->established_flag_cached) {
+> +        return s->established_flag;
+> +    }
+> +
+> +    s->established_flag = !tpm_backend_get_tpm_established_flag(s->be_driver);
+> +    s->established_flag_cached = 1;
+> +
+> +    return s->established_flag;
+> +}
+> +
+>   /*
+>    * Read a register of the TIS interface
+>    * See specs pages 33-63 for description of the registers
+> @@ -556,7 +579,7 @@ static uint64_t tpm_tis_mmio_read(void *opaque, hwaddr addr,
+>           if (tpm_tis_check_request_use_except(s, locty)) {
+>               val |= TPM_TIS_ACCESS_PENDING_REQUEST;
+>           }
+> -        val |= !tpm_backend_get_tpm_established_flag(s->be_driver);
+> +        val |= tpm_tis_get_tpm_established_flag(s);
+>           break;
+>       case TPM_TIS_REG_INT_ENABLE:
+>           val = s->loc[locty].inte;
+> @@ -840,7 +863,7 @@ static void tpm_tis_mmio_write(void *opaque, hwaddr addr,
+>
+>               if (val & TPM_TIS_STS_RESET_ESTABLISHMENT_BIT) {
+>                   if (locty == 3 || locty == 4) {
+> -                    tpm_backend_reset_tpm_established_flag(s->be_driver, locty);
+> +                    tpm_tis_reset_tpm_established_flag(s, locty);
+>                   }
+>               }
+>           }
