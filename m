@@ -1,17 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54696)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59870)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eCYlD-0008AL-Pr
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 17:23:52 -0500
+	(envelope-from <lepton@google.com>) id 1eCZEF-0005Jz-RP
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 17:53:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eCYlC-0004AV-PM
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 17:23:51 -0500
-From: Eric Blake <eblake@redhat.com>
-Date: Wed,  8 Nov 2017 16:23:37 -0600
-Message-Id: <20171108222337.12400-1-eblake@redhat.com>
-In-Reply-To: <20171108215703.9295-3-eblake@redhat.com>
-References: <20171108215703.9295-3-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 2.5/7] fixup! nbd-client: Refuse read-only
- client with BDRV_O_RDWR
+	(envelope-from <lepton@google.com>) id 1eCZEF-0007fg-6Y
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 17:53:51 -0500
+Received: from mail-it0-x244.google.com ([2607:f8b0:4001:c0b::244]:55121)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <lepton@google.com>) id 1eCZEF-0007f8-1E
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 17:53:51 -0500
+Received: by mail-it0-x244.google.com with SMTP id 72so8475476itk.3
+	for <qemu-devel@nongnu.org>; Wed, 08 Nov 2017 14:53:50 -0800 (PST)
+From: Tao Wu <lepton@google.com>
+Date: Wed,  8 Nov 2017 14:53:40 -0800
+Message-Id: <20171108225340.10194-1-lepton@google.com>
+In-Reply-To: <20170508195404.j33kcmqncrb7fziv@var.youpi.perso.aquilenet.fr>
+References: <20170508195404.j33kcmqncrb7fziv@var.youpi.perso.aquilenet.fr>
+Subject: [Qemu-devel] [PATCH] slirp: don't zero ti_i since we access it
+ later.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,69 +27,37 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, vsementsov@virtuozzo.com, pbonzini@redhat.com, kwolf@redhat.com, Max Reitz <mreitz@redhat.com>
+Cc: samuel.thibault@gnu.org, Tao Wu <lepton@google.com>
 
-...
+The current code looks buggy, we zero ti_i while we access
+ti_dst/ti_src later.
 
-Fix several iotests to comply with the new behavior (since
-qemu-nbd of an internal snapshot, as well as nbd-server-add over QMP,
-default to a read-only export, we must tell blockdev-add/qemu-io to
-set up a read-only client).
-
-Signed-off-by: Eric Blake <eblake@redhat.com>
-
+Signed-off-by: Tao Wu <lepton@google.com>
 ---
-Will squash when applying this series to the NBD queue.
----
- tests/qemu-iotests/058 | 8 ++++----
- tests/qemu-iotests/140 | 4 ++--
- 2 files changed, 6 insertions(+), 6 deletions(-)
+ slirp/tcp_subr.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
-diff --git a/tests/qemu-iotests/058 b/tests/qemu-iotests/058
-index 2253c6a6d1..5eb8784669 100755
---- a/tests/qemu-iotests/058
-+++ b/tests/qemu-iotests/058
-@@ -117,15 +117,15 @@ _export_nbd_snapshot sn1
-
- echo
- echo "== verifying the exported snapshot with patterns, method 1 =="
--$QEMU_IO_NBD -c 'read -P 0xa 0x1000 0x1000' "$nbd_snapshot_img" | _filter_qemu_io
--$QEMU_IO_NBD -c 'read -P 0xb 0x2000 0x1000' "$nbd_snapshot_img" | _filter_qemu_io
-+$QEMU_IO_NBD -r -c 'read -P 0xa 0x1000 0x1000' "$nbd_snapshot_img" | _filter_qemu_io
-+$QEMU_IO_NBD -r -c 'read -P 0xb 0x2000 0x1000' "$nbd_snapshot_img" | _filter_qemu_io
-
- _export_nbd_snapshot1 sn1
-
- echo
- echo "== verifying the exported snapshot with patterns, method 2 =="
--$QEMU_IO_NBD -c 'read -P 0xa 0x1000 0x1000' "$nbd_snapshot_img" | _filter_qemu_io
--$QEMU_IO_NBD -c 'read -P 0xb 0x2000 0x1000' "$nbd_snapshot_img" | _filter_qemu_io
-+$QEMU_IO_NBD -r -c 'read -P 0xa 0x1000 0x1000' "$nbd_snapshot_img" | _filter_qemu_io
-+$QEMU_IO_NBD -r -c 'read -P 0xb 0x2000 0x1000' "$nbd_snapshot_img" | _filter_qemu_io
-
- $QEMU_IMG convert "$TEST_IMG" -l sn1 -O qcow2 "$converted_image"
-
-diff --git a/tests/qemu-iotests/140 b/tests/qemu-iotests/140
-index f89d0d6789..a8fc95145c 100755
---- a/tests/qemu-iotests/140
-+++ b/tests/qemu-iotests/140
-@@ -78,7 +78,7 @@ _send_qemu_cmd $QEMU_HANDLE \
-        'arguments': { 'device': 'drv' }}" \
-     'return'
-
--$QEMU_IO_PROG -f raw -c 'read -P 42 0 64k' \
-+$QEMU_IO_PROG -f raw -r -c 'read -P 42 0 64k' \
-     "nbd+unix:///drv?socket=$TEST_DIR/nbd" 2>&1 \
-     | _filter_qemu_io | _filter_nbd
-
-@@ -87,7 +87,7 @@ _send_qemu_cmd $QEMU_HANDLE \
-        'arguments': { 'device': 'drv' }}" \
-     'return'
-
--$QEMU_IO_PROG -f raw -c close \
-+$QEMU_IO_PROG -f raw -r -c close \
-     "nbd+unix:///drv?socket=$TEST_DIR/nbd" 2>&1 \
-     | _filter_qemu_io | _filter_nbd
-
+diff --git a/slirp/tcp_subr.c b/slirp/tcp_subr.c
+index dc8b4bbb50..da0d53743f 100644
+--- a/slirp/tcp_subr.c
++++ b/slirp/tcp_subr.c
+@@ -148,7 +148,16 @@ tcp_respond(struct tcpcb *tp, struct tcpiphdr *ti, struct mbuf *m,
+ 		m->m_data += IF_MAXLINKHDR;
+ 		*mtod(m, struct tcpiphdr *) = *ti;
+ 		ti = mtod(m, struct tcpiphdr *);
+-		memset(&ti->ti, 0, sizeof(ti->ti));
++		switch (af) {
++		case AF_INET:
++		    ti->ti.ti_i4.ih_x1 = 0;
++		    break;
++		case AF_INET6:
++		    ti->ti.ti_i6.ih_x1 = 0;
++		    break;
++		default:
++		    g_assert_not_reached();
++		}
+ 		flags = TH_ACK;
+ 	} else {
+ 		/*
 -- 
-2.13.6
+2.15.0.448.gf294e3d99a-goog
