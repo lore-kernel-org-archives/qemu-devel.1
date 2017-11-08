@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50629)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51076)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eCPnU-0000Ky-7c
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 07:49:37 -0500
+	id 1eCPpa-0001FP-My
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 07:51:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eCPnT-0001ea-DW
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 07:49:36 -0500
+	id 1eCPpU-0002xd-Va
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 07:51:46 -0500
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-References: <20171002124052.13829-1-anthoine.bourgeois@gmail.com>
+References: <20170926210723.38042-1-carenas@gmail.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <4f219f7b-d680-7a46-8832-5a1aaf509783@amsat.org>
-Date: Wed, 8 Nov 2017 09:49:26 -0300
+Message-ID: <cab436f4-5d5c-485e-a7da-0d844429c5a4@amsat.org>
+Date: Wed, 8 Nov 2017 09:51:31 -0300
 MIME-Version: 1.0
-In-Reply-To: <20171002124052.13829-1-anthoine.bourgeois@gmail.com>
+In-Reply-To: <20170926210723.38042-1-carenas@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] gtk: fix wrong id between texture and
- framebuffer
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2] gitignore: ignore check-qlit test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,45 +27,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anthoine Bourgeois <anthoine.bourgeois@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Anthoine Bourgeois <anthoine.bourgeois@blade-group.com>
+To: =?UTF-8?Q?Carlo_Marcelo_Arenas_Bel=c3=b3n?= <carenas@gmail.com>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, marcandre.lureau@redhat.com
 
-Hi Anthoine,
-
-Cc'ing Gerd Hoffmann who is the maintainer of this file.
-
-See
-https://wiki.qemu.org/Contribute/SubmitAPatch#CC_the_relevant_maintainer:
-
-$ ./scripts/get_maintainer.pl -f ui/gtk-gl-area.c
-Gerd Hoffmann <kraxel@redhat.com> (odd fixer:Graphics)
-
-On 10/02/2017 09:40 AM, Anthoine Bourgeois wrote:
-> From: Anthoine Bourgeois <anthoine.bourgeois@blade-group.com>
+On 09/26/2017 06:07 PM, Carlo Marcelo Arenas Belón wrote:
+> test introduced in 382176b4d78e070d119af8e0dcd00884c11bbec2
 > 
-> The gd_gl_area_scanout_texture must destroy framebuffer if there is
-> no texture id instead of no framebuffer id.
-> The effect was a black screen with "-vga virtio -display gtk,gl=on"
-> options.
-> The bug was introduce by a4f113fd "gtk: use framebuffer helper functions."
-> 
-> Signed-off-by: Anthoine Bourgeois <anthoine.bourgeois@blade-group.com>
+> Signed-off-by: Carlo Marcelo Arenas Belón <carenas@gmail.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
 > ---
->  ui/gtk-gl-area.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
+>  tests/.gitignore | 1 +
+>  1 file changed, 1 insertion(+)
 > 
-> diff --git a/ui/gtk-gl-area.c b/ui/gtk-gl-area.c
-> index 18b298f..026b7d7 100644
-> --- a/ui/gtk-gl-area.c
-> +++ b/ui/gtk-gl-area.c
-> @@ -178,8 +178,7 @@ void gd_gl_area_scanout_texture(DisplayChangeListener *dcl,
->  
->      gtk_gl_area_make_current(GTK_GL_AREA(vc->gfx.drawing_area));
->  
-> -    if (vc->gfx.guest_fb.framebuffer  == 0 ||
-> -        vc->gfx.w == 0 || vc->gfx.h == 0) {
-> +    if (backing_id == 0 || vc->gfx.w == 0 || vc->gfx.h == 0) {
->          gtk_gl_area_set_scanout_mode(vc, false);
->          return;
->      }
+> diff --git a/tests/.gitignore b/tests/.gitignore
+> index cf6d99c91e..53cb2efaee 100644
+> --- a/tests/.gitignore
+> +++ b/tests/.gitignore
+> @@ -6,6 +6,7 @@ check-qdict
+>  check-qnum
+>  check-qjson
+>  check-qlist
+> +check-qlit
+>  check-qnull
+>  check-qstring
+>  check-qom-interface
 > 
