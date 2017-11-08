@@ -1,24 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34162)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34222)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1eCZLZ-0007yL-Pq
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 18:01:28 -0500
+	(envelope-from <alistai@xilinx.com>) id 1eCZLj-00086v-Ou
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 18:01:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1eCZLV-0003EE-P2
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 18:01:25 -0500
-Received: from mail-by2nam01on0056.outbound.protection.outlook.com
-	([104.47.34.56]:53861
-	helo=NAM01-BY2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1eCZLV-0003Dd-Fe
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 18:01:21 -0500
+	(envelope-from <alistai@xilinx.com>) id 1eCZLi-0003HD-M2
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 18:01:35 -0500
 From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Wed, 8 Nov 2017 14:57:05 -0800
-Message-ID: <1a4b0d078ceeaa56e3a8450e4015a0c6457b62dd.1510181732.git.alistair.francis@xilinx.com>
+Date: Wed, 8 Nov 2017 14:57:16 -0800
+Message-ID: <2076fce7bbee31c5d7ae4db1dcb10f79c879975d.1510181732.git.alistair.francis@xilinx.com>
 In-Reply-To: <cover.1510181732.git.alistair.francis@xilinx.com>
 References: <cover.1510181732.git.alistair.francis@xilinx.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v4 13/45] hw/gpio: Replace fprintf(stderr,
+Subject: [Qemu-devel] [PATCH v4 16/45] hw/ide: Replace fprintf(stderr,
  "*\n" with error_report()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -29,7 +23,7 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: alistair.francis@xilinx.com, alistair23@gmail.com, armbru@redhat.com
+Cc: alistair.francis@xilinx.com, alistair23@gmail.com, armbru@redhat.com, qemu-block@nongnu.org
 
 Replace a large number of the fprintf(stderr, "*\n" calls with
 error_report(). The functions were renamed with these commands and then
@@ -72,25 +66,54 @@ find ./* -type f -exec sed -i \
 Some lines where then manually tweaked to pass checkpatch.
 
 Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+Cc: qemu-block@nongnu.org
+Reviewed-by: Philippe Mathieu-Daud <f4bug@amsat.org>
+Acked-by: John Snow <jsnow@redhat.com>
 ---
 V2:
  - Split hw patch into individual directories
 
- hw/gpio/omap_gpio.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/ide/ahci.c | 6 +++---
+ hw/ide/core.c | 3 +--
+ 2 files changed, 4 insertions(+), 5 deletions(-)
 
-diff --git a/hw/gpio/omap_gpio.c b/hw/gpio/omap_gpio.c
-index 08472193b5..57aa2e54f5 100644
---- a/hw/gpio/omap_gpio.c
-+++ b/hw/gpio/omap_gpio.c
-@@ -399,7 +399,7 @@ static void omap2_gpio_module_write(void *opaque, hwaddr addr,
+diff --git a/hw/ide/ahci.c b/hw/ide/ahci.c
+index b72dcbcc32..b87d1903c1 100644
+--- a/hw/ide/ahci.c
++++ b/hw/ide/ahci.c
+@@ -410,8 +410,8 @@ static void ahci_mem_write(void *opaque, hwaddr addr,
  
-     case 0x10:	/* GPIO_SYSCONFIG */
-         if (((value >> 3) & 3) == 3)
--            fprintf(stderr, "%s: bad IDLEMODE value\n", __func__);
-+            error_report("%s: bad IDLEMODE value", __func__);
-         if (value & 2)
-             omap2_gpio_module_reset(s);
-         s->config[0] = value & 0x1d;
+     /* Only aligned reads are allowed on AHCI */
+     if (addr & 3) {
+-        fprintf(stderr, "ahci: Mis-aligned write to addr 0x"
+-                TARGET_FMT_plx "\n", addr);
++        error_report("ahci: Mis-aligned write to addr 0x" TARGET_FMT_plx,
++                     addr);
+         return;
+     }
+ 
+@@ -1053,7 +1053,7 @@ static void process_ncq_command(AHCIState *s, int port, uint8_t *cmd_fis,
+     g_assert(is_ncq(ncq_fis->command));
+     if (ncq_tfs->used) {
+         /* error - already in use */
+-        fprintf(stderr, "%s: tag %d already used\n", __func__, tag);
++        error_report("%s: tag %d already used", __func__, tag);
+         return;
+     }
+ 
+diff --git a/hw/ide/core.c b/hw/ide/core.c
+index 471d0c928b..211d67a625 100644
+--- a/hw/ide/core.c
++++ b/hw/ide/core.c
+@@ -2765,8 +2765,7 @@ static int ide_drive_pio_pre_save(void *opaque)
+ 
+     idx = transfer_end_table_idx(s->end_transfer_func);
+     if (idx == -1) {
+-        fprintf(stderr, "%s: invalid end_transfer_func for DRQ_STAT\n",
+-                        __func__);
++        error_report("%s: invalid end_transfer_func for DRQ_STAT", __func__);
+         s->end_transfer_fn_idx = 2;
+     } else {
+         s->end_transfer_fn_idx = idx;
 -- 
 2.14.1
