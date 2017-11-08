@@ -1,21 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44948)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45703)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eCWCl-000545-7M
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 14:40:10 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eCWEh-0006Mk-2W
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 14:42:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eCWCk-0001b6-Fi
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 14:40:07 -0500
-References: <8a184b91-49ef-bb52-d190-053c4c0861a1@redhat.com>
-	<20171107052111.GB16355@lemon>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <0dca5e3b-eded-abf0-86dd-36073710e792@redhat.com>
-Date: Wed, 8 Nov 2017 20:39:52 +0100
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eCWEd-0002iv-Vj
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 14:42:07 -0500
+Received: from mail-qt0-x231.google.com ([2607:f8b0:400d:c0d::231]:44246)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eCWEd-0002ik-Qe
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 14:42:03 -0500
+Received: by mail-qt0-x231.google.com with SMTP id 8so4851871qtv.1
+	for <qemu-devel@nongnu.org>; Wed, 08 Nov 2017 11:42:03 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20171030040056.11780-1-f4bug@amsat.org>
+	<20171030082029.GY2993@localhost.localdomain>
+	<20171108132857.GT12670@redhat.com>
+	<1ecb6a4b-465f-0949-e039-441038f1adf8@amsat.org>
+	<20171108165905.GN3111@localhost.localdomain>
+	<20171108170629.GD12670@redhat.com>
+	<20171108172547.GP3111@localhost.localdomain>
+	<e2ae58f9-4f19-ad9f-c287-2bc282a6de2f@amsat.org>
+	<20171108183509.GS3111@localhost.localdomain>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <f3c04c0a-6df9-849e-5cd7-ba153e1fc856@amsat.org>
+Date: Wed, 8 Nov 2017 16:41:58 -0300
 MIME-Version: 1.0
-In-Reply-To: <20171107052111.GB16355@lemon>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="5gKBhJPnu5oJgwRJWGXDn0LMkRNvbBUGt"
-Subject: Re: [Qemu-devel] Drainage in bdrv_replace_child_noperm()
+In-Reply-To: <20171108183509.GS3111@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [RFC PATCH] vl: only display available accelerators
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,75 +42,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: Qemu-block <qemu-block@nongnu.org>, Qemu-devel <qemu-devel@nongnu.org>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, Thomas Huth <thuth@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Markus Armbruster <armbru@redhat.com>, Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org, "Emilio G . Cota" <cota@braap.org>, Anthony Perard <anthony.perard@citrix.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Christoffer Dall <cdall@linaro.org>, Vincent Palatin <vpalatin@chromium.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---5gKBhJPnu5oJgwRJWGXDn0LMkRNvbBUGt
-From: Max Reitz <mreitz@redhat.com>
-To: Fam Zheng <famz@redhat.com>
-Cc: Qemu-block <qemu-block@nongnu.org>, Qemu-devel <qemu-devel@nongnu.org>
-Message-ID: <0dca5e3b-eded-abf0-86dd-36073710e792@redhat.com>
-Subject: Re: [Qemu-devel] Drainage in bdrv_replace_child_noperm()
-References: <8a184b91-49ef-bb52-d190-053c4c0861a1@redhat.com>
- <20171107052111.GB16355@lemon>
-In-Reply-To: <20171107052111.GB16355@lemon>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 2017-11-07 06:21, Fam Zheng wrote:
-> On Mon, 11/06 19:49, Max Reitz wrote:
-
-[...]
-
->> I have two ideas:
+On 11/08/2017 03:35 PM, Eduardo Habkost wrote:
+> On Wed, Nov 08, 2017 at 03:03:34PM -0300, Philippe Mathieu-Daudé wrote:
+>> On 11/08/2017 02:25 PM, Eduardo Habkost wrote:
+>>> On Wed, Nov 08, 2017 at 05:06:29PM +0000, Daniel P. Berrange wrote:
+>>>> On Wed, Nov 08, 2017 at 02:59:05PM -0200, Eduardo Habkost wrote:
+>>>>> On Wed, Nov 08, 2017 at 01:21:33PM -0300, Philippe Mathieu-Daudé wrote:
+>>>>>> On 11/08/2017 10:28 AM, Daniel P. Berrange wrote:
+>>>>>>> On Mon, Oct 30, 2017 at 09:20:29AM +0100, Eduardo Habkost wrote:
+>>>>>>>> On Mon, Oct 30, 2017 at 01:00:56AM -0300, Philippe Mathieu-Daudé wrote:
+>>>>>>>>> examples configuring with '--enable-kvm --disable-tcg'
+>>>>>>>>>
+>>>>>>>>> - before
+>>>>>>>>>
+>>>>>>>>>   $ qemu-system-x86_64 -accel help
+>>>>>>>>>   Possible accelerators: kvm, xen, hax, tcg
+>>>>>>>>>
+>>>>>>>>>   $ qemu-system-x86_64 -accel tcg
+>>>>>>>>>   qemu-system-x86_64: -machine accel=tcg: No accelerator found
+>>>>>>>>>
+>>>>>>>>>   # qemu-system-x86_64 -accel hax
+>>>>>>>>>   qemu-system-x86_64: -machine accel=hax: No accelerator found
+>>>>>>>>>
+>>>>>>>>>   # qemu-system-x86_64 -accel xen
+>>>>>>>>>   xencall: error: Could not obtain handle on privileged command interface: No such file or directory
+>>>>>>>>>   xen be core: xen be core: can't open xen interface
+>>>>>>>>>   can't open xen interface
+>>>>>>>>>   qemu-system-x86_64: failed to initialize Xen: Operation not permitted
+>>>>>>>>>
+>>>>>>>>> - after
+>>>>>>>>>
+>>>>>>>>>   $ qemu-system-x86_64 -accel help
+>>>>>>>>>   Possible accelerators: kvm
+>>>>>>>>>
+>>>>>>>>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>>>>>>>>> ---
+>>>>>>>>> RFC because:
+>>>>>>>>>     - I don't think this is the nicest way, too much #ifdef'fery in main()
+>>>>>>>>
+>>>>>>>> I suggest using object_class_get_list(TYPE_ACCEL, false).
+>>>>>>>
+>>>>>>> And check the result of the available() method on the returned classes
+>>>>>>> too, to filter the results.
+>>>>>>
+>>>>>> Good idea! I'll use that.
+>>>>>
+>>>>> It looks like QTest is the only accelerator that implements
+>>>>> ->available(), and its return value is a build-time constant that
+>>>>> depends only on CONFIG_POSIX.
+>>>>>
+>>>>> I wonder why we don't simply avoid compiling the qtest class if
+>>>>> CONFIG_POSIX is unset, making the ->available() method
+>>>>> unnecessary.
+>>>>
+>>>> Yeah that does seem simpler, though I'm surprised that Xen does not
+>>>> implement the available method. Xen is an accel I'd expect to see
+>>>> compiled into an x86 build, but is only available if the host is
+>>>> actually booted under a Xen hypervisor.  Likewise shouldn't kvm
+>>>> only report itself as available if the /dev/kvm actually exists.
+>>>> But maybe that's not the kind of semantics code using available()
+>>>> expects ?
+>>>
+>>> Currently the only caller of ->available() calls ->init_machine()
+>>> immediately afterwards, so for the current code it doesn't matter
+>>> if the check is inside ->available() or ->init_machine().
+>>>
+>>> That said, I'm not sure we should look for /dev/kvm or check for
+>>> the Xen hypervisor when handling "-accel help".  I expect help
+>>> text to tell the user what the QEMU binary supports, not what the
+>>> current host supports.
 >>
->> One is to assume that (un-)draining a parent will always (un-)drain al=
-l
->> children, including the one the (un-)drain comes from.  This assumptio=
-n
->> seems wrong, see [1], but maybe it isn't.  Anyway, if so, we could jus=
-t
->> explicitly drain the new child in bdrv_replace_child_noperm() after
->> having drained the parent and thus get a consistent state again.
+>> Yes I prefer that too, I'll write something up such:
 >>
->> The other is to declare (A) wrong.  Maybe when
->> BdrvChildRole.drained_{begin,end}() is invoked, we should not drain th=
-at
->> child because we can declare it the caller's responsibility to make su=
-re
->> it's drained.  This seems logical to me because usually those methods
->> are invoked when the child is drained anyway.  But maybe I'm wrong. :-=
-)
->=20
-> I'm in favor of asking the caller to make sure all nodes involved in th=
-e graph
-> manupulation are drained, it feels comparably easier to do, than fixing=
- the
-> problem in bdrv_append().
+>> static bool kvm_available(void)
+>> {
+>>     return access("/dev/kvm", R_OK|W_OK) == 0;
+>> }
+>>
+>> However I wonder, if an user is not in the kvm group but is in sudoers
+>> and run "qemu-system-aarch64 -accel help" he won't see KVM as
+>> available... (I tend to not use sudo when looking for -help output).
+> 
+> If we do that, I think we should include kvm in the list anyway,
+> but just add a column indicating that it doesn't seem to be
+> available on the host.
 
-I guess my main question was whether any of the two approaches is
-evidently wrong in some way, but if you don't say that (and Kevin says
-the first is wrong), I'm going to assume doing the second is OK. :-)
+So with CONFIG_KVM we have 'KVM enabled' and we should list it, OK.
 
-Max
+kvm_available() could be:
 
+     return access("/dev/kvm", F_OK) == 0;
 
---5gKBhJPnu5oJgwRJWGXDn0LMkRNvbBUGt
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+(missing kmod).
 
------BEGIN PGP SIGNATURE-----
+Checking for R_OK|W_OK would give kvm_usable() but if the user forgot to
+use sudo kvm_arch_init() will fail anyway, so no need to worry about it.
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAloDXYgSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9A/nUH/Rl55LFQDFUHSWC5OfSwHw3sIZoa7nmn
-LBmh+3UpcyaRVsO7g5q1V/34VHL28Y/idGzjhA5G2SoQUWmiRKcIwX97TfZXpy6R
-9VXb0O1Vfzlf528mzQNAqoOeOlzEhmPlAvvyBVd2yyiqrdIWoPBXYIYoReWSazHN
-ZqOP3rJk9faEW0DHFL9bUxXaXyYujjPAk7BRE9vcpbDXhnSd/KWLZ3RmUfziVQRl
-uAjIOglLljPpslav5hIP7NhrSC4T/p3Va23W5NKzkd+q/jSZlxZ9MrQNnd9ekVEp
-moTYPV9XrbZmXKauCLzuTICNXLHOU+m8MfUN4qqmNy2asMn0+Ph2MWc=
-=G7/Z
------END PGP SIGNATURE-----
+> 
+> In either case, I suggest implementing it as a separate patch,
+> and just ignore ->available() in the first version.
 
---5gKBhJPnu5oJgwRJWGXDn0LMkRNvbBUGt--
+Sure, availability check are for 2.12.
+
+This -accel help message was added before 2.10, so this is not a bug fix
+(nobody complained about it since 2.10). I'll postpone this series for 2.12.
+
+>> On POWER7 we have:
+>>
+>> /* On ppc64, the test only works with kvm-hv, but not with kvm-pr */
+>> accel = access("/sys/module/kvm_hv", F_OK) ? "tcg" : "kvm:tcg";
+>>
+>> Isn't it cleaner to register 2 accelerators, KVM-PR and KVM-HV and have
+>> KVM being an alias?
+> 
+> I believe "-accel kvm,kvm-type=HV" and "-accel kvm,kvm-type=PR"
+> would be cleaner ways to represent the two modes, instead of
+> having two different accelerator classes.  This is not supported
+> by the current "<accel1>:<accel2>" syntax, but I think we should
+> replace that syntax with something better anyway.
+
+Ok.
+
+Thanks,
+
+Phil.
