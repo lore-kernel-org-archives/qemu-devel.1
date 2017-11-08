@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54924)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55287)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eCMEV-0002Gc-Ni
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 04:01:21 -0500
+	(envelope-from <berrange@redhat.com>) id 1eCMG0-0002zV-Go
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 04:02:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eCMEP-0005oC-Ml
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 04:01:15 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59200)
+	(envelope-from <berrange@redhat.com>) id 1eCMFq-0006ig-Cy
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 04:02:44 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52270)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eCMEP-0005nK-Dc
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 04:01:09 -0500
-Date: Wed, 8 Nov 2017 09:01:04 +0000
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eCMFq-0006iN-3J
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 04:02:38 -0500
+Date: Wed, 8 Nov 2017 09:02:33 +0000
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20171108090104.GC12670@redhat.com>
+Message-ID: <20171108090233.GD12670@redhat.com>
 Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
 References: <20171103153333.6416-1-berrange@redhat.com>
 	<20171103153333.6416-6-berrange@redhat.com>
 	<d1704cf4-d3d4-cc69-df96-1298c11e1295@ozlabs.ru>
 	<1dee5931-84f6-89e5-54e0-5a61cda23ccf@ozlabs.ru>
 	<20171107101254.GA3213@redhat.com>
-	<96d7c536-1b12-732f-44ce-1c8747e29b62@ozlabs.ru>
+	<d4dff69f-ce98-1309-990d-62425ab636b1@ozlabs.ru>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <96d7c536-1b12-732f-44ce-1c8747e29b62@ozlabs.ru>
+In-Reply-To: <d4dff69f-ce98-1309-990d-62425ab636b1@ozlabs.ru>
 Subject: Re: [Qemu-devel] [PATCH v3 5/5] build: delay check for empty git
  submodule list
 List-Id: <qemu-devel.nongnu.org>
@@ -36,7 +36,7 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Alexey Kardashevskiy <aik@ozlabs.ru>
 Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-On Wed, Nov 08, 2017 at 07:28:31PM +1100, Alexey Kardashevskiy wrote:
+On Wed, Nov 08, 2017 at 09:58:11AM +1100, Alexey Kardashevskiy wrote:
 > On 07/11/17 21:12, Daniel P. Berrange wrote:
 > > On Tue, Nov 07, 2017 at 04:13:27PM +1100, Alexey Kardashevskiy wrote:
 > >> On 07/11/17 15:12, Alexey Kardashevskiy wrote:
@@ -96,13 +96,15 @@ On Wed, Nov 08, 2017 at 07:28:31PM +1100, Alexey Kardashevskiy wrote:
 > > I don't want to add that. We don't want to ever build if we detect that
 > > the submodules are at a different version to what we expect as it would
 > > cause obscure hard to diagnose build problems
+> > 
 > 
-> 
-> btw how is it expected to build from source tarball, without any .git
-> directories present, for example with rpmbuild?
+> I gave you an example with one build machine having dtc and another not
+> having it - your system breaks. What is the proper solution to this?
 
-All submodules are bundled into the tar.xz, so submodules are never used
-when building outside of git.
+You could create separate source directories for each system you're building
+on. This won't take up extra disk space if you clone extra source dirs from
+your first checkout using --reference (or even --shared - but see caveats
+in git manpage for that)
 
 Regards,
 Daniel
