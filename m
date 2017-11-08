@@ -1,31 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41280)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42704)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eCLW7-0007rq-GC
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 03:15:27 -0500
+	(envelope-from <jasowang@redhat.com>) id 1eCLcQ-0002We-6G
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 03:21:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eCLW2-0001V0-CG
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 03:15:23 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33396)
+	(envelope-from <jasowang@redhat.com>) id 1eCLcL-0004CZ-AV
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 03:21:54 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40329)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eCLW2-0001Uo-5w
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 03:15:18 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 43551A58BF
-	for <qemu-devel@nongnu.org>; Wed,  8 Nov 2017 08:15:17 +0000 (UTC)
-Date: Wed, 8 Nov 2017 16:15:10 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20171108081510.GD2992@xz-mi>
-References: <20171030112112.6952-1-quintela@redhat.com>
-	<20171030112112.6952-4-quintela@redhat.com>
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1eCLcL-0004C0-4h
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 03:21:49 -0500
+References: <1b862cf2-2fee-3243-cb54-2780ace6f25b@profihost.ag>
+	<971cc10f-7930-9830-0528-27e8faac7282@redhat.com>
+	<748c4d0d-f84b-303d-f9a6-bafa6037d669@profihost.ag>
+	<f4b0cb70-7f86-f7cf-bb89-3a9f7ae15dc2@redhat.com>
+	<4c2913e2-5946-47db-cced-a5702538bc3b@profihost.ag>
+	<dc3bf74f-fbd6-573d-0d7c-d456469fcf1d@profihost.ag>
+	<9c8673a5-faf7-ca9c-27d3-398df4223d6a@redhat.com>
+	<f362d043-7293-65b7-734b-c8372a5f16c3@profihost.ag>
+	<54326bae-831d-dfb8-151e-534d3a100c2c@redhat.com>
+	<ab53e4ae-4c38-9520-b076-96318b6c09b5@profihost.ag>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <61b97624-bd55-655f-f8e2-ea1699c25d51@redhat.com>
+Date: Wed, 8 Nov 2017 17:21:36 +0900
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20171030112112.6952-4-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 3/6] migration: free addr in the same
- function that we created it
+In-Reply-To: <ab53e4ae-4c38-9520-b076-96318b6c09b5@profihost.ag>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] kvm: virtio-net: saved image requires TUN_F_UFO
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,62 +37,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, lvivier@redhat.com
+To: Stefan Priebe - Profihost AG <s.priebe@profihost.ag>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
 
-On Mon, Oct 30, 2017 at 12:21:09PM +0100, Juan Quintela wrote:
-> Otherwise, we can't use it after calling socket_start_incoming_migration
-> 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
 
-Reviewed-by: Peter Xu <peterx@redhat.com>
 
-http://lists.gnu.org/archive/html/qemu-devel/2017-11/msg01305.html
+On 2017=E5=B9=B411=E6=9C=8808=E6=97=A5 17:05, Stefan Priebe - Profihost A=
+G wrote:
+> Am 08.11.2017 um 08:54 schrieb Jason Wang:
+>>
+>> On 2017=E5=B9=B411=E6=9C=8808=E6=97=A5 15:41, Stefan Priebe - Profihos=
+t AG wrote:
+>>> Hi Paolo,
+>>>
+>>> Am 06.11.2017 um 12:27 schrieb Paolo Bonzini:
+>>>> On 06/11/2017 12:09, Stefan Priebe - Profihost AG wrote:
+>>>>> HI Paolo,
+>>>>>
+>>>>> could this patchset be related?
+>>>> Uh oh, yes it should.=C2=A0 Jason, any ways to fix it?=C2=A0 I suppo=
+se we need to
+>>>> disable UFO in the newest machine types, but do we also have to do
+>>>> (software) UFO in vhost-net and QEMU for migration compatibility?
+>>> Any news on this?
+>>>
+>>> Greets,
+>> Since we probe UFO support, it will be disabled automatically on devic=
+e
+>> startup.
+>>
+>> For the issue of migration, I think the only way is trying to fix it i=
+n
+>> kernel.
+> But 4.14 is around the corner and the patchset is already included.
+> Shouldn't this get fixed before 4.14 is released?
 
-So I got a same patch. Let's see which one will go in earlier. I think
-it should be this one. :)
+We will try to seek a solution as soon as possible. If we can't catch=20
+4.14, we will do it for stable for sure.
 
-> ---
->  migration/socket.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/migration/socket.c b/migration/socket.c
-> index dee869044a..3a8232dd2d 100644
-> --- a/migration/socket.c
-> +++ b/migration/socket.c
-> @@ -172,7 +172,6 @@ static void socket_start_incoming_migration(SocketAddress *saddr,
->  
->      if (qio_channel_socket_listen_sync(listen_ioc, saddr, errp) < 0) {
->          object_unref(OBJECT(listen_ioc));
-> -        qapi_free_SocketAddress(saddr);
->          return;
->      }
->  
-> @@ -181,7 +180,6 @@ static void socket_start_incoming_migration(SocketAddress *saddr,
->                            socket_accept_incoming_migration,
->                            listen_ioc,
->                            (GDestroyNotify)object_unref);
-> -    qapi_free_SocketAddress(saddr);
->  }
->  
->  void tcp_start_incoming_migration(const char *host_port, Error **errp)
-> @@ -191,6 +189,7 @@ void tcp_start_incoming_migration(const char *host_port, Error **errp)
->      if (!err) {
->          socket_start_incoming_migration(saddr, &err);
->      }
-> +    qapi_free_SocketAddress(saddr);
->      error_propagate(errp, err);
->  }
->  
-> @@ -198,4 +197,5 @@ void unix_start_incoming_migration(const char *path, Error **errp)
->  {
->      SocketAddress *saddr = unix_build_address(path);
->      socket_start_incoming_migration(saddr, errp);
-> +    qapi_free_SocketAddress(saddr);
->  }
-> -- 
-> 2.13.6
-> 
+Thanks
 
--- 
-Peter Xu
+>
+> Stefan
+>> Thanks
