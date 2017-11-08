@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58329)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58712)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eCMTY-0007Sd-0o
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 04:16:49 -0500
+	(envelope-from <berrange@redhat.com>) id 1eCMUr-00084C-Vd
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 04:18:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eCMTT-0004kJ-UM
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 04:16:47 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:12807)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eCMTT-0004j4-Nj
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 04:16:43 -0500
-Date: Wed, 8 Nov 2017 09:16:28 +0000
+	(envelope-from <berrange@redhat.com>) id 1eCMUn-0005iP-Os
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 04:18:09 -0500
+Date: Wed, 8 Nov 2017 09:17:45 +0000
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20171108091628.GI12670@redhat.com>
+Message-ID: <20171108091745.GJ12670@redhat.com>
 Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
 References: <20171108022828.7242-1-f4bug@amsat.org>
-	<20171108022828.7242-6-f4bug@amsat.org>
+	<20171108022828.7242-3-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20171108022828.7242-6-f4bug@amsat.org>
+In-Reply-To: <20171108022828.7242-3-f4bug@amsat.org>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 5/6] hw/i386: deprecate the pc-0.10 and
- pc-0.11 machines
+Subject: Re: [Qemu-devel] [RFC PATCH 2/6] hw/arm: deprecate the EP108 board
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,44 +26,55 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
 
-On Tue, Nov 07, 2017 at 11:28:27PM -0300, Philippe Mathieu-Daud=C3=A9 wro=
+On Tue, Nov 07, 2017 at 11:28:24PM -0300, Philippe Mathieu-Daud=C3=A9 wro=
 te:
-> Both are deprecated since 2.9.0
+> From: Alistair Francis <alistair.francis@xilinx.com>
 >=20
+> The EP108 was an early access development board that is no longer used.
+> Add an info message to convert any users to the ZCU102 instead. On QEMU
+> they are both identical.
+>=20
+> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 > ---
->  hw/i386/pc_piix.c | 2 ++
->  1 file changed, 2 insertions(+)
+>  hw/arm/xlnx-zcu102.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
 >=20
-> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-> index f79d5cb694..c462b702ff 100644
-> --- a/hw/i386/pc_piix.c
-> +++ b/hw/i386/pc_piix.c
-> @@ -941,6 +941,7 @@ static void pc_i440fx_0_11_machine_options(MachineC=
-lass *m)
->      pc_i440fx_0_12_machine_options(m);
->      m->hw_version =3D "0.11";
->      SET_MACHINE_COMPAT(m, PC_COMPAT_0_11);
-> +    m->deprecated_reason =3D "Too old";
+> diff --git a/hw/arm/xlnx-zcu102.c b/hw/arm/xlnx-zcu102.c
+> index e2d15a1c9d..d42b6e3d3a 100644
+> --- a/hw/arm/xlnx-zcu102.c
+> +++ b/hw/arm/xlnx-zcu102.c
+> @@ -164,6 +164,8 @@ static void xlnx_ep108_init(MachineState *machine)
+>  {
+>      XlnxZCU102 *s =3D EP108_MACHINE(machine);
+> =20
+> +    info_report("Please use the ZCU102 machine instead of this machine=
+.");
+
+Why do we need this, in addition to the generic deprecation message that
+says basically the same thing ?
+
+> +
+>      xlnx_zynqmp_init(s, machine);
 >  }
 > =20
->  DEFINE_I440FX_MACHINE(v0_11, "pc-0.11", pc_compat_0_13,
-> @@ -976,6 +977,7 @@ static void pc_i440fx_0_10_machine_options(MachineC=
-lass *m)
->      pc_i440fx_0_11_machine_options(m);
->      m->hw_version =3D "0.10";
->      SET_MACHINE_COMPAT(m, PC_COMPAT_0_10);
-> +    m->deprecated_reason =3D "Too old";
+> @@ -180,11 +182,13 @@ static void xlnx_ep108_machine_class_init(ObjectC=
+lass *oc, void *data)
+>  {
+>      MachineClass *mc =3D MACHINE_CLASS(oc);
+> =20
+> -    mc->desc =3D "Xilinx ZynqMP EP108 board (Deprecated, please use xl=
+nx-zcu102)";
+> +    mc->desc =3D "Xilinx ZynqMP EP108 board";
+>      mc->init =3D xlnx_ep108_init;
+>      mc->block_default_type =3D IF_IDE;
+>      mc->units_per_default_bus =3D 1;
+>      mc->ignore_memory_transaction_failures =3D true;
+> +    mc->deprecated_reason =3D
+> +        "The ZCU102 machine has the same features supported";
 >  }
-
-Any deprecation message should give users useful information about what
-they should do instead to avoid the problem.
-
-More generally though, what would removing these two machines types allow
-us to actually achieve ? Seems quite arbitrary to pick 0.10 and 0.11 but
-leave the other 20+ machine types.
 
 Regards,
 Daniel
