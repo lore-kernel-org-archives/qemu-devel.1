@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37639)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38503)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eCSXe-0005xj-Jn
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 10:45:31 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eCSZa-0007As-F0
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 10:47:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eCSXY-0000Sb-Ac
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 10:45:26 -0500
-References: <20171108153245.20740-1-alex.bennee@linaro.org>
-	<20171108153245.20740-2-alex.bennee@linaro.org>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <8d8e292f-378c-e943-2785-f61615d641b3@vivier.eu>
-Date: Wed, 8 Nov 2017 16:45:04 +0100
+	(envelope-from <pbonzini@redhat.com>) id 1eCSZV-0001br-Is
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 10:47:26 -0500
+References: <20171107223708.17935-1-eblake@redhat.com>
+	<20171108154226.GC6118@stefanha-x1.localdomain>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <462c8b69-9665-1342-fd01-5ba57049a39c@redhat.com>
+Date: Wed, 8 Nov 2017 16:47:07 +0100
 MIME-Version: 1.0
-In-Reply-To: <20171108153245.20740-2-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] accel/tcg/translate-all: expand
- cpu_restore_state addr check
+In-Reply-To: <20171108154226.GC6118@stefanha-x1.localdomain>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="sMGnqX3Ew9k2dWCGjeECVUhMNjdM3DLUs"
+Subject: Re: [Qemu-devel] [PATCH] coroutine: Fix documentation of
+ co_aio_sleep_ns()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,128 +25,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, peter.maydell@linaro.org
-Cc: Peter Crosthwaite <crosthwaite.peter@gmail.com>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Stefan Hajnoczi <stefanha@redhat.com>, Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Kevin Wolf <kwolf@redhat.com>
 
-Le 08/11/2017 à 16:32, Alex Bennée a écrit :
-> We are still seeing signals during translation time when we walk over
-> a page protection boundary. This expands the check to ensure the host
-> PC is inside the code generation buffer. The original suggestion was
-> to check versus tcg_ctx.code_gen_ptr but as we now segment the
-> translation buffer we have to settle for just a general check for
-> being inside.
-> 
-> I've also fixed up the declaration to make it clear it can deal with
-> invalid addresses. A later patch will fix up the call sites.
-> 
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> Reported-by: Peter Maydell <peter.maydell@linaro.org>
-> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Richard Henderson <rth@twiddle.net>
-> 
-> ---
-> v2:
->   - add doc comment to exec-all.h
->   - retaddr->host_pc
->   - re-word comments on host_pc
->   - simplify logic as per rth suggestion
-> ---
->  accel/tcg/translate-all.c | 52 ++++++++++++++++++++++++++---------------------
->  include/exec/exec-all.h   | 11 ++++++++++
->  2 files changed, 40 insertions(+), 23 deletions(-)
-> 
-> diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-> index 34c5e28d07..e7f0329a52 100644
-> --- a/accel/tcg/translate-all.c
-> +++ b/accel/tcg/translate-all.c
-> @@ -352,36 +352,42 @@ static int cpu_restore_state_from_tb(CPUState *cpu, TranslationBlock *tb,
->      return 0;
->  }
->  
-> -bool cpu_restore_state(CPUState *cpu, uintptr_t retaddr)
-> +bool cpu_restore_state(CPUState *cpu, uintptr_t host_pc)
->  {
->      TranslationBlock *tb;
->      bool r = false;
-> +    uintptr_t check_offset;
->  
-> -    /* A retaddr of zero is invalid so we really shouldn't have ended
-> -     * up here. The target code has likely forgotten to check retaddr
-> -     * != 0 before attempting to restore state. We return early to
-> -     * avoid blowing up on a recursive tb_lock(). The target must have
-> -     * previously survived a failed cpu_restore_state because
-> -     * tb_find_pc(0) would have failed anyway. It still should be
-> -     * fixed though.
-> +    /* The host_pc has to be in the region of current code buffer. If
-> +     * it is not we will not be able to resolve it here. The two cases
-> +     * where host_pc will not be correct are:
-> +     *
-> +     *  - fault during translation (instruction fetch)
-> +     *  - fault from helper (not using GETPC() macro)
-> +     *
-> +     * Either way we need return early to avoid blowing up on a
-> +     * recursive tb_lock() as we can't resolve it here.
-> +     *
-> +     * We are using unsigned arithmetic so if host_pc <
-> +     * tcg_init_ctx.code_gen_buffer check_offset will wrap to way
-> +     * above the code_gen_buffer_size
->       */
-> -
-> -    if (!retaddr) {
-> -        return r;
-> -    }
-> -
-> -    tb_lock();
-> -    tb = tb_find_pc(retaddr);
-> -    if (tb) {
-> -        cpu_restore_state_from_tb(cpu, tb, retaddr);
-> -        if (tb->cflags & CF_NOCACHE) {
-> -            /* one-shot translation, invalidate it immediately */
-> -            tb_phys_invalidate(tb, -1);
-> -            tb_remove(tb);
-> +    check_offset = host_pc - (uintptr_t) tcg_init_ctx.code_gen_buffer;
-> +
-> +    if (check_offset < tcg_init_ctx.code_gen_buffer_size) {
-> +        tb_lock();
-> +        tb = tb_find_pc(host_pc);
-> +        if (tb) {
-> +            cpu_restore_state_from_tb(cpu, tb, host_pc);
-> +            if (tb->cflags & CF_NOCACHE) {
-> +                /* one-shot translation, invalidate it immediately */
-> +                tb_phys_invalidate(tb, -1);
-> +                tb_remove(tb);
-> +            }
-> +            r = true;
->          }
-> -        r = true;
-> +        tb_unlock();
->      }
-> -    tb_unlock();
->  
->      return r;
->  }
-> diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
-> index 923ece3e9b..0f51c92adb 100644
-> --- a/include/exec/exec-all.h
-> +++ b/include/exec/exec-all.h
-> @@ -45,6 +45,17 @@ void restore_state_to_opc(CPUArchState *env, struct TranslationBlock *tb,
->                            target_ulong *data);
->  
->  void cpu_gen_init(void);
-> +
-> +/**
-> + * cpu_restore_state:
-> + * @cpu: the vCPU state is to be restore to
-> + * @searched_pc: the host PC the fault occurred at
-> + * @return: true if state was restored, false otherwise
-> + *
-> + * Attempt to restore the state for a fault occurring in translated
-> + * code. If the searched_pc is not in translated code no state is
-> + * restored and the function returns false.
-> + */
->  bool cpu_restore_state(CPUState *cpu, uintptr_t searched_pc);
->  
->  void QEMU_NORETURN cpu_loop_exit_noexc(CPUState *cpu);
-> 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--sMGnqX3Ew9k2dWCGjeECVUhMNjdM3DLUs
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>, Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org,
+ Kevin Wolf <kwolf@redhat.com>
+Message-ID: <462c8b69-9665-1342-fd01-5ba57049a39c@redhat.com>
+Subject: Re: [PATCH] coroutine: Fix documentation of co_aio_sleep_ns()
+References: <20171107223708.17935-1-eblake@redhat.com>
+ <20171108154226.GC6118@stefanha-x1.localdomain>
+In-Reply-To: <20171108154226.GC6118@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+On 08/11/2017 16:42, Stefan Hajnoczi wrote:
+>> In any case, co_aio_sleep_ns()
+>> + * does not affect the #AioContext where the current coroutine is run=
+ning,
+>> + * as the coroutine will restart on the same #AioContext that it is
+>> + * running on.
+> I cannot parse the second sentence.  What does "affecting" an AioContex=
+t
+> mean?  Does "where the current coroutine is running" simply mean "the
+> caller"?
+>=20
+> What is it trying to say?  My guess is: the caller will be resumed in
+> the current AioContext, not the timer's AioContext.
+
+Yes, that is the intended meaning.  Perhaps just s/current//.
+
+Paolo
+
+
+--sMGnqX3Ew9k2dWCGjeECVUhMNjdM3DLUs
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEE8TM4V0tmI4mGbHaCv/vSX3jHroMFAloDJvsACgkQv/vSX3jH
+roOD3Af/dmH9U/CPUsg3NCKAzBi15Dut8Uo0oJTj8SfQdTT5M621BvodVRsgPUye
+zG0Mo1RER8OQdJ/1kkgsTE1NL2vVmnNzAPooP7HvwGMZPA5x4PhykTqccHeg5JeD
+V51Sf/qCR7XMLRiY9FZpyV/FjYf1w85E7Eoa6LWRMG9BU4Y/l+qr3sm8ujBEaYF6
+CuQe/i1Adc4KQnNPdiHEb+LuhFrSWt8EuNIbBSNrN4iJEjauPgklz1xmUuFtp8xh
+JBakBDXx109a/d40kkjrCOpty4PS6+isheM0Z9ibQnpM/N/+fePmNCIAck5IXsjW
+9nzX33/lJgfekO564IlGrusjaVKRJQ==
+=NnXs
+-----END PGP SIGNATURE-----
+
+--sMGnqX3Ew9k2dWCGjeECVUhMNjdM3DLUs--
