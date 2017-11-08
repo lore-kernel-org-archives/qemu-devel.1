@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34365)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36910)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eCSMA-0000o1-2U
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 10:33:35 -0500
+	(envelope-from <stefanha@redhat.com>) id 1eCSUq-0004Ly-VQ
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 10:42:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eCSM9-0002OI-6C
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 10:33:34 -0500
-Received: from mail-wr0-x22b.google.com ([2a00:1450:400c:c0c::22b]:49748)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1eCSM8-0002Ny-W9
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 10:33:33 -0500
-Received: by mail-wr0-x22b.google.com with SMTP id o88so2781276wrb.6
-	for <qemu-devel@nongnu.org>; Wed, 08 Nov 2017 07:33:32 -0800 (PST)
+	(envelope-from <stefanha@redhat.com>) id 1eCSUn-0007JC-SQ
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 10:42:32 -0500
+Date: Wed, 8 Nov 2017 15:42:26 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20171108154226.GC6118@stefanha-x1.localdomain>
+References: <20171107223708.17935-1-eblake@redhat.com>
 MIME-Version: 1.0
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Wed, 8 Nov 2017 15:33:31 +0000
-Message-ID: <CAJSP0QUOCzWfM614zRKme+GecU+NVNOFcoGz1wdBcdgKzrq-LQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] Moving release tarballs to a CDN
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="0vzXIDBeUiKkjNJl"
+Content-Disposition: inline
+In-Reply-To: <20171107223708.17935-1-eblake@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] coroutine: Fix documentation of
+ co_aio_sleep_ns()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,38 +24,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Roth <mdroth@linux.vnet.ibm.com>, Jeff Cody <jcody@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, pbonzini@redhat.com, Kevin Wolf <kwolf@redhat.com>
 
-Hi Mike and Jeff,
-qemu.org's bandwidth usage is dominated by release tarball downloads.
-This puts qemu.org bandwidth usage in the 2+ TB/month range.
 
-Many hosting providers do not offer this much bandwidth as part of a
-basic package that would otherwise fit qemu.org's requirements.
+--0vzXIDBeUiKkjNJl
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Several people have suggested putting release tarballs on a mirror or
-CDN to offload the bandwidth usage.  Jeff Cody and I looked at using
-GitHub's "releases" feature to host release tarballs.
+On Tue, Nov 07, 2017 at 04:37:08PM -0600, Eric Blake wrote:
+> co_sleep_ns() was removed in commit 0b9caf9b, leaving behind a
+> stale comment.  Update the documentation to match the current
+> usage of this function.
+>=20
+> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+>  include/qemu/coroutine.h | 7 +++++--
+>  1 file changed, 5 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/include/qemu/coroutine.h b/include/qemu/coroutine.h
+> index 9aff9a735e..01ae415767 100644
+> --- a/include/qemu/coroutine.h
+> +++ b/include/qemu/coroutine.h
+> @@ -262,8 +262,11 @@ void qemu_co_rwlock_unlock(CoRwlock *lock);
+>  /**
+>   * Yield the coroutine for a given duration
+>   *
+> - * Behaves similarly to co_sleep_ns(), but the sleeping coroutine will be
+> - * resumed when using aio_poll().
+> + * This function uses timers and hence needs to know the event loop
+> + * (#AioContext) to place the timer on.  In any case, co_aio_sleep_ns()
+> + * does not affect the #AioContext where the current coroutine is runnin=
+g,
+> + * as the coroutine will restart on the same #AioContext that it is
+> + * running on.
 
-The following changes would be necessary:
+I cannot parse the second sentence.  What does "affecting" an AioContext
+mean?  Does "where the current coroutine is running" simply mean "the
+caller"?
 
-1. Add qemu.org URL redirection to GitHub:
-https://download.qemu.org/qemu-(\d+.\d+.\d+).tar.xz ->
-https://github.com/qemu/qemu/releases/download/v\1/qemu-\1.tar.xz
+What is it trying to say?  My guess is: the caller will be resumed in
+the current AioContext, not the timer's AioContext.
 
-2. Modify release script to immediately push to GitHub and then upload
-tar.xz via API:
-https://developer.github.com/v3/repos/releases/#upload-a-release-asset
+--0vzXIDBeUiKkjNJl
+Content-Type: application/pgp-signature; name="signature.asc"
 
-3. Continue using https://download.qemu.org/qemu-\d+.\d+.\d+.tar.xz
-URL for download links.
+-----BEGIN PGP SIGNATURE-----
 
-This way future QEMU releases would be hosted on GitHub with nice
-qemu.org download links.  The signature file stays hosted on qemu.org
-so it's possible to validate that the tarball has not been tampered
-with.
+iQEcBAEBAgAGBQJaAyXiAAoJEJykq7OBq3PIwh0IAL4pfFSf9PALYrgxxTriXh8S
+HqzTBC7aPX441apOYEB9bD4sQ+jE+QlaaJqu4ecq3sZMCo9KvWWWvxcY9mML+mU/
+8hgsZhil1PmEo6WweW90fxlXx6s3tCYQdClsjD3E4iSMIJ9wNa0oG5X7TnBYyb+5
+RoxfAa8yR2GxD22k0ORmqk3RxIvr8nXXB/ZrfgF3LBJZ8tm1V7n+A2J2MQ+YsSaL
+9IcQ9dPJYP5fnOrYtgf3HeW9QSS7MCFUKvamgkuwoFBfadTct4jgQyzao9+F2Bz2
+UUxijz+6viQzjEzMYL3987OM+rPXF2Fa4q3hVOHpgtK5B4mJYiRLtzxYVyn6ClU=
+=5FrG
+-----END PGP SIGNATURE-----
 
-How does this sound?
-
-Stefan
+--0vzXIDBeUiKkjNJl--
