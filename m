@@ -1,37 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48665)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56581)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eCUid-0001U6-Sc
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 13:05:53 -0500
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1eCUy5-0006J5-LZ
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 13:20:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eCUhZ-00074b-Ih
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 13:04:55 -0500
-Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:50477)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eCUhY-00073U-RP
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 13:03:49 -0500
-Received: by mail-qt0-x243.google.com with SMTP id d9so4446259qtd.7
-	for <qemu-devel@nongnu.org>; Wed, 08 Nov 2017 10:03:48 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20171030040056.11780-1-f4bug@amsat.org>
-	<20171030082029.GY2993@localhost.localdomain>
-	<20171108132857.GT12670@redhat.com>
-	<1ecb6a4b-465f-0949-e039-441038f1adf8@amsat.org>
-	<20171108165905.GN3111@localhost.localdomain>
-	<20171108170629.GD12670@redhat.com>
-	<20171108172547.GP3111@localhost.localdomain>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <e2ae58f9-4f19-ad9f-c287-2bc282a6de2f@amsat.org>
-Date: Wed, 8 Nov 2017 15:03:34 -0300
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1eCUxz-0000CA-Dm
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 13:20:53 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35218
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
+	id 1eCUxz-0000Bo-7H
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 13:20:47 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	vA8IKS8S126755
+	for <qemu-devel@nongnu.org>; Wed, 8 Nov 2017 13:20:41 -0500
+Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2e46ckt9kx-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 08 Nov 2017 13:20:35 -0500
+Received: from localhost
+	by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
+	Wed, 8 Nov 2017 13:19:52 -0500
+References: <1510016336-4086-1-git-send-email-stefanb@linux.vnet.ibm.com>
+	<1510016336-4086-2-git-send-email-stefanb@linux.vnet.ibm.com>
+	<20171108162110.GC13150@boraha>
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Date: Wed, 8 Nov 2017 13:19:50 -0500
 MIME-Version: 1.0
-In-Reply-To: <20171108172547.GP3111@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RFC PATCH] vl: only display available accelerators
+In-Reply-To: <20171108162110.GC13150@boraha>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Message-Id: <141bfd74-35fe-5a7d-4dfe-420182170174@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 1/5] tpm: Move getting TPM buffer size to
+ backends
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,106 +44,202 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Markus Armbruster <armbru@redhat.com>, Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org, "Emilio G . Cota" <cota@braap.org>, Anthony Perard <anthony.perard@citrix.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Christoffer Dall <cdall@linaro.org>, Vincent Palatin <vpalatin@chromium.org>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, amarnath.valluri@intel.com
 
-On 11/08/2017 02:25 PM, Eduardo Habkost wrote:
-> On Wed, Nov 08, 2017 at 05:06:29PM +0000, Daniel P. Berrange wrote:
->> On Wed, Nov 08, 2017 at 02:59:05PM -0200, Eduardo Habkost wrote:
->>> On Wed, Nov 08, 2017 at 01:21:33PM -0300, Philippe Mathieu-Daudé wrote:
->>>> On 11/08/2017 10:28 AM, Daniel P. Berrange wrote:
->>>>> On Mon, Oct 30, 2017 at 09:20:29AM +0100, Eduardo Habkost wrote:
->>>>>> On Mon, Oct 30, 2017 at 01:00:56AM -0300, Philippe Mathieu-Daudé wrote:
->>>>>>> examples configuring with '--enable-kvm --disable-tcg'
->>>>>>>
->>>>>>> - before
->>>>>>>
->>>>>>>   $ qemu-system-x86_64 -accel help
->>>>>>>   Possible accelerators: kvm, xen, hax, tcg
->>>>>>>
->>>>>>>   $ qemu-system-x86_64 -accel tcg
->>>>>>>   qemu-system-x86_64: -machine accel=tcg: No accelerator found
->>>>>>>
->>>>>>>   # qemu-system-x86_64 -accel hax
->>>>>>>   qemu-system-x86_64: -machine accel=hax: No accelerator found
->>>>>>>
->>>>>>>   # qemu-system-x86_64 -accel xen
->>>>>>>   xencall: error: Could not obtain handle on privileged command interface: No such file or directory
->>>>>>>   xen be core: xen be core: can't open xen interface
->>>>>>>   can't open xen interface
->>>>>>>   qemu-system-x86_64: failed to initialize Xen: Operation not permitted
->>>>>>>
->>>>>>> - after
->>>>>>>
->>>>>>>   $ qemu-system-x86_64 -accel help
->>>>>>>   Possible accelerators: kvm
->>>>>>>
->>>>>>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->>>>>>> ---
->>>>>>> RFC because:
->>>>>>>     - I don't think this is the nicest way, too much #ifdef'fery in main()
->>>>>>
->>>>>> I suggest using object_class_get_list(TYPE_ACCEL, false).
->>>>>
->>>>> And check the result of the available() method on the returned classes
->>>>> too, to filter the results.
->>>>
->>>> Good idea! I'll use that.
->>>
->>> It looks like QTest is the only accelerator that implements
->>> ->available(), and its return value is a build-time constant that
->>> depends only on CONFIG_POSIX.
->>>
->>> I wonder why we don't simply avoid compiling the qtest class if
->>> CONFIG_POSIX is unset, making the ->available() method
->>> unnecessary.
+On 11/08/2017 11:21 AM, Marc-Andr=E9 Lureau wrote:
+> On Mon, Nov 06, 2017 at 07:58:52PM -0500, Stefan Berger wrote:
+>> Rather than setting the size of the TPM buffer in the front-end,
+>> query the backend for the size of the buffer. In this patch we
+>> just move the hard-coded buffer size of 4096 to the backends.
 >>
->> Yeah that does seem simpler, though I'm surprised that Xen does not
->> implement the available method. Xen is an accel I'd expect to see
->> compiled into an x86 build, but is only available if the host is
->> actually booted under a Xen hypervisor.  Likewise shouldn't kvm
->> only report itself as available if the /dev/kvm actually exists.
->> But maybe that's not the kind of semantics code using available()
->> expects ?
-> 
-> Currently the only caller of ->available() calls ->init_machine()
-> immediately afterwards, so for the current code it doesn't matter
-> if the check is inside ->available() or ->init_machine().
-> 
-> That said, I'm not sure we should look for /dev/kvm or check for
-> the Xen hypervisor when handling "-accel help".  I expect help
-> text to tell the user what the QEMU binary supports, not what the
-> current host supports.
+>> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+>> ---
+>>   backends/tpm.c               |  9 +++++++++
+>>   hw/tpm/tpm_emulator.c        |  6 ++++++
+>>   hw/tpm/tpm_passthrough.c     |  6 ++++++
+>>   hw/tpm/tpm_tis.c             | 12 +++++++-----
+>>   include/sysemu/tpm_backend.h | 11 +++++++++++
+>>   5 files changed, 39 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/backends/tpm.c b/backends/tpm.c
+>> index 7777467..e7d0f9a 100644
+>> --- a/backends/tpm.c
+>> +++ b/backends/tpm.c
+>> @@ -139,6 +139,15 @@ TPMVersion tpm_backend_get_tpm_version(TPMBackend=
+ *s)
+>>       return k->get_tpm_version(s);
+>>   }
+>>  =20
+>> +uint32_t tpm_backend_get_buffer_size(TPMBackend *s)
+> We have a slight preference for size_t in qemu (even if underlying
+> protocol uses u32)
 
-Yes I prefer that too, I'll write something up such:
+I changed this now throughout the series. I'll collect the Reviewed-by's=20
+next time.
 
-static bool kvm_available(void)
-{
-    return access("/dev/kvm", R_OK|W_OK) == 0;
-}
+>
+>> +{
+>> +    TPMBackendClass *k =3D TPM_BACKEND_GET_CLASS(s);
+>> +
+>> +    assert(k->get_buffer_size);
+>
+> No need to have assert here to be consitent with qemu code, however it
+> is nice to have a comment on the interface declaration instead.
+>
+> (I considered all function pointers mandatory unless explicitely
+> marked optional, as in "tpm-be: update optional function pointers")
 
-However I wonder, if an user is not in the kvm group but is in sudoers
-and run "qemu-system-aarch64 -accel help" he won't see KVM as
-available... (I tend to not use sudo when looking for -help output).
+Removed the assert.
 
-same with:
+    Stefan
 
-static bool hax_available(void)
-{
-    return access("/dev/HAX", R_OK|W_OK) == 0;
-}
-
-ok for:
-
-static bool xen_available(void)
-{
-    return access("/sys/hypervisor/properties/features", F_OK) == 0;
-}
-
-On POWER7 we have:
-
-/* On ppc64, the test only works with kvm-hv, but not with kvm-pr */
-accel = access("/sys/module/kvm_hv", F_OK) ? "tcg" : "kvm:tcg";
-
-Isn't it cleaner to register 2 accelerators, KVM-PR and KVM-HV and have
-KVM being an alias?
+>
+>> +
+>> +    return k->get_buffer_size(s);
+>> +}
+>> +
+>>   TPMInfo *tpm_backend_query_tpm(TPMBackend *s)
+>>   {
+>>       TPMInfo *info =3D g_new0(TPMInfo, 1);
+>> diff --git a/hw/tpm/tpm_emulator.c b/hw/tpm/tpm_emulator.c
+>> index 24cb611..5a6107e 100644
+>> --- a/hw/tpm/tpm_emulator.c
+>> +++ b/hw/tpm/tpm_emulator.c
+>> @@ -356,6 +356,11 @@ static TPMVersion tpm_emulator_get_tpm_version(TP=
+MBackend *tb)
+>>       return tpm_emu->tpm_version;
+>>   }
+>>  =20
+>> +static uint32_t tpm_emulator_get_buffer_size(TPMBackend *tb)
+>> +{
+>> +    return 4096;
+>> +}
+>> +
+>>   static int tpm_emulator_block_migration(TPMEmulator *tpm_emu)
+>>   {
+>>       Error *err =3D NULL;
+>> @@ -556,6 +561,7 @@ static void tpm_emulator_class_init(ObjectClass *k=
+lass, void *data)
+>>       tbc->get_tpm_established_flag =3D tpm_emulator_get_tpm_establish=
+ed_flag;
+>>       tbc->reset_tpm_established_flag =3D tpm_emulator_reset_tpm_estab=
+lished_flag;
+>>       tbc->get_tpm_version =3D tpm_emulator_get_tpm_version;
+>> +    tbc->get_buffer_size =3D tpm_emulator_get_buffer_size;
+>>       tbc->get_tpm_options =3D tpm_emulator_get_tpm_options;
+>>  =20
+>>       tbc->handle_request =3D tpm_emulator_handle_request;
+>> diff --git a/hw/tpm/tpm_passthrough.c b/hw/tpm/tpm_passthrough.c
+>> index 73554aa..7ff9249 100644
+>> --- a/hw/tpm/tpm_passthrough.c
+>> +++ b/hw/tpm/tpm_passthrough.c
+>> @@ -199,6 +199,11 @@ static TPMVersion tpm_passthrough_get_tpm_version=
+(TPMBackend *tb)
+>>       return tpm_pt->tpm_version;
+>>   }
+>>  =20
+>> +static uint32_t tpm_passthrough_get_buffer_size(TPMBackend *tb)
+>> +{
+>> +    return 4096;
+>> +}
+>> +
+>>   /*
+>>    * Unless path or file descriptor set has been provided by user,
+>>    * determine the sysfs cancel file following kernel documentation
+>> @@ -354,6 +359,7 @@ static void tpm_passthrough_class_init(ObjectClass=
+ *klass, void *data)
+>>       tbc->reset_tpm_established_flag =3D
+>>           tpm_passthrough_reset_tpm_established_flag;
+>>       tbc->get_tpm_version =3D tpm_passthrough_get_tpm_version;
+>> +    tbc->get_buffer_size =3D tpm_passthrough_get_buffer_size;
+>>       tbc->get_tpm_options =3D tpm_passthrough_get_tpm_options;
+>>       tbc->handle_request =3D tpm_passthrough_handle_request;
+>>   }
+>> diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
+>> index cc32fcd..a3df40f 100644
+>> --- a/hw/tpm/tpm_tis.c
+>> +++ b/hw/tpm/tpm_tis.c
+>> @@ -88,6 +88,8 @@ typedef struct TPMState {
+>>  =20
+>>       TPMBackend *be_driver;
+>>       TPMVersion be_tpm_version;
+>> +
+>> +    uint32_t be_buffer_size;
+>>   } TPMState;
+>>  =20
+>>   #define TPM(obj) OBJECT_CHECK(TPMState, (obj), TYPE_TPM_TIS)
+>> @@ -977,10 +979,9 @@ static int tpm_tis_do_startup_tpm(TPMState *s)
+>>       return tpm_backend_startup_tpm(s->be_driver);
+>>   }
+>>  =20
+>> -static void tpm_tis_realloc_buffer(TPMSizedBuffer *sb)
+>> +static void tpm_tis_realloc_buffer(TPMSizedBuffer *sb,
+>> +                                   uint32_t wanted_size)
+>>   {
+>> -    size_t wanted_size =3D 4096; /* Linux tpm.c buffer size */
+>> -
+>>       if (sb->size !=3D wanted_size) {
+>>           sb->buffer =3D g_realloc(sb->buffer, wanted_size);
+>>           sb->size =3D wanted_size;
+>> @@ -1007,6 +1008,7 @@ static void tpm_tis_reset(DeviceState *dev)
+>>       int c;
+>>  =20
+>>       s->be_tpm_version =3D tpm_backend_get_tpm_version(s->be_driver);
+>> +    s->be_buffer_size =3D tpm_backend_get_buffer_size(s->be_driver);
+>>  =20
+>>       tpm_backend_reset(s->be_driver);
+>>  =20
+>> @@ -1033,9 +1035,9 @@ static void tpm_tis_reset(DeviceState *dev)
+>>           s->loc[c].state =3D TPM_TIS_STATE_IDLE;
+>>  =20
+>>           s->loc[c].w_offset =3D 0;
+>> -        tpm_tis_realloc_buffer(&s->loc[c].w_buffer);
+>> +        tpm_tis_realloc_buffer(&s->loc[c].w_buffer, s->be_buffer_size=
+);
+>>           s->loc[c].r_offset =3D 0;
+>> -        tpm_tis_realloc_buffer(&s->loc[c].r_buffer);
+>> +        tpm_tis_realloc_buffer(&s->loc[c].r_buffer, s->be_buffer_size=
+);
+>>       }
+>>  =20
+>>       tpm_tis_do_startup_tpm(s);
+>> diff --git a/include/sysemu/tpm_backend.h b/include/sysemu/tpm_backend=
+.h
+>> index 590e8b4..d23cef2 100644
+>> --- a/include/sysemu/tpm_backend.h
+>> +++ b/include/sysemu/tpm_backend.h
+>> @@ -80,6 +80,7 @@ struct TPMBackendClass {
+>>       int (*reset_tpm_established_flag)(TPMBackend *t, uint8_t locty);
+>>  =20
+>>       TPMVersion (*get_tpm_version)(TPMBackend *t);
+>> +    uint32_t (*get_buffer_size)(TPMBackend *t);
+>>  =20
+>>       TpmTypeOptions *(*get_tpm_options)(TPMBackend *t);
+>>  =20
+>> @@ -183,6 +184,16 @@ int tpm_backend_reset_tpm_established_flag(TPMBac=
+kend *s, uint8_t locty);
+>>   TPMVersion tpm_backend_get_tpm_version(TPMBackend *s);
+>>  =20
+>>   /**
+>> + * tpm_backend_get_buffer_size:
+>> + * @s: the backend to call into
+>> + *
+>> + * Get the TPM's buffer size.
+>> + *
+>> + * Returns buffer size.
+>> + */
+>> +uint32_t tpm_backend_get_buffer_size(TPMBackend *s);
+>> +
+>> +/**
+>>    * tpm_backend_query_tpm:
+>>    * @s: the backend
+>>    *
+>> --=20
+>> 2.5.5
+>>
+>>
+> Looks good to me otherwise,
+>
+> Reviewed-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
+>
