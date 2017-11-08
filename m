@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52074)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52748)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1eCM6B-00081A-Ko
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 03:52:42 -0500
+	(envelope-from <cohuck@redhat.com>) id 1eCM6t-0008TJ-UO
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 03:53:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1eCM66-00018n-UQ
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 03:52:35 -0500
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <20171107165226.22546-1-alex.bennee@linaro.org>
-	<CAFEAcA-E4Tq0gi3q5z+_5JOy0-j0=59p5WiKNFP9qmKG8=r4bg@mail.gmail.com>
-	<87r2taq66h.fsf@linaro.org>
-	<CAFEAcA_2QhC5BRJX51n4FP7EBOZ2qyq-H3hRhoGRLMTD=gP=Nw@mail.gmail.com>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <c1ca4ad6-b31f-7c7a-ae43-80eb11b49e1c@twiddle.net>
-Date: Wed, 8 Nov 2017 09:52:22 +0100
+	(envelope-from <cohuck@redhat.com>) id 1eCM6q-0001cg-Pv
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 03:53:24 -0500
+Date: Wed, 8 Nov 2017 09:53:14 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20171108095314.7687676e.cohuck@redhat.com>
+In-Reply-To: <20171107175455.73793-2-borntraeger@de.ibm.com>
+References: <20171107175455.73793-1-borntraeger@de.ibm.com>
+	<20171107175455.73793-2-borntraeger@de.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_2QhC5BRJX51n4FP7EBOZ2qyq-H3hRhoGRLMTD=gP=Nw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] accel/tcg/translate-all: expand
- cpu_restore_state retaddr check
+Subject: Re: [Qemu-devel] [PATCH 1/1] s390x/pci: let pci devices start in
+ configured mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,43 +24,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
+To: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Halil Pasic <pasic@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Yi Min Zhao <zyimin@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>
 
-On 11/07/2017 07:53 PM, Peter Maydell wrote:
->> Then why call cpu_restore_state at all? We should be consistent as there
->> are plenty of places that do things like:
->>
->>     if (pc) {
->>         /* now we have a real cpu fault */
->>         cpu_restore_state(cs, pc);
->>     }
->>
->> I'm happy to make a 0 retaddr officially valid and actually document it
->> in exec-all.h. It's not like most callers even bother checking the
->> return code.
+On Tue,  7 Nov 2017 18:54:55 +0100
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 
-This is exactly the discussion that we had last time, and we did just that.
+> Currently, to enable a pci device in the guest, the user has to issue
+> echo 1 > /sys/bus/pci/slots/00000000/power. This is not what people
+> expect. On an LPAR, the user can put a PCI device in configured or
+> deconfigured state via IOCDS. The "start in deconfigured state" can be
+> used for "sharing" a pci function across LPARs. This is not what we are
+> going to use in KVM, so always start configured.
+> 
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> Acked-by: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
+> Reviewed-by: Pierre Morel <pmorel@linux.vnet.ibm.com>
+> ---
+>  hw/s390x/s390-pci-bus.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+> index e7a58e8..2b1e140 100644
+> --- a/hw/s390x/s390-pci-bus.c
+> +++ b/hw/s390x/s390-pci-bus.c
+> @@ -715,7 +715,7 @@ static void s390_pcihost_hot_plug(HotplugHandler *hotplug_dev,
+>          pbdev->pdev = pdev;
+>          pbdev->iommu = s390_pci_get_iommu(s, pdev->bus, pdev->devfn);
+>          pbdev->iommu->pbdev = pbdev;
+> -        pbdev->state = ZPCI_FS_STANDBY;
+> +        pbdev->state = ZPCI_FS_DISABLED;
+>  
+>          if (s390_pci_msix_init(pbdev)) {
+>              error_setg(errp, "MSI-X support is mandatory "
 
-> Hmm, there's more places than I expected that do that "don't call
-> if 0" check than I thought. Overall it seems better to me to officially
-> allow the zero, rather than having lots of callsites that all have
-> to remember to check.
+A pci function already has to be configured before we can assign it via
+vfio, right?
 
-... what we didn't do is go through and change all of the call sites to remove
-the check for zero.
-
-> Incidentally if retaddr is zero then
-> (retaddr < (uintptr_t) tcg_init_ctx.code_gen_buffer)
-> is always true and you don't need to explicitly check for zero, though
-> it might be clearer to do so if we think we might change the rest
-> of the condition in future.
-
-Indeed, I was thinking
-
-  retaddr - code_gen_buffer < code_gen_buffer_size
-
-which works well with unsigned arithmetic.  And a large comment re zero.
-
-
-r~
+I think I'll queue this for 2.11.
