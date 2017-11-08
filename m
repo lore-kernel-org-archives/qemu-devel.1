@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56065)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56670)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eCRrc-0001M9-Jk
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 10:02:10 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eCRu2-0002MK-Ts
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 10:04:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eCRrZ-000429-FP
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 10:02:00 -0500
-Received: from mail-wr0-f177.google.com ([209.85.128.177]:48359)
+	(envelope-from <pbonzini@redhat.com>) id 1eCRtz-00051t-PW
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 10:04:30 -0500
+Received: from mail-wr0-f180.google.com ([209.85.128.180]:56297)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eCRrZ-00041b-9N
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 10:01:57 -0500
-Received: by mail-wr0-f177.google.com with SMTP id 15so2693156wrb.5
-	for <qemu-devel@nongnu.org>; Wed, 08 Nov 2017 07:01:57 -0800 (PST)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eCRtz-00050z-Jo
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 10:04:27 -0500
+Received: by mail-wr0-f180.google.com with SMTP id l8so2677218wre.12
+	for <qemu-devel@nongnu.org>; Wed, 08 Nov 2017 07:04:27 -0800 (PST)
 References: <cover.1510093478.git.jcody@redhat.com>
 	<41ed8543e005205118438328c7e162532729d9c7.1510093478.git.jcody@redhat.com>
 	<20171108104737.xtxfex7leabfbqyc@starbug-vm.ie.oracle.com>
+	<a888b534-f285-6d02-fdb6-9faae79879fb@redhat.com>
+	<20171108145038.7ms6llpt4vjnh33q@starbug-vm.ie.oracle.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <1465eafb-d4c4-4628-cffd-1b4ea47f2e8a@redhat.com>
-Date: Wed, 8 Nov 2017 16:01:51 +0100
+Message-ID: <e45ecd97-0fa2-edeb-ada2-c973b0edf4b6@redhat.com>
+Date: Wed, 8 Nov 2017 16:04:21 +0100
 MIME-Version: 1.0
-In-Reply-To: <20171108104737.xtxfex7leabfbqyc@starbug-vm.ie.oracle.com>
+In-Reply-To: <20171108145038.7ms6llpt4vjnh33q@starbug-vm.ie.oracle.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v3 7/7] block/curl: code
  cleanup to comply with coding style
 List-Id: <qemu-devel.nongnu.org>
@@ -32,58 +34,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp, rjones@redhat.com, namei.unix@gmail.com
+To: Eric Blake <eblake@redhat.com>, Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp, rjones@redhat.com, namei.unix@gmail.com
 
-On 08/11/2017 11:47, Darren Kenny wrote:
->>
->>
->> -// #define DEBUG_CURL
->> -// #define DEBUG_VERBOSE
->> +/*
->> + #define DEBUG_CURL
->> + #define DEBUG_VERBOSE
->> +*/
+On 08/11/2017 15:50, Darren Kenny wrote:
+>> But, since checkpatch.pl doesn't flag it, and since it is easier to
+>> remove the leading and trailing /* and */ to enable the debug #defines
+>> (compared to editing every single line of the comment), I don't see a
+>> problem with the style chosen here.
 > 
-> Is it not more common to use the style:
+> If that is the purpose, maybe an #if 0 is more appropriate or #ifdef
+> DEBUG, or similar.
 > 
->    /*
->     * text
->     */
-> 
-> This is visible in almost every file at the top, where the Copyright
-> and License is.
+> Isn't the purpose of styling to be consistent? As such should we not
+> be trying to use the multi-line style set out at the top of the file?
 
-The most common style in QEMU is probably
+Yes, and you're very welcome to submit a checkpatch.pl patch that warns
+about that comment style without * at the beginning of each line.
 
-   /* text
-    * more text
-    */
-
-But for DEBUG_* macros I think // are appropriate.  checkpatch should
-still warn about them because DEBUG_* macros should be replaced by
-tracepoints; but unless we do that we should keep line comments.
-
->>
->> -    CURLState *s = ((CURLState*)opaque);
->> +    CURLState *s = opaque;
-> 
-> Not sure about this one - while it may not be strictly necessary to
-> do the casting, from a readability point of view it is helpful to
-> see the cast - possibly with the outer brackets removed:
-> 
->      CURLState *s = (CURLState*)opaque;
-
-I think the most common idiom here is to omit the cast.
-
->> -    // In case we have the requested data already (e.g. read-ahead),
->> -    // we can just call the callback and be done.
->> +    /* In case we have the requested data already (e.g. read-ahead),
->> +       we can just call the callback and be done. */
-> 
-> Please don't do a multi-line comment like this, it is much more
-> obvious that the second line is a comment if you use the more normal
-> format of as outlined earlier by me. 
-
-Agreed.
+On the other hand, style should not get in the way, and the version that
+gets least in the way for debug #defines is //.
 
 Paolo
