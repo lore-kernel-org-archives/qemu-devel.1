@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51014)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54563)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbutsykin@virtuozzo.com>) id 1eCTMG-0006gR-E0
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 11:37:45 -0500
+	(envelope-from <thuth@redhat.com>) id 1eCTaR-0002DF-6X
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 11:52:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbutsykin@virtuozzo.com>) id 1eCTMF-0000xA-IH
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 11:37:44 -0500
-References: <20171108063447.2842-1-slp@redhat.com>
-	<f18d01b4-6ae6-75d9-63ba-83fb22b6a43d@virtuozzo.com>
-	<CAAiTLFV80SfMneuhs7tdYENOb+zV7kJ43B9ZgALk2tva1ZDpUw@mail.gmail.com>
-	<5d4d9db6-f740-c114-9f21-d575eb2d897f@redhat.com>
-From: Pavel Butsykin <pbutsykin@virtuozzo.com>
-Message-ID: <71cba021-1d61-8dc5-1685-c52f40098072@virtuozzo.com>
-Date: Wed, 8 Nov 2017 19:36:53 +0300
+	(envelope-from <thuth@redhat.com>) id 1eCTaM-0007tN-Bv
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 11:52:23 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42116)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1eCTaM-0007qa-51
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 11:52:18 -0500
+References: <20171108152023.80780-1-marcel@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <3722f599-31b4-adb6-270b-aff5819f1bd3@redhat.com>
+Date: Wed, 8 Nov 2017 17:52:08 +0100
 MIME-Version: 1.0
-In-Reply-To: <5d4d9db6-f740-c114-9f21-d575eb2d897f@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20171108152023.80780-1-marcel@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3] util/async: use atomic_mb_set in
- qemu_bh_cancel
+Subject: Re: [Qemu-devel] [PATCH] hw/pcie-pci-bridge: restrict to X86 and ARM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,38 +27,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Sergio Lopez <slp@redhat.com>
-Cc: qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>, stefanha@redhat.com, qemu-block@nongnu.org
+To: Marcel Apfelbaum <marcel@redhat.com>, qemu-devel@nongnu.org
+Cc: mst@redhat.com, zuban32s@gmail.com, cohuck@redhat.com
 
+On 08.11.2017 16:20, Marcel Apfelbaum wrote:
+> The PCIE-PCI bridge is specific to "pure" PCI systems
 
+s/PCI/PCIe/ ?
 
-On 08.11.2017 17:15, Paolo Bonzini wrote:
-> On 08/11/2017 15:10, Sergio Lopez wrote:
->>> I'm not quite sure that the pre-fetched is involved in this issue,
->>> because pre-fetch reading a certain addresses should be invalidated by
->>> write on another core to the same addresses. In our case write
->>> req->state = THREAD_DONE should invalidate read req->state == THREAD_DONE.
->>> I am inclined to think that there is a memory-reordering read with
->>> write. It's a very real case for x86 and I don't see the reasons which
->>> can prevent it:
->>>
->> Yes, you're right. This is actually a memory reordering issue. I'm
->> going to rewrite that paragraph.
+> (on QEMU we have X86 and ARM), it does not make sense to
+> have if in other archs.
 > 
-> Well, memory reordering _is_ caused by speculative prefetching, delayed
-> cache invalidation (store buffers), and so on.
-
-what do you mean?
-
-If we are speaking about x86, then a write on another core
-(like req->state = THREAD_DONE in this issue) should invalidate
-prefetch read(req->state = THREAD_DONE) and this is prevented in
-hardware. The prefetch is locked to the L1, when another cpu
-invalidates the cache lines, the prefetch is invalidated also
-(As far as I understand it).
-
-> But it's probably better indeed to replace "pre-fetched" with
-> "outdated".  Whoever commits the patch can do the substitution (I can too).
+> Reported-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
+> ---
+>  default-configs/arm-softmmu.mak    | 1 +
+>  default-configs/i386-softmmu.mak   | 1 +
+>  default-configs/x86_64-softmmu.mak | 1 +
+>  hw/pci-bridge/Makefile.objs        | 3 ++-
+>  4 files changed, 5 insertions(+), 1 deletion(-)
 > 
-> Paolo
-> 
+> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
+> index 5059d134c8..33934b1dc4 100644
+> --- a/default-configs/arm-softmmu.mak
+> +++ b/default-configs/arm-softmmu.mak
+> @@ -122,6 +122,7 @@ CONFIG_FSL_IMX25=y
+>  CONFIG_IMX_I2C=y
+>  
+>  CONFIG_PCIE_PORT=y
+> +CONFIG_PCIE_PCI_BRIDGE=y
+
+Actually, why not simply use CONFIG_PCIE_PORT instead to determine
+whether the PCIe-to-PCI bridge should be included? The device only makes
+sense if there is a PCIe root port available on the system...
+
+ Thomas
