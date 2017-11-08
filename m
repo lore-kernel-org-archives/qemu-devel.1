@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43652)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45544)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1eCNJd-0006Yo-EE
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 05:10:41 -0500
+	(envelope-from <thuth@redhat.com>) id 1eCNOW-0008J5-0J
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 05:15:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1eCNJa-0001wk-AH
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 05:10:37 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42716)
+	(envelope-from <thuth@redhat.com>) id 1eCNOR-000566-Tt
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 05:15:40 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36902)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1eCNJa-0001wJ-3r
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 05:10:34 -0500
-Date: Wed, 8 Nov 2017 11:10:31 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20171108101031.6z3yqsjw6n5saxcr@sirius.home.kraxel.org>
-References: <20171023210803.20998-1-makovick@gmail.com>
-	<20171023210803.20998-5-makovick@gmail.com>
-	<1509532830.3856.7.camel@redhat.com>
-	<CAHmvugcYmaujAYGwpb+ObistFr522W1XsuV-6jUgi543VgfvTA@mail.gmail.com>
-	<27e88186-fa91-fac3-1564-9c81a55fecd4@redhat.com>
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1eCNOR-00054m-O0
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 05:15:35 -0500
+References: <20171108022828.7242-1-f4bug@amsat.org>
+	<20171108022828.7242-6-f4bug@amsat.org>
+	<20171108091628.GI12670@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <68054d7f-85e2-62e0-bb24-701be23b45ee@redhat.com>
+Date: Wed, 8 Nov 2017 11:15:26 +0100
 MIME-Version: 1.0
+In-Reply-To: <20171108091628.GI12670@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <27e88186-fa91-fac3-1564-9c81a55fecd4@redhat.com>
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 4/7] sdl2: Only accept the hotkeys on the
- main window
+Subject: Re: [Qemu-devel] [RFC PATCH 5/6] hw/i386: deprecate the pc-0.10 and
+ pc-0.11 machines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,33 +30,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cole Robinson <crobinso@redhat.com>
-Cc: =?utf-8?Q?Jind=C5=99ich_Makovi=C4=8Dka?= <makovick@gmail.com>, qemu-devel@nongnu.org
+To: "Daniel P. Berrange" <berrange@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
 
-On Sun, Nov 05, 2017 at 09:10:45AM -0500, Cole Robinson wrote:
-> On 11/02/2017 01:12 PM, Jind=C5=99ich Makovi=C4=8Dka wrote:
-> > This fixes the following case:
-> >=20
-> > 1) Ctrl-Alt-2 for console is pressed
-> > 2) console pops up and gets focus
-> > 3) console receives the Ctrl-Alt-2 keypress event
-> > 4) console closes
-> > 5) focus returns to the main window
-> > 6) main window gets the keypress event
-> > 7) goto 2 until the key is released, with 50% chance that the console
-> > window is shown at the end
+On 08.11.2017 10:16, Daniel P. Berrange wrote:
+> On Tue, Nov 07, 2017 at 11:28:27PM -0300, Philippe Mathieu-Daud=C3=A9 w=
+rote:
+>> Both are deprecated since 2.9.0
+>>
+>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>> ---
+>>  hw/i386/pc_piix.c | 2 ++
+>>  1 file changed, 2 insertions(+)
+>>
+>> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+>> index f79d5cb694..c462b702ff 100644
+>> --- a/hw/i386/pc_piix.c
+>> +++ b/hw/i386/pc_piix.c
+>> @@ -941,6 +941,7 @@ static void pc_i440fx_0_11_machine_options(Machine=
+Class *m)
+>>      pc_i440fx_0_12_machine_options(m);
+>>      m->hw_version =3D "0.11";
+>>      SET_MACHINE_COMPAT(m, PC_COMPAT_0_11);
+>> +    m->deprecated_reason =3D "Too old";
+>>  }
+>> =20
+>>  DEFINE_I440FX_MACHINE(v0_11, "pc-0.11", pc_compat_0_13,
+>> @@ -976,6 +977,7 @@ static void pc_i440fx_0_10_machine_options(Machine=
+Class *m)
+>>      pc_i440fx_0_11_machine_options(m);
+>>      m->hw_version =3D "0.10";
+>>      SET_MACHINE_COMPAT(m, PC_COMPAT_0_10);
+>> +    m->deprecated_reason =3D "Too old";
+>>  }
 >=20
-> Sounds similar to what I reported in my comment here a while back:
-> https://bugzilla.libsdl.org/show_bug.cgi?id=3D3287
+> Any deprecation message should give users useful information about what
+> they should do instead to avoid the problem.
 
-Hmm, so it seems to be a SDL bug.  I'm running SDL 2.0.3 here, which
-explains why I can't reproduce it.  According to the bug it seem to be
-*repeat* keydown events, so is simply ignoring repeat events enough to
-avoid this issue?
++1
 
-Also: Jind=C5=99ich, do you plan to send a new of the patch series with t=
-he
-issues discussed fixed?
+> More generally though, what would removing these two machines types all=
+ow
+> us to actually achieve ? Seems quite arbitrary to pick 0.10 and 0.11 bu=
+t
+> leave the other 20+ machine types.
 
-cheers,
-  Gerd
+We've discussed this a couple of months ago on the mailing list: The
+basic idea is that the oldest machine type that is still in use is 0.12
+(as a base for the RHEL 6 machines), so we should avoid to get rid of
+that code yet. But 0.10 and 0.11 very likely do not have any users
+anymore, so it should be OK to deprecate them.
+
+ Thomas
