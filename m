@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34673)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34744)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1eCZMO-0000Nw-MM
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 18:02:17 -0500
+	(envelope-from <alistai@xilinx.com>) id 1eCZMW-0000Ue-U8
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 18:02:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1eCZML-0003Xh-Jp
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 18:02:16 -0500
-Received: from mail-bn3nam01on0089.outbound.protection.outlook.com
-	([104.47.33.89]:26752
-	helo=NAM01-BN3-obe.outbound.protection.outlook.com)
+	(envelope-from <alistai@xilinx.com>) id 1eCZMT-0003a1-Qr
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 18:02:24 -0500
+Received: from mail-bl2nam02on0083.outbound.protection.outlook.com
+	([104.47.38.83]:62368
+	helo=NAM02-BL2-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1eCZML-0003XH-Dc
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 18:02:13 -0500
+	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1eCZMT-0003ZL-JJ
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 18:02:21 -0500
 From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Wed, 8 Nov 2017 14:57:55 -0800
-Message-ID: <0a23f6b00e104e03738363146849f1b5b10a1945.1510181732.git.alistair.francis@xilinx.com>
+Date: Wed, 8 Nov 2017 14:58:10 -0800
+Message-ID: <a4ec40efea88f365fa4c93c1f096014a4bacc8bc.1510181732.git.alistair.francis@xilinx.com>
 In-Reply-To: <cover.1510181732.git.alistair.francis@xilinx.com>
 References: <cover.1510181732.git.alistair.francis@xilinx.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 25/45] hw/moxie: Replace fprintf(stderr,
+Subject: [Qemu-devel] [PATCH v4 27/45] hw/nios2: Replace fprintf(stderr,
  "*\n" with error_report()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -30,7 +30,7 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: alistair.francis@xilinx.com, alistair23@gmail.com, armbru@redhat.com, Anthony Green <green@moxielogic.com>
+Cc: alistair.francis@xilinx.com, alistair23@gmail.com, armbru@redhat.com, Chris Wulff <crwulff@gmail.com>, Marek Vasut <marex@denx.de>
 
 Replace a large number of the fprintf(stderr, "*\n" calls with
 error_report(). The functions were renamed with these commands and then
@@ -83,66 +83,29 @@ find ./* -type f -exec sed -i \
 Some lines where then manually tweaked to pass checkpatch.
 
 Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-Cc: Anthony Green <green@moxielogic.com>
+Cc: Chris Wulff <crwulff@gmail.com>
+Cc: Marek Vasut <marex@denx.de>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 ---
 V2:
  - Split hw patch into individual directories
 
- hw/moxie/moxiesim.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+ hw/nios2/boot.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/moxie/moxiesim.c b/hw/moxie/moxiesim.c
-index 3ba58481d0..69eb8360cf 100644
---- a/hw/moxie/moxiesim.c
-+++ b/hw/moxie/moxiesim.c
-@@ -25,6 +25,7 @@
-  * THE SOFTWARE.
-  */
- #include "qemu/osdep.h"
-+#include "qemu/error-report.h"
- #include "qapi/error.h"
- #include "qemu-common.h"
- #include "cpu.h"
-@@ -61,8 +62,8 @@ static void load_kernel(MoxieCPU *cpu, LoaderParams *load=
-er_params)
-                            0, 0);
-=20
-     if (kernel_size <=3D 0) {
--        fprintf(stderr, "qemu: could not load kernel '%s'\n",
--                loader_params->kernel_filename);
-+        error_report("could not load kernel '%s'",
-+                     loader_params->kernel_filename);
-         exit(1);
-     }
-=20
-@@ -75,9 +76,8 @@ static void load_kernel(MoxieCPU *cpu, LoaderParams *load=
-er_params)
-             initrd_offset =3D (kernel_high + ~TARGET_PAGE_MASK)
-               & TARGET_PAGE_MASK;
-             if (initrd_offset + initrd_size > loader_params->ram_size) {
--                fprintf(stderr,
--                        "qemu: memory too small for initial ram disk '%s'\=
-n",
--                        loader_params->initrd_filename);
-+                error_report("memory too small for initial ram disk '%s'",
-+                             loader_params->initrd_filename);
-                 exit(1);
-             }
-             initrd_size =3D load_image_targphys(loader_params->initrd_file=
-name,
-@@ -85,8 +85,8 @@ static void load_kernel(MoxieCPU *cpu, LoaderParams *load=
-er_params)
-                                               ram_size);
-         }
-         if (initrd_size =3D=3D (target_ulong)-1) {
--            fprintf(stderr, "qemu: could not load initial ram disk '%s'\n"=
-,
--                    loader_params->initrd_filename);
-+            error_report("could not load initial ram disk '%s'",
-+                         loader_params->initrd_filename);
-             exit(1);
+diff --git a/hw/nios2/boot.c b/hw/nios2/boot.c
+index 2b31f5b844..c896e8007b 100644
+--- a/hw/nios2/boot.c
++++ b/hw/nios2/boot.c
+@@ -96,7 +96,7 @@ static int nios2_load_dtb(struct nios2_boot_info bi, cons=
+t uint32_t ramsize,
+         r =3D qemu_fdt_setprop_string(fdt, "/chosen", "bootargs",
+                                     kernel_cmdline);
+         if (r < 0) {
+-            fprintf(stderr, "couldn't set /chosen/bootargs\n");
++            error_report("couldn't set /chosen/bootargs");
          }
      }
+=20
 --=20
 2.14.1
