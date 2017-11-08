@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55573)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55853)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eCGOn-0006bM-60
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 21:47:29 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1eCGPb-00072V-W2
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 21:48:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eCGOk-0003rl-3a
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 21:47:29 -0500
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Tue,  7 Nov 2017 23:47:19 -0300
-Message-Id: <20171108024719.8389-1-f4bug@amsat.org>
+	(envelope-from <aik@ozlabs.ru>) id 1eCGPY-00043j-Uo
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 21:48:20 -0500
+Received: from mail-pl0-x244.google.com ([2607:f8b0:400e:c01::244]:56993)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1eCGPY-00043P-PB
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 21:48:16 -0500
+Received: by mail-pl0-x244.google.com with SMTP id 63so347980pld.13
+	for <qemu-devel@nongnu.org>; Tue, 07 Nov 2017 18:48:16 -0800 (PST)
+References: <20171108022828.7242-1-f4bug@amsat.org>
+	<20171108022828.7242-6-f4bug@amsat.org>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <b49e3557-7593-44ac-3337-41ee95451457@ozlabs.ru>
+Date: Wed, 8 Nov 2017 13:48:09 +1100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20171108022828.7242-6-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-AU
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH] docker: correctly escape $BACKEND in the help
- output
+Subject: Re: [Qemu-devel] [RFC PATCH 5/6] hw/i386: deprecate the pc-0.10 and
+ pc-0.11 machines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,42 +31,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, "Daniel P . Berrange" <berrange@redhat.com>, Fam Zheng <famz@redhat.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org
 
-In Makefiles the $ must be escaped as $$ in shell uses.
+On 08/11/17 13:28, Philippe Mathieu-Daudé wrote:
+> Both are deprecated since 2.9.0
 
-Since 8a2390a4f47:
+May be so but I could not find where this happened in git history:
 
- $ make docker
-     [...]
-     NETWORK=1            Enable virtual network interface with default backend.
-     NETWORK=ACKEND     Enable virtual network interface with ACKEND.
+[vpl1 qemu]$ git log -n1 --grep 'pc-0.10'
+f6d5a0bad2 2 years, 5 months ago Eduardo Habkost piix: Define PC_COMPAT_0_10
 
-Once escaped:
+Having some pointers in the commit log would be helpful imho, like [2/6].
 
- $ make docker
-     [...]
-     NETWORK=1            Enable virtual network interface with default backend.
-     NETWORK=$BACKEND     Enable virtual network interface with $BACKEND.
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- tests/docker/Makefile.include | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> ---
+>  hw/i386/pc_piix.c | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+> index f79d5cb694..c462b702ff 100644
+> --- a/hw/i386/pc_piix.c
+> +++ b/hw/i386/pc_piix.c
+> @@ -941,6 +941,7 @@ static void pc_i440fx_0_11_machine_options(MachineClass *m)
+>      pc_i440fx_0_12_machine_options(m);
+>      m->hw_version = "0.11";
+>      SET_MACHINE_COMPAT(m, PC_COMPAT_0_11);
+> +    m->deprecated_reason = "Too old";
+>  }
+>  
+>  DEFINE_I440FX_MACHINE(v0_11, "pc-0.11", pc_compat_0_13,
+> @@ -976,6 +977,7 @@ static void pc_i440fx_0_10_machine_options(MachineClass *m)
+>      pc_i440fx_0_11_machine_options(m);
+>      m->hw_version = "0.10";
+>      SET_MACHINE_COMPAT(m, PC_COMPAT_0_10);
+> +    m->deprecated_reason = "Too old";
+>  }
+>  
+>  DEFINE_I440FX_MACHINE(v0_10, "pc-0.10", pc_compat_0_13,
+> 
 
-diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
-index f1a398e9fa..de87341528 100644
---- a/tests/docker/Makefile.include
-+++ b/tests/docker/Makefile.include
-@@ -109,7 +109,7 @@ docker:
- 	@echo '    DEBUG=1              Stop and drop to shell in the created container'
- 	@echo '                         before running the command.'
- 	@echo '    NETWORK=1            Enable virtual network interface with default backend.'
--	@echo '    NETWORK=$BACKEND     Enable virtual network interface with $BACKEND.'
-+	@echo '    NETWORK=$$BACKEND     Enable virtual network interface with $$BACKEND.'
- 	@echo '    NOUSER               Define to disable adding current user to containers passwd.'
- 	@echo '    NOCACHE=1            Ignore cache when build images.'
- 	@echo '    EXECUTABLE=<path>    Include executable in image.'
+
 -- 
-2.15.0
+Alexey
