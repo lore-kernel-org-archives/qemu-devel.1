@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45078)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45201)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eCRKc-0005HZ-GP
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 09:27:55 -0500
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eCRKx-0005UX-9P
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 09:28:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eCRKZ-0008Tz-Cd
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 09:27:54 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53646)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eCRKZ-0008TF-3U
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 09:27:51 -0500
-References: <1510049762-4609-1-git-send-email-peter.maydell@linaro.org>
-	<1510049762-4609-3-git-send-email-peter.maydell@linaro.org>
-	<CD2DCF39-4633-4F81-8B5E-75B49DB93D12@gmail.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <5909acc5-056c-3f37-f683-e826f98a287f@redhat.com>
-Date: Wed, 8 Nov 2017 08:27:49 -0600
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eCRKq-0000Ee-KA
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 09:28:15 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:55512)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eCRKq-0000EH-7l
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 09:28:08 -0500
 MIME-Version: 1.0
-In-Reply-To: <CD2DCF39-4633-4F81-8B5E-75B49DB93D12@gmail.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="w6cocsIEMSxdpKPAp7W6ktmMW3uDCkSap"
-Subject: Re: [Qemu-devel] [PULL 2/3] ui/cocoa.m: move ungrab to ctrl-alt-g
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Date: Wed, 08 Nov 2017 17:28:06 +0300
+From: Mihail Abakumov <mikhail.abakumov@ispras.ru>
+In-Reply-To: <CABdb735OHqGVf_0D=zDy9D4HzG4s+w8OjUX5MG2pWrqOrQc=pg@mail.gmail.com>
+References: <150824572545.6816.5099701189660002212.stgit@Misha-PC.lan02.inno>
+	<CABdb736bkcafKPCHsQGEmB6wYOGB4s4S4+sVkuygDe7SjqZDYA@mail.gmail.com>
+	<CABdb736w49GjXwNOsj4o8RHQKAfmWnu+jJQgAZjzHwwzOW-+gA@mail.gmail.com>
+	<1b94bfaac633fc76c8633bbcec9ff4a9@ispras.ru>
+	<CABdb735OHqGVf_0D=zDy9D4HzG4s+w8OjUX5MG2pWrqOrQc=pg@mail.gmail.com>
+Message-ID: <3205f50a0ec9089fcaf452911e60637b@ispras.ru>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 00/43] Windbg supporting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,60 +31,187 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Programmingkid <programmingkidx@gmail.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org
+To: Ladi Prosek <lprosek@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, sw@weilnetz.de, Pavel Dovgalyuk <dovgaluk@ispras.ru>, Roman Kagan <rkagan@virtuozzo.com>, Paolo Bonzini <pbonzini@redhat.com>, "Denis V. Lunev" <den@openvz.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---w6cocsIEMSxdpKPAp7W6ktmMW3uDCkSap
-From: Eric Blake <eblake@redhat.com>
-To: Programmingkid <programmingkidx@gmail.com>,
- Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org
-Message-ID: <5909acc5-056c-3f37-f683-e826f98a287f@redhat.com>
-Subject: Re: [Qemu-devel] [PULL 2/3] ui/cocoa.m: move ungrab to ctrl-alt-g
-References: <1510049762-4609-1-git-send-email-peter.maydell@linaro.org>
- <1510049762-4609-3-git-send-email-peter.maydell@linaro.org>
- <CD2DCF39-4633-4F81-8B5E-75B49DB93D12@gmail.com>
-In-Reply-To: <CD2DCF39-4633-4F81-8B5E-75B49DB93D12@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 11/08/2017 06:04 AM, Programmingkid wrote:
+Ladi Prosek =D0=BF=D0=B8=D1=81=D0=B0=D0=BB 2017-11-08 16:43:
+> On Wed, Nov 8, 2017 at 12:54 PM, Mihail Abakumov
+> <mikhail.abakumov@ispras.ru> wrote:
+>> Ladi Prosek =D0=BF=D0=B8=D1=81=D0=B0=D0=BB 2017-11-06 18:15:
+>>=20
+>>> On Mon, Oct 23, 2017 at 10:31 AM, Ladi Prosek <lprosek@redhat.com>=20
+>>> wrote:
+>>>>=20
+>>>> On Tue, Oct 17, 2017 at 3:08 PM, Mihail Abakumov
+>>>> <mikhail.abakumov@ispras.ru> wrote:
+>>>>>=20
+>>>>> An update of:
+>>>>>=20
+>>>>>         v1:
+>>>>> https://lists.nongnu.org/archive/html/qemu-devel/2017-09/msg07092.h=
+tml
+>>>>>=20
+>>>>> We made the debugger module WinDbg (like GDB) for QEMU. This is the
+>>>>> replacement of the remote stub in Windows kernel. Used for remote=20
+>>>>> Windows
+>>>>> kernel debugging without debugging mode.
+>>>>>=20
+>>>>> WinDbg is a multipurpose debugger for the Microsoft Windows=20
+>>>>> computer
+>>>>> operating system, distributed by Microsoft. Recent versions of=20
+>>>>> WinDbg have
+>>>>> been and are being distributed as part of the free Debugging Tools=20
+>>>>> for
+>>>>> Windows suite.
+>>>>>=20
+>>>>> How to start debugging QEMU using WinDbg:
+>>>>>   Run QEMU with next option:
+>>>>>     -windbg pipe:<name>
+>>>>>   QEMU will start and pause for waiting WinDbg connection.
+>>>>>   Run WinDbg with next options:
+>>>>>     -b -k com:pipe,baud=3D115200,port=3D\\.\pipe\<name>,resets=3D0
+>>>>>   Wait for debugger connect to kernel.
+>>>>>=20
+>>>>> Note: You can add Symbol Search Path in WinDbg such as
+>>>>> srv*c:\tmp*http://msdl.microsoft.com/download/symbols.
+>>>>>=20
+>>>>> How it works:
+>>>>> The WinDbg debugger has the possibility of connecting to a remote=20
+>>>>> debug
+>>>>> service (Kdsrv.exe) in the Windows kernel. Therefore, it is=20
+>>>>> possible to
+>>>>> connect to the guest system running in the QEMU emulator. Kernel=20
+>>>>> debugging
+>>>>> is possible only with the enabled debugging mode, may change at the=
+=20
+>>>>> same
+>>>>> time. Our module of WinDbg debugger for QEMU is an alternative of=20
+>>>>> the remote
+>>>>> debugging service in the kernel. Thus, the debugger connects to the
+>>>>> debugging module, not to the kernel of the operating system. The=20
+>>>>> module
+>>>>> obtains all the necessary information answering debugger requests=20
+>>>>> from the
+>>>>> QEMU emulator. At the same time for debugging there is no need to=20
+>>>>> enable
+>>>>> debugging mode in the kernel. This leads to hidden debugging. Our=20
+>>>>> module
+>>>>> supports all features of WinDbg regarding remote debugging, besides
+>>>>> interception of events and exceptions. Only i386 is supported now.
+>>>>>=20
+>>>>> Changed in v2:
+>>>>>=20
+>>>>>  - Move target specific code in the 'target/' directory. (Alistair
+>>>>> Francis)
+>>>>>  - Change 'kd_api_fill_memory'. Made a fill of memory by line=20
+>>>>> segments.
+>>>>> Before that, a full array was immediately collected and written in=20
+>>>>> RAM.
+>>>>> (Ladi Prosek)
+>>>>>  - Change 'kd_api_search_memory'. Made a search for memory by line
+>>>>> segments. (Ladi Prosek)
+>>>>>  - Change ld* to st* where it needs. (Ladi Prosek)
+>>>>>  - Add a additional check of input arguments in=20
+>>>>> 'windbg_read_context'
+>>>>> and 'windbg_read_ks_regs'. (Ladi Prosek)
+>>>>>  - Fix typos. (Ladi Prosek)
+>>>>>  - Add a fliping back 'windbg_state->is_loaded' after reset VM.
+>>>>>  - Add a check to disabled kvm. It is supported yet. (Ladi Prosek)
+>>>>>  - Add a check to device in windbg option. Only pipe is supporting=20
+>>>>> now.
+>>>>> (Alistair Francis)
+>>>>>  - Add a check to 'ifdef' WINDBG_DEBUG_ON before define it.=20
+>>>>> (Alistair
+>>>>> Francis)
+>>>>>  - Replace printf to qemu_log. (Alistair Francis)
+>>>>>  - Fix build on s390x host. (patchew)
+>>>>>  - Fix code style error. (patchew)
+>>>>=20
+>>>>=20
+>>>> Thank you, I am planning to take a closer look and test the changes=20
+>>>> in
+>>>> a week or two.
+>>>>=20
+>>>> Still wondering if it is limited to Windows hosts or if it can be=20
+>>>> used
+>>>> on Linux as well, preferably with KVM.
+>>>=20
+>>>=20
+>>> I haven't been able to make this work.
+>>>=20
+>>> I've built a 32-bit QEMU for Windows with these patches and used the
+>>> command line parameters given above:
+>>>=20
+>>>   qemu-system-i386.exe run with -windbg pipe:win7_dbg
+>>>   windbg -b -k com:pipe,baud=3D115200,port=3D\\.\pipe\win7_dbg,resets=
+=3D0
+>>>=20
+>>> The guest is a fresh install of Win7 32-bit.
+>>>=20
+>>> FS base passes all the checks in windbg_on_load() as the guest kernel
+>>> loads and it returns true. QEMU then sends some data over the pipe.
+>>> Windbg doesn't print anything, it's still showing:
+>>>=20
+>>>   Opened \\.\pipe\win7_dbg
+>>>   Waiting to reconnect...
+>>>=20
+>>> Is this expected? In regular remote kernel debugging, windbg produces
+>>> a bunch of output about the target state when it attaches.
+>>>=20
+>>> The only thing I can reasonably do at this point is Ctrl+Break. This
+>>> results in some data exchange between QEMU and windbg but nothing
+>>> really changes -- windbg still says "Waiting to reconnect...".=20
+>>> Hitting
+>>> Ctrl+Break for the second time kills windbg. I tried running windbg
+>>> under windbg and was able to capture this output:
+>>>=20
+>>>   Debug target initialization failed, 0x8000FFFF
+>>>=20
+>>> Once I managed to make windbg actually attach (i.e. it generated the
+>>> target state output) but the QEMU process died shortly after that. I
+>>> don't know why because I haven't been able to reproduce it.
+>>>=20
+>>> So, what am I doing wrong? Can you post your detailed steps please?
+>>>=20
+>>> I'm pasting a dump of the pipe traffic as captured with IO Ninja. "<"
+>>> is windbg to QEMU, ">" is QEMU to windbg. QEMU initialized the stub=20
+>>> at
+>>> 14:57:48, the first Ctrl+Break was issued at 15:00:32 and the second
+>>> one at 15:01:10.
+>>>=20
+>>=20
+>> This is very strange.
+>> After reading the desired addresses (windbg_on_load()), the=20
+>> interaction
+>> between the stub and windbg begins. A lot of packets are being sent.
+>> This happens about 10 seconds. All this time "Waiting to reconnect=20
+>> ..."
+>> Then the windbg connects.
+>> In your case windbg does not send packets, more specifically, does not
+>> continue to do it. What is your version of windbg. Also, windbg stub=20
+>> has
+>> been supported only for windbg x64, yet.
 >=20
->> On Nov 7, 2017, at 5:16 AM, Peter Maydell <peter.maydell@linaro.org> w=
-rote:
->>
->> From: John Arbuckle <programmingkidx@gmail.com>
->>
->> Currently the cocoa user interface relis on the user pushing
+> Ah, so that's a pretty important piece of information and not very
+> intuitive given the "Only i386 is supported now." sentence in the
+> cover email.
 >=20
-> I would change "relis" to "relies" here.
+> Microsoft (R) Windows Debugger Version 10.0.15063.468 X86
+> Microsoft (R) Windows Debugger Version 10.0.15063.468 AMD64
+> Microsoft (R) Windows Debugger Version 10.0.16299.15 X86
+> Microsoft (R) Windows Debugger Version 10.0.16299.15 AMD64
+>=20
+> are the versions I have tried. I don't see any difference between x86
+> and amd64, all versions never connect and crash after the second
+> break.
+>=20
+> What guest OS are you running? Can you maybe zip up your QEMU binaries
+> and share them with me?
+>=20
+> Thanks,
+> Ladi
 
-Too late; it's already commit 5929e36c
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---w6cocsIEMSxdpKPAp7W6ktmMW3uDCkSap
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloDFGUACgkQp6FrSiUn
-Q2rj7gf/THI9a4UDi9xcs7MwzFtXLdwwUempW6shWs5MQFwxCriCjkoUhbAwlXoA
-vOEzoI8JGIrEcSibqBMNwZH6a3N/u0zTlZ/it/mdaBmpiOCY3ZsKuWNjZqADurGV
-u7MMbq+v2WiJ3zAsvxx0jBgp5K6vII2Rm4/b1mPpkdvEPNm3Jn+R7nf7q/1Dk7Mu
-r/HLnxNGFshr1r1icXyUQRjoH1ti3n4PrqfeHT0yskMAHj1HMGj1VQPM1eRdOyeB
-ox6VNI3qWYBKzAoFThU533aFfJaUujgy+1mxGWOIXxpZm9KsK7OFoJjVT2wzxUK2
-JFAYIkG5k3+n7paaE/LRkN9IHx/1hA==
-=KTTz
------END PGP SIGNATURE-----
-
---w6cocsIEMSxdpKPAp7W6ktmMW3uDCkSap--
+Oh, it looks like a problem in the versions. I use the Windbg from=20
+Windows 7.
+Windbg version: 6.12.0002.633 AMD64. I will try to test with your=20
+version.
