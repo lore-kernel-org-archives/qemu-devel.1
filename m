@@ -1,39 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45703)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46396)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eCWEh-0006Mk-2W
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 14:42:08 -0500
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1eCWIs-0007jW-EP
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 14:46:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eCWEd-0002iv-Vj
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 14:42:07 -0500
-Received: from mail-qt0-x231.google.com ([2607:f8b0:400d:c0d::231]:44246)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eCWEd-0002ik-Qe
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 14:42:03 -0500
-Received: by mail-qt0-x231.google.com with SMTP id 8so4851871qtv.1
-	for <qemu-devel@nongnu.org>; Wed, 08 Nov 2017 11:42:03 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20171030040056.11780-1-f4bug@amsat.org>
-	<20171030082029.GY2993@localhost.localdomain>
-	<20171108132857.GT12670@redhat.com>
-	<1ecb6a4b-465f-0949-e039-441038f1adf8@amsat.org>
-	<20171108165905.GN3111@localhost.localdomain>
-	<20171108170629.GD12670@redhat.com>
-	<20171108172547.GP3111@localhost.localdomain>
-	<e2ae58f9-4f19-ad9f-c287-2bc282a6de2f@amsat.org>
-	<20171108183509.GS3111@localhost.localdomain>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <f3c04c0a-6df9-849e-5cd7-ba153e1fc856@amsat.org>
-Date: Wed, 8 Nov 2017 16:41:58 -0300
-MIME-Version: 1.0
-In-Reply-To: <20171108183509.GS3111@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RFC PATCH] vl: only display available accelerators
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1eCWIj-0004Qk-FR
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 14:46:26 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:53040)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
+	id 1eCWIj-0004PH-6C
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 14:46:17 -0500
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	vA8JiGK7082524
+	for <qemu-devel@nongnu.org>; Wed, 8 Nov 2017 14:46:09 -0500
+Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2e45b82meu-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 08 Nov 2017 14:46:08 -0500
+Received: from localhost
+	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
+	Wed, 8 Nov 2017 14:46:07 -0500
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Date: Wed,  8 Nov 2017 14:45:56 -0500
+Message-Id: <1510170356-16953-1-git-send-email-stefanb@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH] tpm: Add a caching layer for the TPM
+ Established flag
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,130 +36,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, Thomas Huth <thuth@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Markus Armbruster <armbru@redhat.com>, Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org, "Emilio G . Cota" <cota@braap.org>, Anthony Perard <anthony.perard@citrix.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Christoffer Dall <cdall@linaro.org>, Vincent Palatin <vpalatin@chromium.org>
+To: qemu-devel@nongnu.org, marcandre.lureau@redhat.com
+Cc: amarnath.valluri@intel.com, Stefan Berger <stefanb@linux.vnet.ibm.com>
 
-On 11/08/2017 03:35 PM, Eduardo Habkost wrote:
-> On Wed, Nov 08, 2017 at 03:03:34PM -0300, Philippe Mathieu-Daudé wrote:
->> On 11/08/2017 02:25 PM, Eduardo Habkost wrote:
->>> On Wed, Nov 08, 2017 at 05:06:29PM +0000, Daniel P. Berrange wrote:
->>>> On Wed, Nov 08, 2017 at 02:59:05PM -0200, Eduardo Habkost wrote:
->>>>> On Wed, Nov 08, 2017 at 01:21:33PM -0300, Philippe Mathieu-Daudé wrote:
->>>>>> On 11/08/2017 10:28 AM, Daniel P. Berrange wrote:
->>>>>>> On Mon, Oct 30, 2017 at 09:20:29AM +0100, Eduardo Habkost wrote:
->>>>>>>> On Mon, Oct 30, 2017 at 01:00:56AM -0300, Philippe Mathieu-Daudé wrote:
->>>>>>>>> examples configuring with '--enable-kvm --disable-tcg'
->>>>>>>>>
->>>>>>>>> - before
->>>>>>>>>
->>>>>>>>>   $ qemu-system-x86_64 -accel help
->>>>>>>>>   Possible accelerators: kvm, xen, hax, tcg
->>>>>>>>>
->>>>>>>>>   $ qemu-system-x86_64 -accel tcg
->>>>>>>>>   qemu-system-x86_64: -machine accel=tcg: No accelerator found
->>>>>>>>>
->>>>>>>>>   # qemu-system-x86_64 -accel hax
->>>>>>>>>   qemu-system-x86_64: -machine accel=hax: No accelerator found
->>>>>>>>>
->>>>>>>>>   # qemu-system-x86_64 -accel xen
->>>>>>>>>   xencall: error: Could not obtain handle on privileged command interface: No such file or directory
->>>>>>>>>   xen be core: xen be core: can't open xen interface
->>>>>>>>>   can't open xen interface
->>>>>>>>>   qemu-system-x86_64: failed to initialize Xen: Operation not permitted
->>>>>>>>>
->>>>>>>>> - after
->>>>>>>>>
->>>>>>>>>   $ qemu-system-x86_64 -accel help
->>>>>>>>>   Possible accelerators: kvm
->>>>>>>>>
->>>>>>>>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->>>>>>>>> ---
->>>>>>>>> RFC because:
->>>>>>>>>     - I don't think this is the nicest way, too much #ifdef'fery in main()
->>>>>>>>
->>>>>>>> I suggest using object_class_get_list(TYPE_ACCEL, false).
->>>>>>>
->>>>>>> And check the result of the available() method on the returned classes
->>>>>>> too, to filter the results.
->>>>>>
->>>>>> Good idea! I'll use that.
->>>>>
->>>>> It looks like QTest is the only accelerator that implements
->>>>> ->available(), and its return value is a build-time constant that
->>>>> depends only on CONFIG_POSIX.
->>>>>
->>>>> I wonder why we don't simply avoid compiling the qtest class if
->>>>> CONFIG_POSIX is unset, making the ->available() method
->>>>> unnecessary.
->>>>
->>>> Yeah that does seem simpler, though I'm surprised that Xen does not
->>>> implement the available method. Xen is an accel I'd expect to see
->>>> compiled into an x86 build, but is only available if the host is
->>>> actually booted under a Xen hypervisor.  Likewise shouldn't kvm
->>>> only report itself as available if the /dev/kvm actually exists.
->>>> But maybe that's not the kind of semantics code using available()
->>>> expects ?
->>>
->>> Currently the only caller of ->available() calls ->init_machine()
->>> immediately afterwards, so for the current code it doesn't matter
->>> if the check is inside ->available() or ->init_machine().
->>>
->>> That said, I'm not sure we should look for /dev/kvm or check for
->>> the Xen hypervisor when handling "-accel help".  I expect help
->>> text to tell the user what the QEMU binary supports, not what the
->>> current host supports.
->>
->> Yes I prefer that too, I'll write something up such:
->>
->> static bool kvm_available(void)
->> {
->>     return access("/dev/kvm", R_OK|W_OK) == 0;
->> }
->>
->> However I wonder, if an user is not in the kvm group but is in sudoers
->> and run "qemu-system-aarch64 -accel help" he won't see KVM as
->> available... (I tend to not use sudo when looking for -help output).
-> 
-> If we do that, I think we should include kvm in the list anyway,
-> but just add a column indicating that it doesn't seem to be
-> available on the host.
+Add a caching layer for the TPM established flag so that we don't
+need to go to the backend every time the flag is read by accessing
+the REG_ACCESS register.
 
-So with CONFIG_KVM we have 'KVM enabled' and we should list it, OK.
+Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+---
+ hw/tpm/tpm_tis.c | 27 +++++++++++++++++++++++++--
+ 1 file changed, 25 insertions(+), 2 deletions(-)
 
-kvm_available() could be:
-
-     return access("/dev/kvm", F_OK) == 0;
-
-(missing kmod).
-
-Checking for R_OK|W_OK would give kvm_usable() but if the user forgot to
-use sudo kvm_arch_init() will fail anyway, so no need to worry about it.
-
-> 
-> In either case, I suggest implementing it as a separate patch,
-> and just ignore ->available() in the first version.
-
-Sure, availability check are for 2.12.
-
-This -accel help message was added before 2.10, so this is not a bug fix
-(nobody complained about it since 2.10). I'll postpone this series for 2.12.
-
->> On POWER7 we have:
->>
->> /* On ppc64, the test only works with kvm-hv, but not with kvm-pr */
->> accel = access("/sys/module/kvm_hv", F_OK) ? "tcg" : "kvm:tcg";
->>
->> Isn't it cleaner to register 2 accelerators, KVM-PR and KVM-HV and have
->> KVM being an alias?
-> 
-> I believe "-accel kvm,kvm-type=HV" and "-accel kvm,kvm-type=PR"
-> would be cleaner ways to represent the two modes, instead of
-> having two different accelerator classes.  This is not supported
-> by the current "<accel1>:<accel2>" syntax, but I think we should
-> replace that syntax with something better anyway.
-
-Ok.
-
-Thanks,
-
-Phil.
+diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
+index 7402528..6b81bbf 100644
+--- a/hw/tpm/tpm_tis.c
++++ b/hw/tpm/tpm_tis.c
+@@ -95,6 +95,9 @@ struct TPMState {
+     char *backend;
+     TPMBackend *be_driver;
+     TPMVersion be_tpm_version;
++
++    unsigned int established_flag:1;
++    unsigned int established_flag_cached:1;
+ };
+ 
+ #define TPM(obj) OBJECT_CHECK(TPMState, (obj), TYPE_TPM_TIS)
+@@ -529,6 +532,26 @@ static void tpm_tis_dump_state(void *opaque, hwaddr addr)
+ }
+ #endif
+ 
++static void tpm_tis_reset_tpm_established_flag(TPMState *s,
++                                               uint8_t locty)
++{
++    s->established_flag_cached = 0;
++
++    tpm_backend_reset_tpm_established_flag(s->be_driver, locty);
++}
++
++static unsigned int tpm_tis_get_tpm_established_flag(TPMState *s)
++{
++    if (s->established_flag_cached) {
++        return s->established_flag;
++    }
++
++    s->established_flag = !tpm_backend_get_tpm_established_flag(s->be_driver);
++    s->established_flag_cached = 1;
++
++    return s->established_flag;
++}
++
+ /*
+  * Read a register of the TIS interface
+  * See specs pages 33-63 for description of the registers
+@@ -556,7 +579,7 @@ static uint64_t tpm_tis_mmio_read(void *opaque, hwaddr addr,
+         if (tpm_tis_check_request_use_except(s, locty)) {
+             val |= TPM_TIS_ACCESS_PENDING_REQUEST;
+         }
+-        val |= !tpm_backend_get_tpm_established_flag(s->be_driver);
++        val |= tpm_tis_get_tpm_established_flag(s);
+         break;
+     case TPM_TIS_REG_INT_ENABLE:
+         val = s->loc[locty].inte;
+@@ -840,7 +863,7 @@ static void tpm_tis_mmio_write(void *opaque, hwaddr addr,
+ 
+             if (val & TPM_TIS_STS_RESET_ESTABLISHMENT_BIT) {
+                 if (locty == 3 || locty == 4) {
+-                    tpm_backend_reset_tpm_established_flag(s->be_driver, locty);
++                    tpm_tis_reset_tpm_established_flag(s, locty);
+                 }
+             }
+         }
+-- 
+2.5.5
