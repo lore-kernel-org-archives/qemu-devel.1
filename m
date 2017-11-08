@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34892)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34977)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eCVT1-0005wj-93
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 13:52:52 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eCVTI-00067T-7e
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 13:53:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eCVT0-00057d-42
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 13:52:51 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eCVTH-0005D3-DM
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 13:53:08 -0500
 References: <20170929165347.29658-1-mreitz@redhat.com>
-	<20170929165347.29658-20-mreitz@redhat.com>
-	<20171108171843.GI30890@localhost.localdomain>
+	<20170929165347.29658-19-mreitz@redhat.com>
+	<w51o9okwtgx.fsf@maestria.local.igalia.com>
+	<15538193-cfa0-822e-04c4-4aedbfd0724a@redhat.com>
+	<20171108171441.GH30890@localhost.localdomain>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <6395a086-c9ff-572e-db59-a6a2bdbdc554@redhat.com>
-Date: Wed, 8 Nov 2017 19:52:35 +0100
+Message-ID: <f93d184c-fbc4-5895-8794-2c48f2b8c52c@redhat.com>
+Date: Wed, 8 Nov 2017 19:52:53 +0100
 MIME-Version: 1.0
-In-Reply-To: <20171108171843.GI30890@localhost.localdomain>
+In-Reply-To: <20171108171441.GH30890@localhost.localdomain>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="MOUmPaNFL4AHOEJSTM3COmSMrqeX4XGtv"
-Subject: Re: [Qemu-devel] [PATCH v6 19/25] block: Add
- BlockDriver.bdrv_gather_child_options
+	boundary="iMRVT7QuajqRgJapdpS4tOMIiRQDK04TA"
+Subject: Re: [Qemu-devel] [PATCH v6 18/25] block: Add sgfnt_runtime_opts to
+ BlockDriver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,143 +29,84 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Alberto Garcia <berto@igalia.com>, Eric Blake <eblake@redhat.com>, John Snow <jsnow@redhat.com>
+Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, John Snow <jsnow@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---MOUmPaNFL4AHOEJSTM3COmSMrqeX4XGtv
+--iMRVT7QuajqRgJapdpS4tOMIiRQDK04TA
 From: Max Reitz <mreitz@redhat.com>
 To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org,
- Alberto Garcia <berto@igalia.com>, Eric Blake <eblake@redhat.com>,
+Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org,
+ qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>,
  John Snow <jsnow@redhat.com>
-Message-ID: <6395a086-c9ff-572e-db59-a6a2bdbdc554@redhat.com>
-Subject: Re: [PATCH v6 19/25] block: Add BlockDriver.bdrv_gather_child_options
+Message-ID: <f93d184c-fbc4-5895-8794-2c48f2b8c52c@redhat.com>
+Subject: Re: [PATCH v6 18/25] block: Add sgfnt_runtime_opts to BlockDriver
 References: <20170929165347.29658-1-mreitz@redhat.com>
- <20170929165347.29658-20-mreitz@redhat.com>
- <20171108171843.GI30890@localhost.localdomain>
-In-Reply-To: <20171108171843.GI30890@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
+ <20170929165347.29658-19-mreitz@redhat.com>
+ <w51o9okwtgx.fsf@maestria.local.igalia.com>
+ <15538193-cfa0-822e-04c4-4aedbfd0724a@redhat.com>
+ <20171108171441.GH30890@localhost.localdomain>
+In-Reply-To: <20171108171441.GH30890@localhost.localdomain>
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: quoted-printable
 
-On 2017-11-08 18:18, Kevin Wolf wrote:
-> Am 29.09.2017 um 18:53 hat Max Reitz geschrieben:
->> Some follow-up patches will rework the way bs->full_open_options is
->> refreshed in bdrv_refresh_filename(). The new implementation will remo=
-ve
->> the need for the block drivers' bdrv_refresh_filename() implementation=
-s
->> to set bs->full_open_options; instead, it will be generic and use stat=
-ic
->> information from each block driver.
+On 2017-11-08 18:14, Kevin Wolf wrote:
+> Am 02.11.2017 um 17:18 hat Max Reitz geschrieben:
+>> On 2017-11-02 17:11, Alberto Garcia wrote:
+>>> On Fri 29 Sep 2017 06:53:40 PM CEST, Max Reitz wrote:
+>>>>      QLIST_ENTRY(BlockDriver) list;
+>>>> +
+>>>> +    /* Pointer to a NULL-terminated array of names of significant o=
+ptions that
+>>>> +     * can be specified for bdrv_open(). A significant option is on=
+e that
+>>>> +     * changes the data of a BDS.
+>>>> +     * If this pointer is NULL, the array is considered empty.
+>>>> +     * "filename" and "driver" are always considered significant. *=
+/
+>>>> +    const char *const *sgfnt_runtime_opts;
+>>>>  };
+>>>
+>>> Is sgfnt a common acronym? I actually had to look it up...
 >>
->> However, by implementing bdrv_gather_child_options(), block drivers wi=
-ll
->> still be able to override the way the full_open_options of their
->> children are incorporated into their own.
+>> I'm open for other suggestions to shorten "significant". :-)
 >>
->> We need to implement this function for VMDK because we have to prevent=
+>> (Actually, I can't remember where I got it from.  I think I just made =
+it
+>> up, but then I don't know why I didn't use sgfcnt -- maybe because cnt=
 
->> the generic implementation from gathering the options of all children:=
-
->> It is not possible to specify options for the extents through the
->> runtime options.
+>> looks either like count (or like something else, but that's a differen=
+t
+>> matter)...?)
 >=20
-> Sounds more like a bug than a feature.
+> Because in reality you were abbreviating "signifant"? ;-)
 
-Want to fix it? :-)
+I actually thought the very same, yes. ;-)
 
->> For quorum, the child names that would be used by the generic
->> implementation and the ones that we actually want to use differ. See
->> quorum_gather_child_options() for more information.
->=20
-> :-/
->=20
-> What was the conclusion of our discussion at KVM Forum again? I just
-> remember that this caused problems in other contexts like dynamic
-> reconfiguration, too.
+> Anyway, I found the inline initialisation as part of BlockDriver rather=
 
-I might have just winced a little.
+> ugly. The places where you used a separate static const array look
+> much nicer. Maybe use that consistently in all places?
 
-The short conclusion was that it's all broken.
-
-The long conclusion...  Is that I might try to wrestle with quorum
-before this series? :-/
-
-Let's see...  The conclusion was that the user needs to specify a unique
-name for each quorum child.  Then, this name would be equivalent to the
-runtime name.  Sounds good so far?  Well, I might have just screamed a
-little when I remembered another issue:
-
-The generic implementation gathers the options like so:
-
-{ /* node options */
-  "child0": { /* child0 options */ },
-  "child1": { /* child1 options */ },
-  ... }
-
-However, specifying child options like so doesn't work easily with QAPI
-and quorum, for two reasons:
-
-(1) Specifying arbitrary keys with specific values would need new QAPI
-infrastructure.  Who is going to implement this? :-)
-
-(2) Quorum needs a fixed order for its children, at least for FIFO mode.
- A JSON object does not have inherent ordering.
-
-The simple way to fix this is to make the children list a list of
-objects which contain the child name and the options:
-
-{ /* quorum node options */
-  "children": [
-    { "child-name": "child0",
-      "options": { /* child0 options */ } },
-    { "child-name": "child1",
-      "options": { /* child1 options */ } },
-    ... ] }
-
-But this would still require bdrv_gather_child_options() to generate.
-
-
-The other way would be to add the QAPI infrastructure to make the
-generic thing work, and add a "children-order" list or something which
-gives order to the children.  Then the generic implementation should
-work...  As long as the quorum driver makes sure to update this list
-whenever a child is added or removed.
-
-Maybe the latter is actually the better choice? :-/
-
-But it definitely means more work (because of the QAPI modifications)...
+Sure.
 
 Max
 
 
->> Signed-off-by: Max Reitz <mreitz@redhat.com>
->> ---
->>  include/block/block_int.h | 13 +++++++++++++
->>  block/quorum.c            | 30 ++++++++++++++++++++++++++++++
->>  block/vmdk.c              | 13 +++++++++++++
->>  3 files changed, 56 insertions(+)
->=20
-> Kevin
->=20
-
-
-
---MOUmPaNFL4AHOEJSTM3COmSMrqeX4XGtv
+--iMRVT7QuajqRgJapdpS4tOMIiRQDK04TA
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAloDUnMSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9A7DAH/0VpP0LpmrayOAMi6Hhk+3wntLjbUkpD
-kg/qXGr+2DVhBirDEpHWW+TisVWBTNvkGsoNnjM8TDEAl9W1svG6ZkumCuumZb2A
-dHal9eFO6hpRxdWmlG0tzkJ7vHrDt/e5M7xSUmAeFBIHkqZqCpeWlZwtNUtxtbds
-rzwWkoCUJqCFeTjgqxu9t/tTHc68QgmON6DJYRc0Xz1U9DunR83SB13xxsK/QKE1
-7Yt3K77L52uyUqVDRbs+GzAmMwKeyauBNGocjUp/56nqaSEtAmjOyRQtQnQSylIx
-c5c7Q4icTzWynZ+NPvRtlt64zVY+usISFFME/OaJJRMfGJMb3I6p/NU=
-=eMiq
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAloDUoUSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AAukH/0LhehHgmPdLuZ/Q6j5EakG1OJ2yBDWd
+zaXsf0rdHws4bgCFuzdaRjkMMSp61MXuJKzgenVrnopPSR8Kj5kq3q3Csq+tZ+sE
++0tdwr+C5vuMlJ0kSkXv5vlhHbYx9a36AOQUAGhuS9TVOdlvFN2cOMQ6vb4cyUVE
+HaoCyIk5vy0vo5yoY3ltzIVxv1yVAUq6flriqtSGOGPsjQtoFWY6o5a/mMMhCokg
+UYcf1P6aBkkGC6adCRDt2/h++Jvs/Vpf3x4W7ksEtrge+nk1Q446OFXKs56I5L/t
+rijuWVkuoyCYx9+uID5Xq3ChHXoFFe5r1lfUDRwpaoH/7RDpnUVxrMM=
+=4EHT
 -----END PGP SIGNATURE-----
 
---MOUmPaNFL4AHOEJSTM3COmSMrqeX4XGtv--
+--iMRVT7QuajqRgJapdpS4tOMIiRQDK04TA--
