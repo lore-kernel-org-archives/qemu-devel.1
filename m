@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45881)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45922)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eCYLV-00050C-Ku
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 16:57:18 -0500
+	(envelope-from <eblake@redhat.com>) id 1eCYLX-00052Z-Hz
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 16:57:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eCYLU-0000VG-Ts
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 16:57:17 -0500
+	(envelope-from <eblake@redhat.com>) id 1eCYLW-0000WL-Oi
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 16:57:19 -0500
 From: Eric Blake <eblake@redhat.com>
-Date: Wed,  8 Nov 2017 15:57:00 -0600
-Message-Id: <20171108215703.9295-5-eblake@redhat.com>
+Date: Wed,  8 Nov 2017 15:57:01 -0600
+Message-Id: <20171108215703.9295-6-eblake@redhat.com>
 In-Reply-To: <20171108215703.9295-1-eblake@redhat.com>
 References: <20171108215703.9295-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 4/7] nbd: Fix struct name for structured
- reads
+Subject: [Qemu-devel] [PATCH v2 5/7] nbd-client: Short-circuit 0-length
+ operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,64 +23,65 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, vsementsov@virtuozzo.com, pbonzini@redhat.com, kwolf@redhat.com, Max Reitz <mreitz@redhat.com>
 
-A closer read of the NBD spec shows that a structured reply chunk
-for a hole is not quite identical to the prefix of a data chunk,
-because the hole has to also send a 32-bit size field.  Although
-we do not yet send holes, we should fix the misleading information
-in our header and make it easier for a future patch to support
-sparse reads.
+The NBD spec was recently clarified to state that clients should
+not send 0-length requests to the server, as the server behavior
+is undefined [1].  We know that qemu-nbd's behavior is a successful
+no-op (once it has filtered for read-only exports), but other NBD
+implementations might return an error.  To avoid any questionable
+server implementations, it is better to just short-circuit such
+requests on the client side (we are relying on the block layer to
+already filter out requests such as invalid offset, write to a
+read-only volume, and so forth).
+
+[1] https://github.com/NetworkBlockDevice/nbd/commit/ee926037
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- include/block/nbd.h | 18 +++++++++++++-----
- nbd/server.c        |  2 +-
- 2 files changed, 14 insertions(+), 6 deletions(-)
+ block/nbd-client.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
-diff --git a/include/block/nbd.h b/include/block/nbd.h
-index 92d1723d7c..113c707a5e 100644
---- a/include/block/nbd.h
-+++ b/include/block/nbd.h
-@@ -86,15 +86,23 @@ typedef union NBDReply {
-     } QEMU_PACKED;
- } NBDReply;
+diff --git a/block/nbd-client.c b/block/nbd-client.c
+index daa4392531..0a675d0fab 100644
+--- a/block/nbd-client.c
++++ b/block/nbd-client.c
+@@ -674,6 +674,9 @@ int nbd_client_co_preadv(BlockDriverState *bs, uint64_t offset,
+     assert(bytes <= NBD_MAX_BUFFER_SIZE);
+     assert(!flags);
 
--/* Header of NBD_REPLY_TYPE_OFFSET_DATA, complete NBD_REPLY_TYPE_OFFSET_HOLE */
--typedef struct NBDStructuredRead {
--    NBDStructuredReplyChunk h;
-+/* Header of chunk for NBD_REPLY_TYPE_OFFSET_DATA */
-+typedef struct NBDStructuredReadData {
-+    NBDStructuredReplyChunk h; /* h.length >= 9 */
-     uint64_t offset;
--} QEMU_PACKED NBDStructuredRead;
-+    /* At least one byte of data payload follows, calculated from h.length */
-+} QEMU_PACKED NBDStructuredReadData;
-+
-+/* Complete chunk for NBD_REPLY_TYPE_OFFSET_HOLE */
-+typedef struct NBDStructuredReadHole {
-+    NBDStructuredReplyChunk h; /* h.length == 12 */
-+    uint64_t offset;
-+    uint32_t length;
-+} QEMU_PACKED NBDStructuredReadHole;
++    if (!bytes) {
++        return 0;
++    }
+     ret = nbd_co_send_request(bs, &request, NULL);
+     if (ret < 0) {
+         return ret;
+@@ -705,6 +708,9 @@ int nbd_client_co_pwritev(BlockDriverState *bs, uint64_t offset,
 
- /* Header of all NBD_REPLY_TYPE_ERROR* errors */
- typedef struct NBDStructuredError {
--    NBDStructuredReplyChunk h;
-+    NBDStructuredReplyChunk h; /* h.length >= 6 */
-     uint32_t error;
-     uint16_t message_length;
- } QEMU_PACKED NBDStructuredError;
-diff --git a/nbd/server.c b/nbd/server.c
-index bcf0cdb47c..6ebb7d9c2e 100644
---- a/nbd/server.c
-+++ b/nbd/server.c
-@@ -1280,7 +1280,7 @@ static int coroutine_fn nbd_co_send_structured_read(NBDClient *client,
-                                                     size_t size,
-                                                     Error **errp)
- {
--    NBDStructuredRead chunk;
-+    NBDStructuredReadData chunk;
-     struct iovec iov[] = {
-         {.iov_base = &chunk, .iov_len = sizeof(chunk)},
-         {.iov_base = data, .iov_len = size}
+     assert(bytes <= NBD_MAX_BUFFER_SIZE);
+
++    if (!bytes) {
++        return 0;
++    }
+     return nbd_co_request(bs, &request, qiov);
+ }
+
+@@ -731,6 +737,9 @@ int nbd_client_co_pwrite_zeroes(BlockDriverState *bs, int64_t offset,
+         request.flags |= NBD_CMD_FLAG_NO_HOLE;
+     }
+
++    if (!bytes) {
++        return 0;
++    }
+     return nbd_co_request(bs, &request, NULL);
+ }
+
+@@ -759,7 +768,7 @@ int nbd_client_co_pdiscard(BlockDriverState *bs, int64_t offset, int bytes)
+     };
+
+     assert(!(client->info.flags & NBD_FLAG_READ_ONLY));
+-    if (!(client->info.flags & NBD_FLAG_SEND_TRIM)) {
++    if (!(client->info.flags & NBD_FLAG_SEND_TRIM) || !bytes) {
+         return 0;
+     }
+
 -- 
 2.13.6
