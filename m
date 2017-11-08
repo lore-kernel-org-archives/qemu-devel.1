@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40076)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40174)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eCUMe-0003Fz-CX
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 12:42:13 -0500
+	(envelope-from <stefanha@gmail.com>) id 1eCUN2-0003VA-2x
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 12:42:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eCUMZ-0003WZ-Nw
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 12:42:12 -0500
-References: <20171107223708.17935-1-eblake@redhat.com>
-	<20171108154226.GC6118@stefanha-x1.localdomain>
-	<462c8b69-9665-1342-fd01-5ba57049a39c@redhat.com>
-	<061e94f4-602e-3ff3-0f20-d3915e7a5550@redhat.com>
-	<20171108173621.GB8403@stefanha-x1.localdomain>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <34d8f43a-483a-fb2d-13b3-994d0a67f464@redhat.com>
-Date: Wed, 8 Nov 2017 11:42:01 -0600
+	(envelope-from <stefanha@gmail.com>) id 1eCUMx-0003jD-4K
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 12:42:36 -0500
+Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:56585)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1eCUMw-0003it-SS
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 12:42:31 -0500
+Received: by mail-wm0-x231.google.com with SMTP id z3so12500690wme.5
+	for <qemu-devel@nongnu.org>; Wed, 08 Nov 2017 09:42:30 -0800 (PST)
+Date: Wed, 8 Nov 2017 17:42:27 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20171108174227.GC8403@stefanha-x1.localdomain>
+References: <20171107104653.8913-1-paul.durrant@citrix.com>
 MIME-Version: 1.0
-In-Reply-To: <20171108173621.GB8403@stefanha-x1.localdomain>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="ew6eqX2AKd9niUbLCdtr1egiGbMQxTGtJ"
-Subject: Re: [Qemu-devel] [PATCH] coroutine: Fix documentation of
- co_aio_sleep_ns()
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="hOcCNbCCxyk/YU74"
+Content-Disposition: inline
+In-Reply-To: <20171107104653.8913-1-paul.durrant@citrix.com>
+Subject: Re: [Qemu-devel] [PATCH v3] xen-disk: use an IOThread per instance
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,86 +29,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-trivial@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+To: Paul Durrant <paul.durrant@citrix.com>
+Cc: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, Anthony Perard <anthony.perard@citrix.com>, Kevin Wolf <kwolf@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Max Reitz <mreitz@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---ew6eqX2AKd9niUbLCdtr1egiGbMQxTGtJ
-From: Eric Blake <eblake@redhat.com>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi
- <stefanha@redhat.com>, qemu-trivial@nongnu.org, Kevin Wolf
- <kwolf@redhat.com>, qemu-devel@nongnu.org
-Message-ID: <34d8f43a-483a-fb2d-13b3-994d0a67f464@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] coroutine: Fix documentation of
- co_aio_sleep_ns()
-References: <20171107223708.17935-1-eblake@redhat.com>
- <20171108154226.GC6118@stefanha-x1.localdomain>
- <462c8b69-9665-1342-fd01-5ba57049a39c@redhat.com>
- <061e94f4-602e-3ff3-0f20-d3915e7a5550@redhat.com>
- <20171108173621.GB8403@stefanha-x1.localdomain>
-In-Reply-To: <20171108173621.GB8403@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=utf-8
+
+--hOcCNbCCxyk/YU74
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On 11/08/2017 11:36 AM, Stefan Hajnoczi wrote:
-
->> This function uses timers and hence needs to know the event loop
->> (#AioContext) to place the timer on.  After the time elapses, the
->> current coroutine will restart with the same #AioContext it is current=
-ly
->> running in, even if that is different than the timer context passed to=
-
->> co_aio_sleep_ns().
+On Tue, Nov 07, 2017 at 05:46:53AM -0500, Paul Durrant wrote:
+> This patch allocates an IOThread object for each xen_disk instance and
+> sets the AIO context appropriately on connect. This allows processing
+> of I/O to proceed in parallel.
 >=20
-> These complicated semantics are a clue that the API should be
-> simplified.  QEMU has changed since this function was first introduced.=
+> The patch also adds tracepoints into xen_disk to make it possible to
+> follow the state transtions of an instance in the log.
 
-> Now we can do the following:
->=20
->   void coroutine_fn qemu_co_sleep_ns(QEMUClockType type, int64_t ns)
->   {
->       AioContext *ctx =3D qemu_get_current_aio_context();
->       CoSleepCB sleep_cb =3D {
->           .co =3D qemu_coroutine_self(),
->       };
->       sleep_cb.ts =3D aio_timer_new(ctx, type, SCALE_NS, co_sleep_cb, &=
-sleep_cb);
->       timer_mod(sleep_cb.ts, qemu_clock_get_ns(type) + ns);
->       qemu_coroutine_yield();
->       timer_del(sleep_cb.ts);
->       timer_free(sleep_cb.ts);
->   }
->=20
-> I don't see a reason for the caller to pass in an AioContext.
->=20
-> Any objections?  Will send a patch if this is okay.
+virtio-blk and virtio-scsi allow the user to specify an IOThread object.
+This allows users to configure the device<->IOThread mapping any way
+they like (e.g. 1:1, M:N).  Are you sure you want to hard-code the
+IOThread mapping?
 
-Makes sense to me.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---ew6eqX2AKd9niUbLCdtr1egiGbMQxTGtJ
+--hOcCNbCCxyk/YU74
 Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloDQekACgkQp6FrSiUn
-Q2qy6Af/RIB0a/WZ3VRjJkFzMdrgFL93ZTIIlPEDSCHlGlxncgXU3W1QkO51/1sa
-Mo6BcTELjLTEPlg3j+2Cvh4sJBSaZbiGZXwr92ojKFqasbSoDaoAeb7J6vVFH3O7
-kb1CyVYibzpb/ERzfIyB4hyNrF3MU+Ji85EKZs/4bdrMxXbbsJezzR1Y7evehaND
-Uuaz6iz8NgAuMmsOLSOa7ANKdWmfUNQrNo6Lxb6b5rT/FKQjeq6oh2wX+rcJ/hBz
-MVHAqJ0VTqpkIwVKhVcE9BTO4LW3Tf2zOmEHVO2/20yl7bUvYBf2ruVaaWu57+S/
-ZQnq9MpCKgGU9hKmuK4pO+pYXoy7LQ==
-=6wcQ
+iQEcBAEBAgAGBQJaA0IDAAoJEJykq7OBq3PIaZQH/RZk0Ya32uUPjPYIfAOruNgu
+rvACDaQmS8ERv4qhxVAQLgYpGxmAIekIn3ULmyHm/AN/tXRmDIDb20okoAxfvAWa
+4AWc8NwBFdExt92aGGxgI3A320e4gKNqHfpuk8KJ7QhMIANGX7P2+bJAottFB524
+hHoTNhZzSd5MN2YHQdKyVQ1Dkd78hCjunIBBNR8xiteYI988eH7Su0MDeCL6Gp/v
+m4roaf+pzmPMZ1fLP1JBhZK5rj7OFoE1mLpkeeAY0+Kf5/lR/wswZRHgon2ld7+R
+Jas4+RO8S6BrWZtAl3/d1joX8fcICD5TK5avC3QLbU2yb/dnrtRXZTM8hvNLK+4=
+=8+As
 -----END PGP SIGNATURE-----
 
---ew6eqX2AKd9niUbLCdtr1egiGbMQxTGtJ--
+--hOcCNbCCxyk/YU74--
