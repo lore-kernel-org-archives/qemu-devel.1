@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40987)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43464)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eCSjl-0001To-0s
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 10:57:57 -0500
+	(envelope-from <lersek@redhat.com>) id 1eCSuo-00046a-3W
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 11:09:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eCSjg-0006Ex-Gt
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 10:57:57 -0500
-References: <20171107223708.17935-1-eblake@redhat.com>
-	<20171108154226.GC6118@stefanha-x1.localdomain>
-	<462c8b69-9665-1342-fd01-5ba57049a39c@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <061e94f4-602e-3ff3-0f20-d3915e7a5550@redhat.com>
-Date: Wed, 8 Nov 2017 09:57:47 -0600
+	(envelope-from <lersek@redhat.com>) id 1eCSuk-0003Fy-VF
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 11:09:22 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33104)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1eCSuk-0003FN-Nq
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 11:09:18 -0500
+References: <7967e55c-de72-6ef2-eb92-a85af8fc2552@redhat.com>
+	<20171108105332.etwcm4nyb6rqmprn@sirius.home.kraxel.org>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <88475458-62ee-7a00-5886-49aa14cd964e@redhat.com>
+Date: Wed, 8 Nov 2017 17:09:12 +0100
 MIME-Version: 1.0
-In-Reply-To: <462c8b69-9665-1342-fd01-5ba57049a39c@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="XWhurDJJjVkBGJtQIwdd5SAEiDpL1DFGm"
-Subject: Re: [Qemu-devel] [PATCH] coroutine: Fix documentation of
- co_aio_sleep_ns()
+In-Reply-To: <20171108105332.etwcm4nyb6rqmprn@sirius.home.kraxel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] Yet another git submodule rant
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,72 +28,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>, Thomas Huth <thuth@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---XWhurDJJjVkBGJtQIwdd5SAEiDpL1DFGm
-From: Eric Blake <eblake@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org,
- Kevin Wolf <kwolf@redhat.com>
-Message-ID: <061e94f4-602e-3ff3-0f20-d3915e7a5550@redhat.com>
-Subject: Re: [PATCH] coroutine: Fix documentation of co_aio_sleep_ns()
-References: <20171107223708.17935-1-eblake@redhat.com>
- <20171108154226.GC6118@stefanha-x1.localdomain>
- <462c8b69-9665-1342-fd01-5ba57049a39c@redhat.com>
-In-Reply-To: <462c8b69-9665-1342-fd01-5ba57049a39c@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 11/08/2017 09:47 AM, Paolo Bonzini wrote:
-> On 08/11/2017 16:42, Stefan Hajnoczi wrote:
->>> In any case, co_aio_sleep_ns()
->>> + * does not affect the #AioContext where the current coroutine is ru=
-nning,
->>> + * as the coroutine will restart on the same #AioContext that it is
->>> + * running on.
->> I cannot parse the second sentence.  What does "affecting" an AioConte=
-xt
->> mean?  Does "where the current coroutine is running" simply mean "the
->> caller"?
+On 11/08/17 11:53, Gerd Hoffmann wrote:
+> On Wed, Nov 08, 2017 at 10:57:21AM +0100, Thomas Huth wrote:
 >>
->> What is it trying to say?  My guess is: the caller will be resumed in
->> the current AioContext, not the timer's AioContext.
->=20
-> Yes, that is the intended meaning.  Perhaps just s/current//.
+>> That automatic git submodule stuff now broke my workflow again. I
+>> usually keep the git repository on my laptop and then simply rsync the
+>> sources (without .git directories) to my target machine to compile it
+>> there.
+> 
+> How about excluding all files listed in .gitignore from rsync?  Which I
+> guess would be a good idea anyway because you don't want sync over the
+> build artifacts to the target machine if you want compile there.  Might
+> be as simple as "rsync --exclude-from .gitignore" (didn't test though).
+> 
+> Or syncronize using git instead of rsync.  This is what I am doing.
 
-How about:
+Me too,
 
-This function uses timers and hence needs to know the event loop
-(#AioContext) to place the timer on.  After the time elapses, the
-current coroutine will restart with the same #AioContext it is currently
-running in, even if that is different than the timer context passed to
-co_aio_sleep_ns().
+$ git push --mirror host:dir
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+(I don't mind having to commit first.)
 
-
---XWhurDJJjVkBGJtQIwdd5SAEiDpL1DFGm
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloDKXsACgkQp6FrSiUn
-Q2pnagf/e+5853+j30Q9nocVlNGa9KU+ODUdaSeNrj2YZRDRUURM8oEn+TrYroF9
-zesAUzPB5FS7C3bryJLdehpLtaQcjTWQrG40dDMeSILhpvIVkXqazrjHdA7tBabw
-HyS+7JzQ0U5t+8qGsaRtLirKFn1jGwUGvQb/ZA7F2LBMmavK/5sn0Vx0SIvERwTe
-t2vmfHW/nyYyzCxh0B0fDJlUyRwJx48OWULAHNuQxlnL9Ydjrj6cfdGb0ylZJFPY
-nYsH883TB+/UrgKOgomLWi8jwW+BPmFYD0W4xC3iLpi6sZUyXjPEsMskNRgYKsjw
-Da4yDU2+gftW5aUPLQ7Z7WklGdylsA==
-=QJvt
------END PGP SIGNATURE-----
-
---XWhurDJJjVkBGJtQIwdd5SAEiDpL1DFGm--
+Thanks,
+Laszlo
