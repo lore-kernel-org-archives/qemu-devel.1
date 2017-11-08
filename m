@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36455)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37035)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eCU9C-0006WJ-JE
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 12:28:19 -0500
+	(envelope-from <cohuck@redhat.com>) id 1eCUAw-0007dg-6Q
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 12:30:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eCU98-0005Xt-9i
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 12:28:18 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41436)
+	(envelope-from <cohuck@redhat.com>) id 1eCUAs-00068K-91
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 12:30:06 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51308)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eCU98-0005Xe-0F
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 12:28:14 -0500
-Date: Wed, 8 Nov 2017 17:28:06 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20171108172806.GG12670@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20171030040056.11780-1-f4bug@amsat.org>
-	<20171030082029.GY2993@localhost.localdomain>
-	<20171108132857.GT12670@redhat.com>
-	<1ecb6a4b-465f-0949-e039-441038f1adf8@amsat.org>
-	<20171108165905.GN3111@localhost.localdomain>
-	<20171108170629.GD12670@redhat.com>
-	<20171108172547.GP3111@localhost.localdomain>
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1eCUAs-00067z-2Z
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 12:30:02 -0500
+Date: Wed, 8 Nov 2017 18:29:55 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20171108182955.20875b2c.cohuck@redhat.com>
+In-Reply-To: <6722cc03-9311-c19b-3f26-4f0cc41a1770@redhat.com>
+References: <20171108152023.80780-1-marcel@redhat.com>
+	<3722f599-31b4-adb6-270b-aff5819f1bd3@redhat.com>
+	<6722cc03-9311-c19b-3f26-4f0cc41a1770@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20171108172547.GP3111@localhost.localdomain>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH] vl: only display available accelerators
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] hw/pcie-pci-bridge: restrict to X86 and ARM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,94 +28,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Thomas Huth <thuth@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Markus Armbruster <armbru@redhat.com>, Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org, "Emilio G . Cota" <cota@braap.org>, Anthony Perard <anthony.perard@citrix.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Marcel Apfelbaum <marcel@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, mst@redhat.com, zuban32s@gmail.com
 
-On Wed, Nov 08, 2017 at 03:25:47PM -0200, Eduardo Habkost wrote:
-> On Wed, Nov 08, 2017 at 05:06:29PM +0000, Daniel P. Berrange wrote:
-> > On Wed, Nov 08, 2017 at 02:59:05PM -0200, Eduardo Habkost wrote:
-> > > On Wed, Nov 08, 2017 at 01:21:33PM -0300, Philippe Mathieu-Daud=C3=A9=
- wrote:
-> > > > On 11/08/2017 10:28 AM, Daniel P. Berrange wrote:
-> > > > > On Mon, Oct 30, 2017 at 09:20:29AM +0100, Eduardo Habkost wrote=
-:
-> > > > >> On Mon, Oct 30, 2017 at 01:00:56AM -0300, Philippe Mathieu-Dau=
-d=C3=A9 wrote:
-> > > > >>> examples configuring with '--enable-kvm --disable-tcg'
-> > > > >>>
-> > > > >>> - before
-> > > > >>>
-> > > > >>>   $ qemu-system-x86_64 -accel help
-> > > > >>>   Possible accelerators: kvm, xen, hax, tcg
-> > > > >>>
-> > > > >>>   $ qemu-system-x86_64 -accel tcg
-> > > > >>>   qemu-system-x86_64: -machine accel=3Dtcg: No accelerator fo=
-und
-> > > > >>>
-> > > > >>>   # qemu-system-x86_64 -accel hax
-> > > > >>>   qemu-system-x86_64: -machine accel=3Dhax: No accelerator fo=
-und
-> > > > >>>
-> > > > >>>   # qemu-system-x86_64 -accel xen
-> > > > >>>   xencall: error: Could not obtain handle on privileged comma=
-nd interface: No such file or directory
-> > > > >>>   xen be core: xen be core: can't open xen interface
-> > > > >>>   can't open xen interface
-> > > > >>>   qemu-system-x86_64: failed to initialize Xen: Operation not=
- permitted
-> > > > >>>
-> > > > >>> - after
-> > > > >>>
-> > > > >>>   $ qemu-system-x86_64 -accel help
-> > > > >>>   Possible accelerators: kvm
-> > > > >>>
-> > > > >>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> > > > >>> ---
-> > > > >>> RFC because:
-> > > > >>>     - I don't think this is the nicest way, too much #ifdef'f=
-ery in main()
-> > > > >>
-> > > > >> I suggest using object_class_get_list(TYPE_ACCEL, false).
-> > > > >=20
-> > > > > And check the result of the available() method on the returned =
-classes
-> > > > > too, to filter the results.
-> > > >=20
-> > > > Good idea! I'll use that.
-> > >=20
-> > > It looks like QTest is the only accelerator that implements
-> > > ->available(), and its return value is a build-time constant that
-> > > depends only on CONFIG_POSIX.
-> > >=20
-> > > I wonder why we don't simply avoid compiling the qtest class if
-> > > CONFIG_POSIX is unset, making the ->available() method
-> > > unnecessary.
-> >=20
-> > Yeah that does seem simpler, though I'm surprised that Xen does not
-> > implement the available method. Xen is an accel I'd expect to see
-> > compiled into an x86 build, but is only available if the host is
-> > actually booted under a Xen hypervisor.  Likewise shouldn't kvm
-> > only report itself as available if the /dev/kvm actually exists.
-> > But maybe that's not the kind of semantics code using available()
-> > expects ?
->=20
-> Currently the only caller of ->available() calls ->init_machine()
-> immediately afterwards, so for the current code it doesn't matter
-> if the check is inside ->available() or ->init_machine().
->=20
-> That said, I'm not sure we should look for /dev/kvm or check for
-> the Xen hypervisor when handling "-accel help".  I expect help
-> text to tell the user what the QEMU binary supports, not what the
-> current host supports.
+On Wed, 8 Nov 2017 19:02:35 +0200
+Marcel Apfelbaum <marcel@redhat.com> wrote:
 
-Yeah, that's sensible.
+> On 08/11/2017 18:52, Thomas Huth wrote:
+> > On 08.11.2017 16:20, Marcel Apfelbaum wrote:  
+> >> The PCIE-PCI bridge is specific to "pure" PCI systems  
+> >  
+> 
+> Hi Thomas,
+> 
+> > s/PCI/PCIe/ ?
+> >   
+> 
+> In this context maybe it doesn't really matter,
+> but if I'll send a v2 I'll make the change, sure.
+> 
+> >> (on QEMU we have X86 and ARM), it does not make sense to
+> >> have if in other archs.
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+If you do a v2 anyway, s/if/it/
+
+> >>
+> >> Reported-by: Thomas Huth <thuth@redhat.com>
+> >> Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
+> >> ---
+> >>   default-configs/arm-softmmu.mak    | 1 +
+> >>   default-configs/i386-softmmu.mak   | 1 +
+> >>   default-configs/x86_64-softmmu.mak | 1 +
+> >>   hw/pci-bridge/Makefile.objs        | 3 ++-
+> >>   4 files changed, 5 insertions(+), 1 deletion(-)
+> >>
+> >> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
+> >> index 5059d134c8..33934b1dc4 100644
+> >> --- a/default-configs/arm-softmmu.mak
+> >> +++ b/default-configs/arm-softmmu.mak
+> >> @@ -122,6 +122,7 @@ CONFIG_FSL_IMX25=y
+> >>   CONFIG_IMX_I2C=y
+> >>   
+> >>   CONFIG_PCIE_PORT=y
+> >> +CONFIG_PCIE_PCI_BRIDGE=y  
+> > 
+> > Actually, why not simply use CONFIG_PCIE_PORT instead to determine
+> > whether the PCIe-to-PCI bridge should be included? The device only makes
+> > sense if there is a PCIe root port available on the system...
+> >   
+> 
+> I thought about it, but then we should also change all the devices
+> that makes sense only if connected to PCIe Root Ports, like Intel
+> Upstream Ports (Switches) and maybe more. (otherwise people will
+> start asking why it is different.)
+> 
+> We could use CONFIG_PCIE_PCI_BRIDGE=CONFIG_PCIE_PORT or something
+> but it looks weird.
+
+I actually like that one.
+
+> 
+> This is why I've chosen the "independent" config option.
+> But, to be fair, I have nothing against your suggestion,
+> let's see what others think.
+> 
+> Thanks for the review,
+> Marcel
+> 
+> >   Thomas
+> >   
+> 
