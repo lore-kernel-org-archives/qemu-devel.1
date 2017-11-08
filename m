@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41750)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41918)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1eCP6Q-0002WT-EA
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 07:05:07 -0500
+	(envelope-from <msuchanek@suse.de>) id 1eCP6s-0002mu-EH
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 07:05:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1eCP6M-0002Q5-81
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 07:05:06 -0500
-Received: from mail-io0-x243.google.com ([2607:f8b0:4001:c06::243]:43599)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
-	id 1eCP6M-0002PL-4J
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 07:05:02 -0500
-Received: by mail-io0-x243.google.com with SMTP id 134so5685088ioo.0
-	for <qemu-devel@nongnu.org>; Wed, 08 Nov 2017 04:05:01 -0800 (PST)
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-From: Programmingkid <programmingkidx@gmail.com>
-In-Reply-To: <1510049762-4609-3-git-send-email-peter.maydell@linaro.org>
-Date: Wed, 8 Nov 2017 07:04:58 -0500
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <CD2DCF39-4633-4F81-8B5E-75B49DB93D12@gmail.com>
-References: <1510049762-4609-1-git-send-email-peter.maydell@linaro.org>
-	<1510049762-4609-3-git-send-email-peter.maydell@linaro.org>
-Subject: Re: [Qemu-devel] [PULL 2/3] ui/cocoa.m: move ungrab to ctrl-alt-g
+	(envelope-from <msuchanek@suse.de>) id 1eCP6o-0002ky-Dz
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 07:05:34 -0500
+Received: from mx2.suse.de ([195.135.220.15]:57196)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <msuchanek@suse.de>) id 1eCP6o-0002jz-6v
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 07:05:30 -0500
+Date: Wed, 8 Nov 2017 13:05:27 +0100
+From: Michal =?UTF-8?B?U3VjaMOhbmVr?= <msuchanek@suse.de>
+Message-ID: <20171108130527.0afeb899@kitsune.suse.cz>
+In-Reply-To: <20171108102529.GL12670@redhat.com>
+References: <7967e55c-de72-6ef2-eb92-a85af8fc2552@redhat.com>
+	<20171108102529.GL12670@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] Yet another git submodule rant
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,100 +27,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
 
+On Wed, 8 Nov 2017 10:25:29 +0000
+"Daniel P. Berrange" <berrange@redhat.com> wrote:
 
-> On Nov 7, 2017, at 5:16 AM, Peter Maydell <peter.maydell@linaro.org> =
-wrote:
->=20
-> From: John Arbuckle <programmingkidx@gmail.com>
->=20
-> Currently the cocoa user interface relis on the user pushing
+> On Wed, Nov 08, 2017 at 10:57:21AM +0100, Thomas Huth wrote:
+> > 
+> > That automatic git submodule stuff now broke my workflow again. I
+> > usually keep the git repository on my laptop and then simply rsync
+> > the sources (without .git directories) to my target machine to
+> > compile it there. Used to work great for years. Now it's broken,
+> > the build process complains:  
+> 
+> Excluding the .git dir will be a problem - that needs to exist, unless
+> you are building from tar.xz (where we will bundled all the submodule
+> sources together in the tar.xz).
+> 
+> If you really want to exclude the .git directories, then instead of
+> doing an rsync, then use the scripts/archive-source.sh tool to create
+> an archive of all the sources (which bundles required submodules)
+> and unpack that on your target machine. Then all submodule handling
+> on the target will be skipped.
 
-I would change "relis" to "relies" here.
+This probably does not work because it archives committed sources and
+not actual sources.
 
-> control-alt to ungrab the mouse.  This is patch changes the key
-> combination to control-alt-g to be in line with the GTK user
-> interface.
->=20
-> Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
-> Message-id: 20171102213907.11443-1-programmingkidx@gmail.com
-> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
-> ui/cocoa.m | 31 ++++++++++++++++++-------------
-> 1 file changed, 18 insertions(+), 13 deletions(-)
->=20
-> diff --git a/ui/cocoa.m b/ui/cocoa.m
-> index 2f76dac..f39c792 100644
-> --- a/ui/cocoa.m
-> +++ b/ui/cocoa.m
-> @@ -674,10 +674,6 @@ QemuCocoaView *cocoaView;
->                 }
->             }
->=20
-> -            // release Mouse grab when pressing ctrl+alt
-> -            if (([event modifierFlags] & NSEventModifierFlagControl) =
-&& ([event modifierFlags] & NSEventModifierFlagOption)) {
-> -                [self ungrabMouse];
-> -            }
->             break;
->         case NSEventTypeKeyDown:
->             keycode =3D cocoa_keycode_to_qemu([event keyCode]);
-> @@ -690,14 +686,23 @@ QemuCocoaView *cocoaView;
->=20
->             // default
->=20
-> -            // handle control + alt Key Combos (ctrl+alt is reserved =
-for QEMU)
-> +            // handle control + alt Key Combos (ctrl+alt+[1..9,g] is =
-reserved for QEMU)
->             if (([event modifierFlags] & NSEventModifierFlagControl) =
-&& ([event modifierFlags] & NSEventModifierFlagOption)) {
-> -                switch (keycode) {
-> -
-> -                    // enable graphic console
-> -                    case Q_KEY_CODE_1 ... Q_KEY_CODE_9: // '1' to '9' =
-keys
-> -                        console_select(keycode - Q_KEY_CODE_1);
-> -                        break;
-> +                NSString *keychar =3D [event =
-charactersIgnoringModifiers];
-> +                if ([keychar length] =3D=3D 1) {
-> +                    char key =3D [keychar characterAtIndex:0];
-> +                    switch (key) {
-> +
-> +                        // enable graphic console
-> +                        case '1' ... '9':
-> +                            console_select(key - '0' - 1); /* ascii =
-math */
-> +                            return;
-> +
-> +                        // release the mouse grab
-> +                        case 'g':
-> +                            [self ungrabMouse];
-> +                            return;
-> +                    }
->                 }
->=20
->             // handle keys for graphic console
-> @@ -840,9 +845,9 @@ QemuCocoaView *cocoaView;
->=20
->     if (!isFullscreen) {
->         if (qemu_name)
-> -            [normalWindow setTitle:[NSString stringWithFormat:@"QEMU =
-%s - (Press ctrl + alt to release Mouse)", qemu_name]];
-> +            [normalWindow setTitle:[NSString stringWithFormat:@"QEMU =
-%s - (Press ctrl + alt + g to release Mouse)", qemu_name]];
->         else
-> -            [normalWindow setTitle:@"QEMU - (Press ctrl + alt to =
-release Mouse)"];
-> +            [normalWindow setTitle:@"QEMU - (Press ctrl + alt + g to =
-release Mouse)"];
->     }
->     [self hideCursor];
->     if (!isAbsoluteEnabled) {
-> --=20
-> 2.7.4
->=20
+> 
+> > 
+> > GIT submodule checkout is out of date. Please run
+> >   scripts/git-submodule.sh update
+> > from the source directory checkout /home/thuth/devel/qemu
+> > 
+> > Running "scripts/git-submodule.sh update" did not fix the issue at
+> > all - I first had to tinker with it for a while to find out that I
+> > simply have to delete ".git-submodule-status" in my git tree to fix
+> > the issue.  
+> 
+> I think it got confused from you deleting the .git directory
+> 
+> > I've got the feeling that all this submodule crap is constantly
+> > causing pain ... do we really need this? Can't we find another
+> > solution instead? Or at least stop modifying files automatically in
+> > the $SRC_PATH ?  
+> 
+> We *have* to modify SRC_PATH, as that's where git submodule checkouts
+> live. If we didn't do that, then people would end up having failed
+> build due to submodules not existing, or even worse, having a silently
+> incorrect build due to using the wrong checked out version.
+
+And that's another reason why submodules are bad thing.
+
+So again, can this be done without submodules?
+
+Let somebody else do the testing and polishing of this pre-alpha git
+feature.
+
+Thanks
+
+Michal
