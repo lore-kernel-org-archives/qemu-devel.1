@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47809)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48144)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eCPYs-000403-JG
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 07:34:31 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eCPc2-0004sv-NE
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 07:37:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eCPYm-0001nG-3t
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 07:34:30 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48116)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eCPYl-0001ms-Qb
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 07:34:24 -0500
-Date: Wed, 8 Nov 2017 12:34:17 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20171108123417.GQ12670@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <7967e55c-de72-6ef2-eb92-a85af8fc2552@redhat.com>
-	<20171108102529.GL12670@redhat.com>
-	<20171108130527.0afeb899@kitsune.suse.cz>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eCPby-0003i2-JO
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 07:37:46 -0500
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1510087611-1851-1-git-send-email-cota@braap.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <49151b79-7ec4-b728-1ea9-d5c393a5bada@amsat.org>
+Date: Wed, 8 Nov 2017 09:37:26 -0300
 MIME-Version: 1.0
+In-Reply-To: <1510087611-1851-1-git-send-email-cota@braap.org>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20171108130527.0afeb899@kitsune.suse.cz>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Yet another git submodule rant
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH] arm/translate-a64: mark path as
+ unreachable to eliminate warning
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,70 +28,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michal =?utf-8?B?U3VjaMOhbmVr?= <msuchanek@suse.de>
-Cc: Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
+To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, QEMU Trivial <qemu-trivial@nongnu.org>
 
-On Wed, Nov 08, 2017 at 01:05:27PM +0100, Michal Such=C3=A1nek wrote:
-> On Wed, 8 Nov 2017 10:25:29 +0000
-> "Daniel P. Berrange" <berrange@redhat.com> wrote:
->=20
-> > On Wed, Nov 08, 2017 at 10:57:21AM +0100, Thomas Huth wrote:
-> > >=20
-> > > That automatic git submodule stuff now broke my workflow again. I
-> > > usually keep the git repository on my laptop and then simply rsync
-> > > the sources (without .git directories) to my target machine to
-> > > compile it there. Used to work great for years. Now it's broken,
-> > > the build process complains: =20
-> >=20
-> > Excluding the .git dir will be a problem - that needs to exist, unles=
-s
-> > you are building from tar.xz (where we will bundled all the submodule
-> > sources together in the tar.xz).
-> >=20
-> > If you really want to exclude the .git directories, then instead of
-> > doing an rsync, then use the scripts/archive-source.sh tool to create
-> > an archive of all the sources (which bundles required submodules)
-> > and unpack that on your target machine. Then all submodule handling
-> > on the target will be skipped.
->=20
-> This probably does not work because it archives committed sources and
-> not actual sources.
+On 11/07/2017 05:46 PM, Emilio G. Cota wrote:
+> Fixes the following warning when compiling with gcc 5.4.0 with -O1
+> optimizations and --enable-debug:
+> 
+> target/arm/translate-a64.c: In function ‘aarch64_tr_translate_insn’:
+> target/arm/translate-a64.c:2361:8: error: ‘post_index’ may be used uninitialized in this function [-Werror=maybe-uninitialized]
+>      if (!post_index) {
+>         ^
+> target/arm/translate-a64.c:2307:10: note: ‘post_index’ was declared here
+>      bool post_index;
+>           ^
+> target/arm/translate-a64.c:2386:8: error: ‘writeback’ may be used uninitialized in this function [-Werror=maybe-uninitialized]
+>      if (writeback) {
+>         ^
+> target/arm/translate-a64.c:2308:10: note: ‘writeback’ was declared here
+>      bool writeback;
+>           ^
+> 
+> Note that idx comes from selecting 2 bits, and therefore its value
+> can be at most 3.
+> 
+> Signed-off-by: Emilio G. Cota <cota@braap.org>
 
-Actually that's not quite correct - if it sees you have non-comitted
-changes, and will use 'git stash create' to capture them in the archive
-it creates.  So it would only miss brand new files which have not yet
-been 'git add'ed
+Acked-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-> > > I've got the feeling that all this submodule crap is constantly
-> > > causing pain ... do we really need this? Can't we find another
-> > > solution instead? Or at least stop modifying files automatically in
-> > > the $SRC_PATH ? =20
-> >=20
-> > We *have* to modify SRC_PATH, as that's where git submodule checkouts
-> > live. If we didn't do that, then people would end up having failed
-> > build due to submodules not existing, or even worse, having a silentl=
-y
-> > incorrect build due to using the wrong checked out version.
->=20
-> And that's another reason why submodules are bad thing.
->=20
-> So again, can this be done without submodules?
->=20
-> Let somebody else do the testing and polishing of this pre-alpha git
-> feature.
-
-Honestly I think the submodule stuff is working pretty well - a handful
-of people have mentioned problems and we've addressed most of them or
-illustrated alternative approaches to deal with it. For most developers
-it has been pretty much transparent and just works, or we would have
-seen alot more noise.
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+> ---
+>  target/arm/translate-a64.c | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+> index caca05a..625ef2d 100644
+> --- a/target/arm/translate-a64.c
+> +++ b/target/arm/translate-a64.c
+> @@ -2340,28 +2340,30 @@ static void disas_ldst_reg_imm9(DisasContext *s, uint32_t insn,
+>      switch (idx) {
+>      case 0:
+>      case 2:
+>          post_index = false;
+>          writeback = false;
+>          break;
+>      case 1:
+>          post_index = true;
+>          writeback = true;
+>          break;
+>      case 3:
+>          post_index = false;
+>          writeback = true;
+>          break;
+> +    default:
+> +        g_assert_not_reached();
+>      }
+>  
+>      if (rn == 31) {
+>          gen_check_sp_alignment(s);
+>      }
+>      tcg_addr = read_cpu_reg_sp(s, rn, 1);
+>  
+>      if (!post_index) {
+>          tcg_gen_addi_i64(tcg_addr, tcg_addr, imm9);
+>      }
+>  
+>      if (is_vector) {
+>          if (is_store) {
+>              do_fp_st(s, rt, tcg_addr, size);
+> 
