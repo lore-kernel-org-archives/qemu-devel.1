@@ -1,30 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37048)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37319)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=4783105bd=Ian.Jackson@citrix.com>)
-	id 1eCOnH-00044R-La
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 06:45:20 -0500
+	(envelope-from <rjones@redhat.com>) id 1eCOoH-0004qd-HG
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 06:46:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=4783105bd=Ian.Jackson@citrix.com>)
-	id 1eCOnD-0000nD-Ll
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 06:45:19 -0500
-Received: from smtp.citrix.com ([66.165.176.89]:42368)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=4783105bd=Ian.Jackson@citrix.com>)
-	id 1eCOnD-0000mp-Dp
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 06:45:15 -0500
-From: Ian Jackson <ian.jackson@eu.citrix.com>
+	(envelope-from <rjones@redhat.com>) id 1eCOoF-0001IE-Sj
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 06:46:21 -0500
+Date: Wed, 8 Nov 2017 11:46:11 +0000
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Message-ID: <20171108114610.GR2787@redhat.com>
+References: <cover.1510093478.git.jcody@redhat.com>
+	<41ed8543e005205118438328c7e162532729d9c7.1510093478.git.jcody@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Message-ID: <23042.59208.477246.94910@mariner.uk.xensource.com>
-Date: Wed, 8 Nov 2017 11:15:20 +0000
-In-Reply-To: <874lq7b68c.fsf@dusky.pond.sub.org>
-References: <1507314444-30835-1-git-send-email-ian.jackson@eu.citrix.com>
-	<1507314444-30835-8-git-send-email-ian.jackson@eu.citrix.com>
-	<87inenfv4y.fsf@dusky.pond.sub.org>
-	<23040.31929.577241.244120@mariner.uk.xensource.com>
-	<874lq7b68c.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH 7/8] os-posix: Provide new -runasid option
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <41ed8543e005205118438328c7e162532729d9c7.1510093478.git.jcody@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 7/7] block/curl: code cleanup to comply
+ with coding style
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,63 +24,258 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, qemu-devel@nongnu.org, Ross Lagerwall <ross.lagerwall@citrix.com>, Anthony PERARD <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org
+To: Jeff Cody <jcody@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, kwolf@redhat.com, eblake@redhat.com
 
-Markus Armbruster writes ("Re: [Qemu-devel] [PATCH 7/8] os-posix: Provide new -runasid option"):
-> Ian Jackson <ian.jackson@eu.citrix.com> writes:
-> > qemu_strtoul fails (returns an error) if the delimiter (that is, the
-> > first character which is not processed as digit by strtoul) is not
-> > '\0'.
+On Tue, Nov 07, 2017 at 05:27:24PM -0500, Jeff Cody wrote:
+> This addresses non-functional changes to help curl.c better comply
+> with the coding styles (comments, indentation, brackets, etc.).
 > 
-> It does that *only* when its @endptr argument is null.  Since you pass
-> &ep, it should work fine here.
-
-I have just read it again and you are right.  Sorry.  I will fix this
-then.
-
-> > Does that all make sense ?
+> One minor code change is the combination of two if statements into
+> a single if statement.
 > 
-> Your code makes sense to me.  It's just the comment that confuses me.
-> Does ID mean "implementation-defined behavior"?  That would be wrong:
+> Signed-off-by: Jeff Cody <jcody@redhat.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
 
-Yes, that's what I meant by ID.
+As you say, just simple coding style fixes except for the single
+combined if statement.  Therefore:
 
->        6.3.1.3  Signed and unsigned integers
+Reviewed-by: Richard W.M. Jones <rjones@redhat.com>
+
+Rich.
+
+>  block/curl.c | 100 +++++++++++++++++++++++++++++++----------------------------
+>  1 file changed, 52 insertions(+), 48 deletions(-)
 > 
->        [#1] When a value with integer type is converted to  another
->        integer   type  other  than  _Bool,  if  the  value  can  be
->        represented by the new type, it is unchanged.
-> 
->        [#2] Otherwise, if the new type is unsigned,  the  value  is
->        converted  by repeatedly adding or subtracting one more than
->        the maximum value that can be represented in  the  new  type
->        until the value is in the range of the new type.
+> diff --git a/block/curl.c b/block/curl.c
+> index 35cf417..7a6dd44 100644
+> --- a/block/curl.c
+> +++ b/block/curl.c
+> @@ -32,8 +32,10 @@
+>  #include <curl/curl.h>
+>  #include "qemu/cutils.h"
+>  
+> -// #define DEBUG_CURL
+> -// #define DEBUG_VERBOSE
+> +/*
+> + #define DEBUG_CURL
+> + #define DEBUG_VERBOSE
+> +*/
+>  
+>  #ifdef DEBUG_CURL
+>  #define DEBUG_CURL_PRINT 1
+> @@ -76,15 +78,15 @@ static CURLMcode __curl_multi_socket_action(CURLM *multi_handle,
+>  #define CURL_TIMEOUT_DEFAULT 5
+>  #define CURL_TIMEOUT_MAX 10000
+>  
+> -#define CURL_BLOCK_OPT_URL       "url"
+> -#define CURL_BLOCK_OPT_READAHEAD "readahead"
+> -#define CURL_BLOCK_OPT_SSLVERIFY "sslverify"
+> -#define CURL_BLOCK_OPT_TIMEOUT "timeout"
+> -#define CURL_BLOCK_OPT_COOKIE    "cookie"
+> -#define CURL_BLOCK_OPT_COOKIE_SECRET "cookie-secret"
+> -#define CURL_BLOCK_OPT_USERNAME "username"
+> -#define CURL_BLOCK_OPT_PASSWORD_SECRET "password-secret"
+> -#define CURL_BLOCK_OPT_PROXY_USERNAME "proxy-username"
+> +#define CURL_BLOCK_OPT_URL                   "url"
+> +#define CURL_BLOCK_OPT_READAHEAD             "readahead"
+> +#define CURL_BLOCK_OPT_SSLVERIFY             "sslverify"
+> +#define CURL_BLOCK_OPT_TIMEOUT               "timeout"
+> +#define CURL_BLOCK_OPT_COOKIE                "cookie"
+> +#define CURL_BLOCK_OPT_COOKIE_SECRET         "cookie-secret"
+> +#define CURL_BLOCK_OPT_USERNAME              "username"
+> +#define CURL_BLOCK_OPT_PASSWORD_SECRET       "password-secret"
+> +#define CURL_BLOCK_OPT_PROXY_USERNAME        "proxy-username"
+>  #define CURL_BLOCK_OPT_PROXY_PASSWORD_SECRET "proxy-password-secret"
+>  
+>  struct BDRVCURLState;
+> @@ -110,8 +112,7 @@ typedef struct CURLSocket {
+>      QLIST_ENTRY(CURLSocket) next;
+>  } CURLSocket;
+>  
+> -typedef struct CURLState
+> -{
+> +typedef struct CURLState {
+>      struct BDRVCURLState *s;
+>      CURLAIOCB *acb[CURL_NUM_ACB];
+>      CURL *curl;
+> @@ -196,22 +197,22 @@ static int curl_sock_cb(CURL *curl, curl_socket_t fd, int action,
+>  
+>      DPRINTF("CURL (AIO): Sock action %d on fd %d\n", action, (int)fd);
+>      switch (action) {
+> -        case CURL_POLL_IN:
+> -            aio_set_fd_handler(s->aio_context, fd, false,
+> -                               curl_multi_read, NULL, NULL, state);
+> -            break;
+> -        case CURL_POLL_OUT:
+> -            aio_set_fd_handler(s->aio_context, fd, false,
+> -                               NULL, curl_multi_do, NULL, state);
+> -            break;
+> -        case CURL_POLL_INOUT:
+> -            aio_set_fd_handler(s->aio_context, fd, false,
+> -                               curl_multi_read, curl_multi_do, NULL, state);
+> -            break;
+> -        case CURL_POLL_REMOVE:
+> -            aio_set_fd_handler(s->aio_context, fd, false,
+> -                               NULL, NULL, NULL, NULL);
+> -            break;
+> +    case CURL_POLL_IN:
+> +        aio_set_fd_handler(s->aio_context, fd, false,
+> +                           curl_multi_read, NULL, NULL, state);
+> +        break;
+> +    case CURL_POLL_OUT:
+> +        aio_set_fd_handler(s->aio_context, fd, false,
+> +                           NULL, curl_multi_do, NULL, state);
+> +        break;
+> +    case CURL_POLL_INOUT:
+> +        aio_set_fd_handler(s->aio_context, fd, false,
+> +                           curl_multi_read, curl_multi_do, NULL, state);
+> +        break;
+> +    case CURL_POLL_REMOVE:
+> +        aio_set_fd_handler(s->aio_context, fd, false,
+> +                           NULL, NULL, NULL, NULL);
+> +        break;
+>      }
+>  
+>      return 0;
+> @@ -235,7 +236,7 @@ static size_t curl_header_cb(void *ptr, size_t size, size_t nmemb, void *opaque)
+>  /* Called from curl_multi_do_locked, with s->mutex held.  */
+>  static size_t curl_read_cb(void *ptr, size_t size, size_t nmemb, void *opaque)
+>  {
+> -    CURLState *s = ((CURLState*)opaque);
+> +    CURLState *s = opaque;
+>      size_t realsize = size * nmemb;
+>      int i;
+>  
+> @@ -253,11 +254,12 @@ static size_t curl_read_cb(void *ptr, size_t size, size_t nmemb, void *opaque)
+>      memcpy(s->orig_buf + s->buf_off, ptr, realsize);
+>      s->buf_off += realsize;
+>  
+> -    for(i=0; i<CURL_NUM_ACB; i++) {
+> +    for (i = 0; i < CURL_NUM_ACB; i++) {
+>          CURLAIOCB *acb = s->acb[i];
+>  
+> -        if (!acb)
+> +        if (!acb) {
+>              continue;
+> +        }
+>  
+>          if ((s->buf_off >= acb->end)) {
+>              size_t request_length = acb->bytes;
+> @@ -293,17 +295,16 @@ static bool curl_find_buf(BDRVCURLState *s, uint64_t start, uint64_t len,
+>      uint64_t clamped_end = MIN(end, s->len);
+>      uint64_t clamped_len = clamped_end - start;
+>  
+> -    for (i=0; i<CURL_NUM_STATES; i++) {
+> +    for (i = 0; i < CURL_NUM_STATES; i++) {
+>          CURLState *state = &s->states[i];
+>          uint64_t buf_end = (state->buf_start + state->buf_off);
+>          uint64_t buf_fend = (state->buf_start + state->buf_len);
+>  
+> -        if (!state->orig_buf)
+> -            continue;
+> -        if (!state->buf_off)
+> +        if (!state->orig_buf || !state->buf_off) {
+>              continue;
+> +        }
+>  
+> -        // Does the existing buffer cover our section?
+> +        /* Does the existing buffer cover our section? */
+>          if ((start >= state->buf_start) &&
+>              (start <= buf_end) &&
+>              (clamped_end >= state->buf_start) &&
+> @@ -319,7 +320,7 @@ static bool curl_find_buf(BDRVCURLState *s, uint64_t start, uint64_t len,
+>              return true;
+>          }
+>  
+> -        // Wait for unfinished chunks
+> +        /* Wait for unfinished chunks */
+>          if (state->in_use &&
+>              (start >= state->buf_start) &&
+>              (start <= buf_fend) &&
+> @@ -331,7 +332,7 @@ static bool curl_find_buf(BDRVCURLState *s, uint64_t start, uint64_t len,
+>              acb->start = start - state->buf_start;
+>              acb->end = acb->start + clamped_len;
+>  
+> -            for (j=0; j<CURL_NUM_ACB; j++) {
+> +            for (j = 0; j < CURL_NUM_ACB; j++) {
+>                  if (!state->acb[j]) {
+>                      state->acb[j] = acb;
+>                      return true;
+> @@ -355,8 +356,9 @@ static void curl_multi_check_completion(BDRVCURLState *s)
+>          msg = curl_multi_info_read(s->multi, &msgs_in_queue);
+>  
+>          /* Quit when there are no more completions */
+> -        if (!msg)
+> +        if (!msg) {
+>              break;
+> +        }
+>  
+>          if (msg->msg == CURLMSG_DONE) {
+>              CURLState *state = NULL;
+> @@ -540,12 +542,14 @@ static void curl_clean_state(CURLState *s)
+>  {
+>      CURLAIOCB *next;
+>      int j;
+> +
+>      for (j = 0; j < CURL_NUM_ACB; j++) {
+>          assert(!s->acb[j]);
+>      }
+>  
+> -    if (s->s->multi)
+> +    if (s->s->multi) {
+>          curl_multi_remove_handle(s->s->multi, s->curl);
+> +    }
+>  
+>      while (!QLIST_EMPTY(&s->sockets)) {
+>          CURLSocket *socket = QLIST_FIRST(&s->sockets);
+> @@ -794,7 +798,7 @@ static int curl_open(BlockDriverState *bs, QDict *options, int flags,
+>          goto out_noclean;
+>      }
+>  
+> -    // Get file size
+> +    /* Get file size */
+>  
+>      if (curl_init_state(s, state) < 0) {
+>          goto out;
+> @@ -802,11 +806,11 @@ static int curl_open(BlockDriverState *bs, QDict *options, int flags,
+>  
+>      s->accept_range = false;
+>      curl_easy_setopt(state->curl, CURLOPT_NOBODY, 1);
+> -    curl_easy_setopt(state->curl, CURLOPT_HEADERFUNCTION,
+> -                     curl_header_cb);
+> +    curl_easy_setopt(state->curl, CURLOPT_HEADERFUNCTION, curl_header_cb);
+>      curl_easy_setopt(state->curl, CURLOPT_HEADERDATA, s);
+> -    if (curl_easy_perform(state->curl))
+> +    if (curl_easy_perform(state->curl)) {
+>          goto out;
+> +    }
+>      if (curl_easy_getinfo(state->curl, CURLINFO_CONTENT_LENGTH_DOWNLOAD, &d)) {
+>          goto out;
+>      }
+> @@ -876,13 +880,13 @@ static void curl_setup_preadv(BlockDriverState *bs, CURLAIOCB *acb)
+>  
+>      qemu_mutex_lock(&s->mutex);
+>  
+> -    // In case we have the requested data already (e.g. read-ahead),
+> -    // we can just call the callback and be done.
+> +    /* In case we have the requested data already (e.g. read-ahead),
+> +       we can just call the callback and be done. */
+>      if (curl_find_buf(s, start, acb->bytes, acb)) {
+>          goto out;
+>      }
+>  
+> -    // No cache found, so let's start a new request
+> +    /* No cache found, so let's start a new request */
+>      for (;;) {
+>          state = curl_find_state(s);
+>          if (state) {
+> -- 
+> 2.9.5
 
-That applies if the new type (uid_t, here) is unsigned.  But I think
-uid_t's signedness is not specified, so it might be signed.  (SuS
-says, in the section on types.h, only
-
-  Additionally:
-     * nlink_t, uid_t, gid_t, and id_t shall be integer types.
-
-C99 6.3.1.3 continues:
-
-         Otherwise, the new type is signed and the value cannot be
-         represented in it; either the result is
-         implementation-defined or an implementation-defined signal is
-         raised.
-
-So the type of uid_t is ID too.
-
-> One more thing: please report errors with error_report().  Here:
-
->             error_report("Could not obtain uid");
-> 
-> No need to quote optarg back at the user, because error_report() already
-> does.
-
-Ah, I will do that.  Thanks.
-
-Regards,
-Ian.
+-- 
+Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
+Read my programming and virtualization blog: http://rwmj.wordpress.com
+Fedora Windows cross-compiler. Compile Windows programs, test, and
+build Windows installers. Over 100 libraries supported.
+http://fedoraproject.org/wiki/MinGW
