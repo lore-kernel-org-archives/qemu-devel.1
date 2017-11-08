@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55866)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56863)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eCMIO-0004PX-Am
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 04:05:17 -0500
+	(envelope-from <berrange@redhat.com>) id 1eCMMG-0005Gk-R4
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 04:09:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eCMIK-0007lr-Sv
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 04:05:16 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46766)
+	(envelope-from <berrange@redhat.com>) id 1eCMMD-0000pU-KT
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 04:09:16 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56432)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eCMIK-0007l6-Hf
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 04:05:12 -0500
-Date: Wed, 8 Nov 2017 09:05:05 +0000
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eCMMD-0000pE-EC
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 04:09:13 -0500
+Date: Wed, 8 Nov 2017 09:09:00 +0000
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20171108090505.GE12670@redhat.com>
+Message-ID: <20171108090900.GF12670@redhat.com>
 Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <e457d4e906dceea4de6c3431813a06b137c1ab9c.1510103351.git.alistair.francis@xilinx.com>
+References: <20171108022828.7242-1-f4bug@amsat.org>
+	<20171108022828.7242-7-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <e457d4e906dceea4de6c3431813a06b137c1ab9c.1510103351.git.alistair.francis@xilinx.com>
-Subject: Re: [Qemu-devel] [PATCH v1 1/1] Makefile: Capstone: Add support for
- cross compile ranlib
+In-Reply-To: <20171108022828.7242-7-f4bug@amsat.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH 6/6] hw/i386: deprecate the "isapc"
+ machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,76 +30,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, alistair23@gmail.com, kraxel@redhat.com, dgilbert@redhat.com
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
 
-On Tue, Nov 07, 2017 at 05:10:46PM -0800, Alistair Francis wrote:
-> When cross compiling QEMU for Windows we need to specify the cross
-> version of ranlib to avoid build errors when buildling capstone. This
-> patch ensures we use the same cross prefix on ranlib as other toolchain
-> components.
-> 
-> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-> Suggested-by: Peter Maydell <peter.maydell@linaro.org>
+On Tue, Nov 07, 2017 at 11:28:28PM -0300, Philippe Mathieu-Daud=C3=A9 wro=
+te:
+> Deprecated since 2.9.0, guests should be able to use "pc" instead.
+
+Isn't isapc important to allow QEMU to old operating systems that
+predate the PCI era. I do recall seeing some messages about specific
+cases where you cannot use the 'pc' machine type and we suggested
+used of 'isapc' instead, but can't remember the exact details..
+
+I know that's not a typical usecase for modern cloud / data center
+virt, but it is interesting for usage of QEMU as a archeology tool,
+so I'm loathe to see this removed unless it is demonstrably causing
+an unacceptable maint burden to keep it.
+
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 > ---
-> 
->  Makefile  | 2 +-
->  configure | 3 +++
->  2 files changed, 4 insertions(+), 1 deletion(-)
-
-Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
-
-
-> 
-> diff --git a/Makefile b/Makefile
-> index 0496c5057a..814f6820d9 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -405,7 +405,7 @@ CAP_CFLAGS += -DCAPSTONE_HAS_POWERPC
->  CAP_CFLAGS += -DCAPSTONE_HAS_X86
->  
->  subdir-capstone: .git-submodule-status
-> -	$(call quiet-command,$(MAKE) -C $(SRC_PATH)/capstone CAPSTONE_SHARED=no BUILDDIR="$(BUILD_DIR)/capstone" CC="$(CC)" AR="$(AR)" LD="$(LD)" CFLAGS="$(CAP_CFLAGS)" $(SUBDIR_MAKEFLAGS) $(BUILD_DIR)/capstone/$(LIBCAPSTONE))
-> +	$(call quiet-command,$(MAKE) -C $(SRC_PATH)/capstone CAPSTONE_SHARED=no BUILDDIR="$(BUILD_DIR)/capstone" CC="$(CC)" AR="$(AR)" LD="$(LD)" RANLIB="$(RANLIB)" CFLAGS="$(CAP_CFLAGS)" $(SUBDIR_MAKEFLAGS) $(BUILD_DIR)/capstone/$(LIBCAPSTONE))
->  
->  $(SUBDIR_RULES): libqemuutil.a $(common-obj-y) $(chardev-obj-y) \
->  	$(qom-obj-y) $(crypto-aes-obj-$(CONFIG_USER_ONLY))
-> diff --git a/configure b/configure
-> index a6055c0710..0e856bbc04 100755
-> --- a/configure
-> +++ b/configure
-> @@ -482,6 +482,7 @@ ccas="${CCAS-$cc}"
->  cpp="${CPP-$cc -E}"
->  objcopy="${OBJCOPY-${cross_prefix}objcopy}"
->  ld="${LD-${cross_prefix}ld}"
-> +ranlib="${RANLIB-${cross_prefix}ranlib}"
->  nm="${NM-${cross_prefix}nm}"
->  strip="${STRIP-${cross_prefix}strip}"
->  windres="${WINDRES-${cross_prefix}windres}"
-> @@ -6288,6 +6289,7 @@ echo "CCAS=$ccas" >> $config_host_mak
->  echo "CPP=$cpp" >> $config_host_mak
->  echo "OBJCOPY=$objcopy" >> $config_host_mak
->  echo "LD=$ld" >> $config_host_mak
-> +echo "RANLIB=$ranlib" >> $config_host_mak
->  echo "NM=$nm" >> $config_host_mak
->  echo "WINDRES=$windres" >> $config_host_mak
->  echo "CFLAGS=$CFLAGS" >> $config_host_mak
-> @@ -6782,6 +6784,7 @@ for rom in seabios vgabios ; do
->      echo "OBJCOPY=objcopy" >> $config_mak
->      echo "IASL=$iasl" >> $config_mak
->      echo "LD=$ld" >> $config_mak
-> +    echo "RANLIB=$ranlib" >> $config_mak
->  done
->  
->  # set up tests data directory
-> -- 
-> 2.11.0
-> 
-> 
+>  hw/i386/pc_piix.c | 1 +
+>  1 file changed, 1 insertion(+)
+>=20
+> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+> index c462b702ff..df4669c6d3 100644
+> --- a/hw/i386/pc_piix.c
+> +++ b/hw/i386/pc_piix.c
+> @@ -1114,6 +1114,7 @@ static void isapc_machine_options(MachineClass *m=
+)
+>      pcmc->smbios_legacy_mode =3D true;
+>      pcmc->has_reserved_memory =3D false;
+>      m->default_cpu_type =3D X86_CPU_TYPE_NAME("486");
+> +    m->deprecated_reason =3D "Use the \"pc\" machine instead";
+>  }
+> =20
+>  DEFINE_PC_MACHINE(isapc, "isapc", pc_init_isa,
 
 Regards,
 Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
