@@ -1,34 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42704)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44819)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1eCLcQ-0002We-6G
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 03:21:55 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1eCLj1-0003jR-De
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 03:28:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1eCLcL-0004CZ-AV
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 03:21:54 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40329)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1eCLcL-0004C0-4h
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 03:21:49 -0500
-References: <1b862cf2-2fee-3243-cb54-2780ace6f25b@profihost.ag>
-	<971cc10f-7930-9830-0528-27e8faac7282@redhat.com>
-	<748c4d0d-f84b-303d-f9a6-bafa6037d669@profihost.ag>
-	<f4b0cb70-7f86-f7cf-bb89-3a9f7ae15dc2@redhat.com>
-	<4c2913e2-5946-47db-cced-a5702538bc3b@profihost.ag>
-	<dc3bf74f-fbd6-573d-0d7c-d456469fcf1d@profihost.ag>
-	<9c8673a5-faf7-ca9c-27d3-398df4223d6a@redhat.com>
-	<f362d043-7293-65b7-734b-c8372a5f16c3@profihost.ag>
-	<54326bae-831d-dfb8-151e-534d3a100c2c@redhat.com>
-	<ab53e4ae-4c38-9520-b076-96318b6c09b5@profihost.ag>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <61b97624-bd55-655f-f8e2-ea1699c25d51@redhat.com>
-Date: Wed, 8 Nov 2017 17:21:36 +0900
+	(envelope-from <aik@ozlabs.ru>) id 1eCLiw-0006q4-Gr
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 03:28:43 -0500
+Received: from mail-io0-x242.google.com ([2607:f8b0:4001:c06::242]:45690)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1eCLiw-0006py-AU
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 03:28:38 -0500
+Received: by mail-io0-x242.google.com with SMTP id i38so5098573iod.2
+	for <qemu-devel@nongnu.org>; Wed, 08 Nov 2017 00:28:38 -0800 (PST)
+References: <20171103153333.6416-1-berrange@redhat.com>
+	<20171103153333.6416-6-berrange@redhat.com>
+	<d1704cf4-d3d4-cc69-df96-1298c11e1295@ozlabs.ru>
+	<1dee5931-84f6-89e5-54e0-5a61cda23ccf@ozlabs.ru>
+	<20171107101254.GA3213@redhat.com>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <96d7c536-1b12-732f-44ce-1c8747e29b62@ozlabs.ru>
+Date: Wed, 8 Nov 2017 19:28:31 +1100
 MIME-Version: 1.0
-In-Reply-To: <ab53e4ae-4c38-9520-b076-96318b6c09b5@profihost.ag>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] kvm: virtio-net: saved image requires TUN_F_UFO
- support
+In-Reply-To: <20171107101254.GA3213@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-AU
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 5/5] build: delay check for empty git
+ submodule list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,45 +34,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Priebe - Profihost AG <s.priebe@profihost.ag>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 
-
-
-On 2017=E5=B9=B411=E6=9C=8808=E6=97=A5 17:05, Stefan Priebe - Profihost A=
-G wrote:
-> Am 08.11.2017 um 08:54 schrieb Jason Wang:
->>
->> On 2017=E5=B9=B411=E6=9C=8808=E6=97=A5 15:41, Stefan Priebe - Profihos=
-t AG wrote:
->>> Hi Paolo,
+On 07/11/17 21:12, Daniel P. Berrange wrote:
+> On Tue, Nov 07, 2017 at 04:13:27PM +1100, Alexey Kardashevskiy wrote:
+>> On 07/11/17 15:12, Alexey Kardashevskiy wrote:
+>>> On 04/11/17 02:33, Daniel P. Berrange wrote:
+>>>> We short circuit the git submodule update when passed an empty module list.
+>>>> This accidentally causes the 'status' command to write to the status file. The
+>>>> test needs to be delayed into the individual commands to avoid this premature
+>>>> writing of the status file.
+>>>>
+>>>> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+>>>> ---
+>>>>  scripts/git-submodule.sh | 19 ++++++++++++-------
+>>>>  1 file changed, 12 insertions(+), 7 deletions(-)
+>>>>
+>>>> diff --git a/scripts/git-submodule.sh b/scripts/git-submodule.sh
+>>>> index 2857fc57c4..90376a7dae 100755
+>>>> --- a/scripts/git-submodule.sh
+>>>> +++ b/scripts/git-submodule.sh
+>>>> @@ -33,12 +33,6 @@ error() {
+>>>>      exit 1
+>>>>  }
+>>>>  
+>>>> -if test -z "$maybe_modules"
+>>>> -then
+>>>> -    test -e $substat || touch $substat
+>>>> -    exit 0
+>>>> -fi
+>>>> -
+>>>>  modules=""
+>>>>  for m in $maybe_modules
+>>>>  do
+>>>> @@ -51,7 +45,7 @@ do
+>>>>      fi
+>>>>  done
+>>>>  
+>>>> -if ! test -e ".git"
+>>>> +if test -n "$maybe_modules" && ! test -e ".git"
 >>>
->>> Am 06.11.2017 um 12:27 schrieb Paolo Bonzini:
->>>> On 06/11/2017 12:09, Stefan Priebe - Profihost AG wrote:
->>>>> HI Paolo,
->>>>>
->>>>> could this patchset be related?
->>>> Uh oh, yes it should.=C2=A0 Jason, any ways to fix it?=C2=A0 I suppo=
-se we need to
->>>> disable UFO in the newest machine types, but do we also have to do
->>>> (software) UFO in vhost-net and QEMU for migration compatibility?
->>> Any news on this?
 >>>
->>> Greets,
->> Since we probe UFO support, it will be disabled automatically on devic=
-e
->> startup.
+>>> $GIT_DIR should be checked too imho:
+>>>
+>>> if test -n "$maybe_modules" && ! test -e ".git" && test "$GIT_DIR" = ""
 >>
->> For the issue of migration, I think the only way is trying to fix it i=
-n
->> kernel.
-> But 4.14 is around the corner and the patchset is already included.
-> Shouldn't this get fixed before 4.14 is released?
+>> Uff. Just this won't help, it is assumed everywhere that the ".git" folder
+>> exists :(
+>>
+>> I was hoping to use "git --work-dir=" for the source tree to have a full
+>> complete source tree to compile on a build machine but
+>> "./scripts/git-submodule.sh status" is always called, no matter what.
+> 
+> If you need to pass extra args to 'git' this is supported already by
+> this changeset. Just create a wrapper script containing whatever args
+> you need to give git, and use "./configure --with-git=your-wrapper"
+> 
+>> I'd really love to have some way to disable git activities in Makefile...
+> 
+> I don't want to add that. We don't want to ever build if we detect that
+> the submodules are at a different version to what we expect as it would
+> cause obscure hard to diagnose build problems
 
-We will try to seek a solution as soon as possible. If we can't catch=20
-4.14, we will do it for stable for sure.
 
-Thanks
+btw how is it expected to build from source tarball, without any .git
+directories present, for example with rpmbuild?
 
->
-> Stefan
->> Thanks
+
+
+-- 
+Alexey
