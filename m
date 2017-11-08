@@ -1,33 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45212)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46601)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eCZwr-0004S2-3Q
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 18:39:58 -0500
+	id 1eCa0f-0007Uo-RK
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 18:43:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eCZwn-0002CE-4o
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 18:39:57 -0500
-Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:46532)
+	id 1eCa0b-0004b9-U3
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 18:43:53 -0500
+Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:45721)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eCZwm-0002C4-W5
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 18:39:53 -0500
-Received: by mail-qk0-x242.google.com with SMTP id o6so5595882qkh.3
-	for <qemu-devel@nongnu.org>; Wed, 08 Nov 2017 15:39:52 -0800 (PST)
+	id 1eCa0b-0004ay-Oq
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 18:43:49 -0500
+Received: by mail-qt0-x244.google.com with SMTP id q33so1153974qta.2
+	for <qemu-devel@nongnu.org>; Wed, 08 Nov 2017 15:43:49 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 References: <cover.1510181732.git.alistair.francis@xilinx.com>
-	<1dc70f25d82fc829cf85b9be45cb77d88d8f3af9.1510181732.git.alistair.francis@xilinx.com>
+	<10f1bca388976b18119fd4fc28d6fdcf7106f7d3.1510181732.git.alistair.francis@xilinx.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <143b2c67-4ebb-e8b6-bf4f-20db5a780768@amsat.org>
-Date: Wed, 8 Nov 2017 20:39:49 -0300
+Message-ID: <20c00ee8-6d77-e8bd-aa77-6db5db789900@amsat.org>
+Date: Wed, 8 Nov 2017 20:43:45 -0300
 MIME-Version: 1.0
-In-Reply-To: <1dc70f25d82fc829cf85b9be45cb77d88d8f3af9.1510181732.git.alistair.francis@xilinx.com>
+In-Reply-To: <10f1bca388976b18119fd4fc28d6fdcf7106f7d3.1510181732.git.alistair.francis@xilinx.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v4 28/45] hw/nvram: Replace fprintf(stderr,
- "*\n" with error_report()
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 40/45] hw/watchdog: Replace
+ fprintf(stderr, "*\n" with error_report()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,7 +36,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org
+To: Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org, "Richard W.M. Jones" <rjones@redhat.com>
 Cc: alistair23@gmail.com, armbru@redhat.com
 
 On 11/08/2017 07:58 PM, Alistair Francis wrote:
@@ -78,65 +78,98 @@ On 11/08/2017 07:58 PM, Alistair Francis wrote:
 >     'N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
 >     {} +
 > 
-> Some lines where then manually tweaked to pass checkpatch.
+> Some lines were then manually tweaked to pass checkpatch.
 > 
-> Some of the message in put_unused() was removed and replaced with
-> g_assert_not_reached().
+> Some lines in wdt_i6300esb.c were manuallly changed to qemu_log_mask().
 > 
 > Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
 > ---
 > V3:
->  - Add g_assert_not_reached() in unused function
+>  - Use qemu_log_mask(LOG_UNIMP,... in wdt_i6300esb.c
 > V2:
 >  - Split hw patch into individual directories
 > 
->  hw/nvram/eeprom93xx.c | 5 +++--
->  hw/nvram/fw_cfg.c     | 5 +++--
->  2 files changed, 6 insertions(+), 4 deletions(-)
+>  hw/watchdog/watchdog.c     | 11 +++++------
+>  hw/watchdog/wdt_i6300esb.c | 10 +++++++---
+>  2 files changed, 12 insertions(+), 9 deletions(-)
 > 
-> diff --git a/hw/nvram/eeprom93xx.c b/hw/nvram/eeprom93xx.c
-> index 2fd0e3c29f..5cad031eba 100644
-> --- a/hw/nvram/eeprom93xx.c
-> +++ b/hw/nvram/eeprom93xx.c
-> @@ -36,6 +36,7 @@
+> diff --git a/hw/watchdog/watchdog.c b/hw/watchdog/watchdog.c
+> index 670114ecfe..9594457082 100644
+> --- a/hw/watchdog/watchdog.c
+> +++ b/hw/watchdog/watchdog.c
+> @@ -20,6 +20,7 @@
 >   */
 >  
 >  #include "qemu/osdep.h"
 > +#include "qemu/error-report.h"
->  #include "hw/hw.h"
->  #include "hw/nvram/eeprom93xx.h"
+>  #include "qemu/option.h"
+>  #include "qemu/config-file.h"
+>  #include "qemu/queue.h"
+> @@ -52,8 +53,7 @@ int select_watchdog(const char *p)
+>      /* -watchdog ? lists available devices and exits cleanly. */
+>      if (is_help_option(p)) {
+>          QLIST_FOREACH(model, &watchdog_list, entry) {
+> -            fprintf(stderr, "\t%s\t%s\n",
+> -                     model->wdt_name, model->wdt_description);
+> +            error_report("\t%s\t%s", model->wdt_name, model->wdt_description);
+>          }
+>          return 2;
+>      }
+> @@ -68,10 +68,9 @@ int select_watchdog(const char *p)
+>          }
+>      }
 >  
-> @@ -105,8 +106,8 @@ static int get_uint16_from_uint8(QEMUFile *f, void *pv, size_t size,
->  static int put_unused(QEMUFile *f, void *pv, size_t size, VMStateField *field,
->                        QJSON *vmdesc)
->  {
-> -    fprintf(stderr, "uint16_from_uint8 is used only for backwards compatibility.\n");
-> -    fprintf(stderr, "Never should be used to write a new state.\n");
-> +    error_report("uint16_from_uint8 is used only for backwards compatibility.");
-> +    error_report("Never should be used to write a new state.");
-
-Sounds like funny english :)
-
->      exit(0);
-
-Why not use g_assert_not_reached() for consistency?
-
->  
->      return 0;
-> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
-> index 753ac0e4ea..1c66052f1f 100644
-> --- a/hw/nvram/fw_cfg.c
-> +++ b/hw/nvram/fw_cfg.c
-> @@ -518,8 +518,9 @@ static int get_uint32_as_uint16(QEMUFile *f, void *pv, size_t size,
->  static int put_unused(QEMUFile *f, void *pv, size_t size, VMStateField *field,
->                        QJSON *vmdesc)
->  {
-> -    fprintf(stderr, "uint32_as_uint16 is only used for backward compatibility.\n");
-> -    fprintf(stderr, "This functions shouldn't be called.\n");
-> +    error_report("uint32_as_uint16 is only used for backward compatibility.");
-> +
-> +    g_assert_not_reached();
->  
->      return 0;
+> -    fprintf(stderr, "Unknown -watchdog device. Supported devices are:\n");
+> +    error_report("Unknown -watchdog device. Supported devices are:");
+>      QLIST_FOREACH(model, &watchdog_list, entry) {
+> -        fprintf(stderr, "\t%s\t%s\n",
+> -                 model->wdt_name, model->wdt_description);
+> +        error_report("\t%s\t%s", model->wdt_name, model->wdt_description);
+>      }
+>      return 1;
 >  }
+> @@ -126,7 +125,7 @@ void watchdog_perform_action(void)
+>  
+>      case WATCHDOG_ACTION_DEBUG:
+>          qapi_event_send_watchdog(WATCHDOG_ACTION_DEBUG, &error_abort);
+> -        fprintf(stderr, "watchdog: timer fired\n");
+> +        error_report("watchdog: timer fired");
+
+I don't think this is an error and would rather use info_report() here.
+
+Richard what do you think?
+
+>          break;
+>  
+>      case WATCHDOG_ACTION_NONE:
+> diff --git a/hw/watchdog/wdt_i6300esb.c b/hw/watchdog/wdt_i6300esb.c
+> index e596b0804d..967f3ebc0d 100644
+> --- a/hw/watchdog/wdt_i6300esb.c
+> +++ b/hw/watchdog/wdt_i6300esb.c
+> @@ -20,7 +20,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -
+> +#include "include/qemu/log.h"
+>  #include "qemu-common.h"
+>  #include "qemu/timer.h"
+>  #include "sysemu/watchdog.h"
+> @@ -186,10 +186,14 @@ static void i6300esb_timer_expired(void *vp)
+>          /* What to do at the end of stage 1? */
+>          switch (d->int_type) {
+>          case INT_TYPE_IRQ:
+> -            fprintf(stderr, "i6300esb_timer_expired: I would send APIC 1 INT 10 here if I knew how (XXX)\n");
+> +               qemu_log_mask(LOG_UNIMP,
+> +                             "i6300esb: timer expired but System "
+> +                             "APIC 1 INT10 not emitted\n");
+>              break;
+>          case INT_TYPE_SMI:
+> -            fprintf(stderr, "i6300esb_timer_expired: I would send SMI here if I knew how (XXX)\n");
+> +               qemu_log_mask(LOG_UNIMP,
+> +                             "i6300esb: timer expired but System "
+> +                             "Management Interrupt not emitted\n");
+>              break;
+>          }
+>  
 > 
