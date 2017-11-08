@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34977)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35416)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eCVTI-00067T-7e
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 13:53:09 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eCVUM-00073k-R2
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 13:54:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eCVTH-0005D3-DM
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 13:53:08 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eCVUL-0005bm-VK
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 13:54:14 -0500
 References: <20170929165347.29658-1-mreitz@redhat.com>
-	<20170929165347.29658-19-mreitz@redhat.com>
-	<w51o9okwtgx.fsf@maestria.local.igalia.com>
-	<15538193-cfa0-822e-04c4-4aedbfd0724a@redhat.com>
-	<20171108171441.GH30890@localhost.localdomain>
+	<20170929165347.29658-17-mreitz@redhat.com>
+	<w51shdwwxpn.fsf@maestria.local.igalia.com>
+	<b28222f7-e360-a31b-dc24-798e2db7d089@redhat.com>
+	<c12f0934-d3a6-10e2-918f-7602518789ad@redhat.com>
+	<w51lgji2sxf.fsf@maestria.local.igalia.com>
+	<20171108170918.GG30890@localhost.localdomain>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <f93d184c-fbc4-5895-8794-2c48f2b8c52c@redhat.com>
-Date: Wed, 8 Nov 2017 19:52:53 +0100
+Message-ID: <b31d8801-9fa7-7e55-e794-c1e923ce1f9b@redhat.com>
+Date: Wed, 8 Nov 2017 19:54:00 +0100
 MIME-Version: 1.0
-In-Reply-To: <20171108171441.GH30890@localhost.localdomain>
+In-Reply-To: <20171108170918.GG30890@localhost.localdomain>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="iMRVT7QuajqRgJapdpS4tOMIiRQDK04TA"
-Subject: Re: [Qemu-devel] [PATCH v6 18/25] block: Add sgfnt_runtime_opts to
- BlockDriver
+	boundary="cmjnvg11bFNbOFOnr1jdWHret1tvFdLrw"
+Subject: Re: [Qemu-devel] [PATCH v6 16/25] block: Add 'base-directory' BDS
+ option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,85 +30,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, John Snow <jsnow@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>
+Cc: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, John Snow <jsnow@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---iMRVT7QuajqRgJapdpS4tOMIiRQDK04TA
+--cmjnvg11bFNbOFOnr1jdWHret1tvFdLrw
 From: Max Reitz <mreitz@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org,
- qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>,
- John Snow <jsnow@redhat.com>
-Message-ID: <f93d184c-fbc4-5895-8794-2c48f2b8c52c@redhat.com>
-Subject: Re: [PATCH v6 18/25] block: Add sgfnt_runtime_opts to BlockDriver
+To: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>
+Cc: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org,
+ qemu-devel@nongnu.org, John Snow <jsnow@redhat.com>
+Message-ID: <b31d8801-9fa7-7e55-e794-c1e923ce1f9b@redhat.com>
+Subject: Re: [PATCH v6 16/25] block: Add 'base-directory' BDS option
 References: <20170929165347.29658-1-mreitz@redhat.com>
- <20170929165347.29658-19-mreitz@redhat.com>
- <w51o9okwtgx.fsf@maestria.local.igalia.com>
- <15538193-cfa0-822e-04c4-4aedbfd0724a@redhat.com>
- <20171108171441.GH30890@localhost.localdomain>
-In-Reply-To: <20171108171441.GH30890@localhost.localdomain>
-Content-Type: text/plain; charset=windows-1252
+ <20170929165347.29658-17-mreitz@redhat.com>
+ <w51shdwwxpn.fsf@maestria.local.igalia.com>
+ <b28222f7-e360-a31b-dc24-798e2db7d089@redhat.com>
+ <c12f0934-d3a6-10e2-918f-7602518789ad@redhat.com>
+ <w51lgji2sxf.fsf@maestria.local.igalia.com>
+ <20171108170918.GG30890@localhost.localdomain>
+In-Reply-To: <20171108170918.GG30890@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 2017-11-08 18:14, Kevin Wolf wrote:
-> Am 02.11.2017 um 17:18 hat Max Reitz geschrieben:
->> On 2017-11-02 17:11, Alberto Garcia wrote:
->>> On Fri 29 Sep 2017 06:53:40 PM CEST, Max Reitz wrote:
->>>>      QLIST_ENTRY(BlockDriver) list;
->>>> +
->>>> +    /* Pointer to a NULL-terminated array of names of significant o=
-ptions that
->>>> +     * can be specified for bdrv_open(). A significant option is on=
-e that
->>>> +     * changes the data of a BDS.
->>>> +     * If this pointer is NULL, the array is considered empty.
->>>> +     * "filename" and "driver" are always considered significant. *=
-/
->>>> +    const char *const *sgfnt_runtime_opts;
->>>>  };
+On 2017-11-08 18:09, Kevin Wolf wrote:
+> Am 07.11.2017 um 13:07 hat Alberto Garcia geschrieben:
+>> On Thu 02 Nov 2017 11:06:28 PM CET, Eric Blake wrote:
+>>
+>>>>>> Using this option, one can directly override what bdrv_dirname()
+>>>>>> will return. This is useful if one uses e.g. qcow2 on top of quoru=
+m
+>>>>>> (with only protocol BDSs under the quorum BDS) and wants to be abl=
+e
+>>>>>> to use relative backing filenames.
+>>>>>>
+>>>>>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>>>>>
+>>>>> Who would be using this option in practice? I understand that
+>>>>> management tools should be using always absolute filenames, and thi=
+s
+>>>>> API doesn't seem so convenient for humans.
+>>>>
+>>>> Hmmm.  I seem to recall Eric liked it a couple of years ago when he
+>>>> was still more on the libvirt side of things. :-)
 >>>
->>> Is sgfnt a common acronym? I actually had to look it up...
+>>> Ideally, libvirt should be using node names rather than filenames
+>>> (whether absolute or relative); but I still think it could be
+>>> something that turns out to be useful.
 >>
->> I'm open for other suggestions to shorten "significant". :-)
->>
->> (Actually, I can't remember where I got it from.  I think I just made =
-it
->> up, but then I don't know why I didn't use sgfcnt -- maybe because cnt=
-
->> looks either like count (or like something else, but that's a differen=
-t
->> matter)...?)
+>> But what would be the use case? For a management tool it's not more
+>> convenient to use relative file names, or is it?
 >=20
-> Because in reality you were abbreviating "signifant"? ;-)
+> If we add an external API, we must maintain compatibility in future
+> versions, so taking the patch comes with a cost. So I agree with you
+> that we better wait for an actual use case rather than just "could turn=
 
-I actually thought the very same, yes. ;-)
+> out to be useful to someone maybe".
 
-> Anyway, I found the inline initialisation as part of BlockDriver rather=
-
-> ugly. The places where you used a separate static const array look
-> much nicer. Maybe use that consistently in all places?
-
-Sure.
+OK, fair enough.  Also, adding it later would hopefully be as simple as
+just sending this patch again.
 
 Max
 
 
---iMRVT7QuajqRgJapdpS4tOMIiRQDK04TA
+--cmjnvg11bFNbOFOnr1jdWHret1tvFdLrw
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAloDUoUSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AAukH/0LhehHgmPdLuZ/Q6j5EakG1OJ2yBDWd
-zaXsf0rdHws4bgCFuzdaRjkMMSp61MXuJKzgenVrnopPSR8Kj5kq3q3Csq+tZ+sE
-+0tdwr+C5vuMlJ0kSkXv5vlhHbYx9a36AOQUAGhuS9TVOdlvFN2cOMQ6vb4cyUVE
-HaoCyIk5vy0vo5yoY3ltzIVxv1yVAUq6flriqtSGOGPsjQtoFWY6o5a/mMMhCokg
-UYcf1P6aBkkGC6adCRDt2/h++Jvs/Vpf3x4W7ksEtrge+nk1Q446OFXKs56I5L/t
-rijuWVkuoyCYx9+uID5Xq3ChHXoFFe5r1lfUDRwpaoH/7RDpnUVxrMM=
-=4EHT
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAloDUsgSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9A3wsH/RXmkT08EFJEOZsxRJd6vIvW2kd1ez7w
+sqypdy0/k9EHXJ/VXxj1xpbipfjgMqvfRKFxE7ibXyvxmX9tDqO91nV5KdStRVNK
+ZQJ0SPI567au4A7lFkZyRJoCL8AGCerzP8kwZWJG3nOgeVnmeWy0qBqqqzeoXkZv
+SDKQYXnYVKYaJ0w1TcCxH596bDtLEzQ0BAx3Rif7l8/u83EWF7Ep+3MwpByDQ0VV
+2EG2/cHQ94C1crzjep5Nqw2veX3eXl/ODKEyLWJLAxR03AvJbGOymUpfvZz/s56e
+Ctqy2/F+01jKBlrjOGexs+mSqUx3jgxo53etK/A0BJadGj9+fe2Z8mQ=
+=SANq
 -----END PGP SIGNATURE-----
 
---iMRVT7QuajqRgJapdpS4tOMIiRQDK04TA--
+--cmjnvg11bFNbOFOnr1jdWHret1tvFdLrw--
