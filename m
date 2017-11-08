@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50093)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51603)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1eCWd3-0002bv-JH
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 15:07:18 -0500
+	(envelope-from <bounces@canonical.com>) id 1eCWmM-0004vQ-OQ
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 15:16:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1eCWd0-0004GT-Ec
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 15:07:17 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39742)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1eCWd0-0004G4-81
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 15:07:14 -0500
-Date: Wed, 8 Nov 2017 18:07:02 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20171108200702.GT3111@localhost.localdomain>
-References: <fddffbab-7aab-72b4-f42f-d18e94517350@redhat.com>
-	<17ed046b-2c29-340b-9802-f43a709715e2@redhat.com>
-	<20171010155003.GD3246@localhost.localdomain>
-	<4b9e65ed-3636-bff4-3cca-52f6b80bca3b@redhat.com>
-	<20171010194117.GK3246@localhost.localdomain>
-	<cdd2b3da-b243-0d17-c3b7-305532b3bc43@redhat.com>
-	<20171013190138.GB3246@localhost.localdomain>
-	<c0614596-8157-0d91-77a7-e28946b8b13f@redhat.com>
-	<20171013235644.GE3246@localhost.localdomain>
-	<eea713f7-2b5e-0233-ebd2-6610d344d2d0@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1eCWmJ-0001sZ-IC
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 15:16:54 -0500
+Received: from indium.canonical.com ([91.189.90.7]:56726)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eCWmJ-0001rv-80
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 15:16:51 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eCWmH-0008FA-9o
+	for <qemu-devel@nongnu.org>; Wed, 08 Nov 2017 20:16:49 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 185872E80E6
+	for <qemu-devel@nongnu.org>; Wed,  8 Nov 2017 20:16:46 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <eea713f7-2b5e-0233-ebd2-6610d344d2d0@redhat.com>
-Subject: Re: [Qemu-devel] [libvirt] [PATCH 0/7] x86: Rework KVM-defaults
- compat code, enable kvm_pv_unhalt by default
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 08 Nov 2017 20:05:27 -0000
+From: Bruno Haible <bruno@clisp.org>
+Reply-To: Bug 1701798 <1701798@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <149890819992.24827.8096984642709091835.malonedeb@soybean.canonical.com>
+Message-Id: <151017152763.24497.8109245910327255490.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1701798] Re: dynamically linked binaries crash
+ for big-endian targets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,28 +37,230 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Waiman Long <longman@redhat.com>, Davidlohr Bueso <dave@stgolabs.net>, "Michael S. Tsirkin" <mst@redhat.com>, libvir-list@redhat.com, qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>
+To: qemu-devel@nongnu.org
 
-On Tue, Nov 07, 2017 at 12:21:16PM +0100, Paolo Bonzini wrote:
-> On 14/10/2017 01:56, Eduardo Habkost wrote:
-> > Now, I don't know yet what's the best default for a guest that
-> > has CONFIG_PARAVIRT_SPINLOCK when it sees a host that supports
-> > kvm_pv_unhalt.  But I'm arguing that it's the guest
-> > responsibility to choose what to do when it detects such a host,
-> > instead of expecting the host to hide features from the guest.
-> > The guest and the guest administrator have more information to
-> > choose what's best.
-> > 
-> > In other words, if exposing kvm_pv_unhalt on CPUID really makes
-> > some guests behave poorly, can we fix the guests instead?
-> 
-> Waiman just did it. :)
-> 
-> https://marc.info/?l=linux-kernel&m=150972337909996
+> You can probably also work around this by creating an empty
+ld.so.cache in the QEMU_LD_PREFIX directory, though it's awkward if you
+wanted that to be the /usr/whatever directory.
 
-Thanks for the pointer.  I will resubmit the series for 2.12
-after 2.11 is released.
+Indeed, qemu already analyzes the QEMU_LD_PREFIX, stores a cache of its
+contents in the static variable 'base', and uses it in the do_openat()
+function.
 
--- 
-Eduardo
+The following provides a workaround for me that does not require any
+change to qemu:
+
+sudo mkdir -p $QEMU_LD_PREFIX/etc
+sudo ln -s /nonexistent $QEMU_LD_PREFIX/etc/ld.so.cache
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1701798
+
+Title:
+  dynamically linked binaries crash for big-endian targets
+
+Status in QEMU:
+  New
+
+Bug description:
+  On the targets
+    hppa
+    m68k
+    mips
+    mips64
+    powerpc
+    powerpc64
+    s390x
+    sparc64
+  dynamically linked binaries crash, but statically linked binaries work.
+  On the targets
+    aarch64
+    alpha
+    armhf
+    powerpc64le
+    sh4
+  both dynamically linked and statically linked binaries work.
+
+  How to reproduce:
+
+  1) On Ubuntu 16.04, install the packages
+  g++-5-aarch64-linux-gnu
+  g++-5-alpha-linux-gnu
+  g++-5-arm-linux-gnueabihf
+  g++-5-hppa-linux-gnu
+  g++-5-m68k-linux-gnu
+  g++-5-mips-linux-gnu
+  g++-5-mips64-linux-gnuabi64
+  g++-5-powerpc-linux-gnu
+  g++-5-powerpc64-linux-gnu
+  g++-5-powerpc64le-linux-gnu
+  g++-5-s390x-linux-gnu
+  g++-5-sh4-linux-gnu
+  g++-5-sparc64-linux-gnu
+
+  2) Install qemu 2.9.0 from source (for m68k, use the 2.7.0-m68k
+  code from https://github.com/vivier/qemu-m68k.git):
+  $ ../configure --prefix=3D/home/bruno/inst-qemu/2.9.0 --target-list=3Daar=
+ch64-softmmu,alpha-softmmu,arm-softmmu,i386-softmmu,m68k-softmmu,mips-softm=
+mu,mipsel-softmmu,mips64-softmmu,mips64el-softmmu,ppc-softmmu,ppc64-softmmu=
+,s390x-softmmu,sh4-softmmu,sparc-softmmu,sparc64-softmmu,x86_64-softmmu,aar=
+ch64-linux-user,alpha-linux-user,arm-linux-user,hppa-linux-user,m68k-linux-=
+user,mips-linux-user,mipsel-linux-user,mips64-linux-user,mips64el-linux-use=
+r,ppc-linux-user,ppc64-linux-user,ppc64le-linux-user,s390x-linux-user,sh4-l=
+inux-user,sparc-linux-user,sparc64-linux-user --disable-strip --disable-wer=
+ror --enable-gtk --enable-vnc
+  $ make
+  $ make install
+
+  3) Cross-compile the programs:
+
+  $ aarch64-linux-gnu-gcc-5 -O hello.c -o hello.aarch64
+  $ alpha-linux-gnu-gcc-5 -O hello.c -o hello.alpha
+  $ arm-linux-gnueabihf-gcc-5 -O hello.c -o hello.armhf
+  $ hppa-linux-gnu-gcc-5 -O hello.c -o hello.hppa
+  $ m68k-linux-gnu-gcc-5 -O hello.c -o hello.m68k
+  $ mips-linux-gnu-gcc-5 -O hello.c -o hello.mips
+  $ mips64-linux-gnuabi64-gcc-5 -O hello.c -o hello.mips64
+  $ powerpc-linux-gnu-gcc-5 -O hello.c -o hello.powerpc
+  $ powerpc64-linux-gnu-gcc-5 -O hello.c -o hello.powerpc64
+  $ powerpc64le-linux-gnu-gcc-5 -O hello.c -o hello.powerpc64le
+  $ s390x-linux-gnu-gcc-5 -O hello.c -o hello.s390x
+  $ sh4-linux-gnu-gcc-5 -O hello.c -o hello.sh4
+  $ sparc64-linux-gnu-gcc-5 -O hello.c -o hello.sparc64
+
+  4) Run the programs:
+
+  * aarch64 works:
+  $ QEMU_LD_PREFIX=3D/usr/aarch64-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-aarc=
+h64 hello.aarch64
+  Hello world
+
+  * alpha works:
+  $ QEMU_LD_PREFIX=3D/usr/alpha-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-alpha =
+hello.alpha =
+
+  Hello world
+
+  * armhf works:
+  $ QEMU_LD_PREFIX=3D/usr/arm-linux-gnueabihf ~/inst-qemu/2.9.0/bin/qemu-ar=
+m hello.armhf
+  Hello world
+
+  * powerpc64le works:
+  $ QEMU_LD_PREFIX=3D/usr/powerpc64le-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-=
+ppc64le hello.powerpc64le
+  Hello world
+
+  * sh4 works:
+  $ QEMU_LD_PREFIX=3D/usr/sh4-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-sh4 hell=
+o.sh4
+  Hello world
+
+  * =3D=3D=3D=3D=3D sparc64 does not work:
+  $ QEMU_LD_PREFIX=3D/usr/sparc64-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-spar=
+c64 hello.sparc64
+  Segmentation fault (core dumped)
+
+  When I copy the file to a machine with `uname -srm` =3D "Linux 4.5.0-2-sp=
+arc64 sparc64",
+  it works:
+  $ ./hello.sparc64
+  Hello world
+
+  When I copy the file and its execution environment /usr/sparc64-linux-gnu=
+ to the
+  same machine and run the binary in a chroot environment:
+  # /bin/hello.sparc64 =
+
+  Hello world
+
+  * =3D=3D=3D=3D=3D mips does not work:
+  $ QEMU_LD_PREFIX=3D/usr/mips-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-mips he=
+llo.mips
+  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+
+  When I copy the file to a machine with `uname -srm` =3D "Linux 3.16.0-4-4=
+kc-malta mips",
+  it works:
+  $ ./hello.mips
+  Hello world
+
+  When I copy the file and its execution environment /usr/mips-linux-gnu to=
+ the
+  same machine and run the binary in a chroot environment:
+  # /bin/hello.mips =
+
+  Hello world
+
+  * =3D=3D=3D=3D=3D mips64 does not work:
+  $ QEMU_LD_PREFIX=3D/usr/mips64-linux-gnuabi64 ~/inst-qemu/2.9.0/bin/qemu-=
+mips64 hello.mips64
+  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+
+  When I copy the file to a machine with `uname -srm` =3D "Linux 3.16.0-4-5=
+kc-malta mips64",
+  it works:
+  $ ./hello.mips64
+  Hello world
+
+  * =3D=3D=3D=3D=3D powerpc does not work:
+  $ QEMU_LD_PREFIX=3D/usr/powerpc-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-ppc =
+hello.powerpc
+  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+
+  When I copy the file to a machine with `uname -srm` =3D "Linux 3.17.2-200=
+.fc20.ppc64p7 ppc64",
+  it works:
+  $ ./hello.powerpc
+  Hello world
+
+  * =3D=3D=3D=3D=3D powerpc64 does not work:
+  $ QEMU_LD_PREFIX=3D/usr/powerpc64-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-pp=
+c64 hello.powerpc64
+  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+
+  When I copy the file to a machine with `uname -srm` =3D "Linux 3.17.2-200=
+.fc20.ppc64p7 ppc64",
+  it works:
+  $ ./hello.powerpc64
+  Hello world
+
+  * =3D=3D=3D=3D=3D s390x does not work:
+  $ QEMU_LD_PREFIX=3D/usr/s390x-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-s390x =
+hello.s390x
+  <hangs>
+  $ QEMU_LD_PREFIX=3D/usr/s390x-linux-gnu ~/inst-qemu/2.8.1/bin/qemu-s390x =
+hello.s390x
+  qemu-s390x: /media/develdata/devel/build/qemu-2.8.1/translate-all.c:175: =
+tb_lock: Assertion `!have_tb_lock' failed.
+  Segmentation fault (core dumped)
+
+  When I copy the file to a machine with `uname -srm` =3D "Linux 3.16.0-4-s=
+390x s390x",
+  it works:
+  $ ./hello.s390x
+  Hello world
+
+  * =3D=3D=3D=3D=3D hppa does not work:
+  $ QEMU_LD_PREFIX=3D/usr/hppa-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-hppa he=
+llo.hppa
+  Segmentation fault (core dumped)
+
+  * =3D=3D=3D=3D=3D m68k does not work:
+  $ QEMU_LD_PREFIX=3D/usr/m68k-linux-gnu QEMU_CPU=3Dm68020 ~/inst-qemu/2.9.=
+0/bin/qemu-m68k hello.m68k
+  qemu: uncaught target signal 4 (Illegal instruction) - core dumped
+  $ QEMU_LD_PREFIX=3D/usr/m68k-linux-gnu QEMU_CPU=3Dm68020 ~/inst-qemu/2.7.=
+0-m68k/bin/qemu-m68k hello.m68k
+  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+
+  =
+
+  The set of targets where it does not work is exactly the big-endian targe=
+ts.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1701798/+subscriptions
