@@ -1,20 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36015)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42816)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eCZPn-0003F5-1r
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 18:05:48 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eCZn0-0005So-IG
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 18:29:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eCZPl-0004a8-Sv
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 18:05:47 -0500
-References: <151017987286.354.17484911984782218867@bafd83ae6430>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <7741570f-5544-be75-840e-99aa44f19e9f@redhat.com>
-Date: Wed, 8 Nov 2017 17:05:34 -0600
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eCZmw-000732-5h
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 18:29:46 -0500
+Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:52730)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eCZmw-00072s-0y
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 18:29:42 -0500
+Received: by mail-qk0-x241.google.com with SMTP id a194so3402162qkc.9
+	for <qemu-devel@nongnu.org>; Wed, 08 Nov 2017 15:29:41 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <cover.1510181732.git.alistair.francis@xilinx.com>
+	<cc36f40c36cc75fe206f529b4ea3ac68a7c592dc.1510181732.git.alistair.francis@xilinx.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <bf2edbdf-848c-cff2-cc6e-da3ff16ddb6d@amsat.org>
+Date: Wed, 8 Nov 2017 20:29:37 -0300
 MIME-Version: 1.0
-In-Reply-To: <151017987286.354.17484911984782218867@bafd83ae6430>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="fXnlkqpQOffOmL31A8D8WVGLWJFQTHQlC"
-Subject: Re: [Qemu-devel] [PATCH v2 0/7] various NBD fixes for 2.11
+In-Reply-To: <cc36f40c36cc75fe206f529b4ea3ac68a7c592dc.1510181732.git.alistair.francis@xilinx.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v4 12/45] hw/dma: Replace fprintf(stderr,
+ "*\n" with error_report()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,79 +36,221 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: famz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org
+To: Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>
+Cc: alistair23@gmail.com, armbru@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---fXnlkqpQOffOmL31A8D8WVGLWJFQTHQlC
-From: Eric Blake <eblake@redhat.com>
-To: qemu-devel@nongnu.org
-Cc: famz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com,
- vsementsov@virtuozzo.com, qemu-block@nongnu.org
-Message-ID: <7741570f-5544-be75-840e-99aa44f19e9f@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 0/7] various NBD fixes for 2.11
-References: <151017987286.354.17484911984782218867@bafd83ae6430>
-In-Reply-To: <151017987286.354.17484911984782218867@bafd83ae6430>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 11/08/2017 04:24 PM, no-reply@patchew.org wrote:
-> Hi,
->=20
-> This series failed automatic build test. Please find the testing comman=
-ds and
-> their output below. If you have docker installed, you can probably repr=
-oduce it
-> locally.
->=20
-
-> 140         - output mismatch (see 140.out.bad)
-> --- /tmp/qemu-test/src/tests/qemu-iotests/140.out	2017-11-08 22:20:18.0=
-00000000 +0000
-> +++ /tmp/qemu-test/build/tests/qemu-iotests/140.out.bad	2017-11-08 22:2=
-2:51.888146974 +0000
-> @@ -5,11 +5,11 @@
->  {"return": {}}
->  {"return": {}}
->  {"return": {}}
-> -read 65536/65536 bytes at offset 0
-> -64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +can't open device nbd+unix:///drv?socket=3DTEST_DIR/nbd: request for w=
-rite access conflicts with read-only export
->  {"return": {}}
-
-Fixup in the form of 2.5/7 already sent.
-
+On 11/08/2017 07:57 PM, Alistair Francis wrote:
+> Replace a large number of the fprintf(stderr, "*\n" calls with
+> error_report(). The functions were renamed with these commands and then
+> compiler issues where manually fixed.
+> 
+> find ./* -type f -exec sed -i \
+>     'N;N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+>     {} +
+> find ./* -type f -exec sed -i \
+>     'N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+>     {} +
+> find ./* -type f -exec sed -i \
+>     'N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+>     {} +
+> find ./* -type f -exec sed -i \
+>     'N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+>     {} +
+> find ./* -type f -exec sed -i \
+>     'N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+>     {} +
+> find ./* -type f -exec sed -i \
+>     'N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+>     {} +
+> find ./* -type f -exec sed -i \
+>     'N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+>     {} +
+> find ./* -type f -exec sed -i \
+>     'N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+>     {} +
+> find ./* -type f -exec sed -i \
+>     'N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+>     {} +
+> find ./* -type f -exec sed -i \
+>     'N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+>     {} +
+> find ./* -type f -exec sed -i \
+>     'N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+>     {} +
+> 
+> Some lines where then manually tweaked to pass checkpatch.
+> 
+> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
 > ---
-> Email generated automatically by Patchew [http://patchew.org/].
-> Please send your feedback to patchew-devel@freelists.org
+> V3:
+>  - Remove ""s
+> V2:
+>  - Split hw patch into individual directories
+> 
+>  hw/dma/omap_dma.c | 26 ++++++++++++++------------
+>  hw/dma/soc_dma.c  | 36 ++++++++++++++++++------------------
+>  2 files changed, 32 insertions(+), 30 deletions(-)
+> 
+> diff --git a/hw/dma/omap_dma.c b/hw/dma/omap_dma.c
+> index abd18c67ea..5d7fe06d98 100644
+> --- a/hw/dma/omap_dma.c
+> +++ b/hw/dma/omap_dma.c
+> @@ -18,6 +18,7 @@
+>   * with this program; if not, see <http://www.gnu.org/licenses/>.
+>   */
+>  #include "qemu/osdep.h"
+> +#include "qemu/error-report.h"
+>  #include "qemu-common.h"
+>  #include "qemu/timer.h"
+>  #include "hw/arm/omap.h"
+> @@ -1898,13 +1899,13 @@ static void omap_dma4_write(void *opaque, hwaddr addr,
+>              omap_dma_reset(s->dma);
+>          s->ocp = value & 0x3321;
+>          if (((s->ocp >> 12) & 3) == 3)				/* MIDLEMODE */
+> -            fprintf(stderr, "%s: invalid DMA power mode\n", __func__);
+> +            error_report("%s: invalid DMA power mode", __func__);
+>          return;
+>  
+>      case 0x78:	/* DMA4_GCR */
+>          s->gcr = value & 0x00ff00ff;
+>  	if ((value & 0xff) == 0x00)		/* MAX_CHANNEL_FIFO_DEPTH */
+> -            fprintf(stderr, "%s: wrong FIFO depth in GCR\n", __func__);
+> +            error_report("%s: wrong FIFO depth in GCR", __func__);
+>          return;
+>  
+>      case 0x80 ... 0xfff:
+> @@ -1934,8 +1935,8 @@ static void omap_dma4_write(void *opaque, hwaddr addr,
+>          ch->buf_disable = (value >> 25) & 1;
+>          ch->src_sync = (value >> 24) & 1;	/* XXX For CamDMA must be 1 */
+>          if (ch->buf_disable && !ch->src_sync)
+> -            fprintf(stderr, "%s: Buffering disable is not allowed in "
+> -                            "destination synchronised mode\n", __func__);
+> +            error_report("%s: Buffering disable is not allowed in "
+> +                         "destination synchronised mode", __func__);
+>          ch->prefetch = (value >> 23) & 1;
+>          ch->bs = (value >> 18) & 1;
+>          ch->transparent_copy = (value >> 17) & 1;
+> @@ -1946,8 +1947,8 @@ static void omap_dma4_write(void *opaque, hwaddr addr,
+>          ch->priority = (value & 0x0040) >> 6;
+>          ch->fs = (value & 0x0020) >> 5;
+>          if (ch->fs && ch->bs && ch->mode[0] && ch->mode[1])
+> -            fprintf(stderr, "%s: For a packet transfer at least one port "
+> -                            "must be constant-addressed\n", __func__);
+> +            error_report("%s: For a packet transfer at least one port "
+> +                         "must be constant-addressed", __func__);
+>          ch->sync = (value & 0x001f) | ((value >> 14) & 0x0060);
+>          /* XXX must be 0x01 for CamDMA */
+>  
+> @@ -1977,8 +1978,8 @@ static void omap_dma4_write(void *opaque, hwaddr addr,
+>          ch->endian[1] =(value >> 19) & 1;
+>          ch->endian_lock[1] =(value >> 18) & 1;
+>          if (ch->endian[0] != ch->endian[1])
+> -            fprintf(stderr, "%s: DMA endianness conversion enable attempt\n",
+> -                            __func__);
+> +            error_report("%s: DMA endianness conversion enable attempt",
+> +                          __func__);
+>          ch->write_mode = (value >> 16) & 3;
+>          ch->burst[1] = (value & 0xc000) >> 14;
+>          ch->pack[1] = (value & 0x2000) >> 13;
+> @@ -1986,12 +1987,13 @@ static void omap_dma4_write(void *opaque, hwaddr addr,
+>          ch->burst[0] = (value & 0x0180) >> 7;
+>          ch->pack[0] = (value & 0x0040) >> 6;
+>          ch->translate[0] = (value & 0x003c) >> 2;
+> -        if (ch->translate[0] | ch->translate[1])
+> -            fprintf(stderr, "%s: bad MReqAddressTranslate sideband signal\n",
+> -                            __func__);
+> +        if (ch->translate[0] | ch->translate[1]) {
 
-But I'm not sure if there is an easy way to tell patchew to include a
-fixup patch and re-test the series, short of sending a v3.
+This looks like bad coding of if (a || b) ...
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+> +            error_report("%s: bad MReqAddressTranslate sideband signal",
+> +                         __func__);
+> +        }
+>          ch->data_type = 1 << (value & 3);
+>          if ((value & 3) == 3) {
+> -            printf("%s: bad data_type for DMA channel\n", __func__);
+> +            error_report("%s: bad data_type for DMA channel", __func__);
+>              ch->data_type >>= 1;
+>          }
+>          break;
+> diff --git a/hw/dma/soc_dma.c b/hw/dma/soc_dma.c
+> index 9bb499bf9c..45516241c6 100644
+> --- a/hw/dma/soc_dma.c
+> +++ b/hw/dma/soc_dma.c
+> @@ -18,6 +18,7 @@
+>   * with this program; if not, see <http://www.gnu.org/licenses/>.
+>   */
+>  #include "qemu/osdep.h"
+> +#include "qemu/error-report.h"
+>  #include "qemu-common.h"
+>  #include "qemu/timer.h"
+>  #include "hw/arm/soc_dma.h"
+> @@ -270,11 +271,11 @@ void soc_dma_port_add_fifo(struct soc_dma_s *soc, hwaddr virt_base,
+>          if (entry->type == soc_dma_port_mem) {
+>              if (entry->addr <= virt_base &&
+>                              entry->addr + entry->u.mem.size > virt_base) {
+> -                fprintf(stderr, "%s: FIFO at %"PRIx64
+> -                                " collides with RAM region at %"PRIx64
+> -                                "-%"PRIx64 "\n", __func__,
+> -                                virt_base, entry->addr,
+> -                                (entry->addr + entry->u.mem.size));
+> +                error_report("%s: FIFO at %"PRIx64
+> +                             " collides with RAM region at %"PRIx64
+> +                             "-%"PRIx64, __func__,
+> +                             virt_base, entry->addr,
+> +                             (entry->addr + entry->u.mem.size));
 
+I wonder why use () here, anyway:
 
---fXnlkqpQOffOmL31A8D8WVGLWJFQTHQlC
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloDjb4ACgkQp6FrSiUn
-Q2orAAf+NNthZL+ATyd+hTEzv2vENDLMw/Ud4xFzd7Zt2eSGNA0PLr+kPyGbck47
-JhNHryOLjUTKPGWIPsaCQmp0aDYXusBVqm47QwUtry77kDtcj8iNTIQKu4GrXf1r
-R/yG6gUgPMh0W8UgumQM1yK1RPCakUdqgP5gagrJ4nrRH72yyo+m0t2Hka4cwywu
-9aKNw06wdCyGJZPdEgBXpx8/H1b/RApiO/9+P3wCEwfm7IlIFlzQ02doNcPRYp+E
-/ISxbKBgag5PNHQxjlY732hH7fgmTFg6aLg6FoAc2kfLfI33Wk1xbkWUxNiNLrYs
-xFQRXxiKzauwk3t6OVgRkW+tvNUGdg==
-=+RD2
------END PGP SIGNATURE-----
-
---fXnlkqpQOffOmL31A8D8WVGLWJFQTHQlC--
+>                  exit(-1);
+>              }
+>  
+> @@ -284,9 +285,9 @@ void soc_dma_port_add_fifo(struct soc_dma_s *soc, hwaddr virt_base,
+>              while (entry < dma->memmap + dma->memmap_size &&
+>                              entry->addr <= virt_base) {
+>                  if (entry->addr == virt_base && entry->u.fifo.out == out) {
+> -                    fprintf(stderr, "%s: FIFO at %"PRIx64
+> -                                    " collides FIFO at %"PRIx64 "\n",
+> -                                    __func__, virt_base, entry->addr);
+> +                    error_report("%s: FIFO at %"PRIx64
+> +                                 " collides FIFO at %"PRIx64,
+> +                                 __func__, virt_base, entry->addr);
+>                      exit(-1);
+>                  }
+>  
+> @@ -321,11 +322,11 @@ void soc_dma_port_add_mem(struct soc_dma_s *soc, uint8_t *phys_base,
+>              if ((entry->addr >= virt_base && entry->addr < virt_base + size) ||
+>                              (entry->addr <= virt_base &&
+>                               entry->addr + entry->u.mem.size > virt_base)) {
+> -                fprintf(stderr, "%s: RAM at %"PRIx64 "-%"PRIx64
+> -                                " collides with RAM region at %"PRIx64
+> -                                "-%"PRIx64 "\n", __func__,
+> -                                virt_base, virt_base + size,
+> -                                entry->addr, entry->addr + entry->u.mem.size);
+> +                error_report("%s: RAM at %"PRIx64 "-%"PRIx64
+> +                             " collides with RAM region at %"PRIx64
+> +                             "-%"PRIx64, __func__,
+> +                             virt_base, virt_base + size,
+> +                             entry->addr, entry->addr + entry->u.mem.size);
+>                  exit(-1);
+>              }
+>  
+> @@ -334,11 +335,10 @@ void soc_dma_port_add_mem(struct soc_dma_s *soc, uint8_t *phys_base,
+>          } else {
+>              if (entry->addr >= virt_base &&
+>                              entry->addr < virt_base + size) {
+> -                fprintf(stderr, "%s: RAM at %"PRIx64 "-%"PRIx64
+> -                                " collides with FIFO at %"PRIx64
+> -                                "\n", __func__,
+> -                                virt_base, virt_base + size,
+> -                                entry->addr);
+> +                error_report("%s: RAM at %"PRIx64 "-%"PRIx64
+> +                             " collides with FIFO at %"PRIx64,
+> +                             __func__, virt_base, virt_base + size,
+> +                             entry->addr);
+>                  exit(-1);
+>              }
+>  
+> 
