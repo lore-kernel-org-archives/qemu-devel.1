@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57539)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37305)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eCE0M-0001ZN-3m
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 19:14:07 -0500
+	(envelope-from <chen_han_xiao@126.com>) id 1eCEmZ-0006Ww-Jc
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 20:03:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eCE0L-0005fl-5Z
-	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 19:14:06 -0500
-References: <cover.1510093478.git.jcody@redhat.com>
-	<facec289ff8a7ea66e420585ac87baf65b3f4cd5.1510093478.git.jcody@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <494bb3c2-03c9-20b1-6214-be004ad846e6@redhat.com>
-Date: Tue, 7 Nov 2017 18:13:57 -0600
+	(envelope-from <chen_han_xiao@126.com>) id 1eCEmW-0000oJ-Gb
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 20:03:55 -0500
+Received: from m15-8.126.com ([220.181.15.8]:7615)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <chen_han_xiao@126.com>) id 1eCEmV-0000lb-LM
+	for qemu-devel@nongnu.org; Tue, 07 Nov 2017 20:03:52 -0500
+Date: Wed, 8 Nov 2017 08:33:03 +0800 (CST)
+From: "Chen Hanxiao" <chen_han_xiao@126.com>
+In-Reply-To: <151008380060.31225.11831036511036878637@sif>
+References: <20171107113716.14244-1-chen_han_xiao@126.com>
+	<151007441527.31225.4851895159440081867@sif>
+	<151008380060.31225.11831036511036878637@sif>
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=GBK
 MIME-Version: 1.0
-In-Reply-To: <facec289ff8a7ea66e420585ac87baf65b3f4cd5.1510093478.git.jcody@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="ibMdeltUOMMn0AKxsbTtXFmxEtsWiBRC6"
-Subject: Re: [Qemu-devel] [PATCH v3 6/7] block/curl: fix minor memory leaks
+Message-ID: <39c3b2d6.db2.15f990b6c6d.Coremail.chen_han_xiao@126.com>
+Subject: Re: [Qemu-devel] [Resend][PATCH] qapi-docs: fix a comment typo
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,81 +28,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, rjones@redhat.com, kwolf@redhat.com
+To: Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: armbru@redhat.com, qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---ibMdeltUOMMn0AKxsbTtXFmxEtsWiBRC6
-From: Eric Blake <eblake@redhat.com>
-To: Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp,
- namei.unix@gmail.com, rjones@redhat.com, kwolf@redhat.com
-Message-ID: <494bb3c2-03c9-20b1-6214-be004ad846e6@redhat.com>
-Subject: Re: [PATCH v3 6/7] block/curl: fix minor memory leaks
-References: <cover.1510093478.git.jcody@redhat.com>
- <facec289ff8a7ea66e420585ac87baf65b3f4cd5.1510093478.git.jcody@redhat.com>
-In-Reply-To: <facec289ff8a7ea66e420585ac87baf65b3f4cd5.1510093478.git.jcody@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 11/07/2017 04:27 PM, Jeff Cody wrote:
-> Signed-off-by: Jeff Cody <jcody@redhat.com>
-> ---
->  block/curl.c | 6 ++++++
->  1 file changed, 6 insertions(+)
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
->=20
-> diff --git a/block/curl.c b/block/curl.c
-> index 00a9879..35cf417 100644
-> --- a/block/curl.c
-> +++ b/block/curl.c
-> @@ -857,6 +857,9 @@ out_noclean:
->      qemu_mutex_destroy(&s->mutex);
->      g_free(s->cookie);
->      g_free(s->url);
-> +    g_free(s->username);
-> +    g_free(s->proxyusername);
-> +    g_free(s->proxypassword);
->      qemu_opts_del(opts);
->      return -EINVAL;
->  }
-> @@ -955,6 +958,9 @@ static void curl_close(BlockDriverState *bs)
-> =20
->      g_free(s->cookie);
->      g_free(s->url);
-> +    g_free(s->username);
-> +    g_free(s->proxyusername);
-> +    g_free(s->proxypassword);
->  }
-> =20
->  static int64_t curl_getlength(BlockDriverState *bs)
->=20
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---ibMdeltUOMMn0AKxsbTtXFmxEtsWiBRC6
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloCTEUACgkQp6FrSiUn
-Q2qNHQf+P4WR7tV3kzbABbO7HkxLMxfxI+ev3bjTIKrY0UxMQxVZYT4DzaBEilc8
-+HS6kn8OJsMWhGCumiVZQrhf1icYuJKxQqZOf29OD7XrWM9y7DaNWas2MYsb5Brk
-D0wHCWZWdzyUBAbm6jFlw1o6zA2wuilNnjcmOKWzqqlfDdjjKf95UCRBbOlMdw2d
-8nNVyOIb6qTzpz8YTDhVkx758+vSRnQspEcsLpy8S39k6Ru9BbyxsLRixOqEcr5t
-uy7taRenHZR3qs0QWdZeTehKmFz17TKGjp97mG/ekT7yDRSawf3OkT5T9N8U/W/D
-JITBQzyCf79VTtsepvaYgK/a4vv8IA==
-=Ks60
------END PGP SIGNATURE-----
-
---ibMdeltUOMMn0AKxsbTtXFmxEtsWiBRC6--
+CtTaIDIwMTctMTEtMDggMDM6NDM6MjCjrCJNaWNoYWVsIFJvdGgiIDxtZHJvdGhAbGludXgudm5l
+dC5pYm0uY29tPiDQtLXAo7oKPlF1b3RpbmcgTWljaGFlbCBSb3RoICgyMDE3LTExLTA3IDExOjA2
+OjU1KQo+PiBRdW90aW5nIENoZW4gSGFueGlhbyAoMjAxNy0xMS0wNyAwNTozNzoxNikKPj4gPiBG
+cm9tOiBDaGVuIEhhbnhpYW8gPGNoZW5oYW54aWFvQGdtYWlsLmNvbT4KPj4gPiAKPj4gPiAgIHMv
+U3ViZWN0aW9uL1N1YnNlY3Rpb24KPj4gPiAKPj4gPiBSZXZpZXdlZC1ieTogTWFyYy1BbmRyqKYg
+THVyZWF1IDxtYXJjYW5kcmUubHVyZWF1QHJlZGhhdC5jb20+Cj4+ID4gU2lnbmVkLW9mZi1ieTog
+Q2hlbiBIYW54aWFvIDxjaGVuaGFueGlhb0BnbWFpbC5jb20+Cj4+IAo+PiBUaGFua3MsIGFwcGxp
+ZWQgdG8gcWdhIHRyZWU6Cj4+ICAgaHR0cHM6Ly9naXRodWIuY29tL21kcm90aC9xZW11L2NvbW1p
+dHMvcWdhCj4KPkFjdHVhbGx5IGxvb2tzIGxpa2UgTWFya3VzIHBpY2tlZCB0aGlzIHVwIHllc3Rl
+cmRheSwgYW5kIEkgcGx1Y2tlZCBpdAo+aW50byB0aGUgd3JvbmcgdHJlZSBhbnl3YXkgPVwKPgoK
+T29wcywgSSBtaXNzZWQgdGhlIG1haWwgZnJvbSBNYXJrdXMuClNvcnJ5IGZvciB0aGUgbm9pc2Uu
+CgpSZWdhcmRzLAotIENoZW4K
