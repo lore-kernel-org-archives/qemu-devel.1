@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41230)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41518)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eCkp7-0005Kz-4J
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 06:16:42 -0500
+	(envelope-from <stefanha@gmail.com>) id 1eCkqB-0005wS-Jt
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 06:17:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eCkp6-0008C4-2E
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 06:16:41 -0500
-Date: Thu, 9 Nov 2017 11:16:32 +0000
+	(envelope-from <stefanha@gmail.com>) id 1eCkqA-00008B-DE
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 06:17:47 -0500
+Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:47625)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1eCkqA-00007z-67
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 06:17:46 -0500
+Received: by mail-wm0-x233.google.com with SMTP id b14so1047932wme.2
+	for <qemu-devel@nongnu.org>; Thu, 09 Nov 2017 03:17:46 -0800 (PST)
+Date: Thu, 9 Nov 2017 11:17:43 +0000
 From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20171109111632.GB17101@stefanha-x1.localdomain>
-References: <cover.1510059970.git.jcody@redhat.com>
+Message-ID: <20171109111743.GC17101@stefanha-x1.localdomain>
+References: <20171107104653.8913-1-paul.durrant@citrix.com>
+	<20171108174227.GC8403@stefanha-x1.localdomain>
+	<fd24582135514408b2e25d2606a77e31@AMSPEX02CL03.citrite.net>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="gj572EiMnwbLXET9"
+	protocol="application/pgp-signature"; boundary="4jXrM3lyYWu4nBt5"
 Content-Disposition: inline
-In-Reply-To: <cover.1510059970.git.jcody@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v4 0/4] Don't write headers if
- BDS is INACTIVE
+In-Reply-To: <fd24582135514408b2e25d2606a77e31@AMSPEX02CL03.citrite.net>
+Subject: Re: [Qemu-devel] [PATCH v3] xen-disk: use an IOThread per instance
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,100 +31,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jeff Cody <jcody@redhat.com>
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, aik@ozlabs.ru, qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com, den@openvz.org
+To: Paul Durrant <Paul.Durrant@citrix.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, Anthony Perard <anthony.perard@citrix.com>, Kevin Wolf <kwolf@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Max Reitz <mreitz@redhat.com>
 
 
---gj572EiMnwbLXET9
+--4jXrM3lyYWu4nBt5
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Nov 07, 2017 at 08:10:32AM -0500, Jeff Cody wrote:
-> Changes from v3->v4:
+On Thu, Nov 09, 2017 at 09:30:45AM +0000, Paul Durrant wrote:
+> > -----Original Message-----
+> > From: Stefan Hajnoczi [mailto:stefanha@gmail.com]
+> > Sent: 08 November 2017 17:42
+> > To: Paul Durrant <Paul.Durrant@citrix.com>
+> > Cc: qemu-devel@nongnu.org; xen-devel@lists.xenproject.org; Anthony
+> > Perard <anthony.perard@citrix.com>; Kevin Wolf <kwolf@redhat.com>;
+> > Stefano Stabellini <sstabellini@kernel.org>; Max Reitz <mreitz@redhat.c=
+om>
+> > Subject: Re: [Qemu-devel] [PATCH v3] xen-disk: use an IOThread per
+> > instance
+> >=20
+> > On Tue, Nov 07, 2017 at 05:46:53AM -0500, Paul Durrant wrote:
+> > > This patch allocates an IOThread object for each xen_disk instance and
+> > > sets the AIO context appropriately on connect. This allows processing
+> > > of I/O to proceed in parallel.
+> > >
+> > > The patch also adds tracepoints into xen_disk to make it possible to
+> > > follow the state transtions of an instance in the log.
+> >=20
+> > virtio-blk and virtio-scsi allow the user to specify an IOThread object.
+> > This allows users to configure the device<->IOThread mapping any way
+> > they like (e.g. 1:1, M:N).  Are you sure you want to hard-code the
+> > IOThread mapping?
 >=20
-> Patch 3: Add migrate_del_blocker and error_free (Thanks Stefan)
+> Stefan,
 >=20
->=20
-> git-backport-diff -r qemu/master.. -u ba11b69
->=20
-> 001/4:[----] [--] 'block/vhdx.c: Don't blindly update the header'
-> 002/4:[----] [--] 'block/parallels: Do not update header or truncate imag=
-e when INMIGRATE'
-> 003/4:[0003] [FC] 'block/parallels: add migration blocker'
-> 004/4:[----] [--] 'qemu-iotests: update unsupported image formats in 194'
->=20
->=20
-> Changes from v2->v3:
->=20
-> Patch 2: Uh... fix that misspelling.  Thanks Stefan :)
-> Patch 3: New patch to block migration in parallels
->=20
-> git-backport-diff -r qemu/master.. -u 6dc6acb
->=20
-> 001/4:[----] [--] 'block/vhdx.c: Don't blindly update the header'
-> 002/4:[----] [--] 'block/parallels: Do not update header or truncate imag=
-e when INMIGRATE'
-> 003/4:[down] 'block/parallels: add migration blocker'
-> 004/4:[----] [--] 'qemu-iotests: update unsupported image formats in 194'
->=20
->=20
-> Changes from v1->v2:
->=20
-> * Drop previous parallels patches, just check BDRV_O_INACTIVE now
->   (Kevin)
->=20
-> git-backport-diff -r qemu/master.. -u github/master
-> Key:
-> [----] : patches are identical
-> [####] : number of functional differences between upstream/downstream pat=
-ch
-> [down] : patch is downstream-only
-> The flags [FC] indicate (F)unctional and (C)ontextual differences, respec=
-tively
->=20
-> 001/3:[----] [--] 'block/vhdx.c: Don't blindly update the header'
-> 002/3:[down] 'block/parallals: Do not update header or truncate image whe=
-n INMIGRATE'
-> 003/3:[----] [--] 'qemu-iotests: update unsupported image formats in 194'
->=20
->=20
-> v1:
->=20
-> VHDX and Parallels both blindly write headers to the image file
-> if the images are opened R/W.  This causes an assert if the QEMU run
-> state is INMIGRATE.
->=20
-> Jeff Cody (4):
->   block/vhdx.c: Don't blindly update the header
->   block/parallels: Do not update header or truncate image when INMIGRATE
->   block/parallels: add migration blocker
->   qemu-iotests: update unsupported image formats in 194
->=20
->  block/parallels.c      | 22 +++++++++++++++++-----
->  block/vhdx.c           |  7 -------
->  tests/qemu-iotests/194 |  2 +-
->  3 files changed, 18 insertions(+), 13 deletions(-)
->=20
-> --=20
-> 2.9.5
->=20
->=20
+>   Realistically it's the only option at the moment. Xen PV backends are n=
+ot configured bu QAPI... so no ability to control them from the command lin=
+e or QMP. This is something I seriously intend to address in the near futur=
+e but, for now, I simply want to unlock the performance boost that IOThread=
+ can provide.
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Okay.
 
---gj572EiMnwbLXET9
+Stefan
+
+--4jXrM3lyYWu4nBt5
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJaBDkQAAoJEJykq7OBq3PIpLIIAI6ui9Qx8aYPEBjTIQcOpGrW
-K/6oiWNofFb3tqAVJEvTVZGDS4NTE+wbaZkpR8mbkBiTaJhF9M96Nqybl4fiNcDr
-fRYm4itcVy+eyjDRhq5hJiYxnh/0iihTsmV6uaOs3I9eFQ/6i5ow3IIKDFZ4OfV1
-f0jA655WKeF9pUIOVQlxqlEcWpSa5vaYJe8us+bSs2islZz4iAKemFTpGW9BTMfM
-EhMTeoPE/bE3RIIJxg/D0UjBAkf0aOnoLbZsEzGUje37vngykuQnosqZyNLEhpkK
-qgEtzp+JCmsAy1xm0+pqOHwU44ZbhZaj6rj2APV/gnI1GnCsRs6WpMnMTgMZ9NE=
-=Shdv
+iQEcBAEBAgAGBQJaBDlXAAoJEJykq7OBq3PIMcYIAKPnCNf/KBZJxmJd7SDAL8IA
+1kiwr+bTeX9t0jVRFN4XN+EKDRWZOKdgyoeWiBv4S+NZnbNmv4APMf4W7/9YyBPD
+p22w4mi/mj/j6gEk3ej2iHd+YAfCIS0kKh0PEqZqGMZHbx2VklVx+cBmCzzOoPXT
+v/9o7vCINjoXQz8aQcj6Ce0y6qofOmUIccwte1quymw6X9HXLPrgBsOq3BLc72bX
+l1eHKxXaRQBomT/Ot4iL/Kf1tHrIGRioSufckuK0pYojDYhBG9UnHLpAlDwIR5df
+qulehS/Cg16YS75V79PSiAqf8UhBbRbQHdttrW7Oz1vNtkuWLVW1ZbPLIblHRhc=
+=E1g5
 -----END PGP SIGNATURE-----
 
---gj572EiMnwbLXET9--
+--4jXrM3lyYWu4nBt5--
