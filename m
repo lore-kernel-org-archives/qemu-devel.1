@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50848)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51323)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eCncW-0003yF-4I
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 09:15:52 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eCndN-0004Sf-TM
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 09:16:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eCncQ-0007nC-7P
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 09:15:52 -0500
-References: <20171109013804.14488-1-mreitz@redhat.com>
-	<20171109013804.14488-6-mreitz@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <099b72f4-fbc6-b7e4-5196-b4154aea9adb@redhat.com>
-Date: Thu, 9 Nov 2017 08:15:32 -0600
-MIME-Version: 1.0
-In-Reply-To: <20171109013804.14488-6-mreitz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="X3trWHvBOKoNQ2PGafi2tgmp6QehEt59r"
-Subject: Re: [Qemu-devel] [PATCH 5/5] iotests: Make 136 less flaky
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eCndN-0008QC-1i
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 09:16:45 -0500
+Received: from mailhub.sw.ru ([195.214.232.25]:18818 helo=relay.sw.ru)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1eCndM-0008PY-MY
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 09:16:44 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Thu,  9 Nov 2017 17:16:31 +0300
+Message-Id: <20171109141631.25688-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH] blockdev-backup: enable non-root nodes for
+ backup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,70 +23,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, kwolf@redhat.com, armbru@redhat.com, den@openvz.org, vsementsov@virtuozzo.com, eblake@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---X3trWHvBOKoNQ2PGafi2tgmp6QehEt59r
-From: Eric Blake <eblake@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
- Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <099b72f4-fbc6-b7e4-5196-b4154aea9adb@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 5/5] iotests: Make 136 less flaky
-References: <20171109013804.14488-1-mreitz@redhat.com>
- <20171109013804.14488-6-mreitz@redhat.com>
-In-Reply-To: <20171109013804.14488-6-mreitz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+This is needed to implement image-fleecing scheme, when we create
+a temporary node, mark our active node to be backing for the temp,
+and start backup(sync=none) from active node to the temp node.
+Temp node then represents a kind of snapshot and may be used
+for external backup through NBD.
 
-On 11/08/2017 07:38 PM, Max Reitz wrote:
-> 136 executes some AIO requests without a final aio_flush; then it
-> advances the virtual clock and thus expects the last access time of the=
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
 
-> device to be less than the current time when queried (i.e. idle_time_ns=
+What was the reason to abandon non-root nodes?
 
-> to be greater than 0).  However, without the aio_flush, some requests
-> may be settled after the clock_step invocation.  In that case,
-> idle_time_ns would be 0 and the test fails.
->=20
-> Fix this by adding an aio_flush if any AIO request but some other
+ blockdev.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-s/but/other than/
-
-> aio_flush has been executed.
->=20
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
->  tests/qemu-iotests/136 | 14 +++++++++++++-
->  1 file changed, 13 insertions(+), 1 deletion(-)
->=20
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---X3trWHvBOKoNQ2PGafi2tgmp6QehEt59r
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloEYwQACgkQp6FrSiUn
-Q2pS4gf/Z7Q8j2IeVWf4ZINDX+MajRpTGi5kdGTINT67naVmybB6zz0CXbBaJWjH
-jB4RjkQJKspcgafO+FdIUIhpcexEnbwDYz8pBOEbGnhV079sFrGmS3x+NnDW7gbJ
-Bsnpl+C6n3S/dGm1HNAEkGVYHGvldtiDWbGhRYkC/nab8zs/Duzpm4UDQcMNJgLd
-cPHL8xYq5tGGLQXMkT3CR0NF8LF9qwH7NclLEOr9lFJprPZTShxEMxPxJA8xTIy9
-sEV69FOIdRT4CX4JduUON9tq1PN8SBCLKcVLm8mAUroC8ldmzlfxj85woTnvHcaL
-OncOLQQzZJEyTdc5Xe7GeUGbRP+9Pg==
-=XhGM
------END PGP SIGNATURE-----
-
---X3trWHvBOKoNQ2PGafi2tgmp6QehEt59r--
+diff --git a/blockdev.c b/blockdev.c
+index 56a6b24a0b..d0a5a107f0 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -3345,7 +3345,7 @@ BlockJob *do_blockdev_backup(BlockdevBackup *backup, BlockJobTxn *txn,
+         backup->compress = false;
+     }
+ 
+-    bs = qmp_get_root_bs(backup->device, errp);
++    bs = bdrv_lookup_bs(backup->device, backup->device, errp);
+     if (!bs) {
+         return NULL;
+     }
+-- 
+2.11.1
