@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45753)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46129)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eCnGd-0002U3-CI
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 08:53:16 -0500
+	(envelope-from <armbru@redhat.com>) id 1eCnI7-00039i-VV
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 08:54:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eCnGa-00067s-9O
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 08:53:15 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44790)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eCnGa-00067h-0P
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 08:53:12 -0500
-Date: Thu, 9 Nov 2017 13:53:06 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20171109135306.GF18164@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <1509072544-89012-1-git-send-email-eswierk@skyportsystems.com>
-	<1510202357-124052-1-git-send-email-eswierk@skyportsystems.com>
+	(envelope-from <armbru@redhat.com>) id 1eCnI6-0006Yy-QR
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 08:54:48 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20171102120223.GI32533@redhat.com>
+	<50b7935f-c02f-7d7d-4e8e-fc8967e85d2e@redhat.com>
+Date: Thu, 09 Nov 2017 14:54:35 +0100
+In-Reply-To: <50b7935f-c02f-7d7d-4e8e-fc8967e85d2e@redhat.com> (Max Reitz's
+	message of "Thu, 2 Nov 2017 22:38:16 +0100")
+Message-ID: <87h8u3ftgk.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1510202357-124052-1-git-send-email-eswierk@skyportsystems.com>
-Subject: Re: [Qemu-devel] [PATCH v2 0/2] e1000e: Reimplement e1000 as a
- variant of e1000e
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [Qemu-block] RFC: use case for adding QMP,
+ block jobs & multiple exports to qemu-nbd ?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,76 +24,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ed Swierk <eswierk@skyportsystems.com>
-Cc: Jason Wang <jasowang@redhat.com>, Dmitry Fleytman <dmitry@daynix.com>, Leonid Bloch <leonid.bloch@ravellosystems.com>, Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org
+To: Max Reitz <mreitz@redhat.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-FWIW, it is generally recommended that new versions of patch series be
-posted as a new top level thread, not in-reply-to the previous version.
-That way the new posting gets attention near top of a dev's email inbox,
-as opposed to hidden away as a reply to a weeks old msg at the back of
-the inbox.
+Max Reitz <mreitz@redhat.com> writes:
 
-On Wed, Nov 08, 2017 at 08:39:15PM -0800, Ed Swierk via Qemu-devel wrote:
-> From a hardware functionality and register perspective, the Intel
-> 8254x Gigabit Ethernet Controller[1] is roughly a subset of the Intel
-> 82574[2], making it practical to implement e1000 device emulation as
-> an extension of e1000e.
-> 
-> That would be a step towards eliminating the existing e1000
-> implementation--a bunch of semi-redundant code with its own bugs (like
-> the faulty tx checksum offload I reported recently[3]).
-> 
-> [1] https://www.intel.com/content/dam/doc/manual/pci-pci-x-family-gbe-controllers-software-dev-manual.pdf
-> [2] https://www.intel.com/content/dam/doc/datasheet/82574l-gbe-controller-datasheet.pdf
-> [3] https://lists.nongnu.org/archive/html/qemu-devel/2017-10/msg03008.html
-> 
-> This patch series adds a new e1000-ng device but leaves the existing
-> e1000 device alone. Linux 4.1 and Windows 10 e1000 guest drivers
-> recognize the e1000-ng device and successfully pass traffic on a Linux
-> host.
-> 
-> Preliminary performance measurements are encouraging: with e1000-ng,
-> single-threaded TCP iperf shows about a 2x speedup in tx and rx
-> throughput vs e1000, and CPU usage is slighly lower.
+> On 2017-11-02 13:02, Daniel P. Berrange wrote:
+> [...]
+>> One alternative approach to doing this would be to suggest that we should
+>> instead just spawn qemu-system-x86_64 with '--machine none' and use that
+>> as a replacement for qemu-nbd, since it already has a built-in NBD server
+>> which can do many exports at once and arbitrary block jobs.
+>
+> As far as I know, we had wanted to add QMP support to qemu-nbd maybe one
+> or two years ago, but nobody ever did it.
+>
+> I've had some discussions about this with Markus and Kevin at KVM Forum.
+>  They appeared to strongly prefer this approach.  I agree with them that
+> design-wise, a qemu with no machine at all (and not even -M none) and
+> early QMP is the way we want to go anyway, and then this would be the
+> correct tool to use.
 
-That is certainly attractive.
+"Strongly" is perhaps a bit strong, at least as far as I'm concerned.  I
+just believe that we want the capability to run QEMU without a machine
+anyway, and if that's good enough, then why bother duplicating so much
+of qemu-system-FOO in qemu-nbd & friends?  Besides, once you start to
+duplicate, you'll likely find it hard to stop.
 
-> A ton of work is needed before e1000-ng will be ready to supplant
-> e1000: testing with every random guest OS, fixing bugs, figuring out
-> migration and other missing functionality. There's no way I can do
-> this myself.
-> 
-> I'd like to propose a more modest and achievable short-term goal: find
-> and fix any regressions that might affect users of e1000e and e1000,
-> so that the patches can be applied and folks can easily start trying
-> out e1000-ng with their favorite guest OS. That means accepting (for
-> now) known deficiencies in the new e1000-ng devices, which can be
-> addressed by myself and (hopefully) others in follow-up patches. Does
-> that sound reasonable?
+>> I'm concerned that this could end up being a be a game of whack-a-mole
+>> though, constantly trying to cut out/down all the bits of system emulation
+>> in the machine emulators to get its resource overhead to match the low
+>> overhead of standalone qemu-nbd.
+>
+> However, I personally share your concern.  Especially, I think that
+> getting to a point where we can have no machine at all and early QMP
+> will take much longer than just adding QMP to qemu-nbd -- or adding a
+> qmp command to qemu-img (because you can add NBD exports through QMP, so
+> qemu-nbd's hardcoded focus on NBD exports seems kind of weird then)[1].
+>
+> I'm very much torn here.  There are two approaches: Stripping fat qemu
+> down, or fattening lean qemu-img (?) up.  The latter is very simple.
 
-My fear is that this approach of building a new e1000-ng device in
-parallel with having the existing e1000 device is going to cause
-long term pain, possibly never getting to a state where the e1000-ng
-device can replace the e1000 device. Any time there needs to be a
-"big bang" to switch from one impl to another completely different
-impl always causes trouble IME. With need for migration wire format
-& state compatibility, this is even more difficult. From a code review
-POV it will be essentially impossible to have confidence that the new
-impl can be a viable drop-in replacement for the old impl.
+"Very simple" is perhaps debatable, but I think we can agree on
+"temptingly simple".
 
-Is there really no way that you can change the approach to do a more
-incremental conversion of the existing code base, but still end up in
-the same place at the very end ?
+> The former is what we want anyway.
 
-eg just copy all the e1000.c code into the e1000e.c file to start with.
-Then gradually merge functional areas over a longish series of patches
-to eliminate the duplication. This would make it far more practical to
-identify where any regressions come from, and will give reviewers more
-confidence that we're not breaking migration compat.
+Yes.
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+> Markus says it's not too hard to strip down qemu.  If that is true,
+
+To find out, we need to experimentally remodel main() with an axe.
+Volunteers?
+
+> there is no point in fattening qemu-img now.  I personally am not
+> convinced at all, but he knows the state of that project much better
+> than me, so I cannot reasonably disagree.
+>
+> So my mail is more of a CC to Markus and Kevin -- but I think both are
+> on PTO right now.
+
+Back, nursing my conference cold.
+
+> I guess the main question is: If someone were to introduce a qemu-img
+> QMP subcommand -- would it be accepted? :-)
+>
+> Max
+>
+>
+> [1] Also, adding QMP should trivially add block jobs and multiple
+> exports to whatever tool we are talking about (in fact, qemu-img already
+> does perform the mirror block job for committing).
