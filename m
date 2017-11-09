@@ -1,33 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46601)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54859)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eCa0f-0007Uo-RK
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 18:43:54 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eCb1r-0006nS-59
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 19:49:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eCa0b-0004b9-U3
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 18:43:53 -0500
-Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:45721)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eCa0b-0004ay-Oq
-	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 18:43:49 -0500
-Received: by mail-qt0-x244.google.com with SMTP id q33so1153974qta.2
-	for <qemu-devel@nongnu.org>; Wed, 08 Nov 2017 15:43:49 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <cover.1510181732.git.alistair.francis@xilinx.com>
-	<10f1bca388976b18119fd4fc28d6fdcf7106f7d3.1510181732.git.alistair.francis@xilinx.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <20c00ee8-6d77-e8bd-aa77-6db5db789900@amsat.org>
-Date: Wed, 8 Nov 2017 20:43:45 -0300
+	(envelope-from <mreitz@redhat.com>) id 1eCb1q-0001Gy-FP
+	for qemu-devel@nongnu.org; Wed, 08 Nov 2017 19:49:11 -0500
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <92c47a3f-92a6-4f3a-505f-dc278604a671@redhat.com>
+Date: Thu, 9 Nov 2017 01:48:58 +0100
 MIME-Version: 1.0
-In-Reply-To: <10f1bca388976b18119fd4fc28d6fdcf7106f7d3.1510181732.git.alistair.francis@xilinx.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 40/45] hw/watchdog: Replace
- fprintf(stderr, "*\n" with error_report()
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="Hfah0C5rUATvtU1etGVMnHmb1XSHNB6uv"
+Subject: [Qemu-devel] Intermittent hang of iotest 194 (bdrv_drain_all after
+ non-shared storage migration)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,140 +22,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org, "Richard W.M. Jones" <rjones@redhat.com>
-Cc: alistair23@gmail.com, armbru@redhat.com
+To: Qemu-block <qemu-block@nongnu.org>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On 11/08/2017 07:58 PM, Alistair Francis wrote:
-> Replace a large number of the fprintf(stderr, "*\n" calls with
-> error_report(). The functions were renamed with these commands and then
-> compiler issues where manually fixed.
-> 
-> find ./* -type f -exec sed -i \
->     'N;N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> 
-> Some lines were then manually tweaked to pass checkpatch.
-> 
-> Some lines in wdt_i6300esb.c were manuallly changed to qemu_log_mask().
-> 
-> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-> ---
-> V3:
->  - Use qemu_log_mask(LOG_UNIMP,... in wdt_i6300esb.c
-> V2:
->  - Split hw patch into individual directories
-> 
->  hw/watchdog/watchdog.c     | 11 +++++------
->  hw/watchdog/wdt_i6300esb.c | 10 +++++++---
->  2 files changed, 12 insertions(+), 9 deletions(-)
-> 
-> diff --git a/hw/watchdog/watchdog.c b/hw/watchdog/watchdog.c
-> index 670114ecfe..9594457082 100644
-> --- a/hw/watchdog/watchdog.c
-> +++ b/hw/watchdog/watchdog.c
-> @@ -20,6 +20,7 @@
->   */
->  
->  #include "qemu/osdep.h"
-> +#include "qemu/error-report.h"
->  #include "qemu/option.h"
->  #include "qemu/config-file.h"
->  #include "qemu/queue.h"
-> @@ -52,8 +53,7 @@ int select_watchdog(const char *p)
->      /* -watchdog ? lists available devices and exits cleanly. */
->      if (is_help_option(p)) {
->          QLIST_FOREACH(model, &watchdog_list, entry) {
-> -            fprintf(stderr, "\t%s\t%s\n",
-> -                     model->wdt_name, model->wdt_description);
-> +            error_report("\t%s\t%s", model->wdt_name, model->wdt_description);
->          }
->          return 2;
->      }
-> @@ -68,10 +68,9 @@ int select_watchdog(const char *p)
->          }
->      }
->  
-> -    fprintf(stderr, "Unknown -watchdog device. Supported devices are:\n");
-> +    error_report("Unknown -watchdog device. Supported devices are:");
->      QLIST_FOREACH(model, &watchdog_list, entry) {
-> -        fprintf(stderr, "\t%s\t%s\n",
-> -                 model->wdt_name, model->wdt_description);
-> +        error_report("\t%s\t%s", model->wdt_name, model->wdt_description);
->      }
->      return 1;
->  }
-> @@ -126,7 +125,7 @@ void watchdog_perform_action(void)
->  
->      case WATCHDOG_ACTION_DEBUG:
->          qapi_event_send_watchdog(WATCHDOG_ACTION_DEBUG, &error_abort);
-> -        fprintf(stderr, "watchdog: timer fired\n");
-> +        error_report("watchdog: timer fired");
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Hfah0C5rUATvtU1etGVMnHmb1XSHNB6uv
+From: Max Reitz <mreitz@redhat.com>
+To: Qemu-block <qemu-block@nongnu.org>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <92c47a3f-92a6-4f3a-505f-dc278604a671@redhat.com>
+Subject: Intermittent hang of iotest 194 (bdrv_drain_all after non-shared
+ storage migration)
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-I don't think this is an error and would rather use info_report() here.
+Hi,
 
-Richard what do you think?
+More exciting news from the bdrv_drain() front!
 
->          break;
->  
->      case WATCHDOG_ACTION_NONE:
-> diff --git a/hw/watchdog/wdt_i6300esb.c b/hw/watchdog/wdt_i6300esb.c
-> index e596b0804d..967f3ebc0d 100644
-> --- a/hw/watchdog/wdt_i6300esb.c
-> +++ b/hw/watchdog/wdt_i6300esb.c
-> @@ -20,7 +20,7 @@
->   */
->  
->  #include "qemu/osdep.h"
-> -
-> +#include "include/qemu/log.h"
->  #include "qemu-common.h"
->  #include "qemu/timer.h"
->  #include "sysemu/watchdog.h"
-> @@ -186,10 +186,14 @@ static void i6300esb_timer_expired(void *vp)
->          /* What to do at the end of stage 1? */
->          switch (d->int_type) {
->          case INT_TYPE_IRQ:
-> -            fprintf(stderr, "i6300esb_timer_expired: I would send APIC 1 INT 10 here if I knew how (XXX)\n");
-> +               qemu_log_mask(LOG_UNIMP,
-> +                             "i6300esb: timer expired but System "
-> +                             "APIC 1 INT10 not emitted\n");
->              break;
->          case INT_TYPE_SMI:
-> -            fprintf(stderr, "i6300esb_timer_expired: I would send SMI here if I knew how (XXX)\n");
-> +               qemu_log_mask(LOG_UNIMP,
-> +                             "i6300esb: timer expired but System "
-> +                             "Management Interrupt not emitted\n");
->              break;
->          }
->  
-> 
+I've noticed in the past that iotest 194 sometimes hangs.  I usually run
+the tests on tmpfs, but I've just now verified that it happens on my SSD
+just as well.
+
+So the reproducer is a plain:
+
+while ./check -raw 194; do; done
+
+(No difference between raw or qcow2, though.)
+
+And then, after a couple of runs (or a couple ten), it will just hang.
+The reason is that the source VM lingers around and doesn't quit
+voluntarily -- the test itself was successful, but it just can't exit.
+
+If you force it to exit by killing the VM (e.g. through pkill -11 qemu),
+this is the backtrace:
+
+#0  0x00007f7cfc297e06 in ppoll () at /lib64/libc.so.6
+#1  0x0000563b846bcac9 in ppoll (__ss=3D0x0, __timeout=3D0x0,
+__nfds=3D<optimized out>, __fds=3D<optimized out>) at
+/usr/include/bits/poll2.h:77
+#2  0x0000563b846bcac9 in qemu_poll_ns (fds=3D<optimized out>,
+nfds=3D<optimized out>, timeout=3D<optimized out>) at util/qemu-timer.c:3=
+22
+#3  0x0000563b846be711 in aio_poll (ctx=3Dctx@entry=3D0x563b856e3e80,
+blocking=3D<optimized out>) at util/aio-posix.c:629
+#4  0x0000563b8463afa4 in bdrv_drain_recurse
+(bs=3Dbs@entry=3D0x563b865568a0, begin=3Dbegin@entry=3Dtrue) at block/io.=
+c:201
+#5  0x0000563b8463baff in bdrv_drain_all_begin () at block/io.c:381
+#6  0x0000563b8463bc99 in bdrv_drain_all () at block/io.c:411
+#7  0x0000563b8459888b in block_migration_cleanup (opaque=3D<optimized
+out>) at migration/block.c:714
+#8  0x0000563b845883be in qemu_savevm_state_cleanup () at
+migration/savevm.c:1251
+#9  0x0000563b845811fd in migration_thread (opaque=3D0x563b856f1da0) at
+migration/migration.c:2298
+#10 0x00007f7cfc56f36d in start_thread () at /lib64/libpthread.so.0
+#11 0x00007f7cfc2a3e1f in clone () at /lib64/libc.so.6
+
+
+And when you make bdrv_drain_all_begin() print what we are trying to
+drain, you can see that it's the format node (managed by the "raw"
+driver in this case).
+
+So I thought, before I put more time into this, let's ask whether the
+test author has any ideas. :-)
+
+Max
+
+
+--Hfah0C5rUATvtU1etGVMnHmb1XSHNB6uv
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAloDpfoSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9Aj2IH/0L7Kglnj9LFpE87KHfl5IvQMeAB14F6
+OOSouUvdWQfJMNDL3ig8R6DC5P32nEKUPupUD2IPFzq4pyC4MktXf7lXcxJ//Kjp
+cnVqtk2YKafDn9gYR8Ud/BAlCrmza0DZHNDVLepmOXTz4S4i3zjNFk4VTs4rbx9J
+kh2UuXnP7oUxYCvgb2Rhn1Rbj3Tc3KdFWGwaBGY6w3tOFIaPQwWT5oU0+xszhLJD
+PGGA7uuG+Vbs6R4v4W8pLVk5+Kmv2q3WlD0Y2vVqkRJL2K4cj361L1aeL/Go4i7f
+tdaA8ToDnNhHOBLnRwVCQDul73YPqkT5r+pQcCavkXiLBT1J5MVWtaU=
+=NfHL
+-----END PGP SIGNATURE-----
+
+--Hfah0C5rUATvtU1etGVMnHmb1XSHNB6uv--
