@@ -1,16 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37233)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41207)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eCtTW-0002bD-Jk
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 15:30:59 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eCtfh-0007hM-Ej
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 15:43:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eCtTV-000412-Pe
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 15:30:58 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eCtfg-0005zR-Fg
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 15:43:33 -0500
 From: Max Reitz <mreitz@redhat.com>
-Date: Thu,  9 Nov 2017 21:30:25 +0100
-Message-Id: <20171109203025.27493-6-mreitz@redhat.com>
-In-Reply-To: <20171109203025.27493-1-mreitz@redhat.com>
-References: <20171109203025.27493-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 5/5] iotests: Make 136 less flaky
+Date: Thu,  9 Nov 2017 21:43:15 +0100
+Message-Id: <20171109204315.27072-1-mreitz@redhat.com>
+Subject: [Qemu-devel] [PATCH for-2.11] block: Keep strong reference when
+ draining all BDS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,56 +19,117 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-136 executes some AIO requests without a final aio_flush; then it
-advances the virtual clock and thus expects the last access time of the
-device to be less than the current time when queried (i.e. idle_time_ns
-to be greater than 0).  However, without the aio_flush, some requests
-may be settled after the clock_step invocation.  In that case,
-idle_time_ns would be 0 and the test fails.
+Draining a BDS may lead to graph modifications, which in turn may result
+in it and other BDS being stripped of their current references.  If
+bdrv_drain_all_begin() and bdrv_drain_all_end() do not keep strong
+references themselves, the BDS they are trying to drain (or undrain) may
+disappear right under their feet -- or, more specifically, under the
+feet of BDRV_POLL_WHILE() in bdrv_drain_recurse().
 
-Fix this by adding an aio_flush if any AIO request other than some other
-aio_flush has been executed.
+This fixes an occasional hang of iotest 194.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- tests/qemu-iotests/136 | 14 +++++++++++++-
- 1 file changed, 13 insertions(+), 1 deletion(-)
+ block/io.c | 47 ++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 44 insertions(+), 3 deletions(-)
 
-diff --git a/tests/qemu-iotests/136 b/tests/qemu-iotests/136
-index 4b994897af..88b97ea7c6 100644
---- a/tests/qemu-iotests/136
-+++ b/tests/qemu-iotests/136
-@@ -238,6 +238,18 @@ sector = "%d"
-         for i in range(failed_wr_ops):
-             ops.append("aio_write %d 512" % bad_offset)
- 
-+        # We need an extra aio_flush to settle all outstanding AIO
-+        # operations before we can advance the virtual clock, so that
-+        # the last access happens before clock_step and idle_time_ns
-+        # will be greater than 0
-+        extra_flush = 0
-+        if rd_ops + wr_ops + invalid_rd_ops + invalid_wr_ops + \
-+                failed_rd_ops + failed_wr_ops > 0:
-+            extra_flush = 1
+diff --git a/block/io.c b/block/io.c
+index 3d5ef2cabe..a0a2833e8e 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -340,7 +340,10 @@ void bdrv_drain_all_begin(void)
+     bool waited = true;
+     BlockDriverState *bs;
+     BdrvNextIterator it;
+-    GSList *aio_ctxs = NULL, *ctx;
++    GSList *aio_ctxs = NULL, *ctx, *bs_list = NULL, *bs_list_entry;
 +
-+        if extra_flush > 0:
-+            ops.append("aio_flush")
-+
-         if failed_wr_ops > 0:
-             highest_offset = max(highest_offset, bad_offset + 512)
++    /* Must be called from the main loop */
++    assert(qemu_get_current_aio_context() == qemu_get_aio_context());
  
-@@ -251,7 +263,7 @@ sector = "%d"
-         self.total_wr_bytes += wr_ops * wr_size
-         self.total_wr_ops += wr_ops
-         self.total_wr_merged += wr_merged
--        self.total_flush_ops += flush_ops
-+        self.total_flush_ops += flush_ops + extra_flush
-         self.invalid_rd_ops += invalid_rd_ops
-         self.invalid_wr_ops += invalid_wr_ops
-         self.failed_rd_ops += failed_rd_ops
+     block_job_pause_all();
+ 
+@@ -355,6 +358,12 @@ void bdrv_drain_all_begin(void)
+         if (!g_slist_find(aio_ctxs, aio_context)) {
+             aio_ctxs = g_slist_prepend(aio_ctxs, aio_context);
+         }
++
++        /* Keep a strong reference to all root BDS and copy them into
++         * an own list because draining them may lead to graph
++         * modifications. */
++        bdrv_ref(bs);
++        bs_list = g_slist_prepend(bs_list, bs);
+     }
+ 
+     /* Note that completion of an asynchronous I/O operation can trigger any
+@@ -370,7 +379,11 @@ void bdrv_drain_all_begin(void)
+             AioContext *aio_context = ctx->data;
+ 
+             aio_context_acquire(aio_context);
+-            for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
++            for (bs_list_entry = bs_list; bs_list_entry;
++                 bs_list_entry = bs_list_entry->next)
++            {
++                bs = bs_list_entry->data;
++
+                 if (aio_context == bdrv_get_aio_context(bs)) {
+                     waited |= bdrv_drain_recurse(bs, true);
+                 }
+@@ -379,24 +392,52 @@ void bdrv_drain_all_begin(void)
+         }
+     }
+ 
++    for (bs_list_entry = bs_list; bs_list_entry;
++         bs_list_entry = bs_list_entry->next)
++    {
++        bdrv_unref(bs_list_entry->data);
++    }
++
+     g_slist_free(aio_ctxs);
++    g_slist_free(bs_list);
+ }
+ 
+ void bdrv_drain_all_end(void)
+ {
+     BlockDriverState *bs;
+     BdrvNextIterator it;
++    GSList *bs_list = NULL, *bs_list_entry;
++
++    /* Must be called from the main loop */
++    assert(qemu_get_current_aio_context() == qemu_get_aio_context());
+ 
++    /* Keep a strong reference to all root BDS and copy them into an
++     * own list because draining them may lead to graph modifications.
++     */
+     for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
+-        AioContext *aio_context = bdrv_get_aio_context(bs);
++        bdrv_ref(bs);
++        bs_list = g_slist_prepend(bs_list, bs);
++    }
++
++    for (bs_list_entry = bs_list; bs_list_entry;
++         bs_list_entry = bs_list_entry->next)
++    {
++        AioContext *aio_context;
++
++        bs = bs_list_entry->data;
++        aio_context = bdrv_get_aio_context(bs);
+ 
+         aio_context_acquire(aio_context);
+         aio_enable_external(aio_context);
+         bdrv_parent_drained_end(bs);
+         bdrv_drain_recurse(bs, false);
+         aio_context_release(aio_context);
++
++        bdrv_unref(bs);
+     }
+ 
++    g_slist_free(bs_list);
++
+     block_job_resume_all();
+ }
+ 
 -- 
 2.13.6
