@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42531)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46087)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1eCoe3-0002tS-Ny
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 10:21:36 -0500
+	(envelope-from <famz@redhat.com>) id 1eConf-0004nI-K4
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 10:31:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1eCoe0-0006Uf-Ih
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 10:21:31 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34352)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1eCoe0-0006UT-9a
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 10:21:28 -0500
-References: <151023266893.360.2441014157612423993@bafd83ae6430>
-	<7e42c571-7e7e-052c-cf6b-2ddd23b56cd4@redhat.com>
-	<20171109143604.GB29835@lemon>
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <38577f02-0fdd-c4aa-8fb7-494beac5247c@redhat.com>
-Date: Thu, 9 Nov 2017 17:21:18 +0200
+	(envelope-from <famz@redhat.com>) id 1eCona-0002ia-Ev
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 10:31:27 -0500
+Date: Thu, 9 Nov 2017 23:30:24 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20171109152856.GA3661@lemon>
+References: <92c47a3f-92a6-4f3a-505f-dc278604a671@redhat.com>
+	<20171109042137.GA13786@lemon>
+	<67bb3458-80da-beda-eec1-c08168837832@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20171109143604.GB29835@lemon>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH V4] hw/pcie-pci-bridge: restrict to X86 and
- ARM
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <67bb3458-80da-beda-eec1-c08168837832@redhat.com>
+Subject: Re: [Qemu-devel] Intermittent hang of iotest 194 (bdrv_drain_all
+ after non-shared storage migration)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,74 +25,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, patchew-devel@freelists.org
+To: Max Reitz <mreitz@redhat.com>
+Cc: Qemu-block <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On 09/11/2017 16:37, Fam Zheng wrote:
-> On Thu, 11/09 16:08, Marcel Apfelbaum wrote:
->>> make[1]: *** No rule to make target `../hw/pci-bridge/pcie_pci_bridge.o', needed by `qemu-system-aarch64'.  Stop.
->>> make[1]: *** Waiting for unfinished jobs..../tmp/qemu-test/src/target/arm/translate-a64.c: In function 'handle_shri_with_rndacc':
->>> /tmp/qemu-test/src/target/arm/translate-a64.c:6390: warning: 'tcg_src_hi' may be used uninitialized in this function
->>> /tmp/qemu-test/src/target/arm/translate-a64.c: In function 'disas_simd_scalar_two_reg_misc':
->>> /tmp/qemu-test/src/target/arm/translate-a64.c:8117: warning: 'rmode' may be used uninitialized in this function
->>>
->>> make: *** [subdir-aarch64-softmmu] Error 2
->>> Traceback (most recent call last):
->>>     File "./tests/docker/docker.py", line 385, in <module>
->>>       sys.exit(main())
->>>     File "./tests/docker/docker.py", line 382, in main
->>>       return args.cmdobj.run(args, argv)
->>>     File "./tests/docker/docker.py", line 239, in run
->>>       return Docker().run(argv, args.keep, quiet=args.quiet)
->>>     File "./tests/docker/docker.py", line 207, in run
->>>       quiet=quiet)
->>>     File "./tests/docker/docker.py", line 125, in _do_check
->>>       return subprocess.check_call(self._command + cmd, **kwargs)
->>>     File "/usr/lib64/python2.7/subprocess.py", line 186, in check_call
->>>       raise CalledProcessError(retcode, cmd)
->>> subprocess.CalledProcessError: Command '['docker', 'run', '--label', 'com.qemu.instance.uuid=561e8180c54e11e79bd052540069c830', '-u', '0', '--security-opt', 'seccomp=unconfined', '--rm', '--net=none', '-e', 'TARGET_LIST=', '-e', 'EXTRA_CONFIGURE_OPTS=', '-e', 'V=', '-e', 'J=8', '-e', 'DEBUG=', '-e', 'SHOW_ENV=1', '-e', 'CCACHE_DIR=/var/tmp/ccache', '-v', '/root/.cache/qemu-docker-ccache:/var/tmp/ccache:z', '-v', '/var/tmp/patchew-tester-tmp-gp94i687/src/docker-src.2017-11-09-08.03.01.2879:/var/tmp/qemu:z,ro', 'qemu:centos6', '/var/tmp/qemu/run', 'test-quick']' returned non-zero exit status 2
->>> make[1]: *** [tests/docker/Makefile.include:129: docker-run] Error 1
->>> make[1]: Leaving directory '/var/tmp/patchew-tester-tmp-gp94i687/src'
->>> make: *** [tests/docker/Makefile.include:163: docker-run-test-quick@centos6] Error 2
->>>
->>> real	1m28.235s
->>> user	0m4.283s
->>> sys	0m4.399s
->>> === OUTPUT END ===
->>>
->>> Test command exited with code: 2
->>>
->>>
->>> ---
->>> Email generated automatically by Patchew [http://patchew.org/].
->>> Please send your feedback to patchew-devel@freelists.org
->>>
->>
->> Hi Fam,
->>
->> I can compile just fine in my workstation, can you
->> please advice ?
+On Thu, 11/09 16:14, Max Reitz wrote:
+> On 2017-11-09 05:21, Fam Zheng wrote:
+> > On Thu, 11/09 01:48, Max Reitz wrote:
+> >> Hi,
+> >>
+> >> More exciting news from the bdrv_drain() front!
+> >>
+> >> I've noticed in the past that iotest 194 sometimes hangs.  I usually run
+> >> the tests on tmpfs, but I've just now verified that it happens on my SSD
+> >> just as well.
+> >>
+> >> So the reproducer is a plain:
+> >>
+> >> while ./check -raw 194; do; done
+> > 
+> > I cannot produce it on my machine.
 > 
-> I can see the same error with
+> Hm, too bad.  I see it both on my work laptop (with Fedora) and my
+> desktop (with Arch)...
 > 
->      make docker-run-test-quick@centos6 V=1 J=8
+> >> (No difference between raw or qcow2, though.)
+> >>
+> >> And then, after a couple of runs (or a couple ten), it will just hang.
+> >> The reason is that the source VM lingers around and doesn't quit
+> >> voluntarily -- the test itself was successful, but it just can't exit.
+> >>
+> >> If you force it to exit by killing the VM (e.g. through pkill -11 qemu),
+> >> this is the backtrace:
+> >>
+> >> #0  0x00007f7cfc297e06 in ppoll () at /lib64/libc.so.6
+> >> #1  0x0000563b846bcac9 in ppoll (__ss=0x0, __timeout=0x0,
+> >> __nfds=<optimized out>, __fds=<optimized out>) at
+> >> /usr/include/bits/poll2.h:77
+> > 
+> > Looking at the 0 timeout it seems we are in the aio_poll(ctx, blocking=false);
+> > branches of BDRV_POLL_WHILE? Is it a busy loop? If so I wonder what is making
+> > progress and causing the return value to be true in aio_poll().
+> > 
+> >> #2  0x0000563b846bcac9 in qemu_poll_ns (fds=<optimized out>,
+> >> nfds=<optimized out>, timeout=<optimized out>) at util/qemu-timer.c:322
+> >> #3  0x0000563b846be711 in aio_poll (ctx=ctx@entry=0x563b856e3e80,
+> >> blocking=<optimized out>) at util/aio-posix.c:629
+> >> #4  0x0000563b8463afa4 in bdrv_drain_recurse
+> >> (bs=bs@entry=0x563b865568a0, begin=begin@entry=true) at block/io.c:201
+> >> #5  0x0000563b8463baff in bdrv_drain_all_begin () at block/io.c:381
+> >> #6  0x0000563b8463bc99 in bdrv_drain_all () at block/io.c:411
+> >> #7  0x0000563b8459888b in block_migration_cleanup (opaque=<optimized
+> >> out>) at migration/block.c:714
+> >> #8  0x0000563b845883be in qemu_savevm_state_cleanup () at
+> >> migration/savevm.c:1251
+> >> #9  0x0000563b845811fd in migration_thread (opaque=0x563b856f1da0) at
+> >> migration/migration.c:2298
+> >> #10 0x00007f7cfc56f36d in start_thread () at /lib64/libpthread.so.0
+> >> #11 0x00007f7cfc2a3e1f in clone () at /lib64/libc.so.6
+> >>
+> >>
+> >> And when you make bdrv_drain_all_begin() print what we are trying to
+> >> drain, you can see that it's the format node (managed by the "raw"
+> >> driver in this case).
+> > 
+> > So what is the value of bs->in_flight?
 > 
-> and also a normal out-of-tree build with
+> gdb:
+> > (gdb) print bs->in_flight 
+> > $3 = 2307492233
 > 
->      $QEMU_SRC/configure --enable-debug --target-list=x86_64-softmmu,aarch64-softmmu
->
-
-Yes, I succeeded to reproduce it, thanks!
-
-
-> Can you install docker and try it?
+> "That's weird, why would it..."
 > 
-
-I wanted to try it eventually, now it seems a good time.
-I will let you know if any problems.
-
-Thanks,
-Marcel
-
-> Fam
+> > (gdb) print *bs
+> > $4 = {open_flags = -1202160144, read_only = 161, encrypted = 85, sg = false, probed = false, force_share = 96, implicit = 159, drv = 0x0, opaque = 0x0, aio_context = 0x8989898989898989, aio_notifiers = {lh_first = 0x8989898989898989}, 
+> >   walking_aio_notifiers = 137, filename = '\211' <repeats 4096 times>, backing_file = '\211' <repeats 4096 times>, backing_format = '\211' <repeats 16 times>, full_open_options = 0x8989898989898989, 
+> >   exact_filename = '\211' <repeats 4096 times>, backing = 0x8989898989898989, file = 0x8989898989898989, bl = {request_alignment = 2307492233, max_pdiscard = -1987475063, pdiscard_alignment = 2307492233, 
+> >     max_pwrite_zeroes = -1987475063, pwrite_zeroes_alignment = 2307492233, opt_transfer = 2307492233, max_transfer = 2307492233, min_mem_alignment = 9910603678816504201, opt_mem_alignment = 9910603678816504201, max_iov = -1987475063}, 
+> >   supported_write_flags = 2307492233, supported_zero_flags = 2307492233, node_name = '\211' <repeats 32 times>, node_list = {tqe_next = 0x8989898989898989, tqe_prev = 0x8989898989898989}, bs_list = {tqe_next = 0x8989898989898989, 
+> >     tqe_prev = 0x8989898989898989}, monitor_list = {tqe_next = 0x8989898989898989, tqe_prev = 0x8989898989898989}, refcnt = -1987475063, op_blockers = {{lh_first = 0x8989898989898989} <repeats 16 times>}, job = 0x8989898989898989, 
+> >   inherits_from = 0x8989898989898989, children = {lh_first = 0x8989898989898989}, parents = {lh_first = 0x8989898989898989}, options = 0x8989898989898989, explicit_options = 0x8989898989898989, detect_zeroes = 2307492233, 
+> >   backing_blocker = 0x8989898989898989, total_sectors = -8536140394893047415, before_write_notifiers = {notifiers = {lh_first = 0x8989898989898989}}, write_threshold_offset = 9910603678816504201, write_threshold_notifier = {notify = 
+> >     0x8989898989898989, node = {le_next = 0x8989898989898989, le_prev = 0x8989898989898989}}, dirty_bitmap_mutex = {lock = {__data = {__lock = -1987475063, __count = 2307492233, __owner = -1987475063, __nusers = 2307492233, 
+> >         __kind = -1987475063, __spins = -30327, __elision = -30327, __list = {__prev = 0x8989898989898989, __next = 0x8989898989898989}}, __size = '\211' <repeats 40 times>, __align = -8536140394893047415}, initialized = 137}, 
+> >   dirty_bitmaps = {lh_first = 0x8989898989898989}, wr_highest_offset = {value = 9910603678816504201}, copy_on_read = -1987475063, in_flight = 2307492233, serialising_in_flight = 2307492233, wakeup = 137, io_plugged = 2307492233, 
+> >   enable_write_cache = -1987475063, quiesce_counter = -1987475063, write_gen = 2307492233, reqs_lock = {locked = 2307492233, ctx = 0x8989898989898989, from_push = {slh_first = 0x8989898989898989}, to_pop = {
+> >       slh_first = 0x8989898989898989}, handoff = 2307492233, sequence = 2307492233, holder = 0x8989898989898989}, tracked_requests = {lh_first = 0x8989898989898989}, flush_queue = {entries = {sqh_first = 0x8989898989898989, 
+> >       sqh_last = 0x8989898989898989}}, active_flush_req = 160, flushed_gen = 0}
+> "Oh."
 > 
+> *sigh*
+> 
+> OK, I'll look into it...
+
+OK, I'll let you.. Just one more thing: could it relate to the use-after-free
+bug reported on block_job_defer_to_main_loop()?
+
+https://lists.gnu.org/archive/html/qemu-devel/2017-11/msg01144.html
+
+Fam
