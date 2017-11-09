@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34177)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38189)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eCi3E-00089p-2F
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 03:19:09 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eCiRK-00031S-BW
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 03:43:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eCi3A-0004IJ-Px
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 03:19:04 -0500
-Received: from mail-wm0-x22e.google.com ([2a00:1450:400c:c09::22e]:55873)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1eCi3A-0004HI-Gp
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 03:19:00 -0500
-Received: by mail-wm0-x22e.google.com with SMTP id b189so896470wmd.4
-	for <qemu-devel@nongnu.org>; Thu, 09 Nov 2017 00:19:00 -0800 (PST)
-References: <20171107150558.22131-1-alex.bennee@linaro.org>
-	<20171107150558.22131-8-alex.bennee@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <3aa5840c-6bd6-f585-5e4f-12219e8c6047@linaro.org>
-Date: Thu, 9 Nov 2017 09:18:56 +0100
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eCiRJ-0008RJ-Eo
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 03:43:58 -0500
+References: <20171107030912.23930-1-eblake@redhat.com>
+	<20171107030912.23930-2-eblake@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <f4e76a21-825b-df7c-cfe9-c866099ca476@virtuozzo.com>
+Date: Thu, 9 Nov 2017 11:43:42 +0300
 MIME-Version: 1.0
-In-Reply-To: <20171107150558.22131-8-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20171107030912.23930-2-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RISU PATCH 07/10] risugen: add --sve support
+Subject: Re: [Qemu-devel] [PATCH 1/2] nbd/server: Implement sparse reads
+ atop structured reply
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,19 +25,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, peter.maydell@linaro.org
-Cc: qemu-arm@nongnu.org, Dave.Martin@arm.com, qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, pbonzini@redhat.com
 
-On 11/07/2017 04:05 PM, Alex Bennée wrote:
-> @@ -483,6 +521,10 @@ sub write_random_aarch64_regdata($)
->          write_random_aarch64_fpdata();
->      }
->  
-> +    if ($sve_enabled) {
-> +        write_random_aarch64_svedata();
-> +    }
+07.11.2017 06:09, Eric Blake wrote:
+> The reason that NBD added structured reply in the first place was
+> to allow for efficient reads of sparse files, by allowing the
+> reply to include chunks to quickly communicate holes to the client
+> without sending lots of zeroes over the wire.  Time to implement
+> this in the server; our client can already read such data.
+>
+> We can only skip holes insofar as the block layer can query them;
+> and only if the client is okay with a fragmented request (if a
+> client requests NBD_CMD_FLAG_DF and the entire read is a hole, we
+> could technically return a single NBD_REPLY_TYPE_OFFSET_HOLE, but
+> that's a fringe case not worth catering to here).  Sadly, the
+> control flow is a bit wonkier than I would have preferred, but
+> it was minimally invasive to have a split in the action between
+> a fragmented read (handled directly where we recognize
+> NBD_CMD_READ with the right conditions, and sending multiple
+> chunks) vs. a single read (handled at the end of nbd_trip, for
+> both simple and structured replies, when we know there is only
+> one thing being read).  Likewise, I didn't make any effort to
+> optimize the final chunk of a fragmented read to set the
+> NBD_REPLY_FLAG_DONE, but unconditionally send that as a separate
+> NBD_REPLY_TYPE_NONE.
+>
+> Signed-off-by: Eric Blake <eblake@redhat.com>
 
-Should write either sve or fpdata, but not both, since the registers overlap.
+
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
 
-r~
+-- 
+Best regards,
+Vladimir
