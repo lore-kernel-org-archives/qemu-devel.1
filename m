@@ -1,39 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58301)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36593)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <s.priebe@profihost.ag>) id 1eDb03-0004dn-Iq
-	for qemu-devel@nongnu.org; Sat, 11 Nov 2017 13:59:28 -0500
+	(envelope-from <no-reply@patchew.org>) id 1eDbyB-0003G8-EY
+	for qemu-devel@nongnu.org; Sat, 11 Nov 2017 15:01:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <s.priebe@profihost.ag>) id 1eDb00-00052f-HL
-	for qemu-devel@nongnu.org; Sat, 11 Nov 2017 13:59:27 -0500
-Received: from cloud1-vm154.de-nserver.de ([178.250.10.56]:28774)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <s.priebe@profihost.ag>)
-	id 1eDb00-00050R-6R
-	for qemu-devel@nongnu.org; Sat, 11 Nov 2017 13:59:24 -0500
-References: <1b862cf2-2fee-3243-cb54-2780ace6f25b@profihost.ag>
-	<971cc10f-7930-9830-0528-27e8faac7282@redhat.com>
-	<748c4d0d-f84b-303d-f9a6-bafa6037d669@profihost.ag>
-	<f4b0cb70-7f86-f7cf-bb89-3a9f7ae15dc2@redhat.com>
-	<4c2913e2-5946-47db-cced-a5702538bc3b@profihost.ag>
-	<dc3bf74f-fbd6-573d-0d7c-d456469fcf1d@profihost.ag>
-	<9c8673a5-faf7-ca9c-27d3-398df4223d6a@redhat.com>
-	<f362d043-7293-65b7-734b-c8372a5f16c3@profihost.ag>
-	<54326bae-831d-dfb8-151e-534d3a100c2c@redhat.com>
-	<ab53e4ae-4c38-9520-b076-96318b6c09b5@profihost.ag>
-	<61b97624-bd55-655f-f8e2-ea1699c25d51@redhat.com>
-	<b110639a-3752-56b5-fe50-741c53048c15@redhat.com>
-	<34a1bec2-403e-8de1-d3dd-661865c6dceb@redhat.com>
-	<a80dde99-460c-15e9-26ba-e5e8a2c0ae5e@redhat.com>
-From: Stefan Priebe - Profihost AG <s.priebe@profihost.ag>
-Message-ID: <9afb46e3-c1d4-e9af-0f45-4c4b6d2c30f4@profihost.ag>
-Date: Sat, 11 Nov 2017 19:59:09 +0100
+	(envelope-from <no-reply@patchew.org>) id 1eDby8-0003nL-DU
+	for qemu-devel@nongnu.org; Sat, 11 Nov 2017 15:01:35 -0500
+Resent-Message-Id: <E1eDby8-0003nL-DU@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21364)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1eDby8-0003kz-4z
+	for qemu-devel@nongnu.org; Sat, 11 Nov 2017 15:01:32 -0500
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <151021502321.354.930267310379053045@bafd83ae6430>
+In-Reply-To: <20171109075243.4794-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <a80dde99-460c-15e9-26ba-e5e8a2c0ae5e@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: de-DE
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] kvm: virtio-net: saved image requires TUN_F_UFO
- support
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 9 Nov 2017 00:10:24 -0800 (PST)
+Subject: Re: [Qemu-devel] [PULL for-2.11 0/2] Capstone updates
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,71 +28,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
+To: richard.henderson@linaro.org
+Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org
 
-Hello,
-
-Am 10.11.2017 um 05:18 schrieb Jason Wang:
-> 
-> 
-> On 2017年11月08日 19:22, Jason Wang wrote:
->>
->>
->> On 2017年11月08日 18:46, Paolo Bonzini wrote:
->>> On 08/11/2017 09:21, Jason Wang wrote:
->>>>
->>>> On 2017年11月08日 17:05, Stefan Priebe - Profihost AG wrote:
->>>>> Am 08.11.2017 um 08:54 schrieb Jason Wang:
->>>>>> On 2017年11月08日 15:41, Stefan Priebe - Profihost AG wrote:
->>>>>>> Hi Paolo,
->>>>>>>
->>>>>>> Am 06.11.2017 um 12:27 schrieb Paolo Bonzini:
->>>>>>>> On 06/11/2017 12:09, Stefan Priebe - Profihost AG wrote:
->>>>>>>>> HI Paolo,
->>>>>>>>>
->>>>>>>>> could this patchset be related?
->>>>>>>> Uh oh, yes it should.  Jason, any ways to fix it?  I suppose we
->>>>>>>> need to
->>>>>>>> disable UFO in the newest machine types, but do we also have to do
->>>>>>>> (software) UFO in vhost-net and QEMU for migration compatibility?
->>>>>>> Any news on this?
->>>>>>>
->>>>>>> Greets,
->>>>>> Since we probe UFO support, it will be disabled automatically on
->>>>>> device
->>>>>> startup.
->>>>>>
->>>>>> For the issue of migration, I think the only way is trying to fix
->>>>>> it in
->>>>>> kernel.
->>>>> But 4.14 is around the corner and the patchset is already included.
->>>>> Shouldn't this get fixed before 4.14 is released?
->>>> We will try to seek a solution as soon as possible. If we can't catch
->>>> 4.14, we will do it for stable for sure.
->>> Jason, can you write to netdev and Cc Linus and me?
->>>
->>> Thanks,
->>>
->>> Paolo
->>
->> Paolo, see this https://www.spinics.net/lists/netdev/msg465454.html
->>
->> Just notice this today since I'm not on the cc list.
->>
->> Thanks
->>
->>
-> 
-> An update:
-> 
-> After some discussions on netdev, we will try to bring UFO back
-> partially for just TAP. Willem promise to fix this. 4.14 is too late
-> consider the fix is not trivial, it will go through stable tree.
-
-OK is it save to just revert the UFO patchset for my local branch?
-
-Greets,
-Stefan
-
-> 
-> Thanks
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
+ZGV2ZWxdIFtQVUxMIGZvci0yLjExIDAvMl0gQ2Fwc3RvbmUgdXBkYXRlcwpUeXBlOiBzZXJpZXMK
+TWVzc2FnZS1pZDogMjAxNzExMDkwNzUyNDMuNDc5NC0xLXJpY2hhcmQuaGVuZGVyc29uQGxpbmFy
+by5vcmcKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpu
+PTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpn
+aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBk
+aWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJz
+ZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRD
+SCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEg
+Z2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1h
+aWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBu
+PSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBk
+YXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBz
+Oi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICAg
+ICAgICBwYXRjaGV3LzIwMTcxMTA5MDc1MjQzLjQ3OTQtMS1yaWNoYXJkLmhlbmRlcnNvbkBsaW5h
+cm8ub3JnIC0+IHBhdGNoZXcvMjAxNzExMDkwNzUyNDMuNDc5NC0xLXJpY2hhcmQuaGVuZGVyc29u
+QGxpbmFyby5vcmcKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo3MjAyZDAyOTA3IE1h
+a2VmaWxlOiBDYXBzdG9uZTogQWRkIHN1cHBvcnQgZm9yIGNyb3NzIGNvbXBpbGUgcmFubGliCmM2
+ZGMwMWRlZGIgZGlzYXM6IER1bXAgaW5zbiBieXRlcyBhbG9uZyB3aXRoIGNhcHN0b25lIGRpc2Fz
+c2VtYmx5Cgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzI6IGRpc2FzOiBE
+dW1wIGluc24gYnl0ZXMgYWxvbmcgd2l0aCBjYXBzdG9uZSBkaXNhc3NlbWJseS4uLgpFUlJPUjog
+c3VzcGVjdCBjb2RlIGluZGVudCBmb3IgY29uZGl0aW9uYWwgc3RhdGVtZW50cyAoOCwgMTEpCiM5
+ODogRklMRTogZGlzYXMuYzozMTU6CiAgICAgICAgIHdoaWxlIChjc19kaXNhc21faXRlcihoYW5k
+bGUsICZjYnVmLCAmY3NpemUsICZwYywgaW5zbikpIHsKKyAgICAgICAgICAgY2FwX2R1bXBfaW5z
+bihpbmZvLCBpbnNuKTsKCkVSUk9SOiBzdXNwZWN0IGNvZGUgaW5kZW50IGZvciBjb25kaXRpb25h
+bCBzdGF0ZW1lbnRzICg0LCA3KQojMTEwOiBGSUxFOiBkaXNhcy5jOjM2MDoKICAgICB3aGlsZSAo
+Y3NfZGlzYXNtX2l0ZXIoaGFuZGxlLCAmY2J1ZiwgJnNpemUsICZwYywgaW5zbikpIHsKKyAgICAg
+ICBjYXBfZHVtcF9pbnNuKGluZm8sIGluc24pOwoKdG90YWw6IDIgZXJyb3JzLCAwIHdhcm5pbmdz
+LCAxODQgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFz
+ZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVw
+b3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJT
+LgoKQ2hlY2tpbmcgUEFUQ0ggMi8yOiBNYWtlZmlsZTogQ2Fwc3RvbmU6IEFkZCBzdXBwb3J0IGZv
+ciBjcm9zcyBjb21waWxlIHJhbmxpYi4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFu
+ZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5
+IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRi
+YWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
