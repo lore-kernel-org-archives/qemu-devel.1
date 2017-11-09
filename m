@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55385)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55950)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <namhyung@gmail.com>) id 1eCnvs-0001dc-DH
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 09:35:56 -0500
+	(envelope-from <famz@redhat.com>) id 1eCnxm-0002Ok-PG
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 09:37:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <namhyung@gmail.com>) id 1eCnvr-0008Fk-HA
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 09:35:52 -0500
-Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:48013)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <namhyung@gmail.com>) id 1eCnvr-0008FK-Cg
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 09:35:51 -0500
-Received: by mail-ot0-x243.google.com with SMTP id s88so5450300ota.4
-	for <qemu-devel@nongnu.org>; Thu, 09 Nov 2017 06:35:51 -0800 (PST)
+	(envelope-from <famz@redhat.com>) id 1eCnxj-0000nP-Lg
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 09:37:50 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36990)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1eCnxj-0000n2-DD
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 09:37:47 -0500
+Date: Thu, 9 Nov 2017 22:37:41 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20171109143604.GB29835@lemon>
+References: <151023266893.360.2441014157612423993@bafd83ae6430>
+	<7e42c571-7e7e-052c-cf6b-2ddd23b56cd4@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20171109104202.GA17101@stefanha-x1.localdomain>
-References: <20171107153136.19426-1-namhyung@gmail.com>
-	<20171109104202.GA17101@stefanha-x1.localdomain>
-From: Namhyung Kim <namhyung@gmail.com>
-Date: Thu, 9 Nov 2017 23:35:29 +0900
-Message-ID: <CAM9d7chD5-dA9NiLL_V+45+QCAq0G2PhMAV4iqcSDk+XEm4Wfw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 1/3] trace: Simplify find_debugfs()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7e42c571-7e7e-052c-cf6b-2ddd23b56cd4@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH V4] hw/pcie-pci-bridge: restrict to X86 and
+ ARM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,38 +28,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
+To: Marcel Apfelbaum <marcel@redhat.com>
+Cc: qemu-devel@nongnu.org, patchew-devel@freelists.org
 
-Hello,
+On Thu, 11/09 16:08, Marcel Apfelbaum wrote:
+> > make[1]: *** No rule to make target `../hw/pci-bridge/pcie_pci_bridge.o', needed by `qemu-system-aarch64'.  Stop.
+> > make[1]: *** Waiting for unfinished jobs..../tmp/qemu-test/src/target/arm/translate-a64.c: In function 'handle_shri_with_rndacc':
+> > /tmp/qemu-test/src/target/arm/translate-a64.c:6390: warning: 'tcg_src_hi' may be used uninitialized in this function
+> > /tmp/qemu-test/src/target/arm/translate-a64.c: In function 'disas_simd_scalar_two_reg_misc':
+> > /tmp/qemu-test/src/target/arm/translate-a64.c:8117: warning: 'rmode' may be used uninitialized in this function
+> > 
+> > make: *** [subdir-aarch64-softmmu] Error 2
+> > Traceback (most recent call last):
+> >    File "./tests/docker/docker.py", line 385, in <module>
+> >      sys.exit(main())
+> >    File "./tests/docker/docker.py", line 382, in main
+> >      return args.cmdobj.run(args, argv)
+> >    File "./tests/docker/docker.py", line 239, in run
+> >      return Docker().run(argv, args.keep, quiet=args.quiet)
+> >    File "./tests/docker/docker.py", line 207, in run
+> >      quiet=quiet)
+> >    File "./tests/docker/docker.py", line 125, in _do_check
+> >      return subprocess.check_call(self._command + cmd, **kwargs)
+> >    File "/usr/lib64/python2.7/subprocess.py", line 186, in check_call
+> >      raise CalledProcessError(retcode, cmd)
+> > subprocess.CalledProcessError: Command '['docker', 'run', '--label', 'com.qemu.instance.uuid=561e8180c54e11e79bd052540069c830', '-u', '0', '--security-opt', 'seccomp=unconfined', '--rm', '--net=none', '-e', 'TARGET_LIST=', '-e', 'EXTRA_CONFIGURE_OPTS=', '-e', 'V=', '-e', 'J=8', '-e', 'DEBUG=', '-e', 'SHOW_ENV=1', '-e', 'CCACHE_DIR=/var/tmp/ccache', '-v', '/root/.cache/qemu-docker-ccache:/var/tmp/ccache:z', '-v', '/var/tmp/patchew-tester-tmp-gp94i687/src/docker-src.2017-11-09-08.03.01.2879:/var/tmp/qemu:z,ro', 'qemu:centos6', '/var/tmp/qemu/run', 'test-quick']' returned non-zero exit status 2
+> > make[1]: *** [tests/docker/Makefile.include:129: docker-run] Error 1
+> > make[1]: Leaving directory '/var/tmp/patchew-tester-tmp-gp94i687/src'
+> > make: *** [tests/docker/Makefile.include:163: docker-run-test-quick@centos6] Error 2
+> > 
+> > real	1m28.235s
+> > user	0m4.283s
+> > sys	0m4.399s
+> > === OUTPUT END ===
+> > 
+> > Test command exited with code: 2
+> > 
+> > 
+> > ---
+> > Email generated automatically by Patchew [http://patchew.org/].
+> > Please send your feedback to patchew-devel@freelists.org
+> > 
+> 
+> Hi Fam,
+> 
+> I can compile just fine in my workstation, can you
+> please advice ?
 
-On Thu, Nov 9, 2017 at 7:42 PM, Stefan Hajnoczi <stefanha@gmail.com> wrote:
-> On Wed, Nov 08, 2017 at 12:31:34AM +0900, Namhyung Kim wrote:
->> The return vale of find_debugfs() is 1 if it could find a mount point of
->> debugfs.  It can be saved in the while loop instead of checking it again.
->>
->> Signed-off-by: Namhyung Kim <namhyung@gmail.com>
->> ---
->>  trace/ftrace.c | 7 +++----
->>  1 file changed, 3 insertions(+), 4 deletions(-)
->
-> Thanks, applied all to my tracing-next tree:
-> https://github.com/stefanha/qemu/commits/tracing-next
->
-> Please send multi-patch series with a cover letter in the future (git
-> format-patch --cover-letter).  Continuous integration tools may ignore
-> multi-patch series without a cover letter.
+I can see the same error with
 
-OK.  I usually use a cover letter when a patch series has 5+
-patches.  But will add it for small series too in the future.
+    make docker-run-test-quick@centos6 V=1 J=8
 
->
-> qemu.git/master is currently frozen for the QEMU 2.11 release so you
-> won't see your patches in master until QEMU 2.11 has been released.
-> Once the development window opens again your patches will be merged into
-> qemu.git/master.
+and also a normal out-of-tree build with
 
-Understood.
+    $QEMU_SRC/configure --enable-debug --target-list=x86_64-softmmu,aarch64-softmmu
 
-Thanks
-Namhyung
+Can you install docker and try it?
+
+Fam
