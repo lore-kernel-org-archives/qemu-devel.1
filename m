@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49999)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51514)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1eCp2n-0002pK-39
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 10:47:05 -0500
+	(envelope-from <eblake@redhat.com>) id 1eCpA1-0006zf-Ga
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 10:54:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1eCp2m-0002MY-Et
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 10:47:05 -0500
+	(envelope-from <eblake@redhat.com>) id 1eCpA0-0006Ft-Jy
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 10:54:33 -0500
+References: <20171109154049.42386-1-vsementsov@virtuozzo.com>
+	<20171109154049.42386-3-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <4b34a07a-cfd3-086a-3d49-16653abf46a4@redhat.com>
+Date: Thu, 9 Nov 2017 09:54:14 -0600
 MIME-Version: 1.0
-In-Reply-To: <20171109121903.24510-1-googuy@gmail.com>
-References: <20171109121903.24510-1-googuy@gmail.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Thu, 9 Nov 2017 16:47:02 +0100
-Message-ID: <CAJ+F1CKtoqXWP8ORZd52b3EKv=BjFX5DO-xksTkkd_ZNG9fhZQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] Add missing parameters to mon option
- documentation
+In-Reply-To: <20171109154049.42386-3-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="4AIv6Tkj3Brg53jkRIBcds8ux0CfjcCx8"
+Subject: Re: [Qemu-devel] [PATCH 2/2] qmp: add nbd-server-remove
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,53 +24,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vicente Jimenez Aguilar <googuy@gmail.com>
-Cc: QEMU <qemu-devel@nongnu.org>, qemu trival <qemu-trivial@nongnu.org>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, den@openvz.org
 
-Hi
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--4AIv6Tkj3Brg53jkRIBcds8ux0CfjcCx8
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, kwolf@redhat.com, mreitz@redhat.com,
+ armbru@redhat.com, den@openvz.org
+Message-ID: <4b34a07a-cfd3-086a-3d49-16653abf46a4@redhat.com>
+Subject: Re: [PATCH 2/2] qmp: add nbd-server-remove
+References: <20171109154049.42386-1-vsementsov@virtuozzo.com>
+ <20171109154049.42386-3-vsementsov@virtuozzo.com>
+In-Reply-To: <20171109154049.42386-3-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Nov 9, 2017 at 1:19 PM, Vicente Jimenez Aguilar
-<googuy@gmail.com> wrote:
-> Documentation missed 'mon' option's 'pretty' and 'default' parameters
->
-> Signed-off-by: Vicente Jimenez Aguilar <googuy@gmail.com>
+On 11/09/2017 09:40 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Add command for export removing. It is needed for cases when we
+> don't want to keep export after the operation on it was completed.
+> The other example is temporary node, created with blockdev-add.
+> If we want to delete it we should firstly remove corresponding
+> NBD export.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > ---
->  qemu-options.hx | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/qemu-options.hx b/qemu-options.hx
-> index 3728e9b4dd..72cf48a8e5 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -3477,9 +3477,9 @@ Like -qmp but uses pretty JSON formatting.
->  ETEXI
->
->  DEF("mon", HAS_ARG, QEMU_OPTION_mon, \
-> -    "-mon [chardev=3D]name[,mode=3Dreadline|control]\n", QEMU_ARCH_ALL)
-> +    "-mon [chardev=3D]name[,mode=3Dreadline|control][,pretty[=3Don|off]]=
-[,default[=3Don|off]]\n", QEMU_ARCH_ALL)
->  STEXI
-> -@item -mon [chardev=3D]name[,mode=3Dreadline|control]
-> +@item -mon [chardev=3D]name[,mode=3Dreadline|control][,pretty[=3Don|off]=
-][,default[=3Don|off]]
+>  qapi/block.json | 20 ++++++++++++++++++++
+>  blockdev-nbd.c  | 27 +++++++++++++++++++++++++++
+>  2 files changed, 47 insertions(+)
 
-"default" is deprecated since commit 06ac27f (2.4.0). It does nothing
-anymore, so should probably not be documented.
+It would be nice (okay as a followup patch) to add iotest coverage of
+the new command.
 
-"pretty" was added in commit 39eaab9ac2a82f. You write some
-documentation for it based on the commit message perhaps?
+>  ##
+> +# @nbd-server-remove:
+> +#
+> +# Stop exporting block node through QEMU's embedded NBD server.
+> +#
+> +# @device: The device name or node name of the exported node. Should b=
+e equal
+> +#          to @device parameter for corresponding nbd-server-add comma=
+nd call.
+> +#
+> +# @force: Whether active connections to the export should be closed. I=
+f this
+> +#         parameter is false the export is only removed from named exp=
+orts list,
+> +#         so new connetions are impossible and it would be freed after=
+ all
+> +#         clients are disconnected (default false).
+> +#
+> +# Returns: error if the server is not running or the device is not mar=
+ked for
+> +#          export.
+> +#
+> +# Since: 2.12
 
-thanks
-
->  @findex -mon
->  Setup monitor on chardev @var{name}.
->  ETEXI
-> --
-> 2.14.1
->
->
-
-
+You are correct that this is too late for 2.11, but I like the concept.
+Once we have some testsuite coverage, I'll queue it for 2.12.
 
 --=20
-Marc-Andr=C3=A9 Lureau
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--4AIv6Tkj3Brg53jkRIBcds8ux0CfjcCx8
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloEeiYACgkQp6FrSiUn
+Q2qXRAf/Q7dqza2JDwW3lyKn/mjYgBFJyVJ1N+d7dUzEQxOc58mrxCn5c2C+2ACv
+xVH+VwqoDDbyH7pNmelgUm7PiDBY3K21FX/4LLiaXCrfMeZ7pdQzBXtEv1HoTe9n
+gOPAweDQouT5LmQ+lF/ZwdqkfUat8MM2AYgBKgcu9vylB7uHt723rV8YDKTacq1O
+zS12+ptpXHnzEzeUaaQ0MZ5ljxqLY9jWcnwXBql9t3iPfM2vZixkttEkwjI6v8Qo
+9mOIYw2nZ+Y/PA2Ydhwy9xIKs7Ieqz9wIUck80O0Cj2lF9KynMNpB8ABW8Xhq/pQ
+1Zyk0wIWsXi/EyPwk+TGtF1dz6q+MA==
+=gRFO
+-----END PGP SIGNATURE-----
+
+--4AIv6Tkj3Brg53jkRIBcds8ux0CfjcCx8--
