@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58467)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59287)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1eCmB5-0005Bl-2t
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 07:43:27 -0500
+	(envelope-from <marcel@redhat.com>) id 1eCmDi-0006e7-7A
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 07:46:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1eCmB4-0001lS-Aw
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 07:43:27 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42700)
+	(envelope-from <marcel@redhat.com>) id 1eCmDf-00033o-3H
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 07:46:10 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44724)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1eCmB4-0001ks-4t
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 07:43:26 -0500
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1eCmDe-000334-Tj
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 07:46:07 -0500
 From: Marcel Apfelbaum <marcel@redhat.com>
-Date: Thu,  9 Nov 2017 14:43:12 +0200
-Message-Id: <20171109124312.117600-1-marcel@redhat.com>
-Subject: [Qemu-devel] [PATCH V2] hw/pcie-pci-bridge: restrict to X86 and ARM
+Date: Thu,  9 Nov 2017 14:45:56 +0200
+Message-Id: <20171109124556.117858-1-marcel@redhat.com>
+Subject: [Qemu-devel] [PATCH V3] hw/pcie-pci-bridge: restrict to X86 and ARM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,11 +26,14 @@ Cc: marcel@redhat.com, mst@redhat.com, thuth@redhat.com, zuban32s@gmail.com, coh
 
 The PCIE-PCI bridge is specific to "pure" PCIe systems
 (on QEMU we have X86 and ARM), it does not make sense to
-have if in other archs.
+have it in other archs.
 
 Reported-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
 ---
+
+V2 -> V3:
+ - Another tweak in subject s/if/it (Cornelia) 
 
 V1 -> V2:
  Addressed Thomas and Cornelia comments:
