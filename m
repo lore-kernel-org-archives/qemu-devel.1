@@ -1,14 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60242)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33258)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eCk36-0001b9-TF
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 05:27:08 -0500
+	(envelope-from <mlureau@redhat.com>) id 1eCkAW-0003Eq-7u
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 05:34:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eCk36-000529-1M
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 05:27:04 -0500
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Thu,  9 Nov 2017 10:26:52 +0000
-Message-Id: <20171109102652.6360-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PATCH] coroutine: simplify co_aio_sleep_ns() prototype
+	(envelope-from <mlureau@redhat.com>) id 1eCkAS-0008Q4-7L
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 05:34:44 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45206)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1eCkAS-0008PY-1x
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 05:34:40 -0500
+Date: Thu, 9 Nov 2017 05:34:37 -0500 (EST)
+From: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Message-ID: <152319465.38481678.1510223677165.JavaMail.zimbra@redhat.com>
+In-Reply-To: <20171108180536.38781-1-lepton@google.com>
+References: <20171108180536.38781-1-lepton@google.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] virtio-gpu: fix bug in host memory
+ calculation.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,105 +27,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, eblake@redhat.com, Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Tao Wu <lepton@google.com>
+Cc: qemu-devel@nongnu.org, kraxel@redhat.com, airlied@redhat.com, liqiang6-s@360.cn
 
-The AioContext pointer argument to co_aio_sleep_ns() is only used for
-the sleep timer.  It does not affect where the caller coroutine is
-resumed.
+Hi
 
-Due to changes to coroutine and AIO APIs it is now possible to drop the
-AioContext pointer argument.  This is safe to do since no caller has
-specific requirements for which AioContext the timer must run in.
+----- Original Message -----
+> The old code treats bits as bytes when calculating host memory usage.
+> Change it to be consistent with allocation logic in pixman library.
+>=20
 
-This patch drops the AioContext pointer argument and renames the
-function to simplify the API.
+Good catch
 
-Reported-by: Paolo Bonzini <pbonzini@redhat.com>
-Reported-by: Eric Blake <eblake@redhat.com>
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- include/qemu/coroutine.h    | 6 +-----
- block/null.c                | 3 +--
- block/sheepdog.c            | 3 +--
- blockjob.c                  | 2 +-
- util/qemu-coroutine-sleep.c | 4 ++--
- 5 files changed, 6 insertions(+), 12 deletions(-)
+> Signed-off-by: Tao Wu <lepton@google.com>
+> ---
+>  hw/display/virtio-gpu.c | 13 +++++++++++--
+>  1 file changed, 11 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/hw/display/virtio-gpu.c b/hw/display/virtio-gpu.c
+> index 43bbe09ea0..428786f291 100644
+> --- a/hw/display/virtio-gpu.c
+> +++ b/hw/display/virtio-gpu.c
+> @@ -322,6 +322,15 @@ static pixman_format_code_t get_pixman_format(uint32=
+_t
+> virtio_gpu_format)
+>      }
+>  }
+> =20
+> +static uint32_t calc_image_hostmem(pixman_format_code_t pformat,
+> +                                   uint32_t width, uint32_t height)
+> +{
+> +    /* copied from pixman/pixman-bits-image.c, skip integer overflow che=
+ck.
+> */
 
-diff --git a/include/qemu/coroutine.h b/include/qemu/coroutine.h
-index 9aff9a735e..ce2eb73670 100644
---- a/include/qemu/coroutine.h
-+++ b/include/qemu/coroutine.h
-@@ -261,12 +261,8 @@ void qemu_co_rwlock_unlock(CoRwlock *lock);
- 
- /**
-  * Yield the coroutine for a given duration
-- *
-- * Behaves similarly to co_sleep_ns(), but the sleeping coroutine will be
-- * resumed when using aio_poll().
-  */
--void coroutine_fn co_aio_sleep_ns(AioContext *ctx, QEMUClockType type,
--                                  int64_t ns);
-+void coroutine_fn qemu_co_sleep_ns(QEMUClockType type, int64_t ns);
- 
- /**
-  * Yield until a file descriptor becomes readable
-diff --git a/block/null.c b/block/null.c
-index dd9c13f9ba..0cdabaa440 100644
---- a/block/null.c
-+++ b/block/null.c
-@@ -110,8 +110,7 @@ static coroutine_fn int null_co_common(BlockDriverState *bs)
-     BDRVNullState *s = bs->opaque;
- 
-     if (s->latency_ns) {
--        co_aio_sleep_ns(bdrv_get_aio_context(bs), QEMU_CLOCK_REALTIME,
--                        s->latency_ns);
-+        qemu_co_sleep_ns(QEMU_CLOCK_REALTIME, s->latency_ns);
-     }
-     return 0;
- }
-diff --git a/block/sheepdog.c b/block/sheepdog.c
-index 696a71442a..a1edb992ff 100644
---- a/block/sheepdog.c
-+++ b/block/sheepdog.c
-@@ -776,8 +776,7 @@ static coroutine_fn void reconnect_to_sdog(void *opaque)
-         if (s->fd < 0) {
-             DPRINTF("Wait for connection to be established\n");
-             error_report_err(local_err);
--            co_aio_sleep_ns(bdrv_get_aio_context(s->bs), QEMU_CLOCK_REALTIME,
--                            1000000000ULL);
-+            qemu_co_sleep_ns(QEMU_CLOCK_REALTIME, 1000000000ULL);
-         }
-     };
- 
-diff --git a/blockjob.c b/blockjob.c
-index 3a0c49137e..24d912161f 100644
---- a/blockjob.c
-+++ b/blockjob.c
-@@ -799,7 +799,7 @@ void block_job_sleep_ns(BlockJob *job, QEMUClockType type, int64_t ns)
- 
-     job->busy = false;
-     if (!block_job_should_pause(job)) {
--        co_aio_sleep_ns(blk_get_aio_context(job->blk), type, ns);
-+        qemu_co_sleep_ns(type, ns);
-     }
-     job->busy = true;
- 
-diff --git a/util/qemu-coroutine-sleep.c b/util/qemu-coroutine-sleep.c
-index 9c5655041b..b345a55994 100644
---- a/util/qemu-coroutine-sleep.c
-+++ b/util/qemu-coroutine-sleep.c
-@@ -28,9 +28,9 @@ static void co_sleep_cb(void *opaque)
-     aio_co_wake(sleep_cb->co);
- }
- 
--void coroutine_fn co_aio_sleep_ns(AioContext *ctx, QEMUClockType type,
--                                  int64_t ns)
-+void coroutine_fn qemu_co_sleep_ns(QEMUClockType type, int64_t ns)
- {
-+    AioContext *ctx = qemu_get_current_aio_context();
-     CoSleepCB sleep_cb = {
-         .co = qemu_coroutine_self(),
-     };
--- 
-2.13.6
+So we rely on pixman create_bits() to fail if overflow happened? perhaps it=
+'s worth a comment.
+=20
+> +    int bpp =3D PIXMAN_FORMAT_BPP(pformat);
+> +    int stride =3D ((width * bpp + 0x1f) >> 5) * sizeof(uint32_t);
+> +    return height * stride;
+> +}
+> +
+>  static void virtio_gpu_resource_create_2d(VirtIOGPU *g,
+>                                            struct virtio_gpu_ctrl_command
+>                                            *cmd)
+>  {
+> @@ -366,7 +375,7 @@ static void virtio_gpu_resource_create_2d(VirtIOGPU *=
+g,
+>          return;
+>      }
+> =20
+> -    res->hostmem =3D PIXMAN_FORMAT_BPP(pformat) * c2d.width * c2d.height=
+;
+> +    res->hostmem =3D calc_image_hostmem(pformat, c2d.width, c2d.height);
+>      if (res->hostmem + g->hostmem < g->conf.max_hostmem) {
+>          res->image =3D pixman_image_create_bits(pformat,
+>                                                c2d.width,
+> @@ -1087,7 +1096,7 @@ static int virtio_gpu_load(QEMUFile *f, void *opaqu=
+e,
+> size_t size,
+>              return -EINVAL;
+>          }
+> =20
+> -        res->hostmem =3D PIXMAN_FORMAT_BPP(pformat) * res->width *
+> res->height;
+> +        res->hostmem =3D calc_image_hostmem(pformat, res->width, res->he=
+ight);
+> =20
+>          res->addrs =3D g_new(uint64_t, res->iov_cnt);
+>          res->iov =3D g_new(struct iovec, res->iov_cnt);
+> --
+> 2.15.0.403.gc27cc4dac6-goog
+>=20
+
+looks good otherwise,
+
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
+>=20
