@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54850)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57035)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eChQv-0000jL-H8
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 02:39:30 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1eChdr-0002W4-18
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 02:52:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eChQs-0002HS-AA
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 02:39:29 -0500
-Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:33627)
+	(envelope-from <richard.henderson@linaro.org>) id 1eChdo-0000Vl-G1
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 02:52:51 -0500
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:48074)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1eChQs-0002HC-2G
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 02:39:26 -0500
-Received: by mail-wm0-x233.google.com with SMTP id r68so1113551wmr.0
-	for <qemu-devel@nongnu.org>; Wed, 08 Nov 2017 23:39:25 -0800 (PST)
-References: <20171107145546.767-1-richard.henderson@linaro.org>
-	<20171108125056.159597fd.cohuck@redhat.com>
+	id 1eChdo-0000VF-8u
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 02:52:48 -0500
+Received: by mail-wm0-x241.google.com with SMTP id r196so15119685wmf.2
+	for <qemu-devel@nongnu.org>; Wed, 08 Nov 2017 23:52:47 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <236e7f64-2b91-0353-8c37-315756dd724c@linaro.org>
-Date: Thu, 9 Nov 2017 08:39:22 +0100
+Date: Thu,  9 Nov 2017 08:52:41 +0100
+Message-Id: <20171109075243.4794-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20171108125056.159597fd.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH] target/s390x: Finish
- implementing RISBGN
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL for-2.11 0/2] Capstone updates
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,13 +27,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, qemu-s390x@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org
 
-On 11/08/2017 12:50 PM, Cornelia Huck wrote:
-> I can queue this to s390-fixes (unless there are other takers).
-
-Please do.  Thanks,
+One build fix for mingw cross-compiling, one feature regression fix.
 
 
 r~
+
+
+The following changes since commit b0fbe46ad82982b289a44ee2495b59b0bad8a842:
+
+  Update version for v2.11.0-rc0 release (2017-11-07 16:05:28 +0000)
+
+are available in the git repository at:
+
+  git://github.com/rth7680/qemu.git tags/pull-cap-20171109
+
+for you to fetch changes up to 9f81aeb5dadab588920b157a4610e890995ef4b9:
+
+  Makefile: Capstone: Add support for cross compile ranlib (2017-11-09 08:47:14 +0100)
+
+----------------------------------------------------------------
+Capstone fixes for 2.11
+
+----------------------------------------------------------------
+Alistair Francis (1):
+      Makefile: Capstone: Add support for cross compile ranlib
+
+Richard Henderson (1):
+      disas: Dump insn bytes along with capstone disassembly
+
+ Makefile            |  2 +-
+ include/disas/bfd.h |  2 ++
+ disas.c             | 96 ++++++++++++++++++++++++++++++++++++++++++++++-------
+ target/arm/cpu.c    |  6 ++++
+ target/i386/cpu.c   |  2 ++
+ configure           |  3 ++
+ 6 files changed, 98 insertions(+), 13 deletions(-)
