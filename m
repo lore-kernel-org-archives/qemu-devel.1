@@ -1,32 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34985)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37261)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eCpvH-0006T5-Nb
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 11:43:24 -0500
+	(envelope-from <cohuck@redhat.com>) id 1eCq28-0008JI-9A
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 11:50:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eCpvC-0007GN-SO
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 11:43:23 -0500
-Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:44200)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eCpvC-0007G2-N9
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 11:43:18 -0500
-Received: by mail-qt0-x241.google.com with SMTP id 8so8425817qtv.1
-	for <qemu-devel@nongnu.org>; Thu, 09 Nov 2017 08:43:18 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20171109154645.70920-1-marcel@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <c86aa3a9-6992-0f4b-1fcf-14992798a6a1@amsat.org>
-Date: Thu, 9 Nov 2017 13:43:06 -0300
+	(envelope-from <cohuck@redhat.com>) id 1eCq24-0003Ej-Bo
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 11:50:28 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45456)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1eCq23-0003E3-WC
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 11:50:24 -0500
+Date: Thu, 9 Nov 2017 17:50:18 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20171109175018.1c2f1b60.cohuck@redhat.com>
+In-Reply-To: <1510075479-17224-3-git-send-email-pmorel@linux.vnet.ibm.com>
+References: <1510075479-17224-1-git-send-email-pmorel@linux.vnet.ibm.com>
+	<1510075479-17224-3-git-send-email-pmorel@linux.vnet.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20171109154645.70920-1-marcel@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH V5] hw/pcie-pci-bridge: restrict to X86 and
- ARM
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/7] s390x/pci: rework PCI STORE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,62 +27,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>, qemu-devel@nongnu.org, Paul Burton <paul.burton@mips.com>, Yongbok Kim <yongbok.kim@mips.com>
-Cc: thuth@redhat.com, cohuck@redhat.com, zuban32s@gmail.com, mst@redhat.com, Paul Burton <paul.burton@imgtec.com>, Yongbok Kim <yongbok.kim@imgtec.com>
+To: Pierre Morel <pmorel@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, agraf@suse.de, borntraeger@de.ibm.com, zyimin@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com
 
-Hi Marcel,
+On Tue,  7 Nov 2017 18:24:34 +0100
+Pierre Morel <pmorel@linux.vnet.ibm.com> wrote:
 
-Cc'ing Paul and Yongbok Since I'm not sure their Boston board could also
-use it.
-
-On 11/09/2017 12:46 PM, Marcel Apfelbaum wrote:
-> The PCIE-PCI bridge is specific to "pure" PCIe systems
-> (on QEMU we have X86 and ARM), it does not make sense to
-> have it in other archs.
+> Enhance the fault detection, correction of the fault reporting.
 > 
-> Reported-by: Thomas Huth <thuth@redhat.com>
-> Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
+> Signed-off-by: Pierre Morel <pmorel@linux.vnet.ibm.com>
+> Reviewed-by: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
 > ---
+>  hw/s390x/s390-pci-inst.c | 41 ++++++++++++++++++++++++-----------------
+>  1 file changed, 24 insertions(+), 17 deletions(-)
 > 
-> V4 -> V5
->   - Since all other tries failed, conditioned the
->     device on the PCIe Root Port.
-> 
-> V3 -> V4:
->  - Move the config line to pci.mak  (Thomas)
-> 
-> V2 -> V3:
->  - Another tweak in subject s/if/it (Cornelia) 
-> 
-> V1 -> V2:
->  Addressed Thomas and Cornelia comments:
->  - Conditioned the pcie-pci-bridge compilation on
->    the PCIe Root CONFIG_PCIE_PORT
->  - Tweaked subject PCI -> PCIe
-> 
->  Thanks,
->  Marcel
-> 
-> 
->  hw/pci-bridge/Makefile.objs | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/pci-bridge/Makefile.objs b/hw/pci-bridge/Makefile.objs
-> index 666db37da2..1b05023662 100644
-> --- a/hw/pci-bridge/Makefile.objs
-> +++ b/hw/pci-bridge/Makefile.objs
-> @@ -1,5 +1,5 @@
-> -common-obj-y += pci_bridge_dev.o pcie_pci_bridge.o
-> -common-obj-$(CONFIG_PCIE_PORT) += pcie_root_port.o gen_pcie_root_port.o
-> +common-obj-y += pci_bridge_dev.o
-> +common-obj-$(CONFIG_PCIE_PORT) += pcie_root_port.o gen_pcie_root_port.o pcie_pci_bridge.o
+> diff --git a/hw/s390x/s390-pci-inst.c b/hw/s390x/s390-pci-inst.c
+> index 8fcb02d..4a2f996 100644
+> --- a/hw/s390x/s390-pci-inst.c
+> +++ b/hw/s390x/s390-pci-inst.c
+> @@ -469,6 +469,12 @@ int pcistg_service_call(S390CPU *cpu, uint8_t r1, uint8_t r2)
+>      pcias = (env->regs[r2] >> 16) & 0xf;
+>      len = env->regs[r2] & 0xf;
+>      offset = env->regs[r2 + 1];
+> +    data = env->regs[r1];
+> +
+> +    if (!(fh & FH_MASK_ENABLE)) {
 
-KISS :)
+This covers the reserved/standby/disabled states, right?
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> +        setcc(cpu, ZPCI_PCI_LS_INVAL_HANDLE);
+> +        return 0;
+> +    }
+>  
+>      pbdev = s390_pci_find_dev_by_fh(s390_get_phb(), fh);
+>      if (!pbdev) {
+> @@ -478,12 +484,7 @@ int pcistg_service_call(S390CPU *cpu, uint8_t r1, uint8_t r2)
+>      }
+>  
+>      switch (pbdev->state) {
+> -    case ZPCI_FS_RESERVED:
+> -    case ZPCI_FS_STANDBY:
+> -    case ZPCI_FS_DISABLED:
+>      case ZPCI_FS_PERMANENT_ERROR:
+> -        setcc(cpu, ZPCI_PCI_LS_INVAL_HANDLE);
+> -        return 0;
+>      case ZPCI_FS_ERROR:
+>          setcc(cpu, ZPCI_PCI_LS_ERR);
+>          s390_set_status_code(env, r2, ZPCI_PCI_ST_BLOCKED);
+> @@ -492,9 +493,13 @@ int pcistg_service_call(S390CPU *cpu, uint8_t r1, uint8_t r2)
+>          break;
+>      }
+>  
+> -    data = env->regs[r1];
+> -    if (pcias < 6) {
+> -        if ((8 - (offset & 0x7)) < len) {
+> +    /* Test that the pcias is a valid pcias and do the according operations */
 
->  common-obj-$(CONFIG_PXB) += pci_expander_bridge.o
->  common-obj-$(CONFIG_XIO3130) += xio3130_upstream.o xio3130_downstream.o
->  common-obj-$(CONFIG_IOH3420) += ioh3420.o
-> 
+s/according/appropriate/ ?
+
+> +    switch (pcias) {
+> +    case 0 ... 5:
+> +        /* Check length:
+> +         * A length of 0 is invalid and length should not cross a double word
+> +         */
+> +        if (!len || (len > (8 - (offset & 0x7)))) {
+>              program_interrupt(env, PGM_OPERAND, 4);
+>              return 0;
+>          }
+> @@ -512,21 +517,23 @@ int pcistg_service_call(S390CPU *cpu, uint8_t r1, uint8_t r2)
+>              program_interrupt(env, PGM_OPERAND, 4);
+>              return 0;
+>          }
+> -    } else if (pcias == 15) {
+> -        if ((4 - (offset & 0x3)) < len) {
+> -            program_interrupt(env, PGM_OPERAND, 4);
+> -            return 0;
+> -        }
+> -
+> -        if (zpci_endian_swap(&data, len)) {
+> +        break;
+> +    case 15:
+> +        /* ZPCI uses the pseudo BAR number 15 as configuration space */
+> +        /* possible access length are 1,2,4 and must not cross a word */
+
+s/length/lengths/
+
+> +        if (!len || (len > (4 - (offset & 0x3))) || len == 3) {
+>              program_interrupt(env, PGM_OPERAND, 4);
+>              return 0;
+>          }
+> -
+> +        /* len = 1,2,4 so we do not need to test */
+> +        zpci_endian_swap(&data, len);
+>          pci_host_config_write_common(pbdev->pdev, offset,
+>                                       pci_config_size(pbdev->pdev),
+>                                       data, len);
+> -    } else {
+> +        break;
+> +    case PCI_ROM_SLOT:
+
+So, will this be filled in a later patch? (Reading from the top.)
+
+> +        /* Fall through */
+> +    default:
+>          DPRINTF("pcistg invalid space\n");
+>          setcc(cpu, ZPCI_PCI_LS_ERR);
+>          s390_set_status_code(env, r2, ZPCI_PCI_ST_INVAL_AS);
+
+On the whole, I think this improves readability, especially for folks
+that do not have access to the spec.
