@@ -1,14 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36966)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36989)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eCtTB-0002KC-2N
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 15:30:38 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eCtTD-0002Ld-MI
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 15:30:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eCtT7-0003fd-W2
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 15:30:37 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eCtTC-0003jV-Pz
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 15:30:39 -0500
 From: Max Reitz <mreitz@redhat.com>
-Date: Thu,  9 Nov 2017 21:30:20 +0100
-Message-Id: <20171109203025.27493-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 0/5] iotests: Make some tests less flaky
+Date: Thu,  9 Nov 2017 21:30:21 +0100
+Message-Id: <20171109203025.27493-2-mreitz@redhat.com>
+In-Reply-To: <20171109203025.27493-1-mreitz@redhat.com>
+References: <20171109203025.27493-1-mreitz@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 1/5] iotests: Make 030 less flaky
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,61 +22,70 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Eric Blake <eblake@redhat.com>
 
-There are a couple of tests that fail (on my machine) from time to
-time (and by that I mean that recently I've rarely ever had a test run
-with both 083 and 136 working on first try).
-This series should fix most (at least the issues I am aware of).
+This patch fixes two race conditions in 030:
 
-Notes:
-- 083 might have another issue, but if so it occurs extremely rarely and
-  so I was unable to debug it.
+1. The first is in TestENOSPC.test_enospc().  After resuming the job,
+   querying it to confirm it is no longer paused may fail because in the
+   meantime it might have completed already.  The same was fixed in
+   TestEIO.test_ignore() already (in commit
+   2c3b44da07d341557a8203cc509ea07fe3605e11).
 
-- 129 is flaky, too, because it tries to use block jobs with BB
-  throttling -- however, block jobs ignore that these days.  Making it
-  use a throttle filter node will require quite a bit of work.  See
-  http://lists.nongnu.org/archive/html/qemu-block/2017-11/msg00111.html
-  for more.
+2. The second is in TestSetSpeed.test_set_speed_invalid(): Here, a
+   stream job is started on a drive without any break points, with a
+   block-job-set-speed invoked subsequently.  However, without any break
+   points, the job might have completed in the meantime (on tmpfs at
+   least); or it might complete before cancel_and_wait() which expects
+   the job to still exist.  This can be fixed like everywhere else by
+   pausing the drive (installing break points) before starting the job
+   and letting cancel_and_wait() resume it.
 
-- 194 sometimes hangs because the source VM fails to drain its drive.
-  This is probably not an issue with the test, but actually an issue in
-  qemu.  See
-  http://lists.nongnu.org/archive/html/qemu-block/2017-11/msg00256.html
-  for more.
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+ tests/qemu-iotests/030 | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-
-v2:
- - Spelling fixes [Eric]
- - Contract grep | sed to a single sed in 083 [Eric]
-
-
-git-backport-diff against v1:
-
-Key:
-[----] : patches are identical
-[####] : number of functional differences between upstream/downstream patch
-[down] : patch is downstream-only
-The flags [FC] indicate (F)unctional and (C)ontextual differences, respectively
-
-001/5:[----] [--] 'iotests: Make 030 less flaky'
-002/5:[----] [--] 'iotests: Add missing 'blkdebug::' in 040'
-003/5:[----] [--] 'iotests: Make 055 less flaky'
-004/5:[0003] [FC] 'iotests: Make 083 less flaky'
-005/5:[----] [--] 'iotests: Make 136 less flaky'
-
-
-Max Reitz (5):
-  iotests: Make 030 less flaky
-  iotests: Add missing 'blkdebug::' in 040
-  iotests: Make 055 less flaky
-  iotests: Make 083 less flaky
-  iotests: Make 136 less flaky
-
- tests/qemu-iotests/030 |  8 ++++++--
- tests/qemu-iotests/040 |  2 +-
- tests/qemu-iotests/055 | 25 ++++++++++++++++---------
- tests/qemu-iotests/083 |  4 +++-
- tests/qemu-iotests/136 | 14 +++++++++++++-
- 5 files changed, 39 insertions(+), 14 deletions(-)
-
+diff --git a/tests/qemu-iotests/030 b/tests/qemu-iotests/030
+index 18838948fa..457984b8e9 100755
+--- a/tests/qemu-iotests/030
++++ b/tests/qemu-iotests/030
+@@ -666,6 +666,7 @@ class TestENOSPC(TestErrors):
+                 if event['event'] == 'BLOCK_JOB_ERROR':
+                     self.assert_qmp(event, 'data/device', 'drive0')
+                     self.assert_qmp(event, 'data/operation', 'read')
++                    error = True
+ 
+                     result = self.vm.qmp('query-block-jobs')
+                     self.assert_qmp(result, 'return[0]/paused', True)
+@@ -676,9 +677,11 @@ class TestENOSPC(TestErrors):
+                     self.assert_qmp(result, 'return', {})
+ 
+                     result = self.vm.qmp('query-block-jobs')
++                    if result == {'return': []}:
++                        # Race; likely already finished. Check.
++                        continue
+                     self.assert_qmp(result, 'return[0]/paused', False)
+                     self.assert_qmp(result, 'return[0]/io-status', 'ok')
+-                    error = True
+                 elif event['event'] == 'BLOCK_JOB_COMPLETED':
+                     self.assertTrue(error, 'job completed unexpectedly')
+                     self.assert_qmp(event, 'data/type', 'stream')
+@@ -792,13 +795,14 @@ class TestSetSpeed(iotests.QMPTestCase):
+ 
+         self.assert_no_active_block_jobs()
+ 
++        self.vm.pause_drive('drive0')
+         result = self.vm.qmp('block-stream', device='drive0')
+         self.assert_qmp(result, 'return', {})
+ 
+         result = self.vm.qmp('block-job-set-speed', device='drive0', speed=-1)
+         self.assert_qmp(result, 'error/class', 'GenericError')
+ 
+-        self.cancel_and_wait()
++        self.cancel_and_wait(resume=True)
+ 
+ if __name__ == '__main__':
+     iotests.main(supported_fmts=['qcow2', 'qed'])
 -- 
 2.13.6
