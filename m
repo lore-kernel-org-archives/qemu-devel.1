@@ -1,29 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40932)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42497)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1eCruS-00038e-TE
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 13:50:42 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eCrzW-0004M3-Os
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 13:55:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1eCruP-0008KI-PC
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 13:50:40 -0500
-Received: from hera.aquilenet.fr ([141.255.128.1]:59297)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1eCruP-0008Jc-J2
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 13:50:37 -0500
-Date: Thu, 9 Nov 2017 19:50:33 +0100
-From: Samuel Thibault <samuel.thibault@gnu.org>
-Message-ID: <20171109185033.p7ka62xswqol5v5b@var.youpi.perso.aquilenet.fr>
-References: <20170508195404.j33kcmqncrb7fziv@var.youpi.perso.aquilenet.fr>
-	<20171108225340.10194-1-lepton@google.com>
-	<CAJ+F1CK53wNxwixP8M4JgbG4kKgpgu_EdJ6-RyNnevNGQsXmJw@mail.gmail.com>
-	<CAOvqHj6Sw6_a90WRsLd3YgVu-rRL5k9cgRy1vbgEfCucf_7dXQ@mail.gmail.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eCrzT-000290-Mg
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 13:55:54 -0500
+Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:50601)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eCrzT-00028l-Hu
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 13:55:51 -0500
+Received: by mail-qk0-x241.google.com with SMTP id p7so8986036qkd.7
+	for <qemu-devel@nongnu.org>; Thu, 09 Nov 2017 10:55:51 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1510075479-17224-1-git-send-email-pmorel@linux.vnet.ibm.com>
+	<1510075479-17224-2-git-send-email-pmorel@linux.vnet.ibm.com>
+	<20171109173802.7a43dcc3.cohuck@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <92ed4a36-5db9-9f76-069f-cd663bbe8aee@amsat.org>
+Date: Thu, 9 Nov 2017 15:55:46 -0300
 MIME-Version: 1.0
+In-Reply-To: <20171109173802.7a43dcc3.cohuck@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAOvqHj6Sw6_a90WRsLd3YgVu-rRL5k9cgRy1vbgEfCucf_7dXQ@mail.gmail.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] slirp: don't zero ti_i since we access it
- later.
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 1/7] s390x/pci: factor out endianess
+ conversion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,23 +37,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Tao =?utf-8?B?V3Uo5ZC05rabQEVuZyk=?= <lepton@google.com>
-Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>, QEMU <qemu-devel@nongnu.org>, maethor@subiron.org
+To: Cornelia Huck <cohuck@redhat.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>
+Cc: borntraeger@de.ibm.com, pasic@linux.vnet.ibm.com, zyimin@linux.vnet.ibm.com, qemu-devel@nongnu.org, agraf@suse.de
 
-Tao Wu(=E5=90=B4=E6=B6=9B@Eng), on jeu. 09 nov. 2017 10:48:27 -0800, wrot=
-e:
-> Thanks. Actually this is a follow up with my previous effort to fix thi=
-s bug.
-> I was busy on something else and then got lost in that old thread. Now =
-I just
-> checked some my local patch
-> to see if they've merged to upstream and then found it out.
->=20
-> This is old thread about this:
-> [1]http://lists.nongnu.org/archive/html/qemu-devel/2017-04/msg05544.htm=
-l
+On 11/09/2017 01:38 PM, Cornelia Huck wrote:
+> On Tue,  7 Nov 2017 18:24:33 +0100
+> Pierre Morel <pmorel@linux.vnet.ibm.com> wrote:
+> 
+>> There are two places where the same endianness conversion
+>> is done.
+>> Let's factor this out into a static function.
+>>
+>> Signed-off-by: Pierre Morel <pmorel@linux.vnet.ibm.com>
+>> Reviewed-by: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
+>> ---
+>>  hw/s390x/s390-pci-inst.c | 58 ++++++++++++++++++++++++++----------------------
+>>  1 file changed, 32 insertions(+), 26 deletions(-)
+>>
+>> diff --git a/hw/s390x/s390-pci-inst.c b/hw/s390x/s390-pci-inst.c
+>> index 8e088f3..8fcb02d 100644
+>> --- a/hw/s390x/s390-pci-inst.c
+>> +++ b/hw/s390x/s390-pci-inst.c
+>> @@ -314,6 +314,35 @@ out:
+>>      return 0;
+>>  }
+>>  
+>> +/**
+>> + * This function swaps the data at ptr according from one
+>> + * endianness to the other.
+>> + * valid data in the uint64_t data field.
+> 
+> I'm not sure what that line is supposed to mean?
+> 
+>> + * @ptr: a pointer to a uint64_t data field
+>> + * @len: the length of the valid data, must be 1,2,4 or 8
+>> + */
+>> +static int zpci_endian_swap(uint64_t *ptr, uint8_t len)
+>> +{
+>> +    uint64_t data = *ptr;
+>> +    switch (len) {
+>> +    case 1:
+>> +        break;
+>> +    case 2:
+>> +        data = bswap16(data);
+>> +        break;
+>> +    case 4:
+>> +        data = bswap32(data);
+>> +        break;
+>> +    case 8:
+>> +        data = bswap64(data);
+>> +        break;
+>> +    default:
+>> +        return -EINVAL;
+>> +    }
+>> +    *ptr = data;
+>> +    return 0;
+>> +}
 
-I knew I had seen that proposal somewhere before :)
+This is usually care taken by memory::adjust_endianness() ...
 
-Thanks for the patch,
-Samuel
+> I was expecting more code to use a similar pattern, but it seems
+> surprisingly uncommon.
+
+Which ring a bell for latent bug?
+
+This remind me of a similar issue on ppc:
+
+http://lists.nongnu.org/archive/html/qemu-devel/2017-02/msg05121.html
+...
+http://lists.nongnu.org/archive/html/qemu-devel/2017-02/msg05666.html
