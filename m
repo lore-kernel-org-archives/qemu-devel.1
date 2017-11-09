@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47722)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47971)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=4790f0bb5=Paul.Durrant@citrix.com>)
-	id 1eCjAn-0006jl-JA
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 04:30:58 -0500
+	(envelope-from <peterz@infradead.org>) id 1eCjCH-0007Us-Ts
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 04:32:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=4790f0bb5=Paul.Durrant@citrix.com>)
-	id 1eCjAk-0004kH-G4
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 04:30:57 -0500
-Received: from smtp.citrix.com.au ([103.14.252.240]:1771)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=4790f0bb5=Paul.Durrant@citrix.com>)
-	id 1eCjAj-0004dZ-Pr
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 04:30:54 -0500
-From: Paul Durrant <Paul.Durrant@citrix.com>
-Date: Thu, 9 Nov 2017 09:30:45 +0000
-Message-ID: <fd24582135514408b2e25d2606a77e31@AMSPEX02CL03.citrite.net>
-References: <20171107104653.8913-1-paul.durrant@citrix.com>
-	<20171108174227.GC8403@stefanha-x1.localdomain>
-In-Reply-To: <20171108174227.GC8403@stefanha-x1.localdomain>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <peterz@infradead.org>) id 1eCjCE-0005ax-P7
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 04:32:29 -0500
+Received: from bombadil.infradead.org ([65.50.211.133]:55627)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterz@infradead.org>)
+	id 1eCjCE-0005Qi-Iu
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 04:32:26 -0500
+Date: Thu, 9 Nov 2017 10:32:00 +0100
+From: Peter Zijlstra <peterz@infradead.org>
+Message-ID: <20171109093200.2562ek7ebdz45gj2@hirez.programming.kicks-ass.net>
+References: <1509118355-4890-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v3] xen-disk: use an IOThread per instance
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1509118355-4890-1-git-send-email-mst@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v6] x86: use lock+addl for smp_mb()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,43 +27,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 'Stefan Hajnoczi' <stefanha@gmail.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, Anthony
-	Perard <anthony.perard@citrix.com>, Kevin Wolf <kwolf@redhat.com>, Stefano
-	Stabellini <sstabellini@kernel.org>, Max Reitz <mreitz@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: linux-kernel@vger.kernel.org, Andy Lutomirski <luto@amacapital.net>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org, virtualization@lists.linux-foundation.org, qemu-devel@nongnu.org
 
-> -----Original Message-----
-> From: Stefan Hajnoczi [mailto:stefanha@gmail.com]
-> Sent: 08 November 2017 17:42
-> To: Paul Durrant <Paul.Durrant@citrix.com>
-> Cc: qemu-devel@nongnu.org; xen-devel@lists.xenproject.org; Anthony
-> Perard <anthony.perard@citrix.com>; Kevin Wolf <kwolf@redhat.com>;
-> Stefano Stabellini <sstabellini@kernel.org>; Max Reitz <mreitz@redhat.com=
->
-> Subject: Re: [Qemu-devel] [PATCH v3] xen-disk: use an IOThread per
-> instance
->=20
-> On Tue, Nov 07, 2017 at 05:46:53AM -0500, Paul Durrant wrote:
-> > This patch allocates an IOThread object for each xen_disk instance and
-> > sets the AIO context appropriately on connect. This allows processing
-> > of I/O to proceed in parallel.
-> >
-> > The patch also adds tracepoints into xen_disk to make it possible to
-> > follow the state transtions of an instance in the log.
->=20
-> virtio-blk and virtio-scsi allow the user to specify an IOThread object.
-> This allows users to configure the device<->IOThread mapping any way
-> they like (e.g. 1:1, M:N).  Are you sure you want to hard-code the
-> IOThread mapping?
+On Fri, Oct 27, 2017 at 07:14:31PM +0300, Michael S. Tsirkin wrote:
 
-Stefan,
+> The one difference between lock+add and mfence is that lock+addl does
+> not affect clflush, previous patches converted all uses of clflush to
+> call mb(), such that changes to smp_mb won't affect it.
+> 
+> Update mb/rmb/wmb on 32 bit to use the negative offset, too, for
+> consistency.
 
-  Realistically it's the only option at the moment. Xen PV backends are not=
- configured bu QAPI... so no ability to control them from the command line =
-or QMP. This is something I seriously intend to address in the near future =
-but, for now, I simply want to unlock the performance boost that IOThread c=
-an provide.
+So I briefly spoke to hpa about this patch in Prague, and yes, we should
+do this.
 
-  Cheers,
+By the very simple argument that we already rely on all LOCK prefixed
+instructions to fully imply smp_mb().
 
-    Paul
+And yes, there are differences between MFENCE and LOCK prefix, but as
+already noted above, those should not have been using smp_mb() in the
+first place and should be converted to mb()
+
+So:
+
+Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+
+
+> diff --git a/arch/x86/include/asm/barrier.h b/arch/x86/include/asm/barrier.h
+> index bfb28ca..3c6ba1e 100644
+> --- a/arch/x86/include/asm/barrier.h
+> +++ b/arch/x86/include/asm/barrier.h
+> @@ -11,11 +11,11 @@
+>   */
+>  
+>  #ifdef CONFIG_X86_32
+> -#define mb() asm volatile(ALTERNATIVE("lock; addl $0,0(%%esp)", "mfence", \
+> +#define mb() asm volatile(ALTERNATIVE("lock; addl $0,-4(%%esp)", "mfence", \
+>  				      X86_FEATURE_XMM2) ::: "memory", "cc")
+> -#define rmb() asm volatile(ALTERNATIVE("lock; addl $0,0(%%esp)", "lfence", \
+> +#define rmb() asm volatile(ALTERNATIVE("lock; addl $0,-4(%%esp)", "lfence", \
+>  				       X86_FEATURE_XMM2) ::: "memory", "cc")
+> -#define wmb() asm volatile(ALTERNATIVE("lock; addl $0,0(%%esp)", "sfence", \
+> +#define wmb() asm volatile(ALTERNATIVE("lock; addl $0,-4(%%esp)", "sfence", \
+>  				       X86_FEATURE_XMM2) ::: "memory", "cc")
+>  #else
+>  #define mb() 	asm volatile("mfence":::"memory")
+> @@ -30,7 +30,11 @@
+>  #endif
+>  #define dma_wmb()	barrier()
+>  
+> -#define __smp_mb()	mb()
+> +#ifdef CONFIG_X86_32
+> +#define __smp_mb()	asm volatile("lock; addl $0,-4(%%esp)" ::: "memory", "cc")
+> +#else
+> +#define __smp_mb()	asm volatile("lock; addl $0,-4(%%rsp)" ::: "memory", "cc")
+> +#endif
+>  #define __smp_rmb()	dma_rmb()
+>  #define __smp_wmb()	barrier()
+>  #define __smp_store_mb(var, value) do { (void)xchg(&var, value); } while (0)
