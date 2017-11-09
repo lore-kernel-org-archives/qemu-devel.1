@@ -1,15 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41207)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44677)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eCtfh-0007hM-Ej
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 15:43:34 -0500
+	(envelope-from <eblake@redhat.com>) id 1eCtty-0002cb-6j
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 15:58:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eCtfg-0005zR-Fg
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 15:43:33 -0500
-From: Max Reitz <mreitz@redhat.com>
-Date: Thu,  9 Nov 2017 21:43:15 +0100
-Message-Id: <20171109204315.27072-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.11] block: Keep strong reference when
- draining all BDS
+	(envelope-from <eblake@redhat.com>) id 1eCttw-0007xs-Vl
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 15:58:18 -0500
+References: <20171109203025.27493-1-mreitz@redhat.com>
+	<20171109203025.27493-5-mreitz@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <73d1bcb3-aeaf-24d1-5cf0-359c58de0283@redhat.com>
+Date: Thu, 9 Nov 2017 14:58:07 -0600
+MIME-Version: 1.0
+In-Reply-To: <20171109203025.27493-5-mreitz@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="V8Af10O83cQ2km6T1l9qMN2KxaHvLhHmJ"
+Subject: Re: [Qemu-devel] [PATCH v2 4/5] iotests: Make 083 less flaky
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,118 +24,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-Draining a BDS may lead to graph modifications, which in turn may result
-in it and other BDS being stripped of their current references.  If
-bdrv_drain_all_begin() and bdrv_drain_all_end() do not keep strong
-references themselves, the BDS they are trying to drain (or undrain) may
-disappear right under their feet -- or, more specifically, under the
-feet of BDRV_POLL_WHILE() in bdrv_drain_recurse().
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--V8Af10O83cQ2km6T1l9qMN2KxaHvLhHmJ
+From: Eric Blake <eblake@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <73d1bcb3-aeaf-24d1-5cf0-359c58de0283@redhat.com>
+Subject: Re: [PATCH v2 4/5] iotests: Make 083 less flaky
+References: <20171109203025.27493-1-mreitz@redhat.com>
+ <20171109203025.27493-5-mreitz@redhat.com>
+In-Reply-To: <20171109203025.27493-5-mreitz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-This fixes an occasional hang of iotest 194.
+On 11/09/2017 02:30 PM, Max Reitz wrote:
+> 083 has (at least) two issues:
+>=20
+> 1. By launching the nbd-fault-injector in background, it may not be
+>    scheduled until the first grep on its output file is executed.
+>    However, until then, that file may not have been created yet -- so i=
+t
+>    either does not exist yet (thus making the grep emit an error), or i=
+t
+>    does exist but contains stale data (thus making the rest of the test=
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
- block/io.c | 47 ++++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 44 insertions(+), 3 deletions(-)
+>    case work connect to a wrong address).
+>    Fix this by explicitly overwriting the output file before executing
+>    nbd-fault-injector.
+>=20
+> 2. The nbd-fault-injector prints things other than "Listening on...".
+>    It also prints a "Closing connection" message from time to time.  We=
 
-diff --git a/block/io.c b/block/io.c
-index 3d5ef2cabe..a0a2833e8e 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -340,7 +340,10 @@ void bdrv_drain_all_begin(void)
-     bool waited = true;
-     BlockDriverState *bs;
-     BdrvNextIterator it;
--    GSList *aio_ctxs = NULL, *ctx;
-+    GSList *aio_ctxs = NULL, *ctx, *bs_list = NULL, *bs_list_entry;
-+
-+    /* Must be called from the main loop */
-+    assert(qemu_get_current_aio_context() == qemu_get_aio_context());
- 
-     block_job_pause_all();
- 
-@@ -355,6 +358,12 @@ void bdrv_drain_all_begin(void)
-         if (!g_slist_find(aio_ctxs, aio_context)) {
-             aio_ctxs = g_slist_prepend(aio_ctxs, aio_context);
-         }
-+
-+        /* Keep a strong reference to all root BDS and copy them into
-+         * an own list because draining them may lead to graph
-+         * modifications. */
-+        bdrv_ref(bs);
-+        bs_list = g_slist_prepend(bs_list, bs);
-     }
- 
-     /* Note that completion of an asynchronous I/O operation can trigger any
-@@ -370,7 +379,11 @@ void bdrv_drain_all_begin(void)
-             AioContext *aio_context = ctx->data;
- 
-             aio_context_acquire(aio_context);
--            for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
-+            for (bs_list_entry = bs_list; bs_list_entry;
-+                 bs_list_entry = bs_list_entry->next)
-+            {
-+                bs = bs_list_entry->data;
-+
-                 if (aio_context == bdrv_get_aio_context(bs)) {
-                     waited |= bdrv_drain_recurse(bs, true);
-                 }
-@@ -379,24 +392,52 @@ void bdrv_drain_all_begin(void)
-         }
-     }
- 
-+    for (bs_list_entry = bs_list; bs_list_entry;
-+         bs_list_entry = bs_list_entry->next)
-+    {
-+        bdrv_unref(bs_list_entry->data);
-+    }
-+
-     g_slist_free(aio_ctxs);
-+    g_slist_free(bs_list);
- }
- 
- void bdrv_drain_all_end(void)
- {
-     BlockDriverState *bs;
-     BdrvNextIterator it;
-+    GSList *bs_list = NULL, *bs_list_entry;
-+
-+    /* Must be called from the main loop */
-+    assert(qemu_get_current_aio_context() == qemu_get_aio_context());
- 
-+    /* Keep a strong reference to all root BDS and copy them into an
-+     * own list because draining them may lead to graph modifications.
-+     */
-     for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
--        AioContext *aio_context = bdrv_get_aio_context(bs);
-+        bdrv_ref(bs);
-+        bs_list = g_slist_prepend(bs_list, bs);
-+    }
-+
-+    for (bs_list_entry = bs_list; bs_list_entry;
-+         bs_list_entry = bs_list_entry->next)
-+    {
-+        AioContext *aio_context;
-+
-+        bs = bs_list_entry->data;
-+        aio_context = bdrv_get_aio_context(bs);
- 
-         aio_context_acquire(aio_context);
-         aio_enable_external(aio_context);
-         bdrv_parent_drained_end(bs);
-         bdrv_drain_recurse(bs, false);
-         aio_context_release(aio_context);
-+
-+        bdrv_unref(bs);
-     }
- 
-+    g_slist_free(bs_list);
-+
-     block_job_resume_all();
- }
- 
--- 
-2.13.6
+>    currently invoke sed on the whole file in the hope of it only
+>    containing the "Listening on..." line yet.  That hope is sometimes
+>    shattered by the brutal reality of race conditions, so invoke grep
+>    before sed.
+
+Comment is now stale; s/invoke grep before sed/make the sed script more
+robust/
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--V8Af10O83cQ2km6T1l9qMN2KxaHvLhHmJ
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloEwV8ACgkQp6FrSiUn
+Q2r1YQgAnuY4iZp1XgCd21sOA5oIcySlztfyF8iattX/jkasBzg8OiZexMHlRBDw
+u/dtzITvXfu/X5a6D6RoLiyhCCj0BNBvSavrBMGEAOOCkZJpnAUfnoiSxPlgid+q
+Dw+K2RfdUtMT0qT511hK0073kDtVteXSwkMYTIZCYe47oJW59DVHwt0eGbruurzu
+1vo6uOqkfd7rq+d+VrRyJhIJmP8uYuwn9ex1FA2byg9H7bld/MbE/Q/CZZN35k3R
+wjenC1d4HYo+W5bMQ18T/cKDroCkW5RowtjIGg9VaQVs8BwoV5+4Z3ujQz9gRYl0
+QfYj9M1hgm4l/FRSZsLfhRZ3O2Ip+Q==
+=YK3S
+-----END PGP SIGNATURE-----
+
+--V8Af10O83cQ2km6T1l9qMN2KxaHvLhHmJ--
