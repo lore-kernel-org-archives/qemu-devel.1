@@ -1,33 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41249)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42595)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eCvLj-0007wx-ND
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 17:31:04 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eCvSW-0000yE-T1
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 17:38:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eCvLe-0006nu-Ps
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 17:31:03 -0500
-Received: from indium.canonical.com ([91.189.90.7]:59488)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eCvLe-0006nA-JX
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 17:30:58 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eCvLd-0002vb-0s
-	for <qemu-devel@nongnu.org>; Thu, 09 Nov 2017 22:30:57 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id D9CF02E80D1
-	for <qemu-devel@nongnu.org>; Thu,  9 Nov 2017 22:30:56 +0000 (UTC)
+	(envelope-from <mreitz@redhat.com>) id 1eCvSV-0001tM-Sl
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 17:38:04 -0500
+References: <20171109221216.10248-1-eblake@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <a4584f65-a9d9-bcfd-1f3b-2cf76553931a@redhat.com>
+Date: Thu, 9 Nov 2017 23:37:53 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 09 Nov 2017 22:22:08 -0000
-From: Johannes Falke <1731347@bugs.launchpad.net>
-Reply-To: Bug 1731347 <1731347@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <151026612898.3153.4753501294134415779.malonedeb@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1731347] [NEW] VFIO Passthrough of SAS2008-based
- HBA card fails on E3-1225v3 due to failed DMA mapping (-14)
+In-Reply-To: <20171109221216.10248-1-eblake@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="1CbIAiTNK7Sx9q316PCRbbWoXR5a3UttE"
+Subject: Re: [Qemu-devel] [PATCH for-2.11] iotests: Use new-style NBD
+ connections
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,107 +24,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, vsementsov@virtuozzo.com, pbonzini@redhat.com, Kevin Wolf <kwolf@redhat.com>
 
-Public bug reported:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--1CbIAiTNK7Sx9q316PCRbbWoXR5a3UttE
+From: Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, vsementsov@virtuozzo.com, pbonzini@redhat.com,
+ Kevin Wolf <kwolf@redhat.com>
+Message-ID: <a4584f65-a9d9-bcfd-1f3b-2cf76553931a@redhat.com>
+Subject: Re: [PATCH for-2.11] iotests: Use new-style NBD connections
+References: <20171109221216.10248-1-eblake@redhat.com>
+In-Reply-To: <20171109221216.10248-1-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-There is a bug preventing multiple people with my combination of
-hardware from using PCI passthrough. I am not actually sure whether the
-bug is in kernel/kvm, vfio or qemu, however, as qemu is the highest-
-level of these, I am reporting the bug here as you will likely know
-better where the origin of the bug may be found.
+On 2017-11-09 23:12, Eric Blake wrote:
+> Old-style NBD is deprecated upstream (it is documented, but no
+> longer implemented in the reference implementation), and it is
+> severely limited (it cannot support structured replies, which
+> means it cannot support efficient handling of zeroes), when
+> compared to new-style NBD.  We are better off having our iotests
+> favor new-style everywhere (although some explicit tests,
+> particularly 83, still cover old-style for back-compat reasons);
+> this is as simple as supplying the empty string as the default
+> export name, as it does not change the URI needed to connect a
+> client to the server.  This also gives us more coverage of the
+> just-added structured reply code, when not overriding $QEMU_NBD
+> to intentionally point to an older server.
+>=20
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+>=20
+> Proposing this for 2.11; it can either go in through the NBD
+> tree (although I just send my 2.11-rc1 pull request) or through
+> Max' iotest tree.
 
-When attempting to pass through this device to a KVM using VFIO, this
-results in error -14 (Bad Address):
+random.org said 1, so: Thanks, applied to my block branch:
 
-# qemu-system-x86_64 -enable-kvm -m 10G -net none -monitor stdio -serial
-# none -parallel none -vnc :1 -device vfio-pci,host=3D1:00.0 -S
-QEMU 2.9.1 monitor - type 'help' for more information
-(qemu) c
-(qemu) qemu-system-x86_64: VFIO_MAP_DMA: -14
-qemu-system-x86_64: vfio_dma_map(0x7f548f0a1fc0, 0xfebd0000, 0x2000, 0x7f54=
-a909d000) =3D -14 (Bad address)
-qemu: hardware error: vfio: DMA mapping failed, unable to continue
+https://github.com/XanClic/qemu/commits/block
 
-See also:
-https://bugzilla.proxmox.com/show_bug.cgi?id=3D1556
-https://www.redhat.com/archives/vfio-users/2016-May/msg00088.html
+Max
 
-This has occurred on Proxmox (Proxmox and Debian packages, Ubuntu kernel), =
-Ubuntu,
-and pure Debian packages and kernel on Proxmox. However, this error
-reportedly does NOT occur for:
 
-- different distributions(!) (Fedora 24, 25)
-- different HBA cards (SAS2308, SAS3008)
-- different CPU (E3-1220v5)
+--1CbIAiTNK7Sx9q316PCRbbWoXR5a3UttE
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-I would be thankful for any input and I'll be happy to provide any
-further info necessary. This is my first time delving this deep into
-anything close to the kernel.
+-----BEGIN PGP SIGNATURE-----
 
-Thanks and best regards,
-Johannes Falke
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAloE2MESHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AcVMH/Aj5vEjNQkxLhAQ1W9XThMfpEw6hQSz3
+aVuKD59xE+gakd9mecqOpTvTCnSZgVqk3iOk9By5mSQajUME69LUcAdWcHdv7Tcv
+9UJ1aKCbAYkOrpdQIAQszmBkBqcrVv3EHfV8N0Er3NfnD/IdZYOPAPQ85j1VKvRx
+JLn11gI/qe+MJdv4VawYTI42aMx+TY0oO8oywo1cx2pdmtrmRLziue36Ce87r8hi
+ZmF0PUjeqb+seLSpOwRdrkvgXy3FRoppViEh4fD+VDa0LbwePPRPob8ROAQGBtuf
+QwlLhkGGhtYgLz0k9OANl0DF/QVXcPDpbK+OVh7NXzwvqgldxHYshqU=
+=hXmJ
+-----END PGP SIGNATURE-----
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
-** Attachment added: "strace.txt"
-   https://bugs.launchpad.net/bugs/1731347/+attachment/5006683/+files/strac=
-e.txt
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1731347
-
-Title:
-  VFIO Passthrough of SAS2008-based HBA card fails on E3-1225v3 due to
-  failed DMA mapping (-14)
-
-Status in QEMU:
-  New
-
-Bug description:
-  There is a bug preventing multiple people with my combination of
-  hardware from using PCI passthrough. I am not actually sure whether
-  the bug is in kernel/kvm, vfio or qemu, however, as qemu is the
-  highest-level of these, I am reporting the bug here as you will likely
-  know better where the origin of the bug may be found.
-
-  When attempting to pass through this device to a KVM using VFIO, this
-  results in error -14 (Bad Address):
-
-  # qemu-system-x86_64 -enable-kvm -m 10G -net none -monitor stdio -serial
-  # none -parallel none -vnc :1 -device vfio-pci,host=3D1:00.0 -S
-  QEMU 2.9.1 monitor - type 'help' for more information
-  (qemu) c
-  (qemu) qemu-system-x86_64: VFIO_MAP_DMA: -14
-  qemu-system-x86_64: vfio_dma_map(0x7f548f0a1fc0, 0xfebd0000, 0x2000, 0x7f=
-54a909d000) =3D -14 (Bad address)
-  qemu: hardware error: vfio: DMA mapping failed, unable to continue
-
-  See also:
-  https://bugzilla.proxmox.com/show_bug.cgi?id=3D1556
-  https://www.redhat.com/archives/vfio-users/2016-May/msg00088.html
-
-  This has occurred on Proxmox (Proxmox and Debian packages, Ubuntu kernel)=
-, Ubuntu,
-  and pure Debian packages and kernel on Proxmox. However, this error
-  reportedly does NOT occur for:
-
-  - different distributions(!) (Fedora 24, 25)
-  - different HBA cards (SAS2308, SAS3008)
-  - different CPU (E3-1220v5)
-
-  I would be thankful for any input and I'll be happy to provide any
-  further info necessary. This is my first time delving this deep into
-  anything close to the kernel.
-
-  Thanks and best regards,
-  Johannes Falke
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1731347/+subscriptions
+--1CbIAiTNK7Sx9q316PCRbbWoXR5a3UttE--
