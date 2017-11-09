@@ -1,34 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42470)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42531)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eCodo-0002mv-PW
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 10:21:18 -0500
+	(envelope-from <marcel@redhat.com>) id 1eCoe3-0002tS-Ny
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 10:21:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eCodl-0006NP-K5
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 10:21:16 -0500
-Received: from indium.canonical.com ([91.189.90.7]:51516)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eCodl-0006LY-DT
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 10:21:13 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eCodh-00026l-KG
-	for <qemu-devel@nongnu.org>; Thu, 09 Nov 2017 15:21:09 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 56C202E82A7
-	for <qemu-devel@nongnu.org>; Thu,  9 Nov 2017 15:11:01 +0000 (UTC)
+	(envelope-from <marcel@redhat.com>) id 1eCoe0-0006Uf-Ih
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 10:21:31 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34352)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1eCoe0-0006UT-9a
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 10:21:28 -0500
+References: <151023266893.360.2441014157612423993@bafd83ae6430>
+	<7e42c571-7e7e-052c-cf6b-2ddd23b56cd4@redhat.com>
+	<20171109143604.GB29835@lemon>
+From: Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <38577f02-0fdd-c4aa-8fb7-494beac5247c@redhat.com>
+Date: Thu, 9 Nov 2017 17:21:18 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 09 Nov 2017 15:03:54 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1731277 <1731277@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <151023792928.3447.3728561425384648409.malonedeb@gac.canonical.com>
-Message-Id: <151023983493.31277.13020700716287549724.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1731277] Re: Provide target specific qemu man
- pages
+In-Reply-To: <20171109143604.GB29835@lemon>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH V4] hw/pcie-pci-bridge: restrict to X86 and
+ ARM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,64 +30,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, patchew-devel@freelists.org
 
-I'm kind of hoping that moving to Sphinx for our docs toolchain will
-allow us to for instance have the board specific information in doc
-comments in each board source file, which could then be automatically
-assembled into the right documentation. The current manpages are
-autobuilt from the monolithic qemu-doc.texi, which is woefully out of
-date in many areas...
+On 09/11/2017 16:37, Fam Zheng wrote:
+> On Thu, 11/09 16:08, Marcel Apfelbaum wrote:
+>>> make[1]: *** No rule to make target `../hw/pci-bridge/pcie_pci_bridge.o', needed by `qemu-system-aarch64'.  Stop.
+>>> make[1]: *** Waiting for unfinished jobs..../tmp/qemu-test/src/target/arm/translate-a64.c: In function 'handle_shri_with_rndacc':
+>>> /tmp/qemu-test/src/target/arm/translate-a64.c:6390: warning: 'tcg_src_hi' may be used uninitialized in this function
+>>> /tmp/qemu-test/src/target/arm/translate-a64.c: In function 'disas_simd_scalar_two_reg_misc':
+>>> /tmp/qemu-test/src/target/arm/translate-a64.c:8117: warning: 'rmode' may be used uninitialized in this function
+>>>
+>>> make: *** [subdir-aarch64-softmmu] Error 2
+>>> Traceback (most recent call last):
+>>>     File "./tests/docker/docker.py", line 385, in <module>
+>>>       sys.exit(main())
+>>>     File "./tests/docker/docker.py", line 382, in main
+>>>       return args.cmdobj.run(args, argv)
+>>>     File "./tests/docker/docker.py", line 239, in run
+>>>       return Docker().run(argv, args.keep, quiet=args.quiet)
+>>>     File "./tests/docker/docker.py", line 207, in run
+>>>       quiet=quiet)
+>>>     File "./tests/docker/docker.py", line 125, in _do_check
+>>>       return subprocess.check_call(self._command + cmd, **kwargs)
+>>>     File "/usr/lib64/python2.7/subprocess.py", line 186, in check_call
+>>>       raise CalledProcessError(retcode, cmd)
+>>> subprocess.CalledProcessError: Command '['docker', 'run', '--label', 'com.qemu.instance.uuid=561e8180c54e11e79bd052540069c830', '-u', '0', '--security-opt', 'seccomp=unconfined', '--rm', '--net=none', '-e', 'TARGET_LIST=', '-e', 'EXTRA_CONFIGURE_OPTS=', '-e', 'V=', '-e', 'J=8', '-e', 'DEBUG=', '-e', 'SHOW_ENV=1', '-e', 'CCACHE_DIR=/var/tmp/ccache', '-v', '/root/.cache/qemu-docker-ccache:/var/tmp/ccache:z', '-v', '/var/tmp/patchew-tester-tmp-gp94i687/src/docker-src.2017-11-09-08.03.01.2879:/var/tmp/qemu:z,ro', 'qemu:centos6', '/var/tmp/qemu/run', 'test-quick']' returned non-zero exit status 2
+>>> make[1]: *** [tests/docker/Makefile.include:129: docker-run] Error 1
+>>> make[1]: Leaving directory '/var/tmp/patchew-tester-tmp-gp94i687/src'
+>>> make: *** [tests/docker/Makefile.include:163: docker-run-test-quick@centos6] Error 2
+>>>
+>>> real	1m28.235s
+>>> user	0m4.283s
+>>> sys	0m4.399s
+>>> === OUTPUT END ===
+>>>
+>>> Test command exited with code: 2
+>>>
+>>>
+>>> ---
+>>> Email generated automatically by Patchew [http://patchew.org/].
+>>> Please send your feedback to patchew-devel@freelists.org
+>>>
+>>
+>> Hi Fam,
+>>
+>> I can compile just fine in my workstation, can you
+>> please advice ?
+> 
+> I can see the same error with
+> 
+>      make docker-run-test-quick@centos6 V=1 J=8
+> 
+> and also a normal out-of-tree build with
+> 
+>      $QEMU_SRC/configure --enable-debug --target-list=x86_64-softmmu,aarch64-softmmu
+>
 
--- =
+Yes, I succeeded to reproduce it, thanks!
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1731277
 
-Title:
-  Provide target specific qemu man pages
+> Can you install docker and try it?
+> 
 
-Status in QEMU:
-  New
+I wanted to try it eventually, now it seems a good time.
+I will let you know if any problems.
 
-Bug description:
-  Right now, all qemu target binaries (qemu-system-...) share the same
-  man page.
+Thanks,
+Marcel
 
-  The current man page is primarily focused on x86, and therefore the
-  information given is entirely wrong for e.g. arm, powerpc or s390x.
-
-  NAME
-         qemu-doc - QEMU Emulator User Documentation
-
-  SYNOPSIS
-         qemu-system-i386 [options] [disk_image]
-
-  DESCRIPTION
-         The QEMU PC System emulator simulates the following peripherals:
-
-         -   i440FX host PCI bridge and PIIX3 PCI to ISA bridge
-
-         -   Cirrus CLGD 5446 PCI VGA card or dummy VGA card with Bochs VES=
-A extensions (hardware level, including all non
-             standard modes).
-
-         -   PS/2 mouse and keyboard
-
-         -   2 PCI IDE interfaces with hard disk and CD-ROM support
-
-         -   Floppy disk
-
-  ...
-
-  We should have target specific man pages, with the common
-  options/settings factored out, so they are included in all target
-  specific man pages.
-
-  "man qemu-system-s390x" should give s390x specific (+common)
-  information and "man qemu-system-x86_64" should contain x86 specific
-  (+common) information.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1731277/+subscriptions
+> Fam
+> 
