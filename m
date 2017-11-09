@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57783)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33098)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eCueX-0005Vp-76
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 16:46:26 -0500
+	(envelope-from <alistai@xilinx.com>) id 1eCuli-0008QH-3R
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 16:53:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eCueW-0002ON-7p
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 16:46:25 -0500
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1510228971-6005-1-git-send-email-sundeep.lkml@gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <4beb4e47-0ff9-8251-6502-23824779edbd@amsat.org>
-Date: Thu, 9 Nov 2017 18:46:15 -0300
+	(envelope-from <alistai@xilinx.com>) id 1eCuld-0002FL-8k
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 16:53:50 -0500
+Received: from mail-bl2nam02on0066.outbound.protection.outlook.com
+	([104.47.38.66]:41169
+	helo=NAM02-BL2-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1eCuld-0002Ep-30
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 16:53:45 -0500
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Thu, 9 Nov 2017 13:49:35 -0800
+Message-ID: <b2df555986423d225a0a79fb58e2a93054ac5300.1510263731.git.alistair.francis@xilinx.com>
+In-Reply-To: <cover.1510263731.git.alistair.francis@xilinx.com>
+References: <cover.1510263731.git.alistair.francis@xilinx.com>
 MIME-Version: 1.0
-In-Reply-To: <1510228971-6005-1-git-send-email-sundeep.lkml@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu devel PATCH] MAINTAINERS: Add entries for
- Smartfusion2
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH for 2.11 v2 2/2] xlnx-zcu102: Add an info
+ message deprecating the EP108
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,70 +28,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Subbaraya Sundeep <sundeep.lkml@gmail.com>, qemu-devel@nongnu.org, qemu-arm@nongnu.org
-Cc: peter.maydell@linaro.org, alistair23@gmail.com
+To: qemu-devel@nongnu.org, peter.maydell@linaro.org
+Cc: alistair.francis@xilinx.com, alistair23@gmail.com, edgar.iglesias@xilinx.com, edgar.iglesias@gmail.com, ehabkost@redhat.com, cota@braap.org, f4bug@amsat.org
 
-Hi Subbaraya,
+The EP108 was an early access development board that is no longer used.
+Add an info message to convert any users to the ZCU102 instead. On QEMU
+they are both identical.
 
-On 11/09/2017 09:02 AM, Subbaraya Sundeep wrote:
-> add voluntarily myself as maintainer for Smartfusion2
+This patch also updated the qemu-doc.texi file to indicate that the
+EP108 has been deprecated.
 
-You need to share your GnuPG key signed, I couldn't find it using
-http://pgp.mit.edu/pks/lookup?search=Subbaraya+Sundeep
+Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+---
+V2:
+ - Update the qemu-doc.texi file
 
-from https://wiki.qemu.org/Contribute/SubmitAPullRequest :
-All pull requests must be signed. If your key is not already signed by
-members of the QEMU community, you should make arrangements to attend a
-KeySigningParty (for example at KVM Forum) or make alternative
-arrangements to have your key signed by an attendee. Key signing
-requires meeting another community member *in person* so please make
-appropriate arrangements.
+ hw/arm/xlnx-zcu102.c | 3 +++
+ qemu-doc.texi        | 7 +++++++
+ 2 files changed, 10 insertions(+)
 
-IMHO it would be great you find some time to review some patches
-(qemu-arm@nongnu.org is not that verbose):
-https://wiki.qemu.org/Contribute/SubmitAPatch#Return_the_favor
-
-> 
-> Signed-off-by: Subbaraya Sundeep <sundeep.lkml@gmail.com>
-> ---
->  MAINTAINERS | 17 +++++++++++++++++
->  1 file changed, 17 insertions(+)
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 0cd4d02..dae08bd 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -564,6 +564,23 @@ M: Alistair Francis <alistair@alistair23.me>
->  S: Maintained
->  F: hw/arm/netduino2.c
->  
-> +MSF2 SoC
-
-SmartFusion2
-
-> +M: Subbaraya Sundeep <sundeep.lkml@gmail.com>
-> +S: Maintained
-> +F: hw/arm/msf2-soc.c
-> +F: hw/misc/msf2-sysreg.c
-> +F: hw/timer/mss-timer.c
-> +F: hw/ssi/mss-spi.c
-> +F: include/hw/arm/msf2-soc.h
-> +F: include/hw/misc/msf2-sysreg.h
-> +F: include/hw/timer/mss-timer.h
-> +F: include/hw/ssi/mss-spi.h
-> +
-
-Emcraft M2S-FG484
-
-> +MSF2 SOM board
-> +M: Subbaraya Sundeep <sundeep.lkml@gmail.com>
-> +S: Maintained
-> +F: hw/arm/msf2-som.c
-> +
->  CRIS Machines
->  -------------
->  Axis Dev88
-
-Regards,
-
-Phil.
+diff --git a/hw/arm/xlnx-zcu102.c b/hw/arm/xlnx-zcu102.c
+index 7ec03dad42..adddd234a1 100644
+--- a/hw/arm/xlnx-zcu102.c
++++ b/hw/arm/xlnx-zcu102.c
+@@ -164,6 +164,9 @@ static void xlnx_ep108_init(MachineState *machine)
+ {
+     XlnxZCU102 *s = EP108_MACHINE(machine);
+ 
++    info_report("The Xilinx EP108 machine is deprecated, please use the "
++                "ZCU102 machine instead. It has the same features supported.");
++
+     xlnx_zynqmp_init(s, machine);
+ }
+ 
+diff --git a/qemu-doc.texi b/qemu-doc.texi
+index 8c10956a66..d383ac44d4 100644
+--- a/qemu-doc.texi
++++ b/qemu-doc.texi
+@@ -2537,6 +2537,13 @@ or ``ivshmem-doorbell`` device types.
+ The ``spapr-pci-vfio-host-bridge'' device type is replaced by
+ the ``spapr-pci-host-bridge'' device type.
+ 
++@section System emulator machines
++
++@subsection Xilinx EP108 (since 2.11.0)
++
++The ``xlnx-ep108'' machine has been replaced by the ``xlnx-zcu102'' machine.
++The ``xlnx-zcu102'' machine has the same features and capabilites in QEMU.
++
+ @node License
+ @appendix License
+ 
+-- 
+2.14.1
