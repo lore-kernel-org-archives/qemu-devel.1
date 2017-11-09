@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38795)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39506)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1eCiUQ-0003z5-SG
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 03:47:11 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eCiX2-0004is-Im
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 03:49:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1eCiUL-0001Th-W6
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 03:47:10 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52430)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <rjones@redhat.com>) id 1eCiUL-0001TS-Q9
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 03:47:05 -0500
-Date: Thu, 9 Nov 2017 08:47:03 +0000
-From: "Richard W.M. Jones" <rjones@redhat.com>
-Message-ID: <20171109084702.GD2787@redhat.com>
-References: <cover.1510181732.git.alistair.francis@xilinx.com>
-	<10f1bca388976b18119fd4fc28d6fdcf7106f7d3.1510181732.git.alistair.francis@xilinx.com>
-	<20c00ee8-6d77-e8bd-aa77-6db5db789900@amsat.org>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eCiX1-0002VG-Ob
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 03:49:52 -0500
+References: <20171107030912.23930-1-eblake@redhat.com>
+	<20171107030912.23930-3-eblake@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <d684d752-3ca9-9d14-b75e-59485962924f@virtuozzo.com>
+Date: Thu, 9 Nov 2017 11:49:39 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20c00ee8-6d77-e8bd-aa77-6db5db789900@amsat.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 40/45] hw/watchdog: Replace
- fprintf(stderr, "*\n" with error_report()
+In-Reply-To: <20171107030912.23930-3-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH 2/2] nbd/server: Optimize final chunk of
+ sparse read
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,30 +25,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Cc: Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org, alistair23@gmail.com, armbru@redhat.com
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, pbonzini@redhat.com
 
-On Wed, Nov 08, 2017 at 08:43:45PM -0300, Philippe Mathieu-Daud=E9 wrote:
-> > @@ -126,7 +125,7 @@ void watchdog_perform_action(void)
-> > =20
-> >      case WATCHDOG_ACTION_DEBUG:
-> >          qapi_event_send_watchdog(WATCHDOG_ACTION_DEBUG, &error_abort=
-);
-> > -        fprintf(stderr, "watchdog: timer fired\n");
-> > +        error_report("watchdog: timer fired");
->=20
-> I don't think this is an error and would rather use info_report() here.
->=20
-> Richard what do you think?
+07.11.2017 06:09, Eric Blake wrote:
+> If we are careful to handle 0-length read requests correctly,
+> we can optimize our sparse read to send the NBD_REPLY_FLAG_DONE
+> bit on our last OFFSET_DATA or OFFSET_HOLE chunk rather than
+> needing a separate chunk.
+>
+> Signed-off-by: Eric Blake <eblake@redhat.com>
 
-Yes, this is not an error.  It's an informational message.
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-Rich.
 
---=20
-Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rj=
-ones
-Read my programming and virtualization blog: http://rwmj.wordpress.com
-virt-top is 'top' for virtual machines.  Tiny program with many
-powerful monitoring features, net stats, disk stats, logging, etc.
-http://people.redhat.com/~rjones/virt-top
+
+-- 
+Best regards,
+Vladimir
