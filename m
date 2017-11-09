@@ -1,17 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46346)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48481)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eCooU-0005GK-BO
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 10:32:22 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eCowv-0000Yj-2D
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 10:41:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eCooT-00035x-07
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 10:32:18 -0500
-From: Cornelia Huck <cohuck@redhat.com>
-Date: Thu,  9 Nov 2017 16:32:04 +0100
-Message-Id: <20171109153204.26436-3-cohuck@redhat.com>
-In-Reply-To: <20171109153204.26436-1-cohuck@redhat.com>
-References: <20171109153204.26436-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL for-2.11 2/2] target/s390x: Finish implementing
- RISBGN
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eCowq-0006ya-5m
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 10:41:01 -0500
+Received: from mailhub.sw.ru ([195.214.232.25]:6261 helo=relay.sw.ru)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1eCowp-0006wk-QB
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 10:40:56 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Thu,  9 Nov 2017 18:40:47 +0300
+Message-Id: <20171109154049.42386-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH 0/2] add qmp nbd-server-remove
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,59 +22,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, rth@twiddle.net, agraf@suse.de, thuth@redhat.com, borntraeger@de.ibm.com, david@redhat.com, Richard Henderson <richard.henderson@linaro.org>, Cornelia Huck <cohuck@redhat.com>
+To: qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: eblake@redhat.com, pbonzini@redhat.com, kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, vsementsov@virtuozzo.com, den@openvz.org
 
-From: Richard Henderson <richard.henderson@linaro.org>
+Add command to remove nbd export, pair to nbd-server-add.
+The whole thing and description are in patch 02.
 
-We added the entry to insn-data.def, but failed to update op_risbg
-to match.  No need to special-case the imask inversion, since that
-is already ~0 for RISBG (and now RISBGN).
+Vladimir Sementsov-Ogievskiy (2):
+  nbd/server: add additional assert to nbd_export_put
+  qmp: add nbd-server-remove
 
-Fixes: 375ee58bedcda359011fe7fa99e0647f66f9ffa0
-Fixes: https://bugs.launchpad.net/qemu/+bug/1701798 (s390x part)
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20171107145546.767-1-richard.henderson@linaro.org>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Tested-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Cornelia Huck <cohuck@redhat.com>
----
- target/s390x/translate.c | 9 +++------
- 1 file changed, 3 insertions(+), 6 deletions(-)
+ qapi/block.json | 20 ++++++++++++++++++++
+ blockdev-nbd.c  | 27 +++++++++++++++++++++++++++
+ nbd/server.c    |  1 +
+ 3 files changed, 48 insertions(+)
 
-diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index dee72a787d..85d0a6c3af 100644
---- a/target/s390x/translate.c
-+++ b/target/s390x/translate.c
-@@ -3432,6 +3432,7 @@ static ExitStatus op_risbg(DisasContext *s, DisasOps *o)
-     /* Adjust the arguments for the specific insn.  */
-     switch (s->fields->op2) {
-     case 0x55: /* risbg */
-+    case 0x59: /* risbgn */
-         i3 &= 63;
-         i4 &= 63;
-         pmask = ~0;
-@@ -3447,7 +3448,7 @@ static ExitStatus op_risbg(DisasContext *s, DisasOps *o)
-         pmask = 0x00000000ffffffffull;
-         break;
-     default:
--        abort();
-+        g_assert_not_reached();
-     }
- 
-     /* MASK is the set of bits to be inserted from R2.
-@@ -3464,11 +3465,7 @@ static ExitStatus op_risbg(DisasContext *s, DisasOps *o)
-        insns, we need to keep the other half of the register.  */
-     imask = ~mask | ~pmask;
-     if (do_zero) {
--        if (s->fields->op2 == 0x55) {
--            imask = 0;
--        } else {
--            imask = ~pmask;
--        }
-+        imask = ~pmask;
-     }
- 
-     len = i4 - i3 + 1;
 -- 
-2.13.6
+2.11.1
