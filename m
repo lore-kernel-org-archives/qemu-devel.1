@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39617)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40678)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eCoXW-0008Tv-D0
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 10:14:50 -0500
+	(envelope-from <marcel@redhat.com>) id 1eCoaG-0001Ty-6R
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 10:17:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eCoXR-0002fy-UC
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 10:14:46 -0500
-References: <92c47a3f-92a6-4f3a-505f-dc278604a671@redhat.com>
-	<20171109042137.GA13786@lemon>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <67bb3458-80da-beda-eec1-c08168837832@redhat.com>
-Date: Thu, 9 Nov 2017 16:14:22 +0100
+	(envelope-from <marcel@redhat.com>) id 1eCoaC-00045R-7i
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 10:17:36 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59422)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1eCoaB-00043t-VI
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 10:17:32 -0500
+References: <151023266893.360.2441014157612423993@bafd83ae6430>
+	<775f71a5-4975-da5f-1e42-c4dfe8f589ef@redhat.com>
+	<d7a34a10-ae75-2d75-95b8-581b814b3e22@redhat.com>
+	<707e2aa1-5e01-ec98-33f0-0a014bcd0623@amsat.org>
+From: Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <0431e372-f2a2-3f11-02d8-41571b7523aa@redhat.com>
+Date: Thu, 9 Nov 2017 17:17:18 +0200
 MIME-Version: 1.0
-In-Reply-To: <20171109042137.GA13786@lemon>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="XSgaRa9r00kkQJI5Ig1ONOtrpeS3w90C7"
-Subject: Re: [Qemu-devel] Intermittent hang of iotest 194 (bdrv_drain_all
- after non-shared storage migration)
+In-Reply-To: <707e2aa1-5e01-ec98-33f0-0a014bcd0623@amsat.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH V4] hw/pcie-pci-bridge: restrict to X86 and
+ ARM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,188 +31,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: Qemu-block <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Cc: cohuck@redhat.com, famz@redhat.com, zuban32s@gmail.com, mst@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---XSgaRa9r00kkQJI5Ig1ONOtrpeS3w90C7
-From: Max Reitz <mreitz@redhat.com>
-To: Fam Zheng <famz@redhat.com>
-Cc: Qemu-block <qemu-block@nongnu.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <67bb3458-80da-beda-eec1-c08168837832@redhat.com>
-Subject: Re: [Qemu-devel] Intermittent hang of iotest 194 (bdrv_drain_all
- after non-shared storage migration)
-References: <92c47a3f-92a6-4f3a-505f-dc278604a671@redhat.com>
- <20171109042137.GA13786@lemon>
-In-Reply-To: <20171109042137.GA13786@lemon>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 2017-11-09 05:21, Fam Zheng wrote:
-> On Thu, 11/09 01:48, Max Reitz wrote:
->> Hi,
->>
->> More exciting news from the bdrv_drain() front!
->>
->> I've noticed in the past that iotest 194 sometimes hangs.  I usually r=
-un
->> the tests on tmpfs, but I've just now verified that it happens on my S=
-SD
->> just as well.
->>
->> So the reproducer is a plain:
->>
->> while ./check -raw 194; do; done
+On 09/11/2017 16:29, Philippe Mathieu-Daud=C3=A9 wrote:
+> Hi Marcel,
 >=20
-> I cannot produce it on my machine.
-
-Hm, too bad.  I see it both on my work laptop (with Fedora) and my
-desktop (with Arch)...
-
->> (No difference between raw or qcow2, though.)
+> On 11/09/2017 11:10 AM, Marcel Apfelbaum wrote:
+>> On 09/11/2017 16:03, Thomas Huth wrote:
+>>> On 09.11.2017 14:04, no-reply@patchew.org wrote:
+>>>> Hi,
+>>>>
+>>>> This series failed automatic build test. Please find the testing
+>>>> commands and
+>>>> their output below. If you have docker installed, you can probably
+>>>> reproduce it
+>>>> locally.
+>>> [...]
+>>>>  =C2=A0=C2=A0 CC=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 aarch64-softmmu/hw/sc=
+si/virtio-scsi.o
+>>>>  =C2=A0=C2=A0 CC=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 aarch64-softmmu/hw/sc=
+si/virtio-scsi-dataplane.o
+>>>> make[1]: *** No rule to make target
+>>>> `../hw/pci-bridge/pcie_pci_bridge.o', needed by
+>>>> `qemu-system-x86_64'.=C2=A0 Stop.
+>>>> make[1]: *** Waiting for unfinished jobs....
+>>>>  =C2=A0=C2=A0 CC=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 aarch64-softmmu/hw/sc=
+si/vhost-scsi-common.o
+>>>>  =C2=A0=C2=A0 CC=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 aarch64-softmmu/hw/sc=
+si/vhost-scsi.o
+>>>>  =C2=A0=C2=A0 CC=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 aarch64-softmmu/hw/sc=
+si/vhost-user-scsi.o
+>>>>  =C2=A0=C2=A0 CC=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 aarch64-softmmu/hw/sd=
+/omap_mmc.o
+>>>>  =C2=A0=C2=A0 CC=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 aarch64-softmmu/hw/sd=
+/pxa2xx_mmci.o
+>>>>  =C2=A0=C2=A0 CC=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 aarch64-softmmu/hw/sd=
+/bcm2835_sdhost.o
+>>>> make: *** [subdir-x86_64-softmmu] Error 2
+>>>> make: *** Waiting for unfinished jobs....
+>>>>  =C2=A0=C2=A0 CC=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 aarch64-softmmu/hw/ss=
+i/omap_spi.o
+>>>>  =C2=A0=C2=A0 CC=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 aarch64-softmmu/hw/ss=
+i/imx_spi.o
+>>>>  =C2=A0=C2=A0 CC=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 aarch64-softmmu/hw/ti=
+mer/exynos4210_mct.o
+>>>>  =C2=A0=C2=A0 CC=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 aarch64-softmmu/hw/ti=
+mer/exynos4210_pwm.o
+>>> [...]
+>>>>  =C2=A0=C2=A0 CC=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 aarch64-softmmu/hw/ti=
+mer/exynos4210_rtc.o
+>>>>  =C2=A0=C2=A0 CC=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 aarch64-softmmu/targe=
+t/arm/translate-a64.o
+>>>> make[1]: *** No rule to make target
+>>>> `../hw/pci-bridge/pcie_pci_bridge.o', needed by
+>>>> `qemu-system-aarch64'.=C2=A0 Stop.
+>>>> make[1]: *** Waiting for unfinished
+>>>> jobs..../tmp/qemu-test/src/target/arm/translate-a64.c: In function
+>>>> 'handle_shri_with_rndacc':
+>>>
+>>> Hmm, looks like this was not working as expected?
+>>>
 >>
->> And then, after a couple of runs (or a couple ten), it will just hang.=
-
->> The reason is that the source VM lingers around and doesn't quit
->> voluntarily -- the test itself was successful, but it just can't exit.=
-
->>
->> If you force it to exit by killing the VM (e.g. through pkill -11 qemu=
-),
->> this is the backtrace:
->>
->> #0  0x00007f7cfc297e06 in ppoll () at /lib64/libc.so.6
->> #1  0x0000563b846bcac9 in ppoll (__ss=3D0x0, __timeout=3D0x0,
->> __nfds=3D<optimized out>, __fds=3D<optimized out>) at
->> /usr/include/bits/poll2.h:77
+>> In my workstation works just fine (clean and compiled all archs),
+>> I sent a mail to Fam.
 >=20
-> Looking at the 0 timeout it seems we are in the aio_poll(ctx, blocking=3D=
-false);
-> branches of BDRV_POLL_WHILE? Is it a busy loop? If so I wonder what is =
-making
-> progress and causing the return value to be true in aio_poll().
+> Applying your patch on v2.11.0-rc0 I also get this:
 >=20
->> #2  0x0000563b846bcac9 in qemu_poll_ns (fds=3D<optimized out>,
->> nfds=3D<optimized out>, timeout=3D<optimized out>) at util/qemu-timer.=
-c:322
->> #3  0x0000563b846be711 in aio_poll (ctx=3Dctx@entry=3D0x563b856e3e80,
->> blocking=3D<optimized out>) at util/aio-posix.c:629
->> #4  0x0000563b8463afa4 in bdrv_drain_recurse
->> (bs=3Dbs@entry=3D0x563b865568a0, begin=3Dbegin@entry=3Dtrue) at block/=
-io.c:201
->> #5  0x0000563b8463baff in bdrv_drain_all_begin () at block/io.c:381
->> #6  0x0000563b8463bc99 in bdrv_drain_all () at block/io.c:411
->> #7  0x0000563b8459888b in block_migration_cleanup (opaque=3D<optimized=
-
->> out>) at migration/block.c:714
->> #8  0x0000563b845883be in qemu_savevm_state_cleanup () at
->> migration/savevm.c:1251
->> #9  0x0000563b845811fd in migration_thread (opaque=3D0x563b856f1da0) a=
-t
->> migration/migration.c:2298
->> #10 0x00007f7cfc56f36d in start_thread () at /lib64/libpthread.so.0
->> #11 0x00007f7cfc2a3e1f in clone () at /lib64/libc.so.6
->>
->>
->> And when you make bdrv_drain_all_begin() print what we are trying to
->> drain, you can see that it's the format node (managed by the "raw"
->> driver in this case).
+> make[1]: *** No rule to make target
+> '../hw/pci-bridge/pcie_pci_bridge.o', needed by 'qemu-system-aarch64'.
+> Stop.
+> Makefile:383: recipe for target 'subdir-aarch64-softmmu' failed
+> make: *** [subdir-aarch64-softmmu] Error 2
 >=20
-> So what is the value of bs->in_flight?
-
-gdb:
-> (gdb) print bs->in_flight=20
-> $3 =3D 2307492233
-
-"That's weird, why would it..."
-
-> (gdb) print *bs
-> $4 =3D {open_flags =3D -1202160144, read_only =3D 161, encrypted =3D 85=
-, sg =3D false, probed =3D false, force_share =3D 96, implicit =3D 159, d=
-rv =3D 0x0, opaque =3D 0x0, aio_context =3D 0x8989898989898989, aio_notif=
-iers =3D {lh_first =3D 0x8989898989898989},=20
->   walking_aio_notifiers =3D 137, filename =3D '\211' <repeats 4096 time=
-s>, backing_file =3D '\211' <repeats 4096 times>, backing_format =3D '\21=
-1' <repeats 16 times>, full_open_options =3D 0x8989898989898989,=20
->   exact_filename =3D '\211' <repeats 4096 times>, backing =3D 0x8989898=
-989898989, file =3D 0x8989898989898989, bl =3D {request_alignment =3D 230=
-7492233, max_pdiscard =3D -1987475063, pdiscard_alignment =3D 2307492233,=
-=20
->     max_pwrite_zeroes =3D -1987475063, pwrite_zeroes_alignment =3D 2307=
-492233, opt_transfer =3D 2307492233, max_transfer =3D 2307492233, min_mem=
-_alignment =3D 9910603678816504201, opt_mem_alignment =3D 991060367881650=
-4201, max_iov =3D -1987475063},=20
->   supported_write_flags =3D 2307492233, supported_zero_flags =3D 230749=
-2233, node_name =3D '\211' <repeats 32 times>, node_list =3D {tqe_next =3D=
- 0x8989898989898989, tqe_prev =3D 0x8989898989898989}, bs_list =3D {tqe_n=
-ext =3D 0x8989898989898989,=20
->     tqe_prev =3D 0x8989898989898989}, monitor_list =3D {tqe_next =3D 0x=
-8989898989898989, tqe_prev =3D 0x8989898989898989}, refcnt =3D -198747506=
-3, op_blockers =3D {{lh_first =3D 0x8989898989898989} <repeats 16 times>}=
-, job =3D 0x8989898989898989,=20
->   inherits_from =3D 0x8989898989898989, children =3D {lh_first =3D 0x89=
-89898989898989}, parents =3D {lh_first =3D 0x8989898989898989}, options =3D=
- 0x8989898989898989, explicit_options =3D 0x8989898989898989, detect_zero=
-es =3D 2307492233,=20
->   backing_blocker =3D 0x8989898989898989, total_sectors =3D -8536140394=
-893047415, before_write_notifiers =3D {notifiers =3D {lh_first =3D 0x8989=
-898989898989}}, write_threshold_offset =3D 9910603678816504201, write_thr=
-eshold_notifier =3D {notify =3D=20
->     0x8989898989898989, node =3D {le_next =3D 0x8989898989898989, le_pr=
-ev =3D 0x8989898989898989}}, dirty_bitmap_mutex =3D {lock =3D {__data =3D=
- {__lock =3D -1987475063, __count =3D 2307492233, __owner =3D -1987475063=
-, __nusers =3D 2307492233,=20
->         __kind =3D -1987475063, __spins =3D -30327, __elision =3D -3032=
-7, __list =3D {__prev =3D 0x8989898989898989, __next =3D 0x89898989898989=
-89}}, __size =3D '\211' <repeats 40 times>, __align =3D -8536140394893047=
-415}, initialized =3D 137},=20
->   dirty_bitmaps =3D {lh_first =3D 0x8989898989898989}, wr_highest_offse=
-t =3D {value =3D 9910603678816504201}, copy_on_read =3D -1987475063, in_f=
-light =3D 2307492233, serialising_in_flight =3D 2307492233, wakeup =3D 13=
-7, io_plugged =3D 2307492233,=20
->   enable_write_cache =3D -1987475063, quiesce_counter =3D -1987475063, =
-write_gen =3D 2307492233, reqs_lock =3D {locked =3D 2307492233, ctx =3D 0=
-x8989898989898989, from_push =3D {slh_first =3D 0x8989898989898989}, to_p=
-op =3D {
->       slh_first =3D 0x8989898989898989}, handoff =3D 2307492233, sequen=
-ce =3D 2307492233, holder =3D 0x8989898989898989}, tracked_requests =3D {=
-lh_first =3D 0x8989898989898989}, flush_queue =3D {entries =3D {sqh_first=
- =3D 0x8989898989898989,=20
->       sqh_last =3D 0x8989898989898989}}, active_flush_req =3D 160, flus=
-hed_gen =3D 0}
-"Oh."
-
-*sigh*
-
-OK, I'll look into it...
-
-Max
-
->> So I thought, before I put more time into this, let's ask whether the
->> test author has any ideas. :-)
+> $ fgrep CONFIG_PCIE config-all-devices.mak
+> CONFIG_PCIE_PCI_BRIDGE:=3D$(findstring
+> y,$(CONFIG_PCIE_PCI_BRIDGE)$(CONFIG_PCIE_PORT))
+> CONFIG_PCIE_PORT:=3D$(findstring y,$(CONFIG_PCIE_PORT)y)
 >=20
-> Fam
+> $ make subdir-aarch64-softmmu --debug=3Dv 2>/dev/null | fgrep -i
+> pcie_pci_bridge
+> Reading makefile '../hw/pci-bridge/pcie_pci_bridge.d' (search path)
+> (don't care) (no ~ expansion)...
+>      Considering target file '../hw/pci-bridge/pcie_pci_bridge.o'.
+>       File '../hw/pci-bridge/pcie_pci_bridge.o' does not exist.
+>       Finished prerequisites of target file
+> '../hw/pci-bridge/pcie_pci_bridge.o'.
+>      Must remake target '../hw/pci-bridge/pcie_pci_bridge.o'.
 >=20
 
+Hi Philippe,
+Thanks for trying it! I succeeded to reproduce with an out of tree build.
+For some reason the make system doesn't work as I would want to.
 
-
---XSgaRa9r00kkQJI5Ig1ONOtrpeS3w90C7
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAloEcM4SHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9Aq7cIAKea/xbUcUJwKW3Js35vlVHj5yZFlRtH
-HvGDfRzVpAtyQKCAoexLDsAHSxqFro2fFqa0keCS3c7jVAKONMBLmbdTR0YoY7vi
-9ZuGkWpgRHN6RyHT5Dx1EVcIdwNGjPtUukUrO6wr6RZXJKPpQZOOU/MdGNpsNADP
-GkeMUUhGzCCcQLfwyF85bkItCizSrAcqmn2RofRj3UCzNZsRjKuoKC18WFTAJg1x
-ibDU8v1AIEIzxk/uJ9ZRoHZMSe7ooak1ToM8TjosFpEi9a/NpWgjg2jlB9FMjTE3
-IwNq/HpcGV6rAQQFpCoNfMfYkonOL2MaPdvcf54/r5qfeVccY7mde7g=
-=gNaE
------END PGP SIGNATURE-----
-
---XSgaRa9r00kkQJI5Ig1ONOtrpeS3w90C7--
+I'll resend a working version,
+Thanks,
+Marcel
