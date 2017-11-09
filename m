@@ -1,28 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50694)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53151)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1eCsYd-0003Zp-Kj
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 14:32:13 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1eCsge-0006tR-Ij
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 14:40:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1eCsYa-0006BN-EE
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 14:32:11 -0500
-Received: from 2.mo2.mail-out.ovh.net ([188.165.53.149]:36415)
+	(envelope-from <ehabkost@redhat.com>) id 1eCsgZ-0003cK-Ec
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 14:40:28 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49566)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1eCsYa-00064Q-8c
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 14:32:08 -0500
-Received: from player796.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 4253BCAFF9
-	for <qemu-devel@nongnu.org>; Thu,  9 Nov 2017 20:31:57 +0100 (CET)
-References: <20171109101439.390-1-clg@kaod.org>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <decc5fca-12a7-ce70-7f88-19d3d9f280c0@kaod.org>
-Date: Thu, 9 Nov 2017 18:33:51 +0000
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1eCsgZ-0003bs-7s
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 14:40:23 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 35423680EE
+	for <qemu-devel@nongnu.org>; Thu,  9 Nov 2017 19:40:22 +0000 (UTC)
+Date: Thu, 9 Nov 2017 17:40:07 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20171109194007.GE3111@localhost.localdomain>
+References: <20171108144809.56305-1-marcel@redhat.com>
+	<bb3fdd1b-a1bf-51cf-284c-69eedef0ccde@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20171109101439.390-1-clg@kaod.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH for-2.12 v2 00/12] spapr:
- introduce an IRQ allocator at the machine level
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <bb3fdd1b-a1bf-51cf-284c-69eedef0ccde@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH V3] hw/pci-host: Fix x86 Host Bridges 64bit
+ PCI hole
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,110 +34,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Greg Kurz <groug@kaod.org>, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: Marcel Apfelbaum <marcel@redhat.com>, qemu-devel@nongnu.org, mst@redhat.com, kraxel@redhat.com, imammedo@redhat.com, pbonzini@redhat.com
 
-David,
+On Thu, Nov 09, 2017 at 12:02:10PM +0100, Laszlo Ersek wrote:
+[...]
+> (3) An idea for the property defaults: you remove
+> DEFAULT_PCI_HOLE64_SIZE, which is cool. How about introducing (in the
+> proper header files)
+> 
+> #define DEFAULT_I440FX_PCI_HOLE64_SIZE (1ULL << 31)
+> #define DEFAULT_Q35_PCI_HOLE64_SIZE    (1ULL << 35)
+> 
+> The main reason for my suggestion is that (1ULL << 35) is used twice in
+> the code, for an obscure qdev/qom reason. The comments definitely help,
+> so keep them, but a greppable macro would help even more, IMO.
+> 
+> And, once we add DEFAULT_Q35_PCI_HOLE64_SIZE, we should add
+> DEFAULT_I440FX_PCI_HOLE64_SIZE too, for consistency.
 
-On 11/09/2017 10:14 AM, C=C3=A9dric Le Goater wrote:
-> Hello,
->=20
-> Currently, the ICSState 'ics' object of the sPAPR machine acts as the
-> global interrupt source handler and also as the IRQ number allocator
-> for the machine. Some IRQ numbers are allocated very early in the
-> machine initialization sequence to populate the device tree, and this
-> is a problem to introduce the new POWER XIVE interrupt model, as it
-> needs to share the IRQ numbers with the older model.
->=20
-> To prepare ground for XIVE, here is a proposal adding a set of new
-> XICSFabric operations to let the machine handle directly the IRQ
-> number allocation and to decorrelate the allocation from the interrupt
-> source object :
->=20
->     bool (*irq_test)(XICSFabric *xi, int irq);
->     int (*irq_alloc_block)(XICSFabric *xi, int count, int align);
->     void (*irq_free_block)(XICSFabric *xi, int irq, int num);
->     bool (*irq_is_lsi)(XICSFabric *xi, int irq);
->=20
-> In these prototypes, the 'irq' parameter refers to a number in the
-> global IRQ number space.
->=20
-> On the sPAPR platform, these operations are simply backed by a bitmap
-> and to handle migration compatibility, we introduce a machine class
-> flag 'has_irq_bitmap', which is set to false for older machines.
+Agreed, especially considering how the code that initializes the
+defaults is non-obvious.
 
-Talking with Greg, I have found a better solution to handle migration=20
-compatibility which is to do like the phb_placement. That is to use=20
-two sets of XICS IRQ operations : one for the latest pseries machine=20
-using the bitmap and another one for the older pseries machine using=20
-the ICSIRQState. It impacts mostly patch 5.
+> 
+> Anyway, I'll leave this up to you as well.
 
-This solution is cleaner and I will send a v3 in my morning unless
-you start reviewing and have some obvious comments in the v2 series.
+If we do that, I recommend adding a bigger warning to
+q35_host_props.  The one in this patch is very easy to miss if
+people try to touch the defaults for other mch.* properties in
+the future.  I suggest something like:
 
-
-Thanks,
-
-C.=20
+    /*
+     * NOTE: setting defaults for the mch.* fields in this table
+     * don't work, because mch is a separate QOM object that is
+     * zeroed by the object_initialize(&s->mch, ...) call inside
+     * q35_host_initfn().  The default values for those
+     * properties need to be initialized manually by
+     * q35_host_initfn() after the object_initialize() call.
+     */
 
 
-> To completely remove the use of the ICSState object (required to
-> introduce XIVE), we also need to change how the nature of an
-> interrupt, MSI or LSI, is stored. Today, this is done using the flag
-> attribute of the ICSIRQState array. We change that by splitting the
-> IRQ number space of the machine in two: first the LSIs and then the
-> MSIs. This has the benefit to keep the LSI IRQ numbers in a well known
-> range which is useful for PHB hotplug.
->=20
-> The git repo for this pachset can be found here along with the latest
-> XIVE model:
->=20
->     https://github.com/legoater/qemu/commits/xive
->=20
-> Thanks,
->=20
-> C.
->=20
-> Tests :
->=20
->  - make check on each patch
->  - migration :
->      qemu-2.12 (pseries-2.12) <->  qemu-2.12 (pseries-2.12)
->      qemu-2.12 (pseries-2.10) <->  qemu-2.12 (pseries-2.10)
->      qemu-2.10 (pseries-2.10) <->  qemu-2.12 (pseries-2.10)
->=20
-> Changes since v1 :
->=20
->  - reorganised patchset to introduce the XICSFabric operations before
->    the major changes: bitmap and IRQ number space split  =20
->  - introduced a reference bitmap to save some state in migration
->=20
-> C=C3=A9dric Le Goater (12):
->   spapr: add pseries 2.12 machine type
->   ppc/xics: remove useless if condition
->   spapr: introduce new XICSFabric operations for an IRQ allocator
->   spapr: move current IRQ allocation under the machine
->   spapr: introduce an IRQ allocator using a bitmap
->   spapr: store a reference IRQ bitmap
->   spapr: introduce an 'irq_base' number
->   spapr: remove the use of ics_valid_irq()
->   spapr: introduce a XICSFabric is_lsi() operation
->   spapr: split the IRQ number space for LSI interrupts
->   sparp: merge ics_set_irq_type() in irq_alloc_block() operation
->   spapr: use sPAPRMachineState in spapr_ics_ prototypes
->=20
->  hw/intc/trace-events   |   2 -
->  hw/intc/xics.c         |  37 ++++++-----
->  hw/intc/xics_kvm.c     |   4 +-
->  hw/intc/xics_spapr.c   |  76 ++++-----------------
->  hw/ppc/pnv.c           |  34 ++++++++++
->  hw/ppc/pnv_psi.c       |   4 --
->  hw/ppc/spapr.c         | 174 +++++++++++++++++++++++++++++++++++++++++=
-+++++++-
->  hw/ppc/spapr_events.c  |   4 +-
->  hw/ppc/spapr_pci.c     |   8 +--
->  hw/ppc/spapr_vio.c     |   2 +-
->  hw/ppc/trace-events    |   2 +
->  include/hw/ppc/spapr.h |   6 ++
->  include/hw/ppc/xics.h  |  20 ++++--
->  13 files changed, 267 insertions(+), 106 deletions(-)
->=20
+> 
+> 
+> (4) I also have a suggestion for the commit message: please move the
+> paragraph that starts with
+> 
+>   "Even if the new defaults..."
+> 
+> from the v2->v3 changelog to the commit message proper. IMO it is
+> important information.
+> 
+> 
+> With (4) addressed:
+> 
+> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+> 
+> Thanks!
+> Laszlo
+
+-- 
+Eduardo
