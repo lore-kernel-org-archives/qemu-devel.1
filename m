@@ -1,21 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46129)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47503)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eCnI7-00039i-VV
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 08:54:49 -0500
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1eCnOp-00052d-EH
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 09:01:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eCnI6-0006Yy-QR
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 08:54:48 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20171102120223.GI32533@redhat.com>
-	<50b7935f-c02f-7d7d-4e8e-fc8967e85d2e@redhat.com>
-Date: Thu, 09 Nov 2017 14:54:35 +0100
-In-Reply-To: <50b7935f-c02f-7d7d-4e8e-fc8967e85d2e@redhat.com> (Max Reitz's
-	message of "Thu, 2 Nov 2017 22:38:16 +0100")
-Message-ID: <87h8u3ftgk.fsf@dusky.pond.sub.org>
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1eCnOj-0001nH-VN
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 09:01:43 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:58838)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
+	id 1eCnOj-0001mq-MN
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 09:01:37 -0500
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	vA9E0MTC068838
+	for <qemu-devel@nongnu.org>; Thu, 9 Nov 2017 09:01:30 -0500
+Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2e4n77tka7-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 09 Nov 2017 09:01:23 -0500
+Received: from localhost
+	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
+	Thu, 9 Nov 2017 07:01:16 -0700
+References: <1510167719-4357-1-git-send-email-stefanb@linux.vnet.ibm.com>
+	<1014244176.38500883.1510231349539.JavaMail.zimbra@redhat.com>
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Date: Thu, 9 Nov 2017 09:01:13 -0500
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [Qemu-block] RFC: use case for adding QMP,
- block jobs & multiple exports to qemu-nbd ?
+In-Reply-To: <1014244176.38500883.1510231349539.JavaMail.zimbra@redhat.com>
+Message-Id: <17766f2c-85a5-ba33-8bba-d5c29510982e@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 0/5] tpm: Match frontend and backend
+ buffer sizes (not 2.11)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,74 +42,15 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+Cc: amarnath valluri <amarnath.valluri@intel.com>, qemu-devel@nongnu.org
 
-Max Reitz <mreitz@redhat.com> writes:
+On 11/09/2017 07:42 AM, Marc-Andr=C3=A9 Lureau wrote:
+> Reviewed-by: Marc-Andr=C3=A9 Lureau<marcandre.lureau@redhat.com>
 
-> On 2017-11-02 13:02, Daniel P. Berrange wrote:
-> [...]
->> One alternative approach to doing this would be to suggest that we should
->> instead just spawn qemu-system-x86_64 with '--machine none' and use that
->> as a replacement for qemu-nbd, since it already has a built-in NBD server
->> which can do many exports at once and arbitrary block jobs.
->
-> As far as I know, we had wanted to add QMP support to qemu-nbd maybe one
-> or two years ago, but nobody ever did it.
->
-> I've had some discussions about this with Markus and Kevin at KVM Forum.
->  They appeared to strongly prefer this approach.  I agree with them that
-> design-wise, a qemu with no machine at all (and not even -M none) and
-> early QMP is the way we want to go anyway, and then this would be the
-> correct tool to use.
+Thanks! I added it to the tpm-next branch.
 
-"Strongly" is perhaps a bit strong, at least as far as I'm concerned.  I
-just believe that we want the capability to run QEMU without a machine
-anyway, and if that's good enough, then why bother duplicating so much
-of qemu-system-FOO in qemu-nbd & friends?  Besides, once you start to
-duplicate, you'll likely find it hard to stop.
+https://github.com/stefanberger/qemu-tpm/commits/tpm-next
 
->> I'm concerned that this could end up being a be a game of whack-a-mole
->> though, constantly trying to cut out/down all the bits of system emulation
->> in the machine emulators to get its resource overhead to match the low
->> overhead of standalone qemu-nbd.
->
-> However, I personally share your concern.  Especially, I think that
-> getting to a point where we can have no machine at all and early QMP
-> will take much longer than just adding QMP to qemu-nbd -- or adding a
-> qmp command to qemu-img (because you can add NBD exports through QMP, so
-> qemu-nbd's hardcoded focus on NBD exports seems kind of weird then)[1].
->
-> I'm very much torn here.  There are two approaches: Stripping fat qemu
-> down, or fattening lean qemu-img (?) up.  The latter is very simple.
 
-"Very simple" is perhaps debatable, but I think we can agree on
-"temptingly simple".
-
-> The former is what we want anyway.
-
-Yes.
-
-> Markus says it's not too hard to strip down qemu.  If that is true,
-
-To find out, we need to experimentally remodel main() with an axe.
-Volunteers?
-
-> there is no point in fattening qemu-img now.  I personally am not
-> convinced at all, but he knows the state of that project much better
-> than me, so I cannot reasonably disagree.
->
-> So my mail is more of a CC to Markus and Kevin -- but I think both are
-> on PTO right now.
-
-Back, nursing my conference cold.
-
-> I guess the main question is: If someone were to introduce a qemu-img
-> QMP subcommand -- would it be accepted? :-)
->
-> Max
->
->
-> [1] Also, adding QMP should trivially add block jobs and multiple
-> exports to whatever tool we are talking about (in fact, qemu-img already
-> does perform the mirror block job for committing).
+     Stefan
