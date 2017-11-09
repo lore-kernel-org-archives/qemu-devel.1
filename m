@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42023)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45753)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1eCmyN-0003xT-1v
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 08:34:24 -0500
+	(envelope-from <berrange@redhat.com>) id 1eCnGd-0002U3-CI
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 08:53:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1eCmyG-0007qL-J8
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 08:34:22 -0500
-Received: from 7.mo68.mail-out.ovh.net ([46.105.63.230]:52787)
+	(envelope-from <berrange@redhat.com>) id 1eCnGa-00067s-9O
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 08:53:15 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44790)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1eCmyG-0007pr-9V
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 08:34:16 -0500
-Received: from player750.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo68.mail-out.ovh.net (Postfix) with ESMTP id E35B99BDB2
-	for <qemu-devel@nongnu.org>; Thu,  9 Nov 2017 14:34:14 +0100 (CET)
-References: <20171108032427.11163-1-joel@jms.id.au>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <d67d5e55-95e1-8858-2005-7df5a3c94cba@kaod.org>
-Date: Thu, 9 Nov 2017 08:24:24 +0100
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eCnGa-00067h-0P
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 08:53:12 -0500
+Date: Thu, 9 Nov 2017 13:53:06 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20171109135306.GF18164@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <1509072544-89012-1-git-send-email-eswierk@skyportsystems.com>
+	<1510202357-124052-1-git-send-email-eswierk@skyportsystems.com>
 MIME-Version: 1.0
-In-Reply-To: <20171108032427.11163-1-joel@jms.id.au>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] hw/arm/aspeed: Unlock SCU when running
- kernel
+Content-Disposition: inline
+In-Reply-To: <1510202357-124052-1-git-send-email-eswierk@skyportsystems.com>
+Subject: Re: [Qemu-devel] [PATCH v2 0/2] e1000e: Reimplement e1000 as a
+ variant of e1000e
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,145 +29,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Joel Stanley <joel@jms.id.au>, Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, Andrew Jeffery <andrew@aj.id.au>
+To: Ed Swierk <eswierk@skyportsystems.com>
+Cc: Jason Wang <jasowang@redhat.com>, Dmitry Fleytman <dmitry@daynix.com>, Leonid Bloch <leonid.bloch@ravellosystems.com>, Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org
 
-On 11/08/2017 04:24 AM, Joel Stanley wrote:
-> The ASPEED hardware contains a lock register for the SCU that disables
-> any writes to the SCU when it is locked. The machine comes up with the
-> lock enabled, but on all known hardware u-boot will unlock it and leave
-> it unlocked when loading the kernel.
+FWIW, it is generally recommended that new versions of patch series be
+posted as a new top level thread, not in-reply-to the previous version.
+That way the new posting gets attention near top of a dev's email inbox,
+as opposed to hidden away as a reply to a weeks old msg at the back of
+the inbox.
+
+On Wed, Nov 08, 2017 at 08:39:15PM -0800, Ed Swierk via Qemu-devel wrote:
+> From a hardware functionality and register perspective, the Intel
+> 8254x Gigabit Ethernet Controller[1] is roughly a subset of the Intel
+> 82574[2], making it practical to implement e1000 device emulation as
+> an extension of e1000e.
 > 
-> This means the kernel expects the SCU to be unlocked. When booting from
-> an emulated ROM the normal u-boot unlock path is executed. Things don't
-> go well when booting using the -kernel command line, as u-boot does not
-> run first.
+> That would be a step towards eliminating the existing e1000
+> implementation--a bunch of semi-redundant code with its own bugs (like
+> the faulty tx checksum offload I reported recently[3]).
 > 
-> Change behaviour so that when a kernel is passed to the machine, set the
-> reset value of the SCU to be unlocked.
+> [1] https://www.intel.com/content/dam/doc/manual/pci-pci-x-family-gbe-controllers-software-dev-manual.pdf
+> [2] https://www.intel.com/content/dam/doc/datasheet/82574l-gbe-controller-datasheet.pdf
+> [3] https://lists.nongnu.org/archive/html/qemu-devel/2017-10/msg03008.html
 > 
-> Signed-off-by: Joel Stanley <joel@jms.id.au>
-> ---
->  hw/arm/aspeed.c               | 10 ++++++++++
->  hw/arm/aspeed_soc.c           |  2 ++
->  hw/misc/aspeed_scu.c          |  2 ++
->  hw/misc/aspeed_sdmc.c         |  1 -
->  include/hw/misc/aspeed_scu.h  |  1 +
->  include/hw/misc/aspeed_sdmc.h |  2 ++
->  6 files changed, 17 insertions(+), 1 deletion(-)
+> This patch series adds a new e1000-ng device but leaves the existing
+> e1000 device alone. Linux 4.1 and Windows 10 e1000 guest drivers
+> recognize the e1000-ng device and successfully pass traffic on a Linux
+> host.
 > 
-> diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
-> index ab895ad490af..179ee66624b9 100644
-> --- a/hw/arm/aspeed.c
-> +++ b/hw/arm/aspeed.c
-> @@ -36,6 +36,7 @@ typedef struct AspeedBoardState {
->  typedef struct AspeedBoardConfig {
->      const char *soc_name;
->      uint32_t hw_strap1;
-> +    uint32_t hw_prot_key;
->      const char *fmc_model;
->      const char *spi_model;
->      uint32_t num_cs;
-> @@ -186,6 +187,15 @@ static void aspeed_board_init(MachineState *machine,
->                              &error_abort);
->      object_property_set_int(OBJECT(&bmc->soc), cfg->num_cs, "num-cs",
->                              &error_abort);
-> +    if (machine->kernel_filename) {
-> +        /*
-> +         * When booting with a -kernel command line there is no u-boot
-> +         * that runs to unlock the SCU. In this case set the default to
-> +         * be unlocked as the kernel expects
-> +         */
-> +        object_property_set_int(OBJECT(&bmc->soc), PROT_KEY_UNLOCK,
-> +                                "hw-prot-key", &error_abort);
-> +    }
->      object_property_set_bool(OBJECT(&bmc->soc), true, "realized",
->                               &error_abort);
->  
-> diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
-> index 5aa3d2ddd9cd..c83b7e207b86 100644
-> --- a/hw/arm/aspeed_soc.c
-> +++ b/hw/arm/aspeed_soc.c
-> @@ -154,6 +154,8 @@ static void aspeed_soc_init(Object *obj)
->                                "hw-strap1", &error_abort);
->      object_property_add_alias(obj, "hw-strap2", OBJECT(&s->scu),
->                                "hw-strap2", &error_abort);
-> +    object_property_add_alias(obj, "hw-prot-key", OBJECT(&s->scu),
-> +                              "hw-prot-key", &error_abort);
->  
->      object_initialize(&s->fmc, sizeof(s->fmc), sc->info->fmc_typename);
->      object_property_add_child(obj, "fmc", OBJECT(&s->fmc), NULL);
-> diff --git a/hw/misc/aspeed_scu.c b/hw/misc/aspeed_scu.c
-> index 95022d3607ad..c71e77729581 100644
-> --- a/hw/misc/aspeed_scu.c
-> +++ b/hw/misc/aspeed_scu.c
-> @@ -246,6 +246,7 @@ static void aspeed_scu_reset(DeviceState *dev)
->      s->regs[SILICON_REV] = s->silicon_rev;
->      s->regs[HW_STRAP1] = s->hw_strap1;
->      s->regs[HW_STRAP2] = s->hw_strap2;
-> +    s->regs[PROT_KEY] = s->hw_prot_key;
->  }
->  
->  static uint32_t aspeed_silicon_revs[] = {
-> @@ -299,6 +300,7 @@ static Property aspeed_scu_properties[] = {
->      DEFINE_PROP_UINT32("silicon-rev", AspeedSCUState, silicon_rev, 0),
->      DEFINE_PROP_UINT32("hw-strap1", AspeedSCUState, hw_strap1, 0),
->      DEFINE_PROP_UINT32("hw-strap2", AspeedSCUState, hw_strap2, 0),
-> +    DEFINE_PROP_UINT32("hw-prot-key", AspeedSCUState, hw_prot_key, 0),
->      DEFINE_PROP_END_OF_LIST(),
->  };
->  
-> diff --git a/hw/misc/aspeed_sdmc.c b/hw/misc/aspeed_sdmc.c
-> index f0b3053fae36..35dc803604f8 100644
-> --- a/hw/misc/aspeed_sdmc.c
-> +++ b/hw/misc/aspeed_sdmc.c
-> @@ -18,7 +18,6 @@
->  
->  /* Protection Key Register */
->  #define R_PROT            (0x00 / 4)
-> -#define   PROT_KEY_UNLOCK     0xFC600309
+> Preliminary performance measurements are encouraging: with e1000-ng,
+> single-threaded TCP iperf shows about a 2x speedup in tx and rx
+> throughput vs e1000, and CPU usage is slighly lower.
 
-why are you using the memory controller magic value ? 
+That is certainly attractive.
 
-
->  /* Configuration Register */
->  #define R_CONF            (0x04 / 4)
-> diff --git a/include/hw/misc/aspeed_scu.h b/include/hw/misc/aspeed_scu.h
-> index bd4ac013f997..f5da54e27105 100644
-> --- a/include/hw/misc/aspeed_scu.h
-> +++ b/include/hw/misc/aspeed_scu.h
-> @@ -29,6 +29,7 @@ typedef struct AspeedSCUState {
->      uint32_t silicon_rev;
->      uint32_t hw_strap1;
->      uint32_t hw_strap2;
-> +    uint32_t hw_prot_key;
->  } AspeedSCUState;
->  
->  #define AST2400_A0_SILICON_REV   0x02000303U
-> diff --git a/include/hw/misc/aspeed_sdmc.h b/include/hw/misc/aspeed_sdmc.h
-> index 551c8afdf4be..a1b3232c5ef3 100644
-> --- a/include/hw/misc/aspeed_sdmc.h
-> +++ b/include/hw/misc/aspeed_sdmc.h
-> @@ -16,6 +16,8 @@
->  
->  #define ASPEED_SDMC_NR_REGS (0x8 >> 2)
->  
-> +#define PROT_KEY_UNLOCK 0xFC600309
-
-Ditto. Should we be using the one from SCU ? 
- 
-Now that we are externalizing this value, adding a prefix would be 
-preferable : ASPEED_SCU_ ? 
-
-Otherwise, it looks ok to me.
-
-Cheers,
-
-C. 
-
-
-> +
->  typedef struct AspeedSDMCState {
->      /*< private >*/
->      SysBusDevice parent_obj;
+> A ton of work is needed before e1000-ng will be ready to supplant
+> e1000: testing with every random guest OS, fixing bugs, figuring out
+> migration and other missing functionality. There's no way I can do
+> this myself.
 > 
+> I'd like to propose a more modest and achievable short-term goal: find
+> and fix any regressions that might affect users of e1000e and e1000,
+> so that the patches can be applied and folks can easily start trying
+> out e1000-ng with their favorite guest OS. That means accepting (for
+> now) known deficiencies in the new e1000-ng devices, which can be
+> addressed by myself and (hopefully) others in follow-up patches. Does
+> that sound reasonable?
+
+My fear is that this approach of building a new e1000-ng device in
+parallel with having the existing e1000 device is going to cause
+long term pain, possibly never getting to a state where the e1000-ng
+device can replace the e1000 device. Any time there needs to be a
+"big bang" to switch from one impl to another completely different
+impl always causes trouble IME. With need for migration wire format
+& state compatibility, this is even more difficult. From a code review
+POV it will be essentially impossible to have confidence that the new
+impl can be a viable drop-in replacement for the old impl.
+
+Is there really no way that you can change the approach to do a more
+incremental conversion of the existing code base, but still end up in
+the same place at the very end ?
+
+eg just copy all the e1000.c code into the e1000e.c file to start with.
+Then gradually merge functional areas over a longish series of patches
+to eliminate the duplication. This would make it far more practical to
+identify where any regressions come from, and will give reviewers more
+confidence that we're not breaking migration compat.
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
