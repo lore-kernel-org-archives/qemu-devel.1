@@ -1,30 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56541)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56850)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eCo08-0003fy-VX
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 09:40:18 -0500
+	(envelope-from <bounces@canonical.com>) id 1eCo0r-0004Ga-0c
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 09:41:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eCo06-0001e3-04
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 09:40:16 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44574)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eCo05-0001cO-MM
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 09:40:13 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D12CD6522
-	for <qemu-devel@nongnu.org>; Thu,  9 Nov 2017 14:40:12 +0000 (UTC)
-Date: Thu, 9 Nov 2017 14:40:05 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20171109142941.GG18164@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20171028205136.8792-1-berrange@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1eCo0n-0001zz-Ut
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 09:41:01 -0500
+Received: from indium.canonical.com ([91.189.90.7]:46212)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eCo0n-0001z5-OO
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 09:40:57 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eCo0m-0006VT-L4
+	for <qemu-devel@nongnu.org>; Thu, 09 Nov 2017 14:40:56 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 89DF82E80D4
+	for <qemu-devel@nongnu.org>; Thu,  9 Nov 2017 14:40:56 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20171028205136.8792-1-berrange@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] smbios: support setting OEM strings table
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 09 Nov 2017 14:32:08 -0000
+From: David Hildenbrand <1731277@bugs.launchpad.net>
+Reply-To: Bug 1731277 <1731277@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <151023792928.3447.3728561425384648409.malonedeb@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1731277] [NEW] Provide target specific qemu man
+ pages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,223 +37,99 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
-Ping, any thoughts on this ? (not expecting it in this 2.11 release of course)
+Public bug reported:
 
-On Sat, Oct 28, 2017 at 09:51:36PM +0100, Daniel P. Berrange wrote:
-> The cloud-init program currently allows fetching of its data by repurposing of
-> the 'system' type 'serial' field. This is a clear abuse of the serial field that
-> would clash with other valid usage a virt management app might have for that
-> field.
-> 
-> Fortunately the SMBIOS defines an "OEM Strings" table whose puporse is to allow
-> exposing of arbitrary vendor specific strings to the operating system. This is
-> perfect for use with cloud-init, or as a way to pass arguments to OS installers
-> such as anaconda.
-> 
-> This patch makes it easier to support this with QEMU. e.g.
-> 
->   $QEMU -smbios type=11,value=Hello,value=World,value=Tricky,,value=test
-> 
-> Which results in the guest seeing dmidecode data
-> 
->   Handle 0x0E00, DMI type 11, 5 bytes
->   OEM Strings
->           String 1: Hello
->           String 2: World
->           String 3: Tricky,value=test
-> 
-> It is suggested that any app wanting to make use of this OEM strings capability
-> for accepting data from the host mgmt layer should use its name as a string
-> prefix. e.g. to expose OEM strings targetting both cloud init and anaconda in
-> parallel the mgmt app could set
-> 
->   $QEMU -smbios type=11,value=cloud-init:ds=nocloud-net;s=http://10.10.0.1:8000/,\
->         value=anaconda:method=http://dl.fedoraproject.org/pub/fedora/linux/releases/25/x86_64/os
-> 
-> which would appear as
-> 
->   Handle 0x0E00, DMI type 11, 5 bytes
->   OEM Strings
->           String 1: cloud-init:ds=nocloud-net;s=http://10.10.0.1:8000/
->           String 2: anaconda:method=http://dl.fedoraproject.org/pub/fedora/linux/releases/25/x86_64/os
-> 
-> Use of such string prefixes means the app won't have to care which string slot
-> its data appears in.
-> 
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> ---
->  hw/smbios/smbios.c         | 72 ++++++++++++++++++++++++++++++++++++++++++++++
->  hw/smbios/smbios_build.h   | 12 ++++++++
->  include/hw/smbios/smbios.h |  6 ++++
->  3 files changed, 90 insertions(+)
-> 
-> diff --git a/hw/smbios/smbios.c b/hw/smbios/smbios.c
-> index 1a5437a07d..5d11f01874 100644
-> --- a/hw/smbios/smbios.c
-> +++ b/hw/smbios/smbios.c
-> @@ -96,6 +96,11 @@ static struct {
->  } type4;
->  
->  static struct {
-> +    size_t nvalues;
-> +    const char **values;
-> +} type11;
-> +
-> +static struct {
->      const char *loc_pfx, *bank, *manufacturer, *serial, *asset, *part;
->      uint16_t speed;
->  } type17;
-> @@ -282,6 +287,14 @@ static const QemuOptDesc qemu_smbios_type4_opts[] = {
->      { /* end of list */ }
->  };
->  
-> +static const QemuOptDesc qemu_smbios_type11_opts[] = {
-> +    {
-> +        .name = "value",
-> +        .type = QEMU_OPT_STRING,
-> +        .help = "OEM string data",
-> +    },
-> +};
-> +
->  static const QemuOptDesc qemu_smbios_type17_opts[] = {
->      {
->          .name = "type",
-> @@ -590,6 +603,27 @@ static void smbios_build_type_4_table(unsigned instance)
->      smbios_type4_count++;
->  }
->  
-> +static void smbios_build_type_11_table(void)
-> +{
-> +    char count_str[128];
-> +    size_t i;
-> +
-> +    if (type11.nvalues == 0) {
-> +        return;
-> +    }
-> +
-> +    SMBIOS_BUILD_TABLE_PRE(11, 0xe00, true); /* required */
-> +
-> +    snprintf(count_str, sizeof(count_str), "%zu", type11.nvalues);
-> +    t->count = type11.nvalues;
-> +
-> +    for (i = 0; i < type11.nvalues; i++) {
-> +        SMBIOS_TABLE_SET_STR_LIST(11, type11.values[i]);
-> +    }
-> +
-> +    SMBIOS_BUILD_TABLE_POST;
-> +}
-> +
->  #define ONE_KB ((ram_addr_t)1 << 10)
->  #define ONE_MB ((ram_addr_t)1 << 20)
->  #define ONE_GB ((ram_addr_t)1 << 30)
-> @@ -832,6 +866,8 @@ void smbios_get_tables(const struct smbios_phys_mem_area *mem_array,
->              smbios_build_type_4_table(i);
->          }
->  
-> +        smbios_build_type_11_table();
-> +
->  #define MAX_DIMM_SZ (16ll * ONE_GB)
->  #define GET_DIMM_SZ ((i < dimm_cnt - 1) ? MAX_DIMM_SZ \
->                                          : ((ram_size - 1) % MAX_DIMM_SZ) + 1)
-> @@ -882,6 +918,38 @@ static void save_opt(const char **dest, QemuOpts *opts, const char *name)
->      }
->  }
->  
-> +
-> +struct opt_list {
-> +    const char *name;
-> +    size_t *ndest;
-> +    const char ***dest;
-> +};
-> +
-> +static int save_opt_one(void *opaque,
-> +                        const char *name, const char *value,
-> +                        Error **errp)
-> +{
-> +    struct opt_list *opt = opaque;
-> +
-> +    if (!g_str_equal(name, opt->name)) {
-> +        return 0;
-> +    }
-> +
-> +    *opt->dest = g_renew(const char *, *opt->dest, (*opt->ndest) + 1);
-> +    (*opt->dest)[*opt->ndest] = value;
-> +    (*opt->ndest)++;
-> +    return 0;
-> +}
-> +
-> +static void save_opt_list(size_t *ndest, const char ***dest,
-> +                          QemuOpts *opts, const char *name)
-> +{
-> +    struct opt_list opt = {
-> +        name, ndest, dest,
-> +    };
-> +    qemu_opt_foreach(opts, save_opt_one, &opt, NULL);
-> +}
-> +
->  void smbios_entry_add(QemuOpts *opts, Error **errp)
->  {
->      const char *val;
-> @@ -1035,6 +1103,10 @@ void smbios_entry_add(QemuOpts *opts, Error **errp)
->              save_opt(&type4.asset, opts, "asset");
->              save_opt(&type4.part, opts, "part");
->              return;
-> +        case 11:
-> +            qemu_opts_validate(opts, qemu_smbios_type11_opts, &error_fatal);
-> +            save_opt_list(&type11.nvalues, &type11.values, opts, "value");
-> +            return;
->          case 17:
->              qemu_opts_validate(opts, qemu_smbios_type17_opts, &error_fatal);
->              save_opt(&type17.loc_pfx, opts, "loc_pfx");
-> diff --git a/hw/smbios/smbios_build.h b/hw/smbios/smbios_build.h
-> index 68b8b72e09..93b360d520 100644
-> --- a/hw/smbios/smbios_build.h
-> +++ b/hw/smbios/smbios_build.h
-> @@ -63,6 +63,18 @@ extern unsigned smbios_table_cnt;
->          }                                                                 \
->      } while (0)
->  
-> +#define SMBIOS_TABLE_SET_STR_LIST(tbl_type, value)                        \
-> +    do {                                                                  \
-> +        int len = (value != NULL) ? strlen(value) + 1 : 0;                \
-> +        if (len > 1) {                                                    \
-> +            smbios_tables = g_realloc(smbios_tables,                      \
-> +                                      smbios_tables_len + len);           \
-> +            memcpy(smbios_tables + smbios_tables_len, value, len);        \
-> +            smbios_tables_len += len;                                     \
-> +            ++str_index;                                                  \
-> +        }                                                                 \
-> +    } while (0)
-> +
->  #define SMBIOS_BUILD_TABLE_POST                                           \
->      do {                                                                  \
->          size_t term_cnt, t_size;                                          \
-> diff --git a/include/hw/smbios/smbios.h b/include/hw/smbios/smbios.h
-> index 31e8d5f47e..a83adb93d7 100644
-> --- a/include/hw/smbios/smbios.h
-> +++ b/include/hw/smbios/smbios.h
-> @@ -195,6 +195,12 @@ struct smbios_type_4 {
->      uint16_t processor_family2;
->  } QEMU_PACKED;
->  
-> +/* SMBIOS type 11 - OEM strings */
-> +struct smbios_type_11 {
-> +    struct smbios_structure_header header;
-> +    uint8_t count;
-> +} QEMU_PACKED;
-> +
->  /* SMBIOS type 16 - Physical Memory Array (v2.7) */
->  struct smbios_type_16 {
->      struct smbios_structure_header header;
-> -- 
-> 2.13.6
-> 
+Right now, all qemu target binaries (qemu-system-...) share the same man
+page.
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+The current man page is primarily focused on x86, and therefore the
+information given is entirely wrong for e.g. arm, powerpc or s390x.
+
+NAME
+       qemu-doc - QEMU Emulator User Documentation
+
+SYNOPSIS
+       qemu-system-i386 [options] [disk_image]
+
+DESCRIPTION
+       The QEMU PC System emulator simulates the following peripherals:
+
+       -   i440FX host PCI bridge and PIIX3 PCI to ISA bridge
+
+       -   Cirrus CLGD 5446 PCI VGA card or dummy VGA card with Bochs VESA =
+extensions (hardware level, including all non
+           standard modes).
+
+       -   PS/2 mouse and keyboard
+
+       -   2 PCI IDE interfaces with hard disk and CD-ROM support
+
+       -   Floppy disk
+
+...
+
+We should have target specific man pages, with the common
+options/settings factored out, so they are included in all target
+specific man pages.
+
+"man qemu-system-s390x" should give s390x specific (+common) information
+and "man qemu-system-x86_64" should contain x86 specific (+common)
+information.
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1731277
+
+Title:
+  Provide target specific qemu man pages
+
+Status in QEMU:
+  New
+
+Bug description:
+  Right now, all qemu target binaries (qemu-system-...) share the same
+  man page.
+
+  The current man page is primarily focused on x86, and therefore the
+  information given is entirely wrong for e.g. arm, powerpc or s390x.
+
+  NAME
+         qemu-doc - QEMU Emulator User Documentation
+
+  SYNOPSIS
+         qemu-system-i386 [options] [disk_image]
+
+  DESCRIPTION
+         The QEMU PC System emulator simulates the following peripherals:
+
+         -   i440FX host PCI bridge and PIIX3 PCI to ISA bridge
+
+         -   Cirrus CLGD 5446 PCI VGA card or dummy VGA card with Bochs VES=
+A extensions (hardware level, including all non
+             standard modes).
+
+         -   PS/2 mouse and keyboard
+
+         -   2 PCI IDE interfaces with hard disk and CD-ROM support
+
+         -   Floppy disk
+
+  ...
+
+  We should have target specific man pages, with the common
+  options/settings factored out, so they are included in all target
+  specific man pages.
+
+  "man qemu-system-s390x" should give s390x specific (+common)
+  information and "man qemu-system-x86_64" should contain x86 specific
+  (+common) information.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1731277/+subscriptions
