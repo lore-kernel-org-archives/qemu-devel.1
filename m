@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33258)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34203)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1eCkAW-0003Eq-7u
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 05:34:45 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1eCkFR-0004aC-Ms
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 05:39:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1eCkAS-0008Q4-7L
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 05:34:44 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45206)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1eCkAS-0008PY-1x
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 05:34:40 -0500
-Date: Thu, 9 Nov 2017 05:34:37 -0500 (EST)
-From: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Message-ID: <152319465.38481678.1510223677165.JavaMail.zimbra@redhat.com>
-In-Reply-To: <20171108180536.38781-1-lepton@google.com>
-References: <20171108180536.38781-1-lepton@google.com>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1eCkFQ-0001rX-RA
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 05:39:49 -0500
+Received: from mail-ua0-x241.google.com ([2607:f8b0:400c:c08::241]:51767)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1eCkFQ-0001rC-M7
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 05:39:48 -0500
+Received: by mail-ua0-x241.google.com with SMTP id 65so4050107uaq.8
+	for <qemu-devel@nongnu.org>; Thu, 09 Nov 2017 02:39:48 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20171109073759.5910-1-kraxel@redhat.com>
+References: <20171109073759.5910-1-kraxel@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Thu, 9 Nov 2017 11:39:47 +0100
+Message-ID: <CAJ+F1CJeZQfwCOhm=jR_=7TyXw+NdsHeT8yETg_ky-wwHPV5tg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] virtio-gpu: fix bug in host memory
- calculation.
+Subject: Re: [Qemu-devel] [PATCH] ui: fix dcl unregister
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,82 +29,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Tao Wu <lepton@google.com>
-Cc: qemu-devel@nongnu.org, kraxel@redhat.com, airlied@redhat.com, liqiang6-s@360.cn
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: QEMU <qemu-devel@nongnu.org>
 
 Hi
 
------ Original Message -----
-> The old code treats bits as bytes when calculating host memory usage.
-> Change it to be consistent with allocation logic in pixman library.
->=20
-
-Good catch
-
-> Signed-off-by: Tao Wu <lepton@google.com>
+On Thu, Nov 9, 2017 at 8:37 AM, Gerd Hoffmann <kraxel@redhat.com> wrote:
+> register checks for dcl->ds being NULL, to avoid registering
+> the same dcl twice.
+>
+> Therefore dcl->ds must be cleared on unregister, otherwise
+> un-registering and re-registering doesn't work.
+>
+> Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=3D1510809
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 > ---
->  hw/display/virtio-gpu.c | 13 +++++++++++--
->  1 file changed, 11 insertions(+), 2 deletions(-)
->=20
-> diff --git a/hw/display/virtio-gpu.c b/hw/display/virtio-gpu.c
-> index 43bbe09ea0..428786f291 100644
-> --- a/hw/display/virtio-gpu.c
-> +++ b/hw/display/virtio-gpu.c
-> @@ -322,6 +322,15 @@ static pixman_format_code_t get_pixman_format(uint32=
-_t
-> virtio_gpu_format)
+>  ui/console.c | 1 +
+>  ui/vnc.c     | 2 ++
+>  2 files changed, 3 insertions(+)
+>
+> diff --git a/ui/console.c b/ui/console.c
+> index eca854cbd5..c4c95abed7 100644
+> --- a/ui/console.c
+> +++ b/ui/console.c
+> @@ -1471,6 +1471,7 @@ void unregister_displaychangelistener(DisplayChange=
+Listener *dcl)
+>          dcl->con->dcls--;
 >      }
+>      QLIST_REMOVE(dcl, next);
+> +    dcl->ds =3D NULL;
+>      gui_setup_refresh(ds);
 >  }
-> =20
-> +static uint32_t calc_image_hostmem(pixman_format_code_t pformat,
-> +                                   uint32_t width, uint32_t height)
-> +{
-> +    /* copied from pixman/pixman-bits-image.c, skip integer overflow che=
-ck.
-> */
-
-So we rely on pixman create_bits() to fail if overflow happened? perhaps it=
-'s worth a comment.
-=20
-> +    int bpp =3D PIXMAN_FORMAT_BPP(pformat);
-> +    int stride =3D ((width * bpp + 0x1f) >> 5) * sizeof(uint32_t);
-> +    return height * stride;
-> +}
-> +
->  static void virtio_gpu_resource_create_2d(VirtIOGPU *g,
->                                            struct virtio_gpu_ctrl_command
->                                            *cmd)
+>
+> diff --git a/ui/vnc.c b/ui/vnc.c
+> index 9f8d5a1b1f..bd46f11fcc 100644
+> --- a/ui/vnc.c
+> +++ b/ui/vnc.c
+> @@ -3044,6 +3044,7 @@ void vnc_display_init(const char *id)
 >  {
-> @@ -366,7 +375,7 @@ static void virtio_gpu_resource_create_2d(VirtIOGPU *=
-g,
+>      VncDisplay *vd;
+>
+> +    fprintf(stderr, "%s: %s\n", __func__, id);
+>      if (vnc_display_find(id) !=3D NULL) {
 >          return;
 >      }
-> =20
-> -    res->hostmem =3D PIXMAN_FORMAT_BPP(pformat) * c2d.width * c2d.height=
-;
-> +    res->hostmem =3D calc_image_hostmem(pformat, c2d.width, c2d.height);
->      if (res->hostmem + g->hostmem < g->conf.max_hostmem) {
->          res->image =3D pixman_image_create_bits(pformat,
->                                                c2d.width,
-> @@ -1087,7 +1096,7 @@ static int virtio_gpu_load(QEMUFile *f, void *opaqu=
-e,
-> size_t size,
->              return -EINVAL;
->          }
-> =20
-> -        res->hostmem =3D PIXMAN_FORMAT_BPP(pformat) * res->width *
-> res->height;
-> +        res->hostmem =3D calc_image_hostmem(pformat, res->width, res->he=
-ight);
-> =20
->          res->addrs =3D g_new(uint64_t, res->iov_cnt);
->          res->iov =3D g_new(struct iovec, res->iov_cnt);
+> @@ -3982,6 +3983,7 @@ void vnc_display_open(const char *id, Error **errp)
+>      }
+>
+>      if (con !=3D vd->dcl.con) {
+> +        fprintf(stderr, "%s: %s\n", __func__, id);
+
+I suppose the 2 printf are not intentional.
+
+>          unregister_displaychangelistener(&vd->dcl);
+>          vd->dcl.con =3D con;
+>          register_displaychangelistener(&vd->dcl);
 > --
-> 2.15.0.403.gc27cc4dac6-goog
->=20
+> 2.9.3
+>
+>
 
-looks good otherwise,
-
+without the printf,
 Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
->=20
+
+
+
+--=20
+Marc-Andr=C3=A9 Lureau
