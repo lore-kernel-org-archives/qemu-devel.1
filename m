@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37036)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37069)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eCtTL-0002S4-KE
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 15:30:48 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eCtTO-0002Tt-8q
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 15:30:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eCtTK-0003r7-S1
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 15:30:47 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eCtTN-0003sh-0D
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 15:30:50 -0500
 From: Max Reitz <mreitz@redhat.com>
-Date: Thu,  9 Nov 2017 21:30:22 +0100
-Message-Id: <20171109203025.27493-3-mreitz@redhat.com>
+Date: Thu,  9 Nov 2017 21:30:23 +0100
+Message-Id: <20171109203025.27493-4-mreitz@redhat.com>
 In-Reply-To: <20171109203025.27493-1-mreitz@redhat.com>
 References: <20171109203025.27493-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 2/5] iotests: Add missing 'blkdebug::' in 040
+Subject: [Qemu-devel] [PATCH v2 3/5] iotests: Make 055 less flaky
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,28 +22,128 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Eric Blake <eblake@redhat.com>
 
-040 tries to invoke pause_drive() on a drive that does not use blkdebug.
-Good idea, but let's use blkdebug to make it actually work.
+First of all, test 055 does a valiant job of invoking pause_drive()
+sometimes, but that is worth nothing without blkdebug.  So the first
+thing to do is to sprinkle a couple of "blkdebug::" in there -- with the
+exception of the transaction tests, because the blkdebug break points
+make the transaction QMP command hang (which is bad).  In that case, we
+can get away with throttling the block job that it effectively is
+paused.
+
+Then, 055 usually does not pause the drive before starting a block job
+that should be cancelled.  This means that the backup job might be
+completed already before block-job-cancel is invoked; thus making the
+test either fail (currently) or moot if cancel_and_wait() ignored this
+condition.  Fix this by pausing the drive before starting the job.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- tests/qemu-iotests/040 | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tests/qemu-iotests/055 | 25 ++++++++++++++++---------
+ 1 file changed, 16 insertions(+), 9 deletions(-)
 
-diff --git a/tests/qemu-iotests/040 b/tests/qemu-iotests/040
-index c284d08796..90b5b4f2ad 100755
---- a/tests/qemu-iotests/040
-+++ b/tests/qemu-iotests/040
-@@ -289,7 +289,7 @@ class TestSetSpeed(ImageCommitTestCase):
-         qemu_img('create', '-f', iotests.imgfmt, '-o', 'backing_file=%s' % mid_img, test_img)
-         qemu_io('-f', iotests.imgfmt, '-c', 'write -P 0x1 0 512', test_img)
-         qemu_io('-f', iotests.imgfmt, '-c', 'write -P 0xef 524288 524288', mid_img)
+diff --git a/tests/qemu-iotests/055 b/tests/qemu-iotests/055
+index e1206caf9b..8a5d9fd269 100755
+--- a/tests/qemu-iotests/055
++++ b/tests/qemu-iotests/055
+@@ -48,7 +48,7 @@ class TestSingleDrive(iotests.QMPTestCase):
+     def setUp(self):
+         qemu_img('create', '-f', iotests.imgfmt, blockdev_target_img, str(image_len))
+ 
 -        self.vm = iotests.VM().add_drive(test_img)
 +        self.vm = iotests.VM().add_drive('blkdebug::' + test_img)
+         self.vm.add_drive(blockdev_target_img, interface="none")
+         if iotests.qemu_default_machine == 'pc':
+             self.vm.add_drive(None, 'media=cdrom', 'ide')
+@@ -65,10 +65,11 @@ class TestSingleDrive(iotests.QMPTestCase):
+     def do_test_cancel(self, cmd, target):
+         self.assert_no_active_block_jobs()
+ 
++        self.vm.pause_drive('drive0')
+         result = self.vm.qmp(cmd, device='drive0', target=target, sync='full')
+         self.assert_qmp(result, 'return', {})
+ 
+-        event = self.cancel_and_wait()
++        event = self.cancel_and_wait(resume=True)
+         self.assert_qmp(event, 'data/type', 'backup')
+ 
+     def test_cancel_drive_backup(self):
+@@ -166,7 +167,7 @@ class TestSetSpeed(iotests.QMPTestCase):
+     def setUp(self):
+         qemu_img('create', '-f', iotests.imgfmt, blockdev_target_img, str(image_len))
+ 
+-        self.vm = iotests.VM().add_drive(test_img)
++        self.vm = iotests.VM().add_drive('blkdebug::' + test_img)
+         self.vm.add_drive(blockdev_target_img, interface="none")
          self.vm.launch()
  
-     def tearDown(self):
+@@ -246,6 +247,8 @@ class TestSetSpeed(iotests.QMPTestCase):
+     def test_set_speed_invalid_blockdev_backup(self):
+         self.do_test_set_speed_invalid('blockdev-backup',  'drive1')
+ 
++# Note: We cannot use pause_drive() here, or the transaction command
++#       would stall.  Instead, we limit the block job speed here.
+ class TestSingleTransaction(iotests.QMPTestCase):
+     def setUp(self):
+         qemu_img('create', '-f', iotests.imgfmt, blockdev_target_img, str(image_len))
+@@ -271,7 +274,8 @@ class TestSingleTransaction(iotests.QMPTestCase):
+                 'type': cmd,
+                 'data': { 'device': 'drive0',
+                           'target': target,
+-                          'sync': 'full' },
++                          'sync': 'full',
++                          'speed': 64 * 1024 },
+             }
+         ])
+ 
+@@ -289,12 +293,12 @@ class TestSingleTransaction(iotests.QMPTestCase):
+     def do_test_pause(self, cmd, target, image):
+         self.assert_no_active_block_jobs()
+ 
+-        self.vm.pause_drive('drive0')
+         result = self.vm.qmp('transaction', actions=[{
+                 'type': cmd,
+                 'data': { 'device': 'drive0',
+                           'target': target,
+-                          'sync': 'full' },
++                          'sync': 'full',
++                          'speed': 64 * 1024 },
+             }
+         ])
+         self.assert_qmp(result, 'return', {})
+@@ -302,7 +306,9 @@ class TestSingleTransaction(iotests.QMPTestCase):
+         result = self.vm.qmp('block-job-pause', device='drive0')
+         self.assert_qmp(result, 'return', {})
+ 
+-        self.vm.resume_drive('drive0')
++        result = self.vm.qmp('block-job-set-speed', device='drive0', speed=0)
++        self.assert_qmp(result, 'return', {})
++
+         self.pause_job('drive0')
+ 
+         result = self.vm.qmp('query-block-jobs')
+@@ -461,7 +467,7 @@ class TestDriveCompression(iotests.QMPTestCase):
+             pass
+ 
+     def do_prepare_drives(self, fmt, args, attach_target):
+-        self.vm = iotests.VM().add_drive(test_img)
++        self.vm = iotests.VM().add_drive('blkdebug::' + test_img)
+ 
+         qemu_img('create', '-f', fmt, blockdev_target_img,
+                  str(TestDriveCompression.image_len), *args)
+@@ -500,10 +506,11 @@ class TestDriveCompression(iotests.QMPTestCase):
+ 
+         self.assert_no_active_block_jobs()
+ 
++        self.vm.pause_drive('drive0')
+         result = self.vm.qmp(cmd, device='drive0', sync='full', compress=True, **args)
+         self.assert_qmp(result, 'return', {})
+ 
+-        event = self.cancel_and_wait()
++        event = self.cancel_and_wait(resume=True)
+         self.assert_qmp(event, 'data/type', 'backup')
+ 
+         self.vm.shutdown()
 -- 
 2.13.6
