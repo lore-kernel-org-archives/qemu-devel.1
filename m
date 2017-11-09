@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47927)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48072)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eCnRP-0006IF-Mm
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 09:04:29 -0500
+	(envelope-from <eblake@redhat.com>) id 1eCnSA-0006q8-8T
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 09:05:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eCnRL-0002q1-58
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 09:04:23 -0500
+	(envelope-from <eblake@redhat.com>) id 1eCnS4-00032X-L1
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 09:05:10 -0500
 References: <20171109013804.14488-1-mreitz@redhat.com>
-	<20171109013804.14488-2-mreitz@redhat.com>
+	<20171109013804.14488-3-mreitz@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <eac16825-8bb8-61ec-dce8-5cfdd53f0d97@redhat.com>
-Date: Thu, 9 Nov 2017 08:03:59 -0600
+Message-ID: <4f27b1ba-33fb-f385-f609-36ebcd80b0e0@redhat.com>
+Date: Thu, 9 Nov 2017 08:04:45 -0600
 MIME-Version: 1.0
-In-Reply-To: <20171109013804.14488-2-mreitz@redhat.com>
+In-Reply-To: <20171109013804.14488-3-mreitz@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="PlnN3L6DEBPx8aoLx2OVlRqR2r5nfWlaF"
-Subject: Re: [Qemu-devel] [PATCH 1/5] iotests: Make 030 less flaky
+	boundary="rDJk3rQWuDlnIls16NDBUeMqAxi32QU4r"
+Subject: Re: [Qemu-devel] [PATCH 2/5] iotests: Add missing 'blkdebug::' in
+ 040
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,49 +29,49 @@ To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---PlnN3L6DEBPx8aoLx2OVlRqR2r5nfWlaF
+--rDJk3rQWuDlnIls16NDBUeMqAxi32QU4r
 From: Eric Blake <eblake@redhat.com>
 To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
  Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <eac16825-8bb8-61ec-dce8-5cfdd53f0d97@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/5] iotests: Make 030 less flaky
+Message-ID: <4f27b1ba-33fb-f385-f609-36ebcd80b0e0@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/5] iotests: Add missing 'blkdebug::' in 040
 References: <20171109013804.14488-1-mreitz@redhat.com>
- <20171109013804.14488-2-mreitz@redhat.com>
-In-Reply-To: <20171109013804.14488-2-mreitz@redhat.com>
+ <20171109013804.14488-3-mreitz@redhat.com>
+In-Reply-To: <20171109013804.14488-3-mreitz@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 11/08/2017 07:38 PM, Max Reitz wrote:
-> This patch fixes two race conditions in 030:
->=20
-> 1. The first is in TestENSPC.test_enospc().  After resuming the job,
-
-s/ENSPC/ENOSPC/
-
->    querying it to confirm it is no longer paused may fail because in th=
-e
->    meantime it might have completed already.  The same was fixed in
->    TestEIO.test_ignore() already (in commit
->    2c3b44da07d341557a8203cc509ea07fe3605e11).
->=20
-> 2. The second is in TestSetSpeed.test_set_speed_invalid(): Here, a
->    stream job is started on a drive without any break points, with a
->    block-job-set-speed invoked subsequently.  However, without any brea=
-k
->    points, the job might have completed in the meantime (on tmpfs at
->    least); or it might complete before cancel_and_wait() which expects
->    the job to still exist.  This can be fixed like everywhere else by
->    pausing the drive (installing break points) before starting the job
->    and letting cancel_and_wait() resume it.
+> 040 tries to invoke pause_drive() on a drive that does not use blkdebug=
+=2E
+> Good idea, but let's use blkdebug to make it actually work.
 >=20
 > Signed-off-by: Max Reitz <mreitz@redhat.com>
 > ---
->  tests/qemu-iotests/030 | 8 ++++++--
->  1 file changed, 6 insertions(+), 2 deletions(-)
+>  tests/qemu-iotests/040 | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >=20
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
+
+> diff --git a/tests/qemu-iotests/040 b/tests/qemu-iotests/040
+> index c284d08796..90b5b4f2ad 100755
+> --- a/tests/qemu-iotests/040
+> +++ b/tests/qemu-iotests/040
+> @@ -289,7 +289,7 @@ class TestSetSpeed(ImageCommitTestCase):
+>          qemu_img('create', '-f', iotests.imgfmt, '-o', 'backing_file=3D=
+%s' % mid_img, test_img)
+>          qemu_io('-f', iotests.imgfmt, '-c', 'write -P 0x1 0 512', test=
+_img)
+>          qemu_io('-f', iotests.imgfmt, '-c', 'write -P 0xef 524288 5242=
+88', mid_img)
+> -        self.vm =3D iotests.VM().add_drive(test_img)
+> +        self.vm =3D iotests.VM().add_drive('blkdebug::' + test_img)
+>          self.vm.launch()
+> =20
+>      def tearDown(self):
+>=20
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -78,7 +79,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---PlnN3L6DEBPx8aoLx2OVlRqR2r5nfWlaF
+--rDJk3rQWuDlnIls16NDBUeMqAxi32QU4r
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -87,14 +88,14 @@ Content-Disposition: attachment; filename="signature.asc"
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloEYE8ACgkQp6FrSiUn
-Q2pK2wf/UJRqPwuQeMOnWuXvOQTnSpZ8iZZSrRHIn9ynfy8Z50C+K97Orm144wcl
-HLmvB9Vxxb/Zyfqp65fXxBj096pvyWdCFtItXv47mLaJeXH58Aazv2XsSDDboQ0e
-f/7tzlbZo3YU2gYfAVI5lzwrDs0WhZEuojUzqlada4NW+u0ncDNIzIBrxAW47Qcd
-LgZWUtRO0Qce6F2AQJxDdKXa65HpFL1xX/DVaXhhYOAApOY7yFK254zjABo4uulA
-gY9d3XScKdjAVAov8sreCV9FqJc70aSK46RAmzy+jKTZ53N9DgS6ACdgI42x4Pys
-Uqsu8PswNu6szu/52uemGKyxc354eA==
-=MN7n
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloEYH0ACgkQp6FrSiUn
+Q2oKsQgAqxxSA+7+n2R4i4X8EyQXtUOXyMoYI8Xt/AyMqf4W2b9QBPRnp+QvKBZo
+AbXnN7ch8leif30YQyPHK/0wPBP2jvYsjqFHK/tWnfDBxkHUqbU8lZeZoQtSo9uF
+7pP+dwCqZozAXwHTMB0G92cCz2bX1Kp8bNupP6KXHv73I73CV//xFTuSvtVCYIWz
+o2U/lGR5MKS/x/iiYFv7+0WlI26SZnfhXgDzF+jprGZaKmiWsSeXKaD9rsONuw+G
+/oxIxYCiKQLCmnlnO1Ts1GIMD8+OWi1Pz+ESaBX1MTsUv59gj9CNTLyqtBy2jsl9
+xgR1KRtIA04qXaWRQkEdiFShCtV5aA==
+=quxJ
 -----END PGP SIGNATURE-----
 
---PlnN3L6DEBPx8aoLx2OVlRqR2r5nfWlaF--
+--rDJk3rQWuDlnIls16NDBUeMqAxi32QU4r--
