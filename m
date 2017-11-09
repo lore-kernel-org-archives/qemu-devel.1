@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45174)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45727)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eCtwN-0003c6-JW
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 16:00:48 -0500
+	(envelope-from <eblake@redhat.com>) id 1eCty8-0004XT-UC
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 16:02:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eCtwM-000141-Q9
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 16:00:47 -0500
-References: <20171109203025.27493-1-mreitz@redhat.com>
-	<20171109203025.27493-5-mreitz@redhat.com>
-	<73d1bcb3-aeaf-24d1-5cf0-359c58de0283@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <f13d3d95-0a46-88c9-2acc-95dfdd6d8486@redhat.com>
-Date: Thu, 9 Nov 2017 22:00:34 +0100
+	(envelope-from <eblake@redhat.com>) id 1eCty7-0002aM-Vj
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 16:02:36 -0500
+References: <20171109204315.27072-1-mreitz@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <e9e49f18-cf12-1dc0-4bd0-ae67c36fb30c@redhat.com>
+Date: Thu, 9 Nov 2017 15:02:23 -0600
 MIME-Version: 1.0
-In-Reply-To: <73d1bcb3-aeaf-24d1-5cf0-359c58de0283@redhat.com>
+In-Reply-To: <20171109204315.27072-1-mreitz@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="oEGfNluLdBG8dVv1xUxQb8lCreklvxRHw"
-Subject: Re: [Qemu-devel] [PATCH v2 4/5] iotests: Make 083 less flaky
+	boundary="7GLlIaXjhV7QjxOD97oFEu8TGtS3HrGBd"
+Subject: Re: [Qemu-devel] [PATCH for-2.11] block: Keep strong reference when
+ draining all BDS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,80 +24,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---oEGfNluLdBG8dVv1xUxQb8lCreklvxRHw
-From: Max Reitz <mreitz@redhat.com>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <f13d3d95-0a46-88c9-2acc-95dfdd6d8486@redhat.com>
-Subject: Re: [PATCH v2 4/5] iotests: Make 083 less flaky
-References: <20171109203025.27493-1-mreitz@redhat.com>
- <20171109203025.27493-5-mreitz@redhat.com>
- <73d1bcb3-aeaf-24d1-5cf0-359c58de0283@redhat.com>
-In-Reply-To: <73d1bcb3-aeaf-24d1-5cf0-359c58de0283@redhat.com>
+--7GLlIaXjhV7QjxOD97oFEu8TGtS3HrGBd
+From: Eric Blake <eblake@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>,
+ qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <e9e49f18-cf12-1dc0-4bd0-ae67c36fb30c@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.11] block: Keep strong reference when
+ draining all BDS
+References: <20171109204315.27072-1-mreitz@redhat.com>
+In-Reply-To: <20171109204315.27072-1-mreitz@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 2017-11-09 21:58, Eric Blake wrote:
-> On 11/09/2017 02:30 PM, Max Reitz wrote:
->> 083 has (at least) two issues:
->>
->> 1. By launching the nbd-fault-injector in background, it may not be
->>    scheduled until the first grep on its output file is executed.
->>    However, until then, that file may not have been created yet -- so =
-it
->>    either does not exist yet (thus making the grep emit an error), or =
-it
->>    does exist but contains stale data (thus making the rest of the tes=
+On 11/09/2017 02:43 PM, Max Reitz wrote:
+> Draining a BDS may lead to graph modifications, which in turn may resul=
 t
->>    case work connect to a wrong address).
->>    Fix this by explicitly overwriting the output file before executing=
-
->>    nbd-fault-injector.
->>
->> 2. The nbd-fault-injector prints things other than "Listening on...".
->>    It also prints a "Closing connection" message from time to time.  W=
-e
->>    currently invoke sed on the whole file in the hope of it only
->>    containing the "Listening on..." line yet.  That hope is sometimes
->>    shattered by the brutal reality of race conditions, so invoke grep
->>    before sed.
+> in it and other BDS being stripped of their current references.  If
+> bdrv_drain_all_begin() and bdrv_drain_all_end() do not keep strong
+> references themselves, the BDS they are trying to drain (or undrain) ma=
+y
+> disappear right under their feet -- or, more specifically, under the
+> feet of BDRV_POLL_WHILE() in bdrv_drain_recurse().
 >=20
-> Comment is now stale; s/invoke grep before sed/make the sed script more=
+> This fixes an occasional hang of iotest 194.
+>=20
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+>  block/io.c | 47 ++++++++++++++++++++++++++++++++++++++++++++---
+>  1 file changed, 44 insertions(+), 3 deletions(-)
 
-> robust/
+> +
+> +        /* Keep a strong reference to all root BDS and copy them into
+> +         * an own list because draining them may lead to graph
 
-*sigh*
+'an own' sounds awkward; maybe 'copy them into a local list'
 
-It appears my hope of easily fixing patches is often shattered by the
-brutal reality, too.
+> +         * modifications. */
+> +        bdrv_ref(bs);
+> +        bs_list =3D g_slist_prepend(bs_list, bs);
+>      }
 
-> Reviewed-by: Eric Blake <eblake@redhat.com>
+>  void bdrv_drain_all_end(void)
+>  {
+>      BlockDriverState *bs;
+>      BdrvNextIterator it;
+> +    GSList *bs_list =3D NULL, *bs_list_entry;
+> +
+> +    /* Must be called from the main loop */
+> +    assert(qemu_get_current_aio_context() =3D=3D qemu_get_aio_context(=
+));
+> =20
+> +    /* Keep a strong reference to all root BDS and copy them into an
+> +     * own list because draining them may lead to graph modifications.=
 
-Thanks!  I'll fix the sentence when applying the series.
 
-Max
+And again.
+
+With that tweak,
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
---oEGfNluLdBG8dVv1xUxQb8lCreklvxRHw
+--7GLlIaXjhV7QjxOD97oFEu8TGtS3HrGBd
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAloEwfMSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AWuoH/ivOJCGO5asbrmDXwMyhuNyw3/+Uv3C+
-cr5tpJcpJMiQPioYTYRynTjMVDUfBFctz61ZTt0j4qwYm9FkyZ3OnFbUhLHwu1DC
-f0HtdX6yU+p/K/Uy+W3q8qsyAyEJvRaRAQGwBTbmguFK5mY5CDnY3CZpP0imfBob
-N8l8bxGQhRYWDabvZl7QELAS9qH6sLoCOYkAdRuvTzmtE0OVDiIe/EefCW4wpESS
-Sl7c5AWImLtDuTS6GZCo5VfzRB5mxaUaIrwUPN9eK+3WrL97z2P4C7uw6vuI3ZEN
-GEeJ+TkiEW450rtyl0+7/leWb43GmC35rxOY/sqq++fodiS4S9ojI5U=
-=R5bo
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloEwl8ACgkQp6FrSiUn
+Q2oUWQf/YW6HXhEpemh3wgKEpz4lYy6FacOxrJjmM6nuj4UKb6DPKDQYu5b+ccgZ
+cRASG3tcljlHbq8TcK2n6wRV5C353Sj6zd0sdodRK9Xw9XV4B7e8FZZDvKDoNSP4
+lNau4na8DwlZYmQjqfo1HiZpm+yJcM4rPxVCb4IfyC2f8ri/RpF88zTbYfEst73y
+pifj8hXncDdWfKVD5xQWBDjyEApF5Tf9EI25kJbC40a/EcEVR3hZQ8MOdPgN4P2C
+vBm0gbTse3NFiCiTUm3YsPCjH69zm8GyDm6Go/EFcVLK9cuXF1TZunm0UNjgT01g
+flhOgApdIAibf23v2+yjyJp1VjyK4g==
+=M7rU
 -----END PGP SIGNATURE-----
 
---oEGfNluLdBG8dVv1xUxQb8lCreklvxRHw--
+--7GLlIaXjhV7QjxOD97oFEu8TGtS3HrGBd--
