@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49514)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49817)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1eCnXM-0001XK-Qa
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 09:10:38 -0500
+	(envelope-from <eblake@redhat.com>) id 1eCnYh-0002JO-7v
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 09:12:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1eCnXI-0005Cl-86
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 09:10:32 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35152)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1eCnXH-0005CQ-Q2
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 09:10:28 -0500
-References: <151023266893.360.2441014157612423993@bafd83ae6430>
-	<775f71a5-4975-da5f-1e42-c4dfe8f589ef@redhat.com>
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <d7a34a10-ae75-2d75-95b8-581b814b3e22@redhat.com>
-Date: Thu, 9 Nov 2017 16:10:18 +0200
+	(envelope-from <eblake@redhat.com>) id 1eCnYg-0005yv-2K
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 09:11:55 -0500
+References: <20171109013804.14488-1-mreitz@redhat.com>
+	<20171109013804.14488-5-mreitz@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <02eb8b5d-7b5a-271c-0a54-aa177dc65ce8@redhat.com>
+Date: Thu, 9 Nov 2017 08:11:39 -0600
 MIME-Version: 1.0
-In-Reply-To: <775f71a5-4975-da5f-1e42-c4dfe8f589ef@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH V4] hw/pcie-pci-bridge: restrict to X86 and
- ARM
+In-Reply-To: <20171109013804.14488-5-mreitz@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="WTvaUoC5OoEl0d9SBxSgMpTSSH1H6K1as"
+Subject: Re: [Qemu-devel] [PATCH 4/5] iotests: Make 083 less flaky
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,47 +24,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: famz@redhat.com, cohuck@redhat.com, zuban32s@gmail.com, mst@redhat.com
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
 
-On 09/11/2017 16:03, Thomas Huth wrote:
-> On 09.11.2017 14:04, no-reply@patchew.org wrote:
->> Hi,
->>
->> This series failed automatic build test. Please find the testing commands and
->> their output below. If you have docker installed, you can probably reproduce it
->> locally.
-> [...]
->>    CC      aarch64-softmmu/hw/scsi/virtio-scsi.o
->>    CC      aarch64-softmmu/hw/scsi/virtio-scsi-dataplane.o
->> make[1]: *** No rule to make target `../hw/pci-bridge/pcie_pci_bridge.o', needed by `qemu-system-x86_64'.  Stop.
->> make[1]: *** Waiting for unfinished jobs....
->>    CC      aarch64-softmmu/hw/scsi/vhost-scsi-common.o
->>    CC      aarch64-softmmu/hw/scsi/vhost-scsi.o
->>    CC      aarch64-softmmu/hw/scsi/vhost-user-scsi.o
->>    CC      aarch64-softmmu/hw/sd/omap_mmc.o
->>    CC      aarch64-softmmu/hw/sd/pxa2xx_mmci.o
->>    CC      aarch64-softmmu/hw/sd/bcm2835_sdhost.o
->> make: *** [subdir-x86_64-softmmu] Error 2
->> make: *** Waiting for unfinished jobs....
->>    CC      aarch64-softmmu/hw/ssi/omap_spi.o
->>    CC      aarch64-softmmu/hw/ssi/imx_spi.o
->>    CC      aarch64-softmmu/hw/timer/exynos4210_mct.o
->>    CC      aarch64-softmmu/hw/timer/exynos4210_pwm.o
-> [...]
->>    CC      aarch64-softmmu/hw/timer/exynos4210_rtc.o
->>    CC      aarch64-softmmu/target/arm/translate-a64.o
->> make[1]: *** No rule to make target `../hw/pci-bridge/pcie_pci_bridge.o', needed by `qemu-system-aarch64'.  Stop.
->> make[1]: *** Waiting for unfinished jobs..../tmp/qemu-test/src/target/arm/translate-a64.c: In function 'handle_shri_with_rndacc':
-> 
-> Hmm, looks like this was not working as expected?
-> 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--WTvaUoC5OoEl0d9SBxSgMpTSSH1H6K1as
+From: Eric Blake <eblake@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
+ Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <02eb8b5d-7b5a-271c-0a54-aa177dc65ce8@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 4/5] iotests: Make 083 less flaky
+References: <20171109013804.14488-1-mreitz@redhat.com>
+ <20171109013804.14488-5-mreitz@redhat.com>
+In-Reply-To: <20171109013804.14488-5-mreitz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-In my workstation works just fine (clean and compiled all archs),
-I sent a mail to Fam.
+On 11/08/2017 07:38 PM, Max Reitz wrote:
+> 083 has (at least) two issues:
 
-Thanks,
-Marcel
+I think I hit one of them intermittently yesterday; thanks for
+diagnosing these (and like you say, there may be more lurking, but we'll
+whack them separately if we can reproduce and identify them).
 
->   Thomas
-> 
+>=20
+> 1. By launching the nbd-fault-injector in background, it may not be
+>    scheduled until the first grep on its output file is executed.
+>    However, until then, that file may not have been created yet -- so i=
+t
+>    either does not exist yet (thus making the grep emit an error), or i=
+t
+>    does exist but contains stale data (thus making the rest of the test=
+
+>    case work connect to a wrong address).
+>    Fix this by explicitly overwriting the output file before executing
+>    nbd-fault-injector.
+>=20
+> 2. The nbd-fault-injector prints things other than "Listening on...".
+>    It also prints a "Closing connection" message from time to time.  We=
+
+>    currently invoke sed on the whole file in the hope of it only
+>    containing the "Listening on..." line yet.  That hope is sometimes
+>    shattered by the brutal reality of race conditions, so invoke grep
+>    before sed.
+
+Invoking 'grep | sed' is almost always a waste of a process; sed can do
+the job alone.
+
+>=20
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+>  tests/qemu-iotests/083 | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/tests/qemu-iotests/083 b/tests/qemu-iotests/083
+> index 0306f112da..2f6444eeb9 100755
+> --- a/tests/qemu-iotests/083
+> +++ b/tests/qemu-iotests/083
+> @@ -86,6 +86,7 @@ EOF
+> =20
+>  	rm -f "$TEST_DIR/nbd.sock"
+> =20
+> +        echo > "$TEST_DIR/nbd-fault-injector.out"
+
+This makes the file contain a blank line.  Would it be any better as a
+truly empty file, as in:
+
+: > "$TEST_DIR/nbd-fault-injector.out"
+
+>  	$PYTHON nbd-fault-injector.py $extra_args "$nbd_addr" "$TEST_DIR/nbd-=
+fault-injector.conf" >"$TEST_DIR/nbd-fault-injector.out" 2>&1 &
+> =20
+>  	# Wait for server to be ready
+> @@ -94,7 +95,7 @@ EOF
+>  	done
+> =20
+>  	# Extract the final address (port number has now been assigned in tcp=
+ case)
+> -	nbd_addr=3D$(sed 's/Listening on \(.*\)$/\1/' "$TEST_DIR/nbd-fault-in=
+jector.out")
+> +        nbd_addr=3D$(grep 'Listening on ' "$TEST_DIR/nbd-fault-injecto=
+r.out" | sed 's/Listening on \(.*\)$/\1/')
+
+Fixing TAB damage while at it - nice.
+
+Here's how to do it using just sed, and with less typing:
+
+    nbd_addr=3D$(sed -n 's/^Listening on //p' \
+               "$TEST_DIR/nbd-fault-injector.out")
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--WTvaUoC5OoEl0d9SBxSgMpTSSH1H6K1as
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloEYhsACgkQp6FrSiUn
+Q2qZ0Af/TDPXzIYAHmTZY78GQNQBxypdA4/dTILddABFUDEBR/4oGxFfpk+0US+2
+RpnyeGlxJqGOBiFhL2EZ0glfI7Fx5CTdfLC6ck2W6mdht6aicm3ynr0KU9G/N9gu
+YIJRH9rrITuTvyV994m/bD05c/vZv1szTVypamET6ZmdidJ27sxJIQh6TNMB56Fb
+ke3UDoYEz3HBwxU6/Evm0V/dDdozVw3bavof7bNcmIJWebO/EpCIMNxfCK7FDoCc
+o41q7FZTnHC0ZPgQ1FNvrSn4o9cLrXyfZUmhEQLL8jJxGqJaaq1k8GfbC5sL5nyQ
+avrA4qxzfXQs56ej8Ufq2W01xiouZA==
+=1/IF
+-----END PGP SIGNATURE-----
+
+--WTvaUoC5OoEl0d9SBxSgMpTSSH1H6K1as--
