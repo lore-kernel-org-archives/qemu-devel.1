@@ -1,25 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58255)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58467)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eCmAL-0004rP-Nn
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 07:42:42 -0500
+	(envelope-from <marcel@redhat.com>) id 1eCmB5-0005Bl-2t
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 07:43:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eCmAI-0001R8-JE
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 07:42:41 -0500
-Received: from mail-eopbgr20137.outbound.protection.outlook.com
-	([40.107.2.137]:61347
-	helo=EUR02-VE1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1eCmAI-0001QS-2d
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 07:42:38 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <37193dd7-a0fc-bfa6-3870-ecbcfefac4e5@virtuozzo.com>
-Date: Thu, 9 Nov 2017 15:42:31 +0300
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: [Qemu-devel] NBD BLOCK_STATUS
+	(envelope-from <marcel@redhat.com>) id 1eCmB4-0001lS-Aw
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 07:43:27 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42700)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1eCmB4-0001ks-4t
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 07:43:26 -0500
+From: Marcel Apfelbaum <marcel@redhat.com>
+Date: Thu,  9 Nov 2017 14:43:12 +0200
+Message-Id: <20171109124312.117600-1-marcel@redhat.com>
+Subject: [Qemu-devel] [PATCH V2] hw/pcie-pci-bridge: restrict to X86 and ARM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,24 +21,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Wouter Verhelst <w@uter.be>, Alex Bligh <alex@alex.org.uk>, nbd list <nbd@other.debian.org>, qemu-devel <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: marcel@redhat.com, mst@redhat.com, thuth@redhat.com, zuban32s@gmail.com, cohuck@redhat.com
 
-Hi!
+The PCIE-PCI bridge is specific to "pure" PCIe systems
+(on QEMU we have X86 and ARM), it does not make sense to
+have if in other archs.
 
-Interesting fact: list/set_meta_context options are per-export,
-so, in the server we should keep context selection per client per export.
+Reported-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
+---
 
-And it is possible for client to set contexts for one export and than 
-proceed
-to transmission phase with another one.
+V1 -> V2:
+ Addressed Thomas and Cornelia comments:
+ - Conditioned the pcie-pci-bridge compilation on
+   the PCIe Root CONFIG_PCIE_PORT
+ - Tweaked subject PCI -> PCIe
 
-This is not really touched in spec, for example
-"Change the set of active metadata contexts. Issuing this command 
-replaces all previously-set metadata contexts"
+ Thanks,
+ Marcel
 
-looks like lacking "for specified export" suffix. May be there are other 
-places.
+ hw/pci-bridge/Makefile.objs | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
+diff --git a/hw/pci-bridge/Makefile.objs b/hw/pci-bridge/Makefile.objs
+index 666db37da2..83539f02e5 100644
+--- a/hw/pci-bridge/Makefile.objs
++++ b/hw/pci-bridge/Makefile.objs
+@@ -1,8 +1,10 @@
+-common-obj-y += pci_bridge_dev.o pcie_pci_bridge.o
++common-obj-y += pci_bridge_dev.o
+ common-obj-$(CONFIG_PCIE_PORT) += pcie_root_port.o gen_pcie_root_port.o
+ common-obj-$(CONFIG_PXB) += pci_expander_bridge.o
++common-obj-$(CONFIG_PCIE_PCI_BRIDGE) += pcie_pci_bridge.o
+ common-obj-$(CONFIG_XIO3130) += xio3130_upstream.o xio3130_downstream.o
+ common-obj-$(CONFIG_IOH3420) += ioh3420.o
+ common-obj-$(CONFIG_I82801B11) += i82801b11.o
+ # NewWorld PowerMac
+ common-obj-$(CONFIG_DEC_PCI) += dec.o
++CONFIG_PCIE_PCI_BRIDGE=$(CONFIG_PCIE_PORT)
 -- 
-Best regards,
-Vladimir
+2.13.5
