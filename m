@@ -1,22 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33097)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37549)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1eCuli-0008QG-36
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 16:53:50 -0500
+	(envelope-from <eblake@redhat.com>) id 1eCv3i-000488-Fa
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 17:12:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1eCuld-0002FF-7n
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 16:53:50 -0500
-Received: from mail-dm3nam03on0066.outbound.protection.outlook.com
-	([104.47.41.66]:17024
-	helo=NAM03-DM3-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1eCulc-0002Ek-UN
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 16:53:45 -0500
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Thu, 9 Nov 2017 13:49:30 -0800
-Message-ID: <cover.1510263731.git.alistair.francis@xilinx.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH for 2.11 v2 0/2] Xilinx ZCU102 fixes for 2.11
+	(envelope-from <eblake@redhat.com>) id 1eCv3h-0004cU-GF
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 17:12:26 -0500
+From: Eric Blake <eblake@redhat.com>
+Date: Thu,  9 Nov 2017 16:12:16 -0600
+Message-Id: <20171109221216.10248-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH for-2.11] iotests: Use new-style NBD connections
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,22 +17,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, peter.maydell@linaro.org
-Cc: alistair.francis@xilinx.com, alistair23@gmail.com, edgar.iglesias@xilinx.com, edgar.iglesias@gmail.com, ehabkost@redhat.com, cota@braap.org, f4bug@amsat.org
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, vsementsov@virtuozzo.com, pbonzini@redhat.com, mreitz@redhat.com, Kevin Wolf <kwolf@redhat.com>
 
-These are two small fixes for 2.11.
+Old-style NBD is deprecated upstream (it is documented, but no
+longer implemented in the reference implementation), and it is
+severely limited (it cannot support structured replies, which
+means it cannot support efficient handling of zeroes), when
+compared to new-style NBD.  We are better off having our iotests
+favor new-style everywhere (although some explicit tests,
+particularly 83, still cover old-style for back-compat reasons);
+this is as simple as supplying the empty string as the default
+export name, as it does not change the URI needed to connect a
+client to the server.  This also gives us more coverage of the
+just-added structured reply code, when not overriding $QEMU_NBD
+to intentionally point to an older server.
 
-V2:
- - Update qemu-doc.texi
+Signed-off-by: Eric Blake <eblake@redhat.com>
+---
 
-Alistair Francis (2):
-  xlnx-zynqmp: Properly support the smp command line option
-  xlnx-zcu102: Add an info message deprecating the EP108
+Proposing this for 2.11; it can either go in through the NBD
+tree (although I just send my 2.11-rc1 pull request) or through
+Max' iotest tree.
 
- hw/arm/xlnx-zcu102.c |  6 +++++-
- hw/arm/xlnx-zynqmp.c | 26 ++++++++++++++++----------
- qemu-doc.texi        |  7 +++++++
- 3 files changed, 28 insertions(+), 11 deletions(-)
+ tests/qemu-iotests/common.rc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tests/qemu-iotests/common.rc b/tests/qemu-iotests/common.rc
+index 0e8a33c696..dbae7d74ba 100644
+--- a/tests/qemu-iotests/common.rc
++++ b/tests/qemu-iotests/common.rc
+@@ -242,7 +242,7 @@ _make_test_img()
+     if [ $IMGPROTO = "nbd" ]; then
+         # Pass a sufficiently high number to -e that should be enough for all
+         # tests
+-        eval "$QEMU_NBD -v -t -b 127.0.0.1 -p 10810 -f $IMGFMT -e 42  $TEST_IMG_FILE >/dev/null &"
++        eval "$QEMU_NBD -v -t -b 127.0.0.1 -p 10810 -f $IMGFMT -e 42 -x '' $TEST_IMG_FILE >/dev/null &"
+         sleep 1 # FIXME: qemu-nbd needs to be listening before we continue
+     fi
 
 -- 
-2.14.1
+2.13.6
