@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34585)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35323)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eCkHi-0005MR-Df
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 05:42:15 -0500
+	(envelope-from <bounces@canonical.com>) id 1eCkMD-0006lC-9N
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 05:46:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eCkHe-0002xx-De
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 05:42:10 -0500
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:55409)
+	(envelope-from <bounces@canonical.com>) id 1eCkM9-0004DZ-9Q
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 05:46:49 -0500
+Received: from indium.canonical.com ([91.189.90.7]:35482)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1eCkHe-0002xc-6M
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 05:42:06 -0500
-Received: by mail-wr0-x242.google.com with SMTP id l8so5128594wre.12
-	for <qemu-devel@nongnu.org>; Thu, 09 Nov 2017 02:42:06 -0800 (PST)
-Date: Thu, 9 Nov 2017 10:42:02 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20171109104202.GA17101@stefanha-x1.localdomain>
-References: <20171107153136.19426-1-namhyung@gmail.com>
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eCkM9-0004DK-2q
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 05:46:45 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eCkM6-0001kf-NI
+	for <qemu-devel@nongnu.org>; Thu, 09 Nov 2017 10:46:42 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 4594A2E80CD
+	for <qemu-devel@nongnu.org>; Thu,  9 Nov 2017 10:46:42 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="qDbXVdCdHGoSgWSk"
-Content-Disposition: inline
-In-Reply-To: <20171107153136.19426-1-namhyung@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH 1/3] trace: Simplify find_debugfs()
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 09 Nov 2017 10:35:10 -0000
+From: Daniel Berrange <1726910@bugs.launchpad.net>
+Reply-To: Bug 1726910 <1726910@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150885852349.17651.9958840122130941388.malonedeb@wampee.canonical.com>
+Message-Id: <151022371074.3019.6875294017061081105.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1726910] Re: UI request: add a function key
+ toolbar (f1-f12)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,50 +37,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Namhyung Kim <namhyung@gmail.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
+Adding a toolbar with function keys consumes alot of screen real estate
+for something that is going to be rarely used in practice.
 
---qDbXVdCdHGoSgWSk
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+The more usual approach to this problem is for the application to grab
+the keyboard and block all local window system accelerators, so that Fn
+goes straight to the guest OS when the console window has focus. This is
+done by GNOME Boxes, virt-viewer, virt-manager, and I though QEMU's
+frontends did it by default too.
 
-On Wed, Nov 08, 2017 at 12:31:34AM +0900, Namhyung Kim wrote:
-> The return vale of find_debugfs() is 1 if it could find a mount point of
-> debugfs.  It can be saved in the while loop instead of checking it again.
->=20
-> Signed-off-by: Namhyung Kim <namhyung@gmail.com>
-> ---
->  trace/ftrace.c | 7 +++----
->  1 file changed, 3 insertions(+), 4 deletions(-)
+Recently though, there has been a regression in this area. With the
+switch to Wayland instead of Xorg, the standard GTK APIs for doing this
+keyboard grabbing / accel blocking no longer work correctly. Instead
+apps need to add custom code to talk to the Wayland compositor IIRC.
+There's work underway to address this but its a way off.
 
-Thanks, applied all to my tracing-next tree:
-https://github.com/stefanha/qemu/commits/tracing-next
+Some key combinations are hard to deal with, even with the above
+approach. For that reason virt-viewer/virt-manager, etc typically have a
+"Send key" menu item, populated with a set of special  sequences.
+Typically this covers Ctrl+Alt+fn sequences, and Ctrl+Alt+Delete and a
+couple more.
 
-Please send multi-patch series with a cover letter in the future (git
-format-patch --cover-letter).  Continuous integration tools may ignore
-multi-patch series without a cover letter.
+-- =
 
-qemu.git/master is currently frozen for the QEMU 2.11 release so you
-won't see your patches in master until QEMU 2.11 has been released.
-Once the development window opens again your patches will be merged into
-qemu.git/master.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1726910
 
-Stefan
+Title:
+  UI request: add a function key toolbar (f1-f12)
 
---qDbXVdCdHGoSgWSk
-Content-Type: application/pgp-signature; name="signature.asc"
+Status in QEMU:
+  New
 
------BEGIN PGP SIGNATURE-----
+Bug description:
+  I run old DOS programs under FreeDOS using QEMU.
 
-iQEcBAEBAgAGBQJaBDD6AAoJEJykq7OBq3PIEwMIAIdSD01qIaznLd6WkRXJYKPM
-163Cg5vzU6JXH2fDDx6i9Fl00w8j/SoJyp7mxArCMlRZrQaF6M3YgX/fflOAidh8
-/DVOlyCu0EGPdO3+zK6b9y+d66UN9f5D0mq5UouzGlO0R34YYYIivOHDajcaiJv/
-MnUswKvo3/5audMkSj4zROvP8SOsDf/pSfOIom8SUq1sB89HRzQqpEbL3VNZVE19
-Qaa4Yq2TgWk5himNeMah2ah9fNyQ3zJh/j67rztK6qoEiSBwFOfShx+IkIxfwUrf
-nsxkedGCK29lmb/Uc87ABscQCwYWx2k7IjFT0Kkei0hmlCF//fFzdp1lY/uA1aI=
-=uI0r
------END PGP SIGNATURE-----
+  It's common when running/testing DOS applications to use the function
+  keys. Some of these (such as F10) are intercepted by the window
+  system. For example, some DOS program installers use F10 to install
+  the software, but F10 is intecepted by the window system.
 
---qDbXVdCdHGoSgWSk--
+  The standard solution is to jump to the QEMU console and use sendkey
+  to send a specific function key to the QEMU guest (often needed for
+  'sendkey f10'). But this does not seem to be very user friendly for
+  new users. Nor is it very fast if you need to this often.
+
+  I propose QEMU add a toolbar with the function keys.
+
+  I've attached a mockup of one possible design, with a simple toolbar
+  for F1-F12. A possible modification would be to add "modifier" buttons
+  for Ctrl and Shift and Alt to make it easier for users to enter
+  combinations like Ctrl-F12 or Alt-F10 or Shift-F1.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1726910/+subscriptions
