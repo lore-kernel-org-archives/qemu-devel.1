@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38189)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38795)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eCiRK-00031S-BW
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 03:43:59 -0500
+	(envelope-from <rjones@redhat.com>) id 1eCiUQ-0003z5-SG
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 03:47:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eCiRJ-0008RJ-Eo
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 03:43:58 -0500
-References: <20171107030912.23930-1-eblake@redhat.com>
-	<20171107030912.23930-2-eblake@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <f4e76a21-825b-df7c-cfe9-c866099ca476@virtuozzo.com>
-Date: Thu, 9 Nov 2017 11:43:42 +0300
+	(envelope-from <rjones@redhat.com>) id 1eCiUL-0001Th-W6
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 03:47:10 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52430)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <rjones@redhat.com>) id 1eCiUL-0001TS-Q9
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 03:47:05 -0500
+Date: Thu, 9 Nov 2017 08:47:03 +0000
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Message-ID: <20171109084702.GD2787@redhat.com>
+References: <cover.1510181732.git.alistair.francis@xilinx.com>
+	<10f1bca388976b18119fd4fc28d6fdcf7106f7d3.1510181732.git.alistair.francis@xilinx.com>
+	<20c00ee8-6d77-e8bd-aa77-6db5db789900@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <20171107030912.23930-2-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH 1/2] nbd/server: Implement sparse reads
- atop structured reply
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20c00ee8-6d77-e8bd-aa77-6db5db789900@amsat.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 40/45] hw/watchdog: Replace
+ fprintf(stderr, "*\n" with error_report()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,38 +30,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, pbonzini@redhat.com
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org, alistair23@gmail.com, armbru@redhat.com
 
-07.11.2017 06:09, Eric Blake wrote:
-> The reason that NBD added structured reply in the first place was
-> to allow for efficient reads of sparse files, by allowing the
-> reply to include chunks to quickly communicate holes to the client
-> without sending lots of zeroes over the wire.  Time to implement
-> this in the server; our client can already read such data.
->
-> We can only skip holes insofar as the block layer can query them;
-> and only if the client is okay with a fragmented request (if a
-> client requests NBD_CMD_FLAG_DF and the entire read is a hole, we
-> could technically return a single NBD_REPLY_TYPE_OFFSET_HOLE, but
-> that's a fringe case not worth catering to here).  Sadly, the
-> control flow is a bit wonkier than I would have preferred, but
-> it was minimally invasive to have a split in the action between
-> a fragmented read (handled directly where we recognize
-> NBD_CMD_READ with the right conditions, and sending multiple
-> chunks) vs. a single read (handled at the end of nbd_trip, for
-> both simple and structured replies, when we know there is only
-> one thing being read).  Likewise, I didn't make any effort to
-> optimize the final chunk of a fragmented read to set the
-> NBD_REPLY_FLAG_DONE, but unconditionally send that as a separate
-> NBD_REPLY_TYPE_NONE.
->
-> Signed-off-by: Eric Blake <eblake@redhat.com>
+On Wed, Nov 08, 2017 at 08:43:45PM -0300, Philippe Mathieu-Daud=E9 wrote:
+> > @@ -126,7 +125,7 @@ void watchdog_perform_action(void)
+> > =20
+> >      case WATCHDOG_ACTION_DEBUG:
+> >          qapi_event_send_watchdog(WATCHDOG_ACTION_DEBUG, &error_abort=
+);
+> > -        fprintf(stderr, "watchdog: timer fired\n");
+> > +        error_report("watchdog: timer fired");
+>=20
+> I don't think this is an error and would rather use info_report() here.
+>=20
+> Richard what do you think?
 
+Yes, this is not an error.  It's an informational message.
 
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Rich.
 
-
--- 
-Best regards,
-Vladimir
+--=20
+Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rj=
+ones
+Read my programming and virtualization blog: http://rwmj.wordpress.com
+virt-top is 'top' for virtual machines.  Tiny program with many
+powerful monitoring features, net stats, disk stats, logging, etc.
+http://people.redhat.com/~rjones/virt-top
