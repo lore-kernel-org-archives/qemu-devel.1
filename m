@@ -1,20 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39659)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42559)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eCg4S-0006sT-Go
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 01:12:13 -0500
+	(envelope-from <kraxel@redhat.com>) id 1eCgKG-0000M3-9r
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 01:28:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eCg4P-0005W5-9b
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 01:12:12 -0500
-Date: Thu, 9 Nov 2017 14:12:00 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20171109061200.GC13786@lemon>
-References: <20171108165519.8931-1-eblake@redhat.com>
+	(envelope-from <kraxel@redhat.com>) id 1eCgKB-00032v-8w
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 01:28:32 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43772)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1eCgKB-00032T-3j
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 01:28:27 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 28255C04AC56
+	for <qemu-devel@nongnu.org>; Thu,  9 Nov 2017 06:28:26 +0000 (UTC)
+Date: Thu, 9 Nov 2017 07:28:21 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20171109062821.nquhgziygo6mwoqi@sirius.home.kraxel.org>
+References: <20171108144809.56305-1-marcel@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20171108165519.8931-1-eblake@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2] coroutine: Fix documentation of
- co_aio_sleep_ns()
+In-Reply-To: <20171108144809.56305-1-marcel@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH V3] hw/pci-host: Fix x86 Host Bridges 64bit
+ PCI hole
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,45 +33,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, pbonzini@redhat.com, Kevin Wolf <kwolf@redhat.com>, stefanha@redhat.com
+To: Marcel Apfelbaum <marcel@redhat.com>
+Cc: qemu-devel@nongnu.org, mst@redhat.com, pbonzini@redhat.com, ehabkost@redhat.com, lersek@redhat.com, imammedo@redhat.com
 
-On Wed, 11/08 10:55, Eric Blake wrote:
-> co_sleep_ns() was removed in commit 0b9caf9b, leaving behind a
-> stale comment.  Update the documentation to match the current
-> usage of this function.
+On Wed, Nov 08, 2017 at 04:48:09PM +0200, Marcel Apfelbaum wrote:
+> Currently there is no MMIO range over 4G
+> reserved for PCI hotplug. Since the 32bit PCI hole
+> depends on the number of cold-plugged PCI devices
+> and other factors, it is very possible is too small
+> to hotplug PCI devices with large BARs.
 > 
-> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Eric Blake <eblake@redhat.com>
+> Fix it by reserving 2G for I4400FX chipset
+> in order to comply with older Win32 Guest OSes
+> and 32G for Q35 chipset.
 > 
-> ---
-> v2: instead of just blindly cribbing from Paolo's email, try to incorporate
-> the feedback given on the wording
-> ---
->  include/qemu/coroutine.h | 7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
-> 
-> diff --git a/include/qemu/coroutine.h b/include/qemu/coroutine.h
-> index 9aff9a735e..10ab50a98c 100644
-> --- a/include/qemu/coroutine.h
-> +++ b/include/qemu/coroutine.h
-> @@ -262,8 +262,11 @@ void qemu_co_rwlock_unlock(CoRwlock *lock);
->  /**
->   * Yield the coroutine for a given duration
->   *
-> - * Behaves similarly to co_sleep_ns(), but the sleeping coroutine will be
-> - * resumed when using aio_poll().
-> + * This function uses timers and hence needs to know the event loop
-> + * (#AioContext) to place the timer on.  After the time elapses, the
-> + * current coroutine will restart with the same #AioContext it is
-> + * currently running in, even if that is different than the timer
-> + * context passed to co_aio_sleep_ns().
->   */
->  void coroutine_fn co_aio_sleep_ns(AioContext *ctx, QEMUClockType type,
->                                    int64_t ns);
-> -- 
-> 2.13.6
-> 
-> 
+> Note this is a regression since prev QEMU versions had
+> some range reserved for 64bit PCI hotplug.
 
-Reviewed-by: Fam Zheng <famz@redhat.com>
+Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
