@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54446)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55481)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eCpLt-00032g-9t
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 11:06:54 -0500
+	(envelope-from <den@virtuozzo.com>) id 1eCpR6-0004mO-UA
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 11:12:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eCpLq-0003jY-1V
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 11:06:49 -0500
-Date: Thu, 9 Nov 2017 16:06:30 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20171109160630.GB25162@stefanha-x1.localdomain>
-References: <20171109013804.14488-1-mreitz@redhat.com>
+	(envelope-from <den@virtuozzo.com>) id 1eCpR0-0006Zg-W0
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 11:12:12 -0500
+References: <cover.1510059970.git.jcody@redhat.com>
+From: "Denis V. Lunev" <den@openvz.org>
+Message-ID: <f65bca5a-c43b-b703-501b-4be0b0d815c8@openvz.org>
+Date: Thu, 9 Nov 2017 19:11:58 +0300
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="PmA2V3Z32TCmWXqI"
-Content-Disposition: inline
-In-Reply-To: <20171109013804.14488-1-mreitz@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 0/5] iotests: Make some tests
- less flaky
+In-Reply-To: <cover.1510059970.git.jcody@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH v4 0/4] Don't write headers if BDS is
+ INACTIVE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,80 +24,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+To: Jeff Cody <jcody@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, aik@ozlabs.ru, mreitz@redhat.com, stefanha@redhat.com
 
-
---PmA2V3Z32TCmWXqI
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Thu, Nov 09, 2017 at 02:37:59AM +0100, Max Reitz wrote:
-> There are a couple of tests that fail (on my machine) from time to
-> time (and by that I mean that recently I've rarely ever had a test run
-> with both 083 and 136 working on first try).
-> This series should fix most (at least the issues I am aware of).
->=20
-> Notes:
-> - 083 might have another issue, but if so it occurs extremely rarely and
->   so I was unable to debug it.
->=20
-> - 129 is flaky, too, because it tries to use block jobs with BB
->   throttling -- however, block jobs ignore that these days.  Making it
->   use a throttle filter node will require quite a bit of work.  See
->   http://lists.nongnu.org/archive/html/qemu-block/2017-11/msg00111.html
->   for more.
->=20
-> - 194 sometimes hangs because the source VM fails to drain its drive.
->   This is probably not an issue with the test, but actually an issue in
->   qemu.  See
->   http://lists.nongnu.org/archive/html/qemu-block/2017-11/msg00256.html
->   for more.
->=20
->=20
-> "All tests have passed, let's ship it!"
-> -- Me, 2:36 am
->=20
->=20
-> (Editor's note: "all" means raw/file, qcow2/file, and raw/nbd.)
->=20
->=20
-> Max Reitz (5):
->   iotests: Make 030 less flaky
->   iotests: Add missing 'blkdebug::' in 040
->   iotests: Make 055 less flaky
->   iotests: Make 083 less flaky
->   iotests: Make 136 less flaky
->=20
->  tests/qemu-iotests/030 |  8 ++++++--
->  tests/qemu-iotests/040 |  2 +-
->  tests/qemu-iotests/055 | 25 ++++++++++++++++---------
->  tests/qemu-iotests/083 |  3 ++-
->  tests/qemu-iotests/136 | 14 +++++++++++++-
->  5 files changed, 38 insertions(+), 14 deletions(-)
->=20
-> --=20
-> 2.13.6
->=20
->=20
-
-Thanks for these fixes!  QEMU 2.11 material.
-
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-
---PmA2V3Z32TCmWXqI
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJaBH0GAAoJEJykq7OBq3PIdNEH/1NNgzjiWhsLaDvQCDb49BDV
-6Snk1JI+r5v/jypiZCt6iq0URoOLSNHlrqVcdvtnLfiaMfjdT+7THj/d32r9ZXCD
-u6n6syyZDv2xxbeOoszFaihV3RkYOr6P0t7umad6G2NYhJf+YuoCMi9DCrM4R65u
-fiXoU/KrNCpM0sjaG8GtYgzzv2+gXjDsi+16ytYoxwbM3S0V0BtTgIgMFBiuELRY
-Dicw8lYav+6Qv9rej6Nso77Wr6ym+9eD4gvXFQLxIYo/TYD7kgEI57LiF27dRmrn
-CzZRKfkW52vHcSVOK6pLOhAo+VGeYUObsGC5IQbBEymwGnoYdQ7HaX7W60PjR7o=
-=lJUU
------END PGP SIGNATURE-----
-
---PmA2V3Z32TCmWXqI--
+On 11/07/2017 04:10 PM, Jeff Cody wrote:
+> Changes from v3->v4:
+>
+> Patch 3: Add migrate_del_blocker and error_free (Thanks Stefan)
+>
+>
+> git-backport-diff -r qemu/master.. -u ba11b69
+>
+> 001/4:[----] [--] 'block/vhdx.c: Don't blindly update the header'
+> 002/4:[----] [--] 'block/parallels: Do not update header or truncate image when INMIGRATE'
+> 003/4:[0003] [FC] 'block/parallels: add migration blocker'
+> 004/4:[----] [--] 'qemu-iotests: update unsupported image formats in 194'
+>
+>
+> Changes from v2->v3:
+>
+> Patch 2: Uh... fix that misspelling.  Thanks Stefan :)
+> Patch 3: New patch to block migration in parallels
+>
+> git-backport-diff -r qemu/master.. -u 6dc6acb
+>
+> 001/4:[----] [--] 'block/vhdx.c: Don't blindly update the header'
+> 002/4:[----] [--] 'block/parallels: Do not update header or truncate image when INMIGRATE'
+> 003/4:[down] 'block/parallels: add migration blocker'
+> 004/4:[----] [--] 'qemu-iotests: update unsupported image formats in 194'
+>
+>
+> Changes from v1->v2:
+>
+> * Drop previous parallels patches, just check BDRV_O_INACTIVE now
+>   (Kevin)
+>
+> git-backport-diff -r qemu/master.. -u github/master
+> Key:
+> [----] : patches are identical
+> [####] : number of functional differences between upstream/downstream patch
+> [down] : patch is downstream-only
+> The flags [FC] indicate (F)unctional and (C)ontextual differences, respectively
+>
+> 001/3:[----] [--] 'block/vhdx.c: Don't blindly update the header'
+> 002/3:[down] 'block/parallals: Do not update header or truncate image when INMIGRATE'
+> 003/3:[----] [--] 'qemu-iotests: update unsupported image formats in 194'
+>
+>
+> v1:
+>
+> VHDX and Parallels both blindly write headers to the image file
+> if the images are opened R/W.  This causes an assert if the QEMU run
+> state is INMIGRATE.
+>
+> Jeff Cody (4):
+>   block/vhdx.c: Don't blindly update the header
+>   block/parallels: Do not update header or truncate image when INMIGRATE
+>   block/parallels: add migration blocker
+>   qemu-iotests: update unsupported image formats in 194
+>
+>  block/parallels.c      | 22 +++++++++++++++++-----
+>  block/vhdx.c           |  7 -------
+>  tests/qemu-iotests/194 |  2 +-
+>  3 files changed, 18 insertions(+), 13 deletions(-)
+>
+Reviewed-by: Denis V. Lunev <den@openvz.org>
