@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56756)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57545)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eD50R-0001nj-F9
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 03:49:45 -0500
+	(envelope-from <sundeep.lkml@gmail.com>) id 1eD54i-0002nj-2s
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 03:54:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eD4zq-00036I-GK
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 03:49:43 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43560)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eD4zq-00035M-9K
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 03:49:06 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <1508443483-5429-1-git-send-email-alindsay@codeaurora.org>
-	<CAFEAcA-R-3F8US1RGJVNyVnC81z9+1dd3Liq0tmVSNz1eDszbA@mail.gmail.com>
-	<3d46d0f4463f337593b7347812f2de7e@codeaurora.org>
-	<ae32fdee-2233-a99a-1fc9-0da58cf4d846@weilnetz.de>
-	<CAFEAcA_KQyBAQ_cjTr8-pqSAibJOFc1mQF0yFgNyQNyzn8NzGg@mail.gmail.com>
-Date: Fri, 10 Nov 2017 09:48:56 +0100
-In-Reply-To: <CAFEAcA_KQyBAQ_cjTr8-pqSAibJOFc1mQF0yFgNyQNyzn8NzGg@mail.gmail.com>
-	(Peter Maydell's message of "Sat, 21 Oct 2017 11:19:42 +0100")
-Message-ID: <878tfe5xjb.fsf@dusky.pond.sub.org>
+	(envelope-from <sundeep.lkml@gmail.com>) id 1eD54g-0008NR-Fl
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 03:54:08 -0500
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] build: Don't force preserving permissions
- on config-devices.mak.old
+In-Reply-To: <5a7b721c-fe04-921b-b9d2-986c9930b00b@amsat.org>
+References: <1510228971-6005-1-git-send-email-sundeep.lkml@gmail.com>
+	<4beb4e47-0ff9-8251-6502-23824779edbd@amsat.org>
+	<CAFEAcA-ATtAougvALVo=48p+jVx5B+Ejq60TD9dGYEQU2ReWCQ@mail.gmail.com>
+	<5a7b721c-fe04-921b-b9d2-986c9930b00b@amsat.org>
+From: sundeep subbaraya <sundeep.lkml@gmail.com>
+Date: Fri, 10 Nov 2017 14:24:05 +0530
+Message-ID: <CALHRZuroyXXzxcWW0XX5fzQ9m8Zh0oZy8RivtiQjzKdHoxQ9WQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu devel PATCH] MAINTAINERS: Add entries for
+ Smartfusion2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,32 +26,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Stefan Weil <sw@weilnetz.de>, QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Paul Brook <paul@codesourcery.com>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Alistair Francis <alistair23@gmail.com>
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+Hi Guys,
 
-> On 20 October 2017 at 20:08, Stefan Weil <sw@weilnetz.de> wrote:
->> Am 20.10.2017 um 20:24 schrieb alindsay@codeaurora.org:
->>> On 2017-10-20 05:27, Peter Maydell wrote:
->>>> Do we even need this code at all? As far as I can tell from
->>>> the git logs, the idea is to support users who hand-modify
->>>> config-devices.mak. But do we want to support that? I would
->>>> think of config-devices.mak as an internal part of the build
->>>> machinery, and the bit you can edit as a user is the stuff
->>>> in default-configs/.
->>
->> It's a long time since I wrote that code, but when I look at
->> the commit message for my commit 012f0879234, it was written
->> for users who do _not_ hand-modify config-devices.mak. They
->> had a problem when they updated the code from git and the
->> new version had changed some of the device configurations
->> which were used to build config-devices.mak.
+On Fri, Nov 10, 2017 at 5:52 AM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
+rg>
+wrote:
+
+> On 11/09/2017 08:55 PM, Peter Maydell wrote:
+> > On 9 November 2017 at 21:46, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
+rg>
+> wrote:
+> >> Hi Subbaraya,
+> >>
+> >> On 11/09/2017 09:02 AM, Subbaraya Sundeep wrote:
+> >>> add voluntarily myself as maintainer for Smartfusion2
+> >>
+> >> You need to share your GnuPG key signed, I couldn't find it using
+> >> http://pgp.mit.edu/pks/lookup?search=3DSubbaraya+Sundeep
+> >>
+> >> from https://wiki.qemu.org/Contribute/SubmitAPullRequest :
+> >
+> > I don't in general expect to take pull requests from
+> > everybody listed as a maintainer in the MAINTAINERS file.
+> > That just means "I'm going to be reviewing and should
+> > be cc'd on patches". Pull requests are sent by people
+> > who are maintainers for a subsystem. Rule of thumb:
+> > unless somebody asks you to send a pull request, you
+> > don't need to do it.
 >
-> Right, but it's only this complicated set of conditions
-> because we seem to be also trying to support the hand-modify
-> case. Otherwise we could just generate the new version
-> and copy it into place if it's changed, unconditionally...
+> Ok, please apologize my misunderstanding. I still think the M: entry
+> stand for 'Maintainer' instead of 'Mail', and still don't understand the
+> difference with a "Designated reviewer" (R: entry):
+>
+>         M: Mail patches to: FullName <address@domain>
+>         R: Designated reviewer: FullName <address@domain>
+>            These reviewers should be CCed on patches.
+>
+> "Designated reviewer" seems to duplicate the M: entry and is therefore
+> confusing. Can we simply remove it instead?
+>
+> When introduced in fdf6fab4df4 the explanation was:
+>
+> --
+> Some people are not content with the amount of mail they get, and would
+> like to be CCed on patches for areas they do not maintain.  Let them
+> satisfy their own appetite for qemu-devel messages.
+>
+> Seriously: the purpose here is a bit different from the Linux kernel.
+> While Linux uses "R" to designate non-maintainers for reviewing patches
+> in a given area, in QEMU I would also like to use "R" so that people can
+> delegate sending pull requests while keeping some degree of oversight.
+>
 
-So, do we need this patch?  If yes, who's going to merge it?  If no, do
-we need some other patch?
+Do you want me to remove M: and put only R: ?
+
+Thanks,
+Sundeep
+
+> --
+>
+> Regards,
+>
+> Phil.
+>
