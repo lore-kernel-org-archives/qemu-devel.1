@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48083)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48557)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1eDB81-0008V7-DQ
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 10:21:59 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eDB9Z-0001VN-Hf
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 10:23:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1eDB7x-0007OA-5X
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 10:21:57 -0500
-Received: from 1.mo68.mail-out.ovh.net ([46.105.41.146]:48707)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1eDB7w-0007MP-T5
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 10:21:53 -0500
-Received: from player737.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo68.mail-out.ovh.net (Postfix) with ESMTP id C79689C30E
-	for <qemu-devel@nongnu.org>; Fri, 10 Nov 2017 16:21:51 +0100 (CET)
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Fri, 10 Nov 2017 15:20:17 +0000
-Message-Id: <20171110152017.24324-12-clg@kaod.org>
-In-Reply-To: <20171110152017.24324-1-clg@kaod.org>
-References: <20171110152017.24324-1-clg@kaod.org>
+	(envelope-from <mreitz@redhat.com>) id 1eDB9Y-0001T2-48
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 10:23:33 -0500
+References: <20171109204315.27072-1-mreitz@redhat.com>
+	<20171110024557.GB4849@lemon>
+	<20171110131752.GD5466@localhost.localdomain>
+	<20171110133207.GA9235@lemon.Home>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <d0e58edd-39cf-2bb5-61bd-442825b82ff9@redhat.com>
+Date: Fri, 10 Nov 2017 16:23:17 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH for-2.12 v3 11/11] spapr: use sPAPRMachineState
- in spapr_ics_ prototypes
+In-Reply-To: <20171110133207.GA9235@lemon.Home>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="bMXtmIn20xetU9fow92xwbBDQumEtdeNW"
+Subject: Re: [Qemu-devel] [PATCH for-2.11] block: Keep strong reference when
+ draining all BDS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,248 +27,208 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Greg Kurz <groug@kaod.org>, Benjamin Herrenschmidt <benh@kernel.crashing.org>
-Cc: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-The routines manipulating the IRQ numbers for the sPAPR machine do not
-have any relation with the ICSState anymore. So use a sPAPRMachineState
-parameter in their prototype and prefix them with spapr_irq_.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--bMXtmIn20xetU9fow92xwbBDQumEtdeNW
+From: Max Reitz <mreitz@redhat.com>
+To: Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org,
+ qemu-block@nongnu.org
+Message-ID: <d0e58edd-39cf-2bb5-61bd-442825b82ff9@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.11] block: Keep strong reference when
+ draining all BDS
+References: <20171109204315.27072-1-mreitz@redhat.com>
+ <20171110024557.GB4849@lemon> <20171110131752.GD5466@localhost.localdomain>
+ <20171110133207.GA9235@lemon.Home>
+In-Reply-To: <20171110133207.GA9235@lemon.Home>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
----
- hw/intc/xics_spapr.c  | 30 ++++++++++++------------------
- hw/ppc/spapr.c        |  5 +++--
- hw/ppc/spapr_events.c |  4 ++--
- hw/ppc/spapr_pci.c    |  8 ++++----
- hw/ppc/spapr_vio.c    |  2 +-
- include/hw/ppc/xics.h | 13 +++++++------
- 6 files changed, 29 insertions(+), 33 deletions(-)
+On 2017-11-10 14:32, Fam Zheng wrote:
+> On Fri, 11/10 14:17, Kevin Wolf wrote:
+>> Am 10.11.2017 um 03:45 hat Fam Zheng geschrieben:
+>>> On Thu, 11/09 21:43, Max Reitz wrote:
+>>>> Draining a BDS may lead to graph modifications, which in turn may re=
+sult
+>>>> in it and other BDS being stripped of their current references.  If
+>>>> bdrv_drain_all_begin() and bdrv_drain_all_end() do not keep strong
+>>>> references themselves, the BDS they are trying to drain (or undrain)=
+ may
+>>>> disappear right under their feet -- or, more specifically, under the=
 
-diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
-index f28e9136f2f6..b5c8b8fa0e89 100644
---- a/hw/intc/xics_spapr.c
-+++ b/hw/intc/xics_spapr.c
-@@ -245,22 +245,20 @@ void xics_spapr_init(sPAPRMachineState *spapr)
-     spapr_register_hypercall(H_IPOLL, h_ipoll);
- }
-=20
--int spapr_ics_alloc(ICSState *ics, int irq_hint, bool lsi, Error **errp)
-+int spapr_irq_alloc(sPAPRMachineState *spapr, int irq_hint, bool lsi,
-+                    Error **errp)
+>>>> feet of BDRV_POLL_WHILE() in bdrv_drain_recurse().
+>>>>
+>>>> This fixes an occasional hang of iotest 194.
+>>>>
+>>>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>>>> ---
+>>>>  block/io.c | 47 ++++++++++++++++++++++++++++++++++++++++++++---
+>>>>  1 file changed, 44 insertions(+), 3 deletions(-)
+>>>>
+>>>> diff --git a/block/io.c b/block/io.c
+>>>> index 3d5ef2cabe..a0a2833e8e 100644
+>>>> --- a/block/io.c
+>>>> +++ b/block/io.c
+>>>> @@ -340,7 +340,10 @@ void bdrv_drain_all_begin(void)
+>>>>      bool waited =3D true;
+>>>>      BlockDriverState *bs;
+>>>>      BdrvNextIterator it;
+>>>> -    GSList *aio_ctxs =3D NULL, *ctx;
+>>>> +    GSList *aio_ctxs =3D NULL, *ctx, *bs_list =3D NULL, *bs_list_en=
+try;
+>>>> +
+>>>> +    /* Must be called from the main loop */
+>>>> +    assert(qemu_get_current_aio_context() =3D=3D qemu_get_aio_conte=
+xt());
+>>>> =20
+>>>>      block_job_pause_all();
+>>>> =20
+>>>> @@ -355,6 +358,12 @@ void bdrv_drain_all_begin(void)
+>>>>          if (!g_slist_find(aio_ctxs, aio_context)) {
+>>>>              aio_ctxs =3D g_slist_prepend(aio_ctxs, aio_context);
+>>>>          }
+>>>> +
+>>>> +        /* Keep a strong reference to all root BDS and copy them in=
+to
+>>>> +         * an own list because draining them may lead to graph
+>>>> +         * modifications. */
+>>>> +        bdrv_ref(bs);
+>>>> +        bs_list =3D g_slist_prepend(bs_list, bs);
+>>>>      }
+>>>> =20
+>>>>      /* Note that completion of an asynchronous I/O operation can tr=
+igger any
+>>>> @@ -370,7 +379,11 @@ void bdrv_drain_all_begin(void)
+>>>>              AioContext *aio_context =3D ctx->data;
+>>>> =20
+>>>>              aio_context_acquire(aio_context);
+>>>> -            for (bs =3D bdrv_first(&it); bs; bs =3D bdrv_next(&it))=
  {
-     int irq;
--    XICSFabricClass *xic =3D XICS_FABRIC_GET_CLASS(ics->xics);
-+    XICSFabricClass *xic =3D XICS_FABRIC_GET_CLASS(spapr);
-=20
--    if (!ics) {
--        return -1;
--    }
-     if (irq_hint) {
--        if (xic->irq_test(ics->xics, irq_hint)) {
-+        if (xic->irq_test(XICS_FABRIC(spapr), irq_hint)) {
-             error_setg(errp, "can't allocate IRQ %d: already in use", ir=
-q_hint);
-             return -1;
-         }
-         irq =3D irq_hint;
-     } else {
--        irq =3D xic->irq_alloc_block(ics->xics, 1, 1, lsi);
-+        irq =3D xic->irq_alloc_block(XICS_FABRIC(spapr), 1, 1, lsi);
-         if (irq < 0) {
-             error_setg(errp, "can't allocate IRQ: no IRQ left");
-             return -1;
-@@ -276,15 +274,11 @@ int spapr_ics_alloc(ICSState *ics, int irq_hint, bo=
-ol lsi, Error **errp)
-  * Allocate block of consecutive IRQs, and return the number of the firs=
-t IRQ in
-  * the block. If align=3D=3Dtrue, aligns the first IRQ number to num.
-  */
--int spapr_ics_alloc_block(ICSState *ics, int num, bool lsi,
-+int spapr_irq_alloc_block(sPAPRMachineState *spapr, int num, bool lsi,
-                           bool align, Error **errp)
- {
-     int first =3D -1;
--    XICSFabricClass *xic =3D XICS_FABRIC_GET_CLASS(ics->xics);
--
--    if (!ics) {
--        return -1;
--    }
-+    XICSFabricClass *xic =3D XICS_FABRIC_GET_CLASS(spapr);
-=20
-     /*
-      * MSIMesage::data is used for storing VIRQ so
-@@ -296,9 +290,9 @@ int spapr_ics_alloc_block(ICSState *ics, int num, boo=
-l lsi,
-     if (align) {
-         assert((num =3D=3D 1) || (num =3D=3D 2) || (num =3D=3D 4) ||
-                (num =3D=3D 8) || (num =3D=3D 16) || (num =3D=3D 32));
--        first =3D xic->irq_alloc_block(ics->xics, num, num, lsi);
-+        first =3D xic->irq_alloc_block(XICS_FABRIC(spapr), num, num, lsi=
-);
-     } else {
--        first =3D xic->irq_alloc_block(ics->xics, num, 1, lsi);
-+        first =3D xic->irq_alloc_block(XICS_FABRIC(spapr), num, 1, lsi);
-     }
-     if (first < 0) {
-         error_setg(errp, "can't find a free %d-IRQ block", num);
-@@ -310,11 +304,11 @@ int spapr_ics_alloc_block(ICSState *ics, int num, b=
-ool lsi,
-     return first;
- }
-=20
--void spapr_ics_free(ICSState *ics, int irq, int num)
-+void spapr_irq_free(sPAPRMachineState *spapr, int irq, int num)
- {
--    XICSFabricClass *xic =3D XICS_FABRIC_GET_CLASS(ics->xics);
-+    XICSFabricClass *xic =3D XICS_FABRIC_GET_CLASS(spapr);
-=20
--    xic->irq_free_block(ics->xics, irq, num);
-+    xic->irq_free_block(XICS_FABRIC(spapr), irq, num);
- }
-=20
- void spapr_dt_xics(int nr_servers, void *fdt, uint32_t phandle)
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 8c2cff93f933..1ef09963519f 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -3669,7 +3669,8 @@ static bool spapr_irq_test(XICSFabric *xi, int irq)
-  * and then the MSIs. This allows us to keep the LSI IRQ numbers in a
-  * well known range which is useful for PHB hotplug.
-  */
--static int spapr_irq_alloc_block(XICSFabric *xi, int count, int align, b=
-ool lsi)
-+static int spapr_irq_alloc_block_xi(XICSFabric *xi, int count, int align=
-,
-+                                    bool lsi)
- {
-     sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
-     int start =3D lsi ? 0 : SPAPR_MAX_LSI;
-@@ -3808,7 +3809,7 @@ static void spapr_machine_class_init(ObjectClass *o=
-c, void *data)
-     xic->ics_resend =3D spapr_ics_resend;
-     xic->icp_get =3D spapr_icp_get;
-     xic->irq_test =3D spapr_irq_test;
--    xic->irq_alloc_block =3D spapr_irq_alloc_block;
-+    xic->irq_alloc_block =3D spapr_irq_alloc_block_xi;
-     xic->irq_free_block =3D spapr_irq_free_block;
-     xic->irq_is_lsi =3D spapr_irq_is_lsi;
-=20
-diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
-index e377fc7ddea2..cead596f3e7a 100644
---- a/hw/ppc/spapr_events.c
-+++ b/hw/ppc/spapr_events.c
-@@ -718,7 +718,7 @@ void spapr_events_init(sPAPRMachineState *spapr)
-     spapr->event_sources =3D spapr_event_sources_new();
-=20
-     spapr_event_sources_register(spapr->event_sources, EVENT_CLASS_EPOW,
--                                 spapr_ics_alloc(spapr->ics, 0, false,
-+                                 spapr_irq_alloc(spapr, 0, false,
-                                                   &error_fatal));
-=20
-     /* NOTE: if machine supports modern/dedicated hotplug event source,
-@@ -731,7 +731,7 @@ void spapr_events_init(sPAPRMachineState *spapr)
-      */
-     if (spapr->use_hotplug_event_source) {
-         spapr_event_sources_register(spapr->event_sources, EVENT_CLASS_H=
-OT_PLUG,
--                                     spapr_ics_alloc(spapr->ics, 0, fals=
-e,
-+                                     spapr_irq_alloc(spapr, 0, false,
-                                                       &error_fatal));
-     }
-=20
-diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-index 5a3122a9f9f9..e0ef77a480e5 100644
---- a/hw/ppc/spapr_pci.c
-+++ b/hw/ppc/spapr_pci.c
-@@ -314,7 +314,7 @@ static void rtas_ibm_change_msi(PowerPCCPU *cpu, sPAP=
-RMachineState *spapr,
-             return;
-         }
-=20
--        spapr_ics_free(spapr->ics, msi->first_irq, msi->num);
-+        spapr_irq_free(spapr, msi->first_irq, msi->num);
-         if (msi_present(pdev)) {
-             spapr_msi_setmsg(pdev, 0, false, 0, 0);
-         }
-@@ -352,7 +352,7 @@ static void rtas_ibm_change_msi(PowerPCCPU *cpu, sPAP=
-RMachineState *spapr,
-     }
-=20
-     /* Allocate MSIs */
--    irq =3D spapr_ics_alloc_block(spapr->ics, req_num, false,
-+    irq =3D spapr_irq_alloc_block(spapr, req_num, false,
-                            ret_intr_type =3D=3D RTAS_TYPE_MSI, &err);
-     if (err) {
-         error_reportf_err(err, "Can't allocate MSIs for device %x: ",
-@@ -363,7 +363,7 @@ static void rtas_ibm_change_msi(PowerPCCPU *cpu, sPAP=
-RMachineState *spapr,
-=20
-     /* Release previous MSIs */
-     if (msi) {
--        spapr_ics_free(spapr->ics, msi->first_irq, msi->num);
-+        spapr_irq_free(spapr, msi->first_irq, msi->num);
-         g_hash_table_remove(phb->msi, &config_addr);
-     }
-=20
-@@ -1675,7 +1675,7 @@ static void spapr_phb_realize(DeviceState *dev, Err=
-or **errp)
-         uint32_t irq;
-         Error *local_err =3D NULL;
-=20
--        irq =3D spapr_ics_alloc_block(spapr->ics, 1, true, false, &local=
-_err);
-+        irq =3D spapr_irq_alloc_block(spapr, 1, true, false, &local_err)=
-;
-         if (local_err) {
-             error_propagate(errp, local_err);
-             error_prepend(errp, "can't allocate LSIs: ");
-diff --git a/hw/ppc/spapr_vio.c b/hw/ppc/spapr_vio.c
-index ea3bc8bd9e21..bb7ed2c537b0 100644
---- a/hw/ppc/spapr_vio.c
-+++ b/hw/ppc/spapr_vio.c
-@@ -454,7 +454,7 @@ static void spapr_vio_busdev_realize(DeviceState *qde=
-v, Error **errp)
-         dev->qdev.id =3D id;
-     }
-=20
--    dev->irq =3D spapr_ics_alloc(spapr->ics, dev->irq, false, &local_err=
-);
-+    dev->irq =3D spapr_irq_alloc(spapr, dev->irq, false, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-         return;
-diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-index 056cf37bc68f..dd3e2eacedb2 100644
---- a/include/hw/ppc/xics.h
-+++ b/include/hw/ppc/xics.h
-@@ -184,10 +184,13 @@ typedef struct XICSFabricClass {
-=20
- #define XICS_IRQS_SPAPR               1024
-=20
--int spapr_ics_alloc(ICSState *ics, int irq_hint, bool lsi, Error **errp)=
-;
--int spapr_ics_alloc_block(ICSState *ics, int num, bool lsi, bool align,
--                           Error **errp);
--void spapr_ics_free(ICSState *ics, int irq, int num);
-+typedef struct sPAPRMachineState sPAPRMachineState;
-+
-+int spapr_irq_alloc(sPAPRMachineState *spapr, int irq_hint, bool lsi,
-+                    Error **errp);
-+int spapr_irq_alloc_block(sPAPRMachineState *spapr, int num, bool lsi,
-+                          bool align, Error **errp);
-+void spapr_irq_free(sPAPRMachineState *spapr, int irq, int num);
- void spapr_dt_xics(int nr_servers, void *fdt, uint32_t phandle);
-=20
- qemu_irq xics_get_qirq(XICSFabric *xi, int irq);
-@@ -210,8 +213,6 @@ bool ics_is_lsi(ICSState *ics, int srno);
- void ics_resend(ICSState *ics);
- void icp_resend(ICPState *ss);
-=20
--typedef struct sPAPRMachineState sPAPRMachineState;
--
- int xics_kvm_init(sPAPRMachineState *spapr, Error **errp);
- void xics_spapr_init(sPAPRMachineState *spapr);
-=20
---=20
-2.13.6
+>>>> +            for (bs_list_entry =3D bs_list; bs_list_entry;
+>>>> +                 bs_list_entry =3D bs_list_entry->next)
+>>>> +            {
+>>>> +                bs =3D bs_list_entry->data;
+>>>> +
+>>>>                  if (aio_context =3D=3D bdrv_get_aio_context(bs)) {
+>>>>                      waited |=3D bdrv_drain_recurse(bs, true);
+>>>>                  }
+>>>> @@ -379,24 +392,52 @@ void bdrv_drain_all_begin(void)
+>>>>          }
+>>>>      }
+>>>> =20
+>>>> +    for (bs_list_entry =3D bs_list; bs_list_entry;
+>>>> +         bs_list_entry =3D bs_list_entry->next)
+>>>> +    {
+>>>> +        bdrv_unref(bs_list_entry->data);
+>>>> +    }
+>>>> +
+>>>>      g_slist_free(aio_ctxs);
+>>>> +    g_slist_free(bs_list);
+>>>>  }
+>>>> =20
+>>>>  void bdrv_drain_all_end(void)
+>>>>  {
+>>>>      BlockDriverState *bs;
+>>>>      BdrvNextIterator it;
+>>>> +    GSList *bs_list =3D NULL, *bs_list_entry;
+>>>> +
+>>>> +    /* Must be called from the main loop */
+>>>> +    assert(qemu_get_current_aio_context() =3D=3D qemu_get_aio_conte=
+xt());
+>>>> =20
+>>>> +    /* Keep a strong reference to all root BDS and copy them into a=
+n
+>>>> +     * own list because draining them may lead to graph modificatio=
+ns.
+>>>> +     */
+>>>>      for (bs =3D bdrv_first(&it); bs; bs =3D bdrv_next(&it)) {
+>>>> -        AioContext *aio_context =3D bdrv_get_aio_context(bs);
+>>>> +        bdrv_ref(bs);
+>>>> +        bs_list =3D g_slist_prepend(bs_list, bs);
+>>>> +    }
+>>>> +
+>>>> +    for (bs_list_entry =3D bs_list; bs_list_entry;
+>>>> +         bs_list_entry =3D bs_list_entry->next)
+>>>> +    {
+>>>> +        AioContext *aio_context;
+>>>> +
+>>>> +        bs =3D bs_list_entry->data;
+>>>> +        aio_context =3D bdrv_get_aio_context(bs);
+>>>> =20
+>>>>          aio_context_acquire(aio_context);
+>>>>          aio_enable_external(aio_context);
+>>>>          bdrv_parent_drained_end(bs);
+>>>>          bdrv_drain_recurse(bs, false);
+>>>>          aio_context_release(aio_context);
+>>>> +
+>>>> +        bdrv_unref(bs);
+>>>>      }
+>>>> =20
+>>>> +    g_slist_free(bs_list);
+>>>> +
+>>>>      block_job_resume_all();
+>>>>  }
+>>>
+>>> It is better to put the references into BdrvNextIterator and introduc=
+e
+>>> bdrv_next_iterator_destroy() to free them? You'll need to touch all c=
+allers
+>>> because it is not C++, but it secures all of rest, which seems vulner=
+able in the
+>>> same pattern, for example the aio_poll() in iothread_stop_all().
+>>
+>> You could automatically free the references when bdrv_next() returns
+>> NULL. Then you need an explicit bdrv_next_iterator_destroy() only for
+>> callers that stop iterating halfway through the list.
+>> Yes, good idea.
+
+But bdrv_unref() is safe only in the main loop.  Without having checked,
+I'm not sure whether all callers of bdrv_next() are running in the main
+loop.
+
+I'd rather introduce a bdrv_next_safe() which is used by those callers
+which need it.
+
+>> Do you actually need to keep references to all BDSes in the whole list=
+
+>> while using the iterator or would it be enough to just keep a referenc=
+e
+>> to the current one?
+>=20
+> To fix the bug we now see I think keeping the current is enough, but I =
+think
+> implementing just like this patch is also good with some future-proofin=
+g: we
+> cannot know what will be wedged into the nexted aio_poll()'s over time =
+(and yes,
+> we should really reduce the number of them.)
+
+I don't really want to think about whether it's safe to only keep a
+reference to the current BDS.  I can't imagine any case where destroying
+one root BDS leads to destroying another, but I'd rather be safe and not
+have to think about it.  (Unless there is an important reason to only
+keep a strong reference to the current one.)
+
+Max
+
+
+--bMXtmIn20xetU9fow92xwbBDQumEtdeNW
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAloFxGUSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AYwgH/18pWBIcVZ2cvQaVtq1OVu3X8oLJhA8f
+hG5xN1YWdk2kb1UKwbRyEF5Vz1vzsOQgIWzrV53kqCliSjfjKNcLTLMwJgpAqixa
+wnk5eV0jJMemcfIDLPEYh2lbj0DsmmX2dbLT4ZbyU277djXmFb4hOd2ZH9ouDGv8
+EzUX8CJyPrg/HwVH36p1RI85KimBH/mwHygJtIXM0If8zltGEqPH0zAK9nwAje14
+9//K9QnpDp7YgNWZn1GGxtdccRkMwGnWJz9PJ2LxQDGQiJlJdpNMAaeAWznKSo5z
+4M0dl4VW7YNPfXgc/kZjzJSoIdexActdYk8VrTee6IhT0AF7guBUT9c=
+=67ua
+-----END PGP SIGNATURE-----
+
+--bMXtmIn20xetU9fow92xwbBDQumEtdeNW--
