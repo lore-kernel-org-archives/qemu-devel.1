@@ -1,27 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40657)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42596)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eCx5R-0001oF-Vw
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 19:22:23 -0500
+	(envelope-from <cota@braap.org>) id 1eCxD8-00031h-N0
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 19:30:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eCx5Q-0007Rw-UR
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 19:22:21 -0500
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1510228971-6005-1-git-send-email-sundeep.lkml@gmail.com>
-	<4beb4e47-0ff9-8251-6502-23824779edbd@amsat.org>
-	<CAFEAcA-ATtAougvALVo=48p+jVx5B+Ejq60TD9dGYEQU2ReWCQ@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <5a7b721c-fe04-921b-b9d2-986c9930b00b@amsat.org>
-Date: Thu, 9 Nov 2017 21:22:10 -0300
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-ATtAougvALVo=48p+jVx5B+Ejq60TD9dGYEQU2ReWCQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu devel PATCH] MAINTAINERS: Add entries for
- Smartfusion2
+	(envelope-from <cota@braap.org>) id 1eCxD5-0005Eg-Jr
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 19:30:18 -0500
+Received: from out4-smtp.messagingengine.com ([66.111.4.28]:41931)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1eCxD5-0005Ay-7Z
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 19:30:15 -0500
+From: "Emilio G. Cota" <cota@braap.org>
+Date: Thu,  9 Nov 2017 19:30:11 -0500
+Message-Id: <1510273811-13419-1-git-send-email-cota@braap.org>
+Subject: [Qemu-devel] [PATCH] thread-posix: fix qemu_rec_mutex_trylock macro
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,53 +21,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: Subbaraya Sundeep <sundeep.lkml@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Alistair Francis <alistair23@gmail.com>
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>
 
-On 11/09/2017 08:55 PM, Peter Maydell wrote:
-> On 9 November 2017 at 21:46, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
->> Hi Subbaraya,
->>
->> On 11/09/2017 09:02 AM, Subbaraya Sundeep wrote:
->>> add voluntarily myself as maintainer for Smartfusion2
->>
->> You need to share your GnuPG key signed, I couldn't find it using
->> http://pgp.mit.edu/pks/lookup?search=Subbaraya+Sundeep
->>
->> from https://wiki.qemu.org/Contribute/SubmitAPullRequest :
-> 
-> I don't in general expect to take pull requests from
-> everybody listed as a maintainer in the MAINTAINERS file.
-> That just means "I'm going to be reviewing and should
-> be cc'd on patches". Pull requests are sent by people
-> who are maintainers for a subsystem. Rule of thumb:
-> unless somebody asks you to send a pull request, you
-> don't need to do it.
+We never noticed because it has no users.
 
-Ok, please apologize my misunderstanding. I still think the M: entry
-stand for 'Maintainer' instead of 'Mail', and still don't understand the
-difference with a "Designated reviewer" (R: entry):
+Signed-off-by: Emilio G. Cota <cota@braap.org>
+---
+ include/qemu/thread-posix.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-        M: Mail patches to: FullName <address@domain>
-        R: Designated reviewer: FullName <address@domain>
-           These reviewers should be CCed on patches.
-
-"Designated reviewer" seems to duplicate the M: entry and is therefore
-confusing. Can we simply remove it instead?
-
-When introduced in fdf6fab4df4 the explanation was:
-
---
-Some people are not content with the amount of mail they get, and would
-like to be CCed on patches for areas they do not maintain.  Let them
-satisfy their own appetite for qemu-devel messages.
-
-Seriously: the purpose here is a bit different from the Linux kernel.
-While Linux uses "R" to designate non-maintainers for reviewing patches
-in a given area, in QEMU I would also like to use "R" so that people can
-delegate sending pull requests while keeping some degree of oversight.
---
-
-Regards,
-
-Phil.
+diff --git a/include/qemu/thread-posix.h b/include/qemu/thread-posix.h
+index f4296d3..f3f47e4 100644
+--- a/include/qemu/thread-posix.h
++++ b/include/qemu/thread-posix.h
+@@ -7,7 +7,7 @@
+ typedef QemuMutex QemuRecMutex;
+ #define qemu_rec_mutex_destroy qemu_mutex_destroy
+ #define qemu_rec_mutex_lock qemu_mutex_lock
+-#define qemu_rec_mutex_try_lock qemu_mutex_try_lock
++#define qemu_rec_mutex_trylock qemu_mutex_trylock
+ #define qemu_rec_mutex_unlock qemu_mutex_unlock
+ 
+ struct QemuMutex {
+-- 
+2.7.4
