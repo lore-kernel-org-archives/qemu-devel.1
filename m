@@ -1,37 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46883)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53960)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1eD0m0-0004Jy-6v
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 23:18:33 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1eD1mh-00043C-Eb
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 00:23:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1eD0lx-0007Td-2R
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 23:18:32 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59528)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1eD0lw-0007T2-ST
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 23:18:28 -0500
-From: Jason Wang <jasowang@redhat.com>
-References: <1b862cf2-2fee-3243-cb54-2780ace6f25b@profihost.ag>
-	<971cc10f-7930-9830-0528-27e8faac7282@redhat.com>
-	<748c4d0d-f84b-303d-f9a6-bafa6037d669@profihost.ag>
-	<f4b0cb70-7f86-f7cf-bb89-3a9f7ae15dc2@redhat.com>
-	<4c2913e2-5946-47db-cced-a5702538bc3b@profihost.ag>
-	<dc3bf74f-fbd6-573d-0d7c-d456469fcf1d@profihost.ag>
-	<9c8673a5-faf7-ca9c-27d3-398df4223d6a@redhat.com>
-	<f362d043-7293-65b7-734b-c8372a5f16c3@profihost.ag>
-	<54326bae-831d-dfb8-151e-534d3a100c2c@redhat.com>
-	<ab53e4ae-4c38-9520-b076-96318b6c09b5@profihost.ag>
-	<61b97624-bd55-655f-f8e2-ea1699c25d51@redhat.com>
-	<b110639a-3752-56b5-fe50-741c53048c15@redhat.com>
-	<34a1bec2-403e-8de1-d3dd-661865c6dceb@redhat.com>
-Message-ID: <a80dde99-460c-15e9-26ba-e5e8a2c0ae5e@redhat.com>
-Date: Fri, 10 Nov 2017 13:18:20 +0900
+	(envelope-from <dgibson@ozlabs.org>) id 1eD1mf-00037y-Rv
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 00:23:19 -0500
+Date: Fri, 10 Nov 2017 14:18:18 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20171110031818.GH7732@umbus.fritz.box>
+References: <1467696699-8941-9-git-send-email-david@gibson.dropbear.id.au>
+	<52275d2d-0a93-fe92-56ed-7841fa5a79dc@redhat.com>
+	<518a60a2-9c65-9eda-471c-83596e746bfb@ozlabs.ru>
 MIME-Version: 1.0
-In-Reply-To: <34a1bec2-403e-8de1-d3dd-661865c6dceb@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] kvm: virtio-net: saved image requires TUN_F_UFO
- support
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="Hlh2aiwFLCZwGcpw"
+Content-Disposition: inline
+In-Reply-To: <518a60a2-9c65-9eda-471c-83596e746bfb@ozlabs.ru>
+Subject: Re: [Qemu-devel] [PULL,
+ 08/14] spapr_pci/spapr_pci_vfio: Support Dynamic DMA Windows (DDW)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,66 +26,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Stefan Priebe - Profihost AG <s.priebe@profihost.ag>, qemu-devel <qemu-devel@nongnu.org>
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: Laurent Vivier <lvivier@redhat.com>, peter.maydell@linaro.org, agraf@suse.de, qemu-devel@nongnu.org, alex.williamson@redhat.com, qemu-ppc@nongnu.org
 
 
+--Hlh2aiwFLCZwGcpw
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 2017=E5=B9=B411=E6=9C=8808=E6=97=A5 19:22, Jason Wang wrote:
->
->
-> On 2017=E5=B9=B411=E6=9C=8808=E6=97=A5 18:46, Paolo Bonzini wrote:
->> On 08/11/2017 09:21, Jason Wang wrote:
->>>
->>> On 2017=E5=B9=B411=E6=9C=8808=E6=97=A5 17:05, Stefan Priebe - Profiho=
-st AG wrote:
->>>> Am 08.11.2017 um 08:54 schrieb Jason Wang:
->>>>> On 2017=E5=B9=B411=E6=9C=8808=E6=97=A5 15:41, Stefan Priebe - Profi=
-host AG wrote:
->>>>>> Hi Paolo,
->>>>>>
->>>>>> Am 06.11.2017 um 12:27 schrieb Paolo Bonzini:
->>>>>>> On 06/11/2017 12:09, Stefan Priebe - Profihost AG wrote:
->>>>>>>> HI Paolo,
->>>>>>>>
->>>>>>>> could this patchset be related?
->>>>>>> Uh oh, yes it should.=C2=A0 Jason, any ways to fix it?=C2=A0 I su=
-ppose we
->>>>>>> need to
->>>>>>> disable UFO in the newest machine types, but do we also have to d=
-o
->>>>>>> (software) UFO in vhost-net and QEMU for migration compatibility?
->>>>>> Any news on this?
->>>>>>
->>>>>> Greets,
->>>>> Since we probe UFO support, it will be disabled automatically on=20
->>>>> device
->>>>> startup.
->>>>>
->>>>> For the issue of migration, I think the only way is trying to fix=20
->>>>> it in
->>>>> kernel.
->>>> But 4.14 is around the corner and the patchset is already included.
->>>> Shouldn't this get fixed before 4.14 is released?
->>> We will try to seek a solution as soon as possible. If we can't catch
->>> 4.14, we will do it for stable for sure.
->> Jason, can you write to netdev and Cc Linus and me?
->>
->> Thanks,
->>
->> Paolo
->
-> Paolo, see this https://www.spinics.net/lists/netdev/msg465454.html
->
-> Just notice this today since I'm not on the cc list.
->
-> Thanks
->
->
+On Wed, Nov 08, 2017 at 09:52:12AM +1100, Alexey Kardashevskiy wrote:
+> On 07/11/17 19:42, Laurent Vivier wrote:
+> > On 05/07/2016 07:31, David Gibson wrote:
+> >> From: Alexey Kardashevskiy <aik@ozlabs.ru>
+> >>
+> >> This adds support for Dynamic DMA Windows (DDW) option defined by
+> >> the SPAPR specification which allows to have additional DMA window(s)
+> >>
+> >> The "ddw" property is enabled by default on a PHB but for compatibility
+> >> the pseries-2.6 machine and older disable it.
+> >> This also creates a single DMA window for the older machines to
+> >> maintain backward migration.
+> >>
+> >> This implements DDW for PHB with emulated and VFIO devices. The host
+> >> kernel support is required. The advertised IOMMU page sizes are 4K and
+> >> 64K; 16M pages are supported but not advertised by default, in order to
+> >> enable them, the user has to specify "pgsz" property for PHB and
+> >> enable huge pages for RAM.
+> >=20
+> > Why is it not advirtised by default?
+>=20
+> I do not remember clearly but this kind of automation is usually less
+> manageable. What if we do not want huge IOMMU pages for some reason?
 
-An update:
+The reason is basically for migration.  Because of the compatibility
+requirements for that, we generally try to avoid making any guest
+visible changes to the virtual machine based on host capabilities or
+configuration because it makes migration a total nightmare.
 
-After some discussions on netdev, we will try to bring UFO back=20
-partially for just TAP. Willem promise to fix this. 4.14 is too late=20
-consider the fix is not trivial, it will go through stable tree.
 
-Thanks
+That said, in this case the difference which we'd need here -
+availability of hugepages in the guest, is *already* guest visible for
+the normal (non IOMMU) page mapping.  So maybe automatically changing
+the IOMMU mask as well would be ok.  Or at least no worse than we have
+already.
+
+> > When we start qemu with hugepage memory ("mount -t hugetlbfs none
+> > /mnt/kvm_hugepage" and ".. -mem-path /mnt/kvm_hugepage .."), we have an
+> > ugly message:
+> >=20
+> > "qemu-kvm: System page size 0x1000000 is not enabled in page_size_mask
+> > (0x11000). Performance may be slow"
+> >=20
+> > I understand if we want to use this with VFIO, we need something like
+> > "-global spapr-pci-host-bridge.pgsz=3D0x1011000".
+> >=20
+> > But is it needed if we don't use VFIO?
+>=20
+> Yes, TCE tables are still created in KVM so the size matters.
+>=20
+> > Is it a way QEMU adds automatically the 0x1000000 mask to page_size_mas=
+k?
+>=20
+> No. That thing which decides about -mem-path should also add the pgsz mas=
+k.
+>=20
+>=20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--Hlh2aiwFLCZwGcpw
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAloFGncACgkQbDjKyiDZ
+s5I02xAAq3ud5ee1homd04tLNmGCKMVfzkV4puVyrpPbvmS3p2XBoexjP8psSDWe
+IECwGxHavUAMFk8IEc02WmVxWQX5wr4JIi5a+p+KoRHV2JYkxA4++mNZbY9Ns9Tw
+2Fs7tlFuDwl1/Mirj5zVqbWMVCB/jrkiuxPvkwY4pgAU+Po5fda7Ty32BNmLZc0R
+bhwLsnrfafJkc0j/ymRBo6Qx6GwNR4BeCkNseA9rhY35rB7HHRnMSFB6/HEPqbQJ
+R6PRzOsUXS1cEQQ9iXmvjNk+fZHBQ6UbKsFOo2AsoFMI/VxWHO35HN97wHmX+g5s
+xPC/j05r7gFjJlpxum+JB3AkERjbmVEBNNWiRbIGwxHHOSuDRHimyuQ1GrmMWvhx
+PP5ff6HDr0ktIuP19/cgf6AuMZHV5JTt6BMsS5U0O7FEUscsQlsk/EZWvZ0f6VWW
+YJd8+DbCOnMhxADTzn871NVcSmcrbAR9WjwC+HYlOw3M+aMbuxm8JrueSCX1m6lh
+D3agcrsNZypcQHQW/RhH8xd60BTBZEwIyUtBDAfkHtmt3XJhISEY2yD1XEX9GAd2
+HTZ8/3voGkNFWTqPAE3Biefn45judf4BBvSSV0WifUXQ7wKnzxddkCPn80GHG3QK
+ZQReNktNeJJfWIwZKccZEviVJzUuLFkgPHVYWy43BzBMM+yzlNE=
+=aGb0
+-----END PGP SIGNATURE-----
+
+--Hlh2aiwFLCZwGcpw--
