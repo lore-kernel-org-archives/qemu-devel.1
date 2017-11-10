@@ -1,33 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41206)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43037)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1eD8WK-0002AR-Uv
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 07:34:54 -0500
+	(envelope-from <berto@igalia.com>) id 1eD8hB-0003uO-0X
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 07:46:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1eD8WG-0002MS-7q
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 07:34:52 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35652)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1eD8WF-0002KD-V7
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 07:34:48 -0500
-References: <1508170976-96869-4-git-send-email-imammedo@redhat.com>
-	<1508325132-70513-1-git-send-email-imammedo@redhat.com>
-	<20171019063151.GA13245@umbus>
-	<20171031150114.60e0958e@nial.brq.redhat.com>
-	<20171106180216.GT3111@localhost.localdomain>
-	<20171107160404.40e368da.cohuck@redhat.com>
-	<20171109065803.GG7732@umbus.fritz.box>
-	<20171109200235.GG3111@localhost.localdomain>
-	<20171110111403.636682ea.cohuck@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <7cda4233-2f8b-cfdc-3468-9416c9b5a855@redhat.com>
-Date: Fri, 10 Nov 2017 13:34:42 +0100
+	(envelope-from <berto@igalia.com>) id 1eD8hA-0004wz-5U
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 07:46:05 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <1508564040-120700-1-git-send-email-lizhengui@huawei.com>
+References: <1508564040-120700-1-git-send-email-lizhengui@huawei.com>
+Date: Fri, 10 Nov 2017 13:45:15 +0100
+Message-ID: <w51zi7uti90.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <20171110111403.636682ea.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v2 3/6] possible_cpus: add CPUArchId::type
- field
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block: all I/O should be
+ completed before removing throttle timers.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,158 +22,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>, Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, peter.maydell@linaro.org, pkrempa@redhat.com, pbonzini@redhat.com, drjones@redhat.com
+To: Zhengui Li <lizhengui@huawei.com>, kwolf@redhat.com, jcody@redhat.com, mreitz@redhat.com, pbonzini@redhat.com
+Cc: lina.lulina@huawei.com, qemu-block@nongnu.org, subo7@huawei.com, eric.fangyi@huawei.com, qemu-devel@nongnu.org, wangjie88@huawei.com, sochin.jiang@huawei.com
 
-On 10.11.2017 11:14, Cornelia Huck wrote:
-> On Thu, 9 Nov 2017 18:02:35 -0200
-> Eduardo Habkost <ehabkost@redhat.com> wrote:
-> 
->> On Thu, Nov 09, 2017 at 05:58:03PM +1100, David Gibson wrote:
->>> On Tue, Nov 07, 2017 at 04:04:04PM +0100, Cornelia Huck wrote:  
->>>> On Mon, 6 Nov 2017 16:02:16 -0200
->>>> Eduardo Habkost <ehabkost@redhat.com> wrote:
->>>>   
->>>>> On Tue, Oct 31, 2017 at 03:01:14PM +0100, Igor Mammedov wrote:  
->>>>>> On Thu, 19 Oct 2017 17:31:51 +1100
->>>>>> David Gibson <david@gibson.dropbear.id.au> wrote:
->>>>>>     
->>>>>>> On Wed, Oct 18, 2017 at 01:12:12PM +0200, Igor Mammedov wrote:    
->>>>>>>> For enabling early cpu to numa node configuration at runtime
->>>>>>>> qmp_query_hotpluggable_cpus() should provide a list of available
->>>>>>>> cpu slots at early stage, before machine_init() is called and
->>>>>>>> the 1st cpu is created, so that mgmt might be able to call it
->>>>>>>> and use output to set numa mapping.
->>>>>>>> Use MachineClass::possible_cpu_arch_ids() callback to set
->>>>>>>> cpu type info, along with the rest of possible cpu properties,
->>>>>>>> to let machine define which cpu type* will be used.
->>>>>>>>
->>>>>>>> * for SPAPR it will be a spapr core type and for ARM/s390x/x86
->>>>>>>>   a respective descendant of CPUClass.
->>>>>>>>
->>>>>>>> Move parse_numa_opts() in vl.c after cpu_model is parsed into
->>>>>>>> cpu_type so that possible_cpu_arch_ids() would know which
->>>>>>>> cpu_type to use during layout initialization.
->>>>>>>>
->>>>>>>> Signed-off-by: Igor Mammedov <imammedo@redhat.com>      
->>>>>>>
->>>>>>> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
->>>>>>>     
->>>>>>>> ---
->>>>>>>>   v2:
->>>>>>>>      - fix NULL dereference caused by not initialized
->>>>>>>>        MachineState::cpu_type at the time parse_numa_opts()
->>>>>>>>        were called
->>>>>>>> ---
->>>>>>>>  include/hw/boards.h        |  2 ++
->>>>>>>>  hw/arm/virt.c              |  3 ++-
->>>>>>>>  hw/core/machine.c          | 12 ++++++------
->>>>>>>>  hw/i386/pc.c               |  4 +++-
->>>>>>>>  hw/ppc/spapr.c             | 13 ++++++++-----
->>>>>>>>  hw/s390x/s390-virtio-ccw.c |  1 +
->>>>>>>>  vl.c                       |  3 +--
->>>>>>>>  7 files changed, 23 insertions(+), 15 deletions(-)
->>>>>>>>
->>>>>>>> diff --git a/include/hw/boards.h b/include/hw/boards.h
->>>>>>>> index 191a5b3..fa21758 100644
->>>>>>>> --- a/include/hw/boards.h
->>>>>>>> +++ b/include/hw/boards.h
->>>>>>>> @@ -80,6 +80,7 @@ void machine_set_cpu_numa_node(MachineState *machine,
->>>>>>>>   * CPUArchId:
->>>>>>>>   * @arch_id - architecture-dependent CPU ID of present or possible CPU      
->>>>>>>
->>>>>>> I know this isn't really in scope for this patch, but is @arch_id here
->>>>>>> supposed to have meaning defined by the target, or by the machine?
->>>>>>>
->>>>>>> If it's the machime, it could do with a rename - "arch" means target
->>>>>>> to most people (thanks to Linux).
->>>>>>>
->>>>>>> If it's the target, it's kind of bogus, because it doesn't necessarily
->>>>>>> have a clear meaning per target - get_arch_id in CPUClass has the same
->>>>>>> problem, which is probably one reason it's basically only used by the
->>>>>>> x86 code at present.
->>>>>>>
->>>>>>> e.g. for target/ppc, what do we use?  There's the PIR, which is in the
->>>>>>> CPU.. but only on some cpu models, not all.  There will generally be
->>>>>>> some kind of master PIC id, but there are different PIC models on
->>>>>>> different boards.  What goes in the devicetree?  Well only some
->>>>>>> machines use devicetree, and they might define the cpu reg 
->>>>>>> differently.
->>>>>>>
->>>>>>> Board designs will generally try to make some if not all of those
->>>>>>> possible values equal for simplicity, but there's still no real way of
->>>>>>> defining a sensible arch_id independent of machine / board.    
->>>>>> I'd say arch_id is machine specific so far, it was introduced when we
->>>>>> didn't have CpuInstanceProperties and at that time we considered only
->>>>>> vcpus (threads) and doesn't really apply to spapr cores.
->>>>>>
->>>>>> In general we could do away with arch_id and use CpuInstanceProperties
->>>>>> instead, but arch_id also serves aux purpose, it allows machine to
->>>>>> pre-calculate(cache) apic-id/mpidr values in one place and then they
->>>>>> are/(could be) used by arch in-depended code to build acpi tables.
->>>>>> So if we drop arch_id we would need to introduce a machine hook,
->>>>>> which would translate CpuInstanceProperties into current arch_id.    
->>>>>
->>>>> I think we need to do a better to job documenting where exactly
->>>>> we expect arch_id to be used and how, so people know what it's
->>>>> supposed to return.
->>>>>
->>>>> If the only place where it's useful now is ACPI code (is it?),
->>>>> should we rename it to something like get_acpi_id()?  
->>>>
->>>> It is also used in hw/s390x/sclp.c to fill out a control block, so acpi
->>>> isn't the only user.  
->>>
->>> Yeah.. this is kind of bogus.  The s390 use is in machine specific
->>> code, so it's basically just re-using the field for an unrelated usage
->>> to the x86/arm one (ACPI).
+On Sat 21 Oct 2017 07:34:00 AM CEST, Zhengui Li wrote:
+> From: Zhengui <lizhengui@huawei.com>
+>
+> In blk_remove_bs, all I/O should be completed before removing throttle
+> timers. If there has inflight I/O, removing throttle timers here will
+> cause the inflight I/O never return.
+> This patch add bdrv_drained_begin before throttle_timers_detach_aio_context
+> to let all I/O completed before removing throttle timers.
+>
+> Signed-off-by: Zhengui <lizhengui@huawei.com>
+> ---
+>  block/block-backend.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+>
+> diff --git a/block/block-backend.c b/block/block-backend.c
+> index 45d9101..9edc452 100644
+> --- a/block/block-backend.c
+> +++ b/block/block-backend.c
+> @@ -660,7 +660,11 @@ void blk_remove_bs(BlockBackend *blk)
+>      notifier_list_notify(&blk->remove_bs_notifiers, blk);
+>      if (blk->public.throttle_group_member.throttle_state) {
+>          tt = &blk->public.throttle_group_member.throttle_timers;
+> +        BlockDriverState *bs;
+> +        bs = blk_bs(blk);
+> +        bdrv_drained_begin(bs);
+>          throttle_timers_detach_aio_context(tt);
+> +        bdrv_drained_end(bs);
 
-as index == arch_id on s390x, that code could easily be changed to
-something like:
+You can keep my R-b, but seeing this in context I think you should
+define BlockDriverState either at the beginning of the block or together
+with ThrottleTimers at the beginning of the function.
 
-@@ -45,7 +45,7 @@ static void prepare_cpu_entries(SCLPDevice *sclp,
-CPUEntry *entry, int *count)
-         if (!ms->possible_cpus->cpus[i].cpu) {
-             continue;
-         }
--        entry[*count].address = ms->possible_cpus->cpus[i].arch_id;
-+        entry[*count].address = i;
-         entry[*count].type = 0;
-         memcpy(entry[*count].features, features, sizeof(features));
-         (*count)++;
-
-arch_id just looked like the right thing to use (documentation issue
-mentioned above)
-
-
->>>
->>> If we can't assign a universal meaning to the field (even if the
->>> actual values are per-machine) - and I don't think we can - then I
->>> really don't think it belongs in CPUState.  A machine hook which
->>> translates an ArchId to an acpi_id is the correct solution I believe.
->>> Or even an ACPIMachine interface (to be implemented by machines which
->>> do ACPI) which has a method to do this.
->>>
->>> Since both the assignment and use are in machine type specific code
->>> for s390, it can have its own field in the s390 specific cpu subclass.
-
-s390x doesn't need arch_id at all.
-
-cs->cpu_index can be used.
-
->>>   
->>
->> I agree.  This might require duplicating cpu_by_arch_id() and
->> cpu_exists() into machine-specific code, but this doesn't sound
->> too bad: there's only one user of cpu_by_arch_id() (that's
->> x86-specific code living inside monitor.c), and one user of
->> cpu_exists() (that's s390-specific code).>>
->> (Maybe those users could be rewritten to use
->> MachineState::possible_cpus, like pc_find_cpu_slot()).
-
-
--- 
-
-Thanks,
-
-David / dhildenb
+Berto
