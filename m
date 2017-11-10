@@ -1,17 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47446)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49961)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1eDFNI-0005Tu-2R
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 14:54:01 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eDFVz-0002zC-Di
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 15:03:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1eDFND-0006GS-IQ
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 14:54:00 -0500
-From: "Emilio G. Cota" <cota@braap.org>
-Date: Fri, 10 Nov 2017 14:53:43 -0500
-Message-Id: <1510343626-25861-3-git-send-email-cota@braap.org>
-In-Reply-To: <1510343626-25861-1-git-send-email-cota@braap.org>
-References: <1510343626-25861-1-git-send-email-cota@braap.org>
-Subject: [Qemu-devel] [PATCH for 2.11 2/5] xlnx-zynqmp: Properly support the
- smp command line option
+	(envelope-from <kwolf@redhat.com>) id 1eDFVy-0002QI-E5
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 15:02:59 -0500
+Date: Fri, 10 Nov 2017 21:02:45 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20171110200245.GJ5466@localhost.localdomain>
+References: <20171110175457.30173-1-vsementsov@virtuozzo.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171110175457.30173-1-vsementsov@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH] iotests: test clearing unknown
+ autoclear_features by qcow2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,112 +23,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Thomas Huth <thuth@redhat.com>, qemu-arm@nongnu.org, Igor Mitsyanko <i.mitsyanko@gmail.com>, Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com, eblake@redhat.com, dgilbert@redhat.com, quintela@redhat.com, den@openvz.org
 
-From: Alistair Francis <alistair.francis@xilinx.com>
+Am 10.11.2017 um 18:54 hat Vladimir Sementsov-Ogievskiy geschrieben:
+> Test clearing unknown autoclear_features by qcow2 on incoming
+> migration.
+> 
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+> 
+> Hi all!
+> 
+> This patch shows degradation, added in 2.10 in commit
+> 
+> commit 9c5e6594f15b7364624a3ad40306c396c93a2145
+> Author: Kevin Wolf <kwolf@redhat.com>
+> Date:   Thu May 4 18:52:40 2017 +0200
+> 
+>     block: Fix write/resize permissions for inactive images
+> 
+> The problem:
+> When on incoming migration with shared storage we reopen image to RW mode
+> we call bdrv_invalidate_cache it firstly call drv->bdrv_invalidate_cache and
+> only after it, through "parent->role->activate(parent, &local_err);" we set
+> appropriate RW permission.
+> 
+> Because of this, if drv->bdrv_invalidate_cache wants to write something
+> (image is RW and BDRV_O_INACTIVE is not set) it goes into
+> "bdrv_aligned_pwritev: Assertion `child->perm & BLK_PERM_WRITE' failed"
+> 
+> One case, when qcow2_invalidate_cache wants to write
+> something - when it wants to clear some unknown autoclear features. So,
+> here is a test for it.
+> 
+> Another case is when we try to migrate persistent dirty bitmaps through
+> shared storage, on invalidate_cache qcow2 will try to set DIRTY bit in
+> all loaded bitmaps.
+> 
+> Kevin, what do you think? I understand that operation order should be changed
+> somehow in bdrv_invalidate_cache, but I'm not sure about how "parent->role->.."
+> things works and can we safely move this part from function end to the middle.
 
-Allow the -smp command line option to control the number of CPUs we
-create.
+I don't think you need to move the parent->role->activate() callback,
+but just the bdrv_set_perm() so that we request the correct permissions
+for operation without the BDRV_O_INACTIVE flag.
 
-Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-Reviewed-by: Emilio G. Cota <cota@braap.org>
-Tested-by: Emilio G. Cota <cota@braap.org>
----
- hw/arm/xlnx-zcu102.c |  3 ++-
- hw/arm/xlnx-zynqmp.c | 26 ++++++++++++++++----------
- 2 files changed, 18 insertions(+), 11 deletions(-)
+The following seems to work for me (including a fix for the test case,
+we don't seem to get a RESUME event). I'm not sure about the error paths
+yet. We should probably try do undo the permission changes there. I can
+have a closer look into this next week.
 
-diff --git a/hw/arm/xlnx-zcu102.c b/hw/arm/xlnx-zcu102.c
-index e2d15a1..7ec03da 100644
---- a/hw/arm/xlnx-zcu102.c
-+++ b/hw/arm/xlnx-zcu102.c
-@@ -235,7 +235,8 @@ static void xlnx_zcu102_machine_class_init(ObjectClass *oc, void *data)
- {
-     MachineClass *mc = MACHINE_CLASS(oc);
- 
--    mc->desc = "Xilinx ZynqMP ZCU102 board";
-+    mc->desc = "Xilinx ZynqMP ZCU102 board with 4xA53s and 2xR5s based on " \
-+               "the value of smp";
-     mc->init = xlnx_zcu102_init;
-     mc->block_default_type = IF_IDE;
-     mc->units_per_default_bus = 1;
-diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
-index d4b6560..c707c66 100644
---- a/hw/arm/xlnx-zynqmp.c
-+++ b/hw/arm/xlnx-zynqmp.c
-@@ -98,8 +98,9 @@ static void xlnx_zynqmp_create_rpu(XlnxZynqMPState *s, const char *boot_cpu,
- {
-     Error *err = NULL;
-     int i;
-+    int num_rpus = MIN(smp_cpus - XLNX_ZYNQMP_NUM_APU_CPUS, XLNX_ZYNQMP_NUM_RPU_CPUS);
- 
--    for (i = 0; i < XLNX_ZYNQMP_NUM_RPU_CPUS; i++) {
-+    for (i = 0; i < num_rpus; i++) {
-         char *name;
- 
-         object_initialize(&s->rpu_cpu[i], sizeof(s->rpu_cpu[i]),
-@@ -132,8 +133,9 @@ static void xlnx_zynqmp_init(Object *obj)
- {
-     XlnxZynqMPState *s = XLNX_ZYNQMP(obj);
-     int i;
-+    int num_apus = MIN(smp_cpus, XLNX_ZYNQMP_NUM_APU_CPUS);
- 
--    for (i = 0; i < XLNX_ZYNQMP_NUM_APU_CPUS; i++) {
-+    for (i = 0; i < num_apus; i++) {
-         object_initialize(&s->apu_cpu[i], sizeof(s->apu_cpu[i]),
-                           "cortex-a53-" TYPE_ARM_CPU);
-         object_property_add_child(obj, "apu-cpu[*]", OBJECT(&s->apu_cpu[i]),
-@@ -182,6 +184,7 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
-     MemoryRegion *system_memory = get_system_memory();
-     uint8_t i;
-     uint64_t ram_size;
-+    int num_apus = MIN(smp_cpus, XLNX_ZYNQMP_NUM_APU_CPUS);
-     const char *boot_cpu = s->boot_cpu ? s->boot_cpu : "apu-cpu[0]";
-     ram_addr_t ddr_low_size, ddr_high_size;
-     qemu_irq gic_spi[GIC_NUM_SPI_INTR];
-@@ -233,10 +236,10 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
- 
-     qdev_prop_set_uint32(DEVICE(&s->gic), "num-irq", GIC_NUM_SPI_INTR + 32);
-     qdev_prop_set_uint32(DEVICE(&s->gic), "revision", 2);
--    qdev_prop_set_uint32(DEVICE(&s->gic), "num-cpu", XLNX_ZYNQMP_NUM_APU_CPUS);
-+    qdev_prop_set_uint32(DEVICE(&s->gic), "num-cpu", num_apus);
- 
-     /* Realize APUs before realizing the GIC. KVM requires this.  */
--    for (i = 0; i < XLNX_ZYNQMP_NUM_APU_CPUS; i++) {
-+    for (i = 0; i < num_apus; i++) {
-         char *name;
- 
-         object_property_set_int(OBJECT(&s->apu_cpu[i]), QEMU_PSCI_CONDUIT_SMC,
-@@ -292,7 +295,7 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
+Kevin
+
+
+diff --git a/block.c b/block.c
+index edc5bb9f9b..f530b630b6 100644
+--- a/block.c
++++ b/block.c
+@@ -4178,7 +4178,17 @@ void bdrv_invalidate_cache(BlockDriverState *bs, Error **errp)
          }
      }
  
--    for (i = 0; i < XLNX_ZYNQMP_NUM_APU_CPUS; i++) {
-+    for (i = 0; i < num_apus; i++) {
-         qemu_irq irq;
- 
-         sysbus_connect_irq(SYS_BUS_DEVICE(&s->gic), i,
-@@ -307,11 +310,14 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
-     }
- 
-     if (s->has_rpu) {
--        xlnx_zynqmp_create_rpu(s, boot_cpu, &err);
--        if (err) {
--            error_propagate(errp, err);
--            return;
--        }
-+        info_report("The 'has_rpu' property is no longer required, to use the "
-+                    "RPUs just use -smp 6.");
-+    }
-+
-+    xlnx_zynqmp_create_rpu(s, boot_cpu, &err);
-+    if (err) {
-+        error_propagate(errp, err);
++    /* Update permissions, they may differ for inactive nodes */
+     bs->open_flags &= ~BDRV_O_INACTIVE;
++    bdrv_get_cumulative_perm(bs, &perm, &shared_perm);
++    ret = bdrv_check_perm(bs, NULL, perm, shared_perm, NULL, &local_err);
++    if (ret < 0) {
++        bs->open_flags |= BDRV_O_INACTIVE;
++        error_propagate(errp, local_err);
 +        return;
++    }
++    bdrv_set_perm(bs, perm, shared_perm);
++
+     if (bs->drv->bdrv_invalidate_cache) {
+         bs->drv->bdrv_invalidate_cache(bs, &local_err);
+         if (local_err) {
+@@ -4195,16 +4205,6 @@ void bdrv_invalidate_cache(BlockDriverState *bs, Error **errp)
+         return;
      }
  
-     if (!s->boot_cpu_ptr) {
--- 
-2.7.4
+-    /* Update permissions, they may differ for inactive nodes */
+-    bdrv_get_cumulative_perm(bs, &perm, &shared_perm);
+-    ret = bdrv_check_perm(bs, NULL, perm, shared_perm, NULL, &local_err);
+-    if (ret < 0) {
+-        bs->open_flags |= BDRV_O_INACTIVE;
+-        error_propagate(errp, local_err);
+-        return;
+-    }
+-    bdrv_set_perm(bs, perm, shared_perm);
+-
+     QLIST_FOREACH(parent, &bs->parents, next_parent) {
+         if (parent->role->activate) {
+             parent->role->activate(parent, &local_err);
+diff --git a/tests/qemu-iotests/196 b/tests/qemu-iotests/196
+index 9ffbc723c2..4116ebc92b 100755
+--- a/tests/qemu-iotests/196
++++ b/tests/qemu-iotests/196
+@@ -53,7 +53,10 @@ class TestInvalidateAutoclear(iotests.QMPTestCase):
+             f.write(b'\xff')
+ 
+         self.vm_b.launch()
+-        self.assertNotEqual(self.vm_b.event_wait("RESUME"), None)
++        while True:
++            result = self.vm_b.qmp('query-status')
++            if result['return']['status'] == 'running':
++                break
+ 
+         with open(disk, 'rb') as f:
+             f.seek(88)
