@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59148)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60711)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eDDra-0002Xj-Tw
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 13:17:11 -0500
+	(envelope-from <eblake@redhat.com>) id 1eDE18-0003vE-Hg
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 13:27:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eDDrZ-0002FO-VJ
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 13:17:10 -0500
-References: <cover.1510143008.git.berto@igalia.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <468a9b98-06ea-f3d5-d9ad-d62afe260845@redhat.com>
-Date: Fri, 10 Nov 2017 19:17:01 +0100
+	(envelope-from <eblake@redhat.com>) id 1eDE17-0005v2-Hx
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 13:27:02 -0500
+References: <20171109203025.27493-1-mreitz@redhat.com>
+	<20171109203025.27493-5-mreitz@redhat.com>
+	<w51375mv4by.fsf@maestria.local.igalia.com>
+	<d44fc75f-829c-65cd-fc19-04f32d897f8a@redhat.com>
+	<w51tvy2t9m1.fsf@maestria.local.igalia.com>
+	<45294d61-b108-3e96-2bdc-59b3d471fefa@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <81f03429-dab4-5e86-9ca5-fecc4cfc91c7@redhat.com>
+Date: Fri, 10 Nov 2017 12:26:49 -0600
 MIME-Version: 1.0
-In-Reply-To: <cover.1510143008.git.berto@igalia.com>
+In-Reply-To: <45294d61-b108-3e96-2bdc-59b3d471fefa@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="aAQmfUiCwCdlU30R9VJlMLT8CaHhirEcc"
-Subject: Re: [Qemu-devel] [PATCH 0/1] qcow2: Check that corrupted images can
- be repaired in iotest 060
+	boundary="pviTh4g4obSUTdC84H3pvS85Ps5A6iN82"
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 4/5] iotests: Make 083 less
+ flaky
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,59 +29,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---aAQmfUiCwCdlU30R9VJlMLT8CaHhirEcc
-From: Max Reitz <mreitz@redhat.com>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <468a9b98-06ea-f3d5-d9ad-d62afe260845@redhat.com>
-Subject: Re: [PATCH 0/1] qcow2: Check that corrupted images can be repaired in
- iotest 060
-References: <cover.1510143008.git.berto@igalia.com>
-In-Reply-To: <cover.1510143008.git.berto@igalia.com>
+--pviTh4g4obSUTdC84H3pvS85Ps5A6iN82
+From: Eric Blake <eblake@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, Alberto Garcia <berto@igalia.com>,
+ qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
+ Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <81f03429-dab4-5e86-9ca5-fecc4cfc91c7@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 4/5] iotests: Make 083 less
+ flaky
+References: <20171109203025.27493-1-mreitz@redhat.com>
+ <20171109203025.27493-5-mreitz@redhat.com>
+ <w51375mv4by.fsf@maestria.local.igalia.com>
+ <d44fc75f-829c-65cd-fc19-04f32d897f8a@redhat.com>
+ <w51tvy2t9m1.fsf@maestria.local.igalia.com>
+ <45294d61-b108-3e96-2bdc-59b3d471fefa@redhat.com>
+In-Reply-To: <45294d61-b108-3e96-2bdc-59b3d471fefa@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 2017-11-08 13:13, Alberto Garcia wrote:
-> Hi,
+On 11/10/2017 11:29 AM, Max Reitz wrote:
+
+>>>> It seems that in this patch you're indenting with spaces but this fi=
+le
+>>>> uses tabs.
+>>>
+>>> Yes, but tabs are wrong. :-)
+>>
+>> I actually agree with you, but don't mix them in the file :-)
 >=20
-> I sent the 'Misc qcow2 corruption checks' series the other day, and
-> Kevin suggested that we check that the corrupted images can be
-> repaired using qemu-img.
->=20
-> This patch extends the tests that I wrote in order to do just
-> that. Since the series is already in Max's branch I decided to write
-> this as a follow-up patch, but if you prefer I can resend it instead.
->=20
-> Regards,
->=20
-> Berto
+> I can whistle and say here, too, that Eric liked it. O:-)
 
-Thanks, applied to my block branch:
+I don't really pay attention to which files have pre-existing TABs.
+You're right that preserving whole-file TABs is a bit nicer from
+consistency than reformatting a file wholesale; but then you have to
+tell checkpatch that preserving TABs was intentional.  Mixed mode
+indentation is not as consistent, but at least keeps checkpatch happy
+without effort, and may make it easier for a patch down the road to
+finally do wholesale conversion of the rest of the file to avoid TABs.
 
-https://github.com/XanClic/qemu/commits/block
+So when it comes to a file with existing TABs, I'm okay whether the
+patch preserves TABs (with documentation that it is doing so
+intentionally) or switches to mixed-mode spaces.
 
-Max
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
---aAQmfUiCwCdlU30R9VJlMLT8CaHhirEcc
+--pviTh4g4obSUTdC84H3pvS85Ps5A6iN82
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAloF7R0SHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AhqYH/3RB0a61y3x5mSm6IaiyLmm4uyDhfLIe
-YyFqQzGZHtCezNmhMGEZXCxrp4C9KM49PLKawh49jJgd0xWNgK0TSJGvJScwTc7H
-qRJXKpfFzfXaSdayPWsRsyq/zXEt4ZmfIFHnoKhBvQJIdM1DY17AnZ2Ygoa/zHJV
-zNwSujc1N0i57QbdPFsvxC8zFUOuOetBMw2WcT/tUB6feCoAZpVOXujhqiB1q7Ez
-JN2R4T1cmlAwFnjrIfbdaPTuFs1HVEbO7lB7h3OanG0Ct2njF6Ac3R6VLjay3hjd
-Eww6zEQsG23cspTpCHFphq4A/ug8uwcJHCLFyVLwW6ikNzFlSlYoEYc=
-=wVAq
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloF72kACgkQp6FrSiUn
+Q2qA/wf/Z4PRwQOBZyGd3QB6q4UZbiqHou9D6SjJ3QIpTsU2ywiN5rk8ezTkEREy
+kVWl6GPfNh+8JtCV0pOayxm4n1ODI2AOEwNJDEaxMb/BdP61XrNFt5lyK30qZt27
+/liG5pbf5n76irNpft5qs26um+MQ3iWncmB+lHYSFSTwFfDWySDvOeS5SPK9iobM
+w0J1i7cyWKSWJVjR6D2MFbEde/B/T+YPV//DcIrj/IkkFVmLzym+ubXgGSf8MBhi
+KsfhGrknlRO96WxhwMNN/qIYRleTOu1DEES2l9ZYocSHbcScdLZzE/jToraiU57L
+wHlcSpNh8SqNvVRQ53/y2BIphEGFzw==
+=1J68
 -----END PGP SIGNATURE-----
 
---aAQmfUiCwCdlU30R9VJlMLT8CaHhirEcc--
+--pviTh4g4obSUTdC84H3pvS85Ps5A6iN82--
