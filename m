@@ -1,19 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39583)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41256)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1eD640-0000QY-CZ
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 04:57:29 -0500
+	(envelope-from <berto@igalia.com>) id 1eD69U-0002kL-Ek
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 05:03:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1eD63z-0002Aq-Nd
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 04:57:28 -0500
+	(envelope-from <berto@igalia.com>) id 1eD69T-0000Jw-Cu
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 05:03:08 -0500
 From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <1508564040-120700-1-git-send-email-lizhengui@huawei.com>
-References: <1508564040-120700-1-git-send-email-lizhengui@huawei.com>
-Date: Fri, 10 Nov 2017 10:57:10 +0100
-Message-ID: <w5160aiv4ll.fsf@maestria.local.igalia.com>
+In-Reply-To: <20171109203025.27493-5-mreitz@redhat.com>
+References: <20171109203025.27493-1-mreitz@redhat.com>
+	<20171109203025.27493-5-mreitz@redhat.com>
+Date: Fri, 10 Nov 2017 11:02:57 +0100
+Message-ID: <w51375mv4by.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block: all I/O should be
- completed before removing throttle timers.
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 4/5] iotests: Make 083 less
+ flaky
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,40 +23,14 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zhengui Li <lizhengui@huawei.com>, kwolf@redhat.com, jcody@redhat.com, mreitz@redhat.com, pbonzini@redhat.com
-Cc: lina.lulina@huawei.com, qemu-block@nongnu.org, subo7@huawei.com, eric.fangyi@huawei.com, qemu-devel@nongnu.org, wangjie88@huawei.com, sochin.jiang@huawei.com
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
 
-On Sat 21 Oct 2017 07:34:00 AM CEST, Zhengui Li wrote:
-> From: Zhengui <lizhengui@huawei.com>
->
-> In blk_remove_bs, all I/O should be completed before removing throttle
-> timers. If there has inflight I/O, removing throttle timers here will
-> cause the inflight I/O never return.
-> This patch add bdrv_drained_begin before throttle_timers_detach_aio_context
-> to let all I/O completed before removing throttle timers.
->
-> Signed-off-by: Zhengui <lizhengui@huawei.com>
-> ---
->  block/block-backend.c | 4 ++++
->  1 file changed, 4 insertions(+)
->
-> diff --git a/block/block-backend.c b/block/block-backend.c
-> index 45d9101..9edc452 100644
-> --- a/block/block-backend.c
-> +++ b/block/block-backend.c
-> @@ -660,7 +660,11 @@ void blk_remove_bs(BlockBackend *blk)
->      notifier_list_notify(&blk->remove_bs_notifiers, blk);
->      if (blk->public.throttle_group_member.throttle_state) {
->          tt = &blk->public.throttle_group_member.throttle_timers;
-> +        BlockDriverState *bs;
-> +        bs = blk_bs(blk);
-> +        bdrv_drained_begin(bs);
->          throttle_timers_detach_aio_context(tt);
-> +        bdrv_drained_end(bs);
->      }
->  
->      blk_update_root_state(blk);
+On Thu 09 Nov 2017 09:30:24 PM CET, Max Reitz wrote:
+> +        echo > "$TEST_DIR/nbd-fault-injector.out"
+>  	$PYTHON nbd-fault-injector.py $extra_args "$nbd_addr" "$TEST_DIR/nbd-fault-injector.conf" >"$TEST_DIR/nbd-fault-injector.out" 2>&1 &
 
-Reviewed-by: Alberto Garcia <berto@igalia.com>
+It seems that in this patch you're indenting with spaces but this file
+uses tabs.
 
 Berto
