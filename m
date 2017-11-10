@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57698)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59567)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eDG7R-0000nG-5b
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 15:41:42 -0500
+	(envelope-from <eblake@redhat.com>) id 1eDGHM-00048x-Q2
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 15:51:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eDG7Q-0000CY-7v
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 15:41:41 -0500
-References: <20171110203111.7666-1-mreitz@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <acddb6b0-a465-d3e2-ce49-8271df33d0c5@redhat.com>
-Date: Fri, 10 Nov 2017 21:41:27 +0100
+	(envelope-from <eblake@redhat.com>) id 1eDGHL-00060d-MI
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 15:51:56 -0500
+References: <20171110203759.14018-1-mreitz@redhat.com>
+	<20171110203759.14018-2-mreitz@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <26945f48-b5dc-49f6-4184-b10379cf510c@redhat.com>
+Date: Fri, 10 Nov 2017 14:51:43 -0600
 MIME-Version: 1.0
-In-Reply-To: <20171110203111.7666-1-mreitz@redhat.com>
+In-Reply-To: <20171110203759.14018-2-mreitz@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="ddtW3xexLoMLmR63JH5u7FKN2UU3Gtoeq"
-Subject: Re: [Qemu-devel] [PATCH for-2.11 0/5] qcow2: Fixes for corrupted
- images
+	boundary="Hpab8TbVMaFrsjXJ8P6mc5oPMrPpUvN8M"
+Subject: Re: [Qemu-devel] [PATCH for-2.12 1/1] qcow2: Repair unaligned
+ preallocated zero clusters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,93 +25,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, John Snow <jsnow@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---ddtW3xexLoMLmR63JH5u7FKN2UU3Gtoeq
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- Alberto Garcia <berto@igalia.com>, John Snow <jsnow@redhat.com>
-Message-ID: <acddb6b0-a465-d3e2-ce49-8271df33d0c5@redhat.com>
-Subject: Re: [PATCH for-2.11 0/5] qcow2: Fixes for corrupted images
-References: <20171110203111.7666-1-mreitz@redhat.com>
-In-Reply-To: <20171110203111.7666-1-mreitz@redhat.com>
+--Hpab8TbVMaFrsjXJ8P6mc5oPMrPpUvN8M
+From: Eric Blake <eblake@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>,
+ Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Message-ID: <26945f48-b5dc-49f6-4184-b10379cf510c@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.12 1/1] qcow2: Repair unaligned
+ preallocated zero clusters
+References: <20171110203759.14018-1-mreitz@redhat.com>
+ <20171110203759.14018-2-mreitz@redhat.com>
+In-Reply-To: <20171110203759.14018-2-mreitz@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 2017-11-10 21:31, Max Reitz wrote:
-> This series contains fixes for another batch of qcow2-related crashes
-> reported on Launchpad by Nageswara (the first batch was
-> http://lists.nongnu.org/archive/html/qemu-block/2017-11/msg00082.html b=
-y
-> Berto).
+On 11/10/2017 02:37 PM, Max Reitz wrote:
+> We can easily repair unaligned preallocated zero clusters by discarding=
+
+> them, so why not do it?
 >=20
-> Patch 4 fixes an out-of-bounds array access in memory which is not
-> really a security issue for multiple reasons (really, at most you can
-> read eight bytes from somewhere with an extremely high chance of
-> crashing qemu and requiring the user to invoke a block_resize shrinking=
-
-> the qcow2 image (and also reset some bit in the image from 1 to 0, but
-> only if the overlap checks don't catch you)), but most importantly that=
-
-> code hasn't been in 2.10, so we're fine.
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+>  block/qcow2-refcount.c     | 70 ++++++++++++++++++++++++++++++++++++++=
+--------
+>  tests/qemu-iotests/060     |  3 +-
+>  tests/qemu-iotests/060.out |  9 ++++++
+>  3 files changed, 69 insertions(+), 13 deletions(-)
 >=20
->=20
-> Max Reitz (5):
->   qcow2: check_errors are fatal
->   qcow2: Unaligned zero cluster in handle_alloc()
->   block: Guard against NULL bs->drv
->   qcow2: Add bounds check to get_refblock_offset()
->   qcow2: Refuse to get unaligned offsets from cache
->=20
->  block/qcow2.h              |   6 ---
->  block.c                    |  19 ++++++-
->  block/io.c                 |  36 +++++++++++++
->  block/qapi.c               |   8 ++-
->  block/qcow2-cache.c        |  21 ++++++++
->  block/qcow2-cluster.c      |  13 ++++-
->  block/qcow2-refcount.c     |  26 +++++++++-
->  block/qcow2.c              |   5 +-
->  block/replication.c        |  15 ++++++
->  block/vvfat.c              |   2 +-
->  tests/qemu-iotests/060     | 125 +++++++++++++++++++++++++++++++++++++=
-++++++++
->  tests/qemu-iotests/060.out | 115 +++++++++++++++++++++++++++++++++++++=
-++++
->  12 files changed, 379 insertions(+), 12 deletions(-)
 
-I see that Patchew complains, so let's try:
+> =20
+> +            /* Correct offsets are cluster aligned */
+> +            if (offset_into_cluster(s, offset)) {
+> +                if (qcow2_get_cluster_type(l2_entry) =3D=3D
+> +                    QCOW2_CLUSTER_ZERO_ALLOC)
+> +                {
+> +                    fprintf(stderr, "%s offset=3D%" PRIx64 ": Prealloc=
+ated zero "
+> +                            "cluster is not properly aligned; L2 entry=
+ "
+> +                            "corrupted.\n",
+> +                            fix & BDRV_FIX_ERRORS ? "Repairing" : "ERR=
+OR",
+> +                            offset);
 
-Based-on: <cover.1510143008.git.berto@igalia.com>
+Is fprintf() still the right thing to be using?
 
-And let's see whether it can handle the recursive dependency...
+> @@ -1586,13 +1637,6 @@ static int check_refcounts_l2(BlockDriverState *=
+bs, BdrvCheckResult *res,
+>              if (ret < 0) {
+>                  goto fail;
+>              }
+> -
+> -            /* Correct offsets are cluster aligned */
+> -            if (offset_into_cluster(s, offset)) {
+> -                fprintf(stderr, "ERROR offset=3D%" PRIx64 ": Cluster i=
+s not "
+> -                    "properly aligned; L2 entry corrupted.\n", offset)=
+;
 
-(Letting Patchew base something on git branches would be nice O:-))
+But it's no worse than what you are refactoring.
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
-Also note my follow-up patch "qcow2: Repair unaligned preallocated zero
-clusters" which fixes the TODO added in patch 2.
-
-Max
-
-
---ddtW3xexLoMLmR63JH5u7FKN2UU3Gtoeq
+--Hpab8TbVMaFrsjXJ8P6mc5oPMrPpUvN8M
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAloGDvcSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9ANvgH/034AQE4tfP4Ukdes2E67eiqw/7jnznr
-mG6amazeBSaMnmcTsSHTvhBsVtHrSTCdozZHoEvtggqrCzJATuGluyvFFuu7edVd
-o81j5aOuAtOymq0ithaDbHcsN3zqGt/CdDyqc/HJoOeHMl9MP3sFNw+AYxwOfH0B
-yyh06lDmVjLrN88rUtLwgdLivDSeHoL0vx3R3HPRtLZN/K5qZ5SLrejQtG4oaAtx
-/0NztvXLmwhWMFIQuaiDTqIVnBbq5cV223UepYUaRqOUZNvr4qeBLqKPdgBl7stQ
-oNYbDKTrSC4yGkWYPp/b6AkkR4Ek0eIx4kmdsuu+IHD7LpOgaiYu390=
-=NnMc
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloGEV8ACgkQp6FrSiUn
+Q2p5NAf/cmbDXMSsRE55qRhkXe+2Y2qp9suQISTvU8ZhMODQvxdHAcxvRr5ZuTjl
+ELdnXWmB5ZpEjVQQDytUbq6xX1oIeCAn44asz8YsjK8sgpXE3Amuc6TsbNpfb5q/
+g+QLR2wTTXmOQDGRiVOSnxswJZdFUwW/GppJDPwvJN2pwdIEJGPgz6sqoJeNCxJD
+nYHdjbBo6NVHHS9UuK5eYy/aZeLS9qWEhvHxEgFEYv+XK6b0s2qx1kdiicHR7n0F
+0rFoOFMG/hmpcMGaGTgvjXLXmyoodfNvKRS/jmWrnn3+u+AkgLv5YpRlGTs5l7ll
+u2oM49BmvZI4u8AI4dCgiU94ucjhtw==
+=HZ3y
 -----END PGP SIGNATURE-----
 
---ddtW3xexLoMLmR63JH5u7FKN2UU3Gtoeq--
+--Hpab8TbVMaFrsjXJ8P6mc5oPMrPpUvN8M--
