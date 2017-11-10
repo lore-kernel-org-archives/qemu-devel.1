@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36840)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38805)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eCzKa-0003QK-S8
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 21:46:10 -0500
+	(envelope-from <famz@redhat.com>) id 1eCzaU-0005hs-Al
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 22:02:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eCzKZ-0006po-QG
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 21:46:08 -0500
-Date: Fri, 10 Nov 2017 10:45:57 +0800
+	(envelope-from <famz@redhat.com>) id 1eCzaT-0006tZ-33
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 22:02:34 -0500
+Date: Fri, 10 Nov 2017 11:02:23 +0800
 From: Fam Zheng <famz@redhat.com>
-Message-ID: <20171110024557.GB4849@lemon>
-References: <20171109204315.27072-1-mreitz@redhat.com>
+Message-ID: <20171110030223.GA7303@lemon>
+References: <dd350838-9132-e787-10b1-4cb200076ec9@virtuozzo.com>
+	<w51inekzv59.fsf@maestria.local.igalia.com>
+	<w518tff4dvi.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20171109204315.27072-1-mreitz@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.11] block: Keep strong reference when
- draining all BDS
+In-Reply-To: <w518tff4dvi.fsf@maestria.local.igalia.com>
+Subject: Re: [Qemu-devel] [Qemu-block] segfault in parallel blockjobs
+ (iotest 30)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,128 +25,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+To: Alberto Garcia <berto@igalia.com>
+Cc: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
 
-On Thu, 11/09 21:43, Max Reitz wrote:
-> Draining a BDS may lead to graph modifications, which in turn may result
-> in it and other BDS being stripped of their current references.  If
-> bdrv_drain_all_begin() and bdrv_drain_all_end() do not keep strong
-> references themselves, the BDS they are trying to drain (or undrain) may
-> disappear right under their feet -- or, more specifically, under the
-> feet of BDRV_POLL_WHILE() in bdrv_drain_recurse().
+On Thu, 11/09 17:26, Alberto Garcia wrote:
+> On Wed 08 Nov 2017 03:45:38 PM CET, Alberto Garcia wrote:
 > 
-> This fixes an occasional hang of iotest 194.
+> > I'm thinking that perhaps we should add the pause point directly to
+> > block_job_defer_to_main_loop(), to prevent any block job from running
+> > the exit function when it's paused.
 > 
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
->  block/io.c | 47 ++++++++++++++++++++++++++++++++++++++++++++---
->  1 file changed, 44 insertions(+), 3 deletions(-)
+> I was trying this and unfortunately this breaks the mirror job at least
+> (reproduced with a simple block-commit on the topmost node, which uses
+> commit_active_start() -> mirror_start_job()).
 > 
-> diff --git a/block/io.c b/block/io.c
-> index 3d5ef2cabe..a0a2833e8e 100644
-> --- a/block/io.c
-> +++ b/block/io.c
-> @@ -340,7 +340,10 @@ void bdrv_drain_all_begin(void)
->      bool waited = true;
->      BlockDriverState *bs;
->      BdrvNextIterator it;
-> -    GSList *aio_ctxs = NULL, *ctx;
-> +    GSList *aio_ctxs = NULL, *ctx, *bs_list = NULL, *bs_list_entry;
-> +
-> +    /* Must be called from the main loop */
-> +    assert(qemu_get_current_aio_context() == qemu_get_aio_context());
->  
->      block_job_pause_all();
->  
-> @@ -355,6 +358,12 @@ void bdrv_drain_all_begin(void)
->          if (!g_slist_find(aio_ctxs, aio_context)) {
->              aio_ctxs = g_slist_prepend(aio_ctxs, aio_context);
->          }
-> +
-> +        /* Keep a strong reference to all root BDS and copy them into
-> +         * an own list because draining them may lead to graph
-> +         * modifications. */
-> +        bdrv_ref(bs);
-> +        bs_list = g_slist_prepend(bs_list, bs);
->      }
->  
->      /* Note that completion of an asynchronous I/O operation can trigger any
-> @@ -370,7 +379,11 @@ void bdrv_drain_all_begin(void)
->              AioContext *aio_context = ctx->data;
->  
->              aio_context_acquire(aio_context);
-> -            for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
-> +            for (bs_list_entry = bs_list; bs_list_entry;
-> +                 bs_list_entry = bs_list_entry->next)
-> +            {
-> +                bs = bs_list_entry->data;
-> +
->                  if (aio_context == bdrv_get_aio_context(bs)) {
->                      waited |= bdrv_drain_recurse(bs, true);
->                  }
-> @@ -379,24 +392,52 @@ void bdrv_drain_all_begin(void)
->          }
->      }
->  
-> +    for (bs_list_entry = bs_list; bs_list_entry;
-> +         bs_list_entry = bs_list_entry->next)
-> +    {
-> +        bdrv_unref(bs_list_entry->data);
-> +    }
-> +
->      g_slist_free(aio_ctxs);
-> +    g_slist_free(bs_list);
->  }
->  
->  void bdrv_drain_all_end(void)
->  {
->      BlockDriverState *bs;
->      BdrvNextIterator it;
-> +    GSList *bs_list = NULL, *bs_list_entry;
-> +
-> +    /* Must be called from the main loop */
-> +    assert(qemu_get_current_aio_context() == qemu_get_aio_context());
->  
-> +    /* Keep a strong reference to all root BDS and copy them into an
-> +     * own list because draining them may lead to graph modifications.
-> +     */
->      for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
-> -        AioContext *aio_context = bdrv_get_aio_context(bs);
-> +        bdrv_ref(bs);
-> +        bs_list = g_slist_prepend(bs_list, bs);
-> +    }
-> +
-> +    for (bs_list_entry = bs_list; bs_list_entry;
-> +         bs_list_entry = bs_list_entry->next)
-> +    {
-> +        AioContext *aio_context;
-> +
-> +        bs = bs_list_entry->data;
-> +        aio_context = bdrv_get_aio_context(bs);
->  
->          aio_context_acquire(aio_context);
->          aio_enable_external(aio_context);
->          bdrv_parent_drained_end(bs);
->          bdrv_drain_recurse(bs, false);
->          aio_context_release(aio_context);
-> +
-> +        bdrv_unref(bs);
->      }
->  
-> +    g_slist_free(bs_list);
-> +
->      block_job_resume_all();
->  }
->  
-> -- 
-> 2.13.6
+> So what happens is that mirror_run() always calls bdrv_drained_begin()
+> before returning, pausing the block job. The closing bdrv_drained_end()
+> call is at the end of mirror_exit(), already in the main loop.
 > 
+> So the mirror job is always calling block_job_defer_to_main_loop() and
+> mirror_exit() when the job is paused.
 > 
 
-It is better to put the references into BdrvNextIterator and introduce
-bdrv_next_iterator_destroy() to free them? You'll need to touch all callers
-because it is not C++, but it secures all of rest, which seems vulnerable in the
-same pattern, for example the aio_poll() in iothread_stop_all().
+FWIW, I think Max's report on 194 failures is related:
+
+https://lists.gnu.org/archive/html/qemu-devel/2017-11/msg01822.html
+
+so perhaps it's worth testing his patch too:
+
+https://lists.gnu.org/archive/html/qemu-devel/2017-11/msg01835.html
 
 Fam
