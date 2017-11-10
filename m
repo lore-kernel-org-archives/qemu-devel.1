@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47716)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47749)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1eDB7F-0007ms-El
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 10:21:10 -0500
+	(envelope-from <clg@kaod.org>) id 1eDB7M-0007sj-Fu
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 10:21:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1eDB7E-00064y-29
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 10:21:09 -0500
-Received: from 2.mo68.mail-out.ovh.net ([46.105.52.162]:33896)
+	(envelope-from <clg@kaod.org>) id 1eDB7L-0006Ka-HT
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 10:21:16 -0500
+Received: from 1.mo68.mail-out.ovh.net ([46.105.41.146]:59851)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1eDB7D-00063O-PE
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 10:21:07 -0500
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1eDB7L-0006J3-AY
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 10:21:15 -0500
 Received: from player737.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo68.mail-out.ovh.net (Postfix) with ESMTP id 9849D9C36A
-	for <qemu-devel@nongnu.org>; Fri, 10 Nov 2017 16:21:06 +0100 (CET)
+	by mo68.mail-out.ovh.net (Postfix) with ESMTP id 4D1659C282
+	for <qemu-devel@nongnu.org>; Fri, 10 Nov 2017 16:21:14 +0100 (CET)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Fri, 10 Nov 2017 15:20:11 +0000
-Message-Id: <20171110152017.24324-6-clg@kaod.org>
+Date: Fri, 10 Nov 2017 15:20:12 +0000
+Message-Id: <20171110152017.24324-7-clg@kaod.org>
 In-Reply-To: <20171110152017.24324-1-clg@kaod.org>
 References: <20171110152017.24324-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH for-2.12 v3 05/11] spapr: introduce an IRQ
- allocator using a bitmap
+Subject: [Qemu-devel] [PATCH for-2.12 v3 06/11] spapr: store a reference IRQ
+ bitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,191 +33,58 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Greg Kurz <groug@kaod.org>, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 Cc: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-Let's define a new set of XICSFabric IRQ operations for the latest
-pseries machine. These simply use a a bitmap 'irq_map' as a IRQ number
-allocator.
-
-The previous pseries machines keep the old set of IRQ operations using
-the ICSIRQState array.
+To save some state when the guest is migrated, we capture the IRQ
+bitmap after all devices have been reseted and store it as a reference
+for the machine.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
 
- Changes since v2 :
+ We should probably merge this patch with the previous in the next
+ versions of the patchset. For the moment, I thought it would be
+ interesting to isolate the topic for discussion.
 
- - introduced a second set of XICSFabric IRQ operations for older
-   pseries machines
-
- hw/ppc/spapr.c         | 76 ++++++++++++++++++++++++++++++++++++++++++++=
-++----
- include/hw/ppc/spapr.h |  3 ++
- 2 files changed, 74 insertions(+), 5 deletions(-)
+ hw/ppc/spapr.c         | 7 ++++++-
+ include/hw/ppc/spapr.h | 1 +
+ 2 files changed, 7 insertions(+), 1 deletion(-)
 
 diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 4bdceb45a14f..4ef0b73559ca 100644
+index 4ef0b73559ca..bf0e5b4f815b 100644
 --- a/hw/ppc/spapr.c
 +++ b/hw/ppc/spapr.c
-@@ -1681,6 +1681,22 @@ static const VMStateDescription vmstate_spapr_patb=
-_entry =3D {
-     },
- };
+@@ -1437,6 +1437,9 @@ static void ppc_spapr_reset(void)
+     qemu_devices_reset();
+     spapr_clear_pending_events(spapr);
 =20
-+static bool spapr_irq_map_needed(void *opaque)
-+{
-+    return true;
-+}
++    spapr->irq_map_ref =3D bitmap_new(spapr->nr_irqs);
++    bitmap_copy(spapr->irq_map_ref, spapr->irq_map, spapr->nr_irqs);
 +
-+static const VMStateDescription vmstate_spapr_irq_map =3D {
-+    .name =3D "spapr_irq_map",
-+    .version_id =3D 0,
-+    .minimum_version_id =3D 0,
-+    .needed =3D spapr_irq_map_needed,
-+    .fields =3D (VMStateField[]) {
-+        VMSTATE_BITMAP(irq_map, sPAPRMachineState, 0, nr_irqs),
-+        VMSTATE_END_OF_LIST()
-+    },
-+};
-+
- static const VMStateDescription vmstate_spapr =3D {
-     .name =3D "spapr",
-     .version_id =3D 3,
-@@ -1700,6 +1716,7 @@ static const VMStateDescription vmstate_spapr =3D {
-         &vmstate_spapr_ov5_cas,
-         &vmstate_spapr_patb_entry,
-         &vmstate_spapr_pending_events,
-+        &vmstate_spapr_irq_map,
-         NULL
-     }
- };
-@@ -2337,8 +2354,12 @@ static void ppc_spapr_init(MachineState *machine)
-     /* Setup a load limit for the ramdisk leaving room for SLOF and FDT =
-*/
-     load_limit =3D MIN(spapr->rma_size, RTAS_MAX_ADDR) - FW_OVERHEAD;
+     /*
+      * We place the device tree and RTAS just below either the top of th=
+e RMA,
+      * or just below 2GB, whichever is lowere, so that it can be
+@@ -1683,7 +1686,9 @@ static const VMStateDescription vmstate_spapr_patb_=
+entry =3D {
 =20
-+    /* Initialize the IRQ allocator */
-+    spapr->nr_irqs  =3D XICS_IRQS_SPAPR;
-+    spapr->irq_map  =3D bitmap_new(spapr->nr_irqs);
+ static bool spapr_irq_map_needed(void *opaque)
+ {
+-    return true;
++    sPAPRMachineState *spapr =3D opaque;
 +
-     /* Set up Interrupt Controller before we create the VCPUs */
--    xics_system_init(machine, XICS_IRQS_SPAPR, &error_fatal);
-+    xics_system_init(machine, spapr->nr_irqs, &error_fatal);
-=20
-     /* Set up containers for ibm,client-architecture-support negotiated =
-options
-      */
-@@ -3560,7 +3581,7 @@ static int ics_find_free_block(ICSState *ics, int n=
-um, int alignnum)
-     return -1;
++    return !bitmap_equal(spapr->irq_map, spapr->irq_map_ref, spapr->nr_i=
+rqs);
  }
 =20
--static bool spapr_irq_test(XICSFabric *xi, int irq)
-+static bool spapr_irq_test_2_11(XICSFabric *xi, int irq)
- {
-     sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
-     ICSState *ics =3D spapr->ics;
-@@ -3569,7 +3590,7 @@ static bool spapr_irq_test(XICSFabric *xi, int irq)
-     return !ICS_IRQ_FREE(ics, srcno);
- }
-=20
--static int spapr_irq_alloc_block(XICSFabric *xi, int count, int align)
-+static int spapr_irq_alloc_block_2_11(XICSFabric *xi, int count, int ali=
-gn)
- {
-     sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
-     ICSState *ics =3D spapr->ics;
-@@ -3583,7 +3604,7 @@ static int spapr_irq_alloc_block(XICSFabric *xi, in=
-t count, int align)
-     return srcno + ics->offset;
- }
-=20
--static void spapr_irq_free_block(XICSFabric *xi, int irq, int num)
-+static void spapr_irq_free_block_2_11(XICSFabric *xi, int irq, int num)
- {
-     sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
-     ICSState *ics =3D spapr->ics;
-@@ -3601,6 +3622,46 @@ static void spapr_irq_free_block(XICSFabric *xi, i=
-nt irq, int num)
-     }
- }
-=20
-+static bool spapr_irq_test(XICSFabric *xi, int irq)
-+{
-+    sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
-+    int srcno =3D irq - spapr->ics->offset;
-+
-+    return test_bit(srcno, spapr->irq_map);
-+}
-+
-+static int spapr_irq_alloc_block(XICSFabric *xi, int count, int align)
-+{
-+    sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
-+    int start =3D 0;
-+    int srcno;
-+
-+    /*
-+     * The 'align_mask' parameter of bitmap_find_next_zero_area()
-+     * should be one less than a power of 2; 0 means no
-+     * alignment. Adapt the 'align' value of the former allocator to
-+     * fit the requirements of bitmap_find_next_zero_area()
-+     */
-+    align -=3D 1;
-+
-+    srcno =3D bitmap_find_next_zero_area(spapr->irq_map, spapr->nr_irqs,=
- start,
-+                                       count, align);
-+    if (srcno =3D=3D spapr->nr_irqs) {
-+        return -1;
-+    }
-+
-+    bitmap_set(spapr->irq_map, srcno, count);
-+    return srcno + spapr->ics->offset;
-+}
-+
-+static void spapr_irq_free_block(XICSFabric *xi, int irq, int num)
-+{
-+    sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
-+    int srcno =3D irq - spapr->ics->offset;
-+
-+    bitmap_clear(spapr->irq_map, srcno, num);
-+}
-+
- static void spapr_pic_print_info(InterruptStatsProvider *obj,
-                                  Monitor *mon)
- {
-@@ -3778,7 +3839,12 @@ static void spapr_machine_2_11_instance_options(Ma=
-chineState *machine)
-=20
- static void spapr_machine_2_11_class_options(MachineClass *mc)
- {
--    /* Defaults for the latest behaviour inherited from the base class *=
-/
-+    XICSFabricClass *xic =3D XICS_FABRIC_CLASS(mc);
-+
-+    spapr_machine_2_12_class_options(mc);
-+    xic->irq_test =3D spapr_irq_test_2_11;
-+    xic->irq_alloc_block =3D spapr_irq_alloc_block_2_11;
-+    xic->irq_free_block =3D spapr_irq_free_block_2_11;
- }
-=20
- DEFINE_SPAPR_MACHINE(2_11, "2.11", false);
+ static const VMStateDescription vmstate_spapr_irq_map =3D {
 diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index 9d21ca9bde3a..5835c694caff 100644
+index 5835c694caff..023436c32b2a 100644
 --- a/include/hw/ppc/spapr.h
 +++ b/include/hw/ppc/spapr.h
-@@ -7,6 +7,7 @@
- #include "hw/ppc/spapr_drc.h"
- #include "hw/mem/pc-dimm.h"
- #include "hw/ppc/spapr_ovec.h"
-+#include "qemu/bitmap.h"
-=20
- struct VIOsPAPRBus;
- struct sPAPRPHBState;
-@@ -78,6 +79,8 @@ struct sPAPRMachineState {
-     struct VIOsPAPRBus *vio_bus;
-     QLIST_HEAD(, sPAPRPHBState) phbs;
+@@ -81,6 +81,7 @@ struct sPAPRMachineState {
      struct sPAPRNVRAM *nvram;
-+    int32_t nr_irqs;
-+    unsigned long *irq_map;
+     int32_t nr_irqs;
+     unsigned long *irq_map;
++    unsigned long *irq_map_ref;
      ICSState *ics;
      sPAPRRTCState rtc;
 =20
