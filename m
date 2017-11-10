@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42109)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44259)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eD6C4-0004ZG-G5
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 05:05:54 -0500
+	(envelope-from <cohuck@redhat.com>) id 1eD6KG-0007fQ-Vm
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 05:14:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eD6C0-0003Xm-GI
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 05:05:48 -0500
-Resent-Message-Id: <E1eD6C0-0003Xm-GI@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21498)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1eD6C0-0003Wg-8Q
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 05:05:44 -0500
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <150996313592.327.4353631543325177108@bafd83ae6430>
-In-Reply-To: <20171106094643.14881-1-peterx@redhat.com>
+	(envelope-from <cohuck@redhat.com>) id 1eD6KD-0005aX-R1
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 05:14:16 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56262)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1eD6KD-0005Z5-HV
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 05:14:13 -0500
+Date: Fri, 10 Nov 2017 11:14:03 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20171110111403.636682ea.cohuck@redhat.com>
+In-Reply-To: <20171109200235.GG3111@localhost.localdomain>
+References: <1508170976-96869-4-git-send-email-imammedo@redhat.com>
+	<1508325132-70513-1-git-send-email-imammedo@redhat.com>
+	<20171019063151.GA13245@umbus>
+	<20171031150114.60e0958e@nial.brq.redhat.com>
+	<20171106180216.GT3111@localhost.localdomain>
+	<20171107160404.40e368da.cohuck@redhat.com>
+	<20171109065803.GG7732@umbus.fritz.box>
+	<20171109200235.GG3111@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 6 Nov 2017 02:12:17 -0800 (PST)
-Subject: Re: [Qemu-devel] [RFC v3 00/27] QMP: out-of-band (OOB) execution
- support
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC v2 3/6] possible_cpus: add CPUArchId::type
+ field
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,90 +34,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peterx@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, lvivier@redhat.comfamz@redhat.com, quintela@redhat.com, mdroth@linux.vnet.ibm.com, armbru@redhat.com, marcandre.lureau@redhat.com, shajnocz@redhat.com, pbonzini@redhat.com, jdenemar@redhat.com, dgilbert@redhat.com
+To: Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>
+Cc: David Gibson <david@gibson.dropbear.id.au>, Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, peter.maydell@linaro.org, pkrempa@redhat.com, pbonzini@redhat.com, drjones@redhat.com
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtSRkMgdjMgMDAvMjddIFFNUDogb3V0LW9mLWJhbmQgKE9PQikgZXhlY3V0aW9uIHN1
-cHBvcnQKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMTcxMTA2MDk0NjQzLjE0ODgxLTEtcGV0
-ZXJ4QHJlZGhhdC5jb20KCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJB
-U0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZh
-aWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcg
-LS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVI
-IC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVj
-a2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIK
-ICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRj
-aC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAg
-IGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5E
-ID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApG
-cm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10g
-ICAgICAgICAgICAgICBwYXRjaGV3LzIwMTcxMTA2MDk0NjQzLjE0ODgxLTEtcGV0ZXJ4QHJlZGhh
-dC5jb20gLT4gcGF0Y2hldy8yMDE3MTEwNjA5NDY0My4xNDg4MS0xLXBldGVyeEByZWRoYXQuY29t
-ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKNTUyNWM0ZTc5MSB0ZXN0czogcW1wLXRl
-c3Q6IGFkZCBvb2IgdGVzdApjY2M5ZTRjMzk5IHRlc3RzOiBxbXAtdGVzdDogdmVyaWZ5IGNvbW1h
-bmQgYmF0Y2hpbmcKN2Y0NWI0YzZjMCBkb2NzOiB1cGRhdGUgUU1QIGRvY3VtZW50cyBmb3IgT09C
-IGNvbW1hbmRzCjU4Y2ZlODc3ZDIgbW9uaXRvcjogZW5hYmxlIElPIHRocmVhZCBmb3IgKHFtcCAm
-ICFtdXgpIHR5cGVkCjVlMWQ1NmNlNzQgcW1wOiBpc29sYXRlIHJlc3BvbnNlcyBpbnRvIGlvIHRo
-cmVhZAphZWY0Mjc1NTM2IHFtcDogbGV0IG1pZ3JhdGUtaW5jb21pbmcgYWxsb3cgb3V0LW9mLWJh
-bmQKNWU2OGJlYWNmMyBxbXA6IHN1cHBvcnQgb3V0LW9mLWJhbmQgKG9vYikgZXhlY3V0aW9uCjQz
-YzcyMTVhMzAgcWFwaTogaW50cm9kdWNlIG5ldyBjbWQgb3B0aW9uICJhbGxvdy1vb2IiCmUxMTEy
-N2JhNGIgbW9uaXRvcjogc2VuZCBldmVudCB3aGVuIHJlcXVlc3QgcXVldWUgZnVsbAo0NWNlZjRm
-N2U0IHFtcDogYWRkIG5ldyBldmVudCAicmVxdWVzdC1kcm9wcGVkIgo0ODVkYTI4YmUxIG1vbml0
-b3I6IHNlcGFyYXRlIFFNUCBwYXJzZXIgYW5kIGRpc3BhdGNoZXIKNDg5MmZlOWNhMiBtb25pdG9y
-OiBsZXQgbW9uaXRvcl97c3VzcGVuZHxyZXN1bWV9IHRocmVhZCBzYWZlCjFiODYxNjZkOWMgbW9u
-aXRvcjogaW50cm9kdWNlIG1vbml0b3JfcW1wX3Jlc3BvbmQoKQowZjQ4MDkzYWRkIHFtcDogaW50
-cm9kdWNlIHNvbWUgY2FwYWJpbGl0eSBoZWxwZXJzCjhkM2YzMzA0M2QgcW1wOiBuZWdvY2lhdGUg
-UU1QIGNhcGFiaWxpdGllcwowMjNiMzg2ZDBlIHFtcDogaW50cm9kdWNlIFFNUENhcGFiaWxpdHkK
-MmJkZTVjYThjZSBtb25pdG9yOiBhbGxvdyB0byB1c2UgSU8gdGhyZWFkIGZvciBwYXJzaW5nCmY0
-Y2MxMTJmODAgbW9uaXRvcjogY3JlYXRlIG1vbml0b3IgZGVkaWNhdGUgaW90aHJlYWQKMzU5MGZk
-YzFkNCBtb25pdG9yOiBsZXQgbW9uX2xpc3QgYmUgdGFpbCBxdWV1ZQoxMWM4MThhOWFjIG1vbml0
-b3I6IHVuaWZ5IGdsb2JhbCBpbml0CjM2ZDNlZmI4N2QgbW9uaXRvcjogbW92ZSB0aGUgY3VyX21v
-biBoYWNrIGRlZXBlciBmb3IgUU1QCmJmM2U0OTNhODYgcWpzb246IGFkZCAib3BhcXVlIiBmaWVs
-ZCB0byBKU09OTWVzc2FnZVBhcnNlcgoxNzM2N2ZlN2ExIG1vbml0b3I6IG1vdmUgc2tpcF9mbHVz
-aCBpbnRvIG1vbml0b3JfZGF0YV9pbml0CjBjOThkNGJhYTQgcW9iamVjdDogbGV0IG9iamVjdF9w
-cm9wZXJ0eV9nZXRfc3RyKCkgdXNlIG5ldyBBUEkKYWE0Yjk3M2RkNSBxb2JqZWN0OiBpbnRyb2R1
-Y2UgcW9iamVjdF9nZXRfdHJ5X3N0cigpCjk4MWNjZWJjMWUgcW9iamVjdDogaW50cm9kdWNlIHFz
-dHJpbmdfZ2V0X3RyeV9zdHIoKQpkNDBiYTM4MDg1IGNoYXItaW86IGZpeCBwb3NzaWJsZSByYWNl
-IG9uIElPV2F0Y2hQb2xsCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzI3
-OiBjaGFyLWlvOiBmaXggcG9zc2libGUgcmFjZSBvbiBJT1dhdGNoUG9sbC4uLgpDaGVja2luZyBQ
-QVRDSCAyLzI3OiBxb2JqZWN0OiBpbnRyb2R1Y2UgcXN0cmluZ19nZXRfdHJ5X3N0cigpLi4uCkNo
-ZWNraW5nIFBBVENIIDMvMjc6IHFvYmplY3Q6IGludHJvZHVjZSBxb2JqZWN0X2dldF90cnlfc3Ry
-KCkuLi4KQ2hlY2tpbmcgUEFUQ0ggNC8yNzogcW9iamVjdDogbGV0IG9iamVjdF9wcm9wZXJ0eV9n
-ZXRfc3RyKCkgdXNlIG5ldyBBUEkuLi4KQ2hlY2tpbmcgUEFUQ0ggNS8yNzogbW9uaXRvcjogbW92
-ZSBza2lwX2ZsdXNoIGludG8gbW9uaXRvcl9kYXRhX2luaXQuLi4KQ2hlY2tpbmcgUEFUQ0ggNi8y
-NzogcWpzb246IGFkZCAib3BhcXVlIiBmaWVsZCB0byBKU09OTWVzc2FnZVBhcnNlci4uLgpDaGVj
-a2luZyBQQVRDSCA3LzI3OiBtb25pdG9yOiBtb3ZlIHRoZSBjdXJfbW9uIGhhY2sgZGVlcGVyIGZv
-ciBRTVAuLi4KQ2hlY2tpbmcgUEFUQ0ggOC8yNzogbW9uaXRvcjogdW5pZnkgZ2xvYmFsIGluaXQu
-Li4KQ2hlY2tpbmcgUEFUQ0ggOS8yNzogbW9uaXRvcjogbGV0IG1vbl9saXN0IGJlIHRhaWwgcXVl
-dWUuLi4KQ2hlY2tpbmcgUEFUQ0ggMTAvMjc6IG1vbml0b3I6IGNyZWF0ZSBtb25pdG9yIGRlZGlj
-YXRlIGlvdGhyZWFkLi4uCkNoZWNraW5nIFBBVENIIDExLzI3OiBtb25pdG9yOiBhbGxvdyB0byB1
-c2UgSU8gdGhyZWFkIGZvciBwYXJzaW5nLi4uCkNoZWNraW5nIFBBVENIIDEyLzI3OiBxbXA6IGlu
-dHJvZHVjZSBRTVBDYXBhYmlsaXR5Li4uCkNoZWNraW5nIFBBVENIIDEzLzI3OiBxbXA6IG5lZ29j
-aWF0ZSBRTVAgY2FwYWJpbGl0aWVzLi4uCkNoZWNraW5nIFBBVENIIDE0LzI3OiBxbXA6IGludHJv
-ZHVjZSBzb21lIGNhcGFiaWxpdHkgaGVscGVycy4uLgpDaGVja2luZyBQQVRDSCAxNS8yNzogbW9u
-aXRvcjogaW50cm9kdWNlIG1vbml0b3JfcW1wX3Jlc3BvbmQoKS4uLgpDaGVja2luZyBQQVRDSCAx
-Ni8yNzogbW9uaXRvcjogbGV0IG1vbml0b3Jfe3N1c3BlbmR8cmVzdW1lfSB0aHJlYWQgc2FmZS4u
-LgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3Rh
-dGVtZW50CiMyODogRklMRTogbW9uaXRvci5jOjQwMTQ6CisgICAgaWYgKGF0b21pY19kZWNfZmV0
-Y2goJm1vbi0+c3VzcGVuZF9jbnQpID09IDApClsuLi5dCgpFUlJPUjogTWlzc2luZyBTaWduZWQt
-b2ZmLWJ5OiBsaW5lKHMpCgp0b3RhbDogMiBlcnJvcnMsIDAgd2FybmluZ3MsIDE2IGxpbmVzIGNo
-ZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYg
-YW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRo
-ZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBB
-VENIIDE3LzI3OiBtb25pdG9yOiBzZXBhcmF0ZSBRTVAgcGFyc2VyIGFuZCBkaXNwYXRjaGVyLi4u
-CkNoZWNraW5nIFBBVENIIDE4LzI3OiBxbXA6IGFkZCBuZXcgZXZlbnQgInJlcXVlc3QtZHJvcHBl
-ZCIuLi4KQ2hlY2tpbmcgUEFUQ0ggMTkvMjc6IG1vbml0b3I6IHNlbmQgZXZlbnQgd2hlbiByZXF1
-ZXN0IHF1ZXVlIGZ1bGwuLi4KQ2hlY2tpbmcgUEFUQ0ggMjAvMjc6IHFhcGk6IGludHJvZHVjZSBu
-ZXcgY21kIG9wdGlvbiAiYWxsb3ctb29iIi4uLgpDaGVja2luZyBQQVRDSCAyMS8yNzogcW1wOiBz
-dXBwb3J0IG91dC1vZi1iYW5kIChvb2IpIGV4ZWN1dGlvbi4uLgpDaGVja2luZyBQQVRDSCAyMi8y
-NzogcW1wOiBsZXQgbWlncmF0ZS1pbmNvbWluZyBhbGxvdyBvdXQtb2YtYmFuZC4uLgpDaGVja2lu
-ZyBQQVRDSCAyMy8yNzogcW1wOiBpc29sYXRlIHJlc3BvbnNlcyBpbnRvIGlvIHRocmVhZC4uLgpD
-aGVja2luZyBQQVRDSCAyNC8yNzogbW9uaXRvcjogZW5hYmxlIElPIHRocmVhZCBmb3IgKHFtcCAm
-ICFtdXgpIHR5cGVkLi4uCkNoZWNraW5nIFBBVENIIDI1LzI3OiBkb2NzOiB1cGRhdGUgUU1QIGRv
-Y3VtZW50cyBmb3IgT09CIGNvbW1hbmRzLi4uCkNoZWNraW5nIFBBVENIIDI2LzI3OiB0ZXN0czog
-cW1wLXRlc3Q6IHZlcmlmeSBjb21tYW5kIGJhdGNoaW5nLi4uCkNoZWNraW5nIFBBVENIIDI3LzI3
-OiB0ZXN0czogcW1wLXRlc3Q6IGFkZCBvb2IgdGVzdC4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRl
-c3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRv
-bWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5
-b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
+On Thu, 9 Nov 2017 18:02:35 -0200
+Eduardo Habkost <ehabkost@redhat.com> wrote:
+
+> On Thu, Nov 09, 2017 at 05:58:03PM +1100, David Gibson wrote:
+> > On Tue, Nov 07, 2017 at 04:04:04PM +0100, Cornelia Huck wrote:  
+> > > On Mon, 6 Nov 2017 16:02:16 -0200
+> > > Eduardo Habkost <ehabkost@redhat.com> wrote:
+> > >   
+> > > > On Tue, Oct 31, 2017 at 03:01:14PM +0100, Igor Mammedov wrote:  
+> > > > > On Thu, 19 Oct 2017 17:31:51 +1100
+> > > > > David Gibson <david@gibson.dropbear.id.au> wrote:
+> > > > >     
+> > > > > > On Wed, Oct 18, 2017 at 01:12:12PM +0200, Igor Mammedov wrote:    
+> > > > > > > For enabling early cpu to numa node configuration at runtime
+> > > > > > > qmp_query_hotpluggable_cpus() should provide a list of available
+> > > > > > > cpu slots at early stage, before machine_init() is called and
+> > > > > > > the 1st cpu is created, so that mgmt might be able to call it
+> > > > > > > and use output to set numa mapping.
+> > > > > > > Use MachineClass::possible_cpu_arch_ids() callback to set
+> > > > > > > cpu type info, along with the rest of possible cpu properties,
+> > > > > > > to let machine define which cpu type* will be used.
+> > > > > > > 
+> > > > > > > * for SPAPR it will be a spapr core type and for ARM/s390x/x86
+> > > > > > >   a respective descendant of CPUClass.
+> > > > > > > 
+> > > > > > > Move parse_numa_opts() in vl.c after cpu_model is parsed into
+> > > > > > > cpu_type so that possible_cpu_arch_ids() would know which
+> > > > > > > cpu_type to use during layout initialization.
+> > > > > > > 
+> > > > > > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>      
+> > > > > > 
+> > > > > > Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+> > > > > >     
+> > > > > > > ---
+> > > > > > >   v2:
+> > > > > > >      - fix NULL dereference caused by not initialized
+> > > > > > >        MachineState::cpu_type at the time parse_numa_opts()
+> > > > > > >        were called
+> > > > > > > ---
+> > > > > > >  include/hw/boards.h        |  2 ++
+> > > > > > >  hw/arm/virt.c              |  3 ++-
+> > > > > > >  hw/core/machine.c          | 12 ++++++------
+> > > > > > >  hw/i386/pc.c               |  4 +++-
+> > > > > > >  hw/ppc/spapr.c             | 13 ++++++++-----
+> > > > > > >  hw/s390x/s390-virtio-ccw.c |  1 +
+> > > > > > >  vl.c                       |  3 +--
+> > > > > > >  7 files changed, 23 insertions(+), 15 deletions(-)
+> > > > > > > 
+> > > > > > > diff --git a/include/hw/boards.h b/include/hw/boards.h
+> > > > > > > index 191a5b3..fa21758 100644
+> > > > > > > --- a/include/hw/boards.h
+> > > > > > > +++ b/include/hw/boards.h
+> > > > > > > @@ -80,6 +80,7 @@ void machine_set_cpu_numa_node(MachineState *machine,
+> > > > > > >   * CPUArchId:
+> > > > > > >   * @arch_id - architecture-dependent CPU ID of present or possible CPU      
+> > > > > > 
+> > > > > > I know this isn't really in scope for this patch, but is @arch_id here
+> > > > > > supposed to have meaning defined by the target, or by the machine?
+> > > > > > 
+> > > > > > If it's the machime, it could do with a rename - "arch" means target
+> > > > > > to most people (thanks to Linux).
+> > > > > > 
+> > > > > > If it's the target, it's kind of bogus, because it doesn't necessarily
+> > > > > > have a clear meaning per target - get_arch_id in CPUClass has the same
+> > > > > > problem, which is probably one reason it's basically only used by the
+> > > > > > x86 code at present.
+> > > > > > 
+> > > > > > e.g. for target/ppc, what do we use?  There's the PIR, which is in the
+> > > > > > CPU.. but only on some cpu models, not all.  There will generally be
+> > > > > > some kind of master PIC id, but there are different PIC models on
+> > > > > > different boards.  What goes in the devicetree?  Well only some
+> > > > > > machines use devicetree, and they might define the cpu reg 
+> > > > > > differently.
+> > > > > > 
+> > > > > > Board designs will generally try to make some if not all of those
+> > > > > > possible values equal for simplicity, but there's still no real way of
+> > > > > > defining a sensible arch_id independent of machine / board.    
+> > > > > I'd say arch_id is machine specific so far, it was introduced when we
+> > > > > didn't have CpuInstanceProperties and at that time we considered only
+> > > > > vcpus (threads) and doesn't really apply to spapr cores.
+> > > > > 
+> > > > > In general we could do away with arch_id and use CpuInstanceProperties
+> > > > > instead, but arch_id also serves aux purpose, it allows machine to
+> > > > > pre-calculate(cache) apic-id/mpidr values in one place and then they
+> > > > > are/(could be) used by arch in-depended code to build acpi tables.
+> > > > > So if we drop arch_id we would need to introduce a machine hook,
+> > > > > which would translate CpuInstanceProperties into current arch_id.    
+> > > > 
+> > > > I think we need to do a better to job documenting where exactly
+> > > > we expect arch_id to be used and how, so people know what it's
+> > > > supposed to return.
+> > > > 
+> > > > If the only place where it's useful now is ACPI code (is it?),
+> > > > should we rename it to something like get_acpi_id()?  
+> > > 
+> > > It is also used in hw/s390x/sclp.c to fill out a control block, so acpi
+> > > isn't the only user.  
+> > 
+> > Yeah.. this is kind of bogus.  The s390 use is in machine specific
+> > code, so it's basically just re-using the field for an unrelated usage
+> > to the x86/arm one (ACPI).
+> > 
+> > If we can't assign a universal meaning to the field (even if the
+> > actual values are per-machine) - and I don't think we can - then I
+> > really don't think it belongs in CPUState.  A machine hook which
+> > translates an ArchId to an acpi_id is the correct solution I believe.
+> > Or even an ACPIMachine interface (to be implemented by machines which
+> > do ACPI) which has a method to do this.
+> > 
+> > Since both the assignment and use are in machine type specific code
+> > for s390, it can have its own field in the s390 specific cpu subclass.
+> >   
+> 
+> I agree.  This might require duplicating cpu_by_arch_id() and
+> cpu_exists() into machine-specific code, but this doesn't sound
+> too bad: there's only one user of cpu_by_arch_id() (that's
+> x86-specific code living inside monitor.c), and one user of
+> cpu_exists() (that's s390-specific code).
+> 
+> (Maybe those users could be rewritten to use
+> MachineState::possible_cpus, like pc_find_cpu_slot()).
+
+David (H), does that sound workable to you?
