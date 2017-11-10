@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53009)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54306)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eDDQT-0000Oe-Cy
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 12:49:10 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eDDWU-0002ie-UZ
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 12:55:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eDDQS-0003MU-Dv
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 12:49:09 -0500
-References: <92c47a3f-92a6-4f3a-505f-dc278604a671@redhat.com>
-	<20171109042137.GA13786@lemon>
-	<67bb3458-80da-beda-eec1-c08168837832@redhat.com>
-	<20171109152856.GA3661@lemon>
-	<e4207841-1ae5-af2e-b7ef-14412202b75a@redhat.com>
-	<20171110023604.GA4849@lemon>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <46b65050-d4f1-496c-abff-4228f57aaa2b@redhat.com>
-Date: Fri, 10 Nov 2017 18:48:53 +0100
-MIME-Version: 1.0
-In-Reply-To: <20171110023604.GA4849@lemon>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="27PsB7NnnXcnNsih1kimtD0LAWrFS99Vx"
-Subject: Re: [Qemu-devel] Intermittent hang of iotest 194 (bdrv_drain_all
- after non-shared storage migration)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eDDWQ-0006tA-Se
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 12:55:22 -0500
+Received: from mailhub.sw.ru ([195.214.232.25]:48670 helo=relay.sw.ru)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1eDDWQ-0006sF-Gn
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 12:55:18 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Fri, 10 Nov 2017 20:54:57 +0300
+Message-Id: <20171110175457.30173-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH] iotests: test clearing unknown
+ autoclear_features by qcow2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,106 +23,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: Qemu-block <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, kwolf@redhat.com, eblake@redhat.com, dgilbert@redhat.com, quintela@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---27PsB7NnnXcnNsih1kimtD0LAWrFS99Vx
-From: Max Reitz <mreitz@redhat.com>
-To: Fam Zheng <famz@redhat.com>
-Cc: Qemu-block <qemu-block@nongnu.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <46b65050-d4f1-496c-abff-4228f57aaa2b@redhat.com>
-Subject: Re: [Qemu-devel] Intermittent hang of iotest 194 (bdrv_drain_all
- after non-shared storage migration)
-References: <92c47a3f-92a6-4f3a-505f-dc278604a671@redhat.com>
- <20171109042137.GA13786@lemon>
- <67bb3458-80da-beda-eec1-c08168837832@redhat.com>
- <20171109152856.GA3661@lemon>
- <e4207841-1ae5-af2e-b7ef-14412202b75a@redhat.com>
- <20171110023604.GA4849@lemon>
-In-Reply-To: <20171110023604.GA4849@lemon>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Test clearing unknown autoclear_features by qcow2 on incoming
+migration.
 
-On 2017-11-10 03:36, Fam Zheng wrote:
-> On Thu, 11/09 20:31, Max Reitz wrote:
->> On 2017-11-09 16:30, Fam Zheng wrote:
->>> On Thu, 11/09 16:14, Max Reitz wrote:
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
 
-[...]
+Hi all!
 
->>>> *sigh*
->>>>
->>>> OK, I'll look into it...
->>>
->>> OK, I'll let you.. Just one more thing: could it relate to the use-af=
-ter-free
->>> bug reported on block_job_defer_to_main_loop()?
->>>
->>> https://lists.gnu.org/archive/html/qemu-devel/2017-11/msg01144.html
->>
->> Thanks for the heads-up; I think it's a different issue, though.
->>
->> What appears to be happening is that the mirror job completes and then=
+This patch shows degradation, added in 2.10 in commit
 
->> drains its BDS.  While that is happening, a bdrv_drain_all() comes in
->> from block_migration_cleanup().
->>
->> That now tries to drain the mirror node.  However, that node cannot be=
+commit 9c5e6594f15b7364624a3ad40306c396c93a2145
+Author: Kevin Wolf <kwolf@redhat.com>
+Date:   Thu May 4 18:52:40 2017 +0200
 
->> drained until the job is truly gone now, so that is what's happening:
->> mirror_exit() is called, it cleans up, destroys the mirror node, and
->> returns.
->>
->> Now bdrv_drain_all() can go on, specifically the BDRV_POLL_WHILE() on
->> the mirror node.  However, oops, that node is gone now...  So that's
->> where the issue seems to be. :-/
->>
->> Maybe all that we need to do is wrap the bdrv_drain_recurse() call in
->> bdrv_drain_all_begin() in a bdrv_ref()/bdrv_unref() pair?  Having run
->> 194 for a couple of minutes, that seems to indeed work -- until it die=
-s
->> because of an invalid BB pointer in bdrv_next().  I guess that is
->> because bdrv_next() does not guard against deleted BDSs.
->>
->> Copying all BDS into an own list (in both bdrv_drain_all_begin() and
->> bdrv_drain_all_end()), with a strong reference to every single one, an=
-d
->> then draining them really seems to work, though.  (Survived 9000
->> iterations, that seems good enough for something that usually fails
->> after, like, 5.)
->=20
-> Yes, that makes sense. I'm curious if the patch in
->=20
-> https://lists.gnu.org/archive/html/qemu-devel/2017-11/msg01649.html
->=20
-> would also work?
+    block: Fix write/resize permissions for inactive images
 
-No, unfortunately it did not.
+The problem:
+When on incoming migration with shared storage we reopen image to RW mode
+we call bdrv_invalidate_cache it firstly call drv->bdrv_invalidate_cache and
+only after it, through "parent->role->activate(parent, &local_err);" we set
+appropriate RW permission.
 
-(Or maybe fortunately so, since that means I didn't do a whole lot of
-work for nothing :-))
+Because of this, if drv->bdrv_invalidate_cache wants to write something
+(image is RW and BDRV_O_INACTIVE is not set) it goes into
+"bdrv_aligned_pwritev: Assertion `child->perm & BLK_PERM_WRITE' failed"
 
-Max
+One case, when qcow2_invalidate_cache wants to write
+something - when it wants to clear some unknown autoclear features. So,
+here is a test for it.
 
+Another case is when we try to migrate persistent dirty bitmaps through
+shared storage, on invalidate_cache qcow2 will try to set DIRTY bit in
+all loaded bitmaps.
 
---27PsB7NnnXcnNsih1kimtD0LAWrFS99Vx
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Kevin, what do you think? I understand that operation order should be changed
+somehow in bdrv_invalidate_cache, but I'm not sure about how "parent->role->.."
+things works and can we safely move this part from function end to the middle.
 
------BEGIN PGP SIGNATURE-----
+ tests/qemu-iotests/196     | 63 ++++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/196.out |  5 ++++
+ tests/qemu-iotests/group   |  1 +
+ 3 files changed, 69 insertions(+)
+ create mode 100755 tests/qemu-iotests/196
+ create mode 100644 tests/qemu-iotests/196.out
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAloF5oUSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9APfgH/1dYpc6ikODeezdXWm2qiWuIuaNjdh/Z
-yNQHomvsRZRkY5Whjj6rFu9cbctzQxH0E+TFRN00z3wpCB4eIElf2SVJ+JvwQufG
-2sgztGy75EqfIB8pod98MaTAeuyein0PSy4LWgOdZxFNNwlyVu2oQibVMlmqe1zG
-S0nZfQthre6GYdpwM/0+H9BFK3P55u1T5JIYCos9AtTaYws1x5QHR1x6hE9mroXF
-HSRFewgf2N9RzWciA41C+mmQXjdMBa3xhXY3XcoDQvwIAfQqsUgGPrHTX1ulF60W
-AgSDZDqtv/1Z0qEw8hMAXrfp8366J7UP5tRSNhvy/FvR9odU5Q7kH/A=
-=1+kU
------END PGP SIGNATURE-----
-
---27PsB7NnnXcnNsih1kimtD0LAWrFS99Vx--
+diff --git a/tests/qemu-iotests/196 b/tests/qemu-iotests/196
+new file mode 100755
+index 0000000000..9ffbc723c2
+--- /dev/null
++++ b/tests/qemu-iotests/196
+@@ -0,0 +1,63 @@
++#!/usr/bin/env python
++#
++# Test clearing unknown autoclear_features flag by qcow2 after
++# migration. This test mimics migration to older qemu.
++#
++# Copyright (c) 2017 Parallels International GmbH
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
++
++import os
++import iotests
++from iotests import qemu_img
++
++disk = os.path.join(iotests.test_dir, 'disk')
++migfile = os.path.join(iotests.test_dir, 'migfile')
++
++class TestInvalidateAutoclear(iotests.QMPTestCase):
++
++    def tearDown(self):
++        self.vm_a.shutdown()
++        self.vm_b.shutdown()
++        os.remove(disk)
++        os.remove(migfile)
++
++    def setUp(self):
++        qemu_img('create', '-f', iotests.imgfmt, disk, '1M')
++
++        self.vm_a = iotests.VM(path_suffix='a').add_drive(disk)
++        self.vm_a.launch()
++
++        self.vm_b = iotests.VM(path_suffix='b').add_drive(disk)
++        self.vm_b.add_incoming("exec: cat '" + migfile + "'")
++
++    def test_migration(self):
++        result = self.vm_a.qmp('migrate', uri='exec:cat>' + migfile)
++        self.assert_qmp(result, 'return', {});
++        self.assertNotEqual(self.vm_a.event_wait("STOP"), None)
++
++        with open(disk, 'r+b') as f:
++            f.seek(88) # first byte of autoclear_features field
++            f.write(b'\xff')
++
++        self.vm_b.launch()
++        self.assertNotEqual(self.vm_b.event_wait("RESUME"), None)
++
++        with open(disk, 'rb') as f:
++            f.seek(88)
++            self.assertEqual(f.read(1), b'\x00')
++
++if __name__ == '__main__':
++    iotests.main(supported_fmts=['qcow2'])
+diff --git a/tests/qemu-iotests/196.out b/tests/qemu-iotests/196.out
+new file mode 100644
+index 0000000000..ae1213e6f8
+--- /dev/null
++++ b/tests/qemu-iotests/196.out
+@@ -0,0 +1,5 @@
++.
++----------------------------------------------------------------------
++Ran 1 tests
++
++OK
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index 24e5ad1b79..78d01d9516 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -193,4 +193,5 @@
+ 192 rw auto quick
+ 194 rw auto migration quick
+ 195 rw auto quick
++196 rw auto quick
+ 197 rw auto quick
+-- 
+2.11.1
