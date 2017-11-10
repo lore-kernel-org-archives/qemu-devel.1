@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33356)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33610)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eD5PJ-0007EV-Ur
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 04:15:29 -0500
+	(envelope-from <armbru@redhat.com>) id 1eD5Qq-00081J-8E
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 04:17:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eD5PG-0006HA-IW
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 04:15:25 -0500
+	(envelope-from <armbru@redhat.com>) id 1eD5Qp-0008Bc-D3
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 04:17:00 -0500
 From: Markus Armbruster <armbru@redhat.com>
 References: <20171004152553.30263-1-mreitz@redhat.com>
-	<20171004152553.30263-7-mreitz@redhat.com>
-Date: Fri, 10 Nov 2017 10:15:02 +0100
-In-Reply-To: <20171004152553.30263-7-mreitz@redhat.com> (Max Reitz's message
-	of "Wed, 4 Oct 2017 17:25:53 +0200")
-Message-ID: <874lq25wbt.fsf@dusky.pond.sub.org>
+Date: Fri, 10 Nov 2017 10:16:52 +0100
+In-Reply-To: <20171004152553.30263-1-mreitz@redhat.com> (Max Reitz's message
+	of "Wed, 4 Oct 2017 17:25:47 +0200")
+Message-ID: <87zi7u4hob.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v6 6/6] tests: Add check-qobject for
- equality tests
+Subject: Re: [Qemu-devel] [PATCH v6 0/6] block: Don't compare strings in
+ bdrv_reopen_prepare()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,11 +28,10 @@ Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 
 Max Reitz <mreitz@redhat.com> writes:
 
-> Add a new test file (check-qobject.c) for unit tests that concern
-> QObjects as a whole.
->
-> Its only purpose for now is to test the qobject_is_equal() function.
->
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> bdrv_reopen_prepare() assumes that all BDS options are strings, which is
+> not necessarily correct. This series introduces a new qobject_is_equal()
+> function which can be used to test whether any options have changed,
+> independently of their type.
 
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Series looks ready to me.  It touches QAPI to achieve its purpose in the
+block layer; I'd be fine with merging it via a block tree.
