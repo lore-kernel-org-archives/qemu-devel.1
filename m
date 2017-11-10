@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54845)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54865)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eDFxY-0001B4-Q5
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 15:31:30 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eDFxb-0001E9-Qj
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 15:31:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eDFxX-00043K-O9
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 15:31:28 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eDFxa-00045O-PJ
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 15:31:31 -0500
 From: Max Reitz <mreitz@redhat.com>
-Date: Fri, 10 Nov 2017 21:31:07 +0100
-Message-Id: <20171110203111.7666-2-mreitz@redhat.com>
+Date: Fri, 10 Nov 2017 21:31:08 +0100
+Message-Id: <20171110203111.7666-3-mreitz@redhat.com>
 In-Reply-To: <20171110203111.7666-1-mreitz@redhat.com>
 References: <20171110203111.7666-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.11 1/5] qcow2: check_errors are fatal
+Subject: [Qemu-devel] [PATCH for-2.11 2/5] qcow2: Unaligned zero cluster in
+ handle_alloc()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,98 +23,91 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, John Snow <jsnow@redhat.com>
 
-When trying to repair a dirty image, qcow2_check() may apparently
-succeed (no really fatal error occurred that would prevent the check
-from continuing), but if check_errors in the result object is non-zero,
-we cannot trust the image to be usable.
+We should check whether the cluster offset we are about to use is
+actually valid; that is, whether it is aligned to cluster boundaries.
 
 Reported-by: R. Nageswara Sastry <nasastry@in.ibm.com>
-Buglink: https://bugs.launchpad.net/qemu/+bug/1728639
+Buglink: https://bugs.launchpad.net/qemu/+bug/1728643
+Buglink: https://bugs.launchpad.net/qemu/+bug/1728657
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/qcow2.c              |  5 ++++-
- tests/qemu-iotests/060     | 20 ++++++++++++++++++++
- tests/qemu-iotests/060.out | 23 +++++++++++++++++++++++
- 3 files changed, 47 insertions(+), 1 deletion(-)
+ block/qcow2-cluster.c      | 13 ++++++++++++-
+ tests/qemu-iotests/060     | 16 ++++++++++++++++
+ tests/qemu-iotests/060.out | 10 ++++++++++
+ 3 files changed, 38 insertions(+), 1 deletion(-)
 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 92e5d548e3..d4fcb0250d 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -1475,7 +1475,10 @@ static int qcow2_do_open(BlockDriverState *bs, QDict *options, int flags,
-         BdrvCheckResult result = {0};
- 
-         ret = qcow2_check(bs, &result, BDRV_FIX_ERRORS | BDRV_FIX_LEAKS);
--        if (ret < 0) {
-+        if (ret < 0 || result.check_errors) {
-+            if (ret >= 0) {
-+                ret = -EIO;
-+            }
-             error_setg_errno(errp, -ret, "Could not repair dirty image");
-             goto fail;
-         }
+diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+index 2e072ed155..a3fec27bf9 100644
+--- a/block/qcow2-cluster.c
++++ b/block/qcow2-cluster.c
+@@ -1308,10 +1308,21 @@ static int handle_alloc(BlockDriverState *bs, uint64_t guest_offset,
+         (!*host_offset ||
+          start_of_cluster(s, *host_offset) == (entry & L2E_OFFSET_MASK)))
+     {
++        int preallocated_nb_clusters;
++
++        if (offset_into_cluster(s, entry & L2E_OFFSET_MASK)) {
++            qcow2_signal_corruption(bs, true, -1, -1, "Preallocated zero "
++                                    "cluster offset %#llx unaligned (guest "
++                                    "offset: %#" PRIx64 ")",
++                                    entry & L2E_OFFSET_MASK, guest_offset);
++            ret = -EIO;
++            goto fail;
++        }
++
+         /* Try to reuse preallocated zero clusters; contiguous normal clusters
+          * would be fine, too, but count_cow_clusters() above has limited
+          * nb_clusters already to a range of COW clusters */
+-        int preallocated_nb_clusters =
++        preallocated_nb_clusters =
+             count_contiguous_clusters(nb_clusters, s->cluster_size,
+                                       &l2_table[l2_index], QCOW_OFLAG_COPIED);
+         assert(preallocated_nb_clusters > 0);
 diff --git a/tests/qemu-iotests/060 b/tests/qemu-iotests/060
-index fae08b03bf..56bdf1ee2e 100755
+index 56bdf1ee2e..49bc89df38 100755
 --- a/tests/qemu-iotests/060
 +++ b/tests/qemu-iotests/060
-@@ -301,6 +301,26 @@ _make_test_img 64M
- poke_file "$TEST_IMG" "48"                "\x00\x00\x00\x00\x00\x00\x00\x00"
- $QEMU_IO -c "write 0 64k" "$TEST_IMG" | _filter_qemu_io
+@@ -321,6 +321,22 @@ echo '--- Repairing ---'
+ # because the image was already marked corrupt by that point
+ _check_test_img -r all
  
 +echo
-+echo "=== Testing dirty corrupt image ==="
++echo "=== Writing to an unaligned preallocated zero cluster ==="
 +echo
 +
 +_make_test_img 64M
 +
-+# Let the refblock appear unaligned
-+poke_file "$TEST_IMG" "$rt_offset"        "\x00\x00\x00\x00\xff\xff\x2a\x00"
-+# Mark the image dirty, thus forcing an automatic check when opening it
-+poke_file "$TEST_IMG" 72 "\x00\x00\x00\x00\x00\x00\x00\x01"
-+# Open the image (qemu should refuse to do so)
-+$QEMU_IO -c close "$TEST_IMG" 2>&1 | _filter_testdir | _filter_imgfmt
++# Allocate the L2 table
++$QEMU_IO -c "write 0 64k" -c "discard 0 64k" "$TEST_IMG" | _filter_qemu_io
++# Pretend there is a preallocated zero cluster somewhere inside the
++# image header
++poke_file "$TEST_IMG" "$l2_offset" "\x80\x00\x00\x00\x00\x00\x2a\x01"
++# Let's write to it!
++$QEMU_IO -c "write 0 64k" "$TEST_IMG" | _filter_qemu_io
 +
-+echo '--- Repairing ---'
-+
-+# The actual repair should have happened (because of the dirty bit),
-+# but some cleanup may have failed (like freeing the old reftable)
-+# because the image was already marked corrupt by that point
-+_check_test_img -r all
++# Can't repair this yet (TODO: We can just deallocate the cluster)
 +
  # success, all done
  echo "*** done"
  rm -f $seq.full
 diff --git a/tests/qemu-iotests/060.out b/tests/qemu-iotests/060.out
-index 62c22701b8..f013fe73c0 100644
+index f013fe73c0..c583076808 100644
 --- a/tests/qemu-iotests/060.out
 +++ b/tests/qemu-iotests/060.out
-@@ -284,4 +284,27 @@ No errors were found on the image.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
- qcow2: Marking image as corrupt: Preventing invalid allocation of L2 table at offset 0; further corruption events will be suppressed
- write failed: Input/output error
+@@ -307,4 +307,14 @@ The following inconsistencies were found and repaired:
+ 
+ Double checking the fixed image now...
+ No errors were found on the image.
 +
-+=== Testing dirty corrupt image ===
++=== Writing to an unaligned preallocated zero cluster ===
 +
 +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
-+ERROR refcount block 0 is not cluster aligned; refcount table entry corrupted
-+IMGFMT: Marking image as corrupt: Refblock offset 0xffff2a00 unaligned (reftable index: 0); further corruption events will be suppressed
-+Can't get refcount for cluster 0: Input/output error
-+Can't get refcount for cluster 1: Input/output error
-+Can't get refcount for cluster 2: Input/output error
-+Can't get refcount for cluster 3: Input/output error
-+Rebuilding refcount structure
-+Repairing cluster 1 refcount=1 reference=0
-+can't open device TEST_DIR/t.IMGFMT: Could not repair dirty image: Input/output error
-+--- Repairing ---
-+Leaked cluster 1 refcount=1 reference=0
-+Repairing cluster 1 refcount=1 reference=0
-+The following inconsistencies were found and repaired:
-+
-+    1 leaked clusters
-+    0 corruptions
-+
-+Double checking the fixed image now...
-+No errors were found on the image.
++wrote 65536/65536 bytes at offset 0
++64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++discard 65536/65536 bytes at offset 0
++64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++qcow2: Marking image as corrupt: Preallocated zero cluster offset 0x2a00 unaligned (guest offset: 0); further corruption events will be suppressed
++write failed: Input/output error
  *** done
 -- 
 2.13.6
