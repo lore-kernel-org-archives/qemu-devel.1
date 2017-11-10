@@ -1,22 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38805)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46883)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eCzaU-0005hs-Al
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 22:02:37 -0500
+	(envelope-from <jasowang@redhat.com>) id 1eD0m0-0004Jy-6v
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 23:18:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eCzaT-0006tZ-33
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 22:02:34 -0500
-Date: Fri, 10 Nov 2017 11:02:23 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20171110030223.GA7303@lemon>
-References: <dd350838-9132-e787-10b1-4cb200076ec9@virtuozzo.com>
-	<w51inekzv59.fsf@maestria.local.igalia.com>
-	<w518tff4dvi.fsf@maestria.local.igalia.com>
+	(envelope-from <jasowang@redhat.com>) id 1eD0lx-0007Td-2R
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 23:18:32 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59528)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1eD0lw-0007T2-ST
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 23:18:28 -0500
+From: Jason Wang <jasowang@redhat.com>
+References: <1b862cf2-2fee-3243-cb54-2780ace6f25b@profihost.ag>
+	<971cc10f-7930-9830-0528-27e8faac7282@redhat.com>
+	<748c4d0d-f84b-303d-f9a6-bafa6037d669@profihost.ag>
+	<f4b0cb70-7f86-f7cf-bb89-3a9f7ae15dc2@redhat.com>
+	<4c2913e2-5946-47db-cced-a5702538bc3b@profihost.ag>
+	<dc3bf74f-fbd6-573d-0d7c-d456469fcf1d@profihost.ag>
+	<9c8673a5-faf7-ca9c-27d3-398df4223d6a@redhat.com>
+	<f362d043-7293-65b7-734b-c8372a5f16c3@profihost.ag>
+	<54326bae-831d-dfb8-151e-534d3a100c2c@redhat.com>
+	<ab53e4ae-4c38-9520-b076-96318b6c09b5@profihost.ag>
+	<61b97624-bd55-655f-f8e2-ea1699c25d51@redhat.com>
+	<b110639a-3752-56b5-fe50-741c53048c15@redhat.com>
+	<34a1bec2-403e-8de1-d3dd-661865c6dceb@redhat.com>
+Message-ID: <a80dde99-460c-15e9-26ba-e5e8a2c0ae5e@redhat.com>
+Date: Fri, 10 Nov 2017 13:18:20 +0900
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <w518tff4dvi.fsf@maestria.local.igalia.com>
-Subject: Re: [Qemu-devel] [Qemu-block] segfault in parallel blockjobs
- (iotest 30)
+In-Reply-To: <34a1bec2-403e-8de1-d3dd-661865c6dceb@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] kvm: virtio-net: saved image requires TUN_F_UFO
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,34 +40,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>
-Cc: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>, Stefan Priebe - Profihost AG <s.priebe@profihost.ag>, qemu-devel <qemu-devel@nongnu.org>
 
-On Thu, 11/09 17:26, Alberto Garcia wrote:
-> On Wed 08 Nov 2017 03:45:38 PM CET, Alberto Garcia wrote:
-> 
-> > I'm thinking that perhaps we should add the pause point directly to
-> > block_job_defer_to_main_loop(), to prevent any block job from running
-> > the exit function when it's paused.
-> 
-> I was trying this and unfortunately this breaks the mirror job at least
-> (reproduced with a simple block-commit on the topmost node, which uses
-> commit_active_start() -> mirror_start_job()).
-> 
-> So what happens is that mirror_run() always calls bdrv_drained_begin()
-> before returning, pausing the block job. The closing bdrv_drained_end()
-> call is at the end of mirror_exit(), already in the main loop.
-> 
-> So the mirror job is always calling block_job_defer_to_main_loop() and
-> mirror_exit() when the job is paused.
-> 
 
-FWIW, I think Max's report on 194 failures is related:
 
-https://lists.gnu.org/archive/html/qemu-devel/2017-11/msg01822.html
+On 2017=E5=B9=B411=E6=9C=8808=E6=97=A5 19:22, Jason Wang wrote:
+>
+>
+> On 2017=E5=B9=B411=E6=9C=8808=E6=97=A5 18:46, Paolo Bonzini wrote:
+>> On 08/11/2017 09:21, Jason Wang wrote:
+>>>
+>>> On 2017=E5=B9=B411=E6=9C=8808=E6=97=A5 17:05, Stefan Priebe - Profiho=
+st AG wrote:
+>>>> Am 08.11.2017 um 08:54 schrieb Jason Wang:
+>>>>> On 2017=E5=B9=B411=E6=9C=8808=E6=97=A5 15:41, Stefan Priebe - Profi=
+host AG wrote:
+>>>>>> Hi Paolo,
+>>>>>>
+>>>>>> Am 06.11.2017 um 12:27 schrieb Paolo Bonzini:
+>>>>>>> On 06/11/2017 12:09, Stefan Priebe - Profihost AG wrote:
+>>>>>>>> HI Paolo,
+>>>>>>>>
+>>>>>>>> could this patchset be related?
+>>>>>>> Uh oh, yes it should.=C2=A0 Jason, any ways to fix it?=C2=A0 I su=
+ppose we
+>>>>>>> need to
+>>>>>>> disable UFO in the newest machine types, but do we also have to d=
+o
+>>>>>>> (software) UFO in vhost-net and QEMU for migration compatibility?
+>>>>>> Any news on this?
+>>>>>>
+>>>>>> Greets,
+>>>>> Since we probe UFO support, it will be disabled automatically on=20
+>>>>> device
+>>>>> startup.
+>>>>>
+>>>>> For the issue of migration, I think the only way is trying to fix=20
+>>>>> it in
+>>>>> kernel.
+>>>> But 4.14 is around the corner and the patchset is already included.
+>>>> Shouldn't this get fixed before 4.14 is released?
+>>> We will try to seek a solution as soon as possible. If we can't catch
+>>> 4.14, we will do it for stable for sure.
+>> Jason, can you write to netdev and Cc Linus and me?
+>>
+>> Thanks,
+>>
+>> Paolo
+>
+> Paolo, see this https://www.spinics.net/lists/netdev/msg465454.html
+>
+> Just notice this today since I'm not on the cc list.
+>
+> Thanks
+>
+>
 
-so perhaps it's worth testing his patch too:
+An update:
 
-https://lists.gnu.org/archive/html/qemu-devel/2017-11/msg01835.html
+After some discussions on netdev, we will try to bring UFO back=20
+partially for just TAP. Willem promise to fix this. 4.14 is too late=20
+consider the fix is not trivial, it will go through stable tree.
 
-Fam
+Thanks
