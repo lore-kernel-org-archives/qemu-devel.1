@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43891)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47630)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kernellwp@gmail.com>) id 1eD49R-0007Ai-JQ
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 02:54:58 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eD4RT-0002vX-Qz
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 03:13:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kernellwp@gmail.com>) id 1eD49Q-0003Kt-Sv
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 02:54:57 -0500
-Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:55966)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <kernellwp@gmail.com>) id 1eD49Q-0003Kd-NU
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 02:54:56 -0500
-Received: by mail-ot0-x244.google.com with SMTP id u10so167101otc.12
-	for <qemu-devel@nongnu.org>; Thu, 09 Nov 2017 23:54:56 -0800 (PST)
+	(envelope-from <pbonzini@redhat.com>) id 1eD4RO-000260-Vt
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 03:13:35 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60718)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eD4RO-00024V-Pv
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 03:13:30 -0500
+References: <1510273811-13419-1-git-send-email-cota@braap.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <537cd77a-41ef-cf05-e835-160a08c53bf5@redhat.com>
+Date: Fri, 10 Nov 2017 09:13:23 +0100
 MIME-Version: 1.0
-In-Reply-To: <1510299947-11287-1-git-send-email-wanpeng.li@hotmail.com>
-References: <1510299947-11287-1-git-send-email-wanpeng.li@hotmail.com>
-From: Wanpeng Li <kernellwp@gmail.com>
-Date: Fri, 10 Nov 2017 15:54:55 +0800
-Message-ID: <CANRm+Cw_Sg04WV0J4tMXy6CSPa+GqfH31hch8p0XCZKmxT=VLQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] target-i386: adds PV_TLB_FLUSH CPUID
- feature bit
+In-Reply-To: <1510273811-13419-1-git-send-email-cota@braap.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] thread-posix: fix qemu_rec_mutex_trylock
+ macro
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,42 +28,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>, Wanpeng Li <wanpeng.li@hotmail.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
+To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
 
-2017-11-10 15:45 GMT+08:00 Wanpeng Li <kernellwp@gmail.com>:
-> From: Wanpeng Li <wanpeng.li@hotmail.com>
->
-> Adds PV_TLB_FLUSH CPUID feature bit.
->
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcmar@redhat.com>
-> Cc: Richard Henderson <rth@twiddle.net>
-> Cc: Eduardo Habkost <ehabkost@redhat.com>
-> Signed-off-by: Wanpeng Li <wanpeng.li@hotmail.com>
+On 10/11/2017 01:30, Emilio G. Cota wrote:
+> We never noticed because it has no users.
+> 
+> Signed-off-by: Emilio G. Cota <cota@braap.org>
 > ---
->  target/i386/cpu.c | 2 +-
+>  include/qemu/thread-posix.h | 2 +-
 >  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index 6f21a5e..ecebc5a 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -347,7 +347,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORD=
-S] =3D {
->          .feat_names =3D {
->              "kvmclock", "kvm-nopiodelay", "kvm-mmu", "kvmclock",
->              "kvm-asyncpf", "kvm-steal-time", "kvm-pv-eoi", "kvm-pv-unhal=
-t",
-> -            NULL, NULL, NULL, NULL,
-> +            NULL, "kvm-pv-tlb-flush", NULL, NULL,
+> 
+> diff --git a/include/qemu/thread-posix.h b/include/qemu/thread-posix.h
+> index f4296d3..f3f47e4 100644
+> --- a/include/qemu/thread-posix.h
+> +++ b/include/qemu/thread-posix.h
+> @@ -7,7 +7,7 @@
+>  typedef QemuMutex QemuRecMutex;
+>  #define qemu_rec_mutex_destroy qemu_mutex_destroy
+>  #define qemu_rec_mutex_lock qemu_mutex_lock
+> -#define qemu_rec_mutex_try_lock qemu_mutex_try_lock
+> +#define qemu_rec_mutex_trylock qemu_mutex_trylock
+>  #define qemu_rec_mutex_unlock qemu_mutex_unlock
+>  
+>  struct QemuMutex {
+> 
 
-Note: bit 8 is reserved for the PV_DEDICATED which is posted by
-another guy in kvm community.
+Queued, thanks.
 
->              NULL, NULL, NULL, NULL,
->              NULL, NULL, NULL, NULL,
->              NULL, NULL, NULL, NULL,
-> --
-> 2.7.4
->
+Paolo
