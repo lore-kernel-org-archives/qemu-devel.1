@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52226)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52848)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eD9Pw-0007M1-0D
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 08:32:21 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eD9T4-0008Ne-Fv
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 08:35:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eD9Pu-0002Df-Ox
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 08:32:20 -0500
-Date: Fri, 10 Nov 2017 21:32:07 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20171110133207.GA9235@lemon.Home>
-References: <20171109204315.27072-1-mreitz@redhat.com>
-	<20171110024557.GB4849@lemon>
-	<20171110131752.GD5466@localhost.localdomain>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eD9T0-0008H3-9y
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 08:35:34 -0500
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20171109115814.28232-1-ppandit@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <7441e865-c6d7-7fbf-3175-63ebdf7291e7@amsat.org>
+Date: Fri, 10 Nov 2017 10:35:18 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171110131752.GD5466@localhost.localdomain>
-Subject: Re: [Qemu-devel] [PATCH for-2.11] block: Keep strong reference when
- draining all BDS
+In-Reply-To: <20171109115814.28232-1-ppandit@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH] highbank: validate register
+ offset before access
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,141 +28,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: P J P <ppandit@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>, Moguofang <moguofang@huawei.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, Prasad J Pandit <pjp@fedoraproject.org>, Shawn Guo <shawn.guo@linaro.org>, Rob Herring <robh@kernel.org>
 
-On Fri, 11/10 14:17, Kevin Wolf wrote:
-> Am 10.11.2017 um 03:45 hat Fam Zheng geschrieben:
-> > On Thu, 11/09 21:43, Max Reitz wrote:
-> > > Draining a BDS may lead to graph modifications, which in turn may result
-> > > in it and other BDS being stripped of their current references.  If
-> > > bdrv_drain_all_begin() and bdrv_drain_all_end() do not keep strong
-> > > references themselves, the BDS they are trying to drain (or undrain) may
-> > > disappear right under their feet -- or, more specifically, under the
-> > > feet of BDRV_POLL_WHILE() in bdrv_drain_recurse().
-> > > 
-> > > This fixes an occasional hang of iotest 194.
-> > > 
-> > > Signed-off-by: Max Reitz <mreitz@redhat.com>
-> > > ---
-> > >  block/io.c | 47 ++++++++++++++++++++++++++++++++++++++++++++---
-> > >  1 file changed, 44 insertions(+), 3 deletions(-)
-> > > 
-> > > diff --git a/block/io.c b/block/io.c
-> > > index 3d5ef2cabe..a0a2833e8e 100644
-> > > --- a/block/io.c
-> > > +++ b/block/io.c
-> > > @@ -340,7 +340,10 @@ void bdrv_drain_all_begin(void)
-> > >      bool waited = true;
-> > >      BlockDriverState *bs;
-> > >      BdrvNextIterator it;
-> > > -    GSList *aio_ctxs = NULL, *ctx;
-> > > +    GSList *aio_ctxs = NULL, *ctx, *bs_list = NULL, *bs_list_entry;
-> > > +
-> > > +    /* Must be called from the main loop */
-> > > +    assert(qemu_get_current_aio_context() == qemu_get_aio_context());
-> > >  
-> > >      block_job_pause_all();
-> > >  
-> > > @@ -355,6 +358,12 @@ void bdrv_drain_all_begin(void)
-> > >          if (!g_slist_find(aio_ctxs, aio_context)) {
-> > >              aio_ctxs = g_slist_prepend(aio_ctxs, aio_context);
-> > >          }
-> > > +
-> > > +        /* Keep a strong reference to all root BDS and copy them into
-> > > +         * an own list because draining them may lead to graph
-> > > +         * modifications. */
-> > > +        bdrv_ref(bs);
-> > > +        bs_list = g_slist_prepend(bs_list, bs);
-> > >      }
-> > >  
-> > >      /* Note that completion of an asynchronous I/O operation can trigger any
-> > > @@ -370,7 +379,11 @@ void bdrv_drain_all_begin(void)
-> > >              AioContext *aio_context = ctx->data;
-> > >  
-> > >              aio_context_acquire(aio_context);
-> > > -            for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
-> > > +            for (bs_list_entry = bs_list; bs_list_entry;
-> > > +                 bs_list_entry = bs_list_entry->next)
-> > > +            {
-> > > +                bs = bs_list_entry->data;
-> > > +
-> > >                  if (aio_context == bdrv_get_aio_context(bs)) {
-> > >                      waited |= bdrv_drain_recurse(bs, true);
-> > >                  }
-> > > @@ -379,24 +392,52 @@ void bdrv_drain_all_begin(void)
-> > >          }
-> > >      }
-> > >  
-> > > +    for (bs_list_entry = bs_list; bs_list_entry;
-> > > +         bs_list_entry = bs_list_entry->next)
-> > > +    {
-> > > +        bdrv_unref(bs_list_entry->data);
-> > > +    }
-> > > +
-> > >      g_slist_free(aio_ctxs);
-> > > +    g_slist_free(bs_list);
-> > >  }
-> > >  
-> > >  void bdrv_drain_all_end(void)
-> > >  {
-> > >      BlockDriverState *bs;
-> > >      BdrvNextIterator it;
-> > > +    GSList *bs_list = NULL, *bs_list_entry;
-> > > +
-> > > +    /* Must be called from the main loop */
-> > > +    assert(qemu_get_current_aio_context() == qemu_get_aio_context());
-> > >  
-> > > +    /* Keep a strong reference to all root BDS and copy them into an
-> > > +     * own list because draining them may lead to graph modifications.
-> > > +     */
-> > >      for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
-> > > -        AioContext *aio_context = bdrv_get_aio_context(bs);
-> > > +        bdrv_ref(bs);
-> > > +        bs_list = g_slist_prepend(bs_list, bs);
-> > > +    }
-> > > +
-> > > +    for (bs_list_entry = bs_list; bs_list_entry;
-> > > +         bs_list_entry = bs_list_entry->next)
-> > > +    {
-> > > +        AioContext *aio_context;
-> > > +
-> > > +        bs = bs_list_entry->data;
-> > > +        aio_context = bdrv_get_aio_context(bs);
-> > >  
-> > >          aio_context_acquire(aio_context);
-> > >          aio_enable_external(aio_context);
-> > >          bdrv_parent_drained_end(bs);
-> > >          bdrv_drain_recurse(bs, false);
-> > >          aio_context_release(aio_context);
-> > > +
-> > > +        bdrv_unref(bs);
-> > >      }
-> > >  
-> > > +    g_slist_free(bs_list);
-> > > +
-> > >      block_job_resume_all();
-> > >  }
-> > 
-> > It is better to put the references into BdrvNextIterator and introduce
-> > bdrv_next_iterator_destroy() to free them? You'll need to touch all callers
-> > because it is not C++, but it secures all of rest, which seems vulnerable in the
-> > same pattern, for example the aio_poll() in iothread_stop_all().
+Hi Prasad, Moguofang.
+
+On 11/09/2017 08:58 AM, P J P wrote:
+> From: Prasad J Pandit <pjp@fedoraproject.org>
 > 
-> You could automatically free the references when bdrv_next() returns
-> NULL. Then you need an explicit bdrv_next_iterator_destroy() only for
-> callers that stop iterating halfway through the list.
-
-Yes, good idea.
-
+> An 'offset' parameter sent to highbank register r/w functions
+> could be greater than number(NUM_REGS=0x200) of hb registers,
+> leading to an OOB access issue. Add check to avoid it.
 > 
-> Do you actually need to keep references to all BDSes in the whole list
-> while using the iterator or would it be enough to just keep a reference
-> to the current one?
+> Reported-by: Moguofang (Dennis mo) <moguofang@huawei.com>
+> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+> ---
+>  hw/arm/highbank.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
+> 
+> diff --git a/hw/arm/highbank.c b/hw/arm/highbank.c
+> index 354c6b25a8..94df151454 100644
+> --- a/hw/arm/highbank.c
+> +++ b/hw/arm/highbank.c
+> @@ -117,6 +117,9 @@ static void hb_regs_write(void *opaque, hwaddr offset,
+>          }
+>      }
+>  
+> +    if (offset / 4 >= NUM_REGS) {
 
-To fix the bug we now see I think keeping the current is enough, but I think
-implementing just like this patch is also good with some future-proofing: we
-cannot know what will be wedged into the nexted aio_poll()'s over time (and yes,
-we should really reduce the number of them.)
+I'd report that:
 
-Fam
+           qemu_log_mask(LOG_UNIMP, ...
+
+Cc'ing Shawn & Rob since this might also be a LOG_GUEST_ERROR.
+
+> +        return;
+> +    }
+>      regs[offset/4] = value;
+>  }
+>  
+> @@ -124,6 +127,10 @@ static uint64_t hb_regs_read(void *opaque, hwaddr offset,
+>                               unsigned size)
+>  {
+>      uint32_t *regs = opaque;
+> +
+> +    if (offset / 4 >= NUM_REGS) {
+
+Ditto.
+
+> +        return 0;
+> +    }
+
+>From CODING_STYLE:
+
+Mixed declarations (interleaving statements and declarations within
+blocks) are generally not allowed; declarations should be at the
+beginning of blocks.
+
+>      uint32_t value = regs[offset/4];
+>  
+>      if ((offset == 0x100) || (offset == 0x108) || (offset == 0x10C)) {
+
+Regards,
+
+Phil.
