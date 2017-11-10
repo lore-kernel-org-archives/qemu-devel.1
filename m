@@ -1,24 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36010)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36871)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1eDEPb-0007XB-4v
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 13:52:19 -0500
+	(envelope-from <berto@igalia.com>) id 1eDESO-0000m5-SA
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 13:55:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1eDEPW-0000gq-Ak
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 13:52:19 -0500
-Received: from out4-smtp.messagingengine.com ([66.111.4.28]:36973)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1eDEPW-0000ge-6Y
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 13:52:14 -0500
-Date: Fri, 10 Nov 2017 13:52:12 -0500
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20171110185212.GA30670@flamenco>
-References: <cover.1510263731.git.alistair.francis@xilinx.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1510263731.git.alistair.francis@xilinx.com>
-Subject: Re: [Qemu-devel] [PATCH for 2.11 v2 0/2] Xilinx ZCU102 fixes for
- 2.11
+	(envelope-from <berto@igalia.com>) id 1eDESK-0001sw-V6
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 13:55:12 -0500
+From: Alberto Garcia <berto@igalia.com>
+Date: Fri, 10 Nov 2017 20:54:46 +0200
+Message-Id: <0d3a67ce8d948bb33e08672564714dcfb76a3d8c.1510339534.git.berto@igalia.com>
+In-Reply-To: <cover.1510339534.git.berto@igalia.com>
+References: <cover.1510339534.git.berto@igalia.com>
+In-Reply-To: <cover.1510339534.git.berto@igalia.com>
+References: <cover.1510339534.git.berto@igalia.com>
+Subject: [Qemu-devel] [PATCH 1/3] block: Check for inserted BlockDriverState
+ in blk_io_limits_disable()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,25 +22,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org, alistair23@gmail.com, edgar.iglesias@xilinx.com, edgar.iglesias@gmail.com, ehabkost@redhat.com, f4bug@amsat.org
+To: qemu-devel@nongnu.org
+Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, sochin jiang <sochin.jiang@huawei.com>
 
-On Thu, Nov 09, 2017 at 13:49:30 -0800, Alistair Francis wrote:
-> These are two small fixes for 2.11.
-> 
-> V2:
->  - Update qemu-doc.texi
-> 
-> Alistair Francis (2):
->   xlnx-zynqmp: Properly support the smp command line option
->   xlnx-zcu102: Add an info message deprecating the EP108
+When you set I/O limits using block_set_io_throttle or the command
+line throttling.* options they are kept in the BlockBackend regardless
+of whether a BlockDriverState is attached to the backend or not.
 
-Peter: please do not merge this yet!
+Therefore when removing the limits using blk_io_limits_disable() we
+need to check if there's a BDS before attempting to drain it, else it
+will crash QEMU. This can be reproduced very easily using HMP:
 
-Given that these two changes require another patch to be tested,
-I am going to include these two patches in an upcoming series
-with the required patch added first.
+     (qemu) drive_add 0 if=none,throttling.iops-total=5000
+     (qemu) drive_del none0
 
-BTW I'll also add my R-b tags plus the max_cpus update for the ep108.
+Reported-by: sochin jiang <sochin.jiang@huawei.com>
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+---
+ block/block-backend.c | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
 
-		Emilio
+diff --git a/block/block-backend.c b/block/block-backend.c
+index 18e543780d..193a080096 100644
+--- a/block/block-backend.c
++++ b/block/block-backend.c
+@@ -1978,10 +1978,16 @@ void blk_set_io_limits(BlockBackend *blk, ThrottleConfig *cfg)
+ 
+ void blk_io_limits_disable(BlockBackend *blk)
+ {
+-    assert(blk->public.throttle_group_member.throttle_state);
+-    bdrv_drained_begin(blk_bs(blk));
+-    throttle_group_unregister_tgm(&blk->public.throttle_group_member);
+-    bdrv_drained_end(blk_bs(blk));
++    BlockDriverState *bs = blk_bs(blk);
++    ThrottleGroupMember *tgm = &blk->public.throttle_group_member;
++    assert(tgm->throttle_state);
++    if (bs) {
++        bdrv_drained_begin(bs);
++    }
++    throttle_group_unregister_tgm(tgm);
++    if (bs) {
++        bdrv_drained_end(bs);
++    }
+ }
+ 
+ /* should be called before blk_set_io_limits if a limit is set */
+-- 
+2.11.0
