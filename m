@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49447)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49759)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eDHgD-0001Zi-SO
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 17:21:42 -0500
+	(envelope-from <eblake@redhat.com>) id 1eDHhS-0002aI-Dj
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 17:23:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eDHgC-0000zb-UN
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 17:21:41 -0500
-References: <cover.1510339534.git.berto@igalia.com>
-	<071eb397118ed207c5a7f01d58766e415ee18d6a.1510339534.git.berto@igalia.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <d725567e-787d-bdea-36aa-d20877d8d288@redhat.com>
-Date: Fri, 10 Nov 2017 23:21:27 +0100
+	(envelope-from <eblake@redhat.com>) id 1eDHhR-0001Z8-Ka
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 17:22:58 -0500
+References: <20171110221329.24176-1-mreitz@redhat.com>
+	<20171110221329.24176-3-mreitz@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <40c5af3a-9d7c-5040-c719-d69e14c2de3c@redhat.com>
+Date: Fri, 10 Nov 2017 16:22:52 -0600
 MIME-Version: 1.0
-In-Reply-To: <071eb397118ed207c5a7f01d58766e415ee18d6a.1510339534.git.berto@igalia.com>
+In-Reply-To: <20171110221329.24176-3-mreitz@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="nWjJ6M0qSFKKjJqIEI6ossgt65Rro3pxg"
-Subject: Re: [Qemu-devel] [PATCH 3/3] qemu-iotests: Test I/O limits with
- removable media
+	boundary="b9ebkUkh6Supb0LDX777xjXSbp71K4tHB"
+Subject: Re: [Qemu-devel] [PATCH for-2.12 2/3] block: Handle null backing
+ link
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,64 +25,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, sochin jiang <sochin.jiang@huawei.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---nWjJ6M0qSFKKjJqIEI6ossgt65Rro3pxg
-From: Max Reitz <mreitz@redhat.com>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>,
- Kevin Wolf <kwolf@redhat.com>, sochin jiang <sochin.jiang@huawei.com>
-Message-ID: <d725567e-787d-bdea-36aa-d20877d8d288@redhat.com>
-Subject: Re: [PATCH 3/3] qemu-iotests: Test I/O limits with removable media
-References: <cover.1510339534.git.berto@igalia.com>
- <071eb397118ed207c5a7f01d58766e415ee18d6a.1510339534.git.berto@igalia.com>
-In-Reply-To: <071eb397118ed207c5a7f01d58766e415ee18d6a.1510339534.git.berto@igalia.com>
+--b9ebkUkh6Supb0LDX777xjXSbp71K4tHB
+From: Eric Blake <eblake@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ qemu-devel@nongnu.org
+Message-ID: <40c5af3a-9d7c-5040-c719-d69e14c2de3c@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.12 2/3] block: Handle null backing link
+References: <20171110221329.24176-1-mreitz@redhat.com>
+ <20171110221329.24176-3-mreitz@redhat.com>
+In-Reply-To: <20171110221329.24176-3-mreitz@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 2017-11-10 19:54, Alberto Garcia wrote:
-> This test hotplugs a CD drive to a VM and checks that I/O limits can
-> be set only when the drive has media inserted and that they are kept
-> when the media is replaced.
+On 11/10/2017 04:13 PM, Max Reitz wrote:
+> Instead of converting all "backing": null instances into "backing": "",=
+
+> handle a null value directly in bdrv_open_inherit().
 >=20
-> This also tests the removal of a device with valid I/O limits set but
-> no media inserted. This involves deleting and disabling the limits
-> of a BlockBackend without BlockDriverState, a scenario that has been
-> crashing until the fixes from the last couple of patches.
+> This enables explicitly null backing links for json:{} filenames.
 >=20
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
 > ---
->  tests/qemu-iotests/093     | 62 ++++++++++++++++++++++++++++++++++++++=
-++++++++
->  tests/qemu-iotests/093.out |  4 +--
->  2 files changed, 64 insertions(+), 2 deletions(-)
+>  block.c                    |  2 +-
+>  blockdev.c                 | 14 --------------
+>  tests/qemu-iotests/089     | 20 ++++++++++++++++++++
+>  tests/qemu-iotests/089.out |  8 ++++++++
+>  4 files changed, 29 insertions(+), 15 deletions(-)
+>=20
 
-By the way, I just noticed that this test tests that
-x-blockdev-remove-medium and x-blockdev-insert-medium do not destroy
-throttling information -- which is exactly why those commands had been
-declared experimental in the first place.  So I guess this means we can
-drop the x- now. :-)
+> @@ -3899,19 +3898,6 @@ void qmp_blockdev_add(BlockdevOptions *options, =
+Error **errp)
+> =20
+>      qdict_flatten(qdict);
+> =20
+> -    /*
+> -     * Rewrite "backing": null to "backing": ""
+> -     * TODO Rewrite "" to null instead, and perhaps not even here
+> -     */
 
-Max
+Nice that the TODO told you what to do :)
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
---nWjJ6M0qSFKKjJqIEI6ossgt65Rro3pxg
+--b9ebkUkh6Supb0LDX777xjXSbp71K4tHB
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAloGJmcSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AHsAH/R/fRgbTJHQAVnpqXVGqIhq+k4QJwLU6
-qcdb2ijv+bnEAYQbaSuuwijMDOpz74h3w9jAtQUXwIrhLYOYHfgEkWRrgslyekFY
-7wL0Z+MSkM2vKg0l4FKkhS2wPFaKsgXIGq44l68nRSL+yaNrQS3hJs62HnhmgiJM
-5rB6D3xdxPaCJOfcVO0+zA9QqmmC3tpfDhQ53EdF8qnkbYLqe94PAQvRFxLQdwFr
-YmQjzwAJZ+5mHR52xNbCyKee3RyLkUsCjkK5dL7vWyuPgqaSmX9ziopVIwDan2Gj
-msSpjFpdHQf7233HG+jJTiqg9EAtLbsVDpkQJu7xPxZ/PuZcKbYmA+Y=
-=Hsbr
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloGJr0ACgkQp6FrSiUn
+Q2oZJAgAsElANVNs4fzQxsMDCi8RF2DfUsZrmltz6RBNBRois9121mrE98JFCqgk
+U/TvfXID0SKnCPhoELJ94OYajtMPgNx2LS2XJqi593CsQ4G//jN6jDBnJS3geumx
+u0VzcwIqsTlLzoxw51OrRAWzkxSyPFuIdPJrFCoNo4rBIT0kpFj8iGXr2CVlTT88
+qLalnfVuvZFvBwDj9LEVm5hD0K34E41zdcnpdxXhe5yEVq8nChV7uwRtO1vairkn
+7R2Iz/Fq8mZfCp0JXdlf76xEllw9mE2sXQI5DZxKsl8WsI+maS2o5SsI7y2Rj0h7
+Drbl7slbBeBG2cSJUQn/u4ulX+00mA==
+=4VxM
 -----END PGP SIGNATURE-----
 
---nWjJ6M0qSFKKjJqIEI6ossgt65Rro3pxg--
+--b9ebkUkh6Supb0LDX777xjXSbp71K4tHB--
