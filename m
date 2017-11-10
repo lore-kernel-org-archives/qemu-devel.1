@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60711)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34030)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eDE18-0003vE-Hg
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 13:27:03 -0500
+	(envelope-from <cota@braap.org>) id 1eDEBX-0005Xb-D1
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 13:37:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eDE17-0005v2-Hx
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 13:27:02 -0500
-References: <20171109203025.27493-1-mreitz@redhat.com>
-	<20171109203025.27493-5-mreitz@redhat.com>
-	<w51375mv4by.fsf@maestria.local.igalia.com>
-	<d44fc75f-829c-65cd-fc19-04f32d897f8a@redhat.com>
-	<w51tvy2t9m1.fsf@maestria.local.igalia.com>
-	<45294d61-b108-3e96-2bdc-59b3d471fefa@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <81f03429-dab4-5e86-9ca5-fecc4cfc91c7@redhat.com>
-Date: Fri, 10 Nov 2017 12:26:49 -0600
+	(envelope-from <cota@braap.org>) id 1eDEBU-0001ij-9J
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 13:37:47 -0500
+Received: from out4-smtp.messagingengine.com ([66.111.4.28]:47623)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1eDEBU-0001iS-2P
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 13:37:44 -0500
+Date: Fri, 10 Nov 2017 13:37:41 -0500
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20171110183741.GA23011@flamenco>
+References: <cover.1510263731.git.alistair.francis@xilinx.com>
+	<b2df555986423d225a0a79fb58e2a93054ac5300.1510263731.git.alistair.francis@xilinx.com>
+	<20171110180722.GA17844@flamenco>
 MIME-Version: 1.0
-In-Reply-To: <45294d61-b108-3e96-2bdc-59b3d471fefa@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="pviTh4g4obSUTdC84H3pvS85Ps5A6iN82"
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 4/5] iotests: Make 083 less
- flaky
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171110180722.GA17844@flamenco>
+Subject: Re: [Qemu-devel] [PATCH for 2.11 v2 2/2] xlnx-zcu102: Add an info
+ message deprecating the EP108
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,76 +29,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+To: Alistair Francis <alistair.francis@xilinx.com>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, alistair23@gmail.com, edgar.iglesias@xilinx.com, edgar.iglesias@gmail.com, ehabkost@redhat.com, f4bug@amsat.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---pviTh4g4obSUTdC84H3pvS85Ps5A6iN82
-From: Eric Blake <eblake@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, Alberto Garcia <berto@igalia.com>,
- qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
- Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <81f03429-dab4-5e86-9ca5-fecc4cfc91c7@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 4/5] iotests: Make 083 less
- flaky
-References: <20171109203025.27493-1-mreitz@redhat.com>
- <20171109203025.27493-5-mreitz@redhat.com>
- <w51375mv4by.fsf@maestria.local.igalia.com>
- <d44fc75f-829c-65cd-fc19-04f32d897f8a@redhat.com>
- <w51tvy2t9m1.fsf@maestria.local.igalia.com>
- <45294d61-b108-3e96-2bdc-59b3d471fefa@redhat.com>
-In-Reply-To: <45294d61-b108-3e96-2bdc-59b3d471fefa@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Fri, Nov 10, 2017 at 13:07:22 -0500, Emilio G. Cota wrote:
+> On Thu, Nov 09, 2017 at 13:49:35 -0800, Alistair Francis wrote:
+> > The EP108 was an early access development board that is no longer used.
+> > Add an info message to convert any users to the ZCU102 instead. On QEMU
+> > they are both identical.
+> > 
+> > This patch also updated the qemu-doc.texi file to indicate that the
+> > EP108 has been deprecated.
+> > 
+> > Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+> 
+> Reviewed-by: Emilio G. Cota <cota@braap.org>
+> 
+> Note to potential reviewers: This patch is meant to be applied after the
+> patch that updates ep108's max_cpus from 1 to NR_APUS + NR_RPUS, for
+> otherwise the message added here won't be seen unless -smp == 1.
+> This other patch is already in target-arm.next:
+>  https://lists.gnu.org/archive/html/qemu-devel/2017-10/msg06537.html
 
-On 11/10/2017 11:29 AM, Max Reitz wrote:
+Correction: that patch does updates the zcu102, not the ep108.
 
->>>> It seems that in this patch you're indenting with spaces but this fi=
-le
->>>> uses tabs.
->>>
->>> Yes, but tabs are wrong. :-)
->>
->> I actually agree with you, but don't mix them in the file :-)
->=20
-> I can whistle and say here, too, that Eric liked it. O:-)
+I think we should update max_cpus for ep108 as well.
 
-I don't really pay attention to which files have pre-existing TABs.
-You're right that preserving whole-file TABs is a bit nicer from
-consistency than reformatting a file wholesale; but then you have to
-tell checkpatch that preserving TABs was intentional.  Mixed mode
-indentation is not as consistent, but at least keeps checkpatch happy
-without effort, and may make it easier for a patch down the road to
-finally do wholesale conversion of the rest of the file to avoid TABs.
-
-So when it comes to a file with existing TABs, I'm okay whether the
-patch preserves TABs (with documentation that it is doing so
-intentionally) or switches to mixed-mode spaces.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---pviTh4g4obSUTdC84H3pvS85Ps5A6iN82
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloF72kACgkQp6FrSiUn
-Q2qA/wf/Z4PRwQOBZyGd3QB6q4UZbiqHou9D6SjJ3QIpTsU2ywiN5rk8ezTkEREy
-kVWl6GPfNh+8JtCV0pOayxm4n1ODI2AOEwNJDEaxMb/BdP61XrNFt5lyK30qZt27
-/liG5pbf5n76irNpft5qs26um+MQ3iWncmB+lHYSFSTwFfDWySDvOeS5SPK9iobM
-w0J1i7cyWKSWJVjR6D2MFbEde/B/T+YPV//DcIrj/IkkFVmLzym+ubXgGSf8MBhi
-KsfhGrknlRO96WxhwMNN/qIYRleTOu1DEES2l9ZYocSHbcScdLZzE/jToraiU57L
-wHlcSpNh8SqNvVRQ53/y2BIphEGFzw==
-=1J68
------END PGP SIGNATURE-----
-
---pviTh4g4obSUTdC84H3pvS85Ps5A6iN82--
+		Emilio
