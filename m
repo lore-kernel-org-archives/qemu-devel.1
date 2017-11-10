@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51058)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54372)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eD6wu-0006dR-M4
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 05:54:13 -0500
+	(envelope-from <prvs=480a076fd=ross.lagerwall@citrix.com>)
+	id 1eD7FD-0000hk-Iw
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 06:13:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eD6wp-0001g9-7t
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 05:54:12 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43768)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1eD6wp-0001f6-1L
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 05:54:07 -0500
-Date: Fri, 10 Nov 2017 11:53:57 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20171110115357.42672a46.cohuck@redhat.com>
-In-Reply-To: <20171109154645.70920-1-marcel@redhat.com>
-References: <20171109154645.70920-1-marcel@redhat.com>
+	(envelope-from <prvs=480a076fd=ross.lagerwall@citrix.com>)
+	id 1eD7FA-0006ZQ-CR
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 06:13:07 -0500
+Received: from smtp02.citrix.com ([66.165.176.63]:43993)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=480a076fd=ross.lagerwall@citrix.com>)
+	id 1eD7FA-0006Xt-5C
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 06:13:04 -0500
+References: <d7a58698-bba9-b873-b2ae-a63bdd06895f@citrix.com>
+	<20171030171814.GB5438@work-vm> <87d14rfsj7.fsf@dusky.pond.sub.org>
+From: Ross Lagerwall <ross.lagerwall@citrix.com>
+Message-ID: <15358405-6c0b-fda9-d6e4-0ed51308b2c7@citrix.com>
+Date: Fri, 10 Nov 2017 10:43:28 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <87d14rfsj7.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH V5] hw/pcie-pci-bridge: restrict to X86 and
- ARM
+Subject: Re: [Qemu-devel] QMP event missed during startup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,54 +31,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>
-Cc: qemu-devel@nongnu.org, mst@redhat.com, thuth@redhat.com, zuban32s@gmail.com
+To: Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-On Thu,  9 Nov 2017 17:46:45 +0200
-Marcel Apfelbaum <marcel@redhat.com> wrote:
+On 11/09/2017 02:14 PM, Markus Armbruster wrote:
+> "Dr. David Alan Gilbert" <dgilbert@redhat.com> writes:
+> 
+>> * Ross Lagerwall (ross.lagerwall@citrix.com) wrote:
+>>> Hi,
+>>>
+>>> I have found an issue where QEMU emits the RESUME event during startup when
+>>> it starts VM execution, but it is not possible to receive this event.
+>>>
+>>> To repro this, run:
+>>> qemu-system-i386 -m 256 -trace
+>>> enable=monitor_protocol_event_emit,file=/tmp/out -qmp
+>>> unix:/tmp/qmp,server,wait
+>>>
+>>> QEMU will not start execution of the VM until something connects to the QMP
+>>> socket (e.g. qmp-shell). Once connected, no event is received on the QMP
+>>> connection but the tracepoint is hit indicating that an event has been
+>>> emitted. I suspect that the event is emitted while the QMP client is doing
+>>> the initial negotiation.
+>>>
+>>> The reason I want to receive this event is that QEMU currently uses xenstore
+>>> to communicate this information to the Xen toolstack (see
+>>> xen-common.c:xen_change_state_handler) but we want to move to using QMP
+>>> rather than xenstore for this kind of thing.
+>>>
+>>> Is this a known issue or just a bug that should be fixed?
+>>
+>> I'll leave it to Markus to say if it's a bug or not, but can't
+>> you work around this by starting qemu with -S which leaves the guest
+>> paused, and then continuing the guest when you have your QMP ?
+> 
+> You can:
+> 
+> <-- {"QMP": {"version": {"qemu": {"micro": 50, "minor": 10, "major": 2}, "package": " (v2.10.0-613-g10656079e1-dirty)"}, "capabilities": []}}
+> --> { "execute": "qmp_capabilities" }
+> <-- {"return": {}}
+> --> { "execute": "cont" }
+> <-- {"timestamp": {"seconds": 1510235984, "microseconds": 108550}, "event": "RESUME"}
+> <-- {"return": {}}
+> 
+> RESUME is sent in vm_prepare_start(), called from main() via vm_start(),
+> but only if @autostart, i.e. no -S.
+> 
+> The "wait" in the argument of -qmp makes QEMU wait for a QMP client to
+> connect to the QMP socket, long before vm_start() gets called.  However,
+> having connected is not sufficient for receiving events, you also have
+> to exit capabilities negotiation mode.  Not possible until QEMU is
+> running the main loop, which runs after the vm_start() quoted above.
+> 
+> If QMP monitors became usable before entering main_loop(), we'd have a
+> race condition instead.  The only reliable way to get the RESUME event
+> is -S.
+> 
+> This adds one minor item to the long list of reasons why management
+> software should pass -S.
+> 
+> All clear now?
+> 
 
-> The PCIE-PCI bridge is specific to "pure" PCIe systems
-> (on QEMU we have X86 and ARM), it does not make sense to
-> have it in other archs.
-> 
-> Reported-by: Thomas Huth <thuth@redhat.com>
-> Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
-> ---
-> 
-> V4 -> V5
->   - Since all other tries failed, conditioned the
->     device on the PCIe Root Port.
-> 
-> V3 -> V4:
->  - Move the config line to pci.mak  (Thomas)
-> 
-> V2 -> V3:
->  - Another tweak in subject s/if/it (Cornelia) 
-> 
-> V1 -> V2:
->  Addressed Thomas and Cornelia comments:
->  - Conditioned the pcie-pci-bridge compilation on
->    the PCIe Root CONFIG_PCIE_PORT
->  - Tweaked subject PCI -> PCIe
-> 
->  Thanks,
->  Marcel
-> 
-> 
->  hw/pci-bridge/Makefile.objs | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/pci-bridge/Makefile.objs b/hw/pci-bridge/Makefile.objs
-> index 666db37da2..1b05023662 100644
-> --- a/hw/pci-bridge/Makefile.objs
-> +++ b/hw/pci-bridge/Makefile.objs
-> @@ -1,5 +1,5 @@
-> -common-obj-y += pci_bridge_dev.o pcie_pci_bridge.o
-> -common-obj-$(CONFIG_PCIE_PORT) += pcie_root_port.o gen_pcie_root_port.o
-> +common-obj-y += pci_bridge_dev.o
-> +common-obj-$(CONFIG_PCIE_PORT) += pcie_root_port.o gen_pcie_root_port.o pcie_pci_bridge.o
->  common-obj-$(CONFIG_PXB) += pci_expander_bridge.o
->  common-obj-$(CONFIG_XIO3130) += xio3130_upstream.o xio3130_downstream.o
->  common-obj-$(CONFIG_IOH3420) += ioh3420.o
+Yeah that makes sense thanks. I've now tested with -S and it works fine.
 
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Cheers,
+-- 
+Ross Lagerwall
