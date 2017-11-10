@@ -1,28 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41979)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43352)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eDChZ-00087Y-RG
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 12:02:47 -0500
+	(envelope-from <anton@advancedtelematic.com>) id 1eDCl6-0002K7-Ci
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 12:06:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eDChV-0004nH-Ji
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 12:02:45 -0500
-Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:43297)
+	(envelope-from <anton@advancedtelematic.com>) id 1eDCl1-0000oj-6U
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 12:06:24 -0500
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:36303)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1eDChV-0004mF-CK
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 12:02:41 -0500
-Received: by mail-wr0-x241.google.com with SMTP id 4so9170878wrt.0
-	for <qemu-devel@nongnu.org>; Fri, 10 Nov 2017 09:02:40 -0800 (PST)
-Date: Fri, 10 Nov 2017 17:02:37 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20171110170237.GA18834@stefanha-x1.localdomain>
-References: <1509951528-30976-1-git-send-email-longpeng2@huawei.com>
-	<1509951528-30976-2-git-send-email-longpeng2@huawei.com>
+	(Exim 4.71) (envelope-from <anton@advancedtelematic.com>)
+	id 1eDCl0-0000mx-Uk
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 12:06:19 -0500
+Received: by mail-wm0-x243.google.com with SMTP id r68so4060108wmr.1
+	for <qemu-devel@nongnu.org>; Fri, 10 Nov 2017 09:06:18 -0800 (PST)
+References: <cb94e9b2-d7c6-68ab-bb25-42f7d8113e03@advancedtelematic.com>
+	<CAEUhbmVTaJmL1jG8aBPPcJ-d+vKba8xhLgc=+7Fd8HHUvVW+-Q@mail.gmail.com>
+	<9b2efc90-3b0e-b13b-27bb-117473c8b41b@advancedtelematic.com>
+	<2fd2077a-9823-41e0-0deb-4142b20259d5@advancedtelematic.com>
+	<CAEUhbmXJZnLZgx8b2ZHV1wfqZvO=agSsp0Yvi7FQQfV6MM1cnA@mail.gmail.com>
+From: Anton Gerasimov <anton@advancedtelematic.com>
+Message-ID: <1cc32460-6067-0c1c-0182-eb17933293d9@advancedtelematic.com>
+Date: Fri, 10 Nov 2017 18:04:52 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="8t9RHnE3ZwKMSgU+"
-Content-Disposition: inline
-In-Reply-To: <1509951528-30976-2-git-send-email-longpeng2@huawei.com>
-Subject: Re: [Qemu-devel] [v21 RESEND 1/2] virtio-crypto: Add virtio crypto
- device specification
+In-Reply-To: <CAEUhbmXJZnLZgx8b2ZHV1wfqZvO=agSsp0Yvi7FQQfV6MM1cnA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [U-Boot] Support of latest qemux86-64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,86 +34,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Longpeng(Mike)" <longpeng2@huawei.com>
-Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, pasic@linux.vnet.ibm.com, Ola.Liljedahl@arm.com, brian.a.keating@intel.com, wangxinxin.wang@huawei.com, mst@redhat.com, xin.zeng@intel.com, jasowang@redhat.com, luonengjun@huawei.com, agraf@suse.de, john.griffin@intel.com, arei.gonglei@huawei.com, liang.j.ma@intel.com, stefanha@redhat.com, jianjay.zhou@huawei.com, cornelia.huck@de.ibm.com, Varun.Sethi@freescale.com, Jani.Kokkonen@huawei.com, vincent.jardin@6wind.com, denglingli@chinamobile.com, weidong.huang@huawei.com
+To: Bin Meng <bmeng.cn@gmail.com>, Igor Mammedov <imammedo@redhat.com>
+Cc: U-Boot Mailing List <u-boot@lists.denx.de>, qemu-devel@nongnu.org
+
+New guess:
+
+in the most safe configuration of u-boot (CONFIG_SMP=3Dn, lacpi disabled)=
+
+with Igor's patch applied `qemu-system-i386 -bios /path/to/uboot.rom`
+fails on the first 'ret' instruction. GDB shows that memory at $esp
+(0xdfffc at the entrance to board_init_f_mem) and everything around it
+is zero despite 'call' and 'push' instructions executed. If you go one
+commit before the breaking one it works fine, stuff gets put onto stack.
+Could it that be that stack itself is in this 'readonly' area?
+
+Thanks,
+Anton Gerasimov
+
+On 11/09/2017 02:58 AM, Bin Meng wrote:
+> On Wed, Nov 8, 2017 at 9:05 PM, Anton Gerasimov
+> <anton@advancedtelematic.com> wrote:
+>> Adding Igor Mammedov to the loop.
+>>
+> Really add Igor Mammedov.
+>
+> Igor, can you help look at this?
+>
+>> On 11/08/2017 01:59 PM, Anton Gerasimov wrote:
+>>> To whoever might be interested: I've bisected qemu and the breaking
+>>> commit is 208fa0e43645edd0b0d8f838857dfc79daff40a8 (pc: make 'pc.rom'=
+
+>>> readonly when machine has PCI enabled). It's just three lines added,
+>>> I'll paste the whole patch here. Not quite sure what can we do here t=
+hough.
+>>>
+>>>
+>>>   diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+>>>   index 22e16031b0..59435390ba 100644
+>>>   --- a/hw/i386/pc.c
+>>>   +++ b/hw/i386/pc.c
+>>>   @@ -1443,6 +1443,9 @@ void pc_memory_init(PCMachineState *pcms,
+>>>        option_rom_mr =3D g_malloc(sizeof(*option_rom_mr));
+>>>        memory_region_init_ram(option_rom_mr, NULL, "pc.rom", PC_ROM_S=
+IZE,
+>>>                               &error_fatal);
+>>>   +    if (pcmc->pci_enabled) {
+>>>   +        memory_region_set_readonly(option_rom_mr, true);
+>>>   +    }
+>>>        memory_region_add_subregion_overlap(rom_memory,
+>>>                                            PC_ROM_MIN_VGA,
+>>>                                            option_rom_mr,
+>>>
+>>>
+> Regards,
+> Bin
 
 
---8t9RHnE3ZwKMSgU+
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Mon, Nov 06, 2017 at 02:58:47PM +0800, Longpeng(Mike) wrote:
-> From: Gonglei <arei.gonglei@huawei.com>
->=20
-> The virtio crypto device is a virtual crypto device (ie. hardware
-> crypto accelerator card). Currently, the virtio crypto device provides
-> the following crypto services: CIPHER, MAC, HASH, and AEAD.
->=20
-> In this patch, CIPHER, MAC, HASH, AEAD services are introduced.
->=20
-> VIRTIO-153
->=20
-> Signed-off-by: Gonglei <arei.gonglei@huawei.com>
-> Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
-
-This doesn't build cleanly for me on commit
-2faf9b0666886abc0ca99f6813446a4e2a04f3ca
-(https://github.com/oasis-tcs/virtio-spec master):
-
-  $=20
-  $ ./makeall.sh
-  ! LaTeX Error: Lonely \item--perhaps a missing list environment.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...
-
-l.384 \item I
-             f the VIRTIO_CRYPTO_F_MUX_MODE feature bit is NOT negotiated, =
-the
-?
-
-> diff --git a/acknowledgements.tex b/acknowledgements.tex
-> index 6c86d12..c4b6844 100644
-> --- a/acknowledgements.tex
-> +++ b/acknowledgements.tex
-> @@ -26,6 +26,8 @@ Sasha Levin,	Oracle	\newline
->  Sergey Tverdyshev,	Thales e-Security	\newline
->  Stefan Hajnoczi,	Red Hat	\newline
->  Tom Lyon,	Samya Systems, Inc.	\newline
-> +Lei Gong,	Huawei	\newline
-> +Peng Long,	Huawei	\newline
->  \end{oasistitlesection}
-> =20
->  The following non-members have provided valuable feedback on this
-> @@ -43,4 +45,5 @@ Laura Novich, Red Hat	\newline
->  Patrick Durusau,	Technical Advisory Board, OASIS	\newline
->  Thomas Huth,	IBM	\newline
->  Yan Vugenfirer, Red Hat / Daynix	\newline
-> +Halil Pasic,	IBM	\newline
->  \end{oasistitlesection}
-
-These lists of names are in alphabetical order.  Please insert names at
-the appropriate place.
-
-> +If VIRTIO_CRYPTO_F_MUX_MODE is negotioated the device may support both s=
-ession mode
-
-s/negotioated/negotiated/
-
---8t9RHnE3ZwKMSgU+
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJaBdusAAoJEJykq7OBq3PI8ysH/2fP8F0dD42DGe8tR3R8aKjM
-f++zo6InB5PL3dyjyuFLsktGH/DVcaI3YSVf4h4fz3BNHpGYtbSI9mZsnRTgOVv0
-c51akttQsLjdHiJ3/tmLXwlFlcY+b/xyPIb6/v1XXLVBqqZ9Zmib0EUwP1i2z+eL
-oLwh1vqVtIdvYIUckJ6DnXU35zdSHdLMJTmMe2Y8c02tEuQq9As4sI9MaR3SZJCt
-hDSA1t+Pf5gubJQ6sCY7x/pq24rz2MHCpJJ96SAjEOza5cr/SjvReEmuR6Z7P7Ub
-qzaKepBuf5Rybso80Z9DZ4x0IN2WQdxj4eNNMh2qruWm4D1Cp3jSR5H0UR5WcIQ=
-=O3QO
------END PGP SIGNATURE-----
-
---8t9RHnE3ZwKMSgU+--
+--=20
+Anton Gerasimov, ATS Advanced Telematic Systems GmbH
+Kantstrasse 162, 10623 Berlin
+Managing Directors: Dirk P=C3=B6schl, Armin G. Schmidt
+Register Court: HRB 151501 B, Amtsgericht Charlottenburg
