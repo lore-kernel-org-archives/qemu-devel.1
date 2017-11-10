@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47840)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47913)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1eDB7f-00087X-7L
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 10:21:39 -0500
+	(envelope-from <clg@kaod.org>) id 1eDB7m-0008GK-CQ
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 10:21:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1eDB7b-0006sT-3O
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 10:21:35 -0500
-Received: from 10.mo68.mail-out.ovh.net ([46.105.79.203]:41869)
+	(envelope-from <clg@kaod.org>) id 1eDB7i-00073p-9N
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 10:21:42 -0500
+Received: from 4.mo68.mail-out.ovh.net ([46.105.59.63]:53669)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1eDB7a-0006p3-Qz
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 10:21:31 -0500
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1eDB7i-000724-0D
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 10:21:38 -0500
 Received: from player737.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo68.mail-out.ovh.net (Postfix) with ESMTP id 73EA09C33C
-	for <qemu-devel@nongnu.org>; Fri, 10 Nov 2017 16:21:29 +0100 (CET)
+	by mo68.mail-out.ovh.net (Postfix) with ESMTP id C6D679C0CA
+	for <qemu-devel@nongnu.org>; Fri, 10 Nov 2017 16:21:36 +0100 (CET)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Fri, 10 Nov 2017 15:20:14 +0000
-Message-Id: <20171110152017.24324-9-clg@kaod.org>
+Date: Fri, 10 Nov 2017 15:20:15 +0000
+Message-Id: <20171110152017.24324-10-clg@kaod.org>
 In-Reply-To: <20171110152017.24324-1-clg@kaod.org>
 References: <20171110152017.24324-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH for-2.12 v3 08/11] spapr: introduce a
- XICSFabric irq_is_lsi() operation
+Subject: [Qemu-devel] [PATCH for-2.12 v3 09/11] spapr: split the IRQ number
+ space for LSI interrupts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,223 +33,161 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Greg Kurz <groug@kaod.org>, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 Cc: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-It will be used later on to distinguish the allocation of an LSI
-interrupt from an MSI and also to reduce the use of the ICSIRQState
-array of the ICSState object, which is on our way to introduce XIVE.
+The type of an interrupt, MSI or LSI, is stored under the flag
+attribute of the ICSIRQState array. To reduce the use of this array
+and consequently of the ICSState object (This is needed to introduce
+the new XIVE model), we choose to split the IRQ number space of the
+machine in two: first the LSIs and then the MSIs.
 
-The 'irq' parameter continues to refer to the global IRQ number space.
+This also has the benefit to keep the LSI IRQ numbers in a well known
+range which will be useful for PHB hotplug.
 
-On PowerNV, only the PSI controller interrupts are handled and they
-are all LSIs.
+This change only applies to the latest pseries machines. Older
+machines still use the ICSIRQState array to define the IRQ type.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- hw/intc/xics.c        | 26 +++++++++++++++++---------
- hw/intc/xics_kvm.c    |  4 ++--
- hw/ppc/pnv.c          | 16 ++++++++++++++++
- hw/ppc/spapr.c        |  9 +++++++++
- include/hw/ppc/xics.h |  2 ++
- 5 files changed, 46 insertions(+), 11 deletions(-)
 
-diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-index 2c4899f278e2..42880e736697 100644
---- a/hw/intc/xics.c
-+++ b/hw/intc/xics.c
-@@ -33,6 +33,7 @@
- #include "trace.h"
- #include "qemu/timer.h"
- #include "hw/ppc/xics.h"
-+#include "hw/ppc/spapr.h"
- #include "qemu/error-report.h"
- #include "qapi/visitor.h"
- #include "monitor/monitor.h"
-@@ -70,8 +71,7 @@ void ics_pic_print_info(ICSState *ics, Monitor *mon)
+ Changes since v2 :
+
+ - introduced a second set of XICSFabric IRQ operations for older
+   pseries machines
+
+ hw/intc/xics_spapr.c  |  6 +++---
+ hw/ppc/spapr.c        | 33 +++++++++++++++++++++++++++++----
+ include/hw/ppc/xics.h |  2 +-
+ 3 files changed, 33 insertions(+), 8 deletions(-)
+
+diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
+index de9e65d35247..b8e91aaf52bd 100644
+--- a/hw/intc/xics_spapr.c
++++ b/hw/intc/xics_spapr.c
+@@ -260,7 +260,7 @@ int spapr_ics_alloc(ICSState *ics, int irq_hint, bool=
+ lsi, Error **errp)
          }
-         monitor_printf(mon, "  %4x %s %02x %02x\n",
-                        ics->offset + i,
--                       (irq->flags & XICS_FLAGS_IRQ_LSI) ?
--                       "LSI" : "MSI",
-+                       ics_is_lsi(ics, i) ? "LSI" : "MSI",
-                        irq->priority, irq->status);
-     }
- }
-@@ -377,6 +377,14 @@ static const TypeInfo icp_info =3D {
- /*
-  * ICS: Source layer
-  */
-+bool ics_is_lsi(ICSState *ics, int srcno)
-+{
-+    XICSFabric *xi =3D ics->xics;
-+    XICSFabricClass *xic =3D XICS_FABRIC_GET_CLASS(xi);
-+
-+    return xic->irq_is_lsi(xi, srcno + ics->offset);
-+}
-+
- static void ics_simple_resend_msi(ICSState *ics, int srcno)
- {
-     ICSIRQState *irq =3D ics->irqs + srcno;
-@@ -435,7 +443,7 @@ static void ics_simple_set_irq(void *opaque, int srcn=
-o, int val)
- {
-     ICSState *ics =3D (ICSState *)opaque;
-=20
--    if (ics->irqs[srcno].flags & XICS_FLAGS_IRQ_LSI) {
-+    if (ics_is_lsi(ics, srcno)) {
-         ics_simple_set_irq_lsi(ics, srcno, val);
+         irq =3D irq_hint;
      } else {
-         ics_simple_set_irq_msi(ics, srcno, val);
-@@ -472,7 +480,7 @@ void ics_simple_write_xive(ICSState *ics, int srcno, =
-int server,
-     trace_xics_ics_simple_write_xive(ics->offset + srcno, srcno, server,
-                                      priority);
-=20
--    if (ics->irqs[srcno].flags & XICS_FLAGS_IRQ_LSI) {
-+    if (ics_is_lsi(ics, srcno)) {
-         ics_simple_write_xive_lsi(ics, srcno);
+-        irq =3D xic->irq_alloc_block(ics->xics, 1, 1);
++        irq =3D xic->irq_alloc_block(ics->xics, 1, 1, lsi);
+         if (irq < 0) {
+             error_setg(errp, "can't allocate IRQ: no IRQ left");
+             return -1;
+@@ -297,9 +297,9 @@ int spapr_ics_alloc_block(ICSState *ics, int num, boo=
+l lsi,
+     if (align) {
+         assert((num =3D=3D 1) || (num =3D=3D 2) || (num =3D=3D 4) ||
+                (num =3D=3D 8) || (num =3D=3D 16) || (num =3D=3D 32));
+-        first =3D xic->irq_alloc_block(ics->xics, num, num);
++        first =3D xic->irq_alloc_block(ics->xics, num, num, lsi);
      } else {
-         ics_simple_write_xive_msi(ics, srcno);
-@@ -484,10 +492,10 @@ static void ics_simple_reject(ICSState *ics, uint32=
-_t nr)
-     ICSIRQState *irq =3D ics->irqs + nr - ics->offset;
-=20
-     trace_xics_ics_simple_reject(nr, nr - ics->offset);
--    if (irq->flags & XICS_FLAGS_IRQ_MSI) {
--        irq->status |=3D XICS_STATUS_REJECTED;
--    } else if (irq->flags & XICS_FLAGS_IRQ_LSI) {
-+    if (ics_is_lsi(ics, nr - ics->offset)) {
-         irq->status &=3D ~XICS_STATUS_SENT;
-+    } else {
-+        irq->status |=3D XICS_STATUS_REJECTED;
+-        first =3D xic->irq_alloc_block(ics->xics, num, 1);
++        first =3D xic->irq_alloc_block(ics->xics, num, 1, lsi);
      }
- }
-=20
-@@ -497,7 +505,7 @@ static void ics_simple_resend(ICSState *ics)
-=20
-     for (i =3D 0; i < ics->nr_irqs; i++) {
-         /* FIXME: filter by server#? */
--        if (ics->irqs[i].flags & XICS_FLAGS_IRQ_LSI) {
-+        if (ics_is_lsi(ics, i)) {
-             ics_simple_resend_lsi(ics, i);
-         } else {
-             ics_simple_resend_msi(ics, i);
-@@ -512,7 +520,7 @@ static void ics_simple_eoi(ICSState *ics, uint32_t nr=
-)
-=20
-     trace_xics_ics_simple_eoi(nr);
-=20
--    if (ics->irqs[srcno].flags & XICS_FLAGS_IRQ_LSI) {
-+    if (ics_is_lsi(ics, srcno)) {
-         irq->status &=3D ~XICS_STATUS_SENT;
-     }
- }
-diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
-index 3091ad3ac2c8..2f10637c9f7c 100644
---- a/hw/intc/xics_kvm.c
-+++ b/hw/intc/xics_kvm.c
-@@ -258,7 +258,7 @@ static int ics_set_kvm_state(ICSState *ics, int versi=
-on_id)
-             state |=3D KVM_XICS_MASKED;
-         }
-=20
--        if (ics->irqs[i].flags & XICS_FLAGS_IRQ_LSI) {
-+        if (ics_is_lsi(ics, i)) {
-             state |=3D KVM_XICS_LEVEL_SENSITIVE;
-             if (irq->status & XICS_STATUS_ASSERTED) {
-                 state |=3D KVM_XICS_PENDING;
-@@ -293,7 +293,7 @@ static void ics_kvm_set_irq(void *opaque, int srcno, =
-int val)
-     int rc;
-=20
-     args.irq =3D srcno + ics->offset;
--    if (ics->irqs[srcno].flags & XICS_FLAGS_IRQ_MSI) {
-+    if (!ics_is_lsi(ics, srcno)) {
-         if (!val) {
-             return;
-         }
-diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-index 8288940ef9d7..958223376b4c 100644
---- a/hw/ppc/pnv.c
-+++ b/hw/ppc/pnv.c
-@@ -1035,6 +1035,21 @@ static bool pnv_irq_test(XICSFabric *xi, int irq)
-     return false;
- }
-=20
-+static bool pnv_irq_is_lsi(XICSFabric *xi, int irq)
-+{
-+    PnvMachineState *pnv =3D POWERNV_MACHINE(xi);
-+    int i;
-+
-+    /* PowerNV machine only has PSI interrupts which are all LSIs */
-+    for (i =3D 0; i < pnv->num_chips; i++) {
-+        ICSState *ics =3D &pnv->chips[i]->psi.ics;
-+        if (ics_valid_irq(ics, irq)) {
-+            return true;
-+        }
-+    }
-+    return false;
-+}
-+
- static void pnv_pic_print_info(InterruptStatsProvider *obj,
-                                Monitor *mon)
- {
-@@ -1120,6 +1135,7 @@ static void powernv_machine_class_init(ObjectClass =
-*oc, void *data)
-     xic->ics_get =3D pnv_ics_get;
-     xic->ics_resend =3D pnv_ics_resend;
-     xic->irq_test =3D pnv_irq_test;
-+    xic->irq_is_lsi =3D pnv_irq_is_lsi;
-     ispc->print_info =3D pnv_pic_print_info;
-=20
-     powernv_machine_class_props_init(oc);
+     if (first < 0) {
+         error_setg(errp, "can't find a free %d-IRQ block", num);
 diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 1cbbd7715a85..ce314fcf38db 100644
+index ce314fcf38db..f14eae6196cd 100644
 --- a/hw/ppc/spapr.c
 +++ b/hw/ppc/spapr.c
-@@ -3628,6 +3628,14 @@ static void spapr_irq_free_block_2_11(XICSFabric *=
-xi, int irq, int num)
+@@ -3596,7 +3596,8 @@ static bool spapr_irq_test_2_11(XICSFabric *xi, int=
+ irq)
+     return !ICS_IRQ_FREE(ics, srcno);
+ }
+=20
+-static int spapr_irq_alloc_block_2_11(XICSFabric *xi, int count, int ali=
+gn)
++static int spapr_irq_alloc_block_2_11(XICSFabric *xi, int count, int ali=
+gn,
++                                      bool lsi)
+ {
+     sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
+     ICSState *ics =3D spapr->ics;
+@@ -3628,7 +3629,7 @@ static void spapr_irq_free_block_2_11(XICSFabric *x=
+i, int irq, int num)
      }
+ }
+=20
+-static bool spapr_irq_is_lsi(XICSFabric *xi, int irq)
++static bool spapr_irq_is_lsi_2_11(XICSFabric *xi, int irq)
+ {
+     sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
+     int srcno =3D irq - spapr->ics->offset;
+@@ -3644,10 +3645,21 @@ static bool spapr_irq_test(XICSFabric *xi, int ir=
+q)
+     return test_bit(srcno, spapr->irq_map);
+ }
+=20
+-static int spapr_irq_alloc_block(XICSFabric *xi, int count, int align)
++
++/*
++ * Let's provision 4 LSIs per PHBs
++ */
++#define SPAPR_MAX_LSI (SPAPR_MAX_PHBS * 4)
++
++/*
++ * Split the IRQ number space of the machine in two: first the LSIs
++ * and then the MSIs. This allows us to keep the LSI IRQ numbers in a
++ * well known range which is useful for PHB hotplug.
++ */
++static int spapr_irq_alloc_block(XICSFabric *xi, int count, int align, b=
+ool lsi)
+ {
+     sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
+-    int start =3D 0;
++    int start =3D lsi ? 0 : SPAPR_MAX_LSI;
+     int srcno;
+=20
+     /*
+@@ -3664,6 +3676,10 @@ static int spapr_irq_alloc_block(XICSFabric *xi, i=
+nt count, int align)
+         return -1;
+     }
+=20
++    if (lsi && srcno >=3D SPAPR_MAX_LSI) {
++        return -1;
++    }
++
+     bitmap_set(spapr->irq_map, srcno, count);
+     return srcno + spapr->irq_base;
+ }
+@@ -3676,6 +3692,14 @@ static void spapr_irq_free_block(XICSFabric *xi, i=
+nt irq, int num)
+     bitmap_clear(spapr->irq_map, srcno, num);
  }
 =20
 +static bool spapr_irq_is_lsi(XICSFabric *xi, int irq)
 +{
 +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
-+    int srcno =3D irq - spapr->ics->offset;
++    int srcno =3D irq - spapr->irq_base;
 +
-+    return spapr->ics->irqs[srcno].flags & XICS_FLAGS_IRQ_LSI;
++    return (srcno >=3D 0) && (srcno < SPAPR_MAX_LSI);
 +}
 +
- static bool spapr_irq_test(XICSFabric *xi, int irq)
+ static void spapr_pic_print_info(InterruptStatsProvider *obj,
+                                  Monitor *mon)
  {
-     sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
-@@ -3765,6 +3773,7 @@ static void spapr_machine_class_init(ObjectClass *o=
-c, void *data)
-     xic->irq_test =3D spapr_irq_test;
-     xic->irq_alloc_block =3D spapr_irq_alloc_block;
-     xic->irq_free_block =3D spapr_irq_free_block;
-+    xic->irq_is_lsi =3D spapr_irq_is_lsi;
+@@ -3860,6 +3884,7 @@ static void spapr_machine_2_11_class_options(Machin=
+eClass *mc)
+     xic->irq_test =3D spapr_irq_test_2_11;
+     xic->irq_alloc_block =3D spapr_irq_alloc_block_2_11;
+     xic->irq_free_block =3D spapr_irq_free_block_2_11;
++    xic->irq_is_lsi =3D spapr_irq_is_lsi_2_11;
+ }
 =20
-     ispc->print_info =3D spapr_pic_print_info;
-     /* Force NUMA node memory size to be a multiple of
+ DEFINE_SPAPR_MACHINE(2_11, "2.11", false);
 diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-index 30e7f2e0a7dd..478f8e510179 100644
+index 478f8e510179..292b929e88eb 100644
 --- a/include/hw/ppc/xics.h
 +++ b/include/hw/ppc/xics.h
-@@ -179,6 +179,7 @@ typedef struct XICSFabricClass {
+@@ -177,7 +177,7 @@ typedef struct XICSFabricClass {
+     ICPState *(*icp_get)(XICSFabric *xi, int server);
+     /* IRQ allocator helpers */
      bool (*irq_test)(XICSFabric *xi, int irq);
-     int (*irq_alloc_block)(XICSFabric *xi, int count, int align);
+-    int (*irq_alloc_block)(XICSFabric *xi, int count, int align);
++    int (*irq_alloc_block)(XICSFabric *xi, int count, int align, bool ls=
+i);
      void (*irq_free_block)(XICSFabric *xi, int irq, int num);
-+    bool (*irq_is_lsi)(XICSFabric *xi, int irq);
+     bool (*irq_is_lsi)(XICSFabric *xi, int irq);
  } XICSFabricClass;
-=20
- #define XICS_IRQS_SPAPR               1024
-@@ -205,6 +206,7 @@ void ics_simple_write_xive(ICSState *ics, int nr, int=
- server,
- void ics_set_irq_type(ICSState *ics, int srcno, bool lsi);
- void icp_pic_print_info(ICPState *icp, Monitor *mon);
- void ics_pic_print_info(ICSState *ics, Monitor *mon);
-+bool ics_is_lsi(ICSState *ics, int srno);
-=20
- void ics_resend(ICSState *ics);
- void icp_resend(ICPState *ss);
 --=20
 2.13.6
