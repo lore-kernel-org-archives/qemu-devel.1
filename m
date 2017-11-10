@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38943)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42281)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eD3VS-0001WQ-73
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 02:13:39 -0500
+	(envelope-from <kernellwp@gmail.com>) id 1eD40i-0004zb-61
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 02:45:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eD3VN-0001TK-Rn
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 02:13:38 -0500
-Resent-Message-Id: <E1eD3VN-0001TK-Rn@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21447)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1eD3VM-0001QX-Su
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 02:13:33 -0500
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <151018330646.354.14634578860738352867@bafd83ae6430>
-In-Reply-To: <20171108225340.10194-1-lepton@google.com>
+	(envelope-from <kernellwp@gmail.com>) id 1eD40f-0004ye-1z
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 02:45:56 -0500
+Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:44100)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <kernellwp@gmail.com>) id 1eD40e-0004w4-SL
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 02:45:52 -0500
+Received: by mail-pg0-x241.google.com with SMTP id j3so6836136pga.1
+	for <qemu-devel@nongnu.org>; Thu, 09 Nov 2017 23:45:52 -0800 (PST)
+From: Wanpeng Li <kernellwp@gmail.com>
+Date: Thu,  9 Nov 2017 23:45:47 -0800
+Message-Id: <1510299947-11287-1-git-send-email-wanpeng.li@hotmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 8 Nov 2017 15:21:47 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH] slirp: don't zero ti_i since we access it
- later.
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH] target-i386: adds PV_TLB_FLUSH CPUID feature
+ bit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,50 +27,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: famz@redhat.com, samuel.thibault@gnu.org, lepton@google.com
+To: qemu-devel@nongnu.org, kvm@vger.kernel.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>, Wanpeng Li <wanpeng.li@hotmail.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtQQVRDSF0gc2xpcnA6IGRvbid0IHplcm8gdGlfaSBzaW5jZSB3ZSBhY2Nlc3MgaXQg
-bGF0ZXIuClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAyMDE3MTEwODIyNTM0MC4xMDE5NC0xLWxl
-cHRvbkBnb29nbGUuY29tCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpC
-QVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpm
-YWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmln
-IC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0l
-SCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hl
-Y2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4i
-CiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0
-Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAg
-ICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVO
-RCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQK
-RnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWdd
-ICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE3MTEwODIyNTM0MC4xMDE5NC0xLWxlcHRvbkBnb29n
-bGUuY29tIC0+IHBhdGNoZXcvMjAxNzExMDgyMjUzNDAuMTAxOTQtMS1sZXB0b25AZ29vZ2xlLmNv
-bQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjU2NmJhMTdhMGIgc2xpcnA6IGRvbid0
-IHplcm8gdGlfaSBzaW5jZSB3ZSBhY2Nlc3MgaXQgbGF0ZXIuCgo9PT0gT1VUUFVUIEJFR0lOID09
-PQpDaGVja2luZyBQQVRDSCAxLzE6IHNsaXJwOiBkb24ndCB6ZXJvIHRpX2kgc2luY2Ugd2UgYWNj
-ZXNzIGl0IGxhdGVyLi4uLgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJz
-CiMyMTogRklMRTogc2xpcnAvdGNwX3N1YnIuYzoxNTE6CiteSV5Jc3dpdGNoIChhZikgeyQKCkVS
-Uk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzIyOiBGSUxFOiBzbGlycC90
-Y3Bfc3Vici5jOjE1MjoKK15JXkljYXNlIEFGX0lORVQ6JAoKRVJST1I6IGNvZGUgaW5kZW50IHNo
-b3VsZCBuZXZlciB1c2UgdGFicwojMjM6IEZJTEU6IHNsaXJwL3RjcF9zdWJyLmM6MTUzOgorXkle
-SSAgICB0aS0+dGkudGlfaTQuaWhfeDEgPSAwOyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQg
-bmV2ZXIgdXNlIHRhYnMKIzI0OiBGSUxFOiBzbGlycC90Y3Bfc3Vici5jOjE1NDoKK15JXkkgICAg
-YnJlYWs7JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMjU6IEZJ
-TEU6IHNsaXJwL3RjcF9zdWJyLmM6MTU1OgorXkleSWNhc2UgQUZfSU5FVDY6JAoKRVJST1I6IGNv
-ZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMjY6IEZJTEU6IHNsaXJwL3RjcF9zdWJy
-LmM6MTU2OgorXkleSSAgICB0aS0+dGkudGlfaTYuaWhfeDEgPSAwOyQKCkVSUk9SOiBjb2RlIGlu
-ZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzI3OiBGSUxFOiBzbGlycC90Y3Bfc3Vici5jOjE1
-NzoKK15JXkkgICAgYnJlYWs7JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2Ug
-dGFicwojMjg6IEZJTEU6IHNsaXJwL3RjcF9zdWJyLmM6MTU4OgorXkleSWRlZmF1bHQ6JAoKRVJS
-T1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMjk6IEZJTEU6IHNsaXJwL3Rj
-cF9zdWJyLmM6MTU5OgorXkleSSAgICBnX2Fzc2VydF9ub3RfcmVhY2hlZCgpOyQKCkVSUk9SOiBj
-b2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzMwOiBGSUxFOiBzbGlycC90Y3Bfc3Vi
-ci5jOjE2MDoKK15JXkl9JAoKdG90YWw6IDEwIGVycm9ycywgMCB3YXJuaW5ncywgMTcgbGluZXMg
-Y2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJ
-ZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8g
-dGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBV
-VCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBn
-ZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4K
-UGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
+From: Wanpeng Li <wanpeng.li@hotmail.com>
+
+Adds PV_TLB_FLUSH CPUID feature bit.
+
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Radim Krčmář <rkrcmar@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
+Signed-off-by: Wanpeng Li <wanpeng.li@hotmail.com>
+---
+ target/i386/cpu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 6f21a5e..ecebc5a 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -347,7 +347,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
+         .feat_names = {
+             "kvmclock", "kvm-nopiodelay", "kvm-mmu", "kvmclock",
+             "kvm-asyncpf", "kvm-steal-time", "kvm-pv-eoi", "kvm-pv-unhalt",
+-            NULL, NULL, NULL, NULL,
++            NULL, "kvm-pv-tlb-flush", NULL, NULL,
+             NULL, NULL, NULL, NULL,
+             NULL, NULL, NULL, NULL,
+             NULL, NULL, NULL, NULL,
+-- 
+2.7.4
