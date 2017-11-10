@@ -1,15 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48014)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48348)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eDD44-0007jv-QR
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 12:26:02 -0500
+	(envelope-from <anton@advancedtelematic.com>) id 1eDD5G-00008m-Ps
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 12:27:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eDD43-0004vF-F7
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 12:26:00 -0500
-From: Max Reitz <mreitz@redhat.com>
-Date: Fri, 10 Nov 2017 18:25:45 +0100
-Message-Id: <20171110172545.32609-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 for-2.11] block: Make bdrv_next() keep
- strong references
+	(envelope-from <anton@advancedtelematic.com>) id 1eDD5C-0005nY-Kn
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 12:27:14 -0500
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:33356)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <anton@advancedtelematic.com>)
+	id 1eDD5C-0005ms-Cm
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 12:27:10 -0500
+Received: by mail-wm0-x241.google.com with SMTP id r68so6625065wmr.0
+	for <qemu-devel@nongnu.org>; Fri, 10 Nov 2017 09:27:10 -0800 (PST)
+From: Anton Gerasimov <anton@advancedtelematic.com>
+References: <cb94e9b2-d7c6-68ab-bb25-42f7d8113e03@advancedtelematic.com>
+	<CAEUhbmVTaJmL1jG8aBPPcJ-d+vKba8xhLgc=+7Fd8HHUvVW+-Q@mail.gmail.com>
+	<9b2efc90-3b0e-b13b-27bb-117473c8b41b@advancedtelematic.com>
+	<2fd2077a-9823-41e0-0deb-4142b20259d5@advancedtelematic.com>
+	<CAEUhbmXJZnLZgx8b2ZHV1wfqZvO=agSsp0Yvi7FQQfV6MM1cnA@mail.gmail.com>
+	<1cc32460-6067-0c1c-0182-eb17933293d9@advancedtelematic.com>
+Message-ID: <ae876253-6a29-eacb-b990-860146a297b2@advancedtelematic.com>
+Date: Fri, 10 Nov 2017 18:25:43 +0100
+MIME-Version: 1.0
+In-Reply-To: <1cc32460-6067-0c1c-0182-eb17933293d9@advancedtelematic.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [U-Boot] Support of latest qemux86-64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,240 +35,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Eric Blake <eblake@redhat.com>
+To: Bin Meng <bmeng.cn@gmail.com>, Igor Mammedov <imammedo@redhat.com>
+Cc: U-Boot Mailing List <u-boot@lists.denx.de>, qemu-devel@nongnu.org
 
-On one hand, it is a good idea for bdrv_next() to return a strong
-reference because ideally nearly every pointer should be refcounted.
-This fixes intermittent failure of iotest 194.
+Yes, apparently 0xdfffc is in ROM area for QEMU (0xc0000 -- 0xe0000,
+defined in include/hw/loader.h). The next thing to figure out is why
+u-boot uses it as a stack area.
 
-On the other, it is absolutely necessary for bdrv_next() itself to keep
-a strong reference to both the BB (in its first phase) and the BDS (at
-least in the second phase) because when called the next time, it will
-dereference those objects to get a link to the next one.  Therefore, it
-needs these objects to stay around until then.  Just storing the pointer
-to the next in the iterator is not really viable because that pointer
-might become invalid as well.
+Best regards,
+Anton Gerasimov
 
-Both arguments taken together means we should probably just invoke
-bdrv_ref() and blk_ref() in bdrv_next().  This means we have to assert
-that bdrv_next() is always called from the main loop, but that was
-probably necessary already before this patch and judging from the
-callers, it also looks to actually be the case.
+On 11/10/2017 06:04 PM, Anton Gerasimov wrote:
+> New guess:
+>
+> in the most safe configuration of u-boot (CONFIG_SMP=n, lacpi disabled)
+> with Igor's patch applied `qemu-system-i386 -bios /path/to/uboot.rom`
+> fails on the first 'ret' instruction. GDB shows that memory at $esp
+> (0xdfffc at the entrance to board_init_f_mem) and everything around it
+> is zero despite 'call' and 'push' instructions executed. If you go one
+> commit before the breaking one it works fine, stuff gets put onto stack.
+> Could it that be that stack itself is in this 'readonly' area?
+>
+> Thanks,
+> Anton Gerasimov
+>
+> On 11/09/2017 02:58 AM, Bin Meng wrote:
+>> On Wed, Nov 8, 2017 at 9:05 PM, Anton Gerasimov
+>> <anton@advancedtelematic.com> wrote:
+>>> Adding Igor Mammedov to the loop.
+>>>
+>> Really add Igor Mammedov.
+>>
+>> Igor, can you help look at this?
+>>
+>>> On 11/08/2017 01:59 PM, Anton Gerasimov wrote:
+>>>> To whoever might be interested: I've bisected qemu and the breaking
+>>>> commit is 208fa0e43645edd0b0d8f838857dfc79daff40a8 (pc: make 'pc.rom'
+>>>> readonly when machine has PCI enabled). It's just three lines added,
+>>>> I'll paste the whole patch here. Not quite sure what can we do here though.
+>>>>
+>>>>
+>>>>   diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+>>>>   index 22e16031b0..59435390ba 100644
+>>>>   --- a/hw/i386/pc.c
+>>>>   +++ b/hw/i386/pc.c
+>>>>   @@ -1443,6 +1443,9 @@ void pc_memory_init(PCMachineState *pcms,
+>>>>        option_rom_mr = g_malloc(sizeof(*option_rom_mr));
+>>>>        memory_region_init_ram(option_rom_mr, NULL, "pc.rom", PC_ROM_SIZE,
+>>>>                               &error_fatal);
+>>>>   +    if (pcmc->pci_enabled) {
+>>>>   +        memory_region_set_readonly(option_rom_mr, true);
+>>>>   +    }
+>>>>        memory_region_add_subregion_overlap(rom_memory,
+>>>>                                            PC_ROM_MIN_VGA,
+>>>>                                            option_rom_mr,
+>>>>
+>>>>
+>> Regards,
+>> Bin
+>
 
-Keeping these strong references means however that callers need to give
-them up if they decide to abort the iteration early.  They can do so
-through the new bdrv_next_cleanup() function.
-
-Suggested-by: Kevin Wolf <kwolf@redhat.com>
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
-v2: Instead of keeping the strong reference in bdrv_drain_all_*() only,
-    have them for all callers of bdrv_next() [Fam, Kevin]
-    (Completely different patch now, so no git-backport-diff included
-     here)
----
- include/block/block.h |  1 +
- block.c               |  3 +++
- block/block-backend.c | 48 ++++++++++++++++++++++++++++++++++++++++++++++--
- block/snapshot.c      |  6 ++++++
- migration/block.c     |  1 +
- 5 files changed, 57 insertions(+), 2 deletions(-)
-
-diff --git a/include/block/block.h b/include/block/block.h
-index fbc21daf62..c05cac57e5 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -461,6 +461,7 @@ typedef struct BdrvNextIterator {
- 
- BlockDriverState *bdrv_first(BdrvNextIterator *it);
- BlockDriverState *bdrv_next(BdrvNextIterator *it);
-+void bdrv_next_cleanup(BdrvNextIterator *it);
- 
- BlockDriverState *bdrv_next_monitor_owned(BlockDriverState *bs);
- bool bdrv_is_encrypted(BlockDriverState *bs);
-diff --git a/block.c b/block.c
-index 0ed0c27140..344551d6f8 100644
---- a/block.c
-+++ b/block.c
-@@ -4226,6 +4226,7 @@ void bdrv_invalidate_cache_all(Error **errp)
-         aio_context_release(aio_context);
-         if (local_err) {
-             error_propagate(errp, local_err);
-+            bdrv_next_cleanup(&it);
-             return;
-         }
-     }
-@@ -4297,6 +4298,7 @@ int bdrv_inactivate_all(void)
-         for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
-             ret = bdrv_inactivate_recurse(bs, pass);
-             if (ret < 0) {
-+                bdrv_next_cleanup(&it);
-                 goto out;
-             }
-         }
-@@ -4828,6 +4830,7 @@ bool bdrv_is_first_non_filter(BlockDriverState *candidate)
- 
-         /* candidate is the first non filter */
-         if (perm) {
-+            bdrv_next_cleanup(&it);
-             return true;
-         }
-     }
-diff --git a/block/block-backend.c b/block/block-backend.c
-index 45d9101be3..e736a63eb7 100644
---- a/block/block-backend.c
-+++ b/block/block-backend.c
-@@ -442,21 +442,37 @@ BlockBackend *blk_next(BlockBackend *blk)
-  * the monitor or attached to a BlockBackend */
- BlockDriverState *bdrv_next(BdrvNextIterator *it)
- {
--    BlockDriverState *bs;
-+    BlockDriverState *bs, *old_bs;
-+
-+    /* Must be called from the main loop */
-+    assert(qemu_get_current_aio_context() == qemu_get_aio_context());
- 
-     /* First, return all root nodes of BlockBackends. In order to avoid
-      * returning a BDS twice when multiple BBs refer to it, we only return it
-      * if the BB is the first one in the parent list of the BDS. */
-     if (it->phase == BDRV_NEXT_BACKEND_ROOTS) {
-+        BlockBackend *old_blk = it->blk;
-+
-+        old_bs = old_blk ? blk_bs(old_blk) : NULL;
-+
-         do {
-             it->blk = blk_all_next(it->blk);
-             bs = it->blk ? blk_bs(it->blk) : NULL;
-         } while (it->blk && (bs == NULL || bdrv_first_blk(bs) != it->blk));
- 
-+        if (it->blk) {
-+            blk_ref(it->blk);
-+        }
-+        blk_unref(old_blk);
-+
-         if (bs) {
-+            bdrv_ref(bs);
-+            bdrv_unref(old_bs);
-             return bs;
-         }
-         it->phase = BDRV_NEXT_MONITOR_OWNED;
-+    } else {
-+        old_bs = it->bs;
-     }
- 
-     /* Then return the monitor-owned BDSes without a BB attached. Ignore all
-@@ -467,18 +483,46 @@ BlockDriverState *bdrv_next(BdrvNextIterator *it)
-         bs = it->bs;
-     } while (bs && bdrv_has_blk(bs));
- 
-+    if (bs) {
-+        bdrv_ref(bs);
-+    }
-+    bdrv_unref(old_bs);
-+
-     return bs;
- }
- 
--BlockDriverState *bdrv_first(BdrvNextIterator *it)
-+static void bdrv_next_reset(BdrvNextIterator *it)
- {
-     *it = (BdrvNextIterator) {
-         .phase = BDRV_NEXT_BACKEND_ROOTS,
-     };
-+}
- 
-+BlockDriverState *bdrv_first(BdrvNextIterator *it)
-+{
-+    bdrv_next_reset(it);
-     return bdrv_next(it);
- }
- 
-+/* Must be called when aborting a bdrv_next() iteration before
-+ * bdrv_next() returns NULL */
-+void bdrv_next_cleanup(BdrvNextIterator *it)
-+{
-+    /* Must be called from the main loop */
-+    assert(qemu_get_current_aio_context() == qemu_get_aio_context());
-+
-+    if (it->phase == BDRV_NEXT_BACKEND_ROOTS) {
-+        if (it->blk) {
-+            bdrv_unref(blk_bs(it->blk));
-+            blk_unref(it->blk);
-+        }
-+    } else {
-+        bdrv_unref(it->bs);
-+    }
-+
-+    bdrv_next_reset(it);
-+}
-+
- /*
-  * Add a BlockBackend into the list of backends referenced by the monitor, with
-  * the given @name acting as the handle for the monitor.
-diff --git a/block/snapshot.c b/block/snapshot.c
-index a46564e7b7..b6add9be88 100644
---- a/block/snapshot.c
-+++ b/block/snapshot.c
-@@ -403,6 +403,7 @@ bool bdrv_all_can_snapshot(BlockDriverState **first_bad_bs)
-         }
-         aio_context_release(ctx);
-         if (!ok) {
-+            bdrv_next_cleanup(&it);
-             goto fail;
-         }
-     }
-@@ -430,6 +431,7 @@ int bdrv_all_delete_snapshot(const char *name, BlockDriverState **first_bad_bs,
-         }
-         aio_context_release(ctx);
-         if (ret < 0) {
-+            bdrv_next_cleanup(&it);
-             goto fail;
-         }
-     }
-@@ -455,6 +457,7 @@ int bdrv_all_goto_snapshot(const char *name, BlockDriverState **first_bad_bs)
-         }
-         aio_context_release(ctx);
-         if (err < 0) {
-+            bdrv_next_cleanup(&it);
-             goto fail;
-         }
-     }
-@@ -480,6 +483,7 @@ int bdrv_all_find_snapshot(const char *name, BlockDriverState **first_bad_bs)
-         }
-         aio_context_release(ctx);
-         if (err < 0) {
-+            bdrv_next_cleanup(&it);
-             goto fail;
-         }
-     }
-@@ -511,6 +515,7 @@ int bdrv_all_create_snapshot(QEMUSnapshotInfo *sn,
-         }
-         aio_context_release(ctx);
-         if (err < 0) {
-+            bdrv_next_cleanup(&it);
-             goto fail;
-         }
-     }
-@@ -534,6 +539,7 @@ BlockDriverState *bdrv_all_find_vmstate_bs(void)
-         aio_context_release(ctx);
- 
-         if (found) {
-+            bdrv_next_cleanup(&it);
-             break;
-         }
-     }
-diff --git a/migration/block.c b/migration/block.c
-index 3282809583..7147171bb7 100644
---- a/migration/block.c
-+++ b/migration/block.c
-@@ -415,6 +415,7 @@ static int init_blk_migration(QEMUFile *f)
-         sectors = bdrv_nb_sectors(bs);
-         if (sectors <= 0) {
-             ret = sectors;
-+            bdrv_next_cleanup(&it);
-             goto out;
-         }
- 
 -- 
-2.13.6
+Anton Gerasimov, ATS Advanced Telematic Systems GmbH
+Kantstrasse 162, 10623 Berlin
+Managing Directors: Dirk Pöschl, Armin G. Schmidt
+Register Court: HRB 151501 B, Amtsgericht Charlottenburg
