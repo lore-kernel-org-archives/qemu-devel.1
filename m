@@ -1,22 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54083)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54792)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eDFuH-00087g-2a
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 15:28:06 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eDFxQ-00015j-9N
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 15:31:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eDFuG-0002vJ-4e
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 15:28:05 -0500
-References: <cover.1510339534.git.berto@igalia.com>
-	<e089c66e7c20289b046d782cea4373b765c5bc1d.1510339534.git.berto@igalia.com>
+	(envelope-from <mreitz@redhat.com>) id 1eDFxP-0003tN-FA
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 15:31:20 -0500
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <e84b73c5-5d27-0a99-0f39-00719bb4f61b@redhat.com>
-Date: Fri, 10 Nov 2017 21:27:51 +0100
-MIME-Version: 1.0
-In-Reply-To: <e089c66e7c20289b046d782cea4373b765c5bc1d.1510339534.git.berto@igalia.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="4uiEwPnQPuKtbg7AV8wHJrVmxH1hkiGbx"
-Subject: Re: [Qemu-devel] [PATCH 2/3] block: Leave valid throttle timers
- when removing a BDS from a backend
+Date: Fri, 10 Nov 2017 21:31:06 +0100
+Message-Id: <20171110203111.7666-1-mreitz@redhat.com>
+Subject: [Qemu-devel] [PATCH for-2.11 0/5] qcow2: Fixes for corrupted images
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,78 +17,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, sochin jiang <sochin.jiang@huawei.com>
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, John Snow <jsnow@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---4uiEwPnQPuKtbg7AV8wHJrVmxH1hkiGbx
-From: Max Reitz <mreitz@redhat.com>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>,
- Kevin Wolf <kwolf@redhat.com>, sochin jiang <sochin.jiang@huawei.com>
-Message-ID: <e84b73c5-5d27-0a99-0f39-00719bb4f61b@redhat.com>
-Subject: Re: [PATCH 2/3] block: Leave valid throttle timers when removing a
- BDS from a backend
-References: <cover.1510339534.git.berto@igalia.com>
- <e089c66e7c20289b046d782cea4373b765c5bc1d.1510339534.git.berto@igalia.com>
-In-Reply-To: <e089c66e7c20289b046d782cea4373b765c5bc1d.1510339534.git.berto@igalia.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+This series contains fixes for another batch of qcow2-related crashes
+reported on Launchpad by Nageswara (the first batch was
+http://lists.nongnu.org/archive/html/qemu-block/2017-11/msg00082.html by
+Berto).
 
-On 2017-11-10 19:54, Alberto Garcia wrote:
-> If a BlockBackend has I/O limits set then its ThrottleGroupMember
-> structure uses the AioContext from its attached BlockDriverState.
-> Those two contexts must be kept in sync manually. This is not
-> ideal and will be fixed in the future by removing the throttling
-> configuration from the BlockBackend and storing it in an implicit
-> filter node instead, but for now we have to live with this.
->=20
-> When you remove the BlockDriverState from the backend then the
-> throttle timers are destroyed. If a new BlockDriverState is later
-> inserted then they are created again using the new AioContext.
->=20
-> There'a a couple of problems with this:
->=20
->    a) The code manipulates the timers directly, leaving the
->       ThrottleGroupMember.aio_context field in an inconsisent state.
->=20
->    b) If you remove the I/O limits (e.g by destroying the backend)
->       when the timers are gone then throttle_group_unregister_tgm()
->       will attempt to destroy them again, crashing QEMU.
->=20
-> While b) could be fixed easily by allowing the timers to be freed
-> twice, this would result in a situation in which we can no longer
-> guarantee that a valid ThrottleState has a valid AioContext and
-> timers.
->=20
-> This patch ensures that the timers and AioContext are always valid
-> when I/O limits are set, regardless of whether the BlockBackend has a
-> BlockDriverState inserted or not.
->=20
-> Reported-by: sochin jiang <sochin.jiang@huawei.com>
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
-> ---
->  block/block-backend.c | 16 ++++++++--------
->  1 file changed, 8 insertions(+), 8 deletions(-)
-
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+Patch 4 fixes an out-of-bounds array access in memory which is not
+really a security issue for multiple reasons (really, at most you can
+read eight bytes from somewhere with an extremely high chance of
+crashing qemu and requiring the user to invoke a block_resize shrinking
+the qcow2 image (and also reset some bit in the image from 1 to 0, but
+only if the overlap checks don't catch you)), but most importantly that
+code hasn't been in 2.10, so we're fine.
 
 
---4uiEwPnQPuKtbg7AV8wHJrVmxH1hkiGbx
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Max Reitz (5):
+  qcow2: check_errors are fatal
+  qcow2: Unaligned zero cluster in handle_alloc()
+  block: Guard against NULL bs->drv
+  qcow2: Add bounds check to get_refblock_offset()
+  qcow2: Refuse to get unaligned offsets from cache
 
------BEGIN PGP SIGNATURE-----
+ block/qcow2.h              |   6 ---
+ block.c                    |  19 ++++++-
+ block/io.c                 |  36 +++++++++++++
+ block/qapi.c               |   8 ++-
+ block/qcow2-cache.c        |  21 ++++++++
+ block/qcow2-cluster.c      |  13 ++++-
+ block/qcow2-refcount.c     |  26 +++++++++-
+ block/qcow2.c              |   5 +-
+ block/replication.c        |  15 ++++++
+ block/vvfat.c              |   2 +-
+ tests/qemu-iotests/060     | 125 +++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/060.out | 115 +++++++++++++++++++++++++++++++++++++++++
+ 12 files changed, 379 insertions(+), 12 deletions(-)
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAloGC8cSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AuoIH/RCx1xTGjacauzY1wuaIDx58hCOUlQnH
-+9gwOCp9RUAQjC/0hVOXBrjclg7DEuNXLrymATtyz7cKFjaFu1gPnj4s/dU6xEAx
-Rz3kaK8L8BWeEfVW5saCE1mbbDh3d99jBYA9UakhaSyCiOw69FzaBEtex3JW0Fn+
-JMsMOG8G85B9N5hQm/tZ2lJ3PKL1vJ4J70TqMNSexdF3RUQPZttdvrPpum8R+Ngc
-DEg33CPOChh1AwD6IMiv5wMEgjXrmuN4sWklQkN5zcblcqTKzGbEGhtU0eLY5LdR
-JmCmg3tYYuXOvlb9jlxJ+ST2fLlulm1ooA7+f9Tv4zFHQtU5ZWArSqs=
-=+aKI
------END PGP SIGNATURE-----
-
---4uiEwPnQPuKtbg7AV8wHJrVmxH1hkiGbx--
+-- 
+2.13.6
