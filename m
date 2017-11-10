@@ -1,30 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45052)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45467)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eD8rv-0005Xa-3E
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 07:57:12 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1eD8tf-0006XM-IA
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 07:59:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eD8ru-0007rw-3V
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 07:57:11 -0500
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:38909)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eD8rt-0007pJ-TB
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 07:57:10 -0500
-Received: by mail-wm0-x242.google.com with SMTP id p75so2574479wmg.3
-	for <qemu-devel@nongnu.org>; Fri, 10 Nov 2017 04:57:09 -0800 (PST)
+	(envelope-from <ehabkost@redhat.com>) id 1eD8tc-0002Ve-Do
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 07:58:59 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42264)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1eD8tc-0002Tw-4x
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 07:58:56 -0500
+Date: Fri, 10 Nov 2017 10:58:50 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20171110125850.GO3111@localhost.localdomain>
+References: <1508170976-96869-4-git-send-email-imammedo@redhat.com>
+	<1508325132-70513-1-git-send-email-imammedo@redhat.com>
+	<20171019063151.GA13245@umbus>
+	<20171031150114.60e0958e@nial.brq.redhat.com>
+	<20171106180216.GT3111@localhost.localdomain>
+	<20171107160404.40e368da.cohuck@redhat.com>
+	<20171109065803.GG7732@umbus.fritz.box>
+	<20171109200235.GG3111@localhost.localdomain>
+	<20171110111403.636682ea.cohuck@redhat.com>
+	<7cda4233-2f8b-cfdc-3468-9416c9b5a855@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <5a7b721c-fe04-921b-b9d2-986c9930b00b@amsat.org>
-References: <1510228971-6005-1-git-send-email-sundeep.lkml@gmail.com>
-	<4beb4e47-0ff9-8251-6502-23824779edbd@amsat.org>
-	<CAFEAcA-ATtAougvALVo=48p+jVx5B+Ejq60TD9dGYEQU2ReWCQ@mail.gmail.com>
-	<5a7b721c-fe04-921b-b9d2-986c9930b00b@amsat.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 10 Nov 2017 12:56:47 +0000
-Message-ID: <CAFEAcA_0jvR90=N9Pd+oA2U6Yy=oF7vvNV67cEAsUYQFcup9KQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu devel PATCH] MAINTAINERS: Add entries for
- Smartfusion2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7cda4233-2f8b-cfdc-3468-9416c9b5a855@redhat.com>
+Subject: Re: [Qemu-devel] [RFC v2 3/6] possible_cpus: add CPUArchId::type
+ field
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,63 +36,175 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Alistair Francis <alistair23@gmail.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: Cornelia Huck <cohuck@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, peter.maydell@linaro.org, pkrempa@redhat.com, pbonzini@redhat.com, drjones@redhat.com
 
-On 10 November 2017 at 00:22, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>=
- wrote:
-> On 11/09/2017 08:55 PM, Peter Maydell wrote:
->> I don't in general expect to take pull requests from
->> everybody listed as a maintainer in the MAINTAINERS file.
->> That just means "I'm going to be reviewing and should
->> be cc'd on patches". Pull requests are sent by people
->> who are maintainers for a subsystem. Rule of thumb:
->> unless somebody asks you to send a pull request, you
->> don't need to do it.
->
-> Ok, please apologize my misunderstanding. I still think the M: entry
-> stand for 'Maintainer' instead of 'Mail', and still don't understand the
-> difference with a "Designated reviewer" (R: entry):
->
->         M: Mail patches to: FullName <address@domain>
->         R: Designated reviewer: FullName <address@domain>
->            These reviewers should be CCed on patches.
->
-> "Designated reviewer" seems to duplicate the M: entry and is therefore
-> confusing. Can we simply remove it instead?
+On Fri, Nov 10, 2017 at 01:34:42PM +0100, David Hildenbrand wrote:
+> On 10.11.2017 11:14, Cornelia Huck wrote:
+> > On Thu, 9 Nov 2017 18:02:35 -0200
+> > Eduardo Habkost <ehabkost@redhat.com> wrote:
+> > 
+> >> On Thu, Nov 09, 2017 at 05:58:03PM +1100, David Gibson wrote:
+> >>> On Tue, Nov 07, 2017 at 04:04:04PM +0100, Cornelia Huck wrote:  
+> >>>> On Mon, 6 Nov 2017 16:02:16 -0200
+> >>>> Eduardo Habkost <ehabkost@redhat.com> wrote:
+> >>>>   
+> >>>>> On Tue, Oct 31, 2017 at 03:01:14PM +0100, Igor Mammedov wrote:  
+> >>>>>> On Thu, 19 Oct 2017 17:31:51 +1100
+> >>>>>> David Gibson <david@gibson.dropbear.id.au> wrote:
+> >>>>>>     
+> >>>>>>> On Wed, Oct 18, 2017 at 01:12:12PM +0200, Igor Mammedov wrote:    
+> >>>>>>>> For enabling early cpu to numa node configuration at runtime
+> >>>>>>>> qmp_query_hotpluggable_cpus() should provide a list of available
+> >>>>>>>> cpu slots at early stage, before machine_init() is called and
+> >>>>>>>> the 1st cpu is created, so that mgmt might be able to call it
+> >>>>>>>> and use output to set numa mapping.
+> >>>>>>>> Use MachineClass::possible_cpu_arch_ids() callback to set
+> >>>>>>>> cpu type info, along with the rest of possible cpu properties,
+> >>>>>>>> to let machine define which cpu type* will be used.
+> >>>>>>>>
+> >>>>>>>> * for SPAPR it will be a spapr core type and for ARM/s390x/x86
+> >>>>>>>>   a respective descendant of CPUClass.
+> >>>>>>>>
+> >>>>>>>> Move parse_numa_opts() in vl.c after cpu_model is parsed into
+> >>>>>>>> cpu_type so that possible_cpu_arch_ids() would know which
+> >>>>>>>> cpu_type to use during layout initialization.
+> >>>>>>>>
+> >>>>>>>> Signed-off-by: Igor Mammedov <imammedo@redhat.com>      
+> >>>>>>>
+> >>>>>>> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+> >>>>>>>     
+> >>>>>>>> ---
+> >>>>>>>>   v2:
+> >>>>>>>>      - fix NULL dereference caused by not initialized
+> >>>>>>>>        MachineState::cpu_type at the time parse_numa_opts()
+> >>>>>>>>        were called
+> >>>>>>>> ---
+> >>>>>>>>  include/hw/boards.h        |  2 ++
+> >>>>>>>>  hw/arm/virt.c              |  3 ++-
+> >>>>>>>>  hw/core/machine.c          | 12 ++++++------
+> >>>>>>>>  hw/i386/pc.c               |  4 +++-
+> >>>>>>>>  hw/ppc/spapr.c             | 13 ++++++++-----
+> >>>>>>>>  hw/s390x/s390-virtio-ccw.c |  1 +
+> >>>>>>>>  vl.c                       |  3 +--
+> >>>>>>>>  7 files changed, 23 insertions(+), 15 deletions(-)
+> >>>>>>>>
+> >>>>>>>> diff --git a/include/hw/boards.h b/include/hw/boards.h
+> >>>>>>>> index 191a5b3..fa21758 100644
+> >>>>>>>> --- a/include/hw/boards.h
+> >>>>>>>> +++ b/include/hw/boards.h
+> >>>>>>>> @@ -80,6 +80,7 @@ void machine_set_cpu_numa_node(MachineState *machine,
+> >>>>>>>>   * CPUArchId:
+> >>>>>>>>   * @arch_id - architecture-dependent CPU ID of present or possible CPU      
+> >>>>>>>
+> >>>>>>> I know this isn't really in scope for this patch, but is @arch_id here
+> >>>>>>> supposed to have meaning defined by the target, or by the machine?
+> >>>>>>>
+> >>>>>>> If it's the machime, it could do with a rename - "arch" means target
+> >>>>>>> to most people (thanks to Linux).
+> >>>>>>>
+> >>>>>>> If it's the target, it's kind of bogus, because it doesn't necessarily
+> >>>>>>> have a clear meaning per target - get_arch_id in CPUClass has the same
+> >>>>>>> problem, which is probably one reason it's basically only used by the
+> >>>>>>> x86 code at present.
+> >>>>>>>
+> >>>>>>> e.g. for target/ppc, what do we use?  There's the PIR, which is in the
+> >>>>>>> CPU.. but only on some cpu models, not all.  There will generally be
+> >>>>>>> some kind of master PIC id, but there are different PIC models on
+> >>>>>>> different boards.  What goes in the devicetree?  Well only some
+> >>>>>>> machines use devicetree, and they might define the cpu reg 
+> >>>>>>> differently.
+> >>>>>>>
+> >>>>>>> Board designs will generally try to make some if not all of those
+> >>>>>>> possible values equal for simplicity, but there's still no real way of
+> >>>>>>> defining a sensible arch_id independent of machine / board.    
+> >>>>>> I'd say arch_id is machine specific so far, it was introduced when we
+> >>>>>> didn't have CpuInstanceProperties and at that time we considered only
+> >>>>>> vcpus (threads) and doesn't really apply to spapr cores.
+> >>>>>>
+> >>>>>> In general we could do away with arch_id and use CpuInstanceProperties
+> >>>>>> instead, but arch_id also serves aux purpose, it allows machine to
+> >>>>>> pre-calculate(cache) apic-id/mpidr values in one place and then they
+> >>>>>> are/(could be) used by arch in-depended code to build acpi tables.
+> >>>>>> So if we drop arch_id we would need to introduce a machine hook,
+> >>>>>> which would translate CpuInstanceProperties into current arch_id.    
+> >>>>>
+> >>>>> I think we need to do a better to job documenting where exactly
+> >>>>> we expect arch_id to be used and how, so people know what it's
+> >>>>> supposed to return.
+> >>>>>
+> >>>>> If the only place where it's useful now is ACPI code (is it?),
+> >>>>> should we rename it to something like get_acpi_id()?  
+> >>>>
+> >>>> It is also used in hw/s390x/sclp.c to fill out a control block, so acpi
+> >>>> isn't the only user.  
+> >>>
+> >>> Yeah.. this is kind of bogus.  The s390 use is in machine specific
+> >>> code, so it's basically just re-using the field for an unrelated usage
+> >>> to the x86/arm one (ACPI).
+> 
+> as index == arch_id on s390x, that code could easily be changed to
+> something like:
+> 
+> @@ -45,7 +45,7 @@ static void prepare_cpu_entries(SCLPDevice *sclp,
+> CPUEntry *entry, int *count)
+>          if (!ms->possible_cpus->cpus[i].cpu) {
+>              continue;
+>          }
+> -        entry[*count].address = ms->possible_cpus->cpus[i].arch_id;
+> +        entry[*count].address = i;
 
-I hadn't realized we had an 'R:' tag in MAINTAINERS...
+What about decoupling it from the array index, by using:
+    entry[*count].address = ms->possible_cpus->cpus[i].props.core_id;
+or:
+    entry[*count].address = S390_CPU(ms->possible_cpus->cpus[i].cpu)->core_id;
+?
 
-> --
-> Some people are not content with the amount of mail they get, and would
-> like to be CCed on patches for areas they do not maintain.  Let them
-> satisfy their own appetite for qemu-devel messages.
->
-> Seriously: the purpose here is a bit different from the Linux kernel.
-> While Linux uses "R" to designate non-maintainers for reviewing patches
-> in a given area, in QEMU I would also like to use "R" so that people can
-> delegate sending pull requests while keeping some degree of oversight.
-> --
 
-So, my view, based on what happens in practice:
- * "maintainer" means you are in effect accepting some responsibility
-   for the continued maintenance of some bit of the codebase, ie
-   you actually will review stuff
- * "reviewer" is a bit weird but I guess is just asking for cc:
-   without promising to actually do anything
- * somebody who sends me pull requests is effectively somebody we've
-   given the ability to make direct more-or-less unchecked commits
-   to master, so that is given out more sparingly and for larger
-   subsystems
+>          entry[*count].type = 0;
+>          memcpy(entry[*count].features, features, sizeof(features));
+>          (*count)++;
+> 
+> arch_id just looked like the right thing to use (documentation issue
+> mentioned above)
+> 
+> 
+> >>>
+> >>> If we can't assign a universal meaning to the field (even if the
+> >>> actual values are per-machine) - and I don't think we can - then I
+> >>> really don't think it belongs in CPUState.  A machine hook which
+> >>> translates an ArchId to an acpi_id is the correct solution I believe.
+> >>> Or even an ACPIMachine interface (to be implemented by machines which
+> >>> do ACPI) which has a method to do this.
+> >>>
+> >>> Since both the assignment and use are in machine type specific code
+> >>> for s390, it can have its own field in the s390 specific cpu subclass.
+> 
+> s390x doesn't need arch_id at all.
+> 
+> cs->cpu_index can be used.
 
-But MAINTAINERS is mostly about what submitters need to do (ie
-who to send patchmails to), so it doesn't particularly document
-how patches flow onward into master, which varies. (For instance
-the block layer folks have a two-level setup where some trees
-get merged into others before they go to master. ARM devboards
-go through me, and "maintainer" just means I let somebody else
-deal with the device specifics if possible but am still the
-reviewer of last resort.)
+What about the cpu_exists() check in s390_cpu_realizefn()?  It
+could be moved to a new s390_machine_device_pre_plug() method
+that just checks ms->possible_cpus->cpus[cpu->env.core_id].cpu.
 
-thanks
--- PMM
+> 
+> >>>   
+> >>
+> >> I agree.  This might require duplicating cpu_by_arch_id() and
+> >> cpu_exists() into machine-specific code, but this doesn't sound
+> >> too bad: there's only one user of cpu_by_arch_id() (that's
+> >> x86-specific code living inside monitor.c), and one user of
+> >> cpu_exists() (that's s390-specific code).>>
+> >> (Maybe those users could be rewritten to use
+> >> MachineState::possible_cpus, like pc_find_cpu_slot()).
+> 
+> 
+> -- 
+> 
+> Thanks,
+> 
+> David / dhildenb
+
+-- 
+Eduardo
