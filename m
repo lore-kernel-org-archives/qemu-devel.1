@@ -1,21 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41845)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46635)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1eDEtP-0000EM-0C
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 14:23:07 -0500
+	(envelope-from <laurent@vivier.eu>) id 1eDFJQ-0004P9-10
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 14:50:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1eDEtO-0008Ty-5a
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 14:23:06 -0500
-Date: Fri, 10 Nov 2017 14:23:00 -0500
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20171110192300.GC17844@flamenco>
-References: <1509734853-3014-1-git-send-email-cota@braap.org>
-	<20171107201545.GA32606@localhost.localdomain>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171107201545.GA32606@localhost.localdomain>
-Subject: Re: [Qemu-devel] [PATCH] hw: add .min_cpus and .default_cpus fields
- to machine_class
+	(envelope-from <laurent@vivier.eu>) id 1eDFJM-00046m-5z
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 14:50:00 -0500
+Received: from mout.kundenserver.de ([212.227.17.13]:54411)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eDFJL-00045o-SK
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 14:49:56 -0500
+From: Laurent Vivier <laurent@vivier.eu>
+Date: Fri, 10 Nov 2017 20:49:35 +0100
+Message-Id: <20171110194935.17541-1-laurent@vivier.eu>
+Subject: [Qemu-devel] [PATCH] linux-user,
+ s390x: ignore OS ABI value in ELF header
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,39 +22,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Richard Henderson <richard.henderson@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>, qemu-arm@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, "Edgar E . Iglesias" <edgar.iglesias@gmail.com>
+To: qemu-devel@nongnu.org
+Cc: Richard Henderson <rth@twiddle.net>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <huth@tuxfamily.org>, Laurent Vivier <laurent@vivier.eu>
 
-On Tue, Nov 07, 2017 at 18:15:45 -0200, Eduardo Habkost wrote:
-> On Fri, Nov 03, 2017 at 02:47:33PM -0400, Emilio G. Cota wrote:
-> > @@ -4330,12 +4330,34 @@ int main(int argc, char **argv, char **envp)
-> >      smp_parse(qemu_opts_find(qemu_find_opts("smp-opts"), NULL));
-> >  
-> >      machine_class->max_cpus = machine_class->max_cpus ?: 1; /* Default to UP */
-> > +    machine_class->min_cpus = machine_class->min_cpus ?: 1;
-> > +    machine_class->default_cpus = machine_class->default_cpus ?: 1;
-> > +
-> > +    /* if -smp is not set, default to mc->default_cpus */
-> > +    if (!smp_cpus) {
-> > +        smp_cpus = machine_class->default_cpus;
-> > +        max_cpus = machine_class->default_cpus;
-> > +    }
-> 
-> I suggest doing this before smp_parse(), so any validation of
-> smp_cpus inside smp_parse will apply to the value we're setting
-> here (e.g. the replay_add_blocker() call in smp_parse() will
-> work).
-(snip)
-> > +    if (max_cpus < machine_class->min_cpus) {
-> 
-> smp_parse() already ensures max_cpus >= smp_cpus, and you are
-> already checking if smp_cpus < machine_class->min_cpus above.  Is
-> it really possible to trigger this error message?
-> 
-> Except for that, the patch looks good to me.
+I have this error:
+bash: /sbin/ldconfig: cannot execute binary file: Exec format error
 
-Both very good points! I've modified the patch accordingly.
+because /sbin/ldconfig is:
+ELF 64-bit MSB executable, IBM S/390, version 1 (GNU/Linux),
+statically linked, for GNU/Linux 3.2.0,
+BuildID[sha1]=90b64604014aafac9c1a0623b1cf447281d1a382, stripped
 
-Thanks,
+OS ABI is GNU/linux
 
-		Emilio
+"/bin/ls" works well:
+
+ELF 64-bit MSB shared object, IBM S/390, version 1 (SYSV), dynamically linked,
+interpreter /lib/ld64.so.1, for GNU/Linux 3.2.0,
+BuildID[sha1]=be9b19143d4657678846f6e5277383071fc1059a, stripped
+
+OS ABI is SYSV
+
+To be able to execute ldconfig, this patch modifies s390x binfmt mask
+to ignore the OS ABI value (EI_OSABI, byte 7).
+
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+---
+ scripts/qemu-binfmt-conf.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/scripts/qemu-binfmt-conf.sh b/scripts/qemu-binfmt-conf.sh
+index 8afc3eb5bb..e2e1b7544d 100755
+--- a/scripts/qemu-binfmt-conf.sh
++++ b/scripts/qemu-binfmt-conf.sh
+@@ -85,7 +85,7 @@ sh4eb_mask='\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff
+ sh4eb_family=sh4
+ 
+ s390x_magic='\x7fELF\x02\x02\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x16'
+-s390x_mask='\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff'
++s390x_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff'
+ s390x_family=s390x
+ 
+ aarch64_magic='\x7fELF\x02\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\xb7\x00'
+-- 
+2.13.6
