@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47360)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47374)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1eDFNC-0005Nn-Pt
+	(envelope-from <cota@braap.org>) id 1eDFND-0005OK-9y
 	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 14:53:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1eDFNB-0006EZ-BH
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 14:53:54 -0500
+	(envelope-from <cota@braap.org>) id 1eDFNC-0006FQ-Ai
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 14:53:55 -0500
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Fri, 10 Nov 2017 14:53:44 -0500
-Message-Id: <1510343626-25861-4-git-send-email-cota@braap.org>
+Date: Fri, 10 Nov 2017 14:53:45 -0500
+Message-Id: <1510343626-25861-5-git-send-email-cota@braap.org>
 In-Reply-To: <1510343626-25861-1-git-send-email-cota@braap.org>
 References: <1510343626-25861-1-git-send-email-cota@braap.org>
-Subject: [Qemu-devel] [PATCH for 2.11 3/5] xlnx-zcu102: Add an info message
- deprecating the EP108
+Subject: [Qemu-devel] [PATCH for 2.11 4/5] xlnx-zcu102: Specify the max
+ number of CPUs for the EP108
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,53 +23,24 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Thomas Huth <thuth@redhat.com>, qemu-arm@nongnu.org, Igor Mitsyanko <i.mitsyanko@gmail.com>, Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
 
-From: Alistair Francis <alistair.francis@xilinx.com>
+Just like the zcu102, the ep108 can instantiate several CPUs.
 
-The EP108 was an early access development board that is no longer used.
-Add an info message to convert any users to the ZCU102 instead. On QEMU
-they are both identical.
-
-This patch also updated the qemu-doc.texi file to indicate that the
-EP108 has been deprecated.
-
-Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-Reviewed-by: Emilio G. Cota <cota@braap.org>
+Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- qemu-doc.texi        | 7 +++++++
- hw/arm/xlnx-zcu102.c | 3 +++
- 2 files changed, 10 insertions(+)
+ hw/arm/xlnx-zcu102.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/qemu-doc.texi b/qemu-doc.texi
-index 8c10956..d383ac4 100644
---- a/qemu-doc.texi
-+++ b/qemu-doc.texi
-@@ -2537,6 +2537,13 @@ or ``ivshmem-doorbell`` device types.
- The ``spapr-pci-vfio-host-bridge'' device type is replaced by
- the ``spapr-pci-host-bridge'' device type.
- 
-+@section System emulator machines
-+
-+@subsection Xilinx EP108 (since 2.11.0)
-+
-+The ``xlnx-ep108'' machine has been replaced by the ``xlnx-zcu102'' machine.
-+The ``xlnx-zcu102'' machine has the same features and capabilites in QEMU.
-+
- @node License
- @appendix License
- 
 diff --git a/hw/arm/xlnx-zcu102.c b/hw/arm/xlnx-zcu102.c
-index 7ec03da..adddd23 100644
+index adddd23..190eb69 100644
 --- a/hw/arm/xlnx-zcu102.c
 +++ b/hw/arm/xlnx-zcu102.c
-@@ -164,6 +164,9 @@ static void xlnx_ep108_init(MachineState *machine)
- {
-     XlnxZCU102 *s = EP108_MACHINE(machine);
- 
-+    info_report("The Xilinx EP108 machine is deprecated, please use the "
-+                "ZCU102 machine instead. It has the same features supported.");
-+
-     xlnx_zynqmp_init(s, machine);
+@@ -188,6 +188,7 @@ static void xlnx_ep108_machine_class_init(ObjectClass *oc, void *data)
+     mc->block_default_type = IF_IDE;
+     mc->units_per_default_bus = 1;
+     mc->ignore_memory_transaction_failures = true;
++    mc->max_cpus = XLNX_ZYNQMP_NUM_APU_CPUS + XLNX_ZYNQMP_NUM_RPU_CPUS;
  }
  
+ static const TypeInfo xlnx_ep108_machine_init_typeinfo = {
 -- 
 2.7.4
