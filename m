@@ -1,29 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37776)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40502)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eD89h-0007Qy-Og
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 07:11:30 -0500
+	(envelope-from <dovgaluk@ispras.ru>) id 1eD8RW-0001FF-2n
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 07:29:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eD89g-0006rz-Bc
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 07:11:29 -0500
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1510228971-6005-1-git-send-email-sundeep.lkml@gmail.com>
-	<4beb4e47-0ff9-8251-6502-23824779edbd@amsat.org>
-	<CAFEAcA-ATtAougvALVo=48p+jVx5B+Ejq60TD9dGYEQU2ReWCQ@mail.gmail.com>
-	<5a7b721c-fe04-921b-b9d2-986c9930b00b@amsat.org>
-	<CALHRZuroyXXzxcWW0XX5fzQ9m8Zh0oZy8RivtiQjzKdHoxQ9WQ@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <d3271bd0-41a9-90b5-c84b-e8ba9ec1585c@amsat.org>
-Date: Fri, 10 Nov 2017 09:11:17 -0300
+	(envelope-from <dovgaluk@ispras.ru>) id 1eD8RR-0001r7-6w
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 07:29:54 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:45822)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <dovgaluk@ispras.ru>) id 1eD8RQ-0001kM-QY
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 07:29:49 -0500
+From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
+References: <20171031112457.10516.8971.stgit@pasha-VirtualBox>
+	<20171031112644.10516.1734.stgit@pasha-VirtualBox>
+	<a8979594-78e4-13dc-2958-f7b4444a1bb0@redhat.com>
+	<001501d353cd$29099010$7b1cb030$@ru>
+	<18ddcf7c-0198-a0ce-c2cc-992131512897@redhat.com>
+	<fbda6d5e-aee1-ec74-faf4-e2dde0003588@redhat.com>
+	<001201d3547d$929156c0$b7b40440$@ru>
+	<954d2fb6-ce56-3000-f395-404c238eb040@redhat.com>
+	<000301d359fc$c168fc30$443af490$@ru>
+	<331c5386-e0a9-8b85-66fb-cdd82eef8ece@redhat.com>
+In-Reply-To: <331c5386-e0a9-8b85-66fb-cdd82eef8ece@redhat.com>
+Date: Fri, 10 Nov 2017 15:29:49 +0300
+Message-ID: <000701d35a1f$9a2e7be0$ce8b73a0$@ru>
 MIME-Version: 1.0
-In-Reply-To: <CALHRZuroyXXzxcWW0XX5fzQ9m8Zh0oZy8RivtiQjzKdHoxQ9WQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu devel PATCH] MAINTAINERS: Add entries for
- Smartfusion2
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Content-Language: ru
+Subject: Re: [Qemu-devel] [RFC PATCH 19/26] cpu-exec: reset exit flag before
+ calling cpu_exec_nocache
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,69 +38,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: sundeep subbaraya <sundeep.lkml@gmail.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Alistair Francis <alistair23@gmail.com>
+To: 'Paolo Bonzini' <pbonzini@redhat.com>, 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, mst@redhat.com, jasowang@redhat.com, quintela@redhat.com, zuban32s@gmail.com, maria.klimushenkova@ispras.ru, kraxel@redhat.com, boost.lists@gmail.com, alex.bennee@linaro.org
 
-Hi Sundeep, Peter.
-
->     On 11/09/2017 08:55 PM, Peter Maydell wrote:
->     > On 9 November 2017 at 21:46, Philippe Mathieu-Daudé <f4bug@amsat.org <mailto:f4bug@amsat.org>> wrote:
->     >> Hi Subbaraya,
->     >>
->     >> On 11/09/2017 09:02 AM, Subbaraya Sundeep wrote:
->     >>> add voluntarily myself as maintainer for Smartfusion2
->     >>
->     >> You need to share your GnuPG key signed, I couldn't find it using
->     >> http://pgp.mit.edu/pks/lookup?search=Subbaraya+Sundeep
->     <http://pgp.mit.edu/pks/lookup?search=Subbaraya+Sundeep>
->     >>
->     >> from https://wiki.qemu.org/Contribute/SubmitAPullRequest
->     <https://wiki.qemu.org/Contribute/SubmitAPullRequest> :
->     >
->     > I don't in general expect to take pull requests from
->     > everybody listed as a maintainer in the MAINTAINERS file.
->     > That just means "I'm going to be reviewing and should
->     > be cc'd on patches". Pull requests are sent by people
->     > who are maintainers for a subsystem. Rule of thumb:
->     > unless somebody asks you to send a pull request, you
->     > don't need to do it.
+> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
+> >>>
+> >>> I tried this approach and it didn't work.
+> >>> I think iothread sets u16.high flag after resetting it in cpu_handle_interrupt.
+> >>
+> >> But why is this a problem?  The TB would exit immediately and go again
+> >> to cpu_handle_interrupt.  cpu_handle_interrupt returns true and
+> >> cpu_handle_exception causes the exception via cpu_exec_nocache.
+> >
+> > I've tested your variant more thoroughly.
+> > It seems, that iothread calls cpu_exec between atomic_set(&cpu->icount_decr.u16.high, 0);
+> > in cpu_handle_interrupt and cpu_exec_nocache in cpu_handle_exception.
+> > I see no other reason, because this happens not for the every time.
+> > And cpu_handle_interrupt is not called again, because cpu_handle_exception returns true.
+> > Therefore we have an infinite loop, because no other code here resets cpu-
+> >icount_decr.u16.high.
 > 
->     Ok, please apologize my misunderstanding. I still think the M: entry
-
-Peter: Oops :) read "I apologize"
-
->     stand for 'Maintainer' instead of 'Mail', and still don't understand the
->     difference with a "Designated reviewer" (R: entry):
+> Then returning true unconditionally is wrong in the cpu_exec_nocache
+> case.  What if you do:
 > 
->             M: Mail patches to: FullName <address@domain>
->             R: Designated reviewer: FullName <address@domain>
->                These reviewers should be CCed on patches.
+> diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
+> index 61297f8f4a..fb5446be3e 100644
+> --- a/accel/tcg/cpu-exec.c
+> +++ b/accel/tcg/cpu-exec.c
+> @@ -470,7 +470,19 @@ static inline void cpu_handle_debug_exception(CPUState *cpu)
 > 
->     "Designated reviewer" seems to duplicate the M: entry and is therefore
->     confusing. Can we simply remove it instead?
+>  static inline bool cpu_handle_exception(CPUState *cpu, int *ret)
+>  {
+> -    if (cpu->exception_index >= 0) {
+> +    if (cpu->exception_index < 0) {
+> +#ifndef CONFIG_USER_ONLY
+> +        if (replay_has_exception()
+> +            && cpu->icount_decr.u16.low + cpu->icount_extra == 0) {
+> +            /* try to cause an exception pending in the log */
+> +            cpu_exec_nocache(cpu, 1, tb_find(cpu, NULL, 0, curr_cflags()), true);
+> +        }
+> +#endif
+> +        if (cpu->exception_index < 0) {
+> +            return;
+
+return false, I guess?
+This approach allows iterating in case of races
+and QEMU does not hangs anymore at replay.
+
+> +        }
+> +    }
+> +
+>          if (cpu->exception_index >= EXCP_INTERRUPT) {
+>              /* exit request from the cpu execution loop */
+>              *ret = cpu->exception_index;
+> @@ -505,16 +517,6 @@ static inline bool cpu_handle_exception(CPUState *cpu, int *ret)
+>              }
+>  #endif
+>          }
+> -#ifndef CONFIG_USER_ONLY
+> -    } else if (replay_has_exception()
+> -               && cpu->icount_decr.u16.low + cpu->icount_extra == 0) {
+> -        /* try to cause an exception pending in the log */
+> -        cpu_exec_nocache(cpu, 1, tb_find(cpu, NULL, 0, curr_cflags()), true);
+> -        *ret = -1;
+> -        return true;
+> -#endif
+> -    }
+> -
+>      return false;
+>  }
 > 
->     When introduced in fdf6fab4df4 the explanation was:
-> 
->     --
->     Some people are not content with the amount of mail they get, and would
->     like to be CCed on patches for areas they do not maintain.  Let them
->     satisfy their own appetite for qemu-devel messages.
-> 
->     Seriously: the purpose here is a bit different from the Linux kernel.
->     While Linux uses "R" to designate non-maintainers for reviewing patches
->     in a given area, in QEMU I would also like to use "R" so that people can
->     delegate sending pull requests while keeping some degree of oversight.
->     --
-> 
-> Do you want me to remove M: and put only R: ?
 
-No, it seems you are correct and I was wrong :)
 
-If you agree changing the first section title to "SmartFusion2" and
-eventually the second to "Emcraft M2S-FG484":
-
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
-Regards,
-
-Phil.
+Pavel Dovgalyuk
