@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53814)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55259)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eDBR9-00044g-Uo
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 10:41:45 -0500
+	(envelope-from <stefanha@gmail.com>) id 1eDBaD-0005jf-Cw
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 10:51:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eDBR6-000487-OK
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 10:41:43 -0500
-Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:47320)
+	(envelope-from <stefanha@gmail.com>) id 1eDBa7-0007rn-3q
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 10:51:05 -0500
+Received: from mail-wr0-x22e.google.com ([2a00:1450:400c:c0c::22e]:55516)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1eDBR6-000478-Gh
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 10:41:40 -0500
-Received: by mail-wr0-x243.google.com with SMTP id k61so8953138wrc.4
-	for <qemu-devel@nongnu.org>; Fri, 10 Nov 2017 07:41:40 -0800 (PST)
-Date: Fri, 10 Nov 2017 15:41:37 +0000
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1eDBa6-0007na-OI
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 10:50:59 -0500
+Received: by mail-wr0-x22e.google.com with SMTP id l8so8950114wre.12
+	for <qemu-devel@nongnu.org>; Fri, 10 Nov 2017 07:50:56 -0800 (PST)
+Date: Fri, 10 Nov 2017 15:50:52 +0000
 From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20171110154137.GC17290@stefanha-x1.localdomain>
-References: <20170920060933.11593-1-w.bumiller@proxmox.com>
-	<1275246042.1286537.1507226615699.JavaMail.zimbra@oxygem.tv>
+Message-ID: <20171110155052.GD17290@stefanha-x1.localdomain>
+References: <1509951528-30976-1-git-send-email-longpeng2@huawei.com>
+	<33183CC9F5247A488A2544077AF19020DA461542@DGGEMA505-MBS.china.huawei.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="NKoe5XOeduwbEQHU"
+	protocol="application/pgp-signature"; boundary="tNQTSEo8WG/FKZ8E"
 Content-Disposition: inline
-In-Reply-To: <1275246042.1286537.1507226615699.JavaMail.zimbra@oxygem.tv>
-Subject: Re: [Qemu-devel] [PATCH] virtio: fix descriptor counting in
- virtqueue_pop
+In-Reply-To: <33183CC9F5247A488A2544077AF19020DA461542@DGGEMA505-MBS.china.huawei.com>
+Subject: Re: [Qemu-devel] [v21 RESEND 0/2] virtio-crypto: virtio crypto
+ device specification
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,109 +31,171 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexandre DERUMIER <aderumier@odiso.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, pbonzini <pbonzini@redhat.com>, Wolfgang Bumiller <w.bumiller@proxmox.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: "Gonglei (Arei)" <arei.gonglei@huawei.com>
+Cc: longpeng <longpeng2@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "pasic@linux.vnet.ibm.com" <pasic@linux.vnet.ibm.com>, "Ola.Liljedahl@arm.com" <Ola.Liljedahl@arm.com>, "brian.a.keating@intel.com" <brian.a.keating@intel.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, "mst@redhat.com" <mst@redhat.com>, "xin.zeng@intel.com" <xin.zeng@intel.com>, "jasowang@redhat.com" <jasowang@redhat.com>, Luonengjun <luonengjun@huawei.com>, "agraf@suse.de" <agraf@suse.de>, "john.griffin@intel.com" <john.griffin@intel.com>, "liang.j.ma@intel.com" <liang.j.ma@intel.com>, "Zhang, Roy Fan" <roy.fan.zhang@intel.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "Zhoujian (jay)" <jianjay.zhou@huawei.com>, "cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>, "Varun.Sethi@freescale.com" <Varun.Sethi@freescale.com>, Jani Kokkonen <Jani.Kokkonen@huawei.com>, "vincent.jardin@6wind.com" <vincent.jardin@6wind.com>, "denglingli@chinamobile.com" <denglingli@chinamobile.com>, "Huangweidong (C)" <weidong.huang@huawei.com>
 
 
---NKoe5XOeduwbEQHU
-Content-Type: text/plain; charset=iso-8859-1
+--tNQTSEo8WG/FKZ8E
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Oct 05, 2017 at 08:03:35PM +0200, Alexandre DERUMIER wrote:
-> Hi,
+On Mon, Nov 06, 2017 at 10:39:24AM +0000, Gonglei (Arei) wrote:
+> Hi guys,
 >=20
-> has somebody reviewed this patch ?
+> What a long time iteration it is.
 >=20
-> I'm also able de reproduce the vm crash like the proxmox user.
-> This patch is fixing it for me too.
+> Hoping this is the final version if no big arguments exist as
+> discussed with Stefan at KVM Forum 2017 this October. People
+> can submit patches to fix some grammar issues or little problems,=20
+> and then Xin' can submit the asymmetric crypto services spec
+> based on this version.
 
-This patch should go through Michael Tsirkin's tree.  I have pinged him
-separately in case this email thread got buried in his inbox.
+Yes, I support merging the virtio-crypto spec as soon as technical
+concerns are addressed.
 
-Stefan
+English language fixes are more efficiently done as follow-up patches
+=66rom native speakers.  This way we avoid extra iterations that might
+themselves add new English language issues.
 
+I hope others see it the same way.  If not, speak up now.
+
+BTW, I am committing myself to proofread the document that goes up for
+vote and will send follow-up patches.
+
+> I'll start a vote for virtio crypto device after one week. :)
+>=20
+> Please reviewing in time, thanks a lot!
+>=20
 >=20
 > Regards,
+> -Gonglei
 >=20
-> Alexandre
 >=20
->=20
-> ----- Mail original -----
-> De: "Wolfgang Bumiller" <w.bumiller@proxmox.com>
-> =C0: "qemu-devel" <qemu-devel@nongnu.org>
-> Cc: "pbonzini" <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.co=
-m>
-> Envoy=E9: Mercredi 20 Septembre 2017 08:09:33
-> Objet: [Qemu-devel] [PATCH] virtio: fix descriptor counting in virtqueue_=
-pop
->=20
-> While changing the s/g list allocation, commit 3b3b0628=20
-> also changed the descriptor counting to count iovec entries=20
-> as split by cpu_physical_memory_map(). Previously only the=20
-> actual descriptor entries were counted and the split into=20
-> the iovec happened afterwards in virtqueue_map().=20
-> Count the entries again instead to avoid erroneous=20
-> "Looped descriptor" errors.=20
->=20
-> Reported-by: Hans Middelhoek <h.middelhoek@ospito.nl>=20
-> Link: https://forum.proxmox.com/threads/vm-crash-with-memory-hotplug.3590=
-4/=20
-> Fixes: 3b3b0628217e ("virtio: slim down allocation of VirtQueueElements")=
-=20
-> Signed-off-by: Wolfgang Bumiller <w.bumiller@proxmox.com>=20
-> ---=20
-> hw/virtio/virtio.c | 6 +++---=20
-> 1 file changed, 3 insertions(+), 3 deletions(-)=20
->=20
-> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c=20
-> index 890b4d7eb7..33bb770177 100644=20
-> --- a/hw/virtio/virtio.c=20
-> +++ b/hw/virtio/virtio.c=20
-> @@ -834,7 +834,7 @@ void *virtqueue_pop(VirtQueue *vq, size_t sz)=20
-> int64_t len;=20
-> VirtIODevice *vdev =3D vq->vdev;=20
-> VirtQueueElement *elem =3D NULL;=20
-> - unsigned out_num, in_num;=20
-> + unsigned out_num, in_num, elem_entries;=20
-> hwaddr addr[VIRTQUEUE_MAX_SIZE];=20
-> struct iovec iov[VIRTQUEUE_MAX_SIZE];=20
-> VRingDesc desc;=20
-> @@ -852,7 +852,7 @@ void *virtqueue_pop(VirtQueue *vq, size_t sz)=20
-> smp_rmb();=20
->=20
-> /* When we start there are none of either input nor output. */=20
-> - out_num =3D in_num =3D 0;=20
-> + out_num =3D in_num =3D elem_entries =3D 0;=20
->=20
-> max =3D vq->vring.num;=20
->=20
-> @@ -922,7 +922,7 @@ void *virtqueue_pop(VirtQueue *vq, size_t sz)=20
-> }=20
->=20
-> /* If we've got too many, that implies a descriptor loop. */=20
-> - if ((in_num + out_num) > max) {=20
-> + if (++elem_entries > max) {=20
-> virtio_error(vdev, "Looped descriptor");=20
-> goto err_undo_map;=20
-> }=20
-> --=20
-> 2.11.0=20
+> > -----Original Message-----
+> > From: longpeng
+> > Sent: Monday, November 06, 2017 2:59 PM
+> > To: qemu-devel@nongnu.org; virtio-dev@lists.oasis-open.org
+> > Cc: Luonengjun; mst@redhat.com; cornelia.huck@de.ibm.com;
+> > stefanha@redhat.com; denglingli@chinamobile.com; Jani Kokkonen;
+> > Ola.Liljedahl@arm.com; Varun.Sethi@freescale.com; xin.zeng@intel.com;
+> > brian.a.keating@intel.com; liang.j.ma@intel.com; john.griffin@intel.com;
+> > Huangweidong (C); agraf@suse.de; jasowang@redhat.com;
+> > vincent.jardin@6wind.com; Gonglei (Arei); pasic@linux.vnet.ibm.com; wan=
+gxin
+> > (U); Zhoujian (jay); longpeng
+> > Subject: [v21 RESEND 0/2] virtio-crypto: virtio crypto device specifica=
+tion
+> >=20
+> > This is the specification about the new virtio crypto device.
+> >=20
+> > ---
+> > v21 -> v20
+> >  - rename 'queue_id' to 'reserved' [Halil]
+> >  - redescribe the format of the structures which using 'union'
+> >    in the previous version [Halil]
+> >=20
+> > v20 -> v19
+> >  - fix some typos and grammar fixes [Halil]
+> >  - make queue_id reserved [Halil]
+> >  - remove 'Steps of Operation'
+> >=20
+> > v19 -> v18:
+> >  - fix some typos and grammar fixes [Stefan, Halil]
+> >  - rename VIRTIO_CRYPTO_F_STATELESS_MODE to
+> > VIRTIO_CRYPTO_F_MUX_MODE
+> >  - describe the VIRTIO_CRYPTO_STATUS in detial. [Halil]
+> >  - refactor and redescribe the controlq/dataq request's format
+> >    of mux mode. [Halil]
+> >  - other small fixes. [Halil]
+> >=20
+> > v18 -> v17:
+> >  - fix many English grammar problems suggested by Stefan, Thanks a lot!
+> >=20
+> > v17 -> v16:
+> >  - Some grammar fixes [Stefan, Halil, Michael]
+> >  - add a section named "Supported crypto services" in order to explain =
+bit
+> >    numbers and valuse clearly. [Halil, Cornelia]
+> >  - avoid word reptition [Halil]
+> >  - rename non-session mode to stateless mode [Halil]
+> >  - change descriptions for all elements in struct virtio_crypto_config =
+[Halil]
+> >  - add Halil as a reviewer in the ackonwledgement part, thanks for his =
+work.
+> >  - other fixes here and there.
+> >=20
+> > Changes since v15:
+> >  - use feature bits for non-session mode in order to keep compatibility=
+ with
+> >    pre-existing code. [Halil & Michael]
+> >  - introduce VIRTIO_CRYPTO_F_ NON_SESSION_MODE feature bit to control a=
+ll
+> > other
+> >    non-session mode feature bits.
+> >  - fix some typos. [Stefan]
+> >  - introduce struct virtio_crypto_op_data_req_mux to support both sessi=
+on
+> >    and non-session based crypto operations and keep compatibility with
+> >    pre-existing code.
+> >=20
+> > Changes since v14:
+> >  - drop VIRTIO_CRYPTO_S_STARTED status [Halil & Cornelia]
+> >  - correct a sentence about dataqueue and controlq in the first paragra=
+ph.
+> > [Halil]
+> >  - change a MAY to MUST about max_dataqueues. [Halil]
+> >  - add non-session mode support
+> >    a) add four features for different crypto services to identify wheat=
+her
+> > support session mode.
+> >    b) rewrite some
+> >=20
+> > For pervious versions of virtio crypto spec, Pls see:
+> >=20
+> > [v18]:
+> > https://www.mail-archive.com/qemu-devel@nongnu.org/msg444897.html
+> >=20
+> > [v14]:
+> > https://lists.gnu.org/archive/html/qemu-devel/2016-11/msg02212.html
+> >=20
+> > [v13]:
+> > https://lists.gnu.org/archive/html/qemu-devel/2016-10/msg07348.html
+> >=20
+> > For more information, please see:
+> >  http://qemu-project.org/Features/VirtioCrypto
+> >=20
+> > ---
+> > Gonglei (2):
+> >   virtio-crypto: Add virtio crypto device specification
+> >   virtio-crypto: Add conformance clauses
+> >=20
+> >  acknowledgements.tex |    3 +
+> >  conformance.tex      |   29 +
+> >  content.tex          |    2 +
+> >  virtio-crypto.tex    | 1426
+> > ++++++++++++++++++++++++++++++++++++++++++++++++++
+> >  4 files changed, 1460 insertions(+)
+> >  create mode 100644 virtio-crypto.tex
+> >=20
+> > --
+> > 1.8.3.1
+> >=20
 >=20
 >=20
 
---NKoe5XOeduwbEQHU
+--tNQTSEo8WG/FKZ8E
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJaBciwAAoJEJykq7OBq3PIZ/cH/1XlbHZa/67I7FOvCGHHBlM7
-I6BIrxi7nsX0HvxG3DLHkgY/IT6Nx2DIIFf39ODfUf0vsjItFwd5PWFDEOyWjCYT
-NphQqDoTs+JUPvhRWj8ltzIgRBSNBxCYQYD107opSWI72fkD3NPdPwHgqk04E6QT
-zA6iSMcN7F5eoB6Rhfn3fTnFKuXjEh4wASrR6JVn8pvIDjFkUFIBdGAQ3CelRApp
-6JeGKUxZd8BPyO9fDc5PuDfAlseGjC+okkPdXV4aD2EyeIJbIYknMEFisGeEi429
-WrD2XWK3ymin1Rjsq0uui5qYETfBZgNNPVABEH2ZO8b23SAslGp7yc1AtkziDZw=
-=kpNz
+iQEcBAEBAgAGBQJaBcrcAAoJEJykq7OBq3PI8RkIAMiG+MsG/j0sTfoaAIa0EGdW
+L7+rxofWrliA3F/coWiikM1lkE0sWfwUhX47VNY1MBBQ3yKy4AEKYgxY9C9BrxG3
+77952972gbnnPpN0AUcrK7vc/cpwIl934dKEpzjwbzIij8RNjtkZU1P1xSW88nhb
+rBZewgUX5ufdHaFxwB50c14nAqq4XCjr1phqvYgUQYd9Uj7BC/GOmC5b8YmItzOz
+0wG9Ps0ewvmqi0us4LJgt/bmp05HQCQzuCNLNkfNwzEem+Q7sJLhAMdSvgUCGwFA
+LNPIbolqVdQUj21Bqp5unGRzENNNT4OxJLOY8TZ+mJq0VzYr0y2XSirASW4W6kQ=
+=5tmo
 -----END PGP SIGNATURE-----
 
---NKoe5XOeduwbEQHU--
+--tNQTSEo8WG/FKZ8E--
