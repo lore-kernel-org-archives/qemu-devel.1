@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50620)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52657)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eDDE9-0004Fm-HM
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 12:36:26 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eDDPF-0008Cj-QR
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 12:47:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eDDE8-00035O-Gw
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 12:36:25 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eDDPF-0002vn-7M
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 12:47:53 -0500
+Date: Fri, 10 Nov 2017 18:47:42 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20171110174742.GI5466@localhost.localdomain>
 References: <20171004152553.30263-1-mreitz@redhat.com>
 	<87zi7u4hob.fsf@dusky.pond.sub.org>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <f051da3e-9181-0e72-b9eb-4e9c2d61e971@redhat.com>
-Date: Fri, 10 Nov 2017 18:36:18 +0100
+	<f051da3e-9181-0e72-b9eb-4e9c2d61e971@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <87zi7u4hob.fsf@dusky.pond.sub.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="D8rfkD1TkAhvFrM0Di2T48IRUmHWNsIHs"
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="at6+YcpfzWZg/htY"
+Content-Disposition: inline
+In-Reply-To: <f051da3e-9181-0e72-b9eb-4e9c2d61e971@redhat.com>
 Subject: Re: [Qemu-devel] [PATCH v6 0/6] block: Don't compare strings in
  bdrv_reopen_prepare()
 List-Id: <qemu-devel.nongnu.org>
@@ -25,59 +26,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+To: Max Reitz <mreitz@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---D8rfkD1TkAhvFrM0Di2T48IRUmHWNsIHs
-From: Max Reitz <mreitz@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- qemu-devel@nongnu.org
-Message-ID: <f051da3e-9181-0e72-b9eb-4e9c2d61e971@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v6 0/6] block: Don't compare strings in
- bdrv_reopen_prepare()
-References: <20171004152553.30263-1-mreitz@redhat.com>
- <87zi7u4hob.fsf@dusky.pond.sub.org>
-In-Reply-To: <87zi7u4hob.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
+
+--at6+YcpfzWZg/htY
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On 2017-11-10 10:16, Markus Armbruster wrote:
-> Max Reitz <mreitz@redhat.com> writes:
->=20
->> bdrv_reopen_prepare() assumes that all BDS options are strings, which =
+Am 10.11.2017 um 18:36 hat Max Reitz geschrieben:
+> On 2017-11-10 10:16, Markus Armbruster wrote:
+> > Max Reitz <mreitz@redhat.com> writes:
+> >=20
+> >> bdrv_reopen_prepare() assumes that all BDS options are strings, which =
 is
->> not necessarily correct. This series introduces a new qobject_is_equal=
+> >> not necessarily correct. This series introduces a new qobject_is_equal=
 ()
->> function which can be used to test whether any options have changed,
->> independently of their type.
+> >> function which can be used to test whether any options have changed,
+> >> independently of their type.
+> >=20
+> > Series looks ready to me.  It touches QAPI to achieve its purpose in the
+> > block layer; I'd be fine with merging it via a block tree.
 >=20
-> Series looks ready to me.  It touches QAPI to achieve its purpose in th=
-e
-> block layer; I'd be fine with merging it via a block tree.
+> Thanks!  So now it's my problem to figure out whether this is 2.11
+> material...? :-)
 
-Thanks!  So now it's my problem to figure out whether this is 2.11
-material...? :-)
+The test case in patch 5 segfaults without the series. Why would it not
+be a bug fix (=3D 2.11 material)?
 
-Max
+Kevin
 
-
---D8rfkD1TkAhvFrM0Di2T48IRUmHWNsIHs
+--at6+YcpfzWZg/htY
 Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAloF45ISHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9A460IAKnWB0zTP9Sp+u1UjwWXVam6EXjZv91t
-caSS6GrN3HFaa5SO0tKWXt2O99ADQMQzJpCQmKa0a6juRBA3e4WQ7V1E8vbeYL+x
-22Wl5Rv0qxT5gPdfJhiwoXVKbsqrRuTFRje1PbukExAKIahVrUVnCdAuQgfPh41a
-Ksy8oh7Zrd42+yQP3gpmKptPql0Jv1veJ7dLhJarjeMNHhAjFJhgnih0Z/vHptyL
-Mnweyqdwi8Ab+6H5sC7dyg+QFCj81GUnK+TZtJv+pzJRWAivkha8+rfr5x/2rjGC
-udKqXX30mNfz7ALlOU2eGwUGh6QLR7KtzarR3kBY7cL7URdlOS+qSNw=
-=V/SC
+iQIcBAEBAgAGBQJaBeY+AAoJEH8JsnLIjy/WyfEQAK3KaXz0pSsknVakl/f2prG+
+ljxPOOEktuhUHGrFvmSsfDL53PEYrUb0CbJuDG8owVHJE8B7VCwk3ipZPuLPfAtZ
+GhqwMqZCgp9vA4Th0RQeqEqtE6iAaYL7VZ4GZmQ+fCbK/jLWJtLBi+nijCwgVex+
+fBXK1UQK/vvyFvO5Km927Lq4KXWIrkUv7hBKKU2rzuRTO0If7a6WW+I+UO0FFs/5
+AD9+31MesfI0pAUG3mHzzGsndyFRkfzylAXsGDUHEIbyn3e+KYPHmndx2fIEbac0
+O494zsrflCJAIL8nfI+Io8DhFXmREuCzcL72hhVD/xASeNhJSfuYr57xa9e8z7L/
+B9aumNyHpe5lOKaKJjUGgAY5DodMKKC2ql2vFP0o0C1avjZlZx4lglaU3Ftz++1f
+DPBCvbkyKFs8TdxoSw+dzZljtdPGLoPrmKeLNIN3V1CtrsJpTgmEIxrYj5Urn0Yy
+tttmHj7zrVbrr+3kF49v9SNhCC6nDyxxo1kV53yxt7E9wl36XPVN2MXQiEPzCpfn
+pNSCyVsjpBn8Ar7IHV/BLEnGe4tF+SAKs/mJmV1lyaAoCpcFFfIgZ4el0bLTK2d2
+5xnaMZig5FSXYq/qLWAJGI43OfYmrRKU/zg9Gqg0vXgVghzJt3Fyqcf5sUSYYWRO
+za6qnk0ui/Yz0TatsqjL
+=3ezL
 -----END PGP SIGNATURE-----
 
---D8rfkD1TkAhvFrM0Di2T48IRUmHWNsIHs--
+--at6+YcpfzWZg/htY--
