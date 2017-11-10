@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50116)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50135)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lprosek@redhat.com>) id 1eDDCR-0002tP-7z
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 12:34:40 -0500
+	(envelope-from <lprosek@redhat.com>) id 1eDDCS-0002v0-Hc
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 12:34:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lprosek@redhat.com>) id 1eDDCP-0001zt-V6
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 12:34:39 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33506)
+	(envelope-from <lprosek@redhat.com>) id 1eDDCR-00021B-OL
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 12:34:40 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45646)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1eDDCP-0001zT-NQ
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 12:34:37 -0500
+	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1eDDCR-00020Z-Ie
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 12:34:39 -0500
 From: Ladi Prosek <lprosek@redhat.com>
-Date: Fri, 10 Nov 2017 18:34:20 +0100
-Message-Id: <20171110173421.17904-3-lprosek@redhat.com>
+Date: Fri, 10 Nov 2017 18:34:21 +0100
+Message-Id: <20171110173421.17904-4-lprosek@redhat.com>
 In-Reply-To: <20171110173421.17904-1-lprosek@redhat.com>
 References: <20171110173421.17904-1-lprosek@redhat.com>
-Subject: [Qemu-devel] [PATCH 2/3] ivshmem: Always remove irqfd notifiers
+Subject: [Qemu-devel] [PATCH 3/3] ivshmem: Improve MSI irqfd error handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,100 +26,85 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: geoff@hostfission.com, pbonzini@redhat.com, armbru@redhat.com, marcandre.lureau@redhat.com
 
-As of commit 660c97eef6f8 ("ivshmem: use kvm irqfd for msi notifications"),
-QEMU crashes with:
+Adds a rollback path to ivshmem_enable_irqfd() and fixes
+ivshmem_disable_irqfd() to bail if irqfd has not been enabled.
 
-ivshmem: msix_set_vector_notifiers failed
-msix_unset_vector_notifiers: Assertion `dev->msix_vector_use_notifier && dev->msix_vector_release_notifier' failed.
-
-if MSI-X is repeatedly enabled and disabled on the ivshmem device, for example
-by loading and unloading the Windows ivshmem driver. This is because
-msix_unset_vector_notifiers() doesn't call any of the release notifier callbacks
-since MSI-X is already disabled at that point (msix_enabled() returning false
-is how this transition is detected in the first place). Thus ivshmem_vector_mask()
-doesn't run and when MSI-X is subsequently enabled again ivshmem_vector_unmask()
-fails.
-
-This is fixed by keeping track of unmasked vectors and making sure that
-ivshmem_vector_mask() always runs on MSI-X disable.
-
-Fixes: 660c97eef6f8 ("ivshmem: use kvm irqfd for msi notifications")
 Signed-off-by: Ladi Prosek <lprosek@redhat.com>
 ---
- hw/misc/ivshmem.c | 30 ++++++++++++++++++++++++------
- 1 file changed, 24 insertions(+), 6 deletions(-)
+ hw/misc/ivshmem.c | 37 ++++++++++++++++++++++++-------------
+ 1 file changed, 24 insertions(+), 13 deletions(-)
 
 diff --git a/hw/misc/ivshmem.c b/hw/misc/ivshmem.c
-index 6e46669744..493a5030a1 100644
+index 493a5030a1..ff07a94691 100644
 --- a/hw/misc/ivshmem.c
 +++ b/hw/misc/ivshmem.c
-@@ -77,6 +77,7 @@ typedef struct Peer {
- typedef struct MSIVector {
-     PCIDevice *pdev;
-     int virq;
-+    bool unmasked;
- } MSIVector;
+@@ -784,6 +784,20 @@ static int ivshmem_setup_interrupts(IVShmemState *s, Error **errp)
+     return 0;
+ }
  
- typedef struct IVShmemState {
-@@ -321,6 +322,7 @@ static int ivshmem_vector_unmask(PCIDevice *dev, unsigned vector,
-         error_report("ivshmem: vector %d route does not exist", vector);
-         return -EINVAL;
-     }
-+    assert(!v->unmasked);
- 
-     ret = kvm_irqchip_update_msi_route(kvm_state, v->virq, msg, dev);
-     if (ret < 0) {
-@@ -328,7 +330,11 @@ static int ivshmem_vector_unmask(PCIDevice *dev, unsigned vector,
-     }
-     kvm_irqchip_commit_routes(kvm_state);
- 
--    return kvm_irqchip_add_irqfd_notifier_gsi(kvm_state, n, NULL, v->virq);
-+    ret = kvm_irqchip_add_irqfd_notifier_gsi(kvm_state, n, NULL, v->virq);
-+    if (ret == 0) {
-+        v->unmasked = true;
++static void ivshmem_remove_kvm_msi_virq(IVShmemState *s, int vector)
++{
++    IVSHMEM_DPRINTF("ivshmem_remove_kvm_msi_virq vector:%d\n", vector);
++
++    if (s->msi_vectors[vector].pdev == NULL) {
++        return;
 +    }
-+    return ret;
++
++    /* it was cleaned when masked in the frontend. */
++    kvm_irqchip_release_virq(kvm_state, s->msi_vectors[vector].virq);
++
++    s->msi_vectors[vector].pdev = NULL;
++}
++
+ static void ivshmem_enable_irqfd(IVShmemState *s)
+ {
+     PCIDevice *pdev = PCI_DEVICE(s);
+@@ -795,7 +809,7 @@ static void ivshmem_enable_irqfd(IVShmemState *s)
+         ivshmem_add_kvm_msi_virq(s, i, &err);
+         if (err) {
+             error_report_err(err);
+-            /* TODO do we need to handle the error? */
++            goto undo;
+         }
+     }
+ 
+@@ -804,21 +818,14 @@ static void ivshmem_enable_irqfd(IVShmemState *s)
+                                   ivshmem_vector_mask,
+                                   ivshmem_vector_poll)) {
+         error_report("ivshmem: msix_set_vector_notifiers failed");
++        goto undo;
+     }
+-}
++    return;
+ 
+-static void ivshmem_remove_kvm_msi_virq(IVShmemState *s, int vector)
+-{
+-    IVSHMEM_DPRINTF("ivshmem_remove_kvm_msi_virq vector:%d\n", vector);
+-
+-    if (s->msi_vectors[vector].pdev == NULL) {
+-        return;
++undo:
++    while (--i >= 0) {
++        ivshmem_remove_kvm_msi_virq(s, i);
+     }
+-
+-    /* it was cleaned when masked in the frontend. */
+-    kvm_irqchip_release_virq(kvm_state, s->msi_vectors[vector].virq);
+-
+-    s->msi_vectors[vector].pdev = NULL;
  }
  
- static void ivshmem_vector_mask(PCIDevice *dev, unsigned vector)
-@@ -343,9 +349,12 @@ static void ivshmem_vector_mask(PCIDevice *dev, unsigned vector)
-         error_report("ivshmem: vector %d route does not exist", vector);
-         return;
-     }
-+    assert(v->unmasked);
- 
-     ret = kvm_irqchip_remove_irqfd_notifier_gsi(kvm_state, n, v->virq);
--    if (ret != 0) {
-+    if (ret == 0) {
-+        v->unmasked = false;
-+    } else {
-         error_report("remove_irqfd_notifier_gsi failed");
-     }
- }
-@@ -817,11 +826,20 @@ static void ivshmem_disable_irqfd(IVShmemState *s)
+ static void ivshmem_disable_irqfd(IVShmemState *s)
+@@ -826,6 +833,10 @@ static void ivshmem_disable_irqfd(IVShmemState *s)
      PCIDevice *pdev = PCI_DEVICE(s);
      int i;
  
--    for (i = 0; i < s->peers[s->vm_id].nb_eventfds; i++) {
--        ivshmem_remove_kvm_msi_virq(s, i);
--    }
--
-     msix_unset_vector_notifiers(pdev);
-+
-+    for (i = 0; i < s->peers[s->vm_id].nb_eventfds; i++) {
-+        /*
-+         * MSI-X is already disabled here so msix_unset_vector_notifiers
-+         * didn't call our release notifier. Do it now to keep our masks and
-+         * unmasks balanced.
-+         */
-+        if (s->msi_vectors[i].unmasked) {
-+            ivshmem_vector_mask(pdev, i);
-+        }
-+        ivshmem_remove_kvm_msi_virq(s, i);
++    if (!pdev->msix_vector_use_notifier) {
++        return;
 +    }
 +
- }
+     msix_unset_vector_notifiers(pdev);
  
- static void ivshmem_write_config(PCIDevice *pdev, uint32_t address,
+     for (i = 0; i < s->peers[s->vm_id].nb_eventfds; i++) {
 -- 
 2.13.5
