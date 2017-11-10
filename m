@@ -1,35 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48628)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49549)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eD97T-0001xK-Fa
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 08:13:16 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eD9CD-0002wH-Qf
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 08:18:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eD97O-0002Xg-Cn
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 08:13:15 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36726)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eD97O-0002VB-0k
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 08:13:10 -0500
-References: <20171031112457.10516.8971.stgit@pasha-VirtualBox>
-	<20171031112644.10516.1734.stgit@pasha-VirtualBox>
-	<a8979594-78e4-13dc-2958-f7b4444a1bb0@redhat.com>
-	<001501d353cd$29099010$7b1cb030$@ru>
-	<18ddcf7c-0198-a0ce-c2cc-992131512897@redhat.com>
-	<fbda6d5e-aee1-ec74-faf4-e2dde0003588@redhat.com>
-	<001201d3547d$929156c0$b7b40440$@ru>
-	<954d2fb6-ce56-3000-f395-404c238eb040@redhat.com>
-	<000301d359fc$c168fc30$443af490$@ru>
-	<331c5386-e0a9-8b85-66fb-cdd82eef8ece@redhat.com>
-	<000701d35a1f$9a2e7be0$ce8b73a0$@ru>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <0d21b0e1-976f-1088-b6d4-e452b38d4d03@redhat.com>
-Date: Fri, 10 Nov 2017 14:12:58 +0100
+	(envelope-from <kwolf@redhat.com>) id 1eD9CC-0002id-Ju
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 08:18:09 -0500
+Date: Fri, 10 Nov 2017 14:17:52 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20171110131752.GD5466@localhost.localdomain>
+References: <20171109204315.27072-1-mreitz@redhat.com>
+	<20171110024557.GB4849@lemon>
 MIME-Version: 1.0
-In-Reply-To: <000701d35a1f$9a2e7be0$ce8b73a0$@ru>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH 19/26] cpu-exec: reset exit flag before
- calling cpu_exec_nocache
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171110024557.GB4849@lemon>
+Subject: Re: [Qemu-devel] [PATCH for-2.11] block: Keep strong reference when
+ draining all BDS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,85 +24,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <dovgaluk@ispras.ru>, 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, mst@redhat.com, jasowang@redhat.com, quintela@redhat.com, zuban32s@gmail.com, maria.klimushenkova@ispras.ru, kraxel@redhat.com, boost.lists@gmail.com, alex.bennee@linaro.org
+To: Fam Zheng <famz@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
 
-On 10/11/2017 13:29, Pavel Dovgalyuk wrote:
->> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
->>>>>
->>>>> I tried this approach and it didn't work.
->>>>> I think iothread sets u16.high flag after resetting it in cpu_handle_interrupt.
->>>>
->>>> But why is this a problem?  The TB would exit immediately and go again
->>>> to cpu_handle_interrupt.  cpu_handle_interrupt returns true and
->>>> cpu_handle_exception causes the exception via cpu_exec_nocache.
->>>
->>> I've tested your variant more thoroughly.
->>> It seems, that iothread calls cpu_exec between atomic_set(&cpu->icount_decr.u16.high, 0);
->>> in cpu_handle_interrupt and cpu_exec_nocache in cpu_handle_exception.
->>> I see no other reason, because this happens not for the every time.
->>> And cpu_handle_interrupt is not called again, because cpu_handle_exception returns true.
->>> Therefore we have an infinite loop, because no other code here resets cpu-
->>> icount_decr.u16.high.
->>
->> Then returning true unconditionally is wrong in the cpu_exec_nocache
->> case.  What if you do:
->>
->> diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
->> index 61297f8f4a..fb5446be3e 100644
->> --- a/accel/tcg/cpu-exec.c
->> +++ b/accel/tcg/cpu-exec.c
->> @@ -470,7 +470,19 @@ static inline void cpu_handle_debug_exception(CPUState *cpu)
->>
->>  static inline bool cpu_handle_exception(CPUState *cpu, int *ret)
->>  {
->> -    if (cpu->exception_index >= 0) {
->> +    if (cpu->exception_index < 0) {
->> +#ifndef CONFIG_USER_ONLY
->> +        if (replay_has_exception()
->> +            && cpu->icount_decr.u16.low + cpu->icount_extra == 0) {
->> +            /* try to cause an exception pending in the log */
->> +            cpu_exec_nocache(cpu, 1, tb_find(cpu, NULL, 0, curr_cflags()), true);
->> +        }
->> +#endif
->> +        if (cpu->exception_index < 0) {
->> +            return;
+Am 10.11.2017 um 03:45 hat Fam Zheng geschrieben:
+> On Thu, 11/09 21:43, Max Reitz wrote:
+> > Draining a BDS may lead to graph modifications, which in turn may result
+> > in it and other BDS being stripped of their current references.  If
+> > bdrv_drain_all_begin() and bdrv_drain_all_end() do not keep strong
+> > references themselves, the BDS they are trying to drain (or undrain) may
+> > disappear right under their feet -- or, more specifically, under the
+> > feet of BDRV_POLL_WHILE() in bdrv_drain_recurse().
+> > 
+> > This fixes an occasional hang of iotest 194.
+> > 
+> > Signed-off-by: Max Reitz <mreitz@redhat.com>
+> > ---
+> >  block/io.c | 47 ++++++++++++++++++++++++++++++++++++++++++++---
+> >  1 file changed, 44 insertions(+), 3 deletions(-)
+> > 
+> > diff --git a/block/io.c b/block/io.c
+> > index 3d5ef2cabe..a0a2833e8e 100644
+> > --- a/block/io.c
+> > +++ b/block/io.c
+> > @@ -340,7 +340,10 @@ void bdrv_drain_all_begin(void)
+> >      bool waited = true;
+> >      BlockDriverState *bs;
+> >      BdrvNextIterator it;
+> > -    GSList *aio_ctxs = NULL, *ctx;
+> > +    GSList *aio_ctxs = NULL, *ctx, *bs_list = NULL, *bs_list_entry;
+> > +
+> > +    /* Must be called from the main loop */
+> > +    assert(qemu_get_current_aio_context() == qemu_get_aio_context());
+> >  
+> >      block_job_pause_all();
+> >  
+> > @@ -355,6 +358,12 @@ void bdrv_drain_all_begin(void)
+> >          if (!g_slist_find(aio_ctxs, aio_context)) {
+> >              aio_ctxs = g_slist_prepend(aio_ctxs, aio_context);
+> >          }
+> > +
+> > +        /* Keep a strong reference to all root BDS and copy them into
+> > +         * an own list because draining them may lead to graph
+> > +         * modifications. */
+> > +        bdrv_ref(bs);
+> > +        bs_list = g_slist_prepend(bs_list, bs);
+> >      }
+> >  
+> >      /* Note that completion of an asynchronous I/O operation can trigger any
+> > @@ -370,7 +379,11 @@ void bdrv_drain_all_begin(void)
+> >              AioContext *aio_context = ctx->data;
+> >  
+> >              aio_context_acquire(aio_context);
+> > -            for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
+> > +            for (bs_list_entry = bs_list; bs_list_entry;
+> > +                 bs_list_entry = bs_list_entry->next)
+> > +            {
+> > +                bs = bs_list_entry->data;
+> > +
+> >                  if (aio_context == bdrv_get_aio_context(bs)) {
+> >                      waited |= bdrv_drain_recurse(bs, true);
+> >                  }
+> > @@ -379,24 +392,52 @@ void bdrv_drain_all_begin(void)
+> >          }
+> >      }
+> >  
+> > +    for (bs_list_entry = bs_list; bs_list_entry;
+> > +         bs_list_entry = bs_list_entry->next)
+> > +    {
+> > +        bdrv_unref(bs_list_entry->data);
+> > +    }
+> > +
+> >      g_slist_free(aio_ctxs);
+> > +    g_slist_free(bs_list);
+> >  }
+> >  
+> >  void bdrv_drain_all_end(void)
+> >  {
+> >      BlockDriverState *bs;
+> >      BdrvNextIterator it;
+> > +    GSList *bs_list = NULL, *bs_list_entry;
+> > +
+> > +    /* Must be called from the main loop */
+> > +    assert(qemu_get_current_aio_context() == qemu_get_aio_context());
+> >  
+> > +    /* Keep a strong reference to all root BDS and copy them into an
+> > +     * own list because draining them may lead to graph modifications.
+> > +     */
+> >      for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
+> > -        AioContext *aio_context = bdrv_get_aio_context(bs);
+> > +        bdrv_ref(bs);
+> > +        bs_list = g_slist_prepend(bs_list, bs);
+> > +    }
+> > +
+> > +    for (bs_list_entry = bs_list; bs_list_entry;
+> > +         bs_list_entry = bs_list_entry->next)
+> > +    {
+> > +        AioContext *aio_context;
+> > +
+> > +        bs = bs_list_entry->data;
+> > +        aio_context = bdrv_get_aio_context(bs);
+> >  
+> >          aio_context_acquire(aio_context);
+> >          aio_enable_external(aio_context);
+> >          bdrv_parent_drained_end(bs);
+> >          bdrv_drain_recurse(bs, false);
+> >          aio_context_release(aio_context);
+> > +
+> > +        bdrv_unref(bs);
+> >      }
+> >  
+> > +    g_slist_free(bs_list);
+> > +
+> >      block_job_resume_all();
+> >  }
 > 
-> return false, I guess?
-> This approach allows iterating in case of races
-> and QEMU does not hangs anymore at replay.
+> It is better to put the references into BdrvNextIterator and introduce
+> bdrv_next_iterator_destroy() to free them? You'll need to touch all callers
+> because it is not C++, but it secures all of rest, which seems vulnerable in the
+> same pattern, for example the aio_poll() in iothread_stop_all().
 
-Great, can you put this change the next time you send your series?
-There are some parts that can definitely go in for 2.11.
+You could automatically free the references when bdrv_next() returns
+NULL. Then you need an explicit bdrv_next_iterator_destroy() only for
+callers that stop iterating halfway through the list.
 
-Thanks,
+Do you actually need to keep references to all BDSes in the whole list
+while using the iterator or would it be enough to just keep a reference
+to the current one?
 
-Paolo
-
->> +        }
->> +    }
->> +
->>          if (cpu->exception_index >= EXCP_INTERRUPT) {
->>              /* exit request from the cpu execution loop */
->>              *ret = cpu->exception_index;
->> @@ -505,16 +517,6 @@ static inline bool cpu_handle_exception(CPUState *cpu, int *ret)
->>              }
->>  #endif
->>          }
->> -#ifndef CONFIG_USER_ONLY
->> -    } else if (replay_has_exception()
->> -               && cpu->icount_decr.u16.low + cpu->icount_extra == 0) {
->> -        /* try to cause an exception pending in the log */
->> -        cpu_exec_nocache(cpu, 1, tb_find(cpu, NULL, 0, curr_cflags()), true);
->> -        *ret = -1;
->> -        return true;
->> -#endif
->> -    }
->> -
->>      return false;
->>  }
->>
-> 
-> 
-> Pavel Dovgalyuk
-> 
+Kevin
