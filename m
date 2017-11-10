@@ -1,32 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48348)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48839)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton@advancedtelematic.com>) id 1eDD5G-00008m-Ps
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 12:27:15 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eDD7c-0001eh-OH
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 12:29:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton@advancedtelematic.com>) id 1eDD5C-0005nY-Kn
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 12:27:14 -0500
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:33356)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <anton@advancedtelematic.com>)
-	id 1eDD5C-0005ms-Cm
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 12:27:10 -0500
-Received: by mail-wm0-x241.google.com with SMTP id r68so6625065wmr.0
-	for <qemu-devel@nongnu.org>; Fri, 10 Nov 2017 09:27:10 -0800 (PST)
-From: Anton Gerasimov <anton@advancedtelematic.com>
-References: <cb94e9b2-d7c6-68ab-bb25-42f7d8113e03@advancedtelematic.com>
-	<CAEUhbmVTaJmL1jG8aBPPcJ-d+vKba8xhLgc=+7Fd8HHUvVW+-Q@mail.gmail.com>
-	<9b2efc90-3b0e-b13b-27bb-117473c8b41b@advancedtelematic.com>
-	<2fd2077a-9823-41e0-0deb-4142b20259d5@advancedtelematic.com>
-	<CAEUhbmXJZnLZgx8b2ZHV1wfqZvO=agSsp0Yvi7FQQfV6MM1cnA@mail.gmail.com>
-	<1cc32460-6067-0c1c-0182-eb17933293d9@advancedtelematic.com>
-Message-ID: <ae876253-6a29-eacb-b990-860146a297b2@advancedtelematic.com>
-Date: Fri, 10 Nov 2017 18:25:43 +0100
+	(envelope-from <mreitz@redhat.com>) id 1eDD7b-0007O1-RM
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 12:29:40 -0500
+References: <20171109203025.27493-1-mreitz@redhat.com>
+	<20171109203025.27493-5-mreitz@redhat.com>
+	<w51375mv4by.fsf@maestria.local.igalia.com>
+	<d44fc75f-829c-65cd-fc19-04f32d897f8a@redhat.com>
+	<w51tvy2t9m1.fsf@maestria.local.igalia.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <45294d61-b108-3e96-2bdc-59b3d471fefa@redhat.com>
+Date: Fri, 10 Nov 2017 18:29:28 +0100
 MIME-Version: 1.0
-In-Reply-To: <1cc32460-6067-0c1c-0182-eb17933293d9@advancedtelematic.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [U-Boot] Support of latest qemux86-64
+In-Reply-To: <w51tvy2t9m1.fsf@maestria.local.igalia.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="2d5ejIxxFbEIINJFuDXS39eBpGjWkfCkQ"
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 4/5] iotests: Make 083 less
+ flaky
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,68 +28,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bin Meng <bmeng.cn@gmail.com>, Igor Mammedov <imammedo@redhat.com>
-Cc: U-Boot Mailing List <u-boot@lists.denx.de>, qemu-devel@nongnu.org
+To: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
 
-Yes, apparently 0xdfffc is in ROM area for QEMU (0xc0000 -- 0xe0000,
-defined in include/hw/loader.h). The next thing to figure out is why
-u-boot uses it as a stack area.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--2d5ejIxxFbEIINJFuDXS39eBpGjWkfCkQ
+From: Max Reitz <mreitz@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
+ Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <45294d61-b108-3e96-2bdc-59b3d471fefa@redhat.com>
+Subject: Re: [Qemu-block] [PATCH v2 4/5] iotests: Make 083 less flaky
+References: <20171109203025.27493-1-mreitz@redhat.com>
+ <20171109203025.27493-5-mreitz@redhat.com>
+ <w51375mv4by.fsf@maestria.local.igalia.com>
+ <d44fc75f-829c-65cd-fc19-04f32d897f8a@redhat.com>
+ <w51tvy2t9m1.fsf@maestria.local.igalia.com>
+In-Reply-To: <w51tvy2t9m1.fsf@maestria.local.igalia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Best regards,
-Anton Gerasimov
-
-On 11/10/2017 06:04 PM, Anton Gerasimov wrote:
-> New guess:
->
-> in the most safe configuration of u-boot (CONFIG_SMP=n, lacpi disabled)
-> with Igor's patch applied `qemu-system-i386 -bios /path/to/uboot.rom`
-> fails on the first 'ret' instruction. GDB shows that memory at $esp
-> (0xdfffc at the entrance to board_init_f_mem) and everything around it
-> is zero despite 'call' and 'push' instructions executed. If you go one
-> commit before the breaking one it works fine, stuff gets put onto stack.
-> Could it that be that stack itself is in this 'readonly' area?
->
-> Thanks,
-> Anton Gerasimov
->
-> On 11/09/2017 02:58 AM, Bin Meng wrote:
->> On Wed, Nov 8, 2017 at 9:05 PM, Anton Gerasimov
->> <anton@advancedtelematic.com> wrote:
->>> Adding Igor Mammedov to the loop.
+On 2017-11-10 16:51, Alberto Garcia wrote:
+> On Fri 10 Nov 2017 04:18:15 PM CET, Max Reitz wrote:
+>> On 2017-11-10 11:02, Alberto Garcia wrote:
+>>> On Thu 09 Nov 2017 09:30:24 PM CET, Max Reitz wrote:
+>>>> +        echo > "$TEST_DIR/nbd-fault-injector.out"
+>>>>  	$PYTHON nbd-fault-injector.py $extra_args "$nbd_addr" "$TEST_DIR/n=
+bd-fault-injector.conf" >"$TEST_DIR/nbd-fault-injector.out" 2>&1 &
 >>>
->> Really add Igor Mammedov.
+>>> It seems that in this patch you're indenting with spaces but this fil=
+e
+>>> uses tabs.
 >>
->> Igor, can you help look at this?
->>
->>> On 11/08/2017 01:59 PM, Anton Gerasimov wrote:
->>>> To whoever might be interested: I've bisected qemu and the breaking
->>>> commit is 208fa0e43645edd0b0d8f838857dfc79daff40a8 (pc: make 'pc.rom'
->>>> readonly when machine has PCI enabled). It's just three lines added,
->>>> I'll paste the whole patch here. Not quite sure what can we do here though.
->>>>
->>>>
->>>>   diff --git a/hw/i386/pc.c b/hw/i386/pc.c
->>>>   index 22e16031b0..59435390ba 100644
->>>>   --- a/hw/i386/pc.c
->>>>   +++ b/hw/i386/pc.c
->>>>   @@ -1443,6 +1443,9 @@ void pc_memory_init(PCMachineState *pcms,
->>>>        option_rom_mr = g_malloc(sizeof(*option_rom_mr));
->>>>        memory_region_init_ram(option_rom_mr, NULL, "pc.rom", PC_ROM_SIZE,
->>>>                               &error_fatal);
->>>>   +    if (pcmc->pci_enabled) {
->>>>   +        memory_region_set_readonly(option_rom_mr, true);
->>>>   +    }
->>>>        memory_region_add_subregion_overlap(rom_memory,
->>>>                                            PC_ROM_MIN_VGA,
->>>>                                            option_rom_mr,
->>>>
->>>>
->> Regards,
->> Bin
->
+>> Yes, but tabs are wrong. :-)
+>=20
+> I actually agree with you, but don't mix them in the file :-)
 
--- 
-Anton Gerasimov, ATS Advanced Telematic Systems GmbH
-Kantstrasse 162, 10623 Berlin
-Managing Directors: Dirk Pöschl, Armin G. Schmidt
-Register Court: HRB 151501 B, Amtsgericht Charlottenburg
+I can whistle and say here, too, that Eric liked it. O:-)
+
+And I really don't want to use tabs in the second hunk of this patch, as
+it's broken over two lines.
+
+Max
+
+
+--2d5ejIxxFbEIINJFuDXS39eBpGjWkfCkQ
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAloF4fgSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AIVIH/1dpErPj+5+bKd+KpABLzuD7LgOx72s+
+gblDIa1XdximWVl3t6Ph/QWQZk5SWdE0qvfpgscu1ukTBC1KE6WyFoiaGCXjuNkh
+rIi0k+0MHRJEpGKtwQYp4T+/lBAvbBE0urJgdFvQXjbjqp4Y/1plEAtYAcPpM/MO
+ZWqIWC5HmwPMrlMR+NPNXnSf8rAXyztzZ7pBkmK79mVxuV6mdgECzv+Pk50ckDJz
+7JHp5Iv+l9u1A3BvF6rvXxrrwdoVcEACFgjeWt1502hsyZ8oXkIv/kYz5vvfIDtW
+ZnSo3Swnxbh2N/VKfim9Osn0/HR0H8eJ4ovTbXyXjf99NIu+KKW/+94=
+=GhFL
+-----END PGP SIGNATURE-----
+
+--2d5ejIxxFbEIINJFuDXS39eBpGjWkfCkQ--
