@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60202)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40657)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eCwg2-00055c-Uf
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 18:56:08 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eCx5R-0001oF-Vw
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 19:22:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eCwg1-00060d-Vk
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 18:56:07 -0500
-Received: from mail-wm0-x22e.google.com ([2a00:1450:400c:c09::22e]:47631)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eCwg1-0005zg-OF
-	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 18:56:05 -0500
-Received: by mail-wm0-x22e.google.com with SMTP id b14so5244416wme.2
-	for <qemu-devel@nongnu.org>; Thu, 09 Nov 2017 15:56:05 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <4beb4e47-0ff9-8251-6502-23824779edbd@amsat.org>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eCx5Q-0007Rw-UR
+	for qemu-devel@nongnu.org; Thu, 09 Nov 2017 19:22:21 -0500
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
 References: <1510228971-6005-1-git-send-email-sundeep.lkml@gmail.com>
 	<4beb4e47-0ff9-8251-6502-23824779edbd@amsat.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 9 Nov 2017 23:55:44 +0000
-Message-ID: <CAFEAcA-ATtAougvALVo=48p+jVx5B+Ejq60TD9dGYEQU2ReWCQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+	<CAFEAcA-ATtAougvALVo=48p+jVx5B+Ejq60TD9dGYEQU2ReWCQ@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <5a7b721c-fe04-921b-b9d2-986c9930b00b@amsat.org>
+Date: Thu, 9 Nov 2017 21:22:10 -0300
+MIME-Version: 1.0
+In-Reply-To: <CAFEAcA-ATtAougvALVo=48p+jVx5B+Ejq60TD9dGYEQU2ReWCQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Subject: Re: [Qemu-devel] [Qemu devel PATCH] MAINTAINERS: Add entries for
  Smartfusion2
 List-Id: <qemu-devel.nongnu.org>
@@ -31,28 +30,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+To: Peter Maydell <peter.maydell@linaro.org>, "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: Subbaraya Sundeep <sundeep.lkml@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Alistair Francis <alistair23@gmail.com>
 
-On 9 November 2017 at 21:46, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> =
-wrote:
-> Hi Subbaraya,
->
-> On 11/09/2017 09:02 AM, Subbaraya Sundeep wrote:
->> add voluntarily myself as maintainer for Smartfusion2
->
-> You need to share your GnuPG key signed, I couldn't find it using
-> http://pgp.mit.edu/pks/lookup?search=3DSubbaraya+Sundeep
->
-> from https://wiki.qemu.org/Contribute/SubmitAPullRequest :
+On 11/09/2017 08:55 PM, Peter Maydell wrote:
+> On 9 November 2017 at 21:46, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
+>> Hi Subbaraya,
+>>
+>> On 11/09/2017 09:02 AM, Subbaraya Sundeep wrote:
+>>> add voluntarily myself as maintainer for Smartfusion2
+>>
+>> You need to share your GnuPG key signed, I couldn't find it using
+>> http://pgp.mit.edu/pks/lookup?search=Subbaraya+Sundeep
+>>
+>> from https://wiki.qemu.org/Contribute/SubmitAPullRequest :
+> 
+> I don't in general expect to take pull requests from
+> everybody listed as a maintainer in the MAINTAINERS file.
+> That just means "I'm going to be reviewing and should
+> be cc'd on patches". Pull requests are sent by people
+> who are maintainers for a subsystem. Rule of thumb:
+> unless somebody asks you to send a pull request, you
+> don't need to do it.
 
-I don't in general expect to take pull requests from
-everybody listed as a maintainer in the MAINTAINERS file.
-That just means "I'm going to be reviewing and should
-be cc'd on patches". Pull requests are sent by people
-who are maintainers for a subsystem. Rule of thumb:
-unless somebody asks you to send a pull request, you
-don't need to do it.
+Ok, please apologize my misunderstanding. I still think the M: entry
+stand for 'Maintainer' instead of 'Mail', and still don't understand the
+difference with a "Designated reviewer" (R: entry):
 
-thanks
--- PMM
+        M: Mail patches to: FullName <address@domain>
+        R: Designated reviewer: FullName <address@domain>
+           These reviewers should be CCed on patches.
+
+"Designated reviewer" seems to duplicate the M: entry and is therefore
+confusing. Can we simply remove it instead?
+
+When introduced in fdf6fab4df4 the explanation was:
+
+--
+Some people are not content with the amount of mail they get, and would
+like to be CCed on patches for areas they do not maintain.  Let them
+satisfy their own appetite for qemu-devel messages.
+
+Seriously: the purpose here is a bit different from the Linux kernel.
+While Linux uses "R" to designate non-maintainers for reviewing patches
+in a given area, in QEMU I would also like to use "R" so that people can
+delegate sending pull requests while keeping some degree of oversight.
+--
+
+Regards,
+
+Phil.
