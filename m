@@ -1,33 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51037)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56756)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eD4jS-0007Vh-JZ
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 03:32:11 -0500
+	(envelope-from <armbru@redhat.com>) id 1eD50R-0001nj-F9
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 03:49:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eD4jP-00036O-F8
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 03:32:10 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36062)
+	(envelope-from <armbru@redhat.com>) id 1eD4zq-00036I-GK
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 03:49:43 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43560)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eD4jP-00035j-69
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 03:32:07 -0500
-References: <20171031112457.10516.8971.stgit@pasha-VirtualBox>
-	<20171031112644.10516.1734.stgit@pasha-VirtualBox>
-	<a8979594-78e4-13dc-2958-f7b4444a1bb0@redhat.com>
-	<001501d353cd$29099010$7b1cb030$@ru>
-	<18ddcf7c-0198-a0ce-c2cc-992131512897@redhat.com>
-	<fbda6d5e-aee1-ec74-faf4-e2dde0003588@redhat.com>
-	<001201d3547d$929156c0$b7b40440$@ru>
-	<954d2fb6-ce56-3000-f395-404c238eb040@redhat.com>
-	<000301d359fc$c168fc30$443af490$@ru>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <331c5386-e0a9-8b85-66fb-cdd82eef8ece@redhat.com>
-Date: Fri, 10 Nov 2017 09:31:52 +0100
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eD4zq-00035M-9K
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 03:49:06 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <1508443483-5429-1-git-send-email-alindsay@codeaurora.org>
+	<CAFEAcA-R-3F8US1RGJVNyVnC81z9+1dd3Liq0tmVSNz1eDszbA@mail.gmail.com>
+	<3d46d0f4463f337593b7347812f2de7e@codeaurora.org>
+	<ae32fdee-2233-a99a-1fc9-0da58cf4d846@weilnetz.de>
+	<CAFEAcA_KQyBAQ_cjTr8-pqSAibJOFc1mQF0yFgNyQNyzn8NzGg@mail.gmail.com>
+Date: Fri, 10 Nov 2017 09:48:56 +0100
+In-Reply-To: <CAFEAcA_KQyBAQ_cjTr8-pqSAibJOFc1mQF0yFgNyQNyzn8NzGg@mail.gmail.com>
+	(Peter Maydell's message of "Sat, 21 Oct 2017 11:19:42 +0100")
+Message-ID: <878tfe5xjb.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <000301d359fc$c168fc30$443af490$@ru>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH 19/26] cpu-exec: reset exit flag before
- calling cpu_exec_nocache
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] build: Don't force preserving permissions
+ on config-devices.mak.old
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,112 +31,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <dovgaluk@ispras.ru>, 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, mst@redhat.com, jasowang@redhat.com, quintela@redhat.com, zuban32s@gmail.com, maria.klimushenkova@ispras.ru, kraxel@redhat.com, boost.lists@gmail.com, alex.bennee@linaro.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Stefan Weil <sw@weilnetz.de>, QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Paul Brook <paul@codesourcery.com>
 
-On 10/11/2017 09:20, Pavel Dovgalyuk wrote:
->> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
->> On 03/11/2017 09:27, Pavel Dovgalyuk wrote:
->>>> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
->>>> On 02/11/2017 12:33, Paolo Bonzini wrote:
->>>>> On 02/11/2017 12:24, Pavel Dovgalyuk wrote:
->>>>>>> I am not sure about this.  I think if instead you should return false
->>>>>>> from here and EXCP_INTERRUPT from cpu_exec.
->>>>>> The problem is inside the TB. It checks cpu->icount_decr.u16.high which is -1.
->>>>>> And we have to enter the TB to cause an exception (because it exists in replay log).
->>>>>> That is why we reset this flag and try to execute the TB.
->>>>>
->>>>> But if u16.high is -1, shouldn't you return EXCP_INTERRUPT first (via
->>>>> "Finally, check if we need to exit to the main loop" in
->>>>> cpu_handle_interrupt)?  Then only cause the exception when that one is
->>>>> processed.
->>>>
->>>> ... indeed, you probably need something like:
->>>>
->>>>     /* Clear the interrupt flag now since we're processing
->>>>      * cpu->interrupt_request and cpu->exit_request.
->>>>      */
->>>>     insns_left = atomic_read(&cpu->icount_decr.u32);
->>>>     atomic_set(&cpu->icount_decr.u16.high, 0);
->>>>     if (unlikely(insns_left < 0) {
->>>>         /* Ensure the zeroing of icount_decr comes before the next read
->>>>          * of cpu->exit_request or cpu->interrupt_request.
->>>>          */
->>>>         smb_mb();
->>>>     }
->>>>
->>>> at the top of cpu_handle_interrupt.  Then you can remove the same
->>>> atomic_set+smp_mb in cpu_loop_exec_tb, like
->>>>
->>>>     *last_tb = NULL;
->>>>     insns_left = atomic_read(&cpu->icount_decr.u32);
->>>>     if (insns_left < 0) {
->>>>         /* Something asked us to stop executing chained TBs; just
->>>>          * continue round the main loop. Whatever requested the exit
->>>>          * will also have set something else (eg exit_request or
->>>>          * interrupt_request) which will be handled by
->>>>          * cpu_handle_interrupt.  cpu_handle_interrupt will also
->>>>          * clear cpu->icount_decr.u16.high.
->>>>          */
->>>>         return;
->>>>     }
->>>
->>> I tried this approach and it didn't work.
->>> I think iothread sets u16.high flag after resetting it in cpu_handle_interrupt.
+Peter Maydell <peter.maydell@linaro.org> writes:
+
+> On 20 October 2017 at 20:08, Stefan Weil <sw@weilnetz.de> wrote:
+>> Am 20.10.2017 um 20:24 schrieb alindsay@codeaurora.org:
+>>> On 2017-10-20 05:27, Peter Maydell wrote:
+>>>> Do we even need this code at all? As far as I can tell from
+>>>> the git logs, the idea is to support users who hand-modify
+>>>> config-devices.mak. But do we want to support that? I would
+>>>> think of config-devices.mak as an internal part of the build
+>>>> machinery, and the bit you can edit as a user is the stuff
+>>>> in default-configs/.
 >>
->> But why is this a problem?  The TB would exit immediately and go again
->> to cpu_handle_interrupt.  cpu_handle_interrupt returns true and
->> cpu_handle_exception causes the exception via cpu_exec_nocache.
-> 
-> I've tested your variant more thoroughly.
-> It seems, that iothread calls cpu_exec between atomic_set(&cpu->icount_decr.u16.high, 0); 
-> in cpu_handle_interrupt and cpu_exec_nocache in cpu_handle_exception.
-> I see no other reason, because this happens not for the every time.
-> And cpu_handle_interrupt is not called again, because cpu_handle_exception returns true.
-> Therefore we have an infinite loop, because no other code here resets cpu->icount_decr.u16.high.
+>> It's a long time since I wrote that code, but when I look at
+>> the commit message for my commit 012f0879234, it was written
+>> for users who do _not_ hand-modify config-devices.mak. They
+>> had a problem when they updated the code from git and the
+>> new version had changed some of the device configurations
+>> which were used to build config-devices.mak.
+>
+> Right, but it's only this complicated set of conditions
+> because we seem to be also trying to support the hand-modify
+> case. Otherwise we could just generate the new version
+> and copy it into place if it's changed, unconditionally...
 
-Then returning true unconditionally is wrong in the cpu_exec_nocache
-case.  What if you do:
-
-diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
-index 61297f8f4a..fb5446be3e 100644
---- a/accel/tcg/cpu-exec.c
-+++ b/accel/tcg/cpu-exec.c
-@@ -470,7 +470,19 @@ static inline void cpu_handle_debug_exception(CPUState *cpu)
- 
- static inline bool cpu_handle_exception(CPUState *cpu, int *ret)
- {
--    if (cpu->exception_index >= 0) {
-+    if (cpu->exception_index < 0) {
-+#ifndef CONFIG_USER_ONLY
-+        if (replay_has_exception()
-+            && cpu->icount_decr.u16.low + cpu->icount_extra == 0) {
-+            /* try to cause an exception pending in the log */
-+            cpu_exec_nocache(cpu, 1, tb_find(cpu, NULL, 0, curr_cflags()), true);
-+        }
-+#endif
-+        if (cpu->exception_index < 0) {
-+            return;
-+        }
-+    }
-+
-         if (cpu->exception_index >= EXCP_INTERRUPT) {
-             /* exit request from the cpu execution loop */
-             *ret = cpu->exception_index;
-@@ -505,16 +517,6 @@ static inline bool cpu_handle_exception(CPUState *cpu, int *ret)
-             }
- #endif
-         }
--#ifndef CONFIG_USER_ONLY
--    } else if (replay_has_exception()
--               && cpu->icount_decr.u16.low + cpu->icount_extra == 0) {
--        /* try to cause an exception pending in the log */
--        cpu_exec_nocache(cpu, 1, tb_find(cpu, NULL, 0, curr_cflags()), true);
--        *ret = -1;
--        return true;
--#endif
--    }
--
-     return false;
- }
- 
+So, do we need this patch?  If yes, who's going to merge it?  If no, do
+we need some other patch?
