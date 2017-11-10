@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58050)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59148)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1eDDnC-0000v2-9f
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 13:12:39 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eDDra-0002Xj-Tw
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 13:17:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1eDDn8-0008EO-R2
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 13:12:38 -0500
-Received: from out4-smtp.messagingengine.com ([66.111.4.28]:56281)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1eDDn8-0008DU-Mj
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 13:12:34 -0500
-Date: Fri, 10 Nov 2017 13:12:33 -0500
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20171110181233.GB17844@flamenco>
-References: <cover.1510263731.git.alistair.francis@xilinx.com>
-	<e23ac66f6ca0ac1b1bf89350e2b3a36a13e52957.1510263731.git.alistair.francis@xilinx.com>
+	(envelope-from <mreitz@redhat.com>) id 1eDDrZ-0002FO-VJ
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 13:17:10 -0500
+References: <cover.1510143008.git.berto@igalia.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <468a9b98-06ea-f3d5-d9ad-d62afe260845@redhat.com>
+Date: Fri, 10 Nov 2017 19:17:01 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e23ac66f6ca0ac1b1bf89350e2b3a36a13e52957.1510263731.git.alistair.francis@xilinx.com>
-Subject: Re: [Qemu-devel] [PATCH for 2.11 v2 1/2] xlnx-zynqmp: Properly
- support the smp command line option
+In-Reply-To: <cover.1510143008.git.berto@igalia.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="aAQmfUiCwCdlU30R9VJlMLT8CaHhirEcc"
+Subject: Re: [Qemu-devel] [PATCH 0/1] qcow2: Check that corrupted images can
+ be repaired in iotest 060
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,24 +24,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, alistair23@gmail.com, edgar.iglesias@xilinx.com, edgar.iglesias@gmail.com, ehabkost@redhat.com, f4bug@amsat.org
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
 
-On Thu, Nov 09, 2017 at 13:49:33 -0800, Alistair Francis wrote:
-> Allow the -smp command line option to control the number of CPUs we
-> create.
-> 
-> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--aAQmfUiCwCdlU30R9VJlMLT8CaHhirEcc
+From: Max Reitz <mreitz@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+Message-ID: <468a9b98-06ea-f3d5-d9ad-d62afe260845@redhat.com>
+Subject: Re: [PATCH 0/1] qcow2: Check that corrupted images can be repaired in
+ iotest 060
+References: <cover.1510143008.git.berto@igalia.com>
+In-Reply-To: <cover.1510143008.git.berto@igalia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Emilio G. Cota <cota@braap.org>
-Tested-by: Emilio G. Cota <cota@braap.org>
+On 2017-11-08 13:13, Alberto Garcia wrote:
+> Hi,
+>=20
+> I sent the 'Misc qcow2 corruption checks' series the other day, and
+> Kevin suggested that we check that the corrupted images can be
+> repaired using qemu-img.
+>=20
+> This patch extends the tests that I wrote in order to do just
+> that. Since the series is already in Max's branch I decided to write
+> this as a follow-up patch, but if you prefer I can resend it instead.
+>=20
+> Regards,
+>=20
+> Berto
 
-As I said in the other thread, this is much better than fiddling with
-MachineClass -- thanks!
+Thanks, applied to my block branch:
 
-I'll send now a proper series with the fixes we discussed in the other
-thread:
-  https://lists.gnu.org/archive/html/qemu-devel/2017-11/msg00502.html
+https://github.com/XanClic/qemu/commits/block
 
-		Emilio
+Max
+
+
+--aAQmfUiCwCdlU30R9VJlMLT8CaHhirEcc
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAloF7R0SHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AhqYH/3RB0a61y3x5mSm6IaiyLmm4uyDhfLIe
+YyFqQzGZHtCezNmhMGEZXCxrp4C9KM49PLKawh49jJgd0xWNgK0TSJGvJScwTc7H
+qRJXKpfFzfXaSdayPWsRsyq/zXEt4ZmfIFHnoKhBvQJIdM1DY17AnZ2Ygoa/zHJV
+zNwSujc1N0i57QbdPFsvxC8zFUOuOetBMw2WcT/tUB6feCoAZpVOXujhqiB1q7Ez
+JN2R4T1cmlAwFnjrIfbdaPTuFs1HVEbO7lB7h3OanG0Ct2njF6Ac3R6VLjay3hjd
+Eww6zEQsG23cspTpCHFphq4A/ug8uwcJHCLFyVLwW6ikNzFlSlYoEYc=
+=wVAq
+-----END PGP SIGNATURE-----
+
+--aAQmfUiCwCdlU30R9VJlMLT8CaHhirEcc--
