@@ -1,32 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47324)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52321)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1eDKJZ-0008Nx-G9
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 20:10:32 -0500
+	(envelope-from <zachriggle@gmail.com>) id 1eDKtY-0003x7-FL
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 20:47:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1eDKJV-0004BR-9m
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 20:10:29 -0500
-Received: from mail-pf0-x230.google.com ([2607:f8b0:400e:c00::230]:54678)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1eDKJU-0004B5-OA
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 20:10:25 -0500
-Received: by mail-pf0-x230.google.com with SMTP id n89so7829139pfk.11
-	for <qemu-devel@nongnu.org>; Fri, 10 Nov 2017 17:10:24 -0800 (PST)
-References: <7967e55c-de72-6ef2-eb92-a85af8fc2552@redhat.com>
-	<96ded936-f9e3-c712-291e-fcb3d44bbe65@amsat.org>
-	<20171108130102.GS12670@redhat.com>
-	<fd7bb230-bbe3-ce3c-3026-d3d51544a14a@ozlabs.ru>
-	<20171110104135.GB30685@redhat.com>
-	<a1d39dc8-72e1-55a6-7c36-4bbe8b6142fa@ozlabs.ru>
-	<20171110142240.GC30685@redhat.com>
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Message-ID: <e5bb3da2-6098-917f-5ce0-1fa1a1986714@ozlabs.ru>
-Date: Sat, 11 Nov 2017 12:10:16 +1100
+	(envelope-from <zachriggle@gmail.com>) id 1eDKtX-00011A-5W
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 20:47:40 -0500
 MIME-Version: 1.0
-In-Reply-To: <20171110142240.GC30685@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-AU
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] Yet another git submodule rant
+In-Reply-To: <fac44468-7869-57fa-fb5f-fbd98828489f@vivier.eu>
+References: <20171024230758.31779-1-riggle@google.com>
+	<20171025033442.44872-1-zachriggle@gmail.com>
+	<fac44468-7869-57fa-fb5f-fbd98828489f@vivier.eu>
+From: Zach Riggle <zachriggle@gmail.com>
+Date: Fri, 10 Nov 2017 19:47:00 -0600
+Message-ID: <CAMP9c5m6GK_Xwt6z3Bj+1WauHzHffzFb1cVD9ojeh2m8gA-D8w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2] linux-user: fix is_proc_myself to check
+ the paths via realpath
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,156 +25,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, "Emilio G. Cota" <cota@braap.org>, Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?Q?Michal_Such=c3=a1nek?= <msuchanek@suse.de>
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>, Riku Voipio <riku.voipio@iki.fi>, "open list:All patches CC here" <qemu-devel@nongnu.org>
 
-On 11/11/17 01:22, Daniel P. Berrange wrote:
-> On Sat, Nov 11, 2017 at 12:46:36AM +1100, Alexey Kardashevskiy wrote:
->> On 10/11/17 21:41, Daniel P. Berrange wrote:
->>> On Fri, Nov 10, 2017 at 09:35:54PM +1100, Alexey Kardashevskiy wrote:
->>>> On 09/11/17 00:01, Daniel P. Berrange wrote:
->>>>> On Wed, Nov 08, 2017 at 09:26:01AM -0300, Philippe Mathieu-Daudé wrote:
->>>>>> On 11/08/2017 06:57 AM, Thomas Huth wrote:
->>>>>>>
->>>>>>> That automatic git submodule stuff now broke my workflow again. I
->>>>>>> usually keep the git repository on my laptop and then simply rsync the
->>>>>>> sources (without .git directories) to my target machine to compile it
->>>>>>> there. Used to work great for years. Now it's broken, the build process
->>>>>>> complains:
->>>>>>>
->>>>>>> GIT submodule checkout is out of date. Please run
->>>>>>>   scripts/git-submodule.sh update
->>>>>>> from the source directory checkout /home/thuth/devel/qemu
->>>>>>>
->>>>>>> Running "scripts/git-submodule.sh update" did not fix the issue at all -
->>>>>>> I first had to tinker with it for a while to find out that I simply have
->>>>>>> to delete ".git-submodule-status" in my git tree to fix the issue.
->>>>>>>
->>>>>>> I've got the feeling that all this submodule crap is constantly causing
->>>>>>> pain ... do we really need this? Can't we find another solution instead?
->>>>>>> Or at least stop modifying files automatically in the $SRC_PATH ?
->>>>>>
->>>>>> Also yesterday on IRC:
->>>>>>
->>>>>> <RaV3N> [...] I downloaded the qemu source from git and tried to compile
->>>>>> it. I am getting this:
->>>>>>
->>>>>> ./configure --static && make && sudo make install
->>>>>>  CC      ui/input-keymap.o
->>>>>> ui/input-keymap.c:8:10: fatal error: ui/input-keymap-linux-to-qcode.c:
->>>>>> No such file or directory
->>>>>
->>>>> I had a pull request merged yesterday later afternoon which possibly
->>>>> would address that problem, though hard hard to say for certain.
->>>>
->>>> wow, already? :(
->>>>
->>>> I still wonder why do not we checkout submodules into the build directory
->>>> and why .git-submodule-status is not there too...
->>>
->>> That simply isn't the way submodules work, they are inherently part of
->>> the source tree, and the status file reflects that too.
->>
->> Sorry, I am missing the point here. What precisely does prevent us from
->> checking out the required modules to the build directory and build them
->> there? git provides a submodule repository url and sha1 for the current
->> qemu branch.
-> 
-> The build directory should never contain any of your version controlled
-> source, as that will get irretrievably lost when the build dir is purged.
+Good catch.  Relying on realpath() for *exe* does cause issues.
 
-I am not suggesting editing submodule sources from the build directory, I
-am suggesting not building them from the source directory, in order to keep
-them in sync, Makefile can rsync or "git push" them to the build directory.
-Yeah, fairly ugly but still more correct than the current solution.
+A better general solution (which handles the "exe" case) is to use open(2)
+with O_PATH | O_NOFOLLOW for the candidate path (e.g. /proc/self/exe) and
+to do the same for the path we're testing along with readlink().
 
-And again, .git-submodule-status is not a source file, what is it doing in
-$SRC_PATH?
-
-Now I cannot compile qemu pretty much 50% of time because of that
-enhancement. In the today's episode:
-
-ssh aikhostos2 cd /home/aik/pbuild/qemu-aikhostos2-ppc64/ ;
-/home/aik/p/qemu/configure --target-list=ppc64-softmmu
---source-path=/home/aik/p/qemu/ --enable-debug --enable-debug-info
---disable-werror --disable-git-update --enable-trace-backend=log
-
-All good. One detail:
-capstone          git
-
-ssh aikhostos2 make -C /home/aik/pbuild/qemu-aikhostos2-ppc64/ -j24
-
-make: Entering directory `/home/aik/pbuild/qemu-aikhostos2-ppc64'
-  GEN     ppc64-softmmu/config-devices.mak.tmp
-mkdir -p dtc/libfdt
-mkdir -p dtc/tests
-  GEN     config-host.h
-  GEN     qemu-options.def
-make[1]: *** No rule to make target
-`/home/aik/pbuild/qemu-aikhostos2-ppc64/capstone/libcapstone.a'.  Stop.
-make: *** [subdir-capstone] Error 2
-make: *** Waiting for unfinished jobs....
-  GEN     ppc64-softmmu/config-devices.mak
+If, in the process of link resolution via the readlink() loop, we end up
+with the same path as our candidate, we can return true.  This avoids the
+need to rely on any libc implementation of realpath(), since we're just
+relying on the host kernel.
 
 
-How, why, where are all these nice warning messages? Ah, there they are
-(added 'set -x' to the script):
+*Zach Riggle*
 
-+ substat=.git-submodule-status
-+ command=status
-+ shift
-+ maybe_modules='ui/keycodemapdb dtc capstone'
-+ test -z git
-+ modules=
-+ for m in '$maybe_modules'
-+ git submodule status ui/keycodemapdb
-+ test 128 = 0
-+ echo 'warn: ignoring non-existent submodule ui/keycodemapdb'
-+ for m in '$maybe_modules'
-+ git submodule status dtc
-+ test 128 = 0:m
-+ echo 'warn: ignoring non-existent submodule dtc'
-+ for m in '$maybe_modules'
-+ git submodule status capstone
-+ test 128 = 0
-+ echo 'warn: ignoring non-existent submodule capstone'
-+ test -n 'ui/keycodemapdb dtc capstone'
-+ test -e .git
-+ case "$command" in
-+ test -z 'ui/keycodemapdb dtc capstone'
-+ test -f .git-submodule-status
-+ exit 1
+On Fri, Nov 10, 2017 at 5:44 PM, Laurent Vivier <laurent@vivier.eu> wrote:
 
-
-I assume that 'warn' is not printed because of Makefile's 'quiet-command'.
-
-And this fails because on the server the source directory is created with
-'git worktree' which points to bare git repo outside of the source tree and
-the git on that build machine has no idea about worktrees (the repo is
-visible to the build machine).
-
-[vpl1 ~]$ ssh -x aikhostos2 'cd p/qemu && pwd && git --version && ls -d
-../qemu.git && git submodule status'
-/home/aik/p/qemu
-git version 1.8.3.1
-../qemu.git
-fatal: Not a git repository: /home/aik/p/qemu.git/worktrees/qemu
-
-
-Again - ok, when I know what is the problem, I know how to fix it - simply
-move .git away when running ./configure and make (as it also runs
-./configure some time) - but the messages... Firstly ./configure decides
-that 'capstone' comes from 'git', then it simply fails with no indication
-why it went wrong.
-
-Ha. I just found another workaround - I can do ./configure --with-git=false
-and silently disable git updates. Pretty much pointing a gun to my leg,
-ready to shoot.
-
-We could just check git submodule status every build and print a warning if
-it is out of sync but continue. This way I would look at the submodules
-list and decide what to do.
-
-
--- 
-Alexey
+> Le 25/10/2017 =C3=A0 05:34, Zach Riggle a =C3=A9crit :
+> > Previously, it was possible to get a handle to the "real" /proc/self/me=
+m
+> > by creating a symlink to it and opening the symlink, or opening e.g.
+> > "./mem" after chdir'ing to "/proc/self".
+> >
+> >     $ ln -s /proc/self self
+> >     $ cat self/maps
+> >     60000000-602bc000 r-xp 00000000 fc:01 270375
+>      /usr/bin/qemu-arm-static
+> >     604bc000-6050f000 rw-p 002bc000 fc:01 270375
+>      /usr/bin/qemu-arm-static
+> >     ...
+> >
+> > Signed-off-by: Zach Riggle <zachriggle@gmail.com>
+> > ---
+> >  linux-user/syscall.c | 47 ++++++++++++++++++++++++++++--
+> -----------------
+> >  1 file changed, 28 insertions(+), 19 deletions(-)
+> >
+> > diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+> > index 9bf901fa11..6c1f28a1f7 100644
+> > --- a/linux-user/syscall.c
+> > +++ b/linux-user/syscall.c
+> > @@ -7496,26 +7496,35 @@ static int open_self_auxv(void *cpu_env, int fd=
+)
+> >
+> >  static int is_proc_myself(const char *filename, const char *entry)
+> >  {
+> > -    if (!strncmp(filename, "/proc/", strlen("/proc/"))) {
+> > -        filename +=3D strlen("/proc/");
+> > -        if (!strncmp(filename, "self/", strlen("self/"))) {
+> > -            filename +=3D strlen("self/");
+> > -        } else if (*filename >=3D '1' && *filename <=3D '9') {
+> > -            char myself[80];
+> > -            snprintf(myself, sizeof(myself), "%d/", getpid());
+> > -            if (!strncmp(filename, myself, strlen(myself))) {
+> > -                filename +=3D strlen(myself);
+> > -            } else {
+> > -                return 0;
+> > -            }
+> > -        } else {
+> > -            return 0;
+> > -        }
+> > -        if (!strcmp(filename, entry)) {
+> > -            return 1;
+> > -        }
+> > +    char proc_self_entry[PATH_MAX + 1];
+> > +    char proc_self_entry_realpath[PATH_MAX + 1];
+> > +    char filename_realpath[PATH_MAX + 1];
+> > +
+> > +    if (PATH_MAX < snprintf(proc_self_entry,
+> > +                            sizeof(proc_self_entry),
+> > +                            "/proc/self/%s",
+> > +                            entry)) {
+> > +        /* Full path to "entry" is too long to fit in the buffer */
+> > +        return 0;
+> >      }
+> > -    return 0;
+> > +
+> > +    if (!realpath(filename, filename_realpath)) {
+> > +        /* File does not exist, or can't be canonicalized */
+> > +        return 0;
+> > +    }
+> > +
+> > +    if (!realpath(proc_self_entry, proc_self_entry_realpath)) {
+> > +        /* Procfs entry does not exist */
+> > +        return 0;
+> > +    }
+> > +
+> > +    if (strcmp(filename_realpath, proc_self_entry_realpath) !=3D 0) {
+> > +        /* Paths are different */
+>
+> I think it doesn't work with /proc/map/exe (or other soft link in
+> /proc/self) as realpath will give the path of the executable and not the
+> path inside /proc so it will be true for any process with the same
+> executable (which in our case is qemu for all).
+>
+> Thanks,
+> Laurent
+>
+>
