@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38982)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40699)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wlsaidhi@gmail.com>) id 1eDJ5U-0007Iu-Oc
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 18:51:53 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1eDJMD-00011b-D9
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 19:09:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wlsaidhi@gmail.com>) id 1eDJ5T-000456-V8
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 18:51:52 -0500
-Received: from mail-lf0-x22d.google.com ([2a00:1450:4010:c07::22d]:46724)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <wlsaidhi@gmail.com>) id 1eDJ5T-000420-OW
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 18:51:51 -0500
-Received: by mail-lf0-x22d.google.com with SMTP id k66so674312lfg.3
-	for <qemu-devel@nongnu.org>; Fri, 10 Nov 2017 15:51:51 -0800 (PST)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1eDJM2-0003qs-40
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 19:09:03 -0500
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+References: <20171110172545.32609-1-mreitz@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <e4501a6c-3643-d0cb-4b6f-a6569646edad@redhat.com>
+Date: Sat, 11 Nov 2017 01:08:51 +0100
 MIME-Version: 1.0
-From: william lin <wlsaidhi@gmail.com>
-Date: Fri, 10 Nov 2017 17:51:09 -0600
-Message-ID: <CAGC02hR-qCeeprFp17ZoRH3KDeuPAiMvKzRzt9kXuVODjN-+pQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] UT Austin Virtualization project
+In-Reply-To: <20171110172545.32609-1-mreitz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 for-2.11] block: Make bdrv_next() keep
+ strong references
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,20 +25,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
 
-Hi all,
+On 10/11/2017 18:25, Max Reitz wrote:
+>          if (bs) {
+> +            bdrv_ref(bs);
+> +            bdrv_unref(old_bs);
+>              return bs;
+>          }
 
-My name is William Lin. I am an undergrad student at UT Austin and for our
-virtualization class we have to contribute to a open source repo related to
-virtualization. I am working in a group of two with about a month of time.
-We are both comfortable with virtualization concepts and systems
-programming. If there are any ideas or suggestions please let me know it
-will be much appreciated. We are looking for any features/issues that would
-take a team of two about a month to complete.
+Maybe instead goto...
 
-Getting the code accepted is not a requirement for our project but is extra
-credit and would be preferred.
+>          it->phase = BDRV_NEXT_MONITOR_OWNED;
+> +    } else {
+> +        old_bs = it->bs;
+>      }
+>  
+>      /* Then return the monitor-owned BDSes without a BB attached. Ignore all
+> @@ -467,18 +483,46 @@ BlockDriverState *bdrv_next(BdrvNextIterator *it)
+>          bs = it->bs;
+>      } while (bs && bdrv_has_blk(bs));
 
-Thanks,
-Will
+... here?
+
+Paolo
+
+> +    if (bs) {
+> +        bdrv_ref(bs);
+> +    }
+> +    bdrv_unref(old_bs);
+> +
+>      return bs;
