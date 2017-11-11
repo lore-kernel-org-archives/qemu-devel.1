@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42914)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39427)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <th.huth@gmail.com>) id 1eDU7M-0001pP-UJ
-	for qemu-devel@nongnu.org; Sat, 11 Nov 2017 06:38:33 -0500
+	(envelope-from <groug@kaod.org>) id 1eDX7O-0000n2-1c
+	for qemu-devel@nongnu.org; Sat, 11 Nov 2017 09:50:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <th.huth@gmail.com>) id 1eDU7J-0000Rp-QX
-	for qemu-devel@nongnu.org; Sat, 11 Nov 2017 06:38:32 -0500
-Received: from mail-wm0-f43.google.com ([74.125.82.43]:54039)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <th.huth@gmail.com>) id 1eDU7J-0000R7-Jv
-	for qemu-devel@nongnu.org; Sat, 11 Nov 2017 06:38:29 -0500
-Received: by mail-wm0-f43.google.com with SMTP id g141so7104036wmg.2
-	for <qemu-devel@nongnu.org>; Sat, 11 Nov 2017 03:38:29 -0800 (PST)
-References: <CAGC02hR-qCeeprFp17ZoRH3KDeuPAiMvKzRzt9kXuVODjN-+pQ@mail.gmail.com>
-From: Thomas Huth <huth@tuxfamily.org>
-Message-ID: <d374dae1-37bd-5671-fb5a-839bb42176b3@tuxfamily.org>
-Date: Sat, 11 Nov 2017 12:38:24 +0100
+	(envelope-from <groug@kaod.org>) id 1eDX7K-0003ta-5f
+	for qemu-devel@nongnu.org; Sat, 11 Nov 2017 09:50:46 -0500
+Received: from 6.mo2.mail-out.ovh.net ([87.98.165.38]:53769)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1eDX7J-0003ri-VM
+	for qemu-devel@nongnu.org; Sat, 11 Nov 2017 09:50:42 -0500
+Received: from player718.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo2.mail-out.ovh.net (Postfix) with ESMTP id E3E83CAE75
+	for <qemu-devel@nongnu.org>; Sat, 11 Nov 2017 15:50:32 +0100 (CET)
+Date: Sat, 11 Nov 2017 15:50:19 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20171111155019.3771a379@bahia.lan>
+In-Reply-To: <20171110152017.24324-3-clg@kaod.org>
+References: <20171110152017.24324-1-clg@kaod.org>
+	<20171110152017.24324-3-clg@kaod.org>
 MIME-Version: 1.0
-In-Reply-To: <CAGC02hR-qCeeprFp17ZoRH3KDeuPAiMvKzRzt9kXuVODjN-+pQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] UT Austin Virtualization project
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-2.12 v3 02/11] ppc/xics: remove useless
+ if condition
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,27 +31,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: william lin <wlsaidhi@gmail.com>, qemu-devel@nongnu.org
+To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
-On 11.11.2017 00:51, william lin wrote:
-> Hi all,
-> 
-> My name is William Lin. I am an undergrad student at UT Austin and for our
-> virtualization class we have to contribute to a open source repo related to
-> virtualization. I am working in a group of two with about a month of time.
-> We are both comfortable with virtualization concepts and systems
-> programming. If there are any ideas or suggestions please let me know it
-> will be much appreciated. We are looking for any features/issues that would
-> take a team of two about a month to complete.
+On Fri, 10 Nov 2017 15:20:08 +0000
+C=C3=A9dric Le Goater <clg@kaod.org> wrote:
 
- Hi!
+> The previous code section uses a 'first < 0' test and returns. Therefore,
+> there is no need to test the 'first' variable against '>=3D 0' afterwards.
+>=20
+> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> ---
 
-A month is not that much time for doing bigger tasks ... but we've got a
-list of small things that might be doable for newcomers here:
+Reviewed-by: Greg Kurz <groug@kaod.org>
 
- https://wiki.qemu.org/BiteSizedTasks
-
-Maybe you can find something suitable there... ?
-
- HTH,
-  Thomas
+>  hw/intc/xics_spapr.c | 6 ++----
+>  1 file changed, 2 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
+> index d98ea8b13068..e8c0a1b3e903 100644
+> --- a/hw/intc/xics_spapr.c
+> +++ b/hw/intc/xics_spapr.c
+> @@ -329,10 +329,8 @@ int spapr_ics_alloc_block(ICSState *ics, int num, bo=
+ol lsi,
+>          return -1;
+>      }
+> =20
+> -    if (first >=3D 0) {
+> -        for (i =3D first; i < first + num; ++i) {
+> -            ics_set_irq_type(ics, i, lsi);
+> -        }
+> +    for (i =3D first; i < first + num; ++i) {
+> +        ics_set_irq_type(ics, i, lsi);
+>      }
+>      first +=3D ics->offset;
+> =20
