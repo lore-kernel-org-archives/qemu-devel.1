@@ -1,15 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45267)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45730)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1eDQsw-0006RE-FG
-	for qemu-devel@nongnu.org; Sat, 11 Nov 2017 03:11:30 -0500
+	(envelope-from <ppandit@redhat.com>) id 1eDQuu-00075v-AW
+	for qemu-devel@nongnu.org; Sat, 11 Nov 2017 03:13:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1eDQsv-0006fl-C4
-	for qemu-devel@nongnu.org; Sat, 11 Nov 2017 03:11:26 -0500
+	(envelope-from <ppandit@redhat.com>) id 1eDQut-0007mq-5N
+	for qemu-devel@nongnu.org; Sat, 11 Nov 2017 03:13:28 -0500
+Date: Sat, 11 Nov 2017 13:43:14 +0530 (IST)
 From: P J P <ppandit@redhat.com>
-Date: Sat, 11 Nov 2017 13:41:11 +0530
-Message-Id: <20171111081111.32724-1-ppandit@redhat.com>
-Subject: [Qemu-devel] [PATCH v1] highbank: validate register offset before
- access
+In-Reply-To: <7441e865-c6d7-7fbf-3175-63ebdf7291e7@amsat.org>
+Message-ID: <nycvar.YSQ.7.76.1711111341320.32164@wniryva>
+References: <20171109115814.28232-1-ppandit@redhat.com>
+	<7441e865-c6d7-7fbf-3175-63ebdf7291e7@amsat.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH] highbank: validate register
+ offset before access
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,63 +24,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Qemu Developers <qemu-devel@nongnu.org>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Moguofang <moguofang@huawei.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, Shawn Guo <shawn.guo@linaro.org>, Rob Herring <robh@kernel.org>, Prasad J Pandit <pjp@fedoraproject.org>
+To: =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc: Qemu Developers <qemu-devel@nongnu.org>, Moguofang <moguofang@huawei.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, Shawn Guo <shawn.guo@linaro.org>, Rob Herring <robh@kernel.org>
 
-From: Prasad J Pandit <pjp@fedoraproject.org>
+  Hello Philippe,
 
-An 'offset' parameter sent to highbank register r/w functions
-could be greater than number(NUM_REGS=0x200) of hb registers,
-leading to an OOB access issue. Add check to avoid it.
++-- On Fri, 10 Nov 2017, Philippe Mathieu-Daud=C3=A9 wrote --+
+| I'd report that:
+|=20
+|            qemu_log_mask(LOG_UNIMP, ...
+|=20
+| Cc'ing Shawn & Rob since this might also be a LOG_GUEST_ERROR.
+|=20
+| Mixed declarations (interleaving statements and declarations within
+| blocks) are generally not allowed; declarations should be at the
+| beginning of blocks.
 
-Reported-by: Moguofang (Dennis mo) <moguofang@huawei.com>
-Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
----
- hw/arm/highbank.c | 15 ++++++++++++++-
- 1 file changed, 14 insertions(+), 1 deletion(-)
+Done. Sent a revised patch v1.
 
-Update: log error message(via qemu_log_mask) before returning
-  -> https://lists.gnu.org/archive/html/qemu-devel/2017-11/msg01914.html
-
-diff --git a/hw/arm/highbank.c b/hw/arm/highbank.c
-index 354c6b25a8..8494dc6a48 100644
---- a/hw/arm/highbank.c
-+++ b/hw/arm/highbank.c
-@@ -34,6 +34,7 @@
- #include "hw/ide/ahci.h"
- #include "hw/cpu/a9mpcore.h"
- #include "hw/cpu/a15mpcore.h"
-+#include "qemu/log.h"
- 
- #define SMP_BOOT_ADDR           0x100
- #define SMP_BOOT_REG            0x40
-@@ -117,14 +118,26 @@ static void hb_regs_write(void *opaque, hwaddr offset,
-         }
-     }
- 
-+    if (offset / 4 >= NUM_REGS) {
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "highbank: bad write offset 0x%x\n", (uint32_t)offset);
-+        return;
-+    }
-     regs[offset/4] = value;
- }
- 
- static uint64_t hb_regs_read(void *opaque, hwaddr offset,
-                              unsigned size)
- {
-+    uint32_t value;
-     uint32_t *regs = opaque;
--    uint32_t value = regs[offset/4];
-+
-+    if (offset / 4 >= NUM_REGS) {
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "highbank: bad read offset 0x%x\n", (uint32_t)offset);
-+        return 0;
-+    }
-+    value = regs[offset/4];
- 
-     if ((offset == 0x100) || (offset == 0x108) || (offset == 0x10C)) {
-         value |= 0x30000000;
--- 
-2.13.6
+Thank you.
+--
+Prasad J Pandit / Red Hat Product Security Team
+47AF CE69 3A90 54AA 9045 1053 DD13 3D32 FE5B 041F
