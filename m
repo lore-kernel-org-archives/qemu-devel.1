@@ -1,21 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33687)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39189)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lizhengui@huawei.com>) id 1eDLj6-0001TJ-Re
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 21:40:57 -0500
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1eDMdn-00074a-3s
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 22:39:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lizhengui@huawei.com>) id 1eDLj3-0002vY-Nj
-	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 21:40:56 -0500
-References: <1508564040-120700-1-git-send-email-lizhengui@huawei.com>
-	<20171110153345.GB17290@stefanha-x1.localdomain>
-From: l00284672 <lizhengui@huawei.com>
-Message-ID: <70de4562-2fa0-7371-4858-b1b8fb3fcd65@huawei.com>
-Date: Sat, 11 Nov 2017 10:37:47 +0800
-MIME-Version: 1.0
-In-Reply-To: <20171110153345.GB17290@stefanha-x1.localdomain>
-Content-Type: multipart/mixed; boundary="------------0ADFC56B1745250AC4CE27DF"
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block: all I/O should be
- completed before removing throttle timers.
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1eDMdi-00076y-8u
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 22:39:31 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:51256
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
+	id 1eDMdi-000761-3G
+	for qemu-devel@nongnu.org; Fri, 10 Nov 2017 22:39:26 -0500
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	vAB3d84P052082
+	for <qemu-devel@nongnu.org>; Fri, 10 Nov 2017 22:39:25 -0500
+Received: from e37.co.us.ibm.com (e37.co.us.ibm.com [32.97.110.158])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2e5h55v197-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 10 Nov 2017 22:39:24 -0500
+Received: from localhost
+	by e37.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
+	Fri, 10 Nov 2017 20:39:24 -0700
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Date: Fri, 10 Nov 2017 22:39:14 -0500
+In-Reply-To: <1510371554-29833-1-git-send-email-stefanb@linux.vnet.ibm.com>
+References: <1510371554-29833-1-git-send-email-stefanb@linux.vnet.ibm.com>
+Message-Id: <1510371554-29833-3-git-send-email-stefanb@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 2/2] tpm_tis: Return 0 for every register in
+ case of failure mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,46 +39,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: kwolf@redhat.com, jcody@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, lina.lulina@huawei.com, qemu-block@nongnu.org, subo7@huawei.com, eric.fangyi@huawei.com, qemu-devel@nongnu.org, wangjie88@huawei.com, sochin.jiang@huawei.com
+To: qemu-devel@nongnu.org, marcandre.lureau@redhat.com
+Cc: amarnath.valluri@intel.com, Stefan Berger <stefanb@linux.vnet.ibm.com>
 
---------------0ADFC56B1745250AC4CE27DF
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
+Rather than returning ~0, return 0 for every register in case of
+failure mode. The '0' is better to indicate that there's no device
+there.
 
-ok，thanks ！
+Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+---
+ hw/tpm/tpm_tis.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-
-On 2017/11/10 23:33, Stefan Hajnoczi wrote:
-> On Sat, Oct 21, 2017 at 01:34:00PM +0800, Zhengui Li wrote:
->> From: Zhengui <lizhengui@huawei.com>
->>
->> In blk_remove_bs, all I/O should be completed before removing throttle
->> timers. If there has inflight I/O, removing throttle timers here will
->> cause the inflight I/O never return.
->> This patch add bdrv_drained_begin before throttle_timers_detach_aio_context
->> to let all I/O completed before removing throttle timers.
->>
->> Signed-off-by: Zhengui <lizhengui@huawei.com>
->> ---
->>   block/block-backend.c | 4 ++++
->>   1 file changed, 4 insertions(+)
-> Hi Zhengui,
-> Sorry it took so long to get thism merged!
->
-> Thanks, applied to my block tree:
-> https://github.com/stefanha/qemu/commits/block
->
-> I moved the declaration of bs as suggested by Berto when I merged the
-> patch.
->
-> Stefan
-
-
---------------0ADFC56B1745250AC4CE27DF
-Content-Type: text/x-vcard; name="lizhengui.vcf"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="lizhengui.vcf"
-
-bnVsbA==
---------------0ADFC56B1745250AC4CE27DF--
+diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
+index eca3374..d0bdd96 100644
+--- a/hw/tpm/tpm_tis.c
++++ b/hw/tpm/tpm_tis.c
+@@ -519,7 +519,7 @@ static uint64_t tpm_tis_mmio_read(void *opaque, hwaddr addr,
+     uint8_t v;
+ 
+     if (tpm_backend_had_startup_error(s->be_driver)) {
+-        return val;
++        return 0;
+     }
+ 
+     switch (offset) {
+-- 
+2.5.5
