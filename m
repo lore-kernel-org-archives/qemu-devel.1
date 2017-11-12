@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53603)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53660)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <makovick@gmail.com>) id 1eDpjg-0002Ub-Tg
-	for qemu-devel@nongnu.org; Sun, 12 Nov 2017 05:43:33 -0500
+	(envelope-from <makovick@gmail.com>) id 1eDpjj-0002XM-Iy
+	for qemu-devel@nongnu.org; Sun, 12 Nov 2017 05:43:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <makovick@gmail.com>) id 1eDpje-00043j-3D
-	for qemu-devel@nongnu.org; Sun, 12 Nov 2017 05:43:32 -0500
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:35966)
+	(envelope-from <makovick@gmail.com>) id 1eDpji-00046w-Qt
+	for qemu-devel@nongnu.org; Sun, 12 Nov 2017 05:43:35 -0500
+Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:56611)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <makovick@gmail.com>) id 1eDpjd-00043D-Sg
-	for qemu-devel@nongnu.org; Sun, 12 Nov 2017 05:43:30 -0500
-Received: by mail-wm0-x241.google.com with SMTP id r68so9766450wmr.1
-	for <qemu-devel@nongnu.org>; Sun, 12 Nov 2017 02:43:29 -0800 (PST)
+	(Exim 4.71) (envelope-from <makovick@gmail.com>) id 1eDpji-00046R-Kl
+	for qemu-devel@nongnu.org; Sun, 12 Nov 2017 05:43:34 -0500
+Received: by mail-wr0-x243.google.com with SMTP id q66so12004155wrb.13
+	for <qemu-devel@nongnu.org>; Sun, 12 Nov 2017 02:43:34 -0800 (PST)
 From: Jindrich Makovicka <makovick@gmail.com>
-Date: Sun, 12 Nov 2017 11:42:39 +0100
-Message-Id: <20171112104246.10007-2-makovick@gmail.com>
+Date: Sun, 12 Nov 2017 11:42:45 +0100
+Message-Id: <20171112104246.10007-8-makovick@gmail.com>
 In-Reply-To: <20171112104246.10007-1-makovick@gmail.com>
 References: <20171023210803.20998-1-makovick@gmail.com>
 	<20171112104246.10007-1-makovick@gmail.com>
-Subject: [Qemu-devel] [PATCH 1/8] sdl2: Fix broken display updating after
- the window is hidden
+Subject: [Qemu-devel] [PATCH 7/8] sdl2: Do not leave grab when fullscreen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,35 +29,27 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>, Cole Robinson <crobinso@redhat.com>
 Cc: Jindrich Makovicka <makovick@gmail.com>
 
-With SDL 2.0.6, calling SDL_ShowWindow during SDL_WINDOWEVENT_HIDDEN
-blocks all subsequent display updates.
-
-Instead of trying to override the change, just update the scon->hidden
-flag.
+Prevents displaying of a doubled mouse pointer when moving the pointer
+to the screen edges when fullscreen.
 ---
- ui/sdl2.c | 8 ++------
- 1 file changed, 2 insertions(+), 6 deletions(-)
+ ui/sdl2.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/ui/sdl2.c b/ui/sdl2.c
-index 53dd447fd2..774904cbf2 100644
+index cdc599be48..6feb637739 100644
 --- a/ui/sdl2.c
 +++ b/ui/sdl2.c
-@@ -572,14 +572,10 @@ static void handle_windowevent(SDL_Event *ev)
+@@ -451,8 +451,9 @@ static void handle_mousemotion(SDL_Event *ev)
+         SDL_GetWindowSize(scon->real_window, &scr_w, &scr_h);
+         max_x = scr_w - 1;
+         max_y = scr_h - 1;
+-        if (gui_grab && (ev->motion.x == 0 || ev->motion.y == 0 ||
+-                         ev->motion.x == max_x || ev->motion.y == max_y)) {
++        if (gui_grab && !gui_fullscreen
++            && (ev->motion.x == 0 || ev->motion.y == 0 ||
++                ev->motion.x == max_x || ev->motion.y == max_y)) {
+             sdl_grab_end(scon);
          }
-         break;
-     case SDL_WINDOWEVENT_SHOWN:
--        if (scon->hidden) {
--            SDL_HideWindow(scon->real_window);
--        }
-+        scon->hidden = false;
-         break;
-     case SDL_WINDOWEVENT_HIDDEN:
--        if (!scon->hidden) {
--            SDL_ShowWindow(scon->real_window);
--        }
-+        scon->hidden = true;
-         break;
-     }
- }
+         if (!gui_grab &&
 -- 
 2.15.0
