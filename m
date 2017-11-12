@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53602)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53604)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <makovick@gmail.com>) id 1eDpjg-0002Ua-Ti
+	(envelope-from <makovick@gmail.com>) id 1eDpjg-0002Uc-Tq
 	for qemu-devel@nongnu.org; Sun, 12 Nov 2017 05:43:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <makovick@gmail.com>) id 1eDpje-000449-S1
+	(envelope-from <makovick@gmail.com>) id 1eDpjd-00043Y-Rk
 	for qemu-devel@nongnu.org; Sun, 12 Nov 2017 05:43:32 -0500
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:38741)
+Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:39971)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <makovick@gmail.com>) id 1eDpje-00043e-LX
-	for qemu-devel@nongnu.org; Sun, 12 Nov 2017 05:43:30 -0500
-Received: by mail-wm0-x243.google.com with SMTP id p75so9768483wmg.3
-	for <qemu-devel@nongnu.org>; Sun, 12 Nov 2017 02:43:30 -0800 (PST)
+	(Exim 4.71) (envelope-from <makovick@gmail.com>) id 1eDpjd-00042q-Kc
+	for qemu-devel@nongnu.org; Sun, 12 Nov 2017 05:43:29 -0500
+Received: by mail-wm0-x234.google.com with SMTP id b189so3027037wmd.5
+	for <qemu-devel@nongnu.org>; Sun, 12 Nov 2017 02:43:29 -0800 (PST)
 From: Jindrich Makovicka <makovick@gmail.com>
-Date: Sun, 12 Nov 2017 11:42:40 +0100
-Message-Id: <20171112104246.10007-3-makovick@gmail.com>
-In-Reply-To: <20171112104246.10007-1-makovick@gmail.com>
+Date: Sun, 12 Nov 2017 11:42:38 +0100
+Message-Id: <20171112104246.10007-1-makovick@gmail.com>
+In-Reply-To: <20171023210803.20998-1-makovick@gmail.com>
 References: <20171023210803.20998-1-makovick@gmail.com>
-	<20171112104246.10007-1-makovick@gmail.com>
-Subject: [Qemu-devel] [PATCH 2/8] sdl2: Do not quit the emulator when an
- auxilliary window is closed
+Subject: [Qemu-devel] [PATCH] SDL2 various fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,33 +26,22 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>, Cole Robinson <crobinso@redhat.com>
-Cc: Jindrich Makovicka <makovick@gmail.com>
 
----
- ui/sdl2.c | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
+Hi,
 
-diff --git a/ui/sdl2.c b/ui/sdl2.c
-index 774904cbf2..dfbd0de791 100644
---- a/ui/sdl2.c
-+++ b/ui/sdl2.c
-@@ -566,9 +566,14 @@ static void handle_windowevent(SDL_Event *ev)
-         update_displaychangelistener(&scon->dcl, 500);
-         break;
-     case SDL_WINDOWEVENT_CLOSE:
--        if (!no_quit) {
--            no_shutdown = 0;
--            qemu_system_shutdown_request(SHUTDOWN_CAUSE_HOST_UI);
-+        if (qemu_console_is_graphic(scon->dcl.con)) {
-+            if (!no_quit) {
-+                no_shutdown = 0;
-+                qemu_system_shutdown_request(SHUTDOWN_CAUSE_HOST_UI);
-+            }
-+        } else {
-+            SDL_HideWindow(scon->real_window);
-+            scon->hidden = true;
-         }
-         break;
-     case SDL_WINDOWEVENT_SHOWN:
--- 
-2.15.0
+here is a revised patchset:
+
+- sdl2: Do not hide the cursor on auxilliary windows 
+    split into two
+
+- sdl2: Only accept the hotkeys on the main window 
+    reworked, also with a more descriptive commit message
+
+- sdl2: Do not quit the emulator when an auxilliary window is closed
+    added missing scon->hidden update
+
+- sdl2: Fix broken display updating after the window is hidden
+    added scon->hidden update instead + the SHOWN part changed
+    the same way
+
+Regards, Jindrich
