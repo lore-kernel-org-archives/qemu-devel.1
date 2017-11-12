@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47672)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47984)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eDoUn-0002AZ-8x
-	for qemu-devel@nongnu.org; Sun, 12 Nov 2017 04:24:06 -0500
+	(envelope-from <lichunguang@hust.edu.cn>) id 1eDoXx-0002vZ-Nt
+	for qemu-devel@nongnu.org; Sun, 12 Nov 2017 04:27:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eDoUi-0008HH-AW
-	for qemu-devel@nongnu.org; Sun, 12 Nov 2017 04:24:05 -0500
-Received: from mout.kundenserver.de ([217.72.192.74]:59643)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eDoUi-0008Fg-1D
-	for qemu-devel@nongnu.org; Sun, 12 Nov 2017 04:24:00 -0500
-References: <20171110194935.17541-1-laurent@vivier.eu>
-	<20171112075627.5798b8b9@thl530.multi.box>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <6f6213f1-40e6-2761-ec5a-2cd77e76ba5c@vivier.eu>
-Date: Sun, 12 Nov 2017 10:23:50 +0100
+	(envelope-from <lichunguang@hust.edu.cn>) id 1eDoXs-0001Pw-E7
+	for qemu-devel@nongnu.org; Sun, 12 Nov 2017 04:27:21 -0500
+Received: from mail.hust.edu.cn ([202.114.0.240]:33462 helo=hust.edu.cn)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <lichunguang@hust.edu.cn>) id 1eDoXr-0001No-CH
+	for qemu-devel@nongnu.org; Sun, 12 Nov 2017 04:27:16 -0500
+Date: Sun, 12 Nov 2017 17:26:31 +0800 (GMT+08:00)
+From: "Chunguang Li" <lichunguang@hust.edu.cn>
 MIME-Version: 1.0
-In-Reply-To: <20171112075627.5798b8b9@thl530.multi.box>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] linux-user,
- s390x: ignore OS ABI value in ELF header
+Message-ID: <6e0e65ef.427f.15faf8d41e9.Coremail.lichunguang@hust.edu.cn>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
+Subject: [Qemu-devel] Abnormal observation during migration: too many
+ "write-not-dirty" pages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,69 +25,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <huth@tuxfamily.org>
-Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com, quintela@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, stefanha@redhat.com
 
-Le 12/11/2017 à 07:56, Thomas Huth a écrit :
-> Am Fri, 10 Nov 2017 20:49:35 +0100
-> schrieb Laurent Vivier <laurent@vivier.eu>:
-> 
->> I have this error:
->> bash: /sbin/ldconfig: cannot execute binary file: Exec format error
->>
->> because /sbin/ldconfig is:
->> ELF 64-bit MSB executable, IBM S/390, version 1 (GNU/Linux),
->> statically linked, for GNU/Linux 3.2.0,
->> BuildID[sha1]=90b64604014aafac9c1a0623b1cf447281d1a382, stripped
->>
->> OS ABI is GNU/linux
->>
->> "/bin/ls" works well:
->>
->> ELF 64-bit MSB shared object, IBM S/390, version 1 (SYSV),
->> dynamically linked, interpreter /lib/ld64.so.1, for GNU/Linux 3.2.0,
->> BuildID[sha1]=be9b19143d4657678846f6e5277383071fc1059a, stripped
->>
->> OS ABI is SYSV
->>
->> To be able to execute ldconfig, this patch modifies s390x binfmt mask
->> to ignore the OS ABI value (EI_OSABI, byte 7).
->>
->> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
->> ---
->>  scripts/qemu-binfmt-conf.sh | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/scripts/qemu-binfmt-conf.sh b/scripts/qemu-binfmt-conf.sh
->> index 8afc3eb5bb..e2e1b7544d 100755
->> --- a/scripts/qemu-binfmt-conf.sh
->> +++ b/scripts/qemu-binfmt-conf.sh
->> @@ -85,7 +85,7 @@
->> sh4eb_mask='\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff
->> sh4eb_family=sh4 
->>  s390x_magic='\x7fELF\x02\x02\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x16'
->> -s390x_mask='\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff'
->> +s390x_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff'
-> 
-> If I've got that right, the OSABI field should either be 0 for
-> "No extensions or unspecified" (which is then printed  by "file"
-> as SYSV) or 3 for "GNU/Linux".
-> Thus wouldn't it be better to use a mask of 0xfc here instead, so
-> that we refuse at least everything with a value > 3 here?
-No, because with this mask you allow HPUX and NetBSD (See
-/usr/include/elf.h), I don't think it's really better. The simplest way
-to manage this is to ignore the field. A better way should be to have
-two binfmt entries, one for SYSV and one for GNU/Linux, but as our goal
-is to run linux binaries on linux system, is it worth it?
-
-Most of the other archs use already 0.
-
-> 
-> Also I wonder whether i386 has the same problem, too?
-> 
-
-Yes, I think all targets can have the same problem (I have with m68k,
-but with the gcc-7/cc1 binary).
-
-Thanks,
-Laurent
+SGkgYWxsIQoKSSBnb3QgYSB2ZXJ5IGFibm9ybWFsIG9ic2VydmF0aW9uIGZvciB0aGUgVk0gbWln
+cmF0aW9uLiBJIGZvdW5kIHRoYXQgbWFueSBwYWdlcyBtYXJrZWQgYXMgZGlydHkgZHVyaW5nIG1p
+Z3JhdGlvbiBhcmUgIm5vdCByZWFsbHkgZGlydHkiLCB3aGljaCBpcywgdGhlaXIgY29udGVudCBh
+cmUgdGhlIHNhbWUgYXMgdGhlIG9sZCB2ZXJzaW9uLgoKCgoKSSBkaWQgdGhlIG1pZ3JhdGlvbiBl
+eHBlcmltZW50IGxpa2UgdGhpczoKCkR1cmluZyB0aGUgc2V0dXAgcGhhc2Ugb2YgbWlncmF0aW9u
+LCBmaXJzdCBJIHN1c3BlbmRlZCB0aGUgVk0uIFRoZW4gSSBjb3BpZWQgYWxsIHRoZSBwYWdlcyB3
+aXRoaW4gdGhlIGd1ZXN0IHBoeXNpY2FsIGFkZHJlc3Mgc3BhY2UgdG8gYSBtZW1vcnkgYnVmZmVy
+IGFzIGxhcmdlIGFzIHRoZSBndWVzdCBtZW1vcnkgc2l6ZS4gQWZ0ZXIgdGhhdCwgdGhlIGRpcnR5
+IHRyYWNraW5nIGJlZ2FuIGFuZCBJIHJlc3VtZWQgdGhlIFZNLiBCZXNpZGVzLCBhdCB0aGUgZW5k
+Cm9mIGVhY2ggaXRlcmF0aW9uLCBJIGFsc28gc3VzcGVuZGVkIHRoZSBWTSB0ZW1wb3JhcmlseS4g
+RHVyaW5nIHRoZSBzdXNwZW5zaW9uLCBJIGNvbXBhcmVkIHRoZSBjb250ZW50IG9mIGFsbCB0aGUg
+cGFnZXMgbWFya2VkIGFzIGRpcnR5IGluIHRoaXMgaXRlcmF0aW9uIGJ5dGUtYnktYnl0ZSB3aXRo
+IHRoZWlyIGZvcm1lciBjb3BpZXMgaW5zaWRlIHRoZSBidWZmZXIuIElmIHRoZSBjb250ZW50IG9m
+IG9uZSBwYWdlIHdhcyB0aGUgc2FtZSBhcyBpdHMgZm9ybWVyIGNvcHksIEkgcmVjb3JkZWQgaXQg
+YXMgYSAid3JpdGUtbm90LWRpcnR5IiBwYWdlICh0aGUgcGFnZSBpcyB3cml0dGVuIGV4YWN0bHkg
+d2l0aCB0aGUgc2FtZSBjb250ZW50IGFzIHRoZSBvbGQgdmVyc2lvbikuIE90aGVyd2lzZSwgSSBy
+ZXBsYWNlZCB0aGlzIHBhZ2UgaW4gdGhlIGJ1ZmZlciB3aXRoIHRoZSBuZXcgY29udGVudCwgZm9y
+IHRoZSBwb3NzaWJsZSBjb21wYXJpc29uIGluIHRoZSBmdXR1cmUuIEFmdGVyIHRoZSByZXNldCBv
+ZiB0aGUgZGlydHkgYml0bWFwLCBJIHJlc3VtZWQgdGhlIFZNLiBUaHVzLCBJIG9idGFpbiB0aGUg
+cHJvcG9ydGlvbiBvZiB0aGUgd3JpdGUtbm90LWRpcnR5IHBhZ2VzIHdpdGhpbiBhbGwgdGhlIHBh
+Z2VzIG1hcmtlZCBhcyBkaXJ0eSBmb3IgZWFjaCBwcmUtY29weSBpdGVyYXRpb24uCgpJIHJlcGVh
+dGVkIHRoaXMgZXhwZXJpbWVudCB3aXRoIDE1IHdvcmtsb2Fkcywgd2hpY2ggYXJlIDExIENQVTIw
+MDYgYmVuY2htYXJrcywgTWVtY2FjaGVkIHNlcnZlciwga2VybmVsIGNvbXBpbGF0aW9uLCBwbGF5
+aW5nIGEgdmlkZW8sIGFuZCBhbiBpZGxlIFZNLiBUaGUgQ1BVMjAwNiBiZW5jaG1hcmtzIGFuZCBN
+ZW1jYWNoZWQgYXJlIHdyaXRlLWludGVuc2l2ZSB3b3JrbG9hZHMuIFNvIGFsbW9zdCBhbGwgb2Yg
+dGhlbSBkaWQgbm90IGNvbnZlcmdlIHRvIHN0b3AtY29weS4KCgoKClN0YXJ0bGluZ2x5LCB0aGUg
+cHJvcG9ydGlvbnMgb2YgdGhlIHdyaXRlLW5vdC1kaXJ0eSBwYWdlcyBhcmUgcXVpdGUgaGlnaC4g
+TWVtY2FjaGVkIGFuZCB0aHJlZSBDUFUyMDA2IGJlbmNobWFya3MoemV1c21wLCBtY2YgYW5kIGJ6
+aXAyKSBoYXZlIHRoZSBtb3N0IGhpZ2ggcHJvcG9ydGlvbnMuIFRoZWlyIHByb3BvcnRpb25zIG9m
+IHRoZSB3cml0ZS1ub3QtZGlydHkgcGFnZXMgd2l0aGluIGFsbCB0aGUgZGlydHkgcGFnZXMgYXJl
+IGFzIGhpZ2ggYXMgNDUlLTgwJS4gVGhlIHByb3BvcnRpb25zIG9mIHRoZSBvdGhlciB3b3JrbG9h
+ZHMgYXJlIGFib3V0IDUlLTIwJSwgd2hpY2ggYXJlIGFsc28gYWJub3JtYWwuIEFjY29yZGluZyB0
+byBteSBpbnR1aXRpb24sIHRoZSBwcm9wb3J0aW9uIG9mIHdyaXRlLW5vdC1kaXJ0eSBwYWdlcyBz
+aG91bGQgYmUgZmFyIGxlc3MgdGhhbiB0aGVzZSBudW1iZXJzLiBJIHRoaW5rIGl0IHNob3VsZCBi
+ZSBxdWl0ZSBhIHBhcnRpY3VsYXIgY2FzZSB0aGF0IG9uZSBwYWdlIGlzIHdyaXR0ZW4gd2l0aCBl
+eGFjdGx5IHRoZSBzYW1lIGNvbnRlbnQgYXMgdGhlIGZvcm1lciBkYXRhLgoKQmVzaWRlcywgdGhl
+IHplcm8gcGFnZXMgYXJlIG5vdCBjb3VudGVkIGZvciBhbGwgdGhlIHJlc3VsdHMuIEJlY2F1c2Ug
+SSB0aGluayBjb2RlcyBsaWtlIG1lbXNldCgpIG1heSB3cml0ZSBsYXJnZSBhcmVhIG9mIHBhZ2Vz
+IHRvIHplcm8gcGFnZXMsIHdoaWNoIGFyZSBhbHJlYWR5IHplcm8gcGFnZXMgYmVmb3JlLgoKCgoK
+SSBleGNsdWRlZCBzb21lIHBvc3NpYmxlIHVua25vd24gcmVhc29ucyB3aXRoIHRoZSBtYWNoaW5l
+IGhhcmR3YXJlLCBiZWNhdXNlIEkgcmVwZWF0ZWQgdGhlIGV4cGVyaW1lbnRzIHdpdGggdHdvIHNl
+dHMgb2YgZGlmZmVyZW50IG1hY2hpbmVzLiBUaGVuIEkgZ3Vlc3NlZCBpdCBtaWdodCBiZSByZWxh
+dGVkIHdpdGggdGhlIGh1Z2UgcGFnZSBmZWF0dXJlLiBIb3dldmVyLCB0aGUgcmVzdWx0IHdhcyB0
+aGUgc2FtZSB3aGVuIEkgdHVybmVkIHRoZSBodWdlIHBhZ2UgZmVhdHVyZSBvZmYgaW4gdGhlIE9T
+LgoKCgoKTm93IHRoZXJlIGFyZSBvbmx5IHR3byBwb3NzaWJsZSByZWFzb25zIGluIG15IG9waW5p
+b24uIAoKRmlyc3QsIHRoZXJlIGlzIHNvbWUgYnVncyBpbiB0aGUgS1ZNIGtlcm5lbCBkaXJ0eSB0
+cmFja2luZyBtZWNoYW5pc20uIEl0IG1heSBtYXJrIHNvbWUgcGFnZXMgdGhhdCBkbyBub3QgcmVj
+ZWl2ZSB3cml0ZSByZXF1ZXN0IGFzIGRpcnR5LgoKU2Vjb25kLCB0aGVyZSBpcyBzb21lIGJ1Z3Mg
+aW4gdGhlIE9TIHJ1bm5pbmcgaW5zaWRlIHRoZSBWTS4gSXQgbWF5IGlzc3VlIHNvbWUgdW5uZWNl
+c3Nhcnkgd3JpdGUgcmVxdWVzdHMuCgoKCgpXaGF0IGRvIHlvdSB0aGluayBhYm91dCB0aGlzIGFi
+bm9ybWFsIHBoZW5vbWVub24/IEFueSBhZHZpY2Ugb3IgcG9zc2libGUgcmVhc29ucyBvciBldmVu
+IGd1ZXNzZXM/IEkgYXBwcmVjaWF0ZSBhbnkgcmVzcG9uc2VzLCBiZWNhdXNlIGl0IGhhcyBjb25m
+dXNlZCBtZSBmb3IgYSBsb25nIHRpbWUuIFRoYW5rIHlvdS4KCgotLQpDaHVuZ3VhbmcgTGksIFBo
+LkQuIENhbmRpZGF0ZQpXdWhhbiBOYXRpb25hbCBMYWJvcmF0b3J5IGZvciBPcHRvZWxlY3Ryb25p
+Y3MgKFdOTE8pCkh1YXpob25nIFVuaXZlcnNpdHkgb2YgU2NpZW5jZSAmIFRlY2hub2xvZ3kgKEhV
+U1QpCld1aGFuLCBIdWJlaSBQcm92LiwgQ2hpbmEKCg==
