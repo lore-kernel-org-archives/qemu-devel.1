@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39873)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39901)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <makovick@gmail.com>) id 1eDxxo-0001dU-D6
-	for qemu-devel@nongnu.org; Sun, 12 Nov 2017 14:30:41 -0500
+	(envelope-from <makovick@gmail.com>) id 1eDxxp-0001dk-O8
+	for qemu-devel@nongnu.org; Sun, 12 Nov 2017 14:30:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <makovick@gmail.com>) id 1eDxxn-0008Dy-1u
-	for qemu-devel@nongnu.org; Sun, 12 Nov 2017 14:30:40 -0500
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:34516)
+	(envelope-from <makovick@gmail.com>) id 1eDxxo-0008En-V2
+	for qemu-devel@nongnu.org; Sun, 12 Nov 2017 14:30:41 -0500
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:53368)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <makovick@gmail.com>) id 1eDxxm-0008Dp-RT
-	for qemu-devel@nongnu.org; Sun, 12 Nov 2017 14:30:38 -0500
-Received: by mail-wm0-x241.google.com with SMTP id n74so11661501wmi.1
-	for <qemu-devel@nongnu.org>; Sun, 12 Nov 2017 11:30:38 -0800 (PST)
+	(Exim 4.71) (envelope-from <makovick@gmail.com>) id 1eDxxo-0008EO-OU
+	for qemu-devel@nongnu.org; Sun, 12 Nov 2017 14:30:40 -0500
+Received: by mail-wm0-x242.google.com with SMTP id g141so11281239wmg.2
+	for <qemu-devel@nongnu.org>; Sun, 12 Nov 2017 11:30:40 -0800 (PST)
 From: Jindrich Makovicka <makovick@gmail.com>
-Date: Sun, 12 Nov 2017 20:30:26 +0100
-Message-Id: <20171112193032.9724-3-makovick@gmail.com>
+Date: Sun, 12 Nov 2017 20:30:28 +0100
+Message-Id: <20171112193032.9724-5-makovick@gmail.com>
 In-Reply-To: <20171112193032.9724-1-makovick@gmail.com>
 References: <903d8048-77e9-4a30-d8e1-56ccd8b6a6bc@amsat.org>
 	<20171112193032.9724-1-makovick@gmail.com>
-Subject: [Qemu-devel] [PATCH 2/8] sdl2: Do not quit the emulator when an
- auxilliary window is closed
+Subject: [Qemu-devel] [PATCH 4/8] sdl2: Do not hide the cursor on auxilliary
+ windows
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,30 +32,57 @@ Cc: Jindrich Makovicka <makovick@gmail.com>
 
 Signed-off-by: Jindrich Makovicka <makovick@gmail.com>
 ---
- ui/sdl2.c | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
+ ui/sdl2.c | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
 diff --git a/ui/sdl2.c b/ui/sdl2.c
-index 774904cbf2..dfbd0de791 100644
+index 9cf4b1772b..677c22282d 100644
 --- a/ui/sdl2.c
 +++ b/ui/sdl2.c
-@@ -566,9 +566,14 @@ static void handle_windowevent(SDL_Event *ev)
-         update_displaychangelistener(&scon->dcl, 500);
-         break;
-     case SDL_WINDOWEVENT_CLOSE:
--        if (!no_quit) {
--            no_shutdown = 0;
--            qemu_system_shutdown_request(SHUTDOWN_CAUSE_HOST_UI);
-+        if (qemu_console_is_graphic(scon->dcl.con)) {
-+            if (!no_quit) {
-+                no_shutdown = 0;
-+                qemu_system_shutdown_request(SHUTDOWN_CAUSE_HOST_UI);
-+            }
-+        } else {
-+            SDL_HideWindow(scon->real_window);
-+            scon->hidden = true;
-         }
-         break;
-     case SDL_WINDOWEVENT_SHOWN:
+@@ -465,6 +465,10 @@ static void handle_mousemotion(SDL_Event *ev)
+     int max_x, max_y;
+     struct sdl2_console *scon = get_scon_from_window(ev->key.windowID);
+ 
++    if (!qemu_console_is_graphic(scon->dcl.con)) {
++        return;
++    }
++    
+     if (qemu_input_is_absolute() || absolute_enabled) {
+         int scr_w, scr_h;
+         SDL_GetWindowSize(scon->real_window, &scr_w, &scr_h);
+@@ -492,6 +496,10 @@ static void handle_mousebutton(SDL_Event *ev)
+     SDL_MouseButtonEvent *bev;
+     struct sdl2_console *scon = get_scon_from_window(ev->key.windowID);
+ 
++    if (!qemu_console_is_graphic(scon->dcl.con)) {
++        return;
++    }
++    
+     bev = &ev->button;
+     if (!gui_grab && !qemu_input_is_absolute()) {
+         if (ev->type == SDL_MOUSEBUTTONUP && bev->button == SDL_BUTTON_LEFT) {
+@@ -514,6 +522,10 @@ static void handle_mousewheel(SDL_Event *ev)
+     SDL_MouseWheelEvent *wev = &ev->wheel;
+     InputButton btn;
+ 
++    if (!qemu_console_is_graphic(scon->dcl.con)) {
++        return;
++    }
++    
+     if (wev->y > 0) {
+         btn = INPUT_BUTTON_WHEEL_UP;
+     } else if (wev->y < 0) {
+@@ -655,6 +667,11 @@ static void sdl_mouse_warp(DisplayChangeListener *dcl,
+                            int x, int y, int on)
+ {
+     struct sdl2_console *scon = container_of(dcl, struct sdl2_console, dcl);
++
++    if (!qemu_console_is_graphic(scon->dcl.con)) {
++        return;
++    }
++    
+     if (on) {
+         if (!guest_cursor) {
+             sdl_show_cursor();
 -- 
 2.15.0
