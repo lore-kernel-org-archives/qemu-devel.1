@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38367)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38624)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <somlo@cmu.edu>) id 1eDrZd-0005Fq-14
-	for qemu-devel@nongnu.org; Sun, 12 Nov 2017 07:41:18 -0500
+	(envelope-from <somlo@cmu.edu>) id 1eDrao-0006DH-Td
+	for qemu-devel@nongnu.org; Sun, 12 Nov 2017 07:42:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <somlo@cmu.edu>) id 1eDrZZ-0006OO-N6
-	for qemu-devel@nongnu.org; Sun, 12 Nov 2017 07:41:16 -0500
-Received: from smtp.andrew.cmu.edu ([128.2.105.204]:54818)
+	(envelope-from <somlo@cmu.edu>) id 1eDral-0007HD-Q6
+	for qemu-devel@nongnu.org; Sun, 12 Nov 2017 07:42:30 -0500
+Received: from smtp.andrew.cmu.edu ([128.2.105.204]:54966)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <somlo@cmu.edu>) id 1eDrZZ-0006Nq-Ff
-	for qemu-devel@nongnu.org; Sun, 12 Nov 2017 07:41:13 -0500
-Date: Sun, 12 Nov 2017 07:41:10 -0500
+	(Exim 4.71) (envelope-from <somlo@cmu.edu>) id 1eDral-0007Gr-Jt
+	for qemu-devel@nongnu.org; Sun, 12 Nov 2017 07:42:27 -0500
+Date: Sun, 12 Nov 2017 07:42:24 -0500
 From: "Gabriel L. Somlo" <somlo@cmu.edu>
-Message-ID: <20171112124110.GC19857@hedwig.ini.cmu.edu>
+Message-ID: <20171112124224.GD19857@hedwig.ini.cmu.edu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20171031151938.14982-3-marcandre.lureau@redhat.com>
+In-Reply-To: <20171031151938.14982-4-marcandre.lureau@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 2/5] fw_cfg: add DMA register
+Subject: Re: [Qemu-devel] [PATCH v4 3/5] fw_cfg: do DMA read operation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,206 +29,317 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
 Cc: linux-kernel@vger.kernel.org, somlo@cmu.edu, qemu-devel@nongnu.org, mst@redhat.com
 
-On Tue, Oct 31, 2017 at 04:19:35PM +0100, Marc-Andr=E9 Lureau wrote:
-> Add an optional <dma_off> kernel module (or command line) parameter
-> using the following syntax:
+On Tue, Oct 31, 2017 at 04:19:36PM +0100, Marc-Andr=E9 Lureau wrote:
+> Modify fw_cfg_read_blob() to use DMA if the device supports it.
+> Return errors, because the operation may fail.
 >=20
->       [qemu_fw_cfg.]ioport=3D<size>@<base>[:<ctrl_off>:<data_off>[:<dma=
-_off>]]
->  or
->       [qemu_fw_cfg.]mmio=3D<size>@<base>[:<ctrl_off>:<data_off>[:<dma_o=
-ff>]]
+> To avoid polling with unbound amount of time, the DMA operation is
+> expected to complete within 200ms, or will return ETIME error.
 >=20
-> and initializes the register address using given or default offset.
+> We may want to switch all the *buf addresses to use only kmalloc'ed
+> buffers (instead of using stack/image addresses with dma=3Dfalse).
 >=20
 > Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
 
-Reviewed-by: Gabriel Somlo <somlo@cmu.edu>
+A couple of silly questions, inline, below.
+
+Thanks,
+--G
 
 > ---
->  drivers/firmware/qemu_fw_cfg.c | 53 ++++++++++++++++++++++++++++++++--=
---------
->  1 file changed, 41 insertions(+), 12 deletions(-)
+>  drivers/firmware/qemu_fw_cfg.c | 154 +++++++++++++++++++++++++++++++++=
++++-----
+>  1 file changed, 137 insertions(+), 17 deletions(-)
 >=20
 > diff --git a/drivers/firmware/qemu_fw_cfg.c b/drivers/firmware/qemu_fw_=
 cfg.c
-> index 5cfe39f7a45f..1f3e8545dab7 100644
+> index 1f3e8545dab7..8ce5e49b7c62 100644
 > --- a/drivers/firmware/qemu_fw_cfg.c
 > +++ b/drivers/firmware/qemu_fw_cfg.c
-> @@ -10,20 +10,21 @@
->   * and select subsets of aarch64), a Device Tree node (on arm), or usi=
-ng
->   * a kernel module (or command line) parameter with the following synt=
-ax:
->   *
-> - *      [qemu_fw_cfg.]ioport=3D<size>@<base>[:<ctrl_off>:<data_off>]
-> + *      [qemu_fw_cfg.]ioport=3D<size>@<base>[:<ctrl_off>:<data_off>[:<=
-dma_off>]]
->   * or
-> - *      [qemu_fw_cfg.]mmio=3D<size>@<base>[:<ctrl_off>:<data_off>]
-> + *      [qemu_fw_cfg.]mmio=3D<size>@<base>[:<ctrl_off>:<data_off>[:<dm=
-a_off>]]
->   *
->   * where:
->   *      <size>     :=3D size of ioport or mmio range
->   *      <base>     :=3D physical base address of ioport or mmio range
->   *      <ctrl_off> :=3D (optional) offset of control register
->   *      <data_off> :=3D (optional) offset of data register
-> + *      <dma_off> :=3D (optional) offset of dma register
->   *
->   * e.g.:
-> - *      qemu_fw_cfg.ioport=3D2@0x510:0:1		(the default on x86)
-> + *      qemu_fw_cfg.ioport=3D12@0x510:0:1:4	(the default on x86)
->   * or
-> - *      qemu_fw_cfg.mmio=3D0xA@0x9020000:8:0	(the default on arm)
-> + *      qemu_fw_cfg.mmio=3D16@0x9020000:8:0:16	(the default on arm)
->   */
+> @@ -33,6 +33,8 @@
+>  #include <linux/slab.h>
+>  #include <linux/io.h>
+>  #include <linux/ioport.h>
+> +#include <linux/delay.h>
+> +#include <linux/dma-mapping.h>
 > =20
->  #include <linux/module.h>
-> @@ -63,6 +64,7 @@ static resource_size_t fw_cfg_p_size;
->  static void __iomem *fw_cfg_dev_base;
->  static void __iomem *fw_cfg_reg_ctrl;
->  static void __iomem *fw_cfg_reg_data;
-> +static void __iomem *fw_cfg_reg_dma;
+>  MODULE_AUTHOR("Gabriel L. Somlo <somlo@cmu.edu>");
+>  MODULE_DESCRIPTION("QEMU fw_cfg sysfs support");
+> @@ -43,12 +45,26 @@ MODULE_LICENSE("GPL");
+>  #define FW_CFG_ID         0x01
+>  #define FW_CFG_FILE_DIR   0x19
 > =20
->  /* atomic access to fw_cfg device (potentially slow i/o, so using mute=
-x) */
->  static DEFINE_MUTEX(fw_cfg_dev_lock);
-> @@ -118,12 +120,14 @@ static void fw_cfg_io_cleanup(void)
->  # if (defined(CONFIG_ARM) || defined(CONFIG_ARM64))
->  #  define FW_CFG_CTRL_OFF 0x08
->  #  define FW_CFG_DATA_OFF 0x00
-> +#  define FW_CFG_DMA_OFF 0x10
->  # elif (defined(CONFIG_PPC_PMAC) || defined(CONFIG_SPARC32)) /* ppc/ma=
-c,sun4m */
->  #  define FW_CFG_CTRL_OFF 0x00
->  #  define FW_CFG_DATA_OFF 0x02
->  # elif (defined(CONFIG_X86) || defined(CONFIG_SPARC64)) /* x86, sun4u =
-*/
->  #  define FW_CFG_CTRL_OFF 0x00
->  #  define FW_CFG_DATA_OFF 0x01
-> +#  define FW_CFG_DMA_OFF 0x04
->  # else
->  #  error "QEMU FW_CFG not available on this architecture!"
->  # endif
-> @@ -133,7 +137,7 @@ static void fw_cfg_io_cleanup(void)
->  static int fw_cfg_do_platform_probe(struct platform_device *pdev)
->  {
->  	char sig[FW_CFG_SIG_SIZE];
-> -	struct resource *range, *ctrl, *data;
-> +	struct resource *range, *ctrl, *data, *dma;
-> =20
->  	/* acquire i/o range details */
->  	fw_cfg_is_mmio =3D false;
-> @@ -170,6 +174,7 @@ static int fw_cfg_do_platform_probe(struct platform=
-_device *pdev)
->  	/* were custom register offsets provided (e.g. on the command line)? =
-*/
->  	ctrl =3D platform_get_resource_byname(pdev, IORESOURCE_REG, "ctrl");
->  	data =3D platform_get_resource_byname(pdev, IORESOURCE_REG, "data");
-> +	dma =3D platform_get_resource_byname(pdev, IORESOURCE_REG, "dma");
->  	if (ctrl && data) {
->  		fw_cfg_reg_ctrl =3D fw_cfg_dev_base + ctrl->start;
->  		fw_cfg_reg_data =3D fw_cfg_dev_base + data->start;
-> @@ -179,6 +184,13 @@ static int fw_cfg_do_platform_probe(struct platfor=
-m_device *pdev)
->  		fw_cfg_reg_data =3D fw_cfg_dev_base + FW_CFG_DATA_OFF;
->  	}
-> =20
-> +	if (dma)
-> +		fw_cfg_reg_dma =3D fw_cfg_dev_base + dma->start;
-> +#ifdef FW_CFG_DMA_OFF
-> +	else
-> +		fw_cfg_reg_dma =3D fw_cfg_dev_base + FW_CFG_DMA_OFF;
-> +#endif
+> +#define FW_CFG_VERSION_DMA     0x02
+> +#define FW_CFG_DMA_CTL_ERROR   0x01
+> +#define FW_CFG_DMA_CTL_READ    0x02
+> +#define FW_CFG_DMA_CTL_SKIP    0x04
+> +#define FW_CFG_DMA_CTL_SELECT  0x08
+> +#define FW_CFG_DMA_CTL_WRITE   0x10
+> +#define FW_CFG_DMA_TIMEOUT     200 /* ms */
 > +
->  	/* verify fw_cfg device signature */
->  	fw_cfg_read_blob(FW_CFG_SIGNATURE, sig, 0, FW_CFG_SIG_SIZE);
->  	if (memcmp(sig, "QEMU", FW_CFG_SIG_SIZE) !=3D 0) {
-> @@ -628,6 +640,7 @@ static struct platform_device *fw_cfg_cmdline_dev;
->  /* use special scanf/printf modifier for phys_addr_t, resource_size_t =
-*/
->  #define PH_ADDR_SCAN_FMT "@%" __PHYS_ADDR_PREFIX "i%n" \
->  			 ":%" __PHYS_ADDR_PREFIX "i" \
-> +			 ":%" __PHYS_ADDR_PREFIX "i%n" \
->  			 ":%" __PHYS_ADDR_PREFIX "i%n"
+>  /* size in bytes of fw_cfg signature */
+>  #define FW_CFG_SIG_SIZE 4
 > =20
->  #define PH_ADDR_PR_1_FMT "0x%" __PHYS_ADDR_PREFIX "x@" \
-> @@ -637,12 +650,15 @@ static struct platform_device *fw_cfg_cmdline_dev=
-;
->  			 ":%" __PHYS_ADDR_PREFIX "u" \
->  			 ":%" __PHYS_ADDR_PREFIX "u"
+>  /* fw_cfg "file name" is up to 56 characters (including terminating nu=
+l) */
+>  #define FW_CFG_MAX_FILE_PATH 56
 > =20
-> +#define PH_ADDR_PR_4_FMT PH_ADDR_PR_3_FMT \
-> +			 ":%" __PHYS_ADDR_PREFIX "u"
+> +/* platform device for dma mapping */
+> +static struct device *dev;
 > +
->  static int fw_cfg_cmdline_set(const char *arg, const struct kernel_par=
-am *kp)
->  {
-> -	struct resource res[3] =3D {};
-> +	struct resource res[4] =3D {};
->  	char *str;
->  	phys_addr_t base;
-> -	resource_size_t size, ctrl_off, data_off;
-> +	resource_size_t size, ctrl_off, data_off, dma_off;
->  	int processed, consumed =3D 0;
+> +/* fw_cfg revision attribute, in /sys/firmware/qemu_fw_cfg top-level d=
+ir. */
+> +static u32 fw_cfg_rev;
+> +
+>  /* fw_cfg file directory entry type */
+>  struct fw_cfg_file {
+>  	u32 size;
+> @@ -57,6 +73,12 @@ struct fw_cfg_file {
+>  	char name[FW_CFG_MAX_FILE_PATH];
+>  };
 > =20
->  	/* only one fw_cfg device can exist system-wide, so if one
-> @@ -658,19 +674,20 @@ static int fw_cfg_cmdline_set(const char *arg, co=
-nst struct kernel_param *kp)
->  	/* consume "<size>" portion of command line argument */
->  	size =3D memparse(arg, &str);
+> +struct fw_cfg_dma {
+> +	u32 control;
+> +	u32 length;
+> +	u64 address;
+> +} __packed;
+> +
+>  /* fw_cfg device i/o register addresses */
+>  static bool fw_cfg_is_mmio;
+>  static phys_addr_t fw_cfg_p_base;
+> @@ -75,12 +97,93 @@ static inline u16 fw_cfg_sel_endianness(u16 key)
+>  	return fw_cfg_is_mmio ? cpu_to_be16(key) : cpu_to_le16(key);
+>  }
 > =20
-> -	/* get "@<base>[:<ctrl_off>:<data_off>]" chunks */
-> +	/* get "@<base>[:<ctrl_off>:<data_off>[:<dma_off>]]" chunks */
->  	processed =3D sscanf(str, PH_ADDR_SCAN_FMT,
->  			   &base, &consumed,
-> -			   &ctrl_off, &data_off, &consumed);
-> +			   &ctrl_off, &data_off, &consumed,
-> +			   &dma_off, &consumed);
-> =20
-> -	/* sscanf() must process precisely 1 or 3 chunks:
-> +	/* sscanf() must process precisely 1, 3 or 4 chunks:
->  	 * <base> is mandatory, optionally followed by <ctrl_off>
-> -	 * and <data_off>;
-> +	 * and <data_off>, and <dma_off>;
->  	 * there must be no extra characters after the last chunk,
->  	 * so str[consumed] must be '\0'.
->  	 */
->  	if (str[consumed] ||
-> -	    (processed !=3D 1 && processed !=3D 3))
-> +	    (processed !=3D 1 && processed !=3D 3 && processed !=3D 4))
->  		return -EINVAL;
-> =20
->  	res[0].start =3D base;
-> @@ -687,6 +704,11 @@ static int fw_cfg_cmdline_set(const char *arg, con=
-st struct kernel_param *kp)
->  		res[2].start =3D data_off;
->  		res[2].flags =3D IORESOURCE_REG;
->  	}
-> +	if (processed > 3) {
-> +		res[3].name =3D "dma";
-> +		res[3].start =3D dma_off;
-> +		res[3].flags =3D IORESOURCE_REG;
+> +static inline bool fw_cfg_dma_enabled(void)
+> +{
+> +	return fw_cfg_rev & FW_CFG_VERSION_DMA && fw_cfg_reg_dma;
+> +}
+> +
+> +static bool fw_cfg_wait_for_control(struct fw_cfg_dma *d, unsigned lon=
+g timeout)
+> +{
+> +	ktime_t start;
+> +	ktime_t stop;
+> +
+> +	start =3D ktime_get();
+> +	stop =3D ktime_add(start, ms_to_ktime(timeout));
+> +
+> +	do {
+> +		if ((be32_to_cpu(d->control) & ~FW_CFG_DMA_CTL_ERROR) =3D=3D 0)
+> +			return true;
+> +
+> +		usleep_range(50, 100);
+> +	} while (ktime_before(ktime_get(), stop));
+> +
+> +	return false;
+> +}
+> +
+> +static ssize_t fw_cfg_dma_transfer(void *address, u32 length, u32 cont=
+rol)
+> +{
+> +	dma_addr_t dma_addr =3D 0;
+> +	struct fw_cfg_dma *d;
+> +	dma_addr_t dma;
+> +	ssize_t ret =3D length;
+> +	enum dma_data_direction dir =3D
+> +		(control & FW_CFG_DMA_CTL_READ ? DMA_FROM_DEVICE : 0);
+> +
+> +	if (address && length) {
+> +		dma_addr =3D dma_map_single(dev, address, length, dir);
+> +		if (dma_mapping_error(NULL, dma_addr)) {
+> +			WARN(1, "%s: failed to map address\n", __func__);
+> +			return -EFAULT;
+> +		}
 > +	}
+> +
+> +	d =3D kmalloc(sizeof(*d), GFP_KERNEL | GFP_DMA);
+> +	if (!d) {
+> +		ret =3D -ENOMEM;
+> +		goto end;
+> +	}
+> +
+> +	dma =3D dma_map_single(dev, d, sizeof(*d), DMA_BIDIRECTIONAL);
+> +	if (dma_mapping_error(NULL, dma)) {
+> +		WARN(1, "%s: failed to map fw_cfg_dma\n", __func__);
+> +		ret =3D -EFAULT;
+> +		goto end;
+> +	}
+> +
+> +	*d =3D (struct fw_cfg_dma) {
+> +		.address =3D cpu_to_be64(dma_addr),
+> +		.length =3D cpu_to_be32(length),
+> +		.control =3D cpu_to_be32(control)
+> +	};
+> +
+> +	iowrite32be((u64)dma >> 32, fw_cfg_reg_dma);
+> +	iowrite32be(dma, fw_cfg_reg_dma + 4);
+> +
+> +	if (!fw_cfg_wait_for_control(d, FW_CFG_DMA_TIMEOUT)) {
+> +		WARN(1, "%s: timeout", __func__);
+> +		ret =3D -ETIME;
+> +	} else if (be32_to_cpu(d->control) & FW_CFG_DMA_CTL_ERROR) {
+> +		ret =3D -EIO;
+> +	}
+> +
+> +	dma_unmap_single(dev, dma, sizeof(*d), DMA_BIDIRECTIONAL);
+> +
+> +end:
+> +	kfree(d);
+> +	if (dma_addr)
+> +		dma_unmap_single(dev, dma_addr, length, dir);
+> +
+> +	return ret;
+> +}
+> +
+>  /* read chunk of given fw_cfg blob (caller responsible for sanity-chec=
+k) */
+> -static inline void fw_cfg_read_blob(u16 key,
+> -				    void *buf, loff_t pos, size_t count)
+> +static ssize_t fw_cfg_read_blob(u16 key,
+> +				void *buf, loff_t pos, size_t count,
+> +				bool dma)
+>  {
+>  	u32 glk =3D -1U;
+>  	acpi_status status;
+> +	ssize_t ret =3D count;
 > =20
->  	/* "processed" happens to nicely match the number of resources
->  	 * we need to pass in to this platform device.
-> @@ -721,6 +743,13 @@ static int fw_cfg_cmdline_get(char *buf, const str=
-uct kernel_param *kp)
->  				fw_cfg_cmdline_dev->resource[0].start,
->  				fw_cfg_cmdline_dev->resource[1].start,
->  				fw_cfg_cmdline_dev->resource[2].start);
-> +	case 4:
-> +		return snprintf(buf, PAGE_SIZE, PH_ADDR_PR_4_FMT,
-> +				resource_size(&fw_cfg_cmdline_dev->resource[0]),
-> +				fw_cfg_cmdline_dev->resource[0].start,
-> +				fw_cfg_cmdline_dev->resource[1].start,
-> +				fw_cfg_cmdline_dev->resource[2].start,
-> +				fw_cfg_cmdline_dev->resource[3].start);
+>  	/* If we have ACPI, ensure mutual exclusion against any potential
+>  	 * device access by the firmware, e.g. via AML methods:
+> @@ -90,17 +193,36 @@ static inline void fw_cfg_read_blob(u16 key,
+>  		/* Should never get here */
+>  		WARN(1, "fw_cfg_read_blob: Failed to lock ACPI!\n");
+>  		memset(buf, 0, count);
+> -		return;
+> +		return -EBUSY;
+
+Why EBUSY here (and not, e.g., EINVAL) ?
+
 >  	}
 > =20
->  	/* Should never get here */
+>  	mutex_lock(&fw_cfg_dev_lock);
+> -	iowrite16(fw_cfg_sel_endianness(key), fw_cfg_reg_ctrl);
+> -	while (pos-- > 0)
+> -		ioread8(fw_cfg_reg_data);
+> -	ioread8_rep(fw_cfg_reg_data, buf, count);
+> +	if (dma && fw_cfg_dma_enabled()) {
+> +		if (pos =3D=3D 0) {
+> +			ret =3D fw_cfg_dma_transfer(buf, count, key << 16
+> +						  | FW_CFG_DMA_CTL_SELECT
+> +						  | FW_CFG_DMA_CTL_READ);
+> +		} else {
+> +			iowrite16(fw_cfg_sel_endianness(key), fw_cfg_reg_ctrl);
+> +			ret =3D fw_cfg_dma_transfer(0, pos, FW_CFG_DMA_CTL_SKIP);
+
+s/0/NULL/ ?
+
+> +			if (ret < 0)
+> +				goto end;
+> +			ret =3D fw_cfg_dma_transfer(buf, count,
+> +						  FW_CFG_DMA_CTL_READ);
+> +		}
+> +	} else {
+> +		iowrite16(fw_cfg_sel_endianness(key), fw_cfg_reg_ctrl);
+> +		while (pos-- > 0)
+> +			ioread8(fw_cfg_reg_data);
+> +		ioread8_rep(fw_cfg_reg_data, buf, count);
+> +	}
+> +
+> +end:
+>  	mutex_unlock(&fw_cfg_dev_lock);
+> =20
+>  	acpi_release_global_lock(glk);
+> +
+> +	return ret;
+>  }
+> =20
+>  /* clean up fw_cfg device i/o */
+> @@ -192,7 +314,7 @@ static int fw_cfg_do_platform_probe(struct platform=
+_device *pdev)
+>  #endif
+> =20
+>  	/* verify fw_cfg device signature */
+> -	fw_cfg_read_blob(FW_CFG_SIGNATURE, sig, 0, FW_CFG_SIG_SIZE);
+> +	fw_cfg_read_blob(FW_CFG_SIGNATURE, sig, 0, FW_CFG_SIG_SIZE, false);
+>  	if (memcmp(sig, "QEMU", FW_CFG_SIG_SIZE) !=3D 0) {
+>  		fw_cfg_io_cleanup();
+>  		return -ENODEV;
+> @@ -201,9 +323,6 @@ static int fw_cfg_do_platform_probe(struct platform=
+_device *pdev)
+>  	return 0;
+>  }
+> =20
+> -/* fw_cfg revision attribute, in /sys/firmware/qemu_fw_cfg top-level d=
+ir. */
+> -static u32 fw_cfg_rev;
+> -
+>  static ssize_t fw_cfg_showrev(struct kobject *k, struct attribute *a, =
+char *buf)
+>  {
+>  	return sprintf(buf, "%u\n", fw_cfg_rev);
+> @@ -351,8 +470,7 @@ static ssize_t fw_cfg_sysfs_read_raw(struct file *f=
+ilp, struct kobject *kobj,
+>  	if (count > entry->f.size - pos)
+>  		count =3D entry->f.size - pos;
+> =20
+> -	fw_cfg_read_blob(entry->f.select, buf, pos, count);
+> -	return count;
+> +	return fw_cfg_read_blob(entry->f.select, buf, pos, count, true);
+>  }
+> =20
+>  static struct bin_attribute fw_cfg_sysfs_attr_raw =3D {
+> @@ -505,7 +623,7 @@ static int fw_cfg_register_dir_entries(void)
+>  	struct fw_cfg_file *dir;
+>  	size_t dir_size;
+> =20
+> -	fw_cfg_read_blob(FW_CFG_FILE_DIR, &count, 0, sizeof(count));
+> +	fw_cfg_read_blob(FW_CFG_FILE_DIR, &count, 0, sizeof(count), false);
+>  	count =3D be32_to_cpu(count);
+>  	dir_size =3D count * sizeof(struct fw_cfg_file);
+> =20
+> @@ -513,7 +631,7 @@ static int fw_cfg_register_dir_entries(void)
+>  	if (!dir)
+>  		return -ENOMEM;
+> =20
+> -	fw_cfg_read_blob(FW_CFG_FILE_DIR, dir, sizeof(count), dir_size);
+> +	fw_cfg_read_blob(FW_CFG_FILE_DIR, dir, sizeof(count), dir_size, true)=
+;
+> =20
+>  	for (i =3D 0; i < count; i++) {
+>  		dir[i].size =3D be32_to_cpu(dir[i].size);
+> @@ -544,9 +662,10 @@ static int fw_cfg_sysfs_probe(struct platform_devi=
+ce *pdev)
+>  	 * one fw_cfg device exist system-wide, so if one was already found
+>  	 * earlier, we might as well stop here.
+>  	 */
+> -	if (fw_cfg_sel_ko)
+> +	if (dev)
+>  		return -EBUSY;
+> =20
+> +	dev =3D &pdev->dev;
+>  	/* create by_key and by_name subdirs of /sys/firmware/qemu_fw_cfg/ */
+>  	err =3D -ENOMEM;
+>  	fw_cfg_sel_ko =3D kobject_create_and_add("by_key", fw_cfg_top_ko);
+> @@ -562,7 +681,7 @@ static int fw_cfg_sysfs_probe(struct platform_devic=
+e *pdev)
+>  		goto err_probe;
+> =20
+>  	/* get revision number, add matching top-level attribute */
+> -	fw_cfg_read_blob(FW_CFG_ID, &fw_cfg_rev, 0, sizeof(fw_cfg_rev));
+> +	fw_cfg_read_blob(FW_CFG_ID, &fw_cfg_rev, 0, sizeof(fw_cfg_rev), false=
+);
+>  	fw_cfg_rev =3D le32_to_cpu(fw_cfg_rev);
+>  	err =3D sysfs_create_file(fw_cfg_top_ko, &fw_cfg_rev_attr.attr);
+>  	if (err)
+> @@ -587,6 +706,7 @@ static int fw_cfg_sysfs_probe(struct platform_devic=
+e *pdev)
+>  err_name:
+>  	fw_cfg_kobj_cleanup(fw_cfg_sel_ko);
+>  err_sel:
+> +	dev =3D NULL;
+>  	return err;
+>  }
+> =20
 > --=20
 > 2.15.0.rc0.40.gaefcc5f6f
 >=20
