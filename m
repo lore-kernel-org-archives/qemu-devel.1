@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38970)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53531)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <somlo@cmu.edu>) id 1eDrcI-0007Bc-Vk
-	for qemu-devel@nongnu.org; Sun, 12 Nov 2017 07:44:04 -0500
+	(envelope-from <mlureau@redhat.com>) id 1eDtNH-0006rt-A4
+	for qemu-devel@nongnu.org; Sun, 12 Nov 2017 09:36:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <somlo@cmu.edu>) id 1eDrcF-0007qb-Td
-	for qemu-devel@nongnu.org; Sun, 12 Nov 2017 07:44:03 -0500
-Received: from smtp.andrew.cmu.edu ([128.2.105.203]:52966)
+	(envelope-from <mlureau@redhat.com>) id 1eDtNE-0003Th-43
+	for qemu-devel@nongnu.org; Sun, 12 Nov 2017 09:36:39 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54910)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <somlo@cmu.edu>) id 1eDrcF-0007qP-NC
-	for qemu-devel@nongnu.org; Sun, 12 Nov 2017 07:43:59 -0500
-Date: Sun, 12 Nov 2017 07:43:56 -0500
-From: "Gabriel L. Somlo" <somlo@cmu.edu>
-Message-ID: <20171112124333.GF19857@hedwig.ini.cmu.edu>
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1eDtND-0003S7-Ry
+	for qemu-devel@nongnu.org; Sun, 12 Nov 2017 09:36:36 -0500
+Date: Sun, 12 Nov 2017 09:36:33 -0500 (EST)
+From: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Message-ID: <1611912671.39195792.1510497393276.JavaMail.zimbra@redhat.com>
+In-Reply-To: <20171112124224.GD19857@hedwig.ini.cmu.edu>
+References: <20171112124224.GD19857@hedwig.ini.cmu.edu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20171031151938.14982-6-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 5/5] fw_cfg: write vmcoreinfo details
+Subject: Re: [Qemu-devel] [PATCH v4 3/5] fw_cfg: do DMA read operation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,171 +26,341 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
-Cc: linux-kernel@vger.kernel.org, somlo@cmu.edu, qemu-devel@nongnu.org, mst@redhat.com
+To: "Gabriel L. Somlo" <somlo@cmu.edu>
+Cc: linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, mst@redhat.com
 
-On Tue, Oct 31, 2017 at 04:19:38PM +0100, Marc-Andr=E9 Lureau wrote:
-> If the "etc/vmcoreinfo" fw_cfg file is present and we are not running
-> the kdump kernel, write the addr/size of the vmcoreinfo ELF note.
+
+
+----- Original Message -----
+> On Tue, Oct 31, 2017 at 04:19:36PM +0100, Marc-Andr=C3=A9 Lureau wrote:
+> > Modify fw_cfg_read_blob() to use DMA if the device supports it.
+> > Return errors, because the operation may fail.
+> >=20
+> > To avoid polling with unbound amount of time, the DMA operation is
+> > expected to complete within 200ms, or will return ETIME error.
+> >=20
+> > We may want to switch all the *buf addresses to use only kmalloc'ed
+> > buffers (instead of using stack/image addresses with dma=3Dfalse).
+> >=20
+> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 >=20
-> Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
-
-Same two questions as for 3/5 earlier :)
-
-Thanks,
---G
-
-> ---
->  drivers/firmware/qemu_fw_cfg.c | 87 ++++++++++++++++++++++++++++++++++=
-+++++++-
->  1 file changed, 86 insertions(+), 1 deletion(-)
+> A couple of silly questions, inline, below.
 >=20
-> diff --git a/drivers/firmware/qemu_fw_cfg.c b/drivers/firmware/qemu_fw_=
-cfg.c
-> index 8ce5e49b7c62..ebd9bb134900 100644
-> --- a/drivers/firmware/qemu_fw_cfg.c
-> +++ b/drivers/firmware/qemu_fw_cfg.c
-> @@ -35,6 +35,8 @@
->  #include <linux/ioport.h>
->  #include <linux/delay.h>
->  #include <linux/dma-mapping.h>
-> +#include <linux/crash_core.h>
-> +#include <linux/crash_dump.h>
-> =20
->  MODULE_AUTHOR("Gabriel L. Somlo <somlo@cmu.edu>");
->  MODULE_DESCRIPTION("QEMU fw_cfg sysfs support");
-> @@ -59,6 +61,8 @@ MODULE_LICENSE("GPL");
->  /* fw_cfg "file name" is up to 56 characters (including terminating nu=
-l) */
->  #define FW_CFG_MAX_FILE_PATH 56
-> =20
-> +#define VMCOREINFO_FORMAT_ELF 0x1
-> +
->  /* platform device for dma mapping */
->  static struct device *dev;
-> =20
-> @@ -127,7 +131,8 @@ static ssize_t fw_cfg_dma_transfer(void *address, u=
-32 length, u32 control)
->  	dma_addr_t dma;
->  	ssize_t ret =3D length;
->  	enum dma_data_direction dir =3D
-> -		(control & FW_CFG_DMA_CTL_READ ? DMA_FROM_DEVICE : 0);
-> +		(control & FW_CFG_DMA_CTL_READ ? DMA_FROM_DEVICE : 0) |
-> +		(control & FW_CFG_DMA_CTL_WRITE ? DMA_TO_DEVICE : 0);
-> =20
->  	if (address && length) {
->  		dma_addr =3D dma_map_single(dev, address, length, dir);
-> @@ -225,6 +230,48 @@ static ssize_t fw_cfg_read_blob(u16 key,
->  	return ret;
->  }
-> =20
-> +#ifdef CONFIG_CRASH_CORE
-> +/* write chunk of given fw_cfg blob (caller responsible for sanity-che=
-ck) */
-> +static ssize_t fw_cfg_write_blob(u16 key,
-> +				 void *buf, loff_t pos, size_t count)
-> +{
-> +	u32 glk =3D -1U;
-> +	acpi_status status;
-> +	ssize_t ret =3D count;
-> +
-> +	/* If we have ACPI, ensure mutual exclusion against any potential
-> +	 * device access by the firmware, e.g. via AML methods:
-> +	 */
-> +	status =3D acpi_acquire_global_lock(ACPI_WAIT_FOREVER, &glk);
-> +	if (ACPI_FAILURE(status) && status !=3D AE_NOT_CONFIGURED) {
-> +		/* Should never get here */
-> +		WARN(1, "%s: Failed to lock ACPI!\n", __func__);
-> +		memset(buf, 0, count);
-> +		return -EBUSY;
+> Thanks,
+> --G
+>=20
+> > ---
+> >  drivers/firmware/qemu_fw_cfg.c | 154
+> >  ++++++++++++++++++++++++++++++++++++-----
+> >  1 file changed, 137 insertions(+), 17 deletions(-)
+> >=20
+> > diff --git a/drivers/firmware/qemu_fw_cfg.c
+> > b/drivers/firmware/qemu_fw_cfg.c
+> > index 1f3e8545dab7..8ce5e49b7c62 100644
+> > --- a/drivers/firmware/qemu_fw_cfg.c
+> > +++ b/drivers/firmware/qemu_fw_cfg.c
+> > @@ -33,6 +33,8 @@
+> >  #include <linux/slab.h>
+> >  #include <linux/io.h>
+> >  #include <linux/ioport.h>
+> > +#include <linux/delay.h>
+> > +#include <linux/dma-mapping.h>
+> > =20
+> >  MODULE_AUTHOR("Gabriel L. Somlo <somlo@cmu.edu>");
+> >  MODULE_DESCRIPTION("QEMU fw_cfg sysfs support");
+> > @@ -43,12 +45,26 @@ MODULE_LICENSE("GPL");
+> >  #define FW_CFG_ID         0x01
+> >  #define FW_CFG_FILE_DIR   0x19
+> > =20
+> > +#define FW_CFG_VERSION_DMA     0x02
+> > +#define FW_CFG_DMA_CTL_ERROR   0x01
+> > +#define FW_CFG_DMA_CTL_READ    0x02
+> > +#define FW_CFG_DMA_CTL_SKIP    0x04
+> > +#define FW_CFG_DMA_CTL_SELECT  0x08
+> > +#define FW_CFG_DMA_CTL_WRITE   0x10
+> > +#define FW_CFG_DMA_TIMEOUT     200 /* ms */
+> > +
+> >  /* size in bytes of fw_cfg signature */
+> >  #define FW_CFG_SIG_SIZE 4
+> > =20
+> >  /* fw_cfg "file name" is up to 56 characters (including terminating nu=
+l)
+> >  */
+> >  #define FW_CFG_MAX_FILE_PATH 56
+> > =20
+> > +/* platform device for dma mapping */
+> > +static struct device *dev;
+> > +
+> > +/* fw_cfg revision attribute, in /sys/firmware/qemu_fw_cfg top-level d=
+ir.
+> > */
+> > +static u32 fw_cfg_rev;
+> > +
+> >  /* fw_cfg file directory entry type */
+> >  struct fw_cfg_file {
+> >  =09u32 size;
+> > @@ -57,6 +73,12 @@ struct fw_cfg_file {
+> >  =09char name[FW_CFG_MAX_FILE_PATH];
+> >  };
+> > =20
+> > +struct fw_cfg_dma {
+> > +=09u32 control;
+> > +=09u32 length;
+> > +=09u64 address;
+> > +} __packed;
+> > +
+> >  /* fw_cfg device i/o register addresses */
+> >  static bool fw_cfg_is_mmio;
+> >  static phys_addr_t fw_cfg_p_base;
+> > @@ -75,12 +97,93 @@ static inline u16 fw_cfg_sel_endianness(u16 key)
+> >  =09return fw_cfg_is_mmio ? cpu_to_be16(key) : cpu_to_le16(key);
+> >  }
+> > =20
+> > +static inline bool fw_cfg_dma_enabled(void)
+> > +{
+> > +=09return fw_cfg_rev & FW_CFG_VERSION_DMA && fw_cfg_reg_dma;
+> > +}
+> > +
+> > +static bool fw_cfg_wait_for_control(struct fw_cfg_dma *d, unsigned lon=
+g
+> > timeout)
+> > +{
+> > +=09ktime_t start;
+> > +=09ktime_t stop;
+> > +
+> > +=09start =3D ktime_get();
+> > +=09stop =3D ktime_add(start, ms_to_ktime(timeout));
+> > +
+> > +=09do {
+> > +=09=09if ((be32_to_cpu(d->control) & ~FW_CFG_DMA_CTL_ERROR) =3D=3D 0)
+> > +=09=09=09return true;
+> > +
+> > +=09=09usleep_range(50, 100);
+> > +=09} while (ktime_before(ktime_get(), stop));
+> > +
+> > +=09return false;
+> > +}
+> > +
+> > +static ssize_t fw_cfg_dma_transfer(void *address, u32 length, u32 cont=
+rol)
+> > +{
+> > +=09dma_addr_t dma_addr =3D 0;
+> > +=09struct fw_cfg_dma *d;
+> > +=09dma_addr_t dma;
+> > +=09ssize_t ret =3D length;
+> > +=09enum dma_data_direction dir =3D
+> > +=09=09(control & FW_CFG_DMA_CTL_READ ? DMA_FROM_DEVICE : 0);
+> > +
+> > +=09if (address && length) {
+> > +=09=09dma_addr =3D dma_map_single(dev, address, length, dir);
+> > +=09=09if (dma_mapping_error(NULL, dma_addr)) {
+> > +=09=09=09WARN(1, "%s: failed to map address\n", __func__);
+> > +=09=09=09return -EFAULT;
+> > +=09=09}
+> > +=09}
+> > +
+> > +=09d =3D kmalloc(sizeof(*d), GFP_KERNEL | GFP_DMA);
+> > +=09if (!d) {
+> > +=09=09ret =3D -ENOMEM;
+> > +=09=09goto end;
+> > +=09}
+> > +
+> > +=09dma =3D dma_map_single(dev, d, sizeof(*d), DMA_BIDIRECTIONAL);
+> > +=09if (dma_mapping_error(NULL, dma)) {
+> > +=09=09WARN(1, "%s: failed to map fw_cfg_dma\n", __func__);
+> > +=09=09ret =3D -EFAULT;
+> > +=09=09goto end;
+> > +=09}
+> > +
+> > +=09*d =3D (struct fw_cfg_dma) {
+> > +=09=09.address =3D cpu_to_be64(dma_addr),
+> > +=09=09.length =3D cpu_to_be32(length),
+> > +=09=09.control =3D cpu_to_be32(control)
+> > +=09};
+> > +
+> > +=09iowrite32be((u64)dma >> 32, fw_cfg_reg_dma);
+> > +=09iowrite32be(dma, fw_cfg_reg_dma + 4);
+> > +
+> > +=09if (!fw_cfg_wait_for_control(d, FW_CFG_DMA_TIMEOUT)) {
+> > +=09=09WARN(1, "%s: timeout", __func__);
+> > +=09=09ret =3D -ETIME;
+> > +=09} else if (be32_to_cpu(d->control) & FW_CFG_DMA_CTL_ERROR) {
+> > +=09=09ret =3D -EIO;
+> > +=09}
+> > +
+> > +=09dma_unmap_single(dev, dma, sizeof(*d), DMA_BIDIRECTIONAL);
+> > +
+> > +end:
+> > +=09kfree(d);
+> > +=09if (dma_addr)
+> > +=09=09dma_unmap_single(dev, dma_addr, length, dir);
+> > +
+> > +=09return ret;
+> > +}
+> > +
+> >  /* read chunk of given fw_cfg blob (caller responsible for sanity-chec=
+k)
+> >  */
+> > -static inline void fw_cfg_read_blob(u16 key,
+> > -=09=09=09=09    void *buf, loff_t pos, size_t count)
+> > +static ssize_t fw_cfg_read_blob(u16 key,
+> > +=09=09=09=09void *buf, loff_t pos, size_t count,
+> > +=09=09=09=09bool dma)
+> >  {
+> >  =09u32 glk =3D -1U;
+> >  =09acpi_status status;
+> > +=09ssize_t ret =3D count;
+> > =20
+> >  =09/* If we have ACPI, ensure mutual exclusion against any potential
+> >  =09 * device access by the firmware, e.g. via AML methods:
+> > @@ -90,17 +193,36 @@ static inline void fw_cfg_read_blob(u16 key,
+> >  =09=09/* Should never get here */
+> >  =09=09WARN(1, "fw_cfg_read_blob: Failed to lock ACPI!\n");
+> >  =09=09memset(buf, 0, count);
+> > -=09=09return;
+> > +=09=09return -EBUSY;
+>=20
+> Why EBUSY here (and not, e.g., EINVAL) ?
 
-Same question as before: why not e.g. EINVAL?
+no specific reason, I guess EINVAL or ENODEV would be fine too.
 
-> +	}
-> +
-> +	mutex_lock(&fw_cfg_dev_lock);
-> +	if (pos =3D=3D 0) {
-> +		ret =3D fw_cfg_dma_transfer(buf, count, key << 16
-> +					  | FW_CFG_DMA_CTL_SELECT
-> +					  | FW_CFG_DMA_CTL_WRITE);
-> +	} else {
-> +		iowrite16(fw_cfg_sel_endianness(key), fw_cfg_reg_ctrl);
-> +		ret =3D fw_cfg_dma_transfer(0, pos, FW_CFG_DMA_CTL_SKIP);
+>=20
+> >  =09}
+> > =20
+> >  =09mutex_lock(&fw_cfg_dev_lock);
+> > -=09iowrite16(fw_cfg_sel_endianness(key), fw_cfg_reg_ctrl);
+> > -=09while (pos-- > 0)
+> > -=09=09ioread8(fw_cfg_reg_data);
+> > -=09ioread8_rep(fw_cfg_reg_data, buf, count);
+> > +=09if (dma && fw_cfg_dma_enabled()) {
+> > +=09=09if (pos =3D=3D 0) {
+> > +=09=09=09ret =3D fw_cfg_dma_transfer(buf, count, key << 16
+> > +=09=09=09=09=09=09  | FW_CFG_DMA_CTL_SELECT
+> > +=09=09=09=09=09=09  | FW_CFG_DMA_CTL_READ);
+> > +=09=09} else {
+> > +=09=09=09iowrite16(fw_cfg_sel_endianness(key), fw_cfg_reg_ctrl);
+> > +=09=09=09ret =3D fw_cfg_dma_transfer(0, pos, FW_CFG_DMA_CTL_SKIP);
+>=20
+> s/0/NULL/ ?
 
-NULL?
+sure
 
-> +		if (ret < 0)
-> +			goto end;
-> +		ret =3D fw_cfg_dma_transfer(buf, count, FW_CFG_DMA_CTL_WRITE);
-> +	}
-> +
-> +end:
-> +	mutex_unlock(&fw_cfg_dev_lock);
-> +
-> +	acpi_release_global_lock(glk);
-> +
-> +	return ret;
-> +}
-> +#endif /* CONFIG_CRASH_CORE */
-> +
->  /* clean up fw_cfg device i/o */
->  static void fw_cfg_io_cleanup(void)
->  {
-> @@ -343,6 +390,37 @@ struct fw_cfg_sysfs_entry {
->  	struct list_head list;
->  };
-> =20
-> +#ifdef CONFIG_CRASH_CORE
-> +static ssize_t write_vmcoreinfo(const struct fw_cfg_file *f)
-> +{
-> +	struct vmci {
-> +		__le16 host_format;
-> +		__le16 guest_format;
-> +		__le32 size;
-> +		__le64 paddr;
-> +	} __packed;
-> +	struct vmci *data;
-> +	ssize_t ret;
-> +
-> +	data =3D kmalloc(sizeof(struct vmci), GFP_KERNEL | GFP_DMA);
-> +	if (!data)
-> +		return -ENOMEM;
-> +
-> +	/* spare ourself reading host format support for now since we
-> +	 * don't know what else to format - host may ignore ours
-> +	 */
-> +	*data =3D (struct vmci) {
-> +		.guest_format =3D cpu_to_le16(VMCOREINFO_FORMAT_ELF),
-> +		.size =3D cpu_to_le32(VMCOREINFO_NOTE_SIZE),
-> +		.paddr =3D cpu_to_le64(paddr_vmcoreinfo_note())
-> +	};
-> +	ret =3D fw_cfg_write_blob(f->select, data, 0, sizeof(struct vmci));
-> +
-> +	kfree(data);
-> +	return ret;
-> +}
-> +#endif /* CONFIG_CRASH_CORE */
-> +
->  /* get fw_cfg_sysfs_entry from kobject member */
->  static inline struct fw_cfg_sysfs_entry *to_entry(struct kobject *kobj=
-)
->  {
-> @@ -582,6 +660,13 @@ static int fw_cfg_register_file(const struct fw_cf=
-g_file *f)
->  	int err;
->  	struct fw_cfg_sysfs_entry *entry;
-> =20
-> +#ifdef CONFIG_CRASH_CORE
-> +	if (strcmp(f->name, "etc/vmcoreinfo") =3D=3D 0 && !is_kdump_kernel())=
- {
-> +		if (write_vmcoreinfo(f) < 0)
-> +			pr_warn("fw_cfg: failed to write vmcoreinfo");
-> +	}
-> +#endif
-> +
->  	/* allocate new entry */
->  	entry =3D kzalloc(sizeof(*entry), GFP_KERNEL);
->  	if (!entry)
-> --=20
-> 2.15.0.rc0.40.gaefcc5f6f
+>=20
+> > +=09=09=09if (ret < 0)
+> > +=09=09=09=09goto end;
+> > +=09=09=09ret =3D fw_cfg_dma_transfer(buf, count,
+> > +=09=09=09=09=09=09  FW_CFG_DMA_CTL_READ);
+> > +=09=09}
+> > +=09} else {
+> > +=09=09iowrite16(fw_cfg_sel_endianness(key), fw_cfg_reg_ctrl);
+> > +=09=09while (pos-- > 0)
+> > +=09=09=09ioread8(fw_cfg_reg_data);
+> > +=09=09ioread8_rep(fw_cfg_reg_data, buf, count);
+> > +=09}
+> > +
+> > +end:
+> >  =09mutex_unlock(&fw_cfg_dev_lock);
+> > =20
+> >  =09acpi_release_global_lock(glk);
+> > +
+> > +=09return ret;
+> >  }
+> > =20
+> >  /* clean up fw_cfg device i/o */
+> > @@ -192,7 +314,7 @@ static int fw_cfg_do_platform_probe(struct
+> > platform_device *pdev)
+> >  #endif
+> > =20
+> >  =09/* verify fw_cfg device signature */
+> > -=09fw_cfg_read_blob(FW_CFG_SIGNATURE, sig, 0, FW_CFG_SIG_SIZE);
+> > +=09fw_cfg_read_blob(FW_CFG_SIGNATURE, sig, 0, FW_CFG_SIG_SIZE, false);
+> >  =09if (memcmp(sig, "QEMU", FW_CFG_SIG_SIZE) !=3D 0) {
+> >  =09=09fw_cfg_io_cleanup();
+> >  =09=09return -ENODEV;
+> > @@ -201,9 +323,6 @@ static int fw_cfg_do_platform_probe(struct
+> > platform_device *pdev)
+> >  =09return 0;
+> >  }
+> > =20
+> > -/* fw_cfg revision attribute, in /sys/firmware/qemu_fw_cfg top-level d=
+ir.
+> > */
+> > -static u32 fw_cfg_rev;
+> > -
+> >  static ssize_t fw_cfg_showrev(struct kobject *k, struct attribute *a, =
+char
+> >  *buf)
+> >  {
+> >  =09return sprintf(buf, "%u\n", fw_cfg_rev);
+> > @@ -351,8 +470,7 @@ static ssize_t fw_cfg_sysfs_read_raw(struct file *f=
+ilp,
+> > struct kobject *kobj,
+> >  =09if (count > entry->f.size - pos)
+> >  =09=09count =3D entry->f.size - pos;
+> > =20
+> > -=09fw_cfg_read_blob(entry->f.select, buf, pos, count);
+> > -=09return count;
+> > +=09return fw_cfg_read_blob(entry->f.select, buf, pos, count, true);
+> >  }
+> > =20
+> >  static struct bin_attribute fw_cfg_sysfs_attr_raw =3D {
+> > @@ -505,7 +623,7 @@ static int fw_cfg_register_dir_entries(void)
+> >  =09struct fw_cfg_file *dir;
+> >  =09size_t dir_size;
+> > =20
+> > -=09fw_cfg_read_blob(FW_CFG_FILE_DIR, &count, 0, sizeof(count));
+> > +=09fw_cfg_read_blob(FW_CFG_FILE_DIR, &count, 0, sizeof(count), false);
+> >  =09count =3D be32_to_cpu(count);
+> >  =09dir_size =3D count * sizeof(struct fw_cfg_file);
+> > =20
+> > @@ -513,7 +631,7 @@ static int fw_cfg_register_dir_entries(void)
+> >  =09if (!dir)
+> >  =09=09return -ENOMEM;
+> > =20
+> > -=09fw_cfg_read_blob(FW_CFG_FILE_DIR, dir, sizeof(count), dir_size);
+> > +=09fw_cfg_read_blob(FW_CFG_FILE_DIR, dir, sizeof(count), dir_size, tru=
+e);
+> > =20
+> >  =09for (i =3D 0; i < count; i++) {
+> >  =09=09dir[i].size =3D be32_to_cpu(dir[i].size);
+> > @@ -544,9 +662,10 @@ static int fw_cfg_sysfs_probe(struct platform_devi=
+ce
+> > *pdev)
+> >  =09 * one fw_cfg device exist system-wide, so if one was already found
+> >  =09 * earlier, we might as well stop here.
+> >  =09 */
+> > -=09if (fw_cfg_sel_ko)
+> > +=09if (dev)
+> >  =09=09return -EBUSY;
+> > =20
+> > +=09dev =3D &pdev->dev;
+> >  =09/* create by_key and by_name subdirs of /sys/firmware/qemu_fw_cfg/ =
+*/
+> >  =09err =3D -ENOMEM;
+> >  =09fw_cfg_sel_ko =3D kobject_create_and_add("by_key", fw_cfg_top_ko);
+> > @@ -562,7 +681,7 @@ static int fw_cfg_sysfs_probe(struct platform_devic=
+e
+> > *pdev)
+> >  =09=09goto err_probe;
+> > =20
+> >  =09/* get revision number, add matching top-level attribute */
+> > -=09fw_cfg_read_blob(FW_CFG_ID, &fw_cfg_rev, 0, sizeof(fw_cfg_rev));
+> > +=09fw_cfg_read_blob(FW_CFG_ID, &fw_cfg_rev, 0, sizeof(fw_cfg_rev), fal=
+se);
+> >  =09fw_cfg_rev =3D le32_to_cpu(fw_cfg_rev);
+> >  =09err =3D sysfs_create_file(fw_cfg_top_ko, &fw_cfg_rev_attr.attr);
+> >  =09if (err)
+> > @@ -587,6 +706,7 @@ static int fw_cfg_sysfs_probe(struct platform_devic=
+e
+> > *pdev)
+> >  err_name:
+> >  =09fw_cfg_kobj_cleanup(fw_cfg_sel_ko);
+> >  err_sel:
+> > +=09dev =3D NULL;
+> >  =09return err;
+> >  }
+> > =20
+> > --
+> > 2.15.0.rc0.40.gaefcc5f6f
+> >=20
 >=20
