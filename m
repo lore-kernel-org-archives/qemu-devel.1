@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47357)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47672)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eDoQf-0001H2-UV
-	for qemu-devel@nongnu.org; Sun, 12 Nov 2017 04:19:51 -0500
+	(envelope-from <laurent@vivier.eu>) id 1eDoUn-0002AZ-8x
+	for qemu-devel@nongnu.org; Sun, 12 Nov 2017 04:24:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eDoQc-0006Oj-Pk
-	for qemu-devel@nongnu.org; Sun, 12 Nov 2017 04:19:49 -0500
-Received: from indium.canonical.com ([91.189.90.7]:54704)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eDoQc-0006O5-In
-	for qemu-devel@nongnu.org; Sun, 12 Nov 2017 04:19:46 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eDoQY-0005H3-HT
-	for <qemu-devel@nongnu.org>; Sun, 12 Nov 2017 09:19:42 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 7DEAF2E80C9
-	for <qemu-devel@nongnu.org>; Sun, 12 Nov 2017 09:19:42 +0000 (UTC)
+	(envelope-from <laurent@vivier.eu>) id 1eDoUi-0008HH-AW
+	for qemu-devel@nongnu.org; Sun, 12 Nov 2017 04:24:05 -0500
+Received: from mout.kundenserver.de ([217.72.192.74]:59643)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eDoUi-0008Fg-1D
+	for qemu-devel@nongnu.org; Sun, 12 Nov 2017 04:24:00 -0500
+References: <20171110194935.17541-1-laurent@vivier.eu>
+	<20171112075627.5798b8b9@thl530.multi.box>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <6f6213f1-40e6-2761-ec5a-2cd77e76ba5c@vivier.eu>
+Date: Sun, 12 Nov 2017 10:23:50 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sun, 12 Nov 2017 09:05:57 -0000
-From: Carlos-velasco <1086782@bugs.launchpad.net>
-Reply-To: Bug 1086782 <1086782@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20121205125603.6348.62070.malonedeb@gac.canonical.com>
-Message-Id: <151047755753.8178.14375822073029170345.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1086782] Re: HPET time drift windows 7 64bits
- guest
+In-Reply-To: <20171112075627.5798b8b9@thl530.multi.box>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] linux-user,
+ s390x: ignore OS ABI value in ELF header
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,124 +29,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Thomas Huth <huth@tuxfamily.org>
+Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Peter Maydell <peter.maydell@linaro.org>
 
-Running from 6 days, here are my results.
-There is still some time drift but not critical.
-Windows 7 guest is behind around 30 seconds in 6 days. This can be correcte=
-d by using NTP.
+Le 12/11/2017 à 07:56, Thomas Huth a écrit :
+> Am Fri, 10 Nov 2017 20:49:35 +0100
+> schrieb Laurent Vivier <laurent@vivier.eu>:
+> 
+>> I have this error:
+>> bash: /sbin/ldconfig: cannot execute binary file: Exec format error
+>>
+>> because /sbin/ldconfig is:
+>> ELF 64-bit MSB executable, IBM S/390, version 1 (GNU/Linux),
+>> statically linked, for GNU/Linux 3.2.0,
+>> BuildID[sha1]=90b64604014aafac9c1a0623b1cf447281d1a382, stripped
+>>
+>> OS ABI is GNU/linux
+>>
+>> "/bin/ls" works well:
+>>
+>> ELF 64-bit MSB shared object, IBM S/390, version 1 (SYSV),
+>> dynamically linked, interpreter /lib/ld64.so.1, for GNU/Linux 3.2.0,
+>> BuildID[sha1]=be9b19143d4657678846f6e5277383071fc1059a, stripped
+>>
+>> OS ABI is SYSV
+>>
+>> To be able to execute ldconfig, this patch modifies s390x binfmt mask
+>> to ignore the OS ABI value (EI_OSABI, byte 7).
+>>
+>> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+>> ---
+>>  scripts/qemu-binfmt-conf.sh | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/scripts/qemu-binfmt-conf.sh b/scripts/qemu-binfmt-conf.sh
+>> index 8afc3eb5bb..e2e1b7544d 100755
+>> --- a/scripts/qemu-binfmt-conf.sh
+>> +++ b/scripts/qemu-binfmt-conf.sh
+>> @@ -85,7 +85,7 @@
+>> sh4eb_mask='\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff
+>> sh4eb_family=sh4 
+>>  s390x_magic='\x7fELF\x02\x02\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x16'
+>> -s390x_mask='\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff'
+>> +s390x_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff'
+> 
+> If I've got that right, the OSABI field should either be 0 for
+> "No extensions or unspecified" (which is then printed  by "file"
+> as SYSV) or 3 for "GNU/Linux".
+> Thus wouldn't it be better to use a mask of 0xfc here instead, so
+> that we refuse at least everything with a value > 3 here?
+No, because with this mask you allow HPUX and NetBSD (See
+/usr/include/elf.h), I don't think it's really better. The simplest way
+to manage this is to ignore the field. A better way should be to have
+two binfmt entries, one for SYSV and one for GNU/Linux, but as our goal
+is to run linux binaries on linux system, is it worth it?
 
--- =
+Most of the other archs use already 0.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1086782
+> 
+> Also I wonder whether i386 has the same problem, too?
+> 
 
-Title:
-  HPET time drift windows 7 64bits guest
+Yes, I think all targets can have the same problem (I have with m68k,
+but with the gcc-7/cc1 binary).
 
-Status in QEMU:
-  Incomplete
-
-Bug description:
-  Using latest qemu-kvm (1.2.0), time drift (clock slow in guest) in Window=
-s 7 64 bits guest when HPET is enabled (default).
-  Disabling HPET (-no-hpet) solves the time drift.
-
-  UsePlatformClock enable/disable doesn't make a difference in the guest.
-  bcdedit /set useplatformclock true
-
-  Using driftfix slew doesn't make a difference too.
-
-  =
-
-  # qemu-system-x86_64 --version
-  QEMU emulator version 1.2.0 (qemu-kvm-1.2.0), Copyright (c) 2003-2008 Fab=
-rice Bellard
-
-  Kernel is 3.6.8:
-  # uname -a
-  Linux pulsar 3.6.8 #1 SMP Sat Dec 1 16:26:10 CET 2012 x86_64 x86_64 x86_6=
-4 GNU/Linux
-
-  TSC is stable in the host:
-  =3D=3D=3D
-  # cat /sys/devices/system/clocksource/clocksource0/current_clocksource
-  tsc
-
-  Dmesg:
-  [    0.000000] hpet clockevent registered
-  [    0.000000] tsc: Fast TSC calibration using PIT
-  [    0.000000] tsc: Detected 2660.096 MHz processor
-  [    0.001002] Calibrating delay loop (skipped), value calculated using t=
-imer frequency.. 5320.19 BogoMIPS (lpj=3D2660096)
-  [    0.001138] pid_max: default: 32768 minimum: 301
-  ...
-  [    1.492019] tsc: Refined TSC clocksource calibration: 2659.973 MHz
-  [    1.492093] Switching to clocksource tsc
-
-  =
-
-  CPUinfo, constant_tsc:
-  vendor_id       : GenuineIntel
-  cpu family      : 6
-  model           : 23
-  model name      : Intel(R) Core(TM)2 Quad CPU    Q8400  @ 2.66GHz
-  stepping        : 10
-  microcode       : 0xa0b
-  cpu MHz         : 2667.000
-  cache size      : 2048 KB
-  flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mc=
-a cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx=
- lm constant_tsc arch_perfmon pebs bts rep_good nopl aperfmperf pni dtes64 =
-monitor ds_cpl vmx est tm2 ssse3 cx16 xtpr pdcm sse4_1 xsave lahf_lm dtherm=
- tpr_shadow vnmi flexpriority
-  bogomips        : 5320.19
-
-  # grep -i hpet .config
-  CONFIG_HPET_TIMER=3Dy
-  CONFIG_HPET_EMULATE_RTC=3Dy
-  CONFIG_HPET=3Dy
-  # CONFIG_HPET_MMAP is not set
-  =3D=3D=3D
-
-  Qemu command line:
-  /usr/bin/qemu-system-x86_64 -drive file=3D/dev/vol0/KVMORION01,cache=3Dno=
-ne,aio=3Dnative,if=3Dvirtio \
-    -drive file=3D/dev/vol0/KVMORION02,cache=3Dnone,aio=3Dnative,if=3Dvirti=
-o \
-    -cpu host \
-    -m 2048 \
-    -smp 4,maxcpus=3D4,cores=3D4,threads=3D1,sockets=3D1 \
-    -rtc base=3Dlocaltime,driftfix=3Dslew \
-    -vnc 10.124.241.211:0,password -k es \
-    -monitor telnet:localhost:37200,server,nowait \
-    -netdev tap,id=3Dkvmorion,ifname=3Dkvmorion,script=3D/etc/qemu-ifup-br0=
-,downscript=3D/etc/qemu-ifdown-br0 \
-    -device virtio-net-pci,netdev=3Dkvmorion,id=3Dvirtio-nic0,mac=3D02:85:6=
-4:02:c2:aa \
-    -device virtio-balloon-pci,id=3Dballoon0 \
-    -boot menu=3Don \
-    -pidfile /var/run/kvmorion.pid \
-    -daemonize
-
-  Using 1 CPU doesn't make a difference.
-  Only workaround is disabling hpet (-no-hpet)
-
-  Sample time drift in guest:
-  >ntpdate -q 10.124.241.211
-   5 Dec 13:36:06 ntpdate[3464]: Raised to realtime priority class
-  server 10.124.241.211, stratum 2, offset 3.694184, delay 0.02551
-   5 Dec 13:36:12 ntpdate[3464]: step time server 10.124.241.211 offset 3.6=
-94184 s
-  ec
-
-  >ntpdate -q 10.124.241.211
-   5 Dec 13:52:02 ntpdate[1964]: Raised to realtime priority class
-  server 10.124.241.211, stratum 2, offset 4.719968, delay 0.02554
-   5 Dec 13:52:08 ntpdate[1964]: step time server 10.124.241.211 offset 4.7=
-19968 s
-  ec
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1086782/+subscriptions
+Thanks,
+Laurent
