@@ -1,15 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44637)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37954)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eDhFT-0004jj-BC
-	for qemu-devel@nongnu.org; Sat, 11 Nov 2017 20:39:48 -0500
+	(envelope-from <th.huth@gmail.com>) id 1eDmC4-00030b-V5
+	for qemu-devel@nongnu.org; Sun, 12 Nov 2017 01:56:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eDhFS-0000VD-Jj
-	for qemu-devel@nongnu.org; Sat, 11 Nov 2017 20:39:47 -0500
-From: Eric Blake <eblake@redhat.com>
-Date: Sat, 11 Nov 2017 19:39:36 -0600
-Message-Id: <20171112013936.5942-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.11] nbd: Don't crash when server reports
- NBD_CMD_READ failure
+	(envelope-from <th.huth@gmail.com>) id 1eDmC1-0006pY-T0
+	for qemu-devel@nongnu.org; Sun, 12 Nov 2017 01:56:37 -0500
+Received: from mail-wm0-f68.google.com ([74.125.82.68]:55487)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <th.huth@gmail.com>) id 1eDmC1-0006p3-MW
+	for qemu-devel@nongnu.org; Sun, 12 Nov 2017 01:56:33 -0500
+Received: by mail-wm0-f68.google.com with SMTP id 9so3948110wme.4
+	for <qemu-devel@nongnu.org>; Sat, 11 Nov 2017 22:56:33 -0800 (PST)
+Date: Sun, 12 Nov 2017 07:56:27 +0100
+From: Thomas Huth <huth@tuxfamily.org>
+Message-ID: <20171112075627.5798b8b9@thl530.multi.box>
+In-Reply-To: <20171110194935.17541-1-laurent@vivier.eu>
+References: <20171110194935.17541-1-laurent@vivier.eu>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] linux-user,
+ s390x: ignore OS ABI value in ELF header
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,39 +29,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, vsementsov@virtuozzo.com, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Peter Maydell <peter.maydell@linaro.org>
 
-If a server fails a read, for example with EIO, but the connection
-is still live, then we would crash trying to print a non-existent
-error message.  Bug introduced in commit f140e300.
+Am Fri, 10 Nov 2017 20:49:35 +0100
+schrieb Laurent Vivier <laurent@vivier.eu>:
 
-Signed-off-by: Eric Blake <eblake@redhat.com>
----
- block/nbd-client.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+> I have this error:
+> bash: /sbin/ldconfig: cannot execute binary file: Exec format error
+> 
+> because /sbin/ldconfig is:
+> ELF 64-bit MSB executable, IBM S/390, version 1 (GNU/Linux),
+> statically linked, for GNU/Linux 3.2.0,
+> BuildID[sha1]=90b64604014aafac9c1a0623b1cf447281d1a382, stripped
+> 
+> OS ABI is GNU/linux
+> 
+> "/bin/ls" works well:
+> 
+> ELF 64-bit MSB shared object, IBM S/390, version 1 (SYSV),
+> dynamically linked, interpreter /lib/ld64.so.1, for GNU/Linux 3.2.0,
+> BuildID[sha1]=be9b19143d4657678846f6e5277383071fc1059a, stripped
+> 
+> OS ABI is SYSV
+> 
+> To be able to execute ldconfig, this patch modifies s390x binfmt mask
+> to ignore the OS ABI value (EI_OSABI, byte 7).
+> 
+> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+> ---
+>  scripts/qemu-binfmt-conf.sh | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/scripts/qemu-binfmt-conf.sh b/scripts/qemu-binfmt-conf.sh
+> index 8afc3eb5bb..e2e1b7544d 100755
+> --- a/scripts/qemu-binfmt-conf.sh
+> +++ b/scripts/qemu-binfmt-conf.sh
+> @@ -85,7 +85,7 @@
+> sh4eb_mask='\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff
+> sh4eb_family=sh4 
+>  s390x_magic='\x7fELF\x02\x02\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x16'
+> -s390x_mask='\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff'
+> +s390x_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff'
 
-diff --git a/block/nbd-client.c b/block/nbd-client.c
-index b44d4d4a01..5f3375a970 100644
---- a/block/nbd-client.c
-+++ b/block/nbd-client.c
-@@ -78,7 +78,7 @@ static coroutine_fn void nbd_read_reply_entry(void *opaque)
-     while (!s->quit) {
-         assert(s->reply.handle == 0);
-         ret = nbd_receive_reply(s->ioc, &s->reply, &local_err);
--        if (ret < 0) {
-+        if (local_err) {
-             error_report_err(local_err);
-         }
-         if (ret <= 0) {
-@@ -681,7 +681,7 @@ int nbd_client_co_preadv(BlockDriverState *bs, uint64_t offset,
+If I've got that right, the OSABI field should either be 0 for
+"No extensions or unspecified" (which is then printed  by "file"
+as SYSV) or 3 for "GNU/Linux".
+Thus wouldn't it be better to use a mask of 0xfc here instead, so
+that we refuse at least everything with a value > 3 here?
 
-     ret = nbd_co_receive_cmdread_reply(client, request.handle, offset, qiov,
-                                        &local_err);
--    if (ret < 0) {
-+    if (local_err) {
-         error_report_err(local_err);
-     }
-     return ret;
--- 
-2.13.6
+Also I wonder whether i386 has the same problem, too?
+
+ Thomas
