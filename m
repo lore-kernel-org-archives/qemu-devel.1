@@ -1,25 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36593)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44637)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eDbyB-0003G8-EY
-	for qemu-devel@nongnu.org; Sat, 11 Nov 2017 15:01:36 -0500
+	(envelope-from <eblake@redhat.com>) id 1eDhFT-0004jj-BC
+	for qemu-devel@nongnu.org; Sat, 11 Nov 2017 20:39:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eDby8-0003nL-DU
-	for qemu-devel@nongnu.org; Sat, 11 Nov 2017 15:01:35 -0500
-Resent-Message-Id: <E1eDby8-0003nL-DU@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21364)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1eDby8-0003kz-4z
-	for qemu-devel@nongnu.org; Sat, 11 Nov 2017 15:01:32 -0500
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <151021502321.354.930267310379053045@bafd83ae6430>
-In-Reply-To: <20171109075243.4794-1-richard.henderson@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 9 Nov 2017 00:10:24 -0800 (PST)
-Subject: Re: [Qemu-devel] [PULL for-2.11 0/2] Capstone updates
+	(envelope-from <eblake@redhat.com>) id 1eDhFS-0000VD-Jj
+	for qemu-devel@nongnu.org; Sat, 11 Nov 2017 20:39:47 -0500
+From: Eric Blake <eblake@redhat.com>
+Date: Sat, 11 Nov 2017 19:39:36 -0600
+Message-Id: <20171112013936.5942-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH for-2.11] nbd: Don't crash when server reports
+ NBD_CMD_READ failure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,43 +18,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: richard.henderson@linaro.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, vsementsov@virtuozzo.com, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtQVUxMIGZvci0yLjExIDAvMl0gQ2Fwc3RvbmUgdXBkYXRlcwpUeXBlOiBzZXJpZXMK
-TWVzc2FnZS1pZDogMjAxNzExMDkwNzUyNDMuNDc5NC0xLXJpY2hhcmQuaGVuZGVyc29uQGxpbmFy
-by5vcmcKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpu
-PTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpn
-aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBk
-aWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJz
-ZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRD
-SCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEg
-Z2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1h
-aWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBu
-PSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBk
-YXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBz
-Oi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICAg
-ICAgICBwYXRjaGV3LzIwMTcxMTA5MDc1MjQzLjQ3OTQtMS1yaWNoYXJkLmhlbmRlcnNvbkBsaW5h
-cm8ub3JnIC0+IHBhdGNoZXcvMjAxNzExMDkwNzUyNDMuNDc5NC0xLXJpY2hhcmQuaGVuZGVyc29u
-QGxpbmFyby5vcmcKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo3MjAyZDAyOTA3IE1h
-a2VmaWxlOiBDYXBzdG9uZTogQWRkIHN1cHBvcnQgZm9yIGNyb3NzIGNvbXBpbGUgcmFubGliCmM2
-ZGMwMWRlZGIgZGlzYXM6IER1bXAgaW5zbiBieXRlcyBhbG9uZyB3aXRoIGNhcHN0b25lIGRpc2Fz
-c2VtYmx5Cgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzI6IGRpc2FzOiBE
-dW1wIGluc24gYnl0ZXMgYWxvbmcgd2l0aCBjYXBzdG9uZSBkaXNhc3NlbWJseS4uLgpFUlJPUjog
-c3VzcGVjdCBjb2RlIGluZGVudCBmb3IgY29uZGl0aW9uYWwgc3RhdGVtZW50cyAoOCwgMTEpCiM5
-ODogRklMRTogZGlzYXMuYzozMTU6CiAgICAgICAgIHdoaWxlIChjc19kaXNhc21faXRlcihoYW5k
-bGUsICZjYnVmLCAmY3NpemUsICZwYywgaW5zbikpIHsKKyAgICAgICAgICAgY2FwX2R1bXBfaW5z
-bihpbmZvLCBpbnNuKTsKCkVSUk9SOiBzdXNwZWN0IGNvZGUgaW5kZW50IGZvciBjb25kaXRpb25h
-bCBzdGF0ZW1lbnRzICg0LCA3KQojMTEwOiBGSUxFOiBkaXNhcy5jOjM2MDoKICAgICB3aGlsZSAo
-Y3NfZGlzYXNtX2l0ZXIoaGFuZGxlLCAmY2J1ZiwgJnNpemUsICZwYywgaW5zbikpIHsKKyAgICAg
-ICBjYXBfZHVtcF9pbnNuKGluZm8sIGluc24pOwoKdG90YWw6IDIgZXJyb3JzLCAwIHdhcm5pbmdz
-LCAxODQgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFz
-ZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVw
-b3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJT
-LgoKQ2hlY2tpbmcgUEFUQ0ggMi8yOiBNYWtlZmlsZTogQ2Fwc3RvbmU6IEFkZCBzdXBwb3J0IGZv
-ciBjcm9zcyBjb21waWxlIHJhbmxpYi4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFu
-ZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5
-IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRi
-YWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
+If a server fails a read, for example with EIO, but the connection
+is still live, then we would crash trying to print a non-existent
+error message.  Bug introduced in commit f140e300.
+
+Signed-off-by: Eric Blake <eblake@redhat.com>
+---
+ block/nbd-client.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/block/nbd-client.c b/block/nbd-client.c
+index b44d4d4a01..5f3375a970 100644
+--- a/block/nbd-client.c
++++ b/block/nbd-client.c
+@@ -78,7 +78,7 @@ static coroutine_fn void nbd_read_reply_entry(void *opaque)
+     while (!s->quit) {
+         assert(s->reply.handle == 0);
+         ret = nbd_receive_reply(s->ioc, &s->reply, &local_err);
+-        if (ret < 0) {
++        if (local_err) {
+             error_report_err(local_err);
+         }
+         if (ret <= 0) {
+@@ -681,7 +681,7 @@ int nbd_client_co_preadv(BlockDriverState *bs, uint64_t offset,
+
+     ret = nbd_co_receive_cmdread_reply(client, request.handle, offset, qiov,
+                                        &local_err);
+-    if (ret < 0) {
++    if (local_err) {
+         error_report_err(local_err);
+     }
+     return ret;
+-- 
+2.13.6
