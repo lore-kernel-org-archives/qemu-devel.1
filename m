@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47984)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53602)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lichunguang@hust.edu.cn>) id 1eDoXx-0002vZ-Nt
-	for qemu-devel@nongnu.org; Sun, 12 Nov 2017 04:27:23 -0500
+	(envelope-from <makovick@gmail.com>) id 1eDpjg-0002Ua-Ti
+	for qemu-devel@nongnu.org; Sun, 12 Nov 2017 05:43:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lichunguang@hust.edu.cn>) id 1eDoXs-0001Pw-E7
-	for qemu-devel@nongnu.org; Sun, 12 Nov 2017 04:27:21 -0500
-Received: from mail.hust.edu.cn ([202.114.0.240]:33462 helo=hust.edu.cn)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lichunguang@hust.edu.cn>) id 1eDoXr-0001No-CH
-	for qemu-devel@nongnu.org; Sun, 12 Nov 2017 04:27:16 -0500
-Date: Sun, 12 Nov 2017 17:26:31 +0800 (GMT+08:00)
-From: "Chunguang Li" <lichunguang@hust.edu.cn>
-MIME-Version: 1.0
-Message-ID: <6e0e65ef.427f.15faf8d41e9.Coremail.lichunguang@hust.edu.cn>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: base64
-Subject: [Qemu-devel] Abnormal observation during migration: too many
- "write-not-dirty" pages
+	(envelope-from <makovick@gmail.com>) id 1eDpje-000449-S1
+	for qemu-devel@nongnu.org; Sun, 12 Nov 2017 05:43:32 -0500
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:38741)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <makovick@gmail.com>) id 1eDpje-00043e-LX
+	for qemu-devel@nongnu.org; Sun, 12 Nov 2017 05:43:30 -0500
+Received: by mail-wm0-x243.google.com with SMTP id p75so9768483wmg.3
+	for <qemu-devel@nongnu.org>; Sun, 12 Nov 2017 02:43:30 -0800 (PST)
+From: Jindrich Makovicka <makovick@gmail.com>
+Date: Sun, 12 Nov 2017 11:42:40 +0100
+Message-Id: <20171112104246.10007-3-makovick@gmail.com>
+In-Reply-To: <20171112104246.10007-1-makovick@gmail.com>
+References: <20171023210803.20998-1-makovick@gmail.com>
+	<20171112104246.10007-1-makovick@gmail.com>
+Subject: [Qemu-devel] [PATCH 2/8] sdl2: Do not quit the emulator when an
+ auxilliary window is closed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,62 +27,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, quintela@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, stefanha@redhat.com
+To: QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>, Cole Robinson <crobinso@redhat.com>
+Cc: Jindrich Makovicka <makovick@gmail.com>
 
-SGkgYWxsIQoKSSBnb3QgYSB2ZXJ5IGFibm9ybWFsIG9ic2VydmF0aW9uIGZvciB0aGUgVk0gbWln
-cmF0aW9uLiBJIGZvdW5kIHRoYXQgbWFueSBwYWdlcyBtYXJrZWQgYXMgZGlydHkgZHVyaW5nIG1p
-Z3JhdGlvbiBhcmUgIm5vdCByZWFsbHkgZGlydHkiLCB3aGljaCBpcywgdGhlaXIgY29udGVudCBh
-cmUgdGhlIHNhbWUgYXMgdGhlIG9sZCB2ZXJzaW9uLgoKCgoKSSBkaWQgdGhlIG1pZ3JhdGlvbiBl
-eHBlcmltZW50IGxpa2UgdGhpczoKCkR1cmluZyB0aGUgc2V0dXAgcGhhc2Ugb2YgbWlncmF0aW9u
-LCBmaXJzdCBJIHN1c3BlbmRlZCB0aGUgVk0uIFRoZW4gSSBjb3BpZWQgYWxsIHRoZSBwYWdlcyB3
-aXRoaW4gdGhlIGd1ZXN0IHBoeXNpY2FsIGFkZHJlc3Mgc3BhY2UgdG8gYSBtZW1vcnkgYnVmZmVy
-IGFzIGxhcmdlIGFzIHRoZSBndWVzdCBtZW1vcnkgc2l6ZS4gQWZ0ZXIgdGhhdCwgdGhlIGRpcnR5
-IHRyYWNraW5nIGJlZ2FuIGFuZCBJIHJlc3VtZWQgdGhlIFZNLiBCZXNpZGVzLCBhdCB0aGUgZW5k
-Cm9mIGVhY2ggaXRlcmF0aW9uLCBJIGFsc28gc3VzcGVuZGVkIHRoZSBWTSB0ZW1wb3JhcmlseS4g
-RHVyaW5nIHRoZSBzdXNwZW5zaW9uLCBJIGNvbXBhcmVkIHRoZSBjb250ZW50IG9mIGFsbCB0aGUg
-cGFnZXMgbWFya2VkIGFzIGRpcnR5IGluIHRoaXMgaXRlcmF0aW9uIGJ5dGUtYnktYnl0ZSB3aXRo
-IHRoZWlyIGZvcm1lciBjb3BpZXMgaW5zaWRlIHRoZSBidWZmZXIuIElmIHRoZSBjb250ZW50IG9m
-IG9uZSBwYWdlIHdhcyB0aGUgc2FtZSBhcyBpdHMgZm9ybWVyIGNvcHksIEkgcmVjb3JkZWQgaXQg
-YXMgYSAid3JpdGUtbm90LWRpcnR5IiBwYWdlICh0aGUgcGFnZSBpcyB3cml0dGVuIGV4YWN0bHkg
-d2l0aCB0aGUgc2FtZSBjb250ZW50IGFzIHRoZSBvbGQgdmVyc2lvbikuIE90aGVyd2lzZSwgSSBy
-ZXBsYWNlZCB0aGlzIHBhZ2UgaW4gdGhlIGJ1ZmZlciB3aXRoIHRoZSBuZXcgY29udGVudCwgZm9y
-IHRoZSBwb3NzaWJsZSBjb21wYXJpc29uIGluIHRoZSBmdXR1cmUuIEFmdGVyIHRoZSByZXNldCBv
-ZiB0aGUgZGlydHkgYml0bWFwLCBJIHJlc3VtZWQgdGhlIFZNLiBUaHVzLCBJIG9idGFpbiB0aGUg
-cHJvcG9ydGlvbiBvZiB0aGUgd3JpdGUtbm90LWRpcnR5IHBhZ2VzIHdpdGhpbiBhbGwgdGhlIHBh
-Z2VzIG1hcmtlZCBhcyBkaXJ0eSBmb3IgZWFjaCBwcmUtY29weSBpdGVyYXRpb24uCgpJIHJlcGVh
-dGVkIHRoaXMgZXhwZXJpbWVudCB3aXRoIDE1IHdvcmtsb2Fkcywgd2hpY2ggYXJlIDExIENQVTIw
-MDYgYmVuY2htYXJrcywgTWVtY2FjaGVkIHNlcnZlciwga2VybmVsIGNvbXBpbGF0aW9uLCBwbGF5
-aW5nIGEgdmlkZW8sIGFuZCBhbiBpZGxlIFZNLiBUaGUgQ1BVMjAwNiBiZW5jaG1hcmtzIGFuZCBN
-ZW1jYWNoZWQgYXJlIHdyaXRlLWludGVuc2l2ZSB3b3JrbG9hZHMuIFNvIGFsbW9zdCBhbGwgb2Yg
-dGhlbSBkaWQgbm90IGNvbnZlcmdlIHRvIHN0b3AtY29weS4KCgoKClN0YXJ0bGluZ2x5LCB0aGUg
-cHJvcG9ydGlvbnMgb2YgdGhlIHdyaXRlLW5vdC1kaXJ0eSBwYWdlcyBhcmUgcXVpdGUgaGlnaC4g
-TWVtY2FjaGVkIGFuZCB0aHJlZSBDUFUyMDA2IGJlbmNobWFya3MoemV1c21wLCBtY2YgYW5kIGJ6
-aXAyKSBoYXZlIHRoZSBtb3N0IGhpZ2ggcHJvcG9ydGlvbnMuIFRoZWlyIHByb3BvcnRpb25zIG9m
-IHRoZSB3cml0ZS1ub3QtZGlydHkgcGFnZXMgd2l0aGluIGFsbCB0aGUgZGlydHkgcGFnZXMgYXJl
-IGFzIGhpZ2ggYXMgNDUlLTgwJS4gVGhlIHByb3BvcnRpb25zIG9mIHRoZSBvdGhlciB3b3JrbG9h
-ZHMgYXJlIGFib3V0IDUlLTIwJSwgd2hpY2ggYXJlIGFsc28gYWJub3JtYWwuIEFjY29yZGluZyB0
-byBteSBpbnR1aXRpb24sIHRoZSBwcm9wb3J0aW9uIG9mIHdyaXRlLW5vdC1kaXJ0eSBwYWdlcyBz
-aG91bGQgYmUgZmFyIGxlc3MgdGhhbiB0aGVzZSBudW1iZXJzLiBJIHRoaW5rIGl0IHNob3VsZCBi
-ZSBxdWl0ZSBhIHBhcnRpY3VsYXIgY2FzZSB0aGF0IG9uZSBwYWdlIGlzIHdyaXR0ZW4gd2l0aCBl
-eGFjdGx5IHRoZSBzYW1lIGNvbnRlbnQgYXMgdGhlIGZvcm1lciBkYXRhLgoKQmVzaWRlcywgdGhl
-IHplcm8gcGFnZXMgYXJlIG5vdCBjb3VudGVkIGZvciBhbGwgdGhlIHJlc3VsdHMuIEJlY2F1c2Ug
-SSB0aGluayBjb2RlcyBsaWtlIG1lbXNldCgpIG1heSB3cml0ZSBsYXJnZSBhcmVhIG9mIHBhZ2Vz
-IHRvIHplcm8gcGFnZXMsIHdoaWNoIGFyZSBhbHJlYWR5IHplcm8gcGFnZXMgYmVmb3JlLgoKCgoK
-SSBleGNsdWRlZCBzb21lIHBvc3NpYmxlIHVua25vd24gcmVhc29ucyB3aXRoIHRoZSBtYWNoaW5l
-IGhhcmR3YXJlLCBiZWNhdXNlIEkgcmVwZWF0ZWQgdGhlIGV4cGVyaW1lbnRzIHdpdGggdHdvIHNl
-dHMgb2YgZGlmZmVyZW50IG1hY2hpbmVzLiBUaGVuIEkgZ3Vlc3NlZCBpdCBtaWdodCBiZSByZWxh
-dGVkIHdpdGggdGhlIGh1Z2UgcGFnZSBmZWF0dXJlLiBIb3dldmVyLCB0aGUgcmVzdWx0IHdhcyB0
-aGUgc2FtZSB3aGVuIEkgdHVybmVkIHRoZSBodWdlIHBhZ2UgZmVhdHVyZSBvZmYgaW4gdGhlIE9T
-LgoKCgoKTm93IHRoZXJlIGFyZSBvbmx5IHR3byBwb3NzaWJsZSByZWFzb25zIGluIG15IG9waW5p
-b24uIAoKRmlyc3QsIHRoZXJlIGlzIHNvbWUgYnVncyBpbiB0aGUgS1ZNIGtlcm5lbCBkaXJ0eSB0
-cmFja2luZyBtZWNoYW5pc20uIEl0IG1heSBtYXJrIHNvbWUgcGFnZXMgdGhhdCBkbyBub3QgcmVj
-ZWl2ZSB3cml0ZSByZXF1ZXN0IGFzIGRpcnR5LgoKU2Vjb25kLCB0aGVyZSBpcyBzb21lIGJ1Z3Mg
-aW4gdGhlIE9TIHJ1bm5pbmcgaW5zaWRlIHRoZSBWTS4gSXQgbWF5IGlzc3VlIHNvbWUgdW5uZWNl
-c3Nhcnkgd3JpdGUgcmVxdWVzdHMuCgoKCgpXaGF0IGRvIHlvdSB0aGluayBhYm91dCB0aGlzIGFi
-bm9ybWFsIHBoZW5vbWVub24/IEFueSBhZHZpY2Ugb3IgcG9zc2libGUgcmVhc29ucyBvciBldmVu
-IGd1ZXNzZXM/IEkgYXBwcmVjaWF0ZSBhbnkgcmVzcG9uc2VzLCBiZWNhdXNlIGl0IGhhcyBjb25m
-dXNlZCBtZSBmb3IgYSBsb25nIHRpbWUuIFRoYW5rIHlvdS4KCgotLQpDaHVuZ3VhbmcgTGksIFBo
-LkQuIENhbmRpZGF0ZQpXdWhhbiBOYXRpb25hbCBMYWJvcmF0b3J5IGZvciBPcHRvZWxlY3Ryb25p
-Y3MgKFdOTE8pCkh1YXpob25nIFVuaXZlcnNpdHkgb2YgU2NpZW5jZSAmIFRlY2hub2xvZ3kgKEhV
-U1QpCld1aGFuLCBIdWJlaSBQcm92LiwgQ2hpbmEKCg==
+---
+ ui/sdl2.c | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
+
+diff --git a/ui/sdl2.c b/ui/sdl2.c
+index 774904cbf2..dfbd0de791 100644
+--- a/ui/sdl2.c
++++ b/ui/sdl2.c
+@@ -566,9 +566,14 @@ static void handle_windowevent(SDL_Event *ev)
+         update_displaychangelistener(&scon->dcl, 500);
+         break;
+     case SDL_WINDOWEVENT_CLOSE:
+-        if (!no_quit) {
+-            no_shutdown = 0;
+-            qemu_system_shutdown_request(SHUTDOWN_CAUSE_HOST_UI);
++        if (qemu_console_is_graphic(scon->dcl.con)) {
++            if (!no_quit) {
++                no_shutdown = 0;
++                qemu_system_shutdown_request(SHUTDOWN_CAUSE_HOST_UI);
++            }
++        } else {
++            SDL_HideWindow(scon->real_window);
++            scon->hidden = true;
+         }
+         break;
+     case SDL_WINDOWEVENT_SHOWN:
+-- 
+2.15.0
