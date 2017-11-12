@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53637)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53603)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <makovick@gmail.com>) id 1eDpjh-0002WF-Vb
-	for qemu-devel@nongnu.org; Sun, 12 Nov 2017 05:43:34 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <makovick@gmail.com>) id 1eDpjh-00045h-5W
-	for qemu-devel@nongnu.org; Sun, 12 Nov 2017 05:43:34 -0500
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:34611)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <makovick@gmail.com>) id 1eDpjh-00044y-0L
+	(envelope-from <makovick@gmail.com>) id 1eDpjg-0002Ub-Tg
 	for qemu-devel@nongnu.org; Sun, 12 Nov 2017 05:43:33 -0500
-Received: by mail-wm0-x243.google.com with SMTP id n74so10660119wmi.1
-	for <qemu-devel@nongnu.org>; Sun, 12 Nov 2017 02:43:32 -0800 (PST)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <makovick@gmail.com>) id 1eDpje-00043j-3D
+	for qemu-devel@nongnu.org; Sun, 12 Nov 2017 05:43:32 -0500
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:35966)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <makovick@gmail.com>) id 1eDpjd-00043D-Sg
+	for qemu-devel@nongnu.org; Sun, 12 Nov 2017 05:43:30 -0500
+Received: by mail-wm0-x241.google.com with SMTP id r68so9766450wmr.1
+	for <qemu-devel@nongnu.org>; Sun, 12 Nov 2017 02:43:29 -0800 (PST)
 From: Jindrich Makovicka <makovick@gmail.com>
-Date: Sun, 12 Nov 2017 11:42:43 +0100
-Message-Id: <20171112104246.10007-6-makovick@gmail.com>
+Date: Sun, 12 Nov 2017 11:42:39 +0100
+Message-Id: <20171112104246.10007-2-makovick@gmail.com>
 In-Reply-To: <20171112104246.10007-1-makovick@gmail.com>
 References: <20171023210803.20998-1-makovick@gmail.com>
 	<20171112104246.10007-1-makovick@gmail.com>
-Subject: [Qemu-devel] [PATCH 5/8] sdl2 uses surface relative coordinates
+Subject: [Qemu-devel] [PATCH 1/8] sdl2: Fix broken display updating after
+ the window is hidden
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,50 +30,35 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>, Cole Robinson <crobinso@redhat.com>
 Cc: Jindrich Makovicka <makovick@gmail.com>
 
-This patch fixes mouse positioning with -device usb-tablet and fullscreen
-or resized window.
+With SDL 2.0.6, calling SDL_ShowWindow during SDL_WINDOWEVENT_HIDDEN
+blocks all subsequent display updates.
+
+Instead of trying to override the change, just update the scon->hidden
+flag.
 ---
- ui/sdl2.c | 28 ++--------------------------
- 1 file changed, 2 insertions(+), 26 deletions(-)
+ ui/sdl2.c | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
 
 diff --git a/ui/sdl2.c b/ui/sdl2.c
-index 677c22282d..51721d764e 100644
+index 53dd447fd2..774904cbf2 100644
 --- a/ui/sdl2.c
 +++ b/ui/sdl2.c
-@@ -276,32 +276,8 @@ static void sdl_send_mouse_event(struct sdl2_console *scon, int dx, int dy,
-     }
- 
-     if (qemu_input_is_absolute()) {
--        int scr_w, scr_h;
--        int max_w = 0, max_h = 0;
--        int off_x = 0, off_y = 0;
--        int cur_off_x = 0, cur_off_y = 0;
--        int i;
--
--        for (i = 0; i < sdl2_num_outputs; i++) {
--            struct sdl2_console *thiscon = &sdl2_console[i];
--            if (thiscon->real_window && thiscon->surface) {
--                SDL_GetWindowSize(thiscon->real_window, &scr_w, &scr_h);
--                cur_off_x = thiscon->x;
--                cur_off_y = thiscon->y;
--                if (scr_w + cur_off_x > max_w) {
--                    max_w = scr_w + cur_off_x;
--                }
--                if (scr_h + cur_off_y > max_h) {
--                    max_h = scr_h + cur_off_y;
--                }
--                if (i == scon->idx) {
--                    off_x = cur_off_x;
--                    off_y = cur_off_y;
--                }
--            }
+@@ -572,14 +572,10 @@ static void handle_windowevent(SDL_Event *ev)
+         }
+         break;
+     case SDL_WINDOWEVENT_SHOWN:
+-        if (scon->hidden) {
+-            SDL_HideWindow(scon->real_window);
 -        }
--        qemu_input_queue_abs(scon->dcl.con, INPUT_AXIS_X, off_x + x, 0, max_w);
--        qemu_input_queue_abs(scon->dcl.con, INPUT_AXIS_Y, off_y + y, 0, max_h);
-+        qemu_input_queue_abs(scon->dcl.con, INPUT_AXIS_X, x, 0, surface_width(scon->surface));
-+        qemu_input_queue_abs(scon->dcl.con, INPUT_AXIS_Y, y, 0, surface_height(scon->surface));
-     } else {
-         if (guest_cursor) {
-             x -= guest_x;
++        scon->hidden = false;
+         break;
+     case SDL_WINDOWEVENT_HIDDEN:
+-        if (!scon->hidden) {
+-            SDL_ShowWindow(scon->real_window);
+-        }
++        scon->hidden = true;
+         break;
+     }
+ }
 -- 
 2.15.0
