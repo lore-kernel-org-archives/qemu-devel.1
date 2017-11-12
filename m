@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53649)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53637)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <makovick@gmail.com>) id 1eDpji-0002WL-H0
-	for qemu-devel@nongnu.org; Sun, 12 Nov 2017 05:43:35 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <makovick@gmail.com>) id 1eDpji-00046N-0u
+	(envelope-from <makovick@gmail.com>) id 1eDpjh-0002WF-Vb
 	for qemu-devel@nongnu.org; Sun, 12 Nov 2017 05:43:34 -0500
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:34611)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <makovick@gmail.com>) id 1eDpjh-00045h-5W
+	for qemu-devel@nongnu.org; Sun, 12 Nov 2017 05:43:34 -0500
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:34611)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <makovick@gmail.com>) id 1eDpjh-00045g-Px
+	(Exim 4.71) (envelope-from <makovick@gmail.com>) id 1eDpjh-00044y-0L
 	for qemu-devel@nongnu.org; Sun, 12 Nov 2017 05:43:33 -0500
-Received: by mail-wm0-x244.google.com with SMTP id n74so10660154wmi.1
-	for <qemu-devel@nongnu.org>; Sun, 12 Nov 2017 02:43:33 -0800 (PST)
+Received: by mail-wm0-x243.google.com with SMTP id n74so10660119wmi.1
+	for <qemu-devel@nongnu.org>; Sun, 12 Nov 2017 02:43:32 -0800 (PST)
 From: Jindrich Makovicka <makovick@gmail.com>
-Date: Sun, 12 Nov 2017 11:42:44 +0100
-Message-Id: <20171112104246.10007-7-makovick@gmail.com>
+Date: Sun, 12 Nov 2017 11:42:43 +0100
+Message-Id: <20171112104246.10007-6-makovick@gmail.com>
 In-Reply-To: <20171112104246.10007-1-makovick@gmail.com>
 References: <20171023210803.20998-1-makovick@gmail.com>
 	<20171112104246.10007-1-makovick@gmail.com>
-Subject: [Qemu-devel] [PATCH 6/8] sdl2: Fix dead keyboard after fullsceen
+Subject: [Qemu-devel] [PATCH 5/8] sdl2 uses surface relative coordinates
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,21 +29,50 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>, Cole Robinson <crobinso@redhat.com>
 Cc: Jindrich Makovicka <makovick@gmail.com>
 
+This patch fixes mouse positioning with -device usb-tablet and fullscreen
+or resized window.
 ---
- ui/sdl2.c | 1 +
- 1 file changed, 1 insertion(+)
+ ui/sdl2.c | 28 ++--------------------------
+ 1 file changed, 2 insertions(+), 26 deletions(-)
 
 diff --git a/ui/sdl2.c b/ui/sdl2.c
-index 51721d764e..cdc599be48 100644
+index 677c22282d..51721d764e 100644
 --- a/ui/sdl2.c
 +++ b/ui/sdl2.c
-@@ -418,6 +418,7 @@ static void handle_keyup(SDL_Event *ev)
-             sdl2_reset_keys(scon);
-             return;
-         }
-+        sdl2_reset_keys(scon);
-         gui_keysym = 0;
+@@ -276,32 +276,8 @@ static void sdl_send_mouse_event(struct sdl2_console *scon, int dx, int dy,
      }
-     if (!gui_keysym) {
+ 
+     if (qemu_input_is_absolute()) {
+-        int scr_w, scr_h;
+-        int max_w = 0, max_h = 0;
+-        int off_x = 0, off_y = 0;
+-        int cur_off_x = 0, cur_off_y = 0;
+-        int i;
+-
+-        for (i = 0; i < sdl2_num_outputs; i++) {
+-            struct sdl2_console *thiscon = &sdl2_console[i];
+-            if (thiscon->real_window && thiscon->surface) {
+-                SDL_GetWindowSize(thiscon->real_window, &scr_w, &scr_h);
+-                cur_off_x = thiscon->x;
+-                cur_off_y = thiscon->y;
+-                if (scr_w + cur_off_x > max_w) {
+-                    max_w = scr_w + cur_off_x;
+-                }
+-                if (scr_h + cur_off_y > max_h) {
+-                    max_h = scr_h + cur_off_y;
+-                }
+-                if (i == scon->idx) {
+-                    off_x = cur_off_x;
+-                    off_y = cur_off_y;
+-                }
+-            }
+-        }
+-        qemu_input_queue_abs(scon->dcl.con, INPUT_AXIS_X, off_x + x, 0, max_w);
+-        qemu_input_queue_abs(scon->dcl.con, INPUT_AXIS_Y, off_y + y, 0, max_h);
++        qemu_input_queue_abs(scon->dcl.con, INPUT_AXIS_X, x, 0, surface_width(scon->surface));
++        qemu_input_queue_abs(scon->dcl.con, INPUT_AXIS_Y, y, 0, surface_height(scon->surface));
+     } else {
+         if (guest_cursor) {
+             x -= guest_x;
 -- 
 2.15.0
