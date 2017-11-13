@@ -1,15 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34248)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35383)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1eE8DB-0003EG-3S
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 01:27:14 -0500
+	(envelope-from <armbru@redhat.com>) id 1eE8MW-0005D6-E2
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 01:36:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1eE8DA-0006BL-0S
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 01:27:13 -0500
-From: P J P <ppandit@redhat.com>
-Date: Mon, 13 Nov 2017 11:56:58 +0530
-Message-Id: <20171113062658.9697-1-ppandit@redhat.com>
-Subject: [Qemu-devel] [PATCH v2] highbank: validate register offset before
- access
+	(envelope-from <armbru@redhat.com>) id 1eE8MT-00029N-Ay
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 01:36:52 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <1507630928-28307-1-git-send-email-Jim.Quigley@oracle.com>
+	<78aed453-49b8-a9e4-ae7c-39c731158eaa@msgid.tls.msk.ru>
+	<1c3087f3-9019-26b3-b4be-df71da2033fc@oracle.com>
+Date: Mon, 13 Nov 2017 07:36:41 +0100
+In-Reply-To: <1c3087f3-9019-26b3-b4be-df71da2033fc@oracle.com> (Jim Quigley's
+	message of "Fri, 10 Nov 2017 10:03:07 +0000")
+Message-ID: <8760aey9ae.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] hw/vfio: improve error message when cannot
+ init vfio event notifiers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,64 +26,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Qemu Developers <qemu-devel@nongnu.org>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Moguofang <moguofang@huawei.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, Shawn Guo <shawn.guo@linaro.org>, Rob Herring <robh@kernel.org>, Prasad J Pandit <pjp@fedoraproject.org>
+To: Jim Quigley <jim.quigley@oracle.com>
+Cc: Michael Tokarev <mjt@tls.msk.ru>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, alex.williamson@redhat.com, laurent@vivier.eu
 
-From: Prasad J Pandit <pjp@fedoraproject.org>
+Jim Quigley <jim.quigley@oracle.com> writes:
 
-An 'offset' parameter sent to highbank register r/w functions
-could be greater than number(NUM_REGS=0x200) of hb registers,
-leading to an OOB access issue. Add check to avoid it.
+> On 16/10/2017 19:07, Michael Tokarev wrote:
+>> 10.10.2017 13:22, Jim Quigley wrote:
+>>> More information is required to assist trouble-shooting when
+>>> QEMU fails to initialise the event notifications for devices
+>>> assigned with VFIO-PCI. Instead of supplying the user with a cryptic
+>>> error number only, print out a proper error message with strerror()
+>>> so that the user has a better way to figure out what the problem is.
+>>>
+>>> Reviewed-by: Liam Merwick <liam.merwick@oracle.com>
+>>> Signed-off-by: Jim Quigley <Jim.Quigley@oracle.com>
+>>> ---
+>>> Cc: qemu-trivial@nongnu.org
+>>> Cc: mjt@tls.msk.ru
+>>> Cc: laurent@vivier.eu
+>>> Cc: alex.williamson@redhat.com
+>>> ---
+>>>   hw/vfio/pci.c | 35 ++++++++++++++++++++++++-----------
+>>>   1 file changed, 24 insertions(+), 11 deletions(-)
+>>>
+>>> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+>>> index 31e1edf..3bffb93 100644
+>>> --- a/hw/vfio/pci.c
+>>> +++ b/hw/vfio/pci.c
+>>> @@ -430,13 +430,16 @@ static int vfio_enable_vectors(VFIOPCIDevice *vde=
+v, bool msix)
+>>>   static void vfio_add_kvm_msi_virq(VFIOPCIDevice *vdev, VFIOMSIVector =
+*vector,
+>>>                                     int vector_n, bool msix)
+>>>   {
+>>> -    int virq;
+>>> +    int virq, ret;
+>>>         if ((msix && vdev->no_kvm_msix) || (!msix &&
+>>> vdev->no_kvm_msi)) {
+>>>           return;
+>>>       }
+>>>   -    if (event_notifier_init(&vector->kvm_interrupt, 0)) {
+>>> +    ret =3D event_notifier_init(&vector->kvm_interrupt, 0);
+>>> +    if (ret) {
+>>> +        error_report("vfio (%s): Error: unable to init event notifier:=
+ %s (%d)",
+>>> +                     __func__, strerror(-ret), -ret);
+>> Since this pattern gets repeated again and again, maybe we can either
 
-Reported-by: Moguofang (Dennis mo) <moguofang@huawei.com>
-Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
----
- hw/arm/highbank.c | 17 +++++++++++++++--
- 1 file changed, 15 insertions(+), 2 deletions(-)
+Parts of it are anti-patterns:
 
-Update: use HWADDR_PRIx to print offset
-  -> https://lists.gnu.org/archive/html/qemu-devel/2017-11/msg02116.html
+* Error messages are by definition meant for the user.  If you feel you
+  need to include __func__ so it makes sense, you're obviously failing
+  to address the end user.
 
-diff --git a/hw/arm/highbank.c b/hw/arm/highbank.c
-index 354c6b25a8..287392bbdc 100644
---- a/hw/arm/highbank.c
-+++ b/hw/arm/highbank.c
-@@ -34,6 +34,7 @@
- #include "hw/ide/ahci.h"
- #include "hw/cpu/a9mpcore.h"
- #include "hw/cpu/a15mpcore.h"
-+#include "qemu/log.h"
- 
- #define SMP_BOOT_ADDR           0x100
- #define SMP_BOOT_REG            0x40
-@@ -117,14 +118,26 @@ static void hb_regs_write(void *opaque, hwaddr offset,
-         }
-     }
- 
--    regs[offset/4] = value;
-+    if (offset / 4 >= NUM_REGS) {
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                  "highbank: bad write offset 0x%" HWADDR_PRIx "\n", offset);
-+        return;
-+    }
-+    regs[offset / 4] = value;
- }
- 
- static uint64_t hb_regs_read(void *opaque, hwaddr offset,
-                              unsigned size)
- {
-+    uint32_t value;
-     uint32_t *regs = opaque;
--    uint32_t value = regs[offset/4];
-+
-+    if (offset / 4 >= NUM_REGS) {
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                  "highbank: bad read offset 0x%" HWADDR_PRIx "\n", offset);
-+        return 0;
-+    }
-+    value = regs[offset / 4];
- 
-     if ((offset == 0x100) || (offset == 0x108) || (offset == 0x10C)) {
-         value |= 0x30000000;
--- 
-2.13.6
+* Likewise for the numeric encoding of errno.
+
+* Printing "Error: " or similar is error_report()'s job.
+
+That leaves printing strerror().
+
+>> use a common wrapper or move that eror reporting into event_notifier_ini=
+t()?
+>> Note there are other users of this function, besides hw/vfio, and maybe
+>> these, too, can benefit from better error reporting?
+>
+> =C2=A0=C2=A0=C2=A0 Ideally the strerror() would be included in the error_=
+report()
+> function,
+> =C2=A0=C2=A0=C2=A0 (as per the error_setg() function), which obviously wo=
+uld involve
+> a more
+> =C2=A0=C2=A0=C2=A0 extensive change to the code base. Would that be an ac=
+ceptable
+> solution ?
+
+All existing uses error_report() that print strerror() would have to be
+converted to the new function.  Same for error_vreport(), warn_report(),
+...  Whether that's worthwhile is not obvious until we see patches.
+
+> =C2=A0=C2=A0=C2=A0 Or I can move the reporting into theevent_notifier_ini=
+t() function
+> if that is
+> =C2=A0=C2=A0=C2=A0 the preferred approach ?
+
+Moving error_report() into event_notifier_init() makes it unusable in
+contexts where error_report() is unwanted or wrong.
