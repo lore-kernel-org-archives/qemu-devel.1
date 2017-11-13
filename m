@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36284)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42491)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eE5L6-0001Cy-TC
-	for qemu-devel@nongnu.org; Sun, 12 Nov 2017 22:23:13 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1eE6HU-0003vk-VL
+	for qemu-devel@nongnu.org; Sun, 12 Nov 2017 23:23:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eE5L3-0006UQ-N1
-	for qemu-devel@nongnu.org; Sun, 12 Nov 2017 22:23:12 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58272)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eE5L3-0006U6-Ds
-	for qemu-devel@nongnu.org; Sun, 12 Nov 2017 22:23:09 -0500
-Date: Mon, 13 Nov 2017 11:22:58 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20171113032258.GB2921@xz-mi>
-References: <20171110203516.17027-1-danielhb@linux.vnet.ibm.com>
+	(envelope-from <dgibson@ozlabs.org>) id 1eE6HT-0007yV-JQ
+	for qemu-devel@nongnu.org; Sun, 12 Nov 2017 23:23:32 -0500
+Date: Mon, 13 Nov 2017 15:23:11 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20171113042311.GA1014@umbus.fritz.box>
+References: <4d05be59374384a32c09437f5d0308bfafaf0128.1509937620.git.sam.bobroff@au1.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="BOKacYhQ+x31HxR3"
 Content-Disposition: inline
-In-Reply-To: <20171110203516.17027-1-danielhb@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v1] migration/ram.c: do not set
- 'postcopy_running' in POSTCOPY_INCOMING_END
+In-Reply-To: <4d05be59374384a32c09437f5d0308bfafaf0128.1509937620.git.sam.bobroff@au1.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 1/1] target/ppc: correct htab shift for
+ hash on radix
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,117 +24,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, dgilbert@redhat.com, quintela@redhat.com
+To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
-On Fri, Nov 10, 2017 at 06:35:16PM -0200, Daniel Henrique Barboza wrote:
-> When migrating a VM with 'migrate_set_capability postcopy-ram on'
-> a postcopy_state is set during the process, ending up with the
-> state POSTCOPY_INCOMING_END when the migration is over. This
-> postcopy_state is taken into account inside ram_load to check
-> how it will load the memory pages. This same ram_load is called when
-> in a loadvm command.
-> 
-> Inside ram_load, the logic to see if we're at postcopy_running state
-> is:
-> 
-> postcopy_running = postcopy_state_get() >= POSTCOPY_INCOMING_LISTENING
-> 
-> postcopy_state_get() returns this enum type:
-> 
-> typedef enum {
->     POSTCOPY_INCOMING_NONE = 0,
->     POSTCOPY_INCOMING_ADVISE,
->     POSTCOPY_INCOMING_DISCARD,
->     POSTCOPY_INCOMING_LISTENING,
->     POSTCOPY_INCOMING_RUNNING,
->     POSTCOPY_INCOMING_END
-> } PostcopyState;
-> 
-> In the case where ram_load is executed and postcopy_state is
-> POSTCOPY_INCOMING_END, postcopy_running will be set to 'true' and
-> ram_load will behave like a postcopy is in progress. This scenario isn't
-> achievable in a migration but it is reproducible when executing
-> savevm/loadvm after migrating with 'postcopy-ram on', causing loadvm
-> to fail with Error -22:
-> 
-> Source:
-> 
-> (qemu) migrate_set_capability postcopy-ram on
-> (qemu) migrate tcp:127.0.0.1:4444
-> 
-> Dest:
-> 
-> (qemu) migrate_set_capability postcopy-ram on
-> (qemu)
-> ubuntu1704-intel login:
-> Ubuntu 17.04 ubuntu1704-intel ttyS0
-> 
-> ubuntu1704-intel login: (qemu)
-> (qemu) savevm test1
-> (qemu) loadvm test1
-> Unknown combination of migration flags: 0x4 (postcopy mode)
-> error while loading state for instance 0x0 of device 'ram'
-> Error -22 while loading VM state
-> (qemu)
-> 
-> This patch fixes this problem by changing a bit the semantics
-> of postcopy_running inside ram_load, verifying first if
-> we're not in the POSTCOPY_INCOMING_END state. In this case,
-> postcopy_running is set to 'false'.
-> 
-> Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+
+--BOKacYhQ+x31HxR3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Mon, Nov 06, 2017 at 02:14:35PM +1100, Sam Bobroff wrote:
+> KVM HV will soon support running a guest in hash mode on a POWER9 host
+> running in radix mode (see [1]), however the guest currently fails to
+> boot.
+>=20
+> This is because the "htab_shift" value (the size of the MMU's hash
+> table) is added to the device tree before KVM has had a chance to
+> change it. If the host is in hash mode, KVM does not need to change it
+> and so the problem is not seen, but when the host is in radix mode a
+> change is required and we see a problem.
+>=20
+> To fix this, move the call spapr_setup_hpt_and_vrma() (where
+> htab_shift could be changed) up a little so that it's called before
+> spapr_h_cas_compose_response() (where htab_shift is added to the
+> device tree).
+>=20
+> Signed-off-by: Sam Bobroff <sam.bobroff@au1.ibm.com>
+
+Applied to ppc-for-2.11.
+
+>=20
+> [1] See http://www.spinics.net/lists/kvm-ppc/msg13057.html
 > ---
->  migration/ram.c | 22 +++++++++++++++-------
->  1 file changed, 15 insertions(+), 7 deletions(-)
-> 
-> diff --git a/migration/ram.c b/migration/ram.c
-> index 8620aa400a..43ed719668 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -2803,13 +2803,21 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
->      int flags = 0, ret = 0, invalid_flags = 0;
->      static uint64_t seq_iter;
->      int len = 0;
-> -    /*
-> -     * If system is running in postcopy mode, page inserts to host memory must
-> -     * be atomic
-> -     */
-> -    bool postcopy_running = postcopy_state_get() >= POSTCOPY_INCOMING_LISTENING;
-> -    /* ADVISE is earlier, it shows the source has the postcopy capability on */
-> -    bool postcopy_advised = postcopy_state_get() >= POSTCOPY_INCOMING_ADVISE;
-> +    bool postcopy_advised = false, postcopy_running = false;
-> +    uint8_t postcopy_state = postcopy_state_get();
-> +
-> +    if (postcopy_state != POSTCOPY_INCOMING_END) {
-> +        /*
-> +         * If system is running in postcopy mode, page inserts to host memory
-> +         * must be atomic
-> +         */
-> +        postcopy_running = postcopy_state >= POSTCOPY_INCOMING_LISTENING;
-> +
-> +        /* ADVISE is earlier, it shows the source has the postcopy
-> +         * capability on
-> +         */
-> +        postcopy_advised = postcopy_state >= POSTCOPY_INCOMING_ADVISE;
-> +    }
+> I tested this patch using a kernel based on Paul's kvm-ppc-next branch fr=
+om his
+> powerpc tree:
+> https://git.kernel.org/pub/scm/linux/kernel/git/paulus/powerpc.git/
+>=20
+>  hw/ppc/spapr_hcall.c | 13 ++++++-------
+>  1 file changed, 6 insertions(+), 7 deletions(-)
+>=20
+> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+> index 0d59d1534d..be22a6b289 100644
+> --- a/hw/ppc/spapr_hcall.c
+> +++ b/hw/ppc/spapr_hcall.c
+> @@ -1636,6 +1636,12 @@ static target_ulong h_client_architecture_support(=
+PowerPCCPU *cpu,
+>      spapr->cas_legacy_guest_workaround =3D !spapr_ovec_test(ov1_guest,
+>                                                            OV1_PPC_3_00);
+>      if (!spapr->cas_reboot) {
+> +        /* If ppc_spapr_reset() did not set up a HPT but one is necessary
+> +         * (because the guest isn't going to use radix) then set it up h=
+ere. */
+> +        if ((spapr->patb_entry & PATBE1_GR) && !guest_radix) {
+> +            /* legacy hash or new hash: */
+> +            spapr_setup_hpt_and_vrma(spapr);
+> +        }
+>          spapr->cas_reboot =3D
+>              (spapr_h_cas_compose_response(spapr, args[1], args[2],
+>                                            ov5_updates) !=3D 0);
+> @@ -1644,13 +1650,6 @@ static target_ulong h_client_architecture_support(=
+PowerPCCPU *cpu,
+> =20
+>      if (spapr->cas_reboot) {
+>          qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
+> -    } else {
+> -        /* If ppc_spapr_reset() did not set up a HPT but one is necessary
+> -         * (because the guest isn't going to use radix) then set it up h=
+ere. */
+> -        if ((spapr->patb_entry & PATBE1_GR) && !guest_radix) {
+> -            /* legacy hash or new hash: */
+> -            spapr_setup_hpt_and_vrma(spapr);
+> -        }
+>      }
+> =20
+>      return H_SUCCESS;
 
-For me, this is not that clear.  I would prefer something simpler like:
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-  PostcopyState state = postcopy_state_get();
-  bool postcopy_running = state >= POSTCOPY_INCOMING_LISTENING && \
-                          state < POSTCOPY_INCOMING_END;
+--BOKacYhQ+x31HxR3
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Or we can introduce postcopy_is_running() helper.  Same thing to
-postcopy_advised.  Thanks,
+-----BEGIN PGP SIGNATURE-----
 
->  
->      seq_iter++;
->  
-> -- 
-> 2.13.6
-> 
-> 
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAloJHiwACgkQbDjKyiDZ
+s5K8SRAA5h4zGTKXuFfmp9cA+/bk3klswnA5DLORvZyoZsdLyi8M1+Fx14OmU/kA
+woxFOk4JyLvNzFYrW4DAY/fKQRQbJNflYgTD8VPtk5E5eurAEGlN4yXdNkpd04Eq
+EKDVpyUjgLli7MSABaLKa40MfXzdDd9w90VqYTBSmtcknTiOeSXkEMilToAaV52s
+D5ZNyArOaBMkpIWv8B7QWER357RGVXx+RbuEnAEt39owZTwFZVf3QyfaxsjuOsAh
+4Y+pKRZ+GpXr8MU5xCRLcChop628uHldl04N4WUzj7nShDc70OL8ca+xujbMaZJT
+PulqsuK0W1o2+IHcBfgroxrorMvKQtZLsseINN51g3K/pfRUzEaTItuGkz6c+88K
+bQHDm9u/Jd3ABSlzHutNjgF2wMI1YAMdAKUu+JJ+WSYxOgbSL9zypkXoKLAsXSUV
+u+nOv4iPg6f5k4wiDFHoTWMTTVuYYDxr2Q0N33/rdVGSGfTabRU8s+ki1WXc1bUk
+awc45zb3LuZ5S7FOY882NiYBXflte/+SibhqCG4wPKfaxCTRIiHWXxGcEo5VUtJs
+WmD3mxYIvGOpm1Y9sEhBu2TTU5A4YqY60lH+xj69dcPdxXugJAHpFI8o4eL+OThH
+8GBFehm0NQ2sM99kTK/F+9lzv41SQAGoq6GjlUUnhQQ+Yx4Hv+Q=
+=12tw
+-----END PGP SIGNATURE-----
 
--- 
-Peter Xu
+--BOKacYhQ+x31HxR3--
