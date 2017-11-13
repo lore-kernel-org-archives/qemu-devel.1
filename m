@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48629)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49577)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eEFUM-0006Zo-QM
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 09:13:30 -0500
+	(envelope-from <bounces@canonical.com>) id 1eEFWs-0000TA-87
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 09:16:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eEFUG-0000RS-RK
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 09:13:26 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42202)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eEFUG-0000R2-Hi
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 09:13:20 -0500
-References: <37193dd7-a0fc-bfa6-3870-ecbcfefac4e5@virtuozzo.com>
-	<bf31a83e-7cd6-4f26-595b-3b1a2def883f@redhat.com>
-	<608ba1f1-38b3-7312-e27b-8a62b197d53e@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <f109edd5-ef86-ff6d-c242-e0731d919c77@redhat.com>
-Date: Mon, 13 Nov 2017 08:13:16 -0600
+	(envelope-from <bounces@canonical.com>) id 1eEFWn-0001SR-5L
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 09:16:02 -0500
+Received: from indium.canonical.com ([91.189.90.7]:56532)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eEFWm-0001Re-VE
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 09:15:57 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eEFWj-0002Zh-LB
+	for <qemu-devel@nongnu.org>; Mon, 13 Nov 2017 14:15:53 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 9E2122E80CE
+	for <qemu-devel@nongnu.org>; Mon, 13 Nov 2017 14:15:53 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <608ba1f1-38b3-7312-e27b-8a62b197d53e@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="0NIbDvM5X26nIE76cLdHvCU4HdscEKXmB"
-Subject: Re: [Qemu-devel] NBD BLOCK_STATUS
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 13 Nov 2017 14:00:43 -0000
+From: Christophe Lyon <christophe.lyon+launchpad@gmail.com>
+Reply-To: Bug 1727737 <1727737@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150902607840.5143.15937446061017284272.malonedeb@chaenomeles.canonical.com>
+Message-Id: <151058164318.28255.17292220902034659220.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1727737] Re: qemu-arm stalls on a GCC sanitizer
+ test since qemu-2.7
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,80 +37,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Wouter Verhelst <w@uter.be>, Alex Bligh <alex@alex.org.uk>, nbd list <nbd@other.debian.org>, qemu-devel <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---0NIbDvM5X26nIE76cLdHvCU4HdscEKXmB
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Wouter Verhelst <w@uter.be>, Alex Bligh <alex@alex.org.uk>,
- nbd list <nbd@other.debian.org>, qemu-devel <qemu-devel@nongnu.org>
-Message-ID: <f109edd5-ef86-ff6d-c242-e0731d919c77@redhat.com>
-Subject: Re: NBD BLOCK_STATUS
-References: <37193dd7-a0fc-bfa6-3870-ecbcfefac4e5@virtuozzo.com>
- <bf31a83e-7cd6-4f26-595b-3b1a2def883f@redhat.com>
- <608ba1f1-38b3-7312-e27b-8a62b197d53e@virtuozzo.com>
-In-Reply-To: <608ba1f1-38b3-7312-e27b-8a62b197d53e@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Thanks for the clarification.
 
-On 11/10/2017 10:51 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 10.11.2017 19:06, Eric Blake wrote:
->> On 11/09/2017 06:42 AM, Vladimir Sementsov-Ogievskiy wrote:
->>> Hi!
->>>
->>> Interesting fact: list/set_meta_context options are per-export,
->>> so, in the server we should keep context selection per client per
->>> export.
->>>
->>> And it is possible for client to set contexts for one export and than=
+But how does the target get the actual syscall return code, if
+do_syscall() is supposed to return negative-target-errno?
 
->>> proceed
->>> to transmission phase with another one.
->> However, we also documented in the spec that
->>
->> +=C2=A0=C2=A0=C2=A0 A client MUST NOT send `NBD_CMD_BLOCK_STATUS` unle=
-ss
->> +=C2=A0=C2=A0=C2=A0 within the negotiation phase it sent `NBD_OPT_SET_=
-META_CONTEXT`
->> +=C2=A0=C2=A0=C2=A0 at least once, and the final time it was sent, it =
-referred
->> +=C2=A0=C2=A0=C2=A0 to the export name that was ultimately selected, t=
-he server
->> +=C2=A0=C2=A0=C2=A0 responded without an error, and returned at least =
-one metadata
->> +=C2=A0=C2=A0=C2=A0 context.
->=20
-> I've missed this, then it's OK.
->=20
-> maybe "ultimately selected for transmission phase" would be a bit bette=
-r.
+I mean, in general the target code will check if the syscall returned -1, a=
+nd only then query errno?
+But if QEMU's do_syscall returns -errno, and put this value in r0 (for arm)=
+ how is the target code supposed to work?
 
-Sure, I'll queue that up for my next round of doc tweaks.
+-- =
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1727737
 
+Title:
+  qemu-arm stalls on a GCC sanitizer test since qemu-2.7
 
---0NIbDvM5X26nIE76cLdHvCU4HdscEKXmB
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Status in QEMU:
+  Incomplete
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+Bug description:
+  Hi,
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloJqHwACgkQp6FrSiUn
-Q2pUpQf+IgUmd2t+G2u0yR7IxD1BykCU2jdrdmPfOl7kQSslM1a0nixlnkxkqoK7
-+bfJZ07/tJdHMHp+C3WX8oG0+hyNw/b7Z6kutea8/6cwRpru/I5XXTPVlAXthv/F
-hxZZKDMzSlBFDglaqQpVde/N/XbHvaB83Gb3HgqKMmd8QBeRVjA3A8hdoMYnqJVl
-t6GOpTVDxYIWu0reYZYMGNw9JxawaLM3kwjBd5KdxlMIEdcVhuOnuWWGLYY4uxvz
-t8SuazIlQRvo2OAdsoWsR70jxGJZExMiE1hmzTPpNF9jFT+qOEIaS9WruVbdBQCx
-LX8Bbb/Q31K4Eoli9ugnl+l4MP3C+g==
-=xrTh
------END PGP SIGNATURE-----
+  I have noticed that several GCC/sanitizer tests fail with timeout when
+  executed under QEMU.
 
---0NIbDvM5X26nIE76cLdHvCU4HdscEKXmB--
+  After a bit of investigation, I have noticed that this worked with
+  qemu-2.7, and started failing with qemu-2.8, and still fails with
+  qemu-2.10.1
+
+  I'm attaching a tarball containing:
+  alloca_instruments_all_paddings.exe : the testcase, and the needed libs:
+  lib/librt.so.1
+  lib/libdl.so.2
+  lib/ld-linux-armhf.so.3
+  lib/libasan.so.5
+  lib/libc.so.6
+  lib/libgcc_s.so.1
+  lib/libpthread.so.0
+  lib/libm.so.6
+
+  To reproduce the problem:
+  $ qemu-arm -cpu any -R 0 -L $PWD $PWD/alloca_instruments_all_paddings.exe
+  returns in less than a second with qemu-2.7, and never with qemu-2.8
+
+  Using -d in_asm suggests that the program "almost" completes and qemu see=
+ms to stall on:
+  0x40b6eb44: e08f4004 add r4, pc, r4
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1727737/+subscriptions
