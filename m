@@ -1,19 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57124)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57270)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1eENOf-00037j-40
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 17:40:06 -0500
+	(envelope-from <alistai@xilinx.com>) id 1eENOo-0003QI-JU
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 17:40:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1eENOe-0007S4-0J
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 17:40:05 -0500
+	(envelope-from <alistai@xilinx.com>) id 1eENOn-0007as-Fu
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 17:40:14 -0500
 From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Mon, 13 Nov 2017 14:35:41 -0800
-Message-ID: <2153fb50fa4599a802cea8abb71b6dd967090cc2.1510612380.git.alistair.francis@xilinx.com>
+Date: Mon, 13 Nov 2017 14:35:54 -0800
+Message-ID: <0526ef6a38766e6b8c80c331c07af4bdd0bd6384.1510612380.git.alistair.francis@xilinx.com>
 In-Reply-To: <cover.1510612380.git.alistair.francis@xilinx.com>
 References: <cover.1510612380.git.alistair.francis@xilinx.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v5 19/29] hw/pci*: Replace fprintf(stderr,
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v5 23/29] hw/sd: Replace fprintf(stderr,
  "*\n" with error_report()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -24,51 +23,41 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
-Cc: alistair.francis@xilinx.com, alistair23@gmail.com, armbru@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
+Cc: alistair.francis@xilinx.com, alistair23@gmail.com, armbru@redhat.com
 
 Replace a large number of the fprintf(stderr, "*\n" calls with
 error_report(). The functions were renamed with these commands and then
 compiler issues where manually fixed.
 
 find ./* -type f -exec sed -i \
-    'N;N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_=
-report("\1"\2);|Ig}' \
+    'N;N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_re=
-port("\1"\2);|Ig}' \
+    'N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report=
-("\1"\2);|Ig}' \
+    'N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("=
-\1"\2);|Ig}' \
+    'N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1=
-"\2);|Ig}' \
+    'N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\=
-2);|Ig}' \
+    'N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2)=
-;|Ig}' \
+    'N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|=
-Ig}' \
+    'N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig=
-}' \
+    'N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}'=
- \
+    'N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
     {} +
 find ./* -type f -exec sed -i \
     'N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
@@ -76,95 +65,103 @@ find ./* -type f -exec sed -i \
 
 Some lines where then manually tweaked to pass checkpatch.
 
-A trailing '.' was removed in hw/pci/pci.c
+Some of the prints in hw/sd/sd.c were manually converted to using
+DPRINTF() instead.
 
 Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Marcel Apfelbaum <marcel@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud <f4bug@amsat.org>
 ---
+V3:
+ - Fixup some DPRINTF() prints being wrong
 V2:
  - Split hw patch into individual directories
 
- hw/pci-host/bonito.c |  6 +++---
- hw/pci/pci.c         | 12 ++++++------
- 2 files changed, 9 insertions(+), 9 deletions(-)
+ hw/sd/pl181.c |  5 +++--
+ hw/sd/sd.c    | 15 ++++++++-------
+ 2 files changed, 11 insertions(+), 9 deletions(-)
 
-diff --git a/hw/pci-host/bonito.c b/hw/pci-host/bonito.c
-index 2ebeab5d90..6f2e589bee 100644
---- a/hw/pci-host/bonito.c
-+++ b/hw/pci-host/bonito.c
-@@ -38,7 +38,7 @@
+diff --git a/hw/sd/pl181.c b/hw/sd/pl181.c
+index 55c8098ecd..2b878a0c5e 100644
+--- a/hw/sd/pl181.c
++++ b/hw/sd/pl181.c
+@@ -8,6 +8,7 @@
   */
-=20
+ 
  #include "qemu/osdep.h"
--
 +#include "qemu/error-report.h"
- #include "hw/hw.h"
- #include "hw/pci/pci.h"
- #include "hw/i386/pc.h"
-@@ -449,8 +449,8 @@ static uint32_t bonito_sbridge_pciaddr(void *opaque, hw=
-addr addr)
-     regno =3D (cfgaddr & BONITO_PCICONF_REG_MASK) >> BONITO_PCICONF_REG_OF=
-FSET;
-=20
-     if (idsel =3D=3D 0) {
--        fprintf(stderr, "error in bonito pci config address " TARGET_FMT_p=
-lx
--            ",pcimap_cfg=3D%x\n", addr, s->regs[BONITO_PCIMAP_CFG]);
-+        error_report("error in bonito pci config address " TARGET_FMT_plx
-+            ",pcimap_cfg=3D%x", addr, s->regs[BONITO_PCIMAP_CFG]);
-         exit(1);
+ #include "sysemu/block-backend.h"
+ #include "sysemu/blockdev.h"
+ #include "hw/sysbus.h"
+@@ -146,7 +147,7 @@ static void pl181_fifo_push(PL181State *s, uint32_t value)
+     int n;
+ 
+     if (s->fifo_len == PL181_FIFO_LEN) {
+-        fprintf(stderr, "pl181: FIFO overflow\n");
++        error_report("pl181: FIFO overflow");
+         return;
      }
-     pciaddr =3D PCI_ADDR(pci_bus_num(phb->bus), devno, funno, regno);
-diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-index 5ed3c8dca4..948d4e04ee 100644
---- a/hw/pci/pci.c
-+++ b/hw/pci/pci.c
-@@ -525,8 +525,8 @@ static int get_pci_irq_state(QEMUFile *f, void *pv, siz=
-e_t size,
-     for (i =3D 0; i < PCI_NUM_PINS; ++i) {
-         irq_state[i] =3D qemu_get_be32(f);
-         if (irq_state[i] !=3D 0x1 && irq_state[i] !=3D 0) {
--            fprintf(stderr, "irq state %d: must be 0 or 1.\n",
--                    irq_state[i]);
-+            error_report("irq state %d: must be 0 or 1",
-+                         irq_state[i]);
-             return -EINVAL;
-         }
+     n = (s->fifo_pos + s->fifo_len) & (PL181_FIFO_LEN - 1);
+@@ -160,7 +161,7 @@ static uint32_t pl181_fifo_pop(PL181State *s)
+     uint32_t value;
+ 
+     if (s->fifo_len == 0) {
+-        fprintf(stderr, "pl181: FIFO underflow\n");
++        error_report("pl181: FIFO underflow");
+         return 0;
      }
-@@ -688,7 +688,7 @@ static PCIBus *pci_get_bus_devfn(int *devfnp, PCIBus *r=
-oot,
-     unsigned slot;
-=20
-     if (!root) {
--        fprintf(stderr, "No primary PCI bus\n");
-+        error_report("No primary PCI bus");
-         return NULL;
+     value = s->fifo[s->fifo_pos];
+diff --git a/hw/sd/sd.c b/hw/sd/sd.c
+index 35347a5bbc..5d7fa3e418 100644
+--- a/hw/sd/sd.c
++++ b/hw/sd/sd.c
+@@ -700,7 +700,7 @@ static void sd_lock_command(SDState *sd)
+         sd->card_status &= ~CARD_IS_LOCKED;
+         sd->pwd_len = 0;
+         /* Erasing the entire card here! */
+-        fprintf(stderr, "SD: Card force-erased by CMD42\n");
++        error_report("SD: Card force-erased by CMD42");
+         return;
      }
-=20
-@@ -704,7 +704,7 @@ static PCIBus *pci_get_bus_devfn(int *devfnp, PCIBus *r=
-oot,
+ 
+@@ -1282,7 +1282,7 @@ static sd_rsp_type_t sd_normal_command(SDState *sd,
+         return sd_r1;
+ 
+     case 56:	/* CMD56:  GEN_CMD */
+-        fprintf(stderr, "SD: GEN_CMD 0x%08x\n", req.arg);
++        error_report("SD: GEN_CMD 0x%08x", req.arg);
+ 
+         switch (sd->state) {
+         case sd_transfer_state:
+@@ -1564,9 +1564,10 @@ send_response:
+     if (rsplen) {
+         int i;
+         DPRINTF("Response:");
+-        for (i = 0; i < rsplen; i++)
+-            fprintf(stderr, " %02x", response[i]);
+-        fprintf(stderr, " state %d\n", sd->state);
++        for (i = 0; i < rsplen; i++) {
++            DPRINTF(" %02x", response[i]);
++        }
++        DPRINTF(" state %d\n", sd->state);
+     } else {
+         DPRINTF("No response %d\n", sd->state);
      }
-=20
-     if (dom !=3D 0) {
--        fprintf(stderr, "No support for non-zero PCI domains\n");
-+        error_report("No support for non-zero PCI domains");
-         return NULL;
+@@ -1580,14 +1581,14 @@ static void sd_blk_read(SDState *sd, uint64_t addr, uint32_t len)
+     DPRINTF("sd_blk_read: addr = 0x%08llx, len = %d\n",
+             (unsigned long long) addr, len);
+     if (!sd->blk || blk_pread(sd->blk, addr, sd->data, len) < 0) {
+-        fprintf(stderr, "sd_blk_read: read error on host side\n");
++        error_report("sd_blk_read: read error on host side");
      }
-=20
-@@ -1128,8 +1128,8 @@ void pci_register_bar(PCIDevice *pci_dev, int region_=
-num,
-     assert(region_num >=3D 0);
-     assert(region_num < PCI_NUM_REGIONS);
-     if (size & (size-1)) {
--        fprintf(stderr, "ERROR: PCI region size must be pow2 "
--                    "type=3D0x%x, size=3D0x%"FMT_PCIBUS"\n", type, size);
-+        error_report("ERROR: PCI region size must be pow2 "
-+                    "type=3D0x%x, size=3D0x%"FMT_PCIBUS"", type, size);
-         exit(1);
+ }
+ 
+ static void sd_blk_write(SDState *sd, uint64_t addr, uint32_t len)
+ {
+     if (!sd->blk || blk_pwrite(sd->blk, addr, sd->data, len, 0) < 0) {
+-        fprintf(stderr, "sd_blk_write: write error on host side\n");
++        error_report("sd_blk_write: write error on host side");
      }
-=20
---=20
+ }
+ 
+-- 
 2.14.1
