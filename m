@@ -1,34 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41177)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41992)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eEGXg-00046n-6O
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 10:21:00 -0500
+	(envelope-from <cohuck@redhat.com>) id 1eEGaJ-0005ik-F3
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 10:23:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eEGXb-0000Or-6x
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 10:20:56 -0500
-Received: from indium.canonical.com ([91.189.90.7]:51020)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eEGXb-0000Ms-0k
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 10:20:51 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eEGXW-00079l-Fv
-	for <qemu-devel@nongnu.org>; Mon, 13 Nov 2017 15:20:46 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id BF8D92E80D1
-	for <qemu-devel@nongnu.org>; Mon, 13 Nov 2017 15:20:45 +0000 (UTC)
+	(envelope-from <cohuck@redhat.com>) id 1eEGaE-0001RA-Eu
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 10:23:39 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52564)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1eEGaE-0001Qr-7Z
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 10:23:34 -0500
+Date: Mon, 13 Nov 2017 16:23:28 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20171113162328.3b94def6.cohuck@redhat.com>
+In-Reply-To: <1510075479-17224-5-git-send-email-pmorel@linux.vnet.ibm.com>
+References: <1510075479-17224-1-git-send-email-pmorel@linux.vnet.ibm.com>
+	<1510075479-17224-5-git-send-email-pmorel@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 13 Nov 2017 15:13:47 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1727737 <1727737@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150902607840.5143.15937446061017284272.malonedeb@chaenomeles.canonical.com>
-Message-Id: <151058602766.8184.622127364494432751.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1727737] Re: qemu-arm stalls on a GCC sanitizer
- test since qemu-2.7
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 4/7] s390x/pci: rework PCI STORE BLOCK
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,58 +27,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Pierre Morel <pmorel@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, agraf@suse.de, borntraeger@de.ibm.com, zyimin@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com
 
-No idea about the environment variable thing -- it seems to work for me. In=
- a chroot:
-# qemu-arm-static -E ASAN_OPTIONS=3Dbar=3Dbaz /usr/bin/env =
+On Tue,  7 Nov 2017 18:24:36 +0100
+Pierre Morel <pmorel@linux.vnet.ibm.com> wrote:
 
-ASAN_OPTIONS=3Dbar=3Dbaz
-[...  other things ...]
+> Enhance the fault detection.
+> 
+> Add the maxstbl entry to both the Query PCI Function Group
+> response and the PCIBusDevice structure.
+> 
+> Initialize the maxstbl to 128 per default until we get
+> the actual data from the hardware.
+> 
+> Signed-off-by: Pierre Morel <pmorel@linux.vnet.ibm.com>
+> Reviewed-by: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
+> ---
+>  hw/s390x/s390-pci-bus.h  |  1 +
+>  hw/s390x/s390-pci-inst.c | 62 +++++++++++++++++++++++++++++-------------------
+>  hw/s390x/s390-pci-inst.h |  2 +-
+>  3 files changed, 40 insertions(+), 25 deletions(-)
+> 
 
-shows that -E is being passed into the child process's environment as
-would be expected.
+> @@ -662,22 +664,10 @@ int pcistb_service_call(S390CPU *cpu, uint8_t r1, uint8_t r3, uint64_t gaddr,
+>      fh = env->regs[r1] >> 32;
+>      pcias = (env->regs[r1] >> 16) & 0xf;
+>      len = env->regs[r1] & 0xff;
+> +    offset = env->regs[r3];
+>  
+> -    if (pcias > 5) {
+> -        DPRINTF("pcistb invalid space\n");
+> -        setcc(cpu, ZPCI_PCI_LS_ERR);
+> -        s390_set_status_code(env, r1, ZPCI_PCI_ST_INVAL_AS);
+> -        return 0;
+> -    }
+> -
+> -    switch (len) {
+> -    case 16:
+> -    case 32:
+> -    case 64:
+> -    case 128:
+> -        break;
+> -    default:
+> -        program_interrupt(env, PGM_SPECIFICATION, 6);
+> +    if (!(fh & FH_MASK_ENABLE)) {
+> +        setcc(cpu, ZPCI_PCI_LS_INVAL_HANDLE);
 
--- =
+So this means you move checking for the device before checking for the
+parameters or the as.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1727737
+>          return 0;
+>      }
+>  
+> @@ -689,12 +679,7 @@ int pcistb_service_call(S390CPU *cpu, uint8_t r1, uint8_t r3, uint64_t gaddr,
+>      }
+>  
+>      switch (pbdev->state) {
+> -    case ZPCI_FS_RESERVED:
+> -    case ZPCI_FS_STANDBY:
+> -    case ZPCI_FS_DISABLED:
+>      case ZPCI_FS_PERMANENT_ERROR:
+> -        setcc(cpu, ZPCI_PCI_LS_INVAL_HANDLE);
+> -        return 0;
+>      case ZPCI_FS_ERROR:
+>          setcc(cpu, ZPCI_PCI_LS_ERR);
+>          s390_set_status_code(env, r1, ZPCI_PCI_ST_BLOCKED);
+> @@ -703,8 +688,33 @@ int pcistb_service_call(S390CPU *cpu, uint8_t r1, uint8_t r3, uint64_t gaddr,
+>          break;
+>      }
+>  
+> +    if (pcias > 5) {
+> +        DPRINTF("pcistb invalid space\n");
+> +        setcc(cpu, ZPCI_PCI_LS_ERR);
+> +        s390_set_status_code(env, r1, ZPCI_PCI_ST_INVAL_AS);
+> +        return 0;
+> +    }
+> +
+> +    /* Verify the address, offset and length */
+> +    /* offset must be a multiple of 8 */
+> +    if (offset % 8) {
+> +        goto addressing_error;
+> +    }
+> +    /* Length must be greater than 8, a multiple of 8, lower than maxstbl */
+> +    if ((len <= 8) || (len % 8) || (len > pbdev->maxstbl)) {
+> +        goto addressing_error;
+> +    }
+> +    /* Do not cross a 4K-byte boundary */
+> +    if (((offset & 0xfff) + len) > 0x1000) {
+> +        goto addressing_error;
+> +    }
+> +    /* Guest address must be double word aligned */
+> +    if (gaddr & 0x07UL) {
+> +        goto addressing_error;
+> +    }
 
-Title:
-  qemu-arm stalls on a GCC sanitizer test since qemu-2.7
+So the checks here are only evaluated if the instruction actually pokes
+at a valid region?
 
-Status in QEMU:
-  Incomplete
+> +
+>      mr = pbdev->pdev->io_regions[pcias].memory;
+> -    if (!memory_region_access_valid(mr, env->regs[r3], len, true)) {
+> +    if (!memory_region_access_valid(mr, offset, len, true)) {
+>          program_interrupt(env, PGM_OPERAND, 6);
+>          return 0;
+>      }
+> @@ -714,9 +724,9 @@ int pcistb_service_call(S390CPU *cpu, uint8_t r1, uint8_t r3, uint64_t gaddr,
+>      }
+>  
+>      for (i = 0; i < len / 8; i++) {
+> -        result = memory_region_dispatch_write(mr, env->regs[r3] + i * 8,
+> -                                     ldq_p(buffer + i * 8), 8,
+> -                                     MEMTXATTRS_UNSPECIFIED);
+> +        result = memory_region_dispatch_write(mr, offset + i * 8,
+> +                                              ldq_p(buffer + i * 8), 8,
+> +                                              MEMTXATTRS_UNSPECIFIED);
+>          if (result != MEMTX_OK) {
+>              program_interrupt(env, PGM_OPERAND, 6);
+>              return 0;
+> @@ -725,6 +735,10 @@ int pcistb_service_call(S390CPU *cpu, uint8_t r1, uint8_t r3, uint64_t gaddr,
+>  
+>      setcc(cpu, ZPCI_PCI_LS_OK);
+>      return 0;
+> +
+> +addressing_error:
+> +    program_interrupt(env, PGM_SPECIFICATION, 6);
+> +    return 0;
+>  }
 
-Bug description:
-  Hi,
-
-  I have noticed that several GCC/sanitizer tests fail with timeout when
-  executed under QEMU.
-
-  After a bit of investigation, I have noticed that this worked with
-  qemu-2.7, and started failing with qemu-2.8, and still fails with
-  qemu-2.10.1
-
-  I'm attaching a tarball containing:
-  alloca_instruments_all_paddings.exe : the testcase, and the needed libs:
-  lib/librt.so.1
-  lib/libdl.so.2
-  lib/ld-linux-armhf.so.3
-  lib/libasan.so.5
-  lib/libc.so.6
-  lib/libgcc_s.so.1
-  lib/libpthread.so.0
-  lib/libm.so.6
-
-  To reproduce the problem:
-  $ qemu-arm -cpu any -R 0 -L $PWD $PWD/alloca_instruments_all_paddings.exe
-  returns in less than a second with qemu-2.7, and never with qemu-2.8
-
-  Using -d in_asm suggests that the program "almost" completes and qemu see=
-ms to stall on:
-  0x40b6eb44: e08f4004 add r4, pc, r4
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1727737/+subscriptions
+This seems more readable; I can't verify whether it is actually correct
+without access to the architecture, though :(
