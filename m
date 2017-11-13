@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35165)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39002)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eENbp-000297-2K
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 17:53:42 -0500
+	(envelope-from <asegundo@redhat.com>) id 1eENlG-0000q6-CH
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 18:03:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eENbk-0005oT-5J
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 17:53:41 -0500
-Received: from mail-qt0-x22a.google.com ([2607:f8b0:400d:c0d::22a]:48405)
+	(envelope-from <asegundo@redhat.com>) id 1eENlC-00020b-B5
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 18:03:26 -0500
+Received: from mail-io0-f171.google.com ([209.85.223.171]:52694)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eENbk-0005oL-15
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 17:53:36 -0500
-Received: by mail-qt0-x22a.google.com with SMTP id f8so21663518qta.5
-	for <qemu-devel@nongnu.org>; Mon, 13 Nov 2017 14:53:35 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <CAFEAcA95abAHYQ=FpS_n4Aqiui7uQCF=ONEPkUCXGOv-joSDtw@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <61f7169d-e017-9ae6-de5e-836dcd0a0fdc@amsat.org>
-Date: Mon, 13 Nov 2017 19:53:27 -0300
+	(Exim 4.71) (envelope-from <asegundo@redhat.com>) id 1eENlC-0001zJ-3t
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 18:03:22 -0500
+Received: by mail-io0-f171.google.com with SMTP id u42so4420889ioi.9
+	for <qemu-devel@nongnu.org>; Mon, 13 Nov 2017 15:03:20 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA95abAHYQ=FpS_n4Aqiui7uQCF=ONEPkUCXGOv-joSDtw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] how do we determine correct guest PC for segfaults
- in atomic helpers for linux-user mode?
+In-Reply-To: <20171113222358.30967-3-apahim@redhat.com>
+References: <20171113222358.30967-1-apahim@redhat.com>
+	<20171113222358.30967-3-apahim@redhat.com>
+From: Amador Pahim <apahim@redhat.com>
+Date: Tue, 14 Nov 2017 00:03:18 +0100
+Message-ID: <CALAZnb2wxK86kAG63RkZT-iRqKjmv=0kCpJHgWA_49eojpVJLg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v10 2/8] qemu.py: better control of created
+ files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,60 +29,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
-Cc: "Emilio G. Cota" <cota@braap.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
+Cc: Fam Zheng <famz@redhat.com>, Cleber Rosa <crosa@redhat.com>, ehabkost@redhat.com
 
-Hi Peter,
+On 13 Nov 2017 11:24 pm, "Amador Pahim" <apahim@redhat.com> wrote:
 
-On 11/13/2017 04:59 PM, Peter Maydell wrote:
-> I've been investigating a bug (a javac crash). I'm not sure if it's
-> the root cause, but I can't figure out how, if we get a guest SEGV in
-> an atomic helper we report the right faulting PC to the guest.
-> 
-> Specifically, if you get a SEGV here:
-> 
-> #0  0x000000006003c22b in helper_atomic_cmpxchgl_le (env=0x63caf680,
->     addr=275041819628, cmpv=0, newv=1)
->     at /home/petmay01/linaro/qemu-from-laptop/qemu/accel/tcg/atomic_template.h:65
-> #1  0x0000000061002f61 in static_code_gen_buffer ()
-> #2  0x0000000060035d6b in cpu_tb_exec (cpu=0x63ca73e0,
->     itb=0x6119d000 <static_code_gen_buffer+9080960>)
->     at /home/petmay01/linaro/qemu-from-laptop/qemu/accel/tcg/cpu-exec.c:167
-> #3  0x0000000060036945 in cpu_loop_exec_tb (cpu=0x63ca73e0,
->     tb=0x6119d000 <static_code_gen_buffer+9080960>, last_tb=0x7f01b213dbd8,
->     tb_exit=0x7f01b213dbd0)
->     at /home/petmay01/linaro/qemu-from-laptop/qemu/accel/tcg/cpu-exec.c:611
-> #4  0x0000000060036bc2 in cpu_exec (cpu=0x63ca73e0)
->     at /home/petmay01/linaro/qemu-from-laptop/qemu/accel/tcg/cpu-exec.c:723
-> #5  0x000000006003da13 in cpu_loop (env=0x63caf680)
->     at /home/petmay01/linaro/qemu-from-laptop/qemu/linux-user/main.c:809
-> #6  0x000000006004c627 in clone_func (arg=0x7ffe028f0a10)
->     at /home/petmay01/linaro/qemu-from-laptop/qemu/linux-user/syscall.c:6241
-> #7  0x00000000602fcc25 in start_thread (arg=0x7f01b213e700)
->     at pthread_create.c:333
-> #8  0x00000000603949a9 in clone ()
-> 
-> then the code in handle_cpu_signal() is passed a pc of 0x6003c22b
-> (the location in the helper function that does the memory access).
-> This is outside generated code, so the call to cpu_restore_state()
-> in handle_cpu_signal() will do nothing. However as far as I can tell,
-> there isn't any syncing of the PC etc state to the CPU before calling
-> this helper (at least, env->pc is completely wrong for the insn that
-> I think is causing this helper call).
+To launch a VM, we need to create basically two files: the monitor
+socket (if it's a UNIX socket) and the qemu log file.
 
-I'm not sure this is related, but last week I hit a similar problem when
-my laptop ran Out Of Memory using the xlnx-zcu102 machine; but I wasn't
-getting a SEGV but various SIGBUS in different places, and my backtraces
-don't show atomic_template.h but softmmu_template.h.
+For the qemu log file, we currently just open the path, which will
+create the file if it does not exist or overwrite the file if it does
+exist.
 
-I found it is easier to understand a such OOM using the -mem-prealloc
-option, I now get a more OOM-related error:
+For the monitor socket, if it already exists, we are currently removing
+it, even if it's not created by us.
 
-Thread 12 "qemu-system-aar" received signal SIGBUS, Bus error.
-0x0000555555de1bd4 in do_touch_pages (arg=0x555556cc0210) at
-util/oslib-posix.c:331
-331            *(volatile char *)addr = *addr;
+This patch moves to pre_launch() the responsibility to create a
+temporary directory to host the files so we can remove the whole
+directory on post_shutdown().
 
-Regards,
+Signed-off-by: Amador Pahim <apahim@redhat.com>
+---
+ scripts/qemu.py | 36 ++++++++++++++++++++++++++----------
+ 1 file changed, 26 insertions(+), 10 deletions(-)
 
-Phil.
+diff --git a/scripts/qemu.py b/scripts/qemu.py
+index 65d9ad688c..c14d6cc8d4 100644
+--- a/scripts/qemu.py
++++ b/scripts/qemu.py
+@@ -17,6 +17,8 @@ import logging
+ import os
+ import subprocess
+ import qmp.qmp
++import shutil
++import tempfile
+
+
+ LOG = logging.getLogger(__name__)
+@@ -72,10 +74,10 @@ class QEMUMachine(object):
+             wrapper = []
+         if name is None:
+             name = "qemu-%d" % os.getpid()
+-        if monitor_address is None:
+-            monitor_address = os.path.join(test_dir, name +
+"-monitor.sock")
++        self._name = name
+         self._monitor_address = monitor_address
+-        self._qemu_log_path = os.path.join(test_dir, name + ".log")
++        self._qemu_log_path = None
++        self._qemu_log_fd = None
+         self._popen = None
+         self._binary = binary
+         self._args = list(args)     # Force copy args in case we modify
+them
+@@ -85,6 +87,8 @@ class QEMUMachine(object):
+         self._socket_scm_helper = socket_scm_helper
+         self._qmp = None
+         self._qemu_full_args = None
++        self._test_dir = test_dir
++        self._temp_dir = None
+
+         # just in case logging wasn't configured by the main script:
+         logging.basicConfig()
+@@ -136,13 +140,13 @@ class QEMUMachine(object):
+
+     @staticmethod
+     def _remove_if_exists(path):
+-        '''Remove file object at path if it exists'''
++    '''Remove file object at path if it exists'''
+
+
+Messed indentation, please ignore. To be fixed in the next version or
+before merge.
+
+         try:
+             os.remove(path)
+         except OSError as exception:
+             if exception.errno == errno.ENOENT:
+                 return
+-            raise
++        raise
+
+
+Messed indentation, please ignore. To be fixed in the next version or
+before merge.
+
+
+
+     def is_running(self):
+         return self._popen is not None and self._popen.returncode is None
+@@ -173,6 +177,13 @@ class QEMUMachine(object):
+                 '-display', 'none', '-vga', 'none']
+
+     def _pre_launch(self):
++        self._temp_dir = tempfile.mkdtemp(dir=self._test_dir)
++        if not isinstance(self._monitor_address, tuple):
++            self._monitor_address = os.path.join(self._temp_dir,
++                                                 self._name +
+"-monitor.sock")
++        self._qemu_log_path = os.path.join(self._temp_dir, self._name +
+".log")
++        self._qemu_log_fd = open(self._qemu_log_path, 'wb')
++
+         self._qmp = qmp.qmp.QEMUMonitorProtocol(self._monitor_address,
+                                                 server=True)
+
+@@ -180,23 +191,28 @@ class QEMUMachine(object):
+         self._qmp.accept()
+
+     def _post_shutdown(self):
+-        if not isinstance(self._monitor_address, tuple):
+-            self._remove_if_exists(self._monitor_address)
+-        self._remove_if_exists(self._qemu_log_path)
++        if self._qemu_log_fd is not None:
++            self._qemu_log_fd.close()
++            self._qemu_log_fd = None
++
++        self._qemu_log_path = None
++
++        if self._temp_dir is not None:
++            shutil.rmtree(self._temp_dir)
++            self._temp_dir = None
+
+     def launch(self):
+         '''Launch the VM and establish a QMP connection'''
+         self._iolog = None
+         self._qemu_full_args = None
+         devnull = open(os.path.devnull, 'rb')
+-        qemulog = open(self._qemu_log_path, 'wb')
+         try:
+             self._pre_launch()
+             self._qemu_full_args = (self._wrapper + [self._binary] +
+                                     self._base_args() + self._args)
+             self._popen = subprocess.Popen(self._qemu_full_args,
+                                            stdin=devnull,
+-                                           stdout=qemulog,
++                                           stdout=self._qemu_log_fd,
+                                            stderr=subprocess.STDOUT,
+                                            shell=False)
+             self._post_launch()
+--
+2.13.6
