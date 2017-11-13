@@ -1,31 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40150)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41473)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eEF38-0002qP-FH
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 08:45:19 -0500
+	(envelope-from <bounces@canonical.com>) id 1eEF8l-0003qQ-5E
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 08:51:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eEF32-0001Ft-TW
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 08:45:18 -0500
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:39777)
+	(envelope-from <bounces@canonical.com>) id 1eEF8h-0006hS-W0
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 08:51:07 -0500
+Received: from indium.canonical.com ([91.189.90.7]:51814)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eEF32-0001F6-Ky
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 08:45:12 -0500
-Received: by mail-wm0-x241.google.com with SMTP id l8so9421014wmg.4
-	for <qemu-devel@nongnu.org>; Mon, 13 Nov 2017 05:45:12 -0800 (PST)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eEF8h-0006gQ-Pv
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 08:51:03 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eEF8e-0006di-Ul
+	for <qemu-devel@nongnu.org>; Mon, 13 Nov 2017 13:51:01 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id A2D5E2E818D
+	for <qemu-devel@nongnu.org>; Mon, 13 Nov 2017 13:50:59 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <0e23f2bb-a3be-2ba5-5d90-2b7c42b68d5b@redhat.com>
-References: <1504286483-23327-1-git-send-email-eric.auger@redhat.com>
-	<1504286483-23327-16-git-send-email-eric.auger@redhat.com>
-	<CAFEAcA-BfvNFMFpiQd-XwGPYGasV3D-w3oDcqfHRoAXOAT17Fg@mail.gmail.com>
-	<40a0ece3-7498-0dda-9e13-234ba09bedf1@redhat.com>
-	<CAFEAcA_d1DzNXoJHpi9afGA-oFcPncuM3L-n8GjiLPcAyic+TA@mail.gmail.com>
-	<0e23f2bb-a3be-2ba5-5d90-2b7c42b68d5b@redhat.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 13 Nov 2017 13:42:26 -0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 13 Nov 2017 13:44:50 +0000
-Message-ID: <CAFEAcA_H+sraWNVhEZc48eS11n6dC9CyEwTL44tPERiPBO+hbw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v7 15/20] hw/arm/sysbus-fdt: Pass the
- VirtMachineState to the node creation functions
+Reply-To: Bug 1727737 <1727737@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150902607840.5143.15937446061017284272.malonedeb@chaenomeles.canonical.com>
+Message-Id: <151058054671.7578.6255731944621602936.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1727737] Re: qemu-arm stalls on a GCC sanitizer
+ test since qemu-2.7
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,36 +37,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Auger Eric <eric.auger@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
-On 13 November 2017 at 13:37, Auger Eric <eric.auger@redhat.com> wrote:
-> On 13/11/2017 14:08, Peter Maydell wrote:
->> Not being able to conveniently wire up a sysbus device on the
->> command line or pass it options are general problems. I don't
->> think the SMMU is a special case that should work around these
->> general issues by being created in a different way to everything
->> else. If the "hard to pass options to the device" problem needs
->> solving (which it does anyway if we want to drop '-net' for
->> configuring embedded ethernet devices) we should solve it,
->> not have some small set of sysbus devices be weirdly magic.
-> do you have examples of other SysbusDevices whose instantiation is made
-> conditional with "-device" option and which address the dt node/ACPI
-> table creation in a more standard manner? Or do you want me to drop the
-> "-device" requirement.
+Hmm, the do_fork() code is a bit inconsistent there. Generally in linux-use=
+r/ functions should either:
+(1) return -1 with host errno set to a host errno; the caller then must use=
+ get_errno() to convert to the negative-target-errno that we need to return=
+ from do_syscall()
+(2) return negative-target-errno; the caller then need do nothing
 
-I think that you just can't create sysbus devices with -device.
-They're hardwired into the machine model.
+In this case do_fork() is supposed to be using approach 2, but some code
+paths are using approach 1 and the callers are all using get_errno().
+This hybrid approach works OK as long as none of the negative-target-
+errno values returned are -1 (which happens to be TARGET_EPERM for all
+architectures, and which we only use once in linux-user, in the
+sigaltstack handling). In an ideal world we'd clean this up to
+consistently use approach 2, but I don't think the code as it stands is
+actually buggy.
 
-> I may manage reaching my goal with yet another machine init done
-> notifier that would create the dt node from virt code at fixed base
-> address. But this solution still may be be virt specific. Is it the
-> direction you want me to follow at the moment?
+-- =
 
-I still don't really understand why the SMMU has to be any
-different from the UART, or the PCI controller, or any of
-the other devices in the virt board model. None of those
-try to be creatable from the command line.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1727737
 
-thanks
--- PMM
+Title:
+  qemu-arm stalls on a GCC sanitizer test since qemu-2.7
+
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  Hi,
+
+  I have noticed that several GCC/sanitizer tests fail with timeout when
+  executed under QEMU.
+
+  After a bit of investigation, I have noticed that this worked with
+  qemu-2.7, and started failing with qemu-2.8, and still fails with
+  qemu-2.10.1
+
+  I'm attaching a tarball containing:
+  alloca_instruments_all_paddings.exe : the testcase, and the needed libs:
+  lib/librt.so.1
+  lib/libdl.so.2
+  lib/ld-linux-armhf.so.3
+  lib/libasan.so.5
+  lib/libc.so.6
+  lib/libgcc_s.so.1
+  lib/libpthread.so.0
+  lib/libm.so.6
+
+  To reproduce the problem:
+  $ qemu-arm -cpu any -R 0 -L $PWD $PWD/alloca_instruments_all_paddings.exe
+  returns in less than a second with qemu-2.7, and never with qemu-2.8
+
+  Using -d in_asm suggests that the program "almost" completes and qemu see=
+ms to stall on:
+  0x40b6eb44: e08f4004 add r4, pc, r4
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1727737/+subscriptions
