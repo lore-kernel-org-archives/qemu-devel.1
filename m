@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49039)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51437)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1eEODG-00075L-BU
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 18:32:23 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1eEOHc-0000c6-A4
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 18:36:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1eEODF-0006QI-9X
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 18:32:22 -0500
-References: <20171030163309.75770-1-vsementsov@virtuozzo.com>
-	<20171030163309.75770-5-vsementsov@virtuozzo.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <a593e984-5d1e-a95c-9b80-dbe82227b8f9@redhat.com>
-Date: Mon, 13 Nov 2017 18:32:05 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1eEOHa-0000Wm-RZ
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 18:36:52 -0500
+Date: Tue, 14 Nov 2017 10:29:07 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20171113232907.GA32308@umbus.fritz.box>
+References: <151060215918.17804.5898929119312944124.stgit@bahia>
 MIME-Version: 1.0
-In-Reply-To: <20171030163309.75770-5-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v8 04/14] block/dirty-bitmap: add
- bdrv_dirty_bitmap_set_frozen
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="ReaqsoxgOBHFXBhH"
+Content-Disposition: inline
+In-Reply-To: <151060215918.17804.5898929119312944124.stgit@bahia>
+Subject: Re: [Qemu-devel] [PATCH for-2.11] xics/kvm: synchonize state before
+ 'info pic'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,143 +24,219 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, famz@redhat.com
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, lirans@il.ibm.com, quintela@redhat.com, armbru@redhat.com, mreitz@redhat.com, stefanha@redhat.com, den@openvz.org, amit.shah@redhat.com, pbonzini@redhat.com, dgilbert@redhat.com
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Cedric Le Goater <clg@kaod.org>
 
 
+--ReaqsoxgOBHFXBhH
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 10/30/2017 12:32 PM, Vladimir Sementsov-Ogievskiy wrote:
-> Make it possible to set bitmap 'frozen' without a successor.
-> This is needed to protect the bitmap during outgoing bitmap postcopy
-> migration.
-> 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+On Mon, Nov 13, 2017 at 08:42:39PM +0100, Greg Kurz wrote:
+> When using the emulated XICS, the 'info pic' monitor command shows:
+>=20
+> CPU 0 XIRR=3Dff000000 ((nil)) PP=3Dff MFRR=3Dff
+> ICS 1000..13ff 0x10040060340
+>   1000 MSI 05 00
+>   1001 MSI 05 00
+>   1002 MSI 05 00
+>   1003 MSI ff 00
+>   1004 LSI ff 00
+>   1005 LSI ff 00
+>   1006 LSI ff 00
+>   1007 LSI ff 00
+>   1008 MSI 05 00
+>   1009 MSI 05 00
+>   100a MSI 05 00
+>   100b MSI 05 00
+>   100c MSI 05 00
+>=20
+> but when using the in-kernel XICS with the very same guest, we get:
+>=20
+> CPU 0 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
+> ICS 1000..13ff 0x10032e00340
+>   1000 MSI ff 00
+>   1001 MSI ff 00
+>   1002 MSI ff 00
+>   1003 MSI ff 00
+>   1004 LSI ff 00
+>   1005 LSI ff 00
+>   1006 LSI ff 00
+>   1007 LSI ff 00
+>   1008 MSI ff 00
+>   1009 MSI ff 00
+>   100a MSI ff 00
+>   100b MSI ff 00
+>   100c MSI ff 00
+>=20
+> ie, all irqs are masked and XIRR is null, while we should get the
+> same output as with the emulated XICS.
+>=20
+> If the guest is then migrated, 'info pic' shows the expected values
+> on both source and destination.
+>=20
+> The problem is that QEMU doesn't synchronize with KVM before printing
+> the XICS state. Migration happens to fix the output because it enforces
+> synchronization with KVM.
+>=20
+> To fix the invalid output of 'info pic', this patch introduces a new
+> synchronize_state operation for both ICPStateClass and ICSStateClass.
+> The ICP operation relies on run_on_cpu() in order to kick the vCPU
+> and avoid sleeping on KVM_GET_ONE_REG.
+>=20
+> Signed-off-by: Greg Kurz <groug@kaod.org>
+
+Applied to ppc-for-2.11.
+
 > ---
->  include/block/dirty-bitmap.h |  1 +
->  block/dirty-bitmap.c         | 22 ++++++++++++++++++++--
->  2 files changed, 21 insertions(+), 2 deletions(-)
-> 
-> diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
-> index a9e2a92e4f..ae6d697850 100644
-> --- a/include/block/dirty-bitmap.h
-> +++ b/include/block/dirty-bitmap.h
-> @@ -39,6 +39,7 @@ uint32_t bdrv_get_default_bitmap_granularity(BlockDriverState *bs);
->  uint32_t bdrv_dirty_bitmap_granularity(const BdrvDirtyBitmap *bitmap);
->  bool bdrv_dirty_bitmap_enabled(BdrvDirtyBitmap *bitmap);
->  bool bdrv_dirty_bitmap_frozen(BdrvDirtyBitmap *bitmap);
-> +void bdrv_dirty_bitmap_set_frozen(BdrvDirtyBitmap *bitmap, bool frozen);
->  const char *bdrv_dirty_bitmap_name(const BdrvDirtyBitmap *bitmap);
->  int64_t bdrv_dirty_bitmap_size(const BdrvDirtyBitmap *bitmap);
->  DirtyBitmapStatus bdrv_dirty_bitmap_status(BdrvDirtyBitmap *bitmap);
-> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-> index 7578863aa1..67fc6bd6e0 100644
-> --- a/block/dirty-bitmap.c
-> +++ b/block/dirty-bitmap.c
-> @@ -40,6 +40,8 @@ struct BdrvDirtyBitmap {
->      QemuMutex *mutex;
->      HBitmap *bitmap;            /* Dirty bitmap implementation */
->      HBitmap *meta;              /* Meta dirty bitmap */
-> +    bool frozen;                /* Bitmap is frozen, it can't be modified
-> +                                   through QMP */
-
-I hesitate, because this now means that we have two independent bits of
-state we need to update and maintain consistency with.
-
-Before:
-
-Frozen: "Bitmap has a successor and is no longer itself recording
-writes, though we are guaranteed to have a successor doing so on our
-behalf."
-
-After:
-
-Frozen: "Bitmap may or may not have a successor, but it is disabled with
-an even more limited subset of tasks than a traditionally disabled bitmap."
-
-This changes the meaning of "frozen" a little, and I am not sure that is
-a problem as such, but it does make the interface seem a little
-"fuzzier" than it did prior.
-
->      BdrvDirtyBitmap *successor; /* Anonymous child; implies frozen status */
->      char *name;                 /* Optional non-empty unique ID */
->      int64_t size;               /* Size of the bitmap, in bytes */
-> @@ -183,13 +185,22 @@ const char *bdrv_dirty_bitmap_name(const BdrvDirtyBitmap *bitmap)
->  /* Called with BQL taken.  */
->  bool bdrv_dirty_bitmap_frozen(BdrvDirtyBitmap *bitmap)
+>  hw/intc/xics.c        |   11 +++++++++++
+>  hw/intc/xics_kvm.c    |   19 +++++++++++++++++++
+>  include/hw/ppc/xics.h |    2 ++
+>  3 files changed, 32 insertions(+)
+>=20
+> diff --git a/hw/intc/xics.c b/hw/intc/xics.c
+> index cc9816e7f204..a1cc0e420c98 100644
+> --- a/hw/intc/xics.c
+> +++ b/hw/intc/xics.c
+> @@ -40,11 +40,17 @@
+> =20
+>  void icp_pic_print_info(ICPState *icp, Monitor *mon)
 >  {
-> -    return bitmap->successor;
-> +    return bitmap->frozen;
-> +}
-
-Are there any cases where we will be unfrozen, but actually have a
-successor now? If so, under what circumstances does that happen?
-
+> +    ICPStateClass *icpc =3D ICP_GET_CLASS(icp);
+>      int cpu_index =3D icp->cs ? icp->cs->cpu_index : -1;
+> =20
+>      if (!icp->output) {
+>          return;
+>      }
 > +
-> +/* Called with BQL taken.  */
-> +void bdrv_dirty_bitmap_set_frozen(BdrvDirtyBitmap *bitmap, bool frozen)
-> +{
-> +    qemu_mutex_lock(bitmap->mutex);
-> +    assert(bitmap->successor == NULL);
-> +    bitmap->frozen = frozen;
-> +    qemu_mutex_unlock(bitmap->mutex);
->  }
->  
-
-OK, so we can only "set frozen" (or unset) if we don't have a successor.
-
->  /* Called with BQL taken.  */
->  bool bdrv_dirty_bitmap_enabled(BdrvDirtyBitmap *bitmap)
+> +    if (icpc->synchronize_state) {
+> +        icpc->synchronize_state(icp);
+> +    }
+> +
+>      monitor_printf(mon, "CPU %d XIRR=3D%08x (%p) PP=3D%02x MFRR=3D%02x\n=
+",
+>                     cpu_index, icp->xirr, icp->xirr_owner,
+>                     icp->pending_priority, icp->mfrr);
+> @@ -52,6 +58,7 @@ void icp_pic_print_info(ICPState *icp, Monitor *mon)
+> =20
+>  void ics_pic_print_info(ICSState *ics, Monitor *mon)
 >  {
-> -    return !(bitmap->disabled || bitmap->successor);
-> +    return !(bitmap->disabled || (bitmap->successor != NULL));
->  }
->  
-
-I guess this just makes 'successor' more obviously non-boolean, which is
-fine.
-
->  /* Called with BQL taken.  */
-> @@ -234,6 +245,7 @@ int bdrv_dirty_bitmap_create_successor(BlockDriverState *bs,
->  
->      /* Install the successor and freeze the parent */
->      bitmap->successor = child;
-> +    bitmap->frozen = true;
->      return 0;
->  }
->  
-> @@ -266,6 +278,8 @@ BdrvDirtyBitmap *bdrv_dirty_bitmap_abdicate(BlockDriverState *bs,
->      name = bitmap->name;
->      bitmap->name = NULL;
->      successor->name = name;
-> +    assert(bitmap->frozen);
-> +    bitmap->frozen = false;
->      bitmap->successor = NULL;
->      successor->persistent = bitmap->persistent;
->      bitmap->persistent = false;
-> @@ -298,6 +312,8 @@ BdrvDirtyBitmap *bdrv_reclaim_dirty_bitmap(BlockDriverState *bs,
->          return NULL;
+> +    ICSStateClass *icsc =3D ICS_BASE_GET_CLASS(ics);
+>      uint32_t i;
+> =20
+>      monitor_printf(mon, "ICS %4x..%4x %p\n",
+> @@ -61,6 +68,10 @@ void ics_pic_print_info(ICSState *ics, Monitor *mon)
+>          return;
 >      }
->      bdrv_release_dirty_bitmap(bs, successor);
-> +    assert(parent->frozen);
-> +    parent->frozen = false;
->      parent->successor = NULL;
->  
->      return parent;
-> @@ -439,6 +455,8 @@ void bdrv_dirty_bitmap_release_successor(BlockDriverState *bs,
->  
->      if (parent->successor) {
->          bdrv_release_dirty_bitmap_locked(bs, parent->successor);
-> +        assert(parent->frozen);
-> +        parent->frozen = false;
->          parent->successor = NULL;
+> =20
+> +    if (icsc->synchronize_state) {
+> +        icsc->synchronize_state(ics);
+> +    }
+> +
+>      for (i =3D 0; i < ics->nr_irqs; i++) {
+>          ICSIRQState *irq =3D ics->irqs + i;
+> =20
+> diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
+> index 3091ad3ac2c8..89fb20e2c55c 100644
+> --- a/hw/intc/xics_kvm.c
+> +++ b/hw/intc/xics_kvm.c
+> @@ -81,6 +81,18 @@ static void icp_get_kvm_state(ICPState *icp)
+>          & KVM_REG_PPC_ICP_PPRI_MASK;
+>  }
+> =20
+> +static void do_icp_synchronize_state(CPUState *cpu, run_on_cpu_data arg)
+> +{
+> +    icp_get_kvm_state(arg.host_ptr);
+> +}
+> +
+> +static void icp_synchronize_state(ICPState *icp)
+> +{
+> +    if (icp->cs) {
+> +        run_on_cpu(icp->cs, do_icp_synchronize_state, RUN_ON_CPU_HOST_PT=
+R(icp));
+> +    }
+> +}
+> +
+>  static int icp_set_kvm_state(ICPState *icp, int version_id)
+>  {
+>      uint64_t state;
+> @@ -156,6 +168,7 @@ static void icp_kvm_class_init(ObjectClass *klass, vo=
+id *data)
+>      icpc->post_load =3D icp_set_kvm_state;
+>      icpc->realize =3D icp_kvm_realize;
+>      icpc->reset =3D icp_kvm_reset;
+> +    icpc->synchronize_state =3D icp_synchronize_state;
+>  }
+> =20
+>  static const TypeInfo icp_kvm_info =3D {
+> @@ -234,6 +247,11 @@ static void ics_get_kvm_state(ICSState *ics)
 >      }
->  
-> 
+>  }
+> =20
+> +static void ics_synchronize_state(ICSState *ics)
+> +{
+> +    ics_get_kvm_state(ics);
+> +}
+> +
+>  static int ics_set_kvm_state(ICSState *ics, int version_id)
+>  {
+>      uint64_t state;
+> @@ -347,6 +365,7 @@ static void ics_kvm_class_init(ObjectClass *klass, vo=
+id *data)
+>      icsc->realize =3D ics_kvm_realize;
+>      icsc->pre_save =3D ics_get_kvm_state;
+>      icsc->post_load =3D ics_set_kvm_state;
+> +    icsc->synchronize_state =3D ics_synchronize_state;
+>  }
+> =20
+>  static const TypeInfo ics_kvm_info =3D {
+> diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
+> index 28d248abad61..2df99be111ce 100644
+> --- a/include/hw/ppc/xics.h
+> +++ b/include/hw/ppc/xics.h
+> @@ -69,6 +69,7 @@ struct ICPStateClass {
+>      void (*pre_save)(ICPState *icp);
+>      int (*post_load)(ICPState *icp, int version_id);
+>      void (*reset)(ICPState *icp);
+> +    void (*synchronize_state)(ICPState *icp);
+>  };
+> =20
+>  struct ICPState {
+> @@ -119,6 +120,7 @@ struct ICSStateClass {
+>      void (*reject)(ICSState *s, uint32_t irq);
+>      void (*resend)(ICSState *s);
+>      void (*eoi)(ICSState *s, uint32_t irq);
+> +    void (*synchronize_state)(ICSState *s);
+>  };
+> =20
+>  struct ICSState {
+>=20
 
-Tentatively:
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-Reviewed-by: John Snow <jsnow@redhat.com>
+--ReaqsoxgOBHFXBhH
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Fam, any thoughts?
+-----BEGIN PGP SIGNATURE-----
 
---John
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAloKKsAACgkQbDjKyiDZ
+s5Labg/+LEOI6IOTsMw3ejxonpQyUYdgwxE2WfT/ZCsrN2FTYdoa8r8PXi//zGZN
++1wvZxCb3IGgsgY4qONzQnzMv0etFQz/sHpjQrCblZ1oApd0D6zVMfRm6gKn29SW
+x0IToGLD3Rf3nCyGGd+AiIxC0gZ6b0GSTUcBx+W7L2+diKvZUrwoxJFRV4tSoZ5H
+ltQTVA2pLA4Joh+nBUtkWfJntvRjs8Y54DaWIaNDCiFxKo6MYSOG8nKq3B9ijItV
+qWw2fJAkio9mGhjXEUyVivHY6CfZe5NiHwimgBHc5iDPT5EyOGE2RgWHgMbM9x12
+mVNngSaDD02uK4oMcBN2rC6sGXGcWTITmGfdDSva8bnLG4vHrqf5X/5D1OM5yFwi
+xlocHAizyKlWxjrv3TdsE0CYnnL3mgR3XmmIfP8i2Q7BrOfrsTLkhPep350dy7ep
+ZWZuDbZhlPhIJr2UH4cmDSWMjDMfCD+mBGGoE9UCrfeula8qZnWpPdcl8CJDo7YL
+ujteCe/DpcwehStknntWB5CSQirO7D3XzIKGXvZm+n4dYPc/lLEALF1dHlCZkxIO
+47ol09NfeZnUI4MMYg8qt1IMA4r/tIu14pudZGFZpuesmnAJtNmrmVNO8kJCa10W
+idJ1ABFdFH/t5fBRSOIqvCeyY1QzaH69vC2+Hso+bfzbwjSQipU=
+=4UXa
+-----END PGP SIGNATURE-----
+
+--ReaqsoxgOBHFXBhH--
