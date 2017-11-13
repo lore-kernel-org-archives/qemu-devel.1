@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59731)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60029)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Michael.Nawrocki@gtri.gatech.edu>)
-	id 1eEIaK-0000XW-Qg
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 12:31:50 -0500
+	(envelope-from <mst@redhat.com>) id 1eEIbE-0001E0-KS
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 12:32:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Michael.Nawrocki@gtri.gatech.edu>)
-	id 1eEIaI-00046i-3f
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 12:31:48 -0500
-Received: from relay2.gtri.gatech.edu ([130.207.199.168]:42969)
+	(envelope-from <mst@redhat.com>) id 1eEIbB-0004N8-Sh
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 12:32:44 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45404)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Michael.Nawrocki@gtri.gatech.edu>)
-	id 1eEIaH-00046A-TR
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 12:31:46 -0500
-From: Mike Nawrocki <michael.nawrocki@gtri.gatech.edu>
-Date: Mon, 13 Nov 2017 12:31:20 -0500
-Message-ID: <20171113173120.3686-1-michael.nawrocki@gtri.gatech.edu>
-In-Reply-To: <20171113161446.2862-1-michael.nawrocki@gtri.gatech.edu>
-References: <20171113161446.2862-1-michael.nawrocki@gtri.gatech.edu>
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eEIbB-0004MR-JM
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 12:32:41 -0500
+Date: Mon, 13 Nov 2017 19:32:29 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20171113192309-mutt-send-email-mst@kernel.org>
+References: <1509696786-1597-1-git-send-email-wei.w.wang@intel.com>
+	<1509696786-1597-7-git-send-email-wei.w.wang@intel.com>
+	<5A097548.8000608@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v3 3/3] Add partial flash interleaving to AMD
- CFI devices
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5A097548.8000608@intel.com>
+Subject: Re: [Qemu-devel] [PATCH v17 6/6] virtio-balloon:
+ VIRTIO_BALLOON_F_FREE_PAGE_VQ
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,376 +29,411 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com, peter.maydell@linaro.org, pbonzini@redhat.com, Mike Nawrocki <michael.nawrocki@gtri.gatech.edu>
+To: Wei Wang <wei.w.wang@intel.com>
+Cc: virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mhocko@kernel.org, akpm@linux-foundation.org, mawilcox@microsoft.com, david@redhat.com, penguin-kernel@I-love.SAKURA.ne.jp, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, willy@infradead.org, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu@aliyun.com, Nitesh Narayan Lal <nilal@redhat.com>, Rik van Riel <riel@redhat.com>
 
-This mirrors the interleaving support already in place in
-pflash_cfi01.c, using the max_device_width and device_width properties.
+You should Cc Nitesh who is working on a related feature.
 
-Signed-off-by: Mike Nawrocki <michael.nawrocki@gtri.gatech.edu>
----
- hw/block/pflash_cfi02.c | 244 +++++++++++++++++++++++++++++++++++++++++-------
- 1 file changed, 209 insertions(+), 35 deletions(-)
+On Mon, Nov 13, 2017 at 06:34:48PM +0800, Wei Wang wrote:
+> Ping for comments, thanks.
+> 
+> On 11/03/2017 04:13 PM, Wei Wang wrote:
+> > Negotiation of the VIRTIO_BALLOON_F_FREE_PAGE_VQ feature indicates the
+> > support of reporting hints of guest free pages to the host via
+> > virtio-balloon. The host requests the guest to report the free pages by
+> > sending commands via the virtio-balloon configuration registers.
+> > 
+> > When the guest starts to report, the first element added to the free page
+> > vq is a sequence id of the start reporting command. The id is given by
+> > the host, and it indicates whether the following free pages correspond
+> > to the command. For example, the host may stop the report and start again
+> > with a new command id. The obsolete pages for the previous start command
+> > can be detected by the id dismatching on the host. The id is added to the
+> > vq using an output buffer, and the free pages are added to the vq using
+> > input buffer.
+> > 
+> > Here are some explainations about the added configuration registers:
+> > - host2guest_cmd: a register used by the host to send commands to the
+> > guest.
+> > - guest2host_cmd: written by the guest to ACK to the host about the
+> > commands that have been received. The host will clear the corresponding
+> > bits on the host2guest_cmd register. The guest also uses this register
+> > to send commands to the host (e.g. when finish free page reporting).
 
-diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
-index 29eb0429a3..edf683bce5 100644
---- a/hw/block/pflash_cfi02.c
-+++ b/hw/block/pflash_cfi02.c
-@@ -28,11 +28,14 @@
-  * - unlock bypass command
-  * - CFI queries
-  *
-- * It does not support flash interleaving.
-  * It does not implement boot blocs with reduced size
-  * It does not implement software data protection as found in many real chips
-  * It does not implement erase suspend/resume commands
-  * It does not implement multiple sectors erase
-+ *
-+ * Flash interleaving is partially supported using the device_width and
-+ * max_device_width properties, as in pflash_cfi01.c
-+ * Issuing commands to individual members of the flash array is not supported.
-  */
- 
- #include "qemu/osdep.h"
-@@ -40,6 +43,7 @@
- #include "hw/block/flash.h"
- #include "qapi/error.h"
- #include "qemu/timer.h"
-+#include "qemu/bitops.h"
- #include "sysemu/block-backend.h"
- #include "exec/address-spaces.h"
- #include "qemu/host-utils.h"
-@@ -69,7 +73,9 @@ struct pflash_t {
-     uint32_t nb_blocs;
-     uint32_t chip_len;
-     uint8_t mappings;
--    uint8_t width;
-+    uint8_t bank_width;
-+    uint8_t device_width; /* If 0, device width not specified. */
-+    uint8_t max_device_width;  /* max device width in bytes */
-     uint8_t be;
-     int wcycle; /* if 0, the flash is read normally */
-     int bypass;
-@@ -138,6 +144,63 @@ static void pflash_timer (void *opaque)
-     pfl->cmd = 0;
- }
- 
-+static uint64_t pflash_cfi_query(pflash_t *pfl, hwaddr offset)
-+{
-+    int i;
-+    uint64_t resp = 0;
-+    hwaddr boff;
-+
-+    /* Adjust incoming offset to match expected device-width
-+     * addressing. CFI query addresses are always specified in terms of
-+     * the maximum supported width of the device.  This means that x8
-+     * devices and x8/x16 devices in x8 mode behave differently.  For
-+     * devices that are not used at their max width, we will be
-+     * provided with addresses that use higher address bits than
-+     * expected (based on the max width), so we will shift them lower
-+     * so that they will match the addresses used when
-+     * device_width==max_device_width.
-+     */
-+    boff = offset >> (ctz32(pfl->bank_width) +
-+                      ctz32(pfl->max_device_width) - ctz32(pfl->device_width));
-+
-+    if (boff > pfl->cfi_len) {
-+        return 0;
-+    }
-+    /* Now we will construct the CFI response generated by a single
-+     * device, then replicate that for all devices that make up the
-+     * bus.  For wide parts used in x8 mode, CFI query responses
-+     * are different than native byte-wide parts.
-+     */
-+    resp = pfl->cfi_table[boff];
-+    if (pfl->device_width != pfl->max_device_width) {
-+        /* The only case currently supported is x8 mode for a
-+         * wider part.
-+         */
-+        if (pfl->device_width != 1 || pfl->bank_width > 8) {
-+            DPRINTF("%s: Unsupported device configuration: "
-+                    "device_width=%d, max_device_width=%d\n",
-+                    __func__, pfl->device_width,
-+                    pfl->max_device_width);
-+            return 0;
-+        }
-+        /* CFI query data is repeated, rather than zero padded for
-+         * wide devices used in x8 mode.
-+         */
-+        for (i = 1; i < pfl->max_device_width; i++) {
-+            resp = deposit64(resp, 8 * i, 8, pfl->cfi_table[boff]);
-+        }
-+    }
-+    /* Replicate responses for each device in bank. */
-+    if (pfl->device_width < pfl->bank_width) {
-+        for (i = pfl->device_width;
-+             i < pfl->bank_width; i += pfl->device_width) {
-+            resp = deposit64(resp, 8 * i, 8 * pfl->device_width, resp);
-+        }
-+    }
-+
-+    return resp;
-+}
-+
- static uint64_t _flash_read(pflash_t *pfl, hwaddr offset,
-                             int width, int be)
- {
-@@ -200,9 +263,66 @@ static uint64_t _flash_read(pflash_t *pfl, hwaddr offset,
-     return ret;
- }
- 
-+/* Perform a device id query based on the bank width of the flash. */
-+static uint64_t pflash_devid_query(pflash_t *pfl, hwaddr offset,
-+                                   int width, int be)
-+{
-+    int i;
-+    uint64_t resp;
-+    hwaddr boff;
-+
-+    /* Adjust incoming offset to match expected device-width
-+     * addressing. Device ID read addresses are always specified in
-+     * terms of the maximum supported width of the device.  This means
-+     * that x8 devices and x8/x16 devices in x8 mode behave
-+     * differently. For devices that are not used at their max width,
-+     * we will be provided with addresses that use higher address bits
-+     * than expected (based on the max width), so we will shift them
-+     * lower so that they will match the addresses used when
-+     * device_width==max_device_width.
-+     */
-+    boff = offset >> (ctz32(pfl->bank_width) +
-+                      ctz32(pfl->max_device_width) - ctz32(pfl->device_width));
-+
-+    /* Mask off upper bits which may be used in to query block
-+     * or sector lock status at other addresses.
-+     */
-+    switch (boff & 0xFF) {
-+    case 0:
-+        resp = pfl->ident0;
-+        DPRINTF("%s: Manufacturer Code %04x\n", __func__, resp);
-+        break;
-+    case 1:
-+        resp = pfl->ident1;
-+        DPRINTF("%s: Device ID Code %04x\n", __func__, resp);
-+        break;
-+    case 2:
-+        resp = 0x00; /* Pretend all sectors are unprotected */
-+        break;
-+    case 0xE:
-+    case 0xF:
-+        resp = boff & 0x01 ? pfl->ident3 : pfl->ident2;
-+        if (resp != (uint8_t)-1) {
-+            break;
-+        }
-+    default:
-+        return _flash_read(pfl, offset, width, be);
-+    }
-+    /* Replicate responses for each device in bank. */
-+    if (pfl->device_width < pfl->bank_width) {
-+        for (i = pfl->device_width;
-+              i < pfl->bank_width; i += pfl->device_width) {
-+            resp = deposit64(resp, 8 * i, 8 * pfl->device_width, resp);
-+        }
-+    }
-+
-+    return resp;
-+}
-+
- static uint64_t pflash_read(pflash_t *pfl, hwaddr offset,
-                             int width, int be)
- {
-+    int i;
-     hwaddr boff;
-     uint64_t ret;
- 
-@@ -215,11 +335,11 @@ static uint64_t pflash_read(pflash_t *pfl, hwaddr offset,
-     }
-     offset &= pfl->chip_len - 1;
-     boff = offset & 0xFF;
--    if (pfl->width == 2)
-+    if (pfl->bank_width == 2)
-         boff = boff >> 1;
--    else if (pfl->width == 4)
-+    else if (pfl->bank_width == 4)
-         boff = boff >> 2;
--    else if (pfl->width == 8)
-+    else if (pfl->bank_width == 8)
-         boff = boff >> 3;
-     switch (pfl->cmd) {
-     default:
-@@ -231,47 +351,76 @@ static uint64_t pflash_read(pflash_t *pfl, hwaddr offset,
-     case 0x80:
-         /* We accept reads during second unlock sequence... */
-     case 0x00:
--    flash_read:
--        /* Flash area read */
-         ret = _flash_read(pfl, offset, width, be);
-         break;
-     case 0x90:
-         /* flash ID read */
--        switch (boff) {
--        case 0x00:
--        case 0x01:
--            ret = boff & 0x01 ? pfl->ident1 : pfl->ident0;
--            break;
--        case 0x02:
--            ret = 0x00; /* Pretend all sectors are unprotected */
--            break;
--        case 0x0E:
--        case 0x0F:
--            ret = boff & 0x01 ? pfl->ident3 : pfl->ident2;
--            if (ret == (uint8_t)-1) {
--                goto flash_read;
-+        if (!pfl->device_width) {
-+            /* Preserve old behavior if device width not specified */
-+            switch (boff) {
-+            case 0x00:
-+            case 0x01:
-+                ret = boff & 0x01 ? pfl->ident1 : pfl->ident0;
-+                break;
-+            case 0x02:
-+                ret = 0x00; /* Pretend all sectors are unprotected */
-+                break;
-+            case 0x0E:
-+            case 0x0F:
-+                ret = boff & 0x01 ? pfl->ident3 : pfl->ident2;
-+                if (ret != (uint8_t)-1) {
-+                    break;
-+                }
-+            default:
-+                ret = _flash_read(pfl, offset, width, be);
-+            }
-+        } else {
-+            /* If we have a read larger than the bank_width, combine multiple
-+             * manufacturer/device ID queries into a single response.
-+             */
-+            int i;
-+            for (i = 0; i < width; i += pfl->bank_width) {
-+                ret = deposit64(ret, i * 8, pfl->bank_width * 8,
-+                                pflash_devid_query(pfl,
-+                                                  offset + i * pfl->bank_width,
-+                                                  width, be));
-             }
--            break;
--        default:
--            goto flash_read;
-         }
--        DPRINTF("%s: ID " TARGET_FMT_plx " %x\n", __func__, boff, ret);
-         break;
-     case 0xA0:
-     case 0x10:
-     case 0x30:
-         /* Status register read */
-         ret = pfl->status;
--        DPRINTF("%s: status %x\n", __func__, ret);
-+        for (i = pfl->device_width;
-+             i < pfl->bank_width; i += pfl->device_width) {
-+            ret = deposit64(ret, 8 * i, 8 * pfl->device_width, ret);
-+        }
-+        DPRINTF("%s: status %" PRIx64 "\n", __func__, ret);
-         /* Toggle bit 6 */
-         pfl->status ^= 0x40;
-         break;
-     case 0x98:
-         /* CFI query mode */
--        if (boff > pfl->cfi_len)
--            ret = 0;
--        else
--            ret = pfl->cfi_table[boff];
-+        if (!pfl->device_width) {
-+            /* Preserve old behavior if device width not specified */
-+            if (boff > pfl->cfi_len) {
-+                ret = 0;
-+            } else {
-+                ret = pfl->cfi_table[boff];
-+            }
-+        } else {
-+            /* If we have a read larger than the bank_width, combine multiple
-+             * CFI queries into a single response.
-+             */
-+            int i;
-+            for (i = 0; i < width; i += pfl->bank_width) {
-+                ret = deposit64(ret, i * 8, pfl->bank_width * 8,
-+                                pflash_cfi_query(pfl,
-+                                                 offset + i * pfl->bank_width));
-+            }
-+        }
-+
-         break;
-     }
- 
-@@ -315,11 +464,11 @@ static void pflash_write(pflash_t *pfl, hwaddr offset,
-     DPRINTF("%s: offset " TARGET_FMT_plx " %08" PRIx64 " %d\n",
-             __func__, offset, value, width);
-     boff = offset & (pfl->sector_len - 1);
--    if (pfl->width == 2)
-+    if (pfl->bank_width == 2)
-         boff = boff >> 1;
--    else if (pfl->width == 4)
-+    else if (pfl->bank_width == 4)
-         boff = boff >> 2;
--    else if (pfl->width == 8)
-+    else if (pfl->bank_width == 8)
-         boff = boff >> 3;
-     switch (pfl->wcycle) {
-     case 0:
-@@ -654,6 +803,13 @@ static void pflash_cfi02_realize(DeviceState *dev, Error **errp)
-         }
-     }
- 
-+    /* Default to devices being used at their maximum device width. This was
-+     * assumed before the device_width support was added.
-+     */
-+    if (!pfl->max_device_width) {
-+        pfl->max_device_width = pfl->device_width;
-+    }
-+
-     pflash_setup_mappings(pfl);
-     pfl->rom_mode = 1;
-     sysbus_init_mmio(SYS_BUS_DEVICE(dev), &pfl->mem);
-@@ -745,7 +901,25 @@ static Property pflash_cfi02_properties[] = {
-     DEFINE_PROP_DRIVE("drive", struct pflash_t, blk),
-     DEFINE_PROP_UINT32("num-blocks", struct pflash_t, nb_blocs, 0),
-     DEFINE_PROP_UINT32("sector-length", struct pflash_t, sector_len, 0),
--    DEFINE_PROP_UINT8("width", struct pflash_t, width, 0),
-+    /* width here is the overall width of this QEMU device in bytes.
-+     * The QEMU device may be emulating a number of flash devices
-+     * wired up in parallel; the width of each individual flash
-+     * device should be specified via device-width. If the individual
-+     * devices have a maximum width which is greater than the width
-+     * they are being used for, this maximum width should be set via
-+     * max-device-width (which otherwise defaults to device-width).
-+     * So for instance a 32-bit wide QEMU flash device made from four
-+     * 16-bit flash devices used in 8-bit wide mode would be configured
-+     * with width = 4, device-width = 1, max-device-width = 2.
-+     *
-+     * If device-width is not specified we default to backwards
-+     * compatible behaviour which is a bad emulation of two
-+     * 16 bit devices making up a 32 bit wide QEMU device. This
-+     * is deprecated for new uses of this device.
-+     */
-+    DEFINE_PROP_UINT8("width", struct pflash_t, bank_width, 0),
-+    DEFINE_PROP_UINT8("device-width", struct pflash_t, device_width, 0),
-+    DEFINE_PROP_UINT8("max-device-width", struct pflash_t, max_device_width, 0),
-     DEFINE_PROP_UINT8("mappings", struct pflash_t, mappings, 0),
-     DEFINE_PROP_UINT8("big-endian", struct pflash_t, be, 0),
-     DEFINE_PROP_UINT16("id0", struct pflash_t, ident0, 0),
-@@ -785,7 +959,7 @@ pflash_t *pflash_cfi02_register(hwaddr base,
-                                 DeviceState *qdev, const char *name,
-                                 hwaddr size,
-                                 BlockBackend *blk, uint32_t sector_len,
--                                int nb_blocs, int nb_mappings, int width,
-+                                int nb_blocs, int nb_mappings, int bank_width,
-                                 uint16_t id0, uint16_t id1,
-                                 uint16_t id2, uint16_t id3,
-                                 uint16_t unlock_addr0, uint16_t unlock_addr1,
-@@ -798,7 +972,7 @@ pflash_t *pflash_cfi02_register(hwaddr base,
-     }
-     qdev_prop_set_uint32(dev, "num-blocks", nb_blocs);
-     qdev_prop_set_uint32(dev, "sector-length", sector_len);
--    qdev_prop_set_uint8(dev, "width", width);
-+    qdev_prop_set_uint8(dev, "width", bank_width);
-     qdev_prop_set_uint8(dev, "mappings", nb_mappings);
-     qdev_prop_set_uint8(dev, "big-endian", !!be);
-     qdev_prop_set_uint16(dev, "id0", id0);
--- 
-2.14.2
+I am not sure what is the role of guest2host_cmd. Reporting of
+the correct cmd id seems sufficient indication that guest
+received the start command. Not getting any more seems sufficient
+to detect stop.
+
+
+> > - free_page_cmd_id: the sequence id of the free page report command
+> > given by the host.
+> > 
+> > Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+> > Signed-off-by: Liang Li <liang.z.li@intel.com>
+> > Cc: Michael S. Tsirkin <mst@redhat.com>
+> > Cc: Michal Hocko <mhocko@kernel.org>
+> > ---
+> >   drivers/virtio/virtio_balloon.c     | 234 ++++++++++++++++++++++++++++++++----
+> >   include/uapi/linux/virtio_balloon.h |  11 ++
+> >   2 files changed, 223 insertions(+), 22 deletions(-)
+> > 
+> > diff --git a/drivers/virtio/virtio_balloon.c b/drivers/virtio/virtio_balloon.c
+> > index b31fc25..4087f04 100644
+> > --- a/drivers/virtio/virtio_balloon.c
+> > +++ b/drivers/virtio/virtio_balloon.c
+> > @@ -55,7 +55,12 @@ static struct vfsmount *balloon_mnt;
+> >   struct virtio_balloon {
+> >   	struct virtio_device *vdev;
+> > -	struct virtqueue *inflate_vq, *deflate_vq, *stats_vq;
+> > +	struct virtqueue *inflate_vq, *deflate_vq, *stats_vq, *free_page_vq;
+> > +
+> > +	/* Balloon's own wq for cpu-intensive work items */
+> > +	struct workqueue_struct *balloon_wq;
+> > +	/* The free page reporting work item submitted to the balloon wq */
+> > +	struct work_struct report_free_page_work;
+> >   	/* The balloon servicing is delegated to a freezable workqueue. */
+> >   	struct work_struct update_balloon_stats_work;
+> > @@ -65,6 +70,10 @@ struct virtio_balloon {
+> >   	spinlock_t stop_update_lock;
+> >   	bool stop_update;
+> > +	/* Stop reporting free pages */
+> > +	bool report_free_page_stop;
+
+I would revert logic here: bool report_free_page;
+
+> > +	uint32_t free_page_cmd_id;
+> > +
+> >   	/* Waiting for host to ack the pages we released. */
+> >   	wait_queue_head_t acked;
+> > @@ -191,6 +200,30 @@ static void send_balloon_page_sg(struct virtio_balloon *vb,
+> >   		kick_and_wait(vq, vb->acked);
+> >   }
+> > +static void send_free_page_sg(struct virtqueue *vq, void *addr, uint32_t size)
+> > +{
+> > +	int err = 0;
+> > +	unsigned int len;
+> > +
+> > +	/* Detach all the used buffers from the vq */
+> > +	while (virtqueue_get_buf(vq, &len))
+> > +		;
+> > +
+> > +	/*
+> > +	 * Since this is an optimization feature, losing a couple of free
+> > +	 * pages to report isn't important. We simply resturn without adding
+> > +	 * the page if the vq is full.
+> > +	 */
+> > +	if (vq->num_free) {
+> > +		err = add_one_sg(vq, addr, size);
+> > +		BUG_ON(err);
+> > +	}
+> > +
+> > +	/* Batch till the vq is full */
+> > +	if (!vq->num_free)
+> > +		virtqueue_kick(vq);
+> > +}
+> > +
+> >   /*
+> >    * Send balloon pages in sgs to host. The balloon pages are recorded in the
+> >    * page xbitmap. Each bit in the bitmap corresponds to a page of PAGE_SIZE.
+> > @@ -495,9 +528,8 @@ static void stats_handle_request(struct virtio_balloon *vb)
+> >   	virtqueue_kick(vq);
+> >   }
+> > -static void virtballoon_changed(struct virtio_device *vdev)
+> > +static void virtballoon_cmd_balloon_memory(struct virtio_balloon *vb)
+> >   {
+> > -	struct virtio_balloon *vb = vdev->priv;
+> >   	unsigned long flags;
+> >   	spin_lock_irqsave(&vb->stop_update_lock, flags);
+> > @@ -506,6 +538,50 @@ static void virtballoon_changed(struct virtio_device *vdev)
+> >   	spin_unlock_irqrestore(&vb->stop_update_lock, flags);
+> >   }
+> > +static void virtballoon_cmd_report_free_page_start(struct virtio_balloon *vb)
+> > +{
+> > +	unsigned long flags;
+> > +
+> > +	vb->report_free_page_stop = false;
+
+this flag is used a lot outside any locks. Why is this safe?
+Please add some comments explaining access to this flag.
+
+> > +	spin_lock_irqsave(&vb->stop_update_lock, flags);
+> > +	if (!vb->stop_update)
+> > +		queue_work(vb->balloon_wq, &vb->report_free_page_work);
+> > +	spin_unlock_irqrestore(&vb->stop_update_lock, flags);
+> > +}
+> > +
+> > +static void virtballoon_changed(struct virtio_device *vdev)
+> > +{
+> > +	struct virtio_balloon *vb = vdev->priv;
+> > +	u32 host2guest_cmd, guest2host_cmd = 0;
+> > +
+> > +	if (!virtio_has_feature(vdev, VIRTIO_BALLOON_F_FREE_PAGE_VQ)) {
+> > +		virtballoon_cmd_balloon_memory(vb);
+> > +		return;
+
+This might be a handy feature: one can disable balloon without
+hot-unplug. But I would use a separate feature flag to
+control it.
+
+> > +	}
+> > +
+> > +	virtio_cread(vb->vdev, struct virtio_balloon_config, host2guest_cmd,
+> > +		     &host2guest_cmd);
+> > +
+> > +	if (host2guest_cmd & VIRTIO_BALLOON_CMD_BALLOON_MEMORY) {
+> > +		virtballoon_cmd_balloon_memory(vb);
+> > +		guest2host_cmd |= VIRTIO_BALLOON_CMD_BALLOON_MEMORY;
+> > +	}
+> > +
+> > +	if (host2guest_cmd & VIRTIO_BALLOON_CMD_REPORT_FREE_PAGE_START) {
+> > +		virtballoon_cmd_report_free_page_start(vb);
+> > +		guest2host_cmd |= VIRTIO_BALLOON_CMD_REPORT_FREE_PAGE_START;
+> > +	}
+> > +
+> > +	if (host2guest_cmd & VIRTIO_BALLOON_CMD_REPORT_FREE_PAGE_STOP) {
+> > +		vb->report_free_page_stop = true;
+> > +		guest2host_cmd |= VIRTIO_BALLOON_CMD_REPORT_FREE_PAGE_STOP;
+> > +	}
+
+I am not sure why free page has start+stop but e.g. balloon has a single
+bit. In fact I would really just use command id. When it changes, we
+know a new report is needed.
+
+> > +
+> > +	/* Ack to the host about the commands that have been received */
+> > +	virtio_cwrite(vb->vdev, struct virtio_balloon_config, guest2host_cmd,
+> > +		      &guest2host_cmd);
+
+So the same register is used to ack stop command and to signal
+end of report. This seems buggy.
+
+> > +}
+> > +
+> >   static inline s64 towards_target(struct virtio_balloon *vb)
+> >   {
+> >   	s64 target;
+> > @@ -597,42 +673,147 @@ static void update_balloon_size_func(struct work_struct *work)
+> >   		queue_work(system_freezable_wq, work);
+> >   }
+> > -static int init_vqs(struct virtio_balloon *vb)
+> > +static bool virtio_balloon_send_free_pages(void *opaque, unsigned long pfn,
+> > +					   unsigned long nr_pages)
+> >   {
+> > -	struct virtqueue *vqs[3];
+> > -	vq_callback_t *callbacks[] = { balloon_ack, balloon_ack, stats_request };
+> > -	static const char * const names[] = { "inflate", "deflate", "stats" };
+> > -	int err, nvqs;
+> > +	struct virtio_balloon *vb = (struct virtio_balloon *)opaque;
+> > +	void *addr = (void *)pfn_to_kaddr(pfn);
+
+How do we know all free pages have a kaddr?
+
+> > +	uint32_t len = nr_pages << PAGE_SHIFT;
+> > +
+> > +	if (vb->report_free_page_stop)
+> > +		return false;
+> > +
+> > +	send_free_page_sg(vb->free_page_vq, addr, len);
+> > +	return true;
+> > +}
+> > +
+> > +static void report_free_page_end(struct virtio_balloon *vb)
+> > +{
+> > +	u32 cmd = VIRTIO_BALLOON_CMD_REPORT_FREE_PAGE_STOP;
+> >   	/*
+> > -	 * We expect two virtqueues: inflate and deflate, and
+> > -	 * optionally stat.
+> > +	 * The host may have already requested to stop the reporting before we
+> > +	 * finish, so no need to notify the host in this case.
+> >   	 */
+> > -	nvqs = virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_STATS_VQ) ? 3 : 2;
+> > -	err = virtio_find_vqs(vb->vdev, nvqs, vqs, callbacks, names, NULL);
+> > +	if (vb->report_free_page_stop)
+> > +		return;
+> > +	vb->report_free_page_stop = true;
+> > +
+> > +	virtio_cwrite(vb->vdev, struct virtio_balloon_config, guest2host_cmd,
+> > +		      &cmd);
+
+Wouldn't it be easier to add a buffer in the queue?
+
+> > +}
+> > +
+> > +static void report_free_page_cmd_id(struct virtio_balloon *vb)
+> > +{
+> > +	struct scatterlist sg;
+> > +	int err;
+> > +
+> > +	virtio_cread(vb->vdev, struct virtio_balloon_config, free_page_cmd_id,
+> > +		     &vb->free_page_cmd_id);
+> > +	sg_init_one(&sg, &vb->free_page_cmd_id, sizeof(uint32_t));
+> > +	err = virtqueue_add_outbuf(vb->free_page_vq, &sg, 1,
+> > +				   &vb->free_page_cmd_id, GFP_KERNEL);
+> > +	BUG_ON(err);
+> > +}
+> > +
+> > +static void report_free_page(struct work_struct *work)
+> > +{
+> > +	struct virtio_balloon *vb;
+> > +
+> > +	vb = container_of(work, struct virtio_balloon, report_free_page_work);
+> > +	report_free_page_cmd_id(vb);
+> > +	walk_free_mem_block(vb, 0, &virtio_balloon_send_free_pages);
+> > +	/*
+> > +	 * The last few free page blocks that were added may not reach the
+> > +	 * batch size, but need a kick to notify the device to handle them.
+> > +	 */
+> > +	virtqueue_kick(vb->free_page_vq);
+> > +	report_free_page_end(vb);
+> > +}
+> > +
+> > +static int init_vqs(struct virtio_balloon *vb)
+> > +{
+> > +	struct virtqueue **vqs;
+> > +	vq_callback_t **callbacks;
+> > +	const char **names;
+> > +	struct scatterlist sg;
+> > +	int i, nvqs, err = -ENOMEM;
+> > +
+> > +	/* Inflateq and deflateq are used unconditionally */
+> > +	nvqs = 2;
+> > +	if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_STATS_VQ))
+> > +		nvqs++;
+> > +	if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_FREE_PAGE_VQ))
+> > +		nvqs++;
+> > +
+> > +	/* Allocate space for find_vqs parameters */
+> > +	vqs = kcalloc(nvqs, sizeof(*vqs), GFP_KERNEL);
+> > +	if (!vqs)
+> > +		goto err_vq;
+> > +	callbacks = kmalloc_array(nvqs, sizeof(*callbacks), GFP_KERNEL);
+> > +	if (!callbacks)
+> > +		goto err_callback;
+> > +	names = kmalloc_array(nvqs, sizeof(*names), GFP_KERNEL);
+> > +	if (!names)
+> > +		goto err_names;
+> > +
+> > +	callbacks[0] = balloon_ack;
+> > +	names[0] = "inflate";
+> > +	callbacks[1] = balloon_ack;
+> > +	names[1] = "deflate";
+> > +
+> > +	i = 2;
+> > +	if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_STATS_VQ)) {
+> > +		callbacks[i] = stats_request;
+> > +		names[i] = "stats";
+> > +		i++;
+> > +	}
+> > +
+> > +	if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_FREE_PAGE_VQ)) {
+> > +		callbacks[i] = NULL;
+> > +		names[i] = "free_page_vq";
+> > +	}
+> > +
+> > +	err = vb->vdev->config->find_vqs(vb->vdev, nvqs, vqs, callbacks, names,
+> > +					 NULL, NULL);
+> >   	if (err)
+> > -		return err;
+> > +		goto err_find;
+> >   	vb->inflate_vq = vqs[0];
+> >   	vb->deflate_vq = vqs[1];
+> > +	i = 2;
+> >   	if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_STATS_VQ)) {
+> > -		struct scatterlist sg;
+> > -		unsigned int num_stats;
+> > -		vb->stats_vq = vqs[2];
+> > -
+> > +		vb->stats_vq = vqs[i++];
+> >   		/*
+> >   		 * Prime this virtqueue with one buffer so the hypervisor can
+> >   		 * use it to signal us later (it can't be broken yet!).
+> >   		 */
+> > -		num_stats = update_balloon_stats(vb);
+> > -
+> > -		sg_init_one(&sg, vb->stats, sizeof(vb->stats[0]) * num_stats);
+> > +		sg_init_one(&sg, vb->stats, sizeof(vb->stats));
+> >   		if (virtqueue_add_outbuf(vb->stats_vq, &sg, 1, vb, GFP_KERNEL)
+> > -		    < 0)
+> > -			BUG();
+> > +		    < 0) {
+> > +			dev_warn(&vb->vdev->dev, "%s: add stat_vq failed\n",
+> > +				 __func__);
+> > +			goto err_find;
+> > +		}
+> >   		virtqueue_kick(vb->stats_vq);
+> >   	}
+> > +
+> > +	if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_FREE_PAGE_VQ))
+> > +		vb->free_page_vq = vqs[i];
+> > +
+> > +	kfree(names);
+> > +	kfree(callbacks);
+> > +	kfree(vqs);
+> >   	return 0;
+> > +
+> > +err_find:
+> > +	kfree(names);
+> > +err_names:
+> > +	kfree(callbacks);
+> > +err_callback:
+> > +	kfree(vqs);
+> > +err_vq:
+> > +	return err;
+> >   }
+> >   #ifdef CONFIG_BALLOON_COMPACTION
+> > @@ -761,6 +942,13 @@ static int virtballoon_probe(struct virtio_device *vdev)
+> >   	if (virtio_has_feature(vdev, VIRTIO_BALLOON_F_SG))
+> >   		xb_init(&vb->page_xb);
+> > +	if (virtio_has_feature(vdev, VIRTIO_BALLOON_F_FREE_PAGE_VQ)) {
+> > +		vb->balloon_wq = alloc_workqueue("balloon-wq",
+> > +					WQ_FREEZABLE | WQ_CPU_INTENSIVE, 0);
+> > +		INIT_WORK(&vb->report_free_page_work, report_free_page);
+> > +		vb->report_free_page_stop = true;
+> > +	}
+> > +
+> >   	vb->nb.notifier_call = virtballoon_oom_notify;
+> >   	vb->nb.priority = VIRTBALLOON_OOM_NOTIFY_PRIORITY;
+> >   	err = register_oom_notifier(&vb->nb);
+> > @@ -825,6 +1013,7 @@ static void virtballoon_remove(struct virtio_device *vdev)
+> >   	spin_unlock_irq(&vb->stop_update_lock);
+> >   	cancel_work_sync(&vb->update_balloon_size_work);
+> >   	cancel_work_sync(&vb->update_balloon_stats_work);
+> > +	cancel_work_sync(&vb->report_free_page_work);
+> >   	remove_common(vb);
+> >   #ifdef CONFIG_BALLOON_COMPACTION
+> > @@ -878,6 +1067,7 @@ static unsigned int features[] = {
+> >   	VIRTIO_BALLOON_F_STATS_VQ,
+> >   	VIRTIO_BALLOON_F_DEFLATE_ON_OOM,
+> >   	VIRTIO_BALLOON_F_SG,
+> > +	VIRTIO_BALLOON_F_FREE_PAGE_VQ,
+> >   };
+> >   static struct virtio_driver virtio_balloon_driver = {
+> > diff --git a/include/uapi/linux/virtio_balloon.h b/include/uapi/linux/virtio_balloon.h
+> > index 37780a7..b758484 100644
+> > --- a/include/uapi/linux/virtio_balloon.h
+> > +++ b/include/uapi/linux/virtio_balloon.h
+> > @@ -35,15 +35,26 @@
+> >   #define VIRTIO_BALLOON_F_STATS_VQ	1 /* Memory Stats virtqueue */
+> >   #define VIRTIO_BALLOON_F_DEFLATE_ON_OOM	2 /* Deflate balloon on OOM */
+> >   #define VIRTIO_BALLOON_F_SG		3 /* Use sg instead of PFN lists */
+> > +#define VIRTIO_BALLOON_F_FREE_PAGE_VQ	4 /* VQ to report free pages */
+> >   /* Size of a PFN in the balloon interface. */
+> >   #define VIRTIO_BALLOON_PFN_SHIFT 12
+> > +#define	VIRTIO_BALLOON_CMD_BALLOON_MEMORY		(1 << 0)
+> > +#define	VIRTIO_BALLOON_CMD_REPORT_FREE_PAGE_START	(1 << 1)
+> > +#define	VIRTIO_BALLOON_CMD_REPORT_FREE_PAGE_STOP	(1 << 2)
+> > +
+> >   struct virtio_balloon_config {
+> >   	/* Number of pages host wants Guest to give up. */
+> >   	__u32 num_pages;
+> >   	/* Number of pages we've actually got in balloon. */
+> >   	__u32 actual;
+> > +	/* Host-to-guest command, readonly by guest */
+> > +	__u32 host2guest_cmd;
+> > +	/* Sequence id of the free_page report command, readonly by guest */
+> > +	__u32 free_page_cmd_id;
+> > +	/* Guest-to-host command */
+> > +	__u32 guest2host_cmd;
+> >   };
+> >   #define VIRTIO_BALLOON_S_SWAP_IN  0   /* Amount of memory swapped in */
