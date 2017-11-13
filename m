@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47436)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47369)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1eEFSL-00049m-EV
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 09:11:22 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1eEFSJ-000485-6m
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 09:11:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1eEFSF-0007hp-LZ
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 09:11:21 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1eEFSE-0007ge-P7
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 09:11:19 -0500
 Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:38322)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1eEFSF-0007Yd-El
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 09:11:15 -0500
+	id 1eEFSE-0007Yd-I0
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 09:11:14 -0500
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1eEFS5-00023P-FS
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 14:11:05 +0000
+	(envelope-from <pm215@archaic.org.uk>) id 1eEFS6-00023s-40
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 14:11:06 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 13 Nov 2017 14:11:39 +0000
-Message-Id: <1510582304-27058-5-git-send-email-peter.maydell@linaro.org>
+Date: Mon, 13 Nov 2017 14:11:40 +0000
+Message-Id: <1510582304-27058-6-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1510582304-27058-1-git-send-email-peter.maydell@linaro.org>
 References: <1510582304-27058-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 4/9] qom: move CPUClass.tcg_initialize to a
- global
+Subject: [Qemu-devel] [PULL 5/9] xlnx-zynqmp: Properly support the smp
+ command line option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,69 +30,111 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: "Emilio G. Cota" <cota@braap.org>
+From: Alistair Francis <alistair.francis@xilinx.com>
 
-55c3cee ("qom: Introduce CPUClass.tcg_initialize", 2017-10-24)
-introduces a per-CPUClass bool that we check so that the target CPU
-is initialized for TCG only once. This works well except when
-we end up creating more than one CPUClass, in which case we end
-up incorrectly initializing TCG more than once, i.e. once for
-each CPUClass.
+Allow the -smp command line option to control the number of CPUs we
+create.
 
-This can be replicated with:
-  $ aarch64-softmmu/qemu-system-aarch64 -machine xlnx-zcu102 -smp 6 \
-      -global driver=xlnx,,zynqmp,property=has_rpu,value=on
-In this case the class name of the "RPUs" is prefixed by "cortex-r5-",
-whereas the "regular" CPUs are prefixed by "cortex-a53-". This
-results in two CPUClass instances being created.
-
-Fix it by introducing a static variable, so that only the first
-target CPU being initialized will initialize the target-dependent
-part of TCG, regardless of CPUClass instances.
-
-Fixes: 55c3ceef61fcf06fc98ddc752b7cce788ce7680b
-Signed-off-by: Emilio G. Cota <cota@braap.org>
+Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
 Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Tested-by: Alistair Francis <alistair.francis@xilinx.com>
-Message-id: 1510343626-25861-2-git-send-email-cota@braap.org
+Reviewed-by: Emilio G. Cota <cota@braap.org>
+Tested-by: Emilio G. Cota <cota@braap.org>
+Message-id: 1510343626-25861-3-git-send-email-cota@braap.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- include/qom/cpu.h | 1 -
- exec.c            | 5 +++--
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ hw/arm/xlnx-zcu102.c |  3 ++-
+ hw/arm/xlnx-zynqmp.c | 26 ++++++++++++++++----------
+ 2 files changed, 18 insertions(+), 11 deletions(-)
 
-diff --git a/include/qom/cpu.h b/include/qom/cpu.h
-index fa4b0c9..c2fa151 100644
---- a/include/qom/cpu.h
-+++ b/include/qom/cpu.h
-@@ -209,7 +209,6 @@ typedef struct CPUClass {
-     /* Keep non-pointer data at the end to minimize holes.  */
-     int gdb_num_core_regs;
-     bool gdb_stop_before_watchpoint;
--    bool tcg_initialized;
- } CPUClass;
- 
- #ifdef HOST_WORDS_BIGENDIAN
-diff --git a/exec.c b/exec.c
-index 97a24a8..8b579c0 100644
---- a/exec.c
-+++ b/exec.c
-@@ -792,11 +792,12 @@ void cpu_exec_initfn(CPUState *cpu)
- void cpu_exec_realizefn(CPUState *cpu, Error **errp)
+diff --git a/hw/arm/xlnx-zcu102.c b/hw/arm/xlnx-zcu102.c
+index e2d15a1..7ec03da 100644
+--- a/hw/arm/xlnx-zcu102.c
++++ b/hw/arm/xlnx-zcu102.c
+@@ -235,7 +235,8 @@ static void xlnx_zcu102_machine_class_init(ObjectClass *oc, void *data)
  {
-     CPUClass *cc = CPU_GET_CLASS(cpu);
-+    static bool tcg_target_initialized;
+     MachineClass *mc = MACHINE_CLASS(oc);
  
-     cpu_list_add(cpu);
+-    mc->desc = "Xilinx ZynqMP ZCU102 board";
++    mc->desc = "Xilinx ZynqMP ZCU102 board with 4xA53s and 2xR5s based on " \
++               "the value of smp";
+     mc->init = xlnx_zcu102_init;
+     mc->block_default_type = IF_IDE;
+     mc->units_per_default_bus = 1;
+diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
+index d4b6560..c707c66 100644
+--- a/hw/arm/xlnx-zynqmp.c
++++ b/hw/arm/xlnx-zynqmp.c
+@@ -98,8 +98,9 @@ static void xlnx_zynqmp_create_rpu(XlnxZynqMPState *s, const char *boot_cpu,
+ {
+     Error *err = NULL;
+     int i;
++    int num_rpus = MIN(smp_cpus - XLNX_ZYNQMP_NUM_APU_CPUS, XLNX_ZYNQMP_NUM_RPU_CPUS);
  
--    if (tcg_enabled() && !cc->tcg_initialized) {
--        cc->tcg_initialized = true;
-+    if (tcg_enabled() && !tcg_target_initialized) {
-+        tcg_target_initialized = true;
-         cc->tcg_initialize();
+-    for (i = 0; i < XLNX_ZYNQMP_NUM_RPU_CPUS; i++) {
++    for (i = 0; i < num_rpus; i++) {
+         char *name;
+ 
+         object_initialize(&s->rpu_cpu[i], sizeof(s->rpu_cpu[i]),
+@@ -132,8 +133,9 @@ static void xlnx_zynqmp_init(Object *obj)
+ {
+     XlnxZynqMPState *s = XLNX_ZYNQMP(obj);
+     int i;
++    int num_apus = MIN(smp_cpus, XLNX_ZYNQMP_NUM_APU_CPUS);
+ 
+-    for (i = 0; i < XLNX_ZYNQMP_NUM_APU_CPUS; i++) {
++    for (i = 0; i < num_apus; i++) {
+         object_initialize(&s->apu_cpu[i], sizeof(s->apu_cpu[i]),
+                           "cortex-a53-" TYPE_ARM_CPU);
+         object_property_add_child(obj, "apu-cpu[*]", OBJECT(&s->apu_cpu[i]),
+@@ -182,6 +184,7 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
+     MemoryRegion *system_memory = get_system_memory();
+     uint8_t i;
+     uint64_t ram_size;
++    int num_apus = MIN(smp_cpus, XLNX_ZYNQMP_NUM_APU_CPUS);
+     const char *boot_cpu = s->boot_cpu ? s->boot_cpu : "apu-cpu[0]";
+     ram_addr_t ddr_low_size, ddr_high_size;
+     qemu_irq gic_spi[GIC_NUM_SPI_INTR];
+@@ -233,10 +236,10 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
+ 
+     qdev_prop_set_uint32(DEVICE(&s->gic), "num-irq", GIC_NUM_SPI_INTR + 32);
+     qdev_prop_set_uint32(DEVICE(&s->gic), "revision", 2);
+-    qdev_prop_set_uint32(DEVICE(&s->gic), "num-cpu", XLNX_ZYNQMP_NUM_APU_CPUS);
++    qdev_prop_set_uint32(DEVICE(&s->gic), "num-cpu", num_apus);
+ 
+     /* Realize APUs before realizing the GIC. KVM requires this.  */
+-    for (i = 0; i < XLNX_ZYNQMP_NUM_APU_CPUS; i++) {
++    for (i = 0; i < num_apus; i++) {
+         char *name;
+ 
+         object_property_set_int(OBJECT(&s->apu_cpu[i]), QEMU_PSCI_CONDUIT_SMC,
+@@ -292,7 +295,7 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
+         }
      }
  
+-    for (i = 0; i < XLNX_ZYNQMP_NUM_APU_CPUS; i++) {
++    for (i = 0; i < num_apus; i++) {
+         qemu_irq irq;
+ 
+         sysbus_connect_irq(SYS_BUS_DEVICE(&s->gic), i,
+@@ -307,11 +310,14 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
+     }
+ 
+     if (s->has_rpu) {
+-        xlnx_zynqmp_create_rpu(s, boot_cpu, &err);
+-        if (err) {
+-            error_propagate(errp, err);
+-            return;
+-        }
++        info_report("The 'has_rpu' property is no longer required, to use the "
++                    "RPUs just use -smp 6.");
++    }
++
++    xlnx_zynqmp_create_rpu(s, boot_cpu, &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
+     }
+ 
+     if (!s->boot_cpu_ptr) {
 -- 
 2.7.4
