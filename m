@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57022)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57119)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1eENOV-0002y1-GD
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 17:39:56 -0500
+	(envelope-from <alistai@xilinx.com>) id 1eENOe-00037E-PN
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 17:40:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1eENOU-0007Mb-7x
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 17:39:55 -0500
+	(envelope-from <alistai@xilinx.com>) id 1eENOd-0007Rr-Je
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 17:40:04 -0500
 From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Mon, 13 Nov 2017 14:35:29 -0800
-Message-ID: <83aa5da9c3f6220edf68b49c6f16bf84108616ab.1510612380.git.alistair.francis@xilinx.com>
+Date: Mon, 13 Nov 2017 14:35:48 -0800
+Message-ID: <e58089d06e65c4b85bddeaf2228ef7d7d86b559e.1510612380.git.alistair.francis@xilinx.com>
 In-Reply-To: <cover.1510612380.git.alistair.francis@xilinx.com>
 References: <cover.1510612380.git.alistair.francis@xilinx.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v5 17/29] hw/nvram: Replace fprintf(stderr,
+Subject: [Qemu-devel] [PATCH v5 21/29] hw/s390x: Replace fprintf(stderr,
  "*\n" with error_report()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -65,60 +65,35 @@ find ./* -type f -exec sed -i \
 
 Some lines where then manually tweaked to pass checkpatch.
 
-Some of the message in put_unused() was removed and replaced with
-g_assert_not_reached() and some of the messages were updated.
+One fprintf(stderr, was manually converted to a
+qemu_log_mask(LOG_GUEST_ERROR,
 
 Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 ---
 V3:
- - Add g_assert_not_reached() in unused function
+ - Use a qemu_log_mask(LOG_GUEST_ERROR,
 V2:
  - Split hw patch into individual directories
 
- hw/nvram/eeprom93xx.c | 7 ++++---
- hw/nvram/fw_cfg.c     | 5 +++--
- 2 files changed, 7 insertions(+), 5 deletions(-)
+ hw/s390x/virtio-ccw.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/hw/nvram/eeprom93xx.c b/hw/nvram/eeprom93xx.c
-index 2fd0e3c29f..6ffce745ae 100644
---- a/hw/nvram/eeprom93xx.c
-+++ b/hw/nvram/eeprom93xx.c
-@@ -36,6 +36,7 @@
-  */
- 
- #include "qemu/osdep.h"
-+#include "qemu/error-report.h"
- #include "hw/hw.h"
- #include "hw/nvram/eeprom93xx.h"
- 
-@@ -105,9 +106,9 @@ static int get_uint16_from_uint8(QEMUFile *f, void *pv, size_t size,
- static int put_unused(QEMUFile *f, void *pv, size_t size, VMStateField *field,
-                       QJSON *vmdesc)
- {
--    fprintf(stderr, "uint16_from_uint8 is used only for backwards compatibility.\n");
--    fprintf(stderr, "Never should be used to write a new state.\n");
--    exit(0);
-+    error_report("uint16_from_uint8 is used only for backwards compatibility.");
-+    error_report("It should never be used to write a new state.");
-+    g_assert_not_reached();
- 
-     return 0;
- }
-diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
-index 753ac0e4ea..1c66052f1f 100644
---- a/hw/nvram/fw_cfg.c
-+++ b/hw/nvram/fw_cfg.c
-@@ -518,8 +518,9 @@ static int get_uint32_as_uint16(QEMUFile *f, void *pv, size_t size,
- static int put_unused(QEMUFile *f, void *pv, size_t size, VMStateField *field,
-                       QJSON *vmdesc)
- {
--    fprintf(stderr, "uint32_as_uint16 is only used for backward compatibility.\n");
--    fprintf(stderr, "This functions shouldn't be called.\n");
-+    error_report("uint32_as_uint16 is only used for backward compatibility.");
-+
-+    g_assert_not_reached();
- 
-     return 0;
- }
+diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
+index 184515ce94..c1dac3325f 100644
+--- a/hw/s390x/virtio-ccw.c
++++ b/hw/s390x/virtio-ccw.c
+@@ -426,8 +426,9 @@ static int virtio_ccw_cb(SubchDev *sch, CCW1 ccw)
+                  * passes us zeroes for those we don't support.
+                  */
+                 if (features.features) {
+-                    fprintf(stderr, "Guest bug: features[%i]=%x (expected 0)\n",
+-                            features.index, features.features);
++                    qemu_log_mask(LOG_GUEST_ERROR,
++                                  "Guest bug: features[%i]=%x (expected 0)",
++                                  features.index, features.features);
+                     /* XXX: do a unit check here? */
+                 }
+             }
 -- 
 2.14.1
