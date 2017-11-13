@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43188)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44650)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1eEGdu-0007fP-C2
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 10:27:23 -0500
+	(envelope-from <eblake@redhat.com>) id 1eEGjB-0000ez-Gi
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 10:32:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1eEGdo-0002p8-BP
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 10:27:22 -0500
-Received: from mail-it0-x233.google.com ([2607:f8b0:4001:c0b::233]:37894)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
-	id 1eEGdo-0002on-5k
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 10:27:16 -0500
-Received: by mail-it0-x233.google.com with SMTP id n134so1247283itg.3
-	for <qemu-devel@nongnu.org>; Mon, 13 Nov 2017 07:27:16 -0800 (PST)
-Content-Type: text/plain; charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-From: Programmingkid <programmingkidx@gmail.com>
-In-Reply-To: <CAJ+F1CLxYBq7zfzMSrhnxb+9Np7ZDnrbLqf+e=FoZyC=bZFA+Q@mail.gmail.com>
-Date: Mon, 13 Nov 2017 10:27:14 -0500
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <77699873-C42D-4678-9E29-432D2A36BCCE@gmail.com>
-References: <03123F70-98FA-439A-868C-855E63916259@gmail.com>
-	<20171113145041.GI18828@redhat.com>
-	<CAJ+F1CLxYBq7zfzMSrhnxb+9Np7ZDnrbLqf+e=FoZyC=bZFA+Q@mail.gmail.com>
-Subject: Re: [Qemu-devel] Command-line option to change ungrab key(s)
+	(envelope-from <eblake@redhat.com>) id 1eEGjA-00058d-BR
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 10:32:49 -0500
+References: <20171113152424.25381-1-eblake@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <be69fe36-58f2-1164-5bcd-823df74ae769@redhat.com>
+Date: Mon, 13 Nov 2017 09:32:38 -0600
+MIME-Version: 1.0
+In-Reply-To: <20171113152424.25381-1-eblake@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="judsBsCXtrJWg2CQiqEpPNC6LWAEeouTS"
+Subject: Re: [Qemu-devel] [PATCH for-2.11] nbd/client: Use error_prepend()
+ correctly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,60 +24,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, vsementsov@virtuozzo.com, qemu-stable@nongnu.org, qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--judsBsCXtrJWg2CQiqEpPNC6LWAEeouTS
+From: Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, vsementsov@virtuozzo.com,
+ qemu-stable@nongnu.org, qemu-block@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>
+Message-ID: <be69fe36-58f2-1164-5bcd-823df74ae769@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.11] nbd/client: Use error_prepend()
+ correctly
+References: <20171113152424.25381-1-eblake@redhat.com>
+In-Reply-To: <20171113152424.25381-1-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> On Nov 13, 2017, at 10:20 AM, Marc-Andr=C3=A9 Lureau =
-<marcandre.lureau@gmail.com> wrote:
+[adding Markus as error maintainer]
+
+On 11/13/2017 09:24 AM, Eric Blake wrote:
+> When using error prepend(), it is necessary to end with a space
+> in the format string; otherwise, messages come out incorrectly,
+> such as when connecting to a socket that hangs up immediately:
 >=20
-> Hi
+> can't open device nbd://localhost:10809/: Failed to read dataUnexpected=
+ end-of-file before all bytes were read
 >=20
-> On Mon, Nov 13, 2017 at 3:50 PM, Daniel P. Berrange =
-<berrange@redhat.com> wrote:
->> On Mon, Nov 13, 2017 at 09:29:25AM -0500, Programmingkid wrote:
->>> Would you accept a patch that allows the user to change the mouse =
-ungrab key(s) in QEMU?
->>>=20
->>> It would look something like this:
->>>=20
->>> -ungrab <key>
->>>=20
->>> or
->>>=20
->>> -ungrab <key>,<key>,...
->>>=20
->>> If the user wanted the F19 key to be the ungrab key, this is what =
-would be sent to QEMU:
->>>=20
->>> -ungrab F19
->>>=20
->>> If the user wanted F16 and F17 held down to ungrab the mouse, this =
-is what would be sent to QEMU:
->>>=20
->>> -ungrab F16,F17
->>>=20
->>>=20
->>> Would this feature be something you would consider adding to QEMU?
->>=20
->> As context, virt-manager allows customization for the ungrab =
-sequence, and
->> so do spice-gtk/gtk-vnc at the API level. So conceptually I think it =
-is
->> reasonable for any UI console that is intended as more than just a =
-toy.
+> Originally botched in commit e44ed99d, then several more instances
+> added in the meantime.
 >=20
-> Would it make sense to share the virt-viewer/remote-viewer --hotkeys
-> option format ? (see man remote-viewer / virt-viewer)
+> CC: qemu-stable@nongnu.org
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+>  nbd/client.c | 50 ++++++++++++++++++++++++++------------------------
+>  1 file changed, 26 insertions(+), 24 deletions(-)
+>=20
+> diff --git a/nbd/client.c b/nbd/client.c
+> index 1880103d2a..4e15fc484d 100644
+> --- a/nbd/client.c
+> +++ b/nbd/client.c
+> @@ -79,12 +79,12 @@ static int nbd_send_option_request(QIOChannel *ioc,=
+ uint32_t opt,
+>      stl_be_p(&req.length, len);
+>=20
+>      if (nbd_write(ioc, &req, sizeof(req), errp) < 0) {
+> -        error_prepend(errp, "Failed to send option request header");
+> +        error_prepend(errp, "Failed to send option request header: ");=
 
-I think you are referring to information found on this page: =
-https://www.mankier.com/1/remote-viewer
 
-The command-line option for changing hotkey actions would be:
---hotkeys=3D<action1>=3D<key1>[+<key2>][,<action2>=3D<key3>[+<key4>]]
+A quick grep of the tree noticed that most (all?) error_prepend()
+callers use trailing ": " in their format string.  Should we refactor
+that to be done automatically by error_prepend() itself, rather than at
+every callsite?
 
-So this means changing the mouse ungrab would look something like this:
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
---hotkeys=3Drelease-cursor=3DF19 (or some other key)
 
-Gerd what you think of this idea?=
+--judsBsCXtrJWg2CQiqEpPNC6LWAEeouTS
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloJuxcACgkQp6FrSiUn
+Q2ojeQf/XYwONoN5HALanjhHHqYzVAbw0be6iBGOc9U0M1ZjO77teblI9aC9m8lg
+jm7xkSfMc1xFsi450kwvTo3lzv3dkMt6xFsFMQL3UF5AIrtc2upQ6scSW7q2Zy2R
+f6VFKCshAUeFNjI8ssxd2L4PXdjI5S+NE6Tmj+8NjwRrkYFmG/V9Zy9SAztvhrPC
+3NqjA/8tK06XVzxa73RjRrQhTSd7vkGI6p/kglyLSklLavmm2Ka2NVUp0hu5o6mB
+UM3VoHWxCVjejBFhWvVbWScHzF+X3BPd5CcTYZHSJMXlfHZWyqgNFU6w6VsN1pbf
++LqUaXFq0oZjINabVopq+U9FxsO3lg==
+=Y3SC
+-----END PGP SIGNATURE-----
+
+--judsBsCXtrJWg2CQiqEpPNC6LWAEeouTS--
