@@ -1,19 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44644)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46175)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhuyijun@huawei.com>) id 1eEDsT-0006sf-0M
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 07:30:14 -0500
+	(envelope-from <armbru@redhat.com>) id 1eEDyW-00014r-Gf
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 07:36:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhuyijun@huawei.com>) id 1eEDsO-0000xl-9O
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 07:30:13 -0500
-From: <zhuyijun@huawei.com>
-Date: Mon, 13 Nov 2017 20:29:01 +0800
-Message-ID: <1510576145-23084-2-git-send-email-zhuyijun@huawei.com>
-In-Reply-To: <1510576145-23084-1-git-send-email-zhuyijun@huawei.com>
-References: <1510576145-23084-1-git-send-email-zhuyijun@huawei.com>
+	(envelope-from <armbru@redhat.com>) id 1eEDyS-0003KD-96
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 07:36:28 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44762)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eEDyR-0003Jz-Vp
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 07:36:24 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20171023151310.6462-1-vadim.galitsyn@profitbricks.com>
+	<20171024104552.GC3780@work-vm>
+Date: Mon, 13 Nov 2017 13:36:20 +0100
+In-Reply-To: <20171024104552.GC3780@work-vm> (David Alan Gilbert's message of
+	"Tue, 24 Oct 2017 11:45:53 +0100")
+Message-ID: <87h8tys6d7.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [RFC 1/5] hw/vfio: Add function for getting
- reserved_region of device iommu group
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] QMP, HMP: introduce 'writeconfig' command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,176 +28,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm@nongnu.org, qemu-devel@nongnu.org, eric.auger@redhat.com
-Cc: peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, zhaoshenglong@huawei.com
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Vadim Galitsyn <vadim.galitsyn@profitbricks.com>, qemu-devel@nongnu.org
 
-From: Zhu Yijun <zhuyijun@huawei.com>
+"Dr. David Alan Gilbert" <dgilbert@redhat.com> writes:
 
-With kernel 4.11, iommu/smmu will populate the MSI IOVA reserved window and
-PCI reserved window which has to be excluded from Guest iova allocations.
+> * Vadim Galitsyn (vadim.galitsyn@profitbricks.com) wrote:
+>> Hi Guys,
+>>=20
+>> This thread is a continuation of discussion started in
+>> http://lists.nongnu.org/archive/html/qemu-devel/2017-02/msg03182.html.
+>>=20
+>> This series introduces =E2=80=98writeconfig=E2=80=99 command support for=
+ QMP and HMP
+>> monitors. This functionality might be useful for live migration for
+>> cases when guest configuration was modified in runtime (for example
+>> as a result of hot- plug/unplug operations) and actual Qemu command
+>> line no longer reflects setup exposed to guest.
+>>=20
+>> Original series has =E2=80=98qemu_opts=E2=80=99 patch as well
+>> (http://lists.nongnu.org/archive/html/qemu-devel/2017-02/msg03183.html)
+>> because HMP=E2=80=99s =E2=80=98object_add=E2=80=99 result was not reflec=
+ted in =E2=80=98writeconfig=E2=80=99
+>> output. Later I found that QMP=E2=80=99s =E2=80=98object-add=E2=80=99 ha=
+s the same
+>> issue. Anyway, I don=E2=80=99t include =E2=80=98qemu_opts=E2=80=99 patch=
+es here because
+>> Markus mentioned (here
+>> http://lists.nongnu.org/archive/html/qemu-devel/2017-02/msg03476.html)
+>> that this functionality is going to be reworked in some future and
+>> such patches might collide with the rework process.
 
-However, If it falls within the Qemu default virtual memory address space,
-then reserved regions may get allocated for a Guest VF DMA iova and it will
-fail.
+This is item 1 of my reply.  Item 3 is more important:
 
-So get those reserved regions in this patch and create some holes in the Qemu
-ram address in next patchset.
+   The accuracy of QemuOpts information is doubtful.
 
-Signed-off-by: Zhu Yijun <zhuyijun@huawei.com>
----
- hw/vfio/common.c              | 67 +++++++++++++++++++++++++++++++++++++++++++
- hw/vfio/pci.c                 |  2 ++
- hw/vfio/platform.c            |  2 ++
- include/exec/memory.h         |  7 +++++
- include/hw/vfio/vfio-common.h |  3 ++
- 5 files changed, 81 insertions(+)
+   Completeness: only certain kinds of configuration are done with
+   QemuOpts.  Incompleteness makes -writeconfig less useful than it
+   could be, but it's still useful.  Monitor command writeconfig could
+   be similarly useful.
 
-diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index 7b2924c..01bdbbd 100644
---- a/hw/vfio/common.c
-+++ b/hw/vfio/common.c
-@@ -40,6 +40,8 @@ struct vfio_group_head vfio_group_list =
-     QLIST_HEAD_INITIALIZER(vfio_group_list);
- struct vfio_as_head vfio_address_spaces =
-     QLIST_HEAD_INITIALIZER(vfio_address_spaces);
-+struct reserved_ram_head reserved_ram_regions =
-+    QLIST_HEAD_INITIALIZER(reserved_ram_regions);
- 
- #ifdef CONFIG_KVM
- /*
-@@ -52,6 +54,71 @@ struct vfio_as_head vfio_address_spaces =
- static int vfio_kvm_device_fd = -1;
- #endif
- 
-+void update_reserved_regions(hwaddr addr, hwaddr size)
-+{
-+    RAMRegion *reg, *new;
-+
-+    new = g_new(RAMRegion, 1);
-+    new->base = addr;
-+    new->size = size;
-+
-+    if (QLIST_EMPTY(&reserved_ram_regions)) {
-+        QLIST_INSERT_HEAD(&reserved_ram_regions, new, next);
-+        return;
-+    }
-+
-+    /* make the base of reserved_ram_regions increase */
-+    QLIST_FOREACH(reg, &reserved_ram_regions, next) {
-+        if (addr > (reg->base + reg->size - 1)) {
-+            if (!QLIST_NEXT(reg, next)) {
-+                QLIST_INSERT_AFTER(reg, new, next);
-+                break;
-+            }
-+            continue;
-+        } else if (addr >= reg->base && addr <= (reg->base + reg->size - 1)) {
-+            /* discard the duplicate entry */
-+            if (addr == reg->base && size == reg->size) {
-+                g_free(new);
-+                break;
-+            } else {
-+                QLIST_INSERT_AFTER(reg, new, next);
-+                break;
-+            }
-+        } else {
-+            QLIST_INSERT_BEFORE(reg, new, next);
-+            break;
-+        }
-+    }
-+}
-+
-+void vfio_get_iommu_group_reserved_region(char *group_path)
-+{
-+    char *filename;
-+    FILE *fp;
-+    hwaddr start, end;
-+    char str[10];
-+    struct stat st;
-+
-+    filename = g_strdup_printf("%s/iommu_group/reserved_regions", group_path);
-+    if (stat(filename, &st) < 0) {
-+        g_free(filename);
-+        return;
-+    }
-+
-+    fp = fopen(filename, "r");
-+    if (!fp) {
-+        g_free(filename);
-+        return;
-+    }
-+
-+    while (fscanf(fp, "%"PRIx64" %"PRIx64" %s", &start, &end, str) != EOF) {
-+        update_reserved_regions(start, (end - start + 1));
-+    }
-+
-+    g_free(filename);
-+    fclose(fp);
-+}
-+
- /*
-  * Common VFIO interrupt disable
-  */
-diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-index c977ee3..9bffb38 100644
---- a/hw/vfio/pci.c
-+++ b/hw/vfio/pci.c
-@@ -2674,6 +2674,8 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
-     vdev->vbasedev.type = VFIO_DEVICE_TYPE_PCI;
-     vdev->vbasedev.dev = &vdev->pdev.qdev;
- 
-+    vfio_get_iommu_group_reserved_region(vdev->vbasedev.sysfsdev);
-+
-     tmp = g_strdup_printf("%s/iommu_group", vdev->vbasedev.sysfsdev);
-     len = readlink(tmp, group_path, sizeof(group_path));
-     g_free(tmp);
-diff --git a/hw/vfio/platform.c b/hw/vfio/platform.c
-index da84abf..d5bbc3a 100644
---- a/hw/vfio/platform.c
-+++ b/hw/vfio/platform.c
-@@ -578,6 +578,8 @@ static int vfio_base_device_init(VFIODevice *vbasedev, Error **errp)
-         return -errno;
-     }
- 
-+    vfio_get_iommu_group_reserved_region(vbasedev->sysfsdev);
-+
-     tmp = g_strdup_printf("%s/iommu_group", vbasedev->sysfsdev);
-     len = readlink(tmp, group_path, sizeof(group_path));
-     g_free(tmp);
-diff --git a/include/exec/memory.h b/include/exec/memory.h
-index 5ed4042..2bcc83b 100644
---- a/include/exec/memory.h
-+++ b/include/exec/memory.h
-@@ -46,6 +46,13 @@
-         OBJECT_GET_CLASS(IOMMUMemoryRegionClass, (obj), \
-                          TYPE_IOMMU_MEMORY_REGION)
- 
-+/* Scattered RAM memory region struct */
-+typedef struct RAMRegion {
-+    hwaddr base;
-+    hwaddr size;
-+    QLIST_ENTRY(RAMRegion) next;
-+} RAMRegion;
-+
- typedef struct MemoryRegionOps MemoryRegionOps;
- typedef struct MemoryRegionMmio MemoryRegionMmio;
- 
-diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-index f3a2ac9..3483ca6 100644
---- a/include/hw/vfio/vfio-common.h
-+++ b/include/hw/vfio/vfio-common.h
-@@ -161,10 +161,13 @@ VFIOGroup *vfio_get_group(int groupid, AddressSpace *as, Error **errp);
- void vfio_put_group(VFIOGroup *group);
- int vfio_get_device(VFIOGroup *group, const char *name,
-                     VFIODevice *vbasedev, Error **errp);
-+void update_reserved_regions(hwaddr addr, hwaddr size);
-+void vfio_get_iommu_group_reserved_region(char *group_path);
- 
- extern const MemoryRegionOps vfio_region_ops;
- extern QLIST_HEAD(vfio_group_head, VFIOGroup) vfio_group_list;
- extern QLIST_HEAD(vfio_as_head, VFIOAddressSpace) vfio_address_spaces;
-+extern QLIST_HEAD(reserved_ram_head, RAMRegion) reserved_ram_regions;
- 
- #ifdef CONFIG_LINUX
- int vfio_get_region_info(VFIODevice *vbasedev, int index,
--- 
-1.8.3.1
+   Correctness: configuration gets stored in QemuOpts when we parse
+   KEY=3DVALUE,... strings.  It can also be constructed and updated
+   manually.  At certain points in time, bits from QemuOpts are used to
+   actually configure stuff.
+
+   Example: -device creates an entry in the "device" configuration
+   group, which is later used to actually create and configure a device
+   object.
+
+   My point is: whenever we manipulate the actual objects, we may
+   invalidate information stored in QemuOpts.  We can try to keep it in
+   sync, and we do at least sometimes.  But this is a game we can only
+   lose, except for the period(s) of time where QemuOpts is all there
+   is, i.e. before actual objects get created.  Note that -writeconfig
+   runs before objects get created, so it's not affected by this issue.
+
+   Out-of-sync QemuOpts is harmless unless something relies on it being
+   accurate.  I know we currently rely on QemuOpts IDs to catch
+   duplicate IDs for some of the configuration groups.  I doubt there's
+   much else.
+
+   If we add your monitor command, out-of-sync QemuOpts goes from
+   harmless to serious bug.  In other words, we'd create a new class of
+   bugs, with an unknown number of existing instances that are probably
+   hard to find and fix.  Probably a perpetual source of new instances,
+   too.
+
+   Feels like a show stopper to me.
+
+Message-ID: <87k28qlca9.fsf@dusky.pond.sub.org>
+
+>> Markus, could you please post if you have an update on this topic?
+>> Current =E2=80=98master=E2=80=99 branch (9993c82dc2f5ce58b41d708b765e1a7=
+17ad4281d)
+>> still has the issue.
+
+There's my "[RFC PATCH 00/32] Command line QAPIfication"
+Message-Id: <20171002152552.27999-1-armbru@redhat.com>
+https://lists.nongnu.org/archive/html/qemu-devel/2017-10/msg00209.html
+
+There's also my KVM Forum presentation.  Permanent links to slides and
+hopefully video should appear at
+http://www.linux-kvm.org/page/KVM_Forum_2017 "soon".  Until then, you
+can also get my slides from
+https://events.linuxfoundation.org/sites/events/files/slides/armbru-qapi-cm=
+dline_1.pdf
+
+>> Also, Markus mentioned that once configuration was changed during
+>> live migration -- it might be an issue because =E2=80=98writeconfig=E2=
+=80=99 data
+>> became outdated (and might be make sense to think about to embed this
+>> data into migration stream itself). In the same time David said that
+>> this is another problem which is unrelated to this patch series. What
+>> is your current opinion on this topic? Can we consider these patches
+>> to be included into =E2=80=98master=E2=80=99 taking into account that no=
+t all
+>> configuration is dumped by =E2=80=98writeconfig=E2=80=99 (=E2=80=98objec=
+t_add=E2=80=99 problem), but
+>> this can be fixed later?
+>
+> I don't see anything wrong with having a 'writeconfig' command - we
+> already have the command line equivalent - that is assuming hotplug
+> etc all cause the values written to be correct.
+
+In the current state of things, this assumption is somewhere between
+reckless and wrong.  See "this is a game we can only lose" above.
+
+> The data becoming outdated doesn't sound like a big issue to me;
+> it's the management layer that's doing any hotplugs, it can reissue
+> another 'writeconfig' command.
+
+It can, but how would it use the data?  It already started the
+destination QEMU with configuration derived from the first writeconfig,
+plus -incoming.  Source configuration may change until we're ready to
+pivot from to the destination.  A second writeconfig only tells the
+management application what configuration it has to reach on the
+destination, but not how it could be done.  Perhaps that helps, perhaps
+it doesn't.
+
+All theoretical, because the data cannot be relied on anyway.
