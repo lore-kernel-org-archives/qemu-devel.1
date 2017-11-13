@@ -1,53 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34316)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34753)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1eEB96-0008PD-Lh
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 04:35:17 -0500
+	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1eEBBl-00015B-Hk
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 04:37:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1eEB91-0005IT-NT
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 04:35:12 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60314)
+	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1eEBBg-0007Gl-KM
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 04:37:57 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:43632
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pmorel@linux.vnet.ibm.com>)
-	id 1eEB91-0005Hq-9m
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 04:35:07 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vAD9YItA064046
-	for <qemu-devel@nongnu.org>; Mon, 13 Nov 2017 04:34:57 -0500
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2e763rqemv-1
+	id 1eEBBg-0007GF-Cu
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 04:37:52 -0500
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	vAD9bX8m004990
+	for <qemu-devel@nongnu.org>; Mon, 13 Nov 2017 04:37:46 -0500
+Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2e77ejv7h8-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 13 Nov 2017 04:34:57 -0500
+	for <qemu-devel@nongnu.org>; Mon, 13 Nov 2017 04:37:46 -0500
 Received: from localhost
-	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <pmorel@linux.vnet.ibm.com>;
-	Mon, 13 Nov 2017 09:34:54 -0000
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com
-	[9.149.105.60])
-	by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with
-	ESMTP id vAD9YqMZ36372546
-	for <qemu-devel@nongnu.org>; Mon, 13 Nov 2017 09:34:52 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 32D0942041
-	for <qemu-devel@nongnu.org>; Mon, 13 Nov 2017 09:29:49 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D025442047
-	for <qemu-devel@nongnu.org>; Mon, 13 Nov 2017 09:29:47 +0000 (GMT)
-Received: from [9.145.26.235] (unknown [9.145.26.235])
-	by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP
-	for <qemu-devel@nongnu.org>; Mon, 13 Nov 2017 09:29:47 +0000 (GMT)
+	Mon, 13 Nov 2017 09:37:44 -0000
 References: <1510075479-17224-1-git-send-email-pmorel@linux.vnet.ibm.com>
 	<1510075479-17224-2-git-send-email-pmorel@linux.vnet.ibm.com>
 	<20171109173802.7a43dcc3.cohuck@redhat.com>
 	<92ed4a36-5db9-9f76-069f-cd663bbe8aee@amsat.org>
 From: Pierre Morel <pmorel@linux.vnet.ibm.com>
-Date: Mon, 13 Nov 2017 10:34:50 +0100
+Date: Mon, 13 Nov 2017 10:37:40 +0100
 MIME-Version: 1.0
 In-Reply-To: <92ed4a36-5db9-9f76-069f-cd663bbe8aee@amsat.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Message-Id: <ea1b5011-c803-4fe0-8e1a-def47424fada@linux.vnet.ibm.com>
+Message-Id: <c88932d3-a60d-663f-4d1b-ae8df1969b5e@linux.vnet.ibm.com>
 Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] [PATCH 1/7] s390x/pci: factor out endianess
  conversion
@@ -59,7 +46,8 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Cornelia Huck <cohuck@redhat.com>
+Cc: borntraeger@de.ibm.com, pasic@linux.vnet.ibm.com, zyimin@linux.vnet.ibm.com, qemu-devel@nongnu.org, agraf@suse.de
 
 On 09/11/2017 19:55, Philippe Mathieu-Daud=C3=A9 wrote:
 > On 11/09/2017 01:38 PM, Cornelia Huck wrote:
@@ -119,6 +107,7 @@ On 09/11/2017 19:55, Philippe Mathieu-Daud=C3=A9 wrote:
 >=20
 > This is usually care taken by memory::adjust_endianness() ...
 
+
 We are here intercepting an instruction with the data in a register.
 That is what troubles me, but I will take a deeper look.
 
@@ -136,7 +125,6 @@ That is what troubles me, but I will take a deeper look.
 >=20
 
 Thanks for the pointers.
-
 
 
 --=20
