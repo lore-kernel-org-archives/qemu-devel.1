@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52256)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58850)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eECSC-0005b1-Tf
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 05:59:01 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eECtF-0002u7-Hb
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 06:27:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eECS9-0004ad-LQ
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 05:59:00 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52682)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eECS9-0004aK-DM
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 05:58:57 -0500
-References: <20171031112457.10516.8971.stgit@pasha-VirtualBox>
-	<20171031112610.10516.78685.stgit@pasha-VirtualBox>
-	<84c5cdaf-4ec6-f05c-e1a2-3228517d491a@redhat.com>
-	<9bbb7744-86e4-9c82-cf82-63a5429ac405@redhat.com>
-	<132030259.16705243.1509653039905.JavaMail.zimbra@redhat.com>
-	<002e01d35c5c$b3ea9c00$1bbfd400$@ru> <87k1yutri5.fsf@linaro.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <8d53d934-3e69-cabc-d02a-b395ac7f9bcf@redhat.com>
-Date: Mon, 13 Nov 2017 11:58:45 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1eECtE-0003N9-KR
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 06:26:57 -0500
+Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:53207)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eECtE-0003Km-83
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 06:26:56 -0500
+Received: by mail-wr0-x231.google.com with SMTP id j23so14093748wra.9
+	for <qemu-devel@nongnu.org>; Mon, 13 Nov 2017 03:26:56 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <87k1yutri5.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <49151b79-7ec4-b728-1ea9-d5c393a5bada@amsat.org>
+References: <1510087611-1851-1-git-send-email-cota@braap.org>
+	<49151b79-7ec4-b728-1ea9-d5c393a5bada@amsat.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 13 Nov 2017 11:26:34 +0000
+Message-ID: <CAFEAcA-pwxfR-+XSu+q117Po=Lh2aRDGtW9jNAEZuPZNjbFC_Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 13/26] cpus: only take BQL for sleeping
- threads
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH] arm/translate-a64: mark path as
+ unreachable to eliminate warning
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,64 +31,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Pavel Dovgalyuk <dovgaluk@ispras.ru>
-Cc: 'David Hildenbrand' <david@redhat.com>, 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org, kwolf@redhat.com, 'peter maydell' <peter.maydell@linaro.org>, 'boost lists' <boost.lists@gmail.com>, quintela@redhat.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, 'maria klimushenkova' <maria.klimushenkova@ispras.ru>, kraxel@redhat.com
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: "Emilio G. Cota" <cota@braap.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>
 
-On 13/11/2017 11:14, Alex Benn=C3=A9e wrote:
->=20
-> Pavel Dovgalyuk <dovgaluk@ispras.ru> writes:
->=20
->>> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
->>>> From: "David Hildenbrand" <david@redhat.com>
->>>> On 02.11.2017 12:08, Paolo Bonzini wrote:
->>>>> On 31/10/2017 12:26, Pavel Dovgalyuk wrote:
->>>>>> From: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->>>>>>
->>>>>> Now the only real need to hold the BQL is for when we sleep on the
->>>>>> cpu->halt conditional. The lock is actually dropped while the thre=
-ad
->>>>>> sleeps so the actual window for contention is pretty small. This a=
-lso
->>>>>> means we can remove the special case hack for exclusive work and
->>>>>> simply declare that work no longer has an implicit BQL held. This
->>>>>> isn't a major problem async work is generally only changing things=
- in
->>>>>> the context of its own vCPU. If it needs to work across vCPUs it
->>>>>> should be using the exclusive mechanism or possibly taking the loc=
-k
->>>>>> itself.
->>>>>>
->>>>>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->>>>>> Tested-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
->>>>>
->>>>> At least cpu_throttle_thread would fail with this patch.
->>>>>
->>>>> Also I am not sure if the s390 SIGP handlers are ready for this.
->>>>>
->>>>
->>>> We have a global lock to the SIGP "facility". However we need the BQ=
-L in
->>>> order to inject interrupts into CPUs (otherwise it would trigger an
->>>> assert when injecting).
->>>>
->>>> We inject Restart and Stop interrupts from run_on_cpu. This requires=
- the
->>>> BQL. So Paolo should be right, this change would break s390x.
->>>
->>> I had some patches to access interrupt_request with the atomic builti=
-ns.  If
->>> Pavel can first extract the other changes to the icount mechanism, I =
-can
->>> update them.
+On 8 November 2017 at 12:37, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> =
+wrote:
+> On 11/07/2017 05:46 PM, Emilio G. Cota wrote:
+>> Fixes the following warning when compiling with gcc 5.4.0 with -O1
+>> optimizations and --enable-debug:
 >>
->> What changes do you mean here?
->> I'm not sure that I understand clearly how threads interact with BQL.
->> These patches were authored by Alex and we'll have to get him into the
->> discussion.
->=20
-> Do you want me to re-spin my sub-set of the patches as a new base?
+>> target/arm/translate-a64.c: In function =E2=80=98aarch64_tr_translate_in=
+sn=E2=80=99:
+>> target/arm/translate-a64.c:2361:8: error: =E2=80=98post_index=E2=80=99 m=
+ay be used uninitialized in this function [-Werror=3Dmaybe-uninitialized]
+>>      if (!post_index) {
+>>         ^
+>> target/arm/translate-a64.c:2307:10: note: =E2=80=98post_index=E2=80=99 w=
+as declared here
+>>      bool post_index;
+>>           ^
+>> target/arm/translate-a64.c:2386:8: error: =E2=80=98writeback=E2=80=99 ma=
+y be used uninitialized in this function [-Werror=3Dmaybe-uninitialized]
+>>      if (writeback) {
+>>         ^
+>> target/arm/translate-a64.c:2308:10: note: =E2=80=98writeback=E2=80=99 wa=
+s declared here
+>>      bool writeback;
+>>           ^
+>>
+>> Note that idx comes from selecting 2 bits, and therefore its value
+>> can be at most 3.
+>>
+>> Signed-off-by: Emilio G. Cota <cota@braap.org>
 
-I think the first part to be merged is changes to cpu-exec.c and
-friends.  These might even go into 2.11.
+Applied to target-arm.next, thanks. (It's a bit sad that
+gcc can't figure out that the result of x & 3 is constrained
+to [0,3], but there you go.)
 
-Paolo
+> Acked-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+
+By the way, Philippe, what are you intending to convey with
+an acked-by tag? Usually "acked-by" means "I'm the maintainer
+for this area and I haven't actually reviewed this but I don't
+object to it"...
+
+thanks
+-- PMM
