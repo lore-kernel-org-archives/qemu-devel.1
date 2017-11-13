@@ -1,21 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35767)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36046)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eEGED-000535-SB
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 10:00:55 -0500
+	(envelope-from <bounces@canonical.com>) id 1eEGEn-0005Wr-UY
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 10:01:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eEGEC-0001IT-W8
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 10:00:49 -0500
-Date: Mon, 13 Nov 2017 23:00:37 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20171113145942.GA29617@lemon>
-References: <151056619347.390.15270351875314848925@bafd83ae6430>
-	<0241ad8e-dd22-a029-5918-62ed4c49cf47@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1eEGEi-0001fR-5B
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 10:01:26 -0500
+Received: from indium.canonical.com ([91.189.90.7]:42446)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eEGEh-0001ed-VB
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 10:01:20 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eEGEg-00029n-LJ
+	for <qemu-devel@nongnu.org>; Mon, 13 Nov 2017 15:01:18 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 9AACA2E80CB
+	for <qemu-devel@nongnu.org>; Mon, 13 Nov 2017 15:01:18 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0241ad8e-dd22-a029-5918-62ed4c49cf47@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] scripts/make-release: No need to delete
- pixman/.git anymore
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 13 Nov 2017 14:49:20 -0000
+From: Christophe Lyon <christophe.lyon+launchpad@gmail.com>
+Reply-To: Bug 1727737 <1727737@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150902607840.5143.15937446061017284272.malonedeb@chaenomeles.canonical.com>
+Message-Id: <151058456043.8260.14252851725051159642.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1727737] Re: qemu-arm stalls on a GCC sanitizer
+ test since qemu-2.7
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,27 +37,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, peter.maydell@linaro.org, mdroth@linux.vnet.ibm.com, qemu-block@nongnu.org
+To: qemu-devel@nongnu.org
 
-On Mon, 11/13 10:48, Thomas Huth wrote:
-> > 077         - output mismatch (see 077.out.bad)
-> > --- /tmp/qemu-test/src/tests/qemu-iotests/077.out	2017-11-13 09:38:59.000000000 +0000
-> > +++ /tmp/qemu-test/build/tests/qemu-iotests/077.out.bad	2017-11-13 09:41:20.601278693 +0000
-> > @@ -56,9 +56,9 @@
-> >  wrote XXX/XXX bytes at offset XXX
-> >  XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> >  blkdebug: Resuming request 'B'
-> > +blkdebug: Resuming request 'A'
-> >  wrote XXX/XXX bytes at offset XXX
-> >  XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> > -blkdebug: Resuming request 'A'
-> >  wrote XXX/XXX bytes at offset XXX
-> >  XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> >  wrote XXX/XXX bytes at offset XXX
-> That's certainly *not* caused by my patch. Is this already a known
-> problem? Otherwise, Fam, could you please have a look at this?
+Thanks fixing my ignorance :-)
 
-I will try to fix the test.
+So it really seems this is a feature, not a bug here.
 
-Fam
+This was a bit off-topic, but I have a pending question in comment #5:
+As a side note, doing
+$ qemu-arm -E ASAN_OPTIONS=3Ddetect_leaks=3D0 blah
+does not affect the execution, while
+$ env ASAN_OPTIONS=3Ddetect_leaks=3D0 qemu-arm blah
+does
+(my question here being: why doesn't -E propagate ASA_OPTIONS to the target=
+ code?)
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1727737
+
+Title:
+  qemu-arm stalls on a GCC sanitizer test since qemu-2.7
+
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  Hi,
+
+  I have noticed that several GCC/sanitizer tests fail with timeout when
+  executed under QEMU.
+
+  After a bit of investigation, I have noticed that this worked with
+  qemu-2.7, and started failing with qemu-2.8, and still fails with
+  qemu-2.10.1
+
+  I'm attaching a tarball containing:
+  alloca_instruments_all_paddings.exe : the testcase, and the needed libs:
+  lib/librt.so.1
+  lib/libdl.so.2
+  lib/ld-linux-armhf.so.3
+  lib/libasan.so.5
+  lib/libc.so.6
+  lib/libgcc_s.so.1
+  lib/libpthread.so.0
+  lib/libm.so.6
+
+  To reproduce the problem:
+  $ qemu-arm -cpu any -R 0 -L $PWD $PWD/alloca_instruments_all_paddings.exe
+  returns in less than a second with qemu-2.7, and never with qemu-2.8
+
+  Using -d in_asm suggests that the program "almost" completes and qemu see=
+ms to stall on:
+  0x40b6eb44: e08f4004 add r4, pc, r4
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1727737/+subscriptions
