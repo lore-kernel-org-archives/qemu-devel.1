@@ -1,17 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36373)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38916)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefan@weilnetz.de>) id 1eE8YI-00078E-Hy
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 01:49:03 -0500
+	(envelope-from <jasowang@redhat.com>) id 1eE8wd-0003Bx-NZ
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 02:14:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefan@weilnetz.de>) id 1eE8YF-0005D7-Fd
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 01:49:02 -0500
-From: Stefan Weil <sw@weilnetz.de>
-Date: Mon, 13 Nov 2017 07:48:45 +0100
-Message-Id: <20171113064845.29142-1-sw@weilnetz.de>
+	(envelope-from <jasowang@redhat.com>) id 1eE8wa-0004eI-B4
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 02:14:11 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45042)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1eE8wa-0004dq-4Y
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 02:14:08 -0500
+References: <20171106132805.19986-1-jfreimann@redhat.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <ad15537b-8a7d-3bca-7ec2-fcd37eea7756@redhat.com>
+Date: Mon, 13 Nov 2017 15:13:59 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20171106132805.19986-1-jfreimann@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH for 2.12] target/i386: Fix compiler warnings
+Subject: Re: [Qemu-devel] [PATCH] net/socket: fix coverity issue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,55 +27,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-trivial@nongnu.org
-Cc: qemu-devel@nongnu.org, Stefan Weil <sw@weilnetz.de>
+To: Jens Freimann <jfreimann@redhat.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org
 
-These gcc warnings are fixed:
 
-target/i386/translate.c:4461:12: warning:
- variable =E2=80=98prefixes=E2=80=99 might be clobbered by =E2=80=98longj=
-mp=E2=80=99 or =E2=80=98vfork=E2=80=99 [-Wclobbered]
-target/i386/translate.c:4466:9: warning:
- variable =E2=80=98rex_w=E2=80=99 might be clobbered by =E2=80=98longjmp=E2=
-=80=99 or =E2=80=98vfork=E2=80=99 [-Wclobbered]
-target/i386/translate.c:4466:16: warning:
- variable =E2=80=98rex_r=E2=80=99 might be clobbered by =E2=80=98longjmp=E2=
-=80=99 or =E2=80=98vfork=E2=80=99 [-Wclobbered]
 
-Tested with x86_64-w64-mingw32-gcc from Debian stretch.
+On 2017=E5=B9=B411=E6=9C=8806=E6=97=A5 21:28, Jens Freimann wrote:
+> This fixes coverity issue CID1005339.
+>
+> Make sure that saddr is not used uninitialized if the
+> mcast parameter is NULL.
+>
+> Cc: qemu-stable@nongnu.org
+> Reported-by: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Jens Freimann <jfreimann@redhat.com>
+> ---
+>   net/socket.c | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/net/socket.c b/net/socket.c
+> index e6b471c63d..51eaea67a0 100644
+> --- a/net/socket.c
+> +++ b/net/socket.c
+> @@ -332,7 +332,7 @@ static NetSocketState *net_socket_fd_init_dgram(Net=
+ClientState *peer,
+>                                                   const char *mcast,
+>                                                   Error **errp)
+>   {
+> -    struct sockaddr_in saddr;
+> +    struct sockaddr_in saddr =3D { 0 };
+>       int newfd;
+>       NetClientState *nc;
+>       NetSocketState *s;
+> @@ -373,7 +373,7 @@ static NetSocketState *net_socket_fd_init_dgram(Net=
+ClientState *peer,
+>       net_socket_read_poll(s, true);
+>  =20
+>       /* mcast: save bound address as dst */
+> -    if (is_connected) {
+> +    if (is_connected && mcast !=3D NULL) {
+>           s->dgram_dst =3D saddr;
+>           snprintf(nc->info_str, sizeof(nc->info_str),
+>                    "socket: fd=3D%d (cloned mcast=3D%s:%d)",
 
-Signed-off-by: Stefan Weil <sw@weilnetz.de>
----
- target/i386/translate.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
-
-diff --git a/target/i386/translate.c b/target/i386/translate.c
-index 088a9d9766..f410938244 100644
---- a/target/i386/translate.c
-+++ b/target/i386/translate.c
-@@ -4467,10 +4467,7 @@ static target_ulong disas_insn(DisasContext *s, CP=
-UState *cpu)
-     target_ulong pc_start =3D s->base.pc_next;
-=20
-     s->pc_start =3D s->pc =3D pc_start;
--    prefixes =3D 0;
-     s->override =3D -1;
--    rex_w =3D -1;
--    rex_r =3D 0;
- #ifdef TARGET_X86_64
-     s->rex_x =3D 0;
-     s->rex_b =3D 0;
-@@ -4484,6 +4481,10 @@ static target_ulong disas_insn(DisasContext *s, CP=
-UState *cpu)
-         return s->pc;
-     }
-=20
-+    prefixes =3D 0;
-+    rex_w =3D -1;
-+    rex_r =3D 0;
-+
-  next_byte:
-     b =3D x86_ldub_code(env, s);
-     /* Collect prefixes.  */
---=20
-2.11.0
+Applied, thanks.
