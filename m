@@ -1,38 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53331)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53800)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1eEIIc-0008B8-37
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 12:13:31 -0500
+	(envelope-from <armbru@redhat.com>) id 1eEIJS-0000Sk-58
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 12:14:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1eEIIX-00059E-Rr
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 12:13:30 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:47650)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1eEIIX-00057W-Hp
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 12:13:25 -0500
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vADHCBcD105863
-	for <qemu-devel@nongnu.org>; Mon, 13 Nov 2017 12:13:17 -0500
-Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2e7dtty2mc-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 13 Nov 2017 12:13:17 -0500
-Received: from localhost
-	by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Mon, 13 Nov 2017 12:13:16 -0500
-References: <1510173421-19895-1-git-send-email-stefanb@linux.vnet.ibm.com>
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Mon, 13 Nov 2017 12:13:13 -0500
+	(envelope-from <armbru@redhat.com>) id 1eEIJQ-0005W6-MD
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 12:14:22 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20171113152424.25381-1-eblake@redhat.com>
+Date: Mon, 13 Nov 2017 18:14:06 +0100
+In-Reply-To: <20171113152424.25381-1-eblake@redhat.com> (Eric Blake's message
+	of "Mon, 13 Nov 2017 09:24:24 -0600")
+Message-ID: <87h8tyyuch.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <1510173421-19895-1-git-send-email-stefanb@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Message-Id: <acb8ccb5-ea02-cd5b-0f70-612dd5e1819b@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v2] tpm_emulator: Add a caching layer for
- the TPM Established flag
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH for-2.11] nbd/client: Use error_prepend()
+ correctly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,75 +23,248 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, marcandre.lureau@redhat.com
-Cc: amarnath.valluri@intel.com
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, vsementsov@virtuozzo.com, qemu-stable@nongnu.org, qemu-block@nongnu.org
 
-On 11/08/2017 03:37 PM, Stefan Berger wrote:
-> Add a caching layer for the TPM established flag so that we don't
-> need to go to the emulator every time the flag is read by accessing
-> the REG_ACCESS register.
+Eric Blake <eblake@redhat.com> writes:
+
+> When using error prepend(), it is necessary to end with a space
+> in the format string; otherwise, messages come out incorrectly,
+> such as when connecting to a socket that hangs up immediately:
 >
-> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
-
-Can anyone have a look, please?
-
-      Stefan
-
+> can't open device nbd://localhost:10809/: Failed to read dataUnexpected end-of-file before all bytes were read
 >
-> v1->v2:
->   - move the caching to the backend layer since detecting the
->     TPM 1.2 TSC_ResetEstablishmentBit() command is easier to do
->     here.
+> Originally botched in commit e44ed99d, then several more instances
+> added in the meantime.
+>
+> CC: qemu-stable@nongnu.org
+> Signed-off-by: Eric Blake <eblake@redhat.com>
 > ---
->   hw/tpm/tpm_emulator.c | 17 ++++++++++++++---
->   1 file changed, 14 insertions(+), 3 deletions(-)
+>  nbd/client.c | 50 ++++++++++++++++++++++++++------------------------
+>  1 file changed, 26 insertions(+), 24 deletions(-)
 >
-> diff --git a/hw/tpm/tpm_emulator.c b/hw/tpm/tpm_emulator.c
-> index 9aaec8e..507e2cb 100644
-> --- a/hw/tpm/tpm_emulator.c
-> +++ b/hw/tpm/tpm_emulator.c
-> @@ -71,6 +71,9 @@ typedef struct TPMEmulator {
->       ptm_cap caps; /* capabilities of the TPM */
->       uint8_t cur_locty_number; /* last set locality */
->       Error *migration_blocker;
-> +
-> +    unsigned int established_flag:1;
-> +    unsigned int established_flag_cached:1;
->   } TPMEmulator;
+> diff --git a/nbd/client.c b/nbd/client.c
+> index 1880103d2a..4e15fc484d 100644
+> --- a/nbd/client.c
+> +++ b/nbd/client.c
+> @@ -79,12 +79,12 @@ static int nbd_send_option_request(QIOChannel *ioc, uint32_t opt,
+>      stl_be_p(&req.length, len);
 >
+>      if (nbd_write(ioc, &req, sizeof(req), errp) < 0) {
+> -        error_prepend(errp, "Failed to send option request header");
+> +        error_prepend(errp, "Failed to send option request header: ");
+>          return -1;
+>      }
 >
-> @@ -277,16 +280,22 @@ static bool tpm_emulator_get_tpm_established_flag(TPMBackend *tb)
->       TPMEmulator *tpm_emu = TPM_EMULATOR(tb);
->       ptm_est est;
+>      if (len && nbd_write(ioc, (char *) data, len, errp) < 0) {
+> -        error_prepend(errp, "Failed to send option request data");
+> +        error_prepend(errp, "Failed to send option request data: ");
+>          return -1;
+>      }
 >
-> -    DPRINTF("%s", __func__);
-> +    if (tpm_emu->established_flag_cached) {
-> +        return tpm_emu->established_flag;
-> +    }
-> +
->       if (tpm_emulator_ctrlcmd(&tpm_emu->ctrl_chr, CMD_GET_TPMESTABLISHED, &est,
->                                0, sizeof(est)) < 0) {
->           error_report("tpm-emulator: Could not get the TPM established flag: %s",
->                        strerror(errno));
->           return false;
->       }
-> -    DPRINTF("established flag: %0x", est.u.resp.bit);
-> +    DPRINTF("got established flag: %0x", est.u.resp.bit);
-> +
-> +    tpm_emu->established_flag_cached = 1;
-> +    tpm_emu->established_flag = (est.u.resp.bit != 0);
+> @@ -113,7 +113,7 @@ static int nbd_receive_option_reply(QIOChannel *ioc, uint32_t opt,
+>  {
+>      QEMU_BUILD_BUG_ON(sizeof(*reply) != 20);
+>      if (nbd_read(ioc, reply, sizeof(*reply), errp) < 0) {
+> -        error_prepend(errp, "failed to read option reply");
+> +        error_prepend(errp, "failed to read option reply: ");
+>          nbd_send_opt_abort(ioc);
+>          return -1;
+>      }
+
+Preexisting: inconsistent capitalization (Failed vs. failed).
+
+In general, prepend chains looks slightly less ugly when each link
+starts with a lower case letter.  Compare:
+
+    can't open device nbd://localhost:10809/: failed to read data: unexpected end-of-file before all bytes were read
+    Can't open device nbd://localhost:10809/: Failed to read data: Unexpected end-of-file before all bytes were read
+
+Neither message is really good, but the second one is ugly to boot.
+
+> @@ -166,7 +166,7 @@ static int nbd_handle_reply_err(QIOChannel *ioc, nbd_opt_reply *reply,
+>          msg = g_malloc(reply->length + 1);
+>          if (nbd_read(ioc, msg, reply->length, errp) < 0) {
+>              error_prepend(errp, "failed to read option error 0x%" PRIx32
+> -                          " (%s) message",
+> +                          " (%s) message: ",
+>                            reply->type, nbd_rep_lookup(reply->type));
+>              goto cleanup;
+>          }
+> @@ -277,7 +277,7 @@ static int nbd_receive_list(QIOChannel *ioc, const char *want, bool *match,
+>          return -1;
+>      }
+>      if (nbd_read(ioc, &namelen, sizeof(namelen), errp) < 0) {
+> -        error_prepend(errp, "failed to read option name length");
+> +        error_prepend(errp, "failed to read option name length: ");
+>          nbd_send_opt_abort(ioc);
+>          return -1;
+>      }
+> @@ -290,7 +290,8 @@ static int nbd_receive_list(QIOChannel *ioc, const char *want, bool *match,
+>      }
+>      if (namelen != strlen(want)) {
+>          if (nbd_drop(ioc, len, errp) < 0) {
+> -            error_prepend(errp, "failed to skip export name with wrong length");
+> +            error_prepend(errp,
+> +                          "failed to skip export name with wrong length: ");
+>              nbd_send_opt_abort(ioc);
+>              return -1;
+>          }
+> @@ -299,14 +300,14 @@ static int nbd_receive_list(QIOChannel *ioc, const char *want, bool *match,
 >
-> -    return (est.u.resp.bit != 0);
-> +    return tpm_emu->established_flag;
->   }
+>      assert(namelen < sizeof(name));
+>      if (nbd_read(ioc, name, namelen, errp) < 0) {
+> -        error_prepend(errp, "failed to read export name");
+> +        error_prepend(errp, "failed to read export name: ");
+>          nbd_send_opt_abort(ioc);
+>          return -1;
+>      }
+>      name[namelen] = '\0';
+>      len -= namelen;
+>      if (nbd_drop(ioc, len, errp) < 0) {
+> -        error_prepend(errp, "failed to read export description");
+> +        error_prepend(errp, "failed to read export description: ");
+>          nbd_send_opt_abort(ioc);
+>          return -1;
+>      }
+> @@ -390,7 +391,7 @@ static int nbd_opt_go(QIOChannel *ioc, const char *wantname,
+>              return -1;
+>          }
+>          if (nbd_read(ioc, &type, sizeof(type), errp) < 0) {
+> -            error_prepend(errp, "failed to read info type");
+> +            error_prepend(errp, "failed to read info type: ");
+>              nbd_send_opt_abort(ioc);
+>              return -1;
+>          }
+> @@ -405,13 +406,13 @@ static int nbd_opt_go(QIOChannel *ioc, const char *wantname,
+>                  return -1;
+>              }
+>              if (nbd_read(ioc, &info->size, sizeof(info->size), errp) < 0) {
+> -                error_prepend(errp, "failed to read info size");
+> +                error_prepend(errp, "failed to read info size: ");
+>                  nbd_send_opt_abort(ioc);
+>                  return -1;
+>              }
+>              be64_to_cpus(&info->size);
+>              if (nbd_read(ioc, &info->flags, sizeof(info->flags), errp) < 0) {
+> -                error_prepend(errp, "failed to read info flags");
+> +                error_prepend(errp, "failed to read info flags: ");
+>                  nbd_send_opt_abort(ioc);
+>                  return -1;
+>              }
+> @@ -428,7 +429,7 @@ static int nbd_opt_go(QIOChannel *ioc, const char *wantname,
+>              }
+>              if (nbd_read(ioc, &info->min_block, sizeof(info->min_block),
+>                           errp) < 0) {
+> -                error_prepend(errp, "failed to read info minimum block size");
+> +                error_prepend(errp, "failed to read info minimum block size: ");
+>                  nbd_send_opt_abort(ioc);
+>                  return -1;
+>              }
+> @@ -441,7 +442,8 @@ static int nbd_opt_go(QIOChannel *ioc, const char *wantname,
+>              }
+>              if (nbd_read(ioc, &info->opt_block, sizeof(info->opt_block),
+>                           errp) < 0) {
+> -                error_prepend(errp, "failed to read info preferred block size");
+> +                error_prepend(errp,
+> +                              "failed to read info preferred block size: ");
+>                  nbd_send_opt_abort(ioc);
+>                  return -1;
+>              }
+> @@ -455,7 +457,7 @@ static int nbd_opt_go(QIOChannel *ioc, const char *wantname,
+>              }
+>              if (nbd_read(ioc, &info->max_block, sizeof(info->max_block),
+>                           errp) < 0) {
+> -                error_prepend(errp, "failed to read info maximum block size");
+> +                error_prepend(errp, "failed to read info maximum block size: ");
+>                  nbd_send_opt_abort(ioc);
+>                  return -1;
+>              }
+> @@ -467,7 +469,7 @@ static int nbd_opt_go(QIOChannel *ioc, const char *wantname,
+>          default:
+>              trace_nbd_opt_go_info_unknown(type, nbd_info_lookup(type));
+>              if (nbd_drop(ioc, len, errp) < 0) {
+> -                error_prepend(errp, "Failed to read info payload");
+> +                error_prepend(errp, "Failed to read info payload: ");
+>                  nbd_send_opt_abort(ioc);
+>                  return -1;
+>              }
+> @@ -618,7 +620,7 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name,
+>      }
 >
->   static int tpm_emulator_reset_tpm_established_flag(TPMBackend *tb,
-> @@ -317,6 +326,8 @@ static int tpm_emulator_reset_tpm_established_flag(TPMBackend *tb,
->           return -1;
->       }
+>      if (nbd_read(ioc, buf, 8, errp) < 0) {
+> -        error_prepend(errp, "Failed to read data");
+> +        error_prepend(errp, "Failed to read data: ");
+>          goto fail;
+>      }
 >
-> +    tpm_emu->established_flag_cached = 0;
-> +
->       return 0;
->   }
+> @@ -637,7 +639,7 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name,
+>      }
 >
+>      if (nbd_read(ioc, &magic, sizeof(magic), errp) < 0) {
+> -        error_prepend(errp, "Failed to read magic");
+> +        error_prepend(errp, "Failed to read magic: ");
+>          goto fail;
+>      }
+>      magic = be64_to_cpu(magic);
+> @@ -649,7 +651,7 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name,
+>          bool fixedNewStyle = false;
+>
+>          if (nbd_read(ioc, &globalflags, sizeof(globalflags), errp) < 0) {
+> -            error_prepend(errp, "Failed to read server flags");
+> +            error_prepend(errp, "Failed to read server flags: ");
+>              goto fail;
+>          }
+>          globalflags = be16_to_cpu(globalflags);
+> @@ -665,7 +667,7 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name,
+>          /* client requested flags */
+>          clientflags = cpu_to_be32(clientflags);
+>          if (nbd_write(ioc, &clientflags, sizeof(clientflags), errp) < 0) {
+> -            error_prepend(errp, "Failed to send clientflags field");
+> +            error_prepend(errp, "Failed to send clientflags field: ");
+>              goto fail;
+>          }
+>          if (tlscreds) {
+> @@ -727,13 +729,13 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name,
+>
+>          /* Read the response */
+>          if (nbd_read(ioc, &info->size, sizeof(info->size), errp) < 0) {
+> -            error_prepend(errp, "Failed to read export length");
+> +            error_prepend(errp, "Failed to read export length: ");
+>              goto fail;
+>          }
+>          be64_to_cpus(&info->size);
+>
+>          if (nbd_read(ioc, &info->flags, sizeof(info->flags), errp) < 0) {
+> -            error_prepend(errp, "Failed to read export flags");
+> +            error_prepend(errp, "Failed to read export flags: ");
+>              goto fail;
+>          }
+>          be16_to_cpus(&info->flags);
+> @@ -750,13 +752,13 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name,
+>          }
+>
+>          if (nbd_read(ioc, &info->size, sizeof(info->size), errp) < 0) {
+> -            error_prepend(errp, "Failed to read export length");
+> +            error_prepend(errp, "Failed to read export length: ");
+>              goto fail;
+>          }
+>          be64_to_cpus(&info->size);
+>
+>          if (nbd_read(ioc, &oldflags, sizeof(oldflags), errp) < 0) {
+> -            error_prepend(errp, "Failed to read export flags");
+> +            error_prepend(errp, "Failed to read export flags: ");
+>              goto fail;
+>          }
+>          be32_to_cpus(&oldflags);
+> @@ -772,7 +774,7 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name,
+>
+>      trace_nbd_receive_negotiate_size_flags(info->size, info->flags);
+>      if (zeroes && nbd_drop(ioc, 124, errp) < 0) {
+> -        error_prepend(errp, "Failed to read reserved block");
+> +        error_prepend(errp, "Failed to read reserved block: ");
+>          goto fail;
+>      }
+>      rc = 0;
+
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
