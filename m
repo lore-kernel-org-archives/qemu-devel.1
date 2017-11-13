@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36678)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38128)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eEIt1-0005Zk-7r
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 12:51:08 -0500
+	(envelope-from <eblake@redhat.com>) id 1eEIxA-0007bN-G8
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 12:55:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eEIt0-0003eY-Bc
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 12:51:07 -0500
-References: <20171113162053.58795-1-vsementsov@virtuozzo.com>
-	<20171113162053.58795-2-vsementsov@virtuozzo.com>
+	(envelope-from <eblake@redhat.com>) id 1eEIx6-0005VY-BH
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 12:55:24 -0500
+References: <CAFEAcA_bXripv8_O8aRuDbdYQ3oWeVzdb8GO=o9j2oddYrg-0A@mail.gmail.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <12463b01-41eb-4d17-65c0-a94de499e753@redhat.com>
-Date: Mon, 13 Nov 2017 11:50:50 -0600
+Message-ID: <a0d53b78-d9aa-7aa9-9fa5-8b29d53c1a9b@redhat.com>
+Date: Mon, 13 Nov 2017 11:55:13 -0600
 MIME-Version: 1.0
-In-Reply-To: <20171113162053.58795-2-vsementsov@virtuozzo.com>
+In-Reply-To: <CAFEAcA_bXripv8_O8aRuDbdYQ3oWeVzdb8GO=o9j2oddYrg-0A@mail.gmail.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="bpAfEjNjU9Ku4HeajLlJPcTqiBTBxIOkV"
-Subject: Re: [Qemu-devel] [PATCH 1/4 for-2.11?] block/dirty-bitmap: add lock
- to bdrv_enable/disable_dirty_bitmap
+	boundary="3DJ41QM1XfE1W5KXw2LjMOEHMks85ctuI"
+Subject: Re: [Qemu-devel] using "qemu-img convert -O qcow2" to convert qcow
+ v1 to v2 creates a qcow v3 file?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,67 +24,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, kwolf@redhat.com, jsnow@redhat.com, famz@redhat.com, stefanha@redhat.com, armbru@redhat.com, pbonzini@redhat.com, den@openvz.org, nshirokovskiy@virtuozzo.com, mnestratov@virtuozzo.com
+To: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Qemu-block <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---bpAfEjNjU9Ku4HeajLlJPcTqiBTBxIOkV
+--3DJ41QM1XfE1W5KXw2LjMOEHMks85ctuI
 From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, kwolf@redhat.com, jsnow@redhat.com, famz@redhat.com,
- stefanha@redhat.com, armbru@redhat.com, pbonzini@redhat.com, den@openvz.org,
- nshirokovskiy@virtuozzo.com, mnestratov@virtuozzo.com
-Message-ID: <12463b01-41eb-4d17-65c0-a94de499e753@redhat.com>
-Subject: Re: [PATCH 1/4 for-2.11?] block/dirty-bitmap: add lock to
- bdrv_enable/disable_dirty_bitmap
-References: <20171113162053.58795-1-vsementsov@virtuozzo.com>
- <20171113162053.58795-2-vsementsov@virtuozzo.com>
-In-Reply-To: <20171113162053.58795-2-vsementsov@virtuozzo.com>
+To: Peter Maydell <peter.maydell@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Qemu-block <qemu-block@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>
+Message-ID: <a0d53b78-d9aa-7aa9-9fa5-8b29d53c1a9b@redhat.com>
+Subject: Re: [Qemu-devel] using "qemu-img convert -O qcow2" to convert qcow v1
+ to v2 creates a qcow v3 file?
+References: <CAFEAcA_bXripv8_O8aRuDbdYQ3oWeVzdb8GO=o9j2oddYrg-0A@mail.gmail.com>
+In-Reply-To: <CAFEAcA_bXripv8_O8aRuDbdYQ3oWeVzdb8GO=o9j2oddYrg-0A@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 11/13/2017 10:20 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Like other setters here these functions should take a lock.
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  block/dirty-bitmap.c | 4 ++++
->  1 file changed, 4 insertions(+)
+On 11/13/2017 11:14 AM, Peter Maydell wrote:> I have a qcow v1 file
+which I created by mistake (forgetting that
+> you need to tell qemu-img create 'qcow2' and not just 'qcow'),
+> which I want to convert to a v2 file so I can put snapshots into
+> it. But when I try to do this with qemu-img convert it creates a
+> v3 file instead:
+>
+> $ file hda-old.qcow
+> hda-old.qcow: QEMU QCOW Image (v1), 5368709120 bytes
+> $ build/x86/qemu-img convert -O qcow2 hda-old.qcow hda.qcow2
+> $ file hda.qcow2
+> hda.qcow2: QEMU QCOW Image (v3), 5368709120 bytes
+>
+> and if you then try to use that in QEMU it complains:
+>
+> qemu-system-aarch64: -drive if=3Dnone,file=3Dhda.qcow2,format=3Dqcow,id=
+=3Dhd:
+> Unsupported qcow version 3
+>
+> What am I missing here?
+qcow2 has two versions; v2 (aka compat=3D0.10), and v3 (aka compat=3D1.1)=
+=2E
+We changed qemu-img to create v3 by default several years ago, but there
+are older qemu binaries (hello, CentOS 6) that still don't understand
+v3.  Your qemu-system-aarch64 appears to be one of these older binaries.
 
-Should this patch be in 2.11?
-
->=20
-> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-> index bd04e991b1..2a0bcd9e51 100644
-> --- a/block/dirty-bitmap.c
-> +++ b/block/dirty-bitmap.c
-> @@ -397,15 +397,19 @@ void bdrv_remove_persistent_dirty_bitmap(BlockDri=
-verState *bs,
->  /* Called with BQL taken.  */
->  void bdrv_disable_dirty_bitmap(BdrvDirtyBitmap *bitmap)
->  {
-> +    bdrv_dirty_bitmap_lock(bitmap);
->      assert(!bdrv_dirty_bitmap_frozen(bitmap));
->      bitmap->disabled =3D true;
-> +    bdrv_dirty_bitmap_unlock(bitmap);
-
-Why do we need this lock in addition to BQL?
-
->  }
-> =20
->  /* Called with BQL taken.  */
->  void bdrv_enable_dirty_bitmap(BdrvDirtyBitmap *bitmap)
->  {
-> +    bdrv_dirty_bitmap_lock(bitmap);
->      assert(!bdrv_dirty_bitmap_frozen(bitmap));
->      bitmap->disabled =3D false;
-> +    bdrv_dirty_bitmap_unlock(bitmap);
-
-Again, why do we need this in addition to BQL?
-
-The commit message needs more details about a scenario where our
-existing BQL lock is insufficient to prevent misuse of bitmap->disabled.
+Try:
+qemu-img convert -O qcow2 -o compat=3D0.10 hda-old.qcow hda.qcow2
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -93,7 +77,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---bpAfEjNjU9Ku4HeajLlJPcTqiBTBxIOkV
+--3DJ41QM1XfE1W5KXw2LjMOEHMks85ctuI
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -102,14 +86,14 @@ Content-Disposition: attachment; filename="signature.asc"
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloJ23oACgkQp6FrSiUn
-Q2qHOAf+OAQSeQCPtw7zeEnkX0MbpBr21Ifj6TiNXMO4W+xOXKnjY0z41JlnCY4t
-l45IIPXCJY0XL89NC+EQGyJ6TSsMnGHnw22zV5O5FCYRQqM9Yv8o5Q6NjWwov8GN
-7mgv9MrWPqRur1/0Osj83GmvcUMaAgzGSnuuDvypvt4farfFR+hyOMHNEJVxaSRZ
-dWAQkLFx+P/OAERGdTjMpFk/lCAmQXG/CH/R4CBFvx8pHldzflQhGPIWiSxrRK4+
-TsgRaXIcuoBoFYwSACMPlUZUQUdhm8O3HfppNqujp7TMiWP1S5YHWdZkOPBvZq9K
-TiYo1hdB5lEf1NrugEmSjOb5C5tJKA==
-=RNXZ
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloJ3IEACgkQp6FrSiUn
+Q2rQrwf/VTeHK+feKJzrUuVsNggEM0H0ptpp3uO5tencCpFCHN5ibi7xupqz16dM
+HA7gVZsClIGyl7MP0h0bcj96kZ0CbGRabzfbYj70e6v7NxHvlFDr8rMA1FX5lvqR
+j/NGAjRnk+hrBhx1ujt39rRZaGrHc2ttPR5TI74xc75kNkvHJc8a/iRsahPYg9lw
+vd4/WLKZgPuvoesn5JwTcD+d+r3z865CMVPPJUlxaISdlSZRGVKkkSbaWZTmXqhP
+fSIsYqTdi0nRjDqsDrfroPcd5kysU8wnLCQS76/9MZw3qVEI0zRHSb2bfXh7wgcK
++JgHpr2UTkvxG2qcwwQ8pN/PHKJDyw==
+=aK5l
 -----END PGP SIGNATURE-----
 
---bpAfEjNjU9Ku4HeajLlJPcTqiBTBxIOkV--
+--3DJ41QM1XfE1W5KXw2LjMOEHMks85ctuI--
