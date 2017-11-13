@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47477)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48223)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1eEFSO-0004CQ-5o
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 09:11:30 -0500
+	(envelope-from <stefanha@redhat.com>) id 1eEFTV-0005n1-Df
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 09:12:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1eEFSI-0007kj-H1
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 09:11:24 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:38322)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1eEFSI-0007Yd-A7
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 09:11:18 -0500
-Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1eEFS3-00021y-0W
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 14:11:03 +0000
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 13 Nov 2017 14:11:36 +0000
-Message-Id: <1510582304-27058-2-git-send-email-peter.maydell@linaro.org>
-In-Reply-To: <1510582304-27058-1-git-send-email-peter.maydell@linaro.org>
-References: <1510582304-27058-1-git-send-email-peter.maydell@linaro.org>
+	(envelope-from <stefanha@redhat.com>) id 1eEFTR-0008VR-Ek
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 09:12:33 -0500
+Date: Mon, 13 Nov 2017 14:12:17 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20171113141217.GC27765@stefanha-x1.localdomain>
+References: <20171110151934.16883-1-stefanha@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 1/9] arm/translate-a64: mark path as unreachable
- to eliminate warning
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="c3bfwLpm8qysLVxt"
+Content-Disposition: inline
+In-Reply-To: <20171110151934.16883-1-stefanha@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4] throttle-groups: drain before detaching
+ ThrottleState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,50 +25,62 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Manos Pitsidianakis <el13635@mail.ntua.gr>, Alberto Garcia <berto@igalia.com>
 
-From: "Emilio G. Cota" <cota@braap.org>
 
-Fixes the following warning when compiling with gcc 5.4.0 with -O1
-optimizations and --enable-debug:
+--c3bfwLpm8qysLVxt
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-target/arm/translate-a64.c: In function ‘aarch64_tr_translate_insn’:
-target/arm/translate-a64.c:2361:8: error: ‘post_index’ may be used uninitialized in this function [-Werror=maybe-uninitialized]
-     if (!post_index) {
-        ^
-target/arm/translate-a64.c:2307:10: note: ‘post_index’ was declared here
-     bool post_index;
-          ^
-target/arm/translate-a64.c:2386:8: error: ‘writeback’ may be used uninitialized in this function [-Werror=maybe-uninitialized]
-     if (writeback) {
-        ^
-target/arm/translate-a64.c:2308:10: note: ‘writeback’ was declared here
-     bool writeback;
-          ^
+On Fri, Nov 10, 2017 at 03:19:34PM +0000, Stefan Hajnoczi wrote:
+> I/O requests hang after stop/cont commands at least since QEMU 2.10.0
+> with -drive iops=3D100:
+>=20
+>   (guest)$ dd if=3D/dev/zero of=3D/dev/vdb oflag=3Ddirect count=3D1000
+>   (qemu) stop
+>   (qemu) cont
+>   ...I/O is stuck...
+>=20
+> This happens because blk_set_aio_context() detaches the ThrottleState
+> while requests may still be in flight:
+>=20
+>   if (tgm->throttle_state) {
+>       throttle_group_detach_aio_context(tgm);
+>       throttle_group_attach_aio_context(tgm, new_context);
+>   }
+>=20
+> This patch encloses the detach/attach calls in a drained region so no
+> I/O request is left hanging.  Also add assertions so we don't make the
+> same mistake again in the future.
+>=20
+> Reported-by: Yongxue Hong <yhong@redhat.com>
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+> v4:
+>  * Simplified patch in response to Berto's review
+> ---
+>  block/block-backend.c   | 2 ++
+>  block/throttle-groups.c | 6 ++++++
+>  2 files changed, 8 insertions(+)
 
-Note that idx comes from selecting 2 bits, and therefore its value
-can be at most 3.
+Thanks, applied to my block tree:
+https://github.com/stefanha/qemu/commits/block
 
-Signed-off-by: Emilio G. Cota <cota@braap.org>
-Acked-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-id: 1510087611-1851-1-git-send-email-cota@braap.org
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- target/arm/translate-a64.c | 2 ++
- 1 file changed, 2 insertions(+)
+Stefan
 
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index caca05a..625ef2d 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -2351,6 +2351,8 @@ static void disas_ldst_reg_imm9(DisasContext *s, uint32_t insn,
-         post_index = false;
-         writeback = true;
-         break;
-+    default:
-+        g_assert_not_reached();
-     }
- 
-     if (rn == 31) {
--- 
-2.7.4
+--c3bfwLpm8qysLVxt
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJaCahBAAoJEJykq7OBq3PIso4H/RsfxWhX9wm4HvRwU71HD0NO
+zsOooLq3HK2D1mgU2uAn4QGDC/+78j4/8C7RDcBppBiMF0hni3bZd2GGju9udUOA
+1O7fJnr4mG1w3luMecQRkcp6FOLspAKe6uV88kbNZ3kCO2MhXm50MzVuBf8a6IDK
+rPtH0bL36hZFMKOCZZABAyYidPVygK6Cbx04/cOr2UB7SVWmY8kN9ssP9cPd+dX/
+boVNGuZTQo9f/sBM6udPRhQYN33oBipL0OkdlshO0mKvjlJicpDVoeMOG1Pu52sw
+3S3EEeHKQAGgDjPpfmHnHY+oSrTmIkCCiwsl/96GJOQ5moHzd35X5Tqp0zqB5tY=
+=R3+g
+-----END PGP SIGNATURE-----
+
+--c3bfwLpm8qysLVxt--
