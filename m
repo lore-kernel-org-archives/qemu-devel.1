@@ -1,23 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33753)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35658)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eEG8v-0002SS-W8
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 09:55:24 -0500
+	(envelope-from <famz@redhat.com>) id 1eEGE3-0004pI-Gg
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 10:00:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eEG8p-0007TL-Sa
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 09:55:21 -0500
-References: <20171112013936.5942-1-eblake@redhat.com>
-	<0f61ba9c-439d-eab7-6657-d8088b9adf96@virtuozzo.com>
-	<c9b80c9d-4131-a7f6-6283-6aadf9d50c7d@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <687789bb-3eb9-98fc-a84e-14a6e0b27e02@virtuozzo.com>
-Date: Mon, 13 Nov 2017 17:55:01 +0300
-MIME-Version: 1.0
-In-Reply-To: <c9b80c9d-4131-a7f6-6283-6aadf9d50c7d@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH for-2.11] nbd: Don't crash when server
- reports NBD_CMD_READ failure
+	(envelope-from <famz@redhat.com>) id 1eEGE1-0001Ce-Vw
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 10:00:39 -0500
+From: Fam Zheng <famz@redhat.com>
+Date: Mon, 13 Nov 2017 23:00:26 +0800
+Message-Id: <20171113150026.4743-1-famz@redhat.com>
+Subject: [Qemu-devel] [PATCH] iotests: 077: Filter out 'resume' lines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,114 +17,151 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
-13.11.2017 17:45, Eric Blake wrote:
-> On 11/13/2017 05:37 AM, Vladimir Sementsov-Ogievskiy wrote:
->> 12.11.2017 04:39, Eric Blake wrote:
->>> If a server fails a read, for example with EIO, but the connection
->>> is still live, then we would crash trying to print a non-existent
->>> error message.=C2=A0 Bug introduced in commit f140e300.
->>>
->>> Signed-off-by: Eric Blake <eblake@redhat.com>
->>> ---
->>>  =C2=A0 block/nbd-client.c | 4 ++--
->>>  =C2=A0 1 file changed, 2 insertions(+), 2 deletions(-)
->>>
->>> diff --git a/block/nbd-client.c b/block/nbd-client.c
->>> index b44d4d4a01..5f3375a970 100644
->>> --- a/block/nbd-client.c
->>> +++ b/block/nbd-client.c
->>> @@ -78,7 +78,7 @@ static coroutine_fn void nbd_read_reply_entry(void
->>> *opaque)
->>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 while (!s->quit) {
->>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 assert(s->reply=
-.handle =3D=3D 0);
->>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret =3D nbd_rec=
-eive_reply(s->ioc, &s->reply, &local_err);
->> hmm.
->>
->> /* nbd_receive_reply
->>  =C2=A0* Returns 1 on success
->>  =C2=A0*=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 0 on eof, when =
-no data was read (errp is not set)
->>  =C2=A0*=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 negative errno =
-on failure (errp is set)
->>  =C2=A0*/
->> int nbd_receive_reply(QIOChannel *ioc, NBDReply *reply, Error **errp)
->>
->>
->> - looks like errp should be set if ret < 0. may be the function should
->> be fixed?
->> - don't you think that this function returns transferred server error?
->> it doesn't.
->>
->>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (ret < 0) {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (local_err) {
->>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 error_report_err(local_err);
-> In my testing, I did not trip on this error_report_err() crashing.
-> Which means I think we are already honoring our contract:
-> nbd_receive_reply() is setting local_err if it returns -1.  Thus, for
-> this call site, 'if (ret < 0)' is equivalent to 'if (local_err)'.  The
-> only reason to change it, then, is for consistency with the other 2
-> callers of error_report_err() in this file...
->
->>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (ret <=3D 0)=
- {
->>> @@ -681,7 +681,7 @@ int nbd_client_co_preadv(BlockDriverState *bs,
->>> uint64_t offset,
->>>
->>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret =3D nbd_co_receive_cmdread_reply(cl=
-ient, request.handle,
->>> offset, qiov,
->>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 &local_err);
->>> -=C2=A0=C2=A0=C2=A0 if (ret < 0) {
->>> +=C2=A0=C2=A0=C2=A0 if (local_err) {
->>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_report_er=
-r(local_err);
->>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return ret;
->> but here, it looks like you are right. My first attempt was to store
->> server error to ret and
->> server error msg to errp (bad idea, as I can see now), but you proposed
->> to do not print every server error msg and
->> deleted this functionality. And now we have a set of functions which can
->> return ret < 0
->> and not set errp..
-> Indeed, this is the caller that MUST return a negative value to get the
-> caller to report a failed operation, but where the negative value does
-> NOT imply a dead connection unless local_err was also set, so here, we
-> must not print anything unless local_err was set.  I caught one of the
-> two spots like this while revising your patch prior to soft freeze, but
-> missed this one.
->
->> It looks very confusing, I think. Better solution is
->> to refactor this somehow,
->> may be not mixing server-error-reply with local normal errors..
-> A refactoring may be nice, but it would be 2.12 material; at this point,
-> I want to minimize what further changes go into 2.11.  That said,
->
->> For now, for second chunk:
-> I see no problem with both chunks going in.  The second is a bug fix,
-> but the first is for consistency, and I'd rather have all callers to
-> error_report_err() look consistent, rather than trying to remember that
-> 'ret < 0' does not always imply errp is set.
+In the "Overlapping multiple requests" cases, the 3rd reqs (the break
+point B) doesn't wait for the 2nd, and once resumed the I/O will just
+continue.  This is because the 2nd is already waiting for the 1st, and
+in wait_serialising_requests() there is:
 
-ok, lets proceed with both chunks.
+    /* If the request is already (indirectly) waiting for us, or
+     * will wait for us as soon as it wakes up, then just go on
+     * (instead of producing a deadlock in the former case). */
+    if (!req->waiting_for) {
+        /* actually break */
+        ...
+    }
 
->
->> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>
->>
->>
+Consequently, the following "sleep 100; resume A" command races with the
+completion of that request, and sometimes results in an unexpected
+order of output:
 
+> @@ -56,9 +56,9 @@
+>  wrote XXX/XXX bytes at offset XXX
+>  XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+>  blkdebug: Resuming request 'B'
+> +blkdebug: Resuming request 'A'
+>  wrote XXX/XXX bytes at offset XXX
+>  XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+> -blkdebug: Resuming request 'A'
+>  wrote XXX/XXX bytes at offset XXX
+>  XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+>  wrote XXX/XXX bytes at offset XXX
 
---=20
-Best regards,
-Vladimir
+Filter out the "Resuming request" lines to make the output
+deterministic.
+
+Reported-by: Patchew <no-reply@patchew.org>
+Signed-off-by: Fam Zheng <famz@redhat.com>
+---
+ tests/qemu-iotests/077     |  3 ++-
+ tests/qemu-iotests/077.out | 48 ++++++++++++++++------------------------------
+ 2 files changed, 18 insertions(+), 33 deletions(-)
+
+diff --git a/tests/qemu-iotests/077 b/tests/qemu-iotests/077
+index d2d2a2d687..b3c6fb1370 100755
+--- a/tests/qemu-iotests/077
++++ b/tests/qemu-iotests/077
+@@ -188,7 +188,8 @@ EOF
+ test_io | $QEMU_IO  | _filter_qemu_io | \
+     sed -e 's,[0-9/]* bytes at offset [0-9]*,XXX/XXX bytes at offset XXX,g' \
+         -e 's/^[0-9]* \(bytes\|KiB\)/XXX bytes/' \
+-        -e '/Suspended/d'
++        -e '/Suspended/d' \
++        -e '/blkdebug: Resuming request/d'
+ 
+ echo
+ echo "== Verify image content =="
+diff --git a/tests/qemu-iotests/077.out b/tests/qemu-iotests/077.out
+index 16f951fd3d..4aae82f2e2 100644
+--- a/tests/qemu-iotests/077.out
++++ b/tests/qemu-iotests/077.out
+@@ -4,17 +4,6 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
+ == Some concurrent requests involving RMW ==
+ wrote XXX/XXX bytes at offset XXX
+ XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-blkdebug: Resuming request 'A'
+-wrote XXX/XXX bytes at offset XXX
+-XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-wrote XXX/XXX bytes at offset XXX
+-XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-blkdebug: Resuming request 'A'
+-wrote XXX/XXX bytes at offset XXX
+-XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-wrote XXX/XXX bytes at offset XXX
+-XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-blkdebug: Resuming request 'A'
+ wrote XXX/XXX bytes at offset XXX
+ XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ wrote XXX/XXX bytes at offset XXX
+@@ -31,51 +20,46 @@ wrote XXX/XXX bytes at offset XXX
+ XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ wrote XXX/XXX bytes at offset XXX
+ XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-blkdebug: Resuming request 'A'
+-wrote XXX/XXX bytes at offset XXX
+-XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-blkdebug: Resuming request 'B'
+ wrote XXX/XXX bytes at offset XXX
+ XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ wrote XXX/XXX bytes at offset XXX
+ XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-blkdebug: Resuming request 'B'
+-wrote XXX/XXX bytes at offset XXX
+-XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-blkdebug: Resuming request 'A'
+ wrote XXX/XXX bytes at offset XXX
+ XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ wrote XXX/XXX bytes at offset XXX
+ XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-blkdebug: Resuming request 'A'
+-wrote XXX/XXX bytes at offset XXX
+-XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-blkdebug: Resuming request 'B'
+ wrote XXX/XXX bytes at offset XXX
+ XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ wrote XXX/XXX bytes at offset XXX
+ XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-blkdebug: Resuming request 'B'
+-wrote XXX/XXX bytes at offset XXX
+-XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-blkdebug: Resuming request 'A'
+ wrote XXX/XXX bytes at offset XXX
+ XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ wrote XXX/XXX bytes at offset XXX
+ XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-blkdebug: Resuming request 'A'
+ wrote XXX/XXX bytes at offset XXX
+ XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ wrote XXX/XXX bytes at offset XXX
+ XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-blkdebug: Resuming request 'A'
+-blkdebug: Resuming request 'C'
+ wrote XXX/XXX bytes at offset XXX
+ XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-blkdebug: Resuming request 'B'
+ wrote XXX/XXX bytes at offset XXX
+ XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-blkdebug: Resuming request 'A'
++wrote XXX/XXX bytes at offset XXX
++XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote XXX/XXX bytes at offset XXX
++XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote XXX/XXX bytes at offset XXX
++XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote XXX/XXX bytes at offset XXX
++XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote XXX/XXX bytes at offset XXX
++XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote XXX/XXX bytes at offset XXX
++XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote XXX/XXX bytes at offset XXX
++XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote XXX/XXX bytes at offset XXX
++XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ wrote XXX/XXX bytes at offset XXX
+ XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ wrote XXX/XXX bytes at offset XXX
+-- 
+2.13.6
