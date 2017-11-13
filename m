@@ -1,15 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42229)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43188)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eEGbG-0006Ce-Un
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 10:24:41 -0500
+	(envelope-from <programmingkidx@gmail.com>) id 1eEGdu-0007fP-C2
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 10:27:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eEGbF-0001fE-Eb
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 10:24:38 -0500
-From: Eric Blake <eblake@redhat.com>
-Date: Mon, 13 Nov 2017 09:24:24 -0600
-Message-Id: <20171113152424.25381-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.11] nbd/client: Use error_prepend()
- correctly
+	(envelope-from <programmingkidx@gmail.com>) id 1eEGdo-0002p8-BP
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 10:27:22 -0500
+Received: from mail-it0-x233.google.com ([2607:f8b0:4001:c0b::233]:37894)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+	id 1eEGdo-0002on-5k
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 10:27:16 -0500
+Received: by mail-it0-x233.google.com with SMTP id n134so1247283itg.3
+	for <qemu-devel@nongnu.org>; Mon, 13 Nov 2017 07:27:16 -0800 (PST)
+Content-Type: text/plain; charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+From: Programmingkid <programmingkidx@gmail.com>
+In-Reply-To: <CAJ+F1CLxYBq7zfzMSrhnxb+9Np7ZDnrbLqf+e=FoZyC=bZFA+Q@mail.gmail.com>
+Date: Mon, 13 Nov 2017 10:27:14 -0500
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <77699873-C42D-4678-9E29-432D2A36BCCE@gmail.com>
+References: <03123F70-98FA-439A-868C-855E63916259@gmail.com>
+	<20171113145041.GI18828@redhat.com>
+	<CAJ+F1CLxYBq7zfzMSrhnxb+9Np7ZDnrbLqf+e=FoZyC=bZFA+Q@mail.gmail.com>
+Subject: Re: [Qemu-devel] Command-line option to change ungrab key(s)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,235 +31,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, vsementsov@virtuozzo.com, qemu-stable@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-When using error prepend(), it is necessary to end with a space
-in the format string; otherwise, messages come out incorrectly,
-such as when connecting to a socket that hangs up immediately:
 
-can't open device nbd://localhost:10809/: Failed to read dataUnexpected end-of-file before all bytes were read
+> On Nov 13, 2017, at 10:20 AM, Marc-Andr=C3=A9 Lureau =
+<marcandre.lureau@gmail.com> wrote:
+>=20
+> Hi
+>=20
+> On Mon, Nov 13, 2017 at 3:50 PM, Daniel P. Berrange =
+<berrange@redhat.com> wrote:
+>> On Mon, Nov 13, 2017 at 09:29:25AM -0500, Programmingkid wrote:
+>>> Would you accept a patch that allows the user to change the mouse =
+ungrab key(s) in QEMU?
+>>>=20
+>>> It would look something like this:
+>>>=20
+>>> -ungrab <key>
+>>>=20
+>>> or
+>>>=20
+>>> -ungrab <key>,<key>,...
+>>>=20
+>>> If the user wanted the F19 key to be the ungrab key, this is what =
+would be sent to QEMU:
+>>>=20
+>>> -ungrab F19
+>>>=20
+>>> If the user wanted F16 and F17 held down to ungrab the mouse, this =
+is what would be sent to QEMU:
+>>>=20
+>>> -ungrab F16,F17
+>>>=20
+>>>=20
+>>> Would this feature be something you would consider adding to QEMU?
+>>=20
+>> As context, virt-manager allows customization for the ungrab =
+sequence, and
+>> so do spice-gtk/gtk-vnc at the API level. So conceptually I think it =
+is
+>> reasonable for any UI console that is intended as more than just a =
+toy.
+>=20
+> Would it make sense to share the virt-viewer/remote-viewer --hotkeys
+> option format ? (see man remote-viewer / virt-viewer)
 
-Originally botched in commit e44ed99d, then several more instances
-added in the meantime.
+I think you are referring to information found on this page: =
+https://www.mankier.com/1/remote-viewer
 
-CC: qemu-stable@nongnu.org
-Signed-off-by: Eric Blake <eblake@redhat.com>
----
- nbd/client.c | 50 ++++++++++++++++++++++++++------------------------
- 1 file changed, 26 insertions(+), 24 deletions(-)
+The command-line option for changing hotkey actions would be:
+--hotkeys=3D<action1>=3D<key1>[+<key2>][,<action2>=3D<key3>[+<key4>]]
 
-diff --git a/nbd/client.c b/nbd/client.c
-index 1880103d2a..4e15fc484d 100644
---- a/nbd/client.c
-+++ b/nbd/client.c
-@@ -79,12 +79,12 @@ static int nbd_send_option_request(QIOChannel *ioc, uint32_t opt,
-     stl_be_p(&req.length, len);
+So this means changing the mouse ungrab would look something like this:
 
-     if (nbd_write(ioc, &req, sizeof(req), errp) < 0) {
--        error_prepend(errp, "Failed to send option request header");
-+        error_prepend(errp, "Failed to send option request header: ");
-         return -1;
-     }
+--hotkeys=3Drelease-cursor=3DF19 (or some other key)
 
-     if (len && nbd_write(ioc, (char *) data, len, errp) < 0) {
--        error_prepend(errp, "Failed to send option request data");
-+        error_prepend(errp, "Failed to send option request data: ");
-         return -1;
-     }
-
-@@ -113,7 +113,7 @@ static int nbd_receive_option_reply(QIOChannel *ioc, uint32_t opt,
- {
-     QEMU_BUILD_BUG_ON(sizeof(*reply) != 20);
-     if (nbd_read(ioc, reply, sizeof(*reply), errp) < 0) {
--        error_prepend(errp, "failed to read option reply");
-+        error_prepend(errp, "failed to read option reply: ");
-         nbd_send_opt_abort(ioc);
-         return -1;
-     }
-@@ -166,7 +166,7 @@ static int nbd_handle_reply_err(QIOChannel *ioc, nbd_opt_reply *reply,
-         msg = g_malloc(reply->length + 1);
-         if (nbd_read(ioc, msg, reply->length, errp) < 0) {
-             error_prepend(errp, "failed to read option error 0x%" PRIx32
--                          " (%s) message",
-+                          " (%s) message: ",
-                           reply->type, nbd_rep_lookup(reply->type));
-             goto cleanup;
-         }
-@@ -277,7 +277,7 @@ static int nbd_receive_list(QIOChannel *ioc, const char *want, bool *match,
-         return -1;
-     }
-     if (nbd_read(ioc, &namelen, sizeof(namelen), errp) < 0) {
--        error_prepend(errp, "failed to read option name length");
-+        error_prepend(errp, "failed to read option name length: ");
-         nbd_send_opt_abort(ioc);
-         return -1;
-     }
-@@ -290,7 +290,8 @@ static int nbd_receive_list(QIOChannel *ioc, const char *want, bool *match,
-     }
-     if (namelen != strlen(want)) {
-         if (nbd_drop(ioc, len, errp) < 0) {
--            error_prepend(errp, "failed to skip export name with wrong length");
-+            error_prepend(errp,
-+                          "failed to skip export name with wrong length: ");
-             nbd_send_opt_abort(ioc);
-             return -1;
-         }
-@@ -299,14 +300,14 @@ static int nbd_receive_list(QIOChannel *ioc, const char *want, bool *match,
-
-     assert(namelen < sizeof(name));
-     if (nbd_read(ioc, name, namelen, errp) < 0) {
--        error_prepend(errp, "failed to read export name");
-+        error_prepend(errp, "failed to read export name: ");
-         nbd_send_opt_abort(ioc);
-         return -1;
-     }
-     name[namelen] = '\0';
-     len -= namelen;
-     if (nbd_drop(ioc, len, errp) < 0) {
--        error_prepend(errp, "failed to read export description");
-+        error_prepend(errp, "failed to read export description: ");
-         nbd_send_opt_abort(ioc);
-         return -1;
-     }
-@@ -390,7 +391,7 @@ static int nbd_opt_go(QIOChannel *ioc, const char *wantname,
-             return -1;
-         }
-         if (nbd_read(ioc, &type, sizeof(type), errp) < 0) {
--            error_prepend(errp, "failed to read info type");
-+            error_prepend(errp, "failed to read info type: ");
-             nbd_send_opt_abort(ioc);
-             return -1;
-         }
-@@ -405,13 +406,13 @@ static int nbd_opt_go(QIOChannel *ioc, const char *wantname,
-                 return -1;
-             }
-             if (nbd_read(ioc, &info->size, sizeof(info->size), errp) < 0) {
--                error_prepend(errp, "failed to read info size");
-+                error_prepend(errp, "failed to read info size: ");
-                 nbd_send_opt_abort(ioc);
-                 return -1;
-             }
-             be64_to_cpus(&info->size);
-             if (nbd_read(ioc, &info->flags, sizeof(info->flags), errp) < 0) {
--                error_prepend(errp, "failed to read info flags");
-+                error_prepend(errp, "failed to read info flags: ");
-                 nbd_send_opt_abort(ioc);
-                 return -1;
-             }
-@@ -428,7 +429,7 @@ static int nbd_opt_go(QIOChannel *ioc, const char *wantname,
-             }
-             if (nbd_read(ioc, &info->min_block, sizeof(info->min_block),
-                          errp) < 0) {
--                error_prepend(errp, "failed to read info minimum block size");
-+                error_prepend(errp, "failed to read info minimum block size: ");
-                 nbd_send_opt_abort(ioc);
-                 return -1;
-             }
-@@ -441,7 +442,8 @@ static int nbd_opt_go(QIOChannel *ioc, const char *wantname,
-             }
-             if (nbd_read(ioc, &info->opt_block, sizeof(info->opt_block),
-                          errp) < 0) {
--                error_prepend(errp, "failed to read info preferred block size");
-+                error_prepend(errp,
-+                              "failed to read info preferred block size: ");
-                 nbd_send_opt_abort(ioc);
-                 return -1;
-             }
-@@ -455,7 +457,7 @@ static int nbd_opt_go(QIOChannel *ioc, const char *wantname,
-             }
-             if (nbd_read(ioc, &info->max_block, sizeof(info->max_block),
-                          errp) < 0) {
--                error_prepend(errp, "failed to read info maximum block size");
-+                error_prepend(errp, "failed to read info maximum block size: ");
-                 nbd_send_opt_abort(ioc);
-                 return -1;
-             }
-@@ -467,7 +469,7 @@ static int nbd_opt_go(QIOChannel *ioc, const char *wantname,
-         default:
-             trace_nbd_opt_go_info_unknown(type, nbd_info_lookup(type));
-             if (nbd_drop(ioc, len, errp) < 0) {
--                error_prepend(errp, "Failed to read info payload");
-+                error_prepend(errp, "Failed to read info payload: ");
-                 nbd_send_opt_abort(ioc);
-                 return -1;
-             }
-@@ -618,7 +620,7 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name,
-     }
-
-     if (nbd_read(ioc, buf, 8, errp) < 0) {
--        error_prepend(errp, "Failed to read data");
-+        error_prepend(errp, "Failed to read data: ");
-         goto fail;
-     }
-
-@@ -637,7 +639,7 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name,
-     }
-
-     if (nbd_read(ioc, &magic, sizeof(magic), errp) < 0) {
--        error_prepend(errp, "Failed to read magic");
-+        error_prepend(errp, "Failed to read magic: ");
-         goto fail;
-     }
-     magic = be64_to_cpu(magic);
-@@ -649,7 +651,7 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name,
-         bool fixedNewStyle = false;
-
-         if (nbd_read(ioc, &globalflags, sizeof(globalflags), errp) < 0) {
--            error_prepend(errp, "Failed to read server flags");
-+            error_prepend(errp, "Failed to read server flags: ");
-             goto fail;
-         }
-         globalflags = be16_to_cpu(globalflags);
-@@ -665,7 +667,7 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name,
-         /* client requested flags */
-         clientflags = cpu_to_be32(clientflags);
-         if (nbd_write(ioc, &clientflags, sizeof(clientflags), errp) < 0) {
--            error_prepend(errp, "Failed to send clientflags field");
-+            error_prepend(errp, "Failed to send clientflags field: ");
-             goto fail;
-         }
-         if (tlscreds) {
-@@ -727,13 +729,13 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name,
-
-         /* Read the response */
-         if (nbd_read(ioc, &info->size, sizeof(info->size), errp) < 0) {
--            error_prepend(errp, "Failed to read export length");
-+            error_prepend(errp, "Failed to read export length: ");
-             goto fail;
-         }
-         be64_to_cpus(&info->size);
-
-         if (nbd_read(ioc, &info->flags, sizeof(info->flags), errp) < 0) {
--            error_prepend(errp, "Failed to read export flags");
-+            error_prepend(errp, "Failed to read export flags: ");
-             goto fail;
-         }
-         be16_to_cpus(&info->flags);
-@@ -750,13 +752,13 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name,
-         }
-
-         if (nbd_read(ioc, &info->size, sizeof(info->size), errp) < 0) {
--            error_prepend(errp, "Failed to read export length");
-+            error_prepend(errp, "Failed to read export length: ");
-             goto fail;
-         }
-         be64_to_cpus(&info->size);
-
-         if (nbd_read(ioc, &oldflags, sizeof(oldflags), errp) < 0) {
--            error_prepend(errp, "Failed to read export flags");
-+            error_prepend(errp, "Failed to read export flags: ");
-             goto fail;
-         }
-         be32_to_cpus(&oldflags);
-@@ -772,7 +774,7 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name,
-
-     trace_nbd_receive_negotiate_size_flags(info->size, info->flags);
-     if (zeroes && nbd_drop(ioc, 124, errp) < 0) {
--        error_prepend(errp, "Failed to read reserved block");
-+        error_prepend(errp, "Failed to read reserved block: ");
-         goto fail;
-     }
-     rc = 0;
--- 
-2.13.6
+Gerd what you think of this idea?=
