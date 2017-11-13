@@ -1,43 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51499)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51746)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1eEA5h-0005IU-S8
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 03:27:39 -0500
+	(envelope-from <peterx@redhat.com>) id 1eEA74-0006D9-8N
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 03:29:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1eEA5g-0006R8-Qt
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 03:27:37 -0500
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:53130)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1eEA5g-0006Pn-KJ
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 03:27:36 -0500
-Received: by mail-wm0-x241.google.com with SMTP id t139so13332557wmt.1
-	for <qemu-devel@nongnu.org>; Mon, 13 Nov 2017 00:27:36 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <1b862cf2-2fee-3243-cb54-2780ace6f25b@profihost.ag>
-	<971cc10f-7930-9830-0528-27e8faac7282@redhat.com>
-	<748c4d0d-f84b-303d-f9a6-bafa6037d669@profihost.ag>
-	<f4b0cb70-7f86-f7cf-bb89-3a9f7ae15dc2@redhat.com>
-	<4c2913e2-5946-47db-cced-a5702538bc3b@profihost.ag>
-	<dc3bf74f-fbd6-573d-0d7c-d456469fcf1d@profihost.ag>
-	<9c8673a5-faf7-ca9c-27d3-398df4223d6a@redhat.com>
-	<f362d043-7293-65b7-734b-c8372a5f16c3@profihost.ag>
-	<54326bae-831d-dfb8-151e-534d3a100c2c@redhat.com>
-	<ab53e4ae-4c38-9520-b076-96318b6c09b5@profihost.ag>
-	<61b97624-bd55-655f-f8e2-ea1699c25d51@redhat.com>
-	<b110639a-3752-56b5-fe50-741c53048c15@redhat.com>
-	<34a1bec2-403e-8de1-d3dd-661865c6dceb@redhat.com>
-	<a80dde99-460c-15e9-26ba-e5e8a2c0ae5e@redhat.com>
-	<9afb46e3-c1d4-e9af-0f45-4c4b6d2c30f4@profihost.ag>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <78c57855-0554-cae6-bede-470a6ccb420e@redhat.com>
-Date: Mon, 13 Nov 2017 09:27:33 +0100
+	(envelope-from <peterx@redhat.com>) id 1eEA71-0006pA-0r
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 03:29:02 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56780)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eEA70-0006oa-Lv
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 03:28:58 -0500
+Date: Mon, 13 Nov 2017 16:28:45 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20171113082845.GA10932@xz-mi>
+References: <1509710516-21084-1-git-send-email-yi.l.liu@linux.intel.com>
+	<1509710516-21084-3-git-send-email-yi.l.liu@linux.intel.com>
+	<20171113055601.GE1014@umbus.fritz.box>
 MIME-Version: 1.0
-In-Reply-To: <9afb46e3-c1d4-e9af-0f45-4c4b6d2c30f4@profihost.ag>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] kvm: virtio-net: saved image requires TUN_F_UFO
- support
+Content-Disposition: inline
+In-Reply-To: <20171113055601.GE1014@umbus.fritz.box>
+Subject: Re: [Qemu-devel] [RESEND PATCH 2/6] memory: introduce
+ AddressSpaceOps and IOMMUObject
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,62 +29,332 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Priebe - Profihost AG <s.priebe@profihost.ag>, Jason Wang <jasowang@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: "Liu, Yi L" <yi.l.liu@linux.intel.com>, qemu-devel@nongnu.org, mst@redhat.com, pbonzini@redhat.com, alex.williamson@redhat.com, tianyu.lan@intel.com, yi.l.liu@intel.com, kevin.tian@intel.com, jasowang@redhat.com
 
-On 11/11/2017 19:59, Stefan Priebe - Profihost AG wrote:
-> Hello,
+On Mon, Nov 13, 2017 at 04:56:01PM +1100, David Gibson wrote:
+> On Fri, Nov 03, 2017 at 08:01:52PM +0800, Liu, Yi L wrote:
+> > From: Peter Xu <peterx@redhat.com>
+> > 
+> > AddressSpaceOps is similar to MemoryRegionOps, it's just for address
+> > spaces to store arch-specific hooks.
+> > 
+> > The first hook I would like to introduce is iommu_get(). Return an
+> > IOMMUObject behind the AddressSpace.
+> > 
+> > For systems that have IOMMUs, we will create a special address
+> > space per device which is different from system default address
+> > space for it (please refer to pci_device_iommu_address_space()).
+> > Normally when that happens, there will be one specific IOMMU (or
+> > say, translation unit) stands right behind that new address space.
+> > 
+> > This iommu_get() fetches that guy behind the address space. Here,
+> > the guy is defined as IOMMUObject, which includes a notifier_list
+> > so far, may extend in future. Along with IOMMUObject, a new iommu
+> > notifier mechanism is introduced. It would be used for virt-svm.
+> > Also IOMMUObject can further have a IOMMUObjectOps which is similar
+> > to MemoryRegionOps. The difference is IOMMUObjectOps is not relied
+> > on MemoryRegion.
+> > 
+> > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
 > 
-> Am 10.11.2017 um 05:18 schrieb Jason Wang:
->>
->>
->> On 2017年11月08日 19:22, Jason Wang wrote:
->>>
->>>
->>> On 2017年11月08日 18:46, Paolo Bonzini wrote:
->>>> On 08/11/2017 09:21, Jason Wang wrote:
->>>>>
->>>>> On 2017年11月08日 17:05, Stefan Priebe - Profihost AG wrote:
->>>>>> Am 08.11.2017 um 08:54 schrieb Jason Wang:
->>>>>>> On 2017年11月08日 15:41, Stefan Priebe - Profihost AG wrote:
->>>>>>>> Hi Paolo,
->>>>>>>>
->>>>>>>> Am 06.11.2017 um 12:27 schrieb Paolo Bonzini:
->>>>>>>>> On 06/11/2017 12:09, Stefan Priebe - Profihost AG wrote:
->>>>>>>>>> HI Paolo,
->>>>>>>>>>
->>>>>>>>>> could this patchset be related?
->>>>>>>>> Uh oh, yes it should.  Jason, any ways to fix it?  I suppose we
->>>>>>>>> need to
->>>>>>>>> disable UFO in the newest machine types, but do we also have to do
->>>>>>>>> (software) UFO in vhost-net and QEMU for migration compatibility?
->>>>>>>> Any news on this?
->>>>>>>>
->>>>>>>> Greets,
->>>>>>> Since we probe UFO support, it will be disabled automatically on
->>>>>>> device
->>>>>>> startup.
->>>>>>>
->>>>>>> For the issue of migration, I think the only way is trying to fix
->>>>>>> it in
->>>>>>> kernel.
->>>>>> But 4.14 is around the corner and the patchset is already included.
->>>>>> Shouldn't this get fixed before 4.14 is released?
->>>>> We will try to seek a solution as soon as possible. If we can't catch
->>>>> 4.14, we will do it for stable for sure.
->>>> Jason, can you write to netdev and Cc Linus and me?
->>>
->>> Paolo, see this https://www.spinics.net/lists/netdev/msg465454.html
->>>
->>> Just notice this today since I'm not on the cc list.
->>
->> An update:
->>
->> After some discussions on netdev, we will try to bring UFO back
->> partially for just TAP. Willem promise to fix this. 4.14 is too late
->> consider the fix is not trivial, it will go through stable tree.
+> Hi, sorry I didn't reply to the earlier postings of this after our
+> discussion in China.  I've been sick several times and very busy.
 > 
-> OK is it save to just revert the UFO patchset for my local branch?
+> I still don't feel like there's an adequate explanation of exactly
+> what an IOMMUObject represents.   Obviously it can represent more than
+> a single translation window - since that's represented by the
+> IOMMUMR.  But what exactly do all the MRs - or whatever else - that
+> are represented by the IOMMUObject have in common, from a functional
+> point of view.
+> 
+> Even understanding the SVM stuff better than I did, I don't really see
+> why an AddressSpace is an obvious unit to have an IOMMUObject
+> associated with it.
 
-Yes, it is.
+Here's what I thought about it: IOMMUObject was planned to be the
+abstraction of the hardware translation unit, which is a higher level
+of the translated address spaces.  Say, for each PCI device, it can
+have its own translated address space.  However for multiple PCI
+devices, they can be sharing the same translation unit that handles
+the translation requests from different devices.  That's the case for
+Intel platforms.  We introduced this IOMMUObject because sometimes we
+want to do something with that translation unit rather than a specific
+device, in which we need a general IOMMU device handle.
 
-Paolo
+IIRC one issue left over during last time's discussion was that there
+could be more complicated IOMMU models. E.g., one device's DMA request
+can be translated nestedly by two or multiple IOMMUs, and current
+proposal cannot really handle that complicated hierachy.  I'm just
+thinking whether we can start from a simple model (say, we don't allow
+nested IOMMUs, and actually we don't even allow multiple IOMMUs so
+far), then we can evolve from that point in the future.
+
+Also, I thought there were something you mentioned that this approach
+is not correct for Power systems, but I can't really remember the
+details...  Anyways, I think this is not the only approach to solve
+the problem, and I believe any new better idea would be greatly
+welcomed as well. :)
+
+Thanks,
+
+> 
+> > ---
+> >  hw/core/Makefile.objs   |  1 +
+> >  hw/core/iommu.c         | 58 +++++++++++++++++++++++++++++++++++++++
+> >  include/exec/memory.h   | 22 +++++++++++++++
+> >  include/hw/core/iommu.h | 73 +++++++++++++++++++++++++++++++++++++++++++++++++
+> >  memory.c                | 10 +++++--
+> >  5 files changed, 162 insertions(+), 2 deletions(-)
+> >  create mode 100644 hw/core/iommu.c
+> >  create mode 100644 include/hw/core/iommu.h
+> > 
+> > diff --git a/hw/core/Makefile.objs b/hw/core/Makefile.objs
+> > index f8d7a4a..d688412 100644
+> > --- a/hw/core/Makefile.objs
+> > +++ b/hw/core/Makefile.objs
+> > @@ -5,6 +5,7 @@ common-obj-y += fw-path-provider.o
+> >  # irq.o needed for qdev GPIO handling:
+> >  common-obj-y += irq.o
+> >  common-obj-y += hotplug.o
+> > +common-obj-y += iommu.o
+> >  common-obj-y += nmi.o
+> >  
+> >  common-obj-$(CONFIG_EMPTY_SLOT) += empty_slot.o
+> > diff --git a/hw/core/iommu.c b/hw/core/iommu.c
+> > new file mode 100644
+> > index 0000000..7c4fcfe
+> > --- /dev/null
+> > +++ b/hw/core/iommu.c
+> > @@ -0,0 +1,58 @@
+> > +/*
+> > + * QEMU emulation of IOMMU logic
+> > + *
+> > + * Copyright (C) 2017 Red Hat Inc.
+> > + *
+> > + * Authors: Peter Xu <peterx@redhat.com>,
+> > + *
+> > + * This program is free software; you can redistribute it and/or modify
+> > + * it under the terms of the GNU General Public License as published by
+> > + * the Free Software Foundation; either version 2 of the License, or
+> > + * (at your option) any later version.
+> > +
+> > + * This program is distributed in the hope that it will be useful,
+> > + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> > + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> > + * GNU General Public License for more details.
+> > +
+> > + * You should have received a copy of the GNU General Public License along
+> > + * with this program; if not, see <http://www.gnu.org/licenses/>.
+> > + */
+> > +
+> > +#include "qemu/osdep.h"
+> > +#include "hw/core/iommu.h"
+> > +
+> > +void iommu_notifier_register(IOMMUObject *iommu,
+> > +                             IOMMUNotifier *n,
+> > +                             IOMMUNotifyFn fn,
+> > +                             IOMMUEvent event)
+> > +{
+> > +    n->event = event;
+> > +    n->iommu_notify = fn;
+> > +    QLIST_INSERT_HEAD(&iommu->iommu_notifiers, n, node);
+> > +    return;
+> > +}
+> > +
+> > +void iommu_notifier_unregister(IOMMUObject *iommu,
+> > +                               IOMMUNotifier *notifier)
+> > +{
+> > +    IOMMUNotifier *cur, *next;
+> > +
+> > +    QLIST_FOREACH_SAFE(cur, &iommu->iommu_notifiers, node, next) {
+> > +        if (cur == notifier) {
+> > +            QLIST_REMOVE(cur, node);
+> > +            break;
+> > +        }
+> > +    }
+> > +}
+> > +
+> > +void iommu_notify(IOMMUObject *iommu, IOMMUEventData *event_data)
+> > +{
+> > +    IOMMUNotifier *cur;
+> > +
+> > +    QLIST_FOREACH(cur, &iommu->iommu_notifiers, node) {
+> > +        if ((cur->event == event_data->event) && cur->iommu_notify) {
+> > +            cur->iommu_notify(cur, event_data);
+> > +        }
+> > +    }
+> > +}
+> > diff --git a/include/exec/memory.h b/include/exec/memory.h
+> > index 03595e3..8350973 100644
+> > --- a/include/exec/memory.h
+> > +++ b/include/exec/memory.h
+> > @@ -26,6 +26,7 @@
+> >  #include "qom/object.h"
+> >  #include "qemu/rcu.h"
+> >  #include "hw/qdev-core.h"
+> > +#include "hw/core/iommu.h"
+> >  
+> >  #define RAM_ADDR_INVALID (~(ram_addr_t)0)
+> >  
+> > @@ -301,6 +302,19 @@ struct MemoryListener {
+> >  };
+> >  
+> >  /**
+> > + * AddressSpaceOps: callbacks structure for address space specific operations
+> > + *
+> > + * @iommu_get: returns an IOMMU object that backs the address space.
+> > + *             Normally this should be NULL for generic address
+> > + *             spaces, and it's only used when there is one
+> > + *             translation unit behind this address space.
+> > + */
+> > +struct AddressSpaceOps {
+> > +    IOMMUObject *(*iommu_get)(AddressSpace *as);
+> > +};
+> > +typedef struct AddressSpaceOps AddressSpaceOps;
+> > +
+> > +/**
+> >   * AddressSpace: describes a mapping of addresses to #MemoryRegion objects
+> >   */
+> >  struct AddressSpace {
+> > @@ -316,6 +330,7 @@ struct AddressSpace {
+> >      struct MemoryRegionIoeventfd *ioeventfds;
+> >      QTAILQ_HEAD(memory_listeners_as, MemoryListener) listeners;
+> >      QTAILQ_ENTRY(AddressSpace) address_spaces_link;
+> > +    AddressSpaceOps as_ops;
+> >  };
+> >  
+> >  FlatView *address_space_to_flatview(AddressSpace *as);
+> > @@ -1988,6 +2003,13 @@ address_space_write_cached(MemoryRegionCache *cache, hwaddr addr,
+> >      address_space_write(cache->as, cache->xlat + addr, MEMTXATTRS_UNSPECIFIED, buf, len);
+> >  }
+> >  
+> > +/**
+> > + * address_space_iommu_get: Get the backend IOMMU for the address space
+> > + *
+> > + * @as: the address space to fetch IOMMU from
+> > + */
+> > +IOMMUObject *address_space_iommu_get(AddressSpace *as);
+> > +
+> >  #endif
+> >  
+> >  #endif
+> > diff --git a/include/hw/core/iommu.h b/include/hw/core/iommu.h
+> > new file mode 100644
+> > index 0000000..34387c0
+> > --- /dev/null
+> > +++ b/include/hw/core/iommu.h
+> > @@ -0,0 +1,73 @@
+> > +/*
+> > + * QEMU emulation of IOMMU logic
+> > + *
+> > + * Copyright (C) 2017 Red Hat Inc.
+> > + *
+> > + * Authors: Peter Xu <peterx@redhat.com>,
+> > + *
+> > + * This program is free software; you can redistribute it and/or modify
+> > + * it under the terms of the GNU General Public License as published by
+> > + * the Free Software Foundation; either version 2 of the License, or
+> > + * (at your option) any later version.
+> > +
+> > + * This program is distributed in the hope that it will be useful,
+> > + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> > + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> > + * GNU General Public License for more details.
+> > +
+> > + * You should have received a copy of the GNU General Public License along
+> > + * with this program; if not, see <http://www.gnu.org/licenses/>.
+> > + */
+> > +
+> > +#ifndef HW_CORE_IOMMU_H
+> > +#define HW_CORE_IOMMU_H
+> > +
+> > +#include "qemu/queue.h"
+> > +
+> > +enum IOMMUEvent {
+> > +    IOMMU_EVENT_BIND_PASIDT,
+> > +};
+> > +typedef enum IOMMUEvent IOMMUEvent;
+> > +
+> > +struct IOMMUEventData {
+> > +    IOMMUEvent event;
+> > +    uint64_t length;
+> > +    void *data;
+> > +};
+> > +typedef struct IOMMUEventData IOMMUEventData;
+> > +
+> > +typedef struct IOMMUNotifier IOMMUNotifier;
+> > +
+> > +typedef void (*IOMMUNotifyFn)(IOMMUNotifier *notifier,
+> > +                              IOMMUEventData *event_data);
+> > +
+> > +struct IOMMUNotifier {
+> > +    IOMMUNotifyFn iommu_notify;
+> > +    /*
+> > +     * What events we are listening to. Let's allow multiple event
+> > +     * registrations from beginning.
+> > +     */
+> > +    IOMMUEvent event;
+> > +    QLIST_ENTRY(IOMMUNotifier) node;
+> > +};
+> > +
+> > +typedef struct IOMMUObject IOMMUObject;
+> > +
+> > +/*
+> > + * This stands for an IOMMU unit. Any translation device should have
+> > + * this struct inside its own structure to make sure it can leverage
+> > + * common IOMMU functionalities.
+> > + */
+> > +struct IOMMUObject {
+> > +    QLIST_HEAD(, IOMMUNotifier) iommu_notifiers;
+> > +};
+> > +
+> > +void iommu_notifier_register(IOMMUObject *iommu,
+> > +                             IOMMUNotifier *n,
+> > +                             IOMMUNotifyFn fn,
+> > +                             IOMMUEvent event);
+> > +void iommu_notifier_unregister(IOMMUObject *iommu,
+> > +                               IOMMUNotifier *notifier);
+> > +void iommu_notify(IOMMUObject *iommu, IOMMUEventData *event_data);
+> > +
+> > +#endif
+> > diff --git a/memory.c b/memory.c
+> > index 77fb3ef..307f665 100644
+> > --- a/memory.c
+> > +++ b/memory.c
+> > @@ -235,8 +235,6 @@ struct FlatView {
+> >      MemoryRegion *root;
+> >  };
+> >  
+> > -typedef struct AddressSpaceOps AddressSpaceOps;
+> > -
+> >  #define FOR_EACH_FLAT_RANGE(var, view)          \
+> >      for (var = (view)->ranges; var < (view)->ranges + (view)->nr; ++var)
+> >  
+> > @@ -2793,6 +2791,14 @@ static void do_address_space_destroy(AddressSpace *as)
+> >      memory_region_unref(as->root);
+> >  }
+> >  
+> > +IOMMUObject *address_space_iommu_get(AddressSpace *as)
+> > +{
+> > +    if (!as->as_ops.iommu_get) {
+> > +        return NULL;
+> > +    }
+> > +    return as->as_ops.iommu_get(as);
+> > +}
+> > +
+> >  void address_space_destroy(AddressSpace *as)
+> >  {
+> >      MemoryRegion *root = as->root;
+> 
+> -- 
+> David Gibson			| I'll have my music baroque, and my code
+> david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+> 				| _way_ _around_!
+> http://www.ozlabs.org/~dgibson
+
+
+
+-- 
+Peter Xu
