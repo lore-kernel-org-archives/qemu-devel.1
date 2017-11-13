@@ -1,45 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58507)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58718)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1eEFyf-0004Qq-SF
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 09:44:47 -0500
+	(envelope-from <eblake@redhat.com>) id 1eEFzN-0004rR-At
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 09:45:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1eEFyc-0003cS-KF
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 09:44:45 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:53284)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pmorel@linux.vnet.ibm.com>)
-	id 1eEFyc-0003cC-Aw
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 09:44:42 -0500
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vADEiTEr093292
-	for <qemu-devel@nongnu.org>; Mon, 13 Nov 2017 09:44:35 -0500
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2e7cty27ga-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 13 Nov 2017 09:44:34 -0500
-Received: from localhost
-	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pmorel@linux.vnet.ibm.com>;
-	Mon, 13 Nov 2017 14:44:30 -0000
-References: <1510075479-17224-1-git-send-email-pmorel@linux.vnet.ibm.com>
-	<1510075479-17224-7-git-send-email-pmorel@linux.vnet.ibm.com>
-	<20171109202308.06a8bc45.cohuck@redhat.com>
-	<15d59e1d-e42f-3068-ddc5-e991a5f21879@linux.vnet.ibm.com>
-	<20171110105116.2a470f57.cohuck@redhat.com>
-	<8a33e51f-ab4e-bd07-a998-d19897cdd87e@linux.vnet.ibm.com>
-	<20171113125456.2c7fc9d2.cohuck@redhat.com>
-From: Pierre Morel <pmorel@linux.vnet.ibm.com>
-Date: Mon, 13 Nov 2017 15:44:27 +0100
+	(envelope-from <eblake@redhat.com>) id 1eEFzM-0003q4-0z
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 09:45:29 -0500
+References: <20171112013936.5942-1-eblake@redhat.com>
+	<0f61ba9c-439d-eab7-6657-d8088b9adf96@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <c9b80c9d-4131-a7f6-6283-6aadf9d50c7d@redhat.com>
+Date: Mon, 13 Nov 2017 08:45:11 -0600
 MIME-Version: 1.0
-In-Reply-To: <20171113125456.2c7fc9d2.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Message-Id: <73b24135-43e8-574e-ec3d-a7b05686f3e1@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 6/7] s390x/pci: move the memory region
- write from pcistg
+In-Reply-To: <0f61ba9c-439d-eab7-6657-d8088b9adf96@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="n2eEcUfrGgTJNBfAhDjSJd0JBDHjK6iWm"
+Subject: Re: [Qemu-devel] [PATCH for-2.11] nbd: Don't crash when server
+ reports NBD_CMD_READ failure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -48,101 +25,158 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Yi Min Zhao <zyimin@linux.vnet.ibm.com>, qemu-devel@nongnu.org, agraf@suse.de, borntraeger@de.ibm.com, pasic@linux.vnet.ibm.com
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On 13/11/2017 12:54, Cornelia Huck wrote:
-> On Mon, 13 Nov 2017 10:39:50 +0100
-> Pierre Morel <pmorel@linux.vnet.ibm.com> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--n2eEcUfrGgTJNBfAhDjSJd0JBDHjK6iWm
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+Message-ID: <c9b80c9d-4131-a7f6-6283-6aadf9d50c7d@redhat.com>
+Subject: Re: [PATCH for-2.11] nbd: Don't crash when server reports
+ NBD_CMD_READ failure
+References: <20171112013936.5942-1-eblake@redhat.com>
+ <0f61ba9c-439d-eab7-6657-d8088b9adf96@virtuozzo.com>
+In-Reply-To: <0f61ba9c-439d-eab7-6657-d8088b9adf96@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 11/13/2017 05:37 AM, Vladimir Sementsov-Ogievskiy wrote:
+> 12.11.2017 04:39, Eric Blake wrote:
+>> If a server fails a read, for example with EIO, but the connection
+>> is still live, then we would crash trying to print a non-existent
+>> error message.=C2=A0 Bug introduced in commit f140e300.
+>>
+>> Signed-off-by: Eric Blake <eblake@redhat.com>
+>> ---
+>> =C2=A0 block/nbd-client.c | 4 ++--
+>> =C2=A0 1 file changed, 2 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/block/nbd-client.c b/block/nbd-client.c
+>> index b44d4d4a01..5f3375a970 100644
+>> --- a/block/nbd-client.c
+>> +++ b/block/nbd-client.c
+>> @@ -78,7 +78,7 @@ static coroutine_fn void nbd_read_reply_entry(void
+>> *opaque)
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 while (!s->quit) {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 assert(s->reply=
+=2Ehandle =3D=3D 0);
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret =3D nbd_rec=
+eive_reply(s->ioc, &s->reply, &local_err);
 >=20
->> On 10/11/2017 10:51, Cornelia Huck wrote:
->>> On Fri, 10 Nov 2017 17:40:12 +0800
->>> Yi Min Zhao <zyimin@linux.vnet.ibm.com> wrote:
->>>   =20
->>>> =E5=9C=A8 2017/11/10 =E4=B8=8A=E5=8D=883:23, Cornelia Huck =E5=86=99=
-=E9=81=93:
->>>>> On Tue,  7 Nov 2017 18:24:38 +0100
->>>>> Pierre Morel <pmorel@linux.vnet.ibm.com> wrote:
->>>>>     =20
->>>>>> Let's move the memory region write from pcistg into a dedicated
->>>>>> function.
->>>>>> This allows us to prepare a later patch searching for subregions
->>>>>> inside of the memory region.
->>>>> OK, so here is the memory region write. Do we have any sleeping
->>>>> endianness bugs in there for when we wire up tcg? I'm not sure how =
-this
->>>>> plays with the bswaps (see patch 1).
->>>>>
->>>>> But maybe I've just gotten lost somewhere.
->>>> I think there's no error. For PCI bars' MRs, we got the little-endia=
-n data
->>>> that is exactly fit to the byte ordering of pcilg instruction. For P=
-CI
->>>> config
->>>> space, the data has been swapped according to the cpu byte ordering.
->>>
->>> Host or target cpu?
->>>   =20
->>>> So we use zpci_swap_endian() to swap the data back to the little-end=
-ian
->>>> ordering.
->>>   =20
->>
->>
->> I do not see where we use the zpci_swap_endian() function in this patc=
-h
->> or in the zpci_write_bar() function.
+> hmm.
 >=20
-> So, is that swap function only ever used to convert BE register
-> contents to LE?
+> /* nbd_receive_reply
+> =C2=A0* Returns 1 on success
+> =C2=A0*=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 0 on eof, when =
+no data was read (errp is not set)
+> =C2=A0*=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 negative errno =
+on failure (errp is set)
+> =C2=A0*/
+> int nbd_receive_reply(QIOChannel *ioc, NBDReply *reply, Error **errp)
+>=20
+>=20
+> - looks like errp should be set if ret < 0. may be the function should
+> be fixed?
+> - don't you think that this function returns transferred server error?
+> it doesn't.
+>=20
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (ret < 0) {
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (local_err) {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 error_report_err(local_err);
 
-Yes that is what I understood.
-The value in the register is read from memory somehow but it may be an=20
-immediate value setup by another instruction, I think the TCG should=20
-have already make sure it is big endian.
+In my testing, I did not trip on this error_report_err() crashing.
+Which means I think we are already honoring our contract:
+nbd_receive_reply() is setting local_err if it returns -1.  Thus, for
+this call site, 'if (ret < 0)' is equivalent to 'if (local_err)'.  The
+only reason to change it, then, is for consistency with the other 2
+callers of error_report_err() in this file...
 
-On the other side the PCI memory is always Little endian AFAIK.
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (ret <=3D 0)=
+ {
+>> @@ -681,7 +681,7 @@ int nbd_client_co_preadv(BlockDriverState *bs,
+>> uint64_t offset,
+>>
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret =3D nbd_co_receive_cmdread_reply(cl=
+ient, request.handle,
+>> offset, qiov,
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 &local_err);
+>> -=C2=A0=C2=A0=C2=A0 if (ret < 0) {
+>> +=C2=A0=C2=A0=C2=A0 if (local_err) {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_report_er=
+r(local_err);
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return ret;
+>=20
+> but here, it looks like you are right. My first attempt was to store
+> server error to ret and
+> server error msg to errp (bad idea, as I can see now), but you proposed=
 
-So the swap function is always from BIG to little.
+> to do not print every server error msg and
+> deleted this functionality. And now we have a set of functions which ca=
+n
+> return ret < 0
+> and not set errp..
 
-But as I said, we do not use the zpci_swap_endian in this function, so I=20
-write this answer again in the thread where the definition of the=20
-function is to continue the discussion on the register to PCI=20
-translation there.
+Indeed, this is the caller that MUST return a negative value to get the
+caller to report a failed operation, but where the negative value does
+NOT imply a dead connection unless local_err was also set, so here, we
+must not print anything unless local_err was set.  I caught one of the
+two spots like this while revising your patch prior to soft freeze, but
+missed this one.
+
+> It looks very confusing, I think. Better solution is
+> to refactor this somehow,
+> may be not mixing server-error-reply with local normal errors..
+
+A refactoring may be nice, but it would be 2.12 material; at this point,
+I want to minimize what further changes go into 2.11.  That said,
 
 >=20
->>
->>
->>
->>> That swap is unconditional. If we were running on a little-endian hos=
-t,
->>> it would be wrong, wouldn't it?
->>
->> I think there is no problem here, we do not use the swap function but =
-we
->> use the memory_region_dispatch_write() to access a subregion of the PC=
-I
->> device which is defined as DEVICE_LITTLE_ENDIAN
->>
->> AFAIU The memory access process the endianness correctly.
->=20
-> OK, if this is all going through generic memory mechanisms, we should
-> be fine. >
->>
->>
->>>   =20
->>>>>     =20
->>>>>> Signed-off-by: Pierre Morel <pmorel@linux.vnet.ibm.com>
->>>>>> Reviewed-by: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
->>>>>> ---
->>>>>>     hw/s390x/s390-pci-inst.c | 27 +++++++++++++++++----------
->>>>>>     1 file changed, 17 insertions(+), 10 deletions(-)
->>>   =20
->>
->>
->=20
+> For now, for second chunk:
 
+I see no problem with both chunks going in.  The second is a bug fix,
+but the first is for consistency, and I'd rather have all callers to
+error_report_err() look consistent, rather than trying to remember that
+'ret < 0' does not always imply errp is set.
+
+>=20
+> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>=20
+>=20
+>=20
 
 --=20
-Pierre Morel
-Linux/KVM/QEMU in B=C3=B6blingen - Germany
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--n2eEcUfrGgTJNBfAhDjSJd0JBDHjK6iWm
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloJr/wACgkQp6FrSiUn
+Q2rwgwf/VGl8HD12L/Zwdvu2TzxWsPiXwjBxuH1j7LT341PjIX3GjFOGz+CGE+qw
+lREXZPexeXMABBtMlChpyRgPvbfJtKQKu4EYuVRydBjrg5I25X+3waheFuKatA8j
+53/h6IdJXH3UKjRvCXJYjBcXcY9724Ib62GaulY74tgcshyRaOyATvDxK1hkMZfB
+Y9+28D89H/KSuGeb0BpM4dwdJtuSVreiK9fKTXDJjKlbexrPlIDDpSg7ap+2onL4
+QQZM0b4RMXiR/UvEEqTSluW/4VyAMtMB4EDO6UGTI+luV/1FRC0oow7R5+Odl12v
+S+jPeCQeVHRryobafupIJzVV12Nycw==
+=aLUK
+-----END PGP SIGNATURE-----
+
+--n2eEcUfrGgTJNBfAhDjSJd0JBDHjK6iWm--
