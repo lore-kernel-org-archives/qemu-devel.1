@@ -1,34 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36046)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41063)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eEGEn-0005Wr-UY
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 10:01:35 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1eEGX3-0003fj-UW
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 10:20:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eEGEi-0001fR-5B
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 10:01:26 -0500
-Received: from indium.canonical.com ([91.189.90.7]:42446)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1eEGX3-0008VY-03
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 10:20:17 -0500
+Received: from mail-ua0-x241.google.com ([2607:f8b0:400c:c08::241]:54576)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eEGEh-0001ed-VB
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 10:01:20 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eEGEg-00029n-LJ
-	for <qemu-devel@nongnu.org>; Mon, 13 Nov 2017 15:01:18 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 9AACA2E80CB
-	for <qemu-devel@nongnu.org>; Mon, 13 Nov 2017 15:01:18 +0000 (UTC)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1eEGX2-0008Uo-RO
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 10:20:16 -0500
+Received: by mail-ua0-x241.google.com with SMTP id j14so11605025uag.11
+	for <qemu-devel@nongnu.org>; Mon, 13 Nov 2017 07:20:16 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20171113145041.GI18828@redhat.com>
+References: <03123F70-98FA-439A-868C-855E63916259@gmail.com>
+	<20171113145041.GI18828@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Mon, 13 Nov 2017 16:20:15 +0100
+Message-ID: <CAJ+F1CLxYBq7zfzMSrhnxb+9Np7ZDnrbLqf+e=FoZyC=bZFA+Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 13 Nov 2017 14:49:20 -0000
-From: Christophe Lyon <christophe.lyon+launchpad@gmail.com>
-Reply-To: Bug 1727737 <1727737@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150902607840.5143.15937446061017284272.malonedeb@chaenomeles.canonical.com>
-Message-Id: <151058456043.8260.14252851725051159642.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1727737] Re: qemu-arm stalls on a GCC sanitizer
- test since qemu-2.7
+Subject: Re: [Qemu-devel] Command-line option to change ungrab key(s)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,61 +30,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Programmingkid <programmingkidx@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-Thanks fixing my ignorance :-)
+Hi
 
-So it really seems this is a feature, not a bug here.
+On Mon, Nov 13, 2017 at 3:50 PM, Daniel P. Berrange <berrange@redhat.com> w=
+rote:
+> On Mon, Nov 13, 2017 at 09:29:25AM -0500, Programmingkid wrote:
+>> Would you accept a patch that allows the user to change the mouse ungrab=
+ key(s) in QEMU?
+>>
+>> It would look something like this:
+>>
+>> -ungrab <key>
+>>
+>> or
+>>
+>> -ungrab <key>,<key>,...
+>>
+>> If the user wanted the F19 key to be the ungrab key, this is what would =
+be sent to QEMU:
+>>
+>> -ungrab F19
+>>
+>> If the user wanted F16 and F17 held down to ungrab the mouse, this is wh=
+at would be sent to QEMU:
+>>
+>> -ungrab F16,F17
+>>
+>>
+>> Would this feature be something you would consider adding to QEMU?
+>
+> As context, virt-manager allows customization for the ungrab sequence, an=
+d
+> so do spice-gtk/gtk-vnc at the API level. So conceptually I think it is
+> reasonable for any UI console that is intended as more than just a toy.
 
-This was a bit off-topic, but I have a pending question in comment #5:
-As a side note, doing
-$ qemu-arm -E ASAN_OPTIONS=3Ddetect_leaks=3D0 blah
-does not affect the execution, while
-$ env ASAN_OPTIONS=3Ddetect_leaks=3D0 qemu-arm blah
-does
-(my question here being: why doesn't -E propagate ASA_OPTIONS to the target=
- code?)
+Would it make sense to share the virt-viewer/remote-viewer --hotkeys
+option format ? (see man remote-viewer / virt-viewer)
 
--- =
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1727737
 
-Title:
-  qemu-arm stalls on a GCC sanitizer test since qemu-2.7
-
-Status in QEMU:
-  Incomplete
-
-Bug description:
-  Hi,
-
-  I have noticed that several GCC/sanitizer tests fail with timeout when
-  executed under QEMU.
-
-  After a bit of investigation, I have noticed that this worked with
-  qemu-2.7, and started failing with qemu-2.8, and still fails with
-  qemu-2.10.1
-
-  I'm attaching a tarball containing:
-  alloca_instruments_all_paddings.exe : the testcase, and the needed libs:
-  lib/librt.so.1
-  lib/libdl.so.2
-  lib/ld-linux-armhf.so.3
-  lib/libasan.so.5
-  lib/libc.so.6
-  lib/libgcc_s.so.1
-  lib/libpthread.so.0
-  lib/libm.so.6
-
-  To reproduce the problem:
-  $ qemu-arm -cpu any -R 0 -L $PWD $PWD/alloca_instruments_all_paddings.exe
-  returns in less than a second with qemu-2.7, and never with qemu-2.8
-
-  Using -d in_asm suggests that the program "almost" completes and qemu see=
-ms to stall on:
-  0x40b6eb44: e08f4004 add r4, pc, r4
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1727737/+subscriptions
+--=20
+Marc-Andr=C3=A9 Lureau
