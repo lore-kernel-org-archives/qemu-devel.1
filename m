@@ -1,34 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43410)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52919)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eE6Nr-0005E9-UP
-	for qemu-devel@nongnu.org; Sun, 12 Nov 2017 23:30:08 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1eE7IL-0007WS-Ft
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 00:28:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eE6Nn-0001Y0-Sv
-	for qemu-devel@nongnu.org; Sun, 12 Nov 2017 23:30:07 -0500
-Received: from indium.canonical.com ([91.189.90.7]:33524)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eE6Nn-0001Wk-Ml
-	for qemu-devel@nongnu.org; Sun, 12 Nov 2017 23:30:03 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eE6Nk-0003Yj-Fc
-	for <qemu-devel@nongnu.org>; Mon, 13 Nov 2017 04:30:00 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 3447D2E80D4
-	for <qemu-devel@nongnu.org>; Mon, 13 Nov 2017 04:30:00 +0000 (UTC)
+	(envelope-from <dgibson@ozlabs.org>) id 1eE7II-0004bd-CA
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 00:28:29 -0500
+Date: Mon, 13 Nov 2017 16:28:11 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20171113052811.GC1014@umbus.fritz.box>
+References: <20171110152017.24324-1-clg@kaod.org>
+	<20171110152017.24324-3-clg@kaod.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 13 Nov 2017 04:17:24 -0000
-From: Launchpad Bug Tracker <1254940@bugs.launchpad.net>
-Reply-To: Bug 1254940 <1254940@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20131126015941.27755.36754.malonedeb@soybean.canonical.com>
-Message-Id: <151054664427.17693.17661495704434639698.malone@loganberry.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1254940] Re: qemu-KVM guest OS occurs many
- ext3-fs errors after multiple forced shutdown
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="PuGuTyElPB9bOcsM"
+Content-Disposition: inline
+In-Reply-To: <20171110152017.24324-3-clg@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH for-2.12 v3 02/11] ppc/xics: remove useless
+ if condition
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,81 +25,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
-[Expired for QEMU because there has been no activity for 60 days.]
 
-** Changed in: qemu
-       Status: Incomplete =3D> Expired
+--PuGuTyElPB9bOcsM
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
--- =
+On Fri, Nov 10, 2017 at 03:20:08PM +0000, C=E9dric Le Goater wrote:
+> The previous code section uses a 'first < 0' test and returns. Therefore,
+> there is no need to test the 'first' variable against '>=3D 0' afterwards.
+>=20
+> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+> ---
+>  hw/intc/xics_spapr.c | 6 ++----
+>  1 file changed, 2 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
+> index d98ea8b13068..e8c0a1b3e903 100644
+> --- a/hw/intc/xics_spapr.c
+> +++ b/hw/intc/xics_spapr.c
+> @@ -329,10 +329,8 @@ int spapr_ics_alloc_block(ICSState *ics, int num, bo=
+ol lsi,
+>          return -1;
+>      }
+> =20
+> -    if (first >=3D 0) {
+> -        for (i =3D first; i < first + num; ++i) {
+> -            ics_set_irq_type(ics, i, lsi);
+> -        }
+> +    for (i =3D first; i < first + num; ++i) {
+> +        ics_set_irq_type(ics, i, lsi);
+>      }
+>      first +=3D ics->offset;
+> =20
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1254940
+Applied to ppc-for-2.12.
 
-Title:
-  qemu-KVM guest OS occurs many ext3-fs errors after multiple forced
-  shutdown
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-Status in QEMU:
-  Expired
+--PuGuTyElPB9bOcsM
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Bug description:
-  Hi:
-  I met some filesysterm errors in a sles guest on KVM. My system environme=
-nt is:
-  HOST:
-  =C2=A0=C2=A0=C2=A0suse 10, the kernel version is 2.6.32.43
-  =C2=A0=C2=A0=C2=A0Qemu-KVM 1.2
-  =C2=A0=C2=A0=C2=A0Libvirt 1.0
-  guest OS:
-  =C2=A0=C2=A0=C2=A0suse 10, the kernel version is 2.6.32.43
-  VMs use a qcow2 disk.
+-----BEGIN PGP SIGNATURE-----
 
-  Description of problem:
-  I have 20+ VMs with qcow2 disk, these VMs have been forced to shut down by
-  "virsh destroy" many times during and after VM installation.
-  When these vm reboot,dmesg show a ext3-fs mount error occurred on /usr/lo=
-cal
-  partion /dev/vda3:
-  =C2=A0=C2=A0=C2=A0=C2=A0EXT3-fs warning: mounting fs with errors, running=
- e2fsck is recommendedand
-  when I wrote into partion /dev/vda3,some errors occurred in dmesg:
-  1.error (device vda3): ext3_free_blocks: Freeing blocks not in datazone -=
- block
-  =3D 1869619311, count =3D 1error (device vda3): ext3_free_blocks_sb: bit =
-already
-  cleared for block 2178152error (device vda3): ext3_readdir: bad entry in
-  directory #1083501:
-  2.[347470.661893] attempt to access beyond end of device[347470.661896] v=
-da3:
-  rw=3D0, want=3D6870892952, limit=3D41945715[347470.661897] EXT3-fs error =
-(device
-  vda3): ext3_free_branches: Read failure, inode=3D1083508, block=3D8588616=
-18
-  3.EXT3-fs error (device vda3): ext3_new_block: block(4295028581) >=3D blo=
-cks
-  count(-1) - block_group =3D 1, es =3D=3D ffff88021b6c7400
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAloJLWsACgkQbDjKyiDZ
+s5JdvxAAobUHzqEx5IdAobrgKau3ZTtWZtiFBphKb84z0XZ3bGr3QF3trWgOen6P
+uJpY7ZZRuMFBFDzEC/GNiQUGzzO3rU17HGpl1OfI/MSsVxGR9kP+/Gpd9REg0cfR
+cN+1dLj4n3MWcL4Wzu2xVZTq1LhtfWkAUPwrNJEiYbQStVZ6GN2+2+YhmSY9guV/
+LL76MdpAETywOObiEn6hrOXmJxjb8J5MXdOn4ugOb+5c84hcTGm0z0zlYLJmwx1q
+EHq5MD3viaqDO4mj4fr1acpX5g8UMIgfGpxprlbxDf0hmgW/7SB8Rs2X7EBDNXcN
+w74CZtGhQzPpboEDllXAJsbADTaNV0n4ZwKJBYQ1vQBL1+d+im0rNiUDYRlZ6Pj/
+Q0Oo5EV2P+poPhc02uOVXrZl1cAtnnVCS6liiIUsNut5Fa88jJz+E09GcQoRZVNL
+JPZpWMuzx7a4RrPcTay21NtqRi84xFjcMBkoESpMlZK1qabnLfYaQkT+QWZxr/QI
+2WrmDm4RzQL9dbOQwmc4Pc8ZAouczfk0OuRqRAeeZuq2dBu+h8EkgEYq2KvytFpx
+RlcT7xCelhtBWaCTyJ1Y6OJ5Z2kKTyz1A/X7Nm3xKLgNUiz9M4nZEghlGY3Qt+SS
+n46UeV9n/MUiI9e6LTlsc8nXq8oVrVm20pd3HSPq8BL1lCU+yQ4=
+=BIiJ
+-----END PGP SIGNATURE-----
 
-  I suspect this fs-error is caused by multiple forced shutdown, but I can't
-  reproduce this bug now.
-
-  So if someone else encountered the same bugs(or fs errors) with me,
-  and what the reasons leads to these fs errors, is the qemu or KVM or
-  just my "rough" cmd.
-
-  Thanks in Advance
-  Regards
-  Ben
-
-  Steps to Reproduce:
-  I can't reproduce this bug now.
-
-  additional:
-  1.multiple forced shutdown during and after the vm installing
-  2.vm with qcow2 disk
-  3.different vm dmesg different errors in above error list(1/2/3)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1254940/+subscriptions
+--PuGuTyElPB9bOcsM--
