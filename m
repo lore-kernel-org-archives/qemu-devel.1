@@ -1,14 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41014)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41400)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefan@weilnetz.de>) id 1eE99N-0006ny-Pc
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 02:27:22 -0500
+	(envelope-from <no-reply@patchew.org>) id 1eE9CU-0007eO-GZ
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 02:30:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefan@weilnetz.de>) id 1eE99K-00009o-L8
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 02:27:21 -0500
-From: Stefan Weil <sw@weilnetz.de>
-Date: Mon, 13 Nov 2017 08:27:15 +0100
-Message-Id: <20171113072715.3443-1-sw@weilnetz.de>
-Subject: [Qemu-devel] [PATCH for 2.12] disas/hppa: Fix compiler errors
+	(envelope-from <no-reply@patchew.org>) id 1eE9CQ-0000im-QQ
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 02:30:34 -0500
+Resent-Message-Id: <E1eE9CQ-0000im-QQ@eggs.gnu.org>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <151055820537.390.14030945316491927841@bafd83ae6430>
+In-Reply-To: <20171113072715.3443-1-sw@weilnetz.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Sun, 12 Nov 2017 23:30:06 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH for 2.12] disas/hppa: Fix compiler errors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,46 +23,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-trivial@nongnu.org
-Cc: qemu-devel@nongnu.org, Stefan Weil <sw@weilnetz.de>
+To: sw@weilnetz.de
+Cc: famz@redhat.com, richard.henderson@linaro.org, qemu-trivial@nongnu.org, qemu-devel@nongnu.org
 
-gcc (Debian 6.3.0-18) 6.3.0 20170516 reports these errors:
-
-disas/hppa.c:2702:20: error:
- left shift of negative value [-Werror=shift-negative-value]
-disas/hppa.c:2718:20: error:
- left shift of negative value [-Werror=shift-negative-value]
-
-Signed-off-by: Stefan Weil <sw@weilnetz.de>
----
-
-This patch fails with checkpatch.pl because the code uses
-tab indention.
-
- disas/hppa.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/disas/hppa.c b/disas/hppa.c
-index a2d371fdb1..0d1e99eab3 100644
---- a/disas/hppa.c
-+++ b/disas/hppa.c
-@@ -2699,7 +2699,7 @@ print_insn_hppa (bfd_vma memaddr, disassemble_info *info)
- 		    int disp;
- 
- 		    if (sign)
--		      disp = (-1 << 10) | imm10;
-+		      disp = (UINT_MAX << 10) | imm10;
- 		    else
- 		      disp = imm10;
- 
-@@ -2715,7 +2715,7 @@ print_insn_hppa (bfd_vma memaddr, disassemble_info *info)
- 		    int disp;
- 
- 		    if (sign)
--		      disp = (-1 << 11) | imm11;
-+		      disp = (UINT_MAX << 11) | imm11;
- 		    else
- 		      disp = imm11;
- 
--- 
-2.11.0
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
+ZGV2ZWxdIFtQQVRDSCBmb3IgMi4xMl0gZGlzYXMvaHBwYTogRml4IGNvbXBpbGVyIGVycm9ycwpU
+eXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMjAxNzExMTMwNzI3MTUuMzQ0My0xLXN3QHdlaWxuZXR6
+LmRlCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0x
+CnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0
+IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlm
+Zi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2Ug
+JEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0gg
+JG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdp
+dCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWls
+YmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0k
+KChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0
+aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczov
+L2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgICAg
+ICAgcGF0Y2hldy8yMDE3MTExMzA3MjcxNS4zNDQzLTEtc3dAd2VpbG5ldHouZGUgLT4gcGF0Y2hl
+dy8yMDE3MTExMzA3MjcxNS4zNDQzLTEtc3dAd2VpbG5ldHouZGUKU3dpdGNoZWQgdG8gYSBuZXcg
+YnJhbmNoICd0ZXN0JwplMGJiZDRkNzFiIGRpc2FzL2hwcGE6IEZpeCBjb21waWxlciBlcnJvcnMK
+Cj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMTogZGlzYXMvaHBwYTogRml4
+IGNvbXBpbGVyIGVycm9ycy4uLgpFUlJPUjogc3VzcGVjdCBjb2RlIGluZGVudCBmb3IgY29uZGl0
+aW9uYWwgc3RhdGVtZW50cyAoMjAsIDIyKQojMjM6IEZJTEU6IGRpc2FzL2hwcGEuYzoyNzAxOgog
+CQkgICAgaWYgKHNpZ24pCisJCSAgICAgIGRpc3AgPSAoVUlOVF9NQVggPDwgMTApIHwgaW1tMTA7
+CgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMyNTogRklMRTogZGlz
+YXMvaHBwYS5jOjI3MDI6CiteSV5JICAgICAgZGlzcCA9IChVSU5UX01BWCA8PCAxMCkgfCBpbW0x
+MDskCgpFUlJPUjogc3VzcGVjdCBjb2RlIGluZGVudCBmb3IgY29uZGl0aW9uYWwgc3RhdGVtZW50
+cyAoMjAsIDIyKQojMzI6IEZJTEU6IGRpc2FzL2hwcGEuYzoyNzE3OgogCQkgICAgaWYgKHNpZ24p
+CisJCSAgICAgIGRpc3AgPSAoVUlOVF9NQVggPDwgMTEpIHwgaW1tMTE7CgpFUlJPUjogY29kZSBp
+bmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMzNDogRklMRTogZGlzYXMvaHBwYS5jOjI3MTg6
+CiteSV5JICAgICAgZGlzcCA9IChVSU5UX01BWCA8PCAxMSkgfCBpbW0xMTskCgp0b3RhbDogNCBl
+cnJvcnMsIDAgd2FybmluZ3MsIDE2IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxl
+IHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFs
+c2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRD
+SCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRl
+ZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0
+Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8g
+cGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
