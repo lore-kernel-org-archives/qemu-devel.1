@@ -1,24 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41992)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42229)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eEGaJ-0005ik-F3
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 10:23:40 -0500
+	(envelope-from <eblake@redhat.com>) id 1eEGbG-0006Ce-Un
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 10:24:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eEGaE-0001RA-Eu
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 10:23:39 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52564)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1eEGaE-0001Qr-7Z
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 10:23:34 -0500
-Date: Mon, 13 Nov 2017 16:23:28 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20171113162328.3b94def6.cohuck@redhat.com>
-In-Reply-To: <1510075479-17224-5-git-send-email-pmorel@linux.vnet.ibm.com>
-References: <1510075479-17224-1-git-send-email-pmorel@linux.vnet.ibm.com>
-	<1510075479-17224-5-git-send-email-pmorel@linux.vnet.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 4/7] s390x/pci: rework PCI STORE BLOCK
+	(envelope-from <eblake@redhat.com>) id 1eEGbF-0001fE-Eb
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 10:24:38 -0500
+From: Eric Blake <eblake@redhat.com>
+Date: Mon, 13 Nov 2017 09:24:24 -0600
+Message-Id: <20171113152424.25381-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH for-2.11] nbd/client: Use error_prepend()
+ correctly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,133 +18,235 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pierre Morel <pmorel@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, agraf@suse.de, borntraeger@de.ibm.com, zyimin@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, vsementsov@virtuozzo.com, qemu-stable@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 
-On Tue,  7 Nov 2017 18:24:36 +0100
-Pierre Morel <pmorel@linux.vnet.ibm.com> wrote:
+When using error prepend(), it is necessary to end with a space
+in the format string; otherwise, messages come out incorrectly,
+such as when connecting to a socket that hangs up immediately:
 
-> Enhance the fault detection.
-> 
-> Add the maxstbl entry to both the Query PCI Function Group
-> response and the PCIBusDevice structure.
-> 
-> Initialize the maxstbl to 128 per default until we get
-> the actual data from the hardware.
-> 
-> Signed-off-by: Pierre Morel <pmorel@linux.vnet.ibm.com>
-> Reviewed-by: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
-> ---
->  hw/s390x/s390-pci-bus.h  |  1 +
->  hw/s390x/s390-pci-inst.c | 62 +++++++++++++++++++++++++++++-------------------
->  hw/s390x/s390-pci-inst.h |  2 +-
->  3 files changed, 40 insertions(+), 25 deletions(-)
-> 
+can't open device nbd://localhost:10809/: Failed to read dataUnexpected end-of-file before all bytes were read
 
-> @@ -662,22 +664,10 @@ int pcistb_service_call(S390CPU *cpu, uint8_t r1, uint8_t r3, uint64_t gaddr,
->      fh = env->regs[r1] >> 32;
->      pcias = (env->regs[r1] >> 16) & 0xf;
->      len = env->regs[r1] & 0xff;
-> +    offset = env->regs[r3];
->  
-> -    if (pcias > 5) {
-> -        DPRINTF("pcistb invalid space\n");
-> -        setcc(cpu, ZPCI_PCI_LS_ERR);
-> -        s390_set_status_code(env, r1, ZPCI_PCI_ST_INVAL_AS);
-> -        return 0;
-> -    }
-> -
-> -    switch (len) {
-> -    case 16:
-> -    case 32:
-> -    case 64:
-> -    case 128:
-> -        break;
-> -    default:
-> -        program_interrupt(env, PGM_SPECIFICATION, 6);
-> +    if (!(fh & FH_MASK_ENABLE)) {
-> +        setcc(cpu, ZPCI_PCI_LS_INVAL_HANDLE);
+Originally botched in commit e44ed99d, then several more instances
+added in the meantime.
 
-So this means you move checking for the device before checking for the
-parameters or the as.
+CC: qemu-stable@nongnu.org
+Signed-off-by: Eric Blake <eblake@redhat.com>
+---
+ nbd/client.c | 50 ++++++++++++++++++++++++++------------------------
+ 1 file changed, 26 insertions(+), 24 deletions(-)
 
->          return 0;
->      }
->  
-> @@ -689,12 +679,7 @@ int pcistb_service_call(S390CPU *cpu, uint8_t r1, uint8_t r3, uint64_t gaddr,
->      }
->  
->      switch (pbdev->state) {
-> -    case ZPCI_FS_RESERVED:
-> -    case ZPCI_FS_STANDBY:
-> -    case ZPCI_FS_DISABLED:
->      case ZPCI_FS_PERMANENT_ERROR:
-> -        setcc(cpu, ZPCI_PCI_LS_INVAL_HANDLE);
-> -        return 0;
->      case ZPCI_FS_ERROR:
->          setcc(cpu, ZPCI_PCI_LS_ERR);
->          s390_set_status_code(env, r1, ZPCI_PCI_ST_BLOCKED);
-> @@ -703,8 +688,33 @@ int pcistb_service_call(S390CPU *cpu, uint8_t r1, uint8_t r3, uint64_t gaddr,
->          break;
->      }
->  
-> +    if (pcias > 5) {
-> +        DPRINTF("pcistb invalid space\n");
-> +        setcc(cpu, ZPCI_PCI_LS_ERR);
-> +        s390_set_status_code(env, r1, ZPCI_PCI_ST_INVAL_AS);
-> +        return 0;
-> +    }
-> +
-> +    /* Verify the address, offset and length */
-> +    /* offset must be a multiple of 8 */
-> +    if (offset % 8) {
-> +        goto addressing_error;
-> +    }
-> +    /* Length must be greater than 8, a multiple of 8, lower than maxstbl */
-> +    if ((len <= 8) || (len % 8) || (len > pbdev->maxstbl)) {
-> +        goto addressing_error;
-> +    }
-> +    /* Do not cross a 4K-byte boundary */
-> +    if (((offset & 0xfff) + len) > 0x1000) {
-> +        goto addressing_error;
-> +    }
-> +    /* Guest address must be double word aligned */
-> +    if (gaddr & 0x07UL) {
-> +        goto addressing_error;
-> +    }
+diff --git a/nbd/client.c b/nbd/client.c
+index 1880103d2a..4e15fc484d 100644
+--- a/nbd/client.c
++++ b/nbd/client.c
+@@ -79,12 +79,12 @@ static int nbd_send_option_request(QIOChannel *ioc, uint32_t opt,
+     stl_be_p(&req.length, len);
 
-So the checks here are only evaluated if the instruction actually pokes
-at a valid region?
+     if (nbd_write(ioc, &req, sizeof(req), errp) < 0) {
+-        error_prepend(errp, "Failed to send option request header");
++        error_prepend(errp, "Failed to send option request header: ");
+         return -1;
+     }
 
-> +
->      mr = pbdev->pdev->io_regions[pcias].memory;
-> -    if (!memory_region_access_valid(mr, env->regs[r3], len, true)) {
-> +    if (!memory_region_access_valid(mr, offset, len, true)) {
->          program_interrupt(env, PGM_OPERAND, 6);
->          return 0;
->      }
-> @@ -714,9 +724,9 @@ int pcistb_service_call(S390CPU *cpu, uint8_t r1, uint8_t r3, uint64_t gaddr,
->      }
->  
->      for (i = 0; i < len / 8; i++) {
-> -        result = memory_region_dispatch_write(mr, env->regs[r3] + i * 8,
-> -                                     ldq_p(buffer + i * 8), 8,
-> -                                     MEMTXATTRS_UNSPECIFIED);
-> +        result = memory_region_dispatch_write(mr, offset + i * 8,
-> +                                              ldq_p(buffer + i * 8), 8,
-> +                                              MEMTXATTRS_UNSPECIFIED);
->          if (result != MEMTX_OK) {
->              program_interrupt(env, PGM_OPERAND, 6);
->              return 0;
-> @@ -725,6 +735,10 @@ int pcistb_service_call(S390CPU *cpu, uint8_t r1, uint8_t r3, uint64_t gaddr,
->  
->      setcc(cpu, ZPCI_PCI_LS_OK);
->      return 0;
-> +
-> +addressing_error:
-> +    program_interrupt(env, PGM_SPECIFICATION, 6);
-> +    return 0;
->  }
+     if (len && nbd_write(ioc, (char *) data, len, errp) < 0) {
+-        error_prepend(errp, "Failed to send option request data");
++        error_prepend(errp, "Failed to send option request data: ");
+         return -1;
+     }
 
-This seems more readable; I can't verify whether it is actually correct
-without access to the architecture, though :(
+@@ -113,7 +113,7 @@ static int nbd_receive_option_reply(QIOChannel *ioc, uint32_t opt,
+ {
+     QEMU_BUILD_BUG_ON(sizeof(*reply) != 20);
+     if (nbd_read(ioc, reply, sizeof(*reply), errp) < 0) {
+-        error_prepend(errp, "failed to read option reply");
++        error_prepend(errp, "failed to read option reply: ");
+         nbd_send_opt_abort(ioc);
+         return -1;
+     }
+@@ -166,7 +166,7 @@ static int nbd_handle_reply_err(QIOChannel *ioc, nbd_opt_reply *reply,
+         msg = g_malloc(reply->length + 1);
+         if (nbd_read(ioc, msg, reply->length, errp) < 0) {
+             error_prepend(errp, "failed to read option error 0x%" PRIx32
+-                          " (%s) message",
++                          " (%s) message: ",
+                           reply->type, nbd_rep_lookup(reply->type));
+             goto cleanup;
+         }
+@@ -277,7 +277,7 @@ static int nbd_receive_list(QIOChannel *ioc, const char *want, bool *match,
+         return -1;
+     }
+     if (nbd_read(ioc, &namelen, sizeof(namelen), errp) < 0) {
+-        error_prepend(errp, "failed to read option name length");
++        error_prepend(errp, "failed to read option name length: ");
+         nbd_send_opt_abort(ioc);
+         return -1;
+     }
+@@ -290,7 +290,8 @@ static int nbd_receive_list(QIOChannel *ioc, const char *want, bool *match,
+     }
+     if (namelen != strlen(want)) {
+         if (nbd_drop(ioc, len, errp) < 0) {
+-            error_prepend(errp, "failed to skip export name with wrong length");
++            error_prepend(errp,
++                          "failed to skip export name with wrong length: ");
+             nbd_send_opt_abort(ioc);
+             return -1;
+         }
+@@ -299,14 +300,14 @@ static int nbd_receive_list(QIOChannel *ioc, const char *want, bool *match,
+
+     assert(namelen < sizeof(name));
+     if (nbd_read(ioc, name, namelen, errp) < 0) {
+-        error_prepend(errp, "failed to read export name");
++        error_prepend(errp, "failed to read export name: ");
+         nbd_send_opt_abort(ioc);
+         return -1;
+     }
+     name[namelen] = '\0';
+     len -= namelen;
+     if (nbd_drop(ioc, len, errp) < 0) {
+-        error_prepend(errp, "failed to read export description");
++        error_prepend(errp, "failed to read export description: ");
+         nbd_send_opt_abort(ioc);
+         return -1;
+     }
+@@ -390,7 +391,7 @@ static int nbd_opt_go(QIOChannel *ioc, const char *wantname,
+             return -1;
+         }
+         if (nbd_read(ioc, &type, sizeof(type), errp) < 0) {
+-            error_prepend(errp, "failed to read info type");
++            error_prepend(errp, "failed to read info type: ");
+             nbd_send_opt_abort(ioc);
+             return -1;
+         }
+@@ -405,13 +406,13 @@ static int nbd_opt_go(QIOChannel *ioc, const char *wantname,
+                 return -1;
+             }
+             if (nbd_read(ioc, &info->size, sizeof(info->size), errp) < 0) {
+-                error_prepend(errp, "failed to read info size");
++                error_prepend(errp, "failed to read info size: ");
+                 nbd_send_opt_abort(ioc);
+                 return -1;
+             }
+             be64_to_cpus(&info->size);
+             if (nbd_read(ioc, &info->flags, sizeof(info->flags), errp) < 0) {
+-                error_prepend(errp, "failed to read info flags");
++                error_prepend(errp, "failed to read info flags: ");
+                 nbd_send_opt_abort(ioc);
+                 return -1;
+             }
+@@ -428,7 +429,7 @@ static int nbd_opt_go(QIOChannel *ioc, const char *wantname,
+             }
+             if (nbd_read(ioc, &info->min_block, sizeof(info->min_block),
+                          errp) < 0) {
+-                error_prepend(errp, "failed to read info minimum block size");
++                error_prepend(errp, "failed to read info minimum block size: ");
+                 nbd_send_opt_abort(ioc);
+                 return -1;
+             }
+@@ -441,7 +442,8 @@ static int nbd_opt_go(QIOChannel *ioc, const char *wantname,
+             }
+             if (nbd_read(ioc, &info->opt_block, sizeof(info->opt_block),
+                          errp) < 0) {
+-                error_prepend(errp, "failed to read info preferred block size");
++                error_prepend(errp,
++                              "failed to read info preferred block size: ");
+                 nbd_send_opt_abort(ioc);
+                 return -1;
+             }
+@@ -455,7 +457,7 @@ static int nbd_opt_go(QIOChannel *ioc, const char *wantname,
+             }
+             if (nbd_read(ioc, &info->max_block, sizeof(info->max_block),
+                          errp) < 0) {
+-                error_prepend(errp, "failed to read info maximum block size");
++                error_prepend(errp, "failed to read info maximum block size: ");
+                 nbd_send_opt_abort(ioc);
+                 return -1;
+             }
+@@ -467,7 +469,7 @@ static int nbd_opt_go(QIOChannel *ioc, const char *wantname,
+         default:
+             trace_nbd_opt_go_info_unknown(type, nbd_info_lookup(type));
+             if (nbd_drop(ioc, len, errp) < 0) {
+-                error_prepend(errp, "Failed to read info payload");
++                error_prepend(errp, "Failed to read info payload: ");
+                 nbd_send_opt_abort(ioc);
+                 return -1;
+             }
+@@ -618,7 +620,7 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name,
+     }
+
+     if (nbd_read(ioc, buf, 8, errp) < 0) {
+-        error_prepend(errp, "Failed to read data");
++        error_prepend(errp, "Failed to read data: ");
+         goto fail;
+     }
+
+@@ -637,7 +639,7 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name,
+     }
+
+     if (nbd_read(ioc, &magic, sizeof(magic), errp) < 0) {
+-        error_prepend(errp, "Failed to read magic");
++        error_prepend(errp, "Failed to read magic: ");
+         goto fail;
+     }
+     magic = be64_to_cpu(magic);
+@@ -649,7 +651,7 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name,
+         bool fixedNewStyle = false;
+
+         if (nbd_read(ioc, &globalflags, sizeof(globalflags), errp) < 0) {
+-            error_prepend(errp, "Failed to read server flags");
++            error_prepend(errp, "Failed to read server flags: ");
+             goto fail;
+         }
+         globalflags = be16_to_cpu(globalflags);
+@@ -665,7 +667,7 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name,
+         /* client requested flags */
+         clientflags = cpu_to_be32(clientflags);
+         if (nbd_write(ioc, &clientflags, sizeof(clientflags), errp) < 0) {
+-            error_prepend(errp, "Failed to send clientflags field");
++            error_prepend(errp, "Failed to send clientflags field: ");
+             goto fail;
+         }
+         if (tlscreds) {
+@@ -727,13 +729,13 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name,
+
+         /* Read the response */
+         if (nbd_read(ioc, &info->size, sizeof(info->size), errp) < 0) {
+-            error_prepend(errp, "Failed to read export length");
++            error_prepend(errp, "Failed to read export length: ");
+             goto fail;
+         }
+         be64_to_cpus(&info->size);
+
+         if (nbd_read(ioc, &info->flags, sizeof(info->flags), errp) < 0) {
+-            error_prepend(errp, "Failed to read export flags");
++            error_prepend(errp, "Failed to read export flags: ");
+             goto fail;
+         }
+         be16_to_cpus(&info->flags);
+@@ -750,13 +752,13 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name,
+         }
+
+         if (nbd_read(ioc, &info->size, sizeof(info->size), errp) < 0) {
+-            error_prepend(errp, "Failed to read export length");
++            error_prepend(errp, "Failed to read export length: ");
+             goto fail;
+         }
+         be64_to_cpus(&info->size);
+
+         if (nbd_read(ioc, &oldflags, sizeof(oldflags), errp) < 0) {
+-            error_prepend(errp, "Failed to read export flags");
++            error_prepend(errp, "Failed to read export flags: ");
+             goto fail;
+         }
+         be32_to_cpus(&oldflags);
+@@ -772,7 +774,7 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name,
+
+     trace_nbd_receive_negotiate_size_flags(info->size, info->flags);
+     if (zeroes && nbd_drop(ioc, 124, errp) < 0) {
+-        error_prepend(errp, "Failed to read reserved block");
++        error_prepend(errp, "Failed to read reserved block: ");
+         goto fail;
+     }
+     rc = 0;
+-- 
+2.13.6
