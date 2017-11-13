@@ -1,40 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40114)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41456)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1eEHlH-0003e8-RQ
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 11:39:06 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1eEHnX-0004cv-9f
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 11:41:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1eEHlE-0005bh-Ig
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 11:39:03 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:54076)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pmorel@linux.vnet.ibm.com>)
-	id 1eEHlE-0005aw-8r
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 11:39:00 -0500
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vADGc0GI139457
-	for <qemu-devel@nongnu.org>; Mon, 13 Nov 2017 11:38:55 -0500
-Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2e7bue48e7-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 13 Nov 2017 11:38:54 -0500
-Received: from localhost
-	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pmorel@linux.vnet.ibm.com>;
-	Mon, 13 Nov 2017 16:38:43 -0000
-References: <1510075479-17224-1-git-send-email-pmorel@linux.vnet.ibm.com>
-	<1510075479-17224-5-git-send-email-pmorel@linux.vnet.ibm.com>
-	<20171113162328.3b94def6.cohuck@redhat.com>
-From: Pierre Morel <pmorel@linux.vnet.ibm.com>
-Date: Mon, 13 Nov 2017 17:38:40 +0100
+	(envelope-from <alex.bennee@linaro.org>) id 1eEHnT-0007CR-Vb
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 11:41:23 -0500
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:52035)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1eEHnT-0007Bl-L5
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 11:41:19 -0500
+Received: by mail-wm0-x243.google.com with SMTP id b189so9686259wmd.0
+	for <qemu-devel@nongnu.org>; Mon, 13 Nov 2017 08:41:19 -0800 (PST)
+References: <20171004184325.24157-1-richard.henderson@linaro.org>
+	<20171004184325.24157-5-richard.henderson@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20171004184325.24157-5-richard.henderson@linaro.org>
+Date: Mon, 13 Nov 2017 16:41:10 +0000
+Message-ID: <87vaie9lnd.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20171113162328.3b94def6.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Message-Id: <cd2217c5-25ca-0a15-46ac-b37e04e528e6@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 4/7] s390x/pci: rework PCI STORE BLOCK
+Subject: Re: [Qemu-devel] [PATCH v1 04/12] target/arm: Decode aa64 armv8.1
+ three same extra
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,175 +31,271 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel@nongnu.org, agraf@suse.de, borntraeger@de.ibm.com, zyimin@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com
-
-On 13/11/2017 16:23, Cornelia Huck wrote:
-> On Tue,  7 Nov 2017 18:24:36 +0100
-> Pierre Morel <pmorel@linux.vnet.ibm.com> wrote:
->=20
->> Enhance the fault detection.
->>
->> Add the maxstbl entry to both the Query PCI Function Group
->> response and the PCIBusDevice structure.
->>
->> Initialize the maxstbl to 128 per default until we get
->> the actual data from the hardware.
->>
->> Signed-off-by: Pierre Morel <pmorel@linux.vnet.ibm.com>
->> Reviewed-by: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
->> ---
->>   hw/s390x/s390-pci-bus.h  |  1 +
->>   hw/s390x/s390-pci-inst.c | 62 +++++++++++++++++++++++++++++---------=
-----------
->>   hw/s390x/s390-pci-inst.h |  2 +-
->>   3 files changed, 40 insertions(+), 25 deletions(-)
->>
->=20
->> @@ -662,22 +664,10 @@ int pcistb_service_call(S390CPU *cpu, uint8_t r1=
-, uint8_t r3, uint64_t gaddr,
->>       fh =3D env->regs[r1] >> 32;
->>       pcias =3D (env->regs[r1] >> 16) & 0xf;
->>       len =3D env->regs[r1] & 0xff;
->> +    offset =3D env->regs[r3];
->>  =20
->> -    if (pcias > 5) {
->> -        DPRINTF("pcistb invalid space\n");
->> -        setcc(cpu, ZPCI_PCI_LS_ERR);
->> -        s390_set_status_code(env, r1, ZPCI_PCI_ST_INVAL_AS);
->> -        return 0;
->> -    }
->> -
->> -    switch (len) {
->> -    case 16:
->> -    case 32:
->> -    case 64:
->> -    case 128:
->> -        break;
->> -    default:
->> -        program_interrupt(env, PGM_SPECIFICATION, 6);
->> +    if (!(fh & FH_MASK_ENABLE)) {
->> +        setcc(cpu, ZPCI_PCI_LS_INVAL_HANDLE);
->=20
-> So this means you move checking for the device before checking for the
-> parameters or the as.
-
-Yes, this is clearly following the specifications that CC=3D3 has priorit=
-y=20
-over CC=3D1 or CC=3D2.
-
-By the way I find that defining ZPCI_PCI_LS_INVAL_HANDLE is obfuscating,=20
-we have the information from the test we just made but we loose the=20
-information about if it is a 1, 2 or 3 CC value.
-May be in another patch?
-
->=20
->>           return 0;
->>       }
->>  =20
->> @@ -689,12 +679,7 @@ int pcistb_service_call(S390CPU *cpu, uint8_t r1,=
- uint8_t r3, uint64_t gaddr,
->>       }
->>  =20
->>       switch (pbdev->state) {
->> -    case ZPCI_FS_RESERVED:
->> -    case ZPCI_FS_STANDBY:
->> -    case ZPCI_FS_DISABLED:
->>       case ZPCI_FS_PERMANENT_ERROR:
->> -        setcc(cpu, ZPCI_PCI_LS_INVAL_HANDLE);
->> -        return 0;
->>       case ZPCI_FS_ERROR:
->>           setcc(cpu, ZPCI_PCI_LS_ERR);
->>           s390_set_status_code(env, r1, ZPCI_PCI_ST_BLOCKED);
->> @@ -703,8 +688,33 @@ int pcistb_service_call(S390CPU *cpu, uint8_t r1,=
- uint8_t r3, uint64_t gaddr,
->>           break;
->>       }
->>  =20
->> +    if (pcias > 5) {
->> +        DPRINTF("pcistb invalid space\n");
->> +        setcc(cpu, ZPCI_PCI_LS_ERR);
->> +        s390_set_status_code(env, r1, ZPCI_PCI_ST_INVAL_AS);
->> +        return 0;
->> +    }
->> +
->> +    /* Verify the address, offset and length */
->> +    /* offset must be a multiple of 8 */
->> +    if (offset % 8) {
->> +        goto addressing_error;
->> +    }
->> +    /* Length must be greater than 8, a multiple of 8, lower than max=
-stbl */
->> +    if ((len <=3D 8) || (len % 8) || (len > pbdev->maxstbl)) {
->> +        goto addressing_error;
->> +    }
->> +    /* Do not cross a 4K-byte boundary */
->> +    if (((offset & 0xfff) + len) > 0x1000) {
->> +        goto addressing_error;
->> +    }
->> +    /* Guest address must be double word aligned */
->> +    if (gaddr & 0x07UL) {
->> +        goto addressing_error;
->> +    }
->=20
-> So the checks here are only evaluated if the instruction actually pokes
-> at a valid region?
-
-hum, I did not find the precedence of execution for PCI STORE BLOCK.
-
-My logic is that you must find a destination before you start reading=20
-the source, so I would say it is the right way to do.
-But the experience as already shown that my logic may not always be=20
-compatible with the internals of S390x :)
-
-However, the documentation specifies that if an error condition is=20
-detected that precludes the *initiation* of the store operation a CC=3D1=20
-is set.
-The fact that the *initiation* is focused on enforce the idea I have on=20
-the precedence between the low level operations.
-
->=20
->> +
->>       mr =3D pbdev->pdev->io_regions[pcias].memory;
->> -    if (!memory_region_access_valid(mr, env->regs[r3], len, true)) {
->> +    if (!memory_region_access_valid(mr, offset, len, true)) {
->>           program_interrupt(env, PGM_OPERAND, 6);
->>           return 0;
->>       }
->> @@ -714,9 +724,9 @@ int pcistb_service_call(S390CPU *cpu, uint8_t r1, =
-uint8_t r3, uint64_t gaddr,
->>       }
->>  =20
->>       for (i =3D 0; i < len / 8; i++) {
->> -        result =3D memory_region_dispatch_write(mr, env->regs[r3] + i=
- * 8,
->> -                                     ldq_p(buffer + i * 8), 8,
->> -                                     MEMTXATTRS_UNSPECIFIED);
->> +        result =3D memory_region_dispatch_write(mr, offset + i * 8,
->> +                                              ldq_p(buffer + i * 8), =
-8,
->> +                                              MEMTXATTRS_UNSPECIFIED)=
-;
->>           if (result !=3D MEMTX_OK) {
->>               program_interrupt(env, PGM_OPERAND, 6);
->>               return 0;
->> @@ -725,6 +735,10 @@ int pcistb_service_call(S390CPU *cpu, uint8_t r1,=
- uint8_t r3, uint64_t gaddr,
->>  =20
->>       setcc(cpu, ZPCI_PCI_LS_OK);
->>       return 0;
->> +
->> +addressing_error:
->> +    program_interrupt(env, PGM_SPECIFICATION, 6);
->> +    return 0;
->>   }
->=20
-> This seems more readable; I can't verify whether it is actually correct
-> without access to the architecture, though :(
->=20
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org
 
 
+Richard Henderson <richard.henderson@linaro.org> writes:
 
---=20
-Pierre Morel
-Linux/KVM/QEMU in B=C3=B6blingen - Germany
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/arm/helper.h         |  9 +++++
+>  target/arm/advsimd_helper.c | 74 +++++++++++++++++++++++++++++++++++++++
+>  target/arm/translate-a64.c  | 84 +++++++++++++++++++++++++++++++++++++++=
+++++++
+>  3 files changed, 167 insertions(+)
+>
+> diff --git a/target/arm/helper.h b/target/arm/helper.h
+> index ec098d8337..67583b3c2e 100644
+> --- a/target/arm/helper.h
+> +++ b/target/arm/helper.h
+> @@ -542,6 +542,15 @@ DEF_HELPER_2(dc_zva, void, env, i64)
+>  DEF_HELPER_FLAGS_2(neon_pmull_64_lo, TCG_CALL_NO_RWG_SE, i64, i64, i64)
+>  DEF_HELPER_FLAGS_2(neon_pmull_64_hi, TCG_CALL_NO_RWG_SE, i64, i64, i64)
+>
+> +DEF_HELPER_FLAGS_5(gvec_qrdmlah_s16, TCG_CALL_NO_RWG,
+> +                   void, ptr, ptr, ptr, ptr, i32)
+> +DEF_HELPER_FLAGS_5(gvec_qrdmlsh_s16, TCG_CALL_NO_RWG,
+> +                   void, ptr, ptr, ptr, ptr, i32)
+> +DEF_HELPER_FLAGS_5(gvec_qrdmlah_s32, TCG_CALL_NO_RWG,
+> +                   void, ptr, ptr, ptr, ptr, i32)
+> +DEF_HELPER_FLAGS_5(gvec_qrdmlsh_s32, TCG_CALL_NO_RWG,
+> +                   void, ptr, ptr, ptr, ptr, i32)
+> +
+>  #ifdef TARGET_AARCH64
+>  #include "helper-a64.h"
+>  #endif
+> diff --git a/target/arm/advsimd_helper.c b/target/arm/advsimd_helper.c
+> index 583c2b0dce..b0f4b02a12 100644
+> --- a/target/arm/advsimd_helper.c
+> +++ b/target/arm/advsimd_helper.c
+> @@ -26,6 +26,16 @@
+>
+>  #define SET_QC() env->vfp.xregs[ARM_VFP_FPSCR] |=3D CPSR_Q
+>
+> +static void clear_tail(void *vd, uintptr_t opr_sz, uintptr_t max_sz)
+> +{
+> +    uint64_t *d =3D vd + opr_sz;
+> +    uintptr_t i;
+> +
+> +    for (i =3D opr_sz; i < max_sz; i +=3D 8) {
+> +        *d++ =3D 0;
+> +    }
+> +}
+> +
+>  static uint16_t inl_qrdmlah_s16(CPUARMState *env, int16_t src1,
+>                                  int16_t src2, int16_t src3)
+>  {
+> @@ -51,6 +61,22 @@ uint32_t HELPER(neon_qrdmlah_s16)(CPUARMState *env, ui=
+nt32_t src1,
+>      return deposit32(e1, 16, 16, e2);
+>  }
+>
+
+A few one line comments wouldn't go amiss for those trying to decode the
+letter salad, e.g.:
+
+/* Vector signed saturating rounding doubling multiply accumulate high
+half result */
+
+> +void HELPER(gvec_qrdmlah_s16)(void *vd, void *vn, void *vm,
+> +                              void *ve, uint32_t desc)
+> +{
+> +    uintptr_t opr_sz =3D simd_oprsz(desc);
+> +    int16_t *d =3D vd;
+> +    int16_t *n =3D vn;
+> +    int16_t *m =3D vm;
+> +    CPUARMState *env =3D ve;
+> +    uintptr_t i;
+> +
+> +    for (i =3D 0; i < opr_sz / 2; ++i) {
+> +        d[i] =3D inl_qrdmlah_s16(env, n[i], m[i], d[i]);
+> +    }
+> +    clear_tail(d, opr_sz, simd_maxsz(desc));
+> +}
+> +
+>  static uint16_t inl_qrdmlsh_s16(CPUARMState *env, int16_t src1,
+>                                  int16_t src2, int16_t src3)
+>  {
+> @@ -76,6 +102,22 @@ uint32_t HELPER(neon_qrdmlsh_s16)(CPUARMState *env, u=
+int32_t src1,
+>      return deposit32(e1, 16, 16, e2);
+>  }
+>
+> +void HELPER(gvec_qrdmlsh_s16)(void *vd, void *vn, void *vm,
+> +                              void *ve, uint32_t desc)
+> +{
+> +    uintptr_t opr_sz =3D simd_oprsz(desc);
+> +    int16_t *d =3D vd;
+> +    int16_t *n =3D vn;
+> +    int16_t *m =3D vm;
+> +    CPUARMState *env =3D ve;
+> +    uintptr_t i;
+> +
+> +    for (i =3D 0; i < opr_sz / 2; ++i) {
+> +        d[i] =3D inl_qrdmlsh_s16(env, n[i], m[i], d[i]);
+> +    }
+> +    clear_tail(d, opr_sz, simd_maxsz(desc));
+> +}
+> +
+>  uint32_t HELPER(neon_qrdmlah_s32)(CPUARMState *env, int32_t src1,
+>                                    int32_t src2, int32_t src3)
+>  {
+> @@ -90,6 +132,22 @@ uint32_t HELPER(neon_qrdmlah_s32)(CPUARMState *env, i=
+nt32_t src1,
+>      return ret;
+>  }
+>
+> +void HELPER(gvec_qrdmlah_s32)(void *vd, void *vn, void *vm,
+> +                              void *ve, uint32_t desc)
+> +{
+> +    uintptr_t opr_sz =3D simd_oprsz(desc);
+> +    int32_t *d =3D vd;
+> +    int32_t *n =3D vn;
+> +    int32_t *m =3D vm;
+> +    CPUARMState *env =3D ve;
+> +    uintptr_t i;
+> +
+> +    for (i =3D 0; i < opr_sz / 4; ++i) {
+> +        d[i] =3D helper_neon_qrdmlah_s32(env, n[i], m[i], d[i]);
+> +    }
+> +    clear_tail(d, opr_sz, simd_maxsz(desc));
+> +}
+> +
+>  uint32_t HELPER(neon_qrdmlsh_s32)(CPUARMState *env, int32_t src1,
+>                                    int32_t src2, int32_t src3)
+>  {
+> @@ -103,3 +161,19 @@ uint32_t HELPER(neon_qrdmlsh_s32)(CPUARMState *env, =
+int32_t src1,
+>      }
+>      return ret;
+>  }
+> +
+> +void HELPER(gvec_qrdmlsh_s32)(void *vd, void *vn, void *vm,
+> +                              void *ve, uint32_t desc)
+> +{
+> +    uintptr_t opr_sz =3D simd_oprsz(desc);
+> +    int32_t *d =3D vd;
+> +    int32_t *n =3D vn;
+> +    int32_t *m =3D vm;
+> +    CPUARMState *env =3D ve;
+> +    uintptr_t i;
+> +
+> +    for (i =3D 0; i < opr_sz / 4; ++i) {
+> +        d[i] =3D helper_neon_qrdmlsh_s32(env, n[i], m[i], d[i]);
+> +    }
+> +    clear_tail(d, opr_sz, simd_maxsz(desc));
+> +}
+> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+> index 182853e3bb..0ea47a9dff 100644
+> --- a/target/arm/translate-a64.c
+> +++ b/target/arm/translate-a64.c
+> @@ -9874,6 +9874,89 @@ static void disas_simd_three_reg_same(DisasContext=
+ *s, uint32_t insn)
+>      }
+>  }
+>
+> +/* AdvSIMD three same extra
+> + *  31   30  29 28       24 23  22  21 20  16  15 14    11  10 9  5 4  0
+> + * +---+---+---+-----------+------+---+------+---+--------+---+----+----+
+> + * | 0 | Q | U | 0 1 1 1 0 | size | 0 |  Rm  | 1 | opcode | 1 | Rn | Rd |
+> + * +---+---+---+-----------+------+---+------+---+--------+---+----+----+
+> + */
+> +static void disas_simd_three_reg_same_extra(DisasContext *s, uint32_t in=
+sn)
+> +{
+> +    void (*fn_gvec_ptr)(TCGv_ptr, TCGv_ptr, TCGv_ptr, TCGv_ptr, TCGv_i32=
+);
+> +    int rd =3D extract32(insn, 0, 5);
+> +    int rn =3D extract32(insn, 5, 5);
+> +    int opcode =3D extract32(insn, 11, 4);
+> +    int rm =3D extract32(insn, 16, 5);
+> +    int size =3D extract32(insn, 22, 2);
+> +    bool u =3D extract32(insn, 29, 1);
+> +    bool is_q =3D extract32(insn, 30, 1);
+> +    int feature;
+> +
+> +    if (!u) {
+> +        unallocated_encoding(s);
+> +        return;
+> +    }
+> +
+> +    switch (opcode) {
+> +    case 0x0: /* SQRDMLAH (vector) */
+> +    case 0x1: /* SQRDMLSH (vector) */
+> +        if (size !=3D 1 && size !=3D 2) {
+> +            unallocated_encoding(s);
+> +            return;
+> +        }
+> +        feature =3D ARM_FEATURE_V8_1_SIMD;
+> +        break;
+> +    default:
+> +        unallocated_encoding(s);
+> +        return;
+> +    }
+> +
+> +    if (!arm_dc_feature(s, feature)) {
+> +        unallocated_encoding(s);
+> +        return;
+> +    }
+> +    if (!fp_access_check(s)) {
+> +        return;
+> +    }
+> +
+> +    switch (opcode) {
+> +    case 0x0: /* SQRDMLAH (vector) */
+> +        switch (size) {
+> +        case 1:
+> +            fn_gvec_ptr =3D gen_helper_gvec_qrdmlah_s16;
+> +            break;
+> +        case 2:
+> +            fn_gvec_ptr =3D gen_helper_gvec_qrdmlah_s32;
+> +            break;
+> +        default:
+> +            g_assert_not_reached();
+> +        }
+> +        goto do_env;
+> +
+> +    case 0x1: /* SQRDMLSH (vector) */
+> +        switch (size) {
+> +        case 1:
+> +            fn_gvec_ptr =3D gen_helper_gvec_qrdmlsh_s16;
+> +            break;
+> +        case 2:
+> +            fn_gvec_ptr =3D gen_helper_gvec_qrdmlsh_s32;
+> +            break;
+> +        default:
+> +            g_assert_not_reached();
+> +        }
+> +    do_env:
+> +        tcg_gen_gvec_3_ptr(vec_full_reg_offset(s, rd),
+> +                           vec_full_reg_offset(s, rn),
+> +                           vec_full_reg_offset(s, rm), cpu_env,
+> +                           is_q ? 16 : 8, vec_full_reg_size(s),
+> +                           0, fn_gvec_ptr);
+> +        break;
+> +
+> +    default:
+> +        g_assert_not_reached();
+> +    }
+> +}
+> +
+>  static void handle_2misc_widening(DisasContext *s, int opcode, bool is_q,
+>                                    int size, int rn, int rd)
+>  {
+> @@ -11261,6 +11344,7 @@ static void disas_crypto_two_reg_sha(DisasContext=
+ *s, uint32_t insn)
+>  static const AArch64DecodeTable data_proc_simd[] =3D {
+>      /* pattern  ,  mask     ,  fn                        */
+>      { 0x0e200400, 0x9f200400, disas_simd_three_reg_same },
+> +    { 0x0e008400, 0x9f208400, disas_simd_three_reg_same_extra },
+>      { 0x0e200000, 0x9f200c00, disas_simd_three_reg_diff },
+>      { 0x0e200800, 0x9f3e0c00, disas_simd_two_reg_misc },
+>      { 0x0e300800, 0x9f3e0c00, disas_simd_across_lanes },
+
+Other that the comments:
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+--
+Alex Benn=C3=A9e
