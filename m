@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35767)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35793)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eEEq8-0005Vv-4z
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 08:32:05 -0500
+	(envelope-from <bounces@canonical.com>) id 1eEEq9-0005b3-NC
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 08:32:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eEEpj-0006Fg-FR
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 08:31:52 -0500
-Received: from indium.canonical.com ([91.189.90.7]:44256)
+	(envelope-from <bounces@canonical.com>) id 1eEEpj-0006FU-Ej
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 08:31:53 -0500
+Received: from indium.canonical.com ([91.189.90.7]:44258)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eEEpj-0006CJ-70
+	id 1eEEpj-0006CK-5k
 	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 08:31:27 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eEEpf-00021V-2I
-	for <qemu-devel@nongnu.org>; Mon, 13 Nov 2017 13:31:23 +0000
+	id 1eEEpe-00022K-9I
+	for <qemu-devel@nongnu.org>; Mon, 13 Nov 2017 13:31:22 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 0B9B62E818D
-	for <qemu-devel@nongnu.org>; Mon, 13 Nov 2017 13:31:18 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 9B1DA2E80D3
+	for <qemu-devel@nongnu.org>; Mon, 13 Nov 2017 13:31:17 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 13 Nov 2017 13:18:13 -0000
+Date: Mon, 13 Nov 2017 13:14:51 -0000
 From: Christophe Lyon <christophe.lyon+launchpad@gmail.com>
 Reply-To: Bug 1727737 <1727737@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <150902607840.5143.15937446061017284272.malonedeb@chaenomeles.canonical.com>
-Message-Id: <151057909309.28361.11219233202071039367.malone@gac.canonical.com>
+Message-Id: <151057889106.7650.7516394275597995728.malone@soybean.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1727737] Re: qemu-arm stalls on a GCC sanitizer
  test since qemu-2.7
@@ -39,20 +39,30 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-I also looked at QEMU's code, and I am suprised that do_syscall()
-returns the value of errno rather than the return code from the syscall.
-So for instance, if clone() fails, do_syscall() returns
-get_errno(do_fork(...)) instead of -1. I thought the target code expects
--1 in case of failure, but I'm not familiar with QEMU sources, so I'm
-probably missing something.
+I looked a bit more at the sanitizers source code, to understand the
+differences between arm and aarch64. And it turns out that on aarch64,
+we have:
 
-Looking at QEMU's linux-user/syscall.c:do_fork(), I noticed several places =
-with return -TARGET_EXXXX: should this be:
-errno =3D TARGET_EXXX;
-return -1;
-instead?
-But given than most (if not all) syscalls in do_syscall actually use 'ret =
-=3D get_errno(xxxx)' I must be wrong :-)
+sanitizer_common/sanitizer_syscall_linux_aarch64.inc:
+133	// Helper function used to avoid cobbler errno.
+134	bool internal_iserror(uptr retval, int *rverrno) {
+135	  if (retval >=3D (uptr)-4095) {
+
+but on arm, in the GCC version, we use:
+
+sanitizer_common/sanitizer_syscall_generic.inc:
+54	bool internal_iserror(uptr retval, int *rverrno) {
+55	  if (retval =3D=3D (uptr)-1) {
+
+But recently (Nov 8th), the upstream sanitizer repo got a new file:
+
+sanitizer_common/sanitizer_syscall_linux_arm.inc
+133	// Helper function used to avoid cobbler errno.
+134	bool internal_iserror(uptr retval, int *rverrno) {
+135	  if (retval >=3D (uptr)-4095) {
+
+With that change, I now observe the same behaviour with qemu-aarch64 and
+qemu-arm.
 
 -- =
 
