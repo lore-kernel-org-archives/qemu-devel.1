@@ -1,27 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51871)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56256)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <apahim@redhat.com>) id 1eENAc-0003Un-G3
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 17:25:38 -0500
+	(envelope-from <alistai@xilinx.com>) id 1eENNS-0001wC-Sm
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 17:38:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <apahim@redhat.com>) id 1eENAZ-0000Vz-Cn
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 17:25:34 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33580)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <apahim@redhat.com>) id 1eENAZ-0000Vb-6p
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 17:25:31 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 156DA5D9F9
-	for <qemu-devel@nongnu.org>; Mon, 13 Nov 2017 22:25:30 +0000 (UTC)
-From: Amador Pahim <apahim@redhat.com>
-Date: Mon, 13 Nov 2017 23:23:58 +0100
-Message-Id: <20171113222358.30967-9-apahim@redhat.com>
-In-Reply-To: <20171113222358.30967-1-apahim@redhat.com>
-References: <20171113222358.30967-1-apahim@redhat.com>
-Subject: [Qemu-devel] [PATCH v10 8/8] qemu.py: don't launch again before
- shutdown()
+	(envelope-from <alistai@xilinx.com>) id 1eENNR-0006ik-Cd
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 17:38:50 -0500
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Mon, 13 Nov 2017 14:34:35 -0800
+Message-ID: <cover.1510612380.git.alistair.francis@xilinx.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v5 00/29]  Remove some of the fprintf(stderr, "*
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,56 +20,225 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: famz@redhat.com, crosa@redhat.com, ehabkost@redhat.com, Amador Pahim <apahim@redhat.com>
+To: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+Cc: alistair.francis@xilinx.com, alistair23@gmail.com, armbru@redhat.com
 
-If a VM is launched, files are created and a cleanup is required before
-a new launch. This cleanup is executed by shutdown(), so shutdown() must
-be called even if the VM is manually terminated (i.e. using kill).
+This is a smaller version of my original series, to hopefully get
+something merged (although it's getting late for 2.11 now).
 
-This patch creates a control to make sure launch() will not be executed
-again if shutdown() is not called after the previous launch().
+Continue on improving QEMUs logging/error messages by removing more
+fprintf()'s.
 
-Signed-off-by: Amador Pahim <apahim@redhat.com>
----
- scripts/qemu.py | 7 +++++++
- 1 file changed, 7 insertions(+)
+Unfortunatley my Coccinelle skills aren't that great so it's all done in
+some nasty regex and a little bit of manual work.
 
-diff --git a/scripts/qemu.py b/scripts/qemu.py
-index ab172c3670..c1b0895e94 100644
---- a/scripts/qemu.py
-+++ b/scripts/qemu.py
-@@ -89,6 +89,7 @@ class QEMUMachine(object):
-         self._qemu_full_args = None
-         self._test_dir = test_dir
-         self._temp_dir = None
-+        self._launched = False
- 
-         # just in case logging wasn't configured by the main script:
-         logging.basicConfig()
-@@ -210,10 +211,14 @@ class QEMUMachine(object):
-         if self.is_running():
-             raise QEMUMachineError('VM already running')
- 
-+        if self._launched:
-+            raise QEMUMachineError('Shutdown pending after previous launch')
-+
-         self._iolog = None
-         self._qemu_full_args = None
-         try:
-             self._launch()
-+            self._launched = True
-         except:
-             self.shutdown()
- 
-@@ -266,6 +271,8 @@ class QEMUMachine(object):
-                 command = ''
-             LOG.warn(msg, exitcode, command)
- 
-+        self._launched = False
-+
-     def qmp(self, cmd, conv_keys=True, **args):
-         '''Invoke a QMP command and return the response dict'''
-         qmp_args = dict()
--- 
-2.13.6
+V5:
+ - Small fixes
+ - Remove a lot of patches
+V4:
+ - Reorder patch 3 (the audio func patch)
+ - Add all tags
+ - Small fixes
+V3:
+ - Rebase
+ - All sorts of style fixes
+ - Remove "qemu: " prefixes from print messages
+V2:
+ - Fix build issues
+ - Drop block patches
+ - Split the hw patches into subdirectories
+ - Remove AUDIO_FUNC macro as well
+ - Add some __FUNCTION__ rename fixes in a seperate patch
+ - Create a qemu_log() conversion patch for target/
+
+
+
+Alistair Francis (29):
+  audio: Replace AUDIO_FUNC with __func__
+  Replace all occurances of __FUNCTION__ with __func__
+  Fixes after renaming __FUNCTION__ to __func__
+  hw/arm: Replace fprintf(stderr, "*\n" with error_report()
+  hw/dma: Replace fprintf(stderr, "*\n" with error_report()
+  hw/gpio: Replace fprintf(stderr, "*\n" with error_report()
+  hw/i2c: Replace fprintf(stderr, "*\n" with error_report()
+  hw/i386: Replace fprintf(stderr, "*\n" with error_report()
+  hw/ide: Replace fprintf(stderr, "*\n" with error_report()
+  hw/intc: Replace fprintf(stderr, "*\n" with error_report()
+  hw/ipmi: Replace fprintf(stderr, "*\n" with error_report()
+  hw/isa: Replace fprintf(stderr, "*\n" with error_report()
+  hw/lm32: Replace fprintf(stderr, "*\n" with error_report()
+  hw/mips: Replace fprintf(stderr, "*\n" with error_report()
+  hw/moxie: Replace fprintf(stderr, "*\n" with error_report()
+  hw/nios2: Replace fprintf(stderr, "*\n" with error_report()
+  hw/nvram: Replace fprintf(stderr, "*\n" with error_report()
+  hw/openrisc: Replace fprintf(stderr, "*\n" with error_report()
+  hw/pci*: Replace fprintf(stderr, "*\n" with error_report()
+  hw/ppc: Replace fprintf(stderr, "*\n" with error_report()
+  hw/s390x: Replace fprintf(stderr, "*\n" with error_report()
+  hw/scsi: Replace fprintf(stderr, "*\n" with error_report()
+  hw/sd: Replace fprintf(stderr, "*\n" with error_report()
+  hw/sparc*: Replace fprintf(stderr, "*\n" with error_report()
+  hw/ssi: Replace fprintf(stderr, "*\n" with error_report()
+  hw/timer: Replace fprintf(stderr, "*\n" with error_report()
+  hw/xen*: Replace fprintf(stderr, "*\n" with error_report()
+  tcg: Replace fprintf(stderr, "*\n" with error_report()
+  target: Use qemu_log() instead of fprintf(stderr, ...)
+
+ audio/alsaaudio.c               |  4 +--
+ audio/audio.c                   | 40 ++++++++++++++---------------
+ audio/audio_int.h               |  6 -----
+ audio/audio_pt_int.c            | 28 ++++++++++-----------
+ audio/audio_template.h          | 26 +++++++++----------
+ audio/dsoundaudio.c             |  2 +-
+ audio/mixeng.c                  |  2 +-
+ audio/ossaudio.c                | 10 +++-----
+ audio/paaudio.c                 | 56 ++++++++++++++++++++-----------------=
+----
+ audio/sdlaudio.c                |  2 +-
+ audio/wavaudio.c                |  2 +-
+ cpus.c                          |  8 +++---
+ exec.c                          | 14 +++++------
+ hw/arm/armv7m.c                 |  2 +-
+ hw/arm/boot.c                   | 37 +++++++++++++--------------
+ hw/arm/gumstix.c                | 13 +++++-----
+ hw/arm/mainstone.c              |  7 +++---
+ hw/arm/musicpal.c               |  2 +-
+ hw/arm/nseries.c                |  2 +-
+ hw/arm/omap1.c                  | 49 ++++++++++++++++++------------------
+ hw/arm/omap2.c                  | 23 +++++++++--------
+ hw/arm/omap_sx1.c               |  6 ++---
+ hw/arm/palm.c                   | 20 +++++++--------
+ hw/arm/pxa2xx.c                 | 53 +++++++++++++++++++------------------=
+-
+ hw/arm/pxa2xx_gpio.c            |  6 ++---
+ hw/arm/pxa2xx_pic.c             |  4 +--
+ hw/arm/stellaris.c              |  3 ++-
+ hw/arm/tosa.c                   | 25 +++++++++---------
+ hw/arm/versatilepb.c            |  2 +-
+ hw/arm/vexpress.c               |  8 +++---
+ hw/arm/z2.c                     |  6 ++---
+ hw/audio/hda-codec.c            | 10 ++++----
+ hw/audio/intel-hda.c            | 28 ++++++++++-----------
+ hw/audio/wm8750.c               |  4 +--
+ hw/block/nand.c                 |  4 +--
+ hw/block/onenand.c              |  8 +++---
+ hw/bt/core.c                    | 10 ++++----
+ hw/bt/hci-csr.c                 | 14 +++++------
+ hw/bt/hci.c                     | 26 +++++++++----------
+ hw/bt/hid.c                     |  2 +-
+ hw/bt/l2cap.c                   | 22 ++++++++--------
+ hw/bt/sdp.c                     |  6 ++---
+ hw/display/blizzard.c           | 18 ++++++-------
+ hw/display/omap_dss.c           |  6 ++---
+ hw/display/pxa2xx_lcd.c         | 14 +++++------
+ hw/display/qxl-render.c         |  6 ++---
+ hw/display/qxl.h                |  2 +-
+ hw/display/tc6393xb.c           |  2 +-
+ hw/display/xenfb.c              |  2 +-
+ hw/dma/omap_dma.c               | 38 +++++++++++++++-------------
+ hw/dma/pxa2xx_dma.c             | 14 +++++------
+ hw/dma/soc_dma.c                | 36 +++++++++++++-------------
+ hw/gpio/max7310.c               |  8 +++---
+ hw/gpio/omap_gpio.c             |  2 +-
+ hw/i2c/omap_i2c.c               | 10 ++++----
+ hw/i386/kvm/apic.c              |  9 ++++---
+ hw/i386/kvm/clock.c             |  7 +++---
+ hw/i386/kvm/i8254.c             |  7 +++---
+ hw/i386/kvm/i8259.c             |  5 ++--
+ hw/i386/kvm/ioapic.c            |  5 ++--
+ hw/i386/multiboot.c             | 21 ++++++++--------
+ hw/i386/pc.c                    | 24 +++++++++---------
+ hw/i386/pc_piix.c               |  2 +-
+ hw/i386/pc_sysfw.c              |  4 +--
+ hw/i386/xen/xen-hvm.c           | 30 +++++++++++-----------
+ hw/i386/xen/xen-mapcache.c      | 12 ++++-----
+ hw/i386/xen/xen_apic.c          |  3 ++-
+ hw/ide/ahci.c                   |  6 ++---
+ hw/ide/core.c                   |  3 +--
+ hw/ide/microdrive.c             |  4 +--
+ hw/input/lm832x.c               |  6 ++---
+ hw/input/pxa2xx_keypad.c        |  6 ++---
+ hw/input/tsc2005.c              |  8 +++---
+ hw/input/tsc210x.c              |  4 +--
+ hw/intc/arm_gic_kvm.c           | 12 ++++-----
+ hw/intc/omap_intc.c             |  4 +--
+ hw/intc/openpic.c               |  7 +++---
+ hw/intc/openpic_kvm.c           |  8 +++---
+ hw/intc/s390_flic_kvm.c         |  4 +--
+ hw/ipmi/ipmi_bmc_extern.c       |  5 ++--
+ hw/isa/isa-bus.c                |  7 +++---
+ hw/isa/vt82c686.c               |  2 +-
+ hw/lm32/lm32_boards.c           |  7 +++---
+ hw/lm32/milkymist.c             |  7 +++---
+ hw/mips/boston.c                |  4 +--
+ hw/mips/gt64xxx_pci.c           |  2 +-
+ hw/mips/mips_fulong2e.c         | 13 +++++-----
+ hw/mips/mips_jazz.c             |  4 +--
+ hw/mips/mips_malta.c            | 16 ++++++------
+ hw/mips/mips_mipssim.c          | 11 ++++----
+ hw/mips/mips_r4k.c              | 18 ++++++-------
+ hw/misc/cbus.c                  | 12 ++++-----
+ hw/misc/omap_clk.c              |  4 +--
+ hw/misc/omap_gpmc.c             |  6 ++---
+ hw/misc/omap_l4.c               |  4 +--
+ hw/misc/omap_sdrc.c             |  2 +-
+ hw/misc/omap_tap.c              |  6 ++---
+ hw/misc/tmp105.c                |  2 +-
+ hw/moxie/moxiesim.c             | 14 +++++------
+ hw/nios2/boot.c                 |  2 +-
+ hw/nvram/eeprom93xx.c           |  7 +++---
+ hw/nvram/fw_cfg.c               |  5 ++--
+ hw/openrisc/openrisc_sim.c      |  4 +--
+ hw/pci-host/bonito.c            |  8 +++---
+ hw/pci/pci.c                    | 12 ++++-----
+ hw/ppc/e500.c                   | 22 ++++++++--------
+ hw/ppc/mac_newworld.c           |  2 +-
+ hw/ppc/mac_oldworld.c           |  2 +-
+ hw/ppc/mpc8544_guts.c           |  5 ++--
+ hw/ppc/ppc405_boards.c          | 15 +++++------
+ hw/ppc/ppc440_bamboo.c          | 22 ++++++++--------
+ hw/ppc/ppc4xx_pci.c             |  3 ++-
+ hw/ppc/prep.c                   |  4 +--
+ hw/ppc/virtex_ml507.c           |  4 +--
+ hw/s390x/virtio-ccw.c           |  5 ++--
+ hw/scsi/lsi53c895a.c            |  4 +--
+ hw/scsi/spapr_vscsi.c           | 49 ++++++++++++++++++------------------
+ hw/scsi/virtio-scsi-dataplane.c |  6 ++---
+ hw/sd/pl181.c                   |  5 ++--
+ hw/sd/pxa2xx_mmci.c             |  6 ++---
+ hw/sd/sd.c                      | 15 +++++------
+ hw/sparc/leon3.c                | 16 ++++++------
+ hw/sparc/sun4m.c                | 16 ++++++------
+ hw/sparc64/niagara.c            |  4 +--
+ hw/sparc64/sun4u.c              | 10 ++++----
+ hw/ssi/omap_spi.c               |  9 ++++---
+ hw/timer/omap_gptimer.c         | 13 +++++-----
+ hw/timer/twl92230.c             |  8 +++---
+ hw/timer/xilinx_timer.c         |  8 +++---
+ hw/usb/desc.c                   |  2 +-
+ hw/usb/dev-bluetooth.c          |  4 +--
+ hw/usb/hcd-musb.c               |  4 +--
+ hw/usb/tusb6010.c               | 14 +++++------
+ hw/xen/xen-common.c             | 11 ++++----
+ hw/xenpv/xen_domainbuild.c      | 32 +++++++++++------------
+ hw/xenpv/xen_machine_pv.c       |  9 ++++---
+ include/hw/arm/omap.h           | 10 ++++----
+ include/hw/arm/sharpsl.h        |  2 +-
+ memory_mapping.c                |  2 +-
+ migration/block.c               |  4 +--
+ target/cris/translate.c         |  2 +-
+ target/ppc/translate.c          | 22 ++++++++--------
+ target/sh4/translate.c          |  4 +--
+ target/unicore32/translate.c    |  2 +-
+ tcg/optimize.c                  |  8 +++---
+ tcg/tcg.c                       |  2 +-
+ tcg/tcg.h                       |  3 ++-
+ tcg/tci.c                       |  2 +-
+ tcg/tci/tcg-target.inc.c        |  4 +--
+ ui/cursor.c                     |  6 ++---
+ ui/spice-display.c              |  4 +--
+ vl.c                            |  2 +-
+ 152 files changed, 780 insertions(+), 773 deletions(-)
+
+--=20
+2.14.1
