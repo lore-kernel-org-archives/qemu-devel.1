@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35094)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35829)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eEHaq-0005Cg-0W
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 11:28:17 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1eEHcv-0006wH-VM
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 11:30:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eEHal-0006bQ-Tc
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 11:28:16 -0500
-References: <20171113152424.25381-1-eblake@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <b1b881fe-c715-b5e2-c8a1-4cb4af2ba341@virtuozzo.com>
-Date: Mon, 13 Nov 2017 19:27:55 +0300
+	(envelope-from <alex.bennee@linaro.org>) id 1eEHcp-0007jC-0p
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 11:30:25 -0500
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:51888)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1eEHco-0007i0-Ct
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 11:30:18 -0500
+Received: by mail-wm0-x241.google.com with SMTP id b189so9610452wmd.0
+	for <qemu-devel@nongnu.org>; Mon, 13 Nov 2017 08:30:18 -0800 (PST)
+References: <20171004184325.24157-1-richard.henderson@linaro.org>
+	<20171004184325.24157-4-richard.henderson@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20171004184325.24157-4-richard.henderson@linaro.org>
+Date: Mon, 13 Nov 2017 16:30:15 +0000
+Message-ID: <87wp2u9m5k.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20171113152424.25381-1-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH for-2.11] nbd/client: Use error_prepend()
- correctly
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v1 03/12] target/arm: Decode
+ aa64 armv8.1 scalar three same extra
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,242 +31,291 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, qemu-stable@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org
 
-13.11.2017 18:24, Eric Blake wrote:
-> When using error prepend(), it is necessary to end with a space
-> in the format string; otherwise, messages come out incorrectly,
-> such as when connecting to a socket that hangs up immediately:
->
-> can't open device nbd://localhost:10809/: Failed to read dataUnexpected end-of-file before all bytes were read
->
-> Originally botched in commit e44ed99d, then several more instances
-> added in the meantime.
->
-> CC: qemu-stable@nongnu.org
-> Signed-off-by: Eric Blake <eblake@redhat.com>
+
+Richard Henderson <richard.henderson@linaro.org> writes:
+
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
->   nbd/client.c | 50 ++++++++++++++++++++++++++------------------------
->   1 file changed, 26 insertions(+), 24 deletions(-)
+>  target/arm/helper.h         |   4 ++
+>  target/arm/advsimd_helper.c | 105 ++++++++++++++++++++++++++++++++++++++=
+++++++
+>  target/arm/translate-a64.c  |  90 +++++++++++++++++++++++++++++++++++++
+>  target/arm/Makefile.objs    |   2 +-
+>  4 files changed, 200 insertions(+), 1 deletion(-)
+>  create mode 100644 target/arm/advsimd_helper.c
 >
-> diff --git a/nbd/client.c b/nbd/client.c
-> index 1880103d2a..4e15fc484d 100644
-> --- a/nbd/client.c
-> +++ b/nbd/client.c
-> @@ -79,12 +79,12 @@ static int nbd_send_option_request(QIOChannel *ioc, uint32_t opt,
->       stl_be_p(&req.length, len);
+> diff --git a/target/arm/helper.h b/target/arm/helper.h
+> index 64afbac59f..ec098d8337 100644
+> --- a/target/arm/helper.h
+> +++ b/target/arm/helper.h
+> @@ -350,8 +350,12 @@ DEF_HELPER_FLAGS_1(neon_rbit_u8, TCG_CALL_NO_RWG_SE,=
+ i32, i32)
 >
->       if (nbd_write(ioc, &req, sizeof(req), errp) < 0) {
-> -        error_prepend(errp, "Failed to send option request header");
-> +        error_prepend(errp, "Failed to send option request header: ");
->           return -1;
->       }
->
->       if (len && nbd_write(ioc, (char *) data, len, errp) < 0) {
-> -        error_prepend(errp, "Failed to send option request data");
-> +        error_prepend(errp, "Failed to send option request data: ");
->           return -1;
->       }
->
-> @@ -113,7 +113,7 @@ static int nbd_receive_option_reply(QIOChannel *ioc, uint32_t opt,
->   {
->       QEMU_BUILD_BUG_ON(sizeof(*reply) != 20);
->       if (nbd_read(ioc, reply, sizeof(*reply), errp) < 0) {
-> -        error_prepend(errp, "failed to read option reply");
-> +        error_prepend(errp, "failed to read option reply: ");
->           nbd_send_opt_abort(ioc);
->           return -1;
->       }
-> @@ -166,7 +166,7 @@ static int nbd_handle_reply_err(QIOChannel *ioc, nbd_opt_reply *reply,
->           msg = g_malloc(reply->length + 1);
->           if (nbd_read(ioc, msg, reply->length, errp) < 0) {
->               error_prepend(errp, "failed to read option error 0x%" PRIx32
-> -                          " (%s) message",
-> +                          " (%s) message: ",
->                             reply->type, nbd_rep_lookup(reply->type));
->               goto cleanup;
->           }
-> @@ -277,7 +277,7 @@ static int nbd_receive_list(QIOChannel *ioc, const char *want, bool *match,
->           return -1;
->       }
->       if (nbd_read(ioc, &namelen, sizeof(namelen), errp) < 0) {
-> -        error_prepend(errp, "failed to read option name length");
-> +        error_prepend(errp, "failed to read option name length: ");
->           nbd_send_opt_abort(ioc);
->           return -1;
->       }
-> @@ -290,7 +290,8 @@ static int nbd_receive_list(QIOChannel *ioc, const char *want, bool *match,
->       }
->       if (namelen != strlen(want)) {
->           if (nbd_drop(ioc, len, errp) < 0) {
-> -            error_prepend(errp, "failed to skip export name with wrong length");
-> +            error_prepend(errp,
-> +                          "failed to skip export name with wrong length: ");
->               nbd_send_opt_abort(ioc);
->               return -1;
->           }
-> @@ -299,14 +300,14 @@ static int nbd_receive_list(QIOChannel *ioc, const char *want, bool *match,
->
->       assert(namelen < sizeof(name));
->       if (nbd_read(ioc, name, namelen, errp) < 0) {
-> -        error_prepend(errp, "failed to read export name");
-> +        error_prepend(errp, "failed to read export name: ");
->           nbd_send_opt_abort(ioc);
->           return -1;
->       }
->       name[namelen] = '\0';
->       len -= namelen;
->       if (nbd_drop(ioc, len, errp) < 0) {
-> -        error_prepend(errp, "failed to read export description");
-> +        error_prepend(errp, "failed to read export description: ");
->           nbd_send_opt_abort(ioc);
->           return -1;
->       }
-> @@ -390,7 +391,7 @@ static int nbd_opt_go(QIOChannel *ioc, const char *wantname,
->               return -1;
->           }
->           if (nbd_read(ioc, &type, sizeof(type), errp) < 0) {
-> -            error_prepend(errp, "failed to read info type");
-> +            error_prepend(errp, "failed to read info type: ");
->               nbd_send_opt_abort(ioc);
->               return -1;
->           }
-> @@ -405,13 +406,13 @@ static int nbd_opt_go(QIOChannel *ioc, const char *wantname,
->                   return -1;
->               }
->               if (nbd_read(ioc, &info->size, sizeof(info->size), errp) < 0) {
-> -                error_prepend(errp, "failed to read info size");
-> +                error_prepend(errp, "failed to read info size: ");
->                   nbd_send_opt_abort(ioc);
->                   return -1;
->               }
->               be64_to_cpus(&info->size);
->               if (nbd_read(ioc, &info->flags, sizeof(info->flags), errp) < 0) {
-> -                error_prepend(errp, "failed to read info flags");
-> +                error_prepend(errp, "failed to read info flags: ");
->                   nbd_send_opt_abort(ioc);
->                   return -1;
->               }
-> @@ -428,7 +429,7 @@ static int nbd_opt_go(QIOChannel *ioc, const char *wantname,
->               }
->               if (nbd_read(ioc, &info->min_block, sizeof(info->min_block),
->                            errp) < 0) {
-> -                error_prepend(errp, "failed to read info minimum block size");
-> +                error_prepend(errp, "failed to read info minimum block size: ");
->                   nbd_send_opt_abort(ioc);
->                   return -1;
->               }
-> @@ -441,7 +442,8 @@ static int nbd_opt_go(QIOChannel *ioc, const char *wantname,
->               }
->               if (nbd_read(ioc, &info->opt_block, sizeof(info->opt_block),
->                            errp) < 0) {
-> -                error_prepend(errp, "failed to read info preferred block size");
-> +                error_prepend(errp,
-> +                              "failed to read info preferred block size: ");
->                   nbd_send_opt_abort(ioc);
->                   return -1;
->               }
-> @@ -455,7 +457,7 @@ static int nbd_opt_go(QIOChannel *ioc, const char *wantname,
->               }
->               if (nbd_read(ioc, &info->max_block, sizeof(info->max_block),
->                            errp) < 0) {
-> -                error_prepend(errp, "failed to read info maximum block size");
-> +                error_prepend(errp, "failed to read info maximum block size: ");
->                   nbd_send_opt_abort(ioc);
->                   return -1;
->               }
-> @@ -467,7 +469,7 @@ static int nbd_opt_go(QIOChannel *ioc, const char *wantname,
->           default:
->               trace_nbd_opt_go_info_unknown(type, nbd_info_lookup(type));
->               if (nbd_drop(ioc, len, errp) < 0) {
-> -                error_prepend(errp, "Failed to read info payload");
-> +                error_prepend(errp, "Failed to read info payload: ");
->                   nbd_send_opt_abort(ioc);
->                   return -1;
->               }
-> @@ -618,7 +620,7 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name,
->       }
->
->       if (nbd_read(ioc, buf, 8, errp) < 0) {
-> -        error_prepend(errp, "Failed to read data");
-> +        error_prepend(errp, "Failed to read data: ");
->           goto fail;
->       }
->
-> @@ -637,7 +639,7 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name,
->       }
->
->       if (nbd_read(ioc, &magic, sizeof(magic), errp) < 0) {
-> -        error_prepend(errp, "Failed to read magic");
-> +        error_prepend(errp, "Failed to read magic: ");
->           goto fail;
->       }
->       magic = be64_to_cpu(magic);
-> @@ -649,7 +651,7 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name,
->           bool fixedNewStyle = false;
->
->           if (nbd_read(ioc, &globalflags, sizeof(globalflags), errp) < 0) {
-> -            error_prepend(errp, "Failed to read server flags");
-> +            error_prepend(errp, "Failed to read server flags: ");
->               goto fail;
->           }
->           globalflags = be16_to_cpu(globalflags);
-> @@ -665,7 +667,7 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name,
->           /* client requested flags */
->           clientflags = cpu_to_be32(clientflags);
->           if (nbd_write(ioc, &clientflags, sizeof(clientflags), errp) < 0) {
-> -            error_prepend(errp, "Failed to send clientflags field");
-> +            error_prepend(errp, "Failed to send clientflags field: ");
->               goto fail;
->           }
->           if (tlscreds) {
-> @@ -727,13 +729,13 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name,
->
->           /* Read the response */
->           if (nbd_read(ioc, &info->size, sizeof(info->size), errp) < 0) {
-> -            error_prepend(errp, "Failed to read export length");
-> +            error_prepend(errp, "Failed to read export length: ");
->               goto fail;
->           }
->           be64_to_cpus(&info->size);
->
->           if (nbd_read(ioc, &info->flags, sizeof(info->flags), errp) < 0) {
-> -            error_prepend(errp, "Failed to read export flags");
-> +            error_prepend(errp, "Failed to read export flags: ");
->               goto fail;
->           }
->           be16_to_cpus(&info->flags);
-> @@ -750,13 +752,13 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name,
->           }
->
->           if (nbd_read(ioc, &info->size, sizeof(info->size), errp) < 0) {
-> -            error_prepend(errp, "Failed to read export length");
-> +            error_prepend(errp, "Failed to read export length: ");
->               goto fail;
->           }
->           be64_to_cpus(&info->size);
->
->           if (nbd_read(ioc, &oldflags, sizeof(oldflags), errp) < 0) {
-> -            error_prepend(errp, "Failed to read export flags");
-> +            error_prepend(errp, "Failed to read export flags: ");
->               goto fail;
->           }
->           be32_to_cpus(&oldflags);
-> @@ -772,7 +774,7 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name,
->
->       trace_nbd_receive_negotiate_size_flags(info->size, info->flags);
->       if (zeroes && nbd_drop(ioc, 124, errp) < 0) {
-> -        error_prepend(errp, "Failed to read reserved block");
-> +        error_prepend(errp, "Failed to read reserved block: ");
->           goto fail;
->       }
->       rc = 0;
+>  DEF_HELPER_3(neon_qdmulh_s16, i32, env, i32, i32)
+>  DEF_HELPER_3(neon_qrdmulh_s16, i32, env, i32, i32)
+> +DEF_HELPER_4(neon_qrdmlah_s16, i32, env, i32, i32, i32)
+> +DEF_HELPER_4(neon_qrdmlsh_s16, i32, env, i32, i32, i32)
+>  DEF_HELPER_3(neon_qdmulh_s32, i32, env, i32, i32)
+>  DEF_HELPER_3(neon_qrdmulh_s32, i32, env, i32, i32)
+> +DEF_HELPER_4(neon_qrdmlah_s32, i32, env, s32, s32, s32)
+> +DEF_HELPER_4(neon_qrdmlsh_s32, i32, env, s32, s32, s32)
 
-If you go that way,
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Hmm are these really NEON or should they be advsimd_qrdm....?
+
+>
+>  DEF_HELPER_1(neon_narrow_u8, i32, i64)
+>  DEF_HELPER_1(neon_narrow_u16, i32, i64)
+> diff --git a/target/arm/advsimd_helper.c b/target/arm/advsimd_helper.c
+> new file mode 100644
+> index 0000000000..583c2b0dce
+> --- /dev/null
+> +++ b/target/arm/advsimd_helper.c
+> @@ -0,0 +1,105 @@
+> +/*
+> + *  ARM AdvSIMD Vector Operations
+> + *
+> + *  Copyright (c) 2017 Linaro
+> + *
+> + * This library is free software; you can redistribute it and/or
+> + * modify it under the terms of the GNU Lesser General Public
+> + * License as published by the Free Software Foundation; either
+> + * version 2 of the License, or (at your option) any later version.
+> + *
+> + * This library is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+> + * Lesser General Public License for more details.
+> + *
+> + * You should have received a copy of the GNU Lesser General Public
+> + * License along with this library; if not, see <http://www.gnu.org/lice=
+nses/>.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "cpu.h"
+> +#include "exec/exec-all.h"
+> +#include "exec/helper-proto.h"
+> +#include "tcg/tcg-gvec-desc.h"
+> +
+> +
+> +#define SET_QC() env->vfp.xregs[ARM_VFP_FPSCR] |=3D CPSR_Q
+> +
+> +static uint16_t inl_qrdmlah_s16(CPUARMState *env, int16_t src1,
+> +                                int16_t src2, int16_t src3)
+> +{
+> +    /* Simplify:
+> +     * =3D ((a3 << 16) + ((e1 * e2) << 1) + (1 << 15)) >> 16
+> +     * =3D ((a3 << 15) + (e1 * e2) + (1 << 14)) >> 15
+> +     */
+> +    int32_t ret =3D (int32_t)src1 * src2;
+> +    ret =3D ((int32_t)src3 << 15) + ret + (1 << 14);
+> +    ret >>=3D 15;
+> +    if (ret !=3D (int16_t)ret) {
+> +        SET_QC();
+> +        ret =3D (ret < 0 ? -0x8000 : 0x7fff);
+> +    }
+> +    return ret;
+> +}
+> +
+> +uint32_t HELPER(neon_qrdmlah_s16)(CPUARMState *env, uint32_t src1,
+> +                                  uint32_t src2, uint32_t src3)
+> +{
+> +    uint16_t e1 =3D inl_qrdmlah_s16(env, src1, src2, src3);
+> +    uint16_t e2 =3D inl_qrdmlah_s16(env, src1 >> 16, src2 >> 16, src3 >>=
+ 16);
+> +    return deposit32(e1, 16, 16, e2);
+> +}
+> +
+> +static uint16_t inl_qrdmlsh_s16(CPUARMState *env, int16_t src1,
+> +                                int16_t src2, int16_t src3)
+> +{
+> +    /* Similarly, using subtraction:
+> +     * =3D ((a3 << 16) - ((e1 * e2) << 1) + (1 << 15)) >> 16
+> +     * =3D ((a3 << 15) - (e1 * e2) + (1 << 14)) >> 15
+> +     */
+> +    int32_t ret =3D (int32_t)src1 * src2;
+> +    ret =3D ((int32_t)src3 << 15) - ret + (1 << 14);
+> +    ret >>=3D 15;
+> +    if (ret !=3D (int16_t)ret) {
+> +        SET_QC();
+> +        ret =3D (ret < 0 ? -0x8000 : 0x7fff);
+> +    }
+> +    return ret;
+> +}
+> +
+> +uint32_t HELPER(neon_qrdmlsh_s16)(CPUARMState *env, uint32_t src1,
+> +                                  uint32_t src2, uint32_t src3)
+> +{
+> +    uint16_t e1 =3D inl_qrdmlsh_s16(env, src1, src2, src3);
+> +    uint16_t e2 =3D inl_qrdmlsh_s16(env, src1 >> 16, src2 >> 16, src3 >>=
+ 16);
+> +    return deposit32(e1, 16, 16, e2);
+> +}
+> +
+> +uint32_t HELPER(neon_qrdmlah_s32)(CPUARMState *env, int32_t src1,
+> +                                  int32_t src2, int32_t src3)
+> +{
+> +    /* Simplify similarly to int_qrdmlah_s16 above.  */
+> +    int64_t ret =3D (int64_t)src1 * src2;
+> +    ret =3D ((int64_t)src3 << 31) + ret + (1 << 30);
+> +    ret >>=3D 31;
+> +    if (ret !=3D (int32_t)ret) {
+> +        SET_QC();
+> +        ret =3D (ret < 0 ? INT32_MIN : INT32_MAX);
+> +    }
+> +    return ret;
+> +}
+> +
+> +uint32_t HELPER(neon_qrdmlsh_s32)(CPUARMState *env, int32_t src1,
+> +                                  int32_t src2, int32_t src3)
+> +{
+> +    /* Simplify similarly to int_qrdmlsh_s16 above.  */
+> +    int64_t ret =3D (int64_t)src1 * src2;
+> +    ret =3D ((int64_t)src3 << 31) - ret + (1 << 30);
+> +    ret >>=3D 31;
+> +    if (ret !=3D (int32_t)ret) {
+> +        SET_QC();
+> +        ret =3D (ret < 0 ? INT32_MIN : INT32_MAX);
+> +    }
+> +    return ret;
+> +}
+> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+> index a4380bbb15..182853e3bb 100644
+> --- a/target/arm/translate-a64.c
+> +++ b/target/arm/translate-a64.c
+> @@ -7596,6 +7596,95 @@ static void disas_simd_scalar_three_reg_same(Disas=
+Context *s, uint32_t insn)
+>      tcg_temp_free_i64(tcg_rd);
+>  }
+>
+> +/* AdvSIMD scalar three same extra
+> + *  31 30  29 28       24 23  22  21 20  16  15 14    11  10 9  5 4  0
+> + * +-----+---+-----------+------+---+------+---+--------+---+----+----+
+> + * | 0 1 | U | 1 1 1 1 0 | size | 0 |  Rm  | 1 | opcode | 1 | Rn | Rd |
+> + * +-----+---+-----------+------+---+------+---+--------+---+----+----+
+> + */
+> +static void disas_simd_scalar_three_reg_same_extra(DisasContext *s,
+> +                                                   uint32_t insn)
+> +{
+> +    int rd =3D extract32(insn, 0, 5);
+> +    int rn =3D extract32(insn, 5, 5);
+> +    int opcode =3D extract32(insn, 11, 4);
+> +    int rm =3D extract32(insn, 16, 5);
+> +    int size =3D extract32(insn, 22, 2);
+> +    bool u =3D extract32(insn, 29, 1);
+> +    TCGv_i32 ele1, ele2, ele3;
+> +    TCGv_i64 res;
+> +    int feature;
+> +
+> +    if (!u) {
+> +        unallocated_encoding(s);
+> +        return;
+> +    }
+> +
+> +    switch (opcode) {
+> +    case 0x0: /* SQRDMLAH (vector) */
+> +    case 0x1: /* SQRDMLSH (vector) */
+> +        if (size !=3D 1 && size !=3D 2) {
+> +            unallocated_encoding(s);
+> +            return;
+> +        }
+> +        feature =3D ARM_FEATURE_V8_1_SIMD;
+> +        break;
+> +    default:
+> +        unallocated_encoding(s);
+> +        return;
+> +    }
+> +
+> +    if (!arm_dc_feature(s, feature)) {
+> +        unallocated_encoding(s);
+> +        return;
+> +    }
+
+I guess this is because we are expecting additional features to be added
+to the encoding space...
+
+> +    if (!fp_access_check(s)) {
+> +        return;
+> +    }
+> +
+> +    /* Do a single operation on the lowest element in the vector.
+> +     * We use the standard Neon helpers and rely on 0 OP 0 =3D=3D 0
+> +     * with no side effects for all these operations.
+> +     * OPTME: special-purpose helpers would avoid doing some
+> +     * unnecessary work in the helper for the 16 bit cases.
+> +     */
+> +    ele1 =3D tcg_temp_new_i32();
+> +    ele2 =3D tcg_temp_new_i32();
+> +    ele3 =3D tcg_temp_new_i32();
+> +
+> +    read_vec_element_i32(s, ele1, rn, 0, size);
+> +    read_vec_element_i32(s, ele2, rm, 0, size);
+> +    read_vec_element_i32(s, ele3, rd, 0, size);
+> +
+> +    switch (opcode) {
+> +    case 0x0: /* SQRDMLAH */
+> +        if (size =3D=3D 1) {
+> +            gen_helper_neon_qrdmlah_s16(ele3, cpu_env, ele1, ele2, ele3);
+> +        } else {
+> +            gen_helper_neon_qrdmlah_s32(ele3, cpu_env, ele1, ele2, ele3);
+> +        }
+> +        break;
+> +    case 0x1: /* SQRDMLSH */
+> +        if (size =3D=3D 1) {
+> +            gen_helper_neon_qrdmlsh_s16(ele3, cpu_env, ele1, ele2, ele3);
+> +        } else {
+> +            gen_helper_neon_qrdmlsh_s32(ele3, cpu_env, ele1, ele2, ele3);
+> +        }
+> +        break;
+> +    default:
+> +        g_assert_not_reached();
+> +    }
+> +    tcg_temp_free_i32(ele1);
+> +    tcg_temp_free_i32(ele2);
+> +
+> +    res =3D tcg_temp_new_i64();
+> +    tcg_gen_extu_i32_i64(res, ele3);
+> +    tcg_temp_free_i32(ele3);
+> +
+> +    write_fp_dreg(s, rd, res);
+> +    tcg_temp_free_i64(res);
+> +}
+> +
+>  static void handle_2misc_64(DisasContext *s, int opcode, bool u,
+>                              TCGv_i64 tcg_rd, TCGv_i64 tcg_rn,
+>                              TCGv_i32 tcg_rmode, TCGv_ptr tcg_fpstatus)
+> @@ -11184,6 +11273,7 @@ static const AArch64DecodeTable data_proc_simd[] =
+=3D {
+>      { 0x0e000800, 0xbf208c00, disas_simd_zip_trn },
+>      { 0x2e000000, 0xbf208400, disas_simd_ext },
+>      { 0x5e200400, 0xdf200400, disas_simd_scalar_three_reg_same },
+> +    { 0x5e008400, 0xdf208400, disas_simd_scalar_three_reg_same_extra },
+>      { 0x5e200000, 0xdf200c00, disas_simd_scalar_three_reg_diff },
+>      { 0x5e200800, 0xdf3e0c00, disas_simd_scalar_two_reg_misc },
+>      { 0x5e300800, 0xdf3e0c00, disas_simd_scalar_pairwise },
+> diff --git a/target/arm/Makefile.objs b/target/arm/Makefile.objs
+> index 847fb52ee0..c2d32988f9 100644
+> --- a/target/arm/Makefile.objs
+> +++ b/target/arm/Makefile.objs
+> @@ -5,7 +5,7 @@ obj-$(call land,$(CONFIG_KVM),$(call lnot,$(TARGET_AARCH6=
+4))) +=3D kvm32.o
+>  obj-$(call land,$(CONFIG_KVM),$(TARGET_AARCH64)) +=3D kvm64.o
+>  obj-$(call lnot,$(CONFIG_KVM)) +=3D kvm-stub.o
+>  obj-y +=3D translate.o op_helper.o helper.o cpu.o
+> -obj-y +=3D neon_helper.o iwmmxt_helper.o
+> +obj-y +=3D neon_helper.o iwmmxt_helper.o advsimd_helper.o
+
+Given this is AArch64 only it makes me wonder if we should be using helper-=
+a64.h?
+
+>  obj-y +=3D gdbstub.o
+>  obj-$(TARGET_AARCH64) +=3D cpu64.o translate-a64.o helper-a64.o gdbstub6=
+4.o
+>  obj-y +=3D crypto_helper.o
 
 
--- 
-Best regards,
-Vladimir
+--
+Alex Benn=C3=A9e
