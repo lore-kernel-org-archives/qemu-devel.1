@@ -1,22 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59784)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60691)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eEHRc-0006gM-U7
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 11:18:45 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eEHU6-0007Zw-Nt
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 11:21:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eEHRc-0001yb-6r
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 11:18:44 -0500
-References: <20171110172545.32609-1-mreitz@redhat.com>
-	<e4501a6c-3643-d0cb-4b6f-a6569646edad@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <f5de0e4f-e561-c03a-d793-d205d6015ed0@redhat.com>
-Date: Mon, 13 Nov 2017 17:18:27 +0100
-MIME-Version: 1.0
-In-Reply-To: <e4501a6c-3643-d0cb-4b6f-a6569646edad@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="WEdnkHkbOD4mLUFg7US9oIgEc61tNlD4b"
-Subject: Re: [Qemu-devel] [PATCH v2 for-2.11] block: Make bdrv_next() keep
- strong references
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eEHU2-00039J-LT
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 11:21:18 -0500
+Received: from mailhub.sw.ru ([195.214.232.25]:10222 helo=relay.sw.ru)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1eEHU2-000378-9m
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 11:21:14 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Mon, 13 Nov 2017 19:20:49 +0300
+Message-Id: <20171113162053.58795-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH for-2.12 0/4] qmp dirty bitmap API
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,80 +22,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, kwolf@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, stefanha@redhat.com, armbru@redhat.com, pbonzini@redhat.com, den@openvz.org, vsementsov@virtuozzo.com, nshirokovskiy@virtuozzo.com, mnestratov@virtuozzo.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---WEdnkHkbOD4mLUFg7US9oIgEc61tNlD4b
-From: Max Reitz <mreitz@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>,
- qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <f5de0e4f-e561-c03a-d793-d205d6015ed0@redhat.com>
-Subject: Re: [PATCH v2 for-2.11] block: Make bdrv_next() keep strong
- references
-References: <20171110172545.32609-1-mreitz@redhat.com>
- <e4501a6c-3643-d0cb-4b6f-a6569646edad@redhat.com>
-In-Reply-To: <e4501a6c-3643-d0cb-4b6f-a6569646edad@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Hi all.
 
-On 2017-11-11 01:08, Paolo Bonzini wrote:
-> On 10/11/2017 18:25, Max Reitz wrote:
->>          if (bs) {
->> +            bdrv_ref(bs);
->> +            bdrv_unref(old_bs);
->>              return bs;
->>          }
->=20
-> Maybe instead goto...
->=20
->>          it->phase =3D BDRV_NEXT_MONITOR_OWNED;
->> +    } else {
->> +        old_bs =3D it->bs;
->>      }
->> =20
->>      /* Then return the monitor-owned BDSes without a BB attached. Ign=
-ore all
->> @@ -467,18 +483,46 @@ BlockDriverState *bdrv_next(BdrvNextIterator *it=
-)
->>          bs =3D it->bs;
->>      } while (bs && bdrv_has_blk(bs));
->=20
-> ... here?
+There are three qmp commands, needed to implement external backup API.
 
-I wouldn't mind too much, but I don't think a goto there makes the code
-easier to read.
+Using these three commands, client may do all needed bitmap management by
+hand:
 
-Max
+on backup start we need to do a transaction:
+ {disable old bitmap, create new bitmap}
 
-> Paolo
->=20
->> +    if (bs) {
->> +        bdrv_ref(bs);
->> +    }
->> +    bdrv_unref(old_bs);
->> +
->>      return bs;
->=20
+on backup success:
+ drop old bitmap
 
+on backup fail:
+ enable old bitmap
+ merge new bitmap to old bitmap
+ drop new bitmap
 
+Question: it may be better to make one command instead of two:
+block-dirty-bitmap-set-enabled(bool enabled)
 
---WEdnkHkbOD4mLUFg7US9oIgEc61tNlD4b
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Vladimir Sementsov-Ogievskiy (4):
+  block/dirty-bitmap: add lock to bdrv_enable/disable_dirty_bitmap
+  qapi: add block-dirty-bitmap-enable/disable
+  qmp: transaction support for block-dirty-bitmap-enable/disable
+  qapi: add block-dirty-bitmap-merge
 
------BEGIN PGP SIGNATURE-----
+ qapi/block-core.json         |  80 +++++++++++++++++++++++
+ qapi/transaction.json        |   4 ++
+ include/block/dirty-bitmap.h |   2 +
+ block/dirty-bitmap.c         |  21 ++++++
+ blockdev.c                   | 151 +++++++++++++++++++++++++++++++++++++++++++
+ 5 files changed, 258 insertions(+)
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAloJxdMSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9ApbkH/0DDxm365b5Tss2Y4PxyzAko3TlnOsjd
-xSyieIec5iuQY3ptZKglLnix6oj79z1sDd5czu//slFQ1iMKNQfuK9Xx/fTCFtOV
-wGG7Y7n0sbHKX7QohGOBW8IU1fzB0d5Gj4cG/EnbsfUFF2XcLTnv097gp9ZzO1L6
-57UxS4J0VogI226k2WAVVTPpP2cZWzf977s0R4ljf0fw/hTF/cA/fnucjgAtC0bz
-qK6Z3FCS5ciqUp1CYtGqtip+s1XDQB66Xuu+h3/UWKy92Chzdc+jVmSe3oaaK9MF
-lo6dpIfRhB9ASIOut8yIoUXEWeucwYzeJYfghAw1YMfn3FgHAGR4bsM=
-=cFeF
------END PGP SIGNATURE-----
-
---WEdnkHkbOD4mLUFg7US9oIgEc61tNlD4b--
+-- 
+2.11.1
