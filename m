@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51708)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51728)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <apahim@redhat.com>) id 1eEN9z-0002vD-3v
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 17:24:58 -0500
+	(envelope-from <apahim@redhat.com>) id 1eENA2-0002yH-Aq
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 17:24:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <apahim@redhat.com>) id 1eEN9y-0000GB-9M
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 17:24:55 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46332)
+	(envelope-from <apahim@redhat.com>) id 1eENA0-0000HH-L3
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 17:24:58 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46354)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <apahim@redhat.com>) id 1eEN9y-0000Fi-39
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 17:24:54 -0500
+	(Exim 4.71) (envelope-from <apahim@redhat.com>) id 1eENA0-0000H2-Fe
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 17:24:56 -0500
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
 	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4C483642
-	for <qemu-devel@nongnu.org>; Mon, 13 Nov 2017 22:24:53 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id A3D9137E6E
+	for <qemu-devel@nongnu.org>; Mon, 13 Nov 2017 22:24:55 +0000 (UTC)
 From: Amador Pahim <apahim@redhat.com>
-Date: Mon, 13 Nov 2017 23:23:54 +0100
-Message-Id: <20171113222358.30967-5-apahim@redhat.com>
+Date: Mon, 13 Nov 2017 23:23:55 +0100
+Message-Id: <20171113222358.30967-6-apahim@redhat.com>
 In-Reply-To: <20171113222358.30967-1-apahim@redhat.com>
 References: <20171113222358.30967-1-apahim@redhat.com>
-Subject: [Qemu-devel] [PATCH v10 4/8] qemu.py: always cleanup on shutdown()
+Subject: [Qemu-devel] [PATCH v10 5/8] qemu.py: use poll() instead of
+ 'returncode'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,44 +33,39 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: famz@redhat.com, crosa@redhat.com, ehabkost@redhat.com, Amador Pahim <apahim@redhat.com>
 
-Currently we only cleanup on shutdown() if the VM is running.
+The 'returncode' Popen attribute is not guaranteed to be updated. It
+actually depends on a call to either poll(), wait() or communicate().
 
-To make sure we will always cleanup, this patch makes the
-self._load_io_log() and the self._post_shutdown() to
-always be called on shutdown(), regardless the VM running state.
+On the other hand, poll() will: "Check if child process has terminated.
+Set and return returncode attribute."
+
+Let's use the poll() to check whether the process is running and to get
+the updated process exit code, when the process is finished.
 
 Reviewed-by: Fam Zheng <famz@redhat.com>
 Signed-off-by: Amador Pahim <apahim@redhat.com>
 ---
- scripts/qemu.py | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+ scripts/qemu.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/scripts/qemu.py b/scripts/qemu.py
-index 813930301c..93f08129ad 100644
+index 93f08129ad..7224f88526 100644
 --- a/scripts/qemu.py
 +++ b/scripts/qemu.py
-@@ -162,8 +162,9 @@ class QEMUMachine(object):
-         return self._popen.pid
+@@ -149,12 +149,12 @@ class QEMUMachine(object):
+         raise
  
-     def _load_io_log(self):
--        with open(self._qemu_log_path, "r") as iolog:
--            self._iolog = iolog.read()
-+        if self._qemu_log_path is not None:
-+            with open(self._qemu_log_path, "r") as iolog:
-+                self._iolog = iolog.read()
+     def is_running(self):
+-        return self._popen is not None and self._popen.returncode is None
++        return self._popen is not None and self._popen.poll() is None
  
-     def _base_args(self):
-         if isinstance(self._monitor_address, tuple):
-@@ -254,8 +255,8 @@ class QEMUMachine(object):
-                 self._popen.kill()
-             self._popen.wait()
+     def exitcode(self):
+         if self._popen is None:
+             return None
+-        return self._popen.returncode
++        return self._popen.poll()
  
--            self._load_io_log()
--            self._post_shutdown()
-+        self._load_io_log()
-+        self._post_shutdown()
- 
-         exitcode = self.exitcode()
-         if exitcode is not None and exitcode < 0:
+     def get_pid(self):
+         if not self.is_running():
 -- 
 2.13.6
