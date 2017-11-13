@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58850)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59679)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eECtF-0002u7-Hb
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 06:27:06 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eECxL-0003kv-NB
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 06:31:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eECtE-0003N9-KR
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 06:26:57 -0500
-Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:53207)
+	(envelope-from <peter.maydell@linaro.org>) id 1eECxK-0000Av-FE
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 06:31:11 -0500
+Received: from mail-wr0-x229.google.com ([2a00:1450:400c:c0c::229]:48783)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eECtE-0003Km-83
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 06:26:56 -0500
-Received: by mail-wr0-x231.google.com with SMTP id j23so14093748wra.9
-	for <qemu-devel@nongnu.org>; Mon, 13 Nov 2017 03:26:56 -0800 (PST)
+	id 1eECxK-0000AM-8P
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 06:31:10 -0500
+Received: by mail-wr0-x229.google.com with SMTP id 15so14108926wrb.5
+	for <qemu-devel@nongnu.org>; Mon, 13 Nov 2017 03:31:10 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <49151b79-7ec4-b728-1ea9-d5c393a5bada@amsat.org>
-References: <1510087611-1851-1-git-send-email-cota@braap.org>
-	<49151b79-7ec4-b728-1ea9-d5c393a5bada@amsat.org>
+In-Reply-To: <20171113062658.9697-1-ppandit@redhat.com>
+References: <20171113062658.9697-1-ppandit@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 13 Nov 2017 11:26:34 +0000
-Message-ID: <CAFEAcA-pwxfR-+XSu+q117Po=Lh2aRDGtW9jNAEZuPZNjbFC_Q@mail.gmail.com>
+Date: Mon, 13 Nov 2017 11:30:48 +0000
+Message-ID: <CAFEAcA-kTyadHKYTAuMOLi+AJyxVd9aWSowj=knU6vWdsaOqaA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH] arm/translate-a64: mark path as
- unreachable to eliminate warning
+Subject: Re: [Qemu-devel] [PATCH v2] highbank: validate register offset
+ before access
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,49 +29,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: "Emilio G. Cota" <cota@braap.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>
+To: P J P <ppandit@redhat.com>
+Cc: Qemu Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Moguofang <moguofang@huawei.com>, qemu-arm <qemu-arm@nongnu.org>, Shawn Guo <shawn.guo@linaro.org>, Rob Herring <robh@kernel.org>, Prasad J Pandit <pjp@fedoraproject.org>
 
-On 8 November 2017 at 12:37, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> =
-wrote:
-> On 11/07/2017 05:46 PM, Emilio G. Cota wrote:
->> Fixes the following warning when compiling with gcc 5.4.0 with -O1
->> optimizations and --enable-debug:
->>
->> target/arm/translate-a64.c: In function =E2=80=98aarch64_tr_translate_in=
-sn=E2=80=99:
->> target/arm/translate-a64.c:2361:8: error: =E2=80=98post_index=E2=80=99 m=
-ay be used uninitialized in this function [-Werror=3Dmaybe-uninitialized]
->>      if (!post_index) {
->>         ^
->> target/arm/translate-a64.c:2307:10: note: =E2=80=98post_index=E2=80=99 w=
-as declared here
->>      bool post_index;
->>           ^
->> target/arm/translate-a64.c:2386:8: error: =E2=80=98writeback=E2=80=99 ma=
-y be used uninitialized in this function [-Werror=3Dmaybe-uninitialized]
->>      if (writeback) {
->>         ^
->> target/arm/translate-a64.c:2308:10: note: =E2=80=98writeback=E2=80=99 wa=
-s declared here
->>      bool writeback;
->>           ^
->>
->> Note that idx comes from selecting 2 bits, and therefore its value
->> can be at most 3.
->>
->> Signed-off-by: Emilio G. Cota <cota@braap.org>
+On 13 November 2017 at 06:26, P J P <ppandit@redhat.com> wrote:
+> From: Prasad J Pandit <pjp@fedoraproject.org>
+>
+> An 'offset' parameter sent to highbank register r/w functions
+> could be greater than number(NUM_REGS=0x200) of hb registers,
+> leading to an OOB access issue. Add check to avoid it.
+>
+> Reported-by: Moguofang (Dennis mo) <moguofang@huawei.com>
+> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+> ---
+>  hw/arm/highbank.c | 17 +++++++++++++++--
+>  1 file changed, 15 insertions(+), 2 deletions(-)
+>
+> Update: use HWADDR_PRIx to print offset
+>   -> https://lists.gnu.org/archive/html/qemu-devel/2017-11/msg02116.html
 
-Applied to target-arm.next, thanks. (It's a bit sad that
-gcc can't figure out that the result of x & 3 is constrained
-to [0,3], but there you go.)
 
-> Acked-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-By the way, Philippe, what are you intending to convey with
-an acked-by tag? Usually "acked-by" means "I'm the maintainer
-for this area and I haven't actually reviewed this but I don't
-object to it"...
+Applied to target-arm.next, thanks.
 
-thanks
 -- PMM
