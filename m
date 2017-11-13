@@ -1,34 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46474)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47239)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eEI1g-0004DZ-OE
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 11:56:01 -0500
+	(envelope-from <thuth@redhat.com>) id 1eEI3h-0005jz-E3
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 11:58:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eEI1e-0005yY-6W
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 11:56:00 -0500
-Received: from indium.canonical.com ([91.189.90.7]:52386)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eEI1d-0005yE-VT
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 11:55:58 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eEI1b-0007er-Dv
-	for <qemu-devel@nongnu.org>; Mon, 13 Nov 2017 16:55:55 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 6747A2E8059
-	for <qemu-devel@nongnu.org>; Mon, 13 Nov 2017 16:55:55 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 13 Nov 2017 16:45:52 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1727737 <1727737@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150902607840.5143.15937446061017284272.malonedeb@chaenomeles.canonical.com>
-Message-Id: <151059155235.8642.3556109151809826532.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1727737] Re: qemu-arm stalls on a GCC sanitizer
- test since qemu-2.7
+	(envelope-from <thuth@redhat.com>) id 1eEI3e-0006nS-Pl
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 11:58:05 -0500
+From: Thomas Huth <thuth@redhat.com>
+Date: Mon, 13 Nov 2017 17:57:57 +0100
+Message-Id: <1510592277-20635-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH for-2.11] hw/net/vmxnet3: Fix code to work on
+ big endian hosts, too
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,50 +18,475 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>
+Cc: Dmitry Fleytman <dmitry@daynix.com>, David Gibson <dgibson@redhat.com>, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org
 
-It would be nice if we got /proc/self/environ right, though...
+Since commit ab06ec43577177a442e8 we test the vmxnet3 device in the
+pxe-tester, too (when running "make check SPEED=slow"). This now
+revealed that the vmxnet3 code is not working right if the host is a big
+endian machine (for example ppc64 or s390x) - "make check SPEED=slow"
+is now failing on such hosts.
 
--- =
+The vmxnet3 code lacks endianess conversions in a couple of places.
+Interestingly, the bitfields in the structs in vmxnet3.h already tried to
+take care of the *bit* endianess of the C compilers - but the code missed
+to change the *byte* endianess when reading or writing the corresponding
+structs. So the bitfields are now wrapped into unions which allow to change
+the byte endianess during runtime with the non-bitfield member of the union.
+With these changes, "make check SPEED=slow" now properly works on big endian
+hosts, too.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1727737
+Reported-by: David Gibson <dgibson@redhat.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ hw/net/vmware_utils.h |   6 ++
+ hw/net/vmxnet3.c      |  30 +++++--
+ hw/net/vmxnet3.h      | 230 ++++++++++++++++++++++++++++++--------------------
+ 3 files changed, 169 insertions(+), 97 deletions(-)
 
-Title:
-  qemu-arm stalls on a GCC sanitizer test since qemu-2.7
-
-Status in QEMU:
-  Incomplete
-
-Bug description:
-  Hi,
-
-  I have noticed that several GCC/sanitizer tests fail with timeout when
-  executed under QEMU.
-
-  After a bit of investigation, I have noticed that this worked with
-  qemu-2.7, and started failing with qemu-2.8, and still fails with
-  qemu-2.10.1
-
-  I'm attaching a tarball containing:
-  alloca_instruments_all_paddings.exe : the testcase, and the needed libs:
-  lib/librt.so.1
-  lib/libdl.so.2
-  lib/ld-linux-armhf.so.3
-  lib/libasan.so.5
-  lib/libc.so.6
-  lib/libgcc_s.so.1
-  lib/libpthread.so.0
-  lib/libm.so.6
-
-  To reproduce the problem:
-  $ qemu-arm -cpu any -R 0 -L $PWD $PWD/alloca_instruments_all_paddings.exe
-  returns in less than a second with qemu-2.7, and never with qemu-2.8
-
-  Using -d in_asm suggests that the program "almost" completes and qemu see=
-ms to stall on:
-  0x40b6eb44: e08f4004 add r4, pc, r4
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1727737/+subscriptions
+diff --git a/hw/net/vmware_utils.h b/hw/net/vmware_utils.h
+index 5500601..6b1e251 100644
+--- a/hw/net/vmware_utils.h
++++ b/hw/net/vmware_utils.h
+@@ -83,6 +83,7 @@ vmw_shmem_ld16(PCIDevice *d, hwaddr addr)
+ {
+     uint16_t res;
+     pci_dma_read(d, addr, &res, 2);
++    res = le16_to_cpu(res);
+     VMW_SHPRN("SHMEM load16: %" PRIx64 " (value 0x%X)", addr, res);
+     return res;
+ }
+@@ -91,6 +92,7 @@ static inline void
+ vmw_shmem_st16(PCIDevice *d, hwaddr addr, uint16_t value)
+ {
+     VMW_SHPRN("SHMEM store16: %" PRIx64 " (value 0x%X)", addr, value);
++    value = cpu_to_le16(value);
+     pci_dma_write(d, addr, &value, 2);
+ }
+ 
+@@ -99,6 +101,7 @@ vmw_shmem_ld32(PCIDevice *d, hwaddr addr)
+ {
+     uint32_t res;
+     pci_dma_read(d, addr, &res, 4);
++    res = le32_to_cpu(res);
+     VMW_SHPRN("SHMEM load32: %" PRIx64 " (value 0x%X)", addr, res);
+     return res;
+ }
+@@ -107,6 +110,7 @@ static inline void
+ vmw_shmem_st32(PCIDevice *d, hwaddr addr, uint32_t value)
+ {
+     VMW_SHPRN("SHMEM store32: %" PRIx64 " (value 0x%X)", addr, value);
++    value = cpu_to_le32(value);
+     pci_dma_write(d, addr, &value, 4);
+ }
+ 
+@@ -115,6 +119,7 @@ vmw_shmem_ld64(PCIDevice *d, hwaddr addr)
+ {
+     uint64_t res;
+     pci_dma_read(d, addr, &res, 8);
++    res = le64_to_cpu(res);
+     VMW_SHPRN("SHMEM load64: %" PRIx64 " (value %" PRIx64 ")", addr, res);
+     return res;
+ }
+@@ -123,6 +128,7 @@ static inline void
+ vmw_shmem_st64(PCIDevice *d, hwaddr addr, uint64_t value)
+ {
+     VMW_SHPRN("SHMEM store64: %" PRIx64 " (value %" PRIx64 ")", addr, value);
++    value = cpu_to_le64(value);
+     pci_dma_write(d, addr, &value, 8);
+ }
+ 
+diff --git a/hw/net/vmxnet3.c b/hw/net/vmxnet3.c
+index 8c4bae5..835d1eb 100644
+--- a/hw/net/vmxnet3.c
++++ b/hw/net/vmxnet3.c
+@@ -222,7 +222,7 @@ vmxnet3_dump_tx_descr(struct Vmxnet3_TxDesc *descr)
+               "addr %" PRIx64 ", len: %d, gen: %d, rsvd: %d, "
+               "dtype: %d, ext1: %d, msscof: %d, hlen: %d, om: %d, "
+               "eop: %d, cq: %d, ext2: %d, ti: %d, tci: %d",
+-              le64_to_cpu(descr->addr), descr->len, descr->gen, descr->rsvd,
++              descr->addr, descr->len, descr->gen, descr->rsvd,
+               descr->dtype, descr->ext1, descr->msscof, descr->hlen, descr->om,
+               descr->eop, descr->cq, descr->ext2, descr->ti, descr->tci);
+ }
+@@ -241,7 +241,7 @@ vmxnet3_dump_rx_descr(struct Vmxnet3_RxDesc *descr)
+ {
+     VMW_PKPRN("RX DESCR: addr %" PRIx64 ", len: %d, gen: %d, rsvd: %d, "
+               "dtype: %d, ext1: %d, btype: %d",
+-              le64_to_cpu(descr->addr), descr->len, descr->gen,
++              descr->addr, descr->len, descr->gen,
+               descr->rsvd, descr->dtype, descr->ext1, descr->btype);
+ }
+ 
+@@ -535,7 +535,8 @@ static void vmxnet3_complete_packet(VMXNET3State *s, int qidx, uint32_t tx_ridx)
+     memset(&txcq_descr, 0, sizeof(txcq_descr));
+     txcq_descr.txdIdx = tx_ridx;
+     txcq_descr.gen = vmxnet3_ring_curr_gen(&s->txq_descr[qidx].comp_ring);
+-
++    txcq_descr.val1 = cpu_to_le32(txcq_descr.val1);
++    txcq_descr.val2 = cpu_to_le32(txcq_descr.val2);
+     vmxnet3_ring_write_curr_cell(d, &s->txq_descr[qidx].comp_ring, &txcq_descr);
+ 
+     /* Flush changes in TX descriptor before changing the counter value */
+@@ -695,11 +696,17 @@ vmxnet3_pop_next_tx_descr(VMXNET3State *s,
+     PCIDevice *d = PCI_DEVICE(s);
+ 
+     vmxnet3_ring_read_curr_cell(d, ring, txd);
++    txd->addr = le64_to_cpu(txd->addr);
++    txd->val1 = le32_to_cpu(txd->val1);
++    txd->val2 = le32_to_cpu(txd->val2);
+     if (txd->gen == vmxnet3_ring_curr_gen(ring)) {
+         /* Only read after generation field verification */
+         smp_rmb();
+         /* Re-read to be sure we got the latest version */
+         vmxnet3_ring_read_curr_cell(d, ring, txd);
++        txd->addr = le64_to_cpu(txd->addr);
++        txd->val1 = le32_to_cpu(txd->val1);
++        txd->val2 = le32_to_cpu(txd->val2);
+         VMXNET3_RING_DUMP(VMW_RIPRN, "TX", qidx, ring);
+         *descr_idx = vmxnet3_ring_curr_cell_idx(ring);
+         vmxnet3_inc_tx_consumption_counter(s, qidx);
+@@ -749,7 +756,7 @@ static void vmxnet3_process_tx_queue(VMXNET3State *s, int qidx)
+ 
+         if (!s->skip_current_tx_pkt) {
+             data_len = (txd.len > 0) ? txd.len : VMXNET3_MAX_TX_BUF_SIZE;
+-            data_pa = le64_to_cpu(txd.addr);
++            data_pa = txd.addr;
+ 
+             if (!net_tx_pkt_add_raw_fragment(s->tx_pkt,
+                                                 data_pa,
+@@ -792,6 +799,9 @@ vmxnet3_read_next_rx_descr(VMXNET3State *s, int qidx, int ridx,
+     Vmxnet3Ring *ring = &s->rxq_descr[qidx].rx_ring[ridx];
+     *didx = vmxnet3_ring_curr_cell_idx(ring);
+     vmxnet3_ring_read_curr_cell(d, ring, dbuf);
++    dbuf->addr = le64_to_cpu(dbuf->addr);
++    dbuf->val1 = le32_to_cpu(dbuf->val1);
++    dbuf->ext1 = le32_to_cpu(dbuf->ext1);
+ }
+ 
+ static inline uint8_t
+@@ -811,6 +821,9 @@ vmxnet3_pop_rxc_descr(VMXNET3State *s, int qidx, uint32_t *descr_gen)
+ 
+     pci_dma_read(PCI_DEVICE(s),
+                  daddr, &rxcd, sizeof(struct Vmxnet3_RxCompDesc));
++    rxcd.val1 = le32_to_cpu(rxcd.val1);
++    rxcd.val2 = le32_to_cpu(rxcd.val2);
++    rxcd.val3 = le32_to_cpu(rxcd.val3);
+     ring_gen = vmxnet3_ring_curr_gen(&s->rxq_descr[qidx].comp_ring);
+ 
+     if (rxcd.gen != ring_gen) {
+@@ -1098,14 +1111,16 @@ vmxnet3_indicate_packet(VMXNET3State *s)
+         }
+ 
+         chunk_size = MIN(bytes_left, rxd.len);
+-        vmxnet3_pci_dma_writev(d, data, bytes_copied,
+-                               le64_to_cpu(rxd.addr), chunk_size);
++        vmxnet3_pci_dma_writev(d, data, bytes_copied, rxd.addr, chunk_size);
+         bytes_copied += chunk_size;
+         bytes_left -= chunk_size;
+ 
+         vmxnet3_dump_rx_descr(&rxd);
+ 
+         if (ready_rxcd_pa != 0) {
++            rxcd.val1 = le32_to_cpu(rxcd.val1);
++            rxcd.val2 = le32_to_cpu(rxcd.val2);
++            rxcd.val3 = le32_to_cpu(rxcd.val3);
+             pci_dma_write(d, ready_rxcd_pa, &rxcd, sizeof(rxcd));
+         }
+ 
+@@ -1138,6 +1153,9 @@ vmxnet3_indicate_packet(VMXNET3State *s)
+         rxcd.eop = 1;
+         rxcd.err = (bytes_left != 0);
+ 
++        rxcd.val1 = le32_to_cpu(rxcd.val1);
++        rxcd.val2 = le32_to_cpu(rxcd.val2);
++        rxcd.val3 = le32_to_cpu(rxcd.val3);
+         pci_dma_write(d, ready_rxcd_pa, &rxcd, sizeof(rxcd));
+ 
+         /* Flush RX descriptor changes */
+diff --git a/hw/net/vmxnet3.h b/hw/net/vmxnet3.h
+index f9352c4..5b3b76b 100644
+--- a/hw/net/vmxnet3.h
++++ b/hw/net/vmxnet3.h
+@@ -226,39 +226,49 @@ enum {
+ struct Vmxnet3_TxDesc {
+     __le64 addr;
+ 
++    union {
++        struct {
+ #ifdef __BIG_ENDIAN_BITFIELD
+-    u32 msscof:14;  /* MSS, checksum offset, flags */
+-    u32 ext1:1;
+-    u32 dtype:1;    /* descriptor type */
+-    u32 rsvd:1;
+-    u32 gen:1;      /* generation bit */
+-    u32 len:14;
++            u32 msscof:14;  /* MSS, checksum offset, flags */
++            u32 ext1:1;
++            u32 dtype:1;    /* descriptor type */
++            u32 rsvd:1;
++            u32 gen:1;      /* generation bit */
++            u32 len:14;
+ #else
+-    u32 len:14;
+-    u32 gen:1;      /* generation bit */
+-    u32 rsvd:1;
+-    u32 dtype:1;    /* descriptor type */
+-    u32 ext1:1;
+-    u32 msscof:14;  /* MSS, checksum offset, flags */
++            u32 len:14;
++            u32 gen:1;      /* generation bit */
++            u32 rsvd:1;
++            u32 dtype:1;    /* descriptor type */
++            u32 ext1:1;
++            u32 msscof:14;  /* MSS, checksum offset, flags */
+ #endif  /* __BIG_ENDIAN_BITFIELD */
+-
++        };
++        u32 val1;
++    };
++    
++    union {
++        struct {
+ #ifdef __BIG_ENDIAN_BITFIELD
+-    u32 tci:16;     /* Tag to Insert */
+-    u32 ti:1;       /* VLAN Tag Insertion */
+-    u32 ext2:1;
+-    u32 cq:1;       /* completion request */
+-    u32 eop:1;      /* End Of Packet */
+-    u32 om:2;       /* offload mode */
+-    u32 hlen:10;    /* header len */
++            u32 tci:16;     /* Tag to Insert */
++            u32 ti:1;       /* VLAN Tag Insertion */
++            u32 ext2:1;
++            u32 cq:1;       /* completion request */
++            u32 eop:1;      /* End Of Packet */
++            u32 om:2;       /* offload mode */
++            u32 hlen:10;    /* header len */
+ #else
+-    u32 hlen:10;    /* header len */
+-    u32 om:2;       /* offload mode */
+-    u32 eop:1;      /* End Of Packet */
+-    u32 cq:1;       /* completion request */
+-    u32 ext2:1;
+-    u32 ti:1;       /* VLAN Tag Insertion */
+-    u32 tci:16;     /* Tag to Insert */
++            u32 hlen:10;    /* header len */
++            u32 om:2;       /* offload mode */
++            u32 eop:1;      /* End Of Packet */
++            u32 cq:1;       /* completion request */
++            u32 ext2:1;
++            u32 ti:1;       /* VLAN Tag Insertion */
++            u32 tci:16;     /* Tag to Insert */
+ #endif  /* __BIG_ENDIAN_BITFIELD */
++        };
++        u32 val2;
++    };
+ };
+ 
+ /* TxDesc.OM values */
+@@ -291,33 +301,57 @@ struct Vmxnet3_TxDataDesc {
+ #define VMXNET3_TCD_GEN_DWORD_SHIFT    3
+ 
+ struct Vmxnet3_TxCompDesc {
+-    u32        txdIdx:12;    /* Index of the EOP TxDesc */
+-    u32        ext1:20;
+-
++    union {
++        struct {
++#ifdef __BIG_ENDIAN_BITFIELD
++            u32 ext1:20;
++            u32 txdIdx:12;    /* Index of the EOP TxDesc */
++#else
++            u32 txdIdx:12;    /* Index of the EOP TxDesc */
++            u32 ext1:20;
++#endif
++        };
++        u32 val1;
++    };
+     __le32        ext2;
+     __le32        ext3;
+ 
+-    u32        rsvd:24;
+-    u32        type:7;       /* completion type */
+-    u32        gen:1;        /* generation bit */
++    union {
++        struct {
++#ifdef __BIG_ENDIAN_BITFIELD
++            u32 gen:1;        /* generation bit */
++            u32 type:7;       /* completion type */
++            u32 rsvd:24;
++#else
++            u32 rsvd:24;
++            u32 type:7;       /* completion type */
++            u32 gen:1;        /* generation bit */
++#endif
++        };
++        u32 val2;
++    };
+ };
+ 
+ struct Vmxnet3_RxDesc {
+     __le64        addr;
+-
++    union {
++        struct {
+ #ifdef __BIG_ENDIAN_BITFIELD
+-    u32        gen:1;        /* Generation bit */
+-    u32        rsvd:15;
+-    u32        dtype:1;      /* Descriptor type */
+-    u32        btype:1;      /* Buffer Type */
+-    u32        len:14;
++            u32 gen:1;        /* Generation bit */
++            u32 rsvd:15;
++            u32 dtype:1;      /* Descriptor type */
++            u32 btype:1;      /* Buffer Type */
++            u32 len:14;
+ #else
+-    u32        len:14;
+-    u32        btype:1;      /* Buffer Type */
+-    u32        dtype:1;      /* Descriptor type */
+-    u32        rsvd:15;
+-    u32        gen:1;        /* Generation bit */
++            u32 len:14;
++            u32 btype:1;      /* Buffer Type */
++            u32 dtype:1;      /* Descriptor type */
++            u32 rsvd:15;
++            u32 gen:1;        /* Generation bit */
+ #endif
++        };
++        u32 val1;
++    };
+     u32        ext1;
+ };
+ 
+@@ -330,66 +364,80 @@ struct Vmxnet3_RxDesc {
+ #define VMXNET3_RXD_GEN_SHIFT    31
+ 
+ struct Vmxnet3_RxCompDesc {
++    union {
++        struct {
+ #ifdef __BIG_ENDIAN_BITFIELD
+-    u32        ext2:1;
+-    u32        cnc:1;        /* Checksum Not Calculated */
+-    u32        rssType:4;    /* RSS hash type used */
+-    u32        rqID:10;      /* rx queue/ring ID */
+-    u32        sop:1;        /* Start of Packet */
+-    u32        eop:1;        /* End of Packet */
+-    u32        ext1:2;
+-    u32        rxdIdx:12;    /* Index of the RxDesc */
++            u32 ext2:1;
++            u32 cnc:1;        /* Checksum Not Calculated */
++            u32 rssType:4;    /* RSS hash type used */
++            u32 rqID:10;      /* rx queue/ring ID */
++            u32 sop:1;        /* Start of Packet */
++            u32 eop:1;        /* End of Packet */
++            u32 ext1:2;
++            u32 rxdIdx:12;    /* Index of the RxDesc */
+ #else
+-    u32        rxdIdx:12;    /* Index of the RxDesc */
+-    u32        ext1:2;
+-    u32        eop:1;        /* End of Packet */
+-    u32        sop:1;        /* Start of Packet */
+-    u32        rqID:10;      /* rx queue/ring ID */
+-    u32        rssType:4;    /* RSS hash type used */
+-    u32        cnc:1;        /* Checksum Not Calculated */
+-    u32        ext2:1;
++            u32 rxdIdx:12;    /* Index of the RxDesc */
++            u32 ext1:2;
++            u32 eop:1;        /* End of Packet */
++            u32 sop:1;        /* Start of Packet */
++            u32 rqID:10;      /* rx queue/ring ID */
++            u32 rssType:4;    /* RSS hash type used */
++            u32 cnc:1;        /* Checksum Not Calculated */
++            u32 ext2:1;
+ #endif  /* __BIG_ENDIAN_BITFIELD */
++        };
++        u32 val1;
++    };
+ 
+     __le32        rssHash;      /* RSS hash value */
+ 
++    union {
++        struct {
+ #ifdef __BIG_ENDIAN_BITFIELD
+-    u32        tci:16;       /* Tag stripped */
+-    u32        ts:1;         /* Tag is stripped */
+-    u32        err:1;        /* Error */
+-    u32        len:14;       /* data length */
++            u32 tci:16;       /* Tag stripped */
++            u32 ts:1;         /* Tag is stripped */
++            u32 err:1;        /* Error */
++            u32 len:14;       /* data length */
+ #else
+-    u32        len:14;       /* data length */
+-    u32        err:1;        /* Error */
+-    u32        ts:1;         /* Tag is stripped */
+-    u32        tci:16;       /* Tag stripped */
++            u32 len:14;       /* data length */
++            u32 err:1;        /* Error */
++            u32 ts:1;         /* Tag is stripped */
++            u32 tci:16;       /* Tag stripped */
+ #endif  /* __BIG_ENDIAN_BITFIELD */
++        };
++        u32 val2;
++    };
+ 
+-
++    union {
++        struct {
+ #ifdef __BIG_ENDIAN_BITFIELD
+-    u32        gen:1;        /* generation bit */
+-    u32        type:7;       /* completion type */
+-    u32        fcs:1;        /* Frame CRC correct */
+-    u32        frg:1;        /* IP Fragment */
+-    u32        v4:1;         /* IPv4 */
+-    u32        v6:1;         /* IPv6 */
+-    u32        ipc:1;        /* IP Checksum Correct */
+-    u32        tcp:1;        /* TCP packet */
+-    u32        udp:1;        /* UDP packet */
+-    u32        tuc:1;        /* TCP/UDP Checksum Correct */
+-    u32        csum:16;
++            u32 gen:1;        /* generation bit */
++            u32 type:7;       /* completion type */
++            u32 fcs:1;        /* Frame CRC correct */
++            u32 frg:1;        /* IP Fragment */
++            u32 v4:1;         /* IPv4 */
++            u32 v6:1;         /* IPv6 */
++            u32 ipc:1;        /* IP Checksum Correct */
++            u32 tcp:1;        /* TCP packet */
++            u32 udp:1;        /* UDP packet */
++            u32 tuc:1;        /* TCP/UDP Checksum Correct */
++            u32 csum:16;
+ #else
+-    u32        csum:16;
+-    u32        tuc:1;        /* TCP/UDP Checksum Correct */
+-    u32        udp:1;        /* UDP packet */
+-    u32        tcp:1;        /* TCP packet */
+-    u32        ipc:1;        /* IP Checksum Correct */
+-    u32        v6:1;         /* IPv6 */
+-    u32        v4:1;         /* IPv4 */
+-    u32        frg:1;        /* IP Fragment */
+-    u32        fcs:1;        /* Frame CRC correct */
+-    u32        type:7;       /* completion type */
+-    u32        gen:1;        /* generation bit */
++            u32 csum:16;
++            u32 tuc:1;        /* TCP/UDP Checksum Correct */
++            u32 udp:1;        /* UDP packet */
++            u32 tcp:1;        /* TCP packet */
++            u32 ipc:1;        /* IP Checksum Correct */
++            u32 v6:1;         /* IPv6 */
++            u32 v4:1;         /* IPv4 */
++            u32 frg:1;        /* IP Fragment */
++            u32 fcs:1;        /* Frame CRC correct */
++            u32 type:7;       /* completion type */
++            u32 gen:1;        /* generation bit */
+ #endif  /* __BIG_ENDIAN_BITFIELD */
++        };
++        u32 val3;
++    };
+ };
+ 
+ /* fields in RxCompDesc we access via Vmxnet3_GenericDesc.dword[3] */
+-- 
+1.8.3.1
