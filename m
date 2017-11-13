@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33714)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35767)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1eEEoF-0003wl-4c
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 08:29:55 -0500
+	(envelope-from <bounces@canonical.com>) id 1eEEq8-0005Vv-4z
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 08:32:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1eEEoA-000340-8y
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 08:29:55 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50594)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1eEEoA-00032K-32
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 08:29:50 -0500
-Date: Mon, 13 Nov 2017 14:29:46 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20171113132946.j4xyt2gx4uqmmvxw@sirius.home.kraxel.org>
-References: <903d8048-77e9-4a30-d8e1-56ccd8b6a6bc@amsat.org>
-	<20171112193032.9724-1-makovick@gmail.com>
-	<20171112193032.9724-9-makovick@gmail.com>
+	(envelope-from <bounces@canonical.com>) id 1eEEpj-0006Fg-FR
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 08:31:52 -0500
+Received: from indium.canonical.com ([91.189.90.7]:44256)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eEEpj-0006CJ-70
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 08:31:27 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eEEpf-00021V-2I
+	for <qemu-devel@nongnu.org>; Mon, 13 Nov 2017 13:31:23 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 0B9B62E818D
+	for <qemu-devel@nongnu.org>; Mon, 13 Nov 2017 13:31:18 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171112193032.9724-9-makovick@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH 8/8] sdl2: Ignore UI hotkeys after a focus
- change when GUI modifier is held
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 13 Nov 2017 13:18:13 -0000
+From: Christophe Lyon <christophe.lyon+launchpad@gmail.com>
+Reply-To: Bug 1727737 <1727737@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150902607840.5143.15937446061017284272.malonedeb@chaenomeles.canonical.com>
+Message-Id: <151057909309.28361.11219233202071039367.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1727737] Re: qemu-arm stalls on a GCC sanitizer
+ test since qemu-2.7
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,21 +37,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jindrich Makovicka <makovick@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Cole Robinson <crobinso@redhat.com>
+To: qemu-devel@nongnu.org
 
- Hi,
+I also looked at QEMU's code, and I am suprised that do_syscall()
+returns the value of errno rather than the return code from the syscall.
+So for instance, if clone() fails, do_syscall() returns
+get_errno(do_fork(...)) instead of -1. I thought the target code expects
+-1 in case of failure, but I'm not familiar with QEMU sources, so I'm
+probably missing something.
 
->          if (!gui_grab && (qemu_input_is_absolute() || absolute_enabled)) {
->              absolute_mouse_grab(scon);
->          }
+Looking at QEMU's linux-user/syscall.c:do_fork(), I noticed several places =
+with return -TARGET_EXXXX: should this be:
+errno =3D TARGET_EXXX;
+return -1;
+instead?
+But given than most (if not all) syscalls in do_syscall actually use 'ret =
+=3D get_errno(xxxx)' I must be wrong :-)
 
-Can you please add a comment here describing why this is done?
->From the code alone it isn't obvious that this is a workaround
-for a SDL bug.
+-- =
 
-> +        scon->ignore_hotkeys = get_mod_state();
->          break;
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1727737
 
-cheers,
-  Gerd
+Title:
+  qemu-arm stalls on a GCC sanitizer test since qemu-2.7
+
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  Hi,
+
+  I have noticed that several GCC/sanitizer tests fail with timeout when
+  executed under QEMU.
+
+  After a bit of investigation, I have noticed that this worked with
+  qemu-2.7, and started failing with qemu-2.8, and still fails with
+  qemu-2.10.1
+
+  I'm attaching a tarball containing:
+  alloca_instruments_all_paddings.exe : the testcase, and the needed libs:
+  lib/librt.so.1
+  lib/libdl.so.2
+  lib/ld-linux-armhf.so.3
+  lib/libasan.so.5
+  lib/libc.so.6
+  lib/libgcc_s.so.1
+  lib/libpthread.so.0
+  lib/libm.so.6
+
+  To reproduce the problem:
+  $ qemu-arm -cpu any -R 0 -L $PWD $PWD/alloca_instruments_all_paddings.exe
+  returns in less than a second with qemu-2.7, and never with qemu-2.8
+
+  Using -d in_asm suggests that the program "almost" completes and qemu see=
+ms to stall on:
+  0x40b6eb44: e08f4004 add r4, pc, r4
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1727737/+subscriptions
