@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54375)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55412)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lprosek@redhat.com>) id 1eEANf-0002pO-0p
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 03:46:16 -0500
+	(envelope-from <dovgaluk@ispras.ru>) id 1eEATU-0004bg-Vp
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 03:52:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lprosek@redhat.com>) id 1eEANb-0001Bz-2l
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 03:46:11 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53066)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1eEANa-0001BQ-TL
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 03:46:07 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2F1556A7DF
-	for <qemu-devel@nongnu.org>; Mon, 13 Nov 2017 08:46:05 +0000 (UTC)
-From: Ladi Prosek <lprosek@redhat.com>
-Date: Mon, 13 Nov 2017 09:45:58 +0100
-Message-Id: <20171113084558.28369-1-lprosek@redhat.com>
-Subject: [Qemu-devel] [PATCH v2] virtio-pci: Don't force Subsystem Vendor ID
- = Vendor ID
+	(envelope-from <dovgaluk@ispras.ru>) id 1eEATR-0006zF-39
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 03:52:13 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:38652)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <dovgaluk@ispras.ru>) id 1eEATQ-0006xu-RC
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 03:52:09 -0500
+From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
+References: <20171031112457.10516.8971.stgit@pasha-VirtualBox>
+	<20171031112610.10516.78685.stgit@pasha-VirtualBox>
+	<84c5cdaf-4ec6-f05c-e1a2-3228517d491a@redhat.com>
+	<9bbb7744-86e4-9c82-cf82-63a5429ac405@redhat.com>
+	<132030259.16705243.1509653039905.JavaMail.zimbra@redhat.com>
+In-Reply-To: <132030259.16705243.1509653039905.JavaMail.zimbra@redhat.com>
+Date: Mon, 13 Nov 2017 11:52:14 +0300
+Message-ID: <002e01d35c5c$b3ea9c00$1bbfd400$@ru>
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Content-Language: ru
+Subject: Re: [Qemu-devel] [RFC PATCH 13/26] cpus: only take BQL for sleeping
+ threads
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,60 +33,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: yvugenfi@redhat.com, vrozenfe@redhat.com, mst@redhat.com, kraxel@redhat.com
+To: 'Paolo Bonzini' <pbonzini@redhat.com>, 'David Hildenbrand' <david@redhat.com>
+Cc: 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org, kwolf@redhat.com, 'peter maydell' <peter.maydell@linaro.org>, 'boost lists' <boost.lists@gmail.com>, quintela@redhat.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, 'maria klimushenkova' <maria.klimushenkova@ispras.ru>, kraxel@redhat.com, 'alex bennee' <alex.bennee@linaro.org>
 
-The statement being removed doesn't change anything as virtio PCI devices already
-have Subsystem Vendor ID set to pci_default_sub_vendor_id (0x1af4), same as Vendor
-ID. And the Virtio spec does not require the two to be equal, either:
+> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
+> > From: "David Hildenbrand" <david@redhat.com>
+> > On 02.11.2017 12:08, Paolo Bonzini wrote:
+> > > On 31/10/2017 12:26, Pavel Dovgalyuk wrote:
+> > >> From: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> > >>
+> > >> Now the only real need to hold the BQL is for when we sleep on =
+the
+> > >> cpu->halt conditional. The lock is actually dropped while the =
+thread
+> > >> sleeps so the actual window for contention is pretty small. This =
+also
+> > >> means we can remove the special case hack for exclusive work and
+> > >> simply declare that work no longer has an implicit BQL held. This
+> > >> isn't a major problem async work is generally only changing =
+things in
+> > >> the context of its own vCPU. If it needs to work across vCPUs it
+> > >> should be using the exclusive mechanism or possibly taking the =
+lock
+> > >> itself.
+> > >>
+> > >> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> > >> Tested-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+> > >
+> > > At least cpu_throttle_thread would fail with this patch.
+> > >
+> > > Also I am not sure if the s390 SIGP handlers are ready for this.
+> > >
+> >
+> > We have a global lock to the SIGP "facility". However we need the =
+BQL in
+> > order to inject interrupts into CPUs (otherwise it would trigger an
+> > assert when injecting).
+> >
+> > We inject Restart and Stop interrupts from run_on_cpu. This requires =
+the
+> > BQL. So Paolo should be right, this change would break s390x.
+>=20
+> I had some patches to access interrupt_request with the atomic =
+builtins.  If
+> Pavel can first extract the other changes to the icount mechanism, I =
+can
+> update them.
 
-  "The PCI Subsystem Vendor ID and the PCI Subsystem Device ID MAY reflect the PCI
-  Vendor and Device ID of the environment (for informational purposes by the driver)."
+What changes do you mean here?
+I'm not sure that I understand clearly how threads interact with BQL.
+These patches were authored by Alex and we'll have to get him into the =
+discussion.
 
-Background:
-
-Following the recent virtio-win licensing change, several vendors are planning to
-ship their own certified version of Windows guest Virtio drivers, potentially taking
-advantage of Windows Update as a distribution channel. It is therefore critical that
-each vendor uses their own PCI Subsystem Vendor ID for Virtio devices to prevent
-drivers from other vendors binding to it.
-
-This would be trivially done by adding:
-
-  k->subsystem_vendor_id = ...
-
-to virtio_pci_class_init(). Except for the problematic statement deleted by this
-patch, which reverts the Subsystem Vendor ID back to 0x1af4 for legacy devices for
-no good reason.
-
-Signed-off-by: Ladi Prosek <lprosek@redhat.com>
----
-
-v1->v2:
-* Added a comment about the default Subsystem Vendor ID.
-
-
- hw/virtio/virtio-pci.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
-
-diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
-index e92837c42b..148621d9c7 100644
---- a/hw/virtio/virtio-pci.c
-+++ b/hw/virtio/virtio-pci.c
-@@ -1588,9 +1588,11 @@ static void virtio_pci_device_plugged(DeviceState *d, Error **errp)
-                        "neither legacy nor transitional device.");
-             return ;
-         }
--        /* legacy and transitional */
--        pci_set_word(config + PCI_SUBSYSTEM_VENDOR_ID,
--                     pci_get_word(config + PCI_VENDOR_ID));
-+        /*
-+         * Legacy and transitional devices use specific subsystem IDs.
-+         * Note that the subsystem vendor ID (config + PCI_SUBSYSTEM_VENDOR_ID)
-+         * is set to PCI_SUBVENDOR_ID_REDHAT_QUMRANET by default.
-+         */
-         pci_set_word(config + PCI_SUBSYSTEM_ID, virtio_bus_get_vdev_id(bus));
-     } else {
-         /* pure virtio-1.0 */
--- 
-2.13.5
+Pavel Dovgalyuk
