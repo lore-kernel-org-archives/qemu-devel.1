@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43412)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43410)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eE6Nr-0005EA-VC
-	for qemu-devel@nongnu.org; Sun, 12 Nov 2017 23:30:09 -0500
+	(envelope-from <bounces@canonical.com>) id 1eE6Nr-0005E9-UP
+	for qemu-devel@nongnu.org; Sun, 12 Nov 2017 23:30:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eE6Nn-0001YA-Tb
+	(envelope-from <bounces@canonical.com>) id 1eE6Nn-0001Y0-Sv
 	for qemu-devel@nongnu.org; Sun, 12 Nov 2017 23:30:07 -0500
-Received: from indium.canonical.com ([91.189.90.7]:33522)
+Received: from indium.canonical.com ([91.189.90.7]:33524)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eE6Nn-0001Wj-NO
+	id 1eE6Nn-0001Wk-Ml
 	for qemu-devel@nongnu.org; Sun, 12 Nov 2017 23:30:03 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eE6Nl-0003Xm-CL
-	for <qemu-devel@nongnu.org>; Mon, 13 Nov 2017 04:30:01 +0000
+	id 1eE6Nk-0003Yj-Fc
+	for <qemu-devel@nongnu.org>; Mon, 13 Nov 2017 04:30:00 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 5A7C72E80C3
-	for <qemu-devel@nongnu.org>; Mon, 13 Nov 2017 04:30:01 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 3447D2E80D4
+	for <qemu-devel@nongnu.org>; Mon, 13 Nov 2017 04:30:00 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 13 Nov 2017 04:17:22 -0000
-From: Launchpad Bug Tracker <888016@bugs.launchpad.net>
-Reply-To: Bug 888016 <888016@bugs.launchpad.net>
+Date: Mon, 13 Nov 2017 04:17:24 -0000
+From: Launchpad Bug Tracker <1254940@bugs.launchpad.net>
+Reply-To: Bug 1254940 <1254940@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20111109115824.7938.15673.malonedeb@chaenomeles.canonical.com>
-Message-Id: <151054664311.17693.6509638852335223279.malone@loganberry.canonical.com>
+References: <20131126015941.27755.36754.malonedeb@soybean.canonical.com>
+Message-Id: <151054664427.17693.17661495704434639698.malone@loganberry.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 888016] Re: RHEL 6.1 guest fails to boot with
- vhost
+Subject: [Qemu-devel] [Bug 1254940] Re: qemu-KVM guest OS occurs many
+ ext3-fs errors after multiple forced shutdown
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -48,40 +48,70 @@ To: qemu-devel@nongnu.org
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/888016
+https://bugs.launchpad.net/bugs/1254940
 
 Title:
-  RHEL 6.1 guest fails to boot with vhost
+  qemu-KVM guest OS occurs many ext3-fs errors after multiple forced
+  shutdown
 
 Status in QEMU:
   Expired
 
 Bug description:
-  Tried to boot 6.1 guest on hs22 blade with/without  vhost enabled.
+  Hi:
+  I met some filesysterm errors in a sles guest on KVM. My system environme=
+nt is:
+  HOST:
+  =C2=A0=C2=A0=C2=A0suse 10, the kernel version is 2.6.32.43
+  =C2=A0=C2=A0=C2=A0Qemu-KVM 1.2
+  =C2=A0=C2=A0=C2=A0Libvirt 1.0
+  guest OS:
+  =C2=A0=C2=A0=C2=A0suse 10, the kernel version is 2.6.32.43
+  VMs use a qcow2 disk.
 
-  With vhost enabled,  guest aborted with core dump.
+  Description of problem:
+  I have 20+ VMs with qcow2 disk, these VMs have been forced to shut down by
+  "virsh destroy" many times during and after VM installation.
+  When these vm reboot,dmesg show a ext3-fs mount error occurred on /usr/lo=
+cal
+  partion /dev/vda3:
+  =C2=A0=C2=A0=C2=A0=C2=A0EXT3-fs warning: mounting fs with errors, running=
+ e2fsck is recommendedand
+  when I wrote into partion /dev/vda3,some errors occurred in dmesg:
+  1.error (device vda3): ext3_free_blocks: Freeing blocks not in datazone -=
+ block
+  =3D 1869619311, count =3D 1error (device vda3): ext3_free_blocks_sb: bit =
+already
+  cleared for block 2178152error (device vda3): ext3_readdir: bad entry in
+  directory #1083501:
+  2.[347470.661893] attempt to access beyond end of device[347470.661896] v=
+da3:
+  rw=3D0, want=3D6870892952, limit=3D41945715[347470.661897] EXT3-fs error =
+(device
+  vda3): ext3_free_branches: Read failure, inode=3D1083508, block=3D8588616=
+18
+  3.EXT3-fs error (device vda3): ext3_new_block: block(4295028581) >=3D blo=
+cks
+  count(-1) - block_group =3D 1, es =3D=3D ffff88021b6c7400
 
-  installed guest with autotest.    =
+  I suspect this fs-error is caused by multiple forced shutdown, but I can't
+  reproduce this bug now.
 
-  Command : =
+  So if someone else encountered the same bugs(or fs errors) with me,
+  and what the reasons leads to these fs errors, is the qemu or KVM or
+  just my "rough" cmd.
 
-  /usr/local/bin/qemu-system-x86_64 -name 'vm1' -nodefaults -vga std -monit=
-or unix:'/tmp/monitor-humanmonitor1-20111108-193209-fc6O',server,nowait -se=
-rial unix:'/tmp/serial-20111108-193209-fc6O',server,nowait -drive file=3D'/=
-home/pradeep/autotest/client/tests/kvm/images/rhel6.1-64.qed',index=3D0,if=
-=3Dvirtio,cache=3Dnone -device virtio-net-pci,netdev=3DidQhUaOc,mac=3D'9a:b=
-7:ea:c9:0e:0d',id=3D'idVR6XQz' -netdev tap,id=3DidQhUaOc,vhost=3Don,script=
-=3D/home/pradeep/qemu-ifup-latest -m 1024 -smp 8 -vnc :0 -monitor stdio
-  QEMU 0.15.91 monitor - type 'help' for more information
-  (qemu) Aborted (core dumped)
+  Thanks in Advance
+  Regards
+  Ben
 
-  =
+  Steps to Reproduce:
+  I can't reproduce this bug now.
 
-  host:
-
-  2.6.32-214
-  m/c: hs22
-  vhost modules are loaded.
+  additional:
+  1.multiple forced shutdown during and after the vm installing
+  2.vm with qcow2 disk
+  3.different vm dmesg different errors in above error list(1/2/3)
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/888016/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1254940/+subscriptions
