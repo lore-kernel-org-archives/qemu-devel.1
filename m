@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33144)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33425)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eEZXH-0000tO-Fz
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 06:37:48 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eEZXk-00015l-UC
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 06:38:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eEZXD-0007T3-DY
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 06:37:47 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:47692)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1eEZXD-0007S6-0i
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 06:37:43 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eEZXj-0007kT-F6
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 06:38:16 -0500
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1510592277-20635-1-git-send-email-thuth@redhat.com>
+	<4bb42004-19d2-26e5-8ae5-3b873f2b8ec3@amsat.org>
+	<ebe7240c-b349-2f58-ab30-870bf49c2549@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <f2d52627-a0b0-2a3f-b928-56288b59debe@amsat.org>
+Date: Tue, 14 Nov 2017 08:37:52 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Date: Tue, 14 Nov 2017 14:37:40 +0300
-From: Mihail Abakumov <mikhail.abakumov@ispras.ru>
-In-Reply-To: <CABdb737buNdep007xMsBR2ZxOpmZXiSd_fz_mcQhnrbZGP2kgw@mail.gmail.com>
-References: <150824572545.6816.5099701189660002212.stgit@Misha-PC.lan02.inno>
-	<CABdb736bkcafKPCHsQGEmB6wYOGB4s4S4+sVkuygDe7SjqZDYA@mail.gmail.com>
-	<CABdb736w49GjXwNOsj4o8RHQKAfmWnu+jJQgAZjzHwwzOW-+gA@mail.gmail.com>
-	<1b94bfaac633fc76c8633bbcec9ff4a9@ispras.ru>
-	<CABdb735OHqGVf_0D=zDy9D4HzG4s+w8OjUX5MG2pWrqOrQc=pg@mail.gmail.com>
-	<3205f50a0ec9089fcaf452911e60637b@ispras.ru>
-	<CABdb737buNdep007xMsBR2ZxOpmZXiSd_fz_mcQhnrbZGP2kgw@mail.gmail.com>
-Message-ID: <c7047af12c8908b2596a367cb9425339@ispras.ru>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 00/43] Windbg supporting
+In-Reply-To: <ebe7240c-b349-2f58-ab30-870bf49c2549@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH for-2.11] hw/net/vmxnet3: Fix code to work
+ on big endian hosts, too
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,126 +30,194 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ladi Prosek <lprosek@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, sw@weilnetz.de, Pavel Dovgalyuk <dovgaluk@ispras.ru>, Roman Kagan <rkagan@virtuozzo.com>, Paolo Bonzini <pbonzini@redhat.com>, "Denis V. Lunev" <den@openvz.org>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, Dmitry Fleytman <dmitry.fleytman@gmail.com>
+Cc: Dmitry Fleytman <dmitry@daynix.com>, David Gibson <dgibson@redhat.com>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org
 
-Ladi Prosek =D0=BF=D0=B8=D1=81=D0=B0=D0=BB 2017-11-13 15:23:
-> On Wed, Nov 8, 2017 at 3:28 PM, Mihail Abakumov
-> <mikhail.abakumov@ispras.ru> wrote:
->> Ladi Prosek =D0=BF=D0=B8=D1=81=D0=B0=D0=BB 2017-11-08 16:43:
->>=20
->>> On Wed, Nov 8, 2017 at 12:54 PM, Mihail Abakumov
->>> <mikhail.abakumov@ispras.ru> wrote:
->>>>=20
->>>> Ladi Prosek =D0=BF=D0=B8=D1=81=D0=B0=D0=BB 2017-11-06 18:15:
->>>>=20
->>>> In your case windbg does not send packets, more specifically, does=20
->>>> not
->>>> continue to do it. What is your version of windbg. Also, windbg stub=
-=20
->>>> has
->>>> been supported only for windbg x64, yet.
->>>=20
->>>=20
->>> Ah, so that's a pretty important piece of information and not very
->>> intuitive given the "Only i386 is supported now." sentence in the
->>> cover email.
->>>=20
->>> Microsoft (R) Windows Debugger Version 10.0.15063.468 X86
->>> Microsoft (R) Windows Debugger Version 10.0.15063.468 AMD64
->>> Microsoft (R) Windows Debugger Version 10.0.16299.15 X86
->>> Microsoft (R) Windows Debugger Version 10.0.16299.15 AMD64
->>>=20
->>> are the versions I have tried. I don't see any difference between x86
->>> and amd64, all versions never connect and crash after the second
->>> break.
->>>=20
->>> What guest OS are you running? Can you maybe zip up your QEMU=20
->>> binaries
->>> and share them with me?
->>>=20
->>> Thanks,
->>> Ladi
->>=20
->>=20
->> Oh, it looks like a problem in the versions. I use the Windbg from=20
->> Windows
->> 7.
->> Windbg version: 6.12.0002.633 AMD64. I will try to test with your=20
->> version.
->=20
-> Looks like it's the -b switch making the difference here. It was
-> removed in later versions of windbg.
->=20
->=20
-> Windbg docs (older):
->=20
-> -b
-> (Kernel mode only) This option has two effects:
-> 1. The debugger will break into the target computer immediately upon=20
-> connection.
->=20
-> 2. After a reboot, the debugger will break into the target computer
-> once the kernel is initialized. See Crashing and Rebooting the Target
-> Computer for details and for other methods of changing this status.
->=20
->=20
-> Windbg docs (newer):
->=20
-> -b
-> This option is no longer supported.
->=20
->=20
-> -b makes windbg send a break-in right after connecting. Apparently
-> there is a short time window when the break-in will work. I can
-> actually successfully connect with a Win10 windbg (so without -b) if I
-> hit Ctrl+Break shortly after the initial handshake. This also explains
-> why I was able to connect once during my initial testing. I was just
-> lucky and hit Ctrl+Break soon enough after connecting.
->=20
-> By initial handshake I mean this sequence (I have added a simple
-> logging, should be clear what it means):
->=20
-> Received control PACKET_TYPE_KD_RESET
-> Sending data 7
-> Sending control 6
->=20
-> Newer debuggers without -b will stop here. Older debuggers with -b
-> will continue with:
->=20
-> Received RESULT_BREAKIN_BYTE
-> Sending data 7
-> Received RESULT_BREAKIN_BYTE
-> Sending data 7
-> Received data PACKET_TYPE_KD_STATE_MANIPULATE (12614)
-> Sending control 4
-> Sending data 2
-> Received data PACKET_TYPE_KD_STATE_MANIPULATE (12592)
-> Sending control 4
-> Sending data 2
-> Received data PACKET_TYPE_KD_STATE_MANIPULATE (12592)
-> Sending control 4
-> Sending data 2
-> ...
->=20
->=20
-> Next step, when I have time, is to find the differences between
-> sending the break-in early and sending it later. Also interesting
-> would be recording the exchange between windbg and the target when
-> doing regular remote kernel debugging. I would still expect to see the
-> "Connected to Windows 7 7601 x86 compatible target ..." output always,
-> even when not breaking in immediately. The handshake is likely still
-> missing something.
->=20
-> Thanks,
-> Ladi
+On 11/14/2017 05:21 AM, Thomas Huth wrote:
+> On 13.11.2017 23:38, Philippe Mathieu-Daudé wrote:
+>> Hi Thomas,
+>>
+>> On 11/13/2017 01:57 PM, Thomas Huth wrote:
+>>> Since commit ab06ec43577177a442e8 we test the vmxnet3 device in the
+>>> pxe-tester, too (when running "make check SPEED=slow"). This now
+>>> revealed that the vmxnet3 code is not working right if the host is a big
+>>> endian machine (for example ppc64 or s390x) - "make check SPEED=slow"
+>>> is now failing on such hosts.
+>>>
+>>> The vmxnet3 code lacks endianess conversions in a couple of places.
+>>> Interestingly, the bitfields in the structs in vmxnet3.h already tried to
+>>> take care of the *bit* endianess of the C compilers - but the code missed
+>>> to change the *byte* endianess when reading or writing the corresponding
+>>> structs. So the bitfields are now wrapped into unions which allow to change
+>>> the byte endianess during runtime with the non-bitfield member of the union.
+>>> With these changes, "make check SPEED=slow" now properly works on big endian
+>>> hosts, too.
+>>>
+>>> Reported-by: David Gibson <dgibson@redhat.com>
+>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>>> ---
+> [...]
+>>>  
+>>> @@ -535,7 +535,8 @@ static void vmxnet3_complete_packet(VMXNET3State *s, int qidx, uint32_t tx_ridx)
+>>>      memset(&txcq_descr, 0, sizeof(txcq_descr));
+>>>      txcq_descr.txdIdx = tx_ridx;
+>>>      txcq_descr.gen = vmxnet3_ring_curr_gen(&s->txq_descr[qidx].comp_ring);
+>>> -
+>>> +    txcq_descr.val1 = cpu_to_le32(txcq_descr.val1);
+>>> +    txcq_descr.val2 = cpu_to_le32(txcq_descr.val2);
+>>>      vmxnet3_ring_write_curr_cell(d, &s->txq_descr[qidx].comp_ring, &txcq_descr);
+>>
+>> What about using inline functions:
+>>
+>> - vmxnet3_rxdesc_pci_to_cpu(struct Vmxnet3_RxDesc *rxd)
+>> - vmxnet3_txdesc_pci_to_cpu(...)
+>> - vmxnet3_rxcompdesc_pci_to_cpu(struct Vmxnet3_RxCompDesc *rxcd)
+>> - vmxnet3_txcompdesc_pci_to_cpu(...)
+> 
+> Most of the structure byte-swapping is only done in one place for each
+> type of structure, so for adding these two or three new lines to the
+> code, it's not really justified to put them into separate functions that
+> add at least six or seven new lines of code. This is only useful if the
+> same struct is byte-swapped at two or more places in the code.
+> 
+>>>      /* Flush changes in TX descriptor before changing the counter value */
+>>> @@ -695,11 +696,17 @@ vmxnet3_pop_next_tx_descr(VMXNET3State *s,
+>>>      PCIDevice *d = PCI_DEVICE(s);
+>>>  
+>>>      vmxnet3_ring_read_curr_cell(d, ring, txd);
+>>> +    txd->addr = le64_to_cpu(txd->addr);
+>>> +    txd->val1 = le32_to_cpu(txd->val1);
+>>> +    txd->val2 = le32_to_cpu(txd->val2);
+>>
+>> ^ probably not useful
+> 
+> At least the txd->gen (via val1) is required one line below! ... and I
+> wanted to be sure that the caller of vmxnet3_pop_next_tx_descr() always
+> gets a consistent descriptor, even if the function returns false, so
+> let's better be safe than sorry and always swap all fields of the struct.
+> 
+>>>      if (txd->gen == vmxnet3_ring_curr_gen(ring)) {
+>>>          /* Only read after generation field verification */
+>>>          smp_rmb();
+>>>          /* Re-read to be sure we got the latest version */
+>>>          vmxnet3_ring_read_curr_cell(d, ring, txd);
+>>> +        txd->addr = le64_to_cpu(txd->addr);
+>>> +        txd->val1 = le32_to_cpu(txd->val1);
+>>> +        txd->val2 = le32_to_cpu(txd->val2);
+>>
+>> Using inlined func:
+>>
+>>            vmxnet3_txdesc_pci_to_cpu(txd);
+> 
+> Ok, so that's one of the few spots where a struct is byteswapped not
+> only in one place, but in two. I guess I could add a inline function for
+> this...
+> 
+>>>          VMXNET3_RING_DUMP(VMW_RIPRN, "TX", qidx, ring);
+>>>          *descr_idx = vmxnet3_ring_curr_cell_idx(ring);
+>>>          vmxnet3_inc_tx_consumption_counter(s, qidx);
+>>> @@ -749,7 +756,7 @@ static void vmxnet3_process_tx_queue(VMXNET3State *s, int qidx)
+>>>  
+>>>          if (!s->skip_current_tx_pkt) {
+>>>              data_len = (txd.len > 0) ? txd.len : VMXNET3_MAX_TX_BUF_SIZE;
+>>> -            data_pa = le64_to_cpu(txd.addr);
+>>> +            data_pa = txd.addr;
+>>>  
+>>>              if (!net_tx_pkt_add_raw_fragment(s->tx_pkt,
+>>>                                                  data_pa,
+>>> @@ -792,6 +799,9 @@ vmxnet3_read_next_rx_descr(VMXNET3State *s, int qidx, int ridx,
+>>>      Vmxnet3Ring *ring = &s->rxq_descr[qidx].rx_ring[ridx];
+>>>      *didx = vmxnet3_ring_curr_cell_idx(ring);
+>>>      vmxnet3_ring_read_curr_cell(d, ring, dbuf);
+>>> +    dbuf->addr = le64_to_cpu(dbuf->addr);
+>>> +    dbuf->val1 = le32_to_cpu(dbuf->val1);
+>>> +    dbuf->ext1 = le32_to_cpu(dbuf->ext1);
+>>
+>> again:
+>>
+>>        vmxnet3_txdesc_pci_to_cpu(dbuf);
+> 
+> That function reads an RX descriptor, not a TX descriptor! And this
 
-I tested the new windbg. And as it turned out, three new api appeared in=20
-it.
-Naturally, it falls due to the fact that they are not realized. I will=20
-try
-to implement these api.
+Oops
 
---=20
-Thanks,
-Mihail
+> descriptor type is only byte-swapped in this single place. And the whole
+> function body is only 6 lines. So an additional inline function is
+> really not justified here!
+> 
+>>>  }
+>>>  
+>>>  static inline uint8_t
+>>> @@ -811,6 +821,9 @@ vmxnet3_pop_rxc_descr(VMXNET3State *s, int qidx, uint32_t *descr_gen)
+>>>  
+>>>      pci_dma_read(PCI_DEVICE(s),
+>>>                   daddr, &rxcd, sizeof(struct Vmxnet3_RxCompDesc));
+>>> +    rxcd.val1 = le32_to_cpu(rxcd.val1);
+>>> +    rxcd.val2 = le32_to_cpu(rxcd.val2);
+>>> +    rxcd.val3 = le32_to_cpu(rxcd.val3);
+>>
+>>        vmxnet3_txcompdesc_pci_to_cpu(&rxcd);
+>>
+>>>      ring_gen = vmxnet3_ring_curr_gen(&s->rxq_descr[qidx].comp_ring);
+>>>  
+>>>      if (rxcd.gen != ring_gen) {
+>>> @@ -1098,14 +1111,16 @@ vmxnet3_indicate_packet(VMXNET3State *s)
+>>>          }
+>>>  
+>>>          chunk_size = MIN(bytes_left, rxd.len);
+>>> -        vmxnet3_pci_dma_writev(d, data, bytes_copied,
+>>> -                               le64_to_cpu(rxd.addr), chunk_size);
+>>> +        vmxnet3_pci_dma_writev(d, data, bytes_copied, rxd.addr, chunk_size);
+>>>          bytes_copied += chunk_size;
+>>>          bytes_left -= chunk_size;
+>>>  
+>>>          vmxnet3_dump_rx_descr(&rxd);
+>>
+>> ^ this dump is incorrect (not host swapped yet).
+> 
+> I think you're wrong, the endianess should be fine here. rxd is ready
+> via vmxnet3_get_next_rx_descr() which eventually calls
+> vmxnet3_read_next_rx_descr() and that function is taking care of the
+> byte-swapping.
+
+Ok, I missed that.
+
+> 
+>>            vmxnet3_rxcompdesc_pci_to_cpu(&rxcd);
+>>
+>>>  
+>>>          if (ready_rxcd_pa != 0) {
+>>> +            rxcd.val1 = le32_to_cpu(rxcd.val1);
+>>> +            rxcd.val2 = le32_to_cpu(rxcd.val2);
+>>> +            rxcd.val3 = le32_to_cpu(rxcd.val3);
+>>
+>> (out of if)
+> 
+> Why?
+
+(previous miss)
+
+> 
+>>>              pci_dma_write(d, ready_rxcd_pa, &rxcd, sizeof(rxcd));
+>>>          }
+>>>  
+>>> @@ -1138,6 +1153,9 @@ vmxnet3_indicate_packet(VMXNET3State *s)
+>>>          rxcd.eop = 1;
+>>>          rxcd.err = (bytes_left != 0);
+>>>  
+>>> +        rxcd.val1 = le32_to_cpu(rxcd.val1);
+>>> +        rxcd.val2 = le32_to_cpu(rxcd.val2);
+>>> +        rxcd.val3 = le32_to_cpu(rxcd.val3);
+>>
+>>            vmxnet3_rxcompdesc_pci_to_cpu(&rxcd);
+>>
+>>>          pci_dma_write(d, ready_rxcd_pa, &rxcd, sizeof(rxcd));
+> 
+> One of the few spots where a struct is written twice. I guess I could
+> indeed add an inline wrapper for this ... not sure whether it's worth
+> the effort...
+
+If you have time it'd rather be worth to add a qtest that refactor as I
+suggested, and the time I spent to review probably took me the same :(
+
+And I'm just seeing your v2 :|
