@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36964)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38459)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eEbPu-0005Uu-0x
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 08:38:22 -0500
+	(envelope-from <bounces@canonical.com>) id 1eEbSZ-0000MI-Ko
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 08:41:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eEbPr-0002i0-Dw
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 08:38:18 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34254)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eEbPr-0002hM-5F
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 08:38:15 -0500
-References: <20171114081630.27640.53933.stgit@pasha-VirtualBox>
-	<20171114081818.27640.33165.stgit@pasha-VirtualBox>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <13f01ae1-3117-6fd8-bec7-8e6a686401c2@redhat.com>
-Date: Tue, 14 Nov 2017 14:38:05 +0100
+	(envelope-from <bounces@canonical.com>) id 1eEbSX-0006QX-0B
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 08:41:03 -0500
+Received: from indium.canonical.com ([91.189.90.7]:38454)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eEbSW-0006Ld-QI
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 08:41:00 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eEbSV-0000da-1G
+	for <qemu-devel@nongnu.org>; Tue, 14 Nov 2017 13:40:59 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 07A1C2E80CC
+	for <qemu-devel@nongnu.org>; Tue, 14 Nov 2017 13:40:59 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20171114081818.27640.33165.stgit@pasha-VirtualBox>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH v2 19/26] cpu-exec: reset exit flag
- before calling cpu_exec_nocache
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 14 Nov 2017 13:35:41 -0000
+From: Googulator <1717708@bugs.launchpad.net>
+Reply-To: Bug 1717708 <1717708@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150558614762.29770.16367876405044972592.malonedeb@chaenomeles.canonical.com>
+Message-Id: <151066654138.28580.6738883568716000930.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1717708] Re: QEMU aarch64 can't run Windows ARM64
+ iso's
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,162 +37,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, boost.lists@gmail.com, quintela@redhat.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, kraxel@redhat.com, alex.bennee@linaro.org
+To: qemu-devel@nongnu.org
 
-On 14/11/2017 09:18, Pavel Dovgalyuk wrote:
-> This patch resets icount_decr.u32.high before calling cpu_exec_nocache
-> when exception is pending. Exception is caused by the first instruction
-> in the block and it cannot be executed without resetting the flag.
-> 
-> This patch also moves this check to the beginning of cpu_handle_exception
-> function to process pending exceptions in one function call.
-> 
-> Signed-off-by: Maria Klimushenkova <maria.klimushenkova@ispras.ru>
-> Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
-> 
-> --
-> 
-> v2: reorganized the exception processing code (as suggested by Paolo Bonzini)
-> 
-> ---
->  accel/tcg/cpu-exec.c |   95 ++++++++++++++++++++++++++++----------------------
->  1 file changed, 54 insertions(+), 41 deletions(-)
-> 
-> diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
-> index 0473055..f3de96f 100644
-> --- a/accel/tcg/cpu-exec.c
-> +++ b/accel/tcg/cpu-exec.c
-> @@ -470,48 +470,51 @@ static inline void cpu_handle_debug_exception(CPUState *cpu)
->  
->  static inline bool cpu_handle_exception(CPUState *cpu, int *ret)
->  {
-> -    if (cpu->exception_index >= 0) {
-> -        if (cpu->exception_index >= EXCP_INTERRUPT) {
-> -            /* exit request from the cpu execution loop */
-> -            *ret = cpu->exception_index;
-> -            if (*ret == EXCP_DEBUG) {
-> -                cpu_handle_debug_exception(cpu);
-> -            }
-> -            cpu->exception_index = -1;
-> -            return true;
-> -        } else {
-> +    if (cpu->exception_index < 0) {
-> +#ifndef CONFIG_USER_ONLY
-> +        if (replay_has_exception()
-> +               && cpu->icount_decr.u16.low + cpu->icount_extra == 0) {
-> +            /* try to cause an exception pending in the log */
-> +            cpu_exec_nocache(cpu, 1, tb_find(cpu, NULL, 0, curr_cflags()), true);
-> +        }
-> +#endif
-> +        if (cpu->exception_index < 0) {
-> +            return false;
-> +        }
-> +    }
-> +
-> +    if (cpu->exception_index >= EXCP_INTERRUPT) {
-> +        /* exit request from the cpu execution loop */
-> +        *ret = cpu->exception_index;
-> +        if (*ret == EXCP_DEBUG) {
-> +            cpu_handle_debug_exception(cpu);
-> +        }
-> +        cpu->exception_index = -1;
-> +        return true;
-> +    } else {
->  #if defined(CONFIG_USER_ONLY)
-> -            /* if user mode only, we simulate a fake exception
-> -               which will be handled outside the cpu execution
-> -               loop */
-> +        /* if user mode only, we simulate a fake exception
-> +           which will be handled outside the cpu execution
-> +           loop */
->  #if defined(TARGET_I386)
-> +        CPUClass *cc = CPU_GET_CLASS(cpu);
-> +        cc->do_interrupt(cpu);
-> +#endif
-> +        *ret = cpu->exception_index;
-> +        cpu->exception_index = -1;
-> +        return true;
-> +#else
-> +        if (replay_exception()) {
->              CPUClass *cc = CPU_GET_CLASS(cpu);
-> +            qemu_mutex_lock_iothread();
->              cc->do_interrupt(cpu);
-> -#endif
-> -            *ret = cpu->exception_index;
-> +            qemu_mutex_unlock_iothread();
->              cpu->exception_index = -1;
-> +        } else if (!replay_has_interrupt()) {
-> +            /* give a chance to iothread in replay mode */
-> +            *ret = EXCP_INTERRUPT;
->              return true;
-> -#else
-> -            if (replay_exception()) {
-> -                CPUClass *cc = CPU_GET_CLASS(cpu);
-> -                qemu_mutex_lock_iothread();
-> -                cc->do_interrupt(cpu);
-> -                qemu_mutex_unlock_iothread();
-> -                cpu->exception_index = -1;
-> -            } else if (!replay_has_interrupt()) {
-> -                /* give a chance to iothread in replay mode */
-> -                *ret = EXCP_INTERRUPT;
-> -                return true;
-> -            }
-> -#endif
->          }
-> -#ifndef CONFIG_USER_ONLY
-> -    } else if (replay_has_exception()
-> -               && cpu->icount_decr.u16.low + cpu->icount_extra == 0) {
-> -        /* try to cause an exception pending in the log */
-> -        cpu_exec_nocache(cpu, 1, tb_find(cpu, NULL, 0, curr_cflags()), true);
-> -        *ret = -1;
-> -        return true;
->  #endif
->      }
->  
-> @@ -522,6 +525,19 @@ static inline bool cpu_handle_interrupt(CPUState *cpu,
->                                          TranslationBlock **last_tb)
->  {
->      CPUClass *cc = CPU_GET_CLASS(cpu);
-> +    int32_t insns_left;
-> +
-> +    /* Clear the interrupt flag now since we're processing
-> +     * cpu->interrupt_request and cpu->exit_request.
-> +     */
-> +    insns_left = atomic_read(&cpu->icount_decr.u32);
-> +    atomic_set(&cpu->icount_decr.u16.high, 0);
-> +    if (unlikely(insns_left < 0)) {
-> +        /* Ensure the zeroing of icount_decr comes before the next read
-> +         * of cpu->exit_request or cpu->interrupt_request.
-> +         */
-> +        smp_mb();
-> +    }
->  
->      if (unlikely(atomic_read(&cpu->interrupt_request))) {
->          int interrupt_request;
-> @@ -620,17 +636,14 @@ static inline void cpu_loop_exec_tb(CPUState *cpu, TranslationBlock *tb,
->  
->      *last_tb = NULL;
->      insns_left = atomic_read(&cpu->icount_decr.u32);
-> -    atomic_set(&cpu->icount_decr.u16.high, 0);
->      if (insns_left < 0) {
->          /* Something asked us to stop executing chained TBs; just
->           * continue round the main loop. Whatever requested the exit
->           * will also have set something else (eg exit_request or
-> -         * interrupt_request) which we will handle next time around
-> -         * the loop.  But we need to ensure the zeroing of icount_decr
-> -         * comes before the next read of cpu->exit_request
-> -         * or cpu->interrupt_request.
-> +         * interrupt_request) which will be handled by
-> +         * cpu_handle_interrupt.  cpu_handle_interrupt will also
-> +         * clear cpu->icount_decr.u16.high.
->           */
-> -        smp_mb();
->          return;
->      }
->  
-> 
+virtio-gpu-pci will not work for booting Windows.
 
-Thanks, queued for 2.11.
+Per https://docs.microsoft.com/en-us/windows-hardware/drivers/bringup
+/uefi-requirements-that-apply-to-all-windows-platforms, Windows
+currently requires a linear framebuffer to be exposed through the UEFI
+Graphics Output Protocol:
 
-Paolo
+"Windows requires the Graphics Output Protocol (GOP). Specific frame
+buffer requirements are:
+
+    For integrated displays, HorizontalResolution and VerticalResoluton
+must be the native resolution of the panel.
+
+    For External displays, HorizontalResolution and VerticalResoluton
+must be the native resolution of the display, or, if this is not
+supported, then the highest values supported by both the video adapter
+and the connected display.
+
+    PixelsPerScanLine must be equal to HorizontalResolution.
+
+    PixelFormat must be PixelBlueGreenRedReserved8BitPerColor. Note that
+a physical frame buffer is required; PixelBltOnly is not supported.
+
+When execution is handed off to a UEFI boot application, the firmware
+boot manager and firmware must not use the frame buffer for any purpose.
+The frame buffer must continue to be scanned out after boot services
+have exited."
+
+The virtio-gpu driver uses PixelBltOnly, which Windows explicitly
+doesn't support. Also, IIRC the Gop->Blt() handler of virtio-gpu is only
+available while UEFI Boot Services are active (before ExitBootServices()
+is called, which is something the Windows boot manager does very early),
+so even if Microsoft tried to implement Gop->Blt() support in the MSBDA
+driver, it couldn't be used with virtio-gpu, as its Gop->Blt() is not
+available at run time.
+
+Instead, "-device VGA" is required.
+
+Mainline edk2 is currently unable to boot any Windows images due to some
+required features being removed as they aren't compatible with KVM (I
+don't quite get it - UEFI for aarch64 virt is supposed to be for qemu in
+general, not exclusive to KVM...), however I actually have a fork with
+these features restored, available at
+https://github.com/Googulator/edk2/releases. This is able to boot the
+leaked Windows Server 2016 beta builds 14282, 14324 and 14877, but not
+14901 or any of the Windows 10 Insider builds, due to an exception loop
+very similar to that seen when trying to run SBSA-ACS.
+
+Also, the only storage option Windows can actually read and boot from is
+USB mass storage over EHCI - anything else is either lacking drivers
+(virtio-scsi and the various emulated LSI Logic adapters) or fails to
+start due to a resource conflict (AHCI, UAS, USB mass storage over
+XHCI). Detailed instructions for booting the leaked builds are available
+here: https://www.betaarchive.com/forum/viewtopic.php?p=3D426768#p426768
+The same instructions cause the previously mentioned exception loop when
+tried with the Insider builds.
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1717708
+
+Title:
+  QEMU aarch64 can't run Windows ARM64 iso's
+
+Status in QEMU:
+  New
+
+Bug description:
+  Hi,
+  recently Windows ARM64 ISOs have been posted on the internet..
+  just checked with latest QEMU 2.10 release from =
+
+  https://qemu.weilnetz.de/w64/qemu-w64-setup-20170830.exe =
+
+  "h:\qemu\qemu-system-aarch64.exe" -boot d -cdrom h:\iso\16353.1000.170825=
+-1423.RS_PRERELEASE_CLIENTPRO_OEMRET_ARM64FRE_ES-ES.ISO -m 2048 -cpu cortex=
+-a57 -smp 1 -machine virt
+  seems no video output..
+  checked various machine options for example versatilepb (says guest has n=
+ot initialized the guest)..
+
+  so don't know if it's a QEMU bug or lacking feature but can support
+  running Windows ARM64 builds (would be nice if you can add a
+  Snapdragon835 machine type which is which first machines will be
+  running..)
+
+  =
+
+  note running a Windows x64 ISO with similar parameters works (removing -c=
+pu and -machine as not needed)
+
+  thanks..
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1717708/+subscriptions
