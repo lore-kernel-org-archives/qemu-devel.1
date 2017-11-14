@@ -1,16 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42061)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43174)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eEfX0-0000QE-1Q
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 13:02:00 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eEfZI-0002NA-Lx
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 13:04:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eEfWw-0003Eo-T6
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 13:01:54 -0500
-From: Max Reitz <mreitz@redhat.com>
-Date: Tue, 14 Nov 2017 19:01:25 +0100
-Message-Id: <20171114180128.17076-4-mreitz@redhat.com>
-In-Reply-To: <20171114180128.17076-1-mreitz@redhat.com>
-References: <20171114180128.17076-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.11? v7 3/6] qapi: Add qobject_is_equal()
+	(envelope-from <pbonzini@redhat.com>) id 1eEfZD-0005oJ-VL
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 13:04:16 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51924)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eEfZD-0005na-Mp
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 13:04:11 -0500
+References: <20171021124213.84AEC7456EF@zero.eik.bme.hu>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <eba4f539-3474-57a2-a44c-6c60f55d90ac@redhat.com>
+Date: Tue, 14 Nov 2017 19:04:03 +0100
+MIME-Version: 1.0
+In-Reply-To: <20171021124213.84AEC7456EF@zero.eik.bme.hu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] exec: Fix section_covers_addr() for
+ sections with non-zero offset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,364 +28,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+To: BALATON Zoltan <balaton@eik.bme.hu>, qemu-devel@nongnu.org
+Cc: Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Fam Zheng <famz@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
-This generic function (along with its implementations for different
-types) determines whether two QObjects are equal.
+On 21/10/2017 13:24, BALATON Zoltan wrote:
+> When a section with non-0 offset_within_region field is tested to
+> cover an address the offset should be taken into account as well.
+>=20
+> This fixes a crash caused by picking the wrong memory region in
+> address_space_lookup_region seen with client code accessing a device
+> model that uses alias memory regions.
+>=20
+> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+> ---
+> This seems to fix the problem described in
+> http://lists.nongnu.org/archive/html/qemu-devel/2017-10/msg03356.html
+> but I'm not completely sure about it. This seems to be introduced in
+> 729633c exec: Introduce AddressSpaceDispatch.mru_section and the patch
+> before that which split off section_covers_addr from phys_page_find so
+> this patch also changes that caller. Is that OK to do? It appears to
+> work but I don't know this part of QEMU.
+>=20
+> Also the bug seems to be caused by section_covers_addr accepting
+> sii3112.bar5 when that's the mru_section instead of picking
+> sii3112.bar0 (which it picks when going through phys_page_find) when
+> client code is accessing 0xc08001006 from this address map (full
+> address map is at above URL):
+>=20
+> address-space: memory
+>     0000000c08000000-0000000c0800ffff (prio 0, i/o): alias isa_mmio @io=
+ 0000000000000000-000000000000ffff
+>=20
+> address-space: I/O
+>   0000000000000000-000000000000ffff (prio 0, i/o): io
+>     0000000000001000-0000000000001007 (prio 1, i/o): alias sii3112.bar0=
+ @sii3112.bar5 0000000000000080-0000000000000087
+>     0000000000001008-000000000000100b (prio 1, i/o): alias sii3112.bar1=
+ @sii3112.bar5 0000000000000088-000000000000008b
+>     0000000000001010-0000000000001017 (prio 1, i/o): alias sii3112.bar2=
+ @sii3112.bar5 00000000000000c0-00000000000000c7
+>     0000000000001018-000000000000101b (prio 1, i/o): alias sii3112.bar3=
+ @sii3112.bar5 00000000000000c8-00000000000000cb
+>     0000000000001020-000000000000102f (prio 1, i/o): alias sii3112.bar4=
+ @sii3112.bar5 0000000000000000-000000000000000f
+>=20
+> which this patch fixes but would the same problem happen if the
+> mru_section is bar5 but bar4 is accessed? I could not reproduce that
+> case but then the offset is 0 but in this case the address would be
+> above 0xc08001020 and size is 0xf so they probably won't match. But
+> this is only because of the size of the region. Could that mean the
+> bug is caused by something else and should be fixed elsewhere?
+>=20
+> ---
+>  exec.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/exec.c b/exec.c
+> index db5ae23..a915817 100644
+> --- a/exec.c
+> +++ b/exec.c
+> @@ -370,7 +370,8 @@ static inline bool section_covers_addr(const Memory=
+RegionSection *section,
+>       * the section must cover the entire address space.
+>       */
+>      return int128_gethi(section->size) ||
+> -           range_covers_byte(section->offset_within_address_space,
+> +           range_covers_byte(section->offset_within_address_space +
+> +                             section->offset_within_region,
+>                               int128_getlo(section->size), addr);
+>  }
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Alberto Garcia <berto@igalia.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
----
- include/qapi/qmp/qbool.h   |  1 +
- include/qapi/qmp/qdict.h   |  1 +
- include/qapi/qmp/qlist.h   |  1 +
- include/qapi/qmp/qnull.h   |  2 ++
- include/qapi/qmp/qnum.h    |  1 +
- include/qapi/qmp/qobject.h |  9 ++++++++
- include/qapi/qmp/qstring.h |  1 +
- qobject/qbool.c            |  8 +++++++
- qobject/qdict.c            | 29 +++++++++++++++++++++++++
- qobject/qlist.c            | 32 +++++++++++++++++++++++++++
- qobject/qnull.c            |  9 ++++++++
- qobject/qnum.c             | 54 ++++++++++++++++++++++++++++++++++++++++++++++
- qobject/qobject.c          | 29 +++++++++++++++++++++++++
- qobject/qstring.c          |  9 ++++++++
- 14 files changed, 186 insertions(+)
+Sorry, this is incorrect.  addr is an address in the address space, and
+range_covers_byte checks if it is between
+section->offset_within_address_space and
+section->offset_within_address_space + section->size.  I am not sure how
+things don't explode completely by adding section->offset_within_region
+(probably it's just because section->offset_within_region is usually 0).
 
-diff --git a/include/qapi/qmp/qbool.h b/include/qapi/qmp/qbool.h
-index a41111c309..f77ea86c4e 100644
---- a/include/qapi/qmp/qbool.h
-+++ b/include/qapi/qmp/qbool.h
-@@ -24,6 +24,7 @@ typedef struct QBool {
- QBool *qbool_from_bool(bool value);
- bool qbool_get_bool(const QBool *qb);
- QBool *qobject_to_qbool(const QObject *obj);
-+bool qbool_is_equal(const QObject *x, const QObject *y);
- void qbool_destroy_obj(QObject *obj);
- 
- #endif /* QBOOL_H */
-diff --git a/include/qapi/qmp/qdict.h b/include/qapi/qmp/qdict.h
-index 7ea5120c4a..fc218e7be6 100644
---- a/include/qapi/qmp/qdict.h
-+++ b/include/qapi/qmp/qdict.h
-@@ -43,6 +43,7 @@ void qdict_del(QDict *qdict, const char *key);
- int qdict_haskey(const QDict *qdict, const char *key);
- QObject *qdict_get(const QDict *qdict, const char *key);
- QDict *qobject_to_qdict(const QObject *obj);
-+bool qdict_is_equal(const QObject *x, const QObject *y);
- void qdict_iter(const QDict *qdict,
-                 void (*iter)(const char *key, QObject *obj, void *opaque),
-                 void *opaque);
-diff --git a/include/qapi/qmp/qlist.h b/include/qapi/qmp/qlist.h
-index 59d209bbae..ec3fcc1a4c 100644
---- a/include/qapi/qmp/qlist.h
-+++ b/include/qapi/qmp/qlist.h
-@@ -61,6 +61,7 @@ QObject *qlist_peek(QList *qlist);
- int qlist_empty(const QList *qlist);
- size_t qlist_size(const QList *qlist);
- QList *qobject_to_qlist(const QObject *obj);
-+bool qlist_is_equal(const QObject *x, const QObject *y);
- void qlist_destroy_obj(QObject *obj);
- 
- static inline const QListEntry *qlist_first(const QList *qlist)
-diff --git a/include/qapi/qmp/qnull.h b/include/qapi/qmp/qnull.h
-index d075549283..c992ee2ae1 100644
---- a/include/qapi/qmp/qnull.h
-+++ b/include/qapi/qmp/qnull.h
-@@ -27,4 +27,6 @@ static inline QNull *qnull(void)
-     return &qnull_;
- }
- 
-+bool qnull_is_equal(const QObject *x, const QObject *y);
-+
- #endif /* QNULL_H */
-diff --git a/include/qapi/qmp/qnum.h b/include/qapi/qmp/qnum.h
-index d6b0791139..c3d86794bb 100644
---- a/include/qapi/qmp/qnum.h
-+++ b/include/qapi/qmp/qnum.h
-@@ -69,6 +69,7 @@ double qnum_get_double(QNum *qn);
- char *qnum_to_string(QNum *qn);
- 
- QNum *qobject_to_qnum(const QObject *obj);
-+bool qnum_is_equal(const QObject *x, const QObject *y);
- void qnum_destroy_obj(QObject *obj);
- 
- #endif /* QNUM_H */
-diff --git a/include/qapi/qmp/qobject.h b/include/qapi/qmp/qobject.h
-index ef1d1a9237..38ac68845c 100644
---- a/include/qapi/qmp/qobject.h
-+++ b/include/qapi/qmp/qobject.h
-@@ -68,6 +68,15 @@ static inline void qobject_incref(QObject *obj)
- }
- 
- /**
-+ * qobject_is_equal(): Return whether the two objects are equal.
-+ *
-+ * Any of the pointers may be NULL; return true if both are.  Always
-+ * return false if only one is (therefore a QNull object is not
-+ * considered equal to a NULL pointer).
-+ */
-+bool qobject_is_equal(const QObject *x, const QObject *y);
-+
-+/**
-  * qobject_destroy(): Free resources used by the object
-  */
- void qobject_destroy(QObject *obj);
-diff --git a/include/qapi/qmp/qstring.h b/include/qapi/qmp/qstring.h
-index 10076b7c8c..65c05a9be5 100644
---- a/include/qapi/qmp/qstring.h
-+++ b/include/qapi/qmp/qstring.h
-@@ -31,6 +31,7 @@ void qstring_append_int(QString *qstring, int64_t value);
- void qstring_append(QString *qstring, const char *str);
- void qstring_append_chr(QString *qstring, int c);
- QString *qobject_to_qstring(const QObject *obj);
-+bool qstring_is_equal(const QObject *x, const QObject *y);
- void qstring_destroy_obj(QObject *obj);
- 
- #endif /* QSTRING_H */
-diff --git a/qobject/qbool.c b/qobject/qbool.c
-index 0606bbd2a3..ac825fc5a2 100644
---- a/qobject/qbool.c
-+++ b/qobject/qbool.c
-@@ -52,6 +52,14 @@ QBool *qobject_to_qbool(const QObject *obj)
- }
- 
- /**
-+ * qbool_is_equal(): Test whether the two QBools are equal
-+ */
-+bool qbool_is_equal(const QObject *x, const QObject *y)
-+{
-+    return qobject_to_qbool(x)->value == qobject_to_qbool(y)->value;
-+}
-+
-+/**
-  * qbool_destroy_obj(): Free all memory allocated by a
-  * QBool object
-  */
-diff --git a/qobject/qdict.c b/qobject/qdict.c
-index 576018e531..e8f15f1132 100644
---- a/qobject/qdict.c
-+++ b/qobject/qdict.c
-@@ -403,6 +403,35 @@ void qdict_del(QDict *qdict, const char *key)
- }
- 
- /**
-+ * qdict_is_equal(): Test whether the two QDicts are equal
-+ *
-+ * Here, equality means whether they contain the same keys and whether
-+ * the respective values are in turn equal (i.e. invoking
-+ * qobject_is_equal() on them yields true).
-+ */
-+bool qdict_is_equal(const QObject *x, const QObject *y)
-+{
-+    const QDict *dict_x = qobject_to_qdict(x);
-+    const QDict *dict_y = qobject_to_qdict(y);
-+    const QDictEntry *e;
-+
-+    if (qdict_size(dict_x) != qdict_size(dict_y)) {
-+        return false;
-+    }
-+
-+    for (e = qdict_first(dict_x); e; e = qdict_next(dict_x, e)) {
-+        const QObject *obj_x = qdict_entry_value(e);
-+        const QObject *obj_y = qdict_get(dict_y, qdict_entry_key(e));
-+
-+        if (!qobject_is_equal(obj_x, obj_y)) {
-+            return false;
-+        }
-+    }
-+
-+    return true;
-+}
-+
-+/**
-  * qdict_destroy_obj(): Free all the memory allocated by a QDict
-  */
- void qdict_destroy_obj(QObject *obj)
-diff --git a/qobject/qlist.c b/qobject/qlist.c
-index 86b60cb88c..3ef57d31d1 100644
---- a/qobject/qlist.c
-+++ b/qobject/qlist.c
-@@ -140,6 +140,38 @@ QList *qobject_to_qlist(const QObject *obj)
- }
- 
- /**
-+ * qlist_is_equal(): Test whether the two QLists are equal
-+ *
-+ * In order to be considered equal, the respective two objects at each
-+ * index of the two lists have to compare equal (regarding
-+ * qobject_is_equal()), and both lists have to have the same number of
-+ * elements.
-+ * That means both lists have to contain equal objects in equal order.
-+ */
-+bool qlist_is_equal(const QObject *x, const QObject *y)
-+{
-+    const QList *list_x = qobject_to_qlist(x);
-+    const QList *list_y = qobject_to_qlist(y);
-+    const QListEntry *entry_x, *entry_y;
-+
-+    entry_x = qlist_first(list_x);
-+    entry_y = qlist_first(list_y);
-+
-+    while (entry_x && entry_y) {
-+        if (!qobject_is_equal(qlist_entry_obj(entry_x),
-+                              qlist_entry_obj(entry_y)))
-+        {
-+            return false;
-+        }
-+
-+        entry_x = qlist_next(entry_x);
-+        entry_y = qlist_next(entry_y);
-+    }
-+
-+    return !entry_x && !entry_y;
-+}
-+
-+/**
-  * qlist_destroy_obj(): Free all the memory allocated by a QList
-  */
- void qlist_destroy_obj(QObject *obj)
-diff --git a/qobject/qnull.c b/qobject/qnull.c
-index bc9fd31626..f6f55f11ea 100644
---- a/qobject/qnull.c
-+++ b/qobject/qnull.c
-@@ -20,3 +20,12 @@ QNull qnull_ = {
-         .refcnt = 1,
-     },
- };
-+
-+/**
-+ * qnull_is_equal(): Always return true because any two QNull objects
-+ * are equal.
-+ */
-+bool qnull_is_equal(const QObject *x, const QObject *y)
-+{
-+    return true;
-+}
-diff --git a/qobject/qnum.c b/qobject/qnum.c
-index 476e81c93b..410686a611 100644
---- a/qobject/qnum.c
-+++ b/qobject/qnum.c
-@@ -213,6 +213,60 @@ QNum *qobject_to_qnum(const QObject *obj)
- }
- 
- /**
-+ * qnum_is_equal(): Test whether the two QNums are equal
-+ *
-+ * Negative integers are never considered equal to unsigned integers,
-+ * but positive integers in the range [0, INT64_MAX] are considered
-+ * equal independently of whether the QNum's kind is i64 or u64.
-+ *
-+ * Doubles are never considered equal to integers.
-+ */
-+bool qnum_is_equal(const QObject *x, const QObject *y)
-+{
-+    QNum *num_x = qobject_to_qnum(x);
-+    QNum *num_y = qobject_to_qnum(y);
-+
-+    switch (num_x->kind) {
-+    case QNUM_I64:
-+        switch (num_y->kind) {
-+        case QNUM_I64:
-+            /* Comparison in native int64_t type */
-+            return num_x->u.i64 == num_y->u.i64;
-+        case QNUM_U64:
-+            /* Implicit conversion of x to uin64_t, so we have to
-+             * check its sign before */
-+            return num_x->u.i64 >= 0 && num_x->u.i64 == num_y->u.u64;
-+        case QNUM_DOUBLE:
-+            return false;
-+        }
-+        abort();
-+    case QNUM_U64:
-+        switch (num_y->kind) {
-+        case QNUM_I64:
-+            return qnum_is_equal(y, x);
-+        case QNUM_U64:
-+            /* Comparison in native uint64_t type */
-+            return num_x->u.u64 == num_y->u.u64;
-+        case QNUM_DOUBLE:
-+            return false;
-+        }
-+        abort();
-+    case QNUM_DOUBLE:
-+        switch (num_y->kind) {
-+        case QNUM_I64:
-+        case QNUM_U64:
-+            return false;
-+        case QNUM_DOUBLE:
-+            /* Comparison in native double type */
-+            return num_x->u.dbl == num_y->u.dbl;
-+        }
-+        abort();
-+    }
-+
-+    abort();
-+}
-+
-+/**
-  * qnum_destroy_obj(): Free all memory allocated by a
-  * QNum object
-  */
-diff --git a/qobject/qobject.c b/qobject/qobject.c
-index b0cafb66f1..b2a536041d 100644
---- a/qobject/qobject.c
-+++ b/qobject/qobject.c
-@@ -27,3 +27,32 @@ void qobject_destroy(QObject *obj)
-     assert(QTYPE_QNULL < obj->type && obj->type < QTYPE__MAX);
-     qdestroy[obj->type](obj);
- }
-+
-+
-+static bool (*qis_equal[QTYPE__MAX])(const QObject *, const QObject *) = {
-+    [QTYPE_NONE] = NULL,               /* No such object exists */
-+    [QTYPE_QNULL] = qnull_is_equal,
-+    [QTYPE_QNUM] = qnum_is_equal,
-+    [QTYPE_QSTRING] = qstring_is_equal,
-+    [QTYPE_QDICT] = qdict_is_equal,
-+    [QTYPE_QLIST] = qlist_is_equal,
-+    [QTYPE_QBOOL] = qbool_is_equal,
-+};
-+
-+bool qobject_is_equal(const QObject *x, const QObject *y)
-+{
-+    /* We cannot test x == y because an object does not need to be
-+     * equal to itself (e.g. NaN floats are not). */
-+
-+    if (!x && !y) {
-+        return true;
-+    }
-+
-+    if (!x || !y || x->type != y->type) {
-+        return false;
-+    }
-+
-+    assert(QTYPE_NONE < x->type && x->type < QTYPE__MAX);
-+
-+    return qis_equal[x->type](x, y);
-+}
-diff --git a/qobject/qstring.c b/qobject/qstring.c
-index 5da7b5f37c..74182a1c02 100644
---- a/qobject/qstring.c
-+++ b/qobject/qstring.c
-@@ -129,6 +129,15 @@ const char *qstring_get_str(const QString *qstring)
- }
- 
- /**
-+ * qstring_is_equal(): Test whether the two QStrings are equal
-+ */
-+bool qstring_is_equal(const QObject *x, const QObject *y)
-+{
-+    return !strcmp(qobject_to_qstring(x)->string,
-+                   qobject_to_qstring(y)->string);
-+}
-+
-+/**
-  * qstring_destroy_obj(): Free all memory allocated by a QString
-  * object
-  */
--- 
-2.13.6
+Paolo
