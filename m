@@ -1,20 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57793)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57855)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1eEQhv-0005Ke-Ju
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 21:12:12 -0500
+	(envelope-from <jasowang@redhat.com>) id 1eEQi4-0005W2-6i
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 21:12:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1eEQhu-0000vP-2p
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 21:12:11 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54038)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1eEQht-0000uK-Q5
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 21:12:10 -0500
+	(envelope-from <jasowang@redhat.com>) id 1eEQi1-00011m-1L
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 21:12:20 -0500
 From: Jason Wang <jasowang@redhat.com>
-Date: Tue, 14 Nov 2017 10:11:37 +0800
-Message-Id: <1510625498-4821-8-git-send-email-jasowang@redhat.com>
+Date: Tue, 14 Nov 2017 10:11:38 +0800
+Message-Id: <1510625498-4821-9-git-send-email-jasowang@redhat.com>
 In-Reply-To: <1510625498-4821-1-git-send-email-jasowang@redhat.com>
 References: <1510625498-4821-1-git-send-email-jasowang@redhat.com>
-Subject: [Qemu-devel] [PULL 7/8] Add new PCI ID for i82559a
+Subject: [Qemu-devel] [PULL 8/8] net/socket: fix coverity issue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,115 +20,35 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, peter.maydell@linaro.org
-Cc: Mike Nawrocki <michael.nawrocki@gtri.gatech.edu>, Jason Wang <jasowang@redhat.com>
+Cc: Jens Freimann <jfreimann@redhat.com>, qemu-stable@nongnu.org, Jason Wang <jasowang@redhat.com>
 
-From: Mike Nawrocki <michael.nawrocki@gtri.gatech.edu>
+From: Jens Freimann <jfreimann@redhat.com>
 
-Adds a new PCI ID for the i82559a (0x8086 0x1030) interface. The
-"x-use-alt-device-id" property controls whether this new ID is to be
-used, and is true by default, and set to false in a compat entry.
+This fixes coverity issue CID1005339.
 
-Signed-off-by: Mike Nawrocki <michael.nawrocki@gtri.gatech.edu>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Make sure that saddr is not used uninitialized if the
+mcast parameter is NULL.
+
+Cc: qemu-stable@nongnu.org
+Reported-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Jens Freimann <jfreimann@redhat.com>
 Signed-off-by: Jason Wang <jasowang@redhat.com>
 ---
- hw/net/eepro100.c    | 13 +++++++++++++
- include/hw/compat.h  |  4 ++++
- include/hw/pci/pci.h |  1 +
- qemu-options.hx      |  2 +-
- 4 files changed, 19 insertions(+), 1 deletion(-)
+ net/socket.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/net/eepro100.c b/hw/net/eepro100.c
-index 91dd058..a63ed2c 100644
---- a/hw/net/eepro100.c
-+++ b/hw/net/eepro100.c
-@@ -132,6 +132,7 @@ typedef struct {
-     const char *name;
-     const char *desc;
-     uint16_t device_id;
-+    uint16_t alt_device_id;
-     uint8_t revision;
-     uint16_t subsystem_vendor_id;
-     uint16_t subsystem_id;
-@@ -276,6 +277,7 @@ typedef struct {
-     /* Quasi static device properties (no need to save them). */
-     uint16_t stats_size;
-     bool has_extended_tcb_support;
-+    bool use_alt_device_id;
- } EEPRO100State;
+diff --git a/net/socket.c b/net/socket.c
+index 83a2a31..6917fbc 100644
+--- a/net/socket.c
++++ b/net/socket.c
+@@ -373,7 +373,7 @@ static NetSocketState *net_socket_fd_init_dgram(NetClientState *peer,
+     net_socket_read_poll(s, true);
  
- /* Word indices in EEPROM. */
-@@ -1855,6 +1857,14 @@ static void e100_nic_realize(PCIDevice *pci_dev, Error **errp)
- 
-     TRACE(OTHER, logout("\n"));
- 
-+    /* By default, the i82559a adapter uses the legacy PCI ID (for the
-+     * i82557). This allows the PCI ID to be changed to the alternate
-+     * i82559 ID if needed.
-+     */
-+    if (s->use_alt_device_id && strcmp(info->name, "i82559a") == 0) {
-+        pci_config_set_device_id(s->dev.config, info->alt_device_id);
-+    }
-+
-     s->device = info->device;
- 
-     e100_pci_reset(s, &local_err);
-@@ -1974,6 +1984,7 @@ static E100PCIDeviceInfo e100_devices[] = {
-         .desc = "Intel i82559A Ethernet",
-         .device = i82559A,
-         .device_id = PCI_DEVICE_ID_INTEL_82557,
-+        .alt_device_id = PCI_DEVICE_ID_INTEL_82559,
-         .revision = 0x06,
-         .stats_size = 80,
-         .has_extended_tcb_support = true,
-@@ -2067,6 +2078,8 @@ static E100PCIDeviceInfo *eepro100_get_class(EEPRO100State *s)
- 
- static Property e100_properties[] = {
-     DEFINE_NIC_PROPERTIES(EEPRO100State, conf),
-+    DEFINE_PROP_BOOL("x-use-alt-device-id", EEPRO100State, use_alt_device_id,
-+                     true),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
-diff --git a/include/hw/compat.h b/include/hw/compat.h
-index cf389b4..f96212c 100644
---- a/include/hw/compat.h
-+++ b/include/hw/compat.h
-@@ -10,6 +10,10 @@
-         .driver   = "virtio-tablet-device",\
-         .property = "wheel-axis",\
-         .value    = "false",\
-+    },{\
-+        .driver   = "i82559a",\
-+        .property = "x-use-alt-device-id",\
-+        .value    = "false",\
-     },
- 
- #define HW_COMPAT_2_9 \
-diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
-index 8d02a0a..f30e2cf 100644
---- a/include/hw/pci/pci.h
-+++ b/include/hw/pci/pci.h
-@@ -70,6 +70,7 @@ extern bool pci_available;
- /* Intel (0x8086) */
- #define PCI_DEVICE_ID_INTEL_82551IT      0x1209
- #define PCI_DEVICE_ID_INTEL_82557        0x1229
-+#define PCI_DEVICE_ID_INTEL_82559        0x1030
- #define PCI_DEVICE_ID_INTEL_82801IR      0x2922
- 
- /* Red Hat / Qumranet (for QEMU) -- see pci-ids.txt */
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 3728e9b..a39c7e4 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -2047,7 +2047,7 @@ that the card should have; this option currently only affects virtio cards; set
- @var{v} = 0 to disable MSI-X. If no @option{-net} option is specified, a single
- NIC is created.  QEMU can emulate several different models of network card.
- Valid values for @var{type} are
--@code{virtio}, @code{i82551}, @code{i82557b}, @code{i82559er},
-+@code{virtio}, @code{i82551}, @code{i82557b}, @code{i82559a}, @code{i82559er},
- @code{ne2k_pci}, @code{ne2k_isa}, @code{pcnet}, @code{rtl8139},
- @code{e1000}, @code{smc91c111}, @code{lance} and @code{mcf_fec}.
- Not all devices are supported on all targets.  Use @code{-net nic,model=help}
+     /* mcast: save bound address as dst */
+-    if (is_connected) {
++    if (is_connected && mcast != NULL) {
+         s->dgram_dst = saddr;
+         snprintf(nc->info_str, sizeof(nc->info_str),
+                  "socket: fd=%d (cloned mcast=%s:%d)",
 -- 
 2.7.4
