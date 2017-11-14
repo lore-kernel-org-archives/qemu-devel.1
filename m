@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36359)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37547)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1eEPrh-0004jT-8w
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 20:18:14 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1eEPu9-0006TJ-A6
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 20:20:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1eEPrc-0004tz-7E
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 20:18:13 -0500
-Received: from mail.cn.fujitsu.com ([183.91.158.132]:19956
-	helo=heian.cn.fujitsu.com) by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1eEPrb-0004rl-E5
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 20:18:08 -0500
-References: <1509074154-25109-1-git-send-email-douly.fnst@cn.fujitsu.com>
-	<20171114010417-mutt-send-email-mst@kernel.org>
-From: Dou Liyang <douly.fnst@cn.fujitsu.com>
-Message-ID: <e9dcc419-f59e-c095-e833-94dae386e37c@cn.fujitsu.com>
-Date: Tue, 14 Nov 2017 09:17:53 +0800
+	(envelope-from <dgibson@ozlabs.org>) id 1eEPu5-0006pZ-9i
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 20:20:45 -0500
+Received: from ozlabs.org ([103.22.144.67]:49645)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1eEPu4-0006mO-DR
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 20:20:41 -0500
+Date: Tue, 14 Nov 2017 11:59:34 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20171114005934.GD32308@umbus.fritz.box>
+References: <1509710516-21084-1-git-send-email-yi.l.liu@linux.intel.com>
+	<1509710516-21084-3-git-send-email-yi.l.liu@linux.intel.com>
+	<20171113055601.GE1014@umbus.fritz.box>
+	<20171113082845.GA10932@xz-mi>
 MIME-Version: 1.0
-In-Reply-To: <20171114010417-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v5] NUMA: Enable adding NUMA node implicitly
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="eheScQNz3K90DVRs"
+Content-Disposition: inline
+In-Reply-To: <20171113082845.GA10932@xz-mi>
+Subject: Re: [Qemu-devel] [RESEND PATCH 2/6] memory: introduce
+ AddressSpaceOps and IOMMUObject
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,166 +31,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, David Hildenbrand <david@redhat.com>, Thomas Huth <thuth@redhat.com>, Alistair Francis <alistair23@gmail.com>, f4bug@amsat.org, Takao Indoh <indou.takao@jp.fujitsu.com>, Izumi Taku <izumi.taku@jp.fujitsu.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: "Liu, Yi L" <yi.l.liu@linux.intel.com>, qemu-devel@nongnu.org, mst@redhat.com, pbonzini@redhat.com, alex.williamson@redhat.com, tianyu.lan@intel.com, yi.l.liu@intel.com, kevin.tian@intel.com, jasowang@redhat.com
 
-Hi Michael,
 
-[...]
-> Seems to cause build failures:
-> /scm/qemu/numa.c:452:13: error: too many arguments to function ‘parse_numa_node’
->              parse_numa_node(ms, &node, NULL, NULL);
->
+--eheScQNz3K90DVRs
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Yes, commit
+On Mon, Nov 13, 2017 at 04:28:45PM +0800, Peter Xu wrote:
+> On Mon, Nov 13, 2017 at 04:56:01PM +1100, David Gibson wrote:
+> > On Fri, Nov 03, 2017 at 08:01:52PM +0800, Liu, Yi L wrote:
+> > > From: Peter Xu <peterx@redhat.com>
+> > >=20
+> > > AddressSpaceOps is similar to MemoryRegionOps, it's just for address
+> > > spaces to store arch-specific hooks.
+> > >=20
+> > > The first hook I would like to introduce is iommu_get(). Return an
+> > > IOMMUObject behind the AddressSpace.
+> > >=20
+> > > For systems that have IOMMUs, we will create a special address
+> > > space per device which is different from system default address
+> > > space for it (please refer to pci_device_iommu_address_space()).
+> > > Normally when that happens, there will be one specific IOMMU (or
+> > > say, translation unit) stands right behind that new address space.
+> > >=20
+> > > This iommu_get() fetches that guy behind the address space. Here,
+> > > the guy is defined as IOMMUObject, which includes a notifier_list
+> > > so far, may extend in future. Along with IOMMUObject, a new iommu
+> > > notifier mechanism is introduced. It would be used for virt-svm.
+> > > Also IOMMUObject can further have a IOMMUObjectOps which is similar
+> > > to MemoryRegionOps. The difference is IOMMUObjectOps is not relied
+> > > on MemoryRegion.
+> > >=20
+> > > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > > Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
+> >=20
+> > Hi, sorry I didn't reply to the earlier postings of this after our
+> > discussion in China.  I've been sick several times and very busy.
+> >=20
+> > I still don't feel like there's an adequate explanation of exactly
+> > what an IOMMUObject represents.   Obviously it can represent more than
+> > a single translation window - since that's represented by the
+> > IOMMUMR.  But what exactly do all the MRs - or whatever else - that
+> > are represented by the IOMMUObject have in common, from a functional
+> > point of view.
+> >=20
+> > Even understanding the SVM stuff better than I did, I don't really see
+> > why an AddressSpace is an obvious unit to have an IOMMUObject
+> > associated with it.
+>=20
+> Here's what I thought about it: IOMMUObject was planned to be the
+> abstraction of the hardware translation unit, which is a higher level
+> of the translated address spaces.  Say, for each PCI device, it can
+> have its own translated address space.  However for multiple PCI
+> devices, they can be sharing the same translation unit that handles
+> the translation requests from different devices.  That's the case for
+> Intel platforms.  We introduced this IOMMUObject because sometimes we
+> want to do something with that translation unit rather than a specific
+> device, in which we need a general IOMMU device handle.
 
-   cc001888b780 ("numa: fixup parsed NumaNodeOptions earlier")
+Ok, but what does "hardware translation unit" mean in practice.  The
+guest neither knows nor cares, which bits of IOMMU translation happen
+to be included in the same bundle of silicon.  It only cares what the
+behaviour is.  What behavioural characteristics does a single
+IOMMUObject have?
 
-removed a argument from the function recently.
+> IIRC one issue left over during last time's discussion was that there
+> could be more complicated IOMMU models. E.g., one device's DMA request
+> can be translated nestedly by two or multiple IOMMUs, and current
+> proposal cannot really handle that complicated hierachy.  I'm just
+> thinking whether we can start from a simple model (say, we don't allow
+> nested IOMMUs, and actually we don't even allow multiple IOMMUs so
+> far), then we can evolve from that point in the future.
+>=20
+> Also, I thought there were something you mentioned that this approach
+> is not correct for Power systems, but I can't really remember the
+> details...  Anyways, I think this is not the only approach to solve
+> the problem, and I believe any new better idea would be greatly
+> welcomed as well. :)
 
-I will rebase this patch.
+So, some of my initial comments were based on a misunderstanding of
+what was proposed here - since discussing this with Yi at LinuxCon
+Beijing, I have a better idea of what's going on.
 
-Thanks,
-	dou.
+On POWER - or rather the "pseries" platform, which is paravirtualized.
+We can have multiple vIOMMU windows (usually 2) for a single virtual
+PCI host bridge.  Because of the paravirtualization, the mapping to
+hardware is fuzzy, but for passthrough devices they will both be
+implemented by the IOMMU built into the physical host bridge.  That
+isn't importat to the guest, though - all operations happen at the
+window level.
 
->
->> ---
->> changelog V4 --> V5:
->>
->>   - Avoid calling qemu_opts_parse*()
->>   - Add a new NUMA node by calling parse_numa_node() directly
->>   - Remove the redundant argument in parse_numa_opts()
->>
->> These all were suggested by Eduardo.
->>
->> ---
->>  hw/i386/pc.c        |  1 +
->>  hw/i386/pc_piix.c   |  1 +
->>  hw/i386/pc_q35.c    |  1 +
->>  include/hw/boards.h |  1 +
->>  numa.c              | 21 ++++++++++++++++++++-
->>  vl.c                |  3 +--
->>  6 files changed, 25 insertions(+), 3 deletions(-)
->>
->> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
->> index 8e307f7..ec4eb97 100644
->> --- a/hw/i386/pc.c
->> +++ b/hw/i386/pc.c
->> @@ -2325,6 +2325,7 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
->>      mc->cpu_index_to_instance_props = pc_cpu_index_to_props;
->>      mc->get_default_cpu_node_id = pc_get_default_cpu_node_id;
->>      mc->possible_cpu_arch_ids = pc_possible_cpu_arch_ids;
->> +    mc->auto_enable_numa_with_memhp = true;
->>      mc->has_hotpluggable_cpus = true;
->>      mc->default_boot_order = "cad";
->>      mc->hot_add_cpu = pc_hot_add_cpu;
->> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
->> index f79d5cb..5e47528 100644
->> --- a/hw/i386/pc_piix.c
->> +++ b/hw/i386/pc_piix.c
->> @@ -446,6 +446,7 @@ static void pc_i440fx_2_10_machine_options(MachineClass *m)
->>      m->is_default = 0;
->>      m->alias = NULL;
->>      SET_MACHINE_COMPAT(m, PC_COMPAT_2_10);
->> +    m->auto_enable_numa_with_memhp = false;
->>  }
->>
->>  DEFINE_I440FX_MACHINE(v2_10, "pc-i440fx-2.10", NULL,
->> diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
->> index da3ea60..d606004 100644
->> --- a/hw/i386/pc_q35.c
->> +++ b/hw/i386/pc_q35.c
->> @@ -318,6 +318,7 @@ static void pc_q35_2_10_machine_options(MachineClass *m)
->>      m->alias = NULL;
->>      SET_MACHINE_COMPAT(m, PC_COMPAT_2_10);
->>      m->numa_auto_assign_ram = numa_legacy_auto_assign_ram;
->> +    m->auto_enable_numa_with_memhp = false;
->>  }
->>
->>  DEFINE_Q35_MACHINE(v2_10, "pc-q35-2.10", NULL,
->> diff --git a/include/hw/boards.h b/include/hw/boards.h
->> index 191a5b3..f1077f1 100644
->> --- a/include/hw/boards.h
->> +++ b/include/hw/boards.h
->> @@ -192,6 +192,7 @@ struct MachineClass {
->>      bool ignore_memory_transaction_failures;
->>      int numa_mem_align_shift;
->>      const char **valid_cpu_types;
->> +    bool auto_enable_numa_with_memhp;
->>      void (*numa_auto_assign_ram)(MachineClass *mc, NodeInfo *nodes,
->>                                   int nb_nodes, ram_addr_t size);
->>
->> diff --git a/numa.c b/numa.c
->> index 100a67f..4d12f30 100644
->> --- a/numa.c
->> +++ b/numa.c
->> @@ -221,6 +221,7 @@ static void parse_numa_node(MachineState *ms, NumaNodeOptions *node,
->>      }
->>      numa_info[nodenr].present = true;
->>      max_numa_nodeid = MAX(max_numa_nodeid, nodenr + 1);
->> +    nb_numa_nodes++;
->>  }
->>
->>  static void parse_numa_distance(NumaDistOptions *dist, Error **errp)
->> @@ -281,7 +282,6 @@ static int parse_numa(void *opaque, QemuOpts *opts, Error **errp)
->>          if (err) {
->>              goto end;
->>          }
->> -        nb_numa_nodes++;
->>          break;
->>      case NUMA_OPTIONS_TYPE_DIST:
->>          parse_numa_distance(&object->u.dist, &err);
->> @@ -432,6 +432,25 @@ void parse_numa_opts(MachineState *ms)
->>          exit(1);
->>      }
->>
->> +    /*
->> +     * If memory hotplug is enabled (slots > 0) but without '-numa'
->> +     * options explicitly on CLI, guestes will break.
->> +     *
->> +     *   Windows: won't enable memory hotplug without SRAT table at all
->> +     *
->> +     *   Linux: if QEMU is started with initial memory all below 4Gb
->> +     *   and no SRAT table present, guest kernel will use nommu DMA ops,
->> +     *   which breaks 32bit hw drivers when memory is hotplugged and
->> +     *   guest tries to use it with that drivers.
->> +     *
->> +     * Enable NUMA implicitly by adding a new NUMA node automatically.
->> +     */
->> +    if (ms->ram_slots > 0 && nb_numa_nodes == 0 &&
->> +        mc->auto_enable_numa_with_memhp) {
->> +            NumaNodeOptions node = { };
->> +            parse_numa_node(ms, &node, NULL, NULL);
->> +    }
->> +
->>      assert(max_numa_nodeid <= MAX_NODES);
->>
->>      /* No support for sparse NUMA node IDs yet: */
->> diff --git a/vl.c b/vl.c
->> index ec29909..be332d1 100644
->> --- a/vl.c
->> +++ b/vl.c
->> @@ -4675,8 +4675,6 @@ int main(int argc, char **argv, char **envp)
->>      default_drive(default_floppy, snapshot, IF_FLOPPY, 0, FD_OPTS);
->>      default_drive(default_sdcard, snapshot, IF_SD, 0, SD_OPTS);
->>
->> -    parse_numa_opts(current_machine);
->> -
->>      if (qemu_opts_foreach(qemu_find_opts("mon"),
->>                            mon_init_func, NULL, NULL)) {
->>          exit(1);
->> @@ -4726,6 +4724,7 @@ int main(int argc, char **argv, char **envp)
->>      current_machine->boot_order = boot_order;
->>      current_machine->cpu_model = cpu_model;
->>
->> +    parse_numa_opts(current_machine);
->>
->>      /* parse features once if machine provides default cpu_type */
->>      if (machine_class->default_cpu_type) {
->> --
->> 2.5.5
->>
->>
->
->
->
+The other thing that bothers me here is the way it's attached to an
+AddressSpace.  IIUC how SVM works, the whole point is that the device
+no longer writes into a specific PCI address space.  Instead, it
+writes directly into a process address space.  So it seems to me more
+that SVM should operate at the PCI level, and disassociate the device
+=66rom the normal PCI address space entirely, rather than hooking up
+something via that address space.
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--eheScQNz3K90DVRs
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAloKP/MACgkQbDjKyiDZ
+s5IkxBAApMeBfOGA4OF/dXf0eL0DcJ4YlgC4ubY4T3boPg+gW8E/qm/lUZJTF6Pg
+bIHuUDTV6k1apAR5Ee7H/x+WFGbnRzPNCkx4aoWRHbY//ect8/uIjw4k01fy4AZS
+OMahKsJ4GP3p1I6bDSOgK7t/GSrhRGM4pmFesnj0CA9eDjE4GvzATIpeCAIko28k
+bDmvvIsmf5KVltP+ujnNXsLpLMLjmC08y6kFH6mvVCRo/8mpiOrPcoZi0UvR9yV3
+7Io5evMwBx4OIanZCMtxIeRvuMfbbnke13DBztdNAaFybPAsTRvl/2CLleOMg+G0
+lD8mveBiQsht1+czKcEX61Mh35mR30sH2eG9KeXOL1/4HSVKVTbQVgPIazISaZ+/
+Xj6Pa5IHcQrddCa/l+8BVux7ZbqDiiPyKkLe1YeemmaFzniFayKKaWD7MPYHiA+M
+SUR7CPscQJOnToVm8dwii/ryQ/2+/KZXiZtAfoUXgHAZTmr24EoY57hZtaFKKItz
+E90inHpqR6+FtGvq/I94n0Ht0HN9QFKVm+8KA2pqmQwKCZgSELkSm9mEzOKUbNxJ
+Xnhs2Oi7qN8mXzmWRVpD1olLazTrA2vp15wdL1pDbu+mZ5xMPs930D0S/9k/AfIv
+Lx0ERJBJweVCkBDHaWdDrzqGuYaB+DOXApnWcam34gqZOiJrMPM=
+=W4B3
+-----END PGP SIGNATURE-----
+
+--eheScQNz3K90DVRs--
