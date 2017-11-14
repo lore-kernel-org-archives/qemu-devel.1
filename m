@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35198)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35196)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhuyijun@huawei.com>) id 1eEPpt-0002XC-2t
+	(envelope-from <zhuyijun@huawei.com>) id 1eEPps-0002XA-Tx
 	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 20:16:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhuyijun@huawei.com>) id 1eEPpo-0003ck-Po
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 20:16:21 -0500
+	(envelope-from <zhuyijun@huawei.com>) id 1eEPpo-0003cp-Pu
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 20:16:20 -0500
 From: <zhuyijun@huawei.com>
-Date: Tue, 14 Nov 2017 09:15:50 +0800
-Message-ID: <1510622154-17224-2-git-send-email-zhuyijun@huawei.com>
+Date: Tue, 14 Nov 2017 09:15:52 +0800
+Message-ID: <1510622154-17224-4-git-send-email-zhuyijun@huawei.com>
 In-Reply-To: <1510622154-17224-1-git-send-email-zhuyijun@huawei.com>
 References: <1510622154-17224-1-git-send-email-zhuyijun@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [RFC 1/5] hw/vfio: Add function for getting
- reserved_region of device iommu group
+Subject: [Qemu-devel] [RFC 3/5] hw/arm: add scattered RAM memory region
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,171 +27,182 @@ Cc: peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, zhaoshenglon
 
 From: Zhu Yijun <zhuyijun@huawei.com>
 
-With kernel 4.11, iommu/smmu will populate the MSI IOVA reserved window and
-PCI reserved window which has to be excluded from Guest iova allocations.
-
-However, If it falls within the Qemu default virtual memory address space,
-then reserved regions may get allocated for a Guest VF DMA iova and it will
-fail.
-
-So get those reserved regions in this patch and create some holes in the Qemu
-ram address in next patchset.
+Dig out reserved memory holes and collect scattered RAM memory
+regions by adding mem_list member in arm_boot_info struct.
 
 Signed-off-by: Zhu Yijun <zhuyijun@huawei.com>
 ---
- hw/vfio/common.c              | 67 +++++++++++++++++++++++++++++++++++++++++++
- hw/vfio/pci.c                 |  2 ++
- hw/vfio/platform.c            |  2 ++
- include/exec/memory.h         |  7 +++++
- include/hw/vfio/vfio-common.h |  3 ++
- 5 files changed, 81 insertions(+)
+ hw/arm/boot.c        |   8 ++++
+ hw/arm/virt.c        | 101 ++++++++++++++++++++++++++++++++++++++++++++++++++-
+ include/hw/arm/arm.h |   1 +
+ 3 files changed, 108 insertions(+), 2 deletions(-)
 
-diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index 7b2924c..01bdbbd 100644
---- a/hw/vfio/common.c
-+++ b/hw/vfio/common.c
-@@ -40,6 +40,8 @@ struct vfio_group_head vfio_group_list =
-     QLIST_HEAD_INITIALIZER(vfio_group_list);
- struct vfio_as_head vfio_address_spaces =
-     QLIST_HEAD_INITIALIZER(vfio_address_spaces);
-+struct reserved_ram_head reserved_ram_regions =
-+    QLIST_HEAD_INITIALIZER(reserved_ram_regions);
+diff --git a/hw/arm/boot.c b/hw/arm/boot.c
+index c2720c8..30438f4 100644
+--- a/hw/arm/boot.c
++++ b/hw/arm/boot.c
+@@ -836,6 +836,14 @@ static void arm_load_kernel_notify(Notifier *notifier, void *data)
+      */
+     assert(!(info->secure_board_setup && kvm_enabled()));
  
- #ifdef CONFIG_KVM
- /*
-@@ -52,6 +54,71 @@ struct vfio_as_head vfio_address_spaces =
- static int vfio_kvm_device_fd = -1;
- #endif
- 
-+void update_reserved_regions(hwaddr addr, hwaddr size)
-+{
-+    RAMRegion *reg, *new;
-+
-+    new = g_new(RAMRegion, 1);
-+    new->base = addr;
-+    new->size = size;
-+
-+    if (QLIST_EMPTY(&reserved_ram_regions)) {
-+        QLIST_INSERT_HEAD(&reserved_ram_regions, new, next);
-+        return;
++    /* If machine is not virt, the mem_list will empty. */
++    if (QLIST_EMPTY(&vms->bootinfo.mem_list)) {
++        RAMRegion *new = g_new(RAMRegion, 1);
++        new->base = info->loader_start;
++        new->size = info->ram_size;
++        QLIST_INSERT_HEAD(&vms->bootinfo.mem_list, new, next);
 +    }
 +
-+    /* make the base of reserved_ram_regions increase */
+     info->dtb_filename = qemu_opt_get(qemu_get_machine_opts(), "dtb");
+ 
+     /* Load the kernel.  */
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index ddde5e1..ff334c1 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -56,6 +56,7 @@
+ #include "hw/smbios/smbios.h"
+ #include "qapi/visitor.h"
+ #include "standard-headers/linux/input.h"
++#include "hw/vfio/vfio-common.h"
+ 
+ #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
+     static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
+@@ -1225,6 +1226,98 @@ void virt_machine_done(Notifier *notifier, void *data)
+     virt_build_smbios(vms);
+ }
+ 
++static void handle_reserved_ram_region_overlap(void)
++{
++    hwaddr cur_end, next_end;
++    RAMRegion *reg, *next_reg, *tmp_reg;
++
 +    QLIST_FOREACH(reg, &reserved_ram_regions, next) {
-+        if (addr > (reg->base + reg->size - 1)) {
-+            if (!QLIST_NEXT(reg, next)) {
-+                QLIST_INSERT_AFTER(reg, new, next);
-+                break;
++        next_reg = QLIST_NEXT(reg, next);
++
++        while (next_reg && next_reg->base <= (reg->base + reg->size)) {
++            next_end = next_reg->base + next_reg->size;
++            cur_end = reg->base + reg->size;
++            if (next_end > cur_end) {
++                reg->size += (next_end - cur_end);
 +            }
-+            continue;
-+        } else if (addr >= reg->base && addr <= (reg->base + reg->size - 1)) {
-+            /* discard the duplicate entry */
-+            if (addr == reg->base && size == reg->size) {
-+                g_free(new);
-+                break;
-+            } else {
-+                QLIST_INSERT_AFTER(reg, new, next);
-+                break;
-+            }
-+        } else {
-+            QLIST_INSERT_BEFORE(reg, new, next);
-+            break;
++
++            tmp_reg = QLIST_NEXT(next_reg, next);
++            QLIST_REMOVE(next_reg, next);
++            g_free(next_reg);
++            next_reg = tmp_reg;
 +        }
 +    }
 +}
 +
-+void vfio_get_iommu_group_reserved_region(char *group_path)
++static void update_memory_regions(VirtMachineState *vms, hwaddr ram_size)
 +{
-+    char *filename;
-+    FILE *fp;
-+    hwaddr start, end;
-+    char str[10];
-+    struct stat st;
 +
-+    filename = g_strdup_printf("%s/iommu_group/reserved_regions", group_path);
-+    if (stat(filename, &st) < 0) {
-+        g_free(filename);
-+        return;
++    RAMRegion *new, *reg, *last = NULL;
++    hwaddr virt_start, virt_end;
++    virt_start = vms->memmap[VIRT_MEM].base;
++    virt_end = virt_start + ram_size - 1;
++
++    handle_reserved_ram_region_overlap();
++
++    QLIST_FOREACH(reg, &reserved_ram_regions, next) {
++        if (reg->base >= virt_start && reg->base < virt_end) {
++            if (reg->base == virt_start) {
++                virt_start += reg->size;
++                virt_end += reg->size;
++                continue;
++            } else {
++                new = g_new(RAMRegion, 1);
++                new->base = virt_start;
++                new->size = reg->base - virt_start;
++                virt_start = reg->base + reg->size;
++            }
++
++            if (QLIST_EMPTY(&vms->bootinfo.mem_list)) {
++                QLIST_INSERT_HEAD(&vms->bootinfo.mem_list, new, next);
++            } else {
++                QLIST_INSERT_AFTER(last, new, next);
++            }
++
++            last = new;
++            ram_size -= new->size;
++            virt_end += reg->size;
++        }
 +    }
 +
-+    fp = fopen(filename, "r");
-+    if (!fp) {
-+        g_free(filename);
-+        return;
-+    }
++    if (ram_size > 0) {
++        new = g_new(RAMRegion, 1);
++        new->base = virt_start;
++        new->size = ram_size;
 +
-+    while (fscanf(fp, "%"PRIx64" %"PRIx64" %s", &start, &end, str) != EOF) {
-+        update_reserved_regions(start, (end - start + 1));
++        if (QLIST_EMPTY(&vms->bootinfo.mem_list)) {
++            QLIST_INSERT_HEAD(&vms->bootinfo.mem_list, new, next);
++        } else {
++            QLIST_INSERT_AFTER(last, new, next);
++        }
 +    }
-+
-+    g_free(filename);
-+    fclose(fp);
 +}
 +
- /*
-  * Common VFIO interrupt disable
-  */
-diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-index c977ee3..9bffb38 100644
---- a/hw/vfio/pci.c
-+++ b/hw/vfio/pci.c
-@@ -2674,6 +2674,8 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
-     vdev->vbasedev.type = VFIO_DEVICE_TYPE_PCI;
-     vdev->vbasedev.dev = &vdev->pdev.qdev;
- 
-+    vfio_get_iommu_group_reserved_region(vdev->vbasedev.sysfsdev);
++static void create_ram_alias(VirtMachineState *vms,
++                             MemoryRegion *sysmem,
++                             MemoryRegion *ram)
++{
++    RAMRegion *reg;
++    MemoryRegion *ram_memory;
++    char *nodename;
++    hwaddr sz = 0;
 +
-     tmp = g_strdup_printf("%s/iommu_group", vdev->vbasedev.sysfsdev);
-     len = readlink(tmp, group_path, sizeof(group_path));
-     g_free(tmp);
-diff --git a/hw/vfio/platform.c b/hw/vfio/platform.c
-index da84abf..d5bbc3a 100644
---- a/hw/vfio/platform.c
-+++ b/hw/vfio/platform.c
-@@ -578,6 +578,8 @@ static int vfio_base_device_init(VFIODevice *vbasedev, Error **errp)
-         return -errno;
-     }
- 
-+    vfio_get_iommu_group_reserved_region(vbasedev->sysfsdev);
++    QLIST_FOREACH(reg, &vms->bootinfo.mem_list, next) {
++        nodename = g_strdup_printf("ram@%" PRIx64, reg->base);
++        ram_memory = g_new(MemoryRegion, 1);
++        memory_region_init_alias(ram_memory, NULL, nodename, ram, sz,
++                                 reg->size);
++        memory_region_add_subregion(sysmem, reg->base, ram_memory);
++        sz += reg->size;
 +
-     tmp = g_strdup_printf("%s/iommu_group", vbasedev->sysfsdev);
-     len = readlink(tmp, group_path, sizeof(group_path));
-     g_free(tmp);
-diff --git a/include/exec/memory.h b/include/exec/memory.h
-index 5ed4042..2bcc83b 100644
---- a/include/exec/memory.h
-+++ b/include/exec/memory.h
-@@ -46,6 +46,13 @@
-         OBJECT_GET_CLASS(IOMMUMemoryRegionClass, (obj), \
-                          TYPE_IOMMU_MEMORY_REGION)
- 
-+/* Scattered RAM memory region struct */
-+typedef struct RAMRegion {
-+    hwaddr base;
-+    hwaddr size;
-+    QLIST_ENTRY(RAMRegion) next;
-+} RAMRegion;
++        g_free(nodename);
++    }
++}
 +
- typedef struct MemoryRegionOps MemoryRegionOps;
- typedef struct MemoryRegionMmio MemoryRegionMmio;
+ static void virt_ram_memory_region_init(Notifier *notifier, void *data)
+ {
+     MachineState *machine = MACHINE(qdev_get_machine());
+@@ -1232,10 +1325,15 @@ static void virt_ram_memory_region_init(Notifier *notifier, void *data)
+     MemoryRegion *ram = g_new(MemoryRegion, 1);
+     VirtMachineState *vms = container_of(notifier, VirtMachineState,
+                                          ram_memory_region_init);
++    RAMRegion *first_mem_reg;
  
-diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-index f3a2ac9..3483ca6 100644
---- a/include/hw/vfio/vfio-common.h
-+++ b/include/hw/vfio/vfio-common.h
-@@ -161,10 +161,13 @@ VFIOGroup *vfio_get_group(int groupid, AddressSpace *as, Error **errp);
- void vfio_put_group(VFIOGroup *group);
- int vfio_get_device(VFIOGroup *group, const char *name,
-                     VFIODevice *vbasedev, Error **errp);
-+void update_reserved_regions(hwaddr addr, hwaddr size);
-+void vfio_get_iommu_group_reserved_region(char *group_path);
+     memory_region_allocate_system_memory(ram, NULL, "mach-virt.ram",
+                                          machine->ram_size);
+-    memory_region_add_subregion(sysmem, vms->memmap[VIRT_MEM].base, ram);
++    update_memory_regions(vms, machine->ram_size);
++    create_ram_alias(vms, sysmem, ram);
++
++    first_mem_reg = QLIST_FIRST(&vms->bootinfo.mem_list);
++    vms->bootinfo.loader_start = first_mem_reg->base;
+ }
  
- extern const MemoryRegionOps vfio_region_ops;
- extern QLIST_HEAD(vfio_group_head, VFIOGroup) vfio_group_list;
- extern QLIST_HEAD(vfio_as_head, VFIOAddressSpace) vfio_address_spaces;
-+extern QLIST_HEAD(reserved_ram_head, RAMRegion) reserved_ram_regions;
+ static uint64_t virt_cpu_mp_affinity(VirtMachineState *vms, int idx)
+@@ -1458,7 +1556,6 @@ static void machvirt_init(MachineState *machine)
+     vms->bootinfo.initrd_filename = machine->initrd_filename;
+     vms->bootinfo.nb_cpus = smp_cpus;
+     vms->bootinfo.board_id = -1;
+-    vms->bootinfo.loader_start = vms->memmap[VIRT_MEM].base;
+     vms->bootinfo.get_dtb = machvirt_dtb;
+     vms->bootinfo.firmware_loaded = firmware_loaded;
+     arm_load_kernel(ARM_CPU(first_cpu), &vms->bootinfo);
+diff --git a/include/hw/arm/arm.h b/include/hw/arm/arm.h
+index ce769bd..d953026 100644
+--- a/include/hw/arm/arm.h
++++ b/include/hw/arm/arm.h
+@@ -124,6 +124,7 @@ struct arm_boot_info {
+     bool secure_board_setup;
  
- #ifdef CONFIG_LINUX
- int vfio_get_region_info(VFIODevice *vbasedev, int index,
+     arm_endianness endianness;
++    QLIST_HEAD(, RAMRegion) mem_list;
+ };
+ 
+ /**
 -- 
 1.8.3.1
