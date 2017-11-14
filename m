@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37308)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40632)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eEX3t-00012x-8L
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 03:59:19 -0500
+	(envelope-from <rth7680@gmail.com>) id 1eEXAj-0003Nh-Is
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 04:06:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eEX3o-0007PG-Up
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 03:59:17 -0500
-Resent-Message-Id: <E1eEX3o-0007PG-Up@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21476)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1eEX3o-0007M2-N7
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 03:59:12 -0500
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <151064991088.402.10276363829336924349@bafd83ae6430>
-In-Reply-To: <20171114081630.27640.53933.stgit@pasha-VirtualBox>
+	(envelope-from <rth7680@gmail.com>) id 1eEXAf-0003vb-LF
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 04:06:21 -0500
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:40897)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1eEXAf-0003ud-DT
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 04:06:17 -0500
+Received: by mail-wm0-x243.google.com with SMTP id b189so12979111wmd.5
+	for <qemu-devel@nongnu.org>; Tue, 14 Nov 2017 01:06:17 -0800 (PST)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <CAFEAcA95abAHYQ=FpS_n4Aqiui7uQCF=ONEPkUCXGOv-joSDtw@mail.gmail.com>
+	<b4c558f5-3b8e-52f0-4b66-c40519bc0500@twiddle.net>
+	<CAFEAcA9rELYend1C3SJOpgb55UQ4NKSeyBg8JDKo_JtnPjDa9w@mail.gmail.com>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <fa2385b4-4f3b-dd44-08ff-a09385ad5c43@twiddle.net>
+Date: Tue, 14 Nov 2017 10:06:11 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 14 Nov 2017 00:58:32 -0800 (PST)
-Subject: Re: [Qemu-devel] [RFC PATCH v2 00/26] replay additions
+In-Reply-To: <CAFEAcA9rELYend1C3SJOpgb55UQ4NKSeyBg8JDKo_JtnPjDa9w@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] how do we determine correct guest PC for segfaults
+ in atomic helpers for linux-user mode?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,120 +33,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel.Dovgaluk@ispras.ru
-Cc: famz@redhat.com, qemu-devel@nongnu.org, kwolf@redhat.com, peter.maydell@linaro.org, pavel.dovgaluk@ispras.ru, mst@redhat.com, jasowang@redhat.com, quintela@redhat.com, zuban32s@gmail.com, maria.klimushenkova@ispras.rudovgaluk@ispras.ru, kraxel@redhat.com, boost.lists@gmail.com, pbonzini@redhat.com, alex.bennee@linaro.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, "Emilio G. Cota" <cota@braap.org>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtSRkMgUEFUQ0ggdjIgMDAvMjZdIHJlcGxheSBhZGRpdGlvbnMKVHlwZTogc2VyaWVz
-Ck1lc3NhZ2UtaWQ6IDIwMTcxMTE0MDgxNjMwLjI3NjQwLjUzOTMzLnN0Z2l0QHBhc2hhLVZpcnR1
-YWxCb3gKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpu
-PTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpn
-aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBk
-aWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJz
-ZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRD
-SCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEg
-Z2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1h
-aWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBu
-PSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBk
-YXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBz
-Oi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogdCBbdGFnIHVwZGF0ZV0gICAgICAg
-ICAgICBwYXRjaGV3LzIwMTcxMTEwMTUyMDE3LjI0MzI0LTEtY2xnQGthb2Qub3JnIC0+IHBhdGNo
-ZXcvMjAxNzExMTAxNTIwMTcuMjQzMjQtMS1jbGdAa2FvZC5vcmcKICogW25ldyB0YWddICAgICAg
-ICAgICAgICAgcGF0Y2hldy8yMDE3MTExNDA4MTYzMC4yNzY0MC41MzkzMy5zdGdpdEBwYXNoYS1W
-aXJ0dWFsQm94IC0+IHBhdGNoZXcvMjAxNzExMTQwODE2MzAuMjc2NDAuNTM5MzMuc3RnaXRAcGFz
-aGEtVmlydHVhbEJveApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmQ2YzkyZTc1OTYg
-c2NyaXB0cy9xZW11LWdkYi90aW1lcnMucHk6IG5ldyBoZWxwZXIgdG8gZHVtcCB0aW1lciBzdGF0
-ZQplODJjZTE5MzMxIHNjcmlwdHMvcmVwbGF5LWR1bXAucHk6IHJlcGxheSBsb2cgZHVtcGVyCjhh
-NzYxOGY5YjAgc2NyaXB0cy9hbmFseXNlLWxvY2tzLXNpbXBsZXRyYWNlLnB5OiBzY3JpcHQgdG8g
-YW5hbHlzZSBsb2NrIHRpbWVzCjUwOWI1ODdiNzcgdXRpbC9xZW11LXRocmVhZC0qOiBhZGQgcWVt
-dV9sb2NrLCBsb2NrZWQgYW5kIHVubG9jayB0cmFjZSBldmVudHMKZThiMTQ0ZWM2ZSBzY3JpcHRz
-L3FlbXUtZ2RiOiBhZGQgc2ltcGxlIHRjZyBsb2NrIHN0YXR1cyBoZWxwZXIKN2QzNjE2NmY4NCBy
-ZXBsYXk6IGNoZWNrIHJldHVybiB2YWx1ZXMgb2YgZndyaXRlCjFlYWNiNTc0YTIgcmVwbGF5OiBk
-b24ndCBkZXN0cm95IG11dGV4IGF0IGV4aXQKMWQwM2Y2ZmI0YyBjcHUtZXhlYzogcmVzZXQgZXhp
-dCBmbGFnIGJlZm9yZSBjYWxsaW5nIGNwdV9leGVjX25vY2FjaGUKODU4MjI4MjVkOSBjcHUtZXhl
-YzogZG9uJ3Qgb3ZlcndyaXRlIGV4Y2VwdGlvbl9pbmRleAo2ZjJhZWI2MDk5IHJlcGxheTogcHVz
-aCByZXBsYXlfbXV0ZXhfbG9jayB1cCB0aGUgY2FsbCB0cmVlCmNlZWQ2OTA3MDggcmVwbGF5OiBt
-YWtlIGxvY2tpbmcgdmlzaWJsZSBvdXRzaWRlIHJlcGxheSBjb2RlCjY5MmYyNDQyOWQgcmVwbGF5
-L3JlcGxheS1pbnRlcm5hbC5jOiB0cmFjayBob2xkaW5nIG9mIHJlcGxheV9sb2NrCmNjNmIxMjVl
-YzkgcmVwbGF5L3JlcGxheS5jOiBidW1wIFJFUExBWV9WRVJTSU9OIGFnYWluCjkwNTBlNWI4MzYg
-Y3B1czogb25seSB0YWtlIEJRTCBmb3Igc2xlZXBpbmcgdGhyZWFkcwpiN2Q0ZjU3Mzk4IGNwdXM6
-IHB1c2ggQlFMIGxvY2sgdG8gcWVtdV8qX3dhaXRfaW9fZXZlbnQKMmEwNjI1NTc2NCB0YXJnZXQv
-YXJtL2FybS1wb3dlcnRjdGw6IGRyb3AgQlFMIGFzc2VydGlvbnMKYTI2NmRjYjNlNyBpY291bnQ6
-IGZpeGVkIHNhdmluZy9yZXN0b3Jpbmcgb2YgaWNvdW50IHdhcnAgdGltZXJzCjdiMDUwOWQ4NGIg
-cmVwbGF5OiBzYXZlIHByaW9yIHZhbHVlIG9mIHRoZSBob3N0IGNsb2NrCmE2NjNhYWZlMzQgcmVw
-bGF5OiBtYWtlIHNhZmUgdm1zdG9wIGF0IHJlY29yZC9yZXBsYXkKNjAwODA4NzI1ZSByZXBsYXk6
-IGFkZGVkIHJlcGxheSBsb2cgZm9ybWF0IGRlc2NyaXB0aW9uCjE5YzAxZGMzYTMgcmVwbGF5OiBm
-aXggc2F2ZS9sb2FkIHZtIGZvciBub24tZW1wdHkgcXVldWUKYzE2Y2IyNDRiYSByZXBsYXk6IGZp
-eGVkIHJlcGxheV9lbmFibGVfZXZlbnRzCjljMzhhZGE2NjQgcmVwbGF5OiBmaXggcHJvY2Vzc2lu
-ZyBhc3luYyBldmVudHMKYTI0YTlmOWI4OSByZXBsYXk6IGRpc2FibGUgZGVmYXVsdCBzbmFwc2hv
-dCBmb3IgcmVjb3JkL3JlcGxheQplNzkyMjU1ZDY1IGJsa3JlcGxheTogY3JlYXRlIHRlbXBvcmFy
-eSBvdmVybGF5IGZvciB1bmRlcmxheWluZyBkZXZpY2VzCjYyOTkxODVlY2IgYmxvY2s6IGltcGxl
-bWVudCBiZHJ2X3NuYXBzaG90X2dvdG8gZm9yIGJsa3JlcGxheQoKPT09IE9VVFBVVCBCRUdJTiA9
-PT0KQ2hlY2tpbmcgUEFUQ0ggMS8yNjogYmxvY2s6IGltcGxlbWVudCBiZHJ2X3NuYXBzaG90X2dv
-dG8gZm9yIGJsa3JlcGxheS4uLgpDaGVja2luZyBQQVRDSCAyLzI2OiBibGtyZXBsYXk6IGNyZWF0
-ZSB0ZW1wb3Jhcnkgb3ZlcmxheSBmb3IgdW5kZXJsYXlpbmcgZGV2aWNlcy4uLgpDaGVja2luZyBQ
-QVRDSCAzLzI2OiByZXBsYXk6IGRpc2FibGUgZGVmYXVsdCBzbmFwc2hvdCBmb3IgcmVjb3JkL3Jl
-cGxheS4uLgpDaGVja2luZyBQQVRDSCA0LzI2OiByZXBsYXk6IGZpeCBwcm9jZXNzaW5nIGFzeW5j
-IGV2ZW50cy4uLgpDaGVja2luZyBQQVRDSCA1LzI2OiByZXBsYXk6IGZpeGVkIHJlcGxheV9lbmFi
-bGVfZXZlbnRzLi4uCkNoZWNraW5nIFBBVENIIDYvMjY6IHJlcGxheTogZml4IHNhdmUvbG9hZCB2
-bSBmb3Igbm9uLWVtcHR5IHF1ZXVlLi4uCkNoZWNraW5nIFBBVENIIDcvMjY6IHJlcGxheTogYWRk
-ZWQgcmVwbGF5IGxvZyBmb3JtYXQgZGVzY3JpcHRpb24uLi4KQ2hlY2tpbmcgUEFUQ0ggOC8yNjog
-cmVwbGF5OiBtYWtlIHNhZmUgdm1zdG9wIGF0IHJlY29yZC9yZXBsYXkuLi4KQ2hlY2tpbmcgUEFU
-Q0ggOS8yNjogcmVwbGF5OiBzYXZlIHByaW9yIHZhbHVlIG9mIHRoZSBob3N0IGNsb2NrLi4uCkNo
-ZWNraW5nIFBBVENIIDEwLzI2OiBpY291bnQ6IGZpeGVkIHNhdmluZy9yZXN0b3Jpbmcgb2YgaWNv
-dW50IHdhcnAgdGltZXJzLi4uCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJyon
-IChjdHg6VnhWKQojMTcwOiBGSUxFOiBjcHVzLmM6Njg4OgorICAgIC5zdWJzZWN0aW9ucyA9IChj
-b25zdCBWTVN0YXRlRGVzY3JpcHRpb24qW10pIHsKICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgXgoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAxNzMgbGlu
-ZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcu
-ICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0g
-dG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tp
-bmcgUEFUQ0ggMTEvMjY6IHRhcmdldC9hcm0vYXJtLXBvd2VydGN0bDogZHJvcCBCUUwgYXNzZXJ0
-aW9ucy4uLgpDaGVja2luZyBQQVRDSCAxMi8yNjogY3B1czogcHVzaCBCUUwgbG9jayB0byBxZW11
-Xypfd2FpdF9pb19ldmVudC4uLgpDaGVja2luZyBQQVRDSCAxMy8yNjogY3B1czogb25seSB0YWtl
-IEJRTCBmb3Igc2xlZXBpbmcgdGhyZWFkcy4uLgpDaGVja2luZyBQQVRDSCAxNC8yNjogcmVwbGF5
-L3JlcGxheS5jOiBidW1wIFJFUExBWV9WRVJTSU9OIGFnYWluLi4uCkNoZWNraW5nIFBBVENIIDE1
-LzI2OiByZXBsYXkvcmVwbGF5LWludGVybmFsLmM6IHRyYWNrIGhvbGRpbmcgb2YgcmVwbGF5X2xv
-Y2suLi4KQ2hlY2tpbmcgUEFUQ0ggMTYvMjY6IHJlcGxheTogbWFrZSBsb2NraW5nIHZpc2libGUg
-b3V0c2lkZSByZXBsYXkgY29kZS4uLgpDaGVja2luZyBQQVRDSCAxNy8yNjogcmVwbGF5OiBwdXNo
-IHJlcGxheV9tdXRleF9sb2NrIHVwIHRoZSBjYWxsIHRyZWUuLi4KQ2hlY2tpbmcgUEFUQ0ggMTgv
-MjY6IGNwdS1leGVjOiBkb24ndCBvdmVyd3JpdGUgZXhjZXB0aW9uX2luZGV4Li4uCkNoZWNraW5n
-IFBBVENIIDE5LzI2OiBjcHUtZXhlYzogcmVzZXQgZXhpdCBmbGFnIGJlZm9yZSBjYWxsaW5nIGNw
-dV9leGVjX25vY2FjaGUuLi4KV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzQ1OiBG
-SUxFOiBhY2NlbC90Y2cvY3B1LWV4ZWMuYzo0Nzg6CisgICAgICAgICAgICBjcHVfZXhlY19ub2Nh
-Y2hlKGNwdSwgMSwgdGJfZmluZChjcHUsIE5VTEwsIDAsIGN1cnJfY2ZsYWdzKCkpLCB0cnVlKTsK
-CnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTI1IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0
-Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVy
-cm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBz
-ZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFUQ0ggMjAvMjY6IHJlcGxh
-eTogZG9uJ3QgZGVzdHJveSBtdXRleCBhdCBleGl0Li4uCkNoZWNraW5nIFBBVENIIDIxLzI2OiBy
-ZXBsYXk6IGNoZWNrIHJldHVybiB2YWx1ZXMgb2YgZndyaXRlLi4uCkNoZWNraW5nIFBBVENIIDIy
-LzI2OiBzY3JpcHRzL3FlbXUtZ2RiOiBhZGQgc2ltcGxlIHRjZyBsb2NrIHN0YXR1cyBoZWxwZXIu
-Li4KQ2hlY2tpbmcgUEFUQ0ggMjMvMjY6IHV0aWwvcWVtdS10aHJlYWQtKjogYWRkIHFlbXVfbG9j
-aywgbG9ja2VkIGFuZCB1bmxvY2sgdHJhY2UgZXZlbnRzLi4uCldBUk5JTkc6IGxpbmUgb3ZlciA4
-MCBjaGFyYWN0ZXJzCiMzMDogRklMRTogaW5jbHVkZS9xZW11L3RocmVhZC5oOjMwOgorI2RlZmlu
-ZSBxZW11X211dGV4X3RyeWxvY2sobXV0ZXgpIHFlbXVfbXV0ZXhfdHJ5bG9ja19pbXBsKG11dGV4
-LCBfX0ZJTEVfXywgX19MSU5FX18pCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwoj
-MzE6IEZJTEU6IGluY2x1ZGUvcWVtdS90aHJlYWQuaDozMToKKyNkZWZpbmUgcWVtdV9tdXRleF91
-bmxvY2sobXV0ZXgpIHFlbXVfbXV0ZXhfdW5sb2NrX2ltcGwobXV0ZXgsIF9fRklMRV9fLCBfX0xJ
-TkVfXykKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojNDA6IEZJTEU6IGluY2x1ZGUv
-cWVtdS90aHJlYWQuaDo0NjoKK3ZvaWQgcWVtdV9jb25kX3dhaXRfaW1wbChRZW11Q29uZCAqY29u
-ZCwgUWVtdU11dGV4ICptdXRleCwgY29uc3QgY2hhciAqZmlsZSwgY29uc3QgaW50IGxpbmUpOwoK
-V0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzQyOiBGSUxFOiBpbmNsdWRlL3FlbXUv
-dGhyZWFkLmg6NDg6CisjZGVmaW5lIHFlbXVfY29uZF93YWl0KGNvbmQsIG11dGV4KSBxZW11X2Nv
-bmRfd2FpdF9pbXBsKGNvbmQsIG11dGV4LCBfX0ZJTEVfXywgX19MSU5FX18pCgpFUlJPUjogbGlu
-ZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzEwNzogRklMRTogdXRpbC9xZW11LXRocmVhZC1wb3NpeC5j
-OjE1ODoKK3ZvaWQgcWVtdV9jb25kX3dhaXRfaW1wbChRZW11Q29uZCAqY29uZCwgUWVtdU11dGV4
-ICptdXRleCwgY29uc3QgY2hhciAqZmlsZSwgY29uc3QgaW50IGxpbmUpCgp0b3RhbDogMiBlcnJv
-cnMsIDMgd2FybmluZ3MsIDEwMyBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBw
-cm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNl
-IHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0gg
-aW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAyNC8yNjogc2NyaXB0cy9hbmFseXNlLWxv
-Y2tzLXNpbXBsZXRyYWNlLnB5OiBzY3JpcHQgdG8gYW5hbHlzZSBsb2NrIHRpbWVzLi4uCkNoZWNr
-aW5nIFBBVENIIDI1LzI2OiBzY3JpcHRzL3JlcGxheS1kdW1wLnB5OiByZXBsYXkgbG9nIGR1bXBl
-ci4uLgpDaGVja2luZyBQQVRDSCAyNi8yNjogc2NyaXB0cy9xZW11LWdkYi90aW1lcnMucHk6IG5l
-dyBoZWxwZXIgdG8gZHVtcCB0aW1lciBzdGF0ZS4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3Qg
-Y29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0
-aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3Vy
-IGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
+On 11/14/2017 09:52 AM, Peter Maydell wrote:
+> On 13 November 2017 at 23:31, Richard Henderson <rth@twiddle.net> wrote:
+>> On 11/13/2017 08:59 PM, Peter Maydell wrote:
+>>> Am I misreading my debugger entrails (entirely possible)? How is this
+>>> code intended to get the right guest PC for segfaults in these helpers?
+>>
+>> It looks like we can't.
+>>
+>> We get it right for system mode, but not linux-user.
+> 
+> How does it work for system mode?
+
+We have retaddr from GETPC which we pass down through tlb_fill and friends,
+which means the correct pc is used for restore state.
+
+What's different about user-mode is that we don't have tlb_fill or equivalent,
+and we rely on the pc from the signal handler.  Which leads to the bogusness
+that you see.
+
+I've just about got a patch together that uses a TLS variable for retaddr.  It
+is the smaller change than setjmp for soft freeze.
+
+
+r~
