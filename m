@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37103)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39199)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <djmk@google.com>) id 1eEOt3-00067h-5w
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 19:15:33 -0500
+	(envelope-from <jsnow@redhat.com>) id 1eEOxB-00027v-SA
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 19:19:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <djmk@google.com>) id 1eEOt2-0000t0-DO
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 19:15:33 -0500
-Received: from mail-io0-x22c.google.com ([2607:f8b0:4001:c06::22c]:52619)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <djmk@google.com>) id 1eEOt2-0000sK-8C
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 19:15:32 -0500
-Received: by mail-io0-x22c.google.com with SMTP id u42so4571361ioi.9
-	for <qemu-devel@nongnu.org>; Mon, 13 Nov 2017 16:15:31 -0800 (PST)
+	(envelope-from <jsnow@redhat.com>) id 1eEOxB-0004Fg-3Y
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 19:19:49 -0500
+References: <20171030163309.75770-1-vsementsov@virtuozzo.com>
+	<20171030163309.75770-8-vsementsov@virtuozzo.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <096f0944-6c42-4c56-b219-e3eaf17054ac@redhat.com>
+Date: Mon, 13 Nov 2017 19:19:26 -0500
 MIME-Version: 1.0
-From: Joe Kniss <djmk@google.com>
-Date: Mon, 13 Nov 2017 16:15:30 -0800
-Message-ID: <CAOvnNvYpQSdM5PXoBZXwf6op+FVNd3j0CPBnKGqxfa2V3pnJjA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] qemu+virgl on systems without dmabuf and/or GBM
+In-Reply-To: <20171030163309.75770-8-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v8 07/14] migration: include
+ migrate_dirty_bitmaps in migrate_postcopy
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,31 +25,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Dave Airlie <airlied@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, famz@redhat.com, lirans@il.ibm.com, quintela@redhat.com, armbru@redhat.com, mreitz@redhat.com, stefanha@redhat.com, den@openvz.org, amit.shah@redhat.com, pbonzini@redhat.com, dgilbert@redhat.com
 
-Hi,
 
-  I am developing using qemu with virglrenderer on linux systems that
-do not support dmabufs or GBM.   I have been successful making this
-work using glx and ignoring egl/dmabuf/gbm use in qemu.
-Unfortunately, there is currently no way to configure qemu to use
-opengl but disable egl/dmabuf/gbm.  This use case could be handled
-with a straight-forward configure fix, but I am not sure what the
-preferred approach would be.  Here are some options for example:
 
-1) Check for gbm in configure, if it is unavailable disable ui/egl*
-since this egl implementation depends on gbm.
-2) Check for gbm in configure, modify ui/egl* to work when gbm is missing.
-3) Add disable-egl flag to configure, ignore gbm package when egl is disabled.
+On 10/30/2017 12:33 PM, Vladimir Sementsov-Ogievskiy wrote:
+> Enable postcopy if dirty bitmap migration is endabled.
+> 
 
-For our use case, option 3 is the simplest, since we don't need either
-egl or gbm and gbm is only used with egl in qemu.  We also encountered
-an additional issue with either gtk or qemu (I forget which)
-attempting to share glx and egl contexts.
+"enabled"
 
-Naturally, we want to come up with a solution that is most generally
-useful,  feedback is greatly appreciated.
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Reviewed-by: Juan Quintela <quintela@redhat.com>
 
-Cheers,
--Joe Kniss
+Reviewed-by: John Snow <jsnow@redhat.com>
