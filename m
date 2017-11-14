@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58052)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33445)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eEWrP-0002Np-3U
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 03:46:23 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eEWy0-0005Ae-Op
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 03:53:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eEWrM-0006xm-1K
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 03:46:23 -0500
-Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:52115)
+	(envelope-from <peter.maydell@linaro.org>) id 1eEWxz-0002Ss-VS
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 03:53:12 -0500
+Received: from mail-wr0-x22e.google.com ([2a00:1450:400c:c0c::22e]:53980)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1eEWrL-0006xA-Pf
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 03:46:19 -0500
-Received: by mail-wm0-x22b.google.com with SMTP id b189so13343379wmd.0
-	for <qemu-devel@nongnu.org>; Tue, 14 Nov 2017 00:46:19 -0800 (PST)
-References: <20171004184325.24157-1-richard.henderson@linaro.org>
-	<20171004184325.24157-7-richard.henderson@linaro.org>
-	<87shdi9l05.fsf@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <e8bb9454-bdbb-34ce-edb6-df31002fbb9a@linaro.org>
-Date: Tue, 14 Nov 2017 09:46:15 +0100
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eEWxz-0002S6-Mb
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 03:53:11 -0500
+Received: by mail-wr0-x22e.google.com with SMTP id u40so16773481wrf.10
+	for <qemu-devel@nongnu.org>; Tue, 14 Nov 2017 00:53:11 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <87shdi9l05.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v1 06/12] target/arm: Decode
- aa32 armv8.1 three same
+In-Reply-To: <b4c558f5-3b8e-52f0-4b66-c40519bc0500@twiddle.net>
+References: <CAFEAcA95abAHYQ=FpS_n4Aqiui7uQCF=ONEPkUCXGOv-joSDtw@mail.gmail.com>
+	<b4c558f5-3b8e-52f0-4b66-c40519bc0500@twiddle.net>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 14 Nov 2017 08:52:50 +0000
+Message-ID: <CAFEAcA9rELYend1C3SJOpgb55UQ4NKSeyBg8JDKo_JtnPjDa9w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] how do we determine correct guest PC for segfaults
+ in atomic helpers for linux-user mode?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,34 +30,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org
+To: Richard Henderson <rth@twiddle.net>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, "Emilio G. Cota" <cota@braap.org>
 
-On 11/13/2017 05:55 PM, Alex Bennée wrote:
->> +        case NEON_3R_VFM_VQRDMLSH:
->> +            if (!u) {
->> +                /* VFM, VFMS */
->> +                if ((5 & (1 << size)) == 0) {
->> +                    return 1;
->> +                }
->> +                break;
->> +            }
->> +            /* VQRDMLSH */
->> +            switch (size) {
->> +            case 1:
->> +                fn_gvec_ptr = gen_helper_gvec_qrdmlsh_s16;
->> +                break;
->> +            case 2:
->> +                fn_gvec_ptr = gen_helper_gvec_qrdmlsh_s32;
->> +                break;
->> +            default:
->> +                return 1;
->> +            }
->> +            goto do_vqrdmlx;
-> Could we not take the opportunity to re-factor out the common bit rather
-> than make this mega 
+On 13 November 2017 at 23:31, Richard Henderson <rth@twiddle.net> wrote:
+> On 11/13/2017 08:59 PM, Peter Maydell wrote:
+>> Am I misreading my debugger entrails (entirely possible)? How is this
+>> code intended to get the right guest PC for segfaults in these helpers?
+>
+> It looks like we can't.
+>
+> We get it right for system mode, but not linux-user.
 
-What, specifically, did you have in mind?
+How does it work for system mode?
 
-
-r~
+thanks
+-- PMM
