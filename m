@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41203)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42039)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1eEcUl-00019G-47
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 09:47:24 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eEcWK-0002Bw-Ju
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 09:49:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1eEcUk-0004lO-2s
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 09:47:23 -0500
-Date: Tue, 14 Nov 2017 15:47:08 +0100
-From: Andrew Jones <drjones@redhat.com>
-Message-ID: <20171114144708.uzh6mkmjygojfpbu@kamzik.brq.redhat.com>
-References: <1510622154-17224-1-git-send-email-zhuyijun@huawei.com>
-	<1510622154-17224-3-git-send-email-zhuyijun@huawei.com>
+	(envelope-from <mreitz@redhat.com>) id 1eEcWG-0006E4-Bp
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 09:49:00 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57612)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1eEcWG-0006DM-2K
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 09:48:56 -0500
+References: <903d8048-77e9-4a30-d8e1-56ccd8b6a6bc@amsat.org>
+	<20171112193032.9724-1-makovick@gmail.com>
+	<20171112193032.9724-2-makovick@gmail.com>
+	<20171113123914.qvj7bjhdx4h5rx4d@sirius.home.kraxel.org>
+	<99826cbb-2f99-8100-484f-85eab0b4731c@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <adc0fbc3-6bf6-d235-e0db-f79157ad7104@redhat.com>
+Date: Tue, 14 Nov 2017 15:48:47 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1510622154-17224-3-git-send-email-zhuyijun@huawei.com>
-Subject: Re: [Qemu-devel] [RFC 2/5] hw/arm/virt: Enable dynamic generation
- of guest RAM memory regions
+In-Reply-To: <99826cbb-2f99-8100-484f-85eab0b4731c@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="hiNb600UrMhdhevl3qp0EKd98LgEF6Ck4"
+Subject: Re: [Qemu-devel] [PATCH 1/8] sdl2: Fix broken display updating
+ after the window is hidden
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,100 +32,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: zhuyijun@huawei.com
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, eric.auger@redhat.com, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, zhaoshenglong@huawei.com
+To: Gerd Hoffmann <kraxel@redhat.com>, Jindrich Makovicka <makovick@gmail.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Cole Robinson <crobinso@redhat.com>
 
-On Tue, Nov 14, 2017 at 09:15:51AM +0800, zhuyijun@huawei.com wrote:
-> From: Zhu Yijun <zhuyijun@huawei.com>
-> 
-> Register a ram_memory_region_init notify to allocate memory region
-> from system memory and add them as subregions.
-> 
-> Signed-off-by: Zhu Yijun <zhuyijun@huawei.com>
-> ---
->  hw/arm/virt.c         | 21 ++++++++++++++++-----
->  include/hw/arm/virt.h |  1 +
->  2 files changed, 17 insertions(+), 5 deletions(-)
-> 
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index 9e18b41..ddde5e1 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -1225,6 +1225,19 @@ void virt_machine_done(Notifier *notifier, void *data)
->      virt_build_smbios(vms);
->  }
->  
-> +static void virt_ram_memory_region_init(Notifier *notifier, void *data)
-> +{
-> +    MachineState *machine = MACHINE(qdev_get_machine());
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--hiNb600UrMhdhevl3qp0EKd98LgEF6Ck4
+From: Max Reitz <mreitz@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>, Jindrich Makovicka <makovick@gmail.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>,
+ Cole Robinson <crobinso@redhat.com>
+Message-ID: <adc0fbc3-6bf6-d235-e0db-f79157ad7104@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/8] sdl2: Fix broken display updating after
+ the window is hidden
+References: <903d8048-77e9-4a30-d8e1-56ccd8b6a6bc@amsat.org>
+ <20171112193032.9724-1-makovick@gmail.com>
+ <20171112193032.9724-2-makovick@gmail.com>
+ <20171113123914.qvj7bjhdx4h5rx4d@sirius.home.kraxel.org>
+ <99826cbb-2f99-8100-484f-85eab0b4731c@redhat.com>
+In-Reply-To: <99826cbb-2f99-8100-484f-85eab0b4731c@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-No need to use qdev_get_machine(), you can get it with MACHINE(vms).
+On 2017-11-13 17:35, Max Reitz wrote:
+> On 2017-11-13 13:39, Gerd Hoffmann wrote:
+>> On Sun, Nov 12, 2017 at 08:30:25PM +0100, Jindrich Makovicka wrote:
+>>> With SDL 2.0.6, calling SDL_ShowWindow during SDL_WINDOWEVENT_HIDDEN
+>>> blocks all subsequent display updates.
+>>>
+>>> Instead of trying to override the change, just update the scon->hidde=
+n
+>>> flag.
+>>
+>> Has for me the side effect that sometimes I have to press ctrl-alt-2
+>> twice.  Showing window first time works.  Hiding the window works too.=
 
-> +    MemoryRegion *sysmem = get_system_memory();
-> +    MemoryRegion *ram = g_new(MemoryRegion, 1);
-> +    VirtMachineState *vms = container_of(notifier, VirtMachineState,
-> +                                         ram_memory_region_init);
-> +
-> +    memory_region_allocate_system_memory(ram, NULL, "mach-virt.ram",
-> +                                         machine->ram_size);
-> +    memory_region_add_subregion(sysmem, vms->memmap[VIRT_MEM].base, ram);
-> +}
-> +
->  static uint64_t virt_cpu_mp_affinity(VirtMachineState *vms, int idx)
->  {
->      uint8_t clustersz = ARM_DEFAULT_CPUS_PER_CLUSTER;
-> @@ -1258,7 +1271,6 @@ static void machvirt_init(MachineState *machine)
->      MemoryRegion *sysmem = get_system_memory();
->      MemoryRegion *secure_sysmem = NULL;
->      int n, virt_max_cpus;
-> -    MemoryRegion *ram = g_new(MemoryRegion, 1);
->      bool firmware_loaded = bios_name || drive_get(IF_PFLASH, 0, 0);
->  
->      /* We can probe only here because during property set
-> @@ -1409,10 +1421,6 @@ static void machvirt_init(MachineState *machine)
->      fdt_add_cpu_nodes(vms);
->      fdt_add_psci_node(vms);
->  
-> -    memory_region_allocate_system_memory(ram, NULL, "mach-virt.ram",
-> -                                         machine->ram_size);
-> -    memory_region_add_subregion(sysmem, vms->memmap[VIRT_MEM].base, ram);
-> -
->      create_flash(vms, sysmem, secure_sysmem ? secure_sysmem : sysmem);
->  
->      create_gic(vms, pic);
-> @@ -1462,6 +1470,9 @@ static void machvirt_init(MachineState *machine)
->       * Notifiers are executed in registration reverse order.
->       */
->      create_platform_bus(vms, pic);
-> +
-> +    vms->ram_memory_region_init.notify = virt_ram_memory_region_init;
-> +    qemu_add_machine_init_done_notifier(&vms->ram_memory_region_init);
+>> Showing it the second time needs the double keypress.
+>>
+>> Added fprintfs to figure why [1].  Reason for that seems to be a suspi=
+ous
+>> SDL_WINDOWEVENT_SHOWN event from SDL, so qemu thinks the window is
+>> visible even though it actually is hidden.
+>>
+>> Have a slightly older SDL version (2.0.3).  Do you see that effect wit=
+h
+>> 2.0.6 too?
+>>
+>> cheers,
+>>   Gerd
+>>
+>> https://www.kraxel.org/cgit/qemu/commit/?h=3Dtesting/sdl&id=3D8235bfb6=
+6e7c82870ff1b1f47bdaaf4f522c5444
+>=20
+> The only thing I can say is that I submitted
+> https://bugzilla.libsdl.org/show_bug.cgi?id=3D2818 as a result.  Nobody=
 
-Does this notifier need to be the first one executed? If so, then a
-comment should be added to state that. Actually the comment above
-create_platform_bus() could be replaced with a comment above the first
-notifier that states all notifier dependencies.
+> has replied to that in three years, but when testing it on SDL 2.0.7,
+> the issue appears to be fixed.
 
->  }
->  
->  static bool virt_get_secure(Object *obj, Error **errp)
-> diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-> index 33b0ff3..38906b8 100644
-> --- a/include/hw/arm/virt.h
-> +++ b/include/hw/arm/virt.h
-> @@ -90,6 +90,7 @@ typedef struct {
->  typedef struct {
->      MachineState parent;
->      Notifier machine_done;
-> +    Notifier ram_memory_region_init;
->      FWCfgState *fw_cfg;
->      bool secure;
->      bool highmem;
-> -- 
-> 1.8.3.1
-> 
-> 
->
+Having done a bisect, SDL2 revision 11151:7cfe088fafba seems to have
+fixed the issue (for 2.0.6).  See also:
 
-Thanks,
-drew 
+https://bugzilla.libsdl.org/show_bug.cgi?id=3D3410
+
+Max
+
+
+--hiNb600UrMhdhevl3qp0EKd98LgEF6Ck4
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAloLAk8SHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9ACxwH/jKCIGHwFVUehELZPWDM8qZkBEslfjtq
+AIVDoV4bhiDNz37+aBfbfH5+5tg922+vQrzwQsfa3EWj+hE/sEgSR6K1BIxryoRf
+49YkpULHaelbF5/TT0SlP59cquj4s+f8g7ym+92d6mdX7vi8XsGk8bziBvflXdHb
+XUzFYNUuxShDujX/tg6wGV1DKXyW0cOdZacK9DGzfQYH+j0UE2w/YlgrhUfZzHnV
+NWgr3VUflhCiwPJJ/+lF87um33CIRi0xKV704THN+9AqsuyzUJKajKclJ+U9y9bT
+OxLIScXTvO2FpqscTC8mH8Y1tYi9L6YAjr30LsNuulXMDJG/ncusCp0=
+=L3Uv
+-----END PGP SIGNATURE-----
+
+--hiNb600UrMhdhevl3qp0EKd98LgEF6Ck4--
