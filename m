@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54027)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54116)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eEexL-0006Oq-OO
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 12:25:04 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eEexS-0006ir-T8
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 12:25:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eEexK-0004V0-CP
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 12:25:03 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eEexN-0004X4-AK
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 12:25:10 -0500
 From: Max Reitz <mreitz@redhat.com>
-Date: Tue, 14 Nov 2017 18:24:09 +0100
-Message-Id: <20171114172417.7654-13-mreitz@redhat.com>
+Date: Tue, 14 Nov 2017 18:24:10 +0100
+Message-Id: <20171114172417.7654-14-mreitz@redhat.com>
 In-Reply-To: <20171114172417.7654-1-mreitz@redhat.com>
 References: <20171114172417.7654-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PULL 12/20] iotests: Make 136 less flaky
+Subject: [Qemu-devel] [PULL 13/20] iotests: Use new-style NBD connections
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,58 +20,42 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
 
-136 executes some AIO requests without a final aio_flush; then it
-advances the virtual clock and thus expects the last access time of the
-device to be less than the current time when queried (i.e. idle_time_ns
-to be greater than 0).  However, without the aio_flush, some requests
-may be settled after the clock_step invocation.  In that case,
-idle_time_ns would be 0 and the test fails.
+From: Eric Blake <eblake@redhat.com>
 
-Fix this by adding an aio_flush if any AIO request other than some other
-aio_flush has been executed.
+Old-style NBD is deprecated upstream (it is documented, but no
+longer implemented in the reference implementation), and it is
+severely limited (it cannot support structured replies, which
+means it cannot support efficient handling of zeroes), when
+compared to new-style NBD.  We are better off having our iotests
+favor new-style everywhere (although some explicit tests,
+particularly 83, still cover old-style for back-compat reasons);
+this is as simple as supplying the empty string as the default
+export name, as it does not change the URI needed to connect a
+client to the server.  This also gives us more coverage of the
+just-added structured reply code, when not overriding $QEMU_NBD
+to intentionally point to an older server.
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Message-id: 20171109203025.27493-6-mreitz@redhat.com
+Signed-off-by: Eric Blake <eblake@redhat.com>
+Message-id: 20171109221216.10248-1-eblake@redhat.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/qemu-iotests/136 | 14 +++++++++++++-
- 1 file changed, 13 insertions(+), 1 deletion(-)
+ tests/qemu-iotests/common.rc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tests/qemu-iotests/136 b/tests/qemu-iotests/136
-index 4b994897af..88b97ea7c6 100644
---- a/tests/qemu-iotests/136
-+++ b/tests/qemu-iotests/136
-@@ -238,6 +238,18 @@ sector = "%d"
-         for i in range(failed_wr_ops):
-             ops.append("aio_write %d 512" % bad_offset)
+diff --git a/tests/qemu-iotests/common.rc b/tests/qemu-iotests/common.rc
+index 0e8a33c696..dbae7d74ba 100644
+--- a/tests/qemu-iotests/common.rc
++++ b/tests/qemu-iotests/common.rc
+@@ -242,7 +242,7 @@ _make_test_img()
+     if [ $IMGPROTO = "nbd" ]; then
+         # Pass a sufficiently high number to -e that should be enough for all
+         # tests
+-        eval "$QEMU_NBD -v -t -b 127.0.0.1 -p 10810 -f $IMGFMT -e 42  $TEST_IMG_FILE >/dev/null &"
++        eval "$QEMU_NBD -v -t -b 127.0.0.1 -p 10810 -f $IMGFMT -e 42 -x '' $TEST_IMG_FILE >/dev/null &"
+         sleep 1 # FIXME: qemu-nbd needs to be listening before we continue
+     fi
  
-+        # We need an extra aio_flush to settle all outstanding AIO
-+        # operations before we can advance the virtual clock, so that
-+        # the last access happens before clock_step and idle_time_ns
-+        # will be greater than 0
-+        extra_flush = 0
-+        if rd_ops + wr_ops + invalid_rd_ops + invalid_wr_ops + \
-+                failed_rd_ops + failed_wr_ops > 0:
-+            extra_flush = 1
-+
-+        if extra_flush > 0:
-+            ops.append("aio_flush")
-+
-         if failed_wr_ops > 0:
-             highest_offset = max(highest_offset, bad_offset + 512)
- 
-@@ -251,7 +263,7 @@ sector = "%d"
-         self.total_wr_bytes += wr_ops * wr_size
-         self.total_wr_ops += wr_ops
-         self.total_wr_merged += wr_merged
--        self.total_flush_ops += flush_ops
-+        self.total_flush_ops += flush_ops + extra_flush
-         self.invalid_rd_ops += invalid_rd_ops
-         self.invalid_wr_ops += invalid_wr_ops
-         self.failed_rd_ops += failed_rd_ops
 -- 
 2.13.6
