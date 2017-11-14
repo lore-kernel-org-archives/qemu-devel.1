@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43881)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47530)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eEbdp-0007wu-LB
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 08:52:42 -0500
+	(envelope-from <kraxel@redhat.com>) id 1eEblr-0001yW-SS
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 09:01:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eEbdo-0003JQ-Nb
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 08:52:41 -0500
-References: <20171103144113.7188-1-berrange@redhat.com>
-	<9b0c5170-c97a-51d5-b1e4-003f1628d7be@redhat.com>
-	<20171110172253.GH30685@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <fa4f8209-37ec-f8e9-eaf1-ac48453c1bff@redhat.com>
-Date: Tue, 14 Nov 2017 14:52:27 +0100
+	(envelope-from <kraxel@redhat.com>) id 1eEbln-00031i-6H
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 09:00:59 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51579)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1eEblm-00031D-VD
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 09:00:55 -0500
+Date: Tue, 14 Nov 2017 15:00:50 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20171114140050.gje7ig3qtquwqmxb@sirius.home.kraxel.org>
+References: <03123F70-98FA-439A-868C-855E63916259@gmail.com>
+	<20171113145041.GI18828@redhat.com>
+	<CAJ+F1CLxYBq7zfzMSrhnxb+9Np7ZDnrbLqf+e=FoZyC=bZFA+Q@mail.gmail.com>
+	<77699873-C42D-4678-9E29-432D2A36BCCE@gmail.com>
+	<20171114072159.nx77jscj22xzikuv@sirius.home.kraxel.org>
+	<82E2A9D3-FF38-4BBF-ADCE-3494505F0E8D@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20171110172253.GH30685@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="ILJ7mD17WauXb3lBt9n9KsETHdlxB0Lqv"
-Subject: Re: [Qemu-devel] [PATCH] qcow2: fix image corruption after
- committing qcow2 image into base
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <82E2A9D3-FF38-4BBF-ADCE-3494505F0E8D@gmail.com>
+Subject: Re: [Qemu-devel] Command-line option to change ungrab key(s)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,80 +31,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: Programmingkid <programmingkidx@gmail.com>
+Cc: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>, "Daniel P. Berrange" <berrange@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---ILJ7mD17WauXb3lBt9n9KsETHdlxB0Lqv
-From: Max Reitz <mreitz@redhat.com>
-To: "Daniel P. Berrange" <berrange@redhat.com>, Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- qemu-block@nongnu.org,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <fa4f8209-37ec-f8e9-eaf1-ac48453c1bff@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] qcow2: fix image corruption after committing
- qcow2 image into base
-References: <20171103144113.7188-1-berrange@redhat.com>
- <9b0c5170-c97a-51d5-b1e4-003f1628d7be@redhat.com>
- <20171110172253.GH30685@redhat.com>
-In-Reply-To: <20171110172253.GH30685@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+  Hi,
 
-On 2017-11-10 18:22, Daniel P. Berrange wrote:
-> On Fri, Nov 10, 2017 at 10:34:59AM -0600, Eric Blake wrote:
->> On 11/03/2017 09:41 AM, Daniel P. Berrange wrote:
->>> After committing the qcow2 image contents into the base image, qemu-i=
-mg
->>> will call bdrv_make_empty to drop the payload in the layered image.
->>>
->>> When this is done for qcow2 images, it blows away the LUKS encryption=
+> > Certainly not this way.
+> 
+> Did you have an idea on how something like this should look like? This
+> feature would only change the old mouse ungrab keys to a
+> user-specified one. So the basic algorithm would be change the text
+> that displays at the top of the QEMU window to say (Press <user
+> specified key(s)> to release mouse.
 
->>> header, making the resulting image unusable. There are two codepaths
->>> for emptying a qcow2 image, and the second (slower) codepaths leaves
->>> the LUKS header intact, so force use of that codepath.
->>>
->>> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
->>> ---
->>>
->>> NB, ideally we would fix the faster codepath in make_completely_empty=
-, but
->>> having looked at the code, I've really no idea how to even start on f=
-ixing that
->>> to not kill the LUKS header clusters.
->>
->> Hmm - I wonder if persistent bitmaps are also corrupted in the fast pa=
-th.
->=20
-> I also wonder if there's anything better we can do to make us safer by
-> default, so we default to the slow & safe path, unless we can provide
-> we *only* have the subset of features that are safe for the fast path ?=
+That is the easy part ;)
 
+> Then tell the code that looks for
+> the ungrab keys which keys to look out for.
 
-I have wondered the same but I can't think of any.  The only thing that
-comes close would be to check for which header extensions there are; but
-at the same time, we could just add a comment to qcow2_read_extensions()
-("If you add a new feature to qcow2, note that you may want to adjust
-the qcow2_make_empty() fastpath conditions").
+Here it becomes more difficuilt.
 
-Max
+> >  The display configuration we have right now is pretty messy
+> >  already.  I want clean this up (draft patch series at
+> >  https://www.kraxel.org/cgit/qemu/log/?h=lupin/display-cmdline), and
+> >  this should be done before adding new stuff.
+> 
+> My original idea was to make a patch that would only change the
+> cocoa.m file. I'm thinking you want this code to be elsewhere.
+> Somewhere where other UI code like GTK would be able to use. Is that
+> what you prefer?
 
+Well, at least the command line parsing part should be in common code,
+yes.  Detecting and handling the hotkeys will most likely stay in
+UI-specific code.
 
---ILJ7mD17WauXb3lBt9n9KsETHdlxB0Lqv
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+> > Also when making this configurable it should be consistent across
+> > all user interfaces we have, which surely is a non-trivial amount of
+> > work.
+> 
+> I know Cocoa but my lack of GTK experience would not permit me to make
+> a patch for that UI code. When you are done with your display
+> configuration work, would there even be a need to patch the Cocoa/GTK
+> code? I'm under the impression you are trying to consolidate some of
+> the UI code under one file.
 
------BEGIN PGP SIGNATURE-----
+No.  But standardize the interface between UIs and qemu, which will not
+only standardize the configuration, but should also make it easier to
+build the UIs as modules.
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAloK9RsSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9Alk0H/Alekyyz5jHicBe4fqRYjQlDTwG+BV7m
-B+KJgKsVojf9neh/9ZIhM6o4TkTBKa8qIvX6Vauyj2uOtwvjnNLxagEIlWnDcjdv
-WbfzYUNd/ziPGjbiO2YLRy7X1UbI2zzhqCIy5YSBzT/CfLSs5JghyOmvTlD/r+BT
-PVFUbnSNJNNL/4BS7tRi+5xcv4YSULO/GRzisiDSR0NLOgMjOFJKQU5Lp+G3+rPo
-aOS3AGhyhLUNGLK/4nBn8HAVcVqbGjKJhucjaWSdXjpAG1Tl/QWdW1MKujXMNQO4
-vZLfZy+sw2eZDVRtmKtTDE4RsjTXfA6jXqvxME31hJAu7W3rD8xMnaM=
-=3Aj5
------END PGP SIGNATURE-----
-
---ILJ7mD17WauXb3lBt9n9KsETHdlxB0Lqv--
+cheers,
+  Gerd
