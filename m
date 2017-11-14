@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59448)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33564)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eEbFE-0007Nk-GV
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 08:27:17 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eEbK3-0001Fu-Ul
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 08:32:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eEbFB-0007S1-8v
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 08:27:16 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36514)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eEbFB-0007R4-2g
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 08:27:13 -0500
-References: <1510676916-76409-1-git-send-email-dariuszx.stojaczyk@intel.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <b2c3c619-8900-a2c4-c09b-47fe0843aeef@redhat.com>
-Date: Tue, 14 Nov 2017 14:27:05 +0100
+	(envelope-from <mreitz@redhat.com>) id 1eEbK2-0003bi-Qs
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 08:32:15 -0500
+References: <CAFEAcA_bXripv8_O8aRuDbdYQ3oWeVzdb8GO=o9j2oddYrg-0A@mail.gmail.com>
+	<CAFEAcA9DK=rb-9Jei+U3xhcVM_oscpY09nANoy4QUpfNeqOMVA@mail.gmail.com>
+	<94700229-5afe-159f-9453-f507b9c83085@redhat.com>
+	<0c42f84d-9096-3f7b-c71d-664a119bc8a2@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <9ab7ae12-730d-a4d4-287c-64dcd509b680@redhat.com>
+Date: Tue, 14 Nov 2017 14:32:05 +0100
 MIME-Version: 1.0
-In-Reply-To: <1510676916-76409-1-git-send-email-dariuszx.stojaczyk@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] vhost-user-scsi: add missing
- virtqueue_size param
+In-Reply-To: <0c42f84d-9096-3f7b-c71d-664a119bc8a2@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="KffxMskVWqd17H4tIr0eM02i4DwouqgAD"
+Subject: Re: [Qemu-devel] using "qemu-img convert -O qcow2" to convert qcow
+ v1 to v2 creates a qcow v3 file?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,42 +27,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dariusz Stojaczyk <dariuszx.stojaczyk@intel.com>, qemu-devel@nongnu.org
-Cc: "Michael S . Tsirkin" <mst@redhat.com>, "Richard W . M . Jones" <rjones@redhat.com>
+To: Eric Blake <eblake@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Qemu-block <qemu-block@nongnu.org>
 
-On 14/11/2017 17:28, Dariusz Stojaczyk wrote:
-> Commit 5c0919d0 [1] introduced virtqueue_size parameter
-> for common virtio-scsi path, without updaing the vhost-user-scsi
-> code. vhost-user-scsi devices right now report size 0 for each vq.
-> 
-> This patch introduces virtqueue_size param to vhost-user-scsi,
-> that can now be set by the user. However, the most importantly, it
-> now has a default value of 128 (same as QEMU's virtio-scsi).
-> 
-> [1] 5c0919d0 ("virtio-scsi: Add virtqueue_size parameter
-> allowing virtqueue size to be set.")
-> 
-> Change-Id: I70e87eab702ebf1196c028dbf17d54fdc0c89a14
-> Signed-off-by: Dariusz Stojaczyk <dariuszx.stojaczyk@intel.com>
-> ---
->  hw/scsi/vhost-user-scsi.c | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/hw/scsi/vhost-user-scsi.c b/hw/scsi/vhost-user-scsi.c
-> index 500fa6a..f7561e2 100644
-> --- a/hw/scsi/vhost-user-scsi.c
-> +++ b/hw/scsi/vhost-user-scsi.c
-> @@ -135,6 +135,8 @@ static Property vhost_user_scsi_properties[] = {
->      DEFINE_PROP_CHR("chardev", VirtIOSCSICommon, conf.chardev),
->      DEFINE_PROP_UINT32("boot_tpgt", VirtIOSCSICommon, conf.boot_tpgt, 0),
->      DEFINE_PROP_UINT32("num_queues", VirtIOSCSICommon, conf.num_queues, 1),
-> +    DEFINE_PROP_UINT32("virtqueue_size", VirtIOSCSICommon, conf.virtqueue_size,
-> +                       128),
->      DEFINE_PROP_UINT32("max_sectors", VirtIOSCSICommon, conf.max_sectors,
->                         0xFFFF),
->      DEFINE_PROP_UINT32("cmd_per_lun", VirtIOSCSICommon, conf.cmd_per_lun, 128),
-> 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--KffxMskVWqd17H4tIr0eM02i4DwouqgAD
+From: Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Qemu-block <qemu-block@nongnu.org>
+Message-ID: <9ab7ae12-730d-a4d4-287c-64dcd509b680@redhat.com>
+Subject: Re: [Qemu-devel] using "qemu-img convert -O qcow2" to convert qcow v1
+ to v2 creates a qcow v3 file?
+References: <CAFEAcA_bXripv8_O8aRuDbdYQ3oWeVzdb8GO=o9j2oddYrg-0A@mail.gmail.com>
+ <CAFEAcA9DK=rb-9Jei+U3xhcVM_oscpY09nANoy4QUpfNeqOMVA@mail.gmail.com>
+ <94700229-5afe-159f-9453-f507b9c83085@redhat.com>
+ <0c42f84d-9096-3f7b-c71d-664a119bc8a2@redhat.com>
+In-Reply-To: <0c42f84d-9096-3f7b-c71d-664a119bc8a2@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Thanks, will apply.
+On 2017-11-13 19:08, Eric Blake wrote:
+> On 11/13/2017 11:58 AM, Eric Blake wrote:
+>=20
+>>>> qemu-system-aarch64: -drive if=3Dnone,file=3Dhda.qcow2,format=3Dqcow=
+,id=3Dhd:
+>>>> Unsupported qcow version 3
+>>>
+>>> ah, this means it wants "format=3Dqcow2".
+>>
+>> Oh, I should have read this followup before writing my other reply.
+>>
+>>>
+>>> This is pretty confusing, especially the error message, the
+>>> output of "file", and the fact that "format=3Dqcow" can't just
+>>> DTRT if it gets a qcow version 3 (2?), since it can clearly
+>>> identify what it's got.
+>>
+>> Indeed, making the qcow driver smart enough to reopen with the qcow2
+>> driver (for both v2 and v3 images) might be an interesting ease-of-use=
+ hack.
+>=20
+> And having the qcow2 driverautomatically be able to open a qcow v1 imag=
+e
+> read-only might also be nice - although v1 is lacking so many features
+> that we'd be insane to let a read-write request of the qcow2 driver
+> downgrade to qcow.
 
-Paolo
+Both seem to be hacks to me, though, which needlessly complicate everythi=
+ng.
+
+Just issuing a deprecation warning when creating qcow v1 images and
+improving the warning when opening qcow2 (v2/v3) images with the qcow
+driver should be enough.
+
+> Another observation: is there any official documentation for the qcow
+> (v1) format?  I know it's an outdated format that we no longer recommen=
+d
+> for new image creation, but it's sad when I have to resort to a google
+> search to find old posts like this:
+>=20
+> https://people.gnome.org/~markmc/qcow-image-format-version-1.html
+>=20
+> rather than being able to see the documentation of v1 alongside v2 in
+> the qemu.git repository.
+
+Well, do you want to document it?  I'd rather deprecate it altogether.
+
+Max
+
+> At any rate, since qcow and qcow2 share the same 4-byte magic number an=
+d
+> version field, it explains why both drivers are able to identify (but
+> fail to open) the files of the other version number.
+
+
+--KffxMskVWqd17H4tIr0eM02i4DwouqgAD
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAloK8FUSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AY+YIAK8M8TnxIx9/bsLj3jPrTmv50CxDWUB2
+rnIefVUqk3G3EaP6qxdXYVBMjX24z+EL8EWWTo3u4uAUrt65e0j066pbpPpmK2l0
+yeftbEH1+gyMtTDj9msRN38EV4LRxclQwzySMCIMZSFCCEwhD7tvqTh5DXOQGFmx
+azOQBzk2gF1IPMD809yYlyigYxWy0DFpqetXiz3D+LOevRBTWrqfPSQZgEtW4kiN
+KwMDH6i1zWzTuLrp4EJ6hUHE3NghPTViDVSnMy066pidXOamcpNqewHpULnGXOKm
+lA/hQROQU38Q3wZR/x/YiwDSW3RzHHae2z6m2igQQIWh+SwPSSPr7w4=
+=1MeB
+-----END PGP SIGNATURE-----
+
+--KffxMskVWqd17H4tIr0eM02i4DwouqgAD--
