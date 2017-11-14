@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41679)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42187)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dariuszx.stojaczyk@intel.com>) id 1eEajB-0000gh-QQ
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 07:54:10 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1eEakE-0001H6-FK
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 07:55:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dariuszx.stojaczyk@intel.com>) id 1eEaj7-0005Bi-4m
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 07:54:09 -0500
-Received: from mga05.intel.com ([192.55.52.43]:65400)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dariuszx.stojaczyk@intel.com>)
-	id 1eEaj6-00054l-TV
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 07:54:05 -0500
-From: Dariusz Stojaczyk <dariuszx.stojaczyk@intel.com>
-Date: Tue, 14 Nov 2017 17:28:36 +0100
-Message-Id: <1510676916-76409-1-git-send-email-dariuszx.stojaczyk@intel.com>
-Subject: [Qemu-devel] [PATCH] vhost-user-scsi: add missing virtqueue_size
- param
+	(envelope-from <richard.henderson@linaro.org>) id 1eEak9-0006C4-Gg
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 07:55:14 -0500
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:35045)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1eEak9-0006Ab-63
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 07:55:09 -0500
+Received: by mail-wm0-x243.google.com with SMTP id y80so21058254wmd.0
+	for <qemu-devel@nongnu.org>; Tue, 14 Nov 2017 04:55:08 -0800 (PST)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Tue, 14 Nov 2017 13:53:04 +0100
+Message-Id: <20171114125304.854-1-richard.henderson@linaro.org>
+In-Reply-To: <20171114094203.28030-1-richard.henderson@linaro.org>
+References: <20171114094203.28030-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH 2/1] target/arm: Use helper_retaddr in stxp
+ helpers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,37 +28,56 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, "Richard W . M . Jones" <rjones@redhat.com>, Dariusz Stojaczyk <dariuszx.stojaczyk@intel.com>
+Cc: peter.maydell@linaro.org
 
-Commit 5c0919d0 [1] introduced virtqueue_size parameter
-for common virtio-scsi path, without updaing the vhost-user-scsi
-code. vhost-user-scsi devices right now report size 0 for each vq.
+We use raw memory primitives along the !parallel_cpus paths in order to
+simplify the endianness handling.  Because of that, we did not benefit
+from the generic changes to cpu_ldst_user_only_template.h.
 
-This patch introduces virtqueue_size param to vhost-user-scsi,
-that can now be set by the user. However, the most importantly, it
-now has a default value of 128 (same as QEMU's virtio-scsi).
+The simplest fix is to manipulate helper_retaddr here.
 
-[1] 5c0919d0 ("virtio-scsi: Add virtqueue_size parameter
-allowing virtqueue size to be set.")
-
-Change-Id: I70e87eab702ebf1196c028dbf17d54fdc0c89a14
-Signed-off-by: Dariusz Stojaczyk <dariuszx.stojaczyk@intel.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- hw/scsi/vhost-user-scsi.c | 2 ++
- 1 file changed, 2 insertions(+)
+ target/arm/helper-a64.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/hw/scsi/vhost-user-scsi.c b/hw/scsi/vhost-user-scsi.c
-index 500fa6a..f7561e2 100644
---- a/hw/scsi/vhost-user-scsi.c
-+++ b/hw/scsi/vhost-user-scsi.c
-@@ -135,6 +135,8 @@ static Property vhost_user_scsi_properties[] = {
-     DEFINE_PROP_CHR("chardev", VirtIOSCSICommon, conf.chardev),
-     DEFINE_PROP_UINT32("boot_tpgt", VirtIOSCSICommon, conf.boot_tpgt, 0),
-     DEFINE_PROP_UINT32("num_queues", VirtIOSCSICommon, conf.num_queues, 1),
-+    DEFINE_PROP_UINT32("virtqueue_size", VirtIOSCSICommon, conf.virtqueue_size,
-+                       128),
-     DEFINE_PROP_UINT32("max_sectors", VirtIOSCSICommon, conf.max_sectors,
-                        0xFFFF),
-     DEFINE_PROP_UINT32("cmd_per_lun", VirtIOSCSICommon, conf.cmd_per_lun, 128),
+diff --git a/target/arm/helper-a64.c b/target/arm/helper-a64.c
+index d0e435ca4b..96a3ecf707 100644
+--- a/target/arm/helper-a64.c
++++ b/target/arm/helper-a64.c
+@@ -456,6 +456,8 @@ static uint64_t do_paired_cmpxchg64_le(CPUARMState *env, uint64_t addr,
+ #ifdef CONFIG_USER_ONLY
+         /* ??? Enforce alignment.  */
+         uint64_t *haddr = g2h(addr);
++
++        helper_retaddr = ra;
+         o0 = ldq_le_p(haddr + 0);
+         o1 = ldq_le_p(haddr + 1);
+         oldv = int128_make128(o0, o1);
+@@ -465,6 +467,7 @@ static uint64_t do_paired_cmpxchg64_le(CPUARMState *env, uint64_t addr,
+             stq_le_p(haddr + 0, int128_getlo(newv));
+             stq_le_p(haddr + 1, int128_gethi(newv));
+         }
++        helper_retaddr = 0;
+ #else
+         int mem_idx = cpu_mmu_index(env, false);
+         TCGMemOpIdx oi0 = make_memop_idx(MO_LEQ | MO_ALIGN_16, mem_idx);
+@@ -523,6 +526,8 @@ static uint64_t do_paired_cmpxchg64_be(CPUARMState *env, uint64_t addr,
+ #ifdef CONFIG_USER_ONLY
+         /* ??? Enforce alignment.  */
+         uint64_t *haddr = g2h(addr);
++
++        helper_retaddr = ra;
+         o1 = ldq_be_p(haddr + 0);
+         o0 = ldq_be_p(haddr + 1);
+         oldv = int128_make128(o0, o1);
+@@ -532,6 +537,7 @@ static uint64_t do_paired_cmpxchg64_be(CPUARMState *env, uint64_t addr,
+             stq_be_p(haddr + 0, int128_gethi(newv));
+             stq_be_p(haddr + 1, int128_getlo(newv));
+         }
++        helper_retaddr = 0;
+ #else
+         int mem_idx = cpu_mmu_index(env, false);
+         TCGMemOpIdx oi0 = make_memop_idx(MO_BEQ | MO_ALIGN_16, mem_idx);
 -- 
-2.7.4
+2.12.0
