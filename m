@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35427)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35690)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhuyijun@huawei.com>) id 1eEPqD-0002os-OH
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 20:16:43 -0500
+	(envelope-from <zhuyijun@huawei.com>) id 1eEPqe-0003yp-5G
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 20:17:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhuyijun@huawei.com>) id 1eEPqC-0003ql-Ck
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 20:16:41 -0500
+	(envelope-from <zhuyijun@huawei.com>) id 1eEPqa-0004A8-V0
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 20:17:08 -0500
 From: <zhuyijun@huawei.com>
-Date: Tue, 14 Nov 2017 09:15:53 +0800
-Message-ID: <1510622154-17224-5-git-send-email-zhuyijun@huawei.com>
+Date: Tue, 14 Nov 2017 09:15:51 +0800
+Message-ID: <1510622154-17224-3-git-send-email-zhuyijun@huawei.com>
 In-Reply-To: <1510622154-17224-1-git-send-email-zhuyijun@huawei.com>
 References: <1510622154-17224-1-git-send-email-zhuyijun@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [RFC 4/5] hw/arm/boot: set fdt size cell of memory
- node from mem_list
+Subject: [Qemu-devel] [RFC 2/5] hw/arm/virt: Enable dynamic generation of
+ guest RAM memory regions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,234 +27,79 @@ Cc: peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, zhaoshenglon
 
 From: Zhu Yijun <zhuyijun@huawei.com>
 
-In case of accessing memory holes, we create memory fdt node by
-traversing mem_list and adjust memory address if the addr is not
-belong to RAM memory region.
+Register a ram_memory_region_init notify to allocate memory region
+from system memory and add them as subregions.
 
 Signed-off-by: Zhu Yijun <zhuyijun@huawei.com>
 ---
- hw/arm/boot.c | 151 ++++++++++++++++++++++++++++++++++++++++++----------------
- 1 file changed, 109 insertions(+), 42 deletions(-)
+ hw/arm/virt.c         | 21 ++++++++++++++++-----
+ include/hw/arm/virt.h |  1 +
+ 2 files changed, 17 insertions(+), 5 deletions(-)
 
-diff --git a/hw/arm/boot.c b/hw/arm/boot.c
-index 30438f4..f4ca599 100644
---- a/hw/arm/boot.c
-+++ b/hw/arm/boot.c
-@@ -384,6 +384,25 @@ static void set_kernel_args_old(const struct arm_boot_info *info)
-     }
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index 9e18b41..ddde5e1 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -1225,6 +1225,19 @@ void virt_machine_done(Notifier *notifier, void *data)
+     virt_build_smbios(vms);
  }
  
-+static char *create_memory_fdt(void *fdt, uint32_t acells, hwaddr mem_base,
-+                                          uint32_t scells, hwaddr mem_len)
++static void virt_ram_memory_region_init(Notifier *notifier, void *data)
 +{
-+    char *nodename = NULL;
-+    int rc;
++    MachineState *machine = MACHINE(qdev_get_machine());
++    MemoryRegion *sysmem = get_system_memory();
++    MemoryRegion *ram = g_new(MemoryRegion, 1);
++    VirtMachineState *vms = container_of(notifier, VirtMachineState,
++                                         ram_memory_region_init);
 +
-+    nodename = g_strdup_printf("/memory@%" PRIx64, mem_base);
-+    qemu_fdt_add_subnode(fdt, nodename);
-+    qemu_fdt_setprop_string(fdt, nodename, "device_type", "memory");
-+    rc = qemu_fdt_setprop_sized_cells(fdt, nodename, "reg", acells, mem_base,
-+                                      scells, mem_len);
-+    if (rc < 0) {
-+        fprintf(stderr, "couldn't set %s/reg\n", nodename);
-+        g_free(nodename);
-+    }
-+
-+    return nodename;
++    memory_region_allocate_system_memory(ram, NULL, "mach-virt.ram",
++                                         machine->ram_size);
++    memory_region_add_subregion(sysmem, vms->memmap[VIRT_MEM].base, ram);
 +}
 +
- /**
-  * load_dtb() - load a device tree binary image into memory
-  * @addr:       the address to load the image at
-@@ -412,7 +431,7 @@ static int load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
-     uint32_t acells, scells;
-     char *nodename;
-     unsigned int i;
--    hwaddr mem_base, mem_len;
-+    RAMRegion *reg;
- 
-     if (binfo->dtb_filename) {
-         char *filename;
-@@ -464,49 +483,65 @@ static int load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
-         goto fail;
-     }
- 
-+    /*
-+     * Turn the /memory node created before into a NOP node, then create
-+     * /memory@addr nodes for all numa nodes respectively.
-+     */
-+    qemu_fdt_nop_node(fdt, "/memory");
-+
-     if (nb_numa_nodes > 0) {
--        /*
--         * Turn the /memory node created before into a NOP node, then create
--         * /memory@addr nodes for all numa nodes respectively.
--         */
--        qemu_fdt_nop_node(fdt, "/memory");
--        mem_base = binfo->loader_start;
-+        hwaddr reg_offset = 0; /* region base addr offset */
-+        hwaddr reg_alloc_size = 0; /* region consumed size */
-+        hwaddr node_mem_size = 0;
-+        RAMRegion *tmp_reg = QLIST_FIRST(&binfo->mem_list);
-+
-         for (i = 0; i < nb_numa_nodes; i++) {
--            mem_len = numa_info[i].node_mem;
--            nodename = g_strdup_printf("/memory@%" PRIx64, mem_base);
--            qemu_fdt_add_subnode(fdt, nodename);
--            qemu_fdt_setprop_string(fdt, nodename, "device_type", "memory");
--            rc = qemu_fdt_setprop_sized_cells(fdt, nodename, "reg",
--                                              acells, mem_base,
--                                              scells, mem_len);
--            if (rc < 0) {
--                fprintf(stderr, "couldn't set %s/reg for node %d\n", nodename,
--                        i);
--                goto fail;
--            }
-+            node_mem_size = numa_info[i].node_mem;
-+            QLIST_FOREACH(reg, &binfo->mem_list, next) {
-+                if (reg->base != tmp_reg->base) {
-+                    continue;
-+                }
- 
--            qemu_fdt_setprop_cell(fdt, nodename, "numa-node-id", i);
--            mem_base += mem_len;
--            g_free(nodename);
--        }
--    } else {
--        Error *err = NULL;
-+                if (node_mem_size >= (reg->size - reg_offset)) {
-+                    reg_alloc_size = reg->size - reg_offset;
-+                } else {
-+                    reg_alloc_size = node_mem_size;
-+                }
- 
--        rc = fdt_path_offset(fdt, "/memory");
--        if (rc < 0) {
--            qemu_fdt_add_subnode(fdt, "/memory");
--        }
-+                nodename = create_memory_fdt(fdt, acells,
-+                                             reg->base + reg_offset,
-+                                             scells, reg_alloc_size);
-+                if (!nodename) {
-+                    goto fail;
-+                }
-+
-+                qemu_fdt_setprop_cell(fdt, nodename, "numa-node-id", i);
-+                g_free(nodename);
- 
--        if (!qemu_fdt_getprop(fdt, "/memory", "device_type", NULL, &err)) {
--            qemu_fdt_setprop_string(fdt, "/memory", "device_type", "memory");
-+                node_mem_size -= reg_alloc_size;
-+                reg_offset += reg_alloc_size;
-+                tmp_reg = reg;
-+
-+                /* The region is depleted */
-+                if (reg->size == reg_offset) {
-+                    reg_offset = 0;
-+                    tmp_reg = QLIST_NEXT(reg, next);
-+                }
-+
-+                if (node_mem_size == 0) {
-+                    break;
-+                }
-+            }
-         }
-+    } else {
-+        QLIST_FOREACH(reg, &binfo->mem_list, next) {
-+            nodename = create_memory_fdt(fdt, acells, reg->base,
-+                                         scells, reg->size);
-+            if (!nodename) {
-+                goto fail;
-+            }
- 
--        rc = qemu_fdt_setprop_sized_cells(fdt, "/memory", "reg",
--                                          acells, binfo->loader_start,
--                                          scells, binfo->ram_size);
--        if (rc < 0) {
--            fprintf(stderr, "couldn't set /memory/reg\n");
--            goto fail;
-+            g_free(nodename);
-         }
-     }
- 
-@@ -814,6 +849,35 @@ static uint64_t load_aarch64_image(const char *filename, hwaddr mem_base,
-     return size;
- }
- 
-+/* Find the max size memory region after info->initrd_start.
-+ * TODO: we may have a corner case where the memory node size may not correctly
-+ * fit into kernel/initrd/dtb Image sizes.
-+ * */
-+static RAMRegion *find_initrd_memregion(const struct arm_boot_info *info,
-+                                        hwaddr *initrd_start)
-+{
-+    RAMRegion *reg, *initrd_reg = NULL;
-+    hwaddr max_size = 0;
-+    hwaddr addr = *initrd_start;
-+
-+    QLIST_FOREACH(reg, &info->mem_list, next) {
-+        if (addr < reg->base) {
-+            if (max_size < reg->size) {
-+                max_size = reg->size;
-+                *initrd_start = reg->base;
-+                initrd_reg = reg;
-+            }
-+        } else if (addr >= reg->base && addr < (reg->base + reg->size)) {
-+            if (max_size < reg->base + reg->size - addr) {
-+                max_size = reg->base + reg->size - addr;
-+                initrd_reg = reg;
-+            }
-+        }
-+    }
-+
-+    return initrd_reg;
-+}
-+
- static void arm_load_kernel_notify(Notifier *notifier, void *data)
+ static uint64_t virt_cpu_mp_affinity(VirtMachineState *vms, int idx)
  {
-     CPUState *cs;
-@@ -837,11 +901,11 @@ static void arm_load_kernel_notify(Notifier *notifier, void *data)
-     assert(!(info->secure_board_setup && kvm_enabled()));
+     uint8_t clustersz = ARM_DEFAULT_CPUS_PER_CLUSTER;
+@@ -1258,7 +1271,6 @@ static void machvirt_init(MachineState *machine)
+     MemoryRegion *sysmem = get_system_memory();
+     MemoryRegion *secure_sysmem = NULL;
+     int n, virt_max_cpus;
+-    MemoryRegion *ram = g_new(MemoryRegion, 1);
+     bool firmware_loaded = bios_name || drive_get(IF_PFLASH, 0, 0);
  
-     /* If machine is not virt, the mem_list will empty. */
--    if (QLIST_EMPTY(&vms->bootinfo.mem_list)) {
-+    if (QLIST_EMPTY(&info->mem_list)) {
-         RAMRegion *new = g_new(RAMRegion, 1);
-         new->base = info->loader_start;
-         new->size = info->ram_size;
--        QLIST_INSERT_HEAD(&vms->bootinfo.mem_list, new, next);
-+        QLIST_INSERT_HEAD(&info->mem_list, new, next);
-     }
+     /* We can probe only here because during property set
+@@ -1409,10 +1421,6 @@ static void machvirt_init(MachineState *machine)
+     fdt_add_cpu_nodes(vms);
+     fdt_add_psci_node(vms);
  
-     info->dtb_filename = qemu_opt_get(qemu_get_machine_opts(), "dtb");
-@@ -973,14 +1037,16 @@ static void arm_load_kernel_notify(Notifier *notifier, void *data)
-         uint32_t fixupcontext[FIXUP_MAX];
+-    memory_region_allocate_system_memory(ram, NULL, "mach-virt.ram",
+-                                         machine->ram_size);
+-    memory_region_add_subregion(sysmem, vms->memmap[VIRT_MEM].base, ram);
+-
+     create_flash(vms, sysmem, secure_sysmem ? secure_sysmem : sysmem);
  
-         if (info->initrd_filename) {
-+            RAMRegion *reg = find_initrd_memregion(info, &info->initrd_start);
+     create_gic(vms, pic);
+@@ -1462,6 +1470,9 @@ static void machvirt_init(MachineState *machine)
+      * Notifiers are executed in registration reverse order.
+      */
+     create_platform_bus(vms, pic);
 +
-             initrd_size = load_ramdisk(info->initrd_filename,
-                                        info->initrd_start,
--                                       info->ram_size -
-+                                       reg->base + reg->size -
-                                        info->initrd_start);
-             if (initrd_size < 0) {
-                 initrd_size = load_image_targphys(info->initrd_filename,
-                                                   info->initrd_start,
--                                                  info->ram_size -
-+                                                  reg->base + reg->size -
-                                                   info->initrd_start);
-             }
-             if (initrd_size < 0) {
-@@ -1027,7 +1093,8 @@ static void arm_load_kernel_notify(Notifier *notifier, void *data)
-             }
-             fixupcontext[FIXUP_ARGPTR] = dtb_start;
-         } else {
--            fixupcontext[FIXUP_ARGPTR] = info->loader_start + KERNEL_ARGS_ADDR;
-+            hwaddr kernel_args_addr = info->loader_start + KERNEL_ARGS_ADDR;
-+            fixupcontext[FIXUP_ARGPTR] = kernel_args_addr;
-             if (info->ram_size >= (1ULL << 32)) {
-                 fprintf(stderr, "qemu: RAM size must be less than 4GB to boot"
-                         " Linux kernel using ATAGS (try passing a device tree"
++    vms->ram_memory_region_init.notify = virt_ram_memory_region_init;
++    qemu_add_machine_init_done_notifier(&vms->ram_memory_region_init);
+ }
+ 
+ static bool virt_get_secure(Object *obj, Error **errp)
+diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
+index 33b0ff3..38906b8 100644
+--- a/include/hw/arm/virt.h
++++ b/include/hw/arm/virt.h
+@@ -90,6 +90,7 @@ typedef struct {
+ typedef struct {
+     MachineState parent;
+     Notifier machine_done;
++    Notifier ram_memory_region_init;
+     FWCfgState *fw_cfg;
+     bool secure;
+     bool highmem;
 -- 
 1.8.3.1
