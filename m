@@ -1,24 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41374)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42454)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1eEWQl-0001BI-8O
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 03:18:57 -0500
+	(envelope-from <bounces@canonical.com>) id 1eEWSp-0003Dg-Um
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 03:21:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1eEWQk-0007UW-2a
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 03:18:51 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:52930)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1eEWQj-0007U4-Lg
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 03:18:50 -0500
-From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Date: Tue, 14 Nov 2017 11:18:57 +0300
-Message-ID: <20171114081857.27640.15221.stgit@pasha-VirtualBox>
-In-Reply-To: <20171114081630.27640.53933.stgit@pasha-VirtualBox>
-References: <20171114081630.27640.53933.stgit@pasha-VirtualBox>
+	(envelope-from <bounces@canonical.com>) id 1eEWSm-0000nq-N7
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 03:20:59 -0500
+Received: from indium.canonical.com ([91.189.90.7]:51056)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eEWSm-0000mv-Gg
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 03:20:56 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eEWSk-00049c-Cr
+	for <qemu-devel@nongnu.org>; Tue, 14 Nov 2017 08:20:54 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 52E442E80CE
+	for <qemu-devel@nongnu.org>; Tue, 14 Nov 2017 08:20:54 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [RFC PATCH v2 26/26] scripts/qemu-gdb/timers.py: new
- helper to dump timer state
+Date: Tue, 14 Nov 2017 08:10:17 -0000
+From: ChristianEhrhardt <1726394@bugs.launchpad.net>
+Reply-To: Bug 1726394 <1726394@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150876459007.17533.9812313883985505054.malonedeb@wampee.canonical.com>
+Message-Id: <151064701764.8680.17751601387051830171.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1726394] Re: Passes through prctl(PR_SET_SECCOMP,
+ SECCOMP_MODE_FILTER, address)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,101 +38,50 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, boost.lists@gmail.com, quintela@redhat.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, kraxel@redhat.com, pavel.dovgaluk@ispras.ru, pbonzini@redhat.com, alex.bennee@linaro.org
 
-From: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Ok, thanks for the info Julian!
 
-This introduces the qemu-gdb command "qemu timers" which will dump the
-state of the main timers in the system.
+** Changed in: qemu (Ubuntu Xenial)
+       Status: Triaged =3D> Won't Fix
 
-Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+** Changed in: qemu (Ubuntu Zesty)
+       Status: Triaged =3D> Won't Fix
 
----
- scripts/qemu-gdb.py       |    3 ++-
- scripts/qemugdb/timers.py |   54 +++++++++++++++++++++++++++++++++++++++=
-++++++
- 2 files changed, 56 insertions(+), 1 deletion(-)
- create mode 100644 scripts/qemugdb/timers.py
+** Changed in: qemu (Ubuntu Artful)
+       Status: Triaged =3D> Won't Fix
 
-diff --git a/scripts/qemu-gdb.py b/scripts/qemu-gdb.py
-index d58213e..690827e 100644
---- a/scripts/qemu-gdb.py
-+++ b/scripts/qemu-gdb.py
-@@ -26,7 +26,7 @@ import os, sys
-=20
- sys.path.append(os.path.dirname(__file__))
-=20
--from qemugdb import aio, mtree, coroutine, tcg
-+from qemugdb import aio, mtree, coroutine, tcg, timers
-=20
- class QemuCommand(gdb.Command):
-     '''Prefix for QEMU debug support commands'''
-@@ -39,6 +39,7 @@ coroutine.CoroutineCommand()
- mtree.MtreeCommand()
- aio.HandlersCommand()
- tcg.TCGLockStatusCommand()
-+timers.TimersCommand()
-=20
- coroutine.CoroutineSPFunction()
- coroutine.CoroutinePCFunction()
-diff --git a/scripts/qemugdb/timers.py b/scripts/qemugdb/timers.py
-new file mode 100644
-index 0000000..be71a00
---- /dev/null
-+++ b/scripts/qemugdb/timers.py
-@@ -0,0 +1,54 @@
-+#!/usr/bin/python
-+# GDB debugging support
-+#
-+# Copyright 2017 Linaro Ltd
-+#
-+# Author: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-+#
-+# This work is licensed under the terms of the GNU GPL, version 2.  See
-+# the COPYING file in the top-level directory.
-+
-+# 'qemu timers' -- display the current timerlists
-+
-+import gdb
-+
-+class TimersCommand(gdb.Command):
-+    '''Display the current QEMU timers'''
-+
-+    def __init__(self):
-+        'Register the class as a gdb command'
-+        gdb.Command.__init__(self, 'qemu timers', gdb.COMMAND_DATA,
-+                             gdb.COMPLETE_NONE)
-+
-+    def dump_timers(self, timer):
-+        "Follow a timer and recursively dump each one in the list."
-+        # timer should be of type QemuTimer
-+        gdb.write("    timer %s/%s (cb:%s,opq:%s)\n" % (
-+            timer['expire_time'],
-+            timer['scale'],
-+            timer['cb'],
-+            timer['opaque']))
-+
-+        if int(timer['next']) > 0:
-+            self.dump_timers(timer['next'])
-+
-+
-+    def process_timerlist(self, tlist, ttype):
-+        gdb.write("Processing %s timers\n" % (ttype))
-+        gdb.write("  clock %s is enabled:%s, last:%s\n" % (
-+            tlist['clock']['type'],
-+            tlist['clock']['enabled'],
-+            tlist['clock']['last']))
-+        if int(tlist['active_timers']) > 0:
-+            self.dump_timers(tlist['active_timers'])
-+
-+
-+    def invoke(self, arg, from_tty):
-+        'Run the command'
-+        main_timers =3D gdb.parse_and_eval("main_loop_tlg")
-+
-+        # This will break if QEMUClockType in timer.h is redfined
-+        self.process_timerlist(main_timers['tl'][0], "Realtime")
-+        self.process_timerlist(main_timers['tl'][1], "Virtual")
-+        self.process_timerlist(main_timers['tl'][2], "Host")
-+        self.process_timerlist(main_timers['tl'][3], "Virtual RT")
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1726394
+
+Title:
+  Passes through prctl(PR_SET_SECCOMP, SECCOMP_MODE_FILTER, address)
+
+Status in QEMU:
+  In Progress
+Status in qemu package in Ubuntu:
+  Fix Committed
+Status in qemu source package in Xenial:
+  Won't Fix
+Status in qemu source package in Zesty:
+  Won't Fix
+Status in qemu source package in Artful:
+  Won't Fix
+Status in qemu package in Debian:
+  Confirmed
+
+Bug description:
+  qemu-user passes through prctl(PR_SET_SECCOMP, SECCOMP_MODE_FILTER,
+  address) unmodified, but the third argument is an address to a BPF
+  filter, causing an EFAULT. Now, the filter is architecture-specifc, so
+  you can't just rewrite the addresses, so the safest bet is to just
+  return an error here.
+
+  I guess you should just return EINVAL, but not sure. I'd really like
+  something that can be identified, so seccomp errors can be ignored
+  when it's not supported.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1726394/+subscriptions
