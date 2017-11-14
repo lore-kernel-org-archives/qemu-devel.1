@@ -1,25 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41929)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53497)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eEeSW-0006hO-7j
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 11:53:13 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eEewm-0005Ny-Ar
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 12:24:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eEeSV-0004t4-Ey
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 11:53:12 -0500
-Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:51680)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eEeSV-0004sm-7m
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 11:53:11 -0500
-Received: by mail-wm0-x231.google.com with SMTP id b189so16489867wmd.0
-	for <qemu-devel@nongnu.org>; Tue, 14 Nov 2017 08:53:11 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <20171114103721.13869-1-stefanha@redhat.com>
-References: <20171114103721.13869-1-stefanha@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 14 Nov 2017 16:52:49 +0000
-Message-ID: <CAFEAcA_m9JnMVTsAXCf=qHWoJAst9pz=rA9DNCbakYLtkxedSw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL for-2.11-rc2 0/5] Block patches
+	(envelope-from <mreitz@redhat.com>) id 1eEewl-00046T-GQ
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 12:24:28 -0500
+From: Max Reitz <mreitz@redhat.com>
+Date: Tue, 14 Nov 2017 18:23:57 +0100
+Message-Id: <20171114172417.7654-1-mreitz@redhat.com>
+Subject: [Qemu-devel] [PULL 00/20] Block patches for 2.11.0-rc1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,27 +17,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Kevin Wolf <kwolf@redhat.com>
 
-On 14 November 2017 at 10:37, Stefan Hajnoczi <stefanha@redhat.com> wrote:
-> The following changes since commit 508ba0f7e2092d3ca56e3f75e894d52d8b94818e:
->
->   Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20171109' into staging (2017-11-13 11:41:47 +0000)
->
-> are available in the git repository at:
->
->   git://github.com/stefanha/qemu.git tags/block-pull-request
->
-> for you to fetch changes up to 0761562687e0d8135310a94b1d3e08376387c027:
->
->   qemu-iotests: Test I/O limits with removable media (2017-11-13 15:46:26 +0000)
->
-> ----------------------------------------------------------------
-> Pull request
->
-> The following disk I/O throttling fixes solve recent bugs.
+The following changes since commit 191b5fbfa66e5b23e2150f3c6981d30eb84418a9:
 
-Applied, thanks.
+  Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request' into staging (2017-11-14 16:11:19 +0000)
 
--- PMM
+are available in the git repository at:
+
+  git://github.com/XanClic/qemu.git tags/pull-block-2017-11-14
+
+for you to fetch changes up to 8b2d7c364d9a2491f7501f6688cd722045cf808a:
+
+  qemu-iotests: update unsupported image formats in 194 (2017-11-14 18:06:26 +0100)
+
+----------------------------------------------------------------
+Block patches for 2.11.0-rc1
+
+----------------------------------------------------------------
+Alberto Garcia (8):
+  qcow2: Prevent allocating refcount blocks at offset 0
+  qcow2: Prevent allocating L2 tables at offset 0
+  qcow2: Prevent allocating compressed clusters at offset 0
+  qcow2: Don't open images with header.refcount_table_clusters == 0
+  qcow2: Add iotest for an image with header.refcount_table_offset == 0
+  qcow2: Add iotest for an empty refcount table
+  qcow2: Assert that the crypto header does not overlap other metadata
+  qcow2: Check that corrupted images can be repaired in iotest 060
+
+Eric Blake (1):
+  iotests: Use new-style NBD connections
+
+Fam Zheng (1):
+  iotests: 077: Filter out 'resume' lines
+
+Jeff Cody (4):
+  block/vhdx.c: Don't blindly update the header
+  block/parallels: Do not update header or truncate image when INMIGRATE
+  block/parallels: add migration blocker
+  qemu-iotests: update unsupported image formats in 194
+
+Max Reitz (5):
+  iotests: Make 030 less flaky
+  iotests: Add missing 'blkdebug::' in 040
+  iotests: Make 055 less flaky
+  iotests: Make 083 less flaky
+  iotests: Make 136 less flaky
+
+Vladimir Sementsov-Ogievskiy (1):
+  block/snapshot: dirty all dirty bitmaps on snapshot-switch
+
+ block/parallels.c            |  22 ++++++---
+ block/qcow2-cluster.c        |   8 ++++
+ block/qcow2-refcount.c       |  14 ++++++
+ block/qcow2.c                |   7 +++
+ block/snapshot.c             |  14 ++++++
+ block/vhdx.c                 |   7 ---
+ tests/qemu-iotests/030       |   8 +++-
+ tests/qemu-iotests/040       |   2 +-
+ tests/qemu-iotests/055       |  25 +++++++----
+ tests/qemu-iotests/060       |  59 +++++++++++++++++++++++++
+ tests/qemu-iotests/060.out   | 103 +++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/077       |   3 +-
+ tests/qemu-iotests/077.out   |  16 -------
+ tests/qemu-iotests/083       |   4 +-
+ tests/qemu-iotests/136       |  14 +++++-
+ tests/qemu-iotests/194       |   2 +-
+ tests/qemu-iotests/common.rc |   2 +-
+ 17 files changed, 265 insertions(+), 45 deletions(-)
+
+-- 
+2.13.6
