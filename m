@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53684)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53777)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eEewy-0005ZQ-8Y
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 12:24:42 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eEex5-0005ra-TM
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 12:24:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eEewx-0004Ed-CM
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 12:24:40 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eEex1-0004Gd-0l
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 12:24:47 -0500
 From: Max Reitz <mreitz@redhat.com>
-Date: Tue, 14 Nov 2017 18:24:03 +0100
-Message-Id: <20171114172417.7654-7-mreitz@redhat.com>
+Date: Tue, 14 Nov 2017 18:24:04 +0100
+Message-Id: <20171114172417.7654-8-mreitz@redhat.com>
 In-Reply-To: <20171114172417.7654-1-mreitz@redhat.com>
 References: <20171114172417.7654-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PULL 06/20] qcow2: Add iotest for an empty refcount
- table
+Subject: [Qemu-devel] [PULL 07/20] qcow2: Assert that the crypto header does
+ not overlap other metadata
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,55 +25,32 @@ Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Peter Maydell <peter.m
 
 From: Alberto Garcia <berto@igalia.com>
 
-This patch adds a simple iotest in which we try to write to an image
-with an empty refcount table (i.e. with all entries set to 0).
+The crypto header is initialized only when QEMU is creating a new
+image, so there's no chance of this happening on a corrupted image.
 
-This scenario was already handled by the existing consistency checks,
-but we add an explicit test case for completeness.
+If QEMU is really trying to allocate the header overlapping other
+existing metadata sections then this is a serious bug in QEMU itself
+so let's add an assertion.
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-Message-id: 7e48b0e2ae1a0a18e0ee303b3045f130feec0474.1509718618.git.berto@igalia.com
+Message-id: ae3d77f312fc0c5e0ac2bbd71676c0112eebe2e5.1509718618.git.berto@igalia.com
+Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/qemu-iotests/060     | 7 +++++++
- tests/qemu-iotests/060.out | 6 ++++++
- 2 files changed, 13 insertions(+)
+ block/qcow2.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/tests/qemu-iotests/060 b/tests/qemu-iotests/060
-index dc5a517673..66a8fa4aea 100755
---- a/tests/qemu-iotests/060
-+++ b/tests/qemu-iotests/060
-@@ -243,6 +243,13 @@ poke_file "$TEST_IMG" "$(($l2_offset+8))" "\x80\x00\x00\x00\x00\x06\x2a\x00"
- $QEMU_IO -c "discard 0 64k" -c "read 64k 64k" "$TEST_IMG" | _filter_qemu_io
- 
- echo
-+echo "=== Testing empty refcount table ==="
-+echo
-+_make_test_img 64M
-+poke_file "$TEST_IMG" "$rt_offset"        "\x00\x00\x00\x00\x00\x00\x00\x00"
-+$QEMU_IO -c "write 0 64k" "$TEST_IMG" | _filter_qemu_io
-+
-+echo
- echo "=== Testing empty refcount table with valid L1 and L2 tables ==="
- echo
- _make_test_img 64M
-diff --git a/tests/qemu-iotests/060.out b/tests/qemu-iotests/060.out
-index 98f314c16d..cfd78f87a9 100644
---- a/tests/qemu-iotests/060.out
-+++ b/tests/qemu-iotests/060.out
-@@ -182,6 +182,12 @@ discard 65536/65536 bytes at offset 0
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- read failed: Input/output error
- 
-+=== Testing empty refcount table ===
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
-+qcow2: Marking image as corrupt: Preventing invalid write on metadata (overlaps with refcount table); further corruption events will be suppressed
-+write failed: Input/output error
-+
- === Testing empty refcount table with valid L1 and L2 tables ===
- 
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
+diff --git a/block/qcow2.c b/block/qcow2.c
+index defc1fe49f..b3d66a0e88 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -126,6 +126,7 @@ static ssize_t qcow2_crypto_hdr_init_func(QCryptoBlock *block, size_t headerlen,
+     /* Zero fill remaining space in cluster so it has predictable
+      * content in case of future spec changes */
+     clusterlen = size_to_clusters(s, headerlen) * s->cluster_size;
++    assert(qcow2_pre_write_overlap_check(bs, 0, ret, clusterlen) == 0);
+     ret = bdrv_pwrite_zeroes(bs->file,
+                              ret + headerlen,
+                              clusterlen - headerlen, 0);
 -- 
 2.13.6
