@@ -1,16 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54410)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55632)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eEexn-00071n-Ny
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 12:25:33 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eEf0h-0002F9-CA
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 12:28:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eEexi-0004ry-S6
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 12:25:31 -0500
-From: Max Reitz <mreitz@redhat.com>
-Date: Tue, 14 Nov 2017 18:24:16 +0100
-Message-Id: <20171114172417.7654-20-mreitz@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1eEf0g-0006IO-Go
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 12:28:31 -0500
+Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:35040)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eEf0g-0006I4-96
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 12:28:30 -0500
+Received: by mail-wm0-x233.google.com with SMTP id y80so22861547wmd.0
+	for <qemu-devel@nongnu.org>; Tue, 14 Nov 2017 09:28:30 -0800 (PST)
+MIME-Version: 1.0
 In-Reply-To: <20171114172417.7654-1-mreitz@redhat.com>
 References: <20171114172417.7654-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PULL 19/20] block/parallels: add migration blocker
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 14 Nov 2017 17:28:08 +0000
+Message-ID: <CAFEAcA-j4=VDkzHAfoUmrb+SLFd46BdOa-qKeYDyBbKmGjZrOw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/20] Block patches for 2.11.0-rc1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,72 +28,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Kevin Wolf <kwolf@redhat.com>, Jeff Cody <jcody@redhat.com>
+To: Max Reitz <mreitz@redhat.com>
+Cc: Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>
 
-From: Jeff Cody <jcody@redhat.com>
+On 14 November 2017 at 17:23, Max Reitz <mreitz@redhat.com> wrote:
+> The following changes since commit 191b5fbfa66e5b23e2150f3c6981d30eb84418a9:
+>
+>   Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request' into staging (2017-11-14 16:11:19 +0000)
+>
+> are available in the git repository at:
+>
+>   git://github.com/XanClic/qemu.git tags/pull-block-2017-11-14
+>
+> for you to fetch changes up to 8b2d7c364d9a2491f7501f6688cd722045cf808a:
+>
+>   qemu-iotests: update unsupported image formats in 194 (2017-11-14 18:06:26 +0100)
+>
 
-Migration does not work for parallels, and has been broken for a while
-(see patch 'block/parallels: Do not update header or truncate image when
- INMIGRATE').  The bdrv_invalidate_cache() method needs to be added for
-migration to be supported.  Until this is done, prohibit migration.
+I can probably squeeze this into rc1, but 17:30 GMT on rc day is at least
+an hour later than you can reasonably rely on being able to get a pull
+request into the rc....
 
-Signed-off-by: Jeff Cody <jcody@redhat.com>
-Reviewed-by: Fam Zheng <famz@redhat.com>
-Message-id: 5e04a7c8a3089913fa58d484af42dab7993984ad.1510059970.git.jcody@redhat.com
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: Denis V. Lunev <den@openvz.org>
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
- block/parallels.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
-
-diff --git a/block/parallels.c b/block/parallels.c
-index 7b7a3efa1d..9545761f49 100644
---- a/block/parallels.c
-+++ b/block/parallels.c
-@@ -35,6 +35,7 @@
- #include "qemu/module.h"
- #include "qemu/bswap.h"
- #include "qemu/bitmap.h"
-+#include "migration/blocker.h"
- 
- /**************************************************************/
- 
-@@ -100,6 +101,7 @@ typedef struct BDRVParallelsState {
-     unsigned int tracks;
- 
-     unsigned int off_multiplier;
-+    Error *migration_blocker;
- } BDRVParallelsState;
- 
- 
-@@ -720,6 +722,16 @@ static int parallels_open(BlockDriverState *bs, QDict *options, int flags,
-     s->bat_dirty_bmap =
-         bitmap_new(DIV_ROUND_UP(s->header_size, s->bat_dirty_block));
- 
-+    /* Disable migration until bdrv_invalidate_cache method is added */
-+    error_setg(&s->migration_blocker, "The Parallels format used by node '%s' "
-+               "does not support live migration",
-+               bdrv_get_device_or_node_name(bs));
-+    ret = migrate_add_blocker(s->migration_blocker, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        error_free(s->migration_blocker);
-+        goto fail;
-+    }
-     qemu_co_mutex_init(&s->lock);
-     return 0;
- 
-@@ -750,6 +762,9 @@ static void parallels_close(BlockDriverState *bs)
- 
-     g_free(s->bat_dirty_bmap);
-     qemu_vfree(s->header);
-+
-+    migrate_del_blocker(s->migration_blocker);
-+    error_free(s->migration_blocker);
- }
- 
- static QemuOptsList parallels_create_opts = {
--- 
-2.13.6
+thanks
+-- PMM
