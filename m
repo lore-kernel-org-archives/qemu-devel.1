@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35603)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35917)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eEbNY-0003WC-Tw
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 08:35:55 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eEbO3-0003v0-Dz
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 08:36:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eEbNW-00083I-Af
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 08:35:52 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52822)
+	(envelope-from <pbonzini@redhat.com>) id 1eEbO0-0000Q0-R2
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 08:36:23 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43756)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eEbNW-000822-4t
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 08:35:50 -0500
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eEbO0-0000P7-Hg
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 08:36:20 -0500
 References: <20171114081630.27640.53933.stgit@pasha-VirtualBox>
-	<20171114081750.27640.53609.stgit@pasha-VirtualBox>
+	<20171114081824.27640.82263.stgit@pasha-VirtualBox>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <cf3d0f53-5b95-0432-8401-cf09d15e0b32@redhat.com>
-Date: Tue, 14 Nov 2017 14:35:38 +0100
+Message-ID: <a7261dd7-59d9-d8dd-8d68-2a78e19a5a6a@redhat.com>
+Date: Tue, 14 Nov 2017 14:36:09 +0100
 MIME-Version: 1.0
-In-Reply-To: <20171114081750.27640.53609.stgit@pasha-VirtualBox>
+In-Reply-To: <20171114081824.27640.82263.stgit@pasha-VirtualBox>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH v2 14/26] replay/replay.c: bump
- REPLAY_VERSION again
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH v2 20/26] replay: don't destroy mutex
+ at exit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,49 +32,28 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, boost.lists@gmail.com, quintela@redhat.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, kraxel@redhat.com, alex.bennee@linaro.org
 
-On 14/11/2017 09:17, Pavel Dovgalyuk wrote:
-> From: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->=20
-> This time commit 802f045a5f61b781df55e4492d896b4d20503ba7 broke the
-> replay file format. Also add a comment about this to
-> replay-internal.h.
->=20
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> Reviewed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
->=20
+On 14/11/2017 09:18, Pavel Dovgalyuk wrote:
+> Replay mutex is held by vCPU thread and destroy function is called
+> from atexit of the main thread. Therefore we cannot destroy it safely.
+> 
+> Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+> 
 > ---
->  replay/replay-internal.h |    2 +-
->  replay/replay.c          |    2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
->=20
-> diff --git a/replay/replay-internal.h b/replay/replay-internal.h
-> index be96d7e..8e4c701 100644
-> --- a/replay/replay-internal.h
-> +++ b/replay/replay-internal.h
-> @@ -12,7 +12,7 @@
->   *
->   */
-> =20
-> -
-> +/* Any changes to order/number of events will need to bump REPLAY_VERS=
-ION */
->  enum ReplayEvents {
->      /* for instruction event */
->      EVENT_INSTRUCTION,
+>  replay/replay.c |    1 -
+>  1 file changed, 1 deletion(-)
+> 
 > diff --git a/replay/replay.c b/replay/replay.c
-> index ff58a5a..4f24498 100644
+> index 6e34b79..be1d4a2 100644
 > --- a/replay/replay.c
 > +++ b/replay/replay.c
-> @@ -22,7 +22,7 @@
-> =20
->  /* Current version of the replay mechanism.
->     Increase it when file format changes. */
-> -#define REPLAY_VERSION              0xe02006
-> +#define REPLAY_VERSION              0xe02007
->  /* Size of replay log header */
->  #define HEADER_SIZE                 (sizeof(uint32_t) + sizeof(uint64_=
-t))
-> =20
->=20
+> @@ -357,7 +357,6 @@ void replay_finish(void)
+>      replay_snapshot = NULL;
+>  
+>      replay_finish_events();
+> -    replay_mutex_destroy();
+>  }
+>  
+>  void replay_add_blocker(Error *reason)
+> 
 
 Acked-by: Paolo Bonzini <pbonzini@redhat.com>
