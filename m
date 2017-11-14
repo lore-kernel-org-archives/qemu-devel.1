@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54265)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54250)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eEexc-0006s3-H4
+	(envelope-from <mreitz@redhat.com>) id 1eEexb-0006rV-WC
 	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 12:25:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eEexb-0004m0-7t
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 12:25:20 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eEexX-0004jR-Iz
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 12:25:19 -0500
 From: Max Reitz <mreitz@redhat.com>
-Date: Tue, 14 Nov 2017 18:24:15 +0100
-Message-Id: <20171114172417.7654-19-mreitz@redhat.com>
+Date: Tue, 14 Nov 2017 18:24:13 +0100
+Message-Id: <20171114172417.7654-17-mreitz@redhat.com>
 In-Reply-To: <20171114172417.7654-1-mreitz@redhat.com>
 References: <20171114172417.7654-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PULL 18/20] block/parallels: Do not update header or
- truncate image when INMIGRATE
+Subject: [Qemu-devel] [PULL 16/20] iotests: 077: Filter out 'resume' lines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,51 +20,139 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Kevin Wolf <kwolf@redhat.com>, Jeff Cody <jcody@redhat.com>
+Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>
 
-From: Jeff Cody <jcody@redhat.com>
+From: Fam Zheng <famz@redhat.com>
 
-If we write or modify the image file while the QEMU run state is
-INMIGRATE, then the BDRV_O_INACTIVE BDS flag is set.  This will cause
-an assert, since the image is marked inactive.  Make sure we obey this
-flag.
+In the "Overlapping multiple requests" cases, the 3rd reqs (the break
+point B) doesn't wait for the 2nd, and once resumed the I/O will just
+continue.  This is because the 2nd is already waiting for the 1st, and
+in wait_serialising_requests() there is:
 
-Tested-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-Signed-off-by: Jeff Cody <jcody@redhat.com>
-Message-id: 3996c930fa8cde8570b7a63032720d76a28fd78b.1510059970.git.jcody@redhat.com
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: Denis V. Lunev <den@openvz.org>
+    /* If the request is already (indirectly) waiting for us, or
+     * will wait for us as soon as it wakes up, then just go on
+     * (instead of producing a deadlock in the former case). */
+    if (!req->waiting_for) {
+        /* actually break */
+        ...
+    }
+
+Consequently, the following "sleep 100; resume A" command races with the
+completion of that request, and sometimes results in an unexpected
+order of output:
+
+> @@ -56,9 +56,9 @@
+>  wrote XXX/XXX bytes at offset XXX
+>  XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+>  blkdebug: Resuming request 'B'
+> +blkdebug: Resuming request 'A'
+>  wrote XXX/XXX bytes at offset XXX
+>  XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+> -blkdebug: Resuming request 'A'
+>  wrote XXX/XXX bytes at offset XXX
+>  XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+>  wrote XXX/XXX bytes at offset XXX
+
+Filter out the "Resuming request" lines to make the output
+deterministic.
+
+Reported-by: Patchew <no-reply@patchew.org>
+Signed-off-by: Fam Zheng <famz@redhat.com>
+Message-id: 20171113150026.4743-1-famz@redhat.com
+Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/parallels.c | 7 ++-----
- 1 file changed, 2 insertions(+), 5 deletions(-)
+ tests/qemu-iotests/077     |  3 ++-
+ tests/qemu-iotests/077.out | 16 ----------------
+ 2 files changed, 2 insertions(+), 17 deletions(-)
 
-diff --git a/block/parallels.c b/block/parallels.c
-index 2b6c6e5709..7b7a3efa1d 100644
---- a/block/parallels.c
-+++ b/block/parallels.c
-@@ -708,7 +708,7 @@ static int parallels_open(BlockDriverState *bs, QDict *options, int flags,
-         s->prealloc_mode = PRL_PREALLOC_MODE_FALLOCATE;
-     }
+diff --git a/tests/qemu-iotests/077 b/tests/qemu-iotests/077
+index d2d2a2d687..b3c6fb1370 100755
+--- a/tests/qemu-iotests/077
++++ b/tests/qemu-iotests/077
+@@ -188,7 +188,8 @@ EOF
+ test_io | $QEMU_IO  | _filter_qemu_io | \
+     sed -e 's,[0-9/]* bytes at offset [0-9]*,XXX/XXX bytes at offset XXX,g' \
+         -e 's/^[0-9]* \(bytes\|KiB\)/XXX bytes/' \
+-        -e '/Suspended/d'
++        -e '/Suspended/d' \
++        -e '/blkdebug: Resuming request/d'
  
--    if (flags & BDRV_O_RDWR) {
-+    if ((flags & BDRV_O_RDWR) && !(flags & BDRV_O_INACTIVE)) {
-         s->header->inuse = cpu_to_le32(HEADER_INUSE_MAGIC);
-         ret = parallels_update_header(bs);
-         if (ret < 0) {
-@@ -741,12 +741,9 @@ static void parallels_close(BlockDriverState *bs)
- {
-     BDRVParallelsState *s = bs->opaque;
- 
--    if (bs->open_flags & BDRV_O_RDWR) {
-+    if ((bs->open_flags & BDRV_O_RDWR) && !(bs->open_flags & BDRV_O_INACTIVE)) {
-         s->header->inuse = 0;
-         parallels_update_header(bs);
--    }
--
--    if (bs->open_flags & BDRV_O_RDWR) {
-         bdrv_truncate(bs->file, s->data_end << BDRV_SECTOR_BITS,
-                       PREALLOC_MODE_OFF, NULL);
-     }
+ echo
+ echo "== Verify image content =="
+diff --git a/tests/qemu-iotests/077.out b/tests/qemu-iotests/077.out
+index 16f951fd3d..4aae82f2e2 100644
+--- a/tests/qemu-iotests/077.out
++++ b/tests/qemu-iotests/077.out
+@@ -4,17 +4,14 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
+ == Some concurrent requests involving RMW ==
+ wrote XXX/XXX bytes at offset XXX
+ XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-blkdebug: Resuming request 'A'
+ wrote XXX/XXX bytes at offset XXX
+ XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ wrote XXX/XXX bytes at offset XXX
+ XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-blkdebug: Resuming request 'A'
+ wrote XXX/XXX bytes at offset XXX
+ XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ wrote XXX/XXX bytes at offset XXX
+ XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-blkdebug: Resuming request 'A'
+ wrote XXX/XXX bytes at offset XXX
+ XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ wrote XXX/XXX bytes at offset XXX
+@@ -31,51 +28,38 @@ wrote XXX/XXX bytes at offset XXX
+ XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ wrote XXX/XXX bytes at offset XXX
+ XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-blkdebug: Resuming request 'A'
+ wrote XXX/XXX bytes at offset XXX
+ XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-blkdebug: Resuming request 'B'
+ wrote XXX/XXX bytes at offset XXX
+ XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ wrote XXX/XXX bytes at offset XXX
+ XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-blkdebug: Resuming request 'B'
+ wrote XXX/XXX bytes at offset XXX
+ XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-blkdebug: Resuming request 'A'
+ wrote XXX/XXX bytes at offset XXX
+ XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ wrote XXX/XXX bytes at offset XXX
+ XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-blkdebug: Resuming request 'A'
+ wrote XXX/XXX bytes at offset XXX
+ XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-blkdebug: Resuming request 'B'
+ wrote XXX/XXX bytes at offset XXX
+ XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ wrote XXX/XXX bytes at offset XXX
+ XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-blkdebug: Resuming request 'B'
+ wrote XXX/XXX bytes at offset XXX
+ XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-blkdebug: Resuming request 'A'
+ wrote XXX/XXX bytes at offset XXX
+ XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ wrote XXX/XXX bytes at offset XXX
+ XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-blkdebug: Resuming request 'A'
+ wrote XXX/XXX bytes at offset XXX
+ XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ wrote XXX/XXX bytes at offset XXX
+ XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-blkdebug: Resuming request 'A'
+-blkdebug: Resuming request 'C'
+ wrote XXX/XXX bytes at offset XXX
+ XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-blkdebug: Resuming request 'B'
+ wrote XXX/XXX bytes at offset XXX
+ XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-blkdebug: Resuming request 'A'
+ wrote XXX/XXX bytes at offset XXX
+ XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ wrote XXX/XXX bytes at offset XXX
 -- 
 2.13.6
