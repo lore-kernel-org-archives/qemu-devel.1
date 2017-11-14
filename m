@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53962)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54027)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eEexH-0006KF-6U
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 12:25:00 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eEexL-0006Oq-OO
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 12:25:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eEexG-0004S6-D6
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 12:24:59 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eEexK-0004V0-CP
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 12:25:03 -0500
 From: Max Reitz <mreitz@redhat.com>
-Date: Tue, 14 Nov 2017 18:24:08 +0100
-Message-Id: <20171114172417.7654-12-mreitz@redhat.com>
+Date: Tue, 14 Nov 2017 18:24:09 +0100
+Message-Id: <20171114172417.7654-13-mreitz@redhat.com>
 In-Reply-To: <20171114172417.7654-1-mreitz@redhat.com>
 References: <20171114172417.7654-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PULL 11/20] iotests: Make 083 less flaky
+Subject: [Qemu-devel] [PULL 12/20] iotests: Make 136 less flaky
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,53 +22,56 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Kevin Wolf <kwolf@redhat.com>
 
-083 has (at least) two issues:
+136 executes some AIO requests without a final aio_flush; then it
+advances the virtual clock and thus expects the last access time of the
+device to be less than the current time when queried (i.e. idle_time_ns
+to be greater than 0).  However, without the aio_flush, some requests
+may be settled after the clock_step invocation.  In that case,
+idle_time_ns would be 0 and the test fails.
 
-1. By launching the nbd-fault-injector in background, it may not be
-   scheduled until the first grep on its output file is executed.
-   However, until then, that file may not have been created yet -- so it
-   either does not exist yet (thus making the grep emit an error), or it
-   does exist but contains stale data (thus making the rest of the test
-   case work connect to a wrong address).
-   Fix this by explicitly overwriting the output file before executing
-   nbd-fault-injector.
-
-2. The nbd-fault-injector prints things other than "Listening on...".
-   It also prints a "Closing connection" message from time to time.  We
-   currently invoke sed on the whole file in the hope of it only
-   containing the "Listening on..." line yet.  That hope is sometimes
-   shattered by the brutal reality of race conditions, so make the sed
-   script more robust.
+Fix this by adding an aio_flush if any AIO request other than some other
+aio_flush has been executed.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
-Message-id: 20171109203025.27493-5-mreitz@redhat.com
 Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Message-id: 20171109203025.27493-6-mreitz@redhat.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/qemu-iotests/083 | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ tests/qemu-iotests/136 | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
 
-diff --git a/tests/qemu-iotests/083 b/tests/qemu-iotests/083
-index 0306f112da..3c1adbf0fb 100755
---- a/tests/qemu-iotests/083
-+++ b/tests/qemu-iotests/083
-@@ -86,6 +86,7 @@ EOF
+diff --git a/tests/qemu-iotests/136 b/tests/qemu-iotests/136
+index 4b994897af..88b97ea7c6 100644
+--- a/tests/qemu-iotests/136
++++ b/tests/qemu-iotests/136
+@@ -238,6 +238,18 @@ sector = "%d"
+         for i in range(failed_wr_ops):
+             ops.append("aio_write %d 512" % bad_offset)
  
- 	rm -f "$TEST_DIR/nbd.sock"
++        # We need an extra aio_flush to settle all outstanding AIO
++        # operations before we can advance the virtual clock, so that
++        # the last access happens before clock_step and idle_time_ns
++        # will be greater than 0
++        extra_flush = 0
++        if rd_ops + wr_ops + invalid_rd_ops + invalid_wr_ops + \
++                failed_rd_ops + failed_wr_ops > 0:
++            extra_flush = 1
++
++        if extra_flush > 0:
++            ops.append("aio_flush")
++
+         if failed_wr_ops > 0:
+             highest_offset = max(highest_offset, bad_offset + 512)
  
-+        echo > "$TEST_DIR/nbd-fault-injector.out"
- 	$PYTHON nbd-fault-injector.py $extra_args "$nbd_addr" "$TEST_DIR/nbd-fault-injector.conf" >"$TEST_DIR/nbd-fault-injector.out" 2>&1 &
- 
- 	# Wait for server to be ready
-@@ -94,7 +95,8 @@ EOF
- 	done
- 
- 	# Extract the final address (port number has now been assigned in tcp case)
--	nbd_addr=$(sed 's/Listening on \(.*\)$/\1/' "$TEST_DIR/nbd-fault-injector.out")
-+        nbd_addr=$(sed -n 's/^Listening on //p' \
-+                       "$TEST_DIR/nbd-fault-injector.out")
- 
- 	if [ "$proto" = "tcp" ]; then
- 		nbd_url="nbd+tcp://$nbd_addr/$export_name"
+@@ -251,7 +263,7 @@ sector = "%d"
+         self.total_wr_bytes += wr_ops * wr_size
+         self.total_wr_ops += wr_ops
+         self.total_wr_merged += wr_merged
+-        self.total_flush_ops += flush_ops
++        self.total_flush_ops += flush_ops + extra_flush
+         self.invalid_rd_ops += invalid_rd_ops
+         self.invalid_wr_ops += invalid_wr_ops
+         self.failed_rd_ops += failed_rd_ops
 -- 
 2.13.6
