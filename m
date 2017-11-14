@@ -1,20 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52392)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53412)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eEcoS-000145-Km
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 10:07:48 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eEcqL-0002iX-7I
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 10:09:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eEcoQ-0000Pv-O5
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 10:07:44 -0500
-References: <20171113150026.4743-1-famz@redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1eEcqF-0002L4-G7
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 10:09:41 -0500
+References: <20171110203111.7666-1-mreitz@redhat.com>
+	<20171110203111.7666-6-mreitz@redhat.com>
+	<w51y3n8zypa.fsf@maestria.local.igalia.com>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <e6dcfec3-310e-bd86-5d43-97da38b23c7c@redhat.com>
-Date: Tue, 14 Nov 2017 16:07:20 +0100
+Message-ID: <6b0680e6-e934-ac2c-659f-8e22ac2c3480@redhat.com>
+Date: Tue, 14 Nov 2017 16:09:16 +0100
 MIME-Version: 1.0
-In-Reply-To: <20171113150026.4743-1-famz@redhat.com>
+In-Reply-To: <w51y3n8zypa.fsf@maestria.local.igalia.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="35LX63kukWEqwHXwQjcQk2hU18FfWrMC2"
-Subject: Re: [Qemu-devel] [PATCH] iotests: 077: Filter out 'resume' lines
+	boundary="SGiQ19PgQXgnScKCxkLASc19qa2lL9adn"
+Subject: Re: [Qemu-devel] [PATCH for-2.11 5/5] qcow2: Refuse to get
+ unaligned offsets from cache
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,85 +26,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+To: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---35LX63kukWEqwHXwQjcQk2hU18FfWrMC2
+--SGiQ19PgQXgnScKCxkLASc19qa2lL9adn
 From: Max Reitz <mreitz@redhat.com>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Message-ID: <e6dcfec3-310e-bd86-5d43-97da38b23c7c@redhat.com>
-Subject: Re: [PATCH] iotests: 077: Filter out 'resume' lines
-References: <20171113150026.4743-1-famz@redhat.com>
-In-Reply-To: <20171113150026.4743-1-famz@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ John Snow <jsnow@redhat.com>
+Message-ID: <6b0680e6-e934-ac2c-659f-8e22ac2c3480@redhat.com>
+Subject: Re: [PATCH for-2.11 5/5] qcow2: Refuse to get unaligned offsets from
+ cache
+References: <20171110203111.7666-1-mreitz@redhat.com>
+ <20171110203111.7666-6-mreitz@redhat.com>
+ <w51y3n8zypa.fsf@maestria.local.igalia.com>
+In-Reply-To: <w51y3n8zypa.fsf@maestria.local.igalia.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 2017-11-13 16:00, Fam Zheng wrote:
-> In the "Overlapping multiple requests" cases, the 3rd reqs (the break
-> point B) doesn't wait for the 2nd, and once resumed the I/O will just
-> continue.  This is because the 2nd is already waiting for the 1st, and
-> in wait_serialising_requests() there is:
+On 2017-11-14 16:06, Alberto Garcia wrote:
+> On Fri 10 Nov 2017 09:31:11 PM CET, Max Reitz wrote:
+>> +static inline const char *qcow2_cache_get_name(BDRVQcow2State *s, Qco=
+w2Cache *c)
+>> +{
+>> +    if (c =3D=3D s->refcount_block_cache) {
+>> +        return "refcount block";
+>> +    } else if (c =3D=3D s->l2_table_cache) {
+>> +        return "L2 table";
+>> +    } else {
+>> +        /* Do not abort, because this is not critical */
+>> +        return "unknown";
+>> +    }
+>> +}
 >=20
->     /* If the request is already (indirectly) waiting for us, or
->      * will wait for us as soon as it wakes up, then just go on
->      * (instead of producing a deadlock in the former case). */
->     if (!req->waiting_for) {
->         /* actually break */
->         ...
->     }
->=20
-> Consequently, the following "sleep 100; resume A" command races with th=
-e
-> completion of that request, and sometimes results in an unexpected
-> order of output:
->=20
->> @@ -56,9 +56,9 @@
->>  wrote XXX/XXX bytes at offset XXX
->>  XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
->>  blkdebug: Resuming request 'B'
->> +blkdebug: Resuming request 'A'
->>  wrote XXX/XXX bytes at offset XXX
->>  XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
->> -blkdebug: Resuming request 'A'
->>  wrote XXX/XXX bytes at offset XXX
->>  XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
->>  wrote XXX/XXX bytes at offset XXX
->=20
-> Filter out the "Resuming request" lines to make the output
-> deterministic.
->=20
-> Reported-by: Patchew <no-reply@patchew.org>
-> Signed-off-by: Fam Zheng <famz@redhat.com>
-> ---
->  tests/qemu-iotests/077     |  3 ++-
->  tests/qemu-iotests/077.out | 48 ++++++++++++++++----------------------=
---------
->  2 files changed, 18 insertions(+), 33 deletions(-)
+> Why is an unknown cache not critical?
 
-Thanks, applied to my block tree:
-
-https://github.com/XanClic/qemu/commits/block
+Because this is debugging information.  I know others disagree with my
+opinion that I'd rather not abort qemu just because someone forgot to
+add a 'return "foo";' here when adding a new cache, but that's my
+opinion so I wanted to at least be told by someone that we should abort
+here before doing it.
 
 Max
 
 
---35LX63kukWEqwHXwQjcQk2hU18FfWrMC2
+--SGiQ19PgQXgnScKCxkLASc19qa2lL9adn
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAloLBqgSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9ASFQH/3fVLYuF/X1G/9Onw/8nXy2vWPGLi2x3
-0bul0fpAn/fD+1fzENKvBV9zgarmOAvYFKaUEAGxINgKgdfg27Yt2+KL9IpgBqbw
-GYGDwt3Pb5vaGRV/uWGlQ8aw1n6jyx8ZrIKe6r5imdYO3xSpIaFkwGRZmGeqXweZ
-Bjz4QrypSe2gRjASKzrPrfraKVEP+ydPo9lQ2GjFSJks4IvhvP9vZOzB0Pwn+xEZ
-hmBzJWsSFIQ0/247CJ4S35jODUnniLquwoPe73FLjgdFYGUN74lNB8quIdGKJRTJ
-IGy80hjPgtKd9D+/hy01ybECTHJkieBfk5XMursAgACwYgO3AoGsOvc=
-=cyHH
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAloLBxwSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9A43oH+wdN4+/QRVZ3fRsnZ5A8JvWcR5ADkzzk
+4XDfuu2+eXItFnZObiq4TEhnRRvzCLHKaRL1eCZPbNujTw0MIJR01KIOBCByZ5zp
+0UhvPF4CIMqUxyeq/5hCGjJKdqbyvKil38IWk943TwKj/UDpzgrLpPlyBmPLzSd4
+Z5316lVUOfFM5F+asN4kXVKAfsyKXbXjxI70VwIx14SyRRgTxPbIo/7gAyRAPD5G
+WL0tcMcAQOz+Ge592ibzN0++x/Cjszsxq3n9N7JUz6JNgMXvA9+xYct2m2qeiaVB
+2KJ1U+bsgZ/kmm1u7+f5i1WKGbwOYuz9x3EGhj/4HIb1BHvB9LWifCI=
+=HGQu
 -----END PGP SIGNATURE-----
 
---35LX63kukWEqwHXwQjcQk2hU18FfWrMC2--
+--SGiQ19PgQXgnScKCxkLASc19qa2lL9adn--
