@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32990)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33706)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eswierk@skyportsystems.com>) id 1eEkYX-0007RV-Ni
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 18:23:51 -0500
+	(envelope-from <eswierk@skyportsystems.com>) id 1eEkaY-0000ap-CH
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 18:25:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eswierk@skyportsystems.com>) id 1eEkYV-0006yG-PC
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 18:23:49 -0500
-Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:51209)
+	(envelope-from <eswierk@skyportsystems.com>) id 1eEkaU-0007yL-5J
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 18:25:54 -0500
+Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:49847)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <eswierk@skyportsystems.com>)
-	id 1eEkYV-0006xv-GP
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 18:23:47 -0500
-Received: by mail-pg0-x241.google.com with SMTP id p9so16545874pgc.8
-	for <qemu-devel@nongnu.org>; Tue, 14 Nov 2017 15:23:47 -0800 (PST)
+	id 1eEkaT-0007xb-VE
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 18:25:50 -0500
+Received: by mail-pg0-x243.google.com with SMTP id 70so4060317pgf.6
+	for <qemu-devel@nongnu.org>; Tue, 14 Nov 2017 15:25:49 -0800 (PST)
 From: Ed Swierk <eswierk@skyportsystems.com>
-Date: Tue, 14 Nov 2017 15:23:34 -0800
-Message-Id: <1510701814-52973-3-git-send-email-eswierk@skyportsystems.com>
-In-Reply-To: <1510701814-52973-1-git-send-email-eswierk@skyportsystems.com>
-References: <1510701814-52973-1-git-send-email-eswierk@skyportsystems.com>
-Subject: [Qemu-devel] [PATCH 2/2] e1000: Separate TSO and non-TSO contexts,
- fixing UDP TX corruption
+Date: Tue, 14 Nov 2017 15:25:38 -0800
+Message-Id: <1510701938-53743-1-git-send-email-eswierk@skyportsystems.com>
+Subject: [Qemu-devel] [PATCH] net: Transmit zero UDP checksum as 0xFFFF
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,207 +27,106 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Jason Wang <jasowang@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>
 Cc: qemu-devel@nongnu.org, Ed Swierk <eswierk@skyportsystems.com>
 
-The device is supposed to maintain two distinct contexts for transmit
-offloads: one has parameters for both segmentation and checksum
-offload, the other only for checksum offload. The guest driver can
-send two context descriptors, one for each context (the TSE flag
-specifies which). Then the guest can refer to one or the other context
-in subsequent transmit data descriptors, depending on what offloads it
-wants applied to each packet.
+The checksum algorithm used by IPv4, TCP and UDP allows a zero value
+to be represented by either 0x0000 and 0xFFFF. But per RFC 768, a zero
+UDP checksum must be transmitted as 0xFFFF, as 0x0000 is a special
+value meaning no checksum.
 
-Currently the e1000 device stores just one context, and misinterprets
-the TSE flags in the context and data descriptors. This is often okay:
-Linux happens to send a fresh context descriptor before every data
-descriptor, so forgetting the other context doesn't matter. Windows
-does rely on separate contexts for TSO vs. non-TSO packets, but for
-mostly-TCP traffic the two contexts have identical TCP-specific
-offload parameters so confusing them doesn't matter.
+Substitute 0xFFFF whenever a checksum is computed as zero on a UDP
+datagram. Doing this on IPv4 packets and TCP segments is unnecessary
+but legal.
 
-One case where this confusion matters is when a Windows guest sets up
-a TSO context for TCP and a non-TSO context for UDP, and then
-transmits both TCP and UDP traffic in parallel. The e1000 device
-sometimes ends up using TCP-specific parameters while doing checksum
-offload on a UDP datagram: it writes the checksum to offset 16 (the
-correct location for a TCP checksum), stomping on two bytes of UDP
-data, and leaving the wrong value in the actual UDP checksum field at
-offset 6. (Even worse, the host network stack may then recompute the
-UDP checksum, "correcting" it to match the corrupt data before sending
-it out a physical interface.)
-
-Correct this by tracking the TSO context independently of the non-TSO
-context, and selecting the appropriate context based on the TSE flag
-in each transmit data descriptor.
+(While it is tempting to make the substitution in
+net_checksum_finish(), that function is also used by receivers to
+verify checksums, and in that case the expected value is always
+0x0000.)
 
 Signed-off-by: Ed Swierk <eswierk@skyportsystems.com>
 ---
- hw/net/e1000.c | 70 +++++++++++++++++++++++++++++++++-------------------------
- 1 file changed, 40 insertions(+), 30 deletions(-)
+ hw/net/e1000.c      | 5 +++--
+ hw/net/net_rx_pkt.c | 3 +++
+ hw/net/net_tx_pkt.c | 6 ++++++
+ hw/net/vmxnet3.c    | 7 +++++--
+ 4 files changed, 17 insertions(+), 4 deletions(-)
 
 diff --git a/hw/net/e1000.c b/hw/net/e1000.c
-index 471cdd9..d642314 100644
+index d642314..97242a1 100644
 --- a/hw/net/e1000.c
 +++ b/hw/net/e1000.c
-@@ -101,6 +101,7 @@ typedef struct E1000State_st {
-         unsigned char sum_needed;
-         bool cptse;
-         e1000x_txd_props props;
-+        e1000x_txd_props tso_props;
-         uint16_t tso_frames;
-     } tx;
- 
-@@ -541,35 +542,37 @@ xmit_seg(E1000State *s)
-     uint16_t len;
-     unsigned int frames = s->tx.tso_frames, css, sofar;
-     struct e1000_tx *tp = &s->tx;
-+    struct e1000x_txd_props *props = tp->cptse ? &tp->tso_props : &tp->props;
- 
--    if (tp->props.tse && tp->cptse) {
--        css = tp->props.ipcss;
-+    if (tp->cptse) {
-+        css = props->ipcss;
-         DBGOUT(TXSUM, "frames %d size %d ipcss %d\n",
-                frames, tp->size, css);
--        if (tp->props.ip) {    /* IPv4 */
-+        if (props->ip) {    /* IPv4 */
-             stw_be_p(tp->data+css+2, tp->size - css);
-             stw_be_p(tp->data+css+4,
-                      lduw_be_p(tp->data + css + 4) + frames);
-         } else {         /* IPv6 */
-             stw_be_p(tp->data+css+4, tp->size - css);
-         }
--        css = tp->props.tucss;
-+        css = props->tucss;
-         len = tp->size - css;
--        DBGOUT(TXSUM, "tcp %d tucss %d len %d\n", tp->props.tcp, css, len);
--        if (tp->props.tcp) {
--            sofar = frames * tp->props.mss;
-+        DBGOUT(TXSUM, "tcp %d tucss %d len %d\n", props->tcp, css, len);
-+        if (props->tcp) {
-+            sofar = frames * props->mss;
-             stl_be_p(tp->data+css+4, ldl_be_p(tp->data+css+4)+sofar); /* seq */
--            if (tp->props.paylen - sofar > tp->props.mss) {
-+            if (props->paylen - sofar > props->mss) {
-                 tp->data[css + 13] &= ~9;    /* PSH, FIN */
-             } else if (frames) {
-                 e1000x_inc_reg_if_not_full(s->mac_reg, TSCTC);
-             }
--        } else    /* UDP */
-+        } else {    /* UDP */
-             stw_be_p(tp->data+css+4, len);
-+        }
-         if (tp->sum_needed & E1000_TXD_POPTS_TXSM) {
-             unsigned int phsum;
-             // add pseudo-header length before checksum calculation
--            void *sp = tp->data + tp->props.tucso;
-+            void *sp = tp->data + props->tucso;
- 
-             phsum = lduw_be_p(sp) + len;
-             phsum = (phsum >> 16) + (phsum & 0xffff);
-@@ -579,12 +582,10 @@ xmit_seg(E1000State *s)
+@@ -505,8 +505,9 @@ putsum(uint8_t *data, uint32_t n, uint32_t sloc, uint32_t css, uint32_t cse)
+     if (cse && cse < n)
+         n = cse + 1;
+     if (sloc < n-1) {
+-        sum = net_checksum_add(n-css, data+css);
+-        stw_be_p(data + sloc, net_checksum_finish(sum));
++        sum = net_raw_checksum(data + css, n - css);
++        /* For UDP, zero checksum must be sent as 0xFFFF */
++        stw_be_p(data + sloc, sum ? sum : 0xffff);
      }
+ }
  
-     if (tp->sum_needed & E1000_TXD_POPTS_TXSM) {
--        putsum(tp->data, tp->size, tp->props.tucso,
--               tp->props.tucss, tp->props.tucse);
-+        putsum(tp->data, tp->size, props->tucso, props->tucss, props->tucse);
-     }
-     if (tp->sum_needed & E1000_TXD_POPTS_IXSM) {
--        putsum(tp->data, tp->size, tp->props.ipcso,
--               tp->props.ipcss, tp->props.ipcse);
-+        putsum(tp->data, tp->size, props->ipcso, props->ipcss, props->ipcse);
-     }
-     if (tp->vlan_needed) {
-         memmove(tp->vlan, tp->data, 4);
-@@ -616,11 +617,11 @@ process_tx_desc(E1000State *s, struct e1000_tx_desc *dp)
+diff --git a/hw/net/net_rx_pkt.c b/hw/net/net_rx_pkt.c
+index 1019b50..e820132 100644
+--- a/hw/net/net_rx_pkt.c
++++ b/hw/net/net_rx_pkt.c
+@@ -588,6 +588,9 @@ bool net_rx_pkt_fix_l4_csum(struct NetRxPkt *pkt)
  
-     s->mit_ide |= (txd_lower & E1000_TXD_CMD_IDE);
-     if (dtype == E1000_TXD_CMD_DEXT) {    /* context descriptor */
--        e1000x_read_tx_ctx_descr(xp, &tp->props);
--        tp->tso_frames = 0;
--        if (tp->props.tucso == 0) {    /* this is probably wrong */
--            DBGOUT(TXSUM, "TCP/UDP: cso 0!\n");
--            tp->props.tucso = tp->props.tucss + (tp->props.tcp ? 16 : 6);
-+        if (le32_to_cpu(xp->cmd_and_length) & E1000_TXD_CMD_TSE) {
-+            e1000x_read_tx_ctx_descr(xp, &tp->tso_props);
-+            tp->tso_frames = 0;
-+        } else {
-+            e1000x_read_tx_ctx_descr(xp, &tp->props);
-         }
+     /* Calculate L4 checksum */
+     csum = cpu_to_be16(_net_rx_pkt_calc_l4_csum(pkt));
++    if (!csum) {
++        csum = 0xFFFF; /* For UDP, zero checksum must be sent as 0xFFFF */
++    }
+ 
+     /* Set calculated checksum to checksum word */
+     iov_from_buf(pkt->vec, pkt->vec_len,
+diff --git a/hw/net/net_tx_pkt.c b/hw/net/net_tx_pkt.c
+index 20b2549..21194e7 100644
+--- a/hw/net/net_tx_pkt.c
++++ b/hw/net/net_tx_pkt.c
+@@ -136,6 +136,9 @@ void net_tx_pkt_update_ip_checksums(struct NetTxPkt *pkt)
          return;
-     } else if (dtype == (E1000_TXD_CMD_DEXT | E1000_TXD_DTYP_D)) {
-@@ -645,8 +646,8 @@ process_tx_desc(E1000State *s, struct e1000_tx_desc *dp)
      }
  
-     addr = le64_to_cpu(dp->buffer_addr);
--    if (tp->props.tse && tp->cptse) {
--        msh = tp->props.hdr_len + tp->props.mss;
-+    if (tp->cptse) {
-+        msh = tp->tso_props.hdr_len + tp->tso_props.mss;
-         do {
-             bytes = split_size;
-             if (tp->size + bytes > msh)
-@@ -655,21 +656,19 @@ process_tx_desc(E1000State *s, struct e1000_tx_desc *dp)
-             bytes = MIN(sizeof(tp->data) - tp->size, bytes);
-             pci_dma_read(d, addr, tp->data + tp->size, bytes);
-             sz = tp->size + bytes;
--            if (sz >= tp->props.hdr_len && tp->size < tp->props.hdr_len) {
--                memmove(tp->header, tp->data, tp->props.hdr_len);
-+            if (sz >= tp->tso_props.hdr_len
-+                && tp->size < tp->tso_props.hdr_len) {
-+                memmove(tp->header, tp->data, tp->tso_props.hdr_len);
-             }
-             tp->size = sz;
-             addr += bytes;
-             if (sz == msh) {
-                 xmit_seg(s);
--                memmove(tp->data, tp->header, tp->props.hdr_len);
--                tp->size = tp->props.hdr_len;
-+                memmove(tp->data, tp->header, tp->tso_props.hdr_len);
-+                tp->size = tp->tso_props.hdr_len;
-             }
-             split_size -= bytes;
-         } while (bytes && split_size);
--    } else if (!tp->props.tse && tp->cptse) {
--        // context descriptor TSE is not set, while data descriptor TSE is set
--        DBGOUT(TXERR, "TCP segmentation error\n");
-     } else {
-         split_size = MIN(sizeof(tp->data) - tp->size, split_size);
-         pci_dma_read(d, addr, tp->data + tp->size, split_size);
-@@ -678,7 +677,7 @@ process_tx_desc(E1000State *s, struct e1000_tx_desc *dp)
++    if (!csum) {
++        csum = 0xFFFF; /* For UDP, zero checksum must be sent as 0xFFFF */
++    }
+     iov_from_buf(&pkt->vec[NET_TX_PKT_PL_START_FRAG], pkt->payload_frags,
+                  pkt->virt_hdr.csum_offset, &csum, sizeof(csum));
+ }
+@@ -487,6 +490,9 @@ static void net_tx_pkt_do_sw_csum(struct NetTxPkt *pkt)
  
-     if (!(txd_lower & E1000_TXD_CMD_EOP))
+     /* Put the checksum obtained into the packet */
+     csum = cpu_to_be16(net_checksum_finish(csum_cntr));
++    if (!csum) {
++        csum = 0xFFFF; /* For UDP, zero checksum must be sent as 0xFFFF */
++    }
+     iov_from_buf(iov, iov_len, csum_offset, &csum, sizeof csum);
+ }
+ 
+diff --git a/hw/net/vmxnet3.c b/hw/net/vmxnet3.c
+index 90f6943..de9c40e 100644
+--- a/hw/net/vmxnet3.c
++++ b/hw/net/vmxnet3.c
+@@ -942,6 +942,7 @@ static void vmxnet3_rx_need_csum_calculate(struct NetRxPkt *pkt,
+     bool isip4, isip6, istcp, isudp;
+     uint8_t *data;
+     int len;
++    uint16_t sum;
+ 
+     if (!net_rx_pkt_has_virt_hdr(pkt)) {
          return;
--    if (!(tp->props.tse && tp->cptse && tp->size < tp->props.hdr_len)) {
-+    if (!(tp->cptse && tp->size < tp->tso_props.hdr_len)) {
-         xmit_seg(s);
-     }
-     tp->tso_frames = 0;
-@@ -1435,7 +1434,7 @@ static const VMStateDescription vmstate_e1000_full_mac_state = {
+@@ -969,8 +970,10 @@ static void vmxnet3_rx_need_csum_calculate(struct NetRxPkt *pkt,
  
- static const VMStateDescription vmstate_e1000 = {
-     .name = "e1000",
--    .version_id = 2,
-+    .version_id = 3,
-     .minimum_version_id = 1,
-     .pre_save = e1000_pre_save,
-     .post_load = e1000_post_load,
-@@ -1508,6 +1507,17 @@ static const VMStateDescription vmstate_e1000 = {
-         VMSTATE_UINT32_SUB_ARRAY(mac_reg, E1000State, RA, 32),
-         VMSTATE_UINT32_SUB_ARRAY(mac_reg, E1000State, MTA, 128),
-         VMSTATE_UINT32_SUB_ARRAY(mac_reg, E1000State, VFTA, 128),
-+        VMSTATE_UINT8_V(tx.tso_props.ipcss, E1000State, 3),
-+        VMSTATE_UINT8_V(tx.tso_props.ipcso, E1000State, 3),
-+        VMSTATE_UINT16_V(tx.tso_props.ipcse, E1000State, 3),
-+        VMSTATE_UINT8_V(tx.tso_props.tucss, E1000State, 3),
-+        VMSTATE_UINT8_V(tx.tso_props.tucso, E1000State, 3),
-+        VMSTATE_UINT16_V(tx.tso_props.tucse, E1000State, 3),
-+        VMSTATE_UINT32_V(tx.tso_props.paylen, E1000State, 3),
-+        VMSTATE_UINT8_V(tx.tso_props.hdr_len, E1000State, 3),
-+        VMSTATE_UINT16_V(tx.tso_props.mss, E1000State, 3),
-+        VMSTATE_INT8_V(tx.tso_props.ip, E1000State, 3),
-+        VMSTATE_INT8_V(tx.tso_props.tcp, E1000State, 3),
-         VMSTATE_END_OF_LIST()
-     },
-     .subsections = (const VMStateDescription*[]) {
+     data = (uint8_t *)pkt_data + vhdr->csum_start;
+     len = pkt_len - vhdr->csum_start;
+-    /* Put the checksum obtained into the packet */
+-    stw_be_p(data + vhdr->csum_offset, net_raw_checksum(data, len));
++    sum = net_raw_checksum(data, len);
++    /* Put the checksum obtained into the packet; for UDP, zero checksum */
++    /* must be sent as 0xFFFF */
++    stw_be_p(data + vhdr->csum_offset, sum ? sum : 0xFFFF);
+ 
+     vhdr->flags &= ~VIRTIO_NET_HDR_F_NEEDS_CSUM;
+     vhdr->flags |= VIRTIO_NET_HDR_F_DATA_VALID;
 -- 
 1.9.1
