@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32991)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32990)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eswierk@skyportsystems.com>) id 1eEkYX-0007RW-Nk
+	(envelope-from <eswierk@skyportsystems.com>) id 1eEkYX-0007RV-Ni
 	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 18:23:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eswierk@skyportsystems.com>) id 1eEkYT-0006xX-Nw
+	(envelope-from <eswierk@skyportsystems.com>) id 1eEkYV-0006yG-PC
 	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 18:23:49 -0500
-Received: from mail-pf0-x229.google.com ([2607:f8b0:400e:c00::229]:47663)
+Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:51209)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <eswierk@skyportsystems.com>)
-	id 1eEkYT-0006xK-F7
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 18:23:45 -0500
-Received: by mail-pf0-x229.google.com with SMTP id t69so6595544pfg.4
-	for <qemu-devel@nongnu.org>; Tue, 14 Nov 2017 15:23:45 -0800 (PST)
+	id 1eEkYV-0006xv-GP
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 18:23:47 -0500
+Received: by mail-pg0-x241.google.com with SMTP id p9so16545874pgc.8
+	for <qemu-devel@nongnu.org>; Tue, 14 Nov 2017 15:23:47 -0800 (PST)
 From: Ed Swierk <eswierk@skyportsystems.com>
-Date: Tue, 14 Nov 2017 15:23:32 -0800
-Message-Id: <1510701814-52973-1-git-send-email-eswierk@skyportsystems.com>
-Subject: [Qemu-devel] [PATCH 0/2] e1000: Correct TX offload context handling
+Date: Tue, 14 Nov 2017 15:23:34 -0800
+Message-Id: <1510701814-52973-3-git-send-email-eswierk@skyportsystems.com>
+In-Reply-To: <1510701814-52973-1-git-send-email-eswierk@skyportsystems.com>
+References: <1510701814-52973-1-git-send-email-eswierk@skyportsystems.com>
+Subject: [Qemu-devel] [PATCH 2/2] e1000: Separate TSO and non-TSO contexts,
+ fixing UDP TX corruption
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,142 +30,207 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Jason Wang <jasowang@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>
 Cc: qemu-devel@nongnu.org, Ed Swierk <eswierk@skyportsystems.com>
 
-The transmit offload implementation in QEMU's e1000 device is
-deficient and causes packet data corruption in some situations.
+The device is supposed to maintain two distinct contexts for transmit
+offloads: one has parameters for both segmentation and checksum
+offload, the other only for checksum offload. The guest driver can
+send two context descriptors, one for each context (the TSE flag
+specifies which). Then the guest can refer to one or the other context
+in subsequent transmit data descriptors, depending on what offloads it
+wants applied to each packet.
 
-According to the Intel 8254x software developer's manual[1], the
-device maintains two separate contexts: the TCP segmentation offload
-context includes parameters for both segmentation offload and checksum
-offload, and the normal (checksum-offload-only) context includes only
-checksum offload parameters. These parameters specify over which
-packet data to compute the checksum, and where in the packet to store
-the computed checksum(s).
+Currently the e1000 device stores just one context, and misinterprets
+the TSE flags in the context and data descriptors. This is often okay:
+Linux happens to send a fresh context descriptor before every data
+descriptor, so forgetting the other context doesn't matter. Windows
+does rely on separate contexts for TSO vs. non-TSO packets, but for
+mostly-TCP traffic the two contexts have identical TCP-specific
+offload parameters so confusing them doesn't matter.
 
-[1] https://www.intel.com/content/dam/doc/manual/pci-pci-x-family-gbe-controllers-software-dev-manual.pdf
+One case where this confusion matters is when a Windows guest sets up
+a TSO context for TCP and a non-TSO context for UDP, and then
+transmits both TCP and UDP traffic in parallel. The e1000 device
+sometimes ends up using TCP-specific parameters while doing checksum
+offload on a UDP datagram: it writes the checksum to offset 16 (the
+correct location for a TCP checksum), stomping on two bytes of UDP
+data, and leaving the wrong value in the actual UDP checksum field at
+offset 6. (Even worse, the host network stack may then recompute the
+UDP checksum, "correcting" it to match the corrupt data before sending
+it out a physical interface.)
 
-The e1000 driver can update either of these contexts by sending a
-transmit context descriptor. The TSE bit in the TUCMD field controls
-which context is modified by the descriptor. Crucially, a transmit
-context descriptor with TSE=1 changes only the TSO context, leaving
-the non-TSO context unchanged; with TSE=0 the opposite is true.
+Correct this by tracking the TSO context independently of the non-TSO
+context, and selecting the appropriate context based on the TSE flag
+in each transmit data descriptor.
 
-Fields in the transmit data descriptor determine which (if either) of
-these two contexts the device uses when actually transmitting some
-data:
+Signed-off-by: Ed Swierk <eswierk@skyportsystems.com>
+---
+ hw/net/e1000.c | 70 +++++++++++++++++++++++++++++++++-------------------------
+ 1 file changed, 40 insertions(+), 30 deletions(-)
 
-- If the TSE bit in the DCMD field is set, then the device performs
-  TCP segmentation offload using the parameters previously set in the
-  TSO context. In addition, if TXSM and/or IXSM is set in the POPTS
-  field, the device performs the appropriate checksum offloads using
-  the parameters in the same (TSO) context.
-
-- Otherwise, if the TSE bit in the DCMD field is clear, then there is
-  no TCP segmentation offload. If TXSM and/or IXSM is set in the POPTS
-  field, the device performs the appropriate checksum offloads using
-  the parameters in the non-TSO context.
-
-The e1000 driver is free to set up the TSO and non-TSO contexts and
-then transmit a mixture of data, with each data descriptor using a
-different (or neither) context. This is what the e1000 driver for
-Windows (Intel(R) PRO/1000 MT Network Connection, aka E1G6023E.sys)
-does in certain cases. Sometimes with quite undesirable results, since
-the QEMU e1000 device doesn't work as described above.
-
-Instead, the QEMU e1000 device maintains only one context in its state
-structure. When it receives a transmit context descriptor from the
-driver, it overwrites the context parameters regardless of the TSE bit
-in the TUCMD field.
-
-To see why this is wrong, suppose the driver first sets up a non-TSO
-context with UDP checksum offload parameters (say, TUCSO pointing to
-the appropriate offset for a UDP checksum, 6 bytes into the header),
-and then sets up a TSO context with TCP checksum offload parameters
-(TUCSO pointing to the appropriate offset for a TCP checksum, 16 bytes
-into the header). The driver then sends a transmit data descriptor
-with TSO=0 and TXSM=1 along with a UDP datagram. The QEMU e1000 device
-computes the checksum using the last set of checksum offload
-parameters, and writes the checksum to offset 16, stomping on two
-bytes of UDP data, and leaving the wrong checksum in the UDP checksum
-field.
-
-To make matters worse, if the network stack on the host running QEMU
-treats data transmitted from a VM as locally originated, it may do its
-own UDP checksum computation, "correcting" it to match the corrupt
-data before sending it on the wire. Now the corrupt UDP packet makes
-its way all the way to the peer application.
-
-I have reproduced this behavior with a Windows 10 guest, rather easily
-with a TCP iperf and a UDP iperf running in parallel. With the
-patchlet below, you'll see an error message whenever the bug is
-triggered.
-
-
- --- a/hw/net/e1000.c
- +++ b/hw/net/e1000.c
- @@ -534,6 +534,30 @@ e1000_send_packet(E1000State *s, const uint8_t *buf, int size)
-  }
-  
-  static void
- +debug_csum(struct e1000_tx *tp, uint16_t oldsum)
- +{
- +    e1000x_txd_props *props = &tp->props;
- +    uint8_t proto = tp->data[14 + 9];
- +    uint32_t sumoff = props->tucso - props->tucss;
- +
- +    if ((proto == 17 && sumoff != 6) ||
- +        (proto == 6 && sumoff != 16)) {
- +        DBGOUT(TXERR, "txsum bug! ver %d src %08x dst %08x len %d proto %d "
- +               "cptse %d sum_needed %x oldsum %x newsum %x realsum %x\n",
- +               tp->data[14] >> 4,
- +               ldl_be_p(tp->data + 14 + 12),
- +               ldl_be_p(tp->data + 14 + 16),
- +               lduw_be_p(tp->data + 14 + 2),
- +               proto,
- +               props->cptse,
- +               props->sum_needed,
- +               oldsum,
- +               lduw_be_p(tp->data + props->tucso),
- +               lduw_be_p(tp->data + props->tucss + (proto == 6 ? 16 : 6)));
- +    }
- +}
- +
- +static void
-  xmit_seg(E1000State *s)
-  {
-      uint16_t len;
- @@ -577,8 +601,10 @@ xmit_seg(E1000State *s)
-      }
-  
-      if (tp->props.sum_needed & E1000_TXD_POPTS_TXSM) {
- +        uint16_t oldsum = lduw_be_p(tp->data + tp->props.tucso);
-          putsum(tp->data, tp->size, tp->props.tucso,
-                 tp->props.tucss, tp->props.tucse);
- +        debug_csum(tp, oldsum); /* FIXME: remove */
-      }
-      if (tp->props.sum_needed & E1000_TXD_POPTS_IXSM) {
-          putsum(tp->data, tp->size, tp->props.ipcso,
-
-
-This patch series first moves per-TX packet flags out of the context
-struct, which is used by both e1000 and e1000e. ("Used" is generous,
-as e1000e ignores most of the context parameters supplied by the guest
-and does its own thing, which is only sometimes correct. Taming e1000e
-is a project for another day. The change to e1000e here is a baby step
-in that direction.)
-
-Then we separate the e1000 TSO and non-TSO contexts, which fixes the
-UDP TX corruption bug.
-
-Ed Swierk (2):
-  e1000, e1000e: Move per-packet TX offload flags out of context state
-  e1000: Separate TSO and non-TSO contexts, fixing UDP TX corruption
-
- hw/net/e1000.c         | 92 ++++++++++++++++++++++++++++----------------------
- hw/net/e1000e.c        |  4 +--
- hw/net/e1000e_core.c   | 16 ++++-----
- hw/net/e1000e_core.h   |  2 ++
- hw/net/e1000x_common.h |  2 --
- 5 files changed, 64 insertions(+), 52 deletions(-)
-
+diff --git a/hw/net/e1000.c b/hw/net/e1000.c
+index 471cdd9..d642314 100644
+--- a/hw/net/e1000.c
++++ b/hw/net/e1000.c
+@@ -101,6 +101,7 @@ typedef struct E1000State_st {
+         unsigned char sum_needed;
+         bool cptse;
+         e1000x_txd_props props;
++        e1000x_txd_props tso_props;
+         uint16_t tso_frames;
+     } tx;
+ 
+@@ -541,35 +542,37 @@ xmit_seg(E1000State *s)
+     uint16_t len;
+     unsigned int frames = s->tx.tso_frames, css, sofar;
+     struct e1000_tx *tp = &s->tx;
++    struct e1000x_txd_props *props = tp->cptse ? &tp->tso_props : &tp->props;
+ 
+-    if (tp->props.tse && tp->cptse) {
+-        css = tp->props.ipcss;
++    if (tp->cptse) {
++        css = props->ipcss;
+         DBGOUT(TXSUM, "frames %d size %d ipcss %d\n",
+                frames, tp->size, css);
+-        if (tp->props.ip) {    /* IPv4 */
++        if (props->ip) {    /* IPv4 */
+             stw_be_p(tp->data+css+2, tp->size - css);
+             stw_be_p(tp->data+css+4,
+                      lduw_be_p(tp->data + css + 4) + frames);
+         } else {         /* IPv6 */
+             stw_be_p(tp->data+css+4, tp->size - css);
+         }
+-        css = tp->props.tucss;
++        css = props->tucss;
+         len = tp->size - css;
+-        DBGOUT(TXSUM, "tcp %d tucss %d len %d\n", tp->props.tcp, css, len);
+-        if (tp->props.tcp) {
+-            sofar = frames * tp->props.mss;
++        DBGOUT(TXSUM, "tcp %d tucss %d len %d\n", props->tcp, css, len);
++        if (props->tcp) {
++            sofar = frames * props->mss;
+             stl_be_p(tp->data+css+4, ldl_be_p(tp->data+css+4)+sofar); /* seq */
+-            if (tp->props.paylen - sofar > tp->props.mss) {
++            if (props->paylen - sofar > props->mss) {
+                 tp->data[css + 13] &= ~9;    /* PSH, FIN */
+             } else if (frames) {
+                 e1000x_inc_reg_if_not_full(s->mac_reg, TSCTC);
+             }
+-        } else    /* UDP */
++        } else {    /* UDP */
+             stw_be_p(tp->data+css+4, len);
++        }
+         if (tp->sum_needed & E1000_TXD_POPTS_TXSM) {
+             unsigned int phsum;
+             // add pseudo-header length before checksum calculation
+-            void *sp = tp->data + tp->props.tucso;
++            void *sp = tp->data + props->tucso;
+ 
+             phsum = lduw_be_p(sp) + len;
+             phsum = (phsum >> 16) + (phsum & 0xffff);
+@@ -579,12 +582,10 @@ xmit_seg(E1000State *s)
+     }
+ 
+     if (tp->sum_needed & E1000_TXD_POPTS_TXSM) {
+-        putsum(tp->data, tp->size, tp->props.tucso,
+-               tp->props.tucss, tp->props.tucse);
++        putsum(tp->data, tp->size, props->tucso, props->tucss, props->tucse);
+     }
+     if (tp->sum_needed & E1000_TXD_POPTS_IXSM) {
+-        putsum(tp->data, tp->size, tp->props.ipcso,
+-               tp->props.ipcss, tp->props.ipcse);
++        putsum(tp->data, tp->size, props->ipcso, props->ipcss, props->ipcse);
+     }
+     if (tp->vlan_needed) {
+         memmove(tp->vlan, tp->data, 4);
+@@ -616,11 +617,11 @@ process_tx_desc(E1000State *s, struct e1000_tx_desc *dp)
+ 
+     s->mit_ide |= (txd_lower & E1000_TXD_CMD_IDE);
+     if (dtype == E1000_TXD_CMD_DEXT) {    /* context descriptor */
+-        e1000x_read_tx_ctx_descr(xp, &tp->props);
+-        tp->tso_frames = 0;
+-        if (tp->props.tucso == 0) {    /* this is probably wrong */
+-            DBGOUT(TXSUM, "TCP/UDP: cso 0!\n");
+-            tp->props.tucso = tp->props.tucss + (tp->props.tcp ? 16 : 6);
++        if (le32_to_cpu(xp->cmd_and_length) & E1000_TXD_CMD_TSE) {
++            e1000x_read_tx_ctx_descr(xp, &tp->tso_props);
++            tp->tso_frames = 0;
++        } else {
++            e1000x_read_tx_ctx_descr(xp, &tp->props);
+         }
+         return;
+     } else if (dtype == (E1000_TXD_CMD_DEXT | E1000_TXD_DTYP_D)) {
+@@ -645,8 +646,8 @@ process_tx_desc(E1000State *s, struct e1000_tx_desc *dp)
+     }
+ 
+     addr = le64_to_cpu(dp->buffer_addr);
+-    if (tp->props.tse && tp->cptse) {
+-        msh = tp->props.hdr_len + tp->props.mss;
++    if (tp->cptse) {
++        msh = tp->tso_props.hdr_len + tp->tso_props.mss;
+         do {
+             bytes = split_size;
+             if (tp->size + bytes > msh)
+@@ -655,21 +656,19 @@ process_tx_desc(E1000State *s, struct e1000_tx_desc *dp)
+             bytes = MIN(sizeof(tp->data) - tp->size, bytes);
+             pci_dma_read(d, addr, tp->data + tp->size, bytes);
+             sz = tp->size + bytes;
+-            if (sz >= tp->props.hdr_len && tp->size < tp->props.hdr_len) {
+-                memmove(tp->header, tp->data, tp->props.hdr_len);
++            if (sz >= tp->tso_props.hdr_len
++                && tp->size < tp->tso_props.hdr_len) {
++                memmove(tp->header, tp->data, tp->tso_props.hdr_len);
+             }
+             tp->size = sz;
+             addr += bytes;
+             if (sz == msh) {
+                 xmit_seg(s);
+-                memmove(tp->data, tp->header, tp->props.hdr_len);
+-                tp->size = tp->props.hdr_len;
++                memmove(tp->data, tp->header, tp->tso_props.hdr_len);
++                tp->size = tp->tso_props.hdr_len;
+             }
+             split_size -= bytes;
+         } while (bytes && split_size);
+-    } else if (!tp->props.tse && tp->cptse) {
+-        // context descriptor TSE is not set, while data descriptor TSE is set
+-        DBGOUT(TXERR, "TCP segmentation error\n");
+     } else {
+         split_size = MIN(sizeof(tp->data) - tp->size, split_size);
+         pci_dma_read(d, addr, tp->data + tp->size, split_size);
+@@ -678,7 +677,7 @@ process_tx_desc(E1000State *s, struct e1000_tx_desc *dp)
+ 
+     if (!(txd_lower & E1000_TXD_CMD_EOP))
+         return;
+-    if (!(tp->props.tse && tp->cptse && tp->size < tp->props.hdr_len)) {
++    if (!(tp->cptse && tp->size < tp->tso_props.hdr_len)) {
+         xmit_seg(s);
+     }
+     tp->tso_frames = 0;
+@@ -1435,7 +1434,7 @@ static const VMStateDescription vmstate_e1000_full_mac_state = {
+ 
+ static const VMStateDescription vmstate_e1000 = {
+     .name = "e1000",
+-    .version_id = 2,
++    .version_id = 3,
+     .minimum_version_id = 1,
+     .pre_save = e1000_pre_save,
+     .post_load = e1000_post_load,
+@@ -1508,6 +1507,17 @@ static const VMStateDescription vmstate_e1000 = {
+         VMSTATE_UINT32_SUB_ARRAY(mac_reg, E1000State, RA, 32),
+         VMSTATE_UINT32_SUB_ARRAY(mac_reg, E1000State, MTA, 128),
+         VMSTATE_UINT32_SUB_ARRAY(mac_reg, E1000State, VFTA, 128),
++        VMSTATE_UINT8_V(tx.tso_props.ipcss, E1000State, 3),
++        VMSTATE_UINT8_V(tx.tso_props.ipcso, E1000State, 3),
++        VMSTATE_UINT16_V(tx.tso_props.ipcse, E1000State, 3),
++        VMSTATE_UINT8_V(tx.tso_props.tucss, E1000State, 3),
++        VMSTATE_UINT8_V(tx.tso_props.tucso, E1000State, 3),
++        VMSTATE_UINT16_V(tx.tso_props.tucse, E1000State, 3),
++        VMSTATE_UINT32_V(tx.tso_props.paylen, E1000State, 3),
++        VMSTATE_UINT8_V(tx.tso_props.hdr_len, E1000State, 3),
++        VMSTATE_UINT16_V(tx.tso_props.mss, E1000State, 3),
++        VMSTATE_INT8_V(tx.tso_props.ip, E1000State, 3),
++        VMSTATE_INT8_V(tx.tso_props.tcp, E1000State, 3),
+         VMSTATE_END_OF_LIST()
+     },
+     .subsections = (const VMStateDescription*[]) {
 -- 
 1.9.1
