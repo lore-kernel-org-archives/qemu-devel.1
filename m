@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39339)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40896)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eETHH-0003ow-MB
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 23:56:52 -0500
+	(envelope-from <jcody@redhat.com>) id 1eETKv-00052C-Fa
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 00:00:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eETHD-0002Bi-GS
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 23:56:51 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44102)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eETHD-0002Au-7j
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 23:56:47 -0500
-Date: Tue, 14 Nov 2017 12:56:42 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20171114045642.GB6821@xz-mi>
-References: <20171113183517.890-1-danielhb@linux.vnet.ibm.com>
-	<20171113183517.890-2-danielhb@linux.vnet.ibm.com>
+	(envelope-from <jcody@redhat.com>) id 1eETKu-00050N-MG
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 00:00:37 -0500
+Date: Tue, 14 Nov 2017 00:00:06 -0500
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20171114050006.GD5399@localhost.localdomain>
+References: <20171012135313.227864-1-vsementsov@virtuozzo.com>
+	<d3b891f0-f9bd-5ced-5890-7e2f70ed1437@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20171113183517.890-2-danielhb@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v2 1/1] migration/ram.c: do not set
- 'postcopy_running' in POSTCOPY_INCOMING_END
+In-Reply-To: <d3b891f0-f9bd-5ced-5890-7e2f70ed1437@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 0/5] backup improvements part 1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,114 +23,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, dgilbert@redhat.com, quintela@redhat.com
+To: John Snow <jsnow@redhat.com>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, famz@redhat.com, kwolf@redhat.com, mreitz@redhat.com, stefanha@redhat.com, den@openvz.org
 
-On Mon, Nov 13, 2017 at 04:35:17PM -0200, Daniel Henrique Barboza wrote:
-> When migrating a VM with 'migrate_set_capability postcopy-ram on'
-> a postcopy_state is set during the process, ending up with the
-> state POSTCOPY_INCOMING_END when the migration is over. This
-> postcopy_state is taken into account inside ram_load to check
-> how it will load the memory pages. This same ram_load is called when
-> in a loadvm command.
+On Mon, Nov 13, 2017 at 05:41:13PM -0500, John Snow wrote:
+> Jeff, I think this ought to go through your tree, but I'll sign off on it.
 > 
-> Inside ram_load, the logic to see if we're at postcopy_running state
-> is:
+> Fam: Do you agree?
 > 
-> postcopy_running = postcopy_state_get() >= POSTCOPY_INCOMING_LISTENING
+> (Probably -next material, but I'm sending this email because I'm taking
+> it out of my review queue and I don't want it to get lost.)
 > 
-> postcopy_state_get() returns this enum type:
-> 
-> typedef enum {
->     POSTCOPY_INCOMING_NONE = 0,
->     POSTCOPY_INCOMING_ADVISE,
->     POSTCOPY_INCOMING_DISCARD,
->     POSTCOPY_INCOMING_LISTENING,
->     POSTCOPY_INCOMING_RUNNING,
->     POSTCOPY_INCOMING_END
-> } PostcopyState;
-> 
-> In the case where ram_load is executed and postcopy_state is
-> POSTCOPY_INCOMING_END, postcopy_running will be set to 'true' and
-> ram_load will behave like a postcopy is in progress. This scenario isn't
-> achievable in a migration but it is reproducible when executing
-> savevm/loadvm after migrating with 'postcopy-ram on', causing loadvm
-> to fail with Error -22:
-> 
-> Source:
-> 
-> (qemu) migrate_set_capability postcopy-ram on
-> (qemu) migrate tcp:127.0.0.1:4444
-> 
-> Dest:
-> 
-> (qemu) migrate_set_capability postcopy-ram on
-> (qemu)
-> ubuntu1704-intel login:
-> Ubuntu 17.04 ubuntu1704-intel ttyS0
-> 
-> ubuntu1704-intel login: (qemu)
-> (qemu) savevm test1
-> (qemu) loadvm test1
-> Unknown combination of migration flags: 0x4 (postcopy mode)
-> error while loading state for instance 0x0 of device 'ram'
-> Error -22 while loading VM state
-> (qemu)
-> 
-> This patch fixes this problem by changing the existing logic for
-> postcopy_advised and postcopy_running in ram_load, making them
-> 'false' if we're at POSTCOPY_INCOMING_END state.
-> 
-> Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-> ---
->  migration/ram.c | 16 ++++++++++++++--
->  1 file changed, 14 insertions(+), 2 deletions(-)
-> 
-> diff --git a/migration/ram.c b/migration/ram.c
-> index 8620aa400a..021d583b9b 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -2798,6 +2798,18 @@ static int ram_load_postcopy(QEMUFile *f)
->      return ret;
->  }
->  
-> +static bool postcopy_is_advised(void)
-> +{
-> +    PostcopyState ps = postcopy_state_get();
-> +    return ps >= POSTCOPY_INCOMING_ADVISE && ps < POSTCOPY_INCOMING_END;
-> +}
-> +
-> +static bool postcopy_is_running(void)
-> +{
-> +    PostcopyState ps = postcopy_state_get();
-> +    return ps >= POSTCOPY_INCOMING_LISTENING && ps < POSTCOPY_INCOMING_END;
-> +}
-> +
-
-If there is a new version, maybe we can put these into
-postcopy-ram.c.  But may not worth a repost since after all we have
-postcopy helpers in ram.c already.
-
-Reviewed-by: Peter Xu <peterx@redhat.com>
-
->  static int ram_load(QEMUFile *f, void *opaque, int version_id)
->  {
->      int flags = 0, ret = 0, invalid_flags = 0;
-> @@ -2807,9 +2819,9 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
->       * If system is running in postcopy mode, page inserts to host memory must
->       * be atomic
->       */
-> -    bool postcopy_running = postcopy_state_get() >= POSTCOPY_INCOMING_LISTENING;
-> +    bool postcopy_running = postcopy_is_running();
->      /* ADVISE is earlier, it shows the source has the postcopy capability on */
-> -    bool postcopy_advised = postcopy_state_get() >= POSTCOPY_INCOMING_ADVISE;
-> +    bool postcopy_advised = postcopy_is_advised();
->  
->      seq_iter++;
->  
-> -- 
-> 2.13.6
+> --js
 > 
 
--- 
-Peter Xu
+Yes, I can bring in through my tree, unless Fam prefers to have it - I'll
+pull it in via my block-next branch.
+
+Jeff
+
+> On 10/12/2017 09:53 AM, Vladimir Sementsov-Ogievskiy wrote:
+> > Hi all. Here is a continuation of my "new backup architecture" series,
+> > The very first part, but it is meaningful itself.
+> > 
+> > v2: rebase on master
+> > 01: add test and fix bug
+> > 02: move commit about NONE mode to this patch, add John's r-b (hope,
+> >      you are OK with this tiny change)
+> > 03: tiny refactor (John)
+> > 04: improve commit message, add John's r-b
+> > 05: add John's r-b
+> > 
+> > Vladimir Sementsov-Ogievskiy (5):
+> >   hbitmap: add next_zero function
+> >   backup: move from done_bitmap to copy_bitmap
+> >   backup: init copy_bitmap from sync_bitmap for incremental
+> >   backup: simplify non-dirty bits progress processing
+> >   backup: use copy_bitmap in incremental backup
+> > 
+> >  include/block/dirty-bitmap.h |   1 +
+> >  include/qemu/hbitmap.h       |   8 +++
+> >  block/backup.c               | 118 ++++++++++++++++++++++++-------------------
+> >  block/dirty-bitmap.c         |   5 ++
+> >  tests/test-hbitmap.c         |  61 ++++++++++++++++++++++
+> >  util/hbitmap.c               |  39 ++++++++++++++
+> >  6 files changed, 180 insertions(+), 52 deletions(-)
+> > 
