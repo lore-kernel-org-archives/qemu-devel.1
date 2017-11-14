@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59698)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60251)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1eEf92-0001zo-7J
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 12:37:10 -0500
+	(envelope-from <wouter@grep.be>) id 1eEfAN-0003Vp-Aa
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 12:38:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1eEf8y-0002DB-A2
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 12:37:08 -0500
-Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:48366)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1eEf8x-0002BB-U2
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 12:37:04 -0500
-Date: Tue, 14 Nov 2017 18:36:47 +0100 (CET)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-In-Reply-To: <alpine.BSF.2.21.1710270020350.57430@zero.eik.bme.hu>
-Message-ID: <alpine.BSF.2.21.1711141836210.54166@zero.eik.bme.hu>
-References: <20171021124213.84AEC7456EF@zero.eik.bme.hu>
-	<alpine.BSF.2.21.1710270020350.57430@zero.eik.bme.hu>
+	(envelope-from <wouter@grep.be>) id 1eEfAJ-0003Cj-4Q
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 12:38:31 -0500
+Date: Tue, 14 Nov 2017 18:37:45 +0100
+From: Wouter Verhelst <w@uter.be>
+Message-ID: <20171114173745.egvtklxyrcprlcdn@grep.be>
+References: <CAJSP0QWXF2tS5q-BpmxR9ti0osjzZCFiRxdRDho4pDBLkD3UUQ@mail.gmail.com>
+	<CAMxP3BQeUWwFLmb42=-XExRzdLe0egCaEUEF4kXLQ9khH9neWg@mail.gmail.com>
+	<90b32a89-6dd8-1f83-4f6f-01bb5479252e@redhat.com>
+	<20170114144500.oxoqvrn5x4sdfo74@grep.be>
+	<1ef924f8-1e58-fe54-dabc-06873a531412@redhat.com>
+	<20170118080126.nyldkjhxdsxd4u2b@grep.be>
+	<CAMxP3BTjBSQEhycavgyfWXEA6pTg=sxfHe5sf+nxVY9ejXWMXQ@mail.gmail.com>
+	<20170122114339.l3ijhy3uymsru4ed@grep.be>
+	<4a5a82d6-7d66-cfb4-bd42-cea596115f6f@redhat.com>
+	<09ef1805-8361-5dff-300e-deede4863e55@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-Subject: Re: [Qemu-devel] [PATCH] exec: Fix section_covers_addr() for
- sections with non-zero offset
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <09ef1805-8361-5dff-300e-deede4863e55@redhat.com>
+Subject: Re: [Qemu-devel] [Nbd] [Qemu-block] How to online resize qemu disk
+ with nbd protocol?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,81 +32,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Fam Zheng <famz@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: Bob Chen <a175818323@gmail.com>, nbd list <nbd@other.debian.org>, Stefan Hajnoczi <stefanha@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>
 
-On Fri, 27 Oct 2017, BALATON Zoltan wrote:
-> On Sat, 21 Oct 2017, BALATON Zoltan wrote:
->> When a section with non-0 offset_within_region field is tested to
->> cover an address the offset should be taken into account as well.
->> 
->> This fixes a crash caused by picking the wrong memory region in
->> address_space_lookup_region seen with client code accessing a device
->> model that uses alias memory regions.
->> 
->> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
->> ---
->
-> Ping? http://patchwork.ozlabs.org/project/qemu-devel/list/?series=9457
+On Tue, Nov 14, 2017 at 10:41:39AM -0600, Eric Blake wrote:
+> Another thought - with structured replies, we finally have a way to let
+> the client ask for the server to send resize information whenever the
+> server wants, rather than having to be polled by a new client request
+> all the time.  This is possible by having the server reply with a chunk
+> without the NBD_REPLY_FLAG_DONE bit, for as many times as it wants,
+> (that is, the server never officially ends the response to the single
+> client request for on-going status, until the client sends an
+> NBD_CMD_DISC).
 
-Ping!
+Hrm, yeah, that could work.
 
->> This seems to fix the problem described in
->> http://lists.nongnu.org/archive/html/qemu-devel/2017-10/msg03356.html
->> but I'm not completely sure about it. This seems to be introduced in
->> 729633c exec: Introduce AddressSpaceDispatch.mru_section and the patch
->> before that which split off section_covers_addr from phys_page_find so
->> this patch also changes that caller. Is that OK to do? It appears to
->> work but I don't know this part of QEMU.
->> 
->> Also the bug seems to be caused by section_covers_addr accepting
->> sii3112.bar5 when that's the mru_section instead of picking
->> sii3112.bar0 (which it picks when going through phys_page_find) when
->> client code is accessing 0xc08001006 from this address map (full
->> address map is at above URL):
->> 
->> address-space: memory
->>    0000000c08000000-0000000c0800ffff (prio 0, i/o): alias isa_mmio @io 
->> 0000000000000000-000000000000ffff
->> 
->> address-space: I/O
->>  0000000000000000-000000000000ffff (prio 0, i/o): io
->>    0000000000001000-0000000000001007 (prio 1, i/o): alias sii3112.bar0 
->> @sii3112.bar5 0000000000000080-0000000000000087
->>    0000000000001008-000000000000100b (prio 1, i/o): alias sii3112.bar1 
->> @sii3112.bar5 0000000000000088-000000000000008b
->>    0000000000001010-0000000000001017 (prio 1, i/o): alias sii3112.bar2 
->> @sii3112.bar5 00000000000000c0-00000000000000c7
->>    0000000000001018-000000000000101b (prio 1, i/o): alias sii3112.bar3 
->> @sii3112.bar5 00000000000000c8-00000000000000cb
->>    0000000000001020-000000000000102f (prio 1, i/o): alias sii3112.bar4 
->> @sii3112.bar5 0000000000000000-000000000000000f
->> 
->> which this patch fixes but would the same problem happen if the
->> mru_section is bar5 but bar4 is accessed? I could not reproduce that
->> case but then the offset is 0 but in this case the address would be
->> above 0xc08001020 and size is 0xf so they probably won't match. But
->> this is only because of the size of the region. Could that mean the
->> bug is caused by something else and should be fixed elsewhere?
->> 
->> ---
->> exec.c | 3 ++-
->> 1 file changed, 2 insertions(+), 1 deletion(-)
->> 
->> diff --git a/exec.c b/exec.c
->> index db5ae23..a915817 100644
->> --- a/exec.c
->> +++ b/exec.c
->> @@ -370,7 +370,8 @@ static inline bool section_covers_addr(const 
->> MemoryRegionSection *section,
->>      * the section must cover the entire address space.
->>      */
->>     return int128_gethi(section->size) ||
->> -           range_covers_byte(section->offset_within_address_space,
->> +           range_covers_byte(section->offset_within_address_space +
->> +                             section->offset_within_region,
->>                              int128_getlo(section->size), addr);
->> }
->> 
->> 
->
+Minor downside of this would be that a client would now be expected to
+continue listening "forever" (probably needs to do a blocking read() or
+a select() on the socket), whereas with the current situation a client
+could get away with only reading for as long as it expects data.
+
+I don't think that should be a blocker, but it might be something we
+might want to document.
+
+> I don't think the server should go into this mode without a flag bit
+> from the client requesting it (as it potentially ties up a thread that
+> could otherwise be used for parallel processing of other requests),
+
+Yeah. I think we should probably initiate this with a BLOCK_STATUS
+message that has a flag with which we mean "don't stop sending data on
+the given region for contexts that support it".
+
+However, I could imagine that there might be some cases wherein a server
+might be able to go into such a mode for two or more metadata contexts,
+and where a client might want to go into that mode for one of them but
+not all of them, while still wanting some information from them.
+
+This could be covered with metadata context syntax, but it's annoying
+and shouldn't be necessary.
+
+I'm starting to think I made a mistake when I said NBD_CMD_BLOCK_STATUS
+can't take a metadata context ID. Okay, there's no space for it, but
+that shouldn't have been a blocker.
+
+Thoughts?
+
+> and that the server could reject a repeat command with the flag if it
+> is already serving a previous open-ended request.
+
+Right.
+
+On the other hand, I can imagine that a client might also want to tell
+the server that it is no longer interested in an outstanding request. In
+such a case, it should be able to cancel it.
+
+-- 
+Could you people please use IRC like normal people?!?
+
+  -- Amaya Rodrigo Sastre, trying to quiet down the buzz in the DebConf 2008
+     Hacklab
