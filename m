@@ -1,26 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57853)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33475)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eEOb4-0005FR-Th
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 18:57:00 -0500
+	(envelope-from <muriloo@linux.vnet.ibm.com>) id 1eEOm8-0003iZ-Ih
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 19:08:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eEOb3-0008F5-Td
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 18:56:59 -0500
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <cover.1510612380.git.alistair.francis@xilinx.com>
-	<83aa5da9c3f6220edf68b49c6f16bf84108616ab.1510612380.git.alistair.francis@xilinx.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <e7e93010-6a95-3c11-1ccc-a3e009b2a5a7@amsat.org>
-Date: Mon, 13 Nov 2017 20:56:47 -0300
+	(envelope-from <muriloo@linux.vnet.ibm.com>) id 1eEOm5-0004TP-75
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 19:08:24 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:52292
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <muriloo@linux.vnet.ibm.com>)
+	id 1eEOm5-0004So-1f
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 19:08:21 -0500
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	vAE053pq110143
+	for <qemu-devel@nongnu.org>; Mon, 13 Nov 2017 19:08:13 -0500
+Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2e7nkxg7y4-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 13 Nov 2017 19:08:13 -0500
+Received: from localhost
+	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <muriloo@linux.vnet.ibm.com>;
+	Mon, 13 Nov 2017 17:08:12 -0700
+References: <20171113213945.20049-1-apahim@redhat.com>
+	<20171113213945.20049-3-apahim@redhat.com>
+From: =?UTF-8?Q?Murilo_Opsfelder_Ara=c3=bajo?= <muriloo@linux.vnet.ibm.com>
+Date: Mon, 13 Nov 2017 22:08:04 -0200
 MIME-Version: 1.0
-In-Reply-To: <83aa5da9c3f6220edf68b49c6f16bf84108616ab.1510612380.git.alistair.francis@xilinx.com>
+In-Reply-To: <20171113213945.20049-3-apahim@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH v5 17/29] hw/nvram: Replace
- fprintf(stderr, "*\n" with error_report()
+Message-Id: <c12472b9-b4a2-8dca-2960-968e02357926@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v9 2/8] qemu.py: better control of created
+ files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,108 +44,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
-Cc: alistair23@gmail.com, armbru@redhat.com
+To: Amador Pahim <apahim@redhat.com>, qemu-devel@nongnu.org
+Cc: famz@redhat.com, ehabkost@redhat.com, crosa@redhat.com
 
-On 11/13/2017 07:35 PM, Alistair Francis wrote:
-> Replace a large number of the fprintf(stderr, "*\n" calls with
-> error_report(). The functions were renamed with these commands and then
-> compiler issues where manually fixed.
+On 11/13/2017 07:39 PM, Amador Pahim wrote:
+> To launch a VM, we need to create basically two files: the monitor
+> socket (if it's a UNIX socket) and the qemu log file.
 > 
-> find ./* -type f -exec sed -i \
->     'N;N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
+> For the qemu log file, we currently just open the path, which will
+> create the file if it does not exist or overwrite the file if it does
+> exist.
 > 
-> Some lines where then manually tweaked to pass checkpatch.
+> For the monitor socket, if it already exists, we are currently removing
+> it, even if it's not created by us.
 > 
-> Some of the message in put_unused() was removed and replaced with
-> g_assert_not_reached() and some of the messages were updated.
-> 
-> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+> This patch moves to pre_launch() the responsibility to create a
+> temporary directory to host the files so we can remove the whole
+> directory on post_shutdown().
+
+s/pre_launch()/_pre_launch()/
+s/post_shutdown()/_post_shutdown()/
+
+> Signed-off-by: Amador Pahim <apahim@redhat.com>
 > ---
-> V3:
->  - Add g_assert_not_reached() in unused function
-> V2:
->  - Split hw patch into individual directories
+>  scripts/qemu.py | 42 ++++++++++++++++++++++++------------------
+>  1 file changed, 24 insertions(+), 18 deletions(-)
 > 
->  hw/nvram/eeprom93xx.c | 7 ++++---
->  hw/nvram/fw_cfg.c     | 5 +++--
->  2 files changed, 7 insertions(+), 5 deletions(-)
+> diff --git a/scripts/qemu.py b/scripts/qemu.py
+> index 65d9ad688c..58f00bdd64 100644
+> --- a/scripts/qemu.py
+> +++ b/scripts/qemu.py
+> @@ -17,6 +17,8 @@ import logging
+>  import os
+>  import subprocess
+>  import qmp.qmp
+> +import shutil
+> +import tempfile
 > 
-> diff --git a/hw/nvram/eeprom93xx.c b/hw/nvram/eeprom93xx.c
-> index 2fd0e3c29f..6ffce745ae 100644
-> --- a/hw/nvram/eeprom93xx.c
-> +++ b/hw/nvram/eeprom93xx.c
-> @@ -36,6 +36,7 @@
->   */
->  
->  #include "qemu/osdep.h"
-> +#include "qemu/error-report.h"
->  #include "hw/hw.h"
->  #include "hw/nvram/eeprom93xx.h"
->  
-> @@ -105,9 +106,9 @@ static int get_uint16_from_uint8(QEMUFile *f, void *pv, size_t size,
->  static int put_unused(QEMUFile *f, void *pv, size_t size, VMStateField *field,
->                        QJSON *vmdesc)
->  {
-> -    fprintf(stderr, "uint16_from_uint8 is used only for backwards compatibility.\n");
-> -    fprintf(stderr, "Never should be used to write a new state.\n");
-> -    exit(0);
-> +    error_report("uint16_from_uint8 is used only for backwards compatibility.");
-> +    error_report("It should never be used to write a new state.");
-> +    g_assert_not_reached();
->  
->      return 0;
->  }
-> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
-> index 753ac0e4ea..1c66052f1f 100644
-> --- a/hw/nvram/fw_cfg.c
-> +++ b/hw/nvram/fw_cfg.c
-> @@ -518,8 +518,9 @@ static int get_uint32_as_uint16(QEMUFile *f, void *pv, size_t size,
->  static int put_unused(QEMUFile *f, void *pv, size_t size, VMStateField *field,
->                        QJSON *vmdesc)
->  {
-> -    fprintf(stderr, "uint32_as_uint16 is only used for backward compatibility.\n");
-> -    fprintf(stderr, "This functions shouldn't be called.\n");
-> +    error_report("uint32_as_uint16 is only used for backward compatibility.");
+> 
+>  LOG = logging.getLogger(__name__)
+> @@ -72,10 +74,10 @@ class QEMUMachine(object):
+>              wrapper = []
+>          if name is None:
+>              name = "qemu-%d" % os.getpid()
+> -        if monitor_address is None:
+> -            monitor_address = os.path.join(test_dir, name + "-monitor.sock")
+> +        self._name = name
+>          self._monitor_address = monitor_address
+> -        self._qemu_log_path = os.path.join(test_dir, name + ".log")
+> +        self._qemu_log_path = None
+> +        self._qemu_log_fd = None
 
+Is our intent to hold an integer file descriptor in self._qemu_log_fd?
+
+Python's built-in open() returns a file object, which is what we're
+using here.
+
+Do you think it shall be named, for example, _qemu_log_file to avoid
+confusion with integer file descriptors, usually denoted by "fd"?
+
+>          self._popen = None
+>          self._binary = binary
+>          self._args = list(args)     # Force copy args in case we modify them
+> @@ -85,6 +87,8 @@ class QEMUMachine(object):
+>          self._socket_scm_helper = socket_scm_helper
+>          self._qmp = None
+>          self._qemu_full_args = None
+> +        self._test_dir = test_dir
+> +        self._temp_dir = None
+> 
+>          # just in case logging wasn't configured by the main script:
+>          logging.basicConfig()
+> @@ -134,16 +138,6 @@ class QEMUMachine(object):
+> 
+>          return proc.returncode
+> 
+> -    @staticmethod
+> -    def _remove_if_exists(path):
+> -        '''Remove file object at path if it exists'''
+> -        try:
+> -            os.remove(path)
+> -        except OSError as exception:
+> -            if exception.errno == errno.ENOENT:
+> -                return
+> -            raise
+> -
+>      def is_running(self):
+>          return self._popen is not None and self._popen.returncode is None
+> 
+> @@ -173,6 +167,13 @@ class QEMUMachine(object):
+>                  '-display', 'none', '-vga', 'none']
+> 
+>      def _pre_launch(self):
+> +        self._temp_dir = tempfile.mkdtemp(dir=self._test_dir)
+> +        if not isinstance(self._monitor_address, tuple):
+> +            self._monitor_address = os.path.join(self._temp_dir,
+> +                                                 self._name + "-monitor.sock")
+> +        self._qemu_log_path = os.path.join(self._temp_dir, self._name + ".log")
+> +        self._qemu_log_fd = open(self._qemu_log_path, 'wb')
 > +
-
-Maybe Michael can remove this extra line, anyway:
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
-> +    g_assert_not_reached();
->  
->      return 0;
->  }
+>          self._qmp = qmp.qmp.QEMUMonitorProtocol(self._monitor_address,
+>                                                  server=True)
 > 
+> @@ -180,23 +181,28 @@ class QEMUMachine(object):
+>          self._qmp.accept()
+> 
+>      def _post_shutdown(self):
+> -        if not isinstance(self._monitor_address, tuple):
+> -            self._remove_if_exists(self._monitor_address)
+> -        self._remove_if_exists(self._qemu_log_path)
+> +        if self._qemu_log_fd is not None:
+> +            self._qemu_log_fd.close()
+> +            self._qemu_log_fd = None
+> +
+> +        self._qemu_log_path = None
+> +
+> +        if self._temp_dir is not None:
+> +            shutil.rmtree(self._temp_dir)
+> +            self._temp_dir = None
+> 
+>      def launch(self):
+>          '''Launch the VM and establish a QMP connection'''
+>          self._iolog = None
+>          self._qemu_full_args = None
+>          devnull = open(os.path.devnull, 'rb')
+> -        qemulog = open(self._qemu_log_path, 'wb')
+>          try:
+>              self._pre_launch()
+>              self._qemu_full_args = (self._wrapper + [self._binary] +
+>                                      self._base_args() + self._args)
+>              self._popen = subprocess.Popen(self._qemu_full_args,
+>                                             stdin=devnull,
+> -                                           stdout=qemulog,
+> +                                           stdout=self._qemu_log_fd,
+>                                             stderr=subprocess.STDOUT,
+>                                             shell=False)
+>              self._post_launch()
+> 
+
+
+-- 
+Murilo
