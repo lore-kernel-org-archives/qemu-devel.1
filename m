@@ -1,30 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41303)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43630)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eEi4i-0003yU-IF
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 15:44:53 -0500
+	(envelope-from <bounces@canonical.com>) id 1eEiAr-0005pF-Hj
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 15:51:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eEi4h-0005T5-JJ
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 15:44:52 -0500
-References: <CAFEAcA_bXripv8_O8aRuDbdYQ3oWeVzdb8GO=o9j2oddYrg-0A@mail.gmail.com>
-	<CAFEAcA9DK=rb-9Jei+U3xhcVM_oscpY09nANoy4QUpfNeqOMVA@mail.gmail.com>
-	<94700229-5afe-159f-9453-f507b9c83085@redhat.com>
-	<0c42f84d-9096-3f7b-c71d-664a119bc8a2@redhat.com>
-	<9ab7ae12-730d-a4d4-287c-64dcd509b680@redhat.com>
-	<1fa78bdf-65e2-c216-49a2-7277231a7141@redhat.com>
-	<20253223-df8f-162d-b8c8-dfa56af9fffd@redhat.com>
-	<e76811c5-6a5a-cf5e-2571-9e112e609740@redhat.com>
-	<89062bb7-f2fa-db5e-d799-c61e1daa6b99@redhat.com>
-	<3db6cc30-f744-7a47-e59a-6a15c9fcfd39@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <db3b249f-7384-8d9e-c280-7c7134c7c294@redhat.com>
-Date: Tue, 14 Nov 2017 21:44:39 +0100
+	(envelope-from <bounces@canonical.com>) id 1eEiAm-0006b1-JN
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 15:51:13 -0500
+Received: from indium.canonical.com ([91.189.90.7]:57932)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eEiAm-0006Z9-D0
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 15:51:08 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eEiAj-0003RD-5w
+	for <qemu-devel@nongnu.org>; Tue, 14 Nov 2017 20:51:05 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id A3E382E81E5
+	for <qemu-devel@nongnu.org>; Tue, 14 Nov 2017 20:51:00 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <3db6cc30-f744-7a47-e59a-6a15c9fcfd39@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="fMmm67KJMSgIKl3dm6bvQs6NpwvIfrAw7"
-Subject: Re: [Qemu-devel] using "qemu-img convert -O qcow2" to convert qcow
- v1 to v2 creates a qcow v3 file?
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 14 Nov 2017 20:45:07 -0000
+From: Maciej Piechotka <uzytkownik2@gmail.com>
+Reply-To: Bug 1713825 <1713825@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150404140220.18876.2468100840644103776.malonedeb@chaenomeles.canonical.com>
+Message-Id: <151069230720.28725.6703819753883062910.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1713825] Re: Booting Windows 2016 with qxl video
+ crashes qemu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,140 +37,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, Thomas Huth <thuth@redhat.com>, Eric Blake <eblake@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
-Cc: Kevin Wolf <kwolf@redhat.com>, Qemu-block <qemu-block@nongnu.org>
+To: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---fMmm67KJMSgIKl3dm6bvQs6NpwvIfrAw7
-From: Max Reitz <mreitz@redhat.com>
-To: John Snow <jsnow@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Eric Blake <eblake@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>
-Cc: Kevin Wolf <kwolf@redhat.com>, Qemu-block <qemu-block@nongnu.org>
-Message-ID: <db3b249f-7384-8d9e-c280-7c7134c7c294@redhat.com>
-Subject: Re: [Qemu-devel] using "qemu-img convert -O qcow2" to convert qcow v1
- to v2 creates a qcow v3 file?
-References: <CAFEAcA_bXripv8_O8aRuDbdYQ3oWeVzdb8GO=o9j2oddYrg-0A@mail.gmail.com>
- <CAFEAcA9DK=rb-9Jei+U3xhcVM_oscpY09nANoy4QUpfNeqOMVA@mail.gmail.com>
- <94700229-5afe-159f-9453-f507b9c83085@redhat.com>
- <0c42f84d-9096-3f7b-c71d-664a119bc8a2@redhat.com>
- <9ab7ae12-730d-a4d4-287c-64dcd509b680@redhat.com>
- <1fa78bdf-65e2-c216-49a2-7277231a7141@redhat.com>
- <20253223-df8f-162d-b8c8-dfa56af9fffd@redhat.com>
- <e76811c5-6a5a-cf5e-2571-9e112e609740@redhat.com>
- <89062bb7-f2fa-db5e-d799-c61e1daa6b99@redhat.com>
- <3db6cc30-f744-7a47-e59a-6a15c9fcfd39@redhat.com>
-In-Reply-To: <3db6cc30-f744-7a47-e59a-6a15c9fcfd39@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+It helps but I'm quite sure that lower level security systems (guest)
+should never be able to crash higher level security systems
+(hypervisor).
 
-On 2017-11-14 21:38, John Snow wrote:
->=20
->=20
-> On 11/14/2017 03:35 PM, Max Reitz wrote:
->> On 2017-11-14 21:30, John Snow wrote:
->>>
->>>
->>> On 11/14/2017 01:46 PM, Max Reitz wrote:
->>>> On 2017-11-14 19:45, Thomas Huth wrote:
->>>>> On 14.11.2017 14:32, Max Reitz wrote:
->>>>> [...]
->>>>>> Well, do you want to document it?  I'd rather deprecate it altoget=
-her.
->>>>>
->>>>> Maybe a first step could be to change qemu-img so that it refuses t=
-o
->>>>> create new qcow1 images (but still can convert them into other form=
-ats).
->>>>> So basically make qcow1 read-only?
->>>>
->>>> Yep, and the actual first step to that is to make it issue a depreca=
-tion
->>>> warning when creating qcow v1 images (which is what I proposed). :-)=
+PS. It repros in 2.10.0 as well.
 
->>>>
->>>> Max
->>>>
->>>
->>> Deprecation warning is good.
->>>
->>> In future versions you can shimmy it behind a
->>> --no-really-I-want-this-old-format option, I think we ought to suppor=
-t
->>> creating the images for as long as is technologically convenient.
->>
->> Well, at some point you can also demand from users to just dig out som=
-e
->> old version of qemu-img to convert their qcow v1 images to qcow2.  It'=
-s
->> not like they are going to miss out on anything.
->>
->=20
-> As long is convenient. I won't throw a fit that it needs to be around
-> forever, but as long as it's sufficiently guarded from use and isn't
-> hard to keep around I'd prefer to do that.
->=20
-> I suppose it's just a weak preference.
+-- =
 
-I agree that sufficiently guarding it (albeit our definitions on what is
-sufficient may differ) serves all the purpose I need, that is, make
-users aware of the fact that they are doing something for which I can
-see no reason.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1713825
 
-But on the other hand, I want those guards to make it dead code,
-effectively.  And if something is dead code... There is no reason to
-keep it around.
+Title:
+  Booting Windows 2016 with qxl video crashes qemu
 
->> (If you deprecate emulated hardware, users may complain that they don'=
-t
->> get the newest qemu features/bugfixes/... while continuing to use that=
+Status in QEMU:
+  New
 
->> hardware, so I can see that it's a tough decision whether to deprecate=
+Bug description:
+  launched from libvirt.
 
->> that.  But it's not like you are going to lose any features or anythin=
-g
->> if you convert your dusty images to qcow2.  On the contrary, we're
->> helping you to get more performance out of them.  Maybe qemu should ju=
-st
->> silently convert qcow v1 images to qcow2 without asking the user, like=
+  qemu version: 2.9.0
+  host: Linux <hostname> 4.9.34-gentoo #1 SMP Sat Jul 29 13:28:43 PDT 2017 =
+x86_64 Intel(R) Core(TM) i7-3930K CPU @ 3.20GHz GenuineIntel GNU/Linux
+  guest: Windows 2016 64 bit
 
->> Apple did...)
->>
->> Max
->>
->=20
-> "Like Apple did" seems sufficient justification to never do that, but
-> maybe that's just my own opinion.
+  Thread 28 (Thread 0x7f0e2edff700 (LWP 29860)):
+  #0  __GI_raise (sig=3Dsig@entry=3D6) at ../sysdeps/unix/sysv/linux/raise.=
+c:51
+          set =3D {__val =3D {18446744067266837079, 139698892694944, 139699=
+853745096, 139700858749789, 4222451712, 139694281220640, 139694281220741, 1=
+39694281220640, 139694281220640, 139694281220810, =
 
-Sorry, forgot the emoticon. :-)
+              139694281220940, 139694281220640, 139694281220940, 0, 0, 0}}
+          pid =3D <optimized out>
+          tid =3D <optimized out>
+  #1  0x00007f0ea40b644a in __GI_abort () at abort.c:89
+          save_stage =3D 2
+          act =3D {__sigaction_handler =3D {sa_handler =3D 0x7f0e2edfe5c0, =
+sa_sigaction =3D 0x7f0e2edfe5c0}, sa_mask =3D {__val =3D {139694281219872, =
+139698106269697, 139698892695344, 4, 2676511744, 0, 139698892695144, 0, =
 
-Yes, that was meant to be a joke.  Although adding a qemu-img amend for
-amending qcow v1 to v2/v3 images is probably mostly an issue of creating
-the right internal interface for cross-format amendments.
+                139698892694912, 1, 4737316546111099904, 139700859888720, 4=
+737316546111099904, 139700862161824, 139700911349760, 94211934977482}}, sa_=
+flags =3D 416, =
 
-(Silently storing qcow v1 as v2/v3 images is actually something where
-users could have a problem because maybe they have some tool that only
-works on qcow v1 images; and then they can't use that together with an
-auto-amending qemu...)
+            sa_restorer =3D 0x55af6ceb0500 <__PRETTY_FUNCTION__.36381>}
+          sigs =3D {__val =3D {32, 0 <repeats 15 times>}}
+  #2  0x00007f0ea40abab6 in __assert_fail_base (fmt=3D<optimized out>, asse=
+rtion=3Dassertion@entry=3D0x55af6ceafdca "offset < qxl->vga.vram_size", =
 
-Max
+      file=3Dfile@entry=3D0x55af6ceaeaa0 "/var/tmp/portage/app-emulation/qe=
+mu-2.9.0-r2/work/qemu-2.9.0/hw/display/qxl.c", line=3Dline@entry=3D416, =
 
+      function=3Dfunction@entry=3D0x55af6ceb0500 <__PRETTY_FUNCTION__.36381=
+> "qxl_ram_set_dirty") at assert.c:92
+          str =3D 0x7f0d1c026220 "\340r\002\034\r\177"
+          total =3D 4096
+  #3  0x00007f0ea40abb81 in __GI___assert_fail (assertion=3Dassertion@entry=
+=3D0x55af6ceafdca "offset < qxl->vga.vram_size", =
 
---fMmm67KJMSgIKl3dm6bvQs6NpwvIfrAw7
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+      file=3Dfile@entry=3D0x55af6ceaeaa0 "/var/tmp/portage/app-emulation/qe=
+mu-2.9.0-r2/work/qemu-2.9.0/hw/display/qxl.c", line=3Dline@entry=3D416, =
 
------BEGIN PGP SIGNATURE-----
+      function=3Dfunction@entry=3D0x55af6ceb0500 <__PRETTY_FUNCTION__.36381=
+> "qxl_ram_set_dirty") at assert.c:101
+  No locals.
+  #4  0x000055af6cc58805 in qxl_ram_set_dirty (qxl=3D<optimized out>, ptr=
+=3D<optimized out>) at /var/tmp/portage/app-emulation/qemu-2.9.0-r2/work/qe=
+mu-2.9.0/hw/display/qxl.c:416
+          base =3D <optimized out>
+          offset =3D <optimized out>
+          qxl =3D <optimized out>
+          ptr =3D <optimized out>
+          base =3D <optimized out>
+          offset =3D <optimized out>
+  #5  0x000055af6cc5b9e2 in interface_release_resource (sin=3D0x55af71a91ed=
+0, ext=3D...) at /var/tmp/portage/app-emulation/qemu-2.9.0-r2/work/qemu-2.9=
+.0/hw/display/qxl.c:767
+          qxl =3D 0x55af71a91450
+          ring =3D <optimized out>
+          item =3D <optimized out>
+          id =3D 18446690739814400920
+          __func__ =3D "interface_release_resource"
+  #6  0x00007f0ea510afa8 in red_drawable_unref (red_drawable=3D0x7f0d1c0261=
+20) at red-worker.c:101
+  No locals.
+  #7  0x00007f0ea510b609 in red_drawable_unref (red_drawable=3D<optimized o=
+ut>) at red-worker.c:104
+  No locals.
+  #8  0x00007f0ea510eae9 in drawable_unref (drawable=3Ddrawable@entry=3D0x7=
+f0e68285ac0) at display-channel.c:1438
+          display =3D 0x55af71dbd3c0
+          __FUNCTION__ =3D "drawable_unref"
+  #9  0x00007f0ea51109f7 in draw_until (display=3Ddisplay@entry=3D0x55af71d=
+bd3c0, surface=3Dsurface@entry=3D0x7f0e6828aae8, last=3D0x7f0e68285ac0) at =
+display-channel.c:1637
+          container =3D 0x0
+          now =3D 0x7f0e68285ac0
+  #10 0x00007f0ea510f93f in display_channel_draw (display=3D0x55af71dbd3c0,=
+ area=3D0x7f0e2edfe8e0, surface_id=3D<optimized out>) at display-channel.c:=
+1729
+          surface =3D 0x7f0e6828aae8
+          last =3D <optimized out>
+          __FUNCTION__ =3D "display_channel_draw"
+          __func__ =3D "display_channel_draw"
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAloLVbcSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AmmIH/1wogIx9Wu6lVgf3zy+iWg6ephfOJJv1
-fHnLuCQcb0NNxJNLqZFUtkUP8JSsG9GHRV/WykauWBabB0pv7NLkiGfuGsxstbRC
-EKOGbE+sWn4ad+vMORExVSNW5cJQnj24IDTg7lWI3TdqqHQkL9LhKXPFsyoVVMiL
-2DTZQaaQuDLF1RFp5wb3m+hSCLAFWQkSmBt6K7nbHSyONJVbOFslMj5wzI1oJskl
-Kyt10URDU46nR3WFa9paFJqboRdgpquFXn+1CbNJkMe8GflCn2RyVpn7Z/I6n2cO
-mQceAuz/e2e4Vyrl/wq4eTXdt0riCbH3UMt8/eGe+oSGIZ0y+h0FclE=
-=ZNxd
------END PGP SIGNATURE-----
-
---fMmm67KJMSgIKl3dm6bvQs6NpwvIfrAw7--
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1713825/+subscriptions
