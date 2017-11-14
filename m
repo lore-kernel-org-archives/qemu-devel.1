@@ -1,19 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58548)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59239)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1eEcyt-0002ZD-Lr
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 10:18:32 -0500
+	(envelope-from <armbru@redhat.com>) id 1eEczu-0003Lt-74
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 10:19:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1eEcys-0001pd-Eg
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 10:18:31 -0500
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <20171110224302.14424-1-mreitz@redhat.com>
-References: <20171110224302.14424-1-mreitz@redhat.com>
-Date: Tue, 14 Nov 2017 16:18:20 +0100
-Message-ID: <w51vaiczy6b.fsf@maestria.local.igalia.com>
+	(envelope-from <armbru@redhat.com>) id 1eEczo-00032K-Cg
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 10:19:34 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20171110221329.24176-1-mreitz@redhat.com>
+	<20171110221329.24176-4-mreitz@redhat.com>
+Date: Tue, 14 Nov 2017 16:19:20 +0100
+In-Reply-To: <20171110221329.24176-4-mreitz@redhat.com> (Max Reitz's message
+	of "Fri, 10 Nov 2017 23:13:29 +0100")
+Message-ID: <87vaicripz.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH for-2.12 0/4] blockdev: Mark
- BD-{remove, insert}-medium stable
+Subject: Re: [Qemu-devel] [PATCH for-2.12 3/3] block: Deprecate "backing": ""
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,33 +23,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+To: Max Reitz <mreitz@redhat.com>
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 
-On Fri 10 Nov 2017 11:42:58 PM CET, Max Reitz wrote:
-> Berto's "Test I/O limits with removable media" patch proves that
-> throttling survives a blockdev-remove-medium/blockdev-insert-medium pair
-> now, so let's mark them stable (because that was the reason they were
-> considered experimental, see commit
-> 6e0abc251dd4f8eba1f53656dfede12e5840e83b for more).
->
-> But before we do that, let's use the chance and drop the @device
-> parameter.
->
->
-> Based-on: <cover.1510339534.git.berto@igalia.com>
-> ("Fix throttling crashes in BlockBackend with no BlockDriverState",
->  because of the test case added there)
->
->
-> Max Reitz (4):
->   iotests: Make BD-{remove,insert}-medium use @id
->   tests/ahci: Switch tray and medium commands to @id
->   blockdev: Drop BD-{remove,insert}-medium's @device
->   blockdev: Mark BD-{remove,insert}-medium stable
+Max Reitz <mreitz@redhat.com> writes:
 
-This series,
+> We have a clear replacement, so let's deprecate it.
+>
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+>  qapi/block-core.json | 4 ++--
+>  block.c              | 4 ++++
+>  qemu-doc.texi        | 7 +++++++
+>  qemu-options.hx      | 4 ++--
+>  4 files changed, 15 insertions(+), 4 deletions(-)
+>
+> diff --git a/qapi/block-core.json b/qapi/block-core.json
+> index 76bf50f813..dfe4d3650c 100644
+> --- a/qapi/block-core.json
+> +++ b/qapi/block-core.json
+> @@ -1090,7 +1090,7 @@
+>  # @overlay: reference to the existing block device that will become
+>  #           the overlay of @node, as part of creating the snapshot.
+>  #           It must not have a current backing file (this can be
+> -#           achieved by passing "backing": "" to blockdev-add).
+> +#           achieved by passing "backing": null to blockdev-add).
+>  #
+>  # Since: 2.5
+>  ##
+> @@ -1238,7 +1238,7 @@
+>  #                     "node-name": "node1534",
+>  #                     "file": { "driver": "file",
+>  #                               "filename": "hd1.qcow2" },
+> -#                     "backing": "" } }
+> +#                     "backing": null } }
+>  #
+>  # <- { "return": {} }
+>  #
+> diff --git a/block.c b/block.c
+> index bc92ddd5a0..463c4de25b 100644
+> --- a/block.c
+> +++ b/block.c
+> @@ -2559,6 +2559,10 @@ static BlockDriverState *bdrv_open_inherit(const char *filename,
+>      /* See cautionary note on accessing @options above */
+>      backing = qdict_get_try_str(options, "backing");
+>      if (qdict_is_qnull(options, "backing") || (backing && *backing == '\0')) {
+> +        if (backing) {
+> +            warn_report("Use of \"backing\": \"\" is deprecated; "
+> +                        "use \"backing\": null instead");
+> +        }
+>          flags |= BDRV_O_NO_BACKING;
+>          qdict_del(options, "backing");
+>      }
+> diff --git a/qemu-doc.texi b/qemu-doc.texi
+> index 8c10956a66..8f57d9ad21 100644
+> --- a/qemu-doc.texi
+> +++ b/qemu-doc.texi
+> @@ -2537,6 +2537,13 @@ or ``ivshmem-doorbell`` device types.
+>  The ``spapr-pci-vfio-host-bridge'' device type is replaced by
+>  the ``spapr-pci-host-bridge'' device type.
+>  
+> +@section Block device options
+> +
+> +@subsection "backing": "" (since 2.12.0)
+> +
+> +In order to prevent QEMU from automatically opening an image's backing
+> +chain, use ``"backing": null'' instead.
+> +
+>  @node License
+>  @appendix License
+>  
+> diff --git a/qemu-options.hx b/qemu-options.hx
+> index 3728e9b4dd..0ee1a04d00 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -731,8 +731,8 @@ Reference to or definition of the data source block driver node
+>  
+>  @item backing
+>  Reference to or definition of the backing file block device (default is taken
+> -from the image file). It is allowed to pass an empty string here in order to
+> -disable the default backing file.
+> +from the image file). It is allowed to pass @code{null} here in order to disable
+> +the default backing file.
+>  
+>  @item lazy-refcounts
+>  Whether to enable the lazy refcounts feature (on/off; default is taken from the
 
-Reviewed-by: Alberto Garcia <berto@igalia.com>
+Missed in commit c42e8742f, I guess.
 
-Berto
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
