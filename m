@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38315)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38481)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yi.l.liu@linux.intel.com>) id 1eEcOQ-0005fT-5u
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 09:40:56 -0500
+	(envelope-from <bounces@canonical.com>) id 1eEcOi-0005tR-Mc
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 09:41:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yi.l.liu@linux.intel.com>) id 1eEcOK-0007Or-2q
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 09:40:50 -0500
-Received: from mga01.intel.com ([192.55.52.88]:58872)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yi.l.liu@linux.intel.com>)
-	id 1eEcOJ-0007Ns-MU
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 09:40:43 -0500
-Date: Tue, 14 Nov 2017 22:24:07 +0800
-From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
-Message-ID: <20171114142407.GC3895@sky-dev>
-References: <1509710516-21084-1-git-send-email-yi.l.liu@linux.intel.com>
-	<1509710516-21084-6-git-send-email-yi.l.liu@linux.intel.com>
-	<7b16c99e-faad-9369-c165-c0dde588021b@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1eEcOe-0007dH-Av
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 09:41:08 -0500
+Received: from indium.canonical.com ([91.189.90.7]:58214)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eEcOe-0007bv-4d
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 09:41:04 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eEcOc-0004ZB-2y
+	for <qemu-devel@nongnu.org>; Tue, 14 Nov 2017 14:41:02 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 156D92E80D5
+	for <qemu-devel@nongnu.org>; Tue, 14 Nov 2017 14:41:02 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7b16c99e-faad-9369-c165-c0dde588021b@redhat.com>
-Subject: Re: [Qemu-devel] [RESEND PATCH 5/6] vfio/pci: add notify framework
- based on IOMMUObject
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 14 Nov 2017 14:35:33 -0000
+From: Launchpad Bug Tracker <1726394@bugs.launchpad.net>
+Reply-To: Bug 1726394 <1726394@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150876459007.17533.9812313883985505054.malonedeb@wampee.canonical.com>
+Message-Id: <151067013951.4962.13674405192881574433.malone@ackee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1726394] Re: Passes through prctl(PR_SET_SECCOMP,
+ SECCOMP_MODE_FILTER, address)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,150 +37,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Auger Eric <eric.auger@redhat.com>
-Cc: qemu-devel@nongnu.org, mst@redhat.com, david@gibson.dropbear.id.au, pbonzini@redhat.com, alex.williamson@redhat.com, tianyu.lan@intel.com, kevin.tian@intel.com, yi.l.liu@intel.com, jasowang@redhat.com, peterx@redhat.com
+To: qemu-devel@nongnu.org
 
-Hi Eric,
+This bug was fixed in the package qemu - 1:2.10+dfsg-0ubuntu4
 
-On Tue, Nov 14, 2017 at 11:23:03AM +0100, Auger Eric wrote:
-> Hi Yi L,
-> 
-> On 03/11/2017 13:01, Liu, Yi L wrote:
-> > This patch introduce a notify framework for IOMMUObject.iommu_notifiers.
-> > Introduce VFIOGuestIOMMUObject is to link VFIO Container and the new
-> > IOMMUObject notififiers.
-> notifiers
-> > 
-> > VFIOGuestIOMMUObject instance is allocated when device is assigned and
-> > meanwhile vIOMMU is exposed to guest.
-> > 
-> > If there is IOMMUObject behind the device AddressSpace(a.ka vIOMMU exposed).
-> > The VFIOGuestIOMMUObject instance would be allocated and inserted to the
-> > VFIOContainer.giommu_object_list.
-> > 
-> > Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
-> > ---
-> >  hw/vfio/pci.c                 | 39 ++++++++++++++++++++++++++++++++++++++-
-> >  include/hw/vfio/vfio-common.h |  8 ++++++++
-> >  2 files changed, 46 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-> > index c977ee3..5b77c7e 100644
-> > --- a/hw/vfio/pci.c
-> > +++ b/hw/vfio/pci.c
-> > @@ -2642,6 +2642,8 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
-> >      VFIOPCIDevice *vdev = DO_UPCAST(VFIOPCIDevice, pdev, pdev);
-> >      VFIODevice *vbasedev_iter;
-> >      VFIOGroup *group;
-> > +    AddressSpace *as;
-> > +    IOMMUObject *iommu;
-> >      char *tmp, group_path[PATH_MAX], *group_name;
-> >      Error *err = NULL;
-> >      ssize_t len;
-> > @@ -2694,7 +2696,8 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
-> >  
-> >      trace_vfio_realize(vdev->vbasedev.name, groupid);
-> >  
-> > -    group = vfio_get_group(groupid, pci_device_iommu_address_space(pdev), errp);
-> > +    as = pci_device_iommu_address_space(pdev);
-> > +    group = vfio_get_group(groupid, as, errp);
-> >      if (!group) {
-> >          goto error;
-> >      }
-> > @@ -2877,6 +2880,17 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
-> >      vfio_register_req_notifier(vdev);
-> >      vfio_setup_resetfn_quirk(vdev);
-> >  
-> > +    iommu = address_space_iommu_get(as);
-> > +    if (iommu != NULL) {
-> > +        VFIOGuestIOMMUObject *giommu;
-> nit: void line needed
+---------------
+qemu (1:2.10+dfsg-0ubuntu4) bionic; urgency=3Dmedium
 
-accepted.
+  * Apply linux-user-return-EINVAL-from-prctl-PR_-_SECCOMP.patch from
+    James Cowgill to prevent qemu-user from forwarding prctl seccomp
+    calls (LP: #1726394)
 
-> > +        giommu = g_malloc0(sizeof(*giommu));
-> > +        giommu->iommu = iommu;
-> > +        giommu->container = group->container;
-> > +        QLIST_INSERT_HEAD(&group->container->giommu_object_list,
-> There is no QLIST_INIT anywhere for container's giommu_object_list?
+ -- Julian Andres Klode <juliank@ubuntu.com>  Sat, 04 Nov 2017 00:21:14
++0100
 
-yes, need to add. thx for the catching.
+** Changed in: qemu (Ubuntu)
+       Status: Fix Committed =3D> Fix Released
 
-Thanks,
-Yi L
+-- =
 
-> 
-> Thanks
-> 
-> Eric
-> > +                          giommu,
-> > +                          giommu_next);
-> > +    }
-> > +
-> >      return;
-> >  
-> >  out_teardown:
-> > @@ -2907,6 +2921,28 @@ static void vfio_instance_finalize(Object *obj)
-> >      vfio_put_group(group);
-> >  }
-> >  
-> > +static void vfio_release_iommu_object(PCIDevice *pdev)
-> > +{
-> > +    VFIOPCIDevice *vdev = DO_UPCAST(VFIOPCIDevice, pdev, pdev);
-> > +    AddressSpace *as;
-> > +    IOMMUObject *iommu;
-> > +
-> > +    as = pci_device_iommu_address_space(pdev);
-> > +    iommu = address_space_iommu_get(as);
-> > +    if (iommu != NULL) {
-> > +        VFIOGuestIOMMUObject *giommu, *tmp;
-> > +        VFIOGroup *group;
-> > +        group = vdev->vbasedev.group;
-> > +
-> > +        QLIST_FOREACH_SAFE(giommu,
-> > +                           &group->container->giommu_object_list,
-> > +                           giommu_next, tmp) {
-> > +            QLIST_REMOVE(giommu, giommu_next);
-> > +            g_free(giommu);
-> > +        }
-> > +    }
-> > +    return;
-> > +}
-> >  static void vfio_exitfn(PCIDevice *pdev)
-> >  {
-> >      VFIOPCIDevice *vdev = DO_UPCAST(VFIOPCIDevice, pdev, pdev);
-> > @@ -2915,6 +2951,7 @@ static void vfio_exitfn(PCIDevice *pdev)
-> >      vfio_unregister_err_notifier(vdev);
-> >      pci_device_set_intx_routing_notifier(&vdev->pdev, NULL);
-> >      vfio_disable_interrupts(vdev);
-> > +    vfio_release_iommu_object(pdev);
-> >      if (vdev->intx.mmap_timer) {
-> >          timer_free(vdev->intx.mmap_timer);
-> >      }
-> > diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-> > index 702a085..e4963cc 100644
-> > --- a/include/hw/vfio/vfio-common.h
-> > +++ b/include/hw/vfio/vfio-common.h
-> > @@ -88,6 +88,7 @@ typedef struct VFIOContainer {
-> >       * future
-> >       */
-> >      QLIST_HEAD(, VFIOGuestIOMMUMR) giommu_mr_list;
-> > +    QLIST_HEAD(, VFIOGuestIOMMUObject) giommu_object_list;
-> >      QLIST_HEAD(, VFIOHostDMAWindow) hostwin_list;
-> >      QLIST_HEAD(, VFIOGroup) group_list;
-> >      QLIST_ENTRY(VFIOContainer) next;
-> > @@ -101,6 +102,13 @@ typedef struct VFIOGuestIOMMUMR {
-> >      QLIST_ENTRY(VFIOGuestIOMMUMR) giommu_next;
-> >  } VFIOGuestIOMMUMR;
-> >  
-> > +typedef struct VFIOGuestIOMMUObject {
-> > +    VFIOContainer *container;
-> > +    IOMMUObject *iommu;
-> > +    IOMMUNotifier n;
-> > +    QLIST_ENTRY(VFIOGuestIOMMUObject) giommu_next;
-> > +} VFIOGuestIOMMUObject;
-> > +
-> >  typedef struct VFIOHostDMAWindow {
-> >      hwaddr min_iova;
-> >      hwaddr max_iova;
-> > 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1726394
+
+Title:
+  Passes through prctl(PR_SET_SECCOMP, SECCOMP_MODE_FILTER, address)
+
+Status in QEMU:
+  In Progress
+Status in qemu package in Ubuntu:
+  Fix Released
+Status in qemu source package in Xenial:
+  Won't Fix
+Status in qemu source package in Zesty:
+  Won't Fix
+Status in qemu source package in Artful:
+  Won't Fix
+Status in qemu package in Debian:
+  Confirmed
+
+Bug description:
+  qemu-user passes through prctl(PR_SET_SECCOMP, SECCOMP_MODE_FILTER,
+  address) unmodified, but the third argument is an address to a BPF
+  filter, causing an EFAULT. Now, the filter is architecture-specifc, so
+  you can't just rewrite the addresses, so the safest bet is to just
+  return an error here.
+
+  I guess you should just return EINVAL, but not sure. I'd really like
+  something that can be identified, so seccomp errors can be ignored
+  when it's not supported.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1726394/+subscriptions
