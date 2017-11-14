@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58037)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58204)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eEcxs-0001oi-74
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 10:17:34 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eEcyB-0001xW-Kn
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 10:17:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eEcxr-0000hM-1L
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 10:17:28 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20171110221329.24176-1-mreitz@redhat.com>
-	<20171110221329.24176-3-mreitz@redhat.com>
-Date: Tue, 14 Nov 2017 16:17:18 +0100
-In-Reply-To: <20171110221329.24176-3-mreitz@redhat.com> (Max Reitz's message
-	of "Fri, 10 Nov 2017 23:13:28 +0100")
-Message-ID: <87zi7oritd.fsf@dusky.pond.sub.org>
+	(envelope-from <mreitz@redhat.com>) id 1eEcyA-00012h-NQ
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 10:17:47 -0500
+References: <cover.1510059970.git.jcody@redhat.com>
+	<659e4cdba6ef4c651737852777c8c93d27b38040.1510059970.git.jcody@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <fe1036ea-5bfe-1c9c-2821-ce62be865a92@redhat.com>
+Date: Tue, 14 Nov 2017 16:17:32 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH for-2.12 2/3] block: Handle null backing
- link
+In-Reply-To: <659e4cdba6ef4c651737852777c8c93d27b38040.1510059970.git.jcody@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="avSW4klOWJI9o2LpHgtHOAnLWNcIEFfp9"
+Subject: Re: [Qemu-devel] [PATCH v4 1/4] block/vhdx.c: Don't blindly update
+ the header
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,123 +25,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+To: Jeff Cody <jcody@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, aik@ozlabs.ru, den@openvz.org, stefanha@redhat.com
 
-Max Reitz <mreitz@redhat.com> writes:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--avSW4klOWJI9o2LpHgtHOAnLWNcIEFfp9
+From: Max Reitz <mreitz@redhat.com>
+To: Jeff Cody <jcody@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, aik@ozlabs.ru, den@openvz.org,
+ stefanha@redhat.com
+Message-ID: <fe1036ea-5bfe-1c9c-2821-ce62be865a92@redhat.com>
+Subject: Re: [PATCH v4 1/4] block/vhdx.c: Don't blindly update the header
+References: <cover.1510059970.git.jcody@redhat.com>
+ <659e4cdba6ef4c651737852777c8c93d27b38040.1510059970.git.jcody@redhat.com>
+In-Reply-To: <659e4cdba6ef4c651737852777c8c93d27b38040.1510059970.git.jcody@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> Instead of converting all "backing": null instances into "backing": "",
-> handle a null value directly in bdrv_open_inherit().
->
-> This enables explicitly null backing links for json:{} filenames.
->
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
+On 2017-11-07 14:10, Jeff Cody wrote:
+> The VHDX specification requires that before user data modification of
+> the vhdx image, the VHDX header file and data GUIDs need to be updated.=
+
+> In vhdx_open(), if the image is set to RDWR, we go ahead and update the=
+
+> header.
+>=20
+> However, just because the image is set to RDWR does not mean we can go
+> ahead and write at this point - specifically, if the QEMU run state is
+> INMIGRATE, the underlying file BS may be set to inactive via the BDS
+> open flag of BDRV_O_INACTIVE.  Attempting to write under this condition=
+
+> will cause an assert in bdrv_co_pwritev().
+>=20
+> We can alternatively latch the first time the image is written.  And lo=
+
+> and behold, we do just that, via vhdx_user_visible_write() in
+> vhdx_co_writev().  This means the call to vhdx_update_headers() in
+> vhdx_open() is likely just vestigial, and can be removed.
+>=20
+> Reported-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> Tested-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> Signed-off-by: Jeff Cody <jcody@redhat.com>
 > ---
->  block.c                    |  2 +-
->  blockdev.c                 | 14 --------------
->  tests/qemu-iotests/089     | 20 ++++++++++++++++++++
->  tests/qemu-iotests/089.out |  8 ++++++++
->  4 files changed, 29 insertions(+), 15 deletions(-)
->
-> diff --git a/block.c b/block.c
-> index 85427df577..bc92ddd5a0 100644
-> --- a/block.c
-> +++ b/block.c
-> @@ -2558,7 +2558,7 @@ static BlockDriverState *bdrv_open_inherit(const char *filename,
->  
->      /* See cautionary note on accessing @options above */
->      backing = qdict_get_try_str(options, "backing");
-> -    if (backing && *backing == '\0') {
-> +    if (qdict_is_qnull(options, "backing") || (backing && *backing == '\0')) {
->          flags |= BDRV_O_NO_BACKING;
->          qdict_del(options, "backing");
+>  block/vhdx.c | 7 -------
+>  1 file changed, 7 deletions(-)
+>=20
+> diff --git a/block/vhdx.c b/block/vhdx.c
+> index 7ae4589..9956933 100644
+> --- a/block/vhdx.c
+> +++ b/block/vhdx.c
+> @@ -1008,13 +1008,6 @@ static int vhdx_open(BlockDriverState *bs, QDict=
+ *options, int flags,
+>          goto fail;
 >      }
+> =20
+> -    if (flags & BDRV_O_RDWR) {
+> -        ret =3D vhdx_update_headers(bs, s, false, NULL);
 
-Consider a comment pointing out "" is deprecated.
+And this doesn't even update the data GUID...
 
-See also my reply to PATCH 1/3.
+Max
 
-> diff --git a/blockdev.c b/blockdev.c
-> index 56a6b24a0b..99ef618b39 100644
-> --- a/blockdev.c
-> +++ b/blockdev.c
-> @@ -3885,7 +3885,6 @@ void qmp_blockdev_add(BlockdevOptions *options, Error **errp)
->      QObject *obj;
->      Visitor *v = qobject_output_visitor_new(&obj);
->      QDict *qdict;
-> -    const QDictEntry *ent;
->      Error *local_err = NULL;
->  
->      visit_type_BlockdevOptions(v, NULL, &options, &local_err);
-> @@ -3899,19 +3898,6 @@ void qmp_blockdev_add(BlockdevOptions *options, Error **errp)
->  
->      qdict_flatten(qdict);
->  
-> -    /*
-> -     * Rewrite "backing": null to "backing": ""
-> -     * TODO Rewrite "" to null instead, and perhaps not even here
-> -     */
-> -    for (ent = qdict_first(qdict); ent; ent = qdict_next(qdict, ent)) {
-> -        char *dot = strrchr(ent->key, '.');
-> -
-> -        if (!strcmp(dot ? dot + 1 : ent->key, "backing")
-> -            && qobject_type(ent->value) == QTYPE_QNULL) {
-> -            qdict_put(qdict, ent->key, qstring_new());
+> -        if (ret < 0) {
+> -            goto fail;
 > -        }
 > -    }
 > -
->      if (!qdict_get_try_str(qdict, "node-name")) {
->          error_setg(errp, "'node-name' must be specified for the root node");
->          goto fail;
-> diff --git a/tests/qemu-iotests/089 b/tests/qemu-iotests/089
-> index 9bfe2307b3..832eac1248 100755
-> --- a/tests/qemu-iotests/089
-> +++ b/tests/qemu-iotests/089
-> @@ -82,6 +82,26 @@ $QEMU_IO_PROG --cache $CACHEMODE \
->  $QEMU_IO -c 'read -P 42 0 512' "$TEST_IMG" | _filter_qemu_io
->  
->  
-> +echo
-> +echo "=== Testing correct handling of 'backing':null ==="
-> +echo
-> +
-> +_make_test_img -b "$TEST_IMG.base" $IMG_SIZE
-> +
-> +# This should read 42
-> +$QEMU_IO -c 'read -P 42 0 512' "$TEST_IMG" | _filter_qemu_io
-> +
-> +# This should read 0
-> +$QEMU_IO -c 'read -P 0 0 512' "json:{\
-> +    'driver': '$IMGFMT',
-> +    'file': {
-> +        'driver': 'file',
-> +        'filename': '$TEST_IMG'
-> +    },
-> +    'backing': null
-> +}" | _filter_qemu_io
-> +
-> +
->  # Taken from test 071
->  echo
->  echo "=== Testing blkdebug ==="
-> diff --git a/tests/qemu-iotests/089.out b/tests/qemu-iotests/089.out
-> index 18f5fdda7a..607a9c6d9c 100644
-> --- a/tests/qemu-iotests/089.out
-> +++ b/tests/qemu-iotests/089.out
-> @@ -19,6 +19,14 @@ Pattern verification failed at offset 0, 512 bytes
->  read 512/512 bytes at offset 0
->  512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
->  
-> +=== Testing correct handling of 'backing':null ===
-> +
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864 backing_file=TEST_DIR/t.IMGFMT.base
-> +read 512/512 bytes at offset 0
-> +512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +read 512/512 bytes at offset 0
-> +512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +
->  === Testing blkdebug ===
->  
->  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
+>      /* TODO: differencing files */
+> =20
+>      return 0;
+>=20
 
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+
+
+--avSW4klOWJI9o2LpHgtHOAnLWNcIEFfp9
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAloLCQwSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AeaMH/3Toi0euQVe3eYj0KIr1VV2Cyt+9oLWm
+q5UxqHqxIuYQ2jrF79JV3sFDnQtbr26UPphfCCqg5k+nmk0f+TgD/E4M2nY5kN83
+izdsqy/CUICbDgbd83uUSCZbrUVnUNxLjuSzJwQNpOSkZ3ql79HAp+LfPZo1BRg+
+nOKHXM6xAlrALt54fju1JL55phnam8t2brzYlSG/QO2nDoEbFoJ13JJ5Gm+Uf7GB
+OdFDH9V+NJqsB0ugf//v0JyCTLu2gRLzrBHuFSYh1w7Hiz8FtKpxp/MSU5Tj6Za9
+svMYEWovYxyhDna+BajzFKOx9JPgaP5uMxUMv7kIvNC8tMVan8Grxh0=
+=naxq
+-----END PGP SIGNATURE-----
+
+--avSW4klOWJI9o2LpHgtHOAnLWNcIEFfp9--
