@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43630)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44688)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eEiAr-0005pF-Hj
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 15:51:14 -0500
+	(envelope-from <bounces@canonical.com>) id 1eEiFQ-00077z-Bb
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 15:55:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eEiAm-0006b1-JN
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 15:51:13 -0500
-Received: from indium.canonical.com ([91.189.90.7]:57932)
+	(envelope-from <bounces@canonical.com>) id 1eEiFL-0001IO-Hw
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 15:55:56 -0500
+Received: from indium.canonical.com ([91.189.90.7]:35154)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eEiAm-0006Z9-D0
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 15:51:08 -0500
+	id 1eEiFL-0001HO-BK
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 15:55:51 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eEiAj-0003RD-5w
-	for <qemu-devel@nongnu.org>; Tue, 14 Nov 2017 20:51:05 +0000
+	id 1eEiFI-0006KX-NS
+	for <qemu-devel@nongnu.org>; Tue, 14 Nov 2017 20:55:48 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id A3E382E81E5
-	for <qemu-devel@nongnu.org>; Tue, 14 Nov 2017 20:51:00 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 2A0882E80DC
+	for <qemu-devel@nongnu.org>; Tue, 14 Nov 2017 20:55:48 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 14 Nov 2017 20:45:07 -0000
-From: Maciej Piechotka <uzytkownik2@gmail.com>
-Reply-To: Bug 1713825 <1713825@bugs.launchpad.net>
+Date: Tue, 14 Nov 2017 20:47:30 -0000
+From: =?utf-8?q?W=C3=BCstengecko?= <1728256@bugs.launchpad.net>
+Reply-To: Bug 1728256 <1728256@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <150404140220.18876.2468100840644103776.malonedeb@chaenomeles.canonical.com>
-Message-Id: <151069230720.28725.6703819753883062910.malone@gac.canonical.com>
+References: <150920686502.20214.12572544661418580428.malonedeb@soybean.canonical.com>
+Message-Id: <151069245104.1570.11113743350297474816.malone@chaenomeles.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1713825] Re: Booting Windows 2016 with qxl video
- crashes qemu
+Subject: [Qemu-devel] [Bug 1728256] Re: (Regression) Memory corruption in
+ Windows 10 guest / amd64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,112 +39,72 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-It helps but I'm quite sure that lower level security systems (guest)
-should never be able to crash higher level security systems
-(hypervisor).
+It happened again, both with the e1000 and the rtl8139 NICs under qemu
+2.11.0.rc0-7-g4ffa88c99c. Kernel is the official Arch one, right now on
+4.13.12.
 
-PS. It repros in 2.10.0 as well.
+At this point I have no idea anymore what could be causing this, and am
+unable to test without having to remove basic functionality from the VM
+(e.g. the graphics card) or downgrading the host kernel (which I really
+want to avoid because I'm using btrfs).
+
+That said, during the last several days I did not experience these weird
+hangup issues that I described previously, however I did see very high
+CPU load in the guest that was caused by the network (listed in task
+manager as System Interrupts, and going as high as one full CPU core
+during large network operations).
+
+What is most interesting though is that it survived while I tried my
+best to get it to crash (stress-testing CPU and network, mostly), and
+then hit me with a Bluescreen in a most unexpected time almost a week
+later. Since then however it started crashing anywhere between a few
+hours and about two days of consecutive uptime again, just like before.
+
+@larsk, could you elaborate on your setup? Like, in which ways is it differ=
+ent (other than you using Ubuntu and thus different versions of the involve=
+d software)?
+Which hardware do you pass through, if any?
+
+** Summary changed:
+
+- (Regression) Memory corruption in Windows 10 guest / amd64
++ Memory corruption in Windows 10 guest / amd64
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1713825
+https://bugs.launchpad.net/bugs/1728256
 
 Title:
-  Booting Windows 2016 with qxl video crashes qemu
+  Memory corruption in Windows 10 guest / amd64
 
 Status in QEMU:
   New
 
 Bug description:
-  launched from libvirt.
+  I have a Win 10 Pro x64 guest inside a qemu/kvm running on an Arch x86_64=
+ host. The VM has a physical GPU passed through, as well as the physical US=
+B controllers, as well as a dedicated SSD attached via SATA; you can find t=
+he complete libvirt xml here: https://pastebin.com/U1ZAXBNg
+  I built qemu from source using the qemu-minimal-git AUR package; you can =
+find the build script here: https://aur.archlinux.org/cgit/aur.git/tree/PKG=
+BUILD?h=3Dqemu-minimal-git (if you aren't familiar with Arch, this is essen=
+tially a bash script where build() and package() are run to build the files=
+, and then install them into the $pkgdir to later tar them up.)
 
-  qemu version: 2.9.0
-  host: Linux <hostname> 4.9.34-gentoo #1 SMP Sat Jul 29 13:28:43 PDT 2017 =
-x86_64 Intel(R) Core(TM) i7-3930K CPU @ 3.20GHz GenuineIntel GNU/Linux
-  guest: Windows 2016 64 bit
+  Starting with qemu v2.10.0, Windows crashes randomly with a bluescreen
+  about CRITICAL_STRUCTURE_CORRUPTION. I also tested the git heads
+  f90ea7ba7c, 861cd431c9 and e822e81e35, before I went back to v2.9.0,
+  which is running stable for over 50 hours right now.
 
-  Thread 28 (Thread 0x7f0e2edff700 (LWP 29860)):
-  #0  __GI_raise (sig=3Dsig@entry=3D6) at ../sysdeps/unix/sysv/linux/raise.=
-c:51
-          set =3D {__val =3D {18446744067266837079, 139698892694944, 139699=
-853745096, 139700858749789, 4222451712, 139694281220640, 139694281220741, 1=
-39694281220640, 139694281220640, 139694281220810, =
+  During my tests I found that locking the memory pages alleviates the
+  problem somewhat, but never completely avoids it. However, with the
+  crashes occuring randomly, that could as well be false conclusions; I
+  had crashes within minutes after boot with that too.
 
-              139694281220940, 139694281220640, 139694281220940, 0, 0, 0}}
-          pid =3D <optimized out>
-          tid =3D <optimized out>
-  #1  0x00007f0ea40b644a in __GI_abort () at abort.c:89
-          save_stage =3D 2
-          act =3D {__sigaction_handler =3D {sa_handler =3D 0x7f0e2edfe5c0, =
-sa_sigaction =3D 0x7f0e2edfe5c0}, sa_mask =3D {__val =3D {139694281219872, =
-139698106269697, 139698892695344, 4, 2676511744, 0, 139698892695144, 0, =
-
-                139698892694912, 1, 4737316546111099904, 139700859888720, 4=
-737316546111099904, 139700862161824, 139700911349760, 94211934977482}}, sa_=
-flags =3D 416, =
-
-            sa_restorer =3D 0x55af6ceb0500 <__PRETTY_FUNCTION__.36381>}
-          sigs =3D {__val =3D {32, 0 <repeats 15 times>}}
-  #2  0x00007f0ea40abab6 in __assert_fail_base (fmt=3D<optimized out>, asse=
-rtion=3Dassertion@entry=3D0x55af6ceafdca "offset < qxl->vga.vram_size", =
-
-      file=3Dfile@entry=3D0x55af6ceaeaa0 "/var/tmp/portage/app-emulation/qe=
-mu-2.9.0-r2/work/qemu-2.9.0/hw/display/qxl.c", line=3Dline@entry=3D416, =
-
-      function=3Dfunction@entry=3D0x55af6ceb0500 <__PRETTY_FUNCTION__.36381=
-> "qxl_ram_set_dirty") at assert.c:92
-          str =3D 0x7f0d1c026220 "\340r\002\034\r\177"
-          total =3D 4096
-  #3  0x00007f0ea40abb81 in __GI___assert_fail (assertion=3Dassertion@entry=
-=3D0x55af6ceafdca "offset < qxl->vga.vram_size", =
-
-      file=3Dfile@entry=3D0x55af6ceaeaa0 "/var/tmp/portage/app-emulation/qe=
-mu-2.9.0-r2/work/qemu-2.9.0/hw/display/qxl.c", line=3Dline@entry=3D416, =
-
-      function=3Dfunction@entry=3D0x55af6ceb0500 <__PRETTY_FUNCTION__.36381=
-> "qxl_ram_set_dirty") at assert.c:101
-  No locals.
-  #4  0x000055af6cc58805 in qxl_ram_set_dirty (qxl=3D<optimized out>, ptr=
-=3D<optimized out>) at /var/tmp/portage/app-emulation/qemu-2.9.0-r2/work/qe=
-mu-2.9.0/hw/display/qxl.c:416
-          base =3D <optimized out>
-          offset =3D <optimized out>
-          qxl =3D <optimized out>
-          ptr =3D <optimized out>
-          base =3D <optimized out>
-          offset =3D <optimized out>
-  #5  0x000055af6cc5b9e2 in interface_release_resource (sin=3D0x55af71a91ed=
-0, ext=3D...) at /var/tmp/portage/app-emulation/qemu-2.9.0-r2/work/qemu-2.9=
-.0/hw/display/qxl.c:767
-          qxl =3D 0x55af71a91450
-          ring =3D <optimized out>
-          item =3D <optimized out>
-          id =3D 18446690739814400920
-          __func__ =3D "interface_release_resource"
-  #6  0x00007f0ea510afa8 in red_drawable_unref (red_drawable=3D0x7f0d1c0261=
-20) at red-worker.c:101
-  No locals.
-  #7  0x00007f0ea510b609 in red_drawable_unref (red_drawable=3D<optimized o=
-ut>) at red-worker.c:104
-  No locals.
-  #8  0x00007f0ea510eae9 in drawable_unref (drawable=3Ddrawable@entry=3D0x7=
-f0e68285ac0) at display-channel.c:1438
-          display =3D 0x55af71dbd3c0
-          __FUNCTION__ =3D "drawable_unref"
-  #9  0x00007f0ea51109f7 in draw_until (display=3Ddisplay@entry=3D0x55af71d=
-bd3c0, surface=3Dsurface@entry=3D0x7f0e6828aae8, last=3D0x7f0e68285ac0) at =
-display-channel.c:1637
-          container =3D 0x0
-          now =3D 0x7f0e68285ac0
-  #10 0x00007f0ea510f93f in display_channel_draw (display=3D0x55af71dbd3c0,=
- area=3D0x7f0e2edfe8e0, surface_id=3D<optimized out>) at display-channel.c:=
-1729
-          surface =3D 0x7f0e6828aae8
-          last =3D <optimized out>
-          __FUNCTION__ =3D "display_channel_draw"
-          __func__ =3D "display_channel_draw"
+  I will now start `git bisect`ing; if you have any other suggestions on
+  what I could try or possible patches feel free to leave them with me.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1713825/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1728256/+subscriptions
