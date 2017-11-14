@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42120)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42061)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eEfX3-0000cq-OL
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 13:01:59 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eEfX0-0000QE-1Q
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 13:02:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eEfX2-0003IW-0A
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 13:01:57 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eEfWw-0003Eo-T6
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 13:01:54 -0500
 From: Max Reitz <mreitz@redhat.com>
-Date: Tue, 14 Nov 2017 19:01:28 +0100
-Message-Id: <20171114180128.17076-7-mreitz@redhat.com>
+Date: Tue, 14 Nov 2017 19:01:25 +0100
+Message-Id: <20171114180128.17076-4-mreitz@redhat.com>
 In-Reply-To: <20171114180128.17076-1-mreitz@redhat.com>
 References: <20171114180128.17076-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.11? v7 6/6] tests: Add check-qobject for
- equality tests
+Subject: [Qemu-devel] [PATCH for-2.11? v7 3/6] qapi: Add qobject_is_equal()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,393 +22,361 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-Add a new test file (check-qobject.c) for unit tests that concern
-QObjects as a whole.
-
-Its only purpose for now is to test the qobject_is_equal() function.
+This generic function (along with its implementations for different
+types) determines whether two QObjects are equal.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Alberto Garcia <berto@igalia.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
 ---
- tests/Makefile.include |   4 +-
- tests/check-qobject.c  | 328 +++++++++++++++++++++++++++++++++++++++++++++++++
- tests/.gitignore       |   1 +
- 3 files changed, 332 insertions(+), 1 deletion(-)
- create mode 100644 tests/check-qobject.c
+ include/qapi/qmp/qbool.h   |  1 +
+ include/qapi/qmp/qdict.h   |  1 +
+ include/qapi/qmp/qlist.h   |  1 +
+ include/qapi/qmp/qnull.h   |  2 ++
+ include/qapi/qmp/qnum.h    |  1 +
+ include/qapi/qmp/qobject.h |  9 ++++++++
+ include/qapi/qmp/qstring.h |  1 +
+ qobject/qbool.c            |  8 +++++++
+ qobject/qdict.c            | 29 +++++++++++++++++++++++++
+ qobject/qlist.c            | 32 +++++++++++++++++++++++++++
+ qobject/qnull.c            |  9 ++++++++
+ qobject/qnum.c             | 54 ++++++++++++++++++++++++++++++++++++++++++++++
+ qobject/qobject.c          | 29 +++++++++++++++++++++++++
+ qobject/qstring.c          |  9 ++++++++
+ 14 files changed, 186 insertions(+)
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 434a2ce868..c002352134 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -41,6 +41,7 @@ check-unit-y += tests/check-qlist$(EXESUF)
- gcov-files-check-qlist-y = qobject/qlist.c
- check-unit-y += tests/check-qnull$(EXESUF)
- gcov-files-check-qnull-y = qobject/qnull.c
-+check-unit-y += tests/check-qobject$(EXESUF)
- check-unit-y += tests/check-qjson$(EXESUF)
- gcov-files-check-qjson-y = qobject/qjson.c
- check-unit-y += tests/check-qlit$(EXESUF)
-@@ -546,7 +547,7 @@ GENERATED_FILES += tests/test-qapi-types.h tests/test-qapi-visit.h \
- 	tests/test-qmp-introspect.h
+diff --git a/include/qapi/qmp/qbool.h b/include/qapi/qmp/qbool.h
+index a41111c309..f77ea86c4e 100644
+--- a/include/qapi/qmp/qbool.h
++++ b/include/qapi/qmp/qbool.h
+@@ -24,6 +24,7 @@ typedef struct QBool {
+ QBool *qbool_from_bool(bool value);
+ bool qbool_get_bool(const QBool *qb);
+ QBool *qobject_to_qbool(const QObject *obj);
++bool qbool_is_equal(const QObject *x, const QObject *y);
+ void qbool_destroy_obj(QObject *obj);
  
- test-obj-y = tests/check-qnum.o tests/check-qstring.o tests/check-qdict.o \
--	tests/check-qlist.o tests/check-qnull.o \
-+	tests/check-qlist.o tests/check-qnull.o tests/check-qobject.o \
- 	tests/check-qjson.o tests/check-qlit.o \
- 	tests/test-coroutine.o tests/test-string-output-visitor.o \
- 	tests/test-string-input-visitor.o tests/test-qobject-output-visitor.o \
-@@ -580,6 +581,7 @@ tests/check-qstring$(EXESUF): tests/check-qstring.o $(test-util-obj-y)
- tests/check-qdict$(EXESUF): tests/check-qdict.o $(test-util-obj-y)
- tests/check-qlist$(EXESUF): tests/check-qlist.o $(test-util-obj-y)
- tests/check-qnull$(EXESUF): tests/check-qnull.o $(test-util-obj-y)
-+tests/check-qobject$(EXESUF): tests/check-qobject.o $(test-util-obj-y)
- tests/check-qjson$(EXESUF): tests/check-qjson.o $(test-util-obj-y)
- tests/check-qlit$(EXESUF): tests/check-qlit.o $(test-util-obj-y)
- tests/check-qom-interface$(EXESUF): tests/check-qom-interface.o $(test-qom-obj-y)
-diff --git a/tests/check-qobject.c b/tests/check-qobject.c
-new file mode 100644
-index 0000000000..03e9175113
---- /dev/null
-+++ b/tests/check-qobject.c
-@@ -0,0 +1,328 @@
-+/*
-+ * Generic QObject unit-tests.
+ #endif /* QBOOL_H */
+diff --git a/include/qapi/qmp/qdict.h b/include/qapi/qmp/qdict.h
+index 7ea5120c4a..fc218e7be6 100644
+--- a/include/qapi/qmp/qdict.h
++++ b/include/qapi/qmp/qdict.h
+@@ -43,6 +43,7 @@ void qdict_del(QDict *qdict, const char *key);
+ int qdict_haskey(const QDict *qdict, const char *key);
+ QObject *qdict_get(const QDict *qdict, const char *key);
+ QDict *qobject_to_qdict(const QObject *obj);
++bool qdict_is_equal(const QObject *x, const QObject *y);
+ void qdict_iter(const QDict *qdict,
+                 void (*iter)(const char *key, QObject *obj, void *opaque),
+                 void *opaque);
+diff --git a/include/qapi/qmp/qlist.h b/include/qapi/qmp/qlist.h
+index 59d209bbae..ec3fcc1a4c 100644
+--- a/include/qapi/qmp/qlist.h
++++ b/include/qapi/qmp/qlist.h
+@@ -61,6 +61,7 @@ QObject *qlist_peek(QList *qlist);
+ int qlist_empty(const QList *qlist);
+ size_t qlist_size(const QList *qlist);
+ QList *qobject_to_qlist(const QObject *obj);
++bool qlist_is_equal(const QObject *x, const QObject *y);
+ void qlist_destroy_obj(QObject *obj);
+ 
+ static inline const QListEntry *qlist_first(const QList *qlist)
+diff --git a/include/qapi/qmp/qnull.h b/include/qapi/qmp/qnull.h
+index d075549283..c992ee2ae1 100644
+--- a/include/qapi/qmp/qnull.h
++++ b/include/qapi/qmp/qnull.h
+@@ -27,4 +27,6 @@ static inline QNull *qnull(void)
+     return &qnull_;
+ }
+ 
++bool qnull_is_equal(const QObject *x, const QObject *y);
++
+ #endif /* QNULL_H */
+diff --git a/include/qapi/qmp/qnum.h b/include/qapi/qmp/qnum.h
+index d6b0791139..c3d86794bb 100644
+--- a/include/qapi/qmp/qnum.h
++++ b/include/qapi/qmp/qnum.h
+@@ -69,6 +69,7 @@ double qnum_get_double(QNum *qn);
+ char *qnum_to_string(QNum *qn);
+ 
+ QNum *qobject_to_qnum(const QObject *obj);
++bool qnum_is_equal(const QObject *x, const QObject *y);
+ void qnum_destroy_obj(QObject *obj);
+ 
+ #endif /* QNUM_H */
+diff --git a/include/qapi/qmp/qobject.h b/include/qapi/qmp/qobject.h
+index ef1d1a9237..38ac68845c 100644
+--- a/include/qapi/qmp/qobject.h
++++ b/include/qapi/qmp/qobject.h
+@@ -68,6 +68,15 @@ static inline void qobject_incref(QObject *obj)
+ }
+ 
+ /**
++ * qobject_is_equal(): Return whether the two objects are equal.
 + *
-+ * Copyright (C) 2017 Red Hat Inc.
-+ *
-+ * This work is licensed under the terms of the GNU LGPL, version 2.1 or later.
-+ * See the COPYING.LIB file in the top-level directory.
++ * Any of the pointers may be NULL; return true if both are.  Always
++ * return false if only one is (therefore a QNull object is not
++ * considered equal to a NULL pointer).
 + */
-+#include "qemu/osdep.h"
-+
-+#include "qapi/qmp/types.h"
-+#include "qemu-common.h"
-+
-+#include <math.h>
-+
-+/* Marks the end of the test_equality() argument list.
-+ * We cannot use NULL there because that is a valid argument. */
-+static QObject test_equality_end_of_arguments;
++bool qobject_is_equal(const QObject *x, const QObject *y);
 +
 +/**
-+ * Test whether all variadic QObject *arguments are equal (@expected
-+ * is true) or whether they are all not equal (@expected is false).
-+ * Every QObject is tested to be equal to itself (to test
-+ * reflexivity), all tests are done both ways (to test symmetry), and
-+ * transitivity is not assumed but checked (each object is compared to
-+ * every other one).
-+ *
-+ * Note that qobject_is_equal() is not really an equivalence relation,
-+ * so this function may not be used for all objects (reflexivity is
-+ * not guaranteed, e.g. in the case of a QNum containing NaN).
-+ *
-+ * The @_ argument is required because a boolean may not be the last
-+ * argument before a variadic argument list (C11 7.16.1.4 para. 4).
+  * qobject_destroy(): Free resources used by the object
+  */
+ void qobject_destroy(QObject *obj);
+diff --git a/include/qapi/qmp/qstring.h b/include/qapi/qmp/qstring.h
+index 10076b7c8c..65c05a9be5 100644
+--- a/include/qapi/qmp/qstring.h
++++ b/include/qapi/qmp/qstring.h
+@@ -31,6 +31,7 @@ void qstring_append_int(QString *qstring, int64_t value);
+ void qstring_append(QString *qstring, const char *str);
+ void qstring_append_chr(QString *qstring, int c);
+ QString *qobject_to_qstring(const QObject *obj);
++bool qstring_is_equal(const QObject *x, const QObject *y);
+ void qstring_destroy_obj(QObject *obj);
+ 
+ #endif /* QSTRING_H */
+diff --git a/qobject/qbool.c b/qobject/qbool.c
+index 0606bbd2a3..ac825fc5a2 100644
+--- a/qobject/qbool.c
++++ b/qobject/qbool.c
+@@ -52,6 +52,14 @@ QBool *qobject_to_qbool(const QObject *obj)
+ }
+ 
+ /**
++ * qbool_is_equal(): Test whether the two QBools are equal
 + */
-+static void do_test_equality(bool expected, int _, ...)
++bool qbool_is_equal(const QObject *x, const QObject *y)
 +{
-+    va_list ap_count, ap_extract;
-+    QObject **args;
-+    int arg_count = 0;
-+    int i, j;
++    return qobject_to_qbool(x)->value == qobject_to_qbool(y)->value;
++}
 +
-+    va_start(ap_count, _);
-+    va_copy(ap_extract, ap_count);
-+    while (va_arg(ap_count, QObject *) != &test_equality_end_of_arguments) {
-+        arg_count++;
++/**
+  * qbool_destroy_obj(): Free all memory allocated by a
+  * QBool object
+  */
+diff --git a/qobject/qdict.c b/qobject/qdict.c
+index 576018e531..e8f15f1132 100644
+--- a/qobject/qdict.c
++++ b/qobject/qdict.c
+@@ -403,6 +403,35 @@ void qdict_del(QDict *qdict, const char *key)
+ }
+ 
+ /**
++ * qdict_is_equal(): Test whether the two QDicts are equal
++ *
++ * Here, equality means whether they contain the same keys and whether
++ * the respective values are in turn equal (i.e. invoking
++ * qobject_is_equal() on them yields true).
++ */
++bool qdict_is_equal(const QObject *x, const QObject *y)
++{
++    const QDict *dict_x = qobject_to_qdict(x);
++    const QDict *dict_y = qobject_to_qdict(y);
++    const QDictEntry *e;
++
++    if (qdict_size(dict_x) != qdict_size(dict_y)) {
++        return false;
 +    }
-+    va_end(ap_count);
 +
-+    args = g_new(QObject *, arg_count);
-+    for (i = 0; i < arg_count; i++) {
-+        args[i] = va_arg(ap_extract, QObject *);
-+    }
-+    va_end(ap_extract);
++    for (e = qdict_first(dict_x); e; e = qdict_next(dict_x, e)) {
++        const QObject *obj_x = qdict_entry_value(e);
++        const QObject *obj_y = qdict_get(dict_y, qdict_entry_key(e));
 +
-+    for (i = 0; i < arg_count; i++) {
-+        g_assert(qobject_is_equal(args[i], args[i]) == true);
-+
-+        for (j = i + 1; j < arg_count; j++) {
-+            g_assert(qobject_is_equal(args[i], args[j]) == expected);
++        if (!qobject_is_equal(obj_x, obj_y)) {
++            return false;
 +        }
 +    }
++
++    return true;
 +}
 +
-+#define check_equal(...) \
-+    do_test_equality(true, 0, __VA_ARGS__, &test_equality_end_of_arguments)
-+#define check_unequal(...) \
-+    do_test_equality(false, 0, __VA_ARGS__, &test_equality_end_of_arguments)
-+
-+static void do_free_all(int _, ...)
++/**
+  * qdict_destroy_obj(): Free all the memory allocated by a QDict
+  */
+ void qdict_destroy_obj(QObject *obj)
+diff --git a/qobject/qlist.c b/qobject/qlist.c
+index 86b60cb88c..3ef57d31d1 100644
+--- a/qobject/qlist.c
++++ b/qobject/qlist.c
+@@ -140,6 +140,38 @@ QList *qobject_to_qlist(const QObject *obj)
+ }
+ 
+ /**
++ * qlist_is_equal(): Test whether the two QLists are equal
++ *
++ * In order to be considered equal, the respective two objects at each
++ * index of the two lists have to compare equal (regarding
++ * qobject_is_equal()), and both lists have to have the same number of
++ * elements.
++ * That means both lists have to contain equal objects in equal order.
++ */
++bool qlist_is_equal(const QObject *x, const QObject *y)
 +{
-+    va_list ap;
-+    QObject *obj;
++    const QList *list_x = qobject_to_qlist(x);
++    const QList *list_y = qobject_to_qlist(y);
++    const QListEntry *entry_x, *entry_y;
 +
-+    va_start(ap, _);
-+    while ((obj = va_arg(ap, QObject *)) != NULL) {
-+        qobject_decref(obj);
++    entry_x = qlist_first(list_x);
++    entry_y = qlist_first(list_y);
++
++    while (entry_x && entry_y) {
++        if (!qobject_is_equal(qlist_entry_obj(entry_x),
++                              qlist_entry_obj(entry_y)))
++        {
++            return false;
++        }
++
++        entry_x = qlist_next(entry_x);
++        entry_y = qlist_next(entry_y);
 +    }
-+    va_end(ap);
++
++    return !entry_x && !entry_y;
 +}
 +
-+#define free_all(...) \
-+    do_free_all(0, __VA_ARGS__, NULL)
++/**
+  * qlist_destroy_obj(): Free all the memory allocated by a QList
+  */
+ void qlist_destroy_obj(QObject *obj)
+diff --git a/qobject/qnull.c b/qobject/qnull.c
+index bc9fd31626..f6f55f11ea 100644
+--- a/qobject/qnull.c
++++ b/qobject/qnull.c
+@@ -20,3 +20,12 @@ QNull qnull_ = {
+         .refcnt = 1,
+     },
+ };
 +
-+static void qobject_is_equal_null_test(void)
++/**
++ * qnull_is_equal(): Always return true because any two QNull objects
++ * are equal.
++ */
++bool qnull_is_equal(const QObject *x, const QObject *y)
 +{
-+    check_unequal(qnull(), NULL);
++    return true;
 +}
-+
-+static void qobject_is_equal_num_test(void)
+diff --git a/qobject/qnum.c b/qobject/qnum.c
+index 476e81c93b..410686a611 100644
+--- a/qobject/qnum.c
++++ b/qobject/qnum.c
+@@ -213,6 +213,60 @@ QNum *qobject_to_qnum(const QObject *obj)
+ }
+ 
+ /**
++ * qnum_is_equal(): Test whether the two QNums are equal
++ *
++ * Negative integers are never considered equal to unsigned integers,
++ * but positive integers in the range [0, INT64_MAX] are considered
++ * equal independently of whether the QNum's kind is i64 or u64.
++ *
++ * Doubles are never considered equal to integers.
++ */
++bool qnum_is_equal(const QObject *x, const QObject *y)
 +{
-+    QNum *u0, *i0, *d0, *dnan, *um42, *im42, *dm42;
++    QNum *num_x = qobject_to_qnum(x);
++    QNum *num_y = qobject_to_qnum(y);
 +
-+    u0 = qnum_from_uint(0u);
-+    i0 = qnum_from_int(0);
-+    d0 = qnum_from_double(0.0);
-+    dnan = qnum_from_double(NAN);
-+    um42 = qnum_from_uint((uint64_t)-42);
-+    im42 = qnum_from_int(-42);
-+    dm42 = qnum_from_double(-42.0);
++    switch (num_x->kind) {
++    case QNUM_I64:
++        switch (num_y->kind) {
++        case QNUM_I64:
++            /* Comparison in native int64_t type */
++            return num_x->u.i64 == num_y->u.i64;
++        case QNUM_U64:
++            /* Implicit conversion of x to uin64_t, so we have to
++             * check its sign before */
++            return num_x->u.i64 >= 0 && num_x->u.i64 == num_y->u.u64;
++        case QNUM_DOUBLE:
++            return false;
++        }
++        abort();
++    case QNUM_U64:
++        switch (num_y->kind) {
++        case QNUM_I64:
++            return qnum_is_equal(y, x);
++        case QNUM_U64:
++            /* Comparison in native uint64_t type */
++            return num_x->u.u64 == num_y->u.u64;
++        case QNUM_DOUBLE:
++            return false;
++        }
++        abort();
++    case QNUM_DOUBLE:
++        switch (num_y->kind) {
++        case QNUM_I64:
++        case QNUM_U64:
++            return false;
++        case QNUM_DOUBLE:
++            /* Comparison in native double type */
++            return num_x->u.dbl == num_y->u.dbl;
++        }
++        abort();
++    }
 +
-+    /* Integers representing a mathematically equal number should
-+     * compare equal */
-+    check_equal(u0, i0);
-+    /* Doubles, however, are always unequal to integers */
-+    check_unequal(u0, d0);
-+    check_unequal(i0, d0);
-+
-+    /* Do not assume any object is equal to itself -- note however
-+     * that NaN cannot occur in a JSON object anyway. */
-+    g_assert(qobject_is_equal(QOBJECT(dnan), QOBJECT(dnan)) == false);
-+
-+    /* No unsigned overflow */
-+    check_unequal(um42, im42);
-+    check_unequal(um42, dm42);
-+    check_unequal(im42, dm42);
-+
-+    free_all(u0, i0, d0, dnan, um42, im42, dm42);
++    abort();
 +}
 +
-+static void qobject_is_equal_bool_test(void)
++/**
+  * qnum_destroy_obj(): Free all memory allocated by a
+  * QNum object
+  */
+diff --git a/qobject/qobject.c b/qobject/qobject.c
+index b0cafb66f1..b2a536041d 100644
+--- a/qobject/qobject.c
++++ b/qobject/qobject.c
+@@ -27,3 +27,32 @@ void qobject_destroy(QObject *obj)
+     assert(QTYPE_QNULL < obj->type && obj->type < QTYPE__MAX);
+     qdestroy[obj->type](obj);
+ }
++
++
++static bool (*qis_equal[QTYPE__MAX])(const QObject *, const QObject *) = {
++    [QTYPE_NONE] = NULL,               /* No such object exists */
++    [QTYPE_QNULL] = qnull_is_equal,
++    [QTYPE_QNUM] = qnum_is_equal,
++    [QTYPE_QSTRING] = qstring_is_equal,
++    [QTYPE_QDICT] = qdict_is_equal,
++    [QTYPE_QLIST] = qlist_is_equal,
++    [QTYPE_QBOOL] = qbool_is_equal,
++};
++
++bool qobject_is_equal(const QObject *x, const QObject *y)
 +{
-+    QBool *btrue_0, *btrue_1, *bfalse_0, *bfalse_1;
++    /* We cannot test x == y because an object does not need to be
++     * equal to itself (e.g. NaN floats are not). */
 +
-+    btrue_0 = qbool_from_bool(true);
-+    btrue_1 = qbool_from_bool(true);
-+    bfalse_0 = qbool_from_bool(false);
-+    bfalse_1 = qbool_from_bool(false);
++    if (!x && !y) {
++        return true;
++    }
 +
-+    check_equal(btrue_0, btrue_1);
-+    check_equal(bfalse_0, bfalse_1);
-+    check_unequal(btrue_0, bfalse_0);
++    if (!x || !y || x->type != y->type) {
++        return false;
++    }
 +
-+    free_all(btrue_0, btrue_1, bfalse_0, bfalse_1);
++    assert(QTYPE_NONE < x->type && x->type < QTYPE__MAX);
++
++    return qis_equal[x->type](x, y);
 +}
-+
-+static void qobject_is_equal_string_test(void)
+diff --git a/qobject/qstring.c b/qobject/qstring.c
+index 5da7b5f37c..74182a1c02 100644
+--- a/qobject/qstring.c
++++ b/qobject/qstring.c
+@@ -129,6 +129,15 @@ const char *qstring_get_str(const QString *qstring)
+ }
+ 
+ /**
++ * qstring_is_equal(): Test whether the two QStrings are equal
++ */
++bool qstring_is_equal(const QObject *x, const QObject *y)
 +{
-+    QString *str_base, *str_whitespace_0, *str_whitespace_1, *str_whitespace_2;
-+    QString *str_whitespace_3, *str_case, *str_built;
-+
-+    str_base = qstring_from_str("foo");
-+    str_whitespace_0 = qstring_from_str(" foo");
-+    str_whitespace_1 = qstring_from_str("foo ");
-+    str_whitespace_2 = qstring_from_str("foo\b");
-+    str_whitespace_3 = qstring_from_str("fooo\b");
-+    str_case = qstring_from_str("Foo");
-+
-+    /* Should yield "foo" */
-+    str_built = qstring_from_substr("form", 0, 1);
-+    qstring_append_chr(str_built, 'o');
-+
-+    check_unequal(str_base, str_whitespace_0, str_whitespace_1,
-+                  str_whitespace_2, str_whitespace_3, str_case);
-+
-+    check_equal(str_base, str_built);
-+
-+    free_all(str_base, str_whitespace_0, str_whitespace_1, str_whitespace_2,
-+             str_whitespace_3, str_case, str_built);
++    return !strcmp(qobject_to_qstring(x)->string,
++                   qobject_to_qstring(y)->string);
 +}
 +
-+static void qobject_is_equal_list_test(void)
-+{
-+    QList *list_0, *list_1, *list_cloned;
-+    QList *list_reordered, *list_longer, *list_shorter;
-+
-+    list_0 = qlist_new();
-+    list_1 = qlist_new();
-+    list_reordered = qlist_new();
-+    list_longer = qlist_new();
-+    list_shorter = qlist_new();
-+
-+    qlist_append_int(list_0, 1);
-+    qlist_append_int(list_0, 2);
-+    qlist_append_int(list_0, 3);
-+
-+    qlist_append_int(list_1, 1);
-+    qlist_append_int(list_1, 2);
-+    qlist_append_int(list_1, 3);
-+
-+    qlist_append_int(list_reordered, 1);
-+    qlist_append_int(list_reordered, 3);
-+    qlist_append_int(list_reordered, 2);
-+
-+    qlist_append_int(list_longer, 1);
-+    qlist_append_int(list_longer, 2);
-+    qlist_append_int(list_longer, 3);
-+    qlist_append_null(list_longer);
-+
-+    qlist_append_int(list_shorter, 1);
-+    qlist_append_int(list_shorter, 2);
-+
-+    list_cloned = qlist_copy(list_0);
-+
-+    check_equal(list_0, list_1, list_cloned);
-+    check_unequal(list_0, list_reordered, list_longer, list_shorter);
-+
-+    /* With a NaN in it, the list should no longer compare equal to
-+     * itself */
-+    qlist_append(list_0, qnum_from_double(NAN));
-+    g_assert(qobject_is_equal(QOBJECT(list_0), QOBJECT(list_0)) == false);
-+
-+    free_all(list_0, list_1, list_cloned, list_reordered, list_longer,
-+             list_shorter);
-+}
-+
-+static void qobject_is_equal_dict_test(void)
-+{
-+    Error *local_err = NULL;
-+    QDict *dict_0, *dict_1, *dict_cloned;
-+    QDict *dict_different_key, *dict_different_value, *dict_different_null_key;
-+    QDict *dict_longer, *dict_shorter, *dict_nested;
-+    QDict *dict_crumpled;
-+
-+    dict_0 = qdict_new();
-+    dict_1 = qdict_new();
-+    dict_different_key = qdict_new();
-+    dict_different_value = qdict_new();
-+    dict_different_null_key = qdict_new();
-+    dict_longer = qdict_new();
-+    dict_shorter = qdict_new();
-+    dict_nested = qdict_new();
-+
-+    qdict_put_int(dict_0, "f.o", 1);
-+    qdict_put_int(dict_0, "bar", 2);
-+    qdict_put_int(dict_0, "baz", 3);
-+    qdict_put_null(dict_0, "null");
-+
-+    qdict_put_int(dict_1, "f.o", 1);
-+    qdict_put_int(dict_1, "bar", 2);
-+    qdict_put_int(dict_1, "baz", 3);
-+    qdict_put_null(dict_1, "null");
-+
-+    qdict_put_int(dict_different_key, "F.o", 1);
-+    qdict_put_int(dict_different_key, "bar", 2);
-+    qdict_put_int(dict_different_key, "baz", 3);
-+    qdict_put_null(dict_different_key, "null");
-+
-+    qdict_put_int(dict_different_value, "f.o", 42);
-+    qdict_put_int(dict_different_value, "bar", 2);
-+    qdict_put_int(dict_different_value, "baz", 3);
-+    qdict_put_null(dict_different_value, "null");
-+
-+    qdict_put_int(dict_different_null_key, "f.o", 1);
-+    qdict_put_int(dict_different_null_key, "bar", 2);
-+    qdict_put_int(dict_different_null_key, "baz", 3);
-+    qdict_put_null(dict_different_null_key, "none");
-+
-+    qdict_put_int(dict_longer, "f.o", 1);
-+    qdict_put_int(dict_longer, "bar", 2);
-+    qdict_put_int(dict_longer, "baz", 3);
-+    qdict_put_int(dict_longer, "xyz", 4);
-+    qdict_put_null(dict_longer, "null");
-+
-+    qdict_put_int(dict_shorter, "f.o", 1);
-+    qdict_put_int(dict_shorter, "bar", 2);
-+    qdict_put_int(dict_shorter, "baz", 3);
-+
-+    qdict_put(dict_nested, "f", qdict_new());
-+    qdict_put_int(qdict_get_qdict(dict_nested, "f"), "o", 1);
-+    qdict_put_int(dict_nested, "bar", 2);
-+    qdict_put_int(dict_nested, "baz", 3);
-+    qdict_put_null(dict_nested, "null");
-+
-+    dict_cloned = qdict_clone_shallow(dict_0);
-+
-+    check_equal(dict_0, dict_1, dict_cloned);
-+    check_unequal(dict_0, dict_different_key, dict_different_value,
-+                  dict_different_null_key, dict_longer, dict_shorter,
-+                  dict_nested);
-+
-+    dict_crumpled = qobject_to_qdict(qdict_crumple(dict_1, &local_err));
-+    g_assert(!local_err);
-+    check_equal(dict_crumpled, dict_nested);
-+
-+    qdict_flatten(dict_nested);
-+    check_equal(dict_0, dict_nested);
-+
-+    /* Containing an NaN value will make this dict compare unequal to
-+     * itself */
-+    qdict_put(dict_0, "NaN", qnum_from_double(NAN));
-+    g_assert(qobject_is_equal(QOBJECT(dict_0), QOBJECT(dict_0)) == false);
-+
-+    free_all(dict_0, dict_1, dict_cloned, dict_different_key,
-+             dict_different_value, dict_different_null_key, dict_longer,
-+             dict_shorter, dict_nested, dict_crumpled);
-+}
-+
-+static void qobject_is_equal_conversion_test(void)
-+{
-+    QNum *u0, *i0, *d0;
-+    QString *s0, *s_empty;
-+    QBool *bfalse;
-+
-+    u0 = qnum_from_uint(0u);
-+    i0 = qnum_from_int(0);
-+    d0 = qnum_from_double(0.0);
-+    s0 = qstring_from_str("0");
-+    s_empty = qstring_new();
-+    bfalse = qbool_from_bool(false);
-+
-+    /* No automatic type conversion */
-+    check_unequal(u0, s0, s_empty, bfalse, qnull(), NULL);
-+    check_unequal(i0, s0, s_empty, bfalse, qnull(), NULL);
-+    check_unequal(d0, s0, s_empty, bfalse, qnull(), NULL);
-+
-+    free_all(u0, i0, d0, s0, s_empty, bfalse);
-+}
-+
-+int main(int argc, char **argv)
-+{
-+    g_test_init(&argc, &argv, NULL);
-+
-+    g_test_add_func("/public/qobject_is_equal_null",
-+                    qobject_is_equal_null_test);
-+    g_test_add_func("/public/qobject_is_equal_num", qobject_is_equal_num_test);
-+    g_test_add_func("/public/qobject_is_equal_bool",
-+                    qobject_is_equal_bool_test);
-+    g_test_add_func("/public/qobject_is_equal_string",
-+                    qobject_is_equal_string_test);
-+    g_test_add_func("/public/qobject_is_equal_list",
-+                    qobject_is_equal_list_test);
-+    g_test_add_func("/public/qobject_is_equal_dict",
-+                    qobject_is_equal_dict_test);
-+    g_test_add_func("/public/qobject_is_equal_conversion",
-+                    qobject_is_equal_conversion_test);
-+
-+    return g_test_run();
-+}
-diff --git a/tests/.gitignore b/tests/.gitignore
-index 53cb2efaee..74e55d7264 100644
---- a/tests/.gitignore
-+++ b/tests/.gitignore
-@@ -8,6 +8,7 @@ check-qjson
- check-qlist
- check-qlit
- check-qnull
-+check-qobject
- check-qstring
- check-qom-interface
- check-qom-proplist
++/**
+  * qstring_destroy_obj(): Free all memory allocated by a QString
+  * object
+  */
 -- 
 2.13.6
