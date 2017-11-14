@@ -1,14 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60569)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60573)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eESz5-0006Li-Jp
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 23:38:04 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1eESz5-0006Lj-UW
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 23:38:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eESz1-0002qz-Km
+	(envelope-from <dgibson@ozlabs.org>) id 1eESz1-0002rC-MC
 	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 23:38:03 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue, 14 Nov 2017 15:37:45 +1100
-Message-Id: <20171114043747.4810-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 0/2] ppc-for-2.11 queue 20171114
+Date: Tue, 14 Nov 2017 15:37:47 +1100
+Message-Id: <20171114043747.4810-3-david@gibson.dropbear.id.au>
+In-Reply-To: <20171114043747.4810-1-david@gibson.dropbear.id.au>
+References: <20171114043747.4810-1-david@gibson.dropbear.id.au>
+Subject: [Qemu-devel] [PULL 2/2] xics/kvm: synchonize state before 'info pic'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,32 +22,178 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: agraf@suse.de, mdroth@linux.vnet.ibm.com, groug@kaod.org, thuth@redhat.com, lvivier@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-The following changes since commit 4e8a737c092d25fe5ff99ac7bff01c222c1c017d:
+From: Greg Kurz <groug@kaod.org>
 
-  Merge remote-tracking branch 'remotes/kraxel/tags/vga-20171110-pull-request' into staging (2017-11-13 14:33:29 +0000)
+When using the emulated XICS, the 'info pic' monitor command shows:
 
-are available in the git repository at:
+CPU 0 XIRR=ff000000 ((nil)) PP=ff MFRR=ff
+ICS 1000..13ff 0x10040060340
+  1000 MSI 05 00
+  1001 MSI 05 00
+  1002 MSI 05 00
+  1003 MSI ff 00
+  1004 LSI ff 00
+  1005 LSI ff 00
+  1006 LSI ff 00
+  1007 LSI ff 00
+  1008 MSI 05 00
+  1009 MSI 05 00
+  100a MSI 05 00
+  100b MSI 05 00
+  100c MSI 05 00
 
-  git://github.com/dgibson/qemu.git tags/ppc-for-2.11-20171114
+but when using the in-kernel XICS with the very same guest, we get:
 
-for you to fetch changes up to dcb556fc6ad879f7d29fb233a273a1ea3aa0549c:
+CPU 0 XIRR=00000000 ((nil)) PP=ff MFRR=ff
+ICS 1000..13ff 0x10032e00340
+  1000 MSI ff 00
+  1001 MSI ff 00
+  1002 MSI ff 00
+  1003 MSI ff 00
+  1004 LSI ff 00
+  1005 LSI ff 00
+  1006 LSI ff 00
+  1007 LSI ff 00
+  1008 MSI ff 00
+  1009 MSI ff 00
+  100a MSI ff 00
+  100b MSI ff 00
+  100c MSI ff 00
 
-  xics/kvm: synchonize state before 'info pic' (2017-11-14 11:12:42 +1100)
+ie, all irqs are masked and XIRR is null, while we should get the
+same output as with the emulated XICS.
 
-----------------------------------------------------------------
-ppc patch queue for 2017-11-14
+If the guest is then migrated, 'info pic' shows the expected values
+on both source and destination.
 
-Another couple of fixes for qemu-2.11.
+The problem is that QEMU doesn't synchronize with KVM before printing
+the XICS state. Migration happens to fix the output because it enforces
+synchronization with KVM.
 
-----------------------------------------------------------------
-Greg Kurz (1):
-      xics/kvm: synchonize state before 'info pic'
+To fix the invalid output of 'info pic', this patch introduces a new
+synchronize_state operation for both ICPStateClass and ICSStateClass.
+The ICP operation relies on run_on_cpu() in order to kick the vCPU
+and avoid sleeping on KVM_GET_ONE_REG.
 
-Sam Bobroff (1):
-      target/ppc: correct htab shift for hash on radix
-
+Signed-off-by: Greg Kurz <groug@kaod.org>
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+---
  hw/intc/xics.c        | 11 +++++++++++
  hw/intc/xics_kvm.c    | 19 +++++++++++++++++++
- hw/ppc/spapr_hcall.c  | 13 ++++++-------
  include/hw/ppc/xics.h |  2 ++
- 4 files changed, 38 insertions(+), 7 deletions(-)
+ 3 files changed, 32 insertions(+)
+
+diff --git a/hw/intc/xics.c b/hw/intc/xics.c
+index cc9816e7f2..a1cc0e420c 100644
+--- a/hw/intc/xics.c
++++ b/hw/intc/xics.c
+@@ -40,11 +40,17 @@
+ 
+ void icp_pic_print_info(ICPState *icp, Monitor *mon)
+ {
++    ICPStateClass *icpc = ICP_GET_CLASS(icp);
+     int cpu_index = icp->cs ? icp->cs->cpu_index : -1;
+ 
+     if (!icp->output) {
+         return;
+     }
++
++    if (icpc->synchronize_state) {
++        icpc->synchronize_state(icp);
++    }
++
+     monitor_printf(mon, "CPU %d XIRR=%08x (%p) PP=%02x MFRR=%02x\n",
+                    cpu_index, icp->xirr, icp->xirr_owner,
+                    icp->pending_priority, icp->mfrr);
+@@ -52,6 +58,7 @@ void icp_pic_print_info(ICPState *icp, Monitor *mon)
+ 
+ void ics_pic_print_info(ICSState *ics, Monitor *mon)
+ {
++    ICSStateClass *icsc = ICS_BASE_GET_CLASS(ics);
+     uint32_t i;
+ 
+     monitor_printf(mon, "ICS %4x..%4x %p\n",
+@@ -61,6 +68,10 @@ void ics_pic_print_info(ICSState *ics, Monitor *mon)
+         return;
+     }
+ 
++    if (icsc->synchronize_state) {
++        icsc->synchronize_state(ics);
++    }
++
+     for (i = 0; i < ics->nr_irqs; i++) {
+         ICSIRQState *irq = ics->irqs + i;
+ 
+diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
+index 3091ad3ac2..89fb20e2c5 100644
+--- a/hw/intc/xics_kvm.c
++++ b/hw/intc/xics_kvm.c
+@@ -81,6 +81,18 @@ static void icp_get_kvm_state(ICPState *icp)
+         & KVM_REG_PPC_ICP_PPRI_MASK;
+ }
+ 
++static void do_icp_synchronize_state(CPUState *cpu, run_on_cpu_data arg)
++{
++    icp_get_kvm_state(arg.host_ptr);
++}
++
++static void icp_synchronize_state(ICPState *icp)
++{
++    if (icp->cs) {
++        run_on_cpu(icp->cs, do_icp_synchronize_state, RUN_ON_CPU_HOST_PTR(icp));
++    }
++}
++
+ static int icp_set_kvm_state(ICPState *icp, int version_id)
+ {
+     uint64_t state;
+@@ -156,6 +168,7 @@ static void icp_kvm_class_init(ObjectClass *klass, void *data)
+     icpc->post_load = icp_set_kvm_state;
+     icpc->realize = icp_kvm_realize;
+     icpc->reset = icp_kvm_reset;
++    icpc->synchronize_state = icp_synchronize_state;
+ }
+ 
+ static const TypeInfo icp_kvm_info = {
+@@ -234,6 +247,11 @@ static void ics_get_kvm_state(ICSState *ics)
+     }
+ }
+ 
++static void ics_synchronize_state(ICSState *ics)
++{
++    ics_get_kvm_state(ics);
++}
++
+ static int ics_set_kvm_state(ICSState *ics, int version_id)
+ {
+     uint64_t state;
+@@ -347,6 +365,7 @@ static void ics_kvm_class_init(ObjectClass *klass, void *data)
+     icsc->realize = ics_kvm_realize;
+     icsc->pre_save = ics_get_kvm_state;
+     icsc->post_load = ics_set_kvm_state;
++    icsc->synchronize_state = ics_synchronize_state;
+ }
+ 
+ static const TypeInfo ics_kvm_info = {
+diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
+index 28d248abad..2df99be111 100644
+--- a/include/hw/ppc/xics.h
++++ b/include/hw/ppc/xics.h
+@@ -69,6 +69,7 @@ struct ICPStateClass {
+     void (*pre_save)(ICPState *icp);
+     int (*post_load)(ICPState *icp, int version_id);
+     void (*reset)(ICPState *icp);
++    void (*synchronize_state)(ICPState *icp);
+ };
+ 
+ struct ICPState {
+@@ -119,6 +120,7 @@ struct ICSStateClass {
+     void (*reject)(ICSState *s, uint32_t irq);
+     void (*resend)(ICSState *s);
+     void (*eoi)(ICSState *s, uint32_t irq);
++    void (*synchronize_state)(ICSState *s);
+ };
+ 
+ struct ICSState {
+-- 
+2.13.6
