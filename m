@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53414)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53540)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eEdnS-0001k1-PL
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 11:10:50 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1eEdnv-0001y9-7b
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 11:11:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eEdnR-0006py-R3
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 11:10:46 -0500
-Received: from mail-wr0-x235.google.com ([2a00:1450:400c:c0c::235]:48869)
+	(envelope-from <alex.bennee@linaro.org>) id 1eEdnr-0007dv-6p
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 11:11:15 -0500
+Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:55426)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eEdnR-0006o9-KT
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 11:10:45 -0500
-Received: by mail-wr0-x235.google.com with SMTP id 15so17942823wrb.5
-	for <qemu-devel@nongnu.org>; Tue, 14 Nov 2017 08:10:45 -0800 (PST)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1eEdnq-0007cI-Vr
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 11:11:11 -0500
+Received: by mail-wr0-x244.google.com with SMTP id l8so17933009wre.12
+	for <qemu-devel@nongnu.org>; Tue, 14 Nov 2017 08:11:10 -0800 (PST)
+References: <20171114094203.28030-1-richard.henderson@linaro.org>
+	<20171114134153.11167-1-richard.henderson@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20171114134153.11167-1-richard.henderson@linaro.org>
+Date: Tue, 14 Nov 2017 16:11:08 +0000
+Message-ID: <87fu9galib.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20171114043747.4810-1-david@gibson.dropbear.id.au>
-References: <20171114043747.4810-1-david@gibson.dropbear.id.au>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 14 Nov 2017 16:10:24 +0000
-Message-ID: <CAFEAcA-ExHoVFuP2tztdHX-FejJ_zxk=TRc=hCc38VXJQnmKig@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/2] ppc-for-2.11 queue 20171114
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 3/1] target/arm: Fix GETPC usage in
+ do_paired_cmpxchg64_l/be
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,34 +31,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Alexander Graf <agraf@suse.de>, Michael Roth <mdroth@linux.vnet.ibm.com>, Greg Kurz <groug@kaod.org>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
 
-On 14 November 2017 at 04:37, David Gibson <david@gibson.dropbear.id.au> wrote:
-> The following changes since commit 4e8a737c092d25fe5ff99ac7bff01c222c1c017d:
->
->   Merge remote-tracking branch 'remotes/kraxel/tags/vga-20171110-pull-request' into staging (2017-11-13 14:33:29 +0000)
->
-> are available in the git repository at:
->
->   git://github.com/dgibson/qemu.git tags/ppc-for-2.11-20171114
->
-> for you to fetch changes up to dcb556fc6ad879f7d29fb233a273a1ea3aa0549c:
->
->   xics/kvm: synchonize state before 'info pic' (2017-11-14 11:12:42 +1100)
->
-> ----------------------------------------------------------------
-> ppc patch queue for 2017-11-14
->
-> Another couple of fixes for qemu-2.11.
->
-> ----------------------------------------------------------------
-> Greg Kurz (1):
->       xics/kvm: synchonize state before 'info pic'
->
-> Sam Bobroff (1):
->       target/ppc: correct htab shift for hash on radix
 
-Applied, thanks.
+Richard Henderson <richard.henderson@linaro.org> writes:
 
--- PMM
+> Use of GETPC must be restricted to those functions that are
+> directly called from TCG generated code.
+>
+> Fixes: 2399d4e7cec22ecf1c51062d2ebfd45220dbaace
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+> ---
+>  target/arm/helper-a64.c | 14 ++++++--------
+>  1 file changed, 6 insertions(+), 8 deletions(-)
+>
+> diff --git a/target/arm/helper-a64.c b/target/arm/helper-a64.c
+> index 96a3ecf707..b84ebcae6e 100644
+> --- a/target/arm/helper-a64.c
+> +++ b/target/arm/helper-a64.c
+> @@ -432,9 +432,8 @@ uint64_t HELPER(crc32c_64)(uint64_t acc, uint64_t val=
+, uint32_t bytes)
+>  /* Returns 0 on success; 1 otherwise.  */
+>  static uint64_t do_paired_cmpxchg64_le(CPUARMState *env, uint64_t addr,
+>                                         uint64_t new_lo, uint64_t new_hi,
+> -                                       bool parallel)
+> +                                       bool parallel, uintptr_t ra)
+>  {
+> -    uintptr_t ra =3D GETPC();
+>      Int128 oldv, cmpv, newv;
+>      bool success;
+>
+> @@ -491,20 +490,19 @@ static uint64_t do_paired_cmpxchg64_le(CPUARMState =
+*env, uint64_t addr,
+>  uint64_t HELPER(paired_cmpxchg64_le)(CPUARMState *env, uint64_t addr,
+>                                                uint64_t new_lo, uint64_t =
+new_hi)
+>  {
+> -    return do_paired_cmpxchg64_le(env, addr, new_lo, new_hi, false);
+> +    return do_paired_cmpxchg64_le(env, addr, new_lo, new_hi, false, GETP=
+C());
+>  }
+>
+>  uint64_t HELPER(paired_cmpxchg64_le_parallel)(CPUARMState *env, uint64_t=
+ addr,
+>                                                uint64_t new_lo, uint64_t =
+new_hi)
+>  {
+> -    return do_paired_cmpxchg64_le(env, addr, new_lo, new_hi, true);
+> +    return do_paired_cmpxchg64_le(env, addr, new_lo, new_hi, true, GETPC=
+());
+>  }
+>
+>  static uint64_t do_paired_cmpxchg64_be(CPUARMState *env, uint64_t addr,
+>                                         uint64_t new_lo, uint64_t new_hi,
+> -                                       bool parallel)
+> +                                       bool parallel, uintptr_t ra)
+>  {
+> -    uintptr_t ra =3D GETPC();
+>      Int128 oldv, cmpv, newv;
+>      bool success;
+>
+> @@ -561,11 +559,11 @@ static uint64_t do_paired_cmpxchg64_be(CPUARMState =
+*env, uint64_t addr,
+>  uint64_t HELPER(paired_cmpxchg64_be)(CPUARMState *env, uint64_t addr,
+>                                       uint64_t new_lo, uint64_t new_hi)
+>  {
+> -    return do_paired_cmpxchg64_be(env, addr, new_lo, new_hi, false);
+> +    return do_paired_cmpxchg64_be(env, addr, new_lo, new_hi, false, GETP=
+C());
+>  }
+>
+>  uint64_t HELPER(paired_cmpxchg64_be_parallel)(CPUARMState *env, uint64_t=
+ addr,
+>                                       uint64_t new_lo, uint64_t new_hi)
+>  {
+> -    return do_paired_cmpxchg64_be(env, addr, new_lo, new_hi, true);
+> +    return do_paired_cmpxchg64_be(env, addr, new_lo, new_hi, true, GETPC=
+());
+>  }
+
+
+--
+Alex Benn=C3=A9e
