@@ -1,25 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41691)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42448)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1eEgeU-0006CE-HD
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 14:13:43 -0500
+	(envelope-from <kchamart@redhat.com>) id 1eEghB-0007hw-I9
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 14:16:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1eEgeQ-0008VU-Ft
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 14:13:42 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48692)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1eEgeQ-0008VG-9b
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 14:13:38 -0500
-References: <e1e3a1d3-da53-e46a-ce9b-7d1707e3a493@linux.intel.com>
-	<81495d39-0026-dba2-10b9-86d7df5babd3@tuxfamily.org>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <4a983bfc-442c-c55f-e3eb-9cb58a0d9ba8@redhat.com>
-Date: Tue, 14 Nov 2017 14:13:36 -0500
-MIME-Version: 1.0
-In-Reply-To: <81495d39-0026-dba2-10b9-86d7df5babd3@tuxfamily.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] HAXM is now open source
+	(envelope-from <kchamart@redhat.com>) id 1eEghA-0001Ov-JM
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 14:16:29 -0500
+From: Kashyap Chamarthy <kchamart@redhat.com>
+Date: Tue, 14 Nov 2017 20:16:04 +0100
+Message-Id: <20171114191605.22349-1-kchamart@redhat.com>
+Subject: [Qemu-devel] [PATCH] qapi: block-core: Clarify events emitted by
+ 'block-job-cancel'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,63 +18,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <huth@tuxfamily.org>, Yu Ning <yu.ning@linux.intel.com>, qemu-devel <qemu-devel@nongnu.org>
-Cc: Vincent Palatin <vpalatin@chromium.org>
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, armbru@redhat.com, eblake@redhat.com, Kashyap Chamarthy <kchamart@redhat.com>
 
+When you cancel an in-progress live block operation with QMP
+`block-job-cancel`, it emits the event: BLOCK_JOB_CANCELLED.  However,
+when `block-job-cancel` is issued after `drive-mirror` has indicated (by
+emitting the event BLOCK_JOB_READY) that the source and destination
+remain synchronized:
 
+    [...] # Snip `drive-mirror` invocation & outputs
+    {
+      "execute":"block-job-cancel",
+      "arguments":{
+        "device":"virtio0"
+      }
+    }
 
-On 11/14/2017 06:09 AM, Thomas Huth wrote:
-> On 14.11.2017 09:54, Yu Ning wrote:
->> Hello,
->>
->> As some of you may have noticed, since QEMU 2.9.0, an accelerator know=
-n
->> as =E2=80=9Chax=E2=80=9D has been available for Windows and macOS buil=
-ds of QEMU, thanks
->> to the hard work of Vincent Palatin and help from this community (Paol=
-o
->> Bonzini, Stefan Weil, et al.).
->>
->> The accelerator requires a host kernel module (driver) known as Intel
->> Hardware Accelerated Execution Manager (HAXM), i.e. intelhaxm.sys on
->> Windows or intelhaxm.kext on macOS, similar to how the KVM accelerator
->> depends on kvm.ko on Linux.
->>
->> Today, we released the source code of the HAXM kernel module under the
->> BSD 3-clause license:
->>
->> https://github.com/intel/haxm
->>
->> We look forward to working with the community to improve HAXM (both th=
-e
->> kernel module and the accelerator). The code is accompanied by some
->> basic documentation (README.md and API.md), which is incomplete, but
->> hopefully helps people get started. If you have any questions or
->> suggestions, please create an issue or post a comment on GitHub.
->=20
-> That's great news! I hope this all will help to promote QEMU on Windows
-> and macOS quite a bit!
->=20
-> However, during the past months, I noticed a couple of times that users
-> ask on IRC or the qemu-discuss mailing list how they could accelerate
-> their QEMU on Windows - and they are running only in TCG mode when you
-> ask how they start QEMU. So it seems like there is not much knowledge
-> about "--accel hax" in the public yet. Maybe you could write a nice blo=
-g
-> post for the QEMU blog or something similar that explains how to use
-> HAXM with QEMU on Windows for the normal users? Or maybe make it more
-> prominent in the QEMU wiki? (e.g. the main page only mentions KVM and
-> Xen, but not HAXM)
->=20
->  Thomas
->=20
+    {"return": {}}
 
-A blog post advertising this new development would be an absolute
-miracle for linking to people who are just getting started with QEMU on
-Windows.
+It (`block-job-cancel`) will counterintuitively emit the event
+'BLOCK_JOB_COMPLETED':
 
-(It would also be really good for idiots like me, who do not use Windows
-for anything other than playing video games and sometimes forget that it
-is capable of doing other things.)
+    {
+      "timestamp":{
+        "seconds":1510678024,
+        "microseconds":526240
+      },
+      "event":"BLOCK_JOB_COMPLETED",
+      "data":{
+        "device":"virtio0",
+        "len":41126400,
+        "offset":41126400,
+        "speed":0,
+        "type":"mirror"
+      }
+    }
 
---js
+But this is expected behaviour, where the _COMPLETED event indicates
+that synchronization has successfully ended (and the destination has a
+point-in-time copy, which is at the time of cancel).
+
+So add a small note to this effect.  (Thanks: Max Reitz for reminding
+me of this on IRC.)
+---
+ qapi/block-core.json | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index ab96e348e6317bb42769ae20f4a4519bac02e93a..e43a7eaeb22b92c613edcb4219ed4f0e928577b6 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -2065,6 +2065,14 @@
+ # BLOCK_JOB_CANCELLED event.  Before that happens the job is still visible when
+ # enumerated using query-block-jobs.
+ #
++# Note: The 'block-job-cancel' command will emit the event BLOCK_JOB_COMPLETED
++# if you issue it ('block-job-cancel') after 'drive-mirror' has
++# indicated (by emitting the event BLOCK_JOB_READY) that the source and
++# destination remain synchronized.  In this case, the BLOCK_JOB_COMPLETED event
++# indicates that synchronization (from `drive-mirror`) has successfully ended
++# and the destination now has a point-in-time copy, which is at the time of
++# cancel.
++#
+ # For streaming, the image file retains its backing file unless the streaming
+ # operation happens to complete just as it is being cancelled.  A new streaming
+ # operation can be started at a later time to finish copying all data from the
+-- 
+2.9.5
