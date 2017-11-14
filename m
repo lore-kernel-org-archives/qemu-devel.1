@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52976)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53414)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1eEdmI-0000j9-S7
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 11:09:35 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eEdnS-0001k1-PL
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 11:10:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1eEdmD-0005G8-68
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 11:09:34 -0500
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:39409)
+	(envelope-from <peter.maydell@linaro.org>) id 1eEdnR-0006py-R3
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 11:10:46 -0500
+Received: from mail-wr0-x235.google.com ([2a00:1450:400c:c0c::235]:48869)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1eEdmD-0005Fe-01
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 11:09:29 -0500
-Received: by mail-wm0-x242.google.com with SMTP id l8so16950001wmg.4
-	for <qemu-devel@nongnu.org>; Tue, 14 Nov 2017 08:09:28 -0800 (PST)
-References: <20171114094203.28030-1-richard.henderson@linaro.org>
-	<20171114125304.854-1-richard.henderson@linaro.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20171114125304.854-1-richard.henderson@linaro.org>
-Date: Tue, 14 Nov 2017 16:09:26 +0000
-Message-ID: <87h8twall5.fsf@linaro.org>
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eEdnR-0006o9-KT
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 11:10:45 -0500
+Received: by mail-wr0-x235.google.com with SMTP id 15so17942823wrb.5
+	for <qemu-devel@nongnu.org>; Tue, 14 Nov 2017 08:10:45 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 2/1] target/arm: Use helper_retaddr in stxp
- helpers
+In-Reply-To: <20171114043747.4810-1-david@gibson.dropbear.id.au>
+References: <20171114043747.4810-1-david@gibson.dropbear.id.au>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 14 Nov 2017 16:10:24 +0000
+Message-ID: <CAFEAcA-ExHoVFuP2tztdHX-FejJ_zxk=TRc=hCc38VXJQnmKig@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/2] ppc-for-2.11 queue 20171114
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,70 +28,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Alexander Graf <agraf@suse.de>, Michael Roth <mdroth@linux.vnet.ibm.com>, Greg Kurz <groug@kaod.org>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-
-Richard Henderson <richard.henderson@linaro.org> writes:
-
-> We use raw memory primitives along the !parallel_cpus paths in order to
-> simplify the endianness handling.  Because of that, we did not benefit
-> from the generic changes to cpu_ldst_user_only_template.h.
+On 14 November 2017 at 04:37, David Gibson <david@gibson.dropbear.id.au> wrote:
+> The following changes since commit 4e8a737c092d25fe5ff99ac7bff01c222c1c017d:
 >
-> The simplest fix is to manipulate helper_retaddr here.
+>   Merge remote-tracking branch 'remotes/kraxel/tags/vga-20171110-pull-request' into staging (2017-11-13 14:33:29 +0000)
 >
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/arm/helper-a64.c | 6 ++++++
->  1 file changed, 6 insertions(+)
+> are available in the git repository at:
 >
-> diff --git a/target/arm/helper-a64.c b/target/arm/helper-a64.c
-> index d0e435ca4b..96a3ecf707 100644
-> --- a/target/arm/helper-a64.c
-> +++ b/target/arm/helper-a64.c
-> @@ -456,6 +456,8 @@ static uint64_t do_paired_cmpxchg64_le(CPUARMState *e=
-nv, uint64_t addr,
->  #ifdef CONFIG_USER_ONLY
->          /* ??? Enforce alignment.  */
->          uint64_t *haddr =3D g2h(addr);
-> +
-> +        helper_retaddr =3D ra;
->          o0 =3D ldq_le_p(haddr + 0);
->          o1 =3D ldq_le_p(haddr + 1);
->          oldv =3D int128_make128(o0, o1);
-> @@ -465,6 +467,7 @@ static uint64_t do_paired_cmpxchg64_le(CPUARMState *e=
-nv, uint64_t addr,
->              stq_le_p(haddr + 0, int128_getlo(newv));
->              stq_le_p(haddr + 1, int128_gethi(newv));
->          }
-> +        helper_retaddr =3D 0;
->  #else
->          int mem_idx =3D cpu_mmu_index(env, false);
->          TCGMemOpIdx oi0 =3D make_memop_idx(MO_LEQ | MO_ALIGN_16, mem_idx=
-);
-> @@ -523,6 +526,8 @@ static uint64_t do_paired_cmpxchg64_be(CPUARMState *e=
-nv, uint64_t addr,
->  #ifdef CONFIG_USER_ONLY
->          /* ??? Enforce alignment.  */
->          uint64_t *haddr =3D g2h(addr);
-> +
-> +        helper_retaddr =3D ra;
->          o1 =3D ldq_be_p(haddr + 0);
->          o0 =3D ldq_be_p(haddr + 1);
->          oldv =3D int128_make128(o0, o1);
-> @@ -532,6 +537,7 @@ static uint64_t do_paired_cmpxchg64_be(CPUARMState *e=
-nv, uint64_t addr,
->              stq_be_p(haddr + 0, int128_gethi(newv));
->              stq_be_p(haddr + 1, int128_getlo(newv));
->          }
-> +        helper_retaddr =3D 0;
->  #else
->          int mem_idx =3D cpu_mmu_index(env, false);
->          TCGMemOpIdx oi0 =3D make_memop_idx(MO_BEQ | MO_ALIGN_16, mem_idx=
-);
+>   git://github.com/dgibson/qemu.git tags/ppc-for-2.11-20171114
+>
+> for you to fetch changes up to dcb556fc6ad879f7d29fb233a273a1ea3aa0549c:
+>
+>   xics/kvm: synchonize state before 'info pic' (2017-11-14 11:12:42 +1100)
+>
+> ----------------------------------------------------------------
+> ppc patch queue for 2017-11-14
+>
+> Another couple of fixes for qemu-2.11.
+>
+> ----------------------------------------------------------------
+> Greg Kurz (1):
+>       xics/kvm: synchonize state before 'info pic'
+>
+> Sam Bobroff (1):
+>       target/ppc: correct htab shift for hash on radix
 
+Applied, thanks.
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
---
-Alex Benn=C3=A9e
+-- PMM
