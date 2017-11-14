@@ -1,30 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41574)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43027)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1eEbYd-0004H1-HR
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 08:47:20 -0500
+	(envelope-from <bounces@canonical.com>) id 1eEbcB-0005zp-Fb
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 08:51:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1eEbYa-0007bk-Sr
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 08:47:19 -0500
-Received: from mail-it0-x22e.google.com ([2607:f8b0:4001:c0b::22e]:53723)
+	(envelope-from <bounces@canonical.com>) id 1eEbc8-00028O-DE
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 08:50:59 -0500
+Received: from indium.canonical.com ([91.189.90.7]:40344)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
-	id 1eEbYa-0007aa-OB
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 08:47:16 -0500
-Received: by mail-it0-x22e.google.com with SMTP id m191so13571755itg.2
-	for <qemu-devel@nongnu.org>; Tue, 14 Nov 2017 05:47:16 -0800 (PST)
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-From: Programmingkid <programmingkidx@gmail.com>
-In-Reply-To: <20171114072159.nx77jscj22xzikuv@sirius.home.kraxel.org>
-Date: Tue, 14 Nov 2017 08:47:12 -0500
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eEbc8-00027H-6V
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 08:50:56 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eEbc4-0002Xn-Fd
+	for <qemu-devel@nongnu.org>; Tue, 14 Nov 2017 13:50:52 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id A308A2E80D7
+	for <qemu-devel@nongnu.org>; Tue, 14 Nov 2017 13:50:50 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <82E2A9D3-FF38-4BBF-ADCE-3494505F0E8D@gmail.com>
-References: <03123F70-98FA-439A-868C-855E63916259@gmail.com>
-	<20171113145041.GI18828@redhat.com>
-	<CAJ+F1CLxYBq7zfzMSrhnxb+9Np7ZDnrbLqf+e=FoZyC=bZFA+Q@mail.gmail.com>
-	<77699873-C42D-4678-9E29-432D2A36BCCE@gmail.com>
-	<20171114072159.nx77jscj22xzikuv@sirius.home.kraxel.org>
-Subject: Re: [Qemu-devel] Command-line option to change ungrab key(s)
+Date: Tue, 14 Nov 2017 13:43:47 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Reply-To: Bug 1717708 <1717708@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150558614762.29770.16367876405044972592.malonedeb@chaenomeles.canonical.com>
+Message-Id: <151066702773.8139.1517199588388659323.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1717708] Re: QEMU aarch64 can't run Windows ARM64
+ iso's
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,64 +37,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: =?utf-8?Q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@gmail.com>, "Daniel P. Berrange" <berrange@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
+Plain linear framebuffer won't work with KVM, unfortunately. The best
+fix is for Windows to support virtio-gpu, then it will work in KVM as
+well as pure emulation.
 
-> On Nov 14, 2017, at 2:21 AM, Gerd Hoffmann <kraxel@redhat.com> wrote:
->=20
->  Hi,
->=20
->>>>> Would this feature be something you would consider adding to QEMU?
->>>>=20
->>>> As context, virt-manager allows customization for the ungrab =
-sequence, and
->>>> so do spice-gtk/gtk-vnc at the API level. So conceptually I think =
-it is
->>>> reasonable for any UI console that is intended as more than just a =
-toy.
->>>=20
->>> Would it make sense to share the virt-viewer/remote-viewer --hotkeys
->>> option format ? (see man remote-viewer / virt-viewer)
->>=20
->> I think you are referring to information found on this page: =
-https://www.mankier.com/1/remote-viewer
->>=20
->> The command-line option for changing hotkey actions would be:
->> --hotkeys=3D<action1>=3D<key1>[+<key2>][,<action2>=3D<key3>[+<key4>]]
->>=20
->> So this means changing the mouse ungrab would look something like =
-this:
->>=20
->> --hotkeys=3Drelease-cursor=3DF19 (or some other key)
->>=20
->> Gerd what you think of this idea?
->=20
-> Certainly not this way.
+-- =
 
-Did you have an idea on how something like this should look like? This =
-feature would only change the old mouse ungrab keys to a user-specified =
-one. So the basic algorithm would be change the text that displays at =
-the top of the QEMU window to say (Press <user specified key(s)> to =
-release mouse. Then tell the code that looks for the ungrab keys which =
-keys to look out for.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1717708
 
->  The display configuration we have right now is
-> pretty messy already.  I want clean this up (draft patch series at
-> https://www.kraxel.org/cgit/qemu/log/?h=3Dlupin/display-cmdline), and =
-this
-> should be done before adding new stuff.
+Title:
+  QEMU aarch64 can't run Windows ARM64 iso's
 
-My original idea was to make a patch that would only change the cocoa.m =
-file. I'm thinking you want this code to be elsewhere. Somewhere where =
-other UI code like GTK would be able to use. Is that what you prefer?
+Status in QEMU:
+  New
 
-> Also when making this configurable it should be consistent across all
-> user interfaces we have, which surely is a non-trivial amount of work.
+Bug description:
+  Hi,
+  recently Windows ARM64 ISOs have been posted on the internet..
+  just checked with latest QEMU 2.10 release from =
 
-I know Cocoa but my lack of GTK experience would not permit me to make a =
-patch for that UI code. When you are done with your display =
-configuration work, would there even be a need to patch the Cocoa/GTK =
-code? I'm under the impression you are trying to consolidate some of the =
-UI code under one file. This does sound like a logic move to make. It =
-would help to keep things consistent across different hosts.
+  https://qemu.weilnetz.de/w64/qemu-w64-setup-20170830.exe =
+
+  "h:\qemu\qemu-system-aarch64.exe" -boot d -cdrom h:\iso\16353.1000.170825=
+-1423.RS_PRERELEASE_CLIENTPRO_OEMRET_ARM64FRE_ES-ES.ISO -m 2048 -cpu cortex=
+-a57 -smp 1 -machine virt
+  seems no video output..
+  checked various machine options for example versatilepb (says guest has n=
+ot initialized the guest)..
+
+  so don't know if it's a QEMU bug or lacking feature but can support
+  running Windows ARM64 builds (would be nice if you can add a
+  Snapdragon835 machine type which is which first machines will be
+  running..)
+
+  =
+
+  note running a Windows x64 ISO with similar parameters works (removing -c=
+pu and -machine as not needed)
+
+  thanks..
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1717708/+subscriptions
