@@ -1,26 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51702)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51879)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1eEYND-00084n-5E
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 05:23:20 -0500
+	(envelope-from <apahim@redhat.com>) id 1eEYNU-0008Gd-8J
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 05:23:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1eEYN9-0002nQ-Vj
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 05:23:19 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46662)
+	(envelope-from <apahim@redhat.com>) id 1eEYNT-000371-7N
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 05:23:36 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48432)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
-	id 1eEYN9-0002ma-MY
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 05:23:15 -0500
-From: Auger Eric <eric.auger@redhat.com>
-References: <1509710516-21084-1-git-send-email-yi.l.liu@linux.intel.com>
-	<1509710516-21084-6-git-send-email-yi.l.liu@linux.intel.com>
-Message-ID: <7b16c99e-faad-9369-c165-c0dde588021b@redhat.com>
-Date: Tue, 14 Nov 2017 11:23:03 +0100
-MIME-Version: 1.0
-In-Reply-To: <1509710516-21084-6-git-send-email-yi.l.liu@linux.intel.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RESEND PATCH 5/6] vfio/pci: add notify framework
- based on IOMMUObject
+	(Exim 4.71) (envelope-from <apahim@redhat.com>) id 1eEYNT-00036G-1W
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 05:23:35 -0500
+From: Amador Pahim <apahim@redhat.com>
+Date: Tue, 14 Nov 2017 11:22:38 +0100
+Message-Id: <20171114102246.22221-1-apahim@redhat.com>
+Subject: [Qemu-devel] [PATCH v11 0/8] scripts/qemu.py fixes and cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,138 +21,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Liu, Yi L" <yi.l.liu@linux.intel.com>, qemu-devel@nongnu.org, mst@redhat.com, david@gibson.dropbear.id.au, pbonzini@redhat.com, alex.williamson@redhat.com
-Cc: tianyu.lan@intel.com, kevin.tian@intel.com, yi.l.liu@intel.com, jasowang@redhat.com, peterx@redhat.com
+To: qemu-devel@nongnu.org
+Cc: famz@redhat.com, crosa@redhat.com, ehabkost@redhat.com, muriloo@linux.vnet.ibm.com, armbru@redhat.com, Amador Pahim <apahim@redhat.com>
 
-Hi Yi L,
+Changes v10->v11:
+ - Fix messed indentation.
+ - Rename self._qemu_log_fd to self._qemu_log_file.
+ - Patch changelog in reverse order.
+Changes v9->v10:
+ - Keep method _remove_if_exists().
+Changes v8->v9:
+ - Some commits were already merged. Rebased the remaining ones.
+ - New commit to remove unused import.
+ - VM files control logic changed to use a temporary directory.
+ - Better naming for variable controlling the need of a shutdown before
+   next launch.
+Changes v7->v8:
+ - Rebased.
+ - Reorder commits to avoid break->fix sequence.
+ - Split commits "use poll() instead of 'returncode'" and "refactor
+   launch()".
+ - Don't ignore errors in _load_io_log(). Instead, check if we created
+   the file before reading it.
+ - Use LOG.warn() instead of LOG.debug() for the negative exit code
+   message.
+ - Fix the exception name called in commits "launch vm only if it's not
+   running" and "don't launch again before shutdown()".
+ - Minor style fixes.
+Changes v6->v7:
+ - Split commits in self-contained/atomic changes.
+ - Addressed the comments from previous version, basically improving the
+   logging messages and the control over created files. See individual
+   commit messages for details.
+Changes v5->v6:
+ - Remove the commit to rename self._args.
+ - Fix is_running() return before first call to maunch().
+ - Use python logging system.
+ - Include the full command line on negative exit code error message.
+ - Use os.path.null instead of /dev/null.
+ - Improve the control over the created/deleted files.
+Changes v4->v5:
+ - Break the cleanup commit into logical changes and include in the
+   commit messages the rationale for making them.
+Changes v3->v4:
+ - Squash the 2 first commits since they are co-dependant.
+ - Cleanup launch() and shutdown().
+ - Reorder the commits, putting the rename of self._args first.
+ - Rebased.
+Changes v2->v3:
+ - Fix typo in patch 3 ("qemu.py: make 'args' public") commit message.
+Changes v1->v2:
+ - Style fixes to make checkpatch.pl happy.
+ - Rebased.
 
-On 03/11/2017 13:01, Liu, Yi L wrote:
-> This patch introduce a notify framework for IOMMUObject.iommu_notifiers.
-> Introduce VFIOGuestIOMMUObject is to link VFIO Container and the new
-> IOMMUObject notififiers.
-notifiers
-> 
-> VFIOGuestIOMMUObject instance is allocated when device is assigned and
-> meanwhile vIOMMU is exposed to guest.
-> 
-> If there is IOMMUObject behind the device AddressSpace(a.ka vIOMMU exposed).
-> The VFIOGuestIOMMUObject instance would be allocated and inserted to the
-> VFIOContainer.giommu_object_list.
-> 
-> Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
-> ---
->  hw/vfio/pci.c                 | 39 ++++++++++++++++++++++++++++++++++++++-
->  include/hw/vfio/vfio-common.h |  8 ++++++++
->  2 files changed, 46 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-> index c977ee3..5b77c7e 100644
-> --- a/hw/vfio/pci.c
-> +++ b/hw/vfio/pci.c
-> @@ -2642,6 +2642,8 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
->      VFIOPCIDevice *vdev = DO_UPCAST(VFIOPCIDevice, pdev, pdev);
->      VFIODevice *vbasedev_iter;
->      VFIOGroup *group;
-> +    AddressSpace *as;
-> +    IOMMUObject *iommu;
->      char *tmp, group_path[PATH_MAX], *group_name;
->      Error *err = NULL;
->      ssize_t len;
-> @@ -2694,7 +2696,8 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
->  
->      trace_vfio_realize(vdev->vbasedev.name, groupid);
->  
-> -    group = vfio_get_group(groupid, pci_device_iommu_address_space(pdev), errp);
-> +    as = pci_device_iommu_address_space(pdev);
-> +    group = vfio_get_group(groupid, as, errp);
->      if (!group) {
->          goto error;
->      }
-> @@ -2877,6 +2880,17 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
->      vfio_register_req_notifier(vdev);
->      vfio_setup_resetfn_quirk(vdev);
->  
-> +    iommu = address_space_iommu_get(as);
-> +    if (iommu != NULL) {
-> +        VFIOGuestIOMMUObject *giommu;
-nit: void line needed
-> +        giommu = g_malloc0(sizeof(*giommu));
-> +        giommu->iommu = iommu;
-> +        giommu->container = group->container;
-> +        QLIST_INSERT_HEAD(&group->container->giommu_object_list,
-There is no QLIST_INIT anywhere for container's giommu_object_list?
+Amador Pahim (8):
+  qemu.py: remove unused import
+  qemu.py: better control of created files
+  qemu.py: refactor launch()
+  qemu.py: always cleanup on shutdown()
+  qemu.py: use poll() instead of 'returncode'
+  qemu.py: cleanup redundant calls in launch()
+  qemu.py: launch vm only if it's not running
+  qemu.py: don't launch again before shutdown()
 
-Thanks
+ scripts/qemu.py | 89 ++++++++++++++++++++++++++++++++++++++-------------------
+ 1 file changed, 59 insertions(+), 30 deletions(-)
 
-Eric
-> +                          giommu,
-> +                          giommu_next);
-> +    }
-> +
->      return;
->  
->  out_teardown:
-> @@ -2907,6 +2921,28 @@ static void vfio_instance_finalize(Object *obj)
->      vfio_put_group(group);
->  }
->  
-> +static void vfio_release_iommu_object(PCIDevice *pdev)
-> +{
-> +    VFIOPCIDevice *vdev = DO_UPCAST(VFIOPCIDevice, pdev, pdev);
-> +    AddressSpace *as;
-> +    IOMMUObject *iommu;
-> +
-> +    as = pci_device_iommu_address_space(pdev);
-> +    iommu = address_space_iommu_get(as);
-> +    if (iommu != NULL) {
-> +        VFIOGuestIOMMUObject *giommu, *tmp;
-> +        VFIOGroup *group;
-> +        group = vdev->vbasedev.group;
-> +
-> +        QLIST_FOREACH_SAFE(giommu,
-> +                           &group->container->giommu_object_list,
-> +                           giommu_next, tmp) {
-> +            QLIST_REMOVE(giommu, giommu_next);
-> +            g_free(giommu);
-> +        }
-> +    }
-> +    return;
-> +}
->  static void vfio_exitfn(PCIDevice *pdev)
->  {
->      VFIOPCIDevice *vdev = DO_UPCAST(VFIOPCIDevice, pdev, pdev);
-> @@ -2915,6 +2951,7 @@ static void vfio_exitfn(PCIDevice *pdev)
->      vfio_unregister_err_notifier(vdev);
->      pci_device_set_intx_routing_notifier(&vdev->pdev, NULL);
->      vfio_disable_interrupts(vdev);
-> +    vfio_release_iommu_object(pdev);
->      if (vdev->intx.mmap_timer) {
->          timer_free(vdev->intx.mmap_timer);
->      }
-> diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-> index 702a085..e4963cc 100644
-> --- a/include/hw/vfio/vfio-common.h
-> +++ b/include/hw/vfio/vfio-common.h
-> @@ -88,6 +88,7 @@ typedef struct VFIOContainer {
->       * future
->       */
->      QLIST_HEAD(, VFIOGuestIOMMUMR) giommu_mr_list;
-> +    QLIST_HEAD(, VFIOGuestIOMMUObject) giommu_object_list;
->      QLIST_HEAD(, VFIOHostDMAWindow) hostwin_list;
->      QLIST_HEAD(, VFIOGroup) group_list;
->      QLIST_ENTRY(VFIOContainer) next;
-> @@ -101,6 +102,13 @@ typedef struct VFIOGuestIOMMUMR {
->      QLIST_ENTRY(VFIOGuestIOMMUMR) giommu_next;
->  } VFIOGuestIOMMUMR;
->  
-> +typedef struct VFIOGuestIOMMUObject {
-> +    VFIOContainer *container;
-> +    IOMMUObject *iommu;
-> +    IOMMUNotifier n;
-> +    QLIST_ENTRY(VFIOGuestIOMMUObject) giommu_next;
-> +} VFIOGuestIOMMUObject;
-> +
->  typedef struct VFIOHostDMAWindow {
->      hwaddr min_iova;
->      hwaddr max_iova;
-> 
+-- 
+2.13.6
