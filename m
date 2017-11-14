@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41399)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43835)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1eEZo4-000749-3o
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 06:55:09 -0500
+	(envelope-from <wei.w.wang@intel.com>) id 1eEZsg-0001Eg-J1
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 06:59:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1eEZo1-0002TB-1M
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 06:55:08 -0500
-Received: from 7.mo7.mail-out.ovh.net ([46.105.43.131]:38550)
+	(envelope-from <wei.w.wang@intel.com>) id 1eEZsd-00070J-HJ
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 06:59:54 -0500
+Received: from mga07.intel.com ([134.134.136.100]:42017)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1eEZo0-0002R9-O9
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 06:55:04 -0500
-Received: from player762.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo7.mail-out.ovh.net (Postfix) with ESMTP id 22A407CFA4
-	for <qemu-devel@nongnu.org>; Tue, 14 Nov 2017 12:55:01 +0100 (CET)
-References: <20171110152017.24324-1-clg@kaod.org>
-	<20171110152017.24324-6-clg@kaod.org>
-	<20171114104224.63ed5e87@bahia.lan>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <9e36e339-3ea5-237c-e06a-d0ae4c1595e6@kaod.org>
-Date: Tue, 14 Nov 2017 11:54:53 +0000
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1eEZsd-0006vJ-6l
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 06:59:51 -0500
+Message-ID: <5A0ADB3B.4070407@intel.com>
+Date: Tue, 14 Nov 2017 20:02:03 +0800
+From: Wei Wang <wei.w.wang@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20171114104224.63ed5e87@bahia.lan>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-2.12 v3 05/11] spapr: introduce an IRQ
- allocator using a bitmap
+References: <1509696786-1597-1-git-send-email-wei.w.wang@intel.com>
+	<1509696786-1597-7-git-send-email-wei.w.wang@intel.com>
+	<5A097548.8000608@intel.com>
+	<20171113192309-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20171113192309-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v17 6/6] virtio-balloon:
+ VIRTIO_BALLOON_F_FREE_PAGE_VQ
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,228 +31,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mhocko@kernel.org, akpm@linux-foundation.org, mawilcox@microsoft.com, david@redhat.com, penguin-kernel@I-love.SAKURA.ne.jp, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, willy@infradead.org, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu@aliyun.com, Nitesh Narayan Lal <nilal@redhat.com>, Rik van Riel <riel@redhat.com>
 
-On 11/14/2017 09:42 AM, Greg Kurz wrote:
-> On Fri, 10 Nov 2017 15:20:11 +0000
-> C=C3=A9dric Le Goater <clg@kaod.org> wrote:
->=20
->> Let's define a new set of XICSFabric IRQ operations for the latest
->> pseries machine. These simply use a a bitmap 'irq_map' as a IRQ number
->> allocator.
->>
->> The previous pseries machines keep the old set of IRQ operations using
->> the ICSIRQState array.
->>
->> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
->> ---
->>
->>  Changes since v2 :
->>
->>  - introduced a second set of XICSFabric IRQ operations for older
->>    pseries machines
->>
->>  hw/ppc/spapr.c         | 76 +++++++++++++++++++++++++++++++++++++++++=
-+++++----
->>  include/hw/ppc/spapr.h |  3 ++
->>  2 files changed, 74 insertions(+), 5 deletions(-)
->>
->> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
->> index 4bdceb45a14f..4ef0b73559ca 100644
->> --- a/hw/ppc/spapr.c
->> +++ b/hw/ppc/spapr.c
->> @@ -1681,6 +1681,22 @@ static const VMStateDescription vmstate_spapr_p=
-atb_entry =3D {
->>      },
->>  };
->> =20
->> +static bool spapr_irq_map_needed(void *opaque)
->> +{
->> +    return true;
->=20
-> I see that the next patch adds some code to avoid sending the
-> bitmap if it doesn't contain state, but I guess you should also
-> explicitly have this function to return false for older machine
-> types (see remark below).
->=20
->> +}
->> +
->> +static const VMStateDescription vmstate_spapr_irq_map =3D {
->> +    .name =3D "spapr_irq_map",
->> +    .version_id =3D 0,
->> +    .minimum_version_id =3D 0,
->> +    .needed =3D spapr_irq_map_needed,
->> +    .fields =3D (VMStateField[]) {
->> +        VMSTATE_BITMAP(irq_map, sPAPRMachineState, 0, nr_irqs),
->> +        VMSTATE_END_OF_LIST()
->> +    },
->> +};
->> +
->>  static const VMStateDescription vmstate_spapr =3D {
->>      .name =3D "spapr",
->>      .version_id =3D 3,
->> @@ -1700,6 +1716,7 @@ static const VMStateDescription vmstate_spapr =3D=
- {
->>          &vmstate_spapr_ov5_cas,
->>          &vmstate_spapr_patb_entry,
->>          &vmstate_spapr_pending_events,
->> +        &vmstate_spapr_irq_map,
->>          NULL
->>      }
->>  };
->> @@ -2337,8 +2354,12 @@ static void ppc_spapr_init(MachineState *machin=
-e)
->>      /* Setup a load limit for the ramdisk leaving room for SLOF and F=
-DT */
->>      load_limit =3D MIN(spapr->rma_size, RTAS_MAX_ADDR) - FW_OVERHEAD;
->> =20
->> +    /* Initialize the IRQ allocator */
->> +    spapr->nr_irqs  =3D XICS_IRQS_SPAPR;
->> +    spapr->irq_map  =3D bitmap_new(spapr->nr_irqs);
->> +
->=20
-> I think you should introduce a sPAPRMachineClass::has_irq_bitmap boolea=
-n
-> so that the bitmap is only allocated for newer machine types. And you s=
-hould
-> then use this flag in spapr_irq_map_needed() above.
+On 11/14/2017 01:32 AM, Michael S. Tsirkin wrote:
+>> - guest2host_cmd: written by the guest to ACK to the host about the
+>> commands that have been received. The host will clear the corresponding
+>> bits on the host2guest_cmd register. The guest also uses this register
+>> to send commands to the host (e.g. when finish free page reporting).
+> I am not sure what is the role of guest2host_cmd. Reporting of
+> the correct cmd id seems sufficient indication that guest
+> received the start command. Not getting any more seems sufficient
+> to detect stop.
+>
 
-yes. I can add a boot to be more explicit on the use of the bitmap.
+I think the issue is when the host is waiting for the guest to report 
+pages, it does not know whether the guest is going to report more or the 
+report is done already. That's why we need a way to let the guest tell 
+the host "the report is done, don't wait for more", then the host 
+continues to the next step - sending the non-free pages to the 
+destination. The following method is a conclusion of other comments, 
+with some new thought. Please have a check if it is good.
 
-Thanks,
+Two new configuration registers in total:
+- cmd_reg: the command register, combined from the previous host2guest 
+and guest2host. I think we can use the same register for host requesting 
+and guest ACKing, since the guest writing will trap to QEMU, that is, 
+all the writes to the register are performed in QEMU, and we can keep 
+things work in a correct way there.
+- cmd_id_reg: the sequence id of the free page report command.
 
-C.=20
+-- free page report:
+     - host requests the guest to start reporting by "cmd_reg | 
+REPORT_START";
+     - guest ACKs to the host about receiving the start reporting 
+request by "cmd_reg | REPORT_START", host will clear the flag bit once 
+receiving the ACK.
+     - host requests the guest to stop reporting by "cmd_reg | REPORT_STOP";
+     - guest ACKs to the host about receiving the stop reporting request 
+by "cmd_reg | REPORT_STOP", host will clear the flag once receiving the ACK.
+     - guest tells the host about the start of the reporting by writing 
+"cmd id" into an outbuf, which is added to the free page vq.
+     - guest tells the host about the end of the reporting by writing 
+"0" into an outbuf, which is added to the free page vq. (we reserve 
+"id=0" as the stop sign)
+
+-- ballooning:
+     - host requests the guest to start ballooning by "cmd_reg | 
+BALLOONING";
+     - guest ACKs to the host about receiving the request by "cmd_reg | 
+BALLOONING", host will clear the flag once receiving the ACK.
 
 
->=20
-> Apart from that, the rest of the patch looks good.
->=20
->>      /* Set up Interrupt Controller before we create the VCPUs */
->> -    xics_system_init(machine, XICS_IRQS_SPAPR, &error_fatal);
->> +    xics_system_init(machine, spapr->nr_irqs, &error_fatal);
->> =20
->>      /* Set up containers for ibm,client-architecture-support negotiat=
-ed options
->>       */
->> @@ -3560,7 +3581,7 @@ static int ics_find_free_block(ICSState *ics, in=
-t num, int alignnum)
->>      return -1;
->>  }
->> =20
->> -static bool spapr_irq_test(XICSFabric *xi, int irq)
->> +static bool spapr_irq_test_2_11(XICSFabric *xi, int irq)
->>  {
->>      sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
->>      ICSState *ics =3D spapr->ics;
->> @@ -3569,7 +3590,7 @@ static bool spapr_irq_test(XICSFabric *xi, int i=
-rq)
->>      return !ICS_IRQ_FREE(ics, srcno);
->>  }
->> =20
->> -static int spapr_irq_alloc_block(XICSFabric *xi, int count, int align=
-)
->> +static int spapr_irq_alloc_block_2_11(XICSFabric *xi, int count, int =
-align)
->>  {
->>      sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
->>      ICSState *ics =3D spapr->ics;
->> @@ -3583,7 +3604,7 @@ static int spapr_irq_alloc_block(XICSFabric *xi,=
- int count, int align)
->>      return srcno + ics->offset;
->>  }
->> =20
->> -static void spapr_irq_free_block(XICSFabric *xi, int irq, int num)
->> +static void spapr_irq_free_block_2_11(XICSFabric *xi, int irq, int nu=
-m)
->>  {
->>      sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
->>      ICSState *ics =3D spapr->ics;
->> @@ -3601,6 +3622,46 @@ static void spapr_irq_free_block(XICSFabric *xi=
-, int irq, int num)
->>      }
->>  }
->> =20
->> +static bool spapr_irq_test(XICSFabric *xi, int irq)
->> +{
->> +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
->> +    int srcno =3D irq - spapr->ics->offset;
->> +
->> +    return test_bit(srcno, spapr->irq_map);
->> +}
->> +
->> +static int spapr_irq_alloc_block(XICSFabric *xi, int count, int align=
-)
->> +{
->> +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
->> +    int start =3D 0;
->> +    int srcno;
->> +
->> +    /*
->> +     * The 'align_mask' parameter of bitmap_find_next_zero_area()
->> +     * should be one less than a power of 2; 0 means no
->> +     * alignment. Adapt the 'align' value of the former allocator to
->> +     * fit the requirements of bitmap_find_next_zero_area()
->> +     */
->> +    align -=3D 1;
->> +
->> +    srcno =3D bitmap_find_next_zero_area(spapr->irq_map, spapr->nr_ir=
-qs, start,
->> +                                       count, align);
->> +    if (srcno =3D=3D spapr->nr_irqs) {
->> +        return -1;
->> +    }
->> +
->> +    bitmap_set(spapr->irq_map, srcno, count);
->> +    return srcno + spapr->ics->offset;
->> +}
->> +
->> +static void spapr_irq_free_block(XICSFabric *xi, int irq, int num)
->> +{
->> +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
->> +    int srcno =3D irq - spapr->ics->offset;
->> +
->> +    bitmap_clear(spapr->irq_map, srcno, num);
->> +}
->> +
->>  static void spapr_pic_print_info(InterruptStatsProvider *obj,
->>                                   Monitor *mon)
->>  {
->> @@ -3778,7 +3839,12 @@ static void spapr_machine_2_11_instance_options=
-(MachineState *machine)
->> =20
->>  static void spapr_machine_2_11_class_options(MachineClass *mc)
->>  {
->> -    /* Defaults for the latest behaviour inherited from the base clas=
-s */
->> +    XICSFabricClass *xic =3D XICS_FABRIC_CLASS(mc);
->> +
->> +    spapr_machine_2_12_class_options(mc);
->> +    xic->irq_test =3D spapr_irq_test_2_11;
->> +    xic->irq_alloc_block =3D spapr_irq_alloc_block_2_11;
->> +    xic->irq_free_block =3D spapr_irq_free_block_2_11;
->>  }
->> =20
->>  DEFINE_SPAPR_MACHINE(2_11, "2.11", false);
->> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
->> index 9d21ca9bde3a..5835c694caff 100644
->> --- a/include/hw/ppc/spapr.h
->> +++ b/include/hw/ppc/spapr.h
->> @@ -7,6 +7,7 @@
->>  #include "hw/ppc/spapr_drc.h"
->>  #include "hw/mem/pc-dimm.h"
->>  #include "hw/ppc/spapr_ovec.h"
->> +#include "qemu/bitmap.h"
->> =20
->>  struct VIOsPAPRBus;
->>  struct sPAPRPHBState;
->> @@ -78,6 +79,8 @@ struct sPAPRMachineState {
->>      struct VIOsPAPRBus *vio_bus;
->>      QLIST_HEAD(, sPAPRPHBState) phbs;
->>      struct sPAPRNVRAM *nvram;
->> +    int32_t nr_irqs;
->> +    unsigned long *irq_map;
->>      ICSState *ics;
->>      sPAPRRTCState rtc;
->> =20
->=20
+Some more explanations:
+-- Why not let the host request the guest to start the free page 
+reporting simply by writing a new cmd id to the cmd_id_reg?
+The configuration interrupt is shared among all the features - 
+ballooning, free page reporting, and future feature extensions which 
+need host-to-guest requests. Some features may need to add other feature 
+specific configuration registers, like free page reporting need the 
+cmd_id_reg, which is not used by ballooning. The rule here is that the 
+feature specific registers are read only when that feature is requested 
+via the cmd_reg. For example, the cmd_id_reg is read only when "cmd_reg 
+| REPORT_START" is true. Otherwise, when the driver receives a 
+configuration interrupt, it has to read both cmd_reg and cmd_id 
+registers to know what are requested by the host - think about the case 
+that ballooning requests are sent frequently while free page reporting 
+isn't requested, the guest has to read the cmd_id register every time a 
+ballooning request is sent by the host, which is not necessary. If 
+future new features follow this style, there will be more unnecessary 
+VMexits to read the unused feature specific registers.
+So I think it is good to have a central control of the feature request 
+via only one cmd register - reading that one is enough to know what is 
+requested by the host.
+
+
+Best,
+Wei
