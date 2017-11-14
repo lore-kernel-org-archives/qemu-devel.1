@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48821)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50901)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eEVin-000569-0p
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 02:33:25 -0500
+	(envelope-from <armbru@redhat.com>) id 1eEVnF-0006jU-Gw
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 02:38:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eEVij-0003p7-K0
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 02:33:25 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54160)
+	(envelope-from <armbru@redhat.com>) id 1eEVnC-0007qZ-D5
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 02:38:01 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51438)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eEVij-0003oU-Dw
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 02:33:21 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 24F3B8B125
-	for <qemu-devel@nongnu.org>; Tue, 14 Nov 2017 07:33:20 +0000 (UTC)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eEVnC-0007pt-7K
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 02:37:58 -0500
 From: Markus Armbruster <armbru@redhat.com>
-References: <20171113222358.30967-1-apahim@redhat.com>
-Date: Tue, 14 Nov 2017 08:33:14 +0100
-In-Reply-To: <20171113222358.30967-1-apahim@redhat.com> (Amador Pahim's
-	message of "Mon, 13 Nov 2017 23:23:50 +0100")
-Message-ID: <8760adwc05.fsf@dusky.pond.sub.org>
+References: <20171110173421.17904-1-lprosek@redhat.com>
+	<20171110173421.17904-4-lprosek@redhat.com>
+	<878tfaytq9.fsf@dusky.pond.sub.org>
+	<546207b7d08628804461a97728ad1c06@hostfission.com>
+Date: Tue, 14 Nov 2017 08:37:53 +0100
+In-Reply-To: <546207b7d08628804461a97728ad1c06@hostfission.com> (geoff's
+	message of "Tue, 14 Nov 2017 04:47:23 +1100")
+Message-ID: <871sl1wbse.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v10 0/8] scripts/qemu.py fixes and cleanups
+Subject: Re: [Qemu-devel] [PATCH 3/3] ivshmem: Improve MSI irqfd error
+ handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,57 +30,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Amador Pahim <apahim@redhat.com>
-Cc: qemu-devel@nongnu.org, famz@redhat.com, ehabkost@redhat.com, crosa@redhat.com
+To: geoff--- via Qemu-devel <qemu-devel@nongnu.org>
+Cc: geoff@hostfission.com, pbonzini@redhat.com, Ladi Prosek <lprosek@redhat.com>, marcandre.lureau@redhat.com
 
-Amador Pahim <apahim@redhat.com> writes:
+geoff--- via Qemu-devel <qemu-devel@nongnu.org> writes:
 
-> Changes v1->v2:
->  - Style fixes to make checkpatch.pl happy.
->  - Rebased.
-> Changes v2->v3:
->  - Fix typo in patch 3 ("qemu.py: make 'args' public") commit message.
-> Changes v3->v4:
->  - Squash the 2 first commits since they are co-dependant.
->  - Cleanup launch() and shutdown().
->  - Reorder the commits, putting the rename of self._args first.
->  - Rebased.
-> Changes v4->v5:
->  - Break the cleanup commit into logical changes and include in the
->    commit messages the rationale for making them.
-> Changes v5->v6:
->  - Remove the commit to rename self._args.
->  - Fix is_running() return before first call to maunch().
->  - Use python logging system.
->  - Include the full command line on negative exit code error message.
->  - Use os.path.null instead of /dev/null.
->  - Improve the control over the created/deleted files.
-> Changes v6->v7:
->  - Split commits in self-contained/atomic changes.
->  - Addressed the comments from previous version, basically improving the
->    logging messages and the control over created files. See individual
->    commit messages for details.
-> Changes v7->v8:
->  - Rebased.
->  - Reorder commits to avoid break->fix sequence.
->  - Split commits "use poll() instead of 'returncode'" and "refactor
->    launch()".
->  - Don't ignore errors in _load_io_log(). Instead, check if we created
->    the file before reading it.
->  - Use LOG.warn() instead of LOG.debug() for the negative exit code
->    message.
->  - Fix the exception name called in commits "launch vm only if it's not
->    running" and "don't launch again before shutdown()".
->  - Minor style fixes.
-> Changes v8->v9:
->  - Some commits were already merged. Rebased the remaining ones.
->  - New commit to remove unused import.
->  - VM files control logic changed to use a temporary directory.
->  - Better naming for variable controlling the need of a shutdown before
->    next launch.
-> Changes v9->v10:
->  - Keep method _remove_if_exists().
+> On 2017-11-14 04:27, Markus Armbruster wrote:
+>> Ladi Prosek <lprosek@redhat.com> writes:
+>>
+>>> Adds a rollback path to ivshmem_enable_irqfd() and fixes
+>>> ivshmem_disable_irqfd() to bail if irqfd has not been enabled.
+>>>
+>>> Signed-off-by: Ladi Prosek <lprosek@redhat.com>
+>>
+>> Is this a theoretical bug, or can you trigger it?
+>
+> It is reproducible, I can trigger it by simply unloading the windows
+> driver and then attempting to re-load it.
 
-Drive-by comment: please keep the patch changelog in reverse order
-(latest first), so repeat reviewers can find the latest change(s) at a
-glance.  Thanks in advance!
+Adding that to the commit message would be nice.  You then can add my
+
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
