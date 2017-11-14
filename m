@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53540)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57179)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1eEdnv-0001y9-7b
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 11:11:16 -0500
+	(envelope-from <groug@kaod.org>) id 1eEdy6-0007D0-1k
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 11:21:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1eEdnr-0007dv-6p
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 11:11:15 -0500
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:55426)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1eEdnq-0007cI-Vr
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 11:11:11 -0500
-Received: by mail-wr0-x244.google.com with SMTP id l8so17933009wre.12
-	for <qemu-devel@nongnu.org>; Tue, 14 Nov 2017 08:11:10 -0800 (PST)
-References: <20171114094203.28030-1-richard.henderson@linaro.org>
-	<20171114134153.11167-1-richard.henderson@linaro.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20171114134153.11167-1-richard.henderson@linaro.org>
-Date: Tue, 14 Nov 2017 16:11:08 +0000
-Message-ID: <87fu9galib.fsf@linaro.org>
+	(envelope-from <groug@kaod.org>) id 1eEdy2-0008J0-OR
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 11:21:46 -0500
+Received: from 12.mo6.mail-out.ovh.net ([178.32.125.228]:42965)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1eEdy2-0008Gs-EW
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 11:21:42 -0500
+Received: from player735.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo6.mail-out.ovh.net (Postfix) with ESMTP id 67B7C11F966
+	for <qemu-devel@nongnu.org>; Tue, 14 Nov 2017 17:21:40 +0100 (CET)
+Date: Tue, 14 Nov 2017 17:21:32 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20171114172132.6fce20c8@bahia.lab.toulouse-stg.fr.ibm.com>
+In-Reply-To: <20171110152017.24324-9-clg@kaod.org>
+References: <20171110152017.24324-1-clg@kaod.org>
+	<20171110152017.24324-9-clg@kaod.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 3/1] target/arm: Fix GETPC usage in
- do_paired_cmpxchg64_l/be
+Subject: Re: [Qemu-devel] [PATCH for-2.12 v3 08/11] spapr: introduce a
+ XICSFabric irq_is_lsi() operation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,89 +31,229 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
+On Fri, 10 Nov 2017 15:20:14 +0000
+C=C3=A9dric Le Goater <clg@kaod.org> wrote:
 
-Richard Henderson <richard.henderson@linaro.org> writes:
-
-> Use of GETPC must be restricted to those functions that are
-> directly called from TCG generated code.
->
-> Fixes: 2399d4e7cec22ecf1c51062d2ebfd45220dbaace
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
+> It will be used later on to distinguish the allocation of an LSI
+> interrupt from an MSI and also to reduce the use of the ICSIRQState
+> array of the ICSState object, which is on our way to introduce XIVE.
+>=20
+> The 'irq' parameter continues to refer to the global IRQ number space.
+>=20
+> On PowerNV, only the PSI controller interrupts are handled and they
+> are all LSIs.
+>=20
+> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 > ---
->  target/arm/helper-a64.c | 14 ++++++--------
->  1 file changed, 6 insertions(+), 8 deletions(-)
->
-> diff --git a/target/arm/helper-a64.c b/target/arm/helper-a64.c
-> index 96a3ecf707..b84ebcae6e 100644
-> --- a/target/arm/helper-a64.c
-> +++ b/target/arm/helper-a64.c
-> @@ -432,9 +432,8 @@ uint64_t HELPER(crc32c_64)(uint64_t acc, uint64_t val=
-, uint32_t bytes)
->  /* Returns 0 on success; 1 otherwise.  */
->  static uint64_t do_paired_cmpxchg64_le(CPUARMState *env, uint64_t addr,
->                                         uint64_t new_lo, uint64_t new_hi,
-> -                                       bool parallel)
-> +                                       bool parallel, uintptr_t ra)
->  {
-> -    uintptr_t ra =3D GETPC();
->      Int128 oldv, cmpv, newv;
->      bool success;
->
-> @@ -491,20 +490,19 @@ static uint64_t do_paired_cmpxchg64_le(CPUARMState =
-*env, uint64_t addr,
->  uint64_t HELPER(paired_cmpxchg64_le)(CPUARMState *env, uint64_t addr,
->                                                uint64_t new_lo, uint64_t =
-new_hi)
->  {
-> -    return do_paired_cmpxchg64_le(env, addr, new_lo, new_hi, false);
-> +    return do_paired_cmpxchg64_le(env, addr, new_lo, new_hi, false, GETP=
-C());
->  }
->
->  uint64_t HELPER(paired_cmpxchg64_le_parallel)(CPUARMState *env, uint64_t=
- addr,
->                                                uint64_t new_lo, uint64_t =
-new_hi)
->  {
-> -    return do_paired_cmpxchg64_le(env, addr, new_lo, new_hi, true);
-> +    return do_paired_cmpxchg64_le(env, addr, new_lo, new_hi, true, GETPC=
-());
->  }
->
->  static uint64_t do_paired_cmpxchg64_be(CPUARMState *env, uint64_t addr,
->                                         uint64_t new_lo, uint64_t new_hi,
-> -                                       bool parallel)
-> +                                       bool parallel, uintptr_t ra)
->  {
-> -    uintptr_t ra =3D GETPC();
->      Int128 oldv, cmpv, newv;
->      bool success;
->
-> @@ -561,11 +559,11 @@ static uint64_t do_paired_cmpxchg64_be(CPUARMState =
-*env, uint64_t addr,
->  uint64_t HELPER(paired_cmpxchg64_be)(CPUARMState *env, uint64_t addr,
->                                       uint64_t new_lo, uint64_t new_hi)
->  {
-> -    return do_paired_cmpxchg64_be(env, addr, new_lo, new_hi, false);
-> +    return do_paired_cmpxchg64_be(env, addr, new_lo, new_hi, false, GETP=
-C());
->  }
->
->  uint64_t HELPER(paired_cmpxchg64_be_parallel)(CPUARMState *env, uint64_t=
- addr,
->                                       uint64_t new_lo, uint64_t new_hi)
->  {
-> -    return do_paired_cmpxchg64_be(env, addr, new_lo, new_hi, true);
-> +    return do_paired_cmpxchg64_be(env, addr, new_lo, new_hi, true, GETPC=
-());
->  }
 
+Reviewed-by: Greg Kurz <groug@kaod.org>
 
---
-Alex Benn=C3=A9e
+>  hw/intc/xics.c        | 26 +++++++++++++++++---------
+>  hw/intc/xics_kvm.c    |  4 ++--
+>  hw/ppc/pnv.c          | 16 ++++++++++++++++
+>  hw/ppc/spapr.c        |  9 +++++++++
+>  include/hw/ppc/xics.h |  2 ++
+>  5 files changed, 46 insertions(+), 11 deletions(-)
+>=20
+> diff --git a/hw/intc/xics.c b/hw/intc/xics.c
+> index 2c4899f278e2..42880e736697 100644
+> --- a/hw/intc/xics.c
+> +++ b/hw/intc/xics.c
+> @@ -33,6 +33,7 @@
+>  #include "trace.h"
+>  #include "qemu/timer.h"
+>  #include "hw/ppc/xics.h"
+> +#include "hw/ppc/spapr.h"
+>  #include "qemu/error-report.h"
+>  #include "qapi/visitor.h"
+>  #include "monitor/monitor.h"
+> @@ -70,8 +71,7 @@ void ics_pic_print_info(ICSState *ics, Monitor *mon)
+>          }
+>          monitor_printf(mon, "  %4x %s %02x %02x\n",
+>                         ics->offset + i,
+> -                       (irq->flags & XICS_FLAGS_IRQ_LSI) ?
+> -                       "LSI" : "MSI",
+> +                       ics_is_lsi(ics, i) ? "LSI" : "MSI",
+>                         irq->priority, irq->status);
+>      }
+>  }
+> @@ -377,6 +377,14 @@ static const TypeInfo icp_info =3D {
+>  /*
+>   * ICS: Source layer
+>   */
+> +bool ics_is_lsi(ICSState *ics, int srcno)
+> +{
+> +    XICSFabric *xi =3D ics->xics;
+> +    XICSFabricClass *xic =3D XICS_FABRIC_GET_CLASS(xi);
+> +
+> +    return xic->irq_is_lsi(xi, srcno + ics->offset);
+> +}
+> +
+>  static void ics_simple_resend_msi(ICSState *ics, int srcno)
+>  {
+>      ICSIRQState *irq =3D ics->irqs + srcno;
+> @@ -435,7 +443,7 @@ static void ics_simple_set_irq(void *opaque, int srcn=
+o, int val)
+>  {
+>      ICSState *ics =3D (ICSState *)opaque;
+> =20
+> -    if (ics->irqs[srcno].flags & XICS_FLAGS_IRQ_LSI) {
+> +    if (ics_is_lsi(ics, srcno)) {
+>          ics_simple_set_irq_lsi(ics, srcno, val);
+>      } else {
+>          ics_simple_set_irq_msi(ics, srcno, val);
+> @@ -472,7 +480,7 @@ void ics_simple_write_xive(ICSState *ics, int srcno, =
+int server,
+>      trace_xics_ics_simple_write_xive(ics->offset + srcno, srcno, server,
+>                                       priority);
+> =20
+> -    if (ics->irqs[srcno].flags & XICS_FLAGS_IRQ_LSI) {
+> +    if (ics_is_lsi(ics, srcno)) {
+>          ics_simple_write_xive_lsi(ics, srcno);
+>      } else {
+>          ics_simple_write_xive_msi(ics, srcno);
+> @@ -484,10 +492,10 @@ static void ics_simple_reject(ICSState *ics, uint32=
+_t nr)
+>      ICSIRQState *irq =3D ics->irqs + nr - ics->offset;
+> =20
+>      trace_xics_ics_simple_reject(nr, nr - ics->offset);
+> -    if (irq->flags & XICS_FLAGS_IRQ_MSI) {
+> -        irq->status |=3D XICS_STATUS_REJECTED;
+> -    } else if (irq->flags & XICS_FLAGS_IRQ_LSI) {
+> +    if (ics_is_lsi(ics, nr - ics->offset)) {
+>          irq->status &=3D ~XICS_STATUS_SENT;
+> +    } else {
+> +        irq->status |=3D XICS_STATUS_REJECTED;
+>      }
+>  }
+> =20
+> @@ -497,7 +505,7 @@ static void ics_simple_resend(ICSState *ics)
+> =20
+>      for (i =3D 0; i < ics->nr_irqs; i++) {
+>          /* FIXME: filter by server#? */
+> -        if (ics->irqs[i].flags & XICS_FLAGS_IRQ_LSI) {
+> +        if (ics_is_lsi(ics, i)) {
+>              ics_simple_resend_lsi(ics, i);
+>          } else {
+>              ics_simple_resend_msi(ics, i);
+> @@ -512,7 +520,7 @@ static void ics_simple_eoi(ICSState *ics, uint32_t nr)
+> =20
+>      trace_xics_ics_simple_eoi(nr);
+> =20
+> -    if (ics->irqs[srcno].flags & XICS_FLAGS_IRQ_LSI) {
+> +    if (ics_is_lsi(ics, srcno)) {
+>          irq->status &=3D ~XICS_STATUS_SENT;
+>      }
+>  }
+> diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
+> index 3091ad3ac2c8..2f10637c9f7c 100644
+> --- a/hw/intc/xics_kvm.c
+> +++ b/hw/intc/xics_kvm.c
+> @@ -258,7 +258,7 @@ static int ics_set_kvm_state(ICSState *ics, int versi=
+on_id)
+>              state |=3D KVM_XICS_MASKED;
+>          }
+> =20
+> -        if (ics->irqs[i].flags & XICS_FLAGS_IRQ_LSI) {
+> +        if (ics_is_lsi(ics, i)) {
+>              state |=3D KVM_XICS_LEVEL_SENSITIVE;
+>              if (irq->status & XICS_STATUS_ASSERTED) {
+>                  state |=3D KVM_XICS_PENDING;
+> @@ -293,7 +293,7 @@ static void ics_kvm_set_irq(void *opaque, int srcno, =
+int val)
+>      int rc;
+> =20
+>      args.irq =3D srcno + ics->offset;
+> -    if (ics->irqs[srcno].flags & XICS_FLAGS_IRQ_MSI) {
+> +    if (!ics_is_lsi(ics, srcno)) {
+>          if (!val) {
+>              return;
+>          }
+> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+> index 8288940ef9d7..958223376b4c 100644
+> --- a/hw/ppc/pnv.c
+> +++ b/hw/ppc/pnv.c
+> @@ -1035,6 +1035,21 @@ static bool pnv_irq_test(XICSFabric *xi, int irq)
+>      return false;
+>  }
+> =20
+> +static bool pnv_irq_is_lsi(XICSFabric *xi, int irq)
+> +{
+> +    PnvMachineState *pnv =3D POWERNV_MACHINE(xi);
+> +    int i;
+> +
+> +    /* PowerNV machine only has PSI interrupts which are all LSIs */
+> +    for (i =3D 0; i < pnv->num_chips; i++) {
+> +        ICSState *ics =3D &pnv->chips[i]->psi.ics;
+> +        if (ics_valid_irq(ics, irq)) {
+> +            return true;
+> +        }
+> +    }
+> +    return false;
+> +}
+> +
+>  static void pnv_pic_print_info(InterruptStatsProvider *obj,
+>                                 Monitor *mon)
+>  {
+> @@ -1120,6 +1135,7 @@ static void powernv_machine_class_init(ObjectClass =
+*oc, void *data)
+>      xic->ics_get =3D pnv_ics_get;
+>      xic->ics_resend =3D pnv_ics_resend;
+>      xic->irq_test =3D pnv_irq_test;
+> +    xic->irq_is_lsi =3D pnv_irq_is_lsi;
+>      ispc->print_info =3D pnv_pic_print_info;
+> =20
+>      powernv_machine_class_props_init(oc);
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 1cbbd7715a85..ce314fcf38db 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -3628,6 +3628,14 @@ static void spapr_irq_free_block_2_11(XICSFabric *=
+xi, int irq, int num)
+>      }
+>  }
+> =20
+> +static bool spapr_irq_is_lsi(XICSFabric *xi, int irq)
+> +{
+> +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
+> +    int srcno =3D irq - spapr->ics->offset;
+> +
+> +    return spapr->ics->irqs[srcno].flags & XICS_FLAGS_IRQ_LSI;
+> +}
+> +
+>  static bool spapr_irq_test(XICSFabric *xi, int irq)
+>  {
+>      sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
+> @@ -3765,6 +3773,7 @@ static void spapr_machine_class_init(ObjectClass *o=
+c, void *data)
+>      xic->irq_test =3D spapr_irq_test;
+>      xic->irq_alloc_block =3D spapr_irq_alloc_block;
+>      xic->irq_free_block =3D spapr_irq_free_block;
+> +    xic->irq_is_lsi =3D spapr_irq_is_lsi;
+> =20
+>      ispc->print_info =3D spapr_pic_print_info;
+>      /* Force NUMA node memory size to be a multiple of
+> diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
+> index 30e7f2e0a7dd..478f8e510179 100644
+> --- a/include/hw/ppc/xics.h
+> +++ b/include/hw/ppc/xics.h
+> @@ -179,6 +179,7 @@ typedef struct XICSFabricClass {
+>      bool (*irq_test)(XICSFabric *xi, int irq);
+>      int (*irq_alloc_block)(XICSFabric *xi, int count, int align);
+>      void (*irq_free_block)(XICSFabric *xi, int irq, int num);
+> +    bool (*irq_is_lsi)(XICSFabric *xi, int irq);
+>  } XICSFabricClass;
+> =20
+>  #define XICS_IRQS_SPAPR               1024
+> @@ -205,6 +206,7 @@ void ics_simple_write_xive(ICSState *ics, int nr, int=
+ server,
+>  void ics_set_irq_type(ICSState *ics, int srcno, bool lsi);
+>  void icp_pic_print_info(ICPState *icp, Monitor *mon);
+>  void ics_pic_print_info(ICSState *ics, Monitor *mon);
+> +bool ics_is_lsi(ICSState *ics, int srno);
+> =20
+>  void ics_resend(ICSState *ics);
+>  void icp_resend(ICPState *ss);
