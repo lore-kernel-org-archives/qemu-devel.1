@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41974)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42063)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eEfWs-0000Lt-IB
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 13:01:50 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eEfX0-0000QF-22
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 13:01:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eEfWq-0003C0-Jf
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 13:01:46 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eEfWw-0003Et-TB
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 13:01:54 -0500
 From: Max Reitz <mreitz@redhat.com>
-Date: Tue, 14 Nov 2017 19:01:24 +0100
-Message-Id: <20171114180128.17076-3-mreitz@redhat.com>
+Date: Tue, 14 Nov 2017 19:01:26 +0100
+Message-Id: <20171114180128.17076-5-mreitz@redhat.com>
 In-Reply-To: <20171114180128.17076-1-mreitz@redhat.com>
 References: <20171114180128.17076-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.11? v7 2/6] qapi/qlist: Add
- qlist_append_null() macro
+Subject: [Qemu-devel] [PATCH for-2.11? v7 4/6] block: qobject_is_equal() in
+ bdrv_reopen_prepare()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,49 +23,65 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-Besides the macro itself, this patch also adds a corresponding
-Coccinelle rule.
+Currently, bdrv_reopen_prepare() assumes that all BDS options are
+strings. However, this is not the case if the BDS has been created
+through the json: pseudo-protocol or blockdev-add.
+
+Note that the user-invokable reopen command is an HMP command, so you
+can only specify strings there. Therefore, specifying a non-string
+option with the "same" value as it was when originally created will now
+return an error because the values are supposedly similar (and there is
+no way for the user to circumvent this but to just not specify the
+option again -- however, this is still strictly better than just
+crashing).
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Alberto Garcia <berto@igalia.com>
 ---
- include/qapi/qmp/qlist.h         | 3 +++
- scripts/coccinelle/qobject.cocci | 3 +++
- 2 files changed, 6 insertions(+)
+ block.c | 29 ++++++++++++++++++-----------
+ 1 file changed, 18 insertions(+), 11 deletions(-)
 
-diff --git a/include/qapi/qmp/qlist.h b/include/qapi/qmp/qlist.h
-index c4b5fdad9b..59d209bbae 100644
---- a/include/qapi/qmp/qlist.h
-+++ b/include/qapi/qmp/qlist.h
-@@ -15,6 +15,7 @@
+diff --git a/block.c b/block.c
+index 684cb018da..28889a2690 100644
+--- a/block.c
++++ b/block.c
+@@ -3069,19 +3069,26 @@ int bdrv_reopen_prepare(BDRVReopenState *reopen_state, BlockReopenQueue *queue,
+         const QDictEntry *entry = qdict_first(reopen_state->options);
  
- #include "qapi/qmp/qobject.h"
- #include "qapi/qmp/qnum.h"
-+#include "qapi/qmp/qnull.h"
- #include "qemu/queue.h"
- 
- typedef struct QListEntry {
-@@ -37,6 +38,8 @@ typedef struct QList {
-         qlist_append(qlist, qbool_from_bool(value))
- #define qlist_append_str(qlist, value) \
-         qlist_append(qlist, qstring_from_str(value))
-+#define qlist_append_null(qlist) \
-+        qlist_append(qlist, qnull())
- 
- #define QLIST_FOREACH_ENTRY(qlist, var)             \
-         for ((var) = ((qlist)->head.tqh_first);     \
-diff --git a/scripts/coccinelle/qobject.cocci b/scripts/coccinelle/qobject.cocci
-index 1120eb1a42..47bcafe9a9 100644
---- a/scripts/coccinelle/qobject.cocci
-+++ b/scripts/coccinelle/qobject.cocci
-@@ -41,4 +41,7 @@ expression Obj, E;
- |
- - qlist_append(Obj, qstring_from_str(E));
- + qlist_append_str(Obj, E);
-+|
-+- qlist_append(Obj, qnull());
-++ qlist_append_null(Obj);
- )
+         do {
+-            QString *new_obj = qobject_to_qstring(entry->value);
+-            const char *new = qstring_get_str(new_obj);
++            QObject *new = entry->value;
++            QObject *old = qdict_get(reopen_state->bs->options, entry->key);
++
+             /*
+-             * Caution: while qdict_get_try_str() is fine, getting
+-             * non-string types would require more care.  When
+-             * bs->options come from -blockdev or blockdev_add, its
+-             * members are typed according to the QAPI schema, but
+-             * when they come from -drive, they're all QString.
++             * TODO: When using -drive to specify blockdev options, all values
++             * will be strings; however, when using -blockdev, blockdev-add or
++             * filenames using the json:{} pseudo-protocol, they will be
++             * correctly typed.
++             * In contrast, reopening options are (currently) always strings
++             * (because you can only specify them through qemu-io; all other
++             * callers do not specify any options).
++             * Therefore, when using anything other than -drive to create a BDS,
++             * this cannot detect non-string options as unchanged, because
++             * qobject_is_equal() always returns false for objects of different
++             * type.  In the future, this should be remedied by correctly typing
++             * all options.  For now, this is not too big of an issue because
++             * the user can simply omit options which cannot be changed anyway,
++             * so they will stay unchanged.
+              */
+-            const char *old = qdict_get_try_str(reopen_state->bs->options,
+-                                                entry->key);
+-
+-            if (!old || strcmp(new, old)) {
++            if (!qobject_is_equal(new, old)) {
+                 error_setg(errp, "Cannot change the option '%s'", entry->key);
+                 ret = -EINVAL;
+                 goto error;
 -- 
 2.13.6
