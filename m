@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41177)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41218)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1eEWQW-0000mz-NZ
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 03:18:37 -0500
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1eEWQa-0000w4-Dm
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 03:18:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1eEWQT-0007GP-Fk
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 03:18:36 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:52870)
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1eEWQZ-0007L6-4Z
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 03:18:40 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:52890)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1eEWQT-0007Fo-40
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 03:18:33 -0500
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1eEWQY-0007Kh-On
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 03:18:39 -0500
 From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Date: Tue, 14 Nov 2017 11:18:40 +0300
-Message-ID: <20171114081840.27640.76952.stgit@pasha-VirtualBox>
+Date: Tue, 14 Nov 2017 11:18:46 +0300
+Message-ID: <20171114081846.27640.12424.stgit@pasha-VirtualBox>
 In-Reply-To: <20171114081630.27640.53933.stgit@pasha-VirtualBox>
 References: <20171114081630.27640.53933.stgit@pasha-VirtualBox>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [RFC PATCH v2 23/26] util/qemu-thread-*: add qemu_lock,
- locked and unlock trace events
+Subject: [Qemu-devel] [RFC PATCH v2 24/26]
+ scripts/analyse-locks-simpletrace.py: script to analyse lock times
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,156 +32,135 @@ Cc: kwolf@redhat.com, peter.maydell@linaro.org, boost.lists@gmail.com, quintela@
 
 From: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
+This script allows analysis of mutex acquisition and hold times based
+on a trace file. Given a trace control file of:
+
+  qemu_mutex_lock
+  qemu_mutex_locked
+  qemu_mutex_unlock
+
+And running with:
+
+  $QEMU $QEMU_ARGS -trace events=3D./lock-trace
+
+You can analyse the results with:
+
+  ./scripts/analyse-locks-simpletrace.py trace-events-all ./trace-21812
+
 Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
 ---
-v1
-  - fix merge conflicts with existing tracing
-  - add trylock/cond_wait traces
+ scripts/analyse-locks-simpletrace.py |   99 ++++++++++++++++++++++++++++=
+++++++
+ 1 file changed, 99 insertions(+)
+ create mode 100755 scripts/analyse-locks-simpletrace.py
 
----
- include/qemu/thread.h    |   14 ++++++++++----
- util/qemu-thread-posix.c |   21 ++++++++++++---------
- util/trace-events        |    7 ++++---
- 3 files changed, 26 insertions(+), 16 deletions(-)
-
-diff --git a/include/qemu/thread.h b/include/qemu/thread.h
-index 9910f49..c51a7f1 100644
---- a/include/qemu/thread.h
-+++ b/include/qemu/thread.h
-@@ -22,9 +22,13 @@ typedef struct QemuThread QemuThread;
-=20
- void qemu_mutex_init(QemuMutex *mutex);
- void qemu_mutex_destroy(QemuMutex *mutex);
--void qemu_mutex_lock(QemuMutex *mutex);
--int qemu_mutex_trylock(QemuMutex *mutex);
--void qemu_mutex_unlock(QemuMutex *mutex);
-+int qemu_mutex_trylock_impl(QemuMutex *mutex, const char *file, const in=
-t line);
-+void qemu_mutex_lock_impl(QemuMutex *mutex, const char *file, const int =
-line);
-+void qemu_mutex_unlock_impl(QemuMutex *mutex, const char *file, const in=
-t line);
+diff --git a/scripts/analyse-locks-simpletrace.py b/scripts/analyse-locks=
+-simpletrace.py
+new file mode 100755
+index 0000000..b72c951
+--- /dev/null
++++ b/scripts/analyse-locks-simpletrace.py
+@@ -0,0 +1,99 @@
++#!/usr/bin/env python
++# -*- coding: utf-8 -*-
++#
++# Analyse lock events and
++#
++# Author: Alex Benn=C3=A9e <alex.bennee@linaro.org>
++#
 +
-+#define qemu_mutex_lock(mutex) qemu_mutex_lock_impl(mutex, __FILE__, __L=
-INE__)
-+#define qemu_mutex_trylock(mutex) qemu_mutex_trylock_impl(mutex, __FILE_=
-_, __LINE__)
-+#define qemu_mutex_unlock(mutex) qemu_mutex_unlock_impl(mutex, __FILE__,=
- __LINE__)
-=20
- /* Prototypes for other functions are in thread-posix.h/thread-win32.h. =
- */
- void qemu_rec_mutex_init(QemuRecMutex *mutex);
-@@ -39,7 +43,9 @@ void qemu_cond_destroy(QemuCond *cond);
-  */
- void qemu_cond_signal(QemuCond *cond);
- void qemu_cond_broadcast(QemuCond *cond);
--void qemu_cond_wait(QemuCond *cond, QemuMutex *mutex);
-+void qemu_cond_wait_impl(QemuCond *cond, QemuMutex *mutex, const char *f=
-ile, const int line);
++import os
++import simpletrace
++import argparse
++import numpy as np
 +
-+#define qemu_cond_wait(cond, mutex) qemu_cond_wait_impl(cond, mutex, __F=
-ILE__, __LINE__)
-=20
- void qemu_sem_init(QemuSemaphore *sem, int init);
- void qemu_sem_post(QemuSemaphore *sem);
-diff --git a/util/qemu-thread-posix.c b/util/qemu-thread-posix.c
-index 7306475..1a838a9 100644
---- a/util/qemu-thread-posix.c
-+++ b/util/qemu-thread-posix.c
-@@ -57,26 +57,28 @@ void qemu_mutex_destroy(QemuMutex *mutex)
-         error_exit(err, __func__);
- }
-=20
--void qemu_mutex_lock(QemuMutex *mutex)
-+void qemu_mutex_lock_impl(QemuMutex *mutex, const char *file, const int =
-line)
- {
-     int err;
-=20
-     assert(mutex->initialized);
-+    trace_qemu_mutex_lock(mutex, file, line);
++class MutexAnalyser(simpletrace.Analyzer):
++    "A simpletrace Analyser for checking locks."
 +
-     err =3D pthread_mutex_lock(&mutex->lock);
-     if (err)
-         error_exit(err, __func__);
-=20
--    trace_qemu_mutex_locked(mutex);
-+    trace_qemu_mutex_locked(mutex, file, line);
- }
-=20
--int qemu_mutex_trylock(QemuMutex *mutex)
-+int qemu_mutex_trylock_impl(QemuMutex *mutex, const char *file, const in=
-t line)
- {
-     int err;
-=20
-     assert(mutex->initialized);
-     err =3D pthread_mutex_trylock(&mutex->lock);
-     if (err =3D=3D 0) {
--        trace_qemu_mutex_locked(mutex);
-+        trace_qemu_mutex_locked(mutex, file, line);
-         return 0;
-     }
-     if (err !=3D EBUSY) {
-@@ -85,15 +87,16 @@ int qemu_mutex_trylock(QemuMutex *mutex)
-     return -EBUSY;
- }
-=20
--void qemu_mutex_unlock(QemuMutex *mutex)
-+void qemu_mutex_unlock_impl(QemuMutex *mutex, const char *file, const in=
-t line)
- {
-     int err;
-=20
-     assert(mutex->initialized);
--    trace_qemu_mutex_unlocked(mutex);
-     err =3D pthread_mutex_unlock(&mutex->lock);
-     if (err)
-         error_exit(err, __func__);
++    def __init__(self):
++        self.locks =3D 0
++        self.locked =3D 0
++        self.unlocks =3D 0
++        self.mutex_records =3D {}
 +
-+    trace_qemu_mutex_unlock(mutex, file, line);
- }
-=20
- void qemu_rec_mutex_init(QemuRecMutex *mutex)
-@@ -152,14 +155,14 @@ void qemu_cond_broadcast(QemuCond *cond)
-         error_exit(err, __func__);
- }
-=20
--void qemu_cond_wait(QemuCond *cond, QemuMutex *mutex)
-+void qemu_cond_wait_impl(QemuCond *cond, QemuMutex *mutex, const char *f=
-ile, const int line)
- {
-     int err;
-=20
-     assert(cond->initialized);
--    trace_qemu_mutex_unlocked(mutex);
-+    trace_qemu_mutex_unlock(mutex, file, line);
-     err =3D pthread_cond_wait(&cond->cond, &mutex->lock);
--    trace_qemu_mutex_locked(mutex);
-+    trace_qemu_mutex_locked(mutex, file, line);
-     if (err)
-         error_exit(err, __func__);
- }
-diff --git a/util/trace-events b/util/trace-events
-index 025499f..515e625 100644
---- a/util/trace-events
-+++ b/util/trace-events
-@@ -56,6 +56,7 @@ lockcnt_futex_wait(const void *lockcnt, int val) "lockc=
-nt %p waiting on %d"
- lockcnt_futex_wait_resume(const void *lockcnt, int new) "lockcnt %p afte=
-r wait: %d"
- lockcnt_futex_wake(const void *lockcnt) "lockcnt %p waking up one waiter=
-"
-=20
--# util/qemu-thread-posix.c
--qemu_mutex_locked(void *lock) "locked mutex %p"
--qemu_mutex_unlocked(void *lock) "unlocked mutex %p"
-+# util/qemu-thread.c
-+qemu_mutex_lock(void *mutex, const char *file, const int line) "waiting =
-on mutex %p (%s:%d)"
-+qemu_mutex_locked(void *mutex, const char *file, const int line) "taken =
-mutex %p (%s:%d)"
-+qemu_mutex_unlock(void *mutex, const char *file, const int line) "releas=
-ed mutex %p (%s:%d)"
++    def _get_mutex(self, mutex):
++        if not mutex in self.mutex_records:
++            self.mutex_records[mutex] =3D {"locks": 0,
++                                         "lock_time": 0,
++                                         "acquire_times": [],
++                                         "locked": 0,
++                                         "locked_time": 0,
++                                         "held_times": [],
++                                         "unlocked": 0}
++
++        return self.mutex_records[mutex]
++
++    def qemu_mutex_lock(self, timestamp, mutex, filename, line):
++        self.locks +=3D 1
++        rec =3D self._get_mutex(mutex)
++        rec["locks"] +=3D 1
++        rec["lock_time"] =3D timestamp[0]
++        rec["lock_loc"] =3D (filename, line)
++
++    def qemu_mutex_locked(self, timestamp, mutex, filename, line):
++        self.locked +=3D 1
++        rec =3D self._get_mutex(mutex)
++        rec["locked"] +=3D 1
++        rec["locked_time"] =3D timestamp[0]
++        acquire_time =3D rec["locked_time"] - rec["lock_time"]
++        rec["locked_loc"] =3D (filename, line)
++        rec["acquire_times"].append(acquire_time)
++
++    def qemu_mutex_unlock(self, timestamp, mutex, filename, line):
++        self.unlocks +=3D 1
++        rec =3D self._get_mutex(mutex)
++        rec["unlocked"] +=3D 1
++        held_time =3D timestamp[0] - rec["locked_time"]
++        rec["held_times"].append(held_time)
++        rec["unlock_loc"] =3D (filename, line)
++
++
++def get_args():
++    "Grab options"
++    parser =3D argparse.ArgumentParser()
++    parser.add_argument("--output", "-o", type=3Dstr, help=3D"Render plo=
+t to file")
++    parser.add_argument("events", type=3Dstr, help=3D'trace file read fr=
+om')
++    parser.add_argument("tracefile", type=3Dstr, help=3D'trace file read=
+ from')
++    return parser.parse_args()
++
++if __name__ =3D=3D '__main__':
++    args =3D get_args()
++
++    # Gather data from the trace
++    analyser =3D MutexAnalyser()
++    simpletrace.process(args.events, args.tracefile, analyser)
++
++    print ("Total locks: %d, locked: %d, unlocked: %d" %
++           (analyser.locks, analyser.locked, analyser.unlocks))
++
++    # Now dump the individual lock stats
++    for key, val in sorted(analyser.mutex_records.iteritems(),
++                           key=3Dlambda (k,v): v["locks"]):
++        print ("Lock: %#x locks: %d, locked: %d, unlocked: %d" %
++               (key, val["locks"], val["locked"], val["unlocked"]))
++
++        acquire_times =3D np.array(val["acquire_times"])
++        if len(acquire_times) > 0:
++            print ("  Acquire Time: min:%d median:%d avg:%.2f max:%d" %
++                   (acquire_times.min(), np.median(acquire_times),
++                    acquire_times.mean(), acquire_times.max()))
++
++        held_times =3D np.array(val["held_times"])
++        if len(held_times) > 0:
++            print ("  Held Time: min:%d median:%d avg:%.2f max:%d" %
++                   (held_times.min(), np.median(held_times),
++                    held_times.mean(), held_times.max()))
++
++        # Check if any locks still held
++        if val["locks"] > val["locked"]:
++            print ("  LOCK HELD (%s:%s)" % (val["locked_loc"]))
++            print ("  BLOCKED   (%s:%s)" % (val["lock_loc"]))
