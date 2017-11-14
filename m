@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38702)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39485)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lu.zhipeng@zte.com.cn>) id 1eER1q-0006sA-0F
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 21:32:48 -0500
+	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1eER3N-0007gE-A7
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 21:34:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lu.zhipeng@zte.com.cn>) id 1eER1l-0005hn-Ul
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 21:32:46 -0500
-Received: from mx7.zte.com.cn ([202.103.147.169]:55710 helo=mxct.zte.com.cn)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lu.zhipeng@zte.com.cn>)
-	id 1eER1k-0005b1-FN
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 21:32:41 -0500
-Date: Tue, 14 Nov 2017 10:32:16 +0800 (CST)
-Message-ID: <201711141032168525867@zte.com.cn>
-In-Reply-To: <151061742918.31225.7414533990256735419@sif>
-References: 1509720860-10065-1-git-send-email-lu.zhipeng@zte.com.cn,
-	201711091926153814085@zte.com.cn,
-	151061742918.31225.7414533990256735419@sif
-Mime-Version: 1.0
-From: <lu.zhipeng@zte.com.cn>
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: base64 
-Subject: [Qemu-devel] =?utf-8?b?562U5aSNOlJlOiDnrZTlpI06IFJlOiBbUEFUQ0gg?=
- =?utf-8?q?v2=5D_qga=3A_replace_GetIfEntry?=
+	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1eER3J-0006e8-A4
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 21:34:21 -0500
+Received: from mail.cn.fujitsu.com ([183.91.158.132]:10482
+	helo=heian.cn.fujitsu.com) by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1eER3I-0006cH-FD
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 21:34:17 -0500
+From: Dou Liyang <douly.fnst@cn.fujitsu.com>
+Date: Tue, 14 Nov 2017 10:34:01 +0800
+Message-ID: <1510626841-9928-1-git-send-email-douly.fnst@cn.fujitsu.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v6] NUMA: Enable adding NUMA node implicitly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,169 +24,172 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mdroth@linux.vnet.ibm.com
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: f4bug@amsat.org, Dou Liyang <douly.fnst@cn.fujitsu.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, David Hildenbrand <david@redhat.com>, Thomas Huth <thuth@redhat.com>, Alistair Francis <alistair23@gmail.com>, Takao Indoh <indou.takao@jp.fujitsu.com>, Izumi Taku <izumi.taku@jp.fujitsu.com>
 
-aSBub3Qgc3VyZSB0aGF0IGkgdXNlIGxhdGVzdCBxZ2EgaW4geHAsbWF5YmUgdXNlIHRoZSBvbGRl
-ciBxZ2EuaSB3aWxsIHRlc3QgbGF0ZXN0IHFnYSBpbiB4cA0KDQoNCg0K5Y+R6Ieq5oiR55qEek1h
-aWwNCg0KDQoNCg0K5Y6f5aeL6YKu5Lu2DQoNCg0KDQrlj5Hku7bkurrvvJpNaWNoYWVsUm90aDsN
-CuaUtuS7tuS6uu+8muiKpuW/l+acizEwMTA4MjcyOw0K5oqE6YCB5Lq677yacWVtdS1kZXZlbEBu
-b25nbnUub3JnOw0K5pel5pyf77yaMjAxNy0xMS0xNCAwNzo1Nzo0NQ0K5Li76aKY77yaUmU6IOet
-lOWkjTogUmU6IFtQQVRDSCB2Ml0gcWdhOiByZXBsYWNlIEdldElmRW50cnkNCg0KDQpRdW90aW5n
-IGx1LnpoaXBlbmdAenRlLmNvbS5jbiAoMjAxNy0xMS0wOSAwNToyNjoxNSkNCj4gIGkgdGhpbmsg
-dGhlIGNvZGUgaXMgYmV0dGVyDQo+IA0KPiAgaWYgKE9TdmVyLmR3TWFqb3JWZXJzaW9uID49IDYp
-IHsNCj4gICAgICAgTUlCX0lGX1JPVzIgYU1pYl9pZnJvdzsNCj4gICAgICAgdHlwZWRlZiBORVRJ
-T0FQSV9BUEkgKFdJTkFQSSAqZ2V0aWZlbnRyeTJfdCkoUE1JQl9JRl9ST1cyIFJvdyk7DQo+ICAg
-ICAgIG1lbXNldCgmYU1pYl9pZnJvdywgMCwgc2l6ZW9mKGFNaWJfaWZyb3cpKTsNCj4gICAgICAg
-YU1pYl9pZnJvdy5JbnRlcmZhY2VJbmRleCA9IG5pY0lkOw0KPiAgICAgICBITU9EVUxFIG1vZHVs
-ZSA9IEdldE1vZHVsZUhhbmRsZSgiaXBobHBhcGkiKTsNCj4gICAgICAgUFZPSUQgZnVuID0gR2V0
-UHJvY0FkZHJlc3MobW9kdWxlLCAiR2V0SWZFbnRyeTIiKTsNCj4gICAgICAgaWYgKGZ1biA9PSBO
-VUxMKSB7DQo+ICAgICAgICAgICBlcnJvcl9zZXRnKGVycnAsIFFFUlJfUUdBX0NPTU1BTkRfRkFJ
-TEVELA0KPiAgICAgICAgICAgICAgICAgICAgICAiRmFpbGVkIHRvIGdldCBhZGRyZXNzIG9mIEdl
-dElmRW50cnkyIik7DQo+ICAgICAgICAgICByZXR1cm4gTlVMTDsNCj4gICAgICAgfQ0KPiAgICAg
-Z2V0aWZlbnRyeTJfdCBnZXRpZmVudHJ5Ml9leCA9IChnZXRpZmVudHJ5Ml90KWZ1bjsNCj4gICAg
-IGlmIChOT19FUlJPUiA9PSBnZXRpZmVudHJ5Ml9leCgmYU1pYl9pZnJvdykpew0KPiAgICAgfQ0K
-DQpJJ3ZlIHVwZGF0ZWQgdGhlIHBhdGNoIHdpdGggdGhpcyBjaGFuZ2U6DQogIGh0dHBzOi8vZ2l0
-aHViLmNvbS9tZHJvdGgvcWVtdS9jb21taXRzL3FnYS1pZi1zdGF0cw0KDQpCdXQgSSdtIGEgYml0
-IGNvbmZ1c2VkIG5vdzogd2hlbiBJIHRyaWVkIHRvIHRlc3QgdGhpcyBvbiBYUCBJIHJlYWxpemVk
-IHRoYXQNCnRoYXQgcWVtdS1nYSBubyBsb25nZXIgd29ya3Mgb24gWFAsIGFuZCBnZW5lcmF0ZXMg
-dGhlIGZvbGxvd2luZyBlcnJvcg0Kd2hlbiBJIHRyeSB0byBzdGFydCBpdCAoZXZlbiB3aXRob3V0
-IHlvdXIgc3RhdHMgcGF0Y2gpOg0KDQogICJUaGUgcHJvY2VkdXJlIGVudHJ5IHBvaW50IEFjcXVp
-cmVTUldMb2NrRXhjbHVzaXZlIGNvdWxkIG5vdCBiZSBsb2NhdGVkDQogICBpbiB0aGUgZHluYW1p
-YyBsaW5rIGxpYnJhcnkgS0VSTkVMMzIuZGxsIg0KDQpJIHRoaW5rIHRoaXMgbWF5IGJlIGR1ZSB0
-byB0aGUgZm9sbG93aW5nIGNvbW1pdCwgd2hpY2ggbm90ZXMgdGhhdCBWaXN0YSsNCmFyZSBub3cg
-cmVxdWlyZWQgYXMgYSByZXN1bHQ6DQoNCmNvbW1pdCAxMmY4ZGVmMGUwMjIzMmQ3YzY0MTZhZDli
-NjY2NDBmOTczYzUzMWQxDQpBdXRob3I6IEFuZHJleSBTaGVkZWwgPGFzaGVkZWxAbWljcm9zb2Z0
-LmNvbT4NCkRhdGU6ICAgRnJpIE1hciAyNCAxNTowMTo0MSAyMDE3IC0wNzAwDQoNCiAgICB3aW4z
-MjogcmVwbGFjZSBjdXN0b20gbXV0ZXggYW5kIGNvbmRpdGlvbiB2YXJpYWJsZSB3aXRoIG5hdGl2
-ZQ0KICAgIHByaW1pdGl2ZXMNCg0KU28sIGFyZSB5b3UgYWN0dWFsbHkgYWJsZSB0byBydW4gb24g
-WFAgY3VycmVudGx5PyBJZiBzbywgaG93PyBBbmQgaWYNCm5vdCwgSSB0aGluayB3ZSBoYXZlIG90
-aGVyIGlzc3VlcyB0aGF0IG5lZWQgdG8gYmUgYWRkcmVzc2VkIGlmIHdlDQp3YW50IHRvIHN1cHBv
-cnQgWFAgc3RpbGw7IEknbSBub3QgZXZlbiBzdXJlIHRoYXQncyByZWFsaXN0aWMgYXQgdGhpcw0K
-cG9pbnQuDQoNClVubGVzcyB0aGVyZSdzIGFjdHVhbGx5IGEgd2F5IHRvIHRlc3QgUUdBIG9uIFhQ
-IHJpZ2h0IG5vdyBJIHRoaW5rIEkNCndlIHNob3VsZCBqdXN0IGdldCBpbiB0aGUgdXBkYXRlZCBw
-YXRjaCBtaW51cyB0aGUgZHluYW1pYyBETEwgc3R1ZmYsDQppLmUuOg0KICBodHRwczovL2dpdGh1
-Yi5jb20vbWRyb3RoL3FlbXUvY29tbWl0L2RlNTk3YThiMjc3MjJjZTRmOWNjNjYwZjkzMGY3ZGNj
-YzcxMjcxMmQNCg0KTWFrZSBzZW5zZT8NCg0KPiANCj4gDQo+IA0KPiANCj4gDQo+IOS4uuS6huiu
-qeaCqOeahFZQbGF06Jma5ouf5py65pWF6Zqc5ZKMZG9ja2Vy5pWF6Zqc5b6X5Yiw6auY5pWI55qE
-5aSE55CG77yM6K+35LiK5oql5pWF6Zqc5YiwOiAkVlBsYXTmioDmnK/mlK8NCj4g5oyB44CCDQo+
-IA0KPiDoiqblv5fmnIsgbHV6aGlwZW5nDQo+IA0KPiANCj4gSVTlvIDlj5Hlt6XnqIvluIggSVQg
-RGV2ZWxvcG1lbnQgRW5naW5lZXINCj4g5pON5L2c57O757uf5Lqn5ZOB6YOoL+S4reW/g+eglOep
-tumZoi/ns7vnu5/kuqflk4EgT1MgUHJvZHVjdCBEZXB0Li9DZW50cmFsIFLvvIZEIEluc3RpdHV0
-ZS8NCj4gU3lzdGVtIFByb2R1Y3QNCj4gDQo+IA0KPiBbY2lkXSAgICAgICAgICBbY2lkXQ0KPiAg
-ICAgICAgICAgICAgICDlm5vlt53nnIHmiJDpg73luILlpKnlupzlpKfpgZPkuK3mrrU4MDDlj7cN
-Cj4gICAgICAgICAgICAgICAgRTogbHUuemhpcGVuZ0B6dGUuY29tLmNuDQo+ICAgICAgICAgICAg
-ICAgIHd3dy56dGUuY29tLmNuDQo+IA0KPiDljp/lp4vpgq7ku7YNCj4g5Y+R5Lu25Lq677ya6Iqm
-5b+X5pyLMTAxMDgyNzINCj4g5pS25Lu25Lq677yaIDxtZHJvdGhAbGludXgudm5ldC5pYm0uY29t
-PjsNCj4g5oqE6YCB5Lq677yaIDxxZW11LWRldmVsQG5vbmdudS5vcmc+Ow0KPiDml6XmnJ/vvJoy
-MDE35bm0MTHmnIgwOOaXpSAxMDo1NA0KPiDkuLvpopjvvJrnrZTlpI06IFJlOiBbUEFUQ0ggdjJd
-IHFnYTogcmVwbGFjZSBHZXRJZkVudHJ5DQo+IA0KPiANCj4gPkkgaGF2ZSB0aGUgbW9kaWZpZWQg
-cGF0Y2ggc3RhZ2VkIGhlcmU6DQo+IA0KPiA+ICBodHRwczovL2dpdGh1Yi5jb20vbWRyb3RoL3Fl
-bXUvY29tbWl0Lw0KPiBkZTU5N2E4YjI3NzIyY2U0ZjljYzY2MGY5MzBmN2RjY2M3MTI3MTJkDQo+
-ID5MZXQgbWUga25vdyBpZiBpdCBsb29rcyBva2F5IGFuZCBJJ2xsIHNlbmQgYSBwdWxsIHJlcXVl
-c3QgZm9yIHJjMQ0KPiANCj4gIA0KPiANCj4gdGhlIGNvZGUgcmlnaHQsIGJ1dCBydW5uaW5nIFFH
-QSBvbiB0aGUgV2luZG93cyBYUCwgZXJyb3I6IGNhbiBub3QgZmluZCB0aGUgbGluaw0KPiB0byAg
-R2V0SWZFbnRyeTIgaW4gaXBobHBhcGkuRExMLg0KPiANCj4gDQo+IA0KPiANCj4g5Li65LqG6K6p
-5oKo55qEVlBsYXTomZrmi5/mnLrmlYXpmpzlkoxkb2NrZXLmlYXpmpzlvpfliLDpq5jmlYjnmoTl
-pITnkIbvvIzor7fkuIrmiqXmlYXpmpzliLA6ICRWUGxhdOaKgOacr+aUrw0KPiDmjIHjgIINCj4g
-DQo+IOiKpuW/l+aciyBsdXpoaXBlbmcNCj4gDQo+IA0KPiBJVOW8gOWPkeW3peeoi+W4iCBJVCBE
-ZXZlbG9wbWVudCBFbmdpbmVlcg0KPiDmk43kvZzns7vnu5/kuqflk4Hpg6gv5Lit5b+D56CU56m2
-6ZmiL+ezu+e7n+S6p+WTgSBPUyBQcm9kdWN0IERlcHQuL0NlbnRyYWwgUu+8hkQgSW5zdGl0dXRl
-Lw0KPiBTeXN0ZW0gUHJvZHVjdA0KPiANCj4gDQo+IFtjaWRdICAgICAgICAgIFtjaWRdDQo+ICAg
-ICAgICAgICAgICAgIOWbm+W3neecgeaIkOmDveW4guWkqeW6nOWkp+mBk+S4reautTgwMOWPtw0K
-PiAgICAgICAgICAgICAgICBFOiBsdS56aGlwZW5nQHp0ZS5jb20uY24NCj4gICAgICAgICAgICAg
-ICAgd3d3Lnp0ZS5jb20uY24NCj4gDQo+IA0KPiDlj5Hku7bkurrvvJogPG1kcm90aEBsaW51eC52
-bmV0LmlibS5jb20+Ow0KPiDmlLbku7bkurrvvJroiqblv5fmnIsxMDEwODI3MjsNCj4g5oqE6YCB
-5Lq677yaIDxxZW11LWRldmVsQG5vbmdudS5vcmc+O+iKpuW/l+acizEwMTA4MjcyOw0KPiDml6Xm
-nJ/vvJoyMDE35bm0MTHmnIgwOOaXpSAwMTowNw0KPiDkuLvpopjvvJpSZTogW1BBVENIIHYyXSBx
-Z2E6IHJlcGxhY2UgR2V0SWZFbnRyeQ0KPiANCj4gDQo+IFF1b3RpbmcgWmhpUGVuZyBMdSAoMjAx
-Ny0xMS0wMyAwOTo1NDoyMCkNCj4gPg0KPiAgVGhlIGRhdGEgb2J0YWluZWQgYnkgR2V0SWZFbnRy
-eSBpcyAzMiBiaXRzLCBhbmQgaXQgbWF5IG92ZXJmbG93LiBUaHVzIHVzaW5nIEdldElmRW50cnky
-IGluc3RlYWQgb2YgR2V0SWZFbnRyeS4NCj4gPiANCj4gPiBTaWduZWQtb2ZmLWJ5OiBaaGlQZW5n
-IEx1IDxsdS56aGlwZW5nQHp0ZS5jb20uY24+DQo+ID4gLS0tDQo+ID4gIHFnYS9jb21tYW5kcy13
-aW4zMi5jIHwgMzEgKysrKysrKysrKysrKysrKysrLS0tLS0tLS0tLS0tLQ0KPiA+ICAxIGZpbGUg
-Y2hhbmdlZCwgMTggaW5zZXJ0aW9ucygrKSwgMTMgZGVsZXRpb25zKC0pDQo+ID4gDQo+ID4gZGlm
-ZiAtLWdpdCBhL3FnYS9jb21tYW5kcy13aW4zMi5jIGIvcWdhL2NvbW1hbmRzLXdpbjMyLmMNCj4g
-PiBpbmRleCAwMzIyMTg4Li5kMDk2ZGMyIDEwMDY0NA0KPiA+IC0tLSBhL3FnYS9jb21tYW5kcy13
-aW4zMi5jDQo+ID4gKysrIGIvcWdhL2NvbW1hbmRzLXdpbjMyLmMNCj4gPiBAQCAtMTE3MywyMCAr
-MTE3MywyNSBAQCBzdGF0aWMgaW50IGd1ZXN0X2dldF9uZXR3b3JrX3N0YXRzKGNvbnN0IGNoYXIg
-Km5hbWUsDQo+ID4gICAgICAgICAgICAgICAgICAgICAgICAgR3Vlc3ROZXR3b3JrSW50ZXJmYWNl
-U3RhdCAqc3RhdHMpDQo+ID4gIHsNCj4gPiAgICAgIERXT1JEIGlmX2luZGV4ID0gMDsNCj4gPiAt
-ICAgIE1JQl9JRlJPVyBhX21pZF9pZnJvdzsNCj4gPiAtICAgIG1lbXNldCgmYV9taWRfaWZyb3cs
-IDAsIHNpemVvZihhX21pZF9pZnJvdykpOw0KPiA+ICsgICAgT1NWRVJTSU9OSU5GTyBPU3ZlcjsN
-Cj4gPiAgICAgIGlmX2luZGV4ID0gZ2V0X2ludGVyZmFjZV9pbmRleChuYW1lKTsNCj4gPiAtICAg
-IGFfbWlkX2lmcm93LmR3SW5kZXggPSBpZl9pbmRleDsNCj4gPiAtICAgIGlmIChOT19FUlJPUiA9
-PSBHZXRJZkVudHJ5KCZhX21pZF9pZnJvdykpIHsNCj4gPiAtICAgICAgICBzdGF0cy0+cnhfYnl0
-ZXMgPSBhX21pZF9pZnJvdy5kd0luT2N0ZXRzOw0KPiA+IC0gICAgICAgIHN0YXRzLT5yeF9wYWNr
-ZXRzID0gYV9taWRfaWZyb3cuZHdJblVjYXN0UGt0czsNCj4gPiAtICAgICAgICBzdGF0cy0+cnhf
-ZXJycyA9IGFfbWlkX2lmcm93LmR3SW5FcnJvcnM7DQo+ID4gLSAgICAgICAgc3RhdHMtPnJ4X2Ry
-b3BwZWQgPSBhX21pZF9pZnJvdy5kd0luRGlzY2FyZHM7DQo+ID4gLSAgICAgICAgc3RhdHMtPnR4
-X2J5dGVzID0gYV9taWRfaWZyb3cuZHdPdXRPY3RldHM7DQo+ID4gLSAgICAgICAgc3RhdHMtPnR4
-X3BhY2tldHMgPSBhX21pZF9pZnJvdy5kd091dFVjYXN0UGt0czsNCj4gPiAtICAgICAgICBzdGF0
-cy0+dHhfZXJycyA9IGFfbWlkX2lmcm93LmR3T3V0RXJyb3JzOw0KPiA+IC0gICAgICAgIHN0YXRz
-LT50eF9kcm9wcGVkID0gYV9taWRfaWZyb3cuZHdPdXREaXNjYXJkczsNCj4gPiAtICAgICAgICBy
-ZXR1cm4gMDsNCj4gPiArICAgIE9TdmVyLmR3T1NWZXJzaW9uSW5mb1NpemUgPSBzaXplb2YoT1NW
-RVJTSU9OSU5GTyk7DQo+ID4gKyAgICBHZXRWZXJzaW9uRXgoJk9TdmVyKTsNCj4gPiArICAgIGlm
-IChPU3Zlci5kd01ham9yVmVyc2lvbiA+PSA2KSB7DQo+ID4gKyAgICAgICAgTUlCX0lGX1JPVzIg
-YV9taWRfaWZyb3c7DQo+ID4gKyAgICAgICAgbWVtc2V0KCZhX21pZF9pZnJvdywgMCwgc2l6ZW9m
-KGFfbWlkX2lmcm93KSk7DQo+ID4gKyAgICAgICAgYV9taWRfaWZyb3cuZHdJbmRleCA9IGlmX2lu
-ZGV4Ow0KPiA+ICsgICAgICAgIGlmIChOT19FUlJPUiA9PSBHZXRJZkVudHJ5MigmYV9taWRfaWZy
-b3cpKSB7DQo+ID4gKyAgICAgICAgICAgIHN0YXRzLT5yeF9ieXRlcyA9IGFfbWlkX2lmcm93LmR3
-SW5PY3RldHM7DQo+ID4gKyAgICAgICAgICAgIHN0YXRzLT5yeF9wYWNrZXRzID0gYV9taWRfaWZy
-b3cuZHdJblVjYXN0UGt0czsNCj4gPiArICAgICAgICAgICAgc3RhdHMtPnJ4X2VycnMgPSBhX21p
-ZF9pZnJvdy5kd0luRXJyb3JzOw0KPiA+ICsgICAgICAgICAgICBzdGF0cy0+cnhfZHJvcHBlZCA9
-IGFfbWlkX2lmcm93LmR3SW5EaXNjYXJkczsNCj4gPiArICAgICAgICAgICAgc3RhdHMtPnR4X2J5
-dGVzID0gYV9taWRfaWZyb3cuZHdPdXRPY3RldHM7DQo+ID4gKyAgICAgICAgICAgIHN0YXRzLT50
-eF9wYWNrZXRzID0gYV9taWRfaWZyb3cuZHdPdXRVY2FzdFBrdHM7DQo+ID4gKyAgICAgICAgICAg
-IHN0YXRzLT50eF9lcnJzID0gYV9taWRfaWZyb3cuZHdPdXRFcnJvcnM7DQo+ID4gKyAgICAgICAg
-ICAgIHN0YXRzLT50eF9kcm9wcGVkID0gYV9taWRfaWZyb3cuZHdPdXREaXNjYXJkczsNCj4gPiAr
-ICAgICAgICAgICAgcmV0dXJuIDA7DQo+IA0KPiBUaGlzIGZhaWxzIHRvIGJ1aWxkIGluIG15IGZj
-MjAgbWluZ3c2NCBlbnZpcm9ubWVudDoNCj4gDQo+IC9ob21lL21kcm90aC93L3FlbXU0LmdpdC9x
-Z2EvDQo+IGNvbW1hbmRzLXdpbjMyLmM6MTE4NDoyMDogZXJyb3I6ICdNSUJfSUZfUk9XMicgaGFz
-IG5vIG1lbWJlciBuYW1lZCAnZHdJbmRleCcNCj4gICAgICAgICAgYV9taWRfaWZyb3cuZHdJbmRl
-eCA9IGlmX2luZGV4Ow0KPiAgICAgICAgICAgICAgICAgICAgIF4NCj4gL2hvbWUvbWRyb3RoL3cv
-cWVtdTQuZ2l0L3FnYS8NCj4gY29tbWFuZHMtd2luMzIuYzoxMTg2OjQyOiBlcnJvcjogJ01JQl9J
-Rl9ST1cyJyBoYXMgbm8gbWVtYmVyIG5hbWVkICdkd0luT2N0ZXRzJw0KPiAgICAgICAgICAgICAg
-c3RhdHMtPnJ4X2J5dGVzID0gYV9taWRfaWZyb3cuZHdJbk9jdGV0czsNCj4gICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXg0KPiAvaG9tZS9tZHJvdGgvdy9xZW11NC5n
-aXQvcWdhLw0KPiBjb21tYW5kcy13aW4zMi5jOjExODc6NDQ6IGVycm9yOiAnTUlCX0lGX1JPVzIn
-IGhhcyBubyBtZW1iZXIgbmFtZWQgJ2R3SW5VY2FzdFBrdHMnDQo+ICAgICAgICAgICAgICBzdGF0
-cy0+cnhfcGFja2V0cyA9IGFfbWlkX2lmcm93LmR3SW5VY2FzdFBrdHM7DQo+IA0KPiBldGMgLi4u
-DQo+IA0KPiBUaGUgcGF0Y2ggc2VlbXMgdG8gYXNzdW1lIE1JQl9JRlJPVyBhbmQgTUlCX0lGX1JP
-VzIgaGF2ZSB0aGUgc2FtZSBmaWVsZCBuYW1lcw0KPiBmb3IgdGhlIHN0YXRzLCBidXQgYWNjb3Jk
-aW5nIHRvIHRoaXMgdGhleSdyZSBzbGlnaHRseSBkaWZmZXJlbnQ6DQo+IA0KPiAgIGh0dHBzOi8v
-bXNkbi5taWNyb3NvZnQuY29tL2VuLXVzL2xpYnJhcnkvd2luZG93cy9kZXNrdG9wL2FhODE0NDkx
-KHY9DQo+IHZzLjg1KS5hc3B4DQo+IA0KPiBUaGlzIGNoYW5nZSBvbiB0b3Agb2YgeW91ciBwYXRj
-aCBzZWVtcyB0byB3b3JrOg0KPiANCj4gZGlmZiAtLWdpdCBhL3FnYS9jb21tYW5kcy13aW4zMi5j
-IGIvcWdhL2NvbW1hbmRzLXdpbjMyLmMNCj4gaW5kZXggZTE3ZmMzYzI4NC4uNThlNDcwODc3ZiAx
-MDA2NDQNCj4gLS0tIGEvcWdhL2NvbW1hbmRzLXdpbjMyLmMNCj4gKysrIGIvcWdhL2NvbW1hbmRz
-LXdpbjMyLmMNCj4gQEAgLTExODEsMTYgKzExODEsMTYgQEAgc3RhdGljIGludCBndWVzdF9nZXRf
-bmV0d29ya19zdGF0cyhjb25zdCBjaGFyICpuYW1lLA0KPiAgICAgIGlmIChvc192ZXIuZHdNYWpv
-clZlcnNpb24gPj0gNikgew0KPiAgICAgICAgICBNSUJfSUZfUk9XMiBhX21pZF9pZnJvdzsNCj4g
-ICAgICAgICAgbWVtc2V0KCZhX21pZF9pZnJvdywgMCwgc2l6ZW9mKGFfbWlkX2lmcm93KSk7DQo+
-IC0gICAgICAgIGFfbWlkX2lmcm93LmR3SW5kZXggPSBpZl9pbmRleDsNCj4gKyAgICAgICAgYV9t
-aWRfaWZyb3cuSW50ZXJmYWNlSW5kZXggPSBpZl9pbmRleDsNCj4gICAgICAgICAgaWYgKE5PX0VS
-Uk9SID09IEdldElmRW50cnkyKCZhX21pZF9pZnJvdykpIHsNCj4gLSAgICAgICAgICAgIHN0YXRz
-LT5yeF9ieXRlcyA9IGFfbWlkX2lmcm93LmR3SW5PY3RldHM7DQo+IC0gICAgICAgICAgICBzdGF0
-cy0+cnhfcGFja2V0cyA9IGFfbWlkX2lmcm93LmR3SW5VY2FzdFBrdHM7DQo+IC0gICAgICAgICAg
-ICBzdGF0cy0+cnhfZXJycyA9IGFfbWlkX2lmcm93LmR3SW5FcnJvcnM7DQo+IC0gICAgICAgICAg
-ICBzdGF0cy0+cnhfZHJvcHBlZCA9IGFfbWlkX2lmcm93LmR3SW5EaXNjYXJkczsNCj4gLSAgICAg
-ICAgICAgIHN0YXRzLT50eF9ieXRlcyA9IGFfbWlkX2lmcm93LmR3T3V0T2N0ZXRzOw0KPiAtICAg
-ICAgICAgICAgc3RhdHMtPnR4X3BhY2tldHMgPSBhX21pZF9pZnJvdy5kd091dFVjYXN0UGt0czsN
-Cj4gLSAgICAgICAgICAgIHN0YXRzLT50eF9lcnJzID0gYV9taWRfaWZyb3cuZHdPdXRFcnJvcnM7
-DQo+IC0gICAgICAgICAgICBzdGF0cy0+dHhfZHJvcHBlZCA9IGFfbWlkX2lmcm93LmR3T3V0RGlz
-Y2FyZHM7DQo+ICsgICAgICAgICAgICBzdGF0cy0+cnhfYnl0ZXMgPSBhX21pZF9pZnJvdy5Jbk9j
-dGV0czsNCj4gKyAgICAgICAgICAgIHN0YXRzLT5yeF9wYWNrZXRzID0gYV9taWRfaWZyb3cuSW5V
-Y2FzdFBrdHM7DQo+ICsgICAgICAgICAgICBzdGF0cy0+cnhfZXJycyA9IGFfbWlkX2lmcm93Lklu
-RXJyb3JzOw0KPiArICAgICAgICAgICAgc3RhdHMtPnJ4X2Ryb3BwZWQgPSBhX21pZF9pZnJvdy5J
-bkRpc2NhcmRzOw0KPiArICAgICAgICAgICAgc3RhdHMtPnR4X2J5dGVzID0gYV9taWRfaWZyb3cu
-T3V0T2N0ZXRzOw0KPiArICAgICAgICAgICAgc3RhdHMtPnR4X3BhY2tldHMgPSBhX21pZF9pZnJv
-dy5PdXRVY2FzdFBrdHM7DQo+ICsgICAgICAgICAgICBzdGF0cy0+dHhfZXJycyA9IGFfbWlkX2lm
-cm93Lk91dEVycm9yczsNCj4gKyAgICAgICAgICAgIHN0YXRzLT50eF9kcm9wcGVkID0gYV9taWRf
-aWZyb3cuT3V0RGlzY2FyZHM7DQo+ICAgICAgICAgICAgICByZXR1cm4gMDsNCj4gICAgICAgICAg
-fQ0KPiAgICAgIH0NCj4gDQo+IEkgaGF2ZSB0aGUgbW9kaWZpZWQgcGF0Y2ggc3RhZ2VkIGhlcmU6
-DQo+IA0KPiAgIGh0dHBzOi8vZ2l0aHViLmNvbS9tZHJvdGgvcWVtdS9jb21taXQvDQo+IGRlNTk3
-YThiMjc3MjJjZTRmOWNjNjYwZjkzMGY3ZGNjYzcxMjcxMmQNCj4gDQo+IExldCBtZSBrbm93IGlm
-IGl0IGxvb2tzIG9rYXkgYW5kIEknbGwgc2VuZCBhIHB1bGwgcmVxdWVzdCBmb3IgcmMxDQo+IA0K
-PiA+ICsgICAgICAgIH0NCj4gPiAgICAgIH0NCj4gPiAgICAgIHJldHVybiAtMTsNCj4gPiAgfQ0K
-PiA+IC0tIA0KPiA+IDEuOC4zLjENCj4gPiANCj4gDQo+
+Linux and Windows need ACPI SRAT table to make memory hotplug work properly,
+however currently QEMU doesn't create SRAT table if numa options aren't present
+on CLI.
+
+Which breaks both linux and windows guests in certain conditions:
+ * Windows: won't enable memory hotplug without SRAT table at all
+ * Linux: if QEMU is started with initial memory all below 4Gb and no SRAT table
+   present, guest kernel will use nommu DMA ops, which breaks 32bit hw drivers
+   when memory is hotplugged and guest tries to use it with that drivers.
+
+Fix above issues by automatically creating a numa node when QEMU is started with
+memory hotplug enabled but without '-numa' options on CLI.
+(PS: auto-create numa node only for new machine types so not to break migration).
+
+Which would provide SRAT table to guests without explicit -numa options on CLI
+and would allow:
+ * Windows: to enable memory hotplug
+ * Linux: switch to SWIOTLB DMA ops, to bounce DMA transfers to 32bit allocated
+   buffers that legacy drivers/hw can handle.
+
+[Rewritten by Igor]
+
+Reported-by: Thadeu Lima de Souza Cascardo <cascardo@canonical.com>
+Suggested-by: Igor Mammedov <imammedo@redhat.com>
+Signed-off-by: Dou Liyang <douly.fnst@cn.fujitsu.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Marcel Apfelbaum <marcel@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>
+Cc: David Hildenbrand <david@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>
+Cc: Alistair Francis <alistair23@gmail.com>
+Cc: Takao Indoh <indou.takao@jp.fujitsu.com>
+Cc: Izumi Taku <izumi.taku@jp.fujitsu.com>
+---
+changelog V5 --> V6:
+  - rebase it to avoid building failure
+  - test again
+---
+ hw/i386/pc.c        |  1 +
+ hw/i386/pc_piix.c   |  1 +
+ hw/i386/pc_q35.c    |  1 +
+ include/hw/boards.h |  1 +
+ numa.c              | 21 ++++++++++++++++++++-
+ vl.c                |  3 +--
+ 6 files changed, 25 insertions(+), 3 deletions(-)
+
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index e11a65b..156501c 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -2325,6 +2325,7 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
+     mc->cpu_index_to_instance_props = pc_cpu_index_to_props;
+     mc->get_default_cpu_node_id = pc_get_default_cpu_node_id;
+     mc->possible_cpu_arch_ids = pc_possible_cpu_arch_ids;
++    mc->auto_enable_numa_with_memhp = true;
+     mc->has_hotpluggable_cpus = true;
+     mc->default_boot_order = "cad";
+     mc->hot_add_cpu = pc_hot_add_cpu;
+diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+index f79d5cb..5e47528 100644
+--- a/hw/i386/pc_piix.c
++++ b/hw/i386/pc_piix.c
+@@ -446,6 +446,7 @@ static void pc_i440fx_2_10_machine_options(MachineClass *m)
+     m->is_default = 0;
+     m->alias = NULL;
+     SET_MACHINE_COMPAT(m, PC_COMPAT_2_10);
++    m->auto_enable_numa_with_memhp = false;
+ }
+ 
+ DEFINE_I440FX_MACHINE(v2_10, "pc-i440fx-2.10", NULL,
+diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+index da3ea60..d606004 100644
+--- a/hw/i386/pc_q35.c
++++ b/hw/i386/pc_q35.c
+@@ -318,6 +318,7 @@ static void pc_q35_2_10_machine_options(MachineClass *m)
+     m->alias = NULL;
+     SET_MACHINE_COMPAT(m, PC_COMPAT_2_10);
+     m->numa_auto_assign_ram = numa_legacy_auto_assign_ram;
++    m->auto_enable_numa_with_memhp = false;
+ }
+ 
+ DEFINE_Q35_MACHINE(v2_10, "pc-q35-2.10", NULL,
+diff --git a/include/hw/boards.h b/include/hw/boards.h
+index 191a5b3..f1077f1 100644
+--- a/include/hw/boards.h
++++ b/include/hw/boards.h
+@@ -192,6 +192,7 @@ struct MachineClass {
+     bool ignore_memory_transaction_failures;
+     int numa_mem_align_shift;
+     const char **valid_cpu_types;
++    bool auto_enable_numa_with_memhp;
+     void (*numa_auto_assign_ram)(MachineClass *mc, NodeInfo *nodes,
+                                  int nb_nodes, ram_addr_t size);
+ 
+diff --git a/numa.c b/numa.c
+index 8d78d95..7151b24 100644
+--- a/numa.c
++++ b/numa.c
+@@ -216,6 +216,7 @@ static void parse_numa_node(MachineState *ms, NumaNodeOptions *node,
+     }
+     numa_info[nodenr].present = true;
+     max_numa_nodeid = MAX(max_numa_nodeid, nodenr + 1);
++    nb_numa_nodes++;
+ }
+ 
+ static void parse_numa_distance(NumaDistOptions *dist, Error **errp)
+@@ -282,7 +283,6 @@ static int parse_numa(void *opaque, QemuOpts *opts, Error **errp)
+         if (err) {
+             goto end;
+         }
+-        nb_numa_nodes++;
+         break;
+     case NUMA_OPTIONS_TYPE_DIST:
+         parse_numa_distance(&object->u.dist, &err);
+@@ -433,6 +433,25 @@ void parse_numa_opts(MachineState *ms)
+         exit(1);
+     }
+ 
++    /*
++     * If memory hotplug is enabled (slots > 0) but without '-numa'
++     * options explicitly on CLI, guestes will break.
++     *
++     *   Windows: won't enable memory hotplug without SRAT table at all
++     *
++     *   Linux: if QEMU is started with initial memory all below 4Gb
++     *   and no SRAT table present, guest kernel will use nommu DMA ops,
++     *   which breaks 32bit hw drivers when memory is hotplugged and
++     *   guest tries to use it with that drivers.
++     *
++     * Enable NUMA implicitly by adding a new NUMA node automatically.
++     */
++    if (ms->ram_slots > 0 && nb_numa_nodes == 0 &&
++        mc->auto_enable_numa_with_memhp) {
++            NumaNodeOptions node = { };
++            parse_numa_node(ms, &node, NULL);
++    }
++
+     assert(max_numa_nodeid <= MAX_NODES);
+ 
+     /* No support for sparse NUMA node IDs yet: */
+diff --git a/vl.c b/vl.c
+index ec29909..be332d1 100644
+--- a/vl.c
++++ b/vl.c
+@@ -4675,8 +4675,6 @@ int main(int argc, char **argv, char **envp)
+     default_drive(default_floppy, snapshot, IF_FLOPPY, 0, FD_OPTS);
+     default_drive(default_sdcard, snapshot, IF_SD, 0, SD_OPTS);
+ 
+-    parse_numa_opts(current_machine);
+-
+     if (qemu_opts_foreach(qemu_find_opts("mon"),
+                           mon_init_func, NULL, NULL)) {
+         exit(1);
+@@ -4726,6 +4724,7 @@ int main(int argc, char **argv, char **envp)
+     current_machine->boot_order = boot_order;
+     current_machine->cpu_model = cpu_model;
+ 
++    parse_numa_opts(current_machine);
+ 
+     /* parse features once if machine provides default cpu_type */
+     if (machine_class->default_cpu_type) {
+-- 
+2.5.5
