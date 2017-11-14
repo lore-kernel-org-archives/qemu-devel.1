@@ -1,36 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45496)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48848)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1eEWXl-0008UA-P5
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 03:26:06 -0500
+	(envelope-from <thuth@redhat.com>) id 1eEWcJ-0004yr-I0
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 03:30:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1eEWXi-0005D3-GZ
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 03:26:05 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:40560)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
-	id 1eEWXi-0005Bt-7S
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 03:26:02 -0500
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vAE8OLrK068305
-	for <qemu-devel@nongnu.org>; Tue, 14 Nov 2017 03:25:54 -0500
-Received: from e19.ny.us.ibm.com (e19.ny.us.ibm.com [129.33.205.209])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2e7uptur36-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 14 Nov 2017 03:25:53 -0500
-Received: from localhost
-	by e19.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
-	Tue, 14 Nov 2017 03:25:52 -0500
-Date: Tue, 14 Nov 2017 16:25:47 +0800
-From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+	(envelope-from <thuth@redhat.com>) id 1eEWcG-0001HP-6U
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 03:30:47 -0500
+References: <cover.1510612380.git.alistair.francis@xilinx.com>
+	<6cb7a17813bdc7df94d3efbe5d0b54d90e14ed98.1510612380.git.alistair.francis@xilinx.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <a03a0890-4915-8df5-d820-94cdf953beaa@redhat.com>
+Date: Tue, 14 Nov 2017 09:30:37 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Message-Id: <20171114082547.GB12696@bjsdjshi@linux.vnet.ibm.com>
-Subject: [Qemu-devel] Questions about usability mess that caused by
- differentiating address based on devices types
+In-Reply-To: <6cb7a17813bdc7df94d3efbe5d0b54d90e14ed98.1510612380.git.alistair.francis@xilinx.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v5 20/29] hw/ppc: Replace
+ fprintf(stderr, "*\n" with error_report()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,56 +25,167 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel@nongnu.org, bjsdjshi@linux.vnet.ibm.com, fiuczy@linux.vnet.ibm.com, bwalk@linux.vnet.ibm.com, shalini@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, borntraeger@de.ibm.com
+To: Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+Cc: alistair23@gmail.com, qemu-ppc@nongnu.org, armbru@redhat.com
 
-Dear Conny,
+On 13.11.2017 23:35, Alistair Francis wrote:
+> Replace a large number of the fprintf(stderr, "*\n" calls with
+> error_report(). The functions were renamed with these commands and then
+> compiler issues where manually fixed.
+[...]
+> @@ -720,7 +720,7 @@ static DeviceState *ppce500_init_mpic_kvm(PPCE500Pa=
+rams *params,
+> =20
+>      CPU_FOREACH(cs) {
+>          if (kvm_openpic_connect_vcpu(dev, cs)) {
+> -            fprintf(stderr, "%s: failed to connect vcpu to irqchip\n",
+> +            error_report("%s: failed to connect vcpu to irqchip",
+>                      __func__);
 
-Good day!
+Wrong indentation.
 
-Just now, our Libvirt folks pointed out a "usability mess" for the
-design of differentiating address based on devices classes (real |
-virtual). The complaints are mainly about the "s390-squash-mcss"
-property and restrictions to define virtual device in the special 0xFE
-css, and define real devices in non-0xFE.
+>              abort();
+>          }
+> @@ -809,7 +809,7 @@ void ppce500_init(MachineState *machine, PPCE500Par=
+ams *params)
+>          cs =3D CPU(cpu);
+> =20
+>          if (env->mmu_model !=3D POWERPC_MMU_BOOKE206) {
+> -            fprintf(stderr, "MMU model %i not supported by this machin=
+e.\n",
+> +            error_report("MMU model %i not supported by this machine."=
+,
+>                  env->mmu_model);
 
-We have some discussions internally, but failed to get it cleared. As we
-think this is about the architecture, so hereby, I as a representative,
-forward our arguments and questions here to ask you for help:
+Wrong indentation.
 
-1. What benifit do we get to put virtual devices in css 0xFE?
+>              exit(1);
+>          }
+[...]
+> diff --git a/hw/ppc/mpc8544_guts.c b/hw/ppc/mpc8544_guts.c
+> index ce1254b5d4..3a2c49e3fd 100644
+> --- a/hw/ppc/mpc8544_guts.c
+> +++ b/hw/ppc/mpc8544_guts.c
+> @@ -18,6 +18,7 @@
+>   */
+> =20
+>  #include "qemu/osdep.h"
+> +#include "qemu/error-report.h"
+>  #include "qemu-common.h"
+>  #include "cpu.h"
+>  #include "hw/hw.h"
+> @@ -83,7 +84,7 @@ static uint64_t mpc8544_guts_read(void *opaque, hwadd=
+r addr,
+>          value =3D env->spr[SPR_E500_SVR];
+>          break;
+>      default:
+> -        fprintf(stderr, "guts: Unknown register read: %x\n", (int)addr=
+);
+> +        error_report("guts: Unknown register read: %x", (int)addr);
+>          break;
+>      }
+> =20
+> @@ -102,7 +103,7 @@ static void mpc8544_guts_write(void *opaque, hwaddr=
+ addr,
+>          }
+>          break;
+>      default:
+> -        fprintf(stderr, "guts: Unknown register write: %x =3D %x\n",
+> +        error_report("guts: Unknown register write: %x =3D %x",
+>                  (int)addr, (unsigned)value);
 
-2. Since we could accept squashing virtual devices into css 0, can we
-accept to not trading 0xFE as a special css?
-So that we can remove the restrictions for the cssid validation for each
-type of device. Even we could drop the s390-squash-mcss, and just allow
-the user to define any device in any css.
+Wrong indentation.
 
-3. If we have to keep the squash property, then when squashing, it's
-somewhat like "I don't care for the cssid", so is it possible for us to
-not check the cssid in the device devno?
-Libvirt would be benifited with this when automatically generating the
-addresses.
+>          break;
+>      }
+[...]
+> diff --git a/hw/ppc/ppc440_bamboo.c b/hw/ppc/ppc440_bamboo.c
+> index 693c215108..12f92b9f2c 100644
+> --- a/hw/ppc/ppc440_bamboo.c
+> +++ b/hw/ppc/ppc440_bamboo.c
+> @@ -12,6 +12,7 @@
+>   */
+> =20
+>  #include "qemu/osdep.h"
+> +#include "qemu/error-report.h"
+>  #include "qemu-common.h"
+>  #include "net/net.h"
+>  #include "hw/hw.h"
+> @@ -80,22 +81,22 @@ static int bamboo_load_device_tree(hwaddr addr,
+>      ret =3D qemu_fdt_setprop(fdt, "/memory", "reg", mem_reg_property,
+>                             sizeof(mem_reg_property));
+>      if (ret < 0)
+> -        fprintf(stderr, "couldn't set /memory/reg\n");
+> +        error_report("couldn't set /memory/reg");
+> =20
+>      ret =3D qemu_fdt_setprop_cell(fdt, "/chosen", "linux,initrd-start"=
+,
+>                                  initrd_base);
+>      if (ret < 0)
+> -        fprintf(stderr, "couldn't set /chosen/linux,initrd-start\n");
+> +        error_report("couldn't set /chosen/linux,initrd-start");
+> =20
+>      ret =3D qemu_fdt_setprop_cell(fdt, "/chosen", "linux,initrd-end",
+>                                  (initrd_base + initrd_size));
+>      if (ret < 0)
+> -        fprintf(stderr, "couldn't set /chosen/linux,initrd-end\n");
+> +        error_report("couldn't set /chosen/linux,initrd-end");
+> =20
+>      ret =3D qemu_fdt_setprop_string(fdt, "/chosen", "bootargs",
+>                                    kernel_cmdline);
+>      if (ret < 0)
+> -        fprintf(stderr, "couldn't set /chosen/bootargs\n");
+> +        error_report("couldn't set /chosen/bootargs");
 
-4. Error message for devno conflict is not helpful. For the following
-case:
-  -M s390-ccw-virtio,s390-squash-mcss=on \
-  -drive file=/dev/disk/by-path/ccw-0.0.3f3e,if=none,id=drive-virtio-disk1,format=raw \
-  -device virtio-blk-ccw,devno=fe.0.2222,scsi=off,drive=drive-virtio-disk1,id=virtio-disk1,bootindex=0 \
-  -device vfio-ccw,devno=0.0.2222,sysfsdev=/sys/devices/css0/0.0.013f/6dfd3ec5-e8b3-4e18-a6fe-57bc9eceb920 \
+While you're at it, add proper curly braces?
 
-We get this error message:
-qemu-system-s390x: -device vfio-ccw,devno=0.0.2222,sysfsdev=/sys/devices/css0/0.0.013f/6dfd3ec5-e8b3-4e18-a6fe-57bc9eceb920: Device 0.0.2222 already exists
+>      /* Copy data from the host device tree into the guest. Since the g=
+uest can
+>       * directly access the timebase without host involvement, we must =
+expose
+> @@ -186,7 +187,7 @@ static void bamboo_init(MachineState *machine)
+>      env =3D &cpu->env;
+> =20
+>      if (env->mmu_model !=3D POWERPC_MMU_BOOKE) {
+> -        fprintf(stderr, "MMU model %i not supported by this machine.\n=
+",
+> +        error_report("MMU model %i not supported by this machine.",
+>              env->mmu_model);
 
-By checking 0.0.2222 from the cmd line, users can not find out the root
-cause - squashing, easily. So, if we have to keep the squash property,
-we could improve this message by adding a hint.
+Wrong indentation.
 
-To sum up, we got the feeling that, this mess is not only for Libvirt
-but also for QEMU cmd line users. And we are wondering if there is some
-way to improve it.
+[...]
+> diff --git a/hw/ppc/virtex_ml507.c b/hw/ppc/virtex_ml507.c
+> index 5ac4f76613..c1cac864c6 100644
+> --- a/hw/ppc/virtex_ml507.c
+> +++ b/hw/ppc/virtex_ml507.c
+> @@ -187,7 +187,7 @@ static int xilinx_load_device_tree(hwaddr addr,
+> =20
+>      r =3D qemu_fdt_setprop_string(fdt, "/chosen", "bootargs", kernel_c=
+mdline);
+>      if (r < 0)
+> -        fprintf(stderr, "couldn't set /chosen/bootargs\n");
+> +        error_report("couldn't set /chosen/bootargs");
+>      cpu_physical_memory_write(addr, fdt, fdt_size);
+>      return fdt_size;
+>  }
+> @@ -215,7 +215,7 @@ static void virtex_init(MachineState *machine)
+>      env =3D &cpu->env;
+> =20
+>      if (env->mmu_model !=3D POWERPC_MMU_BOOKE) {
+> -        fprintf(stderr, "MMU model %i not supported by this machine.\n=
+",
+> +        error_report("MMU model %i not supported by this machine.",
+>              env->mmu_model);
 
-Thanks,
+Wrong indentation.
 
--- 
-Dong Jia Shi
+>          exit(1);
+>      }
+>=20
+
+Before you resend your series, could you please check *all* patches for
+correct indentation. I'm getting tired of indicating this ...
+
+ Thanks,
+  Thomas
