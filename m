@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35095)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36420)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1eEXui-0000uS-CR
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 04:53:53 -0500
+	(envelope-from <kraxel@redhat.com>) id 1eEXwT-0001yb-Go
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 04:55:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1eEXue-0003tq-EA
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 04:53:52 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33044)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1eEXue-0003sk-7p
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 04:53:48 -0500
-Date: Tue, 14 Nov 2017 10:53:44 +0100
+	(envelope-from <kraxel@redhat.com>) id 1eEXwP-0005LO-Is
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 04:55:41 -0500
+Date: Tue, 14 Nov 2017 10:55:35 +0100
 From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20171114095344.gr53frmvizjunlff@sirius.home.kraxel.org>
-References: <903d8048-77e9-4a30-d8e1-56ccd8b6a6bc@amsat.org>
-	<20171112193032.9724-1-makovick@gmail.com>
-	<20171112193032.9724-2-makovick@gmail.com>
-	<20171113123914.qvj7bjhdx4h5rx4d@sirius.home.kraxel.org>
-	<99826cbb-2f99-8100-484f-85eab0b4731c@redhat.com>
+Message-ID: <20171114095535.52dn7x5f4nsz3j2u@sirius.home.kraxel.org>
+References: <cover.1510612380.git.alistair.francis@xilinx.com>
+	<1743d21d4c073ae4f8aabada57692bd2e536aa8e.1510612380.git.alistair.francis@xilinx.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <99826cbb-2f99-8100-484f-85eab0b4731c@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/8] sdl2: Fix broken display updating
- after the window is hidden
+In-Reply-To: <1743d21d4c073ae4f8aabada57692bd2e536aa8e.1510612380.git.alistair.francis@xilinx.com>
+Subject: Re: [Qemu-devel] [PATCH v5 01/29] audio: Replace AUDIO_FUNC with
+ __func__
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,18 +24,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: Jindrich Makovicka <makovick@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, Cole Robinson <crobinso@redhat.com>
+To: Alistair Francis <alistair.francis@xilinx.com>
+Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, alistair23@gmail.com, armbru@redhat.com
 
-> > Have a slightly older SDL version (2.0.3).  Do you see that effect with
-> > 2.0.6 too?
+On Mon, Nov 13, 2017 at 02:34:39PM -0800, Alistair Francis wrote:
+> Apparently we don't use __MSC_VER as a compiler anymore and we always
+> require a C99 compiler (which means we always have __func__) so we don't
+> need a special AUDIO_FUNC macro. We can just replace AUDIO_FUNC with
+> __func__ instead.
 > 
-> The only thing I can say is that I submitted
-> https://bugzilla.libsdl.org/show_bug.cgi?id=2818 as a result.  Nobody
-> has replied to that in three years, but when testing it on SDL 2.0.7,
-> the issue appears to be fixed.
+> Checkpatch failures were manually fixed.
+> 
+> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+> Cc: Gerd Hoffmann <kraxel@redhat.com>
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
 
-Ok, good.  I think I'm fine with merging the patch as-is then.
-
-cheers,
-  Gerd
+Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
