@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43174)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45313)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eEfZI-0002NA-Lx
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 13:04:17 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eEfdY-0005Ps-B3
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 13:08:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eEfZD-0005oJ-VL
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 13:04:16 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51924)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eEfZD-0005na-Mp
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 13:04:11 -0500
-References: <20171021124213.84AEC7456EF@zero.eik.bme.hu>
+	(envelope-from <pbonzini@redhat.com>) id 1eEfdT-0000pi-7t
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 13:08:40 -0500
+Received: from mail-wm0-f68.google.com ([74.125.82.68]:51345)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eEfdT-0000p3-1t
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 13:08:35 -0500
+Received: by mail-wm0-f68.google.com with SMTP id b189so16959218wmd.0
+	for <qemu-devel@nongnu.org>; Tue, 14 Nov 2017 10:08:35 -0800 (PST)
+References: <alpine.BSF.2.21.1707270007490.20438@zero.eik.bme.hu>
+	<alpine.BSF.2.21.1708192307590.44932@zero.eik.bme.hu>
+	<alpine.BSF.2.21.1708202246550.65843@zero.eik.bme.hu>
+	<d4ffee34-8a82-95ea-bedc-ed37ae5fae67@ilande.co.uk>
+	<alpine.BSF.2.21.1710081718490.54240@zero.eik.bme.hu>
+	<alpine.BSF.2.21.1710151239410.57072@zero.eik.bme.hu>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <eba4f539-3474-57a2-a44c-6c60f55d90ac@redhat.com>
-Date: Tue, 14 Nov 2017 19:04:03 +0100
+Message-ID: <59a84d4f-08c9-5ddb-d487-08026c9cefa3@redhat.com>
+Date: Tue, 14 Nov 2017 19:08:26 +0100
 MIME-Version: 1.0
-In-Reply-To: <20171021124213.84AEC7456EF@zero.eik.bme.hu>
+In-Reply-To: <alpine.BSF.2.21.1710151239410.57072@zero.eik.bme.hu>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] exec: Fix section_covers_addr() for
- sections with non-zero offset
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-ppc] How to debug crash in TCG code?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,80 +35,40 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: BALATON Zoltan <balaton@eik.bme.hu>, qemu-devel@nongnu.org
-Cc: Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Fam Zheng <famz@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-ppc@nongnu.org
 
-On 21/10/2017 13:24, BALATON Zoltan wrote:
-> When a section with non-0 offset_within_region field is tested to
-> cover an address the offset should be taken into account as well.
->=20
-> This fixes a crash caused by picking the wrong memory region in
-> address_space_lookup_region seen with client code accessing a device
-> model that uses alias memory regions.
->=20
-> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-> ---
-> This seems to fix the problem described in
-> http://lists.nongnu.org/archive/html/qemu-devel/2017-10/msg03356.html
-> but I'm not completely sure about it. This seems to be introduced in
-> 729633c exec: Introduce AddressSpaceDispatch.mru_section and the patch
-> before that which split off section_covers_addr from phys_page_find so
-> this patch also changes that caller. Is that OK to do? It appears to
-> work but I don't know this part of QEMU.
->=20
-> Also the bug seems to be caused by section_covers_addr accepting
-> sii3112.bar5 when that's the mru_section instead of picking
-> sii3112.bar0 (which it picks when going through phys_page_find) when
-> client code is accessing 0xc08001006 from this address map (full
-> address map is at above URL):
->=20
-> address-space: memory
->     0000000c08000000-0000000c0800ffff (prio 0, i/o): alias isa_mmio @io=
- 0000000000000000-000000000000ffff
->=20
-> address-space: I/O
->   0000000000000000-000000000000ffff (prio 0, i/o): io
->     0000000000001000-0000000000001007 (prio 1, i/o): alias sii3112.bar0=
- @sii3112.bar5 0000000000000080-0000000000000087
->     0000000000001008-000000000000100b (prio 1, i/o): alias sii3112.bar1=
- @sii3112.bar5 0000000000000088-000000000000008b
->     0000000000001010-0000000000001017 (prio 1, i/o): alias sii3112.bar2=
- @sii3112.bar5 00000000000000c0-00000000000000c7
->     0000000000001018-000000000000101b (prio 1, i/o): alias sii3112.bar3=
- @sii3112.bar5 00000000000000c8-00000000000000cb
->     0000000000001020-000000000000102f (prio 1, i/o): alias sii3112.bar4=
- @sii3112.bar5 0000000000000000-000000000000000f
->=20
-> which this patch fixes but would the same problem happen if the
-> mru_section is bar5 but bar4 is accessed? I could not reproduce that
-> case but then the offset is 0 but in this case the address would be
-> above 0xc08001020 and size is 0xf so they probably won't match. But
-> this is only because of the size of the region. Could that mean the
-> bug is caused by something else and should be fixed elsewhere?
->=20
-> ---
->  exec.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->=20
-> diff --git a/exec.c b/exec.c
-> index db5ae23..a915817 100644
-> --- a/exec.c
-> +++ b/exec.c
-> @@ -370,7 +370,8 @@ static inline bool section_covers_addr(const Memory=
-RegionSection *section,
->       * the section must cover the entire address space.
->       */
->      return int128_gethi(section->size) ||
-> -           range_covers_byte(section->offset_within_address_space,
-> +           range_covers_byte(section->offset_within_address_space +
-> +                             section->offset_within_region,
->                               int128_getlo(section->size), addr);
->  }
+On 15/10/2017 13:30, BALATON Zoltan wrote:
+> I've got a bit further with this but still could use some hints to find
+> what is happening. Here are some more details I've found so far.
+> 
+> The memory map I have (see below) is a bit complex but the interesting
+> part is that I have sii3112.bar5 as an mmio region with sii3112.bar0-4
+> as io region aliases into this. The crash is happening when the firmware
+> is accessing one of these aliased io regions when
+> 
+> tlb_set_page_with_attrs: vaddr=d8001000 paddr=0x0000000c08001000 prot=3
+> idx=1
+> 
+> is called in accel/tcg/cputlb.c:616 which then calls
+> 
+> 635        section = address_space_translate_for_iotlb(cpu, asidx,
+> paddr, &xlat, &sz);
+> 
+> this in turn calls address_space_translate_internal which calls
+> 
+> 441        section = address_space_lookup_region(d, addr, resolve_subpage);
+> 
+> that eventually gets the cached section at exec.c:411
+> 
+> 411        MemoryRegionSection *section = atomic_read(&d->mru_section);
+> 
+> When this is not a region covering the address as verifed by
 
-Sorry, this is incorrect.  addr is an address in the address space, and
-range_covers_byte checks if it is between
-section->offset_within_address_space and
-section->offset_within_address_space + section->size.  I am not sure how
-things don't explode completely by adding section->offset_within_region
-(probably it's just because section->offset_within_region is usually 0).
+Could it be that the cached region is only for a small part of the page,
+while phys_page_find returns a subpage (and resolve_subpage is false)?
+
+Maybe it's enough to skip mru_section if resolve_subpage is false.
+
+Thanks,
 
 Paolo
