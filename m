@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39199)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43668)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1eEOxB-00027v-SA
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 19:19:50 -0500
+	(envelope-from <jsnow@redhat.com>) id 1eEP76-00017H-Eu
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 19:30:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1eEOxB-0004Fg-3Y
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 19:19:49 -0500
+	(envelope-from <jsnow@redhat.com>) id 1eEP75-0001BQ-Mr
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 19:30:04 -0500
 References: <20171030163309.75770-1-vsementsov@virtuozzo.com>
-	<20171030163309.75770-8-vsementsov@virtuozzo.com>
+	<20171030163309.75770-10-vsementsov@virtuozzo.com>
 From: John Snow <jsnow@redhat.com>
-Message-ID: <096f0944-6c42-4c56-b219-e3eaf17054ac@redhat.com>
-Date: Mon, 13 Nov 2017 19:19:26 -0500
+Message-ID: <ec302e00-8efc-2cee-e8f2-4ac53e025ea4@redhat.com>
+Date: Mon, 13 Nov 2017 19:29:46 -0500
 MIME-Version: 1.0
-In-Reply-To: <20171030163309.75770-8-vsementsov@virtuozzo.com>
+In-Reply-To: <20171030163309.75770-10-vsementsov@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v8 07/14] migration: include
- migrate_dirty_bitmaps in migrate_postcopy
+Subject: Re: [Qemu-devel] [PATCH v8 09/14] migration: add is_active_iterate
+ handler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,12 +31,12 @@ Cc: kwolf@redhat.com, peter.maydell@linaro.org, famz@redhat.com, lirans@il.ibm.c
 
 
 On 10/30/2017 12:33 PM, Vladimir Sementsov-Ogievskiy wrote:
-> Enable postcopy if dirty bitmap migration is endabled.
+> Only-postcopy savevm states (dirty-bitmap) don't need live iteration, so
+> to disable them and stop transporting empty sections there is a new
+> savevm handler.
 > 
-
-"enabled"
-
 > Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > Reviewed-by: Juan Quintela <quintela@redhat.com>
+
 
 Reviewed-by: John Snow <jsnow@redhat.com>
