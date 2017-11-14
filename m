@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38481)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41203)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eEcOi-0005tR-Mc
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 09:41:09 -0500
+	(envelope-from <drjones@redhat.com>) id 1eEcUl-00019G-47
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 09:47:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eEcOe-0007dH-Av
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 09:41:08 -0500
-Received: from indium.canonical.com ([91.189.90.7]:58214)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eEcOe-0007bv-4d
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 09:41:04 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eEcOc-0004ZB-2y
-	for <qemu-devel@nongnu.org>; Tue, 14 Nov 2017 14:41:02 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 156D92E80D5
-	for <qemu-devel@nongnu.org>; Tue, 14 Nov 2017 14:41:02 +0000 (UTC)
+	(envelope-from <drjones@redhat.com>) id 1eEcUk-0004lO-2s
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 09:47:23 -0500
+Date: Tue, 14 Nov 2017 15:47:08 +0100
+From: Andrew Jones <drjones@redhat.com>
+Message-ID: <20171114144708.uzh6mkmjygojfpbu@kamzik.brq.redhat.com>
+References: <1510622154-17224-1-git-send-email-zhuyijun@huawei.com>
+	<1510622154-17224-3-git-send-email-zhuyijun@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 14 Nov 2017 14:35:33 -0000
-From: Launchpad Bug Tracker <1726394@bugs.launchpad.net>
-Reply-To: Bug 1726394 <1726394@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150876459007.17533.9812313883985505054.malonedeb@wampee.canonical.com>
-Message-Id: <151067013951.4962.13674405192881574433.malone@ackee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1726394] Re: Passes through prctl(PR_SET_SECCOMP,
- SECCOMP_MODE_FILTER, address)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1510622154-17224-3-git-send-email-zhuyijun@huawei.com>
+Subject: Re: [Qemu-devel] [RFC 2/5] hw/arm/virt: Enable dynamic generation
+ of guest RAM memory regions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,55 +24,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: zhuyijun@huawei.com
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, eric.auger@redhat.com, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, zhaoshenglong@huawei.com
 
-This bug was fixed in the package qemu - 1:2.10+dfsg-0ubuntu4
+On Tue, Nov 14, 2017 at 09:15:51AM +0800, zhuyijun@huawei.com wrote:
+> From: Zhu Yijun <zhuyijun@huawei.com>
+> 
+> Register a ram_memory_region_init notify to allocate memory region
+> from system memory and add them as subregions.
+> 
+> Signed-off-by: Zhu Yijun <zhuyijun@huawei.com>
+> ---
+>  hw/arm/virt.c         | 21 ++++++++++++++++-----
+>  include/hw/arm/virt.h |  1 +
+>  2 files changed, 17 insertions(+), 5 deletions(-)
+> 
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index 9e18b41..ddde5e1 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -1225,6 +1225,19 @@ void virt_machine_done(Notifier *notifier, void *data)
+>      virt_build_smbios(vms);
+>  }
+>  
+> +static void virt_ram_memory_region_init(Notifier *notifier, void *data)
+> +{
+> +    MachineState *machine = MACHINE(qdev_get_machine());
 
----------------
-qemu (1:2.10+dfsg-0ubuntu4) bionic; urgency=3Dmedium
+No need to use qdev_get_machine(), you can get it with MACHINE(vms).
 
-  * Apply linux-user-return-EINVAL-from-prctl-PR_-_SECCOMP.patch from
-    James Cowgill to prevent qemu-user from forwarding prctl seccomp
-    calls (LP: #1726394)
+> +    MemoryRegion *sysmem = get_system_memory();
+> +    MemoryRegion *ram = g_new(MemoryRegion, 1);
+> +    VirtMachineState *vms = container_of(notifier, VirtMachineState,
+> +                                         ram_memory_region_init);
+> +
+> +    memory_region_allocate_system_memory(ram, NULL, "mach-virt.ram",
+> +                                         machine->ram_size);
+> +    memory_region_add_subregion(sysmem, vms->memmap[VIRT_MEM].base, ram);
+> +}
+> +
+>  static uint64_t virt_cpu_mp_affinity(VirtMachineState *vms, int idx)
+>  {
+>      uint8_t clustersz = ARM_DEFAULT_CPUS_PER_CLUSTER;
+> @@ -1258,7 +1271,6 @@ static void machvirt_init(MachineState *machine)
+>      MemoryRegion *sysmem = get_system_memory();
+>      MemoryRegion *secure_sysmem = NULL;
+>      int n, virt_max_cpus;
+> -    MemoryRegion *ram = g_new(MemoryRegion, 1);
+>      bool firmware_loaded = bios_name || drive_get(IF_PFLASH, 0, 0);
+>  
+>      /* We can probe only here because during property set
+> @@ -1409,10 +1421,6 @@ static void machvirt_init(MachineState *machine)
+>      fdt_add_cpu_nodes(vms);
+>      fdt_add_psci_node(vms);
+>  
+> -    memory_region_allocate_system_memory(ram, NULL, "mach-virt.ram",
+> -                                         machine->ram_size);
+> -    memory_region_add_subregion(sysmem, vms->memmap[VIRT_MEM].base, ram);
+> -
+>      create_flash(vms, sysmem, secure_sysmem ? secure_sysmem : sysmem);
+>  
+>      create_gic(vms, pic);
+> @@ -1462,6 +1470,9 @@ static void machvirt_init(MachineState *machine)
+>       * Notifiers are executed in registration reverse order.
+>       */
+>      create_platform_bus(vms, pic);
+> +
+> +    vms->ram_memory_region_init.notify = virt_ram_memory_region_init;
+> +    qemu_add_machine_init_done_notifier(&vms->ram_memory_region_init);
 
- -- Julian Andres Klode <juliank@ubuntu.com>  Sat, 04 Nov 2017 00:21:14
-+0100
+Does this notifier need to be the first one executed? If so, then a
+comment should be added to state that. Actually the comment above
+create_platform_bus() could be replaced with a comment above the first
+notifier that states all notifier dependencies.
 
-** Changed in: qemu (Ubuntu)
-       Status: Fix Committed =3D> Fix Released
+>  }
+>  
+>  static bool virt_get_secure(Object *obj, Error **errp)
+> diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
+> index 33b0ff3..38906b8 100644
+> --- a/include/hw/arm/virt.h
+> +++ b/include/hw/arm/virt.h
+> @@ -90,6 +90,7 @@ typedef struct {
+>  typedef struct {
+>      MachineState parent;
+>      Notifier machine_done;
+> +    Notifier ram_memory_region_init;
+>      FWCfgState *fw_cfg;
+>      bool secure;
+>      bool highmem;
+> -- 
+> 1.8.3.1
+> 
+> 
+>
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1726394
-
-Title:
-  Passes through prctl(PR_SET_SECCOMP, SECCOMP_MODE_FILTER, address)
-
-Status in QEMU:
-  In Progress
-Status in qemu package in Ubuntu:
-  Fix Released
-Status in qemu source package in Xenial:
-  Won't Fix
-Status in qemu source package in Zesty:
-  Won't Fix
-Status in qemu source package in Artful:
-  Won't Fix
-Status in qemu package in Debian:
-  Confirmed
-
-Bug description:
-  qemu-user passes through prctl(PR_SET_SECCOMP, SECCOMP_MODE_FILTER,
-  address) unmodified, but the third argument is an address to a BPF
-  filter, causing an EFAULT. Now, the filter is architecture-specifc, so
-  you can't just rewrite the addresses, so the safest bet is to just
-  return an error here.
-
-  I guess you should just return EINVAL, but not sure. I'd really like
-  something that can be identified, so seccomp errors can be ignored
-  when it's not supported.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1726394/+subscriptions
+Thanks,
+drew 
