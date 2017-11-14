@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57582)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58403)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1eEXk5-0005oD-1u
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 04:42:57 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1eEXlM-0006R3-Un
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 04:44:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1eEXk0-000521-1N
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 04:42:53 -0500
-Received: from 16.mo6.mail-out.ovh.net ([87.98.139.208]:41110)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1eEXjz-00051M-Oe
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 04:42:47 -0500
-Received: from player735.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo6.mail-out.ovh.net (Postfix) with ESMTP id C64C211F0CA
-	for <qemu-devel@nongnu.org>; Tue, 14 Nov 2017 10:42:43 +0100 (CET)
-Date: Tue, 14 Nov 2017 10:42:24 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20171114104224.63ed5e87@bahia.lan>
-In-Reply-To: <20171110152017.24324-6-clg@kaod.org>
-References: <20171110152017.24324-1-clg@kaod.org>
-	<20171110152017.24324-6-clg@kaod.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-2.12 v3 05/11] spapr: introduce an IRQ
- allocator using a bitmap
+	(envelope-from <richard.henderson@linaro.org>) id 1eEXlH-0005ez-SM
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 04:44:13 -0500
+Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:53170)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1eEXlH-0005eS-Hm
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 04:44:07 -0500
+Received: by mail-wr0-x243.google.com with SMTP id j23so16914333wra.9
+	for <qemu-devel@nongnu.org>; Tue, 14 Nov 2017 01:44:07 -0800 (PST)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Tue, 14 Nov 2017 10:42:03 +0100
+Message-Id: <20171114094203.28030-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH] tcg: Record code_gen_buffer address for
+ user-only memory helpers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,209 +25,344 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org
 
-On Fri, 10 Nov 2017 15:20:11 +0000
-C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+When we handle a signal from a fault within a user-only memory helper,
+we cannot cpu_restore_state with the PC found within the signal frame.
+Use a TLS variable, helper_retaddr, to record the unwind start point
+to find the faulting guest insn.
 
-> Let's define a new set of XICSFabric IRQ operations for the latest
-> pseries machine. These simply use a a bitmap 'irq_map' as a IRQ number
-> allocator.
->=20
-> The previous pseries machines keep the old set of IRQ operations using
-> the ICSIRQState array.
->=20
-> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-> ---
->=20
->  Changes since v2 :
->=20
->  - introduced a second set of XICSFabric IRQ operations for older
->    pseries machines
->=20
->  hw/ppc/spapr.c         | 76 ++++++++++++++++++++++++++++++++++++++++++++=
-++----
->  include/hw/ppc/spapr.h |  3 ++
->  2 files changed, 74 insertions(+), 5 deletions(-)
->=20
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 4bdceb45a14f..4ef0b73559ca 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -1681,6 +1681,22 @@ static const VMStateDescription vmstate_spapr_patb=
-_entry =3D {
->      },
->  };
-> =20
-> +static bool spapr_irq_map_needed(void *opaque)
-> +{
-> +    return true;
+Reported-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
 
-I see that the next patch adds some code to avoid sending the
-bitmap if it doesn't contain state, but I guess you should also
-explicitly have this function to return false for older machine
-types (see remark below).
+Tested only with a silly test case --
 
-> +}
-> +
-> +static const VMStateDescription vmstate_spapr_irq_map =3D {
-> +    .name =3D "spapr_irq_map",
-> +    .version_id =3D 0,
-> +    .minimum_version_id =3D 0,
-> +    .needed =3D spapr_irq_map_needed,
-> +    .fields =3D (VMStateField[]) {
-> +        VMSTATE_BITMAP(irq_map, sPAPRMachineState, 0, nr_irqs),
-> +        VMSTATE_END_OF_LIST()
-> +    },
-> +};
-> +
->  static const VMStateDescription vmstate_spapr =3D {
->      .name =3D "spapr",
->      .version_id =3D 3,
-> @@ -1700,6 +1716,7 @@ static const VMStateDescription vmstate_spapr =3D {
->          &vmstate_spapr_ov5_cas,
->          &vmstate_spapr_patb_entry,
->          &vmstate_spapr_pending_events,
-> +        &vmstate_spapr_irq_map,
->          NULL
->      }
->  };
-> @@ -2337,8 +2354,12 @@ static void ppc_spapr_init(MachineState *machine)
->      /* Setup a load limit for the ramdisk leaving room for SLOF and FDT =
-*/
->      load_limit =3D MIN(spapr->rma_size, RTAS_MAX_ADDR) - FW_OVERHEAD;
-> =20
-> +    /* Initialize the IRQ allocator */
-> +    spapr->nr_irqs  =3D XICS_IRQS_SPAPR;
-> +    spapr->irq_map  =3D bitmap_new(spapr->nr_irqs);
-> +
+int main()
+{
+  int new = 1, old = 0;
+  __atomic_compare_exchange((int *)0, &old, &new, 0, 0, 0);
+  return old;
+}
 
-I think you should introduce a sPAPRMachineClass::has_irq_bitmap boolean
-so that the bitmap is only allocated for newer machine types. And you should
-then use this flag in spapr_irq_map_needed() above.
+which even before the patch does not fail in the way Peter describes.
 
-Apart from that, the rest of the patch looks good.
+As I post this, I remember in theory we should use __atomic_signal_fence
+after setting helper_retaddr, but as far as I know this is a no-op on all
+supported hosts.  It might still generate a compiler barrier though, so it's
+worth considering.
 
->      /* Set up Interrupt Controller before we create the VCPUs */
-> -    xics_system_init(machine, XICS_IRQS_SPAPR, &error_fatal);
-> +    xics_system_init(machine, spapr->nr_irqs, &error_fatal);
-> =20
->      /* Set up containers for ibm,client-architecture-support negotiated =
-options
->       */
-> @@ -3560,7 +3581,7 @@ static int ics_find_free_block(ICSState *ics, int n=
-um, int alignnum)
->      return -1;
->  }
-> =20
-> -static bool spapr_irq_test(XICSFabric *xi, int irq)
-> +static bool spapr_irq_test_2_11(XICSFabric *xi, int irq)
->  {
->      sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
->      ICSState *ics =3D spapr->ics;
-> @@ -3569,7 +3590,7 @@ static bool spapr_irq_test(XICSFabric *xi, int irq)
->      return !ICS_IRQ_FREE(ics, srcno);
->  }
-> =20
-> -static int spapr_irq_alloc_block(XICSFabric *xi, int count, int align)
-> +static int spapr_irq_alloc_block_2_11(XICSFabric *xi, int count, int ali=
-gn)
->  {
->      sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
->      ICSState *ics =3D spapr->ics;
-> @@ -3583,7 +3604,7 @@ static int spapr_irq_alloc_block(XICSFabric *xi, in=
-t count, int align)
->      return srcno + ics->offset;
->  }
-> =20
-> -static void spapr_irq_free_block(XICSFabric *xi, int irq, int num)
-> +static void spapr_irq_free_block_2_11(XICSFabric *xi, int irq, int num)
->  {
->      sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
->      ICSState *ics =3D spapr->ics;
-> @@ -3601,6 +3622,46 @@ static void spapr_irq_free_block(XICSFabric *xi, i=
-nt irq, int num)
->      }
->  }
-> =20
-> +static bool spapr_irq_test(XICSFabric *xi, int irq)
-> +{
-> +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
-> +    int srcno =3D irq - spapr->ics->offset;
-> +
-> +    return test_bit(srcno, spapr->irq_map);
-> +}
-> +
-> +static int spapr_irq_alloc_block(XICSFabric *xi, int count, int align)
-> +{
-> +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
-> +    int start =3D 0;
-> +    int srcno;
-> +
-> +    /*
-> +     * The 'align_mask' parameter of bitmap_find_next_zero_area()
-> +     * should be one less than a power of 2; 0 means no
-> +     * alignment. Adapt the 'align' value of the former allocator to
-> +     * fit the requirements of bitmap_find_next_zero_area()
-> +     */
-> +    align -=3D 1;
-> +
-> +    srcno =3D bitmap_find_next_zero_area(spapr->irq_map, spapr->nr_irqs,=
- start,
-> +                                       count, align);
-> +    if (srcno =3D=3D spapr->nr_irqs) {
-> +        return -1;
-> +    }
-> +
-> +    bitmap_set(spapr->irq_map, srcno, count);
-> +    return srcno + spapr->ics->offset;
-> +}
-> +
-> +static void spapr_irq_free_block(XICSFabric *xi, int irq, int num)
-> +{
-> +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
-> +    int srcno =3D irq - spapr->ics->offset;
-> +
-> +    bitmap_clear(spapr->irq_map, srcno, num);
-> +}
-> +
->  static void spapr_pic_print_info(InterruptStatsProvider *obj,
->                                   Monitor *mon)
->  {
-> @@ -3778,7 +3839,12 @@ static void spapr_machine_2_11_instance_options(Ma=
-chineState *machine)
-> =20
->  static void spapr_machine_2_11_class_options(MachineClass *mc)
->  {
-> -    /* Defaults for the latest behaviour inherited from the base class */
-> +    XICSFabricClass *xic =3D XICS_FABRIC_CLASS(mc);
-> +
-> +    spapr_machine_2_12_class_options(mc);
-> +    xic->irq_test =3D spapr_irq_test_2_11;
-> +    xic->irq_alloc_block =3D spapr_irq_alloc_block_2_11;
-> +    xic->irq_free_block =3D spapr_irq_free_block_2_11;
->  }
-> =20
->  DEFINE_SPAPR_MACHINE(2_11, "2.11", false);
-> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> index 9d21ca9bde3a..5835c694caff 100644
-> --- a/include/hw/ppc/spapr.h
-> +++ b/include/hw/ppc/spapr.h
-> @@ -7,6 +7,7 @@
->  #include "hw/ppc/spapr_drc.h"
->  #include "hw/mem/pc-dimm.h"
->  #include "hw/ppc/spapr_ovec.h"
-> +#include "qemu/bitmap.h"
-> =20
->  struct VIOsPAPRBus;
->  struct sPAPRPHBState;
-> @@ -78,6 +79,8 @@ struct sPAPRMachineState {
->      struct VIOsPAPRBus *vio_bus;
->      QLIST_HEAD(, sPAPRPHBState) phbs;
->      struct sPAPRNVRAM *nvram;
-> +    int32_t nr_irqs;
-> +    unsigned long *irq_map;
->      ICSState *ics;
->      sPAPRRTCState rtc;
-> =20
+
+r~
+---
+
+ accel/tcg/atomic_template.h               | 32 +++++++++++++----
+ include/exec/cpu_ldst.h                   |  2 ++
+ include/exec/cpu_ldst_useronly_template.h | 14 ++++++--
+ accel/tcg/cputlb.c                        |  1 +
+ accel/tcg/user-exec.c                     | 58 +++++++++++++++++++++++++------
+ 5 files changed, 87 insertions(+), 20 deletions(-)
+
+diff --git a/accel/tcg/atomic_template.h b/accel/tcg/atomic_template.h
+index b400b2a3d3..1c7c17526c 100644
+--- a/accel/tcg/atomic_template.h
++++ b/accel/tcg/atomic_template.h
+@@ -62,7 +62,9 @@ ABI_TYPE ATOMIC_NAME(cmpxchg)(CPUArchState *env, target_ulong addr,
+                               ABI_TYPE cmpv, ABI_TYPE newv EXTRA_ARGS)
+ {
+     DATA_TYPE *haddr = ATOMIC_MMU_LOOKUP;
+-    return atomic_cmpxchg__nocheck(haddr, cmpv, newv);
++    DATA_TYPE ret = atomic_cmpxchg__nocheck(haddr, cmpv, newv);
++    ATOMIC_MMU_CLEANUP;
++    return ret;
+ }
+ 
+ #if DATA_SIZE >= 16
+@@ -70,6 +72,7 @@ ABI_TYPE ATOMIC_NAME(ld)(CPUArchState *env, target_ulong addr EXTRA_ARGS)
+ {
+     DATA_TYPE val, *haddr = ATOMIC_MMU_LOOKUP;
+     __atomic_load(haddr, &val, __ATOMIC_RELAXED);
++    ATOMIC_MMU_CLEANUP;
+     return val;
+ }
+ 
+@@ -78,13 +81,16 @@ void ATOMIC_NAME(st)(CPUArchState *env, target_ulong addr,
+ {
+     DATA_TYPE *haddr = ATOMIC_MMU_LOOKUP;
+     __atomic_store(haddr, &val, __ATOMIC_RELAXED);
++    ATOMIC_MMU_CLEANUP;
+ }
+ #else
+ ABI_TYPE ATOMIC_NAME(xchg)(CPUArchState *env, target_ulong addr,
+                            ABI_TYPE val EXTRA_ARGS)
+ {
+     DATA_TYPE *haddr = ATOMIC_MMU_LOOKUP;
+-    return atomic_xchg__nocheck(haddr, val);
++    DATA_TYPE ret = atomic_xchg__nocheck(haddr, val);
++    ATOMIC_MMU_CLEANUP;
++    return ret;
+ }
+ 
+ #define GEN_ATOMIC_HELPER(X)                                        \
+@@ -92,8 +98,10 @@ ABI_TYPE ATOMIC_NAME(X)(CPUArchState *env, target_ulong addr,       \
+                  ABI_TYPE val EXTRA_ARGS)                           \
+ {                                                                   \
+     DATA_TYPE *haddr = ATOMIC_MMU_LOOKUP;                           \
+-    return atomic_##X(haddr, val);                                  \
+-}                                                                   \
++    DATA_TYPE ret = atomic_##X(haddr, val);                         \
++    ATOMIC_MMU_CLEANUP;                                             \
++    return ret;                                                     \
++}
+ 
+ GEN_ATOMIC_HELPER(fetch_add)
+ GEN_ATOMIC_HELPER(fetch_and)
+@@ -123,7 +131,9 @@ ABI_TYPE ATOMIC_NAME(cmpxchg)(CPUArchState *env, target_ulong addr,
+                               ABI_TYPE cmpv, ABI_TYPE newv EXTRA_ARGS)
+ {
+     DATA_TYPE *haddr = ATOMIC_MMU_LOOKUP;
+-    return BSWAP(atomic_cmpxchg__nocheck(haddr, BSWAP(cmpv), BSWAP(newv)));
++    DATA_TYPE ret = atomic_cmpxchg__nocheck(haddr, BSWAP(cmpv), BSWAP(newv));
++    ATOMIC_MMU_CLEANUP;
++    return BSWAP(ret);
+ }
+ 
+ #if DATA_SIZE >= 16
+@@ -131,6 +141,7 @@ ABI_TYPE ATOMIC_NAME(ld)(CPUArchState *env, target_ulong addr EXTRA_ARGS)
+ {
+     DATA_TYPE val, *haddr = ATOMIC_MMU_LOOKUP;
+     __atomic_load(haddr, &val, __ATOMIC_RELAXED);
++    ATOMIC_MMU_CLEANUP;
+     return BSWAP(val);
+ }
+ 
+@@ -140,13 +151,16 @@ void ATOMIC_NAME(st)(CPUArchState *env, target_ulong addr,
+     DATA_TYPE *haddr = ATOMIC_MMU_LOOKUP;
+     val = BSWAP(val);
+     __atomic_store(haddr, &val, __ATOMIC_RELAXED);
++    ATOMIC_MMU_CLEANUP;
+ }
+ #else
+ ABI_TYPE ATOMIC_NAME(xchg)(CPUArchState *env, target_ulong addr,
+                            ABI_TYPE val EXTRA_ARGS)
+ {
+     DATA_TYPE *haddr = ATOMIC_MMU_LOOKUP;
+-    return BSWAP(atomic_xchg__nocheck(haddr, BSWAP(val)));
++    ABI_TYPE ret = atomic_xchg__nocheck(haddr, BSWAP(val));
++    ATOMIC_MMU_CLEANUP;
++    return BSWAP(ret);
+ }
+ 
+ #define GEN_ATOMIC_HELPER(X)                                        \
+@@ -154,7 +168,9 @@ ABI_TYPE ATOMIC_NAME(X)(CPUArchState *env, target_ulong addr,       \
+                  ABI_TYPE val EXTRA_ARGS)                           \
+ {                                                                   \
+     DATA_TYPE *haddr = ATOMIC_MMU_LOOKUP;                           \
+-    return BSWAP(atomic_##X(haddr, BSWAP(val)));                    \
++    DATA_TYPE ret = atomic_##X(haddr, BSWAP(val));                  \
++    ATOMIC_MMU_CLEANUP;                                             \
++    return BSWAP(ret);                                              \
+ }
+ 
+ GEN_ATOMIC_HELPER(fetch_and)
+@@ -180,6 +196,7 @@ ABI_TYPE ATOMIC_NAME(fetch_add)(CPUArchState *env, target_ulong addr,
+         sto = BSWAP(ret + val);
+         ldn = atomic_cmpxchg__nocheck(haddr, ldo, sto);
+         if (ldn == ldo) {
++            ATOMIC_MMU_CLEANUP;
+             return ret;
+         }
+         ldo = ldn;
+@@ -198,6 +215,7 @@ ABI_TYPE ATOMIC_NAME(add_fetch)(CPUArchState *env, target_ulong addr,
+         sto = BSWAP(ret);
+         ldn = atomic_cmpxchg__nocheck(haddr, ldo, sto);
+         if (ldn == ldo) {
++            ATOMIC_MMU_CLEANUP;
+             return ret;
+         }
+         ldo = ldn;
+diff --git a/include/exec/cpu_ldst.h b/include/exec/cpu_ldst.h
+index 6eb5fe80dc..191f2e962a 100644
+--- a/include/exec/cpu_ldst.h
++++ b/include/exec/cpu_ldst.h
+@@ -76,6 +76,8 @@
+ 
+ #if defined(CONFIG_USER_ONLY)
+ 
++extern __thread uintptr_t helper_retaddr;
++
+ /* In user-only mode we provide only the _code and _data accessors. */
+ 
+ #define MEMSUFFIX _data
+diff --git a/include/exec/cpu_ldst_useronly_template.h b/include/exec/cpu_ldst_useronly_template.h
+index 7b8c7c506e..c168f31bba 100644
+--- a/include/exec/cpu_ldst_useronly_template.h
++++ b/include/exec/cpu_ldst_useronly_template.h
+@@ -73,7 +73,11 @@ glue(glue(glue(cpu_ld, USUFFIX), MEMSUFFIX), _ra)(CPUArchState *env,
+                                                   target_ulong ptr,
+                                                   uintptr_t retaddr)
+ {
+-    return glue(glue(cpu_ld, USUFFIX), MEMSUFFIX)(env, ptr);
++    RES_TYPE ret;
++    helper_retaddr = retaddr;
++    ret = glue(glue(cpu_ld, USUFFIX), MEMSUFFIX)(env, ptr);
++    helper_retaddr = 0;
++    return ret;
+ }
+ 
+ #if DATA_SIZE <= 2
+@@ -93,7 +97,11 @@ glue(glue(glue(cpu_lds, SUFFIX), MEMSUFFIX), _ra)(CPUArchState *env,
+                                                   target_ulong ptr,
+                                                   uintptr_t retaddr)
+ {
+-    return glue(glue(cpu_lds, SUFFIX), MEMSUFFIX)(env, ptr);
++    int ret;
++    helper_retaddr = retaddr;
++    ret = glue(glue(cpu_lds, SUFFIX), MEMSUFFIX)(env, ptr);
++    helper_retaddr = 0;
++    return ret;
+ }
+ #endif
+ 
+@@ -116,7 +124,9 @@ glue(glue(glue(cpu_st, SUFFIX), MEMSUFFIX), _ra)(CPUArchState *env,
+                                                   RES_TYPE v,
+                                                   uintptr_t retaddr)
+ {
++    helper_retaddr = retaddr;
+     glue(glue(cpu_st, SUFFIX), MEMSUFFIX)(env, ptr, v);
++    helper_retaddr = 0;
+ }
+ #endif
+ 
+diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
+index a23919c3a8..d071ca4d14 100644
+--- a/accel/tcg/cputlb.c
++++ b/accel/tcg/cputlb.c
+@@ -1041,6 +1041,7 @@ static void *atomic_mmu_lookup(CPUArchState *env, target_ulong addr,
+ #define ATOMIC_NAME(X) \
+     HELPER(glue(glue(glue(atomic_ ## X, SUFFIX), END), _mmu))
+ #define ATOMIC_MMU_LOOKUP  atomic_mmu_lookup(env, addr, oi, retaddr)
++#define ATOMIC_MMU_CLEANUP do { } while (0)
+ 
+ #define DATA_SIZE 1
+ #include "atomic_template.h"
+diff --git a/accel/tcg/user-exec.c b/accel/tcg/user-exec.c
+index 492ea0826c..0324ba8ad1 100644
+--- a/accel/tcg/user-exec.c
++++ b/accel/tcg/user-exec.c
+@@ -39,6 +39,8 @@
+ #include <sys/ucontext.h>
+ #endif
+ 
++__thread uintptr_t helper_retaddr;
++
+ //#define DEBUG_SIGNAL
+ 
+ /* exit the current TB from a signal handler. The host registers are
+@@ -62,6 +64,27 @@ static inline int handle_cpu_signal(uintptr_t pc, unsigned long address,
+     CPUClass *cc;
+     int ret;
+ 
++    /* We must handle PC addresses from two different sources:
++     * a call return address and a signal frame address.
++     *
++     * Within cpu_restore_state_from_tb we assume the former and adjust
++     * the address by -GETPC_ADJ so that the address is within the call
++     * insn so that addr does not accidentally match the beginning of the
++     * next guest insn.
++     *
++     * However, when the PC comes from the signal frame, it points to
++     * the actual faulting host insn and not a call insn.  Subtracting
++     * GETPC_ADJ in that case may accidentally match the previous guest insn.
++     *
++     * So for the later case, adjust forward to compensate for what
++     * will be done later by cpu_restore_state_from_tb.
++     */
++    if (helper_retaddr) {
++        pc = helper_retaddr;
++    } else {
++        pc += GETPC_ADJ;
++    }
++
+     /* For synchronous signals we expect to be coming from the vCPU
+      * thread (so current_cpu should be valid) and either from running
+      * code or during translation which can fault as we cross pages.
+@@ -84,21 +107,24 @@ static inline int handle_cpu_signal(uintptr_t pc, unsigned long address,
+         switch (page_unprotect(h2g(address), pc)) {
+         case 0:
+             /* Fault not caused by a page marked unwritable to protect
+-             * cached translations, must be the guest binary's problem
++             * cached translations, must be the guest binary's problem.
+              */
+             break;
+         case 1:
+             /* Fault caused by protection of cached translation; TBs
+-             * invalidated, so resume execution
++             * invalidated, so resume execution.  Retain helper_retaddr
++             * for a possible second fault.
+              */
+             return 1;
+         case 2:
+             /* Fault caused by protection of cached translation, and the
+              * currently executing TB was modified and must be exited
+-             * immediately.
++             * immediately.  Clear helper_retaddr for next execution.
+              */
++            helper_retaddr = 0;
+             cpu_exit_tb_from_sighandler(cpu, old_set);
+-            g_assert_not_reached();
++            /* NORETURN */
++
+         default:
+             g_assert_not_reached();
+         }
+@@ -112,17 +138,25 @@ static inline int handle_cpu_signal(uintptr_t pc, unsigned long address,
+     /* see if it is an MMU fault */
+     g_assert(cc->handle_mmu_fault);
+     ret = cc->handle_mmu_fault(cpu, address, is_write, MMU_USER_IDX);
++
++    if (ret == 0) {
++        /* The MMU fault was handled without causing real CPU fault.
++         *  Retain helper_retaddr for a possible second fault.
++         */
++        return 1;
++    }
++
++    /* All other paths lead to cpu_exit; clear helper_retaddr
++     * for next execution.
++     */
++    helper_retaddr = 0;
++
+     if (ret < 0) {
+         return 0; /* not an MMU fault */
+     }
+-    if (ret == 0) {
+-        return 1; /* the MMU fault was handled without causing real CPU fault */
+-    }
+ 
+-    /* Now we have a real cpu fault.  Since this is the exact location of
+-     * the exception, we must undo the adjustment done by cpu_restore_state
+-     * for handling call return addresses.  */
+-    cpu_restore_state(cpu, pc + GETPC_ADJ);
++    /* Now we have a real cpu fault.  */
++    cpu_restore_state(cpu, pc);
+ 
+     sigprocmask(SIG_SETMASK, old_set, NULL);
+     cpu_loop_exit(cpu);
+@@ -585,11 +619,13 @@ static void *atomic_mmu_lookup(CPUArchState *env, target_ulong addr,
+     if (unlikely(addr & (size - 1))) {
+         cpu_loop_exit_atomic(ENV_GET_CPU(env), retaddr);
+     }
++    helper_retaddr = retaddr;
+     return g2h(addr);
+ }
+ 
+ /* Macro to call the above, with local variables from the use context.  */
+ #define ATOMIC_MMU_LOOKUP  atomic_mmu_lookup(env, addr, DATA_SIZE, GETPC())
++#define ATOMIC_MMU_CLEANUP do { helper_retaddr = 0; } while (0)
+ 
+ #define ATOMIC_NAME(X)   HELPER(glue(glue(atomic_ ## X, SUFFIX), END))
+ #define EXTRA_ARGS
+-- 
+2.13.6
