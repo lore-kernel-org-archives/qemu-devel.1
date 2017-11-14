@@ -1,16 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60573)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39339)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eESz5-0006Lj-UW
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 23:38:05 -0500
+	(envelope-from <peterx@redhat.com>) id 1eETHH-0003ow-MB
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 23:56:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eESz1-0002rC-MC
-	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 23:38:03 -0500
-From: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue, 14 Nov 2017 15:37:47 +1100
-Message-Id: <20171114043747.4810-3-david@gibson.dropbear.id.au>
-In-Reply-To: <20171114043747.4810-1-david@gibson.dropbear.id.au>
-References: <20171114043747.4810-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 2/2] xics/kvm: synchonize state before 'info pic'
+	(envelope-from <peterx@redhat.com>) id 1eETHD-0002Bi-GS
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 23:56:51 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44102)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eETHD-0002Au-7j
+	for qemu-devel@nongnu.org; Mon, 13 Nov 2017 23:56:47 -0500
+Date: Tue, 14 Nov 2017 12:56:42 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20171114045642.GB6821@xz-mi>
+References: <20171113183517.890-1-danielhb@linux.vnet.ibm.com>
+	<20171113183517.890-2-danielhb@linux.vnet.ibm.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20171113183517.890-2-danielhb@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v2 1/1] migration/ram.c: do not set
+ 'postcopy_running' in POSTCOPY_INCOMING_END
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,181 +28,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: agraf@suse.de, mdroth@linux.vnet.ibm.com, groug@kaod.org, thuth@redhat.com, lvivier@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, dgilbert@redhat.com, quintela@redhat.com
 
-From: Greg Kurz <groug@kaod.org>
+On Mon, Nov 13, 2017 at 04:35:17PM -0200, Daniel Henrique Barboza wrote:
+> When migrating a VM with 'migrate_set_capability postcopy-ram on'
+> a postcopy_state is set during the process, ending up with the
+> state POSTCOPY_INCOMING_END when the migration is over. This
+> postcopy_state is taken into account inside ram_load to check
+> how it will load the memory pages. This same ram_load is called when
+> in a loadvm command.
+> 
+> Inside ram_load, the logic to see if we're at postcopy_running state
+> is:
+> 
+> postcopy_running = postcopy_state_get() >= POSTCOPY_INCOMING_LISTENING
+> 
+> postcopy_state_get() returns this enum type:
+> 
+> typedef enum {
+>     POSTCOPY_INCOMING_NONE = 0,
+>     POSTCOPY_INCOMING_ADVISE,
+>     POSTCOPY_INCOMING_DISCARD,
+>     POSTCOPY_INCOMING_LISTENING,
+>     POSTCOPY_INCOMING_RUNNING,
+>     POSTCOPY_INCOMING_END
+> } PostcopyState;
+> 
+> In the case where ram_load is executed and postcopy_state is
+> POSTCOPY_INCOMING_END, postcopy_running will be set to 'true' and
+> ram_load will behave like a postcopy is in progress. This scenario isn't
+> achievable in a migration but it is reproducible when executing
+> savevm/loadvm after migrating with 'postcopy-ram on', causing loadvm
+> to fail with Error -22:
+> 
+> Source:
+> 
+> (qemu) migrate_set_capability postcopy-ram on
+> (qemu) migrate tcp:127.0.0.1:4444
+> 
+> Dest:
+> 
+> (qemu) migrate_set_capability postcopy-ram on
+> (qemu)
+> ubuntu1704-intel login:
+> Ubuntu 17.04 ubuntu1704-intel ttyS0
+> 
+> ubuntu1704-intel login: (qemu)
+> (qemu) savevm test1
+> (qemu) loadvm test1
+> Unknown combination of migration flags: 0x4 (postcopy mode)
+> error while loading state for instance 0x0 of device 'ram'
+> Error -22 while loading VM state
+> (qemu)
+> 
+> This patch fixes this problem by changing the existing logic for
+> postcopy_advised and postcopy_running in ram_load, making them
+> 'false' if we're at POSTCOPY_INCOMING_END state.
+> 
+> Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+> ---
+>  migration/ram.c | 16 ++++++++++++++--
+>  1 file changed, 14 insertions(+), 2 deletions(-)
+> 
+> diff --git a/migration/ram.c b/migration/ram.c
+> index 8620aa400a..021d583b9b 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -2798,6 +2798,18 @@ static int ram_load_postcopy(QEMUFile *f)
+>      return ret;
+>  }
+>  
+> +static bool postcopy_is_advised(void)
+> +{
+> +    PostcopyState ps = postcopy_state_get();
+> +    return ps >= POSTCOPY_INCOMING_ADVISE && ps < POSTCOPY_INCOMING_END;
+> +}
+> +
+> +static bool postcopy_is_running(void)
+> +{
+> +    PostcopyState ps = postcopy_state_get();
+> +    return ps >= POSTCOPY_INCOMING_LISTENING && ps < POSTCOPY_INCOMING_END;
+> +}
+> +
 
-When using the emulated XICS, the 'info pic' monitor command shows:
+If there is a new version, maybe we can put these into
+postcopy-ram.c.  But may not worth a repost since after all we have
+postcopy helpers in ram.c already.
 
-CPU 0 XIRR=ff000000 ((nil)) PP=ff MFRR=ff
-ICS 1000..13ff 0x10040060340
-  1000 MSI 05 00
-  1001 MSI 05 00
-  1002 MSI 05 00
-  1003 MSI ff 00
-  1004 LSI ff 00
-  1005 LSI ff 00
-  1006 LSI ff 00
-  1007 LSI ff 00
-  1008 MSI 05 00
-  1009 MSI 05 00
-  100a MSI 05 00
-  100b MSI 05 00
-  100c MSI 05 00
+Reviewed-by: Peter Xu <peterx@redhat.com>
 
-but when using the in-kernel XICS with the very same guest, we get:
+>  static int ram_load(QEMUFile *f, void *opaque, int version_id)
+>  {
+>      int flags = 0, ret = 0, invalid_flags = 0;
+> @@ -2807,9 +2819,9 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
+>       * If system is running in postcopy mode, page inserts to host memory must
+>       * be atomic
+>       */
+> -    bool postcopy_running = postcopy_state_get() >= POSTCOPY_INCOMING_LISTENING;
+> +    bool postcopy_running = postcopy_is_running();
+>      /* ADVISE is earlier, it shows the source has the postcopy capability on */
+> -    bool postcopy_advised = postcopy_state_get() >= POSTCOPY_INCOMING_ADVISE;
+> +    bool postcopy_advised = postcopy_is_advised();
+>  
+>      seq_iter++;
+>  
+> -- 
+> 2.13.6
+> 
 
-CPU 0 XIRR=00000000 ((nil)) PP=ff MFRR=ff
-ICS 1000..13ff 0x10032e00340
-  1000 MSI ff 00
-  1001 MSI ff 00
-  1002 MSI ff 00
-  1003 MSI ff 00
-  1004 LSI ff 00
-  1005 LSI ff 00
-  1006 LSI ff 00
-  1007 LSI ff 00
-  1008 MSI ff 00
-  1009 MSI ff 00
-  100a MSI ff 00
-  100b MSI ff 00
-  100c MSI ff 00
-
-ie, all irqs are masked and XIRR is null, while we should get the
-same output as with the emulated XICS.
-
-If the guest is then migrated, 'info pic' shows the expected values
-on both source and destination.
-
-The problem is that QEMU doesn't synchronize with KVM before printing
-the XICS state. Migration happens to fix the output because it enforces
-synchronization with KVM.
-
-To fix the invalid output of 'info pic', this patch introduces a new
-synchronize_state operation for both ICPStateClass and ICSStateClass.
-The ICP operation relies on run_on_cpu() in order to kick the vCPU
-and avoid sleeping on KVM_GET_ONE_REG.
-
-Signed-off-by: Greg Kurz <groug@kaod.org>
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
----
- hw/intc/xics.c        | 11 +++++++++++
- hw/intc/xics_kvm.c    | 19 +++++++++++++++++++
- include/hw/ppc/xics.h |  2 ++
- 3 files changed, 32 insertions(+)
-
-diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-index cc9816e7f2..a1cc0e420c 100644
---- a/hw/intc/xics.c
-+++ b/hw/intc/xics.c
-@@ -40,11 +40,17 @@
- 
- void icp_pic_print_info(ICPState *icp, Monitor *mon)
- {
-+    ICPStateClass *icpc = ICP_GET_CLASS(icp);
-     int cpu_index = icp->cs ? icp->cs->cpu_index : -1;
- 
-     if (!icp->output) {
-         return;
-     }
-+
-+    if (icpc->synchronize_state) {
-+        icpc->synchronize_state(icp);
-+    }
-+
-     monitor_printf(mon, "CPU %d XIRR=%08x (%p) PP=%02x MFRR=%02x\n",
-                    cpu_index, icp->xirr, icp->xirr_owner,
-                    icp->pending_priority, icp->mfrr);
-@@ -52,6 +58,7 @@ void icp_pic_print_info(ICPState *icp, Monitor *mon)
- 
- void ics_pic_print_info(ICSState *ics, Monitor *mon)
- {
-+    ICSStateClass *icsc = ICS_BASE_GET_CLASS(ics);
-     uint32_t i;
- 
-     monitor_printf(mon, "ICS %4x..%4x %p\n",
-@@ -61,6 +68,10 @@ void ics_pic_print_info(ICSState *ics, Monitor *mon)
-         return;
-     }
- 
-+    if (icsc->synchronize_state) {
-+        icsc->synchronize_state(ics);
-+    }
-+
-     for (i = 0; i < ics->nr_irqs; i++) {
-         ICSIRQState *irq = ics->irqs + i;
- 
-diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
-index 3091ad3ac2..89fb20e2c5 100644
---- a/hw/intc/xics_kvm.c
-+++ b/hw/intc/xics_kvm.c
-@@ -81,6 +81,18 @@ static void icp_get_kvm_state(ICPState *icp)
-         & KVM_REG_PPC_ICP_PPRI_MASK;
- }
- 
-+static void do_icp_synchronize_state(CPUState *cpu, run_on_cpu_data arg)
-+{
-+    icp_get_kvm_state(arg.host_ptr);
-+}
-+
-+static void icp_synchronize_state(ICPState *icp)
-+{
-+    if (icp->cs) {
-+        run_on_cpu(icp->cs, do_icp_synchronize_state, RUN_ON_CPU_HOST_PTR(icp));
-+    }
-+}
-+
- static int icp_set_kvm_state(ICPState *icp, int version_id)
- {
-     uint64_t state;
-@@ -156,6 +168,7 @@ static void icp_kvm_class_init(ObjectClass *klass, void *data)
-     icpc->post_load = icp_set_kvm_state;
-     icpc->realize = icp_kvm_realize;
-     icpc->reset = icp_kvm_reset;
-+    icpc->synchronize_state = icp_synchronize_state;
- }
- 
- static const TypeInfo icp_kvm_info = {
-@@ -234,6 +247,11 @@ static void ics_get_kvm_state(ICSState *ics)
-     }
- }
- 
-+static void ics_synchronize_state(ICSState *ics)
-+{
-+    ics_get_kvm_state(ics);
-+}
-+
- static int ics_set_kvm_state(ICSState *ics, int version_id)
- {
-     uint64_t state;
-@@ -347,6 +365,7 @@ static void ics_kvm_class_init(ObjectClass *klass, void *data)
-     icsc->realize = ics_kvm_realize;
-     icsc->pre_save = ics_get_kvm_state;
-     icsc->post_load = ics_set_kvm_state;
-+    icsc->synchronize_state = ics_synchronize_state;
- }
- 
- static const TypeInfo ics_kvm_info = {
-diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-index 28d248abad..2df99be111 100644
---- a/include/hw/ppc/xics.h
-+++ b/include/hw/ppc/xics.h
-@@ -69,6 +69,7 @@ struct ICPStateClass {
-     void (*pre_save)(ICPState *icp);
-     int (*post_load)(ICPState *icp, int version_id);
-     void (*reset)(ICPState *icp);
-+    void (*synchronize_state)(ICPState *icp);
- };
- 
- struct ICPState {
-@@ -119,6 +120,7 @@ struct ICSStateClass {
-     void (*reject)(ICSState *s, uint32_t irq);
-     void (*resend)(ICSState *s);
-     void (*eoi)(ICSState *s, uint32_t irq);
-+    void (*synchronize_state)(ICSState *s);
- };
- 
- struct ICSState {
 -- 
-2.13.6
+Peter Xu
