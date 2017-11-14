@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43835)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44757)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1eEZsg-0001Eg-J1
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 06:59:55 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eEZuc-0002GU-2v
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 07:01:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1eEZsd-00070J-HJ
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 06:59:54 -0500
-Received: from mga07.intel.com ([134.134.136.100]:42017)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1eEZsd-0006vJ-6l
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 06:59:51 -0500
-Message-ID: <5A0ADB3B.4070407@intel.com>
-Date: Tue, 14 Nov 2017 20:02:03 +0800
-From: Wei Wang <wei.w.wang@intel.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1eEZuU-0000Ai-Cy
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 07:01:54 -0500
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:54963)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eEZuU-00009R-5N
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 07:01:46 -0500
+Received: by mail-wm0-x242.google.com with SMTP id r68so21496123wmr.3
+	for <qemu-devel@nongnu.org>; Tue, 14 Nov 2017 04:01:45 -0800 (PST)
 MIME-Version: 1.0
-References: <1509696786-1597-1-git-send-email-wei.w.wang@intel.com>
-	<1509696786-1597-7-git-send-email-wei.w.wang@intel.com>
-	<5A097548.8000608@intel.com>
-	<20171113192309-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20171113192309-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v17 6/6] virtio-balloon:
- VIRTIO_BALLOON_F_FREE_PAGE_VQ
+In-Reply-To: <20171114094203.28030-1-richard.henderson@linaro.org>
+References: <20171114094203.28030-1-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 14 Nov 2017 12:01:24 +0000
+Message-ID: <CAFEAcA-LhPR25rb6YDbgmE141woAiHLUcWRCF11ke+Eue1Z7vw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] tcg: Record code_gen_buffer address for
+ user-only memory helpers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,80 +29,150 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mhocko@kernel.org, akpm@linux-foundation.org, mawilcox@microsoft.com, david@redhat.com, penguin-kernel@I-love.SAKURA.ne.jp, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, willy@infradead.org, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu@aliyun.com, Nitesh Narayan Lal <nilal@redhat.com>, Rik van Riel <riel@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 11/14/2017 01:32 AM, Michael S. Tsirkin wrote:
->> - guest2host_cmd: written by the guest to ACK to the host about the
->> commands that have been received. The host will clear the corresponding
->> bits on the host2guest_cmd register. The guest also uses this register
->> to send commands to the host (e.g. when finish free page reporting).
-> I am not sure what is the role of guest2host_cmd. Reporting of
-> the correct cmd id seems sufficient indication that guest
-> received the start command. Not getting any more seems sufficient
-> to detect stop.
+On 14 November 2017 at 09:42, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> When we handle a signal from a fault within a user-only memory helper,
+> we cannot cpu_restore_state with the PC found within the signal frame.
+> Use a TLS variable, helper_retaddr, to record the unwind start point
+> to find the faulting guest insn.
 >
+> Reported-by: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>
+> Tested only with a silly test case --
+>
+> int main()
+> {
+>   int new = 1, old = 0;
+>   __atomic_compare_exchange((int *)0, &old, &new, 0, 0, 0);
+>   return old;
+> }
+>
+> which even before the patch does not fail in the way Peter describes.
 
-I think the issue is when the host is waiting for the guest to report 
-pages, it does not know whether the guest is going to report more or the 
-report is done already. That's why we need a way to let the guest tell 
-the host "the report is done, don't wait for more", then the host 
-continues to the next step - sending the non-free pages to the 
-destination. The following method is a conclusion of other comments, 
-with some new thought. Please have a check if it is good.
+Probably because the 32-bit atomic compare gets done inline, rather than
+via a helper. Here's a test case which does fail:
 
-Two new configuration registers in total:
-- cmd_reg: the command register, combined from the previous host2guest 
-and guest2host. I think we can use the same register for host requesting 
-and guest ACKing, since the guest writing will trap to QEMU, that is, 
-all the writes to the register are performed in QEMU, and we can keep 
-things work in a correct way there.
-- cmd_id_reg: the sequence id of the free page report command.
+===begin===
+/* segv on atomic access: check we report correct PC
+ *
+ * Build with:
+ *  aarch64-linux-gnu-gcc -g -Wall -static -o segv-atomic segv-atomic.c
+ *
+ * Copyright (c) 2017 Linaro Ltd
+ * License: 2-clause BSD.
+ */
 
--- free page report:
-     - host requests the guest to start reporting by "cmd_reg | 
-REPORT_START";
-     - guest ACKs to the host about receiving the start reporting 
-request by "cmd_reg | REPORT_START", host will clear the flag bit once 
-receiving the ACK.
-     - host requests the guest to stop reporting by "cmd_reg | REPORT_STOP";
-     - guest ACKs to the host about receiving the stop reporting request 
-by "cmd_reg | REPORT_STOP", host will clear the flag once receiving the ACK.
-     - guest tells the host about the start of the reporting by writing 
-"cmd id" into an outbuf, which is added to the free page vq.
-     - guest tells the host about the end of the reporting by writing 
-"0" into an outbuf, which is added to the free page vq. (we reserve 
-"id=0" as the stop sign)
+#include <stdlib.h>
+#include <signal.h>
+#include <sys/mman.h>
+#include <stdio.h>
+#include <string.h>
+#include <sys/ucontext.h>
+#include <stdint.h>
+#include <inttypes.h>
 
--- ballooning:
-     - host requests the guest to start ballooning by "cmd_reg | 
-BALLOONING";
-     - guest ACKs to the host about receiving the request by "cmd_reg | 
-BALLOONING", host will clear the flag once receiving the ACK.
+static int sigcount = 0;
+static unsigned char *mem = 0;
 
+void sighandler(int s, siginfo_t *info, void *puc)
+{
+    struct ucontext *uc = puc;
+    uint64_t pc = uc->uc_mcontext.pc;
+    uint64_t faultaddr = uc->uc_mcontext.fault_address;
 
-Some more explanations:
--- Why not let the host request the guest to start the free page 
-reporting simply by writing a new cmd id to the cmd_id_reg?
-The configuration interrupt is shared among all the features - 
-ballooning, free page reporting, and future feature extensions which 
-need host-to-guest requests. Some features may need to add other feature 
-specific configuration registers, like free page reporting need the 
-cmd_id_reg, which is not used by ballooning. The rule here is that the 
-feature specific registers are read only when that feature is requested 
-via the cmd_reg. For example, the cmd_id_reg is read only when "cmd_reg 
-| REPORT_START" is true. Otherwise, when the driver receives a 
-configuration interrupt, it has to read both cmd_reg and cmd_id 
-registers to know what are requested by the host - think about the case 
-that ballooning requests are sent frequently while free page reporting 
-isn't requested, the guest has to read the cmd_id register every time a 
-ballooning request is sent by the host, which is not necessary. If 
-future new features follow this style, there will be more unnecessary 
-VMexits to read the unused feature specific registers.
-So I think it is good to have a central control of the feature request 
-via only one cmd register - reading that one is enough to know what is 
-requested by the host.
+    printf("in sighandler, pc = %" PRIx64 " faultaddr %" PRIx64 "\n",
+           pc, faultaddr);
+    sigcount++;
+    if (sigcount == 2) {
+       printf("too many signals\n");
+       exit(1);
+    }
+    /* Advance past the insn */
+    uc->uc_mcontext.pc += 4;
+}
 
+int main(void)
+{
+    struct sigaction sa;
+    int x;
 
-Best,
-Wei
+    mem = mmap(0, 4096, PROT_READ | PROT_WRITE,
+               MAP_PRIVATE|MAP_ANONYMOUS, -1, 0);
+    printf("memory at %p\n", mem);
+
+    memset(&sa, 0, sizeof(sa));
+    sa.sa_sigaction = sighandler;
+    sa.sa_flags = SA_SIGINFO;
+    sigaction(SIGSEGV, &sa, NULL);
+
+    memset(mem, 42, 4096);
+
+    mprotect(mem, 4096, PROT_READ);
+
+    /* This should fault the first time around, and then
+     * the segv handler will advance the PC by 4 to skip the insn.
+     * We surround it with some movs so we know the insn
+     * is not at the start of a TB and so we can tell if we
+     * correctly skipped it.
+     */
+    printf("Trying atomic stxp...\n");
+    __asm__ volatile("mov %[x], #1\n"
+                     "ldxp x4, x3, [%[addr]]\n"
+                     "mov %[x], #2\n"
+                     "stxp w5, x4, x3, [%[addr]]\n"
+                     "mov %[x], #3\n"
+                     : [x] "=&r" (x)
+                     : [addr] "r" (mem)
+                     : "w5", "x4", "x3", "memory");
+
+    printf("...done, with x %d\n", x);
+    return 0;
+}
+===endit===
+
+On real hardware:
+pm215@gcc115:~$ ./segv-atomic
+memory at 0x7f99810000
+Trying atomic stlxr...
+in sighandler, pc = 4007f0 faultaddr 7f99810000
+...done, with x 3
+
+On QEMU linux-user:
+$ ~/linaro/qemu-from-laptop/qemu/build/all-linux-static/aarch64-linux-user/qemu-aarch64
+-d in_asm,out_asm,cpu,exec,int -D /tmp/atomic.log ./segv-atomic
+memory at 0x4000801000
+Trying atomic stlxr...
+in sighandler, pc = 4007d8 faultaddr 4000801000
+in sighandler, pc = 4007e0 faultaddr a32
+too many signals
+
+and the log file shows that the relevant TB is:
+
+0x004007d8:  d0000460  adrp     x0, #0x48e000
+0x004007dc:  9128c000  add      x0, x0, #0xa30
+0x004007e0:  f9400001  ldr      x1, [x0]
+0x004007e4:  d2800020  movz     x0, #0x1
+0x004007e8:  c87f0c24  ldxp     x4, x3, [x1]
+0x004007ec:  d2800040  movz     x0, #0x2
+0x004007f0:  c8250c24  stxp     w5, x4, x3, [x1]
+0x004007f4:  d2800060  movz     x0, #0x3
+0x004007f8:  b9001fa0  str      w0, [x29, #0x1c]
+0x004007fc:  f00002e0  adrp     x0, #0x45f000
+0x00400800:  91044000  add      x0, x0, #0x110
+0x00400804:  b9401fa1  ldr      w1, [x29, #0x1c]
+0x00400808:  940018b6  bl       #0x406ae0
+
+so the stxp faults but the PC reported to the handler is the start
+of the TB, at which point it goes off into the weeds because we
+restart in the wrong place.
+
+Unfortunately it still fails even with your patch...haven't
+investigated why yet.
+
+thanks
+-- PMM
