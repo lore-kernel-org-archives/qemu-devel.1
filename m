@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50901)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52098)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eEVnF-0006jU-Gw
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 02:38:02 -0500
+	(envelope-from <thuth@redhat.com>) id 1eEVq0-0007VZ-BV
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 02:40:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eEVnC-0007qZ-D5
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 02:38:01 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51438)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eEVnC-0007pt-7K
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 02:37:58 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20171110173421.17904-1-lprosek@redhat.com>
-	<20171110173421.17904-4-lprosek@redhat.com>
-	<878tfaytq9.fsf@dusky.pond.sub.org>
-	<546207b7d08628804461a97728ad1c06@hostfission.com>
-Date: Tue, 14 Nov 2017 08:37:53 +0100
-In-Reply-To: <546207b7d08628804461a97728ad1c06@hostfission.com> (geoff's
-	message of "Tue, 14 Nov 2017 04:47:23 +1100")
-Message-ID: <871sl1wbse.fsf@dusky.pond.sub.org>
+	(envelope-from <thuth@redhat.com>) id 1eEVpx-00028A-3W
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 02:40:52 -0500
+References: <cover.1510612380.git.alistair.francis@xilinx.com>
+	<d297d74fd53f91e25e4ffb980ea40d4032beaf0b.1510612380.git.alistair.francis@xilinx.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <7a185bec-43b3-7fcd-d419-9af143b2e3f9@redhat.com>
+Date: Tue, 14 Nov 2017 08:40:43 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 3/3] ivshmem: Improve MSI irqfd error
- handling
+In-Reply-To: <d297d74fd53f91e25e4ffb980ea40d4032beaf0b.1510612380.git.alistair.francis@xilinx.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v5 29/29] target: Use qemu_log() instead of
+ fprintf(stderr, ...)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,24 +25,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: geoff--- via Qemu-devel <qemu-devel@nongnu.org>
-Cc: geoff@hostfission.com, pbonzini@redhat.com, Ladi Prosek <lprosek@redhat.com>, marcandre.lureau@redhat.com
+To: Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+Cc: alistair23@gmail.com, armbru@redhat.com, qemu-ppc@nongnu.org
 
-geoff--- via Qemu-devel <qemu-devel@nongnu.org> writes:
+On 13.11.2017 23:36, Alistair Francis wrote:
+> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+[...]
+> diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+> index 998fbed848..8eafe30624 100644
+> --- a/target/ppc/translate.c
+> +++ b/target/ppc/translate.c
+> @@ -3945,11 +3945,11 @@ static inline void gen_op_mfspr(DisasContext *c=
+tx)
+>               * allowing userland application to read the PVR
+>               */
+>              if (sprn !=3D SPR_PVR) {
+> -                fprintf(stderr, "Trying to read privileged spr %d (0x%=
+03x) at "
+> -                        TARGET_FMT_lx "\n", sprn, sprn, ctx->nip - 4);
+> +                qemu_log("Trying to read privileged spr %d (0x%03x) at=
+ "
+> +                         TARGET_FMT_lx "\n", sprn, sprn, ctx->nip - 4)=
+;
+>                  if (qemu_log_separate()) {
+>                      qemu_log("Trying to read privileged spr %d (0x%03x=
+) at "
+> -                             TARGET_FMT_lx "\n", sprn, sprn, ctx->nip =
+- 4);
+> +                              TARGET_FMT_lx "\n", sprn, sprn, ctx->nip=
+ - 4);
 
-> On 2017-11-14 04:27, Markus Armbruster wrote:
->> Ladi Prosek <lprosek@redhat.com> writes:
->>
->>> Adds a rollback path to ivshmem_enable_irqfd() and fixes
->>> ivshmem_disable_irqfd() to bail if irqfd has not been enabled.
->>>
->>> Signed-off-by: Ladi Prosek <lprosek@redhat.com>
->>
->> Is this a theoretical bug, or can you trigger it?
->
-> It is reproducible, I can trigger it by simply unloading the windows
-> driver and then attempting to re-load it.
+Unnecessary and wrong white space change. Please fix that line.
 
-Adding that to the commit message would be nice.  You then can add my
+>                  }
+>              }
+>              gen_priv_exception(ctx, POWERPC_EXCP_PRIV_REG);
+> @@ -3962,8 +3962,8 @@ static inline void gen_op_mfspr(DisasContext *ctx=
+)
+>              return;
+>          }
+>          /* Not defined */
+> -        fprintf(stderr, "Trying to read invalid spr %d (0x%03x) at "
+> -                TARGET_FMT_lx "\n", sprn, sprn, ctx->nip - 4);
+> +        qemu_log("Trying to read invalid spr %d (0x%03x) at "
+> +                 TARGET_FMT_lx "\n", sprn, sprn, ctx->nip - 4);
+>          if (qemu_log_separate()) {
+>              qemu_log("Trying to read invalid spr %d (0x%03x) at "
+>                       TARGET_FMT_lx "\n", sprn, sprn, ctx->nip - 4);
 
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Now that looks wrong, too: If qemu_log_separate() returns true, the same
+message is printed out again?
+
+> @@ -4108,8 +4108,8 @@ static void gen_mtspr(DisasContext *ctx)
+>              (*write_cb)(ctx, sprn, rS(ctx->opcode));
+>          } else {
+>              /* Privilege exception */
+> -            fprintf(stderr, "Trying to write privileged spr %d (0x%03x=
+) at "
+> -                    TARGET_FMT_lx "\n", sprn, sprn, ctx->nip - 4);
+> +            qemu_log("Trying to write privileged spr %d (0x%03x) at "
+> +                     TARGET_FMT_lx "\n", sprn, sprn, ctx->nip - 4);
+>              if (qemu_log_separate()) {
+>                  qemu_log("Trying to write privileged spr %d (0x%03x) a=
+t "
+>                           TARGET_FMT_lx "\n", sprn, sprn, ctx->nip - 4)=
+;
+
+dito
+
+> @@ -4129,8 +4129,8 @@ static void gen_mtspr(DisasContext *ctx)
+>              qemu_log("Trying to write invalid spr %d (0x%03x) at "
+>                       TARGET_FMT_lx "\n", sprn, sprn, ctx->nip - 4);
+>          }
+> -        fprintf(stderr, "Trying to write invalid spr %d (0x%03x) at "
+> -                TARGET_FMT_lx "\n", sprn, sprn, ctx->nip - 4);
+> +        qemu_log("Trying to write invalid spr %d (0x%03x) at "
+> +                 TARGET_FMT_lx "\n", sprn, sprn, ctx->nip - 4);
+
+dito
+
+> diff --git a/target/sh4/translate.c b/target/sh4/translate.c
+> index 703020fe87..32b72b4701 100644
+> --- a/target/sh4/translate.c
+> +++ b/target/sh4/translate.c
+> @@ -427,7 +427,7 @@ static void _decode_opc(DisasContext * ctx)
+>  	}
+> =20
+>  #if 0
+> -    fprintf(stderr, "Translating opcode 0x%04x\n", ctx->opcode);
+> +    qemu_log("Translating opcode 0x%04x\n", ctx->opcode);
+
+That looks like a debug statement for the develepers ... why should that
+be a qemu_log() ?
+
+>  #endif
+> =20
+>      switch (ctx->opcode) {
+> @@ -1788,7 +1788,7 @@ static void _decode_opc(DisasContext * ctx)
+>          break;
+>      }
+>  #if 0
+> -    fprintf(stderr, "unknown instruction 0x%04x at pc 0x%08x\n",
+> +    qemu_log_mask(LOG_UNIMP, "unknown instruction 0x%04x at pc 0x%08x\=
+n",
+>  	    ctx->opcode, ctx->pc);
+
+Since this is now only logged conditionally if UNIMP logging is enabled,
+I think you should remove the "#if 0" in front of it now.
+
+>      fflush(stderr);
+
+Since you don't print to stderr anymore, this fflush() also does not
+make sense anymore.
+
+>  #endif
+
+ Thomas
