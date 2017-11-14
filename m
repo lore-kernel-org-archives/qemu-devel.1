@@ -1,15 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42448)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47207)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1eEghB-0007hw-I9
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 14:16:30 -0500
+	(envelope-from <eblake@redhat.com>) id 1eEgw6-0003fD-1X
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 14:31:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1eEghA-0001Ov-JM
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 14:16:29 -0500
-From: Kashyap Chamarthy <kchamart@redhat.com>
-Date: Tue, 14 Nov 2017 20:16:04 +0100
-Message-Id: <20171114191605.22349-1-kchamart@redhat.com>
-Subject: [Qemu-devel] [PATCH] qapi: block-core: Clarify events emitted by
- 'block-job-cancel'
+	(envelope-from <eblake@redhat.com>) id 1eEgw4-0008BR-TU
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 14:31:54 -0500
+References: <20171114180128.17076-1-mreitz@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <fd1e94a6-66ec-5a31-5956-98af317e9f51@redhat.com>
+Date: Tue, 14 Nov 2017 13:31:41 -0600
+MIME-Version: 1.0
+In-Reply-To: <20171114180128.17076-1-mreitz@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="baSiw7KTOa5ed61s62fqll5ULixt4NFvw"
+Subject: Re: [Qemu-devel] [PATCH for-2.11? v7 0/6] block: Don't compare
+ strings in bdrv_reopen_prepare()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,71 +24,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, armbru@redhat.com, eblake@redhat.com, Kashyap Chamarthy <kchamart@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-When you cancel an in-progress live block operation with QMP
-`block-job-cancel`, it emits the event: BLOCK_JOB_CANCELLED.  However,
-when `block-job-cancel` is issued after `drive-mirror` has indicated (by
-emitting the event BLOCK_JOB_READY) that the source and destination
-remain synchronized:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--baSiw7KTOa5ed61s62fqll5ULixt4NFvw
+From: Eric Blake <eblake@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
+ Kevin Wolf <kwolf@redhat.com>
+Message-ID: <fd1e94a6-66ec-5a31-5956-98af317e9f51@redhat.com>
+Subject: Re: [PATCH for-2.11? v7 0/6] block: Don't compare strings in
+ bdrv_reopen_prepare()
+References: <20171114180128.17076-1-mreitz@redhat.com>
+In-Reply-To: <20171114180128.17076-1-mreitz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-    [...] # Snip `drive-mirror` invocation & outputs
-    {
-      "execute":"block-job-cancel",
-      "arguments":{
-        "device":"virtio0"
-      }
-    }
+On 11/14/2017 12:01 PM, Max Reitz wrote:
+> bdrv_reopen_prepare() assumes that all BDS options are strings, which i=
+s
+> not necessarily correct. This series introduces a new qobject_is_equal(=
+)
+> function which can be used to test whether any options have changed,
+> independently of their type.
+>=20
+>=20
+> v7:
+> - Patch 6: Fix a clang warning:
+>     tests/check-qobject.c:39:24: error: passing an object that undergoe=
+s
+>                                  default argument promotion to
+>                                  'va_start' has undefined behavior
+>   TIL: You cannot use va_start(ap, foo) if @foo is a bool.  An int
+>        works, however.
 
-    {"return": {}}
+I knew that va_arg(ap, bool) was undefined behavior, but didn't realize
+va_start(ap, bool_param) was also undefined.  But sure enough, reading
+C99 7.15.1.4:
 
-It (`block-job-cancel`) will counterintuitively emit the event
-'BLOCK_JOB_COMPLETED':
+4 The parameter parmN is the identifier of the rightmost parameter in
+the variable
+parameter list in the function definition (the one just before the ,
+=2E..). If the parameter
+parmN is declared with the register storage class, with a function or
+array type, or
+with a type that is not compatible with the type that results after
+application of the default
+argument promotions, the behavior is undefined.
 
-    {
-      "timestamp":{
-        "seconds":1510678024,
-        "microseconds":526240
-      },
-      "event":"BLOCK_JOB_COMPLETED",
-      "data":{
-        "device":"virtio0",
-        "len":41126400,
-        "offset":41126400,
-        "speed":0,
-        "type":"mirror"
-      }
-    }
+>        Feel free to explain the long version to me, because I don't
+>        think I have fully understood the issue, but it's something like=
 
-But this is expected behaviour, where the _COMPLETED event indicates
-that synchronization has successfully ended (and the destination has a
-point-in-time copy, which is at the time of cancel).
+>        "Using bools for variadic arguments results in their promotion t=
+o
+>        an int, but you have to use a type that is promoted to itself
+>        (like int)."
 
-So add a small note to this effect.  (Thanks: Max Reitz for reminding
-me of this on IRC.)
----
- qapi/block-core.json | 8 ++++++++
- 1 file changed, 8 insertions(+)
+So it must be that C99 is trying to cater to platforms that have special
+ABI for passing multiple bool on the stack, by stating that the moment
+argument promotion is in effect, va_list adjacent to a bool may cause
+problems with that special packing in the ABI.  Weird.
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index ab96e348e6317bb42769ae20f4a4519bac02e93a..e43a7eaeb22b92c613edcb4219ed4f0e928577b6 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -2065,6 +2065,14 @@
- # BLOCK_JOB_CANCELLED event.  Before that happens the job is still visible when
- # enumerated using query-block-jobs.
- #
-+# Note: The 'block-job-cancel' command will emit the event BLOCK_JOB_COMPLETED
-+# if you issue it ('block-job-cancel') after 'drive-mirror' has
-+# indicated (by emitting the event BLOCK_JOB_READY) that the source and
-+# destination remain synchronized.  In this case, the BLOCK_JOB_COMPLETED event
-+# indicates that synchronization (from `drive-mirror`) has successfully ended
-+# and the destination now has a point-in-time copy, which is at the time of
-+# cancel.
-+#
- # For streaming, the image file retains its backing file unless the streaming
- # operation happens to complete just as it is being cancelled.  A new streaming
- # operation can be started at a later time to finish copying all data from the
--- 
-2.9.5
+>=20
+>=20
+> git-backport-diff against v6:
+>=20
+> Key:
+> [----] : patches are identical
+> [####] : number of functional differences between upstream/downstream p=
+atch
+> [down] : patch is downstream-only
+> The flags [FC] indicate (F)unctional and (C)ontextual differences, resp=
+ectively
+>=20
+> 001/6:[----] [--] 'qapi/qnull: Add own header'
+> 002/6:[----] [--] 'qapi/qlist: Add qlist_append_null() macro'
+> 003/6:[----] [--] 'qapi: Add qobject_is_equal()'
+> 004/6:[----] [--] 'block: qobject_is_equal() in bdrv_reopen_prepare()'
+> 005/6:[----] [--] 'iotests: Add test for non-string option reopening'
+> 006/6:[0011] [FC] 'tests: Add check-qobject for equality tests'
+
+I still think this is 2.11 material.  Once you fix the typo I point out
+separately on 6/6, the changes since v6 look reasonable, so series:
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--baSiw7KTOa5ed61s62fqll5ULixt4NFvw
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloLRJ0ACgkQp6FrSiUn
+Q2piewgAqVmvtS5mAZODe/7v57WnC/UADL118D+XZShIgGouN6GGAlsGsLaLDNkr
+jVeQveuAcPnhwuW5JN0rJZbSEArFV35aD4A/2nubJYO+oEiZx9qMHyXZCOtBkige
+VfUZd13EkD8x2kJez3/r5U4U9oSIe+sTI5K7k05FIvndB7YcILNfi70Oev2A8S2D
+Vj3lQqlokaR/ZkTCy3oGcWKwXp6ZsaQQKNxxOQ4joXNxS69fAXR1jb0xqUlhKnp+
+f7k/XQei/vt3fAmAp9LfmRPGlKA4Yq431egZ0TbskTLA3Cpt06435mR6JuyUdiLR
+iltUGw+88Qbkumj5cdoEYdy2Ygmt3Q==
+=SJf2
+-----END PGP SIGNATURE-----
+
+--baSiw7KTOa5ed61s62fqll5ULixt4NFvw--
