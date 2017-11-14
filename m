@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52385)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54134)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eEhAm-0000v6-Gd
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 14:47:05 -0500
+	(envelope-from <eblake@redhat.com>) id 1eEhFI-0002M5-HV
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 14:51:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eEhAi-00077Y-FC
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 14:47:04 -0500
-Resent-Message-Id: <E1eEhAi-00077Y-FC@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21427)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1eEhAi-00077G-7U
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 14:47:00 -0500
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <151066079130.402.17584657431777861629@bafd83ae6430>
-In-Reply-To: <1510658424-16527-1-git-send-email-thuth@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1eEhFH-00029V-Lc
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 14:51:44 -0500
+References: <20171114184127.24238-1-mreitz@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <1e0210ef-5720-d9b8-d7e2-6877fc0ce320@redhat.com>
+Date: Tue, 14 Nov 2017 13:51:36 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 14 Nov 2017 03:59:52 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v2 for-2.11] hw/net/vmxnet3: Fix code to
- work on big endian hosts, too
+In-Reply-To: <20171114184127.24238-1-mreitz@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="SoXMHJdLoNkxUCtu9ULIVmr3AHh9XUVdl"
+Subject: Re: [Qemu-devel] [PATCH for-2.11] qcow2: Fix overly broad madvise()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,71 +23,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: thuth@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, jasowang@redhat.com, dmitry@daynix.com, dgibson@redhat.com, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, f4bug@amsat.org
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtQQVRDSCB2MiBmb3ItMi4xMV0gaHcvbmV0L3ZteG5ldDM6IEZpeCBjb2RlIHRvIHdv
-cmsgb24gYmlnIGVuZGlhbiBob3N0cywgdG9vClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAxNTEw
-NjU4NDI0LTE2NTI3LTEtZ2l0LXNlbmQtZW1haWwtdGh1dGhAcmVkaGF0LmNvbQoKPT09IFRFU1Qg
-U0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBs
-b2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2Nh
-bCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVl
-Cgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3Ig
-YyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChn
-aXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZv
-cm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgog
-ICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoK
-ZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMy
-MWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3Bh
-dGNoZXctcHJvamVjdC9xZW11CiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMTUx
-MDY1ODQyNC0xNjUyNy0xLWdpdC1zZW5kLWVtYWlsLXRodXRoQHJlZGhhdC5jb20gLT4gcGF0Y2hl
-dy8xNTEwNjU4NDI0LTE2NTI3LTEtZ2l0LXNlbmQtZW1haWwtdGh1dGhAcmVkaGF0LmNvbQpTd2l0
-Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjJkNWQwNjliMjkgaHcvbmV0L3ZteG5ldDM6IEZp
-eCBjb2RlIHRvIHdvcmsgb24gYmlnIGVuZGlhbiBob3N0cywgdG9vCgo9PT0gT1VUUFVUIEJFR0lO
-ID09PQpDaGVja2luZyBQQVRDSCAxLzE6IGh3L25ldC92bXhuZXQzOiBGaXggY29kZSB0byB3b3Jr
-IG9uIGJpZyBlbmRpYW4gaG9zdHMsIHRvby4uLgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3Vu
-ZCB0aGF0ICc6JyAoY3R4OlZ4VikKIzIzNTogRklMRTogaHcvbmV0L3ZteG5ldDMuaDoyMzI6Cisg
-ICAgICAgICAgICB1MzIgbXNzY29mOjE0OyAgLyogTVNTLCBjaGVja3N1bSBvZmZzZXQsIGZsYWdz
-ICovCiAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91
-bmQgdGhhdCAnOicgKGN0eDpWeFYpCiMyMzY6IEZJTEU6IGh3L25ldC92bXhuZXQzLmg6MjMzOgor
-ICAgICAgICAgICAgdTMyIGV4dDE6MTsKICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNw
-YWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnOicgKGN0eDpWeFYpCiMyMzc6IEZJTEU6IGh3L25l
-dC92bXhuZXQzLmg6MjM0OgorICAgICAgICAgICAgdTMyIGR0eXBlOjE7ICAgIC8qIGRlc2NyaXB0
-b3IgdHlwZSAqLwogICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlcyByZXF1aXJl
-ZCBhcm91bmQgdGhhdCAnOicgKGN0eDpWeFYpCiMyMzg6IEZJTEU6IGh3L25ldC92bXhuZXQzLmg6
-MjM1OgorICAgICAgICAgICAgdTMyIHJzdmQ6MTsKICAgICAgICAgICAgICAgICAgICAgXgoKRVJS
-T1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnOicgKGN0eDpWeFYpCiMyMzk6IEZJTEU6
-IGh3L25ldC92bXhuZXQzLmg6MjM2OgorICAgICAgICAgICAgdTMyIGdlbjoxOyAgICAgIC8qIGdl
-bmVyYXRpb24gYml0ICovCiAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlcyByZXF1
-aXJlZCBhcm91bmQgdGhhdCAnOicgKGN0eDpWeFYpCiMyNDA6IEZJTEU6IGh3L25ldC92bXhuZXQz
-Lmg6MjM3OgorICAgICAgICAgICAgdTMyIGxlbjoxNDsKICAgICAgICAgICAgICAgICAgICBeCgpF
-UlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICc6JyAoY3R4OlZ4VikKIzI0ODogRklM
-RTogaHcvbmV0L3ZteG5ldDMuaDoyMzk6CisgICAgICAgICAgICB1MzIgbGVuOjE0OwogICAgICAg
-ICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJzonIChj
-dHg6VnhWKQojMjQ5OiBGSUxFOiBody9uZXQvdm14bmV0My5oOjI0MDoKKyAgICAgICAgICAgIHUz
-MiBnZW46MTsgICAgICAvKiBnZW5lcmF0aW9uIGJpdCAqLwogICAgICAgICAgICAgICAgICAgIF4K
-CkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJzonIChjdHg6VnhWKQojMjUwOiBG
-SUxFOiBody9uZXQvdm14bmV0My5oOjI0MToKKyAgICAgICAgICAgIHUzMiByc3ZkOjE7CiAgICAg
-ICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJzon
-IChjdHg6VnhWKQojMjUxOiBGSUxFOiBody9uZXQvdm14bmV0My5oOjI0MjoKKyAgICAgICAgICAg
-IHUzMiBkdHlwZToxOyAgICAvKiBkZXNjcmlwdG9yIHR5cGUgKi8KICAgICAgICAgICAgICAgICAg
-ICAgIF4KCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJzonIChjdHg6VnhWKQoj
-MjUyOiBGSUxFOiBody9uZXQvdm14bmV0My5oOjI0MzoKKyAgICAgICAgICAgIHUzMiBleHQxOjE7
-CiAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRo
-YXQgJzonIChjdHg6VnhWKQojMjUzOiBGSUxFOiBody9uZXQvdm14bmV0My5oOjI0NDoKKyAgICAg
-ICAgICAgIHUzMiBtc3Njb2Y6MTQ7ICAvKiBNU1MsIGNoZWNrc3VtIG9mZnNldCwgZmxhZ3MgKi8K
-ICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogdHJhaWxpbmcgd2hpdGVzcGFjZQojMjU5
-OiBGSUxFOiBody9uZXQvdm14bmV0My5oOjI0OToKKyAgICAkCgpXQVJOSU5HOiBhcmNoaXRlY3R1
-cmUgc3BlY2lmaWMgZGVmaW5lcyBzaG91bGQgYmUgYXZvaWRlZAojMzA4OiBGSUxFOiBody9uZXQv
-dm14bmV0My5oOjMwNjoKKyNpZmRlZiBfX0JJR19FTkRJQU5fQklURklFTEQKCldBUk5JTkc6IGFy
-Y2hpdGVjdHVyZSBzcGVjaWZpYyBkZWZpbmVzIHNob3VsZCBiZSBhdm9pZGVkCiMzMjY6IEZJTEU6
-IGh3L25ldC92bXhuZXQzLmg6MzIxOgorI2lmZGVmIF9fQklHX0VORElBTl9CSVRGSUVMRAoKdG90
-YWw6IDEzIGVycm9ycywgMiB3YXJuaW5ncywgNDQxIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2gg
-aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
-cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
-Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21t
-YW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2Fs
-bHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVl
-ZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--SoXMHJdLoNkxUCtu9ULIVmr3AHh9XUVdl
+From: Eric Blake <eblake@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>,
+ qemu-devel@nongnu.org
+Message-ID: <1e0210ef-5720-d9b8-d7e2-6877fc0ce320@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.11] qcow2: Fix overly broad madvise()
+References: <20171114184127.24238-1-mreitz@redhat.com>
+In-Reply-To: <20171114184127.24238-1-mreitz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 11/14/2017 12:41 PM, Max Reitz wrote:
+> @mem_size and @offset are both size_t, thus subtracting them from one
+> another will just return a big size_t if mem_size < offset -- even more=
+
+> obvious here because the result is stored in another size_t.
+>=20
+> Checking that result to be positive is therefore not sufficient to
+> excluse the case that offset > mem_size.  Thus, we currently sometimes
+
+s/excluse/exclude/
+
+> issue an madvise() over a very large address range.
+>=20
+> This is triggered by iotest 163, but with -m64, this does not result in=
+
+> tangible problems.  But with -m32, this test produces three segfaults,
+> all of which are fixed by this patch.
+>=20
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+>  block/qcow2-cache.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--SoXMHJdLoNkxUCtu9ULIVmr3AHh9XUVdl
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloLSUgACgkQp6FrSiUn
+Q2q9kAf6AmgFz3wl3/N5BiIL9skfizcvK9KYIWSk0pUyf/7bv3UK8xCnQLLjrZPP
+GNJPQOEO8xHeoYVEtKFqh1gKvoi1qWoaJW9HJqSKCQt37QYgvhyVZf70OIjOBYU0
+iNLShTBCvY1JGl71phDhULX2MKLhFwUDYfiSx3qUadRCaUNlT9YtEOAAyozZkhoL
+NjCgdqHNzVbwNQsrhWeIDgXgziofb+JhECDEU/bGh071+LhMN460RjpM1L9Urbuk
+4Y5Xd1tz2wc8zdbTQ5yAheBGzeATDMjkBEUCQ+a6M8CidoUPX3p9lYt728siyNqU
+iwUjZrwtuQrrLuYyOEe9E8x/jX3B+w==
+=/Zcp
+-----END PGP SIGNATURE-----
+
+--SoXMHJdLoNkxUCtu9ULIVmr3AHh9XUVdl--
