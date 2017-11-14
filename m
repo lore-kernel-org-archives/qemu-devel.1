@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43513)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45439)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1eEcZO-0005Gr-3d
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 09:52:11 -0500
+	(envelope-from <berto@igalia.com>) id 1eEccm-00009H-0U
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 09:55:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1eEcZM-000191-Py
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 09:52:10 -0500
-Date: Tue, 14 Nov 2017 15:51:50 +0100
-From: Andrew Jones <drjones@redhat.com>
-Message-ID: <20171114145150.wydvirgrrcbicvz4@kamzik.brq.redhat.com>
-References: <1510622154-17224-1-git-send-email-zhuyijun@huawei.com>
-	<1510622154-17224-6-git-send-email-zhuyijun@huawei.com>
+	(envelope-from <berto@igalia.com>) id 1eEcck-0005T5-Qr
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 09:55:40 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20171110203111.7666-3-mreitz@redhat.com>
+References: <20171110203111.7666-1-mreitz@redhat.com>
+	<20171110203111.7666-3-mreitz@redhat.com>
+Date: Tue, 14 Nov 2017 15:55:30 +0100
+Message-ID: <w514lpw29lp.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1510622154-17224-6-git-send-email-zhuyijun@huawei.com>
-Subject: Re: [Qemu-devel] [RFC 5/5] hw/arm/virt-acpi-build: Build srat table
- according to mem_list
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH for-2.11 2/5] qcow2: Unaligned zero cluster
+ in handle_alloc()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,88 +23,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: zhuyijun@huawei.com
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, eric.auger@redhat.com, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, zhaoshenglong@huawei.com
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>
 
-On Tue, Nov 14, 2017 at 09:15:54AM +0800, zhuyijun@huawei.com wrote:
-> From: Zhu Yijun <zhuyijun@huawei.com>
-> 
-> In case of accessing memory holes, we build srat table by
-> traversing mem_list.
-> 
-> Signed-off-by: Zhu Yijun <zhuyijun@huawei.com>
-> ---
->  hw/arm/virt-acpi-build.c | 40 +++++++++++++++++++++++++++++++++++-----
->  1 file changed, 35 insertions(+), 5 deletions(-)
-> 
-> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-> index 3d78ff6..e8dd7c9 100644
-> --- a/hw/arm/virt-acpi-build.c
-> +++ b/hw/arm/virt-acpi-build.c
-> @@ -487,7 +487,12 @@ build_srat(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
->      AcpiSratProcessorGiccAffinity *core;
->      AcpiSratMemoryAffinity *numamem;
->      int i, srat_start;
-> -    uint64_t mem_base;
-> +    hwaddr region_offset = 0;       /* region base addr offset */
-> +    hwaddr region_eat_size = 0;     /* region consumed size */
-> +    hwaddr node_mem_size = 0;
-> +    RAMRegion *begin_search_region = QLIST_FIRST(&vms->bootinfo.mem_list);
-> +    RAMRegion *reg;
-> +
->      MachineClass *mc = MACHINE_GET_CLASS(vms);
->      const CPUArchIdList *cpu_list = mc->possible_cpu_arch_ids(MACHINE(vms));
->  
-> @@ -504,12 +509,37 @@ build_srat(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
->          core->flags = cpu_to_le32(1);
->      }
->  
-> -    mem_base = vms->memmap[VIRT_MEM].base;
->      for (i = 0; i < nb_numa_nodes; ++i) {
->          numamem = acpi_data_push(table_data, sizeof(*numamem));
-> -        build_srat_memory(numamem, mem_base, numa_info[i].node_mem, i,
-> -                          MEM_AFFINITY_ENABLED);
-> -        mem_base += numa_info[i].node_mem;
-> +        node_mem_size = numa_info[i].node_mem;
-> +        QLIST_FOREACH(reg, &vms->bootinfo.mem_list, next) {
-> +            if (reg->base != begin_search_region->base) {
-> +                continue;
-> +            }
-> +
-> +            if (node_mem_size >= (reg->size - region_offset)) {
-> +                region_eat_size = reg->size - region_offset;
-> +            } else {
-> +                region_eat_size = node_mem_size;
-> +            }
-> +
-> +            build_srat_memory(numamem, reg->base + region_offset,
-> +                              region_eat_size, i, MEM_AFFINITY_ENABLED);
-> +
-> +            node_mem_size -= region_eat_size;
-> +            region_offset += region_eat_size;
-> +            begin_search_region = reg;
-> +
-> +            /* The region is depleted */
-> +            if (reg->size == region_offset) {
-> +                region_offset = 0;
-> +                begin_search_region = QLIST_NEXT(reg, next);
-> +            }
-> +
-> +            if (node_mem_size == 0) {
-> +                break;
-> +            }
-> +        }
->      }
->  
->      build_header(linker, table_data, (void *)srat, "SRAT",
-> -- 
-> 1.8.3.1
-> 
-> 
+On Fri 10 Nov 2017 09:31:08 PM CET, Max Reitz wrote:
+> We should check whether the cluster offset we are about to use is
+> actually valid; that is, whether it is aligned to cluster boundaries.
 >
+> Reported-by: R. Nageswara Sastry <nasastry@in.ibm.com>
+> Buglink: https://bugs.launchpad.net/qemu/+bug/1728643
+> Buglink: https://bugs.launchpad.net/qemu/+bug/1728657
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
 
-Same pc-dimm assigning to NUMA node comment from last patch applies to this
-one.
+Reviewed-by: Alberto Garcia <berto@igalia.com>
 
-Thanks,
-drew 
+Berto
