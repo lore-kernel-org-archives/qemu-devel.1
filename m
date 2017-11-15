@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48750)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52126)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eExmA-0005qM-U1
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 08:30:47 -0500
+	(envelope-from <lichunguang@hust.edu.cn>) id 1eExxz-00085o-Dm
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 08:43:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eExm7-0001yI-Px
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 08:30:46 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59114)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eExm7-0001xi-K0
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 08:30:43 -0500
-Date: Wed, 15 Nov 2017 13:30:35 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20171115133034.GB4418@work-vm>
-References: <20171115124602.12501-1-ppandit@redhat.com>
-	<20171115125151.GG20349@redhat.com>
-	<f569ccce-4aa5-423a-25b2-baf69e8e6b43@redhat.com>
+	(envelope-from <lichunguang@hust.edu.cn>) id 1eExxu-0002PU-Tl
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 08:42:59 -0500
+Received: from mail.hust.edu.cn ([202.114.0.240]:47814 helo=hust.edu.cn)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <lichunguang@hust.edu.cn>) id 1eExxs-00029F-V2
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 08:42:54 -0500
+Date: Wed, 15 Nov 2017 21:41:50 +0800 (GMT+08:00)
+From: "Chunguang Li" <lichunguang@hust.edu.cn>
+In-Reply-To: <20171115101137.GA2212@work-vm>
+References: <6e0e65ef.427f.15faf8d41e9.Coremail.lichunguang@hust.edu.cn>
+	<20171115101137.GA2212@work-vm>
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=UTF-8
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f569ccce-4aa5-423a-25b2-baf69e8e6b43@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] ps2: fix PS2Queue counter field type
+Message-ID: <2b8e8e.74dc.15fbfea1827.Coremail.lichunguang@hust.edu.cn>
+Subject: Re: [Qemu-devel] Abnormal observation during migration: too many
+ "write-not-dirty" pages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,40 +28,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, P J P <ppandit@redhat.com>, Cyrille Chatras <cyrille.chatras@orange.com>, Gerd Hoffmann <kraxel@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>, Prasad J Pandit <pjp@fedoraproject.org>
+To: "dr. david alan gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, quintela@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, stefanha@redhat.com
 
-* Paolo Bonzini (pbonzini@redhat.com) wrote:
-> On 15/11/2017 13:51, Daniel P. Berrange wrote:
-> > If you're concerned that someone is tampering with QEMU state
-> > in transit during migration, then you're going to end up playing
-> > whack-a-mole across the entire QEMU codebase IMHO. The answer
-> > to the problem of tampering is to have encryption of the
-> > migration data stream between both QEMU's. Thus QEMU on the
-> > target merely has to trust QEMU on the source. If QEMU on the
-> > source is itself compromised you've already lost and migration
-> > won't make life any worse.
-> > 
-> 
-> This is not entirely true.  A lot of such cases were fixed in the past,
-> especially when they could cause out-of-bounds access.  Someone could
-> provide a bad migration stream (e.g. as a fake bug report!), so
-> migration data should not be considered trusted.
-
-There's probably others to be honest; it's not something we've
-traditionally been careful of.
-
-> However, PJP's patch breaks migration by changing a 4-byte field to
-> 1-byte.  The correct fix is to range-check the fields in
-> ps2_common_post_load.
-
-Agreed.
-
-Dave
-
-> Thanks,
-> 
-> Paolo
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+CgoKPiAtLS0tLeWOn+Wni+mCruS7ti0tLS0tCj4g5Y+R5Lu25Lq6OiAiRHIuIERhdmlkIEFsYW4g
+R2lsYmVydCIgPGRnaWxiZXJ0QHJlZGhhdC5jb20+Cj4g5Y+R6YCB5pe26Ze0OiAyMDE3LTExLTE1
+IDE4OjExOjM3ICjmmJ/mnJ/kuIkpCj4g5pS25Lu25Lq6OiAiQ2h1bmd1YW5nIExpIiA8bGljaHVu
+Z3VhbmdAaHVzdC5lZHUuY24+Cj4g5oqE6YCBOiBxZW11LWRldmVsQG5vbmdudS5vcmcsIHF1aW50
+ZWxhQHJlZGhhdC5jb20sIGFtaXQuc2hhaEByZWRoYXQuY29tLCBwYm9uemluaUByZWRoYXQuY29t
+LCBzdGVmYW5oYUByZWRoYXQuY29tCj4g5Li76aKYOiBSZTogW1FlbXUtZGV2ZWxdIEFibm9ybWFs
+IG9ic2VydmF0aW9uIGR1cmluZyBtaWdyYXRpb246IHRvbyBtYW55ICJ3cml0ZS1ub3QtZGlydHki
+IHBhZ2VzCj4gCj4gKiBDaHVuZ3VhbmcgTGkgKGxpY2h1bmd1YW5nQGh1c3QuZWR1LmNuKSB3cm90
+ZToKPiA+IEhpIGFsbCEKPiA+IAo+ID4gSSBnb3QgYSB2ZXJ5IGFibm9ybWFsIG9ic2VydmF0aW9u
+IGZvciB0aGUgVk0gbWlncmF0aW9uLiBJIGZvdW5kIHRoYXQgbWFueSBwYWdlcyBtYXJrZWQgYXMg
+ZGlydHkgZHVyaW5nIG1pZ3JhdGlvbiBhcmUgIm5vdCByZWFsbHkgZGlydHkiLCB3aGljaCBpcywg
+dGhlaXIgY29udGVudCBhcmUgdGhlIHNhbWUgYXMgdGhlIG9sZCB2ZXJzaW9uLgo+ID4gCj4gPiAK
+PiA+IAo+ID4gCj4gPiBJIGRpZCB0aGUgbWlncmF0aW9uIGV4cGVyaW1lbnQgbGlrZSB0aGlzOgo+
+ID4gCj4gPiBEdXJpbmcgdGhlIHNldHVwIHBoYXNlIG9mIG1pZ3JhdGlvbiwgZmlyc3QgSSBzdXNw
+ZW5kZWQgdGhlIFZNLiBUaGVuIEkgY29waWVkIGFsbCB0aGUgcGFnZXMgd2l0aGluIHRoZSBndWVz
+dCBwaHlzaWNhbCBhZGRyZXNzIHNwYWNlIHRvIGEgbWVtb3J5IGJ1ZmZlciBhcyBsYXJnZSBhcyB0
+aGUgZ3Vlc3QgbWVtb3J5IHNpemUuIEFmdGVyIHRoYXQsIHRoZSBkaXJ0eSB0cmFja2luZyBiZWdh
+biBhbmQgSSByZXN1bWVkIHRoZSBWTS4gQmVzaWRlcywgYXQgdGhlIGVuZAo+ID4gb2YgZWFjaCBp
+dGVyYXRpb24sIEkgYWxzbyBzdXNwZW5kZWQgdGhlIFZNIHRlbXBvcmFyaWx5LiBEdXJpbmcgdGhl
+IHN1c3BlbnNpb24sIEkgY29tcGFyZWQgdGhlIGNvbnRlbnQgb2YgYWxsIHRoZSBwYWdlcyBtYXJr
+ZWQgYXMgZGlydHkgaW4gdGhpcyBpdGVyYXRpb24gYnl0ZS1ieS1ieXRlIHdpdGggdGhlaXIgZm9y
+bWVyIGNvcGllcyBpbnNpZGUgdGhlIGJ1ZmZlci4gSWYgdGhlIGNvbnRlbnQgb2Ygb25lIHBhZ2Ug
+d2FzIHRoZSBzYW1lIGFzIGl0cyBmb3JtZXIgY29weSwgSSByZWNvcmRlZCBpdCBhcyBhICJ3cml0
+ZS1ub3QtZGlydHkiIHBhZ2UgKHRoZSBwYWdlIGlzIHdyaXR0ZW4gZXhhY3RseSB3aXRoIHRoZSBz
+YW1lIGNvbnRlbnQgYXMgdGhlIG9sZCB2ZXJzaW9uKS4gT3RoZXJ3aXNlLCBJIHJlcGxhY2VkIHRo
+aXMgcGFnZSBpbiB0aGUgYnVmZmVyIHdpdGggdGhlIG5ldyBjb250ZW50LCBmb3IgdGhlIHBvc3Np
+YmxlIGNvbXBhcmlzb24gaW4gdGhlIGZ1dHVyZS4gQWZ0ZXIgdGhlIHJlc2V0IG9mIHRoZSBkaXJ0
+eSBiaXRtYXAsIEkgcmVzdW1lZCB0aGUgVk0uIFRodXMsIEkgb2J0YWluIHRoZSBwcm9wb3J0aW9u
+IG9mIHRoZSB3cml0ZS1ub3QtZGlydHkgcGFnZXMgd2l0aGluIGFsbCB0aGUgcGFnZXMgbWFya2Vk
+IGFzIGRpcnR5IGZvciBlYWNoIHByZS1jb3B5IGl0ZXJhdGlvbi4KPiA+IAo+ID4gSSByZXBlYXRl
+ZCB0aGlzIGV4cGVyaW1lbnQgd2l0aCAxNSB3b3JrbG9hZHMsIHdoaWNoIGFyZSAxMSBDUFUyMDA2
+IGJlbmNobWFya3MsIE1lbWNhY2hlZCBzZXJ2ZXIsIGtlcm5lbCBjb21waWxhdGlvbiwgcGxheWlu
+ZyBhIHZpZGVvLCBhbmQgYW4gaWRsZSBWTS4gVGhlIENQVTIwMDYgYmVuY2htYXJrcyBhbmQgTWVt
+Y2FjaGVkIGFyZSB3cml0ZS1pbnRlbnNpdmUgd29ya2xvYWRzLiBTbyBhbG1vc3QgYWxsIG9mIHRo
+ZW0gZGlkIG5vdCBjb252ZXJnZSB0byBzdG9wLWNvcHkuCj4gPiAKPiA+IAo+ID4gCj4gPiAKPiA+
+IFN0YXJ0bGluZ2x5LCB0aGUgcHJvcG9ydGlvbnMgb2YgdGhlIHdyaXRlLW5vdC1kaXJ0eSBwYWdl
+cyBhcmUgcXVpdGUgaGlnaC4gTWVtY2FjaGVkIGFuZCB0aHJlZSBDUFUyMDA2IGJlbmNobWFya3Mo
+emV1c21wLCBtY2YgYW5kIGJ6aXAyKSBoYXZlIHRoZSBtb3N0IGhpZ2ggcHJvcG9ydGlvbnMuIFRo
+ZWlyIHByb3BvcnRpb25zIG9mIHRoZSB3cml0ZS1ub3QtZGlydHkgcGFnZXMgd2l0aGluIGFsbCB0
+aGUgZGlydHkgcGFnZXMgYXJlIGFzIGhpZ2ggYXMgNDUlLTgwJS4gVGhlIHByb3BvcnRpb25zIG9m
+IHRoZSBvdGhlciB3b3JrbG9hZHMgYXJlIGFib3V0IDUlLTIwJSwgd2hpY2ggYXJlIGFsc28gYWJu
+b3JtYWwuIEFjY29yZGluZyB0byBteSBpbnR1aXRpb24sIHRoZSBwcm9wb3J0aW9uIG9mIHdyaXRl
+LW5vdC1kaXJ0eSBwYWdlcyBzaG91bGQgYmUgZmFyIGxlc3MgdGhhbiB0aGVzZSBudW1iZXJzLiBJ
+IHRoaW5rIGl0IHNob3VsZCBiZSBxdWl0ZSBhIHBhcnRpY3VsYXIgY2FzZSB0aGF0IG9uZSBwYWdl
+IGlzIHdyaXR0ZW4gd2l0aCBleGFjdGx5IHRoZSBzYW1lIGNvbnRlbnQgYXMgdGhlIGZvcm1lciBk
+YXRhLgo+ID4gCj4gPiBCZXNpZGVzLCB0aGUgemVybyBwYWdlcyBhcmUgbm90IGNvdW50ZWQgZm9y
+IGFsbCB0aGUgcmVzdWx0cy4gQmVjYXVzZSBJIHRoaW5rIGNvZGVzIGxpa2UgbWVtc2V0KCkgbWF5
+IHdyaXRlIGxhcmdlIGFyZWEgb2YgcGFnZXMgdG8gemVybyBwYWdlcywgd2hpY2ggYXJlIGFscmVh
+ZHkgemVybyBwYWdlcyBiZWZvcmUuCj4gPiAKPiA+IAo+ID4gCj4gPiAKPiA+IEkgZXhjbHVkZWQg
+c29tZSBwb3NzaWJsZSB1bmtub3duIHJlYXNvbnMgd2l0aCB0aGUgbWFjaGluZSBoYXJkd2FyZSwg
+YmVjYXVzZSBJIHJlcGVhdGVkIHRoZSBleHBlcmltZW50cyB3aXRoIHR3byBzZXRzIG9mIGRpZmZl
+cmVudCBtYWNoaW5lcy4gVGhlbiBJIGd1ZXNzZWQgaXQgbWlnaHQgYmUgcmVsYXRlZCB3aXRoIHRo
+ZSBodWdlIHBhZ2UgZmVhdHVyZS4gSG93ZXZlciwgdGhlIHJlc3VsdCB3YXMgdGhlIHNhbWUgd2hl
+biBJIHR1cm5lZCB0aGUgaHVnZSBwYWdlIGZlYXR1cmUgb2ZmIGluIHRoZSBPUy4KPiA+IAo+ID4g
+Cj4gPiAKPiA+IAo+ID4gTm93IHRoZXJlIGFyZSBvbmx5IHR3byBwb3NzaWJsZSByZWFzb25zIGlu
+IG15IG9waW5pb24uIAo+ID4gCj4gPiBGaXJzdCwgdGhlcmUgaXMgc29tZSBidWdzIGluIHRoZSBL
+Vk0ga2VybmVsIGRpcnR5IHRyYWNraW5nIG1lY2hhbmlzbS4gSXQgbWF5IG1hcmsgc29tZSBwYWdl
+cyB0aGF0IGRvIG5vdCByZWNlaXZlIHdyaXRlIHJlcXVlc3QgYXMgZGlydHkuCj4gPiAKPiA+IFNl
+Y29uZCwgdGhlcmUgaXMgc29tZSBidWdzIGluIHRoZSBPUyBydW5uaW5nIGluc2lkZSB0aGUgVk0u
+IEl0IG1heSBpc3N1ZSBzb21lIHVubmVjZXNzYXJ5IHdyaXRlIHJlcXVlc3RzLgo+ID4gCj4gPiAK
+PiA+IFdoYXQgZG8geW91IHRoaW5rIGFib3V0IHRoaXMgYWJub3JtYWwgcGhlbm9tZW5vbj8gQW55
+IGFkdmljZSBvciBwb3NzaWJsZSByZWFzb25zIG9yIGV2ZW4gZ3Vlc3Nlcz8gSSBhcHByZWNpYXRl
+IGFueSByZXNwb25zZXMsIGJlY2F1c2UgaXQgaGFzIGNvbmZ1c2VkIG1lIGZvciBhIGxvbmcgdGlt
+ZS4gVGhhbmsgeW91Lgo+IAo+IFdhc24ndCBpdCB5b3Ugd2hvIHBvaW50ZWQgb3V0IGxhc3QgeWVh
+ciB0aGUgb3RoZXIgcG9zc2liaWxpdHk/IC0gVGhlCj4gcHJvYmxlbSBvZiBmYWxzZSBwb3NpdGl2
+ZXMgZHVlIHRvIHN5bmMnaW5nIHRoZSB3aG9sZSBvZiBtZW1vcnkgYW5kIHRoZW4KPiB3cml0aW5n
+IHRoZSBkYXRhIG91dCwgYnV0IHNvbWUgb2YgdGhlIGRpcnR5IHBhZ2VzIHdlcmUgYWxyZWFkeSB3
+cml0dGVuPwo+IAo+IERhdmUKClllcywgeW91IHJlbWVtYmVyIHRoYXQhIEl0IHdhcyBtZS4gQWZ0
+ZXIgdGhhdCwgSSBkaWQgbW9yZSBhbmFseXNpcyBhbmQgZXhwZXJpbWVudHMuIEkgZm91bmQgdGhh
+dCwgaW4gZmFjdCwgYm90aCByZWFzb25zIGNvbnRyaWJ1dGUgdG8gdGhlICJmYWtlIGRpcnR5IiBw
+YWdlcyAoZGlydHkgcGFnZXMgdGhhdCBkbyBub3QgbmVlZCB0byBiZSByZXNlbnQsIGJlY2F1c2Ug
+dGhlaXIgY29udGVudHMgYXJlIHRoZSBzYW1lIGFzIHRoYXQgaW4gdGhlIHRhcmdldCBub2RlKS4g
+T25lIGlzIHdoYXQgSSBwb2ludGVkIG91dCBsYXN0IHllYXIsIHdoaWNoIHlvdSBoYXZlIG1lbnRp
+b25lZC4gVGhlIG90aGVyIHJlYXNvbiBpcyB3aGF0IEkgYW0gdGFsa2luZyBhYm91dCBub3csIHRo
+ZSAid3JpdGUtbm90LWRpcnR5IiBwaGVub21lbm9uLgpJbiBmYWN0LCBhY2NvcmRpbmcgdG8gbXkg
+ZXhwZXJpbWVudHMgcmVzdWx0cywgdGhlICJ3aXJ0ZS1ub3QtZGlydHkiIGlzIHRoZSBtYWluIHJl
+YXNvbiByZXN1bHRpbmcgdG8gdGhlICJmYWtlIGRpcnR5IiBwYWdlcywgd2hpbGUgc3luYydpbmcg
+dGhlIHdob2xlIG9mIG1lbW9yeSBjb250cmlidXRlcyBsZXNzLgoKQ2h1bmd1YW5nCj4gCj4gPiAK
+PiA+IC0tCj4gPiBDaHVuZ3VhbmcgTGksIFBoLkQuIENhbmRpZGF0ZQo+ID4gV3VoYW4gTmF0aW9u
+YWwgTGFib3JhdG9yeSBmb3IgT3B0b2VsZWN0cm9uaWNzIChXTkxPKQo+ID4gSHVhemhvbmcgVW5p
+dmVyc2l0eSBvZiBTY2llbmNlICYgVGVjaG5vbG9neSAoSFVTVCkKPiA+IFd1aGFuLCBIdWJlaSBQ
+cm92LiwgQ2hpbmEKPiA+IAo+IC0tCj4gRHIuIERhdmlkIEFsYW4gR2lsYmVydCAvIGRnaWxiZXJ0
+QHJlZGhhdC5jb20gLyBNYW5jaGVzdGVyLCBVSwoKCgo=
