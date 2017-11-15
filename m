@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56859)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58008)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eF4FK-0006rO-2S
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 15:25:19 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eF4HP-0007zs-Nc
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 15:27:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eF4FI-0004Eh-Lx
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 15:25:17 -0500
-References: <20171110203111.7666-1-mreitz@redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1eF4HO-0006FW-O6
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 15:27:27 -0500
+References: <CAJH6TXiMxUoU2sFEHAoZ8jhDMtg_saEnTHM9f0vJ6Nhqj7099w@mail.gmail.com>
+	<c2ecae32-f999-9f1e-46a6-37cdab2a62e3@redhat.com>
+	<CAJH6TXhBAaBE9gBSxksWZqNywWmencRaGyeY-oN3jbKdgUettQ@mail.gmail.com>
+	<0e6cc220-814a-17fd-4fd7-7b0665d34e81@redhat.com>
+	<CAJH6TXh2v-F=yqxQbUUawk_Ctq-sgFefGp1XvMsC=syX_5jEqA@mail.gmail.com>
+	<30b54865-2255-d13d-a054-afcf5bbd06b2@redhat.com>
+	<20171115202440.GJ19514@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <947c8174-c559-962d-4c3d-de08ecafe332@redhat.com>
-Date: Wed, 15 Nov 2017 21:25:04 +0100
+Message-ID: <7b11bb2b-b93d-e8ff-f396-703c93549d0d@redhat.com>
+Date: Wed, 15 Nov 2017 21:27:14 +0100
 MIME-Version: 1.0
-In-Reply-To: <20171110203111.7666-1-mreitz@redhat.com>
+In-Reply-To: <20171115202440.GJ19514@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="kj20FGkhLdb0F0FcCvQjkfrdARRkSQjnF"
-Subject: Re: [Qemu-devel] [PATCH for-2.11 0/5] qcow2: Fixes for corrupted
- images
+	boundary="4P1tliVKjoijAQQ3mSBLnU7SEQ3445lqF"
+Subject: Re: [Qemu-devel] [Libguestfs]  [qemu-img] support for XVA
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,85 +29,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, John Snow <jsnow@redhat.com>
+To: "Richard W.M. Jones" <rjones@redhat.com>
+Cc: Gandalf Corvotempesta <gandalf.corvotempesta@gmail.com>, Qemu-block <qemu-block@nongnu.org>, qemu-devel@nongnu.org, libguestfs <libguestfs@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---kj20FGkhLdb0F0FcCvQjkfrdARRkSQjnF
+--4P1tliVKjoijAQQ3mSBLnU7SEQ3445lqF
 From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- Alberto Garcia <berto@igalia.com>, John Snow <jsnow@redhat.com>
-Message-ID: <947c8174-c559-962d-4c3d-de08ecafe332@redhat.com>
-Subject: Re: [PATCH for-2.11 0/5] qcow2: Fixes for corrupted images
-References: <20171110203111.7666-1-mreitz@redhat.com>
-In-Reply-To: <20171110203111.7666-1-mreitz@redhat.com>
+To: "Richard W.M. Jones" <rjones@redhat.com>
+Cc: Gandalf Corvotempesta <gandalf.corvotempesta@gmail.com>,
+ Qemu-block <qemu-block@nongnu.org>, qemu-devel@nongnu.org,
+ libguestfs <libguestfs@redhat.com>
+Message-ID: <7b11bb2b-b93d-e8ff-f396-703c93549d0d@redhat.com>
+Subject: Re: [Libguestfs] [Qemu-devel] [qemu-img] support for XVA
+References: <CAJH6TXiMxUoU2sFEHAoZ8jhDMtg_saEnTHM9f0vJ6Nhqj7099w@mail.gmail.com>
+ <c2ecae32-f999-9f1e-46a6-37cdab2a62e3@redhat.com>
+ <CAJH6TXhBAaBE9gBSxksWZqNywWmencRaGyeY-oN3jbKdgUettQ@mail.gmail.com>
+ <0e6cc220-814a-17fd-4fd7-7b0665d34e81@redhat.com>
+ <CAJH6TXh2v-F=yqxQbUUawk_Ctq-sgFefGp1XvMsC=syX_5jEqA@mail.gmail.com>
+ <30b54865-2255-d13d-a054-afcf5bbd06b2@redhat.com>
+ <20171115202440.GJ19514@redhat.com>
+In-Reply-To: <20171115202440.GJ19514@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 2017-11-10 21:31, Max Reitz wrote:
-> This series contains fixes for another batch of qcow2-related crashes
-> reported on Launchpad by Nageswara (the first batch was
-> http://lists.nongnu.org/archive/html/qemu-block/2017-11/msg00082.html b=
-y
-> Berto).
->=20
-> Patch 4 fixes an out-of-bounds array access in memory which is not
-> really a security issue for multiple reasons (really, at most you can
-> read eight bytes from somewhere with an extremely high chance of
-> crashing qemu and requiring the user to invoke a block_resize shrinking=
+On 2017-11-15 21:24, Richard W.M. Jones wrote:
+> On Wed, Nov 15, 2017 at 09:07:12PM +0100, Max Reitz wrote:
+>> On 2017-11-15 21:06, Gandalf Corvotempesta wrote:
+>>> 2017-11-15 20:59 GMT+01:00 Max Reitz <mreitz@redhat.com>:
+>>>> Well, you can't just add support to qemu-img alone either.  Every im=
+age
+>>>> format supported by qemu-img is one supported by qemu as a whole and=
 
-> the qcow2 image (and also reset some bit in the image from 1 to 0, but
-> only if the overlap checks don't catch you)), but most importantly that=
+>>>> thus needs a proper block driver that needs to support random access=
+es
+>>>> as well.
+>>>
+>>> I was talking about qemu-img convert, just to convert an XVA image to=
 
-> code hasn't been in 2.10, so we're fine.
+>>> something different, in a single pass, without having to extract the
+>>> tar.
+>>
+>> I know, but that doesn't work.  qemu-img convert uses the normal
+>> general-purpose block drivers for that.
 >=20
+> In any case there's no need as qemu/qemu-img can already access files
+> inside an uncompressed tarball using the offset/size support added to
+> the raw driver exactly for this purpose:
 >=20
-> Max Reitz (5):
->   qcow2: check_errors are fatal
->   qcow2: Unaligned zero cluster in handle_alloc()
->   block: Guard against NULL bs->drv
->   qcow2: Add bounds check to get_refblock_offset()
->   qcow2: Refuse to get unaligned offsets from cache
->=20
->  block/qcow2.h              |   6 ---
->  block.c                    |  19 ++++++-
->  block/io.c                 |  36 +++++++++++++
->  block/qapi.c               |   8 ++-
->  block/qcow2-cache.c        |  21 ++++++++
->  block/qcow2-cluster.c      |  13 ++++-
->  block/qcow2-refcount.c     |  26 +++++++++-
->  block/qcow2.c              |   5 +-
->  block/replication.c        |  15 ++++++
->  block/vvfat.c              |   2 +-
->  tests/qemu-iotests/060     | 125 +++++++++++++++++++++++++++++++++++++=
-++++++++
->  tests/qemu-iotests/060.out | 115 +++++++++++++++++++++++++++++++++++++=
-++++
->  12 files changed, 379 insertions(+), 12 deletions(-)
+> https://lists.gnu.org/archive/html/qemu-devel/2016-10/msg03945.html
 
-Applied to my block tree:
-
-https://github.com/XanClic/qemu/commits/block
+If that works, yes.  To me it doesn't look like XVA is just a single raw
+image inside of a tarball, but I may very well be wrong, of course.
 
 Max
 
 
---kj20FGkhLdb0F0FcCvQjkfrdARRkSQjnF
+--4P1tliVKjoijAQQ3mSBLnU7SEQ3445lqF
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAloMoqASHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9A6rUIAMD5w0ir/o5ZWohdPFpi0CY2Kf5TjN04
-zCEUXbsNB+s8qkwTjctnxIB42LjV04pYWbmWBrUijDIvP8DmMZJ42SNc6/SsUR9F
-bzHKO/MIT1XLbGyXEcvZu5iz2Yjp6ZyJHfCegHVTlH2ZaJmDpETHYCJ7xVjnHpS8
-pEF81RLdb/LYST0LBjYznm5EsScXLE94WoaG1dFt/4cmpDhiFtDJpJuBK54zLP9N
-llRO0Os6ifyfRikg9Pggy0hlCLigshlK4XzsbPYa3rgvbOklgV4Z9bcvXtXNiuJE
-mVEDSSzncMEgyKs4r6yxSnH+ZdpksoKUB/SgZZtINcyYa5eCUgjYTIU=
-=+fd3
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAloMoyISHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AgPQH+wU9EK0TRsGB07dSJ9jSyteXc+jriAIS
+tN1614P269qjeJ0nRyS1tidhTq7hrpNkE5s5sMwzsUzxdJABBlem8dvVg67KliR/
+EdTnBtpVvXMRSgdMWQopN3pMDdywHMNF2KWUY/LRSHpIVryG/HAw/vpaTyUYVVdk
+0nvkm+k/LCLdRxzXus0GK68LUQ4pRf+6Giu5Wa1SpVl3bTvOx6tVPVlj+Lg6dsfa
+LL2SC6CSLNVLYogvrm81YP5ziTulX/xNby/AjZwgr5hZba3xaDByb+QandRe7Pud
+pYwL4XfstJQ6ADLunEN9OvosaXCUjHwuOakAx+6MvghRdJXZmtb/pQQ=
+=EkZk
 -----END PGP SIGNATURE-----
 
---kj20FGkhLdb0F0FcCvQjkfrdARRkSQjnF--
+--4P1tliVKjoijAQQ3mSBLnU7SEQ3445lqF--
