@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34051)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34276)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lichunguang@hust.edu.cn>) id 1eEyaY-0001V5-Ch
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 09:22:51 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1eEybp-000258-36
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 09:24:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lichunguang@hust.edu.cn>) id 1eEyaT-0005Vx-Pr
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 09:22:50 -0500
-Received: from mail.hust.edu.cn ([202.114.0.240]:55412 helo=hust.edu.cn)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lichunguang@hust.edu.cn>) id 1eEyaS-0005Qd-UV
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 09:22:45 -0500
-Date: Wed, 15 Nov 2017 22:22:13 +0800 (GMT+08:00)
-From: "Chunguang Li" <lichunguang@hust.edu.cn>
-In-Reply-To: <874lpvdgdz.fsf@secure.laptop>
+	(envelope-from <dgilbert@redhat.com>) id 1eEybk-0006Gu-HS
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 09:24:09 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56356)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eEybk-0006GW-7f
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 09:24:04 -0500
+Date: Wed, 15 Nov 2017 14:23:52 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20171115142352.GB2212@work-vm>
 References: <6e0e65ef.427f.15faf8d41e9.Coremail.lichunguang@hust.edu.cn>
-	<874lpvdgdz.fsf@secure.laptop>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+	<20171115101137.GA2212@work-vm>
+	<2b8e8e.74dc.15fbfea1827.Coremail.lichunguang@hust.edu.cn>
 MIME-Version: 1.0
-Message-ID: <7d022afb.758c.15fc00f11b5.Coremail.lichunguang@hust.edu.cn>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <2b8e8e.74dc.15fbfea1827.Coremail.lichunguang@hust.edu.cn>
+Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] Abnormal observation during migration: too many
  "write-not-dirty" pages
 List-Id: <qemu-devel.nongnu.org>
@@ -28,100 +30,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: quintela@redhat.com
-Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, stefanha@redhat.com
+To: Chunguang Li <lichunguang@hust.edu.cn>
+Cc: qemu-devel@nongnu.org, quintela@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, stefanha@redhat.com
 
-CgoKPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2VzLS0tLS0KPiBGcm9tOiAiSnVhbiBRdWludGVsYSIg
-PHF1aW50ZWxhQHJlZGhhdC5jb20+Cj4gU2VudCBUaW1lOiAyMDE3LTExLTE1IDE3OjQ1OjQ0IChX
-ZWRuZXNkYXkpCj4gVG86ICJDaHVuZ3VhbmcgTGkiIDxsaWNodW5ndWFuZ0BodXN0LmVkdS5jbj4K
-PiBDYzogcWVtdS1kZXZlbEBub25nbnUub3JnLCBkZ2lsYmVydEByZWRoYXQuY29tLCBhbWl0LnNo
-YWhAcmVkaGF0LmNvbSwgcGJvbnppbmlAcmVkaGF0LmNvbSwgc3RlZmFuaGFAcmVkaGF0LmNvbQo+
-IFN1YmplY3Q6IFJlOiBBYm5vcm1hbCBvYnNlcnZhdGlvbiBkdXJpbmcgbWlncmF0aW9uOiB0b28g
-bWFueSAid3JpdGUtbm90LWRpcnR5IiBwYWdlcwo+IAo+ICJDaHVuZ3VhbmcgTGkiIDxsaWNodW5n
-dWFuZ0BodXN0LmVkdS5jbj4gd3JvdGU6Cj4gPiBIaSBhbGwhIAo+IAo+IEhpCj4gCj4gU29ycnkg
-Zm9yIHRoZSBkZWxheSwgSSB3YXMgb24gdmFjYXRpb24gYW4gc3RpbGwgZ2V0dGluZyB1cCB0byBz
-cGVlZC4KCkhpLCBKdWFuLCB0aGFua3MgZm9yIHlvdXIgcmVwbHkuCgo+IAo+ID4gSSBnb3QgYSB2
-ZXJ5IGFibm9ybWFsIG9ic2VydmF0aW9uIGZvciB0aGUgVk0gbWlncmF0aW9uLiBJIGZvdW5kIHRo
-YXQgbWFueSBwYWdlcyBtYXJrZWQgYXMgZGlydHkgZHVyaW5nCj4gPiBtaWdyYXRpb24gYXJlICJu
-b3QgcmVhbGx5IGRpcnR5Iiwgd2hpY2ggaXMsIHRoZWlyIGNvbnRlbnQgYXJlIHRoZSBzYW1lIGFz
-IHRoZSBvbGQgdmVyc2lvbi4gCj4gCj4gSSB0aGluayB5b3VyIHRlc3QgaXMgcXVpdGUgZ29vZCwg
-YW5kIEkgYW0gYWxzbyBhc2hhbWVkIHRoYXQgODAlIG9mCj4gImZhbHNlIiBkaXJ0eSBwYWdlcyBp
-cyByZWFsbHkgYSBsb3QuCj4gCj4gPiBJIGRpZCB0aGUgbWlncmF0aW9uIGV4cGVyaW1lbnQgbGlr
-ZSB0aGlzOiAKPiA+Cj4gPiBEdXJpbmcgdGhlIHNldHVwIHBoYXNlIG9mIG1pZ3JhdGlvbiwgZmly
-c3QgSSBzdXNwZW5kZWQgdGhlIFZNLiBUaGVuIEkgY29waWVkIGFsbCB0aGUgcGFnZXMgd2l0aGlu
-IHRoZSBndWVzdAo+ID4gcGh5c2ljYWwgYWRkcmVzcyBzcGFjZSB0byBhIG1lbW9yeSBidWZmZXIg
-YXMgbGFyZ2UgYXMgdGhlIGd1ZXN0IG1lbW9yeSBzaXplLiBBZnRlciB0aGF0LCB0aGUgZGlydHkg
-dHJhY2tpbmcKPiA+IGJlZ2FuIGFuZCBJIHJlc3VtZWQgdGhlIFZNLiBCZXNpZGVzLCBhdCB0aGUg
-ZW5kCj4gPiBvZiBlYWNoIGl0ZXJhdGlvbiwgSSBhbHNvIHN1c3BlbmRlZCB0aGUgVk0gdGVtcG9y
-YXJpbHkuIER1cmluZyB0aGUgc3VzcGVuc2lvbiwgSSBjb21wYXJlZCB0aGUgY29udGVudCBvZiBh
-bGwKPiA+IHRoZSBwYWdlcyBtYXJrZWQgYXMgZGlydHkgaW4gdGhpcyBpdGVyYXRpb24gYnl0ZS1i
-eS1ieXRlIHdpdGggdGhlaXIgZm9ybWVyIGNvcGllcyBpbnNpZGUgdGhlIGJ1ZmZlci4gSWYgdGhl
-Cj4gPiBjb250ZW50IG9mIG9uZSBwYWdlIHdhcyB0aGUgc2FtZSBhcyBpdHMgZm9ybWVyIGNvcHks
-IEkgcmVjb3JkZWQgaXQgYXMgYSAid3JpdGUtbm90LWRpcnR5IiBwYWdlICh0aGUgcGFnZSBpcwo+
-ID4gd3JpdHRlbiBleGFjdGx5IHdpdGggdGhlIHNhbWUgY29udGVudCBhcyB0aGUgb2xkIHZlcnNp
-b24pLiBPdGhlcndpc2UsIEkgcmVwbGFjZWQgdGhpcyBwYWdlIGluIHRoZSBidWZmZXIgd2l0aAo+
-ID4gdGhlIG5ldyBjb250ZW50LCBmb3IgdGhlIHBvc3NpYmxlIGNvbXBhcmlzb24gaW4gdGhlIGZ1
-dHVyZS4gQWZ0ZXIgdGhlIHJlc2V0IG9mIHRoZSBkaXJ0eSBiaXRtYXAsIEkgcmVzdW1lZCB0aGUK
-PiA+IFZNLiBUaHVzLCBJIG9idGFpbiB0aGUgcHJvcG9ydGlvbiBvZiB0aGUgd3JpdGUtbm90LWRp
-cnR5IHBhZ2VzIHdpdGhpbiBhbGwgdGhlIHBhZ2VzIG1hcmtlZCBhcyBkaXJ0eSBmb3IgZWFjaAo+
-ID4gcHJlLWNvcHkgaXRlcmF0aW9uLiAKPiAKPiAKPiB2aG9zdCBhbmQgZnJpZW5kcyBjb3VsZCBt
-YWtlIGEgc21hbGwgZGlmZmVyZW5jZSBoZXJlLCBidXQgaW4gZ2VuZXJhbCwKPiB0aGlzIGFwcHJv
-YWNoIHNob3VsZCBiZSBvay4KPiAKPiA+IEkgcmVwZWF0ZWQgdGhpcyBleHBlcmltZW50IHdpdGgg
-MTUgd29ya2xvYWRzLCB3aGljaCBhcmUgMTEgQ1BVMjAwNiBiZW5jaG1hcmtzLCBNZW1jYWNoZWQg
-c2VydmVyLAo+ID4ga2VybmVsIGNvbXBpbGF0aW9uLCBwbGF5aW5nIGEgdmlkZW8sIGFuZCBhbiBp
-ZGxlIFZNLiBUaGUgQ1BVMjAwNiBiZW5jaG1hcmtzIGFuZCBNZW1jYWNoZWQgYXJlCj4gPiB3cml0
-ZS1pbnRlbnNpdmUgd29ya2xvYWRzLiBTbyBhbG1vc3QgYWxsIG9mIHRoZW0gZGlkIG5vdCBjb252
-ZXJnZSB0byBzdG9wLWNvcHkuIAo+IAo+IFRoYXQgaXMgdGhlIGltcHJlc3NpdmUgcGFydCwgMTUg
-d29ya2xvYWRzLiAgVGhhbmtzIGZvciB0YWtpbmcgdGhlIGVmZm9yLgo+IAo+IEJUVywgZG8geW91
-IGhhdmUgeW91ciBxZW11IGNoYW5nZXMgaGFuZHksIGp1c3QgdG8gYmUgYWJsZSB0byB0ZXN0Cj4g
-bG9jYWxseSwgYW5kICJyZXZpZXciIGhvdyBkbyB5b3UgbWVhc3VyZSB0aGluZ3MuCgpTb3JyeSwg
-SSBkbyBub3QgaGF2ZSBteSBjaGFuZ2VzIGhhbmR5LiBCdXQgZG9uJ3Qgd29ycnksIEkgd2lsbCBz
-ZW5kIHRoZW0gdG8geW91IHRvbW9ycm93IG1vcm5pbmcuIEl0J3MgbmlnaHQgaGVyZS4KCj4gCj4g
-Cj4gPiBTdGFydGxpbmdseSwgdGhlIHByb3BvcnRpb25zIG9mIHRoZSB3cml0ZS1ub3QtZGlydHkg
-cGFnZXMgYXJlIHF1aXRlIGhpZ2guIE1lbWNhY2hlZCBhbmQgdGhyZWUgQ1BVMjAwNgo+ID4gYmVu
-Y2htYXJrcyh6ZXVzbXAsIG1jZiBhbmQgYnppcDIpIGhhdmUgdGhlIG1vc3QgaGlnaCBwcm9wb3J0
-aW9ucy4gVGhlaXIgcHJvcG9ydGlvbnMgb2YgdGhlIHdyaXRlLW5vdC1kaXJ0eQo+ID4gcGFnZXMg
-d2l0aGluIGFsbCB0aGUgZGlydHkgcGFnZXMgYXJlIGFzIGhpZ2ggYXMgNDUlLTgwJS4KPiAKPiBP
-ciB0aGUgd29ya2xvYWQgZG9lcyByZWFsbHkgc3R1cGlkIHRoaW5ncyBsaWtlOgo+IAo+IGEgPSAw
-Owo+IGEgPSAxOwo+IGEgPSAwOwo+IAo+IFRoaXMgbWFrZXMgbm8gc2Vuc2UgYXQgYWxsLgo+IAo+
-IEp1c3QgaW4gY2FzZSwgY291bGQgeW91IHRyeSB0byB0ZXN0IHRoaXMgd2l0aCB4YnpybGU/ICBJ
-dCBzaG91bGQgZ28gd2VsbAo+IHdpdGggdGhpcyB1c2UgY2FzZSAoYnV0IHlvdSBuZWVkIHRvIGdl
-dCBhIGJpZyBlbm91Z2ggYnVmZmVyIHRvIGNhY2hlCj4gZW5vdWdoIG1lbW9yeSkuCgpJbiBmYWN0
-LCBJIGhhdmUgdGVzdGVkIHRoZXNlIHdvcmtsb2FkcyAodGhlIDQ1JS04MCUgb25lcykgd2l0aCB4
-YnpybGUuIEFuZCB3aGVuIHRoZSBidWZmZXIgaXMgYmlnIGVub3VnaCwgdGhleSByZWFsbHkgZ28g
-d2VsbC4gV2hpbGUgdGhleSBkbyBub3QgY29udmVyZ2UgdG8gc3RvcC1jb3B5IGJlZm9yZSwgbm93
-IHRoZXkgZmluaXNoIG1pZ3JhdGlvbiBxdWlja2x5LgoKPiAKPiAKPiA+IFRoZSBwcm9wb3J0aW9u
-cyBvZiB0aGUgb3RoZXIgd29ya2xvYWRzIGFyZSBhYm91dAo+ID4gNSUtMjAlLCB3aGljaCBhcmUg
-YWxzbyBhYm5vcm1hbC4gQWNjb3JkaW5nIHRvIG15IGludHVpdGlvbiwgdGhlIHByb3BvcnRpb24g
-b2Ygd3JpdGUtbm90LWRpcnR5IHBhZ2VzIHNob3VsZCBiZQo+ID4gZmFyIGxlc3MgdGhhbiB0aGVz
-ZSBudW1iZXJzLiBJIHRoaW5rIGl0IHNob3VsZCBiZSBxdWl0ZSBhIHBhcnRpY3VsYXIgY2FzZSB0
-aGF0IG9uZSBwYWdlIGlzIHdyaXR0ZW4gd2l0aCBleGFjdGx5Cj4gPiB0aGUgc2FtZSBjb250ZW50
-IGFzIHRoZSBmb3JtZXIgZGF0YS4gCj4gCj4gSSBhZ3JlZSB3aXRoIHRoYXQuCj4gCj4gPiBCZXNp
-ZGVzLCB0aGUgemVybyBwYWdlcyBhcmUgbm90IGNvdW50ZWQgZm9yIGFsbCB0aGUgcmVzdWx0cy4g
-QmVjYXVzZSBJIHRoaW5rIGNvZGVzIGxpa2UgbWVtc2V0KCkgbWF5IHdyaXRlCj4gPiBsYXJnZSBh
-cmVhIG9mIHBhZ2VzIHRvIHplcm8gcGFnZXMsIHdoaWNoIGFyZSBhbHJlYWR5IHplcm8gcGFnZXMg
-YmVmb3JlLiAKPiA+Cj4gPiBJIGV4Y2x1ZGVkIHNvbWUgcG9zc2libGUgdW5rbm93biByZWFzb25z
-IHdpdGggdGhlIG1hY2hpbmUgaGFyZHdhcmUsIGJlY2F1c2UgSSByZXBlYXRlZCB0aGUgZXhwZXJp
-bWVudHMKPiA+IHdpdGggdHdvIHNldHMgb2YgZGlmZmVyZW50IG1hY2hpbmVzLiBUaGVuIEkgZ3Vl
-c3NlZCBpdCBtaWdodCBiZSByZWxhdGVkIHdpdGggdGhlIGh1Z2UgcGFnZSBmZWF0dXJlLiBIb3dl
-dmVyLAo+ID4gdGhlIHJlc3VsdCB3YXMgdGhlIHNhbWUgd2hlbiBJIHR1cm5lZCB0aGUgaHVnZSBw
-YWdlIGZlYXR1cmUgb2ZmIGluIHRoZSBPUy4gCj4gCj4gSHVnZSBwYWdlIGNvdWxkIGhhdmUgY2F1
-c2VkIHRoYXQuICBSZW1lbWJlciB0aGF0IHdlIGhhdmUgdHJhbnNwYXJlbnQKPiBodWdlIHBhZ2Vz
-LiAgSSBoYXZlIHRvIGxvb2sgYXQgdGhhdCBjb2RlLgoKSW4gZmFjdCwgdGhlIHJlc3VsdHMgYXJl
-IHRoZSBzYW1lIG5vIG1hdHRlciBJIHR1cm4gb24gb3IgdHVybiBvZmYgdGhlIHRyYW5zcGFyZW50
-IGh1Z2UgcGFnZXMgaW4gdGhlIE9TLgoKTGF0ZXIsIENodW5ndWFuZy4KCj4gCj4gPiBOb3cgdGhl
-cmUgYXJlIG9ubHkgdHdvIHBvc3NpYmxlIHJlYXNvbnMgaW4gbXkgb3Bpbmlvbi4gCj4gPgo+ID4g
-Rmlyc3QsIHRoZXJlIGlzIHNvbWUgYnVncyBpbiB0aGUgS1ZNIGtlcm5lbCBkaXJ0eSB0cmFja2lu
-ZyBtZWNoYW5pc20uIEl0IG1heSBtYXJrIHNvbWUgcGFnZXMgdGhhdCBkbyBub3QKPiA+IHJlY2Vp
-dmUgd3JpdGUgcmVxdWVzdCBhcyBkaXJ0eS4gCj4gCj4gVGhhdCBpcyBhIHBvc2liaWx0eS4KPiAK
-PiA+IFNlY29uZCwgdGhlcmUgaXMgc29tZSBidWdzIGluIHRoZSBPUyBydW5uaW5nIGluc2lkZSB0
-aGUgVk0uIEl0IG1heSBpc3N1ZSBzb21lIHVubmVjZXNzYXJ5IHdyaXRlCj4gPiByZXF1ZXN0cy4g
-Cj4gPgo+ID4gV2hhdCBkbyB5b3UgdGhpbmsgYWJvdXQgdGhpcyBhYm5vcm1hbCBwaGVub21lbm9u
-PyBBbnkgYWR2aWNlIG9yIHBvc3NpYmxlIHJlYXNvbnMgb3IgZXZlbiBndWVzc2VzPyBJCj4gPiBh
-cHByZWNpYXRlIGFueSByZXNwb25zZXMsIGJlY2F1c2UgaXQgaGFzIGNvbmZ1c2VkIG1lIGZvciBh
-IGxvbmcgdGltZS4gVGhhbmsgeW91Lgo+IAo+IEkgd291bGQgbGlrZSB0byByZXByb2R1Y2UgdGhp
-cy4KPiAKPiBUaGFua3MgZm9yIGJyaW5naW5nIHRoaXMgdG8gb3VyIGF0dGVudGlvbi4KPiAKPiBM
-YXRlciwgSnVhbi4KCgotLQpDaHVuZ3VhbmcgTGksIFBoLkQuIENhbmRpZGF0ZQpXdWhhbiBOYXRp
-b25hbCBMYWJvcmF0b3J5IGZvciBPcHRvZWxlY3Ryb25pY3MgKFdOTE8pCkh1YXpob25nIFVuaXZl
-cnNpdHkgb2YgU2NpZW5jZSAmIFRlY2hub2xvZ3kgKEhVU1QpCld1aGFuLCBIdWJlaSBQcm92Liwg
-Q2hpbmEKCgo=
+* Chunguang Li (lichunguang@hust.edu.cn) wrote:
+>=20
+>=20
+>=20
+> > -----=E5=8E=9F=E5=A7=8B=E9=82=AE=E4=BB=B6-----
+> > =E5=8F=91=E4=BB=B6=E4=BA=BA: "Dr. David Alan Gilbert" <dgilbert@redha=
+t.com>
+> > =E5=8F=91=E9=80=81=E6=97=B6=E9=97=B4: 2017-11-15 18:11:37 (=E6=98=9F=E6=
+=9C=9F=E4=B8=89)
+> > =E6=94=B6=E4=BB=B6=E4=BA=BA: "Chunguang Li" <lichunguang@hust.edu.cn>
+> > =E6=8A=84=E9=80=81: qemu-devel@nongnu.org, quintela@redhat.com, amit.=
+shah@redhat.com, pbonzini@redhat.com, stefanha@redhat.com
+> > =E4=B8=BB=E9=A2=98: Re: [Qemu-devel] Abnormal observation during migr=
+ation: too many "write-not-dirty" pages
+> >=20
+> > * Chunguang Li (lichunguang@hust.edu.cn) wrote:
+> > > Hi all!
+> > >=20
+> > > I got a very abnormal observation for the VM migration. I found tha=
+t many pages marked as dirty during migration are "not really dirty", whi=
+ch is, their content are the same as the old version.
+> > >=20
+> > >=20
+> > >=20
+> > >=20
+> > > I did the migration experiment like this:
+> > >=20
+> > > During the setup phase of migration, first I suspended the VM. Then=
+ I copied all the pages within the guest physical address space to a memo=
+ry buffer as large as the guest memory size. After that, the dirty tracki=
+ng began and I resumed the VM. Besides, at the end
+> > > of each iteration, I also suspended the VM temporarily. During the =
+suspension, I compared the content of all the pages marked as dirty in th=
+is iteration byte-by-byte with their former copies inside the buffer. If =
+the content of one page was the same as its former copy, I recorded it as=
+ a "write-not-dirty" page (the page is written exactly with the same cont=
+ent as the old version). Otherwise, I replaced this page in the buffer wi=
+th the new content, for the possible comparison in the future. After the =
+reset of the dirty bitmap, I resumed the VM. Thus, I obtain the proportio=
+n of the write-not-dirty pages within all the pages marked as dirty for e=
+ach pre-copy iteration.
+> > >=20
+> > > I repeated this experiment with 15 workloads, which are 11 CPU2006 =
+benchmarks, Memcached server, kernel compilation, playing a video, and an=
+ idle VM. The CPU2006 benchmarks and Memcached are write-intensive worklo=
+ads. So almost all of them did not converge to stop-copy.
+> > >=20
+> > >=20
+> > >=20
+> > >=20
+> > > Startlingly, the proportions of the write-not-dirty pages are quite=
+ high. Memcached and three CPU2006 benchmarks(zeusmp, mcf and bzip2) have=
+ the most high proportions. Their proportions of the write-not-dirty page=
+s within all the dirty pages are as high as 45%-80%. The proportions of t=
+he other workloads are about 5%-20%, which are also abnormal. According t=
+o my intuition, the proportion of write-not-dirty pages should be far les=
+s than these numbers. I think it should be quite a particular case that o=
+ne page is written with exactly the same content as the former data.
+> > >=20
+> > > Besides, the zero pages are not counted for all the results. Becaus=
+e I think codes like memset() may write large area of pages to zero pages=
+, which are already zero pages before.
+> > >=20
+> > >=20
+> > >=20
+> > >=20
+> > > I excluded some possible unknown reasons with the machine hardware,=
+ because I repeated the experiments with two sets of different machines. =
+Then I guessed it might be related with the huge page feature. However, t=
+he result was the same when I turned the huge page feature off in the OS.
+> > >=20
+> > >=20
+> > >=20
+> > >=20
+> > > Now there are only two possible reasons in my opinion.=20
+> > >=20
+> > > First, there is some bugs in the KVM kernel dirty tracking mechanis=
+m. It may mark some pages that do not receive write request as dirty.
+> > >=20
+> > > Second, there is some bugs in the OS running inside the VM. It may =
+issue some unnecessary write requests.
+> > >=20
+> > >=20
+> > > What do you think about this abnormal phenomenon? Any advice or pos=
+sible reasons or even guesses? I appreciate any responses, because it has=
+ confused me for a long time. Thank you.
+> >=20
+> > Wasn't it you who pointed out last year the other possibility? - The
+> > problem of false positives due to sync'ing the whole of memory and th=
+en
+> > writing the data out, but some of the dirty pages were already writte=
+n?
+> >=20
+> > Dave
+>=20
+> Yes, you remember that!
+
+Yes, I remember that, and my TODO list told me it was you :-)
+
+> It was me. After that, I did more analysis and experiments. I found tha=
+t, in fact, both reasons contribute to the "fake dirty" pages (dirty page=
+s that do not need to be resent, because their contents are the same as t=
+hat in the target node). One is what I pointed out last year, which you h=
+ave mentioned. The other reason is what I am talking about now, the "writ=
+e-not-dirty" phenomenon.
+> In fact, according to my experiments results, the "wirte-not-dirty" is =
+the main reason resulting to the "fake dirty" pages, while sync'ing the w=
+hole of memory contributes less.
+
+How do you differentiate between "fake dirty' and the syncing?
+
+The cases where values change back to what they used to be seem
+the most likely to me (e.g. locks/counts that decrement back) - but
+that seems a high %.
+I wonder if there's any difference between page write protection
+based dirtying and PML (that I think can be used on some newer chips).
+
+One way to debug it I guess would be to keep the write protection
+and watch the progression of data values within a page - do they
+actually change and then change back or do the values never
+really change.
+
+Dave
+
+
+> Chunguang
+> >=20
+> > >=20
+> > > --
+> > > Chunguang Li, Ph.D. Candidate
+> > > Wuhan National Laboratory for Optoelectronics (WNLO)
+> > > Huazhong University of Science & Technology (HUST)
+> > > Wuhan, Hubei Prov., China
+> > >=20
+> > --
+> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>=20
+>=20
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
