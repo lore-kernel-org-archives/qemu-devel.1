@@ -1,40 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48531)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49410)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1eEzRx-0008SF-4F
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 10:18:02 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eEzVJ-0000lz-6A
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 10:21:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1eEzRt-0003RA-TW
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 10:18:01 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:52206
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1eEzRt-0003Ou-NO
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 10:17:57 -0500
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vAFFGVIH106648
-	for <qemu-devel@nongnu.org>; Wed, 15 Nov 2017 10:17:52 -0500
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2e8qxhrhpe-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 15 Nov 2017 10:17:51 -0500
-Received: from localhost
-	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Wed, 15 Nov 2017 15:17:50 -0000
-References: <20171110090354.29608-1-kraxel@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Wed, 15 Nov 2017 16:17:46 +0100
+	(envelope-from <mreitz@redhat.com>) id 1eEzVF-0007vZ-08
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 10:21:29 -0500
+References: <1510654613-47868-1-git-send-email-anton.nefedov@virtuozzo.com>
+	<1510654613-47868-2-git-send-email-anton.nefedov@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <a58bf1a3-d1e1-0c36-85f2-32c89ecc0d12@redhat.com>
+Date: Wed, 15 Nov 2017 16:21:11 +0100
 MIME-Version: 1.0
-In-Reply-To: <20171110090354.29608-1-kraxel@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <0c272cd1-6eeb-c1e9-def8-ebf3fafa2aea@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH] fix scripts/update-linux-headers.sh here
- document
+In-Reply-To: <1510654613-47868-2-git-send-email-anton.nefedov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="qRQKEoOK5W2043pMaWRMXXa1i0PaqCKxE"
+Subject: Re: [Qemu-devel] [PATCH 1/5] qcow2: reject unaligned offsets in
+ write compressed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,29 +25,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, eblake@redhat.com, stefanha@redhat.com, famz@redhat.com, den@virtuozzo.com
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--qRQKEoOK5W2043pMaWRMXXa1i0PaqCKxE
+From: Max Reitz <mreitz@redhat.com>
+To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, eblake@redhat.com,
+ stefanha@redhat.com, famz@redhat.com, den@virtuozzo.com
+Message-ID: <a58bf1a3-d1e1-0c36-85f2-32c89ecc0d12@redhat.com>
+Subject: Re: [PATCH 1/5] qcow2: reject unaligned offsets in write compressed
+References: <1510654613-47868-1-git-send-email-anton.nefedov@virtuozzo.com>
+ <1510654613-47868-2-git-send-email-anton.nefedov@virtuozzo.com>
+In-Reply-To: <1510654613-47868-2-git-send-email-anton.nefedov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On 11/10/2017 10:03 AM, Gerd Hoffmann wrote:
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-
-Tested-by: Christian Borntraeger <borntraeger@de.ibm.com>
-
+On 2017-11-14 11:16, Anton Nefedov wrote:
+> Misaligned compressed write is not supported.
+>=20
+> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
 > ---
->  scripts/update-linux-headers.sh | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/scripts/update-linux-headers.sh b/scripts/update-linux-headers.sh
-> index 8b847e279b..e2b159aa3d 100755
-> --- a/scripts/update-linux-headers.sh
-> +++ b/scripts/update-linux-headers.sh
-> @@ -108,7 +108,7 @@ for arch in $ARCHLIST; do
->      if [ $arch = x86 ]; then
->          cat <<-EOF >"$output/include/standard-headers/asm-x86/hyperv.h"
->          /* this is a temporary placeholder until kvm_para.h stops including it */
-> -        EOF
-> +EOF
->          cp "$tmpdir/include/asm/unistd_32.h" "$output/linux-headers/asm-x86/"
->          cp "$tmpdir/include/asm/unistd_x32.h" "$output/linux-headers/asm-x86/"
->          cp "$tmpdir/include/asm/unistd_64.h" "$output/linux-headers/asm-x86/"
-> 
+>  block/qcow2.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+
+Thanks, applied to my block branch for 2.11:
+
+https://github.com/XanClic/qemu/commits/block
+
+Max
+
+
+--qRQKEoOK5W2043pMaWRMXXa1i0PaqCKxE
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAloMW2cSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9ACgUIAJIoH8CqG0zoojyxFrNXxw61T0qZeq+P
+pJMW63FjruYVE85eIyVjCskw4TkkbaozJe/FAVA76DneOPqqhTujIw19/vg0miH/
+ryVLzyA5/3BoXy8FYYBbHvRjFo7Ie78tdaMc8cW2nqdL70qsliIj/3ehWWeML6Ls
+Lpyc5II9ZzDTQaGZ/i1w/P1j5usjUekErkJhvl1yucEuwwaQxPQ36wXdLjwEPuPf
+6LceNfSDBxEgq4IbgAgdH53f97HBC24IZEoqelTXgSU/67136UZWxTNqMSWVGqcj
+E54tGX4oc7aqk6lukhZR16fKzkZ3G5+gndEnOvuxvDa7Rp4UrhqvETw=
+=m8nH
+-----END PGP SIGNATURE-----
+
+--qRQKEoOK5W2043pMaWRMXXa1i0PaqCKxE--
