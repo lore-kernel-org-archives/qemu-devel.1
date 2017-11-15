@@ -1,39 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60768)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34470)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1eEwqo-00031B-Mv
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 07:31:34 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1eEwwa-0006r3-62
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 07:37:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1eEwqk-0002Av-Op
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 07:31:30 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59234
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1eEwqk-0002Ab-KO
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 07:31:26 -0500
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vAFCSnLV009069
-	for <qemu-devel@nongnu.org>; Wed, 15 Nov 2017 07:31:21 -0500
-Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2e8mdpunyy-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 15 Nov 2017 07:31:20 -0500
-Received: from localhost
-	by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Wed, 15 Nov 2017 07:31:20 -0500
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Wed, 15 Nov 2017 07:31:09 -0500
-In-Reply-To: <1510749069-22059-1-git-send-email-stefanb@linux.vnet.ibm.com>
-References: <1510749069-22059-1-git-send-email-stefanb@linux.vnet.ibm.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1eEwwX-0006MH-1B
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 07:37:28 -0500
+Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:44984)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1eEwwW-0006M3-Q8
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 07:37:24 -0500
+Received: by mail-wr0-x241.google.com with SMTP id u97so20381309wrc.1
+	for <qemu-devel@nongnu.org>; Wed, 15 Nov 2017 04:37:24 -0800 (PST)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Wed, 15 Nov 2017 13:35:17 +0100
+Message-Id: <20171115123520.7464-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Message-Id: <1510749069-22059-5-git-send-email-stefanb@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 4/4] tpm_tis: Return 0 for every register in
- case of failure mode
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL for-2.11 0/3] tcg: user-mode memory helper fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,34 +28,39 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, marcandre.lureau@gmail.com, Stefan Berger <stefanb@linux.vnet.ibm.com>
+Cc: peter.maydell@linaro.org
 
-Rather than returning ~0, return 0 for every register in case of failure
-mode. The '0' is better to indicate that there's no device there. It avoi=
-ds
-SeaBIOS detecting a device and getting stuck on it trying to read and wri=
-te
-its registers.
+Fixes the issue that Peter found wrt javac on aarch64-linux-user.
 
-Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- hw/tpm/tpm_tis.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
-index fec2fc6..42d647d 100644
---- a/hw/tpm/tpm_tis.c
-+++ b/hw/tpm/tpm_tis.c
-@@ -545,7 +545,7 @@ static uint64_t tpm_tis_mmio_read(void *opaque, hwadd=
-r addr,
-     uint8_t v;
-=20
-     if (tpm_backend_had_startup_error(s->be_driver)) {
--        return val;
-+        return 0;
-     }
-=20
-     switch (offset) {
---=20
-2.5.5
+r~
+
+
+The following changes since commit 1fa0f627d03cd0d0755924247cafeb42969016bf:
+
+  Update version for v2.11.0-rc1 release (2017-11-14 18:37:49 +0000)
+
+are available in the git repository at:
+
+  git://github.com/rth7680/qemu.git tags/pull-tcg-20171115
+
+for you to fetch changes up to 3c5f9c3f35dd3b6d1d1cd68c9d4d86fc3c59c397:
+
+  target/arm: Fix GETPC usage in do_paired_cmpxchg64_l/be (2017-11-15 10:34:33 +0100)
+
+----------------------------------------------------------------
+User-mode memory helper fixes
+
+----------------------------------------------------------------
+Richard Henderson (3):
+      tcg: Record code_gen_buffer address for user-only memory helpers
+      target/arm: Use helper_retaddr in stxp helpers
+      target/arm: Fix GETPC usage in do_paired_cmpxchg64_l/be
+
+ accel/tcg/atomic_template.h               | 32 +++++++++++++----
+ include/exec/cpu_ldst.h                   |  2 ++
+ include/exec/cpu_ldst_useronly_template.h | 14 ++++++--
+ accel/tcg/cputlb.c                        |  1 +
+ accel/tcg/user-exec.c                     | 58 +++++++++++++++++++++++++------
+ target/arm/helper-a64.c                   | 20 ++++++-----
+ 6 files changed, 99 insertions(+), 28 deletions(-)
