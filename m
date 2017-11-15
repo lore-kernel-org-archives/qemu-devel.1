@@ -1,28 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51542)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53451)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1eF51p-0003dJ-Qc
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 16:15:26 -0500
+	(envelope-from <eblake@redhat.com>) id 1eF55i-0005ZP-IA
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 16:19:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1eF51o-0001Tn-LV
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 16:15:25 -0500
-Date: Wed, 15 Nov 2017 21:15:11 +0000
-From: "Richard W.M. Jones" <rjones@redhat.com>
-Message-ID: <20171115211511.GD2450@redhat.com>
-References: <c2ecae32-f999-9f1e-46a6-37cdab2a62e3@redhat.com>
-	<CAJH6TXhBAaBE9gBSxksWZqNywWmencRaGyeY-oN3jbKdgUettQ@mail.gmail.com>
-	<0e6cc220-814a-17fd-4fd7-7b0665d34e81@redhat.com>
-	<CAJH6TXh2v-F=yqxQbUUawk_Ctq-sgFefGp1XvMsC=syX_5jEqA@mail.gmail.com>
-	<30b54865-2255-d13d-a054-afcf5bbd06b2@redhat.com>
-	<20171115202440.GJ19514@redhat.com>
-	<7b11bb2b-b93d-e8ff-f396-703c93549d0d@redhat.com>
-	<20171115202938.GN2787@redhat.com>
-	<CAJH6TXiPuLu62-+o2+PrUGpstrks_5pLotFEe1bAOmsbn20otw@mail.gmail.com>
-	<20171115210500.GB2450@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171115210500.GB2450@redhat.com>
-Subject: Re: [Qemu-devel] [Libguestfs]  [qemu-img] support for XVA
+	(envelope-from <eblake@redhat.com>) id 1eF55h-00055v-Ei
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 16:19:26 -0500
+From: Eric Blake <eblake@redhat.com>
+Date: Wed, 15 Nov 2017 15:19:17 -0600
+Message-Id: <20171115211917.789-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH for-2.11] nbd/server: Fix error reporting for
+ bad requests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,25 +18,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gandalf Corvotempesta <gandalf.corvotempesta@gmail.com>
-Cc: Qemu-block <qemu-block@nongnu.org>, qemu-devel@nongnu.org, libguestfs <libguestfs@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, vsementsov@virtuozzo.com, Paolo Bonzini <pbonzini@redhat.com>
 
-On Wed, Nov 15, 2017 at 09:05:00PM +0000, Richard W.M. Jones wrote:
-> This will give you one offset/size/filename tuple for each file.  The
-> plugin will then simply need to calculate which file to access to
-> resolve each virtual file range (or substitute zeroes for missing
-> files).
+The NBD spec says an attempt to NBD_CMD_TRIM on a read-only
+export should fail with EPERM, as a trim has the potential
+to change disk contents, but we were relying on the block
+layer to catch that for us, which might not always give the
+right error (and even if it does, it does not let us pass
+back a sane message over structured replies).
 
-By which I mean, of course, that it accesses the offset/size directly
-by opening the tar file.  The file doesn't have to be extracted.
+The NBD spec says an attempt to NBD_CMD_WRITE_ZEROES out of
+bounds should fail with ENOSPC, not EINVAL.
 
-I'm still interested if you have a small XVA example you can share.
+Our check for u64 offset + u32 length wraparound up front is
+pointless; nothing uses offset until after the second round
+of sanity checks, and we can just as easily ensure there is
+no wraparound by checking whether offset is in bounds (since
+a disk size cannot exceed off_t which is 63 bits, adding a
+32-bit number for a valid offset can't overflow).
 
-Rich.
+Solve all of these issues by some code motion and improved
+request validation.
 
+Signed-off-by: Eric Blake <eblake@redhat.com>
+---
+ nbd/server.c | 35 +++++++++++------------------------
+ 1 file changed, 11 insertions(+), 24 deletions(-)
+
+diff --git a/nbd/server.c b/nbd/server.c
+index df771fd42f..a27183b427 100644
+--- a/nbd/server.c
++++ b/nbd/server.c
+@@ -1366,15 +1366,6 @@ static int nbd_co_receive_request(NBDRequestData *req, NBDRequest *request,
+         return -EIO;
+     }
+
+-    /* Check for sanity in the parameters, part 1.  Defer as many
+-     * checks as possible until after reading any NBD_CMD_WRITE
+-     * payload, so we can try and keep the connection alive.  */
+-    if ((request->from + request->len) < request->from) {
+-        error_setg(errp,
+-                   "integer overflow detected, you're probably being attacked");
+-        return -EINVAL;
+-    }
+-
+     if (request->type == NBD_CMD_READ || request->type == NBD_CMD_WRITE) {
+         if (request->len > NBD_MAX_BUFFER_SIZE) {
+             error_setg(errp, "len (%" PRIu32" ) is larger than max len (%u)",
+@@ -1399,12 +1390,20 @@ static int nbd_co_receive_request(NBDRequestData *req, NBDRequest *request,
+                                                       request->len);
+     }
+
+-    /* Sanity checks, part 2. */
+-    if (request->from + request->len > client->exp->size) {
++    /* Sanity checks. */
++    if (client->exp->nbdflags & NBD_FLAG_READ_ONLY &&
++        (cmd == NBD_CMD_WRITE || cmd == NBD_CMD_WRITE_ZEROES ||
++         cmd == NBD_CMD_TRIM)) {
++        error_setg(&local_err, "Export is read-only");
++        return -EROFS;
++    }
++    if (request->from > client->exp->size ||
++        request->from + request->len > client->exp->size) {
+         error_setg(errp, "operation past EOF; From: %" PRIu64 ", Len: %" PRIu32
+                    ", Size: %" PRIu64, request->from, request->len,
+                    (uint64_t)client->exp->size);
+-        return request->type == NBD_CMD_WRITE ? -ENOSPC : -EINVAL;
++        return (request->type == NBD_CMD_WRITE ||
++                request->type == NBD_CMD_WRITE_ZEROES) ? -ENOSPC : -EINVAL;
+     }
+     valid_flags = NBD_CMD_FLAG_FUA;
+     if (request->type == NBD_CMD_READ && client->structured_reply) {
+@@ -1482,12 +1481,6 @@ static coroutine_fn void nbd_trip(void *opaque)
+
+         break;
+     case NBD_CMD_WRITE:
+-        if (exp->nbdflags & NBD_FLAG_READ_ONLY) {
+-            error_setg(&local_err, "Export is read-only");
+-            ret = -EROFS;
+-            break;
+-        }
+-
+         flags = 0;
+         if (request.flags & NBD_CMD_FLAG_FUA) {
+             flags |= BDRV_REQ_FUA;
+@@ -1500,12 +1493,6 @@ static coroutine_fn void nbd_trip(void *opaque)
+
+         break;
+     case NBD_CMD_WRITE_ZEROES:
+-        if (exp->nbdflags & NBD_FLAG_READ_ONLY) {
+-            error_setg(&local_err, "Export is read-only");
+-            ret = -EROFS;
+-            break;
+-        }
+-
+         flags = 0;
+         if (request.flags & NBD_CMD_FLAG_FUA) {
+             flags |= BDRV_REQ_FUA;
 -- 
-Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
-Read my programming and virtualization blog: http://rwmj.wordpress.com
-Fedora Windows cross-compiler. Compile Windows programs, test, and
-build Windows installers. Over 100 libraries supported.
-http://fedoraproject.org/wiki/MinGW
+2.13.6
