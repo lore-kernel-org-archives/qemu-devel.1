@@ -1,33 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36946)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40073)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eF3d8-0003Z6-UQ
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 14:45:52 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eF3jC-0005j6-BV
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 14:52:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eF3d3-0006K5-Uc
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 14:45:50 -0500
-Received: from indium.canonical.com ([91.189.90.7]:40322)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eF3d3-0006JL-NK
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 14:45:45 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eF3d1-0000yV-K6
-	for <qemu-devel@nongnu.org>; Wed, 15 Nov 2017 19:45:43 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 7C4442E80C3
-	for <qemu-devel@nongnu.org>; Wed, 15 Nov 2017 19:45:43 +0000 (UTC)
+	(envelope-from <mreitz@redhat.com>) id 1eF3jA-0003ML-U1
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 14:52:06 -0500
+References: <1510654613-47868-1-git-send-email-anton.nefedov@virtuozzo.com>
+	<1510654613-47868-6-git-send-email-anton.nefedov@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <5a1b8baf-e583-2142-902e-976fce9ccc40@redhat.com>
+Date: Wed, 15 Nov 2017 20:51:45 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 15 Nov 2017 19:26:15 -0000
-From: Michal Nowak <mnowak@startmail.com>
-Reply-To: Bug 823733 <823733@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20110810053253.11269.76752.malonedeb@gac.canonical.com>
-Message-Id: <151077397583.7958.387960486307548068.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 823733] Re: Soloaris can't be poweroff
+In-Reply-To: <1510654613-47868-6-git-send-email-anton.nefedov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="wlMX6DA7r7EE8HBx4gCd4EBONqgbEi1qi"
+Subject: Re: [Qemu-devel] [PATCH 5/5] iotest 030: add compressed
+ block-stream test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,156 +25,212 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, eblake@redhat.com, stefanha@redhat.com, famz@redhat.com, den@virtuozzo.com
 
-I can reproduce the issue with modern illumos distributions like
-OpenIndiana 2017.10 on Linux KVM host with QEMU 2.10.1 (illumos is
-OpenSolaris OS/Net - i.e. "the kernel" - heir, roughly equal to Solaris
-11).
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--wlMX6DA7r7EE8HBx4gCd4EBONqgbEi1qi
+From: Max Reitz <mreitz@redhat.com>
+To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, eblake@redhat.com,
+ stefanha@redhat.com, famz@redhat.com, den@virtuozzo.com
+Message-ID: <5a1b8baf-e583-2142-902e-976fce9ccc40@redhat.com>
+Subject: Re: [PATCH 5/5] iotest 030: add compressed block-stream test
+References: <1510654613-47868-1-git-send-email-anton.nefedov@virtuozzo.com>
+ <1510654613-47868-6-git-send-email-anton.nefedov@virtuozzo.com>
+In-Reply-To: <1510654613-47868-6-git-send-email-anton.nefedov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-It's still the case illumos will shut down on other hypervizors e.g.
-VirtualBox. I raised the question on #illumos IRC chat and an illumos
-developer replied it might be a shortage in illumos that "it's not
-playing nice with some ACPI emulation bugs".
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/823733
-
-Title:
-  Soloaris can't be poweroff
-
-Status in QEMU:
-  Triaged
-
-Bug description:
-  Thank you forgive my poor English.
-
-  It seems KVM can=E2=80=99t poweroff solairs 10 or sloalrs 11 VM.
-  I have created solaris 10 and 11 as usual. Everything in VM is running OK=
-, but finally I use shell command =E2=80=98poweroff=E2=80=99 or =E2=80=98in=
-it 5=E2=80=99, the solaris VM (both 10 & 11) system could=E2=80=99t be powe=
-roff but with promoting me the message: perss any key to reboot =E2=80=A6..=
-  ,I pressed any key in vnc client, solaris VM reboot immediately. Endless =
-reboot loop above.
-
-  the solaris 10 & 11 from oracle iso file name :
-  sol-10-u9-ga-x86-dvd.iso
-  sol-11-exp-201011-text-x86.iso
-
-  the solaris 10 & 11 from oracle iso file name :
-  sol-10-u9-ga-x86-dvd.iso
-  sol-11-exp-201011-text-x86.iso
-
-  1. On my real physical machine,the solaris can be poweroff
-  2. On vmware ,the solaris can be poweroff
-  3. On my real physical machine,I have try to disbale the ACPI opiton in B=
-OIS, then the solaris can't be poweroff,Like the problem I have described a=
-bove
-  so ,I doubt the KVM has a little problem in ACPI =
-
-
-  I have try the suggestion as follows, but I can=E2=80=99t solve the probl=
-em.
-  7.2 Solaris reboot all the time on grub menu
-  =E2=80=A2	Run through the installer as usual =
-
-  =E2=80=A2	On completion and reboot, the VM will perpetually reboot. "Stop=
-" the VM. =
-
-  =E2=80=A2	Start it up again, and immediately open a vnc console and selec=
-t the Safe Boot from the options screen =
-
-  =E2=80=A2	When prompted if you want to try and recover the boot block, sa=
-y yes =
-
-  =E2=80=A2	You should now have a Bourne terminal with your existing filesy=
-stem mounted on /a =
-
-  =E2=80=A2	Run /a/usr/bin/bash (my preferred shell) =
-
-  =E2=80=A2	export TERM=3Dxterm =
-
-  =E2=80=A2	vi /a/boot/grub/menu.1st (editing the bootloader on your mounte=
-d filesystem), to add "kernel/unix" to the kernel options for the non-safe-=
-mode boot. Ex : =
-
-  Config File : /a/boot/grub/menu.lst =
-
-  kernel$ /platform/i86pc/multiboot -B $ZFS-BOOTFS kernel/unix
-
-  According to KVM requirements, I collected the following information:
-  CPU model name
-  model name      : Intel(R) Xeon(R) CPU           X3450  @ 2.67GHz
-
-  kvm -version
-  QEMU PC emulator version 0.12.3 (qemu-kvm-0.12.3), Copyright (c) 2003-200=
-8 Fabrice Bellard
-
-  Host kernel version
-  Ubuntu 10.04.1 LTS   2.6.32-25-server =
+On 2017-11-14 11:16, Anton Nefedov wrote:
+> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+> ---
+>  tests/qemu-iotests/030     | 69 ++++++++++++++++++++++++++++++++++++++=
++++++++-
+>  tests/qemu-iotests/030.out |  4 +--
+>  2 files changed, 70 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/tests/qemu-iotests/030 b/tests/qemu-iotests/030
+> index 1883894..52cbe5d 100755
+> --- a/tests/qemu-iotests/030
+> +++ b/tests/qemu-iotests/030
+> @@ -21,7 +21,7 @@
+>  import time
+>  import os
+>  import iotests
+> -from iotests import qemu_img, qemu_io
+> +from iotests import qemu_img, qemu_img_pipe, qemu_io
+> =20
+>  backing_img =3D os.path.join(iotests.test_dir, 'backing.img')
+>  mid_img =3D os.path.join(iotests.test_dir, 'mid.img')
+> @@ -800,5 +800,72 @@ class TestSetSpeed(iotests.QMPTestCase):
+> =20
+>          self.cancel_and_wait()
+> =20
+> +class TestCompressed(iotests.QMPTestCase):
+> +    supported_fmts =3D ['qcow2']
+> +    cluster_size =3D 64 * 1024;
+> +    image_len =3D 1 * 1024 * 1024;
+> +
+> +    def setUp(self):
+> +        qemu_img('create', backing_img, str(TestCompressed.image_len))=
 
 
-  What host kernel arch you are using (i386 or x86_64)
-  X86_64
+First, this is missing the '-f raw', if you want to keep it in line with
+the next command.
 
-  Guest OS
-  Solaris 10 and Solaris 11=EF=BC=8Cboth can not shutdown
+> +        qemu_io('-f', 'raw', '-c', 'write -P 1 0 ' + str(TestCompresse=
+d.image_len), backing_img)
 
-  The qemu command line you are using to start the guest
+But why would you want this to be raw?
 
-  First, I used the command line as follows:
-  kvm -m 1024 -drive file=3Dsolaris10.img,cache=3Dwriteback -net nic -net u=
-ser -nographic -vnc :1
-  then I try to use -no-kvm-irqchip or -no-kvm ,but the problem also appear=
-s!
+> +        qemu_img('create', '-f', iotests.imgfmt, '-o', 'backing_file=3D=
+%s' % backing_img, test_img)
+> +
+> +        # write '4' in every 4th cluster
+> +        step=3D4
 
-  Secondly, have created and run solaris 10&11 by using Virsh, still solari=
-s can't be poweroff, the XML file content is :
-  <domain type=3D'kvm'>
-      <name>solairs</name>
-      <uuid>85badf15-244d-4719-a2da-8c3de064137d</uuid>
-      <memory>1677721</memory>
-      <currentMemory>1677721</currentMemory>
-      <vcpu>1</vcpu>
-      <os>
-      <type arch=3D'i686' machine=3D'pc-0.12'>hvm</type>
-        <boot dev=3D'hd'/>
-     </os>
-     <features>
-      <acpi/>
-      <apic/>
-     </features>
-    <clock offset=3D'utc'/>
-     <on_poweroff>destroy</on_poweroff>
-    <on_reboot>restart</on_reboot>
-     <on_crash>destroy</on_crash>
-     <devices>
-       <emulator>/usr/bin/kvm</emulator>
-       <disk type=3D'file' device=3D'disk'>
-        <driver name=3D'qemu' type=3D'qcow2' cache=3D'writeback'/>
-         <source file=3D'/opt/GuestOS/solaris10.img'/>
-         <target dev=3D'hda' bus=3D'ide'/>
-       </disk>
-      <interface type=3D'bridge'>
-        <mac address=3D'00:0c:29:d0:36:c3'/>
-        <source bridge=3D'br1'/>
-        <target dev=3D'vnet0'/>
-       </interface>
-       <input type=3D'mouse' bus=3D'ps2'/>
-       <graphics type=3D'vnc' port=3D'5901' autoport=3D'no' keymap=3D'en-us=
-'/>
-      <video>
-        <model type=3D'vga' vram=3D'65536' heads=3D'1'/>
-      </video>
-    </devices>
-    <seclabel type=3D'dynamic' model=3D'apparmor'>
-      <label>libvirt-f36f5289-692e-6f1c-fe71-c6ed19453e2f</label>
-      <imagelabel>libvirt-f36f5289-692e-6f1c-fe71-c6ed19453e2f</imagelabel>
-    </seclabel>
-   </domain>
+I'd prefer spaces around operators.  (Also in _pattern() and in the call
+to pattern ([1,4,2] should be [1, 4, 2]).)
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/823733/+subscriptions
+> +        for i in range(TestCompressed.image_len / TestCompressed.clust=
+er_size / step + 1):
+
+As far as I know, range() has an actual step parameter, maybe that would
+be simpler -- and I don't know what the +1 is supposed to mean.
+
+How about "for ofs in range(0, TestCompressed.image_len,
+                            TestCompressed.cluster_size * step)"?
+Would that work?
+
+> +            qemu_io('-c', 'write -P %d %d %d' %
+> +                    (step, step * i * TestCompressed.cluster_size,> + =
+                    TestCompressed.cluster_size),
+> +                    test_img)
+> +
+> +        self.vm =3D iotests.VM().add_drive(test_img)
+> +        self.vm.launch()
+> +
+> +    def tearDown(self):
+> +        os.remove(test_img)
+> +        os.remove(backing_img)
+> +
+> +    def _pattern(self, x, divs):
+> +        return divs[-1] if not x%divs[-1] else self._pattern(x, divs[:=
+-1])
+
+I have no idea what this function does.
+
+=2E..OK, having looked into how it's used, I understand better.  A commen=
+t
+would certainly be helpful, though.
+
+Maybe also call it differently.  It doesn't really return a pattern.
+What this function does is it returns the first integer from @divs
+(starting from the end, which is weird) which is a divider of @x.  So
+maybe call it _first_divider(self, x, dividers), that would help already.=
+
+
+> +
+> +    def test_compressed(self):
+> +        self.assert_no_active_block_jobs()
+> +
+> +        result =3D self.vm.qmp('block-stream', device=3D'drive0', comp=
+ress=3DTrue)
+> +        if iotests.imgfmt not in TestCompressed.supported_fmts:
+> +            self.assert_qmp(
+> +                result, 'error/desc',
+> +                'Compression is not supported for this drive drive0')
+> +            return
+> +        self.assert_qmp(result, 'return', {})
+> +
+> +        # write '2' in every 2nd cluster
+> +        step =3D 2
+> +        for i in range(TestCompressed.image_len / TestCompressed.clust=
+er_size / step + 1):
+> +            result =3D self.vm.qmp('human-monitor-command',
+> +                                 command_line=3D
+> +                                 'qemu-io drive0 \"write -P %d %d %d\"=
+' %
+
+Just " instead of \" would be enough, I think.
+
+> +                                 (step, step * i * TestCompressed.clus=
+ter_size,
+> +                                  TestCompressed.cluster_size))
+> +            self.assert_qmp(result, 'return', "")
+> +
+> +        self.wait_until_completed()
+> +        self.assert_no_active_block_jobs()
+> +
+> +        self.vm.shutdown()
+> +
+> +        for i in range(TestCompressed.image_len / TestCompressed.clust=
+er_size):
+> +            outp =3D qemu_io('-c', 'read -P %d %d %d' %
+> +                           (self._pattern(i, [1,4,2]),
+
+The 4 is useless, because everything that's divisible by 4 is divisible
+by 2 already.
+
+Also, I don't quite see what this should achieve exactly.  You first
+write the backing image full of 1s, OK.  Then you write 4s to every
+fourth cluster in the top image.  Then you start streaming, and then you
+write 2s to ever second cluster in the top image, which overwrites all
+of the 4s you wrote.
+
+Do you maybe not want to write 2 into every second cluster of the
+backing image in setUp() instead of 4 into the top image?  (And then 4th
+into every fourth cluster here in test_compressed().)  Then you would
+need [1, 2, 4] here, which makes much more sense.
+
+Max
+
+> +                            i * TestCompressed.cluster_size,
+> +                            TestCompressed.cluster_size),
+> +                           test_img)
+> +            self.assertTrue(not 'fail' in outp)
+> +            self.assertTrue('read' in outp and 'at offset' in outp)
+> +
+> +        self.assertTrue(
+> +            "File contains external, encrypted or compressed clusters.=
+"
+> +            in qemu_img_pipe('map', test_img))
+> +
+>  if __name__ =3D=3D '__main__':
+>      iotests.main(supported_fmts=3D['qcow2', 'qed'])
+> diff --git a/tests/qemu-iotests/030.out b/tests/qemu-iotests/030.out
+> index 391c857..42314e9 100644
+> --- a/tests/qemu-iotests/030.out
+> +++ b/tests/qemu-iotests/030.out
+> @@ -1,5 +1,5 @@
+> -.......................
+> +........................
+>  ----------------------------------------------------------------------=
+
+> -Ran 23 tests
+> +Ran 24 tests
+> =20
+>  OK
+>=20
+
+
+
+--wlMX6DA7r7EE8HBx4gCd4EBONqgbEi1qi
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAloMmtISHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AIrUH/ROIJLX+XdETc4NPQc2i//9b4D4ii2p7
+eRUHgVSNU2CWYSVyhy+WJA3VrssRp/sq+h6cq5VHmbWxWhM0ehjjMMr/AJXMv7qi
+uyJwj3LecIuV8FsbR6iGwdPe1V9TgKlRcOVVMHuTtv5b+ZoXkHEhA0l7+36HU3ur
+De6A59icJM1twjGf50ZS2FoQUy0nfXQBJJKoGwN4MOLfmAzhYGTTjnGV6ZqoMzDP
+D9s1GrKNDpbIJzzQM5RcVnbgqFfM2dGFk0/++5ga9SkQuiIbxUbSk7TrsbiUk8UI
+qV61tMf+IX1kiTR9IIuirXepuFG5i7q92gB+4RVn6/67YbjyIlhtCXM=
+=PGgq
+-----END PGP SIGNATURE-----
+
+--wlMX6DA7r7EE8HBx4gCd4EBONqgbEi1qi--
