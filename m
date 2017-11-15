@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33559)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34051)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eEyZ6-0000lo-Av
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 09:21:21 -0500
+	(envelope-from <lichunguang@hust.edu.cn>) id 1eEyaY-0001V5-Ch
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 09:22:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eEyZ2-0003cm-UN
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 09:21:20 -0500
-Received: from indium.canonical.com ([91.189.90.7]:43736)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eEyZ2-0003bD-GZ
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 09:21:16 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eEyZ0-00069c-AQ
-	for <qemu-devel@nongnu.org>; Wed, 15 Nov 2017 14:21:14 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 1DDE32E80CC
-	for <qemu-devel@nongnu.org>; Wed, 15 Nov 2017 14:21:14 +0000 (UTC)
+	(envelope-from <lichunguang@hust.edu.cn>) id 1eEyaT-0005Vx-Pr
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 09:22:50 -0500
+Received: from mail.hust.edu.cn ([202.114.0.240]:55412 helo=hust.edu.cn)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <lichunguang@hust.edu.cn>) id 1eEyaS-0005Qd-UV
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 09:22:45 -0500
+Date: Wed, 15 Nov 2017 22:22:13 +0800 (GMT+08:00)
+From: "Chunguang Li" <lichunguang@hust.edu.cn>
+In-Reply-To: <874lpvdgdz.fsf@secure.laptop>
+References: <6e0e65ef.427f.15faf8d41e9.Coremail.lichunguang@hust.edu.cn>
+	<874lpvdgdz.fsf@secure.laptop>
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=UTF-8
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 15 Nov 2017 14:07:28 -0000
-From: adg <1728256@bugs.launchpad.net>
-Reply-To: Bug 1728256 <1728256@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150920686502.20214.12572544661418580428.malonedeb@soybean.canonical.com>
-Message-Id: <151075484854.8112.13626497628539769408.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1728256] Re: Memory corruption in Windows 10
- guest / amd64
+Message-ID: <7d022afb.758c.15fc00f11b5.Coremail.lichunguang@hust.edu.cn>
+Subject: Re: [Qemu-devel] Abnormal observation during migration: too many
+ "write-not-dirty" pages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,52 +28,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: quintela@redhat.com
+Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, stefanha@redhat.com
 
-I've also had the exact symptoms and issues you've described. I have
-also noticed that the VM would BSOD with the
-CRITICAL_STRUCTURE_CORRUPTION message when the host system would read VM
-memory from swap.
-
-After disabling swap on the host system I've completely managed to
-eliminate this BSOD issue. Hopefully it's also applicable to your system
-so you can atleast figure out how to move forward.
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1728256
-
-Title:
-  Memory corruption in Windows 10 guest / amd64
-
-Status in QEMU:
-  New
-
-Bug description:
-  I have a Win 10 Pro x64 guest inside a qemu/kvm running on an Arch x86_64=
- host. The VM has a physical GPU passed through, as well as the physical US=
-B controllers, as well as a dedicated SSD attached via SATA; you can find t=
-he complete libvirt xml here: https://pastebin.com/U1ZAXBNg
-  I built qemu from source using the qemu-minimal-git AUR package; you can =
-find the build script here: https://aur.archlinux.org/cgit/aur.git/tree/PKG=
-BUILD?h=3Dqemu-minimal-git (if you aren't familiar with Arch, this is essen=
-tially a bash script where build() and package() are run to build the files=
-, and then install them into the $pkgdir to later tar them up.)
-
-  Starting with qemu v2.10.0, Windows crashes randomly with a bluescreen
-  about CRITICAL_STRUCTURE_CORRUPTION. I also tested the git heads
-  f90ea7ba7c, 861cd431c9 and e822e81e35, before I went back to v2.9.0,
-  which is running stable for over 50 hours right now.
-
-  During my tests I found that locking the memory pages alleviates the
-  problem somewhat, but never completely avoids it. However, with the
-  crashes occuring randomly, that could as well be false conclusions; I
-  had crashes within minutes after boot with that too.
-
-  I will now start `git bisect`ing; if you have any other suggestions on
-  what I could try or possible patches feel free to leave them with me.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1728256/+subscriptions
+CgoKPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2VzLS0tLS0KPiBGcm9tOiAiSnVhbiBRdWludGVsYSIg
+PHF1aW50ZWxhQHJlZGhhdC5jb20+Cj4gU2VudCBUaW1lOiAyMDE3LTExLTE1IDE3OjQ1OjQ0IChX
+ZWRuZXNkYXkpCj4gVG86ICJDaHVuZ3VhbmcgTGkiIDxsaWNodW5ndWFuZ0BodXN0LmVkdS5jbj4K
+PiBDYzogcWVtdS1kZXZlbEBub25nbnUub3JnLCBkZ2lsYmVydEByZWRoYXQuY29tLCBhbWl0LnNo
+YWhAcmVkaGF0LmNvbSwgcGJvbnppbmlAcmVkaGF0LmNvbSwgc3RlZmFuaGFAcmVkaGF0LmNvbQo+
+IFN1YmplY3Q6IFJlOiBBYm5vcm1hbCBvYnNlcnZhdGlvbiBkdXJpbmcgbWlncmF0aW9uOiB0b28g
+bWFueSAid3JpdGUtbm90LWRpcnR5IiBwYWdlcwo+IAo+ICJDaHVuZ3VhbmcgTGkiIDxsaWNodW5n
+dWFuZ0BodXN0LmVkdS5jbj4gd3JvdGU6Cj4gPiBIaSBhbGwhIAo+IAo+IEhpCj4gCj4gU29ycnkg
+Zm9yIHRoZSBkZWxheSwgSSB3YXMgb24gdmFjYXRpb24gYW4gc3RpbGwgZ2V0dGluZyB1cCB0byBz
+cGVlZC4KCkhpLCBKdWFuLCB0aGFua3MgZm9yIHlvdXIgcmVwbHkuCgo+IAo+ID4gSSBnb3QgYSB2
+ZXJ5IGFibm9ybWFsIG9ic2VydmF0aW9uIGZvciB0aGUgVk0gbWlncmF0aW9uLiBJIGZvdW5kIHRo
+YXQgbWFueSBwYWdlcyBtYXJrZWQgYXMgZGlydHkgZHVyaW5nCj4gPiBtaWdyYXRpb24gYXJlICJu
+b3QgcmVhbGx5IGRpcnR5Iiwgd2hpY2ggaXMsIHRoZWlyIGNvbnRlbnQgYXJlIHRoZSBzYW1lIGFz
+IHRoZSBvbGQgdmVyc2lvbi4gCj4gCj4gSSB0aGluayB5b3VyIHRlc3QgaXMgcXVpdGUgZ29vZCwg
+YW5kIEkgYW0gYWxzbyBhc2hhbWVkIHRoYXQgODAlIG9mCj4gImZhbHNlIiBkaXJ0eSBwYWdlcyBp
+cyByZWFsbHkgYSBsb3QuCj4gCj4gPiBJIGRpZCB0aGUgbWlncmF0aW9uIGV4cGVyaW1lbnQgbGlr
+ZSB0aGlzOiAKPiA+Cj4gPiBEdXJpbmcgdGhlIHNldHVwIHBoYXNlIG9mIG1pZ3JhdGlvbiwgZmly
+c3QgSSBzdXNwZW5kZWQgdGhlIFZNLiBUaGVuIEkgY29waWVkIGFsbCB0aGUgcGFnZXMgd2l0aGlu
+IHRoZSBndWVzdAo+ID4gcGh5c2ljYWwgYWRkcmVzcyBzcGFjZSB0byBhIG1lbW9yeSBidWZmZXIg
+YXMgbGFyZ2UgYXMgdGhlIGd1ZXN0IG1lbW9yeSBzaXplLiBBZnRlciB0aGF0LCB0aGUgZGlydHkg
+dHJhY2tpbmcKPiA+IGJlZ2FuIGFuZCBJIHJlc3VtZWQgdGhlIFZNLiBCZXNpZGVzLCBhdCB0aGUg
+ZW5kCj4gPiBvZiBlYWNoIGl0ZXJhdGlvbiwgSSBhbHNvIHN1c3BlbmRlZCB0aGUgVk0gdGVtcG9y
+YXJpbHkuIER1cmluZyB0aGUgc3VzcGVuc2lvbiwgSSBjb21wYXJlZCB0aGUgY29udGVudCBvZiBh
+bGwKPiA+IHRoZSBwYWdlcyBtYXJrZWQgYXMgZGlydHkgaW4gdGhpcyBpdGVyYXRpb24gYnl0ZS1i
+eS1ieXRlIHdpdGggdGhlaXIgZm9ybWVyIGNvcGllcyBpbnNpZGUgdGhlIGJ1ZmZlci4gSWYgdGhl
+Cj4gPiBjb250ZW50IG9mIG9uZSBwYWdlIHdhcyB0aGUgc2FtZSBhcyBpdHMgZm9ybWVyIGNvcHks
+IEkgcmVjb3JkZWQgaXQgYXMgYSAid3JpdGUtbm90LWRpcnR5IiBwYWdlICh0aGUgcGFnZSBpcwo+
+ID4gd3JpdHRlbiBleGFjdGx5IHdpdGggdGhlIHNhbWUgY29udGVudCBhcyB0aGUgb2xkIHZlcnNp
+b24pLiBPdGhlcndpc2UsIEkgcmVwbGFjZWQgdGhpcyBwYWdlIGluIHRoZSBidWZmZXIgd2l0aAo+
+ID4gdGhlIG5ldyBjb250ZW50LCBmb3IgdGhlIHBvc3NpYmxlIGNvbXBhcmlzb24gaW4gdGhlIGZ1
+dHVyZS4gQWZ0ZXIgdGhlIHJlc2V0IG9mIHRoZSBkaXJ0eSBiaXRtYXAsIEkgcmVzdW1lZCB0aGUK
+PiA+IFZNLiBUaHVzLCBJIG9idGFpbiB0aGUgcHJvcG9ydGlvbiBvZiB0aGUgd3JpdGUtbm90LWRp
+cnR5IHBhZ2VzIHdpdGhpbiBhbGwgdGhlIHBhZ2VzIG1hcmtlZCBhcyBkaXJ0eSBmb3IgZWFjaAo+
+ID4gcHJlLWNvcHkgaXRlcmF0aW9uLiAKPiAKPiAKPiB2aG9zdCBhbmQgZnJpZW5kcyBjb3VsZCBt
+YWtlIGEgc21hbGwgZGlmZmVyZW5jZSBoZXJlLCBidXQgaW4gZ2VuZXJhbCwKPiB0aGlzIGFwcHJv
+YWNoIHNob3VsZCBiZSBvay4KPiAKPiA+IEkgcmVwZWF0ZWQgdGhpcyBleHBlcmltZW50IHdpdGgg
+MTUgd29ya2xvYWRzLCB3aGljaCBhcmUgMTEgQ1BVMjAwNiBiZW5jaG1hcmtzLCBNZW1jYWNoZWQg
+c2VydmVyLAo+ID4ga2VybmVsIGNvbXBpbGF0aW9uLCBwbGF5aW5nIGEgdmlkZW8sIGFuZCBhbiBp
+ZGxlIFZNLiBUaGUgQ1BVMjAwNiBiZW5jaG1hcmtzIGFuZCBNZW1jYWNoZWQgYXJlCj4gPiB3cml0
+ZS1pbnRlbnNpdmUgd29ya2xvYWRzLiBTbyBhbG1vc3QgYWxsIG9mIHRoZW0gZGlkIG5vdCBjb252
+ZXJnZSB0byBzdG9wLWNvcHkuIAo+IAo+IFRoYXQgaXMgdGhlIGltcHJlc3NpdmUgcGFydCwgMTUg
+d29ya2xvYWRzLiAgVGhhbmtzIGZvciB0YWtpbmcgdGhlIGVmZm9yLgo+IAo+IEJUVywgZG8geW91
+IGhhdmUgeW91ciBxZW11IGNoYW5nZXMgaGFuZHksIGp1c3QgdG8gYmUgYWJsZSB0byB0ZXN0Cj4g
+bG9jYWxseSwgYW5kICJyZXZpZXciIGhvdyBkbyB5b3UgbWVhc3VyZSB0aGluZ3MuCgpTb3JyeSwg
+SSBkbyBub3QgaGF2ZSBteSBjaGFuZ2VzIGhhbmR5LiBCdXQgZG9uJ3Qgd29ycnksIEkgd2lsbCBz
+ZW5kIHRoZW0gdG8geW91IHRvbW9ycm93IG1vcm5pbmcuIEl0J3MgbmlnaHQgaGVyZS4KCj4gCj4g
+Cj4gPiBTdGFydGxpbmdseSwgdGhlIHByb3BvcnRpb25zIG9mIHRoZSB3cml0ZS1ub3QtZGlydHkg
+cGFnZXMgYXJlIHF1aXRlIGhpZ2guIE1lbWNhY2hlZCBhbmQgdGhyZWUgQ1BVMjAwNgo+ID4gYmVu
+Y2htYXJrcyh6ZXVzbXAsIG1jZiBhbmQgYnppcDIpIGhhdmUgdGhlIG1vc3QgaGlnaCBwcm9wb3J0
+aW9ucy4gVGhlaXIgcHJvcG9ydGlvbnMgb2YgdGhlIHdyaXRlLW5vdC1kaXJ0eQo+ID4gcGFnZXMg
+d2l0aGluIGFsbCB0aGUgZGlydHkgcGFnZXMgYXJlIGFzIGhpZ2ggYXMgNDUlLTgwJS4KPiAKPiBP
+ciB0aGUgd29ya2xvYWQgZG9lcyByZWFsbHkgc3R1cGlkIHRoaW5ncyBsaWtlOgo+IAo+IGEgPSAw
+Owo+IGEgPSAxOwo+IGEgPSAwOwo+IAo+IFRoaXMgbWFrZXMgbm8gc2Vuc2UgYXQgYWxsLgo+IAo+
+IEp1c3QgaW4gY2FzZSwgY291bGQgeW91IHRyeSB0byB0ZXN0IHRoaXMgd2l0aCB4YnpybGU/ICBJ
+dCBzaG91bGQgZ28gd2VsbAo+IHdpdGggdGhpcyB1c2UgY2FzZSAoYnV0IHlvdSBuZWVkIHRvIGdl
+dCBhIGJpZyBlbm91Z2ggYnVmZmVyIHRvIGNhY2hlCj4gZW5vdWdoIG1lbW9yeSkuCgpJbiBmYWN0
+LCBJIGhhdmUgdGVzdGVkIHRoZXNlIHdvcmtsb2FkcyAodGhlIDQ1JS04MCUgb25lcykgd2l0aCB4
+YnpybGUuIEFuZCB3aGVuIHRoZSBidWZmZXIgaXMgYmlnIGVub3VnaCwgdGhleSByZWFsbHkgZ28g
+d2VsbC4gV2hpbGUgdGhleSBkbyBub3QgY29udmVyZ2UgdG8gc3RvcC1jb3B5IGJlZm9yZSwgbm93
+IHRoZXkgZmluaXNoIG1pZ3JhdGlvbiBxdWlja2x5LgoKPiAKPiAKPiA+IFRoZSBwcm9wb3J0aW9u
+cyBvZiB0aGUgb3RoZXIgd29ya2xvYWRzIGFyZSBhYm91dAo+ID4gNSUtMjAlLCB3aGljaCBhcmUg
+YWxzbyBhYm5vcm1hbC4gQWNjb3JkaW5nIHRvIG15IGludHVpdGlvbiwgdGhlIHByb3BvcnRpb24g
+b2Ygd3JpdGUtbm90LWRpcnR5IHBhZ2VzIHNob3VsZCBiZQo+ID4gZmFyIGxlc3MgdGhhbiB0aGVz
+ZSBudW1iZXJzLiBJIHRoaW5rIGl0IHNob3VsZCBiZSBxdWl0ZSBhIHBhcnRpY3VsYXIgY2FzZSB0
+aGF0IG9uZSBwYWdlIGlzIHdyaXR0ZW4gd2l0aCBleGFjdGx5Cj4gPiB0aGUgc2FtZSBjb250ZW50
+IGFzIHRoZSBmb3JtZXIgZGF0YS4gCj4gCj4gSSBhZ3JlZSB3aXRoIHRoYXQuCj4gCj4gPiBCZXNp
+ZGVzLCB0aGUgemVybyBwYWdlcyBhcmUgbm90IGNvdW50ZWQgZm9yIGFsbCB0aGUgcmVzdWx0cy4g
+QmVjYXVzZSBJIHRoaW5rIGNvZGVzIGxpa2UgbWVtc2V0KCkgbWF5IHdyaXRlCj4gPiBsYXJnZSBh
+cmVhIG9mIHBhZ2VzIHRvIHplcm8gcGFnZXMsIHdoaWNoIGFyZSBhbHJlYWR5IHplcm8gcGFnZXMg
+YmVmb3JlLiAKPiA+Cj4gPiBJIGV4Y2x1ZGVkIHNvbWUgcG9zc2libGUgdW5rbm93biByZWFzb25z
+IHdpdGggdGhlIG1hY2hpbmUgaGFyZHdhcmUsIGJlY2F1c2UgSSByZXBlYXRlZCB0aGUgZXhwZXJp
+bWVudHMKPiA+IHdpdGggdHdvIHNldHMgb2YgZGlmZmVyZW50IG1hY2hpbmVzLiBUaGVuIEkgZ3Vl
+c3NlZCBpdCBtaWdodCBiZSByZWxhdGVkIHdpdGggdGhlIGh1Z2UgcGFnZSBmZWF0dXJlLiBIb3dl
+dmVyLAo+ID4gdGhlIHJlc3VsdCB3YXMgdGhlIHNhbWUgd2hlbiBJIHR1cm5lZCB0aGUgaHVnZSBw
+YWdlIGZlYXR1cmUgb2ZmIGluIHRoZSBPUy4gCj4gCj4gSHVnZSBwYWdlIGNvdWxkIGhhdmUgY2F1
+c2VkIHRoYXQuICBSZW1lbWJlciB0aGF0IHdlIGhhdmUgdHJhbnNwYXJlbnQKPiBodWdlIHBhZ2Vz
+LiAgSSBoYXZlIHRvIGxvb2sgYXQgdGhhdCBjb2RlLgoKSW4gZmFjdCwgdGhlIHJlc3VsdHMgYXJl
+IHRoZSBzYW1lIG5vIG1hdHRlciBJIHR1cm4gb24gb3IgdHVybiBvZmYgdGhlIHRyYW5zcGFyZW50
+IGh1Z2UgcGFnZXMgaW4gdGhlIE9TLgoKTGF0ZXIsIENodW5ndWFuZy4KCj4gCj4gPiBOb3cgdGhl
+cmUgYXJlIG9ubHkgdHdvIHBvc3NpYmxlIHJlYXNvbnMgaW4gbXkgb3Bpbmlvbi4gCj4gPgo+ID4g
+Rmlyc3QsIHRoZXJlIGlzIHNvbWUgYnVncyBpbiB0aGUgS1ZNIGtlcm5lbCBkaXJ0eSB0cmFja2lu
+ZyBtZWNoYW5pc20uIEl0IG1heSBtYXJrIHNvbWUgcGFnZXMgdGhhdCBkbyBub3QKPiA+IHJlY2Vp
+dmUgd3JpdGUgcmVxdWVzdCBhcyBkaXJ0eS4gCj4gCj4gVGhhdCBpcyBhIHBvc2liaWx0eS4KPiAK
+PiA+IFNlY29uZCwgdGhlcmUgaXMgc29tZSBidWdzIGluIHRoZSBPUyBydW5uaW5nIGluc2lkZSB0
+aGUgVk0uIEl0IG1heSBpc3N1ZSBzb21lIHVubmVjZXNzYXJ5IHdyaXRlCj4gPiByZXF1ZXN0cy4g
+Cj4gPgo+ID4gV2hhdCBkbyB5b3UgdGhpbmsgYWJvdXQgdGhpcyBhYm5vcm1hbCBwaGVub21lbm9u
+PyBBbnkgYWR2aWNlIG9yIHBvc3NpYmxlIHJlYXNvbnMgb3IgZXZlbiBndWVzc2VzPyBJCj4gPiBh
+cHByZWNpYXRlIGFueSByZXNwb25zZXMsIGJlY2F1c2UgaXQgaGFzIGNvbmZ1c2VkIG1lIGZvciBh
+IGxvbmcgdGltZS4gVGhhbmsgeW91Lgo+IAo+IEkgd291bGQgbGlrZSB0byByZXByb2R1Y2UgdGhp
+cy4KPiAKPiBUaGFua3MgZm9yIGJyaW5naW5nIHRoaXMgdG8gb3VyIGF0dGVudGlvbi4KPiAKPiBM
+YXRlciwgSnVhbi4KCgotLQpDaHVuZ3VhbmcgTGksIFBoLkQuIENhbmRpZGF0ZQpXdWhhbiBOYXRp
+b25hbCBMYWJvcmF0b3J5IGZvciBPcHRvZWxlY3Ryb25pY3MgKFdOTE8pCkh1YXpob25nIFVuaXZl
+cnNpdHkgb2YgU2NpZW5jZSAmIFRlY2hub2xvZ3kgKEhVU1QpCld1aGFuLCBIdWJlaSBQcm92Liwg
+Q2hpbmEKCgo=
