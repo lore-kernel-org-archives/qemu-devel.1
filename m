@@ -1,22 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49410)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50925)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eEzVJ-0000lz-6A
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 10:21:33 -0500
+	(envelope-from <clg@kaod.org>) id 1eEzYA-0001nY-FE
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 10:24:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eEzVF-0007vZ-08
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 10:21:29 -0500
-References: <1510654613-47868-1-git-send-email-anton.nefedov@virtuozzo.com>
-	<1510654613-47868-2-git-send-email-anton.nefedov@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <a58bf1a3-d1e1-0c36-85f2-32c89ecc0d12@redhat.com>
-Date: Wed, 15 Nov 2017 16:21:11 +0100
+	(envelope-from <clg@kaod.org>) id 1eEzY4-0002sY-Bf
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 10:24:26 -0500
+Received: from 2.mo1.mail-out.ovh.net ([178.32.119.250]:43797)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1eEzY4-0002pK-4V
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 10:24:20 -0500
+Received: from player795.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo1.mail-out.ovh.net (Postfix) with ESMTP id 28724A8611
+	for <qemu-devel@nongnu.org>; Wed, 15 Nov 2017 16:24:16 +0100 (CET)
+References: <20171110152017.24324-1-clg@kaod.org>
+	<20171110152017.24324-8-clg@kaod.org>
+	<20171114164516.635c3a14@bahia.lab.toulouse-stg.fr.ibm.com>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <b0f4ee84-4d95-7c35-a9bd-b34cd8fa725a@kaod.org>
+Date: Wed, 15 Nov 2017 15:24:08 +0000
 MIME-Version: 1.0
-In-Reply-To: <1510654613-47868-2-git-send-email-anton.nefedov@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="qRQKEoOK5W2043pMaWRMXXa1i0PaqCKxE"
-Subject: Re: [Qemu-devel] [PATCH 1/5] qcow2: reject unaligned offsets in
- write compressed
+In-Reply-To: <20171114164516.635c3a14@bahia.lab.toulouse-stg.fr.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-2.12 v3 07/11] spapr: introduce an
+ 'irq_base' number
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,53 +33,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, eblake@redhat.com, stefanha@redhat.com, famz@redhat.com, den@virtuozzo.com
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---qRQKEoOK5W2043pMaWRMXXa1i0PaqCKxE
-From: Max Reitz <mreitz@redhat.com>
-To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, eblake@redhat.com,
- stefanha@redhat.com, famz@redhat.com, den@virtuozzo.com
-Message-ID: <a58bf1a3-d1e1-0c36-85f2-32c89ecc0d12@redhat.com>
-Subject: Re: [PATCH 1/5] qcow2: reject unaligned offsets in write compressed
-References: <1510654613-47868-1-git-send-email-anton.nefedov@virtuozzo.com>
- <1510654613-47868-2-git-send-email-anton.nefedov@virtuozzo.com>
-In-Reply-To: <1510654613-47868-2-git-send-email-anton.nefedov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 2017-11-14 11:16, Anton Nefedov wrote:
-> Misaligned compressed write is not supported.
+On 11/14/2017 03:45 PM, Greg Kurz wrote:
+> On Fri, 10 Nov 2017 15:20:13 +0000
+> C=C3=A9dric Le Goater <clg@kaod.org> wrote:
 >=20
-> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
-> ---
->  block/qcow2.c | 4 ++++
->  1 file changed, 4 insertions(+)
+>> 'irq_base' is a base IRQ number which lets us allocate only the subset
+>> of the IRQ numbers used on the sPAPR platform. It is sync with the
+>> ICSState 'offset' attribute and this is slightly redundant. We could
+>> also choose to waste some extra bytes (512) and allocate the whole
+>> number space. To be discussed.
+>>
+>> But more important, it removes a dependency on the ICSState object of
+>> the sPAPR machine which is required for XIVE.
+>>
+>> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+>> ---
+>>  hw/ppc/spapr.c         | 7 ++++---
+>>  include/hw/ppc/spapr.h | 1 +
+>>  2 files changed, 5 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+>> index bf0e5b4f815b..1cbbd7715a85 100644
+>> --- a/hw/ppc/spapr.c
+>> +++ b/hw/ppc/spapr.c
+>> @@ -2362,6 +2362,7 @@ static void ppc_spapr_init(MachineState *machine=
+)
+>>      /* Initialize the IRQ allocator */
+>>      spapr->nr_irqs  =3D XICS_IRQS_SPAPR;
+>>      spapr->irq_map  =3D bitmap_new(spapr->nr_irqs);
+>> +    spapr->irq_base =3D XICS_IRQ_BASE;
+>>
+>=20
+> Since this is a constant value, do we really need a machine-level value=
+ ?
 
-Thanks, applied to my block branch for 2.11:
+no. I don't think either.  =20
 
-https://github.com/XanClic/qemu/commits/block
+But I would like to know why we are starting to allocate IRQ numbers=20
+at 4096 ? Only 2 is reserved fo IPIs. So that seems a little large.=20
+I have not found the reason though.
 
-Max
+
+Also I am starting to think that we should probably segment the allocatio=
+n=20
+per device like this is specified in the PAPR specs. Each device has one=20
+or more Bus Unit IDentifier (BUID) which acts as a prefix for the IRQ=20
+number. That would facilitate the IRQ numbering and fix some issues=20
+in migration when devices are hotplugged. I am thinking about phbs
+mostly.
+
+C.
 
 
---qRQKEoOK5W2043pMaWRMXXa1i0PaqCKxE
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAloMW2cSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9ACgUIAJIoH8CqG0zoojyxFrNXxw61T0qZeq+P
-pJMW63FjruYVE85eIyVjCskw4TkkbaozJe/FAVA76DneOPqqhTujIw19/vg0miH/
-ryVLzyA5/3BoXy8FYYBbHvRjFo7Ie78tdaMc8cW2nqdL70qsliIj/3ehWWeML6Ls
-Lpyc5II9ZzDTQaGZ/i1w/P1j5usjUekErkJhvl1yucEuwwaQxPQ36wXdLjwEPuPf
-6LceNfSDBxEgq4IbgAgdH53f97HBC24IZEoqelTXgSU/67136UZWxTNqMSWVGqcj
-E54tGX4oc7aqk6lukhZR16fKzkZ3G5+gndEnOvuxvDa7Rp4UrhqvETw=
-=m8nH
------END PGP SIGNATURE-----
-
---qRQKEoOK5W2043pMaWRMXXa1i0PaqCKxE--
+> Especially now that all the code that needs it is in spapr.c, I guess i=
+t
+> can directly use the macro, no ?
+>=20
+>>      /* Set up Interrupt Controller before we create the VCPUs */
+>>      xics_system_init(machine, spapr->nr_irqs, &error_fatal);
+>> @@ -3630,7 +3631,7 @@ static void spapr_irq_free_block_2_11(XICSFabric=
+ *xi, int irq, int num)
+>>  static bool spapr_irq_test(XICSFabric *xi, int irq)
+>>  {
+>>      sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
+>> -    int srcno =3D irq - spapr->ics->offset;
+>> +    int srcno =3D irq - spapr->irq_base;
+>> =20
+>>      return test_bit(srcno, spapr->irq_map);
+>>  }
+>> @@ -3656,13 +3657,13 @@ static int spapr_irq_alloc_block(XICSFabric *x=
+i, int count, int align)
+>>      }
+>> =20
+>>      bitmap_set(spapr->irq_map, srcno, count);
+>> -    return srcno + spapr->ics->offset;
+>> +    return srcno + spapr->irq_base;
+>>  }
+>> =20
+>>  static void spapr_irq_free_block(XICSFabric *xi, int irq, int num)
+>>  {
+>>      sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
+>> -    int srcno =3D irq - spapr->ics->offset;
+>> +    int srcno =3D irq - spapr->irq_base;
+>> =20
+>>      bitmap_clear(spapr->irq_map, srcno, num);
+>>  }
+>> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+>> index 023436c32b2a..200667dcff9d 100644
+>> --- a/include/hw/ppc/spapr.h
+>> +++ b/include/hw/ppc/spapr.h
+>> @@ -82,6 +82,7 @@ struct sPAPRMachineState {
+>>      int32_t nr_irqs;
+>>      unsigned long *irq_map;
+>>      unsigned long *irq_map_ref;
+>> +    uint32_t irq_base;
+>>      ICSState *ics;
+>>      sPAPRRTCState rtc;
+>> =20
+>=20
