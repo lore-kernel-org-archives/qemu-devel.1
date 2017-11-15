@@ -1,33 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43827)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44583)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eF0CM-0006Cc-UD
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 11:06:00 -0500
+	(envelope-from <clg@kaod.org>) id 1eF0F5-0006rK-9x
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 11:08:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eF0CJ-0001BP-N3
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 11:05:58 -0500
-Received: from indium.canonical.com ([91.189.90.7]:44594)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eF0CJ-0001Af-HR
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 11:05:55 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eF0CI-00047C-BV
-	for <qemu-devel@nongnu.org>; Wed, 15 Nov 2017 16:05:54 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 2BC8F2E831C
-	for <qemu-devel@nongnu.org>; Wed, 15 Nov 2017 16:05:54 +0000 (UTC)
+	(envelope-from <clg@kaod.org>) id 1eF0F2-0003EI-2q
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 11:08:47 -0500
+Received: from 2.mo1.mail-out.ovh.net ([178.32.119.250]:41678)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1eF0F1-0003Ch-QT
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 11:08:44 -0500
+Received: from player795.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo1.mail-out.ovh.net (Postfix) with ESMTP id 6BD23A7D8F
+	for <qemu-devel@nongnu.org>; Wed, 15 Nov 2017 17:08:40 +0100 (CET)
+References: <20171110152017.24324-1-clg@kaod.org>
+	<20171110152017.24324-10-clg@kaod.org>
+	<20171115165218.6bb14b6f@bahia.lab.toulouse-stg.fr.ibm.com>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <c05754ad-6014-3483-4c7e-2fa86cbd582d@kaod.org>
+Date: Wed, 15 Nov 2017 16:08:32 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20171115165218.6bb14b6f@bahia.lab.toulouse-stg.fr.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 15 Nov 2017 15:56:00 -0000
-From: misairu <1680679@bugs.launchpad.net>
-Reply-To: Bug 1680679 <1680679@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170407032144.12640.21952.malonedeb@gac.canonical.com>
-Message-Id: <151076136016.28466.4285654946684039589.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1680679] Re: qemu cannot run twice
+Subject: Re: [Qemu-devel] [PATCH for-2.12 v3 09/11] spapr: split the IRQ
+ number space for LSI interrupts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,126 +33,197 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
-Does your Subsystem ID and Subsystem Vendor ID (of your GPU) show
-correctly inside the WindowsVM?
+On 11/15/2017 03:52 PM, Greg Kurz wrote:
+> On Fri, 10 Nov 2017 15:20:15 +0000
+> C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+>=20
+>> The type of an interrupt, MSI or LSI, is stored under the flag
+>> attribute of the ICSIRQState array. To reduce the use of this array
+>> and consequently of the ICSState object (This is needed to introduce
+>> the new XIVE model), we choose to split the IRQ number space of the
+>> machine in two: first the LSIs and then the MSIs.
+>>
+>> This also has the benefit to keep the LSI IRQ numbers in a well known
+>> range which will be useful for PHB hotplug.
+>>
+>=20
+> Well... LSIs indeed land in a well known range, but it isn't enough for=
+ PHB
+> hotplug. Each PHB is uniquely identified by its 'index' property, and w=
+e
+> want each PHB to have fixed LSIs, so that they are invariant across mig=
+ration.
 
-It should be the same ID shown in your host. Otherwise that will trigger
-the Code 43 error.
+ok.=20
 
-I once have this problem but now solve this by some vfio-pci option. Now
-I have a laptop that passthrough my dGPU with OVMF working perfectly.
+So, as said in another email, we should think about segmenting
+the allocation per device. At least for PHBs. This is specified in
+the PAPR specs, each device has one or more Bus Unit IDentifier (BUID)
+acting as a prefix for the IRQ number.
 
--- =
+We could model that by using a specific range for each PHB in the=20
+overall IRQ number space, depending on some index. LSIs would be=20
+allocated at the beginning of this range, when the device is realized=20
+and MSIs later on when the guest starts. =20
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1680679
+Identifying a LSI could be done using a mask on the IRQ number range=20
+of each PHB. It should be fast enough. I don't see other devices=20
+using LSIs under the sPAPR platform.
 
-Title:
-  qemu cannot run twice
 
-Status in QEMU:
-  Invalid
+C.
 
-Bug description:
-  After using qemu with gpu passthrough and then shutting down windows 7 pr=
-operly I cannot boot windows 7 a second time.
-  Only a full reboot of linux fixes this issue.
-  Qemu appears to corrupt something in linux when exiting.
-  I get no error messages but windows 7 never finishes booting during the 2=
-nd try.
-  Apparently I do try to run vfiobind each time the script is run.
-  Wondering if rerunning vfiobind can cause an issue?
 
-  =
 
-  My specs:
-  -------------------------------------------------------------------------=
-----------------
-  System:    Host: GT70-2PE Kernel: 4.5.4-040504-generic x86_64 (64 bit gcc=
-: 5.3.1)
-             Desktop: Cinnamon 3.2.7 (Gtk 3.18.9) Distro: Linux Mint 18.1 S=
-erena
-  Machine:   Mobo: Micro-Star model: MS-1763 v: REV:0.C Bios: American Mega=
-trends v: E1763IMS.51B date: 01/29/2015
-  CPU:       Quad core Intel Core i7-4810MQ (-HT-MCP-) cache: 6144 KB
-             flags: (lm nx sse sse2 sse3 sse4_1 sse4_2 ssse3 vmx) bmips: 22=
-347
-             clock speeds: max: 2801 MHz 1: 2801 MHz 2: 2801 MHz 3: 2801 MH=
-z 4: 2801 MHz 5: 2801 MHz 6: 2801 MHz
-             7: 2801 MHz 8: 2801 MHz
-  Graphics:  Card-1: Intel 4th Gen Core Processor Integrated Graphics Contr=
-oller bus-ID: 00:02.0
-             Card-2: NVIDIA GK104M [GeForce GTX 880M] bus-ID: 01:00.0
-             Display Server: X.Org 1.18.4 drivers: intel (unloaded: fbdev,v=
-esa)
-             Resolution: 1920x1080@60.02hz, 1920x1080@60.00hz
-             GLX Renderer: Mesa DRI Intel Haswell Mobile GLX Version: 3.0 M=
-esa 12.0.6 Direct Rendering: Yes
-
-  =
-
-  My script:
-  -------------------------------------------------------------------------=
-------------------
-  #!/bin/bash
-
-  cd ~/qemu
-  sudo ./up.sh tap0
-
-  configfile=3D~/qemu/vfio-pci1.cfg
-
-  vfiobind() {
-      dev=3D"$1"
-          vendor=3D$(cat /sys/bus/pci/devices/$dev/vendor)
-          device=3D$(cat /sys/bus/pci/devices/$dev/device)
-          if [ -e /sys/bus/pci/devices/$dev/driver ]; then
-                  echo $dev > /sys/bus/pci/devices/$dev/driver/unbind
-          fi
-          echo $vendor $device > /sys/bus/pci/drivers/vfio-pci/new_id
-
-  }
-
-  modprobe vfio-pci
-
-  cat $configfile | while read line;do
-      echo $line | grep ^# >/dev/null 2>&1 && continue
-          vfiobind $line
-  done
-
-  sudo qemu-system-x86_64 -machine type=3Dq35,accel=3Dkvm -cpu host,kvm=3Do=
-ff \
-  -smp 8,sockets=3D1,cores=3D4,threads=3D2 \
-  -bios /usr/share/seabios/bios.bin \
-  -serial none \
-  -parallel none \
-  -vga none \
-  -m 4G \
-  -mem-path /run/hugepages/kvm \
-  -mem-prealloc \
-  -balloon none \
-  -rtc clock=3Dhost,base=3Dlocaltime \
-  -device ioh3420,bus=3Dpcie.0,addr=3D1c.0,multifunction=3Don,port=3D1,chas=
-sis=3D1,id=3Droot.1 \
-  -device vfio-pci,host=3D01:00.0,bus=3Droot.1,addr=3D00.0,multifunction=3D=
-on,x-vga=3Don \
-  -device virtio-scsi-pci,id=3Dscsi \
-  -drive id=3Ddisk0,if=3Dvirtio,cache=3Dnone,format=3Draw,file=3D/home/dad/=
-qemu/windows7.img \
-  -drive file=3D/home/dad/1TB-Backup/Iso/SP1ForWin7.iso,id=3Disocd,format=
-=3Draw,if=3Dnone -device scsi-cd,drive=3Disocd \
-  -net nic -net tap,ifname=3Dtap0,script=3Dno,downscript=3Dno \
-  -usbdevice host:413c:a503 \
-  -usbdevice host:13fe:3100 \
-  -usbdevice host:0bc2:ab21 \
-  -boot menu=3Don \
-  -boot order=3Dc
-
-  sudo ./down.sh tap0
-
-  exit 0
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1680679/+subscriptions
+>> This change only applies to the latest pseries machines. Older
+>> machines still use the ICSIRQState array to define the IRQ type.
+>>
+>> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+>> ---
+>>
+>>  Changes since v2 :
+>>
+>>  - introduced a second set of XICSFabric IRQ operations for older
+>>    pseries machines
+>>
+>>  hw/intc/xics_spapr.c  |  6 +++---
+>>  hw/ppc/spapr.c        | 33 +++++++++++++++++++++++++++++----
+>>  include/hw/ppc/xics.h |  2 +-
+>>  3 files changed, 33 insertions(+), 8 deletions(-)pe-total-#msi
+>>
+>> diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
+>> index de9e65d35247..b8e91aaf52bd 100644
+>> --- a/hw/intc/xics_spapr.c
+>> +++ b/hw/intc/xics_spapr.c
+>> @@ -260,7 +260,7 @@ int spapr_ics_alloc(ICSState *ics, int irq_hint, b=
+ool lsi, Error **errp)
+>>          }
+>>          irq =3D irq_hint;
+>>      } else {
+>> -        irq =3D xic->irq_alloc_block(ics->xics, 1, 1);
+>> +        irq =3D xic->irq_alloc_block(ics->xics, 1, 1, lsi);
+>>          if (irq < 0) {
+>>              error_setg(errp, "can't allocate IRQ: no IRQ left");
+>>              return -1;
+>> @@ -297,9 +297,9 @@ int spapr_ics_alloc_block(ICSState *ics, int num, =
+bool lsi,
+>>      if (align) {
+>>          assert((num =3D=3D 1) || (num =3D=3D 2) || (num =3D=3D 4) ||
+>>                 (num =3D=3D 8) || (num =3D=3D 16) || (num =3D=3D 32));
+>> -        first =3D xic->irq_alloc_block(ics->xics, num, num);
+>> +        first =3D xic->irq_alloc_block(ics->xics, num, num, lsi);
+>>      } else {
+>> -        first =3D xic->irq_alloc_block(ics->xics, num, 1);
+>> +        first =3D xic->irq_alloc_block(ics->xics, num, 1, lsi);
+>>      }
+>>      if (first < 0) {
+>>          error_setg(errp, "can't find a free %d-IRQ block", num);
+>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+>> index ce314fcf38db..f14eae6196cd 100644
+>> --- a/hw/ppc/spapr.c
+>> +++ b/hw/ppc/spapr.c
+>> @@ -3596,7 +3596,8 @@ static bool spapr_irq_test_2_11(XICSFabric *xi, =
+int irq)
+>>      return !ICS_IRQ_FREE(ics, srcno);
+>>  }
+>> =20
+>> -static int spapr_irq_alloc_block_2_11(XICSFabric *xi, int count, int =
+align)
+>> +static int spapr_irq_alloc_block_2_11(XICSFabric *xi, int count, int =
+align,
+>> +                                      bool lsi)
+>>  {
+>>      sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
+>>      ICSState *ics =3D spapr->ics;
+>> @@ -3628,7 +3629,7 @@ static void spapr_irq_free_block_2_11(XICSFabric=
+ *xi, int irq, int num)
+>>      }
+>>  }
+>> =20
+>> -static bool spapr_irq_is_lsi(XICSFabric *xi, int irq)
+>> +static bool spapr_irq_is_lsi_2_11(XICSFabric *xi, int irq)
+>>  {
+>>      sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
+>>      int srcno =3D irq - spapr->ics->offset;
+>> @@ -3644,10 +3645,21 @@ static bool spapr_irq_test(XICSFabric *xi, int=
+ irq)
+>>      return test_bit(srcno, spapr->irq_map);
+>>  }
+>> =20
+>> -static int spapr_irq_alloc_block(XICSFabric *xi, int count, int align=
+)
+>> +
+>> +/*
+>> + * Let's provision 4 LSIs per PHBs
+>> + */
+>> +#define SPAPR_MAX_LSI (SPAPR_MAX_PHBS * 4)
+>> +
+>> +/*
+>> + * Split the IRQ number space of the machine in two: first the LSIs
+>> + * and then the MSIs. This allows us to keep the LSI IRQ numbers in a
+>> + * well known range which is useful for PHB hotplug.
+>> + */
+>> +static int spapr_irq_alloc_block(XICSFabric *xi, int count, int align=
+, bool lsi)
+>>  {
+>>      sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
+>> -    int start =3D 0;
+>> +    int start =3D lsi ? 0 : SPAPR_MAX_LSI;
+>>      int srcno;
+>> =20
+>>      /*
+>> @@ -3664,6 +3676,10 @@ static int spapr_irq_alloc_block(XICSFabric *xi=
+, int count, int align)
+>>          return -1;
+>>      }
+>> =20
+>> +    if (lsi && srcno >=3D SPAPR_MAX_LSI) {
+>> +        return -1;
+>> +    }
+>> +
+>>      bitmap_set(spapr->irq_map, srcno, count);
+>>      return srcno + spapr->irq_base;
+>>  }
+>> @@ -3676,6 +3692,14 @@ static void spapr_irq_free_block(XICSFabric *xi=
+, int irq, int num)
+>>      bitmap_clear(spapr->irq_map, srcno, num);
+>>  }
+>> =20
+>> +static bool spapr_irq_is_lsi(XICSFabric *xi, int irq)
+>> +{
+>> +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
+>> +    int srcno =3D irq - spapr->irq_base;
+>> +
+>> +    return (srcno >=3D 0) && (srcno < SPAPR_MAX_LSI);
+>> +}
+>> +
+>>  static void spapr_pic_print_info(InterruptStatsProvider *obj,
+>>                                   Monitor *mon)
+>>  {
+>> @@ -3860,6 +3884,7 @@ static void spapr_machine_2_11_class_options(Mac=
+hineClass *mc)
+>>      xic->irq_test =3D spapr_irq_test_2_11;
+>>      xic->irq_alloc_block =3D spapr_irq_alloc_block_2_11;
+>>      xic->irq_free_block =3D spapr_irq_free_block_2_11;
+>> +    xic->irq_is_lsi =3D spapr_irq_is_lsi_2_11;
+>>  }
+>> =20
+>>  DEFINE_SPAPR_MACHINE(2_11, "2.11", false);
+>> diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
+>> index 478f8e510179..292b929e88eb 100644
+>> --- a/include/hw/ppc/xics.h
+>> +++ b/include/hw/ppc/xics.h
+>> @@ -177,7 +177,7 @@ typedef struct XICSFabricClass {
+>>      ICPState *(*icp_get)(XICSFabric *xi, int server);
+>>      /* IRQ allocator helpers */
+>>      bool (*irq_test)(XICSFabric *xi, int irq);
+>> -    int (*irq_alloc_block)(XICSFabric *xi, int count, int align);
+>> +    int (*irq_alloc_block)(XICSFabric *xi, int count, int align, bool=
+ lsi);
+>>      void (*irq_free_block)(XICSFabric *xi, int irq, int num);
+>>      bool (*irq_is_lsi)(XICSFabric *xi, int irq);
+>>  } XICSFabricClass;
+>=20
