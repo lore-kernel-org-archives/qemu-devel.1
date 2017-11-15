@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35932)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37346)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1eF5ag-0006rA-Od
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 16:51:28 -0500
+	(envelope-from <kchamart@redhat.com>) id 1eF5e4-00011q-P0
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 16:54:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1eF5ag-0006Qh-1p
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 16:51:26 -0500
-Date: Wed, 15 Nov 2017 21:51:14 +0000
-From: "Richard W.M. Jones" <rjones@redhat.com>
-Message-ID: <20171115215114.GP2787@redhat.com>
-References: <c2ecae32-f999-9f1e-46a6-37cdab2a62e3@redhat.com>
-	<CAJH6TXhBAaBE9gBSxksWZqNywWmencRaGyeY-oN3jbKdgUettQ@mail.gmail.com>
-	<0e6cc220-814a-17fd-4fd7-7b0665d34e81@redhat.com>
-	<CAJH6TXh2v-F=yqxQbUUawk_Ctq-sgFefGp1XvMsC=syX_5jEqA@mail.gmail.com>
-	<30b54865-2255-d13d-a054-afcf5bbd06b2@redhat.com>
-	<20171115202440.GJ19514@redhat.com>
-	<7b11bb2b-b93d-e8ff-f396-703c93549d0d@redhat.com>
-	<20171115202938.GN2787@redhat.com>
-	<CAJH6TXiPuLu62-+o2+PrUGpstrks_5pLotFEe1bAOmsbn20otw@mail.gmail.com>
-	<5b6f8758-5e3e-e759-1592-2768eb85b322@redhat.com>
+	(envelope-from <kchamart@redhat.com>) id 1eF5e3-0000RR-WF
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 16:54:56 -0500
+Date: Wed, 15 Nov 2017 22:54:33 +0100
+From: Kashyap Chamarthy <kchamart@redhat.com>
+Message-ID: <20171115215433.fpihpl645mlholgo@eukaryote>
+References: <20171115090947.29883-1-kchamart@redhat.com>
+	<0b29e074-6548-d42e-12ab-67419342773e@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <5b6f8758-5e3e-e759-1592-2768eb85b322@redhat.com>
-Subject: Re: [Qemu-devel] [Libguestfs]  [qemu-img] support for XVA
+In-Reply-To: <0b29e074-6548-d42e-12ab-67419342773e@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2] qapi: block-core: Clarify
+ events emitted by 'block-job-cancel'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,24 +25,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: Gandalf Corvotempesta <gandalf.corvotempesta@gmail.com>, Qemu-block <qemu-block@nongnu.org>, qemu-devel@nongnu.org, libguestfs <libguestfs@redhat.com>
+To: John Snow <jsnow@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, armbru@redhat.com, mreitz@redhat.com
 
-On Wed, Nov 15, 2017 at 10:30:31PM +0100, Max Reitz wrote:
-> Hmmm...  OK, so as Rich said, you can use the raw driver with an offset
-> and a size.  And you can use the null-co driver to emulate holes.  And
-> qemu-img convert supports concatenation.
+On Wed, Nov 15, 2017 at 02:15:57PM -0500, John Snow wrote:
+>=20
+>=20
+> On 11/15/2017 04:09 AM, Kashyap Chamarthy wrote:
+> > When you cancel an in-progress live block operation with QMP
+> > `block-job-cancel`, it emits the event: BLOCK_JOB_CANCELLED.  However=
+,
+> > when `block-job-cancel` is issued after `drive-mirror` has indicated =
+(by
+> > emitting the event BLOCK_JOB_READY) that the source and destination
+> > remain synchronized:
 
-Nice, I didn't know qemu-img convert could concatenate :-)
+[...]
 
-So that's two distinct ways to do this, neither needing any qemu
-modifications.
+> > But this is expected behaviour, where the _COMPLETED event indicates
+> > that synchronization has successfully ended (and the destination has =
+a
+> > point-in-time copy, which is at the time of cancel).
+> >=20
+> > So add a small note to this effect.  (Thanks: Max Reitz for reminding
+> > me of this on IRC.)
+> >=20
+>=20
+> I suppose this difference probably isn't covered in what was the
+> bitmaps.md doc file (we don't bother covering mirror there, only
+> backup);=20
 
-Rich.
+Your supposition is correct: Looking at the now-renamed
+'bitmaps.rst'[1], it isn't covered there.
 
--- 
-Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
-Read my programming and virtualization blog: http://rwmj.wordpress.com
-virt-p2v converts physical machines to virtual machines.  Boot with a
-live CD or over the network (PXE) and turn machines into KVM guests.
-http://libguestfs.org/virt-v2v
+> is it covered sufficiently in live-block-operations.rst ?
+
+I looked in there[2] too.  Short answer: no.  Long: In the "Live disk
+synchronization =E2=80=94 drive-mirror and blockdev-mirror" section, I si=
+mply
+seemed to declare:=20
+
+    "Issuing the command ``block-job-cancel`` after it emits the event
+    ``BLOCK_JOB_CANCELLED``"
+
+As if that's the *only* event it emits, which is clearly not the case.
+So while at it, wonder if should I also update it
+('live-block-operations.rst') too.
+
+[1] https://git.qemu.org/?p=3Dqemu.git;a=3Dblob;f=3Ddocs/interop/bitmaps.=
+rst
+[2] https://git.qemu.org/?p=3Dqemu.git;a=3Dblob;f=3Ddocs/interop/live-blo=
+ck-operations.rst#l513=20
+
+--=20
+/kashyap
