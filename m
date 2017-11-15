@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49470)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51333)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eEufh-0000oU-Cm
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 05:11:54 -0500
+	(envelope-from <stefanha@redhat.com>) id 1eEup5-0002Xp-K9
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 05:21:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eEufd-0003Sg-Cj
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 05:11:53 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36638)
+	(envelope-from <stefanha@redhat.com>) id 1eEup2-0004TB-Cl
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 05:21:35 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51122)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eEufd-0003Rs-3I
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 05:11:49 -0500
-Date: Wed, 15 Nov 2017 10:11:37 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20171115101137.GA2212@work-vm>
-References: <6e0e65ef.427f.15faf8d41e9.Coremail.lichunguang@hust.edu.cn>
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eEup2-0004Qw-3w
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 05:21:32 -0500
+Date: Wed, 15 Nov 2017 10:21:16 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20171115102116.GD8130@stefanha-x1.localdomain>
+References: <20171106094643.14881-1-peterx@redhat.com>
+	<20171106094643.14881-28-peterx@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="GyRA7555PLgSTuth"
 Content-Disposition: inline
-In-Reply-To: <6e0e65ef.427f.15faf8d41e9.Coremail.lichunguang@hust.edu.cn>
-Subject: Re: [Qemu-devel] Abnormal observation during migration: too many
- "write-not-dirty" pages
+In-Reply-To: <20171106094643.14881-28-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [RFC v3 27/27] tests: qmp-test: add oob test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,60 +28,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Chunguang Li <lichunguang@hust.edu.cn>
-Cc: qemu-devel@nongnu.org, quintela@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, stefanha@redhat.com
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Jiri Denemark <jdenemar@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, marcandre.lureau@redhat.com, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-* Chunguang Li (lichunguang@hust.edu.cn) wrote:
-> Hi all!
-> 
-> I got a very abnormal observation for the VM migration. I found that many pages marked as dirty during migration are "not really dirty", which is, their content are the same as the old version.
-> 
-> 
-> 
-> 
-> I did the migration experiment like this:
-> 
-> During the setup phase of migration, first I suspended the VM. Then I copied all the pages within the guest physical address space to a memory buffer as large as the guest memory size. After that, the dirty tracking began and I resumed the VM. Besides, at the end
-> of each iteration, I also suspended the VM temporarily. During the suspension, I compared the content of all the pages marked as dirty in this iteration byte-by-byte with their former copies inside the buffer. If the content of one page was the same as its former copy, I recorded it as a "write-not-dirty" page (the page is written exactly with the same content as the old version). Otherwise, I replaced this page in the buffer with the new content, for the possible comparison in the future. After the reset of the dirty bitmap, I resumed the VM. Thus, I obtain the proportion of the write-not-dirty pages within all the pages marked as dirty for each pre-copy iteration.
-> 
-> I repeated this experiment with 15 workloads, which are 11 CPU2006 benchmarks, Memcached server, kernel compilation, playing a video, and an idle VM. The CPU2006 benchmarks and Memcached are write-intensive workloads. So almost all of them did not converge to stop-copy.
-> 
-> 
-> 
-> 
-> Startlingly, the proportions of the write-not-dirty pages are quite high. Memcached and three CPU2006 benchmarks(zeusmp, mcf and bzip2) have the most high proportions. Their proportions of the write-not-dirty pages within all the dirty pages are as high as 45%-80%. The proportions of the other workloads are about 5%-20%, which are also abnormal. According to my intuition, the proportion of write-not-dirty pages should be far less than these numbers. I think it should be quite a particular case that one page is written with exactly the same content as the former data.
-> 
-> Besides, the zero pages are not counted for all the results. Because I think codes like memset() may write large area of pages to zero pages, which are already zero pages before.
-> 
-> 
-> 
-> 
-> I excluded some possible unknown reasons with the machine hardware, because I repeated the experiments with two sets of different machines. Then I guessed it might be related with the huge page feature. However, the result was the same when I turned the huge page feature off in the OS.
-> 
-> 
-> 
-> 
-> Now there are only two possible reasons in my opinion. 
-> 
-> First, there is some bugs in the KVM kernel dirty tracking mechanism. It may mark some pages that do not receive write request as dirty.
-> 
-> Second, there is some bugs in the OS running inside the VM. It may issue some unnecessary write requests.
-> 
-> 
-> What do you think about this abnormal phenomenon? Any advice or possible reasons or even guesses? I appreciate any responses, because it has confused me for a long time. Thank you.
 
-Wasn't it you who pointed out last year the other possibility? - The
-problem of false positives due to sync'ing the whole of memory and then
-writing the data out, but some of the dirty pages were already written?
+--GyRA7555PLgSTuth
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Dave
+On Mon, Nov 06, 2017 at 05:46:43PM +0800, Peter Xu wrote:
+> +    /*
+> +     * Try a time-consuming command, following by a OOB command, make
+> +     * sure we get OOB command before the time-consuming one (which is
+> +     * run in the parser).
+> +     *
+> +     * When writting up this test script, the only command that
+> +     * support OOB is migrate-incoming.  It's not the best command to
+> +     * test OOB but we don't really have a choice here.  We will check
+> +     * arriving order but not command errors, which does not really
+> +     * matter to us.
+> +     */
+> +    qmp_async("{ 'execute': 'dump-guest-memory',"
+> +              "  'arguments': { 'paging': true, "
+> +              "                 'protocol': 'file:/dev/null' }, "
+> +              "  'id': 'time-consuming-cmd'}");
+> +    qmp_async("{ 'execute': 'migrate-incoming', "
+> +              "  'control': { 'run-oob': true }, "
+> +              "  'id': 'oob-cmd' }");
+> +
+> +    /* Ignore all events.  Wait for 2 acks */
+> +    while (acks < 2) {
+> +        resp = qmp_receive();
+> +        if (qdict_haskey(resp, "event")) {
+> +            /* Skip possible events */
+> +            continue;
+> +        }
+> +        cmd_id = qdict_get_str(resp, "id");
+> +        if (acks == 0) {
+> +            /* Need to receive OOB response first */
+> +            g_assert_cmpstr(cmd_id, ==, "oob-cmd");
+> +        } else if (acks == 1) {
+> +            g_assert_cmpstr(cmd_id, ==, "time-consuming-cmd");
+> +        }
+> +        acks++;
+> +    }
 
-> 
-> --
-> Chunguang Li, Ph.D. Candidate
-> Wuhan National Laboratory for Optoelectronics (WNLO)
-> Huazhong University of Science & Technology (HUST)
-> Wuhan, Hubei Prov., China
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+This test is non-deterministic.  The dump-guest-memory command could
+complete first on a fast machine.
+
+On a slow machine this test might take a long time...
+
+Please introduce a test command that is deterministic.  For example,
+when 'x-oob-test' is invoked without 'run-oob': true it waits until
+invoked again, this time with 'run-oob': true.
+
+We have similar interfaces in the block layer for controlling the order
+in which parallel I/O requests are processed.  This allows test cases to
+deterministically take specific code paths.
+
+--GyRA7555PLgSTuth
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJaDBUcAAoJEJykq7OBq3PIz+sIALO9G2Mlc1SfXs6SbXV/WLH0
+WWEjPZraGNk12/5GE7+O/sZ684d+XVKn5HwpNd8eWWRUQ7ftaDCMsV2GbSgHXNLb
+EdA0c7T5dkgsr2BBtIVRRj3adoDLVXAbZG/tuS5wOKksL8dYdqBzMnbIfJOsb/hU
+yACwuLjk6Ex/VkidexjZxQ5aAFpIlJALyquqQa4h0aAevvxufieSaDgBw0UcdXVR
+617Uu9qNIZbVefnrzYemkackCY+Z4WaygQTPIcmnWH7ZbyqTfq0hLVHc5+K+4FDh
+2lippYWuon3iKmy6TlbtnGxYpbDD41x7vZ3Xvb4GMfVKJdB9o6j5Muzy1PSEnFI=
+=bavv
+-----END PGP SIGNATURE-----
+
+--GyRA7555PLgSTuth--
