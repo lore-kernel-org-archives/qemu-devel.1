@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46769)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47788)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eF2t5-00088M-NN
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 13:58:16 -0500
+	(envelope-from <balaton@eik.bme.hu>) id 1eF2v9-0000LY-Pm
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 14:00:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eF2t4-0002Ke-PL
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 13:58:15 -0500
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:42049)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eF2t4-0002K1-IB
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 13:58:14 -0500
-Received: by mail-wm0-x242.google.com with SMTP id t139so5049719wmt.1
-	for <qemu-devel@nongnu.org>; Wed, 15 Nov 2017 10:58:14 -0800 (PST)
+	(envelope-from <balaton@eik.bme.hu>) id 1eF2v4-0003cL-Tg
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 14:00:23 -0500
+Received: from zero.eik.bme.hu ([152.66.115.2]:64137)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1eF2v4-0003WQ-Iu
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 14:00:18 -0500
+Date: Wed, 15 Nov 2017 20:00:09 +0100 (CET)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+In-Reply-To: <cd544495-16c6-5e75-837b-be1deb4e9768@redhat.com>
+Message-ID: <alpine.BSF.2.21.1711151930030.26122@zero.eik.bme.hu>
+References: <20171114225941.072707456B5@zero.eik.bme.hu>
+	<cd544495-16c6-5e75-837b-be1deb4e9768@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1510625498-4821-4-git-send-email-jasowang@redhat.com>
-References: <1510625498-4821-1-git-send-email-jasowang@redhat.com>
-	<1510625498-4821-4-git-send-email-jasowang@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 15 Nov 2017 18:57:52 +0000
-Message-ID: <CAFEAcA_47953-hdHmueXEGXtpxXVOFubJOhzAUh4hsKiYF1ADg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 3/8] colo-compare: compare the packet in a
- specified Connection
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+Subject: Re: [Qemu-devel] [PATCH] exec: Skip mru section if it's a partial
+ page and not resolving subpage
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,59 +27,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Mao Zhongyi <maozy.fnst@cn.fujitsu.com>, Zhang Chen <zhangckid@gmail.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Fam Zheng <famz@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
-On 14 November 2017 at 02:11, Jason Wang <jasowang@redhat.com> wrote:
-> From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+On Wed, 15 Nov 2017, Paolo Bonzini wrote:
+> This is another possibility:
 >
-> A package from pri_indev or sec_indev only belongs to a particular
-> Connection, so we only need to compare the package in the specified
-> Connection's primary_list and secondary_list, rather than for each
-> the whole Connection list to compare. This is time-consuming and
-> unnecessary.
+> diff --git a/exec.c b/exec.c
+> index 97a24a875e..3bb9fcf257 100644
+> --- a/exec.c
+> +++ b/exec.c
+> @@ -410,22 +410,16 @@ static MemoryRegionSection *address_space_lookup_region(AddressSpaceDispatch *d,
+> {
+>     MemoryRegionSection *section = atomic_read(&d->mru_section);
+>     subpage_t *subpage;
+> -    bool update;
 >
-> Less checkpoint more efficiency.
+> -    if (section && section != &d->map.sections[PHYS_SECTION_UNASSIGNED] &&
+> -        section_covers_addr(section, addr)) {
+> -        update = false;
+> -    } else {
+> +    if (!section || section == &d->map.sections[PHYS_SECTION_UNASSIGNED] ||
+> +        !section_covers_addr(section, addr)) {
+>         section = phys_page_find(d, addr);
+> -        update = true;
+> +        atomic_set(&d->mru_section, section);
+>     }
+>     if (resolve_subpage && section->mr->subpage) {
+>         subpage = container_of(section->mr, subpage_t, iomem);
+>         section = &d->map.sections[subpage->sub_section[SUBPAGE_IDX(addr)]];
+>     }
+> -    if (update) {
+> -        atomic_set(&d->mru_section, section);
+> -    }
+>     return section;
+> }
 >
-> Cc: Zhang Chen <zhangckid@gmail.com>
-> Cc: Li Zhijian <lizhijian@cn.fujitsu.com>
-> Cc: Jason Wang <jasowang@redhat.com>
-> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-> Signed-off-by: Jason Wang <jasowang@redhat.com>
-> ---
->  net/colo-compare.c | 13 ++++++++-----
->  1 file changed, 8 insertions(+), 5 deletions(-)
 >
-> diff --git a/net/colo-compare.c b/net/colo-compare.c
-> index 54b6347..5d2429b 100644
-> --- a/net/colo-compare.c
-> +++ b/net/colo-compare.c
-> @@ -136,7 +136,7 @@ static int colo_insert_packet(GQueue *queue, Packet *pkt)
->   * Return 0 on success, if return -1 means the pkt
->   * is unsupported(arp and ipv6) and will be sent later
->   */
-> -static int packet_enqueue(CompareState *s, int mode)
-> +static int packet_enqueue(CompareState *s, int mode, Connection **con)
->  {
->      ConnectionKey key;
->      Packet *pkt = NULL;
-> @@ -179,6 +179,7 @@ static int packet_enqueue(CompareState *s, int mode)
->                           "drop packet");
->          }
->      }
-> +    con = &conn;
->
->      return 0;
->  }
+> It will skip the expensive phys_page_find but not the cheap subpage lookup.
+> Does it work for you?
 
-Coverity points out that this looks a bit fishy --
-presumably you meant
-  *con = conn;
+This also works but I can't understand why becuase the problematic call to 
+this function which got the wrong result from section_covers_addr was with 
+resolve_subpage=false and in that case this looks identical to the 
+original which did not work. Unless this function is called multiple times 
+and another call with resolve_subpage=true now somehow works better with 
+this change or replacing the mru_section earlier before subpage lookup 
+makes a difference which is not obvious from this function.
 
-? The statement you have now doesn't do anything, since
-'con' is unused after you change it.
+Anyway, it fixes the problem I see so you can use this instead of my 
+patch.
 
-(CID 1382804.)
-
-thanks
--- PMM
+Thank you,
+BALATON Zoltan
