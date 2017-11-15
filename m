@@ -1,27 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43601)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46904)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=485c4faa6=Paul.Durrant@citrix.com>)
-	id 1eEuJZ-0003UR-Lu
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 04:49:03 -0500
+	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1eEuXL-0007C2-Rc
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 05:03:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=485c4faa6=Paul.Durrant@citrix.com>)
-	id 1eEuJW-0000qz-Fk
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 04:49:01 -0500
-Received: from smtp.eu.citrix.com ([185.25.65.24]:30329)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=485c4faa6=Paul.Durrant@citrix.com>)
-	id 1eEuJW-0000ml-25
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 04:48:58 -0500
-From: Paul Durrant <Paul.Durrant@citrix.com>
-Date: Wed, 15 Nov 2017 09:48:55 +0000
-Message-ID: <88c9ab0549a8456e8305353134e099ca@AMSPEX02CL03.citrite.net>
-References: <20171107104653.8913-1-paul.durrant@citrix.com>
-In-Reply-To: <20171107104653.8913-1-paul.durrant@citrix.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1eEuXG-0005kB-Q9
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 05:03:15 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:55196)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pmorel@linux.vnet.ibm.com>)
+	id 1eEuXG-0005jn-G3
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 05:03:10 -0500
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	vAF9xqjZ007995
+	for <qemu-devel@nongnu.org>; Wed, 15 Nov 2017 05:03:04 -0500
+Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2e8jdn2yk5-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 15 Nov 2017 05:03:03 -0500
+Received: from localhost
+	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pmorel@linux.vnet.ibm.com>;
+	Wed, 15 Nov 2017 10:03:01 -0000
+References: <1510075479-17224-1-git-send-email-pmorel@linux.vnet.ibm.com>
+	<20171113181305.5786d700.cohuck@redhat.com>
+From: Pierre Morel <pmorel@linux.vnet.ibm.com>
+Date: Wed, 15 Nov 2017 11:02:57 +0100
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v3] xen-disk: use an IOThread per instance
+In-Reply-To: <20171113181305.5786d700.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Message-Id: <997d47da-e652-4eba-15c1-8ab793c89da7@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 0/7] s390x/pci: Improve zPCI to cover more
+ cases
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,251 +43,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paul Durrant <Paul.Durrant@citrix.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>
-Cc: Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel@nongnu.org, agraf@suse.de, borntraeger@de.ibm.com, zyimin@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com
 
-Anthony, Stefano,
+On 13/11/2017 18:13, Cornelia Huck wrote:
+> On Tue,  7 Nov 2017 18:24:32 +0100
+> Pierre Morel <pmorel@linux.vnet.ibm.com> wrote:
+>=20
+>> Right now the PCI support is very limited (e.g. pass through of a
+>> host vfio device)
+>> To enable features like virtio-pci several modifications needs to be
+>> done.
+>>
+>> Virtio-PCI uses subregions, which may eventually be discontinuous
+>> inside bars instead of a single flat region.
+>> The address offset being formerly calculated from the BAR base address
+>> must be adapted to the subregions instead of to the single region.
+>>
+>> This patch provides the new calculation for the three kind of BAR
+>> access, zPCI STORE, zPCI LOAD and zPCI STORE BLOCK.
+>>
+>> We use the opportunity to
+>>   - enhance the fault detection for zPCI STORE and LOAD,
+>>   - enhance the fault detection and to provide the maximum STORE BLOCK
+>>     block size, maxstbl, for zPCI STORE BLOCK
+>>   - factor out part of the code used to calculate the offset and
+>>     access the BARs,
+>>   - factor out the code for endianess conversion.
+>>
+>>
+>> Pierre Morel (7):
+>>    s390x/pci: factor out endianess conversion
+>>    s390x/pci: rework PCI STORE
+>>    s390x/pci: rework PCI LOAD
+>>    s390x/pci: rework PCI STORE BLOCK
+>>    s390x/pci: move the memory region read from pcilg
+>>    s390x/pci: move the memory region write from pcistg
+>>    s390x/pci: search for subregion inside the BARs
+>>
+>>   hw/s390x/s390-pci-bus.h  |   1 +
+>>   hw/s390x/s390-pci-inst.c | 250 ++++++++++++++++++++++++++++---------=
+----------
+>>   hw/s390x/s390-pci-inst.h |   2 +-
+>>   3 files changed, 153 insertions(+), 100 deletions(-)
+>>
+>=20
+> I assume you'll send a v2?
 
-  Ping?
+Yes, I have a lot of mater to do this now.
 
-> -----Original Message-----
-> From: Paul Durrant [mailto:paul.durrant@citrix.com]
-> Sent: 07 November 2017 10:47
-> To: qemu-devel@nongnu.org; xen-devel@lists.xenproject.org
-> Cc: Paul Durrant <Paul.Durrant@citrix.com>; Stefano Stabellini
-> <sstabellini@kernel.org>; Anthony Perard <anthony.perard@citrix.com>;
-> Kevin Wolf <kwolf@redhat.com>; Max Reitz <mreitz@redhat.com>
-> Subject: [PATCH v3] xen-disk: use an IOThread per instance
+Thanks for reviewing,
+
+Pierre
+
 >=20
-> This patch allocates an IOThread object for each xen_disk instance and
-> sets the AIO context appropriately on connect. This allows processing
-> of I/O to proceed in parallel.
+> I'll see if I can find some time to wire up pci in tcg (as this would
+> get us additional test coverage, especially regarding endianness), but
+> I won't complain should someone beat me to it.
 >=20
-> The patch also adds tracepoints into xen_disk to make it possible to
-> follow the state transtions of an instance in the log.
->=20
-> Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
-> ---
-> Cc: Stefano Stabellini <sstabellini@kernel.org>
-> Cc: Anthony Perard <anthony.perard@citrix.com>
-> Cc: Kevin Wolf <kwolf@redhat.com>
-> Cc: Max Reitz <mreitz@redhat.com>
->=20
-> v3:
->  - Use new iothread_create/destroy() functions
->=20
-> v2:
->  - explicitly acquire and release AIO context in qemu_aio_complete() and
->    blk_bh()
-> ---
->  hw/block/trace-events |  7 +++++++
->  hw/block/xen_disk.c   | 53
-> ++++++++++++++++++++++++++++++++++++++++++++-------
->  2 files changed, 53 insertions(+), 7 deletions(-)
->=20
-> diff --git a/hw/block/trace-events b/hw/block/trace-events
-> index cb6767b3ee..962a3bfa24 100644
-> --- a/hw/block/trace-events
-> +++ b/hw/block/trace-events
-> @@ -10,3 +10,10 @@ virtio_blk_submit_multireq(void *vdev, void *mrb, int
-> start, int num_reqs, uint6
->  # hw/block/hd-geometry.c
->  hd_geometry_lchs_guess(void *blk, int cyls, int heads, int secs) "blk %p
-> LCHS %d %d %d"
->  hd_geometry_guess(void *blk, uint32_t cyls, uint32_t heads, uint32_t sec=
-s,
-> int trans) "blk %p CHS %u %u %u trans %d"
-> +
-> +# hw/block/xen_disk.c
-> +xen_disk_alloc(char *name) "%s"
-> +xen_disk_init(char *name) "%s"
-> +xen_disk_connect(char *name) "%s"
-> +xen_disk_disconnect(char *name) "%s"
-> +xen_disk_free(char *name) "%s"
-> diff --git a/hw/block/xen_disk.c b/hw/block/xen_disk.c
-> index e431bd89e8..f74fcd42d1 100644
-> --- a/hw/block/xen_disk.c
-> +++ b/hw/block/xen_disk.c
-> @@ -27,10 +27,12 @@
->  #include "hw/xen/xen_backend.h"
->  #include "xen_blkif.h"
->  #include "sysemu/blockdev.h"
-> +#include "sysemu/iothread.h"
->  #include "sysemu/block-backend.h"
->  #include "qapi/error.h"
->  #include "qapi/qmp/qdict.h"
->  #include "qapi/qmp/qstring.h"
-> +#include "trace.h"
->=20
->  /* ------------------------------------------------------------- */
->=20
-> @@ -125,6 +127,9 @@ struct XenBlkDev {
->      DriveInfo           *dinfo;
->      BlockBackend        *blk;
->      QEMUBH              *bh;
-> +
-> +    IOThread            *iothread;
-> +    AioContext          *ctx;
->  };
->=20
->  /* ------------------------------------------------------------- */
-> @@ -596,9 +601,12 @@ static int ioreq_runio_qemu_aio(struct ioreq
-> *ioreq);
->  static void qemu_aio_complete(void *opaque, int ret)
->  {
->      struct ioreq *ioreq =3D opaque;
-> +    struct XenBlkDev *blkdev =3D ioreq->blkdev;
-> +
-> +    aio_context_acquire(blkdev->ctx);
->=20
->      if (ret !=3D 0) {
-> -        xen_pv_printf(&ioreq->blkdev->xendev, 0, "%s I/O error\n",
-> +        xen_pv_printf(&blkdev->xendev, 0, "%s I/O error\n",
->                        ioreq->req.operation =3D=3D BLKIF_OP_READ ? "read"=
- : "write");
->          ioreq->aio_errors++;
->      }
-> @@ -607,10 +615,10 @@ static void qemu_aio_complete(void *opaque, int
-> ret)
->      if (ioreq->presync) {
->          ioreq->presync =3D 0;
->          ioreq_runio_qemu_aio(ioreq);
-> -        return;
-> +        goto done;
->      }
->      if (ioreq->aio_inflight > 0) {
-> -        return;
-> +        goto done;
->      }
->=20
->      if (xen_feature_grant_copy) {
-> @@ -647,16 +655,19 @@ static void qemu_aio_complete(void *opaque, int
-> ret)
->          }
->      case BLKIF_OP_READ:
->          if (ioreq->status =3D=3D BLKIF_RSP_OKAY) {
-> -            block_acct_done(blk_get_stats(ioreq->blkdev->blk), &ioreq->a=
-cct);
-> +            block_acct_done(blk_get_stats(blkdev->blk), &ioreq->acct);
->          } else {
-> -            block_acct_failed(blk_get_stats(ioreq->blkdev->blk), &ioreq-=
->acct);
-> +            block_acct_failed(blk_get_stats(blkdev->blk), &ioreq->acct);
->          }
->          break;
->      case BLKIF_OP_DISCARD:
->      default:
->          break;
->      }
-> -    qemu_bh_schedule(ioreq->blkdev->bh);
-> +    qemu_bh_schedule(blkdev->bh);
-> +
-> +done:
-> +    aio_context_release(blkdev->ctx);
->  }
->=20
->  static bool blk_split_discard(struct ioreq *ioreq, blkif_sector_t
-> sector_number,
-> @@ -913,17 +924,29 @@ static void blk_handle_requests(struct XenBlkDev
-> *blkdev)
->  static void blk_bh(void *opaque)
->  {
->      struct XenBlkDev *blkdev =3D opaque;
-> +
-> +    aio_context_acquire(blkdev->ctx);
->      blk_handle_requests(blkdev);
-> +    aio_context_release(blkdev->ctx);
->  }
->=20
->  static void blk_alloc(struct XenDevice *xendev)
->  {
->      struct XenBlkDev *blkdev =3D container_of(xendev, struct XenBlkDev,
-> xendev);
-> +    Error *err =3D NULL;
-> +
-> +    trace_xen_disk_alloc(xendev->name);
->=20
->      QLIST_INIT(&blkdev->inflight);
->      QLIST_INIT(&blkdev->finished);
->      QLIST_INIT(&blkdev->freelist);
-> -    blkdev->bh =3D qemu_bh_new(blk_bh, blkdev);
-> +
-> +    blkdev->iothread =3D iothread_create(xendev->name, &err);
-> +    assert(!err);
-> +
-> +    blkdev->ctx =3D iothread_get_aio_context(blkdev->iothread);
-> +    blkdev->bh =3D aio_bh_new(blkdev->ctx, blk_bh, blkdev);
-> +
->      if (xen_mode !=3D XEN_EMULATE) {
->          batch_maps =3D 1;
->      }
-> @@ -950,6 +973,8 @@ static int blk_init(struct XenDevice *xendev)
->      int info =3D 0;
->      char *directiosafe =3D NULL;
->=20
-> +    trace_xen_disk_init(xendev->name);
-> +
->      /* read xenstore entries */
->      if (blkdev->params =3D=3D NULL) {
->          char *h =3D NULL;
-> @@ -1062,6 +1087,8 @@ static int blk_connect(struct XenDevice *xendev)
->      unsigned int i;
->      uint32_t *domids;
->=20
-> +    trace_xen_disk_connect(xendev->name);
-> +
->      /* read-only ? */
->      if (blkdev->directiosafe) {
->          qflags =3D BDRV_O_NOCACHE | BDRV_O_NATIVE_AIO;
-> @@ -1287,6 +1314,8 @@ static int blk_connect(struct XenDevice *xendev)
->          blkdev->persistent_gnt_count =3D 0;
->      }
->=20
-> +    blk_set_aio_context(blkdev->blk, blkdev->ctx);
-> +
->      xen_be_bind_evtchn(&blkdev->xendev);
->=20
->      xen_pv_printf(&blkdev->xendev, 1, "ok: proto %s, nr-ring-ref %u, "
-> @@ -1300,13 +1329,20 @@ static void blk_disconnect(struct XenDevice
-> *xendev)
->  {
->      struct XenBlkDev *blkdev =3D container_of(xendev, struct XenBlkDev,
-> xendev);
->=20
-> +    trace_xen_disk_disconnect(xendev->name);
-> +
-> +    aio_context_acquire(blkdev->ctx);
-> +
->      if (blkdev->blk) {
-> +        blk_set_aio_context(blkdev->blk, qemu_get_aio_context());
->          blk_detach_dev(blkdev->blk, blkdev);
->          blk_unref(blkdev->blk);
->          blkdev->blk =3D NULL;
->      }
->      xen_pv_unbind_evtchn(&blkdev->xendev);
->=20
-> +    aio_context_release(blkdev->ctx);
-> +
->      if (blkdev->sring) {
->          xengnttab_unmap(blkdev->xendev.gnttabdev, blkdev->sring,
->                          blkdev->nr_ring_ref);
-> @@ -1345,6 +1381,8 @@ static int blk_free(struct XenDevice *xendev)
->      struct XenBlkDev *blkdev =3D container_of(xendev, struct XenBlkDev,
-> xendev);
->      struct ioreq *ioreq;
->=20
-> +    trace_xen_disk_free(xendev->name);
-> +
->      blk_disconnect(xendev);
->=20
->      while (!QLIST_EMPTY(&blkdev->freelist)) {
-> @@ -1360,6 +1398,7 @@ static int blk_free(struct XenDevice *xendev)
->      g_free(blkdev->dev);
->      g_free(blkdev->devtype);
->      qemu_bh_delete(blkdev->bh);
-> +    iothread_destroy(blkdev->iothread);
->      return 0;
->  }
->=20
-> --
-> 2.11.0
+Yes, would be fine to have it to increase test coverage.
+
+
+--=20
+Pierre Morel
+Linux/KVM/QEMU in B=C3=B6blingen - Germany
