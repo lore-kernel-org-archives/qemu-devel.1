@@ -1,24 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47788)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49324)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1eF2v9-0000LY-Pm
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 14:00:24 -0500
+	(envelope-from <eblake@redhat.com>) id 1eF2z6-0001NM-Qq
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 14:04:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1eF2v4-0003cL-Tg
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 14:00:23 -0500
-Received: from zero.eik.bme.hu ([152.66.115.2]:64137)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1eF2v4-0003WQ-Iu
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 14:00:18 -0500
-Date: Wed, 15 Nov 2017 20:00:09 +0100 (CET)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-In-Reply-To: <cd544495-16c6-5e75-837b-be1deb4e9768@redhat.com>
-Message-ID: <alpine.BSF.2.21.1711151930030.26122@zero.eik.bme.hu>
-References: <20171114225941.072707456B5@zero.eik.bme.hu>
-	<cd544495-16c6-5e75-837b-be1deb4e9768@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1eF2z5-0006iK-Md
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 14:04:28 -0500
+References: <20171115180732.31753-1-mreitz@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <e26e9557-d3ad-e267-03fa-7fc06892bf08@redhat.com>
+Date: Wed, 15 Nov 2017 13:04:19 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-Subject: Re: [Qemu-devel] [PATCH] exec: Skip mru section if it's a partial
- page and not resolving subpage
+In-Reply-To: <20171115180732.31753-1-mreitz@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="S7BUUTthbSujq0bFjKiH3OV1EPrnT1X3w"
+Subject: Re: [Qemu-devel] [PATCH] iotests: Make 087 pass without AIO enabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,56 +23,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Fam Zheng <famz@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 
-On Wed, 15 Nov 2017, Paolo Bonzini wrote:
-> This is another possibility:
->
-> diff --git a/exec.c b/exec.c
-> index 97a24a875e..3bb9fcf257 100644
-> --- a/exec.c
-> +++ b/exec.c
-> @@ -410,22 +410,16 @@ static MemoryRegionSection *address_space_lookup_region(AddressSpaceDispatch *d,
-> {
->     MemoryRegionSection *section = atomic_read(&d->mru_section);
->     subpage_t *subpage;
-> -    bool update;
->
-> -    if (section && section != &d->map.sections[PHYS_SECTION_UNASSIGNED] &&
-> -        section_covers_addr(section, addr)) {
-> -        update = false;
-> -    } else {
-> +    if (!section || section == &d->map.sections[PHYS_SECTION_UNASSIGNED] ||
-> +        !section_covers_addr(section, addr)) {
->         section = phys_page_find(d, addr);
-> -        update = true;
-> +        atomic_set(&d->mru_section, section);
->     }
->     if (resolve_subpage && section->mr->subpage) {
->         subpage = container_of(section->mr, subpage_t, iomem);
->         section = &d->map.sections[subpage->sub_section[SUBPAGE_IDX(addr)]];
->     }
-> -    if (update) {
-> -        atomic_set(&d->mru_section, section);
-> -    }
->     return section;
-> }
->
->
-> It will skip the expensive phys_page_find but not the cheap subpage lookup.
-> Does it work for you?
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--S7BUUTthbSujq0bFjKiH3OV1EPrnT1X3w
+From: Eric Blake <eblake@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+Message-ID: <e26e9557-d3ad-e267-03fa-7fc06892bf08@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] iotests: Make 087 pass without AIO enabled
+References: <20171115180732.31753-1-mreitz@redhat.com>
+In-Reply-To: <20171115180732.31753-1-mreitz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-This also works but I can't understand why becuase the problematic call to 
-this function which got the wrong result from section_covers_addr was with 
-resolve_subpage=false and in that case this looks identical to the 
-original which did not work. Unless this function is called multiple times 
-and another call with resolve_subpage=true now somehow works better with 
-this change or replacing the mru_section earlier before subpage lookup 
-makes a difference which is not obvious from this function.
+On 11/15/2017 12:07 PM, Max Reitz wrote:
+> If AIO has not been enabled in the qemu build that is to be tested, we
+> should skip the "aio=3Dnative without O_DIRECT" test instead of failing=
+=2E
+>=20
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+> Cleber wanted to fix this in July with his "build configuration query
+> tool and conditional (qemu-io)test skip" series
+> (https://lists.gnu.org/archive/html/qemu-block/2017-07/msg01303.html),
+> but unfortunately there hasn't been any activity on that (as far as I
+> can see), so let's just solve it the simple way.
+> ---
+>  tests/qemu-iotests/087 | 9 ++++++++-
+>  1 file changed, 8 insertions(+), 1 deletion(-)
 
-Anyway, it fixes the problem I see so you can use this instead of my 
-patch.
+Yep, that's about as simple as possible.
 
-Thank you,
-BALATON Zoltan
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--S7BUUTthbSujq0bFjKiH3OV1EPrnT1X3w
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloMj7MACgkQp6FrSiUn
+Q2qBLQf9GUqyCIrVXl8bJWASvLPGbkPA30a3TtS9RygGDmGhFBdliTavtCF7IJQZ
+KAHoXktqvtgzcfvr6/qRj0wFoJSDdizigLQYR1BIJbMmmzV8swakjUPKLUx+jCIE
+C/gkKhxRtOBTpw0mkw905GkayRq8A4apK2sGQLM9a/lrdSS3TUEICk6O6hRTyZLy
+U2d3rxEkPNo3S6iwBXJ0ySQfVBF1UXFJR/syNHHevVocqMDPTtkdAtKdP8mfhKd5
+TzsxH1KaBxOq/ShEVIKQR7AUz2mTbkS+JfNYN5d0vzRIuN1WCml50WzsUi54WPsb
+2glk+wHrbQHb5IB25NMh9/U1VBs4yQ==
+=c3x5
+-----END PGP SIGNATURE-----
+
+--S7BUUTthbSujq0bFjKiH3OV1EPrnT1X3w--
