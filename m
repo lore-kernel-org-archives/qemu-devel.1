@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58008)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58133)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eF4HP-0007zs-Nc
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 15:27:28 -0500
+	(envelope-from <groug@kaod.org>) id 1eF4Ha-00086d-Vp
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 15:27:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eF4HO-0006FW-O6
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 15:27:27 -0500
-References: <CAJH6TXiMxUoU2sFEHAoZ8jhDMtg_saEnTHM9f0vJ6Nhqj7099w@mail.gmail.com>
-	<c2ecae32-f999-9f1e-46a6-37cdab2a62e3@redhat.com>
-	<CAJH6TXhBAaBE9gBSxksWZqNywWmencRaGyeY-oN3jbKdgUettQ@mail.gmail.com>
-	<0e6cc220-814a-17fd-4fd7-7b0665d34e81@redhat.com>
-	<CAJH6TXh2v-F=yqxQbUUawk_Ctq-sgFefGp1XvMsC=syX_5jEqA@mail.gmail.com>
-	<30b54865-2255-d13d-a054-afcf5bbd06b2@redhat.com>
-	<20171115202440.GJ19514@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <7b11bb2b-b93d-e8ff-f396-703c93549d0d@redhat.com>
-Date: Wed, 15 Nov 2017 21:27:14 +0100
+	(envelope-from <groug@kaod.org>) id 1eF4HY-0006Rg-9l
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 15:27:38 -0500
+Received: from 6.mo68.mail-out.ovh.net ([46.105.63.100]:50945)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1eF4HY-0006PX-0C
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 15:27:36 -0500
+Received: from player789.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo68.mail-out.ovh.net (Postfix) with ESMTP id A45A69CB6A
+	for <qemu-devel@nongnu.org>; Wed, 15 Nov 2017 21:27:32 +0100 (CET)
+Date: Wed, 15 Nov 2017 21:27:19 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20171115212719.02874153@bahia.lab.toulouse-stg.fr.ibm.com>
+In-Reply-To: <c05754ad-6014-3483-4c7e-2fa86cbd582d@kaod.org>
+References: <20171110152017.24324-1-clg@kaod.org>
+	<20171110152017.24324-10-clg@kaod.org>
+	<20171115165218.6bb14b6f@bahia.lab.toulouse-stg.fr.ibm.com>
+	<c05754ad-6014-3483-4c7e-2fa86cbd582d@kaod.org>
 MIME-Version: 1.0
-In-Reply-To: <20171115202440.GJ19514@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="4P1tliVKjoijAQQ3mSBLnU7SEQ3445lqF"
-Subject: Re: [Qemu-devel] [Libguestfs]  [qemu-img] support for XVA
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-2.12 v3 09/11] spapr: split the IRQ
+ number space for LSI interrupts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,76 +33,214 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Richard W.M. Jones" <rjones@redhat.com>
-Cc: Gandalf Corvotempesta <gandalf.corvotempesta@gmail.com>, Qemu-block <qemu-block@nongnu.org>, qemu-devel@nongnu.org, libguestfs <libguestfs@redhat.com>
+To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---4P1tliVKjoijAQQ3mSBLnU7SEQ3445lqF
-From: Max Reitz <mreitz@redhat.com>
-To: "Richard W.M. Jones" <rjones@redhat.com>
-Cc: Gandalf Corvotempesta <gandalf.corvotempesta@gmail.com>,
- Qemu-block <qemu-block@nongnu.org>, qemu-devel@nongnu.org,
- libguestfs <libguestfs@redhat.com>
-Message-ID: <7b11bb2b-b93d-e8ff-f396-703c93549d0d@redhat.com>
-Subject: Re: [Libguestfs] [Qemu-devel] [qemu-img] support for XVA
-References: <CAJH6TXiMxUoU2sFEHAoZ8jhDMtg_saEnTHM9f0vJ6Nhqj7099w@mail.gmail.com>
- <c2ecae32-f999-9f1e-46a6-37cdab2a62e3@redhat.com>
- <CAJH6TXhBAaBE9gBSxksWZqNywWmencRaGyeY-oN3jbKdgUettQ@mail.gmail.com>
- <0e6cc220-814a-17fd-4fd7-7b0665d34e81@redhat.com>
- <CAJH6TXh2v-F=yqxQbUUawk_Ctq-sgFefGp1XvMsC=syX_5jEqA@mail.gmail.com>
- <30b54865-2255-d13d-a054-afcf5bbd06b2@redhat.com>
- <20171115202440.GJ19514@redhat.com>
-In-Reply-To: <20171115202440.GJ19514@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Wed, 15 Nov 2017 16:08:32 +0000
+C=C3=A9dric Le Goater <clg@kaod.org> wrote:
 
-On 2017-11-15 21:24, Richard W.M. Jones wrote:
-> On Wed, Nov 15, 2017 at 09:07:12PM +0100, Max Reitz wrote:
->> On 2017-11-15 21:06, Gandalf Corvotempesta wrote:
->>> 2017-11-15 20:59 GMT+01:00 Max Reitz <mreitz@redhat.com>:
->>>> Well, you can't just add support to qemu-img alone either.  Every im=
-age
->>>> format supported by qemu-img is one supported by qemu as a whole and=
-
->>>> thus needs a proper block driver that needs to support random access=
-es
->>>> as well.
->>>
->>> I was talking about qemu-img convert, just to convert an XVA image to=
-
->>> something different, in a single pass, without having to extract the
->>> tar.
->>
->> I know, but that doesn't work.  qemu-img convert uses the normal
->> general-purpose block drivers for that.
+> On 11/15/2017 03:52 PM, Greg Kurz wrote:
+> > On Fri, 10 Nov 2017 15:20:15 +0000
+> > C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+> >  =20
+> >> The type of an interrupt, MSI or LSI, is stored under the flag
+> >> attribute of the ICSIRQState array. To reduce the use of this array
+> >> and consequently of the ICSState object (This is needed to introduce
+> >> the new XIVE model), we choose to split the IRQ number space of the
+> >> machine in two: first the LSIs and then the MSIs.
+> >>
+> >> This also has the benefit to keep the LSI IRQ numbers in a well known
+> >> range which will be useful for PHB hotplug.
+> >> =20
+> >=20
+> > Well... LSIs indeed land in a well known range, but it isn't enough for=
+ PHB
+> > hotplug. Each PHB is uniquely identified by its 'index' property, and we
+> > want each PHB to have fixed LSIs, so that they are invariant across mig=
+ration. =20
 >=20
-> In any case there's no need as qemu/qemu-img can already access files
-> inside an uncompressed tarball using the offset/size support added to
-> the raw driver exactly for this purpose:
+> ok.=20
 >=20
-> https://lists.gnu.org/archive/html/qemu-devel/2016-10/msg03945.html
+> So, as said in another email, we should think about segmenting
+> the allocation per device. At least for PHBs. This is specified in
+> the PAPR specs, each device has one or more Bus Unit IDentifier (BUID)
 
-If that works, yes.  To me it doesn't look like XVA is just a single raw
-image inside of a tarball, but I may very well be wrong, of course.
+BTW, the code currently uses "BUID" to refer to the PHB Unit ID which
+is a different concept in the PAPR spec. Maybe this should be fixed
+for the sake of clarity ?
 
-Max
+> acting as a prefix for the IRQ number.
+>=20
 
+Since the user can instantiate multiple VIO devices, should we also
+have an irq segment for the VIO bus as well ?
 
---4P1tliVKjoijAQQ3mSBLnU7SEQ3445lqF
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+> We could model that by using a specific range for each PHB in the=20
+> overall IRQ number space, depending on some index. LSIs would be=20
 
------BEGIN PGP SIGNATURE-----
+Some index should be the "index" property I was mentioning before.
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAloMoyISHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AgPQH+wU9EK0TRsGB07dSJ9jSyteXc+jriAIS
-tN1614P269qjeJ0nRyS1tidhTq7hrpNkE5s5sMwzsUzxdJABBlem8dvVg67KliR/
-EdTnBtpVvXMRSgdMWQopN3pMDdywHMNF2KWUY/LRSHpIVryG/HAw/vpaTyUYVVdk
-0nvkm+k/LCLdRxzXus0GK68LUQ4pRf+6Giu5Wa1SpVl3bTvOx6tVPVlj+Lg6dsfa
-LL2SC6CSLNVLYogvrm81YP5ziTulX/xNby/AjZwgr5hZba3xaDByb+QandRe7Pud
-pYwL4XfstJQ6ADLunEN9OvosaXCUjHwuOakAx+6MvghRdJXZmtb/pQQ=
-=EkZk
------END PGP SIGNATURE-----
+> allocated at the beginning of this range, when the device is realized=20
+> and MSIs later on when the guest starts. =20
+>=20
+> Identifying a LSI could be done using a mask on the IRQ number range=20
+> of each PHB. It should be fast enough. I don't see other devices=20
+> using LSIs under the sPAPR platform.
+>=20
 
---4P1tliVKjoijAQQ3mSBLnU7SEQ3445lqF--
+There aren't any other AFAICT.
+
+>=20
+> C.
+>=20
+>=20
+>=20
+> >> This change only applies to the latest pseries machines. Older
+> >> machines still use the ICSIRQState array to define the IRQ type.
+> >>
+> >> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> >> ---
+> >>
+> >>  Changes since v2 :
+> >>
+> >>  - introduced a second set of XICSFabric IRQ operations for older
+> >>    pseries machines
+> >>
+> >>  hw/intc/xics_spapr.c  |  6 +++---
+> >>  hw/ppc/spapr.c        | 33 +++++++++++++++++++++++++++++----
+> >>  include/hw/ppc/xics.h |  2 +-
+> >>  3 files changed, 33 insertions(+), 8 deletions(-)pe-total-#msi
+> >>
+> >> diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
+> >> index de9e65d35247..b8e91aaf52bd 100644
+> >> --- a/hw/intc/xics_spapr.c
+> >> +++ b/hw/intc/xics_spapr.c
+> >> @@ -260,7 +260,7 @@ int spapr_ics_alloc(ICSState *ics, int irq_hint, b=
+ool lsi, Error **errp)
+> >>          }
+> >>          irq =3D irq_hint;
+> >>      } else {
+> >> -        irq =3D xic->irq_alloc_block(ics->xics, 1, 1);
+> >> +        irq =3D xic->irq_alloc_block(ics->xics, 1, 1, lsi);
+> >>          if (irq < 0) {
+> >>              error_setg(errp, "can't allocate IRQ: no IRQ left");
+> >>              return -1;
+> >> @@ -297,9 +297,9 @@ int spapr_ics_alloc_block(ICSState *ics, int num, =
+bool lsi,
+> >>      if (align) {
+> >>          assert((num =3D=3D 1) || (num =3D=3D 2) || (num =3D=3D 4) ||
+> >>                 (num =3D=3D 8) || (num =3D=3D 16) || (num =3D=3D 32));
+> >> -        first =3D xic->irq_alloc_block(ics->xics, num, num);
+> >> +        first =3D xic->irq_alloc_block(ics->xics, num, num, lsi);
+> >>      } else {
+> >> -        first =3D xic->irq_alloc_block(ics->xics, num, 1);
+> >> +        first =3D xic->irq_alloc_block(ics->xics, num, 1, lsi);
+> >>      }
+> >>      if (first < 0) {
+> >>          error_setg(errp, "can't find a free %d-IRQ block", num);
+> >> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> >> index ce314fcf38db..f14eae6196cd 100644
+> >> --- a/hw/ppc/spapr.c
+> >> +++ b/hw/ppc/spapr.c
+> >> @@ -3596,7 +3596,8 @@ static bool spapr_irq_test_2_11(XICSFabric *xi, =
+int irq)
+> >>      return !ICS_IRQ_FREE(ics, srcno);
+> >>  }
+> >> =20
+> >> -static int spapr_irq_alloc_block_2_11(XICSFabric *xi, int count, int =
+align)
+> >> +static int spapr_irq_alloc_block_2_11(XICSFabric *xi, int count, int =
+align,
+> >> +                                      bool lsi)
+> >>  {
+> >>      sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
+> >>      ICSState *ics =3D spapr->ics;
+> >> @@ -3628,7 +3629,7 @@ static void spapr_irq_free_block_2_11(XICSFabric=
+ *xi, int irq, int num)
+> >>      }
+> >>  }
+> >> =20
+> >> -static bool spapr_irq_is_lsi(XICSFabric *xi, int irq)
+> >> +static bool spapr_irq_is_lsi_2_11(XICSFabric *xi, int irq)
+> >>  {
+> >>      sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
+> >>      int srcno =3D irq - spapr->ics->offset;
+> >> @@ -3644,10 +3645,21 @@ static bool spapr_irq_test(XICSFabric *xi, int=
+ irq)
+> >>      return test_bit(srcno, spapr->irq_map);
+> >>  }
+> >> =20
+> >> -static int spapr_irq_alloc_block(XICSFabric *xi, int count, int align)
+> >> +
+> >> +/*
+> >> + * Let's provision 4 LSIs per PHBs
+> >> + */
+> >> +#define SPAPR_MAX_LSI (SPAPR_MAX_PHBS * 4)
+> >> +
+> >> +/*
+> >> + * Split the IRQ number space of the machine in two: first the LSIs
+> >> + * and then the MSIs. This allows us to keep the LSI IRQ numbers in a
+> >> + * well known range which is useful for PHB hotplug.
+> >> + */
+> >> +static int spapr_irq_alloc_block(XICSFabric *xi, int count, int align=
+, bool lsi)
+> >>  {
+> >>      sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
+> >> -    int start =3D 0;
+> >> +    int start =3D lsi ? 0 : SPAPR_MAX_LSI;
+> >>      int srcno;
+> >> =20
+> >>      /*
+> >> @@ -3664,6 +3676,10 @@ static int spapr_irq_alloc_block(XICSFabric *xi=
+, int count, int align)
+> >>          return -1;
+> >>      }
+> >> =20
+> >> +    if (lsi && srcno >=3D SPAPR_MAX_LSI) {
+> >> +        return -1;
+> >> +    }
+> >> +
+> >>      bitmap_set(spapr->irq_map, srcno, count);
+> >>      return srcno + spapr->irq_base;
+> >>  }
+> >> @@ -3676,6 +3692,14 @@ static void spapr_irq_free_block(XICSFabric *xi=
+, int irq, int num)
+> >>      bitmap_clear(spapr->irq_map, srcno, num);
+> >>  }
+> >> =20
+> >> +static bool spapr_irq_is_lsi(XICSFabric *xi, int irq)
+> >> +{
+> >> +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
+> >> +    int srcno =3D irq - spapr->irq_base;
+> >> +
+> >> +    return (srcno >=3D 0) && (srcno < SPAPR_MAX_LSI);
+> >> +}
+> >> +
+> >>  static void spapr_pic_print_info(InterruptStatsProvider *obj,
+> >>                                   Monitor *mon)
+> >>  {
+> >> @@ -3860,6 +3884,7 @@ static void spapr_machine_2_11_class_options(Mac=
+hineClass *mc)
+> >>      xic->irq_test =3D spapr_irq_test_2_11;
+> >>      xic->irq_alloc_block =3D spapr_irq_alloc_block_2_11;
+> >>      xic->irq_free_block =3D spapr_irq_free_block_2_11;
+> >> +    xic->irq_is_lsi =3D spapr_irq_is_lsi_2_11;
+> >>  }
+> >> =20
+> >>  DEFINE_SPAPR_MACHINE(2_11, "2.11", false);
+> >> diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
+> >> index 478f8e510179..292b929e88eb 100644
+> >> --- a/include/hw/ppc/xics.h
+> >> +++ b/include/hw/ppc/xics.h
+> >> @@ -177,7 +177,7 @@ typedef struct XICSFabricClass {
+> >>      ICPState *(*icp_get)(XICSFabric *xi, int server);
+> >>      /* IRQ allocator helpers */
+> >>      bool (*irq_test)(XICSFabric *xi, int irq);
+> >> -    int (*irq_alloc_block)(XICSFabric *xi, int count, int align);
+> >> +    int (*irq_alloc_block)(XICSFabric *xi, int count, int align, bool=
+ lsi);
+> >>      void (*irq_free_block)(XICSFabric *xi, int irq, int num);
+> >>      bool (*irq_is_lsi)(XICSFabric *xi, int irq);
+> >>  } XICSFabricClass; =20
+> >  =20
+>=20
