@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51335)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51542)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eF51Q-0003II-EI
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 16:15:01 -0500
+	(envelope-from <rjones@redhat.com>) id 1eF51p-0003dJ-Qc
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 16:15:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eF51N-00017k-O2
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 16:15:00 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52770)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eF51N-00016I-Fz
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 16:14:57 -0500
-References: <20171114225941.072707456B5@zero.eik.bme.hu>
-	<cd544495-16c6-5e75-837b-be1deb4e9768@redhat.com>
-	<alpine.BSF.2.21.1711151930030.26122@zero.eik.bme.hu>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <e9876d19-3ca6-5be0-572c-b664eddee102@redhat.com>
-Date: Wed, 15 Nov 2017 22:14:48 +0100
+	(envelope-from <rjones@redhat.com>) id 1eF51o-0001Tn-LV
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 16:15:25 -0500
+Date: Wed, 15 Nov 2017 21:15:11 +0000
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Message-ID: <20171115211511.GD2450@redhat.com>
+References: <c2ecae32-f999-9f1e-46a6-37cdab2a62e3@redhat.com>
+	<CAJH6TXhBAaBE9gBSxksWZqNywWmencRaGyeY-oN3jbKdgUettQ@mail.gmail.com>
+	<0e6cc220-814a-17fd-4fd7-7b0665d34e81@redhat.com>
+	<CAJH6TXh2v-F=yqxQbUUawk_Ctq-sgFefGp1XvMsC=syX_5jEqA@mail.gmail.com>
+	<30b54865-2255-d13d-a054-afcf5bbd06b2@redhat.com>
+	<20171115202440.GJ19514@redhat.com>
+	<7b11bb2b-b93d-e8ff-f396-703c93549d0d@redhat.com>
+	<20171115202938.GN2787@redhat.com>
+	<CAJH6TXiPuLu62-+o2+PrUGpstrks_5pLotFEe1bAOmsbn20otw@mail.gmail.com>
+	<20171115210500.GB2450@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <alpine.BSF.2.21.1711151930030.26122@zero.eik.bme.hu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] exec: Skip mru section if it's a partial
- page and not resolving subpage
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171115210500.GB2450@redhat.com>
+Subject: Re: [Qemu-devel] [Libguestfs]  [qemu-img] support for XVA
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,84 +31,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: qemu-devel@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Fam Zheng <famz@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+To: Gandalf Corvotempesta <gandalf.corvotempesta@gmail.com>
+Cc: Qemu-block <qemu-block@nongnu.org>, qemu-devel@nongnu.org, libguestfs <libguestfs@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On 15/11/2017 20:00, BALATON Zoltan wrote:
-> On Wed, 15 Nov 2017, Paolo Bonzini wrote:
->> This is another possibility:
->>
->> diff --git a/exec.c b/exec.c
->> index 97a24a875e..3bb9fcf257 100644
->> --- a/exec.c
->> +++ b/exec.c
->> @@ -410,22 +410,16 @@ static MemoryRegionSection
->> *address_space_lookup_region(AddressSpaceDispatch *d,
->> {
->> =C2=A0=C2=A0=C2=A0 MemoryRegionSection *section =3D atomic_read(&d->mr=
-u_section);
->> =C2=A0=C2=A0=C2=A0 subpage_t *subpage;
->> -=C2=A0=C2=A0=C2=A0 bool update;
->>
->> -=C2=A0=C2=A0=C2=A0 if (section && section !=3D
->> &d->map.sections[PHYS_SECTION_UNASSIGNED] &&
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 section_covers_addr(sectio=
-n, addr)) {
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 update =3D false;
->> -=C2=A0=C2=A0=C2=A0 } else {
->> +=C2=A0=C2=A0=C2=A0 if (!section || section =3D=3D
->> &d->map.sections[PHYS_SECTION_UNASSIGNED] ||
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 !section_covers_addr(secti=
-on, addr)) {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 section =3D phys_page_find(=
-d, addr);
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 update =3D true;
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 atomic_set(&d->mru_section=
-, section);
->> =C2=A0=C2=A0=C2=A0 }
->> =C2=A0=C2=A0=C2=A0 if (resolve_subpage && section->mr->subpage) {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 subpage =3D container_of(se=
-ction->mr, subpage_t, iomem);
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 section =3D
->> &d->map.sections[subpage->sub_section[SUBPAGE_IDX(addr)]];
->> =C2=A0=C2=A0=C2=A0 }
->> -=C2=A0=C2=A0=C2=A0 if (update) {
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 atomic_set(&d->mru_section=
-, section);
->> -=C2=A0=C2=A0=C2=A0 }
->> =C2=A0=C2=A0=C2=A0 return section;
->> }
->>
->>
->> It will skip the expensive phys_page_find but not the cheap subpage
->> lookup.
->> Does it work for you?
->=20
-> This also works but I can't understand why becuase the problematic call
-> to this function which got the wrong result from section_covers_addr wa=
-s
-> with resolve_subpage=3Dfalse and in that case this looks identical to t=
-he
-> original which did not work.
+On Wed, Nov 15, 2017 at 09:05:00PM +0000, Richard W.M. Jones wrote:
+> This will give you one offset/size/filename tuple for each file.  The
+> plugin will then simply need to calculate which file to access to
+> resolve each virtual file range (or substitute zeroes for missing
+> files).
 
-The problem was that a resolve_subpage=3Dtrue mru_section was reused for =
-a
-resolve_subpage=3Dfalse mru_section.  This is fixed by always making the
-mru_section the same as if resolve_subpage=3Dfalse (mru_section is set
-before looking into the subpage_t).
+By which I mean, of course, that it accesses the offset/size directly
+by opening the tar file.  The file doesn't have to be extracted.
 
-Thanks,
+I'm still interested if you have a small XVA example you can share.
 
-Paolo
+Rich.
 
-> Unless this function is called multiple
-> times and another call with resolve_subpage=3Dtrue now somehow works
-> better with this change or replacing the mru_section earlier before
-> subpage lookup makes a difference which is not obvious from this functi=
-on.
->=20
-> Anyway, it fixes the problem I see so you can use this instead of my pa=
-tch.
->=20
-> Thank you,
-> BALATON Zoltan
+-- 
+Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
+Read my programming and virtualization blog: http://rwmj.wordpress.com
+Fedora Windows cross-compiler. Compile Windows programs, test, and
+build Windows installers. Over 100 libraries supported.
+http://fedoraproject.org/wiki/MinGW
