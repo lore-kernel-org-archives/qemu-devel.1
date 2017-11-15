@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36723)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39301)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eEzuC-0000o0-2l
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 10:47:16 -0500
+	(envelope-from <groug@kaod.org>) id 1eEzzZ-00024Y-I0
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 10:52:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eEzu5-0001qL-ET
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 10:47:12 -0500
-Received: from indium.canonical.com ([91.189.90.7]:57760)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eEzu5-0001oo-7m
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 10:47:05 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eEztx-0003qX-NE
-	for <qemu-devel@nongnu.org>; Wed, 15 Nov 2017 15:46:59 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id C610F2E82E7
-	for <qemu-devel@nongnu.org>; Wed, 15 Nov 2017 15:45:58 +0000 (UTC)
+	(envelope-from <groug@kaod.org>) id 1eEzzW-000873-Ba
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 10:52:45 -0500
+Received: from 6.mo6.mail-out.ovh.net ([87.98.177.69]:45918)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1eEzzW-0007u5-29
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 10:52:42 -0500
+Received: from player735.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo6.mail-out.ovh.net (Postfix) with ESMTP id DDA1611E781
+	for <qemu-devel@nongnu.org>; Wed, 15 Nov 2017 16:52:31 +0100 (CET)
+Date: Wed, 15 Nov 2017 16:52:18 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20171115165218.6bb14b6f@bahia.lab.toulouse-stg.fr.ibm.com>
+In-Reply-To: <20171110152017.24324-10-clg@kaod.org>
+References: <20171110152017.24324-1-clg@kaod.org>
+	<20171110152017.24324-10-clg@kaod.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 15 Nov 2017 15:33:38 -0000
-From: Thomas Huth <1724570@bugs.launchpad.net>
-Reply-To: Bug 1724570 <1724570@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150833168269.1534.1058667524294729864.malonedeb@soybean.canonical.com>
-Message-Id: <151076001835.28762.7049356161441112067.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1724570] Re: qemu-system-x86_64 generates ACPI
- tables with broken endianess when run on big-endian hosts
+Subject: Re: [Qemu-devel] [PATCH for-2.12 v3 09/11] spapr: split the IRQ
+ number space for LSI interrupts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,98 +31,171 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
-I think something like this should fix this issue:
+On Fri, 10 Nov 2017 15:20:15 +0000
+C=C3=A9dric Le Goater <clg@kaod.org> wrote:
 
-diff a/tests/bios-tables-test.c b/tests/bios-tables-test.c
---- a/tests/bios-tables-test.c
-+++ b/tests/bios-tables-test.c
-@@ -279,8 +279,19 @@ static void dump_aml_files(test_data *data, bool rebui=
-ld)
-         }
-         g_assert(fd >=3D 0);
- =
+> The type of an interrupt, MSI or LSI, is stored under the flag
+> attribute of the ICSIRQState array. To reduce the use of this array
+> and consequently of the ICSState object (This is needed to introduce
+> the new XIVE model), we choose to split the IRQ number space of the
+> machine in two: first the LSIs and then the MSIs.
+>=20
+> This also has the benefit to keep the LSI IRQ numbers in a well known
+> range which will be useful for PHB hotplug.
+>=20
 
-+        sdt->header.signature =3D cpu_to_le32(sdt->header.signature);
-+        sdt->header.length =3D cpu_to_le32(sdt->header.length);
-+        sdt->header.oem_revision =3D cpu_to_le32(sdt->header.oem_revision);
-+        sdt->header.asl_compiler_revision =3D cpu_to_le32(sdt->header.asl_=
-compiler_revision);
-+
-         ret =3D qemu_write_full(fd, sdt, sizeof(AcpiTableHeader));
-         g_assert(ret =3D=3D sizeof(AcpiTableHeader));
-+
-+        sdt->header.signature =3D le32_to_cpu(sdt->header.signature);
-+        sdt->header.length =3D le32_to_cpu(sdt->header.length);
-+        sdt->header.oem_revision =3D le32_to_cpu(sdt->header.oem_revision);
-+        sdt->header.asl_compiler_revision =3D le32_to_cpu(sdt->header.asl_=
-compiler_revision);
-+
-         ret =3D qemu_write_full(fd, sdt->aml, sdt->aml_len);
-         g_assert(ret =3D=3D sdt->aml_len);
+Well... LSIs indeed land in a well known range, but it isn't enough for PHB
+hotplug. Each PHB is uniquely identified by its 'index' property, and we
+want each PHB to have fixed LSIs, so that they are invariant across migrati=
+on.
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1724570
-
-Title:
-  qemu-system-x86_64 generates ACPI tables with broken endianess when
-  run on big-endian hosts
-
-Status in QEMU:
-  New
-
-Bug description:
-  The bios-tables-test always fails when run on a big-endian host, which
-  has iasl installed. When it calls iasl to dumps the AML files into ASL
-  files, iasl complains
-
-  Intel ACPI Component Architecture
-  ASL+ Optimizing Compiler/Disassembler version 20170831
-  Copyright (c) 2000 - 2017 Intel Corporation
-
-  Input file aml-4L677Y, Length 0x38 (56) bytes
-  Table [TEPH] is too long for file - needs: 0x38000000, remaining in file:=
- 0x38
-  Could not get ACPI tables from aml-4L677Y, AE_BAD_HEADER
-
-  =
-
-  At first I thought this was an iasl bug, but the latest version of iasl i=
-n rawhide is ported to big endian.
-
-  So I looked at the actual AML files that bios-tables-test extracts
-  from the qemu-system-x86_64 memory space, when running on ppc64 host.
-  These do indeed have different content from the AML files generated by
-  qemu-system-x86_64 when running on an x86_64 host.
-
-  =
-
-  eg the AML file for the HPET shows
-
-  < 0000000   T   E   P   H nul nul nul   8 soh etx   B   O   C   H   S  sp
-  <            4554    4850    0000    3800    0301    4f42    4843    2053
-  < 0000020   B   X   P   C   H   P   E   T nul nul nul soh   B   X   P   C
-  <            5842    4350    5048    5445    0000    0100    5842    4350
-  < 0000040 nul nul nul soh soh   " ack nul nul nul nul nul nul nul   P   ~
-  <            0000    0100    a201    8086    0000    0000    0000    fed0
-  ---
-  > 0000000   H   P   E   T   8 nul nul nul soh etx   B   O   C   H   S  sp
-  >            5048    5445    0038    0000    0301    4f42    4843    2053
-  > 0000020   B   X   P   C   H   P   E   T soh nul nul nul   B   X   P   C
-  >            5842    4350    5048    5445    0001    0000    5842    4350
-  > 0000040 soh nul nul nul soh   " ack nul nul nul nul nul nul nul   P   ~
-  >            0001    0000    a201    8086    0000    0000    0000    fed0
-
-  so not only is the table name inverted, but the lenght is inverted,
-  and several fields later on are inverted too.
-
-  Other AML files for APIC and DSDT show similar brokenness
-
-  This is seen with QEMU 2.10.0
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1724570/+subscriptions
+> This change only applies to the latest pseries machines. Older
+> machines still use the ICSIRQState array to define the IRQ type.
+>=20
+> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> ---
+>=20
+>  Changes since v2 :
+>=20
+>  - introduced a second set of XICSFabric IRQ operations for older
+>    pseries machines
+>=20
+>  hw/intc/xics_spapr.c  |  6 +++---
+>  hw/ppc/spapr.c        | 33 +++++++++++++++++++++++++++++----
+>  include/hw/ppc/xics.h |  2 +-
+>  3 files changed, 33 insertions(+), 8 deletions(-)pe-total-#msi
+>=20
+> diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
+> index de9e65d35247..b8e91aaf52bd 100644
+> --- a/hw/intc/xics_spapr.c
+> +++ b/hw/intc/xics_spapr.c
+> @@ -260,7 +260,7 @@ int spapr_ics_alloc(ICSState *ics, int irq_hint, bool=
+ lsi, Error **errp)
+>          }
+>          irq =3D irq_hint;
+>      } else {
+> -        irq =3D xic->irq_alloc_block(ics->xics, 1, 1);
+> +        irq =3D xic->irq_alloc_block(ics->xics, 1, 1, lsi);
+>          if (irq < 0) {
+>              error_setg(errp, "can't allocate IRQ: no IRQ left");
+>              return -1;
+> @@ -297,9 +297,9 @@ int spapr_ics_alloc_block(ICSState *ics, int num, boo=
+l lsi,
+>      if (align) {
+>          assert((num =3D=3D 1) || (num =3D=3D 2) || (num =3D=3D 4) ||
+>                 (num =3D=3D 8) || (num =3D=3D 16) || (num =3D=3D 32));
+> -        first =3D xic->irq_alloc_block(ics->xics, num, num);
+> +        first =3D xic->irq_alloc_block(ics->xics, num, num, lsi);
+>      } else {
+> -        first =3D xic->irq_alloc_block(ics->xics, num, 1);
+> +        first =3D xic->irq_alloc_block(ics->xics, num, 1, lsi);
+>      }
+>      if (first < 0) {
+>          error_setg(errp, "can't find a free %d-IRQ block", num);
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index ce314fcf38db..f14eae6196cd 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -3596,7 +3596,8 @@ static bool spapr_irq_test_2_11(XICSFabric *xi, int=
+ irq)
+>      return !ICS_IRQ_FREE(ics, srcno);
+>  }
+> =20
+> -static int spapr_irq_alloc_block_2_11(XICSFabric *xi, int count, int ali=
+gn)
+> +static int spapr_irq_alloc_block_2_11(XICSFabric *xi, int count, int ali=
+gn,
+> +                                      bool lsi)
+>  {
+>      sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
+>      ICSState *ics =3D spapr->ics;
+> @@ -3628,7 +3629,7 @@ static void spapr_irq_free_block_2_11(XICSFabric *x=
+i, int irq, int num)
+>      }
+>  }
+> =20
+> -static bool spapr_irq_is_lsi(XICSFabric *xi, int irq)
+> +static bool spapr_irq_is_lsi_2_11(XICSFabric *xi, int irq)
+>  {
+>      sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
+>      int srcno =3D irq - spapr->ics->offset;
+> @@ -3644,10 +3645,21 @@ static bool spapr_irq_test(XICSFabric *xi, int ir=
+q)
+>      return test_bit(srcno, spapr->irq_map);
+>  }
+> =20
+> -static int spapr_irq_alloc_block(XICSFabric *xi, int count, int align)
+> +
+> +/*
+> + * Let's provision 4 LSIs per PHBs
+> + */
+> +#define SPAPR_MAX_LSI (SPAPR_MAX_PHBS * 4)
+> +
+> +/*
+> + * Split the IRQ number space of the machine in two: first the LSIs
+> + * and then the MSIs. This allows us to keep the LSI IRQ numbers in a
+> + * well known range which is useful for PHB hotplug.
+> + */
+> +static int spapr_irq_alloc_block(XICSFabric *xi, int count, int align, b=
+ool lsi)
+>  {
+>      sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
+> -    int start =3D 0;
+> +    int start =3D lsi ? 0 : SPAPR_MAX_LSI;
+>      int srcno;
+> =20
+>      /*
+> @@ -3664,6 +3676,10 @@ static int spapr_irq_alloc_block(XICSFabric *xi, i=
+nt count, int align)
+>          return -1;
+>      }
+> =20
+> +    if (lsi && srcno >=3D SPAPR_MAX_LSI) {
+> +        return -1;
+> +    }
+> +
+>      bitmap_set(spapr->irq_map, srcno, count);
+>      return srcno + spapr->irq_base;
+>  }
+> @@ -3676,6 +3692,14 @@ static void spapr_irq_free_block(XICSFabric *xi, i=
+nt irq, int num)
+>      bitmap_clear(spapr->irq_map, srcno, num);
+>  }
+> =20
+> +static bool spapr_irq_is_lsi(XICSFabric *xi, int irq)
+> +{
+> +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
+> +    int srcno =3D irq - spapr->irq_base;
+> +
+> +    return (srcno >=3D 0) && (srcno < SPAPR_MAX_LSI);
+> +}
+> +
+>  static void spapr_pic_print_info(InterruptStatsProvider *obj,
+>                                   Monitor *mon)
+>  {
+> @@ -3860,6 +3884,7 @@ static void spapr_machine_2_11_class_options(Machin=
+eClass *mc)
+>      xic->irq_test =3D spapr_irq_test_2_11;
+>      xic->irq_alloc_block =3D spapr_irq_alloc_block_2_11;
+>      xic->irq_free_block =3D spapr_irq_free_block_2_11;
+> +    xic->irq_is_lsi =3D spapr_irq_is_lsi_2_11;
+>  }
+> =20
+>  DEFINE_SPAPR_MACHINE(2_11, "2.11", false);
+> diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
+> index 478f8e510179..292b929e88eb 100644
+> --- a/include/hw/ppc/xics.h
+> +++ b/include/hw/ppc/xics.h
+> @@ -177,7 +177,7 @@ typedef struct XICSFabricClass {
+>      ICPState *(*icp_get)(XICSFabric *xi, int server);
+>      /* IRQ allocator helpers */
+>      bool (*irq_test)(XICSFabric *xi, int irq);
+> -    int (*irq_alloc_block)(XICSFabric *xi, int count, int align);
+> +    int (*irq_alloc_block)(XICSFabric *xi, int count, int align, bool ls=
+i);
+>      void (*irq_free_block)(XICSFabric *xi, int irq, int num);
+>      bool (*irq_is_lsi)(XICSFabric *xi, int irq);
+>  } XICSFabricClass;
