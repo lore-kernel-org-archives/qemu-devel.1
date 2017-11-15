@@ -1,31 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58155)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60714)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1eEwfL-0001Ah-90
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 07:19:40 -0500
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1eEwqi-0002yT-DO
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 07:31:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1eEwfG-0002FN-NV
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 07:19:39 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40738)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1eEwfG-0002Ep-Gp
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 07:19:34 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A108B6869B
-	for <qemu-devel@nongnu.org>; Wed, 15 Nov 2017 12:19:33 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-116-103.ams2.redhat.com
-	[10.36.116.103])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 67BE511E7CC
-	for <qemu-devel@nongnu.org>; Wed, 15 Nov 2017 12:19:33 +0000 (UTC)
-Date: Wed, 15 Nov 2017 13:19:32 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20171115121932.x4oh4aok5j5x6kxr@sirius.home.kraxel.org>
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1eEwqe-00028V-FF
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 07:31:24 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:34886
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
+	id 1eEwqe-00028F-9l
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 07:31:20 -0500
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	vAFCSX1s094289
+	for <qemu-devel@nongnu.org>; Wed, 15 Nov 2017 07:31:15 -0500
+Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2e8kvbwejd-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 15 Nov 2017 07:31:14 -0500
+Received: from localhost
+	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
+	Wed, 15 Nov 2017 07:31:14 -0500
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Date: Wed, 15 Nov 2017 07:31:05 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Subject: [Qemu-devel] building user interfaces as modules
+Content-Type: text/plain; charset=UTF-8
+Message-Id: <1510749069-22059-1-git-send-email-stefanb@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 0/4] Merge tpm 2017/11/15 v1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,28 +40,44 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, marcandre.lureau@gmail.com, Stefan Berger <stefanb@linux.vnet.ibm.com>
 
-  Hi,
+This pull request is for 2.11 and extends documentation as well as fixes
+bugs related to concurrency and failure mode.
 
-I'm trying to revamp the display initialization code:
+The following changes since commit 4ffa88c99c54d2a30f79e3dbecec50b023eff1=
+c8:
 
-  * First use a qapi type for the display options, so we can use
-    -blockdev style command line parsing for -display (not there yet,
-    but closer).
-  * Second initialize all user interfaces the same way and build a
-    registry for UIs.  Drops lots of #ifdefs from vl.c
-  * Finally this should make it *alot* easier to build user interfaces
-    as modules.
+  Merge remote-tracking branch 'remotes/berrange/tags/pull-qcrypto-2017-1=
+1-08-1' into staging (2017-11-10 16:01:35 +0000)
 
-For SDL we already have sdl.mo defined in ui/Makefile.objs. so I tried
-that first.  Just flipping CONFIG_SDL from 'y' to 'm' doesn't work
-though.  sdl support isn't build, neither with nor without
---enable-modules.
+are available in the git repository at:
 
-Any clues?
+  git://github.com/stefanberger/qemu-tpm.git tags/pull-tpm-2017-11-15-1
 
-thanks,
-  Gerd
+for you to fetch changes up to 6cd65969da57eaa9bdff07b80ecca2becce0597a:
 
-git branch:
-  https://www.kraxel.org/cgit/qemu/log/?h=sirius/display-cmdline
+  tpm_tis: Return 0 for every register in case of failure mode (2017-11-1=
+5 06:47:35 -0500)
+
+----------------------------------------------------------------
+Merge tpm 2017/11/15 v1
+
+----------------------------------------------------------------
+Marc-Andr=C3=A9 Lureau (1):
+      tpm-emulator: protect concurrent ctrl_chr access
+
+Stefan Berger (3):
+      specs: Extend TPM spec with TPM emulator description
+      tpm_tis: Return TPM_VERSION_UNSPEC in case of BE failure
+      tpm_tis: Return 0 for every register in case of failure mode
+
+ docs/specs/tpm.txt    | 79 +++++++++++++++++++++++++++++++++++++++++++++=
+++++++
+ hw/tpm/tpm_emulator.c | 44 +++++++++++++++++-----------
+ hw/tpm/tpm_tis.c      |  6 +++-
+ 3 files changed, 112 insertions(+), 17 deletions(-)
+
+
+--=20
+2.5.5
