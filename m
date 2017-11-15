@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41316)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46987)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lu.zhipeng@zte.com.cn>) id 1eEmic-0000kQ-Vx
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 20:42:26 -0500
+	(envelope-from <jsnow@redhat.com>) id 1eEmyl-0002nv-30
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 20:59:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lu.zhipeng@zte.com.cn>) id 1eEmiZ-0005Tv-07
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 20:42:23 -0500
-Received: from out1.zte.com.cn ([202.103.147.172]:33478 helo=mxct.zte.com.cn)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lu.zhipeng@zte.com.cn>)
-	id 1eEmiX-0005Kx-Am
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 20:42:18 -0500
-Date: Wed, 15 Nov 2017 09:41:58 +0800 (CST)
-Message-ID: <201711150941584900906@zte.com.cn>
-In-Reply-To: <151070890548.31225.9825410878164929754@sif>
-References: 1509720860-10065-1-git-send-email-lu.zhipeng@zte.com.cn,
-	201711141909353579818@zte.com.cn,
-	151070890548.31225.9825410878164929754@sif
-Mime-Version: 1.0
-From: <lu.zhipeng@zte.com.cn>
-Content-Type: multipart/related;
-	boundary="=====_002_next====="
-Subject: [Qemu-devel] =?utf-8?b?562U5aSNOiBSZTog562U5aSNOiBSZTog562U5aSN?=
- =?utf-8?q?=3A_Re=3A_=5BPATCH_v2=5D_qga=3A_replace_GetIfEntry?=
+	(envelope-from <jsnow@redhat.com>) id 1eEmyh-0002Xj-Im
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 20:59:03 -0500
+References: <20171030163309.75770-1-vsementsov@virtuozzo.com>
+	<20171030163309.75770-11-vsementsov@virtuozzo.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <97084802-ba48-4bc0-f106-dbeb906fd6e4@redhat.com>
+Date: Tue, 14 Nov 2017 20:58:40 -0500
+MIME-Version: 1.0
+In-Reply-To: <20171030163309.75770-11-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v8 10/14] migration: add postcopy migration
+ of dirty bitmaps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,412 +25,1108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mdroth@linux.vnet.ibm.com
-Cc: qemu-devel@nongnu.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, famz@redhat.com, lirans@il.ibm.com, quintela@redhat.com, armbru@redhat.com, mreitz@redhat.com, stefanha@redhat.com, den@openvz.org, amit.shah@redhat.com, pbonzini@redhat.com, dgilbert@redhat.com
 
 
 
---=====_002_next=====
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: base64 
+On 10/30/2017 12:33 PM, Vladimir Sementsov-Ogievskiy wrote:
+> Postcopy migration of dirty bitmaps. Only named dirty bitmaps,
+> associated with root nodes and non-root named nodes are migrated.
+> 
+> If destination qemu is already containing a dirty bitmap with the same name
+> as a migrated bitmap (for the same node), then, if their granularities are
+> the same the migration will be done, otherwise the error will be generated.
+> 
+> If destination qemu doesn't contain such bitmap it will be created.
+> 
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  include/migration/misc.h       |   3 +
+>  migration/migration.h          |   3 +
+>  migration/block-dirty-bitmap.c | 734 +++++++++++++++++++++++++++++++++++++++++
 
-aSB1c2VkICB4cCAgdmVyc2lvbjoNCg0KDQp4cCBwcm9mZXNzaW9uYWwgMjAwMiBzZXJ2aWNlIHBh
-Y2sgMw0KDQoNCmJ1aWxkIGVudmlyb25tZW50OiANCg0KDQoNCg0Kcm9vdEBsb2NhbGhvc3QgcWVt
-dS0yLjUuMF0jIGNhdCAvZXRjL3JlZGhhdC1yZWxlYXNlIA0KDQpDZW50T1MgTGludXggcmVsZWFz
-ZSA3LjAuMTQwNiAoQ29yZSkgDQoNCg0KDQoNCg0KDQoNCg0KDQoNCg0KDQoNCg0KDQoNCg0KDQoN
-Cg0KDQoNCg0KDQrkuLrkuoborqnmgqjnmoRWUGxhdOiZmuaLn+acuuaVhemanOWSjGRvY2tlcuaV
-hemanOW+l+WIsOmrmOaViOeahOWkhOeQhu+8jOivt+S4iuaKpeaVhemanOWIsDogJFZQbGF05oqA
-5pyv5pSv5oyB44CCDQoNCg0K6Iqm5b+X5pyLIGx1emhpcGVuZw0KDQoNCg0KDQoNCg0KSVTlvIDl
-j5Hlt6XnqIvluIggSVQgRGV2ZWxvcG1lbnQKRW5naW5lZXINCuaTjeS9nOezu+e7n+S6p+WTgemD
-qC/kuK3lv4PnoJTnqbbpmaIv57O757uf5Lqn5ZOBIE9TIFByb2R1Y3QgRGVwdC4vQ2VudHJhbCBS
-77yGRCBJbnN0aXR1dGUvU3lzdGVtIFByb2R1Y3QNCg0KDQoNCg0KDQoNCg0KDQoNCuWbm+W3neec
-geaIkOmDveW4guWkqeW6nOWkp+mBk+S4reautTgwMOWPtw0KRTogbHUuemhpcGVuZ0B6dGUuY29t
-LmNuIA0Kd3d3Lnp0ZS5jb20uY24NCg0KDQoNCg0KDQoNCg0KDQoNCg0K5Y6f5aeL6YKu5Lu2DQoN
-Cg0KDQrlj5Hku7bkurrvvJogPG1kcm90aEBsaW51eC52bmV0LmlibS5jb20+Ow0K5pS25Lu25Lq6
-77ya6Iqm5b+X5pyLMTAxMDgyNzI7DQrmioTpgIHkurrvvJogPHFlbXUtZGV2ZWxAbm9uZ251Lm9y
-Zz47DQrml6Ug5pyfIO+8mjIwMTflubQxMeaciDE15pelIDA5OjIyDQrkuLsg6aKYIO+8mlJlOiDn
-rZTlpI06IFJlOiDnrZTlpI06IFJlOiBbUEFUQ0ggdjJdIHFnYTogcmVwbGFjZSBHZXRJZkVudHJ5
-DQoNCg0KUXVvdGluZyBsdS56aGlwZW5nQHp0ZS5jb20uY24gKDIwMTctMTEtMTQgMDU6MDk6MzUp
-DQo+ICBpIHRlc3QgdGhlIGxhdGVzdCBxZ2EgaW4geHAgLCBpdCBydW4gb2sgLg0KPiANCj4gDQo+
-IG15IHFnYSBjb25maWcgOg0KPiANCj4gQ29uZmlndXJlZCB3aXRoOiAnLi9jb25maWd1cmUnICct
-LWVuYWJsZS1ndWVzdC1hZ2VudCcgJy0tY3Jvc3MtcHJlZml4PQ0KPiB4ODZfNjQtdzY0LW1pbmd3
-MzItJyAnLS13aXRoLXZzcy1zZGs9L2hvbWUvVlNTU0RLNzInICctLWRpc2FibGUtZmR0JyAgICAg
-ICAgDQo+ICctLXRhcmdldC1saXN0PXg4Nl82NC1zb2Z0bW11Jw0KDQpIbW0sIHNvIHlvdSdyZSB0
-ZXN0aW5nIHdpdGggV2luZG93cyBYUCB4NjQ/IEkgd2FzIHVzaW5nIFhQIDMyLWJpdCAoU1AzKSwN
-CmJ1dCBJIHJldHJpZWQgd2l0aCBYUCB4NjQgKFNQMikgYW5kIEkgc3RpbGwgaGF2ZSB0aGUgc2Ft
-ZSBpc3N1ZS4NCg0KSSBjYW4gb25seSBnZXQgcWVtdS1nYSB3b3JraW5nIGlmIEkgYnVpbGQgb24g
-dG9wIG9mIHNvbWV0aGluZyBwcmlvciB0bw0KY29tbWl0IDEyZjhkZWYwZS4NCg0KV2hhdCBidWls
-ZCBlbnZpcm9ubWVudCBhcmUgeW91IHVzaW5nPyBJJ3ZlIHRyaWVkIEZlZG9yYSBDb3JlIDE4IGFu
-ZCAyMA0KYW5kIGhhdmUgdGhlIHNhbWUgaXNzdWUgd2l0aCBib3RoLg0KDQo+IA0KPiB1c2VkIHFn
-YSB2ZXJzaW9uIGluZm8NCj4gDQo+IFtyb290QGNlc2hpIHFlbXVdIyBnaXQgbG9nDQo+IA0KPiBj
-b21taXQgNTMzYWI4M2VhMDc0ZDVmYzQ1Nzc2OWY2YWM2OTg1MjRhMTJmMTE1Ng0KPiANCj4gQXV0
-aG9yOiBaaGlQZW5nIEx1IDxsdS56aGlwZW5nQHp0ZS5jb20uY24+DQo+IA0KPiBEYXRlOiAgIEZy
-aSBOb3YgMTAgMTA6MTc6MTQgMjAxNyArMDgwMA0KPiANCj4gDQo+ICAgICBxZ2E6IGZpeCBzb21l
-IGVycm9ycyBmb3IgZ3Vlc3RfZ2V0X25ldHdvcmtfc3RhdHMNCj4gDQo+ICAgICANCj4gDQo+ICAg
-ICBmaXggc29tZSBlcnJvczoNCj4gDQo+ICAgICAxLmlmIGJ1aWxkaW5nIHFnYSBvbiBXaW5kb3dz
-IFZpc3RhLzIwMDggYW5kIG5ld2VyLA0KPiANCj4gICAgIGl0IGNhbm4ndCBmaW5kIHRoZSBsaW5r
-IHRvIEdldElmRW50cnkyIGluIHdpbmRvd3MgeHAuDQo+IA0KPiAgICAgMi4gY2hlY2sgdmFsaWQg
-b2YgaWZfaW5kZXguDQo+IA0KPiAgICAgDQo+IA0KPiAgICAgU2lnbmVkLW9mZi1ieTogWmhpUGVu
-ZyBMdSA8bHUuemhpcGVuZ0B6dGUuY29tLmNuPg0KPiANCj4gDQo+IGNvbW1pdCBkZTU5N2E4YjI3
-NzIyY2U0ZjljYzY2MGY5MzBmN2RjY2M3MTI3MTJkDQo+IA0KPiBBdXRob3I6IFpoaVBlbmcgTHUg
-PGx1LnpoaXBlbmdAenRlLmNvbS5jbj4NCj4gDQo+IERhdGU6ICAgRnJpIE5vdiAzIDIyOjU0OjIw
-IDIwMTcgKzA4MDANCj4gDQo+IA0KPiAgICAgcWdhOiByZXBsYWNlIEdldElmRW50cnkNCj4gDQo+
-ICAgICANCj4gDQo+ICAgICBUaGUgZGF0YSBvYnRhaW5lZCBieSBHZXRJZkVudHJ5IGlzIDMyIGJp
-dHMsIGFuZCBpdCBtYXkgb3ZlcmZsb3cuIFRodXMgdXNpbmcNCj4gR2V0SWZFbnRyeTIgaW5zdGVh
-ZCBvZiBHZXRJZkVudHJ5Lg0KPiANCj4gICAgIA0KPiANCj4gICAgIFNpZ25lZC1vZmYtYnk6IFpo
-aVBlbmcgTHUgPGx1LnpoaXBlbmdAenRlLmNvbS5jbj4NCj4gDQo+ICAgICAqYXZvaWQgQ2FtZWxD
-YXNlIHZhcmlhYmxlIG5hbWVzDQo+IA0KPiAgICAgKnVwZGF0ZSBmaWVsZCBuYW1lcyBmb3IgTUlC
-X0lGUk9XIC0+IE1JQl9JRl9ST1cyDQo+IA0KPiAgICAgU2lnbmVkLW9mZi1ieTogTWljaGFlbCBS
-b3RoIDxtZHJvdGhAbGludXgudm5ldC5pYm0uY29tPg0KPiANCj4gDQo+IGNvbW1pdCA1Y2E3YTNj
-YmE0Njg3MzZjZmU1NTU4ODdhZjFmNmJhNzU0ZjZlYWM5DQo+IA0KPiBNZXJnZTogYTRmMDUzNyAx
-MGE3YjdlDQo+IA0KPiBBdXRob3I6IFBldGVyIE1heWRlbGwgPHBldGVyLm1heWRlbGxAbGluYXJv
-Lm9yZz4NCj4gDQo+IERhdGU6ICAgVHVlIE5vdiA3IDE0OjQzOjM1IDIwMTcgKzAwMDANCj4gDQo+
-IA0KPiAgICAgTWVyZ2UgcmVtb3RlLXRyYWNraW5nIGJyYW5jaCAncmVtb3Rlcy9iZXJyYW5nZS90
-YWdzL3B1bGwtMjAxNy0xMS0wNi0yJyBpbnRvDQo+IHN0YWdpbmcNCj4gDQo+ICAgICANCj4gDQo+
-ICAgICBQdWxsIElPIDIwMTcvMTEvMDYgdjINCj4gDQo+IA0KPiANCj4gDQo+IOS4uuS6huiuqeaC
-qOeahFZQbGF06Jma5ouf5py65pWF6Zqc5ZKMZG9ja2Vy5pWF6Zqc5b6X5Yiw6auY5pWI55qE5aSE
-55CG77yM6K+35LiK5oql5pWF6Zqc5YiwOiAkVlBsYXTmioDmnK/mlK8NCj4g5oyB44CCDQo+IA0K
-PiDoiqblv5fmnIsgbHV6aGlwZW5nDQo+IA0KPiANCj4gSVTlvIDlj5Hlt6XnqIvluIggSVQgRGV2
-ZWxvcG1lbnQgRW5naW5lZXINCj4g5pON5L2c57O757uf5Lqn5ZOB6YOoL+S4reW/g+eglOeptumZ
-oi/ns7vnu5/kuqflk4EgT1MgUHJvZHVjdCBEZXB0Li9DZW50cmFsIFLvvIZEIEluc3RpdHV0ZS8N
-Cj4gU3lzdGVtIFByb2R1Y3QNCj4gDQo+IA0KPiBbY2lkXSAgICAgICAgICBbY2lkXQ0KPiAgICAg
-ICAgICAgICAgICDlm5vlt53nnIHmiJDpg73luILlpKnlupzlpKfpgZPkuK3mrrU4MDDlj7cNCj4g
-ICAgICAgICAgICAgICAgRTogbHUuemhpcGVuZ0B6dGUuY29tLmNuDQo+ICAgICAgICAgICAgICAg
-IHd3dy56dGUuY29tLmNuDQo+IA0KPiDljp/lp4vpgq7ku7YNCj4g5Y+R5Lu25Lq677yaIDxtZHJv
-dGhAbGludXgudm5ldC5pYm0uY29tPjsNCj4g5pS25Lu25Lq677ya6Iqm5b+X5pyLMTAxMDgyNzI7
-DQo+IOaKhOmAgeS6uu+8miA8cWVtdS1kZXZlbEBub25nbnUub3JnPjsNCj4g5pel5pyf77yaMjAx
-N+W5tDEx5pyIMTTml6UgMDc6NTcNCj4g5Li76aKY77yaUmU6IOetlOWkjTogUmU6IFtQQVRDSCB2
-Ml0gcWdhOiByZXBsYWNlIEdldElmRW50cnkNCj4gUXVvdGluZyBsdS56aGlwZW5nQHp0ZS5jb20u
-Y24gKDIwMTctMTEtMDkgMDU6MjY6MTUpDQo+ID4gIGkgdGhpbmsgdGhlIGNvZGUgaXMgYmV0dGVy
-DQo+ID4gDQo+ID4gIGlmIChPU3Zlci5kd01ham9yVmVyc2lvbiA+PSA2KSB7DQo+ID4gICAgICAg
-TUlCX0lGX1JPVzIgYU1pYl9pZnJvdzsNCj4gPiAgICAgICB0eXBlZGVmIE5FVElPQVBJX0FQSSAo
-V0lOQVBJICpnZXRpZmVudHJ5Ml90KShQTUlCX0lGX1JPVzIgUm93KTsNCj4gPiAgICAgICBtZW1z
-ZXQoJmFNaWJfaWZyb3csIDAsIHNpemVvZihhTWliX2lmcm93KSk7DQo+ID4gICAgICAgYU1pYl9p
-ZnJvdy5JbnRlcmZhY2VJbmRleCA9IG5pY0lkOw0KPiA+ICAgICAgIEhNT0RVTEUgbW9kdWxlID0g
-R2V0TW9kdWxlSGFuZGxlKCJpcGhscGFwaSIpOw0KPiA+ICAgICAgIFBWT0lEIGZ1biA9IEdldFBy
-b2NBZGRyZXNzKG1vZHVsZSwgIkdldElmRW50cnkyIik7DQo+ID4gICAgICAgaWYgKGZ1biA9PSBO
-VUxMKSB7DQo+ID4gICAgICAgICAgIGVycm9yX3NldGcoZXJycCwgUUVSUl9RR0FfQ09NTUFORF9G
-QUlMRUQsDQo+ID4gICAgICAgICAgICAgICAgICAgICAgIkZhaWxlZCB0byBnZXQgYWRkcmVzcyBv
-ZiBHZXRJZkVudHJ5MiIpOw0KPiA+ICAgICAgICAgICByZXR1cm4gTlVMTDsNCj4gPiAgICAgICB9
-DQo+ID4gICAgIGdldGlmZW50cnkyX3QgZ2V0aWZlbnRyeTJfZXggPSAoZ2V0aWZlbnRyeTJfdClm
-dW47DQo+ID4gICAgIGlmIChOT19FUlJPUiA9PSBnZXRpZmVudHJ5Ml9leCgmYU1pYl9pZnJvdykp
-ew0KPiA+ICAgICB9DQo+IA0KPiBJJ3ZlIHVwZGF0ZWQgdGhlIHBhdGNoIHdpdGggdGhpcyBjaGFu
-Z2U6DQo+ICAgaHR0cHM6Ly9naXRodWIuY29tL21kcm90aC9xZW11L2NvbW1pdHMvcWdhLWlmLXN0
-YXRzDQo+IA0KPiBCdXQgSSdtIGEgYml0IGNvbmZ1c2VkIG5vdzogd2hlbiBJIHRyaWVkIHRvIHRl
-c3QgdGhpcyBvbiBYUCBJIHJlYWxpemVkIHRoYXQNCj4gdGhhdCBxZW11LWdhIG5vIGxvbmdlciB3
-b3JrcyBvbiBYUCwgYW5kIGdlbmVyYXRlcyB0aGUgZm9sbG93aW5nIGVycm9yDQo+IHdoZW4gSSB0
-cnkgdG8gc3RhcnQgaXQgKGV2ZW4gd2l0aG91dCB5b3VyIHN0YXRzIHBhdGNoKToNCj4gDQo+ICAg
-IlRoZSBwcm9jZWR1cmUgZW50cnkgcG9pbnQgQWNxdWlyZVNSV0xvY2tFeGNsdXNpdmUgY291bGQg
-bm90IGJlIGxvY2F0ZWQNCj4gICAgaW4gdGhlIGR5bmFtaWMgbGluayBsaWJyYXJ5IEtFUk5FTDMy
-LmRsbCINCj4gDQo+IEkgdGhpbmsgdGhpcyBtYXkgYmUgZHVlIHRvIHRoZSBmb2xsb3dpbmcgY29t
-bWl0LCB3aGljaCBub3RlcyB0aGF0IFZpc3RhKw0KPiBhcmUgbm93IHJlcXVpcmVkIGFzIGEgcmVz
-dWx0Og0KPiANCj4gY29tbWl0IDEyZjhkZWYwZTAyMjMyZDdjNjQxNmFkOWI2NjY0MGY5NzNjNTMx
-ZDENCj4gQXV0aG9yOiBBbmRyZXkgU2hlZGVsIDxhc2hlZGVsQG1pY3Jvc29mdC5jb20+DQo+IERh
-dGU6ICAgRnJpIE1hciAyNCAxNTowMTo0MSAyMDE3IC0wNzAwDQo+IA0KPiAgICAgd2luMzI6IHJl
-cGxhY2UgY3VzdG9tIG11dGV4IGFuZCBjb25kaXRpb24gdmFyaWFibGUgd2l0aCBuYXRpdmUNCj4g
-ICAgIHByaW1pdGl2ZXMNCj4gDQo+IFNvLCBhcmUgeW91IGFjdHVhbGx5IGFibGUgdG8gcnVuIG9u
-IFhQIGN1cnJlbnRseT8gSWYgc28sIGhvdz8gQW5kIGlmDQo+IG5vdCwgSSB0aGluayB3ZSBoYXZl
-IG90aGVyIGlzc3VlcyB0aGF0IG5lZWQgdG8gYmUgYWRkcmVzc2VkIGlmIHdlDQo+IHdhbnQgdG8g
-c3VwcG9ydCBYUCBzdGlsbDsgSSdtIG5vdCBldmVuIHN1cmUgdGhhdCdzIHJlYWxpc3RpYyBhdCB0
-aGlzDQo+IHBvaW50Lg0KPiANCj4gVW5sZXNzIHRoZXJlJ3MgYWN0dWFsbHkgYSB3YXkgdG8gdGVz
-dCBRR0Egb24gWFAgcmlnaHQgbm93IEkgdGhpbmsgSQ0KPiB3ZSBzaG91bGQganVzdCBnZXQgaW4g
-dGhlIHVwZGF0ZWQgcGF0Y2ggbWludXMgdGhlIGR5bmFtaWMgRExMIHN0dWZmLA0KPiBpLmUuOg0K
-PiAgIGh0dHBzOi8vZ2l0aHViLmNvbS9tZHJvdGgvcWVtdS9jb21taXQvDQo+IGRlNTk3YThiMjc3
-MjJjZTRmOWNjNjYwZjkzMGY3ZGNjYzcxMjcxMmQNCj4gDQo+IE1ha2Ugc2Vuc2U/DQo+IA0KPiA+
-IA0KPiA+IA0KPiA+IA0KPiA+IA0KPiA+IA0KPiA+IOS4uuS6huiuqeaCqOeahFZQbGF06Jma5ouf
-5py65pWF6Zqc5ZKMZG9ja2Vy5pWF6Zqc5b6X5Yiw6auY5pWI55qE5aSE55CG77yM6K+35LiK5oql
-5pWF6Zqc5YiwOiAkVlBsYXTmioDmnK8NCj4g5pSvDQo+ID4g5oyB44CCDQo+ID4gDQo+ID4g6Iqm
-5b+X5pyLIGx1emhpcGVuZw0KPiA+IA0KPiA+IA0KPiA+IElU5byA5Y+R5bel56iL5biIIElUIERl
-dmVsb3BtZW50IEVuZ2luZWVyDQo+ID4g5pON5L2c57O757uf5Lqn5ZOB6YOoL+S4reW/g+eglOep
-tumZoi/ns7vnu5/kuqflk4EgT1MgUHJvZHVjdCBEZXB0Li9DZW50cmFsIFLvvIZEIEluc3RpdHV0
-ZS8NCj4gPiBTeXN0ZW0gUHJvZHVjdA0KPiA+IA0KPiA+IA0KPiA+IFtjaWRdICAgICAgICAgIFtj
-aWRdDQo+ID4gICAgICAgICAgICAgICAg5Zub5bed55yB5oiQ6YO95biC5aSp5bqc5aSn6YGT5Lit
-5q61ODAw5Y+3DQo+ID4gICAgICAgICAgICAgICAgRTogbHUuemhpcGVuZ0B6dGUuY29tLmNuDQo+
-ID4gICAgICAgICAgICAgICAgd3d3Lnp0ZS5jb20uY24NCj4gPiANCj4gPiDljp/lp4vpgq7ku7YN
-Cj4gPiDlj5Hku7bkurrvvJroiqblv5fmnIsxMDEwODI3Mg0KPiA+IOaUtuS7tuS6uu+8miA8bWRy
-b3RoQGxpbnV4LnZuZXQuaWJtLmNvbT47DQo+ID4g5oqE6YCB5Lq677yaIDxxZW11LWRldmVsQG5v
-bmdudS5vcmc+Ow0KPiA+IOaXpeacn++8mjIwMTflubQxMeaciDA45pelIDEwOjU0DQo+ID4g5Li7
-6aKY77ya562U5aSNOiBSZTogW1BBVENIIHYyXSBxZ2E6IHJlcGxhY2UgR2V0SWZFbnRyeQ0KPiA+
-IA0KPiA+IA0KPiA+ID5JIGhhdmUgdGhlIG1vZGlmaWVkIHBhdGNoIHN0YWdlZCBoZXJlOg0KPiA+
-IA0KPiA+ID4gIGh0dHBzOi8vZ2l0aHViLmNvbS9tZHJvdGgvcWVtdS9jb21taXQvDQo+ID4gZGU1
-OTdhOGIyNzcyMmNlNGY5Y2M2NjBmOTMwZjdkY2NjNzEyNzEyZA0KPiA+ID5MZXQgbWUga25vdyBp
-ZiBpdCBsb29rcyBva2F5IGFuZCBJJ2xsIHNlbmQgYSBwdWxsIHJlcXVlc3QgZm9yIHJjMQ0KPiA+
-IA0KPiA+ICANCj4gPiANCj4gPg0KPiAgdGhlIGNvZGUgcmlnaHQsIGJ1dCBydW5uaW5nIFFHQSBv
-biB0aGUgV2luZG93cyBYUCwgZXJyb3I6IGNhbiBub3QgZmluZCB0aGUgbGluaw0KPiA+IHRvICBH
-ZXRJZkVudHJ5MiBpbiBpcGhscGFwaS5ETEwuDQo+ID4gDQo+ID4gDQo+ID4gDQo+ID4gDQo+ID4g
-5Li65LqG6K6p5oKo55qEVlBsYXTomZrmi5/mnLrmlYXpmpzlkoxkb2NrZXLmlYXpmpzlvpfliLDp
-q5jmlYjnmoTlpITnkIbvvIzor7fkuIrmiqXmlYXpmpzliLA6ICRWUGxhdOaKgOacrw0KPiDmlK8N
-Cj4gPiDmjIHjgIINCj4gPiANCj4gPiDoiqblv5fmnIsgbHV6aGlwZW5nDQo+ID4gDQo+ID4gDQo+
-ID4gSVTlvIDlj5Hlt6XnqIvluIggSVQgRGV2ZWxvcG1lbnQgRW5naW5lZXINCj4gPiDmk43kvZzn
-s7vnu5/kuqflk4Hpg6gv5Lit5b+D56CU56m26ZmiL+ezu+e7n+S6p+WTgSBPUyBQcm9kdWN0IERl
-cHQuL0NlbnRyYWwgUu+8hkQgSW5zdGl0dXRlLw0KPiA+IFN5c3RlbSBQcm9kdWN0DQo+ID4gDQo+
-ID4gDQo+ID4gW2NpZF0gICAgICAgICAgW2NpZF0NCj4gPiAgICAgICAgICAgICAgICDlm5vlt53n
-nIHmiJDpg73luILlpKnlupzlpKfpgZPkuK3mrrU4MDDlj7cNCj4gPiAgICAgICAgICAgICAgICBF
-OiBsdS56aGlwZW5nQHp0ZS5jb20uY24NCj4gPiAgICAgICAgICAgICAgICB3d3cuenRlLmNvbS5j
-bg0KPiA+IA0KPiA+IA0KPiA+IOWPkeS7tuS6uu+8miA8bWRyb3RoQGxpbnV4LnZuZXQuaWJtLmNv
-bT47DQo+ID4g5pS25Lu25Lq677ya6Iqm5b+X5pyLMTAxMDgyNzI7DQo+ID4g5oqE6YCB5Lq677ya
-IDxxZW11LWRldmVsQG5vbmdudS5vcmc+O+iKpuW/l+acizEwMTA4MjcyOw0KPiA+IOaXpeacn++8
-mjIwMTflubQxMeaciDA45pelIDAxOjA3DQo+ID4g5Li76aKY77yaUmU6IFtQQVRDSCB2Ml0gcWdh
-OiByZXBsYWNlIEdldElmRW50cnkNCj4gPiANCj4gPiANCj4gPiBRdW90aW5nIFpoaVBlbmcgTHUg
-KDIwMTctMTEtMDMgMDk6NTQ6MjApDQo+ID4gPg0KPiA+DQo+ICAgVGhlIGRhdGEgb2J0YWluZWQg
-YnkgR2V0SWZFbnRyeSBpcyAzMiBiaXRzLCBhbmQgaXQgbWF5IG92ZXJmbG93LiBUaHVzIHVzaW5n
-IEdldElmRW50cnkyIGluc3RlYWQgb2YgR2V0SWZFbnRyeS4NCj4gPiA+IA0KPiA+ID4gU2lnbmVk
-LW9mZi1ieTogWmhpUGVuZyBMdSA8bHUuemhpcGVuZ0B6dGUuY29tLmNuPg0KPiA+ID4gLS0tDQo+
-ID4gPiAgcWdhL2NvbW1hbmRzLXdpbjMyLmMgfCAzMSArKysrKysrKysrKysrKysrKystLS0tLS0t
-LS0tLS0tDQo+ID4gPiAgMSBmaWxlIGNoYW5nZWQsIDE4IGluc2VydGlvbnMoKyksIDEzIGRlbGV0
-aW9ucygtKQ0KPiA+ID4gDQo+ID4gPiBkaWZmIC0tZ2l0IGEvcWdhL2NvbW1hbmRzLXdpbjMyLmMg
-Yi9xZ2EvY29tbWFuZHMtd2luMzIuYw0KPiA+ID4gaW5kZXggMDMyMjE4OC4uZDA5NmRjMiAxMDA2
-NDQNCj4gPiA+IC0tLSBhL3FnYS9jb21tYW5kcy13aW4zMi5jDQo+ID4gPiArKysgYi9xZ2EvY29t
-bWFuZHMtd2luMzIuYw0KPiA+ID4gQEAgLTExNzMsMjAgKzExNzMsMjUgQEAgc3RhdGljIGludCBn
-dWVzdF9nZXRfbmV0d29ya19zdGF0cw0KPiAoY29uc3QgY2hhciAqbmFtZSwNCj4gPiA+ICAgICAg
-ICAgICAgICAgICAgICAgICAgIEd1ZXN0TmV0d29ya0ludGVyZmFjZVN0YXQgKnN0YXRzKQ0KPiA+
-ID4gIHsNCj4gPiA+ICAgICAgRFdPUkQgaWZfaW5kZXggPSAwOw0KPiA+ID4gLSAgICBNSUJfSUZS
-T1cgYV9taWRfaWZyb3c7DQo+ID4gPiAtICAgIG1lbXNldCgmYV9taWRfaWZyb3csIDAsIHNpemVv
-ZihhX21pZF9pZnJvdykpOw0KPiA+ID4gKyAgICBPU1ZFUlNJT05JTkZPIE9TdmVyOw0KPiA+ID4g
-ICAgICBpZl9pbmRleCA9IGdldF9pbnRlcmZhY2VfaW5kZXgobmFtZSk7DQo+ID4gPiAtICAgIGFf
-bWlkX2lmcm93LmR3SW5kZXggPSBpZl9pbmRleDsNCj4gPiA+IC0gICAgaWYgKE5PX0VSUk9SID09
-IEdldElmRW50cnkoJmFfbWlkX2lmcm93KSkgew0KPiA+ID4gLSAgICAgICAgc3RhdHMtPnJ4X2J5
-dGVzID0gYV9taWRfaWZyb3cuZHdJbk9jdGV0czsNCj4gPiA+IC0gICAgICAgIHN0YXRzLT5yeF9w
-YWNrZXRzID0gYV9taWRfaWZyb3cuZHdJblVjYXN0UGt0czsNCj4gPiA+IC0gICAgICAgIHN0YXRz
-LT5yeF9lcnJzID0gYV9taWRfaWZyb3cuZHdJbkVycm9yczsNCj4gPiA+IC0gICAgICAgIHN0YXRz
-LT5yeF9kcm9wcGVkID0gYV9taWRfaWZyb3cuZHdJbkRpc2NhcmRzOw0KPiA+ID4gLSAgICAgICAg
-c3RhdHMtPnR4X2J5dGVzID0gYV9taWRfaWZyb3cuZHdPdXRPY3RldHM7DQo+ID4gPiAtICAgICAg
-ICBzdGF0cy0+dHhfcGFja2V0cyA9IGFfbWlkX2lmcm93LmR3T3V0VWNhc3RQa3RzOw0KPiA+ID4g
-LSAgICAgICAgc3RhdHMtPnR4X2VycnMgPSBhX21pZF9pZnJvdy5kd091dEVycm9yczsNCj4gPiA+
-IC0gICAgICAgIHN0YXRzLT50eF9kcm9wcGVkID0gYV9taWRfaWZyb3cuZHdPdXREaXNjYXJkczsN
-Cj4gPiA+IC0gICAgICAgIHJldHVybiAwOw0KPiA+ID4gKyAgICBPU3Zlci5kd09TVmVyc2lvbklu
-Zm9TaXplID0gc2l6ZW9mKE9TVkVSU0lPTklORk8pOw0KPiA+ID4gKyAgICBHZXRWZXJzaW9uRXgo
-Jk9TdmVyKTsNCj4gPiA+ICsgICAgaWYgKE9TdmVyLmR3TWFqb3JWZXJzaW9uID49IDYpIHsNCj4g
-PiA+ICsgICAgICAgIE1JQl9JRl9ST1cyIGFfbWlkX2lmcm93Ow0KPiA+ID4gKyAgICAgICAgbWVt
-c2V0KCZhX21pZF9pZnJvdywgMCwgc2l6ZW9mKGFfbWlkX2lmcm93KSk7DQo+ID4gPiArICAgICAg
-ICBhX21pZF9pZnJvdy5kd0luZGV4ID0gaWZfaW5kZXg7DQo+ID4gPiArICAgICAgICBpZiAoTk9f
-RVJST1IgPT0gR2V0SWZFbnRyeTIoJmFfbWlkX2lmcm93KSkgew0KPiA+ID4gKyAgICAgICAgICAg
-IHN0YXRzLT5yeF9ieXRlcyA9IGFfbWlkX2lmcm93LmR3SW5PY3RldHM7DQo+ID4gPiArICAgICAg
-ICAgICAgc3RhdHMtPnJ4X3BhY2tldHMgPSBhX21pZF9pZnJvdy5kd0luVWNhc3RQa3RzOw0KPiA+
-ID4gKyAgICAgICAgICAgIHN0YXRzLT5yeF9lcnJzID0gYV9taWRfaWZyb3cuZHdJbkVycm9yczsN
-Cj4gPiA+ICsgICAgICAgICAgICBzdGF0cy0+cnhfZHJvcHBlZCA9IGFfbWlkX2lmcm93LmR3SW5E
-aXNjYXJkczsNCj4gPiA+ICsgICAgICAgICAgICBzdGF0cy0+dHhfYnl0ZXMgPSBhX21pZF9pZnJv
-dy5kd091dE9jdGV0czsNCj4gPiA+ICsgICAgICAgICAgICBzdGF0cy0+dHhfcGFja2V0cyA9IGFf
-bWlkX2lmcm93LmR3T3V0VWNhc3RQa3RzOw0KPiA+ID4gKyAgICAgICAgICAgIHN0YXRzLT50eF9l
-cnJzID0gYV9taWRfaWZyb3cuZHdPdXRFcnJvcnM7DQo+ID4gPiArICAgICAgICAgICAgc3RhdHMt
-PnR4X2Ryb3BwZWQgPSBhX21pZF9pZnJvdy5kd091dERpc2NhcmRzOw0KPiA+ID4gKyAgICAgICAg
-ICAgIHJldHVybiAwOw0KPiA+IA0KPiA+IFRoaXMgZmFpbHMgdG8gYnVpbGQgaW4gbXkgZmMyMCBt
-aW5ndzY0IGVudmlyb25tZW50Og0KPiA+IA0KPiA+IC9ob21lL21kcm90aC93L3FlbXU0LmdpdC9x
-Z2EvDQo+ID4gY29tbWFuZHMtd2luMzIuYzoxMTg0OjIwOiBlcnJvcjogJ01JQl9JRl9ST1cyJyBo
-YXMgbm8gbWVtYmVyIG5hbWVkICdkd0luZGV4Jw0KPiA+ICAgICAgICAgIGFfbWlkX2lmcm93LmR3
-SW5kZXggPSBpZl9pbmRleDsNCj4gPiAgICAgICAgICAgICAgICAgICAgIF4NCj4gPiAvaG9tZS9t
-ZHJvdGgvdy9xZW11NC5naXQvcWdhLw0KPiA+DQo+ICBjb21tYW5kcy13aW4zMi5jOjExODY6NDI6
-IGVycm9yOiAnTUlCX0lGX1JPVzInIGhhcyBubyBtZW1iZXIgbmFtZWQgJ2R3SW5PY3RldHMnDQo+
-ID4gICAgICAgICAgICAgIHN0YXRzLT5yeF9ieXRlcyA9IGFfbWlkX2lmcm93LmR3SW5PY3RldHM7
-DQo+ID4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXg0KPiA+IC9o
-b21lL21kcm90aC93L3FlbXU0LmdpdC9xZ2EvDQo+ID4NCj4gIGNvbW1hbmRzLXdpbjMyLmM6MTE4
-Nzo0NDogZXJyb3I6ICdNSUJfSUZfUk9XMicgaGFzIG5vIG1lbWJlciBuYW1lZCAnZHdJblVjYXN0
-UGt0cycNCj4gPiAgICAgICAgICAgICAgc3RhdHMtPnJ4X3BhY2tldHMgPSBhX21pZF9pZnJvdy5k
-d0luVWNhc3RQa3RzOw0KPiA+IA0KPiA+IGV0YyAuLi4NCj4gPiANCj4gPiBUaGUgcGF0Y2ggc2Vl
-bXMgdG8gYXNzdW1lIE1JQl9JRlJPVyBhbmQgTUlCX0lGX1JPVzIgaGF2ZSB0aGUgc2FtZSBmaWVs
-ZCBuYW1lcw0KPiA+IGZvciB0aGUgc3RhdHMsIGJ1dCBhY2NvcmRpbmcgdG8gdGhpcyB0aGV5J3Jl
-IHNsaWdodGx5IGRpZmZlcmVudDoNCj4gPiANCj4gPiAgIGh0dHBzOi8vbXNkbi5taWNyb3NvZnQu
-Y29tL2VuLXVzL2xpYnJhcnkvd2luZG93cy9kZXNrdG9wL2FhODE0NDkxKHY9DQo+ID4gdnMuODUp
-LmFzcHgNCj4gPiANCj4gPiBUaGlzIGNoYW5nZSBvbiB0b3Agb2YgeW91ciBwYXRjaCBzZWVtcyB0
-byB3b3JrOg0KPiA+IA0KPiA+IGRpZmYgLS1naXQgYS9xZ2EvY29tbWFuZHMtd2luMzIuYyBiL3Fn
-YS9jb21tYW5kcy13aW4zMi5jDQo+ID4gaW5kZXggZTE3ZmMzYzI4NC4uNThlNDcwODc3ZiAxMDA2
-NDQNCj4gPiAtLS0gYS9xZ2EvY29tbWFuZHMtd2luMzIuYw0KPiA+ICsrKyBiL3FnYS9jb21tYW5k
-cy13aW4zMi5jDQo+ID4gQEAgLTExODEsMTYgKzExODEsMTYgQEAgc3RhdGljIGludCBndWVzdF9n
-ZXRfbmV0d29ya19zdGF0cyhjb25zdCBjaGFyICpuYW1lLA0KPiA+ICAgICAgaWYgKG9zX3Zlci5k
-d01ham9yVmVyc2lvbiA+PSA2KSB7DQo+ID4gICAgICAgICAgTUlCX0lGX1JPVzIgYV9taWRfaWZy
-b3c7DQo+ID4gICAgICAgICAgbWVtc2V0KCZhX21pZF9pZnJvdywgMCwgc2l6ZW9mKGFfbWlkX2lm
-cm93KSk7DQo+ID4gLSAgICAgICAgYV9taWRfaWZyb3cuZHdJbmRleCA9IGlmX2luZGV4Ow0KPiA+
-ICsgICAgICAgIGFfbWlkX2lmcm93LkludGVyZmFjZUluZGV4ID0gaWZfaW5kZXg7DQo+ID4gICAg
-ICAgICAgaWYgKE5PX0VSUk9SID09IEdldElmRW50cnkyKCZhX21pZF9pZnJvdykpIHsNCj4gPiAt
-ICAgICAgICAgICAgc3RhdHMtPnJ4X2J5dGVzID0gYV9taWRfaWZyb3cuZHdJbk9jdGV0czsNCj4g
-PiAtICAgICAgICAgICAgc3RhdHMtPnJ4X3BhY2tldHMgPSBhX21pZF9pZnJvdy5kd0luVWNhc3RQ
-a3RzOw0KPiA+IC0gICAgICAgICAgICBzdGF0cy0+cnhfZXJycyA9IGFfbWlkX2lmcm93LmR3SW5F
-cnJvcnM7DQo+ID4gLSAgICAgICAgICAgIHN0YXRzLT5yeF9kcm9wcGVkID0gYV9taWRfaWZyb3cu
-ZHdJbkRpc2NhcmRzOw0KPiA+IC0gICAgICAgICAgICBzdGF0cy0+dHhfYnl0ZXMgPSBhX21pZF9p
-ZnJvdy5kd091dE9jdGV0czsNCj4gPiAtICAgICAgICAgICAgc3RhdHMtPnR4X3BhY2tldHMgPSBh
-X21pZF9pZnJvdy5kd091dFVjYXN0UGt0czsNCj4gPiAtICAgICAgICAgICAgc3RhdHMtPnR4X2Vy
-cnMgPSBhX21pZF9pZnJvdy5kd091dEVycm9yczsNCj4gPiAtICAgICAgICAgICAgc3RhdHMtPnR4
-X2Ryb3BwZWQgPSBhX21pZF9pZnJvdy5kd091dERpc2NhcmRzOw0KPiA+ICsgICAgICAgICAgICBz
-dGF0cy0+cnhfYnl0ZXMgPSBhX21pZF9pZnJvdy5Jbk9jdGV0czsNCj4gPiArICAgICAgICAgICAg
-c3RhdHMtPnJ4X3BhY2tldHMgPSBhX21pZF9pZnJvdy5JblVjYXN0UGt0czsNCj4gPiArICAgICAg
-ICAgICAgc3RhdHMtPnJ4X2VycnMgPSBhX21pZF9pZnJvdy5JbkVycm9yczsNCj4gPiArICAgICAg
-ICAgICAgc3RhdHMtPnJ4X2Ryb3BwZWQgPSBhX21pZF9pZnJvdy5JbkRpc2NhcmRzOw0KPiA+ICsg
-ICAgICAgICAgICBzdGF0cy0+dHhfYnl0ZXMgPSBhX21pZF9pZnJvdy5PdXRPY3RldHM7DQo+ID4g
-KyAgICAgICAgICAgIHN0YXRzLT50eF9wYWNrZXRzID0gYV9taWRfaWZyb3cuT3V0VWNhc3RQa3Rz
-Ow0KPiA+ICsgICAgICAgICAgICBzdGF0cy0+dHhfZXJycyA9IGFfbWlkX2lmcm93Lk91dEVycm9y
-czsNCj4gPiArICAgICAgICAgICAgc3RhdHMtPnR4X2Ryb3BwZWQgPSBhX21pZF9pZnJvdy5PdXRE
-aXNjYXJkczsNCj4gPiAgICAgICAgICAgICAgcmV0dXJuIDA7DQo+ID4gICAgICAgICAgfQ0KPiA+
-ICAgICAgfQ0KPiA+IA0KPiA+IEkgaGF2ZSB0aGUgbW9kaWZpZWQgcGF0Y2ggc3RhZ2VkIGhlcmU6
-DQo+ID4gDQo+ID4gICBodHRwczovL2dpdGh1Yi5jb20vbWRyb3RoL3FlbXUvY29tbWl0Lw0KPiA+
-IGRlNTk3YThiMjc3MjJjZTRmOWNjNjYwZjkzMGY3ZGNjYzcxMjcxMmQNCj4gPiANCj4gPiBMZXQg
-bWUga25vdyBpZiBpdCBsb29rcyBva2F5IGFuZCBJJ2xsIHNlbmQgYSBwdWxsIHJlcXVlc3QgZm9y
-IHJjMQ0KPiA+IA0KPiA+ID4gKyAgICAgICAgfQ0KPiA+ID4gICAgICB9DQo+ID4gPiAgICAgIHJl
-dHVybiAtMTsNCj4gPiA+ICB9DQo+ID4gPiAtLSANCj4gPiA+IDEuOC4zLjENCj4gPiA+IA0KPiA+
-IA0KPiA+IA0KPiANCj4=
+Ouch :\
 
+>  migration/migration.c          |   3 +
+>  migration/savevm.c             |   2 +
+>  vl.c                           |   1 +
+>  migration/Makefile.objs        |   1 +
+>  migration/trace-events         |  14 +
+>  8 files changed, 761 insertions(+)
+>  create mode 100644 migration/block-dirty-bitmap.c
+> 
 
---=====_002_next=====
-Content-Type: image/jpeg;
-	 name="=?UTF-8?B?MjQyNDJlNTYzN2FmNDI4ODkxYzRkYjczMWU3NzY1YWQuanBn?="
-Content-Disposition: inline;
-	filename="=?UTF-8?B?MjQyNDJlNTYzN2FmNDI4ODkxYzRkYjczMWU3NzY1YWQuanBn?="
-Content-Transfer-Encoding: base64
-Content-ID: <24242e5637af428891c4db731e7765ad>
+Organizationally, you introduce three new 'public' prototypes:
 
-R0lGODlhcwAmAPcAAAAAAP///wCP1QCP1Pf7/vL5/QCP1gWR1gqT1gyU2AyU1w6V1xWY2BeZ2R6c
-2iGd2iyi3C6j3TOl3Tqo3kWt4Emv4Uyw4U2x4lOz4ly35F645GO65WW75me85m6/53XC6IHH64XJ
-64bK7IzM7I/N7JXQ7ZfR7pnS7pzT7p3U76PW8KPW76XX8K7b8bDc8rff87vh9Lzh9L7i9cnn9tLr
-+Nnu+eDx+uf0++n1++33/PD4/PT6/fj8/gKQ1AWR1QeS1QiT1QmT1g+W1xCW1xOX1xia2Bub2Ryb
-2R+d2SCd2SKe2iSf2iag2ymh2yqh2yui3DSm3Tio3Typ3j2q3j6q3kCr30Os30eu4Euw4U6x4U+y
-4k+y4VGz4lCy4Va141W04li241q341245F+55GW75Ga85Wm95mi95Gq+5Wu+5m2/5m/A53HB6HDA
-53HB5nLB53PC53XC53bD53nE6HvF6X3G6X/H6YHI6oHI6YLI6oLI6YbK64TJ6YnL64rM64zM65HP
-7JPQ7ZbR7ZrT7qXX76bY8KfY76jZ8Kra8azb8a/c8bDc8bHd8rLd8rXe8rXe8bjg87zi9Lzh873i
-88Dj9MPl9cXm9cfm9cnn9c3p9s/q987p9tHr99Lr99Xt+Nbt+Nrv+d/x+eDx+eX0++Tz+u/4/OHy
-+ePz+ur2+/b7/fr9/vz+/v7//////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAAK0ALAAAAABzACYA
-Rwj/AAMIHEiwoMGDCBMqXMiwoUOGiti0mUhxopcBAgZoHKAglcATFaVg3DgAC0U2hgKsKkJyiZqK
-FUV4bHijx4AHDFmN0BiJ4A2NRFYRJKAAo6WFKzJibOCQEclMB1WxxOgDUQEeqbKm2sEDoQaMhAqS
-sonE4B2MeQ7WmGlwj0YKCv0oHeDkIUGnAvJCNShVowA7dgXyyXKhsGEJG6kYNqxFUEImGSsQDJFR
-gOSClUj61cx5wAmEBKJk9JIwTefTaxzaGNnQxhIBex0WAUPwRZoOZnLr3q27Q6CBKXgL742mhUBW
-e3AP771HlcNSaDjQCVwwByQc1A2+9vtbodONsQn2/8UI2O6F03lP+/1QcEpeJgMbabwyMEzeOQuJ
-bBSAyC5ejeENNN5GQzBAxIEHNgAGAQZ9JQAlBvUggBIGlYDWQBtYoKGGW1yw4YZacPGhBVjsIRAB
-B4xEV3YCfZdRgAKNJ0ATLBo01gBlOXSIARgpohAEeQkgSo1EFmnkkUgmqeSSCKkxl3qaMRUBZ5V1
-llcHAaQ40lxP+uXQWALkmB0HGplhECYHWADDQ24oJYAVClHilwCgRMVSXiYGhgIZG/TZZxlXaNTD
-F2X4+adxA+Fg0wBkEGTfACkQhNgAKzR0iop0MvQdgHZu5EdgXw0AYUE2UViQhQKkVdAcQZYSAA9D
-GP/xxQ4B1KHRFg1h4OYYDzHiJowBDKgiSZXlSZAGeYVFEJhiDnRHXnoM5EOXxO7HmQMGdRJkRtj5
-txmwMqoRWBZPplftuXEkxIUJBj2CxUJSVPkGi5sOAO5UA6hqJCql2sVKEBilcRCyAxhQB0GFqEet
-X3IglAhJlxzEAwPoaSaABV+S1VAmQ+RlREOTBHkGkySXbPLJKKes8sosC6TJllCS9JshC8NsbSUB
-eFAzZ244FIpSNfrRxADsGoRKQS/ETCWWIShspSMBUGyteu82dGOzCr3AR0EyaESFQU4OAJdDcBC7
-SEJjuJmuQTzg+0SSNmG7ECuQDZBAQUlo9AlBg2D/BMVDm2wpQA4KOUISJ53mpa9DJVRmLkZcUgv1
-QDRjRMNAI2SUmkAzYDSEcw3xMVcEmj7VqUblPSRGRl2ooMIKK6hAh0Y/kMBC7K9PkBceBeGwUaUB
-gLKRc/xqZIpD7vkFR0Obwna6AGiAqlEhBY1iUxIG5YFRtAZh1IYOAh090AIY9cRQAUBALsBRzM91
-734CICDEAvQvoMAQGNBaELICKDvQ1Wa5kEBi4IJGNMITmTCgAhvhgg8o5QsvMKALcHaQSKRHAAro
-SlO+ZafHQQ5mAuhDg8AiFo0VBAQCDAAIMWWuKlWGKQZJg5vg5C2/vI92LujKKna4CtAdRAwa8QIL
-7YY4xLPErwREHGIVMMI7km0nL4CgjovsdboBiNAumbPYsKpkLUQZRAZ5+dtAOrEAAXwtITjgkiey
-U68bDiB1RSKARo4QmEOkR3wDOUNlMnCQQrgJPvQyHV+KUCwkAfAhYMjLD4RyECxUJhEESeRmBCAB
-mMCkBAlpnhsHwAQPWHIifWCQ1UzIEFAEqQsLwQEQ8gIBgWiBS0qbI0JeMJcaHGQV04plXr6kEbkp
-hBVTEkAPjtcQOWSEVwGQxBw+wMxmOvOZHxiEQnIAgj1o8JZ/gKY2SeDDhejgDW1YnEI+AUm7fIKR
-LUunOtfJThYFBAA7
+dirty_bitmap_mig_init
+dirty_bitmap_mig_before_vm_start
+init_dirty_bitmap_incoming_migration
 
+mig_init is advertised in migration/misc.h, the other two are in
+migration/migration.h.
+The definitions for all three are in migration/block-dirty-bitmap.c
 
---=====_002_next=====
-Content-Type: image/jpeg;
-	 name="=?UTF-8?B?OWFlM2UyMTRjMTdkNDllZDkzNWQ4N2M2NzRiYTNlZTIuanBn?="
-Content-Disposition: inline;
-	filename="=?UTF-8?B?OWFlM2UyMTRjMTdkNDllZDkzNWQ4N2M2NzRiYTNlZTIuanBn?="
-Content-Transfer-Encoding: base64
-Content-ID: <9ae3e214c17d49ed935d87c674ba3ee2>
+In pure naivety, I find it weird to have something that you use in
+migration.c and advertised in migration.h actually exist separately in
+block-dirty-bitmap.c; but maybe this is the sanest thing to do.
 
-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
+> diff --git a/include/migration/misc.h b/include/migration/misc.h
+> index c079b7771b..9cc539e232 100644
+> --- a/include/migration/misc.h
+> +++ b/include/migration/misc.h
+> @@ -55,4 +55,7 @@ bool migration_has_failed(MigrationState *);
+>  bool migration_in_postcopy_after_devices(MigrationState *);
+>  void migration_global_dump(Monitor *mon);
+>  
+> +/* migration/block-dirty-bitmap.c */
+> +void dirty_bitmap_mig_init(void);
+> +
+>  #endif
+> diff --git a/migration/migration.h b/migration/migration.h
+> index 50d1f01346..4e3ad04664 100644
+> --- a/migration/migration.h
+> +++ b/migration/migration.h
+> @@ -211,4 +211,7 @@ void migrate_send_rp_pong(MigrationIncomingState *mis,
+>  void migrate_send_rp_req_pages(MigrationIncomingState *mis, const char* rbname,
+>                                ram_addr_t start, size_t len);
+>  
+> +void dirty_bitmap_mig_before_vm_start(void);
+> +void init_dirty_bitmap_incoming_migration(void);
+> +
+>  #endif
+> diff --git a/migration/block-dirty-bitmap.c b/migration/block-dirty-bitmap.c
+> new file mode 100644
+> index 0000000000..53cb20045d
+> --- /dev/null
+> +++ b/migration/block-dirty-bitmap.c
+> @@ -0,0 +1,734 @@
+> +/*
+> + * Block dirty bitmap postcopy migration
+> + *
+> + * Copyright IBM, Corp. 2009
+> + * Copyright (c) 2016-2017 Parallels International GmbH
+> + *
+> + * Authors:
+> + *  Liran Schour   <lirans@il.ibm.com>
+> + *  Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2.  See
+> + * the COPYING file in the top-level directory.
+> + * This file is derived from migration/block.c, so it's author and IBM copyright
+> + * are here, although content is quite different.
+> + *
+> + * Contributions after 2012-01-13 are licensed under the terms of the
+> + * GNU GPL, version 2 or (at your option) any later version.
+> + *
+> + *                                ***
+> + *
+> + * Here postcopy migration of dirty bitmaps is realized. Only named dirty
+> + * bitmaps, associated with root nodes and non-root named nodes are migrated.
 
+Put another way, only QMP-addressable bitmaps. Nodes without a name that
+are not the root have no way to be addressed.
 
---=====_002_next=====--
+> + *
+> + * If destination qemu is already containing a dirty bitmap with the same name
+
+"If the destination QEMU already contains a dirty bitmap with the same name"
+
+> + * as a migrated bitmap (for the same node), then, if their granularities are
+> + * the same the migration will be done, otherwise the error will be generated.
+
+"an error"
+
+> + *
+> + * If destination qemu doesn't contain such bitmap it will be created.
+
+"If the destination QEMU doesn't contain such a bitmap, it will be created."
+
+> + *
+> + * format of migration:
+> + *
+> + * # Header (shared for different chunk types)
+> + * 1, 2 or 4 bytes: flags (see qemu_{put,put}_flags)
+> + * [ 1 byte: node name size ] \  flags & DEVICE_NAME
+> + * [ n bytes: node name     ] /
+> + * [ 1 byte: bitmap name size ] \  flags & BITMAP_NAME
+> + * [ n bytes: bitmap name     ] /
+> + *
+> + * # Start of bitmap migration (flags & START)
+> + * header
+> + * be64: granularity
+> + * 1 byte: bitmap flags (corresponds to BdrvDirtyBitmap)
+> + *   bit 0    -  bitmap is enabled
+> + *   bit 1    -  bitmap is persistent
+> + *   bit 2    -  bitmap is autoloading
+> + *   bits 3-7 - reserved, must be zero
+> + *
+> + * # Complete of bitmap migration (flags & COMPLETE)
+> + * header
+> + *
+> + * # Data chunk of bitmap migration
+> + * header
+> + * be64: start sector
+> + * be32: number of sectors
+> + * [ be64: buffer size  ] \ ! (flags & ZEROES)
+> + * [ n bytes: buffer    ] /
+> + *
+> + * The last chunk in stream should contain flags & EOS. The chunk may skip
+> + * device and/or bitmap names, assuming them to be the same with the previous
+> + * chunk.
+> + */
+> +
+
+Been a while since I reviewed the format, but it seems sane.
+
+> +#include "qemu/osdep.h"
+> +#include "block/block.h"
+> +#include "block/block_int.h"
+> +#include "sysemu/block-backend.h"
+> +#include "qemu/main-loop.h"
+> +#include "qemu/error-report.h"
+> +#include "migration/misc.h"
+> +#include "migration/migration.h"
+> +#include "migration/qemu-file.h"
+> +#include "migration/vmstate.h"
+> +#include "migration/register.h"
+> +#include "qemu/hbitmap.h"
+> +#include "sysemu/sysemu.h"
+> +#include "qemu/cutils.h"
+> +#include "qapi/error.h"
+> +#include "trace.h"
+> +
+> +#define CHUNK_SIZE     (1 << 10)
+> +
+> +/* Flags occupy one, two or four bytes (Big Endian). The size is determined as
+> + * follows:
+> + * in first (most significant) byte bit 8 is clear  -->  one byte
+> + * in first byte bit 8 is set    -->  two or four bytes, depending on second
+> + *                                    byte:
+> + *    | in second byte bit 8 is clear  -->  two bytes
+> + *    | in second byte bit 8 is set    -->  four bytes
+> + */
+> +#define DIRTY_BITMAP_MIG_FLAG_EOS           0x01
+> +#define DIRTY_BITMAP_MIG_FLAG_ZEROES        0x02
+> +#define DIRTY_BITMAP_MIG_FLAG_BITMAP_NAME   0x04
+> +#define DIRTY_BITMAP_MIG_FLAG_DEVICE_NAME   0x08
+> +#define DIRTY_BITMAP_MIG_FLAG_START         0x10
+> +#define DIRTY_BITMAP_MIG_FLAG_COMPLETE      0x20
+> +#define DIRTY_BITMAP_MIG_FLAG_BITS          0x40
+> +
+> +#define DIRTY_BITMAP_MIG_EXTRA_FLAGS        0x80
+> +
+> +#define DIRTY_BITMAP_MIG_START_FLAG_ENABLED          0x01
+> +#define DIRTY_BITMAP_MIG_START_FLAG_PERSISTENT       0x02
+> +#define DIRTY_BITMAP_MIG_START_FLAG_AUTOLOAD         0x04
+> +#define DIRTY_BITMAP_MIG_START_FLAG_RESERVED_MASK    0xf8
+> +
+> +typedef struct DirtyBitmapMigBitmapState {
+> +    /* Written during setup phase. */
+> +    BlockDriverState *bs;
+> +    const char *node_name;
+> +    BdrvDirtyBitmap *bitmap;
+> +    uint64_t total_sectors;
+> +    uint64_t sectors_per_chunk;
+> +    QSIMPLEQ_ENTRY(DirtyBitmapMigBitmapState) entry;
+> +    uint8_t flags;
+> +
+> +    /* For bulk phase. */
+> +    bool bulk_completed;
+> +    uint64_t cur_sector;
+> +} DirtyBitmapMigBitmapState;
+> +
+> +typedef struct DirtyBitmapMigState {
+> +    QSIMPLEQ_HEAD(dbms_list, DirtyBitmapMigBitmapState) dbms_list;
+> +
+> +    bool bulk_completed;
+> +
+> +    /* for send_bitmap_bits() */
+> +    BlockDriverState *prev_bs;
+> +    BdrvDirtyBitmap *prev_bitmap;
+> +} DirtyBitmapMigState;
+> +
+> +typedef struct DirtyBitmapLoadState {
+> +    uint32_t flags;
+> +    char node_name[256];
+> +    char bitmap_name[256];
+> +    BlockDriverState *bs;
+> +    BdrvDirtyBitmap *bitmap;
+> +} DirtyBitmapLoadState;
+> +
+> +static DirtyBitmapMigState dirty_bitmap_mig_state;
+> +
+> +typedef struct DirtyBitmapLoadBitmapState {
+> +    BlockDriverState *bs;
+> +    BdrvDirtyBitmap *bitmap;
+> +    bool migrated;
+> +} DirtyBitmapLoadBitmapState;
+> +static GSList *enabled_bitmaps;
+> +QemuMutex finish_lock;
+> +
+> +void init_dirty_bitmap_incoming_migration(void)
+> +{
+> +    qemu_mutex_init(&finish_lock);
+> +}
+> +
+
+This is a little odd as public interface. David, is there a nicer way to
+integrate in-migrate hooks? I guess it hasn't come up yet. Anyway, it
+might be nice to leave a comment here for now that says that the only
+caller is migration.c, and it will only ever call it once.
+
+> +static uint32_t qemu_get_bitmap_flags(QEMUFile *f)
+> +{
+> +    uint8_t flags = qemu_get_byte(f);
+> +    if (flags & DIRTY_BITMAP_MIG_EXTRA_FLAGS) {
+> +        flags = flags << 8 | qemu_get_byte(f);
+> +        if (flags & DIRTY_BITMAP_MIG_EXTRA_FLAGS) {
+> +            flags = flags << 16 | qemu_get_be16(f);
+> +        }
+> +    }
+> +
+> +    return flags;
+> +}
+> +
+
+ok
+
+(Sorry for the per-function ACKs, it's just helpful for me to know which
+functions I followed execution of on paper to make sure I got everything
+in this big patch.)
+
+> +static void qemu_put_bitmap_flags(QEMUFile *f, uint32_t flags)
+> +{
+> +    /* The code currently do not send flags more than one byte */
+> +    assert(!(flags & (0xffffff00 | DIRTY_BITMAP_MIG_EXTRA_FLAGS)));
+> +
+> +    qemu_put_byte(f, flags);
+> +}
+> +
+
+ok
+
+> +static void send_bitmap_header(QEMUFile *f, DirtyBitmapMigBitmapState *dbms,
+> +                               uint32_t additional_flags)
+> +{
+> +    BlockDriverState *bs = dbms->bs;
+> +    BdrvDirtyBitmap *bitmap = dbms->bitmap;
+> +    uint32_t flags = additional_flags;
+> +    trace_send_bitmap_header_enter();
+> +
+> +    if (bs != dirty_bitmap_mig_state.prev_bs) {
+> +        dirty_bitmap_mig_state.prev_bs = bs;
+> +        flags |= DIRTY_BITMAP_MIG_FLAG_DEVICE_NAME;
+> +    }
+> +
+> +    if (bitmap != dirty_bitmap_mig_state.prev_bitmap) {
+> +        dirty_bitmap_mig_state.prev_bitmap = bitmap;
+> +        flags |= DIRTY_BITMAP_MIG_FLAG_BITMAP_NAME;
+> +    }
+> +
+
+I guess the idea here is that we might be able to skip the node name
+broadcast, leaving the possibilities as:
+
+- new node and bitmap: send both
+- new bitmap, but not node: send bitmap name only
+- same for both: send neither
+
+and that otherwise it's not possible to have a new node but "same
+bitmap" by nature of how the structures are organized.
+
+> +    qemu_put_bitmap_flags(f, flags);
+> +
+> +    if (flags & DIRTY_BITMAP_MIG_FLAG_DEVICE_NAME) {
+> +        qemu_put_counted_string(f, dbms->node_name);
+> +    }
+> +
+> +    if (flags & DIRTY_BITMAP_MIG_FLAG_BITMAP_NAME) {
+> +        qemu_put_counted_string(f, bdrv_dirty_bitmap_name(bitmap));
+> +    }
+> +}
+> +
+
+ok
+
+> +static void send_bitmap_start(QEMUFile *f, DirtyBitmapMigBitmapState *dbms)
+> +{
+> +    send_bitmap_header(f, dbms, DIRTY_BITMAP_MIG_FLAG_START);
+> +    qemu_put_be32(f, bdrv_dirty_bitmap_granularity(dbms->bitmap));
+> +    qemu_put_byte(f, dbms->flags);
+> +}
+> +
+
+ok
+
+> +static void send_bitmap_complete(QEMUFile *f, DirtyBitmapMigBitmapState *dbms)
+> +{
+> +    send_bitmap_header(f, dbms, DIRTY_BITMAP_MIG_FLAG_COMPLETE);
+> +}
+> +
+
+ok
+
+> +static void send_bitmap_bits(QEMUFile *f, DirtyBitmapMigBitmapState *dbms,
+> +                             uint64_t start_sector, uint32_t nr_sectors)
+> +{
+> +    /* align for buffer_is_zero() */
+> +    uint64_t align = 4 * sizeof(long);
+> +    uint64_t unaligned_size =
+> +        bdrv_dirty_bitmap_serialization_size(
+> +            dbms->bitmap, start_sector << BDRV_SECTOR_BITS,
+> +            (uint64_t)nr_sectors << BDRV_SECTOR_BITS);
+> +    uint64_t buf_size = (unaligned_size + align - 1) & ~(align - 1);
+> +    uint8_t *buf = g_malloc0(buf_size);
+> +    uint32_t flags = DIRTY_BITMAP_MIG_FLAG_BITS;
+> +
+> +    bdrv_dirty_bitmap_serialize_part(
+> +        dbms->bitmap, buf, start_sector << BDRV_SECTOR_BITS,
+> +        (uint64_t)nr_sectors << BDRV_SECTOR_BITS);
+> +
+> +    if (buffer_is_zero(buf, buf_size)) {
+> +        g_free(buf);
+> +        buf = NULL;
+> +        flags |= DIRTY_BITMAP_MIG_FLAG_ZEROES;
+> +    }
+> +
+> +    trace_send_bitmap_bits(flags, start_sector, nr_sectors, buf_size);
+> +
+> +    send_bitmap_header(f, dbms, flags);
+> +
+> +    qemu_put_be64(f, start_sector);
+> +    qemu_put_be32(f, nr_sectors);
+> +
+> +    /* if a block is zero we need to flush here since the network
+> +     * bandwidth is now a lot higher than the storage device bandwidth.
+> +     * thus if we queue zero blocks we slow down the migration. */
+
+Can you elaborate on this for me?
+
+> +    if (flags & DIRTY_BITMAP_MIG_FLAG_ZEROES) {
+> +        qemu_fflush(f);
+> +    } else {
+> +        qemu_put_be64(f, buf_size);
+> +        qemu_put_buffer(f, buf, buf_size);
+> +    }
+> +
+> +    g_free(buf);
+> +}
+> +
+> +
+> +/* Called with iothread lock taken.  */
+> +
+> +static int init_dirty_bitmap_migration(void)
+> +{
+> +    BlockDriverState *bs;
+> +    BdrvDirtyBitmap *bitmap;
+> +    DirtyBitmapMigBitmapState *dbms;
+> +    BdrvNextIterator it;
+> +
+> +    dirty_bitmap_mig_state.bulk_completed = false;
+> +    dirty_bitmap_mig_state.prev_bs = NULL;
+> +    dirty_bitmap_mig_state.prev_bitmap = NULL;
+> +
+> +    for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
+> +        if (!bdrv_get_device_or_node_name(bs)) {
+> +            /* not named non-root node */
+
+I can't imagine the situation it would arise in, but is it possible to
+have a named bitmap attached to a now-anonymous node?
+
+Let's say we attach a bitmap to a root node, but then later we insert a
+filter or something above it and it's no longer at the root.
+
+We should probably prohibit such things, or at the very least toss out
+an error here instead of silently continuing.
+
+I think the only things valid to just *skip* are nameless bitmaps.
+Anything named we really ought to either migrate or error out over, I
+think, even if the circumstances leading to such a configuration are
+very unlikely.
+
+> +            continue;
+> +        }
+> +
+> +        for (bitmap = bdrv_dirty_bitmap_next(bs, NULL); bitmap;
+> +             bitmap = bdrv_dirty_bitmap_next(bs, bitmap)) {
+> +            if (!bdrv_dirty_bitmap_name(bitmap)) {
+> +                continue;
+> +            }
+> +
+> +            if (bdrv_dirty_bitmap_frozen(bitmap)) {
+> +                error_report("Can't migrate frozen dirty bitmap: '%s",
+> +                             bdrv_dirty_bitmap_name(bitmap));
+> +                return -1;
+> +            }
+> +        }
+> +    }
+> +
+> +    for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
+> +        if (!bdrv_get_device_or_node_name(bs)) {
+> +            /* not named non-root node */
+> +            continue;
+> +        }
+
+Why two-pass? I guess because we don't have to tear anything down if we
+check for errors in advance?
+
+I worry that if we need to amend the logic here that it's error-prone to
+update it in two places, so maybe we ought to just have one loop.
+
+> +
+> +        for (bitmap = bdrv_dirty_bitmap_next(bs, NULL); bitmap;
+> +             bitmap = bdrv_dirty_bitmap_next(bs, bitmap)) {
+> +            if (!bdrv_dirty_bitmap_name(bitmap)) {
+> +                continue;
+> +            }
+> +
+> +            bdrv_ref(bs);
+> +            bdrv_dirty_bitmap_set_frozen(bitmap, true);
+> +
+
+We could say that for any bitmap in the list of pending bitmaps to
+migrate, we know that we have to un-freeze it, since we never add any
+bitmaps that are frozen to our list.
+
+> +            dbms = g_new0(DirtyBitmapMigBitmapState, 1);
+> +            dbms->bs = bs;
+> +            dbms->node_name = bdrv_get_node_name(bs);
+> +            if (!dbms->node_name || dbms->node_name[0] == '\0') {
+> +                dbms->node_name = bdrv_get_device_name(bs);
+> +            }
+> +            dbms->bitmap = bitmap;
+> +            dbms->total_sectors = bdrv_nb_sectors(bs);
+> +            dbms->sectors_per_chunk = CHUNK_SIZE * 8 *
+> +                bdrv_dirty_bitmap_granularity(bitmap) >> BDRV_SECTOR_BITS;
+
+Eric may want to avoid checking in new code that thinks in sectors, but
+for the sake of review I don't mind right now.
+
+(Sorry, Eric!)
+
+> +            if (bdrv_dirty_bitmap_enabled(bitmap)) {
+> +                dbms->flags |= DIRTY_BITMAP_MIG_START_FLAG_ENABLED;
+> +            }
+> +            if (bdrv_dirty_bitmap_get_persistance(bitmap)) {
+> +                dbms->flags |= DIRTY_BITMAP_MIG_START_FLAG_PERSISTENT;
+> +            }
+> +            if (bdrv_dirty_bitmap_get_autoload(bitmap)) {
+> +                dbms->flags |= DIRTY_BITMAP_MIG_START_FLAG_AUTOLOAD;
+> +            }
+> +
+> +            bdrv_dirty_bitmap_set_persistance(bitmap, false);
+
+Oh, this might be stranger to undo. Perhaps what we CAN do is limit the
+second pass to just this action and allow ourselves to unroll everything
+else.
+
+> +
+> +            QSIMPLEQ_INSERT_TAIL(&dirty_bitmap_mig_state.dbms_list,
+> +                                 dbms, entry);
+> +        }
+> +    }
+> +
+> +    return 0;
+> +}
+> +
+> +/* Called with no lock taken.  */
+> +static void bulk_phase_send_chunk(QEMUFile *f, DirtyBitmapMigBitmapState *dbms)
+> +{
+> +    uint32_t nr_sectors = MIN(dbms->total_sectors - dbms->cur_sector,
+> +                             dbms->sectors_per_chunk);
+> +
+> +    send_bitmap_bits(f, dbms, dbms->cur_sector, nr_sectors);
+> +
+> +    dbms->cur_sector += nr_sectors;
+> +    if (dbms->cur_sector >= dbms->total_sectors) {
+> +        dbms->bulk_completed = true;
+> +    }
+> +}
+> +
+> +/* Called with no lock taken.  */
+> +static void bulk_phase(QEMUFile *f, bool limit)
+> +{
+> +    DirtyBitmapMigBitmapState *dbms;
+> +
+> +    QSIMPLEQ_FOREACH(dbms, &dirty_bitmap_mig_state.dbms_list, entry) {
+> +        while (!dbms->bulk_completed) {
+> +            bulk_phase_send_chunk(f, dbms);
+> +            if (limit && qemu_file_rate_limit(f)) {
+> +                return;
+> +            }
+> +        }
+> +    }
+> +
+> +    dirty_bitmap_mig_state.bulk_completed = true;
+> +}
+> +
+> +/* Called with iothread lock taken.  */
+> +static void dirty_bitmap_mig_cleanup(void)
+> +{
+> +    DirtyBitmapMigBitmapState *dbms;
+> +
+> +    while ((dbms = QSIMPLEQ_FIRST(&dirty_bitmap_mig_state.dbms_list)) != NULL) {
+> +        QSIMPLEQ_REMOVE_HEAD(&dirty_bitmap_mig_state.dbms_list, entry);
+> +        bdrv_dirty_bitmap_set_frozen(dbms->bitmap, false);
+> +        bdrv_unref(dbms->bs);
+> +        g_free(dbms);
+> +    }
+> +}
+> +
+
+ok
+
+> +/* for SaveVMHandlers */
+> +static void dirty_bitmap_save_cleanup(void *opaque)
+> +{
+> +    dirty_bitmap_mig_cleanup();
+> +}
+> +
+
+ok
+
+> +static int dirty_bitmap_save_iterate(QEMUFile *f, void *opaque)
+> +{
+> +    trace_dirty_bitmap_save_iterate(migration_in_postcopy());
+> +
+> +    if (migration_in_postcopy() && !dirty_bitmap_mig_state.bulk_completed) {
+> +        bulk_phase(f, true);
+> +    }
+> +
+> +    qemu_put_bitmap_flags(f, DIRTY_BITMAP_MIG_FLAG_EOS);
+> +
+> +    return dirty_bitmap_mig_state.bulk_completed;
+> +}
+> +
+
+What's the purpose behind doing bulk save both here and in
+dirty_bitmap_save_complete? Is there a path that isn't guaranteed to
+call one of the completion functions?
+
+(The way it's coded seems like it'll work fine, but I'm curious about
+what looks like a redundancy at a glance.)
+
+> +/* Called with iothread lock taken.  */
+> +
+> +static int dirty_bitmap_save_complete(QEMUFile *f, void *opaque)
+> +{
+> +    DirtyBitmapMigBitmapState *dbms;
+> +    trace_dirty_bitmap_save_complete_enter();
+> +
+> +    if (!dirty_bitmap_mig_state.bulk_completed) {
+> +        bulk_phase(f, false);
+> +    }
+> +
+
+funny now that we don't actually really iterate over the data, and the
+bulk phase is now really the _only_ phase :)
+
+> +    QSIMPLEQ_FOREACH(dbms, &dirty_bitmap_mig_state.dbms_list, entry) {
+> +        send_bitmap_complete(f, dbms);
+> +    }
+> +
+> +    qemu_put_bitmap_flags(f, DIRTY_BITMAP_MIG_FLAG_EOS);
+> +
+> +    trace_dirty_bitmap_save_complete_finish();
+> +
+> +    dirty_bitmap_mig_cleanup();
+> +    return 0;
+> +}
+> +
+
+ok
+
+> +static void dirty_bitmap_save_pending(QEMUFile *f, void *opaque,
+> +                                      uint64_t max_size,
+> +                                      uint64_t *res_precopy_only,
+> +                                      uint64_t *res_compatible,
+> +                                      uint64_t *res_postcopy_only)
+> +{
+> +    DirtyBitmapMigBitmapState *dbms;
+> +    uint64_t pending = 0;
+> +
+> +    qemu_mutex_lock_iothread();
+> +
+> +    QSIMPLEQ_FOREACH(dbms, &dirty_bitmap_mig_state.dbms_list, entry) {
+> +        uint64_t gran = bdrv_dirty_bitmap_granularity(dbms->bitmap);
+> +        uint64_t sectors = dbms->bulk_completed ? 0 :
+> +                           dbms->total_sectors - dbms->cur_sector;
+> +
+> +        pending += (sectors * BDRV_SECTOR_SIZE + gran - 1) / gran;
+> +    }
+> +
+> +    qemu_mutex_unlock_iothread();
+> +
+> +    trace_dirty_bitmap_save_pending(pending, max_size);
+> +
+> +    *res_postcopy_only += pending;
+> +}
+> +
+
+ok
+
+> +/* First occurrence of this bitmap. It should be created if doesn't exist */
+> +static int dirty_bitmap_load_start(QEMUFile *f, DirtyBitmapLoadState *s)
+> +{
+> +    Error *local_err = NULL;
+> +    uint32_t granularity = qemu_get_be32(f);
+> +    uint8_t flags = qemu_get_byte(f);
+> +
+> +    if (!s->bitmap) {
+> +        s->bitmap = bdrv_create_dirty_bitmap(s->bs, granularity,
+> +                                             s->bitmap_name, &local_err);
+> +        if (!s->bitmap) {
+> +            error_report_err(local_err);
+> +            return -EINVAL;
+> +        }
+> +    } else {
+> +        uint32_t dest_granularity =
+> +            bdrv_dirty_bitmap_granularity(s->bitmap);
+> +        if (dest_granularity != granularity) {
+> +            error_report("Error: "
+> +                         "Migrated bitmap granularity (%" PRIu32 ") "
+> +                         "doesn't match the destination bitmap '%s' "
+> +                         "granularity (%" PRIu32 ")",
+> +                         granularity,
+> +                         bdrv_dirty_bitmap_name(s->bitmap),
+> +                         dest_granularity);
+> +            return -EINVAL;
+> +        }
+> +    }
+> +
+
+I'm a fan of auto-creating the bitmaps. Do you have a use-case for why
+creating them ahead of time is better, or are you just attempting to be
+flexible?
+
+> +    if (flags & DIRTY_BITMAP_MIG_START_FLAG_RESERVED_MASK) {
+> +        error_report("Unknown flags in migrated dirty bitmap header: %x",
+> +                     flags);
+> +        return -EINVAL;
+> +    }
+> +
+> +    if (flags & DIRTY_BITMAP_MIG_START_FLAG_PERSISTENT) {
+> +        bdrv_dirty_bitmap_set_persistance(s->bitmap, true);
+> +    }
+> +    if (flags & DIRTY_BITMAP_MIG_START_FLAG_AUTOLOAD) {
+> +        bdrv_dirty_bitmap_set_autoload(s->bitmap, true);
+> +    }
+> +
+> +    bdrv_disable_dirty_bitmap(s->bitmap);
+
+OK, so we start them off as disabled, and
+
+> +    if (flags & DIRTY_BITMAP_MIG_START_FLAG_ENABLED) {
+> +        DirtyBitmapLoadBitmapState *b;
+> +
+> +        bdrv_dirty_bitmap_create_successor(s->bs, s->bitmap, &local_err);
+> +        if (local_err) {
+> +            error_report_err(local_err);
+> +            return -EINVAL;
+> +        }
+> +
+
+If they weren't disabled on the host, we create a successor to record
+writes while we wait for the rest of the data to arrive.
+
+> +        b = g_new(DirtyBitmapLoadBitmapState, 1);
+> +        b->bs = s->bs;
+> +        b->bitmap = s->bitmap;
+> +        b->migrated = false;
+> +        enabled_bitmaps = g_slist_prepend(enabled_bitmaps, b);
+
+And we make a note of which ones we were supposed to re-enable.
+
+> +    }
+> +
+> +    return 0;
+> +}
+
+OK
+
+> +
+> +void dirty_bitmap_mig_before_vm_start(void)
+
+Similarly, I guess I find it weird that this is a callable interface.
+
+David, no nice hook for just-prior-to-vm-start calls? a
+.postcopy_pivot() hook or something might be nice..
+
+> +{
+> +    GSList *item;
+> +
+> +    qemu_mutex_lock(&finish_lock);
+> +
+> +    for (item = enabled_bitmaps; item; item = g_slist_next(item)) {
+> +        DirtyBitmapLoadBitmapState *b = item->data;
+> +
+
+Anyway, if I am reading this right; we call this in the postcopy phase
+prior to receiving the entirety of the bitmaps (so before receiving
+COMPLETE) ... right?
+
+> +        if (b->migrated) {
+> +            bdrv_enable_dirty_bitmap(b->bitmap);
+
+...or, am I confused, and we might receive a COMPLETE event prior to the
+postcopy pivot?
+
+Anyway, I suppose this code says "If we received the entire bitmap, go
+ahead and enable it."
+
+> +        } else {
+> +            bdrv_dirty_bitmap_enable_successor(b->bitmap);
+
+And this says "If we haven't received it yet, enable the successor to
+record writes until we get the rest of the data."
+
+> +        }
+> +
+> +        g_free(b);
+> +    }
+> +
+> +    g_slist_free(enabled_bitmaps);
+> +    enabled_bitmaps = NULL;
+> +
+> +    qemu_mutex_unlock(&finish_lock);
+> +}
+> +
+> +static void dirty_bitmap_load_complete(QEMUFile *f, DirtyBitmapLoadState *s)
+> +{
+> +    GSList *item;
+> +    trace_dirty_bitmap_load_complete();
+> +    bdrv_dirty_bitmap_deserialize_finish(s->bitmap);
+> +
+> +    qemu_mutex_lock(&finish_lock);
+> +
+> +    for (item = enabled_bitmaps; item; item = g_slist_next(item)) {
+> +        DirtyBitmapLoadBitmapState *b = item->data;
+> +
+> +        if (b->bitmap == s->bitmap) {
+> +            b->migrated = true;
+
+we can probably break; here now, right?
+
+(This whole stanza is a little strange, can't we cache the active
+DirtyBitmapLoadBitmapState in DirtyBitmapLoadState? I guess not, because
+we're looking up the BdrvDirtyBitmap itself and caching that instead, so
+either way we have some kind of lookup on every context switch.)
+
+> +        }
+> +    }
+> +
+> +    if (bdrv_dirty_bitmap_frozen(s->bitmap)) {
+> +        if (enabled_bitmaps == NULL) {
+> +            /* in postcopy */
+> +            AioContext *aio_context = bdrv_get_aio_context(s->bs);
+> +            aio_context_acquire(aio_context);
+> +
+> +            bdrv_reclaim_dirty_bitmap(s->bs, s->bitmap, &error_abort);
+> +            bdrv_enable_dirty_bitmap(s->bitmap);
+> +
+
+OK, so if enabled_bitmaps is gone, that means we already pivoted and
+we're live on the receiving end here. We merge the successor into the
+fully deserialized bitmap and enable it.
+
+> +            aio_context_release(aio_context);
+> +        } else {
+> +            /* target not started, successor is empty */
+> +            bdrv_dirty_bitmap_release_successor(s->bs, s->bitmap);
+
+Otherwise we just trash the successor. Did we really need a new call for
+this? I suppose it's faster than merging a 0-bit bitmap, but the
+additional API complexity for the speed win here seems like premature
+optimization.
+
+...well, you already wrote it, so I won't argue.
+
+> +        }
+> +    }
+> +
+> +    qemu_mutex_unlock(&finish_lock);
+> +}
+> +
+> +static int dirty_bitmap_load_bits(QEMUFile *f, DirtyBitmapLoadState *s)
+> +{
+> +    uint64_t first_byte = qemu_get_be64(f) << BDRV_SECTOR_BITS;
+> +    uint64_t nr_bytes = (uint64_t)qemu_get_be32(f) << BDRV_SECTOR_BITS;
+> +    trace_dirty_bitmap_load_bits_enter(first_byte >> BDRV_SECTOR_BITS,
+> +                                       nr_bytes >> BDRV_SECTOR_BITS);
+> +
+> +    if (s->flags & DIRTY_BITMAP_MIG_FLAG_ZEROES) {
+> +        trace_dirty_bitmap_load_bits_zeroes();
+> +        bdrv_dirty_bitmap_deserialize_zeroes(s->bitmap, first_byte, nr_bytes,
+> +                                             false);
+> +    } else {
+> +        uint8_t *buf;
+> +        uint64_t buf_size = qemu_get_be64(f);
+> +        uint64_t needed_size =
+> +            bdrv_dirty_bitmap_serialization_size(s->bitmap,
+> +                                                 first_byte, nr_bytes);
+> +
+> +        if (needed_size > buf_size) {
+> +            error_report("Error: Migrated bitmap granularity doesn't "
+> +                         "match the destination bitmap '%s' granularity",
+> +                         bdrv_dirty_bitmap_name(s->bitmap));
+> +            return -EINVAL;
+> +        }
+> +
+> +        buf = g_malloc(buf_size);
+> +        qemu_get_buffer(f, buf, buf_size);
+> +        bdrv_dirty_bitmap_deserialize_part(s->bitmap, buf, first_byte, nr_bytes,
+> +                                           false);
+> +        g_free(buf);
+> +    }
+> +
+> +    return 0;
+> +}
+> +
+
+ok
+
+> +static int dirty_bitmap_load_header(QEMUFile *f, DirtyBitmapLoadState *s)
+> +{
+> +    Error *local_err = NULL;
+> +    s->flags = qemu_get_bitmap_flags(f);
+> +    trace_dirty_bitmap_load_header(s->flags);
+> +
+> +    if (s->flags & DIRTY_BITMAP_MIG_FLAG_DEVICE_NAME) {
+> +        if (!qemu_get_counted_string(f, s->node_name)) {
+> +            error_report("Unable to read node name string");
+> +            return -EINVAL;
+> +        }
+> +        s->bs = bdrv_lookup_bs(s->node_name, s->node_name, &local_err);
+> +        if (!s->bs) {
+> +            error_report_err(local_err);
+> +            return -EINVAL;
+> +        }
+> +    } else if (!s->bs) {
+> +        error_report("Error: block device name is not set");
+> +        return -EINVAL;
+> +    }
+> +
+> +    if (s->flags & DIRTY_BITMAP_MIG_FLAG_BITMAP_NAME) {
+> +        if (!qemu_get_counted_string(f, s->bitmap_name)) {
+> +            error_report("Unable to read node name string");
+> +            return -EINVAL;
+> +        }
+> +        s->bitmap = bdrv_find_dirty_bitmap(s->bs, s->bitmap_name);
+> +
+> +        /* bitmap may be NULL here, it wouldn't be an error if it is the
+> +         * first occurrence of the bitmap */
+> +        if (!s->bitmap && !(s->flags & DIRTY_BITMAP_MIG_FLAG_START)) {
+> +            error_report("Error: unknown dirty bitmap "
+> +                         "'%s' for block device '%s'",
+> +                         s->bitmap_name, s->node_name);
+> +            return -EINVAL;
+> +        }
+> +    } else if (!s->bitmap) {
+> +        error_report("Error: block device name is not set");
+> +        return -EINVAL;
+> +    }
+> +
+> +    return 0;
+> +}
+> +
+
+ok
+
+> +static int dirty_bitmap_load(QEMUFile *f, void *opaque, int version_id)
+> +{
+> +    static DirtyBitmapLoadState s;
+> +    int ret = 0;
+> +
+> +    trace_dirty_bitmap_load_enter();
+> +
+> +    if (version_id != 1) {
+> +        return -EINVAL;
+> +    }
+> +
+> +    do {
+> +        dirty_bitmap_load_header(f, &s);
+> +
+> +        if (s.flags & DIRTY_BITMAP_MIG_FLAG_START) {
+> +            ret = dirty_bitmap_load_start(f, &s);
+> +        } else if (s.flags & DIRTY_BITMAP_MIG_FLAG_COMPLETE) {
+> +            dirty_bitmap_load_complete(f, &s);
+> +        } else if (s.flags & DIRTY_BITMAP_MIG_FLAG_BITS) {
+> +            ret = dirty_bitmap_load_bits(f, &s);
+> +        }
+> +
+> +        if (!ret) {
+> +            ret = qemu_file_get_error(f);
+> +        }
+> +
+> +        if (ret) {
+> +            return ret;
+> +        }
+> +    } while (!(s.flags & DIRTY_BITMAP_MIG_FLAG_EOS));
+> +
+> +    trace_dirty_bitmap_load_success();
+> +    return 0;
+> +}
+
+OK
+
+> +
+> +static int dirty_bitmap_save_setup(QEMUFile *f, void *opaque)
+> +{
+> +    DirtyBitmapMigBitmapState *dbms = NULL;
+> +    if (init_dirty_bitmap_migration() < 0) {
+> +        return -1;
+> +    }
+> +
+> +    QSIMPLEQ_FOREACH(dbms, &dirty_bitmap_mig_state.dbms_list, entry) {
+> +        send_bitmap_start(f, dbms);
+> +    }
+> +    qemu_put_bitmap_flags(f, DIRTY_BITMAP_MIG_FLAG_EOS);
+> +
+> +    return 0;
+> +}
+> +
+
+ok
+
+> +static bool dirty_bitmap_is_active(void *opaque)
+> +{
+> +    return migrate_dirty_bitmaps();
+> +}
+> +
+
+ok
+
+> +static bool dirty_bitmap_is_active_iterate(void *opaque)
+> +{
+> +    return dirty_bitmap_is_active(opaque) && !runstate_is_running();
+> +}
+> +
+
+On second thought, in patch 9, can you add a little tiny bit of
+documentation text explaining the exact nature of this callback?
+
+Is the second portion of the conditional here so that once we reach the
+postcopy state that .is_active_iterate starts returning true?
+
+"ok" if I'm reading this right, but it might be helped along by a little
+comment.
+
+> +static bool dirty_bitmap_has_postcopy(void *opaque)
+> +{
+> +    return true;
+> +}
+> +
+
+ok! :)
+
+> +static SaveVMHandlers savevm_dirty_bitmap_handlers = {
+> +    .save_setup = dirty_bitmap_save_setup,
+> +    .save_live_complete_postcopy = dirty_bitmap_save_complete,
+> +    .save_live_complete_precopy = dirty_bitmap_save_complete,
+> +    .has_postcopy = dirty_bitmap_has_postcopy,
+> +    .save_live_pending = dirty_bitmap_save_pending,
+> +    .save_live_iterate = dirty_bitmap_save_iterate,
+> +    .is_active_iterate = dirty_bitmap_is_active_iterate,
+> +    .load_state = dirty_bitmap_load,
+> +    .save_cleanup = dirty_bitmap_save_cleanup,
+> +    .is_active = dirty_bitmap_is_active,
+> +};
+> +
+> +void dirty_bitmap_mig_init(void)
+> +{
+> +    QSIMPLEQ_INIT(&dirty_bitmap_mig_state.dbms_list);
+> +
+> +    register_savevm_live(NULL, "dirty-bitmap", 0, 1,
+> +                         &savevm_dirty_bitmap_handlers,
+> +                         &dirty_bitmap_mig_state);
+> +}
+
+ok
+
+dgilbert, would it be worth registering a block-driver-like registration
+trick that automatically invokes these functions instead of having to
+hook them up in vl.c? the more we add, the more hacky it looks to not
+have some subsystem-wide registration hook.
+
+> diff --git a/migration/migration.c b/migration/migration.c
+> index e973837bfd..66e9cf03cd 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -150,6 +150,9 @@ MigrationIncomingState *migration_incoming_get_current(void)
+>          memset(&mis_current, 0, sizeof(MigrationIncomingState));
+>          qemu_mutex_init(&mis_current.rp_mutex);
+>          qemu_event_init(&mis_current.main_thread_load_event, false);
+> +
+> +        init_dirty_bitmap_incoming_migration();
+> +
+>          once = true;
+>      }
+>      return &mis_current;
+> diff --git a/migration/savevm.c b/migration/savevm.c
+> index 9bbfb3fa1b..b0c37ef9f1 100644
+> --- a/migration/savevm.c
+> +++ b/migration/savevm.c
+> @@ -1673,6 +1673,8 @@ static void loadvm_postcopy_handle_run_bh(void *opaque)
+>  
+>      trace_loadvm_postcopy_handle_run_vmstart();
+>  
+> +    dirty_bitmap_mig_before_vm_start();
+> +
+>      if (autostart) {
+>          /* Hold onto your hats, starting the CPU */
+>          vm_start();
+> diff --git a/vl.c b/vl.c
+> index ec299099ff..3d393aaf2c 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -4642,6 +4642,7 @@ int main(int argc, char **argv, char **envp)
+>  
+>      blk_mig_init();
+>      ram_mig_init();
+> +    dirty_bitmap_mig_init();
+>  
+>      /* If the currently selected machine wishes to override the units-per-bus
+>       * property of its default HBA interface type, do so now. */
+> diff --git a/migration/Makefile.objs b/migration/Makefile.objs
+> index 99e038024d..c83ec47ba8 100644
+> --- a/migration/Makefile.objs
+> +++ b/migration/Makefile.objs
+> @@ -6,6 +6,7 @@ common-obj-y += qemu-file.o global_state.o
+>  common-obj-y += qemu-file-channel.o
+>  common-obj-y += xbzrle.o postcopy-ram.o
+>  common-obj-y += qjson.o
+> +common-obj-y += block-dirty-bitmap.o
+>  
+>  common-obj-$(CONFIG_RDMA) += rdma.o
+>  
+> diff --git a/migration/trace-events b/migration/trace-events
+> index a04fffb877..e9eb8078d4 100644
+> --- a/migration/trace-events
+> +++ b/migration/trace-events
+> @@ -227,3 +227,17 @@ colo_vm_state_change(const char *old, const char *new) "Change '%s' => '%s'"
+>  colo_send_message(const char *msg) "Send '%s' message"
+>  colo_receive_message(const char *msg) "Receive '%s' message"
+>  colo_failover_set_state(const char *new_state) "new state %s"
+> +
+> +# migration/block-dirty-bitmap.c
+> +send_bitmap_header_enter(void) ""
+> +send_bitmap_bits(uint32_t flags, uint64_t start_sector, uint32_t nr_sectors, uint64_t data_size) "\n   flags:        0x%x\n   start_sector: %" PRIu64 "\n   nr_sectors:   %" PRIu32 "\n   data_size:    %" PRIu64 "\n"
+> +dirty_bitmap_save_iterate(int in_postcopy) "in postcopy: %d"
+> +dirty_bitmap_save_complete_enter(void) ""
+> +dirty_bitmap_save_complete_finish(void) ""
+> +dirty_bitmap_save_pending(uint64_t pending, uint64_t max_size) "pending %" PRIu64 " max: %" PRIu64
+> +dirty_bitmap_load_complete(void) ""
+> +dirty_bitmap_load_bits_enter(uint64_t first_sector, uint32_t nr_sectors) "chunk: %" PRIu64 " %" PRIu32
+> +dirty_bitmap_load_bits_zeroes(void) ""
+> +dirty_bitmap_load_header(uint32_t flags) "flags 0x%x"
+> +dirty_bitmap_load_enter(void) ""
+> +dirty_bitmap_load_success(void) ""
+> 
+
+OK, I think everything here is probably in order, and it's only my
+understanding that is a barrier at this point. Help me understand the
+rest of this patch and I'll re-pester migration to get this staged for
+qemu-next.
+
+--js
