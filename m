@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52176)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52434)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eEwJU-0005ph-4p
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 06:57:05 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eEwKR-0006Mw-De
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 06:58:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eEwJT-0003R9-ID
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 06:57:04 -0500
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:43154)
+	(envelope-from <peter.maydell@linaro.org>) id 1eEwKQ-0004EM-Mr
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 06:58:03 -0500
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:47629)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eEwJT-0003QH-AY
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 06:57:03 -0500
-Received: by mail-wr0-x242.google.com with SMTP id 4so20276098wrt.0
-	for <qemu-devel@nongnu.org>; Wed, 15 Nov 2017 03:57:02 -0800 (PST)
+	id 1eEwKQ-0004DJ-GP
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 06:58:02 -0500
+Received: by mail-wr0-x242.google.com with SMTP id k61so20240455wrc.4
+	for <qemu-devel@nongnu.org>; Wed, 15 Nov 2017 03:58:02 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <27983ce7-8de1-620f-ca06-ee4f92dab180@kaod.org>
-References: <20171114122018.12204-1-joel@jms.id.au>
-	<27983ce7-8de1-620f-ca06-ee4f92dab180@kaod.org>
+In-Reply-To: <CAKmqyKORH2jwGP4ULZv6B8=262OhznHkwOzONd9HFQoJkKzD=A@mail.gmail.com>
+References: <1510066898-3725-1-git-send-email-peter.maydell@linaro.org>
+	<CAKmqyKORH2jwGP4ULZv6B8=262OhznHkwOzONd9HFQoJkKzD=A@mail.gmail.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 15 Nov 2017 11:56:41 +0000
-Message-ID: <CAFEAcA9udAJpnJVrkPcS9TrM5EAxPHn70tAjM5Bvr7HvUrqY=g@mail.gmail.com>
+Date: Wed, 15 Nov 2017 11:57:40 +0000
+Message-ID: <CAFEAcA-z_gfMr+=8c1kexo6iL--uxNVMzOnN0aox0FGAv3pHjQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3] hw/arm/aspeed: Unlock SCU when running
- kernel
+Subject: Re: [Qemu-devel] [PATCH for-2.11] target/arm: Report GICv3 sysregs
+ present in ID registers if needed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,29 +30,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
-Cc: Joel Stanley <joel@jms.id.au>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Andrew Jeffery <andrew@aj.id.au>
+To: Alistair Francis <alistair23@gmail.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Stefano Stabellini <sstabellini@kernel.org>, Patch Tracking <patches@linaro.org>
 
-On 15 November 2017 at 08:18, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
-> On 11/14/2017 01:20 PM, Joel Stanley wrote:
->> The ASPEED hardware contains a lock register for the SCU that disables
->> any writes to the SCU when it is locked. The machine comes up with the
->> lock enabled, but on all known hardware u-boot will unlock it and leave
->> it unlocked when loading the kernel.
+On 15 November 2017 at 01:14, Alistair Francis <alistair23@gmail.com> wrote:
+> On Tue, Nov 7, 2017 at 7:01 AM, Peter Maydell <peter.maydell@linaro.org> wrote:
+>> The CPU ID registers ID_AA64PFR0_EL1, ID_PFR1_EL1 and ID_PFR1
+>> have a field for reporting presence of GICv3 system registers.
+>> We need to report this field correctly in order for Xen to
+>> work as a guest inside QEMU emulation. We mustn't incorrectly
+>> claim the sysregs exist when they don't, though, or Linux will
+>> crash.
 >>
->> This means the kernel expects the SCU to be unlocked. When booting from
->> an emulated ROM the normal u-boot unlock path is executed. Things don't
->> go well when booting using the -kernel command line, as u-boot does not
->> run first.
+>> Unfortunately the way we've designed the GICv3 emulation in QEMU
+>> puts the system registers as part of the GICv3 device, which
+>> may be created after the CPU proper has been realized. This
+>> means that we don't know at the point when we define the ID
+>> registers what the correct value is. Handle this by switching
+>> them to calling a function at runtime to read the value, where
+>> we can fill in the GIC field appropriately.
 >>
->> Change behaviour so that when a kernel is passed to the machine, set the
->> reset value of the SCU to be unlocked.
->>
->> Signed-off-by: Joel Stanley <joel@jms.id.au>
+>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 >
-> Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> Is this going to make it into 2.11?
 
-Thanks. Should this go into 2.11 ? It sounds like the kind of
-bugfix that ought to...
+Yes, it's supposed to go into 2.11 -- I think I just forgot
+to put it in the rc1 pullreq, but it'll go in rc2.
 
+thanks
 -- PMM
