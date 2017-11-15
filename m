@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58440)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58458)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eF2G0-0002zo-4V
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 13:17:53 -0500
+	(envelope-from <mst@redhat.com>) id 1eF2G1-0002zt-Se
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 13:17:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eF2Fw-0002bl-3w
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 13:17:52 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37410)
+	(envelope-from <mst@redhat.com>) id 1eF2G0-0002ej-P1
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 13:17:53 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49010)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eF2Fv-0002ay-RF
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 13:17:48 -0500
-Date: Wed, 15 Nov 2017 20:17:41 +0200
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eF2G0-0002eG-IX
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 13:17:52 -0500
+Date: Wed, 15 Nov 2017 20:17:47 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1510769835-31902-1-git-send-email-mst@redhat.com>
+Message-ID: <1510769835-31902-2-git-send-email-mst@redhat.com>
+References: <1510769835-31902-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
+In-Reply-To: <1510769835-31902-1-git-send-email-mst@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 00/10] pc, pci, virtio: fixes for rc1
+Subject: [Qemu-devel] [PULL 01/10] fix: unrealize virtio device if we fail
+ to hotplug it
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,82 +29,58 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, linzhecheng <linzhecheng@huawei.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-The following changes since commit 1fa0f627d03cd0d0755924247cafeb42969016=
-bf:
+From: linzhecheng <linzhecheng@huawei.com>
 
-  Update version for v2.11.0-rc1 release (2017-11-14 18:37:49 +0000)
+If we fail to hotplug virtio-blk device and then suspend
+or shutdown VM, qemu is likely to crash.
 
-are available in the git repository at:
+Re-production steps:
+1. Run VM named vm001
+2. Create a virtio-blk.xml which contains wrong configurations:
+<disk device=3D"lun" rawio=3D"yes" type=3D"block">
+  <driver cache=3D"none" io=3D"native" name=3D"qemu" type=3D"raw" />
+  <source dev=3D"/dev/mapper/11-dm" />
+  <target bus=3D"virtio" dev=3D"vdx" />
+</disk>
+3. Run command : virsh attach-device vm001 virtio-blk.xml
+error: Failed to attach device from blk-scsi.xml
+error: internal error: unable to execute QEMU command 'device_add': Pleas=
+e set scsi=3Doff for virtio-blk devices in order to use virtio 1.0
+it means hotplug virtio-blk device failed.
+4. Suspend or shutdown VM will leads to qemu crash
 
-  git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
+Problem happens in virtio_vmstate_change which is called by
+vm_state_notify:
+vdev=E2=80=99s parent_bus is NULL, so qdev_get_parent_bus(DEVICE(vdev)) w=
+ill crash.
+virtio_vmstate_change is added to the list vm_change_state_head at virtio=
+_blk_device_realize(virtio_init),
+but after hotplug virtio-blk failed, virtio_vmstate_change will not be re=
+moved from vm_change_state_head.
+Adding unrealize function of virtio-blk device can solve this problem.
 
-for you to fetch changes up to 6ed0c1c3ab0925009d15cffb944d9ccb04718846:
-
-  build-sys: restrict vmcoreinfo to fw_cfg+dma capable targets (2017-11-1=
-5 20:13:13 +0200)
-
-----------------------------------------------------------------
-pc, pci, virtio: fixes for rc1
-
-A bunch of fixes all over the place.
-
+Signed-off-by: linzhecheng <linzhecheng@huawei.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+---
+ hw/virtio/virtio.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-----------------------------------------------------------------
-Alexey Kardashevskiy (1):
-      pci: Initialize pci_dev->name before use
-
-Daniel P. Berrange (2):
-      tests: report errors when iasl exits with non-zero status
-      test: fix detection of errors from iasl
-
-Dou Liyang (1):
-      NUMA: Enable adding NUMA node implicitly
-
-Marc-Andr=C3=A9 Lureau (2):
-      vmcoreinfo: put it in the 'misc' device category
-      build-sys: restrict vmcoreinfo to fw_cfg+dma capable targets
-
-Marcel Apfelbaum (2):
-      hw/pci-host: Fix x86 Host Bridges 64bit PCI hole
-      hw/pcie-pci-bridge: restrict to X86 and ARM
-
-Michael S. Tsirkin (1):
-      tests/acpi-test-data: update _CRS in DSDT
-
-linzhecheng (1):
-      fix: unrealize virtio device if we fail to hotplug it
-
- default-configs/arm-softmmu.mak      |   2 ++
- default-configs/i386-softmmu.mak     |   1 +
- default-configs/x86_64-softmmu.mak   |   1 +
- include/hw/boards.h                  |   1 +
- include/hw/i386/pc.h                 |  10 ++++++++-
- include/hw/pci-host/q35.h            |   1 +
- hw/i386/pc.c                         |  23 +++++++++++++++++++
- hw/i386/pc_piix.c                    |   1 +
- hw/i386/pc_q35.c                     |   1 +
- hw/misc/vmcoreinfo.c                 |   1 +
- hw/pci-host/piix.c                   |  32 ++++++++++++++++++++++++--
- hw/pci-host/q35.c                    |  42 +++++++++++++++++++++++++++++=
-+++---
- hw/pci/pci.c                         |   2 +-
- hw/virtio/virtio.c                   |   1 +
- numa.c                               |  21 +++++++++++++++++-
- tests/bios-tables-test.c             |  26 ++++++++++++++++------
- vl.c                                 |   3 +--
- hw/misc/Makefile.objs                |   2 +-
- hw/pci-bridge/Makefile.objs          |   4 ++--
- tests/acpi-test-data/pc/DSDT         | Bin 5098 -> 5144 bytes
- tests/acpi-test-data/pc/DSDT.bridge  | Bin 6957 -> 7003 bytes
- tests/acpi-test-data/pc/DSDT.cphp    | Bin 5561 -> 5607 bytes
- tests/acpi-test-data/pc/DSDT.ipmikcs | Bin 5170 -> 5216 bytes
- tests/acpi-test-data/pc/DSDT.memhp   | Bin 6463 -> 6509 bytes
- tests/acpi-test-data/q35/DSDT        | Bin 7782 -> 7828 bytes
- tests/acpi-test-data/q35/DSDT.bridge | Bin 7799 -> 7845 bytes
- tests/acpi-test-data/q35/DSDT.cphp   | Bin 8245 -> 8291 bytes
- tests/acpi-test-data/q35/DSDT.ipmibt | Bin 7857 -> 7903 bytes
- tests/acpi-test-data/q35/DSDT.memhp  | Bin 9147 -> 9193 bytes
- 29 files changed, 155 insertions(+), 20 deletions(-)
+diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+index 5884ce3..ea532dc 100644
+--- a/hw/virtio/virtio.c
++++ b/hw/virtio/virtio.c
+@@ -2491,6 +2491,7 @@ static void virtio_device_realize(DeviceState *dev,=
+ Error **errp)
+     virtio_bus_device_plugged(vdev, &err);
+     if (err !=3D NULL) {
+         error_propagate(errp, err);
++        vdc->unrealize(dev, NULL);
+         return;
+     }
+=20
+--=20
+MST
