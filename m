@@ -1,20 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58317)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58924)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eF5K4-0001iE-QM
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 16:34:17 -0500
+	(envelope-from <eblake@redhat.com>) id 1eF5Lt-0002Pe-Jo
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 16:36:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eF5K4-0007yX-0A
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 16:34:16 -0500
-References: <151078101230.405.4178905747947844592@bafd83ae6430>
+	(envelope-from <eblake@redhat.com>) id 1eF5Ls-0000pt-Lg
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 16:36:09 -0500
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <c4c090fc-7fda-c2ea-d36e-e3d801b7881e@redhat.com>
-Date: Wed, 15 Nov 2017 15:34:06 -0600
-MIME-Version: 1.0
-In-Reply-To: <151078101230.405.4178905747947844592@bafd83ae6430>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="0SExD0TOir6LA6b1euhdaedD8FKqSqAdN"
-Subject: Re: [Qemu-devel] [PATCH for-2.11] nbd/server: Fix error reporting
+Date: Wed, 15 Nov 2017 15:35:56 -0600
+Message-Id: <20171115213557.3548-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 for-2.11] nbd/server: Fix error reporting
  for bad requests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -25,54 +19,105 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: famz@redhat.com, pbonzini@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org
+Cc: qemu-block@nongnu.org, vsementsov@virtuozzo.com, Paolo Bonzini <pbonzini@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---0SExD0TOir6LA6b1euhdaedD8FKqSqAdN
-From: Eric Blake <eblake@redhat.com>
-To: qemu-devel@nongnu.org
-Cc: famz@redhat.com, pbonzini@redhat.com, vsementsov@virtuozzo.com,
- qemu-block@nongnu.org
-Message-ID: <c4c090fc-7fda-c2ea-d36e-e3d801b7881e@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.11] nbd/server: Fix error reporting for
- bad requests
-References: <151078101230.405.4178905747947844592@bafd83ae6430>
-In-Reply-To: <151078101230.405.4178905747947844592@bafd83ae6430>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+The NBD spec says an attempt to NBD_CMD_TRIM on a read-only
+export should fail with EPERM, as a trim has the potential
+to change disk contents, but we were relying on the block
+layer to catch that for us, which might not always give the
+right error (and even if it does, it does not let us pass
+back a sane message for structured replies).
 
-On 11/15/2017 03:23 PM, no-reply@patchew.org wrote:
-> Hi,
->=20
-> This series failed build test on s390x host. Please find the details be=
-low.
+The NBD spec says an attempt to NBD_CMD_WRITE_ZEROES out of
+bounds should fail with ENOSPC, not EINVAL.
 
-EPEBCAK. Serves me right for tweaking the patch in between
-compile-testing and posting.
+Our check for u64 offset + u32 length wraparound up front is
+pointless; nothing uses offset until after the second round
+of sanity checks, and we can just as easily ensure there is
+no wraparound by checking whether offset is in bounds (since
+a disk size cannot exceed off_t which is 63 bits, adding a
+32-bit number for a valid offset can't overflow).
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Solve all of these issues by some code motion and improved
+request validation.
 
+Signed-off-by: Eric Blake <eblake@redhat.com>
+---
+v2: actually commit the compiler-error fixes before submitting...
 
---0SExD0TOir6LA6b1euhdaedD8FKqSqAdN
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+ nbd/server.c | 36 ++++++++++++------------------------
+ 1 file changed, 12 insertions(+), 24 deletions(-)
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+diff --git a/nbd/server.c b/nbd/server.c
+index df771fd42f..7d6801b427 100644
+--- a/nbd/server.c
++++ b/nbd/server.c
+@@ -1366,15 +1366,6 @@ static int nbd_co_receive_request(NBDRequestData *req, NBDRequest *request,
+         return -EIO;
+     }
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAloMss4ACgkQp6FrSiUn
-Q2qC0wgArEsRhgdI/DOYk+vVxJ7PuQCw4L9hcVAFQ1E4QL2QUxW8oNVJJF492Ffk
-5IkbPaAxD1tKajpLCYaV54V2P2ytEvCekMlwsbodo05WgLCOj4IIH8txcOqeB6W9
-Jn3QGXIFdt7ZDMTvwrTKKbgVFlGYXlmLU3P+nlg9NqCdK7w+tUbJP670O/i3J7HK
-DKn9OO7TlGY56Zovce8LHJ8KMkm/MbWI6r+S8F/mhlIEEwDcMipDGyi1tGCnT7bs
-0dZ3NNVspkyZmEXu8IxSUlBNYDRDKi9iphJ2gtVmJ//fqygdhDjsbcTNe32TM3iM
-dkfz+3LVA55ZcteT2+4hlRILUc944Q==
-=OGGY
------END PGP SIGNATURE-----
+-    /* Check for sanity in the parameters, part 1.  Defer as many
+-     * checks as possible until after reading any NBD_CMD_WRITE
+-     * payload, so we can try and keep the connection alive.  */
+-    if ((request->from + request->len) < request->from) {
+-        error_setg(errp,
+-                   "integer overflow detected, you're probably being attacked");
+-        return -EINVAL;
+-    }
+-
+     if (request->type == NBD_CMD_READ || request->type == NBD_CMD_WRITE) {
+         if (request->len > NBD_MAX_BUFFER_SIZE) {
+             error_setg(errp, "len (%" PRIu32" ) is larger than max len (%u)",
+@@ -1399,12 +1390,21 @@ static int nbd_co_receive_request(NBDRequestData *req, NBDRequest *request,
+                                                       request->len);
+     }
 
---0SExD0TOir6LA6b1euhdaedD8FKqSqAdN--
+-    /* Sanity checks, part 2. */
+-    if (request->from + request->len > client->exp->size) {
++    /* Sanity checks. */
++    if (client->exp->nbdflags & NBD_FLAG_READ_ONLY &&
++        (request->type == NBD_CMD_WRITE ||
++         request->type == NBD_CMD_WRITE_ZEROES ||
++         request->type == NBD_CMD_TRIM)) {
++        error_setg(errp, "Export is read-only");
++        return -EROFS;
++    }
++    if (request->from > client->exp->size ||
++        request->from + request->len > client->exp->size) {
+         error_setg(errp, "operation past EOF; From: %" PRIu64 ", Len: %" PRIu32
+                    ", Size: %" PRIu64, request->from, request->len,
+                    (uint64_t)client->exp->size);
+-        return request->type == NBD_CMD_WRITE ? -ENOSPC : -EINVAL;
++        return (request->type == NBD_CMD_WRITE ||
++                request->type == NBD_CMD_WRITE_ZEROES) ? -ENOSPC : -EINVAL;
+     }
+     valid_flags = NBD_CMD_FLAG_FUA;
+     if (request->type == NBD_CMD_READ && client->structured_reply) {
+@@ -1482,12 +1482,6 @@ static coroutine_fn void nbd_trip(void *opaque)
+
+         break;
+     case NBD_CMD_WRITE:
+-        if (exp->nbdflags & NBD_FLAG_READ_ONLY) {
+-            error_setg(&local_err, "Export is read-only");
+-            ret = -EROFS;
+-            break;
+-        }
+-
+         flags = 0;
+         if (request.flags & NBD_CMD_FLAG_FUA) {
+             flags |= BDRV_REQ_FUA;
+@@ -1500,12 +1494,6 @@ static coroutine_fn void nbd_trip(void *opaque)
+
+         break;
+     case NBD_CMD_WRITE_ZEROES:
+-        if (exp->nbdflags & NBD_FLAG_READ_ONLY) {
+-            error_setg(&local_err, "Export is read-only");
+-            ret = -EROFS;
+-            break;
+-        }
+-
+         flags = 0;
+         if (request.flags & NBD_CMD_FLAG_FUA) {
+             flags |= BDRV_REQ_FUA;
+-- 
+2.13.6
