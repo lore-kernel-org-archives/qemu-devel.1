@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59525)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59726)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1eF4Jf-0001BO-VQ
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 15:29:49 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eF4K5-0001Uh-3k
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 15:30:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1eF4Je-0008Ot-NJ
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 15:29:47 -0500
-Date: Wed, 15 Nov 2017 20:29:38 +0000
-From: "Richard W.M. Jones" <rjones@redhat.com>
-Message-ID: <20171115202938.GN2787@redhat.com>
-References: <CAJH6TXiMxUoU2sFEHAoZ8jhDMtg_saEnTHM9f0vJ6Nhqj7099w@mail.gmail.com>
-	<c2ecae32-f999-9f1e-46a6-37cdab2a62e3@redhat.com>
-	<CAJH6TXhBAaBE9gBSxksWZqNywWmencRaGyeY-oN3jbKdgUettQ@mail.gmail.com>
-	<0e6cc220-814a-17fd-4fd7-7b0665d34e81@redhat.com>
-	<CAJH6TXh2v-F=yqxQbUUawk_Ctq-sgFefGp1XvMsC=syX_5jEqA@mail.gmail.com>
-	<30b54865-2255-d13d-a054-afcf5bbd06b2@redhat.com>
-	<20171115202440.GJ19514@redhat.com>
-	<7b11bb2b-b93d-e8ff-f396-703c93549d0d@redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1eF4K4-0000Kk-2L
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 15:30:13 -0500
+References: <20171114184127.24238-1-mreitz@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <1423c6ac-8320-d797-6dc0-ac111486911d@redhat.com>
+Date: Wed, 15 Nov 2017 21:30:03 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7b11bb2b-b93d-e8ff-f396-703c93549d0d@redhat.com>
-Subject: Re: [Qemu-devel] [Libguestfs]  [qemu-img] support for XVA
+In-Reply-To: <20171114184127.24238-1-mreitz@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="SjR6mWRsums8edGwwewVWJamD5dxv74mx"
+Subject: Re: [Qemu-devel] [PATCH for-2.11] qcow2: Fix overly broad madvise()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,43 +23,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: Gandalf Corvotempesta <gandalf.corvotempesta@gmail.com>, Qemu-block <qemu-block@nongnu.org>, qemu-devel@nongnu.org, libguestfs <libguestfs@redhat.com>
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>
 
-On Wed, Nov 15, 2017 at 09:27:14PM +0100, Max Reitz wrote:
-> On 2017-11-15 21:24, Richard W.M. Jones wrote:
-> > On Wed, Nov 15, 2017 at 09:07:12PM +0100, Max Reitz wrote:
-> >> On 2017-11-15 21:06, Gandalf Corvotempesta wrote:
-> >>> 2017-11-15 20:59 GMT+01:00 Max Reitz <mreitz@redhat.com>:
-> >>>> Well, you can't just add support to qemu-img alone either.  Every image
-> >>>> format supported by qemu-img is one supported by qemu as a whole and
-> >>>> thus needs a proper block driver that needs to support random accesses
-> >>>> as well.
-> >>>
-> >>> I was talking about qemu-img convert, just to convert an XVA image to
-> >>> something different, in a single pass, without having to extract the
-> >>> tar.
-> >>
-> >> I know, but that doesn't work.  qemu-img convert uses the normal
-> >> general-purpose block drivers for that.
-> > 
-> > In any case there's no need as qemu/qemu-img can already access files
-> > inside an uncompressed tarball using the offset/size support added to
-> > the raw driver exactly for this purpose:
-> > 
-> > https://lists.gnu.org/archive/html/qemu-devel/2016-10/msg03945.html
-> 
-> If that works, yes.  To me it doesn't look like XVA is just a single raw
-> image inside of a tarball, but I may very well be wrong, of course.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--SjR6mWRsums8edGwwewVWJamD5dxv74mx
+From: Max Reitz <mreitz@redhat.com>
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ Alberto Garcia <berto@igalia.com>
+Message-ID: <1423c6ac-8320-d797-6dc0-ac111486911d@redhat.com>
+Subject: Re: [PATCH for-2.11] qcow2: Fix overly broad madvise()
+References: <20171114184127.24238-1-mreitz@redhat.com>
+In-Reply-To: <20171114184127.24238-1-mreitz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Gandalf, is there an XVA file publically available (pref. not
-too big) that we can look at?
+On 2017-11-14 19:41, Max Reitz wrote:
+> @mem_size and @offset are both size_t, thus subtracting them from one
+> another will just return a big size_t if mem_size < offset -- even more=
 
-Rich.
+> obvious here because the result is stored in another size_t.
+>=20
+> Checking that result to be positive is therefore not sufficient to
+> excluse the case that offset > mem_size.  Thus, we currently sometimes
+> issue an madvise() over a very large address range.
+>=20
+> This is triggered by iotest 163, but with -m64, this does not result in=
 
--- 
-Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
-Read my programming and virtualization blog: http://rwmj.wordpress.com
-Fedora Windows cross-compiler. Compile Windows programs, test, and
-build Windows installers. Over 100 libraries supported.
-http://fedoraproject.org/wiki/MinGW
+> tangible problems.  But with -m32, this test produces three segfaults,
+> all of which are fixed by this patch.
+>=20
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+>  block/qcow2-cache.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+
+Fixed the typo and applied to my block branch:
+
+https://github.com/XanClic/qemu/commits/block
+
+Max
+
+
+--SjR6mWRsums8edGwwewVWJamD5dxv74mx
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAloMo8sSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9ALyUH/RiDs/sillk8S9cjwaJ0szWB7m8ouDj8
+jU3Ud1e2969HprlPy8Im7+2NlUkhJvmcqg9Zpx75fpqJdo9HG6x+Z7MWYmL7M0lK
+eyOkd7zZ33c/wfrPSrLMGLniUtt318bA6BftOAWzeSWdtNFFrTJsQ7KlwJZRDW5C
+vOhpnwwhWgXClbm3Wa8LbVbaWwUM+TVrBel1hrJ/0ZlevH3pkDt6VRD15p/Y6hf3
+GovRoPH0YwqAGxo6nHD9ZgpVgsO5NPaA4tYKzkTgiNKGvAOm2KKc8JCD2RyPDdRH
+IifItcEngYqEz/Li4v261dbZscLPW8xASN3tJYmECVZVeezuohXx35M=
+=aSaA
+-----END PGP SIGNATURE-----
+
+--SjR6mWRsums8edGwwewVWJamD5dxv74mx--
