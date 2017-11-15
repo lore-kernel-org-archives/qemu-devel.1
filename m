@@ -1,12 +1,10 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35490)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35700)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gandalf.corvotempesta@gmail.com>) id 1eF5ZX-0006A4-KM
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 16:50:17 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eF5a1-0006R4-Pj
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 16:50:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gandalf.corvotempesta@gmail.com>) id 1eF5ZW-0004dz-1e
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 16:50:15 -0500
-MIME-Version: 1.0
-In-Reply-To: <CAJH6TXgrOWxP7jFg98_jv-R1nrFKOXBQA6pPxbkzGWTVW=EReA@mail.gmail.com>
+	(envelope-from <mreitz@redhat.com>) id 1eF5Zy-0005R0-Mp
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 16:50:45 -0500
 References: <CAJH6TXiMxUoU2sFEHAoZ8jhDMtg_saEnTHM9f0vJ6Nhqj7099w@mail.gmail.com>
 	<c2ecae32-f999-9f1e-46a6-37cdab2a62e3@redhat.com>
 	<CAJH6TXhBAaBE9gBSxksWZqNywWmencRaGyeY-oN3jbKdgUettQ@mail.gmail.com>
@@ -19,10 +17,15 @@ References: <CAJH6TXiMxUoU2sFEHAoZ8jhDMtg_saEnTHM9f0vJ6Nhqj7099w@mail.gmail.com>
 	<CAJH6TXiPuLu62-+o2+PrUGpstrks_5pLotFEe1bAOmsbn20otw@mail.gmail.com>
 	<5b6f8758-5e3e-e759-1592-2768eb85b322@redhat.com>
 	<CAJH6TXgrOWxP7jFg98_jv-R1nrFKOXBQA6pPxbkzGWTVW=EReA@mail.gmail.com>
-From: Gandalf Corvotempesta <gandalf.corvotempesta@gmail.com>
-Date: Wed, 15 Nov 2017 22:50:08 +0100
-Message-ID: <CAJH6TXg7eCiqH+3Wq=-QEH3xFhJJekTXm+c1F5w7BebiQGni8A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+	<CAJH6TXg7eCiqH+3Wq=-QEH3xFhJJekTXm+c1F5w7BebiQGni8A@mail.gmail.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <93cde1c0-1255-4cf8-bb38-4e88369c6dd0@redhat.com>
+Date: Wed, 15 Nov 2017 22:50:32 +0100
+MIME-Version: 1.0
+In-Reply-To: <CAJH6TXg7eCiqH+3Wq=-QEH3xFhJJekTXm+c1F5w7BebiQGni8A@mail.gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="2i6eNg1w3Q8Rh1TATrL9Mii0Av9VONngo"
 Subject: Re: [Qemu-devel] [Libguestfs]  [qemu-img] support for XVA
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -32,95 +35,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
+To: Gandalf Corvotempesta <gandalf.corvotempesta@gmail.com>
 Cc: "Richard W.M. Jones" <rjones@redhat.com>, Qemu-block <qemu-block@nongnu.org>, qemu-devel@nongnu.org, libguestfs <libguestfs@redhat.com>
 
-https://stacklet.com/downloads/XenServer-XVA-Template-Debian-7.8-Lightweight-x86
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--2i6eNg1w3Q8Rh1TATrL9Mii0Av9VONngo
+From: Max Reitz <mreitz@redhat.com>
+To: Gandalf Corvotempesta <gandalf.corvotempesta@gmail.com>
+Cc: "Richard W.M. Jones" <rjones@redhat.com>,
+ Qemu-block <qemu-block@nongnu.org>, qemu-devel@nongnu.org,
+ libguestfs <libguestfs@redhat.com>
+Message-ID: <93cde1c0-1255-4cf8-bb38-4e88369c6dd0@redhat.com>
+Subject: Re: [Libguestfs] [Qemu-devel] [qemu-img] support for XVA
+References: <CAJH6TXiMxUoU2sFEHAoZ8jhDMtg_saEnTHM9f0vJ6Nhqj7099w@mail.gmail.com>
+ <c2ecae32-f999-9f1e-46a6-37cdab2a62e3@redhat.com>
+ <CAJH6TXhBAaBE9gBSxksWZqNywWmencRaGyeY-oN3jbKdgUettQ@mail.gmail.com>
+ <0e6cc220-814a-17fd-4fd7-7b0665d34e81@redhat.com>
+ <CAJH6TXh2v-F=yqxQbUUawk_Ctq-sgFefGp1XvMsC=syX_5jEqA@mail.gmail.com>
+ <30b54865-2255-d13d-a054-afcf5bbd06b2@redhat.com>
+ <20171115202440.GJ19514@redhat.com>
+ <7b11bb2b-b93d-e8ff-f396-703c93549d0d@redhat.com>
+ <20171115202938.GN2787@redhat.com>
+ <CAJH6TXiPuLu62-+o2+PrUGpstrks_5pLotFEe1bAOmsbn20otw@mail.gmail.com>
+ <5b6f8758-5e3e-e759-1592-2768eb85b322@redhat.com>
+ <CAJH6TXgrOWxP7jFg98_jv-R1nrFKOXBQA6pPxbkzGWTVW=EReA@mail.gmail.com>
+ <CAJH6TXg7eCiqH+3Wq=-QEH3xFhJJekTXm+c1F5w7BebiQGni8A@mail.gmail.com>
+In-Reply-To: <CAJH6TXg7eCiqH+3Wq=-QEH3xFhJJekTXm+c1F5w7BebiQGni8A@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Some XVAs
+On 2017-11-15 22:50, Gandalf Corvotempesta wrote:
+> https://stacklet.com/downloads/XenServer-XVA-Template-Debian-7.8-Lightw=
+eight-x86
+>=20
+> Some XVAs
 
-Il 15 nov 2017 10:42 PM, "Gandalf Corvotempesta" <
-gandalf.corvotempesta@gmail.com> ha scritto:
+Thanks!
 
-> I'm thinking on how to prove you a sample XVA
-> I have to create (and populate) a VM because an empty image will result in
-> an empty XVA
-> And a VM is 300-400Mb as minimum
->
-> Il 15 nov 2017 10:30 PM, "Max Reitz" <mreitz@redhat.com> ha scritto:
->
->> On 2017-11-15 21:41, Gandalf Corvotempesta wrote:
->> > 2017-11-15 21:29 GMT+01:00 Richard W.M. Jones <rjones@redhat.com>:
->> >> Gandalf, is there an XVA file publically available (pref. not
->> >> too big) that we can look at?
->> >
->> > I can try to provide one, but it's simple:
->> >
->> > # tar tvf 20160630_124823_aa72_.xva.gz | head -n 50
->> > ---------- 0/0           42353 1970-01-01 01:00 ova.xml
->> > ---------- 0/0         1048576 1970-01-01 01:00 Ref:175/00000000
->> > ---------- 0/0              40 1970-01-01 01:00
->> Ref:175/00000000.checksum
->> > ---------- 0/0         1048576 1970-01-01 01:00 Ref:175/00000001
->> > ---------- 0/0              40 1970-01-01 01:00
->> Ref:175/00000001.checksum
->> > ---------- 0/0         1048576 1970-01-01 01:00 Ref:175/00000003
->> > ---------- 0/0              40 1970-01-01 01:00
->> Ref:175/00000003.checksum
->> > ---------- 0/0         1048576 1970-01-01 01:00 Ref:175/00000004
->> > ---------- 0/0              40 1970-01-01 01:00
->> Ref:175/00000004.checksum
->> > ---------- 0/0         1048576 1970-01-01 01:00 Ref:175/00000005
->> > ---------- 0/0              40 1970-01-01 01:00
->> Ref:175/00000005.checksum
->> > ---------- 0/0         1048576 1970-01-01 01:00 Ref:175/00000006
->> > ---------- 0/0              40 1970-01-01 01:00
->> Ref:175/00000006.checksum
->> > ---------- 0/0         1048576 1970-01-01 01:00 Ref:175/00000007
->> > ---------- 0/0              40 1970-01-01 01:00
->> Ref:175/00000007.checksum
->> > ---------- 0/0         1048576 1970-01-01 01:00 Ref:175/00000009
->> > ---------- 0/0              40 1970-01-01 01:00
->> Ref:175/00000009.checksum
->> > ---------- 0/0         1048576 1970-01-01 01:00 Ref:175/00000010
->> > ---------- 0/0              40 1970-01-01 01:00
->> Ref:175/00000010.checksum
->> >
->> >
->> > You can ignore the ova.xml and just use the "Ref:175" directory.
->> > Inside the XVA you'll fine one "Ref" directory for each virtual disk
->> > (ref number is different for each disk)
->> > Inside each Ref directory, you'll get tons of 1MB file, corrisponding
->> > to the RAW image.
->> > You have to merge these files in a single raw file with just an
->> > exception: numbers are not sequential.
->> > as you can see above, we have: 00000000, 00000001, 00000003
->> >
->> > The 00000002 is missing, because it's totally blank. XenServer doesn't
->> > export any empty block, thus it will skip the corrisponding 1MB file.
->> > When building the raw image, you have to replace empty blocks with 1MB
->> > full of zeros.
->> >
->> > This is (in addition to the tar extract) the most time-consuming part.
->> > Currently I'm rebuilding a 250GB image, with tons of files to be
->> > merge.
->> > If qemu-img can be patched to automatically convert this kind of
->> > format, I can save about 3 hours (30 minutes for extracting the
->> > tarball, and about 2 hours to merge 250-300GB image)
->>
->> Hmmm...  OK, so as Rich said, you can use the raw driver with an offset
->> and a size.  And you can use the null-co driver to emulate holes.  And
->> qemu-img convert supports concatenation.
->>
->> Taking all of that together, it should be possible to create an input
->> "file" per 1 MB block and concatenate all of those with qemu-img
->> convert.  The only issue is that it'll get you a *really* long command
->> line.
->>
->> (And you'll still have to gunzip the archive before, of course.)
->>
->> I'll try to write a script, but of course it's hart without an example...
->>
->> Max
->>
->>
+
+--2i6eNg1w3Q8Rh1TATrL9Mii0Av9VONngo
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFFBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAloMtqgSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9A8MIH9RqsS2cK4OVdTQchufXflixM6+N/nuSO
+p/Rgap9ifqvmD9iz4OQaqxcsy+fOa/UFN8eCOF+lTB03p6xxjfwSK9eCdSVbn53+
+6PmUhdkdmtcdZG/jYxkOtx3uKPJgx8/j+niq12kSrGgs5WTSfZlW8hcFawULlfOO
+MnuAnDZChiPbAe0dzmes7twARKMxf/RME2cid81hYsqi66H4tjBCy1NLLvk+f3SB
+KsrkbPps/QjmQTu62P/Rg4S2G65AX+Uzzy3T0F+Q/DsUhxgmb9Zm1a4jbqYqfDSX
+9amQt+9RxXHVBwc3pj5M5K10/qs6L52NVxaW+iyUXNJZ4DO/3OUbEw==
+=qDP+
+-----END PGP SIGNATURE-----
+
+--2i6eNg1w3Q8Rh1TATrL9Mii0Av9VONngo--
