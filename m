@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43635)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48388)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eEsTc-0007kn-Ml
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 02:51:17 -0500
+	(envelope-from <clg@kaod.org>) id 1eEsto-0002Hu-Pk
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 03:18:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eEsTW-0006T4-Se
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 02:51:16 -0500
-Received: from indium.canonical.com ([91.189.90.7]:47040)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eEsTW-0006Qr-M7
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 02:51:10 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eEsTU-00019k-MA
-	for <qemu-devel@nongnu.org>; Wed, 15 Nov 2017 07:51:08 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id DBA9C2E81C5
-	for <qemu-devel@nongnu.org>; Wed, 15 Nov 2017 07:51:02 +0000 (UTC)
+	(envelope-from <clg@kaod.org>) id 1eEstj-0006UW-QM
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 03:18:20 -0500
+Received: from 2.mo173.mail-out.ovh.net ([178.33.251.49]:41321)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1eEstj-0006Ts-Hb
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 03:18:15 -0500
+Received: from player739.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo173.mail-out.ovh.net (Postfix) with ESMTP id 11B8286863
+	for <qemu-devel@nongnu.org>; Wed, 15 Nov 2017 09:18:13 +0100 (CET)
+References: <20171114122018.12204-1-joel@jms.id.au>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <27983ce7-8de1-620f-ca06-ee4f92dab180@kaod.org>
+Date: Wed, 15 Nov 2017 09:18:05 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20171114122018.12204-1-joel@jms.id.au>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 15 Nov 2017 07:43:27 -0000
-From: Gerd Hoffmann <1713825@bugs.launchpad.net>
-Reply-To: Bug 1713825 <1713825@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150404140220.18876.2468100840644103776.malonedeb@chaenomeles.canonical.com>
-Message-Id: <151073180765.28214.15994444719235835127.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1713825] Re: Booting Windows 2016 with qxl video
- crashes qemu
+Subject: Re: [Qemu-devel] [PATCH v3] hw/arm/aspeed: Unlock SCU when running
+ kernel
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,120 +31,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Joel Stanley <joel@jms.id.au>, Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, Andrew Jeffery <andrew@aj.id.au>
 
-Guest triggerable assert() isn't exactly nice indeed.
-But it's not a show stopper.
-It doesn't allow exploiting the host, the guest can only DoS itself.
-And you must be priviledged in the guest to do so.
+On 11/14/2017 01:20 PM, Joel Stanley wrote:
+> The ASPEED hardware contains a lock register for the SCU that disables
+> any writes to the SCU when it is locked. The machine comes up with the
+> lock enabled, but on all known hardware u-boot will unlock it and leave
+> it unlocked when loading the kernel.
+>=20
+> This means the kernel expects the SCU to be unlocked. When booting from
+> an emulated ROM the normal u-boot unlock path is executed. Things don't
+> go well when booting using the -kernel command line, as u-boot does not
+> run first.
+>=20
+> Change behaviour so that when a kernel is passed to the machine, set th=
+e
+> reset value of the SCU to be unlocked.
+>=20
+> Signed-off-by: Joel Stanley <joel@jms.id.au>
 
-Most likely this is the driver placing the qxl commands in the wrong pci
-bar.  See commit 86dbcdd9c7590d06db89ca256c5eaf0b4aba8858.  Seems the
-impact is more than breaking live migration.  So, I can raise a error
-irq and have qxl enter guest bug mode.  That doesn't improve the
-situation much though, the guest will continue running but you will have
-broken display ...
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
 
--- =
+Thanks,
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1713825
+C.
 
-Title:
-  Booting Windows 2016 with qxl video crashes qemu
 
-Status in QEMU:
-  New
-
-Bug description:
-  launched from libvirt.
-
-  qemu version: 2.9.0
-  host: Linux <hostname> 4.9.34-gentoo #1 SMP Sat Jul 29 13:28:43 PDT 2017 =
-x86_64 Intel(R) Core(TM) i7-3930K CPU @ 3.20GHz GenuineIntel GNU/Linux
-  guest: Windows 2016 64 bit
-
-  Thread 28 (Thread 0x7f0e2edff700 (LWP 29860)):
-  #0  __GI_raise (sig=3Dsig@entry=3D6) at ../sysdeps/unix/sysv/linux/raise.=
-c:51
-          set =3D {__val =3D {18446744067266837079, 139698892694944, 139699=
-853745096, 139700858749789, 4222451712, 139694281220640, 139694281220741, 1=
-39694281220640, 139694281220640, 139694281220810, =
-
-              139694281220940, 139694281220640, 139694281220940, 0, 0, 0}}
-          pid =3D <optimized out>
-          tid =3D <optimized out>
-  #1  0x00007f0ea40b644a in __GI_abort () at abort.c:89
-          save_stage =3D 2
-          act =3D {__sigaction_handler =3D {sa_handler =3D 0x7f0e2edfe5c0, =
-sa_sigaction =3D 0x7f0e2edfe5c0}, sa_mask =3D {__val =3D {139694281219872, =
-139698106269697, 139698892695344, 4, 2676511744, 0, 139698892695144, 0, =
-
-                139698892694912, 1, 4737316546111099904, 139700859888720, 4=
-737316546111099904, 139700862161824, 139700911349760, 94211934977482}}, sa_=
-flags =3D 416, =
-
-            sa_restorer =3D 0x55af6ceb0500 <__PRETTY_FUNCTION__.36381>}
-          sigs =3D {__val =3D {32, 0 <repeats 15 times>}}
-  #2  0x00007f0ea40abab6 in __assert_fail_base (fmt=3D<optimized out>, asse=
-rtion=3Dassertion@entry=3D0x55af6ceafdca "offset < qxl->vga.vram_size", =
-
-      file=3Dfile@entry=3D0x55af6ceaeaa0 "/var/tmp/portage/app-emulation/qe=
-mu-2.9.0-r2/work/qemu-2.9.0/hw/display/qxl.c", line=3Dline@entry=3D416, =
-
-      function=3Dfunction@entry=3D0x55af6ceb0500 <__PRETTY_FUNCTION__.36381=
-> "qxl_ram_set_dirty") at assert.c:92
-          str =3D 0x7f0d1c026220 "\340r\002\034\r\177"
-          total =3D 4096
-  #3  0x00007f0ea40abb81 in __GI___assert_fail (assertion=3Dassertion@entry=
-=3D0x55af6ceafdca "offset < qxl->vga.vram_size", =
-
-      file=3Dfile@entry=3D0x55af6ceaeaa0 "/var/tmp/portage/app-emulation/qe=
-mu-2.9.0-r2/work/qemu-2.9.0/hw/display/qxl.c", line=3Dline@entry=3D416, =
-
-      function=3Dfunction@entry=3D0x55af6ceb0500 <__PRETTY_FUNCTION__.36381=
-> "qxl_ram_set_dirty") at assert.c:101
-  No locals.
-  #4  0x000055af6cc58805 in qxl_ram_set_dirty (qxl=3D<optimized out>, ptr=
-=3D<optimized out>) at /var/tmp/portage/app-emulation/qemu-2.9.0-r2/work/qe=
-mu-2.9.0/hw/display/qxl.c:416
-          base =3D <optimized out>
-          offset =3D <optimized out>
-          qxl =3D <optimized out>
-          ptr =3D <optimized out>
-          base =3D <optimized out>
-          offset =3D <optimized out>
-  #5  0x000055af6cc5b9e2 in interface_release_resource (sin=3D0x55af71a91ed=
-0, ext=3D...) at /var/tmp/portage/app-emulation/qemu-2.9.0-r2/work/qemu-2.9=
-.0/hw/display/qxl.c:767
-          qxl =3D 0x55af71a91450
-          ring =3D <optimized out>
-          item =3D <optimized out>
-          id =3D 18446690739814400920
-          __func__ =3D "interface_release_resource"
-  #6  0x00007f0ea510afa8 in red_drawable_unref (red_drawable=3D0x7f0d1c0261=
-20) at red-worker.c:101
-  No locals.
-  #7  0x00007f0ea510b609 in red_drawable_unref (red_drawable=3D<optimized o=
-ut>) at red-worker.c:104
-  No locals.
-  #8  0x00007f0ea510eae9 in drawable_unref (drawable=3Ddrawable@entry=3D0x7=
-f0e68285ac0) at display-channel.c:1438
-          display =3D 0x55af71dbd3c0
-          __FUNCTION__ =3D "drawable_unref"
-  #9  0x00007f0ea51109f7 in draw_until (display=3Ddisplay@entry=3D0x55af71d=
-bd3c0, surface=3Dsurface@entry=3D0x7f0e6828aae8, last=3D0x7f0e68285ac0) at =
-display-channel.c:1637
-          container =3D 0x0
-          now =3D 0x7f0e68285ac0
-  #10 0x00007f0ea510f93f in display_channel_draw (display=3D0x55af71dbd3c0,=
- area=3D0x7f0e2edfe8e0, surface_id=3D<optimized out>) at display-channel.c:=
-1729
-          surface =3D 0x7f0e6828aae8
-          last =3D <optimized out>
-          __FUNCTION__ =3D "display_channel_draw"
-          __func__ =3D "display_channel_draw"
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1713825/+subscriptions
+> ---
+> v3:
+>  - remove unused member from AspeedBoardConfig
+> v2:
+>  - use the correct value for the key
+>  - rename it ASPEED_SCU_PROT_KEY
+> ---
+>  hw/arm/aspeed.c              | 9 +++++++++
+>  hw/arm/aspeed_soc.c          | 2 ++
+>  hw/misc/aspeed_scu.c         | 5 +++--
+>  include/hw/misc/aspeed_scu.h | 3 +++
+>  4 files changed, 17 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
+> index ab895ad490af..7088c907bd23 100644
+> --- a/hw/arm/aspeed.c
+> +++ b/hw/arm/aspeed.c
+> @@ -186,6 +186,15 @@ static void aspeed_board_init(MachineState *machin=
+e,
+>                              &error_abort);
+>      object_property_set_int(OBJECT(&bmc->soc), cfg->num_cs, "num-cs",
+>                              &error_abort);
+> +    if (machine->kernel_filename) {
+> +        /*
+> +         * When booting with a -kernel command line there is no u-boot
+> +         * that runs to unlock the SCU. In this case set the default t=
+o
+> +         * be unlocked as the kernel expects
+> +         */
+> +        object_property_set_int(OBJECT(&bmc->soc), ASPEED_SCU_PROT_KEY=
+,
+> +                                "hw-prot-key", &error_abort);
+> +    }
+>      object_property_set_bool(OBJECT(&bmc->soc), true, "realized",
+>                               &error_abort);
+> =20
+> diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
+> index 5aa3d2ddd9cd..c83b7e207b86 100644
+> --- a/hw/arm/aspeed_soc.c
+> +++ b/hw/arm/aspeed_soc.c
+> @@ -154,6 +154,8 @@ static void aspeed_soc_init(Object *obj)
+>                                "hw-strap1", &error_abort);
+>      object_property_add_alias(obj, "hw-strap2", OBJECT(&s->scu),
+>                                "hw-strap2", &error_abort);
+> +    object_property_add_alias(obj, "hw-prot-key", OBJECT(&s->scu),
+> +                              "hw-prot-key", &error_abort);
+> =20
+>      object_initialize(&s->fmc, sizeof(s->fmc), sc->info->fmc_typename)=
+;
+>      object_property_add_child(obj, "fmc", OBJECT(&s->fmc), NULL);
+> diff --git a/hw/misc/aspeed_scu.c b/hw/misc/aspeed_scu.c
+> index 95022d3607ad..74537ce9755d 100644
+> --- a/hw/misc/aspeed_scu.c
+> +++ b/hw/misc/aspeed_scu.c
+> @@ -85,7 +85,6 @@
+>  #define BMC_REV              TO_REG(0x19C)
+>  #define BMC_DEV_ID           TO_REG(0x1A4)
+> =20
+> -#define PROT_KEY_UNLOCK 0x1688A8A8
+>  #define SCU_IO_REGION_SIZE 0x1000
+> =20
+>  static const uint32_t ast2400_a0_resets[ASPEED_SCU_NR_REGS] =3D {
+> @@ -192,7 +191,7 @@ static void aspeed_scu_write(void *opaque, hwaddr o=
+ffset, uint64_t data,
+>      }
+> =20
+>      if (reg > PROT_KEY && reg < CPU2_BASE_SEG1 &&
+> -            s->regs[PROT_KEY] !=3D PROT_KEY_UNLOCK) {
+> +            s->regs[PROT_KEY] !=3D ASPEED_SCU_PROT_KEY) {
+>          qemu_log_mask(LOG_GUEST_ERROR, "%s: SCU is locked!\n", __func_=
+_);
+>          return;
+>      }
+> @@ -246,6 +245,7 @@ static void aspeed_scu_reset(DeviceState *dev)
+>      s->regs[SILICON_REV] =3D s->silicon_rev;
+>      s->regs[HW_STRAP1] =3D s->hw_strap1;
+>      s->regs[HW_STRAP2] =3D s->hw_strap2;
+> +    s->regs[PROT_KEY] =3D s->hw_prot_key;
+>  }
+> =20
+>  static uint32_t aspeed_silicon_revs[] =3D {
+> @@ -299,6 +299,7 @@ static Property aspeed_scu_properties[] =3D {
+>      DEFINE_PROP_UINT32("silicon-rev", AspeedSCUState, silicon_rev, 0),
+>      DEFINE_PROP_UINT32("hw-strap1", AspeedSCUState, hw_strap1, 0),
+>      DEFINE_PROP_UINT32("hw-strap2", AspeedSCUState, hw_strap2, 0),
+> +    DEFINE_PROP_UINT32("hw-prot-key", AspeedSCUState, hw_prot_key, 0),
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+> =20
+> diff --git a/include/hw/misc/aspeed_scu.h b/include/hw/misc/aspeed_scu.=
+h
+> index bd4ac013f997..d70cc0aeca61 100644
+> --- a/include/hw/misc/aspeed_scu.h
+> +++ b/include/hw/misc/aspeed_scu.h
+> @@ -29,6 +29,7 @@ typedef struct AspeedSCUState {
+>      uint32_t silicon_rev;
+>      uint32_t hw_strap1;
+>      uint32_t hw_strap2;
+> +    uint32_t hw_prot_key;
+>  } AspeedSCUState;
+> =20
+>  #define AST2400_A0_SILICON_REV   0x02000303U
+> @@ -38,6 +39,8 @@ typedef struct AspeedSCUState {
+> =20
+>  extern bool is_supported_silicon_rev(uint32_t silicon_rev);
+> =20
+> +#define ASPEED_SCU_PROT_KEY      0x1688A8A8
+> +
+>  /*
+>   * Extracted from Aspeed SDK v00.03.21. Fixes and extra definitions
+>   * were added.
+>=20
