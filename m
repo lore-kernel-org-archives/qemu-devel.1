@@ -1,28 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34713)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36099)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lu.zhipeng@zte.com.cn>) id 1eEnkw-0002oj-Ji
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 21:48:53 -0500
+	(envelope-from <yi.l.liu@linux.intel.com>) id 1eEnoy-0003kS-0Z
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 21:53:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lu.zhipeng@zte.com.cn>) id 1eEnkt-000609-7u
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 21:48:50 -0500
-Received: from out1.zte.com.cn ([202.103.147.172]:39610 helo=mxct.zte.com.cn)
+	(envelope-from <yi.l.liu@linux.intel.com>) id 1eEnou-0002RB-4G
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 21:53:00 -0500
+Received: from mga11.intel.com ([192.55.52.93]:44081)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lu.zhipeng@zte.com.cn>)
-	id 1eEnkr-0005p4-6V
-	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 21:48:47 -0500
-Date: Wed, 15 Nov 2017 10:48:26 +0800 (CST)
-Message-ID: <201711151048265294713@zte.com.cn>
-In-Reply-To: <151071256607.31225.5018010191377806299@sif>
-References: 1509720860-10065-1-git-send-email-lu.zhipeng@zte.com.cn,
-	201711150941584900906@zte.com.cn,
-	151071256607.31225.5018010191377806299@sif
-Mime-Version: 1.0
-From: <lu.zhipeng@zte.com.cn>
-Content-Type: multipart/related;
-	boundary="=====_002_next====="
-Subject: [Qemu-devel] =?utf-8?b?562U5aSNOiBSZTog562U5aSNOiBSZTog562U5aSN?=
- =?utf-8?b?OiBSZTog562U5aSNOiBSZTogW1BBVENIIHYyXSBxZ2E6IHJlcGxhY2UgR2V0?=
- =?utf-8?q?IfEntry?=
+	(Exim 4.71) (envelope-from <yi.l.liu@linux.intel.com>)
+	id 1eEnot-0002MQ-JP
+	for qemu-devel@nongnu.org; Tue, 14 Nov 2017 21:52:56 -0500
+Date: Wed, 15 Nov 2017 10:36:19 +0800
+From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
+Message-ID: <20171115023619.GA4402@sky-dev>
+References: <1509710516-21084-1-git-send-email-yi.l.liu@linux.intel.com>
+	<1509710516-21084-3-git-send-email-yi.l.liu@linux.intel.com>
+	<20171113055601.GE1014@umbus.fritz.box>
+	<20171113095847.GA9527@sky-dev>
+	<ac8ab4be-802e-09ca-b31c-78cf3399aad9@redhat.com>
+	<20171114135904.GA3895@sky-dev>
+	<cce959ac-939c-3b34-6aeb-33e6be353066@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <cce959ac-939c-3b34-6aeb-33e6be353066@redhat.com>
+Subject: Re: [Qemu-devel] [RESEND PATCH 2/6] memory: introduce
+ AddressSpaceOps and IOMMUObject
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,448 +35,609 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mdroth@linux.vnet.ibm.com
-Cc: qemu-devel@nongnu.org
+To: Auger Eric <eric.auger@redhat.com>
+Cc: tianyu.lan@intel.com, kevin.tian@intel.com, yi.l.liu@intel.com, mst@redhat.com, jasowang@redhat.com, qemu-devel@nongnu.org, peterx@redhat.com, alex.williamson@redhat.com, pbonzini@redhat.com, David Gibson <david@gibson.dropbear.id.au>
 
+Hi Eric,
 
+On Tue, Nov 14, 2017 at 10:52:54PM +0100, Auger Eric wrote:
+> Hi Yi L,
+> 
+> On 14/11/2017 14:59, Liu, Yi L wrote:
+> > On Tue, Nov 14, 2017 at 09:53:07AM +0100, Auger Eric wrote:
+> > Hi Eric,
+> > 
+> >> Hi Yi L,
+> >>
+> >> On 13/11/2017 10:58, Liu, Yi L wrote:
+> >>> On Mon, Nov 13, 2017 at 04:56:01PM +1100, David Gibson wrote:
+> >>>> On Fri, Nov 03, 2017 at 08:01:52PM +0800, Liu, Yi L wrote:
+> >>>>> From: Peter Xu <peterx@redhat.com>
+> >>>>>
+> >>>>> AddressSpaceOps is similar to MemoryRegionOps, it's just for address
+> >>>>> spaces to store arch-specific hooks.
+> >>>>>
+> >>>>> The first hook I would like to introduce is iommu_get(). Return an
+> >>>>> IOMMUObject behind the AddressSpace.
+> >>>>>
+> >>>>> For systems that have IOMMUs, we will create a special address
+> >>>>> space per device which is different from system default address
+> >>>>> space for it (please refer to pci_device_iommu_address_space()).
+> >>>>> Normally when that happens, there will be one specific IOMMU (or
+> >>>>> say, translation unit) stands right behind that new address space.
+> >>>>>
+> >>>>> This iommu_get() fetches that guy behind the address space. Here,
+> >>>>> the guy is defined as IOMMUObject, which includes a notifier_list
+> >>>>> so far, may extend in future. Along with IOMMUObject, a new iommu
+> >>>>> notifier mechanism is introduced. It would be used for virt-svm.
+> >>>>> Also IOMMUObject can further have a IOMMUObjectOps which is similar
+> >>>>> to MemoryRegionOps. The difference is IOMMUObjectOps is not relied
+> >>>>> on MemoryRegion.
+> >>>>>
+> >>>>> Signed-off-by: Peter Xu <peterx@redhat.com>
+> >>>>> Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
+> >>>>
+> >>>> Hi, sorry I didn't reply to the earlier postings of this after our
+> >>>> discussion in China.  I've been sick several times and very busy.
+> >>>
+> >>> Hi David,
+> >>>
+> >>> Fully understood. I'll try my best to address your question. Also,
+> >>> feel free to input further questions, anyhow, the more we discuss the
+> >>> better work we done.
+> >>>
+> >>>> I still don't feel like there's an adequate explanation of exactly
+> >>>> what an IOMMUObject represents.   Obviously it can represent more than
+> >>>
+> >>> IOMMUObject is aimed to represent the iommu itself. e.g. the iommu
+> >>> specific operations. One of the key purpose of IOMMUObject is to
+> >>> introduce a notifier framework to let iommu emulator to be able to
+> >>> do iommu operations other than MAP/UNMAP. As IOMMU grows more and
+> >>> more feature, MAP/UNMAP is not the only operation iommu emulator needs
+> >>> to deal. e.g. shared virtual memory. So far, as I know AMD/ARM also
+> >>> has it. may correct me on it. As my cover letter mentioned, MR based
+> >>> notifier framework doesn’t work for the newly added IOMMU operations.
+> >>> Like bind guest pasid table pointer to host and propagate guest's
+> >>> iotlb flush to host.
+> >>>
+> >>>> a single translation window - since that's represented by the
+> >>>> IOMMUMR.  But what exactly do all the MRs - or whatever else - that
+> >>>> are represented by the IOMMUObject have in common, from a functional
+> >>>> point of view.
+> >>>
+> >>> Let me take virt-SVM as an example. As far as I know, for virt-SVM,
+> >>> the implementation of different vendors are similar. The key design
+> >>> is to have a nested translation(aka. two stage translation). It is to
+> >>> have guest maintain gVA->gPA mapping and hypervisor builds gPA->hPA
+> >>> mapping. Similar to EPT based virt-MMU solution.
+> >>>
+> >>> In Qemu, gPA->hPA mapping is done through MAP/UNMAP notifier, it can
+> >>> keep going. But for gVA->gPA mapping, only guest knows it, so hypervisor
+> >>> needs to trap specific guest iommu operation and pass the gVA->gPA
+> >>> mapping knowledge to host through a notifier(newly added one). In VT-d,
+> >>> it is called bind guest pasid table to host.
+> >>
+> >> What I don't get is the PASID table is per extended context entry. I
+> >> understand this latter is indexed by PCI device function. And today MR
+> >> are created per PCIe device if I am not wrong. 
+> > 
+> > In my understanding, MR is more related to AddressSpace not exactly tagged
+> > with PCIe device.
+> I meant, in the current intel_iommu code, vtd_find_add_as() creates 1
+> IOMMU MR and 1 AS per PCIe device, right?
 
---=====_002_next=====
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: base64 
+yes, it is. This is the PCIe device address space, it's can be guest's physical
+address space if no vIOMMU exposed. Or it can be the guset IOVA address space
+if vIOMMU is epxosed. Both the two address space is treated as 2nd level
+transaltion in VT-d, which is different from the 1st level translation which
+is for process vaddr space.
 
-UXVvdGluZyBsdS56aGlwZW5nQHp0ZS5jb20uY24gKDIwMTctMTEtMTQgMTk6NDE6NTgpPiBpIHVz
-ZWQgIHhwICB2ZXJzaW9uOj4gPiB4cCBwcm9mZXNzaW9uYWwgMjAwMiBzZXJ2aWNlIHBhY2sgMz5I
-bW0sIGRvZXNuJ3QgLS1jcm9zcy1wcmVmaXg9eDg2XzY0LXc2NC1taW5ndzMyLSByZXN1bHQgaW4g
-YSA2NC1iaXQ+IHFlbXUtZ2EuZXhlPyBIb3cgYXJlIHlvdSBydW5uaW5nIHRoaXMgb24gMzItYml0
-IFdpbmRvd3MgWFA/DQoNCg0KDQoNCg0KDQppIGJ1aWxkIHR3byB2ZXJzaW9uIDozMmJpdCBhbmQg
-NjQgYml0ICwgcnVuIDMyYml0IGluIHhwIA0KDQoNCg0KDQoNCg0KDQoNCg0KDQoNCg0KDQoNCg0K
-DQoNCg0KDQoNCg0KDQoNCuS4uuS6huiuqeaCqOeahFZQbGF06Jma5ouf5py65pWF6Zqc5ZKMZG9j
-a2Vy5pWF6Zqc5b6X5Yiw6auY5pWI55qE5aSE55CG77yM6K+35LiK5oql5pWF6Zqc5YiwOiAkVlBs
-YXTmioDmnK/mlK/mjIHjgIINCg0KDQroiqblv5fmnIsgbHV6aGlwZW5nDQoNCg0KDQoNCg0KDQpJ
-VOW8gOWPkeW3peeoi+W4iCBJVCBEZXZlbG9wbWVudApFbmdpbmVlcg0K5pON5L2c57O757uf5Lqn
-5ZOB6YOoL+S4reW/g+eglOeptumZoi/ns7vnu5/kuqflk4EgT1MgUHJvZHVjdCBEZXB0Li9DZW50
-cmFsIFLvvIZEIEluc3RpdHV0ZS9TeXN0ZW0gUHJvZHVjdA0KDQoNCg0KDQoNCg0KDQoNCg0K5Zub
-5bed55yB5oiQ6YO95biC5aSp5bqc5aSn6YGT5Lit5q61ODAw5Y+3DQpFOiBsdS56aGlwZW5nQHp0
-ZS5jb20uY24gDQp3d3cuenRlLmNvbS5jbg0KDQoNCg0KDQoNCg0KDQoNCg0KDQrljp/lp4vpgq7k
-u7YNCg0KDQoNCuWPkeS7tuS6uu+8miA8bWRyb3RoQGxpbnV4LnZuZXQuaWJtLmNvbT47DQrmlLbk
-u7bkurrvvJroiqblv5fmnIsxMDEwODI3MjsNCuaKhOmAgeS6uu+8miA8cWVtdS1kZXZlbEBub25n
-bnUub3JnPjsNCuaXpSDmnJ8g77yaMjAxN+W5tDEx5pyIMTXml6UgMTA6MjMNCuS4uyDpopgg77ya
-UmU6IOetlOWkjTogUmU6IOetlOWkjTogUmU6IOetlOWkjTogUmU6IFtQQVRDSCB2Ml0gcWdhOiBy
-ZXBsYWNlIEdldElmRW50cnkNCg0KDQpRdW90aW5nIGx1LnpoaXBlbmdAenRlLmNvbS5jbiAoMjAx
-Ny0xMS0xNCAxOTo0MTo1OCkNCj4gaSB1c2VkICB4cCAgdmVyc2lvbjoNCj4gDQo+IHhwIHByb2Zl
-c3Npb25hbCAyMDAyIHNlcnZpY2UgcGFjayAzDQoNCkhtbSwgZG9lc24ndCAtLWNyb3NzLXByZWZp
-eD14ODZfNjQtdzY0LW1pbmd3MzItIHJlc3VsdCBpbiBhIDY0LWJpdA0KcWVtdS1nYS5leGU/IEhv
-dyBhcmUgeW91IHJ1bm5pbmcgdGhpcyBvbiAzMi1iaXQgV2luZG93cyBYUD8NCg0KPiANCj4gYnVp
-bGQgZW52aXJvbm1lbnQ6IA0KPiANCj4gcm9vdEBsb2NhbGhvc3QgcWVtdS0yLjUuMF0jIGNhdCAv
-ZXRjL3JlZGhhdC1yZWxlYXNlIA0KPiANCj4gQ2VudE9TIExpbnV4IHJlbGVhc2UgNy4wLjE0MDYg
-KENvcmUpIA0KDQpUaGFua3MsIEknbGwgdHJ5IHRvIHNlZSBpZiB0aGVyZSdzIGFueXRoaW5nIHRo
-ZXJlIHRoYXQgd291bGQgYWNjb3VudCBmb3INCnRoZSBkaWZmZXJlbmNlLg0KDQo+IA0KPiANCj4g
-DQo+IA0KPiANCj4gDQo+IOS4uuS6huiuqeaCqOeahFZQbGF06Jma5ouf5py65pWF6Zqc5ZKMZG9j
-a2Vy5pWF6Zqc5b6X5Yiw6auY5pWI55qE5aSE55CG77yM6K+35LiK5oql5pWF6Zqc5YiwOiAkVlBs
-YXTmioDmnK/mlK8NCj4g5oyB44CCDQo+IA0KPiDoiqblv5fmnIsgbHV6aGlwZW5nDQo+IA0KPiAN
-Cj4gSVTlvIDlj5Hlt6XnqIvluIggSVQgRGV2ZWxvcG1lbnQgRW5naW5lZXINCj4g5pON5L2c57O7
-57uf5Lqn5ZOB6YOoL+S4reW/g+eglOeptumZoi/ns7vnu5/kuqflk4EgT1MgUHJvZHVjdCBEZXB0
-Li9DZW50cmFsIFLvvIZEIEluc3RpdHV0ZS8NCj4gU3lzdGVtIFByb2R1Y3QNCj4gDQo+IA0KPiBb
-Y2lkXSAgICAgICAgICBbY2lkXQ0KPiAgICAgICAgICAgICAgICDlm5vlt53nnIHmiJDpg73luILl
-pKnlupzlpKfpgZPkuK3mrrU4MDDlj7cNCj4gICAgICAgICAgICAgICAgRTogbHUuemhpcGVuZ0B6
-dGUuY29tLmNuDQo+ICAgICAgICAgICAgICAgIHd3dy56dGUuY29tLmNuDQo+IA0KPiDljp/lp4vp
-gq7ku7YNCj4g5Y+R5Lu25Lq677yaIDxtZHJvdGhAbGludXgudm5ldC5pYm0uY29tPjsNCj4g5pS2
-5Lu25Lq677ya6Iqm5b+X5pyLMTAxMDgyNzI7DQo+IOaKhOmAgeS6uu+8miA8cWVtdS1kZXZlbEBu
-b25nbnUub3JnPjsNCj4g5pel5pyf77yaMjAxN+W5tDEx5pyIMTXml6UgMDk6MjINCj4g5Li76aKY
-77yaUmU6IOetlOWkjTogUmU6IOetlOWkjTogUmU6IFtQQVRDSCB2Ml0gcWdhOiByZXBsYWNlIEdl
-dElmRW50cnkNCj4gUXVvdGluZyBsdS56aGlwZW5nQHp0ZS5jb20uY24gKDIwMTctMTEtMTQgMDU6
-MDk6MzUpDQo+ID4gIGkgdGVzdCB0aGUgbGF0ZXN0IHFnYSBpbiB4cCAsIGl0IHJ1biBvayAuDQo+
-ID4gDQo+ID4gDQo+ID4gbXkgcWdhIGNvbmZpZyA6DQo+ID4gDQo+ID4gQ29uZmlndXJlZCB3aXRo
-OiAnLi9jb25maWd1cmUnICctLWVuYWJsZS1ndWVzdC1hZ2VudCcgJy0tY3Jvc3MtcHJlZml4PQ0K
-PiA+IHg4Nl82NC13NjQtbWluZ3czMi0nICctLXdpdGgtdnNzLXNkaz0vaG9tZS9WU1NTREs3Micg
-Jy0tZGlzYWJsZS1mZHQnICAgICAgICANCj4gPiAnLS10YXJnZXQtbGlzdD14ODZfNjQtc29mdG1t
-dScNCj4gDQo+IEhtbSwgc28geW91J3JlIHRlc3Rpbmcgd2l0aCBXaW5kb3dzIFhQIHg2ND8gSSB3
-YXMgdXNpbmcgWFAgMzItYml0IChTUDMpLA0KPiBidXQgSSByZXRyaWVkIHdpdGggWFAgeDY0IChT
-UDIpIGFuZCBJIHN0aWxsIGhhdmUgdGhlIHNhbWUgaXNzdWUuDQo+IA0KPiBJIGNhbiBvbmx5IGdl
-dCBxZW11LWdhIHdvcmtpbmcgaWYgSSBidWlsZCBvbiB0b3Agb2Ygc29tZXRoaW5nIHByaW9yIHRv
-DQo+IGNvbW1pdCAxMmY4ZGVmMGUuDQo+IA0KPiBXaGF0IGJ1aWxkIGVudmlyb25tZW50IGFyZSB5
-b3UgdXNpbmc/IEkndmUgdHJpZWQgRmVkb3JhIENvcmUgMTggYW5kIDIwDQo+IGFuZCBoYXZlIHRo
-ZSBzYW1lIGlzc3VlIHdpdGggYm90aC4NCj4gDQo+ID4gDQo+ID4gdXNlZCBxZ2EgdmVyc2lvbiBp
-bmZvDQo+ID4gDQo+ID4gW3Jvb3RAY2VzaGkgcWVtdV0jIGdpdCBsb2cNCj4gPiANCj4gPiBjb21t
-aXQgNTMzYWI4M2VhMDc0ZDVmYzQ1Nzc2OWY2YWM2OTg1MjRhMTJmMTE1Ng0KPiA+IA0KPiA+IEF1
-dGhvcjogWmhpUGVuZyBMdSA8bHUuemhpcGVuZ0B6dGUuY29tLmNuPg0KPiA+IA0KPiA+IERhdGU6
-ICAgRnJpIE5vdiAxMCAxMDoxNzoxNCAyMDE3ICswODAwDQo+ID4gDQo+ID4gDQo+ID4gICAgIHFn
-YTogZml4IHNvbWUgZXJyb3JzIGZvciBndWVzdF9nZXRfbmV0d29ya19zdGF0cw0KPiA+IA0KPiA+
-ICAgICANCj4gPiANCj4gPiAgICAgZml4IHNvbWUgZXJyb3M6DQo+ID4gDQo+ID4gICAgIDEuaWYg
-YnVpbGRpbmcgcWdhIG9uIFdpbmRvd3MgVmlzdGEvMjAwOCBhbmQgbmV3ZXIsDQo+ID4gDQo+ID4g
-ICAgIGl0IGNhbm4ndCBmaW5kIHRoZSBsaW5rIHRvIEdldElmRW50cnkyIGluIHdpbmRvd3MgeHAu
-DQo+ID4gDQo+ID4gICAgIDIuIGNoZWNrIHZhbGlkIG9mIGlmX2luZGV4Lg0KPiA+IA0KPiA+ICAg
-ICANCj4gPiANCj4gPiAgICAgU2lnbmVkLW9mZi1ieTogWmhpUGVuZyBMdSA8bHUuemhpcGVuZ0B6
-dGUuY29tLmNuPg0KPiA+IA0KPiA+IA0KPiA+IGNvbW1pdCBkZTU5N2E4YjI3NzIyY2U0ZjljYzY2
-MGY5MzBmN2RjY2M3MTI3MTJkDQo+ID4gDQo+ID4gQXV0aG9yOiBaaGlQZW5nIEx1IDxsdS56aGlw
-ZW5nQHp0ZS5jb20uY24+DQo+ID4gDQo+ID4gRGF0ZTogICBGcmkgTm92IDMgMjI6NTQ6MjAgMjAx
-NyArMDgwMA0KPiA+IA0KPiA+IA0KPiA+ICAgICBxZ2E6IHJlcGxhY2UgR2V0SWZFbnRyeQ0KPiA+
-IA0KPiA+ICAgICANCj4gPiANCj4gPg0KPiAgICAgIFRoZSBkYXRhIG9idGFpbmVkIGJ5IEdldElm
-RW50cnkgaXMgMzIgYml0cywgYW5kIGl0IG1heSBvdmVyZmxvdy4gVGh1cyB1c2luZw0KPiA+IEdl
-dElmRW50cnkyIGluc3RlYWQgb2YgR2V0SWZFbnRyeS4NCj4gPiANCj4gPiAgICAgDQo+ID4gDQo+
-ID4gICAgIFNpZ25lZC1vZmYtYnk6IFpoaVBlbmcgTHUgPGx1LnpoaXBlbmdAenRlLmNvbS5jbj4N
-Cj4gPiANCj4gPiAgICAgKmF2b2lkIENhbWVsQ2FzZSB2YXJpYWJsZSBuYW1lcw0KPiA+IA0KPiA+
-ICAgICAqdXBkYXRlIGZpZWxkIG5hbWVzIGZvciBNSUJfSUZST1cgLT4gTUlCX0lGX1JPVzINCj4g
-PiANCj4gPiAgICAgU2lnbmVkLW9mZi1ieTogTWljaGFlbCBSb3RoIDxtZHJvdGhAbGludXgudm5l
-dC5pYm0uY29tPg0KPiA+IA0KPiA+IA0KPiA+IGNvbW1pdCA1Y2E3YTNjYmE0Njg3MzZjZmU1NTU4
-ODdhZjFmNmJhNzU0ZjZlYWM5DQo+ID4gDQo+ID4gTWVyZ2U6IGE0ZjA1MzcgMTBhN2I3ZQ0KPiA+
-IA0KPiA+IEF1dGhvcjogUGV0ZXIgTWF5ZGVsbCA8cGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnPg0K
-PiA+IA0KPiA+IERhdGU6ICAgVHVlIE5vdiA3IDE0OjQzOjM1IDIwMTcgKzAwMDANCj4gPiANCj4g
-PiANCj4gPiAgICAgTWVyZ2UgcmVtb3RlLXRyYWNraW5nIGJyYW5jaCAncmVtb3Rlcy9iZXJyYW5n
-ZS90YWdzLw0KPiBwdWxsLTIwMTctMTEtMDYtMicgaW50bw0KPiA+IHN0YWdpbmcNCj4gPiANCj4g
-PiAgICAgDQo+ID4gDQo+ID4gICAgIFB1bGwgSU8gMjAxNy8xMS8wNiB2Mg0KPiA+IA0KPiA+IA0K
-PiA+IA0KPiA+IA0KPiA+IOS4uuS6huiuqeaCqOeahFZQbGF06Jma5ouf5py65pWF6Zqc5ZKMZG9j
-a2Vy5pWF6Zqc5b6X5Yiw6auY5pWI55qE5aSE55CG77yM6K+35LiK5oql5pWF6Zqc5YiwOiAkVlBs
-YXTmioDmnK8NCj4g5pSvDQo+ID4g5oyB44CCDQo+ID4gDQo+ID4g6Iqm5b+X5pyLIGx1emhpcGVu
-Zw0KPiA+IA0KPiA+IA0KPiA+IElU5byA5Y+R5bel56iL5biIIElUIERldmVsb3BtZW50IEVuZ2lu
-ZWVyDQo+ID4g5pON5L2c57O757uf5Lqn5ZOB6YOoL+S4reW/g+eglOeptumZoi/ns7vnu5/kuqfl
-k4EgT1MgUHJvZHVjdCBEZXB0Li9DZW50cmFsIFLvvIZEIEluc3RpdHV0ZS8NCj4gPiBTeXN0ZW0g
-UHJvZHVjdA0KPiA+IA0KPiA+IA0KPiA+IFtjaWRdICAgICAgICAgIFtjaWRdDQo+ID4gICAgICAg
-ICAgICAgICAg5Zub5bed55yB5oiQ6YO95biC5aSp5bqc5aSn6YGT5Lit5q61ODAw5Y+3DQo+ID4g
-ICAgICAgICAgICAgICAgRTogbHUuemhpcGVuZ0B6dGUuY29tLmNuDQo+ID4gICAgICAgICAgICAg
-ICAgd3d3Lnp0ZS5jb20uY24NCj4gPiANCj4gPiDljp/lp4vpgq7ku7YNCj4gPiDlj5Hku7bkurrv
-vJogPG1kcm90aEBsaW51eC52bmV0LmlibS5jb20+Ow0KPiA+IOaUtuS7tuS6uu+8muiKpuW/l+ac
-izEwMTA4MjcyOw0KPiA+IOaKhOmAgeS6uu+8miA8cWVtdS1kZXZlbEBub25nbnUub3JnPjsNCj4g
-PiDml6XmnJ/vvJoyMDE35bm0MTHmnIgxNOaXpSAwNzo1Nw0KPiA+IOS4u+mimO+8mlJlOiDnrZTl
-pI06IFJlOiBbUEFUQ0ggdjJdIHFnYTogcmVwbGFjZSBHZXRJZkVudHJ5DQo+ID4gUXVvdGluZyBs
-dS56aGlwZW5nQHp0ZS5jb20uY24gKDIwMTctMTEtMDkgMDU6MjY6MTUpDQo+ID4gPiAgaSB0aGlu
-ayB0aGUgY29kZSBpcyBiZXR0ZXINCj4gPiA+IA0KPiA+ID4gIGlmIChPU3Zlci5kd01ham9yVmVy
-c2lvbiA+PSA2KSB7DQo+ID4gPiAgICAgICBNSUJfSUZfUk9XMiBhTWliX2lmcm93Ow0KPiA+ID4g
-ICAgICAgdHlwZWRlZiBORVRJT0FQSV9BUEkgKFdJTkFQSSAqZ2V0aWZlbnRyeTJfdCkoUE1JQl9J
-Rl9ST1cyIFJvdyk7DQo+ID4gPiAgICAgICBtZW1zZXQoJmFNaWJfaWZyb3csIDAsIHNpemVvZihh
-TWliX2lmcm93KSk7DQo+ID4gPiAgICAgICBhTWliX2lmcm93LkludGVyZmFjZUluZGV4ID0gbmlj
-SWQ7DQo+ID4gPiAgICAgICBITU9EVUxFIG1vZHVsZSA9IEdldE1vZHVsZUhhbmRsZSgiaXBobHBh
-cGkiKTsNCj4gPiA+ICAgICAgIFBWT0lEIGZ1biA9IEdldFByb2NBZGRyZXNzKG1vZHVsZSwgIkdl
-dElmRW50cnkyIik7DQo+ID4gPiAgICAgICBpZiAoZnVuID09IE5VTEwpIHsNCj4gPiA+ICAgICAg
-ICAgICBlcnJvcl9zZXRnKGVycnAsIFFFUlJfUUdBX0NPTU1BTkRfRkFJTEVELA0KPiA+ID4gICAg
-ICAgICAgICAgICAgICAgICAgIkZhaWxlZCB0byBnZXQgYWRkcmVzcyBvZiBHZXRJZkVudHJ5MiIp
-Ow0KPiA+ID4gICAgICAgICAgIHJldHVybiBOVUxMOw0KPiA+ID4gICAgICAgfQ0KPiA+ID4gICAg
-IGdldGlmZW50cnkyX3QgZ2V0aWZlbnRyeTJfZXggPSAoZ2V0aWZlbnRyeTJfdClmdW47DQo+ID4g
-PiAgICAgaWYgKE5PX0VSUk9SID09IGdldGlmZW50cnkyX2V4KCZhTWliX2lmcm93KSl7DQo+ID4g
-PiAgICAgfQ0KPiA+IA0KPiA+IEkndmUgdXBkYXRlZCB0aGUgcGF0Y2ggd2l0aCB0aGlzIGNoYW5n
-ZToNCj4gPiAgIGh0dHBzOi8vZ2l0aHViLmNvbS9tZHJvdGgvcWVtdS9jb21taXRzL3FnYS1pZi1z
-dGF0cw0KPiA+IA0KPiA+IEJ1dCBJJ20gYSBiaXQgY29uZnVzZWQgbm93OiB3aGVuIEkgdHJpZWQg
-dG8gdGVzdCB0aGlzIG9uIFhQIEkgcmVhbGl6ZWQgdGhhdA0KPiA+IHRoYXQgcWVtdS1nYSBubyBs
-b25nZXIgd29ya3Mgb24gWFAsIGFuZCBnZW5lcmF0ZXMgdGhlIGZvbGxvd2luZyBlcnJvcg0KPiA+
-IHdoZW4gSSB0cnkgdG8gc3RhcnQgaXQgKGV2ZW4gd2l0aG91dCB5b3VyIHN0YXRzIHBhdGNoKToN
-Cj4gPiANCj4gPiAgICJUaGUgcHJvY2VkdXJlIGVudHJ5IHBvaW50IEFjcXVpcmVTUldMb2NrRXhj
-bHVzaXZlIGNvdWxkIG5vdCBiZSBsb2NhdGVkDQo+ID4gICAgaW4gdGhlIGR5bmFtaWMgbGluayBs
-aWJyYXJ5IEtFUk5FTDMyLmRsbCINCj4gPiANCj4gPiBJIHRoaW5rIHRoaXMgbWF5IGJlIGR1ZSB0
-byB0aGUgZm9sbG93aW5nIGNvbW1pdCwgd2hpY2ggbm90ZXMgdGhhdCBWaXN0YSsNCj4gPiBhcmUg
-bm93IHJlcXVpcmVkIGFzIGEgcmVzdWx0Og0KPiA+IA0KPiA+IGNvbW1pdCAxMmY4ZGVmMGUwMjIz
-MmQ3YzY0MTZhZDliNjY2NDBmOTczYzUzMWQxDQo+ID4gQXV0aG9yOiBBbmRyZXkgU2hlZGVsIDxh
-c2hlZGVsQG1pY3Jvc29mdC5jb20+DQo+ID4gRGF0ZTogICBGcmkgTWFyIDI0IDE1OjAxOjQxIDIw
-MTcgLTA3MDANCj4gPiANCj4gPiAgICAgd2luMzI6IHJlcGxhY2UgY3VzdG9tIG11dGV4IGFuZCBj
-b25kaXRpb24gdmFyaWFibGUgd2l0aCBuYXRpdmUNCj4gPiAgICAgcHJpbWl0aXZlcw0KPiA+IA0K
-PiA+IFNvLCBhcmUgeW91IGFjdHVhbGx5IGFibGUgdG8gcnVuIG9uIFhQIGN1cnJlbnRseT8gSWYg
-c28sIGhvdz8gQW5kIGlmDQo+ID4gbm90LCBJIHRoaW5rIHdlIGhhdmUgb3RoZXIgaXNzdWVzIHRo
-YXQgbmVlZCB0byBiZSBhZGRyZXNzZWQgaWYgd2UNCj4gPiB3YW50IHRvIHN1cHBvcnQgWFAgc3Rp
-bGw7IEknbSBub3QgZXZlbiBzdXJlIHRoYXQncyByZWFsaXN0aWMgYXQgdGhpcw0KPiA+IHBvaW50
-Lg0KPiA+IA0KPiA+IFVubGVzcyB0aGVyZSdzIGFjdHVhbGx5IGEgd2F5IHRvIHRlc3QgUUdBIG9u
-IFhQIHJpZ2h0IG5vdyBJIHRoaW5rIEkNCj4gPiB3ZSBzaG91bGQganVzdCBnZXQgaW4gdGhlIHVw
-ZGF0ZWQgcGF0Y2ggbWludXMgdGhlIGR5bmFtaWMgRExMIHN0dWZmLA0KPiA+IGkuZS46DQo+ID4g
-ICBodHRwczovL2dpdGh1Yi5jb20vbWRyb3RoL3FlbXUvY29tbWl0Lw0KPiA+IGRlNTk3YThiMjc3
-MjJjZTRmOWNjNjYwZjkzMGY3ZGNjYzcxMjcxMmQNCj4gPiANCj4gPiBNYWtlIHNlbnNlPw0KPiA+
-IA0KPiA+ID4gDQo+ID4gPiANCj4gPiA+IA0KPiA+ID4gDQo+ID4gPiANCj4gPiA+IOS4uuS6huiu
-qeaCqOeahFZQbGF06Jma5ouf5py65pWF6Zqc5ZKMZG9ja2Vy5pWF6Zqc5b6X5Yiw6auY5pWI55qE
-5aSE55CG77yM6K+35LiK5oql5pWF6Zqc5YiwOiAkVlBsYXTmioANCj4g5pyvDQo+ID4g5pSvDQo+
-ID4gPiDmjIHjgIINCj4gPiA+IA0KPiA+ID4g6Iqm5b+X5pyLIGx1emhpcGVuZw0KPiA+ID4gDQo+
-ID4gPiANCj4gPiA+IElU5byA5Y+R5bel56iL5biIIElUIERldmVsb3BtZW50IEVuZ2luZWVyDQo+
-ID4gPiDmk43kvZzns7vnu5/kuqflk4Hpg6gv5Lit5b+D56CU56m26ZmiL+ezu+e7n+S6p+WTgSBP
-UyBQcm9kdWN0IERlcHQuL0NlbnRyYWwgUu+8hkQgSW5zdGl0dXRlLw0KPiA+ID4gU3lzdGVtIFBy
-b2R1Y3QNCj4gPiA+IA0KPiA+ID4gDQo+ID4gPiBbY2lkXSAgICAgICAgICBbY2lkXQ0KPiA+ID4g
-ICAgICAgICAgICAgICAg5Zub5bed55yB5oiQ6YO95biC5aSp5bqc5aSn6YGT5Lit5q61ODAw5Y+3
-DQo+ID4gPiAgICAgICAgICAgICAgICBFOiBsdS56aGlwZW5nQHp0ZS5jb20uY24NCj4gPiA+ICAg
-ICAgICAgICAgICAgIHd3dy56dGUuY29tLmNuDQo+ID4gPiANCj4gPiA+IOWOn+Wni+mCruS7tg0K
-PiA+ID4g5Y+R5Lu25Lq677ya6Iqm5b+X5pyLMTAxMDgyNzINCj4gPiA+IOaUtuS7tuS6uu+8miA8
-bWRyb3RoQGxpbnV4LnZuZXQuaWJtLmNvbT47DQo+ID4gPiDmioTpgIHkurrvvJogPHFlbXUtZGV2
-ZWxAbm9uZ251Lm9yZz47DQo+ID4gPiDml6XmnJ/vvJoyMDE35bm0MTHmnIgwOOaXpSAxMDo1NA0K
-PiA+ID4g5Li76aKY77ya562U5aSNOiBSZTogW1BBVENIIHYyXSBxZ2E6IHJlcGxhY2UgR2V0SWZF
-bnRyeQ0KPiA+ID4gDQo+ID4gPiANCj4gPiA+ID5JIGhhdmUgdGhlIG1vZGlmaWVkIHBhdGNoIHN0
-YWdlZCBoZXJlOg0KPiA+ID4gDQo+ID4gPiA+ICBodHRwczovL2dpdGh1Yi5jb20vbWRyb3RoL3Fl
-bXUvY29tbWl0Lw0KPiA+ID4gZGU1OTdhOGIyNzcyMmNlNGY5Y2M2NjBmOTMwZjdkY2NjNzEyNzEy
-ZA0KPiA+ID4gPkxldCBtZSBrbm93IGlmIGl0IGxvb2tzIG9rYXkgYW5kIEknbGwgc2VuZCBhIHB1
-bGwgcmVxdWVzdCBmb3IgcmMxDQo+ID4gPiANCj4gPiA+ICANCj4gPiA+IA0KPiA+ID4NCj4gPg0K
-PiAgIHRoZSBjb2RlIHJpZ2h0LCBidXQgcnVubmluZyBRR0Egb24gdGhlIFdpbmRvd3MgWFAsIGVy
-cm9yOiBjYW4gbm90IGZpbmQgdGhlIGxpbmsNCj4gPiA+IHRvICBHZXRJZkVudHJ5MiBpbiBpcGhs
-cGFwaS5ETEwuDQo+ID4gPiANCj4gPiA+IA0KPiA+ID4gDQo+ID4gPiANCj4gPiA+IOS4uuS6huiu
-qeaCqOeahFZQbGF06Jma5ouf5py65pWF6Zqc5ZKMZG9ja2Vy5pWF6Zqc5b6X5Yiw6auY5pWI55qE
-5aSE55CG77yM6K+35LiK5oql5pWF6Zqc5YiwOiAkVlBsYXTmioANCj4g5pyvDQo+ID4g5pSvDQo+
-ID4gPiDmjIHjgIINCj4gPiA+IA0KPiA+ID4g6Iqm5b+X5pyLIGx1emhpcGVuZw0KPiA+ID4gDQo+
-ID4gPiANCj4gPiA+IElU5byA5Y+R5bel56iL5biIIElUIERldmVsb3BtZW50IEVuZ2luZWVyDQo+
-ID4gPiDmk43kvZzns7vnu5/kuqflk4Hpg6gv5Lit5b+D56CU56m26ZmiL+ezu+e7n+S6p+WTgSBP
-UyBQcm9kdWN0IERlcHQuL0NlbnRyYWwgUu+8hkQgSW5zdGl0dXRlLw0KPiA+ID4gU3lzdGVtIFBy
-b2R1Y3QNCj4gPiA+IA0KPiA+ID4gDQo+ID4gPiBbY2lkXSAgICAgICAgICBbY2lkXQ0KPiA+ID4g
-ICAgICAgICAgICAgICAg5Zub5bed55yB5oiQ6YO95biC5aSp5bqc5aSn6YGT5Lit5q61ODAw5Y+3
-DQo+ID4gPiAgICAgICAgICAgICAgICBFOiBsdS56aGlwZW5nQHp0ZS5jb20uY24NCj4gPiA+ICAg
-ICAgICAgICAgICAgIHd3dy56dGUuY29tLmNuDQo+ID4gPiANCj4gPiA+IA0KPiA+ID4g5Y+R5Lu2
-5Lq677yaIDxtZHJvdGhAbGludXgudm5ldC5pYm0uY29tPjsNCj4gPiA+IOaUtuS7tuS6uu+8muiK
-puW/l+acizEwMTA4MjcyOw0KPiA+ID4g5oqE6YCB5Lq677yaIDxxZW11LWRldmVsQG5vbmdudS5v
-cmc+O+iKpuW/l+acizEwMTA4MjcyOw0KPiA+ID4g5pel5pyf77yaMjAxN+W5tDEx5pyIMDjml6Ug
-MDE6MDcNCj4gPiA+IOS4u+mimO+8mlJlOiBbUEFUQ0ggdjJdIHFnYTogcmVwbGFjZSBHZXRJZkVu
-dHJ5DQo+ID4gPiANCj4gPiA+IA0KPiA+ID4gUXVvdGluZyBaaGlQZW5nIEx1ICgyMDE3LTExLTAz
-IDA5OjU0OjIwKQ0KPiA+ID4gPg0KPiA+ID4NCj4gPg0KPiAgICBUaGUgZGF0YSBvYnRhaW5lZCBi
-eSBHZXRJZkVudHJ5IGlzIDMyIGJpdHMsIGFuZCBpdCBtYXkgb3ZlcmZsb3cuIFRodXMgdXNpbmcg
-R2V0SWZFbnRyeTIgaW5zdGVhZCBvZiBHZXRJZkVudHJ5Lg0KPiA+ID4gPiANCj4gPiA+ID4gU2ln
-bmVkLW9mZi1ieTogWmhpUGVuZyBMdSA8bHUuemhpcGVuZ0B6dGUuY29tLmNuPg0KPiA+ID4gPiAt
-LS0NCj4gPiA+ID4gIHFnYS9jb21tYW5kcy13aW4zMi5jIHwgMzEgKysrKysrKysrKysrKysrKysr
-LS0tLS0tLS0tLS0tLQ0KPiA+ID4gPiAgMSBmaWxlIGNoYW5nZWQsIDE4IGluc2VydGlvbnMoKyks
-IDEzIGRlbGV0aW9ucygtKQ0KPiA+ID4gPiANCj4gPiA+ID4gZGlmZiAtLWdpdCBhL3FnYS9jb21t
-YW5kcy13aW4zMi5jIGIvcWdhL2NvbW1hbmRzLXdpbjMyLmMNCj4gPiA+ID4gaW5kZXggMDMyMjE4
-OC4uZDA5NmRjMiAxMDA2NDQNCj4gPiA+ID4gLS0tIGEvcWdhL2NvbW1hbmRzLXdpbjMyLmMNCj4g
-PiA+ID4gKysrIGIvcWdhL2NvbW1hbmRzLXdpbjMyLmMNCj4gPiA+ID4gQEAgLTExNzMsMjAgKzEx
-NzMsMjUgQEAgc3RhdGljIGludCBndWVzdF9nZXRfbmV0d29ya19zdGF0cw0KPiA+IChjb25zdCBj
-aGFyICpuYW1lLA0KPiA+ID4gPiAgICAgICAgICAgICAgICAgICAgICAgICBHdWVzdE5ldHdvcmtJ
-bnRlcmZhY2VTdGF0ICpzdGF0cykNCj4gPiA+ID4gIHsNCj4gPiA+ID4gICAgICBEV09SRCBpZl9p
-bmRleCA9IDA7DQo+ID4gPiA+IC0gICAgTUlCX0lGUk9XIGFfbWlkX2lmcm93Ow0KPiA+ID4gPiAt
-ICAgIG1lbXNldCgmYV9taWRfaWZyb3csIDAsIHNpemVvZihhX21pZF9pZnJvdykpOw0KPiA+ID4g
-PiArICAgIE9TVkVSU0lPTklORk8gT1N2ZXI7DQo+ID4gPiA+ICAgICAgaWZfaW5kZXggPSBnZXRf
-aW50ZXJmYWNlX2luZGV4KG5hbWUpOw0KPiA+ID4gPiAtICAgIGFfbWlkX2lmcm93LmR3SW5kZXgg
-PSBpZl9pbmRleDsNCj4gPiA+ID4gLSAgICBpZiAoTk9fRVJST1IgPT0gR2V0SWZFbnRyeSgmYV9t
-aWRfaWZyb3cpKSB7DQo+ID4gPiA+IC0gICAgICAgIHN0YXRzLT5yeF9ieXRlcyA9IGFfbWlkX2lm
-cm93LmR3SW5PY3RldHM7DQo+ID4gPiA+IC0gICAgICAgIHN0YXRzLT5yeF9wYWNrZXRzID0gYV9t
-aWRfaWZyb3cuZHdJblVjYXN0UGt0czsNCj4gPiA+ID4gLSAgICAgICAgc3RhdHMtPnJ4X2VycnMg
-PSBhX21pZF9pZnJvdy5kd0luRXJyb3JzOw0KPiA+ID4gPiAtICAgICAgICBzdGF0cy0+cnhfZHJv
-cHBlZCA9IGFfbWlkX2lmcm93LmR3SW5EaXNjYXJkczsNCj4gPiA+ID4gLSAgICAgICAgc3RhdHMt
-PnR4X2J5dGVzID0gYV9taWRfaWZyb3cuZHdPdXRPY3RldHM7DQo+ID4gPiA+IC0gICAgICAgIHN0
-YXRzLT50eF9wYWNrZXRzID0gYV9taWRfaWZyb3cuZHdPdXRVY2FzdFBrdHM7DQo+ID4gPiA+IC0g
-ICAgICAgIHN0YXRzLT50eF9lcnJzID0gYV9taWRfaWZyb3cuZHdPdXRFcnJvcnM7DQo+ID4gPiA+
-IC0gICAgICAgIHN0YXRzLT50eF9kcm9wcGVkID0gYV9taWRfaWZyb3cuZHdPdXREaXNjYXJkczsN
-Cj4gPiA+ID4gLSAgICAgICAgcmV0dXJuIDA7DQo+ID4gPiA+ICsgICAgT1N2ZXIuZHdPU1ZlcnNp
-b25JbmZvU2l6ZSA9IHNpemVvZihPU1ZFUlNJT05JTkZPKTsNCj4gPiA+ID4gKyAgICBHZXRWZXJz
-aW9uRXgoJk9TdmVyKTsNCj4gPiA+ID4gKyAgICBpZiAoT1N2ZXIuZHdNYWpvclZlcnNpb24gPj0g
-Nikgew0KPiA+ID4gPiArICAgICAgICBNSUJfSUZfUk9XMiBhX21pZF9pZnJvdzsNCj4gPiA+ID4g
-KyAgICAgICAgbWVtc2V0KCZhX21pZF9pZnJvdywgMCwgc2l6ZW9mKGFfbWlkX2lmcm93KSk7DQo+
-ID4gPiA+ICsgICAgICAgIGFfbWlkX2lmcm93LmR3SW5kZXggPSBpZl9pbmRleDsNCj4gPiA+ID4g
-KyAgICAgICAgaWYgKE5PX0VSUk9SID09IEdldElmRW50cnkyKCZhX21pZF9pZnJvdykpIHsNCj4g
-PiA+ID4gKyAgICAgICAgICAgIHN0YXRzLT5yeF9ieXRlcyA9IGFfbWlkX2lmcm93LmR3SW5PY3Rl
-dHM7DQo+ID4gPiA+ICsgICAgICAgICAgICBzdGF0cy0+cnhfcGFja2V0cyA9IGFfbWlkX2lmcm93
-LmR3SW5VY2FzdFBrdHM7DQo+ID4gPiA+ICsgICAgICAgICAgICBzdGF0cy0+cnhfZXJycyA9IGFf
-bWlkX2lmcm93LmR3SW5FcnJvcnM7DQo+ID4gPiA+ICsgICAgICAgICAgICBzdGF0cy0+cnhfZHJv
-cHBlZCA9IGFfbWlkX2lmcm93LmR3SW5EaXNjYXJkczsNCj4gPiA+ID4gKyAgICAgICAgICAgIHN0
-YXRzLT50eF9ieXRlcyA9IGFfbWlkX2lmcm93LmR3T3V0T2N0ZXRzOw0KPiA+ID4gPiArICAgICAg
-ICAgICAgc3RhdHMtPnR4X3BhY2tldHMgPSBhX21pZF9pZnJvdy5kd091dFVjYXN0UGt0czsNCj4g
-PiA+ID4gKyAgICAgICAgICAgIHN0YXRzLT50eF9lcnJzID0gYV9taWRfaWZyb3cuZHdPdXRFcnJv
-cnM7DQo+ID4gPiA+ICsgICAgICAgICAgICBzdGF0cy0+dHhfZHJvcHBlZCA9IGFfbWlkX2lmcm93
-LmR3T3V0RGlzY2FyZHM7DQo+ID4gPiA+ICsgICAgICAgICAgICByZXR1cm4gMDsNCj4gPiA+IA0K
-PiA+ID4gVGhpcyBmYWlscyB0byBidWlsZCBpbiBteSBmYzIwIG1pbmd3NjQgZW52aXJvbm1lbnQ6
-DQo+ID4gPiANCj4gPiA+IC9ob21lL21kcm90aC93L3FlbXU0LmdpdC9xZ2EvDQo+ID4gPg0KPiAg
-Y29tbWFuZHMtd2luMzIuYzoxMTg0OjIwOiBlcnJvcjogJ01JQl9JRl9ST1cyJyBoYXMgbm8gbWVt
-YmVyIG5hbWVkICdkd0luZGV4Jw0KPiA+ID4gICAgICAgICAgYV9taWRfaWZyb3cuZHdJbmRleCA9
-IGlmX2luZGV4Ow0KPiA+ID4gICAgICAgICAgICAgICAgICAgICBeDQo+ID4gPiAvaG9tZS9tZHJv
-dGgvdy9xZW11NC5naXQvcWdhLw0KPiA+ID4NCj4gPg0KPiAgIGNvbW1hbmRzLXdpbjMyLmM6MTE4
-Njo0MjogZXJyb3I6ICdNSUJfSUZfUk9XMicgaGFzIG5vIG1lbWJlciBuYW1lZCAnZHdJbk9jdGV0
-cycNCj4gPiA+ICAgICAgICAgICAgICBzdGF0cy0+cnhfYnl0ZXMgPSBhX21pZF9pZnJvdy5kd0lu
-T2N0ZXRzOw0KPiA+ID4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-Xg0KPiA+ID4gL2hvbWUvbWRyb3RoL3cvcWVtdTQuZ2l0L3FnYS8NCj4gPiA+DQo+ID4NCj4gICBj
-b21tYW5kcy13aW4zMi5jOjExODc6NDQ6IGVycm9yOiAnTUlCX0lGX1JPVzInIGhhcyBubyBtZW1i
-ZXIgbmFtZWQgJ2R3SW5VY2FzdFBrdHMnDQo+ID4gPiAgICAgICAgICAgICAgc3RhdHMtPnJ4X3Bh
-Y2tldHMgPSBhX21pZF9pZnJvdy5kd0luVWNhc3RQa3RzOw0KPiA+ID4gDQo+ID4gPiBldGMgLi4u
-DQo+ID4gPiANCj4gPiA+DQo+ICBUaGUgcGF0Y2ggc2VlbXMgdG8gYXNzdW1lIE1JQl9JRlJPVyBh
-bmQgTUlCX0lGX1JPVzIgaGF2ZSB0aGUgc2FtZSBmaWVsZCBuYW1lcw0KPiA+ID4gZm9yIHRoZSBz
-dGF0cywgYnV0IGFjY29yZGluZyB0byB0aGlzIHRoZXkncmUgc2xpZ2h0bHkgZGlmZmVyZW50Og0K
-PiA+ID4gDQo+ID4gPiAgIGh0dHBzOi8vbXNkbi5taWNyb3NvZnQuY29tL2VuLXVzL2xpYnJhcnkv
-d2luZG93cy9kZXNrdG9wL2FhODE0NDkxKHY9DQo+ID4gPiB2cy44NSkuYXNweA0KPiA+ID4gDQo+
-ID4gPiBUaGlzIGNoYW5nZSBvbiB0b3Agb2YgeW91ciBwYXRjaCBzZWVtcyB0byB3b3JrOg0KPiA+
-ID4gDQo+ID4gPiBkaWZmIC0tZ2l0IGEvcWdhL2NvbW1hbmRzLXdpbjMyLmMgYi9xZ2EvY29tbWFu
-ZHMtd2luMzIuYw0KPiA+ID4gaW5kZXggZTE3ZmMzYzI4NC4uNThlNDcwODc3ZiAxMDA2NDQNCj4g
-PiA+IC0tLSBhL3FnYS9jb21tYW5kcy13aW4zMi5jDQo+ID4gPiArKysgYi9xZ2EvY29tbWFuZHMt
-d2luMzIuYw0KPiA+ID4gQEAgLTExODEsMTYgKzExODEsMTYgQEAgc3RhdGljIGludCBndWVzdF9n
-ZXRfbmV0d29ya19zdGF0cw0KPiAoY29uc3QgY2hhciAqbmFtZSwNCj4gPiA+ICAgICAgaWYgKG9z
-X3Zlci5kd01ham9yVmVyc2lvbiA+PSA2KSB7DQo+ID4gPiAgICAgICAgICBNSUJfSUZfUk9XMiBh
-X21pZF9pZnJvdzsNCj4gPiA+ICAgICAgICAgIG1lbXNldCgmYV9taWRfaWZyb3csIDAsIHNpemVv
-ZihhX21pZF9pZnJvdykpOw0KPiA+ID4gLSAgICAgICAgYV9taWRfaWZyb3cuZHdJbmRleCA9IGlm
-X2luZGV4Ow0KPiA+ID4gKyAgICAgICAgYV9taWRfaWZyb3cuSW50ZXJmYWNlSW5kZXggPSBpZl9p
-bmRleDsNCj4gPiA+ICAgICAgICAgIGlmIChOT19FUlJPUiA9PSBHZXRJZkVudHJ5MigmYV9taWRf
-aWZyb3cpKSB7DQo+ID4gPiAtICAgICAgICAgICAgc3RhdHMtPnJ4X2J5dGVzID0gYV9taWRfaWZy
-b3cuZHdJbk9jdGV0czsNCj4gPiA+IC0gICAgICAgICAgICBzdGF0cy0+cnhfcGFja2V0cyA9IGFf
-bWlkX2lmcm93LmR3SW5VY2FzdFBrdHM7DQo+ID4gPiAtICAgICAgICAgICAgc3RhdHMtPnJ4X2Vy
-cnMgPSBhX21pZF9pZnJvdy5kd0luRXJyb3JzOw0KPiA+ID4gLSAgICAgICAgICAgIHN0YXRzLT5y
-eF9kcm9wcGVkID0gYV9taWRfaWZyb3cuZHdJbkRpc2NhcmRzOw0KPiA+ID4gLSAgICAgICAgICAg
-IHN0YXRzLT50eF9ieXRlcyA9IGFfbWlkX2lmcm93LmR3T3V0T2N0ZXRzOw0KPiA+ID4gLSAgICAg
-ICAgICAgIHN0YXRzLT50eF9wYWNrZXRzID0gYV9taWRfaWZyb3cuZHdPdXRVY2FzdFBrdHM7DQo+
-ID4gPiAtICAgICAgICAgICAgc3RhdHMtPnR4X2VycnMgPSBhX21pZF9pZnJvdy5kd091dEVycm9y
-czsNCj4gPiA+IC0gICAgICAgICAgICBzdGF0cy0+dHhfZHJvcHBlZCA9IGFfbWlkX2lmcm93LmR3
-T3V0RGlzY2FyZHM7DQo+ID4gPiArICAgICAgICAgICAgc3RhdHMtPnJ4X2J5dGVzID0gYV9taWRf
-aWZyb3cuSW5PY3RldHM7DQo+ID4gPiArICAgICAgICAgICAgc3RhdHMtPnJ4X3BhY2tldHMgPSBh
-X21pZF9pZnJvdy5JblVjYXN0UGt0czsNCj4gPiA+ICsgICAgICAgICAgICBzdGF0cy0+cnhfZXJy
-cyA9IGFfbWlkX2lmcm93LkluRXJyb3JzOw0KPiA+ID4gKyAgICAgICAgICAgIHN0YXRzLT5yeF9k
-cm9wcGVkID0gYV9taWRfaWZyb3cuSW5EaXNjYXJkczsNCj4gPiA+ICsgICAgICAgICAgICBzdGF0
-cy0+dHhfYnl0ZXMgPSBhX21pZF9pZnJvdy5PdXRPY3RldHM7DQo+ID4gPiArICAgICAgICAgICAg
-c3RhdHMtPnR4X3BhY2tldHMgPSBhX21pZF9pZnJvdy5PdXRVY2FzdFBrdHM7DQo+ID4gPiArICAg
-ICAgICAgICAgc3RhdHMtPnR4X2VycnMgPSBhX21pZF9pZnJvdy5PdXRFcnJvcnM7DQo+ID4gPiAr
-ICAgICAgICAgICAgc3RhdHMtPnR4X2Ryb3BwZWQgPSBhX21pZF9pZnJvdy5PdXREaXNjYXJkczsN
-Cj4gPiA+ICAgICAgICAgICAgICByZXR1cm4gMDsNCj4gPiA+ICAgICAgICAgIH0NCj4gPiA+ICAg
-ICAgfQ0KPiA+ID4gDQo+ID4gPiBJIGhhdmUgdGhlIG1vZGlmaWVkIHBhdGNoIHN0YWdlZCBoZXJl
-Og0KPiA+ID4gDQo+ID4gPiAgIGh0dHBzOi8vZ2l0aHViLmNvbS9tZHJvdGgvcWVtdS9jb21taXQv
-DQo+ID4gPiBkZTU5N2E4YjI3NzIyY2U0ZjljYzY2MGY5MzBmN2RjY2M3MTI3MTJkDQo+ID4gPiAN
-Cj4gPiA+IExldCBtZSBrbm93IGlmIGl0IGxvb2tzIG9rYXkgYW5kIEknbGwgc2VuZCBhIHB1bGwg
-cmVxdWVzdCBmb3IgcmMxDQo+ID4gPiANCj4gPiA+ID4gKyAgICAgICAgfQ0KPiA+ID4gPiAgICAg
-IH0NCj4gPiA+ID4gICAgICByZXR1cm4gLTE7DQo+ID4gPiA+ICB9DQo+ID4gPiA+IC0tIA0KPiA+
-ID4gPiAxLjguMy4xDQo+ID4gPiA+IA0KPiA+ID4gDQo+ID4gPiANCj4gPiANCj4gPiANCj4gDQo+
+> > 
+> >> So why can't we have 1
+> >> new MR notifier dedicated to PASID table passing? My understanding is
+> >> the MR, having a 1-1 correspondence with a PCIe device and thus a
+> >> context could be of right granularity. Then I understand the only flags
+> > 
+> > I didn't quite get your point regards to the "granlarity" here. May talk
+> > a little bit more here?
+> The PASID table is per device (contained by extended context which is
+> dev/fn indexed). The "record_device" notifier also is attached to a
+> specific PCIe device. So we can't really say they have an iommu wide
+> scope (PCIe device granularity would fit). However I understand from
+> below explanation that TLB invalidate notifier is not especially tight
+> to a given source-id as we are going to invalidate by PASID/page.
+> 
 
---=====_002_next=====
-Content-Type: image/jpeg;
-	 name="=?UTF-8?B?MjQyNDJlNTYzN2FmNDI4ODkxYzRkYjczMWU3NzY1YWQuanBn?="
-Content-Disposition: inline;
-	filename="=?UTF-8?B?MjQyNDJlNTYzN2FmNDI4ODkxYzRkYjczMWU3NzY1YWQuanBn?="
-Content-Transfer-Encoding: base64
-Content-ID: <24242e5637af428891c4db731e7765ad>
+correct, it has no tight relationship to the "granlarity" here for the
+discussion to introduce this new notifer framework.
 
-R0lGODlhcwAmAPcAAAAAAP///wCP1QCP1Pf7/vL5/QCP1gWR1gqT1gyU2AyU1w6V1xWY2BeZ2R6c
-2iGd2iyi3C6j3TOl3Tqo3kWt4Emv4Uyw4U2x4lOz4ly35F645GO65WW75me85m6/53XC6IHH64XJ
-64bK7IzM7I/N7JXQ7ZfR7pnS7pzT7p3U76PW8KPW76XX8K7b8bDc8rff87vh9Lzh9L7i9cnn9tLr
-+Nnu+eDx+uf0++n1++33/PD4/PT6/fj8/gKQ1AWR1QeS1QiT1QmT1g+W1xCW1xOX1xia2Bub2Ryb
-2R+d2SCd2SKe2iSf2iag2ymh2yqh2yui3DSm3Tio3Typ3j2q3j6q3kCr30Os30eu4Euw4U6x4U+y
-4k+y4VGz4lCy4Va141W04li241q341245F+55GW75Ga85Wm95mi95Gq+5Wu+5m2/5m/A53HB6HDA
-53HB5nLB53PC53XC53bD53nE6HvF6X3G6X/H6YHI6oHI6YLI6oLI6YbK64TJ6YnL64rM64zM65HP
-7JPQ7ZbR7ZrT7qXX76bY8KfY76jZ8Kra8azb8a/c8bDc8bHd8rLd8rXe8rXe8bjg87zi9Lzh873i
-88Dj9MPl9cXm9cfm9cnn9c3p9s/q987p9tHr99Lr99Xt+Nbt+Nrv+d/x+eDx+eX0++Tz+u/4/OHy
-+ePz+ur2+/b7/fr9/vz+/v7//////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAAK0ALAAAAABzACYA
-Rwj/AAMIHEiwoMGDCBMqXMiwoUOGiti0mUhxopcBAgZoHKAglcATFaVg3DgAC0U2hgKsKkJyiZqK
-FUV4bHijx4AHDFmN0BiJ4A2NRFYRJKAAo6WFKzJibOCQEclMB1WxxOgDUQEeqbKm2sEDoQaMhAqS
-sonE4B2MeQ7WmGlwj0YKCv0oHeDkIUGnAvJCNShVowA7dgXyyXKhsGEJG6kYNqxFUEImGSsQDJFR
-gOSClUj61cx5wAmEBKJk9JIwTefTaxzaGNnQxhIBex0WAUPwRZoOZnLr3q27Q6CBKXgL742mhUBW
-e3AP771HlcNSaDjQCVwwByQc1A2+9vtbodONsQn2/8UI2O6F03lP+/1QcEpeJgMbabwyMEzeOQuJ
-bBSAyC5ejeENNN5GQzBAxIEHNgAGAQZ9JQAlBvUggBIGlYDWQBtYoKGGW1yw4YZacPGhBVjsIRAB
-B4xEV3YCfZdRgAKNJ0ATLBo01gBlOXSIARgpohAEeQkgSo1EFmnkkUgmqeSSCKkxl3qaMRUBZ5V1
-llcHAaQ40lxP+uXQWALkmB0HGplhECYHWADDQ24oJYAVClHilwCgRMVSXiYGhgIZG/TZZxlXaNTD
-F2X4+adxA+Fg0wBkEGTfACkQhNgAKzR0iop0MvQdgHZu5EdgXw0AYUE2UViQhQKkVdAcQZYSAA9D
-GP/xxQ4B1KHRFg1h4OYYDzHiJowBDKgiSZXlSZAGeYVFEJhiDnRHXnoM5EOXxO7HmQMGdRJkRtj5
-txmwMqoRWBZPplftuXEkxIUJBj2CxUJSVPkGi5sOAO5UA6hqJCql2sVKEBilcRCyAxhQB0GFqEet
-X3IglAhJlxzEAwPoaSaABV+S1VAmQ+RlREOTBHkGkySXbPLJKKes8sosC6TJllCS9JshC8NsbSUB
-eFAzZ244FIpSNfrRxADsGoRKQS/ETCWWIShspSMBUGyteu82dGOzCr3AR0EyaESFQU4OAJdDcBC7
-SEJjuJmuQTzg+0SSNmG7ECuQDZBAQUlo9AlBg2D/BMVDm2wpQA4KOUISJ53mpa9DJVRmLkZcUgv1
-QDRjRMNAI2SUmkAzYDSEcw3xMVcEmj7VqUblPSRGRl2ooMIKK6hAh0Y/kMBC7K9PkBceBeGwUaUB
-gLKRc/xqZIpD7vkFR0Obwna6AGiAqlEhBY1iUxIG5YFRtAZh1IYOAh090AIY9cRQAUBALsBRzM91
-734CICDEAvQvoMAQGNBaELICKDvQ1Wa5kEBi4IJGNMITmTCgAhvhgg8o5QsvMKALcHaQSKRHAAro
-SlO+ZafHQQ5mAuhDg8AiFo0VBAQCDAAIMWWuKlWGKQZJg5vg5C2/vI92LujKKna4CtAdRAwa8QIL
-7YY4xLPErwREHGIVMMI7km0nL4CgjovsdboBiNAumbPYsKpkLUQZRAZ5+dtAOrEAAXwtITjgkiey
-U68bDiB1RSKARo4QmEOkR3wDOUNlMnCQQrgJPvQyHV+KUCwkAfAhYMjLD4RyECxUJhEESeRmBCAB
-mMCkBAlpnhsHwAQPWHIifWCQ1UzIEFAEqQsLwQEQ8gIBgWiBS0qbI0JeMJcaHGQV04plXr6kEbkp
-hBVTEkAPjtcQOWSEVwGQxBw+wMxmOvOZHxiEQnIAgj1o8JZ/gKY2SeDDhejgDW1YnEI+AUm7fIKR
-LUunOtfJThYFBAA7
+> I think the main justification behind introducing this new framework is
+> that PT is set along with SVM and in this case the IOMMU MR notifiers
+> are not registered since the IOMMU MR is disabled.
+> 
+> So new notifiers do not fit nicely in current framework.
 
+exactly, that's what I mean. Although we have tricky to fix it, but the trick
+is still a trick. Better to have a new and dedicate framework.
 
---=====_002_next=====
-Content-Type: image/jpeg;
-	 name="=?UTF-8?B?OWFlM2UyMTRjMTdkNDllZDkzNWQ4N2M2NzRiYTNlZTIuanBn?="
-Content-Disposition: inline;
-	filename="=?UTF-8?B?OWFlM2UyMTRjMTdkNDllZDkzNWQ4N2M2NzRiYTNlZTIuanBn?="
-Content-Transfer-Encoding: base64
-Content-ID: <9ae3e214c17d49ed935d87c674ba3ee2>
+> > 
+> >> we currently have are NONE, MAP and UNMAP but couldn't we add a new one
+> >> for PASID TABLE passing? So this is not crystal clear to me why MR
+> >> notifiers are not adapted to PASID table passing.
+> > 
+> > This is also my initial plan. You may get some detail in the link below.
+> > https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg05295.html
+> > 
+> > In brief, the new notifier I want to add is not really MR related and
+> > just more like a behaviour of a translation unit. Also, as my cover letter
+> > mentioned that the MR notifiers would not be registered for VT-d(virt-svm)
+> > in region_add(). Then it requires to register MR notifiers out of the
+> > region_add().
+> 
+> Yes to me this is the main issue: IOMMU MR are not registered in PT
+> mode. Commit message of "[RFC PATCH 06/20] VFIO: add new notifier for
+> binding PASID table" helped me to introduce the problem, although I did
+> not quite understand what you call "vtd_address_space".
 
-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
+"vtd_address_space" is a wrapper of the DMA AddressSpace of a device behind
+a virtual VT-d.
 
+>  Also paste below. I think it more or less breaks the
+> > consistency of MR notifiers. Also, I think existing MR notifiers are more
+> > related IOVA address translation(on VT-d it is 2nd level translation, for ARM
+> > is it stage 2?),
+> Well, level 1 input address is IOVA as well.
+> 
+> On ARM, IOVA -> IPA*=GPA is stage1 and GPA -> HPA is stage2. So I would
+> rather say that for ARM, MR relates to stage1 which is the one emulated
+> by vSMMU along with VFIO.
+> *IPA = intermediate physical address.
 
---=====_002_next=====--
+thx for correction. BTW. if you have virt-SVM on ARM, will stage 1 cover the
+gVA->gPA/IPA translation?
+
+>  and there is some existing codes highly rely on this
+> > assumption. e.g. the memory_replay introduced by Peter, the notifier node
+> > would affect the replay. If adding a non MAP/UNMAP notifier, it would break
+> > the logic. So it's also a reason to add a separate framework instead of
+> > just adding a new flag to the existing MR notifier framework.
+> 
+> 
+> > 
+> > https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg04931.html
+> > 
+> > +    /* Check if vIOMMU exists */
+> > +    QTAILQ_FOREACH(subregion, &as->root->subregions, subregions_link) {
+> > +        if (memory_region_is_iommu(subregion)) {
+> > +            IOMMUNotifier n1;
+> > +
+> > +            /*
+> > +             FIXME: current iommu notifier is actually designed for
+> > +             IOMMUTLB MAP/UNMAP. However, vIOMMU emulator may need
+> > +             notifiers other than MAP/UNMAP, so it'll be better to
+> > +             split the non-IOMMUTLB notifier from the current IOMMUTLB
+> > +             notifier framewrok.
+> > +             */
+> > +            iommu_notifier_init(&n1, vfio_iommu_bind_pasid_tbl_notify,
+> > +                                IOMMU_NOTIFIER_SVM_PASIDT_BIND,
+> > +                                0,
+> > +                                0);
+> > +            vfio_register_notifier(group->container,
+> > +                                   subregion,
+> > +                                   0,
+> > +                                   &n1);
+> > +        }
+> > +    }
+> > +
+> > 
+> > 
+> >>>
+> >>> Also, for the gVA iotlb flushing, only guest knows it. So hypervisor
+> >>> needs to propagate it to host. Here, MAP/UNMAP is not suitable since
+> >>> this gVA iotlb flush here doesn’t require to modify host iommu
+> >>> translation table.
+> >> I don't really get this argument. IOMMUNotifier just is a notifier that
+> >> is attached to an IOMMU MR and calls a an IOMMUNotify function, right?
+> > 
+> > yes, it is.
+> > 
+> >> Then the role of the function currently is attached to the currently
+> >> existing flags, MAP, UNMAP. This is not linked to an action on the
+> >> physical IOMMU, right?
+> > 
+> > The MAP/UNMAP notifier finally talks to physical IOMMU. is it? My point
+> > here is MAP/UNMAP finally would talk to physical IOMMU change the translation
+> > page table in memory.
+> yes it programs the pIOMMU with combined translation stages.
+>  However, for virt-svm case, the translation page
+> > table is the process vaddr page table(though the I/O page table is also used
+> > we don't need to talk it since hypervisor owns it). process vaddr page table
+> > is owned by guest, changes to the translation page table is by guest. So for
+> > such cache, just need to flush the cache in iommu side. no need to modify
+> > translation page table.
+> agreed but the MR notifier is not necessarily supposed to touch table,
+> right?
+
+Not sure for other platform, for VT-d, the existing MAP/UNMAP notifier would
+not touch the page table in Qemu, but they would touch through VFIO APIs. And
+I think it's necessary when it's registered. e.g. when virtual VT-d is exposed,
+guest can use guset IOVA, requires MAP/UNMAP APIs to shadow the mapping guest
+iommu driver builds.
+
+> > 
+> >>
+> >>  At the time gVA iotlb flush is issued, the gVA->gPA
+> >>> mapping has already modified. Host iommu only needs to reference it when
+> >>> performing address translation. But before host iommu perform translation,
+> >>> it needs to flush the old gVA cache. In VT-d, it is called 1st level cache
+> >>> flushing.
+> >>
+> >> The fact MR notifiers may not be relevant could be linked to the nature
+> >> of the tagging of the structures you want to flush. My understanding is
+> >> if you want to flush by source-id, MR granularity could be fine. Please
+> >> could you clarify why do you need an iommu wide operation in that case.
+> > 
+> > The flush is not limited to source-id granularity, it would be page selected
+> > and others. As I mentioned, it has no requirement to modify the translation
+> > page table, so it is more like a translation unit behavior.
+> we could also enumerate all MR notifiers - assuming they are registered!
+> - and call notifiers for each of them, right? Maybe this is not the
+> strongest argument.
+
+yes, it's not the strongest argument for the implementaion. But for design,
+it is a strong argument to address the necessarity across different platforms.
+
+> > 
+> >>>
+> >>> Both of the two notifiers(operations) has no direct relationship with MR,
+> >>> instead they highly depends on virt-iommu itself.
+> >> As described above this is not obvious to me. Please could you clarify
+> >> why source-id granularity (which I understand has a 1-1 granularity with
+> >> MR/AS is not the correct granularity). Of course, please correct me if
+> >> my understanding of MR mapping is not correct.
+> > 
+> > It's correct that for the PCIe device, the iova address space(aka PCI address
+> > space) has kind of 1-1 relationship with MR. But, for virt-SVM, the address
+> > space is not limted to iova address space, it has process address space, how
+> > can such an address space relate to a MR...
+> 
+> So, this discussion, reading again the cover letter, and digging into
+> your original series helped me understand the need for those new
+> notifiers. What confused me originally was the "iommu" wide notifiers.
+> Maybe you should clarify your cover letter by explicitly saying that
+> - SVM works along with PT = 1
+> - if PT = 1 IOMMU MR are disabled so MR notifier are not registered
+> - new notifiers do not fit nicely in this framework as they need to be
+> registered even if PT = 1
+> - having those notifiers attached to the whole IOMMU object abstraction
+> is not an issue
+> 
+> Please correct me if I said anything wrong and please apologize if I
+> brought any further confusion.
+
+yes, you're right. should have written it in a better manner. Would update the
+cover-letter accordingly in next version. Also, feel free to let me know if it
+meets the requirements of the pv work you're doing.
+
+Thanks,
+Yi L
+
+> 
+> Thanks
+> 
+> Eric
+> > 
+> > Thanks,
+> > Yi L
+> >>
+> >> Thanks
+> >>
+> >> Eric
+> >>
+> >>  If virt-iommu exists,
+> >>> then the two notfiers are needed, if not, then it's not.
+> >>>  
+> >>>> Even understanding the SVM stuff better than I did, I don't really see
+> >>>> why an AddressSpace is an obvious unit to have an IOMMUObject
+> >>>> associated with it.
+> >>>
+> >>> This will benefit the notifier registration. As my comments above, the
+> >>> IOMMUObject is to represent iommu. Associate an AddressSpace with an
+> >>> IOMMUObject makes it easy to check if it is necessary to register the
+> >>> notifiers.
+> >>  If no IOMMUObject, means no virt-iommu exposed to guest, then
+> >>> no need to register notifiers. For this, I also considered to use the
+> >>> MemoryRegion.iommu_ops. e.g. for VT-d, it can be a loop to check all the
+> >>> subregions and register notfiers if it is an iommu MemoryRegion. Peter
+> >>> mentioned it may not work for SPAR. So he proposed associating an
+> >>> AddressSpace with an IOMMUObject. I think it wroks and easier, so I
+> >>> didn’t object it.
+> >>>
+> >>> https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg04931.html
+> >>>
+> >>> +    /* Check if vIOMMU exists */
+> >>> +    QTAILQ_FOREACH(subregion, &as->root->subregions, subregions_link) {
+> >>> +        if (memory_region_is_iommu(subregion)) {
+> >>> +            IOMMUNotifier n1;
+> >>> +
+> >>> +            /*
+> >>> +             FIXME: current iommu notifier is actually designed for
+> >>> +             IOMMUTLB MAP/UNMAP. However, vIOMMU emulator may need
+> >>> +             notifiers other than MAP/UNMAP, so it'll be better to
+> >>> +             split the non-IOMMUTLB notifier from the current IOMMUTLB
+> >>> +             notifier framewrok.
+> >>> +             */
+> >>> +            iommu_notifier_init(&n1, vfio_iommu_bind_pasid_tbl_notify,
+> >>> +                                IOMMU_NOTIFIER_SVM_PASIDT_BIND,
+> >>> +                                0,
+> >>> +                                0);
+> >>> +            vfio_register_notifier(group->container,
+> >>> +                                   subregion,
+> >>> +                                   0,
+> >>> +                                   &n1);
+> >>> +        }
+> >>> +    }
+> >>> +
+> >>>
+> >>> Thanks,
+> >>> Yi L
+> >>>
+> >>>>> ---
+> >>>>>  hw/core/Makefile.objs   |  1 +
+> >>>>>  hw/core/iommu.c         | 58 +++++++++++++++++++++++++++++++++++++++
+> >>>>>  include/exec/memory.h   | 22 +++++++++++++++
+> >>>>>  include/hw/core/iommu.h | 73 +++++++++++++++++++++++++++++++++++++++++++++++++
+> >>>>>  memory.c                | 10 +++++--
+> >>>>>  5 files changed, 162 insertions(+), 2 deletions(-)
+> >>>>>  create mode 100644 hw/core/iommu.c
+> >>>>>  create mode 100644 include/hw/core/iommu.h
+> >>>>>
+> >>>>> diff --git a/hw/core/Makefile.objs b/hw/core/Makefile.objs
+> >>>>> index f8d7a4a..d688412 100644
+> >>>>> --- a/hw/core/Makefile.objs
+> >>>>> +++ b/hw/core/Makefile.objs
+> >>>>> @@ -5,6 +5,7 @@ common-obj-y += fw-path-provider.o
+> >>>>>  # irq.o needed for qdev GPIO handling:
+> >>>>>  common-obj-y += irq.o
+> >>>>>  common-obj-y += hotplug.o
+> >>>>> +common-obj-y += iommu.o
+> >>>>>  common-obj-y += nmi.o
+> >>>>>  
+> >>>>>  common-obj-$(CONFIG_EMPTY_SLOT) += empty_slot.o
+> >>>>> diff --git a/hw/core/iommu.c b/hw/core/iommu.c
+> >>>>> new file mode 100644
+> >>>>> index 0000000..7c4fcfe
+> >>>>> --- /dev/null
+> >>>>> +++ b/hw/core/iommu.c
+> >>>>> @@ -0,0 +1,58 @@
+> >>>>> +/*
+> >>>>> + * QEMU emulation of IOMMU logic
+> >>>>> + *
+> >>>>> + * Copyright (C) 2017 Red Hat Inc.
+> >>>>> + *
+> >>>>> + * Authors: Peter Xu <peterx@redhat.com>,
+> >>>>> + *
+> >>>>> + * This program is free software; you can redistribute it and/or modify
+> >>>>> + * it under the terms of the GNU General Public License as published by
+> >>>>> + * the Free Software Foundation; either version 2 of the License, or
+> >>>>> + * (at your option) any later version.
+> >>>>> +
+> >>>>> + * This program is distributed in the hope that it will be useful,
+> >>>>> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> >>>>> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> >>>>> + * GNU General Public License for more details.
+> >>>>> +
+> >>>>> + * You should have received a copy of the GNU General Public License along
+> >>>>> + * with this program; if not, see <http://www.gnu.org/licenses/>.
+> >>>>> + */
+> >>>>> +
+> >>>>> +#include "qemu/osdep.h"
+> >>>>> +#include "hw/core/iommu.h"
+> >>>>> +
+> >>>>> +void iommu_notifier_register(IOMMUObject *iommu,
+> >>>>> +                             IOMMUNotifier *n,
+> >>>>> +                             IOMMUNotifyFn fn,
+> >>>>> +                             IOMMUEvent event)
+> >>>>> +{
+> >>>>> +    n->event = event;
+> >>>>> +    n->iommu_notify = fn;
+> >>>>> +    QLIST_INSERT_HEAD(&iommu->iommu_notifiers, n, node);
+> >>>>> +    return;
+> >>>>> +}
+> >>>>> +
+> >>>>> +void iommu_notifier_unregister(IOMMUObject *iommu,
+> >>>>> +                               IOMMUNotifier *notifier)
+> >>>>> +{
+> >>>>> +    IOMMUNotifier *cur, *next;
+> >>>>> +
+> >>>>> +    QLIST_FOREACH_SAFE(cur, &iommu->iommu_notifiers, node, next) {
+> >>>>> +        if (cur == notifier) {
+> >>>>> +            QLIST_REMOVE(cur, node);
+> >>>>> +            break;
+> >>>>> +        }
+> >>>>> +    }
+> >>>>> +}
+> >>>>> +
+> >>>>> +void iommu_notify(IOMMUObject *iommu, IOMMUEventData *event_data)
+> >>>>> +{
+> >>>>> +    IOMMUNotifier *cur;
+> >>>>> +
+> >>>>> +    QLIST_FOREACH(cur, &iommu->iommu_notifiers, node) {
+> >>>>> +        if ((cur->event == event_data->event) && cur->iommu_notify) {
+> >>>>> +            cur->iommu_notify(cur, event_data);
+> >>>>> +        }
+> >>>>> +    }
+> >>>>> +}
+> >>>>> diff --git a/include/exec/memory.h b/include/exec/memory.h
+> >>>>> index 03595e3..8350973 100644
+> >>>>> --- a/include/exec/memory.h
+> >>>>> +++ b/include/exec/memory.h
+> >>>>> @@ -26,6 +26,7 @@
+> >>>>>  #include "qom/object.h"
+> >>>>>  #include "qemu/rcu.h"
+> >>>>>  #include "hw/qdev-core.h"
+> >>>>> +#include "hw/core/iommu.h"
+> >>>>>  
+> >>>>>  #define RAM_ADDR_INVALID (~(ram_addr_t)0)
+> >>>>>  
+> >>>>> @@ -301,6 +302,19 @@ struct MemoryListener {
+> >>>>>  };
+> >>>>>  
+> >>>>>  /**
+> >>>>> + * AddressSpaceOps: callbacks structure for address space specific operations
+> >>>>> + *
+> >>>>> + * @iommu_get: returns an IOMMU object that backs the address space.
+> >>>>> + *             Normally this should be NULL for generic address
+> >>>>> + *             spaces, and it's only used when there is one
+> >>>>> + *             translation unit behind this address space.
+> >>>>> + */
+> >>>>> +struct AddressSpaceOps {
+> >>>>> +    IOMMUObject *(*iommu_get)(AddressSpace *as);
+> >>>>> +};
+> >>>>> +typedef struct AddressSpaceOps AddressSpaceOps;
+> >>>>> +
+> >>>>> +/**
+> >>>>>   * AddressSpace: describes a mapping of addresses to #MemoryRegion objects
+> >>>>>   */
+> >>>>>  struct AddressSpace {
+> >>>>> @@ -316,6 +330,7 @@ struct AddressSpace {
+> >>>>>      struct MemoryRegionIoeventfd *ioeventfds;
+> >>>>>      QTAILQ_HEAD(memory_listeners_as, MemoryListener) listeners;
+> >>>>>      QTAILQ_ENTRY(AddressSpace) address_spaces_link;
+> >>>>> +    AddressSpaceOps as_ops;
+> >>>>>  };
+> >>>>>  
+> >>>>>  FlatView *address_space_to_flatview(AddressSpace *as);
+> >>>>> @@ -1988,6 +2003,13 @@ address_space_write_cached(MemoryRegionCache *cache, hwaddr addr,
+> >>>>>      address_space_write(cache->as, cache->xlat + addr, MEMTXATTRS_UNSPECIFIED, buf, len);
+> >>>>>  }
+> >>>>>  
+> >>>>> +/**
+> >>>>> + * address_space_iommu_get: Get the backend IOMMU for the address space
+> >>>>> + *
+> >>>>> + * @as: the address space to fetch IOMMU from
+> >>>>> + */
+> >>>>> +IOMMUObject *address_space_iommu_get(AddressSpace *as);
+> >>>>> +
+> >>>>>  #endif
+> >>>>>  
+> >>>>>  #endif
+> >>>>> diff --git a/include/hw/core/iommu.h b/include/hw/core/iommu.h
+> >>>>> new file mode 100644
+> >>>>> index 0000000..34387c0
+> >>>>> --- /dev/null
+> >>>>> +++ b/include/hw/core/iommu.h
+> >>>>> @@ -0,0 +1,73 @@
+> >>>>> +/*
+> >>>>> + * QEMU emulation of IOMMU logic
+> >>>>> + *
+> >>>>> + * Copyright (C) 2017 Red Hat Inc.
+> >>>>> + *
+> >>>>> + * Authors: Peter Xu <peterx@redhat.com>,
+> >>>>> + *
+> >>>>> + * This program is free software; you can redistribute it and/or modify
+> >>>>> + * it under the terms of the GNU General Public License as published by
+> >>>>> + * the Free Software Foundation; either version 2 of the License, or
+> >>>>> + * (at your option) any later version.
+> >>>>> +
+> >>>>> + * This program is distributed in the hope that it will be useful,
+> >>>>> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> >>>>> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> >>>>> + * GNU General Public License for more details.
+> >>>>> +
+> >>>>> + * You should have received a copy of the GNU General Public License along
+> >>>>> + * with this program; if not, see <http://www.gnu.org/licenses/>.
+> >>>>> + */
+> >>>>> +
+> >>>>> +#ifndef HW_CORE_IOMMU_H
+> >>>>> +#define HW_CORE_IOMMU_H
+> >>>>> +
+> >>>>> +#include "qemu/queue.h"
+> >>>>> +
+> >>>>> +enum IOMMUEvent {
+> >>>>> +    IOMMU_EVENT_BIND_PASIDT,
+> >>>>> +};
+> >>>>> +typedef enum IOMMUEvent IOMMUEvent;
+> >>>>> +
+> >>>>> +struct IOMMUEventData {
+> >>>>> +    IOMMUEvent event;
+> >>>>> +    uint64_t length;
+> >>>>> +    void *data;
+> >>>>> +};
+> >>>>> +typedef struct IOMMUEventData IOMMUEventData;
+> >>>>> +
+> >>>>> +typedef struct IOMMUNotifier IOMMUNotifier;
+> >>>>> +
+> >>>>> +typedef void (*IOMMUNotifyFn)(IOMMUNotifier *notifier,
+> >>>>> +                              IOMMUEventData *event_data);
+> >>>>> +
+> >>>>> +struct IOMMUNotifier {
+> >>>>> +    IOMMUNotifyFn iommu_notify;
+> >>>>> +    /*
+> >>>>> +     * What events we are listening to. Let's allow multiple event
+> >>>>> +     * registrations from beginning.
+> >>>>> +     */
+> >>>>> +    IOMMUEvent event;
+> >>>>> +    QLIST_ENTRY(IOMMUNotifier) node;
+> >>>>> +};
+> >>>>> +
+> >>>>> +typedef struct IOMMUObject IOMMUObject;
+> >>>>> +
+> >>>>> +/*
+> >>>>> + * This stands for an IOMMU unit. Any translation device should have
+> >>>>> + * this struct inside its own structure to make sure it can leverage
+> >>>>> + * common IOMMU functionalities.
+> >>>>> + */
+> >>>>> +struct IOMMUObject {
+> >>>>> +    QLIST_HEAD(, IOMMUNotifier) iommu_notifiers;
+> >>>>> +};
+> >>>>> +
+> >>>>> +void iommu_notifier_register(IOMMUObject *iommu,
+> >>>>> +                             IOMMUNotifier *n,
+> >>>>> +                             IOMMUNotifyFn fn,
+> >>>>> +                             IOMMUEvent event);
+> >>>>> +void iommu_notifier_unregister(IOMMUObject *iommu,
+> >>>>> +                               IOMMUNotifier *notifier);
+> >>>>> +void iommu_notify(IOMMUObject *iommu, IOMMUEventData *event_data);
+> >>>>> +
+> >>>>> +#endif
+> >>>>> diff --git a/memory.c b/memory.c
+> >>>>> index 77fb3ef..307f665 100644
+> >>>>> --- a/memory.c
+> >>>>> +++ b/memory.c
+> >>>>> @@ -235,8 +235,6 @@ struct FlatView {
+> >>>>>      MemoryRegion *root;
+> >>>>>  };
+> >>>>>  
+> >>>>> -typedef struct AddressSpaceOps AddressSpaceOps;
+> >>>>> -
+> >>>>>  #define FOR_EACH_FLAT_RANGE(var, view)          \
+> >>>>>      for (var = (view)->ranges; var < (view)->ranges + (view)->nr; ++var)
+> >>>>>  
+> >>>>> @@ -2793,6 +2791,14 @@ static void do_address_space_destroy(AddressSpace *as)
+> >>>>>      memory_region_unref(as->root);
+> >>>>>  }
+> >>>>>  
+> >>>>> +IOMMUObject *address_space_iommu_get(AddressSpace *as)
+> >>>>> +{
+> >>>>> +    if (!as->as_ops.iommu_get) {
+> >>>>> +        return NULL;
+> >>>>> +    }
+> >>>>> +    return as->as_ops.iommu_get(as);
+> >>>>> +}
+> >>>>> +
+> >>>>>  void address_space_destroy(AddressSpace *as)
+> >>>>>  {
+> >>>>>      MemoryRegion *root = as->root;
+> >>>>
+> >>>> -- 
+> >>>> David Gibson			| I'll have my music baroque, and my code
+> >>>> david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+> >>>> 				| _way_ _around_!
+> >>>> http://www.ozlabs.org/~dgibson
+> >>>
+> >>>
+> >>>
+> >>
+> > 
+> 
