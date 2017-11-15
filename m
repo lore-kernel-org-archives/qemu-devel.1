@@ -1,15 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58924)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32937)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eF5Lt-0002Pe-Jo
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 16:36:10 -0500
+	(envelope-from <gandalf.corvotempesta@gmail.com>) id 1eF5SK-0003tm-KO
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 16:42:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eF5Ls-0000pt-Lg
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 16:36:09 -0500
-From: Eric Blake <eblake@redhat.com>
-Date: Wed, 15 Nov 2017 15:35:56 -0600
-Message-Id: <20171115213557.3548-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 for-2.11] nbd/server: Fix error reporting
- for bad requests
+	(envelope-from <gandalf.corvotempesta@gmail.com>) id 1eF5SJ-0005zG-Af
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 16:42:48 -0500
+MIME-Version: 1.0
+In-Reply-To: <5b6f8758-5e3e-e759-1592-2768eb85b322@redhat.com>
+References: <CAJH6TXiMxUoU2sFEHAoZ8jhDMtg_saEnTHM9f0vJ6Nhqj7099w@mail.gmail.com>
+	<c2ecae32-f999-9f1e-46a6-37cdab2a62e3@redhat.com>
+	<CAJH6TXhBAaBE9gBSxksWZqNywWmencRaGyeY-oN3jbKdgUettQ@mail.gmail.com>
+	<0e6cc220-814a-17fd-4fd7-7b0665d34e81@redhat.com>
+	<CAJH6TXh2v-F=yqxQbUUawk_Ctq-sgFefGp1XvMsC=syX_5jEqA@mail.gmail.com>
+	<30b54865-2255-d13d-a054-afcf5bbd06b2@redhat.com>
+	<20171115202440.GJ19514@redhat.com>
+	<7b11bb2b-b93d-e8ff-f396-703c93549d0d@redhat.com>
+	<20171115202938.GN2787@redhat.com>
+	<CAJH6TXiPuLu62-+o2+PrUGpstrks_5pLotFEe1bAOmsbn20otw@mail.gmail.com>
+	<5b6f8758-5e3e-e759-1592-2768eb85b322@redhat.com>
+From: Gandalf Corvotempesta <gandalf.corvotempesta@gmail.com>
+Date: Wed, 15 Nov 2017 22:42:42 +0100
+Message-ID: <CAJH6TXgrOWxP7jFg98_jv-R1nrFKOXBQA6pPxbkzGWTVW=EReA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Libguestfs]  [qemu-img] support for XVA
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,106 +31,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, vsementsov@virtuozzo.com, Paolo Bonzini <pbonzini@redhat.com>
+To: Max Reitz <mreitz@redhat.com>
+Cc: "Richard W.M. Jones" <rjones@redhat.com>, Qemu-block <qemu-block@nongnu.org>, qemu-devel@nongnu.org, libguestfs <libguestfs@redhat.com>
 
-The NBD spec says an attempt to NBD_CMD_TRIM on a read-only
-export should fail with EPERM, as a trim has the potential
-to change disk contents, but we were relying on the block
-layer to catch that for us, which might not always give the
-right error (and even if it does, it does not let us pass
-back a sane message for structured replies).
+I'm thinking on how to prove you a sample XVA
+I have to create (and populate) a VM because an empty image will result in
+an empty XVA
+And a VM is 300-400Mb as minimum
 
-The NBD spec says an attempt to NBD_CMD_WRITE_ZEROES out of
-bounds should fail with ENOSPC, not EINVAL.
+Il 15 nov 2017 10:30 PM, "Max Reitz" <mreitz@redhat.com> ha scritto:
 
-Our check for u64 offset + u32 length wraparound up front is
-pointless; nothing uses offset until after the second round
-of sanity checks, and we can just as easily ensure there is
-no wraparound by checking whether offset is in bounds (since
-a disk size cannot exceed off_t which is 63 bits, adding a
-32-bit number for a valid offset can't overflow).
-
-Solve all of these issues by some code motion and improved
-request validation.
-
-Signed-off-by: Eric Blake <eblake@redhat.com>
----
-v2: actually commit the compiler-error fixes before submitting...
-
- nbd/server.c | 36 ++++++++++++------------------------
- 1 file changed, 12 insertions(+), 24 deletions(-)
-
-diff --git a/nbd/server.c b/nbd/server.c
-index df771fd42f..7d6801b427 100644
---- a/nbd/server.c
-+++ b/nbd/server.c
-@@ -1366,15 +1366,6 @@ static int nbd_co_receive_request(NBDRequestData *req, NBDRequest *request,
-         return -EIO;
-     }
-
--    /* Check for sanity in the parameters, part 1.  Defer as many
--     * checks as possible until after reading any NBD_CMD_WRITE
--     * payload, so we can try and keep the connection alive.  */
--    if ((request->from + request->len) < request->from) {
--        error_setg(errp,
--                   "integer overflow detected, you're probably being attacked");
--        return -EINVAL;
--    }
--
-     if (request->type == NBD_CMD_READ || request->type == NBD_CMD_WRITE) {
-         if (request->len > NBD_MAX_BUFFER_SIZE) {
-             error_setg(errp, "len (%" PRIu32" ) is larger than max len (%u)",
-@@ -1399,12 +1390,21 @@ static int nbd_co_receive_request(NBDRequestData *req, NBDRequest *request,
-                                                       request->len);
-     }
-
--    /* Sanity checks, part 2. */
--    if (request->from + request->len > client->exp->size) {
-+    /* Sanity checks. */
-+    if (client->exp->nbdflags & NBD_FLAG_READ_ONLY &&
-+        (request->type == NBD_CMD_WRITE ||
-+         request->type == NBD_CMD_WRITE_ZEROES ||
-+         request->type == NBD_CMD_TRIM)) {
-+        error_setg(errp, "Export is read-only");
-+        return -EROFS;
-+    }
-+    if (request->from > client->exp->size ||
-+        request->from + request->len > client->exp->size) {
-         error_setg(errp, "operation past EOF; From: %" PRIu64 ", Len: %" PRIu32
-                    ", Size: %" PRIu64, request->from, request->len,
-                    (uint64_t)client->exp->size);
--        return request->type == NBD_CMD_WRITE ? -ENOSPC : -EINVAL;
-+        return (request->type == NBD_CMD_WRITE ||
-+                request->type == NBD_CMD_WRITE_ZEROES) ? -ENOSPC : -EINVAL;
-     }
-     valid_flags = NBD_CMD_FLAG_FUA;
-     if (request->type == NBD_CMD_READ && client->structured_reply) {
-@@ -1482,12 +1482,6 @@ static coroutine_fn void nbd_trip(void *opaque)
-
-         break;
-     case NBD_CMD_WRITE:
--        if (exp->nbdflags & NBD_FLAG_READ_ONLY) {
--            error_setg(&local_err, "Export is read-only");
--            ret = -EROFS;
--            break;
--        }
--
-         flags = 0;
-         if (request.flags & NBD_CMD_FLAG_FUA) {
-             flags |= BDRV_REQ_FUA;
-@@ -1500,12 +1494,6 @@ static coroutine_fn void nbd_trip(void *opaque)
-
-         break;
-     case NBD_CMD_WRITE_ZEROES:
--        if (exp->nbdflags & NBD_FLAG_READ_ONLY) {
--            error_setg(&local_err, "Export is read-only");
--            ret = -EROFS;
--            break;
--        }
--
-         flags = 0;
-         if (request.flags & NBD_CMD_FLAG_FUA) {
-             flags |= BDRV_REQ_FUA;
--- 
-2.13.6
+> On 2017-11-15 21:41, Gandalf Corvotempesta wrote:
+> > 2017-11-15 21:29 GMT+01:00 Richard W.M. Jones <rjones@redhat.com>:
+> >> Gandalf, is there an XVA file publically available (pref. not
+> >> too big) that we can look at?
+> >
+> > I can try to provide one, but it's simple:
+> >
+> > # tar tvf 20160630_124823_aa72_.xva.gz | head -n 50
+> > ---------- 0/0           42353 1970-01-01 01:00 ova.xml
+> > ---------- 0/0         1048576 1970-01-01 01:00 Ref:175/00000000
+> > ---------- 0/0              40 1970-01-01 01:00 Ref:175/00000000.checksum
+> > ---------- 0/0         1048576 1970-01-01 01:00 Ref:175/00000001
+> > ---------- 0/0              40 1970-01-01 01:00 Ref:175/00000001.checksum
+> > ---------- 0/0         1048576 1970-01-01 01:00 Ref:175/00000003
+> > ---------- 0/0              40 1970-01-01 01:00 Ref:175/00000003.checksum
+> > ---------- 0/0         1048576 1970-01-01 01:00 Ref:175/00000004
+> > ---------- 0/0              40 1970-01-01 01:00 Ref:175/00000004.checksum
+> > ---------- 0/0         1048576 1970-01-01 01:00 Ref:175/00000005
+> > ---------- 0/0              40 1970-01-01 01:00 Ref:175/00000005.checksum
+> > ---------- 0/0         1048576 1970-01-01 01:00 Ref:175/00000006
+> > ---------- 0/0              40 1970-01-01 01:00 Ref:175/00000006.checksum
+> > ---------- 0/0         1048576 1970-01-01 01:00 Ref:175/00000007
+> > ---------- 0/0              40 1970-01-01 01:00 Ref:175/00000007.checksum
+> > ---------- 0/0         1048576 1970-01-01 01:00 Ref:175/00000009
+> > ---------- 0/0              40 1970-01-01 01:00 Ref:175/00000009.checksum
+> > ---------- 0/0         1048576 1970-01-01 01:00 Ref:175/00000010
+> > ---------- 0/0              40 1970-01-01 01:00 Ref:175/00000010.checksum
+> >
+> >
+> > You can ignore the ova.xml and just use the "Ref:175" directory.
+> > Inside the XVA you'll fine one "Ref" directory for each virtual disk
+> > (ref number is different for each disk)
+> > Inside each Ref directory, you'll get tons of 1MB file, corrisponding
+> > to the RAW image.
+> > You have to merge these files in a single raw file with just an
+> > exception: numbers are not sequential.
+> > as you can see above, we have: 00000000, 00000001, 00000003
+> >
+> > The 00000002 is missing, because it's totally blank. XenServer doesn't
+> > export any empty block, thus it will skip the corrisponding 1MB file.
+> > When building the raw image, you have to replace empty blocks with 1MB
+> > full of zeros.
+> >
+> > This is (in addition to the tar extract) the most time-consuming part.
+> > Currently I'm rebuilding a 250GB image, with tons of files to be
+> > merge.
+> > If qemu-img can be patched to automatically convert this kind of
+> > format, I can save about 3 hours (30 minutes for extracting the
+> > tarball, and about 2 hours to merge 250-300GB image)
+>
+> Hmmm...  OK, so as Rich said, you can use the raw driver with an offset
+> and a size.  And you can use the null-co driver to emulate holes.  And
+> qemu-img convert supports concatenation.
+>
+> Taking all of that together, it should be possible to create an input
+> "file" per 1 MB block and concatenate all of those with qemu-img
+> convert.  The only issue is that it'll get you a *really* long command
+> line.
+>
+> (And you'll still have to gunzip the archive before, of course.)
+>
+> I'll try to write a script, but of course it's hart without an example...
+>
+> Max
+>
+>
