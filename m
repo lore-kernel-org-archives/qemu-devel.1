@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52777)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54392)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eEy0U-0000wC-4x
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 08:45:35 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eEy64-00027e-0Z
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 08:51:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eEy0P-0004JV-93
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 08:45:34 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40023)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eEy0O-0004IU-TH
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 08:45:29 -0500
-References: <20171115124602.12501-1-ppandit@redhat.com>
-	<20171115125151.GG20349@redhat.com>
-	<f569ccce-4aa5-423a-25b2-baf69e8e6b43@redhat.com>
-	<20171115133034.GB4418@work-vm>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <b18ca48a-8785-9642-584e-c82f0cf7eaba@redhat.com>
-Date: Wed, 15 Nov 2017 14:45:20 +0100
+	(envelope-from <mreitz@redhat.com>) id 1eEy63-0008NR-8Q
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 08:51:19 -0500
+References: <20171114184127.24238-1-mreitz@redhat.com>
+	<w51efozkiwf.fsf@maestria.local.igalia.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <bcb8ada9-059f-1bc6-10f3-94eeeb29ffab@redhat.com>
+Date: Wed, 15 Nov 2017 14:51:01 +0100
 MIME-Version: 1.0
-In-Reply-To: <20171115133034.GB4418@work-vm>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] ps2: fix PS2Queue counter field type
+In-Reply-To: <w51efozkiwf.fsf@maestria.local.igalia.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="VFOjJfHOUwq361ORWukR3g5fjCVKx6Q5b"
+Subject: Re: [Qemu-devel] [PATCH for-2.11] qcow2: Fix overly broad madvise()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,59 +24,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, P J P <ppandit@redhat.com>, Cyrille Chatras <cyrille.chatras@orange.com>, Gerd Hoffmann <kraxel@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>, Prasad J Pandit <pjp@fedoraproject.org>
+To: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
 
-On 15/11/2017 14:30, Dr. David Alan Gilbert wrote:
-> * Paolo Bonzini (pbonzini@redhat.com) wrote:
->> On 15/11/2017 13:51, Daniel P. Berrange wrote:
->>> If you're concerned that someone is tampering with QEMU state
->>> in transit during migration, then you're going to end up playing
->>> whack-a-mole across the entire QEMU codebase IMHO. The answer
->>> to the problem of tampering is to have encryption of the
->>> migration data stream between both QEMU's. Thus QEMU on the
->>> target merely has to trust QEMU on the source. If QEMU on the
->>> source is itself compromised you've already lost and migration
->>> won't make life any worse.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--VFOjJfHOUwq361ORWukR3g5fjCVKx6Q5b
+From: Max Reitz <mreitz@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+Message-ID: <bcb8ada9-059f-1bc6-10f3-94eeeb29ffab@redhat.com>
+Subject: Re: [PATCH for-2.11] qcow2: Fix overly broad madvise()
+References: <20171114184127.24238-1-mreitz@redhat.com>
+ <w51efozkiwf.fsf@maestria.local.igalia.com>
+In-Reply-To: <w51efozkiwf.fsf@maestria.local.igalia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 2017-11-15 10:09, Alberto Garcia wrote:
+> On Tue 14 Nov 2017 07:41:27 PM CET, Max Reitz wrote:
+>> @mem_size and @offset are both size_t, thus subtracting them from one
+>> another will just return a big size_t if mem_size < offset -- even mor=
+e
+>> obvious here because the result is stored in another size_t.
 >>
->> This is not entirely true.  A lot of such cases were fixed in the past=
-,
->> especially when they could cause out-of-bounds access.  Someone could
->> provide a bad migration stream (e.g. as a fake bug report!), so
->> migration data should not be considered trusted.
->=20
-> There's probably others to be honest; it's not something we've
-> traditionally been careful of.
+>> Checking that result to be positive is therefore not sufficient to
+>> excluse the case that offset > mem_size.  Thus, we currently sometimes=
 
-There was a flurry of fixes a while ago:
-
-- CVE-2013-4149 to CVE-2013-4151
-- CVE-2013-4526 to CVE-2013-4527
-- CVE-2013-4529 to CVE-2013-4542
-- CVE-2013-6399
-- CVE-2014-0182
-
-This one was introduced in 2.1, around the same time these others were
-fixed, by commit 2858ab09e6 ("ps2: set ps/2 output buffer size as the
-same as kernel", 2014-05-16).
-
-Thanks,
-
-Paolo
-
->=20
->> However, PJP's patch breaks migration by changing a 4-byte field to
->> 1-byte.  The correct fix is to range-check the fields in
->> ps2_common_post_load.
->=20
-> Agreed.
->=20
-> Dave
->=20
->> Thanks,
+>> issue an madvise() over a very large address range.
 >>
->> Paolo
+>> This is triggered by iotest 163, but with -m64, this does not result i=
+n
+>> tangible problems.  But with -m32, this test produces three segfaults,=
+
+>> all of which are fixed by this patch.
 >>
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>> Signed-off-by: Max Reitz <mreitz@redhat.com>
 >=20
+> Oh, I guess this happens when the page size is larger than the cluster
+> size? Otherwise I don't see how...
+>=20
+> Reviewed-by: Alberto Garcia <berto@igalia.com>
+
+Yes, the test uses 512 byte clusters.
+
+Max
+
+
+--VFOjJfHOUwq361ORWukR3g5fjCVKx6Q5b
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAloMRkUSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9Au6UH/2NRJel54yNKKzp7x0wIBER5I6uHNcgc
+rU9EzCTlfmQpI01xGie9DSHEzhZ1i/GM9zqGMW+kF9CWTLc7bCQvkSKlTWXZ2L2q
+80M83Him4jKauB+tZeK9njRQEpu7UjJ2gbdnR/ZlNGLJd8QlhEc4RiU3jnVbXTRt
+B9DkDbKp+6KzcajAYLThlhINpa6ZvSLkzFUemeMQEvzyzMsVo+12jbM5c/gs004L
+/+psxR+sWwJyyr7vbanxViXZR2o852V/IKUFWUd+xvntsmywz+DgVHoEOX2P6Rzl
+RjKpC6baabOegS98v6jHuvvCmoHPpkf7D5VrlFEcG185uoXQyT6XW1k=
+=zXeQ
+-----END PGP SIGNATURE-----
+
+--VFOjJfHOUwq361ORWukR3g5fjCVKx6Q5b--
