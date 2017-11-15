@@ -1,24 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41900)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43635)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eEsJA-0006PN-2S
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 02:40:28 -0500
+	(envelope-from <bounces@canonical.com>) id 1eEsTc-0007kn-Ml
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 02:51:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eEsJ9-0005Hu-8k
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 02:40:28 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48180)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eEsJ9-0005Gp-2E
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 02:40:27 -0500
-Date: Wed, 15 Nov 2017 15:40:18 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20171115074018.GG6821@xz-mi>
-References: <20171114231350.286025-1-prasad.singamsetty@oracle.com>
+	(envelope-from <bounces@canonical.com>) id 1eEsTW-0006T4-Se
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 02:51:16 -0500
+Received: from indium.canonical.com ([91.189.90.7]:47040)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eEsTW-0006Qr-M7
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 02:51:10 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eEsTU-00019k-MA
+	for <qemu-devel@nongnu.org>; Wed, 15 Nov 2017 07:51:08 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id DBA9C2E81C5
+	for <qemu-devel@nongnu.org>; Wed, 15 Nov 2017 07:51:02 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20171114231350.286025-1-prasad.singamsetty@oracle.com>
-Subject: Re: [Qemu-devel] [PATCH v1 0/2] intel-iommu: Extend address width
- to 48 bits
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 15 Nov 2017 07:43:27 -0000
+From: Gerd Hoffmann <1713825@bugs.launchpad.net>
+Reply-To: Bug 1713825 <1713825@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150404140220.18876.2468100840644103776.malonedeb@chaenomeles.canonical.com>
+Message-Id: <151073180765.28214.15994444719235835127.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1713825] Re: Booting Windows 2016 with qxl video
+ crashes qemu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,44 +37,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: prasad.singamsetty@oracle.com
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, mst@redhat.com, imammedo@redhat.com, konrad.wilk@oracle.com
+To: qemu-devel@nongnu.org
 
-On Tue, Nov 14, 2017 at 06:13:48PM -0500, prasad.singamsetty@oracle.com wrote:
-> From: Prasad Singamsetty <prasad.singamsetty@oracle.com>
-> 
-> This pair of patches extends the intel-iommu to support address
-> width to 48 bits. This is required to support qemu guest with large
-> memory (>=1TB). 
-> 
-> Patch1 implements changes to redefine macros and usage to
-> allow further changes to add support for 48 bit address width.
-> This patch doesn't change the existing functionality or behavior.
-> 
-> Patch2 adds support for 48 bit address width but keeping the
-> default to 39 bits.
-> 
-> NOTE: Peter Xu had originaly started on this enhancement
-> but it was not completed or integrated.
-> 
-> Unit testing done:
-> 
-> patch-1:
->    * Boot vm with and without intel-iommu enabled
->    * Boot vm with #cpus below and above 255 cpus
-> patch-2:
->    * boot vm without "x-aw-bits" or "x-aw-bits=39": guest boots with 39
->    * boot vm with "x-aw-bits=48": guest boots with 48 bits
->    * boot vm with invalid value for x-aw-bits: guest fails to boot
->    * boot vm with >=1TB memory and "x-aw-bits=48": guest boots
-> 
-> Prasad Singamsetty (2):
->   intel-iommu: Redefine macros to enable supporting 48 bit address width
->   intel-iommu: Extend address width to 48 bits
+Guest triggerable assert() isn't exactly nice indeed.
+But it's not a show stopper.
+It doesn't allow exploiting the host, the guest can only DoS itself.
+And you must be priviledged in the guest to do so.
 
-Looks quite good to me!
+Most likely this is the driver placing the qxl commands in the wrong pci
+bar.  See commit 86dbcdd9c7590d06db89ca256c5eaf0b4aba8858.  Seems the
+impact is more than breaking live migration.  So, I can raise a error
+irq and have qxl enter guest bug mode.  That doesn't improve the
+situation much though, the guest will continue running but you will have
+broken display ...
 
-Reviewed-by: Peter Xu <peterx@redhat.com>
+-- =
 
--- 
-Peter Xu
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1713825
+
+Title:
+  Booting Windows 2016 with qxl video crashes qemu
+
+Status in QEMU:
+  New
+
+Bug description:
+  launched from libvirt.
+
+  qemu version: 2.9.0
+  host: Linux <hostname> 4.9.34-gentoo #1 SMP Sat Jul 29 13:28:43 PDT 2017 =
+x86_64 Intel(R) Core(TM) i7-3930K CPU @ 3.20GHz GenuineIntel GNU/Linux
+  guest: Windows 2016 64 bit
+
+  Thread 28 (Thread 0x7f0e2edff700 (LWP 29860)):
+  #0  __GI_raise (sig=3Dsig@entry=3D6) at ../sysdeps/unix/sysv/linux/raise.=
+c:51
+          set =3D {__val =3D {18446744067266837079, 139698892694944, 139699=
+853745096, 139700858749789, 4222451712, 139694281220640, 139694281220741, 1=
+39694281220640, 139694281220640, 139694281220810, =
+
+              139694281220940, 139694281220640, 139694281220940, 0, 0, 0}}
+          pid =3D <optimized out>
+          tid =3D <optimized out>
+  #1  0x00007f0ea40b644a in __GI_abort () at abort.c:89
+          save_stage =3D 2
+          act =3D {__sigaction_handler =3D {sa_handler =3D 0x7f0e2edfe5c0, =
+sa_sigaction =3D 0x7f0e2edfe5c0}, sa_mask =3D {__val =3D {139694281219872, =
+139698106269697, 139698892695344, 4, 2676511744, 0, 139698892695144, 0, =
+
+                139698892694912, 1, 4737316546111099904, 139700859888720, 4=
+737316546111099904, 139700862161824, 139700911349760, 94211934977482}}, sa_=
+flags =3D 416, =
+
+            sa_restorer =3D 0x55af6ceb0500 <__PRETTY_FUNCTION__.36381>}
+          sigs =3D {__val =3D {32, 0 <repeats 15 times>}}
+  #2  0x00007f0ea40abab6 in __assert_fail_base (fmt=3D<optimized out>, asse=
+rtion=3Dassertion@entry=3D0x55af6ceafdca "offset < qxl->vga.vram_size", =
+
+      file=3Dfile@entry=3D0x55af6ceaeaa0 "/var/tmp/portage/app-emulation/qe=
+mu-2.9.0-r2/work/qemu-2.9.0/hw/display/qxl.c", line=3Dline@entry=3D416, =
+
+      function=3Dfunction@entry=3D0x55af6ceb0500 <__PRETTY_FUNCTION__.36381=
+> "qxl_ram_set_dirty") at assert.c:92
+          str =3D 0x7f0d1c026220 "\340r\002\034\r\177"
+          total =3D 4096
+  #3  0x00007f0ea40abb81 in __GI___assert_fail (assertion=3Dassertion@entry=
+=3D0x55af6ceafdca "offset < qxl->vga.vram_size", =
+
+      file=3Dfile@entry=3D0x55af6ceaeaa0 "/var/tmp/portage/app-emulation/qe=
+mu-2.9.0-r2/work/qemu-2.9.0/hw/display/qxl.c", line=3Dline@entry=3D416, =
+
+      function=3Dfunction@entry=3D0x55af6ceb0500 <__PRETTY_FUNCTION__.36381=
+> "qxl_ram_set_dirty") at assert.c:101
+  No locals.
+  #4  0x000055af6cc58805 in qxl_ram_set_dirty (qxl=3D<optimized out>, ptr=
+=3D<optimized out>) at /var/tmp/portage/app-emulation/qemu-2.9.0-r2/work/qe=
+mu-2.9.0/hw/display/qxl.c:416
+          base =3D <optimized out>
+          offset =3D <optimized out>
+          qxl =3D <optimized out>
+          ptr =3D <optimized out>
+          base =3D <optimized out>
+          offset =3D <optimized out>
+  #5  0x000055af6cc5b9e2 in interface_release_resource (sin=3D0x55af71a91ed=
+0, ext=3D...) at /var/tmp/portage/app-emulation/qemu-2.9.0-r2/work/qemu-2.9=
+.0/hw/display/qxl.c:767
+          qxl =3D 0x55af71a91450
+          ring =3D <optimized out>
+          item =3D <optimized out>
+          id =3D 18446690739814400920
+          __func__ =3D "interface_release_resource"
+  #6  0x00007f0ea510afa8 in red_drawable_unref (red_drawable=3D0x7f0d1c0261=
+20) at red-worker.c:101
+  No locals.
+  #7  0x00007f0ea510b609 in red_drawable_unref (red_drawable=3D<optimized o=
+ut>) at red-worker.c:104
+  No locals.
+  #8  0x00007f0ea510eae9 in drawable_unref (drawable=3Ddrawable@entry=3D0x7=
+f0e68285ac0) at display-channel.c:1438
+          display =3D 0x55af71dbd3c0
+          __FUNCTION__ =3D "drawable_unref"
+  #9  0x00007f0ea51109f7 in draw_until (display=3Ddisplay@entry=3D0x55af71d=
+bd3c0, surface=3Dsurface@entry=3D0x7f0e6828aae8, last=3D0x7f0e68285ac0) at =
+display-channel.c:1637
+          container =3D 0x0
+          now =3D 0x7f0e68285ac0
+  #10 0x00007f0ea510f93f in display_channel_draw (display=3D0x55af71dbd3c0,=
+ area=3D0x7f0e2edfe8e0, surface_id=3D<optimized out>) at display-channel.c:=
+1729
+          surface =3D 0x7f0e6828aae8
+          last =3D <optimized out>
+          __FUNCTION__ =3D "display_channel_draw"
+          __func__ =3D "display_channel_draw"
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1713825/+subscriptions
