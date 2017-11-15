@@ -1,26 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42297)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52931)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gandalf.corvotempesta@gmail.com>) id 1eF1kE-0006bD-BA
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 12:45:06 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eF26E-0001ID-Kr
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 13:07:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gandalf.corvotempesta@gmail.com>) id 1eF1kD-00023D-DE
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 12:45:02 -0500
-Received: from mail-it0-x229.google.com ([2607:f8b0:4001:c0b::229]:42110)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <gandalf.corvotempesta@gmail.com>)
-	id 1eF1kD-00022i-7R
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 12:45:01 -0500
-Received: by mail-it0-x229.google.com with SMTP id n134so2693401itg.1
-	for <qemu-devel@nongnu.org>; Wed, 15 Nov 2017 09:45:01 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <c2ecae32-f999-9f1e-46a6-37cdab2a62e3@redhat.com>
-References: <CAJH6TXiMxUoU2sFEHAoZ8jhDMtg_saEnTHM9f0vJ6Nhqj7099w@mail.gmail.com>
-	<c2ecae32-f999-9f1e-46a6-37cdab2a62e3@redhat.com>
-From: Gandalf Corvotempesta <gandalf.corvotempesta@gmail.com>
-Date: Wed, 15 Nov 2017 18:44:59 +0100
-Message-ID: <CAJH6TXhBAaBE9gBSxksWZqNywWmencRaGyeY-oN3jbKdgUettQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [qemu-img] support for XVA
+	(envelope-from <mreitz@redhat.com>) id 1eF26D-0003v5-Mo
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 13:07:46 -0500
+From: Max Reitz <mreitz@redhat.com>
+Date: Wed, 15 Nov 2017 19:07:32 +0100
+Message-Id: <20171115180732.31753-1-mreitz@redhat.com>
+Subject: [Qemu-devel] [PATCH] iotests: Make 087 pass without AIO enabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,41 +17,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, libguestfs <libguestfs@redhat.com>
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-XVA is a tar archive.
-I don't think would be possible to directly use the image stored inside
-without extracting and merging each chunks
+If AIO has not been enabled in the qemu build that is to be tested, we
+should skip the "aio=native without O_DIRECT" test instead of failing.
 
-Any random reads would be impossible to do, only a huge sequential dump to
-build the raw image
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+---
+Cleber wanted to fix this in July with his "build configuration query
+tool and conditional (qemu-io)test skip" series
+(https://lists.gnu.org/archive/html/qemu-block/2017-07/msg01303.html),
+but unfortunately there hasn't been any activity on that (as far as I
+can see), so let's just solve it the simple way.
+---
+ tests/qemu-iotests/087 | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
-Il 15 nov 2017 6:33 PM, "Eric Blake" <eblake@redhat.com> ha scritto:
-
-[adding libguestfs]
-
-On 11/15/2017 09:52 AM, Gandalf Corvotempesta wrote:
-> I'm thinking if support for XVA files could be added to qemu-img
-> The file-format is well known (it's just a tar archive) and there are
-scripts
-> that are able to convert an XVA file to a RAW image. (ie:
-> https://gist.github.com/miebach/0433947bcf053de23159)
->
-> Running these script on their own is very time consuming, as you have to
-> extract the XVA, convert any disk image from "single chunks" to a raw
-image
-> and then use qemu-img to convert from raw to qcow.
->
-> Maybe a native support will be able to skip some steps. (like the
-> conversion from
-> "single chunks" to raw and raw to qcow2)
-
-Another possibility might be writing an nbdkit plugin that can directly
-read XVA, then you can connect qemu to the NBD server provided by
-nbdkit, without having to teach qemu proper how to read the file.
-
---
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+diff --git a/tests/qemu-iotests/087 b/tests/qemu-iotests/087
+index 27ab6c5151..2561a14456 100755
+--- a/tests/qemu-iotests/087
++++ b/tests/qemu-iotests/087
+@@ -102,7 +102,14 @@ echo
+ echo === aio=native without O_DIRECT ===
+ echo
+ 
+-run_qemu <<EOF
++# Skip this test if AIO is not enabled in this build
++function run_qemu_filter_aio()
++{
++    run_qemu "$@" | \
++        sed -e 's/is not supported in this build/it requires cache.direct=on, which was not specified/'
++}
++
++run_qemu_filter_aio <<EOF
+ { "execute": "qmp_capabilities" }
+ { "execute": "blockdev-add",
+   "arguments": {
+-- 
+2.13.6
