@@ -1,22 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33801)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36723)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1eEzqm-0008Cz-3c
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 10:43:41 -0500
+	(envelope-from <bounces@canonical.com>) id 1eEzuC-0000o0-2l
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 10:47:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1eEzqi-0002cH-6y
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 10:43:40 -0500
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <20171110030223.GA7303@lemon>
-References: <dd350838-9132-e787-10b1-4cb200076ec9@virtuozzo.com>
-	<w51inekzv59.fsf@maestria.local.igalia.com>
-	<w518tff4dvi.fsf@maestria.local.igalia.com>
-	<20171110030223.GA7303@lemon>
-Date: Wed, 15 Nov 2017 16:42:56 +0100
-Message-ID: <w518tf7k0ov.fsf@maestria.local.igalia.com>
+	(envelope-from <bounces@canonical.com>) id 1eEzu5-0001qL-ET
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 10:47:12 -0500
+Received: from indium.canonical.com ([91.189.90.7]:57760)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eEzu5-0001oo-7m
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 10:47:05 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eEztx-0003qX-NE
+	for <qemu-devel@nongnu.org>; Wed, 15 Nov 2017 15:46:59 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id C610F2E82E7
+	for <qemu-devel@nongnu.org>; Wed, 15 Nov 2017 15:45:58 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [Qemu-block] segfault in parallel blockjobs
- (iotest 30)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 15 Nov 2017 15:33:38 -0000
+From: Thomas Huth <1724570@bugs.launchpad.net>
+Reply-To: Bug 1724570 <1724570@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150833168269.1534.1058667524294729864.malonedeb@soybean.canonical.com>
+Message-Id: <151076001835.28762.7049356161441112067.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1724570] Re: qemu-system-x86_64 generates ACPI
+ tables with broken endianess when run on big-endian hosts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,44 +37,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
+To: qemu-devel@nongnu.org
 
-On Fri 10 Nov 2017 04:02:23 AM CET, Fam Zheng wrote:
->> > I'm thinking that perhaps we should add the pause point directly to
->> > block_job_defer_to_main_loop(), to prevent any block job from
->> > running the exit function when it's paused.
->> 
->> I was trying this and unfortunately this breaks the mirror job at
->> least (reproduced with a simple block-commit on the topmost node,
->> which uses commit_active_start() -> mirror_start_job()).
->> 
->> So what happens is that mirror_run() always calls
->> bdrv_drained_begin() before returning, pausing the block job. The
->> closing bdrv_drained_end() call is at the end of mirror_exit(),
->> already in the main loop.
->> 
->> So the mirror job is always calling block_job_defer_to_main_loop()
->> and mirror_exit() when the job is paused.
->
-> FWIW, I think Max's report on 194 failures is related:
->
-> https://lists.gnu.org/archive/html/qemu-devel/2017-11/msg01822.html
->
-> so perhaps it's worth testing his patch too:
->
-> https://lists.gnu.org/archive/html/qemu-devel/2017-11/msg01835.html
+I think something like this should fix this issue:
 
-Well, that doesn't solve the original crash with parallel block jobs.
-The root of the crash is that the mirror job manipulates the graph
-_while being paused_, so the BlockReopenQueue in bdrv_reopen_multiple()
-gets messed up, and pausing the jobs (commit 40840e419be31e) won't help.
+diff a/tests/bios-tables-test.c b/tests/bios-tables-test.c
+--- a/tests/bios-tables-test.c
++++ b/tests/bios-tables-test.c
+@@ -279,8 +279,19 @@ static void dump_aml_files(test_data *data, bool rebui=
+ld)
+         }
+         g_assert(fd >=3D 0);
+ =
 
-I have the impression that one major source of headaches is the fact
-that the reopen queue contains nodes that don't need to be reopened at
-all. Ideally this should be detected early on in bdrv_reopen_queue(), so
-there's no chance that the queue contains nodes used by a different
-block job. If we had that then op blockers should be enough to prevent
-these things. Or am I missing something?
++        sdt->header.signature =3D cpu_to_le32(sdt->header.signature);
++        sdt->header.length =3D cpu_to_le32(sdt->header.length);
++        sdt->header.oem_revision =3D cpu_to_le32(sdt->header.oem_revision);
++        sdt->header.asl_compiler_revision =3D cpu_to_le32(sdt->header.asl_=
+compiler_revision);
++
+         ret =3D qemu_write_full(fd, sdt, sizeof(AcpiTableHeader));
+         g_assert(ret =3D=3D sizeof(AcpiTableHeader));
++
++        sdt->header.signature =3D le32_to_cpu(sdt->header.signature);
++        sdt->header.length =3D le32_to_cpu(sdt->header.length);
++        sdt->header.oem_revision =3D le32_to_cpu(sdt->header.oem_revision);
++        sdt->header.asl_compiler_revision =3D le32_to_cpu(sdt->header.asl_=
+compiler_revision);
++
+         ret =3D qemu_write_full(fd, sdt->aml, sdt->aml_len);
+         g_assert(ret =3D=3D sdt->aml_len);
 
-Berto
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1724570
+
+Title:
+  qemu-system-x86_64 generates ACPI tables with broken endianess when
+  run on big-endian hosts
+
+Status in QEMU:
+  New
+
+Bug description:
+  The bios-tables-test always fails when run on a big-endian host, which
+  has iasl installed. When it calls iasl to dumps the AML files into ASL
+  files, iasl complains
+
+  Intel ACPI Component Architecture
+  ASL+ Optimizing Compiler/Disassembler version 20170831
+  Copyright (c) 2000 - 2017 Intel Corporation
+
+  Input file aml-4L677Y, Length 0x38 (56) bytes
+  Table [TEPH] is too long for file - needs: 0x38000000, remaining in file:=
+ 0x38
+  Could not get ACPI tables from aml-4L677Y, AE_BAD_HEADER
+
+  =
+
+  At first I thought this was an iasl bug, but the latest version of iasl i=
+n rawhide is ported to big endian.
+
+  So I looked at the actual AML files that bios-tables-test extracts
+  from the qemu-system-x86_64 memory space, when running on ppc64 host.
+  These do indeed have different content from the AML files generated by
+  qemu-system-x86_64 when running on an x86_64 host.
+
+  =
+
+  eg the AML file for the HPET shows
+
+  < 0000000   T   E   P   H nul nul nul   8 soh etx   B   O   C   H   S  sp
+  <            4554    4850    0000    3800    0301    4f42    4843    2053
+  < 0000020   B   X   P   C   H   P   E   T nul nul nul soh   B   X   P   C
+  <            5842    4350    5048    5445    0000    0100    5842    4350
+  < 0000040 nul nul nul soh soh   " ack nul nul nul nul nul nul nul   P   ~
+  <            0000    0100    a201    8086    0000    0000    0000    fed0
+  ---
+  > 0000000   H   P   E   T   8 nul nul nul soh etx   B   O   C   H   S  sp
+  >            5048    5445    0038    0000    0301    4f42    4843    2053
+  > 0000020   B   X   P   C   H   P   E   T soh nul nul nul   B   X   P   C
+  >            5842    4350    5048    5445    0001    0000    5842    4350
+  > 0000040 soh nul nul nul soh   " ack nul nul nul nul nul nul nul   P   ~
+  >            0001    0000    a201    8086    0000    0000    0000    fed0
+
+  so not only is the table name inverted, but the lenght is inverted,
+  and several fields later on are inverted too.
+
+  Other AML files for APIC and DSDT show similar brokenness
+
+  This is seen with QEMU 2.10.0
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1724570/+subscriptions
