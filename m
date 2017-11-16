@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38818)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40130)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eFF2D-0006VP-Dn
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 02:56:30 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eFF64-0007YJ-5V
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 03:00:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eFF2C-0001jn-II
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 02:56:29 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eFF5u-0005OO-9H
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 03:00:28 -0500
 References: <20171113162053.58795-1-vsementsov@virtuozzo.com>
 	<20171113162053.58795-2-vsementsov@virtuozzo.com>
 	<12463b01-41eb-4d17-65c0-a94de499e753@redhat.com>
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <d4ecc132-da33-53de-011b-57f30c0ccfdd@virtuozzo.com>
-Date: Thu, 16 Nov 2017 10:56:15 +0300
+Message-ID: <80297062-eb79-e3ac-7188-dcefe93e0f3e@virtuozzo.com>
+Date: Thu, 16 Nov 2017 10:59:58 +0300
 MIME-Version: 1.0
 In-Reply-To: <12463b01-41eb-4d17-65c0-a94de499e753@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
 Content-Language: en-US
 Subject: Re: [Qemu-devel] [PATCH 1/4 for-2.11?] block/dirty-bitmap: add lock
  to bdrv_enable/disable_dirty_bitmap
@@ -38,55 +38,41 @@ Cc: mreitz@redhat.com, kwolf@redhat.com, jsnow@redhat.com, famz@redhat.com, stef
 >>   block/dirty-bitmap.c | 4 ++++
 >>   1 file changed, 4 insertions(+)
 > Should this patch be in 2.11?
+
+
+these functions are unused now, so, no, it's not necessary
+
 >
 >> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
 >> index bd04e991b1..2a0bcd9e51 100644
 >> --- a/block/dirty-bitmap.c
 >> +++ b/block/dirty-bitmap.c
->> @@ -397,15 +397,19 @@ void bdrv_remove_persistent_dirty_bitmap(BlockDriv=
-erState *bs,
+>> @@ -397,15 +397,19 @@ void bdrv_remove_persistent_dirty_bitmap(BlockDriverState *bs,
 >>   /* Called with BQL taken.  */
 >>   void bdrv_disable_dirty_bitmap(BdrvDirtyBitmap *bitmap)
 >>   {
 >> +    bdrv_dirty_bitmap_lock(bitmap);
 >>       assert(!bdrv_dirty_bitmap_frozen(bitmap));
->>       bitmap->disabled =3D true;
+>>       bitmap->disabled = true;
 >> +    bdrv_dirty_bitmap_unlock(bitmap);
 > Why do we need this lock in addition to BQL?
-
-in fact, comment about BQL should be dropped.
-
-block_int.h:
-
- =C2=A0=C2=A0=C2=A0 /* Writing to the list requires the BQL _and_ the dirty=
-_bitmap_mutex.
- =C2=A0=C2=A0=C2=A0=C2=A0 * Reading from the list can be done with either t=
-he BQL or the
- =C2=A0=C2=A0=C2=A0=C2=A0 * dirty_bitmap_mutex.=C2=A0 Modifying a bitmap on=
-ly requires
- =C2=A0=C2=A0=C2=A0=C2=A0 * dirty_bitmap_mutex.=C2=A0 */
- =C2=A0=C2=A0=C2=A0 QemuMutex dirty_bitmap_mutex;
-
 >
 >>   }
->>  =20
+>>   
 >>   /* Called with BQL taken.  */
 >>   void bdrv_enable_dirty_bitmap(BdrvDirtyBitmap *bitmap)
 >>   {
 >> +    bdrv_dirty_bitmap_lock(bitmap);
 >>       assert(!bdrv_dirty_bitmap_frozen(bitmap));
->>       bitmap->disabled =3D false;
+>>       bitmap->disabled = false;
 >> +    bdrv_dirty_bitmap_unlock(bitmap);
 > Again, why do we need this in addition to BQL?
-
-and here.
-
 >
 > The commit message needs more details about a scenario where our
 > existing BQL lock is insufficient to prevent misuse of bitmap->disabled.
 >
 
 
---=20
+-- 
 Best regards,
 Vladimir
