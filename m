@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39866)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41603)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eFCqB-0007M2-AM
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 00:35:56 -0500
+	(envelope-from <famz@redhat.com>) id 1eFCuH-0000OS-1e
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 00:40:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eFCq6-0004wG-En
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 00:35:55 -0500
-Received: from indium.canonical.com ([91.189.90.7]:48462)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eFCq6-0004uv-8J
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 00:35:50 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eFCq3-00011S-6m
-	for <qemu-devel@nongnu.org>; Thu, 16 Nov 2017 05:35:47 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 23F452E80EB
-	for <qemu-devel@nongnu.org>; Thu, 16 Nov 2017 05:35:45 +0000 (UTC)
+	(envelope-from <famz@redhat.com>) id 1eFCuD-00004w-A0
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 00:40:09 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52336)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1eFCuD-0008W1-0h
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 00:40:05 -0500
+Date: Thu, 16 Nov 2017 13:39:51 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20171116053951.GD14771@lemon>
+References: <20171106094643.14881-1-peterx@redhat.com>
+	<150996313592.327.4353631543325177108@bafd83ae6430>
+	<20171106130800.GA4764@xz-mi>
+	<20171115094246.GC8130@stefanha-x1.localdomain>
+	<20171116053200.GB30426@xz-mi>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 16 Nov 2017 05:17:45 -0000
-From: Jimi <1728256@bugs.launchpad.net>
-Reply-To: Bug 1728256 <1728256@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150920686502.20214.12572544661418580428.malonedeb@soybean.canonical.com>
-Message-Id: <151080946556.8536.863927632496807160.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1728256] Re: Memory corruption in Windows 10
- guest / amd64
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171116053200.GB30426@xz-mi>
+Subject: Re: [Qemu-devel] [RFC v3 00/27] QMP: out-of-band (OOB) execution
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,53 +31,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Peter Xu <peterx@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org, lvivier@redhat.com, quintela@redhat.com, mdroth@linux.vnet.ibm.com, armbru@redhat.com, marcandre.lureau@redhat.com, shajnocz@redhat.com, pbonzini@redhat.com, jdenemar@redhat.com, dgilbert@redhat.com
 
-I'm experiencing this BSOD issue as well. I'm also on Arch x64, and the
-same versions of everything (though not minimal qemu--just the normal
-package in the main repos). I also passthru a GPU and a USB card, but
-not an SSD. It will happen randomly, anytime, at least once a day, and
-it seems like demanding games make it much more frequent. Since you're
-on btrfs, I'll see what happens if I downgrade the kernel to 4.12. If
-that doesn't work, I guess I'll try to confirm the swapoff fix, but my
-host only gets 4GB of RAM when the VM is running, so no swap would hurt
-real bad.
+On Thu, 11/16 13:32, Peter Xu wrote:
+> On Wed, Nov 15, 2017 at 09:42:46AM +0000, Stefan Hajnoczi wrote:
+> > On Mon, Nov 06, 2017 at 09:08:00PM +0800, Peter Xu wrote:
+> > > On Mon, Nov 06, 2017 at 02:12:17AM -0800, no-reply@patchew.org wrote:
+> > > > Hi,
+> > > > 
+> > > > This series seems to have some coding style problems. See output below for
+> > > > more information:
+> > > > 
+> > > > Subject: [Qemu-devel] [RFC v3 00/27] QMP: out-of-band (OOB) execution support
+> > > > Type: series
+> > > > Message-id: 20171106094643.14881-1-peterx@redhat.com
+> > > > 
+> > > > === TEST SCRIPT BEGIN ===
+> > > > #!/bin/bash
+> > > > 
+> > > > BASE=base
+> > > > n=1
+> > > > total=$(git log --oneline $BASE.. | wc -l)
+> > > > failed=0
+> > > > 
+> > > > git config --local diff.renamelimit 0
+> > > > git config --local diff.renames True
+> > > > 
+> > > > commits="$(git log --format=%H --reverse $BASE..)"
+> > > > for c in $commits; do
+> > > >     echo "Checking PATCH $n/$total: $(git log -n 1 --format=%s $c)..."
+> > > >     if ! git show $c --format=email | ./scripts/checkpatch.pl --mailback -; then
+> > > >         failed=1
+> > > >         echo
+> > > >     fi
+> > > >     n=$((n+1))
+> > > > done
+> > > > 
+> > > > exit $failed
+> > > > === TEST SCRIPT END ===
+> > > > 
+> > > > Updating 3c8cf5a9c21ff8782164d1def7f44bd888713384
+> > > > From https://github.com/patchew-project/qemu
+> > > >  * [new tag]               patchew/20171106094643.14881-1-peterx@redhat.com -> patchew/20171106094643.14881-1-peterx@redhat.com
+> > > > Switched to a new branch 'test'
+> > > > 5525c4e791 tests: qmp-test: add oob test
+> > > > ccc9e4c399 tests: qmp-test: verify command batching
+> > > > 7f45b4c6c0 docs: update QMP documents for OOB commands
+> > > > 58cfe877d2 monitor: enable IO thread for (qmp & !mux) typed
+> > > > 5e1d56ce74 qmp: isolate responses into io thread
+> > > > aef4275536 qmp: let migrate-incoming allow out-of-band
+> > > > 5e68beacf3 qmp: support out-of-band (oob) execution
+> > > > 43c7215a30 qapi: introduce new cmd option "allow-oob"
+> > > > e11127ba4b monitor: send event when request queue full
+> > > > 45cef4f7e4 qmp: add new event "request-dropped"
+> > > > 485da28be1 monitor: separate QMP parser and dispatcher
+> > > > 4892fe9ca2 monitor: let monitor_{suspend|resume} thread safe
+> > > > 1b86166d9c monitor: introduce monitor_qmp_respond()
+> > > > 0f48093add qmp: introduce some capability helpers
+> > > > 8d3f33043d qmp: negociate QMP capabilities
+> > > > 023b386d0e qmp: introduce QMPCapability
+> > > > 2bde5ca8ce monitor: allow to use IO thread for parsing
+> > > > f4cc112f80 monitor: create monitor dedicate iothread
+> > > > 3590fdc1d4 monitor: let mon_list be tail queue
+> > > > 11c818a9ac monitor: unify global init
+> > > > 36d3efb87d monitor: move the cur_mon hack deeper for QMP
+> > > > bf3e493a86 qjson: add "opaque" field to JSONMessageParser
+> > > > 17367fe7a1 monitor: move skip_flush into monitor_data_init
+> > > > 0c98d4baa4 qobject: let object_property_get_str() use new API
+> > > > aa4b973dd5 qobject: introduce qobject_get_try_str()
+> > > > 981ccebc1e qobject: introduce qstring_get_try_str()
+> > > > d40ba38085 char-io: fix possible race on IOWatchPoll
+> > > > 
+> > > > === OUTPUT BEGIN ===
+> > > > Checking PATCH 1/27: char-io: fix possible race on IOWatchPoll...
+> > > > Checking PATCH 2/27: qobject: introduce qstring_get_try_str()...
+> > > > Checking PATCH 3/27: qobject: introduce qobject_get_try_str()...
+> > > > Checking PATCH 4/27: qobject: let object_property_get_str() use new API...
+> > > > Checking PATCH 5/27: monitor: move skip_flush into monitor_data_init...
+> > > > Checking PATCH 6/27: qjson: add "opaque" field to JSONMessageParser...
+> > > > Checking PATCH 7/27: monitor: move the cur_mon hack deeper for QMP...
+> > > > Checking PATCH 8/27: monitor: unify global init...
+> > > > Checking PATCH 9/27: monitor: let mon_list be tail queue...
+> > > > Checking PATCH 10/27: monitor: create monitor dedicate iothread...
+> > > > Checking PATCH 11/27: monitor: allow to use IO thread for parsing...
+> > > > Checking PATCH 12/27: qmp: introduce QMPCapability...
+> > > > Checking PATCH 13/27: qmp: negociate QMP capabilities...
+> > > > Checking PATCH 14/27: qmp: introduce some capability helpers...
+> > > > Checking PATCH 15/27: monitor: introduce monitor_qmp_respond()...
+> > > > Checking PATCH 16/27: monitor: let monitor_{suspend|resume} thread safe...
+> > > > ERROR: braces {} are necessary for all arms of this statement
+> > > > #28: FILE: monitor.c:4014:
+> > > > +    if (atomic_dec_fetch(&mon->suspend_cnt) == 0)
+> > > > [...]
+> > > > 
+> > > > ERROR: Missing Signed-off-by: line(s)
+> > > 
+> > > Will add it in next post.  I still haven't found a good way to let
+> > > magit add this line for me every time automatically.
+> > 
+> > If you don't want to type "git commit -s" all the time you could use the
+> > "format.signOff = on" git-config(1) variable.
+> 
+> I tried it, but it seems to be for when formatting patches rather than
+> putting that s-o-b line into commit messages.  I think what I wanted
+> was something like commit.signOff but after some searches I found that
+> idea was proposed but rejected somehow:
+> 
+> http://git.661346.n2.nabble.com/PATCH-Add-a-commit-signoff-configuration-variable-to-always-use-signoff-td1886619.html#a2093996
+> 
+> So I think I'll just live with my current approach.  Anway, thanks for
+> the hint!
 
--- =
+I think what you could better use here is a checkpatch.pl hook, either before
+committing or before posting. I personally prefer the checkpatch.pl check in the
+pre-publish-tag hook of git-publish so I can freely do dirty commits that
+doesn't need s-o-b lines when I'm working on the branch, but still remember to
+add it before posting.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1728256
-
-Title:
-  Memory corruption in Windows 10 guest / amd64
-
-Status in QEMU:
-  New
-
-Bug description:
-  I have a Win 10 Pro x64 guest inside a qemu/kvm running on an Arch x86_64=
- host. The VM has a physical GPU passed through, as well as the physical US=
-B controllers, as well as a dedicated SSD attached via SATA; you can find t=
-he complete libvirt xml here: https://pastebin.com/U1ZAXBNg
-  I built qemu from source using the qemu-minimal-git AUR package; you can =
-find the build script here: https://aur.archlinux.org/cgit/aur.git/tree/PKG=
-BUILD?h=3Dqemu-minimal-git (if you aren't familiar with Arch, this is essen=
-tially a bash script where build() and package() are run to build the files=
-, and then install them into the $pkgdir to later tar them up.)
-
-  Starting with qemu v2.10.0, Windows crashes randomly with a bluescreen
-  about CRITICAL_STRUCTURE_CORRUPTION. I also tested the git heads
-  f90ea7ba7c, 861cd431c9 and e822e81e35, before I went back to v2.9.0,
-  which is running stable for over 50 hours right now.
-
-  During my tests I found that locking the memory pages alleviates the
-  problem somewhat, but never completely avoids it. However, with the
-  crashes occuring randomly, that could as well be false conclusions; I
-  had crashes within minutes after boot with that too.
-
-  I will now start `git bisect`ing; if you have any other suggestions on
-  what I could try or possible patches feel free to leave them with me.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1728256/+subscriptions
+Fam
