@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60049)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44198)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eF9R5-0004x9-R3
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 20:57:49 -0500
+	(envelope-from <fangying1@huawei.com>) id 1eF9rp-0001Ds-Tk
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 21:25:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eF9R0-0003a2-VF
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 20:57:47 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48310)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eF9R0-0003ZI-L3
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 20:57:42 -0500
-Date: Thu, 16 Nov 2017 03:57:38 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20171116035606-mutt-send-email-mst@kernel.org>
-References: <20171113192958.22953-1-marcandre.lureau@redhat.com>
-	<20171113192958.22953-6-marcandre.lureau@redhat.com>
+	(envelope-from <fangying1@huawei.com>) id 1eF9rm-0006nK-KD
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 21:25:25 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:2293)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <fangying1@huawei.com>) id 1eF9rl-0006SN-VR
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 21:25:22 -0500
+References: <212a9227-5a56-7a0e-1149-2d1bc884b4f0@huawei.com>
+	<CAJ+F1CJcdTHe-_ZK1YEgobwMx7jEH4kVB0BFeCpZWV-dY2tH5g@mail.gmail.com>
+	<bbabe94a-bcb3-5ad5-7dfb-72327f8178b4@huawei.com>
+	<20171115193943.GA14688@work-vm>
+From: Ying Fang <fangying1@huawei.com>
+Message-ID: <79e0d1bf-5884-0c00-2c17-83f2c6f33be4@huawei.com>
+Date: Thu, 16 Nov 2017 10:23:21 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20171113192958.22953-6-marcandre.lureau@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 5/5] fw_cfg: write vmcoreinfo details
+In-Reply-To: <20171115193943.GA14688@work-vm>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] QEMU abort when network serivce is restarted
+ during live migration with vhost-user as the network backend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,163 +30,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
-Cc: linux-kernel@vger.kernel.org, somlo@cmu.edu, qemu-devel@nongnu.org
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-On Mon, Nov 13, 2017 at 08:29:58PM +0100, Marc-Andr=E9 Lureau wrote:
-> If the "etc/vmcoreinfo" fw_cfg file is present and we are not running
-> the kdump kernel, write the addr/size of the vmcoreinfo ELF note.
->=20
-> Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
-> Reviewed-by: Gabriel Somlo <somlo@cmu.edu>
-> ---
->  drivers/firmware/qemu_fw_cfg.c | 87 ++++++++++++++++++++++++++++++++++=
-+++++++-
->  1 file changed, 86 insertions(+), 1 deletion(-)
->=20
-> diff --git a/drivers/firmware/qemu_fw_cfg.c b/drivers/firmware/qemu_fw_=
-cfg.c
-> index 2ac4cd869fe6..7a70e7a549f6 100644
-> --- a/drivers/firmware/qemu_fw_cfg.c
-> +++ b/drivers/firmware/qemu_fw_cfg.c
-> @@ -35,6 +35,8 @@
->  #include <linux/ioport.h>
->  #include <linux/delay.h>
->  #include <linux/dma-mapping.h>
-> +#include <linux/crash_core.h>
-> +#include <linux/crash_dump.h>
-> =20
->  MODULE_AUTHOR("Gabriel L. Somlo <somlo@cmu.edu>");
->  MODULE_DESCRIPTION("QEMU fw_cfg sysfs support");
-> @@ -59,6 +61,8 @@ MODULE_LICENSE("GPL");
->  /* fw_cfg "file name" is up to 56 characters (including terminating nu=
-l) */
->  #define FW_CFG_MAX_FILE_PATH 56
-> =20
-> +#define VMCOREINFO_FORMAT_ELF 0x1
-> +
->  /* platform device for dma mapping */
->  static struct device *dev;
-> =20
-> @@ -127,7 +131,8 @@ static ssize_t fw_cfg_dma_transfer(void *address, u=
-32 length, u32 control)
->  	dma_addr_t dma;
->  	ssize_t ret =3D length;
->  	enum dma_data_direction dir =3D
-> -		(control & FW_CFG_DMA_CTL_READ ? DMA_FROM_DEVICE : 0);
-> +		(control & FW_CFG_DMA_CTL_READ ? DMA_FROM_DEVICE : 0) |
-> +		(control & FW_CFG_DMA_CTL_WRITE ? DMA_TO_DEVICE : 0);
-> =20
->  	if (address && length) {
->  		dma_addr =3D dma_map_single(dev, address, length, dir);
-> @@ -225,6 +230,48 @@ static ssize_t fw_cfg_read_blob(u16 key,
->  	return ret;
->  }
-> =20
-> +#ifdef CONFIG_CRASH_CORE
-> +/* write chunk of given fw_cfg blob (caller responsible for sanity-che=
-ck) */
-> +static ssize_t fw_cfg_write_blob(u16 key,
-> +				 void *buf, loff_t pos, size_t count)
-> +{
-> +	u32 glk =3D -1U;
-> +	acpi_status status;
-> +	ssize_t ret =3D count;
-> +
-> +	/* If we have ACPI, ensure mutual exclusion against any potential
-> +	 * device access by the firmware, e.g. via AML methods:
-> +	 */
-> +	status =3D acpi_acquire_global_lock(ACPI_WAIT_FOREVER, &glk);
-> +	if (ACPI_FAILURE(status) && status !=3D AE_NOT_CONFIGURED) {
-> +		/* Should never get here */
-> +		WARN(1, "%s: Failed to lock ACPI!\n", __func__);
-> +		memset(buf, 0, count);
-> +		return -EINVAL;
-> +	}
-> +
-> +	mutex_lock(&fw_cfg_dev_lock);
-> +	if (pos =3D=3D 0) {
-> +		ret =3D fw_cfg_dma_transfer(buf, count, key << 16
-> +					  | FW_CFG_DMA_CTL_SELECT
-> +					  | FW_CFG_DMA_CTL_WRITE);
-> +	} else {
-> +		iowrite16(fw_cfg_sel_endianness(key), fw_cfg_reg_ctrl);
-> +		ret =3D fw_cfg_dma_transfer(NULL, pos, FW_CFG_DMA_CTL_SKIP);
-> +		if (ret < 0)
-> +			goto end;
-> +		ret =3D fw_cfg_dma_transfer(buf, count, FW_CFG_DMA_CTL_WRITE);
-> +	}
-> +
-> +end:
-> +	mutex_unlock(&fw_cfg_dev_lock);
-> +
-> +	acpi_release_global_lock(glk);
-> +
-> +	return ret;
-> +}
-> +#endif /* CONFIG_CRASH_CORE */
-> +
->  /* clean up fw_cfg device i/o */
->  static void fw_cfg_io_cleanup(void)
->  {
-> @@ -343,6 +390,37 @@ struct fw_cfg_sysfs_entry {
->  	struct list_head list;
->  };
-> =20
-> +#ifdef CONFIG_CRASH_CORE
-> +static ssize_t write_vmcoreinfo(const struct fw_cfg_file *f)
-> +{
-> +	struct vmci {
-> +		__le16 host_format;
-> +		__le16 guest_format;
-> +		__le32 size;
-> +		__le64 paddr;
-> +	} __packed;
-> +	struct vmci *data;
-> +	ssize_t ret;
-> +
-> +	data =3D kmalloc(sizeof(struct vmci), GFP_KERNEL | GFP_DMA);
-> +	if (!data)
-> +		return -ENOMEM;
 
-It's a small bit of data - you can just keep it in a global variable,
-this way failures won't be an issue.
+在 2017/11/16 3:39, Dr. David Alan Gilbert 写道:
+> * Yori Fang (fangying1@huawei.com) wrote:
+>>
+>>
+>> 在 2017/11/14 19:40, Marc-André Lureau 写道:
+>>> Hi
+>>>
+>>> On Tue, Nov 14, 2017 at 8:09 AM, fangying <fangying1@huawei.com> wrote:
+>>>> Hi all,
+>>>>
+>>>> We have a vm running migration with vhost-user as network backend, we notice that qemu will abort when openvswitch is restarted
+>>>> when MEMORY_LISTENER_CALL_GLOBAL(log_global_start, Forward) is called. The reasion is clear that vhost_dev_set_log returns -1 because
+>>>> the network connection is temporarily lost due to the restart of openvswitch service.
+>>>>
+>>>> Below is the trace of the call stack.
+>>>>
+>>>> #0  0x00007f868ed971d7 in raise() from /usr/lib64/libc.so.6
+>>>> #1  0x00007f868ed988c8 in abort() from /usr/lib64/libc.so.6
+>>>> #2  0x00000000004d0d35 in vhost_log_global_start (listener=<optimized out>) at /usr/src/debug/qemu-kvm-2.8.1/hw/virtio/vhost.c:794
+>>>> #2  0x0000000000486bd2 in memory_global_dirty_log_start at /usr/src/debug/qemu-kvm-2.8.1/memory.c:2304
+>>>> #3  0x0000000000486dcd in ram_save_init_globals at /usr/src/debug/qemu-kvm-2.8.1/migration/ram.c:2072
+>>>> #4  0x000000000048c185 in ram_save_setup (f=0x25e6ac0, opaque=<optimized out>) at /usr/src/debug/qemu-kvm-2.8.1/migration/ram.c:2093
+>>>> #5  0x00000000004fbee2 in qemu_savevm_state_begin at /usr/src/debug/qemu-kvm-2.8.1/migration/savevm.c:956
+>>>> #6  0x000000000083d8f8 in migration_thread at migration/migration.c:2198
+>>>>
+>>>> static void vhost_log_global_start(MemoryListener *listener)
+>>>> {
+>>>>     int r;
+>>>>
+>>>>     r = vhost_migration_log(listener, true);
+>>>>     if (r < 0) {
+>>>>         abort();   /* branch taken */
+>>>>     }
+>>>> }
+>>>>
+>>>> What confuse me is that
+>>>> 1. do we really need to abort here ?
+>>>
+>>> Not if we have a sane way to handle the situation. It make sense
+>>> though to not want to support that use case (restarting the vhost-user
+>>> process during migration).
+>>>
+>>>> 2. all member of callbacks in MemoryListener returned with type void, we cannot judge in any upper function on the call stack.
+>>>> Can we just cancel migration here instead of calling abort ? like:
+>>>
+>>> That would be acceptable to me, but there should be a better way than
+>>> calling qmp_migrate_cancel() (we need to give a reason for cancelling,
+>>> and report it to user). Juan should be able to help.
+>>
+>> I agree with you, we'd better give more details here instead of passing NULL in qmp_migrate_cancel.
+> 
+> This is an unfortunate place to want to kill the migration; cancel is
+> the wrong call to use though (it's for users to cancel it).
+> I think the only way to do it is to call
+> migrate_fd_error(migrate_get_current(),...)
+> 
+> It's not nice though, but the only one I can think of from here.
 
-> +
-> +	/* spare ourself reading host format support for now since we
-> +	 * don't know what else to format - host may ignore ours
-> +	 */
-> +	*data =3D (struct vmci) {
-> +		.guest_format =3D cpu_to_le16(VMCOREINFO_FORMAT_ELF),
-> +		.size =3D cpu_to_le32(VMCOREINFO_NOTE_SIZE),
-> +		.paddr =3D cpu_to_le64(paddr_vmcoreinfo_note())
-> +	};
-> +	ret =3D fw_cfg_write_blob(f->select, data, 0, sizeof(struct vmci));
-> +
-> +	kfree(data);
-> +	return ret;
-> +}
-> +#endif /* CONFIG_CRASH_CORE */
-> +
->  /* get fw_cfg_sysfs_entry from kobject member */
->  static inline struct fw_cfg_sysfs_entry *to_entry(struct kobject *kobj=
-)
->  {
-> @@ -582,6 +660,13 @@ static int fw_cfg_register_file(const struct fw_cf=
-g_file *f)
->  	int err;
->  	struct fw_cfg_sysfs_entry *entry;
-> =20
-> +#ifdef CONFIG_CRASH_CORE
-> +	if (strcmp(f->name, "etc/vmcoreinfo") =3D=3D 0 && !is_kdump_kernel())=
- {
-> +		if (write_vmcoreinfo(f) < 0)
-> +			pr_warn("fw_cfg: failed to write vmcoreinfo");
-> +	}
-> +#endif
-> +
->  	/* allocate new entry */
->  	entry =3D kzalloc(sizeof(*entry), GFP_KERNEL);
->  	if (!entry)
-> --=20
-> 2.15.0.125.g8f49766d64
+Thanks, we should use migrate_fd_error(migrate_get_current(),...) instead.
+Actually, this kind of error is better handled in upper level of migration_thread.
+However, the current MEMORY_LISTENER_CALL_xxx doesn't take care of the return value of MemoryListener callbacks.
+
+> 
+> Dave
+> 
+>>>
+>>>>
+>>>> diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+>>>> index ddc42f0..27ae4a2 100644
+>>>> --- a/hw/virtio/vhost.c
+>>>> +++ b/hw/virtio/vhost.c
+>>>> @@ -27,6 +27,7 @@
+>>>>  #include "hw/virtio/virtio-access.h"
+>>>>  #include "migration/blocker.h"
+>>>>  #include "sysemu/dma.h"
+>>>> +#include "qmp-commands.h"
+>>>>
+>>>>  /* enabled until disconnected backend stabilizes */
+>>>>  #define _VHOST_DEBUG 1
+>>>> @@ -885,7 +886,7 @@ static void vhost_log_global_start(MemoryListener *listener)
+>>>>
+>>>>      r = vhost_migration_log(listener, true);
+>>>>      if (r < 0) {
+>>>> -        abort();
+>>>> +        qmp_migrate_cancel(NULL);
+>>>>      }
+>>>>  }
+>>>>
+>>>> @@ -895,7 +896,7 @@ static void vhost_log_global_stop(MemoryListener *listener)
+>>>>
+>>>>      r = vhost_migration_log(listener, false);
+>>>>      if (r < 0) {
+>>>> -        abort();
+>>>> +        qmp_migrate_cancel(NULL);
+>>>>      }
+>>>>  }
+>>>>
+>>>>
+>>>>
+>>>>
+>>>
+>>>
+>>>
+>>
+>>
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> 
+> .
+> 
