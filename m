@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46925)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47839)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <darren.kenny@oracle.com>) id 1eFHFA-0003pI-N5
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 05:18:02 -0500
+	(envelope-from <ppandit@redhat.com>) id 1eFHGr-0004qH-3H
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 05:19:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <darren.kenny@oracle.com>) id 1eFHF6-0005ST-KF
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 05:18:00 -0500
-Received: from userp1040.oracle.com ([156.151.31.81]:24269)
+	(envelope-from <ppandit@redhat.com>) id 1eFHGn-00075T-2Q
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 05:19:45 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33014)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <darren.kenny@oracle.com>)
-	id 1eFHF6-0005PU-CA
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 05:17:56 -0500
-Date: Thu, 16 Nov 2017 10:13:48 +0000
-From: Darren Kenny <darren.kenny@oracle.com>
-Message-ID: <20171116101348.vmwthadfeu3mzuke@starbug-vm.ie.oracle.com>
-References: <20171116022832.24894-1-maozy.fnst@cn.fujitsu.com>
+	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1eFHGm-000748-T6
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 05:19:41 -0500
+Date: Thu, 16 Nov 2017 15:49:16 +0530 (IST)
+From: P J P <ppandit@redhat.com>
+In-Reply-To: <658ecab6-1f09-0c94-c89e-55f71c37309a@redhat.com>
+Message-ID: <nycvar.YSQ.7.76.1711161547370.26400@wniryva>
+References: <20171116075155.22378-1-ppandit@redhat.com>
+	<658ecab6-1f09-0c94-c89e-55f71c37309a@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20171116022832.24894-1-maozy.fnst@cn.fujitsu.com>
-Subject: Re: [Qemu-devel] [PATCH] colo-compare: fix the dangerous assignment
+Content-Type: text/plain; charset=US-ASCII
+Subject: Re: [Qemu-devel] [PATCH v1] ps2: check PS2Queue pointers in
+ post_load routine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,57 +27,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Zhang Chen <zhangckid@gmail.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Qemu Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Cyrille Chatras <cyrille.chatras@orange.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-On Thu, Nov 16, 2017 at 10:28:32AM +0800, Mao Zhongyi wrote:
->Cc: Peter Maydell <peter.maydell@linaro.org>
->Cc: Jason Wang <jasowang@redhat.com>
->Cc: Zhang Chen <zhangckid@gmail.com>
->Cc: Li Zhijian <lizhijian@cn.fujitsu.com>
->Cc: Paolo Bonzini <pbonzini@redhat.com>
->Fixes: 8ec14402029d783720f4312ed8a925548e1dad61
->Reported-by: Peter Maydell <peter.maydell@linaro.org>
->Reported-by: Paolo Bonzini <pbonzini@redhat.com>
->Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
++-- On Thu, 16 Nov 2017, Paolo Bonzini wrote --+
+| you don't need to change the invalid values to sane ones.  Instead, make
+| ps2_common_post_load return an int (just like the .post_load member of
+| VMStateDescription).  You can then detect out of range count/rptr/wptr
+| and return -1 for bad indices.
+| 
+| In the callers,
+| 
+| 	ps2_common_post_load(ps2);
+| 
+| 	return 0;
+| 
+| can then become simply
+| 
+| 	return ps2_common_post_load(ps2);
 
-Code-wise, this looks like a valid fix to the existing code.
+  Okay; Sent a revised patch v2.
 
-Reviewed-by: Darren Kenny <darren.kenny@oracle.com>
-
-But testing wise, have you confirmed that things are behaving as you
-expected with the previous patch, since previously when calling
-colo_compare_connection(), the value of conn would have always been
-its initialized value of NULL.
-
-Just want to be sure that fixing this doesn't end up breaking your
-expected behaviour given that all your testing before would have had
-a NULL value in conn.
-
-Thanks,
-
-Darren.
-
->---
-> net/colo-compare.c | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
->
->diff --git a/net/colo-compare.c b/net/colo-compare.c
->index ccdcba2..1ce195f 100644
->--- a/net/colo-compare.c
->+++ b/net/colo-compare.c
->@@ -179,7 +179,7 @@ static int packet_enqueue(CompareState *s, int mode, Connection **con)
->                          "drop packet");
->         }
->     }
->-    con = &conn;
->+    *con = conn;
->
->     return 0;
-> }
->-- 
->2.9.4
->
->
->
->
+Thank you.
+--
+Prasad J Pandit / Red Hat Product Security Team
+47AF CE69 3A90 54AA 9045 1053 DD13 3D32 FE5B 041F
