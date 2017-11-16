@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32780)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37952)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wouter@grep.be>) id 1eFGpZ-00024Q-BS
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 04:51:34 -0500
+	(envelope-from <rjones@redhat.com>) id 1eFGz8-0003np-7R
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 05:01:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wouter@grep.be>) id 1eFGpW-0006wn-5t
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 04:51:33 -0500
-Date: Thu, 16 Nov 2017 10:51:16 +0100
-From: Wouter Verhelst <w@uter.be>
-Message-ID: <20171116095116.4weodui6w27clyre@grep.be>
-References: <90b32a89-6dd8-1f83-4f6f-01bb5479252e@redhat.com>
-	<20170114144500.oxoqvrn5x4sdfo74@grep.be>
-	<1ef924f8-1e58-fe54-dabc-06873a531412@redhat.com>
-	<20170118080126.nyldkjhxdsxd4u2b@grep.be>
-	<CAMxP3BTjBSQEhycavgyfWXEA6pTg=sxfHe5sf+nxVY9ejXWMXQ@mail.gmail.com>
-	<20170122114339.l3ijhy3uymsru4ed@grep.be>
-	<4a5a82d6-7d66-cfb4-bd42-cea596115f6f@redhat.com>
-	<09ef1805-8361-5dff-300e-deede4863e55@redhat.com>
-	<20171114173745.egvtklxyrcprlcdn@grep.be>
-	<cd864bff-b429-20aa-7fc9-2f9296581470@redhat.com>
+	(envelope-from <rjones@redhat.com>) id 1eFGz2-0002w2-At
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 05:01:26 -0500
+Date: Thu, 16 Nov 2017 10:01:03 +0000
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Message-ID: <20171116100102.GE2450@redhat.com>
+References: <CAJH6TXiMxUoU2sFEHAoZ8jhDMtg_saEnTHM9f0vJ6Nhqj7099w@mail.gmail.com>
+	<c2ecae32-f999-9f1e-46a6-37cdab2a62e3@redhat.com>
+	<CAJH6TXhBAaBE9gBSxksWZqNywWmencRaGyeY-oN3jbKdgUettQ@mail.gmail.com>
+	<0e6cc220-814a-17fd-4fd7-7b0665d34e81@redhat.com>
+	<CAJH6TXh2v-F=yqxQbUUawk_Ctq-sgFefGp1XvMsC=syX_5jEqA@mail.gmail.com>
+	<30b54865-2255-d13d-a054-afcf5bbd06b2@redhat.com>
+	<20171115202440.GJ19514@redhat.com>
+	<7b11bb2b-b93d-e8ff-f396-703c93549d0d@redhat.com>
+	<20171115202938.GN2787@redhat.com>
+	<CAJH6TXiPuLu62-+o2+PrUGpstrks_5pLotFEe1bAOmsbn20otw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/mixed; boundary="7AUc2qLy4jB3hD7Z"
 Content-Disposition: inline
-In-Reply-To: <cd864bff-b429-20aa-7fc9-2f9296581470@redhat.com>
-Subject: Re: [Qemu-devel] [Nbd] [Qemu-block] How to online resize qemu disk
- with nbd protocol?
+In-Reply-To: <CAJH6TXiPuLu62-+o2+PrUGpstrks_5pLotFEe1bAOmsbn20otw@mail.gmail.com>
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Libguestfs]  [qemu-img] support for XVA
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,147 +32,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Bob Chen <a175818323@gmail.com>, nbd list <nbd@other.debian.org>, Stefan Hajnoczi <stefanha@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>
+To: Gandalf Corvotempesta <gandalf.corvotempesta@gmail.com>
+Cc: libguestfs <libguestfs@redhat.com>, qemu-devel@nongnu.org, Qemu-block <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
 
-On Tue, Nov 14, 2017 at 01:06:17PM -0600, Eric Blake wrote:
-> On 11/14/2017 11:37 AM, Wouter Verhelst wrote:
-> > On Tue, Nov 14, 2017 at 10:41:39AM -0600, Eric Blake wrote:
-> >> Another thought - with structured replies, we finally have a way to let
-> >> the client ask for the server to send resize information whenever the
-> >> server wants, rather than having to be polled by a new client request
-> >> all the time.  This is possible by having the server reply with a chunk
-> >> without the NBD_REPLY_FLAG_DONE bit, for as many times as it wants,
-> >> (that is, the server never officially ends the response to the single
-> >> client request for on-going status, until the client sends an
-> >> NBD_CMD_DISC).
-> > 
-> > Hrm, yeah, that could work.
-> > 
-> > Minor downside of this would be that a client would now be expected to
-> > continue listening "forever" (probably needs to do a blocking read() or
-> > a select() on the socket), whereas with the current situation a client
-> > could get away with only reading for as long as it expects data.
-> > 
-> > I don't think that should be a blocker, but it might be something we
-> > might want to document.
-> > 
-> >> I don't think the server should go into this mode without a flag bit
-> >> from the client requesting it (as it potentially ties up a thread that
-> >> could otherwise be used for parallel processing of other requests),
-> > 
-> > Yeah. I think we should probably initiate this with a BLOCK_STATUS
-> > message that has a flag with which we mean "don't stop sending data on
-> > the given region for contexts that support it".
-> 
-> Now we're mixing NBD_CMD_BLOCK_STATUS and NBD_CMD_RESIZE;
 
-Eh, right -- I had forgotten about RESIZE, actually :-)
+--7AUc2qLy4jB3hD7Z
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> I was thinking of the open-ended command for being informed of all
-> server-side-initiated size changes in response to RESIZE; but your mention of
-> an open-ended BLOCK_STATUS has an interesting connotation of being able to
-> get live updates as sections of a file are dirtied.
+Here's my solution, as a nbdkit plugin written in Perl.
 
-For instance, or whatever other metadata we end up sending through
-BLOCK_STATUS.
+As with Max's solution I don't bother to parse the virtual size out of
+the XML file, so you need to specify that on the command line
+otherwise the disk will be truncated to the largest extent stored in
+the file.  Also the =E2=80=98.xva=E2=80=99 file must not be compressed.
 
-> I also remember from talking with Vladimir during KVM Forum last month
-> that one of the shortfalls of the NBD protocol is that you can only ever
-> send a length of up to 32 bits on the command side (unless we introduce
-> structured commands in addition to our current work to add structured
-> replies);
+  $ nbdkit perl script=3D./xva-reader.pl file=3D./debian8cloud.xva size=3D=
+4294967296
 
-Yes, and I'm thinking we should do so. This will obviously require more
-negotiation.
+  $ guestfish --ro --format=3Draw -a nbd://localhost -i
+ =20
+  Welcome to guestfish, the guest filesystem shell for
+  editing virtual machine filesystems and disk images.
+ =20
+  Type: 'help' for help on commands
+        'man' to read the manual
+        'quit' to quit the shell
+ =20
+  Operating system: 8.2
+  /dev/sda1 mounted on /
+ =20
+  ><fs> ll /
+  total 100
+  drwxr-xr-x 22 root root  4096 Jan  8  2016 .
+  drwxr-xr-x 19 root root  4096 Nov 16 09:50 ..
+  drwxrwxr-x  2 root root  4096 Jan  8  2016 bin
+  drwxr-xr-x  3 root root  4096 Jan  8  2016 boot
+  drwxr-xr-x  4 root root  4096 Jan  8  2016 dev
+  drwxr-xr-x 87 root root  4096 Jan  8  2016 etc
+  drwxr-xr-x  3 root root  4096 Jan  8  2016 home
+  lrwxrwxrwx  1 root root    31 Jan  8  2016 initrd.img -> /boot/initrd.i=
+mg-3.16.0-4-amd64
+  drwxr-xr-x 14 root root  4096 Jan  8  2016 lib
+  drwxr-xr-x  2 root root  4096 Jan  8  2016 lib64
+  drwx------  2 root root 16384 Jan  8  2016 lost+found
+  drwxr-xr-x  3 root root  4096 Jan  8  2016 media
+  drwxr-xr-x  2 root root  4096 Jan  8  2016 mnt
+  drwxr-xr-x  2 root root  4096 Jan  8  2016 opt
+  drwxr-xr-x  2 root root  4096 May  4  2015 proc
+  drwx------  2 root root  4096 Jan  8  2016 root
+  drwxr-xr-x  2 root root  4096 Jan  8  2016 run
+  drwxr-xr-x  2 root root  4096 Jan  8  2016 sbin
+  drwxr-xr-x  2 root root  4096 Jan  8  2016 srv
+  drwxr-xr-x  2 root root  4096 Apr  6  2015 sys
+  drwxrwxrwt  7 root root  4096 Jan  8  2016 tmp
+  drwxr-xr-x 10 root root  4096 Jan  8  2016 usr
+  drwxr-xr-x 11 root root  4096 Jan  8  2016 var
+  lrwxrwxrwx  1 root root    27 Jan  8  2016 vmlinuz -> boot/vmlinuz-3.16=
+.0-4-amd64
 
-Can be done fairly easily though:
-- Client negotiates structured replies (don't think it makes sense to do
-  structured requests without structured replies)
-- Server sets an extra transmission flag to say "I am capable of
-  receiving extended requests"
-- Extended requests have a different magic number, and should have a
-  "request length" field as well. I'm thinking we make it:
+I even managed to boot the Debian 8 guest from the sample .xva file:
 
-magic          (32b)
-request length (16b)
-type           (16b)
-flags          (64b)
-handle         (64b)
-from           (64b)
-data length    (64b)
-(extra data)
+  $ qemu-system-x86_64 -cpu host -machine accel=3Dkvm:tcg -m 2048 -drive =
+file=3Dnbd:localhost:10809,format=3Draw,if=3Dvirtio,snapshot=3Don
 
-Request length in this proposal should always be at least 320.
+although it was pretty slow ...
 
-I made flags 64 bits rather than 16 as per the current format, because
-that way everything is aligned on a 4-byte boundary, which makes things
-a bit easier on some architectures (e.g., I know that sparc doesn't like
-unaligned 64-bit access). 64 bits for flags looks like a bit of a waste,
-but then if we're going to waste some bits somewhere, I guess it's best
-to assign them to flags.
+As mentioned before you can use this to do a qemu-img convert using
+captive nbdkit:
 
-The idea is that "request length" is the length of the data that the
-client is sending, and "data length" is the length of the range that
-we're trying to deal with.
+  $ nbdkit -U - \
+      perl script=3D./xva-reader.pl file=3D./debian8cloud.xva size=3D4294=
+967296 \
+      --run 'qemu-img convert -f raw $nbd -O qcow2 /var/tmp/output.qcow2 =
+-p'
 
-A write request would thus have to have request length be (data length +
-320); a read request would have request length be 320, and expect data
-to be returned of data length bytes.
+HTH,
 
-A metadata request could then tack on extra data, where request length
-of 320 implies "all negotiated metadata contexts", but anything more
-than that would imply there are some metadata IDs passed along.
+Rich.
 
-etc.
+--=20
+Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rj=
+ones
+Read my programming and virtualization blog: http://rwmj.wordpress.com
+virt-builder quickly builds VMs from scratch
+http://libguestfs.org/virt-builder.1.html
 
-Thoughts?
+--7AUc2qLy4jB3hD7Z
+Content-Type: application/x-perl
+Content-Disposition: attachment; filename="xva-reader.pl"
+Content-Transfer-Encoding: quoted-printable
 
-[...]
-> > However, I could imagine that there might be some cases wherein a server
-> > might be able to go into such a mode for two or more metadata contexts,
-> > and where a client might want to go into that mode for one of them but
-> > not all of them, while still wanting some information from them.
-> > 
-> > This could be covered with metadata context syntax, but it's annoying
-> > and shouldn't be necessary.
-> > 
-> > I'm starting to think I made a mistake when I said NBD_CMD_BLOCK_STATUS
-> > can't take a metadata context ID. Okay, there's no space for it, but
-> > that shouldn't have been a blocker.
-> > 
-> > Thoughts?
-> 
-> Nothing says the server has to reply the same length of information when
-> replying for multiple selected metadata contexts; but if we allow
-> different reply sizes all in one query, we may also need some way to
-> easily tell that the server has stopped sending metadata for one context
-> even though it is still providing additional replies for another context.
-
-There is that too, yes.
-
-> And maybe we do want to someday start thinking about structured
-> requests; where being able to do per-command selection of metadata
-> contexts (instead of per-export selection) may indeed be the first use case.
-
-See above ;-)
-
-> >> and that the server could reject a repeat command with the flag if it
-> >> is already serving a previous open-ended request.
-> > 
-> > Right.
-> > 
-> > On the other hand, I can imagine that a client might also want to tell
-> > the server that it is no longer interested in an outstanding request. In
-> > such a case, it should be able to cancel it.
-> 
-> Good point - if we allow the client to request an open-ended reply, it's
-> also nice to let the client decide how long that open-endedness should last.
-
-Exactly.
-
--- 
-Could you people please use IRC like normal people?!?
-
-  -- Amaya Rodrigo Sastre, trying to quiet down the buzz in the DebConf 2008
-     Hacklab
+use strict;=0A=0Amy %config =3D ();=0Amy %block =3D ();=0A=0A# XXX Should p=
+arse the virtual size from size from the XML document.=0A# Instead we estim=
+ate the size here, and the user can override=0A# it by setting the optional=
+ size=3D... parameter.=0Amy $estimated_size;=0A=0A# Does XVA define this?  =
+We might need to read it from the file=0A# somehow.=0Amy $block_size =3D 10=
+48576;=0A=0Asub config=0A{=0A    my $key =3D shift;=0A    my $value =3D shi=
+ft;=0A    $config{$key} =3D $value;=0A}=0A=0Asub config_complete=0A{=0A    =
+die "no file=3D... parameter given" unless exists $config{file};=0A=0A    m=
+y $file =3D $config{file};=0A    $estimated_size =3D 0;=0A=0A    # Parse th=
+e XVA file for offsets.=0A    # XXX Does not work if the XVA contains multi=
+ple disk images.  We=0A    # should parse the 'Ref:NN' field too.=0A    ope=
+n FILE, "tar tRvf $file |" or die "$file: $!";=0A    while (<FILE>) {=0A   =
+     if (m{^block (\d+): \S+ \d+/\d+\s+(\d+)\s.*/0*(\d+)$}) {=0A           =
+ my $offset =3D $1;    # block offset in tar file=0A            my $size =
+=3D $2;      # size in bytes in tar file=0A            my $filename =3D $3;=
+  # filename in tar file, without leading 0s=0A            my $byte_offset =
+=3D (1 + $offset) * 512; # byte offset in tar file=0A            $block{$fi=
+lename} =3D { size =3D> $size, offset =3D> $byte_offset };=0A            #p=
+rintf ("%s %d %d\n", $filename, $byte_offset, $size);=0A=0A            if (=
+$byte_offset + $size > $estimated_size) {=0A                $estimated_size=
+ =3D $byte_offset + $size;=0A            }=0A        }=0A    }=0A    close =
+FILE;=0A}=0A=0Asub open=0A{=0A    my $readonly =3D shift;=0A    my $file =
+=3D $config{file};=0A    open (my $fh, "<", $file) or die "$file: $!";=0A  =
+  my $h =3D { fh =3D> $fh };=0A    return $h;=0A}=0A=0Asub close=0A{=0A    =
+my $h =3D shift;=0A    close ($h->{fh});=0A}=0A=0Asub get_size=0A{=0A    my=
+ $h =3D shift;=0A    my $i =3D $estimated_size;=0A    # Allow user to overr=
+ide the estimate by setting size=3D parameter.=0A    $i =3D $config{size} i=
+f exists $config{size};=0A    return $i;=0A}=0A=0Asub read_block=0A{=0A    =
+my $h =3D shift;=0A    my $bnum =3D shift;=0A    my $offset =3D $block{$bnu=
+m}{offset};=0A    my $size =3D $block{$bnum}{size};=0A    seek ($h->{fh}, $=
+offset, 0);=0A    my $ret =3D "";=0A    my $i =3D 0;=0A    while ($size > 0=
+) {=0A        my $n =3D read ($h->{fh}, $ret, $size, $i);=0A        if ($n =
+=3D=3D 0) {=0A            die "unexpected end of file: block number $bnum (=
+offset $offset, size $size)"=0A        }=0A        $i +=3D $n;=0A        $s=
+ize -=3D $n;=0A    }=0A    return $ret;=0A}=0A=0Asub pread=0A{=0A    my $h =
+=3D shift;=0A    my $count =3D shift;=0A    my $offset =3D shift;=0A=0A    =
+my $buf =3D "";=0A    my $bufi =3D 0;=0A=0A    while ($count > 0) {=0A     =
+   # Which block, if any, contains $offset?=0A        my $bnum =3D int ($of=
+fset / $block_size);=0A        my $boffs =3D $offset % $block_size;=0A     =
+   #print "offset =3D $offset, bnum =3D $bnum, boffs =3D $boffs\n";=0A=0A  =
+      # n =3D number of bytes that can be read from this block.=0A        m=
+y $n =3D $block_size - $boffs;=0A        $n =3D $count if $n > $count;=0A=
+=0A        if (exists $block{$bnum}) {=0A            my $bdata =3D read_blo=
+ck ($h, $bnum);=0A            $buf .=3D substr $bdata, $boffs, $n;=0A      =
+  }=0A        else {=0A            # Virtual zero block.=0A            $buf=
+ .=3D "\0" x $n;=0A        }=0A=0A        $count -=3D $n;=0A    }=0A=0A    =
+return $buf;=0A}=0A
+--7AUc2qLy4jB3hD7Z--
