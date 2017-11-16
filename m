@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33887)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33912)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eFNDj-00068Y-Fe
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 11:40:59 -0500
+	(envelope-from <mst@redhat.com>) id 1eFNDn-0006Co-J4
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 11:41:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eFNDe-0000f4-T2
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 11:40:55 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41590)
+	(envelope-from <mst@redhat.com>) id 1eFNDh-0000gm-UX
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 11:40:59 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57964)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eFNDe-0000ei-JT
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 11:40:50 -0500
-Date: Thu, 16 Nov 2017 18:40:43 +0200
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eFNDh-0000gF-KK
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 11:40:53 -0500
+Date: Thu, 16 Nov 2017 18:40:51 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1510850407-17266-4-git-send-email-mst@redhat.com>
+Message-ID: <1510850407-17266-6-git-send-email-mst@redhat.com>
 References: <1510850407-17266-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <1510850407-17266-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PULL 3/9] hw/pci-host: Fix x86 Host Bridges 64bit PCI
- hole
+Subject: [Qemu-devel] [PULL 5/9] tests/acpi-test-data: update _CRS in DSDT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,311 +27,137 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Marcel Apfelbaum <marcel@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>
 
-From: Marcel Apfelbaum <marcel@redhat.com>
+commit dadf988e81b15065ac1d6dbaf4b87b5b80c7b670
+    hw/pci-host: Fix x86 Host Bridges 64bit PCI hole
 
-Currently there is no MMIO range over 4G
-reserved for PCI hotplug. Since the 32bit PCI hole
-depends on the number of cold-plugged PCI devices
-and other factors, it is very possible is too small
-to hotplug PCI devices with large BARs.
+Added a 64 bit hole to _CRS of PCI0.
+Update the expected files accordingly.
 
-Fix it by reserving 2G for I4400FX chipset
-in order to comply with older Win32 Guest OSes
-and 32G for Q35 chipset.
-
-Even if the new defaults of pci-hole64-size will appear in
-"info qtree" also for older machines, the property was
-not implemented so no changes will be visible to guests.
-
-Note this is a regression since prev QEMU versions had
-some range reserved for 64bit PCI hotplug.
-
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
-Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- include/hw/i386/pc.h      | 10 +++++++++-
- include/hw/pci-host/q35.h |  1 +
- hw/i386/pc.c              | 22 ++++++++++++++++++++++
- hw/pci-host/piix.c        | 32 ++++++++++++++++++++++++++++++--
- hw/pci-host/q35.c         | 42 +++++++++++++++++++++++++++++++++++++++---
- 5 files changed, 101 insertions(+), 6 deletions(-)
+ tests/acpi-test-data/pc/DSDT         | Bin 5098 -> 5144 bytes
+ tests/acpi-test-data/pc/DSDT.bridge  | Bin 6957 -> 7003 bytes
+ tests/acpi-test-data/pc/DSDT.cphp    | Bin 5561 -> 5607 bytes
+ tests/acpi-test-data/pc/DSDT.ipmikcs | Bin 5170 -> 5216 bytes
+ tests/acpi-test-data/pc/DSDT.memhp   | Bin 6463 -> 6509 bytes
+ tests/acpi-test-data/q35/DSDT        | Bin 7782 -> 7828 bytes
+ tests/acpi-test-data/q35/DSDT.bridge | Bin 7799 -> 7845 bytes
+ tests/acpi-test-data/q35/DSDT.cphp   | Bin 8245 -> 8291 bytes
+ tests/acpi-test-data/q35/DSDT.ipmibt | Bin 7857 -> 7903 bytes
+ tests/acpi-test-data/q35/DSDT.memhp  | Bin 9147 -> 9193 bytes
+ 10 files changed, 0 insertions(+), 0 deletions(-)
 
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index 087d184..ef438bd 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -238,7 +238,6 @@ void pc_guest_info_init(PCMachineState *pcms);
- #define PCI_HOST_PROP_PCI_HOLE64_SIZE  "pci-hole64-size"
- #define PCI_HOST_BELOW_4G_MEM_SIZE     "below-4g-mem-size"
- #define PCI_HOST_ABOVE_4G_MEM_SIZE     "above-4g-mem-size"
--#define DEFAULT_PCI_HOLE64_SIZE (~0x0ULL)
- 
- 
- void pc_pci_as_mapping_init(Object *owner, MemoryRegion *system_memory,
-@@ -249,6 +248,7 @@ void pc_memory_init(PCMachineState *pcms,
-                     MemoryRegion *system_memory,
-                     MemoryRegion *rom_memory,
-                     MemoryRegion **ram_memory);
-+uint64_t pc_pci_hole64_start(void);
- qemu_irq pc_allocate_cpu_irq(void);
- DeviceState *pc_vga_init(ISABus *isa_bus, PCIBus *pci_bus);
- void pc_basic_device_init(ISABus *isa_bus, qemu_irq *gsi,
-@@ -375,6 +375,14 @@ bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
-         .driver   = TYPE_X86_CPU,\
-         .property = "x-hv-max-vps",\
-         .value    = "0x40",\
-+    },{\
-+        .driver   = "i440FX-pcihost",\
-+        .property = "x-pci-hole64-fix",\
-+        .value    = "off",\
-+    },{\
-+        .driver   = "q35-pcihost",\
-+        .property = "x-pci-hole64-fix",\
-+        .value    = "off",\
-     },
- 
- #define PC_COMPAT_2_9 \
-diff --git a/include/hw/pci-host/q35.h b/include/hw/pci-host/q35.h
-index 58983c0..8f4ddde 100644
---- a/include/hw/pci-host/q35.h
-+++ b/include/hw/pci-host/q35.h
-@@ -68,6 +68,7 @@ typedef struct Q35PCIHost {
-     PCIExpressHost parent_obj;
-     /*< public >*/
- 
-+    bool pci_hole64_fix;
-     MCHPCIState mch;
- } Q35PCIHost;
- 
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index e11a65b..fafe5ba 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -1448,6 +1448,28 @@ void pc_memory_init(PCMachineState *pcms,
-     pcms->ioapic_as = &address_space_memory;
- }
- 
-+/*
-+ * The 64bit pci hole starts after "above 4G RAM" and
-+ * potentially the space reserved for memory hotplug.
-+ */
-+uint64_t pc_pci_hole64_start(void)
-+{
-+    PCMachineState *pcms = PC_MACHINE(qdev_get_machine());
-+    PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(pcms);
-+    uint64_t hole64_start = 0;
-+
-+    if (pcmc->has_reserved_memory && pcms->hotplug_memory.base) {
-+        hole64_start = pcms->hotplug_memory.base;
-+        if (!pcmc->broken_reserved_end) {
-+            hole64_start += memory_region_size(&pcms->hotplug_memory.mr);
-+        }
-+    } else {
-+        hole64_start = 0x100000000ULL + pcms->above_4g_mem_size;
-+    }
-+
-+    return ROUND_UP(hole64_start, 1ULL << 30);
-+}
-+
- qemu_irq pc_allocate_cpu_irq(void)
- {
-     return qemu_allocate_irq(pic_irq_request, NULL, 0);
-diff --git a/hw/pci-host/piix.c b/hw/pci-host/piix.c
-index a7e2256..a684a7c 100644
---- a/hw/pci-host/piix.c
-+++ b/hw/pci-host/piix.c
-@@ -50,6 +50,7 @@ typedef struct I440FXState {
-     PCIHostState parent_obj;
-     Range pci_hole;
-     uint64_t pci_hole64_size;
-+    bool pci_hole64_fix;
-     uint32_t short_root_bus;
- } I440FXState;
- 
-@@ -112,6 +113,9 @@ struct PCII440FXState {
- #define I440FX_PAM_SIZE 7
- #define I440FX_SMRAM    0x72
- 
-+/* Keep it 2G to comply with older win32 guests */
-+#define I440FX_PCI_HOST_HOLE64_SIZE_DEFAULT (1ULL << 31)
-+
- /* Older coreboot versions (4.0 and older) read a config register that doesn't
-  * exist in real hardware, to get the RAM size from QEMU.
-  */
-@@ -238,29 +242,52 @@ static void i440fx_pcihost_get_pci_hole_end(Object *obj, Visitor *v,
-     visit_type_uint32(v, name, &value, errp);
- }
- 
-+/*
-+ * The 64bit PCI hole start is set by the Guest firmware
-+ * as the address of the first 64bit PCI MEM resource.
-+ * If no PCI device has resources on the 64bit area,
-+ * the 64bit PCI hole will start after "over 4G RAM" and the
-+ * reserved space for memory hotplug if any.
-+ */
- static void i440fx_pcihost_get_pci_hole64_start(Object *obj, Visitor *v,
-                                                 const char *name,
-                                                 void *opaque, Error **errp)
- {
-     PCIHostState *h = PCI_HOST_BRIDGE(obj);
-+    I440FXState *s = I440FX_PCI_HOST_BRIDGE(obj);
-     Range w64;
-     uint64_t value;
- 
-     pci_bus_get_w64_range(h->bus, &w64);
-     value = range_is_empty(&w64) ? 0 : range_lob(&w64);
-+    if (!value && s->pci_hole64_fix) {
-+        value = pc_pci_hole64_start();
-+    }
-     visit_type_uint64(v, name, &value, errp);
- }
- 
-+/*
-+ * The 64bit PCI hole end is set by the Guest firmware
-+ * as the address of the last 64bit PCI MEM resource.
-+ * Then it is expanded to the PCI_HOST_PROP_PCI_HOLE64_SIZE
-+ * that can be configured by the user.
-+ */
- static void i440fx_pcihost_get_pci_hole64_end(Object *obj, Visitor *v,
-                                               const char *name, void *opaque,
-                                               Error **errp)
- {
-     PCIHostState *h = PCI_HOST_BRIDGE(obj);
-+    I440FXState *s = I440FX_PCI_HOST_BRIDGE(obj);
-+    uint64_t hole64_start = pc_pci_hole64_start();
-     Range w64;
--    uint64_t value;
-+    uint64_t value, hole64_end;
- 
-     pci_bus_get_w64_range(h->bus, &w64);
-     value = range_is_empty(&w64) ? 0 : range_upb(&w64) + 1;
-+    hole64_end = ROUND_UP(hole64_start + s->pci_hole64_size, 1ULL << 30);
-+    if (s->pci_hole64_fix && value < hole64_end) {
-+        value = hole64_end;
-+    }
-     visit_type_uint64(v, name, &value, errp);
- }
- 
-@@ -863,8 +890,9 @@ static const char *i440fx_pcihost_root_bus_path(PCIHostState *host_bridge,
- 
- static Property i440fx_props[] = {
-     DEFINE_PROP_SIZE(PCI_HOST_PROP_PCI_HOLE64_SIZE, I440FXState,
--                     pci_hole64_size, DEFAULT_PCI_HOLE64_SIZE),
-+                     pci_hole64_size, I440FX_PCI_HOST_HOLE64_SIZE_DEFAULT),
-     DEFINE_PROP_UINT32("short_root_bus", I440FXState, short_root_bus, 0),
-+    DEFINE_PROP_BOOL("x-pci-hole64-fix", I440FXState, pci_hole64_fix, true),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
-diff --git a/hw/pci-host/q35.c b/hw/pci-host/q35.c
-index ddaa7d1..6cb9a8d 100644
---- a/hw/pci-host/q35.c
-+++ b/hw/pci-host/q35.c
-@@ -37,6 +37,8 @@
-  * Q35 host
-  */
- 
-+#define Q35_PCI_HOST_HOLE64_SIZE_DEFAULT (1ULL << 35)
-+
- static void q35_host_realize(DeviceState *dev, Error **errp)
- {
-     PCIHostState *pci = PCI_HOST_BRIDGE(dev);
-@@ -99,29 +101,52 @@ static void q35_host_get_pci_hole_end(Object *obj, Visitor *v,
-     visit_type_uint32(v, name, &value, errp);
- }
- 
-+/*
-+ * The 64bit PCI hole start is set by the Guest firmware
-+ * as the address of the first 64bit PCI MEM resource.
-+ * If no PCI device has resources on the 64bit area,
-+ * the 64bit PCI hole will start after "over 4G RAM" and the
-+ * reserved space for memory hotplug if any.
-+ */
- static void q35_host_get_pci_hole64_start(Object *obj, Visitor *v,
-                                           const char *name, void *opaque,
-                                           Error **errp)
- {
-     PCIHostState *h = PCI_HOST_BRIDGE(obj);
-+    Q35PCIHost *s = Q35_HOST_DEVICE(obj);
-     Range w64;
-     uint64_t value;
- 
-     pci_bus_get_w64_range(h->bus, &w64);
-     value = range_is_empty(&w64) ? 0 : range_lob(&w64);
-+    if (!value && s->pci_hole64_fix) {
-+        value = pc_pci_hole64_start();
-+    }
-     visit_type_uint64(v, name, &value, errp);
- }
- 
-+/*
-+ * The 64bit PCI hole end is set by the Guest firmware
-+ * as the address of the last 64bit PCI MEM resource.
-+ * Then it is expanded to the PCI_HOST_PROP_PCI_HOLE64_SIZE
-+ * that can be configured by the user.
-+ */
- static void q35_host_get_pci_hole64_end(Object *obj, Visitor *v,
-                                         const char *name, void *opaque,
-                                         Error **errp)
- {
-     PCIHostState *h = PCI_HOST_BRIDGE(obj);
-+    Q35PCIHost *s = Q35_HOST_DEVICE(obj);
-+    uint64_t hole64_start = pc_pci_hole64_start();
-     Range w64;
--    uint64_t value;
-+    uint64_t value, hole64_end;
- 
-     pci_bus_get_w64_range(h->bus, &w64);
-     value = range_is_empty(&w64) ? 0 : range_upb(&w64) + 1;
-+    hole64_end = ROUND_UP(hole64_start + s->mch.pci_hole64_size, 1ULL << 30);
-+    if (s->pci_hole64_fix && value < hole64_end) {
-+        value = hole64_end;
-+    }
-     visit_type_uint64(v, name, &value, errp);
- }
- 
-@@ -133,16 +158,25 @@ static void q35_host_get_mmcfg_size(Object *obj, Visitor *v, const char *name,
-     visit_type_uint64(v, name, &e->size, errp);
- }
- 
-+/*
-+ * NOTE: setting defaults for the mch.* fields in this table
-+ * doesn't work, because mch is a separate QOM object that is
-+ * zeroed by the object_initialize(&s->mch, ...) call inside
-+ * q35_host_initfn().  The default values for those
-+ * properties need to be initialized manually by
-+ * q35_host_initfn() after the object_initialize() call.
-+ */
- static Property q35_host_props[] = {
-     DEFINE_PROP_UINT64(PCIE_HOST_MCFG_BASE, Q35PCIHost, parent_obj.base_addr,
-                         MCH_HOST_BRIDGE_PCIEXBAR_DEFAULT),
-     DEFINE_PROP_SIZE(PCI_HOST_PROP_PCI_HOLE64_SIZE, Q35PCIHost,
--                     mch.pci_hole64_size, DEFAULT_PCI_HOLE64_SIZE),
-+                     mch.pci_hole64_size, Q35_PCI_HOST_HOLE64_SIZE_DEFAULT),
-     DEFINE_PROP_UINT32("short_root_bus", Q35PCIHost, mch.short_root_bus, 0),
-     DEFINE_PROP_SIZE(PCI_HOST_BELOW_4G_MEM_SIZE, Q35PCIHost,
-                      mch.below_4g_mem_size, 0),
-     DEFINE_PROP_SIZE(PCI_HOST_ABOVE_4G_MEM_SIZE, Q35PCIHost,
-                      mch.above_4g_mem_size, 0),
-+    DEFINE_PROP_BOOL("x-pci-hole64-fix", Q35PCIHost, pci_hole64_fix, true),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
-@@ -174,7 +208,9 @@ static void q35_host_initfn(Object *obj)
-     object_property_add_child(OBJECT(s), "mch", OBJECT(&s->mch), NULL);
-     qdev_prop_set_int32(DEVICE(&s->mch), "addr", PCI_DEVFN(0, 0));
-     qdev_prop_set_bit(DEVICE(&s->mch), "multifunction", false);
--
-+    /* mch's object_initialize resets the default value, set it again */
-+    qdev_prop_set_uint64(DEVICE(s), PCI_HOST_PROP_PCI_HOLE64_SIZE,
-+                         Q35_PCI_HOST_HOLE64_SIZE_DEFAULT);
-     object_property_add(obj, PCI_HOST_PROP_PCI_HOLE_START, "uint32",
-                         q35_host_get_pci_hole_start,
-                         NULL, NULL, NULL, NULL);
+diff --git a/tests/acpi-test-data/pc/DSDT b/tests/acpi-test-data/pc/DSDT
+index 15c3135d65f168a91edfdc3471ea1d3f012a824f..99f05a502752d9dbac38fdd93f1ebb79b4564fb4 100644
+GIT binary patch
+delta 98
+zcmaE*K0|}cCD<iILWF^VF?=IeJhzy$NQ_>5uv2`1v!?+^ymL^npaU1zoXPdvIeJ~%
+d3=BNX3`l?x$o~KTe?5ps0u3Pc=GWZ+*#RA&6M_H$
+
+delta 51
+zcmbQC@k*V`CD<k8l`sPXW5q_Ucy2LQ!5F>xV5j&1XHNr;c;}#CK__;uyvg<4Ih!SU
+H{<8xBdNvM&
+
+diff --git a/tests/acpi-test-data/pc/DSDT.bridge b/tests/acpi-test-data/pc/DSDT.bridge
+index d38586c95bf31f0212279a2505efd8e2fd321ccc..cf23343e6402421f09da5d09f72811108fbd2661 100644
+GIT binary patch
+delta 98
+zcmZ2$cH4~0CD<h-TAG1@aluBecy2Lgkr=)BV5j&1XHNr;c;}#CK?g3bIg{(TbM(5j
+d85nq&8IS-Ykp2Jv|9TLO1R6l>&9Awg_yJmb6N3N%
+
+delta 51
+zcmca@w$_ZxCD<iISDJx=@xVr|cy2LQ!5F>xV5j&1XHNr;c;}#CK__;uyvg<4Ih!SU
+GocIB3sttqy
+
+diff --git a/tests/acpi-test-data/pc/DSDT.cphp b/tests/acpi-test-data/pc/DSDT.cphp
+index 2dd70bf9520406c36c3684714bb714e536a28d20..c99c49f43705e99d1e0a8ba19d44145dfa63d009 100644
+GIT binary patch
+delta 98
+zcmdm~{al;NCD<k8xhMkz<He0!dc0!JA~AaL!A|i3&YlJw@y<cPf(~3<b0+)o=IC{4
+eGcfQlGavy*Ap8IS|Megm2{eG%n|Ja4X9oa*yA)&q
+
+delta 51
+zcmaE^y;GaZCD<iorzish<HwC$dc0z;f-!pW!A|i3&YlJw@y<cPf==vQd6WHkb2h)=
+H{m%{nhcXXj
+
+diff --git a/tests/acpi-test-data/pc/DSDT.ipmikcs b/tests/acpi-test-data/pc/DSDT.ipmikcs
+index 2796d96b0eec17fb68a79234cbccb70708ac2587..5e970fda7296f9ce44487e0a578a1dead982ba66 100644
+GIT binary patch
+delta 98
+zcmdm_@j!#iCD<h-L4<*U@y<rB<=kS<A~AaL!A|i3&YlJw@y<cPf(~3<b0#0>&e7}A
+eW?<l9W<UarK=%Lt|LZ|C5@-OiHyiW(X9oa_pA<O&
+
+delta 51
+zcmaE$u}Oo=CD<jzNQ8lb@y|xC<=kSff-!pW!A|i3&YlJw@y<cPf==vQd6SQG=WI^o
+H`OgjjfCCRX
+
+diff --git a/tests/acpi-test-data/pc/DSDT.memhp b/tests/acpi-test-data/pc/DSDT.memhp
+index 53f6d5824359ff0ca20179b19b3b5cb79f017f82..1fe6871aa245277e0562ff0a1e93a9bf3bcf2295 100644
+GIT binary patch
+delta 98
+zcmdmQ^wx;WCD<h-SCWB&F>)i<76CD5kr=)BV5j&1XHNr;c;}#CK?g3bIg_sl<mh#2
+eGcfQlGavybAp8IS|Megm2{eG%n;iuIvjYHvJrphg
+
+delta 51
+zcmaEBwBLx!CD<jzUXp=<v3eud76CC=!5F>xV5j&1XHNr;c;}#CK__;uyvbJtayI7)
+H{$~dOd}0qS
+
+diff --git a/tests/acpi-test-data/q35/DSDT b/tests/acpi-test-data/q35/DSDT
+index a080e2ace20ce9b88d5a61078d8caa0262617eed..aa402cca667f82ed0a2dc4969508d8f6e38ad910 100644
+GIT binary patch
+delta 97
+zcmaE6GsTw6CD<ioiW~z2quNHUdop6~{4sj*!A|i3&YlJw@y<cPf(~3<b0+_j$<gc5
+bW?<l9W<UarK=ywi;6M@sF+u#vS+aishSC&{
+
+delta 50
+zcmbPY`^<*RCD<h-O^$(qF?1u>JsB}io*2FOV5j&1XHNr;c;}#CK__;uyvhG$awgA^
+G{R04T6c3I7
+
+diff --git a/tests/acpi-test-data/q35/DSDT.bridge b/tests/acpi-test-data/q35/DSDT.bridge
+index 31a76732e563dde32e6d976670baa732a6b91807..fc3e79c583ababf5615e76ba2f7bc3df1483abb4 100644
+GIT binary patch
+delta 98
+zcmexvv(%Q$CD<iosT>0X<FSog_hiJ}`D66rgPr07oIMRV;+=zn1s%A!=1l%4lcU$A
+c&A`CJ%zy+Kf$aZ4z=0$NVuJXavt)T00pV^GlK=n!
+
+delta 51
+zcmZ2#``w1iCD<jTT#kW(@#{vedop64JTZFl!A|i3&YlJw@y<cPf==vQd6WOi<ZPZH
+H%gYD=pYsos
+
+diff --git a/tests/acpi-test-data/q35/DSDT.cphp b/tests/acpi-test-data/q35/DSDT.cphp
+index 3e23cb638f296644154100379584b30b644926bd..fd3cb3421814d0383863dc780d9a2a9077b727a3 100644
+GIT binary patch
+delta 97
+zcmdn$@YsRNCD<h-S%HCpasEcGwQ^$a{4sj*!A|i3&YlJw@y<cPf(~3<b0(ja%hBu7
+bW?<l9W<UarK=ywi;6M@sF+u#vmhyi9k`NSd
+
+delta 50
+zcmaFtu+@RfCD<jzRDpqk@!UqPwQ^#fJTZFl!A|i3&YlJw@y<cPf==vQd6Un|<xEbO
+G{{sMeF%NJ6
+
+diff --git a/tests/acpi-test-data/q35/DSDT.ipmibt b/tests/acpi-test-data/q35/DSDT.ipmibt
+index 9c5e03fd2ffd3a99f3e5214ba187456a86410b22..332237529e114256384c051858fdac36b024c72e 100644
+GIT binary patch
+delta 97
+zcmdmJd*7DJCD<k8z8nJsqxVKGO<6H_{usUZV5j&1XHNr;c;}#CK?g3bIg>qQbM(5j
+b85nq&8IS-Yko_MBIFQ6ZOb~zaR@pxQS6~zP
+
+delta 50
+zcmca_yU~`*CD<ioqZ|VRW7S43O<6Hdo*2FOV5j&1XHNr;c;}#CK__;uyvd%jIg=mD
+G{s91M?+*9?
+
+diff --git a/tests/acpi-test-data/q35/DSDT.memhp b/tests/acpi-test-data/q35/DSDT.memhp
+index 1b7c484a5e31ec456685bc246197252cb48a3adf..f0a27e1a3093ff7525f62b7509ea44dfe9eb8908 100644
+GIT binary patch
+delta 97
+zcmdn({?eVxCD<k8r7{BpqsB%qV<j<n{usUZV5j&1XHNr;c;}#CK?g3bIg^8xa`d{i
+c85nq&8IS-Iko_MBIFZCaOb#HPykF@L0BA-OI{*Lx
+
+delta 50
+zcmaFqzT2J4CD<iow=x3*W8_9IV<j<9o*2FOV5j&1XHNr;c;}#CK__;uyve~zIg{Ti
+G{Q&@Tw+}l2
+
 -- 
 MST
