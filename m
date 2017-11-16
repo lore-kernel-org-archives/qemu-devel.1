@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59946)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60223)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1eFOpe-0001dj-Ub
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 13:24:12 -0500
+	(envelope-from <groug@kaod.org>) id 1eFOqR-0001z2-Mw
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 13:25:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1eFOpb-0001f8-QP
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 13:24:10 -0500
-References: <20171116170526.12643-1-david@redhat.com>
-	<20171116170526.12643-3-david@redhat.com> <87375e15vx.fsf@linaro.org>
-	<f0fc452d-8229-6eb3-b5d2-1d55b9ba0ee3@redhat.com>
-	<871sky14a9.fsf@linaro.org>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <556871d6-b07a-d7b5-c4d0-78615224b05e@redhat.com>
-Date: Thu, 16 Nov 2017 19:24:03 +0100
+	(envelope-from <groug@kaod.org>) id 1eFOqO-00029m-Il
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 13:24:59 -0500
+Received: from 4.mo5.mail-out.ovh.net ([178.33.111.247]:43962)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1eFOqO-00028M-8c
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 13:24:56 -0500
+Received: from player760.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 4F31614E611
+	for <qemu-devel@nongnu.org>; Thu, 16 Nov 2017 19:24:53 +0100 (CET)
+Date: Thu, 16 Nov 2017 19:24:37 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20171116192437.6fc1222b@bahia.lab.toulouse-stg.fr.ibm.com>
+In-Reply-To: <20171116041607.31852-2-sjitindarsingh@gmail.com>
+References: <20171116041607.31852-1-sjitindarsingh@gmail.com>
+	<20171116041607.31852-2-sjitindarsingh@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <871sky14a9.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v1 for-2.11 2/3] s390x/tcg: fix DIAG 308
- with > 1 VCPU (single threaded TCG)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-ppc] [QEMU-PPC] [PATCH] target/ppc: Update
+ setting of cpu features to account for compat modes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,106 +31,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>
+To: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, sam.bobroff@au1.ibm.com, david@gibson.dropbear.id.au
 
-On 16.11.2017 19:12, Alex Benn=C3=A9e wrote:
->=20
-> David Hildenbrand <david@redhat.com> writes:
->=20
->> On 16.11.2017 18:37, Alex Benn=C3=A9e wrote:
->>>
->>> David Hildenbrand <david@redhat.com> writes:
->>>
->>>> Currently, single threaded TCG with > 1 VCPU gets stuck during IPL, =
-when
->>>> the bios tries to switch to the loaded kernel via DIAG 308.
->>>>
->>>> pause_all_vcpus()/resume_all_vcpus() should not be called from a VCP=
-U.
->>>>
->>>> And there is also no need for it. run_on_cpu() will make sure that t=
-he
->>>> CPUs exit KVM/TCG, where they get stopped. Once stopped, they will n=
-o
->>>> longer run.
->>>>
->>>> Signed-off-by: David Hildenbrand <david@redhat.com>
->>>> ---
->>>>  target/s390x/diag.c | 4 ----
->>>>  1 file changed, 4 deletions(-)
->>>>
->>>> diff --git a/target/s390x/diag.c b/target/s390x/diag.c
->>>> index dbbb9e886f..52bc348808 100644
->>>> --- a/target/s390x/diag.c
->>>> +++ b/target/s390x/diag.c
->>>> @@ -27,7 +27,6 @@ static int modified_clear_reset(S390CPU *cpu)
->>>>      S390CPUClass *scc =3D S390_CPU_GET_CLASS(cpu);
->>>>      CPUState *t;
->>>>
->>>> -    pause_all_vcpus();
->>>>      cpu_synchronize_all_states();
->>>>      CPU_FOREACH(t) {
->>>>          run_on_cpu(t, s390_do_cpu_full_reset, RUN_ON_CPU_NULL);
->>>
->>> I think you also need to fix the run_on_cpu to be a async_run_on_cpu =
-as
->>> you would otherwise hang waiting for run_on_cpu to finish on a
->>> single-threaded TCG run (as you are in the only vCPU context).
->>
->> No, it works just fine for single threaded TCG. run_on_cpu() can deal
->> with single threaded TCG just fine. (otherwise e.g. SIGP code also
->> wouldn't work)
->>
->> In do_run_on_cpu, the following code always directly triggers for sing=
-le
->> threaded tcg:
->>
->>     if (qemu_cpu_is_self(cpu)) {
->>
->>         func(cpu, data);
->>
->>         return;
->>
->>     }
->=20
-> For -smp 1 it's fine, but have you tested --accel thread=3Dsingle -smp =
-2?
+On Thu, 16 Nov 2017 15:16:07 +1100
+Suraj Jitindar Singh <sjitindarsingh@gmail.com> wrote:
 
-Yes, otherwise I would never have noticed this bug ;)
+> The device tree nodes ibm,arch-vec-5-platform-support and ibm,pa-features
+> are used to communicate features of the cpu to the guest operating
+> system. The properties of each of these are determined based on the
+> selected cpu model and the availability of hypervisor features.
+> Currently the compatibility mode of the cpu is not taken into account.
+> 
+> The ibm,arch-vec-5-platform-support node is used to communicate the
+> level of support for various ISAv3 processor features to the guest
+> before CAS to inform the guests' request. The available mmu mode should
+> only be hash unless the cpu is a POWER9 which is not in a prePOWER9
+> compat mode, in which case the available modes depend on the
+> accelerator and the hypervisor capabilities.
+> 
+> The ibm,pa-featues node is used to communicate the level of cpu support
+> for various features to the guest os. This should only contain features
+> relevant to the operating mode of the processor, that is the selected
+> cpu model taking into account any compat mode. This means that the
+> compat mode should be taken into account when choosing the properties of
+> ibm,pa-features and they should match the compat mode selected, or the
+> cpu model selected if no compat mode.
+> 
+> Update the setting of these cpu features in the device tree as described
+> above to properly take into account any compat mode.
+> 
+> Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+> ---
+>  hw/ppc/spapr.c | 38 +++++++++++++++++++++++++++++++++-----
+>  1 file changed, 33 insertions(+), 5 deletions(-)
+> 
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index d682f01..0dab6f1 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -44,6 +44,7 @@
+>  #include "migration/register.h"
+>  #include "mmu-hash64.h"
+>  #include "mmu-book3s-v3.h"
+> +#include "cpu-models.h"
+>  #include "qom/cpu.h"
+>  
+>  #include "hw/boards.h"
+> @@ -255,6 +256,7 @@ static int spapr_fixup_cpu_numa_dt(void *fdt, int offset, PowerPCCPU *cpu)
+>  static void spapr_populate_pa_features(CPUPPCState *env, void *fdt, int offset,
+>                                        bool legacy_guest)
+>  {
+> +    PowerPCCPU *cpu = ppc_env_get_cpu(env);
 
-I use for my current single threaded setup:
-"--accel thread=3Dsingle -smp 4"
+If spapr_populate_pa_features() now needs to peek into PowerPCCPU, then it
+should be passed a PowerPCCPU * instead of doing container_of() contorsions.
+Both callers, spapr_fixup_cpu_dt() and spapr_populate_cpu_dt() can do that.
 
-The point is: if run_on_cpu() would not be able to cope with this very
-simple problem, it would basically be useless.
+>      uint8_t pa_features_206[] = { 6, 0,
+>          0xf6, 0x1f, 0xc7, 0x00, 0x80, 0xc0 };
+>      uint8_t pa_features_207[] = { 24, 0,
+> @@ -290,16 +292,36 @@ static void spapr_populate_pa_features(CPUPPCState *env, void *fdt, int offset,
+>      uint8_t *pa_features;
+>      size_t pa_size;
+>  
+> -    switch (POWERPC_MMU_VER(env->mmu_model)) {
+> -    case POWERPC_MMU_VER_2_06:
+> +    switch (cpu->compat_pvr) {
+> +    case 0:
+> +        /* If not in a compat mode then determine based on the mmu model */
+> +        switch (POWERPC_MMU_VER(env->mmu_model)) {
+> +        case POWERPC_MMU_VER_2_06:
+> +            pa_features = pa_features_206;
+> +            pa_size = sizeof(pa_features_206);
+> +            break;
+> +        case POWERPC_MMU_VER_2_07:
+> +            pa_features = pa_features_207;
+> +            pa_size = sizeof(pa_features_207);
+> +            break;
+> +        case POWERPC_MMU_VER_3_00:
+> +            pa_features = pa_features_300;
+> +            pa_size = sizeof(pa_features_300);
+> +            break;
+> +        default:
+> +            return;
+> +        }
+> +        break;
+> +    case CPU_POWERPC_LOGICAL_2_06:
+> +    case CPU_POWERPC_LOGICAL_2_06_PLUS:
+>          pa_features = pa_features_206;
+>          pa_size = sizeof(pa_features_206);
+>          break;
+> -    case POWERPC_MMU_VER_2_07:
+> +    case CPU_POWERPC_LOGICAL_2_07:
+>          pa_features = pa_features_207;
+>          pa_size = sizeof(pa_features_207);
+>          break;
+> -    case POWERPC_MMU_VER_3_00:
+> +    case CPU_POWERPC_LOGICAL_3_00:
+>          pa_features = pa_features_300;
+>          pa_size = sizeof(pa_features_300);
+>          break;
+> @@ -941,6 +963,7 @@ static void spapr_dt_rtas(sPAPRMachineState *spapr, void *fdt)
+>  static void spapr_dt_ov5_platform_support(void *fdt, int chosen)
+>  {
+>      PowerPCCPU *first_ppc_cpu = POWERPC_CPU(first_cpu);
+> +    CPUPPCState *env = &first_ppc_cpu->env;
+>  
+>      char val[2 * 4] = {
+>          23, 0x00, /* Xive mode, filled in below. */
+> @@ -949,7 +972,12 @@ static void spapr_dt_ov5_platform_support(void *fdt, int chosen)
+>          26, 0x40, /* Radix options: GTSE == yes. */
+>      };
+>  
+> -    if (kvm_enabled()) {
+> +    if (POWERPC_MMU_VER(env->mmu_model) != POWERPC_MMU_VER_3_00 ||
+> +        (first_ppc_cpu->compat_pvr && (first_ppc_cpu->compat_pvr <
+> +                                       CPU_POWERPC_LOGICAL_3_00))) {
+> +        /* If we're in a pre POWER9 compat mode then the guest should do hash */
+> +        val[3] = 0x00; /* Hash */
+> +    } else if (kvm_enabled()) {
+>          if (kvmppc_has_cap_mmu_radix() && kvmppc_has_cap_mmu_hash_v3()) {
+>              val[3] = 0x80; /* OV5_MMU_BOTH */
+>          } else if (kvmppc_has_cap_mmu_radix()) {
 
-instead of scheduling work, it simply executes all these functions
-directly for single threaded TCG. For multi threaded TCG it actually
-schedules work, that's why I notice the missing iolock (see patch
-following this one)
+So we end up with:
 
->=20
->>
->>>
->>> If it is important that the source vCPU doesn't continue you can
->>> schedule it's work afterwards with a async_safe_run_on_cpu which will
->>> complete after all other vCPUs have executed their work.
->>>
->>
->> It is important. Introducing async helpers at a point where sync is
->> needed sounds strange.
->=20
-> Well the helper that schedulules the final async helper also needs to
-> exit the run loop at that point, otherwise you are right it would
-> attempt to execute a few more instructions in the block.
->=20
+    if (POWERPC_MMU_VER(env->mmu_model) != POWERPC_MMU_VER_3_00 ||
 
-And the nice thing about run_on_cpu here is for single threaded TCG that
-not a single work has to be scheduled.
+Isn't this case handled...
 
---=20
+        (first_ppc_cpu->compat_pvr && (first_ppc_cpu->compat_pvr <
+                                       CPU_POWERPC_LOGICAL_3_00))) {
+        /* If we're in a pre POWER9 compat mode then the guest should do hash */
+        val[3] = 0x00; /* Hash */
+    } else if (kvm_enabled()) {
+        if (kvmppc_has_cap_mmu_radix() && kvmppc_has_cap_mmu_hash_v3()) {
+            val[3] = 0x80; /* OV5_MMU_BOTH */
+        } else if (kvmppc_has_cap_mmu_radix()) {
+            val[3] = 0x40; /* OV5_MMU_RADIX_300 */
+        } else {
+            val[3] = 0x00; /* Hash */
+        }
+    } else {
+        if (first_ppc_cpu->env.mmu_model & POWERPC_MMU_V3) {
 
-Thanks,
+s/first_ppc_cpu->env./env->/ ?
 
-David / dhildenb
+            /* V3 MMU supports both hash and radix (with dynamic switching) */
+            val[3] = 0xC0;
+        } else {
+            /* Otherwise we can only do hash */
+            val[3] = 0x00;
+
+... here ?
+
+        }
+    }
