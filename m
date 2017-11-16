@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39867)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39866)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eFCqB-0007M3-Aj
+	(envelope-from <bounces@canonical.com>) id 1eFCqB-0007M2-AM
 	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 00:35:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eFCq6-0004wP-Fv
+	(envelope-from <bounces@canonical.com>) id 1eFCq6-0004wG-En
 	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 00:35:55 -0500
-Received: from indium.canonical.com ([91.189.90.7]:48466)
+Received: from indium.canonical.com ([91.189.90.7]:48462)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eFCq6-0004uw-9l
+	id 1eFCq6-0004uv-8J
 	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 00:35:50 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eFCq3-0000zR-Lk
+	id 1eFCq3-00011S-6m
 	for <qemu-devel@nongnu.org>; Thu, 16 Nov 2017 05:35:47 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 797EF2E818D
+	by loganberry.canonical.com (Postfix) with ESMTP id 23F452E80EB
 	for <qemu-devel@nongnu.org>; Thu, 16 Nov 2017 05:35:45 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 16 Nov 2017 05:22:26 -0000
+Date: Thu, 16 Nov 2017 05:17:45 -0000
 From: Jimi <1728256@bugs.launchpad.net>
 Reply-To: Bug 1728256 <1728256@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <150920686502.20214.12572544661418580428.malonedeb@soybean.canonical.com>
-Message-Id: <151080974667.1801.1274155283049373864.malone@chaenomeles.canonical.com>
+Message-Id: <151080946556.8536.863927632496807160.malone@wampee.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1728256] Re: Memory corruption in Windows 10
  guest / amd64
@@ -39,11 +39,15 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Specifically 4.12.12, because it seems that was the last version I was
-running before this issue started (I was on 4.12.13 when it started). I,
-too, can't find any other package upgrade that could have possibly been
-the culprit. The timing of my upgrades of any qemu or libvirt packages
-rule them out.
+I'm experiencing this BSOD issue as well. I'm also on Arch x64, and the
+same versions of everything (though not minimal qemu--just the normal
+package in the main repos). I also passthru a GPU and a USB card, but
+not an SSD. It will happen randomly, anytime, at least once a day, and
+it seems like demanding games make it much more frequent. Since you're
+on btrfs, I'll see what happens if I downgrade the kernel to 4.12. If
+that doesn't work, I guess I'll try to confirm the swapoff fix, but my
+host only gets 4GB of RAM when the VM is running, so no swap would hurt
+real bad.
 
 -- =
 
