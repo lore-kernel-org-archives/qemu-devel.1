@@ -1,32 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36520)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42544)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1eFIub-0006MT-KT
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 07:04:56 -0500
+	(envelope-from <thuth@redhat.com>) id 1eFJ6g-00037c-EB
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 07:17:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1eFIuV-0004xY-Nf
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 07:04:53 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51346)
+	(envelope-from <thuth@redhat.com>) id 1eFJ6b-00041G-I2
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 07:17:22 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35254)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1eFIuV-0004wX-FG
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 07:04:47 -0500
-References: <CACnE9pzALCNV62Jmo4SUawD=pQiPFENWR_BwK3=+yY7V1U54Ag@mail.gmail.com>
-	<cd39d029-48f9-20d6-cc19-ff87a45240ab@redhat.com>
-	<CACnE9pzm5zabq=nJhqB4LHzSXk2vDGiAN5SbJco3ZfGkfRbW-g@mail.gmail.com>
-	<5A0D27D8.6050506@huawei.com>
-	<2e0ddd76-3903-d715-9a86-73f1286322e7@redhat.com>
-	<33183CC9F5247A488A2544077AF19020DA46E2A6@DGGEMA505-MBS.china.huawei.com>
-	<6aaaca2b-81ef-a1c1-4745-830d008b3770@redhat.com>
-	<5A0D5B1B.3080708@huawei.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <55f2edb1-1fe3-d03f-7f4f-418a3b15997a@redhat.com>
-Date: Thu, 16 Nov 2017 20:04:34 +0800
-MIME-Version: 1.0
-In-Reply-To: <5A0D5B1B.3080708@huawei.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Question] why need to start all queues in
- vhost_net_start
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1eFJ6b-0003zE-9R
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 07:17:17 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5080A6A7D2
+	for <qemu-devel@nongnu.org>; Thu, 16 Nov 2017 12:17:16 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+Date: Thu, 16 Nov 2017 13:17:02 +0100
+Message-Id: <1510834622-28800-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH v2] tests/bios-tables-test: Fix endianess
+ problems when passing data to iasl
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,81 +28,293 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Longpeng (Mike)" <longpeng2@huawei.com>
-Cc: "Huangweidong (C)" <weidong.huang@huawei.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Wangjing (King, Euler)" <king.wang@huawei.com>, "Gonglei (Arei)" <arei.gonglei@huawei.com>, "Longpeng(Mike)" <longpeng.mike@gmail.com>
+To: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
+The bios-tables-test was writing out files that we pass to iasl in
+with the wrong endianness in the header when running on a big endian
+host. So instead of storing mixed endian information in our structures,
+let's keep everything in little endian and byte-swap it only when we
+need a value in the code.
 
+Reported-by: Daniel P. Berrange <berrange@redhat.com>
+Buglink: https://bugs.launchpad.net/qemu/+bug/1724570
+Suggested-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ v2: Fixed vmgenid-test which was accidentially broken in v1
 
-On 2017=E5=B9=B411=E6=9C=8816=E6=97=A5 17:32, Longpeng (Mike) wrote:
-> Hi Jason,
->
-> On 2017/11/16 17:13, Jason Wang wrote:
->
->>
->> On 2017=E5=B9=B411=E6=9C=8816=E6=97=A5 17:01, Gonglei (Arei) wrote:
->>> No, Windows guest + vhost-user/DPDK.
->>>
->>> BTW pls see virtio spec in :
->>>
->>> "If VIRTIO_NET_F_MQ is negotiated, each of receiveq1. . .receiveqN th=
-at will
->>> be used SHOULD be populated
->>> with receive buffers."
->>>
->>> It is not mandatory that all queues must be initialized.
->> I think not, since it said we should fill receive buffers for each que=
-ue which
->> means we should initialize all queues. May Michael can clarify on this=
-.
->>
->
-> I think this doesn't matter, but QEMU should consider this scenario...
->
-> For example, if one queues isn't initialized (Windows guest), the vring=
-.avail=3D0,
-> so vq->desc_phys=3D0, then vq->desc=3D'a avail HVA'(which is the start =
-addr of pc.ram).
->
->      vq->desc_size =3D s =3D l =3D virtio_queue_get_desc_size(vdev, idx=
-);
->      vq->desc_phys =3D a =3D virtio_queue_get_desc_addr(vdev, idx);
->      vq->desc =3D vhost_memory_map(dev, a, &l, 0);
->      if (!vq->desc || l !=3D s) {
->          r =3D -ENOMEM;
->          goto fail_alloc_desc;
->      }
->      .....
->      r =3D vhost_virtqueue_set_addr(dev, vq, vhost_vq_index, dev->log_e=
-nabled);
->      if (r < 0) {
->          r =3D -errno;
->          goto fail_alloc;
->      }
->
-> Then the HVA is send to the vhost-user.
->
-> I think this is wrong, because the '0' here means guest driver doesn't =
-init this
-> queues, it should not be used to calculate the HVA for this vq.
+ tests/acpi-utils.h       | 27 +++++----------------------
+ tests/bios-tables-test.c | 42 ++++++++++++++++++++++--------------------
+ tests/vmgenid-test.c     | 22 ++++++++++++----------
+ 3 files changed, 39 insertions(+), 52 deletions(-)
 
-Yes, workaround is not hard if windows driver won't use the left 3=20
-queues any more. But we should have a complete solution. The main=20
-problem is when vhost need to be started. For legacy device, there's no=20
-easy way to detect whether or not a specific virtqueue is ready to be=20
-used. For modern device, we can probably do this through queue_enable=20
-(but this is not implemented in current code).
-
-Thanks
-
->
->> Thanks
->>
->>> Thanks,
->>> -Gonglei
->>>
->>
->>
->>
->> .
->>
->
+diff --git a/tests/acpi-utils.h b/tests/acpi-utils.h
+index f8d8723..d5ca5b6 100644
+--- a/tests/acpi-utils.h
++++ b/tests/acpi-utils.h
+@@ -28,24 +28,9 @@ typedef struct {
+     bool tmp_files_retain;   /* do not delete the temp asl/aml */
+ } AcpiSdtTable;
+ 
+-#define ACPI_READ_FIELD(field, addr)           \
+-    do {                                       \
+-        switch (sizeof(field)) {               \
+-        case 1:                                \
+-            field = readb(addr);               \
+-            break;                             \
+-        case 2:                                \
+-            field = readw(addr);               \
+-            break;                             \
+-        case 4:                                \
+-            field = readl(addr);               \
+-            break;                             \
+-        case 8:                                \
+-            field = readq(addr);               \
+-            break;                             \
+-        default:                               \
+-            g_assert(false);                   \
+-        }                                      \
++#define ACPI_READ_FIELD(field, addr)            \
++    do {                                        \
++        memread(addr, &field, sizeof(field));   \
+         addr += sizeof(field);                  \
+     } while (0);
+ 
+@@ -74,16 +59,14 @@ typedef struct {
+     } while (0);
+ 
+ #define ACPI_ASSERT_CMP(actual, expected) do { \
+-    uint32_t ACPI_ASSERT_CMP_le = cpu_to_le32(actual); \
+     char ACPI_ASSERT_CMP_str[5] = {}; \
+-    memcpy(ACPI_ASSERT_CMP_str, &ACPI_ASSERT_CMP_le, 4); \
++    memcpy(ACPI_ASSERT_CMP_str, &actual, 4); \
+     g_assert_cmpstr(ACPI_ASSERT_CMP_str, ==, expected); \
+ } while (0)
+ 
+ #define ACPI_ASSERT_CMP64(actual, expected) do { \
+-    uint64_t ACPI_ASSERT_CMP_le = cpu_to_le64(actual); \
+     char ACPI_ASSERT_CMP_str[9] = {}; \
+-    memcpy(ACPI_ASSERT_CMP_str, &ACPI_ASSERT_CMP_le, 8); \
++    memcpy(ACPI_ASSERT_CMP_str, &actual, 8); \
+     g_assert_cmpstr(ACPI_ASSERT_CMP_str, ==, expected); \
+ } while (0)
+ 
+diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
+index 564da45..e28e0c9 100644
+--- a/tests/bios-tables-test.c
++++ b/tests/bios-tables-test.c
+@@ -96,17 +96,20 @@ static void test_acpi_rsdp_table(test_data *data)
+ static void test_acpi_rsdt_table(test_data *data)
+ {
+     AcpiRsdtDescriptorRev1 *rsdt_table = &data->rsdt_table;
+-    uint32_t addr = data->rsdp_table.rsdt_physical_address;
++    uint32_t addr = le32_to_cpu(data->rsdp_table.rsdt_physical_address);
+     uint32_t *tables;
+     int tables_nr;
+     uint8_t checksum;
++    uint32_t rsdt_table_length;
+ 
+     /* read the header */
+     ACPI_READ_TABLE_HEADER(rsdt_table, addr);
+     ACPI_ASSERT_CMP(rsdt_table->signature, "RSDT");
+ 
++    rsdt_table_length = le32_to_cpu(rsdt_table->length);
++
+     /* compute the table entries in rsdt */
+-    tables_nr = (rsdt_table->length - sizeof(AcpiRsdtDescriptorRev1)) /
++    tables_nr = (rsdt_table_length - sizeof(AcpiRsdtDescriptorRev1)) /
+                 sizeof(uint32_t);
+     g_assert(tables_nr > 0);
+ 
+@@ -114,7 +117,7 @@ static void test_acpi_rsdt_table(test_data *data)
+     tables = g_new0(uint32_t, tables_nr);
+     ACPI_READ_ARRAY_PTR(tables, tables_nr, addr);
+ 
+-    checksum = acpi_calc_checksum((uint8_t *)rsdt_table, rsdt_table->length) +
++    checksum = acpi_calc_checksum((uint8_t *)rsdt_table, rsdt_table_length) +
+                acpi_calc_checksum((uint8_t *)tables,
+                                   tables_nr * sizeof(uint32_t));
+     g_assert(!checksum);
+@@ -130,7 +133,7 @@ static void test_acpi_fadt_table(test_data *data)
+     uint32_t addr;
+ 
+     /* FADT table comes first */
+-    addr = data->rsdt_tables_addr[0];
++    addr = le32_to_cpu(data->rsdt_tables_addr[0]);
+     ACPI_READ_TABLE_HEADER(fadt_table, addr);
+ 
+     ACPI_READ_FIELD(fadt_table->firmware_ctrl, addr);
+@@ -187,13 +190,14 @@ static void test_acpi_fadt_table(test_data *data)
+     ACPI_READ_GENERIC_ADDRESS(fadt_table->xgpe1_block, addr);
+ 
+     ACPI_ASSERT_CMP(fadt_table->signature, "FACP");
+-    g_assert(!acpi_calc_checksum((uint8_t *)fadt_table, fadt_table->length));
++    g_assert(!acpi_calc_checksum((uint8_t *)fadt_table,
++                                 le32_to_cpu(fadt_table->length)));
+ }
+ 
+ static void test_acpi_facs_table(test_data *data)
+ {
+     AcpiFacsDescriptorRev1 *facs_table = &data->facs_table;
+-    uint32_t addr = data->fadt_table.firmware_ctrl;
++    uint32_t addr = le32_to_cpu(data->fadt_table.firmware_ctrl);
+ 
+     ACPI_READ_FIELD(facs_table->signature, addr);
+     ACPI_READ_FIELD(facs_table->length, addr);
+@@ -212,7 +216,8 @@ static void test_dst_table(AcpiSdtTable *sdt_table, uint32_t addr)
+ 
+     ACPI_READ_TABLE_HEADER(&sdt_table->header, addr);
+ 
+-    sdt_table->aml_len = sdt_table->header.length - sizeof(AcpiTableHeader);
++    sdt_table->aml_len = le32_to_cpu(sdt_table->header.length)
++                         - sizeof(AcpiTableHeader);
+     sdt_table->aml = g_malloc0(sdt_table->aml_len);
+     ACPI_READ_ARRAY_PTR(sdt_table->aml, sdt_table->aml_len, addr);
+ 
+@@ -226,7 +231,7 @@ static void test_dst_table(AcpiSdtTable *sdt_table, uint32_t addr)
+ static void test_acpi_dsdt_table(test_data *data)
+ {
+     AcpiSdtTable dsdt_table;
+-    uint32_t addr = data->fadt_table.dsdt;
++    uint32_t addr = le32_to_cpu(data->fadt_table.dsdt);
+ 
+     memset(&dsdt_table, 0, sizeof(dsdt_table));
+     data->tables = g_array_new(false, true, sizeof(AcpiSdtTable));
+@@ -245,9 +250,10 @@ static void test_acpi_tables(test_data *data)
+ 
+     for (i = 0; i < tables_nr; i++) {
+         AcpiSdtTable ssdt_table;
++        uint32_t addr;
+ 
+         memset(&ssdt_table, 0, sizeof(ssdt_table));
+-        uint32_t addr = data->rsdt_tables_addr[i + 1]; /* fadt is first */
++        addr = le32_to_cpu(data->rsdt_tables_addr[i + 1]); /* fadt is first */
+         test_dst_table(&ssdt_table, addr);
+         g_array_append_val(data->tables, ssdt_table);
+     }
+@@ -268,9 +274,8 @@ static void dump_aml_files(test_data *data, bool rebuild)
+         g_assert(sdt->aml);
+ 
+         if (rebuild) {
+-            uint32_t signature = cpu_to_le32(sdt->header.signature);
+             aml_file = g_strdup_printf("%s/%s/%.4s%s", data_dir, data->machine,
+-                                       (gchar *)&signature, ext);
++                                       (gchar *)&sdt->header.signature, ext);
+             fd = g_open(aml_file, O_WRONLY|O_TRUNC|O_CREAT,
+                         S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH);
+         } else {
+@@ -381,7 +386,6 @@ static GArray *load_expected_aml(test_data *data)
+     GArray *exp_tables = g_array_new(false, true, sizeof(AcpiSdtTable));
+     for (i = 0; i < data->tables->len; ++i) {
+         AcpiSdtTable exp_sdt;
+-        uint32_t signature;
+         gchar *aml_file = NULL;
+         const char *ext = data->variant ? data->variant : "";
+ 
+@@ -390,11 +394,9 @@ static GArray *load_expected_aml(test_data *data)
+         memset(&exp_sdt, 0, sizeof(exp_sdt));
+         exp_sdt.header.signature = sdt->header.signature;
+ 
+-        signature = cpu_to_le32(sdt->header.signature);
+-
+ try_again:
+         aml_file = g_strdup_printf("%s/%s/%.4s%s", data_dir, data->machine,
+-                                   (gchar *)&signature, ext);
++                                   (gchar *)&sdt->header.signature, ext);
+         if (getenv("V")) {
+             fprintf(stderr, "\nLooking for expected file '%s'\n", aml_file);
+         }
+@@ -571,12 +573,12 @@ static void test_smbios_structs(test_data *data)
+ {
+     DECLARE_BITMAP(struct_bitmap, SMBIOS_MAX_TYPE+1) = { 0 };
+     struct smbios_21_entry_point *ep_table = &data->smbios_ep_table;
+-    uint32_t addr = ep_table->structure_table_address;
++    uint32_t addr = le32_to_cpu(ep_table->structure_table_address);
+     int i, len, max_len = 0;
+     uint8_t type, prv, crt;
+ 
+     /* walk the smbios tables */
+-    for (i = 0; i < ep_table->number_of_structures; i++) {
++    for (i = 0; i < le16_to_cpu(ep_table->number_of_structures); i++) {
+ 
+         /* grab type and formatted area length from struct header */
+         type = readb(addr);
+@@ -608,9 +610,9 @@ static void test_smbios_structs(test_data *data)
+     }
+ 
+     /* total table length and max struct size must match entry point values */
+-    g_assert_cmpuint(ep_table->structure_table_length, ==,
+-                     addr - ep_table->structure_table_address);
+-    g_assert_cmpuint(ep_table->max_structure_size, ==, max_len);
++    g_assert_cmpuint(le16_to_cpu(ep_table->structure_table_length), ==,
++                     addr - le32_to_cpu(ep_table->structure_table_address));
++    g_assert_cmpuint(le16_to_cpu(ep_table->max_structure_size), ==, max_len);
+ 
+     /* required struct types must all be present */
+     for (i = 0; i < data->required_struct_types_len; i++) {
+diff --git a/tests/vmgenid-test.c b/tests/vmgenid-test.c
+index b6e7b3b..5a86b40 100644
+--- a/tests/vmgenid-test.c
++++ b/tests/vmgenid-test.c
+@@ -38,7 +38,7 @@ static uint32_t acpi_find_vgia(void)
+     uint32_t rsdp_offset;
+     uint32_t guid_offset = 0;
+     AcpiRsdpDescriptor rsdp_table;
+-    uint32_t rsdt;
++    uint32_t rsdt, rsdt_table_length;
+     AcpiRsdtDescriptorRev1 rsdt_table;
+     size_t tables_nr;
+     uint32_t *tables;
+@@ -56,14 +56,15 @@ static uint32_t acpi_find_vgia(void)
+ 
+     acpi_parse_rsdp_table(rsdp_offset, &rsdp_table);
+ 
+-    rsdt = rsdp_table.rsdt_physical_address;
++    rsdt = le32_to_cpu(rsdp_table.rsdt_physical_address);
+     /* read the header */
+     ACPI_READ_TABLE_HEADER(&rsdt_table, rsdt);
+     ACPI_ASSERT_CMP(rsdt_table.signature, "RSDT");
++    rsdt_table_length = le32_to_cpu(rsdt_table.length);
+ 
+     /* compute the table entries in rsdt */
+-    g_assert_cmpint(rsdt_table.length, >, sizeof(AcpiRsdtDescriptorRev1));
+-    tables_nr = (rsdt_table.length - sizeof(AcpiRsdtDescriptorRev1)) /
++    g_assert_cmpint(rsdt_table_length, >, sizeof(AcpiRsdtDescriptorRev1));
++    tables_nr = (rsdt_table_length - sizeof(AcpiRsdtDescriptorRev1)) /
+                 sizeof(uint32_t);
+ 
+     /* get the addresses of the tables pointed by rsdt */
+@@ -71,23 +72,24 @@ static uint32_t acpi_find_vgia(void)
+     ACPI_READ_ARRAY_PTR(tables, tables_nr, rsdt);
+ 
+     for (i = 0; i < tables_nr; i++) {
+-        ACPI_READ_TABLE_HEADER(&ssdt_table, tables[i]);
++        uint32_t addr = le32_to_cpu(tables[i]);
++        ACPI_READ_TABLE_HEADER(&ssdt_table, addr);
+         if (!strncmp((char *)ssdt_table.oem_table_id, "VMGENID", 7)) {
+             /* the first entry in the table should be VGIA
+              * That's all we need
+              */
+-            ACPI_READ_FIELD(vgid_table.name_op, tables[i]);
++            ACPI_READ_FIELD(vgid_table.name_op, addr);
+             g_assert(vgid_table.name_op == 0x08);  /* name */
+-            ACPI_READ_ARRAY(vgid_table.vgia, tables[i]);
++            ACPI_READ_ARRAY(vgid_table.vgia, addr);
+             g_assert(memcmp(vgid_table.vgia, "VGIA", 4) == 0);
+-            ACPI_READ_FIELD(vgid_table.val_op, tables[i]);
++            ACPI_READ_FIELD(vgid_table.val_op, addr);
+             g_assert(vgid_table.val_op == 0x0C);  /* dword */
+-            ACPI_READ_FIELD(vgid_table.vgia_val, tables[i]);
++            ACPI_READ_FIELD(vgid_table.vgia_val, addr);
+             /* The GUID is written at a fixed offset into the fw_cfg file
+              * in order to implement the "OVMF SDT Header probe suppressor"
+              * see docs/specs/vmgenid.txt for more details
+              */
+-            guid_offset = vgid_table.vgia_val + VMGENID_GUID_OFFSET;
++            guid_offset = le32_to_cpu(vgid_table.vgia_val) + VMGENID_GUID_OFFSET;
+             break;
+         }
+     }
+-- 
+1.8.3.1
