@@ -1,33 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60501)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37766)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tgolembi@redhat.com>) id 1eFJiS-0005U3-NF
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 07:56:30 -0500
+	(envelope-from <peterx@redhat.com>) id 1eFJsA-0007gY-P2
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 08:06:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tgolembi@redhat.com>) id 1eFJiQ-0007sb-4Y
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 07:56:24 -0500
-Received: from mail-wm0-f48.google.com ([74.125.82.48]:36415)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tgolembi@redhat.com>) id 1eFJiP-0007pW-MK
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 07:56:22 -0500
-Received: by mail-wm0-f48.google.com with SMTP id r68so9545521wmr.1
-	for <qemu-devel@nongnu.org>; Thu, 16 Nov 2017 04:56:20 -0800 (PST)
-Date: Thu, 16 Nov 2017 13:56:16 +0100
-From: =?UTF-8?B?VG9tw6HFoSBHb2xlbWJpb3Zza8O9?= <tgolembi@redhat.com>
-Message-ID: <20171116135616.63dab444@fiorina>
-In-Reply-To: <CAJH6TXiPuLu62-+o2+PrUGpstrks_5pLotFEe1bAOmsbn20otw@mail.gmail.com>
-References: <CAJH6TXiMxUoU2sFEHAoZ8jhDMtg_saEnTHM9f0vJ6Nhqj7099w@mail.gmail.com>
-	<c2ecae32-f999-9f1e-46a6-37cdab2a62e3@redhat.com>
-	<CAJH6TXhBAaBE9gBSxksWZqNywWmencRaGyeY-oN3jbKdgUettQ@mail.gmail.com>
-	<0e6cc220-814a-17fd-4fd7-7b0665d34e81@redhat.com>
-	<CAJH6TXh2v-F=yqxQbUUawk_Ctq-sgFefGp1XvMsC=syX_5jEqA@mail.gmail.com>
-	<30b54865-2255-d13d-a054-afcf5bbd06b2@redhat.com>
-	<20171115202440.GJ19514@redhat.com>
-	<7b11bb2b-b93d-e8ff-f396-703c93549d0d@redhat.com>
-	<20171115202938.GN2787@redhat.com>
-	<CAJH6TXiPuLu62-+o2+PrUGpstrks_5pLotFEe1bAOmsbn20otw@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="MP_/SUq5jFVq_EN=2mjN9xoUynF"
-Subject: Re: [Qemu-devel] [Libguestfs]  [qemu-img] support for XVA
+	(envelope-from <peterx@redhat.com>) id 1eFJs6-00059M-Ao
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 08:06:26 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48378)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eFJs6-00058A-2U
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 08:06:22 -0500
+From: Peter Xu <peterx@redhat.com>
+Date: Thu, 16 Nov 2017 21:05:43 +0800
+Message-Id: <20171116130610.23582-1-peterx@redhat.com>
+Subject: [Qemu-devel] [RFC v4 00/27] QMP: out-of-band (OOB) execution support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,106 +21,180 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gandalf Corvotempesta <gandalf.corvotempesta@gmail.com>
-Cc: "Richard W.M. Jones" <rjones@redhat.com>, libguestfs <libguestfs@redhat.com>, qemu-devel@nongnu.org, Qemu-block <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, peterx@redhat.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
---MP_/SUq5jFVq_EN=2mjN9xoUynF
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+v4:
+- drop first patch to fix IOWatchPool [Stefan, Dan]
+- add s-o-b where missing, and newly got r-bs
+- fix English error in commit msg [Fam]
+- some tunes on request-dropped event:  [Stefan]
+  - firstly let 'id' be any type, meanwhile make sure "id" is there as
+    long as OOB is enabled for the monitor.
+  - some comments fix
+- add new command "x-oob-test" for testing oob commands [Stefan]
+- simplify the test codes to use new x-oob-test
+- flush response queue before cleanup monitors
 
-On Wed, 15 Nov 2017 21:41:20 +0100
-Gandalf Corvotempesta <gandalf.corvotempesta@gmail.com> wrote:
+This series was born from this one:
 
-> 2017-11-15 21:29 GMT+01:00 Richard W.M. Jones <rjones@redhat.com>:
-> > Gandalf, is there an XVA file publically available (pref. not
-> > too big) that we can look at?
->=20
-> I can try to provide one, but it's simple:
->=20
-> # tar tvf 20160630_124823_aa72_.xva.gz | head -n 50
-> ---------- 0/0           42353 1970-01-01 01:00 ova.xml
-> ---------- 0/0         1048576 1970-01-01 01:00 Ref:175/00000000
-> ---------- 0/0              40 1970-01-01 01:00 Ref:175/00000000.checksum
-> ---------- 0/0         1048576 1970-01-01 01:00 Ref:175/00000001
-> ---------- 0/0              40 1970-01-01 01:00 Ref:175/00000001.checksum
-> ---------- 0/0         1048576 1970-01-01 01:00 Ref:175/00000003
-> ---------- 0/0              40 1970-01-01 01:00 Ref:175/00000003.checksum
-> ---------- 0/0         1048576 1970-01-01 01:00 Ref:175/00000004
-> ---------- 0/0              40 1970-01-01 01:00 Ref:175/00000004.checksum
-> ---------- 0/0         1048576 1970-01-01 01:00 Ref:175/00000005
-> ---------- 0/0              40 1970-01-01 01:00 Ref:175/00000005.checksum
-> ---------- 0/0         1048576 1970-01-01 01:00 Ref:175/00000006
-> ---------- 0/0              40 1970-01-01 01:00 Ref:175/00000006.checksum
-> ---------- 0/0         1048576 1970-01-01 01:00 Ref:175/00000007
-> ---------- 0/0              40 1970-01-01 01:00 Ref:175/00000007.checksum
-> ---------- 0/0         1048576 1970-01-01 01:00 Ref:175/00000009
-> ---------- 0/0              40 1970-01-01 01:00 Ref:175/00000009.checksum
-> ---------- 0/0         1048576 1970-01-01 01:00 Ref:175/00000010
-> ---------- 0/0              40 1970-01-01 01:00 Ref:175/00000010.checksum
->=20
->=20
-> You can ignore the ova.xml and just use the "Ref:175" directory.
-> Inside the XVA you'll fine one "Ref" directory for each virtual disk
-> (ref number is different for each disk)
-> Inside each Ref directory, you'll get tons of 1MB file, corrisponding
-> to the RAW image.
-> You have to merge these files in a single raw file with just an
-> exception: numbers are not sequential.
-> as you can see above, we have: 00000000, 00000001, 00000003
->=20
-> The 00000002 is missing, because it's totally blank. XenServer doesn't
-> export any empty block, thus it will skip the corrisponding 1MB file.
-> When building the raw image, you have to replace empty blocks with 1MB
-> full of zeros.
->=20
-> This is (in addition to the tar extract) the most time-consuming part.
-> Currently I'm rebuilding a 250GB image, with tons of files to be
-> merge.
-> If qemu-img can be patched to automatically convert this kind of
-> format, I can save about 3 hours (30 minutes for extracting the
-> tarball, and about 2 hours to merge 250-300GB image)
->=20
+  https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg04310.html
 
-Hi,
+The idea comes from Markus Armbruster and the discussion we had in the
+thread.  It's not a super ideal solution (I believe Markus had been
+thinking hard to keep everything in order meanwhile trying to satisfy
+the migration requirement), but AFAIU it's currently the best.
 
-I like what Richard and Max came up with. Pretty nifty solutions.
-While there's nothing wrong with them I decided to take my own shot at
-it. Since the blocks in tar file are pieces of raw image there is no
-conversion happening. All in all it's just moving bytes from one place
-to another. That means there shouldn't be a need for any heavy
-machinery, right? :)
+What is OOB?
+============
 
-Attached is a shell script that uses dd to do the byte-shuffling.
-I'm pretty sure this could even be safely parallelized by running
-multiple instances of dd at the same time (e.g. with xargs). But I did
-not try that.
+It's the shortcut of Out-Of-Band execution, its name is given by
+Markus.  It's a way to quickly execute a QMP request.  Say, originally
+QMP is going throw these steps:
 
+      JSON Parser --> QMP Dispatcher --> Respond
+          /|\    (2)                (3)     |
+       (1) |                               \|/ (4)
+           +---------  main thread  --------+
 
-    Tomas
+The requests are executed by the so-called QMP-dispatcher after the
+JSON is parsed.  If OOB is on, we run the command directly in the
+parser and quickly returns.
 
---=20
-Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com>
+This series changed the QMP handling logic by moving the command
+parsing and responding phases into IOThreads, so to be more accurate,
+after the series the above graph would change into this:
 
---MP_/SUq5jFVq_EN=2mjN9xoUynF
-Content-Type: application/x-shellscript
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename=xva2raw.sh
+               queue/kick              queue/kick
+     JSON Parser ======> QMP Dispatcher =====> Responder
+         /|\ |     (3)       /|\  |      (4)      | /|\
+      (1) |  | (2)            |   |               |  |
+          |  |                |  \|/           (6)|  |(5)
+          |  |            main thread             |  |
+          |  |                                    |  |
+          |  +--------> monitor IO thread <-------+  |
+          +-----------/                   \----------+
 
-IyEgL2Jpbi9zaAoKaWYgWyAkIyAtbmUgMyBdIDsgdGhlbgogICAgZWNobyAiVXNhZ2U6ICQwIDxp
-bnB1dC54dmE+IDxzdWJkaXI+IDxvdXRwdXQuaW1nPiIKICAgIGV4aXQgMQpmaQoKU1JDPSIkMSIK
-RElSPSIkMiIKRFNUPSIkMyIKCmxpc3RfZmlsZXMoKSB7CiAgICAjIC0gbGlzdCBmaWxlcyBpbiB0
-YXIKICAgICMgLSBleHRyYWN0IGZpbGVzIG1hdGNoaW5nIDxkaXI+LzxudW1iZXI+CiAgICAjIC0g
-c3RyaXAgdHJhaWxpbmcgY29sb24gZnJvbSBvZmZzZXQKICAgICMgLSBwcmludCAiPG9mZnNldD4g
-PGZpbGVuYW1lPiIKICAgIHRhciB0UnZmICIkU1JDIiB8IGF3ayAnJDggfiAvJyIkRElSIidcL1sw
-LTldKyQve3NwbGl0KCQyLCBvZmYsICI6Iik7IHByaW50IG9mZlsxXSwgJDh9Jwp9CgplY2hvICJS
-ZW1vdmluZyAkRFNUIgpybSAtZnYgIiREU1QiCgpsaXN0X2ZpbGVzIHwgd2hpbGUgcmVhZCBvZmZz
-ZXQgZmlsZSA7IGRvCiAgICBmaWxlPSQoYmFzZW5hbWUgIiRmaWxlIikKICAgICMgc3RyaXAgbGVh
-ZGluZyB6ZXJvcyBhbmQgbXVsdGlwbHkgdG8gZ2V0IGJsb2NrIG9mZnNldCAKICAgIGlmIGV4cHIg
-IiRmaWxlIiA6ICcwKiQnID4gL2Rldi9udWxsIDsgdGhlbgogICAgICAgIHNyY19vZmZzZXQ9MAog
-ICAgZWxzZQogICAgICAgIHNyY19vZmZzZXQ9JCgoJChleHByICIkZmlsZSIgOiAnMCpcKFsxLTld
-WzAtOV0qXCknKSAqIDIwNDgpKQogICAgZmkKICAgIGVjaG8gJGZpbGUKICAgIGRkIGlmPSIkU1JD
-IiBicz01MTIgb2Y9IiREU1QiIGNvdW50PTIwNDggc2tpcD0iJCgob2Zmc2V0KzEpKSIgc2Vlaz0i
-JHNyY19vZmZzZXQiCmRvbmUK
+New Interfaces
+==============
 
---MP_/SUq5jFVq_EN=2mjN9xoUynF--
+QMP Introspection Changes
+-------------------------
+
+When do query-qmp-schema, we were getting something like:
+
+  {"name": "migrate-incoming", "ret-type": "17",
+   "meta-type": "command", "arg-type": "89"}
+
+Now we will get a new key named "allow-oob":
+
+  {"name": "migrate-incoming", "ret-type": "17", "allow-oob": true,
+   "meta-type": "command", "arg-type": "89"}
+
+Which shows whether a command supports OOB.
+
+QMP Negociation Changes
+-----------------------
+
+We were running "qmp_capabilities" always without parameters like:
+
+  {"execute": "qmp_capabilities"}
+
+Now we can enable capabilities (we don't have any capability before
+this series) like OOB using:
+
+  {"execute": "qmp_capabilities", "arguments": {"enable": ["oob"]}}
+
+Only after we explicitly enable OOB capability can we send requests in
+OOB manner.  Otherwise we'll have exactly the same QMP session as
+before, just like when OOB is not there.
+
+When OOB is enabled, it's possible that OOB reply reaches faster than
+previous command, so clients should be prepared.
+
+Trigger OOB execution
+---------------------
+
+Let's take migrate-incoming as example.  The old command looks like:
+
+  {"execute": "migrate-incoming", "arguments" : {"uri": "xxxxxx"}}
+
+To execute a command with OOB execution, we need to specify it in the
+QMP request in the extra "control" key:
+
+  {"execute": "migrate-incoming", "arguments" : {"uri": "xxxxxx"},
+   "control" { "run-oob": true } }
+
+Then the command will be run in parser, and it can preempt other
+commands.
+
+Others
+=================
+
+The last patch of OOB test may need some attention.  I used
+dump-guest-memory as a time-consuming command to test whether OOB is
+working, and the only command I can test now is "migrate-incoming".  I
+hope that is a "okay" solution for unit tests.  Any other suggestions
+on that would be welcomed.
+
+Please review.  Thanks.
+
+Peter Xu (27):
+  qobject: introduce qstring_get_try_str()
+  qobject: introduce qobject_get_try_str()
+  qobject: let object_property_get_str() use new API
+  monitor: move skip_flush into monitor_data_init
+  qjson: add "opaque" field to JSONMessageParser
+  monitor: move the cur_mon hack deeper for QMP
+  monitor: unify global init
+  monitor: let mon_list be tail queue
+  monitor: create monitor dedicate iothread
+  monitor: allow to use IO thread for parsing
+  qmp: introduce QMPCapability
+  qmp: negociate QMP capabilities
+  qmp: introduce some capability helpers
+  monitor: introduce monitor_qmp_respond()
+  monitor: let monitor_{suspend|resume} thread safe
+  monitor: separate QMP parser and dispatcher
+  qmp: add new event "request-dropped"
+  monitor: send event when request queue full
+  qapi: introduce new cmd option "allow-oob"
+  qmp: support out-of-band (oob) execution
+  qmp: let migrate-incoming allow out-of-band
+  qmp: isolate responses into io thread
+  monitor: enable IO thread for (qmp & !mux) typed
+  qmp: add command "x-oob-test"
+  docs: update QMP documents for OOB commands
+  tests: qmp-test: verify command batching
+  tests: qmp-test: add oob test
+
+ docs/devel/qapi-code-gen.txt     |  51 +++-
+ docs/interop/qmp-spec.txt        |  35 ++-
+ include/monitor/monitor.h        |   2 +-
+ include/qapi/qmp/dispatch.h      |   2 +
+ include/qapi/qmp/json-streamer.h |  10 +-
+ include/qapi/qmp/qstring.h       |   2 +
+ monitor.c                        | 555 ++++++++++++++++++++++++++++++++++-----
+ qapi-schema.json                 |  80 +++++-
+ qapi/introspect.json             |   6 +-
+ qapi/migration.json              |   3 +-
+ qapi/qmp-dispatch.c              |  39 +++
+ qga/main.c                       |   5 +-
+ qmp.c                            |  16 ++
+ qobject/json-streamer.c          |   6 +-
+ qobject/qjson.c                  |   5 +-
+ qobject/qstring.c                |  21 ++
+ qom/object.c                     |   9 +-
+ scripts/qapi-commands.py         |  19 +-
+ scripts/qapi-introspect.py       |  10 +-
+ scripts/qapi.py                  |  15 +-
+ scripts/qapi2texi.py             |   2 +-
+ tests/libqtest.c                 |   5 +-
+ tests/qapi-schema/test-qapi.py   |   2 +-
+ tests/qmp-test.c                 |  90 ++++++-
+ trace-events                     |   2 +
+ vl.c                             |   3 +-
+ 26 files changed, 874 insertions(+), 121 deletions(-)
+
+-- 
+2.13.6
