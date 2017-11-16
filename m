@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38548)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40111)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1eFMC9-0001S2-0U
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 10:35:14 -0500
+	(envelope-from <mst@redhat.com>) id 1eFMFG-0003Ir-Hs
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 10:38:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1eFMC2-0000hO-SI
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 10:35:13 -0500
-Received: from 6.mo2.mail-out.ovh.net ([87.98.165.38]:40725)
+	(envelope-from <mst@redhat.com>) id 1eFMFA-0005xu-5i
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 10:38:26 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38840)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1eFMC2-0000fv-Iw
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 10:35:06 -0500
-Received: from player770.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo2.mail-out.ovh.net (Postfix) with ESMTP id B9D38CE274
-	for <qemu-devel@nongnu.org>; Thu, 16 Nov 2017 16:35:03 +0100 (CET)
-Date: Thu, 16 Nov 2017 16:34:17 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20171116163417.1ce14bbf@bahia.lab.toulouse-stg.fr.ibm.com>
-In-Reply-To: <20171116172602-mutt-send-email-mst@kernel.org>
-References: <20171116132339.4facb858@bahia.lab.toulouse-stg.fr.ibm.com>
-	<20171116172602-mutt-send-email-mst@kernel.org>
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eFMF9-0005wA-Rs
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 10:38:20 -0500
+Date: Thu, 16 Nov 2017 17:38:18 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20171116173033-mutt-send-email-mst@kernel.org>
+References: <1510769835-31902-1-git-send-email-mst@redhat.com>
+	<CAFEAcA_f_Pxd8aX606KBamm4sKvodr1xt9o4_hbONnqx1uTBBQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] QEMU terminates during reboot after memory unplug
- with vhost=on
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA_f_Pxd8aX606KBamm4sKvodr1xt9o4_hbONnqx1uTBBQ@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PULL 00/10] pc, pci, virtio: fixes for rc1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,107 +27,162 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, david@gibson.dropbear.id.au, bharata@linux.vnet.ibm.com, imammedo@redhat.com, qemu-ppc@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Thu, 16 Nov 2017 17:28:44 +0200
-"Michael S. Tsirkin" <mst@redhat.com> wrote:
-
-> On Thu, Nov 16, 2017 at 01:23:39PM +0100, Greg Kurz wrote:
-> > Hi,
-> > 
-> > I'm resurrecting a thread about a QEMU crash we're still hitting on ppc64. It
-> > was reported to the list by Bharata 2 months ago:
-> > 
-> > https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg03685.html
-> > 
-> > "Hi,
-> > 
-> > QEMU hits the below assert
-> > 
-> > qemu-system-ppc64: used ring relocated for ring 2
-> > qemu-system-ppc64: qemu/hw/virtio/vhost.c:649: vhost_commit: Assertion `r >= 0' failed.
-> > 
-> > in the following scenario:
-> > 
-> > 1. Boot guest with vhost=on
-> >   -netdev tap,id=mynet0,script=qemu-ifup,downscript=qemu-ifdown,vhost=on -device virtio-net-pci,netdev=mynet0
-> > 2. Hot add a DIMM device 
-> > 3. Reboot
-> >    When the guest reboots, we can see
-> >    vhost_virtqueue_start:vq->used_phys getting assigned an address that
-> >    falls in the hotplugged memory range.
-> > 4. Remove the DIMM device
-> >    Guest refuses the removal as the hotplugged memory is under use.
-> > 5. Reboot
-> >    QEMU forces the removal of the DIMM device during reset and that's
-> >    when we hit the above assert.
-> > 
-> > Any pointers on why we are hitting this assert ? Shouldn't vhost be
-> > done with using the hotplugged memory when we hit reset ?
-> > 
-> > Regards,
-> > Bharata."
-> > 
-> > #0  0x00007ffff760eff0 in raise () from /lib64/libc.so.6
-> > #1  0x00007ffff761136c in abort () from /lib64/libc.so.6
-> > #2  0x00007ffff7604c44 in __assert_fail_base () from /lib64/libc.so.6
-> > #3  0x00007ffff7604d34 in __assert_fail () from /lib64/libc.so.6
-> > #4  0x0000000010161138 in vhost_commit (listener=0x11469e88) at /home/greg/Work/qemu/qemu-spapr/hw/virtio/vhost.c:650
-> > #5  0x00000000100917fc in memory_region_transaction_commit () at /home/greg/Work/qemu/qemu-spapr/memory.c:1094
-> > #6  0x0000000010096748 in memory_region_del_subregion (mr=0x1143eed0, subregion=0x116f1920) at /home/greg/Work/qemu/qemu-spapr/memory.c:2337
-> > #7  0x00000000104a9aec in pc_dimm_memory_unplug (dev=0x11445c50, hpms=0x1143eec0, mr=0x116f1920) at /home/greg/Work/qemu/qemu-spapr/hw/mem/pc-dimm.c:126
-> > #8  0x0000000010180454 in spapr_lmb_release (dev=0x11445c50) at /home/greg/Work/qemu/qemu-spapr/hw/ppc/spapr.c:3151
-> > #9  0x00000000101a397c in spapr_drc_release (drc=0x116b9cc0) at /home/greg/Work/qemu/qemu-spapr/hw/ppc/spapr_drc.c:401
-> > #10 0x00000000101a3ba0 in spapr_drc_reset (drc=0x116b9cc0) at /home/greg/Work/qemu/qemu-spapr/hw/ppc/spapr_drc.c:439
-> > #11 0x00000000101a3c88 in drc_reset (opaque=0x116b9cc0) at /home/greg/Work/qemu/qemu-spapr/hw/ppc/spapr_drc.c:460
-> > #12 0x0000000010447380 in qemu_devices_reset () at /home/greg/Work/qemu/qemu-spapr/hw/core/reset.c:69
-> > #13 0x000000001017ae80 in ppc_spapr_reset () at /home/greg/Work/qemu/qemu-spapr/hw/ppc/spapr.c:1445
-> > #14 0x0000000010377c60 in qemu_system_reset (reason=SHUTDOWN_CAUSE_HOST_QMP) at /home/greg/Work/qemu/qemu-spapr/vl.c:1788
-> > #15 0x00000000103785ac in main_loop_should_exit () at /home/greg/Work/qemu/qemu-spapr/vl.c:1962
-> > #16 0x0000000010378708 in main_loop () at /home/greg/Work/qemu/qemu-spapr/vl.c:1999
-> > #17 0x0000000010382c54 in main (argc=21, argv=0x7ffffffff098, envp=0x7ffffffff148) at /home/greg/Work/qemu/qemu-spapr/vl.c:4897
-> > 
-> > 
-> > This basically happens because on pseries, like x86, we usually wait
-> > for the guest to eject the DIMM before actually removing it, BUT,
-> > unlike x86, we force the removal on reset. This is handled by a DRC
-> > object which registers a handler with qemu_register_reset().
-> > 
-> > At reset time, the machine calls qemu_devices_reset() but unfortunately,
-> > the DRC reset handler gets called BEFORE the VirtIONet device one. The
-> > vhost device is still active and it doesn't like the ring addresses to
-> > change while in this state.
-> > 
-> > Michael,
-> > 
-> > The assert() has been around since the beginning, at a time I believe there was
-> > no such thing as memory hot-unplug. Now that memory can go away at reset time,
-> > is it really legitimate to crash QEMU if vhost detects a ring address change ?  
+On Thu, Nov 16, 2017 at 02:41:09PM +0000, Peter Maydell wrote:
+> On 15 November 2017 at 18:17, Michael S. Tsirkin <mst@redhat.com> wrote:
+> > The following changes since commit 1fa0f627d03cd0d0755924247cafeb42969016bf:
+> >
+> >   Update version for v2.11.0-rc1 release (2017-11-14 18:37:49 +0000)
+> >
+> > are available in the git repository at:
+> >
+> >   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
+> >
+> > for you to fetch changes up to 6ed0c1c3ab0925009d15cffb944d9ccb04718846:
+> >
+> >   build-sys: restrict vmcoreinfo to fw_cfg+dma capable targets (2017-11-15 20:13:13 +0200)
+> >
+> > ----------------------------------------------------------------
+> > pc, pci, virtio: fixes for rc1
+> >
+> > A bunch of fixes all over the place.
+> >
+> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 > 
-> It's just a symptom of a problem though. If memory is going away
-> while vhost backend is running, things are not going to
-> end well. Less scary for a network device, more scary for a block
-> device. VFIO probably has the same issue, it just does not
-> have an assert.
+> Hi. This failed tests on a couple of machines:
 > 
-
-I agree.
-
-> > David,
-> > 
-> > Depending on Michael's answer (or anyone else that knows vhost well enough),
-> > I'm not sure we can fix that properly for 2.11. A possible fix/workaround
-> > could be to reset DRCs (at least the LMB ones) after qemu_devices_reset(),
-> > so that we're sure vhost is stopped.
-> > 
-> > Thoughts ?  
+> s390x:
 > 
-> I think the release of DIMM on reset trick must happen after all
-> devices have been reset.
+> TEST: tests/bios-tables-test... (pid=58925)
+>   /i386/acpi/piix4:
+> Looking for expected file 'tests/acpi-test-data/pc/DSDT'
+> 
+> Using expected file 'tests/acpi-test-data/pc/DSDT'
+> 
+> Looking for expected file 'tests/acpi-test-data/pc/APIC'
+> 
+> Using expected file 'tests/acpi-test-data/pc/APIC'
+> 
+> Looking for expected file 'tests/acpi-test-data/pc/HPET'
+> 
+> Using expected file 'tests/acpi-test-data/pc/HPET'
+> 'iasl -p /tmp/asl-CHIM9Y.dsl -d tests/acpi-test-data/pc/DSDT' exited
+> with status 65280
+> Intel ACPI Component Architecture
+> ASL+ Optimizing Compiler version 20160108-64
+> Copyright (c) 2000 - 2016 Intel Corporation
+> 
+> Could not get ACPI tables from tests/acpi-test-data/pc/DSDT, AE_BAD_HEADER
+> Input file tests/acpi-test-data/pc/DSDT, Length 0x1418 (5144) bytes
+> Table [DSDT] is too long for file - needs: 0x18140000, remaining in file: 0x1418
+> **
+> ERROR:/home/linux1/qemu/tests/bios-tables-test.c:461:test_acpi_asl:
+> assertion failed: (!err && !exp_err)
+> FAIL
+> GTester: last random seed: R02S7430f83941b25a926c586492b2745d2c
+> (pid=58933)
+>   /i386/acpi/q35:
 
-I'll send a patch. Thanks for the quick answer.
 
-> > 
-> > --
-> > Greg  
+
+> Looking for expected file 'tests/acpi-test-data/q35/DSDT'
+> 
+> Using expected file 'tests/acpi-test-data/q35/DSDT'
+> 
+> Looking for expected file 'tests/acpi-test-data/q35/APIC'
+> 
+> Using expected file 'tests/acpi-test-data/q35/APIC'
+> 
+> Looking for expected file 'tests/acpi-test-data/q35/HPET'
+> 
+> Using expected file 'tests/acpi-test-data/q35/HPET'
+> 
+> Looking for expected file 'tests/acpi-test-data/q35/MCFG'
+> 
+> Using expected file 'tests/acpi-test-data/q35/MCFG'
+> 'iasl -p /tmp/asl-NRWT9Y.dsl -d tests/acpi-test-data/q35/DSDT' exited
+> with status 65280
+> Intel ACPI Component Architecture
+> ASL+ Optimizing Compiler version 20160108-64
+> Copyright (c) 2000 - 2016 Intel Corporation
+> 
+> Could not get ACPI tables from tests/acpi-test-data/q35/DSDT, AE_BAD_HEADER
+> Input file tests/acpi-test-data/q35/DSDT, Length 0x1E94 (7828) bytes
+> Table [DSDT] is too long for file - needs: 0x941E0000, remaining in file: 0x1E94
+> **
+> ERROR:/home/linux1/qemu/tests/bios-tables-test.c:461:test_acpi_asl:
+> assertion failed: (!err && !exp_err)
+> FAIL
+> 
+> & similarly for a bunch of other tests. Looks like an
+> endianness issue.
+> 
+> and on 32-bit arm:
+> 
+> TEST: tests/bios-tables-test... (pid=30809)
+>   /i386/acpi/piix4:
+> Looking for expected file 'tests/acpi-test-data/pc/DSDT'
+> 
+> Using expected file 'tests/acpi-test-data/pc/DSDT'
+> 
+> Looking for expected file 'tests/acpi-test-data/pc/APIC'
+> 
+> Using expected file 'tests/acpi-test-data/pc/APIC'
+> 
+> Looking for expected file 'tests/acpi-test-data/pc/HPET'
+> 
+> Using expected file 'tests/acpi-test-data/pc/HPET'
+> 'iasl -p /tmp/asl-6T2N9Y.dsl -e /tmp/aml-TV2N9Y -d /tmp/aml-TV2N9Y'
+> exited with status 11Input file /tmp/aml-TV2N9Y, Length 0x1418 (5144)
+> bytes
+> ACPI: DSDT 0x0000000000000000 001418 (v01 BOCHS  BXPCDSDT 00000001
+> BXPC 00000001)
+> Pass 1 parse of [DSDT]
+> Pass 2 parse of [DSDT]
+> Parsing Deferred Opcodes (Methods/Buffers/Packages/Regions)
+> 
+> Parsing completed
+> 'iasl -p /tmp/asl-PKDO9Y.dsl -e tests/acpi-test-data/pc/DSDT -d
+> tests/acpi-test-data/pc/DSDT' exited with status 11Input file
+> tests/acpi-test-data/pc/DSDT, Length 0x1418 (5144) bytes
+> ACPI: DSDT 0x0000000000000000 001418 (v01 BOCHS  BXPCDSDT 00000001
+> BXPC 00000001)
+> Pass 1 parse of [DSDT]
+> Pass 2 parse of [DSDT]
+> Parsing Deferred Opcodes (Methods/Buffers/Packages/Regions)
+> 
+> Parsing completed
+> **
+> ERROR:/home/peter.maydell/qemu/tests/bios-tables-test.c:461:test_acpi_asl:
+> assertion failed: (!err && !exp_err)
+> FAIL
+> GTester: last random seed: R02S5d06952865b5a6ffb8443ae4d324e880
+> (pid=30816)
+>   /i386/acpi/q35:
+> Looking for expected file 'tests/acpi-test-data/q35/DSDT'
+> 
+> Using expected file 'tests/acpi-test-data/q35/DSDT'
+> 
+> Looking for expected file 'tests/acpi-test-data/q35/APIC'
+> 
+> Using expected file 'tests/acpi-test-data/q35/APIC'
+> 
+> Looking for expected file 'tests/acpi-test-data/q35/HPET'
+> 
+> Using expected file 'tests/acpi-test-data/q35/HPET'
+> 
+> Looking for expected file 'tests/acpi-test-data/q35/MCFG'
+> 
+> Using expected file 'tests/acpi-test-data/q35/MCFG'
+> OK
+> 
+> (and similar fails in other tests)
+> 
+> 
+> thanks
+> -- PMM
+
+I think it's     test: fix detection of errors from iasl
+I'll drop it for now.
