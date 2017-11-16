@@ -1,35 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35293)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37492)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eFKkT-00079w-7t
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 09:02:44 -0500
+	(envelope-from <eswierk@skyportsystems.com>) id 1eFKoa-0008Q0-RD
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 09:06:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1eFKkI-0000ER-RL
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 09:02:33 -0500
-References: <CAJH6TXiMxUoU2sFEHAoZ8jhDMtg_saEnTHM9f0vJ6Nhqj7099w@mail.gmail.com>
-	<c2ecae32-f999-9f1e-46a6-37cdab2a62e3@redhat.com>
-	<CAJH6TXhBAaBE9gBSxksWZqNywWmencRaGyeY-oN3jbKdgUettQ@mail.gmail.com>
-	<0e6cc220-814a-17fd-4fd7-7b0665d34e81@redhat.com>
-	<CAJH6TXh2v-F=yqxQbUUawk_Ctq-sgFefGp1XvMsC=syX_5jEqA@mail.gmail.com>
-	<30b54865-2255-d13d-a054-afcf5bbd06b2@redhat.com>
-	<20171115202440.GJ19514@redhat.com>
-	<7b11bb2b-b93d-e8ff-f396-703c93549d0d@redhat.com>
-	<20171115202938.GN2787@redhat.com>
-	<CAJH6TXiPuLu62-+o2+PrUGpstrks_5pLotFEe1bAOmsbn20otw@mail.gmail.com>
-	<5b6f8758-5e3e-e759-1592-2768eb85b322@redhat.com>
-	<CAJH6TXgrOWxP7jFg98_jv-R1nrFKOXBQA6pPxbkzGWTVW=EReA@mail.gmail.com>
-	<CAJH6TXg7eCiqH+3Wq=-QEH3xFhJJekTXm+c1F5w7BebiQGni8A@mail.gmail.com>
-	<d8b9ba38-f39a-9b79-ac89-64e9ab3e6a33@redhat.com>
-	<04518567-9905-c22c-78f8-ea9dcde7e7ac@redhat.com>
-	<CAJH6TXjZMN9msT5sTHLcgFtfgR2bxPVCr2C7ndpnzWdHG0CfqA@mail.gmail.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <d52519be-e4d7-1324-736d-f36c321f3924@redhat.com>
-Date: Thu, 16 Nov 2017 15:02:08 +0100
-MIME-Version: 1.0
-In-Reply-To: <CAJH6TXjZMN9msT5sTHLcgFtfgR2bxPVCr2C7ndpnzWdHG0CfqA@mail.gmail.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="vLvXJq6BeUAMU5PcrrjW4toqi7aEegpDD"
-Subject: Re: [Qemu-devel] [Libguestfs]  [qemu-img] support for XVA
+	(envelope-from <eswierk@skyportsystems.com>) id 1eFKoQ-0006OU-Us
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 09:06:48 -0500
+Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:44313)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <eswierk@skyportsystems.com>)
+	id 1eFKoQ-0006NY-O9
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 09:06:38 -0500
+Received: by mail-pg0-x243.google.com with SMTP id 4so11764563pge.1
+	for <qemu-devel@nongnu.org>; Thu, 16 Nov 2017 06:06:38 -0800 (PST)
+From: Ed Swierk <eswierk@skyportsystems.com>
+Date: Thu, 16 Nov 2017 06:06:06 -0800
+Message-Id: <1510841166-40615-1-git-send-email-eswierk@skyportsystems.com>
+Subject: [Qemu-devel] [PATCH v3 REPOST] net: Transmit zero UDP checksum as
+ 0xFFFF
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,107 +25,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gandalf Corvotempesta <gandalf.corvotempesta@gmail.com>
-Cc: "Richard W.M. Jones" <rjones@redhat.com>, Qemu-block <qemu-block@nongnu.org>, qemu-devel@nongnu.org, libguestfs <libguestfs@redhat.com>
+To: Jason Wang <jasowang@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Dmitry Fleytman <dmitry@daynix.com>
+Cc: qemu-devel@nongnu.org, Ed Swierk <eswierk@skyportsystems.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---vLvXJq6BeUAMU5PcrrjW4toqi7aEegpDD
-From: Max Reitz <mreitz@redhat.com>
-To: Gandalf Corvotempesta <gandalf.corvotempesta@gmail.com>
-Cc: "Richard W.M. Jones" <rjones@redhat.com>,
- Qemu-block <qemu-block@nongnu.org>, qemu-devel@nongnu.org,
- libguestfs <libguestfs@redhat.com>
-Message-ID: <d52519be-e4d7-1324-736d-f36c321f3924@redhat.com>
-Subject: Re: [Libguestfs] [Qemu-devel] [qemu-img] support for XVA
-References: <CAJH6TXiMxUoU2sFEHAoZ8jhDMtg_saEnTHM9f0vJ6Nhqj7099w@mail.gmail.com>
- <c2ecae32-f999-9f1e-46a6-37cdab2a62e3@redhat.com>
- <CAJH6TXhBAaBE9gBSxksWZqNywWmencRaGyeY-oN3jbKdgUettQ@mail.gmail.com>
- <0e6cc220-814a-17fd-4fd7-7b0665d34e81@redhat.com>
- <CAJH6TXh2v-F=yqxQbUUawk_Ctq-sgFefGp1XvMsC=syX_5jEqA@mail.gmail.com>
- <30b54865-2255-d13d-a054-afcf5bbd06b2@redhat.com>
- <20171115202440.GJ19514@redhat.com>
- <7b11bb2b-b93d-e8ff-f396-703c93549d0d@redhat.com>
- <20171115202938.GN2787@redhat.com>
- <CAJH6TXiPuLu62-+o2+PrUGpstrks_5pLotFEe1bAOmsbn20otw@mail.gmail.com>
- <5b6f8758-5e3e-e759-1592-2768eb85b322@redhat.com>
- <CAJH6TXgrOWxP7jFg98_jv-R1nrFKOXBQA6pPxbkzGWTVW=EReA@mail.gmail.com>
- <CAJH6TXg7eCiqH+3Wq=-QEH3xFhJJekTXm+c1F5w7BebiQGni8A@mail.gmail.com>
- <d8b9ba38-f39a-9b79-ac89-64e9ab3e6a33@redhat.com>
- <04518567-9905-c22c-78f8-ea9dcde7e7ac@redhat.com>
- <CAJH6TXjZMN9msT5sTHLcgFtfgR2bxPVCr2C7ndpnzWdHG0CfqA@mail.gmail.com>
-In-Reply-To: <CAJH6TXjZMN9msT5sTHLcgFtfgR2bxPVCr2C7ndpnzWdHG0CfqA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+The checksum algorithm used by IPv4, TCP and UDP allows a zero value
+to be represented by either 0x0000 and 0xFFFF. But per RFC 768, a zero
+UDP checksum must be transmitted as 0xFFFF because 0x0000 is a special
+value meaning no checksum.
 
-On 2017-11-16 11:08, Gandalf Corvotempesta wrote:
-> 2017-11-15 23:55 GMT+01:00 Max Reitz <mreitz@redhat.com>:
->> https://xanclic.moe/convert-xva.rb -- does this work?
->> (It seems to works on the two example images I found...)
->>
->> An example is in the code, you use it like this:
->>
->> $ ./convert-xva.rb ~/Downloads/stats-appliance-2.36.020502.xva Ref:73
->=20
->=20
-> It doesn't work on huge images:
->=20
-> # time convert-xva.rb 20171115_193814_efff_.xva Ref:10 -O qcow2 disk1.q=
-cow2
-> /usr/bin/convert-xva.rb:119:in `exec': Argument list too long -
-> qemu-img (Errno::E2BIG)
-> from /usr/bin/convert-xva.rb:119:in `<main>'
->=20
-> real 9m41.414s
-> user 0m19.280s
-> sys 0m3.260s
+Substitute 0xFFFF whenever a checksum is computed as zero when
+modifying a UDP datagram header. Doing this on IPv4 and TCP checksums
+is unnecessary but legal. Add a wrapper for net_checksum_finish() that
+makes the substitution.
 
-Well, there is this:
+(We can't just change net_checksum_finish(), as that function is also
+used by receivers to verify checksums, and in that case the expected
+value is always 0x0000.)
 
-https://github.com/XanClic/qemu.rb/blob/master/examples/convert-xva-onlin=
-e.rb
+Signed-off-by: Ed Swierk <eswierk@skyportsystems.com>
+---
+v3:
 
-That should get around that restriction, but currently it is stupidly
-slow (because it just issues all 1 MB copy operations simultaneously),
-and it doesn't use qemu-img convert.  Instead, it uses a real qemu with
-block jobs.  Ideally, you'd use it like this:
+(Reposted to fix patch format)
 
-$ ./convert-xva-online.rb ~/Downloads/stats-appliance-2.36.020502.xva
-Ref:73      81936 M
-$ qemu-img create -f qcow2 [whatever options you need] disk1.qcow2 \
-    81936M
-Formatting 'disk1.qcow2', fmt=3Dqcow2 size=3D85916123136 encryption=3Doff=
+Leave net_tx_pkt_update_ip_checksums() alone since it's only computing
+a partial sum of the IP pseudo-header.
 
-cluster_size=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
-$ ./convert-xva-online.rb ~/Downloads/stats-appliance-2.36.020502.xva \
-    Ref:73 \
-    '{"driver":"qcow2",
-      "detect-zeroes":"unmap",
-      "discard":"unmap",
-      "file":{"driver":"file","filename":"disk1.qcow2"}}'
-Adding block devices...
-Starting block jobs...
-100.00 % of jobs completed
+Rename wrapper to net_checksum_finish_nozero() for clarity.
 
-(Maybe I can get it faster.)
+v2:
 
-Max
+Add a wrapper net_checksum_finish_hdr() rather than duplicating the
+logic at every caller.
+---
+ hw/net/e1000.c         | 2 +-
+ hw/net/net_rx_pkt.c    | 2 +-
+ hw/net/net_tx_pkt.c    | 2 +-
+ hw/net/vmxnet3.c       | 3 ++-
+ include/net/checksum.h | 6 ++++++
+ 5 files changed, 11 insertions(+), 4 deletions(-)
 
-
---vLvXJq6BeUAMU5PcrrjW4toqi7aEegpDD
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAloNmmASHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9ABEgH/3PjMLeHkowc44lV8g3ht5d4GozIHa+X
-I3g3nPOte7csKKy2n6oGNEJjLpWkPZX9RCvnl7gbqwlENiRqd5CSoXAJ0NMjXIqg
-6fuKB0+xhXtdZSQXLavDkoSMdmNXB9BI5y3aE/cHbcecfU5ufR1c0yzrZMFm+bsK
-3YfUcUq4+V2tlK+sQB2iH8VYOrc9oxs5iYVztr5Qdw+Sm4bkCjmFtrgVsBx785NX
-X/dV5A24odvfH3UlOeUCJtaMCQMbaipCUt6NH0sRo/khOyGwEzYTv/xTw8RNThO+
-4jGShssCSgOR+C9XakC7lWSsnf4fnwVf10OfRmApRSiteBLsAtQZVOc=
-=8EtC
------END PGP SIGNATURE-----
-
---vLvXJq6BeUAMU5PcrrjW4toqi7aEegpDD--
+diff --git a/hw/net/e1000.c b/hw/net/e1000.c
+index 72a92be..804ec08 100644
+--- a/hw/net/e1000.c
++++ b/hw/net/e1000.c
+@@ -506,7 +506,7 @@ putsum(uint8_t *data, uint32_t n, uint32_t sloc, uint32_t css, uint32_t cse)
+         n = cse + 1;
+     if (sloc < n-1) {
+         sum = net_checksum_add(n-css, data+css);
+-        stw_be_p(data + sloc, net_checksum_finish(sum));
++        stw_be_p(data + sloc, net_checksum_finish_nozero(sum));
+     }
+ }
+ 
+diff --git a/hw/net/net_rx_pkt.c b/hw/net/net_rx_pkt.c
+index cef1c2e..98a5030 100644
+--- a/hw/net/net_rx_pkt.c
++++ b/hw/net/net_rx_pkt.c
+@@ -518,7 +518,7 @@ _net_rx_pkt_calc_l4_csum(struct NetRxPkt *pkt)
+     cntr += net_checksum_add_iov(pkt->vec, pkt->vec_len,
+                                  pkt->l4hdr_off, csl, cso);
+ 
+-    csum = net_checksum_finish(cntr);
++    csum = net_checksum_finish_nozero(cntr);
+ 
+     trace_net_rx_pkt_l4_csum_calc_csum(pkt->l4hdr_off, csl, cntr, csum);
+ 
+diff --git a/hw/net/net_tx_pkt.c b/hw/net/net_tx_pkt.c
+index 20b2549..e29c881 100644
+--- a/hw/net/net_tx_pkt.c
++++ b/hw/net/net_tx_pkt.c
+@@ -486,7 +486,7 @@ static void net_tx_pkt_do_sw_csum(struct NetTxPkt *pkt)
+         net_checksum_add_iov(iov, iov_len, pkt->virt_hdr.csum_start, csl, cso);
+ 
+     /* Put the checksum obtained into the packet */
+-    csum = cpu_to_be16(net_checksum_finish(csum_cntr));
++    csum = cpu_to_be16(net_checksum_finish_nozero(csum_cntr));
+     iov_from_buf(iov, iov_len, csum_offset, &csum, sizeof csum);
+ }
+ 
+diff --git a/hw/net/vmxnet3.c b/hw/net/vmxnet3.c
+index 8c4bae5..cdc307d 100644
+--- a/hw/net/vmxnet3.c
++++ b/hw/net/vmxnet3.c
+@@ -972,7 +972,8 @@ static void vmxnet3_rx_need_csum_calculate(struct NetRxPkt *pkt,
+     data = (uint8_t *)pkt_data + vhdr->csum_start;
+     len = pkt_len - vhdr->csum_start;
+     /* Put the checksum obtained into the packet */
+-    stw_be_p(data + vhdr->csum_offset, net_raw_checksum(data, len));
++    stw_be_p(data + vhdr->csum_offset,
++             net_checksum_finish_nozero(net_checksum_add(len, data)));
+ 
+     vhdr->flags &= ~VIRTIO_NET_HDR_F_NEEDS_CSUM;
+     vhdr->flags |= VIRTIO_NET_HDR_F_DATA_VALID;
+diff --git a/include/net/checksum.h b/include/net/checksum.h
+index 7df472c..05a0d27 100644
+--- a/include/net/checksum.h
++++ b/include/net/checksum.h
+@@ -34,6 +34,12 @@ net_checksum_add(int len, uint8_t *buf)
+ }
+ 
+ static inline uint16_t
++net_checksum_finish_nozero(uint32_t sum)
++{
++    return net_checksum_finish(sum) ?: 0xFFFF;
++}
++
++static inline uint16_t
+ net_raw_checksum(uint8_t *data, int length)
+ {
+     return net_checksum_finish(net_checksum_add(length, data));
+-- 
+1.9.1
