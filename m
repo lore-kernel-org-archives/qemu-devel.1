@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36048)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39281)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1eFG3E-000500-MJ
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 04:01:37 -0500
+	(envelope-from <cohuck@redhat.com>) id 1eFGAh-0007bw-PQ
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 04:09:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1eFG3B-0001BH-IU
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 04:01:36 -0500
-Received: from szxga02-in.huawei.com ([45.249.212.188]:4435)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1eFG3A-0000CC-M1
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 04:01:33 -0500
-From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Date: Thu, 16 Nov 2017 09:01:12 +0000
-Message-ID: <33183CC9F5247A488A2544077AF19020DA46E2A6@DGGEMA505-MBS.china.huawei.com>
-References: <CACnE9pzALCNV62Jmo4SUawD=pQiPFENWR_BwK3=+yY7V1U54Ag@mail.gmail.com>
-	<cd39d029-48f9-20d6-cc19-ff87a45240ab@redhat.com>
-	<CACnE9pzm5zabq=nJhqB4LHzSXk2vDGiAN5SbJco3ZfGkfRbW-g@mail.gmail.com>
-	<5A0D27D8.6050506@huawei.com>
-	<2e0ddd76-3903-d715-9a86-73f1286322e7@redhat.com>
-In-Reply-To: <2e0ddd76-3903-d715-9a86-73f1286322e7@redhat.com>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <cohuck@redhat.com>) id 1eFGAe-0001K1-Ib
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 04:09:19 -0500
+Date: Thu, 16 Nov 2017 10:09:10 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20171116100910.1a9e291a.cohuck@redhat.com>
+In-Reply-To: <07ba2257-d6b4-2a57-1151-21f3a69b89d0@de.ibm.com>
+References: <20171115154223.109991-1-borntraeger@de.ibm.com>
+	<20171115181034.5f0b624e.cohuck@redhat.com>
+	<07ba2257-d6b4-2a57-1151-21f3a69b89d0@de.ibm.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [Question] why need to start all queues in
- vhost_net_start
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] s390/kvm_virtio/linux-headers: remove
+ traces of old virtio transport
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,71 +25,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>, longpeng <longpeng2@huawei.com>, "mst@redhat.com" <mst@redhat.com>
-Cc: "Longpeng(Mike)" <longpeng.mike@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Wangjing (King, Euler)" <king.wang@huawei.com>, "Huangweidong (C)" <weidong.huang@huawei.com>, "stefanha@redhat.com" <stefanha@redhat.com>
+To: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Halil Pasic <pasic@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogSmFzb24gV2FuZyBbbWFp
-bHRvOmphc293YW5nQHJlZGhhdC5jb21dDQo+IFNlbnQ6IFRodXJzZGF5LCBOb3ZlbWJlciAxNiwg
-MjAxNyA0OjU1IFBNDQo+IFRvOiBsb25ncGVuZzsgbXN0QHJlZGhhdC5jb20NCj4gQ2M6IExvbmdw
-ZW5nKE1pa2UpOyBxZW11LWRldmVsQG5vbmdudS5vcmc7IEdvbmdsZWkgKEFyZWkpOyBXYW5namlu
-ZyAoS2luZywNCj4gRXVsZXIpOyBIdWFuZ3dlaWRvbmcgKEMpOyBzdGVmYW5oYUByZWRoYXQuY29t
-DQo+IFN1YmplY3Q6IFJlOiBbUXVlc3Rpb25dIHdoeSBuZWVkIHRvIHN0YXJ0IGFsbCBxdWV1ZXMg
-aW4gdmhvc3RfbmV0X3N0YXJ0DQo+IA0KPiANCj4gDQo+IE9uIDIwMTflubQxMeaciDE25pelIDEz
-OjUzLCBMb25ncGVuZyAoTWlrZSkgd3JvdGU6DQo+ID4gT24gMjAxNy8xMS8xNSAyMzo1NCwgTG9u
-Z3BlbmcoTWlrZSkgd3JvdGU6DQo+ID4+IDIwMTctMTEtMTUgMjM6MDUgR01UKzA4OjAwIEphc29u
-IFdhbmc8amFzb3dhbmdAcmVkaGF0LmNvbT46DQo+ID4+PiBPbiAyMDE35bm0MTHmnIgxNeaXpSAy
-Mjo1NSwgTG9uZ3BlbmcoTWlrZSkgd3JvdGU6DQo+ID4+Pj4gSGkgZ3V5cywNCj4gPj4+Pg0KPiA+
-Pj4+IFdlIGdvdCBhIEJVRyByZXBvcnQgZnJvbSBvdXIgdGVzdGVycyB5ZXN0ZXJkYXksIHRoZSB0
-ZXN0aW5nIHNjZW5hcmlvIHdhcw0KPiA+Pj4+IG1pZ3JhdGluZyBhIFZNIChXaW5kb3dzIGd1ZXN0
-LCAqNCB2Y3B1cyosIDRHQiwgdmhvc3QtdXNlciBuZXQ6ICo3DQo+ID4+Pj4gcXVldWVzKikuDQo+
-ID4+Pj4NCj4gPj4+PiBXZSBmb3VuZCB0aGUgY2F1c2UgcmVhc29uLCBhbmQgd2UnbGwgcmVwb3J0
-IHRoZSBCVUcgb3Igc2VuZCBhIGZpeCBwYXRjaA0KPiA+Pj4+IHRvIHVwc3RyZWFtIGlmIG5lY2Vz
-c2FyeSggd2UgaGF2ZW4ndCB0ZXN0IHRoZSB1cHN0cmVhbSB5ZXQsIHNvcnJ5Li4uICkuDQo+ID4+
-PiBDb3VsZCB5b3UgZXhwbGFpbiB0aGlzIGEgbGl0dGxlIGJpdCBtb3JlPw0KPiA+Pj4NCj4gPj4+
-PiBXZSB3YW50IHRvIGtub3cgd2h5IHRoZSB2aG9zdF9uZXRfc3RhcnQoKSBtdXN0IHN0YXJ0KnRv
-dGFsIHF1ZXVlcyoNCj4gKCBpbg0KPiA+Pj4+IG91cg0KPiA+Pj4+IFZNIHRoZXJlJ3JlIDcgcXVl
-dWVzICkgYnV0IG5vdCp0aGUgcXVldWVzIHRoYXQgY3VycmVudCB1c2VkKiAgKCBpbiBvdXINCj4g
-Vk0sDQo+ID4+Pj4gZ3Vlc3QNCj4gPj4+PiBvbmx5IHVzZXMgdGhlIGZpcnN0IDQgcXVldWVzIGJl
-Y2F1c2UgaXQncyBsaW1pdGVkIGJ5IHRoZSBudW1iZXIgb2YgdmNwdXMpDQo+ID4+Pj4gPw0KPiA+
-Pj4+DQo+ID4+Pj4gTG9va2luZyBmb3J3YXJkIHRvIHlvdXIgaGVscCwgdGh4OikNCj4gPj4+IFNp
-bmNlIHRoZSBjb2RlcyBoYXZlIGJlZW4gdGhlcmUgZm9yIHllYXJzIGFuZCB3b3JrcyB3ZWxsIGZv
-ciBrZXJuZWwNCj4gPj4+IGRhdGFwYXRoLiBZb3Ugc2hvdWxkIHJlYWxseSBleHBsYWluIHdoYXQn
-cyB3cm9uZy4NCj4gPj4+DQo+ID4+IE9LLjopDQo+ID4+DQo+ID4+IEluIG91ciBzY2VuYXJpbywg
-IHRoZSBXaW5kb3dzJ3MgdmlydGlvLW5ldCBkcml2ZXIgb25seSB1c2UgdGhlIGZpcnN0IDQNCj4g
-Pj4gcXVldWVzIGFuZCBpdA0KPiA+PiAqb25seSBzZXQgZGVzYy9hdmFpbC91c2VkIHRhYmxlIGZv
-ciB0aGUgZmlyc3QgNCBxdWV1ZXMqLCBzbyBpbiBRRU1VDQo+ID4+IHRoZSBkZXNjL2F2YWlsLw0K
-PiA+PiB1c2VkIG9mIHRoZSBsYXN0IDMgcXVldWVzIGFyZSBaRVJPLCAgYnV0IHVuZm9ydHVuYXRl
-bHkuLi4NCj4gPj4gJycnDQo+ID4+IHZob3N0X25ldF9zdGFydA0KPiA+PiAgICBmb3IgKGkgPSAw
-OyBpIDwgdG90YWxfcXVldWVzOyBpKyspDQo+ID4+ICAgICAgdmhvc3RfbmV0X3N0YXJ0X29uZQ0K
-PiA+PiAgICAgICAgdmhvc3RfZGV2X3N0YXJ0DQo+ID4+ICAgICAgICAgIHZob3N0X3ZpcnRxdWV1
-ZV9zdGFydA0KPiA+PiAnJycNCj4gPj4gSW4gdmhvc3RfdmlydHF1ZXVlX3N0YXJ0KCksIGl0IHdp
-bGwgY2FsY3VsYXRlIHRoZSBIVkEgb2YNCj4gPj4gZGVzYy9hdmFpbC91c2VkIHRhYmxlLCBzbyBm
-b3IgbGFzdA0KPiA+PiAzIHF1ZXVlcywgaXQgd2lsbCB1c2UgWkVSTyBhcyB0aGUgR1BBIHRvIGNh
-bGN1bGF0ZSB0aGUgSFZBLCBhbmQgdGhlbg0KPiA+PiBzZW5kIHRoZSByZXN1bHRzDQo+ID4+IHRv
-IHRoZSB1c2VyLW1vZGUgYmFja2VuZCAoIHdlIHVzZSp2aG9zdC11c2VyKiAgKSBieQ0KPiB2aG9z
-dF92aXJ0cXVldWVfc2V0X2FkZHIoKS4NCj4gPj4NCj4gPj4gV2hlbiB0aGUgRVZTIGdldCB0aGVz
-ZSBhZGRyZXNzLCBpdCB3aWxsIHVwZGF0ZSBhKmlkeCogIHdoaWNoIHdpbGwgYmUNCj4gPj4gdHJl
-YXRlZCBhcyAgdnEncw0KPiA+PiBsYXN0X2F2YWlsX2lkeCB3aGVuIHZpcnRpby1uZXQgc3RvcCAo
-IHBscyBzZWUgdmhvc3RfdmlydHF1ZXVlX3N0b3AoKSApLg0KPiA+Pg0KPiA+PiBTbyB3ZSBnZXQg
-dGhlIGZvbGxvd2luZyByZXN1bHQgYWZ0ZXIgdmlydGlvLW5ldCBzdG9wOg0KPiA+PiAgICB0aGUg
-ZGVzYy9hdmFpbC91c2VkIG9mIHRoZSBsYXN0IDMgcXVldWVzJ3MgdnFzIGFyZSBhbGwgWkVSTywg
-YnV0IHRoZXNlDQo+IHZxcydzDQo+ID4+ICAgIGxhc3RfYXZhaWxfaWR4IGlzIE5PVCBaRVJPLg0K
-PiA+Pg0KPiA+PiBBdCBsYXN0LCB2aXJ0aW9fbG9hZCgpIHJlcG9ydHMgYW4gZXJyb3I6DQo+ID4+
-ICcnJw0KPiA+PiAgICBpZiAoIXZkZXYtPnZxW2ldLnZyaW5nLmRlc2MgJiYgdmRldi0+dnFbaV0u
-bGFzdF9hdmFpbF9pZHgpIHsgLy8gPC0tDQo+ID4+IHdpbGwgYmUgVFJVRQ0KPiA+PiAgICAgICAg
-ZXJyb3JfcmVwb3J0KCJWUSAlZCBhZGRyZXNzIDB4MCAiDQo+ID4+ICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgImluY29uc2lzdGVudCB3aXRoIEhvc3QgaW5kZXggMHgleCIsDQo+ID4+ICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgaSwgdmRldi0+dnFbaV0ubGFzdF9hdmFpbF9pZHgpOw0KPiA+
-PiAgICAgICAgICAgICAgcmV0dXJuIC0xOw0KPiA+PiAgICAgfQ0KPiA+PiAnJycNCj4gPj4NCj4g
-Pj4gQlRXLCB0aGUgcHJvYmxlbSB3b24ndCBhcHBlYXIgaWYgdXNlIExpbnV4IGd1ZXN0LCBiZWNh
-dXNlIHRoZSBMaW51eA0KPiB2aXJ0aW8tbmV0DQo+ID4+IGRyaXZlciB3aWxsIHNldCBhbGwgNyBx
-dWV1ZXMncyBkZXNjL2F2YWlsL3VzZWQgdGFibGVzLiBBbmQgdGhlIHByb2JsZW0NCj4gPj4gd29u
-J3QgYXBwZWFyDQo+ID4+IGlmIHRoZSBWTSB1c2Ugdmhvc3QtbmV0LCBiZWNhdXNlIHZob3N0LW5l
-dCB3b24ndCB1cGRhdGUqaWR4KiAgaW4NCj4gU0VUX0FERFIgaW9jdGwuDQo+IA0KPiBKdXN0IHRv
-IG1ha2Ugc3VyZSBJIHVuZGVyc3RhbmQgaGVyZSwgSSB0aG91Z2h0IFdpbmRvd3MgZ3Vlc3QgKyB2
-aG9zdF9uZXQNCj4gaGl0IHRoaXMgaXNzdWU/DQo+IA0KTm8sIFdpbmRvd3MgZ3Vlc3QgKyB2aG9z
-dC11c2VyL0RQREsuDQoNCkJUVyBwbHMgc2VlIHZpcnRpbyBzcGVjIGluIDoNCg0KIklmIFZJUlRJ
-T19ORVRfRl9NUSBpcyBuZWdvdGlhdGVkLCBlYWNoIG9mIHJlY2VpdmVxMS4gLiAucmVjZWl2ZXFO
-IHRoYXQgd2lsbCBiZSB1c2VkIFNIT1VMRCBiZSBwb3B1bGF0ZWQNCndpdGggcmVjZWl2ZSBidWZm
-ZXJzLiINCg0KSXQgaXMgbm90IG1hbmRhdG9yeSB0aGF0IGFsbCBxdWV1ZXMgbXVzdCBiZSBpbml0
-aWFsaXplZC4NCg0KVGhhbmtzLA0KLUdvbmdsZWkNCg0K
+On Thu, 16 Nov 2017 08:45:09 +0100
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+
+> On 11/15/2017 06:10 PM, Cornelia Huck wrote:
+> > On Wed, 15 Nov 2017 16:42:23 +0100
+> > Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+> >   
+> >> We no longer support the old s390 transport, neither does the newest
+> >> Linux kernel. Remove it from the linux header script as well as the
+> >> s390x virtio code.  We still should handle the VIRTIO_NOTIFY hypercall,
+> >> to tolerate early printk on older guest kernels without an sclp console.  
+> > 
+> > Are there any such guests still around? Wouldn't they be unable to run
+> > because of the missing old transport anyway?  
+> 
+> As far as I can see even an 4.13 will do
+> 
+> static int __init s390_virtio_console_init(void)
+> {
+>         if (sclp.has_vt220 || sclp.has_linemode)
+>                 return -ENODEV;
+>         return virtio_cons_early_init(early_put_chars);
+> }
+> console_initcall(s390_virtio_console_init);
+> 
+> No matter if there is the old transport or not available.
+> 
+> So as soon as somebody chooses virtio-console you should see the diag500 from the early
+> printk.
+
+Grmpf, and the first condition does not trigger when you don't define
+any sclp console.
+
+Oh well, it seems we still have to drag this along :(
+ 
+> >   
+> >> We continue to ignore these events.
+> >>
+> >> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> >> ---
+> >>  hw/s390x/s390-virtio-hcall.h                   |  6 ++-
+> >>  include/standard-headers/asm-s390/kvm_virtio.h | 64
+> >> --------------------------
+> >> scripts/update-linux-headers.sh                |  1 - 3 files
+> >> changed, 4 insertions(+), 67 deletions(-) delete mode 100644
+> >> include/standard-headers/asm-s390/kvm_virtio.h  
+> >   
+
+I think this becomes relevant only when someone does a headers update
+against 4.15+, which is unlikely to happen in freeze. So I'll queue
+this to s390-next only.
