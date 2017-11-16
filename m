@@ -1,17 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48386)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49982)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1eFNbc-0001zX-9a
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 12:05:42 -0500
+	(envelope-from <alistair23@gmail.com>) id 1eFNfu-0005Fc-0E
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 12:10:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1eFNbb-00017U-GK
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 12:05:36 -0500
-From: David Hildenbrand <david@redhat.com>
-Date: Thu, 16 Nov 2017 18:05:25 +0100
-Message-Id: <20171116170526.12643-3-david@redhat.com>
-In-Reply-To: <20171116170526.12643-1-david@redhat.com>
-References: <20171116170526.12643-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v1 for-2.11 2/3] s390x/tcg: fix DIAG 308 with >
- 1 VCPU (single threaded TCG)
+	(envelope-from <alistair23@gmail.com>) id 1eFNft-0004SI-2M
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 12:10:01 -0500
+MIME-Version: 1.0
+Sender: alistair23@gmail.com
+In-Reply-To: <1510846183-756-1-git-send-email-thuth@redhat.com>
+References: <1510846183-756-1-git-send-email-thuth@redhat.com>
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Thu, 16 Nov 2017 09:09:29 -0800
+Message-ID: <CAKmqyKONK8R_bB1PqtEtDoDRGs6ZRPh97TCrw+ne0D91Mbr=Ww@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] hw/arm: Silence xlnx-ep108 deprecation
+ warning during tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,58 +23,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, David Hildenbrand <david@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, "Emilio G. Cota" <cota@braap.org>, Alistair Francis <alistair.francis@xilinx.com>
 
-Currently, single threaded TCG with > 1 VCPU gets stuck during IPL, when
-the bios tries to switch to the loaded kernel via DIAG 308.
+On Thu, Nov 16, 2017 at 7:29 AM, Thomas Huth <thuth@redhat.com> wrote:
+> The new deprecation warning for the xlnx-ep108 machine also pops up
+> during "make check" which is kind of confusing. Silence it if testing
+> mode is enabled.
+>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  Note: I slightly shortened the message so that the code still fits
+>  into the 80-columns limit.
+>
+>  hw/arm/xlnx-zcu102.c | 7 +++++--
+>  1 file changed, 5 insertions(+), 2 deletions(-)
+>
+> diff --git a/hw/arm/xlnx-zcu102.c b/hw/arm/xlnx-zcu102.c
+> index 9631a53..bbe7d04 100644
+> --- a/hw/arm/xlnx-zcu102.c
+> +++ b/hw/arm/xlnx-zcu102.c
+> @@ -24,6 +24,7 @@
+>  #include "qemu/error-report.h"
+>  #include "exec/address-spaces.h"
+>  #include "qemu/log.h"
+> +#include "sysemu/qtest.h"
+>
+>  typedef struct XlnxZCU102 {
+>      MachineState parent_obj;
+> @@ -164,8 +165,10 @@ static void xlnx_ep108_init(MachineState *machine)
+>  {
+>      XlnxZCU102 *s = EP108_MACHINE(machine);
+>
+> -    info_report("The Xilinx EP108 machine is deprecated, please use the "
+> -                "ZCU102 machine instead. It has the same features supported.");
+> +    if (!qtest_enabled()) {
+> +        info_report("The Xilinx EP108 machine is deprecated, please use the "
+> +                    "ZCU102 machine (which has the same features) instead.");
+> +    }
 
-pause_all_vcpus()/resume_all_vcpus() should not be called from a VCPU.
+Looks good to me.
 
-And there is also no need for it. run_on_cpu() will make sure that the
-CPUs exit KVM/TCG, where they get stopped. Once stopped, they will no
-longer run.
+In future maybe it makes sense to never print info_report() when running qtest.
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- target/s390x/diag.c | 4 ----
- 1 file changed, 4 deletions(-)
+Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
 
-diff --git a/target/s390x/diag.c b/target/s390x/diag.c
-index dbbb9e886f..52bc348808 100644
---- a/target/s390x/diag.c
-+++ b/target/s390x/diag.c
-@@ -27,7 +27,6 @@ static int modified_clear_reset(S390CPU *cpu)
-     S390CPUClass *scc = S390_CPU_GET_CLASS(cpu);
-     CPUState *t;
- 
--    pause_all_vcpus();
-     cpu_synchronize_all_states();
-     CPU_FOREACH(t) {
-         run_on_cpu(t, s390_do_cpu_full_reset, RUN_ON_CPU_NULL);
-@@ -37,7 +36,6 @@ static int modified_clear_reset(S390CPU *cpu)
-     s390_crypto_reset();
-     scc->load_normal(CPU(cpu));
-     cpu_synchronize_all_post_reset();
--    resume_all_vcpus();
-     return 0;
- }
- 
-@@ -53,7 +51,6 @@ static int load_normal_reset(S390CPU *cpu)
-     S390CPUClass *scc = S390_CPU_GET_CLASS(cpu);
-     CPUState *t;
- 
--    pause_all_vcpus();
-     cpu_synchronize_all_states();
-     CPU_FOREACH(t) {
-         run_on_cpu(t, s390_do_cpu_reset, RUN_ON_CPU_NULL);
-@@ -63,7 +60,6 @@ static int load_normal_reset(S390CPU *cpu)
-     scc->initial_cpu_reset(CPU(cpu));
-     scc->load_normal(CPU(cpu));
-     cpu_synchronize_all_post_reset();
--    resume_all_vcpus();
-     return 0;
- }
- 
--- 
-2.13.6
+Alistair
+
+>
+>      xlnx_zynqmp_init(s, machine);
+>  }
+> --
+> 1.8.3.1
+>
+>
