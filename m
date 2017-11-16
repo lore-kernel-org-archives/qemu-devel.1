@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47012)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47832)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1eFOeS-0005Yu-RR
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 13:12:37 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1eFOg5-0006dh-AE
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 13:14:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1eFOeP-0003Ak-NI
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 13:12:36 -0500
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:42843)
+	(envelope-from <alex.bennee@linaro.org>) id 1eFOfz-0004uQ-L0
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 13:14:17 -0500
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:45589)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1eFOeP-0003A5-HN
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 13:12:33 -0500
-Received: by mail-wm0-x244.google.com with SMTP id 5so755232wmk.1
-	for <qemu-devel@nongnu.org>; Thu, 16 Nov 2017 10:12:33 -0800 (PST)
+	id 1eFOfz-0004tL-EU
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 13:14:11 -0500
+Received: by mail-wm0-x243.google.com with SMTP id 9so1969338wme.4
+	for <qemu-devel@nongnu.org>; Thu, 16 Nov 2017 10:14:11 -0800 (PST)
 References: <20171116170526.12643-1-david@redhat.com>
 	<20171116170526.12643-3-david@redhat.com>
 	<87375e15vx.fsf@linaro.org>
 	<f0fc452d-8229-6eb3-b5d2-1d55b9ba0ee3@redhat.com>
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 In-reply-to: <f0fc452d-8229-6eb3-b5d2-1d55b9ba0ee3@redhat.com>
-Date: Thu, 16 Nov 2017 18:12:30 +0000
-Message-ID: <871sky14a9.fsf@linaro.org>
+Date: Thu, 16 Nov 2017 18:14:08 +0000
+Message-ID: <87zi7mytu7.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
@@ -89,40 +89,8 @@ David Hildenbrand <david@redhat.com> writes:
 >
 >     }
 
-For -smp 1 it's fine, but have you tested --accel thread=3Dsingle -smp 2?
-
->
->>
->> If it is important that the source vCPU doesn't continue you can
->> schedule it's work afterwards with a async_safe_run_on_cpu which will
->> complete after all other vCPUs have executed their work.
->>
->
-> It is important. Introducing async helpers at a point where sync is
-> needed sounds strange.
-
-Well the helper that schedulules the final async helper also needs to
-exit the run loop at that point, otherwise you are right it would
-attempt to execute a few more instructions in the block.
-
->
-> Thanks!
->
->>>
->>> --
->>> 2.13.6
->>
->>
->> --
->> Alex Benn=C3=A9e
->>
->
->
-> --
->
-> Thanks,
->
-> David / dhildenb
+Sorry ignore what I said, qemu_cpu_is_self tests the underlying thread
+not the vCPU which they all share.
 
 
 --
