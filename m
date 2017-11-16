@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37492)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37776)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eswierk@skyportsystems.com>) id 1eFKoa-0008Q0-RD
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 09:06:51 -0500
+	(envelope-from <tgolembi@redhat.com>) id 1eFKpX-0000Ue-Ao
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 09:07:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eswierk@skyportsystems.com>) id 1eFKoQ-0006OU-Us
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 09:06:48 -0500
-Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:44313)
+	(envelope-from <tgolembi@redhat.com>) id 1eFKpN-0007iI-G7
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 09:07:47 -0500
+Received: from mail-wm0-f68.google.com ([74.125.82.68]:42783)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <eswierk@skyportsystems.com>)
-	id 1eFKoQ-0006NY-O9
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 09:06:38 -0500
-Received: by mail-pg0-x243.google.com with SMTP id 4so11764563pge.1
-	for <qemu-devel@nongnu.org>; Thu, 16 Nov 2017 06:06:38 -0800 (PST)
-From: Ed Swierk <eswierk@skyportsystems.com>
-Date: Thu, 16 Nov 2017 06:06:06 -0800
-Message-Id: <1510841166-40615-1-git-send-email-eswierk@skyportsystems.com>
-Subject: [Qemu-devel] [PATCH v3 REPOST] net: Transmit zero UDP checksum as
- 0xFFFF
+	(Exim 4.71) (envelope-from <tgolembi@redhat.com>) id 1eFKpN-0007hO-9r
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 09:07:37 -0500
+Received: by mail-wm0-f68.google.com with SMTP id 70so253466wmf.1
+	for <qemu-devel@nongnu.org>; Thu, 16 Nov 2017 06:07:37 -0800 (PST)
+Date: Thu, 16 Nov 2017 15:07:33 +0100
+From: =?UTF-8?B?VG9tw6HFoSBHb2xlbWJpb3Zza8O9?= <tgolembi@redhat.com>
+Message-ID: <20171116150733.2dccc760@fiorina>
+In-Reply-To: <181C9C1B-9119-4B1D-8327-0C5EFD42A5F5@redhat.com>
+References: <cover.1505923516.git.tgolembi@redhat.com>
+	<13ca7e373615efac74661590527067ee8966f027.1505923516.git.tgolembi@redhat.com>
+	<181C9C1B-9119-4B1D-8327-0C5EFD42A5F5@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [virtio-dev] [PATCH 1/1] virtio-balloon: include
+ buffers and chached memory statistics
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,115 +31,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Dmitry Fleytman <dmitry@daynix.com>
-Cc: qemu-devel@nongnu.org, Ed Swierk <eswierk@skyportsystems.com>
+To: Yan Vugenfirer <yvugenfi@redhat.com>
+Cc: virtio-dev@lists.oasis-open.org, qemu-devel <qemu-devel@nongnu.org>, Wei Wang <wei.w.wang@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-The checksum algorithm used by IPv4, TCP and UDP allows a zero value
-to be represented by either 0x0000 and 0xFFFF. But per RFC 768, a zero
-UDP checksum must be transmitted as 0xFFFF because 0x0000 is a special
-value meaning no checksum.
+On Thu, 16 Nov 2017 15:38:21 +0200
+Yan Vugenfirer <yvugenfi@redhat.com> wrote:
 
-Substitute 0xFFFF whenever a checksum is computed as zero when
-modifying a UDP datagram header. Doing this on IPv4 and TCP checksums
-is unnecessary but legal. Add a wrapper for net_checksum_finish() that
-makes the substitution.
+> Hello All,
+>=20
+> Michael asked me to comment regarding the possibility to get this statist=
+ics on Windows.
+> By using Win32_OperatingSystem WMI class we can calculate the amount of c=
+ached memory (https://msdn.microsoft.com/en-us/library/aa394239(v=3Dvs.85).=
+aspx <https://msdn.microsoft.com/en-us/library/aa394239(v=3Dvs.85).aspx> ht=
+tp://brandonlive.com/2010/02/21/measuring-memory-usage-in-windows-7/ <http:=
+//brandonlive.com/2010/02/21/measuring-memory-usage-in-windows-7/>), but Wi=
+ndows doesn=E2=80=99t let to distinguish between =E2=80=9Ccached and buffer=
+s=E2=80=9D as far as I see.=20
 
-(We can't just change net_checksum_finish(), as that function is also
-used by receivers to verify checksums, and in that case the expected
-value is always 0x0000.)
+Thanks for the input, Yan. That's definitely good to know.
 
-Signed-off-by: Ed Swierk <eswierk@skyportsystems.com>
----
-v3:
+    Tomas
 
-(Reposted to fix patch format)
+>=20
+> Best regards,
+> Yan.
+>=20
+> > On 20 Sep 2017, at 19:05, Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@r=
+edhat.com> wrote:
+> >=20
+> > Signed-off-by: Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com>
+> > ---
+> > hw/virtio/virtio-balloon.c                      | 2 ++
+> > include/standard-headers/linux/virtio_balloon.h | 4 +++-
+> > 2 files changed, 5 insertions(+), 1 deletion(-)
+> >=20
+> > diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
+> > index a705e0ec55..0434784c14 100644
+> > --- a/hw/virtio/virtio-balloon.c
+> > +++ b/hw/virtio/virtio-balloon.c
+> > @@ -49,6 +49,8 @@ static const char *balloon_stat_names[] =3D {
+> >    [VIRTIO_BALLOON_S_MEMFREE] =3D "stat-free-memory",
+> >    [VIRTIO_BALLOON_S_MEMTOT] =3D "stat-total-memory",
+> >    [VIRTIO_BALLOON_S_AVAIL] =3D "stat-available-memory",
+> > +   [VIRTIO_BALLOON_S_BUFFERS] =3D "stat-linux-buffers",
+> > +   [VIRTIO_BALLOON_S_CACHED] =3D "stat-linux-cached",
+> >    [VIRTIO_BALLOON_S_NR] =3D NULL
+> > };
+> >=20
+> > diff --git a/include/standard-headers/linux/virtio_balloon.h b/include/=
+standard-headers/linux/virtio_balloon.h
+> > index 9d06ccd066..d61efbfcee 100644
+> > --- a/include/standard-headers/linux/virtio_balloon.h
+> > +++ b/include/standard-headers/linux/virtio_balloon.h
+> > @@ -52,7 +52,9 @@ struct virtio_balloon_config {
+> > #define VIRTIO_BALLOON_S_MEMFREE  4   /* Total amount of free memory */
+> > #define VIRTIO_BALLOON_S_MEMTOT   5   /* Total amount of memory */
+> > #define VIRTIO_BALLOON_S_AVAIL    6   /* Available memory as in /proc */
+> > -#define VIRTIO_BALLOON_S_NR       7
+> > +#define VIRTIO_BALLOON_S_BUFFERS  7   /* Buffers memory as in /proc */
+> > +#define VIRTIO_BALLOON_S_CACHED   8   /* Cached memory as in /proc */
+> > +#define VIRTIO_BALLOON_S_NR       9
+> >=20
+> > /*
+> >  * Memory statistics structure.
+> > --=20
+> > 2.14.1
+> >=20
+> >=20
+> > ---------------------------------------------------------------------
+> > To unsubscribe, e-mail: virtio-dev-unsubscribe@lists.oasis-open.org
+> > For additional commands, e-mail: virtio-dev-help@lists.oasis-open.org
+> >  =20
+>=20
 
-Leave net_tx_pkt_update_ip_checksums() alone since it's only computing
-a partial sum of the IP pseudo-header.
 
-Rename wrapper to net_checksum_finish_nozero() for clarity.
-
-v2:
-
-Add a wrapper net_checksum_finish_hdr() rather than duplicating the
-logic at every caller.
----
- hw/net/e1000.c         | 2 +-
- hw/net/net_rx_pkt.c    | 2 +-
- hw/net/net_tx_pkt.c    | 2 +-
- hw/net/vmxnet3.c       | 3 ++-
- include/net/checksum.h | 6 ++++++
- 5 files changed, 11 insertions(+), 4 deletions(-)
-
-diff --git a/hw/net/e1000.c b/hw/net/e1000.c
-index 72a92be..804ec08 100644
---- a/hw/net/e1000.c
-+++ b/hw/net/e1000.c
-@@ -506,7 +506,7 @@ putsum(uint8_t *data, uint32_t n, uint32_t sloc, uint32_t css, uint32_t cse)
-         n = cse + 1;
-     if (sloc < n-1) {
-         sum = net_checksum_add(n-css, data+css);
--        stw_be_p(data + sloc, net_checksum_finish(sum));
-+        stw_be_p(data + sloc, net_checksum_finish_nozero(sum));
-     }
- }
- 
-diff --git a/hw/net/net_rx_pkt.c b/hw/net/net_rx_pkt.c
-index cef1c2e..98a5030 100644
---- a/hw/net/net_rx_pkt.c
-+++ b/hw/net/net_rx_pkt.c
-@@ -518,7 +518,7 @@ _net_rx_pkt_calc_l4_csum(struct NetRxPkt *pkt)
-     cntr += net_checksum_add_iov(pkt->vec, pkt->vec_len,
-                                  pkt->l4hdr_off, csl, cso);
- 
--    csum = net_checksum_finish(cntr);
-+    csum = net_checksum_finish_nozero(cntr);
- 
-     trace_net_rx_pkt_l4_csum_calc_csum(pkt->l4hdr_off, csl, cntr, csum);
- 
-diff --git a/hw/net/net_tx_pkt.c b/hw/net/net_tx_pkt.c
-index 20b2549..e29c881 100644
---- a/hw/net/net_tx_pkt.c
-+++ b/hw/net/net_tx_pkt.c
-@@ -486,7 +486,7 @@ static void net_tx_pkt_do_sw_csum(struct NetTxPkt *pkt)
-         net_checksum_add_iov(iov, iov_len, pkt->virt_hdr.csum_start, csl, cso);
- 
-     /* Put the checksum obtained into the packet */
--    csum = cpu_to_be16(net_checksum_finish(csum_cntr));
-+    csum = cpu_to_be16(net_checksum_finish_nozero(csum_cntr));
-     iov_from_buf(iov, iov_len, csum_offset, &csum, sizeof csum);
- }
- 
-diff --git a/hw/net/vmxnet3.c b/hw/net/vmxnet3.c
-index 8c4bae5..cdc307d 100644
---- a/hw/net/vmxnet3.c
-+++ b/hw/net/vmxnet3.c
-@@ -972,7 +972,8 @@ static void vmxnet3_rx_need_csum_calculate(struct NetRxPkt *pkt,
-     data = (uint8_t *)pkt_data + vhdr->csum_start;
-     len = pkt_len - vhdr->csum_start;
-     /* Put the checksum obtained into the packet */
--    stw_be_p(data + vhdr->csum_offset, net_raw_checksum(data, len));
-+    stw_be_p(data + vhdr->csum_offset,
-+             net_checksum_finish_nozero(net_checksum_add(len, data)));
- 
-     vhdr->flags &= ~VIRTIO_NET_HDR_F_NEEDS_CSUM;
-     vhdr->flags |= VIRTIO_NET_HDR_F_DATA_VALID;
-diff --git a/include/net/checksum.h b/include/net/checksum.h
-index 7df472c..05a0d27 100644
---- a/include/net/checksum.h
-+++ b/include/net/checksum.h
-@@ -34,6 +34,12 @@ net_checksum_add(int len, uint8_t *buf)
- }
- 
- static inline uint16_t
-+net_checksum_finish_nozero(uint32_t sum)
-+{
-+    return net_checksum_finish(sum) ?: 0xFFFF;
-+}
-+
-+static inline uint16_t
- net_raw_checksum(uint8_t *data, int length)
- {
-     return net_checksum_finish(net_checksum_add(length, data));
--- 
-1.9.1
+--=20
+Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com>
