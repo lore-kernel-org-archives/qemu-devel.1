@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47839)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49102)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1eFHGr-0004qH-3H
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 05:19:45 -0500
+	(envelope-from <cascardo@canonical.com>) id 1eFHJS-0005jN-Bq
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 05:22:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1eFHGn-00075T-2Q
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 05:19:45 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33014)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1eFHGm-000748-T6
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 05:19:41 -0500
-Date: Thu, 16 Nov 2017 15:49:16 +0530 (IST)
-From: P J P <ppandit@redhat.com>
-In-Reply-To: <658ecab6-1f09-0c94-c89e-55f71c37309a@redhat.com>
-Message-ID: <nycvar.YSQ.7.76.1711161547370.26400@wniryva>
-References: <20171116075155.22378-1-ppandit@redhat.com>
-	<658ecab6-1f09-0c94-c89e-55f71c37309a@redhat.com>
+	(envelope-from <cascardo@canonical.com>) id 1eFHJO-0002IS-8W
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 05:22:26 -0500
+Received: from youngberry.canonical.com ([91.189.89.112]:39088)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cascardo@canonical.com>)
+	id 1eFHJO-0002Fj-1s
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 05:22:22 -0500
+Date: Thu, 16 Nov 2017 08:22:12 -0200
+From: Thadeu Lima de Souza Cascardo <cascardo@canonical.com>
+Message-ID: <20171116101510.jky7lmuygq3js3ia@calabresa>
+References: <1510769835-31902-1-git-send-email-mst@redhat.com>
+	<1510769835-31902-9-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: Re: [Qemu-devel] [PATCH v1] ps2: check PS2Queue pointers in
- post_load routine
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1510769835-31902-9-git-send-email-mst@redhat.com>
+Subject: Re: [Qemu-devel] [PULL 08/10] NUMA: Enable adding NUMA node
+ implicitly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,28 +29,180 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Qemu Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Cyrille Chatras <cyrille.chatras@orange.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Dou Liyang <douly.fnst@cn.fujitsu.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, David Hildenbrand <david@redhat.com>, Thomas Huth <thuth@redhat.com>, Alistair Francis <alistair23@gmail.com>, Takao Indoh <indou.takao@jp.fujitsu.com>, Izumi Taku <izumi.taku@jp.fujitsu.com>
 
-+-- On Thu, 16 Nov 2017, Paolo Bonzini wrote --+
-| you don't need to change the invalid values to sane ones.  Instead, make
-| ps2_common_post_load return an int (just like the .post_load member of
-| VMStateDescription).  You can then detect out of range count/rptr/wptr
-| and return -1 for bad indices.
-| 
-| In the callers,
-| 
-| 	ps2_common_post_load(ps2);
-| 
-| 	return 0;
-| 
-| can then become simply
-| 
-| 	return ps2_common_post_load(ps2);
+On Wed, Nov 15, 2017 at 08:18:50PM +0200, Michael S. Tsirkin wrote:
+> From: Dou Liyang <douly.fnst@cn.fujitsu.com>
+> 
+> Linux and Windows need ACPI SRAT table to make memory hotplug work properly,
+> however currently QEMU doesn't create SRAT table if numa options aren't present
+> on CLI.
+> 
+> Which breaks both linux and windows guests in certain conditions:
+>  * Windows: won't enable memory hotplug without SRAT table at all
+>  * Linux: if QEMU is started with initial memory all below 4Gb and no SRAT table
+>    present, guest kernel will use nommu DMA ops, which breaks 32bit hw drivers
+>    when memory is hotplugged and guest tries to use it with that drivers.
+> 
+> Fix above issues by automatically creating a numa node when QEMU is started with
+> memory hotplug enabled but without '-numa' options on CLI.
+> (PS: auto-create numa node only for new machine types so not to break migration).
+> 
+> Which would provide SRAT table to guests without explicit -numa options on CLI
+> and would allow:
+>  * Windows: to enable memory hotplug
+>  * Linux: switch to SWIOTLB DMA ops, to bounce DMA transfers to 32bit allocated
+>    buffers that legacy drivers/hw can handle.
+> 
+> [Rewritten by Igor]
 
-  Okay; Sent a revised patch v2.
+Thanks for copying me on this.
 
-Thank you.
---
-Prasad J Pandit / Red Hat Product Security Team
-47AF CE69 3A90 54AA 9045 1053 DD13 3D32 FE5B 041F
+Acked-by: Thadeu Lima de Souza Cascardo <cascardo@canonical.com>
+
+> 
+> Reported-by: Thadeu Lima de Souza Cascardo <cascardo@canonical.com>
+> Suggested-by: Igor Mammedov <imammedo@redhat.com>
+> Signed-off-by: Dou Liyang <douly.fnst@cn.fujitsu.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Richard Henderson <rth@twiddle.net>
+> Cc: Eduardo Habkost <ehabkost@redhat.com>
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Marcel Apfelbaum <marcel@redhat.com>
+> Cc: Igor Mammedov <imammedo@redhat.com>
+> Cc: David Hildenbrand <david@redhat.com>
+> Cc: Thomas Huth <thuth@redhat.com>
+> Cc: Alistair Francis <alistair23@gmail.com>
+> Cc: Takao Indoh <indou.takao@jp.fujitsu.com>
+> Cc: Izumi Taku <izumi.taku@jp.fujitsu.com>
+> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> ---
+>  include/hw/boards.h |  1 +
+>  hw/i386/pc.c        |  1 +
+>  hw/i386/pc_piix.c   |  1 +
+>  hw/i386/pc_q35.c    |  1 +
+>  numa.c              | 21 ++++++++++++++++++++-
+>  vl.c                |  3 +--
+>  6 files changed, 25 insertions(+), 3 deletions(-)
+> 
+> diff --git a/include/hw/boards.h b/include/hw/boards.h
+> index 62f160e..156b16f 100644
+> --- a/include/hw/boards.h
+> +++ b/include/hw/boards.h
+> @@ -197,6 +197,7 @@ struct MachineClass {
+>      bool ignore_memory_transaction_failures;
+>      int numa_mem_align_shift;
+>      const char **valid_cpu_types;
+> +    bool auto_enable_numa_with_memhp;
+>      void (*numa_auto_assign_ram)(MachineClass *mc, NodeInfo *nodes,
+>                                   int nb_nodes, ram_addr_t size);
+>  
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index fafe5ba..c3afe5b 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -2347,6 +2347,7 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
+>      mc->cpu_index_to_instance_props = pc_cpu_index_to_props;
+>      mc->get_default_cpu_node_id = pc_get_default_cpu_node_id;
+>      mc->possible_cpu_arch_ids = pc_possible_cpu_arch_ids;
+> +    mc->auto_enable_numa_with_memhp = true;
+>      mc->has_hotpluggable_cpus = true;
+>      mc->default_boot_order = "cad";
+>      mc->hot_add_cpu = pc_hot_add_cpu;
+> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+> index f79d5cb..5e47528 100644
+> --- a/hw/i386/pc_piix.c
+> +++ b/hw/i386/pc_piix.c
+> @@ -446,6 +446,7 @@ static void pc_i440fx_2_10_machine_options(MachineClass *m)
+>      m->is_default = 0;
+>      m->alias = NULL;
+>      SET_MACHINE_COMPAT(m, PC_COMPAT_2_10);
+> +    m->auto_enable_numa_with_memhp = false;
+>  }
+>  
+>  DEFINE_I440FX_MACHINE(v2_10, "pc-i440fx-2.10", NULL,
+> diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+> index da3ea60..d606004 100644
+> --- a/hw/i386/pc_q35.c
+> +++ b/hw/i386/pc_q35.c
+> @@ -318,6 +318,7 @@ static void pc_q35_2_10_machine_options(MachineClass *m)
+>      m->alias = NULL;
+>      SET_MACHINE_COMPAT(m, PC_COMPAT_2_10);
+>      m->numa_auto_assign_ram = numa_legacy_auto_assign_ram;
+> +    m->auto_enable_numa_with_memhp = false;
+>  }
+>  
+>  DEFINE_Q35_MACHINE(v2_10, "pc-q35-2.10", NULL,
+> diff --git a/numa.c b/numa.c
+> index 8d78d95..7151b24 100644
+> --- a/numa.c
+> +++ b/numa.c
+> @@ -216,6 +216,7 @@ static void parse_numa_node(MachineState *ms, NumaNodeOptions *node,
+>      }
+>      numa_info[nodenr].present = true;
+>      max_numa_nodeid = MAX(max_numa_nodeid, nodenr + 1);
+> +    nb_numa_nodes++;
+>  }
+>  
+>  static void parse_numa_distance(NumaDistOptions *dist, Error **errp)
+> @@ -282,7 +283,6 @@ static int parse_numa(void *opaque, QemuOpts *opts, Error **errp)
+>          if (err) {
+>              goto end;
+>          }
+> -        nb_numa_nodes++;
+>          break;
+>      case NUMA_OPTIONS_TYPE_DIST:
+>          parse_numa_distance(&object->u.dist, &err);
+> @@ -433,6 +433,25 @@ void parse_numa_opts(MachineState *ms)
+>          exit(1);
+>      }
+>  
+> +    /*
+> +     * If memory hotplug is enabled (slots > 0) but without '-numa'
+> +     * options explicitly on CLI, guestes will break.
+> +     *
+> +     *   Windows: won't enable memory hotplug without SRAT table at all
+> +     *
+> +     *   Linux: if QEMU is started with initial memory all below 4Gb
+> +     *   and no SRAT table present, guest kernel will use nommu DMA ops,
+> +     *   which breaks 32bit hw drivers when memory is hotplugged and
+> +     *   guest tries to use it with that drivers.
+> +     *
+> +     * Enable NUMA implicitly by adding a new NUMA node automatically.
+> +     */
+> +    if (ms->ram_slots > 0 && nb_numa_nodes == 0 &&
+> +        mc->auto_enable_numa_with_memhp) {
+> +            NumaNodeOptions node = { };
+> +            parse_numa_node(ms, &node, NULL);
+> +    }
+> +
+>      assert(max_numa_nodeid <= MAX_NODES);
+>  
+>      /* No support for sparse NUMA node IDs yet: */
+> diff --git a/vl.c b/vl.c
+> index 7372424..1ad1c04 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -4690,8 +4690,6 @@ int main(int argc, char **argv, char **envp)
+>      default_drive(default_floppy, snapshot, IF_FLOPPY, 0, FD_OPTS);
+>      default_drive(default_sdcard, snapshot, IF_SD, 0, SD_OPTS);
+>  
+> -    parse_numa_opts(current_machine);
+> -
+>      if (qemu_opts_foreach(qemu_find_opts("mon"),
+>                            mon_init_func, NULL, NULL)) {
+>          exit(1);
+> @@ -4741,6 +4739,7 @@ int main(int argc, char **argv, char **envp)
+>      current_machine->boot_order = boot_order;
+>      current_machine->cpu_model = cpu_model;
+>  
+> +    parse_numa_opts(current_machine);
+>  
+>      /* parse features once if machine provides default cpu_type */
+>      if (machine_class->default_cpu_type) {
+> -- 
+> MST
+> 
