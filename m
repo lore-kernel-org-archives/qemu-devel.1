@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48595)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48704)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1eFMey-0005YJ-7K
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 11:05:01 -0500
+	(envelope-from <mst@redhat.com>) id 1eFMfO-0005op-Ko
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 11:05:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1eFMes-0006Ck-44
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 11:05:00 -0500
-Date: Thu, 16 Nov 2017 09:04:48 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20171116090448.4d53ac71@t450s.home>
-In-Reply-To: <20171116175713-mutt-send-email-mst@kernel.org>
-References: <20171116132339.4facb858@bahia.lab.toulouse-stg.fr.ibm.com>
-	<20171116172602-mutt-send-email-mst@kernel.org>
-	<20171116085345.7b02ecdd@t450s.home>
-	<20171116175713-mutt-send-email-mst@kernel.org>
+	(envelope-from <mst@redhat.com>) id 1eFMfE-0006TZ-Mr
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 11:05:26 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37670)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eFMfE-0006RU-Ab
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 11:05:16 -0500
+Date: Thu, 16 Nov 2017 18:05:10 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20171116180302-mutt-send-email-mst@kernel.org>
+References: <20171113192958.22953-1-marcandre.lureau@redhat.com>
+	<20171113192958.22953-6-marcandre.lureau@redhat.com>
+	<20171116035606-mutt-send-email-mst@kernel.org>
+	<183118826.40770917.1510839263526.JavaMail.zimbra@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] QEMU terminates during reboot after memory unplug
- with vhost=on
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <183118826.40770917.1510839263526.JavaMail.zimbra@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v6 5/5] fw_cfg: write vmcoreinfo details
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,106 +30,198 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Greg Kurz <groug@kaod.org>, imammedo@redhat.com, bharata@linux.vnet.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
+To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
+Cc: linux-kernel@vger.kernel.org, somlo@cmu.edu, qemu-devel@nongnu.org
 
-On Thu, 16 Nov 2017 17:59:17 +0200
-"Michael S. Tsirkin" <mst@redhat.com> wrote:
+On Thu, Nov 16, 2017 at 08:34:23AM -0500, Marc-Andr=E9 Lureau wrote:
+> Hi
+>=20
+> ----- Original Message -----
+> > On Mon, Nov 13, 2017 at 08:29:58PM +0100, Marc-Andr=E9 Lureau wrote:
+> > > If the "etc/vmcoreinfo" fw_cfg file is present and we are not runni=
+ng
+> > > the kdump kernel, write the addr/size of the vmcoreinfo ELF note.
+> > >=20
+> > > Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
+> > > Reviewed-by: Gabriel Somlo <somlo@cmu.edu>
+> > > ---
+> > >  drivers/firmware/qemu_fw_cfg.c | 87
+> > >  +++++++++++++++++++++++++++++++++++++++++-
+> > >  1 file changed, 86 insertions(+), 1 deletion(-)
+> > >=20
+> > > diff --git a/drivers/firmware/qemu_fw_cfg.c
+> > > b/drivers/firmware/qemu_fw_cfg.c
+> > > index 2ac4cd869fe6..7a70e7a549f6 100644
+> > > --- a/drivers/firmware/qemu_fw_cfg.c
+> > > +++ b/drivers/firmware/qemu_fw_cfg.c
+> > > @@ -35,6 +35,8 @@
+> > >  #include <linux/ioport.h>
+> > >  #include <linux/delay.h>
+> > >  #include <linux/dma-mapping.h>
+> > > +#include <linux/crash_core.h>
+> > > +#include <linux/crash_dump.h>
+> > > =20
+> > >  MODULE_AUTHOR("Gabriel L. Somlo <somlo@cmu.edu>");
+> > >  MODULE_DESCRIPTION("QEMU fw_cfg sysfs support");
+> > > @@ -59,6 +61,8 @@ MODULE_LICENSE("GPL");
+> > >  /* fw_cfg "file name" is up to 56 characters (including terminatin=
+g nul)
+> > >  */
+> > >  #define FW_CFG_MAX_FILE_PATH 56
+> > > =20
+> > > +#define VMCOREINFO_FORMAT_ELF 0x1
+> > > +
+> > >  /* platform device for dma mapping */
+> > >  static struct device *dev;
+> > > =20
+> > > @@ -127,7 +131,8 @@ static ssize_t fw_cfg_dma_transfer(void *addres=
+s, u32
+> > > length, u32 control)
+> > >  	dma_addr_t dma;
+> > >  	ssize_t ret =3D length;
+> > >  	enum dma_data_direction dir =3D
+> > > -		(control & FW_CFG_DMA_CTL_READ ? DMA_FROM_DEVICE : 0);
+> > > +		(control & FW_CFG_DMA_CTL_READ ? DMA_FROM_DEVICE : 0) |
+> > > +		(control & FW_CFG_DMA_CTL_WRITE ? DMA_TO_DEVICE : 0);
+> > > =20
+> > >  	if (address && length) {
+> > >  		dma_addr =3D dma_map_single(dev, address, length, dir);
+> > > @@ -225,6 +230,48 @@ static ssize_t fw_cfg_read_blob(u16 key,
+> > >  	return ret;
+> > >  }
+> > > =20
+> > > +#ifdef CONFIG_CRASH_CORE
+> > > +/* write chunk of given fw_cfg blob (caller responsible for sanity=
+-check)
+> > > */
+> > > +static ssize_t fw_cfg_write_blob(u16 key,
+> > > +				 void *buf, loff_t pos, size_t count)
+> > > +{
+> > > +	u32 glk =3D -1U;
+> > > +	acpi_status status;
+> > > +	ssize_t ret =3D count;
+> > > +
+> > > +	/* If we have ACPI, ensure mutual exclusion against any potential
+> > > +	 * device access by the firmware, e.g. via AML methods:
+> > > +	 */
+> > > +	status =3D acpi_acquire_global_lock(ACPI_WAIT_FOREVER, &glk);
+> > > +	if (ACPI_FAILURE(status) && status !=3D AE_NOT_CONFIGURED) {
+> > > +		/* Should never get here */
+> > > +		WARN(1, "%s: Failed to lock ACPI!\n", __func__);
+> > > +		memset(buf, 0, count);
+> > > +		return -EINVAL;
+> > > +	}
+> > > +
+> > > +	mutex_lock(&fw_cfg_dev_lock);
+> > > +	if (pos =3D=3D 0) {
+> > > +		ret =3D fw_cfg_dma_transfer(buf, count, key << 16
+> > > +					  | FW_CFG_DMA_CTL_SELECT
+> > > +					  | FW_CFG_DMA_CTL_WRITE);
+> > > +	} else {
+> > > +		iowrite16(fw_cfg_sel_endianness(key), fw_cfg_reg_ctrl);
+> > > +		ret =3D fw_cfg_dma_transfer(NULL, pos, FW_CFG_DMA_CTL_SKIP);
+> > > +		if (ret < 0)
+> > > +			goto end;
+> > > +		ret =3D fw_cfg_dma_transfer(buf, count, FW_CFG_DMA_CTL_WRITE);
+> > > +	}
+> > > +
+> > > +end:
+> > > +	mutex_unlock(&fw_cfg_dev_lock);
+> > > +
+> > > +	acpi_release_global_lock(glk);
+> > > +
+> > > +	return ret;
+> > > +}
+> > > +#endif /* CONFIG_CRASH_CORE */
+> > > +
+> > >  /* clean up fw_cfg device i/o */
+> > >  static void fw_cfg_io_cleanup(void)
+> > >  {
+> > > @@ -343,6 +390,37 @@ struct fw_cfg_sysfs_entry {
+> > >  	struct list_head list;
+> > >  };
+> > > =20
+> > > +#ifdef CONFIG_CRASH_CORE
+> > > +static ssize_t write_vmcoreinfo(const struct fw_cfg_file *f)
+> > > +{
+> > > +	struct vmci {
+> > > +		__le16 host_format;
+> > > +		__le16 guest_format;
+> > > +		__le32 size;
+> > > +		__le64 paddr;
+> > > +	} __packed;
+> > > +	struct vmci *data;
+> > > +	ssize_t ret;
+> > > +
+> > > +	data =3D kmalloc(sizeof(struct vmci), GFP_KERNEL | GFP_DMA);
+> > > +	if (!data)
+> > > +		return -ENOMEM;
+> >=20
+> > It's a small bit of data - you can just keep it in a global variable,
+> > this way failures won't be an issue.
+>=20
+> It would still need to be allocated
 
-> On Thu, Nov 16, 2017 at 08:53:45AM -0700, Alex Williamson wrote:
-> > On Thu, 16 Nov 2017 17:28:44 +0200
-> > "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> >   
-> > > On Thu, Nov 16, 2017 at 01:23:39PM +0100, Greg Kurz wrote:  
-> > > > Hi,
-> > > > 
-> > > > I'm resurrecting a thread about a QEMU crash we're still hitting on ppc64. It
-> > > > was reported to the list by Bharata 2 months ago:
-> > > > 
-> > > > https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg03685.html
-> > > > 
-> > > > "Hi,
-> > > > 
-> > > > QEMU hits the below assert
-> > > > 
-> > > > qemu-system-ppc64: used ring relocated for ring 2
-> > > > qemu-system-ppc64: qemu/hw/virtio/vhost.c:649: vhost_commit: Assertion `r >= 0' failed.
-> > > > 
-> > > > in the following scenario:
-> > > > 
-> > > > 1. Boot guest with vhost=on
-> > > >   -netdev tap,id=mynet0,script=qemu-ifup,downscript=qemu-ifdown,vhost=on -device virtio-net-pci,netdev=mynet0
-> > > > 2. Hot add a DIMM device 
-> > > > 3. Reboot
-> > > >    When the guest reboots, we can see
-> > > >    vhost_virtqueue_start:vq->used_phys getting assigned an address that
-> > > >    falls in the hotplugged memory range.
-> > > > 4. Remove the DIMM device
-> > > >    Guest refuses the removal as the hotplugged memory is under use.
-> > > > 5. Reboot
-> > > >    QEMU forces the removal of the DIMM device during reset and that's
-> > > >    when we hit the above assert.
-> > > > 
-> > > > Any pointers on why we are hitting this assert ? Shouldn't vhost be
-> > > > done with using the hotplugged memory when we hit reset ?
-> > > > 
-> > > > Regards,
-> > > > Bharata."
-> > > > 
-> > > > #0  0x00007ffff760eff0 in raise () from /lib64/libc.so.6
-> > > > #1  0x00007ffff761136c in abort () from /lib64/libc.so.6
-> > > > #2  0x00007ffff7604c44 in __assert_fail_base () from /lib64/libc.so.6
-> > > > #3  0x00007ffff7604d34 in __assert_fail () from /lib64/libc.so.6
-> > > > #4  0x0000000010161138 in vhost_commit (listener=0x11469e88) at /home/greg/Work/qemu/qemu-spapr/hw/virtio/vhost.c:650
-> > > > #5  0x00000000100917fc in memory_region_transaction_commit () at /home/greg/Work/qemu/qemu-spapr/memory.c:1094
-> > > > #6  0x0000000010096748 in memory_region_del_subregion (mr=0x1143eed0, subregion=0x116f1920) at /home/greg/Work/qemu/qemu-spapr/memory.c:2337
-> > > > #7  0x00000000104a9aec in pc_dimm_memory_unplug (dev=0x11445c50, hpms=0x1143eec0, mr=0x116f1920) at /home/greg/Work/qemu/qemu-spapr/hw/mem/pc-dimm.c:126
-> > > > #8  0x0000000010180454 in spapr_lmb_release (dev=0x11445c50) at /home/greg/Work/qemu/qemu-spapr/hw/ppc/spapr.c:3151
-> > > > #9  0x00000000101a397c in spapr_drc_release (drc=0x116b9cc0) at /home/greg/Work/qemu/qemu-spapr/hw/ppc/spapr_drc.c:401
-> > > > #10 0x00000000101a3ba0 in spapr_drc_reset (drc=0x116b9cc0) at /home/greg/Work/qemu/qemu-spapr/hw/ppc/spapr_drc.c:439
-> > > > #11 0x00000000101a3c88 in drc_reset (opaque=0x116b9cc0) at /home/greg/Work/qemu/qemu-spapr/hw/ppc/spapr_drc.c:460
-> > > > #12 0x0000000010447380 in qemu_devices_reset () at /home/greg/Work/qemu/qemu-spapr/hw/core/reset.c:69
-> > > > #13 0x000000001017ae80 in ppc_spapr_reset () at /home/greg/Work/qemu/qemu-spapr/hw/ppc/spapr.c:1445
-> > > > #14 0x0000000010377c60 in qemu_system_reset (reason=SHUTDOWN_CAUSE_HOST_QMP) at /home/greg/Work/qemu/qemu-spapr/vl.c:1788
-> > > > #15 0x00000000103785ac in main_loop_should_exit () at /home/greg/Work/qemu/qemu-spapr/vl.c:1962
-> > > > #16 0x0000000010378708 in main_loop () at /home/greg/Work/qemu/qemu-spapr/vl.c:1999
-> > > > #17 0x0000000010382c54 in main (argc=21, argv=0x7ffffffff098, envp=0x7ffffffff148) at /home/greg/Work/qemu/qemu-spapr/vl.c:4897
-> > > > 
-> > > > 
-> > > > This basically happens because on pseries, like x86, we usually wait
-> > > > for the guest to eject the DIMM before actually removing it, BUT,
-> > > > unlike x86, we force the removal on reset. This is handled by a DRC
-> > > > object which registers a handler with qemu_register_reset().
-> > > > 
-> > > > At reset time, the machine calls qemu_devices_reset() but unfortunately,
-> > > > the DRC reset handler gets called BEFORE the VirtIONet device one. The
-> > > > vhost device is still active and it doesn't like the ring addresses to
-> > > > change while in this state.
-> > > > 
-> > > > Michael,
-> > > > 
-> > > > The assert() has been around since the beginning, at a time I believe there was
-> > > > no such thing as memory hot-unplug. Now that memory can go away at reset time,
-> > > > is it really legitimate to crash QEMU if vhost detects a ring address change ?    
-> > > 
-> > > It's just a symptom of a problem though. If memory is going away
-> > > while vhost backend is running, things are not going to
-> > > end well. Less scary for a network device, more scary for a block
-> > > device. VFIO probably has the same issue, it just does not
-> > > have an assert.  
-> > 
-> > Hmm, why?  We don't have data structures living in guest RAM with
-> > vfio.  Guest RAM is just a mapping through the IOMMU.  So long as the
-> > MemoryListener is correctly doing its job, that range will be unmapped
-> > and vfio shouldn't care about it.  Thanks,
-> > 
-> > Alex  
-> 
-> Range is unmapped by listener but device has not been reset yet,
-> so it will get errors when attempting to access guest RAM.
+No - you can just make it a global variable.
 
-So IOMMU faults would occur if the device continues to try to DMA
-into that range.  Sloppy ordering, but vfio wouldn't have any way to
-tell the difference between this and a runtime RAM unplug.  Thanks,
+> with GFP_DMA.
 
-Alex
+Are you sure?
+
+ * GFP_DMA exists for historical reasons and should be avoided where poss=
+ible.
+ *   The flags indicates that the caller requires that the lowest zone be
+ *   used (ZONE_DMA or 16M on x86-64). Ideally, this would be removed but
+ *   it would require careful auditing as some users really require it an=
+d
+ *   others use the flag to avoid lowmem reserves in ZONE_DMA and treat t=
+he
+ *   lowest zone as a type of emergency reserve.
+
+
+> Since it's a one time thing, this is just moving the problem isn't it?
+
+Isn't the timeout just moving the problem too?
+Avoiding memory corruption is a priority.
+
+> >=20
+> > > +
+> > > +	/* spare ourself reading host format support for now since we
+> > > +	 * don't know what else to format - host may ignore ours
+> > > +	 */
+> > > +	*data =3D (struct vmci) {
+> > > +		.guest_format =3D cpu_to_le16(VMCOREINFO_FORMAT_ELF),
+> > > +		.size =3D cpu_to_le32(VMCOREINFO_NOTE_SIZE),
+> > > +		.paddr =3D cpu_to_le64(paddr_vmcoreinfo_note())
+> > > +	};
+> > > +	ret =3D fw_cfg_write_blob(f->select, data, 0, sizeof(struct vmci)=
+);
+> > > +
+> > > +	kfree(data);
+> > > +	return ret;
+> > > +}
+> > > +#endif /* CONFIG_CRASH_CORE */
+> > > +
+> > >  /* get fw_cfg_sysfs_entry from kobject member */
+> > >  static inline struct fw_cfg_sysfs_entry *to_entry(struct kobject *=
+kobj)
+> > >  {
+> > > @@ -582,6 +660,13 @@ static int fw_cfg_register_file(const struct
+> > > fw_cfg_file *f)
+> > >  	int err;
+> > >  	struct fw_cfg_sysfs_entry *entry;
+> > > =20
+> > > +#ifdef CONFIG_CRASH_CORE
+> > > +	if (strcmp(f->name, "etc/vmcoreinfo") =3D=3D 0 && !is_kdump_kerne=
+l()) {
+> > > +		if (write_vmcoreinfo(f) < 0)
+> > > +			pr_warn("fw_cfg: failed to write vmcoreinfo");
+> > > +	}
+> > > +#endif
+> > > +
+> > >  	/* allocate new entry */
+> > >  	entry =3D kzalloc(sizeof(*entry), GFP_KERNEL);
+> > >  	if (!entry)
+> > > --
+> > > 2.15.0.125.g8f49766d64
+> >=20
