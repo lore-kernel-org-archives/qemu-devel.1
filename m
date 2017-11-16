@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59902)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59892)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1eFO7g-0007df-PV
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 12:38:47 -0500
+	(envelope-from <crosa@redhat.com>) id 1eFO7g-0007cx-21
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 12:38:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1eFO7e-0003Up-G7
+	(envelope-from <crosa@redhat.com>) id 1eFO7Z-0003Gq-OJ
 	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 12:38:44 -0500
 From: Cleber Rosa <crosa@redhat.com>
-Date: Thu, 16 Nov 2017 12:38:10 -0500
-Message-Id: <20171116173810.16457-11-crosa@redhat.com>
+Date: Thu, 16 Nov 2017 12:38:03 -0500
+Message-Id: <20171116173810.16457-4-crosa@redhat.com>
 In-Reply-To: <20171116173810.16457-1-crosa@redhat.com>
 References: <20171116173810.16457-1-crosa@redhat.com>
-Subject: [Qemu-devel] [PATCH 10/10] qemu-iotests: add section on how to
- write a new I/O test
+Subject: [Qemu-devel] [PATCH 03/10] qemu-iotests: be strict with expected
+ output
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,200 +23,706 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, Cleber Rosa <crosa@redhat.com>
 
-This adds some basic information on how to write a new test.  I'm
-aware that some of the information in the wiki (Testing/QemuIoTests)
-could also belong here.
+The contract between runner (check) and test is one that accepts some
+minor differences in the expcted output, as the comparison method
+employed is a "diff -w".
 
-Since copying content over won't generate much interesting feedback,
-the goal here is to get feedback on the sample_test_templates, general
-workflow proposed for writing a new test, etc.
+This is an exception to a clearer and more straightforward rule of
+just requiring the generated output to be *equal* (and not similar) to
+the recorded expected output.
 
-After feedback is received, I can go over and sync both sides (wiki
-and README).
+Let's drop this exception and make things more predictable.
 
 Signed-off-by: Cleber Rosa <crosa@redhat.com>
 ---
- tests/qemu-iotests/README                          | 44 ++++++++++++++--
- tests/qemu-iotests/sample_test_templates/sample.py | 59 ++++++++++++++++++++++
- tests/qemu-iotests/sample_test_templates/sample.sh | 40 +++++++++++++++
- 3 files changed, 138 insertions(+), 5 deletions(-)
- create mode 100755 tests/qemu-iotests/sample_test_templates/sample.py
- create mode 100755 tests/qemu-iotests/sample_test_templates/sample.sh
+ tests/qemu-iotests/026.out | 92 +++++++++++++++++++++++-----------------------
+ tests/qemu-iotests/049.out |  4 +-
+ tests/qemu-iotests/061.out |  4 +-
+ tests/qemu-iotests/104.out |  2 +-
+ tests/qemu-iotests/109.out | 44 +++++++++++-----------
+ tests/qemu-iotests/175.out |  2 +-
+ tests/qemu-iotests/check   |  4 +-
+ 7 files changed, 76 insertions(+), 76 deletions(-)
 
-diff --git a/tests/qemu-iotests/README b/tests/qemu-iotests/README
-index 6079b401ae..efaf72d5e7 100644
---- a/tests/qemu-iotests/README
-+++ b/tests/qemu-iotests/README
-@@ -1,20 +1,54 @@
-+= This is the QEMU I/O test suite =
+diff --git a/tests/qemu-iotests/026.out b/tests/qemu-iotests/026.out
+index 86a50a2e13..38d76418b7 100644
+--- a/tests/qemu-iotests/026.out
++++ b/tests/qemu-iotests/026.out
+@@ -3,7 +3,7 @@ Errors while writing 128 kB
  
--=== This is the QEMU I/O test suite ===
--
--* Intro
-+== Intro ==
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
  
- This package contains a simple test suite for the I/O layer of qemu.
- It does not require a guest, but only the qemu, qemu-img and qemu-io
- binaries.  This does limit it to exercise the low-level I/O path only
- but no actual block drivers like ide, scsi or virtio.
+-Event: l1_update; errno: 5; imm: off; once: on; write
++Event: l1_update; errno: 5; imm: off; once: on; write 
+ write failed: Input/output error
+ No errors were found on the image.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+@@ -13,7 +13,7 @@ write failed: Input/output error
+ No errors were found on the image.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
  
--* Usage
-+== Usage ==
+-Event: l1_update; errno: 5; imm: off; once: off; write
++Event: l1_update; errno: 5; imm: off; once: off; write 
+ Failed to flush the L2 table cache: Input/output error
+ Failed to flush the refcount block cache: Input/output error
+ write failed: Input/output error
+@@ -31,7 +31,7 @@ write failed: Input/output error
+ This means waste of disk space, but no harm to data.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
  
- Just run ./check to run all tests for the raw image format, or ./check
- -qcow2 to test the qcow2 image format.  The output of ./check -h explains
- additional options to test further image formats or I/O methods.
+-Event: l1_update; errno: 28; imm: off; once: on; write
++Event: l1_update; errno: 28; imm: off; once: on; write 
+ write failed: No space left on device
+ No errors were found on the image.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+@@ -41,7 +41,7 @@ write failed: No space left on device
+ No errors were found on the image.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
  
--* Feedback and patches
-+== Writing a QEMU I/O test ==
-+
-+It's a common practice to start with an existing test that may relate
-+to the task you have.  QEMU I/O tests are usually written either in
-+shell or Python, so it's also a good idea to pick an existing test
-+based on your familiarity with those languages and/or what you
-+anticipate about your test.
-+
-+You can find templates available at "sample_test_templates/", or you
-+can start with an existing test, such as 001 (shell based) or 030
-+(Python based).
-+
-+After you pick your template, name it as a three-digits file, starting
-+with the next available one.  If `ls -1 ??? | sort -rn | head -1` gives
-+you "197", name your test "198".  Finally, add an entry to the "group"
-+file, which manages just that, test group classification, allowing a
-+user to run all "quick" tests, for instance.
-+
-+=== Test configuration, expected results and reporting ===
-+
-+The tests are (mostly) standard executable files, that are executed by
-+"./check" as such.  Tests get most of their configuration (directly or
-+indirectly) by environment variables.  Some of the framework auxiliary
-+code (for instance, "common.rc") defines or changes some of the
-+environment variables.  You'll come across tests that reference
-+"$TEST_IMG", "$QEMU_IO" and other variables.
-+
-+The expected results for a test are stored in a file named after the
-+(sequential) test number.  For test 001, the expected output (stdout +
-+stderr) is stored at 001.out.
-+
-+Tests that finish successfully should exit with status code 0.  To be
-+considered a successful run, a test must also produce output that
-+matches what is recorded in the expected output file (say, 001.out).
-+
-+== Feedback and patches ==
+-Event: l1_update; errno: 28; imm: off; once: off; write
++Event: l1_update; errno: 28; imm: off; once: off; write 
+ Failed to flush the L2 table cache: No space left on device
+ Failed to flush the refcount block cache: No space left on device
+ write failed: No space left on device
+@@ -59,7 +59,7 @@ write failed: No space left on device
+ This means waste of disk space, but no harm to data.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
  
- Please send improvements to the test suite, general feedback or just
- reports of failing tests cases to qemu-devel@nongnu.org with a CC:
-diff --git a/tests/qemu-iotests/sample_test_templates/sample.py b/tests/qemu-iotests/sample_test_templates/sample.py
-new file mode 100755
-index 0000000000..35a7410b5c
---- /dev/null
-+++ b/tests/qemu-iotests/sample_test_templates/sample.py
-@@ -0,0 +1,59 @@
-+#!/usr/bin/env python
-+#
-+# DESCRIPTION HERE, such as "Test a complex thing using a simple thing"
-+#
-+# COPYRIGHT NOTICE HERE, such as "Copyright (C) YYYY Yourself, Inc.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+# Creator/Owner: your.email@example.com
-+#
-+
-+import iotests
-+
-+
-+class Sample(iotests.QMPTestCase):
-+
-+    def setUp(self):
-+        """
-+        Method that runs before test method(s).  Use it to prepare the
-+        environment that is common to the all tests, but doesn't
-+        necessarily mean that is part of the feature testing
-+        specifics.
-+
-+        Remove this docstring unless you have a really good use for it.
-+        """
-+        pass
-+
-+    def tearDown(self):
-+        """
-+        Method that runs after the test method(s).  Use it to clean up
-+        the environment created previously in setUp().
-+
-+        Remove this docstring unless you have a really good use for it.
-+        """
-+        pass
-+
-+    def test(self):
-+        """
-+        Test code goes here, or in any other method whose name starts
-+        with "test".
-+
-+        It's a good idea to describe what it's about.
-+        """
-+        pass
-+
-+
-+if __name__ == '__main__':
-+    iotests.main()
-diff --git a/tests/qemu-iotests/sample_test_templates/sample.sh b/tests/qemu-iotests/sample_test_templates/sample.sh
-new file mode 100755
-index 0000000000..d50e228efc
---- /dev/null
-+++ b/tests/qemu-iotests/sample_test_templates/sample.sh
-@@ -0,0 +1,40 @@
-+#!/bin/bash
-+#
-+# DESCRIPTION HERE, such as "Test a complex thing using a simple thing"
-+#
-+# COPYRIGHT NOTICE HERE, such as "Copyright (C) YYYY Yourself, Inc.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+# Creator/Owner: your.email@example.com
-+#
-+
-+seq=`basename $0`
-+echo "QA output created by $seq"
-+
-+status=1	# failure is the default!
-+
-+# get standard environment, filters and checks
-+. ./common.rc
-+
-+# describe supported environment, and then remove this line.
-+ _supported_fmt generic
-+ _supported_proto generic
-+ _supported_os Linux
-+
-+# put your test code goes here, and then remove this line.
-+
-+# success, all done
-+echo "*** done"
-+status=0
+-Event: l2_load; errno: 5; imm: off; once: on; write
++Event: l2_load; errno: 5; imm: off; once: on; write 
+ wrote 131072/131072 bytes at offset 0
+ 128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ write failed: Input/output error
+@@ -75,7 +75,7 @@ read failed: Input/output error
+ No errors were found on the image.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+-Event: l2_load; errno: 5; imm: off; once: off; write
++Event: l2_load; errno: 5; imm: off; once: off; write 
+ wrote 131072/131072 bytes at offset 0
+ 128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ write failed: Input/output error
+@@ -91,7 +91,7 @@ read failed: Input/output error
+ No errors were found on the image.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+-Event: l2_load; errno: 28; imm: off; once: on; write
++Event: l2_load; errno: 28; imm: off; once: on; write 
+ wrote 131072/131072 bytes at offset 0
+ 128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ write failed: No space left on device
+@@ -107,7 +107,7 @@ read failed: No space left on device
+ No errors were found on the image.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+-Event: l2_load; errno: 28; imm: off; once: off; write
++Event: l2_load; errno: 28; imm: off; once: off; write 
+ wrote 131072/131072 bytes at offset 0
+ 128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ write failed: No space left on device
+@@ -123,7 +123,7 @@ read failed: No space left on device
+ No errors were found on the image.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+-Event: l2_update; errno: 5; imm: off; once: on; write
++Event: l2_update; errno: 5; imm: off; once: on; write 
+ write failed: Input/output error
+ No errors were found on the image.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+@@ -133,7 +133,7 @@ write failed: Input/output error
+ No errors were found on the image.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+-Event: l2_update; errno: 5; imm: off; once: off; write
++Event: l2_update; errno: 5; imm: off; once: off; write 
+ Failed to flush the L2 table cache: Input/output error
+ Failed to flush the refcount block cache: Input/output error
+ write failed: Input/output error
+@@ -151,7 +151,7 @@ write failed: Input/output error
+ This means waste of disk space, but no harm to data.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+-Event: l2_update; errno: 28; imm: off; once: on; write
++Event: l2_update; errno: 28; imm: off; once: on; write 
+ write failed: No space left on device
+ No errors were found on the image.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+@@ -161,7 +161,7 @@ write failed: No space left on device
+ No errors were found on the image.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+-Event: l2_update; errno: 28; imm: off; once: off; write
++Event: l2_update; errno: 28; imm: off; once: off; write 
+ Failed to flush the L2 table cache: No space left on device
+ Failed to flush the refcount block cache: No space left on device
+ write failed: No space left on device
+@@ -179,7 +179,7 @@ write failed: No space left on device
+ This means waste of disk space, but no harm to data.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+-Event: l2_alloc_write; errno: 5; imm: off; once: on; write
++Event: l2_alloc_write; errno: 5; imm: off; once: on; write 
+ write failed: Input/output error
+ No errors were found on the image.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+@@ -189,7 +189,7 @@ write failed: Input/output error
+ No errors were found on the image.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+-Event: l2_alloc_write; errno: 5; imm: off; once: off; write
++Event: l2_alloc_write; errno: 5; imm: off; once: off; write 
+ Failed to flush the L2 table cache: Input/output error
+ Failed to flush the refcount block cache: Input/output error
+ write failed: Input/output error
+@@ -205,7 +205,7 @@ write failed: Input/output error
+ This means waste of disk space, but no harm to data.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+-Event: l2_alloc_write; errno: 28; imm: off; once: on; write
++Event: l2_alloc_write; errno: 28; imm: off; once: on; write 
+ write failed: No space left on device
+ No errors were found on the image.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+@@ -215,7 +215,7 @@ write failed: No space left on device
+ No errors were found on the image.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+-Event: l2_alloc_write; errno: 28; imm: off; once: off; write
++Event: l2_alloc_write; errno: 28; imm: off; once: off; write 
+ Failed to flush the L2 table cache: No space left on device
+ Failed to flush the refcount block cache: No space left on device
+ write failed: No space left on device
+@@ -231,7 +231,7 @@ write failed: No space left on device
+ This means waste of disk space, but no harm to data.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+-Event: write_aio; errno: 5; imm: off; once: on; write
++Event: write_aio; errno: 5; imm: off; once: on; write 
+ write failed: Input/output error
+ No errors were found on the image.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+@@ -241,7 +241,7 @@ write failed: Input/output error
+ No errors were found on the image.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+-Event: write_aio; errno: 5; imm: off; once: off; write
++Event: write_aio; errno: 5; imm: off; once: off; write 
+ Failed to flush the L2 table cache: Input/output error
+ Failed to flush the refcount block cache: Input/output error
+ write failed: Input/output error
+@@ -255,7 +255,7 @@ write failed: Input/output error
+ No errors were found on the image.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+-Event: write_aio; errno: 28; imm: off; once: on; write
++Event: write_aio; errno: 28; imm: off; once: on; write 
+ write failed: No space left on device
+ No errors were found on the image.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+@@ -265,7 +265,7 @@ write failed: No space left on device
+ No errors were found on the image.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+-Event: write_aio; errno: 28; imm: off; once: off; write
++Event: write_aio; errno: 28; imm: off; once: off; write 
+ Failed to flush the L2 table cache: No space left on device
+ Failed to flush the refcount block cache: No space left on device
+ write failed: No space left on device
+@@ -279,7 +279,7 @@ write failed: No space left on device
+ No errors were found on the image.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+-Event: refblock_load; errno: 5; imm: off; once: on; write
++Event: refblock_load; errno: 5; imm: off; once: on; write 
+ write failed: Input/output error
+ No errors were found on the image.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+@@ -289,7 +289,7 @@ write failed: Input/output error
+ No errors were found on the image.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+-Event: refblock_load; errno: 5; imm: off; once: off; write
++Event: refblock_load; errno: 5; imm: off; once: off; write 
+ Failed to flush the L2 table cache: Input/output error
+ Failed to flush the refcount block cache: Input/output error
+ write failed: Input/output error
+@@ -303,7 +303,7 @@ write failed: Input/output error
+ No errors were found on the image.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+-Event: refblock_load; errno: 28; imm: off; once: on; write
++Event: refblock_load; errno: 28; imm: off; once: on; write 
+ write failed: No space left on device
+ No errors were found on the image.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+@@ -313,7 +313,7 @@ write failed: No space left on device
+ No errors were found on the image.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+-Event: refblock_load; errno: 28; imm: off; once: off; write
++Event: refblock_load; errno: 28; imm: off; once: off; write 
+ Failed to flush the L2 table cache: No space left on device
+ Failed to flush the refcount block cache: No space left on device
+ write failed: No space left on device
+@@ -327,7 +327,7 @@ write failed: No space left on device
+ No errors were found on the image.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+-Event: refblock_update_part; errno: 5; imm: off; once: on; write
++Event: refblock_update_part; errno: 5; imm: off; once: on; write 
+ write failed: Input/output error
+ No errors were found on the image.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+@@ -337,7 +337,7 @@ write failed: Input/output error
+ No errors were found on the image.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+-Event: refblock_update_part; errno: 5; imm: off; once: off; write
++Event: refblock_update_part; errno: 5; imm: off; once: off; write 
+ Failed to flush the L2 table cache: Input/output error
+ Failed to flush the refcount block cache: Input/output error
+ write failed: Input/output error
+@@ -351,7 +351,7 @@ write failed: Input/output error
+ No errors were found on the image.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+-Event: refblock_update_part; errno: 28; imm: off; once: on; write
++Event: refblock_update_part; errno: 28; imm: off; once: on; write 
+ write failed: No space left on device
+ No errors were found on the image.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+@@ -361,7 +361,7 @@ write failed: No space left on device
+ No errors were found on the image.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+-Event: refblock_update_part; errno: 28; imm: off; once: off; write
++Event: refblock_update_part; errno: 28; imm: off; once: off; write 
+ Failed to flush the L2 table cache: No space left on device
+ Failed to flush the refcount block cache: No space left on device
+ write failed: No space left on device
+@@ -375,7 +375,7 @@ write failed: No space left on device
+ No errors were found on the image.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+-Event: refblock_alloc; errno: 5; imm: off; once: on; write
++Event: refblock_alloc; errno: 5; imm: off; once: on; write 
+ write failed: Input/output error
+ No errors were found on the image.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+@@ -385,7 +385,7 @@ write failed: Input/output error
+ No errors were found on the image.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+-Event: refblock_alloc; errno: 5; imm: off; once: off; write
++Event: refblock_alloc; errno: 5; imm: off; once: off; write 
+ Failed to flush the L2 table cache: Input/output error
+ Failed to flush the refcount block cache: Input/output error
+ write failed: Input/output error
+@@ -399,7 +399,7 @@ write failed: Input/output error
+ No errors were found on the image.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+-Event: refblock_alloc; errno: 28; imm: off; once: on; write
++Event: refblock_alloc; errno: 28; imm: off; once: on; write 
+ write failed: No space left on device
+ No errors were found on the image.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+@@ -409,7 +409,7 @@ write failed: No space left on device
+ No errors were found on the image.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+-Event: refblock_alloc; errno: 28; imm: off; once: off; write
++Event: refblock_alloc; errno: 28; imm: off; once: off; write 
+ Failed to flush the L2 table cache: No space left on device
+ Failed to flush the refcount block cache: No space left on device
+ write failed: No space left on device
+@@ -423,7 +423,7 @@ write failed: No space left on device
+ No errors were found on the image.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+-Event: cluster_alloc; errno: 5; imm: off; once: on; write
++Event: cluster_alloc; errno: 5; imm: off; once: on; write 
+ write failed: Input/output error
+ No errors were found on the image.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+@@ -433,7 +433,7 @@ write failed: Input/output error
+ No errors were found on the image.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+-Event: cluster_alloc; errno: 5; imm: off; once: off; write
++Event: cluster_alloc; errno: 5; imm: off; once: off; write 
+ write failed: Input/output error
+ No errors were found on the image.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+@@ -443,7 +443,7 @@ write failed: Input/output error
+ No errors were found on the image.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+-Event: cluster_alloc; errno: 28; imm: off; once: on; write
++Event: cluster_alloc; errno: 28; imm: off; once: on; write 
+ write failed: No space left on device
+ No errors were found on the image.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+@@ -453,7 +453,7 @@ write failed: No space left on device
+ No errors were found on the image.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+-Event: cluster_alloc; errno: 28; imm: off; once: off; write
++Event: cluster_alloc; errno: 28; imm: off; once: off; write 
+ write failed: No space left on device
+ No errors were found on the image.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+@@ -466,7 +466,7 @@ No errors were found on the image.
+ 
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+-Event: refblock_alloc_hookup; errno: 28; imm: off; once: on; write
++Event: refblock_alloc_hookup; errno: 28; imm: off; once: on; write 
+ write failed: No space left on device
+ No errors were found on the image.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+@@ -476,7 +476,7 @@ write failed: No space left on device
+ No errors were found on the image.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+-Event: refblock_alloc_hookup; errno: 28; imm: off; once: off; write
++Event: refblock_alloc_hookup; errno: 28; imm: off; once: off; write 
+ Failed to flush the L2 table cache: No space left on device
+ Failed to flush the refcount block cache: No space left on device
+ write failed: No space left on device
+@@ -494,7 +494,7 @@ write failed: No space left on device
+ This means waste of disk space, but no harm to data.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+-Event: refblock_alloc_write; errno: 28; imm: off; once: on; write
++Event: refblock_alloc_write; errno: 28; imm: off; once: on; write 
+ write failed: No space left on device
+ No errors were found on the image.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+@@ -504,7 +504,7 @@ write failed: No space left on device
+ No errors were found on the image.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+-Event: refblock_alloc_write; errno: 28; imm: off; once: off; write
++Event: refblock_alloc_write; errno: 28; imm: off; once: off; write 
+ Failed to flush the L2 table cache: No space left on device
+ Failed to flush the refcount block cache: No space left on device
+ write failed: No space left on device
+@@ -518,7 +518,7 @@ write failed: No space left on device
+ No errors were found on the image.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+-Event: refblock_alloc_write_blocks; errno: 28; imm: off; once: on; write
++Event: refblock_alloc_write_blocks; errno: 28; imm: off; once: on; write 
+ write failed: No space left on device
+ No errors were found on the image.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+@@ -528,7 +528,7 @@ write failed: No space left on device
+ No errors were found on the image.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+-Event: refblock_alloc_write_blocks; errno: 28; imm: off; once: off; write
++Event: refblock_alloc_write_blocks; errno: 28; imm: off; once: off; write 
+ Failed to flush the L2 table cache: No space left on device
+ Failed to flush the refcount block cache: No space left on device
+ write failed: No space left on device
+@@ -546,7 +546,7 @@ write failed: No space left on device
+ This means waste of disk space, but no harm to data.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+-Event: refblock_alloc_write_table; errno: 28; imm: off; once: on; write
++Event: refblock_alloc_write_table; errno: 28; imm: off; once: on; write 
+ write failed: No space left on device
+ No errors were found on the image.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+@@ -556,7 +556,7 @@ write failed: No space left on device
+ No errors were found on the image.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+-Event: refblock_alloc_write_table; errno: 28; imm: off; once: off; write
++Event: refblock_alloc_write_table; errno: 28; imm: off; once: off; write 
+ Failed to flush the L2 table cache: No space left on device
+ Failed to flush the refcount block cache: No space left on device
+ write failed: No space left on device
+@@ -574,7 +574,7 @@ write failed: No space left on device
+ This means waste of disk space, but no harm to data.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+-Event: refblock_alloc_switch_table; errno: 28; imm: off; once: on; write
++Event: refblock_alloc_switch_table; errno: 28; imm: off; once: on; write 
+ write failed: No space left on device
+ No errors were found on the image.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+@@ -584,7 +584,7 @@ write failed: No space left on device
+ No errors were found on the image.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+-Event: refblock_alloc_switch_table; errno: 28; imm: off; once: off; write
++Event: refblock_alloc_switch_table; errno: 28; imm: off; once: off; write 
+ Failed to flush the L2 table cache: No space left on device
+ Failed to flush the refcount block cache: No space left on device
+ write failed: No space left on device
+diff --git a/tests/qemu-iotests/049.out b/tests/qemu-iotests/049.out
+index 003247023e..5a93d8fc4b 100644
+--- a/tests/qemu-iotests/049.out
++++ b/tests/qemu-iotests/049.out
+@@ -106,7 +106,7 @@ qemu-img: Value '-1k' is out of range for parameter 'size'
+ qemu-img: TEST_DIR/t.qcow2: Invalid options for file format 'qcow2'
+ 
+ qemu-img create -f qcow2 TEST_DIR/t.qcow2 -- 1kilobyte
+-qemu-img: Invalid image size specified! You may use k, M, G, T, P or E suffixes for
++qemu-img: Invalid image size specified! You may use k, M, G, T, P or E suffixes for 
+ qemu-img: kilobytes, megabytes, gigabytes, terabytes, petabytes and exabytes.
+ 
+ qemu-img create -f qcow2 -o size=1kilobyte TEST_DIR/t.qcow2
+@@ -116,7 +116,7 @@ and exabytes, respectively.
+ qemu-img: TEST_DIR/t.qcow2: Invalid options for file format 'qcow2'
+ 
+ qemu-img create -f qcow2 TEST_DIR/t.qcow2 -- foobar
+-qemu-img: Invalid image size specified! You may use k, M, G, T, P or E suffixes for
++qemu-img: Invalid image size specified! You may use k, M, G, T, P or E suffixes for 
+ qemu-img: kilobytes, megabytes, gigabytes, terabytes, petabytes and exabytes.
+ 
+ qemu-img create -f qcow2 -o size=foobar TEST_DIR/t.qcow2
+diff --git a/tests/qemu-iotests/061.out b/tests/qemu-iotests/061.out
+index 942485de99..3dbbeb73ff 100644
+--- a/tests/qemu-iotests/061.out
++++ b/tests/qemu-iotests/061.out
+@@ -417,7 +417,7 @@ wrote 65536/65536 bytes at offset 2147483648
+ 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ wrote 65536/65536 bytes at offset 3221225472
+ 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-    (0.00/100%)
+    (12.50/100%)
+    (25.00/100%)
+    (37.50/100%)
+    (50.00/100%)
+    (62.50/100%)
+    (75.00/100%)
+    (87.50/100%)
+    (100.00/100%)
+    (100.00/100%)
++    (0.00/100%)
+    (12.50/100%)
+    (25.00/100%)
+    (37.50/100%)
+    (50.00/100%)
+    (62.50/100%)
+    (75.00/100%)
+    (87.50/100%)
+    (100.00/100%)
+    (100.00/100%)
+ No errors were found on the image.
+ 
+ === Testing progress report with snapshot ===
+@@ -432,6 +432,6 @@ wrote 65536/65536 bytes at offset 2147483648
+ 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ wrote 65536/65536 bytes at offset 3221225472
+ 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-    (0.00/100%)
+    (6.25/100%)
+    (12.50/100%)
+    (18.75/100%)
+    (25.00/100%)
+    (31.25/100%)
+    (37.50/100%)
+    (43.75/100%)
+    (50.00/100%)
+    (56.25/100%)
+    (62.50/100%)
+    (68.75/100%)
+    (75.00/100%)
+    (81.25/100%)
+    (87.50/100%)
+    (93.75/100%)
+    (100.00/100%)
+    (100.00/100%)
++    (0.00/100%)
+    (6.25/100%)
+    (12.50/100%)
+    (18.75/100%)
+    (25.00/100%)
+    (31.25/100%)
+    (37.50/100%)
+    (43.75/100%)
+    (50.00/100%)
+    (56.25/100%)
+    (62.50/100%)
+    (68.75/100%)
+    (75.00/100%)
+    (81.25/100%)
+    (87.50/100%)
+    (93.75/100%)
+    (100.00/100%)
+    (100.00/100%)
+ No errors were found on the image.
+ *** done
+diff --git a/tests/qemu-iotests/104.out b/tests/qemu-iotests/104.out
+index ab8d892c2a..f9f59d2950 100644
+--- a/tests/qemu-iotests/104.out
++++ b/tests/qemu-iotests/104.out
+@@ -9,4 +9,4 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1234
+ image: TEST_DIR/t.IMGFMT
+ file format: IMGFMT
+ virtual size: 1.5K (1536 bytes)
+-***done
++*** done
+diff --git a/tests/qemu-iotests/109.out b/tests/qemu-iotests/109.out
+index c189e2833d..4fcb497e5e 100644
+--- a/tests/qemu-iotests/109.out
++++ b/tests/qemu-iotests/109.out
+@@ -6,8 +6,8 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
+ Formatting 'TEST_DIR/t.raw.src', fmt=IMGFMT size=67108864
+ {"return": {}}
+ WARNING: Image format was not specified for 'TEST_DIR/t.raw' and probing guessed raw.
+-Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
+-Specify the 'raw' format explicitly to remove the restrictions.
++         Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
++         Specify the 'raw' format explicitly to remove the restrictions.
+ {"return": {}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_ERROR", "data": {"device": "src", "operation": "write", "action": "report"}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": LEN, "offset": 0, "speed": 0, "type": "mirror", "error": "Operation not permitted"}}
+@@ -32,8 +32,8 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
+ Formatting 'TEST_DIR/t.raw.src', fmt=IMGFMT size=67108864
+ {"return": {}}
+ WARNING: Image format was not specified for 'TEST_DIR/t.raw' and probing guessed raw.
+-Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
+-Specify the 'raw' format explicitly to remove the restrictions.
++         Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
++         Specify the 'raw' format explicitly to remove the restrictions.
+ {"return": {}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_ERROR", "data": {"device": "src", "operation": "write", "action": "report"}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": LEN, "offset": 512, "speed": 0, "type": "mirror", "error": "Operation not permitted"}}
+@@ -58,8 +58,8 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
+ Formatting 'TEST_DIR/t.raw.src', fmt=IMGFMT size=67108864
+ {"return": {}}
+ WARNING: Image format was not specified for 'TEST_DIR/t.raw' and probing guessed raw.
+-Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
+-Specify the 'raw' format explicitly to remove the restrictions.
++         Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
++         Specify the 'raw' format explicitly to remove the restrictions.
+ {"return": {}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_ERROR", "data": {"device": "src", "operation": "write", "action": "report"}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": LEN, "offset": 262144, "speed": 0, "type": "mirror", "error": "Operation not permitted"}}
+@@ -84,8 +84,8 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
+ Formatting 'TEST_DIR/t.raw.src', fmt=IMGFMT size=67108864
+ {"return": {}}
+ WARNING: Image format was not specified for 'TEST_DIR/t.raw' and probing guessed raw.
+-Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
+-Specify the 'raw' format explicitly to remove the restrictions.
++         Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
++         Specify the 'raw' format explicitly to remove the restrictions.
+ {"return": {}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_ERROR", "data": {"device": "src", "operation": "write", "action": "report"}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": LEN, "offset": 0, "speed": 0, "type": "mirror", "error": "Operation not permitted"}}
+@@ -110,8 +110,8 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
+ Formatting 'TEST_DIR/t.raw.src', fmt=IMGFMT size=67108864
+ {"return": {}}
+ WARNING: Image format was not specified for 'TEST_DIR/t.raw' and probing guessed raw.
+-Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
+-Specify the 'raw' format explicitly to remove the restrictions.
++         Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
++         Specify the 'raw' format explicitly to remove the restrictions.
+ {"return": {}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_ERROR", "data": {"device": "src", "operation": "write", "action": "report"}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": LEN, "offset": 0, "speed": 0, "type": "mirror", "error": "Operation not permitted"}}
+@@ -136,8 +136,8 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
+ Formatting 'TEST_DIR/t.raw.src', fmt=IMGFMT size=67108864
+ {"return": {}}
+ WARNING: Image format was not specified for 'TEST_DIR/t.raw' and probing guessed raw.
+-Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
+-Specify the 'raw' format explicitly to remove the restrictions.
++         Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
++         Specify the 'raw' format explicitly to remove the restrictions.
+ {"return": {}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_ERROR", "data": {"device": "src", "operation": "write", "action": "report"}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": LEN, "offset": 0, "speed": 0, "type": "mirror", "error": "Operation not permitted"}}
+@@ -161,8 +161,8 @@ Images are identical.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
+ {"return": {}}
+ WARNING: Image format was not specified for 'TEST_DIR/t.raw' and probing guessed raw.
+-Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
+-Specify the 'raw' format explicitly to remove the restrictions.
++         Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
++         Specify the 'raw' format explicitly to remove the restrictions.
+ {"return": {}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_ERROR", "data": {"device": "src", "operation": "write", "action": "report"}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": LEN, "offset": OFFSET, "speed": 0, "type": "mirror", "error": "Operation not permitted"}}
+@@ -186,8 +186,8 @@ Images are identical.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
+ {"return": {}}
+ WARNING: Image format was not specified for 'TEST_DIR/t.raw' and probing guessed raw.
+-Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
+-Specify the 'raw' format explicitly to remove the restrictions.
++         Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
++         Specify the 'raw' format explicitly to remove the restrictions.
+ {"return": {}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_ERROR", "data": {"device": "src", "operation": "write", "action": "report"}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": LEN, "offset": OFFSET, "speed": 0, "type": "mirror", "error": "Operation not permitted"}}
+@@ -211,8 +211,8 @@ Images are identical.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
+ {"return": {}}
+ WARNING: Image format was not specified for 'TEST_DIR/t.raw' and probing guessed raw.
+-Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
+-Specify the 'raw' format explicitly to remove the restrictions.
++         Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
++         Specify the 'raw' format explicitly to remove the restrictions.
+ {"return": {}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_ERROR", "data": {"device": "src", "operation": "write", "action": "report"}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": LEN, "offset": OFFSET, "speed": 0, "type": "mirror", "error": "Operation not permitted"}}
+@@ -236,8 +236,8 @@ Images are identical.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
+ {"return": {}}
+ WARNING: Image format was not specified for 'TEST_DIR/t.raw' and probing guessed raw.
+-Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
+-Specify the 'raw' format explicitly to remove the restrictions.
++         Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
++         Specify the 'raw' format explicitly to remove the restrictions.
+ {"return": {}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_ERROR", "data": {"device": "src", "operation": "write", "action": "report"}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": LEN, "offset": OFFSET, "speed": 0, "type": "mirror", "error": "Operation not permitted"}}
+@@ -261,8 +261,8 @@ Images are identical.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
+ {"return": {}}
+ WARNING: Image format was not specified for 'TEST_DIR/t.raw' and probing guessed raw.
+-Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
+-Specify the 'raw' format explicitly to remove the restrictions.
++         Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
++         Specify the 'raw' format explicitly to remove the restrictions.
+ {"return": {}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "src", "len": 512, "offset": 512, "speed": 0, "type": "mirror"}}
+ {"return": [{"io-status": "ok", "device": "src", "busy": false, "len": 512, "offset": 512, "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
+diff --git a/tests/qemu-iotests/175.out b/tests/qemu-iotests/175.out
+index 76c02c6a57..53c5186dbd 100644
+--- a/tests/qemu-iotests/175.out
++++ b/tests/qemu-iotests/175.out
+@@ -15,4 +15,4 @@ size=1048576, blocks=2048
+ == creating image with preallocation falloc ==
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576 preallocation=falloc
+ size=1048576, blocks=2048
+- *** done
++*** done
+diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
+index 08741328d0..7718b98bc4 100755
+--- a/tests/qemu-iotests/check
++++ b/tests/qemu-iotests/check
+@@ -795,7 +795,7 @@ do
+                 echo " - no qualified output"
+                 err=true
+             else
+-                if diff -w "$reference" $tmp.out >/dev/null 2>&1
++                if diff "$reference" $tmp.out >/dev/null 2>&1
+                 then
+                     echo ""
+                     if $err
+@@ -807,7 +807,7 @@ do
+                 else
+                     echo " - output mismatch (see $seq.out.bad)"
+                     mv $tmp.out $seq.out.bad
+-                    $diff -w "$reference" $(realpath $seq.out.bad)
++                    $diff "$reference" $(realpath $seq.out.bad)
+                     err=true
+                 fi
+             fi
 -- 
 2.13.6
