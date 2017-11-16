@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38107)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38000)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eFJsc-0007tQ-Gg
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 08:06:55 -0500
+	(envelope-from <peterx@redhat.com>) id 1eFJsU-0007lX-Hp
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 08:06:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eFJsY-0006ko-6B
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 08:06:54 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50102)
+	(envelope-from <peterx@redhat.com>) id 1eFJsP-0006Gx-30
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 08:06:46 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53542)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eFJsX-0006iU-UO
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 08:06:50 -0500
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eFJsO-0006Ed-SM
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 08:06:40 -0500
 From: Peter Xu <peterx@redhat.com>
-Date: Thu, 16 Nov 2017 21:05:48 +0800
-Message-Id: <20171116130610.23582-6-peterx@redhat.com>
+Date: Thu, 16 Nov 2017 21:05:46 +0800
+Message-Id: <20171116130610.23582-4-peterx@redhat.com>
 In-Reply-To: <20171116130610.23582-1-peterx@redhat.com>
 References: <20171116130610.23582-1-peterx@redhat.com>
-Subject: [Qemu-devel] [RFC v4 05/27] qjson: add "opaque" field to
- JSONMessageParser
+Subject: [Qemu-devel] [RFC v4 03/27] qobject: let object_property_get_str()
+ use new API
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,177 +27,40 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, peterx@redhat.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-It'll be passed to emit() as well when it happens.  Since at it, add a
-typedef for the emitter function.
+We can simplify object_property_get_str() using the new
+qobject_get_try_str().
 
 Reviewed-by: Fam Zheng <famz@redhat.com>
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- include/qapi/qmp/json-streamer.h | 10 ++++++++--
- monitor.c                        |  7 ++++---
- qga/main.c                       |  5 +++--
- qobject/json-streamer.c          |  6 ++++--
- qobject/qjson.c                  |  5 +++--
- tests/libqtest.c                 |  5 +++--
- 6 files changed, 25 insertions(+), 13 deletions(-)
+ qom/object.c | 9 +++------
+ 1 file changed, 3 insertions(+), 6 deletions(-)
 
-diff --git a/include/qapi/qmp/json-streamer.h b/include/qapi/qmp/json-streamer.h
-index 00d8a23af8..9198b67342 100644
---- a/include/qapi/qmp/json-streamer.h
-+++ b/include/qapi/qmp/json-streamer.h
-@@ -23,9 +23,14 @@ typedef struct JSONToken {
-     char str[];
- } JSONToken;
+diff --git a/qom/object.c b/qom/object.c
+index c58c52d518..9cbeb51f0b 100644
+--- a/qom/object.c
++++ b/qom/object.c
+@@ -1116,18 +1116,15 @@ char *object_property_get_str(Object *obj, const char *name,
+                               Error **errp)
+ {
+     QObject *ret = object_property_get_qobject(obj, name, errp);
+-    QString *qstring;
+     char *retval;
  
-+struct JSONMessageParser;
-+typedef void (*JSONMessageEmitFunc)(struct JSONMessageParser *parser,
-+                                    GQueue *tokens, void *opaque);
+     if (!ret) {
+         return NULL;
+     }
+-    qstring = qobject_to_qstring(ret);
+-    if (!qstring) {
 +
- typedef struct JSONMessageParser
- {
--    void (*emit)(struct JSONMessageParser *parser, GQueue *tokens);
-+    JSONMessageEmitFunc emit;
-+    void *opaque;
-     JSONLexer lexer;
-     int brace_count;
-     int bracket_count;
-@@ -34,7 +39,8 @@ typedef struct JSONMessageParser
- } JSONMessageParser;
++    retval = g_strdup(qobject_get_try_str(ret));
++    if (!retval) {
+         error_setg(errp, QERR_INVALID_PARAMETER_TYPE, name, "string");
+-        retval = NULL;
+-    } else {
+-        retval = g_strdup(qstring_get_str(qstring));
+     }
  
- void json_message_parser_init(JSONMessageParser *parser,
--                              void (*func)(JSONMessageParser *, GQueue *));
-+                              JSONMessageEmitFunc func,
-+                              void *opaque);
- 
- int json_message_parser_feed(JSONMessageParser *parser,
-                              const char *buffer, size_t size);
-diff --git a/monitor.c b/monitor.c
-index 3940737c1c..ab80d32c70 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -3808,7 +3808,8 @@ static int monitor_can_read(void *opaque)
-     return (mon->suspend_cnt == 0) ? 1 : 0;
- }
- 
--static void handle_qmp_command(JSONMessageParser *parser, GQueue *tokens)
-+static void handle_qmp_command(JSONMessageParser *parser, GQueue *tokens,
-+                               void *opaque)
- {
-     QObject *req, *rsp = NULL, *id = NULL;
-     QDict *qdict = NULL;
-@@ -3955,7 +3956,7 @@ static void monitor_qmp_event(void *opaque, int event)
-         break;
-     case CHR_EVENT_CLOSED:
-         json_message_parser_destroy(&mon->qmp.parser);
--        json_message_parser_init(&mon->qmp.parser, handle_qmp_command);
-+        json_message_parser_init(&mon->qmp.parser, handle_qmp_command, NULL);
-         mon_refcount--;
-         monitor_fdsets_cleanup();
-         break;
-@@ -4105,7 +4106,7 @@ void monitor_init(Chardev *chr, int flags)
-         qemu_chr_fe_set_handlers(&mon->chr, monitor_can_read, monitor_qmp_read,
-                                  monitor_qmp_event, NULL, mon, NULL, true);
-         qemu_chr_fe_set_echo(&mon->chr, true);
--        json_message_parser_init(&mon->qmp.parser, handle_qmp_command);
-+        json_message_parser_init(&mon->qmp.parser, handle_qmp_command, NULL);
-     } else {
-         qemu_chr_fe_set_handlers(&mon->chr, monitor_can_read, monitor_read,
-                                  monitor_event, NULL, mon, NULL, true);
-diff --git a/qga/main.c b/qga/main.c
-index 62a62755bd..3b5ebbc1ee 100644
---- a/qga/main.c
-+++ b/qga/main.c
-@@ -593,7 +593,8 @@ static void process_command(GAState *s, QDict *req)
- }
- 
- /* handle requests/control events coming in over the channel */
--static void process_event(JSONMessageParser *parser, GQueue *tokens)
-+static void process_event(JSONMessageParser *parser, GQueue *tokens,
-+                          void *opaque)
- {
-     GAState *s = container_of(parser, GAState, parser);
-     QDict *qdict;
-@@ -1320,7 +1321,7 @@ static int run_agent(GAState *s, GAConfig *config, int socket_activation)
-     s->command_state = ga_command_state_new();
-     ga_command_state_init(s, s->command_state);
-     ga_command_state_init_all(s->command_state);
--    json_message_parser_init(&s->parser, process_event);
-+    json_message_parser_init(&s->parser, process_event, NULL);
- 
- #ifndef _WIN32
-     if (!register_signal_handlers()) {
-diff --git a/qobject/json-streamer.c b/qobject/json-streamer.c
-index c51c2021f9..8fc1b15321 100644
---- a/qobject/json-streamer.c
-+++ b/qobject/json-streamer.c
-@@ -102,18 +102,20 @@ out_emit:
-      */
-     tokens = parser->tokens;
-     parser->tokens = g_queue_new();
--    parser->emit(parser, tokens);
-+    parser->emit(parser, tokens, parser->opaque);
-     parser->token_size = 0;
- }
- 
- void json_message_parser_init(JSONMessageParser *parser,
--                              void (*func)(JSONMessageParser *, GQueue *))
-+                              JSONMessageEmitFunc func,
-+                              void *opaque)
- {
-     parser->emit = func;
-     parser->brace_count = 0;
-     parser->bracket_count = 0;
-     parser->tokens = g_queue_new();
-     parser->token_size = 0;
-+    parser->opaque = opaque;
- 
-     json_lexer_init(&parser->lexer, json_message_process_token);
- }
-diff --git a/qobject/qjson.c b/qobject/qjson.c
-index 2e0930884e..f9766febe3 100644
---- a/qobject/qjson.c
-+++ b/qobject/qjson.c
-@@ -28,7 +28,8 @@ typedef struct JSONParsingState
-     Error *err;
- } JSONParsingState;
- 
--static void parse_json(JSONMessageParser *parser, GQueue *tokens)
-+static void parse_json(JSONMessageParser *parser, GQueue *tokens,
-+                       void *opaque)
- {
-     JSONParsingState *s = container_of(parser, JSONParsingState, parser);
- 
-@@ -41,7 +42,7 @@ QObject *qobject_from_jsonv(const char *string, va_list *ap, Error **errp)
- 
-     state.ap = ap;
- 
--    json_message_parser_init(&state.parser, parse_json);
-+    json_message_parser_init(&state.parser, parse_json, NULL);
-     json_message_parser_feed(&state.parser, string, strlen(string));
-     json_message_parser_flush(&state.parser);
-     json_message_parser_destroy(&state.parser);
-diff --git a/tests/libqtest.c b/tests/libqtest.c
-index 0ec8af2923..6e5ddc2ffd 100644
---- a/tests/libqtest.c
-+++ b/tests/libqtest.c
-@@ -412,7 +412,8 @@ typedef struct {
-     QDict *response;
- } QMPResponseParser;
- 
--static void qmp_response(JSONMessageParser *parser, GQueue *tokens)
-+static void qmp_response(JSONMessageParser *parser, GQueue *tokens,
-+                         void *opaque)
- {
-     QMPResponseParser *qmp = container_of(parser, QMPResponseParser, parser);
-     QObject *obj;
-@@ -434,7 +435,7 @@ QDict *qmp_fd_receive(int fd)
-     bool log = getenv("QTEST_LOG") != NULL;
- 
-     qmp.response = NULL;
--    json_message_parser_init(&qmp.parser, qmp_response);
-+    json_message_parser_init(&qmp.parser, qmp_response, NULL);
-     while (!qmp.response) {
-         ssize_t len;
-         char c;
+     qobject_decref(ret);
 -- 
 2.13.6
