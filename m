@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59650)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60881)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eFFuB-0000x8-Av
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 03:52:16 -0500
+	(envelope-from <jasowang@redhat.com>) id 1eFFwi-0001z1-Pu
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 03:54:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eFFu9-0005z4-Qj
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 03:52:15 -0500
-References: <20171115213557.3548-1-eblake@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <d4ddb01f-dab0-9b5f-f2ec-78cbd975ffbe@virtuozzo.com>
-Date: Thu, 16 Nov 2017 11:52:00 +0300
+	(envelope-from <jasowang@redhat.com>) id 1eFFwf-0007uU-Mu
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 03:54:52 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56233)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1eFFwf-0007le-Ar
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 03:54:49 -0500
+References: <CACnE9pzALCNV62Jmo4SUawD=pQiPFENWR_BwK3=+yY7V1U54Ag@mail.gmail.com>
+	<cd39d029-48f9-20d6-cc19-ff87a45240ab@redhat.com>
+	<CACnE9pzm5zabq=nJhqB4LHzSXk2vDGiAN5SbJco3ZfGkfRbW-g@mail.gmail.com>
+	<5A0D27D8.6050506@huawei.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <2e0ddd76-3903-d715-9a86-73f1286322e7@redhat.com>
+Date: Thu, 16 Nov 2017 16:54:35 +0800
 MIME-Version: 1.0
-In-Reply-To: <20171115213557.3548-1-eblake@redhat.com>
+In-Reply-To: <5A0D27D8.6050506@huawei.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v2 for-2.11] nbd/server: Fix error
- reporting for bad requests
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Question] why need to start all queues in
+ vhost_net_start
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,130 +31,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
-
-16.11.2017 00:35, Eric Blake wrote:
-> The NBD spec says an attempt to NBD_CMD_TRIM on a read-only
-> export should fail with EPERM, as a trim has the potential
-> to change disk contents, but we were relying on the block
-> layer to catch that for us, which might not always give the
-> right error (and even if it does, it does not let us pass
-> back a sane message for structured replies).
->
-> The NBD spec says an attempt to NBD_CMD_WRITE_ZEROES out of
-> bounds should fail with ENOSPC, not EINVAL.
->
-> Our check for u64 offset + u32 length wraparound up front is
-> pointless; nothing uses offset until after the second round
-> of sanity checks, and we can just as easily ensure there is
-> no wraparound by checking whether offset is in bounds (since
-> a disk size cannot exceed off_t which is 63 bits, adding a
-> 32-bit number for a valid offset can't overflow).
-
-looks like here is another problem which you've fixed:
-with old code connection would be lost if this check fails in case of
-CMD_WRITE, as req->complete would be false.
-
->
-> Solve all of these issues by some code motion and improved
-> request validation.
->
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> ---
-> v2: actually commit the compiler-error fixes before submitting...
->
->   nbd/server.c | 36 ++++++++++++------------------------
->   1 file changed, 12 insertions(+), 24 deletions(-)
->
-> diff --git a/nbd/server.c b/nbd/server.c
-> index df771fd42f..7d6801b427 100644
-> --- a/nbd/server.c
-> +++ b/nbd/server.c
-> @@ -1366,15 +1366,6 @@ static int nbd_co_receive_request(NBDRequestData *req, NBDRequest *request,
->           return -EIO;
->       }
->
-> -    /* Check for sanity in the parameters, part 1.  Defer as many
-> -     * checks as possible until after reading any NBD_CMD_WRITE
-> -     * payload, so we can try and keep the connection alive.  */
-
-I don't understand the comment. Opposite: to keep connection alive we 
-must read the payload, even in case of sanity check fail.
-
-> -    if ((request->from + request->len) < request->from) {
-> -        error_setg(errp,
-> -                   "integer overflow detected, you're probably being attacked");
-> -        return -EINVAL;
-> -    }
-> -
->       if (request->type == NBD_CMD_READ || request->type == NBD_CMD_WRITE) {
->           if (request->len > NBD_MAX_BUFFER_SIZE) {
->               error_setg(errp, "len (%" PRIu32" ) is larger than max len (%u)",
-
-related idea here: if request->len > NBD_MAX_BUFFER_SIZE or if we failed 
-to allocate buffer in following if,
-we can call nbd_drop to read CMD_WRITE payload and set req->complete = 
-true;, to keep connection in this
-cases.
-
-However, it may be done later.
-
-> @@ -1399,12 +1390,21 @@ static int nbd_co_receive_request(NBDRequestData *req, NBDRequest *request,
->                                                         request->len);
->       }
->
-> -    /* Sanity checks, part 2. */
-> -    if (request->from + request->len > client->exp->size) {
-> +    /* Sanity checks. */
-> +    if (client->exp->nbdflags & NBD_FLAG_READ_ONLY &&
-> +        (request->type == NBD_CMD_WRITE ||
-> +         request->type == NBD_CMD_WRITE_ZEROES ||
-> +         request->type == NBD_CMD_TRIM)) {
-> +        error_setg(errp, "Export is read-only");
-> +        return -EROFS;
-> +    }
-> +    if (request->from > client->exp->size ||
-> +        request->from + request->len > client->exp->size) {
->           error_setg(errp, "operation past EOF; From: %" PRIu64 ", Len: %" PRIu32
->                      ", Size: %" PRIu64, request->from, request->len,
->                      (uint64_t)client->exp->size);
-> -        return request->type == NBD_CMD_WRITE ? -ENOSPC : -EINVAL;
-> +        return (request->type == NBD_CMD_WRITE ||
-> +                request->type == NBD_CMD_WRITE_ZEROES) ? -ENOSPC : -EINVAL;
->       }
->       valid_flags = NBD_CMD_FLAG_FUA;
->       if (request->type == NBD_CMD_READ && client->structured_reply) {
-> @@ -1482,12 +1482,6 @@ static coroutine_fn void nbd_trip(void *opaque)
->
->           break;
->       case NBD_CMD_WRITE:
-> -        if (exp->nbdflags & NBD_FLAG_READ_ONLY) {
-> -            error_setg(&local_err, "Export is read-only");
-> -            ret = -EROFS;
-> -            break;
-> -        }
-> -
->           flags = 0;
->           if (request.flags & NBD_CMD_FLAG_FUA) {
->               flags |= BDRV_REQ_FUA;
-> @@ -1500,12 +1494,6 @@ static coroutine_fn void nbd_trip(void *opaque)
->
->           break;
->       case NBD_CMD_WRITE_ZEROES:
-> -        if (exp->nbdflags & NBD_FLAG_READ_ONLY) {
-> -            error_setg(&local_err, "Export is read-only");
-> -            ret = -EROFS;
-> -            break;
-> -        }
-> -
->           flags = 0;
->           if (request.flags & NBD_CMD_FLAG_FUA) {
->               flags |= BDRV_REQ_FUA;
+To: "Longpeng (Mike)" <longpeng2@huawei.com>, mst@redhat.com
+Cc: "Longpeng(Mike)" <longpeng.mike@gmail.com>, qemu-devel@nongnu.org, arei.gonglei@huawei.com, king.wang@huawei.com, weidong.huang@huawei.com, stefanha@redhat.com
 
 
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
--- 
-Best regards,
-Vladimir
+On 2017=E5=B9=B411=E6=9C=8816=E6=97=A5 13:53, Longpeng (Mike) wrote:
+> On 2017/11/15 23:54, Longpeng(Mike) wrote:
+>> 2017-11-15 23:05 GMT+08:00 Jason Wang<jasowang@redhat.com>:
+>>> On 2017=E5=B9=B411=E6=9C=8815=E6=97=A5 22:55, Longpeng(Mike) wrote:
+>>>> Hi guys,
+>>>>
+>>>> We got a BUG report from our testers yesterday, the testing scenario=
+ was
+>>>> migrating a VM (Windows guest, *4 vcpus*, 4GB, vhost-user net: *7
+>>>> queues*).
+>>>>
+>>>> We found the cause reason, and we'll report the BUG or send a fix pa=
+tch
+>>>> to upstream if necessary( we haven't test the upstream yet, sorry...=
+ ).
+>>> Could you explain this a little bit more?
+>>>
+>>>> We want to know why the vhost_net_start() must start*total queues*  =
+( in
+>>>> our
+>>>> VM there're 7 queues ) but not*the queues that current used*  ( in o=
+ur VM,
+>>>> guest
+>>>> only uses the first 4 queues because it's limited by the number of v=
+cpus)
+>>>> ?
+>>>>
+>>>> Looking forward to your help, thx:)
+>>> Since the codes have been there for years and works well for kernel
+>>> datapath. You should really explain what's wrong.
+>>>
+>> OK.:)
+>>
+>> In our scenario,  the Windows's virtio-net driver only use the first 4
+>> queues and it
+>> *only set desc/avail/used table for the first 4 queues*, so in QEMU
+>> the desc/avail/
+>> used of the last 3 queues are ZERO,  but unfortunately...
+>> '''
+>> vhost_net_start
+>>    for (i =3D 0; i < total_queues; i++)
+>>      vhost_net_start_one
+>>        vhost_dev_start
+>>          vhost_virtqueue_start
+>> '''
+>> In vhost_virtqueue_start(), it will calculate the HVA of
+>> desc/avail/used table, so for last
+>> 3 queues, it will use ZERO as the GPA to calculate the HVA, and then
+>> send the results
+>> to the user-mode backend ( we use*vhost-user*  ) by vhost_virtqueue_se=
+t_addr().
+>>
+>> When the EVS get these address, it will update a*idx*  which will be
+>> treated as  vq's
+>> last_avail_idx when virtio-net stop ( pls see vhost_virtqueue_stop() )=
+.
+>>
+>> So we get the following result after virtio-net stop:
+>>    the desc/avail/used of the last 3 queues's vqs are all ZERO, but th=
+ese vqs's
+>>    last_avail_idx is NOT ZERO.
+>>
+>> At last, virtio_load() reports an error:
+>> '''
+>>    if (!vdev->vq[i].vring.desc && vdev->vq[i].last_avail_idx) { // <--
+>> will be TRUE
+>>        error_report("VQ %d address 0x0 "
+>>                           "inconsistent with Host index 0x%x",
+>>                           i, vdev->vq[i].last_avail_idx);
+>>              return -1;
+>>     }
+>> '''
+>>
+>> BTW, the problem won't appear if use Linux guest, because the Linux vi=
+rtio-net
+>> driver will set all 7 queues's desc/avail/used tables. And the problem
+>> won't appear
+>> if the VM use vhost-net, because vhost-net won't update*idx*  in SET_A=
+DDR ioctl.
+
+Just to make sure I understand here, I thought Windows guest + vhost_net=20
+hit this issue?
+
+Thanks
+
+>>
+>> Sorry for my pool English, Maybe I could describe the problem in Chine=
+se for you
+>> in private if necessary.
+>>
+>>
+>>> Thanks
+> -- Regards, Longpeng(Mike)
