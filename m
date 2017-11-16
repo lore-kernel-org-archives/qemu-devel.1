@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48428)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48386)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1eFNbe-00021P-QY
+	(envelope-from <david@redhat.com>) id 1eFNbc-0001zX-9a
 	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 12:05:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1eFNbe-00018K-0K
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 12:05:38 -0500
+	(envelope-from <david@redhat.com>) id 1eFNbb-00017U-GK
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 12:05:36 -0500
 From: David Hildenbrand <david@redhat.com>
-Date: Thu, 16 Nov 2017 18:05:26 +0100
-Message-Id: <20171116170526.12643-4-david@redhat.com>
+Date: Thu, 16 Nov 2017 18:05:25 +0100
+Message-Id: <20171116170526.12643-3-david@redhat.com>
 In-Reply-To: <20171116170526.12643-1-david@redhat.com>
 References: <20171116170526.12643-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v1 for-2.11 3/3] s390x/tcg: fix DIAG 308 with >
- 1 VCPU (MTTCG)
+Subject: [Qemu-devel] [PATCH v1 for-2.11 2/3] s390x/tcg: fix DIAG 308 with >
+ 1 VCPU (single threaded TCG)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,30 +23,55 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, David Hildenbrand <david@redhat.com>
 
-Currently, multi threaded TCG with > 1 VCPU gets stuck during IPL, when
+Currently, single threaded TCG with > 1 VCPU gets stuck during IPL, when
 the bios tries to switch to the loaded kernel via DIAG 308.
 
-As run_on_cpu() is used, we run into a deadlock after handling the reset.
-We need the iolock (just like KVM).
+pause_all_vcpus()/resume_all_vcpus() should not be called from a VCPU.
+
+And there is also no need for it. run_on_cpu() will make sure that the
+CPUs exit KVM/TCG, where they get stopped. Once stopped, they will no
+longer run.
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- target/s390x/misc_helper.c | 2 ++
- 1 file changed, 2 insertions(+)
+ target/s390x/diag.c | 4 ----
+ 1 file changed, 4 deletions(-)
 
-diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
-index 4afd90b969..d272851e1c 100644
---- a/target/s390x/misc_helper.c
-+++ b/target/s390x/misc_helper.c
-@@ -103,7 +103,9 @@ void HELPER(diag)(CPUS390XState *env, uint32_t r1, uint32_t r3, uint32_t num)
-         break;
-     case 0x308:
-         /* ipl */
-+        qemu_mutex_lock_iothread();
-         handle_diag_308(env, r1, r3);
-+        qemu_mutex_unlock_iothread();
-         r = 0;
-         break;
-     case 0x288:
+diff --git a/target/s390x/diag.c b/target/s390x/diag.c
+index dbbb9e886f..52bc348808 100644
+--- a/target/s390x/diag.c
++++ b/target/s390x/diag.c
+@@ -27,7 +27,6 @@ static int modified_clear_reset(S390CPU *cpu)
+     S390CPUClass *scc = S390_CPU_GET_CLASS(cpu);
+     CPUState *t;
+ 
+-    pause_all_vcpus();
+     cpu_synchronize_all_states();
+     CPU_FOREACH(t) {
+         run_on_cpu(t, s390_do_cpu_full_reset, RUN_ON_CPU_NULL);
+@@ -37,7 +36,6 @@ static int modified_clear_reset(S390CPU *cpu)
+     s390_crypto_reset();
+     scc->load_normal(CPU(cpu));
+     cpu_synchronize_all_post_reset();
+-    resume_all_vcpus();
+     return 0;
+ }
+ 
+@@ -53,7 +51,6 @@ static int load_normal_reset(S390CPU *cpu)
+     S390CPUClass *scc = S390_CPU_GET_CLASS(cpu);
+     CPUState *t;
+ 
+-    pause_all_vcpus();
+     cpu_synchronize_all_states();
+     CPU_FOREACH(t) {
+         run_on_cpu(t, s390_do_cpu_reset, RUN_ON_CPU_NULL);
+@@ -63,7 +60,6 @@ static int load_normal_reset(S390CPU *cpu)
+     scc->initial_cpu_reset(CPU(cpu));
+     scc->load_normal(CPU(cpu));
+     cpu_synchronize_all_post_reset();
+-    resume_all_vcpus();
+     return 0;
+ }
+ 
 -- 
 2.13.6
