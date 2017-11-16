@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34992)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36048)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1eFG1D-0004Ek-2O
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 03:59:32 -0500
+	(envelope-from <arei.gonglei@huawei.com>) id 1eFG3E-000500-MJ
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 04:01:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1eFG19-0000TE-VA
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 03:59:31 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52058)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1eFG19-0000K8-MO
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 03:59:27 -0500
-References: <20171106203520.7880-1-michael.nawrocki@gtri.gatech.edu>
-	<20171106203520.7880-3-michael.nawrocki@gtri.gatech.edu>
-	<ce62c001-2273-c850-88f8-592fc58766c9@weilnetz.de>
-	<7bb60d60-28d4-3c37-2740-fd16d7c6856a@gtri.gatech.edu>
-	<2e6d4835-e277-fd46-12bc-612c7e57a6f4@weilnetz.de>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <2462ccd8-176c-16d3-d995-7a90c0feea23@redhat.com>
-Date: Thu, 16 Nov 2017 16:59:15 +0800
+	(envelope-from <arei.gonglei@huawei.com>) id 1eFG3B-0001BH-IU
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 04:01:36 -0500
+Received: from szxga02-in.huawei.com ([45.249.212.188]:4435)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <arei.gonglei@huawei.com>) id 1eFG3A-0000CC-M1
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 04:01:33 -0500
+From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
+Date: Thu, 16 Nov 2017 09:01:12 +0000
+Message-ID: <33183CC9F5247A488A2544077AF19020DA46E2A6@DGGEMA505-MBS.china.huawei.com>
+References: <CACnE9pzALCNV62Jmo4SUawD=pQiPFENWR_BwK3=+yY7V1U54Ag@mail.gmail.com>
+	<cd39d029-48f9-20d6-cc19-ff87a45240ab@redhat.com>
+	<CACnE9pzm5zabq=nJhqB4LHzSXk2vDGiAN5SbJco3ZfGkfRbW-g@mail.gmail.com>
+	<5A0D27D8.6050506@huawei.com>
+	<2e0ddd76-3903-d715-9a86-73f1286322e7@redhat.com>
+In-Reply-To: <2e0ddd76-3903-d715-9a86-73f1286322e7@redhat.com>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <2e6d4835-e277-fd46-12bc-612c7e57a6f4@weilnetz.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] Add new PCI ID for i82559a
+Subject: Re: [Qemu-devel] [Question] why need to start all queues in
+ vhost_net_start
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,55 +32,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Weil <sw@weilnetz.de>, Michael Nawrocki <michael.nawrocki@gtri.gatech.edu>, qemu-devel@nongnu.org
-Cc: marcel@redhat.com, Peter Maydell <peter.maydell@linaro.org>, mst@redhat.com
+To: Jason Wang <jasowang@redhat.com>, longpeng <longpeng2@huawei.com>, "mst@redhat.com" <mst@redhat.com>
+Cc: "Longpeng(Mike)" <longpeng.mike@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Wangjing (King, Euler)" <king.wang@huawei.com>, "Huangweidong (C)" <weidong.huang@huawei.com>, "stefanha@redhat.com" <stefanha@redhat.com>
 
-
-
-On 2017=E5=B9=B411=E6=9C=8816=E6=97=A5 14:40, Stefan Weil wrote:
-> Am 15.11.2017 um 14:09 schrieb Michael Nawrocki:
->> Hi Stefan,
->>
->> I've got a VxWorks driver binary that explicitly looks for device ID
->> 0x1030 (which is admittedly not ideal). It seems like the "82559
->> InBusiness 10/100" hardware uses this, though I've had trouble finding
->> an official source. The following documents reference that ID:
->>
->> https://pci-ids.ucw.cz/read/PC/8086/1030
->> http://ks.pams.ncsu.edu/pub/ncsuscyld/i386/misc/src/trees/hdstg2/modul=
-es/pcitable
->>
->> https://cateee.net/lkddb/web-lkddb/E100.html
->>
->> And I found a similar post on a different mailing list that might shed
->> some light:
->> http://www.beowulf.org/pipermail/eepro100/2000-January/000760.html
->>
->> It looks like the 8255x series of devices have a number of potential
->> IDs; maybe a property to set a specific PCI device ID would work?
->>
->> Thanks,
->> Mike
-> Yes, that might be a very general solution which could be applied to al=
-l
-> PCI devices.
-> It could even be extended to include the vendor ID or any PCI
-> configuration value
-> as well.
->
-> Nevertheless the technically correct solution would be a full emulation
-> of the
-> EEPROM. Then we could provide an EEPROM for the 82559 InBusiness 10/100=
-",
-> and the data from that EEPROM would set the right PCI device ID.
->
-> Jason, until we get a better solution, the last commit should be
-> reverted before
-> the new QEMU version is made. That commit also added a wrong help text.
->
-> Regards
-> Stefan
-
-Let me post a patch soon.
-
-Thanks
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogSmFzb24gV2FuZyBbbWFp
+bHRvOmphc293YW5nQHJlZGhhdC5jb21dDQo+IFNlbnQ6IFRodXJzZGF5LCBOb3ZlbWJlciAxNiwg
+MjAxNyA0OjU1IFBNDQo+IFRvOiBsb25ncGVuZzsgbXN0QHJlZGhhdC5jb20NCj4gQ2M6IExvbmdw
+ZW5nKE1pa2UpOyBxZW11LWRldmVsQG5vbmdudS5vcmc7IEdvbmdsZWkgKEFyZWkpOyBXYW5namlu
+ZyAoS2luZywNCj4gRXVsZXIpOyBIdWFuZ3dlaWRvbmcgKEMpOyBzdGVmYW5oYUByZWRoYXQuY29t
+DQo+IFN1YmplY3Q6IFJlOiBbUXVlc3Rpb25dIHdoeSBuZWVkIHRvIHN0YXJ0IGFsbCBxdWV1ZXMg
+aW4gdmhvc3RfbmV0X3N0YXJ0DQo+IA0KPiANCj4gDQo+IE9uIDIwMTflubQxMeaciDE25pelIDEz
+OjUzLCBMb25ncGVuZyAoTWlrZSkgd3JvdGU6DQo+ID4gT24gMjAxNy8xMS8xNSAyMzo1NCwgTG9u
+Z3BlbmcoTWlrZSkgd3JvdGU6DQo+ID4+IDIwMTctMTEtMTUgMjM6MDUgR01UKzA4OjAwIEphc29u
+IFdhbmc8amFzb3dhbmdAcmVkaGF0LmNvbT46DQo+ID4+PiBPbiAyMDE35bm0MTHmnIgxNeaXpSAy
+Mjo1NSwgTG9uZ3BlbmcoTWlrZSkgd3JvdGU6DQo+ID4+Pj4gSGkgZ3V5cywNCj4gPj4+Pg0KPiA+
+Pj4+IFdlIGdvdCBhIEJVRyByZXBvcnQgZnJvbSBvdXIgdGVzdGVycyB5ZXN0ZXJkYXksIHRoZSB0
+ZXN0aW5nIHNjZW5hcmlvIHdhcw0KPiA+Pj4+IG1pZ3JhdGluZyBhIFZNIChXaW5kb3dzIGd1ZXN0
+LCAqNCB2Y3B1cyosIDRHQiwgdmhvc3QtdXNlciBuZXQ6ICo3DQo+ID4+Pj4gcXVldWVzKikuDQo+
+ID4+Pj4NCj4gPj4+PiBXZSBmb3VuZCB0aGUgY2F1c2UgcmVhc29uLCBhbmQgd2UnbGwgcmVwb3J0
+IHRoZSBCVUcgb3Igc2VuZCBhIGZpeCBwYXRjaA0KPiA+Pj4+IHRvIHVwc3RyZWFtIGlmIG5lY2Vz
+c2FyeSggd2UgaGF2ZW4ndCB0ZXN0IHRoZSB1cHN0cmVhbSB5ZXQsIHNvcnJ5Li4uICkuDQo+ID4+
+PiBDb3VsZCB5b3UgZXhwbGFpbiB0aGlzIGEgbGl0dGxlIGJpdCBtb3JlPw0KPiA+Pj4NCj4gPj4+
+PiBXZSB3YW50IHRvIGtub3cgd2h5IHRoZSB2aG9zdF9uZXRfc3RhcnQoKSBtdXN0IHN0YXJ0KnRv
+dGFsIHF1ZXVlcyoNCj4gKCBpbg0KPiA+Pj4+IG91cg0KPiA+Pj4+IFZNIHRoZXJlJ3JlIDcgcXVl
+dWVzICkgYnV0IG5vdCp0aGUgcXVldWVzIHRoYXQgY3VycmVudCB1c2VkKiAgKCBpbiBvdXINCj4g
+Vk0sDQo+ID4+Pj4gZ3Vlc3QNCj4gPj4+PiBvbmx5IHVzZXMgdGhlIGZpcnN0IDQgcXVldWVzIGJl
+Y2F1c2UgaXQncyBsaW1pdGVkIGJ5IHRoZSBudW1iZXIgb2YgdmNwdXMpDQo+ID4+Pj4gPw0KPiA+
+Pj4+DQo+ID4+Pj4gTG9va2luZyBmb3J3YXJkIHRvIHlvdXIgaGVscCwgdGh4OikNCj4gPj4+IFNp
+bmNlIHRoZSBjb2RlcyBoYXZlIGJlZW4gdGhlcmUgZm9yIHllYXJzIGFuZCB3b3JrcyB3ZWxsIGZv
+ciBrZXJuZWwNCj4gPj4+IGRhdGFwYXRoLiBZb3Ugc2hvdWxkIHJlYWxseSBleHBsYWluIHdoYXQn
+cyB3cm9uZy4NCj4gPj4+DQo+ID4+IE9LLjopDQo+ID4+DQo+ID4+IEluIG91ciBzY2VuYXJpbywg
+IHRoZSBXaW5kb3dzJ3MgdmlydGlvLW5ldCBkcml2ZXIgb25seSB1c2UgdGhlIGZpcnN0IDQNCj4g
+Pj4gcXVldWVzIGFuZCBpdA0KPiA+PiAqb25seSBzZXQgZGVzYy9hdmFpbC91c2VkIHRhYmxlIGZv
+ciB0aGUgZmlyc3QgNCBxdWV1ZXMqLCBzbyBpbiBRRU1VDQo+ID4+IHRoZSBkZXNjL2F2YWlsLw0K
+PiA+PiB1c2VkIG9mIHRoZSBsYXN0IDMgcXVldWVzIGFyZSBaRVJPLCAgYnV0IHVuZm9ydHVuYXRl
+bHkuLi4NCj4gPj4gJycnDQo+ID4+IHZob3N0X25ldF9zdGFydA0KPiA+PiAgICBmb3IgKGkgPSAw
+OyBpIDwgdG90YWxfcXVldWVzOyBpKyspDQo+ID4+ICAgICAgdmhvc3RfbmV0X3N0YXJ0X29uZQ0K
+PiA+PiAgICAgICAgdmhvc3RfZGV2X3N0YXJ0DQo+ID4+ICAgICAgICAgIHZob3N0X3ZpcnRxdWV1
+ZV9zdGFydA0KPiA+PiAnJycNCj4gPj4gSW4gdmhvc3RfdmlydHF1ZXVlX3N0YXJ0KCksIGl0IHdp
+bGwgY2FsY3VsYXRlIHRoZSBIVkEgb2YNCj4gPj4gZGVzYy9hdmFpbC91c2VkIHRhYmxlLCBzbyBm
+b3IgbGFzdA0KPiA+PiAzIHF1ZXVlcywgaXQgd2lsbCB1c2UgWkVSTyBhcyB0aGUgR1BBIHRvIGNh
+bGN1bGF0ZSB0aGUgSFZBLCBhbmQgdGhlbg0KPiA+PiBzZW5kIHRoZSByZXN1bHRzDQo+ID4+IHRv
+IHRoZSB1c2VyLW1vZGUgYmFja2VuZCAoIHdlIHVzZSp2aG9zdC11c2VyKiAgKSBieQ0KPiB2aG9z
+dF92aXJ0cXVldWVfc2V0X2FkZHIoKS4NCj4gPj4NCj4gPj4gV2hlbiB0aGUgRVZTIGdldCB0aGVz
+ZSBhZGRyZXNzLCBpdCB3aWxsIHVwZGF0ZSBhKmlkeCogIHdoaWNoIHdpbGwgYmUNCj4gPj4gdHJl
+YXRlZCBhcyAgdnEncw0KPiA+PiBsYXN0X2F2YWlsX2lkeCB3aGVuIHZpcnRpby1uZXQgc3RvcCAo
+IHBscyBzZWUgdmhvc3RfdmlydHF1ZXVlX3N0b3AoKSApLg0KPiA+Pg0KPiA+PiBTbyB3ZSBnZXQg
+dGhlIGZvbGxvd2luZyByZXN1bHQgYWZ0ZXIgdmlydGlvLW5ldCBzdG9wOg0KPiA+PiAgICB0aGUg
+ZGVzYy9hdmFpbC91c2VkIG9mIHRoZSBsYXN0IDMgcXVldWVzJ3MgdnFzIGFyZSBhbGwgWkVSTywg
+YnV0IHRoZXNlDQo+IHZxcydzDQo+ID4+ICAgIGxhc3RfYXZhaWxfaWR4IGlzIE5PVCBaRVJPLg0K
+PiA+Pg0KPiA+PiBBdCBsYXN0LCB2aXJ0aW9fbG9hZCgpIHJlcG9ydHMgYW4gZXJyb3I6DQo+ID4+
+ICcnJw0KPiA+PiAgICBpZiAoIXZkZXYtPnZxW2ldLnZyaW5nLmRlc2MgJiYgdmRldi0+dnFbaV0u
+bGFzdF9hdmFpbF9pZHgpIHsgLy8gPC0tDQo+ID4+IHdpbGwgYmUgVFJVRQ0KPiA+PiAgICAgICAg
+ZXJyb3JfcmVwb3J0KCJWUSAlZCBhZGRyZXNzIDB4MCAiDQo+ID4+ICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgImluY29uc2lzdGVudCB3aXRoIEhvc3QgaW5kZXggMHgleCIsDQo+ID4+ICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgaSwgdmRldi0+dnFbaV0ubGFzdF9hdmFpbF9pZHgpOw0KPiA+
+PiAgICAgICAgICAgICAgcmV0dXJuIC0xOw0KPiA+PiAgICAgfQ0KPiA+PiAnJycNCj4gPj4NCj4g
+Pj4gQlRXLCB0aGUgcHJvYmxlbSB3b24ndCBhcHBlYXIgaWYgdXNlIExpbnV4IGd1ZXN0LCBiZWNh
+dXNlIHRoZSBMaW51eA0KPiB2aXJ0aW8tbmV0DQo+ID4+IGRyaXZlciB3aWxsIHNldCBhbGwgNyBx
+dWV1ZXMncyBkZXNjL2F2YWlsL3VzZWQgdGFibGVzLiBBbmQgdGhlIHByb2JsZW0NCj4gPj4gd29u
+J3QgYXBwZWFyDQo+ID4+IGlmIHRoZSBWTSB1c2Ugdmhvc3QtbmV0LCBiZWNhdXNlIHZob3N0LW5l
+dCB3b24ndCB1cGRhdGUqaWR4KiAgaW4NCj4gU0VUX0FERFIgaW9jdGwuDQo+IA0KPiBKdXN0IHRv
+IG1ha2Ugc3VyZSBJIHVuZGVyc3RhbmQgaGVyZSwgSSB0aG91Z2h0IFdpbmRvd3MgZ3Vlc3QgKyB2
+aG9zdF9uZXQNCj4gaGl0IHRoaXMgaXNzdWU/DQo+IA0KTm8sIFdpbmRvd3MgZ3Vlc3QgKyB2aG9z
+dC11c2VyL0RQREsuDQoNCkJUVyBwbHMgc2VlIHZpcnRpbyBzcGVjIGluIDoNCg0KIklmIFZJUlRJ
+T19ORVRfRl9NUSBpcyBuZWdvdGlhdGVkLCBlYWNoIG9mIHJlY2VpdmVxMS4gLiAucmVjZWl2ZXFO
+IHRoYXQgd2lsbCBiZSB1c2VkIFNIT1VMRCBiZSBwb3B1bGF0ZWQNCndpdGggcmVjZWl2ZSBidWZm
+ZXJzLiINCg0KSXQgaXMgbm90IG1hbmRhdG9yeSB0aGF0IGFsbCBxdWV1ZXMgbXVzdCBiZSBpbml0
+aWFsaXplZC4NCg0KVGhhbmtzLA0KLUdvbmdsZWkNCg0K
