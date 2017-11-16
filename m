@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59433)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33941)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lichunguang@hust.edu.cn>) id 1eFAR0-0007s3-AK
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 22:01:47 -0500
+	(envelope-from <eswierk@skyportsystems.com>) id 1eFAWW-0000gu-MO
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 22:07:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lichunguang@hust.edu.cn>) id 1eFAQv-0005Up-L2
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 22:01:46 -0500
-Received: from mail.hust.edu.cn ([202.114.0.240]:31063 helo=hust.edu.cn)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lichunguang@hust.edu.cn>) id 1eFAQu-0005Fi-8s
-	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 22:01:41 -0500
-Date: Thu, 16 Nov 2017 11:01:27 +0800 (GMT+08:00)
-From: "Chunguang Li" <lichunguang@hust.edu.cn>
-In-Reply-To: <20171115142352.GB2212@work-vm>
-References: <6e0e65ef.427f.15faf8d41e9.Coremail.lichunguang@hust.edu.cn>
-	<20171115101137.GA2212@work-vm>
-	<2b8e8e.74dc.15fbfea1827.Coremail.lichunguang@hust.edu.cn>
-	<20171115142352.GB2212@work-vm>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
-MIME-Version: 1.0
-Message-ID: <1c5315bf.7bb2.15fc2c627ea.Coremail.lichunguang@hust.edu.cn>
-Subject: Re: [Qemu-devel] Abnormal observation during migration: too many
- "write-not-dirty" pages
+	(envelope-from <eswierk@skyportsystems.com>) id 1eFAWR-0005kK-EE
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 22:07:28 -0500
+Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:53926)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <eswierk@skyportsystems.com>)
+	id 1eFAWR-0005j6-89
+	for qemu-devel@nongnu.org; Wed, 15 Nov 2017 22:07:23 -0500
+Received: by mail-pg0-x244.google.com with SMTP id r12so2775747pgu.10
+	for <qemu-devel@nongnu.org>; Wed, 15 Nov 2017 19:07:22 -0800 (PST)
+From: Ed Swierk <eswierk@skyportsystems.com>
+Date: Wed, 15 Nov 2017 19:07:13 -0800
+Message-Id: <1510801633-115970-1-git-send-email-eswierk@skyportsystems.com>
+Subject: [Qemu-devel] [PATCH v3] net: Transmit zero UDP checksum as 0xFFFF
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,139 +24,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "dr. david alan gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, quintela@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, stefanha@redhat.com
+To: Jason Wang <jasowang@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Dmitry Fleytman <dmitry@daynix.com>
+Cc: qemu-devel@nongnu.org, Ed Swierk <eswierk@skyportsystems.com>
 
-CgoKPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2VzLS0tLS0KPiBGcm9tOiAiRHIuIERhdmlkIEFsYW4g
-R2lsYmVydCIgPGRnaWxiZXJ0QHJlZGhhdC5jb20+Cj4gU2VudCBUaW1lOiAyMDE3LTExLTE1IDIy
-OjIzOjUyIChXZWRuZXNkYXkpCj4gVG86ICJDaHVuZ3VhbmcgTGkiIDxsaWNodW5ndWFuZ0BodXN0
-LmVkdS5jbj4KPiBDYzogcWVtdS1kZXZlbEBub25nbnUub3JnLCBxdWludGVsYUByZWRoYXQuY29t
-LCBhbWl0LnNoYWhAcmVkaGF0LmNvbSwgcGJvbnppbmlAcmVkaGF0LmNvbSwgc3RlZmFuaGFAcmVk
-aGF0LmNvbQo+IFN1YmplY3Q6IFJlOiBbUWVtdS1kZXZlbF0gQWJub3JtYWwgb2JzZXJ2YXRpb24g
-ZHVyaW5nIG1pZ3JhdGlvbjogdG9vIG1hbnkgIndyaXRlLW5vdC1kaXJ0eSIgcGFnZXMKPiAKPiAq
-IENodW5ndWFuZyBMaSAobGljaHVuZ3VhbmdAaHVzdC5lZHUuY24pIHdyb3RlOgo+ID4gCj4gPiAK
-PiA+IAo+ID4gPiAtLS0tLeWOn+Wni+mCruS7ti0tLS0tCj4gPiA+IOWPkeS7tuS6ujogIkRyLiBE
-YXZpZCBBbGFuIEdpbGJlcnQiIDxkZ2lsYmVydEByZWRoYXQuY29tPgo+ID4gPiDlj5HpgIHml7bp
-l7Q6IDIwMTctMTEtMTUgMTg6MTE6MzcgKOaYn+acn+S4iSkKPiA+ID4g5pS25Lu25Lq6OiAiQ2h1
-bmd1YW5nIExpIiA8bGljaHVuZ3VhbmdAaHVzdC5lZHUuY24+Cj4gPiA+IOaKhOmAgTogcWVtdS1k
-ZXZlbEBub25nbnUub3JnLCBxdWludGVsYUByZWRoYXQuY29tLCBhbWl0LnNoYWhAcmVkaGF0LmNv
-bSwgcGJvbnppbmlAcmVkaGF0LmNvbSwgc3RlZmFuaGFAcmVkaGF0LmNvbQo+ID4gPiDkuLvpopg6
-IFJlOiBbUWVtdS1kZXZlbF0gQWJub3JtYWwgb2JzZXJ2YXRpb24gZHVyaW5nIG1pZ3JhdGlvbjog
-dG9vIG1hbnkgIndyaXRlLW5vdC1kaXJ0eSIgcGFnZXMKPiA+ID4gCj4gPiA+ICogQ2h1bmd1YW5n
-IExpIChsaWNodW5ndWFuZ0BodXN0LmVkdS5jbikgd3JvdGU6Cj4gPiA+ID4gSGkgYWxsIQo+ID4g
-PiA+IAo+ID4gPiA+IEkgZ290IGEgdmVyeSBhYm5vcm1hbCBvYnNlcnZhdGlvbiBmb3IgdGhlIFZN
-IG1pZ3JhdGlvbi4gSSBmb3VuZCB0aGF0IG1hbnkgcGFnZXMgbWFya2VkIGFzIGRpcnR5IGR1cmlu
-ZyBtaWdyYXRpb24gYXJlICJub3QgcmVhbGx5IGRpcnR5Iiwgd2hpY2ggaXMsIHRoZWlyIGNvbnRl
-bnQgYXJlIHRoZSBzYW1lIGFzIHRoZSBvbGQgdmVyc2lvbi4KPiA+ID4gPiAKPiA+ID4gPiAKPiA+
-ID4gPiAKPiA+ID4gPiAKPiA+ID4gPiBJIGRpZCB0aGUgbWlncmF0aW9uIGV4cGVyaW1lbnQgbGlr
-ZSB0aGlzOgo+ID4gPiA+IAo+ID4gPiA+IER1cmluZyB0aGUgc2V0dXAgcGhhc2Ugb2YgbWlncmF0
-aW9uLCBmaXJzdCBJIHN1c3BlbmRlZCB0aGUgVk0uIFRoZW4gSSBjb3BpZWQgYWxsIHRoZSBwYWdl
-cyB3aXRoaW4gdGhlIGd1ZXN0IHBoeXNpY2FsIGFkZHJlc3Mgc3BhY2UgdG8gYSBtZW1vcnkgYnVm
-ZmVyIGFzIGxhcmdlIGFzIHRoZSBndWVzdCBtZW1vcnkgc2l6ZS4gQWZ0ZXIgdGhhdCwgdGhlIGRp
-cnR5IHRyYWNraW5nIGJlZ2FuIGFuZCBJIHJlc3VtZWQgdGhlIFZNLiBCZXNpZGVzLCBhdCB0aGUg
-ZW5kCj4gPiA+ID4gb2YgZWFjaCBpdGVyYXRpb24sIEkgYWxzbyBzdXNwZW5kZWQgdGhlIFZNIHRl
-bXBvcmFyaWx5LiBEdXJpbmcgdGhlIHN1c3BlbnNpb24sIEkgY29tcGFyZWQgdGhlIGNvbnRlbnQg
-b2YgYWxsIHRoZSBwYWdlcyBtYXJrZWQgYXMgZGlydHkgaW4gdGhpcyBpdGVyYXRpb24gYnl0ZS1i
-eS1ieXRlIHdpdGggdGhlaXIgZm9ybWVyIGNvcGllcyBpbnNpZGUgdGhlIGJ1ZmZlci4gSWYgdGhl
-IGNvbnRlbnQgb2Ygb25lIHBhZ2Ugd2FzIHRoZSBzYW1lIGFzIGl0cyBmb3JtZXIgY29weSwgSSBy
-ZWNvcmRlZCBpdCBhcyBhICJ3cml0ZS1ub3QtZGlydHkiIHBhZ2UgKHRoZSBwYWdlIGlzIHdyaXR0
-ZW4gZXhhY3RseSB3aXRoIHRoZSBzYW1lIGNvbnRlbnQgYXMgdGhlIG9sZCB2ZXJzaW9uKS4gT3Ro
-ZXJ3aXNlLCBJIHJlcGxhY2VkIHRoaXMgcGFnZSBpbiB0aGUgYnVmZmVyIHdpdGggdGhlIG5ldyBj
-b250ZW50LCBmb3IgdGhlIHBvc3NpYmxlIGNvbXBhcmlzb24gaW4gdGhlIGZ1dHVyZS4gQWZ0ZXIg
-dGhlIHJlc2V0IG9mIHRoZSBkaXJ0eSBiaXRtYXAsIEkgcmVzdW1lZCB0aGUgVk0uIFRodXMsIEkg
-b2J0YWluIHRoZSBwcm9wb3J0aW9uIG9mIHRoZSB3cml0ZS1ub3QtZGlydHkgcGFnZXMgd2l0aGlu
-IGFsbCB0aGUgcGFnZXMgbWFya2VkIGFzIGRpcnR5IGZvciBlYWNoIHByZS1jb3B5IGl0ZXJhdGlv
-bi4KPiA+ID4gPiAKPiA+ID4gPiBJIHJlcGVhdGVkIHRoaXMgZXhwZXJpbWVudCB3aXRoIDE1IHdv
-cmtsb2Fkcywgd2hpY2ggYXJlIDExIENQVTIwMDYgYmVuY2htYXJrcywgTWVtY2FjaGVkIHNlcnZl
-ciwga2VybmVsIGNvbXBpbGF0aW9uLCBwbGF5aW5nIGEgdmlkZW8sIGFuZCBhbiBpZGxlIFZNLiBU
-aGUgQ1BVMjAwNiBiZW5jaG1hcmtzIGFuZCBNZW1jYWNoZWQgYXJlIHdyaXRlLWludGVuc2l2ZSB3
-b3JrbG9hZHMuIFNvIGFsbW9zdCBhbGwgb2YgdGhlbSBkaWQgbm90IGNvbnZlcmdlIHRvIHN0b3At
-Y29weS4KPiA+ID4gPiAKPiA+ID4gPiAKPiA+ID4gPiAKPiA+ID4gPiAKPiA+ID4gPiBTdGFydGxp
-bmdseSwgdGhlIHByb3BvcnRpb25zIG9mIHRoZSB3cml0ZS1ub3QtZGlydHkgcGFnZXMgYXJlIHF1
-aXRlIGhpZ2guIE1lbWNhY2hlZCBhbmQgdGhyZWUgQ1BVMjAwNiBiZW5jaG1hcmtzKHpldXNtcCwg
-bWNmIGFuZCBiemlwMikgaGF2ZSB0aGUgbW9zdCBoaWdoIHByb3BvcnRpb25zLiBUaGVpciBwcm9w
-b3J0aW9ucyBvZiB0aGUgd3JpdGUtbm90LWRpcnR5IHBhZ2VzIHdpdGhpbiBhbGwgdGhlIGRpcnR5
-IHBhZ2VzIGFyZSBhcyBoaWdoIGFzIDQ1JS04MCUuIFRoZSBwcm9wb3J0aW9ucyBvZiB0aGUgb3Ro
-ZXIgd29ya2xvYWRzIGFyZSBhYm91dCA1JS0yMCUsIHdoaWNoIGFyZSBhbHNvIGFibm9ybWFsLiBB
-Y2NvcmRpbmcgdG8gbXkgaW50dWl0aW9uLCB0aGUgcHJvcG9ydGlvbiBvZiB3cml0ZS1ub3QtZGly
-dHkgcGFnZXMgc2hvdWxkIGJlIGZhciBsZXNzIHRoYW4gdGhlc2UgbnVtYmVycy4gSSB0aGluayBp
-dCBzaG91bGQgYmUgcXVpdGUgYSBwYXJ0aWN1bGFyIGNhc2UgdGhhdCBvbmUgcGFnZSBpcyB3cml0
-dGVuIHdpdGggZXhhY3RseSB0aGUgc2FtZSBjb250ZW50IGFzIHRoZSBmb3JtZXIgZGF0YS4KPiA+
-ID4gPiAKPiA+ID4gPiBCZXNpZGVzLCB0aGUgemVybyBwYWdlcyBhcmUgbm90IGNvdW50ZWQgZm9y
-IGFsbCB0aGUgcmVzdWx0cy4gQmVjYXVzZSBJIHRoaW5rIGNvZGVzIGxpa2UgbWVtc2V0KCkgbWF5
-IHdyaXRlIGxhcmdlIGFyZWEgb2YgcGFnZXMgdG8gemVybyBwYWdlcywgd2hpY2ggYXJlIGFscmVh
-ZHkgemVybyBwYWdlcyBiZWZvcmUuCj4gPiA+ID4gCj4gPiA+ID4gCj4gPiA+ID4gCj4gPiA+ID4g
-Cj4gPiA+ID4gSSBleGNsdWRlZCBzb21lIHBvc3NpYmxlIHVua25vd24gcmVhc29ucyB3aXRoIHRo
-ZSBtYWNoaW5lIGhhcmR3YXJlLCBiZWNhdXNlIEkgcmVwZWF0ZWQgdGhlIGV4cGVyaW1lbnRzIHdp
-dGggdHdvIHNldHMgb2YgZGlmZmVyZW50IG1hY2hpbmVzLiBUaGVuIEkgZ3Vlc3NlZCBpdCBtaWdo
-dCBiZSByZWxhdGVkIHdpdGggdGhlIGh1Z2UgcGFnZSBmZWF0dXJlLiBIb3dldmVyLCB0aGUgcmVz
-dWx0IHdhcyB0aGUgc2FtZSB3aGVuIEkgdHVybmVkIHRoZSBodWdlIHBhZ2UgZmVhdHVyZSBvZmYg
-aW4gdGhlIE9TLgo+ID4gPiA+IAo+ID4gPiA+IAo+ID4gPiA+IAo+ID4gPiA+IAo+ID4gPiA+IE5v
-dyB0aGVyZSBhcmUgb25seSB0d28gcG9zc2libGUgcmVhc29ucyBpbiBteSBvcGluaW9uLiAKPiA+
-ID4gPiAKPiA+ID4gPiBGaXJzdCwgdGhlcmUgaXMgc29tZSBidWdzIGluIHRoZSBLVk0ga2VybmVs
-IGRpcnR5IHRyYWNraW5nIG1lY2hhbmlzbS4gSXQgbWF5IG1hcmsgc29tZSBwYWdlcyB0aGF0IGRv
-IG5vdCByZWNlaXZlIHdyaXRlIHJlcXVlc3QgYXMgZGlydHkuCj4gPiA+ID4gCj4gPiA+ID4gU2Vj
-b25kLCB0aGVyZSBpcyBzb21lIGJ1Z3MgaW4gdGhlIE9TIHJ1bm5pbmcgaW5zaWRlIHRoZSBWTS4g
-SXQgbWF5IGlzc3VlIHNvbWUgdW5uZWNlc3Nhcnkgd3JpdGUgcmVxdWVzdHMuCj4gPiA+ID4gCj4g
-PiA+ID4gCj4gPiA+ID4gV2hhdCBkbyB5b3UgdGhpbmsgYWJvdXQgdGhpcyBhYm5vcm1hbCBwaGVu
-b21lbm9uPyBBbnkgYWR2aWNlIG9yIHBvc3NpYmxlIHJlYXNvbnMgb3IgZXZlbiBndWVzc2VzPyBJ
-IGFwcHJlY2lhdGUgYW55IHJlc3BvbnNlcywgYmVjYXVzZSBpdCBoYXMgY29uZnVzZWQgbWUgZm9y
-IGEgbG9uZyB0aW1lLiBUaGFuayB5b3UuCj4gPiA+IAo+ID4gPiBXYXNuJ3QgaXQgeW91IHdobyBw
-b2ludGVkIG91dCBsYXN0IHllYXIgdGhlIG90aGVyIHBvc3NpYmlsaXR5PyAtIFRoZQo+ID4gPiBw
-cm9ibGVtIG9mIGZhbHNlIHBvc2l0aXZlcyBkdWUgdG8gc3luYydpbmcgdGhlIHdob2xlIG9mIG1l
-bW9yeSBhbmQgdGhlbgo+ID4gPiB3cml0aW5nIHRoZSBkYXRhIG91dCwgYnV0IHNvbWUgb2YgdGhl
-IGRpcnR5IHBhZ2VzIHdlcmUgYWxyZWFkeSB3cml0dGVuPwo+ID4gPiAKPiA+ID4gRGF2ZQo+ID4g
-Cj4gPiBZZXMsIHlvdSByZW1lbWJlciB0aGF0IQo+IAo+IFllcywgSSByZW1lbWJlciB0aGF0LCBh
-bmQgbXkgVE9ETyBsaXN0IHRvbGQgbWUgaXQgd2FzIHlvdSA6LSkKPiAKPiA+IEl0IHdhcyBtZS4g
-QWZ0ZXIgdGhhdCwgSSBkaWQgbW9yZSBhbmFseXNpcyBhbmQgZXhwZXJpbWVudHMuIEkgZm91bmQg
-dGhhdCwgaW4gZmFjdCwgYm90aCByZWFzb25zIGNvbnRyaWJ1dGUgdG8gdGhlICJmYWtlIGRpcnR5
-IiBwYWdlcyAoZGlydHkgcGFnZXMgdGhhdCBkbyBub3QgbmVlZCB0byBiZSByZXNlbnQsIGJlY2F1
-c2UgdGhlaXIgY29udGVudHMgYXJlIHRoZSBzYW1lIGFzIHRoYXQgaW4gdGhlIHRhcmdldCBub2Rl
-KS4gT25lIGlzIHdoYXQgSSBwb2ludGVkIG91dCBsYXN0IHllYXIsIHdoaWNoIHlvdSBoYXZlIG1l
-bnRpb25lZC4gVGhlIG90aGVyIHJlYXNvbiBpcyB3aGF0IEkgYW0gdGFsa2luZyBhYm91dCBub3cs
-IHRoZSAid3JpdGUtbm90LWRpcnR5IiBwaGVub21lbm9uLgo+ID4gSW4gZmFjdCwgYWNjb3JkaW5n
-IHRvIG15IGV4cGVyaW1lbnRzIHJlc3VsdHMsIHRoZSAid2lydGUtbm90LWRpcnR5IiBpcyB0aGUg
-bWFpbiByZWFzb24gcmVzdWx0aW5nIHRvIHRoZSAiZmFrZSBkaXJ0eSIgcGFnZXMsIHdoaWxlIHN5
-bmMnaW5nIHRoZSB3aG9sZSBvZiBtZW1vcnkgY29udHJpYnV0ZXMgbGVzcy4KPiAKPiBIb3cgZG8g
-eW91IGRpZmZlcmVudGlhdGUgYmV0d2VlbiAiZmFrZSBkaXJ0eScgYW5kIHRoZSBzeW5jaW5nPwoK
-SSByZWNvcmQgdGhlIGZvbGxvd2luZyB0d28ga2luZHMgb2YgcHJvcG9ydGlvbnM6CigxKTogVGhl
-IHByb3BvcnRpb24gb2YgIndyaXRlLW5vdC1kaXJ0eSIgcGFnZXMuIFRoaXMgaXMgZG9uZSBieSB0
-aGUgbWV0aG9kIEkgaGF2ZSBkZXNjcmliZWQuIEkgY29waWVkIHRoZSB3aG9sZSBWTSBtZW1vcnkg
-aW4gbWlncmF0aW9uIHNldHVwLCBhbmQgYXQgdGhlIGVuZCBvZiB0aGUgZmlyc3QgaXRlcmF0aW9u
-LCBjb21wYXJlZCB0aGUgcGFnZXMgbWFya2VkIGFzIGRpcnR5IHRvIHRoZWlyIGNvcGllcyBpbiB0
-aGUgYnVmZmVyLiBUaHVzIEkgZ290IHRoZSBwcm9wb3J0aW9uIG9mICJ3cml0ZS1ub3QtZGlydHki
-IHBhZ2VzIGZvciB0aGUgZmlyc3QgaXRlcmF0aW9uLgoKKDIpOiBCZXNpZGVzLCBJIGFsc28gZ290
-IHRoZSBmb2xsb3dpbmcgcHJvcG9ydGlvbiwgd2hpY2ggaXMgdGhlICJmYWtlIGRpcnR5Ii4gSW4g
-dGhlIGZpcnN0IGl0ZXJhdGlvbiwgd2hlbiBlYWNoIHBhZ2Ugd2FzIHNlbnQgdG8gdGhlIHRhcmdl
-dCwgSSBjb3BpZWQgaXQgdG8gYSBidWZmZXIuIE5vdGUgdGhhdCwgdGhlIGNvbnRlbnRzIG9mIHRo
-ZXNlIHBhZ2VzIGluIHRoZSBidWZmZXIgbWF5IGJlIGRpZmZlcmVudCBmcm9tIHRoYXQgaW4gKDEp
-LiBCdWZmZXIgaW4gKDEpIHJlY29yZHMgdGhlIHBhZ2VzIGNvbnRlbnQgYmVmb3JlIG1pZ3JhdGlv
-biwgYW5kIGJ1ZmZlciBpbiAoMikgcmVjb3JkcyB0aGUgY29udGVudCBzZW50IHRvIHRhcmdldC4g
-VGhlbiBkdXJpbmcgdGhlIHNlY29uZCBpdGVyYXRpb24sIHdoZW4gZWFjaCBkaXJ0eSBwYWdlcyB3
-YXMgc2VudCB0byB0YXJnZXQsIEkgY29tcGFyZWQgaXQgd2l0aCBpdHMgY29weSBpbiBidWZmZXIu
-IFRodXMgSSBnb3QgdGhlIHByb3BvcnRpb24gb2YgImZha2UgZGlydHkiIHBhZ2VzIHNlbnQgaW4g
-dGhlIHNlY29uZCBpdGVyYXRpb24uCgpUaGUgbnVtYmVyIG9mICgyKSBpcyBiaWdnZXIgdGhhbiAo
-MSkuIEkgYXR0cmlidXRlIHRoaXMgcGFydCB0byB0aGUgc3luY2luZy4KCj4gCj4gVGhlIGNhc2Vz
-IHdoZXJlIHZhbHVlcyBjaGFuZ2UgYmFjayB0byB3aGF0IHRoZXkgdXNlZCB0byBiZSBzZWVtCj4g
-dGhlIG1vc3QgbGlrZWx5IHRvIG1lIChlLmcuIGxvY2tzL2NvdW50cyB0aGF0IGRlY3JlbWVudCBi
-YWNrKSAtIGJ1dAo+IHRoYXQgc2VlbXMgYSBoaWdoICUuCj4gSSB3b25kZXIgaWYgdGhlcmUncyBh
-bnkgZGlmZmVyZW5jZSBiZXR3ZWVuIHBhZ2Ugd3JpdGUgcHJvdGVjdGlvbgo+IGJhc2VkIGRpcnR5
-aW5nIGFuZCBQTUwgKHRoYXQgSSB0aGluayBjYW4gYmUgdXNlZCBvbiBzb21lIG5ld2VyIGNoaXBz
-KS4KCkkgdGhpbmsgUE1MIG1heSBvbmx5IHJlZHVjZSB0aGUgb3ZlcmhlYWQgZm9yIHRyYWNpbmcg
-ZGlydHksIGJ1dCB3aGljaCBwYWdlcyBhcmUgbWFya2VkIGFzIGRpcnR5IHNob3VsZCBiZSB0aGUg
-c2FtZSBhcyBwYWdlIHdyaXRlIHByb3RlY3Rpb24uIEhvd2V2ZXIsIEkgYW0gbm90IHN1cmUgZm9y
-IHRoaXMuCgpDaHVuZ3VhbmcKCj4gCj4gT25lIHdheSB0byBkZWJ1ZyBpdCBJIGd1ZXNzIHdvdWxk
-IGJlIHRvIGtlZXAgdGhlIHdyaXRlIHByb3RlY3Rpb24KPiBhbmQgd2F0Y2ggdGhlIHByb2dyZXNz
-aW9uIG9mIGRhdGEgdmFsdWVzIHdpdGhpbiBhIHBhZ2UgLSBkbyB0aGV5Cj4gYWN0dWFsbHkgY2hh
-bmdlIGFuZCB0aGVuIGNoYW5nZSBiYWNrIG9yIGRvIHRoZSB2YWx1ZXMgbmV2ZXIKPiByZWFsbHkg
-Y2hhbmdlLgo+IAo+IERhdmUKPiAKPiAKPiA+IENodW5ndWFuZwo+ID4gPiAKPiA+ID4gPiAKPiA+
-ID4gPiAtLQo+ID4gPiA+IENodW5ndWFuZyBMaSwgUGguRC4gQ2FuZGlkYXRlCj4gPiA+ID4gV3Vo
-YW4gTmF0aW9uYWwgTGFib3JhdG9yeSBmb3IgT3B0b2VsZWN0cm9uaWNzIChXTkxPKQo+ID4gPiA+
-IEh1YXpob25nIFVuaXZlcnNpdHkgb2YgU2NpZW5jZSAmIFRlY2hub2xvZ3kgKEhVU1QpCj4gPiA+
-ID4gV3VoYW4sIEh1YmVpIFByb3YuLCBDaGluYQo+ID4gPiA+IAo+ID4gPiAtLQo+ID4gPiBEci4g
-RGF2aWQgQWxhbiBHaWxiZXJ0IC8gZGdpbGJlcnRAcmVkaGF0LmNvbSAvIE1hbmNoZXN0ZXIsIFVL
-Cj4gPiAKPiA+IAo+ID4gCj4gLS0KPiBEci4gRGF2aWQgQWxhbiBHaWxiZXJ0IC8gZGdpbGJlcnRA
-cmVkaGF0LmNvbSAvIE1hbmNoZXN0ZXIsIFVLCgoKLS0KQ2h1bmd1YW5nIExpLCBQaC5ELiBDYW5k
-aWRhdGUKV3VoYW4gTmF0aW9uYWwgTGFib3JhdG9yeSBmb3IgT3B0b2VsZWN0cm9uaWNzIChXTkxP
-KQpIdWF6aG9uZyBVbml2ZXJzaXR5IG9mIFNjaWVuY2UgJiBUZWNobm9sb2d5IChIVVNUKQpXdWhh
-biwgSHViZWkgUHJvdi4sIENoaW5hCgoK
+The checksum algorithm used by IPv4, TCP and UDP allows a zero value
+to be represented by either 0x0000 and 0xFFFF. But per RFC 768, a zero
+UDP checksum must be transmitted as 0xFFFF, as 0x0000 is a special
+value meaning no checksum.
+
+Substitute 0xFFFF whenever a checksum is computed as zero when
+modifying a UDP datagram header. Doing this on IPv4 packets and TCP
+segments is unnecessary but legal. Add a wrapper for
+net_checksum_finish() that makes the substitution.
+
+(We can't just change net_checksum_finish(), as that function is also
+used by receivers to verify checksums, and in that case the expected
+value is always 0x0000.)
+
+v3:
+
+Leave net_tx_pkt_update_ip_checksums() alone since it's only computing
+a partial sum of the IP pseudo-header.
+
+Rename wrapper to net_checksum_finish_nozero() for clarity.
+
+v2:
+
+Add a wrapper net_checksum_finish_hdr() rather than duplicating the
+logic at every caller.
+
+Signed-off-by: Ed Swierk <eswierk@skyportsystems.com>
+---
+ hw/net/e1000.c         | 2 +-
+ hw/net/net_rx_pkt.c    | 2 +-
+ hw/net/net_tx_pkt.c    | 2 +-
+ hw/net/vmxnet3.c       | 3 ++-
+ include/net/checksum.h | 6 ++++++
+ 5 files changed, 11 insertions(+), 4 deletions(-)
+
+diff --git a/hw/net/e1000.c b/hw/net/e1000.c
+index 72a92be..804ec08 100644
+--- a/hw/net/e1000.c
++++ b/hw/net/e1000.c
+@@ -506,7 +506,7 @@ putsum(uint8_t *data, uint32_t n, uint32_t sloc, uint32_t css, uint32_t cse)
+         n = cse + 1;
+     if (sloc < n-1) {
+         sum = net_checksum_add(n-css, data+css);
+-        stw_be_p(data + sloc, net_checksum_finish(sum));
++        stw_be_p(data + sloc, net_checksum_finish_nozero(sum));
+     }
+ }
+ 
+diff --git a/hw/net/net_rx_pkt.c b/hw/net/net_rx_pkt.c
+index cef1c2e..98a5030 100644
+--- a/hw/net/net_rx_pkt.c
++++ b/hw/net/net_rx_pkt.c
+@@ -518,7 +518,7 @@ _net_rx_pkt_calc_l4_csum(struct NetRxPkt *pkt)
+     cntr += net_checksum_add_iov(pkt->vec, pkt->vec_len,
+                                  pkt->l4hdr_off, csl, cso);
+ 
+-    csum = net_checksum_finish(cntr);
++    csum = net_checksum_finish_nozero(cntr);
+ 
+     trace_net_rx_pkt_l4_csum_calc_csum(pkt->l4hdr_off, csl, cntr, csum);
+ 
+diff --git a/hw/net/net_tx_pkt.c b/hw/net/net_tx_pkt.c
+index 20b2549..e29c881 100644
+--- a/hw/net/net_tx_pkt.c
++++ b/hw/net/net_tx_pkt.c
+@@ -486,7 +486,7 @@ static void net_tx_pkt_do_sw_csum(struct NetTxPkt *pkt)
+         net_checksum_add_iov(iov, iov_len, pkt->virt_hdr.csum_start, csl, cso);
+ 
+     /* Put the checksum obtained into the packet */
+-    csum = cpu_to_be16(net_checksum_finish(csum_cntr));
++    csum = cpu_to_be16(net_checksum_finish_nozero(csum_cntr));
+     iov_from_buf(iov, iov_len, csum_offset, &csum, sizeof csum);
+ }
+ 
+diff --git a/hw/net/vmxnet3.c b/hw/net/vmxnet3.c
+index 8c4bae5..cdc307d 100644
+--- a/hw/net/vmxnet3.c
++++ b/hw/net/vmxnet3.c
+@@ -972,7 +972,8 @@ static void vmxnet3_rx_need_csum_calculate(struct NetRxPkt *pkt,
+     data = (uint8_t *)pkt_data + vhdr->csum_start;
+     len = pkt_len - vhdr->csum_start;
+     /* Put the checksum obtained into the packet */
+-    stw_be_p(data + vhdr->csum_offset, net_raw_checksum(data, len));
++    stw_be_p(data + vhdr->csum_offset,
++             net_checksum_finish_nozero(net_checksum_add(len, data)));
+ 
+     vhdr->flags &= ~VIRTIO_NET_HDR_F_NEEDS_CSUM;
+     vhdr->flags |= VIRTIO_NET_HDR_F_DATA_VALID;
+diff --git a/include/net/checksum.h b/include/net/checksum.h
+index 7df472c..05a0d27 100644
+--- a/include/net/checksum.h
++++ b/include/net/checksum.h
+@@ -34,6 +34,12 @@ net_checksum_add(int len, uint8_t *buf)
+ }
+ 
+ static inline uint16_t
++net_checksum_finish_nozero(uint32_t sum)
++{
++    return net_checksum_finish(sum) ?: 0xFFFF;
++}
++
++static inline uint16_t
+ net_raw_checksum(uint8_t *data, int length)
+ {
+     return net_checksum_finish(net_checksum_add(length, data));
+-- 
+1.9.1
