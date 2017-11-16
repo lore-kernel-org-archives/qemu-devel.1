@@ -1,15 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60871)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33374)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefan@weilnetz.de>) id 1eFNAd-0003lD-7C
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 11:37:44 -0500
+	(envelope-from <yang.zhong@intel.com>) id 1eFNCc-0005EU-SF
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 11:39:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefan@weilnetz.de>) id 1eFNAY-0006vK-B1
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 11:37:43 -0500
-From: Stefan Weil <sw@weilnetz.de>
-Date: Thu, 16 Nov 2017 17:37:32 +0100
-Message-Id: <20171116163732.31584-1-sw@weilnetz.de>
-Subject: [Qemu-devel] [PATCH for-2.11] Fix build of console and GUI
- executables for Windows
+	(envelope-from <yang.zhong@intel.com>) id 1eFNCZ-0008De-4z
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 11:39:46 -0500
+Received: from mga14.intel.com ([192.55.52.115]:12922)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <yang.zhong@intel.com>) id 1eFNCY-0008AC-7i
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 11:39:43 -0500
+Date: Thu, 16 Nov 2017 09:43:46 +0800
+From: Zhong Yang <yang.zhong@intel.com>
+Message-ID: <20171116014346.GA16015@yangzhon-Virtual>
+References: <8E78D212B8C25246BE4CE7EA0E645FE501B557EA@dggeml511-mbs.china.huawei.com>
+	<d344052d-ac24-2ce0-38bc-b8008c895946@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <d344052d-ac24-2ce0-38bc-b8008c895946@redhat.com>
+Subject: Re: [Qemu-devel] [Question] Qemu's Heap Becomes Very Large and
+ Never Reduce Down
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,35 +29,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Fam Zheng <famz@redhat.com>, qemu-trivial@nongnu.org
-Cc: qemu-devel@nongnu.org, Stefan Weil <sw@weilnetz.de>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, yang.zhong@intel.com, anthony.xu@intel.com, stefanha@redhat.com, berrange@redhat.com, stone.xulei@huawei.com, arei.gonglei@huawei.com, wangxinxin.wang@huawei.com, weidong.huang@huawei.com, zhang.zhanghailiang@huawei.com, liujunjie23@huawei.com
 
-It was broken by commit 8ecc89f6e792152496eccb684d6c8c48aba8027d which
-moved the SDL linker flags from macro libs_softmmu to macro SDL_LIBS.
+On Wed, Nov 15, 2017 at 02:18:55PM +0100, Paolo Bonzini wrote:
+> On 15/11/2017 04:14, Xulei (Stone) wrote:
+> > Hi, guys
+> > 
+> > I met a strange problem, with qemu 2.8.1:
+> > qemu consumes too many heap memory after several operations and can not
+> > release them anymore: 
+> > hot pulg/unplug disk & net, vnc connect/disconnect, guestOS reboot, etc.
+> 
+> Try with newer QEMU; until recently we used a lot of memory at startup,
+> but it was improved in 2.11.
+> 
+> However, I think Anthony also had a patch adding a malloc_trim call in
+> the RCU thread, which improved memory usage.  Anthony, do you know if
+> this is still necessary in 2.11?
+>
+  Hello Paolo,
 
-Signed-off-by: Stefan Weil <sw@weilnetz.de>
----
+  Last time, when you traveled in BeiJing, we talked about this malloc_trim() 
+  solution in RH office. At that time, you asked me to send this patch to upstream.
+  I can try this patch in the newest Qemu version if you regard this solution is
+  suitable.
 
-Peter, can you apply this fix directly, or do you need a pull request?
+  I also want to look for other more better solution, but there are some urgency 
+  tasks interrupt me.
 
-Regards
-Stefan
+  In fact, Anthony also have some other solutions for heap memory deduction in
+  our intel ClearContainer.
+ 
+  Regards,
 
- Makefile.target | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/Makefile.target b/Makefile.target
-index e4244c188a..f9a9da7e7c 100644
---- a/Makefile.target
-+++ b/Makefile.target
-@@ -22,7 +22,7 @@ QEMU_PROG_BUILD = $(QEMU_PROG)
- else
- # system emulator name
- QEMU_PROG=qemu-system-$(TARGET_NAME)$(EXESUF)
--ifneq (,$(findstring -mwindows,$(libs_softmmu)))
-+ifneq (,$(findstring -mwindows,$(SDL_LIBS)))
- # Terminate program name with a 'w' because the linker builds a windows executable.
- QEMU_PROGW=qemu-system-$(TARGET_NAME)w$(EXESUF)
- $(QEMU_PROG): $(QEMU_PROGW)
--- 
-2.11.0
+  Yang Zhong
+ 
+> Thanks,
+> 
+> Paolo
