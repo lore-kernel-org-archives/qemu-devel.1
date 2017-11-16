@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44168)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44255)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1eFH8y-0000nt-60
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 05:11:42 -0500
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1eFH9G-00010k-3B
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 05:11:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1eFH8x-0007Xa-4f
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 05:11:36 -0500
-Date: Thu, 16 Nov 2017 10:11:22 +0000
-From: "Richard W.M. Jones" <rjones@redhat.com>
-Message-ID: <20171116101122.GF2450@redhat.com>
-References: <CAJH6TXhBAaBE9gBSxksWZqNywWmencRaGyeY-oN3jbKdgUettQ@mail.gmail.com>
-	<0e6cc220-814a-17fd-4fd7-7b0665d34e81@redhat.com>
-	<CAJH6TXh2v-F=yqxQbUUawk_Ctq-sgFefGp1XvMsC=syX_5jEqA@mail.gmail.com>
-	<30b54865-2255-d13d-a054-afcf5bbd06b2@redhat.com>
-	<20171115202440.GJ19514@redhat.com>
-	<7b11bb2b-b93d-e8ff-f396-703c93549d0d@redhat.com>
-	<20171115202938.GN2787@redhat.com>
-	<CAJH6TXiPuLu62-+o2+PrUGpstrks_5pLotFEe1bAOmsbn20otw@mail.gmail.com>
-	<20171116100102.GE2450@redhat.com>
-	<CAJH6TXiVz1Xu94mFSaeSesLBZ_jViS9WL6B7T3T8ufF1nXxtfQ@mail.gmail.com>
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1eFH9E-0007s3-So
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 05:11:54 -0500
+References: <1510654613-47868-1-git-send-email-anton.nefedov@virtuozzo.com>
+	<1510654613-47868-5-git-send-email-anton.nefedov@virtuozzo.com>
+	<b9d9b3f9-480c-6e59-0e8a-1fd4f5e84b6a@redhat.com>
+From: Anton Nefedov <anton.nefedov@virtuozzo.com>
+Message-ID: <aa7e78db-1604-547e-d11f-3c033de4feab@virtuozzo.com>
+Date: Thu, 16 Nov 2017 13:11:37 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAJH6TXiVz1Xu94mFSaeSesLBZ_jViS9WL6B7T3T8ufF1nXxtfQ@mail.gmail.com>
-Subject: Re: [Qemu-devel] [Libguestfs] [qemu-img] support for XVA
+In-Reply-To: <b9d9b3f9-480c-6e59-0e8a-1fd4f5e84b6a@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 4/5] block-stream: add compress option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,29 +25,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gandalf Corvotempesta <gandalf.corvotempesta@gmail.com>
-Cc: Qemu-block <qemu-block@nongnu.org>, qemu-devel@nongnu.org, libguestfs <libguestfs@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, eblake@redhat.com, stefanha@redhat.com, famz@redhat.com, den@virtuozzo.com, jcody@redhat.com, armbru@redhat.com, dgilbert@redhat.com
 
-On Thu, Nov 16, 2017 at 11:07:10AM +0100, Gandalf Corvotempesta wrote:
-> 2017-11-16 11:01 GMT+01:00 Richard W.M. Jones <rjones@redhat.com>:
-> > As mentioned before you can use this to do a qemu-img convert using
-> > captive nbdkit:
-> >
-> >   $ nbdkit -U - \
-> >       perl script=./xva-reader.pl file=./debian8cloud.xva size=4294967296 \
-> >       --run 'qemu-img convert -f raw $nbd -O qcow2 /var/tmp/output.qcow2 -p'
+
+
+On 15/11/2017 10:16 PM, Max Reitz wrote:
+> On 2017-11-14 11:16, Anton Nefedov wrote:
+>> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+>> ---
+>>   qapi/block-core.json      |  4 ++++
+>>   include/block/block_int.h |  4 +++-
+>>   block/stream.c            | 16 ++++++++++++----
+>>   blockdev.c                | 13 ++++++++++++-
+>>   hmp.c                     |  2 ++
+>>   hmp-commands.hx           |  4 ++--
+>>   6 files changed, 35 insertions(+), 8 deletions(-)
 > 
+> Looks good to me overall, two notes below.
 > 
-> What if XVA is hosting 2 or more partitions ? Which partition are you
-> converting with this command ?
+> Max
+> 
+>> diff --git a/qapi/block-core.json b/qapi/block-core.json
+>> index ab96e34..b0d022f 100644
+>> --- a/qapi/block-core.json
+>> +++ b/qapi/block-core.json
+>> @@ -2007,6 +2007,9 @@
+>>   #
+>>   # @speed:  the maximum speed, in bytes per second
+>>   #
+>> +# @compress: true to compress data, if the target format supports it.
+>> +#            (default: false). Since 2.12.
+>> +#
+> 
+> Too many full stops (one before, one after the parentheses).  Also, this
+> makes it sound a bit like it would still be possible to specify this
+> parameter even if the target doesn't support it (and it would just be
+> ignored then), but that's not true.
+> 
+> Also, the format most parameter documentation follows for block-stream
+> is more "@parameter: Description. Default. (Since version)".
+> 
+> So I'd suggest:
+> 
+> "true to compress data; may only be set if the target format supports
+> it.  Defaults to false if omitted.  (Since 2.12)"
+> 
+> But I won't argue too much over the format, so the following is OK, too:
+> 
+> "true to compress data; may only be set if the target format supports it
+> (default: false). (Since 2.12)"
+> 
 
-See "XXX" comments in the code, left as an exercise to the reader :-)
+Thanks, will fix.
 
-Rich.
+[..]
 
--- 
-Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
-Read my programming and virtualization blog: http://rwmj.wordpress.com
-virt-df lists disk usage of guests without needing to install any
-software inside the virtual machine.  Supports Linux and Windows.
-http://people.redhat.com/~rjones/virt-df/
+>> @@ -3034,11 +3039,17 @@ void qmp_block_stream(bool has_job_id, const char *job_id, const char *device,
+>>           goto out;
+>>       }
+>>   
+>> +    if (compress && bs->drv->bdrv_co_pwritev_compressed == NULL) {
+>> +        error_setg(errp, "Compression is not supported for this drive %s",
+>> +                   bdrv_get_device_name(bs));
+> 
+> I think just device instead of bdrv_get_device_name(bs) is better (or
+> bdrv_get_device_or_node_name(bs) at least).
+> 
+
+device should be enough indeed, done.
+
+/Anton
