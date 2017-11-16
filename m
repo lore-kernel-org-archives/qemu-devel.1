@@ -1,25 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42544)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43713)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eFJ6g-00037c-EB
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 07:17:24 -0500
+	(envelope-from <jasowang@redhat.com>) id 1eFJ9b-00044D-Fk
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 07:20:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eFJ6b-00041G-I2
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 07:17:22 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35254)
+	(envelope-from <jasowang@redhat.com>) id 1eFJ9X-0001WD-6s
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 07:20:23 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51088)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1eFJ6b-0003zE-9R
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 07:17:17 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5080A6A7D2
-	for <qemu-devel@nongnu.org>; Thu, 16 Nov 2017 12:17:16 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-Date: Thu, 16 Nov 2017 13:17:02 +0100
-Message-Id: <1510834622-28800-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH v2] tests/bios-tables-test: Fix endianess
- problems when passing data to iasl
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1eFJ9W-0001V2-TA
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 07:20:19 -0500
+From: Jason Wang <jasowang@redhat.com>
+Date: Thu, 16 Nov 2017 20:20:06 +0800
+Message-Id: <1510834806-25666-1-git-send-email-jasowang@redhat.com>
+Subject: [Qemu-devel] [PATCH] Revert "Add new PCI ID for i82559a"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,293 +21,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
+To: jasowang@redhat.com, mst@redhat.com, marcel@redhat.com, qemu-devel@nongnu.org
+Cc: Stefan Weil <sw@weilnetz.de>, Michael Nawrocki <michael.nawrocki@gtri.gatech.edu>, Peter Maydell <peter.maydell@linaro.org>
 
-The bios-tables-test was writing out files that we pass to iasl in
-with the wrong endianness in the header when running on a big endian
-host. So instead of storing mixed endian information in our structures,
-let's keep everything in little endian and byte-swap it only when we
-need a value in the code.
+This reverts commit 5e89dc01133f8f5e621f6b66b356c6f37d31dafb since:
 
-Reported-by: Daniel P. Berrange <berrange@redhat.com>
-Buglink: https://bugs.launchpad.net/qemu/+bug/1724570
-Suggested-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
+- we should use ID in the spec instead the one used by OEM
+- in the future, we should allow changing id through either property
+  or EEPROM file.
+
+Cc: Stefan Weil <sw@weilnetz.de>
+Cc: Michael Nawrocki <michael.nawrocki@gtri.gatech.edu>
+Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Jason Wang <jasowang@redhat.com>
 ---
- v2: Fixed vmgenid-test which was accidentially broken in v1
+ hw/net/eepro100.c    | 13 -------------
+ include/hw/compat.h  |  4 ----
+ include/hw/pci/pci.h |  1 -
+ qemu-options.hx      |  2 +-
+ 4 files changed, 1 insertion(+), 19 deletions(-)
 
- tests/acpi-utils.h       | 27 +++++----------------------
- tests/bios-tables-test.c | 42 ++++++++++++++++++++++--------------------
- tests/vmgenid-test.c     | 22 ++++++++++++----------
- 3 files changed, 39 insertions(+), 52 deletions(-)
-
-diff --git a/tests/acpi-utils.h b/tests/acpi-utils.h
-index f8d8723..d5ca5b6 100644
---- a/tests/acpi-utils.h
-+++ b/tests/acpi-utils.h
-@@ -28,24 +28,9 @@ typedef struct {
-     bool tmp_files_retain;   /* do not delete the temp asl/aml */
- } AcpiSdtTable;
+diff --git a/hw/net/eepro100.c b/hw/net/eepro100.c
+index a63ed2c..91dd058 100644
+--- a/hw/net/eepro100.c
++++ b/hw/net/eepro100.c
+@@ -132,7 +132,6 @@ typedef struct {
+     const char *name;
+     const char *desc;
+     uint16_t device_id;
+-    uint16_t alt_device_id;
+     uint8_t revision;
+     uint16_t subsystem_vendor_id;
+     uint16_t subsystem_id;
+@@ -277,7 +276,6 @@ typedef struct {
+     /* Quasi static device properties (no need to save them). */
+     uint16_t stats_size;
+     bool has_extended_tcb_support;
+-    bool use_alt_device_id;
+ } EEPRO100State;
  
--#define ACPI_READ_FIELD(field, addr)           \
--    do {                                       \
--        switch (sizeof(field)) {               \
--        case 1:                                \
--            field = readb(addr);               \
--            break;                             \
--        case 2:                                \
--            field = readw(addr);               \
--            break;                             \
--        case 4:                                \
--            field = readl(addr);               \
--            break;                             \
--        case 8:                                \
--            field = readq(addr);               \
--            break;                             \
--        default:                               \
--            g_assert(false);                   \
--        }                                      \
-+#define ACPI_READ_FIELD(field, addr)            \
-+    do {                                        \
-+        memread(addr, &field, sizeof(field));   \
-         addr += sizeof(field);                  \
-     } while (0);
+ /* Word indices in EEPROM. */
+@@ -1857,14 +1855,6 @@ static void e100_nic_realize(PCIDevice *pci_dev, Error **errp)
  
-@@ -74,16 +59,14 @@ typedef struct {
-     } while (0);
+     TRACE(OTHER, logout("\n"));
  
- #define ACPI_ASSERT_CMP(actual, expected) do { \
--    uint32_t ACPI_ASSERT_CMP_le = cpu_to_le32(actual); \
-     char ACPI_ASSERT_CMP_str[5] = {}; \
--    memcpy(ACPI_ASSERT_CMP_str, &ACPI_ASSERT_CMP_le, 4); \
-+    memcpy(ACPI_ASSERT_CMP_str, &actual, 4); \
-     g_assert_cmpstr(ACPI_ASSERT_CMP_str, ==, expected); \
- } while (0)
- 
- #define ACPI_ASSERT_CMP64(actual, expected) do { \
--    uint64_t ACPI_ASSERT_CMP_le = cpu_to_le64(actual); \
-     char ACPI_ASSERT_CMP_str[9] = {}; \
--    memcpy(ACPI_ASSERT_CMP_str, &ACPI_ASSERT_CMP_le, 8); \
-+    memcpy(ACPI_ASSERT_CMP_str, &actual, 8); \
-     g_assert_cmpstr(ACPI_ASSERT_CMP_str, ==, expected); \
- } while (0)
- 
-diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
-index 564da45..e28e0c9 100644
---- a/tests/bios-tables-test.c
-+++ b/tests/bios-tables-test.c
-@@ -96,17 +96,20 @@ static void test_acpi_rsdp_table(test_data *data)
- static void test_acpi_rsdt_table(test_data *data)
- {
-     AcpiRsdtDescriptorRev1 *rsdt_table = &data->rsdt_table;
--    uint32_t addr = data->rsdp_table.rsdt_physical_address;
-+    uint32_t addr = le32_to_cpu(data->rsdp_table.rsdt_physical_address);
-     uint32_t *tables;
-     int tables_nr;
-     uint8_t checksum;
-+    uint32_t rsdt_table_length;
- 
-     /* read the header */
-     ACPI_READ_TABLE_HEADER(rsdt_table, addr);
-     ACPI_ASSERT_CMP(rsdt_table->signature, "RSDT");
- 
-+    rsdt_table_length = le32_to_cpu(rsdt_table->length);
-+
-     /* compute the table entries in rsdt */
--    tables_nr = (rsdt_table->length - sizeof(AcpiRsdtDescriptorRev1)) /
-+    tables_nr = (rsdt_table_length - sizeof(AcpiRsdtDescriptorRev1)) /
-                 sizeof(uint32_t);
-     g_assert(tables_nr > 0);
- 
-@@ -114,7 +117,7 @@ static void test_acpi_rsdt_table(test_data *data)
-     tables = g_new0(uint32_t, tables_nr);
-     ACPI_READ_ARRAY_PTR(tables, tables_nr, addr);
- 
--    checksum = acpi_calc_checksum((uint8_t *)rsdt_table, rsdt_table->length) +
-+    checksum = acpi_calc_checksum((uint8_t *)rsdt_table, rsdt_table_length) +
-                acpi_calc_checksum((uint8_t *)tables,
-                                   tables_nr * sizeof(uint32_t));
-     g_assert(!checksum);
-@@ -130,7 +133,7 @@ static void test_acpi_fadt_table(test_data *data)
-     uint32_t addr;
- 
-     /* FADT table comes first */
--    addr = data->rsdt_tables_addr[0];
-+    addr = le32_to_cpu(data->rsdt_tables_addr[0]);
-     ACPI_READ_TABLE_HEADER(fadt_table, addr);
- 
-     ACPI_READ_FIELD(fadt_table->firmware_ctrl, addr);
-@@ -187,13 +190,14 @@ static void test_acpi_fadt_table(test_data *data)
-     ACPI_READ_GENERIC_ADDRESS(fadt_table->xgpe1_block, addr);
- 
-     ACPI_ASSERT_CMP(fadt_table->signature, "FACP");
--    g_assert(!acpi_calc_checksum((uint8_t *)fadt_table, fadt_table->length));
-+    g_assert(!acpi_calc_checksum((uint8_t *)fadt_table,
-+                                 le32_to_cpu(fadt_table->length)));
- }
- 
- static void test_acpi_facs_table(test_data *data)
- {
-     AcpiFacsDescriptorRev1 *facs_table = &data->facs_table;
--    uint32_t addr = data->fadt_table.firmware_ctrl;
-+    uint32_t addr = le32_to_cpu(data->fadt_table.firmware_ctrl);
- 
-     ACPI_READ_FIELD(facs_table->signature, addr);
-     ACPI_READ_FIELD(facs_table->length, addr);
-@@ -212,7 +216,8 @@ static void test_dst_table(AcpiSdtTable *sdt_table, uint32_t addr)
- 
-     ACPI_READ_TABLE_HEADER(&sdt_table->header, addr);
- 
--    sdt_table->aml_len = sdt_table->header.length - sizeof(AcpiTableHeader);
-+    sdt_table->aml_len = le32_to_cpu(sdt_table->header.length)
-+                         - sizeof(AcpiTableHeader);
-     sdt_table->aml = g_malloc0(sdt_table->aml_len);
-     ACPI_READ_ARRAY_PTR(sdt_table->aml, sdt_table->aml_len, addr);
- 
-@@ -226,7 +231,7 @@ static void test_dst_table(AcpiSdtTable *sdt_table, uint32_t addr)
- static void test_acpi_dsdt_table(test_data *data)
- {
-     AcpiSdtTable dsdt_table;
--    uint32_t addr = data->fadt_table.dsdt;
-+    uint32_t addr = le32_to_cpu(data->fadt_table.dsdt);
- 
-     memset(&dsdt_table, 0, sizeof(dsdt_table));
-     data->tables = g_array_new(false, true, sizeof(AcpiSdtTable));
-@@ -245,9 +250,10 @@ static void test_acpi_tables(test_data *data)
- 
-     for (i = 0; i < tables_nr; i++) {
-         AcpiSdtTable ssdt_table;
-+        uint32_t addr;
- 
-         memset(&ssdt_table, 0, sizeof(ssdt_table));
--        uint32_t addr = data->rsdt_tables_addr[i + 1]; /* fadt is first */
-+        addr = le32_to_cpu(data->rsdt_tables_addr[i + 1]); /* fadt is first */
-         test_dst_table(&ssdt_table, addr);
-         g_array_append_val(data->tables, ssdt_table);
-     }
-@@ -268,9 +274,8 @@ static void dump_aml_files(test_data *data, bool rebuild)
-         g_assert(sdt->aml);
- 
-         if (rebuild) {
--            uint32_t signature = cpu_to_le32(sdt->header.signature);
-             aml_file = g_strdup_printf("%s/%s/%.4s%s", data_dir, data->machine,
--                                       (gchar *)&signature, ext);
-+                                       (gchar *)&sdt->header.signature, ext);
-             fd = g_open(aml_file, O_WRONLY|O_TRUNC|O_CREAT,
-                         S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH);
-         } else {
-@@ -381,7 +386,6 @@ static GArray *load_expected_aml(test_data *data)
-     GArray *exp_tables = g_array_new(false, true, sizeof(AcpiSdtTable));
-     for (i = 0; i < data->tables->len; ++i) {
-         AcpiSdtTable exp_sdt;
--        uint32_t signature;
-         gchar *aml_file = NULL;
-         const char *ext = data->variant ? data->variant : "";
- 
-@@ -390,11 +394,9 @@ static GArray *load_expected_aml(test_data *data)
-         memset(&exp_sdt, 0, sizeof(exp_sdt));
-         exp_sdt.header.signature = sdt->header.signature;
- 
--        signature = cpu_to_le32(sdt->header.signature);
+-    /* By default, the i82559a adapter uses the legacy PCI ID (for the
+-     * i82557). This allows the PCI ID to be changed to the alternate
+-     * i82559 ID if needed.
+-     */
+-    if (s->use_alt_device_id && strcmp(info->name, "i82559a") == 0) {
+-        pci_config_set_device_id(s->dev.config, info->alt_device_id);
+-    }
 -
- try_again:
-         aml_file = g_strdup_printf("%s/%s/%.4s%s", data_dir, data->machine,
--                                   (gchar *)&signature, ext);
-+                                   (gchar *)&sdt->header.signature, ext);
-         if (getenv("V")) {
-             fprintf(stderr, "\nLooking for expected file '%s'\n", aml_file);
-         }
-@@ -571,12 +573,12 @@ static void test_smbios_structs(test_data *data)
- {
-     DECLARE_BITMAP(struct_bitmap, SMBIOS_MAX_TYPE+1) = { 0 };
-     struct smbios_21_entry_point *ep_table = &data->smbios_ep_table;
--    uint32_t addr = ep_table->structure_table_address;
-+    uint32_t addr = le32_to_cpu(ep_table->structure_table_address);
-     int i, len, max_len = 0;
-     uint8_t type, prv, crt;
+     s->device = info->device;
  
-     /* walk the smbios tables */
--    for (i = 0; i < ep_table->number_of_structures; i++) {
-+    for (i = 0; i < le16_to_cpu(ep_table->number_of_structures); i++) {
+     e100_pci_reset(s, &local_err);
+@@ -1984,7 +1974,6 @@ static E100PCIDeviceInfo e100_devices[] = {
+         .desc = "Intel i82559A Ethernet",
+         .device = i82559A,
+         .device_id = PCI_DEVICE_ID_INTEL_82557,
+-        .alt_device_id = PCI_DEVICE_ID_INTEL_82559,
+         .revision = 0x06,
+         .stats_size = 80,
+         .has_extended_tcb_support = true,
+@@ -2078,8 +2067,6 @@ static E100PCIDeviceInfo *eepro100_get_class(EEPRO100State *s)
  
-         /* grab type and formatted area length from struct header */
-         type = readb(addr);
-@@ -608,9 +610,9 @@ static void test_smbios_structs(test_data *data)
-     }
+ static Property e100_properties[] = {
+     DEFINE_NIC_PROPERTIES(EEPRO100State, conf),
+-    DEFINE_PROP_BOOL("x-use-alt-device-id", EEPRO100State, use_alt_device_id,
+-                     true),
+     DEFINE_PROP_END_OF_LIST(),
+ };
  
-     /* total table length and max struct size must match entry point values */
--    g_assert_cmpuint(ep_table->structure_table_length, ==,
--                     addr - ep_table->structure_table_address);
--    g_assert_cmpuint(ep_table->max_structure_size, ==, max_len);
-+    g_assert_cmpuint(le16_to_cpu(ep_table->structure_table_length), ==,
-+                     addr - le32_to_cpu(ep_table->structure_table_address));
-+    g_assert_cmpuint(le16_to_cpu(ep_table->max_structure_size), ==, max_len);
+diff --git a/include/hw/compat.h b/include/hw/compat.h
+index f96212c..cf389b4 100644
+--- a/include/hw/compat.h
++++ b/include/hw/compat.h
+@@ -10,10 +10,6 @@
+         .driver   = "virtio-tablet-device",\
+         .property = "wheel-axis",\
+         .value    = "false",\
+-    },{\
+-        .driver   = "i82559a",\
+-        .property = "x-use-alt-device-id",\
+-        .value    = "false",\
+     },
  
-     /* required struct types must all be present */
-     for (i = 0; i < data->required_struct_types_len; i++) {
-diff --git a/tests/vmgenid-test.c b/tests/vmgenid-test.c
-index b6e7b3b..5a86b40 100644
---- a/tests/vmgenid-test.c
-+++ b/tests/vmgenid-test.c
-@@ -38,7 +38,7 @@ static uint32_t acpi_find_vgia(void)
-     uint32_t rsdp_offset;
-     uint32_t guid_offset = 0;
-     AcpiRsdpDescriptor rsdp_table;
--    uint32_t rsdt;
-+    uint32_t rsdt, rsdt_table_length;
-     AcpiRsdtDescriptorRev1 rsdt_table;
-     size_t tables_nr;
-     uint32_t *tables;
-@@ -56,14 +56,15 @@ static uint32_t acpi_find_vgia(void)
+ #define HW_COMPAT_2_9 \
+diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
+index f30e2cf..8d02a0a 100644
+--- a/include/hw/pci/pci.h
++++ b/include/hw/pci/pci.h
+@@ -70,7 +70,6 @@ extern bool pci_available;
+ /* Intel (0x8086) */
+ #define PCI_DEVICE_ID_INTEL_82551IT      0x1209
+ #define PCI_DEVICE_ID_INTEL_82557        0x1229
+-#define PCI_DEVICE_ID_INTEL_82559        0x1030
+ #define PCI_DEVICE_ID_INTEL_82801IR      0x2922
  
-     acpi_parse_rsdp_table(rsdp_offset, &rsdp_table);
- 
--    rsdt = rsdp_table.rsdt_physical_address;
-+    rsdt = le32_to_cpu(rsdp_table.rsdt_physical_address);
-     /* read the header */
-     ACPI_READ_TABLE_HEADER(&rsdt_table, rsdt);
-     ACPI_ASSERT_CMP(rsdt_table.signature, "RSDT");
-+    rsdt_table_length = le32_to_cpu(rsdt_table.length);
- 
-     /* compute the table entries in rsdt */
--    g_assert_cmpint(rsdt_table.length, >, sizeof(AcpiRsdtDescriptorRev1));
--    tables_nr = (rsdt_table.length - sizeof(AcpiRsdtDescriptorRev1)) /
-+    g_assert_cmpint(rsdt_table_length, >, sizeof(AcpiRsdtDescriptorRev1));
-+    tables_nr = (rsdt_table_length - sizeof(AcpiRsdtDescriptorRev1)) /
-                 sizeof(uint32_t);
- 
-     /* get the addresses of the tables pointed by rsdt */
-@@ -71,23 +72,24 @@ static uint32_t acpi_find_vgia(void)
-     ACPI_READ_ARRAY_PTR(tables, tables_nr, rsdt);
- 
-     for (i = 0; i < tables_nr; i++) {
--        ACPI_READ_TABLE_HEADER(&ssdt_table, tables[i]);
-+        uint32_t addr = le32_to_cpu(tables[i]);
-+        ACPI_READ_TABLE_HEADER(&ssdt_table, addr);
-         if (!strncmp((char *)ssdt_table.oem_table_id, "VMGENID", 7)) {
-             /* the first entry in the table should be VGIA
-              * That's all we need
-              */
--            ACPI_READ_FIELD(vgid_table.name_op, tables[i]);
-+            ACPI_READ_FIELD(vgid_table.name_op, addr);
-             g_assert(vgid_table.name_op == 0x08);  /* name */
--            ACPI_READ_ARRAY(vgid_table.vgia, tables[i]);
-+            ACPI_READ_ARRAY(vgid_table.vgia, addr);
-             g_assert(memcmp(vgid_table.vgia, "VGIA", 4) == 0);
--            ACPI_READ_FIELD(vgid_table.val_op, tables[i]);
-+            ACPI_READ_FIELD(vgid_table.val_op, addr);
-             g_assert(vgid_table.val_op == 0x0C);  /* dword */
--            ACPI_READ_FIELD(vgid_table.vgia_val, tables[i]);
-+            ACPI_READ_FIELD(vgid_table.vgia_val, addr);
-             /* The GUID is written at a fixed offset into the fw_cfg file
-              * in order to implement the "OVMF SDT Header probe suppressor"
-              * see docs/specs/vmgenid.txt for more details
-              */
--            guid_offset = vgid_table.vgia_val + VMGENID_GUID_OFFSET;
-+            guid_offset = le32_to_cpu(vgid_table.vgia_val) + VMGENID_GUID_OFFSET;
-             break;
-         }
-     }
+ /* Red Hat / Qumranet (for QEMU) -- see pci-ids.txt */
+diff --git a/qemu-options.hx b/qemu-options.hx
+index a39c7e4..3728e9b 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -2047,7 +2047,7 @@ that the card should have; this option currently only affects virtio cards; set
+ @var{v} = 0 to disable MSI-X. If no @option{-net} option is specified, a single
+ NIC is created.  QEMU can emulate several different models of network card.
+ Valid values for @var{type} are
+-@code{virtio}, @code{i82551}, @code{i82557b}, @code{i82559a}, @code{i82559er},
++@code{virtio}, @code{i82551}, @code{i82557b}, @code{i82559er},
+ @code{ne2k_pci}, @code{ne2k_isa}, @code{pcnet}, @code{rtl8139},
+ @code{e1000}, @code{smc91c111}, @code{lance} and @code{mcf_fec}.
+ Not all devices are supported on all targets.  Use @code{-net nic,model=help}
 -- 
-1.8.3.1
+2.7.4
