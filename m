@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39491)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40145)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1eFH1v-0004j8-0I
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 05:04:24 -0500
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1eFH30-0005Ga-TN
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 05:05:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1eFH1t-0006s7-SY
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 05:04:19 -0500
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1eFH2w-0008El-SM
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 05:05:26 -0500
 References: <1510654613-47868-1-git-send-email-anton.nefedov@virtuozzo.com>
-	<20171116032622.GB14771@lemon>
+	<1510654613-47868-4-git-send-email-anton.nefedov@virtuozzo.com>
+	<be9e3518-cca4-18b8-d56b-8e574fd782da@redhat.com>
 From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Message-ID: <1cce700e-2de3-65c8-71c9-bf395b9f39cf@virtuozzo.com>
-Date: Thu, 16 Nov 2017 13:04:04 +0300
+Message-ID: <cdff6baa-ef4a-c0e5-3274-29075a58c0fa@virtuozzo.com>
+Date: Thu, 16 Nov 2017 13:05:09 +0300
 MIME-Version: 1.0
-In-Reply-To: <20171116032622.GB14771@lemon>
+In-Reply-To: <be9e3518-cca4-18b8-d56b-8e574fd782da@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 0/5] compressed block-stream
+Subject: Re: [Qemu-devel] [PATCH 3/5] block: support compressed write for
+ copy-on-read
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,27 +26,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, stefanha@redhat.com, den@virtuozzo.com
+To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, eblake@redhat.com, stefanha@redhat.com, famz@redhat.com, den@virtuozzo.com
 
-On 16/11/2017 6:26 AM, Fam Zheng wrote:
-> On Tue, 11/14 13:16, Anton Nefedov wrote:
->> It might be useful to compress images during block-stream;
->> this way the user can merge compressed images of a backing chain and
->> the result will remain compressed.
+
+On 15/11/2017 9:49 PM, Max Reitz wrote:
+> On 2017-11-14 11:16, Anton Nefedov wrote:
+>> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+>> ---
+>>   block/io.c         | 30 ++++++++++++++++++++++++------
+>>   block/trace-events |  2 +-
+>>   2 files changed, 25 insertions(+), 7 deletions(-)
+>>
+>> diff --git a/block/io.c b/block/io.c
+>> index 3d5ef2c..93c6b24 100644
+>> --- a/block/io.c
+>> +++ b/block/io.c
 > 
-> I haven't looked at the patches yet so maybe the answer is obvious, but still:
-> would the "compress" option be still necessary if what we have is
-> blockdev-stream instead?
+> [...]
 > 
-> Fam
+>> @@ -1209,6 +1220,13 @@ int coroutine_fn bdrv_co_preadv(BdrvChild *child,
+>>           return ret;
+>>       }
+>>   
+>> +    /* write compressed only makes sense with copy on read */
+>> +    if ((flags & BDRV_REQ_WRITE_COMPRESSED) &&
+>> +        !(flags & BDRV_REQ_COPY_ON_READ))
+>> +    {
+>> +        return -EINVAL;
+>> +    }
+>> +
+> 
+> I think the assertion in bdrv_aligned_preadv() should be enough, but
+> either way:
+> 
+> Reviewed-by: Max Reitz <mreitz@redhat.com>
 > 
 
-Sorry, I can't see blockdev-stream available now. How that would be
-different? Would it imply the blocks are pulled up to the top (active)
-image?
+Ok, and it will fail more loudly. Will remove.
 
-Or did you mean block-commit? The option might be useful there as well,
-and needs to be implemented separately
-
-/Anton
+>>       bdrv_inc_in_flight(bs);
+>>   
+>>       /* Don't do copy-on-read if we read data before write operation */
+> 
