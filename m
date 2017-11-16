@@ -1,22 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39281)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39362)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eFGAh-0007bw-PQ
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 04:09:21 -0500
+	(envelope-from <jasowang@redhat.com>) id 1eFGAv-0007hn-Jf
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 04:09:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eFGAe-0001K1-Ib
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 04:09:19 -0500
-Date: Thu, 16 Nov 2017 10:09:10 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20171116100910.1a9e291a.cohuck@redhat.com>
-In-Reply-To: <07ba2257-d6b4-2a57-1151-21f3a69b89d0@de.ibm.com>
-References: <20171115154223.109991-1-borntraeger@de.ibm.com>
-	<20171115181034.5f0b624e.cohuck@redhat.com>
-	<07ba2257-d6b4-2a57-1151-21f3a69b89d0@de.ibm.com>
+	(envelope-from <jasowang@redhat.com>) id 1eFGAu-0002dZ-AV
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 04:09:33 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52304)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1eFGAu-0002Yk-1S
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 04:09:32 -0500
+References: <CACnE9pzALCNV62Jmo4SUawD=pQiPFENWR_BwK3=+yY7V1U54Ag@mail.gmail.com>
+	<cd39d029-48f9-20d6-cc19-ff87a45240ab@redhat.com>
+	<CACnE9pzm5zabq=nJhqB4LHzSXk2vDGiAN5SbJco3ZfGkfRbW-g@mail.gmail.com>
+	<5A0D27D8.6050506@huawei.com>
+	<2e0ddd76-3903-d715-9a86-73f1286322e7@redhat.com>
+	<33183CC9F5247A488A2544077AF19020DA46E2A6@DGGEMA505-MBS.china.huawei.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <a7d8545f-efb1-4ee8-d342-6171a059cfb9@redhat.com>
+Date: Thu, 16 Nov 2017 17:09:05 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] s390/kvm_virtio/linux-headers: remove
- traces of old virtio transport
+In-Reply-To: <33183CC9F5247A488A2544077AF19020DA46E2A6@DGGEMA505-MBS.china.huawei.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Question] why need to start all queues in
+ vhost_net_start
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,57 +33,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Halil Pasic <pasic@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>
+To: "Gonglei (Arei)" <arei.gonglei@huawei.com>, longpeng <longpeng2@huawei.com>, "mst@redhat.com" <mst@redhat.com>
+Cc: "Longpeng(Mike)" <longpeng.mike@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Wangjing (King, Euler)" <king.wang@huawei.com>, "Huangweidong (C)" <weidong.huang@huawei.com>, "stefanha@redhat.com" <stefanha@redhat.com>
 
-On Thu, 16 Nov 2017 08:45:09 +0100
-Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 
-> On 11/15/2017 06:10 PM, Cornelia Huck wrote:
-> > On Wed, 15 Nov 2017 16:42:23 +0100
-> > Christian Borntraeger <borntraeger@de.ibm.com> wrote:
-> >   
-> >> We no longer support the old s390 transport, neither does the newest
-> >> Linux kernel. Remove it from the linux header script as well as the
-> >> s390x virtio code.  We still should handle the VIRTIO_NOTIFY hypercall,
-> >> to tolerate early printk on older guest kernels without an sclp console.  
-> > 
-> > Are there any such guests still around? Wouldn't they be unable to run
-> > because of the missing old transport anyway?  
-> 
-> As far as I can see even an 4.13 will do
-> 
-> static int __init s390_virtio_console_init(void)
-> {
->         if (sclp.has_vt220 || sclp.has_linemode)
->                 return -ENODEV;
->         return virtio_cons_early_init(early_put_chars);
-> }
-> console_initcall(s390_virtio_console_init);
-> 
-> No matter if there is the old transport or not available.
-> 
-> So as soon as somebody chooses virtio-console you should see the diag500 from the early
-> printk.
 
-Grmpf, and the first condition does not trigger when you don't define
-any sclp console.
+On 2017=E5=B9=B411=E6=9C=8816=E6=97=A5 17:01, Gonglei (Arei) wrote:
+>
+>> -----Original Message-----
+>> From: Jason Wang [mailto:jasowang@redhat.com]
+>> Sent: Thursday, November 16, 2017 4:55 PM
+>> To: longpeng; mst@redhat.com
+>> Cc: Longpeng(Mike); qemu-devel@nongnu.org; Gonglei (Arei); Wangjing (K=
+ing,
+>> Euler); Huangweidong (C); stefanha@redhat.com
+>> Subject: Re: [Question] why need to start all queues in vhost_net_star=
+t
+>>
+>>
+>>
+>> On 2017=E5=B9=B411=E6=9C=8816=E6=97=A5 13:53, Longpeng (Mike) wrote:
+>>> On 2017/11/15 23:54, Longpeng(Mike) wrote:
+>>>> 2017-11-15 23:05 GMT+08:00 Jason Wang<jasowang@redhat.com>:
+>>>>> On 2017=E5=B9=B411=E6=9C=8815=E6=97=A5 22:55, Longpeng(Mike) wrote:
+>>>>>> Hi guys,
+>>>>>>
+>>>>>> We got a BUG report from our testers yesterday, the testing scenar=
+io was
+>>>>>> migrating a VM (Windows guest, *4 vcpus*, 4GB, vhost-user net: *7
+>>>>>> queues*).
+>>>>>>
+>>>>>> We found the cause reason, and we'll report the BUG or send a fix =
+patch
+>>>>>> to upstream if necessary( we haven't test the upstream yet, sorry.=
+.. ).
+>>>>> Could you explain this a little bit more?
+>>>>>
+>>>>>> We want to know why the vhost_net_start() must start*total queues*
+>> ( in
+>>>>>> our
+>>>>>> VM there're 7 queues ) but not*the queues that current used*  ( in=
+ our
+>> VM,
+>>>>>> guest
+>>>>>> only uses the first 4 queues because it's limited by the number of=
+ vcpus)
+>>>>>> ?
+>>>>>>
+>>>>>> Looking forward to your help, thx:)
+>>>>> Since the codes have been there for years and works well for kernel
+>>>>> datapath. You should really explain what's wrong.
+>>>>>
+>>>> OK.:)
+>>>>
+>>>> In our scenario,  the Windows's virtio-net driver only use the first=
+ 4
+>>>> queues and it
+>>>> *only set desc/avail/used table for the first 4 queues*, so in QEMU
+>>>> the desc/avail/
+>>>> used of the last 3 queues are ZERO,  but unfortunately...
+>>>> '''
+>>>> vhost_net_start
+>>>>     for (i =3D 0; i < total_queues; i++)
+>>>>       vhost_net_start_one
+>>>>         vhost_dev_start
+>>>>           vhost_virtqueue_start
+>>>> '''
+>>>> In vhost_virtqueue_start(), it will calculate the HVA of
+>>>> desc/avail/used table, so for last
+>>>> 3 queues, it will use ZERO as the GPA to calculate the HVA, and then
+>>>> send the results
+>>>> to the user-mode backend ( we use*vhost-user*  ) by
+>> vhost_virtqueue_set_addr().
+>>>> When the EVS get these address, it will update a*idx*  which will be
+>>>> treated as  vq's
+>>>> last_avail_idx when virtio-net stop ( pls see vhost_virtqueue_stop()=
+ ).
+>>>>
+>>>> So we get the following result after virtio-net stop:
+>>>>     the desc/avail/used of the last 3 queues's vqs are all ZERO, but=
+ these
+>> vqs's
+>>>>     last_avail_idx is NOT ZERO.
+>>>>
+>>>> At last, virtio_load() reports an error:
+>>>> '''
+>>>>     if (!vdev->vq[i].vring.desc && vdev->vq[i].last_avail_idx) { // =
+<--
+>>>> will be TRUE
+>>>>         error_report("VQ %d address 0x0 "
+>>>>                            "inconsistent with Host index 0x%x",
+>>>>                            i, vdev->vq[i].last_avail_idx);
+>>>>               return -1;
+>>>>      }
+>>>> '''
+>>>>
+>>>> BTW, the problem won't appear if use Linux guest, because the Linux
+>> virtio-net
+>>>> driver will set all 7 queues's desc/avail/used tables. And the probl=
+em
+>>>> won't appear
+>>>> if the VM use vhost-net, because vhost-net won't update*idx*  in
+>> SET_ADDR ioctl.
+>>
+>> Just to make sure I understand here, I thought Windows guest + vhost_n=
+et
+>> hit this issue?
+>>
+> No, Windows guest + vhost-user/DPDK.
+>
+> BTW pls see virtio spec in :
+>
+> "If VIRTIO_NET_F_MQ is negotiated, each of receiveq1. . .receiveqN that=
+ will be used SHOULD be populated
+> with receive buffers."
+>
+> It is not mandatory that all queues must be initialized.
+>
+> Thanks,
+> -Gonglei
+>
 
-Oh well, it seems we still have to drag this along :(
- 
-> >   
-> >> We continue to ignore these events.
-> >>
-> >> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> >> ---
-> >>  hw/s390x/s390-virtio-hcall.h                   |  6 ++-
-> >>  include/standard-headers/asm-s390/kvm_virtio.h | 64
-> >> --------------------------
-> >> scripts/update-linux-headers.sh                |  1 - 3 files
-> >> changed, 4 insertions(+), 67 deletions(-) delete mode 100644
-> >> include/standard-headers/asm-s390/kvm_virtio.h  
-> >   
+Interesting, vhost_net will set last_avail_idx to vq.num during=20
+SET_VRING_BASE. So I thought it should hit this.
 
-I think this becomes relevant only when someone does a headers update
-against 4.15+, which is unlikely to happen in freeze. So I'll queue
-this to s390-next only.
+Btw, maybe we should relax the check to:
+
+if (!vdev->vq[i].vring.desc && (vdev->vq[i].last_avail_idx !=3D=20
+vdev->vq[i].vring.num)) {
+
+Thanks
