@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44502)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44941)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1eFMUJ-00084e-8v
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 10:54:00 -0500
+	(envelope-from <berto@igalia.com>) id 1eFMVm-0000cH-6t
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 10:55:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1eFMUE-0004TL-Gq
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 10:53:59 -0500
-Date: Thu, 16 Nov 2017 08:53:45 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20171116085345.7b02ecdd@t450s.home>
-In-Reply-To: <20171116172602-mutt-send-email-mst@kernel.org>
-References: <20171116132339.4facb858@bahia.lab.toulouse-stg.fr.ibm.com>
-	<20171116172602-mutt-send-email-mst@kernel.org>
+	(envelope-from <berto@igalia.com>) id 1eFMVh-0005VD-C6
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 10:55:30 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <14461b9b-d62d-3723-d2bb-c2fe873207c5@virtuozzo.com>
+References: <dd350838-9132-e787-10b1-4cb200076ec9@virtuozzo.com>
+	<w51inekzv59.fsf@maestria.local.igalia.com>
+	<w518tff4dvi.fsf@maestria.local.igalia.com>
+	<20171110030223.GA7303@lemon>
+	<w518tf7k0ov.fsf@maestria.local.igalia.com>
+	<14461b9b-d62d-3723-d2bb-c2fe873207c5@virtuozzo.com>
+Date: Thu, 16 Nov 2017 16:54:44 +0100
+Message-ID: <w51bmk2qkvv.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] QEMU terminates during reboot after memory unplug
- with vhost=on
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [Qemu-block] segfault in parallel blockjobs
+ (iotest 30)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,93 +27,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Greg Kurz <groug@kaod.org>, imammedo@redhat.com, bharata@linux.vnet.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
+To: Anton Nefedov <anton.nefedov@virtuozzo.com>, Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com, John Snow <jsnow@redhat.com>
 
-On Thu, 16 Nov 2017 17:28:44 +0200
-"Michael S. Tsirkin" <mst@redhat.com> wrote:
+On Wed 15 Nov 2017 05:31:20 PM CET, Anton Nefedov wrote:
+>> I have the impression that one major source of headaches is the fact
+>> that the reopen queue contains nodes that don't need to be reopened at
+>> all. Ideally this should be detected early on in bdrv_reopen_queue(), so
+>> there's no chance that the queue contains nodes used by a different
+>> block job. If we had that then op blockers should be enough to prevent
+>> these things. Or am I missing something?
+>> 
+> After applying Max's patch I tried the similar approach; that is keep
+> BDSes referenced while they are in the reopen queue.  Now I get the
+> stream job hanging. Somehow one blk_root_drained_begin() is not paired
+> with blk_root_drained_end(). So the job stays paused.
 
-> On Thu, Nov 16, 2017 at 01:23:39PM +0100, Greg Kurz wrote:
-> > Hi,
-> > 
-> > I'm resurrecting a thread about a QEMU crash we're still hitting on ppc64. It
-> > was reported to the list by Bharata 2 months ago:
-> > 
-> > https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg03685.html
-> > 
-> > "Hi,
-> > 
-> > QEMU hits the below assert
-> > 
-> > qemu-system-ppc64: used ring relocated for ring 2
-> > qemu-system-ppc64: qemu/hw/virtio/vhost.c:649: vhost_commit: Assertion `r >= 0' failed.
-> > 
-> > in the following scenario:
-> > 
-> > 1. Boot guest with vhost=on
-> >   -netdev tap,id=mynet0,script=qemu-ifup,downscript=qemu-ifdown,vhost=on -device virtio-net-pci,netdev=mynet0
-> > 2. Hot add a DIMM device 
-> > 3. Reboot
-> >    When the guest reboots, we can see
-> >    vhost_virtqueue_start:vq->used_phys getting assigned an address that
-> >    falls in the hotplugged memory range.
-> > 4. Remove the DIMM device
-> >    Guest refuses the removal as the hotplugged memory is under use.
-> > 5. Reboot
-> >    QEMU forces the removal of the DIMM device during reset and that's
-> >    when we hit the above assert.
-> > 
-> > Any pointers on why we are hitting this assert ? Shouldn't vhost be
-> > done with using the hotplugged memory when we hit reset ?
-> > 
-> > Regards,
-> > Bharata."
-> > 
-> > #0  0x00007ffff760eff0 in raise () from /lib64/libc.so.6
-> > #1  0x00007ffff761136c in abort () from /lib64/libc.so.6
-> > #2  0x00007ffff7604c44 in __assert_fail_base () from /lib64/libc.so.6
-> > #3  0x00007ffff7604d34 in __assert_fail () from /lib64/libc.so.6
-> > #4  0x0000000010161138 in vhost_commit (listener=0x11469e88) at /home/greg/Work/qemu/qemu-spapr/hw/virtio/vhost.c:650
-> > #5  0x00000000100917fc in memory_region_transaction_commit () at /home/greg/Work/qemu/qemu-spapr/memory.c:1094
-> > #6  0x0000000010096748 in memory_region_del_subregion (mr=0x1143eed0, subregion=0x116f1920) at /home/greg/Work/qemu/qemu-spapr/memory.c:2337
-> > #7  0x00000000104a9aec in pc_dimm_memory_unplug (dev=0x11445c50, hpms=0x1143eec0, mr=0x116f1920) at /home/greg/Work/qemu/qemu-spapr/hw/mem/pc-dimm.c:126
-> > #8  0x0000000010180454 in spapr_lmb_release (dev=0x11445c50) at /home/greg/Work/qemu/qemu-spapr/hw/ppc/spapr.c:3151
-> > #9  0x00000000101a397c in spapr_drc_release (drc=0x116b9cc0) at /home/greg/Work/qemu/qemu-spapr/hw/ppc/spapr_drc.c:401
-> > #10 0x00000000101a3ba0 in spapr_drc_reset (drc=0x116b9cc0) at /home/greg/Work/qemu/qemu-spapr/hw/ppc/spapr_drc.c:439
-> > #11 0x00000000101a3c88 in drc_reset (opaque=0x116b9cc0) at /home/greg/Work/qemu/qemu-spapr/hw/ppc/spapr_drc.c:460
-> > #12 0x0000000010447380 in qemu_devices_reset () at /home/greg/Work/qemu/qemu-spapr/hw/core/reset.c:69
-> > #13 0x000000001017ae80 in ppc_spapr_reset () at /home/greg/Work/qemu/qemu-spapr/hw/ppc/spapr.c:1445
-> > #14 0x0000000010377c60 in qemu_system_reset (reason=SHUTDOWN_CAUSE_HOST_QMP) at /home/greg/Work/qemu/qemu-spapr/vl.c:1788
-> > #15 0x00000000103785ac in main_loop_should_exit () at /home/greg/Work/qemu/qemu-spapr/vl.c:1962
-> > #16 0x0000000010378708 in main_loop () at /home/greg/Work/qemu/qemu-spapr/vl.c:1999
-> > #17 0x0000000010382c54 in main (argc=21, argv=0x7ffffffff098, envp=0x7ffffffff148) at /home/greg/Work/qemu/qemu-spapr/vl.c:4897
-> > 
-> > 
-> > This basically happens because on pseries, like x86, we usually wait
-> > for the guest to eject the DIMM before actually removing it, BUT,
-> > unlike x86, we force the removal on reset. This is handled by a DRC
-> > object which registers a handler with qemu_register_reset().
-> > 
-> > At reset time, the machine calls qemu_devices_reset() but unfortunately,
-> > the DRC reset handler gets called BEFORE the VirtIONet device one. The
-> > vhost device is still active and it doesn't like the ring addresses to
-> > change while in this state.
-> > 
-> > Michael,
-> > 
-> > The assert() has been around since the beginning, at a time I believe there was
-> > no such thing as memory hot-unplug. Now that memory can go away at reset time,
-> > is it really legitimate to crash QEMU if vhost detects a ring address change ?  
-> 
-> It's just a symptom of a problem though. If memory is going away
-> while vhost backend is running, things are not going to
-> end well. Less scary for a network device, more scary for a block
-> device. VFIO probably has the same issue, it just does not
-> have an assert.
+I can see this if I apply Max's patch and keep refs to BDSs in the
+reopen queue:
 
-Hmm, why?  We don't have data structures living in guest RAM with
-vfio.  Guest RAM is just a mapping through the IOMMU.  So long as the
-MemoryListener is correctly doing its job, that range will be unmapped
-and vfio shouldn't care about it.  Thanks,
+#0  block_job_pause (...) at blockjob.c:130
+#1  0x000055c143cb586d in block_job_drained_begin (...) at blockjob.c:227
+#2  0x000055c143d08067 in blk_set_dev_ops (...) at block/block-backend.c:887
+#3  0x000055c143cb69db in block_job_create (...) at blockjob.c:678
+#4  0x000055c143d17c0c in mirror_start_job (...) at block/mirror.c:1177
 
-Alex
+There's a ops->drained_begin(opaque) call in blk_set_dev_ops() that
+doesn't seem to be paired. And when you call block_job_start() then it
+yields immediately waiting for the resume (that never arrives).
+
+John, this change was yours (f4d9cc88ee69a5b04). Any idea?
+
+Berto
