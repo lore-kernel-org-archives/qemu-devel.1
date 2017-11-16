@@ -1,21 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58886)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34486)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eFEgW-0001wQ-Lu
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 02:34:05 -0500
+	(envelope-from <borntraeger@de.ibm.com>) id 1eFErS-0003cF-5X
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 02:45:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eFEgV-0003WB-MQ
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 02:34:04 -0500
-References: <20171113194857.13933-1-eblake@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <c844bfa1-d976-07eb-04e5-6dfa54b48635@virtuozzo.com>
-Date: Thu, 16 Nov 2017 10:33:49 +0300
+	(envelope-from <borntraeger@de.ibm.com>) id 1eFErO-0006QP-OR
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 02:45:21 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:57304
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1eFErO-0006PN-J8
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 02:45:18 -0500
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	vAG7i78w147051
+	for <qemu-devel@nongnu.org>; Thu, 16 Nov 2017 02:45:15 -0500
+Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2e96ey88am-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 16 Nov 2017 02:45:14 -0500
+Received: from localhost
+	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Thu, 16 Nov 2017 07:45:13 -0000
+References: <20171115154223.109991-1-borntraeger@de.ibm.com>
+	<20171115181034.5f0b624e.cohuck@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Thu, 16 Nov 2017 08:45:09 +0100
 MIME-Version: 1.0
-In-Reply-To: <20171113194857.13933-1-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20171115181034.5f0b624e.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH for-2.11] nbd/client: Don't hard-disconnect
- on ESHUTDOWN from server
+Content-Transfer-Encoding: 7bit
+Message-Id: <07ba2257-d6b4-2a57-1151-21f3a69b89d0@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH] s390/kvm_virtio/linux-headers: remove
+ traces of old virtio transport
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,63 +44,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
-
-13.11.2017 22:48, Eric Blake wrote:
-> The NBD spec says that a server may fail any transmission request
-> with ESHUTDOWN when it is apparent that no further request from
-> the client can be successfully honored.  The client is supposed
-> to then initiate a soft shutdown (wait for all remaining in-flight
-> requests to be answered, then send NBD_CMD_DISC).  However, since
-> qemu's server never uses ESHUTDOWN errors, this code was mostly
-> untested since its introduction in commit b6f5d3b5.
->
-> More recently, I learned that nbdkit as the NBD server is able to
-> send ESHUTDOWN errors, so I finally tested this code, and noticed
-> that our client was special-casing ESHUTDOWN to cause a hard
-> shutdown (immediate disconnect, with no NBD_CMD_DISC), but only
-> if the server sends this error as a simple reply.  Further
-> investigation found that commit d2febedb introduced a regression
-> where structured replies behave differently than simple replies -
-> but that the structured reply behavior is more in line with the
-> spec (even if we still lack code in nbd-client.c to properly quit
-> sending further requests).  So this patch reverts the portion of
-> b6f5d3b5 that introduced an improper hard-disconnect special-case
-> at the lower level, and leaves the future enhancement of a nicer
-> soft-disconnect at the higher level for another day.
->
-> CC: qemu-trivial@nongnu.org
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-
-> ---
->   nbd/client.c | 6 ------
->   1 file changed, 6 deletions(-)
->
-> diff --git a/nbd/client.c b/nbd/client.c
-> index 4e15fc484d..eea236ca06 100644
-> --- a/nbd/client.c
-> +++ b/nbd/client.c
-> @@ -996,15 +996,9 @@ int nbd_receive_reply(QIOChannel *ioc, NBDReply *reply, Error **errp)
->           if (ret < 0) {
->               break;
->           }
-> -
->           trace_nbd_receive_simple_reply(reply->simple.error,
->                                          nbd_err_lookup(reply->simple.error),
->                                          reply->handle);
-> -        if (reply->simple.error == NBD_ESHUTDOWN) {
-> -            /* This works even on mingw which lacks a native ESHUTDOWN */
-> -            error_setg(errp, "server shutting down");
-> -            return -EINVAL;
-> -        }
->           break;
->       case NBD_STRUCTURED_REPLY_MAGIC:
->           ret = nbd_receive_structured_reply_chunk(ioc, &reply->structured, errp);
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Halil Pasic <pasic@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>
 
 
--- 
-Best regards,
-Vladimir
+
+On 11/15/2017 06:10 PM, Cornelia Huck wrote:
+> On Wed, 15 Nov 2017 16:42:23 +0100
+> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+> 
+>> We no longer support the old s390 transport, neither does the newest
+>> Linux kernel. Remove it from the linux header script as well as the
+>> s390x virtio code.  We still should handle the VIRTIO_NOTIFY hypercall,
+>> to tolerate early printk on older guest kernels without an sclp console.
+> 
+> Are there any such guests still around? Wouldn't they be unable to run
+> because of the missing old transport anyway?
+
+As far as I can see even an 4.13 will do
+
+static int __init s390_virtio_console_init(void)
+{
+        if (sclp.has_vt220 || sclp.has_linemode)
+                return -ENODEV;
+        return virtio_cons_early_init(early_put_chars);
+}
+console_initcall(s390_virtio_console_init);
+
+No matter if there is the old transport or not available.
+
+So as soon as somebody chooses virtio-console you should see the diag500 from the early
+printk.
+
+
+> 
+>> We continue to ignore these events.
+>>
+>> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+>> ---
+>>  hw/s390x/s390-virtio-hcall.h                   |  6 ++-
+>>  include/standard-headers/asm-s390/kvm_virtio.h | 64 --------------------------
+>>  scripts/update-linux-headers.sh                |  1 -
+>>  3 files changed, 4 insertions(+), 67 deletions(-)
+>>  delete mode 100644 include/standard-headers/asm-s390/kvm_virtio.h
+> 
