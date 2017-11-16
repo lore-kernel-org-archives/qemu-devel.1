@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33820)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33852)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eFIpW-0001i7-VB
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 06:59:42 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eFIpa-0001lb-8f
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 06:59:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eFIpR-0008W1-6L
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 06:59:39 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48224)
+	(envelope-from <pbonzini@redhat.com>) id 1eFIpY-0000DA-6f
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 06:59:42 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55478)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eFIpQ-0008V3-Uq
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 06:59:33 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 071C04A6EA
-	for <qemu-devel@nongnu.org>; Thu, 16 Nov 2017 11:59:32 +0000 (UTC)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eFIpY-0000Ca-0T
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 06:59:40 -0500
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 16 Nov 2017 12:59:17 +0100
-Message-Id: <20171116115926.16627-3-pbonzini@redhat.com>
+Date: Thu, 16 Nov 2017 12:59:21 +0100
+Message-Id: <20171116115926.16627-7-pbonzini@redhat.com>
 In-Reply-To: <20171116115926.16627-1-pbonzini@redhat.com>
 References: <20171116115926.16627-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 02/11] ioapic/tracing: Remove last DPRINTFs
+Subject: [Qemu-devel] [PULL 06/11] vhost-user-scsi: add missing
+ virtqueue_size param
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,98 +25,41 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Dariusz Stojaczyk <dariuszx.stojaczyk@intel.com>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+From: Dariusz Stojaczyk <dariuszx.stojaczyk@intel.com>
 
-Remove the last few DPRINTFs from hw/intc/ioapic.c and turn
-them into tracing.  In one case it's a new trace, in the others
-it's just adding a parameter to the existing traces.
+Commit 5c0919d0 [1] introduced virtqueue_size parameter
+for common virtio-scsi path, without updaing the vhost-user-scsi
+code. vhost-user-scsi devices right now report size 0 for each vq.
 
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Message-Id: <20171102180310.24760-1-dgilbert@redhat.com>
-Reviewed-by: Peter Xu <peterx@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+This patch introduces virtqueue_size param to vhost-user-scsi,
+that can now be set by the user. However, the most importantly, it
+now has a default value of 128 (same as QEMU's virtio-scsi).
+
+[1] 5c0919d0 ("virtio-scsi: Add virtqueue_size parameter
+allowing virtqueue size to be set.")
+
+Change-Id: I70e87eab702ebf1196c028dbf17d54fdc0c89a14
+Signed-off-by: Dariusz Stojaczyk <dariuszx.stojaczyk@intel.com>
+Message-Id: <1510676916-76409-1-git-send-email-dariuszx.stojaczyk@intel.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/intc/ioapic.c     | 17 +++--------------
- hw/intc/trace-events |  5 +++--
- 2 files changed, 6 insertions(+), 16 deletions(-)
+ hw/scsi/vhost-user-scsi.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/hw/intc/ioapic.c b/hw/intc/ioapic.c
-index 37c4386ae3..36139a4db6 100644
---- a/hw/intc/ioapic.c
-+++ b/hw/intc/ioapic.c
-@@ -35,15 +35,6 @@
- #include "hw/i386/x86-iommu.h"
- #include "trace.h"
- 
--//#define DEBUG_IOAPIC
--
--#ifdef DEBUG_IOAPIC
--#define DPRINTF(fmt, ...)                                       \
--    do { printf("ioapic: " fmt , ## __VA_ARGS__); } while (0)
--#else
--#define DPRINTF(fmt, ...)
--#endif
--
- #define APIC_DELIVERY_MODE_SHIFT 8
- #define APIC_POLARITY_SHIFT 14
- #define APIC_TRIG_MODE_SHIFT 15
-@@ -157,7 +148,7 @@ static void ioapic_set_irq(void *opaque, int vector, int level)
-      * to GSI 2.  GSI maps to ioapic 1-1.  This is not
-      * the cleanest way of doing it but it should work. */
- 
--    DPRINTF("%s: %s vec %x\n", __func__, level ? "raise" : "lower", vector);
-+    trace_ioapic_set_irq(vector, level);
-     if (vector == 0) {
-         vector = 2;
-     }
-@@ -290,11 +281,10 @@ ioapic_mem_read(void *opaque, hwaddr addr, unsigned int size)
-                 }
-             }
-         }
--        DPRINTF("read: %08x = %08x\n", s->ioregsel, val);
-         break;
-     }
- 
--    trace_ioapic_mem_read(addr, size, val);
-+    trace_ioapic_mem_read(addr, s->ioregsel, size, val);
- 
-     return val;
- }
-@@ -335,7 +325,7 @@ ioapic_mem_write(void *opaque, hwaddr addr, uint64_t val,
-     int index;
- 
-     addr &= 0xff;
--    trace_ioapic_mem_write(addr, size, val);
-+    trace_ioapic_mem_write(addr, s->ioregsel, size, val);
- 
-     switch (addr) {
-     case IOAPIC_IOREGSEL:
-@@ -345,7 +335,6 @@ ioapic_mem_write(void *opaque, hwaddr addr, uint64_t val,
-         if (size != 4) {
-             break;
-         }
--        DPRINTF("write: %08x = %08" PRIx64 "\n", s->ioregsel, val);
-         switch (s->ioregsel) {
-         case IOAPIC_REG_ID:
-             s->id = (val >> IOAPIC_ID_SHIFT) & IOAPIC_ID_MASK;
-diff --git a/hw/intc/trace-events b/hw/intc/trace-events
-index b86f242b0f..b298fac7c6 100644
---- a/hw/intc/trace-events
-+++ b/hw/intc/trace-events
-@@ -18,8 +18,9 @@ apic_mem_writel(uint64_t addr, uint32_t val) "0x%"PRIx64" = 0x%08x"
- ioapic_set_remote_irr(int n) "set remote irr for pin %d"
- ioapic_clear_remote_irr(int n, int vector) "clear remote irr for pin %d vector %d"
- ioapic_eoi_broadcast(int vector) "EOI broadcast for vector %d"
--ioapic_mem_read(uint8_t addr, uint8_t size, uint32_t val) "ioapic mem read addr 0x%"PRIx8" size 0x%"PRIx8" retval 0x%"PRIx32
--ioapic_mem_write(uint8_t addr, uint8_t size, uint32_t val) "ioapic mem write addr 0x%"PRIx8" size 0x%"PRIx8" val 0x%"PRIx32
-+ioapic_mem_read(uint8_t addr, uint8_t regsel, uint8_t size, uint32_t val) "ioapic mem read addr 0x%"PRIx8" regsel: 0x%"PRIx8" size 0x%"PRIx8" retval 0x%"PRIx32
-+ioapic_mem_write(uint8_t addr, uint8_t regsel, uint8_t size, uint32_t val) "ioapic mem write addr 0x%"PRIx8" regsel: 0x%"PRIx8" size 0x%"PRIx8" val 0x%"PRIx32
-+ioapic_set_irq(int vector, int level) "vector: %d level: %d"
- 
- # hw/intc/slavio_intctl.c
- slavio_intctl_mem_readl(uint32_t cpu, uint64_t addr, uint32_t ret) "read cpu %d reg 0x%"PRIx64" = 0x%x"
+diff --git a/hw/scsi/vhost-user-scsi.c b/hw/scsi/vhost-user-scsi.c
+index 500fa6a067..f7561e23fa 100644
+--- a/hw/scsi/vhost-user-scsi.c
++++ b/hw/scsi/vhost-user-scsi.c
+@@ -135,6 +135,8 @@ static Property vhost_user_scsi_properties[] = {
+     DEFINE_PROP_CHR("chardev", VirtIOSCSICommon, conf.chardev),
+     DEFINE_PROP_UINT32("boot_tpgt", VirtIOSCSICommon, conf.boot_tpgt, 0),
+     DEFINE_PROP_UINT32("num_queues", VirtIOSCSICommon, conf.num_queues, 1),
++    DEFINE_PROP_UINT32("virtqueue_size", VirtIOSCSICommon, conf.virtqueue_size,
++                       128),
+     DEFINE_PROP_UINT32("max_sectors", VirtIOSCSICommon, conf.max_sectors,
+                        0xFFFF),
+     DEFINE_PROP_UINT32("cmd_per_lun", VirtIOSCSICommon, conf.cmd_per_lun, 128),
 -- 
 2.14.3
