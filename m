@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42734)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45627)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1eFOTI-0000Xj-NI
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 13:01:08 -0500
+	(envelope-from <Michael.Nawrocki@gtri.gatech.edu>)
+	id 1eFObB-0003vl-T4
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 13:09:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1eFOTC-000462-TV
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 13:01:04 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33318)
+	(envelope-from <Michael.Nawrocki@gtri.gatech.edu>)
+	id 1eFOb9-00005t-7G
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 13:09:13 -0500
+Received: from relay2.gtri.gatech.edu ([130.207.199.168]:49229)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <rjones@redhat.com>) id 1eFOTC-00043c-My
-	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 13:00:58 -0500
-Date: Thu, 16 Nov 2017 18:00:54 +0000
-From: "Richard W.M. Jones" <rjones@redhat.com>
-Message-ID: <20171116180054.GZ2787@redhat.com>
-References: <20171115115246.GA1955@redhat.com>
-	<20171116144746.GE29106@stefanha-x1.localdomain>
-	<20171116151031.GV2787@redhat.com>
-	<CAJSP0QWop2Xvjp5bObJ0yRoJ=W-6cH84fGHXj5b93Qb6TxCxDA@mail.gmail.com>
+	(Exim 4.71) (envelope-from <Michael.Nawrocki@gtri.gatech.edu>)
+	id 1eFOb9-0008WR-0a
+	for qemu-devel@nongnu.org; Thu, 16 Nov 2017 13:09:11 -0500
+References: <20171106203520.7880-1-michael.nawrocki@gtri.gatech.edu>
+	<20171106203520.7880-2-michael.nawrocki@gtri.gatech.edu>
+	<41891d99-8cb7-79a6-9aa7-0bfe3d192f41@redhat.com>
+	<59e0dcbc-ed53-8fc5-4a0f-3830056f2145@redhat.com>
+From: Michael Nawrocki <michael.nawrocki@gtri.gatech.edu>
+Message-ID: <428e44cb-5f51-d47c-f8ff-f0ce504ab976@gtri.gatech.edu>
+Date: Thu, 16 Nov 2017 13:09:08 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAJSP0QWop2Xvjp5bObJ0yRoJ=W-6cH84fGHXj5b93Qb6TxCxDA@mail.gmail.com>
-Subject: Re: [Qemu-devel] Effect of qemu-img convert -m and -W options
+In-Reply-To: <59e0dcbc-ed53-8fc5-4a0f-3830056f2145@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] Fix eepro100 simple transmission
+ mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,30 +34,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: libguestfs@redhat.com, Peter Lieven <pl@kamp.de>, qemu-devel <qemu-devel@nongnu.org>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Cc: marcel@redhat.com, Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>, qemu-s390x@nongnu.org, mst@redhat.com
 
-On Thu, Nov 16, 2017 at 05:30:48PM +0000, Stefan Hajnoczi wrote:
-> On Thu, Nov 16, 2017 at 3:10 PM, Richard W.M. Jones <rjones@redhat.com> wrote:
-> > Both local filesystems, but on different SATA devices.
+On 11/16/2017 12:43 PM, Thomas Huth wrote:
+> On 16.11.2017 17:59, Thomas Huth wrote:
+>> On 06.11.2017 21:35, Mike Nawrocki wrote:
+>>> The simple transmission mode was treating the area immediately after the
+>>> transmit command block (TCB) as if it were a transmit buffer descriptor,
+>>> when in reality it is simply the packet data. This change simply copies
+>>> the data following the TCB into the packet buffer.
+>>>
+>>> Signed-off-by: Mike Nawrocki <michael.nawrocki@gtri.gatech.edu>
+>>> ---
+>>>   hw/net/eepro100.c | 18 +++---------------
+>>>   1 file changed, 3 insertions(+), 15 deletions(-)
+>>>
+>>> diff --git a/hw/net/eepro100.c b/hw/net/eepro100.c
+>>> index 80b8f47c4b..91dd058010 100644
+>>> --- a/hw/net/eepro100.c
+>>> +++ b/hw/net/eepro100.c
+>>> @@ -774,23 +774,11 @@ static void tx_command(EEPRO100State *s)
+>>>       }
+>>>       assert(tcb_bytes <= sizeof(buf));
+>>>       while (size < tcb_bytes) {
+>>> -        uint32_t tx_buffer_address = ldl_le_pci_dma(&s->dev, tbd_address);
+>>> -        uint16_t tx_buffer_size = lduw_le_pci_dma(&s->dev, tbd_address + 4);
+>>> -#if 0
+>>> -        uint16_t tx_buffer_el = lduw_le_pci_dma(&s->dev, tbd_address + 6);
+>>> -#endif
+>>> -        if (tx_buffer_size == 0) {
+>>> -            /* Prevent an endless loop. */
+>>> -            logout("loop in %s:%u\n", __FILE__, __LINE__);
+>>> -            break;
+>>> -        }
+>>> -        tbd_address += 8;
+>>>           TRACE(RXTX, logout
+>>>               ("TBD (simplified mode): buffer address 0x%08x, size 0x%04x\n",
+>>> -             tx_buffer_address, tx_buffer_size));
+>>> -        tx_buffer_size = MIN(tx_buffer_size, sizeof(buf) - size);
+>>> -        pci_dma_read(&s->dev, tx_buffer_address, &buf[size], tx_buffer_size);
+>>> -        size += tx_buffer_size;
+>>> +             tbd_address, tcb_bytes));
+>>> +        pci_dma_read(&s->dev, tbd_address, &buf[size], tcb_bytes);
+>>> +        size += tcb_bytes;
+>>>       }
+>>>       if (tbd_array == 0xffffffff) {
+>>>           /* Simplified mode. Was already handled by code above. */
+>>>
+>>
+>>   Hi,
+>>
+>> I've got no clue why, but apparently this patch introduced a regression
+>> in rc1: The tests/pxe-test is now failing on a big endian (s390x) host
+>> when testing the i82550 device.
+>> It's working fine with commit 8fa5ad6dfb66b6c695aa6a6b54b7031c (and
+>> 2.11-rc0), and it's broken starting with commit
+>> 1865e288a823c764cd4344d704e33344 ... do you have any clue what might be
+>> wrong here now?
 > 
-> Okay.  I'm curious what the strace -f output looks like (only the
-> preadv(2)/pwritev(2) syscalls are interesting at the moment).
+> This patch seems to fix the issue for me:
+> 
+> diff --git a/hw/net/eepro100.c b/hw/net/eepro100.c
+> index a63ed2c..03e00f7 100644
+> --- a/hw/net/eepro100.c
+> +++ b/hw/net/eepro100.c
+> @@ -756,8 +756,8 @@ static void read_cb(EEPRO100State *s)
+>   
+>   static void tx_command(EEPRO100State *s)
+>   {
+> -    uint32_t tbd_array = le32_to_cpu(s->tx.tbd_array_addr);
+> -    uint16_t tcb_bytes = (le16_to_cpu(s->tx.tcb_bytes) & 0x3fff);
+> +    uint32_t tbd_array = s->tx.tbd_array_addr;
+> +    uint16_t tcb_bytes = s->tx.tcb_bytes & 0x3fff;
+>       /* Sends larger than MAX_ETH_FRAME_SIZE are allowed, up to 2600 bytes. */
+>       uint8_t buf[2600];
+>       uint16_t size = 0;
+> 
+> Does that make sense? I think the fields are already swapped in
+> read_cb(), so no need to swap them in tx_command() again?
+> 
+>   Thomas
+> 
 
-Here's the full strace from one run:
+That makes sense to me. Not entirely sure why my patch caused the 
+regression, but your patch seems like the correct behavior here.
 
-  http://oirase.annexia.org/tmp/strace.xz
-
-The command is (with the output.qcow2 file created in a previous run):
-
-  $ strace -o /tmp/strace -f -s 1024 qemu-img convert -f raw fedora-27.img -O qcow2 /var/tmp/output.qcow2 -m 8 -W -n
-
-The version of qemu is: qemu-2.10.0-7.fc28.x86_64
-
-Rich.
-
--- 
-Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
-Read my programming and virtualization blog: http://rwmj.wordpress.com
-virt-builder quickly builds VMs from scratch
-http://libguestfs.org/virt-builder.1.html
+Thanks,
+Mike
